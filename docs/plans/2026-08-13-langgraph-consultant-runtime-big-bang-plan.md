@@ -214,11 +214,11 @@ Big-bang 只代表最後一次硬切，不允許累積十個 Task 後才發現�
 
 **Produces:** Framework-neutral commands, durable snapshots and typed SSE events; no legacy DTO aliases.
 
-- [ ] Define JSON Schema for catalog, current interview reason, understanding projection／calibration, visible work units, coverage／depth／decision／gap, advisory sufficiency, messages, document changesets／review decisions, required clarification, approved document, readiness and durable run snapshot.
-- [ ] Add endpoints for create／read／delete, submit employee answer (202＋run ID), read snapshot, typed SSE, review command, calibration／clarification answer, direct edit and export. Do not add pause／finish endpoints.
-- [ ] Test source-first admission: while an answer is pending／failed, a second AI interview answer is rejected with a typed recoverable problem; read, review, direct edit, export and delete remain available.
-- [ ] Enforce idempotency, payload hash, document scope, stale errors and untrusted client payloads. SSE only triggers refetch and never owns state.
-- [ ] Run contract schema tests, codegen zero-diff check and entire API suite; run the common north-star gate, append the Task 7 ledger entry and commit `feat: expose consultant runtime contract`.
+- [x] Define JSON Schema for catalog, current interview reason, understanding projection／calibration, visible work units, coverage／depth／decision／gap, advisory sufficiency, messages, document changesets／review decisions, required clarification, approved document, readiness and durable run snapshot.
+- [x] Add endpoints for create／read／delete, submit employee answer (202＋run ID), read snapshot, typed SSE, review command, calibration／clarification answer, direct edit and export. Do not add pause／finish endpoints.
+- [x] Test source-first admission: while an answer is pending／failed, a second AI interview answer is rejected with a typed recoverable problem; read, review, direct edit, export and delete remain available.
+- [x] Enforce idempotency, payload hash, document scope, stale errors and untrusted client payloads. SSE only triggers refetch and never owns state.
+- [x] Run contract schema tests, deterministic codegen check and entire API suite; run the common north-star gate, append the Task 7 ledger entry and commit `feat: expose consultant runtime contract`.
 
 ### Task 8: Deliver the employee-facing consultant workspace
 

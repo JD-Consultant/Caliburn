@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Annotated, Any
 
@@ -12,6 +13,7 @@ from langchain.agents.middleware.types import AgentState, PrivateStateAttr
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
+from langchain_core.tools import BaseTool
 from langgraph.channels.untracked_value import UntrackedValue
 from langgraph.runtime import Runtime
 from typing_extensions import NotRequired, override
@@ -161,6 +163,7 @@ def build_professional_consultant_agent(
     model: BaseChatModel,
     execution: ResolvedExecution,
     selected_skill_ids: tuple[str, ...],
+    source_tools: Sequence[BaseTool] = (),
     context_middleware: AgentMiddleware | None = None,
     context_schema: type[Any] | None = None,
 ) -> ProfessionalConsultantAgent:
@@ -204,6 +207,7 @@ def build_professional_consultant_agent(
         model=model,
         execution=execution,
         response_schema=ConsultantResult,
+        tools=source_tools,
         additional_middleware=(skills, files, lookup_cap),
         context_middleware=context_middleware,
         context_schema=context_schema,

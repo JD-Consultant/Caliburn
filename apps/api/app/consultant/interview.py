@@ -34,6 +34,7 @@ from app.consultant.state import (
     InterviewWorkStatus,
     RequiredClarification,
     RunReceipt,
+    RunExecutionEvidence,
     RunStatus,
     UnderstandingCalibration,
     UnderstandingItem,
@@ -50,6 +51,7 @@ class VerifiedConsultantCommit(DurableModel):
     started_at: datetime
     completed_at: datetime
     returning_after_long_gap: bool = False
+    execution_evidence: RunExecutionEvidence | None = None
     result: ConsultantResult
 
     @model_validator(mode="after")
@@ -485,6 +487,7 @@ def apply_verified_consultant_commit(
         source_id=commit.answer_source_id,
         started_at=commit.started_at,
         completed_at=commit.completed_at,
+        execution_evidence=commit.execution_evidence,
     )
     return {
         "revision": revision,

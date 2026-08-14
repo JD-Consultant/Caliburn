@@ -13,6 +13,7 @@ from uuid import UUID
 from langchain.agents.middleware import AgentMiddleware, ModelRequest, ModelResponse
 from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
 from langchain_core.messages.utils import count_tokens_approximately
+from langchain_core.tools import BaseTool, tool
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.adapters.langgraph.postgres import PostgresConsultantRuntime
@@ -248,6 +249,82 @@ class DocumentSourceLookup:
             scored.append((exact_count * 100 + term_count, source.created_at, source))
         scored.sort(key=lambda item: (item[0], item[1]), reverse=True)
         return tuple(item[2] for item in scored[:limit])
+
+
+def _source_tool_payload(source: EmployeeSource) -> dict[str, Any]:
+    """Return exact employee evidence without Store/control-plane metadata."""
+
+    return {
+        "source_id": str(source.source_id),
+        "kind": source.kind.value,
+        "text": source.text,
+        "created_at": source.created_at.isoformat(),
+        "validity": source.validity.value,
+        "supersedes_source_id": (
+            str(source.supersedes_source_id)
+            if source.supersedes_source_id is not None
+            else None
+        ),
+        "superseded_by_source_id": (
+            str(source.superseded_by_source_id)
+            if source.superseded_by_source_id is not None
+            else None
+        ),
+    }
+
+
+def build_source_lookup_tools(
+    lookup: DocumentSourceLookup,
+    *,
+    document_id: UUID,
+) -> tuple[BaseTool, ...]:
+    """Bind mature LangChain tools to exactly one document's evidence namespace."""
+
+    @tool(
+        "source_by_id",
+        description=(
+            "Read one exact employee evidence source by the source ID shown in the "
+            "consultant context. The document scope is fixed by the server."
+        ),
+    )
+    async def source_by_id(source_id: UUID) -> dict[str, Any]:
+        return _source_tool_payload(await lookup.by_id(document_id, source_id))
+
+    @tool(
+        "source_lineage",
+        description=(
+            "Read the correction lineage for one employee source, oldest to newest. "
+            "Use it when a source was corrected or superseded."
+        ),
+    )
+    async def source_lineage(source_id: UUID) -> list[dict[str, Any]]:
+        return [
+            _source_tool_payload(source)
+            for source in await lookup.lineage(document_id, source_id)
+        ]
+
+    @tool(
+        "source_lexical_search",
+        description=(
+            "Search current employee evidence in this document by exact words. "
+            "Use a concise query and inspect returned source IDs before citing them."
+        ),
+    )
+    async def source_lexical_search(
+        query: str,
+        limit: int = 5,
+    ) -> list[dict[str, Any]]:
+        return [
+            _source_tool_payload(source)
+            for source in await lookup.search(
+                document_id,
+                query=query,
+                mode=SourceLookupMode.LEXICAL,
+                limit=limit,
+            )
+        ]
+
+    return (source_by_id, source_lineage, source_lexical_search)
 
 
 async def _gather_sources(

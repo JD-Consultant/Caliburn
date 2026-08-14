@@ -21,6 +21,7 @@ from app.consultant.context import (
     SemanticSourceIndex,
     SourceLookupMode,
     build_consultant_context,
+    build_source_lookup_tools,
 )
 from app.consultant.document_review import create_document_changeset
 from app.consultant.model_runtime import (
@@ -548,6 +549,63 @@ async def test_optional_semantic_index_stays_document_scoped_and_is_not_rag(
             )
         finally:
             await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
+async def test_langchain_source_tools_are_document_scoped_and_expose_exact_evidence(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    other_document_id = uuid4()
+    other_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        try:
+            await runtime.create_document(document_id, title="採購職務")
+            await runtime.create_document(other_document_id, title="他份職務")
+            await runtime.record_employee_source(
+                document_id=document_id,
+                source_id=source_id,
+                kind=EmployeeSourceKind.EMPLOYEE_TURN,
+                text="我每週整理採購需求。",
+            )
+            await runtime.record_employee_source(
+                document_id=other_document_id,
+                source_id=other_source_id,
+                kind=EmployeeSourceKind.EMPLOYEE_TURN,
+                text="不應跨文件讀到。",
+            )
+
+            tools = {
+                item.name: item
+                for item in build_source_lookup_tools(
+                    DocumentSourceLookup(runtime),
+                    document_id=document_id,
+                )
+            }
+            exact = await tools["source_by_id"].ainvoke(
+                {"source_id": str(source_id)}
+            )
+            found = await tools["source_lexical_search"].ainvoke(
+                {"query": "採購需求", "limit": 5}
+            )
+
+            assert exact["source_id"] == str(source_id)
+            assert exact["text"] == "我每週整理採購需求。"
+            assert found == [exact]
+            with pytest.raises(KeyError):
+                await tools["source_by_id"].ainvoke(
+                    {"source_id": str(other_source_id)}
+                )
+            assert set(tools) == {
+                "source_by_id",
+                "source_lineage",
+                "source_lexical_search",
+            }
+        finally:
+            await runtime.delete_document(document_id)
+            await runtime.delete_document(other_document_id)
 
 
 @pytest.mark.asyncio

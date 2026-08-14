@@ -8,6 +8,7 @@ from uuid import UUID, uuid4
 import pytest
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
+from langchain_core.tools import tool
 from pydantic import PrivateAttr, ValidationError
 
 from app.consultant.agent import build_professional_consultant_agent
@@ -363,6 +364,65 @@ def test_agent_rejects_skill_or_read_tool_outside_resolved_policy() -> None:
             execution=_execution(tools=()),
             selected_skill_ids=("task-boundary",),
         )
+
+
+@pytest.mark.asyncio
+async def test_agent_receives_document_scoped_source_tools_from_the_runtime() -> None:
+    @tool(description="Read one employee source.")
+    async def source_by_id(source_id: UUID) -> dict[str, str]:
+        return {"source_id": str(source_id)}
+
+    source = _employee_source("我每週整理採購需求。")
+    model = RecordingToolModel(
+        responses=[
+            AIMessage(
+                content="",
+                tool_calls=[
+                    {
+                        "name": "read_file",
+                        "args": {
+                            "file_path": skill_path("task-boundary"),
+                            "limit": 1000,
+                        },
+                        "id": "read-task-boundary",
+                        "type": "tool_call",
+                    },
+                    {
+                        "name": "source_by_id",
+                        "args": {"source_id": str(source.source_id)},
+                        "id": "read-source",
+                        "type": "tool_call",
+                    },
+                ],
+            ),
+            AIMessage(
+                content="",
+                tool_calls=[
+                    {
+                        "name": "ConsultantResult",
+                        "args": _minimal_result(source).model_dump(mode="json"),
+                        "id": "structured-result",
+                        "type": "tool_call",
+                    }
+                ],
+            ),
+        ]
+    )
+    assembly = build_professional_consultant_agent(
+        model=model,
+        execution=_execution(tools=("read_file", "source_by_id")),
+        selected_skill_ids=("task-boundary",),
+        source_tools=(source_by_id,),
+    )
+    await assembly.ainvoke(
+        {"messages": [HumanMessage(content=f"[employee source {source.source_id}]")]}
+    )
+
+    assert set(model.bound_tool_names) == {
+        "read_file",
+        "source_by_id",
+        "ConsultantResult",
+    }
 
 
 def test_interactive_agent_rejects_policy_above_product_call_caps() -> None:

@@ -22,10 +22,15 @@ from app.consultant.interview import (
 from app.consultant.state import (
     ApprovedJobDocument,
     CalibrationDecision,
+    CommandReceipt,
     ConsultantCommandContext,
     ConsultantThreadState,
+    RunReceipt,
+    RunStatus,
     SourceReference,
+    attach_command_receipt,
     initial_thread_state,
+    inspect_command_receipt,
 )
 from app.consultant.understanding import decide_calibration, invalidate_sufficiency
 
@@ -87,6 +92,17 @@ def _apply_command(
         return initial_thread_state(document_id)
 
     _require_document(state, document_id)
+    receipt_payload = command.get("command_receipt")
+    command_receipt = (
+        CommandReceipt.model_validate(receipt_payload)
+        if receipt_payload is not None
+        else None
+    )
+    if (
+        command_receipt is not None
+        and inspect_command_receipt(state, command_receipt) == "replay"
+    ):
+        return {}
     expected_revision = command["expected_revision"]
     _require_revision(state, expected_revision)
 
@@ -99,6 +115,11 @@ def _apply_command(
     update: ConsultantThreadState = {
         "revision": expected_revision + 1,
     }
+    if command_receipt is not None:
+        update["command_receipts"] = attach_command_receipt(
+            state,
+            command_receipt,
+        )
     if action == "register_source":
         if source_reference is None:
             raise ValueError("register_source requires a source reference")
@@ -119,6 +140,49 @@ def _apply_command(
         )
         if invalidated is not None:
             update["sufficiency"] = invalidated
+        run_payload = command.get("run_receipt")
+        if run_payload is not None:
+            receipt = RunReceipt.model_validate(run_payload)
+            if (
+                receipt.status is not RunStatus.SOURCE_SAVED
+                or receipt.source_id != source_reference.source_id
+            ):
+                raise ValueError(
+                    "registered answer requires a source-saved run receipt"
+                )
+            update["latest_run"] = receipt.model_dump(mode="json")
+        return update
+    if action == "restart_consultant_run":
+        receipt = RunReceipt.model_validate(command["run_receipt"])
+        previous_payload = state.get("latest_run")
+        if previous_payload is None:
+            raise ValueError("no failed consultant run is available to retry")
+        previous = RunReceipt.model_validate(previous_payload)
+        if (
+            previous.status is not RunStatus.FAILED
+            or receipt.status is not RunStatus.SOURCE_SAVED
+            or receipt.run_id != previous.run_id
+            or receipt.source_id != previous.source_id
+        ):
+            raise ValueError("consultant retry does not match the failed run")
+        update["latest_run"] = receipt.model_dump(mode="json")
+        return update
+    if action == "mark_consultant_run_failed":
+        receipt = RunReceipt.model_validate(command["run_receipt"])
+        previous_payload = state.get("latest_run")
+        if previous_payload is None:
+            raise ValueError("no consultant run is available to fail")
+        previous = RunReceipt.model_validate(previous_payload)
+        if (
+            previous.status is not RunStatus.SOURCE_SAVED
+            or receipt.status is not RunStatus.FAILED
+            or receipt.run_id != previous.run_id
+            or receipt.source_id != previous.source_id
+        ):
+            raise ValueError(
+                "failed receipt does not match the active consultant run"
+            )
+        update["latest_run"] = receipt.model_dump(mode="json")
         return update
     if action == "direct_edit":
         before = ApprovedJobDocument.model_validate(state["approved_document"])

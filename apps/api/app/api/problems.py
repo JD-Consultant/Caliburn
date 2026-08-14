@@ -6,6 +6,17 @@ from fastapi.responses import JSONResponse
 from job_analysis_contract import ProblemDetail, ProblemFieldError
 from pydantic import ValidationError
 
+from app.adapters.langgraph.postgres import (
+    ActiveConsultantRun,
+    ConsultantPersistenceError,
+    DocumentNotFound as ConsultantDocumentNotFound,
+    IdempotencyConflict as ConsultantIdempotencyConflict,
+    PendingSourceRequiresReconciliation,
+    QuoteAnchorMismatch,
+    SourceConflict,
+    StaleRevision,
+    UnknownEvidenceSource,
+)
 from app.core.errors import (
     ConcurrentAuthorityChange,
     DocumentNotFound,
@@ -58,6 +69,15 @@ PROPOSAL_NOT_FOUND = (
 )
 CONSULTANT_UNAVAILABLE = (
     "https://caliburn.dev/problems/job-analysis/consultant-unavailable"
+)
+CONSULTANT_RUN_ACTIVE = (
+    "https://caliburn.dev/problems/job-analysis/consultant-run-active"
+)
+CONSULTANT_COMMAND_CONFLICT = (
+    "https://caliburn.dev/problems/job-analysis/consultant-command-conflict"
+)
+EXPORT_CONFIRMATION_REQUIRED = (
+    "https://caliburn.dev/problems/job-analysis/export-confirmation-required"
 )
 
 
@@ -176,6 +196,66 @@ def consultant_unavailable_response() -> JSONResponse:
         title="Consultant temporarily unavailable",
         status=503,
     )
+
+
+def consultant_runtime_error_response(error: Exception) -> JSONResponse:
+    """Map the new durable runtime without exposing evidence or provider payloads."""
+
+    if isinstance(error, ConsultantDocumentNotFound):
+        return problem_response(
+            type_uri=DOCUMENT_NOT_FOUND,
+            title="Document not found",
+            status=404,
+        )
+    if isinstance(error, ActiveConsultantRun):
+        return problem_response(
+            type_uri=CONSULTANT_RUN_ACTIVE,
+            title="Another consultant run must be recovered first",
+            status=409,
+        )
+    if isinstance(
+        error,
+        (
+            ConsultantIdempotencyConflict,
+            SourceConflict,
+        ),
+    ):
+        return problem_response(
+            type_uri=IDEMPOTENCY_CONFLICT,
+            title="Idempotency conflict",
+            status=409,
+        )
+    if isinstance(error, StaleRevision):
+        return problem_response(
+            type_uri=AUTHORITY_CONFLICT,
+            title="Document revision changed",
+            status=409,
+        )
+    if isinstance(error, PendingSourceRequiresReconciliation):
+        return problem_response(
+            type_uri=CONSULTANT_RUN_ACTIVE,
+            title="A saved employee input must be recovered first",
+            status=409,
+        )
+    if isinstance(error, (QuoteAnchorMismatch, UnknownEvidenceSource, ValueError)):
+        return problem_response(
+            type_uri=INVALID_REQUEST,
+            title="Invalid request",
+            status=422,
+        )
+    if isinstance(error, KeyError):
+        return problem_response(
+            type_uri=CONSULTANT_COMMAND_CONFLICT,
+            title="The requested decision is no longer available",
+            status=409,
+        )
+    if isinstance(error, ConsultantPersistenceError):
+        return problem_response(
+            type_uri=CONSULTANT_COMMAND_CONFLICT,
+            title="Consultant command conflict",
+            status=409,
+        )
+    raise TypeError(f"unmapped consultant runtime error: {type(error).__name__}")
 
 
 def domain_validation_error_response(error: ValidationError) -> JSONResponse:

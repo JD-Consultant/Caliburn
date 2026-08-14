@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–6 **Passed**
+- 狀態：Pre-implementation audit **Passed**；Tasks 1–7 **Passed**
 - 決策：ADR 0060 Accepted
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.13
@@ -208,6 +208,18 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 範圍防線：model-facing patch 支援 job title／work description／Duty／Task／order／reassignment／O／P／K／S；能力級別、A 與官方代碼被 deterministic verifier 拒絕。沒有接 RAG／Reference、正式 eval、production route／Web 或舊 writer bridge。
 - TDD／驗證：Task 6 focused consultant suite 為 `129 passed`，另有 foundation boundary canary `3 passed`；完整 PostgreSQL API gate 為 `936 passed`。第一次完整命令與後續 `-x` 診斷都在 pytest session cleanup 遭遇 sandbox 建立之 Windows basetemp `WinError 5`，其中第一個受影響的臨時 package 測試在正常 Windows 暫存環境單獨為 `1 passed`；同環境重跑全套才取得上述 `936 passed`，沒有把 ACL 中止當產品結果。Python compileall 與 `git diff --check` 於提交前另行重驗。
 - 北極星回歸：單一顧問、動態 Task／Duty／OPKS、員工文件 authority、一般 Gap 與 required clarification 分流、自然離開／續談、無假完成狀態，以及 RAG／能力級別／A／正式 eval 延後均未偏移。結果 **Pass**。
+
+### Task 7：跨語言契約與 production API transport
+
+- 狀態：**Pass**；預定同一 task commit 為 `feat: expose consultant runtime contract`。
+- 員工效果：新 API 已能建立／讀取／刪除文件、先保存回答再非同步處理、重開 durable snapshot、審核或修改後接受文件 changeset、理解校準、回答必要澄清、直接編輯，以及從同一入口查看缺口後明確強制匯出。沒有 pause／finish endpoint；員工停止傳訊息、關頁與日後重開仍是自然離開／續談。
+- 成熟 primitive：JSON Schema codegen 直接產生 Pydantic／TypeScript contract；FastAPI lifespan 持有 application-scoped runtime，native `EventSourceResponse` 只送 refetch event；LangGraph Saver／Store／checkpoint command／interrupt 直接持有 durable snapshot、source-first run、authority command 與 restart；LangChain agent 已真正註冊同文件 source lookup tools、middleware、structured output 與 callback。沒有自寫第二套 event state、session manager、provider wire、workflow table 或 agent loop。
+- Caliburn 薄政策：API mapper 只做產品 view projection；canonical payload hash、document scope、employee authority、source／quote、readiness、force-export 與 deterministic XLSX mapping 是通用框架不知道的產品差額。command receipt 與 authority update 同存一個 LangGraph checkpoint，不另建 idempotency table。
+- 詳細複審修正：查到 source lookup 雖已實作卻未接到 production agent tool surface；request-local runtime 會讓同文件 lock 失效；run service 直接 import OpenRouter 破壞 composition boundary；Store-before-checkpoint 與 checkpoint-before-Store-status 兩個 crash window 未完整 reconcile；resolved execution／Context selection／attempt receipt 驗完後被丟棄；非對話 authority command 只靠 revision，無 payload-bound durable replay；新 route 未列入依賴 guard。以上均已補 wiring、red／green regression 與完整 gate。
+- Idempotency：document create 以 title 綁 key，answer 以 immutable source payload 綁 key；review／calibration／clarification／direct edit 以 stable command ID＋kind＋canonical payload hash 寫 checkpoint receipt。精確重送可帶舊 revision 成功返回；同 key 換 payload 回 409，且 direct-edit／confirm source 在 checkpoint 後 crash 可只補 committed status。
+- 邊界誠實性：新 route 使用 purpose-first DTO，沒有把 raw graph state、Context receipt 或 model attempt 暴露給 Web。為了 Task 8 垂直切片，舊 route／舊 contract definitions 暫時仍在 repo，但新舊不雙寫、沒有 compatibility alias；Task 9 必須同一 hard-cut commit 刪除，否則最終 gate 不通過。
+- 驗證：contract `18 passed`；codegen 前後 Python／TypeScript SHA-256 完全相同；consultant 群 `146 passed`；sandbox 外完整 PostgreSQL API gate `953 passed`。第一次完整 gate 的唯一 assertion 是 route allowlist 尚未加入 `consultant.py`，已修正；其餘 error 為 Windows pytest temp ACL，改用已確認的 sandbox 外 basetemp 重跑取得完整綠燈。compileall 與 `git diff --check` 另行通過。
+- 北極星回歸：一位顧問、前景焦點／背景吸收、Task／Duty／OPKS 可動態修訂、AI 文件內容先審後入、必要澄清只擋相依 branch、可見 gap／可信進度、自然續談與單一可強制匯出均未偏移。九個方法 Skill 仍按需、能力級別／A 不由 LLM 生成，且 production tool／import／contract 沒有接入 RAG／Reference。結果 **Pass**。
 
 ## 8. 本次直接使用的一手來源
 

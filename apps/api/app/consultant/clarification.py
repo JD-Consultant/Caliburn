@@ -10,6 +10,7 @@ from pydantic import model_validator
 
 from app.consultant.results import RequiredClarificationDraft
 from app.consultant.state import (
+    CommandReceipt,
     ConsultantThreadState,
     DurableModel,
     EmployeeSourceKind,
@@ -17,6 +18,8 @@ from app.consultant.state import (
     InterviewWorkStatus,
     RequiredClarification,
     SourceReference,
+    attach_command_receipt,
+    inspect_command_receipt,
 )
 
 
@@ -24,6 +27,7 @@ class ClarificationAnswer(DurableModel):
     choice: str
     text: str
     source_reference: SourceReference
+    command_receipt: CommandReceipt | None = None
 
     @model_validator(mode="after")
     def answer_is_employee_evidence(self) -> ClarificationAnswer:
@@ -119,6 +123,11 @@ def resolve_required_clarification(
     request: RequiredClarification,
     answer: ClarificationAnswer,
 ) -> ConsultantThreadState:
+    if (
+        answer.command_receipt is not None
+        and inspect_command_receipt(state, answer.command_receipt) == "replay"
+    ):
+        return {}
     if answer.choice not in request.choices:
         raise ValueError("clarification answer choice is not offered by the request")
     source_id = answer.source_reference.source_id
@@ -151,7 +160,7 @@ def resolve_required_clarification(
     supersessions = dict(state.get("source_supersessions", {}))
     if answer.source_reference.supersedes_source_id is not None:
         supersessions[str(answer.source_reference.supersedes_source_id)] = str(source_id)
-    return {
+    update: ConsultantThreadState = {
         "revision": revision,
         "source_count": state.get("source_count", 0) + 1,
         "latest_source_id": str(source_id),
@@ -169,6 +178,12 @@ def resolve_required_clarification(
         "required_clarification": None,
         "sufficiency": None,
     }
+    if answer.command_receipt is not None:
+        update["command_receipts"] = attach_command_receipt(
+            state,
+            answer.command_receipt,
+        )
+    return update
 
 
 def interrupt_for_required_clarification(

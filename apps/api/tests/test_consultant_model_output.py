@@ -7,11 +7,18 @@ from uuid import UUID, uuid4
 
 import pytest
 from deepagents.middleware.filesystem import FilesystemMiddleware
+from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from pydantic import ValidationError
 
-from app.consultant.candidate_wire import CandidateEditBatch
+import app.consultant.model_runtime as model_runtime
+from app.config import Settings
+from app.consultant.candidate_tool import (
+    CandidateEditToolBinding,
+    build_job_document_candidate_edit_tool,
+)
 from app.consultant.context import DocumentSourceLookup, build_employee_source_tools
+from app.consultant.model_runtime import build_consultant_agent
 from app.consultant.model_output import (
     ConsultantModelOutput,
     ConsultantOutputMappingError,
@@ -34,6 +41,7 @@ from app.consultant.results import (
     GapReason,
     UnderstandingOperation,
 )
+from app.consultant.run_service import build_configured_execution
 from app.consultant.skill_backend import PackageSkillBackend
 from app.consultant.state import (
     InterviewPriority,
@@ -243,7 +251,9 @@ def test_langchain_converts_the_same_closed_union_free_pydantic_contract() -> No
     }
 
 
-def test_combined_model_grammar_measures_all_read_tools_candidate_input_and_final_output() -> None:
+def test_combined_model_grammar_measures_actual_tool_and_provider_strategy_schemas(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
     files = FilesystemMiddleware(
         backend=PackageSkillBackend(("task-boundary",)),
         tools=["read_file"],
@@ -258,12 +268,38 @@ def test_combined_model_grammar_measures_all_read_tools_candidate_input_and_fina
         DocumentSourceLookup(runtime=object()),  # type: ignore[arg-type]
         document_id=uuid4(),
     )
+    candidate_tool = build_job_document_candidate_edit_tool(
+        binding=CandidateEditToolBinding(
+            runtime=object(),  # type: ignore[arg-type]
+            document_id=uuid4(),
+            run_id=uuid4(),
+            baseline_revision=1,
+            selected_skill_ids=("task-boundary",),
+        ),
+        loaded_skill_ids=lambda: ("task-boundary",),
+    )
+    captured: dict[str, Any] = {}
+
+    def capture_create_agent(**kwargs: Any) -> object:
+        captured.update(kwargs)
+        return object()
+
+    monkeypatch.setattr(model_runtime, "create_agent", capture_create_agent)
+    build_consultant_agent(
+        model=FakeMessagesListChatModel(responses=[]),
+        execution=build_configured_execution(
+            Settings(_env_file=None, openrouter_api_key="test-key")
+        ),
+        response_schema=ConsultantModelOutput,
+    )
     tools = (*files.tools, *source_tools)
     schemas = tuple(
         convert_to_openai_tool(tool)["function"]["parameters"] for tool in tools
     ) + (
-        convert_to_openai_tool(CandidateEditBatch)["function"]["parameters"],
-        convert_to_openai_tool(ConsultantModelOutput)["function"]["parameters"],
+        convert_to_openai_tool(candidate_tool.tool_call_schema)["function"][
+            "parameters"
+        ],
+        captured["response_format"].schema_spec.json_schema,
     )
 
     assert tuple(tool.name for tool in tools) == (
@@ -272,6 +308,7 @@ def test_combined_model_grammar_measures_all_read_tools_candidate_input_and_fina
         "employee_source_lineage",
         "employee_source_search",
     )
+    assert candidate_tool.name == "job_document_candidate_edit"
     candidate_metrics = _schema_metrics(schemas[-2])
     final_metrics = _schema_metrics(schemas[-1])
     combined_metrics = _combined_schema_metrics(schemas)

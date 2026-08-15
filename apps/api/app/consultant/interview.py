@@ -12,6 +12,7 @@ from pydantic import model_validator
 from app.consultant.clarification import create_required_clarification
 from app.consultant.document_review import (
     block_review_dependent_work,
+    revalidate_review_queue,
     revalidate_review_work,
     stale_superseded_review_actions,
     stale_review_queue_for_source_correction,
@@ -365,6 +366,11 @@ def _publish_persisted_changeset(
     if existing is not None and DocumentChangeSet.model_validate(existing) != published_changeset:
         raise ValueError("published candidate changeset conflicts with review queue")
     review_queue[str(published_changeset.changeset_id)] = _dump(published_changeset)
+    review_queue = revalidate_review_queue(
+        ApprovedJobDocument.model_validate(state["approved_document"]),
+        review_queue,
+        stale_reason="新的候選取代了先前建議，請重新確認這項建議的文件前提。",
+    )
     interview_work = block_review_dependent_work(
         interview_work,
         published_changeset.actions,

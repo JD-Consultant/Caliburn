@@ -31,8 +31,12 @@ The five Tool IDs are exactly `read_file`, `employee_source_get`,
 candidate input and final response each have zero optional parameters, unions,
 and open objects after LangChain conversion. Combined observed grammar: 6
 schemas, 0 defs, 129 properties, 2 optional, 0 union, 4 open objects, max depth
-4, and 13,377 UTF-8 minified bytes. Total bytes are recorded evidence only,
+4, and 13,426 UTF-8 minified bytes. Total bytes are recorded evidence only,
 not a provider limit.
+
+The measurement now builds the actual `job_document_candidate_edit` Tool and
+uses its exposed `tool_call_schema`; it captures the actual production
+`ProviderStrategy.schema_spec.json_schema` from `build_consultant_agent`.
 
 ## Review notes
 
@@ -58,6 +62,36 @@ the earlier host stdout-detachment observation.
 After that gate, a direct PostgreSQL query reported zero rows in all five tables:
 `consultant_documents`, `checkpoints`, `checkpoint_blobs`, `checkpoint_writes`,
 and `store`.
+
+## Fix round 1 review closure
+
+- Supersession now reuses `revalidate_review_queue` immediately after explicit
+  stale marking and bundle insertion. A focused RED found a cross-bundle
+  external dependent stayed `PENDING` (`1 failed, 24 deselected in 0.35s`);
+  GREEN is `1 passed, 24 deselected in 0.26s`, with the prerequisite and
+  dependent stale for meaningful 取代／前置 reasons and an unrelated action pending.
+- The three stale hard-cut modules first reproduced
+  `ImportError: OutputDocumentChange from model_output` (`1 error in 1.21s`).
+  They now use neutral/exact candidate publication and direct
+  `DocumentChangeSet`/`published_changeset` seams: `61 passed in 1.51s`.
+  Removed final-draft assertions were impossible after the cut; equivalent
+  wire/path/evidence coverage is in candidate-wire, candidate-Tool, review, and
+  publication-authority tests. No final reviewable-change channel returned.
+- Duplicate-publication production behavior was intentionally unchanged: the
+  existing exact-publication fail-closed test passed in `4.11s`; nested
+  `model_construct` data is rejected by `CandidatePublication` validation
+  before graph execution.
+- The run-service factory test now proves its candidate-edit binding injects
+  exactly runtime, document ID, run ID, baseline revision, and selected Skills.
+  Grammar/binding narrow GREEN is `27 passed in 1.22s`.
+- Controller verification first found host-killed-run contamination: the first
+  nine-file run was `1 failed, 148 passed` because the catalog contained two
+  prior orphan documents. The fixture cleanup restored all five tables to zero.
+  From that verified clean DB, the exact same sequential nine-file gate exited
+  0 with **`149 passed in 103.61s` and zero skips**. The immediate residue was
+  again `(0, 0, 0, 0, 0)` for consultant documents, checkpoints, checkpoint
+  blobs, checkpoint writes, and store. Full API collection is `249 tests
+  collected`.
 
 ## Constraints audit
 

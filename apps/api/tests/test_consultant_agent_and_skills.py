@@ -23,11 +23,7 @@ from app.consultant.agent import (
 from app.consultant.model_output import (
     ConsultantModelOutput,
     OutputAnalysisBasis,
-    OutputDocumentChange,
-    OutputDocumentField,
-    OutputDocumentTarget,
-    OutputOpksItem,
-    OutputOpksKind,
+    OutputCandidatePublication,
     OutputQuestion,
     OutputQuestionKind,
     OutputSufficiency,
@@ -253,7 +249,11 @@ def _minimal_model_output(
         understanding_changes=(),
         attention_changes=(),
         gaps=(),
-        reviewable_document_changes=(),
+        candidate_publication=OutputCandidatePublication(
+            candidate_revision=0,
+            revision_digest="",
+            action_ids=(),
+        ),
         question=OutputQuestion(
             kind=OutputQuestionKind.NEXT,
             text="這件工作完成後，會留下什麼結果或讓什麼狀態改變？",
@@ -272,45 +272,6 @@ def _minimal_model_output(
             continuing_benefit="繼續訪談可釐清 Task 的實際結果。",
             basis_ordinal=1,
         ),
-    )
-
-
-def _output_document_change(
-    source_id: UUID,
-    *,
-    operation: DocumentChangeOperation,
-    target: OutputDocumentTarget,
-    target_id: str,
-    field: OutputDocumentField,
-    basis_ordinal: int,
-    text_value: str = "",
-    opks_items: tuple[OutputOpksItem, ...] = (),
-    opks_kind: OutputOpksKind = OutputOpksKind.NONE,
-    task_ids: tuple[UUID, ...] = (),
-) -> OutputDocumentChange:
-    return OutputDocumentChange(
-        change_ref="",
-        depends_on_change_refs=(),
-        depends_on_action_ids=(),
-        supersedes_action_ids=(),
-        atomic_group_ref="",
-        operation=operation,
-        target=target,
-        target_id=target_id,
-        field=field,
-        text_value=text_value,
-        integer_value=-1,
-        uuid_value="",
-        uuid_values=(),
-        enablers=(),
-        duties=(),
-        tasks=(),
-        opks_items=opks_items,
-        target_ids=(),
-        opks_kind=opks_kind,
-        task_ids=task_ids,
-        indicator_ids=(),
-        basis_ordinal=basis_ordinal,
     )
 
 
@@ -376,7 +337,6 @@ def test_package_skill_backend_is_selected_only_read_only_and_traversal_safe() -
 
 @pytest.mark.asyncio
 async def test_agent_composes_selected_skills_without_leaking_ineligible_content() -> None:
-    task_id = uuid4()
     source_id = uuid4()
     basis = _output_basis(source_id, "task-boundary", "output")
     task_basis = _output_basis(source_id, "task-boundary")
@@ -389,38 +349,10 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
         understanding_changes=(),
         attention_changes=(),
         gaps=(),
-        reviewable_document_changes=(
-            _output_document_change(
-                source_id,
-                operation=DocumentChangeOperation.REVISE,
-                target=OutputDocumentTarget.TASK,
-                target_id=str(task_id),
-                field=OutputDocumentField.PURPOSE_RESULT,
-                text_value="形成可供主管審核的採購需求",
-                basis_ordinal=2,
-            ),
-            _output_document_change(
-                source_id,
-                operation=DocumentChangeOperation.ADD,
-                target=OutputDocumentTarget.OPKS,
-                target_id="",
-                field=OutputDocumentField.ENTITY,
-                opks_items=(
-                    OutputOpksItem(
-                        item_id="",
-                        entity_ref="",
-                        text="採購需求文件",
-                        display_order=-1,
-                        task_ids=(),
-                        indicator_ids=(),
-                        task_refs=(),
-                        indicator_refs=(),
-                    ),
-                ),
-                opks_kind=OutputOpksKind.OUTPUT,
-                task_ids=(task_id,),
-                basis_ordinal=3,
-            ),
+        candidate_publication=OutputCandidatePublication(
+            candidate_revision=0,
+            revision_digest="",
+            action_ids=(),
         ),
         question=_no_output_question(),
         sufficiency=OutputSufficiency(
@@ -896,14 +828,6 @@ def test_verifier_accepts_anchored_source_and_selected_skill_dependencies() -> N
                 basis=_basis(source, "task-boundary", quote=quote),
             ),
         ),
-        reviewable_document_changes=(
-            ReviewableDocumentChange(
-                operation=DocumentChangeOperation.REVISE,
-                path=f"/tasks/{task_id}/purpose_result",
-                after="形成採購需求並交付主管審核",
-                basis=_basis(source, "task-boundary", quote=quote),
-            ),
-        ),
         sufficiency=SufficiencyRecommendation(
             currently_enough=False,
             reason="仍缺完成標準。",
@@ -1021,222 +945,6 @@ def test_verifier_rejects_unauthorized_dependencies_and_bad_quote_anchors(
         )
 
 
-@pytest.mark.parametrize(
-    "path",
-    [
-        "/competency_level",
-        "/tasks/00000000-0000-0000-0000-000000000001/competency_level",
-        "/occupation_code",
-        "/occupation_name",
-        "/occupation_category_name",
-        "/industry_code",
-        "/industry_name",
-        "/icap_code",
-        "/notes",
-    ],
-)
-def test_verifier_rejects_model_authored_unsupported_document_paths(path: str) -> None:
-    source = _employee_source("我整理採購需求。")
-    result = _minimal_result(source).model_copy(
-        update={
-            "reviewable_document_changes": (
-                ReviewableDocumentChange(
-                    operation=DocumentChangeOperation.REVISE,
-                    path=path,
-                    after="模型不得寫入",
-                    basis=_basis(source, "task-boundary", quote="整理採購需求"),
-                ),
-            )
-        }
-    )
-
-    with pytest.raises(ConsultantVerificationError, match="unsupported document"):
-        verify_consultant_result(
-            result,
-            execution=_execution(),
-            document_id=source.document_id,
-            selected_skill_ids=("task-boundary",),
-            loaded_skill_ids=("task-boundary",),
-            employee_sources=(source,),
-        )
-
-
-def test_result_schema_makes_attitude_generation_unrepresentable() -> None:
-    source = _employee_source("我整理採購需求。")
-    with pytest.raises(ValidationError, match="opks_kind"):
-        ReviewableDocumentChange.model_validate(
-            {
-                "operation": "add",
-                "path": "/opks",
-                "after": "主動積極",
-                "opks_kind": "attitude",
-                "basis": _basis(
-                    source, "task-boundary", quote="整理採購需求"
-                ).model_dump(mode="json"),
-            }
-        )
-
-
-def test_verifier_rejects_attitude_smuggled_through_full_opks_replacement() -> None:
-    source = _employee_source("我整理採購需求。")
-    task_id = uuid4()
-    item_id = uuid4()
-    result = _minimal_result(source).model_copy(
-        update={
-            "reviewable_document_changes": (
-                ReviewableDocumentChange(
-                    operation=DocumentChangeOperation.MERGE,
-                    path="/opks",
-                    target_ids=(item_id,),
-                    after={
-                        "item_id": str(item_id),
-                        "kind": "attitude",
-                        "text": "主動積極",
-                        "display_order": 0,
-                        "task_ids": [],
-                        "indicator_ids": [],
-                    },
-                    opks_kind=OpksKind.KNOWLEDGE,
-                    task_ids=(task_id,),
-                    basis=_basis(
-                        source,
-                        "knowledge",
-                        quote="整理採購需求",
-                    ),
-                ),
-            )
-        }
-    )
-
-    with pytest.raises(ConsultantVerificationError, match="OPKS payload kind"):
-        verify_consultant_result(
-            result,
-            execution=_execution(),
-            document_id=source.document_id,
-            selected_skill_ids=("task-boundary", "knowledge"),
-            loaded_skill_ids=("task-boundary", "knowledge"),
-            employee_sources=(source,),
-        )
-
-
-@pytest.mark.parametrize(
-    "operation",
-    [DocumentChangeOperation.MERGE, DocumentChangeOperation.SPLIT],
-)
-def test_verifier_requires_merge_and_split_collection_paths(
-    operation: DocumentChangeOperation,
-) -> None:
-    source = _employee_source("我整理採購需求。")
-    item_id = uuid4()
-    replacement_id = uuid4()
-    result = _minimal_result(source).model_copy(
-        update={
-            "reviewable_document_changes": (
-                ReviewableDocumentChange(
-                    operation=operation,
-                    path=f"/tasks/{item_id}",
-                    target_ids=(item_id,),
-                    after={
-                        "task_id": str(replacement_id),
-                        "statement": "整理採購需求",
-                        "action": "整理",
-                        "object": "採購需求",
-                        "display_order": 0,
-                    },
-                    basis=_basis(
-                        source,
-                        "task-boundary",
-                        quote="整理採購需求",
-                    ),
-                ),
-            )
-        }
-    )
-
-    with pytest.raises(ConsultantVerificationError, match="collection path"):
-        verify_consultant_result(
-            result,
-            execution=_execution(),
-            document_id=source.document_id,
-            selected_skill_ids=("task-boundary",),
-            loaded_skill_ids=("task-boundary",),
-            employee_sources=(source,),
-        )
-
-
-def test_non_merge_change_cannot_carry_merge_target_ids() -> None:
-    source = _employee_source("我整理採購需求。")
-    with pytest.raises(ValidationError, match="target_ids"):
-        ReviewableDocumentChange(
-            operation=DocumentChangeOperation.REVISE,
-            path="/job_title",
-            after="採購專員",
-            target_ids=(uuid4(),),
-            basis=_basis(
-                source,
-                "task-boundary",
-                quote="整理採購需求",
-            ),
-        )
-
-
-@pytest.mark.parametrize(
-    ("path", "after"),
-    [
-        ("/tasks", []),
-        (
-            "/tasks/00000000-0000-0000-0000-000000000001",
-            {
-                "task_id": "00000000-0000-0000-0000-000000000001",
-                "statement": "整理採購需求",
-                "action": "整理",
-                "object": "採購需求",
-                "display_order": 0,
-            },
-        ),
-        (
-            "/tasks/00000000-0000-0000-0000-000000000001/duty_id",
-            "00000000-0000-0000-0000-000000000002",
-        ),
-        (
-            "/tasks/00000000-0000-0000-0000-000000000001/display_order",
-            1,
-        ),
-    ],
-)
-def test_revise_cannot_bypass_granular_structural_operations(
-    path: str,
-    after: object,
-) -> None:
-    source = _employee_source("我整理採購需求。")
-    result = _minimal_result(source).model_copy(
-        update={
-            "reviewable_document_changes": (
-                ReviewableDocumentChange(
-                    operation=DocumentChangeOperation.REVISE,
-                    path=path,
-                    after=after,
-                    basis=_basis(
-                        source,
-                        "task-boundary",
-                        quote="整理採購需求",
-                    ),
-                ),
-            )
-        }
-    )
-
-    with pytest.raises(ConsultantVerificationError, match="revise operation"):
-        verify_consultant_result(
-            result,
-            execution=_execution(),
-            document_id=source.document_id,
-            selected_skill_ids=("task-boundary",),
-            loaded_skill_ids=("task-boundary",),
-            employee_sources=(source,),
-        )
-
-
 def test_risky_specific_claim_requires_an_exact_employee_quote_anchor() -> None:
     source = _employee_source("主管只說要整理採購需求。")
     unanchored = ConsultantResult(
@@ -1294,71 +1002,6 @@ def test_risky_specific_claim_requires_an_exact_employee_quote_anchor() -> None:
     )
 
 
-def test_opks_axes_allow_early_output_and_document_level_many_to_many_ks() -> None:
-    source = _employee_source(
-        "我會整理採購需求文件，並比對需求與預算後送主管審核。"
-    )
-    task_ids = (uuid4(), uuid4())
-    changes = (
-        ReviewableDocumentChange(
-            operation=DocumentChangeOperation.REVISE,
-            path=f"/tasks/{task_ids[0]}/statement",
-            after="整理並確認採購需求",
-            basis=_basis(source, "task-boundary", quote="整理採購需求文件"),
-        ),
-        ReviewableDocumentChange(
-            operation=DocumentChangeOperation.ADD,
-            path="/opks",
-            after="採購需求文件",
-            opks_kind=OpksKind.OUTPUT,
-            task_ids=(task_ids[0],),
-            basis=_basis(source, "output", quote="採購需求文件"),
-        ),
-        ReviewableDocumentChange(
-            operation=DocumentChangeOperation.ADD,
-            path="/opks",
-            after="採購需求與預算原則",
-            opks_kind=OpksKind.KNOWLEDGE,
-            task_ids=task_ids,
-            basis=_basis(source, "knowledge", quote="比對需求與預算"),
-        ),
-        ReviewableDocumentChange(
-            operation=DocumentChangeOperation.ADD,
-            path="/opks",
-            after="比對需求與預算",
-            opks_kind=OpksKind.SKILL,
-            task_ids=task_ids,
-            basis=_basis(source, "skill", quote="比對需求與預算"),
-        ),
-    )
-    result = ConsultantResult(
-        visible_reply="Task 邊界仍可修訂，但已有足夠證據先整理 O／K／S。",
-        reply_basis=_basis(
-            source, "task-boundary", "output", "knowledge", "skill"
-        ),
-        used_skill_ids=("task-boundary", "output", "knowledge", "skill"),
-        reviewable_document_changes=changes,
-        sufficiency=SufficiencyRecommendation(
-            currently_enough=False,
-            reason="仍需確認行為指標。",
-            remaining_gap_reasons=(GapReason.PERFORMANCE_EVIDENCE_MISSING,),
-            continuing_benefit="繼續訪談可補齊可觀察的行為指標。",
-            basis=_basis(
-                source, "task-boundary", "output", "knowledge", "skill"
-            ),
-        ),
-    )
-
-    verify_consultant_result(
-        result,
-        execution=_execution(),
-        document_id=source.document_id,
-        selected_skill_ids=result.used_skill_ids,
-        loaded_skill_ids=result.used_skill_ids,
-        employee_sources=(source,),
-    )
-
-
 def test_no_meaningful_output_is_a_visible_task_boundary_gap_not_a_fabricated_o() -> None:
     source = _employee_source("我就是每天打開系統看一下。")
     result = ConsultantResult(
@@ -1388,7 +1031,7 @@ def test_no_meaningful_output_is_a_visible_task_boundary_gap_not_a_fabricated_o(
         ),
     )
 
-    assert not result.reviewable_document_changes
+    assert result.candidate_publication is None
     verify_consultant_result(
         result,
         execution=_execution(),
@@ -1475,41 +1118,6 @@ def test_unanchored_named_law_in_visible_reply_is_rejected() -> None:
     )
 
     with pytest.raises(ConsultantVerificationError, match="anchored employee quote"):
-        verify_consultant_result(
-            result,
-            execution=_execution(),
-            document_id=source.document_id,
-            selected_skill_ids=("task-boundary",),
-            loaded_skill_ids=("task-boundary",),
-            employee_sources=(source,),
-        )
-
-
-def test_collection_change_cannot_smuggle_deferred_or_unknown_fields() -> None:
-    source = _employee_source("我整理採購需求。")
-    result = _minimal_result(source).model_copy(
-        update={
-            "reviewable_document_changes": (
-                ReviewableDocumentChange(
-                    operation=DocumentChangeOperation.ADD,
-                    path="/tasks",
-                    after={
-                        "statement": "整理採購需求",
-                        "action": "整理",
-                        "object": "採購需求",
-                        "competency_level": 4,
-                    },
-                    basis=_basis(
-                        source,
-                        "task-boundary",
-                        quote="整理採購需求",
-                    ),
-                ),
-            )
-        }
-    )
-
-    with pytest.raises(ConsultantVerificationError, match="unsupported payload"):
         verify_consultant_result(
             result,
             execution=_execution(),
@@ -1636,33 +1244,5 @@ def test_candidate_document_verifier_fails_closed_for_receipt_or_evidence_mismat
             document_id=(uuid4() if failure == "cross_document" else source.document_id),
             selected_skill_ids=("task-boundary",),
             loaded_skill_ids=(() if failure == "unloaded" else ("task-boundary",)),
-            employee_sources=(source,),
-        )
-
-
-def test_document_operation_must_match_its_target_shape() -> None:
-    source = _employee_source("我整理採購需求。")
-    bad = _minimal_result(source).model_copy(
-        update={
-            "reviewable_document_changes": (
-                ReviewableDocumentChange(
-                    operation=DocumentChangeOperation.REASSIGN,
-                    path="/job_title",
-                    after="採購管理人員",
-                    basis=_basis(
-                        source, "task-boundary", quote="整理採購需求"
-                    ),
-                ),
-            )
-        }
-    )
-
-    with pytest.raises(ConsultantVerificationError, match="Task duty_id"):
-        verify_consultant_result(
-            bad,
-            execution=_execution(),
-            document_id=source.document_id,
-            selected_skill_ids=("task-boundary",),
-            loaded_skill_ids=("task-boundary",),
             employee_sources=(source,),
         )

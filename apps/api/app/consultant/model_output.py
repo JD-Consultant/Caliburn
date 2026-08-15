@@ -14,18 +14,6 @@ from uuid import UUID
 
 from pydantic import Field, ValidationError
 
-from app.consultant.candidate_wire import (
-    OutputDocumentChange,
-    OutputDocumentField,
-    OutputDocumentTarget,
-    OutputDuty,
-    OutputEnabler,
-    OutputOpksItem,
-    OutputOpksKind,
-    OutputResponsibilityRole,
-    OutputTask,
-    map_provider_document_change as _map_document_change,
-)
 from app.consultant.provider_wire import (
     AnalysisBasisTable,
     OutputAnalysisBasis,
@@ -35,6 +23,7 @@ from app.consultant.provider_wire import (
 from app.consultant.results import (
     AttentionChange,
     AttentionOperation,
+    CandidatePublication,
     ConsultantResult,
     GapOperation,
     GapReason,
@@ -136,6 +125,12 @@ class OutputSufficiency(OutputModel):
     basis_ordinal: int = Field(description="analysis_bases 的 1-based ordinal")
 
 
+class OutputCandidatePublication(OutputModel):
+    candidate_revision: int = Field(ge=0)
+    revision_digest: str = Field(pattern=r"^(?:|[0-9a-f]{64})$")
+    action_ids: tuple[UUID, ...]
+
+
 class ConsultantModelOutput(OutputModel):
     visible_reply: str
     analysis_bases: tuple[OutputAnalysisBasis, ...]
@@ -146,7 +141,7 @@ class ConsultantModelOutput(OutputModel):
     understanding_changes: tuple[OutputUnderstandingChange, ...]
     attention_changes: tuple[OutputAttentionChange, ...]
     gaps: tuple[OutputGap, ...]
-    reviewable_document_changes: tuple[OutputDocumentChange, ...]
+    candidate_publication: OutputCandidatePublication
     question: OutputQuestion
     sufficiency: OutputSufficiency
 
@@ -175,9 +170,8 @@ def map_consultant_model_output(output: ConsultantModelOutput) -> ConsultantResu
                 _map_attention(item, bases) for item in output.attention_changes
             ),
             gaps=tuple(_map_gap(item, bases) for item in output.gaps),
-            reviewable_document_changes=tuple(
-                _map_document_change(item, bases)
-                for item in output.reviewable_document_changes
+            candidate_publication=_map_candidate_publication(
+                output.candidate_publication
             ),
             next_question=next_question,
             required_clarification=clarification,
@@ -200,6 +194,31 @@ def map_consultant_model_output(output: ConsultantModelOutput) -> ConsultantResu
         raise ConsultantOutputMappingError(
             str(error)
         ) from error
+
+
+def _map_candidate_publication(
+    value: OutputCandidatePublication,
+) -> CandidatePublication | None:
+    neutral = (
+        value.candidate_revision == 0
+        and value.revision_digest == ""
+        and not value.action_ids
+    )
+    if neutral:
+        return None
+    if value.candidate_revision == 0:
+        raise ConsultantOutputMappingError(
+            "neutral candidate publication cannot carry digest or action handles"
+        )
+    if not value.revision_digest or not value.action_ids:
+        raise ConsultantOutputMappingError(
+            "candidate publication requires digest and action handles"
+        )
+    return CandidatePublication(
+        candidate_revision=value.candidate_revision,
+        revision_digest=value.revision_digest,
+        action_ids=value.action_ids,
+    )
 
 
 def _map_understanding(

@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     consultant_timeout_seconds: float = 90.0
     consultant_policy_revision: int = 1
     consultant_max_context_tokens: int = 24_000
-    consultant_max_model_calls: int = 3
+    consultant_max_model_calls: int = 5
     consultant_max_lookup_waves: int = 2
     consultant_max_total_tool_calls: int = 12
     consultant_model_retry_count: int = 1

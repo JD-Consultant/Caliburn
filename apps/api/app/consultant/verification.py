@@ -167,14 +167,6 @@ def verify_consultant_result(
     if not selected <= set(execution.allowed_skill_ids):
         raise ConsultantVerificationError("run selected an ineligible Skill")
 
-    verify_candidate_document_changes(
-        result.reviewable_document_changes,
-        document_id=document_id,
-        selected_skill_ids=selected_skill_ids,
-        loaded_skill_ids=loaded_skill_ids,
-        employee_sources=employee_sources,
-    )
-
     source_by_id = {source.source_id: source for source in employee_sources}
     if len(source_by_id) != len(employee_sources):
         raise ConsultantVerificationError("duplicate employee source supplied to verifier")

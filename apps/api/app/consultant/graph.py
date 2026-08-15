@@ -285,14 +285,21 @@ def _apply_command(
         if source_reference is not None:
             raise ValueError("model semantic commit cannot mint employee evidence")
         commit = VerifiedConsultantCommit.model_validate(command["semantic_commit"])
+        published_changeset = _published_candidate_changeset(
+            state,
+            commit=commit,
+            expected_revision=expected_revision,
+        )
         update.update(
             apply_verified_consultant_commit(
                 state,
                 document_id=document_id,
                 revision=expected_revision + 1,
                 commit=commit,
+                published_changeset=published_changeset,
             )
         )
+        update["active_candidate"] = None
         return update
     if action == "decide_understanding_calibration":
         calibration_id = UUID(command["calibration_id"])
@@ -325,6 +332,35 @@ def _apply_command(
         )
         return update
     raise ValueError(f"unsupported consultant command: {action}")
+
+
+def _published_candidate_changeset(
+    state: ConsultantThreadState,
+    *,
+    commit: VerifiedConsultantCommit,
+    expected_revision: int,
+):
+    publication = commit.result.candidate_publication
+    if publication is None:
+        return None
+    active_payload = state.get("active_candidate")
+    if active_payload is None:
+        raise ValueError("candidate publication has no active candidate workspace")
+    active = CandidateWorkspace.model_validate(active_payload)
+    if active.run_id != commit.run_id:
+        raise ValueError("candidate publication belongs to another consultant run")
+    if active.baseline_revision != expected_revision:
+        raise ValueError("candidate publication baseline revision is stale")
+    if active.candidate_revision != publication.candidate_revision:
+        raise ValueError("candidate publication does not reference the latest revision")
+    if active.revision_digest != publication.revision_digest:
+        raise ValueError("candidate publication digest does not match latest revision")
+    action_ids = tuple(action.action_id for action in active.changeset.actions)
+    if action_ids != publication.action_ids:
+        raise ValueError("candidate publication action handles do not match latest revision")
+    if not set(active.used_skill_ids) <= set(commit.result.used_skill_ids):
+        raise ValueError("candidate publication used Skills missing from final result")
+    return active.changeset
 
 
 def build_consultant_graph(checkpointer: Any, store: Any) -> Any:

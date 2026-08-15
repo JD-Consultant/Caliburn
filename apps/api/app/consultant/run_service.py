@@ -17,6 +17,8 @@ from app.adapters.langgraph.postgres import (
 )
 from app.config import Settings
 from app.consultant.agent import build_professional_consultant_agent
+from app.consultant.candidate_tool import CandidateEditToolBinding
+from app.consultant.candidate_workspace import CandidateWorkspace
 from app.consultant.context import (
     ConsultantAgentRuntimeContext,
     ConsultantContextMiddleware,
@@ -46,6 +48,7 @@ from app.consultant.state import (
     SourceProcessingStatus,
 )
 from app.consultant.verification import (
+    ConsultantVerificationError,
     verify_consultant_result,
     verify_context_selection,
     verify_model_attempts,
@@ -105,7 +108,11 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
         revision=config.consultant_policy_revision,
         run_kind="interactive_consultation",
         allowed_skill_ids=CONSULTANT_SKILL_IDS,
-        allowed_tool_ids=("read_file", *EMPLOYEE_SOURCE_TOOL_IDS),
+        allowed_tool_ids=(
+            "read_file",
+            *EMPLOYEE_SOURCE_TOOL_IDS,
+            "job_document_candidate_edit",
+        ),
         max_context_tokens=config.consultant_max_context_tokens,
         max_model_calls=config.consultant_max_model_calls,
         max_lookup_waves=config.consultant_max_lookup_waves,
@@ -191,6 +198,13 @@ async def execute_admitted_consultant_turn(
             execution=execution,
             selected_skill_ids=CONSULTANT_SKILL_IDS,
             source_tools=source_tools,
+            candidate_edit_binding=CandidateEditToolBinding(
+                runtime=runtime,
+                document_id=document_id,
+                run_id=run_id,
+                baseline_revision=snapshot.revision,
+                selected_skill_ids=CONSULTANT_SKILL_IDS,
+            ),
             context_middleware=ConsultantContextMiddleware(),
             context_schema=ConsultantAgentRuntimeContext,
         )
@@ -236,6 +250,24 @@ async def execute_admitted_consultant_turn(
             response["structured_response"]
         )
         result = map_consultant_model_output(model_output)
+        candidate_source_ids: tuple[UUID, ...] = ()
+        if result.candidate_publication is not None:
+            raw_state = await runtime.raw_state(document_id)
+            active_payload = raw_state.get("active_candidate")
+            if active_payload is None:
+                raise ConsultantVerificationError(
+                    "candidate publication has no active candidate workspace"
+                )
+            active_candidate = CandidateWorkspace.model_validate(active_payload)
+            if active_candidate.run_id != run_id:
+                raise ConsultantVerificationError(
+                    "candidate publication belongs to another consultant run"
+                )
+            if not set(active_candidate.used_skill_ids) <= set(result.used_skill_ids):
+                raise ConsultantVerificationError(
+                    "candidate publication used Skills missing from final result"
+                )
+            candidate_source_ids = active_candidate.changeset.source_ids
         if not runtime_context.context_receipts:
             raise ValueError("consultant run emitted no context-selection receipt")
         for receipt in runtime_context.context_receipts:
@@ -246,7 +278,11 @@ async def execute_admitted_consultant_turn(
                 source_id
                 for basis in result.analysis_bases()
                 for source_id in basis.source_ids
+                if source_id is not None
             )
+        )
+        referenced_source_ids = tuple(
+            dict.fromkeys((*referenced_source_ids, *candidate_source_ids))
         )
         evidence = tuple(
             [

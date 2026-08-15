@@ -1,45 +1,41 @@
 from __future__ import annotations
 
 from collections.abc import Iterator
+import json
 from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
+from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain_core.utils.function_calling import convert_to_openai_tool
+from pydantic import ValidationError
 
+from app.consultant.candidate_wire import CandidateEditBatch
+from app.consultant.context import DocumentSourceLookup, build_employee_source_tools
 from app.consultant.model_output import (
     ConsultantModelOutput,
     ConsultantOutputMappingError,
     OutputAnalysisBasis,
     OutputAttentionChange,
     OutputAttentionDisposition,
-    OutputDocumentChange,
-    OutputDocumentField,
-    OutputDocumentTarget,
-    OutputDuty,
-    OutputEnabler,
+    OutputCandidatePublication,
     OutputGap,
-    OutputOpksItem,
-    OutputOpksKind,
     OutputQuestion,
     OutputQuestionKind,
     OutputQuoteAnchor,
-    OutputResponsibilityRole,
     OutputSufficiency,
-    OutputTask,
     OutputUnderstandingChange,
     map_consultant_model_output,
 )
 from app.consultant.results import (
     AttentionOperation,
-    DocumentChangeOperation,
+    CandidatePublication,
     GapOperation,
     GapReason,
     UnderstandingOperation,
 )
+from app.consultant.skill_backend import PackageSkillBackend
 from app.consultant.state import (
-    ApprovedResponsibilityRole,
-    ApprovedEnablerKind,
     InterviewPriority,
     InterviewWorkStatus,
     UnderstandingImpact,
@@ -88,41 +84,16 @@ def _output(source_id: UUID, **overrides: Any) -> ConsultantModelOutput:
         "understanding_changes": (),
         "attention_changes": (),
         "gaps": (),
-        "reviewable_document_changes": (),
+        "candidate_publication": OutputCandidatePublication(
+            candidate_revision=0,
+            revision_digest="",
+            action_ids=(),
+        ),
         "question": _no_question(),
         "sufficiency": _sufficiency(source_id),
     }
     values.update(overrides)
     return ConsultantModelOutput(**values)
-
-
-def _document_change(source_id: UUID, **overrides: Any) -> OutputDocumentChange:
-    values: dict[str, Any] = {
-        "change_ref": "",
-        "depends_on_change_refs": (),
-        "depends_on_action_ids": (),
-        "supersedes_action_ids": (),
-        "atomic_group_ref": "",
-        "operation": DocumentChangeOperation.REVISE,
-        "target": OutputDocumentTarget.JOB_TITLE,
-        "target_id": "",
-        "field": OutputDocumentField.VALUE,
-        "text_value": "採購專員",
-        "integer_value": -1,
-        "uuid_value": "",
-        "uuid_values": (),
-        "enablers": (),
-        "duties": (),
-        "tasks": (),
-        "opks_items": (),
-        "target_ids": (),
-        "opks_kind": OutputOpksKind.NONE,
-        "task_ids": (),
-        "indicator_ids": (),
-        "basis_ordinal": 1,
-    }
-    values.update(overrides)
-    return OutputDocumentChange(**values)
 
 
 def _walk_schema(node: Any) -> Iterator[dict[str, Any]]:
@@ -176,6 +147,26 @@ def _schema_metrics(schema: dict[str, Any]) -> dict[str, int]:
     }
 
 
+def _combined_schema_metrics(
+    schemas: tuple[dict[str, Any], ...],
+) -> dict[str, int]:
+    metrics = tuple(_schema_metrics(schema) for schema in schemas)
+    return {
+        "schemas": len(schemas),
+        "definitions": sum(item["definitions"] for item in metrics),
+        "properties": sum(item["properties"] for item in metrics),
+        "optional_parameters": sum(
+            item["optional_parameters"] for item in metrics
+        ),
+        "union_sites": sum(item["union_sites"] for item in metrics),
+        "open_objects": sum(item["open_objects"] for item in metrics),
+        "max_object_depth": max(item["object_depth"] for item in metrics),
+        "bytes": len(
+            json.dumps(schemas, ensure_ascii=False, separators=(",", ":")).encode()
+        ),
+    }
+
+
 def test_model_output_schema_is_closed_required_and_union_free() -> None:
     schema = ConsultantModelOutput.model_json_schema()
     nodes = tuple(_walk_schema(schema))
@@ -191,14 +182,26 @@ def test_model_output_schema_is_closed_required_and_union_free() -> None:
     assert _expanded_object_depth(schema) <= 5
 
 
+def test_final_schema_has_only_candidate_publication_not_document_draft_payloads() -> None:
+    schema = ConsultantModelOutput.model_json_schema()
+    serialized = str(schema)
+
+    assert "candidate_publication" in schema["properties"]
+    assert "reviewable_document_changes" not in serialized
+    assert "OutputDocumentChange" not in serialized
+    assert "OutputDuty" not in serialized
+    assert "OutputTask" not in serialized
+    assert "OutputOpksItem" not in serialized
+
+
 def test_model_output_schema_metrics_are_review_visible() -> None:
     assert _schema_metrics(ConsultantModelOutput.model_json_schema()) == {
-        "definitions": 26,
-        "properties": 107,
+        "definitions": 16,
+        "properties": 61,
         "optional_parameters": 0,
         "union_sites": 0,
         "open_objects": 0,
-        "object_depth": 4,
+        "object_depth": 3,
     }
 
 
@@ -217,14 +220,6 @@ def test_model_facing_id_anchor_and_question_fields_explain_safe_sentinels() -> 
     )
 
 
-def test_model_facing_document_field_discriminators_are_unambiguous() -> None:
-    assert OutputDocumentField.VALUE.value == "top_level_value"
-    assert OutputDocumentField.ENTITY.value == "whole_entity"
-    description = OutputDocumentChange.model_fields["field"].description or ""
-    assert "job_title" in description
-    assert "whole_entity" in description
-
-
 def test_langchain_converts_the_same_closed_union_free_pydantic_contract() -> None:
     converted = convert_to_openai_tool(ConsultantModelOutput)
     assert converted["function"]["name"] == "ConsultantModelOutput"
@@ -240,147 +235,119 @@ def test_langchain_converts_the_same_closed_union_free_pydantic_contract() -> No
     )
     assert _schema_metrics(provider_schema) == {
         "definitions": 0,
-        "properties": 109,
+        "properties": 61,
         "optional_parameters": 0,
         "union_sites": 0,
         "open_objects": 0,
-        "object_depth": 4,
+        "object_depth": 3,
     }
 
 
-def test_model_output_schema_does_not_expose_free_form_document_json() -> None:
-    fields = OutputDocumentChange.model_fields
+def test_combined_model_grammar_measures_all_read_tools_candidate_input_and_final_output() -> None:
+    files = FilesystemMiddleware(
+        backend=PackageSkillBackend(("task-boundary",)),
+        tools=["read_file"],
+        custom_tool_descriptions={
+            "read_file": "Read one eligible Caliburn analysis Skill.",
+        },
+        system_prompt=None,
+        tool_token_limit_before_evict=None,
+        human_message_token_limit_before_evict=None,
+    )
+    source_tools = build_employee_source_tools(
+        DocumentSourceLookup(runtime=object()),  # type: ignore[arg-type]
+        document_id=uuid4(),
+    )
+    tools = (*files.tools, *source_tools)
+    schemas = tuple(
+        convert_to_openai_tool(tool)["function"]["parameters"] for tool in tools
+    ) + (
+        convert_to_openai_tool(CandidateEditBatch)["function"]["parameters"],
+        convert_to_openai_tool(ConsultantModelOutput)["function"]["parameters"],
+    )
 
-    assert "path" not in fields
-    assert "after" not in fields
-    assert set(fields) >= {
-        "target",
-        "target_id",
-        "field",
-        "text_value",
-        "integer_value",
-        "uuid_value",
-        "uuid_values",
-        "enablers",
-        "duties",
-        "tasks",
-        "opks_items",
-    }
+    assert tuple(tool.name for tool in tools) == (
+        "read_file",
+        "employee_source_get",
+        "employee_source_lineage",
+        "employee_source_search",
+    )
+    candidate_metrics = _schema_metrics(schemas[-2])
+    final_metrics = _schema_metrics(schemas[-1])
+    combined_metrics = _combined_schema_metrics(schemas)
+
+    for metrics in (candidate_metrics, final_metrics):
+        assert metrics["optional_parameters"] == 0
+        assert metrics["union_sites"] == 0
+        assert metrics["open_objects"] == 0
+    assert combined_metrics["schemas"] == 6
+    assert combined_metrics["definitions"] == 0
+    assert combined_metrics["union_sites"] == 0
+    assert combined_metrics["properties"] > 0
+    assert combined_metrics["max_object_depth"] >= max(
+        candidate_metrics["object_depth"], final_metrics["object_depth"]
+    )
+    assert combined_metrics["bytes"] > 0
 
 
-def test_shared_document_wire_allows_the_legacy_empty_change_ref_sentinel() -> None:
-    assert _document_change(uuid4(), change_ref="").change_ref == ""
+def test_candidate_publication_maps_neutral_and_exact_valid_receipts() -> None:
+    source_id = uuid4()
+    action_id = uuid4()
+
+    neutral = map_consultant_model_output(_output(source_id))
+    published = map_consultant_model_output(
+        _output(
+            source_id,
+            candidate_publication=OutputCandidatePublication(
+                candidate_revision=2,
+                revision_digest="a" * 64,
+                action_ids=(action_id,),
+            ),
+        )
+    )
+
+    assert neutral.candidate_publication is None
+    assert published.candidate_publication == CandidatePublication(
+        candidate_revision=2,
+        revision_digest="a" * 64,
+        action_ids=(action_id,),
+    )
 
 
 @pytest.mark.parametrize(
-    "change",
+    "candidate_revision, revision_digest, action_ids",
     [
-        pytest.param(
-            lambda source_id: _document_change(source_id, change_ref="candidate-1"),
-            id="change-ref",
-        ),
-        pytest.param(
-            lambda source_id: _document_change(
-                source_id, depends_on_change_refs=("candidate-0",)
-            ),
-            id="change-dependency",
-        ),
-        pytest.param(
-            lambda source_id: _document_change(
-                source_id, depends_on_action_ids=(uuid4(),)
-            ),
-            id="action-dependency",
-        ),
-        pytest.param(
-            lambda source_id: _document_change(
-                source_id, supersedes_action_ids=(uuid4(),)
-            ),
-            id="action-supersession",
-        ),
-        pytest.param(
-            lambda source_id: _document_change(
-                source_id, atomic_group_ref="atomic-1"
-            ),
-            id="atomic-group",
-        ),
-        pytest.param(
-            lambda source_id: _document_change(
-                source_id,
-                operation=DocumentChangeOperation.ADD,
-                target=OutputDocumentTarget.DUTY,
-                field=OutputDocumentField.ENTITY,
-                text_value="",
-                duties=(
-                    OutputDuty(
-                        duty_id="",
-                        entity_ref="d1",
-                        statement="管理採購作業",
-                        display_order=-1,
-                    ),
-                ),
-            ),
-            id="duty-local-ref",
-        ),
-        pytest.param(
-            lambda source_id: _document_change(
-                source_id,
-                operation=DocumentChangeOperation.ADD,
-                target=OutputDocumentTarget.TASK,
-                field=OutputDocumentField.ENTITY,
-                text_value="",
-                tasks=(
-                    OutputTask(
-                        task_id="",
-                        duty_id="",
-                        entity_ref="t1",
-                        duty_ref="d1",
-                        statement="建立請購單",
-                        action="建立",
-                        object="請購單",
-                        purpose_result="",
-                        context="",
-                        frequency_text="",
-                        responsibility_role=OutputResponsibilityRole.NONE,
-                        enablers=(),
-                        display_order=-1,
-                    ),
-                ),
-            ),
-            id="task-local-ref",
-        ),
-        pytest.param(
-            lambda source_id: _document_change(
-                source_id,
-                operation=DocumentChangeOperation.ADD,
-                target=OutputDocumentTarget.OPKS,
-                field=OutputDocumentField.ENTITY,
-                text_value="",
-                opks_kind=OutputOpksKind.OUTPUT,
-                opks_items=(
-                    OutputOpksItem(
-                        item_id="",
-                        entity_ref="o1",
-                        text="採購成果",
-                        display_order=-1,
-                        task_ids=(),
-                        indicator_ids=(),
-                        task_refs=("t1",),
-                        indicator_refs=("p1",),
-                    ),
-                ),
-            ),
-            id="opks-local-refs",
-        ),
+        pytest.param(0, "a" * 64, (), id="neutral-with-digest"),
+        pytest.param(0, "", (uuid4(),), id="neutral-with-action"),
+        pytest.param(1, "", (uuid4(),), id="positive-without-digest"),
+        pytest.param(1, "a" * 64, (), id="positive-without-action"),
+        pytest.param(1, "a" * 64, (uuid4(),) * 2, id="duplicate-action"),
     ],
 )
-def test_final_model_output_rejects_non_neutral_candidate_only_slots(
-    change: Any,
+def test_candidate_publication_rejects_mixed_sentinels_and_duplicate_handles(
+    candidate_revision: int,
+    revision_digest: str,
+    action_ids: tuple[UUID, ...],
 ) -> None:
-    source_id = uuid4()
-
-    with pytest.raises(ConsultantOutputMappingError, match="candidate-only"):
+    with pytest.raises(ConsultantOutputMappingError):
         map_consultant_model_output(
-            _output(source_id, reviewable_document_changes=(change(source_id),))
+            _output(
+                uuid4(),
+                candidate_publication=OutputCandidatePublication(
+                    candidate_revision=candidate_revision,
+                    revision_digest=revision_digest,
+                    action_ids=action_ids,
+                ),
+            )
+        )
+
+
+def test_candidate_publication_digest_requires_lowercase_sha256_or_neutral_empty() -> None:
+    with pytest.raises(ValidationError):
+        OutputCandidatePublication(
+            candidate_revision=1,
+            revision_digest="not-a-digest",
+            action_ids=(uuid4(),),
         )
 
 
@@ -392,31 +359,11 @@ def test_model_output_normalizes_repeated_evidence_into_one_basis_table() -> Non
         OutputUnderstandingChange,
         OutputAttentionChange,
         OutputGap,
-        OutputDocumentChange,
         OutputQuestion,
         OutputSufficiency,
     ):
         assert "basis_ordinal" in effect.model_fields
         assert "basis" not in effect.model_fields
-
-
-def test_neutral_wire_enums_track_the_application_enums() -> None:
-    assert {item.value for item in OutputAttentionDisposition} == {
-        "none",
-        *(item.value for item in InterviewWorkStatus),
-    }
-    assert {item.value for item in OutputOpksKind} == {
-        "none",
-        "output",
-        "indicator",
-        "knowledge",
-        "skill",
-    }
-    assert {item.value for item in OutputResponsibilityRole} == {
-        "none",
-        *(item.value for item in ApprovedResponsibilityRole),
-    }
-
 
 def test_minimal_model_output_maps_to_the_rich_application_result() -> None:
     source_id = uuid4()
@@ -503,219 +450,6 @@ def test_all_non_document_effects_survive_the_wire_mapping() -> None:
     assert result.gaps[0].gap_id == gap_id
 
 
-@pytest.mark.parametrize(
-    ("change", "expected_path", "expected_after"),
-    [
-        pytest.param(
-            {"target": OutputDocumentTarget.WORK_DESCRIPTION, "text_value": "負責採購作業。"},
-            "/work_description",
-            "負責採購作業。",
-            id="top-level-text",
-        ),
-        pytest.param(
-            {
-                "operation": DocumentChangeOperation.REORDER,
-                "target": OutputDocumentTarget.DUTY,
-                "target_id": "00000000-0000-0000-0000-000000000001",
-                "field": OutputDocumentField.DISPLAY_ORDER,
-                "text_value": "",
-                "integer_value": 0,
-            },
-            "/duties/00000000-0000-0000-0000-000000000001/display_order",
-            0,
-            id="integer",
-        ),
-        pytest.param(
-            {
-                "operation": DocumentChangeOperation.REASSIGN,
-                "target": OutputDocumentTarget.TASK,
-                "target_id": "00000000-0000-0000-0000-000000000002",
-                "field": OutputDocumentField.DUTY_ID,
-                "text_value": "",
-                "uuid_value": "00000000-0000-0000-0000-000000000003",
-            },
-            "/tasks/00000000-0000-0000-0000-000000000002/duty_id",
-            "00000000-0000-0000-0000-000000000003",
-            id="uuid",
-        ),
-        pytest.param(
-            {
-                "target": OutputDocumentTarget.OPKS,
-                "target_id": "00000000-0000-0000-0000-000000000004",
-                "field": OutputDocumentField.TASK_IDS,
-                "text_value": "",
-                "uuid_values": (UUID("00000000-0000-0000-0000-000000000002"),),
-                "opks_kind": OutputOpksKind.KNOWLEDGE,
-                "task_ids": (UUID("00000000-0000-0000-0000-000000000002"),),
-            },
-            "/opks/00000000-0000-0000-0000-000000000004/task_ids",
-            ["00000000-0000-0000-0000-000000000002"],
-            id="uuid-list",
-        ),
-        pytest.param(
-            {
-                "target": OutputDocumentTarget.TASK,
-                "target_id": "00000000-0000-0000-0000-000000000002",
-                "field": OutputDocumentField.ENABLERS,
-                "text_value": "",
-                "enablers": (
-                    OutputEnabler(kind=ApprovedEnablerKind.TOOL_SYSTEM, name="ERP"),
-                ),
-            },
-            "/tasks/00000000-0000-0000-0000-000000000002/enablers",
-            [{"kind": "tool_system", "name": "ERP"}],
-            id="typed-object-list",
-        ),
-    ],
-)
-def test_typed_scalar_document_payloads_map_to_existing_review_changes(
-    change: dict[str, Any], expected_path: str, expected_after: object
-) -> None:
-    source_id = uuid4()
-    mapped = map_consultant_model_output(
-        _output(
-            source_id,
-            reviewable_document_changes=(
-                _document_change(source_id, **change),
-            ),
-        )
-    ).reviewable_document_changes[0]
-
-    assert mapped.path == expected_path
-    assert mapped.after == expected_after
-
-
-def test_typed_entity_payloads_preserve_duty_task_and_opks_proposals() -> None:
-    source_id = uuid4()
-    task_id = uuid4()
-    redundant_item_task_id = uuid4()
-    changes = (
-        _document_change(
-            source_id,
-            operation=DocumentChangeOperation.ADD,
-            target=OutputDocumentTarget.DUTY,
-            field=OutputDocumentField.ENTITY,
-            text_value="",
-            duties=(
-                OutputDuty(
-                    duty_id="",
-                    entity_ref="",
-                    statement="管理採購作業",
-                    display_order=-1,
-                ),
-            ),
-        ),
-        _document_change(
-            source_id,
-            operation=DocumentChangeOperation.ADD,
-            target=OutputDocumentTarget.TASK,
-            field=OutputDocumentField.ENTITY,
-            text_value="",
-            tasks=(
-                OutputTask(
-                    task_id=str(task_id),
-                    duty_id="",
-                    entity_ref="",
-                    duty_ref="",
-                    statement="建立請購單",
-                    action="建立",
-                    object="請購單",
-                    purpose_result="",
-                    context="",
-                    frequency_text="",
-                    responsibility_role=OutputResponsibilityRole.NONE,
-                    enablers=(),
-                    display_order=-1,
-                ),
-            ),
-        ),
-        _document_change(
-            source_id,
-            operation=DocumentChangeOperation.ADD,
-            target=OutputDocumentTarget.OPKS,
-            field=OutputDocumentField.ENTITY,
-            text_value="",
-            opks_items=(
-                OutputOpksItem(
-                    item_id="",
-                    entity_ref="",
-                    text="完成的請購單",
-                    display_order=-1,
-                    task_ids=(redundant_item_task_id,),
-                    indicator_ids=(),
-                    task_refs=(),
-                    indicator_refs=(),
-                ),
-            ),
-            opks_kind=OutputOpksKind.OUTPUT,
-            task_ids=(task_id,),
-        ),
-    )
-
-    mapped = map_consultant_model_output(
-        _output(source_id, reviewable_document_changes=changes)
-    ).reviewable_document_changes
-
-    assert mapped[0].path == "/duties"
-    assert mapped[0].after == {"statement": "管理採購作業"}
-    assert mapped[1].path == "/tasks"
-    assert mapped[1].after["task_id"] == str(task_id)
-    assert mapped[1].after["statement"] == "建立請購單"
-    assert "display_order" not in mapped[1].after
-    assert mapped[2].path == "/opks"
-    assert mapped[2].after == "完成的請購單"
-    assert mapped[2].task_ids == (task_id,)
-
-
-def test_unambiguous_model_wire_aliases_normalize_before_domain_mapping() -> None:
-    source_id = uuid4()
-    mapped = map_consultant_model_output(
-        _output(
-            source_id,
-            reviewable_document_changes=(
-                _document_change(
-                    source_id,
-                    operation=DocumentChangeOperation.ADD,
-                    target=OutputDocumentTarget.JOB_TITLE,
-                    field=OutputDocumentField.ENTITY,
-                    text_value="採購專員",
-                ),
-                _document_change(
-                    source_id,
-                    operation=DocumentChangeOperation.ADD,
-                    target=OutputDocumentTarget.TASK,
-                    field=OutputDocumentField.VALUE,
-                    text_value="",
-                    tasks=(
-                        OutputTask(
-                            task_id="",
-                            duty_id="",
-                            entity_ref="",
-                            duty_ref="",
-                            statement="確認採購需求",
-                            action="確認",
-                            object="採購需求",
-                            purpose_result="",
-                            context="",
-                            frequency_text="",
-                            responsibility_role=OutputResponsibilityRole.NONE,
-                            enablers=(),
-                            display_order=-1,
-                        ),
-                    ),
-                ),
-            ),
-        )
-    ).reviewable_document_changes
-
-    assert mapped[0].operation is DocumentChangeOperation.REVISE
-    assert mapped[0].path == "/job_title"
-    assert mapped[0].after == "採購專員"
-    assert mapped[1].operation is DocumentChangeOperation.ADD
-    assert mapped[1].path == "/tasks"
-    assert mapped[1].after["statement"] == "確認採購需求"
-
-
 def test_required_clarification_maps_to_the_employee_form_instead_of_next_question() -> None:
     source_id = uuid4()
     work_id = uuid4()
@@ -749,55 +483,6 @@ def test_required_clarification_maps_to_the_employee_form_instead_of_next_questi
             lambda source: {"question": _no_question().model_copy(update={"text": "偷渡問題"})},
             "question",
             id="content-in-none-question",
-        ),
-        pytest.param(
-            lambda source: {
-                "reviewable_document_changes": (
-                    _document_change(source, integer_value=0),
-                )
-            },
-            "unused document payload",
-            id="unused-payload-slot",
-        ),
-        pytest.param(
-            lambda source: {
-                "reviewable_document_changes": (
-                    _document_change(
-                        source,
-                        target=OutputDocumentTarget.TASK,
-                        target_id=str(uuid4()),
-                        field=OutputDocumentField.TEXT,
-                    ),
-                )
-            },
-            "field",
-            id="unsupported-target-field",
-        ),
-        pytest.param(
-            lambda source: {
-                "reviewable_document_changes": (
-                    _document_change(source, opks_kind=OutputOpksKind.KNOWLEDGE),
-                )
-            },
-            "non-OPKS",
-            id="opks-metadata-on-other-target",
-        ),
-        pytest.param(
-            lambda source: {
-                "reviewable_document_changes": (
-                    _document_change(
-                        source,
-                        operation=DocumentChangeOperation.REASSIGN,
-                        target=OutputDocumentTarget.TASK,
-                        target_id=str(uuid4()),
-                        field=OutputDocumentField.DUTY_ID,
-                        text_value="",
-                        uuid_value="not-a-uuid",
-                    ),
-                )
-            },
-            "UUID",
-            id="invalid-uuid-sentinel-field",
         ),
         pytest.param(
             lambda source: {
@@ -854,37 +539,6 @@ def test_required_clarification_maps_to_the_employee_form_instead_of_next_questi
             },
             "application-owned ID",
             id="new-attention-smuggles-id",
-        ),
-        pytest.param(
-            lambda source: {
-                "reviewable_document_changes": (
-                    _document_change(
-                        source,
-                        operation=DocumentChangeOperation.MERGE,
-                        target=OutputDocumentTarget.OPKS,
-                        target_id="",
-                        field=OutputDocumentField.ENTITY,
-                        text_value="",
-                        target_ids=(uuid4(),),
-                        opks_kind=OutputOpksKind.KNOWLEDGE,
-                        task_ids=(uuid4(),),
-                        opks_items=(
-                            OutputOpksItem(
-                                item_id=str(uuid4()),
-                                entity_ref="",
-                                text="採購流程知識",
-                                display_order=0,
-                                task_ids=(uuid4(),),
-                                indicator_ids=(),
-                                task_refs=(),
-                                indicator_refs=(),
-                            ),
-                        ),
-                    ),
-                )
-            },
-            "contradict",
-            id="opks-linkage-copies-disagree",
         ),
         pytest.param(
             lambda source: {"reply_basis_ordinal": 0},

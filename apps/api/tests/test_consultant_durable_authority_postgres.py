@@ -39,6 +39,7 @@ from app.consultant.candidate_workspace import (
     CandidateStageRequest,
     CandidateWorkspace,
 )
+from app.consultant.graph import _published_candidate_changeset
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.provider_wire import OutputAnalysisBasis
 from app.consultant.results import (
@@ -46,10 +47,10 @@ from app.consultant.results import (
     AttentionChange,
     AttentionOperation,
     ConsultantResult,
+    CandidatePublication,
     DocumentChangeOperation,
     GapReason,
     RequiredClarificationDraft,
-    ReviewableDocumentChange,
     SufficiencyRecommendation,
     UnderstandingChange,
     UnderstandingOperation,
@@ -888,58 +889,59 @@ async def test_document_review_and_clarification_survive_postgres_restart(
             document=document,
             source_id=seed_source_id,
         )
-        sourced = await runtime.record_employee_source(
+        run_id = uuid4()
+        sourced, _ = await runtime.admit_employee_answer(
             document_id=document_id,
+            run_id=run_id,
             source_id=answer_source_id,
-            kind=EmployeeSourceKind.EMPLOYEE_TURN,
             text="我會建立並覆核請購單。",
         )
         basis = AnalysisBasis(
             source_ids=(answer_source_id,),
             skill_ids=("task-boundary",),
         )
-        now = datetime.now(UTC)
-        committed = await runtime.commit_verified_consultant_result(
+        committed = await _stage_and_publish(
+            runtime,
             document_id=document_id,
-            expected_revision=sourced.revision,
-            commit=VerifiedConsultantCommit(
-                run_id=uuid4(),
-                answer_source_id=answer_source_id,
-                started_at=now,
-                completed_at=now,
-                result=ConsultantResult(
-                    visible_reply="我整理了一項任務文字更新供您審核。",
-                    reply_basis=basis,
-                    used_skill_ids=("task-boundary",),
-                    attention_changes=(
-                        AttentionChange(
-                            operation=AttentionOperation.ADD,
-                            kind="task_boundary",
-                            title="請購下單",
-                            subject_id=task_id,
-                            reason="需要確認請購責任邊界。",
-                            priority=InterviewPriority.TASK_BOUNDARY,
-                            make_current=True,
-                            basis=basis,
-                        ),
-                    ),
-                    reviewable_document_changes=(
-                        ReviewableDocumentChange(
-                            operation=DocumentChangeOperation.REVISE,
-                            path=f"/tasks/{task_id}/statement",
-                            after="建立並覆核請購單",
-                            basis=basis,
-                        ),
-                    ),
-                    sufficiency=SufficiencyRecommendation(
-                        currently_enough=False,
-                        reason="其他採購工作尚待盤點。",
-                        remaining_gap_reasons=(GapReason.WORK_COVERAGE_MISSING,),
-                        continuing_benefit="繼續訪談可補齊其他工作。",
+            run_id=run_id,
+            source_id=answer_source_id,
+            baseline_revision=sourced.revision,
+            changes=(
+                _candidate_wire_change(
+                    change_ref="task-statement",
+                    operation=DocumentChangeOperation.REVISE,
+                    target=OutputDocumentTarget.TASK,
+                    target_id=str(task_id),
+                    field=OutputDocumentField.STATEMENT,
+                    text_value="建立並覆核請購單",
+                    duties=(),
+                ),
+            ),
+            result=ConsultantResult(
+                visible_reply="我整理了一項任務文字更新供您審核。",
+                reply_basis=basis,
+                used_skill_ids=("task-boundary",),
+                attention_changes=(
+                    AttentionChange(
+                        operation=AttentionOperation.ADD,
+                        kind="task_boundary",
+                        title="請購下單",
+                        subject_id=task_id,
+                        reason="需要確認請購責任邊界。",
+                        priority=InterviewPriority.TASK_BOUNDARY,
+                        make_current=True,
                         basis=basis,
                     ),
                 ),
+                sufficiency=SufficiencyRecommendation(
+                    currently_enough=False,
+                    reason="其他採購工作尚待盤點。",
+                    remaining_gap_reasons=(GapReason.WORK_COVERAGE_MISSING,),
+                    continuing_benefit="繼續訪談可補齊其他工作。",
+                    basis=basis,
+                ),
             ),
+            candidate_skill_id="task-boundary",
         )
         bundle = committed.document_review.bundles[0]
         action = bundle.actions[0]
@@ -1054,46 +1056,48 @@ async def test_structural_edit_accept_uses_candidate_source_without_minting_evid
             document=document,
             source_id=seed_source_id,
         )
-        sourced = await runtime.record_employee_source(
+        run_id = uuid4()
+        sourced, _ = await runtime.admit_employee_answer(
             document_id=document_id,
+            run_id=run_id,
             source_id=answer_source_id,
-            kind=EmployeeSourceKind.EMPLOYEE_TURN,
             text="這項工作可能不屬於原本的主要職責。",
         )
         basis = AnalysisBasis(
             source_ids=(answer_source_id,),
             skill_ids=("duty-grouping",),
         )
-        now = datetime.now(UTC)
-        proposed = await runtime.commit_verified_consultant_result(
+        proposed = await _stage_and_publish(
+            runtime,
             document_id=document_id,
-            expected_revision=sourced.revision,
-            commit=VerifiedConsultantCommit(
-                run_id=uuid4(),
-                answer_source_id=answer_source_id,
-                started_at=now,
-                completed_at=now,
-                result=ConsultantResult(
-                    visible_reply="我整理了一項工作歸類建議供你確認。",
-                    reply_basis=basis,
-                    used_skill_ids=("duty-grouping",),
-                    reviewable_document_changes=(
-                        ReviewableDocumentChange(
-                            operation=DocumentChangeOperation.REORDER,
-                            path=f"/duties/{duty_id}/display_order",
-                            after=1,
-                            basis=basis,
-                        ),
-                    ),
-                    sufficiency=SufficiencyRecommendation(
-                        currently_enough=False,
-                        reason="仍有其他工作待確認。",
-                        remaining_gap_reasons=(GapReason.WORK_COVERAGE_MISSING,),
-                        continuing_benefit="繼續訪談可確認職責分組。",
-                        basis=basis,
-                    ),
+            run_id=run_id,
+            source_id=answer_source_id,
+            baseline_revision=sourced.revision,
+            changes=(
+                _candidate_wire_change(
+                    change_ref="duty-reorder",
+                    operation=DocumentChangeOperation.REORDER,
+                    target=OutputDocumentTarget.DUTY,
+                    target_id=str(duty_id),
+                    field=OutputDocumentField.DISPLAY_ORDER,
+                    text_value="",
+                    integer_value=1,
+                    duties=(),
                 ),
             ),
+            result=ConsultantResult(
+                visible_reply="我整理了一項工作歸類建議供你確認。",
+                reply_basis=basis,
+                used_skill_ids=("duty-grouping",),
+                sufficiency=SufficiencyRecommendation(
+                    currently_enough=False,
+                    reason="仍有其他工作待確認。",
+                    remaining_gap_reasons=(GapReason.WORK_COVERAGE_MISSING,),
+                    continuing_benefit="繼續訪談可確認職責分組。",
+                    basis=basis,
+                ),
+            ),
+            candidate_skill_id="duty-grouping",
         )
         bundle = proposed.document_review.bundles[0]
         action = bundle.actions[0]
@@ -1429,6 +1433,23 @@ def _candidate_wire_change(**overrides: object) -> OutputDocumentChange:
     return OutputDocumentChange(**values)
 
 
+def _two_candidate_wire_changes() -> tuple[OutputDocumentChange, ...]:
+    return (
+        _candidate_wire_change(),
+        _candidate_wire_change(
+            change_ref="candidate-duty-two",
+            duties=(
+                OutputDuty(
+                    duty_id="",
+                    entity_ref="candidate-duty-two",
+                    statement="追蹤供應商交期。",
+                    display_order=-1,
+                ),
+            ),
+        ),
+    )
+
+
 def _candidate_stage_request(
     *,
     run_id: UUID,
@@ -1438,6 +1459,7 @@ def _candidate_stage_request(
     tool_call_id: str = "candidate-tool-1",
     changes: tuple[OutputDocumentChange, ...] | None = None,
     summary: str = "建立可審核的候選文件。",
+    skill_id: str = "task-boundary",
 ) -> CandidateStageRequest:
     return CandidateStageRequest(
         run_id=run_id,
@@ -1450,14 +1472,359 @@ def _candidate_stage_request(
                 OutputAnalysisBasis(
                     source_ids=(source_id,),
                     quote_anchors=(),
-                    skill_ids=("task-boundary",),
+                    skill_ids=(skill_id,),
                 ),
             ),
             replacement_changes=changes or (_candidate_wire_change(),),
         ),
-        selected_skill_ids=("task-boundary",),
-        loaded_skill_ids=("task-boundary",),
+        selected_skill_ids=(skill_id,),
+        loaded_skill_ids=(skill_id,),
     )
+
+
+def _publication_result(
+    source_id: UUID,
+    publication: CandidatePublication | None,
+    *,
+    skill_id: str = "task-boundary",
+) -> ConsultantResult:
+    basis = AnalysisBasis(source_ids=(source_id,), skill_ids=(skill_id,))
+    return ConsultantResult(
+        visible_reply="我已整理本回合的職務分析結果。",
+        reply_basis=basis,
+        used_skill_ids=(skill_id,),
+        candidate_publication=publication,
+        sufficiency=SufficiencyRecommendation(
+            currently_enough=True,
+            reason="目前資訊足以保存這項工作。",
+            continuing_benefit="繼續訪談仍可補充細節。",
+            basis=basis,
+        ),
+    )
+
+
+def _publication(receipt) -> CandidatePublication:
+    return CandidatePublication(
+        candidate_revision=receipt.candidate_revision,
+        revision_digest=receipt.revision_digest,
+        action_ids=receipt.action_ids,
+    )
+
+
+async def _stage_and_publish(
+    runtime,
+    *,
+    document_id: UUID,
+    run_id: UUID,
+    source_id: UUID,
+    baseline_revision: int,
+    result: ConsultantResult,
+    changes: tuple[OutputDocumentChange, ...] | None = None,
+    candidate_skill_id: str = "task-boundary",
+):
+    receipt = await runtime.stage_candidate_revision(
+        document_id=document_id,
+        request=_candidate_stage_request(
+            run_id=run_id,
+            source_id=source_id,
+            baseline_revision=baseline_revision,
+            changes=changes,
+            skill_id=candidate_skill_id,
+        ),
+    )
+    now = datetime.now(UTC)
+    return await runtime.commit_verified_consultant_result(
+        document_id=document_id,
+        expected_revision=baseline_revision,
+        commit=VerifiedConsultantCommit(
+            run_id=run_id,
+            answer_source_id=source_id,
+            started_at=now,
+            completed_at=now,
+            result=result.model_copy(
+                update={"candidate_publication": _publication(receipt)}
+            ),
+        ),
+    )
+
+
+@pytest.mark.asyncio
+async def test_semantic_commit_publishes_only_the_exact_latest_candidate(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+    now = datetime.now(UTC)
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        receipt = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=admitted.revision,
+            ),
+        )
+        published = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=admitted.revision,
+            commit=VerifiedConsultantCommit(
+                run_id=run_id,
+                answer_source_id=source_id,
+                started_at=now,
+                completed_at=now,
+                result=_publication_result(
+                    source_id,
+                    CandidatePublication(
+                        candidate_revision=receipt.candidate_revision,
+                        revision_digest=receipt.revision_digest,
+                        action_ids=receipt.action_ids,
+                    ),
+                ),
+            ),
+        )
+
+        assert published.approved_document == admitted.approved_document
+        assert len(published.document_review.bundles) == 1
+        bundle = published.document_review.bundles[0]
+        assert tuple(action.action_id for action in bundle.actions) == receipt.action_ids
+        assert (await runtime.raw_state(document_id))["active_candidate"] is None
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
+async def test_neutral_semantic_commit_discards_unpublished_candidate_only_after_commit(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=admitted.revision,
+            ),
+        )
+        committed = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=admitted.revision,
+            commit=VerifiedConsultantCommit(
+                run_id=run_id,
+                answer_source_id=source_id,
+                started_at=datetime.now(UTC),
+                completed_at=datetime.now(UTC),
+                result=_publication_result(source_id, None),
+            ),
+        )
+
+        assert committed.approved_document == admitted.approved_document
+        assert committed.document_review.bundles == ()
+        assert (await runtime.raw_state(document_id))["active_candidate"] is None
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
+async def test_publication_fails_closed_unless_it_is_the_latest_exact_candidate(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        first = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=admitted.revision,
+            ),
+        )
+        latest = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=admitted.revision,
+                base_candidate_revision=first.candidate_revision,
+                tool_call_id="candidate-tool-2",
+                changes=_two_candidate_wire_changes(),
+            ),
+        )
+        before_state = await runtime.raw_state(document_id)
+        before_snapshot = await runtime.reopen_document(document_id)
+
+        attempts = (
+            (
+                CandidatePublication(
+                    candidate_revision=latest.candidate_revision + 1,
+                    revision_digest=latest.revision_digest,
+                    action_ids=latest.action_ids,
+                ),
+                run_id,
+                admitted.revision,
+                "latest revision",
+            ),
+            (_publication(first), run_id, admitted.revision, "latest revision"),
+            (
+                CandidatePublication(
+                    candidate_revision=latest.candidate_revision,
+                    revision_digest="b" * 64,
+                    action_ids=latest.action_ids,
+                ),
+                run_id,
+                admitted.revision,
+                "digest",
+            ),
+            (
+                CandidatePublication(
+                    candidate_revision=latest.candidate_revision,
+                    revision_digest=latest.revision_digest,
+                    action_ids=latest.action_ids[:1],
+                ),
+                run_id,
+                admitted.revision,
+                "action handles",
+            ),
+            (
+                CandidatePublication(
+                    candidate_revision=latest.candidate_revision,
+                    revision_digest=latest.revision_digest,
+                    action_ids=tuple(reversed(latest.action_ids)),
+                ),
+                run_id,
+                admitted.revision,
+                "action handles",
+            ),
+            (_publication(latest), uuid4(), admitted.revision, "another consultant run"),
+        )
+        for publication, publication_run_id, expected_revision, message in attempts:
+            now = datetime.now(UTC)
+            with pytest.raises((ValueError, StaleRevision), match=message):
+                await runtime.commit_verified_consultant_result(
+                    document_id=document_id,
+                    expected_revision=expected_revision,
+                    commit=VerifiedConsultantCommit(
+                        run_id=publication_run_id,
+                        answer_source_id=source_id,
+                        started_at=now,
+                        completed_at=now,
+                        result=_publication_result(source_id, publication),
+                    ),
+                )
+            assert (await runtime.raw_state(document_id)) == before_state
+            assert await runtime.reopen_document(document_id) == before_snapshot
+
+        now = datetime.now(UTC)
+        with pytest.raises(ValueError, match="baseline revision is stale"):
+            _published_candidate_changeset(
+                {**before_state, "revision": admitted.revision + 1},
+                commit=VerifiedConsultantCommit(
+                    run_id=run_id,
+                    answer_source_id=source_id,
+                    started_at=now,
+                    completed_at=now,
+                    result=_publication_result(source_id, _publication(latest)),
+                ),
+                expected_revision=admitted.revision + 1,
+            )
+        duplicate_publication = CandidatePublication.model_construct(
+            candidate_revision=latest.candidate_revision,
+            revision_digest=latest.revision_digest,
+            action_ids=(latest.action_ids[0], latest.action_ids[0]),
+        )
+        with pytest.raises(ValueError, match="duplicate candidate publication action ID"):
+            _published_candidate_changeset(
+                before_state,
+                commit=VerifiedConsultantCommit(
+                    run_id=run_id,
+                    answer_source_id=source_id,
+                    started_at=now,
+                    completed_at=now,
+                    result=_publication_result(source_id, duplicate_publication),
+                ),
+                expected_revision=admitted.revision,
+            )
+        assert (await runtime.raw_state(document_id)) == before_state
+        assert await runtime.reopen_document(document_id) == before_snapshot
+
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
+async def test_publication_requires_final_skills_to_include_candidate_skills(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        admitted, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            text="我負責管理採購作業。",
+        )
+        receipt = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=run_id,
+                source_id=source_id,
+                baseline_revision=admitted.revision,
+                skill_id="duty-grouping",
+            ),
+        )
+        before_state = await runtime.raw_state(document_id)
+        before_snapshot = await runtime.reopen_document(document_id)
+        now = datetime.now(UTC)
+
+        with pytest.raises(ValueError, match="used Skills missing"):
+            await runtime.commit_verified_consultant_result(
+                document_id=document_id,
+                expected_revision=admitted.revision,
+                commit=VerifiedConsultantCommit(
+                    run_id=run_id,
+                    answer_source_id=source_id,
+                    started_at=now,
+                    completed_at=now,
+                    result=_publication_result(
+                        source_id,
+                        _publication(receipt),
+                        skill_id="task-boundary",
+                    ),
+                ),
+            )
+        assert (await runtime.raw_state(document_id) == before_state)
+        assert await runtime.reopen_document(document_id) == before_snapshot
+        await runtime.delete_document(document_id)
 
 
 @pytest.mark.asyncio
@@ -1922,7 +2289,7 @@ async def test_candidate_exact_replay_revalidates_its_own_receipt_evidence(
                 source_id=correction_source_id,
                 kind=EmployeeSourceKind.EMPLOYEE_TURN,
                 text="更正：我改為每日管理採購作業。",
-                supersedes_source_id=source_a_id,
+                supersedes_source_id=source_b_id,
             )
 
         raw_before_replay = await runtime.raw_state(document_id)
@@ -1933,28 +2300,46 @@ async def test_candidate_exact_replay_revalidates_its_own_receipt_evidence(
         assert active_before_replay.candidate_revision == second.candidate_revision == 2
         assert active_before_replay.changeset.source_ids == (source_b_id,)
 
-        with pytest.raises(CandidateEditRejected) as rejected:
+        now = datetime.now(UTC)
+        with pytest.raises(SourceConflict, match=str(source_b_id)):
+            await runtime.commit_verified_consultant_result(
+                document_id=document_id,
+                expected_revision=source_b_snapshot.revision,
+                commit=VerifiedConsultantCommit(
+                    run_id=run_id,
+                    answer_source_id=source_a_id,
+                    started_at=now,
+                    completed_at=now,
+                    result=_publication_result(source_a_id, _publication(second)),
+                ),
+            )
+        assert (await runtime.raw_state(document_id)) == raw_before_replay
+        assert await runtime.reopen_document(document_id) == snapshot_before_replay
+
+        assert (
             await runtime.stage_candidate_revision(
                 document_id=document_id,
                 request=first_request,
             )
+            == first
+        )
+        with pytest.raises(CandidateEditRejected) as rejected:
+            await runtime.stage_candidate_revision(
+                document_id=document_id,
+                request=second_request,
+            )
         assert rejected.value.baseline_revision == source_b_snapshot.revision
         assert rejected.value.candidate_revision == second.candidate_revision
         assert rejected.value.issues == (
-            f"source {source_a_id} was superseded before candidate staging",
+            f"source {source_b_id} was superseded before candidate staging",
         )
         assert isinstance(rejected.value.__cause__, SourceConflict)
         assert str(rejected.value.__cause__) == (
-            f"source {source_a_id} was superseded before candidate staging"
+            f"source {source_b_id} was superseded before candidate staging"
         )
 
-        latest_replay = await runtime.stage_candidate_revision(
-            document_id=document_id,
-            request=second_request,
-        )
         snapshot_after_replay = await runtime.reopen_document(document_id)
         assert first.candidate_revision == 1
-        assert latest_replay == second
         assert (await runtime.raw_state(document_id)) == raw_before_replay
         assert snapshot_after_replay.approved_document == snapshot_before_replay.approved_document
         assert snapshot_after_replay.review_queue == snapshot_before_replay.review_queue
@@ -2019,14 +2404,6 @@ async def test_every_employee_review_decision_clears_candidate_workspace(
         visible_reply="我整理了一項 Duty 建議。",
         reply_basis=basis,
         used_skill_ids=("task-boundary",),
-        reviewable_document_changes=(
-            ReviewableDocumentChange(
-                operation=DocumentChangeOperation.ADD,
-                path="/duties",
-                after={"statement": "執行採購作業"},
-                basis=basis,
-            ),
-        ),
         sufficiency=SufficiencyRecommendation(
             currently_enough=False,
             reason="仍有工作待盤點。",
@@ -2038,22 +2415,20 @@ async def test_every_employee_review_decision_clears_candidate_workspace(
 
     async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
         await runtime.create_document(document_id, title="採購職務")
-        sourced = await runtime.record_employee_source(
+        proposal_run_id = uuid4()
+        sourced, _ = await runtime.admit_employee_answer(
             document_id=document_id,
+            run_id=proposal_run_id,
             source_id=evidence_source_id,
-            kind=EmployeeSourceKind.EMPLOYEE_TURN,
             text="我負責執行採購作業。",
         )
-        proposed = await runtime.commit_verified_consultant_result(
+        proposed = await _stage_and_publish(
+            runtime,
             document_id=document_id,
-            expected_revision=sourced.revision,
-            commit=VerifiedConsultantCommit(
-                run_id=uuid4(),
-                answer_source_id=evidence_source_id,
-                started_at=now,
-                completed_at=now,
-                result=result,
-            ),
+            run_id=proposal_run_id,
+            source_id=evidence_source_id,
+            baseline_revision=sourced.revision,
+            result=result,
         )
         bundle = proposed.document_review.bundles[0]
         old_action = bundle.actions[0]

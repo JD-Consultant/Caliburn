@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 import os
 from decimal import Decimal
+from hashlib import sha256
 from uuid import UUID, uuid4
 
 import pytest
@@ -12,14 +13,23 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from langgraph.runtime import Runtime
 
 from app.adapters.langgraph.postgres import open_postgres_consultant_runtime
+from app.consultant.candidate_workspace import (
+    CandidateEditAction,
+    CandidateToolReceipt,
+    CandidateWorkspace,
+    candidate_revision_digest,
+)
 from app.consultant.context import (
+    ApprovedDocumentSlice,
     ContextRequest,
     ContextSelectionReason,
     ConsultantAgentRuntimeContext,
     ConsultantContextMiddleware,
     DocumentSourceLookup,
+    GlobalOrientationIndex,
     SemanticSourceIndex,
     SourceLookupMode,
+    _prompt,
     build_consultant_context,
     build_employee_source_tools,
 )
@@ -38,9 +48,16 @@ from app.consultant.state import (
     ApprovedDuty,
     ApprovedJobDocument,
     ApprovedTask,
+    DocumentChangeSet,
+    DocumentChangeStatus,
+    DocumentPatchAction,
+    DocumentPatchOperation,
+    DocumentPathRead,
+    EmployeeSource,
     EmployeeSourceKind,
+    initial_thread_state,
 )
-from app.consultant.views import ConsultantSnapshot
+from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 
 
 def _database_url() -> str:
@@ -129,6 +146,171 @@ def _approved_document(document_id: UUID) -> ApprovedJobDocument:
                 display_order=1,
             ),
         ),
+    )
+
+
+def _context_source(document_id: UUID, source_id: UUID) -> EmployeeSource:
+    return EmployeeSource.pending(
+        source_id=source_id,
+        document_id=document_id,
+        kind=EmployeeSourceKind.EMPLOYEE_TURN,
+        text="這是本輪員工原話。",
+    )
+
+
+class _ContextSourceRuntime:
+    def __init__(self, source: EmployeeSource) -> None:
+        self.source = source
+
+    async def get_source(self, document_id: UUID, source_id: UUID) -> EmployeeSource:
+        assert document_id == self.source.document_id
+        assert source_id == self.source.source_id
+        return self.source
+
+
+def _context_action(
+    *,
+    action_id: UUID,
+    source_id: UUID,
+    target_id: UUID,
+    status: DocumentChangeStatus = DocumentChangeStatus.PENDING,
+    after: str = "候選內容",
+    path: str | None = None,
+    target_key: str | None = None,
+    depends_on_action_ids: tuple[UUID, ...] = (),
+    employee_after: str | None = None,
+    rejection_reason: str | None = None,
+    stale_reason: str | None = None,
+) -> DocumentPatchAction:
+    return DocumentPatchAction(
+        action_id=action_id,
+        operation=DocumentPatchOperation.REVISE,
+        path=path or f"/tasks/{target_id}/statement",
+        target_key=target_key or f"task:{target_id}:statement",
+        before="原核准內容",
+        after=after,
+        source_ids=(source_id,),
+        read_set=(
+            DocumentPathRead(
+                path=path or f"/tasks/{target_id}/statement",
+                value_sha256=sha256(b"original").hexdigest(),
+            ),
+        ),
+        target_ids=(target_id,),
+        depends_on_action_ids=depends_on_action_ids,
+        atomic_subgroup_id=uuid4(),
+        status=status,
+        employee_after=employee_after,
+        rejection_reason=rejection_reason,
+        stale_reason=stale_reason,
+    )
+
+
+def _context_changeset(
+    *,
+    changeset_id: UUID,
+    created_revision: int,
+    actions: tuple[DocumentPatchAction, ...],
+) -> DocumentChangeSet:
+    return DocumentChangeSet(
+        changeset_id=changeset_id,
+        summary="候選文件變更。",
+        actions=actions,
+        source_ids=tuple(
+            sorted({source_id for action in actions for source_id in action.source_ids}, key=str)
+        ),
+        created_revision=created_revision,
+    )
+
+
+def _prompt_section(prompt: str, name: str) -> dict:
+    start = prompt.index(f"<{name}")
+    payload_start = prompt.index(">", start) + 1
+    payload_end = prompt.index(f"</{name}>", payload_start)
+    return json.loads(prompt[payload_start:payload_end])
+
+
+def _empty_orientation(document_id: UUID) -> GlobalOrientationIndex:
+    return GlobalOrientationIndex(
+        document_id=document_id,
+        state_revision=7,
+        total_work_count=0,
+        total_hypothesis_count=0,
+        total_duty_count=0,
+        total_task_count=0,
+        gap_count=0,
+        pending_review_count=0,
+        omitted_work_count=0,
+        omitted_hypothesis_count=0,
+        omitted_duty_count=0,
+        omitted_task_count=0,
+    )
+
+
+def _context_snapshot(
+    *,
+    document: ApprovedJobDocument,
+    source_id: UUID,
+    review_queue: dict[str, dict] | None = None,
+    active_candidate: CandidateWorkspace | None = None,
+) -> ConsultantSnapshot:
+    state = initial_thread_state(document.document_id)
+    state.update(
+        {
+            "revision": 7,
+            "source_count": 1,
+            "latest_source_id": str(source_id),
+            "approved_document": document.model_dump(mode="json"),
+            "review_queue": review_queue or {},
+            "active_candidate": (
+                active_candidate.model_dump(mode="json")
+                if active_candidate is not None
+                else None
+            ),
+        }
+    )
+    return snapshot_from_state(state)
+
+
+def _active_workspace(
+    *,
+    run_id: UUID,
+    changeset: DocumentChangeSet,
+) -> CandidateWorkspace:
+    digest = candidate_revision_digest(changeset)
+    actions = tuple(
+        CandidateEditAction(
+            action_id=action.action_id,
+            operation=action.operation,
+            path=action.path,
+            before=action.before,
+            after=action.after,
+            depends_on_action_ids=action.depends_on_action_ids,
+            supersedes_action_ids=action.supersedes_action_ids,
+            atomic_subgroup_id=action.atomic_subgroup_id,
+            status=action.status,
+            stale_reason=action.stale_reason,
+        )
+        for action in changeset.actions
+    )
+    receipt = CandidateToolReceipt(
+        request_sha256="a" * 64,
+        candidate_revision=1,
+        revision_digest=digest,
+        changeset_id=changeset.changeset_id,
+        source_ids=changeset.source_ids,
+        action_ids=tuple(action.action_id for action in changeset.actions),
+        actions=actions,
+    )
+    return CandidateWorkspace(
+        run_id=run_id,
+        baseline_revision=7,
+        candidate_revision=1,
+        request_sha256="a" * 64,
+        revision_digest=digest,
+        used_skill_ids=("task-boundary",),
+        changeset=changeset,
+        tool_receipts={"candidate-call-1": receipt},
     )
 
 
@@ -680,3 +862,298 @@ async def test_context_degrades_orientation_explicitly_without_dropping_current_
             assert edited.revision < latest.revision
         finally:
             await runtime.delete_document(document_id)
+
+
+def test_context_exposes_semantic_pending_overlay_and_employee_decision_memory() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = _approved_document(document_id)
+    task_id = document.tasks[0].task_id
+    actions = (
+        _context_action(
+            action_id=UUID(int=1), source_id=source_id, target_id=task_id,
+            after="待審候選內容",
+        ),
+        _context_action(
+            action_id=UUID(int=2), source_id=source_id, target_id=task_id,
+            status=DocumentChangeStatus.DEFERRED, after="暫緩候選內容",
+        ),
+        _context_action(
+            action_id=UUID(int=3), source_id=source_id, target_id=task_id,
+            status=DocumentChangeStatus.REJECTED, after="不得混入核准的拒絕內容",
+            rejection_reason="這不是我的職責。",
+        ),
+        _context_action(
+            action_id=UUID(int=4), source_id=source_id, target_id=task_id,
+            status=DocumentChangeStatus.STALE, after="不得混入核准的失效內容",
+            stale_reason="前置內容已變更。",
+        ),
+        _context_action(
+            action_id=UUID(int=5), source_id=source_id, target_id=task_id,
+            status=DocumentChangeStatus.EDIT_ACCEPTED, after="模型原本的候選內容",
+            employee_after="員工修改後的核准內容",
+        ),
+    )
+    changeset = _context_changeset(
+        changeset_id=UUID(int=101), created_revision=6, actions=actions
+    )
+    approved = document.model_copy(update={"work_description": "員工修改後的核准內容"})
+    source = _context_source(document_id, source_id)
+    prompt = _prompt(
+        orientation=_empty_orientation(document_id),
+        approved_slice=ApprovedDocumentSlice(
+            document_id=document_id,
+            work_description=approved.work_description,
+        ),
+        current_work={"subject_id": str(task_id)},
+        recent_consultant_turns=(),
+        required_clarification=None,
+        understanding={},
+        gaps={},
+        review_queue={str(changeset.changeset_id): changeset.model_dump(mode="json")},
+        current_source=source,
+        sources=(),
+        lookup_handles=(),
+        non_authoritative_dialogue_summary=None,
+    )
+
+    assert '<pending_document_overlay authority="candidate" approved="false">' in prompt
+    assert '<document_decision_history authority="employee_decision" approved="false">' in prompt
+    assert "pending content is only a conditional hypothesis" in prompt
+
+    pending = _prompt_section(prompt, "pending_document_overlay")
+    assert [item["status"] for item in pending["actions"]] == ["pending", "deferred"]
+    assert pending["actions"][0] == {
+        "changeset_id": str(changeset.changeset_id),
+        "created_revision": 6,
+        "action_id": str(actions[0].action_id),
+        "operation": "revise",
+        "path": f"/tasks/{task_id}/statement",
+        "before": "原核准內容",
+        "after": "待審候選內容",
+        "source_ids": [str(source_id)],
+        "depends_on_action_ids": [],
+        "supersedes_action_ids": [],
+        "atomic_subgroup_id": str(actions[0].atomic_subgroup_id),
+        "status": "pending",
+    }
+    assert pending["omitted_count"] == {"pending": 0, "deferred": 0}
+
+    history = _prompt_section(prompt, "document_decision_history")
+    assert [item["status"] for item in history["actions"]] == [
+        "rejected",
+        "stale",
+        "edit_accepted",
+    ]
+    assert history["actions"][0]["target_key"] == actions[2].target_key
+    assert history["actions"][0]["rejection_reason"] == "這不是我的職責。"
+    assert history["actions"][1]["stale_reason"] == "前置內容已變更。"
+    assert history["actions"][2]["model_after"] == "模型原本的候選內容"
+    assert history["actions"][2]["employee_after"] == "員工修改後的核准內容"
+    assert history["omitted_count"] == {
+        "rejected": 0,
+        "stale": 0,
+        "edit_accepted": 0,
+    }
+    approved_payload = _prompt_section(prompt, "approved_document_slice")
+    assert approved_payload["work_description"] == "員工修改後的核准內容"
+    assert "不得混入核准" not in json.dumps(approved_payload, ensure_ascii=False)
+
+
+def test_context_overlay_has_deterministic_caps_and_dependency_closure() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = _approved_document(document_id)
+    focus_id = document.tasks[0].task_id
+    unrelated_id = document.tasks[1].task_id
+    pending_actions = tuple(
+        _context_action(
+            action_id=UUID(int=index + 1),
+            source_id=source_id,
+            target_id=focus_id if index == 13 else unrelated_id,
+            depends_on_action_ids=(UUID(int=1),) if index == 13 else (),
+            after=f"pending-{index}",
+        )
+        for index in range(14)
+    )
+    pending = _context_changeset(
+        changeset_id=UUID(int=201), created_revision=4, actions=pending_actions
+    )
+    rejected = tuple(
+        _context_action(
+            action_id=UUID(int=301 + index), source_id=source_id,
+            target_id=unrelated_id, status=DocumentChangeStatus.REJECTED,
+            after=f"rejected-{index}", rejection_reason="員工拒絕。",
+        )
+        for index in range(9)
+    )
+    history_bundles = {
+        str(UUID(int=400 + index)): _context_changeset(
+            changeset_id=UUID(int=400 + index), created_revision=index,
+            actions=(action,),
+        ).model_dump(mode="json")
+        for index, action in enumerate(rejected)
+    }
+    queue = {
+        str(pending.changeset_id): pending.model_dump(mode="json"),
+        **history_bundles,
+    }
+    source = _context_source(document_id, source_id)
+
+    def render(review_queue: dict[str, dict]) -> str:
+        return _prompt(
+            orientation=_empty_orientation(document_id),
+            approved_slice=ApprovedDocumentSlice(
+                document_id=document_id, tasks=(document.tasks[0],)
+            ),
+            current_work={"subject_id": str(focus_id)},
+            recent_consultant_turns=(), required_clarification=None,
+            understanding={}, gaps={}, review_queue=review_queue,
+            current_source=source, sources=(), lookup_handles=(),
+            non_authoritative_dialogue_summary=None,
+        )
+
+    first_pending = _prompt_section(render(queue), "pending_document_overlay")
+    reversed_queue = dict(reversed(tuple(queue.items())))
+    second_pending = _prompt_section(render(reversed_queue), "pending_document_overlay")
+    assert first_pending == second_pending
+    assert len(first_pending["actions"]) == 12
+    assert str(UUID(int=14)) in {item["action_id"] for item in first_pending["actions"]}
+    assert str(UUID(int=1)) in {item["action_id"] for item in first_pending["actions"]}
+    assert first_pending["omitted_count"] == {"pending": 2, "deferred": 0}
+
+    history = _prompt_section(render(queue), "document_decision_history")
+    assert [item["action_id"] for item in history["actions"]] == [
+        str(UUID(int=value)) for value in range(302, 310)
+    ]
+    assert history["omitted_count"] == {
+        "rejected": 1,
+        "stale": 0,
+        "edit_accepted": 0,
+    }
+
+
+def test_context_keeps_nine_employee_accepted_tasks_separate_from_rejected_output() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    duty_id = uuid4()
+    accepted_tasks = tuple(
+        ApprovedTask(
+            task_id=uuid4(),
+            duty_id=duty_id,
+            statement=f"員工接受的工作 {index}",
+            action="完成",
+            object=f"工作 {index}",
+            purpose_result="交付結果",
+            display_order=index,
+        )
+        for index in range(9)
+    )
+    document = ApprovedJobDocument(
+        document_id=document_id,
+        job_title="九項已接受工作",
+        duties=(ApprovedDuty(duty_id=duty_id, statement="主要職責", display_order=0),),
+        tasks=accepted_tasks,
+    )
+    rejected_output = _context_action(
+        action_id=UUID(int=601),
+        source_id=source_id,
+        target_id=accepted_tasks[0].task_id,
+        path="/opks",
+        target_key=f"opks:output:{accepted_tasks[0].task_id}",
+        status=DocumentChangeStatus.REJECTED,
+        after="模型重提的錯誤 O",
+        rejection_reason="這不是本職務的產出。",
+    )
+    changeset = _context_changeset(
+        changeset_id=UUID(int=602),
+        created_revision=8,
+        actions=(rejected_output,),
+    )
+    prompt = _prompt(
+        orientation=_empty_orientation(document_id),
+        approved_slice=ApprovedDocumentSlice(
+            document_id=document_id,
+            duties=(document.duties[0],),
+            tasks=accepted_tasks,
+        ),
+        current_work={"subject_id": str(accepted_tasks[0].task_id)},
+        recent_consultant_turns=(), required_clarification=None,
+        understanding={}, gaps={},
+        review_queue={str(changeset.changeset_id): changeset.model_dump(mode="json")},
+        current_source=_context_source(document_id, source_id),
+        sources=(), lookup_handles=(), non_authoritative_dialogue_summary=None,
+    )
+
+    approved = _prompt_section(prompt, "approved_document_slice")
+    assert [task["statement"] for task in approved["tasks"]] == [
+        f"員工接受的工作 {index}" for index in range(9)
+    ]
+    assert "模型重提的錯誤 O" not in json.dumps(approved, ensure_ascii=False)
+    pending = _prompt_section(prompt, "pending_document_overlay")
+    assert pending["actions"] == []
+    history = _prompt_section(prompt, "document_decision_history")
+    assert history["actions"] == [
+        {
+            "changeset_id": str(changeset.changeset_id),
+            "created_revision": 8,
+            "action_id": str(rejected_output.action_id),
+            "status": "rejected",
+            "target_key": rejected_output.target_key,
+            "rejection_reason": "這不是本職務的產出。",
+        }
+    ]
+
+
+@pytest.mark.asyncio
+async def test_same_run_retry_sees_active_candidate_without_changing_progress() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    run_id = uuid4()
+    document = _approved_document(document_id)
+    changeset = _context_changeset(
+        changeset_id=uuid4(),
+        created_revision=7,
+        actions=(
+            _context_action(
+                action_id=uuid4(), source_id=source_id,
+                target_id=document.tasks[0].task_id, after="同一 run 可修正的候選",
+            ),
+        ),
+    )
+    snapshot = _context_snapshot(
+        document=document,
+        source_id=source_id,
+        active_candidate=_active_workspace(run_id=run_id, changeset=changeset),
+    )
+    runtime = _ContextSourceRuntime(_context_source(document_id, source_id))
+    before = snapshot.semantic_progress
+    same_run = await build_consultant_context(
+        runtime=runtime,
+        snapshot=snapshot,
+        execution=_execution(),
+        request=ContextRequest(
+            run_id=run_id,
+            current_source_id=source_id,
+            selected_skill_ids=("task-boundary",),
+        ),
+    )
+    assert '<active_candidate_workspace authority="none" approved="false">' in same_run.system_prompt
+    active = _prompt_section(same_run.system_prompt, "active_candidate_workspace")
+    assert active["candidate_revision"] == 1
+    assert active["revision_digest"] == snapshot.active_candidate.revision_digest
+    assert active["actions"][0]["source_ids"] == [str(source_id)]
+    assert snapshot.semantic_progress == before
+    assert snapshot.semantic_progress.employee_decisions.pending == 0
+
+    new_run = await build_consultant_context(
+        runtime=runtime,
+        snapshot=snapshot,
+        execution=_execution(),
+        request=ContextRequest(
+            run_id=uuid4(),
+            current_source_id=source_id,
+            selected_skill_ids=("task-boundary",),
+        ),
+    )
+    assert "<active_candidate_workspace" not in new_run.system_prompt

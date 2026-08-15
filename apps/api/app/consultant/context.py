@@ -651,7 +651,14 @@ def _approved_slice(
 def _json(value: Any, *, exclude_none: bool = False) -> str:
     if isinstance(value, BaseModel):
         value = value.model_dump(mode="json", exclude_none=exclude_none)
-    return json.dumps(value, ensure_ascii=False, separators=(",", ":"), default=str)
+    payload = json.dumps(
+        value,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    return payload.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
 
 
 _PENDING_CONTEXT_LIMIT = 12
@@ -681,6 +688,7 @@ def _context_target_ids(
             for duty in approved_slice.duties
         ),
         *(task.task_id for task in approved_slice.tasks),
+        *(item.item_id for item in approved_slice.opks),
     }
     if current_work is not None:
         raw_subject_id = current_work.get("subject_id")
@@ -690,6 +698,137 @@ def _context_target_ids(
         except (TypeError, ValueError):
             pass
     return target_ids
+
+
+_CONTEXT_ENTITY_COLLECTIONS = frozenset({"duties", "tasks", "opks"})
+_CONTEXT_LINKAGE_ID_FIELDS = frozenset(
+    {
+        "duty_id",
+        "task_id",
+        "task_ids",
+        "item_id",
+        "indicator_id",
+        "indicator_ids",
+    }
+)
+
+
+def _context_uuid(value: Any) -> UUID | None:
+    try:
+        return UUID(str(value))
+    except (TypeError, ValueError):
+        return None
+
+
+def _canonical_context_entity_id(value: str) -> UUID | None:
+    path = value.split("#", 1)[0]
+    parts = path.strip("/").split("/")
+    if len(parts) < 2 or parts[0] not in _CONTEXT_ENTITY_COLLECTIONS:
+        return None
+    return _context_uuid(parts[1])
+
+
+def _context_linkage_ids(value: JsonValue | None) -> set[UUID]:
+    """Read only persisted document linkage identities, never arbitrary UUID text."""
+
+    found: set[UUID] = set()
+
+    def visit(item: Any) -> None:
+        if isinstance(item, dict):
+            for key, nested in item.items():
+                if key in _CONTEXT_LINKAGE_ID_FIELDS:
+                    values = nested if key.endswith("_ids") else (nested,)
+                    if isinstance(values, (list, tuple)):
+                        for candidate in values:
+                            parsed = _context_uuid(candidate)
+                            if parsed is not None:
+                                found.add(parsed)
+                    else:
+                        parsed = _context_uuid(values)
+                        if parsed is not None:
+                            found.add(parsed)
+                if isinstance(nested, (dict, list, tuple)):
+                    visit(nested)
+        elif isinstance(item, (list, tuple)):
+            for nested in item:
+                visit(nested)
+
+    visit(value)
+    return found
+
+
+def _context_path_linkage_ids(action: DocumentPatchAction) -> set[UUID]:
+    """Decode a scalar linkage patch only when its canonical OPKS path names it."""
+
+    for value in (action.path, action.target_key):
+        parts = value.split("#", 1)[0].strip("/").split("/")
+        if (
+            len(parts) < 3
+            or parts[0] != "opks"
+            or _context_uuid(parts[1]) is None
+            or parts[2] not in _CONTEXT_LINKAGE_ID_FIELDS
+        ):
+            continue
+        linkage_value = {
+            parts[2]: action.after if action.after is not None else action.before
+        }
+        return _context_linkage_ids(linkage_value)
+    return set()
+
+
+def _context_action_target_ids(action: DocumentPatchAction) -> set[UUID]:
+    target_ids = set(action.target_ids)
+    for value in (action.path, action.target_key):
+        entity_id = _canonical_context_entity_id(value)
+        if entity_id is not None:
+            target_ids.add(entity_id)
+    target_ids.update(_context_linkage_ids(action.before))
+    target_ids.update(_context_linkage_ids(action.after))
+    target_ids.update(_context_path_linkage_ids(action))
+    return target_ids
+
+
+def _pending_closure_groups(
+    unresolved: Sequence[tuple[DocumentChangeSet, DocumentPatchAction]],
+) -> tuple[tuple[tuple[DocumentChangeSet, DocumentPatchAction], ...], ...]:
+    """Return same-changeset dependency/atomic components in persisted action order."""
+
+    by_changeset: dict[UUID, list[tuple[DocumentChangeSet, DocumentPatchAction]]] = {}
+    for item in unresolved:
+        by_changeset.setdefault(item[0].changeset_id, []).append(item)
+    groups: list[tuple[tuple[DocumentChangeSet, DocumentPatchAction], ...]] = []
+    for actions in by_changeset.values():
+        index_by_id = {action.action_id: index for index, (_, action) in enumerate(actions)}
+        adjacent = [set() for _ in actions]
+        for index, (_, action) in enumerate(actions):
+            for dependency_id in action.depends_on_action_ids:
+                dependency_index = index_by_id.get(dependency_id)
+                if dependency_index is not None:
+                    adjacent[index].add(dependency_index)
+                    adjacent[dependency_index].add(index)
+        atomic_members: dict[UUID, list[int]] = {}
+        for index, (_, action) in enumerate(actions):
+            if action.atomic_subgroup_id is not None:
+                atomic_members.setdefault(action.atomic_subgroup_id, []).append(index)
+        for members in atomic_members.values():
+            for member in members[1:]:
+                adjacent[members[0]].add(member)
+                adjacent[member].add(members[0])
+        visited: set[int] = set()
+        for start in range(len(actions)):
+            if start in visited:
+                continue
+            stack = [start]
+            component: set[int] = set()
+            while stack:
+                current = stack.pop()
+                if current in component:
+                    continue
+                component.add(current)
+                stack.extend(adjacent[current] - component)
+            visited.update(component)
+            groups.append(tuple(actions[index] for index in sorted(component)))
+    return tuple(groups)
 
 
 def _context_action(
@@ -725,35 +864,25 @@ def _pending_document_overlay(
         if action.status
         in {DocumentChangeStatus.PENDING, DocumentChangeStatus.DEFERRED}
     ]
-    action_by_id = {
-        action.action_id: (changeset, action) for changeset, action in unresolved
-    }
     target_ids = _context_target_ids(
         approved_slice=approved_slice,
         current_work=current_work,
     )
-    direct = [
-        item for item in unresolved if target_ids & set(item[1].target_ids)
+    groups = _pending_closure_groups(unresolved)
+    direct_groups = [
+        group
+        for group in groups
+        if any(target_ids & _context_action_target_ids(action) for _, action in group)
     ]
-    selected: list[tuple[DocumentChangeSet, Any]] = []
+    direct_group_ids = {tuple(action.action_id for _, action in group) for group in direct_groups}
+    selected: list[tuple[DocumentChangeSet, DocumentPatchAction]] = []
     selected_ids: set[UUID] = set()
 
-    def include_with_dependencies(item: tuple[DocumentChangeSet, Any]) -> None:
-        changeset, action = item
-        if action.action_id in selected_ids:
-            return
-        for dependency_id in action.depends_on_action_ids:
-            dependency = action_by_id.get(dependency_id)
-            if dependency is not None and dependency[0].changeset_id == changeset.changeset_id:
-                include_with_dependencies(dependency)
-        if len(selected) < _PENDING_CONTEXT_LIMIT:
-            selected.append((changeset, action))
-            selected_ids.add(action.action_id)
-
-    for item in direct:
-        include_with_dependencies(item)
-    for item in unresolved:
-        include_with_dependencies(item)
+    for group in (*direct_groups, *(group for group in groups if tuple(action.action_id for _, action in group) not in direct_group_ids)):
+        additions = [item for item in group if item[1].action_id not in selected_ids]
+        if len(selected) + len(additions) <= _PENDING_CONTEXT_LIMIT:
+            selected.extend(additions)
+            selected_ids.update(action.action_id for _, action in additions)
 
     omitted = {
         status.value: sum(
@@ -900,7 +1029,7 @@ def _prompt(
         + "</revisable_understanding>",
         "<visible_gaps>" + _json(gaps) + "</visible_gaps>",
         "<pending_document_overlay authority=\"candidate\" approved=\"false\">"
-        + _json(pending_overlay, exclude_none=True)
+        + _json(pending_overlay)
         + "</pending_document_overlay>",
         "<document_decision_history authority=\"employee_decision\" approved=\"false\">"
         + _json(decision_history, exclude_none=True)
@@ -928,7 +1057,7 @@ def _prompt(
         sections.insert(
             3,
             "<active_candidate_workspace authority=\"none\" approved=\"false\">"
-            + _json(active_workspace, exclude_none=True)
+            + _json(active_workspace)
             + "</active_candidate_workspace>",
         )
     if non_authoritative_dialogue_summary is not None:

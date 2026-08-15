@@ -265,6 +265,11 @@ async def test_admitted_turn_is_verified_then_committed_once() -> None:
         _snapshot(document_id, run_id, source_id),
         _source(document_id, source_id),
     )
+    agent_factory_kwargs: dict[str, object] = {}
+
+    def agent_factory(**kwargs: object) -> FakeAgent:
+        agent_factory_kwargs.update(kwargs)
+        return FakeAgent(result=_model_output(source_id), execution=execution)
 
     await execute_admitted_consultant_turn(
         runtime=runtime,
@@ -273,11 +278,15 @@ async def test_admitted_turn_is_verified_then_committed_once() -> None:
         source_id=source_id,
         execution=execution,
         model=object(),
-        agent_factory=lambda **_: FakeAgent(
-            result=_model_output(source_id), execution=execution
-        ),
+        agent_factory=agent_factory,
     )
 
+    binding = agent_factory_kwargs["candidate_edit_binding"]
+    assert binding.runtime is runtime
+    assert binding.document_id == document_id
+    assert binding.run_id == run_id
+    assert binding.baseline_revision == 1
+    assert binding.selected_skill_ids == CONSULTANT_SKILL_IDS
     assert len(runtime.commits) == 1
     commit = runtime.commits[0]["commit"]
     assert commit.run_id == run_id

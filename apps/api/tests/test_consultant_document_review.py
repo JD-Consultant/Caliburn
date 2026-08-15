@@ -21,7 +21,11 @@ from app.consultant.document_review import (
 )
 from app.consultant.document_authority import apply_document_actions
 from app.consultant.graph import build_consultant_graph
-from app.consultant.interview import VerifiedConsultantCommit
+from app.consultant.interview import (
+    VerifiedConsultantCommit,
+    _publish_persisted_changeset,
+    apply_verified_consultant_commit,
+)
 from app.consultant.results import (
     AnalysisBasis,
     ConsultantResult,
@@ -73,14 +77,12 @@ def _basis(source_id: UUID) -> AnalysisBasis:
 
 def _result(
     source_id: UUID,
-    changes: tuple[ReviewableDocumentChange, ...],
 ) -> ConsultantResult:
     basis = _basis(source_id)
     return ConsultantResult(
         visible_reply="我整理了一組可供您審核的文件變更。",
         reply_basis=basis,
         used_skill_ids=("task-boundary",),
-        reviewable_document_changes=changes,
         sufficiency=SufficiencyRecommendation(
             currently_enough=False,
             reason="仍有工作細節待確認。",
@@ -234,24 +236,35 @@ async def _commit_changes(
     run_id: UUID,
     changes: tuple[ReviewableDocumentChange, ...],
 ):
+    state = (await graph.aget_state(_config(document_id))).values
+    document = ApprovedJobDocument.model_validate(state["approved_document"])
+    published_changeset = create_document_changeset(
+        document_id=document_id,
+        run_id=run_id,
+        summary="我整理了一組可供您審核的文件變更。",
+        read_revision=revision,
+        document=document,
+        changes=changes,
+        existing_review_queue=state.get("review_queue", {}),
+        interview_work=state.get("interview_work", {}),
+    )
     now = datetime.now(UTC)
     commit = VerifiedConsultantCommit(
         run_id=run_id,
         answer_source_id=source_id,
         started_at=now,
         completed_at=now,
-        result=_result(source_id, changes),
+        result=_result(source_id),
     )
-    return await graph.ainvoke(
-        {},
-        _config(document_id),
-        context={
-            "action": "commit_consultant_result",
-            "document_id": str(document_id),
-            "expected_revision": revision,
-            "semantic_commit": commit.model_dump(mode="json"),
-        },
+    published = apply_verified_consultant_commit(
+        state,
+        document_id=document_id,
+        revision=revision + 1,
+        commit=commit,
+        published_changeset=published_changeset,
     )
+    await graph.aupdate_state(_config(document_id), published)
+    return (await graph.aget_state(_config(document_id))).values
 
 
 def test_application_assigns_stable_action_ids_and_remembers_rejection_by_target() -> None:
@@ -2129,3 +2142,109 @@ def test_publication_supersession_stales_only_explicit_unresolved_actions() -> N
     assert stale_old.actions[0].status is DocumentChangeStatus.STALE
     assert "取代" in stale_old.actions[0].stale_reason
     assert replacement.actions[0].status is DocumentChangeStatus.PENDING
+
+
+def test_publishing_supersession_revalidates_cross_bundle_dependencies() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document = ApprovedJobDocument(document_id=document_id, job_title="採購專員")
+    prerequisite = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="前置建議。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(source_id=source_id, path="/job_title", after="採購管理師"),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    prerequisite_id = prerequisite.actions[0].action_id
+    dependent = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="依賴前置的建議。",
+        read_revision=1,
+        document=apply_document_actions(document, prerequisite.actions),
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/work_description",
+                after="以採購管理師角色管理採購作業。",
+            ).model_copy(update={"depends_on_action_ids": (prerequisite_id,)}),
+        ),
+        existing_review_queue={
+            str(prerequisite.changeset_id): prerequisite.model_dump(mode="json")
+        },
+        interview_work={},
+        external_dependency_action_ids=(prerequisite_id,),
+    )
+    unrelated = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="無關建議。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(
+                source_id=source_id,
+                path="/notes",
+                after="供後續訪談使用。",
+            ),
+        ),
+        existing_review_queue={
+            str(prerequisite.changeset_id): prerequisite.model_dump(mode="json"),
+            str(dependent.changeset_id): dependent.model_dump(mode="json"),
+        },
+        interview_work={},
+    )
+    replacement = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="取代前置的候選。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _change(source_id=source_id, path="/job_title", after="資深採購管理師").model_copy(
+                update={"supersedes_action_ids": (prerequisite_id,)}
+            ),
+        ),
+        existing_review_queue={
+            str(prerequisite.changeset_id): prerequisite.model_dump(mode="json"),
+            str(dependent.changeset_id): dependent.model_dump(mode="json"),
+            str(unrelated.changeset_id): unrelated.model_dump(mode="json"),
+        },
+        interview_work={},
+    )
+
+    queue, _ = _publish_persisted_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        read_revision=1,
+        state={
+            "approved_document": document.model_dump(mode="json"),
+            "review_queue": {
+                str(prerequisite.changeset_id): prerequisite.model_dump(mode="json"),
+                str(dependent.changeset_id): dependent.model_dump(mode="json"),
+                str(unrelated.changeset_id): unrelated.model_dump(mode="json"),
+            },
+        },
+        published_changeset=replacement,
+        interview_work={},
+    )
+
+    stale_prerequisite = DocumentChangeSet.model_validate(
+        queue[str(prerequisite.changeset_id)]
+    ).actions[0]
+    stale_dependent = DocumentChangeSet.model_validate(
+        queue[str(dependent.changeset_id)]
+    ).actions[0]
+    pending_unrelated = DocumentChangeSet.model_validate(
+        queue[str(unrelated.changeset_id)]
+    ).actions[0]
+    assert stale_prerequisite.status is DocumentChangeStatus.STALE
+    assert "取代" in stale_prerequisite.stale_reason
+    assert stale_dependent.status is DocumentChangeStatus.STALE
+    assert "前置" in stale_dependent.stale_reason
+    assert pending_unrelated.status is DocumentChangeStatus.PENDING

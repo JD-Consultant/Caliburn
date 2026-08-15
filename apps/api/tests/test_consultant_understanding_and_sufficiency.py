@@ -9,7 +9,11 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 
 from app.consultant.graph import build_consultant_graph
-from app.consultant.interview import VerifiedConsultantCommit
+from app.consultant.document_review import create_document_changeset
+from app.consultant.interview import (
+    VerifiedConsultantCommit,
+    apply_verified_consultant_commit,
+)
 from app.consultant.results import (
     AnalysisBasis,
     AttentionChange,
@@ -25,6 +29,7 @@ from app.consultant.results import (
 )
 from app.consultant.state import (
     CalibrationDecision,
+    ApprovedJobDocument,
     EmployeeSourceKind,
     InterviewPriority,
     InterviewWorkStatus,
@@ -77,6 +82,7 @@ async def _commit(
     result: ConsultantResult,
     *,
     returning_after_long_gap: bool = False,
+    published_changeset=None,
 ):
     now = datetime.now(UTC)
     commit = VerifiedConsultantCommit(
@@ -87,16 +93,27 @@ async def _commit(
         returning_after_long_gap=returning_after_long_gap,
         result=result,
     )
-    return await graph.ainvoke(
-        {},
-        _config(document_id),
-        context={
-            "action": "commit_consultant_result",
-            "document_id": str(document_id),
-            "expected_revision": revision,
-            "semantic_commit": commit.model_dump(mode="json"),
-        },
+    if published_changeset is None:
+        return await graph.ainvoke(
+            {},
+            _config(document_id),
+            context={
+                "action": "commit_consultant_result",
+                "document_id": str(document_id),
+                "expected_revision": revision,
+                "semantic_commit": commit.model_dump(mode="json"),
+            },
+        )
+    state = (await graph.aget_state(_config(document_id))).values
+    updated = apply_verified_consultant_commit(
+        state,
+        document_id=document_id,
+        revision=revision + 1,
+        commit=commit,
+        published_changeset=published_changeset,
     )
+    await graph.aupdate_state(_config(document_id), updated)
+    return (await graph.aget_state(_config(document_id))).values
 
 
 def _result_with_understanding(
@@ -337,22 +354,27 @@ async def test_semantic_progress_is_explainable_and_has_no_percentage_or_pause_s
         source_id,
         impact=UnderstandingImpact.ROUTINE,
     )
-    result = result.model_copy(
-        update={
-            "reviewable_document_changes": (
-                    ReviewableDocumentChange(
-                        operation=DocumentChangeOperation.ADD,
-                        path="/tasks",
-                        after={
-                            "statement": "依缺料狀況建立請購單",
-                            "action": "建立",
-                            "object": "請購單",
-                            "display_order": 0,
-                        },
-                        basis=_basis(source_id),
-                    ),
-            )
-        }
+    changeset = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="建立待審 Task 候選。",
+        read_revision=state["revision"],
+        document=ApprovedJobDocument.model_validate(state["approved_document"]),
+        changes=(
+            ReviewableDocumentChange(
+                operation=DocumentChangeOperation.ADD,
+                path="/tasks",
+                after={
+                    "statement": "依缺料狀況建立請購單",
+                    "action": "建立",
+                    "object": "請購單",
+                    "display_order": 0,
+                },
+                basis=_basis(source_id),
+            ),
+        ),
+        existing_review_queue=state["review_queue"],
+        interview_work=state["interview_work"],
     )
     state = await _commit(
         graph,
@@ -360,6 +382,7 @@ async def test_semantic_progress_is_explainable_and_has_no_percentage_or_pause_s
         state["revision"],
         source_id,
         result,
+        published_changeset=changeset,
     )
     snapshot = snapshot_from_state(state)
     payload = snapshot.model_dump(mode="json")

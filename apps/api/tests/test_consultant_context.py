@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import json
 import os
+from collections.abc import AsyncIterator
 from decimal import Decimal
 from hashlib import sha256
 from uuid import UUID, uuid4
 
+import psycopg
 import pytest
+import pytest_asyncio
 from langchain.agents.middleware import ModelRequest, ModelResponse
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
@@ -63,6 +66,46 @@ from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 def _database_url() -> str:
     value = os.getenv("TEST_DATABASE_URL", "")
     return value.replace("postgresql+asyncpg://", "postgresql://", 1)
+
+
+@pytest_asyncio.fixture(autouse=True)
+async def cleanup_new_context_documents() -> AsyncIterator[None]:
+    """Hard-delete only catalog rows created by this context test."""
+    database_url = _database_url()
+    if not database_url:
+        yield
+        return
+
+    async def catalog_ids() -> set[UUID]:
+        async with await psycopg.AsyncConnection.connect(
+            database_url, autocommit=True
+        ) as connection:
+            async with connection.cursor() as cursor:
+                await cursor.execute(
+                    "SELECT to_regclass('public.consultant_documents')"
+                )
+                row = await cursor.fetchone()
+                if row is None or row[0] is None:
+                    return set()
+                await cursor.execute("SELECT document_id FROM consultant_documents")
+                return {row[0] for row in await cursor.fetchall()}
+
+    before = await catalog_ids()
+    yield
+    created = await catalog_ids() - before
+    if not created:
+        return
+    async with open_postgres_consultant_runtime(database_url) as runtime:
+        for document_id in created:
+            await runtime.delete_document(document_id)
+    async with await psycopg.AsyncConnection.connect(
+        database_url, autocommit=True
+    ) as connection:
+        async with connection.cursor() as cursor:
+            await cursor.executemany(
+                "DELETE FROM consultant_documents WHERE document_id = %s",
+                [(document_id,) for document_id in created],
+            )
 
 
 @pytest.fixture

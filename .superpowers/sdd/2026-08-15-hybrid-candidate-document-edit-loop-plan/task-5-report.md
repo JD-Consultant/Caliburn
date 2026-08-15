@@ -12,4 +12,8 @@
 - Same-run retry exposes active candidate revision/digest and semantic actions only when request run ID matches; new runs omit it; active candidate action limit is 32.
 - Token evidence: context receipt still counted the fully rendered prompt and final gate preserved its configured token budget assertions; no employee source body is copied into the receipt.
 - Progress evidence: candidate staging changes no deterministic coverage/depth/decision/gap projection; publication makes review decisions pending, and accept/edit-accept remains the only approved-content edge.
+- Controller initial real-DB gate: `42 passed in 14.41s`, zero skips; framework persistence tables were zero but `consultant_documents` retained exactly seven soft-deleted rows from context test create/delete calls.
+- Hygiene fix: scoped autouse fixture snapshots catalog IDs for each context test, runs normal runtime namespace cleanup only for that test's new IDs, then parameterized hard-deletes only the resulting catalog-ID difference; production `delete_document` remains soft-delete.
+- Residue cleanup: verified all seven controller UUIDs were soft-deleted, hard-deleted exactly those IDs from the disposable `caliburn` DB, then asserted `checkpoints/checkpoint_blobs/checkpoint_writes/store/consultant_documents = 0/0/0/0/0`.
+- Controller rerun: four-file sequential real-DB gate → `42 passed in 16.19s`, zero skips; immediate five-table post-gate query again returned `0/0/0/0/0`.
 - Deviation/concern: `uv run ruff check` could not run because this environment has no `ruff` executable; `git diff --check` passed before staging.

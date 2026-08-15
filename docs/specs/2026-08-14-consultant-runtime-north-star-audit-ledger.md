@@ -335,6 +335,14 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - Duplicate finding 處置：既有 exact-publication fail-closed test 4.11s 通過；不合法 `model_construct` receipt nested 進 `ConsultantResult` 時，`CandidatePublication` validator 先拒絕 duplicate action handles，故不加冗餘 graph validator。run-service test 另精確核對 candidate edit binding 的 runtime、document_id、run_id、baseline_revision、selected_skill_ids 均為 application injected 值。
 - 驗證：supersession RED `1 failed, 24 deselected`，GREEN `1 passed, 24 deselected`；grammar/binding `27 passed in 1.22s`；三個遷移檔 `61 passed in 1.51s`。controller 先在九檔 gate 得到 `1 failed, 148 passed`，診斷為本機被殺掉的 96% pytest run 留下兩個 catalog orphan document；fixture cleanup 後五表已歸零。自 verified-clean DB 順序重跑完全相同九檔 command，exit 0：**`149 passed in 103.61s`、zero skips**；立即 query 的 consultant_documents/checkpoints/checkpoint_blobs/checkpoint_writes/store 均為 0，沒有平行 DB pytest。實際 schema 指標為 6 schemas、129 props、2 optional、0 union、4 open、depth 4、13,426 bytes；candidate/final individually 均為 0 optional/union/open。
 
+### ADR 0063 Task 5：明示非核准 candidate overlay 與員工決策記憶
+
+- 狀態：**Pass**；context 只從既有 LangGraph checkpoint 的 approved document、review queue 與同 run active candidate 讀取。沒有新增 candidate table、memory store、RAG、LLM progress 或任何 approved-document write edge。
+- Authority／投影：approved slice 仍只序列化 `ApprovedJobDocument`。pending/deferred 為 `<pending_document_overlay authority="candidate" approved="false">`，含 operation、path、before／after、source IDs、dependencies、atomic subgroup、status 與各 status omitted count；rejected／stale／edit-accepted 為 `<document_decision_history authority="employee_decision" approved="false">`，保留 target 與員工 decision reason，edit-accepted 同時顯示模型原候選與員工採用值。三者都不是 JD baseline。
+- Retry／budget：`<active_candidate_workspace authority="none" approved="false">` 只在 request run ID 等於 active candidate run ID 時出現，帶 revision、digest 及最多 32 個實際 changeset action；一般新 run 不見舊 candidate。pending 以 current work／approved focus 相交優先、僅補同 changeset dependency closure，最多 12；decision history 依 created revision、changeset ID、action order 穩定排序，保留最近 8，均提供 omitted counts。token receipt 仍以完整 prompt 計算並受既有 budget gate 約束。
+- TDD／驗證：baseline `27 passed, 6 skipped`；新增 RED 為 **`4 failed, 27 passed, 6 skipped`**，四項均因缺三個 overlay section 而失敗。最終指定四檔 gate 為 **`36 passed, 6 skipped in 0.64s`**。測試覆蓋 semantic pending/deferred payload、rejected/stale/edit-accepted memory、九項已接受 Task 與一項 rejected O 分離、same-run retry、deterministic caps/order/omitted count，以及 staging 不改 semantic progress。
+- 北極星回歸：一位顧問、動態 Task／Duty／OPKS、員工原話、必要澄清／Gap、deterministic coverage／depth／decision／gap、自然續談與單一強制匯出均未改變。沒有 Proposal legacy、第二 persistence authority、multi-agent、auto-accept 或 pending/rejected 進 approved slice。結果 **Pass**。
+
 ## 8. 本次直接使用的一手來源
 
 - [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)

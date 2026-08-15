@@ -49,11 +49,11 @@ them. Regression proof: `1 passed, 33 deselected in 2.77s`.
 
 ## Focused gate and residue
 
-The requested six-file PostgreSQL gate was started once, sequentially, with
+The controller subsequently reran the requested six-file PostgreSQL gate from
+committed HEAD, sequentially, with
 `TEST_DATABASE_URL=postgresql+asyncpg://postgres:password@localhost:5432/caliburn`.
-Its host session detached stdout after 62 progress dots; the process ended and a
-subsequent collection reported `88 tests collected`, but the final pass/skip
-summary was unavailable and is not claimed. No second full gate was run.
+It exited 0 with **88 passed in 103.64s (0:01:43), zero skips**. This supersedes
+the earlier host stdout-detachment observation.
 
 After that gate, a direct PostgreSQL query reported zero rows in all five tables:
 `consultant_documents`, `checkpoints`, `checkpoint_blobs`, `checkpoint_writes`,

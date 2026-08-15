@@ -277,6 +277,20 @@ class SufficiencyRecommendation(ResultModel):
         return self
 
 
+class CandidatePublication(ResultModel):
+    """A final reference to one already-persisted candidate revision."""
+
+    candidate_revision: int = Field(ge=1)
+    revision_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
+    action_ids: tuple[UUID, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def action_handles_are_unique(self) -> CandidatePublication:
+        if len(self.action_ids) != len(set(self.action_ids)):
+            raise ValueError("duplicate candidate publication action ID")
+        return self
+
+
 class ConsultantResult(ResultModel):
     """One coherent result owned by the single professional consultant."""
 
@@ -286,7 +300,7 @@ class ConsultantResult(ResultModel):
     understanding_changes: tuple[UnderstandingChange, ...] = ()
     attention_changes: tuple[AttentionChange, ...] = ()
     gaps: tuple[VisibleGap, ...] = ()
-    reviewable_document_changes: tuple[ReviewableDocumentChange, ...] = ()
+    candidate_publication: CandidatePublication | None = None
     next_question: NextQuestion | None = None
     required_clarification: RequiredClarificationDraft | None = None
     sufficiency: SufficiencyRecommendation
@@ -313,7 +327,6 @@ class ConsultantResult(ResultModel):
             *(item.basis for item in self.understanding_changes),
             *(item.basis for item in self.attention_changes),
             *(item.basis for item in self.gaps),
-            *(item.basis for item in self.reviewable_document_changes),
             self.sufficiency.basis,
         ]
         if self.next_question is not None:
@@ -334,18 +347,6 @@ class ConsultantResult(ResultModel):
             *((item.reason, item.basis) for item in (self.sufficiency,)),
             ((self.sufficiency.continuing_benefit, self.sufficiency.basis)),
         ]
-        for change in self.reviewable_document_changes:
-            if change.after is not None and not (
-                change.operation
-                in {
-                    DocumentChangeOperation.REASSIGN,
-                    DocumentChangeOperation.REORDER,
-                }
-                or change.path.endswith(
-                    ("/duty_id", "/display_order", "/task_ids", "/indicator_ids")
-                )
-            ):
-                values.append((_json_text(change.after), change.basis))
         if self.next_question is not None:
             values.extend(
                 (

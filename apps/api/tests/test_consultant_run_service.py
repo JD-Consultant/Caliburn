@@ -13,6 +13,7 @@ from app.consultant.context import ContextSelectionReceipt
 from app.consultant.model_output import (
     ConsultantModelOutput,
     OutputAnalysisBasis,
+    OutputCandidatePublication,
     OutputQuestion,
     OutputQuestionKind,
     OutputSufficiency,
@@ -103,7 +104,11 @@ def _model_output(source_id: UUID) -> ConsultantModelOutput:
         understanding_changes=(),
         attention_changes=(),
         gaps=(),
-        reviewable_document_changes=(),
+        candidate_publication=OutputCandidatePublication(
+            candidate_revision=0,
+            revision_digest="",
+            action_ids=(),
+        ),
         question=OutputQuestion(
             kind=OutputQuestionKind.NONE,
             text="",
@@ -245,6 +250,7 @@ def test_configured_execution_has_all_methods_and_only_non_rag_source_tools() ->
         "employee_source_get",
         "employee_source_lineage",
         "employee_source_search",
+        "job_document_candidate_edit",
     )
     assert "employee_reference_search" not in execution.allowed_tool_ids
 

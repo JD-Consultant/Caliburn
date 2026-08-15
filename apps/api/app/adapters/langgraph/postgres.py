@@ -1557,6 +1557,16 @@ class PostgresConsultantRuntime:
                 raise SourceConflict(
                     f"source {source.source_id} was superseded before semantic commit"
                 )
+            if commit.result.candidate_publication is not None:
+                active_payload = (await self.raw_state(document_id)).get(
+                    "active_candidate"
+                )
+                if active_payload is not None:
+                    active = CandidateWorkspace.model_validate(active_payload)
+                    await self._require_current_committed_sources(
+                        document_id,
+                        active.changeset.source_ids,
+                    )
             snapshot = await self._snapshot(document_id)
             if snapshot.revision != expected_revision:
                 raise StaleRevision(

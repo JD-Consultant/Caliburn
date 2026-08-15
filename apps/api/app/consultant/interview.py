@@ -12,8 +12,8 @@ from pydantic import model_validator
 from app.consultant.clarification import create_required_clarification
 from app.consultant.document_review import (
     block_review_dependent_work,
-    create_document_changeset,
     revalidate_review_work,
+    stale_superseded_review_actions,
     stale_review_queue_for_source_correction,
 )
 from app.consultant.results import (
@@ -36,6 +36,7 @@ from app.consultant.state import (
     RunReceipt,
     RunExecutionEvidence,
     RunStatus,
+    DocumentChangeSet,
     UnderstandingCalibration,
     UnderstandingItem,
     UnderstandingStatus,
@@ -342,32 +343,31 @@ def _apply_gap_changes(
     return gaps
 
 
-def _apply_reviewable_changes(
+def _publish_persisted_changeset(
     *,
     document_id: UUID,
     run_id: UUID,
     read_revision: int,
     state: ConsultantThreadState,
-    result: ConsultantResult,
+    published_changeset: DocumentChangeSet | None,
     interview_work: dict[str, dict[str, Any]],
 ) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
     review_queue = dict(state.get("review_queue", {}))
-    if not result.reviewable_document_changes:
+    if published_changeset is None:
         return review_queue, interview_work
-    changeset = create_document_changeset(
-        document_id=document_id,
-        run_id=run_id,
-        summary=result.visible_reply,
-        read_revision=read_revision,
-        document=ApprovedJobDocument.model_validate(state["approved_document"]),
-        changes=result.reviewable_document_changes,
-        existing_review_queue=review_queue,
-        interview_work=interview_work,
+    if published_changeset.created_revision != read_revision:
+        raise ValueError("published candidate baseline revision is stale")
+    review_queue = stale_superseded_review_actions(
+        review_queue,
+        published_changeset=published_changeset,
     )
-    review_queue[str(changeset.changeset_id)] = _dump(changeset)
+    existing = review_queue.get(str(published_changeset.changeset_id))
+    if existing is not None and DocumentChangeSet.model_validate(existing) != published_changeset:
+        raise ValueError("published candidate changeset conflicts with review queue")
+    review_queue[str(published_changeset.changeset_id)] = _dump(published_changeset)
     interview_work = block_review_dependent_work(
         interview_work,
-        changeset.actions,
+        published_changeset.actions,
         revision=read_revision + 1,
     )
     return review_queue, interview_work
@@ -379,6 +379,7 @@ def apply_verified_consultant_commit(
     document_id: UUID,
     revision: int,
     commit: VerifiedConsultantCommit,
+    published_changeset: DocumentChangeSet | None = None,
 ) -> ConsultantThreadState:
     if state.get("latest_source_id") != str(commit.answer_source_id):
         raise ValueError("consultant result does not belong to the latest saved input")
@@ -402,12 +403,12 @@ def apply_verified_consultant_commit(
         state=state,
         result=commit.result,
     )
-    review_queue, work = _apply_reviewable_changes(
+    review_queue, work = _publish_persisted_changeset(
         document_id=document_id,
         run_id=commit.run_id,
         read_revision=revision - 1,
         state=state,
-        result=commit.result,
+        published_changeset=published_changeset,
         interview_work=work,
     )
     prospective: ConsultantThreadState = {

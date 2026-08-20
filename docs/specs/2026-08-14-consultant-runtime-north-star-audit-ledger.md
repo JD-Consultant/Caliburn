@@ -1,8 +1,8 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit **Passed**；Tasks 1–9 **Passed**；Task 10 schema-only 修正與 Task 11 Tool surface 已通過完整 deterministic gates，paid live canary／最終產品交付仍待另行授權與後續
-- 決策：ADR 0060 **Accepted**；ADR 0061 **Accepted（schema-only）**；ADR 0062 **Accepted（四個受限唯讀 Tool）**
+- 狀態：Pre-implementation audit、Tasks 1–11與ADR 0063 Tasks 1–7均 **Passed**；paid live canary、完整 monorepo gates與最後獨立審核均完成
+- 決策：ADR 0060 **Accepted**；ADR 0061 **Accepted（schema-only）**；ADR 0062 **Accepted（四個受限唯讀 Tool）**；ADR 0063 **Accepted（hybrid candidate edit loop）**
 - 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
 - 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.16
 
@@ -365,6 +365,18 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - Schema／驗證：最新合併量測為 **6 schemas、0 defs、128 properties、2 optional、0 union、4 open objects、depth 4、13,411 bytes**；candidate/final各為 61 properties、0 optional／union／open，optional/open只來自既有 read Tools。candidate／authority warning-as-error gate **102 passed in 124.32s**；產品方向 focused gate **88 passed in 42.95s**；其後 `consultant_documents`／`checkpoints`／`checkpoint_blobs`／`checkpoint_writes`／`store` 為 **0／0／0／0／0**。
 - 北極星回歸：一位顧問、前景焦點／背景吸收、Task／Duty／OPKS 動態演化、員工原話與更正、必要澄清、Gap、deterministic progress、自然離開／返回、單一可強制匯出與員工唯一文件 authority 均保持。沒有 RAG／Reference consumer、能力級別／A、auto-accept、multi-agent、正式 eval或「本輪可停」狀態。結果 **Pass**；真 GPT-5.6 Luna Max smoke與完整 monorepo gate屬 Task 7。
 - 獨立 review：無 Critical／Important。唯一 Minor 是第一個 local-ref canary只檢查 Task 數與 OPKS kind，未直接凍結 application-issued ID、O/P→Task linkage、各 OPKS axis order 與 evidence。確認 production 已正確實現後補上精確 assertion；單一情境 `1 passed in 4.37s`、四情境 warning-as-error `4 passed in 22.27s`。沒有因測試意見新增產品能力。
+
+### ADR 0063 Task 7：真實 provider、完整閘門與交付
+
+- 真實閉環：GPT-5.6 Luna `medium／8192` 完成 Task＋O/P 候選、final receipt、員工接受 Task＋Indicator／拒絕 Output，以及下一輪 approved＋rejected context。最終 run 的 candidate Tool 第一次即 `applied`，revision 1／digest／三個 handles 與 review queue 完全一致；第二輪 `approved_context_seen=true`、`rejected_context_seen=true`、沒有文件變更、核准 JD 不變。
+- Max 診斷：`max／16384` 在五個 primary model step＋兩個 summarization call後觸發 `ModelCallLimitExceededError`；沒有提高 hard ceiling掩蓋 profile不合。這支持 interactive baseline用 medium，並把 Max／Terra／Sol的品質比較留給產品核心完成後的代表性 eval，而不是在 smoke階段提前建立 eval平台。
+- 成本證據：最終 medium run為 5 model attempts、43,023 tokens、41.483秒、USD 0.01162862；requested／actual model均為 `openai/gpt-5.6-luna`、actual provider均為 OpenAI、無 silent fallback。Max已知成本約 USD 0.01988928但沒有 final publication。
+- 真實 prompt回饋：required-only wire雖已通過 schema gate，早期 medium run仍因 unused `integer_value`帶內容而多一次 Tool rejected→repair。先補測試，再明列未使用 `text_value=""`／`integer_value=-1`／`uuid_value=""`與空陣列；focused warning-as-error `56 passed`，post-fix live首次 candidate call直接成功。這是 wire可用性修正，不是增加 operation、Tool或 authority。
+- API transport回歸：完整 API gate抓到 mapper把 internal durable `DocumentChangeSet`直接塞進 strict generated view，新增的 supersession／external-dependency metadata造成 422。改為 explicit transport projection，保持 domain truth與DTO分離；完整 API重新為 `265 passed`。
+- 可觀測與清理：一次不可複核的PTY截斷結果不計入通過；一次第二輪 stochastic output被 `ConsultantVerificationError` fail closed且同輸入未重現，未放寬 verifier。ignored runner補 failure message／second trace／run receipt。所有明列 disposable文件均精確刪除；最終 `consultant_documents`／`checkpoints`／`checkpoint_blobs`／`checkpoint_writes`／`store`前後皆為0。
+- 官方複核：OpenAI最新 Luna頁仍列 Function Calling／Structured Outputs支援與成本敏感、高流量定位；LangChain官方仍以 `ToolRuntime`隱藏runtime注入、Tool result／`Command`回饋實際結果、provider-native Structured Output承接final schema；LangGraph以durable checkpoint／interrupt／resume承接必要澄清。沒有成熟primitive要求改回only-SO、operation-per-tool、專用split／merge或第二authority。
+- 最後獨立review：Critical 0、Important 0、Ready to merge = Yes。reviewer唯一Minor是完成報告未建立；核對發現該報告是在review啟動後建立的同一路徑未追蹤檔，因此不屬code／交付缺口。沒有為此建立重複文件或修改產品行為。
+- 北極星回歸：一位顧問、動態 Task／Duty／OPKS、員工原話記憶、前景焦點／背景吸收、必要澄清、Gap、deterministic progress、自然關閉／回來繼續、員工審核後才進文件與單一可強制匯出均未偏移。仍沒有 RAG／Reference consumer、能力級別／A、auto-accept、multi-agent或正式eval。結果 **Pass**。
 
 ## 8. 本次直接使用的一手來源
 

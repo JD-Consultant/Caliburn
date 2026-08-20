@@ -672,14 +672,15 @@ class ConsultantResult(ResultModel):
 - [ ] **Step 5: 完整 monorepo gates**
 
   ```powershell
+  $env:DEBUG='false'
+  $env:TEST_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn'
+  $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'
   cd apps/api
   uv run pytest -q
   cd ../web
   npm run test
   npx tsc --noEmit
   npm run lint
-  cd ../../packages/job-analysis-contract
-  npm run test
   cd ../..
   npm run check-codegen -w @caliburn/job-analysis-contract
   npx turbo test --env-mode=loose --output-logs=errors-only --force

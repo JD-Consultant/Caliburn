@@ -1,9 +1,11 @@
 # GPT-5.6 Luna 真實 API 顧問訪談 smoke 與修復紀錄
 
 - 日期：2026-08-14
-- 狀態：**進行中**。第一輪真實 API、員工校準與文件審核已完成；第二輪具體事件已實際送出並暴露兩個 wire mapping 缺口，程式與回歸測試已修正。相同輸入的最終付費重跑仍待重新注入暫存 OpenRouter key。
+- 狀態：**歷史診斷已完成，後續閉環由 [`2026-08-15-hybrid-candidate-loop-live-smoke.md`](2026-08-15-hybrid-candidate-loop-live-smoke.md) 取代**。本文件保留 only-Structured-Output 時期的真實 provider 問題與修復證據，不再代表現行 candidate Tool 架構的完成狀態。
 - 性質：付費 smoke／contract conformance／產品流程驗證，**不是正式品質 eval**。依 owner 決定，正式 eval 延至產品核心完成後。
 - 範圍：current 顧問 runtime；不接 RAG／Reference，不生成能力級別或 A。
+
+> 2026-08-21 successor note：ADR 0063 已把文件候選改為「Tool 實際套用／回傳結果／同 run 可修正，final Structured Output 只發布 candidate receipt」。successor smoke 已完成兩輪真實 GPT-5.6 Luna medium、員工接受／拒絕與下一輪記憶驗證；本文件第 6–8 節的待辦只屬當時歷史 run，不再是現行交付 blocker。
 
 ## 1. 本輪要回答什麼
 

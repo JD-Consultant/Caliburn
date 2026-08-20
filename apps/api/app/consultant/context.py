@@ -1083,6 +1083,7 @@ async def build_consultant_context(
     snapshot: ConsultantSnapshot,
     execution: ResolvedExecution,
     request: ContextRequest,
+    active_candidate: CandidateWorkspace | None = None,
 ) -> ConsultantContextBundle:
     if snapshot.document_id != snapshot.approved_document.document_id:
         raise ValueError("approved document scope does not match snapshot")
@@ -1201,9 +1202,9 @@ async def build_consultant_context(
             lookup_handles=lookup_handles,
             non_authoritative_dialogue_summary=dialogue_summary,
             active_candidate=(
-                snapshot.active_candidate
-                if snapshot.active_candidate is not None
-                and snapshot.active_candidate.run_id == request.run_id
+                active_candidate
+                if active_candidate is not None
+                and active_candidate.run_id == request.run_id
                 else None
             ),
         )
@@ -1326,11 +1327,21 @@ class ConsultantContextMiddleware(AgentMiddleware):
         if request.runtime is None or request.runtime.context is None:
             raise ValueError("consultant runtime context is required")
         runtime_context = request.runtime.context
+        raw_state = await runtime_context.runtime.raw_state(
+            runtime_context.snapshot.document_id
+        )
+        active_payload = raw_state.get("active_candidate")
+        active_candidate = (
+            CandidateWorkspace.model_validate(active_payload)
+            if active_payload is not None
+            else None
+        )
         bundle = await build_consultant_context(
             runtime=runtime_context.runtime,
             snapshot=runtime_context.snapshot,
             execution=runtime_context.execution,
             request=runtime_context.request,
+            active_candidate=active_candidate,
         )
         runtime_context.context_receipts.append(bundle.receipt)
         messages = list(request.messages)

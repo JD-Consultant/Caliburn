@@ -260,7 +260,7 @@ async def PostgresConsultantRuntime.stage_candidate_revision(
   )
   ```
 
-  adapter 在 document lock 內先由目前 workspace算出 next revision，再以此 seed將 raw `CandidateEditBatch` 映成 `VerifiedCandidateStage`，配置 entity／action／changeset IDs，呼叫既有 `create_document_changeset()` 與 `apply_document_actions()` 做真實全批驗證。`depends_on_change_refs` 轉成本 bundle dependency；相同 `atomic_group_ref` 與 explicit merge/split 組成同一 subgroup；dependency cycle 或不完整 group 必須在 state write 前拒絕。
+  adapter 在 document lock 內先由目前 workspace算出 next revision，再以此 seed將 raw `CandidateEditBatch` 映成 `VerifiedCandidateStage`，配置 entity／action／changeset IDs，呼叫既有 `create_document_changeset()` 與 `apply_document_actions()` 做真實全批驗證。`depends_on_change_refs` 轉成本 bundle dependency；只有相同 `atomic_group_ref` 或 domain invariant 要求共同成立的 actions 才組成同一 subgroup；dependency cycle 或不完整 group 必須在 state write 前拒絕。Task／Duty 的拆分或合併只是一般 ADD／REVISE／WITHDRAW／REASSIGN 等 operations 的組合，不要求專用 split／merge primitive。
 
   若 change 明確列出 `depends_on_action_ids`，先從 review queue 建立其 pending/deferred transitive dependency closure，依 dependency order套用到 approved document的 copy，形成明示 `approved=false` 的條件式 baseline，再驗證新 actions。不存在、rejected、stale、跨文件或 cycle 的外部 dependency 一律拒絕；沒有明列 action ID 時絕不自動混入任何 pending candidate。
 
@@ -590,7 +590,7 @@ class ConsultantResult(ResultModel):
   使用真 LangChain Tool loop＋真 product graph／PostgreSQL，但用 deterministic scripted chat model，不建 eval harness。四個場景：
 
   1. 新 Task＋該 Task 的 O／P，以 local refs同批建立，final publication後進 review queue，員工 accept後才進 approved JD；
-  2. 跨 Duty／Task split 第一批因 linkage錯誤被 Tool拒絕，模型看見 error後第二批修正，final引用第二個 revision，split actions同 atomic group；
+  2. 將一個過大的 Task 以通用 operations 原子重組成兩個（新增兩個 Task、撤回原 Task，並按需重接 Duty／OPKS）；第一個完整 batch 因 linkage 錯誤被 Tool 拒絕，模型看見 error 後以第二個完整 batch 修正，final 引用最新 revision，不可分割 actions 同一 atomic group；不得把這項驗收解讀成必須新增或使用專用 Duty／Task split Tool／primitive；
   3. 十個已發布項目中員工接受九個、拒絕一個 O，下一輪能看到核准結果＋拒絕記憶，不會把該 O 偷偷視為事實；
   4. candidate成功後員工 direct edit，舊 baseline不得發布；既有 review queue依 read-set標 stale。
 

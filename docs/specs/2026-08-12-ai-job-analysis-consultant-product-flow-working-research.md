@@ -2506,7 +2506,9 @@ Opus 5 可借鑑的精簡不是刪除分析方法，而是把重複 scaffolding 
 3. `employee_source_lineage`：取更正／被更正鏈；
 4. `employee_source_search`：查找同文件相關原話，名稱不綁目前 lexical backend。
 
-`document_id`、權限與搜尋 `limit=5` 由 application 注入，不要求模型填已知參數。source result 保留 source ID、exact text、speaker、validity、timestamps 與 correction pointers。ADD／REVISE／WITHDRAW／MERGE／SPLIT 等文件候選維持 provider-native Structured Output；員工 accept／edit-accept／reject／defer 維持 LangGraph authority command；必要澄清維持 Structured Output＋interrupt。Focus、Gap 與 Progress 是 graph state／projection，都不為湊 Tool 而 Tool 化。[OpenAI Function Calling](https://developers.openai.com/api/docs/guides/function-calling) · [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) · [Google Function Calling](https://ai.google.dev/gemini-api/docs/function-calling) · [Google Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output) · [LangChain Tools](https://docs.langchain.com/oss/python/langchain/tools) · [LangChain Structured Output](https://docs.langchain.com/oss/python/langchain/structured-output)
+`document_id`、權限與搜尋 `limit=5` 由 application 注入，不要求模型填已知參數。source result 保留 source ID、exact text、speaker、validity、timestamps 與 correction pointers。ADD／REVISE／WITHDRAW／MERGE／SPLIT 等文件候選當時維持 provider-native Structured Output；員工 accept／edit-accept／reject／defer 維持 LangGraph authority command；必要澄清維持 Structured Output＋interrupt。Focus、Gap 與 Progress 是 graph state／projection，都不為湊 Tool 而 Tool 化。[OpenAI Function Calling](https://developers.openai.com/api/docs/guides/function-calling) · [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) · [Google Function Calling](https://ai.google.dev/gemini-api/docs/function-calling) · [Google Structured Outputs](https://ai.google.dev/gemini-api/docs/structured-output) · [LangChain Tools](https://docs.langchain.com/oss/python/langchain/tools) · [LangChain Structured Output](https://docs.langchain.com/oss/python/langchain/structured-output)
+
+> **Successor note（2026-08-21）：**上句是 ADR 0062 階段的歷史裁決，已由 §9.18／ADR 0063 取代。現行文件候選走一個 Tool＋final publication reference；model-facing operation 只有 ADD／REVISE／WITHDRAW／REASSIGN／REORDER，沒有 MERGE／SPLIT。
 
 lookup 不再固定「第一波 Skill、第二波 Source」。context 足夠時可以零 Tool call；彼此獨立的 Skill／source 讀取可在同一波平行；只有第一波結果產生新的資料依賴時才使用第二波。此節當時保留最多三次 model call、兩個 lookup waves 與總 Tool／token／timeout budget；其中固定三次上限其後已由 §9.18／ADR 0063 取代，兩個 lookup waves 與其他總預算仍保留。當時完整裁決見 [ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)。
 
@@ -2555,6 +2557,8 @@ LangChain／LangGraph 已有相同成熟 primitive：agent tool loop 會在 fina
 
 Anthropic 的工具工程研究另支持「少數、目的清楚、能整併高影響工作流的 Tool」，並要求只回傳高訊號 context 與可行動的錯誤，不要把每個內部 API 都一比一暴露給模型。故不應建立 `add_task`、`split_task`、`merge_duty`、`revise_opks` 等一串互相重疊 Tool。[Anthropic — Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
 
+2026-08-21 實作前後再次查閱官方頁面，結論沒有改變：OpenAI 要求 strict function schema 的所有欄位 required、每個 object `additionalProperties=false`，並建議不要讓模型填 application 已知參數、把固定連續呼叫的 functions 合併、起始可用 functions 維持少量；Apply Patch 也是 `create／update／delete` 一般操作，由 harness 真正套用、回傳 `completed／failed` 與可行動錯誤，atomicity 由 application 決定。Google 支援 compositional function calling，並明列 Gemini 3 可把 Function Calling 與 Structured Output 結合；LangChain 的 `ToolRuntime`／runtime context 是正式 dependency-injection 面，Structured Output 的 provider strategy 則負責 final typed response。這些資料支持「一個通用候選編輯 Tool＋final typed publication」，不支持為 Duty／Task／OPKS 各建一批 operation Tool。[OpenAI Function Calling](https://developers.openai.com/api/docs/guides/function-calling) · [OpenAI Apply Patch](https://developers.openai.com/api/docs/guides/tools-apply-patch) · [Google Function Calling](https://ai.google.dev/gemini-api/docs/function-calling) · [LangChain Runtime](https://docs.langchain.com/oss/python/langchain/runtime) · [LangChain Structured Output](https://docs.langchain.com/oss/python/langchain/structured-output)
+
 #### 9.18.2 三種方案比較
 
 | 機制 | 效果與功能 | 主要限制 | 結論 |
@@ -2567,7 +2571,7 @@ Deep Agents 的 `StateBackend` 確實能把虛擬檔案存在 LangGraph state �
 
 #### 9.18.3 建議的第一版框架映射
 
-1. **新增一個 model-facing `edit_candidate_document` 類型 Tool，而不是每種編輯一個 Tool。** 名稱可在實作前再定；它表達的產品能力是「在隔離候選成果中編輯」，不是直接寫正式文件。模型可在一個 atomic batch 內新增、修改、撤回、移動、重新歸類與重排 Duty／Task／OPKS；split／merge 可由一般多步編輯組合表達，不需要各自成為 Tool。batch 的 deterministic 套用是全成或全敗；成功後的 action 則依語意 dependency 分成員工可獨立審核的 atomic subgroup，split 等不可分割重組仍整組決定。若保留 split／merge intent label，也只用於語意 diff／audit，不是額外權限。
+1. **新增一個 model-facing `edit_candidate_document` 類型 Tool，而不是每種編輯一個 Tool。** 名稱可在實作前再定；它表達的產品能力是「在隔離候選成果中編輯」，不是直接寫正式文件。模型可在一個 atomic batch 內以 ADD／REVISE／WITHDRAW／REASSIGN／REORDER 新增、修改、撤回、移動、重新歸類與重排 Duty／Task／OPKS。model-facing contract 不提供 MERGE／SPLIT operation：過大 Task 由新增替代 Task、撤回原 Task並按需重接 Duty／OPKS 表達；不可分割 actions 使用同一 `atomic_group_ref` 供員工整組決定。若人類可讀語意 diff／audit 需要「拆分／合併」標籤，只能由 application 從一般 operations 確定性推導，不是模型輸入或額外權限。batch 的 deterministic 套用是全成或全敗；成功後的其他 action 仍可依語意 dependency 分成員工可獨立審核的 atomic subgroup。
 2. **Tool 只更新 LangGraph candidate overlay。** document scope、核准 baseline revision、權限與 ID 配置由 application 注入；模型不能提供另一個 `document_id`，也沒有到 approved artifact 的 write edge。Tool 透過既有 framework ToolNode／reducer／`Command` 更新 thread state，checkpointer 負責 durable resume。
 3. **每次 Tool call 都由 deterministic reducer 真正試套。** 成功回傳 candidate revision、實際 semantic diff、受影響 entity／dependency；失敗回傳具體 path／reason／可修正提示。模型只能根據這個實際結果繼續，不能把「想要改」當成「已改成功」。
 4. **沿用已驗證的 compact typed wire 原則，不沿用舊元件身分。** candidate Tool 應使用固定 target／field／payload slots 或同等的 union-free typed contract；不接受任意 JSON Pointer、open object、SQL 或 host path。可重用現有 pure mapper／verifier 的語意與測試安全網，但 production API 不因相容而必須保留舊 class／欄位名稱。
@@ -2604,6 +2608,18 @@ Deep Agents 的 `StateBackend` 確實能把虛擬檔案存在 LangGraph state �
 比較記錄只看任務是否完成、semantic diff 正確性、工具錯誤後能否修復、authority 是否零繞過、員工審核是否清楚，以及 token／latency；不以 Tool call 越多越好，也不提前做完整品質 eval。
 
 Owner 已接受主方案；[ADR 0063](../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md) 因此正式取代 Accepted ADR 0062 決定 5 的「文件候選不是 business Tool」，並把固定三次 model call 改為受總預算約束、初始上限五步的可驗證 profile。ADR 0062 的四個 read Tool、員工 decision command、必要澄清與 no-RAG 邊界保持有效；Accepted ADR 0061／0062 原文不事後修改。
+
+#### 9.18.5 Task 6 實作校正與產品 canary（2026-08-21）
+
+實作沒有把舊 Work Model／Proposal 類別包進新框架，也沒有把 JD 偽裝成檔案：LangChain `create_agent`／ToolNode 負責 model → Tool → result → model，Deep Agents `SkillsMiddleware` 負責按需方法，LangGraph＋PostgreSQL checkpoint 保存唯一 durable product thread；Caliburn 只提供 typed JD mapper、Evidence／quote verifier、document invariant、atomic review 與 employee authority policy。
+
+- 正式模型 surface 恰為四個唯讀 Tool＋`job_document_candidate_edit`。candidate operation enum 精確只有 `add／revise／withdraw／reassign／reorder`；沒有專用 split／merge Tool，也沒有 model-facing split／merge operation。新實體使用同批 local ref，正式 UUID、document scope、baseline 與權限由 application 注入。
+- candidate Tool 使用 LangChain 隱藏的 `ToolRuntime` call identity；因 Tool 本身只讀 `tool_call_id`、產品 binding 已由 closure 注入，注入欄位宣告為非 `None` 的 framework generic `ToolRuntime[Any, Any]`，不反向依賴 Postgres／context 具體類別，也不出現在模型 schema。這修正了 Pydantic 對預設 `ToolRuntime[None, ...]` 的 serializer warning。
+- `active_candidate` 只存在 LangGraph raw checkpoint。一般 `ConsultantSnapshot`／API projection 完全沒有此欄位；Context middleware 在每個 model step 重讀同一 product checkpoint，只在 candidate run ID 等於本 run 時投影 `<active_candidate_workspace approved="false">`。因此既不洩漏 unpublished candidate，也不會在一次 Tool loop 中拿到舊 candidate revision。
+- 四個 PostgreSQL scripted-model canary 走真 `create_agent`、真第五 Tool、真 product graph 與員工 command：Task＋O/P 同批 local refs；無效 linkage 被 Tool 拒絕後同 run 修正；九項接受一項 O 拒絕後下一輪只記得實際核准與拒絕；direct edit 清 unpublished candidate並使 published read-set stale。canary 以 `UserWarning` 視為 error 為 **4 passed**。
+- candidate／authority 六檔 gate 以 warning-as-error 為 **102 passed in 124.32s**；產品大方向 focused gate 為 **88 passed in 42.95s**；兩次 gate 後 `consultant_documents`、`checkpoints`、`checkpoint_blobs`、`checkpoint_writes`、`store` 均為 0。合併 grammar 實測為 6 schemas、0 defs、128 properties、2 optional、0 union、4 open objects、depth 4、13,411 bytes；candidate 與 final 各自為 61 properties、0 optional／union／open object。optional／open object 只來自既有四個 read Tool；bytes 仍只是比較訊號，不是供應商上限。
+
+本 checkpoint 沒有加入 RAG／Reference consumer、能力級別／A、自動核准、多 Agent或正式 eval；也沒有新增「本輪可停」狀態。員工仍可自然關閉、返回或繼續傳訊息，只有接受／修改接受或 direct edit 能改核准 JD。結果與本文產品北極星一致；真 GPT-5.6 Luna Max smoke 與完整 monorepo gate 留在下一 Task。
 
 ## 10. 本稿依據
 

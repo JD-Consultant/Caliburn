@@ -1,5 +1,7 @@
 # LangGraph Consultant Runtime Big-bang Implementation Plan
 
+> **Successor note（2026-08-15）：**這是已執行的歷史計畫。文件候選只放在 final Structured Output、固定三次 model call，以及四個唯讀 Tool 的假設，已由 [ADR 0063](../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md) 與 [`2026-08-15-hybrid-candidate-document-edit-loop-plan.md`](2026-08-15-hybrid-candidate-document-edit-loop-plan.md) 取代。現行實作仍使用同一 LangChain／LangGraph product graph，但改為四個 read Tool＋一個通用候選編輯 Tool；Task／Duty 拆分或合併由一般 atomic operations 組合，不要求專用 split／merge primitive。以下內容保留作歷史執行證據，不再作當前施工規格。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 以 LangChain／LangGraph 成熟元件直接取代 current AI／document-state 自寫機制，交付一位可自然續談、記得員工原話、動態選擇訪談重點、按需分析 Task／Duty／O／P／K／S、呈現可信缺口、讓員工審核所有 LLM 文件內容並可靠匯出的專業職務顧問。

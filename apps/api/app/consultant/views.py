@@ -8,7 +8,6 @@ from uuid import UUID
 from langchain_core.messages import AIMessage
 from pydantic import Field
 
-from app.consultant.candidate_workspace import CandidateWorkspace
 from app.consultant.state import (
     ApprovedJobDocument,
     ConsultantThreadState,
@@ -77,7 +76,6 @@ class ConsultantSnapshot(DurableModel):
     required_clarification: RequiredClarification | None = None
     sufficiency: SufficiencyProjection
     latest_run: dict | None = None
-    active_candidate: CandidateWorkspace | None = None
 
 
 def _consultant_turns(state: ConsultantThreadState) -> tuple[ConsultantTurnProjection, ...]:
@@ -194,6 +192,5 @@ def snapshot_from_state(state: ConsultantThreadState) -> ConsultantSnapshot:
             "required_clarification": state.get("required_clarification"),
             "sufficiency": sufficiency_projection_from_state(state),
             "latest_run": state.get("latest_run"),
-            "active_candidate": state.get("active_candidate"),
         }
     )

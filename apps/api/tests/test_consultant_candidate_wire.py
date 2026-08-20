@@ -67,7 +67,6 @@ def _change(**overrides: Any) -> OutputDocumentChange:
         ),
         "tasks": (),
         "opks_items": (),
-        "target_ids": (),
         "opks_kind": OutputOpksKind.NONE,
         "task_ids": (),
         "indicator_ids": (),
@@ -145,6 +144,11 @@ def test_candidate_edit_wire_schema_is_closed_required_and_union_free() -> None:
     schema = CandidateEditBatch.model_json_schema()
     nodes = tuple(_walk_schema(schema))
     objects = tuple(node for node in nodes if node.get("type") == "object")
+    operation_enums = tuple(
+        tuple(node["enum"])
+        for node in nodes
+        if "enum" in node and "add" in node["enum"] and "revise" in node["enum"]
+    )
 
     assert objects
     assert not any("anyOf" in node or "oneOf" in node for node in nodes)
@@ -152,6 +156,9 @@ def test_candidate_edit_wire_schema_is_closed_required_and_union_free() -> None:
     assert all(
         set(node.get("required", ())) == set(node.get("properties", ()))
         for node in objects
+    )
+    assert operation_enums == (
+        ("add", "revise", "withdraw", "reassign", "reorder"),
     )
 
 
@@ -354,25 +361,6 @@ def test_candidate_wire_rejects_malformed_nonempty_atomic_group_ref() -> None:
                 opks_kind=OutputOpksKind.OUTPUT,
             ),
             id="non-add-uuid-values",
-        ),
-        pytest.param(
-            lambda bound, unbound: _change(
-                operation=DocumentChangeOperation.MERGE,
-                target=OutputDocumentTarget.DUTY,
-                target_id="",
-                field=OutputDocumentField.ENTITY,
-                text_value="",
-                target_ids=(unbound,),
-                duties=(
-                    OutputDuty(
-                        duty_id="",
-                        entity_ref="",
-                        statement="合併後的採購作業",
-                        display_order=-1,
-                    ),
-                ),
-            ),
-            id="merge-target-ids",
         ),
         pytest.param(
             lambda bound, unbound: _task_change(

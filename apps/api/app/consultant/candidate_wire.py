@@ -70,6 +70,16 @@ class OutputDocumentField(StrEnum):
     INDICATOR_IDS = "indicator_ids"
 
 
+class CandidateEditOperation(StrEnum):
+    """Generic editor operations exposed to the model-facing candidate Tool."""
+
+    ADD = DocumentChangeOperation.ADD.value
+    REVISE = DocumentChangeOperation.REVISE.value
+    WITHDRAW = DocumentChangeOperation.WITHDRAW.value
+    REASSIGN = DocumentChangeOperation.REASSIGN.value
+    REORDER = DocumentChangeOperation.REORDER.value
+
+
 class OutputEnabler(ProviderWireModel):
     kind: ApprovedEnablerKind
     name: str
@@ -115,7 +125,7 @@ class OutputDocumentChange(ProviderWireModel):
     depends_on_action_ids: tuple[UUID, ...]
     supersedes_action_ids: tuple[UUID, ...]
     atomic_group_ref: LocalRef
-    operation: DocumentChangeOperation
+    operation: CandidateEditOperation
     target: OutputDocumentTarget
     target_id: str
     field: OutputDocumentField = Field(
@@ -129,7 +139,6 @@ class OutputDocumentChange(ProviderWireModel):
     duties: tuple[OutputDuty, ...]
     tasks: tuple[OutputTask, ...]
     opks_items: tuple[OutputOpksItem, ...]
-    target_ids: tuple[UUID, ...]
     opks_kind: OutputOpksKind
     task_ids: tuple[UUID, ...]
     indicator_ids: tuple[UUID, ...]
@@ -356,7 +365,7 @@ class _LocalRefResolver:
 def _resolved_add_id(
     value: OutputDocumentChange, supplied_id: str, local_id: UUID | None
 ) -> str:
-    if value.operation is DocumentChangeOperation.ADD and supplied_id:
+    if value.operation is CandidateEditOperation.ADD and supplied_id:
         raise CandidateWireMappingError("ADD cannot carry an application-owned ID")
     return str(local_id) if local_id is not None else supplied_id
 
@@ -399,7 +408,6 @@ def _require_bound_entity_handles(
     _require_entity_handle(value.uuid_value, allowed_entity_ids)
     for entity_id in (
         *value.uuid_values,
-        *value.target_ids,
         *value.task_ids,
         *value.indicator_ids,
         *(duty.duty_id for duty in value.duties),
@@ -484,10 +492,10 @@ def _map_provider_document_change(
         else {}
     )
     return ReviewableDocumentChange(
-        operation=value.operation,
+        operation=DocumentChangeOperation(value.operation.value),
         path=path,
         after=after,
-        target_ids=value.target_ids,
+        target_ids=(),
         opks_kind=opks_kind,
         task_ids=value.task_ids,
         indicator_ids=value.indicator_ids,
@@ -498,17 +506,17 @@ def _map_provider_document_change(
 
 def _normalize_document_wire_aliases(value: OutputDocumentChange) -> OutputDocumentChange:
     if value.target in {OutputDocumentTarget.JOB_TITLE, OutputDocumentTarget.WORK_DESCRIPTION}:
-        if value.operation in {DocumentChangeOperation.ADD, DocumentChangeOperation.REVISE} and not value.target_id and not value.target_ids:
-            return value.model_copy(update={"operation": DocumentChangeOperation.REVISE, "field": OutputDocumentField.VALUE})
+        if value.operation in {CandidateEditOperation.ADD, CandidateEditOperation.REVISE} and not value.target_id:
+            return value.model_copy(update={"operation": CandidateEditOperation.REVISE, "field": OutputDocumentField.VALUE})
         return value
-    if value.operation in {DocumentChangeOperation.ADD, DocumentChangeOperation.WITHDRAW, DocumentChangeOperation.MERGE, DocumentChangeOperation.SPLIT}:
+    if value.operation in {CandidateEditOperation.ADD, CandidateEditOperation.WITHDRAW}:
         return value.model_copy(update={"field": OutputDocumentField.ENTITY})
     return value
 
 
 def _document_path(value: OutputDocumentChange) -> str:
     if value.target in {OutputDocumentTarget.JOB_TITLE, OutputDocumentTarget.WORK_DESCRIPTION}:
-        if value.operation is not DocumentChangeOperation.REVISE or value.field is not OutputDocumentField.VALUE or value.target_id or value.target_ids:
+        if value.operation is not CandidateEditOperation.REVISE or value.field is not OutputDocumentField.VALUE or value.target_id:
             raise CandidateWireMappingError("top-level document target requires revise/value without IDs")
         return f"/{value.target.value}"
     allowed_fields = _FIELDS_BY_TARGET[value.target]
@@ -516,23 +524,15 @@ def _document_path(value: OutputDocumentChange) -> str:
         raise CandidateWireMappingError(f"field {value.field.value} is unsupported for {value.target.value}")
     collection = _COLLECTIONS[value.target]
     if value.field is OutputDocumentField.ENTITY:
-        if value.operation is DocumentChangeOperation.WITHDRAW:
-            if value.target_ids:
-                raise CandidateWireMappingError("withdraw cannot carry merge or split target IDs")
+        if value.operation is CandidateEditOperation.WITHDRAW:
             return f"/{collection}/{_required_uuid(value.target_id, 'target_id')}"
-        if value.operation not in {DocumentChangeOperation.ADD, DocumentChangeOperation.MERGE, DocumentChangeOperation.SPLIT}:
-            raise CandidateWireMappingError("entity field supports only add, withdraw, merge or split")
+        if value.operation is not CandidateEditOperation.ADD:
+            raise CandidateWireMappingError("entity field supports only add or withdraw")
         if value.target_id:
             raise CandidateWireMappingError("collection operation cannot carry target_id")
-        if value.operation in {DocumentChangeOperation.MERGE, DocumentChangeOperation.SPLIT} and not value.target_ids:
-            raise CandidateWireMappingError("merge or split requires target_ids")
-        if value.operation is DocumentChangeOperation.ADD and value.target_ids:
-            raise CandidateWireMappingError("add cannot carry target_ids")
         return f"/{collection}"
-    if value.target_ids:
-        raise CandidateWireMappingError("field-level change cannot carry merge or split target IDs")
     target_id = _required_uuid(value.target_id, "target_id")
-    expected_operation = DocumentChangeOperation.REASSIGN if value.field is OutputDocumentField.DUTY_ID else DocumentChangeOperation.REORDER if value.field is OutputDocumentField.DISPLAY_ORDER else DocumentChangeOperation.REVISE
+    expected_operation = CandidateEditOperation.REASSIGN if value.field is OutputDocumentField.DUTY_ID else CandidateEditOperation.REORDER if value.field is OutputDocumentField.DISPLAY_ORDER else CandidateEditOperation.REVISE
     if value.operation is not expected_operation:
         raise CandidateWireMappingError(f"field {value.field.value} requires {expected_operation.value}")
     return f"/{collection}/{target_id}/{value.field.value}"
@@ -559,9 +559,9 @@ def _document_after(value: OutputDocumentChange, *, include_candidate_identities
     if expected_slot == "enabler_list":
         return [{"kind": item.kind.value, "name": _required_text(item.name, "enabler name")} for item in value.enablers]
     if expected_slot == "duty_list":
-        return _entity_after(value.operation, tuple(_map_duty(item) for item in value.duties), "Duty")
+        return _entity_after(tuple(_map_duty(item) for item in value.duties), "Duty")
     if expected_slot == "task_list":
-        return _entity_after(value.operation, tuple(_map_task(item) for item in value.tasks), "Task")
+        return _entity_after(tuple(_map_task(item) for item in value.tasks), "Task")
     if expected_slot == "opks_list":
         return _map_opks_after(value, include_candidate_identities=include_candidate_identities)
     raise AssertionError(expected_slot)
@@ -569,7 +569,7 @@ def _document_after(value: OutputDocumentChange, *, include_candidate_identities
 
 def _expected_payload_slot(value: OutputDocumentChange) -> str:
     if value.field is OutputDocumentField.ENTITY:
-        if value.operation is DocumentChangeOperation.WITHDRAW:
+        if value.operation is CandidateEditOperation.WITHDRAW:
             return "none"
         return {OutputDocumentTarget.DUTY: "duty_list", OutputDocumentTarget.TASK: "task_list", OutputDocumentTarget.OPKS: "opks_list"}[value.target]
     if value.field is OutputDocumentField.DISPLAY_ORDER:
@@ -591,13 +591,9 @@ def _payload_slot_is_neutral(name: str, value: Any) -> bool:
     return not value
 
 
-def _entity_after(operation: DocumentChangeOperation, entities: tuple[dict[str, Any], ...], label: str) -> dict[str, Any] | list[dict[str, Any]]:
-    if operation is DocumentChangeOperation.SPLIT:
-        if len(entities) < 2:
-            raise CandidateWireMappingError(f"{label} split requires at least two replacements")
-        return list(entities)
+def _entity_after(entities: tuple[dict[str, Any], ...], label: str) -> dict[str, Any]:
     if len(entities) != 1:
-        raise CandidateWireMappingError(f"{label} add or merge requires exactly one replacement")
+        raise CandidateWireMappingError(f"{label} add requires exactly one entity")
     return entities[0]
 
 
@@ -634,7 +630,7 @@ def _map_opks_after(value: OutputDocumentChange, *, include_candidate_identities
     if not value.opks_items:
         raise CandidateWireMappingError("OPKS entity change requires a payload")
     single_item = value.opks_items[0] if len(value.opks_items) == 1 else None
-    if not include_candidate_identities and value.operation is DocumentChangeOperation.ADD and single_item is not None and single_item.item_id == "" and single_item.display_order == NEUTRAL_INTEGER:
+    if not include_candidate_identities and value.operation is CandidateEditOperation.ADD and single_item is not None and single_item.item_id == "" and single_item.display_order == NEUTRAL_INTEGER:
         return _required_text(single_item.text, "OPKS text")
     if value.opks_kind is OutputOpksKind.NONE:
         raise CandidateWireMappingError("OPKS entity requires opks_kind")
@@ -645,7 +641,7 @@ def _map_opks_after(value: OutputDocumentChange, *, include_candidate_identities
     if payload_indicator_ids != set(value.indicator_ids):
         raise CandidateWireMappingError("OPKS payload indicator IDs contradict change-level indicator IDs")
     entities = tuple(_map_opks_item(item, value.opks_kind, allow_neutral_order=include_candidate_identities) for item in value.opks_items)
-    return _entity_after(value.operation, entities, "OPKS")
+    return _entity_after(entities, "OPKS")
 
 
 def _map_opks_item(value: OutputOpksItem, kind: OutputOpksKind, *, allow_neutral_order: bool) -> dict[str, Any]:

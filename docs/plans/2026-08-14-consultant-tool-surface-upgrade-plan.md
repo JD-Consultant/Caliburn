@@ -1,5 +1,7 @@
 # Consultant Tool Surface Upgrade Implementation Plan
 
+> **Successor note（2026-08-15）：**這是四個 read Tool 階段的歷史計畫。文件候選仍由 final Structured Output 一次交付、固定三次 model call與總 Tool 數四個的假設，已由 [ADR 0063](../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md) 與 [`2026-08-15-hybrid-candidate-document-edit-loop-plan.md`](2026-08-15-hybrid-candidate-document-edit-loop-plan.md) 取代。現行 surface 為四個 read Tool＋一個通用 `job_document_candidate_edit` Tool；拆分／合併是一般 operations 的原子組合，不是專用 Tool。以下完成紀錄保留作歷史證據。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 以最新主流 Tool Calling 做法收斂職務顧問的四個唯讀 Tool，並保持 Structured Output、員工審核與 durable authority 的清楚邊界。

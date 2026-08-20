@@ -263,13 +263,29 @@ def _context_source(document_id: UUID, source_id: UUID) -> EmployeeSource:
 
 
 class _ContextSourceRuntime:
-    def __init__(self, source: EmployeeSource) -> None:
+    def __init__(
+        self,
+        source: EmployeeSource,
+        *,
+        active_candidate: CandidateWorkspace | None = None,
+    ) -> None:
         self.source = source
+        self.active_candidate = active_candidate
 
     async def get_source(self, document_id: UUID, source_id: UUID) -> EmployeeSource:
         assert document_id == self.source.document_id
         assert source_id == self.source.source_id
         return self.source
+
+    async def raw_state(self, document_id: UUID) -> dict:
+        assert document_id == self.source.document_id
+        return {
+            "active_candidate": (
+                self.active_candidate.model_dump(mode="json")
+                if self.active_candidate is not None
+                else None
+            )
+        }
 
 
 def _context_action(
@@ -356,7 +372,6 @@ def _context_snapshot(
     document: ApprovedJobDocument,
     source_id: UUID,
     review_queue: dict[str, dict] | None = None,
-    active_candidate: CandidateWorkspace | None = None,
 ) -> ConsultantSnapshot:
     state = initial_thread_state(document.document_id)
     state.update(
@@ -366,11 +381,6 @@ def _context_snapshot(
             "latest_source_id": str(source_id),
             "approved_document": document.model_dump(mode="json"),
             "review_queue": review_queue or {},
-            "active_candidate": (
-                active_candidate.model_dump(mode="json")
-                if active_candidate is not None
-                else None
-            ),
         }
     )
     return snapshot_from_state(state)
@@ -1237,11 +1247,8 @@ async def test_same_run_retry_sees_active_candidate_without_changing_progress() 
             ),
         ),
     )
-    snapshot = _context_snapshot(
-        document=document,
-        source_id=source_id,
-        active_candidate=_active_workspace(run_id=run_id, changeset=changeset),
-    )
+    active_candidate = _active_workspace(run_id=run_id, changeset=changeset)
+    snapshot = _context_snapshot(document=document, source_id=source_id)
     runtime = _ContextSourceRuntime(_context_source(document_id, source_id))
     before = snapshot.semantic_progress
     same_run = await build_consultant_context(
@@ -1253,12 +1260,14 @@ async def test_same_run_retry_sees_active_candidate_without_changing_progress() 
             current_source_id=source_id,
             selected_skill_ids=("task-boundary",),
         ),
+        active_candidate=active_candidate,
     )
     assert '<active_candidate_workspace authority="none" approved="false">' in same_run.system_prompt
     active = _prompt_section(same_run.system_prompt, "active_candidate_workspace")
     assert active["candidate_revision"] == 1
-    assert active["revision_digest"] == snapshot.active_candidate.revision_digest
+    assert active["revision_digest"] == active_candidate.revision_digest
     assert active["actions"][0]["source_ids"] == [str(source_id)]
+    assert "active_candidate" not in snapshot.model_dump(mode="json")
     assert snapshot.semantic_progress == before
     assert snapshot.semantic_progress.employee_decisions.pending == 0
 
@@ -1271,8 +1280,69 @@ async def test_same_run_retry_sees_active_candidate_without_changing_progress() 
             current_source_id=source_id,
             selected_skill_ids=("task-boundary",),
         ),
+        active_candidate=active_candidate,
     )
     assert "<active_candidate_workspace" not in new_run.system_prompt
+
+
+@pytest.mark.asyncio
+async def test_context_middleware_reads_active_candidate_from_internal_graph_state() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    run_id = uuid4()
+    document = _approved_document(document_id)
+    changeset = _context_changeset(
+        changeset_id=uuid4(),
+        created_revision=7,
+        actions=(
+            _context_action(
+                action_id=uuid4(),
+                source_id=source_id,
+                target_id=document.tasks[0].task_id,
+                after="同一 run 尚未發布的候選",
+            ),
+        ),
+    )
+    active_candidate = _active_workspace(run_id=run_id, changeset=changeset)
+    snapshot = _context_snapshot(document=document, source_id=source_id)
+    runtime = _ContextSourceRuntime(
+        _context_source(document_id, source_id),
+        active_candidate=active_candidate,
+    )
+    runtime_context = ConsultantAgentRuntimeContext(
+        runtime=runtime,  # type: ignore[arg-type]
+        snapshot=snapshot,
+        execution=_execution(),
+        request=ContextRequest(
+            run_id=run_id,
+            current_source_id=source_id,
+            selected_skill_ids=("task-boundary",),
+        ),
+    )
+    request = ModelRequest(
+        model=FakeMessagesListChatModel(responses=[AIMessage(content="完成")]),
+        messages=[
+            HumanMessage(
+                content=f"[employee source {source_id}]",
+                additional_kwargs={"employee_source_id": str(source_id)},
+            )
+        ],
+        runtime=Runtime(context=runtime_context),
+    )
+    captured: dict[str, ModelRequest] = {}
+
+    async def handler(overridden: ModelRequest) -> ModelResponse:
+        captured["request"] = overridden
+        return ModelResponse(result=[AIMessage(content="完成")])
+
+    await ConsultantContextMiddleware().awrap_model_call(request, handler)
+
+    prompt = captured["request"].system_message.text
+    assert '<active_candidate_workspace authority="none" approved="false">' in prompt
+    assert _prompt_section(prompt, "active_candidate_workspace")[
+        "revision_digest"
+    ] == active_candidate.revision_digest
+    assert "active_candidate" not in snapshot.model_dump(mode="json")
 
 
 def test_materialized_paths_and_opks_linkage_rank_focused_pending_actions() -> None:
@@ -1585,7 +1655,6 @@ def _candidate_task_field_change(
         duties=(),
         tasks=(),
         opks_items=(),
-        target_ids=(),
         opks_kind="none",
         task_ids=(),
         indicator_ids=(),

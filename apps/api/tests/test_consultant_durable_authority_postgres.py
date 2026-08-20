@@ -1423,7 +1423,6 @@ def _candidate_wire_change(**overrides: object) -> OutputDocumentChange:
         ),
         "tasks": (),
         "opks_items": (),
-        "target_ids": (),
         "opks_kind": OutputOpksKind.NONE,
         "task_ids": (),
         "indicator_ids": (),

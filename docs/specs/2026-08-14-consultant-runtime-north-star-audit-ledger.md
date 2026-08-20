@@ -354,6 +354,17 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - TDD／驗證：RED `4 failed, 10 deselected`；narrow GREEN `4 passed, 10 deselected`；runtime projection `1 passed, 14 deselected in 4.57s`；完整 context／receipt regression `18 passed in 19.84s`。最終 explicit `TEST_DATABASE_URL` 四檔 sequential gate 為 **`50 passed in 19.96s`、zero skips**；post-gate `checkpoints`、`checkpoint_blobs`、`checkpoint_writes`、`store`、`consultant_documents` 全為 0。
 - 北極星回歸：employee acceptance／edit-accept 仍是模型內容進 approved JD 的唯一路徑；pending/deferred 是 conditional hypothesis，rejected/stale/edit-accepted 是記憶而非 JD。單一顧問、動態 Task／Duty／OPKS、員工原話、澄清／Gap、自然續談與單一強制匯出保持不變。結果 **Pass**。
 
+### ADR 0063 Task 6：hybrid candidate product canary、通用操作與 active design 同步
+
+- 狀態：**Implementation gate Pass；獨立 Task review 待本段 commit 後執行。** 四個 canary 使用 deterministic scripted chat model，但其餘路徑是真 LangChain `create_agent`／ToolNode、五個正式 Tool、LangGraph product graph、PostgreSQL Saver／Store、candidate publication 與員工 authority command；沒有假 agent loop、第二 graph 或 candidate table。
+- 產品情境：① Task＋O/P 以同 batch local refs 建立，publication 後只進 review queue，accept 後才進 approved JD；② 過大 Task 以 ADD 兩個替代 Task＋ADD replacement O＋WITHDRAW 舊 O／Task 原子重組，第一批 unknown linkage 正常回 rejected ToolMessage，模型看到後提交完整修正版，沒有專用 split／merge；③ 九個 Task 接受、一個 O 拒絕，下一個真 run context 看見九個核准項與拒絕 decision memory，不把拒絕 O 當事實；④ unpublished candidate 遇員工 direct edit 被清除，published pending action 遇同欄 direct edit依 read-set stale。
+- model-facing operation hard-cut：`CandidateEditOperation` 精確為 ADD／REVISE／WITHDRAW／REASSIGN／REORDER。內部歷史／非模型 `DocumentChangeOperation` 可保留 MERGE／SPLIT，但 candidate schema、prompt 與 Tool call 都沒有該 primitive；人類 semantic diff 若需要拆分／合併文字，只能從一般 operations 確定性推導。candidate Tool schema因此由 62 降為 61 properties，仍為 zero optional／union／open object。
+- Snapshot 邊界回歸：Task 2 原有 PostgreSQL test 重新揭露 Task 5 將 `active_candidate` 誤放進一般 `ConsultantSnapshot`。根因不是 checkpoint，而是內部 run state 被升格成公開 projection，而且該 projection在同一 model loop 內可能陳舊。修正後一般 snapshot完全無此欄位；Context middleware每個 model step從同一 raw product checkpoint重讀，僅 matching run投影非核准 active workspace。RED 為 `2 failed`（builder沒有 explicit candidate、middleware沒讀 internal state），GREEN `2 passed`；原 PostgreSQL leakage regression `1 passed`。
+- Framework injection warning：真 ToolNode canary 原有 12 個 Pydantic warning，warning-as-error stack trace定位到未參數化 `ToolRuntime` 被當成 `context=None`，實際注入 `ConsultantAgentRuntimeContext`。改用 framework generic `ToolRuntime[Any, Any]` 後，hidden context／call identity仍不進 model schema，candidate Tool亦未反向依賴具體 Postgres／context類別；四個 canary以 `UserWarning` 視為 error為 **4 passed in 22.33s**。
+- 官方複核：OpenAI 要求 strict schema、application 已知參數不交模型、固定串行 functions 合併、初始 functions 維持少量；Apply Patch 使用一般 create／update／delete、真實 completed／failed output與 application-owned atomicity。Anthropic要求自然功能邊界、可整併連續工作、只回高訊號與可行動 error；Google支援 compositional function calls＋Structured Output；LangChain以 `ToolRuntime`作 dependency injection、ProviderStrategy作 final typed response。這些共同支持「四讀＋一個通用候選編輯 Tool」，沒有發現更成熟元件要求回到專用 split／merge或第二 authority。
+- Schema／驗證：最新合併量測為 **6 schemas、0 defs、128 properties、2 optional、0 union、4 open objects、depth 4、13,411 bytes**；candidate/final各為 61 properties、0 optional／union／open，optional/open只來自既有 read Tools。candidate／authority warning-as-error gate **102 passed in 124.32s**；產品方向 focused gate **88 passed in 42.95s**；其後 `consultant_documents`／`checkpoints`／`checkpoint_blobs`／`checkpoint_writes`／`store` 為 **0／0／0／0／0**。
+- 北極星回歸：一位顧問、前景焦點／背景吸收、Task／Duty／OPKS 動態演化、員工原話與更正、必要澄清、Gap、deterministic progress、自然離開／返回、單一可強制匯出與員工唯一文件 authority 均保持。沒有 RAG／Reference consumer、能力級別／A、auto-accept、multi-agent、正式 eval或「本輪可停」狀態。結果 **Pass**；真 GPT-5.6 Luna Max smoke與完整 monorepo gate屬 Task 7。
+
 ## 8. 本次直接使用的一手來源
 
 - [Anthropic — Prompting Claude Opus 5](https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/prompting-claude-opus-5)
@@ -365,11 +376,13 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - [Anthropic — Tool search tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/tool-search-tool)
 - [Anthropic — Writing tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
 - [OpenAI — Function calling](https://developers.openai.com/api/docs/guides/function-calling)
+- [OpenAI — Apply Patch](https://developers.openai.com/api/docs/guides/tools-apply-patch)
 - [OpenAI — Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)
 - [OpenAI — Tool search](https://developers.openai.com/api/docs/guides/tools-tool-search)
 - [Google Gemini — Function calling](https://ai.google.dev/gemini-api/docs/function-calling)
 - [Google Gemini — Structured output](https://ai.google.dev/gemini-api/docs/structured-output)
 - [LangChain — Tools](https://docs.langchain.com/oss/python/langchain/tools)
+- [LangChain — Runtime／ToolRuntime dependency injection](https://docs.langchain.com/oss/python/langchain/runtime)
 - [LangChain `Citation`](https://reference.langchain.com/python/langchain-core/messages/content/Citation)
 - [W3C Web Annotation Data Model](https://www.w3.org/TR/annotation-model/)
 - [W3C PROV-O](https://www.w3.org/TR/prov-o/)

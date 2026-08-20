@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Annotated, Protocol
+from typing import Annotated, Any, Protocol
 from uuid import UUID
 
 from langchain.tools import ToolRuntime
@@ -57,7 +57,7 @@ class _CandidateEditToolInput(CandidateEditBatch):
         frozen=True,
         arbitrary_types_allowed=True,
     )
-    runtime: ToolRuntime
+    runtime: ToolRuntime[Any, Any]
 
 
 class _CandidateEditStructuredTool(StructuredTool):
@@ -137,7 +137,7 @@ def build_job_document_candidate_edit_tool(
         replacement_changes: Annotated[
             tuple[OutputDocumentChange, ...], Field(min_length=1, max_length=32)
         ],
-        runtime: ToolRuntime,
+        runtime: ToolRuntime[Any, Any],
     ) -> str:
         if runtime.tool_call_id is None:
             raise RuntimeError("candidate Tool call is missing its provider call ID")

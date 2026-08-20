@@ -395,6 +395,8 @@ async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> No
 
     source_id = uuid4()
     changeset_id = uuid4()
+    external_dependency_action_id = uuid4()
+    superseded_action_id = uuid4()
     action = DocumentPatchAction(
         action_id=uuid4(),
         operation=DocumentPatchOperation.REVISE,
@@ -406,6 +408,8 @@ async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> No
         read_set=(
             DocumentPathRead(path="/job_title", value_sha256="0" * 64),
         ),
+        depends_on_action_ids=(external_dependency_action_id,),
+        supersedes_action_ids=(superseded_action_id,),
     )
     changeset = DocumentChangeSet(
         changeset_id=changeset_id,
@@ -413,6 +417,7 @@ async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> No
         actions=(action,),
         source_ids=(source_id,),
         created_revision=0,
+        external_dependency_action_ids=(external_dependency_action_id,),
     )
     state = initial_thread_state(document_id)
     state["approved_document"]["job_title"] = "已核准名稱"

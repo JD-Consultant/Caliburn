@@ -63,6 +63,47 @@ def _durable_run(value: dict | None) -> DurableRunView | None:
     )
 
 
+def _document_changeset_view(value: DocumentChangeSet) -> DocumentChangeSetView:
+    """Project durable review state without leaking internal workflow metadata."""
+
+    return DocumentChangeSetView.model_validate(
+        {
+            "changeset_id": value.changeset_id,
+            "summary": value.summary,
+            "actions": [
+                {
+                    "action_id": action.action_id,
+                    "operation": action.operation.value,
+                    "path": action.path,
+                    "target_key": action.target_key,
+                    "before": action.before,
+                    "after": action.after,
+                    "source_ids": action.source_ids,
+                    "quote_anchors": [
+                        anchor.model_dump(mode="json")
+                        for anchor in action.quote_anchors
+                    ],
+                    "read_set": [
+                        item.model_dump(mode="json") for item in action.read_set
+                    ],
+                    "target_ids": action.target_ids,
+                    "depends_on_action_ids": action.depends_on_action_ids,
+                    "atomic_subgroup_id": action.atomic_subgroup_id,
+                    "affected_work_ids": action.affected_work_ids,
+                    "blocks_dependent_analysis": action.blocks_dependent_analysis,
+                    "status": action.status.value,
+                    "employee_after": action.employee_after,
+                    "rejection_reason": action.rejection_reason,
+                    "stale_reason": action.stale_reason,
+                }
+                for action in value.actions
+            ],
+            "source_ids": value.source_ids,
+            "created_revision": value.created_revision,
+        }
+    )
+
+
 def _readiness(snapshot: ConsultantSnapshot) -> ExportReadinessView:
     issues: list[ExportReadinessIssueView] = []
     for task in snapshot.approved_document.tasks:
@@ -198,9 +239,7 @@ def to_consultant_snapshot_view(
         document_review=DocumentReviewView.model_validate(
             {
                 "bundles": [
-                    DocumentChangeSetView.model_validate(
-                        bundle.model_dump(mode="json")
-                    ).model_dump(mode="json")
+                    _document_changeset_view(bundle).model_dump(mode="json")
                     for bundle in review.bundles
                 ],
                 "unresolved_action_count": review.unresolved_action_count,

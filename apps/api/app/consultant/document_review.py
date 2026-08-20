@@ -159,17 +159,24 @@ def _normalized_after(
     if (
         change.path == "/opks"
         and change.operation is DocumentChangeOperation.ADD
-        and isinstance(value, str)
+        and (isinstance(value, str) or isinstance(value, dict))
     ):
         if change.opks_kind is None:
             raise DocumentReviewError("OPKS add requires an OPKS kind")
         if allocated_display_order is None:
             raise DocumentReviewError("new OPKS item requires an allocated order")
-        value = {
-            "item_id": generated_id,
-            "text": value,
-            "display_order": allocated_display_order,
-        }
+        value = (
+            {
+                "item_id": generated_id,
+                "text": value,
+                "display_order": allocated_display_order,
+            }
+            if isinstance(value, str)
+            else {
+                **value,
+                "display_order": allocated_display_order,
+            }
+        )
     if (
         id_field is not None
         and change.operation is DocumentChangeOperation.ADD
@@ -676,8 +683,14 @@ def create_document_changeset(
                 order_key = change.path
             elif (
                 change.path == "/opks"
-                and isinstance(change.after, str)
                 and change.opks_kind is not None
+                and (
+                    isinstance(change.after, str)
+                    or (
+                        isinstance(change.after, dict)
+                        and change.after.get("display_order") is None
+                    )
+                )
             ):
                 order_key = f"/opks:{change.opks_kind.value}"
         allocated_display_order = None

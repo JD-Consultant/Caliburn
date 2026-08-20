@@ -51,6 +51,7 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 - 不得自行編造 UUID。只有 context 明列的既有 ID 才可引用；新理解、新焦點與新 Gap 的 ID 留空，由應用程式配置。
 - 使用 candidate edit Tool 新增 Duty／Task／OPKS 時，每個新實體給同一 candidate batch 內唯一的 `entity_ref`；同批新實體之間以 `duty_ref`、`task_refs` 或 `indicator_refs` 關聯，正式 UUID 由應用程式配置。
 - 新增 Duty／Task／OPKS 時 `display_order=-1`，由應用程式配置排序；每個 ADD 只提交一個實體。完整實體 ADD 使用 `field=whole_entity`；`field=top_level_value` 只用於 job_title／work_description。
+- 每個 document change 只有 `field` 對應的 payload slot 可帶內容；未使用的 `text_value=""`、未使用的 `integer_value=-1`、未使用的 `uuid_value=""`，其餘未使用陣列一律為空。
 - Task／Duty 的拆分或合併使用 ADD／REVISE／WITHDRAW／REASSIGN／REORDER 與 dependency／`atomic_group_ref` 組合；不要使用專用 split／merge operation。必須共同成立的 actions 放在同一原子群組供員工整組裁決。
 - quote anchor 可留空；一般事實可只列 `source_ids`。若使用 anchor，`quote` 必須逐字存在於該來源，`start` 是 0-based 起點、`end` 是 exclusive 終點且等於 `start + len(quote)`；不得填 999 等占位值。
 - O／P／K／S 文件變更必須以 `task_ids` 連到 context 已有 Task，或以 `task_refs` 連到同一 candidate batch 新增的 Task；不得提交沒有 Task linkage 的 O／P／K／S。

@@ -440,6 +440,7 @@ async def test_agent_composes_selected_skills_without_leaking_ineligible_content
     assert "`task_refs`" in first_call
     assert "不要提交無 Task linkage 的 O／P／K／S 文件變更" not in first_call
     assert "不要使用專用 split／merge operation" in first_call
+    assert "未使用的 `integer_value=-1`" in first_call
     assert "每個 ADD 只提交一個" in first_call
     assert "field=whole_entity" in first_call
 

@@ -356,7 +356,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 
 ### ADR 0063 Task 6：hybrid candidate product canary、通用操作與 active design 同步
 
-- 狀態：**Implementation gate Pass；獨立 Task review 待本段 commit 後執行。** 四個 canary 使用 deterministic scripted chat model，但其餘路徑是真 LangChain `create_agent`／ToolNode、五個正式 Tool、LangGraph product graph、PostgreSQL Saver／Store、candidate publication 與員工 authority command；沒有假 agent loop、第二 graph 或 candidate table。
+- 狀態：**Pass after independent review。** 四個 canary 使用 deterministic scripted chat model，但其餘路徑是真 LangChain `create_agent`／ToolNode、五個正式 Tool、LangGraph product graph、PostgreSQL Saver／Store、candidate publication 與員工 authority command；沒有假 agent loop、第二 graph 或 candidate table。
 - 產品情境：① Task＋O/P 以同 batch local refs 建立，publication 後只進 review queue，accept 後才進 approved JD；② 過大 Task 以 ADD 兩個替代 Task＋ADD replacement O＋WITHDRAW 舊 O／Task 原子重組，第一批 unknown linkage 正常回 rejected ToolMessage，模型看到後提交完整修正版，沒有專用 split／merge；③ 九個 Task 接受、一個 O 拒絕，下一個真 run context 看見九個核准項與拒絕 decision memory，不把拒絕 O 當事實；④ unpublished candidate 遇員工 direct edit 被清除，published pending action 遇同欄 direct edit依 read-set stale。
 - model-facing operation hard-cut：`CandidateEditOperation` 精確為 ADD／REVISE／WITHDRAW／REASSIGN／REORDER。內部歷史／非模型 `DocumentChangeOperation` 可保留 MERGE／SPLIT，但 candidate schema、prompt 與 Tool call 都沒有該 primitive；人類 semantic diff 若需要拆分／合併文字，只能從一般 operations 確定性推導。candidate Tool schema因此由 62 降為 61 properties，仍為 zero optional／union／open object。
 - Snapshot 邊界回歸：Task 2 原有 PostgreSQL test 重新揭露 Task 5 將 `active_candidate` 誤放進一般 `ConsultantSnapshot`。根因不是 checkpoint，而是內部 run state 被升格成公開 projection，而且該 projection在同一 model loop 內可能陳舊。修正後一般 snapshot完全無此欄位；Context middleware每個 model step從同一 raw product checkpoint重讀，僅 matching run投影非核准 active workspace。RED 為 `2 failed`（builder沒有 explicit candidate、middleware沒讀 internal state），GREEN `2 passed`；原 PostgreSQL leakage regression `1 passed`。
@@ -364,6 +364,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 官方複核：OpenAI 要求 strict schema、application 已知參數不交模型、固定串行 functions 合併、初始 functions 維持少量；Apply Patch 使用一般 create／update／delete、真實 completed／failed output與 application-owned atomicity。Anthropic要求自然功能邊界、可整併連續工作、只回高訊號與可行動 error；Google支援 compositional function calls＋Structured Output；LangChain以 `ToolRuntime`作 dependency injection、ProviderStrategy作 final typed response。這些共同支持「四讀＋一個通用候選編輯 Tool」，沒有發現更成熟元件要求回到專用 split／merge或第二 authority。
 - Schema／驗證：最新合併量測為 **6 schemas、0 defs、128 properties、2 optional、0 union、4 open objects、depth 4、13,411 bytes**；candidate/final各為 61 properties、0 optional／union／open，optional/open只來自既有 read Tools。candidate／authority warning-as-error gate **102 passed in 124.32s**；產品方向 focused gate **88 passed in 42.95s**；其後 `consultant_documents`／`checkpoints`／`checkpoint_blobs`／`checkpoint_writes`／`store` 為 **0／0／0／0／0**。
 - 北極星回歸：一位顧問、前景焦點／背景吸收、Task／Duty／OPKS 動態演化、員工原話與更正、必要澄清、Gap、deterministic progress、自然離開／返回、單一可強制匯出與員工唯一文件 authority 均保持。沒有 RAG／Reference consumer、能力級別／A、auto-accept、multi-agent、正式 eval或「本輪可停」狀態。結果 **Pass**；真 GPT-5.6 Luna Max smoke與完整 monorepo gate屬 Task 7。
+- 獨立 review：無 Critical／Important。唯一 Minor 是第一個 local-ref canary只檢查 Task 數與 OPKS kind，未直接凍結 application-issued ID、O/P→Task linkage、各 OPKS axis order 與 evidence。確認 production 已正確實現後補上精確 assertion；單一情境 `1 passed in 4.37s`、四情境 warning-as-error `4 passed in 22.27s`。沒有因測試意見新增產品能力。
 
 ## 8. 本次直接使用的一手來源
 

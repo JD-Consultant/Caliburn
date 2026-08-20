@@ -644,10 +644,25 @@ async def test_candidate_tool_loop_publishes_local_ref_task_and_opks_only_after_
             action_ids=tuple(action.action_id for action in bundle.actions),
         )
         assert len(accepted.approved_document.tasks) == 1
-        assert {item.kind.value for item in accepted.approved_document.opks} == {
-            "output",
-            "indicator",
+        created_task = accepted.approved_document.tasks[0]
+        assert created_task.display_order == 0
+        opks_by_kind = {
+            item.kind: item for item in accepted.approved_document.opks
         }
+        assert set(opks_by_kind) == {
+            ApprovedOpksKind.OUTPUT,
+            ApprovedOpksKind.PERFORMANCE_INDICATOR,
+        }
+        assert len(
+            {
+                created_task.task_id,
+                *(item.item_id for item in accepted.approved_document.opks),
+            }
+        ) == 3
+        for item in opks_by_kind.values():
+            assert item.task_ids == (created_task.task_id,)
+            assert item.display_order == 0
+            assert item.evidence_source_ids == (source_id,)
 
 
 @pytest.mark.asyncio

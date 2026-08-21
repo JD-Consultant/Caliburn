@@ -210,6 +210,10 @@ def test_composite_grep_paths_consume_lookup_waves_but_candidate_grep_does_not()
     assert middleware.after_model(state("/", count=1), runtime=None) == {
         "run_lookup_wave_count": 2
     }
+    with pytest.raises(LookupWaveLimitExceeded):
+        middleware.after_model(state("/.", count=2), runtime=None)
+    with pytest.raises(LookupWaveLimitExceeded):
+        middleware.after_model(state("/./", count=2), runtime=None)
     assert middleware.after_model(
         state("/candidate/run-1", count=2), runtime=None
     ) is None

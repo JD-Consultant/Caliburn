@@ -109,7 +109,7 @@ class LookupWaveLimitMiddleware(AgentMiddleware[LookupWaveState, Any]):
         if not isinstance(args, Mapping):
             return False
         raw_path = args.get("file_path", args.get("path"))
-        if name == "grep" and (raw_path is None or raw_path == "/"):
+        if name == "grep" and raw_path is None:
             return True
         if not isinstance(raw_path, str):
             return False
@@ -117,6 +117,8 @@ class LookupWaveLimitMiddleware(AgentMiddleware[LookupWaveState, Any]):
             path = validate_path(raw_path)
         except (TypeError, ValueError):
             return False
+        if name == "grep" and path == "/":
+            return True
         return any(path == root or path.startswith(root + "/") for root in _LOOKUP_ROOTS)
 
     @override

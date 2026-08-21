@@ -151,3 +151,51 @@ hard-cut rg: 0 matches
 - Removed the direct Skill backend compatibility adapter, the workspace backend alias, `active_candidate`, candidate staging command/state, and all model-facing employee-source business Tools.
 - Reused the existing LangChain/Deep Agents middleware, `PackageSkillBackend`, FilesystemMiddleware, prompt-cache/context middleware, model usage/budget/attempt receipts, catalog/resolver, checked receipt, verifier, publication, and authority graph. No Tool Search, router, new loop, new store, model/provider-only path, sync database, RAG, eval platform, auto-accept, capability level, or A was added.
 - No product-flow research implementation example or historical ADR was migrated into the current surface; ADR0064’s catalog-backed deterministic resolver direction is the implementation authority.
+
+## Review fix round 2/5
+
+This round made only the three requested minimal corrections:
+
+- `_is_external_lookup` treats grep with no path as external, validates a supplied path first, and then treats every canonical root alias (`/`, `/.`, and `/./`) as an external composite-workspace lookup. Explicit `/candidate/<run-id>/...` grep remains free and no Tool surface was broadened.
+- Context budget degradation now runs after dialogue-summary/orientation compaction and before the final budget error: when the two recent consultant turns do not fit, it retains only the latest turn and records `recent_consultant_turns`. It does not restore source selection, recent source loading, or approved-slice machinery.
+- PostgreSQL idempotent check replay returns the existing ordered action handles with the receipt actions. The replay canary asserts the compact observation exposes handles without the receipt and that the review queue/checkpoint state is unchanged.
+
+TDD evidence for this round:
+
+```text
+$env:DEBUG='false'; $env:TEST_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn_reviewed'; $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_task6_contract.py::test_composite_grep_paths_consume_lookup_waves_but_candidate_grep_does_not tests/test_consultant_context.py::test_context_drops_only_oldest_recent_turn_when_budget_requires tests/test_consultant_durable_authority_postgres.py::test_workspace_check_only_records_receipt_then_publishes_once_and_replays -p no:cacheprovider -q
+→ RED: 3 failed in 4.26s
+→ GREEN: 3 passed in 4.26s
+```
+
+The minimal handle-only `/pending` semantic view is deliberately assigned to the
+already-planned Task 7 pending/decision-memory E2E. Task 6 does not add a generic
+UUID sanitizer or redesign the pending projection: read-only raw IDs cannot pass
+the typed candidate/final publication contracts, so this deferral creates no
+authority bypass. The full employee-authority/check-repair/9-accept-1-reject/
+direct-edit-stale run-level migration remains Task 7 work as stated above.
+
+## Round-2 final gates
+
+```text
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_task6_contract.py tests/test_consultant_model_output.py tests/test_consultant_model_runtime.py tests/test_consultant_run_service.py tests/test_consultant_context.py tests/test_consultant_agent_and_skills.py -p no:cacheprovider -q
+→ 55 passed in 1.78s
+
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_workspace_tools.py tests/test_consultant_workspace_backend.py tests/test_consultant_candidate_publication.py -p no:cacheprovider -q
+→ 70 passed in 2.98s
+
+$env:DEBUG='false'; $env:TEST_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn_reviewed'; $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_durable_authority_postgres.py -p no:cacheprovider -q
+→ 10 passed in 18.53s, zero skipped
+
+$env:DEBUG='false'; $env:TEST_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn_reviewed'; $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest -p no:cacheprovider -q
+→ 260 passed in 24.80s
+```
+
+The final structural gates also passed:
+
+```text
+AST hard-cut → python_files=47, forbidden_imports=[], retired_files_present=[]
+hard-cut rg → 0 matches
+uv run python -m compileall -q app tests → passed with no output
+git diff --check → passed; only Git LF/CRLF conversion warnings were emitted
+```

@@ -28,7 +28,7 @@ from app.consultant.state import (
     SourceValidity,
     initial_thread_state,
 )
-from app.consultant.views import snapshot_from_state
+from app.consultant.views import ConsultantTurnProjection, snapshot_from_state
 
 
 DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000701")
@@ -233,6 +233,69 @@ async def test_context_does_not_fetch_or_claim_recent_source_payloads() -> None:
     assert bundle.messages[0].content == current.text
     assert recent_sources[0].text not in bundle.system_prompt
     assert recent_sources[1].text not in bundle.system_prompt
+
+
+@pytest.mark.asyncio
+async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> None:
+    document = _document()
+    source = _source()
+    older = ConsultantTurnProjection(
+        run_id=uuid4(),
+        answer_source_id=uuid4(),
+        text="較早顧問回覆：先整理職務範圍與責任邊界。",
+        used_skill_ids=(),
+    )
+    latest = ConsultantTurnProjection(
+        run_id=uuid4(),
+        answer_source_id=uuid4(),
+        text="最新顧問回覆：請確認缺料處理的決策責任。",
+        used_skill_ids=(),
+    )
+    one_turn = _snapshot(document, source).model_copy(update={"messages": (latest,)})
+    two_turns = _snapshot(document, source).model_copy(
+        update={"messages": (older, latest)}
+    )
+    runtime = InMemorySourceRuntime((source,))
+
+    one_turn_bundle = await build_consultant_context(
+        runtime=runtime,  # type: ignore[arg-type]
+        snapshot=one_turn,
+        execution=_execution(),
+        request=ContextRequest(
+            run_id=RUN_ID,
+            current_source_id=source.source_id,
+            selected_skill_ids=("task-boundary",),
+        ),
+    )
+    two_turn_bundle = await build_consultant_context(
+        runtime=runtime,  # type: ignore[arg-type]
+        snapshot=two_turns,
+        execution=_execution(),
+        request=ContextRequest(
+            run_id=RUN_ID,
+            current_source_id=source.source_id,
+            selected_skill_ids=("task-boundary",),
+        ),
+    )
+    budget = one_turn_bundle.receipt.total_input_tokens
+    assert one_turn_bundle.receipt.total_input_tokens <= budget
+    assert two_turn_bundle.receipt.total_input_tokens > budget
+
+    compacted = await build_consultant_context(
+        runtime=runtime,  # type: ignore[arg-type]
+        snapshot=two_turns,
+        execution=_execution(max_context_tokens=budget),
+        request=ContextRequest(
+            run_id=RUN_ID,
+            current_source_id=source.source_id,
+            selected_skill_ids=("task-boundary",),
+        ),
+    )
+
+    assert "recent_consultant_turns" in compacted.receipt.degraded_sections
+    assert latest.text in compacted.system_prompt
+    assert older.text not in compacted.system_prompt
+    assert compacted.messages[0].content == source.text
 
 
 @pytest.mark.asyncio

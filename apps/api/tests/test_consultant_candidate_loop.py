@@ -38,6 +38,7 @@ from app.consultant.model_output import (
 from app.consultant.provider_wire import OutputQuoteAnchor
 from app.consultant.document_review import AtomicSubgroupIncomplete, DocumentReviewError
 from app.consultant.run_service import build_configured_execution, execute_admitted_consultant_turn
+from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.state import (
     ApprovedDuty,
     ApprovedJobDocument,
@@ -1286,6 +1287,8 @@ async def test_workspace_check_only_records_receipt_then_publishes_exactly_once(
             run_id=run_id,
             files=files,
             tool_call_id="resource-check-001",
+            selected_skill_ids=CONSULTANT_SKILL_IDS,
+            loaded_skill_ids=CONSULTANT_SKILL_IDS,
         )
         assert checked.status == "checked", checked.issues
         after_check = await runtime.reopen_document(document_id)
@@ -1300,6 +1303,7 @@ async def test_workspace_check_only_records_receipt_then_publishes_exactly_once(
         )
         assert len(published.review_queue) == 1
         assert (await runtime.raw_state(document_id))["checked_candidate"] is None
+        assert (await runtime.raw_state(document_id))["command_receipts"]
 
         replayed = await runtime.publish_checked_candidate(
             document_id=document_id,

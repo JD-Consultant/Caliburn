@@ -182,6 +182,11 @@ def _apply_command(
                 "checked_candidate": None,
             }
         )
+        if command_receipt is not None:
+            update["command_receipts"] = attach_command_receipt(
+                state,
+                command_receipt,
+            )
         return update
     update: ConsultantThreadState = {
         "revision": expected_revision + 1,

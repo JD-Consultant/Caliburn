@@ -54,6 +54,8 @@ class CandidateCheckPort(Protocol):
         run_id: UUID,
         files: Mapping[str, str],
         tool_call_id: str,
+        selected_skill_ids: tuple[str, ...],
+        loaded_skill_ids: tuple[str, ...],
     ) -> Any: ...
 
 
@@ -171,6 +173,8 @@ def build_check_candidate_document_tool(
             run_id=binding.workspace.run_id,
             files=files,
             tool_call_id=runtime.tool_call_id,
+            selected_skill_ids=binding.workspace.skill_backend.selected_skill_ids,
+            loaded_skill_ids=binding.workspace.skill_backend.loaded_skill_ids,
         )
         return _serialize_check_result(result)
 

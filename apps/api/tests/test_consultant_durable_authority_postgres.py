@@ -44,6 +44,7 @@ from app.consultant.candidate_publication import CandidatePublicationStale
 from app.consultant.graph import _published_candidate_changeset
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.provider_wire import OutputAnalysisBasis
+from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.results import (
     AnalysisBasis,
     AttentionChange,
@@ -3032,6 +3033,8 @@ async def test_checked_candidate_stale_digest_run_and_baseline_leave_review_queu
             run_id=run_id,
             files=files,
             tool_call_id="stale-check-001",
+            selected_skill_ids=CONSULTANT_SKILL_IDS,
+            loaded_skill_ids=CONSULTANT_SKILL_IDS,
         )
         assert checked.status == "checked", checked.issues
         assert (await runtime.reopen_document(document_id)).review_queue == {}

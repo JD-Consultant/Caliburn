@@ -87,7 +87,6 @@ from app.consultant.state import (
     UnderstandingCalibration,
     inspect_command_receipt,
 )
-from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.workspace_resources import WorkspaceCatalog
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 from app.consultant.verification import (
@@ -816,6 +815,8 @@ class PostgresConsultantRuntime:
         run_id: UUID,
         files: Mapping[str, str | bytes],
         tool_call_id: str,
+        selected_skill_ids: tuple[str, ...],
+        loaded_skill_ids: tuple[str, ...],
     ) -> CandidateCheckResult:
         """Check current candidate resources and persist only its receipt."""
 
@@ -882,8 +883,8 @@ class PostgresConsultantRuntime:
                 candidate_revision=candidate_revision,
                 files=normalized_files,
                 check_call_id=tool_call_id,
-                selected_skill_ids=CONSULTANT_SKILL_IDS,
-                loaded_skill_ids=CONSULTANT_SKILL_IDS,
+                selected_skill_ids=selected_skill_ids,
+                loaded_skill_ids=loaded_skill_ids,
             )
             result = check_candidate_document(
                 request,

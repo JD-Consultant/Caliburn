@@ -1,4 +1,4 @@
-# Task 5 report — verified virtual JD candidate publication
+# Task 5 report — verified virtual JD candidate publication (fix round 1/5)
 
 ## Scope and controller ruling
 
@@ -11,9 +11,10 @@ Task 5 adds only the narrow resource-after-state publication path:
   checkpoint.  Check stores only the receipt and never mutates the review
   queue.  Publication moves the exact checked changeset into the existing
   review queue and clears the receipt in the same graph transition.
-- `PostgresConsultantRuntime` performs the document lock, current run/source
-  checks, exact resource digest/read-set validation, and idempotent check and
-  publication calls.  No second document store was introduced.
+- `PostgresConsultantRuntime` uses the runtime-owned per-document authority
+  lock, current run/source checks, revision CAS, exact resource digest/read-set
+  validation, and idempotent check/publication calls.  No second document
+  store was introduced.
 
 The controller ruling was applied: this intermediate commit leaves the
 existing `CandidateWorkspace`, `active_candidate`, `candidate_tool`,
@@ -140,12 +141,128 @@ git diff --check
 
 The new path reuses the existing `Evidence` resolver, `create_document_changeset`,
 `_publish_persisted_changeset`, stable IDs, read-set hashes, review queue, and
-document lock/authority transaction boundaries.  The current Task 4
-`CandidateCheckPort` does not carry selected/loaded Skill IDs, so the minimal
-PostgreSQL bridge supplies the packaged consultant Skill set; the pure
-application request still validates selected-versus-loaded Skills, and Task 6
-may narrow the final runtime/model seam.
+runtime-owned per-document authority lock, revision CAS, and graph authority
+transition.  Fix round 1 extends the existing Task 4 `CandidateCheckPort` with
+the selected and loaded Skill receipts already held by
+`workspace.skill_backend`; the workspace Tool forwards those exact values and
+Postgres consumes them.  No manager, adapter, store, or second transaction seam
+was introduced.
 
 No load-bearing existing domain invariant was found to conflict with the
 approved plan.  The persistent false-dirty ADR0060 and the progress ledger
 were not modified and are excluded from the Task 5 commit.
+
+## Fix round 1/5 — controller findings and evidence
+
+The controller-verified fixes remain narrow:
+
+- Existing general `_link_required_groups` closure now links OPKS
+  `/task_ids` and `/indicator_ids` revisions to same-changeset new-entity
+  creators.  The split remains two general Task adds, OPKS reconnect revises,
+  and old-Task withdraw; all actions receive one common atomic subgroup and
+  existing review commands reject partial acceptance.  No split/merge action
+  or specialized service was added.
+- Candidate semantic changes now pass through
+  `verify_candidate_document_changes` before changeset creation.  K/S text
+  without an anchored quote fails closed; receipt Skills come from the
+  verifier's returned used IDs.  The default basis uses only loaded Skills and
+  an empty loaded Skill set is rejected instead of falling back to selected
+  Skills.  Existing application-owned `competency_level` and OPKS evidence
+  metadata are handled without weakening source/evidence validation.
+- The existing check binding/port forwards
+  `workspace.skill_backend.selected_skill_ids` and `.loaded_skill_ids` into the
+  Postgres runtime.  The full catalog is no longer hardcoded in that path.
+- Publication attaches the existing `CommandReceipt` in the same graph update
+  that inserts the exact review bundle and clears `checked_candidate`.
+- Scope ruling: this single-process product uses the shared runtime-owned
+  per-document `asyncio.Lock` plus existing revision CAS/checkpoint authority.
+  No PostgreSQL advisory lock, row lock, distributed lock, or new lock store
+  was added or implied.
+
+### Fix-round RED
+
+The new regression assertions were run before the fixes:
+
+```text
+cd apps/api
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task5'
+uv run pytest tests/test_consultant_candidate_publication.py -k "task_split or knowledge_text_change or receipt_uses_loaded or graph_check" -p no:cacheprovider -q
+→ 4 failed, 29 deselected
+```
+
+The failures were the expected old behavior: K/S text was checked without a
+quote, the receipt used selected rather than loaded Skills, split actions had
+both `None` and non-`None` subgroup IDs, and publication did not attach the
+command receipt.
+
+The binding regression also failed before the port change.  This was the exact
+invocation used while both test paths were supplied:
+
+```text
+cd apps/api
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task5'
+uv run pytest tests/test_consultant_candidate_publication.py -k "task_split or knowledge_text_change or receipt_uses_loaded or graph_check" -p no:cacheprovider -q tests/test_consultant_workspace_tools.py -k check_tool_uses_hidden_runtime_and_current_files_channel
+→ 1 failed, 56 deselected; TypeError: the check port was missing selected_skill_ids and loaded_skill_ids
+```
+
+After the verifier was connected, the first full pure run exposed the existing
+verifier's missing `competency_level` allowlist entry, application-owned OPKS
+evidence metadata, structural withdraw assumptions, and empty-loaded-basis
+exception.  The observed intermediate result was:
+
+```text
+cd apps/api
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task5'
+uv run pytest tests/test_consultant_candidate_publication.py -p no:cacheprovider -q
+→ 11 failed, 22 passed
+```
+
+### Fix-round GREEN
+
+```text
+cd apps/api
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task5'
+uv run pytest tests/test_consultant_candidate_publication.py -p no:cacheprovider -q
+→ 33 passed in 0.47s
+
+uv run pytest tests/test_consultant_workspace_tools.py tests/test_consultant_workspace_backend.py -p no:cacheprovider -q
+→ 37 passed in 2.81s
+
+uv run pytest tests/test_consultant_agent_and_skills.py -p no:cacheprovider -q
+→ 39 passed in 1.95s
+```
+
+The required real PostgreSQL gate used the approved disposable local database
+and had zero skips:
+
+```text
+cd apps/api
+$env:DEBUG='false'
+$env:TEST_DATABASE_URL='<approved disposable local PostgreSQL URL>'
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task5'
+uv run pytest tests/test_consultant_candidate_publication.py tests/test_consultant_candidate_loop.py tests/test_consultant_durable_authority_postgres.py -p no:cacheprovider -q
+→ 80 passed in 147.03s (0:02:27)
+```
+
+Related consultant regressions remained green:
+
+```text
+uv run pytest tests/test_consultant_interview_flow.py tests/test_consultant_document_review.py tests/test_consultant_context.py tests/test_consultant_run_service.py -p no:cacheprovider -q
+→ 53 passed in 21.20s
+
+uv run pytest tests/test_consultant_workspace_resources.py tests/test_consultant_evidence_anchor.py tests/test_consultant_workspace_backend.py tests/test_consultant_workspace_tools.py tests/test_consultant_candidate_workspace.py -p no:cacheprovider -q
+→ 79 passed in 2.98s
+```
+
+Final fix-round static/whitespace checks:
+
+```text
+cd apps/api
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task5'
+uv run python -m py_compile app\adapters\langgraph\postgres.py app\consultant\candidate_publication.py app\consultant\document_review.py app\consultant\graph.py app\consultant\state.py app\consultant\verification.py app\consultant\workspace_tools.py
+→ passed
+
+cd S:\caliburn\.worktrees\langgraph-consultant-runtime
+git diff --check
+→ passed with no diff errors
+```

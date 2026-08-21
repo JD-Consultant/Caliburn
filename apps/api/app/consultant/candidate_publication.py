@@ -54,6 +54,10 @@ from app.consultant.state import (
     SourceProcessingStatus,
     SourceValidity,
 )
+from app.consultant.verification import (
+    ConsultantVerificationError,
+    verify_candidate_document_changes,
+)
 from app.consultant.workspace_resources import (
     CandidateDocumentDraft,
     CandidateReviewGroup,
@@ -198,9 +202,14 @@ def _basis_from_sources(
     source_ids: Sequence[UUID],
     skill_ids: Sequence[SkillId],
 ) -> AnalysisBasis:
+    unique_skill_ids = tuple(dict.fromkeys(skill_ids))
+    if not unique_skill_ids:
+        raise ConsultantVerificationError(
+            "candidate check requires at least one loaded Skill for a semantic basis"
+        )
     return AnalysisBasis(
         source_ids=tuple(dict.fromkeys(source_ids)),
-        skill_ids=tuple(dict.fromkeys(skill_ids)),
+        skill_ids=unique_skill_ids,
     )
 
 
@@ -291,6 +300,7 @@ def _normalized_entity_after(
     else:
         identity = value.item_id
         collection = value.kind.value
+        payload.pop("evidence_source_ids", None)
     if identity not in {
         item.duty_id for item in baseline.duties
     } | {item.task_id for item in baseline.tasks} | {
@@ -675,6 +685,8 @@ def _semantic_changes(
                     after=after[field],
                     basis=basis,
                     opks_kind=OpksKind(after_item.kind.value),
+                    task_ids=after_item.task_ids,
+                    indicator_ids=after_item.indicator_ids,
                 )
     return tuple(changes)
 
@@ -705,10 +717,13 @@ def check_candidate_document(
     except (ValueError, WorkspaceResourceError) as error:
         return _invalid(request, digest, (f"candidate resources are invalid: {error}",))
 
-    default_basis = _basis_from_sources(
-        [source.source_id for source in current_sources],
-        request.selected_skill_ids,
-    )
+    try:
+        default_basis = _basis_from_sources(
+            [source.source_id for source in current_sources],
+            request.loaded_skill_ids,
+        )
+    except ConsultantVerificationError as error:
+        return _invalid(request, digest, (f"candidate verification failed: {error}",))
     evidence, evidence_issues = _resolve_evidence(draft, catalog, request)
     if evidence_issues:
         return _invalid(request, digest, evidence_issues)
@@ -727,6 +742,17 @@ def check_candidate_document(
         return _invalid(request, digest, (f"candidate semantic diff is invalid: {error}",))
     if not changes:
         return _invalid(request, digest, ("candidate check found no document change",))
+
+    try:
+        used_skill_ids = verify_candidate_document_changes(
+            changes,
+            document_id=request.document_id,
+            selected_skill_ids=request.selected_skill_ids,
+            loaded_skill_ids=request.loaded_skill_ids,
+            employee_sources=current_sources,
+        )
+    except ConsultantVerificationError as error:
+        return _invalid(request, digest, (f"candidate verification failed: {error}",))
 
     pending_handles = _pending_action_handles(catalog.pending)
     changes, external_ids, group_issues = _apply_review_groups(
@@ -752,16 +778,7 @@ def check_candidate_document(
         return _invalid(request, digest, (f"candidate review changeset is invalid: {error}",))
 
     # Every semantic action has a declared basis.  The default basis is the
-    # application-selected method; explicit OPKS anchors may narrow it.
-    used_skill_ids = tuple(
-        sorted(
-            {
-                skill_id
-                for change in changes
-                for skill_id in change.basis.skill_ids
-            }
-        )
-    )
+    # actually loaded method set; explicit OPKS anchors may narrow it.
     receipt = CheckedCandidateReceipt(
         run_id=request.run_id,
         baseline_revision=request.baseline_revision,

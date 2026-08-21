@@ -582,7 +582,7 @@ def _header_resource(document: ApprovedJobDocument) -> CandidateHeaderResource:
 
 def _project_review_groups(catalog: WorkspaceCatalog) -> CandidateReviewGroupsResource:
     pending = _sorted_pending(catalog.pending)
-    action_handles = _pending_action_handles(pending)
+    action_handles = pending_action_handles(pending)
     return CandidateReviewGroupsResource(
         groups=tuple(
             CandidateReviewGroup(
@@ -611,11 +611,11 @@ def _sorted_pending(
     )
 
 
-def _pending_action_handles(
+def pending_action_handles(
     pending: Sequence[DocumentChangeSet],
 ) -> dict[UUID, str]:
     result: dict[UUID, str] = {}
-    for changeset in pending:
+    for changeset in _sorted_pending(pending):
         for action in changeset.actions:
             if action.action_id in result:
                 raise WorkspaceResourceError(

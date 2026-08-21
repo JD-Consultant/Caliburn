@@ -18,10 +18,6 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.adapters.langgraph.postgres import PostgresConsultantRuntime
 from app.consultant.model_runtime import ResolvedExecution
 from app.consultant.state import (
-    ApprovedDuty,
-    ApprovedJobDocument,
-    ApprovedOpksItem,
-    ApprovedTask,
     DocumentChangeSet,
     DocumentChangeStatus,
     EmployeeSource,
@@ -38,15 +34,6 @@ class ContextModel(BaseModel):
 
 class ContextSelectionReason(StrEnum):
     CURRENT_INPUT = "current_input"
-    LATEST_CORRECTION = "latest_correction"
-    REQUIRED_EVIDENCE = "required_evidence"
-    RECENT_DIALOGUE = "recent_dialogue"
-    DIRECT_LOOKUP = "direct_lookup"
-    LEXICAL_MATCH = "lexical_match"
-    SEMANTIC_MATCH = "semantic_match"
-    SUPERSEDED = "superseded"
-    BUDGET = "budget"
-    NOT_RELEVANT = "not_relevant"
 
 
 class SourceLookupMode(StrEnum):
@@ -85,26 +72,11 @@ class GlobalOrientationIndex(ContextModel):
     degraded: bool = False
 
 
-class ApprovedDocumentSlice(ContextModel):
-    document_id: UUID
-    job_title: str | None = None
-    work_description: str | None = None
-    duties: tuple[ApprovedDuty, ...] = ()
-    tasks: tuple[ApprovedTask, ...] = ()
-    opks: tuple[ApprovedOpksItem, ...] = ()
-
-
 class ContextSourceReceipt(ContextModel):
     source_id: UUID
     reason: ContextSelectionReason
     text_sha256: str
     token_count: int = Field(ge=0)
-
-
-class OmittedSourceReceipt(ContextModel):
-    source_id: UUID
-    reason: ContextSelectionReason
-    text_sha256: str
 
 
 class ContextSelectionReceipt(ContextModel):
@@ -118,7 +90,6 @@ class ContextSelectionReceipt(ContextModel):
     policy_revision: int = Field(ge=1)
     selected_skill_ids: tuple[str, ...]
     loaded_sources: tuple[ContextSourceReceipt, ...]
-    omitted_sources: tuple[OmittedSourceReceipt, ...]
     total_input_tokens: int = Field(ge=0)
     context_token_budget: int = Field(ge=1)
     degraded_sections: tuple[str, ...] = ()
@@ -130,16 +101,12 @@ class ContextRequest(ContextModel):
     current_source_id: UUID
     current_work_id: UUID | None = None
     focus_subject_id: UUID | None = None
-    required_source_ids: tuple[UUID, ...] = ()
-    recent_source_ids: tuple[UUID, ...] = ()
     selected_skill_ids: tuple[str, ...] = ()
     non_authoritative_dialogue_summary: str | None = None
 
     @model_validator(mode="after")
     def source_and_skill_ids_are_unique(self) -> ContextRequest:
         for label, values in (
-            ("required_source_ids", self.required_source_ids),
-            ("recent_source_ids", self.recent_source_ids),
             ("selected_skill_ids", self.selected_skill_ids),
         ):
             if len(values) != len(set(values)):
@@ -150,7 +117,6 @@ class ContextRequest(ContextModel):
 @dataclass(frozen=True)
 class ConsultantContextBundle:
     orientation: GlobalOrientationIndex
-    approved_document_slice: ApprovedDocumentSlice
     system_prompt: str
     messages: tuple[BaseMessage, ...]
     receipt: ContextSelectionReceipt
@@ -496,41 +462,6 @@ def _orientation(
     )
 
 
-def _approved_slice(
-    document: ApprovedJobDocument,
-    focus_subject_id: UUID | None,
-) -> ApprovedDocumentSlice:
-    if focus_subject_id is None:
-        return ApprovedDocumentSlice(
-            document_id=document.document_id,
-            job_title=document.job_title,
-            work_description=document.work_description,
-        )
-    focused_tasks = tuple(
-        task
-        for task in document.tasks
-        if task.task_id == focus_subject_id or task.duty_id == focus_subject_id
-    )
-    duty_ids = {
-        task.duty_id for task in focused_tasks if task.duty_id is not None
-    } | {focus_subject_id}
-    focused_duties = tuple(
-        duty for duty in document.duties if duty.duty_id in duty_ids
-    )
-    focused_task_ids = {task.task_id for task in focused_tasks}
-    focused_opks = tuple(
-        item for item in document.opks if set(item.task_ids) & focused_task_ids
-    )
-    return ApprovedDocumentSlice(
-        document_id=document.document_id,
-        job_title=document.job_title,
-        work_description=document.work_description,
-        duties=focused_duties,
-        tasks=focused_tasks,
-        opks=focused_opks,
-    )
-
-
 def _json(value: Any, *, exclude_none: bool = False) -> str:
     if isinstance(value, BaseModel):
         value = value.model_dump(mode="json", exclude_none=exclude_none)
@@ -648,46 +579,11 @@ async def build_consultant_context(
         and snapshot.latest_source_id != current_source.source_id
     ):
         raise ValueError("context source is not the snapshot's latest employee input")
-    required_sources = await _gather_sources(
-        runtime,
-        snapshot.document_id,
-        request.required_source_ids,
-    )
-    if any(
-        source.validity is not SourceValidity.CURRENT for source in required_sources
-    ):
-        raise ValueError("required context source has been superseded")
-    mandatory = [
-        current_source,
-        *(
-            source
-            for source in required_sources
-            if source.source_id != current_source.source_id
-        ),
-    ]
-    loaded_ids = {source.source_id for source in mandatory}
-    omitted: list[OmittedSourceReceipt] = []
-    candidates: list[EmployeeSource] = []
-    for source_id in request.recent_source_ids:
-        source = await runtime.get_source(snapshot.document_id, source_id)
-        if source.validity is SourceValidity.SUPERSEDED:
-            omitted.append(
-                OmittedSourceReceipt(
-                    source_id=source.source_id,
-                    reason=ContextSelectionReason.SUPERSEDED,
-                    text_sha256=source.text_sha256,
-                )
-            )
-        elif source.source_id not in loaded_ids:
-            candidates.append(source)
     orientation = _orientation(
         snapshot,
         request,
         compact=False,
         max_items=execution.max_orientation_items,
-    )
-    approved_slice = _approved_slice(
-        snapshot.approved_document, request.focus_subject_id
     )
     current_work = (
         snapshot.interview_work.get(str(request.current_work_id))
@@ -757,52 +653,18 @@ async def build_consultant_context(
         system_prompt, messages, token_count = render()
     elif orientation.degraded:
         degraded.append("global_orientation")
-    if token_count > execution.max_context_tokens and len(recent_consultant_turns) > 1:
-        recent_consultant_turns = recent_consultant_turns[-1:]
-        degraded.append("recent_consultant_turns")
-        system_prompt, messages, token_count = render()
-
     if token_count > execution.max_context_tokens:
         raise ContextBudgetExceeded(
             "mandatory consultant context exceeds the configured token budget"
         )
 
-    selected = list(mandatory)
-    for candidate in candidates:
-        proposed = [*selected, candidate]
-        proposed_prompt, proposed_messages, proposed_tokens = render()
-        if proposed_tokens <= execution.max_context_tokens:
-            selected = proposed
-            system_prompt = proposed_prompt
-            messages = proposed_messages
-            token_count = proposed_tokens
-            loaded_ids.add(candidate.source_id)
-        else:
-            omitted.append(
-                OmittedSourceReceipt(
-                    source_id=candidate.source_id,
-                    reason=ContextSelectionReason.BUDGET,
-                    text_sha256=candidate.text_sha256,
-                )
-            )
-    required_source_ids = set(request.required_source_ids)
-    loaded_receipts = tuple(
+    loaded_receipts = (
         ContextSourceReceipt(
-            source_id=source.source_id,
-            reason=(
-                ContextSelectionReason.CURRENT_INPUT
-                if source.source_id == current_source.source_id
-                else ContextSelectionReason.LATEST_CORRECTION
-                if source.source_id in required_source_ids
-                and source.supersedes_source_id is not None
-                else ContextSelectionReason.REQUIRED_EVIDENCE
-                if source.source_id in required_source_ids
-                else ContextSelectionReason.RECENT_DIALOGUE
-            ),
-            text_sha256=source.text_sha256,
-            token_count=count_tokens_approximately([source.text]),
-        )
-        for source in selected
+            source_id=current_source.source_id,
+            reason=ContextSelectionReason.CURRENT_INPUT,
+            text_sha256=current_source.text_sha256,
+            token_count=count_tokens_approximately([current_source.text]),
+        ),
     )
     receipt = ContextSelectionReceipt(
         run_id=request.run_id,
@@ -814,7 +676,6 @@ async def build_consultant_context(
         policy_revision=execution.policy_revision,
         selected_skill_ids=request.selected_skill_ids,
         loaded_sources=loaded_receipts,
-        omitted_sources=tuple(omitted),
         total_input_tokens=token_count,
         context_token_budget=execution.max_context_tokens,
         degraded_sections=tuple(dict.fromkeys(degraded)),
@@ -822,7 +683,6 @@ async def build_consultant_context(
     verify_context_selection(execution, receipt)
     return ConsultantContextBundle(
         orientation=orientation,
-        approved_document_slice=approved_slice,
         system_prompt=system_prompt,
         messages=messages,
         receipt=receipt,

@@ -39,9 +39,11 @@ RUN_ID = UUID("00000000-0000-0000-0000-000000000703")
 class InMemorySourceRuntime:
     def __init__(self, sources: tuple[EmployeeSource, ...]) -> None:
         self.sources = sources
+        self.get_calls: list[UUID] = []
 
     async def get_source(self, document_id: UUID, source_id: UUID) -> EmployeeSource:
         assert document_id == DOCUMENT_ID
+        self.get_calls.append(source_id)
         for source in self.sources:
             if source.source_id == source_id:
                 return source
@@ -79,12 +81,17 @@ def _document() -> ApprovedJobDocument:
     )
 
 
-def _source(*, validity: SourceValidity = SourceValidity.CURRENT) -> EmployeeSource:
+def _source(
+    *,
+    source_id: UUID = SOURCE_ID,
+    text: str = "我會先檢查缺料，再依交期安排採購。",
+    validity: SourceValidity = SourceValidity.CURRENT,
+) -> EmployeeSource:
     return EmployeeSource.pending(
-        source_id=SOURCE_ID,
+        source_id=source_id,
         document_id=DOCUMENT_ID,
         kind=EmployeeSourceKind.EMPLOYEE_TURN,
-        text="我會先檢查缺料，再依交期安排採購。",
+        text=text,
     ).model_copy(
         update={
             "processing_status": SourceProcessingStatus.COMMITTED,
@@ -196,6 +203,36 @@ async def test_context_rejects_superseded_current_employee_turn() -> None:
                 selected_skill_ids=("task-boundary",),
             ),
         )
+
+
+@pytest.mark.asyncio
+async def test_context_does_not_fetch_or_claim_recent_source_payloads() -> None:
+    current = _source()
+    recent_sources = (
+        _source(source_id=uuid4(), text="歷史來源一：曾經負責月度盤點。"),
+        _source(source_id=uuid4(), text="歷史來源二：曾經協助供應商評估。"),
+    )
+    runtime = InMemorySourceRuntime((current, *recent_sources))
+
+    bundle = await build_consultant_context(
+        runtime=runtime,  # type: ignore[arg-type]
+        snapshot=_snapshot(_document(), current),
+        execution=_execution(),
+        request=ContextRequest(
+            run_id=RUN_ID,
+            current_source_id=current.source_id,
+            selected_skill_ids=("task-boundary",),
+        ),
+    )
+
+    assert runtime.get_calls == [current.source_id]
+    assert [item.source_id for item in bundle.receipt.loaded_sources] == [
+        current.source_id
+    ]
+    assert "omitted_sources" not in bundle.receipt.model_dump(mode="json")
+    assert bundle.messages[0].content == current.text
+    assert recent_sources[0].text not in bundle.system_prompt
+    assert recent_sources[1].text not in bundle.system_prompt
 
 
 @pytest.mark.asyncio

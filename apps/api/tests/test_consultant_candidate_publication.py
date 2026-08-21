@@ -34,6 +34,7 @@ from app.consultant.workspace_resources import (
     WorkspaceCatalog,
     project_candidate_files,
 )
+from app.consultant.workspace_tools import _serialize_check_result
 
 
 DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000501")
@@ -569,6 +570,18 @@ def test_successful_check_persists_only_exact_receipt_fields_and_not_review_item
     assert result.status == "checked"
     assert result.review_queue == {}
     assert result.receipt is not None
+    assert result.action_handles
+    assert result.action_handles == tuple(
+        f"action-{index:03d}" for index in range(1, len(result.actions) + 1)
+    )
+    assert all(
+        handle not in {str(action.action_id) for action in result.actions}
+        for handle in result.action_handles
+    )
+    assert result.receipt.action_handles == result.action_handles
+    observation = _serialize_check_result(result)
+    assert '"action_handles"' in observation
+    assert all(str(action.action_id) not in observation for action in result.actions)
     assert set(result.receipt.model_dump(mode="json")) == {
         "run_id",
         "baseline_revision",
@@ -576,6 +589,7 @@ def test_successful_check_persists_only_exact_receipt_fields_and_not_review_item
         "resource_digest",
         "check_call_id",
         "used_skill_ids",
+        "action_handles",
         "changeset",
     }
     assert result.receipt.resource_digest == resource_digest(files)

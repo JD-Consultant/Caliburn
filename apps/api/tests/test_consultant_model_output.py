@@ -110,7 +110,7 @@ def _output(source_id: UUID, **overrides: Any) -> ConsultantModelOutput:
         "candidate_publication": OutputCandidatePublication(
             candidate_revision=0,
             revision_digest="",
-            action_ids=(),
+            action_handles=(),
         ),
         "question": _no_question(),
         "sufficiency": _sufficiency(),
@@ -141,6 +141,11 @@ def test_model_output_schema_is_closed_and_evidence_is_provider_neutral() -> Non
     assert "source_id" not in evidence_schema["properties"]
     assert "start" not in evidence_schema["properties"]
     assert "end" not in evidence_schema["properties"]
+    publication_schema = schema["$defs"]["OutputCandidatePublication"]
+    assert "action_handles" in publication_schema["properties"]
+    assert "action_ids" not in publication_schema["properties"]
+    assert publication_schema["properties"]["action_handles"]["items"]["type"] == "string"
+    assert "format" not in publication_schema["properties"]["action_handles"]["items"]
 
 
 def test_langchain_converts_the_same_final_contract() -> None:
@@ -199,7 +204,7 @@ def test_unknown_handle_or_quote_fails_before_rich_result_mapping() -> None:
 
 def test_candidate_publication_maps_neutral_and_exact_valid_receipts() -> None:
     source_id = uuid4()
-    action_id = uuid4()
+    action_handle = "action-001"
 
     neutral = map_consultant_model_output(_output(source_id), catalog=_catalog(source_id))
     published = map_consultant_model_output(
@@ -208,7 +213,7 @@ def test_candidate_publication_maps_neutral_and_exact_valid_receipts() -> None:
             candidate_publication=OutputCandidatePublication(
                 candidate_revision=2,
                 revision_digest="a" * 64,
-                action_ids=(action_id,),
+                action_handles=(action_handle,),
             ),
         ),
         catalog=_catalog(source_id),
@@ -218,24 +223,26 @@ def test_candidate_publication_maps_neutral_and_exact_valid_receipts() -> None:
     assert published.candidate_publication == CandidatePublication(
         candidate_revision=2,
         revision_digest="a" * 64,
-        action_ids=(action_id,),
+        action_handles=(action_handle,),
     )
+    assert published.candidate_publication.action_handles == (action_handle,)
+    assert not hasattr(published.candidate_publication, "action_ids")
 
 
 @pytest.mark.parametrize(
-    "candidate_revision, revision_digest, action_ids",
+    "candidate_revision, revision_digest, action_handles",
     [
         pytest.param(0, "a" * 64, (), id="neutral-with-digest"),
-        pytest.param(0, "", (uuid4(),), id="neutral-with-action"),
-        pytest.param(1, "", (uuid4(),), id="positive-without-digest"),
+        pytest.param(0, "", ("action-001",), id="neutral-with-action"),
+        pytest.param(1, "", ("action-001",), id="positive-without-digest"),
         pytest.param(1, "a" * 64, (), id="positive-without-action"),
-        pytest.param(1, "a" * 64, (uuid4(),) * 2, id="duplicate-action"),
+        pytest.param(1, "a" * 64, ("action-001",) * 2, id="duplicate-action"),
     ],
 )
 def test_candidate_publication_rejects_mixed_sentinels_and_duplicate_handles(
     candidate_revision: int,
     revision_digest: str,
-    action_ids: tuple[UUID, ...],
+    action_handles: tuple[str, ...],
 ) -> None:
     with pytest.raises(ConsultantOutputMappingError):
         map_consultant_model_output(
@@ -244,7 +251,7 @@ def test_candidate_publication_rejects_mixed_sentinels_and_duplicate_handles(
                 candidate_publication=OutputCandidatePublication(
                     candidate_revision=candidate_revision,
                     revision_digest=revision_digest,
-                    action_ids=action_ids,
+                    action_handles=action_handles,
                 ),
             ),
             catalog=_catalog(uuid4()),
@@ -256,7 +263,7 @@ def test_candidate_publication_digest_requires_lowercase_sha256_or_neutral_empty
         OutputCandidatePublication(
             candidate_revision=1,
             revision_digest="not-a-digest",
-            action_ids=(uuid4(),),
+            action_handles=("action-001",),
         )
 
 

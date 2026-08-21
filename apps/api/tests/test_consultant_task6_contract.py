@@ -14,7 +14,7 @@ from langchain_core.messages import AIMessage
 
 import app.consultant.provider_wire as provider_wire
 from app.config import Settings
-from app.consultant.agent import LookupWaveLimitMiddleware
+from app.consultant.agent import LookupWaveLimitExceeded, LookupWaveLimitMiddleware
 from app.consultant.candidate_publication import CandidateCheckResult
 from app.consultant.model_runtime import (
     ConsultantModelProfile,
@@ -119,6 +119,7 @@ def test_check_observation_is_compact_and_does_not_expose_receipt_or_changeset()
         run_id=uuid4(),
         candidate_revision=3,
         resource_digest="a" * 64,
+        action_handles=("action-001",),
         actions=(),
         receipt={"changeset": {"actions": [{"before": "secret"}]}},
         issues=(),
@@ -131,6 +132,9 @@ def test_check_observation_is_compact_and_does_not_expose_receipt_or_changeset()
     assert "changeset" not in payload
     assert "secret" not in payload
     assert '"status":"checked"' in payload
+    assert '"action_handles":["action-001"]' in payload
+    assert "action_ids" not in payload
+    assert str(result.run_id) not in payload
 
 
 def test_lookup_wave_counts_only_path_aware_external_workspace_reads() -> None:
@@ -173,6 +177,44 @@ def test_lookup_wave_counts_only_path_aware_external_workspace_reads() -> None:
     assert middleware.after_model(external_read, runtime=None) == {
         "run_lookup_wave_count": 1
     }
+
+
+def test_composite_grep_paths_consume_lookup_waves_but_candidate_grep_does_not() -> None:
+    middleware = LookupWaveLimitMiddleware(
+        tool_names=frozenset({"ls", "read_file", "grep"}),
+        run_limit=2,
+    )
+
+    def state(path: str | None, count: int = 0) -> dict[str, object]:
+        args = {} if path is None else {"path": path}
+        return {
+            "messages": [
+                AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "grep",
+                            "args": args,
+                            "id": "grep",
+                            "type": "tool_call",
+                        }
+                    ],
+                )
+            ],
+            "run_lookup_wave_count": count,
+        }
+
+    assert middleware.after_model(state(None), runtime=None) == {
+        "run_lookup_wave_count": 1
+    }
+    assert middleware.after_model(state("/", count=1), runtime=None) == {
+        "run_lookup_wave_count": 2
+    }
+    assert middleware.after_model(
+        state("/candidate/run-1", count=2), runtime=None
+    ) is None
+    with pytest.raises(LookupWaveLimitExceeded):
+        middleware.after_model(state(None, count=2), runtime=None)
 
 
 def test_framework_model_call_limit_allows_eight_and_rejects_ninth() -> None:

@@ -34,7 +34,12 @@ from app.consultant.results import (
     UnderstandingOperation,
     VisibleGap,
 )
-from app.consultant.state import InterviewPriority, InterviewWorkStatus, UnderstandingImpact
+from app.consultant.state import (
+    ActionHandle,
+    InterviewPriority,
+    InterviewWorkStatus,
+    UnderstandingImpact,
+)
 from app.consultant.workspace_resources import WorkspaceCatalog
 
 
@@ -128,7 +133,7 @@ class OutputSufficiency(OutputModel):
 class OutputCandidatePublication(OutputModel):
     candidate_revision: int = Field(ge=0)
     revision_digest: str = Field(pattern=r"^(?:|[0-9a-f]{64})$")
-    action_ids: tuple[UUID, ...]
+    action_handles: tuple[ActionHandle, ...]
 
 
 class ConsultantModelOutput(OutputModel):
@@ -206,7 +211,7 @@ def _map_candidate_publication(
     neutral = (
         value.candidate_revision == 0
         and value.revision_digest == ""
-        and not value.action_ids
+        and not value.action_handles
     )
     if neutral:
         return None
@@ -214,14 +219,14 @@ def _map_candidate_publication(
         raise ConsultantOutputMappingError(
             "neutral candidate publication cannot carry digest or action handles"
         )
-    if not value.revision_digest or not value.action_ids:
+    if not value.revision_digest or not value.action_handles:
         raise ConsultantOutputMappingError(
             "candidate publication requires digest and action handles"
         )
     return CandidatePublication(
         candidate_revision=value.candidate_revision,
         revision_digest=value.revision_digest,
-        action_ids=value.action_ids,
+        action_handles=value.action_handles,
     )
 
 

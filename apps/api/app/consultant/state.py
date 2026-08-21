@@ -27,6 +27,10 @@ from typing_extensions import Annotated
 
 
 NonEmptyText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
+ActionHandle = Annotated[
+    str,
+    StringConstraints(pattern=r"^action-[0-9]{3,}$"),
+]
 VerbatimText = Annotated[str, StringConstraints(min_length=1)]
 
 
@@ -600,12 +604,19 @@ class CheckedCandidateReceipt(DurableModel):
     resource_digest: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
     check_call_id: NonEmptyText
     used_skill_ids: tuple[ConsultantSkillId, ...]
+    action_handles: tuple[ActionHandle, ...] = Field(min_length=1)
     changeset: DocumentChangeSet
 
     @model_validator(mode="after")
     def used_skills_are_unique(self) -> CheckedCandidateReceipt:
         if len(self.used_skill_ids) != len(set(self.used_skill_ids)):
             raise ValueError("duplicate checked candidate used_skill_ids")
+        if len(self.action_handles) != len(set(self.action_handles)):
+            raise ValueError("duplicate checked candidate action handle")
+        if len(self.action_handles) != len(self.changeset.actions):
+            raise ValueError(
+                "checked candidate action handles must match receipt actions"
+            )
         return self
 
 

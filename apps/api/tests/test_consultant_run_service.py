@@ -121,7 +121,7 @@ def _model_output(source_id: UUID) -> ConsultantModelOutput:
         candidate_publication=OutputCandidatePublication(
             candidate_revision=0,
             revision_digest="",
-            action_ids=(),
+            action_handles=(),
         ),
         question=OutputQuestion(
             kind=OutputQuestionKind.NONE,
@@ -214,7 +214,6 @@ class FakeAgent:
                 policy_revision=self.execution.policy_revision,
                 selected_skill_ids=context.request.selected_skill_ids,
                 loaded_sources=(),
-                omitted_sources=(),
                 total_input_tokens=100,
                 context_token_budget=self.execution.max_context_tokens,
             )

@@ -106,6 +106,7 @@ def _model_output(source_id: UUID) -> ConsultantModelOutput:
             OutputEvidenceReference(
                 source_handle="source-001",
                 quote="整理採購需求",
+                occurrence=0,
                 skill_ids=("task-boundary",),
             ),
         ),

@@ -417,3 +417,11 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - [Deep Agents 0.7.5 PyPI](https://pypi.org/project/deepagents/0.7.5/)
 - [FastAPI 0.141.1 PyPI](https://pypi.org/project/fastapi/0.141.1/)
 - [HTTPX 0.28.1 PyPI](https://pypi.org/project/httpx/0.28.1/)
+
+### Virtual JD workspace upgrade：Task 8 Phase C evidence
+
+- 狀態：**partial closure**。provider schema 修正與 employee authority browser review 已完成；exact GPT-5.6 Luna/max live smoke 仍有既定 lookup-wave blocker，不標成 live pass。
+- Provider schema：第一次 exact live run 由 OpenAI strict response schema 拒絕 optional `OutputEvidenceReference.occurrence`。最小修正是 provider wire required integer sentinel（唯一 quote 填 `0`、重複 quote 填 1-based），`AnalysisBasisTable` 映射回 workspace 時將 `0` 轉為 `None`，agent prompt 明示規則；沒有新增 abstraction 或放寬 schema。
+- Exact live：修正後已實際到達 `openai/gpt-5.6-luna`、OpenAI、`reasoning=max` 與既有八 call／兩 lookup-wave policy，並確認 exact seven-Tool surface 已 bound/exposed；實際 Tool calls 只觀察到 `ls`／`read_file`。模型重複這兩個 lookup，超過兩波 lookup limit，production middleware 以 `LookupWaveLimitExceeded` fail closed。不得提高 budget、換 model/provider、加 fallback 或放寬 policy。
+- Browser authority：controller 以真 local Next＋FastAPI＋disposable PostgreSQL fixture 完成 semantic accept、edit-accept、reject、defer，並保留單一 O pending；reload 後 status 保留，API snapshot 只把員工接受的內容寫入 approved，沒有 raw VFS／Tool leakage。production Web 不需改動，integration test 是唯一 Web coverage 變更。
+- Cleanup／boundary：controller 的 disposable fixture 與 live runner document 均精確清理，相關 persistence tables 回到零。RAG／Reference、能力級別／A、auto mode、multi-agent 與正式 eval 仍延後。

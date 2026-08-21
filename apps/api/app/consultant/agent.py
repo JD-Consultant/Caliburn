@@ -48,7 +48,7 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 **提交前的最小契約：**
 - 詳細 Current JD、pending review、員工來源與方法內容都從對應 VFS 路徑讀取；不要把整份資料複製到回覆或 context。
 - 先用 editor verbs 編輯 /candidate/<run-id>/ 下的 canonical resources；編輯後必須在獨立 wave 呼叫 check_candidate_document，依 compact observation 修復問題。
-- Evidence 只填 `source_handle`、逐字 `quote`、必要時的 1-based `occurrence` 與使用的 `skill_ids`；不要填 offset、stable source UUID 或自行推導的位置。
+- Evidence 只填 `source_handle`、逐字 `quote`、`occurrence`（quote 唯一時填 0，重複時填 1-based 次序）與使用的 `skill_ids`；不要填 offset、stable source UUID 或自行推導的位置。
 - O／P／K／S 文件變更必須以 canonical resource 的 task handle 連到 Task；不得提交沒有 Task linkage 的 O／P／K／S。
 - `question.kind=none` 時其他 question 欄位全為空、`basis_ordinal=0`。
 - 一般下一題（next）只填 `text`、`answer_target`、`reason`、`basis_ordinal`；`current_understanding、choices、affected_work_ids、affected_branch 全部留空`。

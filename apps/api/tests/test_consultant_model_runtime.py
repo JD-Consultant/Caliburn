@@ -20,7 +20,7 @@ from langchain.agents.structured_output import ProviderStrategy
 from langchain_core.language_models.fake_chat_models import (
     FakeMessagesListChatModel,
 )
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.tools import tool
 from pydantic import BaseModel, ValidationError
 
@@ -193,6 +193,36 @@ def test_openrouter_adapter_round_trips_only_resolved_parameters() -> None:
     assert "test-secret" not in repr(model.metadata)
 
 
+def test_openrouter_adapter_preserves_prompt_cache_content_blocks() -> None:
+    execution = resolve_execution(_profile(), _policy())
+    model = build_openrouter_chat_model(
+        execution,
+        api_key="test-secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+    stable_block = {
+        "type": "text",
+        "text": "stable consultant rules",
+        "cache_control": {"type": "ephemeral"},
+    }
+    dynamic_block = {
+        "type": "text",
+        "text": "\n\ndynamic document context",
+    }
+
+    messages, _ = model._create_message_dicts(  # noqa: SLF001 - adapter canary
+        [SystemMessage(content=[stable_block, dynamic_block])],
+        None,
+    )
+
+    assert messages == [
+        {
+            "role": "system",
+            "content": [stable_block, dynamic_block],
+        }
+    ]
+
+
 def test_openrouter_adapter_preserves_actual_route_and_cost_metadata() -> None:
     execution = resolve_execution(_profile(), _policy())
     model = build_openrouter_chat_model(
@@ -230,6 +260,10 @@ def test_openrouter_adapter_preserves_actual_route_and_cost_metadata() -> None:
                 "completion_tokens": 30,
                 "total_tokens": 150,
                 "cost": 0.0123,
+                "prompt_tokens_details": {
+                    "cached_tokens": 96,
+                    "cache_write_tokens": 24,
+                },
             },
         }
     )
@@ -241,6 +275,10 @@ def test_openrouter_adapter_preserves_actual_route_and_cost_metadata() -> None:
     )
     assert message.response_metadata["cost"] == 0.0123
     assert message.usage_metadata["total_tokens"] == 150
+    assert message.usage_metadata["input_token_details"] == {
+        "cache_read": 96,
+        "cache_creation": 24,
+    }
 
 
 class ProbeResult(BaseModel):
@@ -489,6 +527,10 @@ async def test_attempt_callback_records_actual_route_usage_cost_and_error() -> N
                     "input_tokens": 120,
                     "output_tokens": 30,
                     "total_tokens": 150,
+                    "input_token_details": {
+                        "cache_read": 96,
+                        "cache_creation": 24,
+                    },
                 },
             )
         ]
@@ -506,6 +548,8 @@ async def test_attempt_callback_records_actual_route_usage_cost_and_error() -> N
     assert receipt.actual_model == "anthropic/claude-opus-5-20260801"
     assert receipt.actual_provider == "Anthropic"
     assert receipt.usage.total_tokens == 150
+    assert receipt.usage.cache_read_tokens == 96
+    assert receipt.usage.cache_write_tokens == 24
     assert receipt.cost_usd == Decimal("0.0123")
     assert receipt.latency_ms >= 0
     assert len(tracer.spans) == 1

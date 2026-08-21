@@ -40,6 +40,7 @@ from app.consultant.candidate_workspace import (
     CandidateStageRequest,
     CandidateWorkspace,
 )
+from app.consultant.candidate_publication import CandidatePublicationStale
 from app.consultant.graph import _published_candidate_changeset
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.provider_wire import OutputAnalysisBasis
@@ -75,6 +76,7 @@ from app.consultant.state import (
     SourceValidity,
     UnderstandingImpact,
 )
+from app.consultant.workspace_resources import WorkspaceCatalog, project_candidate_files
 
 
 @pytest.mark.asyncio
@@ -2980,3 +2982,93 @@ async def test_store_owned_source_payload_has_linear_growth(
 
         await runtime.delete_document(short_document)
         await runtime.delete_document(long_document)
+
+
+@pytest.mark.asyncio
+async def test_checked_candidate_stale_digest_run_and_baseline_leave_review_queue_empty(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    source_id = uuid4()
+    direct_edit_source_id = uuid4()
+    later_direct_edit_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="候選 publication stale")
+        recorded = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="員工說明採購工作。",
+        )
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=recorded.revision,
+            document=_document(document_id),
+            source_id=direct_edit_source_id,
+        )
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=uuid4(),
+            text="請檢查職務標題。",
+        )
+        assert should_process is True
+        assert admitted.revision == seeded.revision + 1
+        current_sources = await runtime.list_sources(document_id)
+        catalog = WorkspaceCatalog.from_snapshot(
+            admitted.approved_document,
+            sources=current_sources,
+        )
+        files = project_candidate_files(catalog, run_id=run_id)
+        header_path = f"/candidate/{run_id}/header.json"
+        header = json.loads(files[header_path])
+        header["job_title"] = "資深採購管理專員"
+        files[header_path] = json.dumps(header, ensure_ascii=False, indent=2) + "\n"
+
+        checked = await runtime.check_candidate_document(
+            document_id=document_id,
+            run_id=run_id,
+            files=files,
+            tool_call_id="stale-check-001",
+        )
+        assert checked.status == "checked", checked.issues
+        assert (await runtime.reopen_document(document_id)).review_queue == {}
+
+        mutated = dict(files)
+        mutated[header_path] = mutated[header_path].replace(
+            "資深採購管理專員", "後續修改的標題"
+        )
+        with pytest.raises(CandidatePublicationStale, match="digest"):
+            await runtime.publish_checked_candidate(
+                document_id=document_id,
+                run_id=run_id,
+                files=mutated,
+            )
+        assert (await runtime.reopen_document(document_id)).review_queue == {}
+
+        with pytest.raises(CandidatePublicationStale, match="run"):
+            await runtime.publish_checked_candidate(
+                document_id=document_id,
+                run_id=uuid4(),
+                files=files,
+            )
+        assert (await runtime.reopen_document(document_id)).review_queue == {}
+
+        current = await runtime.reopen_document(document_id)
+        await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=current.revision,
+            document=current.approved_document.model_copy(
+                update={"job_title": "員工已修正的標題"}
+            ),
+            source_id=later_direct_edit_source_id,
+        )
+        with pytest.raises(CandidatePublicationStale, match="baseline"):
+            await runtime.publish_checked_candidate(
+                document_id=document_id,
+                run_id=run_id,
+                files=files,
+            )
+        assert (await runtime.reopen_document(document_id)).review_queue == {}

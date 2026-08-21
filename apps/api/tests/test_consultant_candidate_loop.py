@@ -47,6 +47,7 @@ from app.consultant.state import (
     DocumentChangeStatus,
 )
 from app.consultant.verification import ConsultantVerificationError
+from app.consultant.workspace_resources import WorkspaceCatalog, project_candidate_files
 
 
 def _database_url() -> str:
@@ -1233,3 +1234,77 @@ async def test_direct_edit_blocks_an_unpublished_old_candidate_and_stales_a_publ
             )
         final = await runtime.reopen_document(published_document_id)
         assert final.approved_document.tasks[0].statement == employee_statement
+
+
+@pytest.mark.asyncio
+async def test_workspace_check_only_records_receipt_then_publishes_exactly_once(
+    owned_documents: _OwnedDocuments,
+) -> None:
+    document_id = uuid4()
+    run_id = uuid4()
+    direct_edit_source_id = uuid4()
+    employee_source_id = uuid4()
+    duty_id, task_id, output_id = uuid4(), uuid4(), uuid4()
+    owned_documents.document_ids.add(document_id)
+
+    async with open_postgres_consultant_runtime(_database_url()) as runtime:
+        await runtime.create_document(document_id, title="resource publication")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=0,
+            document=_oversized_task_document(
+                document_id,
+                duty_id=duty_id,
+                task_id=task_id,
+                output_id=output_id,
+                evidence_source_id=direct_edit_source_id,
+            ),
+            source_id=direct_edit_source_id,
+        )
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=employee_source_id,
+            text="請確認採購職務標題。",
+        )
+        assert should_process is True
+        assert admitted.revision == seeded.revision + 1
+
+        sources = await runtime.list_sources(document_id)
+        catalog = WorkspaceCatalog.from_snapshot(
+            admitted.approved_document,
+            sources=sources,
+        )
+        files = project_candidate_files(catalog, run_id=run_id)
+        header_path = f"/candidate/{run_id}/header.json"
+        header = json.loads(files[header_path])
+        header["job_title"] = "資深採購專員"
+        files[header_path] = json.dumps(header, ensure_ascii=False, indent=2) + "\n"
+
+        checked = await runtime.check_candidate_document(
+            document_id=document_id,
+            run_id=run_id,
+            files=files,
+            tool_call_id="resource-check-001",
+        )
+        assert checked.status == "checked", checked.issues
+        after_check = await runtime.reopen_document(document_id)
+        assert after_check.review_queue == {}
+        raw_checked = await runtime.raw_state(document_id)
+        assert raw_checked["checked_candidate"] is not None
+
+        published = await runtime.publish_checked_candidate(
+            document_id=document_id,
+            run_id=run_id,
+            files=files,
+        )
+        assert len(published.review_queue) == 1
+        assert (await runtime.raw_state(document_id))["checked_candidate"] is None
+
+        replayed = await runtime.publish_checked_candidate(
+            document_id=document_id,
+            run_id=run_id,
+            files=files,
+        )
+        assert replayed.revision == published.revision
+        assert replayed.review_queue == published.review_queue

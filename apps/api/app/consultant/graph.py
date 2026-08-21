@@ -20,6 +20,7 @@ from app.consultant.document_review import (
 )
 from app.consultant.interview import (
     VerifiedConsultantCommit,
+    _publish_persisted_changeset,
     apply_source_correction,
     apply_verified_consultant_commit,
     normalize_current_work,
@@ -28,6 +29,7 @@ from app.consultant.state import (
     ApprovedJobDocument,
     CalibrationDecision,
     CommandReceipt,
+    CheckedCandidateReceipt,
     ConsultantCommandContext,
     ConsultantThreadState,
     RunReceipt,
@@ -97,6 +99,23 @@ def _apply_command(
         return initial_thread_state(document_id)
 
     _require_document(state, document_id)
+    if action == "check_candidate_document":
+        expected_revision = command.get("expected_revision")
+        if not isinstance(expected_revision, int):
+            raise ValueError("candidate check requires the current revision")
+        _require_revision(state, expected_revision)
+        receipt = CheckedCandidateReceipt.model_validate(
+            command["checked_candidate"]
+        )
+        latest_payload = state.get("latest_run")
+        if latest_payload is None:
+            raise ValueError("candidate check requires an active consultant run")
+        latest = RunReceipt.model_validate(latest_payload)
+        if latest.run_id != receipt.run_id or latest.status is not RunStatus.SOURCE_SAVED:
+            raise ValueError("candidate check does not match the active consultant run")
+        if receipt.baseline_revision != expected_revision:
+            raise ValueError("candidate check baseline revision is stale")
+        return {"checked_candidate": receipt.model_dump(mode="json")}
     if action == "stage_candidate_revision":
         stage = VerifiedCandidateStage.model_validate(command["candidate_stage"])
         latest_payload = state.get("latest_run")
@@ -127,6 +146,43 @@ def _apply_command(
         if source_reference_payload is not None
         else None
     )
+    if action == "publish_checked_candidate":
+        receipt_payload = state.get("checked_candidate")
+        if receipt_payload is None:
+            raise ValueError("candidate publication has no checked candidate receipt")
+        receipt = CheckedCandidateReceipt.model_validate(receipt_payload)
+        requested_run_id = command.get("run_id")
+        if requested_run_id is not None and receipt.run_id != UUID(requested_run_id):
+            raise ValueError("candidate publication belongs to another consultant run")
+        if receipt.baseline_revision != expected_revision:
+            raise ValueError("candidate publication baseline revision is stale")
+        review_queue, interview_work = _publish_persisted_changeset(
+            document_id=document_id,
+            run_id=receipt.run_id,
+            read_revision=expected_revision,
+            state=state,
+            published_changeset=receipt.changeset,
+            interview_work=dict(state.get("interview_work", {})),
+        )
+        work, current_work_id = normalize_current_work(
+            interview_work,
+            preferred_work_id=(
+                UUID(state["current_work_id"])
+                if state.get("current_work_id") is not None
+                else None
+            ),
+            revision=expected_revision + 1,
+        )
+        update: ConsultantThreadState = {"revision": expected_revision + 1}
+        update.update(
+            {
+                "review_queue": review_queue,
+                "interview_work": work,
+                "current_work_id": current_work_id,
+                "checked_candidate": None,
+            }
+        )
+        return update
     update: ConsultantThreadState = {
         "revision": expected_revision + 1,
     }

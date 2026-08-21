@@ -14,6 +14,8 @@
 
 - [`design/consultant-runtime.md`](design/consultant-runtime.md) — LangChain／LangGraph durable consultant、context、Skills、文件審核／authority、API、Web 與 export 的端到端真相。
 - [`adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md`](adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) — **Accepted** framework replacement、單一 durable authority、Big-bang 與延後 RAG 的決策。
+- [`adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md`](adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md) — **Proposed** Deep Agents 受限虛擬 JD editor、薄 domain check、typed publication gate 與 application-derived Evidence anchor。
+- [`specs/2026-08-21-provider-neutral-virtual-jd-editor-and-evidence-anchor-research.md`](specs/2026-08-21-provider-neutral-virtual-jd-editor-and-evidence-anchor-research.md) — Codex／Claude／Deep Agents 官方做法、現行 mega-form／quote-offset 診斷、方案與施工邊界。
 - [`plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md) — 逐 task 驗證與 hard-cut 計畫。
 - [`specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md`](specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md) — 每個功能切片回看產品大方向與 framework 覆蓋的證據。
 - [`contract-strategy.md`](contract-strategy.md) — 現行 `job-analysis-contract` 的契約規範。

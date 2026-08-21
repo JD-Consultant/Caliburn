@@ -41,6 +41,7 @@ from app.consultant.results import (
     SkillId,
 )
 from app.consultant.state import (
+    ActionHandle,
     ApprovedDuty,
     ApprovedJobDocument,
     ApprovedOpksItem,
@@ -63,6 +64,7 @@ from app.consultant.workspace_resources import (
     CandidateReviewGroup,
     WorkspaceCatalog,
     WorkspaceResourceError,
+    pending_action_handles,
     parse_candidate_files,
 )
 
@@ -106,12 +108,21 @@ class CandidateCheckResult(BaseModel):
     run_id: UUID
     candidate_revision: int = Field(ge=1)
     resource_digest: Digest
+    action_handles: tuple[ActionHandle, ...] = ()
     actions: tuple[DocumentPatchAction, ...] = ()
     receipt: CheckedCandidateReceipt | None = None
     issues: tuple[str, ...] = ()
     # A check is deliberately not a review-queue mutation.  Keeping this
     # projection in the result makes that boundary explicit to callers.
     review_queue: dict[str, dict[str, Any]] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def action_handles_match_actions(self) -> CandidateCheckResult:
+        if len(self.action_handles) != len(set(self.action_handles)):
+            raise ValueError("duplicate candidate check action handle")
+        if len(self.action_handles) != len(self.actions):
+            raise ValueError("candidate check action handles must match actions")
+        return self
 
 
 def resource_digest(files: Mapping[str, str | bytes]) -> str:
@@ -397,28 +408,16 @@ def _opks_basis(
     return default
 
 
-def _pending_action_handles(
-    pending: Sequence[DocumentChangeSet],
-) -> dict[str, UUID]:
-    handles: dict[str, UUID] = {}
-    for changeset in sorted(
-        pending,
-        key=lambda value: (value.created_revision, str(value.changeset_id)),
-    ):
-        for action in changeset.actions:
-            handles[f"action-{len(handles) + 1:03d}"] = action.action_id
-    external = sorted(
-        {
-            dependency_id
-            for changeset in pending
-            for dependency_id in changeset.external_dependency_action_ids
-            if dependency_id not in handles.values()
-        },
-        key=str,
-    )
-    for dependency_id in external:
-        handles[f"action-{len(handles) + 1:03d}"] = dependency_id
-    return handles
+def _candidate_action_handles(
+    changes: Sequence[ReviewableDocumentChange],
+    *,
+    pending_handles: Mapping[str, UUID],
+) -> dict[ActionHandle, str]:
+    offset = len(pending_handles)
+    return {
+        f"action-{offset + index + 1:03d}": change.change_ref
+        for index, change in enumerate(changes)
+    }
 
 
 def _apply_review_groups(
@@ -427,11 +426,10 @@ def _apply_review_groups(
     *,
     pending_handles: Mapping[str, UUID],
 ) -> tuple[tuple[ReviewableDocumentChange, ...], tuple[UUID, ...], tuple[str, ...]]:
-    offset = len(pending_handles)
-    candidate_handles = {
-        f"action-{offset + index + 1:03d}": change.change_ref
-        for index, change in enumerate(changes)
-    }
+    candidate_handles = _candidate_action_handles(
+        changes,
+        pending_handles=pending_handles,
+    )
     known_handles = set(pending_handles) | set(candidate_handles)
     issues: list[str] = []
     updates: dict[str, dict[str, Any]] = {}
@@ -754,7 +752,10 @@ def check_candidate_document(
     except ConsultantVerificationError as error:
         return _invalid(request, digest, (f"candidate verification failed: {error}",))
 
-    pending_handles = _pending_action_handles(catalog.pending)
+    pending_handles = {
+        handle: action_id
+        for action_id, handle in pending_action_handles(catalog.pending).items()
+    }
     changes, external_ids, group_issues = _apply_review_groups(
         changes,
         draft.review_groups.groups,
@@ -786,6 +787,12 @@ def check_candidate_document(
         resource_digest=digest,
         check_call_id=request.check_call_id,
         used_skill_ids=used_skill_ids,
+        action_handles=tuple(
+            _candidate_action_handles(
+                changes,
+                pending_handles=pending_handles,
+            )
+        ),
         changeset=changeset,
     )
     return CandidateCheckResult(
@@ -793,6 +800,7 @@ def check_candidate_document(
         run_id=request.run_id,
         candidate_revision=request.candidate_revision,
         resource_digest=digest,
+        action_handles=receipt.action_handles,
         actions=changeset.actions,
         receipt=receipt,
         review_queue={},

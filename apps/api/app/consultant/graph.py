@@ -394,8 +394,7 @@ def _published_candidate_changeset(
         raise ValueError("candidate publication does not reference the latest revision")
     if receipt.resource_digest != publication.revision_digest:
         raise ValueError("candidate publication digest does not match latest revision")
-    action_ids = tuple(action.action_id for action in receipt.changeset.actions)
-    if action_ids != publication.action_ids:
+    if receipt.action_handles != publication.action_handles:
         raise ValueError("candidate publication action handles do not match latest revision")
     if not set(receipt.used_skill_ids) <= set(commit.result.used_skill_ids):
         raise ValueError("candidate publication used Skills missing from final result")

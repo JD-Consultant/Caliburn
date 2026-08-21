@@ -41,6 +41,8 @@ tests/test_consultant_durable_authority_postgres.py::test_workspace_check_only_r
 
 It asserts that check leaves `review_queue` empty, persists `checked_candidate`, publication creates exactly one review bundle and clears the checked receipt, one publication command receipt is durable, and exact publication replay is idempotent. A companion regression proves changed post-check files fail closed without mutating the queue or clearing the receipt.
 
+Task 6 does not claim the complete run-level lifecycle migration. Employee authority, check-repair-recheck, 9-accept-1-reject with decision memory, and direct-edit-stale full-run scenarios remain pending the already-planned Task 7 real-agent/PostgreSQL scope. This task preserves the current check/publication/receipt PostgreSQL canary without recreating the retired candidate loop or Task 7 E2E suite.
+
 ## Exact GREEN evidence
 
 ```text
@@ -63,6 +65,49 @@ uv run pytest -p no:cacheprovider -q
 ```
 
 Additional current context/agent/runtime regression: `56 passed`. `git diff --check` was clean. `uv run python -m compileall -q app tests` completed with no output or errors.
+
+## Review fix round 1/5
+
+The review fixes remain within the existing catalog, VFS, checked-receipt, and
+context seams:
+
+- Check observations and final `OutputCandidatePublication` /
+  `CandidatePublication` now expose ordered `action-001`-style aliases only.
+  The deterministic pending-action mapping is reused from
+  `workspace_resources`; the checked receipt records the ordered aliases next
+  to its internal authority changeset. Runtime and graph publication compare
+  revision, digest, aliases, receipt action count/order, and the actual current
+  response files before authority uses receipt UUIDs.
+- `grep` with no path or `/` is counted as a composite-workspace lookup wave;
+  explicit candidate paths and candidate mutations/check remain free.
+- Required/recent source selection and the unused approved-document slice were
+  deleted. Context reads and records only the current employee turn while
+  historical/current-only source details remain VFS-on-demand.
+
+The fix-round TDD gate was first run against the new tests and failed with
+`17 failed, 74 passed in 2.13s`. The corrected implementation then produced:
+
+```text
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_model_output.py tests/test_consultant_task6_contract.py tests/test_consultant_agent_and_skills.py tests/test_consultant_context.py tests/test_consultant_candidate_publication.py tests/test_consultant_workspace_tools.py -p no:cacheprovider -q
+→ 91 passed in 1.79s
+
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_task6_contract.py tests/test_consultant_model_output.py tests/test_consultant_model_runtime.py tests/test_consultant_run_service.py tests/test_consultant_context.py tests/test_consultant_agent_and_skills.py -p no:cacheprovider -q
+→ 54 passed in 1.80s
+
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_workspace_tools.py tests/test_consultant_workspace_backend.py tests/test_consultant_candidate_publication.py -p no:cacheprovider -q
+→ 70 passed in 2.75s
+
+$env:TEST_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn_reviewed'; $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_durable_authority_postgres.py -p no:cacheprovider -q
+→ 10 passed in 17.74s, zero skipped
+
+$env:TEST_DATABASE_URL='postgresql+asyncpg://postgres:password@localhost:5432/caliburn_reviewed'; $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest -p no:cacheprovider -q
+→ 259 passed in 25.28s
+
+AST hard-cut → python_files=47, forbidden_imports=[], retired_files_present=[]
+hard-cut rg → 0 matches
+uv run python -m compileall -q app tests → passed with no output
+git diff --check → passed with no diff errors
+```
 
 ## Schema and hard-cut metrics
 

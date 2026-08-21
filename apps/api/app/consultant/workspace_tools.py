@@ -148,7 +148,7 @@ def _serialize_check_result(result: Any) -> str:
             "status": result.status,
             "candidate_revision": result.candidate_revision,
             "resource_digest": result.resource_digest,
-            "action_handles": [str(action.action_id) for action in result.actions],
+            "action_handles": list(result.action_handles),
             "actions": [
                 {
                     "operation": action.operation.value,

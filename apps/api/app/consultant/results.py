@@ -16,6 +16,7 @@ from pydantic import BaseModel, ConfigDict, Field, JsonValue, StringConstraints,
 from typing_extensions import Annotated
 
 from app.consultant.state import (
+    ActionHandle,
     InterviewPriority,
     InterviewWorkStatus,
     QuoteAnchor,
@@ -282,12 +283,12 @@ class CandidatePublication(ResultModel):
 
     candidate_revision: int = Field(ge=1)
     revision_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
-    action_ids: tuple[UUID, ...] = Field(min_length=1)
+    action_handles: tuple[ActionHandle, ...] = Field(min_length=1)
 
     @model_validator(mode="after")
     def action_handles_are_unique(self) -> CandidatePublication:
-        if len(self.action_ids) != len(set(self.action_ids)):
-            raise ValueError("duplicate candidate publication action ID")
+        if len(self.action_handles) != len(set(self.action_handles)):
+            raise ValueError("duplicate candidate publication action handle")
         return self
 
 

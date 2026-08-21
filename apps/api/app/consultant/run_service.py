@@ -210,7 +210,6 @@ async def execute_admitted_consultant_turn(
         current_sources = tuple(
             source for source in all_sources if source.validity.value == "current"
         )
-        recent_source_ids = tuple(source.source_id for source in current_sources[-24:])
         current_work_id = (
             snapshot.current_interview.work_id
             if snapshot.current_interview is not None
@@ -228,7 +227,6 @@ async def execute_admitted_consultant_turn(
             current_source_id=source_id,
             current_work_id=current_work_id,
             focus_subject_id=focus_subject_id,
-            recent_source_ids=recent_source_ids,
             selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
         runtime_context = ConsultantAgentRuntimeContext(
@@ -327,8 +325,7 @@ async def execute_admitted_consultant_turn(
             if (
                 checked.candidate_revision != publication.candidate_revision
                 or checked.resource_digest != publication.revision_digest
-                or tuple(action.action_id for action in checked.changeset.actions)
-                != publication.action_ids
+                or checked.action_handles != publication.action_handles
             ):
                 raise ConsultantVerificationError(
                     "candidate publication does not exactly match the checked receipt"

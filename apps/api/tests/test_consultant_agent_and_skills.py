@@ -239,6 +239,11 @@ def test_lookup_waves_count_only_path_aware_external_workspace_reads() -> None:
     assert middleware.after_model(state("grep", "/approved" , count=1), None) == {"run_lookup_wave_count": 2}  # type: ignore[arg-type]
     with pytest.raises(LookupWaveLimitExceeded):
         middleware.after_model(state("ls", "/pending", count=2), None)  # type: ignore[arg-type]
+    assert middleware.after_model(state("grep", count=0), None) == {"run_lookup_wave_count": 1}  # type: ignore[arg-type]
+    assert middleware.after_model(state("grep", "/", count=1), None) == {"run_lookup_wave_count": 2}  # type: ignore[arg-type]
+    assert middleware.after_model(state("grep", "/candidate/run", count=2), None) is None  # type: ignore[arg-type]
+    with pytest.raises(LookupWaveLimitExceeded):
+        middleware.after_model(state("grep", count=2), None)  # type: ignore[arg-type]
 
 
 def test_run_scoped_skills_reject_stale_skill_receipts_but_allow_vfs_receipts() -> None:

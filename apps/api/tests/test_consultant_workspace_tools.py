@@ -62,7 +62,7 @@ class RecordingCheckPort:
             "status": "checked",
             "candidate_revision": 1,
             "revision_digest": "a" * 64,
-            "action_ids": ["action-001"],
+            "action_handles": ["action-001"],
             "actions": [],
         }
         self.calls: list[dict[str, Any]] = []

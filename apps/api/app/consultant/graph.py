@@ -260,6 +260,7 @@ def _apply_command(
                 revision=expected_revision + 1,
             )
         )
+        update["checked_candidate"] = None
         work, current_work_id = normalize_current_work(
             update.get("interview_work", state.get("interview_work", {})),
             preferred_work_id=(

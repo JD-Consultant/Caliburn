@@ -6,6 +6,7 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Annotated, Any
 
+from deepagents.backends import BackendProtocol
 from deepagents.middleware.filesystem import FilesystemMiddleware
 from deepagents.middleware.skills import SkillsMiddleware, SkillsState
 from langchain.agents.middleware import AgentMiddleware
@@ -23,6 +24,14 @@ from app.consultant.model_output import ConsultantModelOutput
 from app.consultant.candidate_tool import (
     CandidateEditToolBinding,
     build_job_document_candidate_edit_tool,
+)
+from app.consultant.workspace_backend import ConsultantWorkspaceBackendBinding
+from app.consultant.workspace_tools import (
+    WORKSPACE_FILESYSTEM_TOOL_NAMES,
+    WORKSPACE_TOOL_DESCRIPTIONS,
+    CandidateCheckToolBinding,
+    WorkspaceToolWaveMiddleware,
+    build_check_candidate_document_tool,
 )
 from app.consultant.skill_backend import (
     DirectPackageSkillBackendAdapter,
@@ -67,7 +76,8 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 @dataclass(frozen=True)
 class ProfessionalConsultantAgent:
     graph: Any
-    skill_backend: DirectPackageSkillBackendAdapter
+    skill_backend: DirectPackageSkillBackendAdapter | PackageSkillBackend
+    workspace_binding: ConsultantWorkspaceBackendBinding | None = None
 
     def invoke(self, *args: Any, **kwargs: Any) -> Any:
         return self.graph.invoke(*args, **kwargs)
@@ -135,13 +145,18 @@ class LookupWaveLimitMiddleware(AgentMiddleware[LookupWaveState, Any]):
 class RunScopedSkillsMiddleware(SkillsMiddleware):
     """Refresh framework Skill metadata so a prior turn cannot leak eligibility."""
 
-    def __init__(self, *, backend: DirectPackageSkillBackendAdapter) -> None:
+    def __init__(
+        self,
+        *,
+        backend: BackendProtocol,
+        receipt_backend: DirectPackageSkillBackendAdapter | PackageSkillBackend | None = None,
+    ) -> None:
         super().__init__(
             backend=backend,
             sources=[("/skills", "Caliburn")],
             system_prompt=SKILLS_SYSTEM_PROMPT,
         )
-        self._package_backend = backend
+        self._package_backend = receipt_backend or backend
 
     @override
     def before_agent(
@@ -194,6 +209,8 @@ def build_professional_consultant_agent(
     candidate_edit_binding: CandidateEditToolBinding | None = None,
     context_middleware: AgentMiddleware | None = None,
     context_schema: type[Any] | None = None,
+    workspace_binding: ConsultantWorkspaceBackendBinding | None = None,
+    candidate_check_binding: CandidateCheckToolBinding | None = None,
 ) -> ProfessionalConsultantAgent:
     """Build the bounded agent using Deep Agents' Skill/read-file primitives."""
 
@@ -209,11 +226,48 @@ def build_professional_consultant_agent(
     if execution.max_lookup_waves > 2:
         raise ValueError("interactive consultant runs allow at most two lookup waves")
 
-    backend = DirectPackageSkillBackendAdapter(
-        PackageSkillBackend(selected_skill_ids)
-    )
+    if workspace_binding is not None and source_tools:
+        raise ValueError("workspace agents cannot receive legacy source Tools")
+    if workspace_binding is not None and candidate_edit_binding is not None:
+        raise ValueError("workspace agents cannot receive the legacy candidate Tool")
+    if workspace_binding is not None and candidate_check_binding is None:
+        raise ValueError("workspace agents require a candidate check Tool binding")
+
+    if workspace_binding is None:
+        legacy_backend = DirectPackageSkillBackendAdapter(
+            PackageSkillBackend(selected_skill_ids)
+        )
+        backend: BackendProtocol = legacy_backend
+        receipt_backend: DirectPackageSkillBackendAdapter | PackageSkillBackend = (
+            legacy_backend
+        )
+    else:
+        if workspace_binding.skill_backend.selected_skill_ids != selected_skill_ids:
+            raise ValueError("workspace Skill binding must match selected Skills")
+        if candidate_check_binding is not None and (
+            candidate_check_binding.workspace is not workspace_binding
+        ):
+            raise ValueError("candidate check binding must use the agent workspace")
+        backend = workspace_binding.composite_backend
+        receipt_backend = workspace_binding.skill_backend
+
     candidate_tools: tuple[BaseTool, ...] = ()
-    if candidate_edit_binding is not None:
+    check_tools: tuple[BaseTool, ...] = ()
+    if workspace_binding is not None:
+        if not WORKSPACE_FILESYSTEM_TOOL_NAMES.issubset(
+            set(execution.allowed_tool_ids)
+        ) or "check_candidate_document" not in execution.allowed_tool_ids:
+            raise ValueError(
+                "resolved run policy must allow the complete workspace Tool surface"
+            )
+        check_binding = candidate_check_binding
+        assert check_binding is not None
+        check_tools = (
+            build_check_candidate_document_tool(
+                binding=check_binding,
+            ),
+        )
+    elif candidate_edit_binding is not None:
         if "job_document_candidate_edit" not in execution.allowed_tool_ids:
             raise ValueError(
                 "resolved run policy must allow the candidate document edit Tool"
@@ -226,13 +280,22 @@ def build_professional_consultant_agent(
                 loaded_skill_ids=lambda: backend.loaded_skill_ids,
             ),
         )
-    skills = RunScopedSkillsMiddleware(backend=backend)
+    skills = RunScopedSkillsMiddleware(
+        backend=backend,
+        receipt_backend=(receipt_backend if workspace_binding is not None else None),
+    )
     files = FilesystemMiddleware(
         backend=backend,
-        tools=["read_file"],
-        custom_tool_descriptions={
-            "read_file": SKILL_READ_TOOL_DESCRIPTION,
-        },
+        tools=(
+            sorted(WORKSPACE_FILESYSTEM_TOOL_NAMES)
+            if workspace_binding is not None
+            else ["read_file"]
+        ),
+        custom_tool_descriptions=(
+            WORKSPACE_TOOL_DESCRIPTIONS
+            if workspace_binding is not None
+            else {"read_file": SKILL_READ_TOOL_DESCRIPTION}
+        ),
         system_prompt=None,
         tool_token_limit_before_evict=None,
         human_message_token_limit_before_evict=None,
@@ -253,9 +316,17 @@ def build_professional_consultant_agent(
         model=model,
         execution=execution,
         response_schema=ConsultantModelOutput,
-        tools=(*source_tools, *candidate_tools),
-        additional_middleware=(skills, files, lookup_cap),
+        tools=(*source_tools, *candidate_tools, *check_tools),
+        additional_middleware=(
+            (skills, files, lookup_cap, WorkspaceToolWaveMiddleware())
+            if workspace_binding is not None
+            else (skills, files, lookup_cap)
+        ),
         context_middleware=context_middleware,
         context_schema=context_schema,
     )
-    return ProfessionalConsultantAgent(graph=graph, skill_backend=backend)
+    return ProfessionalConsultantAgent(
+        graph=graph,
+        skill_backend=receipt_backend,
+        workspace_binding=workspace_binding,
+    )

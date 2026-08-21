@@ -32,6 +32,7 @@ from app.consultant.candidate_wire import (
     OutputDocumentField,
     OutputDocumentTarget,
     OutputDuty,
+    OutputOpksItem,
     OutputOpksKind,
 )
 from app.consultant.candidate_workspace import (
@@ -1124,6 +1125,142 @@ async def test_structural_edit_accept_uses_candidate_source_without_minting_evid
 
 
 @pytest.mark.asyncio
+async def test_opks_edit_accept_attaches_direct_edit_source_to_adopted_text(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    seed_source_id = uuid4()
+    answer_source_id = uuid4()
+    direct_edit_source_id = uuid4()
+    document = _document(document_id)
+    task_id = document.tasks[0].task_id
+    edited_text = "每週五完成採購異常報表"
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        initial = await runtime.create_document(document_id, title="採購職務")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=initial.revision,
+            document=document,
+            source_id=seed_source_id,
+        )
+        run_id = uuid4()
+        sourced, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=answer_source_id,
+            text="我負責整理採購異常報表。",
+        )
+        proposed = await _stage_and_publish(
+            runtime,
+            document_id=document_id,
+            run_id=run_id,
+            source_id=answer_source_id,
+            baseline_revision=sourced.revision,
+            changes=(_candidate_opks_add(task_id),),
+            result=_publication_result(answer_source_id, None),
+        )
+        bundle = proposed.document_review.bundles[0]
+        action = bundle.actions[0]
+        assert isinstance(action.after, dict)
+
+        reviewed = await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=proposed.revision,
+            action="edit_and_accept_changes",
+            changeset_id=bundle.changeset_id,
+            action_ids=(action.action_id,),
+            edited_after_by_action_id={
+                action.action_id: {**action.after, "text": edited_text}
+            },
+            source_id=direct_edit_source_id,
+        )
+        source = await runtime.get_source(document_id, direct_edit_source_id)
+        terminal_bundle = reviewed.document_review.bundles[0]
+        terminal_action = terminal_bundle.actions[0]
+
+        assert reviewed.approved_document.opks[0].evidence_source_ids[-1] == (
+            direct_edit_source_id
+        )
+        assert direct_edit_source_id in terminal_action.source_ids
+        assert direct_edit_source_id in terminal_bundle.source_ids
+        assert source.positions[0].document_path == "/opks/text"
+        assert source.positions[0].start == 0
+        assert (
+            source.text[source.positions[0].start : source.positions[0].end]
+            == edited_text
+        )
+        assert reviewed.source_count == seeded.source_count + 2
+
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
+async def test_structural_edit_accept_does_not_attach_text_evidence(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    seed_source_id = uuid4()
+    answer_source_id = uuid4()
+    candidate_edit_source_id = uuid4()
+    document = _document(document_id)
+    task_id = document.tasks[0].task_id
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        initial = await runtime.create_document(document_id, title="採購職務")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=initial.revision,
+            document=document,
+            source_id=seed_source_id,
+        )
+        run_id = uuid4()
+        sourced, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=answer_source_id,
+            text="我負責整理採購異常報表。",
+        )
+        proposed = await _stage_and_publish(
+            runtime,
+            document_id=document_id,
+            run_id=run_id,
+            source_id=answer_source_id,
+            baseline_revision=sourced.revision,
+            changes=(_candidate_opks_add(task_id),),
+            result=_publication_result(answer_source_id, None),
+        )
+        bundle = proposed.document_review.bundles[0]
+        action = bundle.actions[0]
+        assert isinstance(action.after, dict)
+        new_order = int(action.after["display_order"]) + 1
+
+        reviewed = await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=proposed.revision,
+            action="edit_and_accept_changes",
+            changeset_id=bundle.changeset_id,
+            action_ids=(action.action_id,),
+            edited_after_by_action_id={
+                action.action_id: {**action.after, "display_order": new_order}
+            },
+            source_id=candidate_edit_source_id,
+        )
+        terminal_bundle = reviewed.document_review.bundles[0]
+        terminal_action = terminal_bundle.actions[0]
+
+        assert reviewed.approved_document.opks[0].display_order == new_order
+        assert (
+            await runtime.get_source_or_none(document_id, candidate_edit_source_id)
+        ) is None
+        assert candidate_edit_source_id not in terminal_action.source_ids
+        assert candidate_edit_source_id not in terminal_bundle.source_ids
+        assert reviewed.source_count == seeded.source_count + 1
+
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
 async def test_direct_edit_rejects_unknown_opks_evidence_before_writing_source(
     consultant_database_url: str,
 ) -> None:
@@ -1430,6 +1567,31 @@ def _candidate_wire_change(**overrides: object) -> OutputDocumentChange:
     }
     values.update(overrides)
     return OutputDocumentChange(**values)
+
+
+def _candidate_opks_add(task_id: UUID) -> OutputDocumentChange:
+    return _candidate_wire_change(
+        change_ref="candidate-opks",
+        target=OutputDocumentTarget.OPKS,
+        field=OutputDocumentField.ENTITY,
+        duties=(),
+        tasks=(),
+        opks_items=(
+            OutputOpksItem(
+                item_id="",
+                entity_ref="candidate-opks-item",
+                text="模型提出的工作產出",
+                display_order=-1,
+                task_ids=(task_id,),
+                indicator_ids=(),
+                task_refs=(),
+                indicator_refs=(),
+            ),
+        ),
+        opks_kind=OutputOpksKind.OUTPUT,
+        task_ids=(task_id,),
+        indicator_ids=(),
+    )
 
 
 def _two_candidate_wire_changes() -> tuple[OutputDocumentChange, ...]:

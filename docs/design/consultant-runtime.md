@@ -76,6 +76,8 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 
 `document_id`、權限、source namespace、核准 baseline、正式 ID 與 receipt 都由 application 注入。workspace 只有 `/skills`、`/sources`、`/approved`、`/pending`、`/candidate/<run-id>` 五根目錄；沒有 Tool Search、MCP catalog、keyword router、另一個 LLM selector 或 provider beta。
 
+`/pending` 是只讀、非核准的 model-facing review projection，不是 durable raw changeset dump：`/index.json` 提供 `approved: false`、整體 status 與 stable-per-snapshot `review-###`／`action-###` handles；每個 `/reviews/review-###.json` 提供 summary、status、action handles 與 dependency handles；每個 `/actions/action-###.json` 提供 operation、handle-based path／targets、semantic before／after、status、`approved: false` 與必要的 employee decision reason。正式 changeset/action/dependency/source UUID、authority revision 與 raw durable payload 不進入這些路徑或 JSON；Duty／Task／OPKS relation values 也依現有 catalog 映射為 handles，不靠通用 UUID sanitizer。
+
 Tool Calling 承載的是**候選編輯，不是文件 authority**：模型以 VFS editor verbs 寫入 canonical resources，獨立的 `check_candidate_document` 讀取實際 after-state 並保存 receipt；check 不直接改 review queue，publish 前再次 exact-match files／digest／ordered action handles。accept／edit-accept／reject／defer 是員工透過 API 發出的 LangGraph command，模型不能呼叫。必要澄清由 Structured Output 表達，再用 `interrupt()`／`Command(resume=...)` 處理；Focus、Gap 與 Progress 是 durable state／projection，不是 Tool。
 
 lookup 由當下資料依賴決定：context 足夠可零呼叫；彼此獨立的 Skill／workspace reads 可在同一 model response 平行讀取；只有前一波結果產生新依賴才用第二波。lookup 最多兩波；只計 `/skills`、`/sources`、`/approved`、`/pending` 上的 `ls`／`read_file`／`grep`，candidate reads、editor verbs 與 check 不計入 lookup wave。interactive profile 預設最多八個 model calls，第九次由 framework middleware 拒絕，並另受總 Tool／token／time／cost／recursion budget 限制。

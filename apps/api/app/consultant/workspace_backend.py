@@ -44,9 +44,10 @@ from deepagents.backends.utils import (
 from app.adapters.langgraph.postgres import PostgresConsultantRuntime
 from app.consultant.context import DocumentSourceLookup
 from app.consultant.skill_backend import PackageSkillBackend
-from app.consultant.state import EmployeeSource
+from app.consultant.state import DocumentChangeSet, DocumentPatchAction, EmployeeSource
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
+    pending_action_handles,
     project_candidate_files,
 )
 
@@ -256,23 +257,208 @@ def _pending_files(catalog: WorkspaceCatalog) -> dict[str, str]:
         catalog.pending,
         key=lambda item: (item.created_revision, str(item.changeset_id)),
     )
+    action_handles = pending_action_handles(changesets)
+    review_handles = {
+        changeset.changeset_id: f"review-{index:03d}"
+        for index, changeset in enumerate(changesets, start=1)
+    }
     contents: dict[str, str] = {
         "/index.json": _json_text(
             {
-                "status": "pending",
-                "changeset_ids": [str(item.changeset_id) for item in changesets],
+                "approved": False,
+                "status": _pending_status(changesets),
+                "review_handles": [review_handles[item.changeset_id] for item in changesets],
+                "action_handles": [
+                    action_handles[action.action_id]
+                    for item in changesets
+                    for action in item.actions
+                ],
             }
         )
     }
     for changeset in changesets:
-        changeset_path = f"/changesets/{changeset.changeset_id}.json"
-        contents[changeset_path] = _json_text(changeset.model_dump(mode="json"))
+        review_handle = review_handles[changeset.changeset_id]
+        contents[f"/reviews/{review_handle}.json"] = _json_text(
+            {
+                "handle": review_handle,
+                "approved": False,
+                "status": _pending_status((changeset,)),
+                "summary": changeset.summary,
+                "action_handles": [
+                    action_handles[action.action_id] for action in changeset.actions
+                ],
+                "dependency_handles": _pending_dependency_handles(
+                    changeset, action_handles
+                ),
+            }
+        )
         for action in changeset.actions:
-            action_path = (
-                f"/changesets/{changeset.changeset_id}/actions/{action.action_id}.json"
+            action_handle = action_handles[action.action_id]
+            contents[f"/actions/{action_handle}.json"] = _json_text(
+                _pending_action_projection(
+                    catalog,
+                    action,
+                    action_handle=action_handle,
+                    action_handles=action_handles,
+                )
             )
-            contents[action_path] = _json_text(action.model_dump(mode="json"))
     return contents
+
+
+def _pending_status(changesets: Sequence[DocumentChangeSet]) -> str:
+    statuses = {
+        action.status.value for changeset in changesets for action in changeset.actions
+    }
+    if not statuses:
+        return "pending"
+    if len(statuses) == 1:
+        return next(iter(statuses))
+    return "partial"
+
+
+def _pending_dependency_handles(
+    changeset: DocumentChangeSet,
+    action_handles: Mapping[UUID, str],
+) -> list[str]:
+    dependency_ids = set(changeset.external_dependency_action_ids)
+    for action in changeset.actions:
+        dependency_ids.update(action.depends_on_action_ids)
+    return [action_handles[item] for item in sorted(dependency_ids, key=str)]
+
+
+def _pending_action_projection(
+    catalog: WorkspaceCatalog,
+    action: DocumentPatchAction,
+    *,
+    action_handle: str,
+    action_handles: Mapping[UUID, str],
+) -> dict[str, Any]:
+    decision_reason = action.rejection_reason or action.stale_reason
+    projection: dict[str, Any] = {
+        "handle": action_handle,
+        "approved": False,
+        "status": action.status.value,
+        "operation": action.operation.value,
+        "path": _pending_path(catalog, action.path),
+        "target_handles": _pending_target_handles(catalog, action),
+        "before": _pending_action_value(catalog, action.path, action.before),
+        "after": _pending_action_value(catalog, action.path, action.after),
+        "dependency_handles": [
+            action_handles[item] for item in sorted(action.depends_on_action_ids, key=str)
+        ],
+    }
+    if action.employee_after is not None:
+        projection["employee_after"] = _pending_semantic_value(
+            catalog, action.employee_after
+        )
+    if decision_reason is not None:
+        projection["decision_reason"] = decision_reason
+    return projection
+
+
+def _pending_action_value(catalog: WorkspaceCatalog, path: str, value: Any) -> Any:
+    relation = path.rstrip("/").rsplit("/", 1)[-1]
+    if relation in {"duty_id", "task_id"}:
+        if value is None:
+            return None
+        return catalog.handle_for_id(UUID(str(value)))
+    if relation in {"task_ids", "indicator_ids"}:
+        if value is None:
+            return None
+        return [
+            catalog.handle_for_id(UUID(str(raw_id)))
+            for raw_id in value
+        ]
+    return _pending_semantic_value(catalog, value)
+
+
+def _pending_path(catalog: WorkspaceCatalog, path: str) -> str:
+    parts = path.strip("/").split("/")
+    if len(parts) >= 2 and parts[0] in {"duties", "tasks", "opks"}:
+        try:
+            parts[1] = catalog.handle_for_id(UUID(parts[1]))
+        except (KeyError, ValueError):
+            pass
+    return "/" + "/".join(parts)
+
+
+def _pending_target_handles(
+    catalog: WorkspaceCatalog,
+    action: DocumentPatchAction,
+) -> list[str]:
+    target_ids = list(action.target_ids)
+    if not target_ids:
+        parts = action.path.strip("/").split("/")
+        id_field = {
+            "duties": "duty_id",
+            "tasks": "task_id",
+            "opks": "item_id",
+        }.get(parts[0] if parts else "")
+        if len(parts) >= 2:
+            try:
+                target_ids.append(UUID(parts[1]))
+            except ValueError:
+                pass
+        if id_field is not None and isinstance(action.after, dict):
+            raw_id = action.after.get(id_field)
+            if raw_id is not None:
+                try:
+                    target_ids.append(UUID(str(raw_id)))
+                except ValueError:
+                    pass
+    handles: list[str] = []
+    for target_id in target_ids:
+        handle = catalog.handle_for_id(target_id)
+        if handle not in handles:
+            handles.append(handle)
+    return handles
+
+
+def _pending_semantic_value(catalog: WorkspaceCatalog, value: Any) -> Any:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    if isinstance(value, list):
+        return [_pending_semantic_value(catalog, item) for item in value]
+    if not isinstance(value, dict):
+        return None
+
+    projected: dict[str, Any] = {}
+    for key in (
+        "kind",
+        "text",
+        "statement",
+        "action",
+        "object",
+        "purpose_result",
+        "context",
+        "frequency_text",
+        "responsibility_role",
+        "name",
+    ):
+        if key in value:
+            projected[key] = value[key]
+    for source_key, handle_key in (
+        ("duty_id", "duty_handle"),
+        ("task_id", "task_handle"),
+    ):
+        raw_id = value.get(source_key)
+        if raw_id is not None:
+            projected[handle_key] = catalog.handle_for_id(UUID(str(raw_id)))
+    for source_key, handle_key in (
+        ("task_ids", "task_handles"),
+        ("indicator_ids", "indicator_handles"),
+    ):
+        if source_key in value:
+            projected[handle_key] = [
+                catalog.handle_for_id(UUID(str(raw_id))) for raw_id in value[source_key]
+            ]
+    if "enablers" in value:
+        projected["enablers"] = [
+            {"kind": item["kind"], "name": item["name"]}
+            for item in value["enablers"]
+            if isinstance(item, dict) and "kind" in item and "name" in item
+        ]
+    return projected
 
 
 class CandidatePolicyBackend(BackendProtocol):

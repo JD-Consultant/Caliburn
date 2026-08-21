@@ -835,6 +835,7 @@ class PostgresConsultantRuntime:
                         run_id=run_id,
                         candidate_revision=existing.candidate_revision,
                         resource_digest=digest,
+                        action_handles=existing.action_handles,
                         actions=existing.changeset.actions,
                         receipt=existing,
                         review_queue={},

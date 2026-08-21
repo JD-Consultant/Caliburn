@@ -653,6 +653,10 @@ async def build_consultant_context(
         system_prompt, messages, token_count = render()
     elif orientation.degraded:
         degraded.append("global_orientation")
+    if token_count > execution.max_context_tokens and len(recent_consultant_turns) > 1:
+        recent_consultant_turns = recent_consultant_turns[-1:]
+        degraded.append("recent_consultant_turns")
+        system_prompt, messages, token_count = render()
     if token_count > execution.max_context_tokens:
         raise ContextBudgetExceeded(
             "mandatory consultant context exceeds the configured token budget"

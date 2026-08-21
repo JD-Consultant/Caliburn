@@ -45,6 +45,7 @@ from app.consultant.state import (
     SourceValidity,
 )
 from app.consultant.workspace_resources import WorkspaceCatalog, project_candidate_files
+from app.consultant.workspace_tools import _serialize_check_result
 
 
 def _database_url() -> str:
@@ -421,6 +422,25 @@ async def test_workspace_check_only_records_receipt_then_publishes_once_and_repl
         assert (await runtime.reopen_document(document_id)).review_queue == {}
         checked_state = await runtime.raw_state(document_id)
         assert checked_state["checked_candidate"] is not None
+
+        replayed_check = await runtime.check_candidate_document(
+            document_id=document_id,
+            run_id=run_id,
+            files=files,
+            tool_call_id="check-task6-001",
+            selected_skill_ids=("output",),
+            loaded_skill_ids=("output",),
+        )
+        assert replayed_check.status == "checked"
+        assert replayed_check.resource_digest == checked.resource_digest
+        assert replayed_check.action_handles == checked.action_handles
+        assert replayed_check.actions == checked.actions
+        assert replayed_check.review_queue == {}
+        replayed_observation = _serialize_check_result(replayed_check)
+        assert '"action_handles"' in replayed_observation
+        assert "receipt" not in replayed_observation
+        assert replayed_check.receipt == checked.receipt
+        assert await runtime.raw_state(document_id) == checked_state
 
         published = await runtime.publish_checked_candidate(
             document_id=document_id,

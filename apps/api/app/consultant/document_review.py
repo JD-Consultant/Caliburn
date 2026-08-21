@@ -76,22 +76,21 @@ _UNRESOLVED_STATUSES = {
 }
 
 
-def _entity_identity(path: str, after: JsonValue | None) -> str:
-    id_field = _COLLECTION_ID_FIELDS.get(path)
-    if id_field is None or not isinstance(after, dict) or id_field not in after:
-        raise DocumentReviewError(f"{path} addition requires {id_field or 'an ID'}")
-    return str(after[id_field])
-
-
-def _canonical_semantic_after(value: JsonValue | None) -> bytes:
+def _canonical_semantic_after(change: ReviewableDocumentChange) -> bytes:
+    ignored_keys = {"evidence_source_ids"}
+    if change.operation is DocumentChangeOperation.ADD:
+        ignored_keys.add("display_order")
+        id_field = _COLLECTION_ID_FIELDS.get(change.path)
+        if id_field is not None:
+            ignored_keys.add(id_field)
     semantic = (
         {
             key: item
-            for key, item in value.items()
-            if key != "evidence_source_ids"
+            for key, item in change.after.items()
+            if key not in ignored_keys
         }
-        if isinstance(value, dict)
-        else value
+        if isinstance(change.after, dict)
+        else change.after
     )
     return json.dumps(
         semantic,
@@ -115,7 +114,7 @@ def _logical_linkage_key(change: ReviewableDocumentChange) -> str:
 
 
 def _target_key(change: ReviewableDocumentChange) -> str:
-    canonical = _canonical_semantic_after(change.after)
+    canonical = _canonical_semantic_after(change)
     linkage = _logical_linkage_key(change)
     axis = change.opks_kind.value if change.opks_kind is not None else "none"
     return (
@@ -270,7 +269,7 @@ def _read_paths(
     normalized_after: JsonValue | None,
 ) -> tuple[str, ...]:
     if change.operation is DocumentChangeOperation.ADD:
-        return (f"{change.path}/{_entity_identity(change.path, normalized_after)}",)
+        return (change.path,)
     if change.operation in {
         DocumentChangeOperation.MERGE,
         DocumentChangeOperation.SPLIT,

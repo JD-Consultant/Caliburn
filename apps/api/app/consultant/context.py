@@ -1359,10 +1359,27 @@ class ConsultantContextMiddleware(AgentMiddleware):
             )
         if source_indexes:
             messages[source_indexes[0]] = bundle.messages[-1]
-        base_system = request.system_message.text if request.system_message else ""
-        system_message = SystemMessage(
-            content=(base_system + "\n\n" + bundle.system_prompt).strip()
+        stable_system = (
+            request.system_message.text.strip() if request.system_message else ""
         )
+        dynamic_system = bundle.system_prompt.strip()
+        system_content: list[dict[str, Any]] = []
+        if stable_system:
+            system_content.append(
+                {
+                    "type": "text",
+                    "text": stable_system,
+                    "cache_control": {"type": "ephemeral"},
+                }
+            )
+        if dynamic_system:
+            system_content.append(
+                {
+                    "type": "text",
+                    "text": ("\n\n" if stable_system else "") + dynamic_system,
+                }
+            )
+        system_message = SystemMessage(content=system_content)
         return await handler(
             request.override(system_message=system_message, messages=messages)
         )

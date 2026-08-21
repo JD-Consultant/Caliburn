@@ -711,6 +711,24 @@ async def test_context_middleware_rebinds_tagged_source_without_reordering_tool_
             await ConsultantContextMiddleware().awrap_model_call(request, handler)
 
             actual = captured["request"]
+            assert isinstance(actual.system_message.content, list)
+            assert actual.system_message.content[0] == {
+                "type": "text",
+                "text": "非權威摘要可以保留，但不能取代來源。",
+                "cache_control": {"type": "ephemeral"},
+            }
+            dynamic_system = actual.system_message.content[1]
+            assert dynamic_system["type"] == "text"
+            assert "cache_control" not in dynamic_system
+            assert dynamic_system["text"].startswith("\n\n")
+            assert (
+                "這是必須從 Store 重載的完整員工原話。"
+                in dynamic_system["text"]
+            )
+            assert actual.system_message.text == (
+                "非權威摘要可以保留，但不能取代來源。"
+                + dynamic_system["text"]
+            )
             assert actual.messages[0].content == f"[employee source {source_id}]"
             assert isinstance(actual.messages[-1], ToolMessage)
             assert actual.messages[-1].content == "唯讀工具結果"

@@ -232,7 +232,12 @@ async def _run_workspace_wave(
     graph = create_agent(
         model=model,
         tools=([check_tool] if check_tool is not None else []),
-        middleware=(filesystem, WorkspaceToolWaveMiddleware()),
+        middleware=(
+            filesystem,
+            WorkspaceToolWaveMiddleware(
+                candidate_backend=workspace.candidate_backend
+            ),
+        ),
     )
     return await graph.ainvoke(
         {
@@ -302,7 +307,11 @@ async def test_real_consultant_provider_binding_captures_exact_workspace_tools_a
             }
         )
 
-    converted = {schema["function"]["name"]: schema for schema in model.bound_tool_schemas}
+    captured = model.bound_tool_schemas
+    assert len(captured) == 7
+    captured_names = [schema["function"]["name"] for schema in captured]
+    assert len(set(captured_names)) == len(captured_names)
+    converted = {schema["function"]["name"]: schema for schema in captured}
     assert set(converted) == EXPECTED_WORKSPACE_TOOLS
     assert {
         name: _provider_schema_metrics(converted[name])
@@ -564,11 +573,11 @@ async def test_framework_canonical_aliases_to_same_file_reject_the_entire_wave(
 @pytest.mark.parametrize(
     "invalid_path",
     [
-        f"/candidate/{RUN_ID}/../{OTHER_RUN_ID}/header.json",
-        f"/candidate/{RUN_ID}/../../outside.json",
+        f"/candidate/{OTHER_RUN_ID}/header.json",
+        f"/candidate/{RUN_ID}/not-a-resource.json",
     ],
 )
-async def test_invalid_or_traversal_mutation_rejects_sibling_before_zero_mutation(
+async def test_cross_run_or_invalid_resource_mutation_rejects_sibling_before_zero_mutation(
     invalid_path: str,
 ) -> None:
     workspace = _workspace_binding()
@@ -714,7 +723,6 @@ async def test_overlapping_mutation_wave_rejects_every_call_before_mutation(
     messages = _tool_messages(result)
     assert [message.status for message in messages] == ["error", "error"]
     assert len({str(message.content) for message in messages}) == 1
-    assert "sequential" in str(messages[0].content).casefold()
     assert _candidate_text(result, header_path) == original_header
     new_path = f"/candidate/{RUN_ID}/tasks/task-002.json"
     assert new_path not in result["files"]

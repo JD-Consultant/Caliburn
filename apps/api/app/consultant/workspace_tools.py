@@ -1,0 +1,298 @@
+"""Model-facing virtual workspace tools for the consultant runtime."""
+
+from __future__ import annotations
+
+import json
+from collections.abc import Awaitable, Callable, Mapping, Sequence
+from dataclasses import dataclass
+from typing import Any, Protocol
+from uuid import UUID
+
+from deepagents.backends.utils import file_data_to_string
+from langchain.agents.middleware import AgentMiddleware
+from langchain.agents.middleware.types import ToolCallRequest
+from langchain.tools import ToolRuntime
+from langchain_core.messages import AIMessage, ToolMessage
+from langchain_core.tools import BaseTool, StructuredTool
+from langgraph.types import Command
+from pydantic import BaseModel, ConfigDict
+from typing_extensions import override
+
+from app.consultant.workspace_backend import ConsultantWorkspaceBackendBinding
+
+
+WORKSPACE_FILESYSTEM_TOOL_NAMES = frozenset(
+    {"ls", "read_file", "grep", "write_file", "edit_file", "delete"}
+)
+WORKSPACE_MUTATION_TOOL_NAMES = frozenset(
+    {"write_file", "edit_file", "delete"}
+)
+CHECK_CANDIDATE_DOCUMENT_TOOL_NAME = "check_candidate_document"
+WORKSPACE_TOOL_NAMES = frozenset(
+    {*WORKSPACE_FILESYSTEM_TOOL_NAMES, CHECK_CANDIDATE_DOCUMENT_TOOL_NAME}
+)
+WORKSPACE_TOOL_DESCRIPTIONS = {
+    "ls": "List entries in the scoped virtual JD workspace using an absolute POSIX path.",
+    "read_file": "Read one file from the scoped virtual JD workspace.",
+    "grep": "Search literal text in the scoped virtual JD workspace.",
+    "write_file": "Create one new candidate resource; existing resources must be edited.",
+    "edit_file": "Replace one exact unique string in a candidate resource; do not replace all.",
+    "delete": "Delete one candidate entity resource; directories and protected resources are not deletable.",
+}
+
+
+class CandidateCheckPort(Protocol):
+    """Application-owned semantic check boundary for the candidate after-state."""
+
+    async def check_candidate_document(
+        self,
+        *,
+        document_id: UUID,
+        run_id: UUID,
+        files: Mapping[str, str],
+        tool_call_id: str,
+    ) -> Any: ...
+
+
+@dataclass(frozen=True, slots=True)
+class CandidateCheckToolBinding:
+    """Bind the domain check to the one workspace/backend for a run."""
+
+    runtime: CandidateCheckPort
+    workspace: ConsultantWorkspaceBackendBinding
+
+    @property
+    def port(self) -> CandidateCheckPort:
+        """Name the application boundary without duplicating the binding."""
+
+        return self.runtime
+
+
+class _EmptyCandidateCheckInput(BaseModel):
+    model_config = ConfigDict(
+        extra="forbid",
+        frozen=True,
+        arbitrary_types_allowed=True,
+    )
+
+
+class _CandidateCheckToolInput(_EmptyCandidateCheckInput):
+    """Internal schema that receives LangChain's hidden ToolRuntime."""
+
+    runtime: ToolRuntime[Any, Any]
+
+
+class _CandidateCheckStructuredTool(StructuredTool):
+    """Expose no application or runtime arguments to the model."""
+
+    @property
+    def tool_call_schema(self) -> type[_EmptyCandidateCheckInput]:
+        return _EmptyCandidateCheckInput
+
+
+def _current_candidate_files(
+    binding: CandidateCheckToolBinding,
+    runtime: ToolRuntime[Any, Any],
+) -> dict[str, str]:
+    state = runtime.state
+    if not isinstance(state, Mapping):
+        raise RuntimeError("check_candidate_document requires the LangGraph state")
+    raw_files = state.get("files")
+    if not isinstance(raw_files, Mapping):
+        raise RuntimeError(
+            "check_candidate_document requires the current workspace files channel"
+        )
+
+    prefix = f"/candidate/{binding.workspace.run_id}/"
+    files: dict[str, str] = {}
+    for raw_path, raw_file in raw_files.items():
+        if not isinstance(raw_path, str) or not raw_path.startswith(prefix):
+            continue
+        if isinstance(raw_file, str):
+            content = raw_file
+        elif isinstance(raw_file, bytes):
+            content = raw_file.decode("utf-8")
+        elif isinstance(raw_file, Mapping):
+            content = file_data_to_string(raw_file)
+        else:
+            raise RuntimeError(
+                f"workspace file {raw_path!r} has an unsupported state value"
+            )
+        files[raw_path] = content
+    return dict(sorted(files.items()))
+
+
+def _serialize_check_result(result: Any) -> str:
+    if isinstance(result, str):
+        return result
+    model_dump_json = getattr(result, "model_dump_json", None)
+    if callable(model_dump_json):
+        return str(model_dump_json())
+    model_dump = getattr(result, "model_dump", None)
+    if callable(model_dump):
+        result = model_dump(mode="json")
+    return json.dumps(result, ensure_ascii=False, separators=(",", ":"), default=str)
+
+
+def build_check_candidate_document_tool(
+    *,
+    binding: CandidateCheckToolBinding,
+) -> BaseTool:
+    """Build the payload-free semantic check Tool for one virtual workspace."""
+
+    async def check_candidate_document(
+        runtime: ToolRuntime[Any, Any],
+    ) -> str:
+        if runtime.tool_call_id is None:
+            raise RuntimeError(
+                "check_candidate_document is missing its provider call ID"
+            )
+        files = _current_candidate_files(binding, runtime)
+        result = await binding.runtime.check_candidate_document(
+            document_id=binding.workspace.document_id,
+            run_id=binding.workspace.run_id,
+            files=files,
+            tool_call_id=runtime.tool_call_id,
+        )
+        return _serialize_check_result(result)
+
+    return _CandidateCheckStructuredTool(
+        name=CHECK_CANDIDATE_DOCUMENT_TOOL_NAME,
+        description=(
+            "Check the current candidate workspace after editor observations. "
+            "The application reads the current files and returns actionable "
+            "issues or a checked candidate receipt."
+        ),
+        args_schema=_CandidateCheckToolInput,
+        coroutine=check_candidate_document,
+    )
+
+
+def _normal_path(path: Any) -> tuple[str, ...] | None:
+    if not isinstance(path, str) or not path.startswith("/"):
+        return None
+    parts = tuple(part for part in path.split("/") if part)
+    return parts
+
+
+def _path_text(parts: tuple[str, ...]) -> str:
+    return "/" + "/".join(parts)
+
+
+def _is_ancestor_or_same(
+    left: tuple[str, ...], right: tuple[str, ...]
+) -> bool:
+    if len(left) > len(right):
+        return False
+    return right[: len(left)] == left
+
+
+def _tool_call_path(tool_call: Mapping[str, Any]) -> tuple[str, ...] | None:
+    args = tool_call.get("args")
+    if not isinstance(args, Mapping):
+        return None
+    return _normal_path(args.get("file_path"))
+
+
+def _ordered_mutation_paths(
+    tool_calls: Sequence[Mapping[str, Any]],
+) -> list[tuple[str, tuple[str, ...]]]:
+    result: list[tuple[str, tuple[str, ...]]] = []
+    for tool_call in sorted(
+        tool_calls,
+        key=lambda item: str(item.get("id", "")),
+    ):
+        name = str(tool_call.get("name", ""))
+        if name not in WORKSPACE_MUTATION_TOOL_NAMES:
+            continue
+        path = _tool_call_path(tool_call)
+        if path is not None:
+            result.append((str(tool_call.get("id", "")), path))
+    return result
+
+
+def analyze_workspace_wave(
+    tool_calls: Sequence[Mapping[str, Any]],
+) -> str | None:
+    """Return one deterministic rejection for a conflicting complete tool wave."""
+
+    has_check = any(
+        str(tool_call.get("name", "")) == CHECK_CANDIDATE_DOCUMENT_TOOL_NAME
+        for tool_call in tool_calls
+    )
+    mutation_paths = _ordered_mutation_paths(tool_calls)
+    if has_check and any(
+        str(tool_call.get("name", "")) in WORKSPACE_MUTATION_TOOL_NAMES
+        for tool_call in tool_calls
+    ):
+        return (
+            "Tool wave rejected: check_candidate_document cannot run with a "
+            "candidate mutation. Retry the mutations first, observe their results, "
+            "then call check_candidate_document in a separate sequential wave."
+        )
+
+    for index, (left_id, left_path) in enumerate(mutation_paths):
+        for right_id, right_path in mutation_paths[index + 1 :]:
+            if _is_ancestor_or_same(left_path, right_path) or _is_ancestor_or_same(
+                right_path, left_path
+            ):
+                return (
+                    "Tool wave rejected: candidate mutation paths "
+                    f"{_path_text(left_path)!r} and {_path_text(right_path)!r} "
+                    "overlap. Retry overlapping mutations in separate sequential "
+                    f"tool calls (call IDs {left_id!r} and {right_id!r})."
+                )
+    return None
+
+
+def _last_ai_tool_calls(state: Any) -> Sequence[Mapping[str, Any]]:
+    if isinstance(state, Mapping):
+        messages = state.get("messages", ())
+    else:
+        messages = getattr(state, "messages", ())
+    if not isinstance(messages, Sequence):
+        return ()
+    for message in reversed(messages):
+        if isinstance(message, AIMessage):
+            return message.tool_calls
+        if isinstance(message, Mapping) and message.get("type") == "ai":
+            tool_calls = message.get("tool_calls", ())
+            return tool_calls if isinstance(tool_calls, Sequence) else ()
+    return ()
+
+
+def _wave_error_message(request: ToolCallRequest) -> ToolMessage:
+    conflict = analyze_workspace_wave(_last_ai_tool_calls(request.state))
+    if conflict is None:
+        raise RuntimeError("workspace wave was not conflicting")
+    tool_call = request.tool_call
+    return ToolMessage(
+        name=str(tool_call.get("name", "")),
+        tool_call_id=str(tool_call.get("id", "")),
+        status="error",
+        content=conflict,
+    )
+
+
+class WorkspaceToolWaveMiddleware(AgentMiddleware):
+    """Reject a complete conflicting workspace wave before any handler runs."""
+
+    @override
+    async def awrap_tool_call(
+        self,
+        request: ToolCallRequest,
+        handler: Callable[[ToolCallRequest], Awaitable[ToolMessage | Command[Any]]],
+    ) -> ToolMessage | Command[Any]:
+        if analyze_workspace_wave(_last_ai_tool_calls(request.state)) is not None:
+            return _wave_error_message(request)
+        return await handler(request)
+
+    @override
+    def wrap_tool_call(
+        self,
+        request: ToolCallRequest,
+        handler: Callable[[ToolCallRequest], ToolMessage | Command[Any]],
+    ) -> ToolMessage | Command[Any]:
+        if analyze_workspace_wave(_last_ai_tool_calls(request.state)) is not None:
+            return _wave_error_message(request)
+        return handler(request)

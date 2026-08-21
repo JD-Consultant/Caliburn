@@ -47,6 +47,9 @@ COLLISION_ID = UUID("00000000-0000-0000-0000-000000000111")
 ACTION_ONE_ID = UUID("00000000-0000-0000-0000-000000000301")
 ACTION_TWO_ID = UUID("00000000-0000-0000-0000-000000000302")
 ACTION_THREE_ID = UUID("00000000-0000-0000-0000-000000000303")
+ACTION_FOUR_ID = UUID("00000000-0000-0000-0000-000000000304")
+ACTION_FIVE_ID = UUID("00000000-0000-0000-0000-000000000305")
+EXTERNAL_ACTION_ID = UUID("00000000-0000-0000-0000-000000000399")
 
 
 def _document() -> ApprovedJobDocument:
@@ -270,6 +273,39 @@ def test_projected_review_groups_use_global_action_handles_and_dependencies() ->
             "handle": "review-002",
             "action_handles": ["action-003"],
             "depends_on_handles": ["action-002"],
+        },
+    ]
+
+
+def test_projected_review_groups_allocate_repeated_external_dependencies() -> None:
+    first_bundle = _pending_bundle(
+        UUID("00000000-0000-0000-0000-000000000501"),
+        (_pending_action(ACTION_FOUR_ID, depends_on_action_ids=(EXTERNAL_ACTION_ID,)),),
+        external_dependency_action_ids=(EXTERNAL_ACTION_ID,),
+    )
+    second_bundle = _pending_bundle(
+        UUID("00000000-0000-0000-0000-000000000502"),
+        (_pending_action(ACTION_FIVE_ID, depends_on_action_ids=(EXTERNAL_ACTION_ID,)),),
+        external_dependency_action_ids=(EXTERNAL_ACTION_ID,),
+    )
+    catalog = WorkspaceCatalog.from_snapshot(
+        _document(),
+        pending=(first_bundle, second_bundle),
+    )
+
+    files = project_candidate_files(catalog, run_id=RUN_ID)
+    groups = json.loads(files[f"/candidate/{RUN_ID}/review-groups.json"])["groups"]
+
+    assert groups == [
+        {
+            "handle": "review-001",
+            "action_handles": ["action-001"],
+            "depends_on_handles": ["action-003"],
+        },
+        {
+            "handle": "review-002",
+            "action_handles": ["action-002"],
+            "depends_on_handles": ["action-003"],
         },
     ]
 

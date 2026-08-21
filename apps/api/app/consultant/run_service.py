@@ -4,12 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
 from langchain_core.messages import HumanMessage
+from deepagents.backends.utils import file_data_to_string
 
 from app.adapters.langgraph.postgres import (
     PostgresConsultantRuntime,
@@ -17,14 +18,15 @@ from app.adapters.langgraph.postgres import (
 )
 from app.config import Settings
 from app.consultant.agent import build_professional_consultant_agent
-from app.consultant.candidate_tool import CandidateEditToolBinding
-from app.consultant.candidate_workspace import CandidateWorkspace
+from app.consultant.candidate_publication import (
+    CandidatePublicationStale,
+    publish_checked_candidate as validate_checked_candidate,
+)
 from app.consultant.context import (
     ConsultantAgentRuntimeContext,
     ConsultantContextMiddleware,
     ContextRequest,
     DocumentSourceLookup,
-    build_employee_source_tools,
 )
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.model_output import (
@@ -42,10 +44,17 @@ from app.consultant.model_runtime import (
 )
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.state import (
+    CheckedCandidateReceipt,
+    DocumentChangeSet,
     RunReceipt,
     RunExecutionEvidence,
     RunStatus,
     SourceProcessingStatus,
+)
+from app.consultant.workspace_backend import build_consultant_workspace_backend
+from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_tools import (
+    CandidateCheckToolBinding,
 )
 from app.consultant.verification import (
     ConsultantVerificationError,
@@ -55,11 +64,6 @@ from app.consultant.verification import (
 )
 
 
-EMPLOYEE_SOURCE_TOOL_IDS = (
-    "employee_source_get",
-    "employee_source_lineage",
-    "employee_source_search",
-)
 logger = logging.getLogger(__name__)
 
 
@@ -109,9 +113,13 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
         run_kind="interactive_consultation",
         allowed_skill_ids=CONSULTANT_SKILL_IDS,
         allowed_tool_ids=(
+            "ls",
             "read_file",
-            *EMPLOYEE_SOURCE_TOOL_IDS,
-            "job_document_candidate_edit",
+            "grep",
+            "write_file",
+            "edit_file",
+            "delete",
+            "check_candidate_document",
         ),
         max_context_tokens=config.consultant_max_context_tokens,
         max_model_calls=config.consultant_max_model_calls,
@@ -124,6 +132,46 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
         max_cost_usd=config.consultant_max_cost_usd,
     )
     return resolve_execution(profile, policy)
+
+
+def _candidate_files_from_response(
+    response: Mapping[str, Any],
+    workspace,
+) -> dict[str, str]:
+    raw_files = response.get("files")
+    if not isinstance(raw_files, Mapping):
+        raise CandidatePublicationStale(
+            "candidate publication requires the current workspace files"
+        )
+    files: dict[str, str] = {}
+    for raw_path, raw_file in raw_files.items():
+        if not isinstance(raw_path, str):
+            raise CandidatePublicationStale(
+                "candidate publication found a non-text workspace path"
+            )
+        try:
+            canonical_path = workspace.candidate_backend.validate_candidate_file_path(
+                raw_path
+            )
+        except ValueError as error:
+            raise CandidatePublicationStale(
+                f"candidate publication found an invalid workspace path: {raw_path!r}"
+            ) from error
+        if canonical_path != raw_path:
+            raise CandidatePublicationStale(
+                f"candidate publication requires canonical workspace paths: {raw_path!r}"
+            )
+        if isinstance(raw_file, str):
+            files[canonical_path] = raw_file
+        elif isinstance(raw_file, bytes):
+            files[canonical_path] = raw_file.decode("utf-8")
+        elif isinstance(raw_file, Mapping):
+            files[canonical_path] = file_data_to_string(raw_file)
+        else:
+            raise CandidatePublicationStale(
+                f"candidate publication found an unsupported file value: {raw_path!r}"
+            )
+    return dict(sorted(files.items()))
 
 
 async def execute_admitted_consultant_turn(
@@ -189,21 +237,31 @@ async def execute_admitted_consultant_turn(
             execution=execution,
             request=request,
         )
-        source_tools = build_employee_source_tools(
-            DocumentSourceLookup(runtime),
+        pending = tuple(
+            DocumentChangeSet.model_validate(value)
+            for value in snapshot.review_queue.values()
+        )
+        catalog = WorkspaceCatalog.from_snapshot(
+            snapshot.approved_document,
+            pending=pending,
+            sources=all_sources,
+        )
+        workspace = build_consultant_workspace_backend(
+            runtime=runtime,
             document_id=document_id,
+            run_id=run_id,
+            catalog=catalog,
+            selected_skill_ids=CONSULTANT_SKILL_IDS,
+            source_lookup=DocumentSourceLookup(runtime),
         )
         agent = agent_factory(
             model=model,
             execution=execution,
             selected_skill_ids=CONSULTANT_SKILL_IDS,
-            source_tools=source_tools,
-            candidate_edit_binding=CandidateEditToolBinding(
+            workspace_binding=workspace,
+            candidate_check_binding=CandidateCheckToolBinding(
                 runtime=runtime,
-                document_id=document_id,
-                run_id=run_id,
-                baseline_revision=snapshot.revision,
-                selected_skill_ids=CONSULTANT_SKILL_IDS,
+                workspace=workspace,
             ),
             context_middleware=ConsultantContextMiddleware(),
             context_schema=ConsultantAgentRuntimeContext,
@@ -224,12 +282,13 @@ async def execute_admitted_consultant_turn(
                 {
                     "messages": [
                         HumanMessage(
-                            content=f"[employee source {source_id}]",
+                            content=current_source.text,
                             additional_kwargs={
                                 "employee_source_id": str(source_id),
                             },
                         )
-                    ]
+                    ],
+                    "files": dict(workspace.initial_files),
                 },
                 context=runtime_context,
                 config={
@@ -249,25 +308,53 @@ async def execute_admitted_consultant_turn(
         model_output = ConsultantModelOutput.model_validate(
             response["structured_response"]
         )
-        result = map_consultant_model_output(model_output)
+        result = map_consultant_model_output(model_output, catalog=catalog)
         candidate_source_ids: tuple[UUID, ...] = ()
+        candidate_files: dict[str, str] | None = None
         if result.candidate_publication is not None:
             raw_state = await runtime.raw_state(document_id)
-            active_payload = raw_state.get("active_candidate")
-            if active_payload is None:
+            checked_payload = raw_state.get("checked_candidate")
+            if checked_payload is None:
                 raise ConsultantVerificationError(
-                    "candidate publication has no active candidate workspace"
+                    "candidate publication has no checked candidate receipt"
                 )
-            active_candidate = CandidateWorkspace.model_validate(active_payload)
-            if active_candidate.run_id != run_id:
+            checked = CheckedCandidateReceipt.model_validate(checked_payload)
+            if checked.run_id != run_id:
                 raise ConsultantVerificationError(
                     "candidate publication belongs to another consultant run"
                 )
-            if not set(active_candidate.used_skill_ids) <= set(result.used_skill_ids):
+            publication = result.candidate_publication
+            if (
+                checked.candidate_revision != publication.candidate_revision
+                or checked.resource_digest != publication.revision_digest
+                or tuple(action.action_id for action in checked.changeset.actions)
+                != publication.action_ids
+            ):
+                raise ConsultantVerificationError(
+                    "candidate publication does not exactly match the checked receipt"
+                )
+            if not set(checked.used_skill_ids) <= set(result.used_skill_ids):
                 raise ConsultantVerificationError(
                     "candidate publication used Skills missing from final result"
                 )
-            candidate_source_ids = active_candidate.changeset.source_ids
+            candidate_files = _candidate_files_from_response(response, workspace)
+            current_source_ids = tuple(
+                source.source_id
+                for source in all_sources
+                if (
+                    source.processing_status is SourceProcessingStatus.COMMITTED
+                    and source.validity.value == "current"
+                )
+            )
+            validate_checked_candidate(
+                checked,
+                current_run_id=run_id,
+                current_baseline_revision=snapshot.revision,
+                current_document=snapshot.approved_document,
+                current_files=candidate_files,
+                current_source_ids=current_source_ids,
+            )
+            candidate_source_ids = checked.changeset.source_ids
         if not runtime_context.context_receipts:
             raise ValueError("consultant run emitted no context-selection receipt")
         for receipt in runtime_context.context_receipts:
@@ -324,6 +411,7 @@ async def execute_admitted_consultant_turn(
             document_id=document_id,
             expected_revision=snapshot.revision,
             commit=commit,
+            candidate_files=candidate_files,
         )
     except BaseException as error:
         if isinstance(error, (KeyboardInterrupt, SystemExit, asyncio.CancelledError)):

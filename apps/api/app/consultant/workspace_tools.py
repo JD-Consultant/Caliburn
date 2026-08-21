@@ -141,6 +141,25 @@ def _current_candidate_files(
 def _serialize_check_result(result: Any) -> str:
     if isinstance(result, str):
         return result
+    from app.consultant.candidate_publication import CandidateCheckResult
+
+    if isinstance(result, CandidateCheckResult):
+        payload = {
+            "status": result.status,
+            "candidate_revision": result.candidate_revision,
+            "resource_digest": result.resource_digest,
+            "action_handles": [str(action.action_id) for action in result.actions],
+            "actions": [
+                {
+                    "operation": action.operation.value,
+                    "path": action.path,
+                    "target_key": action.target_key,
+                }
+                for action in result.actions
+            ],
+            "issues": list(result.issues),
+        }
+        return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
     model_dump_json = getattr(result, "model_dump_json", None)
     if callable(model_dump_json):
         return str(model_dump_json())

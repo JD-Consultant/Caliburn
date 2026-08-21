@@ -37,25 +37,6 @@ from app.consultant.candidate_publication import (
     publish_checked_candidate as validate_checked_candidate,
     resource_digest,
 )
-from app.consultant.candidate_wire import (
-    CandidateWireMappingError,
-    map_candidate_edit_batch,
-)
-from app.consultant.candidate_workspace import (
-    CandidateEditReceipt,
-    CandidateEditRejected,
-    CandidateDependencyError,
-    CandidateRevisionConflict,
-    CandidateStageRequest,
-    CandidateToolCallConflict,
-    CandidateWorkspace,
-    VerifiedCandidateStage,
-    candidate_edit_receipt_for_tool_call,
-    candidate_mapping_authority,
-    candidate_request_sha256,
-    candidate_staging_baseline,
-    materialize_candidate_workspace,
-)
 from app.consultant.document_authority import DocumentAuthorityError, edited_action_source_payload
 from app.consultant.document_review import (
     DocumentReviewError,
@@ -1006,187 +987,6 @@ class PostgresConsultantRuntime:
             await self._touch_catalog(document_id)
             return await self._snapshot(document_id)
 
-    async def stage_candidate_revision(
-        self,
-        *,
-        document_id: UUID,
-        request: CandidateStageRequest,
-    ) -> CandidateEditReceipt:
-        """Stage one verified candidate through the existing product graph."""
-
-        async with self._lock_for(document_id):
-            await self._require_active_catalog(document_id)
-            raw_state = await self.raw_state(document_id)
-            latest_payload = raw_state.get("latest_run")
-            if latest_payload is None:
-                raise ActiveConsultantRun(
-                    "candidate staging requires an active consultant run"
-                )
-            latest = RunReceipt.model_validate(latest_payload)
-            if (
-                latest.run_id != request.run_id
-                or latest.status is not RunStatus.SOURCE_SAVED
-            ):
-                raise ActiveConsultantRun(
-                    "candidate staging does not match the active consultant run"
-                )
-            active_payload = raw_state.get("active_candidate")
-            active = (
-                CandidateWorkspace.model_validate(active_payload)
-                if active_payload is not None
-                else None
-            )
-            current_candidate_revision = active.candidate_revision if active else 0
-            expected_baseline = candidate_staging_baseline(
-                raw_state,
-                run_id=request.run_id,
-            )
-            if request.baseline_revision != expected_baseline:
-                raise CandidateEditRejected(
-                    baseline_revision=expected_baseline,
-                    candidate_revision=current_candidate_revision,
-                    issues=(
-                        f"expected baseline revision {expected_baseline}, "
-                        f"found {request.baseline_revision}",
-                    ),
-                )
-            request_sha256 = candidate_request_sha256(request)
-            if active is not None:
-                replay = active.tool_receipts.get(request.tool_call_id)
-                if replay is not None:
-                    if replay.request_sha256 != request_sha256:
-                        raise CandidateEditRejected(
-                            baseline_revision=expected_baseline,
-                            candidate_revision=current_candidate_revision,
-                            issues=(
-                                f"candidate tool call {request.tool_call_id} was reused "
-                                "with another payload",
-                            ),
-                        )
-                    try:
-                        await self._require_current_committed_sources(
-                            document_id,
-                            replay.source_ids,
-                        )
-                    except (
-                        UnknownEvidenceSource,
-                        PendingSourceRequiresReconciliation,
-                        SourceConflict,
-                    ) as error:
-                        raise CandidateEditRejected(
-                            baseline_revision=expected_baseline,
-                            candidate_revision=current_candidate_revision,
-                            issues=(str(error),),
-                        ) from error
-                    return candidate_edit_receipt_for_tool_call(
-                        active,
-                        request.tool_call_id,
-                    )
-            if request.batch.base_candidate_revision != current_candidate_revision:
-                raise CandidateEditRejected(
-                    baseline_revision=expected_baseline,
-                    candidate_revision=current_candidate_revision,
-                    issues=(
-                        "expected candidate revision "
-                        f"{current_candidate_revision}, found "
-                        f"{request.batch.base_candidate_revision}",
-                    ),
-                )
-            try:
-                next_candidate_revision = current_candidate_revision + 1
-                dependency_action_ids = tuple(
-                    action_id
-                    for change in request.batch.replacement_changes
-                    for action_id in change.depends_on_action_ids
-                )
-                superseded_action_ids = tuple(
-                    action_id
-                    for change in request.batch.replacement_changes
-                    for action_id in change.supersedes_action_ids
-                )
-                allowed_entity_ids, allowed_action_ids = candidate_mapping_authority(
-                    raw_state,
-                    depends_on_action_ids=dependency_action_ids,
-                    supersedes_action_ids=superseded_action_ids,
-                )
-                materialization_run_id = uuid5(
-                    request.run_id,
-                    f"candidate-revision:{next_candidate_revision}",
-                )
-                changes = map_candidate_edit_batch(
-                    request.batch,
-                    document_id=document_id,
-                    materialization_run_id=materialization_run_id,
-                    allowed_entity_ids=allowed_entity_ids,
-                    allowed_action_ids=allowed_action_ids,
-                )
-                source_ids = tuple(
-                    sorted(
-                        {
-                            source_id
-                            for change in changes
-                            for source_id in change.basis.source_ids
-                        },
-                        key=str,
-                    )
-                )
-                sources = await self._require_current_committed_sources(
-                    document_id,
-                    source_ids,
-                )
-                used_skill_ids = verify_candidate_document_changes(
-                    changes,
-                    document_id=document_id,
-                    selected_skill_ids=request.selected_skill_ids,
-                    loaded_skill_ids=request.loaded_skill_ids,
-                    employee_sources=sources,
-                )
-                stage = VerifiedCandidateStage(
-                    run_id=request.run_id,
-                    baseline_revision=request.baseline_revision,
-                    base_candidate_revision=request.batch.base_candidate_revision,
-                    tool_call_id=request.tool_call_id,
-                    request_sha256=request_sha256,
-                    summary=request.batch.summary,
-                    changes=changes,
-                    used_skill_ids=used_skill_ids,
-                )
-                materialize_candidate_workspace(raw_state, stage)
-            except (
-                CandidateDependencyError,
-                CandidateRevisionConflict,
-                CandidateToolCallConflict,
-                CandidateWireMappingError,
-                ConsultantVerificationError,
-                DocumentAuthorityError,
-                DocumentReviewError,
-                RejectedChangeRequiresNewEvidence,
-                UnknownEvidenceSource,
-                PendingSourceRequiresReconciliation,
-                SourceConflict,
-            ) as error:
-                raise CandidateEditRejected(
-                    baseline_revision=expected_baseline,
-                    candidate_revision=current_candidate_revision,
-                    issues=(str(error),),
-                ) from error
-            await self.graph.ainvoke(
-                {},
-                self.graph_config(document_id),
-                context={
-                    "action": "stage_candidate_revision",
-                    "document_id": str(document_id),
-                    "candidate_stage": stage.model_dump(mode="json"),
-                },
-            )
-            persisted = CandidateWorkspace.model_validate(
-                (await self.raw_state(document_id))["active_candidate"]
-            )
-            return candidate_edit_receipt_for_tool_call(
-                persisted,
-                request.tool_call_id,
-            )
-
     @staticmethod
     def _changed_employee_text(
         before: ApprovedJobDocument,
@@ -1786,6 +1586,7 @@ class PostgresConsultantRuntime:
         document_id: UUID,
         expected_revision: int,
         commit: VerifiedConsultantCommit,
+        candidate_files: Mapping[str, str | bytes] | None = None,
     ) -> ConsultantSnapshot:
         """Atomically publish one already-verified semantic consultant result."""
 
@@ -1801,19 +1602,40 @@ class PostgresConsultantRuntime:
                     f"source {source.source_id} was superseded before semantic commit"
                 )
             if commit.result.candidate_publication is not None:
-                active_payload = (await self.raw_state(document_id)).get(
-                    "active_candidate"
-                )
-                if active_payload is not None:
-                    active = CandidateWorkspace.model_validate(active_payload)
-                    await self._require_current_committed_sources(
-                        document_id,
-                        active.changeset.source_ids,
+                if candidate_files is None:
+                    raise CandidatePublicationStale(
+                        "candidate publication has no current workspace files"
                     )
             snapshot = await self._snapshot(document_id)
             if snapshot.revision != expected_revision:
                 raise StaleRevision(
                     f"expected revision {expected_revision}, found {snapshot.revision}"
+                )
+            if commit.result.candidate_publication is not None:
+                raw_state = await self.raw_state(document_id)
+                receipt_payload = raw_state.get("checked_candidate")
+                if receipt_payload is None:
+                    raise CandidatePublicationStale(
+                        "candidate publication has no checked candidate receipt"
+                    )
+                receipt = CheckedCandidateReceipt.model_validate(receipt_payload)
+                sources = await self.list_sources(document_id)
+                current_source_ids = tuple(
+                    source.source_id
+                    for source in sources
+                    if (
+                        source.document_id == document_id
+                        and source.processing_status is SourceProcessingStatus.COMMITTED
+                        and source.validity is SourceValidity.CURRENT
+                    )
+                )
+                validate_checked_candidate(
+                    receipt,
+                    current_run_id=commit.run_id,
+                    current_baseline_revision=snapshot.revision,
+                    current_document=snapshot.approved_document,
+                    current_files=candidate_files,
+                    current_source_ids=current_source_ids,
                 )
             try:
                 await self.graph.ainvoke(

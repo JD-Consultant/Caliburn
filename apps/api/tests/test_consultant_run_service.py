@@ -24,6 +24,7 @@ from app.consultant.model_runtime import (
     AttemptStatus,
     AttemptUsage,
 )
+from app.consultant.provider_wire import OutputEvidenceReference
 from app.consultant.results import (
     AnalysisBasis,
     ConsultantResult,
@@ -37,6 +38,7 @@ from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.state import (
     EmployeeSource,
     EmployeeSourceKind,
+    QuoteAnchor,
     RunReceipt,
     RunStatus,
     SourceProcessingStatus,
@@ -75,6 +77,14 @@ def _snapshot(document_id: UUID, run_id: UUID, source_id: UUID) -> ConsultantSna
 def _result(source_id: UUID) -> ConsultantResult:
     basis = AnalysisBasis(
         source_ids=(source_id,),
+        quote_anchors=(
+            QuoteAnchor(
+                source_id=source_id,
+                start=3,
+                end=9,
+                quote="整理採購需求",
+            ),
+        ),
         skill_ids=("task-boundary",),
     )
     return ConsultantResult(
@@ -92,9 +102,13 @@ def _result(source_id: UUID) -> ConsultantResult:
 
 def _model_output(source_id: UUID) -> ConsultantModelOutput:
     basis = OutputAnalysisBasis(
-        source_ids=(source_id,),
-        quote_anchors=(),
-        skill_ids=("task-boundary",),
+        evidence=(
+            OutputEvidenceReference(
+                source_handle="source-001",
+                quote="整理採購需求",
+                skill_ids=("task-boundary",),
+            ),
+        ),
     )
     return ConsultantModelOutput(
         visible_reply="我已記錄這項工作，接下來可以再釐清它的完成結果。",
@@ -241,18 +255,19 @@ def _settings() -> Settings:
     return Settings(_env_file=None, openrouter_api_key="test-key")
 
 
-def test_configured_execution_has_all_methods_and_only_non_rag_source_tools() -> None:
+def test_configured_execution_has_exactly_the_virtual_workspace_tools() -> None:
     execution = build_configured_execution(_settings())
 
     assert execution.allowed_skill_ids == CONSULTANT_SKILL_IDS
     assert execution.allowed_tool_ids == (
+        "ls",
         "read_file",
-        "employee_source_get",
-        "employee_source_lineage",
-        "employee_source_search",
-        "job_document_candidate_edit",
+        "grep",
+        "write_file",
+        "edit_file",
+        "delete",
+        "check_candidate_document",
     )
-    assert "employee_reference_search" not in execution.allowed_tool_ids
 
 
 @pytest.mark.asyncio
@@ -281,12 +296,12 @@ async def test_admitted_turn_is_verified_then_committed_once() -> None:
         agent_factory=agent_factory,
     )
 
-    binding = agent_factory_kwargs["candidate_edit_binding"]
-    assert binding.runtime is runtime
-    assert binding.document_id == document_id
-    assert binding.run_id == run_id
-    assert binding.baseline_revision == 1
-    assert binding.selected_skill_ids == CONSULTANT_SKILL_IDS
+    workspace = agent_factory_kwargs["workspace_binding"]
+    check_binding = agent_factory_kwargs["candidate_check_binding"]
+    assert workspace.document_id == document_id
+    assert workspace.run_id == run_id
+    assert check_binding.runtime is runtime
+    assert check_binding.workspace is workspace
     assert len(runtime.commits) == 1
     commit = runtime.commits[0]["commit"]
     assert commit.run_id == run_id

@@ -15,17 +15,12 @@ from langchain.agents.middleware.types import AgentState, PrivateStateAttr
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
-from langchain_core.tools import BaseTool
 from langgraph.channels.untracked_value import UntrackedValue
 from langgraph.runtime import Runtime
 from typing_extensions import NotRequired, override
 
 from app.consultant.model_runtime import ResolvedExecution, build_consultant_agent
 from app.consultant.model_output import ConsultantModelOutput
-from app.consultant.candidate_tool import (
-    CandidateEditToolBinding,
-    build_job_document_candidate_edit_tool,
-)
 from app.consultant.workspace_backend import ConsultantWorkspaceBackendBinding
 from app.consultant.workspace_tools import (
     WORKSPACE_FILESYSTEM_TOOL_NAMES,
@@ -34,24 +29,14 @@ from app.consultant.workspace_tools import (
     WorkspaceToolWaveMiddleware,
     build_check_candidate_document_tool,
 )
-from app.consultant.skill_backend import (
-    DirectPackageSkillBackendAdapter,
-    PackageSkillBackend,
-)
-
-
-SKILL_READ_TOOL_DESCRIPTION = (
-    "Read one eligible Caliburn analysis Skill in full. "
-    "Use only the exact /skills/<skill-id>/SKILL.md path listed for this run. "
-    "Omit offset and limit; the server scopes access and records the loaded Skill."
-)
+from app.consultant.skill_backend import PackageSkillBackend
 
 
 SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 
 你是同一位專業職務分析顧問；下列 Skills 是可按需載入的方法，不是多個人格或固定階段。
-本輪只有列出的 Skills 可用。每個實際用來形成結果的 Skill，都必須先用 read_file 完整讀取一次；不要重複讀取，也不要嘗試其他路徑。
-先判斷現有 context 是否已足夠；足夠時不要為了展示而呼叫 Tool。彼此獨立的 Skill 與員工來源讀取可在同一波平行呼叫，不固定先後；只有前一波結果產生新的資料依賴時才使用第二波。
+本輪只有列出的 Skills 可用。每個實際用來形成結果的 Skill，都必須先用 read_file 完整讀取一次；只能讀取列出的 /skills/<skill-id>/SKILL.md。
+先判斷現有 context 是否已足夠；足夠時不要為了展示而呼叫 Tool。/skills、/sources、/approved、/pending 是唯讀 workspace；/candidate 是本輪唯一可編輯的候選 workspace。只有前一波結果產生新的資料依賴時才使用第二波 lookup wave。
 
 {skills_locations}{skills_load_warnings}
 
@@ -61,13 +46,10 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 讀完本輪實際選用的方法後，把它們共同整合成一份結構化顧問結果。員工畫面只呈現一位顧問、必要的待審文件變更與至多一個主要問題；不得把 Skill 編排暴露成員工要操作的流程。
 
 **提交前的最小契約：**
-- 不得自行編造 UUID。只有 context 明列的既有 ID 才可引用；新理解、新焦點與新 Gap 的 ID 留空，由應用程式配置。
-- 使用 candidate edit Tool 新增 Duty／Task／OPKS 時，每個新實體給同一 candidate batch 內唯一的 `entity_ref`；同批新實體之間以 `duty_ref`、`task_refs` 或 `indicator_refs` 關聯，正式 UUID 由應用程式配置。
-- 新增 Duty／Task／OPKS 時 `display_order=-1`，由應用程式配置排序；每個 ADD 只提交一個實體。完整實體 ADD 使用 `field=whole_entity`；`field=top_level_value` 只用於 job_title／work_description。
-- 每個 document change 只有 `field` 對應的 payload slot 可帶內容；未使用的 `text_value=""`、未使用的 `integer_value=-1`、未使用的 `uuid_value=""`，其餘未使用陣列一律為空。
-- Task／Duty 的拆分或合併使用 ADD／REVISE／WITHDRAW／REASSIGN／REORDER 與 dependency／`atomic_group_ref` 組合；不要使用專用 split／merge operation。必須共同成立的 actions 放在同一原子群組供員工整組裁決。
-- quote anchor 可留空；一般事實可只列 `source_ids`。若使用 anchor，`quote` 必須逐字存在於該來源，`start` 是 0-based 起點、`end` 是 exclusive 終點且等於 `start + len(quote)`；不得填 999 等占位值。
-- O／P／K／S 文件變更必須以 `task_ids` 連到 context 已有 Task，或以 `task_refs` 連到同一 candidate batch 新增的 Task；不得提交沒有 Task linkage 的 O／P／K／S。
+- 詳細 Current JD、pending review、員工來源與方法內容都從對應 VFS 路徑讀取；不要把整份資料複製到回覆或 context。
+- 先用 editor verbs 編輯 /candidate/<run-id>/ 下的 canonical resources；編輯後必須在獨立 wave 呼叫 check_candidate_document，依 compact observation 修復問題。
+- Evidence 只填 `source_handle`、逐字 `quote`、必要時的 1-based `occurrence` 與使用的 `skill_ids`；不要填 offset、stable source UUID 或自行推導的位置。
+- O／P／K／S 文件變更必須以 canonical resource 的 task handle 連到 Task；不得提交沒有 Task linkage 的 O／P／K／S。
 - `question.kind=none` 時其他 question 欄位全為空、`basis_ordinal=0`。
 - 一般下一題（next）只填 `text`、`answer_target`、`reason`、`basis_ordinal`；`current_understanding、choices、affected_work_ids、affected_branch 全部留空`。
 - 必要澄清（required_clarification）才填 `current_understanding`、2–3 個 `choices`、既有 `affected_work_ids` 與 `affected_branch`，且 `answer_target` 留空。
@@ -77,15 +59,13 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 @dataclass(frozen=True)
 class ProfessionalConsultantAgent:
     graph: Any
-    skill_backend: DirectPackageSkillBackendAdapter | PackageSkillBackend
-    workspace_binding: ConsultantWorkspaceBackendBinding | None = None
+    skill_backend: PackageSkillBackend
+    workspace_binding: ConsultantWorkspaceBackendBinding
 
     def invoke(self, *args: Any, **kwargs: Any) -> Any:
-        if self.workspace_binding is not None:
-            raise WorkspaceAgentAsyncOnlyError(
-                "workspace consultant agents are async-only; use ainvoke()"
-            )
-        return self.graph.invoke(*args, **kwargs)
+        raise WorkspaceAgentAsyncOnlyError(
+            "workspace consultant agents are async-only; use ainvoke()"
+        )
 
     async def ainvoke(self, *args: Any, **kwargs: Any) -> Any:
         return await self.graph.ainvoke(*args, **kwargs)
@@ -102,6 +82,10 @@ class LookupWaveLimitExceeded(RuntimeError):
     pass
 
 
+_LOOKUP_TOOL_NAMES = frozenset({"ls", "read_file", "grep"})
+_LOOKUP_ROOTS = ("/skills", "/sources", "/approved", "/pending")
+
+
 class LookupWaveState(AgentState):
     run_lookup_wave_count: NotRequired[
         Annotated[int, UntrackedValue, PrivateStateAttr]
@@ -109,13 +93,31 @@ class LookupWaveState(AgentState):
 
 
 class LookupWaveLimitMiddleware(AgentMiddleware[LookupWaveState, Any]):
-    """Count one wave per model message, not one per parallel lookup call."""
+    """Count one wave for path-aware reads outside the candidate workspace."""
 
     state_schema = LookupWaveState
 
     def __init__(self, *, tool_names: frozenset[str], run_limit: int) -> None:
         self.tool_names = tool_names
         self.run_limit = run_limit
+
+    def _is_external_lookup(self, call: Mapping[str, Any]) -> bool:
+        name = call.get("name")
+        if name not in _LOOKUP_TOOL_NAMES or name not in self.tool_names:
+            return False
+        args = call.get("args")
+        if not isinstance(args, Mapping):
+            return False
+        raw_path = args.get("file_path", args.get("path"))
+        if raw_path is None and name == "grep":
+            raw_path = "/"
+        if not isinstance(raw_path, str):
+            return False
+        try:
+            path = validate_path(raw_path)
+        except (TypeError, ValueError):
+            return False
+        return any(path == root or path.startswith(root + "/") for root in _LOOKUP_ROOTS)
 
     @override
     def after_model(
@@ -133,7 +135,9 @@ class LookupWaveLimitMiddleware(AgentMiddleware[LookupWaveState, Any]):
             None,
         )
         if last_ai is None or not any(
-            call["name"] in self.tool_names for call in last_ai.tool_calls
+            self._is_external_lookup(call)
+            for call in last_ai.tool_calls
+            if isinstance(call, Mapping)
         ):
             return None
         count = state.get("run_lookup_wave_count", 0) + 1
@@ -158,7 +162,7 @@ class RunScopedSkillsMiddleware(SkillsMiddleware):
         self,
         *,
         backend: BackendProtocol,
-        receipt_backend: DirectPackageSkillBackendAdapter | PackageSkillBackend | None = None,
+        receipt_backend: PackageSkillBackend | None = None,
         workspace_mode: bool = False,
     ) -> None:
         super().__init__(
@@ -273,12 +277,10 @@ def build_professional_consultant_agent(
     model: BaseChatModel,
     execution: ResolvedExecution,
     selected_skill_ids: tuple[str, ...],
-    source_tools: Sequence[BaseTool] = (),
-    candidate_edit_binding: CandidateEditToolBinding | None = None,
     context_middleware: AgentMiddleware | None = None,
     context_schema: type[Any] | None = None,
-    workspace_binding: ConsultantWorkspaceBackendBinding | None = None,
-    candidate_check_binding: CandidateCheckToolBinding | None = None,
+    workspace_binding: ConsultantWorkspaceBackendBinding,
+    candidate_check_binding: CandidateCheckToolBinding,
 ) -> ProfessionalConsultantAgent:
     """Build the bounded agent using Deep Agents' Skill/read-file primitives."""
 
@@ -289,114 +291,54 @@ def build_professional_consultant_agent(
         raise ValueError(f"agent requested ineligible Skills: {sorted(ineligible)}")
     if "read_file" not in execution.allowed_tool_ids:
         raise ValueError("resolved run policy must allow the read_file Skill tool")
-    if execution.max_model_calls > 5:
-        raise ValueError("interactive consultant runs allow at most five model calls")
+    if execution.max_model_calls > 8:
+        raise ValueError("interactive consultant runs allow at most eight model calls")
     if execution.max_lookup_waves > 2:
         raise ValueError("interactive consultant runs allow at most two lookup waves")
+    expected_tools = WORKSPACE_FILESYSTEM_TOOL_NAMES | {
+        "check_candidate_document"
+    }
+    if set(execution.allowed_tool_ids) != expected_tools:
+        raise ValueError("resolved run policy must allow exactly the workspace Tool surface")
+    if workspace_binding.skill_backend.selected_skill_ids != selected_skill_ids:
+        raise ValueError("workspace Skill binding must match selected Skills")
+    if candidate_check_binding.workspace is not workspace_binding:
+        raise ValueError("candidate check binding must use the agent workspace")
 
-    if workspace_binding is not None and source_tools:
-        raise ValueError("workspace agents cannot receive legacy source Tools")
-    if workspace_binding is not None and candidate_edit_binding is not None:
-        raise ValueError("workspace agents cannot receive the legacy candidate Tool")
-    if workspace_binding is not None and candidate_check_binding is None:
-        raise ValueError("workspace agents require a candidate check Tool binding")
-
-    if workspace_binding is None:
-        legacy_backend = DirectPackageSkillBackendAdapter(
-            PackageSkillBackend(selected_skill_ids)
-        )
-        backend: BackendProtocol = legacy_backend
-        receipt_backend: DirectPackageSkillBackendAdapter | PackageSkillBackend = (
-            legacy_backend
-        )
-    else:
-        if workspace_binding.skill_backend.selected_skill_ids != selected_skill_ids:
-            raise ValueError("workspace Skill binding must match selected Skills")
-        if candidate_check_binding is not None and (
-            candidate_check_binding.workspace is not workspace_binding
-        ):
-            raise ValueError("candidate check binding must use the agent workspace")
-        backend = workspace_binding.composite_backend
-        receipt_backend = workspace_binding.skill_backend
-
-    candidate_tools: tuple[BaseTool, ...] = ()
-    check_tools: tuple[BaseTool, ...] = ()
-    if workspace_binding is not None:
-        if not WORKSPACE_FILESYSTEM_TOOL_NAMES.issubset(
-            set(execution.allowed_tool_ids)
-        ) or "check_candidate_document" not in execution.allowed_tool_ids:
-            raise ValueError(
-                "resolved run policy must allow the complete workspace Tool surface"
-            )
-        check_binding = candidate_check_binding
-        assert check_binding is not None
-        check_tools = (
-            build_check_candidate_document_tool(
-                binding=check_binding,
-            ),
-        )
-    elif candidate_edit_binding is not None:
-        if "job_document_candidate_edit" not in execution.allowed_tool_ids:
-            raise ValueError(
-                "resolved run policy must allow the candidate document edit Tool"
-            )
-        if candidate_edit_binding.selected_skill_ids != selected_skill_ids:
-            raise ValueError("candidate Tool binding must match selected Skills")
-        candidate_tools = (
-            build_job_document_candidate_edit_tool(
-                binding=candidate_edit_binding,
-                loaded_skill_ids=lambda: backend.loaded_skill_ids,
-            ),
-        )
+    backend: BackendProtocol = workspace_binding.composite_backend
+    receipt_backend = workspace_binding.skill_backend
+    check_tools = (
+        build_check_candidate_document_tool(binding=candidate_check_binding),
+    )
     skills = RunScopedSkillsMiddleware(
         backend=backend,
-        receipt_backend=(receipt_backend if workspace_binding is not None else None),
-        workspace_mode=workspace_binding is not None,
+        receipt_backend=receipt_backend,
+        workspace_mode=True,
     )
     files = FilesystemMiddleware(
         backend=backend,
-        tools=(
-            sorted(WORKSPACE_FILESYSTEM_TOOL_NAMES)
-            if workspace_binding is not None
-            else ["read_file"]
-        ),
-        custom_tool_descriptions=(
-            WORKSPACE_TOOL_DESCRIPTIONS
-            if workspace_binding is not None
-            else {"read_file": SKILL_READ_TOOL_DESCRIPTION}
-        ),
+        tools=sorted(WORKSPACE_FILESYSTEM_TOOL_NAMES),
+        custom_tool_descriptions=WORKSPACE_TOOL_DESCRIPTIONS,
         system_prompt=None,
         tool_token_limit_before_evict=None,
         human_message_token_limit_before_evict=None,
     )
     lookup_cap = LookupWaveLimitMiddleware(
-        tool_names=frozenset(
-            {
-                "read_file",
-                "employee_source_get",
-                "employee_source_lineage",
-                "employee_source_search",
-            }
-            & set(execution.allowed_tool_ids)
-        ),
+        tool_names=frozenset({"ls", "read_file", "grep"}),
         run_limit=execution.max_lookup_waves,
     )
     graph = build_consultant_agent(
         model=model,
         execution=execution,
         response_schema=ConsultantModelOutput,
-        tools=(*source_tools, *candidate_tools, *check_tools),
+        tools=check_tools,
         additional_middleware=(
-            (
-                skills,
-                files,
-                lookup_cap,
-                WorkspaceToolWaveMiddleware(
-                    candidate_backend=workspace_binding.candidate_backend
-                ),
-            )
-            if workspace_binding is not None
-            else (skills, files, lookup_cap)
+            skills,
+            files,
+            lookup_cap,
+            WorkspaceToolWaveMiddleware(
+                candidate_backend=workspace_binding.candidate_backend
+            ),
         ),
         context_middleware=context_middleware,
         context_schema=context_schema,

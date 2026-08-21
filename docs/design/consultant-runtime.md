@@ -1,7 +1,7 @@
 # AI 職務顧問 runtime 設計
 
-- 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)；compact schema：[ADR 0061](../adr/0061-compact-consultant-wire-progressive-skills-and-tools.md)；read Tool 邊界：[ADR 0062](../adr/0062-bounded-consultant-read-tools-and-structured-authority.md)；候選編輯混合迴圈：[ADR 0063](../adr/0063-hybrid-candidate-edit-tool-and-structured-final-response.md)
-- 狀態：production 已 hard-cut 至 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。model-facing surface 是四個唯讀 Tool＋一個 `job_document_candidate_edit` Tool；文件候選先在同一 product graph 的 run-scoped candidate workspace 真實試套，final Structured Output 只引用最新成功 revision，員工 command 才能更新核准 JD。四個 scripted PostgreSQL canary、hybrid 真模型 smoke、完整 gates 與最終獨立複審均已通過；交付證據見 [`Hybrid Candidate Document Edit Loop 完成報告`](../specs/2026-08-15-hybrid-candidate-loop-completion.md)。
+- 決策：[ADR 0064](../adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md)；durable authority：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
+- 狀態：production 已 hard-cut 至 LangChain／LangGraph 顧問 runtime、purpose-first API／Web、fresh-root storage 與 deterministic export。model-facing surface 精確是 `ls`、`read_file`、`grep`、`write_file`、`edit_file`、`delete`、`check_candidate_document` 七個 Tool，全部走同一個五根目錄 virtual JD workspace；模型編輯 candidate files，application check 只保存 compact checked receipt，final 只引用 receipt 的 revision／digest／ordered action handles，員工 command 才能更新核准 JD。
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
 
 ## 儲存權威
@@ -40,7 +40,7 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 ## 模型執行
 
 - Versioned model profile 只決定 requested model、唯一 provider、有效參數與 timeout；versioned run policy 只決定 eligible Skills／tools、context／call／token／time／cost budget 與 retry。兩者在每次 run 前解析成 immutable `ResolvedExecution`，Skill 不能選模型。
-- `ChatOpenRouter` 承接 provider wire。rich application result 不直接送 provider；LangChain `response_format` 使用 compact Pydantic `ConsultantModelOutput`，再由 fail-closed pure mapper 還原 rich `ConsultantResult`。Evidence 只在 `analysis_bases` 出現一次，回覆與各 effect 用 1-based ordinal 引用；越界、未引用與矛盾 payload 都拒絕。同一位顧問、同一 model profile 的 bounded `create_agent` loop 同時承接四個唯讀 Tool 與一個 candidate edit Tool；final response 不重送 Duty／Task／OPKS 草稿，只能引用同一 run 最新且完整的 persisted candidate receipt。
+- `ChatOpenRouter` 承接 provider wire。rich application result 不直接送 provider；LangChain `response_format` 使用 compact Pydantic `ConsultantModelOutput`，再由 fail-closed pure mapper 還原 rich `ConsultantResult`。Evidence 只填 catalog 可解析的 source handle、exact quote、必要 occurrence 與 Skill IDs；existing resolver 確定性產生 source UUID／offset，模型不提供它們。final response 只帶同一 run checked receipt 的 revision、digest 與 ordered action handles。
 - structured-output strategy 是 versioned model profile 的已解析能力，不由 LangChain 自動猜測或 fallback。現行 `ToolStrategy` 曾產生錯誤的多重輸出工具呼叫，因此 Opus 5／OpenRouter profile 只能選通過 exact conformance 的 provider-native strategy；換模型／provider 也必須重跑窄 canary。這保留可換模型，同時避免把所有 strategy 假定為可互換。
 - model／tool call limit、retry、非權威摘要與唯讀工具結果清理由 LangChain built-in middleware 承接。OpenRouter SDK 自己的通用 retry 關閉；LangChain 1.3.15 `SummarizationMiddleware` 內建的獨立三次 retry也由窄 subclass關閉，所有 primary／必要 contingency finalization／摘要共用同一個 run attempt budget，避免框架內部出現無紀錄重試。
 - provider-facing system message 依 [OpenRouter prompt caching](https://openrouter.ai/docs/guides/best-practices/prompt-caching) 與 [LangChain ChatOpenRouter](https://docs.langchain.com/oss/python/integrations/chat/openrouter) 的 content-block 介面固定排序：framework 組出的顧問／authority／Skill catalog 規則是第一個 stable block，帶 `cache_control={"type":"ephemeral"}`；每個 model step 從 PostgreSQL／LangGraph 重建的 employee／approved／pending／focus／gap／candidate context 是第二個未標記 dynamic block。兩個 block 的合併文字與原本 prompt 相同；cache miss、過期或 provider 不支援只影響成本／延遲，不得影響語意、continuation 或 authority。OpenRouter 對 OpenAI 是自動快取且最低 1,024 input tokens；marker主要保留需要 explicit breakpoint 的 provider 相容性，不把 OpenAI 命中誤稱為 marker 因果。OpenRouter response caching 不啟用，避免舊回答或 Tool call 原樣重播。
@@ -53,30 +53,32 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 每次實際模型推論都由 middleware 依目前 checkpoint snapshot 與 Store 重建 Context，不持久化第二份 Context packet：
 
 1. bounded global orientation 讓模型知道目前已辨識的工作範圍、有效工作假說、核准 Duty／Task、目前工作、Gap 與待審數量；它不是只看核准文件，也不把舊版／retired 理解重新送回模型；
-2. 載入目前焦點的核准文件 slice、目前有效且與焦點相關的可修訂理解、具體 Gap、明示 `approved=false` 的 pending／deferred semantic overlay、最近員工裁決記憶、同 run active candidate、最近有界顧問回合與必要澄清；
-3. checkpoint message 只留帶 stable source ID 的 placeholder；本輪員工原話每次從 Store 逐字重載到明標「不可信 evidence」的 authority Context，明確 required evidence 必帶，相關近期來源在 token budget 內加入；
-4. 只有本輪、required 與近期相關來源的 stable lookup handle 進 prompt；更早來源不列出全部 ID，模型可透過同文件 `employee_source_search`，再以 `employee_source_get`／`employee_source_lineage` 按需讀取。model-facing 名稱不綁 lexical backend，但現階段沒有 semantic index，也沒有連接 Reference／RAG bounded context；
+2. 載入目前焦點的核准文件 slice、目前有效且與焦點相關的可修訂理解、具體 Gap、pending／deferred 數量、最近有界顧問回合與必要澄清；完整文件與 pending details 由 workspace VFS 按需讀取；
+3. checkpoint message 不保存員工原話；本輪員工原話每次從 Store 逐字重載到明標「不可信 evidence」的 authority Context，明確 required evidence 必帶，相關近期來源在 token budget 內加入；
+4. context 保留 current focus、understanding、gaps、progress、pending、required clarification 與 employee turn；完整來源不複製到 system prompt，模型從 `/sources` 以 VFS 按需讀取；
 5. Context selection receipt 只存 ID、hash、原因、revision、Skills、token 與降級資訊，不複製員工文字。
 
 明確降級順序是：先捨棄非權威 dialogue summary，再壓縮 global orientation，再把最近兩個顧問回合縮成正在回答的上一回合，再略過超出預算的近期候選來源。本輪原話、required evidence、必要澄清、blocking Gap、焦點理解與焦點核准 slice 不會被摘要取代；這些 mandatory 內容本身超出 budget 時直接回 typed error。即使 LangChain 已把舊 message history 摘要化，middleware 仍會從 Store 重建 authority Context；tool loop 後續推論不會把員工回答重複追加到 ToolMessage 後面。
 
 ## Model-facing Tool 與 authority 邊界
 
-第一版只暴露五個小型、靜態 Tool；前四個唯讀，第五個只能寫隔離候選：
+現行只暴露七個小型 Tool；四個 root 只讀、candidate root 可用三個 editor verbs，check 是獨立 application boundary：
 
 | Tool | 唯一目的 | 模型提供的輸入 |
 |---|---|---|
-| `read_file` | 完整讀取一份本輪 eligible 的職務分析 Skill | exact `/skills/<skill-id>/SKILL.md` path；`offset`／`limit` 省略 |
-| `employee_source_get` | 已知 stable ID 時取回一筆員工原話 | `source_id` |
-| `employee_source_lineage` | 原話被更正／取代時取回完整 lineage | `source_id` |
-| `employee_source_search` | 不知道 ID 時搜尋同文件目前有效原話 | `query` |
-| `job_document_candidate_edit` | 以一個 strict replacement batch 真實試套 Duty／Task／OPKS 候選並回傳 revision／semantic diff／action handles／可修正錯誤 | `base_candidate_revision`、summary、analysis bases 與 typed replacement changes；文件 scope、authority revision、正式 ID 與 budget 由 application 注入 |
+| `ls` | 列出 scoped virtual workspace entries | absolute POSIX path |
+| `read_file` | 讀取一份 workspace resource 或 Skill | absolute POSIX path |
+| `grep` | 在 scoped workspace 搜尋 literal text | pattern 與 optional path |
+| `write_file` | 建立一份新的 candidate canonical resource | candidate file path 與 text |
+| `edit_file` | 對 candidate resource 做一次 exact replacement | candidate file path、old／new string |
+| `delete` | 刪除一份允許的 candidate entity resource | candidate file path |
+| `check_candidate_document` | 讀取現行 candidate files 並保存 compact checked receipt | 無模型輸入；application 注入 run／document／Skill receipts |
 
-`document_id`、權限、source namespace、搜尋上限、核准 baseline 與正式 ID 配置由 application 注入。來源回傳保留 stable ID、exact text、speaker、validity、timestamp 及 correction pointers；跨文件與不存在來源 fail closed。Tool 定義數只有五個，沒有 Tool Search、MCP catalog、keyword router、另一個 LLM selector 或 provider beta。
+`document_id`、權限、source namespace、核准 baseline、正式 ID 與 receipt 都由 application 注入。workspace 只有 `/skills`、`/sources`、`/approved`、`/pending`、`/candidate/<run-id>` 五根目錄；沒有 Tool Search、MCP catalog、keyword router、另一個 LLM selector 或 provider beta。
 
-Tool Calling 承載的是**候選編輯，不是文件 authority**：模型用一個 strict typed atomic batch 組合 ADD／REVISE／WITHDRAW／REASSIGN／REORDER 等一般 operations，實際 reducer 全成或全敗；過大 Task 可由「新增兩個 Task＋撤回原 Task＋按需重接 Duty／OPKS」完成。model-facing contract 沒有 `split_task`／`merge_duty` Tool，也沒有 MERGE／SPLIT operation；若人類可讀 semantic diff／audit 需要「拆分／合併」標籤，只能由 application 從一般 operations 確定性推導，不能讓它成為另一條模型權限。成功 revision 仍須由 final Structured Output 完整引用後才進 review queue；accept／edit-accept／reject／defer 是員工透過 API 發出的 LangGraph command，模型不能呼叫。必要澄清由 Structured Output 表達，再用 `interrupt()`／`Command(resume=...)` 處理；Focus、Gap 與 Progress 是 durable state／projection，不是 Tool。
+Tool Calling 承載的是**候選編輯，不是文件 authority**：模型以 VFS editor verbs 寫入 canonical resources，獨立的 `check_candidate_document` 讀取實際 after-state 並保存 receipt；check 不直接改 review queue，publish 前再次 exact-match files／digest／ordered action handles。accept／edit-accept／reject／defer 是員工透過 API 發出的 LangGraph command，模型不能呼叫。必要澄清由 Structured Output 表達，再用 `interrupt()`／`Command(resume=...)` 處理；Focus、Gap 與 Progress 是 durable state／projection，不是 Tool。
 
-lookup 由當下資料依賴決定：context 足夠可零呼叫；彼此獨立的 Skill／員工來源可在同一 model response 平行讀取；只有前一波結果產生新依賴才用第二波。lookup 最多兩波；interactive profile 最多五個 model steps，以容納讀取、candidate edit、錯誤修正與 final response，並另受總 Tool／token／time／cost／recursion budget 限制。candidate edit 不算 lookup wave，但仍計總 Tool calls。
+lookup 由當下資料依賴決定：context 足夠可零呼叫；彼此獨立的 Skill／workspace reads 可在同一 model response 平行讀取；只有前一波結果產生新依賴才用第二波。lookup 最多兩波；只計 `/skills`、`/sources`、`/approved`、`/pending` 上的 `ls`／`read_file`／`grep`，candidate reads、editor verbs 與 check 不計入 lookup wave。interactive profile 預設最多八個 model calls，第九次由 framework middleware 拒絕，並另受總 Tool／token／time／cost／recursion budget 限制。
 
 ## 專業分析 Skills 與模型結果閘門
 
@@ -84,16 +86,15 @@ lookup 由當下資料依賴決定：context 足夠可零呼叫；彼此獨立�
 
 第一版可把九個方法的短 metadata catalog 交給 `SkillsMiddleware`，讓同一模型依完整員工回答發現意外的 Task／Duty／OPKS 線索；progressive disclosure 的節省點是只有實際使用的 `SKILL.md` 正文進 context。catalog 中的 Skill 是 **eligible／可發現**，不是 selected／已載入；`PackageSkillBackend.loaded_skill_ids` 與 verifier 必須證明 result 只引用真正完整讀過的方法。若日後 metadata catalog 本身造成可量測的品質／成本問題，再用 typed state narrowing；不得先用脆弱關鍵字 router 或另一個 LLM selector 阻止跨焦點發現。
 
-- Deep Agents `SkillsMiddleware` 只掃描本輪 eligible Skill 的 frontmatter；`FilesystemMiddleware(tools=["read_file"])` 提供唯一 Skill 讀取工具，並以原生 `custom_tool_descriptions` 改成只描述完整讀取 `/skills/<id>/SKILL.md` 的短產品 contract，不把 editing／PDF／paging 等未開放能力送給模型。production 使用自訂 `BackendProtocol` adapter 直接讀 package resources，不使用 host `FilesystemBackend`，也不暴露 ls／glob／grep／write／edit／delete／execute／subagent。
-- `/skills/<id>/SKILL.md` 是唯一可讀路徑。backend 拒絕 traversal、未選 Skill、分頁式不完整讀取與同 run 第二次讀取；metadata discovery 不算模型讀取。互動 agent 不另接 checkpointer／Store，durable product graph只保存 semantic result／receipt；每次 invocation 重新投影 eligible metadata，並拒絕外部輸入夾帶舊 `read_file` ToolMessage，因此前一輪 Skill 全文、metadata 或 load warning 都不能流入本輪。
-- interactive policy 最多五個 model steps、兩個 lookup wave；同一個模型回應中平行載入數個 Skill／source 算一波，不把「多個方法可組合」錯誤限制成最多兩個 Skill，也不固定第一波 Skill、第二波 Source。LangChain 既有 `ModelCallLimitMiddleware`／`ToolCallLimitMiddleware` 繼續管 call／tool 總量，Caliburn 只補框架沒有的「wave」語意。
-- compact provider wire 分成兩個責任：candidate Tool input 承載 strict typed document changes；final `ConsultantModelOutput` 保留員工可見回覆、可修訂理解 delta、動態注意力／待處理 delta、具體 Gap、latest candidate publication reference、至多一個主要問題與可重算充分性建議。兩者全欄 required，以明確 enum、中性 payload／空陣列降低 grammar，而不是刪能力。模型不組自由 JSON Pointer 或任意 `after`；typed target／stable ID／field／payload 經 pure mapper 還原，sentinel、ordinal、payload 或 OPKS linkage 矛盾即拒絕。新實體 ID 與 collection-local order 由 application 配置，每個 ADD 是一個 semantic action；依賴與 atomic subgroup 決定哪些可分開審核。provider wire 沒有核准文件欄位、pause／finish lifecycle、Reference、能力級別或 A。
-- 每個語意 claim 明列 employee source IDs、quote anchors 與實際使用的 Skill IDs。commit 前 deterministic verifier 驗同文件 scope、current source、quote 的 Unicode code-point 起訖位置、selected／loaded Skill、允許的 document path／operation／payload、O／P 單 Task、K／S 文件層多對多 refs，以及具體數量、法規、SOP、公司規則與外部主張的逐字 anchor。模型文字本身永遠不是 evidence。
+- Deep Agents `SkillsMiddleware` 只掃描本輪 eligible Skill 的 frontmatter；一個 shared `FilesystemMiddleware` 暴露七個 workspace Tool，並以 `custom_tool_descriptions` 固定短產品 contract。production 使用自訂 `BackendProtocol` projection，不使用 host `FilesystemBackend`、shell、execute、subagent 或第二份 Store。
+- `/skills/<id>/SKILL.md` 是 Skill 的唯一可讀路徑；其他四個 root 由同一個 composite backend 投影。backend 拒絕 traversal、未選 Skill、分頁式不完整讀取與同 run 第二次讀取；metadata discovery 不算模型讀取。互動 agent 不另接 checkpointer／Store，durable product graph 只保存 semantic result／receipt。
+- interactive policy 預設八個 model calls、兩個 lookup wave；LangChain 既有 `ModelCallLimitMiddleware`／`ToolCallLimitMiddleware` 繼續管 call／tool 總量，Caliburn 只補 path-aware wave 語意。
+- compact provider wire 的 Evidence 僅傳 source handle、exact quote、occurrence 與 Skill IDs；catalog/resolver 在 application 端 deterministic resolve source UUID／offset。final `ConsultantModelOutput` 只傳 checked receipt 的 revision、digest 與 ordered action handles，不傳 provider offsets、source UUID 或完整 receipt。
+- 每個語意 claim 由 provider-neutral source handle、exact quote、occurrence 與實際使用的 Skill IDs 支持。commit 前 deterministic resolver／verifier 驗同文件 scope、current source、quote 的 Unicode code-point 起訖位置、selected／loaded Skill、允許的 document path／operation／payload、O／P 單 Task、K／S 文件層多對多 refs，以及具體數量、法規、SOP、公司規則與外部主張的逐字 anchor。模型文字本身永遠不是 evidence。
 - K／S 必須有有效員工 quote anchor；O 可以在操作型工作沒有獨立產出時保持空白，顧問改留下 Task-boundary gap，不為填表補造文件。能力級別與 A 連 model-facing enum 都不提供；職業／行業分類與 iCAP 配發代碼也不在允許的模型文件路徑。
 
-`job_document_candidate_edit` 將 provider-facing typed target／field／payload映射成實際 `DocumentChangeSet`，配置 stable action ID、before／after、path read-set、dependency 與必要時的 atomic subgroup，並保存為同一 product checkpoint 的 run-scoped candidate revision。final `candidate_publication` 只帶 revision、digest 與完整 action handles；graph 核對後才發布到 review queue。模型仍不能直接寫入核准文件；只有員工 review command 或 direct edit 能進入 document authority graph command。
+VFS editor verbs 將 canonical resources 留在本輪 run-scoped candidate workspace；`check_candidate_document` 產生的 checked receipt 是 check 與 publication 間唯一 durable hand-off。publish 前 application 重新讀取實際 framework files，精確核對 run、baseline、revision、digest 與 ordered action handles；模型仍不能直接寫入核准文件，只有員工 review command 或 direct edit 能進入 document authority graph command。
 
-`active_candidate` 是 checkpoint 內部 run state，不屬於一般 `ConsultantSnapshot`、API、export 或核准文件 projection。Context middleware 在每個 model step 從同一 product checkpoint 重讀，只有 candidate 的 run ID 等於目前 run 才投影明示 `approved=false` 的 active workspace；因此 failed-run retry 可繼續，其他 reopen 不會看到 unpublished candidate，同一 Tool loop 也不會拿到過時 revision。
 
 ## 來源支持、引用與執行證據
 
@@ -132,7 +133,7 @@ LangGraph checkpoint、`StateGraph` command 與 `interrupt()`／`Command(resume)
 新 `/api/v1/job-analysis/consultant-documents` surface 只輸出 purpose-first projection，不暴露 checkpoint raw state、command receipt、Context selection 或 model attempt 內部資料。JSON Schema 生成 Pydantic 與 TypeScript 型別；FastAPI native SSE 只發送帶 revision／run ID 的 refetch notification， durable snapshot 才是狀態權威。
 
 - 建立／讀取／刪除文件、202 source-first answer admission、snapshot、review、calibration、required clarification、direct edit 與單一 export 都走同一 application-scoped runtime；同文件 admission lock 不再因 request-local dependency 而失效。
-- model factory 只在 composition root 注入；`app.consultant` 不直接依賴 OpenRouter adapter。三個 LangChain employee-source tools 已接到真正 agent surface，且只允許同文件 stable-ID get／correction lineage／bounded search；目前 search backend 仍是 lexical，沒有 semantic retrieval、Reference 或 RAG tool。
+- model factory 只在 composition root 注入；`app.consultant` 不直接依賴 OpenRouter adapter。來源由 `/sources` workspace projection 按需讀取；沒有 semantic retrieval、Reference 或 RAG tool。
 - export readiness 有具體 gap 時回 409，員工以同一入口 `force=true` 明確確認後仍可匯出；pending changeset 不會被匯出或暗中接受。
 - production 只保留 `/consultant-documents` surface；舊 route、舊契約定義與舊 writer 已在 Task 9 同一 hard-cut 移除。沒有 DTO alias、雙寫或 compatibility layer。
 
@@ -174,4 +175,4 @@ Next App Router 頁面只負責掛載 purpose-first Client Component；TanStack 
 
 ## 當前邊界
 
-這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、四個受限唯讀 Tool＋一個隔離 candidate edit Tool、adaptive interview routing、可見理解／Gap／語意進度、hybrid candidate revision／final publication、完整 review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables；inner agent 不建立第二個 checkpointer／Store。scripted product canary 已走真 `create_agent` Tool loop、真 product graph 與 PostgreSQL；hybrid 真模型 smoke、完整 monorepo gates 與獨立複審均已通過。它沒有 RAG／Reference consumer、能力級別／A 生成、auto-accept、multi-agent 或正式品質 eval，也沒有雙寫或 compatibility layer。
+這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、七個 shared-workspace Tool、adaptive interview routing、可見理解／Gap／語意進度、checked receipt／final publication、完整 review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables；inner agent 不建立第二個 checkpointer／Store。scripted product canary 已走真 `create_agent` Tool loop、真 product graph 與 PostgreSQL；它沒有 RAG／Reference consumer、能力級別／A 生成、auto-accept、multi-agent 或正式品質 eval，也沒有雙寫或 compatibility layer。

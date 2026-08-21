@@ -135,7 +135,7 @@ def _execution() -> Any:
         allowed_skill_ids=("output",),
         allowed_tool_ids=tuple(EXPECTED_WORKSPACE_TOOLS),
         max_context_tokens=24_000,
-        max_model_calls=5,
+        max_model_calls=8,
         max_lookup_waves=2,
         max_total_tool_calls=12,
         model_retry_count=0,
@@ -364,25 +364,17 @@ def test_workspace_agent_surface_has_only_framework_editor_verbs_and_check(
         ),
     }
     assert actual == EXPECTED_WORKSPACE_TOOLS
-    assert not actual.intersection(
-        {
-            "glob",
-            "execute",
-            "employee_source_get",
-            "employee_source_lineage",
-            "employee_source_search",
-            "job_document_candidate_edit",
-        }
-    )
+    assert "glob" not in actual
+    assert "execute" not in actual
 
 
-def test_workspace_agent_sync_invoke_fails_fast_but_legacy_agent_keeps_sync_invoke() -> None:
+def test_workspace_agent_sync_invoke_fails_fast() -> None:
     workspace = _workspace_binding()
 
     class SyncGraph:
         def invoke(self, *args: Any, **kwargs: Any) -> str:
             del args, kwargs
-            return "legacy sync result"
+            return "sync result"
 
     workspace_agent = ProfessionalConsultantAgent(
         graph=SyncGraph(),
@@ -391,12 +383,6 @@ def test_workspace_agent_sync_invoke_fails_fast_but_legacy_agent_keeps_sync_invo
     )
     with pytest.raises(RuntimeError, match="async-only"):
         workspace_agent.invoke({"messages": []})
-
-    legacy_agent = ProfessionalConsultantAgent(
-        graph=SyncGraph(),
-        skill_backend=workspace.skill_backend,
-    )
-    assert legacy_agent.invoke({"messages": []}) == "legacy sync result"
 
 
 @pytest.mark.asyncio

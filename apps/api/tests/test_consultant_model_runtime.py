@@ -76,12 +76,16 @@ def _policy(*, skills: tuple[str, ...] = ("work-discovery",)):
         run_kind="interactive_consultation",
         allowed_skill_ids=skills,
         allowed_tool_ids=(
-            "employee_source_get",
-            "employee_source_lineage",
-            "employee_source_search",
+            "ls",
+            "read_file",
+            "grep",
+            "write_file",
+            "edit_file",
+            "delete",
+            "check_candidate_document",
         ),
         max_context_tokens=24_000,
-        max_model_calls=3,
+        max_model_calls=8,
         max_lookup_waves=2,
         max_total_tool_calls=12,
         model_retry_count=1,
@@ -376,11 +380,6 @@ async def test_agent_uses_structured_output_and_builtin_limits_without_fallback(
 
 def test_agent_rejects_tools_outside_the_resolved_run_policy() -> None:
     @tool
-    def employee_source_get(source_id: str) -> str:
-        """Read one employee source by its stable ID."""
-        return source_id
-
-    @tool
     def forbidden_shell(command: str) -> str:
         """A tool that must never enter this consultant runtime."""
         return command
@@ -388,12 +387,6 @@ def test_agent_rejects_tools_outside_the_resolved_run_policy() -> None:
     model = ToolCapableFakeModel(responses=[AIMessage(content="unused")])
     execution = resolve_execution(_profile(), _policy())
 
-    build_consultant_agent(
-        model=model,
-        execution=execution,
-        response_schema=ProbeResult,
-        tools=(employee_source_get,),
-    )
     with pytest.raises(ValueError, match="ineligible tools"):
         build_consultant_agent(
             model=model,
@@ -441,10 +434,10 @@ def test_agent_uses_a_normalized_provider_native_output_schema(monkeypatch) -> N
     assert not ref_nodes
 
 
-def test_five_step_ceiling_rejects_sixth_model_step_and_keeps_candidate_in_total_tool_cap() -> None:
+def test_eight_step_ceiling_rejects_ninth_model_step_and_keeps_workspace_tools_in_total_cap() -> None:
     execution = resolve_execution(
         _profile(),
-        _policy().model_copy(update={"max_model_calls": 5}),
+        _policy().model_copy(update={"max_model_calls": 8}),
     )
     middleware = build_consultant_middleware(
         model=ToolCapableFakeModel(responses=[]),
@@ -454,26 +447,26 @@ def test_five_step_ceiling_rejects_sixth_model_step_and_keeps_candidate_in_total
         item for item in middleware if isinstance(item, ModelCallLimitMiddleware)
     )
     state: dict[str, int] = {}
-    for _ in range(5):
+    for _ in range(8):
         assert model_limit.before_model(state, runtime=None) is None  # type: ignore[arg-type]
         state.update(model_limit.after_model(state, runtime=None) or {})  # type: ignore[arg-type]
-    with pytest.raises(ModelCallLimitExceededError, match=r"run limit \(5/5\)"):
+    with pytest.raises(ModelCallLimitExceededError, match=r"run limit \(8/8\)"):
         model_limit.before_model(state, runtime=None)  # type: ignore[arg-type]
 
     tool_limit = next(
         item for item in middleware if isinstance(item, ToolCallLimitMiddleware)
     )
-    candidate_calls = [
+    workspace_calls = [
         {
-            "name": "job_document_candidate_edit",
+            "name": "edit_file",
             "args": {},
-            "id": f"candidate-{index}",
+            "id": f"workspace-{index}",
             "type": "tool_call",
         }
         for index in range(execution.max_total_tool_calls)
     ]
     allowed = tool_limit.after_model(
-        {"messages": [AIMessage(content="", tool_calls=candidate_calls)]},
+        {"messages": [AIMessage(content="", tool_calls=workspace_calls)]},
         runtime=None,  # type: ignore[arg-type] - middleware does not use runtime
     )
     assert allowed == {
@@ -488,9 +481,9 @@ def test_five_step_ceiling_rejects_sixth_model_step_and_keeps_candidate_in_total
                         content="",
                         tool_calls=[
                             {
-                                "name": "job_document_candidate_edit",
+                                "name": "edit_file",
                                 "args": {},
-                                "id": "candidate-over-limit",
+                                "id": "workspace-over-limit",
                                 "type": "tool_call",
                             }
                         ],

@@ -17,7 +17,6 @@ from pydantic import Field, ValidationError
 from app.consultant.provider_wire import (
     AnalysisBasisTable,
     OutputAnalysisBasis,
-    OutputQuoteAnchor,
     ProviderWireModel as OutputModel,
 )
 from app.consultant.results import (
@@ -36,6 +35,7 @@ from app.consultant.results import (
     VisibleGap,
 )
 from app.consultant.state import InterviewPriority, InterviewWorkStatus, UnderstandingImpact
+from app.consultant.workspace_resources import WorkspaceCatalog
 
 
 NEUTRAL = "none"
@@ -150,11 +150,15 @@ class ConsultantOutputMappingError(ValueError):
     pass
 
 
-def map_consultant_model_output(output: ConsultantModelOutput) -> ConsultantResult:
+def map_consultant_model_output(
+    output: ConsultantModelOutput,
+    *,
+    catalog: WorkspaceCatalog,
+) -> ConsultantResult:
     """Restore one provider wire value without inventing or discarding content."""
 
     try:
-        bases = AnalysisBasisTable(output.analysis_bases)
+        bases = AnalysisBasisTable(output.analysis_bases, catalog=catalog)
         next_question, clarification = _map_question(output.question, bases)
         result = ConsultantResult(
             visible_reply=output.visible_reply,

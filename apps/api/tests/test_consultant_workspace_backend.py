@@ -395,7 +395,7 @@ async def test_async_candidate_create_only_write_is_atomic_in_one_tool_wave(
 
 
 @pytest.mark.asyncio
-async def test_cancelled_async_candidate_tool_waiter_does_not_leak_mutex(
+async def test_cancelled_async_workspace_mutation_waiter_does_not_leak_mutex(
     workspace_binding: ConsultantWorkspaceBackendBinding,
     real_filesystem_tools: FilesystemToolHarness,
 ) -> None:
@@ -444,7 +444,7 @@ async def test_cancelled_async_candidate_tool_waiter_does_not_leak_mutex(
 
 
 @pytest.mark.asyncio
-async def test_many_async_candidate_tool_waiters_do_not_use_default_executor_for_mutex(
+async def test_many_async_workspace_mutation_waiters_do_not_use_default_executor_for_mutex(
     workspace_binding: ConsultantWorkspaceBackendBinding,
     real_filesystem_tools: FilesystemToolHarness,
 ) -> None:

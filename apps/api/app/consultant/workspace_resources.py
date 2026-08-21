@@ -703,6 +703,53 @@ def _sorted_entity_groups(
             ):
                 pending_ids[prefix].append(stable_id)
                 known_by_prefix[prefix].add(stable_id)
+    opks_prefixes = {
+        "output": "o",
+        "indicator": "p",
+        "knowledge": "k",
+        "skill": "s",
+        "attitude": "a",
+    }
+    for changeset in pending:
+        for action in changeset.actions:
+            parts = action.path.strip("/").split("/")
+            collection = parts[0] if parts else ""
+            prefix = {"duties": "duty", "tasks": "task"}.get(collection)
+            if collection == "opks":
+                payloads = [
+                    payload
+                    for value in (action.after, action.before)
+                    for payload in (
+                        value
+                        if isinstance(value, list)
+                        else [value]
+                    )
+                    if isinstance(payload, dict)
+                ]
+                prefix = next(
+                    (
+                        opks_prefixes.get(str(payload.get("kind")))
+                        for payload in payloads
+                        if opks_prefixes.get(str(payload.get("kind"))) is not None
+                    ),
+                    None,
+                )
+                if prefix is None:
+                    target_key_parts = action.target_key.split(":", 3)
+                    if len(target_key_parts) > 2:
+                        prefix = opks_prefixes.get(target_key_parts[2])
+            if prefix is None:
+                continue
+            historical_ids: list[UUID] = list(action.target_ids)
+            if len(parts) >= 2:
+                try:
+                    historical_ids.append(UUID(parts[1]))
+                except ValueError:
+                    pass
+            for stable_id in historical_ids:
+                if stable_id not in known_by_prefix[prefix]:
+                    pending_ids[prefix].append(stable_id)
+                    known_by_prefix[prefix].add(stable_id)
     return tuple(
         (prefix, values + tuple(sorted(pending_ids[prefix], key=str)))
         for prefix, values in groups

@@ -205,3 +205,54 @@ fix: close Task 7 review gaps
 ```
 
 After commit, obtain the reproducible identifier with `git rev-parse HEAD` in this worktree; no SHA or commit count is recorded here.
+
+## Review round 2/5
+
+### RED and actual runtime shape
+
+- The controller-requested test-only change from `published.approved_document` to `accepted.approved_document` produced the expected valid RED. An accepted split removes the old entity from the approved snapshot while the accepted changeset still contains the old target identity; pending projection then failed in `_pending_target_handles` with `unknown stable ID`.
+- This is the same shape used by `run_service.py`: it builds `WorkspaceCatalog.from_snapshot(snapshot.approved_document, pending=pending, sources=all_sources)` for the next run. No separate test-only runtime path was introduced.
+
+### Minimal GREEN fix
+
+- `WorkspaceCatalog._sorted_entity_groups` keeps the existing current-snapshot mapping and existing pending `ADD` mapping unchanged, then appends only pending action collection-path and `target_ids` identities that are absent from the accepted/current document. Historical handles are therefore stable within that catalog snapshot and do not alter current or ADD handle allocation.
+- Entity kind is explicit: `/duties` and `/tasks` use their collection prefix; `/opks` obtains kind from the action `after` payload, then `before` for `WITHDRAW(after=None)`, with the existing action target-key axis as the narrow field-action fallback. `target_ids` are assigned under their declared collection/kind, so Task/Duty/OPKS identities cannot be merged into one prefix.
+- A small existing-resource canary verifies an OPKS `WITHDRAW` whose `after` is `None` retains its historical output handle from `before.kind`, and an OPKS target action retains the indicator prefix. No generic scanner, second mapping, projection, serializer, store, or runtime layer was added.
+
+### Review GREEN and files
+
+- The six existing lifecycle scenarios remain unchanged in number and still exercise the accepted snapshot path. The only extra coverage is the narrow `WorkspaceCatalog` canary above; no new agent scenario or scripted model was added.
+- Changed files in this round:
+  - `apps/api/app/consultant/workspace_resources.py`
+  - `apps/api/tests/test_consultant_candidate_loop.py`
+  - `apps/api/tests/test_consultant_workspace_resources.py`
+  - `.superpowers/sdd/2026-08-21-deep-agents-virtual-jd-workspace-plan/task-7-report.md`
+
+### Review gate commands and results
+
+All PostgreSQL commands used the explicit disposable `TEST_DATABASE_URL` from the Task 7 gate instructions and completed with zero skips:
+
+```text
+uv run pytest tests/test_consultant_candidate_loop.py -p no:cacheprovider -q
+uv run pytest tests/test_consultant_candidate_loop.py tests/test_consultant_durable_authority_postgres.py tests/test_consultant_interview_flow.py tests/test_consultant_context.py tests/test_app_wiring.py -p no:cacheprovider -q
+uv run pytest tests/test_consultant_workspace_tools.py tests/test_consultant_workspace_backend.py tests/test_consultant_candidate_publication.py -p no:cacheprovider -q
+uv run pytest -p no:cacheprovider -q
+uv run python -m compileall -q app tests
+git diff --check
+```
+
+Every command passed. The report records only reproducible commands; obtain the review commit identifier with `git rev-parse HEAD` after commit rather than recording a SHA or commit count.
+
+### Round 2 north-star and overdesign audit
+
+Approved truth remains the actual accepted snapshot, employee authority remains the only commit seam, and `/pending` remains a read-only `approved: false` semantic projection. Historical pending identities are handles for review readability only; they are not reintroduced into approved content or a new candidate baseline. Current/ADD identity allocation and stable-per-snapshot behavior remain intact. The only necessary production seam is the existing catalog collection; it can be removed only by reintroducing the verified unknown-handle failure. No additional abstraction is justified.
+
+### Review commit
+
+Create the round-two commit with exactly:
+
+```text
+fix: project pending from current approved snapshot
+```
+
+After commit, obtain the reproducible identifier with `git rev-parse HEAD` in this worktree; no SHA or commit count is recorded here.

@@ -1134,7 +1134,7 @@ async def test_runtime_split_candidate_requires_atomic_review_decision(
             next(iter(accepted.review_queue.values()))
         )
         accepted_catalog = WorkspaceCatalog.from_snapshot(
-            published.approved_document,
+            accepted.approved_document,
             pending=(accepted_bundle,),
             sources=await runtime.list_sources(document_id),
         )

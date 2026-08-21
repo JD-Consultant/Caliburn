@@ -8,6 +8,7 @@ from threading import Lock
 
 from deepagents.backends import BackendProtocol
 from deepagents.backends.protocol import (
+    DeleteResult,
     EditResult,
     FileDownloadResponse,
     FileUploadResponse,
@@ -92,12 +93,14 @@ class PackageSkillBackend(BackendProtocol):
             }
 
     def ls(self, path: str) -> LsResult:
-        if path.rstrip("/") != "/skills" or not _is_safe_absolute_path(path):
-            return LsResult(error="permission denied: only /skills can be listed")
+        if not _is_safe_absolute_path(path):
+            return LsResult(error="permission denied: invalid Skill path")
+        if path.rstrip("/") not in {"", "/"}:
+            return LsResult(error="permission denied: only the Skill mount can be listed")
         return LsResult(
             entries=[
                 {
-                    "path": f"/skills/{skill_id}/",
+                    "path": f"/{skill_id}/",
                     "is_dir": True,
                     "size": 0,
                     "modified_at": "",
@@ -154,7 +157,9 @@ class PackageSkillBackend(BackendProtocol):
         return responses
 
     def write(self, file_path: str, content: str) -> WriteResult:
-        del file_path, content
+        del content
+        if not _is_mount_relative_path(file_path):
+            return WriteResult(error="permission denied: invalid Skill path")
         return WriteResult(error="permission denied: consultant Skills are read-only")
 
     def edit(
@@ -164,8 +169,15 @@ class PackageSkillBackend(BackendProtocol):
         new_string: str,
         replace_all: bool = False,
     ) -> EditResult:
-        del file_path, old_string, new_string, replace_all
+        del old_string, new_string, replace_all
+        if not _is_mount_relative_path(file_path):
+            return EditResult(error="permission denied: invalid Skill path")
         return EditResult(error="permission denied: consultant Skills are read-only")
+
+    def delete(self, file_path: str) -> DeleteResult:
+        if not _is_mount_relative_path(file_path):
+            return DeleteResult(error="permission denied: invalid Skill path")
+        return DeleteResult(error="permission denied: consultant Skills are read-only")
 
     def upload_files(
         self, files_to_upload: list[tuple[str, bytes]]
@@ -176,12 +188,135 @@ class PackageSkillBackend(BackendProtocol):
         ]
 
     def _selected_skill_for_path(self, path: str) -> str | None:
-        if not _is_safe_absolute_path(path):
+        if not _is_mount_relative_path(path):
             return None
         for skill_id in self._selected_skill_ids:
-            if path == skill_path(skill_id):
+            if path == f"/{skill_id}/SKILL.md":
                 return skill_id
         return None
+
+
+class DirectPackageSkillBackendAdapter(BackendProtocol):
+    """Temporary public-path adapter for the pre-Task-4 direct agent seam."""
+
+    def __init__(self, backend: PackageSkillBackend) -> None:
+        self._backend = backend
+
+    @property
+    def selected_skill_ids(self) -> tuple[str, ...]:
+        return self._backend.selected_skill_ids
+
+    @property
+    def loaded_skill_ids(self) -> tuple[str, ...]:
+        return self._backend.loaded_skill_ids
+
+    def begin_run(self) -> None:
+        self._backend.begin_run()
+
+    def ls(self, path: str) -> LsResult:
+        if not _is_safe_absolute_path(path):
+            return LsResult(error="permission denied: invalid Skill path")
+        normalized = path.rstrip("/")
+        if normalized in {"", "/"}:
+            return LsResult(
+                entries=[
+                    {
+                        "path": "/skills/",
+                        "is_dir": True,
+                        "size": 0,
+                        "modified_at": "",
+                    }
+                ]
+            )
+        if normalized != "/skills":
+            return LsResult(error="permission denied: only the Skill mount can be listed")
+        result = self._backend.ls("/")
+        if result.error:
+            return result
+        return LsResult(
+            entries=[
+                {
+                    **entry,
+                    "path": f"/skills{entry['path']}",
+                }
+                for entry in result.entries or []
+            ]
+        )
+
+    def read(
+        self,
+        file_path: str,
+        offset: int = 0,
+        limit: int = 2000,
+    ) -> ReadResult:
+        relative_path = _direct_public_skill_file_path(file_path)
+        if relative_path is None:
+            return ReadResult(
+                error="permission denied: Skill path must use the /skills mount"
+            )
+        return self._backend.read(relative_path, offset=offset, limit=limit)
+
+    def download_files(self, paths: list[str]) -> list[FileDownloadResponse]:
+        responses: list[FileDownloadResponse] = []
+        for path in paths:
+            relative_path = _direct_public_skill_file_path(path)
+            if relative_path is None:
+                responses.append(
+                    FileDownloadResponse(path=path, error="permission_denied")
+                )
+                continue
+            response = self._backend.download_files([relative_path])[0]
+            responses.append(
+                FileDownloadResponse(
+                    path=path,
+                    content=response.content,
+                    error=response.error,
+                )
+            )
+        return responses
+
+    def write(self, file_path: str, content: str) -> WriteResult:
+        relative_path = _direct_public_skill_file_path(file_path)
+        if relative_path is None:
+            return WriteResult(
+                error="permission denied: Skill path must use the /skills mount"
+            )
+        return self._backend.write(relative_path, content)
+
+    def edit(
+        self,
+        file_path: str,
+        old_string: str,
+        new_string: str,
+        replace_all: bool = False,
+    ) -> EditResult:
+        relative_path = _direct_public_skill_file_path(file_path)
+        if relative_path is None:
+            return EditResult(
+                error="permission denied: Skill path must use the /skills mount"
+            )
+        return self._backend.edit(
+            relative_path,
+            old_string,
+            new_string,
+            replace_all=replace_all,
+        )
+
+    def delete(self, file_path: str) -> DeleteResult:
+        relative_path = _direct_public_skill_file_path(file_path)
+        if relative_path is None:
+            return DeleteResult(
+                error="permission denied: Skill path must use the /skills mount"
+            )
+        return self._backend.delete(relative_path)
+
+    def upload_files(
+        self, files_to_upload: list[tuple[str, bytes]]
+    ) -> list[FileUploadResponse]:
+        return [
+            FileUploadResponse(path=path, error="permission_denied")
+            for path, _content in files_to_upload
+        ]
 
 
 def _is_safe_absolute_path(path: str) -> bool:
@@ -189,3 +324,18 @@ def _is_safe_absolute_path(path: str) -> bool:
         return False
     parts = PurePosixPath(path).parts
     return ".." not in parts and "." not in parts
+
+
+def _is_mount_relative_path(path: str) -> bool:
+    return _is_safe_absolute_path(path) and not (
+        path == "/skills" or path.startswith("/skills/")
+    )
+
+
+def _direct_public_skill_file_path(path: str) -> str | None:
+    if not _is_safe_absolute_path(path) or not path.startswith("/skills/"):
+        return None
+    relative_path = path[len("/skills") :]
+    if relative_path == "/" or not _is_mount_relative_path(relative_path):
+        return None
+    return relative_path

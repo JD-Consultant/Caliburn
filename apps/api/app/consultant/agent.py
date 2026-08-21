@@ -24,7 +24,10 @@ from app.consultant.candidate_tool import (
     CandidateEditToolBinding,
     build_job_document_candidate_edit_tool,
 )
-from app.consultant.skill_backend import PackageSkillBackend
+from app.consultant.skill_backend import (
+    DirectPackageSkillBackendAdapter,
+    PackageSkillBackend,
+)
 
 
 SKILL_READ_TOOL_DESCRIPTION = (
@@ -64,7 +67,7 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 @dataclass(frozen=True)
 class ProfessionalConsultantAgent:
     graph: Any
-    skill_backend: PackageSkillBackend
+    skill_backend: DirectPackageSkillBackendAdapter
 
     def invoke(self, *args: Any, **kwargs: Any) -> Any:
         return self.graph.invoke(*args, **kwargs)
@@ -132,7 +135,7 @@ class LookupWaveLimitMiddleware(AgentMiddleware[LookupWaveState, Any]):
 class RunScopedSkillsMiddleware(SkillsMiddleware):
     """Refresh framework Skill metadata so a prior turn cannot leak eligibility."""
 
-    def __init__(self, *, backend: PackageSkillBackend) -> None:
+    def __init__(self, *, backend: DirectPackageSkillBackendAdapter) -> None:
         super().__init__(
             backend=backend,
             sources=[("/skills", "Caliburn")],
@@ -206,7 +209,9 @@ def build_professional_consultant_agent(
     if execution.max_lookup_waves > 2:
         raise ValueError("interactive consultant runs allow at most two lookup waves")
 
-    backend = PackageSkillBackend(selected_skill_ids)
+    backend = DirectPackageSkillBackendAdapter(
+        PackageSkillBackend(selected_skill_ids)
+    )
     candidate_tools: tuple[BaseTool, ...] = ()
     if candidate_edit_binding is not None:
         if "job_document_candidate_edit" not in execution.allowed_tool_ids:

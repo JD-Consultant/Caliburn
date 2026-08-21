@@ -51,6 +51,7 @@ from app.consultant.results import (
 )
 from app.consultant.skill_backend import (
     CONSULTANT_SKILL_IDS,
+    DirectPackageSkillBackendAdapter,
     PackageSkillBackend,
     load_packaged_skill_text,
     skill_path,
@@ -312,27 +313,49 @@ def test_declared_skill_resources_are_tracked_delivery_assets() -> None:
 def test_package_skill_backend_is_selected_only_read_only_and_traversal_safe() -> None:
     backend = PackageSkillBackend(("task-boundary", "output"))
 
-    listing = backend.ls("/skills")
-    assert listing.error is None
-    assert [entry["path"] for entry in listing.entries or []] == [
-        "/skills/output/",
-        "/skills/task-boundary/",
+    mount_listing = backend.ls("/")
+    assert mount_listing.error is None
+    assert [entry["path"] for entry in mount_listing.entries or []] == [
+        "/output/",
+        "/task-boundary/",
     ]
 
-    first = backend.read(skill_path("task-boundary"), offset=0, limit=1000)
+    listing = backend.ls("/skills")
+    assert listing.error is not None
+
+    first = backend.read("/task-boundary/SKILL.md", offset=0, limit=1000)
     assert first.error is None
     assert first.file_data is not None
     assert "Task 邊界" in first.file_data["content"]
     assert backend.loaded_skill_ids == ("task-boundary",)
 
-    duplicate = backend.read(skill_path("task-boundary"), offset=0, limit=1000)
+    duplicate = backend.read("/task-boundary/SKILL.md", offset=0, limit=1000)
     assert duplicate.error is not None
     assert "already loaded" in duplicate.error
 
+    assert backend.read(skill_path("task-boundary")).error is not None
     assert backend.read("/skills/knowledge/SKILL.md").error is not None
     assert backend.read("/skills/../knowledge/SKILL.md").error is not None
     assert backend.read("\\skills\\task-boundary\\SKILL.md").error is not None
     assert backend.write("/skills/output/SKILL.md", "replace").error is not None
+
+
+def test_direct_skill_adapter_is_the_only_public_mount_compatibility_seam() -> None:
+    adapter = DirectPackageSkillBackendAdapter(PackageSkillBackend(("output",)))
+
+    root = adapter.ls("/")
+    assert root.error is None
+    assert [entry["path"] for entry in root.entries or []] == ["/skills/"]
+
+    listing = adapter.ls("/skills")
+    assert listing.error is None
+    assert [entry["path"] for entry in listing.entries or []] == [
+        "/skills/output/",
+    ]
+
+    first = adapter.read(skill_path("output"), offset=0, limit=1000)
+    assert first.error is None
+    assert adapter.read("/output/SKILL.md").error is not None
 
 
 @pytest.mark.asyncio
@@ -728,7 +751,7 @@ def test_parallel_skill_and_employee_source_reads_are_one_lookup_wave() -> None:
 
 
 def test_run_scoped_skill_metadata_replaces_stale_framework_state() -> None:
-    backend = PackageSkillBackend(("output",))
+    backend = DirectPackageSkillBackendAdapter(PackageSkillBackend(("output",)))
     middleware = RunScopedSkillsMiddleware(backend=backend)
     update = middleware.before_agent(
         {
@@ -763,7 +786,7 @@ def test_interactive_agent_cannot_reuse_prior_skill_tool_content_or_own_checkpoi
     ).parameters
 
     middleware = RunScopedSkillsMiddleware(
-        backend=PackageSkillBackend(("output",))
+        backend=DirectPackageSkillBackendAdapter(PackageSkillBackend(("output",)))
     )
     with pytest.raises(ValueError, match="stale Skill tool result"):
         middleware.before_agent(

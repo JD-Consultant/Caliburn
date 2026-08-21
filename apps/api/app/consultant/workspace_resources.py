@@ -622,6 +622,17 @@ def _pending_action_handles(
                     f"duplicate pending action_id: {action.action_id}"
                 )
             result[action.action_id] = f"action-{len(result) + 1:03d}"
+    external_ids = sorted(
+        {
+            dependency_id
+            for changeset in pending
+            for dependency_id in changeset.external_dependency_action_ids
+            if dependency_id not in result
+        },
+        key=str,
+    )
+    for dependency_id in external_ids:
+        result[dependency_id] = f"action-{len(result) + 1:03d}"
     return result
 
 
@@ -629,17 +640,18 @@ def _dependency_handles(
     changeset: DocumentChangeSet,
     action_handles: Mapping[UUID, str],
 ) -> tuple[str, ...]:
-    result: list[str] = []
+    dependency_ids = set(changeset.external_dependency_action_ids)
     for action in changeset.actions:
-        for dependency_id in action.depends_on_action_ids:
-            try:
-                handle = action_handles[dependency_id]
-            except KeyError as error:
-                raise WorkspaceResourceError(
-                    f"unknown pending dependency action_id: {dependency_id}"
-                ) from error
-            if handle not in result:
-                result.append(handle)
+        dependency_ids.update(action.depends_on_action_ids)
+
+    result: list[str] = []
+    for dependency_id in sorted(dependency_ids, key=str):
+        try:
+            result.append(action_handles[dependency_id])
+        except KeyError as error:
+            raise WorkspaceResourceError(
+                f"unknown pending dependency action_id: {dependency_id}"
+            ) from error
     return tuple(result)
 
 

@@ -232,6 +232,19 @@ class DocumentSourceLookup:
     async def by_id(self, document_id: UUID, source_id: UUID) -> EmployeeSource:
         return await self.runtime.get_source(document_id, source_id)
 
+    async def current_sources(self, document_id: UUID) -> tuple[EmployeeSource, ...]:
+        """Read only current sources for one document from the runtime.
+
+        The virtual workspace uses this method for lazy projection.  It keeps
+        the document scope and validity rule in the existing lookup boundary
+        instead of copying source records into LangGraph state.
+        """
+
+        sources = await self.runtime.list_sources(document_id)
+        return tuple(
+            source for source in sources if source.validity is SourceValidity.CURRENT
+        )
+
     async def lineage(
         self, document_id: UUID, source_id: UUID
     ) -> tuple[EmployeeSource, ...]:
@@ -297,7 +310,7 @@ class DocumentSourceLookup:
         return tuple(item[2] for item in scored[:limit])
 
 
-def _source_tool_payload(source: EmployeeSource) -> dict[str, Any]:
+def source_payload(source: EmployeeSource) -> dict[str, Any]:
     """Return exact employee evidence without Store/control-plane metadata."""
 
     return {
@@ -318,6 +331,12 @@ def _source_tool_payload(source: EmployeeSource) -> dict[str, Any]:
             else None
         ),
     }
+
+
+def _source_tool_payload(source: EmployeeSource) -> dict[str, Any]:
+    """Compatibility alias for the existing LangChain source tools."""
+
+    return source_payload(source)
 
 
 def build_employee_source_tools(

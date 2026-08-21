@@ -292,12 +292,14 @@ Anthropic 的五分鐘 cache 同樣是 write `1.25x`、read `0.1x`，官方直�
 1. 把 model input 固定排序成兩層：
    - **stable prefix**：顧問角色、authority／安全規則、固定 Tool schema、final publication 規則與短 Skill catalog；
    - **dynamic suffix**：本輪 employee input、approved／pending／focus／gap 投影、candidate revision、按需載入 Skill 內容與 Tool results。
-2. 在 stable system content block 末端加 provider-neutral `cache_control: {"type": "ephemeral"}`。OpenRouter 官方會把這個 Anthropic-style marker 轉成 GPT-5.6 的 `prompt_cache_breakpoint`，也可送往 Anthropic／Google；不在 domain model 引入 provider-specific cache DTO。
+2. 在 stable system content block 末端保留 provider-neutral `cache_control: {"type": "ephemeral"}`。LangChain／OpenRouter 會原樣保存此 wire，供 Anthropic 等需要 explicit breakpoint 的 provider 使用；但 OpenRouter 對 OpenAI 的正式說法是**自動快取且不需額外設定**，最低 prompt size 為 1,024 tokens。因此不得把 GPT-5.6 命中單獨歸功於 marker，也不宣稱目前 Chat Completions route 已把它翻成 OpenAI Responses API 的 `prompt_cache_breakpoint`。OpenAI 目前依賴穩定共同前綴，domain model 仍不引入 provider-specific cache DTO。
 3. 沿用目前 `langchain-openrouter==0.2.7` 的原生 content-block 支援。實際套件 characterization 已確認 `SystemMessage(content=[...cache_control...])` 會原樣進 request，且 LangChain 官方以 `usage_metadata.input_token_details.cache_creation／cache_read` 回報。不要把 `prompt_cache_key` 硬塞進 `model_kwargs`：目前 OpenRouter SDK `chat.send()` 不接受該參數，會形成 runtime error。
 4. 可傳一個不含員工文字的 opaque `session_id` 作 OpenRouter session grouping／觀測。現行 profile 同時指定手動 `provider.order`，OpenRouter 官方明示這會停用 sticky routing；又因目前是 exact provider、禁止 fallback，本來也沒有跨 provider 漂移。因此第一版不得把 `session_id` 宣稱成命中保證，除非日後改 routing policy。
-5. 第一版使用 provider default 短 TTL：Anthropic 五分鐘已覆蓋目前 180 秒 run ceiling；GPT-5.6 explicit cache 的預設／目前唯一 TTL 為 30 分鐘。暫不買 Anthropic 一小時 write `2x`，因員工可自然關頁、隔很久再回來，而 durable continuation 本來就由 PostgreSQL／LangGraph 承接。
+5. 第一版使用 provider default 短 TTL：Anthropic 五分鐘已覆蓋目前 180 秒 run ceiling；OpenAI direct Responses 的 GPT-5.6 explicit cache 預設／目前唯一 TTL 為 30 分鐘，但目前 OpenRouter Chat Completions route 不自行承諾該 direct-API TTL。暫不買 Anthropic 一小時 write `2x`，因員工可自然關頁、隔很久再回來，而 durable continuation 本來就由 PostgreSQL／LangGraph 承接。
 6. 現有 `AttemptUsage.cache_read_tokens／cache_write_tokens` 與 LangChain normalization 已具備；補 characterization test，確認 OpenRouter 的 `cached_tokens／cache_write_tokens` 最終落進 receipt。若 provider 不支援、prefix 太短、過期或 cache miss，行為與結果必須完全相同，只是成本不同。
 7. live canary 以完全相同 stable prefix、不同 dynamic suffix 順序呼叫 3–5 step；記錄每 step 的 write／read token、total cost、latency 與 actual provider。至少第二次後看到 `cache_read_tokens > 0` 才算啟用成功；若沒有，先查 prefix bytes、模型最低 token、TTL 與 route，不可用「可能有 cache」結案。
+
+2026-08-21 真實 canary 先以 877-token input 得到三次零 write／read，符合 OpenAI 1,024-token minimum；沒有加入 filler，而是補上產品原本就會送的三個固定唯讀 Tool schema，使 input 自然達 1,072 tokens。第一步 `write=1,069／read=0`，第二、三步各 `write=39／read=1,030`，requested／actual route 均為 `OpenAI / openai/gpt-5.6-luna`。成功 probe 成本 USD 0.00035855，warm 後單步 USD 0.00004055；完整證據見 [`Consultant Prompt Cache 實作與真實 Provider Smoke`](2026-08-21-consultant-prompt-cache-live-smoke.md)。這證明目前 stable-prefix／framework receipt 路徑有效，但不證明 marker 是 OpenAI 命中的唯一原因。
 
 不採用 OpenRouter **response caching**。它針對整個 request 回傳完全相同舊 response，連 Tool call 都可能原樣重播；訪談與候選 JD 每輪都應取得依最新 context 產生的新判斷，這會帶來 stale candidate／副作用重播風險。Prompt caching 只是重用模型處理過的共同輸入，仍會進行新的推理與輸出，兩者不可混稱。
 

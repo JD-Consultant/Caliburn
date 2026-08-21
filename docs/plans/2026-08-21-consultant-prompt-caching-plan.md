@@ -201,19 +201,23 @@ $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-prompt-caching'
 uv run pytest -p no:cacheprovider tests/test_consultant_context.py tests/test_consultant_model_runtime.py tests/test_consultant_run_service.py tests/test_consultant_agent_and_skills.py -q
 ```
 
-- [ ] **Step 2: 用合成資料順序跑 3–5 個 GPT-5.6 Luna model steps**
+- [x] **Step 2: 用合成資料順序跑 3–5 個 GPT-5.6 Luna model steps**
 
 固定 requested／actual model=`openai/gpt-5.6-luna`、provider=`OpenAI`、fallback disabled；第一個 attempt 應有 `cache_write_tokens > 0`，後續至少一個 attempt 應有 `cache_read_tokens > 0`。若 route、最低 prefix token 或 TTL 導致 miss，記錄實際欄位與原因，不放寬產品 verifier、不重送真實員工資料。
 
-- [ ] **Step 3: 清除精確 disposable document，確認五張表回到前值**
+結果：877-token threshold probe 如預期沒有 cache；加入產品既有三個固定唯讀 Tool schema 後自然達 1,072 tokens，第一步 `write=1,069`，第二、三步各 `read=1,030`，route 全為 `OpenAI / openai/gpt-5.6-luna`。
+
+- [x] **Step 3: 清除精確 disposable document，確認五張表回到前值**
 
 只刪本 smoke 建立的 document ID；檢查 `consultant_documents／checkpoints／checkpoint_blobs／checkpoint_writes／store` 前後計數相同。
+
+實際 cache canary 只走 production model adapter／receipt callback，未建立文件或連線 PostgreSQL，因此沒有 document 可刪；先前完整 API gate 已確認五張表皆為 0，本輪不改變資料庫。
 
 - [x] **Step 4: 寫 smoke report 與產品方向複核**
 
 報告必須列每 step 的 input／output／cache write／cache read／latency／cost／actual route，並確認：員工 authority、動態 context、Evidence、自然關頁續談、RAG 延後範圍都未改變。若 provider 沒回 cache usage，狀態寫「未證明」，不可寫通過。
 
-- [ ] **Step 5: Final gate 與 Commit**
+- [x] **Step 5: Final gate 與 Commit**
 
 ```powershell
 git diff --check
@@ -231,3 +235,4 @@ git commit -m "docs: record consultant prompt cache verification"
 - Scope：沒有 session stickiness、1h TTL、cache DB、provider-specific domain contract 或正式 eval；現行手動 `provider.order` 下不宣稱 `session_id` 能提高命中。
 - Type consistency：OpenRouter 的 `cached_tokens／cache_write_tokens` 只在 adapter 層正規化為 LangChain `cache_read／cache_creation`，再由既有 `AttemptUsage` 保存。
 - Placeholder scan：無 TBD／TODO；live key 不寫入 repo，缺 key 時只能記錄 blocker，不能偽造結果。
+- Live proof：sub-threshold miss 與自然跨過門檻後的 write→read 都照實保留；沒有用 filler、沒有把 OpenAI automatic caching 誤稱為 marker 因果。

@@ -1,10 +1,10 @@
 # 0064. Deep Agents 虛擬 JD 工作區與確定性 Evidence Anchor
 
-- **狀態**：Proposed
+- **狀態**：Accepted
 - **日期**：2026-08-21
-- **Owner 對齊**：owner 已核准「像 Claude／Codex 控制編輯器，但只改候選、員工審後才進 JD」的大方向；本書面決策仍待 owner 明確接受
+- **Owner 對齊**：owner 於 2026-08-21 確認本版完成本 ADR 與兩項 authority／Evidence 缺口後再 merge
 - **研究**：[`2026-08-21-provider-neutral-virtual-jd-editor-and-evidence-anchor-research.md`](../specs/2026-08-21-provider-neutral-virtual-jd-editor-and-evidence-anchor-research.md)
-- **Supersedes（若 Accepted）**：ADR 0060 決定 2／§4.1 對 Deep Agents 僅使用 Skill `read_file`、不暴露其餘 VFS verbs 的限制；ADR 0061 決定 2–4 的 model-facing required-only／fixed payload slots／model-authored Evidence anchor 表示法（只限 filesystem Tool 與 candidate resource，final output 仍維持 compact typed contract）；ADR 0062 決定 1–2 與決定 4 的 model-facing source Tool／payload 形狀；ADR 0063 決定 2–4、10 與決定 11 的初始五次 model-step ceiling；ADR 0063 Rejected Alternatives 中對「完整 Deep Agents virtual filesystem」的整體否決
+- **Supersedes**：ADR 0060 決定 2／§4.1 對 Deep Agents 僅使用 Skill `read_file`、不暴露其餘 VFS verbs 的限制；ADR 0061 決定 2–4 的 model-facing required-only／fixed payload slots／model-authored Evidence anchor 表示法（只限 filesystem Tool 與 candidate resource，final output 仍維持 compact typed contract）；ADR 0062 決定 1–2 與決定 4 的 model-facing source Tool／payload 形狀；ADR 0063 決定 2–4、10 與決定 11 的初始五次 model-step ceiling；ADR 0063 Rejected Alternatives 中對「完整 Deep Agents virtual filesystem」的整體否決
 - **保留**：ADR 0060 的產品行為、framework replacement、單一 durable authority、Store／Saver 事實分工與 no-RAG；ADR 0061 決定 1、5–6 的 model/application 分層、Pydantic／LangChain transport 與完整產品效果，以及 Evidence 的 employee source／exact quote／Skill 語意；ADR 0062 的 application-controlled scope／limit、來源資格與更正語意、必要澄清、員工 command、no Tool Search；ADR 0063 決定 1、5–10、12，以及決定 11 的有界 budget 原則（不保留初始五次 ceiling），包括 tool→result→repair、candidate／approved 分離、revision＋digest＋action handles final reference、pending dependency、員工 authority與 deterministic projection
 
 ## Context

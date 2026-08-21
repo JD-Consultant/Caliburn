@@ -1,7 +1,7 @@
 # Provider-neutral 虛擬 JD 編輯器與確定性 Evidence Anchor 研究
 
 - 日期：2026-08-21
-- 狀態：**設計已與 owner 白話對齊；待 successor ADR 核准後施工**
+- 狀態：**設計與 owner 對齊；ADR 0064 已 Accepted，依 implementation plan 施工**
 - 範圍：候選 JD 編輯、Tool 介面、候選／待審／核准邊界、員工原話定位
 - 不在本輪：RAG／Reference、能力級別、A、auto-accept、正式品質 eval
 - 前置決策：ADR 0060、0061、0062、0063

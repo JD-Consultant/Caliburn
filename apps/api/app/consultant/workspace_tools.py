@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Protocol
 from uuid import UUID
 
-from deepagents.backends.utils import file_data_to_string
+from deepagents.backends.utils import file_data_to_string, validate_path
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ToolCallRequest
 from langchain.tools import ToolRuntime
@@ -103,11 +103,22 @@ def _current_candidate_files(
             "check_candidate_document requires the current workspace files channel"
         )
 
-    prefix = f"/candidate/{binding.workspace.run_id}/"
     files: dict[str, str] = {}
     for raw_path, raw_file in raw_files.items():
-        if not isinstance(raw_path, str) or not raw_path.startswith(prefix):
-            continue
+        if not isinstance(raw_path, str):
+            raise RuntimeError("check_candidate_document found a non-text candidate path")
+        try:
+            canonical_path = binding.workspace.candidate_backend.validate_candidate_file_path(
+                raw_path
+            )
+        except ValueError as error:
+            raise RuntimeError(
+                f"check_candidate_document rejected candidate path {raw_path!r}: {error}"
+            ) from error
+        if canonical_path != raw_path:
+            raise RuntimeError(
+                f"check_candidate_document requires canonical candidate paths: {raw_path!r}"
+            )
         if isinstance(raw_file, str):
             content = raw_file
         elif isinstance(raw_file, bytes):
@@ -118,7 +129,7 @@ def _current_candidate_files(
             raise RuntimeError(
                 f"workspace file {raw_path!r} has an unsupported state value"
             )
-        files[raw_path] = content
+        files[canonical_path] = content
     return dict(sorted(files.items()))
 
 
@@ -138,7 +149,11 @@ def build_check_candidate_document_tool(
     *,
     binding: CandidateCheckToolBinding,
 ) -> BaseTool:
-    """Build the payload-free semantic check Tool for one virtual workspace."""
+    """Build the payload-free async-only semantic check Tool for one workspace.
+
+    The production consultant invokes this Tool through ``ainvoke`` because its
+    CandidateCheckPort is async-only.
+    """
 
     async def check_candidate_document(
         runtime: ToolRuntime[Any, Any],
@@ -168,36 +183,23 @@ def build_check_candidate_document_tool(
     )
 
 
-def _normal_path(path: Any) -> tuple[str, ...] | None:
-    if not isinstance(path, str) or not path.startswith("/"):
-        return None
-    parts = tuple(part for part in path.split("/") if part)
-    return parts
-
-
-def _path_text(parts: tuple[str, ...]) -> str:
-    return "/" + "/".join(parts)
-
-
-def _is_ancestor_or_same(
-    left: tuple[str, ...], right: tuple[str, ...]
-) -> bool:
-    if len(left) > len(right):
-        return False
-    return right[: len(left)] == left
-
-
-def _tool_call_path(tool_call: Mapping[str, Any]) -> tuple[str, ...] | None:
+def _tool_call_path(tool_call: Mapping[str, Any]) -> str | None:
     args = tool_call.get("args")
     if not isinstance(args, Mapping):
         return None
-    return _normal_path(args.get("file_path"))
+    path = args.get("file_path")
+    if not isinstance(path, str) or not path:
+        return None
+    try:
+        return validate_path(path)
+    except (TypeError, ValueError):
+        return None
 
 
 def _ordered_mutation_paths(
     tool_calls: Sequence[Mapping[str, Any]],
-) -> list[tuple[str, tuple[str, ...]]]:
-    result: list[tuple[str, tuple[str, ...]]] = []
+) -> list[tuple[str, str | None]]:
+    result: list[tuple[str, str | None]] = []
     for tool_call in sorted(
         tool_calls,
         key=lambda item: str(item.get("id", "")),
@@ -205,9 +207,7 @@ def _ordered_mutation_paths(
         name = str(tool_call.get("name", ""))
         if name not in WORKSPACE_MUTATION_TOOL_NAMES:
             continue
-        path = _tool_call_path(tool_call)
-        if path is not None:
-            result.append((str(tool_call.get("id", "")), path))
+        result.append((str(tool_call.get("id", "")), _tool_call_path(tool_call)))
     return result
 
 
@@ -221,6 +221,16 @@ def analyze_workspace_wave(
         for tool_call in tool_calls
     )
     mutation_paths = _ordered_mutation_paths(tool_calls)
+    invalid_mutation = next(
+        (call_id for call_id, path in mutation_paths if path is None),
+        None,
+    )
+    if invalid_mutation is not None:
+        return (
+            "Tool wave rejected: every candidate mutation must provide a valid "
+            "file_path accepted by the virtual filesystem. No call in this wave "
+            f"was run (invalid mutation call ID {invalid_mutation!r})."
+        )
     if has_check and any(
         str(tool_call.get("name", "")) in WORKSPACE_MUTATION_TOOL_NAMES
         for tool_call in tool_calls
@@ -231,14 +241,20 @@ def analyze_workspace_wave(
             "then call check_candidate_document in a separate sequential wave."
         )
 
-    for index, (left_id, left_path) in enumerate(mutation_paths):
-        for right_id, right_path in mutation_paths[index + 1 :]:
-            if _is_ancestor_or_same(left_path, right_path) or _is_ancestor_or_same(
-                right_path, left_path
+    valid_mutation_paths = [(call_id, path) for call_id, path in mutation_paths if path is not None]
+    for index, (left_id, left_path) in enumerate(valid_mutation_paths):
+        for right_id, right_path in valid_mutation_paths[index + 1 :]:
+            assert left_path is not None and right_path is not None
+            left_prefix = left_path.rstrip("/") + "/"
+            right_prefix = right_path.rstrip("/") + "/"
+            if (
+                left_path == right_path
+                or right_path.startswith(left_prefix)
+                or left_path.startswith(right_prefix)
             ):
                 return (
                     "Tool wave rejected: candidate mutation paths "
-                    f"{_path_text(left_path)!r} and {_path_text(right_path)!r} "
+                    f"{left_path!r} and {right_path!r} "
                     "overlap. Retry overlapping mutations in separate sequential "
                     f"tool calls (call IDs {left_id!r} and {right_id!r})."
                 )

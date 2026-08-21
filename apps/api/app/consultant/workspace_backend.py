@@ -38,6 +38,7 @@ from deepagents.backends.utils import (
     file_data_to_string,
     grep_matches_from_files,
     slice_read_response,
+    validate_path,
 )
 
 from app.adapters.langgraph.postgres import PostgresConsultantRuntime
@@ -318,6 +319,18 @@ class CandidatePolicyBackend(BackendProtocol):
         if relative in _CANDIDATE_DOCUMENT or _CANDIDATE_ENTITY.fullmatch(relative):
             return None
         return "permission denied: invalid candidate resource path"
+
+    def validate_candidate_file_path(self, path: str) -> str:
+        """Return a framework-canonical current-run resource path or reject it."""
+
+        try:
+            canonical = validate_path(path)
+        except (TypeError, ValueError) as error:
+            raise ValueError(f"permission denied: invalid candidate path: {error}") from error
+        error = self._file_policy(canonical)
+        if error is not None:
+            raise ValueError(error)
+        return canonical
 
     def _scope_policy(self, path: str) -> str | None:
         if not _safe_absolute_path(path):

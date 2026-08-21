@@ -1359,10 +1359,19 @@ class ConsultantContextMiddleware(AgentMiddleware):
             )
         if source_indexes:
             messages[source_indexes[0]] = bundle.messages[-1]
-        stable_system = (
-            request.system_message.text.strip() if request.system_message else ""
-        )
-        dynamic_system = bundle.system_prompt.strip()
+        base_system = request.system_message.text if request.system_message else ""
+        raw_system = base_system + "\n\n" + bundle.system_prompt
+        if raw_system.strip():
+            content_start = len(raw_system) - len(raw_system.lstrip())
+            content_end = len(raw_system.rstrip())
+            stable_boundary = min(
+                max(len(base_system), content_start), content_end
+            )
+            stable_system = raw_system[content_start:stable_boundary]
+            dynamic_system = raw_system[stable_boundary:content_end]
+        else:
+            stable_system = ""
+            dynamic_system = ""
         system_content: list[dict[str, Any]] = []
         if stable_system:
             system_content.append(
@@ -1376,7 +1385,7 @@ class ConsultantContextMiddleware(AgentMiddleware):
             system_content.append(
                 {
                     "type": "text",
-                    "text": ("\n\n" if stable_system else "") + dynamic_system,
+                    "text": dynamic_system,
                 }
             )
         system_message = SystemMessage(content=system_content)

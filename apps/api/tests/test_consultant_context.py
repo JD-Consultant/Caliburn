@@ -692,14 +692,13 @@ async def test_context_middleware_rebinds_tagged_source_without_reordering_tool_
                 ),
                 ToolMessage(content="唯讀工具結果", tool_call_id="lookup-1"),
             ]
+            stable_system = "非權威摘要可以保留，但不能取代來源。" + "  "
             request = ModelRequest(
                 model=FakeMessagesListChatModel(
                     responses=[AIMessage(content="完成")]
                 ),
                 messages=messages,
-                system_message=SystemMessage(
-                    content="非權威摘要可以保留，但不能取代來源。"
-                ),
+                system_message=SystemMessage(content=stable_system),
                 runtime=Runtime(context=runtime_context),
             )
             captured: dict[str, ModelRequest] = {}
@@ -714,7 +713,7 @@ async def test_context_middleware_rebinds_tagged_source_without_reordering_tool_
             assert isinstance(actual.system_message.content, list)
             assert actual.system_message.content[0] == {
                 "type": "text",
-                "text": "非權威摘要可以保留，但不能取代來源。",
+                "text": stable_system,
                 "cache_control": {"type": "ephemeral"},
             }
             dynamic_system = actual.system_message.content[1]
@@ -726,8 +725,7 @@ async def test_context_middleware_rebinds_tagged_source_without_reordering_tool_
                 in dynamic_system["text"]
             )
             assert actual.system_message.text == (
-                "非權威摘要可以保留，但不能取代來源。"
-                + dynamic_system["text"]
+                stable_system + dynamic_system["text"]
             )
             assert actual.messages[0].content == f"[employee source {source_id}]"
             assert isinstance(actual.messages[-1], ToolMessage)

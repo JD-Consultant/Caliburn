@@ -2,9 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Any
-from uuid import UUID
-
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints
 from typing_extensions import Annotated
 
@@ -81,29 +78,22 @@ def resolve_exact_quote(
 
 
 def resolve_evidence_reference(
-    reference: WorkspaceEvidenceReference | Any,
-    catalog: WorkspaceCatalog | Any,
-    *,
-    document_id: UUID | None = None,
+    reference: WorkspaceEvidenceReference,
+    catalog: WorkspaceCatalog,
 ) -> QuoteAnchor:
     """Resolve a local model reference to the existing durable ``QuoteAnchor``.
 
-    The normal argument order is ``(reference, catalog)``.  Accepting the
-    reversed order keeps the boundary tolerant for small application adapters;
-    both values are still type-checked before any source text is read.
+    The reference and catalog are deliberately strict application-boundary
+    types; provider wire models must be converted before resolution.
     """
 
-    if isinstance(reference, WorkspaceCatalog) and not isinstance(catalog, WorkspaceCatalog):
-        reference, catalog = catalog, reference
     if not isinstance(catalog, WorkspaceCatalog):
         raise EvidenceAnchorError("evidence resolution requires a workspace catalog")
-    if not hasattr(reference, "source_handle") or not hasattr(reference, "quote"):
+    if not isinstance(reference, WorkspaceEvidenceReference):
         raise EvidenceAnchorError("invalid evidence reference")
 
-    if document_id is not None and document_id != catalog.document_id:
-        raise EvidenceAnchorError("evidence reference belongs to a different document")
     try:
-        source = catalog.source_for_handle(str(reference.source_handle))
+        source = catalog.source_for_handle(reference.source_handle)
     except KeyError as error:
         raise EvidenceAnchorError("unknown source handle") from error
     if source.document_id != catalog.document_id:
@@ -113,7 +103,7 @@ def resolve_evidence_reference(
 
     match = resolve_exact_quote(
         raw=source.text,
-        quote=str(reference.quote),
+        quote=reference.quote,
         occurrence=reference.occurrence,
     )
     return QuoteAnchor(

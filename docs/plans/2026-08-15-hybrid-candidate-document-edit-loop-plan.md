@@ -1,5 +1,7 @@
 # Hybrid Candidate Document Edit Loop Implementation Plan
 
+**Status:** Tasks 1–7、真模型 smoke、完整 gates 與獨立複審均已完成；逐 Task 證據見 [`north-star audit ledger`](../specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md)，最終結果見 [`completion report`](../specs/2026-08-15-hybrid-candidate-loop-completion.md)。下列 Task 內步驟保留為可重跑施工腳本，最終 coverage checklist 已依 fresh 驗證結果勾選。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 將現行「模型在 final Structured Output 一次交付完整文件草稿」升級成「單一候選文件編輯 Tool 可實際套用、取得錯誤並在同一 run 修正，final Structured Output 只發布經驗證的候選 revision」，同時維持員工接受／修改接受／拒絕前絕不改變核准 JD。
@@ -721,12 +723,12 @@ class ConsultantResult(ResultModel):
 
 ## Final Spec-Coverage Checklist
 
-- [ ] ADR 0063 決定 1／6：Tool Calling＋final Structured Output，final不重送完整文件候選。
-- [ ] 決定 2／3：單一 typed atomic batch Tool，無 operation-per-tool、自由 patch、host path或模型權威 UUID。
-- [ ] 決定 4／5：run-scoped candidate revision、真實 Tool result、同 graph durable recovery、無 approved write edge。
-- [ ] 決定 7／8：pending／decision context明示非核准；員工 accept/edit/reject/defer仍為唯一 authority command。
-- [ ] 決定 9：coverage／depth／decision／gap progress仍為 deterministic projection。
-- [ ] 決定 10／11：恰好五 Tool、lookup最多兩波、model ceiling五步且保留 token/tool/time/cost/recursion budgets。
-- [ ] 決定 12：四個小型 canary＋GPT-5.6 Luna Max smoke；沒有提前建立完整 eval平台。
-- [ ] 產品北極星：一位顧問、動態 Task／Duty／OPKS、原話記憶、必要澄清、Gap、自然續談、單一匯出均未偏移。
-- [ ] 延後邊界：RAG／Reference consumer、能力級別／A模型生成、Auto-accept、multi-agent與正式eval仍未進 production。
+- [x] ADR 0063 決定 1／6：Tool Calling＋final Structured Output，final不重送完整文件候選。
+- [x] 決定 2／3：單一 typed atomic batch Tool，無 operation-per-tool、自由 patch、host path或模型權威 UUID。
+- [x] 決定 4／5：run-scoped candidate revision、真實 Tool result、同 graph durable recovery、無 approved write edge。
+- [x] 決定 7／8：pending／decision context明示非核准；員工 accept/edit/reject/defer仍為唯一 authority command。
+- [x] 決定 9：coverage／depth／decision／gap progress仍為 deterministic projection。
+- [x] 決定 10／11：恰好五 Tool、lookup最多兩波、model ceiling五步且保留 token/tool/time/cost/recursion budgets。
+- [x] 決定 12：四個小型 canary＋GPT-5.6 Luna Max smoke；沒有提前建立完整 eval平台。
+- [x] 產品北極星：一位顧問、動態 Task／Duty／OPKS、原話記憶、必要澄清、Gap、自然續談、單一匯出均未偏移。
+- [x] 延後邊界：RAG／Reference consumer、能力級別／A模型生成、Auto-accept、multi-agent與正式eval仍未進 production。

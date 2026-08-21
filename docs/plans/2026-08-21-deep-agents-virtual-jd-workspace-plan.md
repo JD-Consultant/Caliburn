@@ -162,7 +162,7 @@ Expected: import error，因兩個新 module 尚不存在。
 class WorkspaceEvidenceReference(WorkspaceModel):
     source_handle: Handle
     quote: NonEmptyText
-    occurrence: int = Field(default=1, ge=1)
+    occurrence: int | None = Field(default=None, ge=1)
     skill_ids: tuple[SkillId, ...] = Field(min_length=1)
 
 def canonical_resource_json(value: BaseModel) -> str:
@@ -176,7 +176,7 @@ def canonical_resource_json(value: BaseModel) -> str:
 ```python
 def test_resolver_finds_second_chinese_occurrence_in_raw_source() -> None:
     anchor = resolve_exact_quote(raw="核對訂單，再核對訂單。", quote="核對訂單", occurrence=2)
-    assert (anchor.start, anchor.end) == (7, 11)
+    assert (anchor.start, anchor.end) == (6, 10)
 
 def test_resolver_rejects_read_file_gutter() -> None:
     with pytest.raises(EvidenceAnchorError, match="quote does not occur"):
@@ -379,7 +379,7 @@ Commit: `refactor: publish verified virtual JD candidates`
 
 ---
 
-### Task 6: Hard-cut model wire、來源 Tool 與五步 profile
+### Task 6: Hard-cut model wire、來源 Tool 與八步 profile
 
 **Files:**
 - Modify: `apps/api/app/consultant/agent.py`
@@ -505,7 +505,7 @@ Expected: 零 unexpected failure；任何既存環境問題要用證據區分，
 
 - [ ] **Step 3: 跑 GPT-5.6 Luna 窄 live smoke**
 
-只使用本專案 `apps/api/.env` 的 key/base URL，不輸出 secret。情境必須實際產生至少一次 edit error或domain diagnostic，再由模型修正、check成功與final publication；記錄每 model step、Tool名稱/status、cache write/read tokens、cost、latency、requested/actual provider。額外用 owner指定的第二 profile做一次窄 probe；若不可用，記實際 provider錯誤而不換模型冒充。
+只使用本專案 `apps/api/.env` 的 key/base URL，不輸出 secret。以 owner 指定的 GPT-5.6 Luna／max profile 執行窄測；情境必須實際產生至少一次 edit error或domain diagnostic，再由模型修正、check成功與final publication，並記錄每 model step、Tool名稱/status、cache write/read tokens、cost、latency、requested/actual provider。若指定 profile 不可用，記實際 provider錯誤而不換模型冒充。
 
 - [ ] **Step 4: 以 in-app browser 驗證真頁面**
 

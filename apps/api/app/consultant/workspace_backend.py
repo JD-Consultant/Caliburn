@@ -896,6 +896,3 @@ def build_consultant_workspace_backend(
         document_id=document_id,
         initial_files=initial_files,
     )
-
-
-build_workspace_backend_binding = build_consultant_workspace_backend

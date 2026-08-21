@@ -9,11 +9,6 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
 
 from app.consultant.clarification import interrupt_for_required_clarification
-from app.consultant.candidate_workspace import (
-    CandidateWorkspace,
-    VerifiedCandidateStage,
-    materialize_candidate_workspace,
-)
 from app.consultant.document_review import (
     apply_review_command,
     revalidate_after_direct_edit,
@@ -116,16 +111,6 @@ def _apply_command(
         if receipt.baseline_revision != expected_revision:
             raise ValueError("candidate check baseline revision is stale")
         return {"checked_candidate": receipt.model_dump(mode="json")}
-    if action == "stage_candidate_revision":
-        stage = VerifiedCandidateStage.model_validate(command["candidate_stage"])
-        latest_payload = state.get("latest_run")
-        if latest_payload is None:
-            raise ValueError("candidate staging requires an active consultant run")
-        latest = RunReceipt.model_validate(latest_payload)
-        if latest.run_id != stage.run_id or latest.status is not RunStatus.SOURCE_SAVED:
-            raise ValueError("candidate staging does not match the active consultant run")
-        workspace, _ = materialize_candidate_workspace(state, stage)
-        return {"active_candidate": workspace.model_dump(mode="json")}
     receipt_payload = command.get("command_receipt")
     command_receipt = (
         CommandReceipt.model_validate(receipt_payload)
@@ -227,7 +212,6 @@ def _apply_command(
                     "registered answer requires a source-saved run receipt"
                 )
             update["latest_run"] = receipt.model_dump(mode="json")
-        update["active_candidate"] = None
         return update
     if action == "restart_consultant_run":
         receipt = RunReceipt.model_validate(command["run_receipt"])
@@ -243,11 +227,6 @@ def _apply_command(
         ):
             raise ValueError("consultant retry does not match the failed run")
         update["latest_run"] = receipt.model_dump(mode="json")
-        active_payload = state.get("active_candidate")
-        if active_payload is not None:
-            active = CandidateWorkspace.model_validate(active_payload)
-            if active.run_id != receipt.run_id:
-                update["active_candidate"] = None
         return update
     if action == "mark_consultant_run_failed":
         receipt = RunReceipt.model_validate(command["run_receipt"])
@@ -273,7 +252,6 @@ def _apply_command(
             raise ValueError("approved document does not match thread document_id")
         update.update(_source_state_update(state, source_reference))
         update["approved_document"] = approved.model_dump(mode="json")
-        update["active_candidate"] = None
         update.update(
             revalidate_after_direct_edit(
                 state,
@@ -323,7 +301,6 @@ def _apply_command(
         )
         update.update(_source_state_update(state, source_reference))
         update.update(reviewed)
-        update["active_candidate"] = None
         work, current_work_id = normalize_current_work(
             reviewed["interview_work"],
             preferred_work_id=(
@@ -360,7 +337,8 @@ def _apply_command(
                 published_changeset=published_changeset,
             )
         )
-        update["active_candidate"] = None
+        if commit.result.candidate_publication is not None:
+            update["checked_candidate"] = None
         return update
     if action == "decide_understanding_calibration":
         calibration_id = UUID(command["calibration_id"])
@@ -404,24 +382,24 @@ def _published_candidate_changeset(
     publication = commit.result.candidate_publication
     if publication is None:
         return None
-    active_payload = state.get("active_candidate")
-    if active_payload is None:
-        raise ValueError("candidate publication has no active candidate workspace")
-    active = CandidateWorkspace.model_validate(active_payload)
-    if active.run_id != commit.run_id:
+    receipt_payload = state.get("checked_candidate")
+    if receipt_payload is None:
+        raise ValueError("candidate publication has no checked candidate receipt")
+    receipt = CheckedCandidateReceipt.model_validate(receipt_payload)
+    if receipt.run_id != commit.run_id:
         raise ValueError("candidate publication belongs to another consultant run")
-    if active.baseline_revision != expected_revision:
+    if receipt.baseline_revision != expected_revision:
         raise ValueError("candidate publication baseline revision is stale")
-    if active.candidate_revision != publication.candidate_revision:
+    if receipt.candidate_revision != publication.candidate_revision:
         raise ValueError("candidate publication does not reference the latest revision")
-    if active.revision_digest != publication.revision_digest:
+    if receipt.resource_digest != publication.revision_digest:
         raise ValueError("candidate publication digest does not match latest revision")
-    action_ids = tuple(action.action_id for action in active.changeset.actions)
+    action_ids = tuple(action.action_id for action in receipt.changeset.actions)
     if action_ids != publication.action_ids:
         raise ValueError("candidate publication action handles do not match latest revision")
-    if not set(active.used_skill_ids) <= set(commit.result.used_skill_ids):
+    if not set(receipt.used_skill_ids) <= set(commit.result.used_skill_ids):
         raise ValueError("candidate publication used Skills missing from final result")
-    return active.changeset
+    return receipt.changeset
 
 
 def build_consultant_graph(checkpointer: Any, store: Any) -> Any:

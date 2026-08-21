@@ -711,7 +711,6 @@ class ConsultantThreadState(TypedDict, total=False):
     latest_run: dict[str, Any] | None
     command_receipts: dict[str, dict[str, Any]]
     checked_candidate: dict[str, Any] | None
-    active_candidate: dict[str, Any] | None
 
 
 class ConsultantCommandContext(TypedDict, total=False):
@@ -727,7 +726,6 @@ class ConsultantCommandContext(TypedDict, total=False):
         "edit_and_accept_changes",
         "reject_changes",
         "defer_changes",
-        "stage_candidate_revision",
         "check_candidate_document",
         "publish_checked_candidate",
     ]
@@ -744,7 +742,6 @@ class ConsultantCommandContext(TypedDict, total=False):
     rejection_reason: str
     run_receipt: dict[str, Any]
     command_receipt: dict[str, Any]
-    candidate_stage: dict[str, Any]
     checked_candidate: dict[str, Any]
     run_id: str
 
@@ -773,7 +770,6 @@ def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
         "latest_run": None,
         "command_receipts": {},
         "checked_candidate": None,
-        "active_candidate": None,
     }
 
 

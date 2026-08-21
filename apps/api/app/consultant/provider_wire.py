@@ -2,29 +2,19 @@
 
 from __future__ import annotations
 
-from uuid import UUID
+from pydantic import BaseModel, ConfigDict, Field, ValidationError
 
-from pydantic import BaseModel, ConfigDict, Field
-
+from app.consultant.evidence_anchor import EvidenceAnchorError, resolve_evidence_reference
 from app.consultant.results import AnalysisBasis, SkillId
-from app.consultant.state import QuoteAnchor
-from app.consultant.workspace_resources import Handle
+from app.consultant.workspace_resources import (
+    Handle,
+    WorkspaceCatalog,
+    WorkspaceEvidenceReference,
+)
 
 
 class ProviderWireModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
-
-
-class OutputQuoteAnchor(ProviderWireModel):
-    source_id: UUID = Field(description="必須是 context 明列的員工來源 ID")
-    start: int = Field(
-        ge=0, description="quote 在來源文字中的 0-based 起點；不得用占位值"
-    )
-    end: int = Field(
-        gt=0,
-        description="quote 的 exclusive 終點，必須等於 start + len(quote)",
-    )
-    quote: str = Field(min_length=1, description="必須逐字存在於指定員工來源")
 
 
 class OutputEvidenceReference(ProviderWireModel):
@@ -37,11 +27,7 @@ class OutputEvidenceReference(ProviderWireModel):
 
 
 class OutputAnalysisBasis(ProviderWireModel):
-    source_ids: tuple[UUID, ...]
-    quote_anchors: tuple[OutputQuoteAnchor, ...] = Field(
-        description="無法保證逐字位置時可留空，不得用假 offset 占位"
-    )
-    skill_ids: tuple[SkillId, ...]
+    evidence: tuple[OutputEvidenceReference, ...] = Field(min_length=1)
 
 
 class ProviderWireMappingError(ValueError):
@@ -49,8 +35,14 @@ class ProviderWireMappingError(ValueError):
 
 
 class AnalysisBasisTable:
-    def __init__(self, values: tuple[OutputAnalysisBasis, ...]) -> None:
+    def __init__(
+        self,
+        values: tuple[OutputAnalysisBasis, ...],
+        *,
+        catalog: WorkspaceCatalog,
+    ) -> None:
         self._values = values
+        self._catalog = catalog
         self._mapped: dict[int, AnalysisBasis] = {}
         self._used: set[int] = set()
 
@@ -62,18 +54,32 @@ class AnalysisBasisTable:
         self._used.add(ordinal)
         if ordinal not in self._mapped:
             value = self._values[ordinal - 1]
-            self._mapped[ordinal] = AnalysisBasis(
-                source_ids=value.source_ids,
-                quote_anchors=tuple(
-                    QuoteAnchor(
-                        source_id=item.source_id,
-                        start=item.start,
-                        end=item.end,
-                        quote=item.quote,
+            source_ids = []
+            quote_anchors = []
+            skill_ids = []
+            for reference in value.evidence:
+                try:
+                    workspace_reference = WorkspaceEvidenceReference.model_validate(
+                        reference.model_dump(mode="python")
                     )
-                    for item in value.quote_anchors
-                ),
-                skill_ids=value.skill_ids,
+                    anchor = resolve_evidence_reference(
+                        workspace_reference,
+                        self._catalog,
+                    )
+                except (EvidenceAnchorError, ValidationError, ValueError) as error:
+                    raise ProviderWireMappingError(
+                        f"{label} evidence could not be resolved: {error}"
+                    ) from error
+                if anchor.source_id not in source_ids:
+                    source_ids.append(anchor.source_id)
+                quote_anchors.append(anchor)
+                for skill_id in reference.skill_ids:
+                    if skill_id not in skill_ids:
+                        skill_ids.append(skill_id)
+            self._mapped[ordinal] = AnalysisBasis(
+                source_ids=tuple(source_ids),
+                quote_anchors=tuple(quote_anchors),
+                skill_ids=tuple(skill_ids),
             )
         return self._mapped[ordinal]
 

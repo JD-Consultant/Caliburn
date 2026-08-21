@@ -86,33 +86,17 @@ def test_consultant_foundation_directly_imports_langgraph_persistence() -> None:
     assert "langgraph.store.postgres.aio" in imports
 
 
-def test_candidate_workspace_depends_only_on_current_document_authority() -> None:
-    path = API_ROOT / "app" / "consultant" / "candidate_workspace.py"
-    imports = _imports(path)
-    application_imports = {
-        module for module in imports if module.startswith(("app.", "packages."))
-    }
-
-    assert application_imports <= {
-        "app.consultant.candidate_wire",
-        "app.consultant.document_authority",
-        "app.consultant.document_review",
-        "app.consultant.results",
-        "app.consultant.state",
-    }
-    assert not any(
-        module.startswith(
-            (
-                "app.api",
-                "app.core",
-                "app.documents",
-                "app.task_analysis",
-                "app.opks",
-                "app.consultation",
-                "app.adapters",
-                "ocs_contract",
-                "indexer_contract",
-            )
-        )
-        for module in imports
+def test_task6_hard_cut_removes_retired_workspace_modules_and_imports() -> None:
+    retired_files = tuple(
+        API_ROOT / "app" / "consultant" / f"candidate_{suffix}.py"
+        for suffix in ("tool", "wire", "workspace")
     )
+    assert all(not path.exists() for path in retired_files)
+
+    retired_terms = tuple(
+        "candidate_" + suffix
+        for suffix in ("tool", "wire", "workspace")
+    )
+    for path in _production_files():
+        source = path.read_text(encoding="utf-8")
+        assert not any(term in source for term in retired_terms)

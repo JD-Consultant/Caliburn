@@ -164,6 +164,19 @@ def test_model_output_schema_is_closed_and_evidence_is_provider_neutral() -> Non
     assert "format" not in publication_schema["properties"]["action_handles"]["items"]
 
 
+@pytest.mark.parametrize("occurrence", [True, "0"])
+def test_provider_evidence_occurrence_rejects_coercible_non_integers(
+    occurrence: object,
+) -> None:
+    with pytest.raises(ValidationError):
+        OutputEvidenceReference(
+            source_handle="source-001",
+            quote="整理採購需求",
+            occurrence=occurrence,
+            skill_ids=("task-boundary",),
+        )
+
+
 def test_langchain_converts_the_same_final_contract() -> None:
     converted = convert_to_openai_tool(ConsultantModelOutput)
     provider_schema = converted["function"]["parameters"]
@@ -195,6 +208,33 @@ def test_model_evidence_is_resolved_by_handle_quote_and_occurrence() -> None:
     anchor = result.reply_basis.quote_anchors[0]
     assert anchor.source_id == source_id
     assert (anchor.start, anchor.end, anchor.quote) == (7, 9, "採購")
+
+
+def test_occurrence_zero_rejects_an_ambiguous_quote() -> None:
+    source_id = uuid4()
+    duplicate_source = _source(source_id).model_copy(update={"text": "採購與採購"})
+    catalog = WorkspaceCatalog.from_snapshot(
+        ApprovedJobDocument(document_id=DOCUMENT_ID),
+        sources=(duplicate_source,),
+    )
+    output = _output(
+        source_id,
+        analysis_bases=(
+            OutputAnalysisBasis(
+                evidence=(
+                    OutputEvidenceReference(
+                        source_handle="source-001",
+                        quote="採購",
+                        occurrence=0,
+                        skill_ids=("task-boundary",),
+                    ),
+                )
+            ),
+        ),
+    )
+
+    with pytest.raises(ConsultantOutputMappingError, match="multiple times"):
+        map_consultant_model_output(output, catalog=catalog)
 
 
 def test_unknown_handle_or_quote_fails_before_rich_result_mapping() -> None:

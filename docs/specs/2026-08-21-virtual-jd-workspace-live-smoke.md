@@ -10,7 +10,7 @@
 
 最小修正如下：
 
-- provider-facing `occurrence` 改為 required integer；唯一 quote 填 `0`，重複 quote 填 1-based occurrence；
+- provider-facing `occurrence` 改為 required strict integer；唯一 quote 填 `0`，重複 quote 填 1-based occurrence；
 - `AnalysisBasisTable` 將 provider sentinel `0` 映射回 workspace `WorkspaceEvidenceReference.occurrence=None`，正整數原樣保留；
 - agent prompt 明示 sentinel 規則；
 - fixtures、schema contract、mapper 與 runtime regression 一併更新。

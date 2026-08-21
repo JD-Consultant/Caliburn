@@ -316,7 +316,10 @@ describe("employee consultant workspace integration", () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(
       JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body)),
-    ).toMatchObject({ command: "accept_changes" });
+    ).toMatchObject({
+      command: "accept_changes",
+      action_ids: [actionIds.accept],
+    });
 
     const description = screen.getByLabelText("工作描述");
     await user.clear(description);
@@ -326,7 +329,13 @@ describe("employee consultant workspace integration", () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(
       JSON.parse(String((fetchMock.mock.calls[1][1] as RequestInit).body)),
-    ).toMatchObject({ command: "edit_and_accept_changes" });
+    ).toMatchObject({
+      command: "edit_and_accept_changes",
+      action_ids: [actionIds.edit],
+      edited_after_by_action_id: {
+        [actionIds.edit]: "員工確認後的工作描述",
+      },
+    });
 
     await selectWithKeyboard("選取移除變更");
     const rejectionReason = screen.getByLabelText("若要拒絕，可補充原因");
@@ -337,6 +346,7 @@ describe("employee consultant workspace integration", () => {
       JSON.parse(String((fetchMock.mock.calls[2][1] as RequestInit).body)),
     ).toMatchObject({
       command: "reject_changes",
+      action_ids: [actionIds.reject],
       rejection_reason: "目前正式文件仍需要這項內容",
     });
 
@@ -345,7 +355,10 @@ describe("employee consultant workspace integration", () => {
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
     expect(
       JSON.parse(String((fetchMock.mock.calls[3][1] as RequestInit).body)),
-    ).toMatchObject({ command: "defer_changes" });
+    ).toMatchObject({
+      command: "defer_changes",
+      action_ids: [actionIds.defer],
+    });
   });
 
   it("edits a structural Duty suggestion through employee fields without exposing raw JSON or IDs", async () => {

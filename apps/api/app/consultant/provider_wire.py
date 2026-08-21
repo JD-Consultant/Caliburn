@@ -23,6 +23,7 @@ class OutputEvidenceReference(ProviderWireModel):
     source_handle: Handle
     quote: str = Field(min_length=1)
     occurrence: int = Field(
+        strict=True,
         ge=0,
         description="逐字 quote 唯一時填 0；重複時填 1-based occurrence",
     )

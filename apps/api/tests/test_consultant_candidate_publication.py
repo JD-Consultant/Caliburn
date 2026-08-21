@@ -15,12 +15,14 @@ from app.consultant.candidate_publication import (
     publish_checked_candidate,
     resource_digest,
 )
+from app.consultant.document_review import AtomicSubgroupIncomplete, apply_review_command
 from app.consultant.state import (
     ApprovedDuty,
     ApprovedJobDocument,
     ApprovedOpksItem,
     ApprovedOpksKind,
     ApprovedTask,
+    CommandReceipt,
     EmployeeSource,
     EmployeeSourceKind,
     SourceProcessingStatus,
@@ -276,6 +278,39 @@ def test_existing_duty_task_and_opks_edit_emits_fixed_semantic_path(
     assert expected_path in [action.path for action in result.actions]
 
 
+def test_knowledge_text_change_requires_anchored_employee_evidence() -> None:
+    files = _files()
+    path = f"/candidate/{RUN_ID}/opks/k/k-001.json"
+    _json_edit(files, path, text="沒有員工引文的新增知識")
+
+    result = check_candidate_document(
+        _request(files, loaded_skill_ids=("knowledge",)),
+        catalog=_catalog(),
+        existing_review_queue={},
+        interview_work={},
+    )
+
+    assert result.status == "invalid"
+    assert result.receipt is None
+    assert any("anchored" in issue.lower() for issue in result.issues)
+
+
+def test_receipt_uses_loaded_skill_ids_not_all_selected_skill_ids() -> None:
+    files = _files()
+    _json_edit(files, f"/candidate/{RUN_ID}/header.json", job_title="資深採購專員")
+
+    result = check_candidate_document(
+        _request(files, loaded_skill_ids=("output",)),
+        catalog=_catalog(),
+        existing_review_queue={},
+        interview_work={},
+    )
+
+    assert result.status == "checked", result.issues
+    assert result.receipt is not None
+    assert result.receipt.used_skill_ids == ("output",)
+
+
 @pytest.mark.parametrize(
     ("kind", "handle", "skill_id"),
     [
@@ -413,13 +448,30 @@ def test_task_split_is_general_atomic_resource_diff() -> None:
         "revise",
         "withdraw",
     }
-    groups = {
-        action.atomic_subgroup_id
-        for action in result.actions
-        if action.atomic_subgroup_id is not None
-    }
+    groups = {action.atomic_subgroup_id for action in result.actions}
     assert len(groups) == 1
+    atomic_group = next(iter(groups))
+    assert atomic_group is not None
     assert len(result.actions) >= 7
+
+    assert result.receipt is not None
+    state = {
+        "approved_document": _document().model_dump(mode="json"),
+        "review_queue": {
+            str(result.receipt.changeset.changeset_id): result.receipt.changeset.model_dump(
+                mode="json"
+            )
+        },
+        "interview_work": {},
+    }
+    with pytest.raises(AtomicSubgroupIncomplete):
+        apply_review_command(
+            state,
+            action="accept_changes",
+            changeset_id=result.receipt.changeset.changeset_id,
+            action_ids=(result.actions[0].action_id,),
+            revision=8,
+        )
 
 
 def test_invalid_linkage_returns_issues_without_a_receipt() -> None:
@@ -625,6 +677,11 @@ def test_graph_check_then_publication_moves_exact_receipt_atomically() -> None:
             ).model_dump(mode="json"),
         }
     )
+    command_receipt = CommandReceipt(
+        command_id=uuid5(DOCUMENT_ID, "candidate-publication-command"),
+        command_kind="publish_checked_candidate",
+        payload_sha256="a" * 64,
+    )
 
     class Runtime:
         def __init__(self, context: dict[str, object]) -> None:
@@ -652,9 +709,13 @@ def test_graph_check_then_publication_moves_exact_receipt_atomically() -> None:
                 "document_id": str(DOCUMENT_ID),
                 "expected_revision": 7,
                 "run_id": str(RUN_ID),
+                "command_receipt": command_receipt.model_dump(mode="json"),
             }
         ),
     )
     assert published["revision"] == 8
     assert published["checked_candidate"] is None
     assert set(published["review_queue"]) == {str(receipt.changeset.changeset_id)}
+    assert published["command_receipts"][str(command_receipt.command_id)] == (
+        command_receipt.model_dump(mode="json")
+    )

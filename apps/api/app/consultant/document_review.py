@@ -481,6 +481,18 @@ def _link_required_groups(
                     creator = creators.get(("/opks", str(indicator_id)))
                     if creator is not None:
                         depend(index, creator)
+        if action.path.endswith("/task_ids") and isinstance(action.after, list):
+            for task_id in action.after:
+                creator = creators.get(("/tasks", str(task_id)))
+                if creator is not None:
+                    depend(index, creator)
+                    atomic_links.add((index, creator))
+        if action.path.endswith("/indicator_ids") and isinstance(action.after, list):
+            for indicator_id in action.after:
+                creator = creators.get(("/opks", str(indicator_id)))
+                if creator is not None:
+                    depend(index, creator)
+                    atomic_links.add((index, creator))
 
     removed: list[tuple[int, str, str]] = []
     for index, action in enumerate(actions):

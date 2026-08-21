@@ -74,6 +74,8 @@ class RecordingCheckPort:
         run_id: UUID,
         files: Mapping[str, str],
         tool_call_id: str,
+        selected_skill_ids: tuple[str, ...],
+        loaded_skill_ids: tuple[str, ...],
     ) -> Any:
         self.calls.append(
             {
@@ -81,6 +83,8 @@ class RecordingCheckPort:
                 "run_id": run_id,
                 "files": dict(files),
                 "tool_call_id": tool_call_id,
+                "selected_skill_ids": selected_skill_ids,
+                "loaded_skill_ids": loaded_skill_ids,
             }
         )
         return self.result
@@ -427,6 +431,8 @@ async def test_check_tool_uses_hidden_runtime_and_current_files_channel() -> Non
     await check_tool.coroutine(runtime=runtime)  # type: ignore[misc]
     assert port.calls[-1]["tool_call_id"] == "check-002"
     assert port.calls[-1]["files"][header_path] == "{\"job_title\":\"更新後\"}\n"
+    assert port.calls[-1]["selected_skill_ids"] == workspace.skill_backend.selected_skill_ids
+    assert port.calls[-1]["loaded_skill_ids"] == workspace.skill_backend.loaded_skill_ids
 
 
 @pytest.mark.asyncio

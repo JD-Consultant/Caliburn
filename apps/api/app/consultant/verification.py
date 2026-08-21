@@ -62,6 +62,7 @@ _ALLOWED_COLLECTION_PAYLOAD_KEYS = {
     "frequency_text",
     "responsibility_role",
     "enablers",
+    "competency_level",
     "display_order",
     "text",
     "task_ids",
@@ -270,6 +271,8 @@ def verify_candidate_document_changes(
             )
         _verify_document_payload(change.after)
         _verify_change_operation(change.operation.value, change.path)
+        if change.operation.value == "withdraw":
+            continue
         if not change.path.startswith("/opks") and (
             change.opks_kind is not None
             or change.task_ids

@@ -187,3 +187,38 @@ check 的 provider parameters 仍是 empty object（`properties={}`、無 requir
 - 仍只有一個 Task 3 `StateBackend`／`CompositeBackend`；沒有把 candidate files 複製成第二份 durable state，也沒有 publication／authority edge。
 - 未修改 `run_service.py`、publication、authority、model output、policy default 或 ADR 0060；Task 5／6 留待後續 task。
 - `git diff --check` 通過。persistent false-dirty `docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md` 持續未修改、未 stage、未 restore。
+
+## Fix round 2/5（2026-08-22）
+
+本輪只修正 scoped re-review 剩餘的 wave candidate-policy seam 與 provider capture assertion，沒有開始 Task 5 publication 或 Task 6 hard-cut。`WorkspaceToolWaveMiddleware` 現在直接接收同一個 `workspace_binding.candidate_backend`；每個 mutation path 先經 pinned Deep Agents `validate_path` canonicalize，再呼叫既有 `CandidatePolicyBackend.validate_candidate_file_path()`。沒有新增 policy framework、path grammar、state/store 或 transaction layer。
+
+### RED 證據
+
+先把兩個 real `create_agent` + `FilesystemMiddleware` cases 改為 canonical cross-run 與 canonical invalid-resource path，並保留合法 sibling edit：
+
+```text
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_workspace_tools.py::test_cross_run_or_invalid_resource_mutation_rejects_sibling_before_zero_mutation -q -p no:cacheprovider
+```
+
+在 production 接線前結果為 `2 failed in 6.05s`；兩個 case 都觀察到 `['error', 'success']`，證明 invalid mutation 被拒絕但 sibling handler 仍已執行，且 state safety assertion 不能成立。provider regression 同步在 captured schemas 轉 dict 前固定 `len == 7` 與 names 不重複。
+
+### GREEN／framework evidence
+
+- 新增 real framework wave cases 接線後：`2 passed in 4.27s`。
+- brief focused gate：
+
+  ```text
+  $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_workspace_tools.py tests/test_consultant_agent_and_skills.py -q
+  ```
+
+  結果：`63 passed, 2 warnings in 8.52s`。兩個 warning 是 worktree `.pytest_cache` 的 Windows `WinError 5`，不是測試或 production warning。
+- 同一 focused gate 關閉 pytest cache 的 final evidence：`63 passed in 8.47s`。
+- 相關 regression gate（關閉 pytest cache）的 final evidence：`140 passed in 11.79s`。
+- `convert_to_openai_tool()` 的真實 provider capture 仍是恰好七個且無 duplicate names；exact metrics 沒有改變：`ls 1/0/0/1/3/165`、`read_file 3/2/0/1/3/433`、`write_file 2/0/0/1/3/304`、`edit_file 4/1/0/1/3/613`、`delete 1/0/0/1/3/172`、`grep 5/4/3/1/4/1598`、`check_candidate_document 0/0/0/0/2/62`（欄位順序同前表：properties/optional/unions/open_objects/depth/bytes）。check provider schema 仍為空 properties、無 required，沒有 document payload。
+
+### Fix round self-review
+
+- cross-run、canonical invalid resource、missing/invalid path 都在任何 handler 前使整個 wave 的每個 call 回 error；canonical aliases 仍在 framework validation 後比較，並保留同 path／重疊 safety 行為。
+- preflight 與 `FilesystemMiddleware` 共用同一 `CandidatePolicyBackend` policy seam；沒有複製 resource grammar，也沒有第二份 candidate state。
+- production 只改 `agent.py` 的 middleware binding 與 `workspace_tools.py` 的直接 backend plumbing；沒有修改 run service、publication、authority、model output 或 policy defaults。
+- `docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md` 仍是既有 false-dirty，未修改、未 stage、未 restore；沒有 tag、merge 或 push。`git diff --check` 通過。

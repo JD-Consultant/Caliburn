@@ -18,7 +18,10 @@ from langgraph.types import Command
 from pydantic import BaseModel, ConfigDict
 from typing_extensions import override
 
-from app.consultant.workspace_backend import ConsultantWorkspaceBackendBinding
+from app.consultant.workspace_backend import (
+    CandidatePolicyBackend,
+    ConsultantWorkspaceBackendBinding,
+)
 
 
 WORKSPACE_FILESYSTEM_TOOL_NAMES = frozenset(
@@ -183,7 +186,10 @@ def build_check_candidate_document_tool(
     )
 
 
-def _tool_call_path(tool_call: Mapping[str, Any]) -> str | None:
+def _tool_call_path(
+    tool_call: Mapping[str, Any],
+    candidate_backend: CandidatePolicyBackend,
+) -> str | None:
     args = tool_call.get("args")
     if not isinstance(args, Mapping):
         return None
@@ -191,13 +197,15 @@ def _tool_call_path(tool_call: Mapping[str, Any]) -> str | None:
     if not isinstance(path, str) or not path:
         return None
     try:
-        return validate_path(path)
+        canonical_path = validate_path(path)
+        return candidate_backend.validate_candidate_file_path(canonical_path)
     except (TypeError, ValueError):
         return None
 
 
 def _ordered_mutation_paths(
     tool_calls: Sequence[Mapping[str, Any]],
+    candidate_backend: CandidatePolicyBackend,
 ) -> list[tuple[str, str | None]]:
     result: list[tuple[str, str | None]] = []
     for tool_call in sorted(
@@ -207,12 +215,19 @@ def _ordered_mutation_paths(
         name = str(tool_call.get("name", ""))
         if name not in WORKSPACE_MUTATION_TOOL_NAMES:
             continue
-        result.append((str(tool_call.get("id", "")), _tool_call_path(tool_call)))
+        result.append(
+            (
+                str(tool_call.get("id", "")),
+                _tool_call_path(tool_call, candidate_backend),
+            )
+        )
     return result
 
 
 def analyze_workspace_wave(
     tool_calls: Sequence[Mapping[str, Any]],
+    *,
+    candidate_backend: CandidatePolicyBackend,
 ) -> str | None:
     """Return one deterministic rejection for a conflicting complete tool wave."""
 
@@ -220,7 +235,7 @@ def analyze_workspace_wave(
         str(tool_call.get("name", "")) == CHECK_CANDIDATE_DOCUMENT_TOOL_NAME
         for tool_call in tool_calls
     )
-    mutation_paths = _ordered_mutation_paths(tool_calls)
+    mutation_paths = _ordered_mutation_paths(tool_calls, candidate_backend)
     invalid_mutation = next(
         (call_id for call_id, path in mutation_paths if path is None),
         None,
@@ -277,8 +292,14 @@ def _last_ai_tool_calls(state: Any) -> Sequence[Mapping[str, Any]]:
     return ()
 
 
-def _wave_error_message(request: ToolCallRequest) -> ToolMessage:
-    conflict = analyze_workspace_wave(_last_ai_tool_calls(request.state))
+def _wave_error_message(
+    request: ToolCallRequest,
+    candidate_backend: CandidatePolicyBackend,
+) -> ToolMessage:
+    conflict = analyze_workspace_wave(
+        _last_ai_tool_calls(request.state),
+        candidate_backend=candidate_backend,
+    )
     if conflict is None:
         raise RuntimeError("workspace wave was not conflicting")
     tool_call = request.tool_call
@@ -293,14 +314,23 @@ def _wave_error_message(request: ToolCallRequest) -> ToolMessage:
 class WorkspaceToolWaveMiddleware(AgentMiddleware):
     """Reject a complete conflicting workspace wave before any handler runs."""
 
+    def __init__(self, *, candidate_backend: CandidatePolicyBackend) -> None:
+        self._candidate_backend = candidate_backend
+
     @override
     async def awrap_tool_call(
         self,
         request: ToolCallRequest,
         handler: Callable[[ToolCallRequest], Awaitable[ToolMessage | Command[Any]]],
     ) -> ToolMessage | Command[Any]:
-        if analyze_workspace_wave(_last_ai_tool_calls(request.state)) is not None:
-            return _wave_error_message(request)
+        if (
+            analyze_workspace_wave(
+                _last_ai_tool_calls(request.state),
+                candidate_backend=self._candidate_backend,
+            )
+            is not None
+        ):
+            return _wave_error_message(request, self._candidate_backend)
         return await handler(request)
 
     @override
@@ -309,6 +339,12 @@ class WorkspaceToolWaveMiddleware(AgentMiddleware):
         request: ToolCallRequest,
         handler: Callable[[ToolCallRequest], ToolMessage | Command[Any]],
     ) -> ToolMessage | Command[Any]:
-        if analyze_workspace_wave(_last_ai_tool_calls(request.state)) is not None:
-            return _wave_error_message(request)
+        if (
+            analyze_workspace_wave(
+                _last_ai_tool_calls(request.state),
+                candidate_backend=self._candidate_backend,
+            )
+            is not None
+        ):
+            return _wave_error_message(request, self._candidate_backend)
         return handler(request)

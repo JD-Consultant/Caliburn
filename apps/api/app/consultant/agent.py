@@ -387,7 +387,14 @@ def build_professional_consultant_agent(
         response_schema=ConsultantModelOutput,
         tools=(*source_tools, *candidate_tools, *check_tools),
         additional_middleware=(
-            (skills, files, lookup_cap, WorkspaceToolWaveMiddleware())
+            (
+                skills,
+                files,
+                lookup_cap,
+                WorkspaceToolWaveMiddleware(
+                    candidate_backend=workspace_binding.candidate_backend
+                ),
+            )
             if workspace_binding is not None
             else (skills, files, lookup_cap)
         ),

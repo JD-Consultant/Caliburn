@@ -292,7 +292,10 @@ Run: `cd apps/api && uv run pytest tests/test_consultant_workspace_tools.py -q`
 `WorkspaceToolWaveMiddleware.awrap_tool_call()` 從最後一個 AI message 的完整 `tool_calls` 建立 deterministic wave plan。若包含 check＋mutation或 mutation paths相同／ancestor-descendant，依 tool_call_id 全部回相同 actionable `ToolMessage(status="error")`；不依 completion order上鎖後放行部分呼叫。
 
 ```python
-conflict = analyze_workspace_wave(last_ai_message.tool_calls)
+conflict = analyze_workspace_wave(
+    last_ai_message.tool_calls,
+    candidate_backend=workspace_binding.candidate_backend,
+)
 if conflict is not None:
     return ToolMessage(name=name, tool_call_id=tool_call_id, status="error", content=conflict)
 return await handler(request)

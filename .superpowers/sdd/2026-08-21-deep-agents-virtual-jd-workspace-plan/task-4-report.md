@@ -222,3 +222,7 @@ $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_con
 - preflight 與 `FilesystemMiddleware` 共用同一 `CandidatePolicyBackend` policy seam；沒有複製 resource grammar，也沒有第二份 candidate state。
 - production 只改 `agent.py` 的 middleware binding 與 `workspace_tools.py` 的直接 backend plumbing；沒有修改 run service、publication、authority、model output 或 policy defaults。
 - `docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md` 仍是既有 false-dirty，未修改、未 stage、未 restore；沒有 tag、merge 或 push。`git diff --check` 通過。
+
+## Docs-only clarification（2026-08-22）
+
+Task 4 Step 3 的非可執行 `analyze_workspace_wave` 範例已補上 `candidate_backend=workspace_binding.candidate_backend`，與 production signature 及目前 workspace policy binding 一致；本次未修改 production/tests，亦未重跑 broad gates。

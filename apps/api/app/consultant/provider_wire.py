@@ -26,6 +26,15 @@ class OutputQuoteAnchor(ProviderWireModel):
     quote: str = Field(min_length=1, description="必須逐字存在於指定員工來源")
 
 
+class OutputEvidenceReference(ProviderWireModel):
+    """Model-facing evidence reference before application-side resolution."""
+
+    source_handle: str
+    quote: str = Field(min_length=1)
+    occurrence: int | None = Field(default=None, ge=1)
+    skill_ids: tuple[SkillId, ...] = Field(min_length=1)
+
+
 class OutputAnalysisBasis(ProviderWireModel):
     source_ids: tuple[UUID, ...]
     quote_anchors: tuple[OutputQuoteAnchor, ...] = Field(

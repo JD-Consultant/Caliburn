@@ -1,0 +1,902 @@
+"""Canonical typed resources for the consultant virtual JD workspace.
+
+The resources deliberately contain local handles instead of authority IDs.
+``WorkspaceCatalog`` is the application-owned bridge back to the approved
+snapshot; the JSON files are a disposable model-editable projection.
+"""
+
+from __future__ import annotations
+
+import json
+import re
+from dataclasses import dataclass, field
+from enum import StrEnum
+from types import MappingProxyType
+from typing import Any, Iterable, Mapping, Sequence
+from uuid import UUID, uuid5
+
+from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
+from typing_extensions import Annotated
+
+from app.consultant.results import SkillId
+from app.consultant.state import (
+    ApprovedDuty,
+    ApprovedEnabler,
+    ApprovedEnablerKind,
+    ApprovedJobDocument,
+    ApprovedOpksItem,
+    ApprovedOpksKind,
+    ApprovedResponsibilityRole,
+    ApprovedTask,
+    DocumentChangeSet,
+    DocumentPatchAction,
+    DocumentPatchOperation,
+    EmployeeSource,
+)
+
+
+NonEmptyText = Annotated[str, StringConstraints(min_length=1)]
+Handle = Annotated[
+    str,
+    StringConstraints(
+        min_length=5,
+        pattern=r"^[a-z][a-z0-9]*(?:-[a-z0-9]+)*-[0-9]{3,}$",
+    ),
+]
+
+
+class WorkspaceModel(BaseModel):
+    model_config = ConfigDict(extra="forbid", frozen=True)
+
+
+class CandidateHeaderResource(WorkspaceModel):
+    job_title: NonEmptyText | None = None
+    occupation_category_name: NonEmptyText | None = None
+    occupation_name: NonEmptyText | None = None
+    occupation_code: NonEmptyText | None = None
+    industry_name: NonEmptyText | None = None
+    industry_code: NonEmptyText | None = None
+    work_description: NonEmptyText | None = None
+    notes: NonEmptyText | None = None
+
+
+class CandidateDutyResource(WorkspaceModel):
+    handle: Handle
+    statement: NonEmptyText
+
+
+class CandidateEnablerResource(WorkspaceModel):
+    kind: ApprovedEnablerKind
+    name: NonEmptyText
+
+
+class CandidateTaskResource(WorkspaceModel):
+    handle: Handle
+    duty_handle: Handle | None = None
+    statement: NonEmptyText
+    action: NonEmptyText
+    object: NonEmptyText
+    purpose_result: NonEmptyText | None = None
+    context: NonEmptyText | None = None
+    frequency_text: NonEmptyText | None = None
+    responsibility_role: ApprovedResponsibilityRole | None = None
+    enablers: tuple[CandidateEnablerResource, ...] = ()
+
+
+class CandidateOpksKind(StrEnum):
+    OUTPUT = "output"
+    PERFORMANCE_INDICATOR = "indicator"
+    KNOWLEDGE = "knowledge"
+    SKILL = "skill"
+
+
+class WorkspaceEvidenceReference(WorkspaceModel):
+    source_handle: Handle
+    quote: NonEmptyText
+    occurrence: int | None = Field(default=None, ge=1)
+    skill_ids: tuple[SkillId, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def skill_references_are_unique(self) -> WorkspaceEvidenceReference:
+        if len(self.skill_ids) != len(set(self.skill_ids)):
+            raise ValueError("duplicate Skill dependency")
+        return self
+
+
+class CandidateOpksResource(WorkspaceModel):
+    handle: Handle
+    kind: CandidateOpksKind
+    text: NonEmptyText
+    task_handles: tuple[Handle, ...] = ()
+    indicator_handles: tuple[Handle, ...] = ()
+    evidence: tuple[WorkspaceEvidenceReference, ...] = ()
+
+    @model_validator(mode="after")
+    def references_are_unique(self) -> CandidateOpksResource:
+        for label, values in (
+            ("task_handles", self.task_handles),
+            ("indicator_handles", self.indicator_handles),
+        ):
+            if len(values) != len(set(values)):
+                raise ValueError(f"duplicate {label}")
+        return self
+
+
+class CandidateReviewGroup(WorkspaceModel):
+    handle: Handle
+    action_handles: tuple[Handle, ...] = ()
+    depends_on_handles: tuple[Handle, ...] = ()
+
+
+class CandidateReviewGroupsResource(WorkspaceModel):
+    groups: tuple[CandidateReviewGroup, ...] = ()
+
+
+class CandidateDocumentDraft(WorkspaceModel):
+    """The typed after-state reconstructed from candidate resources."""
+
+    approved_document: ApprovedJobDocument
+    evidence_references: tuple[WorkspaceEvidenceReference, ...] = ()
+
+
+class WorkspaceResourceError(ValueError):
+    """A candidate resource cannot be parsed into a valid document draft."""
+
+
+@dataclass(frozen=True, slots=True)
+class WorkspaceCatalog:
+    """Immutable application-side mapping for one approved snapshot."""
+
+    document: ApprovedJobDocument
+    pending: tuple[DocumentChangeSet, ...] = ()
+    sources: tuple[EmployeeSource, ...] = ()
+    _stable_to_handle: Mapping[UUID, str] = field(default_factory=dict, repr=False)
+    _handle_to_stable: Mapping[str, UUID] = field(default_factory=dict, repr=False)
+    _source_by_handle: Mapping[str, EmployeeSource] = field(
+        default_factory=dict, repr=False
+    )
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "pending", tuple(self.pending))
+        object.__setattr__(self, "sources", tuple(self.sources))
+        object.__setattr__(
+            self,
+            "_stable_to_handle",
+            MappingProxyType(dict(self._stable_to_handle)),
+        )
+        object.__setattr__(
+            self,
+            "_handle_to_stable",
+            MappingProxyType(dict(self._handle_to_stable)),
+        )
+        object.__setattr__(
+            self,
+            "_source_by_handle",
+            MappingProxyType(dict(self._source_by_handle)),
+        )
+
+    @classmethod
+    def from_snapshot(
+        cls,
+        document: ApprovedJobDocument,
+        pending: Sequence[DocumentChangeSet] | DocumentChangeSet = (),
+        sources: Sequence[EmployeeSource] = (),
+        *,
+        employee_sources: Sequence[EmployeeSource] | None = None,
+    ) -> WorkspaceCatalog:
+        if isinstance(pending, EmployeeSource):
+            pending_values: tuple[DocumentChangeSet, ...] = ()
+            positional_sources: tuple[EmployeeSource, ...] = (pending,)
+        elif isinstance(pending, Sequence) and pending and all(
+            isinstance(item, EmployeeSource) for item in pending
+        ):
+            pending_values = ()
+            positional_sources = tuple(pending)
+        else:
+            pending_values = (
+                (pending,)
+                if isinstance(pending, DocumentChangeSet)
+                else tuple(pending)
+            )
+            positional_sources = tuple(sources)
+        source_values = tuple(
+            sorted(
+                employee_sources
+                if employee_sources is not None
+                else positional_sources,
+                key=lambda source: (source.created_at, str(source.source_id)),
+            )
+        )
+
+        stable_to_handle: dict[UUID, str] = {}
+        handle_to_stable: dict[str, UUID] = {}
+
+        def add_mapping(stable_id: UUID, handle: str) -> None:
+            if stable_id in stable_to_handle or handle in handle_to_stable:
+                return
+            stable_to_handle[stable_id] = handle
+            handle_to_stable[handle] = stable_id
+
+        for prefix, values in _sorted_entity_groups(document, pending_values):
+            for index, stable_id in enumerate(values, start=1):
+                add_mapping(stable_id, f"{prefix}-{index:03d}")
+
+        source_ids = {source.source_id for source in source_values}
+        source_ids.update(
+            source_id
+            for item in document.opks
+            for source_id in item.evidence_source_ids
+        )
+        for changeset in pending_values:
+            source_ids.update(changeset.source_ids)
+            source_ids.update(
+                source_id
+                for action in changeset.actions
+                for source_id in action.source_ids
+            )
+            source_ids.update(
+                anchor.source_id
+                for action in changeset.actions
+                for anchor in action.quote_anchors
+            )
+        source_by_id = {source.source_id: source for source in source_values}
+        source_order = sorted(
+            source_ids,
+            key=lambda source_id: (
+                0,
+                source_by_id[source_id].created_at,
+                str(source_id),
+            )
+            if source_id in source_by_id
+            else (1, str(source_id)),
+        )
+        for index, source_id in enumerate(source_order, start=1):
+            add_mapping(source_id, f"source-{index:03d}")
+
+        source_by_handle = {
+            stable_to_handle[stable_id]: source
+            for stable_id, source in source_by_id.items()
+            if stable_to_handle.get(stable_id, "").startswith("source-")
+        }
+        return cls(
+            document=document,
+            pending=pending_values,
+            sources=source_values,
+            _stable_to_handle=stable_to_handle,
+            _handle_to_stable=handle_to_stable,
+            _source_by_handle=source_by_handle,
+        )
+
+    @property
+    def document_id(self) -> UUID:
+        return self.document.document_id
+
+    @property
+    def handle_by_id(self) -> Mapping[UUID, str]:
+        return self._stable_to_handle
+
+    @property
+    def id_by_handle(self) -> Mapping[str, UUID]:
+        return self._handle_to_stable
+
+    @property
+    def stable_id_to_handle(self) -> Mapping[UUID, str]:
+        return self._stable_to_handle
+
+    @property
+    def handle_to_stable_id(self) -> Mapping[str, UUID]:
+        return self._handle_to_stable
+
+    @property
+    def stable_to_handle(self) -> Mapping[UUID, str]:
+        return self._stable_to_handle
+
+    @property
+    def handle_to_stable(self) -> Mapping[str, UUID]:
+        return self._handle_to_stable
+
+    @property
+    def source_handle_by_id(self) -> Mapping[UUID, str]:
+        return MappingProxyType(
+            {
+                stable_id: handle
+                for stable_id, handle in self._stable_to_handle.items()
+                if handle.startswith("source-")
+            }
+        )
+
+    @property
+    def source_by_handle(self) -> Mapping[str, EmployeeSource]:
+        return self._source_by_handle
+
+    @property
+    def source_ids(self) -> tuple[UUID, ...]:
+        return tuple(
+            stable_id
+            for stable_id, handle in self._stable_to_handle.items()
+            if handle.startswith("source-")
+        )
+
+    def handle_for_id(self, stable_id: UUID) -> str:
+        try:
+            return self._stable_to_handle[stable_id]
+        except KeyError as error:
+            raise KeyError(f"unknown stable ID: {stable_id}") from error
+
+    def id_for_handle(self, handle: str) -> UUID:
+        try:
+            return self._handle_to_stable[handle]
+        except KeyError as error:
+            raise KeyError(f"unknown workspace handle: {handle}") from error
+
+    def source_for_handle(self, handle: str) -> EmployeeSource:
+        try:
+            return self._source_by_handle[handle]
+        except KeyError as error:
+            if handle in self._handle_to_stable:
+                raise KeyError(f"source is not materialized for handle: {handle}") from error
+            raise KeyError(f"unknown source handle: {handle}") from error
+
+    def source_handle_for_id(self, source_id: UUID) -> str:
+        handle = self.handle_for_id(source_id)
+        if not handle.startswith("source-"):
+            raise KeyError(f"stable ID is not an employee source: {source_id}")
+        return handle
+
+
+def canonical_resource_json(value: BaseModel) -> str:
+    """Serialize one resource without provider- or platform-specific drift."""
+
+    return (
+        json.dumps(value.model_dump(mode="json"), ensure_ascii=False, indent=2)
+        + "\n"
+    )
+
+
+def project_candidate_files(
+    catalog: WorkspaceCatalog,
+    *,
+    run_id: UUID | str,
+) -> dict[str, str]:
+    run = str(run_id)
+    root = f"/candidate/{run}"
+    files: dict[str, str] = {
+        f"{root}/header.json": canonical_resource_json(_header_resource(catalog.document))
+    }
+
+    for duty in _sorted_by_display_order(catalog.document.duties):
+        resource = CandidateDutyResource(
+            handle=catalog.handle_for_id(duty.duty_id),
+            statement=duty.statement,
+        )
+        files[f"{root}/duties/{resource.handle}.json"] = canonical_resource_json(resource)
+
+    for task in _sorted_by_display_order(catalog.document.tasks):
+        resource = CandidateTaskResource(
+            handle=catalog.handle_for_id(task.task_id),
+            duty_handle=(
+                catalog.handle_for_id(task.duty_id)
+                if task.duty_id is not None
+                else None
+            ),
+            statement=task.statement,
+            action=task.action,
+            object=task.object,
+            purpose_result=task.purpose_result,
+            context=task.context,
+            frequency_text=task.frequency_text,
+            responsibility_role=task.responsibility_role,
+            enablers=tuple(
+                CandidateEnablerResource(kind=item.kind, name=item.name)
+                for item in task.enablers
+            ),
+        )
+        files[f"{root}/tasks/{resource.handle}.json"] = canonical_resource_json(resource)
+
+    for kind, prefix in (
+        (ApprovedOpksKind.OUTPUT, "o"),
+        (ApprovedOpksKind.PERFORMANCE_INDICATOR, "p"),
+        (ApprovedOpksKind.KNOWLEDGE, "k"),
+        (ApprovedOpksKind.SKILL, "s"),
+    ):
+        for item in _sorted_opks(catalog.document.opks, kind):
+            resource = CandidateOpksResource(
+                handle=catalog.handle_for_id(item.item_id),
+                kind=CandidateOpksKind(item.kind.value),
+                text=item.text,
+                task_handles=tuple(
+                    catalog.handle_for_id(task_id) for task_id in item.task_ids
+                ),
+                indicator_handles=tuple(
+                    catalog.handle_for_id(indicator_id)
+                    for indicator_id in item.indicator_ids
+                ),
+            )
+            files[f"{root}/opks/{prefix}/{resource.handle}.json"] = canonical_resource_json(resource)
+
+    files[f"{root}/review-groups.json"] = canonical_resource_json(
+        _project_review_groups(catalog)
+    )
+    return files
+
+
+def parse_candidate_files(
+    catalog: WorkspaceCatalog,
+    files: Mapping[str, str | bytes],
+    *,
+    run_id: UUID | str | None = None,
+) -> CandidateDocumentDraft:
+    parsed: dict[str, Any] = {}
+    expected_run = str(run_id) if run_id is not None else None
+    for path, raw in files.items():
+        path_text = str(path)
+        match = re.fullmatch(r"/candidate/([^/]+)/(.*)", path_text)
+        if match is None:
+            raise WorkspaceResourceError(f"unexpected candidate resource path: {path_text}")
+        path_run, relative = match.groups()
+        if expected_run is not None and path_run != expected_run:
+            raise WorkspaceResourceError("candidate resource belongs to another run")
+        if expected_run is None:
+            expected_run = path_run
+        try:
+            value = json.loads(raw.decode("utf-8") if isinstance(raw, bytes) else raw)
+        except (TypeError, ValueError) as error:
+            raise WorkspaceResourceError(f"invalid JSON resource: {path_text}") from error
+        parsed[relative] = value
+
+    for relative in parsed:
+        if (
+            relative not in {"header.json", "review-groups.json"}
+            and not relative.startswith("duties/")
+            and not relative.startswith("tasks/")
+            and not relative.startswith("opks/")
+        ):
+            raise WorkspaceResourceError(f"unexpected candidate resource: {relative}")
+
+    header_value = parsed.get("header.json")
+    if header_value is None:
+        raise WorkspaceResourceError("candidate header.json is required")
+    header = _validate_resource(CandidateHeaderResource, header_value, "header.json")
+    duty_resources = _load_entity_resources(parsed, "duties", CandidateDutyResource)
+    task_resources = _load_entity_resources(parsed, "tasks", CandidateTaskResource)
+    opks_resources = _load_opks_resources(parsed)
+    review_groups = parsed.get("review-groups.json")
+    if review_groups is not None:
+        _validate_resource(CandidateReviewGroupsResource, review_groups, "review-groups.json")
+
+    duties = _parse_duties(catalog, duty_resources)
+    duty_ids = {item.handle: item.duty.duty_id for item in duties}
+    tasks = _parse_tasks(catalog, task_resources, duty_ids)
+    task_ids = {item.handle: item.task.task_id for item in tasks}
+    opks, evidence_references = _parse_opks(catalog, opks_resources, task_ids)
+    opks = _restore_baseline_attitudes(catalog.document.opks, opks)
+
+    try:
+        document = ApprovedJobDocument(
+            schema_version=catalog.document.schema_version,
+            document_id=catalog.document.document_id,
+            job_title=header.job_title,
+            occupation_category_name=header.occupation_category_name,
+            occupation_name=header.occupation_name,
+            occupation_code=header.occupation_code,
+            industry_name=header.industry_name,
+            industry_code=header.industry_code,
+            work_description=header.work_description,
+            competency_level=catalog.document.competency_level,
+            notes=header.notes,
+            duties=tuple(item.duty for item in duties),
+            tasks=tuple(item.task for item in tasks),
+            opks=tuple(item.item for item in opks),
+        )
+    except ValueError as error:
+        raise WorkspaceResourceError(str(error)) from error
+    return CandidateDocumentDraft(
+        approved_document=document,
+        evidence_references=tuple(evidence_references),
+    )
+
+
+def _header_resource(document: ApprovedJobDocument) -> CandidateHeaderResource:
+    return CandidateHeaderResource(
+        job_title=document.job_title,
+        occupation_category_name=document.occupation_category_name,
+        occupation_name=document.occupation_name,
+        occupation_code=document.occupation_code,
+        industry_name=document.industry_name,
+        industry_code=document.industry_code,
+        work_description=document.work_description,
+        notes=document.notes,
+    )
+
+
+def _project_review_groups(catalog: WorkspaceCatalog) -> CandidateReviewGroupsResource:
+    return CandidateReviewGroupsResource(
+        groups=tuple(
+            CandidateReviewGroup(
+                handle=f"review-{group_index:03d}",
+                action_handles=tuple(
+                    f"action-{action_index:03d}"
+                    for action_index, _ in enumerate(changeset.actions, start=1)
+                ),
+            )
+            for group_index, changeset in enumerate(catalog.pending, start=1)
+        )
+    )
+
+
+def _sorted_entity_groups(
+    document: ApprovedJobDocument,
+    pending: Sequence[DocumentChangeSet],
+) -> tuple[tuple[str, tuple[UUID, ...]], ...]:
+    groups: list[tuple[str, tuple[UUID, ...]]] = [
+        (
+            "duty",
+            tuple(item.duty_id for item in _sorted_by_display_order(document.duties)),
+        ),
+        (
+            "task",
+            tuple(item.task_id for item in _sorted_by_display_order(document.tasks)),
+        ),
+    ]
+    opks_by_prefix = (
+        ("o", ApprovedOpksKind.OUTPUT),
+        ("p", ApprovedOpksKind.PERFORMANCE_INDICATOR),
+        ("k", ApprovedOpksKind.KNOWLEDGE),
+        ("s", ApprovedOpksKind.SKILL),
+        ("a", ApprovedOpksKind.ATTITUDE),
+    )
+    for prefix, kind in opks_by_prefix:
+        groups.append(
+            (
+                prefix,
+                tuple(item.item_id for item in _sorted_opks(document.opks, kind)),
+            )
+        )
+
+    pending_ids: dict[str, list[UUID]] = {prefix: [] for prefix, _ in groups}
+    known = {stable_id for _, values in groups for stable_id in values}
+    for changeset in pending:
+        for action in changeset.actions:
+            if action.operation is not DocumentPatchOperation.ADD:
+                continue
+            payload = action.after
+            if not isinstance(payload, dict):
+                continue
+            prefix, stable_id = _pending_entity_identity(changeset, action, payload)
+            if stable_id is not None and stable_id not in known:
+                pending_ids[prefix].append(stable_id)
+                known.add(stable_id)
+    return tuple(
+        (prefix, values + tuple(sorted(pending_ids[prefix], key=str)))
+        for prefix, values in groups
+    )
+
+
+def _pending_entity_identity(
+    changeset: DocumentChangeSet,
+    action: DocumentPatchAction,
+    payload: dict[str, Any],
+) -> tuple[str, UUID | None]:
+    collection = action.path.strip("/").split("/", 1)[0]
+    key = {"duties": "duty_id", "tasks": "task_id", "opks": "item_id"}.get(collection)
+    if key is None:
+        return "duty", None
+    raw_id = payload.get(key)
+    if raw_id is None:
+        stable_id = uuid5(changeset.changeset_id, str(action.action_id))
+    else:
+        try:
+            stable_id = UUID(str(raw_id))
+        except (TypeError, ValueError, AttributeError):
+            return "duty", None
+    if collection == "duties":
+        return "duty", stable_id
+    if collection == "tasks":
+        return "task", stable_id
+    return (
+        {
+            "output": "o",
+            "indicator": "p",
+            "knowledge": "k",
+            "skill": "s",
+            "attitude": "a",
+        }.get(str(payload.get("kind")), "o"),
+        stable_id,
+    )
+
+
+def _sorted_by_display_order(values: Iterable[Any]) -> tuple[Any, ...]:
+    return tuple(sorted(values, key=lambda item: (item.display_order, str(_identity(item)))))
+
+
+def _sorted_opks(
+    values: Iterable[ApprovedOpksItem], kind: ApprovedOpksKind
+) -> tuple[ApprovedOpksItem, ...]:
+    return tuple(
+        sorted(
+            (item for item in values if item.kind is kind),
+            key=lambda item: (item.display_order, str(item.item_id)),
+        )
+    )
+
+
+def _identity(value: Any) -> UUID:
+    for name in ("duty_id", "task_id", "item_id"):
+        if hasattr(value, name):
+            return getattr(value, name)
+    raise TypeError(f"unsupported workspace entity: {type(value)!r}")
+
+
+def _load_entity_resources(
+    parsed: Mapping[str, Any],
+    collection: str,
+    model: type[WorkspaceModel],
+) -> tuple[tuple[str, Any], ...]:
+    prefix = f"{collection}/"
+    expected_prefix = {"duties": "duty-", "tasks": "task-"}[collection]
+    values: list[tuple[str, Any]] = []
+    for relative, payload in sorted(parsed.items()):
+        if not relative.startswith(prefix):
+            continue
+        name = relative[len(prefix) :]
+        if "/" in name or not name.endswith(".json"):
+            raise WorkspaceResourceError(f"invalid {collection} resource path: {relative}")
+        handle = name[:-5]
+        resource = _validate_resource(model, payload, relative)
+        if resource.handle != handle:
+            raise WorkspaceResourceError(f"resource handle does not match path: {relative}")
+        if not handle.startswith(expected_prefix):
+            raise WorkspaceResourceError(f"wrong handle kind for {relative}")
+        values.append((handle, resource))
+    return tuple(values)
+
+
+def _load_opks_resources(parsed: Mapping[str, Any]) -> tuple[tuple[str, Any], ...]:
+    values: list[tuple[str, Any]] = []
+    for relative, payload in sorted(parsed.items()):
+        match = re.fullmatch(r"opks/(o|p|k|s)/([^/]+)\.json", relative)
+        if match is None:
+            if relative.startswith("opks/"):
+                raise WorkspaceResourceError(f"invalid OPKS resource path: {relative}")
+            continue
+        prefix, handle = match.groups()
+        resource = _validate_resource(CandidateOpksResource, payload, relative)
+        if resource.handle != handle:
+            raise WorkspaceResourceError(f"resource handle does not match path: {relative}")
+        expected_kind = {
+            "o": CandidateOpksKind.OUTPUT,
+            "p": CandidateOpksKind.PERFORMANCE_INDICATOR,
+            "k": CandidateOpksKind.KNOWLEDGE,
+            "s": CandidateOpksKind.SKILL,
+        }[prefix]
+        if resource.kind is not expected_kind:
+            raise WorkspaceResourceError(f"OPKS kind does not match path: {relative}")
+        values.append((handle, resource))
+    return tuple(values)
+
+
+def _validate_resource(model: type[WorkspaceModel], value: Any, path: str) -> WorkspaceModel:
+    try:
+        return model.model_validate(value)
+    except ValueError as error:
+        raise WorkspaceResourceError(f"invalid resource {path}: {error}") from error
+
+
+@dataclass(frozen=True, slots=True)
+class _DutyDraft:
+    handle: str
+    duty: ApprovedDuty
+
+
+def _parse_duties(
+    catalog: WorkspaceCatalog,
+    values: Sequence[tuple[str, CandidateDutyResource]],
+) -> tuple[_DutyDraft, ...]:
+    existing = {item.duty_id: item for item in catalog.document.duties}
+    next_order = max((item.display_order for item in existing.values()), default=-1) + 1
+    drafts: list[_DutyDraft] = []
+    for index, (handle, resource) in enumerate(values):
+        stable_id = _resolve_entity_id(catalog, handle, "duty")
+        baseline = existing.get(stable_id)
+        drafts.append(
+            _DutyDraft(
+                handle=handle,
+                duty=ApprovedDuty(
+                    duty_id=stable_id,
+                    statement=resource.statement,
+                    display_order=(baseline.display_order if baseline else next_order + index),
+                ),
+            )
+        )
+    return _order_drafts(drafts)
+
+
+@dataclass(frozen=True, slots=True)
+class _TaskDraft:
+    handle: str
+    task: ApprovedTask
+
+
+def _parse_tasks(
+    catalog: WorkspaceCatalog,
+    values: Sequence[tuple[str, CandidateTaskResource]],
+    duty_ids: Mapping[str, UUID],
+) -> tuple[_TaskDraft, ...]:
+    existing = {item.task_id: item for item in catalog.document.tasks}
+    next_order = max((item.display_order for item in existing.values()), default=-1) + 1
+    drafts: list[_TaskDraft] = []
+    for index, (handle, resource) in enumerate(values):
+        stable_id = _resolve_entity_id(catalog, handle, "task")
+        baseline = existing.get(stable_id)
+        duty_id = duty_ids.get(resource.duty_handle) if resource.duty_handle else None
+        if resource.duty_handle and duty_id is None:
+            raise WorkspaceResourceError(f"unknown duty handle: {resource.duty_handle}")
+        drafts.append(
+            _TaskDraft(
+                handle=handle,
+                task=ApprovedTask(
+                    task_id=stable_id,
+                    duty_id=duty_id,
+                    statement=resource.statement,
+                    action=resource.action,
+                    object=resource.object,
+                    purpose_result=resource.purpose_result,
+                    context=resource.context,
+                    frequency_text=resource.frequency_text,
+                    responsibility_role=resource.responsibility_role,
+                    enablers=tuple(
+                        ApprovedEnabler(kind=item.kind, name=item.name)
+                        for item in resource.enablers
+                    ),
+                    display_order=(baseline.display_order if baseline else next_order + index),
+                    competency_level=(baseline.competency_level if baseline else None),
+                ),
+            )
+        )
+    return _order_drafts(drafts)
+
+
+@dataclass(frozen=True, slots=True)
+class _OpksDraft:
+    handle: str
+    item: ApprovedOpksItem
+
+
+def _parse_opks(
+    catalog: WorkspaceCatalog,
+    values: Sequence[tuple[str, CandidateOpksResource]],
+    task_ids: Mapping[str, UUID],
+) -> tuple[tuple[_OpksDraft, ...], tuple[WorkspaceEvidenceReference, ...]]:
+    existing = {
+        item.item_id: item
+        for item in catalog.document.opks
+        if item.kind is not ApprovedOpksKind.ATTITUDE
+    }
+    opks_ids = {
+        handle: _resolve_entity_id(catalog, handle, resource.kind.value)
+        for handle, resource in values
+    }
+    indicator_ids = {
+        handle: stable_id
+        for handle, stable_id in opks_ids.items()
+        if handle.startswith("p-")
+    }
+    next_orders = {
+        kind: max(
+            (item.display_order for item in existing.values() if item.kind is kind),
+            default=-1,
+        )
+        + 1
+        for kind in ApprovedOpksKind
+        if kind is not ApprovedOpksKind.ATTITUDE
+    }
+    drafts: list[_OpksDraft] = []
+    evidence_references: list[WorkspaceEvidenceReference] = []
+    for index, (handle, resource) in enumerate(values):
+        kind = ApprovedOpksKind(resource.kind.value)
+        stable_id = opks_ids[handle]
+        baseline = existing.get(stable_id)
+        resolved_task_ids = tuple(_resolve_task_handles(task_ids, resource.task_handles))
+        resolved_indicator_ids = tuple(
+            _resolve_indicator_handles(indicator_ids, resource.indicator_handles)
+        )
+        if resource.evidence:
+            source_ids = tuple(
+                _resolve_source_handle(catalog, item.source_handle)
+                for item in resource.evidence
+            )
+            evidence_references.extend(resource.evidence)
+        elif baseline is not None:
+            source_ids = baseline.evidence_source_ids
+        else:
+            source_ids = ()
+        drafts.append(
+            _OpksDraft(
+                handle=handle,
+                item=ApprovedOpksItem(
+                    item_id=stable_id,
+                    kind=kind,
+                    text=resource.text,
+                    display_order=(
+                        baseline.display_order
+                        if baseline is not None
+                        else next_orders[kind] + index
+                    ),
+                    task_ids=resolved_task_ids,
+                    indicator_ids=resolved_indicator_ids,
+                    evidence_source_ids=source_ids,
+                ),
+            )
+        )
+    return _order_drafts(drafts), tuple(evidence_references)
+
+
+def _restore_baseline_attitudes(
+    baseline: Sequence[ApprovedOpksItem], editable: Sequence[_OpksDraft]
+) -> tuple[_OpksDraft, ...]:
+    by_id = {draft.item.item_id: draft for draft in editable}
+    baseline_ids = {item.item_id for item in baseline}
+    result: list[_OpksDraft] = []
+    for item in baseline:
+        if item.kind is ApprovedOpksKind.ATTITUDE:
+            result.append(_OpksDraft(handle="", item=item))
+        elif item.item_id in by_id:
+            result.append(by_id[item.item_id])
+    result.extend(
+        draft for draft in editable if draft.item.item_id not in baseline_ids
+    )
+    return tuple(result)
+
+
+def _order_drafts(drafts: Sequence[Any]) -> tuple[Any, ...]:
+    def key(draft: Any) -> tuple[int, str]:
+        item = draft.task if hasattr(draft, "task") else draft.duty if hasattr(draft, "duty") else draft.item
+        return item.display_order, str(_identity(item))
+
+    return tuple(sorted(drafts, key=key))
+
+
+def _resolve_entity_id(catalog: WorkspaceCatalog, handle: str, kind: str) -> UUID:
+    expected_prefix = {
+        "duty": "duty-",
+        "task": "task-",
+        "output": "o-",
+        "indicator": "p-",
+        "knowledge": "k-",
+        "skill": "s-",
+    }.get(kind)
+    if expected_prefix is not None and not handle.startswith(expected_prefix):
+        raise WorkspaceResourceError(f"handle {handle} is not a {kind} handle")
+    try:
+        return catalog.id_for_handle(handle)
+    except KeyError:
+        return uuid5(catalog.document.document_id, f"candidate:{kind}:{handle}")
+
+
+def _resolve_task_handles(
+    task_ids: Mapping[str, UUID], handles: Sequence[str]
+) -> Iterable[UUID]:
+    for handle in handles:
+        try:
+            yield task_ids[handle]
+        except KeyError as error:
+            raise WorkspaceResourceError(f"unknown task handle: {handle}") from error
+
+
+def _resolve_indicator_handles(
+    indicator_ids: Mapping[str, UUID], handles: Sequence[str]
+) -> Iterable[UUID]:
+    for handle in handles:
+        try:
+            yield indicator_ids[handle]
+        except KeyError as error:
+            raise WorkspaceResourceError(f"unknown indicator handle: {handle}") from error
+
+
+def _resolve_source_handle(catalog: WorkspaceCatalog, handle: str) -> UUID:
+    if not handle.startswith("source-"):
+        raise WorkspaceResourceError(f"not a source handle: {handle}")
+    try:
+        return catalog.id_for_handle(handle)
+    except KeyError as error:
+        raise WorkspaceResourceError(f"unknown source handle: {handle}") from error

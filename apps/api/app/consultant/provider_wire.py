@@ -8,6 +8,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from app.consultant.results import AnalysisBasis, SkillId
 from app.consultant.state import QuoteAnchor
+from app.consultant.workspace_resources import Handle
 
 
 class ProviderWireModel(BaseModel):
@@ -29,7 +30,7 @@ class OutputQuoteAnchor(ProviderWireModel):
 class OutputEvidenceReference(ProviderWireModel):
     """Model-facing evidence reference before application-side resolution."""
 
-    source_handle: str
+    source_handle: Handle
     quote: str = Field(min_length=1)
     occurrence: int | None = Field(default=None, ge=1)
     skill_ids: tuple[SkillId, ...] = Field(min_length=1)

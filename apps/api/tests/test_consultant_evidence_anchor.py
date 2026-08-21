@@ -156,3 +156,38 @@ def test_evidence_reference_rejects_superseded_source() -> None:
 
     with pytest.raises(EvidenceAnchorError, match="superseded"):
         resolve_evidence_reference(reference, catalog)
+
+
+def test_evidence_resolver_rejects_provider_wire_reference_type() -> None:
+    source = _source()
+    catalog = WorkspaceCatalog.from_snapshot(
+        ApprovedJobDocument(document_id=DOCUMENT_ID),
+        pending=(),
+        sources=(source,),
+    )
+    reference = OutputEvidenceReference(
+        source_handle="source-001",
+        quote="核對訂單",
+        occurrence=1,
+        skill_ids=("task-boundary",),
+    )
+
+    with pytest.raises(EvidenceAnchorError, match="invalid evidence reference"):
+        resolve_evidence_reference(reference, catalog)
+
+
+def test_evidence_resolver_rejects_reversed_argument_types() -> None:
+    source = _source()
+    catalog = WorkspaceCatalog.from_snapshot(
+        ApprovedJobDocument(document_id=DOCUMENT_ID),
+        pending=(),
+        sources=(source,),
+    )
+    reference = WorkspaceEvidenceReference(
+        source_handle="source-001",
+        quote="核對訂單",
+        skill_ids=("task-boundary",),
+    )
+
+    with pytest.raises(EvidenceAnchorError, match="workspace catalog"):
+        resolve_evidence_reference(catalog, reference)

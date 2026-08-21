@@ -122,21 +122,56 @@ class CandidateOpksResource(WorkspaceModel):
         return self
 
 
+class CandidateOpksEvidenceBinding(WorkspaceModel):
+    """Keep model-authored evidence attached to its owning OPKS handle."""
+
+    opks_handle: Handle
+    references: tuple[WorkspaceEvidenceReference, ...] = Field(min_length=1)
+
+
+OpksEvidenceBinding = CandidateOpksEvidenceBinding
+
+
 class CandidateReviewGroup(WorkspaceModel):
     handle: Handle
     action_handles: tuple[Handle, ...] = ()
     depends_on_handles: tuple[Handle, ...] = ()
 
+    @model_validator(mode="after")
+    def handles_are_unique(self) -> CandidateReviewGroup:
+        for label, values in (
+            ("action_handles", self.action_handles),
+            ("depends_on_handles", self.depends_on_handles),
+        ):
+            if len(values) != len(set(values)):
+                raise ValueError(f"duplicate {label}")
+        return self
+
 
 class CandidateReviewGroupsResource(WorkspaceModel):
     groups: tuple[CandidateReviewGroup, ...] = ()
+
+    @model_validator(mode="after")
+    def group_handles_are_unique(self) -> CandidateReviewGroupsResource:
+        handles = [group.handle for group in self.groups]
+        if len(handles) != len(set(handles)):
+            raise ValueError("duplicate review group handle")
+        return self
 
 
 class CandidateDocumentDraft(WorkspaceModel):
     """The typed after-state reconstructed from candidate resources."""
 
     approved_document: ApprovedJobDocument
+    review_groups: CandidateReviewGroupsResource = Field(
+        default_factory=CandidateReviewGroupsResource
+    )
     evidence_references: tuple[WorkspaceEvidenceReference, ...] = ()
+    opks_evidence: tuple[CandidateOpksEvidenceBinding, ...] = ()
+
+    @property
+    def evidence_bindings(self) -> tuple[CandidateOpksEvidenceBinding, ...]:
+        return self.opks_evidence
 
 
 class WorkspaceResourceError(ValueError):
@@ -201,9 +236,27 @@ class WorkspaceCatalog:
             positional_sources = tuple(sources)
         source_values = tuple(
             sorted(
-                employee_sources
-                if employee_sources is not None
-                else positional_sources,
+                (
+                    employee_sources
+                    if employee_sources is not None
+                    else positional_sources
+                ),
+                key=lambda source: (source.created_at, str(source.source_id)),
+            )
+        )
+
+        source_by_id: dict[UUID, EmployeeSource] = {}
+        for source in source_values:
+            previous = source_by_id.get(source.source_id)
+            if previous is None:
+                source_by_id[source.source_id] = source
+            elif previous != source:
+                raise WorkspaceResourceError(
+                    f"stable ID collision for employee source: {source.source_id}"
+                )
+        source_values = tuple(
+            sorted(
+                source_by_id.values(),
                 key=lambda source: (source.created_at, str(source.source_id)),
             )
         )
@@ -212,8 +265,10 @@ class WorkspaceCatalog:
         handle_to_stable: dict[str, UUID] = {}
 
         def add_mapping(stable_id: UUID, handle: str) -> None:
-            if stable_id in stable_to_handle or handle in handle_to_stable:
-                return
+            if stable_id in stable_to_handle:
+                raise WorkspaceResourceError(f"stable ID collision: {stable_id}")
+            if handle in handle_to_stable:
+                raise WorkspaceResourceError(f"workspace handle collision: {handle}")
             stable_to_handle[stable_id] = handle
             handle_to_stable[handle] = stable_id
 
@@ -239,7 +294,6 @@ class WorkspaceCatalog:
                 for action in changeset.actions
                 for anchor in action.quote_anchors
             )
-        source_by_id = {source.source_id: source for source in source_values}
         source_order = sorted(
             source_ids,
             key=lambda source_id: (
@@ -358,7 +412,7 @@ def project_candidate_files(
     *,
     run_id: UUID | str,
 ) -> dict[str, str]:
-    run = str(run_id)
+    run = str(_validated_run_id(run_id))
     root = f"/candidate/{run}"
     files: dict[str, str] = {
         f"{root}/header.json": canonical_resource_json(_header_resource(catalog.document))
@@ -427,17 +481,18 @@ def parse_candidate_files(
     run_id: UUID | str | None = None,
 ) -> CandidateDocumentDraft:
     parsed: dict[str, Any] = {}
-    expected_run = str(run_id) if run_id is not None else None
+    expected_run = _validated_run_id(run_id) if run_id is not None else None
     for path, raw in files.items():
         path_text = str(path)
         match = re.fullmatch(r"/candidate/([^/]+)/(.*)", path_text)
         if match is None:
             raise WorkspaceResourceError(f"unexpected candidate resource path: {path_text}")
         path_run, relative = match.groups()
-        if expected_run is not None and path_run != expected_run:
+        path_run_id = _validated_run_id(path_run)
+        if expected_run is not None and path_run_id != expected_run:
             raise WorkspaceResourceError("candidate resource belongs to another run")
         if expected_run is None:
-            expected_run = path_run
+            expected_run = path_run_id
         try:
             value = json.loads(raw.decode("utf-8") if isinstance(raw, bytes) else raw)
         except (TypeError, ValueError) as error:
@@ -460,15 +515,29 @@ def parse_candidate_files(
     duty_resources = _load_entity_resources(parsed, "duties", CandidateDutyResource)
     task_resources = _load_entity_resources(parsed, "tasks", CandidateTaskResource)
     opks_resources = _load_opks_resources(parsed)
-    review_groups = parsed.get("review-groups.json")
-    if review_groups is not None:
-        _validate_resource(CandidateReviewGroupsResource, review_groups, "review-groups.json")
+    review_groups_value = parsed.get("review-groups.json")
+    review_groups = (
+        _validate_resource(
+            CandidateReviewGroupsResource,
+            review_groups_value,
+            "review-groups.json",
+        )
+        if review_groups_value is not None
+        else CandidateReviewGroupsResource()
+    )
+    if expected_run is None:
+        raise WorkspaceResourceError("candidate run namespace must be a UUID")
 
-    duties = _parse_duties(catalog, duty_resources)
+    duties = _parse_duties(catalog, duty_resources, expected_run)
     duty_ids = {item.handle: item.duty.duty_id for item in duties}
-    tasks = _parse_tasks(catalog, task_resources, duty_ids)
+    tasks = _parse_tasks(catalog, task_resources, duty_ids, expected_run)
     task_ids = {item.handle: item.task.task_id for item in tasks}
-    opks, evidence_references = _parse_opks(catalog, opks_resources, task_ids)
+    opks, evidence_references, opks_evidence = _parse_opks(
+        catalog,
+        opks_resources,
+        task_ids,
+        expected_run,
+    )
     opks = _restore_baseline_attitudes(catalog.document.opks, opks)
 
     try:
@@ -492,7 +561,9 @@ def parse_candidate_files(
         raise WorkspaceResourceError(str(error)) from error
     return CandidateDocumentDraft(
         approved_document=document,
+        review_groups=review_groups,
         evidence_references=tuple(evidence_references),
+        opks_evidence=opks_evidence,
     )
 
 
@@ -510,18 +581,66 @@ def _header_resource(document: ApprovedJobDocument) -> CandidateHeaderResource:
 
 
 def _project_review_groups(catalog: WorkspaceCatalog) -> CandidateReviewGroupsResource:
+    pending = _sorted_pending(catalog.pending)
+    action_handles = _pending_action_handles(pending)
     return CandidateReviewGroupsResource(
         groups=tuple(
             CandidateReviewGroup(
                 handle=f"review-{group_index:03d}",
                 action_handles=tuple(
-                    f"action-{action_index:03d}"
-                    for action_index, _ in enumerate(changeset.actions, start=1)
+                    action_handles[action.action_id] for action in changeset.actions
                 ),
+                depends_on_handles=_dependency_handles(changeset, action_handles),
             )
-            for group_index, changeset in enumerate(catalog.pending, start=1)
+            for group_index, changeset in enumerate(pending, start=1)
         )
     )
+
+
+def _sorted_pending(
+    pending: Sequence[DocumentChangeSet],
+) -> tuple[DocumentChangeSet, ...]:
+    return tuple(
+        sorted(
+            pending,
+            key=lambda changeset: (
+                changeset.created_revision,
+                str(changeset.changeset_id),
+            ),
+        )
+    )
+
+
+def _pending_action_handles(
+    pending: Sequence[DocumentChangeSet],
+) -> dict[UUID, str]:
+    result: dict[UUID, str] = {}
+    for changeset in pending:
+        for action in changeset.actions:
+            if action.action_id in result:
+                raise WorkspaceResourceError(
+                    f"duplicate pending action_id: {action.action_id}"
+                )
+            result[action.action_id] = f"action-{len(result) + 1:03d}"
+    return result
+
+
+def _dependency_handles(
+    changeset: DocumentChangeSet,
+    action_handles: Mapping[UUID, str],
+) -> tuple[str, ...]:
+    result: list[str] = []
+    for action in changeset.actions:
+        for dependency_id in action.depends_on_action_ids:
+            try:
+                handle = action_handles[dependency_id]
+            except KeyError as error:
+                raise WorkspaceResourceError(
+                    f"unknown pending dependency action_id: {dependency_id}"
+                ) from error
+            if handle not in result:
+                result.append(handle)
+    return tuple(result)
 
 
 def _sorted_entity_groups(
@@ -554,7 +673,10 @@ def _sorted_entity_groups(
         )
 
     pending_ids: dict[str, list[UUID]] = {prefix: [] for prefix, _ in groups}
-    known = {stable_id for _, values in groups for stable_id in values}
+    known_by_prefix = {
+        prefix: set(values)
+        for prefix, values in groups
+    }
     for changeset in pending:
         for action in changeset.actions:
             if action.operation is not DocumentPatchOperation.ADD:
@@ -563,9 +685,12 @@ def _sorted_entity_groups(
             if not isinstance(payload, dict):
                 continue
             prefix, stable_id = _pending_entity_identity(changeset, action, payload)
-            if stable_id is not None and stable_id not in known:
+            if (
+                stable_id is not None
+                and stable_id not in known_by_prefix[prefix]
+            ):
                 pending_ids[prefix].append(stable_id)
-                known.add(stable_id)
+                known_by_prefix[prefix].add(stable_id)
     return tuple(
         (prefix, values + tuple(sorted(pending_ids[prefix], key=str)))
         for prefix, values in groups
@@ -691,12 +816,13 @@ class _DutyDraft:
 def _parse_duties(
     catalog: WorkspaceCatalog,
     values: Sequence[tuple[str, CandidateDutyResource]],
+    run_id: UUID,
 ) -> tuple[_DutyDraft, ...]:
     existing = {item.duty_id: item for item in catalog.document.duties}
     next_order = max((item.display_order for item in existing.values()), default=-1) + 1
     drafts: list[_DutyDraft] = []
     for index, (handle, resource) in enumerate(values):
-        stable_id = _resolve_entity_id(catalog, handle, "duty")
+        stable_id = _resolve_entity_id(catalog, handle, "duty", run_id)
         baseline = existing.get(stable_id)
         drafts.append(
             _DutyDraft(
@@ -721,12 +847,13 @@ def _parse_tasks(
     catalog: WorkspaceCatalog,
     values: Sequence[tuple[str, CandidateTaskResource]],
     duty_ids: Mapping[str, UUID],
+    run_id: UUID,
 ) -> tuple[_TaskDraft, ...]:
     existing = {item.task_id: item for item in catalog.document.tasks}
     next_order = max((item.display_order for item in existing.values()), default=-1) + 1
     drafts: list[_TaskDraft] = []
     for index, (handle, resource) in enumerate(values):
-        stable_id = _resolve_entity_id(catalog, handle, "task")
+        stable_id = _resolve_entity_id(catalog, handle, "task", run_id)
         baseline = existing.get(stable_id)
         duty_id = duty_ids.get(resource.duty_handle) if resource.duty_handle else None
         if resource.duty_handle and duty_id is None:
@@ -766,14 +893,19 @@ def _parse_opks(
     catalog: WorkspaceCatalog,
     values: Sequence[tuple[str, CandidateOpksResource]],
     task_ids: Mapping[str, UUID],
-) -> tuple[tuple[_OpksDraft, ...], tuple[WorkspaceEvidenceReference, ...]]:
+    run_id: UUID,
+) -> tuple[
+    tuple[_OpksDraft, ...],
+    tuple[WorkspaceEvidenceReference, ...],
+    tuple[CandidateOpksEvidenceBinding, ...],
+]:
     existing = {
         item.item_id: item
         for item in catalog.document.opks
         if item.kind is not ApprovedOpksKind.ATTITUDE
     }
     opks_ids = {
-        handle: _resolve_entity_id(catalog, handle, resource.kind.value)
+        handle: _resolve_entity_id(catalog, handle, resource.kind.value, run_id)
         for handle, resource in values
     }
     indicator_ids = {
@@ -792,6 +924,7 @@ def _parse_opks(
     }
     drafts: list[_OpksDraft] = []
     evidence_references: list[WorkspaceEvidenceReference] = []
+    opks_evidence: list[CandidateOpksEvidenceBinding] = []
     for index, (handle, resource) in enumerate(values):
         kind = ApprovedOpksKind(resource.kind.value)
         stable_id = opks_ids[handle]
@@ -806,6 +939,12 @@ def _parse_opks(
                 for item in resource.evidence
             )
             evidence_references.extend(resource.evidence)
+            opks_evidence.append(
+                CandidateOpksEvidenceBinding(
+                    opks_handle=handle,
+                    references=resource.evidence,
+                )
+            )
         elif baseline is not None:
             source_ids = baseline.evidence_source_ids
         else:
@@ -828,7 +967,7 @@ def _parse_opks(
                 ),
             )
         )
-    return _order_drafts(drafts), tuple(evidence_references)
+    return _order_drafts(drafts), tuple(evidence_references), tuple(opks_evidence)
 
 
 def _restore_baseline_attitudes(
@@ -856,7 +995,12 @@ def _order_drafts(drafts: Sequence[Any]) -> tuple[Any, ...]:
     return tuple(sorted(drafts, key=key))
 
 
-def _resolve_entity_id(catalog: WorkspaceCatalog, handle: str, kind: str) -> UUID:
+def _resolve_entity_id(
+    catalog: WorkspaceCatalog,
+    handle: str,
+    kind: str,
+    run_id: UUID,
+) -> UUID:
     expected_prefix = {
         "duty": "duty-",
         "task": "task-",
@@ -870,7 +1014,10 @@ def _resolve_entity_id(catalog: WorkspaceCatalog, handle: str, kind: str) -> UUI
     try:
         return catalog.id_for_handle(handle)
     except KeyError:
-        return uuid5(catalog.document.document_id, f"candidate:{kind}:{handle}")
+        return uuid5(
+            catalog.document.document_id,
+            f"candidate:{run_id}:{kind}:{handle}",
+        )
 
 
 def _resolve_task_handles(
@@ -900,3 +1047,10 @@ def _resolve_source_handle(catalog: WorkspaceCatalog, handle: str) -> UUID:
         return catalog.id_for_handle(handle)
     except KeyError as error:
         raise WorkspaceResourceError(f"unknown source handle: {handle}") from error
+
+
+def _validated_run_id(value: UUID | str) -> UUID:
+    try:
+        return value if isinstance(value, UUID) else UUID(str(value))
+    except (AttributeError, TypeError, ValueError) as error:
+        raise WorkspaceResourceError("candidate run namespace must be a UUID") from error

@@ -1196,6 +1196,108 @@ async def test_opks_edit_accept_attaches_direct_edit_source_to_adopted_text(
 
 
 @pytest.mark.asyncio
+async def test_mixed_opks_text_and_structural_edit_accept_scopes_direct_source(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    seed_source_id = uuid4()
+    answer_source_id = uuid4()
+    direct_edit_source_id = uuid4()
+    document = _document(document_id)
+    task_id = document.tasks[0].task_id
+    duty_id = document.duties[0].duty_id
+    edited_text = "每週五完成採購異常報表"
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        initial = await runtime.create_document(document_id, title="採購職務")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=initial.revision,
+            document=document,
+            source_id=seed_source_id,
+        )
+        run_id = uuid4()
+        sourced, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=answer_source_id,
+            text="我負責整理採購異常報表。",
+        )
+        proposed = await _stage_and_publish(
+            runtime,
+            document_id=document_id,
+            run_id=run_id,
+            source_id=answer_source_id,
+            baseline_revision=sourced.revision,
+            changes=(
+                _candidate_opks_add(task_id),
+                _candidate_wire_change(
+                    change_ref="duty-reorder-with-opks-text",
+                    operation=DocumentChangeOperation.REORDER,
+                    target=OutputDocumentTarget.DUTY,
+                    target_id=str(duty_id),
+                    field=OutputDocumentField.DISPLAY_ORDER,
+                    text_value="",
+                    integer_value=1,
+                    duties=(),
+                ),
+            ),
+            result=_publication_result(answer_source_id, None),
+        )
+        bundle = proposed.document_review.bundles[0]
+        textual_action = next(
+            action for action in bundle.actions if action.path == "/opks"
+        )
+        structural_action = next(
+            action
+            for action in bundle.actions
+            if action.path == f"/duties/{duty_id}/display_order"
+        )
+
+        reviewed = await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=proposed.revision,
+            action="edit_and_accept_changes",
+            changeset_id=bundle.changeset_id,
+            action_ids=(textual_action.action_id, structural_action.action_id),
+            edited_after_by_action_id={
+                textual_action.action_id: {
+                    **textual_action.after,
+                    "text": edited_text,
+                },
+                structural_action.action_id: 1,
+            },
+            source_id=direct_edit_source_id,
+        )
+        source = await runtime.get_source(document_id, direct_edit_source_id)
+        terminal_bundle = reviewed.document_review.bundles[0]
+        terminal_textual_action = next(
+            action for action in terminal_bundle.actions if action.path == "/opks"
+        )
+        terminal_structural_action = next(
+            action
+            for action in terminal_bundle.actions
+            if action.path == f"/duties/{duty_id}/display_order"
+        )
+
+        assert reviewed.approved_document.opks[0].text == edited_text
+        assert reviewed.approved_document.duties[0].display_order == 1
+        assert direct_edit_source_id in terminal_textual_action.source_ids
+        assert direct_edit_source_id not in terminal_structural_action.source_ids
+        assert direct_edit_source_id in terminal_bundle.source_ids
+        assert len(source.positions) == 1
+        assert source.positions[0].document_path == "/opks/text"
+        assert source.positions[0].start == 0
+        assert source.positions[0].end == len(edited_text)
+        assert source.text[source.positions[0].start : source.positions[0].end] == (
+            edited_text
+        )
+        assert reviewed.source_count == seeded.source_count + 2
+
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
 async def test_structural_edit_accept_does_not_attach_text_evidence(
     consultant_database_url: str,
 ) -> None:
@@ -1256,6 +1358,89 @@ async def test_structural_edit_accept_does_not_attach_text_evidence(
         assert candidate_edit_source_id not in terminal_action.source_ids
         assert candidate_edit_source_id not in terminal_bundle.source_ids
         assert reviewed.source_count == seeded.source_count + 1
+
+        await runtime.delete_document(document_id)
+
+
+@pytest.mark.asyncio
+async def test_candidate_opks_rejection_identity_survives_new_run_and_new_source(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    seed_source_id = uuid4()
+    first_answer_source_id = uuid4()
+    second_answer_source_id = uuid4()
+    document = _document(document_id)
+    task_id = document.tasks[0].task_id
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        initial = await runtime.create_document(document_id, title="採購職務")
+        await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=initial.revision,
+            document=document,
+            source_id=seed_source_id,
+        )
+        first_run_id = uuid4()
+        first_sourced, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=first_run_id,
+            source_id=first_answer_source_id,
+            text="我負責整理採購異常報表。",
+        )
+        first = await _stage_and_publish(
+            runtime,
+            document_id=document_id,
+            run_id=first_run_id,
+            source_id=first_answer_source_id,
+            baseline_revision=first_sourced.revision,
+            changes=(_candidate_opks_add(task_id),),
+            result=_publication_result(first_answer_source_id, None),
+        )
+        first_bundle = first.document_review.bundles[0]
+        first_action = first_bundle.actions[0]
+
+        rejected = await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=first.revision,
+            action="reject_changes",
+            changeset_id=first_bundle.changeset_id,
+            action_ids=(first_action.action_id,),
+            rejection_reason="這不是本工作的產出。",
+        )
+
+        second_run_id = uuid4()
+        second_sourced, _ = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=second_run_id,
+            source_id=second_answer_source_id,
+            text="我也會覆核採購異常報表。",
+        )
+        second_receipt = await runtime.stage_candidate_revision(
+            document_id=document_id,
+            request=_candidate_stage_request(
+                run_id=second_run_id,
+                source_id=second_answer_source_id,
+                baseline_revision=second_sourced.revision,
+                tool_call_id="candidate-tool-2",
+                changes=(_candidate_opks_add(task_id),),
+            ),
+        )
+        second_state = CandidateWorkspace.model_validate(
+            (await runtime.raw_state(document_id))["active_candidate"]
+        )
+        second_action = second_state.changeset.actions[0]
+        second_source = await runtime.get_source(
+            document_id, second_answer_source_id
+        )
+
+        assert rejected.approved_document == first.approved_document
+        assert first_action.after["item_id"] != second_action.after["item_id"]
+        assert first_action.target_key == second_action.target_key
+        assert first_action.read_set == second_action.read_set
+        assert second_action.read_set[0].path == "/opks"
+        assert second_source.processing_status is SourceProcessingStatus.COMMITTED
+        assert second_receipt.actions[0].action_id == second_action.action_id
 
         await runtime.delete_document(document_id)
 

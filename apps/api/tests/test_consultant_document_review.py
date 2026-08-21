@@ -505,6 +505,63 @@ def test_rejected_opks_add_cannot_reappear_by_changing_method_or_anchor() -> Non
             _create_again(replay)
 
 
+def test_rejected_opks_add_ignores_application_owned_identity_and_order() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document, _duty_a, _duty_b, task_a, _task_b = _document(
+        document_id,
+        source_id=source_id,
+    )
+    rejected_bundle = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="建議工作產出。",
+        read_revision=1,
+        document=document,
+        changes=(
+            _opks_add(
+                source_id=source_id,
+                task_id=task_a,
+                item_id=uuid4(),
+            ),
+        ),
+        existing_review_queue={},
+        interview_work={},
+    )
+    rejected = rejected_bundle.model_copy(
+        update={
+            "actions": (
+                rejected_bundle.actions[0].model_copy(
+                    update={
+                        "status": DocumentChangeStatus.REJECTED,
+                        "rejection_reason": "這不是本工作的產出。",
+                    }
+                ),
+            )
+        }
+    )
+
+    with pytest.raises(RejectedChangeRequiresNewEvidence):
+        create_document_changeset(
+            document_id=document_id,
+            run_id=uuid4(),
+            summary="不同 generated identity 的同一項產出。",
+            read_revision=1,
+            document=document,
+            changes=(
+                _opks_add(
+                    source_id=source_id,
+                    task_id=task_a,
+                    item_id=uuid4(),
+                ),
+            ),
+            existing_review_queue={
+                str(rejected.changeset_id): rejected.model_dump(mode="json")
+            },
+            interview_work={},
+        )
+
+
 def test_rejected_opks_add_may_reappear_with_new_employee_source() -> None:
     document_id = uuid4()
     source_id = uuid4()

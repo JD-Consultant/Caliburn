@@ -153,3 +153,55 @@ test: close virtual JD authority loop
 ```
 
 Commit SHA: run `git rev-parse HEAD` in this worktree to obtain it.
+
+## Review round 1/5
+
+### RED and root causes
+
+- The fresh structural-relation regression was a valid product RED: after `edit_and_accept_changes`, an action such as `/tasks/<handle>/task_ids` still emitted the formal UUID in `employee_after` on the accepted-action pending surface. The cause was the existing `_pending_action_projection` branch calling `_pending_semantic_value` without the action path.
+- The first scratch assertion that called `StateBackend` directly produced a framework-only RED because the real backend requires LangGraph execution context. It was corrected in the test harness with the existing `FilesystemMiddleware` and `ToolNode`; no production isolation layer was added.
+- The defer/direct-edit evidence now uses the latest revision and accepts only the independent `/work_description` action. The conflicting `/job_title` action remains stale and absent from approved. The new-run evidence performs a real first-run scratch write/read, then real second-run read/ls/glob attempts against the old run path.
+
+### GREEN and minimal fix
+
+- The six existing lifecycle scenarios remain the only full-agent scenarios. The partial-review fixture keeps two independent semantic actions as the brief's smallest-equivalent proof of independent accept/reject and rejected-O memory; this is a test minimization, not a product cardinality change.
+- Production change is one path-aware reuse in `workspace_backend.py`: `employee_after` now goes through `_pending_action_value(catalog, action.path, ...)`, so the existing explicit scalar/list relation mapping applies to both before and after values. No `graph.py` change was needed.
+- The test-only filesystem probe runs existing framework tools inside a real graph state context. It adds no Tool, store, serializer, VFS persistence layer, or second scripted model.
+
+### Changed files in this review round
+
+- `apps/api/app/consultant/workspace_backend.py`
+- `apps/api/tests/test_consultant_candidate_loop.py`
+- `.superpowers/sdd/2026-08-21-deep-agents-virtual-jd-workspace-plan/task-7-report.md`
+
+### Review gate commands and results
+
+All PostgreSQL commands used the explicit disposable `TEST_DATABASE_URL` from the Task 7 gate instructions and completed with zero skips. The following commands were rerun and passed:
+
+```text
+uv run pytest tests/test_consultant_candidate_loop.py -p no:cacheprovider -q
+uv run pytest tests/test_consultant_candidate_loop.py tests/test_consultant_durable_authority_postgres.py tests/test_consultant_interview_flow.py tests/test_consultant_context.py tests/test_app_wiring.py -p no:cacheprovider -q
+uv run pytest tests/test_consultant_task6_contract.py tests/test_consultant_agent_and_skills.py tests/test_consultant_context.py -p no:cacheprovider -q
+uv run pytest tests/test_consultant_model_output.py tests/test_consultant_model_runtime.py tests/test_consultant_run_service.py tests/test_consultant_hard_cut.py -p no:cacheprovider -q
+uv run pytest tests/test_consultant_workspace_tools.py tests/test_consultant_workspace_backend.py tests/test_consultant_candidate_publication.py -p no:cacheprovider -q
+uv run pytest tests/test_consultant_candidate_loop.py tests/test_consultant_durable_authority_postgres.py -p no:cacheprovider -q
+uv run pytest -p no:cacheprovider -q
+uv run python -m compileall -q app tests
+git diff --check
+```
+
+### North-star and overdesign audit
+
+The north star remains intact: one employee-facing consultant, employee-only authority, no hidden acceptance, dynamic Duty/Task/OPKS editing, exact employee corrections preserved, and no UI/VFS detail leakage. Approved truth is still changed only by the existing authority graph; `/pending` remains a read-only, `approved: false` semantic projection.
+
+Each pending helper remains justified by a proven surface: `_pending_action_value` for path-specific scalar/list structural relations; `_pending_action_projection` for the shared action envelope; `_pending_path` and `_pending_target_handles` for model-facing identity paths and collection targets; `_pending_dependency_handles` for review dependency visibility; `_pending_semantic_value` for the explicit human-readable semantic allowlist; and `_pending_status` for deterministic aggregate status. None can be removed without either reintroducing a tested UUID leak, losing review context, or duplicating the same public shape. No helper was generalized, and no further reduction is justified without weakening one of the six lifecycle invariants.
+
+### Review commit
+
+Create the review commit with exactly:
+
+```text
+fix: close Task 7 review gaps
+```
+
+After commit, obtain the reproducible identifier with `git rev-parse HEAD` in this worktree; no SHA or commit count is recorded here.

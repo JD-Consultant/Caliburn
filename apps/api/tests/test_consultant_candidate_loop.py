@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import copy
 import json
 import os
 import re
@@ -11,9 +12,12 @@ from uuid import UUID, uuid4
 import psycopg
 import pytest
 import pytest_asyncio
+from deepagents.middleware.filesystem import FilesystemMiddleware, FilesystemState
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
+from langgraph.graph import END, START, StateGraph
+from langgraph.prebuilt import ToolNode
 from pydantic import Field
 
 from app.adapters.langgraph.postgres import open_postgres_consultant_runtime
@@ -258,6 +262,44 @@ async def _check_and_publish(
         files=files,
     )
     return checked, published
+
+
+class _FilesystemToolProbe:
+    """Run real filesystem middleware tools inside a LangGraph state context."""
+
+    def __init__(self, binding: Any) -> None:
+        middleware = FilesystemMiddleware(
+            backend=binding.composite_backend,
+            tools=["ls", "read_file", "write_file", "glob"],
+            system_prompt=None,
+            tool_token_limit_before_evict=None,
+            human_message_token_limit_before_evict=None,
+            grep_max_count=None,
+        )
+        graph = StateGraph(FilesystemState)
+        graph.add_node("tools", ToolNode(middleware.tools))
+        graph.add_edge(START, "tools")
+        graph.add_edge("tools", END)
+        self._graph = graph.compile()
+        self._state = {"files": copy.deepcopy(binding.initial_files)}
+
+    async def invoke(self, name: str, **args: Any) -> ToolMessage:
+        call = {
+            "name": name,
+            "args": args,
+            "id": f"call-{uuid4()}",
+            "type": "tool_call",
+        }
+        result = await self._graph.ainvoke(
+            {
+                "messages": [AIMessage(content="", tool_calls=[call])],
+                "files": copy.deepcopy(self._state["files"]),
+            }
+        )
+        self._state = result
+        message = result["messages"][-1]
+        assert isinstance(message, ToolMessage)
+        return message
 
 
 class ScriptedConsultantModel(FakeMessagesListChatModel):
@@ -891,6 +933,22 @@ async def test_runtime_defer_then_direct_edit_stales_only_pending_projection(
             r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}",
             pending_surface,
         ) is None
+        accepted = await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=edited.revision,
+            action="accept_changes",
+            changeset_id=stale_bundle.changeset_id,
+            action_ids=(actions_by_path["/work_description"].action_id,),
+        )
+        accepted_bundle = DocumentChangeSet.model_validate(
+            next(iter(accepted.review_queue.values()))
+        )
+        accepted_by_path = {action.path: action for action in accepted_bundle.actions}
+        assert accepted_by_path["/work_description"].status is DocumentChangeStatus.ACCEPTED
+        assert accepted_by_path["/job_title"].status is DocumentChangeStatus.STALE
+        assert accepted.approved_document.work_description == "候選工作描述"
+        assert accepted.approved_document.job_title == "員工直接修訂職稱"
+        assert accepted.approved_document.job_title != "候選採購專員"
 
 
 @pytest.mark.asyncio
@@ -1059,6 +1117,67 @@ async def test_runtime_split_candidate_requires_atomic_review_decision(
             "snapshot"
         ].approved_document
 
+        relation_action = next(
+            action for action in atomic_actions if action.path.endswith("/task_ids")
+        )
+        accepted = await runtime.decide_document_changes(
+            document_id=document_id,
+            expected_revision=published.revision,
+            action="edit_and_accept_changes",
+            changeset_id=checked.receipt.changeset.changeset_id,
+            action_ids=tuple(action.action_id for action in atomic_actions),
+            edited_after_by_action_id={
+                relation_action.action_id: relation_action.after,
+            },
+        )
+        accepted_bundle = DocumentChangeSet.model_validate(
+            next(iter(accepted.review_queue.values()))
+        )
+        accepted_catalog = WorkspaceCatalog.from_snapshot(
+            published.approved_document,
+            pending=(accepted_bundle,),
+            sources=await runtime.list_sources(document_id),
+        )
+        accepted_binding = build_consultant_workspace_backend(
+            runtime=runtime,
+            document_id=document_id,
+            run_id=uuid4(),
+            catalog=accepted_catalog,
+            selected_skill_ids=CONSULTANT_SKILL_IDS,
+        )
+        accepted_handles = pending_action_handles((accepted_bundle,))
+        accepted_paths = (
+            "/index.json",
+            "/reviews/review-001.json",
+            *(f"/actions/{handle}.json" for handle in accepted_handles.values()),
+        )
+        accepted_payloads = []
+        for path in accepted_paths:
+            read = accepted_binding.pending_backend.read(path)
+            assert read.error is None
+            assert read.file_data is not None
+            accepted_payloads.append(json.loads(read.file_data["content"]))
+        accepted_surface = "\n".join(accepted_paths) + json.dumps(
+            accepted_payloads,
+            ensure_ascii=False,
+        )
+        assert re.search(
+            r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-5][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}",
+            accepted_surface,
+        ) is None
+        relation_handle = accepted_handles[relation_action.action_id]
+        relation_view = json.loads(
+            accepted_binding.pending_backend.read(
+                f"/actions/{relation_handle}.json"
+            ).file_data["content"]
+        )
+        assert relation_view["approved"] is False
+        assert relation_view["status"] == "edit_accepted"
+        assert relation_view["employee_after"] == [
+            accepted_catalog.handle_for_id(UUID(str(raw_id)))
+            for raw_id in relation_action.after
+        ]
+
 
 @pytest.mark.asyncio
 async def test_new_candidate_run_cannot_read_previous_run_scratch(
@@ -1079,6 +1198,16 @@ async def test_new_candidate_run_cannot_read_previous_run_scratch(
         )
         scratch_path = f"/candidate/{first_run_id}/opks/o/scratch-001.json"
         assert first.candidate_backend.validate_candidate_file_path(scratch_path) == scratch_path
+        first_probe = _FilesystemToolProbe(first)
+        written = await first_probe.invoke(
+            "write_file",
+            file_path=scratch_path,
+            content='{"text":"first-run-only"}\n',
+        )
+        assert written.status == "success"
+        first_read = await first_probe.invoke("read_file", file_path=scratch_path)
+        assert first_read.status == "success"
+        assert "first-run-only" in str(first_read.content)
 
         second = build_consultant_workspace_backend(
             runtime=runtime,
@@ -1087,8 +1216,23 @@ async def test_new_candidate_run_cannot_read_previous_run_scratch(
             catalog=prepared["catalog"],
             selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
-        with pytest.raises(ValueError, match="outside the current candidate run"):
-            second.candidate_backend.validate_candidate_file_path(scratch_path)
+        second_probe = _FilesystemToolProbe(second)
+        second_read = await second_probe.invoke("read_file", file_path=scratch_path)
+        assert second_read.status == "error"
+        assert "outside the current candidate run" in str(second_read.content)
+        second_ls = await second_probe.invoke(
+            "ls",
+            path=f"/candidate/{first_run_id}/",
+        )
+        assert second_ls.status == "error"
+        assert "outside the current candidate run" in str(second_ls.content)
+        second_glob = await second_probe.invoke(
+            "glob",
+            pattern="**/scratch-001.json",
+            path=f"/candidate/{first_run_id}/",
+        )
+        assert second_glob.status == "error"
+        assert "outside the current candidate run" in str(second_glob.content)
         assert all(
             str(first_run_id) not in path for path in second.initial_candidate_files
         )

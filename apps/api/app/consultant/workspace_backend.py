@@ -348,8 +348,8 @@ def _pending_action_projection(
         ],
     }
     if action.employee_after is not None:
-        projection["employee_after"] = _pending_semantic_value(
-            catalog, action.employee_after
+        projection["employee_after"] = _pending_action_value(
+            catalog, action.path, action.employee_after
         )
     if decision_reason is not None:
         projection["decision_reason"] = decision_reason

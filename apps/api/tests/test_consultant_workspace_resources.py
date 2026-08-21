@@ -518,5 +518,6 @@ def test_provider_evidence_reference_rejects_invalid_handle() -> None:
         OutputEvidenceReference(
             source_handle="not-a-local-handle",
             quote="核對訂單",
+            occurrence=0,
             skill_ids=("task-boundary",),
         )

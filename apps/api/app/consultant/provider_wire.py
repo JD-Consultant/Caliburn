@@ -22,7 +22,10 @@ class OutputEvidenceReference(ProviderWireModel):
 
     source_handle: Handle
     quote: str = Field(min_length=1)
-    occurrence: int | None = Field(default=None, ge=1)
+    occurrence: int = Field(
+        ge=0,
+        description="逐字 quote 唯一時填 0；重複時填 1-based occurrence",
+    )
     skill_ids: tuple[SkillId, ...] = Field(min_length=1)
 
 
@@ -59,8 +62,11 @@ class AnalysisBasisTable:
             skill_ids = []
             for reference in value.evidence:
                 try:
-                    workspace_reference = WorkspaceEvidenceReference.model_validate(
-                        reference.model_dump(mode="python")
+                    workspace_reference = WorkspaceEvidenceReference(
+                        source_handle=reference.source_handle,
+                        quote=reference.quote,
+                        occurrence=reference.occurrence or None,
+                        skill_ids=reference.skill_ids,
                     )
                     anchor = resolve_evidence_reference(
                         workspace_reference,

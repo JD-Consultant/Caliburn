@@ -40,7 +40,7 @@ checkpoint 不複製員工逐字來源；Store 不保存第二份核准文件。
 ## 模型執行
 
 - Versioned model profile 只決定 requested model、唯一 provider、有效參數與 timeout；versioned run policy 只決定 eligible Skills／tools、context／call／token／time／cost budget 與 retry。兩者在每次 run 前解析成 immutable `ResolvedExecution`，Skill 不能選模型。
-- `ChatOpenRouter` 承接 provider wire。rich application result 不直接送 provider；LangChain `response_format` 使用 compact Pydantic `ConsultantModelOutput`，再由 fail-closed pure mapper 還原 rich `ConsultantResult`。Evidence 只填 catalog 可解析的 source handle、exact quote、必要 occurrence 與 Skill IDs；existing resolver 確定性產生 source UUID／offset，模型不提供它們。final response 只帶同一 run checked receipt 的 revision、digest 與 ordered action handles。
+- `ChatOpenRouter` 承接 provider wire。rich application result 不直接送 provider；LangChain `response_format` 使用 compact Pydantic `ConsultantModelOutput`，再由 fail-closed pure mapper 還原 rich `ConsultantResult`。Evidence 只填 catalog 可解析的 source handle、exact quote、occurrence 與 Skill IDs；provider-facing `occurrence` 是 required integer sentinel（唯一 quote 填 `0`，重複 quote 填 1-based occurrence），`AnalysisBasisTable` 在 application boundary 將 `0` 還原為 workspace 的 `occurrence=None`。existing resolver 確定性產生 source UUID／offset，模型不提供它們。final response 只帶同一 run checked receipt 的 revision、digest 與 ordered action handles。
 - structured-output strategy 是 versioned model profile 的已解析能力，不由 LangChain 自動猜測或 fallback。現行 `ToolStrategy` 曾產生錯誤的多重輸出工具呼叫，因此 Opus 5／OpenRouter profile 只能選通過 exact conformance 的 provider-native strategy；換模型／provider 也必須重跑窄 canary。這保留可換模型，同時避免把所有 strategy 假定為可互換。
 - model／tool call limit、retry、非權威摘要與唯讀工具結果清理由 LangChain built-in middleware 承接。OpenRouter SDK 自己的通用 retry 關閉；LangChain 1.3.15 `SummarizationMiddleware` 內建的獨立三次 retry也由窄 subclass關閉，所有 primary／必要 contingency finalization／摘要共用同一個 run attempt budget，避免框架內部出現無紀錄重試。
 - provider-facing system message 依 [OpenRouter prompt caching](https://openrouter.ai/docs/guides/best-practices/prompt-caching) 與 [LangChain ChatOpenRouter](https://docs.langchain.com/oss/python/integrations/chat/openrouter) 的 content-block 介面固定排序：framework 組出的顧問／authority／Skill catalog 規則是第一個 stable block，帶 `cache_control={"type":"ephemeral"}`；每個 model step 從 PostgreSQL／LangGraph 重建的 employee／approved／pending／focus／gap／candidate context 是第二個未標記 dynamic block。兩個 block 的合併文字與原本 prompt 相同；cache miss、過期或 provider 不支援只影響成本／延遲，不得影響語意、continuation 或 authority。OpenRouter 對 OpenAI 是自動快取且最低 1,024 input tokens；marker主要保留需要 explicit breakpoint 的 provider 相容性，不把 OpenAI 命中誤稱為 marker 因果。OpenRouter response caching 不啟用，避免舊回答或 Tool call 原樣重播。
@@ -178,3 +178,13 @@ Next App Router 頁面只負責掛載 purpose-first Client Component；TanStack 
 ## 當前邊界
 
 這個 runtime 已有可替換模型 profile、LangChain agent harness、attempt receipt、Context middleware、真實顧問 Skills、七個 shared-workspace Tool、adaptive interview routing、可見理解／Gap／語意進度、checked receipt／final publication、完整 review command、deterministic authority、required-clarification interrupt、generated contract／production API transport、員工顧問工作區與 deterministic XLSX export。fresh root 只建立最小 catalog，LangGraph 官方 setup 擁有 Saver／Store tables；inner agent 不建立第二個 checkpointer／Store。scripted product canary 已走真 `create_agent` Tool loop、真 product graph 與 PostgreSQL；它沒有 RAG／Reference consumer、能力級別／A 生成、auto-accept、multi-agent 或正式品質 eval，也沒有雙寫或 compatibility layer。
+
+## Task 8 Phase C evidence（2026-08-22）
+
+本次 closure evidence 分開看三件事：
+
+- provider schema：第一次 exact live run 由 OpenAI strict response schema 拒絕 optional `OutputEvidenceReference.occurrence`。最小修正是把 provider wire 改成 required integer sentinel（唯一 quote=`0`、重複 quote=1-based），mapping 回到 workspace model 時把 `0` 轉為 `None`，並在 agent prompt 明示規則；沒有新增 abstraction 或放寬 schema。
+- exact live：修正後已實際到達 `openai/gpt-5.6-luna`、OpenAI、`reasoning=max` 與既有八 call／兩 lookup-wave policy，並確認 exact seven-Tool surface 已 bound/exposed；實際 Tool calls 只觀察到 `ls`／`read_file`。模型重複這兩個 lookup，超過既定兩個 lookup waves，production middleware 以 `LookupWaveLimitExceeded` fail closed。這是 unresolved exact-profile live blocker；沒有提高預算、換模型、加 fallback 或改 lookup policy，不能標成 live pass。runner 仍只清理單一 disposable document，並核對 persistence cleanup。
+- employee authority：controller 以真 local Next＋FastAPI＋disposable PostgreSQL fixture 完成 browser QA；accept、edit-accept、reject、defer 與保留單一 O pending 的語意決策在 reload 後維持，API snapshot 只把員工接受的職稱／工作描述寫入 approved，Duty／Task 維持原值，沒有暗中接受其他候選。畫面沒有 candidate path 或 Tool/framework 內部細節；production Web 不需改動，integration coverage 保留。
+
+RAG／Reference、能力級別與 A、auto mode、multi-agent 及正式 quality eval 仍是延後邊界；本次 evidence 不改變它們的狀態。

@@ -397,7 +397,7 @@ class ScriptedConsultantModel(FakeMessagesListChatModel):
                             {
                                 "source_handle": self.source_handle,
                                 "quote": "核對訂單",
-                                "occurrence": None,
+                                "occurrence": 0,
                                 "skill_ids": ["output"],
                             }
                         ]

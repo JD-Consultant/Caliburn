@@ -3,6 +3,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import type { DocumentPatchActionView } from "@caliburn/job-analysis-contract";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -193,6 +194,158 @@ describe("employee consultant workspace integration", () => {
         jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID),
       )?.revision,
     ).toBe(5);
+  });
+
+  it("supports keyboard semantic review decisions without exposing internal action details", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    const baseAction = snapshot.document_review.bundles[0].actions[0];
+    const action = (
+      overrides: Partial<DocumentPatchActionView>,
+    ): DocumentPatchActionView => ({
+      ...baseAction,
+      atomic_subgroup_id: null,
+      ...overrides,
+    });
+    const actionIds = {
+      accept: "ui-review-accept-internal",
+      edit: "ui-review-edit-internal",
+      reject: "ui-review-reject-internal",
+      defer: "ui-review-defer-internal",
+    };
+    snapshot.document_review.bundles = [
+      {
+        changeset_id: "ui-review-changeset-accept",
+        summary: "接受職務名稱建議",
+        created_revision: snapshot.revision,
+        source_ids: [snapshot.latest_source_id!],
+        actions: [
+          action({
+            action_id: actionIds.accept,
+            operation: "add",
+            path: "/job_title",
+            target_key: "/job_title",
+            before: null,
+            after: "採購專員",
+          }),
+        ],
+      },
+      {
+        changeset_id: "ui-review-changeset-edit",
+        summary: "修改工作描述建議",
+        created_revision: snapshot.revision,
+        source_ids: [snapshot.latest_source_id!],
+        actions: [
+          action({
+            action_id: actionIds.edit,
+            operation: "revise",
+            path: "/work_description",
+            target_key: "/work_description",
+            before: "目前工作描述",
+            after: "AI 建議工作描述",
+          }),
+        ],
+      },
+      {
+        changeset_id: "ui-review-changeset-reject",
+        summary: "移除不適用建議",
+        created_revision: snapshot.revision,
+        source_ids: [snapshot.latest_source_id!],
+        actions: [
+          action({
+            action_id: actionIds.reject,
+            operation: "withdraw",
+            path: "/job_title",
+            target_key: "/job_title",
+            before: "目前職務名稱",
+            after: null,
+          }),
+        ],
+      },
+      {
+        changeset_id: "ui-review-changeset-defer",
+        summary: "調整工作順序建議",
+        created_revision: snapshot.revision,
+        source_ids: [snapshot.latest_source_id!],
+        actions: [
+          action({
+            action_id: actionIds.defer,
+            operation: "reorder",
+            path: "/tasks/task-1/display_order",
+            target_key: "task-1",
+            before: 0,
+            after: 1,
+          }),
+        ],
+      },
+    ];
+    snapshot.document_review.unresolved_action_count = 4;
+    const response = structuredClone(snapshot);
+    response.revision += 1;
+    const fetchMock = vi.fn().mockImplementation(
+      async () =>
+        new Response(JSON.stringify(response), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(screen.getByRole("region", { name: "AI 文件變更審核" })).toBeTruthy();
+    expect(document.body.textContent).not.toContain(actionIds.accept);
+    expect(document.body.textContent).not.toContain("write_file");
+    expect(document.body.textContent).not.toContain("/candidate/");
+
+    const selectWithKeyboard = async (name: string) => {
+      const checkbox = screen.getByRole("checkbox", { name });
+      checkbox.focus();
+      await user.keyboard(" ");
+      expect(checkbox).toHaveProperty("checked", true);
+    };
+    const decideWithKeyboard = async (name: string) => {
+      const button = screen.getByRole("button", { name });
+      button.focus();
+      await user.keyboard("{Enter}");
+    };
+
+    await selectWithKeyboard("選取新增變更");
+    await decideWithKeyboard("接受 AI 建議");
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(
+      JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body)),
+    ).toMatchObject({ command: "accept_changes" });
+
+    const description = screen.getByLabelText("工作描述");
+    await user.clear(description);
+    await user.type(description, "員工確認後的工作描述");
+    await selectWithKeyboard("選取修改變更");
+    await decideWithKeyboard("修改後接受");
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(
+      JSON.parse(String((fetchMock.mock.calls[1][1] as RequestInit).body)),
+    ).toMatchObject({ command: "edit_and_accept_changes" });
+
+    await selectWithKeyboard("選取移除變更");
+    const rejectionReason = screen.getByLabelText("若要拒絕，可補充原因");
+    await user.type(rejectionReason, "目前正式文件仍需要這項內容");
+    await decideWithKeyboard("拒絕");
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+    expect(
+      JSON.parse(String((fetchMock.mock.calls[2][1] as RequestInit).body)),
+    ).toMatchObject({
+      command: "reject_changes",
+      rejection_reason: "目前正式文件仍需要這項內容",
+    });
+
+    await selectWithKeyboard("選取調整順序變更");
+    await decideWithKeyboard("稍後處理");
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
+    expect(
+      JSON.parse(String((fetchMock.mock.calls[3][1] as RequestInit).body)),
+    ).toMatchObject({ command: "defer_changes" });
   });
 
   it("edits a structural Duty suggestion through employee fields without exposing raw JSON or IDs", async () => {

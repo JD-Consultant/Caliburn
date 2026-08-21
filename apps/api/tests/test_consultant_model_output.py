@@ -68,6 +68,7 @@ def _basis(source_id: UUID, *skill_ids: str) -> OutputAnalysisBasis:
             OutputEvidenceReference(
                 source_handle="source-001",
                 quote="整理採購需求",
+                occurrence=0,
                 skill_ids=skill_ids,
             ),
         )
@@ -136,8 +137,23 @@ def test_model_output_schema_is_closed_and_evidence_is_provider_neutral() -> Non
 
     assert objects
     assert all(node.get("additionalProperties") is False for node in objects)
+    assert all(
+        set(node.get("required", ())) == set(node.get("properties", ()))
+        for node in objects
+    )
     evidence_schema = schema["$defs"]["OutputEvidenceReference"]
-    assert set(evidence_schema["required"]) == {"source_handle", "quote", "skill_ids"}
+    assert set(evidence_schema["required"]) == {
+        "source_handle",
+        "quote",
+        "occurrence",
+        "skill_ids",
+    }
+    assert evidence_schema["properties"]["occurrence"] == {
+        "description": "逐字 quote 唯一時填 0；重複時填 1-based occurrence",
+        "minimum": 0,
+        "title": "Occurrence",
+        "type": "integer",
+    }
     assert "source_id" not in evidence_schema["properties"]
     assert "start" not in evidence_schema["properties"]
     assert "end" not in evidence_schema["properties"]
@@ -191,6 +207,7 @@ def test_unknown_handle_or_quote_fails_before_rich_result_mapping() -> None:
                     OutputEvidenceReference(
                         source_handle="source-999",
                         quote="不存在",
+                        occurrence=0,
                         skill_ids=("task-boundary",),
                     ),
                 )

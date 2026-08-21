@@ -22,7 +22,8 @@ ADR 0063 的大方向不翻案：模型必須先在非權威候選區實際編�
 4. model 透過通用 editor 反覆修改，再像 coding agent 跑測試一樣呼叫 `check_candidate_document`；application 解析 typed candidate、回傳可行動問題，final publication 前 fail closed；
 5. Evidence 改由模型選 `source／segment＋exact quote`，application 確定性解析並保存 char offsets；模型不再手算 `start／end`；
 6. split／merge 不是額外權限或專用 Tool，而是 create／edit／delete 的一組相依變更，員工仍以 atomic review group 裁決；
-7. VFS／checkpoint 是可丟棄的工作區，不是第二份文件 authority；只有員工 authority command 能改核准 JD。
+7. VFS／checkpoint 是可丟棄的工作區，不是第二份文件 authority；只有員工 authority command 能改核准 JD；
+8. 將固定顧問規則與 Tool schema 做成穩定 prompt prefix，交給 provider prompt caching；這只降低重複輸入成本／延遲，不取代記憶、context、checkpoint 或 authority。
 
 ## 1. 產品大方向與名詞
 
@@ -256,6 +257,50 @@ deterministic verifier 與來源可信度政策保留；只移除模型手算 of
 - 員工要求繼續修待審稿：application 才把指定 pending bundle 投影成新 candidate base，並記錄 dependency／supersession；
 - reject／edit-accept／direct edit 後：重驗下游 candidate，必要時標 stale；被拒絕內容不能由 framework merge 偷偷復活。
 
+### 6.7 Prompt caching：值得加，但只作 provider 最佳化
+
+#### 6.7.1 為何本產品符合
+
+Caliburn 一輪不是單次 completion，而是最多八個 model step 的 `lookup／edit／check／repair／publish` loop。每一步都會重送固定顧問規則、authority 邊界、Tool schema 與 final contract；真正變動的是 employee turn、核准 JD／pending／focus／gap 投影、candidate 狀態與 Tool observation。因此它正是官方所稱「長且重複的 prompt prefix」案例。
+
+現行組裝卻把固定 `base_system` 與每一步會變的 `bundle.system_prompt` 串成同一段 `SystemMessage`。這不一定讓自動 caching 完全失效，但無法明確保證 breakpoint 只包含可重用內容，也容易因動態內容或序列化順序變化反覆付 cache-write 成本。目標不是增加一個 Caliburn cache service，而是把現有 prompt 排成穩定前綴＋動態尾端，使用 provider／LangChain 已有能力。
+
+#### 6.7.2 成本判斷
+
+OpenAI GPT-5.6 Luna 官方價為 uncached input `$0.20/M`、cached input `$0.02/M`，cache write 為 uncached input 的 `1.25x`。若同一穩定 prefix 在一輪內使用 `N` 次，其 prefix 相對成本為：
+
+```text
+不快取：N × P
+快取：1.25 × P + 0.10 × (N - 1) × P
+```
+
+| 同一 prefix 使用次數 | 只看該 prefix 的理論節省 |
+|---:|---:|
+| 2 | 32.5% |
+| 3 | 51.7% |
+| 5 | 67.0% |
+| 8 | 75.6% |
+
+Anthropic 的五分鐘 cache 同樣是 write `1.25x`、read `0.1x`，官方直接說一次 cache read 後就已回本；Claude Opus 5 的最低可快取 prefix 已降到 512 tokens。Google Gemini 2.5 以上預設有 implicit caching，但仍要求把共同內容放在 prompt 開頭並檢查 cached-token usage。三家方向一致：多步 agent loop 應重用穩定 prefix，且必須看真實 usage，不能只因送了 cache hint 就宣稱命中。
+
+這些百分比**只適用穩定 prefix 的 input cost**；動態 input、reasoning／output token 都不會因此消失。既有 GPT-5.6 Luna smoke 為 5 attempts、43,023 total tokens、USD 0.01162862，但報告沒有拆出 input／output／stable-prefix 比例，因此不能誠實倒推出絕對省多少美元。Luna 的單輪金額本來就小，絕對節省可能只是美分以下；若換回昂貴模型、同時有更多並行使用或八步 loop，效益會成比例放大。是否「真的值」以 live receipt 的 `cache_read_tokens／cache_write_tokens／total cost／latency` 為準，不以理論表代替實測。
+
+結論是**現在值得加入**：重用次數足夠、官方與 framework 已成熟支援、改動面小，而且 cache miss 不影響正確性。它不是阻擋產品核心的前置大工程；應和新 runtime prompt assembly 一起完成，並以一個窄 live canary 驗證，不建立新資料表或正式 eval 平台。
+
+#### 6.7.3 第一版怎麼加
+
+1. 把 model input 固定排序成兩層：
+   - **stable prefix**：顧問角色、authority／安全規則、固定 Tool schema、final publication 規則與短 Skill catalog；
+   - **dynamic suffix**：本輪 employee input、approved／pending／focus／gap 投影、candidate revision、按需載入 Skill 內容與 Tool results。
+2. 在 stable system content block 末端加 provider-neutral `cache_control: {"type": "ephemeral"}`。OpenRouter 官方會把這個 Anthropic-style marker 轉成 GPT-5.6 的 `prompt_cache_breakpoint`，也可送往 Anthropic／Google；不在 domain model 引入 provider-specific cache DTO。
+3. 沿用目前 `langchain-openrouter==0.2.7` 的原生 content-block 支援。實際套件 characterization 已確認 `SystemMessage(content=[...cache_control...])` 會原樣進 request，且 LangChain 官方以 `usage_metadata.input_token_details.cache_creation／cache_read` 回報。不要把 `prompt_cache_key` 硬塞進 `model_kwargs`：目前 OpenRouter SDK `chat.send()` 不接受該參數，會形成 runtime error。
+4. 可傳一個不含員工文字的 opaque `session_id` 作 OpenRouter session grouping／觀測。現行 profile 同時指定手動 `provider.order`，OpenRouter 官方明示這會停用 sticky routing；又因目前是 exact provider、禁止 fallback，本來也沒有跨 provider 漂移。因此第一版不得把 `session_id` 宣稱成命中保證，除非日後改 routing policy。
+5. 第一版使用 provider default 短 TTL：Anthropic 五分鐘已覆蓋目前 180 秒 run ceiling；GPT-5.6 explicit cache 的預設／目前唯一 TTL 為 30 分鐘。暫不買 Anthropic 一小時 write `2x`，因員工可自然關頁、隔很久再回來，而 durable continuation 本來就由 PostgreSQL／LangGraph 承接。
+6. 現有 `AttemptUsage.cache_read_tokens／cache_write_tokens` 與 LangChain normalization 已具備；補 characterization test，確認 OpenRouter 的 `cached_tokens／cache_write_tokens` 最終落進 receipt。若 provider 不支援、prefix 太短、過期或 cache miss，行為與結果必須完全相同，只是成本不同。
+7. live canary 以完全相同 stable prefix、不同 dynamic suffix 順序呼叫 3–5 step；記錄每 step 的 write／read token、total cost、latency 與 actual provider。至少第二次後看到 `cache_read_tokens > 0` 才算啟用成功；若沒有，先查 prefix bytes、模型最低 token、TTL 與 route，不可用「可能有 cache」結案。
+
+不採用 OpenRouter **response caching**。它針對整個 request 回傳完全相同舊 response，連 Tool call 都可能原樣重播；訪談與候選 JD 每輪都應取得依最新 context 產生的新判斷，這會帶來 stale candidate／副作用重播風險。Prompt caching 只是重用模型處理過的共同輸入，仍會進行新的推理與輸出，兩者不可混稱。
+
 ## 7. 最小驗證，不建立正式 eval 平台
 
 施工採 TDD 並先保留目前失敗作回歸案例：
@@ -271,8 +316,9 @@ deterministic verifier 與來源可信度政策保留；只移除模型手算 of
 9. Evidence：中文、換行、重複 quote、錯 source、source correction、誤含 read-file gutter 都由 resolver 確定處理；模型 wire 無 `start／end`；
 10. source parity：stable-ID read、更正鏈、只查 current source 的 lexical search、async Store access 與 document scope 都不能因 VFS 化而退化；
 11. budget／offload：初始八次 model-step hard ceiling 能完成兩波 lookup＋edit＋check＋一次 repair＋recheck＋final，第九次拒絕；兩個 eviction threshold 均為 `None`，backend 不出現 `/large_tool_results`／`/conversation_history`；
-12. 真模型 smoke：用 GPT-5.6 Luna 的互動基線驗證 edit→diagnostic→repair→publish，再以 owner 指定 profile 做一次窄 probe；只記效果、成本與問題，不提前建立正式品質 eval；
-13. Browser：員工只看到 semantic diff／接受／修改／拒絕／延後，不看到 VFS JSON 或每次 tool call；accessible name 與鍵盤操作通過。
+12. prompt cache：characterization 凍結 stable／dynamic block 順序與 `cache_control` passthrough；cache miss／disabled 結果等價；真模型連續 3–5 step 必須以 receipt 證明 write→read，並記實際成本／延遲，不能只驗 request 有 marker；
+13. 真模型 smoke：用 GPT-5.6 Luna 的互動基線驗證 edit→diagnostic→repair→publish，再以 owner 指定 profile 做一次窄 probe；只記效果、成本與問題，不提前建立正式品質 eval；
+14. Browser：員工只看到 semantic diff／接受／修改／拒絕／延後，不看到 VFS JSON 或每次 tool call；accessible name 與鍵盤操作通過。
 
 每完成 editor、Evidence、publication、review UI 任一獨立切片，都回看產品北極星，不等 Big-bang 最後才檢查偏移。
 
@@ -292,6 +338,9 @@ deterministic verifier 與來源可信度政策保留；只移除模型手算 of
 | VFS 取代來源 Tool 後遺失更正鏈 | source backend 明示 current／lineage projection；一般 grep 排除 historical revision；source parity tests |
 | framework 自動 offload 形成隱藏 namespace／原話副本 | 關閉兩個 eviction threshold；source／check result application-bounded並帶 omitted count；characterization test 凍結無隱藏 route |
 | 新 edit／check 拓撲超過舊五步上限 | successor ADR 明確取代初始五步 profile；八步 hard ceiling＋總 Tool／token／cost／elapsed／recursion budget＋成功／耗盡測試 |
+| 把 prompt cache 誤當記憶／權威 | cache miss、過期或停用不得改語意；continuation 仍只讀 PostgreSQL／LangGraph，cache 不持有產品 truth |
+| 動態內容進 prefix，反覆付昂貴 cache write | 固定 block 排序與序列化；employee／JD／candidate／Tool result 全在 breakpoint 後；以 write／read token canary 驗證 |
+| 把 response cache 當 prompt cache | 不啟用 OpenRouter response caching；互動回答與 Tool call 每次都重新推理，禁止舊 response／副作用重播 |
 
 ## 9. 來源與採用理由
 
@@ -310,3 +359,11 @@ deterministic verifier 與來源可信度政策保留；只移除模型手算 of
 - [Deep Agents — Context engineering](https://docs.langchain.com/oss/python/deepagents/context-engineering) — filesystem tool prompts、offloading 與按需讀取。
 - [LangGraph — Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts) — checkpointed pause／resume 與 durable human input。
 - [LangChain — Tools](https://docs.langchain.com/oss/python/langchain/tools) — ToolNode 平行執行、state update 與 error handling。
+- [OpenAI — GPT-5.6 model guidance](https://developers.openai.com/api/docs/guides/latest-model) — explicit／implicit prompt caching、1.25x write 與 usage 量測要求。
+- [OpenAI — GPT-5.6 Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna) — uncached／cached input 與 output 官方價格。
+- [Anthropic — Prompt caching](https://platform.claude.com/docs/en/build-with-claude/prompt-caching) — tools→system→messages prefix、TTL、最低 token 與 cache usage。
+- [Anthropic — Pricing](https://platform.claude.com/docs/en/about-claude/pricing) — 5m／1h write、read multiplier 與回本點。
+- [Google — Context caching](https://ai.google.dev/gemini-api/docs/caching) — implicit caching、穩定共同 prefix 與 cached-token 觀測。
+- [OpenRouter — Prompt caching](https://openrouter.ai/docs/guides/best-practices/prompt-caching) — provider translation、session／routing 限制與 `cached_tokens／cache_write_tokens`。
+- [LangChain — ChatOpenRouter integration](https://docs.langchain.com/oss/python/integrations/chat/openrouter) — content-block `cache_control` 與 normalized cache usage metadata。
+- [OpenRouter — Response caching](https://openrouter.ai/docs/guides/features/response-caching) — identical response replay；據此明確排除於互動候選 JD loop。

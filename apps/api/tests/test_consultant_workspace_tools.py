@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import copy
+import json
 from typing import Any, Mapping
 from uuid import UUID
 
@@ -13,8 +14,12 @@ from langchain_core.language_models.fake_chat_models import FakeMessagesListChat
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langgraph.prebuilt import ToolRuntime
+from pydantic import PrivateAttr
 
-from app.consultant.agent import build_professional_consultant_agent
+from app.consultant.agent import (
+    ProfessionalConsultantAgent,
+    build_professional_consultant_agent,
+)
 from app.consultant.model_runtime import (
     ConsultantModelProfile,
     RunPolicy,
@@ -46,6 +51,7 @@ EXPECTED_WORKSPACE_TOOLS = frozenset(
 )
 DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000101")
 RUN_ID = UUID("00000000-0000-0000-0000-000000000102")
+OTHER_RUN_ID = UUID("00000000-0000-0000-0000-000000000103")
 DUTY_ID = UUID("00000000-0000-0000-0000-000000000201")
 TASK_ID = UUID("00000000-0000-0000-0000-000000000202")
 
@@ -147,6 +153,62 @@ class WaveModel(FakeMessagesListChatModel):
         return self
 
 
+class ProviderBindingModel(FakeMessagesListChatModel):
+    _bound_tool_schemas: list[dict[str, Any]] = PrivateAttr(default_factory=list)
+
+    @property
+    def bound_tool_schemas(self) -> tuple[dict[str, Any], ...]:
+        return tuple(self._bound_tool_schemas)
+
+    def bind_tools(self, tools: Any, **kwargs: Any) -> ProviderBindingModel:
+        del kwargs
+        self._bound_tool_schemas = [convert_to_openai_tool(tool) for tool in tools]
+        return self
+
+    def _generate(self, messages: Any, stop: Any = None, run_manager: Any = None, **kwargs: Any) -> Any:
+        del messages, stop, run_manager, kwargs
+        raise RuntimeError("stop after real provider binding")
+
+
+def _walk_schema(node: Any):
+    if isinstance(node, dict):
+        yield node
+        for value in node.values():
+            yield from _walk_schema(value)
+    elif isinstance(node, list):
+        for value in node:
+            yield from _walk_schema(value)
+
+
+def _schema_tree_depth(node: Any) -> int:
+    if isinstance(node, dict):
+        return 1 + max((_schema_tree_depth(value) for value in node.values()), default=0)
+    if isinstance(node, list):
+        return max((_schema_tree_depth(value) for value in node), default=0)
+    return 0
+
+
+def _provider_schema_metrics(tool_schema: dict[str, Any]) -> dict[str, int]:
+    parameters = tool_schema["function"]["parameters"]
+    nodes = tuple(_walk_schema(parameters))
+    objects = tuple(node for node in nodes if node.get("type") == "object")
+    return {
+        "properties": sum(len(node.get("properties", {})) for node in objects),
+        "optional": sum(
+            len(set(node.get("properties", {})) - set(node.get("required", ())))
+            for node in objects
+        ),
+        "unions": sum("anyOf" in node or "oneOf" in node for node in nodes),
+        "open_objects": sum(
+            node.get("additionalProperties") is not False for node in objects
+        ),
+        "depth": _schema_tree_depth(parameters),
+        "bytes": len(
+            json.dumps(parameters, ensure_ascii=False, separators=(",", ":")).encode()
+        ),
+    }
+
+
 async def _run_workspace_wave(
     workspace: ConsultantWorkspaceBackendBinding,
     calls: list[dict[str, Any]],
@@ -213,6 +275,48 @@ def test_check_tool_has_empty_model_schema_and_no_document_payload() -> None:
         forbidden not in schema_text
         for forbidden in ("document_id", "run_id", "files", "runtime")
     )
+    assert check_tool.func is None
+    assert check_tool.coroutine is not None
+
+
+@pytest.mark.asyncio
+async def test_real_consultant_provider_binding_captures_exact_workspace_tools_and_metrics() -> None:
+    workspace = _workspace_binding()
+    model = ProviderBindingModel(responses=[])
+    agent = build_professional_consultant_agent(
+        model=model,
+        execution=_execution(),
+        selected_skill_ids=("output",),
+        workspace_binding=workspace,
+        candidate_check_binding=CandidateCheckToolBinding(
+            runtime=RecordingCheckPort(),
+            workspace=workspace,
+        ),
+    )
+
+    with pytest.raises(RuntimeError, match="stop after real provider binding"):
+        await agent.ainvoke(
+            {
+                "messages": [HumanMessage(content="inspect the candidate")],
+                "files": copy.deepcopy(workspace.initial_files),
+            }
+        )
+
+    converted = {schema["function"]["name"]: schema for schema in model.bound_tool_schemas}
+    assert set(converted) == EXPECTED_WORKSPACE_TOOLS
+    assert {
+        name: _provider_schema_metrics(converted[name])
+        for name in sorted(converted)
+    } == {
+        "ls": {"properties": 1, "optional": 0, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 165},
+        "read_file": {"properties": 3, "optional": 2, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 433},
+        "write_file": {"properties": 2, "optional": 0, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 304},
+        "edit_file": {"properties": 4, "optional": 1, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 613},
+        "delete": {"properties": 1, "optional": 0, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 172},
+        "grep": {"properties": 5, "optional": 4, "unions": 3, "open_objects": 1, "depth": 4, "bytes": 1598},
+        "check_candidate_document": {"properties": 0, "optional": 0, "unions": 0, "open_objects": 0, "depth": 2, "bytes": 62},
+    }
+    assert converted["check_candidate_document"]["function"]["parameters"]["properties"] == {}
 
 
 def test_workspace_agent_surface_has_only_framework_editor_verbs_and_check(
@@ -259,6 +363,29 @@ def test_workspace_agent_surface_has_only_framework_editor_verbs_and_check(
     )
 
 
+def test_workspace_agent_sync_invoke_fails_fast_but_legacy_agent_keeps_sync_invoke() -> None:
+    workspace = _workspace_binding()
+
+    class SyncGraph:
+        def invoke(self, *args: Any, **kwargs: Any) -> str:
+            del args, kwargs
+            return "legacy sync result"
+
+    workspace_agent = ProfessionalConsultantAgent(
+        graph=SyncGraph(),
+        skill_backend=workspace.skill_backend,
+        workspace_binding=workspace,
+    )
+    with pytest.raises(RuntimeError, match="async-only"):
+        workspace_agent.invoke({"messages": []})
+
+    legacy_agent = ProfessionalConsultantAgent(
+        graph=SyncGraph(),
+        skill_backend=workspace.skill_backend,
+    )
+    assert legacy_agent.invoke({"messages": []}) == "legacy sync result"
+
+
 @pytest.mark.asyncio
 async def test_check_tool_uses_hidden_runtime_and_current_files_channel() -> None:
     workspace = _workspace_binding()
@@ -291,6 +418,45 @@ async def test_check_tool_uses_hidden_runtime_and_current_files_channel() -> Non
     await check_tool.coroutine(runtime=runtime)  # type: ignore[misc]
     assert port.calls[-1]["tool_call_id"] == "check-002"
     assert port.calls[-1]["files"][header_path] == "{\"job_title\":\"更新後\"}\n"
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "invalid_path",
+    [
+        f"/candidate/{RUN_ID}/../{OTHER_RUN_ID}/header.json",
+        f"/candidate/{RUN_ID}/./header.json",
+        f"/candidate//{RUN_ID}/header.json",
+        f"/candidate/{RUN_ID}\\header.json",
+        f"/candidate/{RUN_ID}/not-a-resource.json",
+        f"/candidate/{OTHER_RUN_ID}/header.json",
+    ],
+)
+async def test_check_rejects_noncanonical_or_invalid_state_keys_before_port_call(
+    invalid_path: str,
+) -> None:
+    workspace = _workspace_binding()
+    port = RecordingCheckPort()
+    check_tool = build_check_candidate_document_tool(
+        binding=CandidateCheckToolBinding(runtime=port, workspace=workspace)
+    )
+    header_path = f"/candidate/{RUN_ID}/header.json"
+    runtime = ToolRuntime(
+        state={
+            "files": {
+                invalid_path: copy.deepcopy(workspace.initial_files[header_path]),
+            }
+        },
+        context={},
+        config={},
+        stream_writer=lambda _value: None,
+        tool_call_id="check-invalid-path",
+        store=None,
+    )
+
+    with pytest.raises(RuntimeError, match="candidate"):
+        await check_tool.coroutine(runtime=runtime)  # type: ignore[misc]
+    assert port.calls == []
 
 
 @pytest.mark.asyncio
@@ -347,6 +513,149 @@ async def test_disjoint_edits_in_one_real_framework_wave_succeed() -> None:
     assert [message.status for message in messages] == ["success", "success"]
     assert _candidate_text(result, header_path) != original_header
     assert _candidate_text(result, task_path) != original_task
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "alias_path",
+    [
+        f"/candidate/{RUN_ID}/./header.json",
+        f"/candidate//{RUN_ID}/header.json",
+        f"/candidate/{RUN_ID}\\header.json",
+    ],
+)
+async def test_framework_canonical_aliases_to_same_file_reject_the_entire_wave(
+    alias_path: str,
+) -> None:
+    workspace = _workspace_binding()
+    canonical_path = f"/candidate/{RUN_ID}/header.json"
+    original_header = workspace.initial_files[canonical_path]["content"]
+
+    result = await _run_workspace_wave(
+        workspace,
+        [
+            _tool_call(
+                "edit_file",
+                {
+                    "file_path": alias_path,
+                    "old_string": "採購專員",
+                    "new_string": "別名修改",
+                },
+                "alias-001",
+            ),
+            _tool_call(
+                "edit_file",
+                {
+                    "file_path": canonical_path,
+                    "old_string": "採購專員",
+                    "new_string": "正規修改",
+                },
+                "alias-002",
+            ),
+        ],
+    )
+
+    messages = _tool_messages(result)
+    assert [message.status for message in messages] == ["error", "error"]
+    assert _candidate_text(result, canonical_path) == original_header
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "invalid_path",
+    [
+        f"/candidate/{RUN_ID}/../{OTHER_RUN_ID}/header.json",
+        f"/candidate/{RUN_ID}/../../outside.json",
+    ],
+)
+async def test_invalid_or_traversal_mutation_rejects_sibling_before_zero_mutation(
+    invalid_path: str,
+) -> None:
+    workspace = _workspace_binding()
+    header_path = f"/candidate/{RUN_ID}/header.json"
+    task_path = f"/candidate/{RUN_ID}/tasks/task-001.json"
+    original_header = workspace.initial_files[header_path]["content"]
+    original_task = workspace.initial_files[task_path]["content"]
+
+    result = await _run_workspace_wave(
+        workspace,
+        [
+            _tool_call(
+                "edit_file",
+                {
+                    "file_path": invalid_path,
+                    "old_string": "採購專員",
+                    "new_string": "不應套用",
+                },
+                "invalid-001",
+            ),
+            _tool_call(
+                "edit_file",
+                {
+                    "file_path": task_path,
+                    "old_string": "整理需求",
+                    "new_string": "不應套用",
+                },
+                "invalid-002",
+            ),
+        ],
+    )
+
+    messages = _tool_messages(result)
+    assert [message.status for message in messages] == ["error", "error"]
+    assert _candidate_text(result, header_path) == original_header
+    assert _candidate_text(result, task_path) == original_task
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "bad_args",
+    [
+        {
+            "old_string": "採購專員",
+            "new_string": "不應套用",
+        },
+        {
+            "file_path": "",
+            "old_string": "採購專員",
+            "new_string": "不應套用",
+        },
+        {
+            "file_path": "../candidate/outside/header.json",
+            "old_string": "採購專員",
+            "new_string": "不應套用",
+        },
+    ],
+)
+async def test_unvalidated_mutation_path_rejects_every_call_before_valid_sibling(
+    bad_args: dict[str, Any],
+) -> None:
+    workspace = _workspace_binding()
+    header_path = f"/candidate/{RUN_ID}/header.json"
+    task_path = f"/candidate/{RUN_ID}/tasks/task-001.json"
+    original_header = workspace.initial_files[header_path]["content"]
+    original_task = workspace.initial_files[task_path]["content"]
+
+    result = await _run_workspace_wave(
+        workspace,
+        [
+            _tool_call("edit_file", bad_args, "missing-or-invalid-001"),
+            _tool_call(
+                "edit_file",
+                {
+                    "file_path": task_path,
+                    "old_string": "整理需求",
+                    "new_string": "不應套用",
+                },
+                "missing-or-invalid-002",
+            ),
+        ],
+    )
+
+    messages = _tool_messages(result)
+    assert [message.status for message in messages] == ["error", "error"]
+    assert _candidate_text(result, header_path) == original_header
+    assert _candidate_text(result, task_path) == original_task
 
 
 @pytest.mark.asyncio

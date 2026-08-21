@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from typing import Annotated, Any
 
 from deepagents.backends import BackendProtocol
+from deepagents.backends.utils import validate_path
 from deepagents.middleware.filesystem import FilesystemMiddleware
 from deepagents.middleware.skills import SkillsMiddleware, SkillsState
 from langchain.agents.middleware import AgentMiddleware
@@ -80,6 +81,10 @@ class ProfessionalConsultantAgent:
     workspace_binding: ConsultantWorkspaceBackendBinding | None = None
 
     def invoke(self, *args: Any, **kwargs: Any) -> Any:
+        if self.workspace_binding is not None:
+            raise WorkspaceAgentAsyncOnlyError(
+                "workspace consultant agents are async-only; use ainvoke()"
+            )
         return self.graph.invoke(*args, **kwargs)
 
     async def ainvoke(self, *args: Any, **kwargs: Any) -> Any:
@@ -87,6 +92,10 @@ class ProfessionalConsultantAgent:
 
     def __getattr__(self, name: str) -> Any:
         return getattr(self.graph, name)
+
+
+class WorkspaceAgentAsyncOnlyError(RuntimeError):
+    """Raised when a workspace-backed consultant is invoked synchronously."""
 
 
 class LookupWaveLimitExceeded(RuntimeError):
@@ -150,6 +159,7 @@ class RunScopedSkillsMiddleware(SkillsMiddleware):
         *,
         backend: BackendProtocol,
         receipt_backend: DirectPackageSkillBackendAdapter | PackageSkillBackend | None = None,
+        workspace_mode: bool = False,
     ) -> None:
         super().__init__(
             backend=backend,
@@ -157,6 +167,7 @@ class RunScopedSkillsMiddleware(SkillsMiddleware):
             system_prompt=SKILLS_SYSTEM_PROMPT,
         )
         self._package_backend = receipt_backend or backend
+        self._workspace_mode = workspace_mode
 
     @override
     def before_agent(
@@ -165,7 +176,7 @@ class RunScopedSkillsMiddleware(SkillsMiddleware):
         runtime: Runtime,
         config: RunnableConfig,
     ) -> dict[str, Any] | None:
-        _reject_stale_skill_results(state)
+        _reject_stale_skill_results(state, workspace_mode=self._workspace_mode)
         self._package_backend.begin_run()
         clean = dict(state)
         clean.pop("skills_metadata", None)
@@ -180,7 +191,7 @@ class RunScopedSkillsMiddleware(SkillsMiddleware):
         runtime: Runtime,
         config: RunnableConfig,
     ) -> dict[str, Any] | None:
-        _reject_stale_skill_results(state)
+        _reject_stale_skill_results(state, workspace_mode=self._workspace_mode)
         self._package_backend.begin_run()
         clean = dict(state)
         clean.pop("skills_metadata", None)
@@ -190,7 +201,14 @@ class RunScopedSkillsMiddleware(SkillsMiddleware):
         return update
 
 
-def _reject_stale_skill_results(state: SkillsState) -> None:
+def _reject_stale_skill_results(
+    state: SkillsState,
+    *,
+    workspace_mode: bool = False,
+) -> None:
+    if workspace_mode:
+        _reject_stale_workspace_read_receipts(state)
+        return
     if any(
         isinstance(message, ToolMessage) and message.name == "read_file"
         for message in state.get("messages", [])
@@ -198,6 +216,56 @@ def _reject_stale_skill_results(state: SkillsState) -> None:
         raise ValueError(
             "interactive consultant input contains a stale Skill tool result"
         )
+
+
+def _message_tool_calls(message: Any) -> tuple[Mapping[str, Any], ...]:
+    if isinstance(message, AIMessage):
+        return tuple(call for call in message.tool_calls if isinstance(call, Mapping))
+    if isinstance(message, Mapping) and message.get("type") == "ai":
+        calls = message.get("tool_calls", ())
+        if isinstance(calls, Sequence):
+            return tuple(call for call in calls if isinstance(call, Mapping))
+    return ()
+
+
+def _read_file_receipt(message: Any) -> tuple[bool, str | None]:
+    if isinstance(message, ToolMessage):
+        return message.name == "read_file", message.tool_call_id
+    if isinstance(message, Mapping) and message.get("type") == "tool":
+        return message.get("name") == "read_file", message.get("tool_call_id")
+    return False, None
+
+
+def _reject_stale_workspace_read_receipts(state: SkillsState) -> None:
+    messages = state.get("messages", [])
+    if not isinstance(messages, Sequence):
+        return
+    for index, message in enumerate(messages):
+        is_read_receipt, tool_call_id = _read_file_receipt(message)
+        if not is_read_receipt:
+            continue
+        if not isinstance(tool_call_id, str) or not tool_call_id:
+            raise ValueError("workspace read_file receipt is orphaned")
+        matches = [
+            call
+            for prior in messages[:index]
+            for call in _message_tool_calls(prior)
+            if call.get("name") == "read_file" and call.get("id") == tool_call_id
+        ]
+        if not matches:
+            raise ValueError("workspace read_file receipt is orphaned")
+        if len(matches) != 1:
+            raise ValueError("workspace read_file receipt is ambiguous")
+        args = matches[0].get("args")
+        path = args.get("file_path") if isinstance(args, Mapping) else None
+        if not isinstance(path, str):
+            raise ValueError("workspace read_file receipt has no valid path")
+        try:
+            canonical_path = validate_path(path)
+        except (TypeError, ValueError) as error:
+            raise ValueError("workspace read_file receipt has an invalid path") from error
+        if canonical_path == "/skills" or canonical_path.startswith("/skills/"):
+            raise ValueError("interactive consultant input contains a stale Skill tool result")
 
 
 def build_professional_consultant_agent(
@@ -283,6 +351,7 @@ def build_professional_consultant_agent(
     skills = RunScopedSkillsMiddleware(
         backend=backend,
         receipt_backend=(receipt_backend if workspace_binding is not None else None),
+        workspace_mode=workspace_binding is not None,
     )
     files = FilesystemMiddleware(
         backend=backend,

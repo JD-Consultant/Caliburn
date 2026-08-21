@@ -124,3 +124,66 @@ workspace mode 的 filesystem descriptions 也以 framework `custom_tool_descrip
 - `CandidateCheckPort` 目前是 Task 4 的 raw current-files application seam；它將 `document_id`、`run_id`、排序後的目前 candidate file contents 與 `tool_call_id` 傳給下一個 Task。Task 5 才實作 parser→Evidence→semantic changeset／checked receipt，故 Task 4 沒有偷做 publication 或第二份 domain state。
 - Task 6 仍需把 production run service 接到 workspace binding、改八步 policy／path-aware lookup，並移除 legacy source／candidate Tool compatibility seam；本 Task 沒有提前做這些 hard-cut。
 - `docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md` 在開始時已是 persistent dirty，未修改、未 stage、未 restore；沒有建立 tag、merge、push 或對外動作。
+
+## Fix round 1/5（2026-08-22）
+
+本輪只修正 Task 4 review 已驗證的六項安全／介面缺口，沒有開始 Task 5 publication 或 Task 6 hard-cut。除原有三個 Task 4 檔案外，為重用既有 candidate resource policy，新增一個最小的 `CandidatePolicyBackend.validate_candidate_file_path()` 入口；沒有新增 state、Store、transaction layer、sync DB port 或另一套 path normalizer。
+
+### RED 證據
+
+先只加入 `apps/api/tests/test_consultant_workspace_tools.py` 與 `apps/api/tests/test_consultant_agent_and_skills.py` 的回歸測試，再執行 brief focused gate：
+
+```text
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task4'; $env:VIRTUAL_ENV=(Join-Path (Get-Location) '.venv'); uv run --active pytest tests/test_consultant_workspace_tools.py tests/test_consultant_agent_and_skills.py -p no:cacheprovider -q
+```
+
+結果為 exit code 1：`41 passed, 21 failed`。失敗集中在：未驗證 mutation path 未阻擋 sibling、canonical alias 未整波拒絕、check raw files key 未 fail closed、workspace continuation constructor／receipt policy 尚未存在、workspace sync `invoke` 未拒絕。provider test 首次顯示的差異是測試內 depth helper 未採報告既有 schema-tree 定義；改正測試 helper 後，該 test 成為 provider-binding characterization（現有 builder 已能通過真實 bind），沒有藉此擴張 production scope。
+
+另外補測空字串 mutation path 後，先獨立執行該 parametrized case 得到 `1 failed, 2 passed`；同一 framework validation 結果納入最小 fail-closed guard。
+
+### Framework evidence and minimal fixes
+
+- 實際 pinned versions：`deepagents==0.7.5`、`langchain==1.3.15`、`langgraph==1.2.11`。
+- `deepagents.backends.utils.validate_path(path, *, allowed_prefixes=None) -> str` 是唯一 path canonicalization primitive；實測 `/./`、重複 slash、backslash aliases 都回傳同一 canonical path，`..`／traversal raise `ValueError`。wave 現在保存每個 mutation call 的 validation 結果，任何 missing／invalid path 都先拒絕整個 wave，再以 canonical string 做 same／ancestor-descendant 比較。
+- check 讀同一 LangGraph `files` channel；每個 key 先經 `CandidatePolicyBackend.validate_candidate_file_path()`（內部重用 `validate_path` 與既有 resource grammar），並要求 raw key 已是 canonical current-run resource。cross-run、dot、重複 slash、backslash alias、traversal 與非法 resource key 都在 CandidateCheckPort 前 fail closed。
+- `RunScopedSkillsMiddleware` 保留 legacy direct mode 的 blanket stale-read rejection。workspace mode 才以 preceding `AIMessage` 的 matching `tool_call_id` 找 `read_file.file_path`、經 framework validation，只有 `/skills` receipt 視為 stale；正常 `/candidate`、`/sources`、`/approved`、`/pending` receipt 放行，orphan／ambiguous receipt 拒絕。
+- workspace `ProfessionalConsultantAgent.invoke()` 現在立即 raise 明確的 `WorkspaceAgentAsyncOnlyError`；legacy direct agent 仍可 sync invoke。check `StructuredTool` 維持只有 `coroutine`、無 sync `func`，其 async-only contract 已寫入 docstring。
+
+### GREEN evidence
+
+brief 原始 focused gate（保留 Windows pytest cache warning，以證明原命令本身）：
+
+```text
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task4'; $env:VIRTUAL_ENV=(Join-Path (Get-Location) '.venv'); uv run pytest tests/test_consultant_workspace_tools.py tests/test_consultant_agent_and_skills.py -q
+```
+
+結果：`63 passed, 2 warnings in 10.66s`。warnings 只是在 worktree 建立 `.pytest_cache` 的 `WinError 5`，不是測試／production warning；同一 focused gate 關閉 cache provider 為 `63 passed`。
+
+相關 regression gate：
+
+```text
+$env:UV_CACHE_DIR='S:\caliburn\.uv-cache-task4'; $env:VIRTUAL_ENV=(Join-Path (Get-Location) '.venv'); uv run --active pytest tests/test_consultant_workspace_tools.py tests/test_consultant_agent_and_skills.py tests/test_consultant_workspace_backend.py tests/test_consultant_workspace_resources.py tests/test_consultant_evidence_anchor.py tests/test_consultant_model_output.py tests/test_consultant_model_runtime.py -p no:cacheprovider -q
+```
+
+結果：`140 passed in 13.44s`。
+
+真實 provider binding regression 以實際 `build_professional_consultant_agent()` 建 graph，讓 model 的真實 `bind_tools()` 收集 `convert_to_openai_tool()` 結果；沒有 monkeypatch builder，也沒有使用會丟棄 tools 的 model。exact names 仍為七個 workspace tools，provider-converted metrics（`properties/optional/unions/open_objects/depth/bytes`）如下：
+
+| tool | properties | optional | unions | open_objects | depth | bytes |
+|---|---:|---:|---:|---:|---:|---:|
+| `ls` | 1 | 0 | 0 | 1 | 3 | 165 |
+| `read_file` | 3 | 2 | 0 | 1 | 3 | 433 |
+| `write_file` | 2 | 0 | 0 | 1 | 3 | 304 |
+| `edit_file` | 4 | 1 | 0 | 1 | 3 | 613 |
+| `delete` | 1 | 0 | 0 | 1 | 3 | 172 |
+| `grep` | 5 | 4 | 3 | 1 | 4 | 1598 |
+| `check_candidate_document` | 0 | 0 | 0 | 0 | 2 | 62 |
+
+check 的 provider parameters 仍是 empty object（`properties={}`、無 required／document payload），internal schema 只有 hidden `ToolRuntime`。
+
+### Fix round self-review
+
+- 平行 reads、disjoint edits、same／ancestor overlap、mutation＋check 的既有成功／拒絕行為保留；conflicting wave 仍由完整最後 AI message preflight，未依 completion order 部分套用。
+- 仍只有一個 Task 3 `StateBackend`／`CompositeBackend`；沒有把 candidate files 複製成第二份 durable state，也沒有 publication／authority edge。
+- 未修改 `run_service.py`、publication、authority、model output、policy default 或 ADR 0060；Task 5／6 留待後續 task。
+- `git diff --check` 通過。persistent false-dirty `docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md` 持續未修改、未 stage、未 restore。

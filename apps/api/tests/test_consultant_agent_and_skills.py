@@ -56,12 +56,21 @@ from app.consultant.skill_backend import (
     load_packaged_skill_text,
     skill_path,
 )
-from app.consultant.state import EmployeeSource, EmployeeSourceKind, QuoteAnchor
+from app.consultant.state import (
+    ApprovedDuty,
+    ApprovedJobDocument,
+    ApprovedTask,
+    EmployeeSource,
+    EmployeeSourceKind,
+    QuoteAnchor,
+)
 from app.consultant.verification import (
     ConsultantVerificationError,
     verify_candidate_document_changes,
     verify_consultant_result,
 )
+from app.consultant.workspace_backend import build_consultant_workspace_backend
+from app.consultant.workspace_resources import WorkspaceCatalog
 
 
 ALL_FIRST_RELEASE_SKILLS = (
@@ -282,6 +291,62 @@ def _text_seen(messages: list[BaseMessage]) -> str:
         for message in messages
         if isinstance(message.content, (str, list))
     )
+
+
+def _workspace_skill_backend():
+    document_id = UUID("00000000-0000-0000-0000-000000000301")
+    run_id = UUID("00000000-0000-0000-0000-000000000302")
+    duty_id = UUID("00000000-0000-0000-0000-000000000303")
+    task_id = UUID("00000000-0000-0000-0000-000000000304")
+    document = ApprovedJobDocument(
+        document_id=document_id,
+        job_title="採購專員",
+        work_description="管理採購流程。",
+        competency_level=5,
+        duties=(ApprovedDuty(duty_id=duty_id, statement="管理採購作業", display_order=0),),
+        tasks=(
+            ApprovedTask(
+                task_id=task_id,
+                duty_id=duty_id,
+                statement="整理需求",
+                action="整理",
+                object="採購需求",
+                display_order=0,
+                competency_level=4,
+            ),
+        ),
+    )
+    catalog = WorkspaceCatalog.from_snapshot(document)
+    return build_consultant_workspace_backend(
+        runtime=object(),  # type: ignore[arg-type] - source projection is not used here
+        document_id=document_id,
+        run_id=run_id,
+        catalog=catalog,
+        selected_skill_ids=("output",),
+    )
+
+
+def _read_receipt_state(path: str, call_id: str = "prior-read") -> dict[str, Any]:
+    return {
+        "messages": [
+            AIMessage(
+                content="",
+                tool_calls=[
+                    {
+                        "name": "read_file",
+                        "args": {"file_path": path},
+                        "id": call_id,
+                        "type": "tool_call",
+                    }
+                ],
+            ),
+            ToolMessage(
+                content="prior read result",
+                name="read_file",
+                tool_call_id=call_id,
+            ),
+        ]
+    }
 
 
 def test_first_release_skill_registry_is_exact_and_has_no_deferred_domains() -> None:
@@ -775,6 +840,122 @@ def test_run_scoped_skill_metadata_replaces_stale_framework_state() -> None:
     assert update is not None
     assert [item["name"] for item in update["skills_metadata"]] == ["output"]
     assert update["skills_load_errors"] == []
+
+
+@pytest.mark.parametrize(
+    "path",
+    [
+        "/candidate/00000000-0000-0000-0000-000000000302/header.json",
+        "/sources/current/source-001.txt",
+        "/approved/header.json",
+        "/pending/changesets.json",
+    ],
+)
+def test_workspace_continuation_allows_non_skill_read_receipts(path: str) -> None:
+    workspace = _workspace_skill_backend()
+    middleware = RunScopedSkillsMiddleware(
+        backend=workspace.composite_backend,
+        receipt_backend=workspace.skill_backend,
+        workspace_mode=True,
+    )
+
+    update = middleware.before_agent(
+        _read_receipt_state(path),
+        runtime=None,  # type: ignore[arg-type] - middleware does not use runtime
+        config={},
+    )
+
+    assert update is not None
+    assert update["skills_load_errors"] == []
+
+
+def test_workspace_continuation_rejects_a_prior_skill_read_receipt() -> None:
+    workspace = _workspace_skill_backend()
+    middleware = RunScopedSkillsMiddleware(
+        backend=workspace.composite_backend,
+        receipt_backend=workspace.skill_backend,
+        workspace_mode=True,
+    )
+
+    with pytest.raises(ValueError, match="stale Skill tool result"):
+        middleware.before_agent(
+            _read_receipt_state("/skills/output/SKILL.md"),
+            runtime=None,  # type: ignore[arg-type]
+            config={},
+        )
+
+
+def test_workspace_continuation_rejects_orphan_skill_read_receipt() -> None:
+    workspace = _workspace_skill_backend()
+    middleware = RunScopedSkillsMiddleware(
+        backend=workspace.composite_backend,
+        receipt_backend=workspace.skill_backend,
+        workspace_mode=True,
+    )
+
+    with pytest.raises(ValueError, match="orphan"):
+        middleware.before_agent(
+            {
+                "messages": [
+                    ToolMessage(
+                        content="orphan read result",
+                        name="read_file",
+                        tool_call_id="missing-ai-call",
+                    )
+                ]
+            },
+            runtime=None,  # type: ignore[arg-type]
+            config={},
+        )
+
+
+def test_workspace_continuation_rejects_ambiguous_read_receipt_id() -> None:
+    workspace = _workspace_skill_backend()
+    middleware = RunScopedSkillsMiddleware(
+        backend=workspace.composite_backend,
+        receipt_backend=workspace.skill_backend,
+        workspace_mode=True,
+    )
+    state = {
+        "messages": [
+            AIMessage(
+                content="",
+                tool_calls=[
+                    {
+                        "name": "read_file",
+                        "args": {
+                            "file_path": "/candidate/00000000-0000-0000-0000-000000000302/header.json"
+                        },
+                        "id": "ambiguous-read",
+                        "type": "tool_call",
+                    }
+                ],
+            ),
+            AIMessage(
+                content="",
+                tool_calls=[
+                    {
+                        "name": "read_file",
+                        "args": {"file_path": "/sources/current/source-001.txt"},
+                        "id": "ambiguous-read",
+                        "type": "tool_call",
+                    }
+                ],
+            ),
+            ToolMessage(
+                content="ambiguous read result",
+                name="read_file",
+                tool_call_id="ambiguous-read",
+            ),
+        ]
+    }
+
+    with pytest.raises(ValueError, match="ambiguous"):
+        middleware.before_agent(
+            state,
+            runtime=None,  # type: ignore[arg-type]
+            config={},
+        )
 
 
 def test_interactive_agent_cannot_reuse_prior_skill_tool_content_or_own_checkpoint() -> None:

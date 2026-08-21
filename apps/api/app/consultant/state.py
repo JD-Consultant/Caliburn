@@ -574,6 +574,41 @@ class DocumentChangeSet(DurableModel):
         return self
 
 
+ConsultantSkillId = Literal[
+    "work-discovery",
+    "story-interview",
+    "task-boundary",
+    "duty-grouping",
+    "output",
+    "performance-indicator",
+    "knowledge",
+    "skill",
+    "completion-red-team",
+]
+
+
+class CheckedCandidateReceipt(DurableModel):
+    """The exact candidate check accepted by the authority graph.
+
+    Candidate resource files are transient model state.  This receipt is the
+    only durable hand-off between a successful check and final publication.
+    """
+
+    run_id: UUID
+    baseline_revision: int = Field(ge=0)
+    candidate_revision: int = Field(ge=1)
+    resource_digest: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
+    check_call_id: NonEmptyText
+    used_skill_ids: tuple[ConsultantSkillId, ...]
+    changeset: DocumentChangeSet
+
+    @model_validator(mode="after")
+    def used_skills_are_unique(self) -> CheckedCandidateReceipt:
+        if len(self.used_skill_ids) != len(set(self.used_skill_ids)):
+            raise ValueError("duplicate checked candidate used_skill_ids")
+        return self
+
+
 class RequiredClarification(DurableModel):
     clarification_id: UUID
     question: NonEmptyText
@@ -675,6 +710,7 @@ class ConsultantThreadState(TypedDict, total=False):
     sufficiency: dict[str, Any] | None
     latest_run: dict[str, Any] | None
     command_receipts: dict[str, dict[str, Any]]
+    checked_candidate: dict[str, Any] | None
     active_candidate: dict[str, Any] | None
 
 
@@ -692,6 +728,8 @@ class ConsultantCommandContext(TypedDict, total=False):
         "reject_changes",
         "defer_changes",
         "stage_candidate_revision",
+        "check_candidate_document",
+        "publish_checked_candidate",
     ]
     document_id: str
     expected_revision: int
@@ -707,6 +745,8 @@ class ConsultantCommandContext(TypedDict, total=False):
     run_receipt: dict[str, Any]
     command_receipt: dict[str, Any]
     candidate_stage: dict[str, Any]
+    checked_candidate: dict[str, Any]
+    run_id: str
 
 
 def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
@@ -732,6 +772,7 @@ def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
         "sufficiency": None,
         "latest_run": None,
         "command_receipts": {},
+        "checked_candidate": None,
         "active_candidate": None,
     }
 

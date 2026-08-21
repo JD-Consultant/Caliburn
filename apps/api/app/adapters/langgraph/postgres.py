@@ -12,6 +12,8 @@ from collections.abc import AsyncIterator, Awaitable, Callable, Iterable, Mappin
 from contextlib import asynccontextmanager
 from copy import deepcopy
 from datetime import UTC, datetime
+from hashlib import sha256
+import json
 from typing import Any, Literal
 from uuid import UUID, uuid5
 
@@ -27,6 +29,14 @@ from psycopg.rows import DictRow, dict_row
 
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.clarification import ClarificationAnswer
+from app.consultant.candidate_publication import (
+    CandidateCheckRequest,
+    CandidateCheckResult,
+    CandidatePublicationStale,
+    check_candidate_document,
+    publish_checked_candidate as validate_checked_candidate,
+    resource_digest,
+)
 from app.consultant.candidate_wire import (
     CandidateWireMappingError,
     map_candidate_edit_batch,
@@ -69,6 +79,7 @@ from app.consultant.state import (
     SourcePositionAnchor,
     SourceReference,
     SourceValidity,
+    CheckedCandidateReceipt,
     RequiredClarification,
     RunReceipt,
     RunExecutionEvidence,
@@ -76,6 +87,8 @@ from app.consultant.state import (
     UnderstandingCalibration,
     inspect_command_receipt,
 )
+from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
+from app.consultant.workspace_resources import WorkspaceCatalog
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 from app.consultant.verification import (
     ConsultantVerificationError,
@@ -756,6 +769,235 @@ class PostgresConsultantRuntime:
                         "document_id": str(document_id),
                         "expected_revision": snapshot.revision,
                         "run_receipt": receipt.model_dump(mode="json"),
+                    },
+                )
+            except StaleThreadRevision as error:
+                raise StaleRevision(str(error)) from error
+            await self._touch_catalog(document_id)
+            return await self._snapshot(document_id)
+
+    @staticmethod
+    def _candidate_text_files(
+        files: Mapping[str, str | bytes],
+    ) -> dict[str, str]:
+        normalized: dict[str, str] = {}
+        for path, raw in files.items():
+            if isinstance(raw, bytes):
+                normalized[str(path)] = raw.decode("utf-8")
+            elif isinstance(raw, str):
+                normalized[str(path)] = raw
+            else:
+                raise TypeError("candidate resources must be UTF-8 text files")
+        return normalized
+
+    @staticmethod
+    def _candidate_publication_command_receipt(
+        receipt: CheckedCandidateReceipt,
+    ) -> CommandReceipt:
+        payload = json.dumps(
+            receipt.model_dump(mode="json"),
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return CommandReceipt(
+            command_id=uuid5(
+                receipt.changeset.changeset_id,
+                f"candidate-publication:{receipt.check_call_id}",
+            ),
+            command_kind="publish_checked_candidate",
+            payload_sha256=sha256(payload).hexdigest(),
+        )
+
+    async def check_candidate_document(
+        self,
+        *,
+        document_id: UUID,
+        run_id: UUID,
+        files: Mapping[str, str | bytes],
+        tool_call_id: str,
+    ) -> CandidateCheckResult:
+        """Check current candidate resources and persist only its receipt."""
+
+        normalized_files = self._candidate_text_files(files)
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            snapshot = await self._snapshot(document_id)
+            raw_state = await self.raw_state(document_id)
+            latest_payload = raw_state.get("latest_run")
+            if latest_payload is None:
+                raise ActiveConsultantRun(
+                    "candidate check requires an active consultant run"
+                )
+            latest = RunReceipt.model_validate(latest_payload)
+            if latest.run_id != run_id or latest.status is not RunStatus.SOURCE_SAVED:
+                raise ActiveConsultantRun(
+                    "candidate check does not match the active consultant run"
+                )
+
+            digest = resource_digest(normalized_files)
+            existing_payload = raw_state.get("checked_candidate")
+            existing = (
+                CheckedCandidateReceipt.model_validate(existing_payload)
+                if existing_payload is not None
+                else None
+            )
+            if existing is not None and existing.check_call_id == tool_call_id:
+                if (
+                    existing.run_id == run_id
+                    and existing.baseline_revision == snapshot.revision
+                    and existing.resource_digest == digest
+                ):
+                    return CandidateCheckResult(
+                        status="checked",
+                        run_id=run_id,
+                        candidate_revision=existing.candidate_revision,
+                        resource_digest=digest,
+                        actions=existing.changeset.actions,
+                        receipt=existing,
+                        review_queue={},
+                    )
+                raise IdempotencyConflict(
+                    f"candidate check call {tool_call_id} was reused with another payload"
+                )
+            candidate_revision = (
+                existing.candidate_revision + 1
+                if existing is not None and existing.run_id == run_id
+                else 1
+            )
+            pending = tuple(
+                DocumentChangeSet.model_validate(value)
+                for value in snapshot.review_queue.values()
+            )
+            sources = await self.list_sources(document_id)
+            catalog = WorkspaceCatalog.from_snapshot(
+                snapshot.approved_document,
+                pending=pending,
+                sources=sources,
+            )
+            request = CandidateCheckRequest(
+                document_id=document_id,
+                run_id=run_id,
+                baseline_revision=snapshot.revision,
+                candidate_revision=candidate_revision,
+                files=normalized_files,
+                check_call_id=tool_call_id,
+                selected_skill_ids=CONSULTANT_SKILL_IDS,
+                loaded_skill_ids=CONSULTANT_SKILL_IDS,
+            )
+            result = check_candidate_document(
+                request,
+                catalog=catalog,
+                existing_review_queue=snapshot.review_queue,
+                interview_work=snapshot.interview_work,
+            )
+            if result.status != "checked" or result.receipt is None:
+                return result
+            try:
+                await self._require_current_committed_sources(
+                    document_id,
+                    result.receipt.changeset.source_ids,
+                )
+            except (
+                UnknownEvidenceSource,
+                PendingSourceRequiresReconciliation,
+                SourceConflict,
+            ) as error:
+                return CandidateCheckResult(
+                    status="invalid",
+                    run_id=run_id,
+                    candidate_revision=candidate_revision,
+                    resource_digest=digest,
+                    issues=(str(error),),
+                    review_queue={},
+                )
+            try:
+                await self.graph.ainvoke(
+                    {},
+                    self.graph_config(document_id),
+                    context={
+                        "action": "check_candidate_document",
+                        "document_id": str(document_id),
+                        "expected_revision": snapshot.revision,
+                        "checked_candidate": result.receipt.model_dump(mode="json"),
+                    },
+                )
+            except StaleThreadRevision as error:
+                raise StaleRevision(str(error)) from error
+            await self._touch_catalog(document_id)
+            return result
+
+    async def publish_checked_candidate(
+        self,
+        *,
+        document_id: UUID,
+        run_id: UUID,
+        files: Mapping[str, str | bytes],
+    ) -> ConsultantSnapshot:
+        """Atomically move the exact checked changeset into review queue."""
+
+        normalized_files = self._candidate_text_files(files)
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            snapshot = await self._snapshot(document_id)
+            raw_state = await self.raw_state(document_id)
+            checked_payload = raw_state.get("checked_candidate")
+            if checked_payload is None:
+                changeset_id = uuid5(
+                    document_id,
+                    f"consultant:{run_id}:document-changes",
+                )
+                if str(changeset_id) in snapshot.review_queue:
+                    return snapshot
+                raise CandidatePublicationStale(
+                    "candidate publication has no checked candidate receipt"
+                )
+            receipt = CheckedCandidateReceipt.model_validate(checked_payload)
+            if receipt.run_id != run_id:
+                raise CandidatePublicationStale(
+                    "candidate publication run is stale"
+                )
+            latest_payload = raw_state.get("latest_run")
+            if latest_payload is None:
+                raise CandidatePublicationStale(
+                    "candidate publication run is stale"
+                )
+            latest = RunReceipt.model_validate(latest_payload)
+            if latest.run_id != run_id or latest.status is not RunStatus.SOURCE_SAVED:
+                raise CandidatePublicationStale(
+                    "candidate publication run is stale"
+                )
+            sources = await self.list_sources(document_id)
+            current_source_ids = tuple(
+                source.source_id
+                for source in sources
+                if (
+                    source.document_id == document_id
+                    and source.processing_status is SourceProcessingStatus.COMMITTED
+                    and source.validity is SourceValidity.CURRENT
+                )
+            )
+            validate_checked_candidate(
+                receipt,
+                current_run_id=run_id,
+                current_baseline_revision=snapshot.revision,
+                current_document=snapshot.approved_document,
+                current_files=normalized_files,
+                current_source_ids=current_source_ids,
+            )
+            command_receipt = self._candidate_publication_command_receipt(receipt)
+            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                return snapshot
+            try:
+                await self.graph.ainvoke(
+                    {},
+                    self.graph_config(document_id),
+                    context={
+                        "action": "publish_checked_candidate",
+                        "document_id": str(document_id),
+                        "expected_revision": snapshot.revision,
+                        "run_id": str(run_id),
+                        "command_receipt": command_receipt.model_dump(mode="json"),
                     },
                 )
             except StaleThreadRevision as error:

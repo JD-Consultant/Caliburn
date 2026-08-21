@@ -210,6 +210,61 @@ def test_workspace_resources_round_trip_editable_jd_without_exposing_a_or_level(
     assert parsed.approved_document.opks[-1].kind.value == "attitude"
 
 
+def test_catalog_keeps_historical_opks_kind_for_pending_targets() -> None:
+    historical_output_id = UUID("00000000-0000-0000-0000-000000000112")
+    historical_indicator_id = UUID("00000000-0000-0000-0000-000000000113")
+    withdraw = DocumentPatchAction(
+        action_id=ACTION_ONE_ID,
+        operation=DocumentPatchOperation.WITHDRAW,
+        path=f"/opks/{historical_output_id}",
+        target_key="withdraw:/opks:output",
+        before={
+            "item_id": str(historical_output_id),
+            "kind": "output",
+            "text": "歷史產出",
+        },
+        source_ids=(SOURCE_ID,),
+        read_set=(
+            DocumentPathRead(
+                path=f"/opks/{historical_output_id}",
+                value_sha256="b" * 64,
+            ),
+        ),
+    )
+    merge = DocumentPatchAction(
+        action_id=ACTION_TWO_ID,
+        operation=DocumentPatchOperation.MERGE,
+        path="/opks",
+        target_key="merge:/opks:indicator",
+        before=[
+            {"item_id": str(historical_indicator_id), "kind": "indicator"}
+        ],
+        after=[
+            {"item_id": str(historical_indicator_id), "kind": "indicator"}
+        ],
+        source_ids=(SOURCE_ID,),
+        read_set=(
+            DocumentPathRead(
+                path=f"/opks/{historical_indicator_id}",
+                value_sha256="c" * 64,
+            ),
+        ),
+        target_ids=(historical_indicator_id,),
+    )
+    catalog = WorkspaceCatalog.from_snapshot(
+        _document(),
+        pending=(
+            _pending_bundle(
+                UUID("00000000-0000-0000-0000-000000000114"),
+                (withdraw, merge),
+            ),
+        ),
+    )
+
+    assert catalog.handle_for_id(historical_output_id) == "o-002"
+    assert catalog.handle_for_id(historical_indicator_id) == "p-002"
+
+
 def test_workspace_resource_models_are_frozen_and_forbid_extra_fields() -> None:
     with pytest.raises(ValidationError):
         CandidateTaskResource(

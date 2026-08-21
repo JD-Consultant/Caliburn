@@ -47,6 +47,7 @@ from app.consultant.state import (
     InterviewPriority,
     InterviewWorkItem,
     InterviewWorkStatus,
+    QuoteAnchor,
     SourceReference,
 )
 from app.consultant.views import document_review_projection_from_state
@@ -173,6 +174,37 @@ def _change(
         task_ids=task_ids,
         opks_kind=opks_kind,
         basis=_basis(source_id),
+    )
+
+
+def _opks_add(
+    *,
+    source_id: UUID,
+    task_id: UUID,
+    item_id: UUID,
+    skill_ids: tuple[str, ...] = ("output",),
+    anchored: bool = False,
+) -> ReviewableDocumentChange:
+    anchors = (
+        (QuoteAnchor(source_id=source_id, start=0, end=2, quote="完成"),)
+        if anchored
+        else ()
+    )
+    return ReviewableDocumentChange(
+        operation=DocumentChangeOperation.ADD,
+        path="/opks",
+        after={
+            "item_id": str(item_id),
+            "text": "完成的請購單",
+            "display_order": None,
+        },
+        task_ids=(task_id,),
+        opks_kind=OpksKind.OUTPUT,
+        basis=AnalysisBasis(
+            source_ids=(source_id,),
+            quote_anchors=anchors,
+            skill_ids=skill_ids,
+        ),
     )
 
 
@@ -313,10 +345,10 @@ def test_application_assigns_stable_action_ids_and_remembers_rejection_by_target
     )
     rejected = first.model_copy(update={"actions": (rejected_action,)})
     queue = {str(rejected.changeset_id): rejected.model_dump(mode="json")}
-    reworded = _change(
+    replayed = _change(
         source_id=source_id,
         path=f"/tasks/{task_a}/statement",
-        after="建立請購資料並完成覆核",
+        after="建立並覆核請購單",
     )
     with pytest.raises(RejectedChangeRequiresNewEvidence):
         create_document_changeset(
@@ -325,7 +357,7 @@ def test_application_assigns_stable_action_ids_and_remembers_rejection_by_target
             summary="重新提出同一路徑。",
             read_revision=4,
             document=document,
-            changes=(reworded,),
+            changes=(replayed,),
             existing_review_queue=queue,
             interview_work={},
         )
@@ -409,6 +441,116 @@ def test_rejection_memory_distinguishes_opks_axes_from_the_same_evidence() -> No
     )
 
     assert allowed.actions[0].target_key != rejected.actions[0].target_key
+
+
+def test_rejected_opks_add_cannot_reappear_by_changing_method_or_anchor() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    item_id = uuid4()
+    document, _duty_a, _duty_b, task_a, _task_b = _document(
+        document_id,
+        source_id=source_id,
+    )
+    rejected_bundle = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="建議工作產出。",
+        read_revision=1,
+        document=document,
+        changes=(_opks_add(source_id=source_id, task_id=task_a, item_id=item_id),),
+        existing_review_queue={},
+        interview_work={},
+    )
+    rejected = rejected_bundle.model_copy(
+        update={
+            "actions": (
+                rejected_bundle.actions[0].model_copy(
+                    update={
+                        "status": DocumentChangeStatus.REJECTED,
+                        "rejection_reason": "這不是本工作的產出。",
+                    }
+                ),
+            )
+        }
+    )
+    queue = {str(rejected.changeset_id): rejected.model_dump(mode="json")}
+
+    def _create_again(replay: ReviewableDocumentChange) -> DocumentChangeSet:
+        return create_document_changeset(
+            document_id=document_id,
+            run_id=uuid4(),
+            summary="重新提出同一項產出。",
+            read_revision=1,
+            document=document,
+            changes=(replay,),
+            existing_review_queue=queue,
+            interview_work={},
+        )
+
+    for replay in (
+        _opks_add(
+            source_id=source_id,
+            task_id=task_a,
+            item_id=item_id,
+            skill_ids=("output", "story-interview"),
+        ),
+        _opks_add(
+            source_id=source_id,
+            task_id=task_a,
+            item_id=item_id,
+            anchored=True,
+        ),
+    ):
+        with pytest.raises(RejectedChangeRequiresNewEvidence):
+            _create_again(replay)
+
+
+def test_rejected_opks_add_may_reappear_with_new_employee_source() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    new_source = uuid4()
+    item_id = uuid4()
+    document, _duty_a, _duty_b, task_a, _task_b = _document(
+        document_id,
+        source_id=source_id,
+    )
+    rejected_bundle = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="建議工作產出。",
+        read_revision=1,
+        document=document,
+        changes=(_opks_add(source_id=source_id, task_id=task_a, item_id=item_id),),
+        existing_review_queue={},
+        interview_work={},
+    )
+    rejected = rejected_bundle.model_copy(
+        update={
+            "actions": (
+                rejected_bundle.actions[0].model_copy(
+                    update={
+                        "status": DocumentChangeStatus.REJECTED,
+                        "rejection_reason": "這不是本工作的產出。",
+                    }
+                ),
+            )
+        }
+    )
+
+    replayed = create_document_changeset(
+        document_id=document_id,
+        run_id=uuid4(),
+        summary="新證據支持重新提出。",
+        read_revision=1,
+        document=document,
+        changes=(_opks_add(source_id=new_source, task_id=task_a, item_id=item_id),),
+        existing_review_queue={
+            str(rejected.changeset_id): rejected.model_dump(mode="json")
+        },
+        interview_work={},
+    )
+
+    assert replayed.actions
 
 
 @pytest.mark.asyncio

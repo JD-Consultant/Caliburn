@@ -83,49 +83,45 @@ def _entity_identity(path: str, after: JsonValue | None) -> str:
     return str(after[id_field])
 
 
-def _evidence_key(change: ReviewableDocumentChange) -> str:
-    anchors = ",".join(
-        f"{item.source_id}:{item.start}:{item.end}"
-        for item in change.basis.quote_anchors
+def _canonical_semantic_after(value: JsonValue | None) -> bytes:
+    semantic = (
+        {
+            key: item
+            for key, item in value.items()
+            if key != "evidence_source_ids"
+        }
+        if isinstance(value, dict)
+        else value
     )
-    sources = ",".join(sorted(str(item) for item in change.basis.source_ids))
-    links = ",".join(
-        sorted(
-            str(item)
-            for item in (
-                *change.target_ids,
-                *change.task_ids,
-                *change.indicator_ids,
-            )
-        )
-    )
-    method = ",".join(sorted(change.basis.skill_ids))
-    axis = change.opks_kind.value if change.opks_kind is not None else "none"
-    return (
-        f"sources={sources};anchors={anchors};links={links};"
-        f"method={method};axis={axis}"
+    return json.dumps(
+        semantic,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def _logical_linkage_key(change: ReviewableDocumentChange) -> str:
+    return json.dumps(
+        {
+            "indicator_ids": sorted(str(item) for item in change.indicator_ids),
+            "target_ids": sorted(str(item) for item in change.target_ids),
+            "task_ids": sorted(str(item) for item in change.task_ids),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
     )
 
 
 def _target_key(change: ReviewableDocumentChange) -> str:
-    if change.operation is DocumentChangeOperation.ADD:
-        canonical_after = json.dumps(
-            change.after,
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
-        return (
-            f"{change.path}#add:payload={sha256(canonical_after).hexdigest()};"
-            f"{_evidence_key(change)}"
-        )
-    if change.operation in {
-        DocumentChangeOperation.MERGE,
-        DocumentChangeOperation.SPLIT,
-    }:
-        joined = ",".join(sorted(str(item) for item in change.target_ids))
-        return f"{change.path}#targets={joined}"
-    return change.path
+    canonical = _canonical_semantic_after(change.after)
+    linkage = _logical_linkage_key(change)
+    axis = change.opks_kind.value if change.opks_kind is not None else "none"
+    return (
+        f"{change.operation.value}:{change.path}:{axis}:{linkage}:"
+        f"{sha256(canonical).hexdigest()}"
+    )
 
 
 def _normalized_after(
@@ -347,6 +343,15 @@ def _read_set_key(action: DocumentPatchAction) -> tuple[tuple[str, str], ...]:
     return tuple((item.path, item.value_sha256) for item in action.read_set)
 
 
+def _with_employee_source(
+    action: DocumentPatchAction,
+    source_id: UUID,
+) -> DocumentPatchAction:
+    if source_id in action.source_ids:
+        return action
+    return action.model_copy(update={"source_ids": (*action.source_ids, source_id)})
+
+
 def _ensure_not_rejected_without_new_evidence(
     action: DocumentPatchAction,
     existing_review_queue: Mapping[str, dict[str, Any]],
@@ -354,11 +359,12 @@ def _ensure_not_rejected_without_new_evidence(
     for raw_bundle in existing_review_queue.values():
         bundle = DocumentChangeSet.model_validate(raw_bundle)
         for previous in bundle.actions:
+            new_source_ids = set(action.source_ids) - set(previous.source_ids)
             if (
                 previous.status is DocumentChangeStatus.REJECTED
                 and previous.target_key == action.target_key
                 and _read_set_key(previous) == _read_set_key(action)
-                and set(action.source_ids) <= set(previous.source_ids)
+                and not new_source_ids
             ):
                 raise RejectedChangeRequiresNewEvidence(
                     f"rejected target {action.target_key} requires new employee evidence"
@@ -1267,10 +1273,31 @@ def apply_review_command(
                     "核准文件在這個建議建立後已變更，請重新檢查。",
                 )
         if applicable:
+            employee_evidence_action_ids = {
+                item.action_id
+                for item in applicable
+                if item.action_id in edited
+                and edited_action_source_payload(
+                    (item,), {item.action_id: edited[item.action_id]}
+                )
+                is not None
+            }
+            authority_actions = tuple(
+                _with_employee_source(item, source_reference.source_id)
+                if (
+                    source_reference is not None
+                    and item.action_id in employee_evidence_action_ids
+                )
+                else item
+                for item in applicable
+            )
+            authority_action_by_id = {
+                item.action_id: item for item in authority_actions
+            }
             try:
                 document = apply_document_actions(
                     document,
-                    applicable,
+                    authority_actions,
                     edited_after_by_action_id=edited,
                 )
             except DocumentAuthorityError as error:
@@ -1286,7 +1313,9 @@ def apply_review_command(
             else:
                 for item in applicable:
                     employee_after = edited.get(item.action_id)
-                    changed_actions[item.action_id] = item.model_copy(
+                    changed_actions[item.action_id] = authority_action_by_id[
+                        item.action_id
+                    ].model_copy(
                         update={
                             "status": (
                                 DocumentChangeStatus.EDIT_ACCEPTED
@@ -1320,10 +1349,25 @@ def apply_review_command(
                 update={"status": DocumentChangeStatus.DEFERRED}
             )
 
-    updated_bundle = bundle.model_copy(
-        update={
-            "actions": tuple(changed_actions.get(item.action_id, item) for item in bundle.actions)
-        }
+    updated_actions = tuple(
+        changed_actions.get(item.action_id, item) for item in bundle.actions
+    )
+    updated_bundle = DocumentChangeSet.model_validate(
+        bundle.model_copy(
+            update={
+                "actions": updated_actions,
+                "source_ids": tuple(
+                    sorted(
+                        {
+                            source_id
+                            for item in updated_actions
+                            for source_id in item.source_ids
+                        },
+                        key=str,
+                    )
+                ),
+            }
+        ).model_dump(mode="json")
     )
     review_queue[str(changeset_id)] = updated_bundle.model_dump(mode="json")
     review_queue = revalidate_review_queue(

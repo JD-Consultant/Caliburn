@@ -299,71 +299,59 @@ async def get_consultant_snapshot(
         return consultant_runtime_error_response(error)
 
 
-@router.get("/{document_id}/events")
+@router.get("/{document_id}/events", response_class=EventSourceResponse)
 async def stream_consultant_snapshot_events(
     document_id: UUID,
     last_event_id: Annotated[
-        str | None,
+        int | None,
         Header(alias="Last-Event-ID"),
     ] = None,
     runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
 ):
-    try:
-        cursor = int(last_event_id) if last_event_id is not None else -1
-    except ValueError:
-        return problem_response(
-            type_uri=INVALID_REQUEST,
-            title="Invalid request",
-            status=422,
-        )
-
-    async def events():
-        seen = cursor
-        quiet_ticks = 0
-        while True:
-            try:
-                snapshot = await runtime.reopen_document(document_id)
-            except DocumentNotFound:
-                event = ConsultantSnapshotEvent(
-                    event="document_deleted",
-                    document_id=document_id,
-                    revision=max(seen, 0),
-                    run_id=None,
-                )
-                yield ServerSentEvent(
-                    data=event.model_dump(mode="json"),
-                    event="snapshot",
-                    id=str(max(seen, 0)),
-                )
-                return
-            if snapshot.revision > seen:
-                receipt = (
-                    RunReceipt.model_validate(snapshot.latest_run)
-                    if snapshot.latest_run is not None
-                    else None
-                )
-                event = ConsultantSnapshotEvent(
-                    event="snapshot_changed",
-                    document_id=document_id,
-                    revision=snapshot.revision,
-                    run_id=receipt.run_id if receipt is not None else None,
-                )
-                seen = snapshot.revision
+    seen = last_event_id if last_event_id is not None else -1
+    quiet_ticks = 0
+    while True:
+        try:
+            snapshot = await runtime.reopen_document(document_id)
+        except DocumentNotFound:
+            event = ConsultantSnapshotEvent(
+                event="document_deleted",
+                document_id=document_id,
+                revision=max(seen, 0),
+                run_id=None,
+            )
+            yield ServerSentEvent(
+                data=event.model_dump(mode="json"),
+                event="snapshot",
+                id=str(max(seen, 0)),
+            )
+            return
+        if snapshot.revision > seen:
+            receipt = (
+                RunReceipt.model_validate(snapshot.latest_run)
+                if snapshot.latest_run is not None
+                else None
+            )
+            event = ConsultantSnapshotEvent(
+                event="snapshot_changed",
+                document_id=document_id,
+                revision=snapshot.revision,
+                run_id=receipt.run_id if receipt is not None else None,
+            )
+            seen = snapshot.revision
+            quiet_ticks = 0
+            yield ServerSentEvent(
+                data=event.model_dump(mode="json"),
+                event="snapshot",
+                id=str(snapshot.revision),
+                retry=1000,
+            )
+        else:
+            quiet_ticks += 1
+            if quiet_ticks >= 15:
                 quiet_ticks = 0
-                yield ServerSentEvent(
-                    data=event.model_dump(mode="json"),
-                    event="snapshot",
-                    id=str(snapshot.revision),
-                    retry=1000,
-                )
-            else:
-                quiet_ticks += 1
-                if quiet_ticks >= 15:
-                    quiet_ticks = 0
-                    yield ServerSentEvent(comment="keepalive")
-            await asyncio.sleep(1)
-
-    return EventSourceResponse(events())
+                yield ServerSentEvent(comment="keepalive")
+        await asyncio.sleep(1)
 
 
 @router.post(

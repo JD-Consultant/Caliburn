@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 from io import BytesIO
 from uuid import UUID, uuid4
@@ -10,11 +11,14 @@ import pytest_asyncio
 from fastapi import FastAPI
 from openpyxl import load_workbook
 
+import app.app_factory as app_factory
 from app.adapters.langgraph.postgres import (
     ActiveConsultantRun,
     ConsultantDocumentCatalogEntry,
+    DocumentNotFound,
 )
 from app.api.deps import get_consultant_runtime, get_consultant_turn_processor
+from app.api.problems import INVALID_REQUEST
 from app.api.routes import consultant
 from app.consultant.state import (
     EmployeeSource,
@@ -164,6 +168,20 @@ class FakeProcessor:
         self.processed.append((document_id, run_id, source_id))
 
 
+class FiniteEventRuntime(FakeRuntime):
+    """End the production SSE stream after one snapshot event."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.reopen_calls = 0
+
+    async def reopen_document(self, document_id: UUID):
+        self.reopen_calls += 1
+        if self.reopen_calls > 1:
+            raise DocumentNotFound(document_id)
+        return await super().reopen_document(document_id)
+
+
 @pytest_asyncio.fixture
 async def api():
     runtime = FakeRuntime()
@@ -230,6 +248,101 @@ async def test_catalog_create_read_snapshot_and_delete(api) -> None:
     deleted = await client.delete(f"{BASE}/{document_id}")
     assert deleted.status_code == 204
     assert runtime.deleted is True
+
+
+async def test_snapshot_events_encode_native_sse_from_production_route() -> None:
+    runtime = FiniteEventRuntime()
+    document_id = uuid4()
+    await runtime.create_document(document_id, title="採購職務")
+    app = FastAPI()
+    app.include_router(consultant.router, prefix="/api/v1")
+    app.dependency_overrides[get_consultant_runtime] = lambda: runtime
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+        response = await client.get(f"{BASE}/{document_id}/events")
+
+    assert response.status_code == 200
+    assert response.headers["content-type"].startswith("text/event-stream")
+    assert response.headers["cache-control"] == "no-cache"
+    assert response.headers["x-accel-buffering"] == "no"
+    lines = response.text.splitlines()
+    assert [line for line in lines if line.startswith("event:")] == [
+        "event: snapshot",
+        "event: snapshot",
+    ]
+    assert [line for line in lines if line.startswith("id:")] == [
+        "id: 0",
+        "id: 0",
+    ]
+    assert [line for line in lines if line.startswith("retry:")] == [
+        "retry: 1000"
+    ]
+    assert [
+        json.loads(line.removeprefix("data: "))
+        for line in lines
+        if line.startswith("data: ")
+    ] == [
+        {
+            "event": "snapshot_changed",
+            "document_id": str(document_id),
+            "revision": 0,
+            "run_id": None,
+        },
+        {
+            "event": "document_deleted",
+            "document_id": str(document_id),
+            "revision": 0,
+            "run_id": None,
+        },
+    ]
+
+
+async def test_snapshot_events_resume_without_replaying_seen_revision() -> None:
+    runtime = FiniteEventRuntime()
+    document_id = uuid4()
+    await runtime.create_document(document_id, title="採購職務")
+    app = FastAPI()
+    app.include_router(consultant.router, prefix="/api/v1")
+    app.dependency_overrides[get_consultant_runtime] = lambda: runtime
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+        response = await client.get(
+            f"{BASE}/{document_id}/events",
+            headers={"Last-Event-ID": "0"},
+        )
+
+    assert response.status_code == 200
+    assert '"event": "snapshot_changed"' not in response.text
+    assert '"event": "document_deleted"' in response.text
+    assert "id: 0" in response.text
+    assert "retry:" not in response.text
+
+
+async def test_snapshot_events_reject_invalid_resume_header_as_problem() -> None:
+    runtime = FakeRuntime()
+    app = app_factory.configure(FastAPI())
+    app.dependency_overrides[get_consultant_runtime] = lambda: runtime
+
+    async with httpx.AsyncClient(
+        transport=httpx.ASGITransport(app=app),
+        base_url="http://test",
+    ) as client:
+        response = await client.get(
+            f"{BASE}/{uuid4()}/events",
+            headers={"Last-Event-ID": "invalid"},
+        )
+
+    assert response.status_code == 422
+    assert response.headers["content-type"].startswith(
+        "application/problem+json"
+    )
+    assert response.json()["type"] == INVALID_REQUEST
 
 
 async def test_answer_is_source_first_202_idempotent_and_background_owned(api) -> None:

@@ -33,6 +33,7 @@ from app.consultant.state import (
     DocumentPatchOperation,
     EmployeeSource,
 )
+from app.consultant.workspace_state import Sha256Digest, workspace_resource_digest
 
 
 NonEmptyText = Annotated[str, StringConstraints(min_length=1)]
@@ -49,7 +50,7 @@ class WorkspaceModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
-class CandidateHeaderResource(WorkspaceModel):
+class WorkspaceHeaderResource(WorkspaceModel):
     job_title: NonEmptyText | None = None
     occupation_category_name: NonEmptyText | None = None
     occupation_name: NonEmptyText | None = None
@@ -60,17 +61,17 @@ class CandidateHeaderResource(WorkspaceModel):
     notes: NonEmptyText | None = None
 
 
-class CandidateDutyResource(WorkspaceModel):
+class WorkspaceDutyResource(WorkspaceModel):
     handle: Handle
     statement: NonEmptyText
 
 
-class CandidateEnablerResource(WorkspaceModel):
+class WorkspaceEnablerResource(WorkspaceModel):
     kind: ApprovedEnablerKind
     name: NonEmptyText
 
 
-class CandidateTaskResource(WorkspaceModel):
+class WorkspaceTaskResource(WorkspaceModel):
     handle: Handle
     duty_handle: Handle | None = None
     statement: NonEmptyText
@@ -80,10 +81,10 @@ class CandidateTaskResource(WorkspaceModel):
     context: NonEmptyText | None = None
     frequency_text: NonEmptyText | None = None
     responsibility_role: ApprovedResponsibilityRole | None = None
-    enablers: tuple[CandidateEnablerResource, ...] = ()
+    enablers: tuple[WorkspaceEnablerResource, ...] = ()
 
 
-class CandidateOpksKind(StrEnum):
+class WorkspaceOpksKind(StrEnum):
     OUTPUT = "output"
     PERFORMANCE_INDICATOR = "indicator"
     KNOWLEDGE = "knowledge"
@@ -103,16 +104,16 @@ class WorkspaceEvidenceReference(WorkspaceModel):
         return self
 
 
-class CandidateOpksResource(WorkspaceModel):
+class WorkspaceOpksResource(WorkspaceModel):
     handle: Handle
-    kind: CandidateOpksKind
+    kind: WorkspaceOpksKind
     text: NonEmptyText
     task_handles: tuple[Handle, ...] = ()
     indicator_handles: tuple[Handle, ...] = ()
     evidence: tuple[WorkspaceEvidenceReference, ...] = ()
 
     @model_validator(mode="after")
-    def references_are_unique(self) -> CandidateOpksResource:
+    def references_are_unique(self) -> WorkspaceOpksResource:
         for label, values in (
             ("task_handles", self.task_handles),
             ("indicator_handles", self.indicator_handles),
@@ -120,6 +121,15 @@ class CandidateOpksResource(WorkspaceModel):
             if len(values) != len(set(values)):
                 raise ValueError(f"duplicate {label}")
         return self
+
+
+# Temporary compatibility aliases.  Task 6 removes pre-workspace imports.
+CandidateHeaderResource = WorkspaceHeaderResource
+CandidateDutyResource = WorkspaceDutyResource
+CandidateEnablerResource = WorkspaceEnablerResource
+CandidateTaskResource = WorkspaceTaskResource
+CandidateOpksKind = WorkspaceOpksKind
+CandidateOpksResource = WorkspaceOpksResource
 
 
 class CandidateOpksEvidenceBinding(WorkspaceModel):
@@ -404,6 +414,360 @@ def canonical_resource_json(value: BaseModel) -> str:
     return (
         json.dumps(value.model_dump(mode="json"), ensure_ascii=False, indent=2)
         + "\n"
+    )
+
+
+class WorkspaceDraftDuty(WorkspaceModel):
+    duty_id: UUID
+    statement: NonEmptyText
+
+
+class WorkspaceDraftTask(WorkspaceModel):
+    task_id: UUID
+    duty_id: UUID | None = None
+    statement: NonEmptyText
+    action: NonEmptyText
+    object: NonEmptyText
+    purpose_result: NonEmptyText | None = None
+    context: NonEmptyText | None = None
+    frequency_text: NonEmptyText | None = None
+    responsibility_role: ApprovedResponsibilityRole | None = None
+    enablers: tuple[WorkspaceEnablerResource, ...] = ()
+
+
+class WorkspaceDraftOpks(WorkspaceModel):
+    item_id: UUID
+    kind: WorkspaceOpksKind
+    text: NonEmptyText
+    task_ids: tuple[UUID, ...] = ()
+    indicator_ids: tuple[UUID, ...] = ()
+
+
+class WorkspaceEditableDocument(WorkspaceModel):
+    document_id: UUID
+    job_title: NonEmptyText | None = None
+    occupation_category_name: NonEmptyText | None = None
+    occupation_name: NonEmptyText | None = None
+    occupation_code: NonEmptyText | None = None
+    industry_name: NonEmptyText | None = None
+    industry_code: NonEmptyText | None = None
+    work_description: NonEmptyText | None = None
+    notes: NonEmptyText | None = None
+    duties: tuple[WorkspaceDraftDuty, ...] = ()
+    tasks: tuple[WorkspaceDraftTask, ...] = ()
+    opks: tuple[WorkspaceDraftOpks, ...] = ()
+
+
+class WorkspaceDocumentDraft(WorkspaceModel):
+    """Validated editable workspace content plus its durable identity registry."""
+
+    document: WorkspaceEditableDocument
+    handle_registry: dict[str, UUID]
+
+
+@dataclass(frozen=True, slots=True)
+class WorkspaceProjection:
+    """Canonical workspace files and the identity metadata needed to reopen them."""
+
+    files: Mapping[str, str]
+    handle_registry: Mapping[str, UUID]
+    resource_digest: Sha256Digest
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "files", MappingProxyType(dict(self.files)))
+        object.__setattr__(
+            self,
+            "handle_registry",
+            MappingProxyType(dict(self.handle_registry)),
+        )
+
+
+def project_workspace_files(
+    document: ApprovedJobDocument,
+    *,
+    handle_registry: Mapping[str, UUID],
+) -> WorkspaceProjection:
+    """Project one approved document into the single, run-independent workspace."""
+
+    registry = _validated_workspace_registry(handle_registry)
+    files: dict[str, str] = {
+        "/workspace/header.json": canonical_resource_json(_header_resource(document))
+    }
+
+    for index, duty in enumerate(_sorted_by_display_order(document.duties), start=1):
+        handle = _workspace_handle_for_id(registry, duty.duty_id, "duty", index)
+        files[f"/workspace/duties/{handle}.json"] = canonical_resource_json(
+            WorkspaceDutyResource(handle=handle, statement=duty.statement)
+        )
+
+    for index, task in enumerate(_sorted_by_display_order(document.tasks), start=1):
+        handle = _workspace_handle_for_id(registry, task.task_id, "task", index)
+        files[f"/workspace/tasks/{handle}.json"] = canonical_resource_json(
+            WorkspaceTaskResource(
+                handle=handle,
+                duty_handle=(
+                    _workspace_existing_handle(registry, task.duty_id, "duty")
+                    if task.duty_id is not None
+                    else None
+                ),
+                statement=task.statement,
+                action=task.action,
+                object=task.object,
+                purpose_result=task.purpose_result,
+                context=task.context,
+                frequency_text=task.frequency_text,
+                responsibility_role=task.responsibility_role,
+                enablers=tuple(
+                    WorkspaceEnablerResource(kind=item.kind, name=item.name)
+                    for item in task.enablers
+                ),
+            )
+        )
+
+    for kind, prefix in (
+        (ApprovedOpksKind.OUTPUT, "o"),
+        (ApprovedOpksKind.PERFORMANCE_INDICATOR, "p"),
+        (ApprovedOpksKind.KNOWLEDGE, "k"),
+        (ApprovedOpksKind.SKILL, "s"),
+    ):
+        for index, item in enumerate(_sorted_opks(document.opks, kind), start=1):
+            handle = _workspace_handle_for_id(registry, item.item_id, kind.value, index)
+            files[f"/workspace/opks/{prefix}/{handle}.json"] = canonical_resource_json(
+                WorkspaceOpksResource(
+                    handle=handle,
+                    kind=WorkspaceOpksKind(kind.value),
+                    text=item.text,
+                    task_handles=tuple(
+                        _workspace_existing_handle(registry, task_id, "task")
+                        for task_id in item.task_ids
+                    ),
+                    indicator_handles=tuple(
+                        _workspace_existing_handle(registry, indicator_id, "indicator")
+                        for indicator_id in item.indicator_ids
+                    ),
+                )
+            )
+
+    return WorkspaceProjection(
+        files=files,
+        handle_registry=registry,
+        resource_digest=workspace_resource_digest(files),
+    )
+
+
+def parse_workspace_files(
+    document_id: UUID,
+    files: Mapping[str, str | bytes],
+    *,
+    handle_registry: Mapping[str, UUID],
+) -> WorkspaceDocumentDraft:
+    """Parse canonical workspace files without deriving identity from a run."""
+
+    parsed: dict[str, Any] = {}
+    for path, raw in files.items():
+        path_text = str(path)
+        if not path_text.startswith("/workspace/"):
+            raise WorkspaceResourceError(f"unexpected workspace resource path: {path_text}")
+        relative = path_text.removeprefix("/workspace/")
+        try:
+            parsed[relative] = json.loads(
+                raw.decode("utf-8") if isinstance(raw, bytes) else raw
+            )
+        except (TypeError, ValueError) as error:
+            raise WorkspaceResourceError(f"invalid JSON resource: {path_text}") from error
+
+    for relative in parsed:
+        if (
+            relative != "header.json"
+            and not relative.startswith("duties/")
+            and not relative.startswith("tasks/")
+            and not relative.startswith("opks/")
+        ):
+            raise WorkspaceResourceError(f"unexpected workspace resource: {relative}")
+
+    header_value = parsed.get("header.json")
+    if header_value is None:
+        raise WorkspaceResourceError("workspace header.json is required")
+    header = _validate_resource(WorkspaceHeaderResource, header_value, "header.json")
+    duty_resources = _load_entity_resources(parsed, "duties", WorkspaceDutyResource)
+    task_resources = _load_entity_resources(parsed, "tasks", WorkspaceTaskResource)
+    opks_resources = _load_workspace_opks_resources(parsed)
+
+    registry = _validated_workspace_registry(handle_registry)
+    duty_ids = {
+        handle: _workspace_entity_id(registry, document_id, handle, "duty")
+        for handle, _ in duty_resources
+    }
+    task_ids = {
+        handle: _workspace_entity_id(registry, document_id, handle, "task")
+        for handle, _ in task_resources
+    }
+    opks_ids = {
+        handle: _workspace_entity_id(registry, document_id, handle, resource.kind.value)
+        for handle, resource in opks_resources
+    }
+    indicator_ids = {
+        handle: stable_id
+        for handle, stable_id in opks_ids.items()
+        if handle.startswith("p-")
+    }
+
+    duties = tuple(
+        WorkspaceDraftDuty(duty_id=duty_ids[handle], statement=resource.statement)
+        for handle, resource in duty_resources
+    )
+    tasks = tuple(
+        WorkspaceDraftTask(
+            task_id=task_ids[handle],
+            duty_id=(
+                _workspace_referenced_id(duty_ids, resource.duty_handle, "duty")
+                if resource.duty_handle is not None
+                else None
+            ),
+            statement=resource.statement,
+            action=resource.action,
+            object=resource.object,
+            purpose_result=resource.purpose_result,
+            context=resource.context,
+            frequency_text=resource.frequency_text,
+            responsibility_role=resource.responsibility_role,
+            enablers=resource.enablers,
+        )
+        for handle, resource in task_resources
+    )
+    opks = tuple(
+        WorkspaceDraftOpks(
+            item_id=opks_ids[handle],
+            kind=resource.kind,
+            text=resource.text,
+            task_ids=tuple(
+                _workspace_referenced_id(task_ids, task_handle, "task")
+                for task_handle in resource.task_handles
+            ),
+            indicator_ids=tuple(
+                _workspace_referenced_id(
+                    indicator_ids, indicator_handle, "indicator"
+                )
+                for indicator_handle in resource.indicator_handles
+            ),
+        )
+        for handle, resource in opks_resources
+    )
+    return WorkspaceDocumentDraft(
+        document=WorkspaceEditableDocument(
+            document_id=document_id,
+            job_title=header.job_title,
+            occupation_category_name=header.occupation_category_name,
+            occupation_name=header.occupation_name,
+            occupation_code=header.occupation_code,
+            industry_name=header.industry_name,
+            industry_code=header.industry_code,
+            work_description=header.work_description,
+            notes=header.notes,
+            duties=duties,
+            tasks=tasks,
+            opks=opks,
+        ),
+        handle_registry=registry,
+    )
+
+
+def _validated_workspace_registry(
+    handle_registry: Mapping[str, UUID],
+) -> dict[str, UUID]:
+    registry = dict(handle_registry)
+    if len(registry.values()) != len(set(registry.values())):
+        raise WorkspaceResourceError("duplicate stable ID in workspace handle registry")
+    return registry
+
+
+def _workspace_handle_for_id(
+    registry: dict[str, UUID], stable_id: UUID, kind: str, index: int
+) -> str:
+    return _workspace_existing_handle(registry, stable_id, kind) or _new_workspace_handle(
+        registry, stable_id, kind, index
+    )
+
+
+def _workspace_existing_handle(
+    registry: Mapping[str, UUID], stable_id: UUID, kind: str
+) -> str | None:
+    for handle, candidate_id in registry.items():
+        if candidate_id == stable_id:
+            if not handle.startswith(_workspace_handle_prefix(kind)):
+                raise WorkspaceResourceError(
+                    f"stable ID {stable_id} has the wrong workspace handle kind"
+                )
+            return handle
+    return None
+
+
+def _new_workspace_handle(
+    registry: dict[str, UUID], stable_id: UUID, kind: str, index: int
+) -> str:
+    prefix = _workspace_handle_prefix(kind)
+    candidate_index = index
+    while True:
+        handle = f"{prefix}{candidate_index:03d}"
+        known_id = registry.get(handle)
+        if known_id is None:
+            registry[handle] = stable_id
+            return handle
+        if known_id == stable_id:
+            return handle
+        candidate_index += 1
+
+
+def _workspace_entity_id(
+    registry: dict[str, UUID], document_id: UUID, handle: str, kind: str
+) -> UUID:
+    prefix = _workspace_handle_prefix(kind)
+    if not handle.startswith(prefix):
+        raise WorkspaceResourceError(f"handle {handle} is not a {kind} handle")
+    stable_id = registry.get(handle)
+    if stable_id is None:
+        stable_id = uuid5(document_id, f"workspace:{kind}:{handle}")
+        registry[handle] = stable_id
+    return stable_id
+
+
+def _workspace_referenced_id(
+    values: Mapping[str, UUID], handle: str, kind: str
+) -> UUID:
+    try:
+        return values[handle]
+    except KeyError as error:
+        raise WorkspaceResourceError(f"unknown {kind} handle: {handle}") from error
+
+
+def _workspace_handle_prefix(kind: str) -> str:
+    try:
+        return {
+            "duty": "duty-",
+            "task": "task-",
+            "output": "o-",
+            "indicator": "p-",
+            "knowledge": "k-",
+            "skill": "s-",
+        }[kind]
+    except KeyError as error:
+        raise WorkspaceResourceError(f"unknown workspace entity kind: {kind}") from error
+
+
+def _load_workspace_opks_resources(
+    parsed: Mapping[str, Any],
+) -> tuple[tuple[str, WorkspaceOpksResource], ...]:
+    order = {
+        WorkspaceOpksKind.OUTPUT: 0,
+        WorkspaceOpksKind.PERFORMANCE_INDICATOR: 1,
+        WorkspaceOpksKind.KNOWLEDGE: 2,
+        WorkspaceOpksKind.SKILL: 3,
+    }
+    return tuple(
+        sorted(
+            _load_opks_resources(parsed),
+            key=lambda item: (order[item[1].kind], item[0]),
+        )
     )
 
 

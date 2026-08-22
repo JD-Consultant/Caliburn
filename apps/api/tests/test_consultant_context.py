@@ -187,7 +187,9 @@ async def test_context_keeps_current_employee_turn_and_compact_workspace_orienta
     assert "/sources/current/source-001.txt" in prompt
     assert '"approved_index_path":"/approved/index.json"' in prompt
     assert '"pending_index_path":"/pending/index.json"' in prompt
-    assert f"/candidate/{RUN_ID}" in prompt
+    assert '"workspace_root":"/workspace"' in prompt
+    assert '"candidate_root"' not in prompt
+    assert "/candidate/" not in prompt
     assert document.work_description not in prompt
     assert str(source.source_id) not in prompt
 

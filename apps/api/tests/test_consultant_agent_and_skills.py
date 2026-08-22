@@ -7,6 +7,7 @@ from uuid import UUID
 import pytest
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, ToolMessage
+from langgraph.store.memory import InMemoryStore
 
 from app.consultant.agent import (
     LookupWaveLimitExceeded,
@@ -33,6 +34,7 @@ from app.consultant.workspace_backend import (
     build_consultant_workspace_backend,
 )
 from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_state import StoreBackedWorkspace
 from app.consultant.workspace_tools import CandidateCheckToolBinding
 
 
@@ -54,7 +56,6 @@ class RecordingCheckPort:
 
 def _workspace() -> ConsultantWorkspaceBackendBinding:
     document_id = UUID("00000000-0000-0000-0000-000000000801")
-    run_id = UUID("00000000-0000-0000-0000-000000000802")
     duty_id = UUID("00000000-0000-0000-0000-000000000803")
     task_id = UUID("00000000-0000-0000-0000-000000000804")
     document = ApprovedJobDocument(
@@ -76,7 +77,10 @@ def _workspace() -> ConsultantWorkspaceBackendBinding:
     return build_consultant_workspace_backend(
         runtime=object(),  # type: ignore[arg-type]
         document_id=document_id,
-        run_id=run_id,
+        workspace=StoreBackedWorkspace(
+            store=InMemoryStore(),
+            document_id=document_id,
+        ),
         catalog=WorkspaceCatalog.from_snapshot(document),
         selected_skill_ids=("output",),
     )
@@ -250,14 +254,14 @@ def test_lookup_waves_count_only_path_aware_external_workspace_reads() -> None:
             "run_lookup_wave_count": count,
         }
 
-    assert middleware.after_model(state("read_file", "/candidate/run/header.json"), None) is None  # type: ignore[arg-type]
+    assert middleware.after_model(state("read_file", "/workspace/header.json"), None) is None  # type: ignore[arg-type]
     assert middleware.after_model(state("read_file", "/sources/current/source-001.txt"), None) == {"run_lookup_wave_count": 1}  # type: ignore[arg-type]
     assert middleware.after_model(state("grep", "/approved" , count=1), None) == {"run_lookup_wave_count": 2}  # type: ignore[arg-type]
     with pytest.raises(LookupWaveLimitExceeded):
         middleware.after_model(state("ls", "/pending", count=2), None)  # type: ignore[arg-type]
     assert middleware.after_model(state("grep", count=0), None) == {"run_lookup_wave_count": 1}  # type: ignore[arg-type]
     assert middleware.after_model(state("grep", "/", count=1), None) == {"run_lookup_wave_count": 2}  # type: ignore[arg-type]
-    assert middleware.after_model(state("grep", "/candidate/run", count=2), None) is None  # type: ignore[arg-type]
+    assert middleware.after_model(state("grep", "/workspace", count=2), None) is None  # type: ignore[arg-type]
     with pytest.raises(LookupWaveLimitExceeded):
         middleware.after_model(state("grep", count=2), None)  # type: ignore[arg-type]
 

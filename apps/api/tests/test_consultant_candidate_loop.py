@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import copy
 import json
 import os
 import re
@@ -12,11 +11,11 @@ from uuid import UUID, uuid4
 import psycopg
 import pytest
 import pytest_asyncio
-from deepagents.middleware.filesystem import FilesystemMiddleware, FilesystemState
+from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
-from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
+from langchain_core.messages import AIMessage, BaseMessage, SystemMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
-from langgraph.graph import END, START, StateGraph
+from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
 from pydantic import Field
 
@@ -47,6 +46,7 @@ from app.consultant.workspace_resources import (
     pending_action_handles,
     project_candidate_files,
 )
+from app.consultant.workspace_state import StoreBackedWorkspace
 
 
 EXPECTED_TOOLS = {
@@ -264,6 +264,26 @@ async def _check_and_publish(
     return checked, published
 
 
+async def _build_workspace_binding(
+    runtime: Any,
+    *,
+    document_id: UUID,
+    catalog: WorkspaceCatalog,
+) -> Any:
+    workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+    await workspace.ensure_initialized(
+        approved_document=catalog.document,
+        approved_revision=0,
+    )
+    return build_consultant_workspace_backend(
+        runtime=runtime,
+        document_id=document_id,
+        workspace=workspace,
+        catalog=catalog,
+        selected_skill_ids=CONSULTANT_SKILL_IDS,
+    )
+
+
 class _FilesystemToolProbe:
     """Run real filesystem middleware tools inside a LangGraph state context."""
 
@@ -276,12 +296,11 @@ class _FilesystemToolProbe:
             human_message_token_limit_before_evict=None,
             grep_max_count=None,
         )
-        graph = StateGraph(FilesystemState)
+        graph = StateGraph(MessagesState)
         graph.add_node("tools", ToolNode(middleware.tools))
         graph.add_edge(START, "tools")
         graph.add_edge("tools", END)
         self._graph = graph.compile()
-        self._state = {"files": copy.deepcopy(binding.initial_files)}
 
     async def invoke(self, name: str, **args: Any) -> ToolMessage:
         call = {
@@ -293,10 +312,9 @@ class _FilesystemToolProbe:
         result = await self._graph.ainvoke(
             {
                 "messages": [AIMessage(content="", tool_calls=[call])],
-                "files": copy.deepcopy(self._state["files"]),
             }
         )
-        self._state = result
+        assert "files" not in result
         message = result["messages"][-1]
         assert isinstance(message, ToolMessage)
         return message
@@ -440,7 +458,15 @@ class ScriptedConsultantModel(FakeMessagesListChatModel):
     ) -> ChatResult:
         del stop, run_manager, kwargs
         self.call_count += 1
-        run_root = f"/candidate/{self.run_id}"
+        if self.call_count == 1:
+            model_prompt = "\n".join(
+                str(message.content)
+                for message in messages
+                if isinstance(message, SystemMessage)
+            )
+            assert "/workspace" in model_prompt
+            assert "/candidate/" not in model_prompt
+        run_root = "/workspace"
         output_path = f"{run_root}/opks/o/o-002.json"
         if self.call_count == 1:
             return self._message(
@@ -606,12 +632,10 @@ async def test_real_agent_repairs_candidate_and_publishes_pending_only(
             pending=(pending_bundle,),
             sources=sources,
         )
-        binding = build_consultant_workspace_backend(
-            runtime=runtime,
+        binding = await _build_workspace_binding(
+            runtime,
             document_id=document_id,
-            run_id=uuid4(),
             catalog=pending_catalog,
-            selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
         pending_paths = (
             "/index.json",
@@ -740,12 +764,10 @@ async def test_runtime_partial_review_keeps_rejected_output_memory(
             pending=(bundle,),
             sources=await runtime.list_sources(document_id),
         )
-        binding = build_consultant_workspace_backend(
-            runtime=runtime,
+        binding = await _build_workspace_binding(
+            runtime,
             document_id=document_id,
-            run_id=uuid4(),
             catalog=pending_catalog,
-            selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
         approved_read = binding.approved_backend.read("/header.json")
         assert approved_read.error is None
@@ -754,9 +776,10 @@ async def test_runtime_partial_review_keeps_rejected_output_memory(
         assert approved_header["job_title"] == "資深採購專員"
         assert "可接受輸出" not in approved_read.file_data["content"]
         assert binding.approved_backend.read("/opks/o/o-002.json").error is not None
+        workspace_snapshot = await binding.workspace.read_snapshot()
         assert all(
             "可接受輸出" not in content
-            for content in binding.initial_candidate_files.values()
+            for content in workspace_snapshot.files.values()
         )
         handles = pending_action_handles((bundle,))
         rejected_handle = handles[output_action.action_id]
@@ -905,12 +928,10 @@ async def test_runtime_defer_then_direct_edit_stales_only_pending_projection(
             pending=(stale_bundle,),
             sources=await runtime.list_sources(document_id),
         )
-        pending_binding = build_consultant_workspace_backend(
-            runtime=runtime,
+        pending_binding = await _build_workspace_binding(
+            runtime,
             document_id=document_id,
-            run_id=uuid4(),
             catalog=pending_catalog,
-            selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
         pending_handles = pending_action_handles((stale_bundle,))
         pending_surface = json.dumps(
@@ -1060,12 +1081,10 @@ async def test_runtime_split_candidate_requires_atomic_review_decision(
             pending=(split_bundle,),
             sources=await runtime.list_sources(document_id),
         )
-        split_binding = build_consultant_workspace_backend(
-            runtime=runtime,
+        split_binding = await _build_workspace_binding(
+            runtime,
             document_id=document_id,
-            run_id=uuid4(),
             catalog=split_catalog,
-            selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
         split_handles = pending_action_handles((split_bundle,))
         split_pending_paths = (
@@ -1138,12 +1157,10 @@ async def test_runtime_split_candidate_requires_atomic_review_decision(
             pending=(accepted_bundle,),
             sources=await runtime.list_sources(document_id),
         )
-        accepted_binding = build_consultant_workspace_backend(
-            runtime=runtime,
+        accepted_binding = await _build_workspace_binding(
+            runtime,
             document_id=document_id,
-            run_id=uuid4(),
             catalog=accepted_catalog,
-            selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
         accepted_handles = pending_action_handles((accepted_bundle,))
         accepted_paths = (
@@ -1180,24 +1197,21 @@ async def test_runtime_split_candidate_requires_atomic_review_decision(
 
 
 @pytest.mark.asyncio
-async def test_new_candidate_run_cannot_read_previous_run_scratch(
+async def test_same_document_workspace_preserves_scratch_across_turns(
     consultant_database_url: str,
 ) -> None:
     document_id = uuid4()
     first_run_id = uuid4()
-    second_run_id = uuid4()
 
     async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
         prepared = await _prepare_runtime_run(runtime, document_id, first_run_id)
-        first = build_consultant_workspace_backend(
-            runtime=runtime,
+        first = await _build_workspace_binding(
+            runtime,
             document_id=document_id,
-            run_id=first_run_id,
             catalog=prepared["catalog"],
-            selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
-        scratch_path = f"/candidate/{first_run_id}/opks/o/scratch-001.json"
-        assert first.candidate_backend.validate_candidate_file_path(scratch_path) == scratch_path
+        scratch_path = "/workspace/opks/o/scratch-001.json"
+        assert first.workspace_backend.validate_workspace_file_path(scratch_path) == scratch_path
         first_probe = _FilesystemToolProbe(first)
         written = await first_probe.invoke(
             "write_file",
@@ -1209,33 +1223,28 @@ async def test_new_candidate_run_cannot_read_previous_run_scratch(
         assert first_read.status == "success"
         assert "first-run-only" in str(first_read.content)
 
-        second = build_consultant_workspace_backend(
-            runtime=runtime,
+        second = await _build_workspace_binding(
+            runtime,
             document_id=document_id,
-            run_id=second_run_id,
             catalog=prepared["catalog"],
-            selected_skill_ids=CONSULTANT_SKILL_IDS,
         )
         second_probe = _FilesystemToolProbe(second)
         second_read = await second_probe.invoke("read_file", file_path=scratch_path)
-        assert second_read.status == "error"
-        assert "outside the current candidate run" in str(second_read.content)
+        assert second_read.status == "success"
+        assert "first-run-only" in str(second_read.content)
         second_ls = await second_probe.invoke(
             "ls",
-            path=f"/candidate/{first_run_id}/",
+            path="/workspace/opks/o/",
         )
-        assert second_ls.status == "error"
-        assert "outside the current candidate run" in str(second_ls.content)
+        assert second_ls.status == "success"
+        assert scratch_path in str(second_ls.content)
         second_glob = await second_probe.invoke(
             "glob",
             pattern="**/scratch-001.json",
-            path=f"/candidate/{first_run_id}/",
+            path="/workspace",
         )
-        assert second_glob.status == "error"
-        assert "outside the current candidate run" in str(second_glob.content)
-        assert all(
-            str(first_run_id) not in path for path in second.initial_candidate_files
-        )
+        assert second_glob.status == "success"
+        assert scratch_path in str(second_glob.content)
 
 
 @pytest.mark.asyncio

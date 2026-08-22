@@ -12,7 +12,7 @@ import re
 from dataclasses import dataclass, field
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Any, Iterable, Mapping, Sequence
+from typing import Any, Iterable, Literal, Mapping, Sequence
 from uuid import UUID, uuid5
 
 from pydantic import BaseModel, ConfigDict, Field, StringConstraints, model_validator
@@ -731,6 +731,18 @@ def _workspace_entity_id(
     return stable_id
 
 
+def workspace_entity_id(
+    document_id: UUID,
+    handle: str,
+    kind: str,
+    *,
+    handle_registry: Mapping[str, UUID],
+) -> UUID:
+    """Resolve one persistent workspace identity without mutating its registry."""
+
+    return _workspace_entity_id(dict(handle_registry), document_id, handle, kind)
+
+
 def _workspace_referenced_id(
     values: Mapping[str, UUID], handle: str, kind: str
 ) -> UUID:
@@ -843,6 +855,7 @@ def parse_candidate_files(
     files: Mapping[str, str | bytes],
     *,
     run_id: UUID | str | None = None,
+    new_entity_namespace: Literal["candidate", "workspace"] = "candidate",
 ) -> CandidateDocumentDraft:
     parsed: dict[str, Any] = {}
     expected_run = _validated_run_id(run_id) if run_id is not None else None
@@ -892,15 +905,27 @@ def parse_candidate_files(
     if expected_run is None:
         raise WorkspaceResourceError("candidate run namespace must be a UUID")
 
-    duties = _parse_duties(catalog, duty_resources, expected_run)
+    duties = _parse_duties(
+        catalog,
+        duty_resources,
+        expected_run,
+        new_entity_namespace=new_entity_namespace,
+    )
     duty_ids = {item.handle: item.duty.duty_id for item in duties}
-    tasks = _parse_tasks(catalog, task_resources, duty_ids, expected_run)
+    tasks = _parse_tasks(
+        catalog,
+        task_resources,
+        duty_ids,
+        expected_run,
+        new_entity_namespace=new_entity_namespace,
+    )
     task_ids = {item.handle: item.task.task_id for item in tasks}
     opks, evidence_references, opks_evidence = _parse_opks(
         catalog,
         opks_resources,
         task_ids,
         expected_run,
+        new_entity_namespace=new_entity_namespace,
     )
     opks = _restore_baseline_attitudes(catalog.document.opks, opks)
 
@@ -1240,12 +1265,20 @@ def _parse_duties(
     catalog: WorkspaceCatalog,
     values: Sequence[tuple[str, CandidateDutyResource]],
     run_id: UUID,
+    *,
+    new_entity_namespace: Literal["candidate", "workspace"],
 ) -> tuple[_DutyDraft, ...]:
     existing = {item.duty_id: item for item in catalog.document.duties}
     next_order = max((item.display_order for item in existing.values()), default=-1) + 1
     drafts: list[_DutyDraft] = []
     for index, (handle, resource) in enumerate(values):
-        stable_id = _resolve_entity_id(catalog, handle, "duty", run_id)
+        stable_id = _resolve_entity_id(
+            catalog,
+            handle,
+            "duty",
+            run_id,
+            new_entity_namespace=new_entity_namespace,
+        )
         baseline = existing.get(stable_id)
         drafts.append(
             _DutyDraft(
@@ -1271,12 +1304,20 @@ def _parse_tasks(
     values: Sequence[tuple[str, CandidateTaskResource]],
     duty_ids: Mapping[str, UUID],
     run_id: UUID,
+    *,
+    new_entity_namespace: Literal["candidate", "workspace"],
 ) -> tuple[_TaskDraft, ...]:
     existing = {item.task_id: item for item in catalog.document.tasks}
     next_order = max((item.display_order for item in existing.values()), default=-1) + 1
     drafts: list[_TaskDraft] = []
     for index, (handle, resource) in enumerate(values):
-        stable_id = _resolve_entity_id(catalog, handle, "task", run_id)
+        stable_id = _resolve_entity_id(
+            catalog,
+            handle,
+            "task",
+            run_id,
+            new_entity_namespace=new_entity_namespace,
+        )
         baseline = existing.get(stable_id)
         duty_id = duty_ids.get(resource.duty_handle) if resource.duty_handle else None
         if resource.duty_handle and duty_id is None:
@@ -1317,6 +1358,8 @@ def _parse_opks(
     values: Sequence[tuple[str, CandidateOpksResource]],
     task_ids: Mapping[str, UUID],
     run_id: UUID,
+    *,
+    new_entity_namespace: Literal["candidate", "workspace"],
 ) -> tuple[
     tuple[_OpksDraft, ...],
     tuple[WorkspaceEvidenceReference, ...],
@@ -1328,7 +1371,13 @@ def _parse_opks(
         if item.kind is not ApprovedOpksKind.ATTITUDE
     }
     opks_ids = {
-        handle: _resolve_entity_id(catalog, handle, resource.kind.value, run_id)
+        handle: _resolve_entity_id(
+            catalog,
+            handle,
+            resource.kind.value,
+            run_id,
+            new_entity_namespace=new_entity_namespace,
+        )
         for handle, resource in values
     }
     indicator_ids = {
@@ -1423,6 +1472,8 @@ def _resolve_entity_id(
     handle: str,
     kind: str,
     run_id: UUID,
+    *,
+    new_entity_namespace: Literal["candidate", "workspace"],
 ) -> UUID:
     expected_prefix = {
         "duty": "duty-",
@@ -1437,6 +1488,13 @@ def _resolve_entity_id(
     try:
         return catalog.id_for_handle(handle)
     except KeyError:
+        if new_entity_namespace == "workspace":
+            return workspace_entity_id(
+                catalog.document.document_id,
+                handle,
+                kind,
+                handle_registry=catalog.handle_to_stable,
+            )
         return uuid5(
             catalog.document.document_id,
             f"candidate:{run_id}:{kind}:{handle}",

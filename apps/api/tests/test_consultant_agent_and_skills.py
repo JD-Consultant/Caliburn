@@ -36,6 +36,7 @@ from app.consultant.workspace_backend import (
 from app.consultant.workspace_resources import WorkspaceCatalog
 from app.consultant.workspace_state import StoreBackedWorkspace
 from app.consultant.workspace_tools import CandidateCheckToolBinding
+from app.consultant.workspace_validation import WorkspaceValidationMiddleware
 
 
 EXPECTED_TOOLS = (
@@ -194,6 +195,10 @@ def test_professional_agent_composes_exactly_one_workspace_and_check_tool(
     filesystem = captured["additional_middleware"][1]
     assert {tool.name for tool in filesystem.tools} == set(EXPECTED_TOOLS[:6])
     assert captured["additional_middleware"][2].run_limit == 2
+    assert isinstance(
+        captured["additional_middleware"][-1],
+        WorkspaceValidationMiddleware,
+    )
 
 
 def test_professional_agent_allows_eleven_calls_but_rejects_a_twelfth() -> None:

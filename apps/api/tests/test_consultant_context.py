@@ -29,6 +29,11 @@ from app.consultant.state import (
     initial_thread_state,
 )
 from app.consultant.views import ConsultantTurnProjection, snapshot_from_state
+from app.consultant.workspace_state import (
+    WorkspaceDiagnostic,
+    WorkspaceValidationStatus,
+)
+from app.consultant.workspace_validation import WorkspaceValidationSummary
 
 
 DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000701")
@@ -192,6 +197,49 @@ async def test_context_keeps_current_employee_turn_and_compact_workspace_orienta
     assert "/candidate/" not in prompt
     assert document.work_description not in prompt
     assert str(source.source_id) not in prompt
+
+
+@pytest.mark.asyncio
+async def test_context_injects_only_compact_workspace_validation_navigation() -> None:
+    document = _document()
+    source = _source()
+    runtime = InMemorySourceRuntime((source,))
+    summary = WorkspaceValidationSummary(
+        generation=4,
+        status=WorkspaceValidationStatus.INVALID,
+        resource_digest="a" * 64,
+        diagnostics=(
+            WorkspaceDiagnostic(
+                code="json-syntax",
+                path="/workspace/tasks/task-001.json",
+                message="Resource is not valid JSON.",
+            ),
+        ),
+    )
+
+    bundle = await build_consultant_context(
+        runtime=runtime,  # type: ignore[arg-type]
+        snapshot=_snapshot(document, source),
+        execution=_execution(),
+        request=ContextRequest(
+            run_id=RUN_ID,
+            current_source_id=source.source_id,
+            current_source_handle="source-001",
+            selected_skill_ids=("task-boundary",),
+        ),
+        workspace_validation=summary,
+    )
+
+    prompt = bundle.system_prompt
+    assert '<workspace_validation>{"diagnostics":[' in prompt
+    assert '"generation":4' in prompt
+    assert '"status":"invalid"' in prompt
+    assert '"workspace_root":"/workspace"' in prompt
+    assert '"review_root":"/review"' in prompt
+    assert "json-syntax" in prompt
+    assert "/workspace/tasks/task-001.json" in prompt
+    assert summary.resource_digest not in prompt
+    assert document.work_description not in prompt
 
 
 @pytest.mark.asyncio

@@ -69,7 +69,8 @@ class WorkspaceDiagnosticSeverity(StrEnum):
 
 class WorkspaceDiagnostic(DurableModel):
     code: Annotated[str, StringConstraints(min_length=1)]
-    message: Annotated[str, StringConstraints(min_length=1)]
+    path: Annotated[str, StringConstraints(min_length=1, max_length=160)] = "/workspace"
+    message: Annotated[str, StringConstraints(min_length=1, max_length=240)]
     severity: WorkspaceDiagnosticSeverity = WorkspaceDiagnosticSeverity.ERROR
 
 
@@ -182,6 +183,33 @@ class StoreBackedWorkspace:
             await self._put_manifest(manifest)
         return WorkspaceSnapshot(files=files, manifest=manifest)
 
+    async def commit_validation(
+        self,
+        *,
+        expected_resource_digest: Sha256Digest,
+        evidence_basis_digest: Sha256Digest,
+        validation_status: WorkspaceValidationStatus,
+        diagnostics: tuple[WorkspaceDiagnostic, ...],
+        entity_ids_by_handle: Mapping[str, UUID],
+    ) -> WorkspaceManifest:
+        """Persist validation only if it still describes the real Store bytes."""
+
+        current = await self.read_snapshot()
+        if current.manifest.resource_digest != expected_resource_digest:
+            raise ValueError("workspace changed during validation")
+        manifest = current.manifest.model_copy(
+            update={
+                "generation": current.manifest.generation + 1,
+                "resource_digest": expected_resource_digest,
+                "evidence_basis_digest": evidence_basis_digest,
+                "validation_status": validation_status,
+                "diagnostics": diagnostics,
+                "entity_ids_by_handle": dict(entity_ids_by_handle),
+            }
+        )
+        await self._put_manifest(manifest)
+        return manifest
+
     async def _manifest(self) -> WorkspaceManifest | None:
         item = await self.store.aget(
             workspace_metadata_namespace(self.document_id),
@@ -214,7 +242,7 @@ class StoreBackedWorkspace:
         return files
 
 
-def _approved_document_digest(document: ApprovedJobDocument) -> Sha256Digest:
+def approved_document_digest(document: ApprovedJobDocument) -> Sha256Digest:
     encoded = json.dumps(
         document.model_dump(mode="json"),
         ensure_ascii=False,
@@ -222,6 +250,9 @@ def _approved_document_digest(document: ApprovedJobDocument) -> Sha256Digest:
         separators=(",", ":"),
     ).encode("utf-8")
     return cast(Sha256Digest, sha256(encoded).hexdigest())
+
+
+_approved_document_digest = approved_document_digest
 
 
 def workspace_resource_digest(files: Mapping[str, str | bytes]) -> Sha256Digest:

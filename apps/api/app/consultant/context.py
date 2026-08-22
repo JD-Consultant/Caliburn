@@ -26,6 +26,7 @@ from app.consultant.state import (
 )
 from app.consultant.verification import verify_context_selection
 from app.consultant.views import ConsultantSnapshot
+from app.consultant.workspace_validation import WorkspaceValidationSummary
 
 
 class ContextModel(BaseModel):
@@ -488,6 +489,7 @@ def _prompt(
     sufficiency: dict[str, Any] | None,
     current_source_handle: str,
     non_authoritative_dialogue_summary: str | None,
+    workspace_validation: WorkspaceValidationSummary | None,
 ) -> str:
     pending_counts: dict[str, int] = {}
     for changeset in review_queue.values():
@@ -548,6 +550,27 @@ def _prompt(
         )
         + "</workspace_index>",
     ]
+    if workspace_validation is not None:
+        sections.append(
+            "<workspace_validation>"
+            + _json(
+                {
+                    "generation": workspace_validation.generation,
+                    "status": workspace_validation.status.value,
+                    "diagnostics": [
+                        {
+                            "code": item.code,
+                            "path": item.path,
+                            "message": item.message,
+                        }
+                        for item in workspace_validation.diagnostics[:5]
+                    ],
+                    "workspace_root": "/workspace",
+                    "review_root": "/review",
+                }
+            )
+            + "</workspace_validation>"
+        )
     if non_authoritative_dialogue_summary is not None:
         sections.insert(
             1,
@@ -571,6 +594,7 @@ async def build_consultant_context(
     snapshot: ConsultantSnapshot,
     execution: ResolvedExecution,
     request: ContextRequest,
+    workspace_validation: WorkspaceValidationSummary | None = None,
 ) -> ConsultantContextBundle:
     if snapshot.document_id != snapshot.approved_document.document_id:
         raise ValueError("approved document scope does not match snapshot")
@@ -637,6 +661,7 @@ async def build_consultant_context(
             sufficiency=snapshot.sufficiency,
             current_source_handle=request.current_source_handle,
             non_authoritative_dialogue_summary=dialogue_summary,
+            workspace_validation=workspace_validation,
         )
         messages: tuple[BaseMessage, ...] = (
             HumanMessage(
@@ -709,6 +734,7 @@ class ConsultantAgentRuntimeContext:
     execution: ResolvedExecution
     request: ContextRequest
     context_receipts: list[ContextSelectionReceipt] = field(default_factory=list)
+    workspace_validation: WorkspaceValidationSummary | None = None
 
 
 class ConsultantContextMiddleware(AgentMiddleware):
@@ -730,6 +756,7 @@ class ConsultantContextMiddleware(AgentMiddleware):
             snapshot=runtime_context.snapshot,
             execution=runtime_context.execution,
             request=runtime_context.request,
+            workspace_validation=runtime_context.workspace_validation,
         )
         runtime_context.context_receipts.append(bundle.receipt)
         messages = list(request.messages)

@@ -205,6 +205,10 @@ def to_consultant_snapshot_view(
         for turn in snapshot.messages
     ]
     review = snapshot.document_review
+    if review is None:
+        raise ValueError(
+            "Store-derived document review must be loaded before public projection"
+        )
     return ConsultantSnapshotView(
         document_id=snapshot.document_id,
         revision=snapshot.revision,

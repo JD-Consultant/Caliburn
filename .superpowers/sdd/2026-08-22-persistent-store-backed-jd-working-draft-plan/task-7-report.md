@@ -72,3 +72,54 @@
 
 - The repository's `check-codegen` script intentionally compares generated files against the unstaged working tree. Before committing, generated artifacts must be staged so the script verifies regeneration consistency rather than reporting the intended Task 7 diff. This is handled in the final verification sequence.
 - The Windows sandbox blocks `uv`'s default user cache and Vite child-process spawning. All test/codegen commands used the managed repo uv cache or the approved local process permission; no PostgreSQL or live-model gate was run.
+
+## Review fix round 1/5 — truthful unloaded review and accessible selections
+
+### Findings resolved
+
+- `snapshot_from_state()` now creates an internal `ConsultantSnapshot` with `document_review=None`. It cannot be mapped to the public `ConsultantSnapshotView`: the mapper raises until the production runtime has read Store and supplied `document_review_projection_from_workspace()`.
+- The pre-Store checkpoint path now retains only `safe_interview_work_available` through a dedicated state helper. It no longer creates a fictional clean workspace review, generation, or diagnostics.
+- The production PostgreSQL runtime remains the only public snapshot path and already enriches its checkpoint snapshot from a fresh Store read before mapper use. API test runtimes now use that same Store-derived projection helper rather than injecting a final status.
+- Each review checkbox now announces a stable visible ordinal, the employee-facing operation, semantic JD field and change summary, plus `必須整組決定` for atomic groups. The 409 edit error is also cleared after a later successful decision.
+
+### TDD evidence
+
+1. RED — `cd apps/api; $env:UV_CACHE_DIR='S:\caliburn\.uv-cache-reviewed'; uv run pytest tests/test_consultant_api_mapper.py -q`
+   - First corrected two pre-existing expectation shape mismatches (`latest_run`, tuple messages), then failed for the intended reason: `snapshot.document_review` was a fabricated `workspace_generation=0`, `clean` projection instead of unloaded.
+2. GREEN — after making the internal review optional, enforcing Store enrichment at the mapper boundary, and preserving safe interview work independently: `uv run pytest tests/test_consultant_api_mapper.py tests/test_consultant_api.py -q` — `14 passed`.
+3. The mapper regression derives `clean`, `pending`, `invalid`, and `conflicted` from validation status, diagnostics, workspace bundles, and a conflict-bearing group. It asserts generation, deferred unresolved actions, conflict acceptance blocking, employee diagnostics, and safe interview availability without injecting a final review enum.
+4. RED — `npm run test -w @caliburn/web -- ConsultantWorkspace.integration.test.tsx consultantWorkspaceModel.test.ts consultantApi.test.ts`
+   - The new repeated-action accessibility assertion failed because all checkboxes still announced only `選取修改變更`.
+5. GREEN — after semantic names and updated keyboard behavior assertions, the same focused Web command passed `3 files, 27 tests`.
+
+### Verification commands and outcomes
+
+- `uv run pytest tests/test_consultant_api_mapper.py tests/test_consultant_api.py -q` from `apps/api` with `UV_CACHE_DIR=S:\caliburn\.uv-cache-reviewed` — `14 passed` (only non-failing pytest cache permission warnings).
+- `npm run test -w @caliburn/web -- ConsultantWorkspace.integration.test.tsx consultantWorkspaceModel.test.ts consultantApi.test.ts` — `3 files, 27 tests passed`. The first sandboxed attempt could not spawn Vite; the approved local-process rerun completed.
+- `npx tsc --noEmit -p apps/web/tsconfig.json` — passed.
+- `npm run lint -w @caliburn/web` — passed.
+- `git diff --check` — no whitespace errors (only Windows LF/CRLF informational warnings).
+- Contract schema did not change in this fix round, so codegen/check-codegen and contract tests were not rerun.
+- No PostgreSQL, live-model, or full-monorepo gate was run.
+
+### Files changed in this fix round
+
+- `apps/api/app/consultant/views.py`
+- `apps/api/app/api/consultant_mapper.py`
+- `apps/api/tests/test_consultant_api_mapper.py`
+- `apps/api/tests/test_consultant_api.py`
+- `apps/web/src/features/consultant/DocumentReviewPanel.tsx`
+- `apps/web/src/features/consultant/ConsultantWorkspace.integration.test.tsx`
+- `.superpowers/sdd/2026-08-22-persistent-store-backed-jd-working-draft-plan/task-7-report.md`
+
+### North-star self-review
+
+- Public review state is always fresh Store/runtime truth; an unloaded checkpoint cannot emit an employee-visible clean status or generation.
+- Store diagnostics and conflict groups still determine the existing four employee states. No fifth status, no conflict endpoint, and no compatibility surface were added.
+- The UI continues to expose only Chinese JD semantics, typed field editors, partial selection, atomic-group constraints, and stale-response handling; accessible labels contain no IDs, paths, Store/VFS/framework terms, or raw technical diagnostics.
+- Accept/edit-accept remains blocked only for conflicted groups; reject/defer and unaffected groups retain their existing authority behavior.
+
+### Concerns
+
+- The focused API run emits harmless Windows pytest-cache write warnings in this worktree; assertions and test outcomes are unaffected.
+- No public contract changed, so schema generation was intentionally not touched.

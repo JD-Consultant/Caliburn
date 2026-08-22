@@ -25,8 +25,11 @@ from app.consultant.state import (
 from app.consultant.workspace_resources import (
     CandidateReviewGroupsResource,
     CandidateTaskResource,
+    WorkspaceTaskResource,
     WorkspaceCatalog,
     WorkspaceResourceError,
+    parse_workspace_files,
+    project_workspace_files,
     parse_candidate_files,
     project_candidate_files,
 )
@@ -521,3 +524,124 @@ def test_provider_evidence_reference_rejects_invalid_handle() -> None:
             occurrence=0,
             skill_ids=("task-boundary",),
         )
+
+
+def _files_with_new_workspace_task(handle: str) -> dict[str, str]:
+    projection = project_workspace_files(_document(), handle_registry={})
+    files = dict(projection.files)
+    files[f"/workspace/tasks/{handle}.json"] = json.dumps(
+        WorkspaceTaskResource(
+            handle=handle,
+            statement="處理退貨申請",
+            action="處理",
+            object="退貨申請",
+        ).model_dump(mode="json"),
+        ensure_ascii=False,
+        indent=2,
+    ) + "\n"
+    return files
+
+
+def test_workspace_projection_has_one_run_independent_root() -> None:
+    projection = project_workspace_files(_document(), handle_registry={})
+
+    assert "/workspace/header.json" in projection.files
+    assert not any("/candidate/" in path for path in projection.files)
+    assert not any("review-groups" in path for path in projection.files)
+
+
+def test_new_workspace_handle_keeps_the_same_stable_id_after_restart() -> None:
+    first = parse_workspace_files(
+        DOCUMENT_ID,
+        _files_with_new_workspace_task("task-new-001"),
+        handle_registry={},
+    )
+    second = parse_workspace_files(
+        DOCUMENT_ID,
+        _files_with_new_workspace_task("task-new-001"),
+        handle_registry=first.handle_registry,
+    )
+
+    assert first.document.tasks[-1].task_id == second.document.tasks[-1].task_id
+
+
+def test_accepted_new_task_keeps_its_handle_and_uuid_when_reprojected() -> None:
+    first = parse_workspace_files(
+        DOCUMENT_ID,
+        _files_with_new_workspace_task("task-new-001"),
+        handle_registry={},
+    )
+    accepted_task = ApprovedTask(
+        task_id=first.document.tasks[-1].task_id,
+        statement="處理退貨申請",
+        action="處理",
+        object="退貨申請",
+        display_order=1,
+    )
+    accepted_document = _document().model_copy(
+        update={"tasks": _document().tasks + (accepted_task,)}
+    )
+
+    projection = project_workspace_files(
+        accepted_document,
+        handle_registry=first.handle_registry,
+    )
+    reparsed = parse_workspace_files(
+        DOCUMENT_ID,
+        projection.files,
+        handle_registry=projection.handle_registry,
+    )
+
+    assert "/workspace/tasks/task-new-001.json" in projection.files
+    assert reparsed.document.tasks[-1].task_id == accepted_task.task_id
+
+
+def test_workspace_resources_round_trip_editable_fields_without_a_or_levels() -> None:
+    document = _document()
+    projection = project_workspace_files(document, handle_registry={})
+    draft = parse_workspace_files(
+        DOCUMENT_ID,
+        projection.files,
+        handle_registry=projection.handle_registry,
+    )
+
+    assert draft.document.duties[0].statement == "管理採購作業"
+    assert draft.document.tasks[0].model_dump() == {
+        "task_id": TASK_ID,
+        "duty_id": None,
+        "statement": "核對訂單內容",
+        "action": "核對",
+        "object": "訂單內容",
+        "purpose_result": "避免錯誤出貨",
+        "context": "接獲訂單後",
+        "frequency_text": "每日",
+        "responsibility_role": "primary",
+        "enablers": (
+            {"kind": "tool_system", "name": "ERP"},
+        ),
+    }
+    assert [item.kind.value for item in draft.document.opks] == [
+        "output",
+        "indicator",
+        "knowledge",
+        "skill",
+    ]
+    assert all("competency_level" not in value for value in projection.files.values())
+    assert "/workspace/opks/a/" not in "\n".join(projection.files)
+
+
+def test_workspace_canonical_json_is_utf8_ordered_indented_and_newline_terminated() -> None:
+    projection = project_workspace_files(_document(), handle_registry={})
+
+    assert projection.files["/workspace/header.json"] == (
+        "{\n"
+        '  "job_title": "採購專員",\n'
+        '  "occupation_category_name": "採購",\n'
+        '  "occupation_name": "採購人員",\n'
+        '  "occupation_code": "A-001",\n'
+        '  "industry_name": "製造業",\n'
+        '  "industry_code": "M-001",\n'
+        '  "work_description": "維持採購作業順暢。",\n'
+        '  "notes": "保留基線備註。"\n'
+        "}\n"
+    )

@@ -4,13 +4,12 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from collections.abc import Callable, Mapping
+from collections.abc import Callable
 from datetime import UTC, datetime
 from typing import Any
 from uuid import UUID
 
 from langchain_core.messages import HumanMessage
-from deepagents.backends.utils import file_data_to_string
 
 from app.adapters.langgraph.postgres import (
     PostgresConsultantRuntime,
@@ -53,6 +52,7 @@ from app.consultant.state import (
 )
 from app.consultant.workspace_backend import build_consultant_workspace_backend
 from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_state import StoreBackedWorkspace
 from app.consultant.workspace_tools import (
     CandidateCheckToolBinding,
 )
@@ -134,23 +134,14 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
     return resolve_execution(profile, policy)
 
 
-def _candidate_files_from_response(
-    response: Mapping[str, Any],
+async def _current_workspace_files(
     workspace,
 ) -> dict[str, str]:
-    raw_files = response.get("files")
-    if not isinstance(raw_files, Mapping):
-        raise CandidatePublicationStale(
-            "candidate publication requires the current workspace files"
-        )
+    snapshot = await workspace.workspace.read_snapshot()
     files: dict[str, str] = {}
-    for raw_path, raw_file in raw_files.items():
-        if not isinstance(raw_path, str):
-            raise CandidatePublicationStale(
-                "candidate publication found a non-text workspace path"
-            )
+    for raw_path, content in snapshot.files.items():
         try:
-            canonical_path = workspace.candidate_backend.validate_candidate_file_path(
+            canonical_path = workspace.workspace_backend.validate_workspace_file_path(
                 raw_path
             )
         except ValueError as error:
@@ -161,16 +152,7 @@ def _candidate_files_from_response(
             raise CandidatePublicationStale(
                 f"candidate publication requires canonical workspace paths: {raw_path!r}"
             )
-        if isinstance(raw_file, str):
-            files[canonical_path] = raw_file
-        elif isinstance(raw_file, bytes):
-            files[canonical_path] = raw_file.decode("utf-8")
-        elif isinstance(raw_file, Mapping):
-            files[canonical_path] = file_data_to_string(raw_file)
-        else:
-            raise CandidatePublicationStale(
-                f"candidate publication found an unsupported file value: {raw_path!r}"
-            )
+        files[canonical_path] = content
     return dict(sorted(files.items()))
 
 
@@ -245,10 +227,18 @@ async def execute_admitted_consultant_turn(
             execution=execution,
             request=request,
         )
+        store_workspace = StoreBackedWorkspace(
+            store=runtime.store,
+            document_id=document_id,
+        )
+        await store_workspace.ensure_initialized(
+            approved_document=snapshot.approved_document,
+            approved_revision=snapshot.revision,
+        )
         workspace = build_consultant_workspace_backend(
             runtime=runtime,
             document_id=document_id,
-            run_id=run_id,
+            workspace=store_workspace,
             catalog=catalog,
             selected_skill_ids=CONSULTANT_SKILL_IDS,
             source_lookup=DocumentSourceLookup(runtime),
@@ -261,6 +251,7 @@ async def execute_admitted_consultant_turn(
             candidate_check_binding=CandidateCheckToolBinding(
                 runtime=runtime,
                 workspace=workspace,
+                run_id=run_id,
             ),
             context_middleware=ConsultantContextMiddleware(),
             context_schema=ConsultantAgentRuntimeContext,
@@ -287,7 +278,6 @@ async def execute_admitted_consultant_turn(
                             },
                         )
                     ],
-                    "files": dict(workspace.initial_files),
                 },
                 context=runtime_context,
                 config={
@@ -335,7 +325,7 @@ async def execute_admitted_consultant_turn(
                 raise ConsultantVerificationError(
                     "candidate publication used Skills missing from final result"
                 )
-            candidate_files = _candidate_files_from_response(response, workspace)
+            candidate_files = await _current_workspace_files(workspace)
             current_source_ids = tuple(
                 source.source_id
                 for source in all_sources

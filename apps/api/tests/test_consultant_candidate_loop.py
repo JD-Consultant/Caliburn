@@ -329,6 +329,7 @@ class ScriptedConsultantModel(FakeMessagesListChatModel):
     bound_tool_names: list[tuple[str, ...]] = Field(default_factory=list)
     observed_reads: list[str] = Field(default_factory=list)
     check_results: list[dict[str, Any]] = Field(default_factory=list)
+    system_prompts: list[str] = Field(default_factory=list)
     final_publication: dict[str, Any] | None = None
 
     def bind_tools(
@@ -458,12 +459,13 @@ class ScriptedConsultantModel(FakeMessagesListChatModel):
     ) -> ChatResult:
         del stop, run_manager, kwargs
         self.call_count += 1
+        model_prompt = "\n".join(
+            str(message.content)
+            for message in messages
+            if isinstance(message, SystemMessage)
+        )
+        self.system_prompts.append(model_prompt)
         if self.call_count == 1:
-            model_prompt = "\n".join(
-                str(message.content)
-                for message in messages
-                if isinstance(message, SystemMessage)
-            )
             assert "/workspace" in model_prompt
             assert "/candidate/" not in model_prompt
         run_root = "/workspace"
@@ -601,6 +603,13 @@ async def test_real_agent_repairs_candidate_and_publishes_pending_only(
         )
 
         assert model.call_count == 6
+        assert len(model.system_prompts) == 6
+        assert '"status":"invalid"' in model.system_prompts[2]
+        assert '"status":"invalid"' in model.system_prompts[3]
+        assert '"status":"valid"' in model.system_prompts[4]
+        assert '"status":"valid"' in model.system_prompts[5]
+        assert "/review" in model.system_prompts[2]
+        assert "我負責核對訂單並回報結果。" not in model.system_prompts[2]
         assert [item["status"] for item in model.check_results] == [
             "invalid",
             "checked",

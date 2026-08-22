@@ -29,10 +29,6 @@ from app.consultant.document_review import (
     DocumentReviewError,
     create_document_changeset,
 )
-from app.consultant.evidence_anchor import (
-    EvidenceAnchorError,
-    resolve_evidence_reference,
-)
 from app.consultant.results import (
     AnalysisBasis,
     DocumentChangeOperation,
@@ -52,22 +48,18 @@ from app.consultant.state import (
     DocumentPatchAction,
     EmployeeSource,
     NonEmptyText,
-    SourceProcessingStatus,
-    SourceValidity,
 )
 from app.consultant.verification import (
     ConsultantVerificationError,
     verify_candidate_document_changes,
 )
 from app.consultant.workspace_resources import (
-    CandidateDocumentDraft,
     CandidateReviewGroup,
     WorkspaceCatalog,
-    WorkspaceResourceError,
     pending_action_handles,
-    parse_candidate_files,
     workspace_entity_id,
 )
+from app.consultant.workspace_validation import validate_workspace_payload
 
 
 Digest = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
@@ -193,36 +185,6 @@ def _invalid(
 
 def _model_json(value: Any) -> dict[str, JsonValue]:
     return value.model_dump(mode="json")
-
-
-def _current_sources(catalog: WorkspaceCatalog) -> tuple[EmployeeSource, ...]:
-    return tuple(
-        sorted(
-            (
-                source
-                for source in catalog.sources
-                if source.document_id == catalog.document_id
-                and source.processing_status is SourceProcessingStatus.COMMITTED
-                and source.validity is SourceValidity.CURRENT
-            ),
-            key=lambda source: str(source.source_id),
-        )
-    )
-
-
-def _basis_from_sources(
-    source_ids: Sequence[UUID],
-    skill_ids: Sequence[SkillId],
-) -> AnalysisBasis:
-    unique_skill_ids = tuple(dict.fromkeys(skill_ids))
-    if not unique_skill_ids:
-        raise ConsultantVerificationError(
-            "candidate check requires at least one loaded Skill for a semantic basis"
-        )
-    return AnalysisBasis(
-        source_ids=tuple(dict.fromkeys(source_ids)),
-        skill_ids=unique_skill_ids,
-    )
 
 
 def _entity_maps(document: ApprovedJobDocument) -> tuple[
@@ -496,58 +458,6 @@ def _apply_review_groups(
     )
 
 
-def _resolve_evidence(
-    draft: CandidateDocumentDraft,
-    catalog: WorkspaceCatalog,
-    request: CandidateCheckRequest,
-) -> tuple[dict[str, tuple[AnalysisBasis, ...]], tuple[str, ...]]:
-    bindings: dict[str, list[AnalysisBasis]] = {}
-    issues: list[str] = []
-    loaded = set(request.loaded_skill_ids)
-    selected = set(request.selected_skill_ids)
-    for binding in draft.opks_evidence:
-        for reference in binding.references:
-            missing = set(reference.skill_ids) - selected
-            if missing:
-                issues.append(
-                    f"evidence for {binding.opks_handle} uses unselected Skill(s): "
-                    + ", ".join(sorted(missing))
-                )
-            unloaded = set(reference.skill_ids) - loaded
-            if unloaded:
-                issues.append(
-                    f"evidence for {binding.opks_handle} uses unloaded Skill(s): "
-                    + ", ".join(sorted(unloaded))
-                )
-            try:
-                anchor = resolve_evidence_reference(reference, catalog)
-            except EvidenceAnchorError as error:
-                issues.append(
-                    f"evidence for {binding.opks_handle} is invalid: {error}"
-                )
-                continue
-            source = next(
-                (item for item in catalog.sources if item.source_id == anchor.source_id),
-                None,
-            )
-            if source is None or source.processing_status is not SourceProcessingStatus.COMMITTED:
-                issues.append(
-                    f"evidence for {binding.opks_handle} does not use a committed source"
-                )
-                continue
-            bindings.setdefault(binding.opks_handle, []).append(
-                AnalysisBasis(
-                    source_ids=(anchor.source_id,),
-                    quote_anchors=(anchor,),
-                    skill_ids=reference.skill_ids,
-                )
-            )
-    return (
-        {handle: tuple(values) for handle, values in bindings.items()},
-        tuple(issues),
-    )
-
-
 def _semantic_changes(
     *,
     baseline: ApprovedJobDocument,
@@ -740,33 +650,36 @@ def check_candidate_document(
         return _invalid(request, digest, ("candidate document scope does not match",))
     if not request.selected_skill_ids:
         return _invalid(request, digest, ("candidate check requires selected Skills",))
-    current_sources = _current_sources(catalog)
-    if not current_sources:
+    validation = validate_workspace_payload(
+        request.files,
+        catalog=catalog,
+        selected_skill_ids=request.selected_skill_ids,
+        loaded_skill_ids=request.loaded_skill_ids,
+    )
+    if validation.diagnostics:
         return _invalid(
             request,
             digest,
-            ("candidate check requires at least one current committed employee source",),
+            tuple(
+                f"{item.code} {item.path}: {item.message}"
+                for item in validation.diagnostics
+            ),
         )
-    try:
-        draft = parse_candidate_files(
-            catalog,
-            candidate_files,
-            run_id=request.run_id,
-            new_entity_namespace=new_entity_namespace,
+    draft = validation.document
+    if draft is None:
+        return _invalid(request, digest, ("candidate resources are invalid",))
+    current_sources = validation.current_sources
+    default_basis = validation.default_basis
+    if default_basis is None:
+        return _invalid(
+            request,
+            digest,
+            (
+                "candidate verification failed: candidate check requires at least "
+                "one loaded Skill for a semantic basis",
+            ),
         )
-    except (ValueError, WorkspaceResourceError) as error:
-        return _invalid(request, digest, (f"candidate resources are invalid: {error}",))
-
-    try:
-        default_basis = _basis_from_sources(
-            [source.source_id for source in current_sources],
-            request.loaded_skill_ids,
-        )
-    except ConsultantVerificationError as error:
-        return _invalid(request, digest, (f"candidate verification failed: {error}",))
-    evidence, evidence_issues = _resolve_evidence(draft, catalog, request)
-    if evidence_issues:
-        return _invalid(request, digest, evidence_issues)
+    evidence = validation.evidence_by_handle
     try:
         changes = _semantic_changes(
             baseline=catalog.document,

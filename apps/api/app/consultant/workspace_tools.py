@@ -292,7 +292,9 @@ def analyze_workspace_wave(
     return None
 
 
-def _last_ai_tool_calls(state: Any) -> Sequence[Mapping[str, Any]]:
+def last_ai_tool_calls(state: Any) -> Sequence[Mapping[str, Any]]:
+    """Return the latest complete model wave using framework message state."""
+
     if isinstance(state, Mapping):
         messages = state.get("messages", ())
     else:
@@ -313,7 +315,7 @@ def _wave_error_message(
     candidate_backend: WorkspacePolicyBackend,
 ) -> ToolMessage:
     conflict = analyze_workspace_wave(
-        _last_ai_tool_calls(request.state),
+        last_ai_tool_calls(request.state),
         candidate_backend=candidate_backend,
     )
     if conflict is None:
@@ -341,7 +343,7 @@ class WorkspaceToolWaveMiddleware(AgentMiddleware):
     ) -> ToolMessage | Command[Any]:
         if (
             analyze_workspace_wave(
-                _last_ai_tool_calls(request.state),
+                last_ai_tool_calls(request.state),
                 candidate_backend=self._candidate_backend,
             )
             is not None
@@ -357,7 +359,7 @@ class WorkspaceToolWaveMiddleware(AgentMiddleware):
     ) -> ToolMessage | Command[Any]:
         if (
             analyze_workspace_wave(
-                _last_ai_tool_calls(request.state),
+                last_ai_tool_calls(request.state),
                 candidate_backend=self._candidate_backend,
             )
             is not None

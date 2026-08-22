@@ -29,6 +29,10 @@ from app.consultant.workspace_tools import (
     WorkspaceToolWaveMiddleware,
     build_check_candidate_document_tool,
 )
+from app.consultant.workspace_validation import (
+    WorkspaceValidationMiddleware,
+    WorkspaceValidationService,
+)
 from app.consultant.skill_backend import PackageSkillBackend
 
 
@@ -332,6 +336,21 @@ def build_professional_consultant_agent(
         tool_names=frozenset({"ls", "read_file", "grep"}),
         run_limit=execution.max_lookup_waves,
     )
+
+    async def load_document_sources() -> Sequence[Any]:
+        return await workspace_binding.source_backend.lookup.runtime.list_sources(
+            workspace_binding.document_id
+        )
+
+    validation = WorkspaceValidationMiddleware(
+        validator=WorkspaceValidationService(
+            workspace=workspace_binding.workspace,
+            catalog=workspace_binding.catalog,
+            source_loader=load_document_sources,
+            selected_skill_ids=selected_skill_ids,
+        ),
+        skill_backend=receipt_backend,
+    )
     graph = build_consultant_agent(
         model=model,
         execution=execution,
@@ -344,6 +363,7 @@ def build_professional_consultant_agent(
             WorkspaceToolWaveMiddleware(
                 candidate_backend=workspace_binding.candidate_backend
             ),
+            validation,
         ),
         context_middleware=context_middleware,
         context_schema=context_schema,

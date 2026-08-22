@@ -47,6 +47,19 @@ class WorkspaceModel(BaseModel):
     model_config = ConfigDict(extra="forbid", frozen=True)
 
 
+class WorkspaceEvidenceReference(WorkspaceModel):
+    source_handle: Handle
+    quote: NonEmptyText
+    occurrence: int | None = Field(default=None, ge=1)
+    skill_ids: tuple[SkillId, ...] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def skill_references_are_unique(self) -> WorkspaceEvidenceReference:
+        if len(self.skill_ids) != len(set(self.skill_ids)):
+            raise ValueError("duplicate Skill dependency")
+        return self
+
+
 class WorkspaceHeaderResource(WorkspaceModel):
     job_title: NonEmptyText | None = None
     occupation_category_name: NonEmptyText | None = None
@@ -56,12 +69,14 @@ class WorkspaceHeaderResource(WorkspaceModel):
     industry_code: NonEmptyText | None = None
     work_description: NonEmptyText | None = None
     notes: NonEmptyText | None = None
+    evidence: tuple[WorkspaceEvidenceReference, ...] = ()
 
 
 class WorkspaceDutyResource(WorkspaceModel):
     handle: Handle
     statement: NonEmptyText
     display_order: int | None = Field(default=None, ge=0)
+    evidence: tuple[WorkspaceEvidenceReference, ...] = ()
 
 
 class WorkspaceEnablerResource(WorkspaceModel):
@@ -81,6 +96,7 @@ class WorkspaceTaskResource(WorkspaceModel):
     responsibility_role: ApprovedResponsibilityRole | None = None
     enablers: tuple[WorkspaceEnablerResource, ...] = ()
     display_order: int | None = Field(default=None, ge=0)
+    evidence: tuple[WorkspaceEvidenceReference, ...] = ()
 
 
 class WorkspaceOpksKind(StrEnum):
@@ -90,17 +106,13 @@ class WorkspaceOpksKind(StrEnum):
     SKILL = "skill"
 
 
-class WorkspaceEvidenceReference(WorkspaceModel):
-    source_handle: Handle
-    quote: NonEmptyText
-    occurrence: int | None = Field(default=None, ge=1)
-    skill_ids: tuple[SkillId, ...] = Field(min_length=1)
-
-    @model_validator(mode="after")
-    def skill_references_are_unique(self) -> WorkspaceEvidenceReference:
-        if len(self.skill_ids) != len(set(self.skill_ids)):
-            raise ValueError("duplicate Skill dependency")
-        return self
+def _opks_prefix(kind: WorkspaceOpksKind) -> str:
+    return {
+        WorkspaceOpksKind.OUTPUT: "o",
+        WorkspaceOpksKind.PERFORMANCE_INDICATOR: "p",
+        WorkspaceOpksKind.KNOWLEDGE: "k",
+        WorkspaceOpksKind.SKILL: "s",
+    }[kind]
 
 
 class WorkspaceOpksResource(WorkspaceModel):
@@ -123,10 +135,11 @@ class WorkspaceOpksResource(WorkspaceModel):
         return self
 
 
-class WorkspaceOpksEvidenceBinding(WorkspaceModel):
-    """Keep model-authored evidence attached to its owning OPKS handle."""
+class WorkspaceResourceEvidenceBinding(WorkspaceModel):
+    """Attach model-authored Evidence to one canonical workspace resource."""
 
-    opks_handle: Handle
+    resource_handle: str
+    resource_path: NonEmptyText
     references: tuple[WorkspaceEvidenceReference, ...] = Field(min_length=1)
 
 
@@ -388,11 +401,11 @@ class WorkspaceDocumentDraft(WorkspaceModel):
         repr=False,
     )
     evidence_references: tuple[WorkspaceEvidenceReference, ...] = ()
-    opks_evidence: tuple[WorkspaceOpksEvidenceBinding, ...] = ()
+    resource_evidence: tuple[WorkspaceResourceEvidenceBinding, ...] = ()
 
     @property
-    def evidence_bindings(self) -> tuple[WorkspaceOpksEvidenceBinding, ...]:
-        return self.opks_evidence
+    def evidence_bindings(self) -> tuple[WorkspaceResourceEvidenceBinding, ...]:
+        return self.resource_evidence
 
     @property
     def approved_document(self) -> ApprovedJobDocument:
@@ -718,14 +731,45 @@ def parse_workspace_files(
         )
         for index, (handle, resource) in enumerate(opks_resources)
     )
+    evidence_owners = (
+        (("header", "/workspace/header.json", header),)
+        + tuple(
+            (
+                handle,
+                f"/workspace/duties/{handle}.json",
+                resource,
+            )
+            for handle, resource in duty_resources
+        )
+        + tuple(
+            (
+                handle,
+                f"/workspace/tasks/{handle}.json",
+                resource,
+            )
+            for handle, resource in task_resources
+        )
+        + tuple(
+            (
+                handle,
+                f"/workspace/opks/{_opks_prefix(resource.kind)}/{handle}.json",
+                resource,
+            )
+            for handle, resource in opks_resources
+        )
+    )
     evidence_references = tuple(
         reference
-        for _, resource in opks_resources
+        for _, _, resource in evidence_owners
         for reference in resource.evidence
     )
-    opks_evidence = tuple(
-        WorkspaceOpksEvidenceBinding(opks_handle=handle, references=resource.evidence)
-        for handle, resource in opks_resources
+    resource_evidence = tuple(
+        WorkspaceResourceEvidenceBinding(
+            resource_handle=handle,
+            resource_path=path,
+            references=resource.evidence,
+        )
+        for handle, path, resource in evidence_owners
         if resource.evidence
     )
     return WorkspaceDocumentDraft(
@@ -746,7 +790,7 @@ def parse_workspace_files(
         handle_registry=registry,
         baseline_document=baseline_document,
         evidence_references=evidence_references,
-        opks_evidence=opks_evidence,
+        resource_evidence=resource_evidence,
     )
 
 

@@ -566,23 +566,80 @@ async def test_changed_knowledge_requires_exact_employee_quote_anchor() -> None:
 
 
 @pytest.mark.asyncio
-async def test_changed_risky_factual_text_requires_employee_quote_anchor(
-    validation_harness: tuple[
-        StoreBackedWorkspace,
-        WorkspaceValidationService,
-        MutableSourceLoader,
+@pytest.mark.parametrize(
+    ("path", "field", "risky_text"),
+    [
+        (
+            "/workspace/header.json",
+            "job_title",
+            "每週處理 100 筆訂單的採購專員",
+        ),
+        (
+            "/workspace/duties/duty-001.json",
+            "statement",
+            "依公司 SOP 規定管理採購作業",
+        ),
+        (
+            "/workspace/tasks/task-001.json",
+            "statement",
+            "每週核對 100 筆訂單",
+        ),
     ],
+)
+async def test_risky_non_opks_resource_can_be_repaired_with_exact_quote(
+    path: str,
+    field: str,
+    risky_text: str,
 ) -> None:
-    workspace, validator, _loader = validation_harness
-    path = "/workspace/tasks/task-001.json"
+    source = _source(text=f"員工原話：{risky_text}。")
+    document = _document()
+    workspace = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(approved_document=document, approved_revision=7)
+    validator = WorkspaceValidationService(
+        workspace=workspace,
+        catalog=WorkspaceCatalog.from_snapshot(document, sources=(source,)),
+        source_loader=MutableSourceLoader((source,)),
+        selected_skill_ids=("output",),
+    )
     before = (await workspace.read_snapshot()).files[path]
-    risky = before.replace("核對訂單", "每週核對 100 筆訂單", 1)
-    assert (await workspace.backend.aedit(path, before, risky)).error is None
+    payload = json.loads(before)
+    payload[field] = risky_text
+    unanchored = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    assert (await workspace.backend.aedit(path, before, unanchored)).error is None
 
-    result = await validator.validate_current(loaded_skill_ids=("output",))
+    rejected = await validator.validate_current(loaded_skill_ids=("output",))
 
-    assert result.document is None
-    assert result.diagnostics[0].code == "evidence-anchor-required"
+    assert rejected.document is None
+    assert rejected.diagnostics[0].code == "evidence-anchor-required"
+    payload["evidence"] = [
+        {
+            "source_handle": "source-001",
+            "quote": risky_text,
+            "occurrence": 1,
+            "skill_ids": ["output"],
+        }
+    ]
+    anchored = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    assert (await workspace.backend.aedit(path, unanchored, anchored)).error is None
+
+    accepted = await validator.validate_current(loaded_skill_ids=("output",))
+
+    assert accepted.document is not None
+    validation = workspace_validation.validate_workspace_payload(
+        (await workspace.read_snapshot()).files,
+        catalog=WorkspaceCatalog.from_snapshot(document, sources=(source,)),
+        selected_skill_ids=("output",),
+        loaded_skill_ids=("output",),
+    )
+    from app.consultant.workspace_review import derive_workspace_review
+
+    review = derive_workspace_review(document, validation, accepted.manifest, ())
+    assert any(
+        anchor.quote == risky_text
+        for group in review.groups
+        for action in group.actions
+        for anchor in action.quote_anchors
+    )
 
 
 @pytest.mark.asyncio

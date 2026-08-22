@@ -33,6 +33,7 @@ from app.consultant.state import (
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
     project_candidate_files,
+    project_workspace_files,
 )
 from app.consultant.workspace_tools import _serialize_check_result
 
@@ -374,6 +375,46 @@ def test_new_duty_and_task_create_get_application_uuid_and_axis_order(
     expected_id = uuid5(DOCUMENT_ID, f"candidate:{RUN_ID}:{kind}:{handle}")
     assert added[0].after[identity_key] == str(expected_id)
     assert added[0].after["display_order"] == 1
+
+
+def test_workspace_new_entity_identity_is_document_scoped_across_runs() -> None:
+    catalog = _catalog()
+    projection = project_workspace_files(
+        catalog.document,
+        handle_registry=catalog.handle_to_stable,
+    )
+    files = dict(projection.files)
+    files["/workspace/duties/duty-101.json"] = json.dumps(
+        {"handle": "duty-101", "statement": "新增職責"},
+        ensure_ascii=False,
+        indent=2,
+    ) + "\n"
+
+    results = tuple(
+        check_candidate_document(
+            _request(files, run_id=run_id),
+            catalog=catalog,
+            existing_review_queue={},
+            interview_work={},
+        )
+        for run_id in (RUN_ID, OTHER_RUN_ID)
+    )
+
+    assert all(result.status == "checked" for result in results), [
+        result.issues for result in results
+    ]
+    added_ids = tuple(
+        next(
+            action.after["duty_id"]
+            for action in result.actions
+            if action.operation.value == "add"
+        )
+        for result in results
+    )
+    assert added_ids == (
+        "d1b71734-33f3-503d-b0f0-936b93bfe371",
+        "d1b71734-33f3-503d-b0f0-936b93bfe371",
+    )
 
 
 @pytest.mark.parametrize(

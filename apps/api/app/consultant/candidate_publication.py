@@ -66,6 +66,7 @@ from app.consultant.workspace_resources import (
     WorkspaceResourceError,
     pending_action_handles,
     parse_candidate_files,
+    workspace_entity_id,
 )
 
 
@@ -325,6 +326,8 @@ def _candidate_handle_by_id(
     catalog: WorkspaceCatalog,
     files: Mapping[str, str],
     run_id: UUID,
+    *,
+    new_entity_namespace: Literal["candidate", "workspace"],
 ) -> dict[UUID, str]:
     """Recover local handles for new entities without storing another mapping."""
 
@@ -354,9 +357,18 @@ def _candidate_handle_by_id(
         try:
             identity = catalog.id_for_handle(handle)
         except KeyError:
-            identity = uuid5(
-                catalog.document.document_id,
-                f"candidate:{run_id}:{kind}:{handle}",
+            identity = (
+                workspace_entity_id(
+                    catalog.document.document_id,
+                    handle,
+                    kind,
+                    handle_registry=catalog.handle_to_stable,
+                )
+                if new_entity_namespace == "workspace"
+                else uuid5(
+                    catalog.document.document_id,
+                    f"candidate:{run_id}:{kind}:{handle}",
+                )
             )
         result[identity] = handle
     return result
@@ -717,6 +729,12 @@ def check_candidate_document(
     """Parse, verify, and materialize one candidate without queue mutation."""
 
     digest = resource_digest(request.files)
+    new_entity_namespace: Literal["candidate", "workspace"] = (
+        "workspace"
+        if request.files
+        and all(path.startswith("/workspace/") for path in request.files)
+        else "candidate"
+    )
     candidate_files = _candidate_compatibility_view(request.files, request.run_id)
     if request.document_id != catalog.document_id:
         return _invalid(request, digest, ("candidate document scope does not match",))
@@ -730,7 +748,12 @@ def check_candidate_document(
             ("candidate check requires at least one current committed employee source",),
         )
     try:
-        draft = parse_candidate_files(catalog, candidate_files, run_id=request.run_id)
+        draft = parse_candidate_files(
+            catalog,
+            candidate_files,
+            run_id=request.run_id,
+            new_entity_namespace=new_entity_namespace,
+        )
     except (ValueError, WorkspaceResourceError) as error:
         return _invalid(request, digest, (f"candidate resources are invalid: {error}",))
 
@@ -750,7 +773,10 @@ def check_candidate_document(
             candidate=draft.approved_document,
             catalog=catalog,
             candidate_handles=_candidate_handle_by_id(
-                catalog, candidate_files, request.run_id
+                catalog,
+                candidate_files,
+                request.run_id,
+                new_entity_namespace=new_entity_namespace,
             ),
             evidence=evidence,
             default_basis=default_basis,

@@ -315,7 +315,7 @@ describe("employee consultant workspace integration", () => {
       await user.keyboard("{Enter}");
     };
 
-    await selectWithKeyboard("選取第 1 項新增變更：職務名稱（接受職務名稱建議）");
+    await selectWithKeyboard("選取第 1 組第 1 項新增變更：職務名稱（接受職務名稱建議）");
     await decideWithKeyboard("接受 AI 建議");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(
@@ -328,7 +328,7 @@ describe("employee consultant workspace integration", () => {
     const description = screen.getByLabelText("工作描述");
     await user.clear(description);
     await user.type(description, "員工確認後的工作描述");
-    await selectWithKeyboard("選取第 1 項修改變更：工作描述（修改工作描述建議）");
+    await selectWithKeyboard("選取第 2 組第 1 項修改變更：工作描述（修改工作描述建議）");
     await decideWithKeyboard("修改後接受");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(
@@ -341,7 +341,7 @@ describe("employee consultant workspace integration", () => {
       },
     });
 
-    await selectWithKeyboard("選取第 1 項移除變更：職務名稱（移除不適用建議）");
+    await selectWithKeyboard("選取第 3 組第 1 項移除變更：職務名稱（移除不適用建議）");
     const rejectionReason = screen.getByLabelText("若要拒絕，可補充原因");
     await user.type(rejectionReason, "目前正式文件仍需要這項內容");
     await decideWithKeyboard("拒絕");
@@ -354,7 +354,7 @@ describe("employee consultant workspace integration", () => {
       rejection_reason: "目前正式文件仍需要這項內容",
     });
 
-    await selectWithKeyboard("選取第 1 項調整順序變更：工作順序（調整工作順序建議）");
+    await selectWithKeyboard("選取第 4 組第 1 項調整順序變更：工作順序（調整工作順序建議）");
     await decideWithKeyboard("稍後處理");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
     expect(
@@ -410,12 +410,51 @@ describe("employee consultant workspace integration", () => {
 
     expect(
       screen.getByRole("checkbox", {
-        name: "選取第 1 項修改變更：工作敘述（更新工作描述）；必須整組決定",
+        name: "選取第 1 組第 1 項修改變更：工作敘述（更新工作描述）；必須整組決定",
       }),
     ).toBeTruthy();
     expect(
       screen.getByRole("checkbox", {
-        name: "選取第 2 項修改變更：工作敘述（更新工作描述）；必須整組決定",
+        name: "選取第 1 組第 2 項修改變更：工作敘述（更新工作描述）；必須整組決定",
+      }),
+    ).toBeTruthy();
+  });
+
+  it("distinguishes identical semantic review controls across groups", () => {
+    const snapshot = consultantSnapshotFixture();
+    const firstBundle = snapshot.document_review.bundles[0];
+    const firstAction = firstBundle.actions[0];
+    snapshot.document_review.bundles = [
+      {
+        ...firstBundle,
+        summary: "更新工作內容",
+        actions: [firstAction],
+      },
+      {
+        ...firstBundle,
+        changeset_id: "second-identical-review-group",
+        summary: "更新工作內容",
+        actions: [
+          {
+            ...firstAction,
+            action_id: "second-identical-review-action",
+          },
+        ],
+      },
+    ];
+
+    renderWithClient(
+      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(
+      screen.getByRole("checkbox", {
+        name: "選取第 1 組第 1 項修改變更：工作敘述（更新工作內容）；必須整組決定",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("checkbox", {
+        name: "選取第 2 組第 1 項修改變更：工作敘述（更新工作內容）；必須整組決定",
       }),
     ).toBeTruthy();
   });

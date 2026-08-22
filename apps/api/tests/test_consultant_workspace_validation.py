@@ -31,7 +31,6 @@ from app.consultant.workspace_backend import WorkspacePolicyBackend
 from app.consultant.workspace_state import (
     StoreBackedWorkspace,
     WorkspaceValidationStatus,
-    approved_document_digest,
     workspace_resource_digest,
 )
 import app.consultant.workspace_validation as workspace_validation
@@ -351,34 +350,32 @@ async def test_invalid_draft_is_retained_and_repair_advances_generation_to_valid
 
 
 @pytest.mark.asyncio
-async def test_approved_basis_mismatch_fails_closed_without_trusting_valid_status(
+async def test_new_turn_stale_approved_basis_never_uses_cached_validation(
     validation_harness: tuple[
         StoreBackedWorkspace,
         WorkspaceValidationService,
         MutableSourceLoader,
     ],
 ) -> None:
-    workspace, validator, _loader = validation_harness
-    first = await validator.validate_current(loaded_skill_ids=("output",))
+    workspace, _validator, loader = validation_harness
     changed = _document().model_copy(update={"job_title": "員工已直接修訂"})
-    await workspace._put_manifest(  # noqa: SLF001 - stale-basis crash characterization
-        first.manifest.model_copy(
-            update={
-                "approved_baseline_digest": approved_document_digest(changed),
-                "validation_status": WorkspaceValidationStatus.VALID,
-            }
-        )
+    new_turn_validator = WorkspaceValidationService(
+        workspace=workspace,
+        catalog=WorkspaceCatalog.from_snapshot(changed, sources=loader.sources),
+        source_loader=loader,
+        selected_skill_ids=("output",),
     )
 
-    result = await validator.validate_current(loaded_skill_ids=("output",))
+    result = await new_turn_validator.validate_current(loaded_skill_ids=("output",))
 
     assert result.document is None
     assert result.manifest.validation_status is WorkspaceValidationStatus.INVALID
     assert result.diagnostics[0].code == "approved-basis-stale"
 
-    cached = await validator.validate_current(loaded_skill_ids=("output",))
-    assert cached.revalidated is False
-    assert cached.manifest.generation == result.manifest.generation
+    repeated = await new_turn_validator.validate_current(loaded_skill_ids=("output",))
+    assert repeated.document is None
+    assert repeated.revalidated is True
+    assert repeated.manifest.generation == result.manifest.generation
 
 
 @pytest.mark.asyncio

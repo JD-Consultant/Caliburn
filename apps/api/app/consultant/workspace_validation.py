@@ -488,8 +488,8 @@ class WorkspaceValidationService:
             last is not None
             and last.manifest.resource_digest == snapshot.manifest.resource_digest
             and last.manifest.evidence_basis_digest == basis_digest
-            and last.manifest.approved_baseline_digest
-            == snapshot.manifest.approved_baseline_digest
+            and snapshot.manifest.approved_baseline_digest == baseline_digest
+            and last.manifest.approved_baseline_digest == baseline_digest
             and last.manifest.validation_status
             is snapshot.manifest.validation_status
             and last.manifest.diagnostics == snapshot.manifest.diagnostics

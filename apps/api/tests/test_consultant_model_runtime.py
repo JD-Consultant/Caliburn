@@ -140,6 +140,26 @@ def test_gpt_5_6_luna_max_reasoning_is_forwarded_to_openrouter() -> None:
     assert model.reasoning == {"effort": "max", "exclude": True}
 
 
+def test_gpt_5_6_luna_xhigh_reasoning_is_forwarded_to_openrouter() -> None:
+    execution = resolve_execution(
+        _profile(
+            model="openai/gpt-5.6-luna",
+            provider="OpenAI",
+            reasoning_effort="xhigh",
+        ),
+        _policy(),
+    )
+    model = build_openrouter_chat_model(
+        execution,
+        api_key="test-secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+
+    assert execution.effective_parameters.reasoning is not None
+    assert execution.effective_parameters.reasoning.effort == "xhigh"
+    assert model.reasoning == {"effort": "xhigh", "exclude": True}
+
+
 def test_skills_cannot_own_or_switch_the_consultant_model() -> None:
     first = resolve_execution(_profile(), _policy(skills=("task-boundary",)))
     second = resolve_execution(_profile(), _policy(skills=("knowledge", "skill")))
@@ -494,6 +514,36 @@ def test_eight_step_ceiling_rejects_ninth_model_step_and_keeps_workspace_tools_i
             },
             runtime=None,  # type: ignore[arg-type] - middleware does not use runtime
         )
+
+
+def test_run_policy_allows_eleven_model_steps_and_rejects_twelfth() -> None:
+    policy_values = _policy().model_dump()
+    policy_values.update(
+        revision=2,
+        max_model_calls=11,
+        max_total_tokens=160_000,
+    )
+    execution = resolve_execution(
+        _profile(),
+        RunPolicy.model_validate(policy_values),
+    )
+    middleware = build_consultant_middleware(
+        model=ToolCapableFakeModel(responses=[]),
+        execution=execution,
+    )
+    model_limit = next(
+        item for item in middleware if isinstance(item, ModelCallLimitMiddleware)
+    )
+    state: dict[str, int] = {}
+
+    for _ in range(11):
+        assert model_limit.before_model(state, runtime=None) is None  # type: ignore[arg-type]
+        state.update(model_limit.after_model(state, runtime=None) or {})  # type: ignore[arg-type]
+
+    with pytest.raises(ModelCallLimitExceededError, match=r"run limit \(11/11\)"):
+        model_limit.before_model(state, runtime=None)  # type: ignore[arg-type]
+    with pytest.raises(ValidationError):
+        RunPolicy.model_validate({**policy_values, "max_model_calls": 12})
 
 
 @pytest.mark.asyncio

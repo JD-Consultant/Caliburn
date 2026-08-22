@@ -99,6 +99,7 @@ class ContextSelectionReceipt(ContextModel):
 class ContextRequest(ContextModel):
     run_id: UUID
     current_source_id: UUID
+    current_source_handle: str = Field(pattern=r"^source-[0-9]{3,}$")
     current_work_id: UUID | None = None
     focus_subject_id: UUID | None = None
     selected_skill_ids: tuple[str, ...] = ()
@@ -486,6 +487,7 @@ def _prompt(
     review_queue: dict[str, dict],
     sufficiency: dict[str, Any] | None,
     run_id: UUID,
+    current_source_handle: str,
     non_authoritative_dialogue_summary: str | None,
 ) -> str:
     pending_counts: dict[str, int] = {}
@@ -529,11 +531,19 @@ def _prompt(
         + _json(
             {
                 "read_only_roots": ["/skills", "/sources", "/approved", "/pending"],
+                "current_source_path": (
+                    f"/sources/current/{current_source_handle}.txt"
+                ),
+                "approved_index_path": "/approved/index.json",
+                "pending_index_path": "/pending/index.json",
                 "candidate_root": f"/candidate/{run_id}",
                 "instructions": (
-                    "Use ls/read_file/grep for details. Use write_file/edit_file/delete "
-                    "only below the candidate root. After edits, check the candidate "
-                    "in a separate wave."
+                    "Read the exact source and index paths directly before listing "
+                    "read-only roots. The candidate starts as an editable copy of "
+                    "approved resources: map each candidate_relative_resource_path "
+                    "from the approved index below the candidate root. Use "
+                    "write_file/edit_file/delete only below the candidate root. "
+                    "After edits, check the candidate in a separate wave."
                 ),
             }
         )
@@ -627,6 +637,7 @@ async def build_consultant_context(
             review_queue=snapshot.review_queue,
             sufficiency=snapshot.sufficiency,
             run_id=request.run_id,
+            current_source_handle=request.current_source_handle,
             non_authoritative_dialogue_summary=dialogue_summary,
         )
         messages: tuple[BaseMessage, ...] = (

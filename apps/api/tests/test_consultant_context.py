@@ -161,6 +161,7 @@ async def test_context_keeps_current_employee_turn_and_compact_workspace_orienta
         request=ContextRequest(
             run_id=RUN_ID,
             current_source_id=source.source_id,
+            current_source_handle="source-001",
             selected_skill_ids=("task-boundary",),
         ),
     )
@@ -183,6 +184,9 @@ async def test_context_keeps_current_employee_turn_and_compact_workspace_orienta
     assert "/sources" in prompt
     assert "/approved" in prompt
     assert "/pending" in prompt
+    assert "/sources/current/source-001.txt" in prompt
+    assert '"approved_index_path":"/approved/index.json"' in prompt
+    assert '"pending_index_path":"/pending/index.json"' in prompt
     assert f"/candidate/{RUN_ID}" in prompt
     assert document.work_description not in prompt
     assert str(source.source_id) not in prompt
@@ -200,6 +204,7 @@ async def test_context_rejects_superseded_current_employee_turn() -> None:
             request=ContextRequest(
                 run_id=RUN_ID,
                 current_source_id=source.source_id,
+                current_source_handle="source-001",
                 selected_skill_ids=("task-boundary",),
             ),
         )
@@ -221,6 +226,7 @@ async def test_context_does_not_fetch_or_claim_recent_source_payloads() -> None:
         request=ContextRequest(
             run_id=RUN_ID,
             current_source_id=current.source_id,
+            current_source_handle="source-001",
             selected_skill_ids=("task-boundary",),
         ),
     )
@@ -264,6 +270,7 @@ async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> N
         request=ContextRequest(
             run_id=RUN_ID,
             current_source_id=source.source_id,
+            current_source_handle="source-001",
             selected_skill_ids=("task-boundary",),
         ),
     )
@@ -274,6 +281,7 @@ async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> N
         request=ContextRequest(
             run_id=RUN_ID,
             current_source_id=source.source_id,
+            current_source_handle="source-001",
             selected_skill_ids=("task-boundary",),
         ),
     )
@@ -288,6 +296,7 @@ async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> N
         request=ContextRequest(
             run_id=RUN_ID,
             current_source_id=source.source_id,
+            current_source_handle="source-001",
             selected_skill_ids=("task-boundary",),
         ),
     )

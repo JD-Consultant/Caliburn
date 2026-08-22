@@ -4,7 +4,7 @@ import json
 import os
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
-from typing import TypedDict
+from typing import Any, TypedDict
 from uuid import UUID, uuid4
 
 import psycopg
@@ -22,6 +22,7 @@ from app.adapters.langgraph.postgres import (
 )
 from app.consultant.candidate_publication import CandidatePublicationStale
 from app.consultant.interview import VerifiedConsultantCommit
+from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.results import (
     AnalysisBasis,
     AttentionChange,
@@ -49,7 +50,14 @@ from app.consultant.workspace_resources import (
     WorkspaceCatalog,
     project_workspace_files,
 )
-from app.consultant.workspace_state import StoreBackedWorkspace
+from app.consultant.workspace_authority import (
+    WorkspaceAuthorityError,
+    WorkspaceAuthorityService,
+    WorkspaceDecisionKind,
+    WorkspaceReviewCommand,
+)
+from app.consultant.workspace_state import StoreBackedWorkspace, WorkspaceValidationStatus
+from app.consultant.workspace_validation import WorkspaceValidationService
 from app.consultant.workspace_tools import _serialize_check_result
 
 
@@ -132,6 +140,86 @@ def _document(document_id: UUID, *, suffix: str = "") -> ApprovedJobDocument:
             ),
         ),
     )
+
+
+async def _validated_workspace_review(
+    runtime: Any,
+    document_id: UUID,
+) -> tuple[Any, StoreBackedWorkspace, Any, Any]:
+    workspace = StoreBackedWorkspace(
+        store=runtime.store,
+        document_id=document_id,
+    )
+    snapshot = await runtime._snapshot(document_id)
+    sources = await runtime.list_sources(document_id)
+    validator = WorkspaceValidationService(
+        workspace=workspace,
+        catalog=WorkspaceCatalog.from_snapshot(
+            snapshot.approved_document,
+            sources=sources,
+        ),
+        source_loader=lambda: runtime.list_sources(document_id),
+        selected_skill_ids=CONSULTANT_SKILL_IDS,
+    )
+    validation = await validator.validate_current(
+        loaded_skill_ids=CONSULTANT_SKILL_IDS,
+    )
+    assert validation.document is not None
+    _, _, workspace_snapshot, projection = await WorkspaceAuthorityService(
+        runtime
+    )._review_context(document_id)
+    assert not projection.diagnostics
+    return snapshot, workspace, workspace_snapshot, projection
+
+
+def _workspace_command(
+    *,
+    document_id: UUID,
+    snapshot: Any,
+    workspace_snapshot: Any,
+    group: Any,
+    decision: WorkspaceDecisionKind,
+    action_id: UUID,
+    edited_after: str | None = None,
+    reason: str | None = None,
+) -> WorkspaceReviewCommand:
+    edited = {action_id: edited_after} if edited_after is not None else {}
+    return WorkspaceReviewCommand(
+        command_id=uuid4(),
+        document_id=document_id,
+        decision=decision,
+        approved_revision=snapshot.revision,
+        workspace_generation=workspace_snapshot.manifest.generation,
+        workspace_digest=workspace_snapshot.manifest.resource_digest,
+        changeset_id=group.changeset.changeset_id,
+        group_digest=group.group_digest,
+        selected_action_ids=(action_id,),
+        edited_after_by_action_id=edited,
+        reason=reason,
+    )
+
+
+async def _edit_task_statement(
+    workspace: StoreBackedWorkspace,
+    value: str,
+) -> None:
+    await _edit_task_field(workspace, "statement", value)
+
+
+async def _edit_task_field(
+    workspace: StoreBackedWorkspace,
+    field: str,
+    value: str,
+) -> None:
+    path = "/workspace/tasks/task-001.json"
+    current = await workspace.read_snapshot()
+    before = json.loads(current.files[path])[field]
+    result = await workspace.backend.aedit(
+        path,
+        json.dumps(before, ensure_ascii=False),
+        json.dumps(value, ensure_ascii=False),
+    )
+    assert result.error is None
 
 
 @pytest.mark.asyncio
@@ -228,6 +316,485 @@ async def test_store_backend_workspace_survives_postgres_runtime_restart_byte_ex
                 document_id=other_document_id,
             ).read_snapshot()
         ).files
+
+
+@pytest.mark.asyncio
+async def test_direct_edit_rebases_against_ai_workspace_without_reseeding(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    employee_source_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Direct rebase")
+        approved = _document(document_id)
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=approved,
+            source_id=source_id,
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        task_path = "/workspace/tasks/task-001.json"
+        task_before = (await workspace.read_snapshot()).files[task_path]
+        assert (await workspace.backend.aedit(
+            task_path,
+            '"檢查缺料並安排採購"',
+            '"AI工作B"',
+        )).error is None
+
+        employee_document = approved.model_copy(
+            update={
+                "tasks": (
+                    approved.tasks[0].model_copy(update={"statement": "員工C"}),
+                )
+            }
+        )
+        result = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=seeded.revision,
+            document=employee_document,
+            source_id=employee_source_id,
+        )
+
+        assert result.approved_document.tasks[0].statement == "員工C"
+        snapshot = await workspace.read_snapshot()
+        assert snapshot.files[task_path] != task_before
+        assert '"statement": "AI工作B"' in snapshot.files[task_path]
+        assert snapshot.manifest.validation_status is WorkspaceValidationStatus.CONFLICTED
+        assert any(
+            diagnostic.code == "workspace-rebase-conflict"
+            for diagnostic in snapshot.manifest.diagnostics
+        )
+        review_snapshot, _, review_workspace, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        conflicted_groups = [group for group in projection.groups if group.diagnostics]
+        assert len(conflicted_groups) == 1
+        conflicted_group = conflicted_groups[0]
+        reject = _workspace_command(
+            document_id=document_id,
+            snapshot=review_snapshot,
+            workspace_snapshot=review_workspace,
+            group=conflicted_group,
+            decision=WorkspaceDecisionKind.REJECT,
+            action_id=conflicted_group.actions[0].action_id,
+            reason="拒絕 AI working 差異",
+        )
+        rejected = await runtime.decide_workspace_changes(reject)
+        assert rejected.approved_document.tasks[0].statement == "員工C"
+        converged = await workspace.read_snapshot()
+        assert json.loads(converged.files[task_path])["statement"] == "員工C"
+        assert converged.manifest.validation_status is WorkspaceValidationStatus.VALID
+        assert not converged.manifest.diagnostics
+
+
+@pytest.mark.asyncio
+async def test_workspace_authority_applies_partial_decisions_and_exact_replay(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Workspace authority")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        task_path = "/workspace/tasks/task-001.json"
+
+        await _edit_task_statement(workspace, "AI接受")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        assert len(projection.groups) == 1
+        group = projection.groups[0]
+        action = group.actions[0]
+        accept = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=group,
+            decision=WorkspaceDecisionKind.ACCEPT,
+            action_id=action.action_id,
+            reason="員工接受",
+        )
+        accepted = await runtime.decide_workspace_changes(accept)
+        assert accepted.approved_document.tasks[0].statement == "AI接受"
+        assert json.loads((await workspace.read_snapshot()).files[task_path])["statement"] == "AI接受"
+        replayed = await runtime.decide_workspace_changes(accept)
+        assert replayed == accepted
+        with pytest.raises(WorkspaceAuthorityError, match="reused"):
+            await runtime.decide_workspace_changes(accept.model_copy(update={"reason": "另一個理由"}))
+
+        await _edit_task_statement(workspace, "AI拒絕")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        group = projection.groups[0]
+        action = group.actions[0]
+        reject = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=group,
+            decision=WorkspaceDecisionKind.REJECT,
+            action_id=action.action_id,
+            reason="不符合目前職務邊界",
+        )
+        rejected = await runtime.decide_workspace_changes(reject)
+        assert rejected.approved_document.tasks[0].statement == "AI接受"
+        rejected_workspace = await workspace.read_snapshot()
+        expected_files = project_workspace_files(
+            rejected.approved_document,
+            handle_registry=rejected_workspace.manifest.entity_ids_by_handle,
+        ).files
+        assert json.loads(rejected_workspace.files[task_path]) == json.loads(
+            expected_files[task_path]
+        )
+
+        await _edit_task_statement(workspace, "AI延後")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        group = projection.groups[0]
+        action = group.actions[0]
+        defer = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=group,
+            decision=WorkspaceDecisionKind.DEFER,
+            action_id=action.action_id,
+            reason="稍後再看",
+        )
+        deferred = await runtime.decide_workspace_changes(defer)
+        assert deferred.approved_document.tasks[0].statement == "AI接受"
+        assert json.loads((await workspace.read_snapshot()).files[task_path])["statement"] == "AI延後"
+
+        await _edit_task_statement(workspace, "AI編輯前")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        group = projection.groups[0]
+        action = group.actions[0]
+        edit_accept = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=group,
+            decision=WorkspaceDecisionKind.EDIT_ACCEPT,
+            action_id=action.action_id,
+            edited_after="員工編輯後",
+            reason="員工修訂後接受",
+        )
+        edited = await runtime.decide_workspace_changes(edit_accept)
+        assert edited.approved_document.tasks[0].statement == "員工編輯後"
+        assert json.loads((await workspace.read_snapshot()).files[task_path])["statement"] == "員工編輯後"
+        sources = await runtime.list_sources(document_id)
+        direct_sources = [
+            source
+            for source in sources
+            if source.kind is EmployeeSourceKind.DIRECT_EDIT
+            and source.processing_status is SourceProcessingStatus.COMMITTED
+            and source.text == "員工編輯後"
+        ]
+        assert len(direct_sources) == 1
+        assert direct_sources[0].positions[0].document_path == action.path
+
+
+@pytest.mark.asyncio
+async def test_workspace_authority_rejects_stale_identity_and_keeps_nonoverlap_decidable(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    initial_source_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Stale authority")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=initial_source_id,
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        await _edit_task_statement(workspace, "AI語句")
+        await _edit_task_field(workspace, "action", "AI動作")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        assert len(projection.groups) == 2
+        statement_group = next(
+            group
+            for group in projection.groups
+            if group.actions[0].path.endswith("/statement")
+        )
+        action_group = next(
+            group
+            for group in projection.groups
+            if group.actions[0].path.endswith("/action")
+        )
+        statement_command = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=statement_group,
+            decision=WorkspaceDecisionKind.ACCEPT,
+            action_id=statement_group.actions[0].action_id,
+            reason="接受語句",
+        )
+        with pytest.raises(WorkspaceAuthorityError, match="group digest"):
+            await runtime.decide_workspace_changes(
+                statement_command.model_copy(update={"group_digest": "0" * 64})
+            )
+
+        action_command = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=action_group,
+            decision=WorkspaceDecisionKind.ACCEPT,
+            action_id=action_group.actions[0].action_id,
+            reason="接受動作",
+        )
+        accepted_action = await runtime.decide_workspace_changes(action_command)
+        assert accepted_action.approved_document.tasks[0].action == "AI動作"
+        assert json.loads(
+            (await workspace.read_snapshot()).files["/workspace/tasks/task-001.json"]
+        )["statement"] == "AI語句"
+        with pytest.raises(WorkspaceAuthorityError, match="stale"):
+            await runtime.decide_workspace_changes(statement_command)
+
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        statement_group = next(
+            group
+            for group in projection.groups
+            if group.actions[0].path.endswith("/statement")
+        )
+        fresh_statement_command = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=statement_group,
+            decision=WorkspaceDecisionKind.ACCEPT,
+            action_id=statement_group.actions[0].action_id,
+            reason="接受語句",
+        )
+        await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=uuid4(),
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="更正證據",
+            supersedes_source_id=initial_source_id,
+        )
+        with pytest.raises(WorkspaceAuthorityError, match="stale"):
+            await runtime.decide_workspace_changes(fresh_statement_command)
+
+
+@pytest.mark.asyncio
+async def test_workspace_authority_recovers_after_approved_checkpoint_before_rebase(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Authority crash")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        await _edit_task_statement(workspace, "AI崩潰窗")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        group = projection.groups[0]
+        action = group.actions[0]
+        command = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=group,
+            decision=WorkspaceDecisionKind.ACCEPT,
+            action_id=action.action_id,
+            reason="接受",
+        )
+
+        class InjectedFailure(RuntimeError):
+            pass
+
+        async def fail_once() -> None:
+            raise InjectedFailure("after authority checkpoint")
+
+        runtime._after_workspace_authority_checkpoint = fail_once
+        with pytest.raises(InjectedFailure):
+            await runtime.decide_workspace_changes(command)
+        runtime._after_workspace_authority_checkpoint = runtime._noop_workspace_hook
+
+        reopened = await runtime.reopen_document(document_id)
+        assert reopened.approved_document.tasks[0].statement == "AI崩潰窗"
+        assert (await workspace.read_snapshot()).manifest.approved_baseline_revision == reopened.revision
+        assert reopened.document_review.unresolved_action_count == 0
+
+
+@pytest.mark.asyncio
+async def test_edit_accept_source_store_crash_replays_one_deterministic_source(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Source crash")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        await _edit_task_statement(workspace, "AI source crash")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        group = projection.groups[0]
+        action = group.actions[0]
+        command = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=group,
+            decision=WorkspaceDecisionKind.EDIT_ACCEPT,
+            action_id=action.action_id,
+            edited_after="員工 source recovery",
+            reason="員工確認",
+        )
+
+        class InjectedFailure(RuntimeError):
+            pass
+
+        async def fail_after_source_store(_source: EmployeeSource) -> None:
+            raise InjectedFailure("after direct-edit source store")
+
+        runtime._after_source_store = fail_after_source_store
+        with pytest.raises(InjectedFailure):
+            await runtime.decide_workspace_changes(command)
+        runtime._after_source_store = runtime._noop_source_hook
+
+        direct_sources = [
+            source
+            for source in await runtime.list_sources(document_id)
+            if source.kind is EmployeeSourceKind.DIRECT_EDIT
+            and source.text == "員工 source recovery"
+        ]
+        assert len(direct_sources) == 1
+        assert direct_sources[0].processing_status is SourceProcessingStatus.PENDING
+
+        different_payload = command.model_copy(
+            update={"edited_after_by_action_id": {action.action_id: "另一個員工值"}}
+        )
+        with pytest.raises(SourceConflict):
+            await runtime.decide_workspace_changes(different_payload)
+
+        replayed = await runtime.decide_workspace_changes(command)
+        assert replayed.approved_document.tasks[0].statement == "員工 source recovery"
+        direct_sources = [
+            source
+            for source in await runtime.list_sources(document_id)
+            if source.kind is EmployeeSourceKind.DIRECT_EDIT
+            and source.text == "員工 source recovery"
+        ]
+        assert len(direct_sources) == 1
+        assert direct_sources[0].processing_status is SourceProcessingStatus.COMMITTED
+
+
+@pytest.mark.asyncio
+async def test_workspace_reject_record_recovers_before_workspace_revert(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Reject crash")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        await _edit_task_statement(workspace, "AI拒絕崩潰窗")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        group = projection.groups[0]
+        action = group.actions[0]
+        command = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=group,
+            decision=WorkspaceDecisionKind.REJECT,
+            action_id=action.action_id,
+            reason="不採用",
+        )
+
+        class InjectedFailure(RuntimeError):
+            pass
+
+        async def fail_once() -> None:
+            raise InjectedFailure("after decision record")
+
+        runtime._after_workspace_decision_record = fail_once
+        with pytest.raises(InjectedFailure):
+            await runtime.decide_workspace_changes(command)
+        runtime._after_workspace_decision_record = runtime._noop_workspace_hook
+
+        reopened = await runtime.reopen_document(document_id)
+        expected_files = project_workspace_files(
+            reopened.approved_document,
+            handle_registry=(await workspace.read_snapshot()).manifest.entity_ids_by_handle,
+        ).files
+        final_workspace = await workspace.read_snapshot()
+        assert json.loads(final_workspace.files["/workspace/tasks/task-001.json"]) == json.loads(
+            expected_files["/workspace/tasks/task-001.json"]
+        )
 
 
 @pytest.mark.asyncio

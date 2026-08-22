@@ -69,6 +69,10 @@ from app.consultant.state import (
     inspect_command_receipt,
 )
 from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_authority import (
+    WorkspaceAuthorityService,
+    WorkspaceReviewCommand,
+)
 from app.consultant.workspace_state import (
     workspace_decision_namespace as _workspace_decision_namespace,
     workspace_metadata_namespace as _workspace_metadata_namespace,
@@ -82,6 +86,7 @@ from app.consultant.verification import (
 
 
 SourceHook = Callable[[EmployeeSource], Awaitable[None]]
+WorkspaceHook = Callable[[], Awaitable[None]]
 
 
 class ConsultantPersistenceError(RuntimeError):
@@ -152,9 +157,19 @@ class PostgresConsultantRuntime:
         self._document_locks: dict[UUID, asyncio.Lock] = {}
         self._after_source_store: SourceHook = self._noop_source_hook
         self._after_source_checkpoint: SourceHook = self._noop_source_hook
+        self._after_workspace_authority_checkpoint: WorkspaceHook = (
+            self._noop_workspace_hook
+        )
+        self._after_workspace_decision_record: WorkspaceHook = (
+            self._noop_workspace_hook
+        )
 
     @staticmethod
     async def _noop_source_hook(_source: EmployeeSource) -> None:
+        return None
+
+    @staticmethod
+    async def _noop_workspace_hook() -> None:
         return None
 
     async def setup(self) -> None:
@@ -306,8 +321,10 @@ class PostgresConsultantRuntime:
             return await self._snapshot(document_id)
 
     async def reopen_document(self, document_id: UUID) -> ConsultantSnapshot:
-        await self._require_active_catalog(document_id)
-        return await self._snapshot(document_id)
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            await WorkspaceAuthorityService(self).recover(document_id)
+            return await self._snapshot(document_id)
 
     async def _snapshot(self, document_id: UUID) -> ConsultantSnapshot:
         state = await self.graph.aget_state(self.graph_config(document_id))
@@ -1143,11 +1160,12 @@ class PostgresConsultantRuntime:
             snapshot = await self._snapshot(document_id)
             raw_state = await self.raw_state(document_id)
             if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                await WorkspaceAuthorityService(self).recover(document_id)
                 await self._reconcile_replayed_command_source(
                     document_id,
                     source_id,
                 )
-                return snapshot
+                return await self._snapshot(document_id)
             document = ApprovedJobDocument.model_validate(
                 document.model_dump(mode="json")
             )
@@ -1213,6 +1231,18 @@ class PostgresConsultantRuntime:
                     kind=source.kind,
                     created_at=source.created_at,
                 ).model_dump(mode="json")
+            workspace_authority = WorkspaceAuthorityService(self)
+            direct_rebase_command_id = (
+                command_receipt.command_id if command_receipt is not None else source_id
+            )
+            await workspace_authority.prepare_direct_edit_rebase(
+                document_id=document_id,
+                command_id=direct_rebase_command_id,
+                source_id=source_id,
+                old_approved=snapshot.approved_document,
+                new_approved=document,
+                approved_revision=expected_revision + 1,
+            )
             try:
                 await self.graph.ainvoke(
                     {}, self.graph_config(document_id), context=command
@@ -1224,6 +1254,10 @@ class PostgresConsultantRuntime:
             if source is not None:
                 await self._after_source_checkpoint(source)
                 await self._mark_source_committed(source)
+            await workspace_authority.finish_direct_edit_rebase(
+                document_id,
+                direct_rebase_command_id,
+            )
             return result
 
     @staticmethod
@@ -1263,6 +1297,16 @@ class PostgresConsultantRuntime:
                 item.status is DocumentChangeStatus.DEFERRED for item in selected
             )
         return False
+
+    async def decide_workspace_changes(
+        self,
+        command: WorkspaceReviewCommand,
+    ) -> ConsultantSnapshot:
+        """Apply one employee decision to the persistent workspace authority seam."""
+
+        async with self._lock_for(command.document_id):
+            await self._require_active_catalog(command.document_id)
+            return await WorkspaceAuthorityService(self).decide(command)
 
     async def decide_document_changes(
         self,

@@ -261,10 +261,6 @@ class EmployeeDecisionSummaryView(BaseModel):
     )
     pending: conint(ge=0, strict=True)
     deferred: conint(ge=0, strict=True)
-    accepted: conint(ge=0, strict=True)
-    edit_accepted: conint(ge=0, strict=True)
-    rejected: conint(ge=0, strict=True)
-    stale: conint(ge=0, strict=True)
 
 
 class Status3(StrEnum):
@@ -332,8 +328,6 @@ class Operation(StrEnum):
     add = 'add'
     revise = 'revise'
     withdraw = 'withdraw'
-    merge = 'merge'
-    split = 'split'
     reassign = 'reassign'
     reorder = 'reorder'
 
@@ -341,10 +335,6 @@ class Operation(StrEnum):
 class Status4(StrEnum):
     pending = 'pending'
     deferred = 'deferred'
-    accepted = 'accepted'
-    edit_accepted = 'edit_accepted'
-    rejected = 'rejected'
-    stale = 'stale'
 
 
 class DocumentPatchActionView(BaseModel):
@@ -360,15 +350,11 @@ class DocumentPatchActionView(BaseModel):
     source_ids: list[UUID]
     quote_anchors: list[QuoteAnchorView]
     read_set: list[DocumentPathReadView]
-    target_ids: list[UUID]
     depends_on_action_ids: list[UUID]
     atomic_subgroup_id: UUID | None
     affected_work_ids: list[UUID]
     blocks_dependent_analysis: bool
     status: Status4
-    employee_after: Any
-    rejection_reason: str | None
-    stale_reason: str | None
 
 
 class DocumentChangeSetView(BaseModel):
@@ -380,6 +366,7 @@ class DocumentChangeSetView(BaseModel):
     actions: list[DocumentPatchActionView]
     source_ids: list[UUID]
     created_revision: conint(ge=0, strict=True)
+    acceptance_blocked: bool
 
 
 class BlockedInterviewBranchView(BaseModel):
@@ -392,16 +379,20 @@ class BlockedInterviewBranchView(BaseModel):
     reason: str
 
 
-class DocumentReviewView(BaseModel):
+class WorkspaceDiagnosticView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    bundles: list[DocumentChangeSetView]
-    unresolved_action_count: conint(ge=0, strict=True)
-    blocked_branches: list[BlockedInterviewBranchView]
-    safe_interview_work_available: bool
-    decision_required_before_more_interview: bool
-    explanation: str | None
+    code: str
+    path: str | None
+    message: str
+
+
+class WorkspaceReviewStatus(StrEnum):
+    CLEAN = 'clean'
+    PENDING = 'pending'
+    INVALID = 'invalid'
+    CONFLICTED = 'conflicted'
 
 
 class RequiredClarificationView(BaseModel):
@@ -691,6 +682,21 @@ class SemanticProgressView(BaseModel):
     depth: list[WorkDepthView]
     employee_decisions: EmployeeDecisionSummaryView
     gaps: list[VisibleGapView]
+
+
+class DocumentReviewView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workspace_generation: conint(ge=0, strict=True)
+    workspace_status: WorkspaceReviewStatus
+    diagnostics: list[WorkspaceDiagnosticView]
+    bundles: list[DocumentChangeSetView]
+    unresolved_action_count: conint(ge=0, strict=True)
+    blocked_branches: list[BlockedInterviewBranchView]
+    safe_interview_work_available: bool
+    decision_required_before_more_interview: bool
+    explanation: str | None
 
 
 class ConsultantSnapshotView(BaseModel):

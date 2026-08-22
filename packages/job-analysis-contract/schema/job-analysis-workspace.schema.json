@@ -242,14 +242,10 @@
     "EmployeeDecisionSummaryView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pending", "deferred", "accepted", "edit_accepted", "rejected", "stale"],
+      "required": ["pending", "deferred"],
       "properties": {
         "pending": { "type": "integer", "minimum": 0 },
-        "deferred": { "type": "integer", "minimum": 0 },
-        "accepted": { "type": "integer", "minimum": 0 },
-        "edit_accepted": { "type": "integer", "minimum": 0 },
-        "rejected": { "type": "integer", "minimum": 0 },
-        "stale": { "type": "integer", "minimum": 0 }
+        "deferred": { "type": "integer", "minimum": 0 }
       }
     },
     "VisibleGapView": {
@@ -327,10 +323,10 @@
     "DocumentPatchActionView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["action_id", "operation", "path", "target_key", "before", "after", "source_ids", "quote_anchors", "read_set", "target_ids", "depends_on_action_ids", "atomic_subgroup_id", "affected_work_ids", "blocks_dependent_analysis", "status", "employee_after", "rejection_reason", "stale_reason"],
+      "required": ["action_id", "operation", "path", "target_key", "before", "after", "source_ids", "quote_anchors", "read_set", "depends_on_action_ids", "atomic_subgroup_id", "affected_work_ids", "blocks_dependent_analysis", "status"],
       "properties": {
         "action_id": { "type": "string", "format": "uuid" },
-        "operation": { "type": "string", "enum": ["add", "revise", "withdraw", "merge", "split", "reassign", "reorder"] },
+        "operation": { "type": "string", "enum": ["add", "revise", "withdraw", "reassign", "reorder"] },
         "path": { "type": "string" },
         "target_key": { "type": "string" },
         "before": {},
@@ -338,27 +334,24 @@
         "source_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
         "quote_anchors": { "type": "array", "items": { "$ref": "#/$defs/QuoteAnchorView" } },
         "read_set": { "type": "array", "items": { "$ref": "#/$defs/DocumentPathReadView" } },
-        "target_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
         "depends_on_action_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
         "atomic_subgroup_id": { "type": ["string", "null"], "format": "uuid" },
         "affected_work_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
         "blocks_dependent_analysis": { "type": "boolean" },
-        "status": { "type": "string", "enum": ["pending", "deferred", "accepted", "edit_accepted", "rejected", "stale"] },
-        "employee_after": {},
-        "rejection_reason": { "type": ["string", "null"] },
-        "stale_reason": { "type": ["string", "null"] }
+        "status": { "type": "string", "enum": ["pending", "deferred"] }
       }
     },
     "DocumentChangeSetView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["changeset_id", "summary", "actions", "source_ids", "created_revision"],
+      "required": ["changeset_id", "summary", "actions", "source_ids", "created_revision", "acceptance_blocked"],
       "properties": {
         "changeset_id": { "type": "string", "format": "uuid" },
         "summary": { "type": "string" },
         "actions": { "type": "array", "items": { "$ref": "#/$defs/DocumentPatchActionView" } },
         "source_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
-        "created_revision": { "type": "integer", "minimum": 0 }
+        "created_revision": { "type": "integer", "minimum": 0 },
+        "acceptance_blocked": { "type": "boolean" }
       }
     },
     "BlockedInterviewBranchView": {
@@ -375,8 +368,11 @@
     "DocumentReviewView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["bundles", "unresolved_action_count", "blocked_branches", "safe_interview_work_available", "decision_required_before_more_interview", "explanation"],
+      "required": ["workspace_generation", "workspace_status", "diagnostics", "bundles", "unresolved_action_count", "blocked_branches", "safe_interview_work_available", "decision_required_before_more_interview", "explanation"],
       "properties": {
+        "workspace_generation": { "type": "integer", "minimum": 0 },
+        "workspace_status": { "$ref": "#/$defs/WorkspaceReviewStatus" },
+        "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/WorkspaceDiagnosticView" } },
         "bundles": { "type": "array", "items": { "$ref": "#/$defs/DocumentChangeSetView" } },
         "unresolved_action_count": { "type": "integer", "minimum": 0 },
         "blocked_branches": { "type": "array", "items": { "$ref": "#/$defs/BlockedInterviewBranchView" } },
@@ -384,6 +380,21 @@
         "decision_required_before_more_interview": { "type": "boolean" },
         "explanation": { "type": ["string", "null"] }
       }
+    },
+    "WorkspaceDiagnosticView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string" },
+        "path": { "type": ["string", "null"] },
+        "message": { "type": "string" }
+      }
+    },
+    "WorkspaceReviewStatus": {
+      "type": "string",
+      "enum": ["clean", "pending", "invalid", "conflicted"],
+      "x-enum-varnames": ["CLEAN", "PENDING", "INVALID", "CONFLICTED"]
     },
     "RequiredClarificationView": {
       "type": "object",

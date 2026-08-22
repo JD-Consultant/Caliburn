@@ -49,6 +49,8 @@ from .models import (
     VisibleGapView,
     VisibleWorkItemView,
     WorkDepthView,
+    WorkspaceDiagnosticView,
+    WorkspaceReviewStatus,
 )
 
 __all__ = [
@@ -100,4 +102,6 @@ __all__ = [
     "VisibleGapView",
     "VisibleWorkItemView",
     "WorkDepthView",
+    "WorkspaceDiagnosticView",
+    "WorkspaceReviewStatus",
 ]

@@ -116,10 +116,6 @@ class WorkDepthProjection(DurableModel):
 class EmployeeDecisionProjection(DurableModel):
     pending: int = Field(ge=0)
     deferred: int = Field(ge=0)
-    accepted: int = Field(ge=0)
-    edit_accepted: int = Field(ge=0)
-    rejected: int = Field(ge=0)
-    stale: int = Field(ge=0)
 
 
 class GapProjection(DurableModel):
@@ -414,10 +410,6 @@ def semantic_progress_from_state(
         employee_decisions=EmployeeDecisionProjection(
             pending=0,
             deferred=0,
-            accepted=0,
-            edit_accepted=0,
-            rejected=0,
-            stale=0,
         ),
         gaps=tuple(
             GapProjection(

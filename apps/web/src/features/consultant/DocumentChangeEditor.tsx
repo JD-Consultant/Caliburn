@@ -111,7 +111,7 @@ function proposedOptions(
 ): ReferenceOption[] {
   return bundle.actions.flatMap((action) => {
     if (action.path !== `/${collection}`) return [];
-    return entityObjects(action.employee_after ?? action.after).flatMap((item) => {
+    return entityObjects(action.after).flatMap((item) => {
       const id = item[idField];
       const label = item[labelField];
       return typeof id === "string" && typeof label === "string" && predicate(item)

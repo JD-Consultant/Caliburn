@@ -307,16 +307,12 @@ def _new_change(
     )
 
 
-def _opks_basis(
+def _resource_basis(
     *,
-    item: ApprovedOpksItem,
     handle: str,
     bindings: Mapping[str, tuple[AnalysisBasis, ...]],
     default: AnalysisBasis,
-    changed: bool,
 ) -> AnalysisBasis:
-    if not changed:
-        return default
     bound = bindings.get(handle, ())
     if not bound:
         return default
@@ -331,6 +327,22 @@ def _opks_basis(
         source_ids=tuple(dict.fromkeys(source_ids)),
         quote_anchors=tuple(quote_anchors),
         skill_ids=tuple(dict.fromkeys(skill_ids)),
+    )
+
+
+def _opks_basis(
+    *,
+    handle: str,
+    bindings: Mapping[str, tuple[AnalysisBasis, ...]],
+    default: AnalysisBasis,
+    changed: bool,
+) -> AnalysisBasis:
+    if not changed:
+        return default
+    return _resource_basis(
+        handle=handle,
+        bindings=bindings,
+        default=default,
     )
 
 
@@ -361,7 +373,11 @@ def derive_semantic_changes(
                 operation=DocumentChangeOperation.REVISE,
                 path=f"/{field}",
                 after=working_header[field],
-                basis=default_basis,
+                basis=_resource_basis(
+                    handle="header",
+                    bindings=evidence,
+                    default=default_basis,
+                ),
             )
 
     orders = _next_orders(baseline, working_document)
@@ -372,15 +388,21 @@ def derive_semantic_changes(
             basis=default_basis,
         )
     for identity in sorted(set(working_duties) - set(baseline_duties), key=str):
+        handle = workspace_handles.get(identity, "")
         add(
             operation=DocumentChangeOperation.ADD,
             path="/duties",
             after=_normalized_entity_after(
                 working_duties[identity], baseline=baseline, orders=orders
             ),
-            basis=default_basis,
+            basis=_resource_basis(
+                handle=handle,
+                bindings=evidence,
+                default=default_basis,
+            ),
         )
     for identity in sorted(set(baseline_duties) & set(working_duties), key=str):
+        handle = workspace_handles.get(identity, "")
         before, after = (
             _model_json(baseline_duties[identity]),
             _model_json(working_duties[identity]),
@@ -391,7 +413,11 @@ def derive_semantic_changes(
                     operation=DocumentChangeOperation.REVISE,
                     path=f"/duties/{identity}/{field}",
                     after=after[field],
-                    basis=default_basis,
+                    basis=_resource_basis(
+                        handle=handle,
+                        bindings=evidence,
+                        default=default_basis,
+                    ),
                 )
         if before["display_order"] != after["display_order"]:
             add(
@@ -408,15 +434,21 @@ def derive_semantic_changes(
             basis=default_basis,
         )
     for identity in sorted(set(working_tasks) - set(baseline_tasks), key=str):
+        handle = workspace_handles.get(identity, "")
         add(
             operation=DocumentChangeOperation.ADD,
             path="/tasks",
             after=_normalized_entity_after(
                 working_tasks[identity], baseline=baseline, orders=orders
             ),
-            basis=default_basis,
+            basis=_resource_basis(
+                handle=handle,
+                bindings=evidence,
+                default=default_basis,
+            ),
         )
     for identity in sorted(set(baseline_tasks) & set(working_tasks), key=str):
+        handle = workspace_handles.get(identity, "")
         before, after = (
             _model_json(baseline_tasks[identity]),
             _model_json(working_tasks[identity]),
@@ -432,7 +464,15 @@ def derive_semantic_changes(
                 ),
                 path=f"/tasks/{identity}/{field}",
                 after=after[field],
-                basis=default_basis,
+                basis=(
+                    default_basis
+                    if field == "duty_id"
+                    else _resource_basis(
+                        handle=handle,
+                        bindings=evidence,
+                        default=default_basis,
+                    )
+                ),
             )
         if before["display_order"] != after["display_order"]:
             add(
@@ -456,7 +496,6 @@ def derive_semantic_changes(
         if item.kind not in _EDITABLE_OPKS_KINDS:
             continue
         basis = _opks_basis(
-            item=item,
             handle=workspace_handles.get(identity, ""),
             bindings=evidence,
             default=default_basis,
@@ -480,7 +519,6 @@ def derive_semantic_changes(
         before, after = _model_json(before_item), _model_json(after_item)
         changed = any(before[field] != after[field] for field in _OPKS_FIELDS)
         basis = _opks_basis(
-            item=after_item,
             handle=workspace_handles.get(identity, ""),
             bindings=evidence,
             default=default_basis,

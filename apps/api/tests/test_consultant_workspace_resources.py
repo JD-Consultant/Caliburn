@@ -147,6 +147,7 @@ def test_workspace_resources_round_trip_editable_jd_without_exposing_a_or_level(
         "responsibility_role",
         "enablers",
         "display_order",
+        "evidence",
     ]
     assert "competency_level" not in files[task_path]
     assert "/opks/a/" not in "\n".join(files)
@@ -237,13 +238,13 @@ def test_workspace_draft_keeps_evidence_owner_for_each_opks_handle() -> None:
         baseline_document=catalog.document,
     )
 
-    assert [binding.opks_handle for binding in draft.opks_evidence] == [
+    assert [binding.resource_handle for binding in draft.evidence_bindings] == [
         "o-001",
         "s-001",
     ]
     assert [
         (binding.references[0].quote, binding.references[0].skill_ids)
-        for binding in draft.opks_evidence
+        for binding in draft.evidence_bindings
     ] == [("輸出原話", ("output",)), ("技能原話", ("skill",))]
 
 
@@ -485,6 +486,7 @@ def test_workspace_canonical_json_is_utf8_ordered_indented_and_newline_terminate
         '  "industry_name": "製造業",\n'
         '  "industry_code": "M-001",\n'
         '  "work_description": "維持採購作業順暢。",\n'
-        '  "notes": "保留基線備註。"\n'
+        '  "notes": "保留基線備註。",\n'
+        '  "evidence": []\n'
         "}\n"
     )

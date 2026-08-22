@@ -294,8 +294,8 @@ def _resolve_evidence(
     loaded = set(loaded_skill_ids)
     bindings: dict[str, list[AnalysisBasis]] = {}
     diagnostics: list[WorkspaceDiagnostic] = []
-    for binding in draft.opks_evidence:
-        path = _workspace_path_for_handle(files, binding.opks_handle)
+    for binding in draft.evidence_bindings:
+        path = binding.resource_path
         for reference in binding.references:
             if set(reference.skill_ids) - selected:
                 diagnostics.append(
@@ -343,7 +343,7 @@ def _resolve_evidence(
                     )
                 )
                 continue
-            bindings.setdefault(binding.opks_handle, []).append(
+            bindings.setdefault(binding.resource_handle, []).append(
                 AnalysisBasis(
                     source_ids=(anchor.source_id,),
                     quote_anchors=(anchor,),
@@ -409,7 +409,7 @@ def _semantic_evidence_diagnostics(
         before = getattr(baseline, field)
         after = getattr(working, field)
         if before != after:
-            require_for_risky_text("/workspace/header.json", after, None)
+            require_for_risky_text("/workspace/header.json", after, "header")
 
     baseline_duties = {item.duty_id: item for item in baseline.duties}
     for duty in working.duties:

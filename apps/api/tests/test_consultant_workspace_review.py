@@ -335,6 +335,8 @@ def test_ten_independent_task_and_opks_changes_remain_individually_reviewable() 
         ),
     )
     assert len(rejected.groups) == 9
+    assert rejected.diagnostics[0].code == "rejected-semantic-change"
+    assert rejected.blocking_diagnostics == ()
 
 
 def test_task_replacement_forms_one_atomic_dependency_group() -> None:

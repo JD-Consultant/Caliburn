@@ -57,7 +57,10 @@ from app.consultant.workspace_authority import (
     WorkspaceAuthorityService,
     WorkspaceReviewCommand,
 )
-from app.consultant.workspace_review import derive_workspace_review
+from app.consultant.workspace_review import (
+    WorkspaceReviewDecision,
+    derive_workspace_review,
+)
 from app.consultant.workspace_state import (
     StoreBackedWorkspace,
     WorkspaceValidationStatus,
@@ -200,6 +203,12 @@ class PostgresConsultantRuntime:
         document_id: UUID,
     ) -> tuple[str, str, str, str]:
         return _workspace_decision_namespace(document_id)
+
+    async def workspace_review_decisions(
+        self,
+        document_id: UUID,
+    ) -> tuple[WorkspaceReviewDecision, ...]:
+        return await WorkspaceAuthorityService(self).review_decisions(document_id)
 
     def connection_invariants(self) -> dict[str, bool]:
         saver_connection = self.saver.conn
@@ -375,9 +384,7 @@ class PostgresConsultantRuntime:
                     "diagnostics": conflicts,
                 }
             )
-        decisions = WorkspaceAuthorityService._projection_decisions(
-            await WorkspaceAuthorityService(self)._load_records(document_id)
-        )
+        decisions = await self.workspace_review_decisions(document_id)
         projection = derive_workspace_review(
             snapshot.approved_document,
             validation,

@@ -130,33 +130,6 @@ class WorkspaceOpksEvidenceBinding(WorkspaceModel):
     references: tuple[WorkspaceEvidenceReference, ...] = Field(min_length=1)
 
 
-class WorkspaceReviewGroupResource(WorkspaceModel):
-    handle: Handle
-    action_handles: tuple[Handle, ...] = ()
-    depends_on_handles: tuple[Handle, ...] = ()
-
-    @model_validator(mode="after")
-    def handles_are_unique(self) -> WorkspaceReviewGroupResource:
-        for label, values in (
-            ("action_handles", self.action_handles),
-            ("depends_on_handles", self.depends_on_handles),
-        ):
-            if len(values) != len(set(values)):
-                raise ValueError(f"duplicate {label}")
-        return self
-
-
-class WorkspaceReviewGroupsResource(WorkspaceModel):
-    groups: tuple[WorkspaceReviewGroupResource, ...] = ()
-
-    @model_validator(mode="after")
-    def group_handles_are_unique(self) -> WorkspaceReviewGroupsResource:
-        handles = [group.handle for group in self.groups]
-        if len(handles) != len(set(handles)):
-            raise ValueError("duplicate review group handle")
-        return self
-
-
 class WorkspaceResourceError(ValueError):
     """A workspace resource cannot be parsed into a valid document draft."""
 
@@ -413,9 +386,6 @@ class WorkspaceDocumentDraft(WorkspaceModel):
         default=None,
         exclude=True,
         repr=False,
-    )
-    review_groups: WorkspaceReviewGroupsResource = Field(
-        default_factory=WorkspaceReviewGroupsResource
     )
     evidence_references: tuple[WorkspaceEvidenceReference, ...] = ()
     opks_evidence: tuple[WorkspaceOpksEvidenceBinding, ...] = ()

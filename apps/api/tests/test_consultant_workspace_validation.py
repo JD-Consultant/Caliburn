@@ -20,6 +20,8 @@ from langgraph.store.memory import InMemoryStore
 from app.consultant.state import (
     ApprovedDuty,
     ApprovedJobDocument,
+    ApprovedOpksItem,
+    ApprovedOpksKind,
     ApprovedTask,
     EmployeeSource,
     EmployeeSourceKind,
@@ -508,6 +510,79 @@ async def test_exact_quote_occurrence_and_loaded_skill_are_validated(
     assert reset_receipts.document is None
     assert reset_receipts.manifest.validation_status is WorkspaceValidationStatus.INVALID
     assert reset_receipts.diagnostics[0].code == "skill-unloaded"
+
+
+@pytest.mark.asyncio
+async def test_changed_knowledge_requires_exact_employee_quote_anchor() -> None:
+    source = _source(text="員工表示需要理解驗收規則。")
+    document = _document().model_copy(
+        update={
+            "opks": (
+                ApprovedOpksItem(
+                    item_id=UUID("00000000-0000-0000-0000-000000000906"),
+                    kind=ApprovedOpksKind.KNOWLEDGE,
+                    text="採購驗收知識",
+                    display_order=0,
+                    task_ids=(TASK_ID,),
+                    evidence_source_ids=(SOURCE_ID,),
+                ),
+            )
+        }
+    )
+    workspace = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(approved_document=document, approved_revision=7)
+    loader = MutableSourceLoader((source,))
+    validator = WorkspaceValidationService(
+        workspace=workspace,
+        catalog=WorkspaceCatalog.from_snapshot(document, sources=(source,)),
+        source_loader=loader,
+        selected_skill_ids=("knowledge",),
+    )
+    path = "/workspace/opks/k/k-001.json"
+    before = (await workspace.read_snapshot()).files[path]
+    unanchored = before.replace("採購驗收知識", "理解驗收規則")
+    assert (await workspace.backend.aedit(path, before, unanchored)).error is None
+
+    rejected = await validator.validate_current(loaded_skill_ids=("knowledge",))
+
+    assert rejected.document is None
+    assert rejected.diagnostics[0].code == "evidence-anchor-required"
+    payload = json.loads(unanchored)
+    payload["evidence"] = [
+        {
+            "source_handle": "source-001",
+            "quote": "理解驗收規則",
+            "occurrence": 1,
+            "skill_ids": ["knowledge"],
+        }
+    ]
+    anchored = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    assert (await workspace.backend.aedit(path, unanchored, anchored)).error is None
+
+    accepted = await validator.validate_current(loaded_skill_ids=("knowledge",))
+
+    assert accepted.document is not None
+    assert accepted.manifest.validation_status is WorkspaceValidationStatus.VALID
+
+
+@pytest.mark.asyncio
+async def test_changed_risky_factual_text_requires_employee_quote_anchor(
+    validation_harness: tuple[
+        StoreBackedWorkspace,
+        WorkspaceValidationService,
+        MutableSourceLoader,
+    ],
+) -> None:
+    workspace, validator, _loader = validation_harness
+    path = "/workspace/tasks/task-001.json"
+    before = (await workspace.read_snapshot()).files[path]
+    risky = before.replace("核對訂單", "每週核對 100 筆訂單", 1)
+    assert (await workspace.backend.aedit(path, before, risky)).error is None
+
+    result = await validator.validate_current(loaded_skill_ids=("output",))
+
+    assert result.document is None
+    assert result.diagnostics[0].code == "evidence-anchor-required"
 
 
 @pytest.mark.asyncio

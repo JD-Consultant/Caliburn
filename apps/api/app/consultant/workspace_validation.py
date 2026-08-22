@@ -22,10 +22,12 @@ from app.consultant.evidence_anchor import EvidenceAnchorError, resolve_evidence
 from app.consultant.results import AnalysisBasis, SkillId
 from app.consultant.state import (
     ApprovedJobDocument,
+    ApprovedOpksKind,
     EmployeeSource,
     SourceProcessingStatus,
     SourceValidity,
 )
+from app.consultant.verification import requires_anchored_employee_quote
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
     WorkspaceDocumentDraft,
@@ -354,6 +356,129 @@ def _resolve_evidence(
     )
 
 
+def _semantic_evidence_diagnostics(
+    draft: WorkspaceDocumentDraft,
+    baseline: ApprovedJobDocument,
+    evidence_by_handle: Mapping[str, tuple[AnalysisBasis, ...]],
+) -> tuple[WorkspaceDiagnostic, ...]:
+    """Keep accepted Evidence rules on the persistent workspace lifecycle."""
+
+    handle_by_id = {
+        stable_id: handle for handle, stable_id in draft.handle_registry.items()
+    }
+    anchored_handles = {
+        handle
+        for handle, bases in evidence_by_handle.items()
+        if any(basis.quote_anchors for basis in bases)
+    }
+    diagnostics: list[WorkspaceDiagnostic] = []
+    seen_paths: set[str] = set()
+
+    def add(path: str, message: str) -> None:
+        if path in seen_paths or len(diagnostics) >= _MAX_DIAGNOSTICS:
+            return
+        seen_paths.add(path)
+        diagnostics.append(_diagnostic("evidence-anchor-required", path, message))
+
+    def require_for_risky_text(
+        path: str,
+        text: str | None,
+        handle: str | None,
+    ) -> None:
+        if (
+            text
+            and requires_anchored_employee_quote(text)
+            and (handle is None or handle not in anchored_handles)
+        ):
+            add(
+                path,
+                "Quantities, named rules, SOPs, and external claims require an exact employee quote.",
+            )
+
+    working = draft.approved_document
+    for field in (
+        "job_title",
+        "occupation_category_name",
+        "occupation_name",
+        "occupation_code",
+        "industry_name",
+        "industry_code",
+        "work_description",
+        "notes",
+    ):
+        before = getattr(baseline, field)
+        after = getattr(working, field)
+        if before != after:
+            require_for_risky_text("/workspace/header.json", after, None)
+
+    baseline_duties = {item.duty_id: item for item in baseline.duties}
+    for duty in working.duties:
+        before = baseline_duties.get(duty.duty_id)
+        if before is None or before.statement != duty.statement:
+            handle = handle_by_id.get(duty.duty_id)
+            require_for_risky_text(
+                f"/workspace/duties/{handle}.json" if handle else "/workspace/duties",
+                duty.statement,
+                handle,
+            )
+
+    baseline_tasks = {item.task_id: item for item in baseline.tasks}
+    task_text_fields = (
+        "statement",
+        "action",
+        "object",
+        "purpose_result",
+        "context",
+        "frequency_text",
+    )
+    for task in working.tasks:
+        before = baseline_tasks.get(task.task_id)
+        handle = handle_by_id.get(task.task_id)
+        path = f"/workspace/tasks/{handle}.json" if handle else "/workspace/tasks"
+        for field in task_text_fields:
+            before_value = getattr(before, field) if before is not None else None
+            after_value = getattr(task, field)
+            if before is None or before_value != after_value:
+                require_for_risky_text(path, after_value, handle)
+        before_enablers = before.enablers if before is not None else ()
+        if before is None or before_enablers != task.enablers:
+            for enabler in task.enablers:
+                require_for_risky_text(path, enabler.name, handle)
+
+    baseline_opks = {item.item_id: item for item in baseline.opks}
+    prefix_by_kind = {
+        ApprovedOpksKind.OUTPUT: "o",
+        ApprovedOpksKind.PERFORMANCE_INDICATOR: "p",
+        ApprovedOpksKind.KNOWLEDGE: "k",
+        ApprovedOpksKind.SKILL: "s",
+    }
+    for item in working.opks:
+        prefix = prefix_by_kind.get(item.kind)
+        if prefix is None:
+            continue
+        before = baseline_opks.get(item.item_id)
+        handle = handle_by_id.get(item.item_id)
+        path = (
+            f"/workspace/opks/{prefix}/{handle}.json"
+            if handle
+            else f"/workspace/opks/{prefix}"
+        )
+        semantic_changed = before is None or any(
+            getattr(before, field) != getattr(item, field)
+            for field in ("text", "task_ids", "indicator_ids")
+        )
+        if (
+            semantic_changed
+            and item.kind in {ApprovedOpksKind.KNOWLEDGE, ApprovedOpksKind.SKILL}
+            and (handle is None or handle not in anchored_handles)
+        ):
+            add(path, "Changed Knowledge or Skill requires an exact employee quote.")
+        if before is None or before.text != item.text:
+            require_for_risky_text(path, item.text, handle)
+
+    return tuple(diagnostics)
+
+
 def validate_workspace_payload(
     files: Mapping[str, str],
     *,
@@ -401,6 +526,10 @@ def validate_workspace_payload(
         normalized,
         selected_skill_ids=selected_skill_ids,
         loaded_skill_ids=loaded_skill_ids,
+    )
+    diagnostics = (
+        *diagnostics,
+        *_semantic_evidence_diagnostics(draft, catalog.document, evidence),
     )
     current_ids = {source.source_id for source in current_sources}
     if any(

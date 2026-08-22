@@ -127,7 +127,7 @@ def _normalized_after(
     change: ReviewableDocumentChange,
     *,
     document_id: UUID,
-    run_id: UUID,
+    identity_scope: str,
     change_index: int,
     allocated_display_order: int | None,
 ) -> JsonValue | None:
@@ -136,7 +136,7 @@ def _normalized_after(
     generated_id = str(
         uuid5(
             document_id,
-            f"consultant:{run_id}:document-entity:{change_index}:0",
+            f"{identity_scope}:document-entity:{change_index}:0",
         )
     )
     if (
@@ -417,7 +417,7 @@ def _action_affects_entity(
 
 def _link_required_groups(
     document_id: UUID,
-    run_id: UUID,
+    identity_scope: str,
     document: ApprovedJobDocument,
     actions: list[DocumentPatchAction],
 ) -> list[DocumentPatchAction]:
@@ -602,8 +602,7 @@ def _link_required_groups(
         group_id = (
             uuid5(
                 document_id,
-                "consultant:"
-                f"{run_id}:atomic-component:"
+                f"{identity_scope}:atomic-component:"
                 + ",".join(map(str, sorted(component))),
             )
             if requires_group
@@ -656,6 +655,7 @@ def create_document_changeset(
     changes: Sequence[ReviewableDocumentChange],
     existing_review_queue: Mapping[str, dict[str, Any]],
     interview_work: Mapping[str, dict[str, Any]],
+    identity_scope: str | None = None,
     external_dependency_action_ids: Sequence[UUID] = (),
 ) -> DocumentChangeSet:
     """Turn verified model semantics into replay-stable application patch actions."""
@@ -664,6 +664,9 @@ def create_document_changeset(
         raise DocumentReviewError("cannot create an empty document changeset")
     if document.document_id != document_id:
         raise DocumentReviewError("review document scope does not match")
+    if identity_scope is not None and not identity_scope.strip():
+        raise DocumentReviewError("identity_scope must not be blank")
+    identity_root = identity_scope or f"consultant:{run_id}"
     next_display_orders = {
         "/duties": max(
             (item.display_order for item in document.duties), default=-1
@@ -682,7 +685,7 @@ def create_document_changeset(
     action_ids_by_change_ref = {
         change.change_ref: uuid5(
             document_id,
-            f"consultant:{run_id}:patch-action:{index}",
+            f"{identity_root}:patch-action:{index}",
         )
         for index, change in enumerate(changes)
         if change.change_ref
@@ -717,23 +720,23 @@ def create_document_changeset(
         after = _normalized_after(
             change,
             document_id=document_id,
-            run_id=run_id,
+            identity_scope=identity_root,
             change_index=index,
             allocated_display_order=allocated_display_order,
         )
         read_paths = _read_paths(change, after)
         operation = DocumentPatchOperation(change.operation.value)
-        action_id = uuid5(document_id, f"consultant:{run_id}:patch-action:{index}")
+        action_id = uuid5(document_id, f"{identity_root}:patch-action:{index}")
         if change.atomic_group_ref:
             atomic_group = uuid5(
                 document_id,
-                f"consultant:{run_id}:atomic-ref:{change.atomic_group_ref}",
+                f"{identity_root}:atomic-ref:{change.atomic_group_ref}",
             )
         elif operation in {
             DocumentPatchOperation.MERGE,
             DocumentPatchOperation.SPLIT,
         }:
-            atomic_group = uuid5(document_id, f"consultant:{run_id}:atomic:{index}")
+            atomic_group = uuid5(document_id, f"{identity_root}:atomic:{index}")
         else:
             atomic_group = None
         local_dependencies = tuple(
@@ -772,7 +775,7 @@ def create_document_changeset(
             ),
         )
         actions.append(action)
-    actions = _link_required_groups(document_id, run_id, document, actions)
+    actions = _link_required_groups(document_id, identity_root, document, actions)
     try:
         apply_document_actions(document, tuple(actions))
     except DocumentAuthorityError as error:
@@ -782,7 +785,7 @@ def create_document_changeset(
     for action in actions:
         _ensure_not_rejected_without_new_evidence(action, existing_review_queue)
     bundle = DocumentChangeSet(
-        changeset_id=uuid5(document_id, f"consultant:{run_id}:document-changes"),
+        changeset_id=uuid5(document_id, f"{identity_root}:document-changes"),
         summary=summary,
         actions=tuple(actions),
         source_ids=tuple(

@@ -8,6 +8,8 @@
 
 大方向追溯：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md)、[`2026-07-30-professional-consultant-minimal-complete-loop-research.md`](2026-07-30-professional-consultant-minimal-complete-loop-research.md)、[`2026-08-01-opks-design-decisions-research.md`](2026-08-01-opks-design-decisions-research.md) 與 ADR 0060。若本研究的 editor 機制與這些產品行為衝突，應修改本研究，不用舊實作反向改寫產品。
 
+> **Lifecycle successor note（2026-08-22）**：本研究與 Accepted ADR 0064 對 Deep Agents VFS、低階 editor verbs、canonical resources、Evidence resolver 與 employee authority 的裁決仍有效；其中 `/candidate/<run_id>`、顯式 `check_candidate_document`、final publication receipt與另一份pending lifecycle，已依owner澄清重新研究。現行候選是「一份 JD 一個可跨回合續編的非權威 working draft」，詳見 [`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md) 與 Accepted [ADR 0066](../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)。VS Code只作持久工作面與差異審核的概念類比，不是Git／PR／IDE介面規格。
+
 ## 0. 結論
 
 ADR 0063 的大方向不翻案：模型必須先在非權威候選區實際編輯、取得 application 結果並修正，最後只發布已驗證的 candidate；員工接受或修改後接受之前，核准 JD 不得改變。

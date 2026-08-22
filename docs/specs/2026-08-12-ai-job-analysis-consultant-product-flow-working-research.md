@@ -4,8 +4,8 @@
 - 狀態：Working Research；隨 owner 討論持續修訂
 - 決策狀態：只記錄已確認的產品方向與待討論問題；不是 ADR，不授權 production 實作
 - 優先順序：先以「產品如何像專業顧問工作」約束架構；核心 runtime 已選 LangChain 1.x＋LangGraph 1.2.x，RAG 明確留待後續另案研究
-- 外部資料查核：截至 2026-08-15 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策
-- Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例；ADR 0060 與 successor ADR 0061–0063、施工計畫必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等目的與 framework primitive 命名。選型先看效果、功能完整、可靠性與員工體驗；只有效果相當時才比較自寫量
+- 外部資料查核：截至 2026-08-22 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策
+- Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x；§9.19再把候選生命週期收斂為Deep Agents／LangGraph持久working draft＋application semantic review。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例。施工必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等產品目的與framework primitive命名；選型先看效果、功能完整、可靠性與員工體驗，只有效果相當時才比較自寫量
 - 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
 
 ## 0. 這份工作稿怎麼使用
@@ -1483,7 +1483,7 @@ Owner 已確認：**模型、provider 與底層參數由本機維護者透過版
 
 ## 9. 升級進度與下一步
 
-> **現況與閱讀順序（2026-08-15）**：產品大方向以 §1–§8 為準；框架選擇以 §9.12 為準；自然續談、舊名稱不得回流、第一版 LLM 範圍與「本次不做 RAG」以 §9.13 為準；schema／read Tool 修正見 §9.15–§9.16；候選工作區與 Tool＋Structured Output 混合裁決以 §9.17–§9.18 為最新 owner 決定。§9.1.1–§9.11 是按時間保留的研究／反證歷程，其中 `Work Model`、`Focus`、`Progress`、`Proposal`、`Current JD` 等只描述被替換的舊機制，任何「RAG 是本次 final gate」或「文件候選永遠只能放 final Structured Output」敘述都已被後續裁決取代，不得拿來施工。目標架構見已 Accepted 的 ADR 0060–0063；既有 Big-bang 計畫完成 Task 10 前的施工，0063 另開增量計畫。
+> **現況與閱讀順序（2026-08-22）**：產品大方向以 §1–§8 為準；框架選擇以 §9.12 為準；自然續談、舊名稱不得回流、第一版 LLM 範圍與「本次不做 RAG」以 §9.13 為準；schema／read Tool 修正見 §9.15–§9.16；VFS與Evidence機制見 §9.17–§9.18，最新候選生命週期以 §9.19 為準。§9.1.1–§9.11 是按時間保留的研究／反證歷程，其中 `Work Model`、`Focus`、`Progress`、`Proposal`、`Current JD` 等只描述被替換的舊機制，不得拿來切割target state。Accepted ADR 0060–0065保留決策歷史；run-scoped candidate、model-facing check／publication receipt與第二份pending lifecycle已由Accepted ADR 0066取代。
 
 ### 9.1 討論與設計關卡（2026-08-14 現況）
 
@@ -2620,6 +2620,16 @@ Owner 已接受主方案；[ADR 0063](../adr/0063-hybrid-candidate-edit-tool-and
 - candidate／authority 六檔 gate 以 warning-as-error 為 **102 passed in 124.32s**；產品大方向 focused gate 為 **88 passed in 42.95s**；兩次 gate 後 `consultant_documents`、`checkpoints`、`checkpoint_blobs`、`checkpoint_writes`、`store` 均為 0。合併 grammar 實測為 6 schemas、0 defs、128 properties、2 optional、0 union、4 open objects、depth 4、13,411 bytes；candidate 與 final 各自為 61 properties、0 optional／union／open object。optional／open object 只來自既有四個 read Tool；bytes 仍只是比較訊號，不是供應商上限。
 
 本 checkpoint 沒有加入 RAG／Reference consumer、能力級別／A、自動核准、多 Agent或正式 eval；也沒有新增「本輪可停」狀態。員工仍可自然關閉、返回或繼續傳訊息，只有接受／修改接受或 direct edit 能改核准 JD。結果與本文產品北極星一致；真 GPT-5.6 Luna Max smoke 與完整 monorepo gate 留在下一 Task。
+
+### 9.19 持久 AI working draft 與語意審核校正（2026-08-22，owner 已核准）
+
+Owner進一步澄清：候選工作區不是單次run的暫存區，也不應等模型完成publication handshake後才成為可延續狀態。它是一份JD唯一的、可跨訊息／關閉／重啟續編的**非權威working draft**。員工即使尚未接受，下一輪AI仍看得到並能在其上繼續修改；只有員工接受、修改後接受或direct edit，內容才進核准JD。VS Code只用來類比「隔離工作面＋可見差異＋最後由人整合」，不導入Git、branch、commit、PR、檔案中心UI或IDE權限模式。
+
+這項修正不撤回Deep Agents VFS。相反地，它讓成熟框架承接更多同目的機制：canonical resources由`StoreBackend`放入document-scoped LangGraph Postgres Store namespace，讓agent與employee command共用同一份持久workspace；LangGraph checkpointer保留對話、interrupt與run recovery；`CompositeBackend`路由`/skills`、`/sources`、`/approved`、`/workspace`與derived `/review`；validation middleware在每波mutation後自動跑Pydantic／JD／Evidence verifier。需要員工先裁決的衝突才用interrupt，accept／edit-accept／reject／defer走application command。模型仍只使用`ls／read_file／grep／write_file／edit_file／delete`，不新增Duty／Task／OPKS business Tools，也不再顯式呼叫`check_candidate_document`或在final抄回revision／digest／action handles。此mapping修正已由Accepted [ADR 0067](../adr/0067-deep-agents-store-backed-jd-working-draft.md)收斂。
+
+員工看到的是application由approved↔workspace產生的**semantic change set**，不是file diff或Tool JSON。互不相依項目可個別接受／修改後接受／拒絕／延後；Task拆分、Duty重組或跨Task／OPKS相依變更按atomic group整組決策。接受後approved與workspace重基線；拒絕項退出active draft但保留decision memory；延後項留在workspace。每個review group綁精確approved／workspace revision與digest，後續重疊改動使舊決策fail stale，避免把員工批准套到不同內容。
+
+持久workspace不等於每輪把完整JD塞進prompt；Skills、員工來源與workspace仍依目前訪談焦點按需讀取。第一版不做多workspace、版本歷史UI、auto-accept、RAG／Reference、能力級別／A、多Agent或正式eval平台。完整官方資料、方案比較、成本／checkpoint風險與施工gate見[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)；架構裁決見Accepted [ADR 0066](../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)。
 
 ## 10. 本稿依據
 

@@ -21,6 +21,7 @@ from app.adapters.langgraph.postgres import (
     open_postgres_consultant_runtime,
 )
 from app.consultant.candidate_publication import CandidatePublicationStale
+from app.consultant.document_authority import apply_document_actions
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.results import (
@@ -434,6 +435,13 @@ async def test_workspace_authority_applies_partial_decisions_and_exact_replay(
         accepted = await runtime.decide_workspace_changes(accept)
         assert accepted.approved_document.tasks[0].statement == "AI接受"
         assert json.loads((await workspace.read_snapshot()).files[task_path])["statement"] == "AI接受"
+        assert (
+            await runtime.store.aget(
+                runtime.workspace_metadata_namespace(document_id),
+                f"rebase:{accept.command_id}",
+            )
+            is None
+        )
         replayed = await runtime.decide_workspace_changes(accept)
         assert replayed == accepted
         with pytest.raises(WorkspaceAuthorityError, match="reused"):
@@ -516,6 +524,76 @@ async def test_workspace_authority_applies_partial_decisions_and_exact_replay(
         ]
         assert len(direct_sources) == 1
         assert direct_sources[0].positions[0].document_path == action.path
+
+
+@pytest.mark.asyncio
+async def test_planned_workspace_decision_replays_authority_after_graph_receipt_gap(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Planned recovery")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        await _edit_task_statement(workspace, "AI planned recovery")
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        group = projection.groups[0]
+        action = group.actions[0]
+        command = _workspace_command(
+            document_id=document_id,
+            snapshot=snapshot,
+            workspace_snapshot=workspace_snapshot,
+            group=group,
+            decision=WorkspaceDecisionKind.ACCEPT,
+            action_id=action.action_id,
+            reason="接受 planned",
+        )
+        prospective = apply_document_actions(
+            snapshot.approved_document,
+            (action,),
+        )
+        authority = WorkspaceAuthorityService(runtime)
+        plan = await authority._build_plan(
+            command_id=command.command_id,
+            old_approved=snapshot.approved_document,
+            workspace_files=workspace_snapshot.files,
+            new_approved=prospective,
+            manifest=workspace_snapshot.manifest,
+            approved_revision=snapshot.revision + 1,
+        )
+        record = authority._record(command, group, plan=plan)
+        await authority._put_plan(document_id, plan)
+        await authority._put_record(document_id, record)
+        assert await authority._load_plan(document_id, command.command_id) is not None
+        assert (await runtime.raw_state(document_id)).get("command_receipts", {}) == {}
+
+        with pytest.raises(WorkspaceAuthorityError, match="reused"):
+            await runtime.decide_workspace_changes(
+                command.model_copy(update={"reason": "不同 payload"})
+            )
+
+        replayed = await runtime.decide_workspace_changes(command)
+
+        assert replayed.approved_document.tasks[0].statement == "AI planned recovery"
+        assert (
+            await runtime.store.aget(
+                runtime.workspace_metadata_namespace(document_id),
+                f"rebase:{command.command_id}",
+            )
+            is None
+        )
 
 
 @pytest.mark.asyncio
@@ -794,6 +872,13 @@ async def test_workspace_reject_record_recovers_before_workspace_revert(
         final_workspace = await workspace.read_snapshot()
         assert json.loads(final_workspace.files["/workspace/tasks/task-001.json"]) == json.loads(
             expected_files["/workspace/tasks/task-001.json"]
+        )
+        assert (
+            await runtime.store.aget(
+                runtime.workspace_metadata_namespace(document_id),
+                f"rebase:{command.command_id}",
+            )
+            is None
         )
 
 

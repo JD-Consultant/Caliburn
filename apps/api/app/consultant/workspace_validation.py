@@ -632,11 +632,11 @@ class WorkspaceValidationService:
             if payload.document is not None
             else WorkspaceValidationStatus.INVALID
         )
-        diagnostics = (
-            conflict_diagnostics
-            if payload.document is not None and conflict_diagnostics
-            else payload.diagnostics
-        )
+        diagnostics_list = list(payload.diagnostics)
+        for diagnostic in conflict_diagnostics:
+            if diagnostic not in diagnostics_list:
+                diagnostics_list.append(diagnostic)
+        diagnostics = tuple(diagnostics_list)
         must_commit = (
             snapshot.manifest.validation_status is not status
             or snapshot.manifest.evidence_basis_digest != basis_digest

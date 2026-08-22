@@ -7,7 +7,7 @@ from hashlib import sha256
 import json
 from collections.abc import Mapping, Sequence
 from typing import Any, cast
-from uuid import UUID, uuid4, uuid5
+from uuid import UUID, uuid5
 
 from pydantic import Field, JsonValue, StringConstraints, model_validator
 from typing_extensions import Annotated
@@ -420,123 +420,6 @@ _COLLECTION_ID_FIELDS = {
 }
 
 
-def _entity_resource_path(
-    files: Mapping[str, str],
-    registry: Mapping[str, UUID],
-    collection: str,
-    identity: UUID,
-) -> str | None:
-    prefix = f"/workspace/{collection}/"
-    for path in sorted(files):
-        if not path.startswith(prefix) or not path.endswith(".json"):
-            continue
-        handle = path.rsplit("/", 1)[-1][:-5]
-        if registry.get(handle) == identity:
-            return path
-    return None
-
-
-def _entity_path_from_registry(
-    files: Mapping[str, str],
-    registry: Mapping[str, UUID],
-    collection: str,
-    identity: UUID,
-) -> str:
-    existing = _entity_resource_path(files, registry, collection, identity)
-    if existing is not None:
-        return existing
-    for handle, candidate in registry.items():
-        if candidate != identity:
-            continue
-        if collection == "opks" and handle.startswith(("o-", "p-", "k-", "s-")):
-            return f"/workspace/opks/{handle[0]}/{handle}.json"
-        if handle.startswith({"duties": "duty-", "tasks": "task-"}.get(collection, "")):
-            return f"/workspace/{collection}/{handle}.json"
-    return f"/workspace/{collection}/{identity}.json"
-
-
-def _reset_workspace_field(
-    files: dict[str, str],
-    old_files: Mapping[str, str],
-    path: str,
-    field: str | None,
-) -> None:
-    old_raw = old_files.get(path)
-    if old_raw is None:
-        files.pop(path, None)
-        return
-    if field is None:
-        files[path] = old_raw
-        return
-    try:
-        old_payload = json.loads(old_raw)
-        current_payload = json.loads(files.get(path, old_raw))
-    except (TypeError, json.JSONDecodeError):
-        files[path] = old_raw
-        return
-    workspace_field = _WORKSPACE_FIELD_NAMES.get(field, field)
-    if workspace_field in old_payload:
-        current_payload[workspace_field] = old_payload[workspace_field]
-    else:
-        current_payload.pop(workspace_field, None)
-    files[path] = json.dumps(current_payload, ensure_ascii=False, indent=2) + "\n"
-
-
-def _reset_workspace_for_rejected_actions(
-    workspace_files: Mapping[str, str],
-    old_approved_files: Mapping[str, str],
-    actions: Sequence[DocumentPatchAction],
-    *,
-    entity_ids_by_handle: Mapping[str, UUID],
-) -> dict[str, str]:
-    """Remove only selected semantic edits from the working resources."""
-
-    files = dict(workspace_files)
-    registry = dict(entity_ids_by_handle)
-    for action in actions:
-        parts = action.path.strip("/").split("/")
-        collection = parts[0] if parts else ""
-        if collection not in _COLLECTION_ID_FIELDS:
-            if action.path.strip("/"):
-                _reset_workspace_field(
-                    files,
-                    old_approved_files,
-                    "/workspace/header.json",
-                    parts[0],
-                )
-            continue
-        id_field = _COLLECTION_ID_FIELDS[collection]
-        if action.operation is DocumentPatchOperation.ADD and isinstance(
-            action.after, dict
-        ):
-            raw_id = action.after.get(id_field)
-            if raw_id is not None:
-                try:
-                    identity = UUID(str(raw_id))
-                except ValueError:
-                    identity = None
-                if identity is not None:
-                    path = _entity_path_from_registry(
-                        files, registry, collection, identity
-                    )
-                    files.pop(path, None)
-            continue
-        if len(parts) < 2:
-            continue
-        try:
-            identity = UUID(parts[1])
-        except ValueError:
-            continue
-        path = _entity_path_from_registry(files, registry, collection, identity)
-        _reset_workspace_field(
-            files,
-            old_approved_files,
-            path,
-            _WORKSPACE_FIELD_NAMES.get(parts[2]) if len(parts) > 2 else None,
-        )
-    return files
-
-
 def _workspace_path_for_action(
     action: DocumentPatchAction,
     *,
@@ -657,6 +540,12 @@ class WorkspaceAuthorityService:
             self._plan_key(plan.command_id),
             {"plan": plan.model_dump(mode="json")},
             index=False,
+        )
+
+    async def _delete_plan(self, document_id: UUID, command_id: UUID) -> None:
+        await self.runtime.store.adelete(
+            self.runtime.workspace_metadata_namespace(document_id),
+            self._plan_key(command_id),
         )
 
     async def _load_direct_plan(
@@ -878,6 +767,11 @@ class WorkspaceAuthorityService:
             **workspace_files,
         }
         working = dict(workspace_files)
+        existing_conflicts = active_conflict_diagnostics(
+            files=workspace_files,
+            approved_document=old_approved,
+            manifest=manifest,
+        )
         employee_override_paths = tuple(
             path
             for action in (*reset_actions, *employee_override_actions)
@@ -908,6 +802,14 @@ class WorkspaceAuthorityService:
             update={
                 "expected_workspace_digest": actual_digest,
                 "changes": actual_changes,
+                "conflicted_paths": tuple(
+                    dict.fromkeys(
+                        (
+                            *(diagnostic.path for diagnostic in existing_conflicts),
+                            *plan.conflicted_paths,
+                        )
+                    )
+                ),
                 "entity_ids_by_handle": entity_ids_by_handle,
             }
         )
@@ -920,10 +822,13 @@ class WorkspaceAuthorityService:
     ) -> tuple[EmployeeSource | None, SourceReference | None]:
         if payload is None:
             return None, None
+        if source_id is None:
+            raise WorkspaceAuthorityError(
+                "employee source id is required for direct-edit payload"
+            )
         text, positions = payload
-        resolved_source_id = source_id or uuid4()
         requested = EmployeeSource.pending(
-            source_id=resolved_source_id,
+            source_id=source_id,
             document_id=document_id,
             kind=EmployeeSourceKind.DIRECT_EDIT,
             text=text,
@@ -1028,29 +933,39 @@ class WorkspaceAuthorityService:
             selected_skill_ids=CONSULTANT_SKILL_IDS,
             loaded_skill_ids=CONSULTANT_SKILL_IDS,
         )
+        conflict_candidates = tuple(
+            WorkspaceDiagnostic(
+                code="workspace-rebase-conflict",
+                path=path,
+                message=(
+                    "The AI working value was retained for this path; the employee "
+                    "approved value is authoritative."
+                ),
+                severity=WorkspaceDiagnosticSeverity.ERROR,
+            )
+            for path in plan.conflicted_paths
+        )
+        active_conflicts = active_conflict_diagnostics(
+            files=snapshot.files,
+            approved_document=approved,
+            manifest=snapshot.manifest.model_copy(
+                update={"diagnostics": conflict_candidates}
+            ),
+        )
         status = (
             (
                 WorkspaceValidationStatus.CONFLICTED
-                if plan.conflicted_paths
+                if active_conflicts
                 else WorkspaceValidationStatus.VALID
             )
             if validation.document is not None and not validation.diagnostics
             else WorkspaceValidationStatus.INVALID
         )
-        diagnostics = tuple(validation.diagnostics)
-        if plan.conflicted_paths and validation.document is not None and not validation.diagnostics:
-            diagnostics = tuple(
-                WorkspaceDiagnostic(
-                    code="workspace-rebase-conflict",
-                    path=path,
-                    message=(
-                        "The AI working value was retained for this path; the employee "
-                        "approved value is authoritative."
-                    ),
-                    severity=WorkspaceDiagnosticSeverity.ERROR,
-                )
-                for path in plan.conflicted_paths
-            )
+        diagnostics_list = list(validation.diagnostics)
+        for diagnostic in active_conflicts:
+            if diagnostic not in diagnostics_list:
+                diagnostics_list.append(diagnostic)
+        diagnostics = tuple(diagnostics_list)
         return await workspace.commit_validation(
             expected_resource_digest=snapshot.manifest.resource_digest,
             evidence_basis_digest=evidence_basis_digest(validation.current_sources),
@@ -1106,6 +1021,7 @@ class WorkspaceAuthorityService:
             }
         )
         await self._put_record(document_id, completed)
+        await self._delete_plan(document_id, record.command_id)
         return completed
 
     async def recover(self, document_id: UUID) -> None:
@@ -1118,6 +1034,9 @@ class WorkspaceAuthorityService:
                 WorkspaceDecisionKind.ACCEPT,
                 WorkspaceDecisionKind.EDIT_ACCEPT,
             }:
+                if record.status is WorkspaceDecisionStatus.COMPLETED:
+                    await self._delete_plan(document_id, record.command_id)
+                    continue
                 receipt = CommandReceipt(
                     command_id=record.command_id,
                     command_kind=self._command_kind(record.decision),
@@ -1135,6 +1054,11 @@ class WorkspaceAuthorityService:
                 and record.result_workspace_digest is None
             ):
                 await self._finish_rebase(document_id, record)
+            elif (
+                record.decision is WorkspaceDecisionKind.REJECT
+                and record.status is WorkspaceDecisionStatus.COMPLETED
+            ):
+                await self._delete_plan(document_id, record.command_id)
         metadata_items = await self.runtime.store.asearch(
             self.runtime.workspace_metadata_namespace(document_id),
             limit=1000,
@@ -1163,7 +1087,11 @@ class WorkspaceAuthorityService:
                     f"command {command.command_id} was reused with another payload"
                 )
             await self.recover(document_id)
-            return await self.runtime._snapshot(document_id)
+            existing = await self._load_record(document_id, command.command_id)
+            if existing is None:
+                raise WorkspaceAuthorityError("workspace decision record disappeared")
+            if existing.status is WorkspaceDecisionStatus.COMPLETED:
+                return await self.runtime._snapshot(document_id)
 
         snapshot, workspace, workspace_snapshot, projection = await self._review_context(
             document_id
@@ -1207,7 +1135,10 @@ class WorkspaceAuthorityService:
 
         text_payload = edited_action_source_payload(selected, edited)
         employee_source_id = (
-            self._employee_source_id(document_id, command.command_id)
+            (
+                (existing.employee_source_id if existing is not None else None)
+                or self._employee_source_id(document_id, command.command_id)
+            )
             if text_payload is not None
             else None
         )

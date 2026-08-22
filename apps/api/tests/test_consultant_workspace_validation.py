@@ -281,6 +281,125 @@ async def test_validation_preserves_conflict_diagnostics_until_store_content_cha
 
 
 @pytest.mark.asyncio
+async def test_unrelated_valid_workspace_edit_preserves_existing_conflict(
+    validation_harness: tuple[
+        StoreBackedWorkspace,
+        WorkspaceValidationService,
+        MutableSourceLoader,
+    ],
+) -> None:
+    workspace, validator, _loader = validation_harness
+    valid = await validator.validate_current(loaded_skill_ids=("output",))
+    task_path = "/workspace/tasks/task-001.json"
+    assert (
+        await workspace.backend.aedit(
+            task_path,
+            '"核對訂單"',
+            '"AI核對訂單"',
+        )
+    ).error is None
+    changed = await workspace.read_snapshot()
+    conflict = WorkspaceDiagnostic(
+        code="workspace-rebase-conflict",
+        path=f"{task_path}/statement",
+        message="AI value retained while employee authority is committed.",
+        severity=WorkspaceDiagnosticSeverity.ERROR,
+    )
+    await workspace.commit_validation(
+        expected_resource_digest=changed.manifest.resource_digest,
+        evidence_basis_digest=valid.manifest.evidence_basis_digest,
+        validation_status=WorkspaceValidationStatus.CONFLICTED,
+        diagnostics=(conflict,),
+        entity_ids_by_handle=changed.manifest.entity_ids_by_handle,
+    )
+
+    latest = await workspace.read_snapshot()
+    task = json.loads(latest.files[task_path])
+    task["action"] = "AI核對"
+    assert (
+        await workspace.backend.aedit(
+            task_path,
+            latest.files[task_path],
+            json.dumps(task, ensure_ascii=False, indent=2) + "\n",
+        )
+    ).error is None
+
+    result = await validator.validate_current(loaded_skill_ids=("output",))
+
+    assert result.manifest.validation_status is WorkspaceValidationStatus.CONFLICTED
+    assert any(
+        diagnostic.code == "workspace-rebase-conflict"
+        and diagnostic.path == f"{task_path}/statement"
+        for diagnostic in result.diagnostics
+    )
+
+
+@pytest.mark.asyncio
+async def test_invalid_unrelated_workspace_edit_keeps_conflict_after_repair(
+    validation_harness: tuple[
+        StoreBackedWorkspace,
+        WorkspaceValidationService,
+        MutableSourceLoader,
+    ],
+) -> None:
+    workspace, validator, _loader = validation_harness
+    valid = await validator.validate_current(loaded_skill_ids=("output",))
+    task_path = "/workspace/tasks/task-001.json"
+    assert (
+        await workspace.backend.aedit(
+            task_path,
+            '"核對訂單"',
+            '"AI核對訂單"',
+        )
+    ).error is None
+    changed = await workspace.read_snapshot()
+    conflict = WorkspaceDiagnostic(
+        code="workspace-rebase-conflict",
+        path=f"{task_path}/statement",
+        message="AI value retained while employee authority is committed.",
+        severity=WorkspaceDiagnosticSeverity.ERROR,
+    )
+    await workspace.commit_validation(
+        expected_resource_digest=changed.manifest.resource_digest,
+        evidence_basis_digest=valid.manifest.evidence_basis_digest,
+        validation_status=WorkspaceValidationStatus.CONFLICTED,
+        diagnostics=(conflict,),
+        entity_ids_by_handle=changed.manifest.entity_ids_by_handle,
+    )
+
+    latest = await workspace.read_snapshot()
+    header_path = "/workspace/header.json"
+    original_header = latest.files[header_path]
+    assert (
+        await workspace.backend.aedit(
+            header_path,
+            original_header,
+            "{not-json\n",
+        )
+    ).error is None
+    invalid = await validator.validate_current(loaded_skill_ids=("output",))
+    assert invalid.manifest.validation_status is WorkspaceValidationStatus.INVALID
+    assert any(diagnostic.code == "workspace-rebase-conflict" for diagnostic in invalid.diagnostics)
+    assert any(diagnostic.code == "json-syntax" for diagnostic in invalid.diagnostics)
+
+    assert (
+        await workspace.backend.aedit(
+            header_path,
+            "{not-json\n",
+            original_header,
+        )
+    ).error is None
+    result = await validator.validate_current(loaded_skill_ids=("output",))
+
+    assert result.manifest.validation_status is WorkspaceValidationStatus.CONFLICTED
+    assert any(
+        diagnostic.code == "workspace-rebase-conflict"
+        and diagnostic.path == f"{task_path}/statement"
+        for diagnostic in result.diagnostics
+    )
+
+
+@pytest.mark.asyncio
 async def test_conflicted_manifest_still_verifies_the_real_store_digest(
     validation_harness: tuple[
         StoreBackedWorkspace,

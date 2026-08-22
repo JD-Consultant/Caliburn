@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from datetime import UTC, datetime
 from io import BytesIO
+from types import SimpleNamespace
 from uuid import UUID, uuid4
 
 import httpx
@@ -32,6 +33,7 @@ from app.consultant.state import (
     initial_thread_state,
 )
 from app.consultant.views import snapshot_from_state
+from app.consultant.workspace_review import WorkspaceReviewGroup, WorkspaceReviewProjection
 
 
 pytestmark = pytest.mark.asyncio
@@ -62,6 +64,8 @@ class FakeRuntime:
         self.active_conflict = False
         self.calls: list[tuple[str, dict]] = []
         self.sources: list[EmployeeSource] = []
+        self.review_changeset_id: UUID | None = None
+        self.review_action_id: UUID | None = None
 
     async def list_documents(self):
         if self.document_id is None or self.deleted:
@@ -125,8 +129,52 @@ class FakeRuntime:
         )
         return self.snapshot, True
 
-    async def decide_document_changes(self, **kwargs):
-        self.calls.append(("review", kwargs))
+    async def workspace_review_context(self, document_id: UUID):
+        assert document_id == self.document_id
+        changeset_id = self.review_changeset_id or uuid4()
+        action_id = self.review_action_id or uuid4()
+        action = DocumentPatchAction(
+            action_id=action_id,
+            operation=DocumentPatchOperation.REVISE,
+            path="/job_title",
+            target_key="/job_title",
+            before=self.snapshot.approved_document.job_title,
+            after="候選職稱",
+            source_ids=(uuid4(),),
+            read_set=(
+                DocumentPathRead(path="/job_title", value_sha256="0" * 64),
+            ),
+        )
+        changeset = DocumentChangeSet(
+            changeset_id=changeset_id,
+            summary="工作區語意審查",
+            actions=(action,),
+            source_ids=action.source_ids,
+            created_revision=self.snapshot.revision,
+        )
+        digest = "a" * 64
+        group = WorkspaceReviewGroup(
+            changeset=changeset,
+            group_digest=digest,
+            semantic_fingerprint=digest,
+            evidence_digest=digest,
+            employee_request_digest=digest,
+            boundary_digest=digest,
+        )
+        return (
+            self.snapshot,
+            None,
+            SimpleNamespace(
+                manifest=SimpleNamespace(
+                    generation=0,
+                    resource_digest="a" * 64,
+                )
+            ),
+            WorkspaceReviewProjection(workspace_digest="a" * 64, groups=(group,)),
+        )
+
+    async def decide_workspace_changes(self, command):
+        self.calls.append(("review", command.model_dump(mode="json")))
         return self.snapshot
 
     async def decide_understanding_calibration(self, **kwargs):
@@ -422,6 +470,8 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     document_id = UUID((await _create(client)).json()["document_id"])
     changeset_id = uuid4()
     action_id = uuid4()
+    runtime.review_changeset_id = changeset_id
+    runtime.review_action_id = action_id
     calibration_id = uuid4()
     clarification_id = uuid4()
 
@@ -435,7 +485,7 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
             "rejection_reason": None,
         },
     )
-    assert review.status_code == 200
+    assert review.status_code == 200, review.text
     assert runtime.calls[-1][0] == "review"
 
     confirmed = await client.post(
@@ -506,36 +556,21 @@ async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> No
     client, runtime, _ = api
     document_id = UUID((await _create(client)).json()["document_id"])
 
-    source_id = uuid4()
-    changeset_id = uuid4()
-    external_dependency_action_id = uuid4()
-    superseded_action_id = uuid4()
-    action = DocumentPatchAction(
-        action_id=uuid4(),
-        operation=DocumentPatchOperation.REVISE,
-        path="/job_title",
-        target_key="/job_title",
-        before="已核准名稱",
-        after="尚待審核名稱",
-        source_ids=(source_id,),
-        read_set=(
-            DocumentPathRead(path="/job_title", value_sha256="0" * 64),
-        ),
-        depends_on_action_ids=(external_dependency_action_id,),
-        supersedes_action_ids=(superseded_action_id,),
-    )
-    changeset = DocumentChangeSet(
-        changeset_id=changeset_id,
-        summary="修改職務名稱",
-        actions=(action,),
-        source_ids=(source_id,),
-        created_revision=0,
-        external_dependency_action_ids=(external_dependency_action_id,),
-    )
     state = initial_thread_state(document_id)
     state["approved_document"]["job_title"] = "已核准名稱"
-    state["review_queue"] = {
-        str(changeset_id): changeset.model_dump(mode="json")
+    gap_id = uuid4()
+    state["gaps"] = {
+        str(gap_id): {
+            "gap_id": str(gap_id),
+            "reason": "work_coverage_missing",
+            "description": "仍有工作內容待補齊。",
+            "subject_kind": "task",
+            "subject_id": None,
+            "blocks_dependent_analysis": False,
+            "status": "active",
+            "source_ids": [str(uuid4())],
+            "last_changed_revision": 0,
+        }
     }
     runtime.snapshot = snapshot_from_state(state)
 

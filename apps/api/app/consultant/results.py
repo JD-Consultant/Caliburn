@@ -16,7 +16,6 @@ from pydantic import BaseModel, ConfigDict, Field, JsonValue, StringConstraints,
 from typing_extensions import Annotated
 
 from app.consultant.state import (
-    ActionHandle,
     InterviewPriority,
     InterviewWorkStatus,
     QuoteAnchor,
@@ -177,8 +176,6 @@ class DocumentChangeOperation(StrEnum):
     ADD = "add"
     REVISE = "revise"
     WITHDRAW = "withdraw"
-    MERGE = "merge"
-    SPLIT = "split"
     REASSIGN = "reassign"
     REORDER = "reorder"
 
@@ -196,7 +193,6 @@ class ReviewableDocumentChange(ResultModel):
     operation: DocumentChangeOperation
     path: NonEmptyText
     after: DocumentAfterValue | None = None
-    target_ids: tuple[UUID, ...] = ()
     opks_kind: OpksKind | None = None
     task_ids: tuple[UUID, ...] = ()
     indicator_ids: tuple[UUID, ...] = ()
@@ -210,7 +206,6 @@ class ReviewableDocumentChange(ResultModel):
     @model_validator(mode="after")
     def references_are_unique(self) -> ReviewableDocumentChange:
         for label, values in (
-            ("target_ids", self.target_ids),
             ("task_ids", self.task_ids),
             ("indicator_ids", self.indicator_ids),
         ):
@@ -218,16 +213,6 @@ class ReviewableDocumentChange(ResultModel):
                 raise ValueError(f"duplicate {label}")
         if self.operation is not DocumentChangeOperation.WITHDRAW and self.after is None:
             raise ValueError("non-withdraw document change requires an after value")
-        if self.operation in {
-            DocumentChangeOperation.MERGE,
-            DocumentChangeOperation.SPLIT,
-        } and not self.target_ids:
-            raise ValueError("merge or split requires stable target_ids")
-        if self.operation not in {
-            DocumentChangeOperation.MERGE,
-            DocumentChangeOperation.SPLIT,
-        } and self.target_ids:
-            raise ValueError("target_ids are only valid for merge or split")
         return self
 
 
@@ -278,42 +263,20 @@ class SufficiencyRecommendation(ResultModel):
         return self
 
 
-class CandidatePublication(ResultModel):
-    """A final reference to one already-persisted candidate revision."""
-
-    candidate_revision: int = Field(ge=1)
-    revision_digest: str = Field(pattern=r"^[0-9a-f]{64}$")
-    action_handles: tuple[ActionHandle, ...] = Field(min_length=1)
-
-    @model_validator(mode="after")
-    def action_handles_are_unique(self) -> CandidatePublication:
-        if len(self.action_handles) != len(set(self.action_handles)):
-            raise ValueError("duplicate candidate publication action handle")
-        return self
-
-
 class ConsultantResult(ResultModel):
     """One coherent result owned by the single professional consultant."""
 
     visible_reply: NonEmptyText
     reply_basis: AnalysisBasis
-    used_skill_ids: tuple[SkillId, ...] = Field(min_length=1)
     understanding_changes: tuple[UnderstandingChange, ...] = ()
     attention_changes: tuple[AttentionChange, ...] = ()
     gaps: tuple[VisibleGap, ...] = ()
-    candidate_publication: CandidatePublication | None = None
     next_question: NextQuestion | None = None
     required_clarification: RequiredClarificationDraft | None = None
     sufficiency: SufficiencyRecommendation
 
     @model_validator(mode="after")
     def every_claim_uses_a_declared_skill(self) -> ConsultantResult:
-        if len(self.used_skill_ids) != len(set(self.used_skill_ids)):
-            raise ValueError("duplicate used_skill_ids")
-        used = set(self.used_skill_ids)
-        for basis in self.analysis_bases():
-            if not set(basis.skill_ids) <= used:
-                raise ValueError("semantic claim depends on an undeclared used Skill")
         if sum(item.make_current for item in self.attention_changes) > 1:
             raise ValueError("one consultant result can select only one current work item")
         if self.next_question is not None and self.required_clarification is not None:

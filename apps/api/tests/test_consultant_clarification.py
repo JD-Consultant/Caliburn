@@ -92,7 +92,6 @@ def test_safe_follow_up_preserves_an_unanswered_required_clarification() -> None
     result = ConsultantResult(
         visible_reply="我先整理不受這個衝突影響的其他工作。",
         reply_basis=basis,
-        used_skill_ids=("work-discovery",),
         sufficiency=SufficiencyRecommendation(
             currently_enough=False,
             reason="仍有責任歸屬待確認。",
@@ -208,7 +207,6 @@ async def test_required_clarification_survives_restart_and_answer_is_only_eviden
     discovery = ConsultantResult(
         visible_reply="我先記下請購觸發條件這個訪談重點。",
         reply_basis=discovery_basis,
-        used_skill_ids=("story-interview",),
         attention_changes=(
             AttentionChange(
                 operation=AttentionOperation.ADD,
@@ -266,7 +264,6 @@ async def test_required_clarification_survives_restart_and_answer_is_only_eviden
     result = ConsultantResult(
         visible_reply="這兩段說法會改變請購責任邊界，我需要先確認一件事。",
         reply_basis=basis,
-        used_skill_ids=("story-interview",),
         required_clarification=RequiredClarificationDraft(
             reason="兩次回答對請購觸發條件互相衝突",
             question="實際在哪種情況才建立請購單？",
@@ -311,7 +308,6 @@ async def test_required_clarification_survives_restart_and_answer_is_only_eviden
 
     checkpoint = await graph.aget_state(_config(document_id))
     approved_before = checkpoint.values["approved_document"]
-    review_before = checkpoint.values["review_queue"]
     assert checkpoint.values["required_clarification"] is not None
 
     restarted = build_consultant_graph(saver, store)
@@ -360,7 +356,6 @@ async def test_required_clarification_survives_restart_and_answer_is_only_eviden
     safe_result = ConsultantResult(
         visible_reply="我先整理另一項不受此衝突影響的工作。",
         reply_basis=safe_basis,
-        used_skill_ids=("work-discovery",),
         sufficiency=SufficiencyRecommendation(
             currently_enough=False,
             reason="請購責任仍待確認。",
@@ -404,7 +399,6 @@ async def test_required_clarification_survives_restart_and_answer_is_only_eviden
     assert resumed["latest_source_id"] == str(clarification_source)
     assert resumed["source_count"] == 5
     assert resumed["approved_document"]["job_title"] == "採購專員"
-    assert resumed["review_queue"] == review_before
     assert resumed["interview_work"][str(work_id)]["status"] in {
         "active",
         "available",

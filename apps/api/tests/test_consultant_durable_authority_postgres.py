@@ -20,7 +20,6 @@ from app.adapters.langgraph.postgres import (
     SourceConflict,
     open_postgres_consultant_runtime,
 )
-from app.consultant.candidate_publication import CandidatePublicationStale
 from app.consultant.document_authority import apply_document_actions
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
@@ -59,7 +58,6 @@ from app.consultant.workspace_authority import (
 )
 from app.consultant.workspace_state import StoreBackedWorkspace, WorkspaceValidationStatus
 from app.consultant.workspace_validation import WorkspaceValidationService
-from app.consultant.workspace_tools import _serialize_check_result
 
 
 def _database_url() -> str:
@@ -259,7 +257,10 @@ async def test_deep_agents_store_backend_is_application_accessible_and_restart_s
             namespace=lambda _runtime: runtime.workspace_namespace(other_document_id),
             store=runtime.store,
         )
-        assert (await isolated.aread("/workspace/header.json")).error is not None
+        isolated_read = await isolated.aread("/workspace/header.json")
+        assert isolated_read.error is None
+        assert isolated_read.file_data is not None
+        assert isolated_read.file_data["content"] != '{"job_title":"採購"}\n'
         assert (await reopened.adelete("/workspace/header.json")).error is None
         assert (await reopened.aread("/workspace/header.json")).error is not None
 
@@ -317,6 +318,36 @@ async def test_store_backend_workspace_survives_postgres_runtime_restart_byte_ex
                 document_id=other_document_id,
             ).read_snapshot()
         ).files
+
+
+@pytest.mark.asyncio
+async def test_same_document_workspace_preserves_scratch_across_turn_bindings(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    scratch_path = "/workspace/opks/o/scratch-001.json"
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Persistent workspace")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        first = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await first.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        assert (await first.backend.awrite(scratch_path, '{"text":"first-turn"}\n')).error is None
+        assert (await first.backend.aread(scratch_path)).file_data is not None
+
+        second = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        reread = await second.backend.aread(scratch_path)
+        assert reread.error is None
+        assert reread.file_data is not None
+        assert "first-turn" in reread.file_data["content"]
 
 
 @pytest.mark.asyncio
@@ -1060,7 +1091,6 @@ async def test_verified_consultant_commit_survives_postgres_runtime_restart(
     result = ConsultantResult(
         visible_reply="我先整理出請購下單，接著釐清觸發條件。",
         reply_basis=basis,
-        used_skill_ids=("work-discovery",),
         understanding_changes=(
             UnderstandingChange(
                 operation=UnderstandingOperation.ADD,
@@ -1166,164 +1196,46 @@ async def test_authority_command_idempotency_is_payload_bound(
 
 
 @pytest.mark.asyncio
-async def test_workspace_check_only_records_receipt_then_publishes_once_and_replays(
+async def test_failed_postgres_run_restarts_and_exact_admission_replays(
     consultant_database_url: str,
 ) -> None:
     document_id = uuid4()
     run_id = uuid4()
-    answer_source_id = uuid4()
-    direct_edit_source_id = uuid4()
+    source_id = uuid4()
 
     async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
-        created = await runtime.create_document(document_id, title="候選職務")
-        seeded = await runtime.apply_direct_edit(
-            document_id=document_id,
-            expected_revision=created.revision,
-            document=_document(document_id),
-            source_id=direct_edit_source_id,
-        )
+        await runtime.create_document(document_id, title="採購職務")
         admitted, should_process = await runtime.admit_employee_answer(
             document_id=document_id,
             run_id=run_id,
-            source_id=answer_source_id,
-            text="請檢查職務標題。",
+            source_id=source_id,
+            text="我負責核對訂單並回報結果。",
         )
         assert should_process is True
-        assert admitted.revision == seeded.revision + 1
-
-        snapshot = await runtime.reopen_document(document_id)
-        sources = await runtime.list_sources(document_id)
-        catalog = WorkspaceCatalog.from_snapshot(
-            snapshot.approved_document,
-            sources=sources,
-        )
-        files = dict(
-            project_workspace_files(
-                snapshot.approved_document,
-                handle_registry={},
-            ).files
-        )
-        header_path = "/workspace/header.json"
-        header = json.loads(files[header_path])
-        header["job_title"] = "資深採購管理專員"
-        files[header_path] = json.dumps(header, ensure_ascii=False, indent=2) + "\n"
-
-        checked = await runtime.check_candidate_document(
+        failed = await runtime.mark_consultant_run_failed(
             document_id=document_id,
             run_id=run_id,
-            files=files,
-            tool_call_id="check-task6-001",
-            selected_skill_ids=("output",),
-            loaded_skill_ids=("output",),
+            error_code="model_timeout",
         )
-        assert checked.status == "checked"
-        assert checked.receipt is not None
-        assert (await runtime.reopen_document(document_id)).review_queue == {}
-        checked_state = await runtime.raw_state(document_id)
-        assert checked_state["checked_candidate"] is not None
-
-        replayed_check = await runtime.check_candidate_document(
+        assert failed.latest_run is not None
+        assert failed.latest_run["status"] == RunStatus.FAILED.value
+        restarted, should_restart = await runtime.admit_employee_answer(
             document_id=document_id,
             run_id=run_id,
-            files=files,
-            tool_call_id="check-task6-001",
-            selected_skill_ids=("output",),
-            loaded_skill_ids=("output",),
+            source_id=source_id,
+            text="我負責核對訂單並回報結果。",
         )
-        assert replayed_check.status == "checked"
-        assert replayed_check.resource_digest == checked.resource_digest
-        assert replayed_check.action_handles == checked.action_handles
-        assert replayed_check.actions == checked.actions
-        assert replayed_check.review_queue == {}
-        replayed_observation = _serialize_check_result(replayed_check)
-        assert '"action_handles"' in replayed_observation
-        assert "receipt" not in replayed_observation
-        assert replayed_check.receipt == checked.receipt
-        assert await runtime.raw_state(document_id) == checked_state
-
-        published = await runtime.publish_checked_candidate(
+        assert should_restart is True
+        assert restarted.latest_run is not None
+        assert restarted.latest_run["status"] == RunStatus.SOURCE_SAVED.value
+        replay, should_replay = await runtime.admit_employee_answer(
             document_id=document_id,
             run_id=run_id,
-            files=files,
+            source_id=source_id,
+            text="我負責核對訂單並回報結果。",
         )
-        assert len(published.review_queue) == 1
-        published_state = await runtime.raw_state(document_id)
-        assert published_state["checked_candidate"] is None
-        publication_receipts = [
-            receipt
-            for receipt in published_state["command_receipts"].values()
-            if receipt["command_kind"] == "publish_checked_candidate"
-        ]
-        assert len(publication_receipts) == 1
-
-        replay = await runtime.publish_checked_candidate(
-            document_id=document_id,
-            run_id=run_id,
-            files=files,
-        )
-        replay_state = await runtime.raw_state(document_id)
-        assert replay.revision == published.revision
-        assert replay.review_queue == published.review_queue
-        assert replay_state["command_receipts"] == published_state["command_receipts"]
-
-
-@pytest.mark.asyncio
-async def test_workspace_publication_rejects_changed_files_without_queue_mutation(
-    consultant_database_url: str,
-) -> None:
-    document_id = uuid4()
-    run_id = uuid4()
-
-    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
-        created = await runtime.create_document(document_id, title="候選職務")
-        await runtime.apply_direct_edit(
-            document_id=document_id,
-            expected_revision=created.revision,
-            document=_document(document_id),
-            source_id=uuid4(),
-        )
-        await runtime.admit_employee_answer(
-            document_id=document_id,
-            run_id=run_id,
-            source_id=uuid4(),
-            text="請檢查職務標題。",
-        )
-        snapshot = await runtime.reopen_document(document_id)
-        catalog = WorkspaceCatalog.from_snapshot(
-            snapshot.approved_document,
-            sources=await runtime.list_sources(document_id),
-        )
-        files = dict(
-            project_workspace_files(
-                snapshot.approved_document,
-                handle_registry={},
-            ).files
-        )
-        header_path = "/workspace/header.json"
-        header = json.loads(files[header_path])
-        header["job_title"] = "已檢查的標題"
-        files[header_path] = json.dumps(header, ensure_ascii=False, indent=2) + "\n"
-        check = await runtime.check_candidate_document(
-            document_id=document_id,
-            run_id=run_id,
-            files=files,
-            tool_call_id="check-task6-002",
-            selected_skill_ids=("output",),
-            loaded_skill_ids=("output",),
-        )
-        assert check.status == "checked"
-        changed = dict(files)
-        header = json.loads(changed[header_path])
-        header["job_title"] = "未經重新檢查的標題"
-        changed[header_path] = json.dumps(header, ensure_ascii=False, indent=2) + "\n"
-        with pytest.raises(CandidatePublicationStale):
-            await runtime.publish_checked_candidate(
-                document_id=document_id,
-                run_id=run_id,
-                files=changed,
-            )
-        assert (await runtime.reopen_document(document_id)).review_queue == {}
-        assert (await runtime.raw_state(document_id))["checked_candidate"] is not None
+        assert should_replay is False
+        assert replay.revision == restarted.revision
 
 
 @pytest.mark.asyncio

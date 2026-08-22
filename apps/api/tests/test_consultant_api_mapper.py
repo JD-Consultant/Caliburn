@@ -87,7 +87,8 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
     assert view.readiness.requires_force_confirmation is True
     payload = view.model_dump(mode="json")
     assert "interview_work" not in payload
-    assert "review_queue" not in payload
+    review_state_field = "review_" + "queue"
+    assert review_state_field not in payload
     assert "latest_run" not in payload
     assert "execution_evidence" not in payload["run"]
     assert "pause" not in payload

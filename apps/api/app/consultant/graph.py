@@ -9,13 +9,8 @@ from langgraph.graph import END, START, StateGraph
 from langgraph.runtime import Runtime
 
 from app.consultant.clarification import interrupt_for_required_clarification
-from app.consultant.document_review import (
-    apply_review_command,
-    revalidate_after_direct_edit,
-)
 from app.consultant.interview import (
     VerifiedConsultantCommit,
-    _publish_persisted_changeset,
     apply_source_correction,
     apply_verified_consultant_commit,
     normalize_current_work,
@@ -24,7 +19,6 @@ from app.consultant.state import (
     ApprovedJobDocument,
     CalibrationDecision,
     CommandReceipt,
-    CheckedCandidateReceipt,
     ConsultantCommandContext,
     ConsultantThreadState,
     RunReceipt,
@@ -94,23 +88,6 @@ def _apply_command(
         return initial_thread_state(document_id)
 
     _require_document(state, document_id)
-    if action == "check_candidate_document":
-        expected_revision = command.get("expected_revision")
-        if not isinstance(expected_revision, int):
-            raise ValueError("candidate check requires the current revision")
-        _require_revision(state, expected_revision)
-        receipt = CheckedCandidateReceipt.model_validate(
-            command["checked_candidate"]
-        )
-        latest_payload = state.get("latest_run")
-        if latest_payload is None:
-            raise ValueError("candidate check requires an active consultant run")
-        latest = RunReceipt.model_validate(latest_payload)
-        if latest.run_id != receipt.run_id or latest.status is not RunStatus.SOURCE_SAVED:
-            raise ValueError("candidate check does not match the active consultant run")
-        if receipt.baseline_revision != expected_revision:
-            raise ValueError("candidate check baseline revision is stale")
-        return {"checked_candidate": receipt.model_dump(mode="json")}
     receipt_payload = command.get("command_receipt")
     command_receipt = (
         CommandReceipt.model_validate(receipt_payload)
@@ -131,48 +108,6 @@ def _apply_command(
         if source_reference_payload is not None
         else None
     )
-    if action == "publish_checked_candidate":
-        receipt_payload = state.get("checked_candidate")
-        if receipt_payload is None:
-            raise ValueError("candidate publication has no checked candidate receipt")
-        receipt = CheckedCandidateReceipt.model_validate(receipt_payload)
-        requested_run_id = command.get("run_id")
-        if requested_run_id is not None and receipt.run_id != UUID(requested_run_id):
-            raise ValueError("candidate publication belongs to another consultant run")
-        if receipt.baseline_revision != expected_revision:
-            raise ValueError("candidate publication baseline revision is stale")
-        review_queue, interview_work = _publish_persisted_changeset(
-            document_id=document_id,
-            run_id=receipt.run_id,
-            read_revision=expected_revision,
-            state=state,
-            published_changeset=receipt.changeset,
-            interview_work=dict(state.get("interview_work", {})),
-        )
-        work, current_work_id = normalize_current_work(
-            interview_work,
-            preferred_work_id=(
-                UUID(state["current_work_id"])
-                if state.get("current_work_id") is not None
-                else None
-            ),
-            revision=expected_revision + 1,
-        )
-        update: ConsultantThreadState = {"revision": expected_revision + 1}
-        update.update(
-            {
-                "review_queue": review_queue,
-                "interview_work": work,
-                "current_work_id": current_work_id,
-                "checked_candidate": None,
-            }
-        )
-        if command_receipt is not None:
-            update["command_receipts"] = attach_command_receipt(
-                state,
-                command_receipt,
-            )
-        return update
     update: ConsultantThreadState = {
         "revision": expected_revision + 1,
     }
@@ -254,7 +189,6 @@ def _apply_command(
         if approved.document_id != document_id:
             raise ValueError("approved document does not match thread document_id")
         update["approved_document"] = approved.model_dump(mode="json")
-        update["checked_candidate"] = None
         invalidated = invalidate_sufficiency(
             state,
             revision=expected_revision + 1,
@@ -263,64 +197,13 @@ def _apply_command(
             update["sufficiency"] = invalidated
         return update
     if action == "direct_edit":
-        before = ApprovedJobDocument.model_validate(state["approved_document"])
         approved = ApprovedJobDocument.model_validate(command["approved_document"])
         if approved.document_id != document_id:
             raise ValueError("approved document does not match thread document_id")
         update.update(_source_state_update(state, source_reference))
         update["approved_document"] = approved.model_dump(mode="json")
-        update.update(
-            revalidate_after_direct_edit(
-                state,
-                before=before,
-                after=approved,
-                revision=expected_revision + 1,
-            )
-        )
-        update["checked_candidate"] = None
         work, current_work_id = normalize_current_work(
             update.get("interview_work", state.get("interview_work", {})),
-            preferred_work_id=(
-                UUID(state["current_work_id"])
-                if state.get("current_work_id") is not None
-                else None
-            ),
-            revision=expected_revision + 1,
-        )
-        update["interview_work"] = work
-        update["current_work_id"] = current_work_id
-        invalidated = invalidate_sufficiency(
-            state,
-            revision=expected_revision + 1,
-        )
-        if invalidated is not None:
-            update["sufficiency"] = invalidated
-        return update
-    if action in {
-        "accept_changes",
-        "edit_and_accept_changes",
-        "reject_changes",
-        "defer_changes",
-    }:
-        reviewed = apply_review_command(
-            state,
-            action=action,
-            changeset_id=UUID(command["changeset_id"]),
-            action_ids=tuple(UUID(item) for item in command["action_ids"]),
-            revision=expected_revision + 1,
-            edited_after_by_action_id={
-                UUID(key): value
-                for key, value in command.get(
-                    "edited_after_by_action_id", {}
-                ).items()
-            },
-            rejection_reason=command.get("rejection_reason"),
-            source_reference=source_reference,
-        )
-        update.update(_source_state_update(state, source_reference))
-        update.update(reviewed)
-        work, current_work_id = normalize_current_work(
-            reviewed["interview_work"],
             preferred_work_id=(
                 UUID(state["current_work_id"])
                 if state.get("current_work_id") is not None
@@ -341,22 +224,14 @@ def _apply_command(
         if source_reference is not None:
             raise ValueError("model semantic commit cannot mint employee evidence")
         commit = VerifiedConsultantCommit.model_validate(command["semantic_commit"])
-        published_changeset = _published_candidate_changeset(
-            state,
-            commit=commit,
-            expected_revision=expected_revision,
-        )
         update.update(
             apply_verified_consultant_commit(
                 state,
                 document_id=document_id,
                 revision=expected_revision + 1,
                 commit=commit,
-                published_changeset=published_changeset,
             )
         )
-        if commit.result.candidate_publication is not None:
-            update["checked_candidate"] = None
         return update
     if action == "decide_understanding_calibration":
         calibration_id = UUID(command["calibration_id"])
@@ -389,34 +264,6 @@ def _apply_command(
         )
         return update
     raise ValueError(f"unsupported consultant command: {action}")
-
-
-def _published_candidate_changeset(
-    state: ConsultantThreadState,
-    *,
-    commit: VerifiedConsultantCommit,
-    expected_revision: int,
-):
-    publication = commit.result.candidate_publication
-    if publication is None:
-        return None
-    receipt_payload = state.get("checked_candidate")
-    if receipt_payload is None:
-        raise ValueError("candidate publication has no checked candidate receipt")
-    receipt = CheckedCandidateReceipt.model_validate(receipt_payload)
-    if receipt.run_id != commit.run_id:
-        raise ValueError("candidate publication belongs to another consultant run")
-    if receipt.baseline_revision != expected_revision:
-        raise ValueError("candidate publication baseline revision is stale")
-    if receipt.candidate_revision != publication.candidate_revision:
-        raise ValueError("candidate publication does not reference the latest revision")
-    if receipt.resource_digest != publication.revision_digest:
-        raise ValueError("candidate publication digest does not match latest revision")
-    if receipt.action_handles != publication.action_handles:
-        raise ValueError("candidate publication action handles do not match latest revision")
-    if not set(receipt.used_skill_ids) <= set(commit.result.used_skill_ids):
-        raise ValueError("candidate publication used Skills missing from final result")
-    return receipt.changeset
 
 
 def build_consultant_graph(checkpointer: Any, store: Any) -> Any:

@@ -96,7 +96,6 @@ def test_evidence_reference_resolves_to_durable_quote_anchor() -> None:
     source = _source()
     catalog = WorkspaceCatalog.from_snapshot(
         ApprovedJobDocument(document_id=DOCUMENT_ID),
-        pending=(),
         sources=(source,),
     )
     reference = WorkspaceEvidenceReference(
@@ -124,7 +123,6 @@ def test_evidence_reference_rejects_source_from_another_document() -> None:
     )
     catalog = WorkspaceCatalog.from_snapshot(
         ApprovedJobDocument(document_id=DOCUMENT_ID),
-        pending=(),
         sources=(foreign_source,),
     )
     reference = WorkspaceEvidenceReference(
@@ -145,7 +143,6 @@ def test_evidence_reference_rejects_superseded_source() -> None:
     )
     catalog = WorkspaceCatalog.from_snapshot(
         ApprovedJobDocument(document_id=DOCUMENT_ID),
-        pending=(),
         sources=(superseded,),
     )
     reference = WorkspaceEvidenceReference(
@@ -162,7 +159,6 @@ def test_evidence_resolver_rejects_provider_wire_reference_type() -> None:
     source = _source()
     catalog = WorkspaceCatalog.from_snapshot(
         ApprovedJobDocument(document_id=DOCUMENT_ID),
-        pending=(),
         sources=(source,),
     )
     reference = OutputEvidenceReference(
@@ -180,7 +176,6 @@ def test_evidence_resolver_rejects_reversed_argument_types() -> None:
     source = _source()
     catalog = WorkspaceCatalog.from_snapshot(
         ApprovedJobDocument(document_id=DOCUMENT_ID),
-        pending=(),
         sources=(source,),
     )
     reference = WorkspaceEvidenceReference(

@@ -1,8 +1,8 @@
 """Employee-facing semantic review derived from approved and workspace state.
 
 The workspace remains a non-authoritative draft.  This module creates an
-ephemeral review projection; it never writes the workspace, review queue, or
-approved document.
+ephemeral review projection; authority commits are performed separately by
+the workspace authority service.
 """
 
 from __future__ import annotations
@@ -18,7 +18,12 @@ from uuid import UUID, uuid5
 
 from pydantic import JsonValue
 
-from app.consultant.document_review import create_document_changeset
+from app.consultant.document_authority import (
+    DocumentAuthorityError,
+    apply_document_actions,
+    document_path_sha256,
+    read_document_path,
+)
 from app.consultant.results import (
     AnalysisBasis,
     DocumentChangeOperation,
@@ -34,7 +39,9 @@ from app.consultant.state import (
     ApprovedTask,
     DocumentChangeSet,
     DocumentChangeStatus,
+    DocumentPathRead,
     DocumentPatchAction,
+    DocumentPatchOperation,
 )
 from app.consultant.workspace_state import (
     Sha256Digest,
@@ -78,6 +85,15 @@ _EDITABLE_OPKS_KINDS = {
     ApprovedOpksKind.PERFORMANCE_INDICATOR,
     ApprovedOpksKind.KNOWLEDGE,
     ApprovedOpksKind.SKILL,
+}
+_COLLECTION_ID_FIELDS = {
+    "/duties": "duty_id",
+    "/tasks": "task_id",
+    "/opks": "item_id",
+}
+_STRUCTURAL_OPERATIONS = {
+    DocumentPatchOperation.WITHDRAW,
+    DocumentPatchOperation.REASSIGN,
 }
 
 
@@ -197,7 +213,7 @@ def _entity_maps(document: ApprovedJobDocument) -> tuple[
 
 def _next_orders(
     document: ApprovedJobDocument,
-    candidate: ApprovedJobDocument,
+    working_document: ApprovedJobDocument,
 ) -> dict[str, dict[UUID, int]]:
     result: dict[str, dict[UUID, int]] = {
         "duties": {},
@@ -210,8 +226,8 @@ def _next_orders(
     baseline_duties = {item.duty_id for item in document.duties}
     baseline_tasks = {item.task_id for item in document.tasks}
     for collection, values, baseline_ids in (
-        ("duties", candidate.duties, baseline_duties),
-        ("tasks", candidate.tasks, baseline_tasks),
+        ("duties", working_document.duties, baseline_duties),
+        ("tasks", working_document.tasks, baseline_tasks),
     ):
         next_order = max(
             (item.display_order for item in getattr(document, collection)), default=-1
@@ -230,7 +246,7 @@ def _next_orders(
         for item in sorted(
             (
                 item
-                for item in candidate.opks
+                for item in working_document.opks
                 if item.kind is kind and item.item_id not in baseline_ids
             ),
             key=lambda item: (item.display_order, str(item.item_id)),
@@ -313,15 +329,15 @@ def _opks_basis(
 def derive_semantic_changes(
     *,
     baseline: ApprovedJobDocument,
-    candidate: ApprovedJobDocument,
-    candidate_handles: Mapping[UUID, str],
+    working_document: ApprovedJobDocument,
+    workspace_handles: Mapping[UUID, str],
     evidence: Mapping[str, tuple[AnalysisBasis, ...]],
     default_basis: AnalysisBasis,
 ) -> tuple[ReviewableDocumentChange, ...]:
     """Return canonical semantic changes; formatting and key order are absent."""
 
     baseline_duties, baseline_tasks, baseline_opks = _entity_maps(baseline)
-    candidate_duties, candidate_tasks, candidate_opks = _entity_maps(candidate)
+    working_duties, working_tasks, working_opks = _entity_maps(working_document)
     changes: list[ReviewableDocumentChange] = []
 
     def add(**kwargs: Any) -> None:
@@ -330,36 +346,36 @@ def derive_semantic_changes(
         )
 
     baseline_header = baseline.model_dump(mode="json")
-    candidate_header = candidate.model_dump(mode="json")
+    working_header = working_document.model_dump(mode="json")
     for field in _HEADER_FIELDS:
-        if baseline_header[field] != candidate_header[field]:
+        if baseline_header[field] != working_header[field]:
             add(
                 operation=DocumentChangeOperation.REVISE,
                 path=f"/{field}",
-                after=candidate_header[field],
+                after=working_header[field],
                 basis=default_basis,
             )
 
-    orders = _next_orders(baseline, candidate)
-    for identity in sorted(set(baseline_duties) - set(candidate_duties), key=str):
+    orders = _next_orders(baseline, working_document)
+    for identity in sorted(set(baseline_duties) - set(working_duties), key=str):
         add(
             operation=DocumentChangeOperation.WITHDRAW,
             path=f"/duties/{identity}",
             basis=default_basis,
         )
-    for identity in sorted(set(candidate_duties) - set(baseline_duties), key=str):
+    for identity in sorted(set(working_duties) - set(baseline_duties), key=str):
         add(
             operation=DocumentChangeOperation.ADD,
             path="/duties",
             after=_normalized_entity_after(
-                candidate_duties[identity], baseline=baseline, orders=orders
+                working_duties[identity], baseline=baseline, orders=orders
             ),
             basis=default_basis,
         )
-    for identity in sorted(set(baseline_duties) & set(candidate_duties), key=str):
+    for identity in sorted(set(baseline_duties) & set(working_duties), key=str):
         before, after = (
             _model_json(baseline_duties[identity]),
-            _model_json(candidate_duties[identity]),
+            _model_json(working_duties[identity]),
         )
         for field in _DUTY_FIELDS:
             if before[field] != after[field]:
@@ -377,25 +393,25 @@ def derive_semantic_changes(
                 basis=default_basis,
             )
 
-    for identity in sorted(set(baseline_tasks) - set(candidate_tasks), key=str):
+    for identity in sorted(set(baseline_tasks) - set(working_tasks), key=str):
         add(
             operation=DocumentChangeOperation.WITHDRAW,
             path=f"/tasks/{identity}",
             basis=default_basis,
         )
-    for identity in sorted(set(candidate_tasks) - set(baseline_tasks), key=str):
+    for identity in sorted(set(working_tasks) - set(baseline_tasks), key=str):
         add(
             operation=DocumentChangeOperation.ADD,
             path="/tasks",
             after=_normalized_entity_after(
-                candidate_tasks[identity], baseline=baseline, orders=orders
+                working_tasks[identity], baseline=baseline, orders=orders
             ),
             basis=default_basis,
         )
-    for identity in sorted(set(baseline_tasks) & set(candidate_tasks), key=str):
+    for identity in sorted(set(baseline_tasks) & set(working_tasks), key=str):
         before, after = (
             _model_json(baseline_tasks[identity]),
-            _model_json(candidate_tasks[identity]),
+            _model_json(working_tasks[identity]),
         )
         for field in _TASK_FIELDS:
             if before[field] == after[field]:
@@ -418,7 +434,7 @@ def derive_semantic_changes(
                 basis=default_basis,
             )
 
-    for identity in sorted(set(baseline_opks) - set(candidate_opks), key=str):
+    for identity in sorted(set(baseline_opks) - set(working_opks), key=str):
         item = baseline_opks[identity]
         if item.kind in _EDITABLE_OPKS_KINDS:
             add(
@@ -427,13 +443,13 @@ def derive_semantic_changes(
                 basis=default_basis,
                 opks_kind=OpksKind(item.kind.value),
             )
-    for identity in sorted(set(candidate_opks) - set(baseline_opks), key=str):
-        item = candidate_opks[identity]
+    for identity in sorted(set(working_opks) - set(baseline_opks), key=str):
+        item = working_opks[identity]
         if item.kind not in _EDITABLE_OPKS_KINDS:
             continue
         basis = _opks_basis(
             item=item,
-            handle=candidate_handles.get(identity, ""),
+            handle=workspace_handles.get(identity, ""),
             bindings=evidence,
             default=default_basis,
             changed=True,
@@ -449,15 +465,15 @@ def derive_semantic_changes(
             task_ids=item.task_ids,
             indicator_ids=item.indicator_ids,
         )
-    for identity in sorted(set(baseline_opks) & set(candidate_opks), key=str):
-        before_item, after_item = baseline_opks[identity], candidate_opks[identity]
+    for identity in sorted(set(baseline_opks) & set(working_opks), key=str):
+        before_item, after_item = baseline_opks[identity], working_opks[identity]
         if before_item.kind not in _EDITABLE_OPKS_KINDS:
             continue
         before, after = _model_json(before_item), _model_json(after_item)
         changed = any(before[field] != after[field] for field in _OPKS_FIELDS)
         basis = _opks_basis(
             item=after_item,
-            handle=candidate_handles.get(identity, ""),
+            handle=workspace_handles.get(identity, ""),
             bindings=evidence,
             default=default_basis,
             changed=changed,
@@ -486,6 +502,419 @@ def derive_semantic_changes(
     return tuple(changes)
 
 
+def _canonical_semantic_after(change: ReviewableDocumentChange) -> bytes:
+    ignored_keys = {"evidence_source_ids"}
+    if change.operation is DocumentChangeOperation.ADD:
+        ignored_keys.add("display_order")
+        id_field = _COLLECTION_ID_FIELDS.get(change.path)
+        if id_field is not None:
+            ignored_keys.add(id_field)
+    semantic = (
+        {
+            key: item
+            for key, item in change.after.items()
+            if key not in ignored_keys
+        }
+        if isinstance(change.after, dict)
+        else change.after
+    )
+    return json.dumps(
+        semantic,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+
+
+def _logical_linkage_key(change: ReviewableDocumentChange) -> str:
+    return json.dumps(
+        {
+            "indicator_ids": sorted(str(item) for item in change.indicator_ids),
+            "task_ids": sorted(str(item) for item in change.task_ids),
+        },
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+
+def _target_key(change: ReviewableDocumentChange) -> str:
+    canonical = _canonical_semantic_after(change)
+    linkage = _logical_linkage_key(change)
+    axis = change.opks_kind.value if change.opks_kind is not None else "none"
+    return (
+        f"{change.operation.value}:{change.path}:{axis}:{linkage}:"
+        f"{sha256(canonical).hexdigest()}"
+    )
+
+
+def _normalized_after(
+    change: ReviewableDocumentChange,
+    *,
+    document_id: UUID,
+    identity_scope: str,
+    change_index: int,
+    allocated_display_order: int | None,
+) -> JsonValue | None:
+    value = change.after
+    id_field = _COLLECTION_ID_FIELDS.get(change.path)
+    generated_id = str(
+        uuid5(document_id, f"{identity_scope}:document-entity:{change_index}:0")
+    )
+    if (
+        change.path in {"/duties", "/tasks"}
+        and change.operation is DocumentChangeOperation.ADD
+        and isinstance(value, dict)
+        and value.get("display_order") is None
+    ):
+        if allocated_display_order is None:
+            raise ValueError("new workspace entity requires an allocated order")
+        value = {**value, "display_order": allocated_display_order}
+    if (
+        change.path == "/opks"
+        and change.operation is DocumentChangeOperation.ADD
+        and (isinstance(value, str) or isinstance(value, dict))
+    ):
+        if change.opks_kind is None:
+            raise ValueError("OPKS add requires an OPKS kind")
+        if allocated_display_order is None:
+            raise ValueError("new OPKS item requires an allocated order")
+        value = (
+            {
+                "item_id": generated_id,
+                "text": value,
+                "display_order": allocated_display_order,
+            }
+            if isinstance(value, str)
+            else {**value, "display_order": allocated_display_order}
+        )
+    if (
+        id_field is not None
+        and change.operation is DocumentChangeOperation.ADD
+        and isinstance(value, dict)
+        and value.get(id_field) is None
+    ):
+        value = {**value, id_field: generated_id}
+    if not change.path.startswith("/opks"):
+        return value
+    if change.operation is DocumentChangeOperation.ADD:
+        if not isinstance(value, dict) or change.opks_kind is None:
+            raise ValueError("OPKS add requires a complete typed object")
+        return {
+            **value,
+            "kind": change.opks_kind.value,
+            "task_ids": [str(item) for item in change.task_ids],
+            "indicator_ids": [str(item) for item in change.indicator_ids],
+            "evidence_source_ids": [str(source) for source in change.basis.source_ids],
+        }
+    return value
+
+
+def _ensure_opks_axis_matches_document(
+    change: ReviewableDocumentChange,
+    document: ApprovedJobDocument,
+) -> None:
+    if not change.path.startswith("/opks") or change.opks_kind is None:
+        return
+    parts = change.path.strip("/").split("/")
+    if len(parts) < 2:
+        return
+    known = {str(item.item_id): item.kind.value for item in document.opks}
+    actual = known.get(parts[1])
+    if actual is not None and actual != change.opks_kind.value:
+        raise ValueError("workspace OPKS change does not match the existing axis")
+
+
+def _read_paths(
+    change: ReviewableDocumentChange,
+    normalized_after: JsonValue | None,
+) -> tuple[str, ...]:
+    del normalized_after
+    return (change.path,)
+
+
+def _before_value(
+    document: ApprovedJobDocument,
+    change: ReviewableDocumentChange,
+) -> JsonValue | None:
+    if change.operation is DocumentChangeOperation.ADD:
+        return None
+    return read_document_path(document, change.path)
+
+
+def _replacement_entities(action: DocumentPatchAction) -> tuple[dict[str, Any], ...]:
+    if action.operation is DocumentPatchOperation.ADD and isinstance(action.after, dict):
+        return (action.after,)
+    return ()
+
+
+def _entity_collection(path: str) -> str | None:
+    root = "/" + path.lstrip("/").split("/", 1)[0]
+    return root if root in _COLLECTION_ID_FIELDS else None
+
+
+def _entity_target_from_path(path: str) -> tuple[str, str] | None:
+    parts = path.strip("/").split("/")
+    collection = "/" + parts[0] if parts else ""
+    if collection not in _COLLECTION_ID_FIELDS or len(parts) < 2:
+        return None
+    try:
+        UUID(parts[1])
+    except ValueError:
+        return None
+    return collection, parts[1]
+
+
+def _action_affects_entity(
+    action: DocumentPatchAction,
+    collection: str,
+    identity: str,
+) -> bool:
+    return _entity_target_from_path(action.path) == (collection, identity)
+
+
+def _link_required_groups(
+    document_id: UUID,
+    identity_scope: str,
+    document: ApprovedJobDocument,
+    actions: list[DocumentPatchAction],
+) -> list[DocumentPatchAction]:
+    creators: dict[tuple[str, str], int] = {}
+    for index, action in enumerate(actions):
+        collection = _entity_collection(action.path)
+        id_field = _COLLECTION_ID_FIELDS.get(collection or "")
+        for entity in _replacement_entities(action):
+            if collection is not None and id_field is not None and entity.get(id_field) is not None:
+                creators[(collection, str(entity[id_field]))] = index
+
+    index_by_action_id = {action.action_id: index for index, action in enumerate(actions)}
+    dependencies: dict[int, set[int]] = {index: set() for index in range(len(actions))}
+    atomic_links: set[tuple[int, int]] = set()
+    for index, action in enumerate(actions):
+        for dependency_id in action.depends_on_action_ids:
+            dependency_index = index_by_action_id.get(dependency_id)
+            if dependency_index is not None and dependency_index != index:
+                dependencies[index].add(dependency_index)
+    grouped_by_explicit_id: dict[UUID, list[int]] = {}
+    for index, action in enumerate(actions):
+        if action.atomic_subgroup_id is not None:
+            grouped_by_explicit_id.setdefault(action.atomic_subgroup_id, []).append(index)
+    for members in grouped_by_explicit_id.values():
+        for member in members[1:]:
+            atomic_links.add((members[0], member))
+
+    def depend(consumer: int, prerequisite: int) -> None:
+        if consumer != prerequisite:
+            dependencies[consumer].add(prerequisite)
+
+    for index, action in enumerate(actions):
+        if action.path.startswith("/tasks"):
+            duty_id = action.after if action.operation is DocumentPatchOperation.REASSIGN else (
+                action.after.get("duty_id") if isinstance(action.after, dict) else None
+            )
+            creator = creators.get(("/duties", str(duty_id))) if duty_id is not None else None
+            if creator is not None:
+                depend(index, creator)
+                if action.operation is DocumentPatchOperation.REASSIGN:
+                    atomic_links.add((index, creator))
+        if action.path.startswith("/opks") and isinstance(action.after, (dict, list)):
+            values = action.after if isinstance(action.after, list) else [action.after]
+            for value in values:
+                if not isinstance(value, dict):
+                    continue
+                for task_id in value.get("task_ids", []):
+                    creator = creators.get(("/tasks", str(task_id)))
+                    if creator is not None:
+                        depend(index, creator)
+                for indicator_id in value.get("indicator_ids", []):
+                    creator = creators.get(("/opks", str(indicator_id)))
+                    if creator is not None:
+                        depend(index, creator)
+        if action.path.endswith("/task_ids") and isinstance(action.after, list):
+            for task_id in action.after:
+                creator = creators.get(("/tasks", str(task_id)))
+                if creator is not None:
+                    depend(index, creator)
+                    atomic_links.add((index, creator))
+        if action.path.endswith("/indicator_ids") and isinstance(action.after, list):
+            for indicator_id in action.after:
+                creator = creators.get(("/opks", str(indicator_id)))
+                if creator is not None:
+                    depend(index, creator)
+                    atomic_links.add((index, creator))
+
+    removed: list[tuple[int, str, str]] = []
+    for index, action in enumerate(actions):
+        target = _entity_target_from_path(action.path)
+        if action.operation is DocumentPatchOperation.WITHDRAW and target is not None:
+            removed.append((index, *target))
+    payload = document.model_dump(mode="json")
+    for structural_index, collection, identity in removed:
+        if collection == "/duties":
+            dependent_entities = [
+                ("/tasks", str(item["task_id"]))
+                for item in payload["tasks"]
+                if str(item.get("duty_id")) == identity
+            ]
+        elif collection == "/tasks":
+            dependent_entities = [
+                ("/opks", str(item["item_id"]))
+                for item in payload["opks"]
+                if identity in {str(value) for value in item.get("task_ids", [])}
+            ]
+        else:
+            dependent_entities = [
+                ("/opks", str(item["item_id"]))
+                for item in payload["opks"]
+                if identity in {str(value) for value in item.get("indicator_ids", [])}
+            ]
+        for collection_name, dependent_identity in dependent_entities:
+            for mutator, action_item in enumerate(actions):
+                if _action_affects_entity(action_item, collection_name, dependent_identity):
+                    atomic_links.add((structural_index, mutator))
+
+    adjacency: dict[int, set[int]] = {index: set() for index in dependencies}
+    for left, right in atomic_links:
+        adjacency[left].add(right)
+        adjacency[right].add(left)
+    grouped = list(actions)
+    visited: set[int] = set()
+    for start in range(len(actions)):
+        if start in visited:
+            continue
+        stack = [start]
+        component: set[int] = set()
+        while stack:
+            current = stack.pop()
+            if current in component:
+                continue
+            component.add(current)
+            stack.extend(adjacency[current] - component)
+        visited.update(component)
+        requires_group = len(component) > 1
+        group_id = (
+            uuid5(document_id, f"{identity_scope}:atomic-component:{','.join(map(str, sorted(component)))}")
+            if requires_group
+            else None
+        )
+        for index in component:
+            action = grouped[index]
+            grouped[index] = action.model_copy(
+                update={
+                    "atomic_subgroup_id": group_id,
+                    "depends_on_action_ids": tuple(
+                        sorted(
+                            set(action.depends_on_action_ids)
+                            | {grouped[prerequisite].action_id for prerequisite in dependencies[index]},
+                            key=str,
+                        )
+                    ),
+                }
+            )
+    return grouped
+
+
+def create_workspace_changeset(
+    *,
+    document_id: UUID,
+    summary: str,
+    read_revision: int,
+    document: ApprovedJobDocument,
+    changes: Sequence[ReviewableDocumentChange],
+    identity_scope: str,
+    external_dependency_action_ids: Sequence[UUID] = (),
+) -> DocumentChangeSet:
+    """Build a replay-stable workspace review changeset without another lifecycle."""
+
+    if not changes:
+        raise ValueError("cannot create an empty workspace changeset")
+    if document.document_id != document_id:
+        raise ValueError("workspace review document scope does not match")
+    next_display_orders = {
+        "/duties": max((item.display_order for item in document.duties), default=-1) + 1,
+        "/tasks": max((item.display_order for item in document.tasks), default=-1) + 1,
+    }
+    for item in document.opks:
+        key = f"/opks:{item.kind.value}"
+        next_display_orders[key] = max(next_display_orders.get(key, 0), item.display_order + 1)
+    action_ids_by_change_ref = {
+        change.change_ref: uuid5(document_id, f"{identity_scope}:patch-action:{index}")
+        for index, change in enumerate(changes)
+        if change.change_ref
+    }
+    actions: list[DocumentPatchAction] = []
+    for index, change in enumerate(changes):
+        _ensure_opks_axis_matches_document(change, document)
+        order_key: str | None = None
+        if change.operation is DocumentChangeOperation.ADD:
+            if change.path in {"/duties", "/tasks"} and isinstance(change.after, dict) and change.after.get("display_order") is None:
+                order_key = change.path
+            elif change.path == "/opks" and change.opks_kind is not None and isinstance(change.after, (str, dict)):
+                if isinstance(change.after, str) or change.after.get("display_order") is None:
+                    order_key = f"/opks:{change.opks_kind.value}"
+        allocated = next_display_orders.get(order_key, 0) if order_key is not None else None
+        if order_key is not None:
+            next_display_orders[order_key] = allocated + 1
+        after = _normalized_after(
+            change,
+            document_id=document_id,
+            identity_scope=identity_scope,
+            change_index=index,
+            allocated_display_order=allocated,
+        )
+        operation = DocumentPatchOperation(change.operation.value)
+        action = DocumentPatchAction(
+            action_id=uuid5(document_id, f"{identity_scope}:patch-action:{index}"),
+            operation=operation,
+            path=change.path,
+            target_key=_target_key(change),
+            before=_before_value(document, change),
+            after=after,
+            source_ids=tuple(sorted(change.basis.source_ids, key=str)),
+            quote_anchors=change.basis.quote_anchors,
+            read_set=tuple(
+                DocumentPathRead(path=path, value_sha256=document_path_sha256(document, path))
+                for path in _read_paths(change, after)
+            ),
+            depends_on_action_ids=tuple(
+                sorted(
+                    {
+                        *(
+                            action_ids_by_change_ref[change_ref]
+                            for change_ref in change.depends_on_change_refs
+                        ),
+                        *change.depends_on_action_ids,
+                    },
+                    key=str,
+                )
+            ),
+            supersedes_action_ids=change.supersedes_action_ids,
+            atomic_subgroup_id=(
+                uuid5(document_id, f"{identity_scope}:atomic-ref:{change.atomic_group_ref}")
+                if change.atomic_group_ref
+                else None
+            ),
+            blocks_dependent_analysis=(
+                operation in _STRUCTURAL_OPERATIONS
+                or change.path.endswith("/responsibility_role")
+            ),
+        )
+        actions.append(action)
+    actions = _link_required_groups(document_id, identity_scope, document, actions)
+    try:
+        apply_document_actions(document, tuple(actions))
+    except DocumentAuthorityError as error:
+        raise ValueError(f"workspace changes do not form a valid review state: {error}") from error
+    return DocumentChangeSet(
+        changeset_id=uuid5(document_id, f"{identity_scope}:document-changes"),
+        summary=summary,
+        actions=tuple(actions),
+        source_ids=tuple(sorted({source_id for action in actions for source_id in action.source_ids}, key=str)),
+        created_revision=read_revision,
+        external_dependency_action_ids=tuple(dict.fromkeys(external_dependency_action_ids)),
+    )
+
+
 def _action_semantics(action: DocumentPatchAction) -> dict[str, Any]:
     return {
         "operation": action.operation.value,
@@ -493,7 +922,6 @@ def _action_semantics(action: DocumentPatchAction) -> dict[str, Any]:
         "target_key": action.target_key,
         "before": action.before,
         "after": action.after,
-        "target_ids": sorted(str(item) for item in action.target_ids),
     }
 
 
@@ -532,7 +960,7 @@ def _group_components(
             pending.extend(adjacency[current] - member_ids)
         visited.update(member_ids)
         components.append(
-            tuple(candidate for candidate in actions if candidate.action_id in member_ids)
+            tuple(action_item for action_item in actions if action_item.action_id in member_ids)
         )
     return tuple(
         component
@@ -736,7 +1164,7 @@ def _conflict_affects_action(
     if identity is None:
         return False
     handle = next(
-        (candidate for candidate, stable_id in entity_ids_by_handle.items() if stable_id == identity),
+        (handle for handle, stable_id in entity_ids_by_handle.items() if stable_id == identity),
         None,
     )
     if handle is None:
@@ -826,8 +1254,8 @@ def derive_workspace_review(
     }
     changes = derive_semantic_changes(
         baseline=approved,
-        candidate=valid_workspace.document.approved_document,
-        candidate_handles=handles_by_id,
+        working_document=valid_workspace.document.approved_document,
+        workspace_handles=handles_by_id,
         evidence=valid_workspace.evidence_by_handle,
         default_basis=valid_workspace.default_basis,
     )
@@ -836,21 +1264,12 @@ def derive_workspace_review(
             workspace_digest=manifest.resource_digest,
             entity_ids_by_handle=manifest.entity_ids_by_handle,
         )
-    provisional_run = uuid5(
-        approved.document_id,
-        "workspace-review-provisional:"
-        f"{manifest.approved_baseline_revision}:"
-        f"{manifest.generation}:{manifest.resource_digest}",
-    )
-    provisional = create_document_changeset(
+    provisional = create_workspace_changeset(
         document_id=approved.document_id,
-        run_id=provisional_run,
         summary="Workspace semantic review",
         read_revision=manifest.approved_baseline_revision,
         document=approved,
         changes=changes,
-        existing_review_queue={},
-        interview_work={},
         identity_scope=(
             "consultant:workspace-review:"
             f"revision={manifest.approved_baseline_revision}:"

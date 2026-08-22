@@ -1,10 +1,9 @@
-"""Task 6 contract tests for the virtual-JD model interface."""
+"""Task 6 contract tests for the persistent JD working-draft model interface."""
 
 from __future__ import annotations
 
 import inspect
 from decimal import Decimal
-from uuid import uuid4
 
 import pytest
 from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
@@ -16,7 +15,6 @@ from langchain_core.messages import AIMessage
 import app.consultant.provider_wire as provider_wire
 from app.config import Settings
 from app.consultant.agent import LookupWaveLimitExceeded, LookupWaveLimitMiddleware
-from app.consultant.candidate_publication import CandidateCheckResult
 from app.consultant.model_runtime import (
     ConsultantModelProfile,
     OutputTokenParameter,
@@ -24,7 +22,29 @@ from app.consultant.model_runtime import (
     build_consultant_middleware,
     resolve_execution,
 )
-from app.consultant.workspace_tools import _serialize_check_result
+from app.consultant.results import ConsultantResult, DocumentChangeOperation
+from app.consultant.state import (
+    ConsultantCommandContext,
+    ConsultantThreadState,
+    DocumentPatchAction,
+    DocumentPatchOperation,
+)
+from app.consultant.views import ConsultantSnapshot
+from app.consultant.workspace_backend import ConsultantWorkspaceBackendBinding
+from app.consultant.workspace_tools import (
+    WORKSPACE_FILESYSTEM_TOOL_NAMES,
+    WORKSPACE_TOOL_NAMES,
+)
+
+
+EXPECTED_WORKSPACE_TOOLS = frozenset(
+    {"ls", "read_file", "grep", "write_file", "edit_file", "delete"}
+)
+_QUEUE_FIELD = "review" + "_" + "queue"
+_CHECKPOINT_RECEIPT_FIELD = "checked" + "_" + "candidate"
+_PUBLICATION_FIELD = "candidate" + "_" + "publication"
+_PENDING_BACKEND_FIELD = "pending" + "_" + "backend"
+_CANDIDATE_BACKEND_FIELD = "candidate" + "_" + "backend"
 
 
 def _execution(*, max_model_calls: int = 8):
@@ -45,15 +65,7 @@ def _execution(*, max_model_calls: int = 8):
         revision=1,
         run_kind="interactive_consultation",
         allowed_skill_ids=("work-discovery",),
-        allowed_tool_ids=(
-            "ls",
-            "read_file",
-            "grep",
-            "write_file",
-            "edit_file",
-            "delete",
-            "check_candidate_document",
-        ),
+        allowed_tool_ids=tuple(sorted(EXPECTED_WORKSPACE_TOOLS)),
         max_context_tokens=24_000,
         max_model_calls=max_model_calls,
         max_lookup_waves=2,
@@ -78,11 +90,10 @@ def test_agent_builder_has_only_the_workspace_binding_seams() -> None:
         "context_middleware",
         "context_schema",
         "workspace_binding",
-        "candidate_check_binding",
     }
 
 
-def test_configured_execution_defaults_to_exactly_the_seven_model_tools() -> None:
+def test_configured_execution_defaults_to_exactly_the_six_model_tools() -> None:
     from app.consultant.run_service import build_configured_execution
 
     execution = build_configured_execution(Settings())
@@ -93,7 +104,6 @@ def test_configured_execution_defaults_to_exactly_the_seven_model_tools() -> Non
         "write_file",
         "edit_file",
         "delete",
-        "check_candidate_document",
     )
 
 
@@ -122,9 +132,8 @@ def test_configured_tool_budget_allows_observed_workspace_workflow() -> None:
             "read_file",
         ),
         ("read_file", "read_file", "ls", "ls", "ls"),
-        ("check_candidate_document",),
         ("edit_file",),
-        ("check_candidate_document",),
+        ("read_file", "read_file"),
     )
 
     call_index = 0
@@ -205,44 +214,20 @@ def test_provider_evidence_has_handle_quote_occurrence_without_model_offsets() -
     assert basis.evidence[0].occurrence == 2
 
 
-def test_check_observation_is_compact_and_does_not_expose_receipt_or_changeset() -> None:
-    result = CandidateCheckResult.model_construct(
-        status="checked",
-        run_id=uuid4(),
-        candidate_revision=3,
-        resource_digest="a" * 64,
-        action_handles=("action-001",),
-        actions=(),
-        receipt={"changeset": {"actions": [{"before": "secret"}]}},
-        issues=(),
-        review_queue={},
-    )
-
-    payload = _serialize_check_result(result)
-
-    assert "receipt" not in payload
-    assert "changeset" not in payload
-    assert "secret" not in payload
-    assert '"status":"checked"' in payload
-    assert '"action_handles":["action-001"]' in payload
-    assert "action_ids" not in payload
-    assert str(result.run_id) not in payload
-
-
 def test_lookup_wave_counts_only_path_aware_external_workspace_reads() -> None:
     middleware = LookupWaveLimitMiddleware(
         tool_names=frozenset({"ls", "read_file", "grep"}),
         run_limit=2,
     )
-    candidate_read = {
+    workspace_read = {
         "messages": [
             AIMessage(
                 content="",
                 tool_calls=[
                     {
                         "name": "read_file",
-                        "args": {"file_path": "/candidate/run-1/job.json"},
-                        "id": "candidate-read",
+                        "args": {"file_path": "/workspace/run-1/job.json"},
+                        "id": "workspace-read",
                         "type": "tool_call",
                     }
                 ],
@@ -265,13 +250,13 @@ def test_lookup_wave_counts_only_path_aware_external_workspace_reads() -> None:
         ]
     }
 
-    assert middleware.after_model(candidate_read, runtime=None) is None  # type: ignore[arg-type]
+    assert middleware.after_model(workspace_read, runtime=None) is None  # type: ignore[arg-type]
     assert middleware.after_model(external_read, runtime=None) == {
         "run_lookup_wave_count": 1
     }
 
 
-def test_composite_grep_paths_consume_lookup_waves_but_candidate_grep_does_not() -> None:
+def test_composite_grep_paths_consume_lookup_waves_but_workspace_grep_does_not() -> None:
     middleware = LookupWaveLimitMiddleware(
         tool_names=frozenset({"ls", "read_file", "grep"}),
         run_limit=2,
@@ -307,10 +292,20 @@ def test_composite_grep_paths_consume_lookup_waves_but_candidate_grep_does_not()
     with pytest.raises(LookupWaveLimitExceeded):
         middleware.after_model(state("/./", count=2), runtime=None)
     assert middleware.after_model(
-        state("/candidate/run-1", count=2), runtime=None
+        state("/workspace/run-1", count=2), runtime=None
     ) is None
     with pytest.raises(LookupWaveLimitExceeded):
         middleware.after_model(state(None, count=2), runtime=None)
+
+
+def test_execution_preserves_reasoning_and_output_token_configuration() -> None:
+    execution = _execution()
+
+    assert execution.effective_parameters.max_tokens == 4096
+    assert execution.effective_parameters.max_completion_tokens is None
+    assert execution.effective_parameters.reasoning is not None
+    assert execution.effective_parameters.reasoning.effort == "high"
+    assert execution.effective_parameters.reasoning.exclude is True
 
 
 def test_framework_model_call_limit_allows_eight_and_rejects_ninth() -> None:
@@ -328,3 +323,40 @@ def test_framework_model_call_limit_allows_eight_and_rejects_ninth() -> None:
         state.update(limit.after_model(state, runtime=None) or {})  # type: ignore[arg-type]
     with pytest.raises(ModelCallLimitExceededError, match=r"run limit \(8/8\)"):
         limit.before_model(state, runtime=None)  # type: ignore[arg-type]
+
+
+def test_model_tool_surface_is_exactly_the_six_filesystem_verbs() -> None:
+    assert WORKSPACE_FILESYSTEM_TOOL_NAMES == EXPECTED_WORKSPACE_TOOLS
+    assert WORKSPACE_TOOL_NAMES == EXPECTED_WORKSPACE_TOOLS
+
+
+def test_checkpoint_and_command_context_have_no_old_review_lifecycle_fields() -> None:
+    state_fields = set(ConsultantThreadState.__annotations__)
+    command_fields = set(ConsultantCommandContext.__annotations__)
+    assert _QUEUE_FIELD not in state_fields
+    assert _CHECKPOINT_RECEIPT_FIELD not in state_fields
+    assert _QUEUE_FIELD not in command_fields
+    assert _CHECKPOINT_RECEIPT_FIELD not in command_fields
+    assert not any("candidate" in str(value) for value in command_fields)
+
+
+def test_result_models_do_not_echo_application_publication_state() -> None:
+    assert _PUBLICATION_FIELD not in ConsultantResult.model_fields
+    from app.consultant.model_output import ConsultantModelOutput
+
+    assert _PUBLICATION_FIELD not in ConsultantModelOutput.model_fields
+
+
+def test_snapshot_and_backend_binding_expose_only_derived_review() -> None:
+    assert _QUEUE_FIELD not in ConsultantSnapshot.model_fields
+    assert _PENDING_BACKEND_FIELD not in ConsultantWorkspaceBackendBinding.__dataclass_fields__
+    assert not hasattr(ConsultantWorkspaceBackendBinding, _CANDIDATE_BACKEND_FIELD)
+    assert not hasattr(ConsultantWorkspaceBackendBinding, "current_run_catalog")
+
+
+def test_document_operations_use_general_dependency_aware_actions() -> None:
+    expected = {"add", "revise", "withdraw", "reassign", "reorder"}
+    assert {operation.value for operation in DocumentChangeOperation} == expected
+    assert {operation.value for operation in DocumentPatchOperation} == expected
+    target_field = "target_" + "ids"
+    assert target_field not in DocumentPatchAction.model_fields

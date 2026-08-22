@@ -25,9 +25,7 @@ from app.consultant.workspace_backend import ConsultantWorkspaceBackendBinding
 from app.consultant.workspace_tools import (
     WORKSPACE_FILESYSTEM_TOOL_NAMES,
     WORKSPACE_TOOL_DESCRIPTIONS,
-    CandidateCheckToolBinding,
     WorkspaceToolWaveMiddleware,
-    build_check_candidate_document_tool,
 )
 from app.consultant.workspace_validation import (
     WorkspaceValidationMiddleware,
@@ -40,19 +38,20 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 
 你是同一位專業職務分析顧問；下列 Skills 是可按需載入的方法，不是多個人格或固定階段。
 本輪只有列出的 Skills 可用。每個實際用來形成結果的 Skill，都必須先用 read_file 完整讀取一次；只能讀取列出的 /skills/<skill-id>/SKILL.md。
-先判斷現有 context 是否已足夠；足夠時不要為了展示而呼叫 Tool。/skills、/sources、/approved、/pending 是唯讀 workspace；/workspace 是同一份跨 turn 保留、non-authoritative 且唯一可編輯的工作草稿。只有前一波結果產生新的資料依賴時才使用第二波 lookup wave。
+先判斷現有 context 是否已足夠；足夠時不要為了展示而呼叫 Tool。/skills、/sources、/approved、/review 是唯讀；/workspace 是同一份跨 turn 保留、non-authoritative 且唯一可編輯的工作草稿。只有前一波結果產生新的資料依賴時才使用第二波 lookup wave。
 
 {skills_locations}{skills_load_warnings}
 
 **本輪可用 Skills：**
 {skills_list}
 
-讀完本輪實際選用的方法後，把它們共同整合成一份結構化顧問結果。員工畫面只呈現一位顧問、必要的待審文件變更與至多一個主要問題；不得把 Skill 編排暴露成員工要操作的流程。
+讀完本輪實際選用的方法後，把它們共同整合成一份結構化顧問結果。員工畫面只呈現一位顧問、必要的文件變更與至多一個主要問題；不得把 Skill 編排暴露成員工要操作的流程。
 
 **提交前的最小契約：**
-- 詳細 Current JD、pending review、員工來源與方法內容都從對應 VFS 路徑讀取；不要把整份資料複製到回覆或 context。
-- 直接續編 /workspace 下既有的 canonical resources；不得從 approved 複製或重建另一份草稿。編輯後必須在獨立 wave 呼叫 check_candidate_document，依 compact observation 修復問題。
-- Candidate JSON 的 Evidence 只填 `source_handle`、逐字 `quote`、`occurrence`（quote 唯一時填 null，重複時填 1-based 次序）與使用的 `skill_ids`；最終 structured output 才以 0 表示唯一 quote。不要填 offset、stable source UUID 或自行推導的位置。
+- 詳細 Current JD、/review、員工來源與方法內容都從對應 VFS 路徑讀取；不要把整份資料複製到回覆或 context。
+- 直接續編 /workspace 下既有的 canonical resources；不得從 approved 複製或重建另一份草稿。每一波編輯後 application 會自動驗證 workspace。
+- Workspace JSON 的 Evidence 只填 `source_handle`、逐字 `quote`、`occurrence`（quote 唯一時填 null，重複時填 1-based 次序）與使用的 `skill_ids`。不要填 offset、stable source UUID、workspace revision、digest 或 action handle。
+- /review 是 application 由 workspace 派生的 semantic review；只有員工決定後，authority 才能把內容整合進 approved。
 - O／P／K／S 文件變更必須以 canonical resource 的 task handle 連到 Task；不得提交沒有 Task linkage 的 O／P／K／S。
 - `question.kind=none` 時其他 question 欄位全為空、`basis_ordinal=0`。
 - 一般下一題（next）只填 `text`、`answer_target`、`reason`、`basis_ordinal`；`current_understanding、choices、affected_work_ids、affected_branch 全部留空`。
@@ -87,7 +86,7 @@ class LookupWaveLimitExceeded(RuntimeError):
 
 
 _LOOKUP_TOOL_NAMES = frozenset({"ls", "read_file", "grep"})
-_EXTERNAL_DATA_LOOKUP_ROOTS = ("/sources", "/approved", "/pending")
+_EXTERNAL_DATA_LOOKUP_ROOTS = ("/sources", "/approved", "/review")
 
 
 class LookupWaveState(AgentState):
@@ -289,7 +288,6 @@ def build_professional_consultant_agent(
     context_middleware: AgentMiddleware | None = None,
     context_schema: type[Any] | None = None,
     workspace_binding: ConsultantWorkspaceBackendBinding,
-    candidate_check_binding: CandidateCheckToolBinding,
 ) -> ProfessionalConsultantAgent:
     """Build the bounded agent using Deep Agents' Skill/read-file primitives."""
 
@@ -304,21 +302,14 @@ def build_professional_consultant_agent(
         raise ValueError("interactive consultant runs allow at most eleven model calls")
     if execution.max_lookup_waves > 2:
         raise ValueError("interactive consultant runs allow at most two lookup waves")
-    expected_tools = WORKSPACE_FILESYSTEM_TOOL_NAMES | {
-        "check_candidate_document"
-    }
+    expected_tools = WORKSPACE_FILESYSTEM_TOOL_NAMES
     if set(execution.allowed_tool_ids) != expected_tools:
         raise ValueError("resolved run policy must allow exactly the workspace Tool surface")
     if workspace_binding.skill_backend.selected_skill_ids != selected_skill_ids:
         raise ValueError("workspace Skill binding must match selected Skills")
-    if candidate_check_binding.workspace is not workspace_binding:
-        raise ValueError("candidate check binding must use the agent workspace")
 
     backend: BackendProtocol = workspace_binding.composite_backend
     receipt_backend = workspace_binding.skill_backend
-    check_tools = (
-        build_check_candidate_document_tool(binding=candidate_check_binding),
-    )
     skills = RunScopedSkillsMiddleware(
         backend=backend,
         receipt_backend=receipt_backend,
@@ -355,13 +346,13 @@ def build_professional_consultant_agent(
         model=model,
         execution=execution,
         response_schema=ConsultantModelOutput,
-        tools=check_tools,
+        tools=(),
         additional_middleware=(
             skills,
             files,
             lookup_cap,
             WorkspaceToolWaveMiddleware(
-                candidate_backend=workspace_binding.candidate_backend
+                workspace_backend=workspace_binding.workspace_backend
             ),
             validation,
         ),

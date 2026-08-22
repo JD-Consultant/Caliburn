@@ -2,26 +2,17 @@
 
 from __future__ import annotations
 
-import json
 from collections.abc import Awaitable, Callable, Mapping, Sequence
-from dataclasses import dataclass
-from typing import Any, Protocol
-from uuid import UUID
+from typing import Any
 
 from deepagents.backends.utils import validate_path
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ToolCallRequest
-from langchain.tools import ToolRuntime
 from langchain_core.messages import AIMessage, ToolMessage
-from langchain_core.tools import BaseTool, StructuredTool
 from langgraph.types import Command
-from pydantic import BaseModel, ConfigDict
 from typing_extensions import override
 
-from app.consultant.workspace_backend import (
-    ConsultantWorkspaceBackendBinding,
-    WorkspacePolicyBackend,
-)
+from app.consultant.workspace_backend import WorkspacePolicyBackend
 
 
 WORKSPACE_FILESYSTEM_TOOL_NAMES = frozenset(
@@ -30,10 +21,7 @@ WORKSPACE_FILESYSTEM_TOOL_NAMES = frozenset(
 WORKSPACE_MUTATION_TOOL_NAMES = frozenset(
     {"write_file", "edit_file", "delete"}
 )
-CHECK_CANDIDATE_DOCUMENT_TOOL_NAME = "check_candidate_document"
-WORKSPACE_TOOL_NAMES = frozenset(
-    {*WORKSPACE_FILESYSTEM_TOOL_NAMES, CHECK_CANDIDATE_DOCUMENT_TOOL_NAME}
-)
+WORKSPACE_TOOL_NAMES = WORKSPACE_FILESYSTEM_TOOL_NAMES
 WORKSPACE_TOOL_DESCRIPTIONS = {
     "ls": "List entries in the scoped virtual JD workspace using an absolute POSIX path.",
     "read_file": "Read one file from the scoped virtual JD workspace.",
@@ -55,156 +43,9 @@ WORKSPACE_TOOL_DESCRIPTIONS = {
 }
 
 
-class CandidateCheckPort(Protocol):
-    """Application-owned semantic check boundary for the candidate after-state."""
-
-    async def check_candidate_document(
-        self,
-        *,
-        document_id: UUID,
-        run_id: UUID,
-        files: Mapping[str, str],
-        tool_call_id: str,
-        selected_skill_ids: tuple[str, ...],
-        loaded_skill_ids: tuple[str, ...],
-    ) -> Any: ...
-
-
-@dataclass(frozen=True, slots=True)
-class CandidateCheckToolBinding:
-    """Bind the domain check to the one workspace/backend for a run."""
-
-    runtime: CandidateCheckPort
-    workspace: ConsultantWorkspaceBackendBinding
-    run_id: UUID | None = None
-
-    @property
-    def port(self) -> CandidateCheckPort:
-        """Name the application boundary without duplicating the binding."""
-
-        return self.runtime
-
-
-class _EmptyCandidateCheckInput(BaseModel):
-    model_config = ConfigDict(
-        extra="forbid",
-        frozen=True,
-        arbitrary_types_allowed=True,
-    )
-
-
-class _CandidateCheckToolInput(_EmptyCandidateCheckInput):
-    """Internal schema that receives LangChain's hidden ToolRuntime."""
-
-    runtime: ToolRuntime[Any, Any]
-
-
-class _CandidateCheckStructuredTool(StructuredTool):
-    """Expose no application or runtime arguments to the model."""
-
-    @property
-    def tool_call_schema(self) -> type[_EmptyCandidateCheckInput]:
-        return _EmptyCandidateCheckInput
-
-
-async def _current_workspace_files(
-    binding: CandidateCheckToolBinding,
-) -> dict[str, str]:
-    snapshot = await binding.workspace.workspace.read_snapshot()
-    files: dict[str, str] = {}
-    for raw_path, content in snapshot.files.items():
-        try:
-            canonical_path = binding.workspace.workspace_backend.validate_workspace_file_path(
-                raw_path
-            )
-        except ValueError as error:
-            raise RuntimeError(
-                f"check_candidate_document rejected workspace path {raw_path!r}: {error}"
-            ) from error
-        if canonical_path != raw_path:
-            raise RuntimeError(
-                f"check_candidate_document requires canonical workspace paths: {raw_path!r}"
-            )
-        files[canonical_path] = content
-    return dict(sorted(files.items()))
-
-
-def _serialize_check_result(result: Any) -> str:
-    if isinstance(result, str):
-        return result
-    from app.consultant.candidate_publication import CandidateCheckResult
-
-    if isinstance(result, CandidateCheckResult):
-        payload = {
-            "status": result.status,
-            "candidate_revision": result.candidate_revision,
-            "resource_digest": result.resource_digest,
-            "action_handles": list(result.action_handles),
-            "actions": [
-                {
-                    "operation": action.operation.value,
-                    "path": action.path,
-                    "target_key": action.target_key,
-                }
-                for action in result.actions
-            ],
-            "issues": list(result.issues),
-        }
-        return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
-    model_dump_json = getattr(result, "model_dump_json", None)
-    if callable(model_dump_json):
-        return str(model_dump_json())
-    model_dump = getattr(result, "model_dump", None)
-    if callable(model_dump):
-        result = model_dump(mode="json")
-    return json.dumps(result, ensure_ascii=False, separators=(",", ":"), default=str)
-
-
-def build_check_candidate_document_tool(
-    *,
-    binding: CandidateCheckToolBinding,
-) -> BaseTool:
-    """Build the payload-free async-only semantic check Tool for one workspace.
-
-    The production consultant invokes this Tool through ``ainvoke`` because its
-    CandidateCheckPort is async-only.
-    """
-
-    async def check_candidate_document(
-        runtime: ToolRuntime[Any, Any],
-    ) -> str:
-        if runtime.tool_call_id is None:
-            raise RuntimeError(
-                "check_candidate_document is missing its provider call ID"
-            )
-        if binding.run_id is None:
-            raise RuntimeError("check_candidate_document is missing its consultant run ID")
-        files = await _current_workspace_files(binding)
-        result = await binding.runtime.check_candidate_document(
-            document_id=binding.workspace.document_id,
-            run_id=binding.run_id,
-            files=files,
-            tool_call_id=runtime.tool_call_id,
-            selected_skill_ids=binding.workspace.skill_backend.selected_skill_ids,
-            loaded_skill_ids=binding.workspace.skill_backend.loaded_skill_ids,
-        )
-        return _serialize_check_result(result)
-
-    return _CandidateCheckStructuredTool(
-        name=CHECK_CANDIDATE_DOCUMENT_TOOL_NAME,
-        description=(
-            "Check the current candidate workspace after editor observations. "
-            "The application reads the current files and returns actionable "
-            "issues or a checked candidate receipt."
-        ),
-        args_schema=_CandidateCheckToolInput,
-        coroutine=check_candidate_document,
-    )
-
-
 def _tool_call_path(
     tool_call: Mapping[str, Any],
-    candidate_backend: WorkspacePolicyBackend,
+    workspace_backend: WorkspacePolicyBackend,
 ) -> str | None:
     args = tool_call.get("args")
     if not isinstance(args, Mapping):
@@ -214,14 +55,14 @@ def _tool_call_path(
         return None
     try:
         canonical_path = validate_path(path)
-        return candidate_backend.validate_workspace_file_path(canonical_path)
+        return workspace_backend.validate_workspace_file_path(canonical_path)
     except (TypeError, ValueError):
         return None
 
 
 def _ordered_mutation_paths(
     tool_calls: Sequence[Mapping[str, Any]],
-    candidate_backend: WorkspacePolicyBackend,
+    workspace_backend: WorkspacePolicyBackend,
 ) -> list[tuple[str, str | None]]:
     result: list[tuple[str, str | None]] = []
     for tool_call in sorted(
@@ -234,7 +75,7 @@ def _ordered_mutation_paths(
         result.append(
             (
                 str(tool_call.get("id", "")),
-                _tool_call_path(tool_call, candidate_backend),
+                _tool_call_path(tool_call, workspace_backend),
             )
         )
     return result
@@ -243,15 +84,11 @@ def _ordered_mutation_paths(
 def analyze_workspace_wave(
     tool_calls: Sequence[Mapping[str, Any]],
     *,
-    candidate_backend: WorkspacePolicyBackend,
+    workspace_backend: WorkspacePolicyBackend,
 ) -> str | None:
     """Return one deterministic rejection for a conflicting complete tool wave."""
 
-    has_check = any(
-        str(tool_call.get("name", "")) == CHECK_CANDIDATE_DOCUMENT_TOOL_NAME
-        for tool_call in tool_calls
-    )
-    mutation_paths = _ordered_mutation_paths(tool_calls, candidate_backend)
+    mutation_paths = _ordered_mutation_paths(tool_calls, workspace_backend)
     invalid_mutation = next(
         (call_id for call_id, path in mutation_paths if path is None),
         None,
@@ -262,16 +99,6 @@ def analyze_workspace_wave(
             "file_path accepted by the virtual filesystem. No call in this wave "
             f"was run (invalid mutation call ID {invalid_mutation!r})."
         )
-    if has_check and any(
-        str(tool_call.get("name", "")) in WORKSPACE_MUTATION_TOOL_NAMES
-        for tool_call in tool_calls
-    ):
-        return (
-            "Tool wave rejected: check_candidate_document cannot run with a "
-            "workspace mutation. Retry the mutations first, observe their results, "
-            "then call check_candidate_document in a separate sequential wave."
-        )
-
     valid_mutation_paths = [(call_id, path) for call_id, path in mutation_paths if path is not None]
     for index, (left_id, left_path) in enumerate(valid_mutation_paths):
         for right_id, right_path in valid_mutation_paths[index + 1 :]:
@@ -312,11 +139,11 @@ def last_ai_tool_calls(state: Any) -> Sequence[Mapping[str, Any]]:
 
 def _wave_error_message(
     request: ToolCallRequest,
-    candidate_backend: WorkspacePolicyBackend,
+    workspace_backend: WorkspacePolicyBackend,
 ) -> ToolMessage:
     conflict = analyze_workspace_wave(
         last_ai_tool_calls(request.state),
-        candidate_backend=candidate_backend,
+        workspace_backend=workspace_backend,
     )
     if conflict is None:
         raise RuntimeError("workspace wave was not conflicting")
@@ -332,8 +159,8 @@ def _wave_error_message(
 class WorkspaceToolWaveMiddleware(AgentMiddleware):
     """Reject a complete conflicting workspace wave before any handler runs."""
 
-    def __init__(self, *, candidate_backend: WorkspacePolicyBackend) -> None:
-        self._candidate_backend = candidate_backend
+    def __init__(self, *, workspace_backend: WorkspacePolicyBackend) -> None:
+        self._workspace_backend = workspace_backend
 
     @override
     async def awrap_tool_call(
@@ -344,11 +171,11 @@ class WorkspaceToolWaveMiddleware(AgentMiddleware):
         if (
             analyze_workspace_wave(
                 last_ai_tool_calls(request.state),
-                candidate_backend=self._candidate_backend,
+                workspace_backend=self._workspace_backend,
             )
             is not None
         ):
-            return _wave_error_message(request, self._candidate_backend)
+            return _wave_error_message(request, self._workspace_backend)
         return await handler(request)
 
     @override
@@ -360,9 +187,9 @@ class WorkspaceToolWaveMiddleware(AgentMiddleware):
         if (
             analyze_workspace_wave(
                 last_ai_tool_calls(request.state),
-                candidate_backend=self._candidate_backend,
+                workspace_backend=self._workspace_backend,
             )
             is not None
         ):
-            return _wave_error_message(request, self._candidate_backend)
+            return _wave_error_message(request, self._workspace_backend)
         return handler(request)

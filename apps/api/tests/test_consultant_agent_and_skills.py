@@ -35,7 +35,6 @@ from app.consultant.workspace_backend import (
 )
 from app.consultant.workspace_resources import WorkspaceCatalog
 from app.consultant.workspace_state import StoreBackedWorkspace
-from app.consultant.workspace_tools import CandidateCheckToolBinding
 from app.consultant.workspace_validation import WorkspaceValidationMiddleware
 
 
@@ -46,13 +45,7 @@ EXPECTED_TOOLS = (
     "write_file",
     "edit_file",
     "delete",
-    "check_candidate_document",
 )
-
-
-class RecordingCheckPort:
-    async def check_candidate_document(self, **kwargs: Any) -> dict[str, Any]:
-        return {"status": "checked", **kwargs}
 
 
 def _workspace() -> ConsultantWorkspaceBackendBinding:
@@ -165,14 +158,10 @@ def test_first_release_skills_are_packaged_and_read_only() -> None:
     assert backend.write("/output/SKILL.md", "replace").error is not None
 
 
-def test_professional_agent_composes_exactly_one_workspace_and_check_tool(
+def test_professional_agent_composes_exactly_one_persistent_workspace_tool_surface(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     workspace = _workspace()
-    binding = CandidateCheckToolBinding(
-        runtime=RecordingCheckPort(),
-        workspace=workspace,
-    )
     captured: dict[str, Any] = {}
 
     def capture_agent(**kwargs: Any) -> object:
@@ -185,15 +174,12 @@ def test_professional_agent_composes_exactly_one_workspace_and_check_tool(
         execution=_execution(),
         selected_skill_ids=("output",),
         workspace_binding=workspace,
-        candidate_check_binding=binding,
     )
 
     assert assembled.skill_backend is workspace.skill_backend
-    assert tuple(tool.name for tool in captured["tools"]) == (
-        "check_candidate_document",
-    )
+    assert tuple(tool.name for tool in captured["tools"]) == ()
     filesystem = captured["additional_middleware"][1]
-    assert {tool.name for tool in filesystem.tools} == set(EXPECTED_TOOLS[:6])
+    assert {tool.name for tool in filesystem.tools} == set(EXPECTED_TOOLS)
     assert captured["additional_middleware"][2].run_limit == 2
     assert isinstance(
         captured["additional_middleware"][-1],
@@ -203,7 +189,6 @@ def test_professional_agent_composes_exactly_one_workspace_and_check_tool(
 
 def test_professional_agent_allows_eleven_calls_but_rejects_a_twelfth() -> None:
     workspace = _workspace()
-    binding = CandidateCheckToolBinding(runtime=RecordingCheckPort(), workspace=workspace)
     model = FakeMessagesListChatModel(responses=[AIMessage(content="unused")])
     eleven_call_execution = _execution().model_copy(update={"max_model_calls": 11})
 
@@ -212,7 +197,6 @@ def test_professional_agent_allows_eleven_calls_but_rejects_a_twelfth() -> None:
         execution=eleven_call_execution,
         selected_skill_ids=("output",),
         workspace_binding=workspace,
-        candidate_check_binding=binding,
     )
     with pytest.raises(ValueError, match="at most eleven"):
         build_professional_consultant_agent(
@@ -220,13 +204,11 @@ def test_professional_agent_allows_eleven_calls_but_rejects_a_twelfth() -> None:
             execution=eleven_call_execution.model_copy(update={"max_model_calls": 12}),
             selected_skill_ids=("output",),
             workspace_binding=workspace,
-            candidate_check_binding=binding,
         )
 
 
 def test_professional_agent_rejects_non_workspace_surface() -> None:
     workspace = _workspace()
-    binding = CandidateCheckToolBinding(runtime=RecordingCheckPort(), workspace=workspace)
     model = FakeMessagesListChatModel(responses=[AIMessage(content="unused")])
 
     with pytest.raises(ValueError, match="exactly the workspace Tool surface"):
@@ -235,7 +217,6 @@ def test_professional_agent_rejects_non_workspace_surface() -> None:
             execution=_execution(tools=EXPECTED_TOOLS[:-1]),
             selected_skill_ids=("output",),
             workspace_binding=workspace,
-            candidate_check_binding=binding,
         )
 
 
@@ -263,7 +244,7 @@ def test_lookup_waves_count_only_path_aware_external_workspace_reads() -> None:
     assert middleware.after_model(state("read_file", "/sources/current/source-001.txt"), None) == {"run_lookup_wave_count": 1}  # type: ignore[arg-type]
     assert middleware.after_model(state("grep", "/approved" , count=1), None) == {"run_lookup_wave_count": 2}  # type: ignore[arg-type]
     with pytest.raises(LookupWaveLimitExceeded):
-        middleware.after_model(state("ls", "/pending", count=2), None)  # type: ignore[arg-type]
+        middleware.after_model(state("ls", "/review", count=2), None)  # type: ignore[arg-type]
     assert middleware.after_model(state("grep", count=0), None) == {"run_lookup_wave_count": 1}  # type: ignore[arg-type]
     assert middleware.after_model(state("grep", "/", count=1), None) == {"run_lookup_wave_count": 2}  # type: ignore[arg-type]
     assert middleware.after_model(state("grep", "/workspace", count=2), None) is None  # type: ignore[arg-type]
@@ -301,7 +282,7 @@ def test_skill_activation_does_not_consume_external_data_lookup_waves() -> None:
     ) is None
     with pytest.raises(LookupWaveLimitExceeded):
         middleware.after_model(  # type: ignore[arg-type]
-            state("/pending/index.json", count=2),
+            state("/review/index.json", count=2),
             None,
         )
 

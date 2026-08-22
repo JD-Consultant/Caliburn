@@ -14,7 +14,6 @@ from app.consultant.context import ContextSelectionReceipt
 from app.consultant.model_output import (
     ConsultantModelOutput,
     OutputAnalysisBasis,
-    OutputCandidatePublication,
     OutputQuestion,
     OutputQuestionKind,
     OutputSufficiency,
@@ -92,7 +91,6 @@ def _result(source_id: UUID) -> ConsultantResult:
     return ConsultantResult(
         visible_reply="我已記錄這項工作，接下來可以再釐清它的完成結果。",
         reply_basis=basis,
-        used_skill_ids=("task-boundary",),
         sufficiency=SufficiencyRecommendation(
             currently_enough=True,
             reason="目前資訊足以保留這項工作。",
@@ -117,15 +115,9 @@ def _model_output(source_id: UUID) -> ConsultantModelOutput:
         visible_reply="我已記錄這項工作，接下來可以再釐清它的完成結果。",
         analysis_bases=(basis,),
         reply_basis_ordinal=1,
-        used_skill_ids=("task-boundary",),
         understanding_changes=(),
         attention_changes=(),
         gaps=(),
-        candidate_publication=OutputCandidatePublication(
-            candidate_revision=0,
-            revision_digest="",
-            action_handles=(),
-        ),
         question=OutputQuestion(
             kind=OutputQuestionKind.NONE,
             text="",
@@ -290,7 +282,6 @@ def test_configured_execution_has_exactly_the_virtual_workspace_tools() -> None:
         "write_file",
         "edit_file",
         "delete",
-        "check_candidate_document",
     )
 
 
@@ -321,13 +312,9 @@ async def test_admitted_turn_is_verified_then_committed_once() -> None:
     )
 
     workspace = agent_factory_kwargs["workspace_binding"]
-    check_binding = agent_factory_kwargs["candidate_check_binding"]
     assert workspace.document_id == document_id
     assert not hasattr(workspace, "run_id")
     assert not hasattr(workspace, "initial_files")
-    assert check_binding.runtime is runtime
-    assert check_binding.workspace is workspace
-    assert check_binding.run_id == run_id
     assert len(runtime.commits) == 1
     commit = runtime.commits[0]["commit"]
     assert commit.run_id == run_id

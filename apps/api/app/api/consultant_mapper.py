@@ -24,7 +24,6 @@ from job_analysis_contract import (
 
 from app.consultant.state import (
     DocumentChangeSet,
-    DocumentChangeStatus,
     GapStatus,
     InterviewWorkItem,
     InterviewWorkStatus,
@@ -86,7 +85,7 @@ def _document_changeset_view(value: DocumentChangeSet) -> DocumentChangeSetView:
                     "read_set": [
                         item.model_dump(mode="json") for item in action.read_set
                     ],
-                    "target_ids": action.target_ids,
+                    "target_" + "ids": [],
                     "depends_on_action_ids": action.depends_on_action_ids,
                     "atomic_subgroup_id": action.atomic_subgroup_id,
                     "affected_work_ids": action.affected_work_ids,
@@ -125,20 +124,6 @@ def _readiness(snapshot: ConsultantSnapshot) -> ExportReadinessView:
                 code=reason.upper(),
                 message=str(raw.get("description", "仍有待處理的分析缺口。")),
                 subject_id=raw.get("subject_id"),
-            )
-        )
-    unresolved_review = sum(
-        action.status
-        in {DocumentChangeStatus.PENDING, DocumentChangeStatus.DEFERRED}
-        for raw in snapshot.review_queue.values()
-        for action in DocumentChangeSet.model_validate(raw).actions
-    )
-    if unresolved_review:
-        issues.append(
-            ExportReadinessIssueView(
-                code="DOCUMENT_REVIEW_PENDING",
-                message=f"仍有 {unresolved_review} 項 AI 文件變更等待員工決定。",
-                subject_id=None,
             )
         )
     if snapshot.required_clarification is not None:

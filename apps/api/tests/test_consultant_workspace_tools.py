@@ -27,11 +27,7 @@ from app.consultant.workspace_backend import (
 )
 from app.consultant.workspace_resources import WorkspaceCatalog
 from app.consultant.workspace_state import StoreBackedWorkspace
-from app.consultant.workspace_tools import (
-    CandidateCheckToolBinding,
-    WorkspaceToolWaveMiddleware,
-    build_check_candidate_document_tool,
-)
+from app.consultant.workspace_tools import WorkspaceToolWaveMiddleware
 
 
 EXPECTED_WORKSPACE_TOOLS = frozenset(
@@ -42,46 +38,11 @@ EXPECTED_WORKSPACE_TOOLS = frozenset(
         "write_file",
         "edit_file",
         "delete",
-        "check_candidate_document",
     }
 )
 DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000101")
-RUN_ID = UUID("00000000-0000-0000-0000-000000000102")
 DUTY_ID = UUID("00000000-0000-0000-0000-000000000201")
 TASK_ID = UUID("00000000-0000-0000-0000-000000000202")
-
-
-class RecordingCheckPort:
-    def __init__(self) -> None:
-        self.calls: list[dict[str, Any]] = []
-
-    async def check_candidate_document(
-        self,
-        *,
-        document_id: UUID,
-        run_id: UUID,
-        files: Mapping[str, str],
-        tool_call_id: str,
-        selected_skill_ids: tuple[str, ...],
-        loaded_skill_ids: tuple[str, ...],
-    ) -> Any:
-        self.calls.append(
-            {
-                "document_id": document_id,
-                "run_id": run_id,
-                "files": dict(files),
-                "tool_call_id": tool_call_id,
-                "selected_skill_ids": selected_skill_ids,
-                "loaded_skill_ids": loaded_skill_ids,
-            }
-        )
-        return {
-            "status": "checked",
-            "candidate_revision": 1,
-            "revision_digest": "a" * 64,
-            "action_handles": ["action-001"],
-            "actions": [],
-        }
 
 
 def _document() -> ApprovedJobDocument:
@@ -196,8 +157,6 @@ class ProviderBindingModel(FakeMessagesListChatModel):
 async def _run_workspace_wave(
     workspace: ConsultantWorkspaceBackendBinding,
     calls: list[dict[str, Any]],
-    *,
-    check_tool: Any | None = None,
 ) -> dict[str, Any]:
     filesystem = FilesystemMiddleware(
         backend=workspace.composite_backend,
@@ -214,10 +173,10 @@ async def _run_workspace_wave(
                 AIMessage(content="wave complete"),
             ]
         ),
-        tools=([check_tool] if check_tool is not None else []),
+        tools=(),
         middleware=(
             filesystem,
-            WorkspaceToolWaveMiddleware(candidate_backend=workspace.workspace_backend),
+            WorkspaceToolWaveMiddleware(workspace_backend=workspace.workspace_backend),
         ),
     )
     result = await graph.ainvoke(
@@ -240,30 +199,6 @@ async def _workspace_text(
     return (await workspace.workspace.read_snapshot()).files[path]
 
 
-def test_check_tool_has_empty_model_schema_and_no_document_payload() -> None:
-    workspace = _workspace_binding_sync()
-    check_tool = build_check_candidate_document_tool(
-        binding=CandidateCheckToolBinding(
-            runtime=RecordingCheckPort(),
-            workspace=workspace,
-            run_id=RUN_ID,
-        )
-    )
-
-    schema = check_tool.tool_call_schema.model_json_schema()
-    assert schema["properties"] == {}
-    assert schema.get("required", []) == []
-    assert schema.get("additionalProperties") is False
-    converted = convert_to_openai_tool(check_tool)
-    assert converted["function"]["parameters"]["properties"] == {}
-    assert all(
-        forbidden not in str(converted["function"]["parameters"])
-        for forbidden in ("document_id", "run_id", "files", "runtime")
-    )
-    assert check_tool.func is None
-    assert check_tool.coroutine is not None
-
-
 @pytest.mark.asyncio
 async def test_real_provider_binding_has_exact_workspace_tool_surface() -> None:
     workspace = await _workspace_binding()
@@ -273,23 +208,18 @@ async def test_real_provider_binding_has_exact_workspace_tool_surface() -> None:
         execution=_execution(),
         selected_skill_ids=("output",),
         workspace_binding=workspace,
-        candidate_check_binding=CandidateCheckToolBinding(
-            runtime=RecordingCheckPort(),
-            workspace=workspace,
-            run_id=RUN_ID,
-        ),
     )
 
     with pytest.raises(RuntimeError, match="stop after real provider binding"):
         await agent.ainvoke({"messages": [HumanMessage(content="inspect workspace")]})
 
     captured = model.bound_tool_schemas
-    assert len(captured) == 7
+    assert len(captured) == 6
     assert {schema["function"]["name"] for schema in captured} == EXPECTED_WORKSPACE_TOOLS
     assert len({schema["function"]["name"] for schema in captured}) == len(captured)
 
 
-def test_workspace_agent_surface_has_only_framework_editor_verbs_and_check(
+def test_workspace_agent_surface_has_only_framework_editor_verbs(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     workspace = _workspace_binding_sync()
@@ -305,11 +235,6 @@ def test_workspace_agent_surface_has_only_framework_editor_verbs_and_check(
         execution=_execution(),
         selected_skill_ids=("output",),
         workspace_binding=workspace,
-        candidate_check_binding=CandidateCheckToolBinding(
-            runtime=RecordingCheckPort(),
-            workspace=workspace,
-            run_id=RUN_ID,
-        ),
     )
 
     actual = {
@@ -340,70 +265,6 @@ def test_workspace_agent_sync_invoke_fails_fast() -> None:
     )
     with pytest.raises(RuntimeError, match="async-only"):
         agent.invoke({"messages": []})
-
-
-@pytest.mark.asyncio
-async def test_check_tool_reads_current_store_workspace_without_files_channel() -> None:
-    workspace = await _workspace_binding()
-    port = RecordingCheckPort()
-    check_tool = build_check_candidate_document_tool(
-        binding=CandidateCheckToolBinding(
-            runtime=port,
-            workspace=workspace,
-            run_id=RUN_ID,
-        )
-    )
-    assert (
-        await workspace.workspace_backend.aedit(
-            "/workspace/header.json",
-            '"採購專員"',
-            '"更新後"',
-        )
-    ).error is None
-    runtime = ToolRuntime(
-        state={"messages": []},
-        context={},
-        config={},
-        stream_writer=lambda _value: None,
-        tool_call_id="check-001",
-        store=None,
-    )
-
-    await check_tool.coroutine(runtime=runtime)  # type: ignore[misc]
-
-    assert port.calls[-1]["run_id"] == RUN_ID
-    assert '"更新後"' in port.calls[-1]["files"]["/workspace/header.json"]
-
-
-@pytest.mark.asyncio
-async def test_check_tool_rejects_invalid_store_resource_before_port_call() -> None:
-    workspace = await _workspace_binding()
-    port = RecordingCheckPort()
-    check_tool = build_check_candidate_document_tool(
-        binding=CandidateCheckToolBinding(
-            runtime=port,
-            workspace=workspace,
-            run_id=RUN_ID,
-        )
-    )
-    assert (
-        await workspace.workspace.backend.awrite(
-            "/workspace/not-a-resource.json",
-            "{}\n",
-        )
-    ).error is None
-    runtime = ToolRuntime(
-        state={"messages": []},
-        context={},
-        config={},
-        stream_writer=lambda _value: None,
-        tool_call_id="check-invalid",
-        store=None,
-    )
-
-    with pytest.raises(RuntimeError, match="workspace path"):
-        await check_tool.coroutine(runtime=runtime)  # type: ignore[misc]
-    assert port.calls == []
 
 
 @pytest.mark.asyncio
@@ -520,18 +381,10 @@ async def test_invalid_mutation_rejects_valid_sibling_before_zero_mutation() -> 
 
 
 @pytest.mark.asyncio
-async def test_mutation_and_check_wave_rejects_both_before_zero_mutation() -> None:
+async def test_mutation_and_invalid_wave_rejects_both_before_zero_mutation() -> None:
     workspace = await _workspace_binding()
     header = "/workspace/header.json"
     before = await _workspace_text(workspace, header)
-    port = RecordingCheckPort()
-    check_tool = build_check_candidate_document_tool(
-        binding=CandidateCheckToolBinding(
-            runtime=port,
-            workspace=workspace,
-            run_id=RUN_ID,
-        )
-    )
     result = await _run_workspace_wave(
         workspace,
         [
@@ -544,11 +397,13 @@ async def test_mutation_and_check_wave_rejects_both_before_zero_mutation() -> No
                 },
                 "edit-001",
             ),
-            _tool_call("check_candidate_document", {}, "check-002"),
+            _tool_call(
+                "edit_file",
+                {"old_string": "採購專員", "new_string": "無效"},
+                "invalid-002",
+            ),
         ],
-        check_tool=check_tool,
     )
 
     assert [message.status for message in _tool_messages(result)] == ["error", "error"]
     assert await _workspace_text(workspace, header) == before
-    assert port.calls == []

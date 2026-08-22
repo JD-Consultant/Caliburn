@@ -22,7 +22,6 @@ from app.consultant.provider_wire import (
 from app.consultant.results import (
     AttentionChange,
     AttentionOperation,
-    CandidatePublication,
     ConsultantResult,
     GapOperation,
     GapReason,
@@ -35,7 +34,6 @@ from app.consultant.results import (
     VisibleGap,
 )
 from app.consultant.state import (
-    ActionHandle,
     InterviewPriority,
     InterviewWorkStatus,
     UnderstandingImpact,
@@ -130,23 +128,15 @@ class OutputSufficiency(OutputModel):
     basis_ordinal: int = Field(description="analysis_bases 的 1-based ordinal")
 
 
-class OutputCandidatePublication(OutputModel):
-    candidate_revision: int = Field(ge=0)
-    revision_digest: str = Field(pattern=r"^(?:|[0-9a-f]{64})$")
-    action_handles: tuple[ActionHandle, ...]
-
-
 class ConsultantModelOutput(OutputModel):
     visible_reply: str
     analysis_bases: tuple[OutputAnalysisBasis, ...]
     reply_basis_ordinal: int = Field(
         description="visible_reply 所用 analysis_bases 的 1-based ordinal"
     )
-    used_skill_ids: tuple[SkillId, ...]
     understanding_changes: tuple[OutputUnderstandingChange, ...]
     attention_changes: tuple[OutputAttentionChange, ...]
     gaps: tuple[OutputGap, ...]
-    candidate_publication: OutputCandidatePublication
     question: OutputQuestion
     sufficiency: OutputSufficiency
 
@@ -170,7 +160,6 @@ def map_consultant_model_output(
             reply_basis=bases.resolve(
                 output.reply_basis_ordinal, "reply_basis_ordinal"
             ),
-            used_skill_ids=output.used_skill_ids,
             understanding_changes=tuple(
                 _map_understanding(item, bases)
                 for item in output.understanding_changes
@@ -179,9 +168,6 @@ def map_consultant_model_output(
                 _map_attention(item, bases) for item in output.attention_changes
             ),
             gaps=tuple(_map_gap(item, bases) for item in output.gaps),
-            candidate_publication=_map_candidate_publication(
-                output.candidate_publication
-            ),
             next_question=next_question,
             required_clarification=clarification,
             sufficiency=SufficiencyRecommendation(
@@ -203,31 +189,6 @@ def map_consultant_model_output(
         raise ConsultantOutputMappingError(
             str(error)
         ) from error
-
-
-def _map_candidate_publication(
-    value: OutputCandidatePublication,
-) -> CandidatePublication | None:
-    neutral = (
-        value.candidate_revision == 0
-        and value.revision_digest == ""
-        and not value.action_handles
-    )
-    if neutral:
-        return None
-    if value.candidate_revision == 0:
-        raise ConsultantOutputMappingError(
-            "neutral candidate publication cannot carry digest or action handles"
-        )
-    if not value.revision_digest or not value.action_handles:
-        raise ConsultantOutputMappingError(
-            "candidate publication requires digest and action handles"
-        )
-    return CandidatePublication(
-        candidate_revision=value.candidate_revision,
-        revision_digest=value.revision_digest,
-        action_handles=value.action_handles,
-    )
 
 
 def _map_understanding(

@@ -82,7 +82,6 @@ def _policy(*, skills: tuple[str, ...] = ("work-discovery",)):
             "write_file",
             "edit_file",
             "delete",
-            "check_candidate_document",
         ),
         max_context_tokens=24_000,
         max_model_calls=8,

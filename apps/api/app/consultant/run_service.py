@@ -17,10 +17,6 @@ from app.adapters.langgraph.postgres import (
 )
 from app.config import Settings
 from app.consultant.agent import build_professional_consultant_agent
-from app.consultant.candidate_publication import (
-    CandidatePublicationStale,
-    publish_checked_candidate as validate_checked_candidate,
-)
 from app.consultant.context import (
     ConsultantAgentRuntimeContext,
     ConsultantContextMiddleware,
@@ -43,8 +39,6 @@ from app.consultant.model_runtime import (
 )
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.state import (
-    CheckedCandidateReceipt,
-    DocumentChangeSet,
     RunReceipt,
     RunExecutionEvidence,
     RunStatus,
@@ -53,9 +47,6 @@ from app.consultant.state import (
 from app.consultant.workspace_backend import build_consultant_workspace_backend
 from app.consultant.workspace_resources import WorkspaceCatalog
 from app.consultant.workspace_state import StoreBackedWorkspace
-from app.consultant.workspace_tools import (
-    CandidateCheckToolBinding,
-)
 from app.consultant.verification import (
     ConsultantVerificationError,
     verify_consultant_result,
@@ -119,7 +110,6 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
             "write_file",
             "edit_file",
             "delete",
-            "check_candidate_document",
         ),
         max_context_tokens=config.consultant_max_context_tokens,
         max_model_calls=config.consultant_max_model_calls,
@@ -132,28 +122,6 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
         max_cost_usd=config.consultant_max_cost_usd,
     )
     return resolve_execution(profile, policy)
-
-
-async def _current_workspace_files(
-    workspace,
-) -> dict[str, str]:
-    snapshot = await workspace.workspace.read_snapshot()
-    files: dict[str, str] = {}
-    for raw_path, content in snapshot.files.items():
-        try:
-            canonical_path = workspace.workspace_backend.validate_workspace_file_path(
-                raw_path
-            )
-        except ValueError as error:
-            raise CandidatePublicationStale(
-                f"candidate publication found an invalid workspace path: {raw_path!r}"
-            ) from error
-        if canonical_path != raw_path:
-            raise CandidatePublicationStale(
-                f"candidate publication requires canonical workspace paths: {raw_path!r}"
-            )
-        files[canonical_path] = content
-    return dict(sorted(files.items()))
 
 
 async def execute_admitted_consultant_turn(
@@ -204,13 +172,8 @@ async def execute_admitted_consultant_turn(
             )
             if focus_subject is not None:
                 focus_subject_id = UUID(str(focus_subject))
-        pending = tuple(
-            DocumentChangeSet.model_validate(value)
-            for value in snapshot.review_queue.values()
-        )
         catalog = WorkspaceCatalog.from_snapshot(
             snapshot.approved_document,
-            pending=pending,
             sources=all_sources,
         )
         request = ContextRequest(
@@ -248,11 +211,6 @@ async def execute_admitted_consultant_turn(
             execution=execution,
             selected_skill_ids=CONSULTANT_SKILL_IDS,
             workspace_binding=workspace,
-            candidate_check_binding=CandidateCheckToolBinding(
-                runtime=runtime,
-                workspace=workspace,
-                run_id=run_id,
-            ),
             context_middleware=ConsultantContextMiddleware(),
             context_schema=ConsultantAgentRuntimeContext,
         )
@@ -298,51 +256,6 @@ async def execute_admitted_consultant_turn(
             response["structured_response"]
         )
         result = map_consultant_model_output(model_output, catalog=catalog)
-        candidate_source_ids: tuple[UUID, ...] = ()
-        candidate_files: dict[str, str] | None = None
-        if result.candidate_publication is not None:
-            raw_state = await runtime.raw_state(document_id)
-            checked_payload = raw_state.get("checked_candidate")
-            if checked_payload is None:
-                raise ConsultantVerificationError(
-                    "candidate publication has no checked candidate receipt"
-                )
-            checked = CheckedCandidateReceipt.model_validate(checked_payload)
-            if checked.run_id != run_id:
-                raise ConsultantVerificationError(
-                    "candidate publication belongs to another consultant run"
-                )
-            publication = result.candidate_publication
-            if (
-                checked.candidate_revision != publication.candidate_revision
-                or checked.resource_digest != publication.revision_digest
-                or checked.action_handles != publication.action_handles
-            ):
-                raise ConsultantVerificationError(
-                    "candidate publication does not exactly match the checked receipt"
-                )
-            if not set(checked.used_skill_ids) <= set(result.used_skill_ids):
-                raise ConsultantVerificationError(
-                    "candidate publication used Skills missing from final result"
-                )
-            candidate_files = await _current_workspace_files(workspace)
-            current_source_ids = tuple(
-                source.source_id
-                for source in all_sources
-                if (
-                    source.processing_status is SourceProcessingStatus.COMMITTED
-                    and source.validity.value == "current"
-                )
-            )
-            validate_checked_candidate(
-                checked,
-                current_run_id=run_id,
-                current_baseline_revision=snapshot.revision,
-                current_document=snapshot.approved_document,
-                current_files=candidate_files,
-                current_source_ids=current_source_ids,
-            )
-            candidate_source_ids = checked.changeset.source_ids
         if not runtime_context.context_receipts:
             raise ValueError("consultant run emitted no context-selection receipt")
         for receipt in runtime_context.context_receipts:
@@ -355,9 +268,6 @@ async def execute_admitted_consultant_turn(
                 for source_id in basis.source_ids
                 if source_id is not None
             )
-        )
-        referenced_source_ids = tuple(
-            dict.fromkeys((*referenced_source_ids, *candidate_source_ids))
         )
         evidence = tuple(
             [
@@ -399,7 +309,6 @@ async def execute_admitted_consultant_turn(
             document_id=document_id,
             expected_revision=snapshot.revision,
             commit=commit,
-            candidate_files=candidate_files,
         )
     except BaseException as error:
         if isinstance(error, (KeyboardInterrupt, SystemExit, asyncio.CancelledError)):

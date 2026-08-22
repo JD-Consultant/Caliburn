@@ -195,33 +195,6 @@ def _withdraw_entity(payload: dict[str, Any], path: str) -> None:
     del items[entity_index]
 
 
-def _replace_entities(
-    payload: dict[str, Any],
-    action: DocumentPatchAction,
-    value: Any,
-) -> None:
-    parts = _pointer_parts(action.path)
-    if len(parts) != 1 or parts[0] not in _COLLECTION_IDS:
-        raise DocumentAuthorityError("merge or split requires a collection path")
-    replacements = value if isinstance(value, list) else [value]
-    if not replacements or not all(isinstance(item, dict) for item in replacements):
-        raise DocumentAuthorityError("merge or split requires replacement entities")
-    items = _collection(payload, parts[0])
-    id_field = _COLLECTION_IDS[parts[0]]
-    target_ids = {str(item) for item in action.target_ids}
-    found = {str(item[id_field]) for item in items if str(item[id_field]) in target_ids}
-    if found != target_ids:
-        raise DocumentAuthorityError("merge or split target no longer exists")
-    items[:] = [item for item in items if str(item[id_field]) not in target_ids]
-    existing = {str(item[id_field]) for item in items}
-    for replacement in replacements:
-        identity = replacement.get(id_field)
-        if identity is None or str(identity) in existing:
-            raise DocumentAuthorityError("replacement entity identity conflicts")
-        items.append(deepcopy(replacement))
-        existing.add(str(identity))
-
-
 def _attach_opks_evidence(
     payload: dict[str, Any],
     action: DocumentPatchAction,
@@ -233,11 +206,6 @@ def _attach_opks_evidence(
     affected_ids: set[str] = set()
     if action.operation is DocumentPatchOperation.ADD and isinstance(action.after, dict):
         affected_ids.add(str(action.after.get("item_id")))
-    elif action.operation in {DocumentPatchOperation.MERGE, DocumentPatchOperation.SPLIT}:
-        replacements = action.after if isinstance(action.after, list) else [action.after]
-        affected_ids.update(
-            str(item.get("item_id")) for item in replacements if isinstance(item, dict)
-        )
     elif len(parts) >= 2:
         affected_ids.add(parts[1])
     for item in items:
@@ -287,11 +255,6 @@ def apply_document_actions(
             _add_to_collection(payload, action.path, value)
         elif action.operation is DocumentPatchOperation.WITHDRAW:
             _withdraw_entity(payload, action.path)
-        elif action.operation in {
-            DocumentPatchOperation.MERGE,
-            DocumentPatchOperation.SPLIT,
-        }:
-            _replace_entities(payload, action, value)
         else:
             _set_existing_path(payload, action.path, value)
         _attach_opks_evidence(payload, action)

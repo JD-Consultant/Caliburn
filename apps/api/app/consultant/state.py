@@ -27,10 +27,6 @@ from typing_extensions import Annotated
 
 
 NonEmptyText = Annotated[str, StringConstraints(strip_whitespace=True, min_length=1)]
-ActionHandle = Annotated[
-    str,
-    StringConstraints(pattern=r"^action-[0-9]{3,}$"),
-]
 VerbatimText = Annotated[str, StringConstraints(min_length=1)]
 
 
@@ -471,8 +467,6 @@ class DocumentPatchOperation(StrEnum):
     ADD = "add"
     REVISE = "revise"
     WITHDRAW = "withdraw"
-    MERGE = "merge"
-    SPLIT = "split"
     REASSIGN = "reassign"
     REORDER = "reorder"
 
@@ -494,7 +488,6 @@ class DocumentPatchAction(DurableModel):
     source_ids: tuple[UUID, ...] = Field(min_length=1)
     quote_anchors: tuple[QuoteAnchor, ...] = ()
     read_set: tuple[DocumentPathRead, ...] = Field(min_length=1)
-    target_ids: tuple[UUID, ...] = ()
     depends_on_action_ids: tuple[UUID, ...] = ()
     supersedes_action_ids: tuple[UUID, ...] = ()
     atomic_subgroup_id: UUID | None = None
@@ -509,7 +502,6 @@ class DocumentPatchAction(DurableModel):
     def review_metadata_is_consistent(self) -> DocumentPatchAction:
         for label, values in (
             ("source_ids", self.source_ids),
-            ("target_ids", self.target_ids),
             ("depends_on_action_ids", self.depends_on_action_ids),
             ("supersedes_action_ids", self.supersedes_action_ids),
             ("affected_work_ids", self.affected_work_ids),
@@ -574,48 +566,6 @@ class DocumentChangeSet(DurableModel):
         if referenced_external != external_actions:
             raise ValueError(
                 "declared external dependency closure does not match patch dependencies"
-            )
-        return self
-
-
-ConsultantSkillId = Literal[
-    "work-discovery",
-    "story-interview",
-    "task-boundary",
-    "duty-grouping",
-    "output",
-    "performance-indicator",
-    "knowledge",
-    "skill",
-    "completion-red-team",
-]
-
-
-class CheckedCandidateReceipt(DurableModel):
-    """The exact candidate check accepted by the authority graph.
-
-    Candidate resource files are transient model state.  This receipt is the
-    only durable hand-off between a successful check and final publication.
-    """
-
-    run_id: UUID
-    baseline_revision: int = Field(ge=0)
-    candidate_revision: int = Field(ge=1)
-    resource_digest: Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
-    check_call_id: NonEmptyText
-    used_skill_ids: tuple[ConsultantSkillId, ...]
-    action_handles: tuple[ActionHandle, ...] = Field(min_length=1)
-    changeset: DocumentChangeSet
-
-    @model_validator(mode="after")
-    def used_skills_are_unique(self) -> CheckedCandidateReceipt:
-        if len(self.used_skill_ids) != len(set(self.used_skill_ids)):
-            raise ValueError("duplicate checked candidate used_skill_ids")
-        if len(self.action_handles) != len(set(self.action_handles)):
-            raise ValueError("duplicate checked candidate action handle")
-        if len(self.action_handles) != len(self.changeset.actions):
-            raise ValueError(
-                "checked candidate action handles must match receipt actions"
             )
         return self
 
@@ -715,13 +665,11 @@ class ConsultantThreadState(TypedDict, total=False):
     understanding_calibrations: dict[str, dict[str, Any]]
     latest_calibration_id: str | None
     gaps: dict[str, dict[str, Any]]
-    review_queue: dict[str, dict[str, Any]]
     approved_document: dict[str, Any]
     required_clarification: dict[str, Any] | None
     sufficiency: dict[str, Any] | None
     latest_run: dict[str, Any] | None
     command_receipts: dict[str, dict[str, Any]]
-    checked_candidate: dict[str, Any] | None
 
 
 class ConsultantCommandContext(TypedDict, total=False):
@@ -738,8 +686,6 @@ class ConsultantCommandContext(TypedDict, total=False):
         "reject_changes",
         "defer_changes",
         "workspace_authority_commit",
-        "check_candidate_document",
-        "publish_checked_candidate",
     ]
     document_id: str
     expected_revision: int
@@ -754,7 +700,6 @@ class ConsultantCommandContext(TypedDict, total=False):
     rejection_reason: str
     run_receipt: dict[str, Any]
     command_receipt: dict[str, Any]
-    checked_candidate: dict[str, Any]
     run_id: str
 
 
@@ -773,7 +718,6 @@ def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
         "understanding_calibrations": {},
         "latest_calibration_id": None,
         "gaps": {},
-        "review_queue": {},
         "approved_document": ApprovedJobDocument(
             document_id=document_id
         ).model_dump(mode="json"),
@@ -781,7 +725,6 @@ def initial_thread_state(document_id: UUID) -> ConsultantThreadState:
         "sufficiency": None,
         "latest_run": None,
         "command_receipts": {},
-        "checked_candidate": None,
     }
 
 

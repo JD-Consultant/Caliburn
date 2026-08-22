@@ -12,7 +12,6 @@ from app.consultant.state import (
     ApprovedJobDocument,
     ConsultantThreadState,
     DocumentChangeSet,
-    DocumentChangeStatus,
     DurableModel,
     InterviewWorkItem,
     InterviewWorkStatus,
@@ -70,7 +69,6 @@ class ConsultantSnapshot(DurableModel):
     understanding_projection: UnderstandingProjection
     gaps: dict[str, dict] = Field(default_factory=dict)
     semantic_progress: SemanticProgressProjection
-    review_queue: dict[str, dict] = Field(default_factory=dict)
     document_review: DocumentReviewProjection
     approved_document: ApprovedJobDocument
     required_clarification: RequiredClarification | None = None
@@ -93,7 +91,7 @@ def _consultant_turns(state: ConsultantThreadState) -> tuple[ConsultantTurnProje
                 run_id=metadata["run_id"],
                 answer_source_id=metadata["answer_source_id"],
                 text=text,
-                used_skill_ids=tuple(metadata.get("used_skill_ids", ())),
+                used_skill_ids=[],
                 next_question=metadata.get("next_question"),
             )
         )
@@ -103,22 +101,6 @@ def _consultant_turns(state: ConsultantThreadState) -> tuple[ConsultantTurnProje
 def document_review_projection_from_state(
     state: ConsultantThreadState,
 ) -> DocumentReviewProjection:
-    bundles = tuple(
-        DocumentChangeSet.model_validate(raw)
-        for _, raw in sorted(state.get("review_queue", {}).items())
-    )
-    unresolved_actions = [
-        action
-        for bundle in bundles
-        for action in bundle.actions
-        if action.status
-        in {DocumentChangeStatus.PENDING, DocumentChangeStatus.DEFERRED}
-    ]
-    unresolved_structural_action_ids = {
-        action.action_id
-        for action in unresolved_actions
-        if action.blocks_dependent_analysis
-    }
     work = tuple(
         InterviewWorkItem.model_validate(raw)
         for raw in state.get("interview_work", {}).values()
@@ -132,38 +114,36 @@ def document_review_projection_from_state(
         }
         for item in work
     )
-    blocked_items: list[BlockedInterviewBranchProjection] = []
-    for item in sorted(work, key=lambda value: str(value.work_id)):
-        if item.status is not InterviewWorkStatus.BLOCKED:
-            continue
-        review_blockers = tuple(
-            blocker
-            for blocker in item.blocked_by_decision_ids
-            if blocker in unresolved_structural_action_ids
-        )
-        if not review_blockers:
-            continue
-        blocked_items.append(
-            BlockedInterviewBranchProjection(
-                work_id=item.work_id,
-                title=item.title,
-                decision_action_ids=review_blockers,
-                reason=item.priority_reason,
-            )
-        )
-    blocked = tuple(blocked_items)
-    requires_decision = bool(blocked) and not safe_available
-    explanation = None
-    if requires_decision:
-        explanation = "目前沒有其他可安全深入的工作，需先處理所列文件結構決定。"
-    elif blocked:
-        explanation = "部分分析等待文件結構決定；其他不相依工作仍可繼續。"
+    return DocumentReviewProjection(
+        bundles=(),
+        unresolved_action_count=0,
+        blocked_branches=(),
+        safe_interview_work_available=safe_available,
+        decision_required_before_more_interview=False,
+        explanation=None,
+    )
+
+
+def document_review_projection_from_workspace(
+    state: ConsultantThreadState,
+    bundles: tuple[DocumentChangeSet, ...],
+    *,
+    explanation: str | None = None,
+) -> DocumentReviewProjection:
+    """Map a fresh Store-derived review without making it checkpoint state."""
+
+    checkpoint = document_review_projection_from_state(state)
+    unresolved_actions = sum(
+        action.status.value in {"pending", "deferred"}
+        for bundle in bundles
+        for action in bundle.actions
+    )
     return DocumentReviewProjection(
         bundles=bundles,
-        unresolved_action_count=len(unresolved_actions),
-        blocked_branches=blocked,
-        safe_interview_work_available=safe_available,
-        decision_required_before_more_interview=requires_decision,
+        unresolved_action_count=unresolved_actions,
+        blocked_branches=(),
+        safe_interview_work_available=checkpoint.safe_interview_work_available,
+        decision_required_before_more_interview=False,
         explanation=explanation,
     )
 
@@ -186,7 +166,6 @@ def snapshot_from_state(state: ConsultantThreadState) -> ConsultantSnapshot:
             "understanding_projection": understanding_projection_from_state(state),
             "gaps": state.get("gaps", {}),
             "semantic_progress": semantic_progress_from_state(state),
-            "review_queue": state.get("review_queue", {}),
             "document_review": document_review_projection_from_state(state),
             "approved_document": state["approved_document"],
             "required_clarification": state.get("required_clarification"),

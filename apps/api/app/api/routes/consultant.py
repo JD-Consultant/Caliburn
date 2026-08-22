@@ -38,6 +38,10 @@ from app.api.problems import (
 )
 from app.consultant.run_service import ConsultantTurnProcessor
 from app.consultant.state import ApprovedJobDocument, CommandReceipt, RunReceipt
+from app.consultant.workspace_authority import (
+    WorkspaceDecisionKind,
+    WorkspaceReviewCommand,
+)
 from app.export import assemble_approved_export_document
 
 
@@ -371,29 +375,36 @@ async def review_document_changes(
             UUID(key): value
             for key, value in body.edited_after_by_action_id.items()
         }
-        snapshot = await runtime.decide_document_changes(
-            document_id=document_id,
-            expected_revision=expected_revision,
-            action=body.command.value,
-            changeset_id=changeset_id,
-            action_ids=body.action_ids,
-            edited_after_by_action_id=edited,
-            rejection_reason=body.rejection_reason,
-            source_id=(
-                _command_id(document_id, "review-edit-source", idempotency_key)
-                if body.command.value == "edit_and_accept_changes"
-                else None
-            ),
-            command_receipt=_command_receipt(
-                document_id,
-                "document_review",
-                idempotency_key,
-                {
-                    "changeset_id": str(changeset_id),
-                    "decision": body.model_dump(mode="json"),
-                },
-            ),
+        _, _, workspace_snapshot, projection = await runtime.workspace_review_context(
+            document_id
         )
+        groups = [
+            group
+            for group in projection.groups
+            if group.changeset.changeset_id == changeset_id
+        ]
+        if len(groups) != 1:
+            raise ValueError(f"workspace changeset {changeset_id} is stale")
+        decision = {
+            "accept_changes": WorkspaceDecisionKind.ACCEPT,
+            "edit_and_accept_changes": WorkspaceDecisionKind.EDIT_ACCEPT,
+            "reject_changes": WorkspaceDecisionKind.REJECT,
+            "defer_changes": WorkspaceDecisionKind.DEFER,
+        }[body.command.value]
+        command = WorkspaceReviewCommand(
+            command_id=_command_id(document_id, "workspace-review", idempotency_key),
+            document_id=document_id,
+            decision=decision,
+            approved_revision=expected_revision,
+            workspace_generation=workspace_snapshot.manifest.generation,
+            workspace_digest=workspace_snapshot.manifest.resource_digest,
+            changeset_id=changeset_id,
+            group_digest=groups[0].group_digest,
+            selected_action_ids=tuple(body.action_ids),
+            edited_after_by_action_id=edited,
+            reason=body.rejection_reason,
+        )
+        snapshot = await runtime.decide_workspace_changes(command)
         return await _snapshot_view(runtime, snapshot)
     except Exception as error:
         return consultant_runtime_error_response(error)

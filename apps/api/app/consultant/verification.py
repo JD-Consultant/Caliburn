@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Sequence
 import re
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 from app.consultant.model_runtime import (
@@ -19,8 +19,6 @@ if TYPE_CHECKING:
     from app.consultant.results import (
         AnalysisBasis,
         ConsultantResult,
-        ReviewableDocumentChange,
-        SkillId,
     )
     from app.consultant.state import EmployeeSource
 
@@ -29,57 +27,10 @@ class ConsultantVerificationError(RuntimeError):
     pass
 
 
-_UUID = r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
-_SUPPORTED_DOCUMENT_PATHS = (
-    re.compile(r"^/job_title$"),
-    re.compile(r"^/work_description$"),
-    re.compile(r"^/duties$"),
-    re.compile(rf"^/duties/{_UUID}$"),
-    re.compile(rf"^/duties/{_UUID}/(?:statement|display_order)$"),
-    re.compile(r"^/tasks$"),
-    re.compile(rf"^/tasks/{_UUID}$"),
-    re.compile(
-        rf"^/tasks/{_UUID}/(?:duty_id|statement|action|object|purpose_result|context|frequency_text|responsibility_role|enablers|display_order)$"
-    ),
-    re.compile(r"^/opks$"),
-    re.compile(rf"^/opks/{_UUID}$"),
-    re.compile(rf"^/opks/{_UUID}/(?:text|display_order|task_ids|indicator_ids)$"),
-)
 _RISKY_SPECIFIC_CLAIM = re.compile(
     r"(?:\d|依.{0,12}(?:規定|辦法|法|SOP|標準)|[\u4e00-\u9fff]{2,20}(?:基準法|管理法|保護法|處罰法|組織法|施行法|條例|辦法|規則)|公司法|民法|刑法|(?:公司|法規|法律|規章|SOP).{0,12}(?:規定|要求|必須)|SOP|標準作業程序|(?:依據|根據).{0,12}(?:iCAP|Reference|參考資料|外部資料)|according to|policy|law|regulation)",
     re.IGNORECASE,
 )
-_ALLOWED_COLLECTION_PAYLOAD_KEYS = {
-    "duty_id",
-    "task_id",
-    "item_id",
-    "kind",
-    "statement",
-    "action",
-    "object",
-    "purpose_result",
-    "context",
-    "frequency_text",
-    "responsibility_role",
-    "enablers",
-    "competency_level",
-    "display_order",
-    "text",
-    "task_ids",
-    "indicator_ids",
-    "name",
-}
-_STRUCTURAL_PAYLOAD_KEYS = {
-    "duty_id",
-    "task_id",
-    "item_id",
-    "kind",
-    "display_order",
-    "task_ids",
-    "indicator_ids",
-}
-
-
 def verify_context_selection(
     execution: ResolvedExecution,
     receipt: ContextSelectionReceipt,
@@ -161,9 +112,14 @@ def verify_consultant_result(
     loaded = set(loaded_skill_ids)
     if not loaded <= selected:
         raise ConsultantVerificationError("run loaded an unselected Skill")
-    if not set(result.used_skill_ids) <= selected:
+    result_skill_ids = {
+        skill_id
+        for basis in result.analysis_bases()
+        for skill_id in basis.skill_ids
+    }
+    if not result_skill_ids <= selected:
         raise ConsultantVerificationError("result used an unselected Skill")
-    if not set(result.used_skill_ids) <= loaded:
+    if not result_skill_ids <= loaded:
         raise ConsultantVerificationError("result used a Skill that was not loaded")
     if not selected <= set(execution.allowed_skill_ids):
         raise ConsultantVerificationError("run selected an ineligible Skill")
@@ -215,137 +171,6 @@ def verify_consultant_result(
             )
 
 
-def verify_candidate_document_changes(
-    changes: Sequence[ReviewableDocumentChange],
-    *,
-    document_id: UUID,
-    selected_skill_ids: Sequence[str],
-    loaded_skill_ids: Sequence[str],
-    employee_sources: Sequence[EmployeeSource],
-) -> tuple[SkillId, ...]:
-    """Verify candidate document semantics and evidence before graph staging."""
-
-    from app.consultant.results import OpksKind
-    from app.consultant.state import SourceValidity
-
-    if not changes:
-        return ()
-
-    selected = set(selected_skill_ids)
-    loaded = set(loaded_skill_ids)
-    if not loaded <= selected:
-        raise ConsultantVerificationError("run loaded an unselected Skill")
-    source_by_id = {source.source_id: source for source in employee_sources}
-    if len(source_by_id) != len(employee_sources):
-        raise ConsultantVerificationError("duplicate employee source supplied to verifier")
-    if any(source.validity is not SourceValidity.CURRENT for source in employee_sources):
-        raise ConsultantVerificationError(
-            "superseded employee source cannot support current result"
-        )
-    if any(source.document_id != document_id for source in employee_sources):
-        raise ConsultantVerificationError("employee source crosses document scope")
-
-    used_skill_ids = tuple(
-        dict.fromkeys(
-            skill_id
-            for change in changes
-            for skill_id in change.basis.skill_ids
-        )
-    )
-    if not set(used_skill_ids) <= selected:
-        raise ConsultantVerificationError("candidate used an unselected Skill")
-    if not set(used_skill_ids) <= loaded:
-        raise ConsultantVerificationError("candidate used a Skill that was not loaded")
-
-    for change in changes:
-        _verify_analysis_basis(
-            change.basis,
-            selected_skill_ids=selected,
-            source_by_id=source_by_id,
-        )
-        if not any(
-            pattern.fullmatch(change.path) for pattern in _SUPPORTED_DOCUMENT_PATHS
-        ):
-            raise ConsultantVerificationError(
-                f"unsupported document change path: {change.path}"
-            )
-        _verify_document_payload(change.after)
-        _verify_change_operation(change.operation.value, change.path)
-        if change.operation.value == "withdraw":
-            continue
-        if not change.path.startswith("/opks") and (
-            change.opks_kind is not None
-            or change.task_ids
-            or change.indicator_ids
-        ):
-            raise ConsultantVerificationError(
-                "non-OPKS change cannot carry OPKS linkage fields"
-            )
-        if change.path.startswith("/opks"):
-            if change.opks_kind is None:
-                raise ConsultantVerificationError("OPKS change requires an OPKS kind")
-            _verify_opks_payload_kind(change.after, change.opks_kind.value)
-            if change.opks_kind in {
-                OpksKind.OUTPUT,
-                OpksKind.PERFORMANCE_INDICATOR,
-            }:
-                if len(change.task_ids) != 1:
-                    raise ConsultantVerificationError(
-                        "O/P changes must reference exactly one Task"
-                    )
-                if change.indicator_ids:
-                    raise ConsultantVerificationError(
-                        "O/P changes cannot reference performance indicators"
-                    )
-            elif not change.task_ids:
-                raise ConsultantVerificationError(
-                    "document-level K/S changes require Task linkages"
-                )
-            if change.opks_kind in {OpksKind.KNOWLEDGE, OpksKind.SKILL} and not (
-                change.basis.quote_anchors
-            ):
-                raise ConsultantVerificationError(
-                    "active K/S requires anchored employee evidence"
-                )
-        text = _candidate_change_text(change)
-        if text and _RISKY_SPECIFIC_CLAIM.search(text) and not (
-            change.basis.quote_anchors
-        ):
-            raise ConsultantVerificationError(
-                "quantities, named rules and external claims require an anchored employee quote"
-            )
-    return cast("tuple[SkillId, ...]", used_skill_ids)
-
-
-def _candidate_change_text(change: ReviewableDocumentChange) -> str:
-    if change.after is None or change.operation.value in {"reassign", "reorder"}:
-        return ""
-    if change.path.endswith(
-        ("/duty_id", "/display_order", "/task_ids", "/indicator_ids")
-    ):
-        return ""
-    if isinstance(change.after, str):
-        return change.after
-    return "\n".join(_payload_factual_texts(change.after))
-
-
-def _payload_factual_texts(value: object) -> tuple[str, ...]:
-    if isinstance(value, str):
-        return (value,)
-    if isinstance(value, dict):
-        return tuple(
-            text
-            for key, nested in value.items()
-            if key not in _STRUCTURAL_PAYLOAD_KEYS
-            for text in _payload_factual_texts(nested)
-        )
-    if isinstance(value, list):
-        return tuple(
-            text for nested in value for text in _payload_factual_texts(nested)
-        )
-    return ()
-
-
 def _verify_analysis_basis(
     basis: AnalysisBasis,
     *,
@@ -364,60 +189,3 @@ def _verify_analysis_basis(
             raise ConsultantVerificationError("quote anchor exceeds employee source")
         if source.text[anchor.start : anchor.end] != anchor.quote:
             raise ConsultantVerificationError("quote anchor does not match employee source")
-
-
-def _verify_document_payload(value: object) -> None:
-    if isinstance(value, dict):
-        unknown = set(value) - _ALLOWED_COLLECTION_PAYLOAD_KEYS
-        if unknown:
-            raise ConsultantVerificationError(
-                f"unsupported payload fields: {sorted(unknown)}"
-            )
-        for nested in value.values():
-            _verify_document_payload(nested)
-    elif isinstance(value, list):
-        for nested in value:
-            _verify_document_payload(nested)
-
-
-def _verify_opks_payload_kind(value: object, expected_kind: str) -> None:
-    payloads = value if isinstance(value, list) else [value]
-    for payload in payloads:
-        if not isinstance(payload, dict) or "kind" not in payload:
-            continue
-        if payload["kind"] != expected_kind:
-            raise ConsultantVerificationError(
-                "OPKS payload kind does not match the typed OPKS kind"
-            )
-
-
-def _verify_change_operation(operation: str, path: str) -> None:
-    entity_path = re.fullmatch(rf"/(?:duties|tasks|opks)/{_UUID}", path) is not None
-    collection_path = path in {"/duties", "/tasks", "/opks"}
-    if operation == "add" and not collection_path:
-        raise ConsultantVerificationError("add operation requires a collection path")
-    if operation == "withdraw" and not entity_path:
-        raise ConsultantVerificationError("withdraw operation requires an entity path")
-    if operation in {"merge", "split"} and not collection_path:
-        raise ConsultantVerificationError(
-            f"{operation} operation requires a collection path"
-        )
-    if operation == "reassign" and not re.fullmatch(
-        rf"/tasks/{_UUID}/duty_id", path
-    ):
-        raise ConsultantVerificationError(
-            "reassign operation requires a Task duty_id path"
-        )
-    if operation == "reorder" and not path.endswith("/display_order"):
-        raise ConsultantVerificationError(
-            "reorder operation requires a display_order path"
-        )
-    if operation == "revise" and (
-        collection_path
-        or entity_path
-        or path.endswith("/duty_id")
-        or path.endswith("/display_order")
-    ):
-        raise ConsultantVerificationError(
-            "revise operation requires one non-structural document field path"
-        )

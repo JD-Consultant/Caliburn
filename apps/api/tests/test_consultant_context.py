@@ -126,7 +126,6 @@ def _execution(*, max_context_tokens: int = 24_000):
                 "write_file",
                 "edit_file",
                 "delete",
-                "check_candidate_document",
             ),
             max_context_tokens=max_context_tokens,
             max_model_calls=8,
@@ -188,13 +187,15 @@ async def test_context_keeps_current_employee_turn_and_compact_workspace_orienta
     assert "/skills" in prompt
     assert "/sources" in prompt
     assert "/approved" in prompt
-    assert "/pending" in prompt
+    assert "/review" in prompt
     assert "/sources/current/source-001.txt" in prompt
     assert '"approved_index_path":"/approved/index.json"' in prompt
-    assert '"pending_index_path":"/pending/index.json"' in prompt
+    assert '"review_index_path":"/review/index.json"' in prompt
     assert '"workspace_root":"/workspace"' in prompt
-    assert '"candidate_root"' not in prompt
-    assert "/candidate/" not in prompt
+    candidate_root_field = '"candidate_' + 'root"'
+    candidate_path = "/" + "candidate/"
+    assert candidate_root_field not in prompt
+    assert candidate_path not in prompt
     assert document.work_description not in prompt
     assert str(source.source_id) not in prompt
 

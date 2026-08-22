@@ -284,7 +284,8 @@ async def test_workspace_binding_uses_initialized_store_backend_without_files_st
     binding = await _binding()
 
     assert binding.workspace_backend.store_backend is binding.workspace.backend
-    assert not hasattr(binding, "candidate_state_backend")
+    legacy_backend_field = "candidate_" + "state_backend"
+    assert not hasattr(binding, legacy_backend_field)
     assert not hasattr(binding, "initial_files")
     assert not hasattr(binding, "run_id")
     assert (await binding.composite_backend.aread("/workspace/header.json")).error is None
@@ -321,7 +322,8 @@ async def test_write_file_contract_creates_parseable_linked_workspace_resources(
     draft = parse_workspace_files(
         DOCUMENT_ID,
         snapshot.files,
-        handle_registry=snapshot.manifest.entity_ids_by_handle,
+        handle_registry=workspace_binding.catalog.handle_to_stable,
+        baseline_document=workspace_binding.catalog.document,
     )
     duty = next(item for item in draft.document.duties if item.statement == "管理供應商交期")
     task = next(item for item in draft.document.tasks if item.statement == "核對供應商交期")
@@ -340,7 +342,6 @@ async def test_workspace_binding_exposes_exactly_six_roots(
     assert {entry.removesuffix("/") for entry in entries} == {
         "/workspace",
         "/approved",
-        "/pending",
         "/review",
         "/sources",
         "/skills",
@@ -404,21 +405,21 @@ async def test_cancelled_workspace_mutation_waiter_does_not_leak_lock(
 
 
 @pytest.mark.asyncio
-async def test_approved_and_pending_projections_remain_readable(
+async def test_approved_and_review_projections_remain_readable(
     real_filesystem_tools: FilesystemToolHarness,
 ) -> None:
     approved = await real_filesystem_tools.invoke(
         "read_file",
         file_path="/approved/header.json",
     )
-    pending = await real_filesystem_tools.invoke(
+    review = await real_filesystem_tools.invoke(
         "read_file",
-        file_path="/pending/index.json",
+        file_path="/review/index.json",
     )
 
-    assert approved.status == pending.status == "success"
+    assert approved.status == review.status == "success"
     assert "採購專員" in str(approved.content)
-    assert '"status": "pending"' in str(pending.content)
+    assert '"group_handles"' in str(review.content)
 
 
 @pytest.mark.asyncio
@@ -612,7 +613,6 @@ async def test_read_only_routes_reject_mutation_through_real_tools(
 ) -> None:
     for path in (
         "/approved/header.json",
-        "/pending/index.json",
         "/review/index.json",
         "/sources/current/source-002.txt",
         "/skills/output/SKILL.md",

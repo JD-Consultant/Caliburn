@@ -9,19 +9,15 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 
 from app.consultant.graph import build_consultant_graph
-from app.consultant.document_review import create_document_changeset
 from app.consultant.interview import (
     VerifiedConsultantCommit,
-    apply_verified_consultant_commit,
 )
 from app.consultant.results import (
     AnalysisBasis,
     AttentionChange,
     AttentionOperation,
     ConsultantResult,
-    DocumentChangeOperation,
     GapReason,
-    ReviewableDocumentChange,
     SufficiencyRecommendation,
     UnderstandingChange,
     UnderstandingOperation,
@@ -29,7 +25,6 @@ from app.consultant.results import (
 )
 from app.consultant.state import (
     CalibrationDecision,
-    ApprovedJobDocument,
     EmployeeSourceKind,
     InterviewPriority,
     InterviewWorkStatus,
@@ -82,7 +77,6 @@ async def _commit(
     result: ConsultantResult,
     *,
     returning_after_long_gap: bool = False,
-    published_changeset=None,
 ):
     now = datetime.now(UTC)
     commit = VerifiedConsultantCommit(
@@ -93,27 +87,16 @@ async def _commit(
         returning_after_long_gap=returning_after_long_gap,
         result=result,
     )
-    if published_changeset is None:
-        return await graph.ainvoke(
-            {},
-            _config(document_id),
-            context={
-                "action": "commit_consultant_result",
-                "document_id": str(document_id),
-                "expected_revision": revision,
-                "semantic_commit": commit.model_dump(mode="json"),
-            },
-        )
-    state = (await graph.aget_state(_config(document_id))).values
-    updated = apply_verified_consultant_commit(
-        state,
-        document_id=document_id,
-        revision=revision + 1,
-        commit=commit,
-        published_changeset=published_changeset,
+    return await graph.ainvoke(
+        {},
+        _config(document_id),
+        context={
+            "action": "commit_consultant_result",
+            "document_id": str(document_id),
+            "expected_revision": revision,
+            "semantic_commit": commit.model_dump(mode="json"),
+        },
     )
-    await graph.aupdate_state(_config(document_id), updated)
-    return (await graph.aget_state(_config(document_id))).values
 
 
 def _result_with_understanding(
@@ -126,7 +109,6 @@ def _result_with_understanding(
     return ConsultantResult(
         visible_reply="我目前理解你會依缺料狀況建立請購單。",
         reply_basis=_basis(source_id),
-        used_skill_ids=("work-discovery",),
         understanding_changes=(
             UnderstandingChange(
                 operation=UnderstandingOperation.ADD,
@@ -232,7 +214,6 @@ async def test_understanding_is_always_visible_and_calibration_is_triggered_by_i
         },
     )
     assert confirmed["approved_document"] == before_document
-    assert confirmed["review_queue"] == state["review_queue"]
     assert any(
         item["status"] == "employee_confirmed"
         for item in confirmed["understanding"].values()
@@ -287,7 +268,6 @@ async def test_blocking_calibration_blocks_only_dependent_branch_and_later_is_no
     structural = ConsultantResult(
         visible_reply="主管核准邊界會影響請購 Task 的責任描述，先請你確認。",
         reply_basis=_basis(source_id),
-        used_skill_ids=("work-discovery",),
         understanding_changes=(
             UnderstandingChange(
                 operation=UnderstandingOperation.REVISE,
@@ -354,35 +334,12 @@ async def test_semantic_progress_is_explainable_and_has_no_percentage_or_pause_s
         source_id,
         impact=UnderstandingImpact.ROUTINE,
     )
-    changeset = create_document_changeset(
-        document_id=document_id,
-        run_id=uuid4(),
-        summary="建立待審 Task 候選。",
-        read_revision=state["revision"],
-        document=ApprovedJobDocument.model_validate(state["approved_document"]),
-        changes=(
-            ReviewableDocumentChange(
-                operation=DocumentChangeOperation.ADD,
-                path="/tasks",
-                after={
-                    "statement": "依缺料狀況建立請購單",
-                    "action": "建立",
-                    "object": "請購單",
-                    "display_order": 0,
-                },
-                basis=_basis(source_id),
-            ),
-        ),
-        existing_review_queue=state["review_queue"],
-        interview_work=state["interview_work"],
-    )
     state = await _commit(
         graph,
         document_id,
         state["revision"],
         source_id,
         result,
-        published_changeset=changeset,
     )
     snapshot = snapshot_from_state(state)
     payload = snapshot.model_dump(mode="json")
@@ -398,7 +355,7 @@ async def test_semantic_progress_is_explainable_and_has_no_percentage_or_pause_s
     assert snapshot.semantic_progress.depth[0].task_boundary == "interviewing"
     assert snapshot.semantic_progress.depth[0].duty_grouping == "not_yet_deepened"
     assert snapshot.semantic_progress.depth[0].knowledge == "not_yet_deepened"
-    assert snapshot.semantic_progress.employee_decisions.pending == 1
+    assert snapshot.semantic_progress.employee_decisions.pending == 0
     assert snapshot.approved_document.tasks == ()
     assert snapshot.semantic_progress.gaps[0].reason_code == "work_coverage_missing"
     assert "percent" not in serialized

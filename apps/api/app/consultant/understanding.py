@@ -9,7 +9,6 @@ and how to explain currently known coverage without a fake denominator.
 from __future__ import annotations
 
 import json
-from collections import Counter
 from enum import StrEnum
 from hashlib import sha256
 from typing import Any, Literal, Sequence
@@ -28,8 +27,6 @@ from app.consultant.state import (
     CalibrationStatus,
     CalibrationTrigger,
     ConsultantThreadState,
-    DocumentChangeSet,
-    DocumentChangeStatus,
     DurableModel,
     EmployeeSourceKind,
     GapItem,
@@ -176,7 +173,6 @@ _BLOCKING_GAP_REASONS = {
     GapReason.SOURCE_CONTRADICTION.value,
     GapReason.CURRENT_RESPONSIBILITY_UNCLEAR.value,
 }
-_STRUCTURAL_OPERATIONS = {"merge", "split", "reassign"}
 
 
 def _work_items(state: ConsultantThreadState) -> dict[str, InterviewWorkItem]:
@@ -411,22 +407,17 @@ def semantic_progress_from_state(
                 values[work_axis] = DepthStatus.HELD_WITH_REASON
         depth.append(WorkDepthProjection(work_id=item.work_id, **values))
 
-    decisions = Counter(
-        action.status.value
-        for value in state.get("review_queue", {}).values()
-        for action in DocumentChangeSet.model_validate(value).actions
-    )
     return SemanticProgressProjection(
         currently_known_work_count=len(work),
         coverage=coverage,
         depth=tuple(depth),
         employee_decisions=EmployeeDecisionProjection(
-            pending=decisions[DocumentChangeStatus.PENDING.value],
-            deferred=decisions[DocumentChangeStatus.DEFERRED.value],
-            accepted=decisions[DocumentChangeStatus.ACCEPTED.value],
-            edit_accepted=decisions[DocumentChangeStatus.EDIT_ACCEPTED.value],
-            rejected=decisions[DocumentChangeStatus.REJECTED.value],
-            stale=decisions[DocumentChangeStatus.STALE.value],
+            pending=0,
+            deferred=0,
+            accepted=0,
+            edit_accepted=0,
+            rejected=0,
+            stale=0,
         ),
         gaps=tuple(
             GapProjection(
@@ -444,17 +435,8 @@ def semantic_progress_from_state(
 
 
 def _structural_decision_count(state: ConsultantThreadState) -> int:
-    count = 0
-    for value in state.get("review_queue", {}).values():
-        bundle = DocumentChangeSet.model_validate(value)
-        if any(
-            action.status
-            in {DocumentChangeStatus.PENDING, DocumentChangeStatus.DEFERRED}
-            and action.operation.value in _STRUCTURAL_OPERATIONS
-            for action in bundle.actions
-        ):
-            count += 1
-    return count
+    del state
+    return 0
 
 
 def sufficiency_evidence_from_state(

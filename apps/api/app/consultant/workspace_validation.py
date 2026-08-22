@@ -27,10 +27,10 @@ from app.consultant.state import (
     SourceValidity,
 )
 from app.consultant.workspace_resources import (
-    CandidateDocumentDraft,
     WorkspaceCatalog,
+    WorkspaceDocumentDraft,
     WorkspaceResourceError,
-    parse_candidate_files,
+    parse_workspace_files,
     project_workspace_files,
     workspace_entity_id,
 )
@@ -46,7 +46,6 @@ from app.consultant.workspace_state import (
 
 
 SourceLoader = Callable[[], Awaitable[Sequence[EmployeeSource]]]
-_COMPATIBILITY_RUN_ID = UUID("00000000-0000-0000-0000-000000000000")
 _MAX_DIAGNOSTICS = 8
 _ENTITY_PATH = re.compile(
     r"^/workspace/(?:(duties)/(duty-[^/]+)|(tasks)/(task-[^/]+)|"
@@ -65,7 +64,7 @@ class WorkspaceValidationSummary:
 @dataclass(frozen=True, slots=True)
 class WorkspaceValidationResult:
     manifest: WorkspaceManifest
-    document: CandidateDocumentDraft | None
+    document: WorkspaceDocumentDraft | None
     diagnostics: tuple[WorkspaceDiagnostic, ...]
     revalidated: bool
 
@@ -91,7 +90,7 @@ class WorkspaceValidationResult:
 
 @dataclass(frozen=True, slots=True)
 class WorkspacePayloadValidation:
-    document: CandidateDocumentDraft | None
+    document: WorkspaceDocumentDraft | None
     diagnostics: tuple[WorkspaceDiagnostic, ...]
     current_sources: tuple[EmployeeSource, ...]
     evidence_by_handle: Mapping[str, tuple[AnalysisBasis, ...]]
@@ -197,9 +196,6 @@ def _workspace_path_from_error(error: BaseException, files: Mapping[str, str]) -
     direct = re.search(r"(/workspace/[^\s:]+)", message)
     if direct is not None:
         return direct.group(1).rstrip(".,)")
-    candidate = re.search(r"/candidate/[^/]+/([^\s:]+)", message)
-    if candidate is not None:
-        return "/workspace/" + candidate.group(1).rstrip(".,)")
     relative = re.search(
         r"(?:resource|path):?\s+(header\.json|(?:duties|tasks|opks)/[^\s:]+\.json)",
         message,
@@ -253,14 +249,6 @@ def _resource_error_diagnostic(
     )
 
 
-def _compatibility_view(files: Mapping[str, str]) -> dict[str, str]:
-    root = f"/candidate/{_COMPATIBILITY_RUN_ID}/"
-    return {
-        root + path.removeprefix("/workspace/"): content
-        for path, content in files.items()
-    }
-
-
 def _current_sources(catalog: WorkspaceCatalog) -> tuple[EmployeeSource, ...]:
     return tuple(
         sorted(
@@ -290,7 +278,7 @@ def _default_basis(
 
 
 def _resolve_evidence(
-    draft: CandidateDocumentDraft,
+    draft: WorkspaceDocumentDraft,
     catalog: WorkspaceCatalog,
     files: Mapping[str, str],
     *,
@@ -366,13 +354,6 @@ def _resolve_evidence(
     )
 
 
-def _candidate_run_id(files: Mapping[str, str]) -> UUID:
-    for path in files:
-        if path.startswith("/candidate/"):
-            return UUID(path.split("/")[2])
-    raise WorkspaceResourceError("candidate run namespace must be a UUID")
-
-
 def validate_workspace_payload(
     files: Mapping[str, str],
     *,
@@ -380,23 +361,15 @@ def validate_workspace_payload(
     selected_skill_ids: Sequence[SkillId],
     loaded_skill_ids: Sequence[SkillId],
 ) -> WorkspacePayloadValidation:
-    """Parse and validate one workspace/candidate payload without side effects."""
+    """Parse and validate one persistent workspace payload without side effects."""
 
     normalized = dict(sorted(files.items()))
-    workspace_files = bool(normalized) and all(
-        path.startswith("/workspace/") for path in normalized
-    )
-    parser_files = _compatibility_view(normalized) if workspace_files else normalized
     try:
-        draft = parse_candidate_files(
-            catalog,
-            parser_files,
-            run_id=(
-                _COMPATIBILITY_RUN_ID
-                if workspace_files
-                else _candidate_run_id(parser_files)
-            ),
-            new_entity_namespace=("workspace" if workspace_files else "candidate"),
+        draft = parse_workspace_files(
+            catalog.document_id,
+            normalized,
+            handle_registry=catalog.handle_to_stable,
+            baseline_document=catalog.document,
         )
     except (ValueError, WorkspaceResourceError) as error:
         return WorkspacePayloadValidation(
@@ -592,7 +565,6 @@ class WorkspaceValidationService:
         else:
             fresh_catalog = WorkspaceCatalog.from_snapshot(
                 self._catalog.document,
-                pending=self._catalog.pending,
                 sources=sources,
             )
             registry, identity_issue = _entity_registry(

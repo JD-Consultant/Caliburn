@@ -44,11 +44,10 @@ from deepagents.backends.utils import (
 from app.adapters.langgraph.postgres import PostgresConsultantRuntime
 from app.consultant.context import DocumentSourceLookup
 from app.consultant.skill_backend import PackageSkillBackend
-from app.consultant.state import DocumentChangeSet, DocumentPatchAction, EmployeeSource
+from app.consultant.state import EmployeeSource
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
-    pending_action_handles,
-    project_candidate_files,
+    project_workspace_files,
 )
 from app.consultant.workspace_review import (
     WorkspaceReviewDecision,
@@ -251,13 +250,6 @@ class ApprovedProjectionBackend(_StaticProjectionBackend):
         super().__init__(_canonical_document_files(catalog))
 
 
-class PendingProjectionBackend(_StaticProjectionBackend):
-    """Expose pending review memory without merging it into approved content."""
-
-    def __init__(self, catalog: WorkspaceCatalog) -> None:
-        super().__init__(_pending_files(catalog))
-
-
 class WorkspaceReviewProjectionBackend(BackendProtocol):
     """Fresh, read-only semantic review over the actual Store workspace bytes."""
 
@@ -363,7 +355,6 @@ class WorkspaceReviewProjectionBackend(BackendProtocol):
         )
         current_catalog = WorkspaceCatalog.from_snapshot(
             self.catalog.document,
-            pending=self.catalog.pending,
             sources=current_sources,
         )
         current_evidence_digest = evidence_basis_digest(current_sources)
@@ -484,13 +475,13 @@ class WorkspaceReviewProjectionBackend(BackendProtocol):
 
 
 def _canonical_document_files(catalog: WorkspaceCatalog) -> dict[str, str]:
-    projection_run = UUID("00000000-0000-0000-0000-000000000000")
-    candidate_files = project_candidate_files(catalog, run_id=projection_run)
-    prefix = f"/candidate/{projection_run}"
+    projection = project_workspace_files(
+        catalog.document,
+        handle_registry=catalog.handle_to_stable,
+    )
     resources = {
-        path.removeprefix(prefix) or "/": content
-        for path, content in candidate_files.items()
-        if not path.endswith("/review-groups.json")
+        path.removeprefix("/workspace") or "/": content
+        for path, content in projection.files.items()
     }
     relative_paths = sorted(path.lstrip("/") for path in resources)
     resources["/index.json"] = _json_text(
@@ -498,219 +489,10 @@ def _canonical_document_files(catalog: WorkspaceCatalog) -> dict[str, str]:
             "approved_resource_paths": [
                 f"/approved/{path}" for path in relative_paths
             ],
-            "candidate_relative_resource_paths": relative_paths,
+            "workspace_relative_resource_paths": relative_paths,
         }
     )
     return resources
-
-
-def _pending_files(catalog: WorkspaceCatalog) -> dict[str, str]:
-    changesets = sorted(
-        catalog.pending,
-        key=lambda item: (item.created_revision, str(item.changeset_id)),
-    )
-    action_handles = pending_action_handles(changesets)
-    review_handles = {
-        changeset.changeset_id: f"review-{index:03d}"
-        for index, changeset in enumerate(changesets, start=1)
-    }
-    contents: dict[str, str] = {
-        "/index.json": _json_text(
-            {
-                "approved": False,
-                "status": _pending_status(changesets),
-                "review_handles": [review_handles[item.changeset_id] for item in changesets],
-                "action_handles": [
-                    action_handles[action.action_id]
-                    for item in changesets
-                    for action in item.actions
-                ],
-            }
-        )
-    }
-    for changeset in changesets:
-        review_handle = review_handles[changeset.changeset_id]
-        contents[f"/reviews/{review_handle}.json"] = _json_text(
-            {
-                "handle": review_handle,
-                "approved": False,
-                "status": _pending_status((changeset,)),
-                "summary": changeset.summary,
-                "action_handles": [
-                    action_handles[action.action_id] for action in changeset.actions
-                ],
-                "dependency_handles": _pending_dependency_handles(
-                    changeset, action_handles
-                ),
-            }
-        )
-        for action in changeset.actions:
-            action_handle = action_handles[action.action_id]
-            contents[f"/actions/{action_handle}.json"] = _json_text(
-                _pending_action_projection(
-                    catalog,
-                    action,
-                    action_handle=action_handle,
-                    action_handles=action_handles,
-                )
-            )
-    return contents
-
-
-def _pending_status(changesets: Sequence[DocumentChangeSet]) -> str:
-    statuses = {
-        action.status.value for changeset in changesets for action in changeset.actions
-    }
-    if not statuses:
-        return "pending"
-    if len(statuses) == 1:
-        return next(iter(statuses))
-    return "partial"
-
-
-def _pending_dependency_handles(
-    changeset: DocumentChangeSet,
-    action_handles: Mapping[UUID, str],
-) -> list[str]:
-    dependency_ids = set(changeset.external_dependency_action_ids)
-    for action in changeset.actions:
-        dependency_ids.update(action.depends_on_action_ids)
-    return [action_handles[item] for item in sorted(dependency_ids, key=str)]
-
-
-def _pending_action_projection(
-    catalog: WorkspaceCatalog,
-    action: DocumentPatchAction,
-    *,
-    action_handle: str,
-    action_handles: Mapping[UUID, str],
-) -> dict[str, Any]:
-    decision_reason = action.rejection_reason or action.stale_reason
-    projection: dict[str, Any] = {
-        "handle": action_handle,
-        "approved": False,
-        "status": action.status.value,
-        "operation": action.operation.value,
-        "path": _pending_path(catalog, action.path),
-        "target_handles": _pending_target_handles(catalog, action),
-        "before": _pending_action_value(catalog, action.path, action.before),
-        "after": _pending_action_value(catalog, action.path, action.after),
-        "dependency_handles": [
-            action_handles[item] for item in sorted(action.depends_on_action_ids, key=str)
-        ],
-    }
-    if action.employee_after is not None:
-        projection["employee_after"] = _pending_action_value(
-            catalog, action.path, action.employee_after
-        )
-    if decision_reason is not None:
-        projection["decision_reason"] = decision_reason
-    return projection
-
-
-def _pending_action_value(catalog: WorkspaceCatalog, path: str, value: Any) -> Any:
-    relation = path.rstrip("/").rsplit("/", 1)[-1]
-    if relation in {"duty_id", "task_id"}:
-        if value is None:
-            return None
-        return catalog.handle_for_id(UUID(str(value)))
-    if relation in {"task_ids", "indicator_ids"}:
-        if value is None:
-            return None
-        return [
-            catalog.handle_for_id(UUID(str(raw_id)))
-            for raw_id in value
-        ]
-    return _pending_semantic_value(catalog, value)
-
-
-def _pending_path(catalog: WorkspaceCatalog, path: str) -> str:
-    parts = path.strip("/").split("/")
-    if len(parts) >= 2 and parts[0] in {"duties", "tasks", "opks"}:
-        try:
-            parts[1] = catalog.handle_for_id(UUID(parts[1]))
-        except (KeyError, ValueError):
-            pass
-    return "/" + "/".join(parts)
-
-
-def _pending_target_handles(
-    catalog: WorkspaceCatalog,
-    action: DocumentPatchAction,
-) -> list[str]:
-    target_ids = list(action.target_ids)
-    if not target_ids:
-        parts = action.path.strip("/").split("/")
-        id_field = {
-            "duties": "duty_id",
-            "tasks": "task_id",
-            "opks": "item_id",
-        }.get(parts[0] if parts else "")
-        if len(parts) >= 2:
-            try:
-                target_ids.append(UUID(parts[1]))
-            except ValueError:
-                pass
-        if id_field is not None and isinstance(action.after, dict):
-            raw_id = action.after.get(id_field)
-            if raw_id is not None:
-                try:
-                    target_ids.append(UUID(str(raw_id)))
-                except ValueError:
-                    pass
-    handles: list[str] = []
-    for target_id in target_ids:
-        handle = catalog.handle_for_id(target_id)
-        if handle not in handles:
-            handles.append(handle)
-    return handles
-
-
-def _pending_semantic_value(catalog: WorkspaceCatalog, value: Any) -> Any:
-    if value is None or isinstance(value, (str, int, float, bool)):
-        return value
-    if isinstance(value, list):
-        return [_pending_semantic_value(catalog, item) for item in value]
-    if not isinstance(value, dict):
-        return None
-
-    projected: dict[str, Any] = {}
-    for key in (
-        "kind",
-        "text",
-        "statement",
-        "action",
-        "object",
-        "purpose_result",
-        "context",
-        "frequency_text",
-        "responsibility_role",
-        "name",
-    ):
-        if key in value:
-            projected[key] = value[key]
-    for source_key, handle_key in (
-        ("duty_id", "duty_handle"),
-        ("task_id", "task_handle"),
-    ):
-        raw_id = value.get(source_key)
-        if raw_id is not None:
-            projected[handle_key] = catalog.handle_for_id(UUID(str(raw_id)))
-    for source_key, handle_key in (
-        ("task_ids", "task_handles"),
-        ("indicator_ids", "indicator_handles"),
-    ):
-        if source_key in value:
-            projected[handle_key] = [
-                catalog.handle_for_id(UUID(str(raw_id))) for raw_id in value[source_key]
-            ]
-    if "enablers" in value:
-        projected["enablers"] = [
-            {"kind": item["kind"], "name": item["name"]}
-            for item in value["enablers"]
-            if isinstance(item, dict) and "kind" in item and "name" in item
-        ]
-    return projected
 
 
 class WorkspacePolicyBackend(BackendProtocol):
@@ -1236,7 +1018,6 @@ class ConsultantWorkspaceBackendBinding:
     workspace_backend: WorkspacePolicyBackend
     source_backend: EmployeeSourceProjectionBackend
     approved_backend: ApprovedProjectionBackend
-    pending_backend: PendingProjectionBackend
     review_backend: WorkspaceReviewProjectionBackend
     catalog: WorkspaceCatalog
     document_id: UUID
@@ -1245,15 +1026,6 @@ class ConsultantWorkspaceBackendBinding:
     def backend(self) -> CompositeBackend:
         return self.composite_backend
 
-    @property
-    def current_run_catalog(self) -> WorkspaceCatalog:
-        return self.catalog
-
-    @property
-    def candidate_backend(self) -> WorkspacePolicyBackend:
-        """Temporary pre-Task-6 name used by the existing agent assembly."""
-
-        return self.workspace_backend
 
 def build_consultant_workspace_backend(
     *,
@@ -1282,7 +1054,6 @@ def build_consultant_workspace_backend(
         catalog=catalog,
     )
     approved_backend = ApprovedProjectionBackend(catalog)
-    pending_backend = PendingProjectionBackend(catalog)
     review_backend = WorkspaceReviewProjectionBackend(
         workspace=workspace,
         catalog=catalog,
@@ -1295,7 +1066,6 @@ def build_consultant_workspace_backend(
             "/skills/": skill_backend,
             "/sources/": source_backend,
             "/approved/": approved_backend,
-            "/pending/": pending_backend,
             "/review/": review_backend,
         },
     )
@@ -1306,7 +1076,6 @@ def build_consultant_workspace_backend(
         workspace_backend=workspace_backend,
         source_backend=source_backend,
         approved_backend=approved_backend,
-        pending_backend=pending_backend,
         review_backend=review_backend,
         catalog=catalog,
         document_id=document_id,

@@ -10,13 +10,6 @@ from langchain_core.messages import AIMessage
 from pydantic import model_validator
 
 from app.consultant.clarification import create_required_clarification
-from app.consultant.document_review import (
-    block_review_dependent_work,
-    revalidate_review_queue,
-    revalidate_review_work,
-    stale_superseded_review_actions,
-    stale_review_queue_for_source_correction,
-)
 from app.consultant.results import (
     AttentionOperation,
     ConsultantResult,
@@ -24,7 +17,6 @@ from app.consultant.results import (
     UnderstandingOperation,
 )
 from app.consultant.state import (
-    ApprovedJobDocument,
     CalibrationStatus,
     ConsultantThreadState,
     DurableModel,
@@ -37,7 +29,6 @@ from app.consultant.state import (
     RunReceipt,
     RunExecutionEvidence,
     RunStatus,
-    DocumentChangeSet,
     UnderstandingCalibration,
     UnderstandingItem,
     UnderstandingStatus,
@@ -344,48 +335,12 @@ def _apply_gap_changes(
     return gaps
 
 
-def _publish_persisted_changeset(
-    *,
-    document_id: UUID,
-    run_id: UUID,
-    read_revision: int,
-    state: ConsultantThreadState,
-    published_changeset: DocumentChangeSet | None,
-    interview_work: dict[str, dict[str, Any]],
-) -> tuple[dict[str, dict[str, Any]], dict[str, dict[str, Any]]]:
-    review_queue = dict(state.get("review_queue", {}))
-    if published_changeset is None:
-        return review_queue, interview_work
-    if published_changeset.created_revision != read_revision:
-        raise ValueError("published candidate baseline revision is stale")
-    review_queue = stale_superseded_review_actions(
-        review_queue,
-        published_changeset=published_changeset,
-    )
-    existing = review_queue.get(str(published_changeset.changeset_id))
-    if existing is not None and DocumentChangeSet.model_validate(existing) != published_changeset:
-        raise ValueError("published candidate changeset conflicts with review queue")
-    review_queue[str(published_changeset.changeset_id)] = _dump(published_changeset)
-    review_queue = revalidate_review_queue(
-        ApprovedJobDocument.model_validate(state["approved_document"]),
-        review_queue,
-        stale_reason="新的候選取代了先前建議，請重新確認這項建議的文件前提。",
-    )
-    interview_work = block_review_dependent_work(
-        interview_work,
-        published_changeset.actions,
-        revision=read_revision + 1,
-    )
-    return review_queue, interview_work
-
-
 def apply_verified_consultant_commit(
     state: ConsultantThreadState,
     *,
     document_id: UUID,
     revision: int,
     commit: VerifiedConsultantCommit,
-    published_changeset: DocumentChangeSet | None = None,
 ) -> ConsultantThreadState:
     if state.get("latest_source_id") != str(commit.answer_source_id):
         raise ValueError("consultant result does not belong to the latest saved input")
@@ -409,14 +364,6 @@ def apply_verified_consultant_commit(
         state=state,
         result=commit.result,
     )
-    review_queue, work = _publish_persisted_changeset(
-        document_id=document_id,
-        run_id=commit.run_id,
-        read_revision=revision - 1,
-        state=state,
-        published_changeset=published_changeset,
-        interview_work=work,
-    )
     prospective: ConsultantThreadState = {
         **state,
         "revision": revision,
@@ -424,7 +371,6 @@ def apply_verified_consultant_commit(
         "current_work_id": str(current_work_id) if current_work_id else None,
         "understanding": understanding,
         "gaps": gaps,
-        "review_queue": review_queue,
     }
     calibrations, latest_calibration_id, work = create_calibration(
         document_id=document_id,
@@ -479,7 +425,6 @@ def apply_verified_consultant_commit(
                 "kind": "consultant_turn",
                 "run_id": str(commit.run_id),
                 "answer_source_id": str(commit.answer_source_id),
-                "used_skill_ids": list(commit.result.used_skill_ids),
                 "next_question": (
                     commit.result.next_question.model_dump(mode="json")
                     if commit.result.next_question is not None
@@ -505,7 +450,6 @@ def apply_verified_consultant_commit(
         "understanding_calibrations": calibrations,
         "latest_calibration_id": latest_calibration_id,
         "gaps": gaps,
-        "review_queue": review_queue,
         "required_clarification": (
             required_clarification.model_dump(mode="json")
             if required_clarification is not None
@@ -524,10 +468,6 @@ def apply_source_correction(
     correction_source_id: UUID,
     revision: int,
 ) -> ConsultantThreadState:
-    review_queue = stale_review_queue_for_source_correction(
-        state.get("review_queue", {}),
-        superseded_source_id=superseded_source_id,
-    )
     clarification = (
         RequiredClarification.model_validate(state["required_clarification"])
         if state.get("required_clarification") is not None
@@ -612,13 +552,6 @@ def apply_source_correction(
                 }
             )
         )
-    work = revalidate_review_work(
-        work,
-        review_queue,
-        revision=revision,
-        resolved_reason="員工已更正舊來源，這個工作需依最新說法重新檢查。",
-    )
-
     gaps = dict(state.get("gaps", {}))
     for key, value in tuple(gaps.items()):
         item = GapItem.model_validate(value)
@@ -668,7 +601,6 @@ def apply_source_correction(
             else state.get("latest_calibration_id")
         ),
         "gaps": gaps,
-        "review_queue": review_queue,
         **(
             {"required_clarification": None}
             if retired_clarification_id is not None

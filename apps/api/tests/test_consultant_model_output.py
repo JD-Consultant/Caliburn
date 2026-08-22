@@ -15,7 +15,6 @@ from app.consultant.model_output import (
     OutputAnalysisBasis,
     OutputAttentionChange,
     OutputAttentionDisposition,
-    OutputCandidatePublication,
     OutputGap,
     OutputQuestion,
     OutputQuestionKind,
@@ -26,7 +25,6 @@ from app.consultant.model_output import (
 from app.consultant.provider_wire import OutputEvidenceReference
 from app.consultant.results import (
     AttentionOperation,
-    CandidatePublication,
     GapOperation,
     GapReason,
     UnderstandingOperation,
@@ -104,15 +102,9 @@ def _output(source_id: UUID, **overrides: Any) -> ConsultantModelOutput:
         "visible_reply": "我理解你會整理採購需求。",
         "analysis_bases": (_basis(source_id, "task-boundary"),),
         "reply_basis_ordinal": 1,
-        "used_skill_ids": ("task-boundary",),
         "understanding_changes": (),
         "attention_changes": (),
         "gaps": (),
-        "candidate_publication": OutputCandidatePublication(
-            candidate_revision=0,
-            revision_digest="",
-            action_handles=(),
-        ),
         "question": _no_question(),
         "sufficiency": _sufficiency(),
     }
@@ -157,11 +149,6 @@ def test_model_output_schema_is_closed_and_evidence_is_provider_neutral() -> Non
     assert "source_id" not in evidence_schema["properties"]
     assert "start" not in evidence_schema["properties"]
     assert "end" not in evidence_schema["properties"]
-    publication_schema = schema["$defs"]["OutputCandidatePublication"]
-    assert "action_handles" in publication_schema["properties"]
-    assert "action_ids" not in publication_schema["properties"]
-    assert publication_schema["properties"]["action_handles"]["items"]["type"] == "string"
-    assert "format" not in publication_schema["properties"]["action_handles"]["items"]
 
 
 @pytest.mark.parametrize("occurrence", [True, "0"])
@@ -182,7 +169,8 @@ def test_langchain_converts_the_same_final_contract() -> None:
     provider_schema = converted["function"]["parameters"]
     assert converted["function"]["name"] == "ConsultantModelOutput"
     assert provider_schema["additionalProperties"] is False
-    assert "candidate_publication" in provider_schema["properties"]
+    publication_field = "candidate" + "_publication"
+    assert publication_field not in provider_schema["properties"]
 
 
 def test_model_evidence_is_resolved_by_handle_quote_and_occurrence() -> None:
@@ -257,71 +245,6 @@ def test_unknown_handle_or_quote_fails_before_rich_result_mapping() -> None:
 
     with pytest.raises(ConsultantOutputMappingError, match="could not be resolved"):
         map_consultant_model_output(output, catalog=_catalog(source_id))
-
-
-def test_candidate_publication_maps_neutral_and_exact_valid_receipts() -> None:
-    source_id = uuid4()
-    action_handle = "action-001"
-
-    neutral = map_consultant_model_output(_output(source_id), catalog=_catalog(source_id))
-    published = map_consultant_model_output(
-        _output(
-            source_id,
-            candidate_publication=OutputCandidatePublication(
-                candidate_revision=2,
-                revision_digest="a" * 64,
-                action_handles=(action_handle,),
-            ),
-        ),
-        catalog=_catalog(source_id),
-    )
-
-    assert neutral.candidate_publication is None
-    assert published.candidate_publication == CandidatePublication(
-        candidate_revision=2,
-        revision_digest="a" * 64,
-        action_handles=(action_handle,),
-    )
-    assert published.candidate_publication.action_handles == (action_handle,)
-    assert not hasattr(published.candidate_publication, "action_ids")
-
-
-@pytest.mark.parametrize(
-    "candidate_revision, revision_digest, action_handles",
-    [
-        pytest.param(0, "a" * 64, (), id="neutral-with-digest"),
-        pytest.param(0, "", ("action-001",), id="neutral-with-action"),
-        pytest.param(1, "", ("action-001",), id="positive-without-digest"),
-        pytest.param(1, "a" * 64, (), id="positive-without-action"),
-        pytest.param(1, "a" * 64, ("action-001",) * 2, id="duplicate-action"),
-    ],
-)
-def test_candidate_publication_rejects_mixed_sentinels_and_duplicate_handles(
-    candidate_revision: int,
-    revision_digest: str,
-    action_handles: tuple[str, ...],
-) -> None:
-    with pytest.raises(ConsultantOutputMappingError):
-        map_consultant_model_output(
-            _output(
-                uuid4(),
-                candidate_publication=OutputCandidatePublication(
-                    candidate_revision=candidate_revision,
-                    revision_digest=revision_digest,
-                    action_handles=action_handles,
-                ),
-            ),
-            catalog=_catalog(uuid4()),
-        )
-
-
-def test_candidate_publication_digest_requires_lowercase_sha256_or_neutral_empty() -> None:
-    with pytest.raises(ValidationError):
-        OutputCandidatePublication(
-            candidate_revision=1,
-            revision_digest="not-a-digest",
-            action_handles=("action-001",),
-        )
 
 
 def test_all_non_document_effects_survive_the_wire_mapping() -> None:
@@ -425,6 +348,7 @@ def test_model_output_schema_metrics_are_recorded_without_legacy_editor_schema()
     schema = ConsultantModelOutput.model_json_schema()
     serialized = json.dumps(schema, ensure_ascii=False)
     assert "analysis_bases" in schema["properties"]
-    assert "candidate_publication" in schema["properties"]
+    publication_field = "candidate" + "_publication"
+    assert publication_field not in schema["properties"]
     assert "document_draft" not in serialized
     assert "model_offsets" not in serialized

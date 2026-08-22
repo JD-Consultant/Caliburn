@@ -140,7 +140,6 @@ async def test_procurement_interview_keeps_one_focus_and_reopens_only_corrected_
             "供應商績效會保留，稍後再回來。"
         ),
         reply_basis=_basis(first_source, "work-discovery"),
-        used_skill_ids=("work-discovery",),
         understanding_changes=(
             UnderstandingChange(
                 operation=UnderstandingOperation.ADD,
@@ -225,13 +224,6 @@ async def test_procurement_interview_keeps_one_focus_and_reopens_only_corrected_
         ),
         reply_basis=_basis(
             second_source,
-            "work-discovery",
-            "task-boundary",
-            "duty-grouping",
-            "output",
-            "knowledge",
-        ),
-        used_skill_ids=(
             "work-discovery",
             "task-boundary",
             "duty-grouping",
@@ -385,7 +377,6 @@ async def test_source_correction_only_challenges_dependent_understanding() -> No
     result = ConsultantResult(
         visible_reply="我先保留兩項工作理解。",
         reply_basis=_basis(shortage_source, "work-discovery"),
-        used_skill_ids=("work-discovery",),
         understanding_changes=(
             UnderstandingChange(
                 operation=UnderstandingOperation.ADD,

@@ -29,20 +29,7 @@ from psycopg.rows import DictRow, dict_row
 
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.clarification import ClarificationAnswer
-from app.consultant.candidate_publication import (
-    CandidateCheckRequest,
-    CandidateCheckResult,
-    CandidatePublicationStale,
-    check_candidate_document,
-    publish_checked_candidate as validate_checked_candidate,
-    resource_digest,
-)
 from app.consultant.document_authority import DocumentAuthorityError, edited_action_source_payload
-from app.consultant.document_review import (
-    DocumentReviewError,
-    RejectedChangeRequiresNewEvidence,
-    apply_review_command,
-)
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.state import (
     ApprovedJobDocument,
@@ -50,8 +37,6 @@ from app.consultant.state import (
     CalibrationStatus,
     CommandReceipt,
     CommandReceiptConflict,
-    DocumentChangeSet,
-    DocumentChangeStatus,
     DurableModel,
     EmployeeSource,
     EmployeeSourceKind,
@@ -60,7 +45,6 @@ from app.consultant.state import (
     SourcePositionAnchor,
     SourceReference,
     SourceValidity,
-    CheckedCandidateReceipt,
     RequiredClarification,
     RunReceipt,
     RunExecutionEvidence,
@@ -73,16 +57,28 @@ from app.consultant.workspace_authority import (
     WorkspaceAuthorityService,
     WorkspaceReviewCommand,
 )
+from app.consultant.workspace_review import derive_workspace_review
+from app.consultant.workspace_state import (
+    StoreBackedWorkspace,
+    WorkspaceValidationStatus,
+    approved_document_digest,
+)
+from app.consultant.workspace_validation import (
+    active_conflict_diagnostics,
+    evidence_basis_digest,
+    validate_workspace_payload,
+)
 from app.consultant.workspace_state import (
     workspace_decision_namespace as _workspace_decision_namespace,
     workspace_metadata_namespace as _workspace_metadata_namespace,
     workspace_namespace as _workspace_namespace,
 )
-from app.consultant.views import ConsultantSnapshot, snapshot_from_state
-from app.consultant.verification import (
-    ConsultantVerificationError,
-    verify_candidate_document_changes,
+from app.consultant.views import (
+    ConsultantSnapshot,
+    document_review_projection_from_workspace,
+    snapshot_from_state,
 )
+from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 
 
 SourceHook = Callable[[EmployeeSource], Awaitable[None]]
@@ -326,13 +322,80 @@ class PostgresConsultantRuntime:
             await WorkspaceAuthorityService(self).recover(document_id)
             return await self._snapshot(document_id)
 
+    async def workspace_review_context(self, document_id: UUID) -> Any:
+        """Load the current workspace review context for the HTTP command seam."""
+
+        return await WorkspaceAuthorityService(self)._review_context(document_id)
+
     async def _snapshot(self, document_id: UUID) -> ConsultantSnapshot:
         state = await self.graph.aget_state(self.graph_config(document_id))
         if not state.values:
             raise DocumentNotFound(
                 f"consultant checkpoint for {document_id} was not found"
             )
-        return snapshot_from_state(state.values)
+        snapshot = snapshot_from_state(state.values)
+        workspace = StoreBackedWorkspace(
+            store=self.store,
+            document_id=document_id,
+        )
+        await workspace.ensure_initialized(
+            approved_document=snapshot.approved_document,
+            approved_revision=snapshot.revision,
+        )
+        workspace_snapshot = await workspace.read_snapshot()
+        sources = await self.list_sources(document_id)
+        catalog = WorkspaceCatalog.from_snapshot(
+            snapshot.approved_document,
+            sources=sources,
+        )
+        validation = validate_workspace_payload(
+            workspace_snapshot.files,
+            catalog=catalog,
+            selected_skill_ids=CONSULTANT_SKILL_IDS,
+            loaded_skill_ids=CONSULTANT_SKILL_IDS,
+        )
+        manifest = workspace_snapshot.manifest
+        effective_manifest = manifest
+        if manifest.validation_status in {
+            WorkspaceValidationStatus.VALID,
+            WorkspaceValidationStatus.CONFLICTED,
+        } and validation.document is not None:
+            conflicts = active_conflict_diagnostics(
+                files=workspace_snapshot.files,
+                approved_document=snapshot.approved_document,
+                manifest=manifest,
+            )
+            effective_manifest = manifest.model_copy(
+                update={
+                    "validation_status": (
+                        WorkspaceValidationStatus.CONFLICTED
+                        if conflicts
+                        else WorkspaceValidationStatus.VALID
+                    ),
+                    "diagnostics": conflicts,
+                }
+            )
+        decisions = WorkspaceAuthorityService._projection_decisions(
+            await WorkspaceAuthorityService(self)._load_records(document_id)
+        )
+        projection = derive_workspace_review(
+            snapshot.approved_document,
+            validation,
+            effective_manifest,
+            decisions,
+        )
+        explanation = None
+        if projection.diagnostics:
+            explanation = "; ".join(item.message for item in projection.diagnostics)
+        return snapshot.model_copy(
+            update={
+                "document_review": document_review_projection_from_workspace(
+                    state.values,
+                    projection.changesets,
+                    explanation=explanation,
+                )
+            }
+        )
 
     async def raw_state(self, document_id: UUID) -> dict[str, Any]:
         await self._require_active_catalog(document_id)
@@ -423,7 +486,7 @@ class PostgresConsultantRuntime:
             for source in sources
         ):
             raise PendingSourceRequiresReconciliation(
-                "candidate evidence includes an uncommitted employee source"
+                "workspace Evidence includes an uncommitted employee source"
             )
         superseded = next(
             (
@@ -435,7 +498,7 @@ class PostgresConsultantRuntime:
         )
         if superseded is not None:
             raise SourceConflict(
-                f"source {superseded.source_id} was superseded before candidate staging"
+                f"source {superseded.source_id} was superseded before workspace staging"
             )
         return sources
 
@@ -795,238 +858,6 @@ class PostgresConsultantRuntime:
             return await self._snapshot(document_id)
 
     @staticmethod
-    def _candidate_text_files(
-        files: Mapping[str, str | bytes],
-    ) -> dict[str, str]:
-        normalized: dict[str, str] = {}
-        for path, raw in files.items():
-            if isinstance(raw, bytes):
-                normalized[str(path)] = raw.decode("utf-8")
-            elif isinstance(raw, str):
-                normalized[str(path)] = raw
-            else:
-                raise TypeError("candidate resources must be UTF-8 text files")
-        return normalized
-
-    @staticmethod
-    def _candidate_publication_command_receipt(
-        receipt: CheckedCandidateReceipt,
-    ) -> CommandReceipt:
-        payload = json.dumps(
-            receipt.model_dump(mode="json"),
-            ensure_ascii=False,
-            sort_keys=True,
-            separators=(",", ":"),
-        ).encode("utf-8")
-        return CommandReceipt(
-            command_id=uuid5(
-                receipt.changeset.changeset_id,
-                f"candidate-publication:{receipt.check_call_id}",
-            ),
-            command_kind="publish_checked_candidate",
-            payload_sha256=sha256(payload).hexdigest(),
-        )
-
-    async def check_candidate_document(
-        self,
-        *,
-        document_id: UUID,
-        run_id: UUID,
-        files: Mapping[str, str | bytes],
-        tool_call_id: str,
-        selected_skill_ids: tuple[str, ...],
-        loaded_skill_ids: tuple[str, ...],
-    ) -> CandidateCheckResult:
-        """Check current candidate resources and persist only its receipt."""
-
-        normalized_files = self._candidate_text_files(files)
-        async with self._lock_for(document_id):
-            await self._require_active_catalog(document_id)
-            snapshot = await self._snapshot(document_id)
-            raw_state = await self.raw_state(document_id)
-            latest_payload = raw_state.get("latest_run")
-            if latest_payload is None:
-                raise ActiveConsultantRun(
-                    "candidate check requires an active consultant run"
-                )
-            latest = RunReceipt.model_validate(latest_payload)
-            if latest.run_id != run_id or latest.status is not RunStatus.SOURCE_SAVED:
-                raise ActiveConsultantRun(
-                    "candidate check does not match the active consultant run"
-                )
-
-            digest = resource_digest(normalized_files)
-            existing_payload = raw_state.get("checked_candidate")
-            existing = (
-                CheckedCandidateReceipt.model_validate(existing_payload)
-                if existing_payload is not None
-                else None
-            )
-            if existing is not None and existing.check_call_id == tool_call_id:
-                if (
-                    existing.run_id == run_id
-                    and existing.baseline_revision == snapshot.revision
-                    and existing.resource_digest == digest
-                ):
-                    return CandidateCheckResult(
-                        status="checked",
-                        run_id=run_id,
-                        candidate_revision=existing.candidate_revision,
-                        resource_digest=digest,
-                        action_handles=existing.action_handles,
-                        actions=existing.changeset.actions,
-                        receipt=existing,
-                        review_queue={},
-                    )
-                raise IdempotencyConflict(
-                    f"candidate check call {tool_call_id} was reused with another payload"
-                )
-            candidate_revision = (
-                existing.candidate_revision + 1
-                if existing is not None and existing.run_id == run_id
-                else 1
-            )
-            pending = tuple(
-                DocumentChangeSet.model_validate(value)
-                for value in snapshot.review_queue.values()
-            )
-            sources = await self.list_sources(document_id)
-            catalog = WorkspaceCatalog.from_snapshot(
-                snapshot.approved_document,
-                pending=pending,
-                sources=sources,
-            )
-            request = CandidateCheckRequest(
-                document_id=document_id,
-                run_id=run_id,
-                baseline_revision=snapshot.revision,
-                candidate_revision=candidate_revision,
-                files=normalized_files,
-                check_call_id=tool_call_id,
-                selected_skill_ids=selected_skill_ids,
-                loaded_skill_ids=loaded_skill_ids,
-            )
-            result = check_candidate_document(
-                request,
-                catalog=catalog,
-                existing_review_queue=snapshot.review_queue,
-                interview_work=snapshot.interview_work,
-            )
-            if result.status != "checked" or result.receipt is None:
-                return result
-            try:
-                await self._require_current_committed_sources(
-                    document_id,
-                    result.receipt.changeset.source_ids,
-                )
-            except (
-                UnknownEvidenceSource,
-                PendingSourceRequiresReconciliation,
-                SourceConflict,
-            ) as error:
-                return CandidateCheckResult(
-                    status="invalid",
-                    run_id=run_id,
-                    candidate_revision=candidate_revision,
-                    resource_digest=digest,
-                    issues=(str(error),),
-                    review_queue={},
-                )
-            try:
-                await self.graph.ainvoke(
-                    {},
-                    self.graph_config(document_id),
-                    context={
-                        "action": "check_candidate_document",
-                        "document_id": str(document_id),
-                        "expected_revision": snapshot.revision,
-                        "checked_candidate": result.receipt.model_dump(mode="json"),
-                    },
-                )
-            except StaleThreadRevision as error:
-                raise StaleRevision(str(error)) from error
-            await self._touch_catalog(document_id)
-            return result
-
-    async def publish_checked_candidate(
-        self,
-        *,
-        document_id: UUID,
-        run_id: UUID,
-        files: Mapping[str, str | bytes],
-    ) -> ConsultantSnapshot:
-        """Atomically move the exact checked changeset into review queue."""
-
-        normalized_files = self._candidate_text_files(files)
-        async with self._lock_for(document_id):
-            await self._require_active_catalog(document_id)
-            snapshot = await self._snapshot(document_id)
-            raw_state = await self.raw_state(document_id)
-            checked_payload = raw_state.get("checked_candidate")
-            if checked_payload is None:
-                changeset_id = uuid5(
-                    document_id,
-                    f"consultant:{run_id}:document-changes",
-                )
-                if str(changeset_id) in snapshot.review_queue:
-                    return snapshot
-                raise CandidatePublicationStale(
-                    "candidate publication has no checked candidate receipt"
-                )
-            receipt = CheckedCandidateReceipt.model_validate(checked_payload)
-            if receipt.run_id != run_id:
-                raise CandidatePublicationStale(
-                    "candidate publication run is stale"
-                )
-            latest_payload = raw_state.get("latest_run")
-            if latest_payload is None:
-                raise CandidatePublicationStale(
-                    "candidate publication run is stale"
-                )
-            latest = RunReceipt.model_validate(latest_payload)
-            if latest.run_id != run_id or latest.status is not RunStatus.SOURCE_SAVED:
-                raise CandidatePublicationStale(
-                    "candidate publication run is stale"
-                )
-            sources = await self.list_sources(document_id)
-            current_source_ids = tuple(
-                source.source_id
-                for source in sources
-                if (
-                    source.document_id == document_id
-                    and source.processing_status is SourceProcessingStatus.COMMITTED
-                    and source.validity is SourceValidity.CURRENT
-                )
-            )
-            validate_checked_candidate(
-                receipt,
-                current_run_id=run_id,
-                current_baseline_revision=snapshot.revision,
-                current_document=snapshot.approved_document,
-                current_files=normalized_files,
-                current_source_ids=current_source_ids,
-            )
-            command_receipt = self._candidate_publication_command_receipt(receipt)
-            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
-                return snapshot
-            try:
-                await self.graph.ainvoke(
-                    {},
-                    self.graph_config(document_id),
-                    context={
-                        "action": "publish_checked_candidate",
-                        "document_id": str(document_id),
-                        "expected_revision": snapshot.revision,
-                        "run_id": str(run_id),
-                        "command_receipt": command_receipt.model_dump(mode="json"),
-                    },
-                )
-            except StaleThreadRevision as error:
-                raise StaleRevision(str(error)) from error
-            await self._touch_catalog(document_id)
-            return await self._snapshot(document_id)
-
-    @staticmethod
     def _changed_employee_text(
         before: ApprovedJobDocument,
         after: ApprovedJobDocument,
@@ -1260,43 +1091,6 @@ class PostgresConsultantRuntime:
             )
             return result
 
-    @staticmethod
-    def _review_replay_matches(
-        bundle: DocumentChangeSet,
-        *,
-        action: str,
-        action_ids: Sequence[UUID],
-        edited_after_by_action_id: Mapping[UUID, JsonValue | None],
-        rejection_reason: str | None,
-    ) -> bool:
-        selected = [
-            item for item in bundle.actions if item.action_id in set(action_ids)
-        ]
-        if len(selected) != len(set(action_ids)):
-            return False
-        if action == "accept_changes":
-            return all(
-                item.status is DocumentChangeStatus.ACCEPTED for item in selected
-            )
-        if action == "edit_and_accept_changes":
-            return all(
-                item.status is DocumentChangeStatus.EDIT_ACCEPTED
-                and item.employee_after
-                == edited_after_by_action_id.get(item.action_id)
-                for item in selected
-            )
-        if action == "reject_changes":
-            reason = (rejection_reason or "").strip()
-            return bool(reason) and all(
-                item.status is DocumentChangeStatus.REJECTED
-                and item.rejection_reason == reason
-                for item in selected
-            )
-        if action == "defer_changes":
-            return all(
-                item.status is DocumentChangeStatus.DEFERRED for item in selected
-            )
-        return False
 
     async def decide_workspace_changes(
         self,
@@ -1307,144 +1101,6 @@ class PostgresConsultantRuntime:
         async with self._lock_for(command.document_id):
             await self._require_active_catalog(command.document_id)
             return await WorkspaceAuthorityService(self).decide(command)
-
-    async def decide_document_changes(
-        self,
-        *,
-        document_id: UUID,
-        expected_revision: int,
-        action: Literal[
-            "accept_changes",
-            "edit_and_accept_changes",
-            "reject_changes",
-            "defer_changes",
-        ],
-        changeset_id: UUID,
-        action_ids: Sequence[UUID],
-        edited_after_by_action_id: Mapping[UUID, JsonValue | None] | None = None,
-        rejection_reason: str | None = None,
-        source_id: UUID | None = None,
-        command_receipt: CommandReceipt | None = None,
-    ) -> ConsultantSnapshot:
-        """Apply one employee review decision without invoking a provider."""
-
-        async with self._lock_for(document_id):
-            await self._require_active_catalog(document_id)
-            snapshot = await self._snapshot(document_id)
-            raw_state = await self.raw_state(document_id)
-            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
-                await self._reconcile_replayed_command_source(
-                    document_id,
-                    source_id,
-                )
-                return snapshot
-            raw_bundle = raw_state.get("review_queue", {}).get(str(changeset_id))
-            if raw_bundle is None:
-                raise KeyError(f"changeset {changeset_id} was not found")
-            bundle = DocumentChangeSet.model_validate(raw_bundle)
-            edited = dict(edited_after_by_action_id or {})
-            if snapshot.revision != expected_revision:
-                if self._review_replay_matches(
-                    bundle,
-                    action=action,
-                    action_ids=action_ids,
-                    edited_after_by_action_id=edited,
-                    rejection_reason=rejection_reason,
-                ) and command_receipt is None:
-                    if source_id is not None:
-                        source = await self.get_source_or_none(document_id, source_id)
-                        if (
-                            source is not None
-                            and source.processing_status
-                            is SourceProcessingStatus.PENDING
-                        ):
-                            await self._mark_source_committed(source)
-                    return snapshot
-                raise StaleRevision(
-                    f"expected revision {expected_revision}, found {snapshot.revision}"
-                )
-            selected = tuple(
-                item for item in bundle.actions if item.action_id in set(action_ids)
-            )
-            if len(selected) != len(set(action_ids)):
-                raise ValueError("review decision references an unknown patch action")
-            employee_payload = (
-                edited_action_source_payload(selected, edited)
-                if action == "edit_and_accept_changes"
-                else None
-            )
-            source: EmployeeSource | None = None
-            source_reference: SourceReference | None = None
-            if employee_payload is not None:
-                if source_id is None:
-                    raise ValueError(
-                        "employee text edit requires an application-issued source_id"
-                    )
-                text, positions = employee_payload
-                requested = EmployeeSource.pending(
-                    source_id=source_id,
-                    document_id=document_id,
-                    kind=EmployeeSourceKind.DIRECT_EDIT,
-                    text=text,
-                    positions=positions,
-                )
-                source = await self._load_or_prepare_source(requested)
-                source_reference = SourceReference(
-                    source_id=source.source_id,
-                    kind=source.kind,
-                    created_at=source.created_at,
-                )
-
-            preflight = apply_review_command(
-                raw_state,
-                action=action,
-                changeset_id=changeset_id,
-                action_ids=action_ids,
-                revision=expected_revision + 1,
-                edited_after_by_action_id=edited,
-                rejection_reason=rejection_reason,
-                source_reference=source_reference,
-            )
-            prospective_document = ApprovedJobDocument.model_validate(
-                preflight["approved_document"]
-            )
-            await self._require_known_evidence_sources(
-                prospective_document,
-                pending_direct_edit_source_id=(
-                    source.source_id if source is not None else None
-                ),
-            )
-            if source is not None and source.processing_status is SourceProcessingStatus.PENDING:
-                await self._after_source_store(source)
-
-            command: dict[str, Any] = {
-                "action": action,
-                "document_id": str(document_id),
-                "expected_revision": expected_revision,
-                "changeset_id": str(changeset_id),
-                "action_ids": [str(item) for item in action_ids],
-                "edited_after_by_action_id": {
-                    str(key): value for key, value in edited.items()
-                },
-            }
-            if rejection_reason is not None:
-                command["rejection_reason"] = rejection_reason
-            if source_reference is not None:
-                command["source_reference"] = source_reference.model_dump(mode="json")
-            if command_receipt is not None:
-                command["command_receipt"] = command_receipt.model_dump(mode="json")
-            try:
-                await self.graph.ainvoke(
-                    {}, self.graph_config(document_id), context=command
-                )
-            except StaleThreadRevision as error:
-                raise StaleRevision(str(error)) from error
-            result = await self._snapshot(document_id)
-            await self._touch_catalog(document_id)
-            if source is not None:
-                await self._after_source_checkpoint(source)
-                await self._mark_source_committed(source)
-            return result
 
     async def answer_required_clarification(
         self,
@@ -1652,9 +1308,8 @@ class PostgresConsultantRuntime:
         document_id: UUID,
         expected_revision: int,
         commit: VerifiedConsultantCommit,
-        candidate_files: Mapping[str, str | bytes] | None = None,
     ) -> ConsultantSnapshot:
-        """Atomically publish one already-verified semantic consultant result."""
+        """Atomically commit one already-verified semantic consultant result."""
 
         async with self._lock_for(document_id):
             await self._require_active_catalog(document_id)
@@ -1667,41 +1322,10 @@ class PostgresConsultantRuntime:
                 raise SourceConflict(
                     f"source {source.source_id} was superseded before semantic commit"
                 )
-            if commit.result.candidate_publication is not None:
-                if candidate_files is None:
-                    raise CandidatePublicationStale(
-                        "candidate publication has no current workspace files"
-                    )
             snapshot = await self._snapshot(document_id)
             if snapshot.revision != expected_revision:
                 raise StaleRevision(
                     f"expected revision {expected_revision}, found {snapshot.revision}"
-                )
-            if commit.result.candidate_publication is not None:
-                raw_state = await self.raw_state(document_id)
-                receipt_payload = raw_state.get("checked_candidate")
-                if receipt_payload is None:
-                    raise CandidatePublicationStale(
-                        "candidate publication has no checked candidate receipt"
-                    )
-                receipt = CheckedCandidateReceipt.model_validate(receipt_payload)
-                sources = await self.list_sources(document_id)
-                current_source_ids = tuple(
-                    source.source_id
-                    for source in sources
-                    if (
-                        source.document_id == document_id
-                        and source.processing_status is SourceProcessingStatus.COMMITTED
-                        and source.validity is SourceValidity.CURRENT
-                    )
-                )
-                validate_checked_candidate(
-                    receipt,
-                    current_run_id=commit.run_id,
-                    current_baseline_revision=snapshot.revision,
-                    current_document=snapshot.approved_document,
-                    current_files=candidate_files,
-                    current_source_ids=current_source_ids,
                 )
             try:
                 await self.graph.ainvoke(

@@ -28,9 +28,17 @@ class ConsultantVerificationError(RuntimeError):
 
 
 _RISKY_SPECIFIC_CLAIM = re.compile(
-    r"(?:\d|依.{0,12}(?:規定|辦法|法|SOP|標準)|[\u4e00-\u9fff]{2,20}(?:基準法|管理法|保護法|處罰法|組織法|施行法|條例|辦法|規則)|公司法|民法|刑法|(?:公司|法規|法律|規章|SOP).{0,12}(?:規定|要求|必須)|SOP|標準作業程序|(?:依據|根據).{0,12}(?:iCAP|Reference|參考資料|外部資料)|according to|policy|law|regulation)",
+    r"(?:\d+(?:[.,]\d+)?\s*(?:%|％|次|筆|件|份|人|元|分鐘|小時|天|日|週|周|月|年|個|項|張|頁|公斤|公克|克|公里|公尺|公分|秒)|依.{0,12}(?:規定|辦法|法|SOP|標準)|[\u4e00-\u9fff]{2,20}(?:基準法|管理法|保護法|處罰法|組織法|施行法|條例|辦法|規則)|公司法|民法|刑法|(?:公司|法規|法律|規章|SOP).{0,12}(?:規定|要求|必須)|SOP|標準作業程序|(?:依據|根據).{0,12}(?:iCAP|Reference|參考資料|外部資料)|according to|policy|law|regulation)",
     re.IGNORECASE,
 )
+
+
+def requires_anchored_employee_quote(text: str) -> bool:
+    """Return whether factual text needs an exact employee quote to be reviewable."""
+
+    return bool(_RISKY_SPECIFIC_CLAIM.search(text))
+
+
 def verify_context_selection(
     execution: ResolvedExecution,
     receipt: ContextSelectionReceipt,
@@ -165,7 +173,7 @@ def verify_consultant_result(
         )
 
     for text, basis in result.factual_texts():
-        if _RISKY_SPECIFIC_CLAIM.search(text) and not basis.quote_anchors:
+        if requires_anchored_employee_quote(text) and not basis.quote_anchors:
             raise ConsultantVerificationError(
                 "quantities, named rules and external claims require an anchored employee quote"
             )

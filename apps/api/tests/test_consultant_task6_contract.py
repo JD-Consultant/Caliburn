@@ -31,6 +31,7 @@ from app.consultant.state import (
 )
 from app.consultant.views import ConsultantSnapshot
 from app.consultant.workspace_backend import ConsultantWorkspaceBackendBinding
+from app.consultant.workspace_resources import WorkspaceDocumentDraft
 from app.consultant.workspace_tools import (
     WORKSPACE_FILESYSTEM_TOOL_NAMES,
     WORKSPACE_TOOL_NAMES,
@@ -91,6 +92,10 @@ def test_agent_builder_has_only_the_workspace_binding_seams() -> None:
         "context_schema",
         "workspace_binding",
     }
+
+
+def test_workspace_codec_has_no_model_authored_review_group_payload() -> None:
+    assert "review_groups" not in WorkspaceDocumentDraft.model_fields
 
 
 def test_configured_execution_defaults_to_exactly_the_six_model_tools() -> None:

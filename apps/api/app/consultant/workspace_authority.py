@@ -513,6 +513,12 @@ class WorkspaceAuthorityService:
         records = [WorkspaceDecisionRecord.model_validate(item.value) for item in items]
         return tuple(sorted(records, key=lambda item: str(item.command_id)))
 
+    async def review_decisions(
+        self,
+        document_id: UUID,
+    ) -> tuple[WorkspaceReviewDecision, ...]:
+        return self._projection_decisions(await self._load_records(document_id))
+
     async def _put_record(self, document_id: UUID, record: WorkspaceDecisionRecord) -> None:
         await self.runtime.store.aput(
             self.runtime.workspace_decision_namespace(document_id),
@@ -644,16 +650,14 @@ class WorkspaceAuthorityService:
                     "diagnostics": active_conflicts,
                 }
             )
-        decisions = self._projection_decisions(
-            await self._load_records(document_id)
-        )
+        decisions = await self.review_decisions(document_id)
         projection = derive_workspace_review(
             snapshot.approved_document,
             validation,
             effective_manifest,
             decisions,
         )
-        if projection.diagnostics:
+        if projection.blocking_diagnostics:
             raise WorkspaceAuthorityError("workspace review is not available")
         return snapshot, workspace, workspace_snapshot, projection
 

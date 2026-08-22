@@ -170,6 +170,14 @@ class WorkspaceReviewProjection:
     def changesets(self) -> tuple[DocumentChangeSet, ...]:
         return tuple(group.changeset for group in self.groups)
 
+    @property
+    def blocking_diagnostics(self) -> tuple[WorkspaceDiagnostic, ...]:
+        return tuple(
+            diagnostic
+            for diagnostic in self.diagnostics
+            if diagnostic.severity is WorkspaceDiagnosticSeverity.ERROR
+        )
+
     def group_containing_path(self, path: str) -> WorkspaceReviewGroup | None:
         parts = path.rstrip("/").split("/")
         if len(parts) >= 3 and parts[2] in self.entity_ids_by_handle:

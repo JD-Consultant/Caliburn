@@ -31,6 +31,11 @@ from app.consultant.workspace_backend import (
     build_consultant_workspace_backend,
 )
 from app.consultant.workspace_resources import WorkspaceCatalog, parse_workspace_files
+from app.consultant.workspace_review import (
+    WorkspaceReviewDecision,
+    WorkspaceReviewDecisionKind,
+    derive_workspace_review,
+)
 from app.consultant.workspace_state import (
     StoreBackedWorkspace,
     WorkspaceDiagnostic,
@@ -55,6 +60,7 @@ CURRENT_SOURCE_ID = UUID("00000000-0000-0000-0000-000000000302")
 class FakeRuntime:
     def __init__(self, sources: tuple[EmployeeSource, ...]) -> None:
         self._sources = {source.source_id: source for source in sources}
+        self.review_decisions: tuple[WorkspaceReviewDecision, ...] = ()
 
     async def get_source(self, document_id: UUID, source_id: UUID) -> EmployeeSource:
         source = self._sources[source_id]
@@ -70,6 +76,13 @@ class FakeRuntime:
             )
             if source.document_id == document_id
         )
+
+    async def workspace_review_decisions(
+        self,
+        document_id: UUID,
+    ) -> tuple[WorkspaceReviewDecision, ...]:
+        assert document_id == DOCUMENT_ID
+        return self.review_decisions
 
 
 class FilesystemToolHarness:
@@ -481,6 +494,83 @@ async def test_review_projection_rechecks_store_bytes_and_never_serves_a_stale_g
         "/review/groups/group-001.json"
     )
     assert stale_group.error is not None
+
+
+@pytest.mark.asyncio
+async def test_review_projection_loads_durable_decisions_after_backend_construction() -> None:
+    sources = _sources()
+    runtime = FakeRuntime(sources)
+    catalog = WorkspaceCatalog.from_snapshot(_document(), sources=sources)
+    workspace = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(
+        approved_document=catalog.document,
+        approved_revision=0,
+    )
+    binding = build_consultant_workspace_backend(
+        runtime=runtime,
+        document_id=DOCUMENT_ID,
+        workspace=workspace,
+        catalog=catalog,
+        selected_skill_ids=("output",),
+    )
+    assert (
+        await binding.workspace_backend.aedit(
+            "/workspace/tasks/task-001.json",
+            '"整理需求"',
+            '"複核需求"',
+        )
+    ).error is None
+    snapshot = await workspace.read_snapshot()
+    validation = validate_workspace_payload(
+        snapshot.files,
+        catalog=catalog,
+        selected_skill_ids=("output",),
+        loaded_skill_ids=("output",),
+    )
+    await workspace.commit_validation(
+        expected_resource_digest=snapshot.manifest.resource_digest,
+        evidence_basis_digest=evidence_basis_digest(validation.current_sources),
+        validation_status=WorkspaceValidationStatus.VALID,
+        diagnostics=(),
+        entity_ids_by_handle=snapshot.manifest.entity_ids_by_handle,
+    )
+    validated = await workspace.read_snapshot()
+    projection = derive_workspace_review(
+        catalog.document,
+        validation,
+        validated.manifest,
+        (),
+    )
+    group = projection.groups[0]
+
+    runtime.review_decisions = (
+        WorkspaceReviewDecision.from_group(
+            WorkspaceReviewDecisionKind.DEFER,
+            group,
+            workspace_digest=projection.workspace_digest,
+        ),
+    )
+    deferred = await binding.composite_backend.aread(
+        "/review/groups/group-001.json"
+    )
+    assert deferred.error is None
+    assert deferred.file_data is not None
+    assert (
+        json.loads(deferred.file_data["content"])["actions"][0]["status"]
+        == "deferred"
+    )
+
+    runtime.review_decisions = (
+        WorkspaceReviewDecision.from_group(
+            WorkspaceReviewDecisionKind.REJECT,
+            group,
+            workspace_digest=projection.workspace_digest,
+        ),
+    )
+    rejected = await binding.composite_backend.aread("/review/index.json")
+    assert rejected.error is None
+    assert rejected.file_data is not None
+    assert json.loads(rejected.file_data["content"])["group_handles"] == []
 
 
 @pytest.mark.asyncio

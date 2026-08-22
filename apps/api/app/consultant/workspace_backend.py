@@ -11,7 +11,7 @@ import asyncio
 import json
 import re
 import threading
-from collections.abc import Mapping, Sequence
+from collections.abc import Awaitable, Callable, Mapping, Sequence
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import PurePosixPath
@@ -260,13 +260,15 @@ class WorkspaceReviewProjectionBackend(BackendProtocol):
         catalog: WorkspaceCatalog,
         source_lookup: DocumentSourceLookup,
         selected_skill_ids: tuple[str, ...],
-        decisions: Sequence[WorkspaceReviewDecision] = (),
+        decision_loader: Callable[
+            [], Awaitable[Sequence[WorkspaceReviewDecision]]
+        ],
     ) -> None:
         self.workspace = workspace
         self.catalog = catalog
         self.source_lookup = source_lookup
         self.selected_skill_ids = selected_skill_ids
-        self.decisions = tuple(decisions)
+        self.decision_loader = decision_loader
 
     @staticmethod
     def _sync_unavailable() -> str:
@@ -407,11 +409,12 @@ class WorkspaceReviewProjectionBackend(BackendProtocol):
                         "diagnostics": active_conflicts,
                     }
                 )
+        decisions = tuple(await self.decision_loader())
         projection = derive_workspace_review(
             self.catalog.document,
             validation,
             manifest,
-            self.decisions,
+            decisions,
         )
         return workspace_review_files(projection)
 
@@ -1036,7 +1039,7 @@ def build_consultant_workspace_backend(
     selected_skill_ids: tuple[str, ...],
     source_lookup: DocumentSourceLookup | None = None,
 ) -> ConsultantWorkspaceBackendBinding:
-    """Build the single six-root composite backend for one active workspace."""
+    """Build the single five-root composite backend for one active workspace."""
 
     if not isinstance(document_id, UUID):
         raise TypeError("document_id must be a UUID value")
@@ -1054,11 +1057,16 @@ def build_consultant_workspace_backend(
         catalog=catalog,
     )
     approved_backend = ApprovedProjectionBackend(catalog)
+
+    async def load_review_decisions() -> Sequence[WorkspaceReviewDecision]:
+        return await runtime.workspace_review_decisions(document_id)
+
     review_backend = WorkspaceReviewProjectionBackend(
         workspace=workspace,
         catalog=catalog,
         source_lookup=lookup,
         selected_skill_ids=selected_skill_ids,
+        decision_loader=load_review_decisions,
     )
     composite_backend = CompositeBackend(
         default=workspace_backend,

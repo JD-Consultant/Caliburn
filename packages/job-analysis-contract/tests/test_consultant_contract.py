@@ -12,9 +12,12 @@ from job_analysis_contract import (
     ConsultantSnapshotEvent,
     ConsultantSnapshotView,
     DocumentReviewDecisionWrite,
+    DocumentReviewView,
     EmployeeAnswerWrite,
     RequiredClarificationAnswerWrite,
     UnderstandingCalibrationDecisionWrite,
+    WorkspaceDiagnosticView,
+    WorkspaceReviewStatus,
 )
 
 
@@ -49,6 +52,48 @@ def test_consultant_contract_covers_the_durable_employee_workspace() -> None:
     serialized = json.dumps(definitions, ensure_ascii=False).casefold()
     assert '"pause' not in serialized
     assert '"finish' not in serialized
+
+
+def test_document_review_contract_exposes_workspace_status_without_old_action_lifecycle() -> None:
+    diagnostic = WorkspaceDiagnosticView(
+        code="json-syntax",
+        path="工作內容",
+        message="工作草稿有內容需要 AI 修正。",
+    )
+    for status, diagnostics in (
+        (WorkspaceReviewStatus.CLEAN, []),
+        (WorkspaceReviewStatus.PENDING, []),
+        (WorkspaceReviewStatus.INVALID, [diagnostic]),
+        (WorkspaceReviewStatus.CONFLICTED, [diagnostic]),
+    ):
+        review = DocumentReviewView(
+            workspace_generation=7,
+            workspace_status=status,
+            diagnostics=diagnostics,
+            bundles=[],
+            unresolved_action_count=0,
+            blocked_branches=[],
+            safe_interview_work_available=True,
+            decision_required_before_more_interview=False,
+            explanation=None,
+        )
+        assert review.workspace_generation == 7
+        assert review.workspace_status is status
+        assert review.diagnostics == diagnostics
+
+    definitions = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))["$defs"]
+    action = definitions["DocumentPatchActionView"]["properties"]
+    operation = action["operation"]["enum"]
+    status = action["status"]["enum"]
+    assert operation == ["add", "revise", "withdraw", "reassign", "reorder"]
+    assert status == ["pending", "deferred"]
+    assert {"target_ids", "employee_after", "rejection_reason", "stale_reason"}.isdisjoint(
+        action
+    )
+    assert set(definitions["EmployeeDecisionSummaryView"]["properties"]) == {
+        "pending",
+        "deferred",
+    }
 
 
 def test_commands_are_typed_and_reject_untrusted_extra_fields() -> None:

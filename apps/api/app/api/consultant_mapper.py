@@ -20,6 +20,7 @@ from job_analysis_contract import (
     SufficiencyView,
     UnderstandingView,
     VisibleWorkItemView,
+    WorkspaceDiagnosticView,
 )
 
 from app.consultant.state import (
@@ -62,7 +63,11 @@ def _durable_run(value: dict | None) -> DurableRunView | None:
     )
 
 
-def _document_changeset_view(value: DocumentChangeSet) -> DocumentChangeSetView:
+def _document_changeset_view(
+    value: DocumentChangeSet,
+    *,
+    acceptance_blocked: bool,
+) -> DocumentChangeSetView:
     """Project durable review state without leaking internal workflow metadata."""
 
     return DocumentChangeSetView.model_validate(
@@ -85,21 +90,39 @@ def _document_changeset_view(value: DocumentChangeSet) -> DocumentChangeSetView:
                     "read_set": [
                         item.model_dump(mode="json") for item in action.read_set
                     ],
-                    "target_" + "ids": [],
                     "depends_on_action_ids": action.depends_on_action_ids,
                     "atomic_subgroup_id": action.atomic_subgroup_id,
                     "affected_work_ids": action.affected_work_ids,
                     "blocks_dependent_analysis": action.blocks_dependent_analysis,
                     "status": action.status.value,
-                    "employee_after": action.employee_after,
-                    "rejection_reason": action.rejection_reason,
-                    "stale_reason": action.stale_reason,
                 }
                 for action in value.actions
             ],
             "source_ids": value.source_ids,
             "created_revision": value.created_revision,
+            "acceptance_blocked": acceptance_blocked,
         }
+    )
+
+
+def _employee_workspace_diagnostic(value) -> WorkspaceDiagnosticView:
+    path = value.path
+    if "/duties/" in path:
+        label = "主要職責內容"
+    elif "/tasks/" in path:
+        label = "工作內容"
+    elif "/opks/" in path:
+        label = "O／P／K／S 內容"
+    else:
+        label = "工作草稿"
+    messages = {
+        "workspace-rebase-conflict": "正式文件與工作草稿的同一內容已有變動，請先選擇要保留的內容。",
+        "json-syntax": "工作草稿有內容需要 AI 修正。",
+    }
+    return WorkspaceDiagnosticView(
+        code=value.code,
+        path=label,
+        message=messages.get(value.code, "工作草稿有一項內容需要 AI 確認。"),
     )
 
 
@@ -224,8 +247,20 @@ def to_consultant_snapshot_view(
         document_review=DocumentReviewView.model_validate(
             {
                 "bundles": [
-                    _document_changeset_view(bundle).model_dump(mode="json")
+                    _document_changeset_view(
+                        bundle,
+                        acceptance_blocked=(
+                            bundle.changeset_id
+                            in review.acceptance_blocked_changeset_ids
+                        ),
+                    ).model_dump(mode="json")
                     for bundle in review.bundles
+                ],
+                "workspace_generation": review.workspace_generation,
+                "workspace_status": review.workspace_status.value,
+                "diagnostics": [
+                    _employee_workspace_diagnostic(item).model_dump(mode="json")
+                    for item in review.diagnostics
                 ],
                 "unresolved_action_count": review.unresolved_action_count,
                 "blocked_branches": [

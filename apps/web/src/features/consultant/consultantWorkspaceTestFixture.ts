@@ -23,15 +23,11 @@ export function changesetFixture(): DocumentChangeSetView {
     source_ids: [SOURCE_ID],
     quote_anchors: [],
     read_set: [],
-    target_ids: [],
     depends_on_action_ids: [],
     atomic_subgroup_id: atomicSubgroupId,
     affected_work_ids: [WORK_ID],
     blocks_dependent_analysis: false,
     status: "pending" as const,
-    employee_after: null,
-    rejection_reason: null,
-    stale_reason: null,
   });
   return {
     changeset_id: CHANGESET_ID,
@@ -39,6 +35,7 @@ export function changesetFixture(): DocumentChangeSetView {
     actions: [action(ACTION_ID, ATOMIC_ID), action(ACTION_ID_2, ATOMIC_ID)],
     source_ids: [SOURCE_ID],
     created_revision: 2,
+    acceptance_blocked: false,
   };
 }
 
@@ -124,10 +121,6 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
       employee_decisions: {
         pending: 2,
         deferred: 0,
-        accepted: 0,
-        edit_accepted: 0,
-        rejected: 0,
-        stale: 0,
       },
       gaps: [
         {
@@ -166,6 +159,9 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
       },
     ],
     document_review: {
+      workspace_generation: 4,
+      workspace_status: "pending",
+      diagnostics: [],
       bundles: [changesetFixture()],
       unresolved_action_count: 2,
       blocked_branches: [],

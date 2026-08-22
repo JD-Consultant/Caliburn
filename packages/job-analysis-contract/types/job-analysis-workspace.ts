@@ -16,6 +16,11 @@ export type ConsultantRunStatus = "idle" | "source_saved" | "completed" | "faile
  */
 export type DepthStatus =
   "evidence_present" | "gap" | "interviewing" | "not_yet_deepened" | "sufficient_for_now" | "held_with_reason";
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "WorkspaceReviewStatus".
+ */
+export type WorkspaceReviewStatus = "clean" | "pending" | "invalid" | "conflicted";
 
 /**
  * Local Web contract for the durable professional job-analysis consultant.
@@ -211,10 +216,6 @@ export interface WorkDepthView {
 export interface EmployeeDecisionSummaryView {
   pending: number;
   deferred: number;
-  accepted: number;
-  edit_accepted: number;
-  rejected: number;
-  stale: number;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -288,7 +289,7 @@ export interface DocumentPathReadView {
  */
 export interface DocumentPatchActionView {
   action_id: string;
-  operation: "add" | "revise" | "withdraw" | "merge" | "split" | "reassign" | "reorder";
+  operation: "add" | "revise" | "withdraw" | "reassign" | "reorder";
   path: string;
   target_key: string;
   before: unknown;
@@ -296,15 +297,11 @@ export interface DocumentPatchActionView {
   source_ids: string[];
   quote_anchors: QuoteAnchorView[];
   read_set: DocumentPathReadView[];
-  target_ids: string[];
   depends_on_action_ids: string[];
   atomic_subgroup_id: string | null;
   affected_work_ids: string[];
   blocks_dependent_analysis: boolean;
-  status: "pending" | "deferred" | "accepted" | "edit_accepted" | "rejected" | "stale";
-  employee_after: unknown;
-  rejection_reason: string | null;
-  stale_reason: string | null;
+  status: "pending" | "deferred";
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -316,6 +313,7 @@ export interface DocumentChangeSetView {
   actions: DocumentPatchActionView[];
   source_ids: string[];
   created_revision: number;
+  acceptance_blocked: boolean;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -332,12 +330,24 @@ export interface BlockedInterviewBranchView {
  * via the `definition` "DocumentReviewView".
  */
 export interface DocumentReviewView {
+  workspace_generation: number;
+  workspace_status: WorkspaceReviewStatus;
+  diagnostics: WorkspaceDiagnosticView[];
   bundles: DocumentChangeSetView[];
   unresolved_action_count: number;
   blocked_branches: BlockedInterviewBranchView[];
   safe_interview_work_available: boolean;
   decision_required_before_more_interview: boolean;
   explanation: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "WorkspaceDiagnosticView".
+ */
+export interface WorkspaceDiagnosticView {
+  code: string;
+  path: string | null;
+  message: string;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema

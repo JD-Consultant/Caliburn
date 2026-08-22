@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from enum import StrEnum
 from typing import Any
 from uuid import UUID
 
@@ -29,6 +30,11 @@ from app.consultant.understanding import (
     sufficiency_projection_from_state,
     understanding_projection_from_state,
 )
+from app.consultant.workspace_review import WorkspaceReviewProjection
+from app.consultant.workspace_state import (
+    WorkspaceDiagnostic,
+    WorkspaceValidationStatus,
+)
 
 
 class ConsultantTurnProjection(DurableModel):
@@ -46,8 +52,19 @@ class BlockedInterviewBranchProjection(DurableModel):
     reason: str
 
 
+class WorkspaceReviewStatus(StrEnum):
+    CLEAN = "clean"
+    PENDING = "pending"
+    INVALID = "invalid"
+    CONFLICTED = "conflicted"
+
+
 class DocumentReviewProjection(DurableModel):
+    workspace_generation: int = Field(ge=0)
+    workspace_status: WorkspaceReviewStatus
+    diagnostics: tuple[WorkspaceDiagnostic, ...] = ()
     bundles: tuple[DocumentChangeSet, ...] = ()
+    acceptance_blocked_changeset_ids: tuple[UUID, ...] = ()
     unresolved_action_count: int = Field(ge=0)
     blocked_branches: tuple[BlockedInterviewBranchProjection, ...] = ()
     safe_interview_work_available: bool
@@ -115,7 +132,11 @@ def document_review_projection_from_state(
         for item in work
     )
     return DocumentReviewProjection(
+        workspace_generation=0,
+        workspace_status=WorkspaceReviewStatus.CLEAN,
+        diagnostics=(),
         bundles=(),
+        acceptance_blocked_changeset_ids=(),
         unresolved_action_count=0,
         blocked_branches=(),
         safe_interview_work_available=safe_available,
@@ -126,25 +147,56 @@ def document_review_projection_from_state(
 
 def document_review_projection_from_workspace(
     state: ConsultantThreadState,
-    bundles: tuple[DocumentChangeSet, ...],
     *,
-    explanation: str | None = None,
+    workspace_generation: int,
+    validation_status: WorkspaceValidationStatus,
+    workspace_review: WorkspaceReviewProjection,
 ) -> DocumentReviewProjection:
     """Map a fresh Store-derived review without making it checkpoint state."""
 
     checkpoint = document_review_projection_from_state(state)
+    bundles = workspace_review.changesets
+    all_diagnostics = (
+        *workspace_review.diagnostics,
+        *(item for group in workspace_review.groups for item in group.diagnostics),
+    )
+    diagnostics = tuple(
+        {
+            (item.code, item.path, item.message, item.severity): item
+            for item in all_diagnostics
+        }.values()
+    )
+    if validation_status is WorkspaceValidationStatus.CONFLICTED:
+        status = WorkspaceReviewStatus.CONFLICTED
+    elif workspace_review.blocking_diagnostics:
+        status = WorkspaceReviewStatus.INVALID
+    elif bundles:
+        status = WorkspaceReviewStatus.PENDING
+    else:
+        status = WorkspaceReviewStatus.CLEAN
     unresolved_actions = sum(
         action.status.value in {"pending", "deferred"}
         for bundle in bundles
         for action in bundle.actions
     )
     return DocumentReviewProjection(
+        workspace_generation=workspace_generation,
+        workspace_status=status,
+        diagnostics=diagnostics,
         bundles=bundles,
+        acceptance_blocked_changeset_ids=tuple(
+            group.changeset.changeset_id
+            for group in workspace_review.groups
+            if any(
+                diagnostic.code == "workspace-rebase-conflict"
+                for diagnostic in group.diagnostics
+            )
+        ),
         unresolved_action_count=unresolved_actions,
         blocked_branches=(),
         safe_interview_work_available=checkpoint.safe_interview_work_available,
         decision_required_before_more_interview=False,
-        explanation=explanation,
+        explanation=None,
     )
 
 

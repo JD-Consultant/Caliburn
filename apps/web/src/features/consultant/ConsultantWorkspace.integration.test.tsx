@@ -219,6 +219,7 @@ describe("employee consultant workspace integration", () => {
         summary: "接受職務名稱建議",
         created_revision: snapshot.revision,
         source_ids: [snapshot.latest_source_id!],
+        acceptance_blocked: false,
         actions: [
           action({
             action_id: actionIds.accept,
@@ -235,6 +236,7 @@ describe("employee consultant workspace integration", () => {
         summary: "修改工作描述建議",
         created_revision: snapshot.revision,
         source_ids: [snapshot.latest_source_id!],
+        acceptance_blocked: false,
         actions: [
           action({
             action_id: actionIds.edit,
@@ -251,6 +253,7 @@ describe("employee consultant workspace integration", () => {
         summary: "移除不適用建議",
         created_revision: snapshot.revision,
         source_ids: [snapshot.latest_source_id!],
+        acceptance_blocked: false,
         actions: [
           action({
             action_id: actionIds.reject,
@@ -267,6 +270,7 @@ describe("employee consultant workspace integration", () => {
         summary: "調整工作順序建議",
         created_revision: snapshot.revision,
         source_ids: [snapshot.latest_source_id!],
+        acceptance_blocked: false,
         actions: [
           action({
             action_id: actionIds.defer,
@@ -361,6 +365,183 @@ describe("employee consultant workspace integration", () => {
     });
   });
 
+  it("shows an employee-safe repair state without review actions when the working draft is invalid", () => {
+    const snapshot = consultantSnapshotFixture();
+    snapshot.document_review = {
+      ...snapshot.document_review,
+      workspace_status: "invalid",
+      diagnostics: [
+        {
+          code: "json-syntax",
+          path: "工作內容",
+          message: "工作草稿有內容需要 AI 修正。",
+        },
+      ],
+    };
+
+    renderWithClient(
+      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(screen.getByRole("status").textContent).toContain("AI 正在修正工作草稿");
+    expect(screen.getByText("工作草稿有內容需要 AI 修正。")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "接受 AI 建議" })).toBeNull();
+    expect(document.body.textContent).not.toContain("/workspace/");
+  });
+
+  it("announces pending document changes as a status update", () => {
+    renderWithClient(
+      <DocumentReviewPanel
+        documentId={DOCUMENT_ID}
+        snapshot={consultantSnapshotFixture()}
+      />,
+    );
+
+    expect(screen.getByRole("status").textContent).toContain("AI 建議的文件變更");
+  });
+
+  it("explains a working-draft conflict in employee language while leaving safe choices available", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    snapshot.document_review = {
+      ...snapshot.document_review,
+      workspace_status: "conflicted",
+      diagnostics: [
+        {
+          code: "workspace-rebase-conflict",
+          path: "工作內容",
+          message: "正式文件與工作草稿的同一內容已有變動，請先選擇要保留的內容。",
+        },
+      ],
+      bundles: [
+        {
+          ...snapshot.document_review.bundles[0],
+          acceptance_blocked: true,
+        },
+      ],
+    };
+
+    renderWithClient(
+      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(screen.getByRole("alert").textContent).toContain(
+      "正式文件與工作草稿的同一內容已有變動",
+    );
+    expect(document.body.textContent).not.toMatch(/Store|workspace-rebase-conflict|UUID/i);
+    const checkbox = screen.getAllByRole("checkbox")[0];
+    await user.click(checkbox);
+    expect(
+      (screen.getByRole("button", { name: "接受 AI 建議" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "修改後接受" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "拒絕" }) as HTMLButtonElement).disabled,
+    ).toBe(false);
+    expect(
+      (screen.getByRole("button", { name: "稍後處理" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false);
+  });
+
+  it("lets an employee accept nine changes and reject the remaining one", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    const base = snapshot.document_review.bundles[0].actions[0];
+    const actionIds = Array.from(
+      { length: 10 },
+      (_, index) => `00000000-0000-0000-0000-${String(index + 20).padStart(12, "0")}`,
+    );
+    snapshot.document_review = {
+      ...snapshot.document_review,
+      bundles: [
+        {
+          ...snapshot.document_review.bundles[0],
+          acceptance_blocked: false,
+          actions: actionIds.map((actionId, index) => ({
+            ...base,
+            action_id: actionId,
+            atomic_subgroup_id: null,
+            path: `/tasks/task-${index}/statement`,
+          })),
+        },
+      ],
+      unresolved_action_count: 10,
+    };
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(snapshot), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    const checkboxes = screen.getAllByRole("checkbox");
+    for (const checkbox of checkboxes.slice(0, 9)) await user.click(checkbox);
+    expect(screen.getByText("已選 9 項")).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "接受 AI 建議" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(
+      JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body)).action_ids,
+    ).toEqual(actionIds.slice(0, 9));
+
+    await user.click(screen.getAllByRole("checkbox")[9]);
+    await user.type(
+      screen.getByLabelText("若要拒絕，可補充原因"),
+      "這項內容不適用目前職務",
+    );
+    await user.click(screen.getByRole("button", { name: "拒絕" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    expect(
+      JSON.parse(String((fetchMock.mock.calls[1][1] as RequestInit).body)),
+    ).toMatchObject({
+      command: "reject_changes",
+      action_ids: [actionIds[9]],
+    });
+  });
+
+  it("clears stale selections after a 409 and refetches the current review", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    const client = new QueryClient();
+    client.setQueryData(jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID), snapshot);
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(
+        new Response(
+          JSON.stringify({
+            type: "https://caliburn.dev/problems/job-analysis/authority-conflict",
+            title: "Document revision changed",
+            status: 409,
+          }),
+          { status: 409, headers: { "Content-Type": "application/json" } },
+        ),
+      ),
+    );
+    renderWithClient(
+      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      client,
+    );
+
+    await user.click(screen.getAllByRole("checkbox")[0]);
+    await user.click(screen.getByRole("button", { name: "接受 AI 建議" }));
+
+    await waitFor(() =>
+      expect(
+        client.getQueryState(jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID))
+          ?.isInvalidated,
+      ).toBe(true),
+    );
+    expect(screen.queryByText("已選 2 項")).toBeNull();
+  });
+
   it("edits a structural Duty suggestion through employee fields without exposing raw JSON or IDs", async () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
@@ -372,6 +553,7 @@ describe("employee consultant workspace integration", () => {
         summary: "新增主要職責",
         created_revision: snapshot.revision,
         source_ids: [snapshot.latest_source_id!],
+        acceptance_blocked: false,
         actions: [
           {
             action_id: actionId,
@@ -387,15 +569,11 @@ describe("employee consultant workspace integration", () => {
             source_ids: [snapshot.latest_source_id!],
             quote_anchors: [],
             read_set: [],
-            target_ids: [dutyId],
             depends_on_action_ids: [],
             atomic_subgroup_id: null,
             affected_work_ids: [],
             blocks_dependent_analysis: true,
             status: "pending",
-            employee_after: null,
-            rejection_reason: null,
-            stale_reason: null,
           },
         ],
       },
@@ -508,15 +686,11 @@ describe("employee consultant workspace integration", () => {
       source_ids: [snapshot.latest_source_id!],
       quote_anchors: [],
       read_set: [],
-      target_ids: [],
       depends_on_action_ids: [],
       atomic_subgroup_id: null,
       affected_work_ids: [],
       blocks_dependent_analysis: false,
       status: "pending" as const,
-      employee_after: null,
-      rejection_reason: null,
-      stale_reason: null,
     };
     snapshot.document_review.bundles = [
       {
@@ -524,6 +698,7 @@ describe("employee consultant workspace integration", () => {
         summary: "調整工作方法與 O／P／K／S 關聯",
         created_revision: snapshot.revision,
         source_ids: [snapshot.latest_source_id!],
+        acceptance_blocked: false,
         actions: [
           {
             ...baseAction,

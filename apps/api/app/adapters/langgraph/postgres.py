@@ -391,15 +391,13 @@ class PostgresConsultantRuntime:
             effective_manifest,
             decisions,
         )
-        explanation = None
-        if projection.diagnostics:
-            explanation = "; ".join(item.message for item in projection.diagnostics)
         return snapshot.model_copy(
             update={
                 "document_review": document_review_projection_from_workspace(
                     state.values,
-                    projection.changesets,
-                    explanation=explanation,
+                    workspace_generation=workspace_snapshot.manifest.generation,
+                    validation_status=effective_manifest.validation_status,
+                    workspace_review=projection,
                 )
             }
         )

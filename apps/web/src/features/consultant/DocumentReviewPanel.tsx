@@ -39,8 +39,6 @@ const operationLabels: Record<DocumentPatchActionView["operation"], string> = {
   add: "新增",
   revise: "修改",
   withdraw: "移除",
-  merge: "合併",
-  split: "拆分",
   reassign: "重新歸類",
   reorder: "調整順序",
 };
@@ -48,10 +46,6 @@ const operationLabels: Record<DocumentPatchActionView["operation"], string> = {
 const statusLabels: Record<DocumentPatchActionView["status"], string> = {
   pending: "待確認",
   deferred: "稍後處理",
-  accepted: "已接受",
-  edit_accepted: "修改後接受",
-  rejected: "已拒絕",
-  stale: "內容已變更，需重看",
 };
 
 function errorText(error: unknown): string {
@@ -77,7 +71,7 @@ function ReviewBundle({
     Object.fromEntries(
       bundle.actions.map((action) => [
         action.action_id,
-        toReviewValue(action.employee_after ?? action.after),
+        toReviewValue(action.after),
       ]),
     ),
   );
@@ -104,6 +98,9 @@ function ReviewBundle({
     },
     onError: async (error) => {
       if (error instanceof JobAnalysisApiError && error.status === 409) {
+        setSelected([]);
+        setRejectionReason("");
+        setEditError("文件變更已更新，請重新查看後再決定。");
         await refreshConsultantQueries(queryClient, documentId);
       }
     },
@@ -121,6 +118,12 @@ function ReviewBundle({
 
   const decide = (command: DocumentReviewDecisionWrite["command"]) => {
     if (!selected.length || mutation.isPending) return;
+    if (
+      bundle.acceptance_blocked &&
+      ["accept_changes", "edit_and_accept_changes"].includes(command)
+    ) {
+      return;
+    }
     if (command === "reject_changes" && !rejectionReason.trim()) {
       setEditError("拒絕時請簡短說明原因，讓顧問之後不要重複提出同一內容。");
       return;
@@ -247,16 +250,6 @@ function ReviewBundle({
                       />
                     </div>
                   </div>
-                  {action.rejection_reason ? (
-                    <p className="mt-2 text-xs text-stone-500">
-                      拒絕原因：{action.rejection_reason}
-                    </p>
-                  ) : null}
-                  {action.stale_reason ? (
-                    <p className="mt-2 text-xs text-destructive">
-                      {action.stale_reason}
-                    </p>
-                  ) : null}
                 </div>
               </div>
             </div>
@@ -277,12 +270,15 @@ function ReviewBundle({
             onChange={(event) => setRejectionReason(event.target.value)}
           />
           <div className="mt-3 flex flex-wrap gap-2">
-            <Button disabled={mutation.isPending} onClick={() => decide("accept_changes")}>
+            <Button
+              disabled={mutation.isPending || bundle.acceptance_blocked}
+              onClick={() => decide("accept_changes")}
+            >
               接受 AI 建議
             </Button>
             <Button
               variant="outline"
-              disabled={mutation.isPending}
+              disabled={mutation.isPending || bundle.acceptance_blocked}
               onClick={() => decide("edit_and_accept_changes")}
             >
               修改後接受
@@ -310,7 +306,7 @@ function ReviewBundle({
       ) : null}
       {mutation.isError ? (
         <p role="alert" className="mt-3 text-sm text-destructive">
-          {errorText(mutation.error)}；所選內容仍保留，可直接重試。
+          {errorText(mutation.error)}；請重新查看目前內容後再決定。
         </p>
       ) : null}
     </Card>
@@ -327,6 +323,16 @@ export function DocumentReviewPanel({
   const activeBundles = snapshot.document_review.bundles.filter((bundle) =>
     bundle.actions.some((action) => ["pending", "deferred"].includes(action.status)),
   );
+  const review = snapshot.document_review;
+  const isInvalid = review.workspace_status === "invalid";
+  const isConflicted = review.workspace_status === "conflicted";
+  const statusMessage = isInvalid
+    ? "AI 正在修正工作草稿"
+    : isConflicted
+      ? "正式文件與工作草稿需要你選擇"
+      : review.workspace_status === "clean"
+        ? "目前沒有等待你決定的文件變更。"
+        : "AI 建議的文件變更";
 
   return (
     <section className="space-y-4" aria-label="AI 文件變更審核">
@@ -338,17 +344,31 @@ export function DocumentReviewPanel({
           <p className="text-xs font-semibold tracking-[0.16em] text-stone-500 uppercase">
             正式文件權限
           </p>
-          <h2 className="text-lg font-semibold">AI 建議，等你決定</h2>
+          <h2 className="text-lg font-semibold">{statusMessage}</h2>
           <p className="text-xs text-stone-500">
             接受或修改後接受，才會更新下方正式文件。
           </p>
         </div>
       </div>
 
-      {snapshot.document_review.explanation ? (
-        <p className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm">
-          {snapshot.document_review.explanation}
+      {review.workspace_status === "pending" ? (
+        <p role="status" className="sr-only">
+          {statusMessage}
         </p>
+      ) : null}
+
+      {isInvalid || isConflicted ? (
+        <div
+          role={isConflicted ? "alert" : "status"}
+          className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm"
+        >
+          <p className="font-medium">{statusMessage}</p>
+          {review.diagnostics.map((diagnostic) => (
+            <p key={`${diagnostic.code}:${diagnostic.path ?? ""}`} className="mt-1 text-stone-700">
+              {diagnostic.message}
+            </p>
+          ))}
+        </div>
       ) : null}
       {snapshot.document_review.blocked_branches.length ? (
         <div className="grid gap-2 sm:grid-cols-2">
@@ -363,8 +383,8 @@ export function DocumentReviewPanel({
           ))}
         </div>
       ) : null}
-      {activeBundles.length === 0 ? (
-        <div className="rounded-xl border border-dashed border-stone-300 bg-white px-5 py-8 text-center text-sm text-stone-500">
+      {isInvalid ? null : activeBundles.length === 0 ? (
+        <div role="status" className="rounded-xl border border-dashed border-stone-300 bg-white px-5 py-8 text-center text-sm text-stone-500">
           目前沒有等待你決定的文件變更。
         </div>
       ) : (

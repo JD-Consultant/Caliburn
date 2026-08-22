@@ -16,7 +16,8 @@ from app.consultant.state import (
     RunStatus,
     initial_thread_state,
 )
-from app.consultant.views import snapshot_from_state
+from app.consultant.views import DocumentReviewProjection, snapshot_from_state
+from app.consultant.workspace_state import WorkspaceDiagnostic
 
 
 def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -> None:
@@ -106,3 +107,45 @@ def test_initial_snapshot_is_naturally_resumable_without_a_pause_state() -> None
     assert view.opening_navigation.visible is True
     assert view.messages == []
     assert view.readiness.force_export_allowed is True
+
+
+def test_snapshot_mapper_projects_store_review_status_generation_and_employee_diagnostics() -> None:
+    document_id = uuid4()
+    snapshot = snapshot_from_state(initial_thread_state(document_id))
+    diagnostics = (
+        WorkspaceDiagnostic(
+            code="workspace-rebase-conflict",
+            path="/workspace/tasks/task-001.json/statement",
+            message="Technical store conflict details must not reach employees.",
+        ),
+    )
+
+    for status, review_diagnostics in (
+        ("clean", ()),
+        ("pending", ()),
+        ("invalid", diagnostics),
+        ("conflicted", diagnostics),
+    ):
+        view = to_consultant_snapshot_view(
+            snapshot.model_copy(
+                update={
+                    "document_review": DocumentReviewProjection(
+                        workspace_generation=11,
+                        workspace_status=status,
+                        diagnostics=review_diagnostics,
+                        bundles=(),
+                        unresolved_action_count=0,
+                        blocked_branches=(),
+                        safe_interview_work_available=True,
+                        decision_required_before_more_interview=False,
+                    )
+                }
+            )
+        )
+
+        assert view.document_review.workspace_generation == 11
+        assert view.document_review.workspace_status.value == status
+        if review_diagnostics:
+            assert view.document_review.diagnostics[0].code == "workspace-rebase-conflict"
+            assert view.document_review.diagnostics[0].path == "工作內容"
+            assert "Technical" not in view.document_review.diagnostics[0].message

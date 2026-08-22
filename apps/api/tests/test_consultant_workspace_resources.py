@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import pytest
 from pydantic import ValidationError
@@ -563,6 +563,10 @@ def test_new_workspace_handle_keeps_the_same_stable_id_after_restart() -> None:
     )
 
     assert first.document.tasks[-1].task_id == second.document.tasks[-1].task_id
+    assert first.document.tasks[-1].task_id == uuid5(
+        DOCUMENT_ID,
+        "workspace:task:task-new-001",
+    )
 
 
 def test_accepted_new_task_keeps_its_handle_and_uuid_when_reprojected() -> None:
@@ -597,7 +601,16 @@ def test_accepted_new_task_keeps_its_handle_and_uuid_when_reprojected() -> None:
 
 
 def test_workspace_resources_round_trip_editable_fields_without_a_or_levels() -> None:
-    document = _document()
+    document = _document().model_copy(
+        update={
+            "opks": tuple(
+                item.model_copy(update={"indicator_ids": (INDICATOR_ID,)})
+                if item.item_id == KNOWLEDGE_ID
+                else item
+                for item in _document().opks
+            )
+        }
+    )
     projection = project_workspace_files(document, handle_registry={})
     draft = parse_workspace_files(
         DOCUMENT_ID,
@@ -620,11 +633,20 @@ def test_workspace_resources_round_trip_editable_fields_without_a_or_levels() ->
             {"kind": "tool_system", "name": "ERP"},
         ),
     }
-    assert [item.kind.value for item in draft.document.opks] == [
-        "output",
-        "indicator",
-        "knowledge",
-        "skill",
+    assert [
+        (
+            item.item_id,
+            item.kind.value,
+            item.text,
+            item.task_ids,
+            item.indicator_ids,
+        )
+        for item in draft.document.opks
+    ] == [
+        (OUTPUT_ID, "output", "完成正確訂單", (TASK_ID,), ()),
+        (INDICATOR_ID, "indicator", "訂單錯誤率低", (TASK_ID,), ()),
+        (KNOWLEDGE_ID, "knowledge", "訂單規則", (TASK_ID,), (INDICATOR_ID,)),
+        (SKILL_ID, "skill", "細節核對", (TASK_ID,), ()),
     ]
     assert all("competency_level" not in value for value in projection.files.values())
     assert "/workspace/opks/a/" not in "\n".join(projection.files)

@@ -10,11 +10,20 @@ from app.consultant.workspace_state import (
     WorkspaceDiagnosticSeverity,
     WorkspaceManifest,
     WorkspaceValidationStatus,
+    workspace_resource_digest,
 )
 
 
 DIGEST_A = "a" * 64
 DIGEST_B = "b" * 64
+WORKSPACE_RESOURCE_DIGEST_VECTOR = "8d3c7ab80efc84e4d337b3dae067639e97fee83768fb9c9b4c3277cf1639a32d"
+
+
+def _digest_vector_files() -> dict[str, str | bytes]:
+    return {
+        "/workspace/z.json": "台北\n",
+        "/workspace/a.json": b"{}\n",
+    }
 
 
 def _manifest(**changes: object) -> WorkspaceManifest:
@@ -71,3 +80,24 @@ def test_valid_manifest_rejects_a_digest_that_does_not_match_workspace_files() -
 
     with pytest.raises(ValueError, match="resource digest does not match workspace files"):
         manifest.validate_files({"/workspace/header.json": "{}\n"})
+
+
+def test_workspace_resource_digest_has_a_stable_utf8_sorted_fixed_vector() -> None:
+    assert workspace_resource_digest(_digest_vector_files()) == (
+        WORKSPACE_RESOURCE_DIGEST_VECTOR
+    )
+    assert workspace_resource_digest(
+        {
+            "/workspace/a.json": "{}\n",
+            "/workspace/z.json": "台北\n",
+        }
+    ) == WORKSPACE_RESOURCE_DIGEST_VECTOR
+
+
+def test_valid_manifest_accepts_files_matching_the_resource_digest() -> None:
+    manifest = _manifest(
+        resource_digest=WORKSPACE_RESOURCE_DIGEST_VECTOR,
+        validation_status=WorkspaceValidationStatus.VALID,
+    )
+
+    manifest.validate_files(_digest_vector_files())

@@ -192,18 +192,34 @@ def test_professional_agent_composes_exactly_one_workspace_and_check_tool(
     assert captured["additional_middleware"][2].run_limit == 2
 
 
-def test_professional_agent_rejects_a_ninth_call_or_non_workspace_surface() -> None:
+def test_professional_agent_allows_eleven_calls_but_rejects_a_twelfth() -> None:
     workspace = _workspace()
     binding = CandidateCheckToolBinding(runtime=RecordingCheckPort(), workspace=workspace)
     model = FakeMessagesListChatModel(responses=[AIMessage(content="unused")])
-    with pytest.raises(ValueError, match="at most eight"):
+    eleven_call_execution = _execution().model_copy(update={"max_model_calls": 11})
+
+    build_professional_consultant_agent(
+        model=model,
+        execution=eleven_call_execution,
+        selected_skill_ids=("output",),
+        workspace_binding=workspace,
+        candidate_check_binding=binding,
+    )
+    with pytest.raises(ValueError, match="at most eleven"):
         build_professional_consultant_agent(
             model=model,
-            execution=_execution(max_model_calls=9),
+            execution=eleven_call_execution.model_copy(update={"max_model_calls": 12}),
             selected_skill_ids=("output",),
             workspace_binding=workspace,
             candidate_check_binding=binding,
         )
+
+
+def test_professional_agent_rejects_non_workspace_surface() -> None:
+    workspace = _workspace()
+    binding = CandidateCheckToolBinding(runtime=RecordingCheckPort(), workspace=workspace)
+    model = FakeMessagesListChatModel(responses=[AIMessage(content="unused")])
+
     with pytest.raises(ValueError, match="exactly the workspace Tool surface"):
         build_professional_consultant_agent(
             model=model,
@@ -244,6 +260,41 @@ def test_lookup_waves_count_only_path_aware_external_workspace_reads() -> None:
     assert middleware.after_model(state("grep", "/candidate/run", count=2), None) is None  # type: ignore[arg-type]
     with pytest.raises(LookupWaveLimitExceeded):
         middleware.after_model(state("grep", count=2), None)  # type: ignore[arg-type]
+
+
+def test_skill_activation_does_not_consume_external_data_lookup_waves() -> None:
+    middleware = LookupWaveLimitMiddleware(
+        tool_names=frozenset({"ls", "read_file", "grep"}),
+        run_limit=2,
+    )
+
+    def state(path: str, count: int) -> dict[str, Any]:
+        return {
+            "messages": [
+                AIMessage(
+                    content="",
+                    tool_calls=[
+                        {
+                            "name": "read_file",
+                            "args": {"file_path": path},
+                            "id": path,
+                            "type": "tool_call",
+                        }
+                    ],
+                )
+            ],
+            "run_lookup_wave_count": count,
+        }
+
+    assert middleware.after_model(  # type: ignore[arg-type]
+        state("/skills/task-boundary/SKILL.md", count=2),
+        None,
+    ) is None
+    with pytest.raises(LookupWaveLimitExceeded):
+        middleware.after_model(  # type: ignore[arg-type]
+            state("/pending/index.json", count=2),
+            None,
+        )
 
 
 def test_run_scoped_skills_reject_stale_skill_receipts_but_allow_vfs_receipts() -> None:

@@ -245,11 +245,21 @@ def _canonical_document_files(catalog: WorkspaceCatalog) -> dict[str, str]:
     projection_run = UUID("00000000-0000-0000-0000-000000000000")
     candidate_files = project_candidate_files(catalog, run_id=projection_run)
     prefix = f"/candidate/{projection_run}"
-    return {
+    resources = {
         path.removeprefix(prefix) or "/": content
         for path, content in candidate_files.items()
         if not path.endswith("/review-groups.json")
     }
+    relative_paths = sorted(path.lstrip("/") for path in resources)
+    resources["/index.json"] = _json_text(
+        {
+            "approved_resource_paths": [
+                f"/approved/{path}" for path in relative_paths
+            ],
+            "candidate_relative_resource_paths": relative_paths,
+        }
+    )
+    return resources
 
 
 def _pending_files(catalog: WorkspaceCatalog) -> dict[str, str]:

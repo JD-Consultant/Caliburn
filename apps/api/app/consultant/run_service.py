@@ -222,9 +222,19 @@ async def execute_admitted_consultant_turn(
             )
             if focus_subject is not None:
                 focus_subject_id = UUID(str(focus_subject))
+        pending = tuple(
+            DocumentChangeSet.model_validate(value)
+            for value in snapshot.review_queue.values()
+        )
+        catalog = WorkspaceCatalog.from_snapshot(
+            snapshot.approved_document,
+            pending=pending,
+            sources=all_sources,
+        )
         request = ContextRequest(
             run_id=run_id,
             current_source_id=source_id,
+            current_source_handle=catalog.source_handle_for_id(source_id),
             current_work_id=current_work_id,
             focus_subject_id=focus_subject_id,
             selected_skill_ids=CONSULTANT_SKILL_IDS,
@@ -234,15 +244,6 @@ async def execute_admitted_consultant_turn(
             snapshot=snapshot,
             execution=execution,
             request=request,
-        )
-        pending = tuple(
-            DocumentChangeSet.model_validate(value)
-            for value in snapshot.review_queue.values()
-        )
-        catalog = WorkspaceCatalog.from_snapshot(
-            snapshot.approved_document,
-            pending=pending,
-            sources=all_sources,
         )
         workspace = build_consultant_workspace_backend(
             runtime=runtime,

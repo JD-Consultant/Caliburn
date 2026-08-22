@@ -5,6 +5,7 @@ from __future__ import annotations
 import asyncio
 import ast
 import copy
+import json
 from datetime import UTC, datetime, timedelta
 from concurrent.futures import ThreadPoolExecutor
 import threading
@@ -12,6 +13,7 @@ from typing import Any
 from uuid import UUID, uuid4
 
 import pytest
+from deepagents.backends.utils import file_data_to_string
 from deepagents.middleware.filesystem import FilesystemMiddleware, FilesystemState
 from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.graph import END, START, StateGraph
@@ -30,7 +32,8 @@ from app.consultant.workspace_backend import (
     ConsultantWorkspaceBackendBinding,
     build_consultant_workspace_backend,
 )
-from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_resources import WorkspaceCatalog, parse_candidate_files
+from app.consultant.workspace_tools import WORKSPACE_TOOL_DESCRIPTIONS
 
 
 DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000101")
@@ -294,6 +297,69 @@ def real_filesystem_tools(
         grep_max_count=None,
     )
     return FilesystemToolHarness(middleware, workspace_binding.initial_files)
+
+
+@pytest.mark.asyncio
+async def test_write_file_contract_creates_parseable_linked_candidate_resources(
+    workspace_binding: ConsultantWorkspaceBackendBinding,
+) -> None:
+    middleware = FilesystemMiddleware(
+        backend=workspace_binding.composite_backend,
+        tools=["read_file", "write_file"],
+        custom_tool_descriptions=WORKSPACE_TOOL_DESCRIPTIONS,
+        system_prompt=None,
+        tool_token_limit_before_evict=None,
+        human_message_token_limit_before_evict=None,
+    )
+    write_tool = next(tool for tool in middleware.tools if tool.name == "write_file")
+    examples = [
+        json.loads(line.removeprefix("CREATE_EXAMPLE "))
+        for line in write_tool.description.splitlines()
+        if line.startswith("CREATE_EXAMPLE ")
+    ]
+
+    assert {example["path"] for example in examples} == {
+        "duties/duty-002.json",
+        "tasks/task-002.json",
+        "opks/o/o-001.json",
+    }
+
+    harness = FilesystemToolHarness(middleware, workspace_binding.initial_files)
+    candidate_root = f"/candidate/{RUN_ID}"
+    for example in examples:
+        result = await harness.invoke(
+            "write_file",
+            file_path=f"{candidate_root}/{example['path']}",
+            content=json.dumps(example["content"], ensure_ascii=False) + "\n",
+        )
+        assert result.status == "success"
+
+    draft = parse_candidate_files(
+        workspace_binding.catalog,
+        {
+            path: file_data_to_string(raw_file)
+            for path, raw_file in harness.state["files"].items()
+        },
+        run_id=RUN_ID,
+    )
+    duty = next(
+        item
+        for item in draft.approved_document.duties
+        if item.statement == "管理供應商交期"
+    )
+    task = next(
+        item
+        for item in draft.approved_document.tasks
+        if item.statement == "核對供應商交期"
+    )
+    output = next(
+        item
+        for item in draft.approved_document.opks
+        if item.text == "已核對的供應商交期"
+    )
+    assert task.duty_id == duty.duty_id
+    assert output.task_ids == (task.task_id,)
+    assert draft.opks_evidence[0].references[0].occurrence is None
 
 
 @pytest.mark.asyncio
@@ -577,6 +643,9 @@ async def test_source_projection_preserves_stable_read_lineage_and_current_grep(
 async def test_approved_and_pending_projections_are_readable_but_not_candidate_state(
     real_filesystem_tools: FilesystemToolHarness,
 ) -> None:
+    approved_index = await real_filesystem_tools.invoke(
+        "read_file", file_path="/approved/index.json"
+    )
     approved = await real_filesystem_tools.invoke(
         "read_file", file_path="/approved/header.json"
     )
@@ -584,6 +653,10 @@ async def test_approved_and_pending_projections_are_readable_but_not_candidate_s
         "read_file", file_path="/pending/index.json"
     )
 
+    assert approved_index.status == "success"
+    assert '"/approved/header.json"' in str(approved_index.content)
+    assert '"/approved/duties/duty-001.json"' in str(approved_index.content)
+    assert '"/approved/tasks/task-001.json"' in str(approved_index.content)
     assert approved.status == "success"
     assert "採購專員" in str(approved.content)
     assert pending.status == "success"

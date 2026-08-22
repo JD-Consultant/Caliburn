@@ -7,8 +7,9 @@ from decimal import Decimal
 from uuid import uuid4
 
 import pytest
-from langchain.agents.middleware import ModelCallLimitMiddleware
+from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
 from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
+from langchain.agents.middleware.tool_call_limit import ToolCallLimitExceededError
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage
 
@@ -85,7 +86,6 @@ def test_configured_execution_defaults_to_exactly_the_seven_model_tools() -> Non
     from app.consultant.run_service import build_configured_execution
 
     execution = build_configured_execution(Settings())
-    assert execution.max_model_calls == 8
     assert execution.allowed_tool_ids == (
         "ls",
         "read_file",
@@ -95,6 +95,98 @@ def test_configured_execution_defaults_to_exactly_the_seven_model_tools() -> Non
         "delete",
         "check_candidate_document",
     )
+
+
+def test_configured_tool_budget_allows_observed_workspace_workflow() -> None:
+    from app.consultant.run_service import build_configured_execution
+
+    execution = build_configured_execution(Settings())
+    middleware = build_consultant_middleware(
+        model=FakeMessagesListChatModel(responses=[]),
+        execution=execution,
+    )
+    limit = next(
+        item for item in middleware if isinstance(item, ToolCallLimitMiddleware)
+    )
+    state: dict[str, object] = {}
+    waves = (
+        (
+            "read_file",
+            "ls",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+            "read_file",
+        ),
+        ("read_file", "read_file", "ls", "ls", "ls"),
+        ("check_candidate_document",),
+        ("edit_file",),
+        ("check_candidate_document",),
+    )
+
+    call_index = 0
+    for wave in waves:
+        calls = []
+        for name in wave:
+            call_index += 1
+            calls.append(
+                {
+                    "name": name,
+                    "args": {},
+                    "id": f"workspace-{call_index}",
+                    "type": "tool_call",
+                }
+            )
+        state["messages"] = [AIMessage(content="", tool_calls=calls)]
+        state.update(limit.after_model(state, runtime=None) or {})  # type: ignore[arg-type]
+
+    assert state["run_tool_call_count"] == {"__all__": 17}
+
+
+def test_configured_tool_budget_allows_forty_eight_and_rejects_forty_ninth() -> None:
+    from app.consultant.run_service import build_configured_execution
+
+    execution = build_configured_execution(Settings())
+    middleware = build_consultant_middleware(
+        model=FakeMessagesListChatModel(responses=[]),
+        execution=execution,
+    )
+    limit = next(
+        item for item in middleware if isinstance(item, ToolCallLimitMiddleware)
+    )
+    first_forty_eight = [
+        {
+            "name": "read_file",
+            "args": {},
+            "id": f"bounded-{index}",
+            "type": "tool_call",
+        }
+        for index in range(1, 49)
+    ]
+    state: dict[str, object] = {
+        "messages": [AIMessage(content="", tool_calls=first_forty_eight)]
+    }
+
+    state.update(limit.after_model(state, runtime=None) or {})  # type: ignore[arg-type]
+    state["messages"] = [
+        AIMessage(
+            content="",
+            tool_calls=[
+                {
+                    "name": "read_file",
+                    "args": {},
+                    "id": "bounded-49",
+                    "type": "tool_call",
+                }
+            ],
+        )
+    ]
+
+    with pytest.raises(ToolCallLimitExceededError, match=r"49/48 calls"):
+        limit.after_model(state, runtime=None)  # type: ignore[arg-type]
 
 
 def test_provider_evidence_has_handle_quote_occurrence_without_model_offsets() -> None:

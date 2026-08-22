@@ -38,7 +38,18 @@ WORKSPACE_TOOL_DESCRIPTIONS = {
     "ls": "List entries in the scoped virtual JD workspace using an absolute POSIX path.",
     "read_file": "Read one file from the scoped virtual JD workspace.",
     "grep": "Search literal text in the scoped virtual JD workspace.",
-    "write_file": "Create one new candidate resource; existing resources must be edited.",
+    "write_file": (
+        "Create one new JSON resource below /candidate/<run-id>/; edit existing "
+        "resources instead. Choose the next unused zero-padded handle and replace "
+        "all example values. Each JSONL example means file_path is the candidate "
+        "root plus path, and content is JSON.stringify(content). Candidate evidence "
+        "uses occurrence=null for a unique quote or a positive 1-based occurrence "
+        "when repeated. OPKS alternatives: opks/p/p-###.json kind=indicator, "
+        "opks/k/k-###.json kind=knowledge, opks/s/s-###.json kind=skill.\n"
+        'CREATE_EXAMPLE {"path":"duties/duty-002.json","content":{"handle":"duty-002","statement":"管理供應商交期"}}\n'
+        'CREATE_EXAMPLE {"path":"tasks/task-002.json","content":{"handle":"task-002","duty_handle":"duty-002","statement":"核對供應商交期","action":"核對","object":"供應商交期"}}\n'
+        'CREATE_EXAMPLE {"path":"opks/o/o-001.json","content":{"handle":"o-001","kind":"output","text":"已核對的供應商交期","task_handles":["task-002"],"evidence":[{"source_handle":"source-002","quote":"目前內容第一行。","occurrence":null,"skill_ids":["output"]}]}}'
+    ),
     "edit_file": "Replace one exact unique string in a candidate resource; do not replace all.",
     "delete": "Delete one candidate entity resource; directories and protected resources are not deletable.",
 }

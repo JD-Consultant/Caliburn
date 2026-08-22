@@ -202,6 +202,7 @@ class FakeAgent:
         assert payload["messages"][0].additional_kwargs[
             "employee_source_id"
         ] == str(context.request.current_source_id)
+        assert getattr(context.request, "current_source_handle", None) == "source-001"
         if self.fail:
             raise TimeoutError("secret employee payload must not be persisted")
         context.context_receipts.append(
@@ -258,6 +259,10 @@ def _settings() -> Settings:
 def test_configured_execution_has_exactly_the_virtual_workspace_tools() -> None:
     execution = build_configured_execution(_settings())
 
+    assert execution.policy_revision == 2
+    assert execution.max_model_calls == 11
+    assert execution.max_total_tokens == 160_000
+    assert execution.max_cost_usd == Decimal("2.00")
     assert execution.allowed_skill_ids == CONSULTANT_SKILL_IDS
     assert execution.allowed_tool_ids == (
         "ls",

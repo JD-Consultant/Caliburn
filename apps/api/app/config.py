@@ -29,15 +29,15 @@ class Settings(BaseSettings):
     consultant_output_token_parameter: str = "max_tokens"
     consultant_reasoning_effort: str | None = "high"
     consultant_timeout_seconds: float = 90.0
-    consultant_policy_revision: int = 1
+    consultant_policy_revision: int = 2
     consultant_max_context_tokens: int = 24_000
-    consultant_max_model_calls: int = 8
+    consultant_max_model_calls: int = 11
     consultant_max_lookup_waves: int = 2
-    consultant_max_total_tool_calls: int = 12
+    consultant_max_total_tool_calls: int = 48
     consultant_model_retry_count: int = 1
     consultant_tool_retry_count: int = 1
     consultant_max_elapsed_seconds: float = 180.0
-    consultant_max_total_tokens: int = 32_000
+    consultant_max_total_tokens: int = 160_000
     consultant_max_cost_usd: Decimal | None = Decimal("2.00")
 
 

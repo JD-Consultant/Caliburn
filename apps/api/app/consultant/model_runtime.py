@@ -50,7 +50,7 @@ class OutputTokenParameter(StrEnum):
 
 
 class ReasoningParameters(RuntimeModel):
-    effort: Literal["low", "medium", "high", "max"]
+    effort: Literal["low", "medium", "high", "xhigh", "max"]
     exclude: bool = True
 
 
@@ -85,7 +85,7 @@ class ConsultantModelProfile(RuntimeModel):
     seed: int | None = None
     max_output_tokens: int = Field(default=4096, ge=256)
     output_token_parameter: OutputTokenParameter = OutputTokenParameter.MAX_TOKENS
-    reasoning_effort: Literal["low", "medium", "high", "max"] | None = None
+    reasoning_effort: Literal["low", "medium", "high", "xhigh", "max"] | None = None
     exclude_reasoning_from_response: bool = True
     timeout_seconds: float = Field(default=90, gt=0, le=600)
 
@@ -114,7 +114,7 @@ class RunPolicy(RuntimeModel):
     allowed_skill_ids: tuple[NonEmptyText, ...] = ()
     allowed_tool_ids: tuple[NonEmptyText, ...] = ()
     max_context_tokens: int = Field(ge=512)
-    max_model_calls: int = Field(ge=1, le=10)
+    max_model_calls: int = Field(ge=1, le=11)
     max_lookup_waves: int = Field(ge=0, le=10)
     max_total_tool_calls: int = Field(ge=0, le=100)
     model_retry_count: int = Field(ge=0, le=3)

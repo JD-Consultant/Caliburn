@@ -69,6 +69,11 @@ from app.consultant.state import (
     inspect_command_receipt,
 )
 from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_state import (
+    workspace_decision_namespace as _workspace_decision_namespace,
+    workspace_metadata_namespace as _workspace_metadata_namespace,
+    workspace_namespace as _workspace_namespace,
+)
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 from app.consultant.verification import (
     ConsultantVerificationError,
@@ -168,6 +173,22 @@ class PostgresConsultantRuntime:
         if not isinstance(document_id, UUID):
             raise TypeError("document_id must be an application-issued UUID")
         return ("caliburn", "consultant", str(document_id), "sources")
+
+    @staticmethod
+    def workspace_namespace(document_id: UUID) -> tuple[str, str, str, str]:
+        return _workspace_namespace(document_id)
+
+    @staticmethod
+    def workspace_metadata_namespace(
+        document_id: UUID,
+    ) -> tuple[str, str, str, str]:
+        return _workspace_metadata_namespace(document_id)
+
+    @staticmethod
+    def workspace_decision_namespace(
+        document_id: UUID,
+    ) -> tuple[str, str, str, str]:
+        return _workspace_decision_namespace(document_id)
 
     def connection_invariants(self) -> dict[str, bool]:
         saver_connection = self.saver.conn
@@ -1688,11 +1709,17 @@ class PostgresConsultantRuntime:
                     (document_id,),
                 )
             await self.saver.adelete_thread(str(document_id))
-            namespace = self.source_namespace(document_id)
-            while items := await self.store.asearch(namespace, limit=100):
-                await asyncio.gather(
-                    *(self.store.adelete(namespace, item.key) for item in items)
-                )
+            namespaces = (
+                self.source_namespace(document_id),
+                self.workspace_namespace(document_id),
+                self.workspace_metadata_namespace(document_id),
+                self.workspace_decision_namespace(document_id),
+            )
+            for namespace in namespaces:
+                while items := await self.store.asearch(namespace, limit=100):
+                    await asyncio.gather(
+                        *(self.store.adelete(namespace, item.key) for item in items)
+                    )
         self._document_locks.pop(document_id, None)
 
 

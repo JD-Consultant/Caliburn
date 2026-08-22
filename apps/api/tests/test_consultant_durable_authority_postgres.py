@@ -10,6 +10,7 @@ from uuid import UUID, uuid4
 import psycopg
 import pytest
 import pytest_asyncio
+from deepagents.backends import StoreBackend
 from langgraph.graph import END, START, StateGraph
 
 from app.adapters.langgraph.postgres import (
@@ -44,7 +45,11 @@ from app.consultant.state import (
     SourceProcessingStatus,
     SourceValidity,
 )
-from app.consultant.workspace_resources import WorkspaceCatalog, project_candidate_files
+from app.consultant.workspace_resources import (
+    WorkspaceCatalog,
+    project_workspace_files,
+)
+from app.consultant.workspace_state import StoreBackedWorkspace
 from app.consultant.workspace_tools import _serialize_check_result
 
 
@@ -127,6 +132,143 @@ def _document(document_id: UUID, *, suffix: str = "") -> ApprovedJobDocument:
             ),
         ),
     )
+
+
+@pytest.mark.asyncio
+async def test_deep_agents_store_backend_is_application_accessible_and_restart_safe(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    other_document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="Store workspace")
+        await runtime.create_document(other_document_id, title="Isolated workspace")
+        first = StoreBackend(
+            namespace=lambda _runtime: runtime.workspace_namespace(document_id),
+            store=runtime.store,
+        )
+
+        assert (await first.awrite("/workspace/header.json", "{}\n")).error is None
+        assert (
+            await first.aedit(
+                "/workspace/header.json",
+                "{}",
+                '{"job_title":"採購"}',
+            )
+        ).error is None
+
+        reopened = StoreBackend(
+            namespace=lambda _runtime: runtime.workspace_namespace(document_id),
+            store=runtime.store,
+        )
+        reopened_read = await reopened.aread("/workspace/header.json")
+        assert reopened_read.error is None
+        assert reopened_read.file_data is not None
+        assert reopened_read.file_data["content"] == '{"job_title":"採購"}\n'
+
+        isolated = StoreBackend(
+            namespace=lambda _runtime: runtime.workspace_namespace(other_document_id),
+            store=runtime.store,
+        )
+        assert (await isolated.aread("/workspace/header.json")).error is not None
+        assert (await reopened.adelete("/workspace/header.json")).error is None
+        assert (await reopened.aread("/workspace/header.json")).error is not None
+
+
+@pytest.mark.asyncio
+async def test_store_backend_workspace_survives_postgres_runtime_restart_byte_exact(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    other_document_id = uuid4()
+    new_task_path = "/workspace/tasks/task-new-001.json"
+    new_task = (
+        '{"handle":"task-new-001","statement":"追蹤交期",'
+        '"action":"追蹤","object":"交期"}\n'
+    )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Store workspace")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        assert (await workspace.backend.awrite(new_task_path, new_task)).error is None
+        before_restart = await workspace.read_snapshot()
+        approved_before = await runtime.export_approved_document(document_id)
+
+        other = await runtime.create_document(other_document_id, title="Other workspace")
+        other_workspace = StoreBackedWorkspace(
+            store=runtime.store,
+            document_id=other_document_id,
+        )
+        await other_workspace.ensure_initialized(
+            approved_document=other.approved_document,
+            approved_revision=other.revision,
+        )
+        assert new_task_path not in (await other_workspace.read_snapshot()).files
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        reopened = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        after_restart = await reopened.read_snapshot()
+
+        assert after_restart.files == before_restart.files
+        assert after_restart.files[new_task_path] == new_task
+        assert await runtime.export_approved_document(document_id) == approved_before
+        assert new_task_path not in (
+            await StoreBackedWorkspace(
+                store=runtime.store,
+                document_id=other_document_id,
+            ).read_snapshot()
+        ).files
+
+
+@pytest.mark.asyncio
+async def test_workspace_store_backend_is_not_an_authority_checkpoint_files_channel(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="Store workspace")
+        backend = StoreBackend(
+            namespace=lambda _runtime: runtime.workspace_namespace(document_id),
+            store=runtime.store,
+        )
+
+        assert (await backend.awrite("/workspace/header.json", "{}\n")).error is None
+
+        assert "files" not in await runtime.raw_state(document_id)
+
+
+@pytest.mark.asyncio
+async def test_delete_document_clears_all_workspace_namespaces(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="Store workspace")
+        namespaces = (
+            runtime.workspace_namespace(document_id),
+            runtime.workspace_metadata_namespace(document_id),
+            runtime.workspace_decision_namespace(document_id),
+        )
+        for index, namespace in enumerate(namespaces):
+            await runtime.store.aput(namespace, f"item-{index}", {"value": index})
+
+        await runtime.delete_document(document_id)
+
+        assert [await runtime.store.asearch(namespace) for namespace in namespaces] == [
+            [],
+            [],
+            [],
+        ]
 
 
 @pytest.mark.asyncio
@@ -403,8 +545,13 @@ async def test_workspace_check_only_records_receipt_then_publishes_once_and_repl
             snapshot.approved_document,
             sources=sources,
         )
-        files = project_candidate_files(catalog, run_id=run_id)
-        header_path = f"/candidate/{run_id}/header.json"
+        files = dict(
+            project_workspace_files(
+                snapshot.approved_document,
+                handle_registry={},
+            ).files
+        )
+        header_path = "/workspace/header.json"
         header = json.loads(files[header_path])
         header["job_title"] = "資深採購管理專員"
         files[header_path] = json.dumps(header, ensure_ascii=False, indent=2) + "\n"
@@ -494,8 +641,13 @@ async def test_workspace_publication_rejects_changed_files_without_queue_mutatio
             snapshot.approved_document,
             sources=await runtime.list_sources(document_id),
         )
-        files = project_candidate_files(catalog, run_id=run_id)
-        header_path = f"/candidate/{run_id}/header.json"
+        files = dict(
+            project_workspace_files(
+                snapshot.approved_document,
+                handle_registry={},
+            ).files
+        )
+        header_path = "/workspace/header.json"
         header = json.loads(files[header_path])
         header["job_title"] = "已檢查的標題"
         files[header_path] = json.dumps(header, ensure_ascii=False, indent=2) + "\n"

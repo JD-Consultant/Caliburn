@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from typing import Any, Protocol
 from uuid import UUID
 
-from deepagents.backends.utils import file_data_to_string, validate_path
+from deepagents.backends.utils import validate_path
 from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.types import ToolCallRequest
 from langchain.tools import ToolRuntime
@@ -19,8 +19,8 @@ from pydantic import BaseModel, ConfigDict
 from typing_extensions import override
 
 from app.consultant.workspace_backend import (
-    CandidatePolicyBackend,
     ConsultantWorkspaceBackendBinding,
+    WorkspacePolicyBackend,
 )
 
 
@@ -39,10 +39,10 @@ WORKSPACE_TOOL_DESCRIPTIONS = {
     "read_file": "Read one file from the scoped virtual JD workspace.",
     "grep": "Search literal text in the scoped virtual JD workspace.",
     "write_file": (
-        "Create one new JSON resource below /candidate/<run-id>/; edit existing "
+        "Create one new JSON resource below /workspace/; edit existing "
         "resources instead. Choose the next unused zero-padded handle and replace "
-        "all example values. Each JSONL example means file_path is the candidate "
-        "root plus path, and content is JSON.stringify(content). Candidate evidence "
+        "all example values. Each JSONL example means file_path is the workspace "
+        "root plus path, and content is JSON.stringify(content). Workspace evidence "
         "uses occurrence=null for a unique quote or a positive 1-based occurrence "
         "when repeated. OPKS alternatives: opks/p/p-###.json kind=indicator, "
         "opks/k/k-###.json kind=knowledge, opks/s/s-###.json kind=skill.\n"
@@ -50,8 +50,8 @@ WORKSPACE_TOOL_DESCRIPTIONS = {
         'CREATE_EXAMPLE {"path":"tasks/task-002.json","content":{"handle":"task-002","duty_handle":"duty-002","statement":"核對供應商交期","action":"核對","object":"供應商交期"}}\n'
         'CREATE_EXAMPLE {"path":"opks/o/o-001.json","content":{"handle":"o-001","kind":"output","text":"已核對的供應商交期","task_handles":["task-002"],"evidence":[{"source_handle":"source-002","quote":"目前內容第一行。","occurrence":null,"skill_ids":["output"]}]}}'
     ),
-    "edit_file": "Replace one exact unique string in a candidate resource; do not replace all.",
-    "delete": "Delete one candidate entity resource; directories and protected resources are not deletable.",
+    "edit_file": "Replace one exact unique string in a workspace resource; do not replace all.",
+    "delete": "Delete one workspace entity resource; directories and the header are not deletable.",
 }
 
 
@@ -76,6 +76,7 @@ class CandidateCheckToolBinding:
 
     runtime: CandidateCheckPort
     workspace: ConsultantWorkspaceBackendBinding
+    run_id: UUID | None = None
 
     @property
     def port(self) -> CandidateCheckPort:
@@ -106,44 +107,23 @@ class _CandidateCheckStructuredTool(StructuredTool):
         return _EmptyCandidateCheckInput
 
 
-def _current_candidate_files(
+async def _current_workspace_files(
     binding: CandidateCheckToolBinding,
-    runtime: ToolRuntime[Any, Any],
 ) -> dict[str, str]:
-    state = runtime.state
-    if not isinstance(state, Mapping):
-        raise RuntimeError("check_candidate_document requires the LangGraph state")
-    raw_files = state.get("files")
-    if not isinstance(raw_files, Mapping):
-        raise RuntimeError(
-            "check_candidate_document requires the current workspace files channel"
-        )
-
+    snapshot = await binding.workspace.workspace.read_snapshot()
     files: dict[str, str] = {}
-    for raw_path, raw_file in raw_files.items():
-        if not isinstance(raw_path, str):
-            raise RuntimeError("check_candidate_document found a non-text candidate path")
+    for raw_path, content in snapshot.files.items():
         try:
-            canonical_path = binding.workspace.candidate_backend.validate_candidate_file_path(
+            canonical_path = binding.workspace.workspace_backend.validate_workspace_file_path(
                 raw_path
             )
         except ValueError as error:
             raise RuntimeError(
-                f"check_candidate_document rejected candidate path {raw_path!r}: {error}"
+                f"check_candidate_document rejected workspace path {raw_path!r}: {error}"
             ) from error
         if canonical_path != raw_path:
             raise RuntimeError(
-                f"check_candidate_document requires canonical candidate paths: {raw_path!r}"
-            )
-        if isinstance(raw_file, str):
-            content = raw_file
-        elif isinstance(raw_file, bytes):
-            content = raw_file.decode("utf-8")
-        elif isinstance(raw_file, Mapping):
-            content = file_data_to_string(raw_file)
-        else:
-            raise RuntimeError(
-                f"workspace file {raw_path!r} has an unsupported state value"
+                f"check_candidate_document requires canonical workspace paths: {raw_path!r}"
             )
         files[canonical_path] = content
     return dict(sorted(files.items()))
@@ -197,10 +177,12 @@ def build_check_candidate_document_tool(
             raise RuntimeError(
                 "check_candidate_document is missing its provider call ID"
             )
-        files = _current_candidate_files(binding, runtime)
+        if binding.run_id is None:
+            raise RuntimeError("check_candidate_document is missing its consultant run ID")
+        files = await _current_workspace_files(binding)
         result = await binding.runtime.check_candidate_document(
             document_id=binding.workspace.document_id,
-            run_id=binding.workspace.run_id,
+            run_id=binding.run_id,
             files=files,
             tool_call_id=runtime.tool_call_id,
             selected_skill_ids=binding.workspace.skill_backend.selected_skill_ids,
@@ -222,7 +204,7 @@ def build_check_candidate_document_tool(
 
 def _tool_call_path(
     tool_call: Mapping[str, Any],
-    candidate_backend: CandidatePolicyBackend,
+    candidate_backend: WorkspacePolicyBackend,
 ) -> str | None:
     args = tool_call.get("args")
     if not isinstance(args, Mapping):
@@ -232,14 +214,14 @@ def _tool_call_path(
         return None
     try:
         canonical_path = validate_path(path)
-        return candidate_backend.validate_candidate_file_path(canonical_path)
+        return candidate_backend.validate_workspace_file_path(canonical_path)
     except (TypeError, ValueError):
         return None
 
 
 def _ordered_mutation_paths(
     tool_calls: Sequence[Mapping[str, Any]],
-    candidate_backend: CandidatePolicyBackend,
+    candidate_backend: WorkspacePolicyBackend,
 ) -> list[tuple[str, str | None]]:
     result: list[tuple[str, str | None]] = []
     for tool_call in sorted(
@@ -261,7 +243,7 @@ def _ordered_mutation_paths(
 def analyze_workspace_wave(
     tool_calls: Sequence[Mapping[str, Any]],
     *,
-    candidate_backend: CandidatePolicyBackend,
+    candidate_backend: WorkspacePolicyBackend,
 ) -> str | None:
     """Return one deterministic rejection for a conflicting complete tool wave."""
 
@@ -276,7 +258,7 @@ def analyze_workspace_wave(
     )
     if invalid_mutation is not None:
         return (
-            "Tool wave rejected: every candidate mutation must provide a valid "
+            "Tool wave rejected: every workspace mutation must provide a valid "
             "file_path accepted by the virtual filesystem. No call in this wave "
             f"was run (invalid mutation call ID {invalid_mutation!r})."
         )
@@ -286,7 +268,7 @@ def analyze_workspace_wave(
     ):
         return (
             "Tool wave rejected: check_candidate_document cannot run with a "
-            "candidate mutation. Retry the mutations first, observe their results, "
+            "workspace mutation. Retry the mutations first, observe their results, "
             "then call check_candidate_document in a separate sequential wave."
         )
 
@@ -302,7 +284,7 @@ def analyze_workspace_wave(
                 or left_path.startswith(right_prefix)
             ):
                 return (
-                    "Tool wave rejected: candidate mutation paths "
+                    "Tool wave rejected: workspace mutation paths "
                     f"{left_path!r} and {right_path!r} "
                     "overlap. Retry overlapping mutations in separate sequential "
                     f"tool calls (call IDs {left_id!r} and {right_id!r})."
@@ -328,7 +310,7 @@ def _last_ai_tool_calls(state: Any) -> Sequence[Mapping[str, Any]]:
 
 def _wave_error_message(
     request: ToolCallRequest,
-    candidate_backend: CandidatePolicyBackend,
+    candidate_backend: WorkspacePolicyBackend,
 ) -> ToolMessage:
     conflict = analyze_workspace_wave(
         _last_ai_tool_calls(request.state),
@@ -348,7 +330,7 @@ def _wave_error_message(
 class WorkspaceToolWaveMiddleware(AgentMiddleware):
     """Reject a complete conflicting workspace wave before any handler runs."""
 
-    def __init__(self, *, candidate_backend: CandidatePolicyBackend) -> None:
+    def __init__(self, *, candidate_backend: WorkspacePolicyBackend) -> None:
         self._candidate_backend = candidate_backend
 
     @override

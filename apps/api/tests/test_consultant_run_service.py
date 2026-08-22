@@ -7,6 +7,7 @@ from types import SimpleNamespace
 from uuid import UUID, uuid4
 
 import pytest
+from langgraph.store.memory import InMemoryStore
 
 from app.config import Settings
 from app.consultant.context import ContextSelectionReceipt
@@ -45,6 +46,7 @@ from app.consultant.state import (
     initial_thread_state,
 )
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
+from app.consultant.workspace_state import StoreBackedWorkspace
 
 
 def _source(document_id: UUID, source_id: UUID) -> EmployeeSource:
@@ -153,6 +155,7 @@ class FakeRuntime:
     ) -> None:
         self.snapshot = snapshot
         self.source = source
+        self.store = InMemoryStore()
         self.commits = []
         self.failures: list[tuple[UUID, str, object]] = []
 
@@ -189,21 +192,37 @@ class FakeRuntime:
 
 class FakeAgent:
     def __init__(
-        self, *, result: ConsultantModelOutput, execution, fail: bool = False
+        self,
+        *,
+        result: ConsultantModelOutput,
+        execution,
+        fail: bool = False,
+        workspace=None,
     ):
         self.result = result
         self.execution = execution
         self.fail = fail
+        self.workspace = workspace
         self.skill_backend = SimpleNamespace(
             loaded_skill_ids=("task-boundary",)
         )
 
     async def ainvoke(self, payload, *, context, config):
+        assert set(payload) == {"messages"}
         assert payload["messages"][0].additional_kwargs[
             "employee_source_id"
         ] == str(context.request.current_source_id)
         assert getattr(context.request, "current_source_handle", None) == "source-001"
         if self.fail:
+            assert self.workspace is not None
+            write = await self.workspace.workspace_backend.awrite(
+                "/workspace/tasks/task-new-001.json",
+                (
+                    '{"handle":"task-new-001","statement":"追蹤供應",'
+                    '"action":"追蹤","object":"供應"}\n'
+                ),
+            )
+            assert write.error is None
             raise TimeoutError("secret employee payload must not be persisted")
         context.context_receipts.append(
             ContextSelectionReceipt(
@@ -304,9 +323,11 @@ async def test_admitted_turn_is_verified_then_committed_once() -> None:
     workspace = agent_factory_kwargs["workspace_binding"]
     check_binding = agent_factory_kwargs["candidate_check_binding"]
     assert workspace.document_id == document_id
-    assert workspace.run_id == run_id
+    assert not hasattr(workspace, "run_id")
+    assert not hasattr(workspace, "initial_files")
     assert check_binding.runtime is runtime
     assert check_binding.workspace is workspace
+    assert check_binding.run_id == run_id
     assert len(runtime.commits) == 1
     commit = runtime.commits[0]["commit"]
     assert commit.run_id == run_id
@@ -340,10 +361,11 @@ async def test_failed_model_run_is_durably_classified_without_payload() -> None:
             source_id=source_id,
             execution=execution,
             model=object(),
-            agent_factory=lambda **_: FakeAgent(
+            agent_factory=lambda **kwargs: FakeAgent(
                 result=_model_output(source_id),
                 execution=execution,
                 fail=True,
+                workspace=kwargs["workspace_binding"],
             ),
         )
 
@@ -355,6 +377,13 @@ async def test_failed_model_run_is_durably_classified_without_payload() -> None:
     assert evidence.resolved_execution["profile_id"] == execution.profile_id
     assert evidence.context_selection_receipts == ()
     assert evidence.attempt_receipts == ()
+    reopened_workspace = StoreBackedWorkspace(
+        store=runtime.store,
+        document_id=document_id,
+    )
+    workspace_snapshot = await reopened_workspace.read_snapshot()
+    assert "/workspace/tasks/task-new-001.json" in workspace_snapshot.files
+    assert runtime.snapshot.approved_document.tasks == ()
 
 
 @pytest.mark.asyncio

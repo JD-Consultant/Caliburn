@@ -1,8 +1,8 @@
 """Scoped Deep Agents backends for the consultant virtual JD workspace.
 
 The framework owns generic file operations.  This module only supplies the
-application projections and the policy that keeps the candidate state inside
-the current run.
+application projections and the policy that keeps the working draft inside
+the one document-scoped workspace.
 """
 
 from __future__ import annotations
@@ -18,7 +18,7 @@ from pathlib import PurePosixPath
 from typing import Any
 from uuid import UUID
 
-from deepagents.backends import BackendProtocol, CompositeBackend, StateBackend
+from deepagents.backends import BackendProtocol, CompositeBackend, StoreBackend
 from deepagents.backends.protocol import (
     DeleteResult,
     EditResult,
@@ -50,14 +50,15 @@ from app.consultant.workspace_resources import (
     pending_action_handles,
     project_candidate_files,
 )
+from app.consultant.workspace_state import StoreBackedWorkspace
 
 
 _HANDLE_PATTERN = r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*-[0-9]{3,}"
-_CANDIDATE_ENTITY = re.compile(
+_WORKSPACE_ENTITY = re.compile(
     rf"(?:duties|tasks)/{_HANDLE_PATTERN}\.json"
     rf"|opks/(?:o|p|k|s)/{_HANDLE_PATTERN}\.json"
 )
-_CANDIDATE_DOCUMENT = {"header.json", "review-groups.json"}
+_WORKSPACE_DOCUMENT = {"header.json"}
 
 
 def _safe_absolute_path(path: str) -> bool:
@@ -471,58 +472,43 @@ def _pending_semantic_value(catalog: WorkspaceCatalog, value: Any) -> Any:
     return projected
 
 
-class CandidatePolicyBackend(BackendProtocol):
-    """Enforce Caliburn's narrow candidate policy over StateBackend."""
+class WorkspacePolicyBackend(BackendProtocol):
+    """Enforce Caliburn's narrow JD workspace policy over StoreBackend."""
 
     def __init__(
         self,
-        backend: StateBackend,
-        *,
-        run_id: UUID,
-        initial_paths: Sequence[str] = (),
+        backend: StoreBackend,
     ) -> None:
-        if not isinstance(run_id, UUID):
-            raise TypeError("candidate run_id must be a UUID")
         self._backend = backend
-        self.run_id = run_id
-        self.initial_paths = tuple(initial_paths)
         self._mutation_lock = threading.Lock()
-        for path in self.initial_paths:
-            error = self._file_policy(path)
-            if error is not None:
-                raise ValueError(error)
 
     @property
-    def state_backend(self) -> StateBackend:
+    def store_backend(self) -> StoreBackend:
         return self._backend
 
     @property
-    def _run_root(self) -> str:
-        return f"/candidate/{self.run_id}"
-
-    @property
-    def _run_prefix(self) -> str:
-        return f"{self._run_root}/"
+    def _workspace_prefix(self) -> str:
+        return "/workspace/"
 
     def _file_policy(self, path: str) -> str | None:
         if not _safe_absolute_path(path):
-            return "permission denied: candidate path must be an absolute POSIX path"
-        if not path.startswith(self._run_prefix):
-            return "permission denied: path is outside the current candidate run"
-        relative = path[len(self._run_prefix) :]
+            return "permission denied: workspace path must be an absolute POSIX path"
+        if not path.startswith(self._workspace_prefix):
+            return "permission denied: path is outside the workspace"
+        relative = path[len(self._workspace_prefix) :]
         if not relative or relative.endswith("/"):
-            return "permission denied: candidate path must identify one resource file"
-        if relative in _CANDIDATE_DOCUMENT or _CANDIDATE_ENTITY.fullmatch(relative):
+            return "permission denied: workspace path must identify one resource file"
+        if relative in _WORKSPACE_DOCUMENT or _WORKSPACE_ENTITY.fullmatch(relative):
             return None
-        return "permission denied: invalid candidate resource path"
+        return "permission denied: invalid workspace resource path"
 
-    def validate_candidate_file_path(self, path: str) -> str:
-        """Return a framework-canonical current-run resource path or reject it."""
+    def validate_workspace_file_path(self, path: str) -> str:
+        """Return a framework-canonical workspace resource path or reject it."""
 
         try:
             canonical = validate_path(path)
         except (TypeError, ValueError) as error:
-            raise ValueError(f"permission denied: invalid candidate path: {error}") from error
+            raise ValueError(f"permission denied: invalid workspace path: {error}") from error
         error = self._file_policy(canonical)
         if error is not None:
             raise ValueError(error)
@@ -530,18 +516,18 @@ class CandidatePolicyBackend(BackendProtocol):
 
     def _scope_policy(self, path: str) -> str | None:
         if not _safe_absolute_path(path):
-            return "permission denied: candidate path must be an absolute POSIX path"
+            return "permission denied: workspace path must be an absolute POSIX path"
         if path == "/":
             return None
-        if path in {"/candidate", "/candidate/", self._run_root, self._run_prefix}:
+        if path in {"/workspace", "/workspace/"}:
             return None
-        if path.startswith(self._run_prefix):
+        if path.startswith(self._workspace_prefix):
             return None
-        return "permission denied: path is outside the current candidate run"
+        return "permission denied: path is outside the workspace"
 
     def _search_path(self, path: str | None) -> tuple[str | None, str | None]:
-        if path is None or path in {"/", "/candidate", "/candidate/"}:
-            return self._run_prefix, None
+        if path is None or path in {"/", "/workspace", "/workspace/"}:
+            return self._workspace_prefix, None
         error = self._scope_policy(path)
         if error is not None:
             return None, error
@@ -551,13 +537,13 @@ class CandidatePolicyBackend(BackendProtocol):
         result: list[FileInfo] = []
         for entry in entries or []:
             path = entry.get("path", "")
-            if path == "/candidate/" or path.startswith(self._run_prefix):
+            if path == "/workspace/" or path.startswith(self._workspace_prefix):
                 result.append(entry)
-        if not any(entry.get("path") == "/candidate/" for entry in result):
+        if not any(entry.get("path") == "/workspace/" for entry in result):
             result.insert(
                 0,
                 {
-                    "path": "/candidate/",
+                    "path": "/workspace/",
                     "is_dir": True,
                     "size": 0,
                     "modified_at": "",
@@ -729,10 +715,10 @@ class CandidatePolicyBackend(BackendProtocol):
         error = self._file_policy(file_path)
         if error is not None:
             return DeleteResult(error=error)
-        relative = file_path[len(self._run_prefix) :]
-        if relative in _CANDIDATE_DOCUMENT:
+        relative = file_path[len(self._workspace_prefix) :]
+        if relative in _WORKSPACE_DOCUMENT:
             return DeleteResult(
-                error="permission denied: candidate document resource cannot be deleted"
+                error="permission denied: workspace header cannot be deleted"
             )
         with self._mutation_lock:
             return self._backend.delete(file_path)
@@ -741,10 +727,10 @@ class CandidatePolicyBackend(BackendProtocol):
         error = self._file_policy(file_path)
         if error is not None:
             return DeleteResult(error=error)
-        relative = file_path[len(self._run_prefix) :]
-        if relative in _CANDIDATE_DOCUMENT:
+        relative = file_path[len(self._workspace_prefix) :]
+        if relative in _WORKSPACE_DOCUMENT:
             return DeleteResult(
-                error="permission denied: candidate document resource cannot be deleted"
+                error="permission denied: workspace header cannot be deleted"
             )
         async with self._async_mutation_guard():
             return await self._backend.adelete(file_path)
@@ -1001,19 +987,17 @@ def _source_metadata(catalog: WorkspaceCatalog, source: EmployeeSource) -> dict[
 
 @dataclass(frozen=True, slots=True)
 class ConsultantWorkspaceBackendBinding:
-    """All backends and state inputs for one consultant run."""
+    """All backends for one document-scoped consultant workspace."""
 
     composite_backend: CompositeBackend
     skill_backend: PackageSkillBackend
-    candidate_state_backend: StateBackend
-    candidate_backend: CandidatePolicyBackend
+    workspace: StoreBackedWorkspace
+    workspace_backend: WorkspacePolicyBackend
     source_backend: EmployeeSourceProjectionBackend
     approved_backend: ApprovedProjectionBackend
     pending_backend: PendingProjectionBackend
     catalog: WorkspaceCatalog
-    run_id: UUID
     document_id: UUID
-    initial_files: dict[str, FileData]
 
     @property
     def backend(self) -> CompositeBackend:
@@ -1024,43 +1008,30 @@ class ConsultantWorkspaceBackendBinding:
         return self.catalog
 
     @property
-    def candidate_files(self) -> dict[str, FileData]:
-        return self.initial_files
+    def candidate_backend(self) -> WorkspacePolicyBackend:
+        """Temporary pre-Task-6 name used by the existing agent assembly."""
 
-    @property
-    def initial_candidate_files(self) -> dict[str, str]:
-        """Return canonical contents for the LangGraph ``files`` initializer."""
-
-        return {
-            path: file_data_to_string(file_data)
-            for path, file_data in self.initial_files.items()
-        }
-
+        return self.workspace_backend
 
 def build_consultant_workspace_backend(
     *,
     runtime: PostgresConsultantRuntime,
     document_id: UUID,
-    run_id: UUID,
+    workspace: StoreBackedWorkspace,
     catalog: WorkspaceCatalog,
     selected_skill_ids: tuple[str, ...],
     source_lookup: DocumentSourceLookup | None = None,
 ) -> ConsultantWorkspaceBackendBinding:
-    """Build the single five-root composite backend for one run."""
+    """Build the single five-root composite backend for one active workspace."""
 
-    if not isinstance(document_id, UUID) or not isinstance(run_id, UUID):
-        raise TypeError("document_id and run_id must be UUID values")
+    if not isinstance(document_id, UUID):
+        raise TypeError("document_id must be a UUID value")
     if catalog.document_id != document_id:
         raise ValueError("workspace catalog document scope does not match document_id")
+    if workspace.document_id != document_id:
+        raise ValueError("Store-backed workspace scope does not match document_id")
 
-    candidate_contents = project_candidate_files(catalog, run_id=run_id)
-    initial_files = _file_data_map(candidate_contents)
-    candidate_state_backend = StateBackend()
-    candidate_backend = CandidatePolicyBackend(
-        candidate_state_backend,
-        run_id=run_id,
-        initial_paths=tuple(candidate_contents),
-    )
+    workspace_backend = WorkspacePolicyBackend(workspace.backend)
     skill_backend = PackageSkillBackend(selected_skill_ids)
     lookup = source_lookup or DocumentSourceLookup(runtime)
     source_backend = EmployeeSourceProjectionBackend(
@@ -1071,7 +1042,7 @@ def build_consultant_workspace_backend(
     approved_backend = ApprovedProjectionBackend(catalog)
     pending_backend = PendingProjectionBackend(catalog)
     composite_backend = CompositeBackend(
-        default=candidate_backend,
+        default=workspace_backend,
         routes={
             "/skills/": skill_backend,
             "/sources/": source_backend,
@@ -1082,13 +1053,11 @@ def build_consultant_workspace_backend(
     return ConsultantWorkspaceBackendBinding(
         composite_backend=composite_backend,
         skill_backend=skill_backend,
-        candidate_state_backend=candidate_state_backend,
-        candidate_backend=candidate_backend,
+        workspace=workspace,
+        workspace_backend=workspace_backend,
         source_backend=source_backend,
         approved_backend=approved_backend,
         pending_backend=pending_backend,
         catalog=catalog,
-        run_id=run_id,
         document_id=document_id,
-        initial_files=initial_files,
     )

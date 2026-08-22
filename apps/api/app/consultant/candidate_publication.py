@@ -689,6 +689,24 @@ def _semantic_changes(
     return tuple(changes)
 
 
+def _candidate_compatibility_view(
+    files: Mapping[str, str],
+    run_id: UUID,
+) -> dict[str, str]:
+    """Adapt the persistent workspace root to the pre-Task-6 check parser."""
+
+    workspace_prefix = "/workspace/"
+    candidate_prefix = f"/candidate/{run_id}/"
+    return {
+        (
+            f"{candidate_prefix}{path.removeprefix(workspace_prefix)}"
+            if path.startswith(workspace_prefix)
+            else path
+        ): content
+        for path, content in files.items()
+    }
+
+
 def check_candidate_document(
     request: CandidateCheckRequest,
     *,
@@ -699,6 +717,7 @@ def check_candidate_document(
     """Parse, verify, and materialize one candidate without queue mutation."""
 
     digest = resource_digest(request.files)
+    candidate_files = _candidate_compatibility_view(request.files, request.run_id)
     if request.document_id != catalog.document_id:
         return _invalid(request, digest, ("candidate document scope does not match",))
     if not request.selected_skill_ids:
@@ -711,7 +730,7 @@ def check_candidate_document(
             ("candidate check requires at least one current committed employee source",),
         )
     try:
-        draft = parse_candidate_files(catalog, request.files, run_id=request.run_id)
+        draft = parse_candidate_files(catalog, candidate_files, run_id=request.run_id)
     except (ValueError, WorkspaceResourceError) as error:
         return _invalid(request, digest, (f"candidate resources are invalid: {error}",))
 
@@ -731,7 +750,7 @@ def check_candidate_document(
             candidate=draft.approved_document,
             catalog=catalog,
             candidate_handles=_candidate_handle_by_id(
-                catalog, request.files, request.run_id
+                catalog, candidate_files, request.run_id
             ),
             evidence=evidence,
             default_basis=default_basis,

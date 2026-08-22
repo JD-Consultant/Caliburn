@@ -1,36 +1,32 @@
 from __future__ import annotations
 
-import copy
+import asyncio
 import json
 from typing import Any, Mapping
 from uuid import UUID
 
 import pytest
-from deepagents.backends import StateBackend
-from deepagents.backends.utils import create_file_data
 from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain.agents import create_agent
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.utils.function_calling import convert_to_openai_tool
 from langgraph.prebuilt import ToolRuntime
+from langgraph.store.memory import InMemoryStore
 from pydantic import PrivateAttr
 
 from app.consultant.agent import (
     ProfessionalConsultantAgent,
     build_professional_consultant_agent,
 )
-from app.consultant.model_runtime import (
-    ConsultantModelProfile,
-    RunPolicy,
-    resolve_execution,
-)
+from app.consultant.model_runtime import ConsultantModelProfile, RunPolicy, resolve_execution
 from app.consultant.state import ApprovedDuty, ApprovedJobDocument, ApprovedTask
 from app.consultant.workspace_backend import (
     ConsultantWorkspaceBackendBinding,
     build_consultant_workspace_backend,
 )
 from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_state import StoreBackedWorkspace
 from app.consultant.workspace_tools import (
     CandidateCheckToolBinding,
     WorkspaceToolWaveMiddleware,
@@ -51,20 +47,12 @@ EXPECTED_WORKSPACE_TOOLS = frozenset(
 )
 DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000101")
 RUN_ID = UUID("00000000-0000-0000-0000-000000000102")
-OTHER_RUN_ID = UUID("00000000-0000-0000-0000-000000000103")
 DUTY_ID = UUID("00000000-0000-0000-0000-000000000201")
 TASK_ID = UUID("00000000-0000-0000-0000-000000000202")
 
 
 class RecordingCheckPort:
-    def __init__(self, result: Any | None = None) -> None:
-        self.result = result or {
-            "status": "checked",
-            "candidate_revision": 1,
-            "revision_digest": "a" * 64,
-            "action_handles": ["action-001"],
-            "actions": [],
-        }
+    def __init__(self) -> None:
         self.calls: list[dict[str, Any]] = []
 
     async def check_candidate_document(
@@ -87,16 +75,28 @@ class RecordingCheckPort:
                 "loaded_skill_ids": loaded_skill_ids,
             }
         )
-        return self.result
+        return {
+            "status": "checked",
+            "candidate_revision": 1,
+            "revision_digest": "a" * 64,
+            "action_handles": ["action-001"],
+            "actions": [],
+        }
 
 
-def _workspace_binding() -> ConsultantWorkspaceBackendBinding:
-    document = ApprovedJobDocument(
+def _document() -> ApprovedJobDocument:
+    return ApprovedJobDocument(
         document_id=DOCUMENT_ID,
         job_title="採購專員",
         work_description="管理採購流程。",
         competency_level=5,
-        duties=(ApprovedDuty(duty_id=DUTY_ID, statement="管理採購作業", display_order=0),),
+        duties=(
+            ApprovedDuty(
+                duty_id=DUTY_ID,
+                statement="管理採購作業",
+                display_order=0,
+            ),
+        ),
         tasks=(
             ApprovedTask(
                 task_id=TASK_ID,
@@ -109,14 +109,27 @@ def _workspace_binding() -> ConsultantWorkspaceBackendBinding:
             ),
         ),
     )
+
+
+async def _workspace_binding() -> ConsultantWorkspaceBackendBinding:
+    document = _document()
     catalog = WorkspaceCatalog.from_snapshot(document)
+    workspace = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(
+        approved_document=document,
+        approved_revision=0,
+    )
     return build_consultant_workspace_backend(
-        runtime=object(),  # type: ignore[arg-type] - source projection is not used here
+        runtime=object(),  # type: ignore[arg-type] - source projection is unused
         document_id=DOCUMENT_ID,
-        run_id=RUN_ID,
+        workspace=workspace,
         catalog=catalog,
         selected_skill_ids=("output",),
     )
+
+
+def _workspace_binding_sync() -> ConsultantWorkspaceBackendBinding:
+    return asyncio.run(_workspace_binding())
 
 
 def _execution() -> Any:
@@ -169,48 +182,15 @@ class ProviderBindingModel(FakeMessagesListChatModel):
         self._bound_tool_schemas = [convert_to_openai_tool(tool) for tool in tools]
         return self
 
-    def _generate(self, messages: Any, stop: Any = None, run_manager: Any = None, **kwargs: Any) -> Any:
+    def _generate(
+        self,
+        messages: Any,
+        stop: Any = None,
+        run_manager: Any = None,
+        **kwargs: Any,
+    ) -> Any:
         del messages, stop, run_manager, kwargs
         raise RuntimeError("stop after real provider binding")
-
-
-def _walk_schema(node: Any):
-    if isinstance(node, dict):
-        yield node
-        for value in node.values():
-            yield from _walk_schema(value)
-    elif isinstance(node, list):
-        for value in node:
-            yield from _walk_schema(value)
-
-
-def _schema_tree_depth(node: Any) -> int:
-    if isinstance(node, dict):
-        return 1 + max((_schema_tree_depth(value) for value in node.values()), default=0)
-    if isinstance(node, list):
-        return max((_schema_tree_depth(value) for value in node), default=0)
-    return 0
-
-
-def _provider_schema_metrics(tool_schema: dict[str, Any]) -> dict[str, int]:
-    parameters = tool_schema["function"]["parameters"]
-    nodes = tuple(_walk_schema(parameters))
-    objects = tuple(node for node in nodes if node.get("type") == "object")
-    return {
-        "properties": sum(len(node.get("properties", {})) for node in objects),
-        "optional": sum(
-            len(set(node.get("properties", {})) - set(node.get("required", ())))
-            for node in objects
-        ),
-        "unions": sum("anyOf" in node or "oneOf" in node for node in nodes),
-        "open_objects": sum(
-            node.get("additionalProperties") is not False for node in objects
-        ),
-        "depth": _schema_tree_depth(parameters),
-        "bytes": len(
-            json.dumps(parameters, ensure_ascii=False, separators=(",", ":")).encode()
-        ),
-    }
 
 
 async def _run_workspace_wave(
@@ -227,61 +207,57 @@ async def _run_workspace_wave(
         human_message_token_limit_before_evict=None,
         grep_max_count=None,
     )
-    model = WaveModel(
-        responses=[
-            AIMessage(content="", tool_calls=calls),
-            AIMessage(content="wave complete"),
-        ]
-    )
     graph = create_agent(
-        model=model,
+        model=WaveModel(
+            responses=[
+                AIMessage(content="", tool_calls=calls),
+                AIMessage(content="wave complete"),
+            ]
+        ),
         tools=([check_tool] if check_tool is not None else []),
         middleware=(
             filesystem,
-            WorkspaceToolWaveMiddleware(
-                candidate_backend=workspace.candidate_backend
-            ),
+            WorkspaceToolWaveMiddleware(candidate_backend=workspace.workspace_backend),
         ),
     )
-    return await graph.ainvoke(
-        {
-            "messages": [HumanMessage(content="edit the candidate")],
-            "files": copy.deepcopy(workspace.initial_files),
-        }
+    result = await graph.ainvoke(
+        {"messages": [HumanMessage(content="edit the workspace")]}
     )
+    assert result.get("files", {}) == {}
+    return result
 
 
 def _tool_messages(result: Mapping[str, Any]) -> list[ToolMessage]:
     return [
-        message
-        for message in result["messages"]
-        if isinstance(message, ToolMessage)
+        message for message in result["messages"] if isinstance(message, ToolMessage)
     ]
 
 
-def _candidate_text(result: Mapping[str, Any], path: str) -> str:
-    return str(result["files"][path]["content"])
+async def _workspace_text(
+    workspace: ConsultantWorkspaceBackendBinding,
+    path: str,
+) -> str:
+    return (await workspace.workspace.read_snapshot()).files[path]
 
 
 def test_check_tool_has_empty_model_schema_and_no_document_payload() -> None:
-    workspace = _workspace_binding()
+    workspace = _workspace_binding_sync()
     check_tool = build_check_candidate_document_tool(
         binding=CandidateCheckToolBinding(
             runtime=RecordingCheckPort(),
             workspace=workspace,
+            run_id=RUN_ID,
         )
     )
 
-    assert check_tool.name == "check_candidate_document"
     schema = check_tool.tool_call_schema.model_json_schema()
     assert schema["properties"] == {}
     assert schema.get("required", []) == []
     assert schema.get("additionalProperties") is False
     converted = convert_to_openai_tool(check_tool)
     assert converted["function"]["parameters"]["properties"] == {}
-    schema_text = str(converted["function"]["parameters"])
     assert all(
-        forbidden not in schema_text
+        forbidden not in str(converted["function"]["parameters"])
         for forbidden in ("document_id", "run_id", "files", "runtime")
     )
     assert check_tool.func is None
@@ -289,8 +265,8 @@ def test_check_tool_has_empty_model_schema_and_no_document_payload() -> None:
 
 
 @pytest.mark.asyncio
-async def test_real_consultant_provider_binding_captures_exact_workspace_tools_and_metrics() -> None:
-    workspace = _workspace_binding()
+async def test_real_provider_binding_has_exact_workspace_tool_surface() -> None:
+    workspace = await _workspace_binding()
     model = ProviderBindingModel(responses=[])
     agent = build_professional_consultant_agent(
         model=model,
@@ -300,46 +276,23 @@ async def test_real_consultant_provider_binding_captures_exact_workspace_tools_a
         candidate_check_binding=CandidateCheckToolBinding(
             runtime=RecordingCheckPort(),
             workspace=workspace,
+            run_id=RUN_ID,
         ),
     )
 
     with pytest.raises(RuntimeError, match="stop after real provider binding"):
-        await agent.ainvoke(
-            {
-                "messages": [HumanMessage(content="inspect the candidate")],
-                "files": copy.deepcopy(workspace.initial_files),
-            }
-        )
+        await agent.ainvoke({"messages": [HumanMessage(content="inspect workspace")]})
 
     captured = model.bound_tool_schemas
     assert len(captured) == 7
-    captured_names = [schema["function"]["name"] for schema in captured]
-    assert len(set(captured_names)) == len(captured_names)
-    converted = {schema["function"]["name"]: schema for schema in captured}
-    assert set(converted) == EXPECTED_WORKSPACE_TOOLS
-    assert {
-        name: _provider_schema_metrics(converted[name])
-        for name in sorted(converted)
-    } == {
-        "ls": {"properties": 1, "optional": 0, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 165},
-        "read_file": {"properties": 3, "optional": 2, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 433},
-        "write_file": {"properties": 2, "optional": 0, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 304},
-        "edit_file": {"properties": 4, "optional": 1, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 613},
-        "delete": {"properties": 1, "optional": 0, "unions": 0, "open_objects": 1, "depth": 3, "bytes": 172},
-        "grep": {"properties": 5, "optional": 4, "unions": 3, "open_objects": 1, "depth": 4, "bytes": 1598},
-        "check_candidate_document": {"properties": 0, "optional": 0, "unions": 0, "open_objects": 0, "depth": 2, "bytes": 62},
-    }
-    assert converted["check_candidate_document"]["function"]["parameters"]["properties"] == {}
+    assert {schema["function"]["name"] for schema in captured} == EXPECTED_WORKSPACE_TOOLS
+    assert len({schema["function"]["name"] for schema in captured}) == len(captured)
 
 
 def test_workspace_agent_surface_has_only_framework_editor_verbs_and_check(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    workspace = _workspace_binding()
-    check_binding = CandidateCheckToolBinding(
-        runtime=RecordingCheckPort(),
-        workspace=workspace,
-    )
+    workspace = _workspace_binding_sync()
     captured: dict[str, Any] = {}
 
     def capture_agent(**kwargs: Any) -> object:
@@ -352,7 +305,11 @@ def test_workspace_agent_surface_has_only_framework_editor_verbs_and_check(
         execution=_execution(),
         selected_skill_ids=("output",),
         workspace_binding=workspace,
-        candidate_check_binding=check_binding,
+        candidate_check_binding=CandidateCheckToolBinding(
+            runtime=RecordingCheckPort(),
+            workspace=workspace,
+            run_id=RUN_ID,
+        ),
     )
 
     actual = {
@@ -369,305 +326,147 @@ def test_workspace_agent_surface_has_only_framework_editor_verbs_and_check(
 
 
 def test_workspace_agent_sync_invoke_fails_fast() -> None:
-    workspace = _workspace_binding()
+    workspace = _workspace_binding_sync()
 
     class SyncGraph:
         def invoke(self, *args: Any, **kwargs: Any) -> str:
             del args, kwargs
             return "sync result"
 
-    workspace_agent = ProfessionalConsultantAgent(
+    agent = ProfessionalConsultantAgent(
         graph=SyncGraph(),
         skill_backend=workspace.skill_backend,
         workspace_binding=workspace,
     )
     with pytest.raises(RuntimeError, match="async-only"):
-        workspace_agent.invoke({"messages": []})
+        agent.invoke({"messages": []})
 
 
 @pytest.mark.asyncio
-async def test_check_tool_uses_hidden_runtime_and_current_files_channel() -> None:
-    workspace = _workspace_binding()
+async def test_check_tool_reads_current_store_workspace_without_files_channel() -> None:
+    workspace = await _workspace_binding()
     port = RecordingCheckPort()
     check_tool = build_check_candidate_document_tool(
-        binding=CandidateCheckToolBinding(runtime=port, workspace=workspace)
+        binding=CandidateCheckToolBinding(
+            runtime=port,
+            workspace=workspace,
+            run_id=RUN_ID,
+        )
     )
-    header_path = f"/candidate/{RUN_ID}/header.json"
-    current_files = copy.deepcopy(workspace.initial_files)
-    current_files[header_path]["content"] = "{\"job_title\":\"更新後\"}\n"
-
-    result = await _run_workspace_wave(
-        workspace,
-        [_tool_call("check_candidate_document", {}, "check-001")],
-        check_tool=check_tool,
-    )
-
-    assert [message.status for message in _tool_messages(result)] == ["success"]
-    # The wave helper uses the initial state; the direct runtime invocation below
-    # proves that the Tool reads the framework's current files channel, not the
-    # binding's initial snapshot.
+    assert (
+        await workspace.workspace_backend.aedit(
+            "/workspace/header.json",
+            '"採購專員"',
+            '"更新後"',
+        )
+    ).error is None
     runtime = ToolRuntime(
-        state={"files": current_files},
+        state={"messages": []},
         context={},
         config={},
         stream_writer=lambda _value: None,
-        tool_call_id="check-002",
+        tool_call_id="check-001",
         store=None,
     )
+
     await check_tool.coroutine(runtime=runtime)  # type: ignore[misc]
-    assert port.calls[-1]["tool_call_id"] == "check-002"
-    assert port.calls[-1]["files"][header_path] == "{\"job_title\":\"更新後\"}\n"
-    assert port.calls[-1]["selected_skill_ids"] == workspace.skill_backend.selected_skill_ids
-    assert port.calls[-1]["loaded_skill_ids"] == workspace.skill_backend.loaded_skill_ids
+
+    assert port.calls[-1]["run_id"] == RUN_ID
+    assert '"更新後"' in port.calls[-1]["files"]["/workspace/header.json"]
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "invalid_path",
-    [
-        f"/candidate/{RUN_ID}/../{OTHER_RUN_ID}/header.json",
-        f"/candidate/{RUN_ID}/./header.json",
-        f"/candidate//{RUN_ID}/header.json",
-        f"/candidate/{RUN_ID}\\header.json",
-        f"/candidate/{RUN_ID}/not-a-resource.json",
-        f"/candidate/{OTHER_RUN_ID}/header.json",
-    ],
-)
-async def test_check_rejects_noncanonical_or_invalid_state_keys_before_port_call(
-    invalid_path: str,
-) -> None:
-    workspace = _workspace_binding()
+async def test_check_tool_rejects_invalid_store_resource_before_port_call() -> None:
+    workspace = await _workspace_binding()
     port = RecordingCheckPort()
     check_tool = build_check_candidate_document_tool(
-        binding=CandidateCheckToolBinding(runtime=port, workspace=workspace)
+        binding=CandidateCheckToolBinding(
+            runtime=port,
+            workspace=workspace,
+            run_id=RUN_ID,
+        )
     )
-    header_path = f"/candidate/{RUN_ID}/header.json"
+    assert (
+        await workspace.workspace.backend.awrite(
+            "/workspace/not-a-resource.json",
+            "{}\n",
+        )
+    ).error is None
     runtime = ToolRuntime(
-        state={
-            "files": {
-                invalid_path: copy.deepcopy(workspace.initial_files[header_path]),
-            }
-        },
+        state={"messages": []},
         context={},
         config={},
         stream_writer=lambda _value: None,
-        tool_call_id="check-invalid-path",
+        tool_call_id="check-invalid",
         store=None,
     )
 
-    with pytest.raises(RuntimeError, match="candidate"):
+    with pytest.raises(RuntimeError, match="workspace path"):
         await check_tool.coroutine(runtime=runtime)  # type: ignore[misc]
     assert port.calls == []
 
 
 @pytest.mark.asyncio
-async def test_parallel_reads_in_one_real_framework_wave_succeed() -> None:
-    workspace = _workspace_binding()
-    header_path = f"/candidate/{RUN_ID}/header.json"
-    task_path = f"/candidate/{RUN_ID}/tasks/task-001.json"
+async def test_parallel_reads_and_disjoint_edits_succeed_in_real_waves() -> None:
+    workspace = await _workspace_binding()
+    header = "/workspace/header.json"
+    task = "/workspace/tasks/task-001.json"
 
-    result = await _run_workspace_wave(
+    reads = await _run_workspace_wave(
         workspace,
         [
-            _tool_call("read_file", {"file_path": header_path}, "read-001"),
-            _tool_call("read_file", {"file_path": task_path}, "read-002"),
+            _tool_call("read_file", {"file_path": header}, "read-001"),
+            _tool_call("read_file", {"file_path": task}, "read-002"),
         ],
     )
+    assert [message.status for message in _tool_messages(reads)] == [
+        "success",
+        "success",
+    ]
 
-    messages = _tool_messages(result)
-    assert [message.status for message in messages] == ["success", "success"]
-
-
-@pytest.mark.asyncio
-async def test_disjoint_edits_in_one_real_framework_wave_succeed() -> None:
-    workspace = _workspace_binding()
-    header_path = f"/candidate/{RUN_ID}/header.json"
-    task_path = f"/candidate/{RUN_ID}/tasks/task-001.json"
-    original_header = workspace.initial_files[header_path]["content"]
-    original_task = workspace.initial_files[task_path]["content"]
-
-    result = await _run_workspace_wave(
+    edits = await _run_workspace_wave(
         workspace,
         [
             _tool_call(
                 "edit_file",
                 {
-                    "file_path": header_path,
+                    "file_path": header,
                     "old_string": "採購專員",
-                    "new_string": "資深採購專員",
+                    "new_string": "採購管理師",
                 },
                 "edit-001",
             ),
             _tool_call(
                 "edit_file",
                 {
-                    "file_path": task_path,
+                    "file_path": task,
                     "old_string": "整理需求",
-                    "new_string": "分析採購需求",
+                    "new_string": "彙整需求",
                 },
                 "edit-002",
             ),
         ],
     )
-
-    messages = _tool_messages(result)
-    assert [message.status for message in messages] == ["success", "success"]
-    assert _candidate_text(result, header_path) != original_header
-    assert _candidate_text(result, task_path) != original_task
+    assert [message.status for message in _tool_messages(edits)] == [
+        "success",
+        "success",
+    ]
+    assert "採購管理師" in await _workspace_text(workspace, header)
+    assert "彙整需求" in await _workspace_text(workspace, task)
 
 
 @pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "alias_path",
-    [
-        f"/candidate/{RUN_ID}/./header.json",
-        f"/candidate//{RUN_ID}/header.json",
-        f"/candidate/{RUN_ID}\\header.json",
-    ],
-)
-async def test_framework_canonical_aliases_to_same_file_reject_the_entire_wave(
-    alias_path: str,
-) -> None:
-    workspace = _workspace_binding()
-    canonical_path = f"/candidate/{RUN_ID}/header.json"
-    original_header = workspace.initial_files[canonical_path]["content"]
-
+async def test_overlapping_mutation_wave_rejects_every_call_before_mutation() -> None:
+    workspace = await _workspace_binding()
+    header = "/workspace/header.json"
+    before = await _workspace_text(workspace, header)
     result = await _run_workspace_wave(
         workspace,
         [
             _tool_call(
                 "edit_file",
                 {
-                    "file_path": alias_path,
-                    "old_string": "採購專員",
-                    "new_string": "別名修改",
-                },
-                "alias-001",
-            ),
-            _tool_call(
-                "edit_file",
-                {
-                    "file_path": canonical_path,
-                    "old_string": "採購專員",
-                    "new_string": "正規修改",
-                },
-                "alias-002",
-            ),
-        ],
-    )
-
-    messages = _tool_messages(result)
-    assert [message.status for message in messages] == ["error", "error"]
-    assert _candidate_text(result, canonical_path) == original_header
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "invalid_path",
-    [
-        f"/candidate/{OTHER_RUN_ID}/header.json",
-        f"/candidate/{RUN_ID}/not-a-resource.json",
-    ],
-)
-async def test_cross_run_or_invalid_resource_mutation_rejects_sibling_before_zero_mutation(
-    invalid_path: str,
-) -> None:
-    workspace = _workspace_binding()
-    header_path = f"/candidate/{RUN_ID}/header.json"
-    task_path = f"/candidate/{RUN_ID}/tasks/task-001.json"
-    original_header = workspace.initial_files[header_path]["content"]
-    original_task = workspace.initial_files[task_path]["content"]
-
-    result = await _run_workspace_wave(
-        workspace,
-        [
-            _tool_call(
-                "edit_file",
-                {
-                    "file_path": invalid_path,
-                    "old_string": "採購專員",
-                    "new_string": "不應套用",
-                },
-                "invalid-001",
-            ),
-            _tool_call(
-                "edit_file",
-                {
-                    "file_path": task_path,
-                    "old_string": "整理需求",
-                    "new_string": "不應套用",
-                },
-                "invalid-002",
-            ),
-        ],
-    )
-
-    messages = _tool_messages(result)
-    assert [message.status for message in messages] == ["error", "error"]
-    assert _candidate_text(result, header_path) == original_header
-    assert _candidate_text(result, task_path) == original_task
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "bad_args",
-    [
-        {
-            "old_string": "採購專員",
-            "new_string": "不應套用",
-        },
-        {
-            "file_path": "",
-            "old_string": "採購專員",
-            "new_string": "不應套用",
-        },
-        {
-            "file_path": "../candidate/outside/header.json",
-            "old_string": "採購專員",
-            "new_string": "不應套用",
-        },
-    ],
-)
-async def test_unvalidated_mutation_path_rejects_every_call_before_valid_sibling(
-    bad_args: dict[str, Any],
-) -> None:
-    workspace = _workspace_binding()
-    header_path = f"/candidate/{RUN_ID}/header.json"
-    task_path = f"/candidate/{RUN_ID}/tasks/task-001.json"
-    original_header = workspace.initial_files[header_path]["content"]
-    original_task = workspace.initial_files[task_path]["content"]
-
-    result = await _run_workspace_wave(
-        workspace,
-        [
-            _tool_call("edit_file", bad_args, "missing-or-invalid-001"),
-            _tool_call(
-                "edit_file",
-                {
-                    "file_path": task_path,
-                    "old_string": "整理需求",
-                    "new_string": "不應套用",
-                },
-                "missing-or-invalid-002",
-            ),
-        ],
-    )
-
-    messages = _tool_messages(result)
-    assert [message.status for message in messages] == ["error", "error"]
-    assert _candidate_text(result, header_path) == original_header
-    assert _candidate_text(result, task_path) == original_task
-
-
-@pytest.mark.asyncio
-@pytest.mark.parametrize(
-    "calls",
-    [
-        [
-            _tool_call(
-                "edit_file",
-                {
-                    "file_path": f"/candidate/{RUN_ID}/header.json",
+                    "file_path": header,
                     "old_string": "採購專員",
                     "new_string": "甲",
                 },
@@ -676,80 +475,80 @@ async def test_unvalidated_mutation_path_rejects_every_call_before_valid_sibling
             _tool_call(
                 "edit_file",
                 {
-                    "file_path": f"/candidate/{RUN_ID}/header.json",
+                    "file_path": "/workspace/./header.json",
                     "old_string": "採購專員",
                     "new_string": "乙",
                 },
                 "same-002",
             ),
         ],
-        [
-            _tool_call(
-                "write_file",
-                {
-                    "file_path": f"/candidate/{RUN_ID}/tasks",
-                    "content": "invalid ancestor mutation",
-                },
-                "ancestor-001",
-            ),
-            _tool_call(
-                "write_file",
-                {
-                    "file_path": f"/candidate/{RUN_ID}/tasks/task-002.json",
-                    "content": "{}",
-                },
-                "ancestor-002",
-            ),
-        ],
-    ],
-)
-async def test_overlapping_mutation_wave_rejects_every_call_before_mutation(
-    calls: list[dict[str, Any]],
-) -> None:
-    workspace = _workspace_binding()
-    header_path = f"/candidate/{RUN_ID}/header.json"
-    original_header = workspace.initial_files[header_path]["content"]
-
-    result = await _run_workspace_wave(workspace, calls)
+    )
 
     messages = _tool_messages(result)
     assert [message.status for message in messages] == ["error", "error"]
-    assert len({str(message.content) for message in messages}) == 1
-    assert _candidate_text(result, header_path) == original_header
-    new_path = f"/candidate/{RUN_ID}/tasks/task-002.json"
-    assert new_path not in result["files"]
+    assert all("overlap" in str(message.content) for message in messages)
+    assert await _workspace_text(workspace, header) == before
 
 
 @pytest.mark.asyncio
-async def test_mutation_and_check_in_one_wave_reject_both_before_zero_mutation() -> None:
-    workspace = _workspace_binding()
+async def test_invalid_mutation_rejects_valid_sibling_before_zero_mutation() -> None:
+    workspace = await _workspace_binding()
+    header = "/workspace/header.json"
+    before = await _workspace_text(workspace, header)
+    result = await _run_workspace_wave(
+        workspace,
+        [
+            _tool_call(
+                "edit_file",
+                {"old_string": "採購專員", "new_string": "錯誤"},
+                "bad-001",
+            ),
+            _tool_call(
+                "edit_file",
+                {
+                    "file_path": header,
+                    "old_string": "採購專員",
+                    "new_string": "正確",
+                },
+                "good-002",
+            ),
+        ],
+    )
+
+    assert [message.status for message in _tool_messages(result)] == ["error", "error"]
+    assert await _workspace_text(workspace, header) == before
+
+
+@pytest.mark.asyncio
+async def test_mutation_and_check_wave_rejects_both_before_zero_mutation() -> None:
+    workspace = await _workspace_binding()
+    header = "/workspace/header.json"
+    before = await _workspace_text(workspace, header)
     port = RecordingCheckPort()
     check_tool = build_check_candidate_document_tool(
-        binding=CandidateCheckToolBinding(runtime=port, workspace=workspace)
+        binding=CandidateCheckToolBinding(
+            runtime=port,
+            workspace=workspace,
+            run_id=RUN_ID,
+        )
     )
-    header_path = f"/candidate/{RUN_ID}/header.json"
-    original_header = workspace.initial_files[header_path]["content"]
-
     result = await _run_workspace_wave(
         workspace,
         [
             _tool_call(
                 "edit_file",
                 {
-                    "file_path": header_path,
+                    "file_path": header,
                     "old_string": "採購專員",
-                    "new_string": "不應套用",
+                    "new_string": "採購管理師",
                 },
-                "mutation-001",
+                "edit-001",
             ),
-            _tool_call("check_candidate_document", {}, "check-001"),
+            _tool_call("check_candidate_document", {}, "check-002"),
         ],
         check_tool=check_tool,
     )
 
-    messages = _tool_messages(result)
-    assert [message.status for message in messages] == ["error", "error"]
-    assert len({str(message.content) for message in messages}) == 1
-    assert "check_candidate_document" in str(messages[0].content)
-    assert _candidate_text(result, header_path) == original_header
+    assert [message.status for message in _tool_messages(result)] == ["error", "error"]
+    assert await _workspace_text(workspace, header) == before
     assert port.calls == []

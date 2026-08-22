@@ -41,6 +41,7 @@ from app.consultant.state import (
     ApprovedOpksItem,
     ApprovedOpksKind,
     ApprovedTask,
+    CommandReceipt,
     DocumentChangeSet,
     DocumentChangeStatus,
     EmployeeSourceKind,
@@ -238,6 +239,39 @@ async def _initialize_with_document(
         },
     )
     return graph, saver, store, state
+
+
+@pytest.mark.asyncio
+async def test_workspace_authority_graph_seam_accepts_only_verified_document_and_receipt() -> None:
+    source_id = uuid4()
+    document, *_ = _document(uuid4(), source_id=source_id)
+    graph, _saver, _store, state = await _initialize_with_document(
+        document,
+        source_id=source_id,
+    )
+    approved = document.model_copy(update={"job_title": "員工核准職稱"})
+    receipt = CommandReceipt(
+        command_id=uuid4(),
+        command_kind="workspace_review_accept",
+        payload_sha256="a" * 64,
+    )
+
+    updated = await graph.ainvoke(
+        {},
+        _config(document.document_id),
+        context={
+            "action": "workspace_authority_commit",
+            "document_id": str(document.document_id),
+            "expected_revision": state["revision"],
+            "approved_document": approved.model_dump(mode="json"),
+            "command_receipt": receipt.model_dump(mode="json"),
+        },
+    )
+
+    assert updated["approved_document"]["job_title"] == "員工核准職稱"
+    assert updated["command_receipts"][str(receipt.command_id)] == receipt.model_dump(
+        mode="json"
+    )
 
 
 async def _register_source(

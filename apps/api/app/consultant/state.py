@@ -737,6 +737,7 @@ class ConsultantCommandContext(TypedDict, total=False):
         "edit_and_accept_changes",
         "reject_changes",
         "defer_changes",
+        "workspace_authority_commit",
         "check_candidate_document",
         "publish_checked_candidate",
     ]

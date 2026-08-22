@@ -7,7 +7,7 @@ from dataclasses import dataclass
 from enum import StrEnum
 from hashlib import sha256
 from types import MappingProxyType
-from typing import Literal, Mapping, cast
+from typing import Literal, Mapping, Protocol, Sequence, cast
 from uuid import UUID
 
 from deepagents.backends import StoreBackend
@@ -55,6 +55,18 @@ Sha256Digest = Annotated[
 ]
 
 
+class WorkspaceRebaseChange(Protocol):
+    path: str
+    before: str | None
+    after: str | None
+
+
+class WorkspaceRebasePlanProtocol(Protocol):
+    expected_workspace_digest: Sha256Digest
+    result_workspace_digest: Sha256Digest | None
+    changes: Sequence[WorkspaceRebaseChange]
+
+
 class WorkspaceValidationStatus(StrEnum):
     UNVALIDATED = "unvalidated"
     VALID = "valid"
@@ -99,7 +111,11 @@ class WorkspaceManifest(DurableModel):
 
     def validate_files(self, files: Mapping[str, str | bytes]) -> None:
         if (
-            self.validation_status is WorkspaceValidationStatus.VALID
+            self.validation_status
+            in {
+                WorkspaceValidationStatus.VALID,
+                WorkspaceValidationStatus.CONFLICTED,
+            }
             and self.resource_digest != workspace_resource_digest(files)
         ):
             raise ValueError("resource digest does not match workspace files")
@@ -173,11 +189,20 @@ class StoreBackedWorkspace:
         files = await self._read_files()
         actual_digest = workspace_resource_digest(files)
         if actual_digest != manifest.resource_digest:
+            conflict_diagnostics = tuple(
+                diagnostic
+                for diagnostic in manifest.diagnostics
+                if diagnostic.code == "workspace-rebase-conflict"
+            )
             manifest = manifest.model_copy(
                 update={
                     "resource_digest": actual_digest,
-                    "validation_status": WorkspaceValidationStatus.UNVALIDATED,
-                    "diagnostics": (),
+                    "validation_status": (
+                        WorkspaceValidationStatus.CONFLICTED
+                        if conflict_diagnostics
+                        else WorkspaceValidationStatus.UNVALIDATED
+                    ),
+                    "diagnostics": conflict_diagnostics,
                 }
             )
             await self._put_manifest(manifest)
@@ -205,6 +230,87 @@ class StoreBackedWorkspace:
                 "validation_status": validation_status,
                 "diagnostics": diagnostics,
                 "entity_ids_by_handle": dict(entity_ids_by_handle),
+            }
+        )
+        await self._put_manifest(manifest)
+        return manifest
+
+    async def apply_rebase(
+        self,
+        *,
+        plan: WorkspaceRebasePlanProtocol,
+        approved_document: ApprovedJobDocument,
+        approved_revision: int,
+    ) -> WorkspaceManifest:
+        """Apply one persisted, exact Store rebase and advance its baseline.
+
+        The plan is intentionally accepted as a small protocol instead of an
+        import from ``workspace_authority``.  That keeps the Store owner below
+        the authority policy and lets recovery replay the same bytes without
+        reconstructing a review payload.
+        """
+
+        if approved_document.document_id != self.document_id:
+            raise ValueError("approved document scope does not match workspace")
+        if approved_revision < 0:
+            raise ValueError("approved_revision must be non-negative")
+
+        current = await self.read_snapshot()
+        actual_digest = workspace_resource_digest(current.files)
+        expected_digest = plan.expected_workspace_digest
+        result_digest = plan.result_workspace_digest
+        baseline_digest = approved_document_digest(approved_document)
+        if (
+            current.manifest.approved_baseline_revision == approved_revision
+            and current.manifest.approved_baseline_digest == baseline_digest
+            and (result_digest is None or actual_digest == result_digest)
+        ):
+            return current.manifest
+
+        if actual_digest != expected_digest:
+            if result_digest is None or actual_digest != result_digest:
+                raise ValueError("workspace changed before its persisted rebase")
+            manifest = current.manifest.model_copy(
+                update={
+                    "generation": current.manifest.generation + 1,
+                    "approved_baseline_revision": approved_revision,
+                    "approved_baseline_digest": baseline_digest,
+                    "validation_status": WorkspaceValidationStatus.UNVALIDATED,
+                    "diagnostics": (),
+                }
+            )
+            await self._put_manifest(manifest)
+            return manifest
+
+        files = dict(current.files)
+        for change in plan.changes:
+            before = files.get(change.path)
+            if before != change.before:
+                raise ValueError(f"workspace rebase before value changed: {change.path}")
+            if change.after is None:
+                if before is not None:
+                    result = await self.backend.adelete(change.path)
+                    if result.error is not None:
+                        raise RuntimeError(result.error)
+                    files.pop(change.path, None)
+            else:
+                result = await self.backend.awrite(change.path, change.after)
+                if result.error is not None:
+                    raise RuntimeError(result.error)
+                files[change.path] = change.after
+
+        after = await self.read_snapshot()
+        after_digest = workspace_resource_digest(after.files)
+        if result_digest is not None and after_digest != result_digest:
+            raise ValueError("workspace rebase produced an unexpected digest")
+        manifest = after.manifest.model_copy(
+            update={
+                "generation": after.manifest.generation + 1,
+                "resource_digest": after_digest,
+                "approved_baseline_revision": approved_revision,
+                "approved_baseline_digest": baseline_digest,
+                "validation_status": WorkspaceValidationStatus.UNVALIDATED,
+                "diagnostics": (),
             }
         )
         await self._put_manifest(manifest)

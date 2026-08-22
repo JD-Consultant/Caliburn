@@ -33,6 +33,7 @@ from app.consultant.workspace_backend import (
 from app.consultant.workspace_resources import WorkspaceCatalog, parse_workspace_files
 from app.consultant.workspace_state import (
     StoreBackedWorkspace,
+    WorkspaceDiagnostic,
     WorkspaceValidationStatus,
     workspace_resource_digest,
 )
@@ -479,6 +480,71 @@ async def test_review_projection_rechecks_store_bytes_and_never_serves_a_stale_g
         "/review/groups/group-001.json"
     )
     assert stale_group.error is not None
+
+
+@pytest.mark.asyncio
+async def test_conflicted_review_keeps_unaffected_groups_and_real_store_document(
+    workspace_binding: ConsultantWorkspaceBackendBinding,
+) -> None:
+    task_path = "/workspace/tasks/task-001.json"
+    header_path = "/workspace/header.json"
+    workspace = workspace_binding.workspace
+    task_before = (await workspace.read_snapshot()).files[task_path]
+    header_before = (await workspace.read_snapshot()).files[header_path]
+    assert (
+        await workspace_binding.workspace_backend.aedit(
+            task_path,
+            '"整理需求"',
+            '"AI整理需求"',
+        )
+    ).error is None
+    assert (
+        await workspace_binding.workspace_backend.aedit(
+            header_path,
+            '"採購專員"',
+            '"新職稱"',
+        )
+    ).error is None
+
+    snapshot = await workspace.read_snapshot()
+    validation = validate_workspace_payload(
+        snapshot.files,
+        catalog=workspace_binding.catalog,
+        selected_skill_ids=("output",),
+        loaded_skill_ids=("output",),
+    )
+    assert validation.document is not None
+    conflict = WorkspaceDiagnostic(
+        code="workspace-rebase-conflict",
+        path=f"{task_path}/statement",
+        message="AI value retained while employee authority is committed.",
+    )
+    await workspace.commit_validation(
+        expected_resource_digest=snapshot.manifest.resource_digest,
+        evidence_basis_digest=evidence_basis_digest(validation.current_sources),
+        validation_status=WorkspaceValidationStatus.CONFLICTED,
+        diagnostics=(conflict,),
+        entity_ids_by_handle=snapshot.manifest.entity_ids_by_handle,
+    )
+
+    index = await workspace_binding.composite_backend.aread("/review/index.json")
+    assert index.error is None
+    assert index.file_data is not None
+    index_payload = json.loads(index.file_data["content"])
+    assert len(index_payload["group_handles"]) == 2
+
+    groups = []
+    for handle in index_payload["group_handles"]:
+        group = await workspace_binding.composite_backend.aread(
+            f"/review/groups/{handle}.json"
+        )
+        assert group.error is None
+        assert group.file_data is not None
+        groups.append(json.loads(group.file_data["content"]))
+    assert sum(bool(group["diagnostics"]) for group in groups) == 1
+    assert sum(not group["diagnostics"] for group in groups) == 1
+    assert (await workspace.read_snapshot()).files[task_path] != task_before
+    assert (await workspace.read_snapshot()).files[header_path] != header_before
 
 
 @pytest.mark.asyncio

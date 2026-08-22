@@ -245,6 +245,23 @@ def _apply_command(
             )
         update["latest_run"] = receipt.model_dump(mode="json")
         return update
+    if action == "workspace_authority_commit":
+        if command_receipt is None:
+            raise ValueError("workspace authority commit requires a command receipt")
+        if source_reference is not None:
+            update.update(_source_state_update(state, source_reference))
+        approved = ApprovedJobDocument.model_validate(command["approved_document"])
+        if approved.document_id != document_id:
+            raise ValueError("approved document does not match thread document_id")
+        update["approved_document"] = approved.model_dump(mode="json")
+        update["checked_candidate"] = None
+        invalidated = invalidate_sufficiency(
+            state,
+            revision=expected_revision + 1,
+        )
+        if invalidated is not None:
+            update["sufficiency"] = invalidated
+        return update
     if action == "direct_edit":
         before = ApprovedJobDocument.model_validate(state["approved_document"])
         approved = ApprovedJobDocument.model_validate(command["approved_document"])

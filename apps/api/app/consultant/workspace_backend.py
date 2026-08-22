@@ -62,6 +62,7 @@ from app.consultant.workspace_state import (
     approved_document_digest,
 )
 from app.consultant.workspace_validation import (
+    active_conflict_diagnostics,
     WorkspacePayloadValidation,
     evidence_basis_digest,
     validate_workspace_payload,
@@ -366,7 +367,10 @@ class WorkspaceReviewProjectionBackend(BackendProtocol):
             sources=current_sources,
         )
         current_evidence_digest = evidence_basis_digest(current_sources)
-        if manifest.validation_status is not WorkspaceValidationStatus.VALID:
+        if manifest.validation_status not in {
+            WorkspaceValidationStatus.VALID,
+            WorkspaceValidationStatus.CONFLICTED,
+        }:
             validation = self._unavailable_validation(
                 code="workspace-not-valid",
                 message="Workspace review requires the current Store files to validate.",
@@ -396,6 +400,22 @@ class WorkspaceReviewProjectionBackend(BackendProtocol):
                 selected_skill_ids=self.selected_skill_ids,
                 loaded_skill_ids=self.selected_skill_ids,
             )
+            active_conflicts = active_conflict_diagnostics(
+                files=snapshot.files,
+                approved_document=self.catalog.document,
+                manifest=manifest,
+            )
+            if validation.document is not None:
+                manifest = manifest.model_copy(
+                    update={
+                        "validation_status": (
+                            WorkspaceValidationStatus.CONFLICTED
+                            if active_conflicts
+                            else WorkspaceValidationStatus.VALID
+                        ),
+                        "diagnostics": active_conflicts,
+                    }
+                )
         projection = derive_workspace_review(
             self.catalog.document,
             validation,

@@ -21,6 +21,7 @@ from typing_extensions import NotRequired, override
 from app.consultant.evidence_anchor import EvidenceAnchorError, resolve_evidence_reference
 from app.consultant.results import AnalysisBasis, SkillId
 from app.consultant.state import (
+    ApprovedJobDocument,
     EmployeeSource,
     SourceProcessingStatus,
     SourceValidity,
@@ -30,6 +31,7 @@ from app.consultant.workspace_resources import (
     WorkspaceCatalog,
     WorkspaceResourceError,
     parse_candidate_files,
+    project_workspace_files,
     workspace_entity_id,
 )
 from app.consultant.workspace_state import (
@@ -68,10 +70,14 @@ class WorkspaceValidationResult:
     revalidated: bool
 
     def __post_init__(self) -> None:
-        if (
-            self.manifest.validation_status is WorkspaceValidationStatus.VALID
-        ) != (self.document is not None):
-            raise ValueError("only a valid workspace may expose a parsed document")
+        exposes_document = self.manifest.validation_status in {
+            WorkspaceValidationStatus.VALID,
+            WorkspaceValidationStatus.CONFLICTED,
+        }
+        if exposes_document != (self.document is not None):
+            raise ValueError(
+                "only a valid or conflicted workspace may expose a parsed document"
+            )
 
     @property
     def summary(self) -> WorkspaceValidationSummary:
@@ -97,6 +103,69 @@ class WorkspacePayloadValidation:
             "evidence_by_handle",
             MappingProxyType(dict(self.evidence_by_handle)),
         )
+
+
+def _resource_value(
+    files: Mapping[str, str],
+    diagnostic_path: str,
+) -> tuple[bool, Any]:
+    marker = diagnostic_path.find(".json")
+    if marker < 0:
+        return False, None
+    resource_path = diagnostic_path[: marker + len(".json")]
+    raw = files.get(resource_path)
+    if raw is None:
+        return False, None
+    pointer = diagnostic_path[marker + len(".json") :]
+    if not pointer:
+        return True, raw
+    try:
+        value: Any = json.loads(raw)
+    except json.JSONDecodeError:
+        return True, raw
+    for segment in pointer.removeprefix("/").split("/"):
+        segment = segment.replace("~1", "/").replace("~0", "~")
+        if isinstance(value, dict) and segment in value:
+            value = value[segment]
+        elif isinstance(value, list):
+            try:
+                value = value[int(segment)]
+            except (ValueError, IndexError):
+                return False, None
+        else:
+            return False, None
+    return True, value
+
+
+def active_conflict_diagnostics(
+    *,
+    files: Mapping[str, str],
+    approved_document: ApprovedJobDocument,
+    manifest: WorkspaceManifest,
+) -> tuple[WorkspaceDiagnostic, ...]:
+    """Keep conflict metadata until its affected Store value converges."""
+
+    conflicts = tuple(
+        diagnostic
+        for diagnostic in manifest.diagnostics
+        if diagnostic.code == "workspace-rebase-conflict"
+    )
+    if not conflicts:
+        return ()
+    try:
+        approved_files = project_workspace_files(
+            approved_document,
+            handle_registry=manifest.entity_ids_by_handle,
+        ).files
+    except (TypeError, ValueError, WorkspaceResourceError):
+        return conflicts
+    active: list[WorkspaceDiagnostic] = []
+    for diagnostic in conflicts:
+        current_exists, current = _resource_value(files, diagnostic.path)
+        approved_exists, approved = _resource_value(approved_files, diagnostic.path)
+        if (current_exists, current) != (approved_exists, approved):
+            active.append(diagnostic)
+    return tuple(active)
 
 
 def _short(value: object, *, limit: int) -> str:
@@ -549,15 +618,29 @@ class WorkspaceValidationService:
                 )
             )
 
+        conflict_diagnostics = active_conflict_diagnostics(
+            files=snapshot.files,
+            approved_document=self._catalog.document,
+            manifest=snapshot.manifest,
+        )
         status = (
-            WorkspaceValidationStatus.VALID
+            (
+                WorkspaceValidationStatus.CONFLICTED
+                if conflict_diagnostics
+                else WorkspaceValidationStatus.VALID
+            )
             if payload.document is not None
             else WorkspaceValidationStatus.INVALID
+        )
+        diagnostics = (
+            conflict_diagnostics
+            if payload.document is not None and conflict_diagnostics
+            else payload.diagnostics
         )
         must_commit = (
             snapshot.manifest.validation_status is not status
             or snapshot.manifest.evidence_basis_digest != basis_digest
-            or snapshot.manifest.diagnostics != payload.diagnostics
+            or snapshot.manifest.diagnostics != diagnostics
             or snapshot.manifest.entity_ids_by_handle != registry
         )
         manifest = snapshot.manifest
@@ -566,13 +649,13 @@ class WorkspaceValidationService:
                 expected_resource_digest=snapshot.manifest.resource_digest,
                 evidence_basis_digest=basis_digest,
                 validation_status=status,
-                diagnostics=payload.diagnostics,
+                diagnostics=diagnostics,
                 entity_ids_by_handle=registry,
             )
         result = WorkspaceValidationResult(
             manifest=manifest,
             document=payload.document,
-            diagnostics=payload.diagnostics,
+            diagnostics=diagnostics,
             revalidated=True,
         )
         self._last_result = result

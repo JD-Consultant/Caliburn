@@ -8,7 +8,7 @@ approved document.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import StrEnum
 from hashlib import sha256
 import json
@@ -95,6 +95,7 @@ class WorkspaceReviewDecision:
     evidence_digest: Sha256Digest
     employee_request_digest: Sha256Digest
     boundary_digest: Sha256Digest
+    selected_action_ids: tuple[UUID, ...] = ()
 
     @classmethod
     def from_group(
@@ -103,6 +104,7 @@ class WorkspaceReviewDecision:
         group: WorkspaceReviewGroup,
         *,
         workspace_digest: Sha256Digest,
+        selected_action_ids: tuple[UUID, ...] = (),
     ) -> WorkspaceReviewDecision:
         return cls(
             kind=kind,
@@ -112,6 +114,7 @@ class WorkspaceReviewDecision:
             evidence_digest=group.evidence_digest,
             employee_request_digest=group.employee_request_digest,
             boundary_digest=group.boundary_digest,
+            selected_action_ids=selected_action_ids,
         )
 
 
@@ -123,6 +126,7 @@ class WorkspaceReviewGroup:
     evidence_digest: Sha256Digest
     employee_request_digest: Sha256Digest
     boundary_digest: Sha256Digest
+    diagnostics: tuple[WorkspaceDiagnostic, ...] = ()
 
     @property
     def actions(self) -> tuple[DocumentPatchAction, ...]:
@@ -690,13 +694,67 @@ def _matches_rejection(
     decision: WorkspaceReviewDecision,
     group: WorkspaceReviewGroup,
 ) -> bool:
+    selected = set(decision.selected_action_ids)
+    action_ids = {action.action_id for action in group.actions}
     return (
         decision.kind is WorkspaceReviewDecisionKind.REJECT
+        and (not selected or action_ids <= selected)
         and decision.semantic_fingerprint == group.semantic_fingerprint
         and decision.evidence_digest == group.evidence_digest
         and decision.employee_request_digest == group.employee_request_digest
         and decision.boundary_digest == group.boundary_digest
     )
+
+
+def _conflict_affects_action(
+    conflict_path: str,
+    action: DocumentPatchAction,
+    entity_ids_by_handle: Mapping[str, UUID],
+) -> bool:
+    """Match a Store resource diagnostic to the semantic action it affects."""
+
+    parts = action.path.strip("/").split("/")
+    if not parts or not parts[0]:
+        return False
+    if parts[0] not in {"duties", "tasks", "opks"}:
+        expected = f"/workspace/header.json/{parts[0]}"
+        return conflict_path == expected or conflict_path.startswith(f"{expected}/")
+    identity: UUID | None = None
+    if action.operation.value == "add" and isinstance(action.after, dict):
+        field = {"duties": "duty_id", "tasks": "task_id", "opks": "item_id"}[parts[0]]
+        raw_identity = action.after.get(field)
+        if raw_identity is not None:
+            try:
+                identity = UUID(str(raw_identity))
+            except ValueError:
+                return False
+    elif len(parts) >= 2:
+        try:
+            identity = UUID(parts[1])
+        except ValueError:
+            return False
+    if identity is None:
+        return False
+    handle = next(
+        (candidate for candidate, stable_id in entity_ids_by_handle.items() if stable_id == identity),
+        None,
+    )
+    if handle is None:
+        return False
+    resource_marker = f"/{handle}.json"
+    marker_index = conflict_path.find(resource_marker)
+    if marker_index < 0:
+        return False
+    if len(parts) < 3:
+        return True
+    workspace_field = {
+        "duty_id": "duty_handle",
+        "task_ids": "task_handles",
+        "indicator_ids": "indicator_handles",
+    }.get(parts[2], parts[2])
+    expected = f"{resource_marker}/{workspace_field}"
+    suffix = conflict_path[marker_index:]
+    return suffix == expected or suffix.startswith(f"{expected}/")
 
 
 def derive_workspace_review(
@@ -708,7 +766,11 @@ def derive_workspace_review(
     """Derive review bundles from one validated after-state without persistence."""
 
     if (
-        manifest.validation_status is not WorkspaceValidationStatus.VALID
+        manifest.validation_status
+        not in {
+            WorkspaceValidationStatus.VALID,
+            WorkspaceValidationStatus.CONFLICTED,
+        }
         or valid_workspace.document is None
         or valid_workspace.diagnostics
     ):
@@ -799,7 +861,26 @@ def derive_workspace_review(
     groups = _review_groups(provisional, manifest)
     diagnostics: list[WorkspaceDiagnostic] = []
     projected: list[WorkspaceReviewGroup] = []
+    conflict_diagnostics = tuple(
+        diagnostic
+        for diagnostic in manifest.diagnostics
+        if diagnostic.code == "workspace-rebase-conflict"
+    )
     for group in groups:
+        group_conflicts = tuple(
+            diagnostic
+            for diagnostic in conflict_diagnostics
+            if any(
+                _conflict_affects_action(
+                    diagnostic.path,
+                    action,
+                    manifest.entity_ids_by_handle,
+                )
+                for action in group.actions
+            )
+        )
+        if group_conflicts:
+            group = replace(group, diagnostics=group_conflicts)
         if any(_matches_rejection(decision, group) for decision in decisions):
             diagnostics.append(
                 WorkspaceDiagnostic(
@@ -813,19 +894,31 @@ def derive_workspace_review(
                 )
             )
             continue
-        deferred = any(
-            decision.kind is WorkspaceReviewDecisionKind.DEFER
+        deferred_action_ids = {
+            action_id
+            for decision in decisions
+            if decision.kind is WorkspaceReviewDecisionKind.DEFER
             and decision.workspace_digest == manifest.resource_digest
             and decision.group_digest == group.group_digest
-            for decision in decisions
-        )
+            for action_id in (
+                decision.selected_action_ids
+                or tuple(action.action_id for action in group.actions)
+            )
+        }
+        deferred = bool(deferred_action_ids)
         if deferred:
             group = WorkspaceReviewGroup(
                 changeset=group.changeset.model_copy(
                     update={
                         "actions": tuple(
-                            action.model_copy(
-                                update={"status": DocumentChangeStatus.DEFERRED}
+                            (
+                                action.model_copy(
+                                    update={
+                                        "status": DocumentChangeStatus.DEFERRED
+                                    }
+                                )
+                                if action.action_id in deferred_action_ids
+                                else action
                             )
                             for action in group.changeset.actions
                         )
@@ -836,6 +929,7 @@ def derive_workspace_review(
                 evidence_digest=group.evidence_digest,
                 employee_request_digest=group.employee_request_digest,
                 boundary_digest=group.boundary_digest,
+                diagnostics=group.diagnostics,
             )
         projected.append(group)
     return WorkspaceReviewProjection(
@@ -892,12 +986,20 @@ def workspace_review_files(projection: WorkspaceReviewProjection) -> dict[str, s
         group.changeset.changeset_id: f"group-{index:03d}"
         for index, group in enumerate(projection.groups, start=1)
     }
+    all_diagnostics = tuple(
+        (*projection.diagnostics,)
+        + tuple(
+            diagnostic
+            for group in projection.groups
+            for diagnostic in group.diagnostics
+        )
+    )
     files = {
         "/index.json": json.dumps(
             {
                 "workspace_digest": projection.workspace_digest,
                 "group_handles": list(group_handles.values()),
-                "diagnostic_count": len(projection.diagnostics),
+                "diagnostic_count": len(all_diagnostics),
             },
             ensure_ascii=False,
             indent=2,
@@ -937,13 +1039,17 @@ def workspace_review_files(projection: WorkspaceReviewProjection) -> dict[str, s
                         }
                         for action in group.actions
                     ],
+                    "diagnostics": [
+                        diagnostic.model_dump(mode="json")
+                        for diagnostic in group.diagnostics
+                    ],
                 },
                 ensure_ascii=False,
                 indent=2,
             )
             + "\n"
         )
-    for index, diagnostic in enumerate(projection.diagnostics, start=1):
+    for index, diagnostic in enumerate(all_diagnostics, start=1):
         files[f"/diagnostics/diagnostic-{index:03d}.json"] = (
             json.dumps(diagnostic.model_dump(mode="json"), ensure_ascii=False, indent=2)
             + "\n"

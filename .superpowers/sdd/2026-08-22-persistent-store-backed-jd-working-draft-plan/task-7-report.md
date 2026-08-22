@@ -123,3 +123,41 @@
 
 - The focused API run emits harmless Windows pytest-cache write warnings in this worktree; assertions and test outcomes are unaffected.
 - No public contract changed, so schema generation was intentionally not touched.
+
+## Review fix round 2/5 — distinguish review controls across groups
+
+### Finding resolved
+
+- `DocumentReviewPanel` now passes a one-based employee-visible group ordinal from the displayed review groups to each `ReviewBundle`.
+- Every review checkbox announces `第 N 組第 M 項`, then its employee-facing operation, semantic JD field, summary, and—where applicable—`必須整組決定`.
+- The UI exposes no UUID, raw path, Store/framework/tool wording, or technical content. No API, contract, or domain code changed.
+
+### TDD evidence
+
+1. RED — added a Testing Library regression with two different bundles intentionally sharing the same operation, path label, and summary. The first sandboxed focused test attempt was blocked by Vite child-process `EPERM`; the approved local-process rerun executed the test.
+2. RED outcome — `npm run test -w @caliburn/web -- ConsultantWorkspace.integration.test.tsx consultantWorkspaceModel.test.ts consultantApi.test.ts` failed as intended: both controls were named `選取第 1 項修改變更：工作敘述（更新工作內容）；必須整組決定`, and neither matched the required `第 1 組第 1 項` name.
+3. GREEN — passed the one-based group ordinal into `ReviewBundle`, incorporated it into the checkbox name, and updated the existing keyboard behavior expectations for their four groups.
+4. GREEN outcome — the same exact focused command passed `3 files, 28 tests`.
+
+### Verification commands and outcomes
+
+- `npm run test -w @caliburn/web -- ConsultantWorkspace.integration.test.tsx consultantWorkspaceModel.test.ts consultantApi.test.ts` — `3 files, 28 tests passed` (approved local-process run required for Vite on Windows).
+- `npx tsc --noEmit -p apps/web/tsconfig.json` — passed.
+- `npm run lint -w @caliburn/web` — passed.
+- `git diff --check` — no whitespace errors (only Windows LF/CRLF informational warnings).
+- No API, contract, PostgreSQL, live-model, or full-monorepo gate was run because this round changes only the Web accessibility boundary.
+
+### Files changed in this fix round
+
+- `apps/web/src/features/consultant/DocumentReviewPanel.tsx`
+- `apps/web/src/features/consultant/ConsultantWorkspace.integration.test.tsx`
+- `.superpowers/sdd/2026-08-22-persistent-store-backed-jd-working-draft-plan/task-7-report.md`
+
+### North-star self-review
+
+- Controls that are otherwise semantically identical across different review groups now have deterministic, employee-understandable accessible names.
+- Item selection, atomic whole-group wording, typed editors, partial selection, stale-response handling, and all four employee review states remain unchanged.
+
+### Concerns
+
+- The Windows sandbox still cannot spawn Vite's setup child process; the focused test was rerun with the minimal approved local-process permission.

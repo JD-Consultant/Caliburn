@@ -57,11 +57,13 @@ function errorText(error: unknown): string {
 function ReviewBundle({
   documentId,
   revision,
+  bundleOrdinal,
   bundle,
   approvedDocument,
 }: {
   documentId: string;
   revision: number;
+  bundleOrdinal: number;
   bundle: DocumentChangeSetView;
   approvedDocument: ApprovedJobDocumentView;
 }) {
@@ -187,7 +189,7 @@ function ReviewBundle({
       <div className="mt-4 space-y-3">
         {bundle.actions.map((action, index) => {
           const reviewable = ["pending", "deferred"].includes(action.status);
-          const selectionLabel = `選取第 ${index + 1} 項${operationLabels[action.operation]}變更：${documentPathLabel(action.path)}（${bundle.summary}）${action.atomic_subgroup_id ? "；必須整組決定" : ""}`;
+          const selectionLabel = `選取第 ${bundleOrdinal} 組第 ${index + 1} 項${operationLabels[action.operation]}變更：${documentPathLabel(action.path)}（${bundle.summary}）${action.atomic_subgroup_id ? "；必須整組決定" : ""}`;
           return (
             <div
               key={action.action_id}
@@ -390,11 +392,12 @@ export function DocumentReviewPanel({
           目前沒有等待你決定的文件變更。
         </div>
       ) : (
-        activeBundles.map((bundle) => (
+        activeBundles.map((bundle, index) => (
           <ReviewBundle
             key={bundle.changeset_id}
             documentId={documentId}
             revision={snapshot.revision}
+            bundleOrdinal={index + 1}
             bundle={bundle}
             approvedDocument={snapshot.approved_document}
           />

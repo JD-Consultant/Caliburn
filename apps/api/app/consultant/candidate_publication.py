@@ -18,7 +18,6 @@ from pydantic import (
     BaseModel,
     ConfigDict,
     Field,
-    JsonValue,
     StringConstraints,
     model_validator,
 )
@@ -30,19 +29,12 @@ from app.consultant.document_review import (
     create_document_changeset,
 )
 from app.consultant.results import (
-    AnalysisBasis,
-    DocumentChangeOperation,
-    OpksKind,
     ReviewableDocumentChange,
     SkillId,
 )
 from app.consultant.state import (
     ActionHandle,
-    ApprovedDuty,
     ApprovedJobDocument,
-    ApprovedOpksItem,
-    ApprovedOpksKind,
-    ApprovedTask,
     CheckedCandidateReceipt,
     DocumentChangeSet,
     DocumentPatchAction,
@@ -60,6 +52,7 @@ from app.consultant.workspace_resources import (
     workspace_entity_id,
 )
 from app.consultant.workspace_validation import validate_workspace_payload
+from app.consultant.workspace_review import derive_semantic_changes
 
 
 Digest = Annotated[str, StringConstraints(pattern=r"^[0-9a-f]{64}$")]
@@ -134,37 +127,6 @@ def resource_digest(files: Mapping[str, str | bytes]) -> str:
     return sha256(encoded).hexdigest()
 
 
-_HEADER_FIELDS = (
-    "job_title",
-    "occupation_category_name",
-    "occupation_name",
-    "occupation_code",
-    "industry_name",
-    "industry_code",
-    "work_description",
-    "notes",
-)
-_DUTY_FIELDS = ("statement",)
-_TASK_FIELDS = (
-    "duty_id",
-    "statement",
-    "action",
-    "object",
-    "purpose_result",
-    "context",
-    "frequency_text",
-    "responsibility_role",
-    "enablers",
-)
-_OPKS_FIELDS = ("text", "task_ids", "indicator_ids")
-_EDITABLE_OPKS_KINDS = {
-    ApprovedOpksKind.OUTPUT,
-    ApprovedOpksKind.PERFORMANCE_INDICATOR,
-    ApprovedOpksKind.KNOWLEDGE,
-    ApprovedOpksKind.SKILL,
-}
-
-
 def _invalid(
     request: CandidateCheckRequest,
     digest: str,
@@ -181,107 +143,6 @@ def _invalid(
         issues=normalized,
         review_queue={},
     )
-
-
-def _model_json(value: Any) -> dict[str, JsonValue]:
-    return value.model_dump(mode="json")
-
-
-def _entity_maps(document: ApprovedJobDocument) -> tuple[
-    dict[UUID, ApprovedDuty],
-    dict[UUID, ApprovedTask],
-    dict[UUID, ApprovedOpksItem],
-]:
-    return (
-        {item.duty_id: item for item in document.duties},
-        {item.task_id: item for item in document.tasks},
-        {item.item_id: item for item in document.opks},
-    )
-
-
-def _next_orders(
-    document: ApprovedJobDocument,
-    candidate: ApprovedJobDocument,
-) -> dict[str, dict[UUID, int]]:
-    """Assign new resource order per collection/OPKS axis deterministically."""
-
-    result: dict[str, dict[UUID, int]] = {
-        "duties": {},
-        "tasks": {},
-        "output": {},
-        "indicator": {},
-        "knowledge": {},
-        "skill": {},
-    }
-    baseline_duties = {item.duty_id for item in document.duties}
-    baseline_tasks = {item.task_id for item in document.tasks}
-    for collection, values, baseline_ids in (
-        ("duties", candidate.duties, baseline_duties),
-        ("tasks", candidate.tasks, baseline_tasks),
-    ):
-        next_order = max(
-            (item.display_order for item in getattr(document, collection)),
-            default=-1,
-        ) + 1
-        if collection == "duties":
-            new_values = (
-                item for item in values if item.duty_id not in baseline_ids
-            )
-            key = lambda item: (item.display_order, str(item.duty_id))
-        else:
-            new_values = (
-                item for item in values if item.task_id not in baseline_ids
-            )
-            key = lambda item: (item.display_order, str(item.task_id))
-        for item in sorted(new_values, key=key):
-            identity = item.duty_id if collection == "duties" else item.task_id
-            result[collection][identity] = next_order
-            next_order += 1
-    for kind in _EDITABLE_OPKS_KINDS:
-        key = kind.value
-        baseline_values = [item for item in document.opks if item.kind is kind]
-        baseline_ids = {item.item_id for item in baseline_values}
-        next_order = max((item.display_order for item in baseline_values), default=-1) + 1
-        new_values = sorted(
-            (
-                item
-                for item in candidate.opks
-                if item.kind is kind and item.item_id not in baseline_ids
-            ),
-            key=lambda item: (item.display_order, str(item.item_id)),
-        )
-        for item in new_values:
-            result[key][item.item_id] = next_order
-            next_order += 1
-    return result
-
-
-def _normalized_entity_after(
-    value: ApprovedDuty | ApprovedTask | ApprovedOpksItem,
-    *,
-    baseline: ApprovedJobDocument,
-    orders: Mapping[str, Mapping[UUID, int]],
-) -> dict[str, JsonValue]:
-    payload = _model_json(value)
-    identity: UUID
-    collection: str
-    if isinstance(value, ApprovedDuty):
-        identity = value.duty_id
-        collection = "duties"
-    elif isinstance(value, ApprovedTask):
-        identity = value.task_id
-        collection = "tasks"
-    else:
-        identity = value.item_id
-        collection = value.kind.value
-        payload.pop("evidence_source_ids", None)
-    if identity not in {
-        item.duty_id for item in baseline.duties
-    } | {item.task_id for item in baseline.tasks} | {
-        item.item_id for item in baseline.opks
-    }:
-        payload["display_order"] = orders[collection][identity]
-    return payload
 
 
 def _candidate_handle_by_id(
@@ -334,52 +195,6 @@ def _candidate_handle_by_id(
             )
         result[identity] = handle
     return result
-
-
-def _new_change(
-    *,
-    operation: DocumentChangeOperation,
-    path: str,
-    basis: AnalysisBasis,
-    after: JsonValue | None = None,
-    change_ref: str,
-    **kwargs: Any,
-) -> ReviewableDocumentChange:
-    return ReviewableDocumentChange(
-        operation=operation,
-        path=path,
-        after=after,
-        basis=basis,
-        change_ref=change_ref,
-        **kwargs,
-    )
-
-
-def _opks_basis(
-    *,
-    item: ApprovedOpksItem,
-    handle: str,
-    bindings: Mapping[str, tuple[AnalysisBasis, ...]],
-    default: AnalysisBasis,
-    changed: bool,
-) -> AnalysisBasis:
-    if not changed:
-        return default
-    bound = bindings.get(handle, ())
-    if bound:
-        source_ids: list[UUID] = []
-        quote_anchors = []
-        skill_ids: list[SkillId] = []
-        for basis in bound:
-            source_ids.extend(basis.source_ids)
-            quote_anchors.extend(basis.quote_anchors)
-            skill_ids.extend(basis.skill_ids)
-        return AnalysisBasis(
-            source_ids=tuple(dict.fromkeys(source_ids)),
-            quote_anchors=tuple(quote_anchors),
-            skill_ids=tuple(dict.fromkeys(skill_ids)),
-        )
-    return default
 
 
 def _candidate_action_handles(
@@ -458,159 +273,6 @@ def _apply_review_groups(
     )
 
 
-def _semantic_changes(
-    *,
-    baseline: ApprovedJobDocument,
-    candidate: ApprovedJobDocument,
-    catalog: WorkspaceCatalog,
-    candidate_handles: Mapping[UUID, str],
-    evidence: Mapping[str, tuple[AnalysisBasis, ...]],
-    default_basis: AnalysisBasis,
-) -> tuple[ReviewableDocumentChange, ...]:
-    baseline_duties, baseline_tasks, baseline_opks = _entity_maps(baseline)
-    candidate_duties, candidate_tasks, candidate_opks = _entity_maps(candidate)
-    changes: list[ReviewableDocumentChange] = []
-
-    def add(**kwargs: Any) -> None:
-        changes.append(
-            _new_change(
-                change_ref=f"candidate-{len(changes) + 1:03d}",
-                **kwargs,
-            )
-        )
-
-    baseline_header = baseline.model_dump(mode="json")
-    candidate_header = candidate.model_dump(mode="json")
-    for field in _HEADER_FIELDS:
-        if baseline_header[field] != candidate_header[field]:
-            add(
-                operation=DocumentChangeOperation.REVISE,
-                path=f"/{field}",
-                after=candidate_header[field],
-                basis=default_basis,
-            )
-
-    orders = _next_orders(baseline, candidate)
-    for identity in sorted(set(baseline_duties) - set(candidate_duties), key=str):
-        add(
-            operation=DocumentChangeOperation.WITHDRAW,
-            path=f"/duties/{identity}",
-            basis=default_basis,
-        )
-    for identity in sorted(set(candidate_duties) - set(baseline_duties), key=str):
-        add(
-            operation=DocumentChangeOperation.ADD,
-            path="/duties",
-            after=_normalized_entity_after(
-                candidate_duties[identity], baseline=baseline, orders=orders
-            ),
-            basis=default_basis,
-        )
-    for identity in sorted(set(baseline_duties) & set(candidate_duties), key=str):
-        before = _model_json(baseline_duties[identity])
-        after = _model_json(candidate_duties[identity])
-        for field in _DUTY_FIELDS:
-            if before[field] != after[field]:
-                add(
-                    operation=DocumentChangeOperation.REVISE,
-                    path=f"/duties/{identity}/{field}",
-                    after=after[field],
-                    basis=default_basis,
-                )
-
-    for identity in sorted(set(baseline_tasks) - set(candidate_tasks), key=str):
-        add(
-            operation=DocumentChangeOperation.WITHDRAW,
-            path=f"/tasks/{identity}",
-            basis=default_basis,
-        )
-    for identity in sorted(set(candidate_tasks) - set(baseline_tasks), key=str):
-        add(
-            operation=DocumentChangeOperation.ADD,
-            path="/tasks",
-            after=_normalized_entity_after(
-                candidate_tasks[identity], baseline=baseline, orders=orders
-            ),
-            basis=default_basis,
-        )
-    for identity in sorted(set(baseline_tasks) & set(candidate_tasks), key=str):
-        before = _model_json(baseline_tasks[identity])
-        after = _model_json(candidate_tasks[identity])
-        for field in _TASK_FIELDS:
-            if before[field] != after[field]:
-                add(
-                    operation=DocumentChangeOperation.REVISE,
-                    path=f"/tasks/{identity}/{field}",
-                    after=after[field],
-                    basis=default_basis,
-                )
-
-    for identity in sorted(set(baseline_opks) - set(candidate_opks), key=str):
-        item = baseline_opks[identity]
-        if item.kind not in _EDITABLE_OPKS_KINDS:
-            continue
-        add(
-            operation=DocumentChangeOperation.WITHDRAW,
-            path=f"/opks/{identity}",
-            basis=default_basis,
-            opks_kind=OpksKind(item.kind.value),
-        )
-    for identity in sorted(set(candidate_opks) - set(baseline_opks), key=str):
-        item = candidate_opks[identity]
-        if item.kind not in _EDITABLE_OPKS_KINDS:
-            continue
-        handle = candidate_handles.get(identity, "")
-        basis = _opks_basis(
-            item=item,
-            handle=handle,
-            bindings=evidence,
-            default=default_basis,
-            changed=True,
-        )
-        after = _normalized_entity_after(item, baseline=baseline, orders=orders)
-        # The existing review factory is the single allocator for new OPKS
-        # orders.  Leaving this field absent/None lets it assign the next
-        # order within the axis, independent of parser file ordering.
-        after["display_order"] = None
-        add(
-            operation=DocumentChangeOperation.ADD,
-            path="/opks",
-            after=after,
-            basis=basis,
-            opks_kind=OpksKind(item.kind.value),
-            task_ids=item.task_ids,
-            indicator_ids=item.indicator_ids,
-        )
-    for identity in sorted(set(baseline_opks) & set(candidate_opks), key=str):
-        before_item = baseline_opks[identity]
-        after_item = candidate_opks[identity]
-        if before_item.kind not in _EDITABLE_OPKS_KINDS:
-            continue
-        before = _model_json(before_item)
-        after = _model_json(after_item)
-        handle = candidate_handles.get(identity, catalog.handle_for_id(identity))
-        changed = any(before[field] != after[field] for field in _OPKS_FIELDS)
-        basis = _opks_basis(
-            item=after_item,
-            handle=handle,
-            bindings=evidence,
-            default=default_basis,
-            changed=changed,
-        )
-        for field in _OPKS_FIELDS:
-            if before[field] != after[field]:
-                add(
-                    operation=DocumentChangeOperation.REVISE,
-                    path=f"/opks/{identity}/{field}",
-                    after=after[field],
-                    basis=basis,
-                    opks_kind=OpksKind(after_item.kind.value),
-                    task_ids=after_item.task_ids,
-                    indicator_ids=after_item.indicator_ids,
-                )
-    return tuple(changes)
-
-
 def _candidate_compatibility_view(
     files: Mapping[str, str],
     run_id: UUID,
@@ -681,10 +343,9 @@ def check_candidate_document(
         )
     evidence = validation.evidence_by_handle
     try:
-        changes = _semantic_changes(
+        changes = derive_semantic_changes(
             baseline=catalog.document,
             candidate=draft.approved_document,
-            catalog=catalog,
             candidate_handles=_candidate_handle_by_id(
                 catalog,
                 candidate_files,

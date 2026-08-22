@@ -362,6 +362,7 @@ def test_application_assigns_stable_action_ids_and_remembers_rejection_by_target
             interview_work={},
         )
 
+
     new_source = uuid4()
     with_new_evidence = _change(
         source_id=new_source,
@@ -379,6 +380,35 @@ def test_application_assigns_stable_action_ids_and_remembers_rejection_by_target
         interview_work={},
     )
     assert proposed_again.actions[0].source_ids == (new_source,)
+
+
+def test_application_review_factory_accepts_a_run_independent_identity_scope() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    document, _duty_a, _duty_b, task_a, _task_b = _document(
+        document_id,
+        source_id=source_id,
+    )
+    change = _change(
+        source_id=source_id,
+        path=f"/tasks/{task_a}/statement",
+        after="依工作區內容複核請購單",
+    )
+    kwargs = {
+        "document_id": document_id,
+        "summary": "工作區語意審查。",
+        "read_revision": 4,
+        "document": document,
+        "changes": (change,),
+        "existing_review_queue": {},
+        "interview_work": {},
+        "identity_scope": "workspace:revision=4:generation=2:digest=abc",
+    }
+
+    first = create_document_changeset(run_id=uuid4(), **kwargs)
+    another_run = create_document_changeset(run_id=uuid4(), **kwargs)
+
+    assert first == another_run
 
 
 def test_rejection_memory_distinguishes_opks_axes_from_the_same_evidence() -> None:

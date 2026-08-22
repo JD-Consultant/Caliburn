@@ -280,6 +280,25 @@ def test_existing_duty_task_and_opks_edit_emits_fixed_semantic_path(
     assert expected_path in [action.path for action in result.actions]
 
 
+def test_temporary_candidate_check_delegates_semantic_reclassification() -> None:
+    files = _files()
+    _add_duty(files, "duty-101")
+    _json_edit(
+        files,
+        f"/candidate/{RUN_ID}/tasks/task-001.json",
+        duty_handle="duty-101",
+    )
+
+    result = check_candidate_document(
+        _request(files), catalog=_catalog(), existing_review_queue={}, interview_work={}
+    )
+
+    assert result.status == "checked", result.issues
+    reassigned = [action for action in result.actions if action.operation.value == "reassign"]
+    assert len(reassigned) == 1
+    assert reassigned[0].path == f"/tasks/{TASK_ID}/duty_id"
+
+
 def test_knowledge_text_change_requires_anchored_employee_evidence() -> None:
     files = _files()
     path = f"/candidate/{RUN_ID}/opks/k/k-001.json"

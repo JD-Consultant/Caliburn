@@ -64,6 +64,7 @@ class WorkspaceHeaderResource(WorkspaceModel):
 class WorkspaceDutyResource(WorkspaceModel):
     handle: Handle
     statement: NonEmptyText
+    display_order: int | None = Field(default=None, ge=0)
 
 
 class WorkspaceEnablerResource(WorkspaceModel):
@@ -82,6 +83,7 @@ class WorkspaceTaskResource(WorkspaceModel):
     frequency_text: NonEmptyText | None = None
     responsibility_role: ApprovedResponsibilityRole | None = None
     enablers: tuple[WorkspaceEnablerResource, ...] = ()
+    display_order: int | None = Field(default=None, ge=0)
 
 
 class WorkspaceOpksKind(StrEnum):
@@ -111,6 +113,7 @@ class WorkspaceOpksResource(WorkspaceModel):
     task_handles: tuple[Handle, ...] = ()
     indicator_handles: tuple[Handle, ...] = ()
     evidence: tuple[WorkspaceEvidenceReference, ...] = ()
+    display_order: int | None = Field(default=None, ge=0)
 
     @model_validator(mode="after")
     def references_are_unique(self) -> WorkspaceOpksResource:
@@ -411,10 +414,10 @@ class WorkspaceCatalog:
 def canonical_resource_json(value: BaseModel) -> str:
     """Serialize one resource without provider- or platform-specific drift."""
 
-    return (
-        json.dumps(value.model_dump(mode="json"), ensure_ascii=False, indent=2)
-        + "\n"
-    )
+    payload = value.model_dump(mode="json")
+    if payload.get("display_order") is None:
+        payload.pop("display_order", None)
+    return json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
 
 
 class WorkspaceDraftDuty(WorkspaceModel):
@@ -497,7 +500,11 @@ def project_workspace_files(
     for index, duty in enumerate(_sorted_by_display_order(document.duties), start=1):
         handle = _workspace_handle_for_id(registry, duty.duty_id, "duty", index)
         files[f"/workspace/duties/{handle}.json"] = canonical_resource_json(
-            WorkspaceDutyResource(handle=handle, statement=duty.statement)
+            WorkspaceDutyResource(
+                handle=handle,
+                statement=duty.statement,
+                display_order=duty.display_order,
+            )
         )
 
     for index, task in enumerate(_sorted_by_display_order(document.tasks), start=1):
@@ -521,6 +528,7 @@ def project_workspace_files(
                     WorkspaceEnablerResource(kind=item.kind, name=item.name)
                     for item in task.enablers
                 ),
+                display_order=task.display_order,
             )
         )
 
@@ -545,6 +553,7 @@ def project_workspace_files(
                         _workspace_existing_handle(registry, indicator_id, "indicator")
                         for indicator_id in item.indicator_ids
                     ),
+                    display_order=item.display_order,
                 )
             )
 
@@ -1286,7 +1295,13 @@ def _parse_duties(
                 duty=ApprovedDuty(
                     duty_id=stable_id,
                     statement=resource.statement,
-                    display_order=(baseline.display_order if baseline else next_order + index),
+                    display_order=(
+                        resource.display_order
+                        if resource.display_order is not None
+                        else baseline.display_order
+                        if baseline
+                        else next_order + index
+                    ),
                 ),
             )
         )
@@ -1339,7 +1354,13 @@ def _parse_tasks(
                         ApprovedEnabler(kind=item.kind, name=item.name)
                         for item in resource.enablers
                     ),
-                    display_order=(baseline.display_order if baseline else next_order + index),
+                    display_order=(
+                        resource.display_order
+                        if resource.display_order is not None
+                        else baseline.display_order
+                        if baseline
+                        else next_order + index
+                    ),
                     competency_level=(baseline.competency_level if baseline else None),
                 ),
             )
@@ -1429,7 +1450,9 @@ def _parse_opks(
                     kind=kind,
                     text=resource.text,
                     display_order=(
-                        baseline.display_order
+                        resource.display_order
+                        if resource.display_order is not None
+                        else baseline.display_order
                         if baseline is not None
                         else next_orders[kind] + index
                     ),

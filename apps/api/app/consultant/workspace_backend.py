@@ -50,7 +50,22 @@ from app.consultant.workspace_resources import (
     pending_action_handles,
     project_candidate_files,
 )
-from app.consultant.workspace_state import StoreBackedWorkspace
+from app.consultant.workspace_review import (
+    WorkspaceReviewDecision,
+    derive_workspace_review,
+    workspace_review_files,
+)
+from app.consultant.workspace_state import (
+    StoreBackedWorkspace,
+    WorkspaceDiagnostic,
+    WorkspaceValidationStatus,
+    approved_document_digest,
+)
+from app.consultant.workspace_validation import (
+    WorkspacePayloadValidation,
+    evidence_basis_digest,
+    validate_workspace_payload,
+)
 
 
 _HANDLE_PATTERN = r"[a-z][a-z0-9]*(?:-[a-z0-9]+)*-[0-9]{3,}"
@@ -240,6 +255,212 @@ class PendingProjectionBackend(_StaticProjectionBackend):
 
     def __init__(self, catalog: WorkspaceCatalog) -> None:
         super().__init__(_pending_files(catalog))
+
+
+class WorkspaceReviewProjectionBackend(BackendProtocol):
+    """Fresh, read-only semantic review over the actual Store workspace bytes."""
+
+    def __init__(
+        self,
+        *,
+        workspace: StoreBackedWorkspace,
+        catalog: WorkspaceCatalog,
+        source_lookup: DocumentSourceLookup,
+        selected_skill_ids: tuple[str, ...],
+        decisions: Sequence[WorkspaceReviewDecision] = (),
+    ) -> None:
+        self.workspace = workspace
+        self.catalog = catalog
+        self.source_lookup = source_lookup
+        self.selected_skill_ids = selected_skill_ids
+        self.decisions = tuple(decisions)
+
+    @staticmethod
+    def _sync_unavailable() -> str:
+        return "review projection requires the async backend method"
+
+    def ls(self, path: str) -> LsResult:
+        del path
+        return LsResult(error=self._sync_unavailable())
+
+    def read(self, file_path: str, offset: int = 0, limit: int = 2000) -> ReadResult:
+        del file_path, offset, limit
+        return ReadResult(error=self._sync_unavailable())
+
+    def grep(
+        self,
+        pattern: str,
+        path: str | None = None,
+        glob: str | None = None,
+        *,
+        max_count: int | None = None,
+    ) -> GrepResult:
+        del pattern, path, glob, max_count
+        return GrepResult(error=self._sync_unavailable())
+
+    def glob(self, pattern: str, path: str | None = None) -> GlobResult:
+        del pattern, path
+        return GlobResult(error=self._sync_unavailable())
+
+    def write(self, file_path: str, content: str) -> WriteResult:
+        del content
+        return _read_only_write_result(file_path)
+
+    def edit(
+        self,
+        file_path: str,
+        old_string: str,
+        new_string: str,
+        replace_all: bool = False,
+    ) -> EditResult:
+        del old_string, new_string, replace_all
+        if not _safe_absolute_path(file_path):
+            return EditResult(error="permission denied: invalid projection path")
+        return EditResult(error="permission denied: projection is read-only")
+
+    def delete(self, file_path: str) -> DeleteResult:
+        if not _safe_absolute_path(file_path):
+            return DeleteResult(error="permission denied: invalid projection path")
+        return DeleteResult(error="permission denied: projection is read-only")
+
+    def download_files(self, paths: list[str]) -> list[FileDownloadResponse]:
+        return [
+            FileDownloadResponse(path=path, error="permission_denied") for path in paths
+        ]
+
+    def upload_files(
+        self, files: list[tuple[str, bytes]]
+    ) -> list[FileUploadResponse]:
+        return [
+            FileUploadResponse(path=path, error="permission_denied")
+            for path, _content in files
+        ]
+
+    def _unavailable_validation(
+        self,
+        *,
+        code: str,
+        message: str,
+    ) -> WorkspacePayloadValidation:
+        return WorkspacePayloadValidation(
+            document=None,
+            diagnostics=(
+                WorkspaceDiagnostic(code=code, path="/workspace", message=message),
+            ),
+            current_sources=(),
+            evidence_by_handle={},
+            default_basis=None,
+        )
+
+    async def _files(self) -> dict[str, str]:
+        # read_snapshot recomputes the digest from Store bytes and marks a
+        # mismatched manifest unvalidated before any projection is built.
+        snapshot = await self.workspace.read_snapshot()
+        manifest = snapshot.manifest
+        current_sources = await self.source_lookup.current_sources(
+            self.catalog.document_id
+        )
+        current_catalog = WorkspaceCatalog.from_snapshot(
+            self.catalog.document,
+            pending=self.catalog.pending,
+            sources=current_sources,
+        )
+        current_evidence_digest = evidence_basis_digest(current_sources)
+        if manifest.validation_status is not WorkspaceValidationStatus.VALID:
+            validation = self._unavailable_validation(
+                code="workspace-not-valid",
+                message="Workspace review requires the current Store files to validate.",
+            )
+        elif manifest.approved_baseline_digest != approved_document_digest(
+            self.catalog.document
+        ):
+            validation = self._unavailable_validation(
+                code="approved-baseline-stale",
+                message="Workspace review baseline no longer matches the approved document.",
+            )
+            manifest = manifest.model_copy(
+                update={"validation_status": WorkspaceValidationStatus.UNVALIDATED}
+            )
+        elif manifest.evidence_basis_digest != current_evidence_digest:
+            validation = self._unavailable_validation(
+                code="evidence-basis-stale",
+                message="Workspace review Evidence changed since the last validation.",
+            )
+            manifest = manifest.model_copy(
+                update={"validation_status": WorkspaceValidationStatus.UNVALIDATED}
+            )
+        else:
+            validation = validate_workspace_payload(
+                snapshot.files,
+                catalog=current_catalog,
+                selected_skill_ids=self.selected_skill_ids,
+                loaded_skill_ids=self.selected_skill_ids,
+            )
+        projection = derive_workspace_review(
+            self.catalog.document,
+            validation,
+            manifest,
+            self.decisions,
+        )
+        return workspace_review_files(projection)
+
+    async def als(self, path: str) -> LsResult:
+        if not _safe_absolute_path(path):
+            return LsResult(error="permission denied: invalid review path")
+        return _StaticProjectionBackend(await self._files()).ls(path)
+
+    async def aread(
+        self, file_path: str, offset: int = 0, limit: int = 2000
+    ) -> ReadResult:
+        if not _safe_absolute_path(file_path):
+            return ReadResult(error="permission denied: invalid review path")
+        return _StaticProjectionBackend(await self._files()).read(
+            file_path, offset=offset, limit=limit
+        )
+
+    async def agrep(
+        self,
+        pattern: str,
+        path: str | None = None,
+        glob: str | None = None,
+        *,
+        max_count: int | None = None,
+    ) -> GrepResult:
+        if path is not None and not _safe_absolute_path(path):
+            return GrepResult(error="permission denied: invalid review path")
+        return _StaticProjectionBackend(await self._files()).grep(
+            pattern, path=path, glob=glob, max_count=max_count
+        )
+
+    async def aglob(self, pattern: str, path: str | None = None) -> GlobResult:
+        if path is not None and not _safe_absolute_path(path):
+            return GlobResult(error="permission denied: invalid review path")
+        return _StaticProjectionBackend(await self._files()).glob(pattern, path)
+
+    async def awrite(self, file_path: str, content: str) -> WriteResult:
+        return self.write(file_path, content)
+
+    async def aedit(
+        self,
+        file_path: str,
+        old_string: str,
+        new_string: str,
+        replace_all: bool = False,
+    ) -> EditResult:
+        return self.edit(file_path, old_string, new_string, replace_all)
+
+    async def adelete(self, file_path: str) -> DeleteResult:
+        return self.delete(file_path)
+
+    async def adownload_files(
+        self, paths: list[str]
+    ) -> list[FileDownloadResponse]:
+        return _StaticProjectionBackend(await self._files()).download_files(paths)
+
+    async def aupload_files(
+        self, files: list[tuple[str, bytes]]
+    ) -> list[FileUploadResponse]:
+        return self.upload_files(files)
 
 
 def _canonical_document_files(catalog: WorkspaceCatalog) -> dict[str, str]:
@@ -996,6 +1217,7 @@ class ConsultantWorkspaceBackendBinding:
     source_backend: EmployeeSourceProjectionBackend
     approved_backend: ApprovedProjectionBackend
     pending_backend: PendingProjectionBackend
+    review_backend: WorkspaceReviewProjectionBackend
     catalog: WorkspaceCatalog
     document_id: UUID
 
@@ -1022,7 +1244,7 @@ def build_consultant_workspace_backend(
     selected_skill_ids: tuple[str, ...],
     source_lookup: DocumentSourceLookup | None = None,
 ) -> ConsultantWorkspaceBackendBinding:
-    """Build the single five-root composite backend for one active workspace."""
+    """Build the single six-root composite backend for one active workspace."""
 
     if not isinstance(document_id, UUID):
         raise TypeError("document_id must be a UUID value")
@@ -1041,6 +1263,12 @@ def build_consultant_workspace_backend(
     )
     approved_backend = ApprovedProjectionBackend(catalog)
     pending_backend = PendingProjectionBackend(catalog)
+    review_backend = WorkspaceReviewProjectionBackend(
+        workspace=workspace,
+        catalog=catalog,
+        source_lookup=lookup,
+        selected_skill_ids=selected_skill_ids,
+    )
     composite_backend = CompositeBackend(
         default=workspace_backend,
         routes={
@@ -1048,6 +1276,7 @@ def build_consultant_workspace_backend(
             "/sources/": source_backend,
             "/approved/": approved_backend,
             "/pending/": pending_backend,
+            "/review/": review_backend,
         },
     )
     return ConsultantWorkspaceBackendBinding(
@@ -1058,6 +1287,7 @@ def build_consultant_workspace_backend(
         source_backend=source_backend,
         approved_backend=approved_backend,
         pending_backend=pending_backend,
+        review_backend=review_backend,
         catalog=catalog,
         document_id=document_id,
     )

@@ -23,6 +23,7 @@ from app.consultant.state import (
     ApprovedTask,
     EmployeeSource,
     EmployeeSourceKind,
+    SourceProcessingStatus,
     SourceValidity,
 )
 from app.consultant.workspace_backend import (
@@ -34,6 +35,10 @@ from app.consultant.workspace_state import (
     StoreBackedWorkspace,
     WorkspaceValidationStatus,
     workspace_resource_digest,
+)
+from app.consultant.workspace_validation import (
+    evidence_basis_digest,
+    validate_workspace_payload,
 )
 from app.consultant.workspace_tools import WORKSPACE_TOOL_DESCRIPTIONS
 
@@ -121,7 +126,7 @@ def _sources() -> tuple[EmployeeSource, ...]:
         text="目前內容第一行。\n目前內容第二行。",
         supersedes_source_id=OLD_SOURCE_ID,
         created_at=created + timedelta(minutes=1),
-    )
+    ).model_copy(update={"processing_status": SourceProcessingStatus.COMMITTED})
     return old, current
 
 
@@ -325,7 +330,7 @@ async def test_write_file_contract_creates_parseable_linked_workspace_resources(
 
 
 @pytest.mark.asyncio
-async def test_workspace_binding_exposes_exactly_five_roots(
+async def test_workspace_binding_exposes_exactly_six_roots(
     real_filesystem_tools: FilesystemToolHarness,
 ) -> None:
     listing = await real_filesystem_tools.invoke("ls", path="/")
@@ -335,6 +340,7 @@ async def test_workspace_binding_exposes_exactly_five_roots(
         "/workspace",
         "/approved",
         "/pending",
+        "/review",
         "/sources",
         "/skills",
     }
@@ -415,6 +421,67 @@ async def test_approved_and_pending_projections_remain_readable(
 
 
 @pytest.mark.asyncio
+async def test_review_projection_rechecks_store_bytes_and_never_serves_a_stale_group(
+    workspace_binding: ConsultantWorkspaceBackendBinding,
+) -> None:
+    backend = workspace_binding.review_backend
+    assert "async" in (backend.read("/index.json").error or "")
+
+    assert (
+        await workspace_binding.workspace_backend.aedit(
+            "/workspace/tasks/task-001.json",
+            '"整理需求"',
+            '"複核需求"',
+        )
+    ).error is None
+    unvalidated = await workspace_binding.composite_backend.aread("/review/index.json")
+    assert unvalidated.error is None
+    assert unvalidated.file_data is not None
+    assert json.loads(unvalidated.file_data["content"])["diagnostic_count"] == 1
+
+    snapshot = await workspace_binding.workspace.read_snapshot()
+    payload = validate_workspace_payload(
+        snapshot.files,
+        catalog=workspace_binding.catalog,
+        selected_skill_ids=("output",),
+        loaded_skill_ids=("output",),
+    )
+    assert payload.document is not None
+    await workspace_binding.workspace.commit_validation(
+        expected_resource_digest=snapshot.manifest.resource_digest,
+        evidence_basis_digest=evidence_basis_digest(payload.current_sources),
+        validation_status=WorkspaceValidationStatus.VALID,
+        diagnostics=(),
+        entity_ids_by_handle=snapshot.manifest.entity_ids_by_handle,
+    )
+    valid = await workspace_binding.composite_backend.aread("/review/index.json")
+    assert valid.error is None
+    assert valid.file_data is not None
+    assert json.loads(valid.file_data["content"])["group_handles"] == ["group-001"]
+    group = await workspace_binding.composite_backend.aread(
+        "/review/groups/group-001.json"
+    )
+    assert group.error is None
+    assert group.file_data is not None
+    group_payload = json.loads(group.file_data["content"])
+    assert group_payload["actions"][0]["path"] == "/tasks/task-001/statement"
+    assert "read_set" not in group_payload["actions"][0]
+    assert "source_ids" not in group_payload["actions"][0]
+
+    assert (
+        await workspace_binding.workspace_backend.aedit(
+            "/workspace/tasks/task-001.json",
+            '"複核需求"',
+            '"再次複核需求"',
+        )
+    ).error is None
+    stale_group = await workspace_binding.composite_backend.aread(
+        "/review/groups/group-001.json"
+    )
+    assert stale_group.error is not None
+
+
+@pytest.mark.asyncio
 async def test_missing_projection_download_uses_framework_not_found_code(
     workspace_binding: ConsultantWorkspaceBackendBinding,
 ) -> None:
@@ -480,6 +547,7 @@ async def test_read_only_routes_reject_mutation_through_real_tools(
     for path in (
         "/approved/header.json",
         "/pending/index.json",
+        "/review/index.json",
         "/sources/current/source-002.txt",
         "/skills/output/SKILL.md",
     ):

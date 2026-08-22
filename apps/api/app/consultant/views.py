@@ -86,7 +86,9 @@ class ConsultantSnapshot(DurableModel):
     understanding_projection: UnderstandingProjection
     gaps: dict[str, dict] = Field(default_factory=dict)
     semantic_progress: SemanticProgressProjection
-    document_review: DocumentReviewProjection
+    # Store-derived only: a checkpoint snapshot cannot truthfully describe
+    # workspace generation, validation, or diagnostics before Store is read.
+    document_review: DocumentReviewProjection | None = None
     approved_document: ApprovedJobDocument
     required_clarification: RequiredClarification | None = None
     sufficiency: SufficiencyProjection
@@ -115,9 +117,7 @@ def _consultant_turns(state: ConsultantThreadState) -> tuple[ConsultantTurnProje
     return tuple(turns)
 
 
-def document_review_projection_from_state(
-    state: ConsultantThreadState,
-) -> DocumentReviewProjection:
+def safe_interview_work_available_from_state(state: ConsultantThreadState) -> bool:
     work = tuple(
         InterviewWorkItem.model_validate(raw)
         for raw in state.get("interview_work", {}).values()
@@ -131,18 +131,7 @@ def document_review_projection_from_state(
         }
         for item in work
     )
-    return DocumentReviewProjection(
-        workspace_generation=0,
-        workspace_status=WorkspaceReviewStatus.CLEAN,
-        diagnostics=(),
-        bundles=(),
-        acceptance_blocked_changeset_ids=(),
-        unresolved_action_count=0,
-        blocked_branches=(),
-        safe_interview_work_available=safe_available,
-        decision_required_before_more_interview=False,
-        explanation=None,
-    )
+    return safe_available
 
 
 def document_review_projection_from_workspace(
@@ -154,7 +143,6 @@ def document_review_projection_from_workspace(
 ) -> DocumentReviewProjection:
     """Map a fresh Store-derived review without making it checkpoint state."""
 
-    checkpoint = document_review_projection_from_state(state)
     bundles = workspace_review.changesets
     all_diagnostics = (
         *workspace_review.diagnostics,
@@ -194,7 +182,7 @@ def document_review_projection_from_workspace(
         ),
         unresolved_action_count=unresolved_actions,
         blocked_branches=(),
-        safe_interview_work_available=checkpoint.safe_interview_work_available,
+        safe_interview_work_available=safe_interview_work_available_from_state(state),
         decision_required_before_more_interview=False,
         explanation=None,
     )
@@ -218,7 +206,7 @@ def snapshot_from_state(state: ConsultantThreadState) -> ConsultantSnapshot:
             "understanding_projection": understanding_projection_from_state(state),
             "gaps": state.get("gaps", {}),
             "semantic_progress": semantic_progress_from_state(state),
-            "document_review": document_review_projection_from_state(state),
+            "document_review": None,
             "approved_document": state["approved_document"],
             "required_clarification": state.get("required_clarification"),
             "sufficiency": sufficiency_projection_from_state(state),

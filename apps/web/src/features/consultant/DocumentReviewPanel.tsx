@@ -94,6 +94,7 @@ function ReviewBundle({
       cacheConsultantSnapshot(queryClient, documentId, result);
       setSelected([]);
       setRejectionReason("");
+      setEditError(null);
       await refreshConsultantQueries(queryClient, documentId);
     },
     onError: async (error) => {
@@ -184,8 +185,9 @@ function ReviewBundle({
       </div>
 
       <div className="mt-4 space-y-3">
-        {bundle.actions.map((action) => {
+        {bundle.actions.map((action, index) => {
           const reviewable = ["pending", "deferred"].includes(action.status);
+          const selectionLabel = `選取第 ${index + 1} 項${operationLabels[action.operation]}變更：${documentPathLabel(action.path)}（${bundle.summary}）${action.atomic_subgroup_id ? "；必須整組決定" : ""}`;
           return (
             <div
               key={action.action_id}
@@ -199,7 +201,7 @@ function ReviewBundle({
                 <input
                   className="mt-1"
                   type="checkbox"
-                  aria-label={`選取${operationLabels[action.operation]}變更`}
+                  aria-label={selectionLabel}
                   checked={selected.includes(action.action_id)}
                   disabled={!reviewable || mutation.isPending}
                   onChange={() => toggle(action.action_id)}

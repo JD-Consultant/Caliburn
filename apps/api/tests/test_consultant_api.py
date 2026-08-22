@@ -32,8 +32,12 @@ from app.consultant.state import (
     RunStatus,
     initial_thread_state,
 )
-from app.consultant.views import snapshot_from_state
+from app.consultant.views import (
+    document_review_projection_from_workspace,
+    snapshot_from_state,
+)
 from app.consultant.workspace_review import WorkspaceReviewGroup, WorkspaceReviewProjection
+from app.consultant.workspace_state import WorkspaceValidationStatus
 
 
 pytestmark = pytest.mark.asyncio
@@ -52,7 +56,18 @@ def _snapshot(
         state["latest_run"] = run.model_dump(mode="json")
         state["latest_source_id"] = str(run.source_id)
         state["source_count"] = 1
-    return snapshot_from_state(state)
+    return _store_enriched_snapshot(state)
+
+
+def _store_enriched_snapshot(state):
+    snapshot = snapshot_from_state(state)
+    review = document_review_projection_from_workspace(
+        state,
+        workspace_generation=1,
+        validation_status=WorkspaceValidationStatus.VALID,
+        workspace_review=WorkspaceReviewProjection(workspace_digest="a" * 64),
+    )
+    return snapshot.model_copy(update={"document_review": review})
 
 
 class FakeRuntime:
@@ -572,7 +587,7 @@ async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> No
             "last_changed_revision": 0,
         }
     }
-    runtime.snapshot = snapshot_from_state(state)
+    runtime.snapshot = _store_enriched_snapshot(state)
 
     blocked = await client.get(f"{BASE}/{document_id}/export")
     assert blocked.status_code == 409

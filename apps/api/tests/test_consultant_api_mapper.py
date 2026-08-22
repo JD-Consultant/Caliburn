@@ -3,10 +3,17 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from uuid import uuid4
 
+import pytest
+
 from app.api.consultant_mapper import to_consultant_snapshot_view
 from app.consultant.state import (
     ApprovedJobDocument,
     ApprovedTask,
+    DocumentChangeSet,
+    DocumentChangeStatus,
+    DocumentPatchAction,
+    DocumentPatchOperation,
+    DocumentPathRead,
     GapItem,
     InterviewPriority,
     InterviewWorkItem,
@@ -16,8 +23,15 @@ from app.consultant.state import (
     RunStatus,
     initial_thread_state,
 )
-from app.consultant.views import DocumentReviewProjection, snapshot_from_state
-from app.consultant.workspace_state import WorkspaceDiagnostic
+from app.consultant.views import (
+    document_review_projection_from_workspace,
+    snapshot_from_state,
+)
+from app.consultant.workspace_review import WorkspaceReviewGroup, WorkspaceReviewProjection
+from app.consultant.workspace_state import (
+    WorkspaceDiagnostic,
+    WorkspaceValidationStatus,
+)
 
 
 def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -> None:
@@ -74,7 +88,16 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
         ),
     ).model_dump(mode="json")
 
-    view = to_consultant_snapshot_view(snapshot_from_state(state))
+    snapshot = snapshot_from_state(state)
+    review = document_review_projection_from_workspace(
+        state,
+        workspace_generation=7,
+        validation_status=WorkspaceValidationStatus.VALID,
+        workspace_review=WorkspaceReviewProjection(workspace_digest="a" * 64),
+    )
+    view = to_consultant_snapshot_view(
+        snapshot.model_copy(update={"document_review": review})
+    )
 
     assert view.current_interview is not None
     assert view.current_interview.work_id == work_id
@@ -86,6 +109,7 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
         "INTERVIEW_NOT_YET_SUFFICIENT",
     }
     assert view.readiness.requires_force_confirmation is True
+    assert view.document_review.safe_interview_work_available is True
     payload = view.model_dump(mode="json")
     assert "interview_work" not in payload
     review_state_field = "review_" + "queue"
@@ -98,54 +122,149 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
 
 def test_initial_snapshot_is_naturally_resumable_without_a_pause_state() -> None:
     document_id = uuid4()
-    view = to_consultant_snapshot_view(
-        snapshot_from_state(initial_thread_state(document_id))
-    )
+    snapshot = snapshot_from_state(initial_thread_state(document_id))
 
-    assert view.document_id == document_id
-    assert view.run is None
-    assert view.opening_navigation.visible is True
-    assert view.messages == []
-    assert view.readiness.force_export_allowed is True
+    assert snapshot.document_id == document_id
+    assert snapshot.latest_run is None
+    assert snapshot.opening_navigation.visible is True
+    assert snapshot.messages == ()
+    assert snapshot.document_review is None
+    with pytest.raises(ValueError, match="Store-derived document review"):
+        to_consultant_snapshot_view(snapshot)
 
 
 def test_snapshot_mapper_projects_store_review_status_generation_and_employee_diagnostics() -> None:
     document_id = uuid4()
-    snapshot = snapshot_from_state(initial_thread_state(document_id))
-    diagnostics = (
+    action_id = uuid4()
+    changeset_id = uuid4()
+    source_id = uuid4()
+    subgroup_id = uuid4()
+    state = initial_thread_state(document_id)
+    snapshot = snapshot_from_state(state)
+    invalid_diagnostics = (
+        WorkspaceDiagnostic(
+            code="json-syntax",
+            path="/workspace/tasks/task-001.json/statement",
+            message="Technical validation details must not reach employees.",
+        ),
+    )
+    conflict_diagnostics = (
         WorkspaceDiagnostic(
             code="workspace-rebase-conflict",
             path="/workspace/tasks/task-001.json/statement",
             message="Technical store conflict details must not reach employees.",
         ),
     )
+    changeset = DocumentChangeSet(
+        changeset_id=changeset_id,
+        summary="更新工作描述",
+        actions=(
+            DocumentPatchAction(
+                action_id=action_id,
+                operation=DocumentPatchOperation.REVISE,
+                path="/tasks/task-001/statement",
+                target_key="task-001",
+                before="整理需求",
+                after="彙整採購需求",
+                source_ids=(source_id,),
+                read_set=(
+                    DocumentPathRead(
+                        path="/tasks/task-001/statement",
+                        value_sha256="0" * 64,
+                    ),
+                ),
+                atomic_subgroup_id=subgroup_id,
+            ),
+            DocumentPatchAction(
+                action_id=uuid4(),
+                operation=DocumentPatchOperation.REVISE,
+                path="/tasks/task-001/action",
+                target_key="task-001",
+                before="整理",
+                after="彙整",
+                source_ids=(source_id,),
+                read_set=(
+                    DocumentPathRead(
+                        path="/tasks/task-001/action",
+                        value_sha256="1" * 64,
+                    ),
+                ),
+                atomic_subgroup_id=subgroup_id,
+                status=DocumentChangeStatus.DEFERRED,
+            ),
+        ),
+        source_ids=(source_id,),
+        created_revision=0,
+    )
+    group = WorkspaceReviewGroup(
+        changeset=changeset,
+        group_digest="2" * 64,
+        semantic_fingerprint="3" * 64,
+        evidence_digest="4" * 64,
+        employee_request_digest="5" * 64,
+        boundary_digest="6" * 64,
+    )
+    cases = (
+        (
+            "clean",
+            WorkspaceValidationStatus.VALID,
+            WorkspaceReviewProjection(workspace_digest="a" * 64),
+        ),
+        (
+            "pending",
+            WorkspaceValidationStatus.VALID,
+            WorkspaceReviewProjection(workspace_digest="a" * 64, groups=(group,)),
+        ),
+        (
+            "invalid",
+            WorkspaceValidationStatus.INVALID,
+            WorkspaceReviewProjection(
+                workspace_digest="a" * 64,
+                diagnostics=invalid_diagnostics,
+            ),
+        ),
+        (
+            "conflicted",
+            WorkspaceValidationStatus.CONFLICTED,
+            WorkspaceReviewProjection(
+                workspace_digest="a" * 64,
+                groups=(
+                    WorkspaceReviewGroup(
+                        changeset=changeset,
+                        group_digest=group.group_digest,
+                        semantic_fingerprint=group.semantic_fingerprint,
+                        evidence_digest=group.evidence_digest,
+                        employee_request_digest=group.employee_request_digest,
+                        boundary_digest=group.boundary_digest,
+                        diagnostics=conflict_diagnostics,
+                    ),
+                ),
+            ),
+        ),
+    )
 
-    for status, review_diagnostics in (
-        ("clean", ()),
-        ("pending", ()),
-        ("invalid", diagnostics),
-        ("conflicted", diagnostics),
-    ):
+    for status, validation_status, workspace_review in cases:
+        review = document_review_projection_from_workspace(
+            state,
+            workspace_generation=11,
+            validation_status=validation_status,
+            workspace_review=workspace_review,
+        )
         view = to_consultant_snapshot_view(
             snapshot.model_copy(
-                update={
-                    "document_review": DocumentReviewProjection(
-                        workspace_generation=11,
-                        workspace_status=status,
-                        diagnostics=review_diagnostics,
-                        bundles=(),
-                        unresolved_action_count=0,
-                        blocked_branches=(),
-                        safe_interview_work_available=True,
-                        decision_required_before_more_interview=False,
-                    )
-                }
+                update={"document_review": review}
             )
         )
 
         assert view.document_review.workspace_generation == 11
         assert view.document_review.workspace_status.value == status
-        if review_diagnostics:
-            assert view.document_review.diagnostics[0].code == "workspace-rebase-conflict"
+        if status == "pending":
+            assert [action.status.value for action in view.document_review.bundles[0].actions] == [
+                "pending",
+                "deferred",
+            ]
+            assert view.document_review.unresolved_action_count == 2
+        if status == "conflicted":
+            assert view.document_review.bundles[0].acceptance_blocked is True
             assert view.document_review.diagnostics[0].path == "工作內容"
             assert "Technical" not in view.document_review.diagnostics[0].message

@@ -44,7 +44,10 @@ from app.consultant.workspace_state import (
     WorkspaceValidationStatus,
     approved_document_digest,
 )
-from app.consultant.workspace_validation import WorkspacePayloadValidation
+from app.consultant.workspace_validation import (
+    WorkspacePayloadValidation,
+    evidence_basis_digest,
+)
 
 
 _HEADER_FIELDS = (
@@ -716,6 +719,20 @@ def derive_workspace_review(
         )
     if approved.document_id != valid_workspace.document.approved_document.document_id:
         raise ValueError("workspace review document scope does not match")
+    if evidence_basis_digest(valid_workspace.current_sources) != (
+        manifest.evidence_basis_digest
+    ):
+        return WorkspaceReviewProjection(
+            workspace_digest=manifest.resource_digest,
+            diagnostics=(
+                WorkspaceDiagnostic(
+                    code="evidence-basis-stale",
+                    path="/workspace",
+                    message="Workspace review Evidence changed since the last validation.",
+                ),
+            ),
+            entity_ids_by_handle=manifest.entity_ids_by_handle,
+        )
     if manifest.approved_baseline_digest != approved_document_digest(approved):
         return WorkspaceReviewProjection(
             workspace_digest=manifest.resource_digest,
@@ -837,16 +854,29 @@ def workspace_review_files(projection: WorkspaceReviewProjection) -> dict[str, s
         for handle, stable_id in projection.entity_ids_by_handle.items()
     }
 
-    def semantic_value(value: Any) -> Any:
-        if isinstance(value, list):
-            return [semantic_value(item) for item in value]
-        if isinstance(value, dict):
-            return {key: semantic_value(item) for key, item in value.items()}
+    scalar_id_fields = {"duty_id", "task_id", "item_id"}
+    sequence_id_fields = {"task_ids", "indicator_ids"}
+
+    def semantic_identifier(value: Any) -> Any:
         if isinstance(value, str):
             try:
                 return handle_by_id.get(UUID(value), value)
             except ValueError:
                 return value
+        return value
+
+    def semantic_value(value: Any, *, field_name: str | None = None) -> Any:
+        if field_name in scalar_id_fields:
+            return semantic_identifier(value)
+        if field_name in sequence_id_fields and isinstance(value, list):
+            return [semantic_identifier(item) for item in value]
+        if isinstance(value, list):
+            return [semantic_value(item) for item in value]
+        if isinstance(value, dict):
+            return {
+                key: semantic_value(item, field_name=key)
+                for key, item in value.items()
+            }
         return value
 
     def semantic_path(path: str) -> str:
@@ -887,8 +917,14 @@ def workspace_review_files(projection: WorkspaceReviewProjection) -> dict[str, s
                             "action_id": str(action.action_id),
                             "operation": action.operation.value,
                             "path": semantic_path(action.path),
-                            "before": semantic_value(action.before),
-                            "after": semantic_value(action.after),
+                            "before": semantic_value(
+                                action.before,
+                                field_name=action.path.rstrip("/").rsplit("/", 1)[-1],
+                            ),
+                            "after": semantic_value(
+                                action.after,
+                                field_name=action.path.rstrip("/").rsplit("/", 1)[-1],
+                            ),
                             "status": action.status.value,
                             "atomic_subgroup_id": (
                                 str(action.atomic_subgroup_id)

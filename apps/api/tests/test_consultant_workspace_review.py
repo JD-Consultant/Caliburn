@@ -27,6 +27,7 @@ from app.consultant.workspace_review import (
     WorkspaceReviewDecision,
     WorkspaceReviewDecisionKind,
     derive_workspace_review,
+    workspace_review_files,
 )
 from app.consultant.workspace_state import (
     WorkspaceManifest,
@@ -226,6 +227,44 @@ def test_add_withdraw_reassign_and_reorder_are_derived_without_split_or_merge() 
     )
 
 
+def test_review_files_translate_only_structural_id_fields_to_handles() -> None:
+    files, registry = _workspace()
+    new_duty_id = workspace_entity_id(
+        DOCUMENT_ID, "duty-002", "duty", handle_registry=registry
+    )
+    registry["duty-002"] = new_duty_id
+    files["/workspace/duties/duty-002.json"] = json.dumps(
+        {"handle": "duty-002", "statement": "管理供應商"},
+        ensure_ascii=False,
+    )
+    _edit(
+        files,
+        "/workspace/header.json",
+        notes=str(TASK_ID),
+    )
+    _edit(
+        files,
+        "/workspace/tasks/task-001.json",
+        duty_handle="duty-002",
+        statement=str(DUTY_ID),
+        object=str(OUTPUT_ID),
+    )
+
+    serialized = workspace_review_files(_derive(files, registry))
+    actions = tuple(
+        action
+        for path, raw in serialized.items()
+        if path.startswith("/groups/")
+        for action in json.loads(raw)["actions"]
+    )
+    by_path = {action["path"]: action for action in actions}
+
+    assert by_path["/tasks/task-001/duty_id"]["after"] == "duty-002"
+    assert by_path["/tasks/task-001/statement"]["after"] == str(DUTY_ID)
+    assert by_path["/tasks/task-001/object"]["after"] == str(OUTPUT_ID)
+    assert by_path["/notes"]["after"] == str(TASK_ID)
+
+
 def test_existing_entity_display_order_is_a_reorder_not_a_revise() -> None:
     files, registry = _workspace()
     _edit(files, "/workspace/tasks/task-001.json", display_order=4)
@@ -258,7 +297,7 @@ def test_ten_independent_task_and_opks_changes_remain_individually_reviewable() 
             "opks": tuple(
                 ApprovedOpksItem(
                     item_id=UUID(f"00000000-0000-0000-0000-{840 + index:012d}"),
-                    kind=ApprovedOpksKind.KNOWLEDGE,
+                    kind=ApprovedOpksKind.OUTPUT,
                     text=f"規則 {index}",
                     display_order=index,
                     task_ids=(task.task_id,),
@@ -395,6 +434,19 @@ def test_valid_manifest_with_a_different_approved_baseline_is_not_reviewable() -
     assert any(item.code == "approved-baseline-stale" for item in review.diagnostics)
 
 
+def test_valid_workspace_with_a_stale_evidence_basis_is_not_reviewable() -> None:
+    files, registry = _workspace()
+    _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
+    manifest = _manifest(files, registry).model_copy(
+        update={"evidence_basis_digest": "e" * 64}
+    )
+
+    review = derive_workspace_review(_document(), _validated(files), manifest, ())
+
+    assert review.groups == ()
+    assert [item.code for item in review.diagnostics] == ["evidence-basis-stale"]
+
+
 def test_accepted_after_state_naturally_disappears_from_review_projection() -> None:
     files, registry = _workspace()
     _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
@@ -463,3 +515,40 @@ def test_defer_and_reject_are_projected_only_for_matching_fingerprints() -> None
         changed_basis = replace(reject, **{field: "a" * 64})
         revived = _derive(files, registry, decisions=(changed_basis,))
         assert len(revived.groups) == 1
+
+
+def test_raw_workspace_digest_change_revives_defer_but_not_reject() -> None:
+    files, registry = _workspace()
+    _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
+    pending = _derive(files, registry)
+    group = pending.groups[0]
+    defer = WorkspaceReviewDecision.from_group(
+        WorkspaceReviewDecisionKind.DEFER,
+        group,
+        workspace_digest=pending.workspace_digest,
+    )
+    reject = WorkspaceReviewDecision.from_group(
+        WorkspaceReviewDecisionKind.REJECT,
+        group,
+        workspace_digest=pending.workspace_digest,
+    )
+    raw_changed_files = dict(files)
+    task_path = "/workspace/tasks/task-001.json"
+    raw_changed_files[task_path] = json.dumps(
+        json.loads(raw_changed_files[task_path]),
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+    )
+
+    deferred_replay = _derive(raw_changed_files, registry, decisions=(defer,))
+    rejected_replay = _derive(raw_changed_files, registry, decisions=(reject,))
+
+    assert deferred_replay.workspace_digest != pending.workspace_digest
+    assert {
+        action.status for action in deferred_replay.groups[0].changeset.actions
+    } == {DocumentChangeStatus.PENDING}
+    assert rejected_replay.groups == ()
+    assert [item.code for item in rejected_replay.diagnostics] == [
+        "rejected-semantic-change"
+    ]

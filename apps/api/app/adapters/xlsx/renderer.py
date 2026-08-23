@@ -10,7 +10,7 @@ from openpyxl.cell.cell import Cell
 from openpyxl.styles import Alignment, Border, Font, Side
 from openpyxl.worksheet.worksheet import Worksheet
 
-from app.export import ExportDocument, ExportOpksEntry, ExportTaskEntry
+from app.export.models import ExportDocument, ExportOpksEntry, ExportTaskEntry
 
 
 XLSX_MEDIA_TYPE = (
@@ -18,7 +18,6 @@ XLSX_MEDIA_TYPE = (
 )
 SHEET_NAME = "職能基準表"
 TABLE_HEADER_ROW = 12
-ISSUED_BY_ICAP = "（iCAP 計畫執行單位提供）"
 TABLE_HEADERS = (
     "主要職責",
     "工作任務",
@@ -104,7 +103,7 @@ def _write_header(sheet: Worksheet, document: ExportDocument) -> None:
     _merge(sheet, 1, 1, 7)
 
     _put_text(sheet, 3, 1, "職能基準代碼", bold=True)
-    _put_text(sheet, 3, 2, ISSUED_BY_ICAP)
+    _put_text(sheet, 3, 2, None)
     _merge(sheet, 3, 2, 7)
 
     _put_text(sheet, 4, 1, "職能基準名稱\n（擇一填寫）", bold=True)
@@ -117,7 +116,7 @@ def _write_header(sheet: Worksheet, document: ExportDocument) -> None:
 
     _put_text(sheet, 6, 1, "所屬類別", bold=True)
     categories = (
-        ("職類別", header.occupation_category_name, "職類別代碼", ISSUED_BY_ICAP),
+        ("職類別", header.occupation_category_name, "職類別代碼", None),
         ("職業別", header.occupation_name, "職業別代碼", header.occupation_code),
         ("行業別", header.industry_name, "行業別代碼", header.industry_code),
     )

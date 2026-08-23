@@ -7,9 +7,6 @@ from sqlalchemy.ext.asyncio import create_async_engine
 from alembic import context
 
 from app.config import settings
-from app.models.base import Base
-# Current-only metadata used by autogenerate; migrations remain the schema authority.
-import app.adapters.postgres.models  # noqa: F401
 
 if sys.platform == "win32":
     asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
@@ -18,7 +15,7 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-target_metadata = Base.metadata
+target_metadata = None
 
 
 def run_migrations_offline() -> None:

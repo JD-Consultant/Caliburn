@@ -15,6 +15,13 @@ import pytest
         "app.interview",
         "app.interview_vnext",
         "app.job_authoring",
+        "app.core",
+        "app.documents",
+        "app.task_analysis",
+        "app.opks",
+        "app.consultation",
+        "app.models",
+        "app.adapters.postgres",
     ],
 )
 def test_removed_runtime_modules_are_gone(mod):

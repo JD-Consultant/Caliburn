@@ -1,24 +1,19 @@
 # Caliburn Web
 
-Next.js 本機工作台，只服務現行 Job Analysis API。`/` 導向 `/workspace`；文件庫與單一文件工作頁分別是 `/workspace` 與 `/workspace/[document_id]`。
+Next.js 本機員工顧問工作區。`/` 導向 `/workspace`；文件庫與單一文件頁分別是 `/workspace` 與 `/workspace/[document_id]`。
 
 ## 結構
 
-Web 依 UI responsibility 採 feature-first；`shared` 只放 HTTP／query／通用 UI，不放 domain policy；跨 feature 組裝只在 Next.js app workspace composition（`app/workspace/[document_id]/_components/`）。
+- `src/features/consultant/`：文件庫、訪談對話、AI 目前理解／焦點／Gap／語意進度、必要澄清、待審文件變更與核准文件 editor。
+- `src/shared/api/jobAnalysisApi.ts`：唯一 consultant API client。
+- `src/shared/query/jobAnalysisQueries.ts`：TanStack Query keys、revision-monotonic cache 與 invalidation。
+- `src/shared/ui/`：通用 UI；不放 domain policy。
+- `src/app/workspace/`：App Router composition；只從 feature barrel 掛載。
+- `src/architecture.test.ts`：feature-first import boundary。
 
-- `src/features/documents/`：文件庫、JD header、Duty／Task 員工直接編輯與 readiness 提示。
-- `src/features/consultation/`：Task Proposal 卡片與決策 helper。
-- `src/features/opks/`：OPKS 編輯、Proposal 卡片與 helper。
-- `src/features/export/`：匯出 dirty-state／檔名純函式（無獨立 UI）。
-- `src/shared/api/jobAnalysisApi.ts`：唯一 API client。
-- `src/shared/query/jobAnalysisQueries.ts`：TanStack Query options／keys。
-- `src/shared/ui/`：shadcn-style 通用元件。
-- `src/shared/providers/Providers.tsx`：TanStack Query client。
-- `src/app/workspace/[document_id]/_components/`：`ConsultationPanel`／`ConsultationWorkspace`，因同時協調 Task／OPKS proposal，留在 app 層組裝而非任一 feature 內。
-- `src/architecture.test.ts`：AST 掃 import，擋 `shared → feature`、`feature ↔ feature`、`app` 繞過 feature `index.ts` 的深路徑 import。
-- `packages/job-analysis-contract/`：生成的 TypeScript DTO 來源。
+Web 只讀 purpose-first durable snapshot，不解析 LangGraph checkpoint／interrupt／receipt，也不重算 authority、evidence、readiness 或完成度。正式文件草稿只存在 document-scoped localStorage，不能成為第二份 server document store。所有 AI 文件內容都先讓員工 accept／edit-accept／reject／defer；員工直接編輯另走 authority command。
 
-Web 不保留舊 dashboard、OCS editor、interview component、舊 store 或 OCS contract；新功能只能接 `/api/v1/job-analysis` 與現有 Job Analysis contract。
+目前沒有 RAG／Reference UI、consumer 或 contract。能力級別與 A 只有員工可直接編輯，LLM 不產生。
 
 ## 驗證
 
@@ -28,4 +23,4 @@ npx tsc --noEmit
 npm run lint
 ```
 
-Web 不自行重算 readiness、Evidence 或 authority state；讀取 API projection，寫入使用 API 回傳的 idempotency／decision contract。跨 app 流程見 [`docs/design/task-analysis-engine.md`](../../docs/design/task-analysis-engine.md)。
+跨 app 真相見 [`docs/design/consultant-runtime.md`](../../docs/design/consultant-runtime.md)。

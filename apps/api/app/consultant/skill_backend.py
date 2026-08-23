@@ -53,8 +53,9 @@ class PackageSkillBackend(BackendProtocol):
     """Expose only explicitly selected, versioned Skill resources.
 
     Metadata discovery uses ``download_files``.  A model's full ``read_file``
-    access goes through ``read`` and is limited to one successful full load per
-    selected Skill in each interactive invocation.
+    access goes through ``read``. Reads are idempotent so framework context
+    summarization can safely reload a method that is no longer in model context;
+    loaded-skill receipts still record each Skill only once per invocation.
     """
 
     def __init__(self, selected_skill_ids: tuple[str, ...]) -> None:
@@ -127,9 +128,7 @@ class PackageSkillBackend(BackendProtocol):
                 )
             )
         with self._read_lock:
-            if self._read_counts[skill_id] >= 1:
-                return ReadResult(error=f"Skill '{skill_id}' was already loaded")
-            self._read_counts[skill_id] += 1
+            self._read_counts[skill_id] = 1
         return slice_read_response(
             {"content": self._contents[skill_id], "encoding": "utf-8"},
             offset,

@@ -28,7 +28,12 @@ from app.consultant.state import (
     SourceValidity,
     initial_thread_state,
 )
-from app.consultant.views import ConsultantTurnProjection, snapshot_from_state
+from app.consultant.views import (
+    ConsultantTurnProjection,
+    document_review_projection_from_workspace,
+    snapshot_from_state,
+)
+from app.consultant.workspace_review import WorkspaceReviewProjection
 from app.consultant.workspace_state import (
     WorkspaceDiagnostic,
     WorkspaceValidationStatus,
@@ -129,7 +134,6 @@ def _execution(*, max_context_tokens: int = 24_000):
             ),
             max_context_tokens=max_context_tokens,
             max_model_calls=8,
-            max_lookup_waves=2,
             max_total_tool_calls=12,
             model_retry_count=0,
             tool_retry_count=0,
@@ -150,7 +154,14 @@ def _snapshot(document: ApprovedJobDocument, source: EmployeeSource):
             "approved_document": document.model_dump(mode="json"),
         }
     )
-    return snapshot_from_state(state)
+    snapshot = snapshot_from_state(state)
+    review = document_review_projection_from_workspace(
+        state,
+        workspace_generation=1,
+        validation_status=WorkspaceValidationStatus.VALID,
+        workspace_review=WorkspaceReviewProjection(workspace_digest="a" * 64),
+    )
+    return snapshot.model_copy(update={"document_review": review})
 
 
 @pytest.mark.asyncio
@@ -189,6 +200,11 @@ async def test_context_keeps_current_employee_turn_and_compact_workspace_orienta
     assert "/approved" in prompt
     assert "/review" in prompt
     assert "/sources/current/source-001.txt" in prompt
+    assert "already supplied as the current HumanMessage" in prompt
+    assert "do not reread that path" in prompt
+    assert "only when their details are needed" in prompt
+    assert "do not reread a path whose result is still in context" in prompt
+    assert "Read the exact approved and review index paths directly" not in prompt
     assert '"approved_index_path":"/approved/index.json"' in prompt
     assert '"review_index_path":"/review/index.json"' in prompt
     assert '"workspace_root":"/workspace"' in prompt
@@ -241,6 +257,36 @@ async def test_context_injects_only_compact_workspace_validation_navigation() ->
     assert "/workspace/tasks/task-001.json" in prompt
     assert summary.resource_digest not in prompt
     assert document.work_description not in prompt
+
+
+@pytest.mark.asyncio
+async def test_valid_workspace_status_is_trusted_without_becoming_a_completion_signal() -> None:
+    document = _document()
+    source = _source()
+    summary = WorkspaceValidationSummary(
+        generation=5,
+        status=WorkspaceValidationStatus.VALID,
+        resource_digest="b" * 64,
+        diagnostics=(),
+    )
+
+    bundle = await build_consultant_context(
+        runtime=InMemorySourceRuntime((source,)),  # type: ignore[arg-type]
+        snapshot=_snapshot(document, source),
+        execution=_execution(),
+        request=ContextRequest(
+            run_id=RUN_ID,
+            current_source_id=source.source_id,
+            current_source_handle="source-001",
+            selected_skill_ids=("task-boundary",),
+        ),
+        workspace_validation=summary,
+    )
+
+    prompt = bundle.system_prompt
+    assert "application-owned validation result" in prompt
+    assert "do not reread files merely to reconfirm it" in prompt
+    assert "valid does not mean the current employee turn was already processed" in prompt
 
 
 @pytest.mark.asyncio

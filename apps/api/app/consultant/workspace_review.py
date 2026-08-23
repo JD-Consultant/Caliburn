@@ -112,6 +112,7 @@ class WorkspaceReviewDecision:
     employee_request_digest: Sha256Digest
     boundary_digest: Sha256Digest
     selected_action_ids: tuple[UUID, ...] = ()
+    selected_action_fingerprints: tuple[Sha256Digest, ...] = ()
 
     @classmethod
     def from_group(
@@ -122,6 +123,12 @@ class WorkspaceReviewDecision:
         workspace_digest: Sha256Digest,
         selected_action_ids: tuple[UUID, ...] = (),
     ) -> WorkspaceReviewDecision:
+        selected_ids = set(selected_action_ids)
+        selected_actions = tuple(
+            action
+            for action in group.actions
+            if not selected_ids or action.action_id in selected_ids
+        )
         return cls(
             kind=kind,
             workspace_digest=workspace_digest,
@@ -131,6 +138,10 @@ class WorkspaceReviewDecision:
             employee_request_digest=group.employee_request_digest,
             boundary_digest=group.boundary_digest,
             selected_action_ids=selected_action_ids,
+            selected_action_fingerprints=tuple(
+                workspace_action_semantic_fingerprint(action)
+                for action in selected_actions
+            ),
         )
 
 
@@ -971,6 +982,14 @@ def _action_semantics(action: DocumentPatchAction) -> dict[str, Any]:
     }
 
 
+def workspace_action_semantic_fingerprint(
+    action: DocumentPatchAction,
+) -> Sha256Digest:
+    """Return stable identity for one unchanged employee-facing semantic edit."""
+
+    return _digest(_action_semantics(action))
+
+
 def _group_components(
     actions: Sequence[DocumentPatchAction],
 ) -> tuple[tuple[DocumentPatchAction, ...], ...]:
@@ -1164,20 +1183,56 @@ def _unavailable_diagnostics(
     )
 
 
-def _matches_rejection(
+def _rejected_action_ids(
     decision: WorkspaceReviewDecision,
     group: WorkspaceReviewGroup,
-) -> bool:
-    selected = set(decision.selected_action_ids)
-    action_ids = {action.action_id for action in group.actions}
-    return (
-        decision.kind is WorkspaceReviewDecisionKind.REJECT
-        and (not selected or action_ids <= selected)
-        and decision.semantic_fingerprint == group.semantic_fingerprint
-        and decision.evidence_digest == group.evidence_digest
-        and decision.employee_request_digest == group.employee_request_digest
-        and decision.boundary_digest == group.boundary_digest
-    )
+) -> set[UUID]:
+    if (
+        decision.kind is not WorkspaceReviewDecisionKind.REJECT
+        or decision.semantic_fingerprint != group.semantic_fingerprint
+        or decision.evidence_digest != group.evidence_digest
+        or decision.boundary_digest != group.boundary_digest
+    ):
+        return set()
+    selected_fingerprints = set(decision.selected_action_fingerprints)
+    if selected_fingerprints:
+        return {
+            action.action_id
+            for action in group.actions
+            if workspace_action_semantic_fingerprint(action) in selected_fingerprints
+        }
+    selected_ids = set(decision.selected_action_ids)
+    return selected_ids & {action.action_id for action in group.actions}
+
+
+def _deferred_action_ids(
+    decision: WorkspaceReviewDecision,
+    group: WorkspaceReviewGroup,
+    manifest: WorkspaceManifest,
+) -> set[UUID]:
+    if (
+        decision.kind is not WorkspaceReviewDecisionKind.DEFER
+        or decision.group_digest != group.group_digest
+        or decision.boundary_digest != group.boundary_digest
+    ):
+        return set()
+    selected_fingerprints = set(decision.selected_action_fingerprints)
+    if selected_fingerprints:
+        return {
+            action.action_id
+            for action in group.actions
+            if workspace_action_semantic_fingerprint(action) in selected_fingerprints
+        }
+    if decision.workspace_digest == manifest.resource_digest:
+        return set(decision.selected_action_ids) or {
+            action.action_id for action in group.actions
+        }
+    # Backward compatibility for decision records written before selected
+    # semantic fingerprints were persisted.  A whole unchanged group can be
+    # mapped safely; a partial legacy selection cannot.
+    if len(decision.selected_action_ids) == len(group.actions):
+        return {action.action_id for action in group.actions}
+    return set()
 
 
 def _conflict_affects_action(
@@ -1349,11 +1404,21 @@ def derive_workspace_review(
         if group_conflicts:
             group = replace(group, diagnostics=group_conflicts)
             matched_diagnostics.update(group_conflicts)
-        if any(_matches_rejection(decision, group) for decision in decisions):
+        rejected_action_ids = set().union(
+            *(
+                _rejected_action_ids(decision, group)
+                for decision in decisions
+            )
+        )
+        if rejected_action_ids:
             diagnostics.append(
                 WorkspaceDiagnostic(
                     code="rejected-semantic-change",
-                    path=group.changeset.actions[0].path,
+                    path=next(
+                        action.path
+                        for action in group.changeset.actions
+                        if action.action_id in rejected_action_ids
+                    ),
                     message=(
                         "This unchanged semantic proposal remains rejected; add new "
                         "employee Evidence or change its work boundary before review."
@@ -1361,18 +1426,37 @@ def derive_workspace_review(
                     severity=WorkspaceDiagnosticSeverity.WARNING,
                 )
             )
-            continue
-        deferred_action_ids = {
-            action_id
-            for decision in decisions
-            if decision.kind is WorkspaceReviewDecisionKind.DEFER
-            and decision.workspace_digest == manifest.resource_digest
-            and decision.group_digest == group.group_digest
-            for action_id in (
-                decision.selected_action_ids
-                or tuple(action.action_id for action in group.actions)
+            remaining_actions = tuple(
+                action
+                for action in group.changeset.actions
+                if action.action_id not in rejected_action_ids
             )
-        }
+            if not remaining_actions:
+                continue
+            group = replace(
+                group,
+                changeset=group.changeset.model_copy(
+                    update={
+                        "actions": remaining_actions,
+                        "source_ids": tuple(
+                            sorted(
+                                {
+                                    source_id
+                                    for action in remaining_actions
+                                    for source_id in action.source_ids
+                                },
+                                key=str,
+                            )
+                        ),
+                    }
+                ),
+            )
+        deferred_action_ids = set().union(
+            *(
+                _deferred_action_ids(decision, group, manifest)
+                for decision in decisions
+            )
+        )
         deferred = bool(deferred_action_ids)
         if deferred:
             group = WorkspaceReviewGroup(

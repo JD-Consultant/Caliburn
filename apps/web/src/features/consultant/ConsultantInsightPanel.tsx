@@ -25,6 +25,7 @@ import { Card } from "@/shared/ui/card";
 import {
   interviewWorkStatusLabel,
   understandingStatusLabel,
+  workspaceSections,
 } from "./consultantWorkspaceModel";
 
 function errorText(error: unknown): string {
@@ -70,6 +71,7 @@ export function ConsultantInsightPanel({
   const [clarificationText, setClarificationText] = useState("");
   const calibration = snapshot.understanding.calibration;
   const clarification = snapshot.required_clarification;
+  const focus = workspaceSections(snapshot).focus;
 
   const refresh = async () => {
     await refreshConsultantQueries(queryClient, documentId);
@@ -246,24 +248,24 @@ export function ConsultantInsightPanel({
           <Compass className="mt-0.5 size-5 shrink-0 text-amber-700" />
           <div className="min-w-0 flex-1">
             <p className="text-xs font-semibold tracking-[0.16em] text-stone-500 uppercase">
-              目前訪談重點
+              {focus?.label ?? "目前訪談重點"}
             </p>
-            {snapshot.current_interview ? (
+            {focus ? (
               <>
                 <h2 className="mt-1 text-lg font-semibold">
-                  {snapshot.current_interview.title}
+                  {focus.title}
                 </h2>
                 <p className="mt-2 text-sm leading-6 text-stone-700">
-                  {snapshot.current_interview.why_now}
+                  {focus.whyNow}
                 </p>
-                {snapshot.current_interview.missing_before_enough ? (
+                {focus.missingBeforeEnough ? (
                   <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-950">
-                    還差：{snapshot.current_interview.missing_before_enough}
+                    還差：{focus.missingBeforeEnough}
                   </p>
                 ) : null}
-                {snapshot.current_interview.recommended_next_step ? (
+                {focus.recommendedNextStep ? (
                   <p className="mt-3 text-sm font-medium text-stone-700">
-                    接下來：{snapshot.current_interview.recommended_next_step}
+                    接下來：{focus.recommendedNextStep}
                   </p>
                 ) : null}
               </>
@@ -390,9 +392,21 @@ export function ConsultantInsightPanel({
               訪談進度
             </p>
             <h2 className="mt-1 font-semibold">
-              目前知道 {snapshot.semantic_progress.currently_known_work_count} 項工作
+              目前已辨識 {snapshot.semantic_progress.currently_known_work_count} 項工作
             </h2>
           </div>
+        </div>
+
+        <div
+          aria-label="文件變更決定進度"
+          className="mt-4 flex flex-wrap gap-2 text-sm"
+        >
+          <span className="rounded-full bg-amber-50 px-3 py-1.5 text-amber-900">
+            待你確認 {snapshot.semantic_progress.employee_decisions.pending} 項
+          </span>
+          <span className="rounded-full bg-stone-100 px-3 py-1.5 text-stone-700">
+            你已延後 {snapshot.semantic_progress.employee_decisions.deferred} 項
+          </span>
         </div>
 
         <div className="mt-4 space-y-3">

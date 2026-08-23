@@ -299,7 +299,7 @@ def _settings() -> Settings:
 def test_configured_execution_has_exactly_the_virtual_workspace_tools() -> None:
     execution = build_configured_execution(_settings())
 
-    assert execution.policy_revision == 2
+    assert execution.policy_revision == 3
     assert execution.max_model_calls == 11
     assert execution.max_total_tokens == 160_000
     assert execution.max_cost_usd == Decimal("2.00")

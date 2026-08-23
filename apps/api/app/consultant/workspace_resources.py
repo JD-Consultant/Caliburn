@@ -184,6 +184,7 @@ class WorkspaceCatalog:
         sources: Sequence[EmployeeSource] = (),
         *,
         employee_sources: Sequence[EmployeeSource] | None = None,
+        handle_registry: Mapping[str, UUID] | None = None,
     ) -> WorkspaceCatalog:
         source_values = tuple(
             sorted(
@@ -212,20 +213,31 @@ class WorkspaceCatalog:
             )
         )
 
-        stable_to_handle: dict[UUID, str] = {}
-        handle_to_stable: dict[str, UUID] = {}
+        handle_to_stable = _validated_workspace_registry(handle_registry or {})
+        stable_to_handle = {
+            stable_id: handle for handle, stable_id in handle_to_stable.items()
+        }
 
-        def add_mapping(stable_id: UUID, handle: str) -> None:
-            if stable_id in stable_to_handle:
-                raise WorkspaceResourceError(f"stable ID collision: {stable_id}")
-            if handle in handle_to_stable:
-                raise WorkspaceResourceError(f"workspace handle collision: {handle}")
+        def ensure_mapping(stable_id: UUID, prefix: str, index: int) -> None:
+            existing = stable_to_handle.get(stable_id)
+            if existing is not None:
+                if not existing.startswith(f"{prefix}-"):
+                    raise WorkspaceResourceError(
+                        f"stable ID collision: {stable_id} has the wrong workspace "
+                        "handle kind"
+                    )
+                return
+            next_index = index
+            handle = f"{prefix}-{next_index:03d}"
+            while handle in handle_to_stable:
+                next_index += 1
+                handle = f"{prefix}-{next_index:03d}"
             stable_to_handle[stable_id] = handle
             handle_to_stable[handle] = stable_id
 
         for prefix, values in _sorted_entity_groups(document):
             for index, stable_id in enumerate(values, start=1):
-                add_mapping(stable_id, f"{prefix}-{index:03d}")
+                ensure_mapping(stable_id, prefix, index)
 
         source_ids = {source.source_id for source in source_values}
         source_ids.update(
@@ -244,7 +256,7 @@ class WorkspaceCatalog:
             else (1, str(source_id)),
         )
         for index, source_id in enumerate(source_order, start=1):
-            add_mapping(source_id, f"source-{index:03d}")
+            ensure_mapping(source_id, "source", index)
 
         source_by_handle = {
             stable_to_handle[stable_id]: source

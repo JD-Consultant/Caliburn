@@ -14,9 +14,13 @@
 
 - [`design/consultant-runtime.md`](design/consultant-runtime.md) — LangChain／LangGraph durable consultant、context、Skills、文件審核／authority、API、Web 與 export 的端到端真相。
 - [`adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md`](adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) — **Accepted** framework replacement、單一 durable authority、Big-bang 與延後 RAG 的決策。
-- [`adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md`](adr/0064-deep-agents-virtual-jd-workspace-and-deterministic-evidence-anchor.md) — **Proposed** Deep Agents 受限虛擬 JD editor、薄 domain check、typed publication gate 與 application-derived Evidence anchor。
-- [`specs/2026-08-21-provider-neutral-virtual-jd-editor-and-evidence-anchor-research.md`](specs/2026-08-21-provider-neutral-virtual-jd-editor-and-evidence-anchor-research.md) — Codex／Claude／Deep Agents 官方做法、現行 mega-form／quote-offset 診斷、方案與施工邊界。
-- [`plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md) — 逐 task 驗證與 hard-cut 計畫。
+- [`adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md`](adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md) — **Accepted** 一份 JD 一個持久、非權威工作草稿，以及 derived semantic review 與員工 authority。
+- [`adr/0067-deep-agents-store-backed-jd-working-draft.md`](adr/0067-deep-agents-store-backed-jd-working-draft.md) — **Accepted** 以 Deep Agents `StoreBackend`／LangGraph Store 保存 active workspace；Saver 仍負責對話與核准 authority。
+- [`adr/0068-framework-run-budgets-replace-lookup-wave-cap.md`](adr/0068-framework-run-budgets-replace-lookup-wave-cap.md) — **Accepted** 以 LangChain model／Tool budgets 與既有 token／cost／elapsed guards 取代自寫 lookup-wave 上限。
+- [`specs/2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](specs/2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md) — OpenAI／Anthropic／Microsoft／Google／LangChain 官方做法、方案比較與現行產品邊界。
+- [`specs/2026-08-23-luna-structured-tools-and-context-official-audit.md`](specs/2026-08-23-luna-structured-tools-and-context-official-audit.md) — Luna／OpenRouter／LangChain／Deep Agents 官方文件重審、strict schema 實測與未提交 workaround 裁決。
+- [`specs/2026-08-22-persistent-store-backed-jd-working-draft-completion.md`](specs/2026-08-22-persistent-store-backed-jd-working-draft-completion.md) — 持久工作草稿升級的產品對照、framework mapping、live evidence、Final Gate 與已知界線。
+- [`plans/2026-08-22-persistent-store-backed-jd-working-draft-plan.md`](plans/2026-08-22-persistent-store-backed-jd-working-draft-plan.md) — 現行持久草稿逐 task 驗證、hard-cut、browser／live gate 與 traceability 計畫。
 - [`specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md`](specs/2026-08-14-consultant-runtime-north-star-audit-ledger.md) — 每個功能切片回看產品大方向與 framework 覆蓋的證據。
 - [`contract-strategy.md`](contract-strategy.md) — 現行 `job-analysis-contract` 的契約規範。
 - [`adr/README.md`](adr/README.md) — ADR 索引；0057 記錄 current-only hard cut。

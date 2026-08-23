@@ -14,7 +14,6 @@ from langchain_core.messages import AIMessage
 
 import app.consultant.provider_wire as provider_wire
 from app.config import Settings
-from app.consultant.agent import LookupWaveLimitExceeded, LookupWaveLimitMiddleware
 from app.consultant.model_runtime import (
     ConsultantModelProfile,
     OutputTokenParameter,
@@ -69,7 +68,6 @@ def _execution(*, max_model_calls: int = 8):
         allowed_tool_ids=tuple(sorted(EXPECTED_WORKSPACE_TOOLS)),
         max_context_tokens=24_000,
         max_model_calls=max_model_calls,
-        max_lookup_waves=2,
         max_total_tool_calls=24,
         model_retry_count=0,
         tool_retry_count=0,
@@ -217,90 +215,6 @@ def test_provider_evidence_has_handle_quote_occurrence_without_model_offsets() -
     )
     assert basis.evidence[0].source_handle == "source-001"
     assert basis.evidence[0].occurrence == 2
-
-
-def test_lookup_wave_counts_only_path_aware_external_workspace_reads() -> None:
-    middleware = LookupWaveLimitMiddleware(
-        tool_names=frozenset({"ls", "read_file", "grep"}),
-        run_limit=2,
-    )
-    workspace_read = {
-        "messages": [
-            AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "read_file",
-                        "args": {"file_path": "/workspace/run-1/job.json"},
-                        "id": "workspace-read",
-                        "type": "tool_call",
-                    }
-                ],
-            )
-        ]
-    }
-    external_read = {
-        "messages": [
-            AIMessage(
-                content="",
-                tool_calls=[
-                    {
-                        "name": "read_file",
-                        "args": {"file_path": "/sources/current/source-001.txt"},
-                        "id": "source-read",
-                        "type": "tool_call",
-                    }
-                ],
-            )
-        ]
-    }
-
-    assert middleware.after_model(workspace_read, runtime=None) is None  # type: ignore[arg-type]
-    assert middleware.after_model(external_read, runtime=None) == {
-        "run_lookup_wave_count": 1
-    }
-
-
-def test_composite_grep_paths_consume_lookup_waves_but_workspace_grep_does_not() -> None:
-    middleware = LookupWaveLimitMiddleware(
-        tool_names=frozenset({"ls", "read_file", "grep"}),
-        run_limit=2,
-    )
-
-    def state(path: str | None, count: int = 0) -> dict[str, object]:
-        args = {} if path is None else {"path": path}
-        return {
-            "messages": [
-                AIMessage(
-                    content="",
-                    tool_calls=[
-                        {
-                            "name": "grep",
-                            "args": args,
-                            "id": "grep",
-                            "type": "tool_call",
-                        }
-                    ],
-                )
-            ],
-            "run_lookup_wave_count": count,
-        }
-
-    assert middleware.after_model(state(None), runtime=None) == {
-        "run_lookup_wave_count": 1
-    }
-    assert middleware.after_model(state("/", count=1), runtime=None) == {
-        "run_lookup_wave_count": 2
-    }
-    with pytest.raises(LookupWaveLimitExceeded):
-        middleware.after_model(state("/.", count=2), runtime=None)
-    with pytest.raises(LookupWaveLimitExceeded):
-        middleware.after_model(state("/./", count=2), runtime=None)
-    assert middleware.after_model(
-        state("/workspace/run-1", count=2), runtime=None
-    ) is None
-    with pytest.raises(LookupWaveLimitExceeded):
-        middleware.after_model(state(None, count=2), runtime=None)
 
 
 def test_execution_preserves_reasoning_and_output_token_configuration() -> None:

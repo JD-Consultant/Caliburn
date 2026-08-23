@@ -16,6 +16,7 @@ from langchain.agents.middleware.types import AgentState, PrivateStateAttr
 from langchain_core.messages import AIMessage
 from langgraph.channels.untracked_value import UntrackedValue
 from langgraph.runtime import Runtime
+from pydantic import ValidationError
 from typing_extensions import NotRequired, override
 
 from app.consultant.evidence_anchor import EvidenceAnchorError, resolve_evidence_reference
@@ -31,7 +32,11 @@ from app.consultant.verification import requires_anchored_employee_quote
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
     WorkspaceDocumentDraft,
+    WorkspaceDutyResource,
+    WorkspaceHeaderResource,
+    WorkspaceOpksResource,
     WorkspaceResourceError,
+    WorkspaceTaskResource,
     parse_workspace_files,
     project_workspace_files,
     workspace_entity_id,
@@ -59,6 +64,55 @@ _ENTITY_PATH = re.compile(
     r"^/workspace/(?:(duties)/(duty-[^/]+)|(tasks)/(task-[^/]+)|"
     r"opks/(o|p|k|s)/((?:o|p|k|s)-[^/]+))\.json$"
 )
+
+
+def _implicit_display_order(
+    files: Mapping[str, str],
+    resource_path: str,
+) -> int | None:
+    if resource_path.startswith("/workspace/duties/"):
+        paths = sorted(
+            path for path in files if path.startswith("/workspace/duties/")
+        )
+    elif resource_path.startswith("/workspace/tasks/"):
+        paths = sorted(
+            path for path in files if path.startswith("/workspace/tasks/")
+        )
+    elif resource_path.startswith("/workspace/opks/"):
+        kind_order = {"o": 0, "p": 1, "k": 2, "s": 3}
+
+        def opks_key(path: str) -> tuple[int, str]:
+            parts = path.split("/")
+            return kind_order.get(parts[3] if len(parts) > 3 else "", 99), path
+
+        paths = sorted(
+            (path for path in files if path.startswith("/workspace/opks/")),
+            key=opks_key,
+        )
+    else:
+        return None
+    try:
+        return paths.index(resource_path)
+    except ValueError:
+        return None
+
+
+def _normalized_conflict_resource(
+    files: Mapping[str, str],
+    resource_path: str,
+    value: Any,
+) -> Any:
+    model = _resource_schema_model(resource_path)
+    if model is None:
+        return value
+    try:
+        normalized = model.model_validate(value).model_dump(mode="json")
+    except ValueError:
+        return value
+    normalized.pop("evidence", None)
+    if normalized.get("display_order") is None:
+        normalized["display_order"] = _implicit_display_order(files, resource_path)
+    return normalized
 
 
 @dataclass(frozen=True, slots=True)
@@ -124,12 +178,12 @@ def _resource_value(
     if raw is None:
         return False, None
     pointer = diagnostic_path[marker + len(".json") :]
-    if not pointer:
-        return True, raw
     try:
         value: Any = json.loads(raw)
     except json.JSONDecodeError:
         return True, raw
+    if not pointer:
+        return True, _normalized_conflict_resource(files, resource_path, value)
     for segment in pointer.removeprefix("/").split("/"):
         segment = segment.replace("~1", "/").replace("~0", "~")
         if isinstance(value, dict) and segment in value:
@@ -243,7 +297,7 @@ def _resource_error_diagnostic(
         safe_message = "Resource references a missing Duty, Task, or indicator handle."
     elif "invalid resource" in lowered:
         code = "schema"
-        safe_message = "Resource does not match the canonical JD schema."
+        safe_message = _safe_schema_error_message(error)
     elif "handle" in lowered or "stable id" in lowered or "collision" in lowered:
         code = "identity"
         safe_message = "Resource identity does not match its path or registry."
@@ -255,6 +309,81 @@ def _resource_error_diagnostic(
         _workspace_path_from_error(error, files),
         safe_message,
     )
+
+
+def _safe_schema_error_message(error: BaseException) -> str:
+    """Keep Pydantic's actionable location/type while omitting input values."""
+
+    cause: BaseException | None = error
+    while cause is not None and not isinstance(cause, ValidationError):
+        cause = cause.__cause__
+    if not isinstance(cause, ValidationError):
+        return "Resource does not match the canonical JD schema."
+    issues = cause.errors(
+        include_url=False,
+        include_context=False,
+        include_input=False,
+    )
+    if not issues:
+        return "Resource does not match the canonical JD schema."
+    issue = issues[0]
+    location = ".".join(str(part) for part in issue.get("loc", ()))[:120]
+    issue_type = str(issue.get("type", "validation_error"))
+    if issue_type == "extra_forbidden" and location:
+        return f"Unexpected field `{location}` is not part of this resource schema; remove it."
+    if issue_type == "missing" and location:
+        return f"Required field `{location}` is missing."
+    if location:
+        return f"Field `{location}` is invalid ({issue_type})."
+    return f"Resource does not match the canonical JD schema ({issue_type})."
+
+
+def _resource_schema_model(path: str) -> type[Any] | None:
+    if path == "/workspace/header.json":
+        return WorkspaceHeaderResource
+    match = _ENTITY_PATH.fullmatch(path)
+    if match is None:
+        return None
+    if match.group(1) == "duties":
+        return WorkspaceDutyResource
+    if match.group(3) == "tasks":
+        return WorkspaceTaskResource
+    return WorkspaceOpksResource
+
+
+def _resource_schema_diagnostics(
+    files: Mapping[str, str],
+) -> tuple[WorkspaceDiagnostic, ...]:
+    """Preflight independent resources so one bad file cannot hide the next."""
+
+    diagnostics: list[WorkspaceDiagnostic] = []
+    for path, raw in sorted(files.items()):
+        model = _resource_schema_model(path)
+        if model is None:
+            continue
+        try:
+            payload = json.loads(raw)
+        except (TypeError, ValueError):
+            diagnostics.append(
+                _diagnostic("json-syntax", path, "Resource is not valid JSON.")
+            )
+        else:
+            try:
+                model.model_validate(payload)
+            except ValidationError as error:
+                lowered = str(error).casefold()
+                if "duplicate task_handles" in lowered or "must reference" in lowered:
+                    code = "jd-invariant"
+                    message = "JD relationship cardinality is invalid."
+                else:
+                    code = "schema"
+                    message = _safe_schema_error_message(error)
+                diagnostics.append(
+                    _diagnostic(code, path, message)
+                )
+        if len(diagnostics) >= _MAX_DIAGNOSTICS:
+            break
+    return tuple(diagnostics)
 
 
 def _current_sources(catalog: WorkspaceCatalog) -> tuple[EmployeeSource, ...]:
@@ -489,6 +618,15 @@ def validate_workspace_payload(
     """Parse and validate one persistent workspace payload without side effects."""
 
     normalized = dict(sorted(files.items()))
+    schema_diagnostics = _resource_schema_diagnostics(normalized)
+    if schema_diagnostics:
+        return WorkspacePayloadValidation(
+            document=None,
+            diagnostics=schema_diagnostics,
+            current_sources=_current_sources(catalog),
+            evidence_by_handle={},
+            default_basis=None,
+        )
     try:
         draft = parse_workspace_files(
             catalog.document_id,
@@ -643,6 +781,37 @@ def _entity_registry(
     return registry, None
 
 
+def _approved_registry_issue(
+    *,
+    files: Mapping[str, str],
+    document: ApprovedJobDocument,
+    manifest: WorkspaceManifest,
+) -> WorkspaceDiagnostic | None:
+    """Reject a manifest that forgot an already-approved editable identity."""
+
+    expected = project_workspace_files(document, handle_registry={}).handle_registry
+    actual_handle_by_id = {
+        stable_id: handle
+        for handle, stable_id in manifest.entity_ids_by_handle.items()
+    }
+    for expected_handle, stable_id in expected.items():
+        actual_handle = actual_handle_by_id.get(stable_id)
+        if actual_handle is None:
+            return _diagnostic(
+                "identity",
+                _workspace_path_for_handle(files, expected_handle),
+                "Workspace registry no longer contains an approved stable identity.",
+            )
+        expected_prefix = expected_handle.split("-", maxsplit=1)[0]
+        if not actual_handle.startswith(f"{expected_prefix}-"):
+            return _diagnostic(
+                "identity",
+                _workspace_path_for_handle(files, actual_handle),
+                "Workspace handle no longer matches its approved entity kind.",
+            )
+    return None
+
+
 class WorkspaceValidationService:
     def __init__(
         self,
@@ -713,32 +882,61 @@ class WorkspaceValidationService:
             )
             registry = dict(snapshot.manifest.entity_ids_by_handle)
         else:
-            fresh_catalog = WorkspaceCatalog.from_snapshot(
-                self._catalog.document,
-                sources=sources,
-            )
-            registry, identity_issue = _entity_registry(
+            approved_identity_issue = _approved_registry_issue(
                 files=snapshot.files,
-                document_id=self._workspace.document_id,
+                document=self._catalog.document,
                 manifest=snapshot.manifest,
-                catalog=fresh_catalog,
             )
-            payload = (
-                WorkspacePayloadValidation(
+            if approved_identity_issue is not None:
+                registry = dict(snapshot.manifest.entity_ids_by_handle)
+                payload = WorkspacePayloadValidation(
                     document=None,
-                    diagnostics=(identity_issue,),
+                    diagnostics=(approved_identity_issue,),
                     current_sources=(),
                     evidence_by_handle={},
                     default_basis=None,
                 )
-                if identity_issue is not None
-                else validate_workspace_payload(
-                    snapshot.files,
-                    catalog=fresh_catalog,
-                    selected_skill_ids=self._selected_skill_ids,
-                    loaded_skill_ids=loaded_skill_ids,
-                )
-            )
+            else:
+                try:
+                    fresh_catalog = WorkspaceCatalog.from_snapshot(
+                        self._catalog.document,
+                        sources=sources,
+                        handle_registry=snapshot.manifest.entity_ids_by_handle,
+                    )
+                except (TypeError, ValueError, WorkspaceResourceError) as error:
+                    registry = dict(snapshot.manifest.entity_ids_by_handle)
+                    payload = WorkspacePayloadValidation(
+                        document=None,
+                        diagnostics=(
+                            _resource_error_diagnostic(error, snapshot.files),
+                        ),
+                        current_sources=(),
+                        evidence_by_handle={},
+                        default_basis=None,
+                    )
+                else:
+                    registry, identity_issue = _entity_registry(
+                        files=snapshot.files,
+                        document_id=self._workspace.document_id,
+                        manifest=snapshot.manifest,
+                        catalog=fresh_catalog,
+                    )
+                    payload = (
+                        WorkspacePayloadValidation(
+                            document=None,
+                            diagnostics=(identity_issue,),
+                            current_sources=(),
+                            evidence_by_handle={},
+                            default_basis=None,
+                        )
+                        if identity_issue is not None
+                        else validate_workspace_payload(
+                            snapshot.files,
+                            catalog=fresh_catalog,
+                            selected_skill_ids=self._selected_skill_ids,
+                            loaded_skill_ids=loaded_skill_ids,
+                        )
+                    )
 
         conflict_diagnostics = active_conflict_diagnostics(
             files=snapshot.files,

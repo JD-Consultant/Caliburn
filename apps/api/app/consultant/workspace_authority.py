@@ -40,6 +40,7 @@ from app.consultant.workspace_review import (
     WorkspaceReviewGroup,
     WorkspaceReviewProjection,
     derive_workspace_review,
+    workspace_action_semantic_fingerprint,
 )
 from app.consultant.workspace_state import (
     Sha256Digest,
@@ -127,6 +128,7 @@ class WorkspaceDecisionRecord(DurableModel):
     decision: WorkspaceDecisionKind
     changeset_id: UUID
     selected_action_ids: tuple[UUID, ...]
+    selected_action_fingerprints: tuple[Sha256Digest, ...] = ()
     workspace_digest: Sha256Digest
     group_digest: Sha256Digest
     semantic_fingerprint: Sha256Digest
@@ -239,6 +241,10 @@ def _render_resource(value: Any, *, original: str | object) -> str | None:
     return json.dumps(value, ensure_ascii=False) + "\n"
 
 
+def _path_is_within(path: str, parent: str) -> bool:
+    return path == parent or path.startswith(f"{parent.rstrip('/')}/")
+
+
 def build_workspace_rebase_plan(
     *,
     command_id: UUID,
@@ -248,6 +254,7 @@ def build_workspace_rebase_plan(
     approved_revision: int,
     approved_digest: Sha256Digest,
     employee_override_paths: Sequence[str] = (),
+    resolved_workspace_paths: Sequence[str] = (),
 ) -> WorkspaceRebasePlan:
     """Compute a deterministic per-resource three-way rebase before authority."""
 
@@ -255,6 +262,7 @@ def build_workspace_rebase_plan(
     conflicts: list[str] = []
     rebased_files: dict[str, str] = {}
     forced_paths = frozenset(employee_override_paths)
+    resolved_paths = frozenset(resolved_workspace_paths)
     paths = sorted(
         set(old_approved_files) | set(workspace_files) | set(new_approved_files)
     )
@@ -262,15 +270,20 @@ def build_workspace_rebase_plan(
         old_raw = old_approved_files.get(resource_path, _MISSING)
         working_raw = workspace_files.get(resource_path, _MISSING)
         new_raw = new_approved_files.get(resource_path, _MISSING)
+        working_value = _parse_resource(working_raw)
         merged = _three_way_value(
             _parse_resource(old_raw),
-            _parse_resource(working_raw),
+            working_value,
             _parse_resource(new_raw),
             path=resource_path,
             conflicts=conflicts,
             employee_override_paths=forced_paths,
         )
-        rendered = _render_resource(merged, original=working_raw)
+        rendered = (
+            cast(str, working_raw)
+            if working_raw is not _MISSING and merged == working_value
+            else _render_resource(merged, original=working_raw)
+        )
         before = None if working_raw is _MISSING else cast(str, working_raw)
         if rendered is not None:
             rebased_files[resource_path] = rendered
@@ -288,7 +301,16 @@ def build_workspace_rebase_plan(
         approved_revision=approved_revision,
         approved_digest=approved_digest,
         changes=tuple(changes),
-        conflicted_paths=tuple(dict.fromkeys(conflicts)),
+        conflicted_paths=tuple(
+            dict.fromkeys(
+                path
+                for path in conflicts
+                if not any(
+                    _path_is_within(path, resolved_path)
+                    for resolved_path in resolved_paths
+                )
+            )
+        ),
         result_workspace_digest=workspace_resource_digest(rebased_files),
     )
 
@@ -612,6 +634,7 @@ class WorkspaceAuthorityService:
         catalog = WorkspaceCatalog.from_snapshot(
             snapshot.approved_document,
             sources=sources,
+            handle_registry=workspace_snapshot.manifest.entity_ids_by_handle,
         )
         validation = validate_workspace_payload(
             workspace_snapshot.files,
@@ -692,6 +715,9 @@ class WorkspaceAuthorityService:
                     employee_request_digest=record.employee_request_digest,
                     boundary_digest=record.boundary_digest,
                     selected_action_ids=record.selected_action_ids,
+                    selected_action_fingerprints=(
+                        record.selected_action_fingerprints
+                    ),
                 )
             )
         return tuple(decisions)
@@ -724,12 +750,18 @@ class WorkspaceAuthorityService:
         plan: WorkspaceRebasePlan | None = None,
         status: WorkspaceDecisionStatus = WorkspaceDecisionStatus.PLANNED,
     ) -> WorkspaceDecisionRecord:
+        selected_ids = set(command.selected_action_ids)
         return WorkspaceDecisionRecord(
             command_id=command.command_id,
             payload_digest=command.payload_digest(),
             decision=command.decision,
             changeset_id=command.changeset_id,
             selected_action_ids=command.selected_action_ids,
+            selected_action_fingerprints=tuple(
+                workspace_action_semantic_fingerprint(action)
+                for action in group.actions
+                if action.action_id in selected_ids
+            ),
             workspace_digest=command.workspace_digest,
             group_digest=group.group_digest,
             semantic_fingerprint=group.semantic_fingerprint,
@@ -762,6 +794,7 @@ class WorkspaceAuthorityService:
         manifest: WorkspaceManifest,
         approved_revision: int,
         reset_actions: Sequence[DocumentPatchAction] = (),
+        accepted_actions: Sequence[DocumentPatchAction] = (),
         employee_override_actions: Sequence[DocumentPatchAction] = (),
     ) -> WorkspaceRebasePlan:
         old_projection = project_workspace_files(
@@ -798,6 +831,18 @@ class WorkspaceAuthorityService:
             )
             is not None
         )
+        resolved_workspace_paths = tuple(
+            path
+            for action in accepted_actions
+            if (
+                path := _workspace_path_for_action(
+                    action,
+                    files=all_projection_files,
+                    entity_ids_by_handle=entity_ids_by_handle,
+                )
+            )
+            is not None
+        )
         plan = build_workspace_rebase_plan(
             command_id=command_id,
             old_approved_files=old_projection.files,
@@ -806,6 +851,7 @@ class WorkspaceAuthorityService:
             approved_revision=approved_revision,
             approved_digest=approved_document_digest(new_approved),
             employee_override_paths=employee_override_paths,
+            resolved_workspace_paths=resolved_workspace_paths,
         )
         actual_digest = workspace_resource_digest(workspace_files)
         actual_changes = tuple(
@@ -938,9 +984,16 @@ class WorkspaceAuthorityService:
         *,
         plan: WorkspaceRebasePlan,
     ) -> WorkspaceManifest:
-        sources = await self.runtime.list_sources(approved.document_id)
-        catalog = WorkspaceCatalog.from_snapshot(approved, sources=sources)
         snapshot = await workspace.read_snapshot()
+        sources = await self.runtime.list_sources(approved.document_id)
+        catalog = WorkspaceCatalog.from_snapshot(
+            approved,
+            sources=sources,
+            handle_registry=(
+                plan.entity_ids_by_handle
+                or snapshot.manifest.entity_ids_by_handle
+            ),
+        )
         validation = validate_workspace_payload(
             snapshot.files,
             catalog=catalog,
@@ -1193,6 +1246,7 @@ class WorkspaceAuthorityService:
             new_approved=prospective,
             manifest=workspace_snapshot.manifest,
             approved_revision=snapshot.revision + 1,
+            accepted_actions=selected,
             employee_override_actions=tuple(
                 action for action in selected if action.action_id in edited
             ),

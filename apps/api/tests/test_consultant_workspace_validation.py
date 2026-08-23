@@ -41,6 +41,7 @@ import app.consultant.workspace_validation as workspace_validation
 from app.consultant.workspace_validation import (
     WorkspaceValidationResult,
     WorkspaceValidationService,
+    active_conflict_diagnostics,
 )
 
 
@@ -285,6 +286,58 @@ async def test_validation_preserves_conflict_diagnostics_until_store_content_cha
 
 
 @pytest.mark.asyncio
+async def test_whole_resource_conflict_ignores_workspace_only_evidence_but_not_content(
+    validation_harness: tuple[
+        StoreBackedWorkspace,
+        WorkspaceValidationService,
+        MutableSourceLoader,
+    ],
+) -> None:
+    workspace, validator, _loader = validation_harness
+    valid = await validator.validate_current(loaded_skill_ids=("output",))
+    task_path = "/workspace/tasks/task-001.json"
+    conflict = WorkspaceDiagnostic(
+        code="workspace-rebase-conflict",
+        path=task_path,
+        message="AI value retained while employee authority is committed.",
+        severity=WorkspaceDiagnosticSeverity.ERROR,
+    )
+    manifest = valid.manifest.model_copy(update={"diagnostics": (conflict,)})
+    files = dict((await workspace.read_snapshot()).files)
+    task = json.loads(files[task_path])
+    for optional_field in (
+        "display_order",
+        "frequency_text",
+        "responsibility_role",
+        "enablers",
+    ):
+        task.pop(optional_field)
+    task["evidence"] = [
+        {
+            "source_handle": "source-001",
+            "quote": "核對訂單",
+            "occurrence": 1,
+            "skill_ids": ["task-boundary"],
+        }
+    ]
+    files[task_path] = json.dumps(task, ensure_ascii=False, indent=2) + "\n"
+
+    assert active_conflict_diagnostics(
+        files=files,
+        approved_document=_document(),
+        manifest=manifest,
+    ) == ()
+
+    task["statement"] = "AI 尚未核准的工作內容"
+    files[task_path] = json.dumps(task, ensure_ascii=False, indent=2) + "\n"
+    assert active_conflict_diagnostics(
+        files=files,
+        approved_document=_document(),
+        manifest=manifest,
+    ) == (conflict,)
+
+
+@pytest.mark.asyncio
 async def test_unrelated_valid_workspace_edit_preserves_existing_conflict(
     validation_harness: tuple[
         StoreBackedWorkspace,
@@ -479,6 +532,72 @@ async def test_validation_returns_short_structured_resource_diagnostics(
     assert result.diagnostics[0].path == path
     assert len(result.diagnostics[0].message) <= 240
     assert "採購流程" not in result.diagnostics[0].message
+
+
+@pytest.mark.asyncio
+async def test_schema_diagnostic_names_the_invalid_field_without_echoing_its_value(
+    validation_harness: tuple[
+        StoreBackedWorkspace,
+        WorkspaceValidationService,
+        MutableSourceLoader,
+    ],
+) -> None:
+    workspace, validator, _loader = validation_harness
+    path = "/workspace/duties/duty-001.json"
+    before = (await workspace.read_snapshot()).files[path]
+    payload = json.loads(before)
+    payload["task_handles"] = ["private-task-value"]
+    invalid = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+    assert (await workspace.backend.aedit(path, before, invalid)).error is None
+
+    result = await validator.validate_current(loaded_skill_ids=("output",))
+
+    assert result.document is None
+    assert result.diagnostics[0].code == "schema"
+    assert result.diagnostics[0].path == path
+    assert "task_handles" in result.diagnostics[0].message
+    assert "private-task-value" not in result.diagnostics[0].message
+
+
+@pytest.mark.asyncio
+async def test_schema_preflight_reports_independent_invalid_resources_together(
+    validation_harness: tuple[
+        StoreBackedWorkspace,
+        WorkspaceValidationService,
+        MutableSourceLoader,
+    ],
+) -> None:
+    workspace, validator, _loader = validation_harness
+    first_path = "/workspace/duties/duty-001.json"
+    first_before = (await workspace.read_snapshot()).files[first_path]
+    first_payload = json.loads(first_before)
+    first_payload["task_handles"] = ["task-001"]
+    first_invalid = json.dumps(first_payload, ensure_ascii=False, indent=2) + "\n"
+    assert (
+        await workspace.backend.aedit(first_path, first_before, first_invalid)
+    ).error is None
+
+    second_path = "/workspace/duties/duty-002.json"
+    second_payload = {
+        **first_payload,
+        "handle": "duty-002",
+        "statement": "管理交期",
+    }
+    assert (
+        await workspace.backend.awrite(
+            second_path,
+            json.dumps(second_payload, ensure_ascii=False, indent=2) + "\n",
+        )
+    ).error is None
+
+    result = await validator.validate_current(loaded_skill_ids=("output",))
+
+    assert result.document is None
+    assert [diagnostic.path for diagnostic in result.diagnostics] == [
+        first_path,
+        second_path,
+    ]
+    assert all("task_handles" in item.message for item in result.diagnostics)
 
 
 @pytest.mark.asyncio

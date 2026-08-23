@@ -48,6 +48,10 @@ from app.consultant.state import (
 )
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
+    WorkspaceDutyResource,
+    WorkspaceEvidenceReference,
+    WorkspaceTaskResource,
+    canonical_resource_json,
     project_workspace_files,
 )
 from app.consultant.workspace_authority import (
@@ -219,6 +223,38 @@ async def _edit_task_field(
         json.dumps(value, ensure_ascii=False),
     )
     assert result.error is None
+
+
+@pytest.mark.asyncio
+async def test_store_snapshot_projects_valid_workspace_progress_and_review_counts(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Workspace progress")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        await _edit_task_statement(workspace, "AI 候選工作內容")
+        await _validated_workspace_review(runtime, document_id)
+
+        snapshot = await runtime.reopen_document(document_id)
+
+        assert snapshot.approved_document.tasks[0].statement != "AI 候選工作內容"
+        assert snapshot.semantic_progress.currently_known_work_count == 1
+        assert snapshot.semantic_progress.employee_decisions.pending == 1
+        assert snapshot.semantic_progress.employee_decisions.deferred == 0
+        assert snapshot.semantic_progress.coverage[0].status == (
+            "awaiting_employee_decision"
+        )
 
 
 @pytest.mark.asyncio
@@ -402,6 +438,8 @@ async def test_direct_edit_rebases_against_ai_workspace_without_reseeding(
             diagnostic.code == "workspace-rebase-conflict"
             for diagnostic in snapshot.manifest.diagnostics
         )
+        assert result.document_review.workspace_generation == snapshot.manifest.generation
+        assert result.document_review.workspace_status == "conflicted"
         review_snapshot, _, review_workspace, projection = await _validated_workspace_review(
             runtime,
             document_id,
@@ -555,6 +593,140 @@ async def test_workspace_authority_applies_partial_decisions_and_exact_replay(
         ]
         assert len(direct_sources) == 1
         assert direct_sources[0].positions[0].document_path == action.path
+
+
+@pytest.mark.asyncio
+async def test_partial_accept_keeps_sparse_workspace_handles_restart_safe(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    source_text = "我負責供應管理，平常會確認庫存，也會追蹤進度。"
+
+    def evidence(quote: str) -> tuple[WorkspaceEvidenceReference, ...]:
+        return (
+            WorkspaceEvidenceReference(
+                source_handle="source-001",
+                quote=quote,
+                occurrence=1,
+                skill_ids=("task-boundary",),
+            ),
+        )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Sparse handles")
+        await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text=source_text,
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=created.approved_document,
+            approved_revision=created.revision,
+        )
+        resources = {
+            "/workspace/duties/duty-001.json": canonical_resource_json(
+                WorkspaceDutyResource(
+                    handle="duty-001",
+                    statement="供應管理",
+                    evidence=evidence("供應管理"),
+                )
+            ),
+            "/workspace/tasks/task-001.json": canonical_resource_json(
+                WorkspaceTaskResource(
+                    handle="task-001",
+                    duty_handle="duty-001",
+                    statement="確認庫存",
+                    action="確認",
+                    object="庫存",
+                    evidence=evidence("確認庫存"),
+                )
+            ),
+            "/workspace/tasks/task-002.json": canonical_resource_json(
+                WorkspaceTaskResource(
+                    handle="task-002",
+                    duty_handle="duty-001",
+                    statement="追蹤進度",
+                    action="追蹤",
+                    object="進度",
+                    evidence=evidence("追蹤進度"),
+                )
+            ),
+        }
+        for path, content in resources.items():
+            assert (await workspace.backend.awrite(path, content)).error is None
+
+        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
+            runtime,
+            document_id,
+        )
+        duty_id = workspace_snapshot.manifest.entity_ids_by_handle["duty-001"]
+        accepted_task_id = workspace_snapshot.manifest.entity_ids_by_handle["task-002"]
+        selected = tuple(
+            action
+            for group in projection.groups
+            for action in group.actions
+            if isinstance(action.after, dict)
+            and (
+                (action.path == "/duties" and action.after.get("duty_id") == str(duty_id))
+                or (
+                    action.path == "/tasks"
+                    and action.after.get("task_id") == str(accepted_task_id)
+                )
+            )
+        )
+        assert len(selected) == 2
+        group = next(
+            group
+            for group in projection.groups
+            if {action.action_id for action in selected}
+            <= {action.action_id for action in group.actions}
+        )
+        command = WorkspaceReviewCommand(
+            command_id=uuid4(),
+            document_id=document_id,
+            decision=WorkspaceDecisionKind.ACCEPT,
+            approved_revision=snapshot.revision,
+            workspace_generation=workspace_snapshot.manifest.generation,
+            workspace_digest=workspace_snapshot.manifest.resource_digest,
+            changeset_id=group.changeset.changeset_id,
+            group_digest=group.group_digest,
+            selected_action_ids=tuple(action.action_id for action in selected),
+            reason="接受職責與第二項工作",
+        )
+
+        accepted = await runtime.decide_workspace_changes(command)
+        reopened = await runtime.reopen_document(document_id)
+        after = await workspace.read_snapshot()
+
+        assert accepted.approved_document == reopened.approved_document
+        assert tuple(item.duty_id for item in reopened.approved_document.duties) == (
+            duty_id,
+        )
+        assert tuple(item.task_id for item in reopened.approved_document.tasks) == (
+            accepted_task_id,
+        )
+        assert "/workspace/tasks/task-001.json" in after.files
+        assert "/workspace/tasks/task-002.json" in after.files
+        assert (
+            after.manifest.entity_ids_by_handle["task-001"]
+            != after.manifest.entity_ids_by_handle["task-002"]
+        )
+        assert after.manifest.validation_status is WorkspaceValidationStatus.VALID
+        assert not any(
+            diagnostic.code == "workspace-rebase-conflict"
+            for diagnostic in after.manifest.diagnostics
+        )
+        assert reopened.document_review.unresolved_action_count > 0
+        assert (
+            await runtime.store.aget(
+                runtime.workspace_metadata_namespace(document_id),
+                f"rebase:{command.command_id}",
+            )
+            is None
+        )
 
 
 @pytest.mark.asyncio

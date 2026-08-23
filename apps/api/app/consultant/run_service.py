@@ -113,7 +113,6 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
         ),
         max_context_tokens=config.consultant_max_context_tokens,
         max_model_calls=config.consultant_max_model_calls,
-        max_lookup_waves=config.consultant_max_lookup_waves,
         max_total_tool_calls=config.consultant_max_total_tool_calls,
         model_retry_count=config.consultant_model_retry_count,
         tool_retry_count=config.consultant_tool_retry_count,
@@ -172,9 +171,19 @@ async def _execute_admitted_consultant_turn(
             )
             if focus_subject is not None:
                 focus_subject_id = UUID(str(focus_subject))
+        store_workspace = StoreBackedWorkspace(
+            store=runtime.store,
+            document_id=document_id,
+        )
+        await store_workspace.ensure_initialized(
+            approved_document=snapshot.approved_document,
+            approved_revision=snapshot.revision,
+        )
+        workspace_snapshot = await store_workspace.read_snapshot()
         catalog = WorkspaceCatalog.from_snapshot(
             snapshot.approved_document,
             sources=all_sources,
+            handle_registry=workspace_snapshot.manifest.entity_ids_by_handle,
         )
         request = ContextRequest(
             run_id=run_id,
@@ -189,14 +198,6 @@ async def _execute_admitted_consultant_turn(
             snapshot=snapshot,
             execution=execution,
             request=request,
-        )
-        store_workspace = StoreBackedWorkspace(
-            store=runtime.store,
-            document_id=document_id,
-        )
-        await store_workspace.ensure_initialized(
-            approved_document=snapshot.approved_document,
-            approved_revision=snapshot.revision,
         )
         workspace = build_consultant_workspace_backend(
             runtime=runtime,

@@ -358,6 +358,7 @@ class WorkspaceReviewProjectionBackend(BackendProtocol):
         current_catalog = WorkspaceCatalog.from_snapshot(
             self.catalog.document,
             sources=current_sources,
+            handle_registry=manifest.entity_ids_by_handle,
         )
         current_evidence_digest = evidence_basis_digest(current_sources)
         if manifest.validation_status not in {

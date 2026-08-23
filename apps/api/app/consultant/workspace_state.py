@@ -154,6 +154,17 @@ class StoreBackedWorkspace:
 
         existing = await self._manifest()
         if existing is not None:
+            current = await self.read_snapshot()
+            existing = current.manifest
+            baseline_digest = _approved_document_digest(approved_document)
+            if (
+                existing.approved_baseline_digest == baseline_digest
+                and approved_revision > existing.approved_baseline_revision
+            ):
+                existing = existing.model_copy(
+                    update={"approved_baseline_revision": approved_revision}
+                )
+                await self._put_manifest(existing)
             return existing
 
         from app.consultant.workspace_resources import project_workspace_files

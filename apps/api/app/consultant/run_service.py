@@ -124,7 +124,7 @@ def build_configured_execution(config: Settings) -> ResolvedExecution:
     return resolve_execution(profile, policy)
 
 
-async def execute_admitted_consultant_turn(
+async def _execute_admitted_consultant_turn(
     *,
     runtime: PostgresConsultantRuntime,
     document_id: UUID,
@@ -331,6 +331,30 @@ async def execute_admitted_consultant_turn(
             # reconciles a still-source-saved run from the durable checkpoint.
             pass
         raise
+
+
+async def execute_admitted_consultant_turn(
+    *,
+    runtime: PostgresConsultantRuntime,
+    document_id: UUID,
+    run_id: UUID,
+    source_id: UUID,
+    execution: ResolvedExecution,
+    model: Any,
+    agent_factory: Callable[..., Any] = build_professional_consultant_agent,
+):
+    """Execute one turn while this process owns document mutation admission."""
+
+    async with runtime.active_consultant_run(document_id):
+        return await _execute_admitted_consultant_turn(
+            runtime=runtime,
+            document_id=document_id,
+            run_id=run_id,
+            source_id=source_id,
+            execution=execution,
+            model=model,
+            agent_factory=agent_factory,
+        )
 
 
 class ConsultantTurnProcessor:

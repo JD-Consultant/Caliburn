@@ -403,10 +403,14 @@ class WorkspaceReviewProjectionBackend(BackendProtocol):
                     update={
                         "validation_status": (
                             WorkspaceValidationStatus.CONFLICTED
-                            if active_conflicts
+                            if validation.diagnostics or active_conflicts
                             else WorkspaceValidationStatus.VALID
                         ),
-                        "diagnostics": active_conflicts,
+                        "diagnostics": tuple(
+                            dict.fromkeys(
+                                (*validation.diagnostics, *active_conflicts)
+                            )
+                        ),
                     }
                 )
         decisions = tuple(await self.decision_loader())

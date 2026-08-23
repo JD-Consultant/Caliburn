@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from decimal import Decimal
 from types import SimpleNamespace
@@ -9,6 +10,10 @@ from uuid import UUID, uuid4
 import pytest
 from langgraph.store.memory import InMemoryStore
 
+from app.adapters.langgraph.postgres import (
+    ConsultantRunAlreadyActive,
+    PostgresConsultantRuntime,
+)
 from app.config import Settings
 from app.consultant.context import ContextSelectionReceipt
 from app.consultant.model_output import (
@@ -46,6 +51,19 @@ from app.consultant.state import (
 )
 from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 from app.consultant.workspace_state import StoreBackedWorkspace
+
+
+def _admission_only_runtime() -> PostgresConsultantRuntime:
+    runtime = object.__new__(PostgresConsultantRuntime)
+    runtime._document_locks = {}  # noqa: SLF001 - isolated admission behavior
+    runtime._active_model_runs = set()  # noqa: SLF001 - isolated admission behavior
+    runtime._active_employee_mutations = {}  # noqa: SLF001 - isolated admission behavior
+
+    async def persistence_must_not_start(_document_id: UUID) -> None:
+        raise AssertionError("busy employee command reached persistence")
+
+    runtime._require_active_catalog = persistence_must_not_start  # type: ignore[method-assign]  # noqa: SLF001
+    return runtime
 
 
 def _source(document_id: UUID, source_id: UUID) -> EmployeeSource:
@@ -150,6 +168,17 @@ class FakeRuntime:
         self.store = InMemoryStore()
         self.commits = []
         self.failures: list[tuple[UUID, str, object]] = []
+        self.active_entries = 0
+        self.active_documents: set[UUID] = set()
+
+    @asynccontextmanager
+    async def active_consultant_run(self, document_id: UUID):
+        self.active_entries += 1
+        self.active_documents.add(document_id)
+        try:
+            yield
+        finally:
+            self.active_documents.discard(document_id)
 
     async def reopen_document(self, document_id: UUID) -> ConsultantSnapshot:
         assert document_id == self.snapshot.document_id
@@ -286,6 +315,41 @@ def test_configured_execution_has_exactly_the_virtual_workspace_tools() -> None:
 
 
 @pytest.mark.asyncio
+@pytest.mark.parametrize("command_kind", ["direct_edit", "workspace_review"])
+async def test_active_model_run_rejects_same_document_employee_mutation_before_persistence(
+    command_kind: str,
+) -> None:
+    runtime = _admission_only_runtime()
+    document_id = uuid4()
+
+    async with runtime.active_consultant_run(document_id):
+        with pytest.raises(ConsultantRunAlreadyActive):
+            if command_kind == "direct_edit":
+                await runtime.apply_direct_edit(
+                    document_id=document_id,
+                    expected_revision=0,
+                    document=object(),  # type: ignore[arg-type]
+                    source_id=uuid4(),
+                )
+            else:
+                await runtime.decide_workspace_changes(
+                    SimpleNamespace(document_id=document_id)  # type: ignore[arg-type]
+                )
+
+
+@pytest.mark.asyncio
+async def test_employee_mutation_admission_reserves_document_before_route_preflight(
+) -> None:
+    runtime = _admission_only_runtime()
+    document_id = uuid4()
+
+    async with runtime.employee_mutation_admission(document_id):
+        with pytest.raises(ConsultantRunAlreadyActive):
+            async with runtime.active_consultant_run(document_id):
+                pass
+
+
+@pytest.mark.asyncio
 async def test_admitted_turn_is_verified_then_committed_once() -> None:
     document_id = uuid4()
     run_id = uuid4()
@@ -327,6 +391,8 @@ async def test_admitted_turn_is_verified_then_committed_once() -> None:
     assert len(commit.execution_evidence.context_selection_receipts) == 1
     assert len(commit.execution_evidence.attempt_receipts) == 1
     assert runtime.failures == []
+    assert runtime.active_entries == 1
+    assert runtime.active_documents == set()
 
 
 @pytest.mark.asyncio
@@ -371,6 +437,8 @@ async def test_failed_model_run_is_durably_classified_without_payload() -> None:
     workspace_snapshot = await reopened_workspace.read_snapshot()
     assert "/workspace/tasks/task-new-001.json" in workspace_snapshot.files
     assert runtime.snapshot.approved_document.tasks == ()
+    assert runtime.active_entries == 1
+    assert runtime.active_documents == set()
 
 
 @pytest.mark.asyncio

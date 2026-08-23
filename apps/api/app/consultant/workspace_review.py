@@ -1191,6 +1191,8 @@ def _conflict_affects_action(
     if not parts or not parts[0]:
         return False
     if parts[0] not in {"duties", "tasks", "opks"}:
+        if conflict_path == "/workspace/header.json":
+            return True
         expected = f"/workspace/header.json/{parts[0]}"
         return conflict_path == expected or conflict_path.startswith(f"{expected}/")
     identity: UUID | None = None
@@ -1221,13 +1223,15 @@ def _conflict_affects_action(
         return False
     if len(parts) < 3:
         return True
+    suffix = conflict_path[marker_index:]
+    if suffix == resource_marker:
+        return True
     workspace_field = {
         "duty_id": "duty_handle",
         "task_ids": "task_handles",
         "indicator_ids": "indicator_handles",
     }.get(parts[2], parts[2])
     expected = f"{resource_marker}/{workspace_field}"
-    suffix = conflict_path[marker_index:]
     return suffix == expected or suffix.startswith(f"{expected}/")
 
 
@@ -1246,7 +1250,6 @@ def derive_workspace_review(
             WorkspaceValidationStatus.CONFLICTED,
         }
         or valid_workspace.document is None
-        or valid_workspace.diagnostics
     ):
         return WorkspaceReviewProjection(
             workspace_digest=manifest.resource_digest,
@@ -1326,15 +1329,14 @@ def derive_workspace_review(
     groups = _review_groups(provisional, manifest)
     diagnostics: list[WorkspaceDiagnostic] = []
     projected: list[WorkspaceReviewGroup] = []
-    conflict_diagnostics = tuple(
-        diagnostic
-        for diagnostic in manifest.diagnostics
-        if diagnostic.code == "workspace-rebase-conflict"
+    localized_diagnostics = tuple(
+        dict.fromkeys((*valid_workspace.diagnostics, *manifest.diagnostics))
     )
+    matched_diagnostics: set[WorkspaceDiagnostic] = set()
     for group in groups:
         group_conflicts = tuple(
             diagnostic
-            for diagnostic in conflict_diagnostics
+            for diagnostic in localized_diagnostics
             if any(
                 _conflict_affects_action(
                     diagnostic.path,
@@ -1346,6 +1348,7 @@ def derive_workspace_review(
         )
         if group_conflicts:
             group = replace(group, diagnostics=group_conflicts)
+            matched_diagnostics.update(group_conflicts)
         if any(_matches_rejection(decision, group) for decision in decisions):
             diagnostics.append(
                 WorkspaceDiagnostic(
@@ -1397,6 +1400,11 @@ def derive_workspace_review(
                 diagnostics=group.diagnostics,
             )
         projected.append(group)
+    diagnostics.extend(
+        diagnostic
+        for diagnostic in localized_diagnostics
+        if diagnostic not in matched_diagnostics
+    )
     return WorkspaceReviewProjection(
         workspace_digest=manifest.resource_digest,
         groups=tuple(projected),

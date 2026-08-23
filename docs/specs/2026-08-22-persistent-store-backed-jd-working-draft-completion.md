@@ -64,8 +64,9 @@
 4. 隔離 worktree 不會帶入 ignored `.env`；第一次 live 啟動在 provider call 前 fail closed，沒有 Opus call／費用。之後以啟動程序明確注入 Luna profile 與 secret，並以 durable attempt receipt 的 `actual_model`／`actual_provider` 驗證真實路由。
 5. sandbox 阻擋外部 TCP 與 Vite 子程序曾造成 `transport_error`／`spawn EPERM`。兩者都以相同程式在允許網路／子程序的受控測試環境重跑；沒有把環境限制誤修成產品 workaround。
 6. 最後獨立複審確認兩個真缺口：部分 reject 原先會隱藏整組而非只隱藏員工勾選的 action；direct edit 回應會帶 rebase 前的舊 workspace snapshot。兩者都先以 regression RED 重現，再分別改成 selected-action semantic fingerprint 投影與 rebase 後 fresh snapshot，scoped re-review 回報無新 Critical／Important。reviewer 另建議把 Duty／OPKS action 各自算成進度工作，複核後不採用：產品進度是 Task／工作範圍中心，相關 Duty／OPKS 已透過 Task depth 反映；另有 pending／deferred action count，若把 Header／Duty 當工作反而會灌水。
+7. 關閉 live dev server 時，真 browser console 暴露多筆相同 employee-safe diagnostic 使用相同 React key。依 React 官方 sibling key 規則，先用真元件測試重現 warning，再以完整 `code／path／message` 加同內容 occurrence 形成 deterministic key；保留每筆診斷、不用 random、不新增 API identity。完整 Web `38 passed`，scoped Luna review 為 Critical／Important／Minor 全零。
 
-上述做法主要依 [LangChain middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)、[Deep Agents production](https://docs.langchain.com/oss/python/deepagents/going-to-production)、[Deep Agents backends](https://docs.langchain.com/oss/python/deepagents/backends)、[LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[VS Code review agent edits](https://code.visualstudio.com/docs/agents/run/review-code-edits)、[Git merge](https://git-scm.com/docs/git-merge)、[OpenAI Apply Patch](https://developers.openai.com/api/docs/guides/tools-apply-patch) 與 [Anthropic checkpointing](https://code.claude.com/docs/en/checkpointing)；診斷與方案細節見研究稿及 ADR Sources。
+上述做法主要依 [LangChain middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)、[Deep Agents production](https://docs.langchain.com/oss/python/deepagents/going-to-production)、[Deep Agents backends](https://docs.langchain.com/oss/python/deepagents/backends)、[LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[VS Code review agent edits](https://code.visualstudio.com/docs/agents/run/review-code-edits)、[Git merge](https://git-scm.com/docs/git-merge)、[OpenAI Apply Patch](https://developers.openai.com/api/docs/guides/tools-apply-patch)、[Anthropic checkpointing](https://code.claude.com/docs/en/checkpointing) 與 [React list keys](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key)；診斷與方案細節見研究稿及 ADR Sources。
 
 ## 6. Final Gate evidence
 
@@ -73,9 +74,9 @@
 
 - 顧問 runtime／workspace／authority focused：`172 passed`。
 - API 全套、真 PostgreSQL：`287 passed`。
-- Web Vitest：`5 files／37 passed`；TypeScript `tsc --noEmit` 與 ESLint exit 0。
+- Web Vitest：`5 files／38 passed`；TypeScript `tsc --noEmit` 與 ESLint exit 0。
 - contract codegen check exit 0。
-- `npx turbo test`：5 tasks successful；API `258 passed／29 skipped`、Web `37 passed`、PDF `23 passed`、OCS indexer `53 passed`。
+- `npx turbo test`：5 tasks successful；API `258 passed／29 skipped`、Web `38 passed`、PDF `23 passed`、OCS indexer `53 passed`。
 - `git diff --check` 無 whitespace error。
 - hard-cut：淘汰 app 與隔離 RAG 對 current production import 為零；舊 lifecycle 唯一字串命中是 Web negative canary 明確斷言頁面不得出現 `/candidate/`，不是 production reference。
 

@@ -410,6 +410,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - [WHATWG HTML — Server-sent events](https://html.spec.whatwg.org/multipage/server-sent-events.html)
 - [TanStack Query — Query invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/query-invalidation)
 - [Next.js — Server and Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components)
+- [React — Rendering Lists／Rules of keys](https://react.dev/learn/rendering-lists#keeping-list-items-in-order-with-key)
 - [LangChain 1.3.15 PyPI](https://pypi.org/project/langchain/1.3.15/)
 - [LangGraph 1.2.11 PyPI](https://pypi.org/project/langgraph/1.2.11/)
 - [`langgraph-checkpoint-postgres` 3.1.2 PyPI／security setup](https://pypi.org/project/langgraph-checkpoint-postgres/3.1.2/)
@@ -431,5 +432,6 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - 狀態：**Pass after independent review**。Deep Agents `StoreBackend`／`CompositeBackend` 承接跨回合 active workspace 與六個低階 VFS Tool；LangGraph Store／checkpointer 承接文件範圍的工作草稿、決策記憶、對話與 authority receipt；Pydantic 與 Caliburn deterministic rules 承接 JD／Evidence 驗證。沒有另建 workspace table、第二份 proposal queue、business write Tool 或第二 authority。
 - 真實產品證據：兩回合 GPT-5.6 Luna／browser 流程可在同一工作草稿繼續編輯，員工可部分接受、拒絕、延後後重新開頁；approved 最終只含員工接受的 1 Duty／1 Task／0 OPKS，未決草稿為 23 pending＋1 deferred、diagnostics 0。候選工作在進度上明示「待員工決定」，不冒充核准事實。
 - 最後獨立複審：確認 partial reject 曾錯誤隱藏整個 group，以及 direct edit 曾回傳 rebase 前 snapshot。兩項都以 TDD 修正；selected-action semantic fingerprint 只抑制真正被拒 action，direct edit 在 rebase 後重新讀 Store snapshot。scoped re-review 無新 Critical／Important。把每筆 Header／Duty／OPKS action 都算成工作進度的建議經產品 SSOT 複核後不採用，以免把非 Task entity 灌成虛假工作；其變更量仍由 pending／deferred action count 顯示。
-- 修正後 gates：顧問 focused `172 passed`；真 PostgreSQL API `287 passed`；Web `37 passed`；TypeScript、ESLint、contract codegen exit 0；Turbo 5 tasks successful（API `258 passed／29 skipped`、Web `37 passed`、PDF `23 passed`、OCS indexer `53 passed`）；hard-cut 與 `git diff --check` clean。
+- browser 收尾發現與修正：真 Luna fixture 的多筆 employee-safe diagnostic 暴露 React sibling key 碰撞。依 React 官方 list-key規則，以完整可見診斷 identity＋同內容 occurrence 產生 deterministic key；TDD RED 精確捕捉 `same key` warning，GREEN 保留兩筆內容且無 warning。scoped Luna review 為 Critical／Important／Minor 全零；沒有增加後端 ID、contract 或產品能力。
+- 修正後 gates：顧問 focused `172 passed`；真 PostgreSQL API `287 passed`；Web `38 passed`；TypeScript、ESLint、contract codegen exit 0；Turbo 5 tasks successful（API `258 passed／29 skipped`、Web `38 passed`、PDF `23 passed`、OCS indexer `53 passed`）；hard-cut 與 `git diff --check` clean。
 - 北極星回歸：一位專業顧問、當前焦點與背景吸收、Task／Duty／OPKS 動態演化、員工原話與更正、必要澄清、Gap、可信進度、未核准草稿跨回合延續、員工唯一文件 authority、自然關閉／續談與單一可強制匯出均保持。沒有引入 RAG／Reference consumer、能力級別／A、auto-accept、multi-agent、正式 eval 或「本輪可停」產品狀態。結果 **Pass**。

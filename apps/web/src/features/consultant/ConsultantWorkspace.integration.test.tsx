@@ -408,6 +408,40 @@ describe("employee consultant workspace integration", () => {
     expect(document.body.textContent).not.toContain("/workspace/");
   });
 
+  it("renders repeated employee-safe diagnostics without React key collisions", () => {
+    const snapshot = consultantSnapshotFixture();
+    const repeatedDiagnostic = {
+      code: "skill-unloaded",
+      path: "工作內容",
+      message: "工作草稿有一項內容需要 AI 確認。",
+    };
+    snapshot.document_review = {
+      ...snapshot.document_review,
+      workspace_status: "invalid",
+      diagnostics: [repeatedDiagnostic, { ...repeatedDiagnostic }],
+      bundles: [],
+      unresolved_action_count: 0,
+    };
+    const consoleError = vi
+      .spyOn(console, "error")
+      .mockImplementation(() => undefined);
+
+    try {
+      renderWithClient(
+        <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      );
+
+      expect(
+        screen.getAllByText("工作草稿有一項內容需要 AI 確認。"),
+      ).toHaveLength(2);
+      expect(consoleError.mock.calls.flat().join(" ")).not.toContain(
+        "same key",
+      );
+    } finally {
+      consoleError.mockRestore();
+    }
+  });
+
   it("announces pending document changes as a status update", () => {
     renderWithClient(
       <DocumentReviewPanel

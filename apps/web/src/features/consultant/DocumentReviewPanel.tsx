@@ -54,6 +54,22 @@ function errorText(error: unknown): string {
     : "無法保存這項決定，請稍後再試";
 }
 
+function diagnosticRenderKeys(
+  diagnostics: ConsultantSnapshotView["document_review"]["diagnostics"],
+): string[] {
+  const occurrences = new Map<string, number>();
+  return diagnostics.map((diagnostic) => {
+    const identity = JSON.stringify([
+      diagnostic.code,
+      diagnostic.path,
+      diagnostic.message,
+    ]);
+    const occurrence = occurrences.get(identity) ?? 0;
+    occurrences.set(identity, occurrence + 1);
+    return `${identity}:${occurrence}`;
+  });
+}
+
 function ReviewBundle({
   documentId,
   revision,
@@ -328,6 +344,7 @@ export function DocumentReviewPanel({
     bundle.actions.some((action) => ["pending", "deferred"].includes(action.status)),
   );
   const review = snapshot.document_review;
+  const diagnosticKeys = diagnosticRenderKeys(review.diagnostics);
   const isInvalid = review.workspace_status === "invalid";
   const isConflicted = review.workspace_status === "conflicted";
   const statusMessage = isInvalid
@@ -367,8 +384,8 @@ export function DocumentReviewPanel({
           className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm"
         >
           <p className="font-medium">{statusMessage}</p>
-          {review.diagnostics.map((diagnostic) => (
-            <p key={`${diagnostic.code}:${diagnostic.path ?? ""}`} className="mt-1 text-stone-700">
+          {review.diagnostics.map((diagnostic, index) => (
+            <p key={diagnosticKeys[index]} className="mt-1 text-stone-700">
               {diagnostic.message}
             </p>
           ))}

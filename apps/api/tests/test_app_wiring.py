@@ -6,7 +6,9 @@ from app.config import Settings
 
 
 def _paths(app: FastAPI) -> list[str]:
-    return [getattr(r, "path", "") for r in app.routes]
+    # FastAPI 0.141 keeps included routers lazy; OpenAPI is the public flattened
+    # route contract and therefore the stable wiring assertion surface.
+    return list(app.openapi()["paths"])
 
 
 def test_configure_mounts_current_job_analysis_api_and_health():
@@ -17,13 +19,14 @@ def test_configure_mounts_current_job_analysis_api_and_health():
         for path in paths
         if path.startswith("/api/v1/")
     )
-    assert "/api/v1/job-analysis/documents" in paths
-    assert any(path.endswith("/{document_id}/consultation") for path in paths)
-    assert any(path.endswith("/{document_id}/turns") for path in paths)
+    assert "/api/v1/job-analysis/consultant-documents" in paths
+    assert any(path.endswith("/{document_id}/snapshot") for path in paths)
+    assert any(path.endswith("/{document_id}/answers") for path in paths)
     assert any(
-        path.endswith("/{document_id}/proposals/{proposal_id}/decisions")
+        path.endswith("/{document_id}/reviews/{changeset_id}")
         for path in paths
     )
+    assert not any("/documents/" in path for path in paths)
 
 
 def test_configure_does_not_mount_retired_routes():
@@ -35,10 +38,12 @@ def test_configure_does_not_mount_retired_routes():
     assert not any("interview" in path for path in paths)
 
 
-def test_job_analysis_consultant_defaults_pin_one_exact_a6_route():
+def test_consultant_defaults_pin_one_exact_versioned_model_route():
     fields = Settings.model_fields
 
-    assert fields["job_analysis_model"].default == "anthropic/claude-opus-5"
-    assert fields["job_analysis_provider"].default == "anthropic"
-    assert fields["job_analysis_max_output_tokens"].default == 4096
-    assert fields["job_analysis_timeout_s"].default == 90.0
+    assert fields["consultant_profile_id"].default == "primary-consultant"
+    assert fields["consultant_profile_revision"].default == 1
+    assert fields["consultant_model"].default == "anthropic/claude-opus-5"
+    assert fields["consultant_provider"].default == "Anthropic"
+    assert fields["consultant_max_output_tokens"].default == 4096
+    assert fields["consultant_timeout_seconds"].default == 90.0

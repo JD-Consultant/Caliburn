@@ -1,60 +1,73 @@
 # Runbook — Caliburn 本機開發
 
-Current 產品只有 PostgreSQL、FastAPI 與 Next.js；`npm run up`／`npm run dev` 只啟動這三者。舊 `app.interview`／`app.interview_vnext`／`app.job_authoring` 服務已移除，不要再啟動或設定它們。repo 另外保留一組與 current 完全隔離、選用（opt-in）的 RAG 供應鏈（Qdrant／embedder／ocs-indexer），見下方「RAG（選用、隔離）」與 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
+Current 產品只有 PostgreSQL、FastAPI 與 Next.js；OpenRouter 是外部 LLM gateway。RAG 供應鏈保留但尚未接入 current 產品，必須明確 opt-in。
 
 ## 埠位
 
 | 埠 | 服務 | 起法 |
 |---|---|---|
-| 5432 | PostgreSQL | `docker compose up -d db` |
-| 8001 | API | `cd apps/api && uv run python run_live.py` 或 `npx turbo dev` |
-| 3000 | Web | `npx turbo dev` |
-| 6333／6334 | Qdrant（選用，RAG） | `npm run rag:up` |
-| 8082 | embedder（選用，RAG，GPU） | `npm run rag:up` |
-| 8000 | ocs-indexer 查詢 API（選用，RAG） | `npm run rag:dev` |
+| 5432 | PostgreSQL | `npm run infra` |
+| 8001 | API | `cd apps/api && uv run python run_live.py` 或 `npm run dev` |
+| 3000 | Web | `npm run dev` |
+| 6333／6334 | Qdrant（隔離 RAG） | `npm run rag:up` |
+| 8082 | embedder（隔離 RAG） | `npm run rag:up` |
+| 8000 | ocs-indexer（隔離 RAG） | `npm run rag:dev` |
 
-## 啟動與停止
+## Fresh DB 與首次啟動
 
 ```bash
-npm run up
+npm install
+npm run infra
 npm run db:migrate
-npm run down
+npm run consultant-storage:setup
+npm run dev
 ```
 
-`npm run up` 只起 PostgreSQL，接著在 host 啟動 API 與 Web；不會啟動 Qdrant 或 embedder。健康檢查：`curl http://127.0.0.1:8001/healthz`；工作台在 `http://localhost:3000/workspace`。
+執行順序有意分開：Alembic root `0018_consultant_runtime_root` 先建立 `consultant_documents` catalog；接著 LangGraph 官方 `.setup()` 建立 Saver／Store tables；最後才啟動 API／Web。已初始化的日常環境可直接 `npm run up`。
 
-API reload 已關閉；改 Python 後停止並重新啟動 API。`npm run down` 會停 compose 並收 `3000`／`8001` 的孤兒程序。
+健康檢查：`http://127.0.0.1:8001/healthz`；工作台：`http://localhost:3000/workspace`。API reload 已關閉，改 Python 後要重啟。`npm run down` 會停止 compose 並清理 `3000`／`8001` 的孤兒程序。
 
-## RAG（選用、隔離）
+## 資料庫邊界
 
-RAG 供應鏈（`apps/pdf-to-json`／`apps/ocs-indexer`／`apps/embedder`／`packages/ocs-contract`／`packages/indexer-contract`）不是 current API/Web 的 runtime dependency，預設不啟動；完整資料流、package 責任與資料落地見 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
+空 DB 完成 migration＋setup 後，public schema 應只有：
 
-```bash
-npm run rag:up      # docker compose --profile rag up -d（Qdrant + GPU embedder）
-npm run rag:down    # docker compose stop qdrant embedder（只停 RAG，db 不動）
-npm run rag:dev     # turbo dev --filter=@caliburn/ocs-indexer（查詢 API :8000）
-```
+- `alembic_version`、`consultant_documents`；
+- LangGraph 官方 `checkpoints`、`checkpoint_blobs`、`checkpoint_writes`、`checkpoint_migrations`、`store`、`store_migrations`。
 
-`db`（PostgreSQL）沒有 Compose profile，`npm run up`／`docker compose up -d db` 都會啟動它；`qdrant`／`embedder` 標記 `profiles: [rag]`，只有 `npm run rag:up`（或 `docker compose --profile rag up -d`）會啟動。
-
-## 資料庫
-
-Current-only schema 的 root 是 migration `0012_job_analysis_current_state`，目前 head 為 `0017`。它只建立 `job_analysis_*` 七張表與 `alembic_version`，不建立舊 users、documents、interview 或 job_authoring 表；RAG 供應鏈不寫入這個 PostgreSQL（PDF／OCS JSON／Qdrant 是另一套資料世界，見 `design/rag-pipeline.md`）。
-
-本次硬切不搬舊資料。若既有 volume 是舊 schema，使用可丟棄的本機資料庫重建：
+不得出現 `job_analysis_*` 舊表，也沒有資料搬移、雙寫或 compatibility converter。若本機 volume 仍是舊 schema，且確定資料可丟棄，重建：
 
 ```bash
 docker compose down -v
 docker compose up -d db
 npm run db:migrate
+npm run consultant-storage:setup
 ```
 
-## 測試與故障排除
+## OpenRouter
+
+複製 `apps/api/.env.example` 為 `.env`，填入 `OPENROUTER_API_KEY`。`CONSULTANT_MODEL`／`CONSULTANT_PROVIDER` 指定一條 exact route，profile／policy revision 與參數會在每輪解析成 immutable execution snapshot；第一版禁止 silent fallback。沒有 key 時，catalog／snapshot 等不需模型的功能仍可使用，AI 回合回 typed unavailable response。
+
+Git worktree 不會自動帶入被 ignore 的 `apps/api/.env`。在隔離 worktree 做 live model smoke 時，應由啟動程序安全注入 key與明確的 `CONSULTANT_MODEL`／`CONSULTANT_PROVIDER` override；不要把 secret 複製、commit 或印到 log。判定實際路由時讀 durable attempt receipt 的 `actual_model`／`actual_provider`，不能只相信 shell 目標值；若 attempt receipt 為空，代表尚未呼叫 provider。
+
+## RAG（保留、隔離、非 current runtime）
+
+`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract` 與 `packages/indexer-contract` 不在 current API/Web dependency graph，也不由預設指令啟動：
+
+```bash
+npm run rag:up
+npm run rag:down
+npm run rag:dev
+```
+
+目前產品沒有 Reference／RAG route、tool、contract 或 UI；不要把上述服務接進 current composition root。詳見 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
+
+## 驗證與故障排除
 
 ```bash
 npx turbo test
 cd apps/api && uv run pytest -q
 cd apps/web && npm run test && npx tsc --noEmit && npm run lint
+npm run check-codegen -w @caliburn/job-analysis-contract
 ```
 
-若 current API import 出現 `app.interview`／`app.interview_vnext`／`app.job_authoring`（已刪除）或 `ocs_contract`／`indexer_contract`／`jd_ocs_indexer`／`jd_pdf_to_json`／`embedder`（RAG 專屬、與 current 隔離）之類的模組，先確認目前 branch、工作目錄與 `uv sync`；不要把舊模組加回來，也不要把 RAG 模組接進 current composition root——`apps/api/tests/test_job_analysis_dependencies.py` 的 AST guard 會擋下這兩種情況。詳細現行邊界見 [`ARCHITECTURE.md`](../ARCHITECTURE.md) 與 [ADR 0057](adr/0057-current-only-runtime-and-data-boundary.md)。
+`apps/api/tests/test_consultant_hard_cut.py` 會阻止舊 writer／route／migration／contract 復活；`test_consultant_foundation_boundaries.py` 會阻止 RAG 或 provider adapter 滲入核心顧問邏輯。若 import 行為與 code 不符，先確認 `pwd`、branch 與殘留 `__pycache__`，不要恢復已刪模組。

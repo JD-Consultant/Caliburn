@@ -4,14 +4,15 @@
 from __future__ import annotations
 
 from enum import Enum, StrEnum
+from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, conint, constr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, conint, constr
 
 
 class JobAnalysisWorkspaceContract(BaseModel):
     """
-    Local Web document and Current JD Task wire contract.
+    Local Web contract for the durable professional job-analysis consultant.
     """
 
     model_config = ConfigDict(
@@ -19,37 +20,485 @@ class JobAnalysisWorkspaceContract(BaseModel):
     )
 
 
-class DocumentMetadataWrite(BaseModel):
+class ConsultantDocumentCreate(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    title: str
+    title: constr(min_length=1)
 
 
-class DocumentMetadataView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    document_id: UUID
-    title: str
-    updated_at: AwareDatetime
-
-
-class DocumentSummary(BaseModel):
+class ConsultantDocumentCatalogItem(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     document_id: UUID
-    title: str
-    task_count: conint(ge=0, strict=True)
+    title: constr(min_length=1)
+    created_at: AwareDatetime
     updated_at: AwareDatetime
 
 
-class JdHeaderView(BaseModel):
+class ConsultantDocumentCatalog(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    competency_name: str | None
+    documents: list[ConsultantDocumentCatalogItem]
+
+
+class EmployeeAnswerWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    text: constr(min_length=1)
+    supersedes_source_id: UUID | None = None
+
+
+class ConsultantRunStatus(StrEnum):
+    idle = 'idle'
+    source_saved = 'source_saved'
+    completed = 'completed'
+    failed = 'failed'
+
+
+class ConsultantRunAccepted(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    run_id: UUID
+    source_id: UUID
+    status: ConsultantRunStatus
+
+
+class DurableRunView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    run_id: UUID
+    status: ConsultantRunStatus
+    source_id: UUID | None
+    started_at: AwareDatetime
+    completed_at: AwareDatetime | None
+    error_code: str | None
+
+
+class NextQuestionView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    text: str
+    answer_target: str
+    reason: str
+
+
+class ConsultantMessageView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    run_id: UUID
+    answer_source_id: UUID
+    text: str
+    used_skill_ids: list[str]
+    next_question: NextQuestionView | None
+
+
+class ProcessingStatus(StrEnum):
+    pending = 'pending'
+    committed = 'committed'
+
+
+class Validity(StrEnum):
+    current = 'current'
+    superseded = 'superseded'
+
+
+class EmployeeMessageView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source_id: UUID
+    text: str
+    created_at: AwareDatetime
+    processing_status: ProcessingStatus
+    validity: Validity
+    supersedes_source_id: UUID | None
+    superseded_by_source_id: UUID | None
+
+
+class OpeningNavigationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    visible: bool
+    steps: list[str]
+
+
+class CurrentInterviewReasonView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    work_id: UUID
+    title: str
+    why_now: str
+    missing_before_enough: str | None
+    recommended_next_step: str | None
+
+
+class Status(StrEnum):
+    available = 'available'
+    active = 'active'
+    parked = 'parked'
+    blocked = 'blocked'
+    sufficient_for_now = 'sufficient_for_now'
+    unknown = 'unknown'
+    not_applicable = 'not_applicable'
+    retired = 'retired'
+
+
+class VisibleWorkItemView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    work_id: UUID
+    kind: str
+    title: str
+    status: Status
+    priority_reason: str
+    blocked_by_decision_ids: list[UUID]
+
+
+class Status1(StrEnum):
+    active = 'active'
+    challenged = 'challenged'
+    employee_confirmed = 'employee_confirmed'
+    superseded = 'superseded'
+    retired = 'retired'
+
+
+class UnderstandingItemView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    understanding_id: UUID
+    kind: str
+    text: str
+    status: Status1
+    source_ids: list[UUID]
+
+
+class Kind(StrEnum):
+    soft = 'soft'
+    branch_blocking = 'branch_blocking'
+
+
+class Trigger(StrEnum):
+    focus_transition = 'focus_transition'
+    meaningful_shift = 'meaningful_shift'
+    long_return = 'long_return'
+    structural_premise = 'structural_premise'
+    high_risk_responsibility = 'high_risk_responsibility'
+    contradiction = 'contradiction'
+    employee_request = 'employee_request'
+
+
+class Status2(StrEnum):
+    pending = 'pending'
+    later = 'later'
+    confirmed = 'confirmed'
+    superseded = 'superseded'
+
+
+class AllowedAction(StrEnum):
+    confirm = 'confirm'
+    direct_correction = 'direct_correction'
+    later = 'later'
+
+
+class UnderstandingCalibrationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    calibration_id: UUID
+    kind: Kind
+    trigger: Trigger
+    status: Status2
+    affected_work_ids: list[UUID]
+    changed_understanding_ids: list[UUID]
+    allowed_actions: list[AllowedAction]
+
+
+class UnderstandingView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    label: Literal['AI 目前理解']
+    collapsible: Literal[True]
+    items: list[UnderstandingItemView]
+    parked_clues: list[CurrentInterviewReasonView]
+    calibration: UnderstandingCalibrationView | None
+
+
+class CoverageItemView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    work_id: UUID
+    title: str
+    status: str
+    reason: str
+
+
+class DepthStatus(StrEnum):
+    evidence_present = 'evidence_present'
+    gap = 'gap'
+    interviewing = 'interviewing'
+    not_yet_deepened = 'not_yet_deepened'
+    sufficient_for_now = 'sufficient_for_now'
+    held_with_reason = 'held_with_reason'
+
+
+class EmployeeDecisionSummaryView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    pending: conint(ge=0, strict=True)
+    deferred: conint(ge=0, strict=True)
+
+
+class Status3(StrEnum):
+    active = 'active'
+    held_with_reason = 'held_with_reason'
+    resolved = 'resolved'
+
+
+class VisibleGapView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    gap_id: UUID
+    reason_code: str
+    description: str
+    subject_kind: str
+    subject_id: UUID | None
+    blocks_dependent_analysis: bool
+    status: Status3
+
+
+class SufficiencyEvidenceView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    known_work_count: conint(ge=0, strict=True)
+    sufficient_work_count: conint(ge=0, strict=True)
+    active_or_unvisited_work_count: conint(ge=0, strict=True)
+    blocking_gap_count: conint(ge=0, strict=True)
+    structural_decision_count: conint(ge=0, strict=True)
+
+
+class SufficiencyView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    currently_enough: bool
+    why_enough: str
+    remaining_gap_reasons: list[str]
+    likely_benefit_of_continuing: str
+    deterministic_evidence: SufficiencyEvidenceView
+    assessed_revision: conint(ge=0, strict=True)
+    needs_recalculation: bool
+
+
+class QuoteAnchorView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source_id: UUID
+    start: conint(ge=0, strict=True)
+    end: conint(ge=1, strict=True)
+    quote: constr(min_length=1)
+
+
+class DocumentPathReadView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    path: str
+    value_sha256: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class Operation(StrEnum):
+    add = 'add'
+    revise = 'revise'
+    withdraw = 'withdraw'
+    reassign = 'reassign'
+    reorder = 'reorder'
+
+
+class Status4(StrEnum):
+    pending = 'pending'
+    deferred = 'deferred'
+
+
+class DocumentPatchActionView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    action_id: UUID
+    operation: Operation
+    path: str
+    target_key: str
+    before: Any
+    after: Any
+    source_ids: list[UUID]
+    quote_anchors: list[QuoteAnchorView]
+    read_set: list[DocumentPathReadView]
+    depends_on_action_ids: list[UUID]
+    atomic_subgroup_id: UUID | None
+    affected_work_ids: list[UUID]
+    blocks_dependent_analysis: bool
+    status: Status4
+
+
+class DocumentChangeSetView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    changeset_id: UUID
+    summary: str
+    actions: list[DocumentPatchActionView]
+    source_ids: list[UUID]
+    created_revision: conint(ge=0, strict=True)
+    acceptance_blocked: bool
+
+
+class BlockedInterviewBranchView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    work_id: UUID
+    title: str
+    decision_action_ids: list[UUID]
+    reason: str
+
+
+class WorkspaceDiagnosticView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    code: str
+    path: str | None
+    message: str
+
+
+class WorkspaceReviewStatus(StrEnum):
+    CLEAN = 'clean'
+    PENDING = 'pending'
+    INVALID = 'invalid'
+    CONFLICTED = 'conflicted'
+
+
+class RequiredClarificationView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    clarification_id: UUID
+    question: str
+    reason: str
+    current_understanding: str
+    choices: list[str] = Field(..., max_length=3, min_length=2)
+    affected_work_ids: list[UUID]
+    affected_branch: str
+    source_ids: list[UUID]
+
+
+class Kind1(StrEnum):
+    tool_system = 'tool_system'
+    method = 'method'
+    knowledge = 'knowledge'
+    skill = 'skill'
+    other = 'other'
+
+
+class ApprovedEnablerView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Kind1
+    name: str
+
+
+class ApprovedDutyView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    duty_id: UUID
+    statement: str
+    display_order: conint(ge=0, strict=True)
+
+
+class ResponsibilityRole(Enum):
+    primary = 'primary'
+    shared = 'shared'
+    assist = 'assist'
+    NoneType_None = None
+
+
+class ApprovedTaskView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    task_id: UUID
+    duty_id: UUID | None
+    statement: str
+    action: str
+    object: str
+    purpose_result: str | None
+    context: str | None
+    frequency_text: str | None
+    responsibility_role: ResponsibilityRole | None
+    enablers: list[ApprovedEnablerView]
+    display_order: conint(ge=0, strict=True)
+    competency_level: conint(ge=1, le=6, strict=True) | None
+
+
+class Kind2(StrEnum):
+    output = 'output'
+    indicator = 'indicator'
+    knowledge = 'knowledge'
+    skill = 'skill'
+    attitude = 'attitude'
+
+
+class ApprovedOpksItemView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    item_id: UUID
+    kind: Kind2
+    text: str
+    display_order: conint(ge=0, strict=True)
+    task_ids: list[UUID]
+    indicator_ids: list[UUID]
+    evidence_source_ids: list[UUID]
+
+
+class ApprovedOpksItemWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    item_id: UUID
+    kind: Kind2
+    text: str
+    display_order: conint(ge=0, strict=True)
+    task_ids: list[UUID]
+    indicator_ids: list[UUID]
+
+
+class ApprovedJobDocumentView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    schema_version: Literal[1] = 1
+    document_id: UUID
+    job_title: str | None
     occupation_category_name: str | None
     occupation_name: str | None
     occupation_code: str | None
@@ -58,345 +507,111 @@ class JdHeaderView(BaseModel):
     work_description: str | None
     competency_level: conint(ge=1, le=6, strict=True) | None
     notes: str | None
+    duties: list[ApprovedDutyView]
+    tasks: list[ApprovedTaskView]
+    opks: list[ApprovedOpksItemView]
 
 
-class JdHeaderWrite(BaseModel):
+class ApprovedJobDocumentWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    competency_name: str | None = None
-    occupation_category_name: str | None = None
-    occupation_name: str | None = None
-    occupation_code: str | None = None
-    industry_name: str | None = None
-    industry_code: str | None = None
-    work_description: str | None = None
-    competency_level: conint(ge=1, le=6, strict=True) | None = None
-    notes: str | None = None
-
-
-class Code(StrEnum):
-    competency_name_missing = 'competency_name_missing'
-    work_description_missing = 'work_description_missing'
-    competency_level_missing = 'competency_level_missing'
-    task_duty_missing = 'task_duty_missing'
-    task_competency_level_missing = 'task_competency_level_missing'
-    duty_without_task = 'duty_without_task'
-    opks_task_link_missing = 'opks_task_link_missing'
-
-
-class ReadinessIssueView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    code: Code
-
-
-class DocumentReadinessView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    issues: list[ReadinessIssueView]
-
-
-class Kind(StrEnum):
-    tool_system = 'tool_system'
-    method = 'method'
-    knowledge = 'knowledge'
-    skill = 'skill'
-    other = 'other'
-
-
-class Enabler(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    kind: Kind
-    name: str
-
-
-class ResponsibilityRole(Enum):
-    primary = 'primary'
-    shared = 'shared'
-    assist = 'assist'
-    field_ = ''
-    NoneType_None = None
-
-
-class JdTaskWrite(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    statement: str
-    purpose_result: str | None
-    context: str | None
-    frequency_text: str | None
-    responsibility_role: ResponsibilityRole | None
-    enablers: list[Enabler]
-    duty_id: str | None = None
-    competency_level: conint(ge=1, le=6, strict=True) | None = None
-
-
-class ResponsibilityRole1(Enum):
-    primary = 'primary'
-    shared = 'shared'
-    assist = 'assist'
-    NoneType_None = None
-
-
-class JdTaskView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    task_id: str
-    statement: str
-    purpose_result: str | None
-    context: str | None
-    frequency_text: str | None
-    responsibility_role: ResponsibilityRole1 | None
-    enablers: list[Enabler]
-    duty_id: str | None = None
-    competency_level: conint(ge=1, le=6, strict=True) | None = None
-    display_order: conint(ge=0, strict=True)
-
-
-class DutyWrite(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    statement: str
-
-
-class DutyView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    duty_id: str
-    statement: str
-    display_order: conint(ge=0, strict=True)
-
-
-class EntityKind(StrEnum):
-    output = 'output'
-    indicator = 'indicator'
-    knowledge = 'knowledge'
-    skill = 'skill'
-    attitude = 'attitude'
-
-
-class OpksItemWrite(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    entity_kind: EntityKind
-    text: str
-    task_refs: list[str]
-    indicator_refs: list[str]
-
-
-class OpksItemView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    entity_id: str
-    entity_kind: EntityKind
-    text: str
-    task_refs: list[str]
-    indicator_refs: list[str]
-    evidence_quotes: list[str]
-    display_order: conint(ge=0, strict=True)
-
-
-class Status(StrEnum):
-    awaiting_employee_answer = 'awaiting_employee_answer'
-    proposals_ready = 'proposals_ready'
-    not_ready_for_analysis = 'not_ready_for_analysis'
-
-
-class OpksTaskStatusView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    task_id: str
-    status: Status
-
-
-class Action(StrEnum):
-    add = 'add'
-    revise = 'revise'
-    remove = 'remove'
-
-
-class Status1(StrEnum):
-    pending = 'pending'
-    deferred = 'deferred'
-    accepted = 'accepted'
-    edited = 'edited'
-    rejected = 'rejected'
-    stale = 'stale'
-
-
-class OpksProposalView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    proposal_id: str
-    operation_id: str
-    entity_id: str
-    entity_kind: EntityKind
-    action: Action
-    status: Status1
-    before: OpksItemView | None
-    after: OpksItemView | None
-    edited_after: OpksItemView | None
-    rejection_reason: str | None
-    stale_reason: str | None
-
-
-class DocumentView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
+    schema_version: Literal[1] = 1
     document_id: UUID
-    title: str
-    updated_at: AwareDatetime
-    jd_header: JdHeaderView
-    readiness: DocumentReadinessView
-    duties: list[DutyView]
-    tasks: list[JdTaskView]
-    opks_items: list[OpksItemView]
-    opks_task_status: list[OpksTaskStatusView]
+    job_title: str | None
+    occupation_category_name: str | None
+    occupation_name: str | None
+    occupation_code: str | None
+    industry_name: str | None
+    industry_code: str | None
+    work_description: str | None
+    competency_level: conint(ge=1, le=6, strict=True) | None
+    notes: str | None
+    duties: list[ApprovedDutyView]
+    tasks: list[ApprovedTaskView]
+    opks: list[ApprovedOpksItemWrite]
 
 
-class Speaker(StrEnum):
-    employee = 'employee'
-    consultant = 'consultant'
-
-
-class ConversationTurnView(BaseModel):
+class DirectDocumentEditWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    turn_id: str
-    speaker: Speaker
-    text: str
+    document: ApprovedJobDocumentWrite
 
 
-class ActiveQuestionView(BaseModel):
+class ExportReadinessIssueView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    turn_id: str
-    text: str
+    code: str
+    message: str
+    subject_id: UUID | None
 
 
-class ProposalJdEntryView(BaseModel):
+class ExportReadinessView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    task_id: str
-    value: JdTaskView | None
+    ready: bool
+    requires_force_confirmation: bool
+    force_export_allowed: Literal[True]
+    issues: list[ExportReadinessIssueView]
 
 
-class Action1(StrEnum):
-    add = 'add'
-    revise = 'revise'
-    withdraw = 'withdraw'
-    merge = 'merge'
-    split = 'split'
+class Command(StrEnum):
+    accept_changes = 'accept_changes'
+    edit_and_accept_changes = 'edit_and_accept_changes'
+    reject_changes = 'reject_changes'
+    defer_changes = 'defer_changes'
 
 
-class Status2(StrEnum):
-    pending = 'pending'
-    deferred = 'deferred'
-    accepted = 'accepted'
-    edited = 'edited'
-    rejected = 'rejected'
-    revision_requested = 'revision_requested'
-    stale = 'stale'
-
-
-class ProposalView(BaseModel):
+class DocumentReviewDecisionWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    proposal_id: str
-    action: Action1
-    status: Status2
-    jd_before: list[ProposalJdEntryView]
-    jd_after: list[ProposalJdEntryView]
-    edited_jd_after: list[ProposalJdEntryView] | None
+    command: Command
+    action_ids: list[UUID] = Field(..., min_length=1)
+    edited_after_by_action_id: dict[
+        str, str | float | bool | list[Any] | dict[str, Any] | None
+    ]
     rejection_reason: str | None
-    stale_reason: str | None
-    evidence_quotes: list[str]
-
-
-class ConsultationView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    document: DocumentMetadataView
-    conversation: list[ConversationTurnView]
-    active_question: ActiveQuestionView | None
-    proposals: list[ProposalView]
-    opks_proposals: list[OpksProposalView]
-    tasks: list[JdTaskView]
-    opks_items: list[OpksItemView]
-    opks_task_status: list[OpksTaskStatusView]
-
-
-class EmployeeTurnWrite(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    text: constr(min_length=1)
 
 
 class Decision(StrEnum):
-    accepted = 'accepted'
-    edited = 'edited'
-    rejected = 'rejected'
-    deferred = 'deferred'
+    confirm = 'confirm'
+    direct_correction = 'direct_correction'
+    later = 'later'
 
 
-class ProposalDecisionWrite(BaseModel):
+class UnderstandingCalibrationDecisionWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     decision: Decision
-    edited_jd_after: list[ProposalJdEntryView] | None = None
-    reason: str | None = None
+    employee_text: str | None
 
 
-class OpksProposalDecisionWrite(BaseModel):
+class RequiredClarificationAnswerWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    decision: Decision
-    edited_text: str | None = None
-    reason: str | None = None
+    choice: constr(min_length=1)
+    text: constr(min_length=1)
 
 
-class TaskOrderWrite(BaseModel):
+class Event(StrEnum):
+    snapshot_changed = 'snapshot_changed'
+    document_deleted = 'document_deleted'
+
+
+class ConsultantSnapshotEvent(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    ordered_task_ids: list[str]
-
-
-class OpksOrderWrite(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    entity_kind: EntityKind
-    ordered_entity_ids: list[str]
-
-
-class DutyOrderWrite(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    ordered_duty_ids: list[str]
+    event: Event
+    document_id: UUID
+    revision: conint(ge=0, strict=True)
+    run_id: UUID | None
 
 
 class ProblemFieldError(BaseModel):
@@ -411,38 +626,26 @@ class Type(StrEnum):
     https___caliburn_dev_problems_job_analysis_document_not_found = (
         'https://caliburn.dev/problems/job-analysis/document-not-found'
     )
-    https___caliburn_dev_problems_job_analysis_task_not_found = (
-        'https://caliburn.dev/problems/job-analysis/task-not-found'
-    )
     https___caliburn_dev_problems_job_analysis_idempotency_conflict = (
         'https://caliburn.dev/problems/job-analysis/idempotency-conflict'
     )
     https___caliburn_dev_problems_job_analysis_authority_conflict = (
         'https://caliburn.dev/problems/job-analysis/authority-conflict'
     )
-    https___caliburn_dev_problems_job_analysis_invalid_task_order = (
-        'https://caliburn.dev/problems/job-analysis/invalid-task-order'
-    )
-    https___caliburn_dev_problems_job_analysis_duty_not_found = (
-        'https://caliburn.dev/problems/job-analysis/duty-not-found'
-    )
-    https___caliburn_dev_problems_job_analysis_invalid_duty_order = (
-        'https://caliburn.dev/problems/job-analysis/invalid-duty-order'
-    )
-    https___caliburn_dev_problems_job_analysis_invalid_opks_order = (
-        'https://caliburn.dev/problems/job-analysis/invalid-opks-order'
-    )
     https___caliburn_dev_problems_job_analysis_invalid_request = (
         'https://caliburn.dev/problems/job-analysis/invalid-request'
-    )
-    https___caliburn_dev_problems_job_analysis_proposal_not_found = (
-        'https://caliburn.dev/problems/job-analysis/proposal-not-found'
     )
     https___caliburn_dev_problems_job_analysis_consultant_unavailable = (
         'https://caliburn.dev/problems/job-analysis/consultant-unavailable'
     )
-    https___caliburn_dev_problems_job_analysis_opks_item_not_found = (
-        'https://caliburn.dev/problems/job-analysis/opks-item-not-found'
+    https___caliburn_dev_problems_job_analysis_consultant_run_active = (
+        'https://caliburn.dev/problems/job-analysis/consultant-run-active'
+    )
+    https___caliburn_dev_problems_job_analysis_consultant_command_conflict = (
+        'https://caliburn.dev/problems/job-analysis/consultant-command-conflict'
+    )
+    https___caliburn_dev_problems_job_analysis_export_confirmation_required = (
+        'https://caliburn.dev/problems/job-analysis/export-confirmation-required'
     )
 
 
@@ -455,3 +658,65 @@ class ProblemDetail(BaseModel):
     status: conint(ge=400, le=599, strict=True)
     detail: str | None = None
     errors: list[ProblemFieldError] | None = None
+
+
+class WorkDepthView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    work_id: UUID
+    task_boundary: DepthStatus
+    duty_grouping: DepthStatus
+    output: DepthStatus
+    performance_indicator: DepthStatus
+    knowledge: DepthStatus
+    skill: DepthStatus
+
+
+class SemanticProgressView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    currently_known_work_count: conint(ge=0, strict=True)
+    coverage: list[CoverageItemView]
+    depth: list[WorkDepthView]
+    employee_decisions: EmployeeDecisionSummaryView
+    gaps: list[VisibleGapView]
+
+
+class DocumentReviewView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    workspace_generation: conint(ge=0, strict=True)
+    workspace_status: WorkspaceReviewStatus
+    diagnostics: list[WorkspaceDiagnosticView]
+    bundles: list[DocumentChangeSetView]
+    unresolved_action_count: conint(ge=0, strict=True)
+    blocked_branches: list[BlockedInterviewBranchView]
+    safe_interview_work_available: bool
+    decision_required_before_more_interview: bool
+    explanation: str | None
+
+
+class ConsultantSnapshotView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    document_id: UUID
+    revision: conint(ge=0, strict=True)
+    source_count: conint(ge=0, strict=True)
+    latest_source_id: UUID | None
+    run: DurableRunView | None
+    opening_navigation: OpeningNavigationView
+    current_interview: CurrentInterviewReasonView | None
+    visible_work: list[VisibleWorkItemView]
+    understanding: UnderstandingView
+    semantic_progress: SemanticProgressView
+    employee_messages: list[EmployeeMessageView]
+    messages: list[ConsultantMessageView]
+    document_review: DocumentReviewView
+    required_clarification: RequiredClarificationView | None
+    sufficiency: SufficiencyView
+    approved_document: ApprovedJobDocumentView
+    readiness: ExportReadinessView

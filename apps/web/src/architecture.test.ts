@@ -4,8 +4,7 @@ import * as path from "node:path";
 import { describe, expect, it } from "vitest";
 import * as ts from "typescript";
 
-// Enforces the feature-first boundaries from ADR 0058 / the current-only
-// modularization plan:
+// Enforces the feature-first Web boundary retained by ADR 0060:
 //   1. `shared/**` may never import from `features/*`.
 //   2. `features/<A>/**` may never import from `features/<B>/**` (sibling
 //      features may only be composed at the app layer).

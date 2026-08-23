@@ -9,14 +9,14 @@ from openpyxl import load_workbook
 from app.export import (
     ExportDocument,
     ExportDutySection,
+    ExportHeader,
     ExportOpksEntry,
     ExportTaskEntry,
 )
-from app.core.domain import JdHeader
 from app.adapters.xlsx.renderer import render_xlsx
 
 
-def _document(*, header: JdHeader | None = None) -> ExportDocument:
+def _document(*, header: ExportHeader | None = None) -> ExportDocument:
     task = ExportTaskEntry(
         task_id="t1",
         position_code="T1.1",
@@ -29,7 +29,7 @@ def _document(*, header: JdHeader | None = None) -> ExportDocument:
     )
     return ExportDocument(
         title="門市營運專員",
-        header=header or JdHeader(competency_name="門市營運專員"),
+        header=header or ExportHeader(competency_name="門市營運專員"),
         duties=(
             ExportDutySection(
                 position_code="T1",
@@ -53,7 +53,7 @@ def test_workbook_has_only_the_official_form_sheet():
 
 def test_formula_shaped_employee_text_stays_literal_text():
     workbook = _workbook(
-        _document(header=JdHeader(work_description="=1+1"))
+        _document(header=ExportHeader(work_description="=1+1"))
     )
 
     cell = next(
@@ -66,7 +66,7 @@ def test_formula_shaped_employee_text_stays_literal_text():
     assert cell.data_type == "s"
 
 
-def test_public_form_has_official_seven_column_headers_and_icap_notes():
+def test_public_form_has_official_headers_and_keeps_icap_code_cells_blank():
     sheet = _workbook(_document()).active
     values = [cell.value for cell in sheet[12]]
     all_text = "\n".join(
@@ -85,9 +85,10 @@ def test_public_form_has_official_seven_column_headers_and_icap_notes():
         "職能內涵（K=knowledge知識）",
         "職能內涵（S=skills技能）",
     ]
-    assert "（iCAP 計畫執行單位提供）" in {
-        cell.value for row in sheet.iter_rows() for cell in row
-    }
+    assert sheet["B3"].value is None
+    assert sheet["F6"].value is None
+    assert sheet["F7"].value is None
+    assert sheet["F8"].value is None
     assert "iCAP 版型缺漏" not in all_text
     assert "不代表勞動部認證" not in all_text
 
@@ -118,7 +119,7 @@ def test_unassigned_task_stays_in_the_official_task_column_without_custom_label(
 def test_long_text_is_wrapped_and_empty_fields_remain_blank():
     long_text = "這是一段很長的中文工作描述，用來確認公版表格不會把員工文字截斷。" * 4
     document = _document(
-        header=JdHeader(
+        header=ExportHeader(
             competency_name="門市營運專員",
             work_description=long_text,
             occupation_name=None,

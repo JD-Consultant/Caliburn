@@ -2,590 +2,625 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://caliburn.dev/schema/job-analysis-workspace.schema.json",
   "title": "JobAnalysisWorkspaceContract",
-  "description": "Local Web document and Current JD Task wire contract.",
+  "description": "Local Web contract for the durable professional job-analysis consultant.",
   "type": "object",
   "additionalProperties": false,
   "properties": {},
   "$defs": {
-    "DocumentMetadataWrite": {
+    "ConsultantDocumentCreate": {
       "type": "object",
       "additionalProperties": false,
       "required": ["title"],
       "properties": {
-        "title": { "type": "string" }
+        "title": { "type": "string", "minLength": 1 }
       }
     },
-    "DocumentMetadataView": {
+    "ConsultantDocumentCatalogItem": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["document_id", "title", "updated_at"],
+      "required": ["document_id", "title", "created_at", "updated_at"],
       "properties": {
         "document_id": { "type": "string", "format": "uuid" },
-        "title": { "type": "string" },
+        "title": { "type": "string", "minLength": 1 },
+        "created_at": { "type": "string", "format": "date-time" },
         "updated_at": { "type": "string", "format": "date-time" }
       }
     },
-    "DocumentSummary": {
+    "ConsultantDocumentCatalog": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["document_id", "title", "task_count", "updated_at"],
+      "required": ["documents"],
       "properties": {
-        "document_id": { "type": "string", "format": "uuid" },
-        "title": { "type": "string" },
-        "task_count": { "type": "integer", "minimum": 0 },
-        "updated_at": { "type": "string", "format": "date-time" }
+        "documents": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/ConsultantDocumentCatalogItem" }
+        }
       }
     },
-    "JdHeaderView": {
+    "EmployeeAnswerWrite": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "competency_name",
-        "occupation_category_name",
-        "occupation_name",
-        "occupation_code",
-        "industry_name",
-        "industry_code",
-        "work_description",
-        "competency_level",
-        "notes"
-      ],
+      "required": ["text"],
       "properties": {
-        "competency_name": { "type": ["string", "null"] },
+        "text": { "type": "string", "minLength": 1 },
+        "supersedes_source_id": {
+          "type": ["string", "null"],
+          "format": "uuid",
+          "default": null
+        }
+      }
+    },
+    "ConsultantRunStatus": {
+      "type": "string",
+      "enum": ["idle", "source_saved", "completed", "failed"]
+    },
+    "ConsultantRunAccepted": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "source_id", "status"],
+      "properties": {
+        "run_id": { "type": "string", "format": "uuid" },
+        "source_id": { "type": "string", "format": "uuid" },
+        "status": { "$ref": "#/$defs/ConsultantRunStatus" }
+      }
+    },
+    "DurableRunView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "status", "source_id", "started_at", "completed_at", "error_code"],
+      "properties": {
+        "run_id": { "type": "string", "format": "uuid" },
+        "status": { "$ref": "#/$defs/ConsultantRunStatus" },
+        "source_id": { "type": ["string", "null"], "format": "uuid" },
+        "started_at": { "type": "string", "format": "date-time" },
+        "completed_at": { "type": ["string", "null"], "format": "date-time" },
+        "error_code": { "type": ["string", "null"] }
+      }
+    },
+    "NextQuestionView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["text", "answer_target", "reason"],
+      "properties": {
+        "text": { "type": "string" },
+        "answer_target": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "ConsultantMessageView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["run_id", "answer_source_id", "text", "used_skill_ids", "next_question"],
+      "properties": {
+        "run_id": { "type": "string", "format": "uuid" },
+        "answer_source_id": { "type": "string", "format": "uuid" },
+        "text": { "type": "string" },
+        "used_skill_ids": { "type": "array", "items": { "type": "string" } },
+        "next_question": {
+          "anyOf": [
+            { "$ref": "#/$defs/NextQuestionView" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "EmployeeMessageView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "text", "created_at", "processing_status", "validity", "supersedes_source_id", "superseded_by_source_id"],
+      "properties": {
+        "source_id": { "type": "string", "format": "uuid" },
+        "text": { "type": "string" },
+        "created_at": { "type": "string", "format": "date-time" },
+        "processing_status": { "type": "string", "enum": ["pending", "committed"] },
+        "validity": { "type": "string", "enum": ["current", "superseded"] },
+        "supersedes_source_id": { "type": ["string", "null"], "format": "uuid" },
+        "superseded_by_source_id": { "type": ["string", "null"], "format": "uuid" }
+      }
+    },
+    "OpeningNavigationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["visible", "steps"],
+      "properties": {
+        "visible": { "type": "boolean" },
+        "steps": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "CurrentInterviewReasonView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_id", "title", "why_now", "missing_before_enough", "recommended_next_step"],
+      "properties": {
+        "work_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "why_now": { "type": "string" },
+        "missing_before_enough": { "type": ["string", "null"] },
+        "recommended_next_step": { "type": ["string", "null"] }
+      }
+    },
+    "VisibleWorkItemView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_id", "kind", "title", "status", "priority_reason", "blocked_by_decision_ids"],
+      "properties": {
+        "work_id": { "type": "string", "format": "uuid" },
+        "kind": { "type": "string" },
+        "title": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["available", "active", "parked", "blocked", "sufficient_for_now", "unknown", "not_applicable", "retired"]
+        },
+        "priority_reason": { "type": "string" },
+        "blocked_by_decision_ids": {
+          "type": "array",
+          "items": { "type": "string", "format": "uuid" }
+        }
+      }
+    },
+    "UnderstandingItemView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["understanding_id", "kind", "text", "status", "source_ids"],
+      "properties": {
+        "understanding_id": { "type": "string", "format": "uuid" },
+        "kind": { "type": "string" },
+        "text": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["active", "challenged", "employee_confirmed", "superseded", "retired"]
+        },
+        "source_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } }
+      }
+    },
+    "UnderstandingCalibrationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["calibration_id", "kind", "trigger", "status", "affected_work_ids", "changed_understanding_ids", "allowed_actions"],
+      "properties": {
+        "calibration_id": { "type": "string", "format": "uuid" },
+        "kind": { "type": "string", "enum": ["soft", "branch_blocking"] },
+        "trigger": {
+          "type": "string",
+          "enum": ["focus_transition", "meaningful_shift", "long_return", "structural_premise", "high_risk_responsibility", "contradiction", "employee_request"]
+        },
+        "status": { "type": "string", "enum": ["pending", "later", "confirmed", "superseded"] },
+        "affected_work_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "changed_understanding_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "allowed_actions": {
+          "type": "array",
+          "items": { "type": "string", "enum": ["confirm", "direct_correction", "later"] }
+        }
+      }
+    },
+    "UnderstandingView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["label", "collapsible", "items", "parked_clues", "calibration"],
+      "properties": {
+        "label": { "type": "string", "const": "AI 目前理解" },
+        "collapsible": { "type": "boolean", "const": true },
+        "items": { "type": "array", "items": { "$ref": "#/$defs/UnderstandingItemView" } },
+        "parked_clues": { "type": "array", "items": { "$ref": "#/$defs/CurrentInterviewReasonView" } },
+        "calibration": {
+          "anyOf": [
+            { "$ref": "#/$defs/UnderstandingCalibrationView" },
+            { "type": "null" }
+          ]
+        }
+      }
+    },
+    "CoverageItemView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_id", "title", "status", "reason"],
+      "properties": {
+        "work_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "status": { "type": "string" },
+        "reason": { "type": "string" }
+      }
+    },
+    "WorkDepthView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_id", "task_boundary", "duty_grouping", "output", "performance_indicator", "knowledge", "skill"],
+      "properties": {
+        "work_id": { "type": "string", "format": "uuid" },
+        "task_boundary": { "$ref": "#/$defs/DepthStatus" },
+        "duty_grouping": { "$ref": "#/$defs/DepthStatus" },
+        "output": { "$ref": "#/$defs/DepthStatus" },
+        "performance_indicator": { "$ref": "#/$defs/DepthStatus" },
+        "knowledge": { "$ref": "#/$defs/DepthStatus" },
+        "skill": { "$ref": "#/$defs/DepthStatus" }
+      }
+    },
+    "DepthStatus": {
+      "type": "string",
+      "enum": ["evidence_present", "gap", "interviewing", "not_yet_deepened", "sufficient_for_now", "held_with_reason"]
+    },
+    "EmployeeDecisionSummaryView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["pending", "deferred"],
+      "properties": {
+        "pending": { "type": "integer", "minimum": 0 },
+        "deferred": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "VisibleGapView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["gap_id", "reason_code", "description", "subject_kind", "subject_id", "blocks_dependent_analysis", "status"],
+      "properties": {
+        "gap_id": { "type": "string", "format": "uuid" },
+        "reason_code": { "type": "string" },
+        "description": { "type": "string" },
+        "subject_kind": { "type": "string" },
+        "subject_id": { "type": ["string", "null"], "format": "uuid" },
+        "blocks_dependent_analysis": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["active", "held_with_reason", "resolved"] }
+      }
+    },
+    "SemanticProgressView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currently_known_work_count", "coverage", "depth", "employee_decisions", "gaps"],
+      "properties": {
+        "currently_known_work_count": { "type": "integer", "minimum": 0 },
+        "coverage": { "type": "array", "items": { "$ref": "#/$defs/CoverageItemView" } },
+        "depth": { "type": "array", "items": { "$ref": "#/$defs/WorkDepthView" } },
+        "employee_decisions": { "$ref": "#/$defs/EmployeeDecisionSummaryView" },
+        "gaps": { "type": "array", "items": { "$ref": "#/$defs/VisibleGapView" } }
+      }
+    },
+    "SufficiencyEvidenceView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["known_work_count", "sufficient_work_count", "active_or_unvisited_work_count", "blocking_gap_count", "structural_decision_count"],
+      "properties": {
+        "known_work_count": { "type": "integer", "minimum": 0 },
+        "sufficient_work_count": { "type": "integer", "minimum": 0 },
+        "active_or_unvisited_work_count": { "type": "integer", "minimum": 0 },
+        "blocking_gap_count": { "type": "integer", "minimum": 0 },
+        "structural_decision_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "SufficiencyView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["currently_enough", "why_enough", "remaining_gap_reasons", "likely_benefit_of_continuing", "deterministic_evidence", "assessed_revision", "needs_recalculation"],
+      "properties": {
+        "currently_enough": { "type": "boolean" },
+        "why_enough": { "type": "string" },
+        "remaining_gap_reasons": { "type": "array", "items": { "type": "string" } },
+        "likely_benefit_of_continuing": { "type": "string" },
+        "deterministic_evidence": { "$ref": "#/$defs/SufficiencyEvidenceView" },
+        "assessed_revision": { "type": "integer", "minimum": 0 },
+        "needs_recalculation": { "type": "boolean" }
+      }
+    },
+    "QuoteAnchorView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "start", "end", "quote"],
+      "properties": {
+        "source_id": { "type": "string", "format": "uuid" },
+        "start": { "type": "integer", "minimum": 0 },
+        "end": { "type": "integer", "minimum": 1 },
+        "quote": { "type": "string", "minLength": 1 }
+      }
+    },
+    "DocumentPathReadView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "value_sha256"],
+      "properties": {
+        "path": { "type": "string" },
+        "value_sha256": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "DocumentPatchActionView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["action_id", "operation", "path", "target_key", "before", "after", "source_ids", "quote_anchors", "read_set", "depends_on_action_ids", "atomic_subgroup_id", "affected_work_ids", "blocks_dependent_analysis", "status"],
+      "properties": {
+        "action_id": { "type": "string", "format": "uuid" },
+        "operation": { "type": "string", "enum": ["add", "revise", "withdraw", "reassign", "reorder"] },
+        "path": { "type": "string" },
+        "target_key": { "type": "string" },
+        "before": {},
+        "after": {},
+        "source_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "quote_anchors": { "type": "array", "items": { "$ref": "#/$defs/QuoteAnchorView" } },
+        "read_set": { "type": "array", "items": { "$ref": "#/$defs/DocumentPathReadView" } },
+        "depends_on_action_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "atomic_subgroup_id": { "type": ["string", "null"], "format": "uuid" },
+        "affected_work_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "blocks_dependent_analysis": { "type": "boolean" },
+        "status": { "type": "string", "enum": ["pending", "deferred"] }
+      }
+    },
+    "DocumentChangeSetView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changeset_id", "summary", "actions", "source_ids", "created_revision", "acceptance_blocked"],
+      "properties": {
+        "changeset_id": { "type": "string", "format": "uuid" },
+        "summary": { "type": "string" },
+        "actions": { "type": "array", "items": { "$ref": "#/$defs/DocumentPatchActionView" } },
+        "source_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "created_revision": { "type": "integer", "minimum": 0 },
+        "acceptance_blocked": { "type": "boolean" }
+      }
+    },
+    "BlockedInterviewBranchView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["work_id", "title", "decision_action_ids", "reason"],
+      "properties": {
+        "work_id": { "type": "string", "format": "uuid" },
+        "title": { "type": "string" },
+        "decision_action_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "reason": { "type": "string" }
+      }
+    },
+    "DocumentReviewView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["workspace_generation", "workspace_status", "diagnostics", "bundles", "unresolved_action_count", "blocked_branches", "safe_interview_work_available", "decision_required_before_more_interview", "explanation"],
+      "properties": {
+        "workspace_generation": { "type": "integer", "minimum": 0 },
+        "workspace_status": { "$ref": "#/$defs/WorkspaceReviewStatus" },
+        "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/WorkspaceDiagnosticView" } },
+        "bundles": { "type": "array", "items": { "$ref": "#/$defs/DocumentChangeSetView" } },
+        "unresolved_action_count": { "type": "integer", "minimum": 0 },
+        "blocked_branches": { "type": "array", "items": { "$ref": "#/$defs/BlockedInterviewBranchView" } },
+        "safe_interview_work_available": { "type": "boolean" },
+        "decision_required_before_more_interview": { "type": "boolean" },
+        "explanation": { "type": ["string", "null"] }
+      }
+    },
+    "WorkspaceDiagnosticView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "path", "message"],
+      "properties": {
+        "code": { "type": "string" },
+        "path": { "type": ["string", "null"] },
+        "message": { "type": "string" }
+      }
+    },
+    "WorkspaceReviewStatus": {
+      "type": "string",
+      "enum": ["clean", "pending", "invalid", "conflicted"],
+      "x-enum-varnames": ["CLEAN", "PENDING", "INVALID", "CONFLICTED"]
+    },
+    "RequiredClarificationView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["clarification_id", "question", "reason", "current_understanding", "choices", "affected_work_ids", "affected_branch", "source_ids"],
+      "properties": {
+        "clarification_id": { "type": "string", "format": "uuid" },
+        "question": { "type": "string" },
+        "reason": { "type": "string" },
+        "current_understanding": { "type": "string" },
+        "choices": { "type": "array", "minItems": 2, "maxItems": 3, "items": { "type": "string" } },
+        "affected_work_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "affected_branch": { "type": "string" },
+        "source_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } }
+      }
+    },
+    "ApprovedEnablerView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "name"],
+      "properties": {
+        "kind": { "type": "string", "enum": ["tool_system", "method", "knowledge", "skill", "other"] },
+        "name": { "type": "string" }
+      }
+    },
+    "ApprovedDutyView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["duty_id", "statement", "display_order"],
+      "properties": {
+        "duty_id": { "type": "string", "format": "uuid" },
+        "statement": { "type": "string" },
+        "display_order": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "ApprovedTaskView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_id", "duty_id", "statement", "action", "object", "purpose_result", "context", "frequency_text", "responsibility_role", "enablers", "display_order", "competency_level"],
+      "properties": {
+        "task_id": { "type": "string", "format": "uuid" },
+        "duty_id": { "type": ["string", "null"], "format": "uuid" },
+        "statement": { "type": "string" },
+        "action": { "type": "string" },
+        "object": { "type": "string" },
+        "purpose_result": { "type": ["string", "null"] },
+        "context": { "type": ["string", "null"] },
+        "frequency_text": { "type": ["string", "null"] },
+        "responsibility_role": { "type": ["string", "null"], "enum": ["primary", "shared", "assist", null] },
+        "enablers": { "type": "array", "items": { "$ref": "#/$defs/ApprovedEnablerView" } },
+        "display_order": { "type": "integer", "minimum": 0 },
+        "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 }
+      }
+    },
+    "ApprovedOpksItemView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_id", "kind", "text", "display_order", "task_ids", "indicator_ids", "evidence_source_ids"],
+      "properties": {
+        "item_id": { "type": "string", "format": "uuid" },
+        "kind": { "type": "string", "enum": ["output", "indicator", "knowledge", "skill", "attitude"] },
+        "text": { "type": "string" },
+        "display_order": { "type": "integer", "minimum": 0 },
+        "task_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "indicator_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "evidence_source_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } }
+      }
+    },
+    "ApprovedOpksItemWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["item_id", "kind", "text", "display_order", "task_ids", "indicator_ids"],
+      "properties": {
+        "item_id": { "type": "string", "format": "uuid" },
+        "kind": { "type": "string", "enum": ["output", "indicator", "knowledge", "skill", "attitude"] },
+        "text": { "type": "string" },
+        "display_order": { "type": "integer", "minimum": 0 },
+        "task_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
+        "indicator_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } }
+      }
+    },
+    "ApprovedJobDocumentView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document_id", "job_title", "occupation_category_name", "occupation_name", "occupation_code", "industry_name", "industry_code", "work_description", "competency_level", "notes", "duties", "tasks", "opks"],
+      "properties": {
+        "schema_version": { "type": "integer", "const": 1, "default": 1 },
+        "document_id": { "type": "string", "format": "uuid" },
+        "job_title": { "type": ["string", "null"] },
         "occupation_category_name": { "type": ["string", "null"] },
         "occupation_name": { "type": ["string", "null"] },
         "occupation_code": { "type": ["string", "null"] },
         "industry_name": { "type": ["string", "null"] },
         "industry_code": { "type": ["string", "null"] },
         "work_description": { "type": ["string", "null"] },
-        "competency_level": {
-          "type": ["integer", "null"],
-          "minimum": 1,
-          "maximum": 6
-        },
-        "notes": { "type": ["string", "null"] }
+        "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 },
+        "notes": { "type": ["string", "null"] },
+        "duties": { "type": "array", "items": { "$ref": "#/$defs/ApprovedDutyView" } },
+        "tasks": { "type": "array", "items": { "$ref": "#/$defs/ApprovedTaskView" } },
+        "opks": { "type": "array", "items": { "$ref": "#/$defs/ApprovedOpksItemView" } }
       }
     },
-    "JdHeaderWrite": {
+    "ApprovedJobDocumentWrite": {
       "type": "object",
       "additionalProperties": false,
+      "required": ["document_id", "job_title", "occupation_category_name", "occupation_name", "occupation_code", "industry_name", "industry_code", "work_description", "competency_level", "notes", "duties", "tasks", "opks"],
       "properties": {
-        "competency_name": { "type": ["string", "null"], "default": null },
-        "occupation_category_name": {
-          "type": ["string", "null"],
-          "default": null
-        },
-        "occupation_name": { "type": ["string", "null"], "default": null },
-        "occupation_code": { "type": ["string", "null"], "default": null },
-        "industry_name": { "type": ["string", "null"], "default": null },
-        "industry_code": { "type": ["string", "null"], "default": null },
-        "work_description": { "type": ["string", "null"], "default": null },
-        "competency_level": {
-          "type": ["integer", "null"],
-          "minimum": 1,
-          "maximum": 6,
-          "default": null
-        },
-        "notes": { "type": ["string", "null"], "default": null }
+        "schema_version": { "type": "integer", "const": 1, "default": 1 },
+        "document_id": { "type": "string", "format": "uuid" },
+        "job_title": { "type": ["string", "null"] },
+        "occupation_category_name": { "type": ["string", "null"] },
+        "occupation_name": { "type": ["string", "null"] },
+        "occupation_code": { "type": ["string", "null"] },
+        "industry_name": { "type": ["string", "null"] },
+        "industry_code": { "type": ["string", "null"] },
+        "work_description": { "type": ["string", "null"] },
+        "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 },
+        "notes": { "type": ["string", "null"] },
+        "duties": { "type": "array", "items": { "$ref": "#/$defs/ApprovedDutyView" } },
+        "tasks": { "type": "array", "items": { "$ref": "#/$defs/ApprovedTaskView" } },
+        "opks": { "type": "array", "items": { "$ref": "#/$defs/ApprovedOpksItemWrite" } }
       }
     },
-    "ReadinessIssueView": {
+    "DirectDocumentEditWrite": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["code"],
+      "required": ["document"],
       "properties": {
-        "code": {
-          "type": "string",
-          "enum": [
-            "competency_name_missing",
-            "work_description_missing",
-            "competency_level_missing",
-            "task_duty_missing",
-            "task_competency_level_missing",
-            "duty_without_task",
-            "opks_task_link_missing"
-          ]
-        }
+        "document": { "$ref": "#/$defs/ApprovedJobDocumentWrite" }
       }
     },
-    "DocumentReadinessView": {
+    "ExportReadinessIssueView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["issues"],
+      "required": ["code", "message", "subject_id"],
       "properties": {
-        "issues": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/ReadinessIssueView" }
-        }
+        "code": { "type": "string" },
+        "message": { "type": "string" },
+        "subject_id": { "type": ["string", "null"], "format": "uuid" }
       }
     },
-    "Enabler": {
+    "ExportReadinessView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["kind", "name"],
+      "required": ["ready", "requires_force_confirmation", "force_export_allowed", "issues"],
       "properties": {
-        "kind": {
-          "type": "string",
-          "enum": ["tool_system", "method", "knowledge", "skill", "other"]
-        },
-        "name": { "type": "string" }
+        "ready": { "type": "boolean" },
+        "requires_force_confirmation": { "type": "boolean" },
+        "force_export_allowed": { "type": "boolean", "const": true },
+        "issues": { "type": "array", "items": { "$ref": "#/$defs/ExportReadinessIssueView" } }
       }
     },
-    "JdTaskWrite": {
+    "ConsultantSnapshotView": {
       "type": "object",
       "additionalProperties": false,
-      "required": [
-        "statement",
-        "purpose_result",
-        "context",
-        "frequency_text",
-        "responsibility_role",
-        "enablers"
-      ],
-      "properties": {
-        "statement": { "type": "string" },
-        "purpose_result": { "type": ["string", "null"] },
-        "context": { "type": ["string", "null"] },
-        "frequency_text": { "type": ["string", "null"] },
-        "responsibility_role": {
-          "type": ["string", "null"],
-          "enum": ["primary", "shared", "assist", "", null]
-        },
-        "enablers": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Enabler" }
-        },
-        "duty_id": { "type": ["string", "null"], "default": null },
-        "competency_level": {
-          "type": ["integer", "null"],
-          "minimum": 1,
-          "maximum": 6,
-          "default": null
-        }
-      }
-    },
-    "JdTaskView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "task_id",
-        "statement",
-        "purpose_result",
-        "context",
-        "frequency_text",
-        "responsibility_role",
-        "enablers",
-        "display_order"
-      ],
-      "properties": {
-        "task_id": { "type": "string" },
-        "statement": { "type": "string" },
-        "purpose_result": { "type": ["string", "null"] },
-        "context": { "type": ["string", "null"] },
-        "frequency_text": { "type": ["string", "null"] },
-        "responsibility_role": {
-          "type": ["string", "null"],
-          "enum": ["primary", "shared", "assist", null]
-        },
-        "enablers": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/Enabler" }
-        },
-        "duty_id": { "type": ["string", "null"], "default": null },
-        "competency_level": {
-          "type": ["integer", "null"],
-          "minimum": 1,
-          "maximum": 6,
-          "default": null
-        },
-        "display_order": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "DutyWrite": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["statement"],
-      "properties": {
-        "statement": { "type": "string" }
-      }
-    },
-    "DutyView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["duty_id", "statement", "display_order"],
-      "properties": {
-        "duty_id": { "type": "string" },
-        "statement": { "type": "string" },
-        "display_order": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "OpksItemWrite": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["entity_kind", "text", "task_refs", "indicator_refs"],
-      "properties": {
-        "entity_kind": {
-          "type": "string",
-          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
-        },
-        "text": { "type": "string" },
-        "task_refs": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "indicator_refs": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      }
-    },
-    "OpksItemView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "entity_id",
-        "entity_kind",
-        "text",
-        "task_refs",
-        "indicator_refs",
-        "evidence_quotes",
-        "display_order"
-      ],
-      "properties": {
-        "entity_id": { "type": "string" },
-        "entity_kind": {
-          "type": "string",
-          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
-        },
-        "text": { "type": "string" },
-        "task_refs": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "indicator_refs": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "evidence_quotes": {
-          "type": "array",
-          "items": { "type": "string" }
-        },
-        "display_order": { "type": "integer", "minimum": 0 }
-      }
-    },
-    "OpksTaskStatusView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["task_id", "status"],
-      "properties": {
-        "task_id": { "type": "string" },
-        "status": {
-          "type": "string",
-          "enum": [
-            "awaiting_employee_answer",
-            "proposals_ready",
-            "not_ready_for_analysis"
-          ]
-        }
-      }
-    },
-    "OpksProposalView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "proposal_id",
-        "operation_id",
-        "entity_id",
-        "entity_kind",
-        "action",
-        "status",
-        "before",
-        "after",
-        "edited_after",
-        "rejection_reason",
-        "stale_reason"
-      ],
-      "properties": {
-        "proposal_id": { "type": "string" },
-        "operation_id": { "type": "string" },
-        "entity_id": { "type": "string" },
-        "entity_kind": {
-          "type": "string",
-          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
-        },
-        "action": {
-          "type": "string",
-          "enum": ["add", "revise", "remove"]
-        },
-        "status": {
-          "type": "string",
-          "enum": ["pending", "deferred", "accepted", "edited", "rejected", "stale"]
-        },
-        "before": {
-          "oneOf": [
-            { "$ref": "#/$defs/OpksItemView" },
-            { "type": "null" }
-          ]
-        },
-        "after": {
-          "oneOf": [
-            { "$ref": "#/$defs/OpksItemView" },
-            { "type": "null" }
-          ]
-        },
-        "edited_after": {
-          "oneOf": [
-            { "$ref": "#/$defs/OpksItemView" },
-            { "type": "null" }
-          ]
-        },
-        "rejection_reason": { "type": ["string", "null"] },
-        "stale_reason": { "type": ["string", "null"] }
-      }
-    },
-    "DocumentView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "document_id",
-        "title",
-        "updated_at",
-        "jd_header",
-        "readiness",
-        "duties",
-        "tasks",
-        "opks_items",
-        "opks_task_status"
-      ],
+      "required": ["document_id", "revision", "source_count", "latest_source_id", "run", "opening_navigation", "current_interview", "visible_work", "understanding", "semantic_progress", "employee_messages", "messages", "document_review", "required_clarification", "sufficiency", "approved_document", "readiness"],
       "properties": {
         "document_id": { "type": "string", "format": "uuid" },
-        "title": { "type": "string" },
-        "updated_at": { "type": "string", "format": "date-time" },
-        "jd_header": { "$ref": "#/$defs/JdHeaderView" },
-        "readiness": { "$ref": "#/$defs/DocumentReadinessView" },
-        "duties": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/DutyView" }
-        },
-        "tasks": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/JdTaskView" }
-        },
-        "opks_items": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/OpksItemView" }
-        },
-        "opks_task_status": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/OpksTaskStatusView" }
-        }
+        "revision": { "type": "integer", "minimum": 0 },
+        "source_count": { "type": "integer", "minimum": 0 },
+        "latest_source_id": { "type": ["string", "null"], "format": "uuid" },
+        "run": { "anyOf": [{ "$ref": "#/$defs/DurableRunView" }, { "type": "null" }] },
+        "opening_navigation": { "$ref": "#/$defs/OpeningNavigationView" },
+        "current_interview": { "anyOf": [{ "$ref": "#/$defs/CurrentInterviewReasonView" }, { "type": "null" }] },
+        "visible_work": { "type": "array", "items": { "$ref": "#/$defs/VisibleWorkItemView" } },
+        "understanding": { "$ref": "#/$defs/UnderstandingView" },
+        "semantic_progress": { "$ref": "#/$defs/SemanticProgressView" },
+        "employee_messages": { "type": "array", "items": { "$ref": "#/$defs/EmployeeMessageView" } },
+        "messages": { "type": "array", "items": { "$ref": "#/$defs/ConsultantMessageView" } },
+        "document_review": { "$ref": "#/$defs/DocumentReviewView" },
+        "required_clarification": { "anyOf": [{ "$ref": "#/$defs/RequiredClarificationView" }, { "type": "null" }] },
+        "sufficiency": { "$ref": "#/$defs/SufficiencyView" },
+        "approved_document": { "$ref": "#/$defs/ApprovedJobDocumentView" },
+        "readiness": { "$ref": "#/$defs/ExportReadinessView" }
       }
     },
-    "ConversationTurnView": {
+    "DocumentReviewDecisionWrite": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["turn_id", "speaker", "text"],
+      "required": ["command", "action_ids", "edited_after_by_action_id", "rejection_reason"],
       "properties": {
-        "turn_id": { "type": "string" },
-        "speaker": { "type": "string", "enum": ["employee", "consultant"] },
-        "text": { "type": "string" }
+        "command": { "type": "string", "enum": ["accept_changes", "edit_and_accept_changes", "reject_changes", "defer_changes"] },
+        "action_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "format": "uuid" } },
+        "edited_after_by_action_id": {
+          "type": "object",
+          "additionalProperties": {
+            "anyOf": [
+              { "type": "string" },
+              { "type": "number" },
+              { "type": "boolean" },
+              { "type": "null" },
+              { "type": "array" },
+              { "type": "object" }
+            ]
+          }
+        },
+        "rejection_reason": { "type": ["string", "null"] }
       }
     },
-    "ActiveQuestionView": {
+    "UnderstandingCalibrationDecisionWrite": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["turn_id", "text"],
+      "required": ["decision", "employee_text"],
       "properties": {
-        "turn_id": { "type": "string" },
-        "text": { "type": "string" }
+        "decision": { "type": "string", "enum": ["confirm", "direct_correction", "later"] },
+        "employee_text": { "type": ["string", "null"] }
       }
     },
-    "ProposalJdEntryView": {
+    "RequiredClarificationAnswerWrite": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["task_id", "value"],
+      "required": ["choice", "text"],
       "properties": {
-        "task_id": { "type": "string" },
-        "value": {
-          "oneOf": [
-            { "$ref": "#/$defs/JdTaskView" },
-            { "type": "null" }
-          ]
-        }
-      }
-    },
-    "ProposalView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "proposal_id",
-        "action",
-        "status",
-        "jd_before",
-        "jd_after",
-        "edited_jd_after",
-        "rejection_reason",
-        "stale_reason",
-        "evidence_quotes"
-      ],
-      "properties": {
-        "proposal_id": { "type": "string" },
-        "action": {
-          "type": "string",
-          "enum": ["add", "revise", "withdraw", "merge", "split"]
-        },
-        "status": {
-          "type": "string",
-          "enum": [
-            "pending",
-            "deferred",
-            "accepted",
-            "edited",
-            "rejected",
-            "revision_requested",
-            "stale"
-          ]
-        },
-        "jd_before": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
-        },
-        "jd_after": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
-        },
-        "edited_jd_after": {
-          "type": ["array", "null"],
-          "items": { "$ref": "#/$defs/ProposalJdEntryView" }
-        },
-        "rejection_reason": { "type": ["string", "null"] },
-        "stale_reason": { "type": ["string", "null"] },
-        "evidence_quotes": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      }
-    },
-    "ConsultationView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": [
-        "document",
-        "conversation",
-        "active_question",
-        "proposals",
-        "opks_proposals",
-        "tasks",
-        "opks_items",
-        "opks_task_status"
-      ],
-      "properties": {
-        "document": { "$ref": "#/$defs/DocumentMetadataView" },
-        "conversation": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/ConversationTurnView" }
-        },
-        "active_question": {
-          "oneOf": [
-            { "$ref": "#/$defs/ActiveQuestionView" },
-            { "type": "null" }
-          ]
-        },
-        "proposals": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/ProposalView" }
-        },
-        "opks_proposals": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/OpksProposalView" }
-        },
-        "tasks": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/JdTaskView" }
-        },
-        "opks_items": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/OpksItemView" }
-        },
-        "opks_task_status": {
-          "type": "array",
-          "items": { "$ref": "#/$defs/OpksTaskStatusView" }
-        }
-      }
-    },
-    "EmployeeTurnWrite": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["text"],
-      "properties": {
+        "choice": { "type": "string", "minLength": 1 },
         "text": { "type": "string", "minLength": 1 }
       }
     },
-    "ProposalDecisionWrite": {
+    "ConsultantSnapshotEvent": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["decision"],
+      "required": ["event", "document_id", "revision", "run_id"],
       "properties": {
-        "decision": {
-          "type": "string",
-          "enum": ["accepted", "edited", "rejected", "deferred"]
-        },
-        "edited_jd_after": {
-          "type": ["array", "null"],
-          "items": { "$ref": "#/$defs/ProposalJdEntryView" },
-          "default": null
-        },
-        "reason": { "type": ["string", "null"], "default": null }
-      }
-    },
-    "OpksProposalDecisionWrite": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["decision"],
-      "properties": {
-        "decision": {
-          "type": "string",
-          "enum": ["accepted", "edited", "rejected", "deferred"]
-        },
-        "edited_text": { "type": ["string", "null"], "default": null },
-        "reason": { "type": ["string", "null"], "default": null }
-      }
-    },
-    "TaskOrderWrite": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["ordered_task_ids"],
-      "properties": {
-        "ordered_task_ids": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      }
-    },
-    "OpksOrderWrite": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["entity_kind", "ordered_entity_ids"],
-      "properties": {
-        "entity_kind": {
-          "type": "string",
-          "enum": ["output", "indicator", "knowledge", "skill", "attitude"]
-        },
-        "ordered_entity_ids": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
-      }
-    },
-    "DutyOrderWrite": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["ordered_duty_ids"],
-      "properties": {
-        "ordered_duty_ids": {
-          "type": "array",
-          "items": { "type": "string" }
-        }
+        "event": { "type": "string", "enum": ["snapshot_changed", "document_deleted"] },
+        "document_id": { "type": "string", "format": "uuid" },
+        "revision": { "type": "integer", "minimum": 0 },
+        "run_id": { "type": ["string", "null"], "format": "uuid" }
       }
     },
     "ProblemFieldError": {
@@ -606,17 +641,13 @@
           "type": "string",
           "enum": [
             "https://caliburn.dev/problems/job-analysis/document-not-found",
-            "https://caliburn.dev/problems/job-analysis/task-not-found",
             "https://caliburn.dev/problems/job-analysis/idempotency-conflict",
             "https://caliburn.dev/problems/job-analysis/authority-conflict",
-            "https://caliburn.dev/problems/job-analysis/invalid-task-order",
-            "https://caliburn.dev/problems/job-analysis/duty-not-found",
-            "https://caliburn.dev/problems/job-analysis/invalid-duty-order",
-            "https://caliburn.dev/problems/job-analysis/invalid-opks-order",
             "https://caliburn.dev/problems/job-analysis/invalid-request",
-            "https://caliburn.dev/problems/job-analysis/proposal-not-found",
             "https://caliburn.dev/problems/job-analysis/consultant-unavailable",
-            "https://caliburn.dev/problems/job-analysis/opks-item-not-found"
+            "https://caliburn.dev/problems/job-analysis/consultant-run-active",
+            "https://caliburn.dev/problems/job-analysis/consultant-command-conflict",
+            "https://caliburn.dev/problems/job-analysis/export-confirmation-required"
           ]
         },
         "title": { "type": "string" },

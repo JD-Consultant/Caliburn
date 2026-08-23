@@ -6,41 +6,435 @@
  */
 
 /**
- * Local Web document and Current JD Task wire contract.
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ConsultantRunStatus".
+ */
+export type ConsultantRunStatus = "idle" | "source_saved" | "completed" | "failed";
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DepthStatus".
+ */
+export type DepthStatus =
+  "evidence_present" | "gap" | "interviewing" | "not_yet_deepened" | "sufficient_for_now" | "held_with_reason";
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "WorkspaceReviewStatus".
+ */
+export type WorkspaceReviewStatus = "clean" | "pending" | "invalid" | "conflicted";
+
+/**
+ * Local Web contract for the durable professional job-analysis consultant.
  */
 export interface JobAnalysisWorkspaceContract {}
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DocumentMetadataWrite".
+ * via the `definition` "ConsultantDocumentCreate".
  */
-export interface DocumentMetadataWrite {
+export interface ConsultantDocumentCreate {
   title: string;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DocumentMetadataView".
+ * via the `definition` "ConsultantDocumentCatalogItem".
  */
-export interface DocumentMetadataView {
+export interface ConsultantDocumentCatalogItem {
   document_id: string;
   title: string;
+  created_at: string;
   updated_at: string;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DocumentSummary".
+ * via the `definition` "ConsultantDocumentCatalog".
  */
-export interface DocumentSummary {
-  document_id: string;
-  title: string;
-  task_count: number;
-  updated_at: string;
+export interface ConsultantDocumentCatalog {
+  documents: ConsultantDocumentCatalogItem[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "JdHeaderView".
+ * via the `definition` "EmployeeAnswerWrite".
  */
-export interface JdHeaderView {
-  competency_name: string | null;
+export interface EmployeeAnswerWrite {
+  text: string;
+  supersedes_source_id?: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ConsultantRunAccepted".
+ */
+export interface ConsultantRunAccepted {
+  run_id: string;
+  source_id: string;
+  status: ConsultantRunStatus;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DurableRunView".
+ */
+export interface DurableRunView {
+  run_id: string;
+  status: ConsultantRunStatus;
+  source_id: string | null;
+  started_at: string;
+  completed_at: string | null;
+  error_code: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "NextQuestionView".
+ */
+export interface NextQuestionView {
+  text: string;
+  answer_target: string;
+  reason: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ConsultantMessageView".
+ */
+export interface ConsultantMessageView {
+  run_id: string;
+  answer_source_id: string;
+  text: string;
+  used_skill_ids: string[];
+  next_question: NextQuestionView | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "EmployeeMessageView".
+ */
+export interface EmployeeMessageView {
+  source_id: string;
+  text: string;
+  created_at: string;
+  processing_status: "pending" | "committed";
+  validity: "current" | "superseded";
+  supersedes_source_id: string | null;
+  superseded_by_source_id: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "OpeningNavigationView".
+ */
+export interface OpeningNavigationView {
+  visible: boolean;
+  steps: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "CurrentInterviewReasonView".
+ */
+export interface CurrentInterviewReasonView {
+  work_id: string;
+  title: string;
+  why_now: string;
+  missing_before_enough: string | null;
+  recommended_next_step: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "VisibleWorkItemView".
+ */
+export interface VisibleWorkItemView {
+  work_id: string;
+  kind: string;
+  title: string;
+  status:
+    "available" | "active" | "parked" | "blocked" | "sufficient_for_now" | "unknown" | "not_applicable" | "retired";
+  priority_reason: string;
+  blocked_by_decision_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "UnderstandingItemView".
+ */
+export interface UnderstandingItemView {
+  understanding_id: string;
+  kind: string;
+  text: string;
+  status: "active" | "challenged" | "employee_confirmed" | "superseded" | "retired";
+  source_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "UnderstandingCalibrationView".
+ */
+export interface UnderstandingCalibrationView {
+  calibration_id: string;
+  kind: "soft" | "branch_blocking";
+  trigger:
+    | "focus_transition"
+    | "meaningful_shift"
+    | "long_return"
+    | "structural_premise"
+    | "high_risk_responsibility"
+    | "contradiction"
+    | "employee_request";
+  status: "pending" | "later" | "confirmed" | "superseded";
+  affected_work_ids: string[];
+  changed_understanding_ids: string[];
+  allowed_actions: ("confirm" | "direct_correction" | "later")[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "UnderstandingView".
+ */
+export interface UnderstandingView {
+  label: "AI 目前理解";
+  collapsible: true;
+  items: UnderstandingItemView[];
+  parked_clues: CurrentInterviewReasonView[];
+  calibration: UnderstandingCalibrationView | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "CoverageItemView".
+ */
+export interface CoverageItemView {
+  work_id: string;
+  title: string;
+  status: string;
+  reason: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "WorkDepthView".
+ */
+export interface WorkDepthView {
+  work_id: string;
+  task_boundary: DepthStatus;
+  duty_grouping: DepthStatus;
+  output: DepthStatus;
+  performance_indicator: DepthStatus;
+  knowledge: DepthStatus;
+  skill: DepthStatus;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "EmployeeDecisionSummaryView".
+ */
+export interface EmployeeDecisionSummaryView {
+  pending: number;
+  deferred: number;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "VisibleGapView".
+ */
+export interface VisibleGapView {
+  gap_id: string;
+  reason_code: string;
+  description: string;
+  subject_kind: string;
+  subject_id: string | null;
+  blocks_dependent_analysis: boolean;
+  status: "active" | "held_with_reason" | "resolved";
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "SemanticProgressView".
+ */
+export interface SemanticProgressView {
+  currently_known_work_count: number;
+  coverage: CoverageItemView[];
+  depth: WorkDepthView[];
+  employee_decisions: EmployeeDecisionSummaryView;
+  gaps: VisibleGapView[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "SufficiencyEvidenceView".
+ */
+export interface SufficiencyEvidenceView {
+  known_work_count: number;
+  sufficient_work_count: number;
+  active_or_unvisited_work_count: number;
+  blocking_gap_count: number;
+  structural_decision_count: number;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "SufficiencyView".
+ */
+export interface SufficiencyView {
+  currently_enough: boolean;
+  why_enough: string;
+  remaining_gap_reasons: string[];
+  likely_benefit_of_continuing: string;
+  deterministic_evidence: SufficiencyEvidenceView;
+  assessed_revision: number;
+  needs_recalculation: boolean;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "QuoteAnchorView".
+ */
+export interface QuoteAnchorView {
+  source_id: string;
+  start: number;
+  end: number;
+  quote: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentPathReadView".
+ */
+export interface DocumentPathReadView {
+  path: string;
+  value_sha256: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentPatchActionView".
+ */
+export interface DocumentPatchActionView {
+  action_id: string;
+  operation: "add" | "revise" | "withdraw" | "reassign" | "reorder";
+  path: string;
+  target_key: string;
+  before: unknown;
+  after: unknown;
+  source_ids: string[];
+  quote_anchors: QuoteAnchorView[];
+  read_set: DocumentPathReadView[];
+  depends_on_action_ids: string[];
+  atomic_subgroup_id: string | null;
+  affected_work_ids: string[];
+  blocks_dependent_analysis: boolean;
+  status: "pending" | "deferred";
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentChangeSetView".
+ */
+export interface DocumentChangeSetView {
+  changeset_id: string;
+  summary: string;
+  actions: DocumentPatchActionView[];
+  source_ids: string[];
+  created_revision: number;
+  acceptance_blocked: boolean;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "BlockedInterviewBranchView".
+ */
+export interface BlockedInterviewBranchView {
+  work_id: string;
+  title: string;
+  decision_action_ids: string[];
+  reason: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentReviewView".
+ */
+export interface DocumentReviewView {
+  workspace_generation: number;
+  workspace_status: WorkspaceReviewStatus;
+  diagnostics: WorkspaceDiagnosticView[];
+  bundles: DocumentChangeSetView[];
+  unresolved_action_count: number;
+  blocked_branches: BlockedInterviewBranchView[];
+  safe_interview_work_available: boolean;
+  decision_required_before_more_interview: boolean;
+  explanation: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "WorkspaceDiagnosticView".
+ */
+export interface WorkspaceDiagnosticView {
+  code: string;
+  path: string | null;
+  message: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "RequiredClarificationView".
+ */
+export interface RequiredClarificationView {
+  clarification_id: string;
+  question: string;
+  reason: string;
+  current_understanding: string;
+  /**
+   * @minItems 2
+   * @maxItems 3
+   */
+  choices: [string, string] | [string, string, string];
+  affected_work_ids: string[];
+  affected_branch: string;
+  source_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ApprovedEnablerView".
+ */
+export interface ApprovedEnablerView {
+  kind: "tool_system" | "method" | "knowledge" | "skill" | "other";
+  name: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ApprovedDutyView".
+ */
+export interface ApprovedDutyView {
+  duty_id: string;
+  statement: string;
+  display_order: number;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ApprovedTaskView".
+ */
+export interface ApprovedTaskView {
+  task_id: string;
+  duty_id: string | null;
+  statement: string;
+  action: string;
+  object: string;
+  purpose_result: string | null;
+  context: string | null;
+  frequency_text: string | null;
+  responsibility_role: "primary" | "shared" | "assist" | null;
+  enablers: ApprovedEnablerView[];
+  display_order: number;
+  competency_level: number | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ApprovedOpksItemView".
+ */
+export interface ApprovedOpksItemView {
+  item_id: string;
+  kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
+  text: string;
+  display_order: number;
+  task_ids: string[];
+  indicator_ids: string[];
+  evidence_source_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ApprovedOpksItemWrite".
+ */
+export interface ApprovedOpksItemWrite {
+  item_id: string;
+  kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
+  text: string;
+  display_order: number;
+  task_ids: string[];
+  indicator_ids: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ApprovedJobDocumentView".
+ */
+export interface ApprovedJobDocumentView {
+  schema_version?: 1;
+  document_id: string;
+  job_title: string | null;
   occupation_category_name: string | null;
   occupation_name: string | null;
   occupation_code: string | null;
@@ -49,260 +443,126 @@ export interface JdHeaderView {
   work_description: string | null;
   competency_level: number | null;
   notes: string | null;
+  duties: ApprovedDutyView[];
+  tasks: ApprovedTaskView[];
+  opks: ApprovedOpksItemView[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "JdHeaderWrite".
+ * via the `definition` "ApprovedJobDocumentWrite".
  */
-export interface JdHeaderWrite {
-  competency_name?: string | null;
-  occupation_category_name?: string | null;
-  occupation_name?: string | null;
-  occupation_code?: string | null;
-  industry_name?: string | null;
-  industry_code?: string | null;
-  work_description?: string | null;
-  competency_level?: number | null;
-  notes?: string | null;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ReadinessIssueView".
- */
-export interface ReadinessIssueView {
-  code:
-    | "competency_name_missing"
-    | "work_description_missing"
-    | "competency_level_missing"
-    | "task_duty_missing"
-    | "task_competency_level_missing"
-    | "duty_without_task"
-    | "opks_task_link_missing";
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DocumentReadinessView".
- */
-export interface DocumentReadinessView {
-  issues: ReadinessIssueView[];
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "Enabler".
- */
-export interface Enabler {
-  kind: "tool_system" | "method" | "knowledge" | "skill" | "other";
-  name: string;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "JdTaskWrite".
- */
-export interface JdTaskWrite {
-  statement: string;
-  purpose_result: string | null;
-  context: string | null;
-  frequency_text: string | null;
-  responsibility_role: "primary" | "shared" | "assist" | "" | null;
-  enablers: Enabler[];
-  duty_id?: string | null;
-  competency_level?: number | null;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "JdTaskView".
- */
-export interface JdTaskView {
-  task_id: string;
-  statement: string;
-  purpose_result: string | null;
-  context: string | null;
-  frequency_text: string | null;
-  responsibility_role: "primary" | "shared" | "assist" | null;
-  enablers: Enabler[];
-  duty_id?: string | null;
-  competency_level?: number | null;
-  display_order: number;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DutyWrite".
- */
-export interface DutyWrite {
-  statement: string;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DutyView".
- */
-export interface DutyView {
-  duty_id: string;
-  statement: string;
-  display_order: number;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "OpksItemWrite".
- */
-export interface OpksItemWrite {
-  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
-  text: string;
-  task_refs: string[];
-  indicator_refs: string[];
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "OpksItemView".
- */
-export interface OpksItemView {
-  entity_id: string;
-  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
-  text: string;
-  task_refs: string[];
-  indicator_refs: string[];
-  evidence_quotes: string[];
-  display_order: number;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "OpksTaskStatusView".
- */
-export interface OpksTaskStatusView {
-  task_id: string;
-  status: "awaiting_employee_answer" | "proposals_ready" | "not_ready_for_analysis";
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "OpksProposalView".
- */
-export interface OpksProposalView {
-  proposal_id: string;
-  operation_id: string;
-  entity_id: string;
-  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
-  action: "add" | "revise" | "remove";
-  status: "pending" | "deferred" | "accepted" | "edited" | "rejected" | "stale";
-  before: OpksItemView | null;
-  after: OpksItemView | null;
-  edited_after: OpksItemView | null;
-  rejection_reason: string | null;
-  stale_reason: string | null;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DocumentView".
- */
-export interface DocumentView {
+export interface ApprovedJobDocumentWrite {
+  schema_version?: 1;
   document_id: string;
-  title: string;
-  updated_at: string;
-  jd_header: JdHeaderView;
-  readiness: DocumentReadinessView;
-  duties: DutyView[];
-  tasks: JdTaskView[];
-  opks_items: OpksItemView[];
-  opks_task_status: OpksTaskStatusView[];
+  job_title: string | null;
+  occupation_category_name: string | null;
+  occupation_name: string | null;
+  occupation_code: string | null;
+  industry_name: string | null;
+  industry_code: string | null;
+  work_description: string | null;
+  competency_level: number | null;
+  notes: string | null;
+  duties: ApprovedDutyView[];
+  tasks: ApprovedTaskView[];
+  opks: ApprovedOpksItemWrite[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ConversationTurnView".
+ * via the `definition` "DirectDocumentEditWrite".
  */
-export interface ConversationTurnView {
-  turn_id: string;
-  speaker: "employee" | "consultant";
-  text: string;
+export interface DirectDocumentEditWrite {
+  document: ApprovedJobDocumentWrite;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ActiveQuestionView".
+ * via the `definition` "ExportReadinessIssueView".
  */
-export interface ActiveQuestionView {
-  turn_id: string;
-  text: string;
+export interface ExportReadinessIssueView {
+  code: string;
+  message: string;
+  subject_id: string | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ProposalJdEntryView".
+ * via the `definition` "ExportReadinessView".
  */
-export interface ProposalJdEntryView {
-  task_id: string;
-  value: JdTaskView | null;
+export interface ExportReadinessView {
+  ready: boolean;
+  requires_force_confirmation: boolean;
+  force_export_allowed: true;
+  issues: ExportReadinessIssueView[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ProposalView".
+ * via the `definition` "ConsultantSnapshotView".
  */
-export interface ProposalView {
-  proposal_id: string;
-  action: "add" | "revise" | "withdraw" | "merge" | "split";
-  status: "pending" | "deferred" | "accepted" | "edited" | "rejected" | "revision_requested" | "stale";
-  jd_before: ProposalJdEntryView[];
-  jd_after: ProposalJdEntryView[];
-  edited_jd_after: ProposalJdEntryView[] | null;
+export interface ConsultantSnapshotView {
+  document_id: string;
+  revision: number;
+  source_count: number;
+  latest_source_id: string | null;
+  run: DurableRunView | null;
+  opening_navigation: OpeningNavigationView;
+  current_interview: CurrentInterviewReasonView | null;
+  visible_work: VisibleWorkItemView[];
+  understanding: UnderstandingView;
+  semantic_progress: SemanticProgressView;
+  employee_messages: EmployeeMessageView[];
+  messages: ConsultantMessageView[];
+  document_review: DocumentReviewView;
+  required_clarification: RequiredClarificationView | null;
+  sufficiency: SufficiencyView;
+  approved_document: ApprovedJobDocumentView;
+  readiness: ExportReadinessView;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentReviewDecisionWrite".
+ */
+export interface DocumentReviewDecisionWrite {
+  command: "accept_changes" | "edit_and_accept_changes" | "reject_changes" | "defer_changes";
+  /**
+   * @minItems 1
+   */
+  action_ids: [string, ...string[]];
+  edited_after_by_action_id: {
+    [k: string]:
+      | string
+      | number
+      | boolean
+      | null
+      | unknown[]
+      | {
+        };
+  };
   rejection_reason: string | null;
-  stale_reason: string | null;
-  evidence_quotes: string[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ConsultationView".
+ * via the `definition` "UnderstandingCalibrationDecisionWrite".
  */
-export interface ConsultationView {
-  document: DocumentMetadataView;
-  conversation: ConversationTurnView[];
-  active_question: ActiveQuestionView | null;
-  proposals: ProposalView[];
-  opks_proposals: OpksProposalView[];
-  tasks: JdTaskView[];
-  opks_items: OpksItemView[];
-  opks_task_status: OpksTaskStatusView[];
+export interface UnderstandingCalibrationDecisionWrite {
+  decision: "confirm" | "direct_correction" | "later";
+  employee_text: string | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "EmployeeTurnWrite".
+ * via the `definition` "RequiredClarificationAnswerWrite".
  */
-export interface EmployeeTurnWrite {
+export interface RequiredClarificationAnswerWrite {
+  choice: string;
   text: string;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ProposalDecisionWrite".
+ * via the `definition` "ConsultantSnapshotEvent".
  */
-export interface ProposalDecisionWrite {
-  decision: "accepted" | "edited" | "rejected" | "deferred";
-  edited_jd_after?: ProposalJdEntryView[] | null;
-  reason?: string | null;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "OpksProposalDecisionWrite".
- */
-export interface OpksProposalDecisionWrite {
-  decision: "accepted" | "edited" | "rejected" | "deferred";
-  edited_text?: string | null;
-  reason?: string | null;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "TaskOrderWrite".
- */
-export interface TaskOrderWrite {
-  ordered_task_ids: string[];
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "OpksOrderWrite".
- */
-export interface OpksOrderWrite {
-  entity_kind: "output" | "indicator" | "knowledge" | "skill" | "attitude";
-  ordered_entity_ids: string[];
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DutyOrderWrite".
- */
-export interface DutyOrderWrite {
-  ordered_duty_ids: string[];
+export interface ConsultantSnapshotEvent {
+  event: "snapshot_changed" | "document_deleted";
+  document_id: string;
+  revision: number;
+  run_id: string | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -319,17 +579,13 @@ export interface ProblemFieldError {
 export interface ProblemDetail {
   type:
     | "https://caliburn.dev/problems/job-analysis/document-not-found"
-    | "https://caliburn.dev/problems/job-analysis/task-not-found"
     | "https://caliburn.dev/problems/job-analysis/idempotency-conflict"
     | "https://caliburn.dev/problems/job-analysis/authority-conflict"
-    | "https://caliburn.dev/problems/job-analysis/invalid-task-order"
-    | "https://caliburn.dev/problems/job-analysis/duty-not-found"
-    | "https://caliburn.dev/problems/job-analysis/invalid-duty-order"
-    | "https://caliburn.dev/problems/job-analysis/invalid-opks-order"
     | "https://caliburn.dev/problems/job-analysis/invalid-request"
-    | "https://caliburn.dev/problems/job-analysis/proposal-not-found"
     | "https://caliburn.dev/problems/job-analysis/consultant-unavailable"
-    | "https://caliburn.dev/problems/job-analysis/opks-item-not-found";
+    | "https://caliburn.dev/problems/job-analysis/consultant-run-active"
+    | "https://caliburn.dev/problems/job-analysis/consultant-command-conflict"
+    | "https://caliburn.dev/problems/job-analysis/export-confirmation-required";
   title: string;
   status: number;
   detail?: string | null;

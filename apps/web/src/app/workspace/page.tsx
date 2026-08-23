@@ -1,5 +1,5 @@
-import { DocumentLibrary } from "@/features/documents";
+import { ConsultantDocumentLibrary } from "@/features/consultant";
 
 export default function WorkspacePage() {
-  return <DocumentLibrary />;
+  return <ConsultantDocumentLibrary />;
 }

@@ -17,6 +17,7 @@ from app.consultant.state import (
     EmployeeSource,
     EmployeeSourceKind,
     SourceProcessingStatus,
+    SourceValidity,
 )
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
@@ -30,6 +31,7 @@ from app.consultant.workspace_review import (
     workspace_review_files,
 )
 from app.consultant.workspace_state import (
+    WorkspaceDiagnostic,
     WorkspaceManifest,
     WorkspaceValidationStatus,
     approved_document_digest,
@@ -47,6 +49,7 @@ DUTY_ID = UUID("00000000-0000-0000-0000-000000000811")
 TASK_ID = UUID("00000000-0000-0000-0000-000000000812")
 OUTPUT_ID = UUID("00000000-0000-0000-0000-000000000813")
 SOURCE_ID = UUID("00000000-0000-0000-0000-000000000814")
+CORRECTED_SOURCE_ID = UUID("00000000-0000-0000-0000-000000000815")
 SKILLS = ("knowledge", "task-boundary")
 
 
@@ -185,6 +188,109 @@ def test_semantic_review_ids_are_stable_and_bind_the_workspace_version() -> None
         first.groups[0].changeset.actions[0].action_id
         != next_generation.groups[0].changeset.actions[0].action_id
     )
+
+
+def test_resource_level_header_diagnostic_blocks_only_header_review_group() -> None:
+    files, registry = _workspace()
+    _edit(files, "/workspace/header.json", job_title="資深採購專員")
+    _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
+    valid = _validated(files)
+    diagnostic = WorkspaceDiagnostic(
+        code="evidence-source-stale",
+        path="/workspace/header.json",
+        message="Header Evidence source is no longer current.",
+    )
+    validation = replace(valid, diagnostics=(diagnostic,))
+    manifest = _manifest(
+        files,
+        registry,
+        status=WorkspaceValidationStatus.CONFLICTED,
+    ).model_copy(update={"diagnostics": (diagnostic,)})
+
+    review = derive_workspace_review(_document(), validation, manifest, ())
+    header_group = next(
+        group
+        for group in review.groups
+        if any(action.path == "/job_title" for action in group.actions)
+    )
+    task_group = next(
+        group
+        for group in review.groups
+        if any(str(TASK_ID) in action.path for action in group.actions)
+    )
+
+    assert header_group.diagnostics == (diagnostic,)
+    assert task_group.diagnostics == ()
+    assert review.blocking_diagnostics == ()
+
+
+def test_source_corrected_opks_diagnostic_blocks_only_its_review_group() -> None:
+    document = _document().model_copy(
+        update={
+            "opks": (
+                _document().opks[0].model_copy(
+                    update={"kind": ApprovedOpksKind.OUTPUT}
+                ),
+            )
+        }
+    )
+    projected = project_workspace_files(document, handle_registry={})
+    files = dict(projected.files)
+    registry = dict(projected.handle_registry)
+    _edit(files, "/workspace/opks/o/o-001.json", text="更新後的核對結果")
+    _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
+    original = _source().model_copy(
+        update={
+            "validity": SourceValidity.SUPERSEDED,
+            "superseded_by_source_id": CORRECTED_SOURCE_ID,
+        }
+    )
+    correction = EmployeeSource.pending(
+        source_id=CORRECTED_SOURCE_ID,
+        document_id=DOCUMENT_ID,
+        kind=EmployeeSourceKind.EMPLOYEE_TURN,
+        text="更正：只需使用新版訂單核對規則。",
+        supersedes_source_id=SOURCE_ID,
+    ).model_copy(update={"processing_status": SourceProcessingStatus.COMMITTED})
+    catalog = WorkspaceCatalog.from_snapshot(
+        document,
+        sources=(original, correction),
+    )
+    validation = validate_workspace_payload(
+        files,
+        catalog=catalog,
+        selected_skill_ids=SKILLS,
+        loaded_skill_ids=SKILLS,
+    )
+    manifest = WorkspaceManifest(
+        generation=3,
+        resource_digest=workspace_resource_digest(files),
+        approved_baseline_revision=7,
+        approved_baseline_digest=approved_document_digest(document),
+        evidence_basis_digest=evidence_basis_digest((correction,)),
+        validation_status=WorkspaceValidationStatus.CONFLICTED,
+        diagnostics=validation.diagnostics,
+        entity_ids_by_handle=registry,
+    )
+
+    review = derive_workspace_review(document, validation, manifest, ())
+    opks_group = next(
+        group
+        for group in review.groups
+        if any(str(OUTPUT_ID) in action.path for action in group.actions)
+    )
+    task_group = next(
+        group
+        for group in review.groups
+        if any(str(TASK_ID) in action.path for action in group.actions)
+    )
+
+    assert any(
+        diagnostic.code == "evidence-source-stale"
+        for diagnostic in opks_group.diagnostics
+    )
+    assert task_group.diagnostics == ()
+    assert review.blocking_diagnostics == ()
 
 
 def test_add_withdraw_reassign_and_reorder_are_derived_without_split_or_merge() -> None:

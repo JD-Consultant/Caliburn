@@ -336,14 +336,22 @@ def select_workspace_actions(
     conflict_diagnostics = tuple(
         diagnostic
         for diagnostic in getattr(group, "diagnostics", ())
-        if diagnostic.code == "workspace-rebase-conflict"
+        if diagnostic.severity is WorkspaceDiagnosticSeverity.ERROR
     )
     if conflict_diagnostics and command.decision in {
         WorkspaceDecisionKind.ACCEPT,
         WorkspaceDecisionKind.EDIT_ACCEPT,
     }:
+        blocker = (
+            "a rebase conflict"
+            if any(
+                diagnostic.code == "workspace-rebase-conflict"
+                for diagnostic in conflict_diagnostics
+            )
+            else "a diagnostic"
+        )
         raise WorkspaceAuthorityError(
-            f"workspace changeset {group.changeset.changeset_id} is blocked by a rebase conflict"
+            f"workspace changeset {group.changeset.changeset_id} is blocked by {blocker}"
         )
     by_id = {action.action_id: action for action in group.actions}
     all_actions = {
@@ -619,7 +627,7 @@ class WorkspaceAuthorityService:
             raise WorkspaceAuthorityError(
                 "workspace is not reviewable until validation succeeds"
             )
-        if validation.document is None or validation.diagnostics:
+        if validation.document is None:
             raise WorkspaceAuthorityError(
                 "workspace validation failed: "
                 + "; ".join(item.code for item in validation.diagnostics)
@@ -644,10 +652,12 @@ class WorkspaceAuthorityService:
                 update={
                     "validation_status": (
                         WorkspaceValidationStatus.CONFLICTED
-                        if active_conflicts
+                        if validation.diagnostics or active_conflicts
                         else WorkspaceValidationStatus.VALID
                     ),
-                    "diagnostics": active_conflicts,
+                    "diagnostics": tuple(
+                        dict.fromkeys((*validation.diagnostics, *active_conflicts))
+                    ),
                 }
             )
         decisions = await self.review_decisions(document_id)
@@ -959,10 +969,10 @@ class WorkspaceAuthorityService:
         status = (
             (
                 WorkspaceValidationStatus.CONFLICTED
-                if active_conflicts
+                if validation.diagnostics or active_conflicts
                 else WorkspaceValidationStatus.VALID
             )
-            if validation.document is not None and not validation.diagnostics
+            if validation.document is not None
             else WorkspaceValidationStatus.INVALID
         )
         diagnostics_list = list(validation.diagnostics)

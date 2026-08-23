@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from io import BytesIO
 from types import SimpleNamespace
@@ -16,10 +17,11 @@ import app.app_factory as app_factory
 from app.adapters.langgraph.postgres import (
     ActiveConsultantRun,
     ConsultantDocumentCatalogEntry,
+    ConsultantRunAlreadyActive,
     DocumentNotFound,
 )
 from app.api.deps import get_consultant_runtime, get_consultant_turn_processor
-from app.api.problems import INVALID_REQUEST
+from app.api.problems import CONSULTANT_RUN_ACTIVE, INVALID_REQUEST
 from app.api.routes import consultant
 from app.consultant.state import (
     EmployeeSource,
@@ -77,6 +79,9 @@ class FakeRuntime:
         self.deleted = False
         self.snapshot = None
         self.active_conflict = False
+        self.model_mutation_busy = False
+        self.employee_admission_entries = 0
+        self.busy_preflight_calls = 0
         self.calls: list[tuple[str, dict]] = []
         self.sources: list[EmployeeSource] = []
         self.review_changeset_id: UUID | None = None
@@ -107,7 +112,17 @@ class FakeRuntime:
 
     async def reopen_document(self, document_id: UUID):
         assert document_id == self.document_id
+        if self.model_mutation_busy:
+            self.busy_preflight_calls += 1
         return self.snapshot
+
+    @asynccontextmanager
+    async def employee_mutation_admission(self, document_id: UUID):
+        assert document_id == self.document_id
+        self.employee_admission_entries += 1
+        if self.model_mutation_busy:
+            raise ConsultantRunAlreadyActive(document_id)
+        yield
 
     async def list_sources(self, document_id: UUID):
         assert document_id == self.document_id
@@ -146,6 +161,8 @@ class FakeRuntime:
 
     async def workspace_review_context(self, document_id: UUID):
         assert document_id == self.document_id
+        if self.model_mutation_busy:
+            self.busy_preflight_calls += 1
         changeset_id = self.review_changeset_id or uuid4()
         action_id = self.review_action_id or uuid4()
         action = DocumentPatchAction(
@@ -189,6 +206,8 @@ class FakeRuntime:
         )
 
     async def decide_workspace_changes(self, command):
+        if self.model_mutation_busy:
+            raise ConsultantRunAlreadyActive(command.document_id)
         self.calls.append(("review", command.model_dump(mode="json")))
         return self.snapshot
 
@@ -201,6 +220,8 @@ class FakeRuntime:
         return self.snapshot
 
     async def apply_direct_edit(self, **kwargs):
+        if self.model_mutation_busy:
+            raise ConsultantRunAlreadyActive(kwargs["document_id"])
         self.calls.append(("direct_edit", kwargs))
         self.snapshot = self.snapshot.model_copy(
             update={"approved_document": kwargs["document"]}
@@ -537,6 +558,44 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     )
     assert edited.status_code == 200, edited.text
     assert runtime.calls[-1][0] == "direct_edit"
+
+
+async def test_review_and_direct_edit_return_clear_busy_conflict_during_model_mutation(
+    api,
+) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+    changeset_id = uuid4()
+    action_id = uuid4()
+    runtime.review_changeset_id = changeset_id
+    runtime.review_action_id = action_id
+    runtime.model_mutation_busy = True
+
+    review = await client.post(
+        f"{BASE}/{document_id}/reviews/{changeset_id}",
+        headers={"Idempotency-Key": "busy-review", "X-Expected-Revision": "0"},
+        json={
+            "command": "accept_changes",
+            "action_ids": [str(action_id)],
+            "edited_after_by_action_id": {},
+            "rejection_reason": None,
+        },
+    )
+    document = runtime.snapshot.approved_document.model_dump(mode="json")
+    document["job_title"] = "忙碌時不得交錯寫入"
+    direct_edit = await client.put(
+        f"{BASE}/{document_id}/approved-document",
+        headers={"Idempotency-Key": "busy-edit", "X-Expected-Revision": "0"},
+        json={"document": document},
+    )
+
+    for response in (review, direct_edit):
+        assert response.status_code == 409
+        assert response.json()["type"] == CONSULTANT_RUN_ACTIVE
+        assert response.json()["title"] == "Document is busy with an active consultant run"
+    assert runtime.calls == []
+    assert runtime.employee_admission_entries == 2
+    assert runtime.busy_preflight_calls == 0
 
 
 async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_browser(api) -> None:

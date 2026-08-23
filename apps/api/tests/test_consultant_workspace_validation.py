@@ -49,6 +49,8 @@ DUTY_ID = UUID("00000000-0000-0000-0000-000000000902")
 TASK_ID = UUID("00000000-0000-0000-0000-000000000903")
 SOURCE_ID = UUID("00000000-0000-0000-0000-000000000904")
 CORRECTED_SOURCE_ID = UUID("00000000-0000-0000-0000-000000000905")
+SECOND_SOURCE_ID = UUID("00000000-0000-0000-0000-000000000906")
+SECOND_TASK_ID = UUID("00000000-0000-0000-0000-000000000907")
 
 
 def _document() -> ApprovedJobDocument:
@@ -673,12 +675,129 @@ async def test_source_correction_revalidates_unchanged_files_and_invalidates_old
     corrected = await validator.validate_current(loaded_skill_ids=("output",))
 
     assert first.document is not None
-    assert corrected.document is None
+    assert corrected.document is not None
+    assert corrected.manifest.validation_status is WorkspaceValidationStatus.CONFLICTED
     assert corrected.manifest.generation == first.manifest.generation + 1
     assert corrected.manifest.resource_digest == first.manifest.resource_digest
     assert corrected.manifest.evidence_basis_digest != first.manifest.evidence_basis_digest
     assert corrected.diagnostics[0].code == "evidence-source-stale"
     assert (await workspace.read_snapshot()).files == files_before
+
+
+@pytest.mark.asyncio
+async def test_source_correction_blocks_only_the_review_group_with_stale_exact_evidence(
+) -> None:
+    created = datetime(2026, 8, 22, 9, 0, tzinfo=UTC)
+    first_source = _source(created_at=created)
+    second_source = _source(
+        source_id=SECOND_SOURCE_ID,
+        text="回報缺料結果。",
+        created_at=created + timedelta(minutes=1),
+    )
+    document = _document().model_copy(
+        update={
+            "tasks": (
+                _document().tasks[0],
+                ApprovedTask(
+                    task_id=SECOND_TASK_ID,
+                    duty_id=DUTY_ID,
+                    statement="回報結果",
+                    action="回報",
+                    object="結果",
+                    display_order=1,
+                ),
+            )
+        }
+    )
+    workspace = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(approved_document=document, approved_revision=7)
+    loader = MutableSourceLoader((first_source, second_source))
+    validator = WorkspaceValidationService(
+        workspace=workspace,
+        catalog=WorkspaceCatalog.from_snapshot(
+            document,
+            sources=loader.sources,
+        ),
+        source_loader=loader,
+        selected_skill_ids=("output",),
+    )
+
+    for path, statement, source_handle, quote in (
+        (
+            "/workspace/tasks/task-001.json",
+            "核對訂單，核對訂單。",
+            "source-001",
+            "核對訂單",
+        ),
+        (
+            "/workspace/tasks/task-002.json",
+            "回報缺料結果。",
+            "source-002",
+            "回報缺料結果",
+        ),
+    ):
+        before = (await workspace.read_snapshot()).files[path]
+        payload = json.loads(before)
+        payload["statement"] = statement
+        payload["evidence"] = [
+            {
+                "source_handle": source_handle,
+                "quote": quote,
+                "occurrence": 1,
+                "skill_ids": ["output"],
+            }
+        ]
+        after = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+        assert (await workspace.backend.aedit(path, before, after)).error is None
+
+    initial = await validator.validate_current(loaded_skill_ids=("output",))
+    assert initial.document is not None
+    loader.sources = (
+        first_source.model_copy(
+            update={
+                "validity": SourceValidity.SUPERSEDED,
+                "superseded_by_source_id": CORRECTED_SOURCE_ID,
+            }
+        ),
+        second_source,
+        _source(
+            source_id=CORRECTED_SOURCE_ID,
+            text="更正：只需回報核對結果。",
+            supersedes_source_id=SOURCE_ID,
+            created_at=created + timedelta(minutes=2),
+        ),
+    )
+
+    corrected = await validator.validate_current(loaded_skill_ids=("output",))
+
+    assert corrected.document is not None
+    assert corrected.manifest.validation_status is WorkspaceValidationStatus.CONFLICTED
+    assert corrected.diagnostics[0].code == "evidence-source-stale"
+    from app.consultant.workspace_review import derive_workspace_review
+
+    projection = derive_workspace_review(
+        document,
+        workspace_validation.validate_workspace_payload(
+            (await workspace.read_snapshot()).files,
+            catalog=WorkspaceCatalog.from_snapshot(document, sources=loader.sources),
+            selected_skill_ids=("output",),
+            loaded_skill_ids=("output",),
+        ),
+        corrected.manifest,
+        (),
+    )
+    affected = next(
+        group
+        for group in projection.groups
+        if any(str(TASK_ID) in action.path for action in group.actions)
+    )
+    unrelated = next(
+        group
+        for group in projection.groups
+        if any(str(SECOND_TASK_ID) in action.path for action in group.actions)
+    )
+    assert affected.diagnostics[0].code == "evidence-source-stale"
+    assert unrelated.diagnostics == ()
 
 
 @pytest.mark.asyncio

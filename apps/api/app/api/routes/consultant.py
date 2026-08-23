@@ -26,11 +26,16 @@ from job_analysis_contract import (
     UnderstandingCalibrationDecisionWrite,
 )
 
-from app.adapters.langgraph.postgres import DocumentNotFound, PostgresConsultantRuntime
+from app.adapters.langgraph.postgres import (
+    ConsultantRunAlreadyActive,
+    DocumentNotFound,
+    PostgresConsultantRuntime,
+)
 from app.adapters.xlsx import XLSX_MEDIA_TYPE, render_xlsx
 from app.api.consultant_mapper import to_consultant_snapshot_view
 from app.api.deps import get_consultant_runtime, get_consultant_turn_processor
 from app.api.problems import (
+    CONSULTANT_RUN_ACTIVE,
     EXPORT_CONFIRMATION_REQUIRED,
     INVALID_REQUEST,
     consultant_runtime_error_response,
@@ -66,6 +71,16 @@ OptionalExpectedRevision = Annotated[
 
 def _command_id(document_id: UUID, channel: str, key: str) -> UUID:
     return uuid5(document_id, f"consultant-http:{channel}:{key}")
+
+
+def _employee_mutation_error_response(error: Exception):
+    if isinstance(error, ConsultantRunAlreadyActive):
+        return problem_response(
+            type_uri=CONSULTANT_RUN_ACTIVE,
+            title="Document is busy with an active consultant run",
+            status=409,
+        )
+    return consultant_runtime_error_response(error)
 
 
 def _command_receipt(
@@ -371,43 +386,48 @@ async def review_document_changes(
     runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
 ):
     try:
-        edited = {
-            UUID(key): value
-            for key, value in body.edited_after_by_action_id.items()
-        }
-        _, _, workspace_snapshot, projection = await runtime.workspace_review_context(
-            document_id
-        )
-        groups = [
-            group
-            for group in projection.groups
-            if group.changeset.changeset_id == changeset_id
-        ]
-        if len(groups) != 1:
-            raise ValueError(f"workspace changeset {changeset_id} is stale")
-        decision = {
-            "accept_changes": WorkspaceDecisionKind.ACCEPT,
-            "edit_and_accept_changes": WorkspaceDecisionKind.EDIT_ACCEPT,
-            "reject_changes": WorkspaceDecisionKind.REJECT,
-            "defer_changes": WorkspaceDecisionKind.DEFER,
-        }[body.command.value]
-        command = WorkspaceReviewCommand(
-            command_id=_command_id(document_id, "workspace-review", idempotency_key),
-            document_id=document_id,
-            decision=decision,
-            approved_revision=expected_revision,
-            workspace_generation=workspace_snapshot.manifest.generation,
-            workspace_digest=workspace_snapshot.manifest.resource_digest,
-            changeset_id=changeset_id,
-            group_digest=groups[0].group_digest,
-            selected_action_ids=tuple(body.action_ids),
-            edited_after_by_action_id=edited,
-            reason=body.rejection_reason,
-        )
-        snapshot = await runtime.decide_workspace_changes(command)
-        return await _snapshot_view(runtime, snapshot)
+        async with runtime.employee_mutation_admission(document_id):
+            edited = {
+                UUID(key): value
+                for key, value in body.edited_after_by_action_id.items()
+            }
+            _, _, workspace_snapshot, projection = (
+                await runtime.workspace_review_context(document_id)
+            )
+            groups = [
+                group
+                for group in projection.groups
+                if group.changeset.changeset_id == changeset_id
+            ]
+            if len(groups) != 1:
+                raise ValueError(f"workspace changeset {changeset_id} is stale")
+            decision = {
+                "accept_changes": WorkspaceDecisionKind.ACCEPT,
+                "edit_and_accept_changes": WorkspaceDecisionKind.EDIT_ACCEPT,
+                "reject_changes": WorkspaceDecisionKind.REJECT,
+                "defer_changes": WorkspaceDecisionKind.DEFER,
+            }[body.command.value]
+            command = WorkspaceReviewCommand(
+                command_id=_command_id(
+                    document_id,
+                    "workspace-review",
+                    idempotency_key,
+                ),
+                document_id=document_id,
+                decision=decision,
+                approved_revision=expected_revision,
+                workspace_generation=workspace_snapshot.manifest.generation,
+                workspace_digest=workspace_snapshot.manifest.resource_digest,
+                changeset_id=changeset_id,
+                group_digest=groups[0].group_digest,
+                selected_action_ids=tuple(body.action_ids),
+                edited_after_by_action_id=edited,
+                reason=body.rejection_reason,
+            )
+            snapshot = await runtime.decide_workspace_changes(command)
+            return await _snapshot_view(runtime, snapshot)
     except Exception as error:
-        return consultant_runtime_error_response(error)
+        return _employee_mutation_error_response(error)
 
 
 @router.post(
@@ -529,30 +549,31 @@ async def edit_approved_document(
     runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
 ):
     try:
-        source_id = _command_id(
-            document_id, "direct-edit-source", idempotency_key
-        )
-        current = (await runtime.reopen_document(document_id)).approved_document
-        document = _approved_document_from_edit(
-            body.document,
-            current,
-            source_id,
-        )
-        snapshot = await runtime.apply_direct_edit(
-            document_id=document_id,
-            expected_revision=expected_revision,
-            document=document,
-            source_id=source_id,
-            command_receipt=_command_receipt(
-                document_id,
-                "direct_document_edit",
-                idempotency_key,
-                {"document": body.document.model_dump(mode="json")},
-            ),
-        )
-        return await _snapshot_view(runtime, snapshot)
+        async with runtime.employee_mutation_admission(document_id):
+            source_id = _command_id(
+                document_id, "direct-edit-source", idempotency_key
+            )
+            current = (await runtime.reopen_document(document_id)).approved_document
+            document = _approved_document_from_edit(
+                body.document,
+                current,
+                source_id,
+            )
+            snapshot = await runtime.apply_direct_edit(
+                document_id=document_id,
+                expected_revision=expected_revision,
+                document=document,
+                source_id=source_id,
+                command_receipt=_command_receipt(
+                    document_id,
+                    "direct_document_edit",
+                    idempotency_key,
+                    {"document": body.document.model_dump(mode="json")},
+                ),
+            )
+            return await _snapshot_view(runtime, snapshot)
     except Exception as error:
-        return consultant_runtime_error_response(error)
+        return _employee_mutation_error_response(error)
 
 
 def _export_filename(title: str) -> str:

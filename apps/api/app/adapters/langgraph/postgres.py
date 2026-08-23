@@ -124,6 +124,10 @@ class ActiveConsultantRun(ConsultantPersistenceError):
     pass
 
 
+class ConsultantRunAlreadyActive(ConsultantPersistenceError):
+    """One process-local model run currently owns this document."""
+
+
 class ConsultantDocumentCatalogEntry(DurableModel):
     document_id: UUID
     title: str
@@ -154,6 +158,8 @@ class PostgresConsultantRuntime:
         self._strict_serializer = strict_serializer
         self.graph = build_consultant_graph(saver, store)
         self._document_locks: dict[UUID, asyncio.Lock] = {}
+        self._active_model_runs: set[UUID] = set()
+        self._active_employee_mutations: dict[UUID, int] = {}
         self._after_source_store: SourceHook = self._noop_source_hook
         self._after_source_checkpoint: SourceHook = self._noop_source_hook
         self._after_workspace_authority_checkpoint: WorkspaceHook = (
@@ -226,6 +232,53 @@ class PostgresConsultantRuntime:
 
     def _lock_for(self, document_id: UUID) -> asyncio.Lock:
         return self._document_locks.setdefault(document_id, asyncio.Lock())
+
+    @asynccontextmanager
+    async def active_consultant_run(self, document_id: UUID) -> AsyncIterator[None]:
+        """Own one document's model mutation admission in this local process."""
+
+        async with self._lock_for(document_id):
+            if (
+                document_id in self._active_model_runs
+                or self._active_employee_mutations.get(document_id, 0) > 0
+            ):
+                raise ConsultantRunAlreadyActive(
+                    f"document mutation already active for {document_id}"
+                )
+            self._active_model_runs.add(document_id)
+        try:
+            yield
+        finally:
+            async with self._lock_for(document_id):
+                self._active_model_runs.discard(document_id)
+
+    @asynccontextmanager
+    async def employee_mutation_admission(
+        self,
+        document_id: UUID,
+    ) -> AsyncIterator[None]:
+        """Reserve one route's preflight and authority mutation against the model."""
+
+        async with self._lock_for(document_id):
+            self._require_employee_mutation_admitted(document_id)
+            self._active_employee_mutations[document_id] = (
+                self._active_employee_mutations.get(document_id, 0) + 1
+            )
+        try:
+            yield
+        finally:
+            async with self._lock_for(document_id):
+                remaining = self._active_employee_mutations.get(document_id, 1) - 1
+                if remaining > 0:
+                    self._active_employee_mutations[document_id] = remaining
+                else:
+                    self._active_employee_mutations.pop(document_id, None)
+
+    def _require_employee_mutation_admitted(self, document_id: UUID) -> None:
+        if document_id in self._active_model_runs:
+            raise ConsultantRunAlreadyActive(
+                f"document {document_id} is busy with a consultant model run"
+            )
 
     async def _catalog_row(self, document_id: UUID) -> dict[str, Any] | None:
         async with self._catalog_connection.cursor() as cursor:
@@ -378,10 +431,12 @@ class PostgresConsultantRuntime:
                 update={
                     "validation_status": (
                         WorkspaceValidationStatus.CONFLICTED
-                        if conflicts
+                        if validation.diagnostics or conflicts
                         else WorkspaceValidationStatus.VALID
                     ),
-                    "diagnostics": conflicts,
+                    "diagnostics": tuple(
+                        dict.fromkeys((*validation.diagnostics, *conflicts))
+                    ),
                 }
             )
         decisions = await self.workspace_review_decisions(document_id)
@@ -992,6 +1047,7 @@ class PostgresConsultantRuntime:
         command_receipt: CommandReceipt | None = None,
     ) -> ConsultantSnapshot:
         async with self._lock_for(document_id):
+            self._require_employee_mutation_admitted(document_id)
             await self._require_active_catalog(document_id)
             snapshot = await self._snapshot(document_id)
             raw_state = await self.raw_state(document_id)
@@ -1104,6 +1160,7 @@ class PostgresConsultantRuntime:
         """Apply one employee decision to the persistent workspace authority seam."""
 
         async with self._lock_for(command.document_id):
+            self._require_employee_mutation_admitted(command.document_id)
             await self._require_active_catalog(command.document_id)
             return await WorkspaceAuthorityService(self).decide(command)
 

@@ -49,6 +49,12 @@ from app.consultant.workspace_state import (
 
 SourceLoader = Callable[[], Awaitable[Sequence[EmployeeSource]]]
 _MAX_DIAGNOSTICS = 8
+_OPKS_PREFIX_BY_KIND = {
+    ApprovedOpksKind.OUTPUT: "o",
+    ApprovedOpksKind.PERFORMANCE_INDICATOR: "p",
+    ApprovedOpksKind.KNOWLEDGE: "k",
+    ApprovedOpksKind.SKILL: "s",
+}
 _ENTITY_PATH = re.compile(
     r"^/workspace/(?:(duties)/(duty-[^/]+)|(tasks)/(task-[^/]+)|"
     r"opks/(o|p|k|s)/((?:o|p|k|s)-[^/]+))\.json$"
@@ -446,14 +452,8 @@ def _semantic_evidence_diagnostics(
                 require_for_risky_text(path, enabler.name, handle)
 
     baseline_opks = {item.item_id: item for item in baseline.opks}
-    prefix_by_kind = {
-        ApprovedOpksKind.OUTPUT: "o",
-        ApprovedOpksKind.PERFORMANCE_INDICATOR: "p",
-        ApprovedOpksKind.KNOWLEDGE: "k",
-        ApprovedOpksKind.SKILL: "s",
-    }
     for item in working.opks:
-        prefix = prefix_by_kind.get(item.kind)
+        prefix = _OPKS_PREFIX_BY_KIND.get(item.kind)
         if prefix is None:
             continue
         before = baseline_opks.get(item.item_id)
@@ -532,21 +532,35 @@ def validate_workspace_payload(
         *_semantic_evidence_diagnostics(draft, catalog.document, evidence),
     )
     current_ids = {source.source_id for source in current_sources}
-    if any(
-        set(item.evidence_source_ids) - current_ids
-        for item in draft.approved_document.opks
-    ):
+    handles_by_id = {
+        stable_id: handle for handle, stable_id in draft.handle_registry.items()
+    }
+    for item in draft.approved_document.opks:
+        if not set(item.evidence_source_ids) - current_ids:
+            continue
+        handle = handles_by_id.get(item.item_id)
+        prefix = _OPKS_PREFIX_BY_KIND.get(item.kind)
+        path = (
+            f"/workspace/opks/{prefix}/{handle}.json"
+            if prefix is not None and handle is not None
+            else "/workspace/opks"
+        )
         diagnostics = (
             *diagnostics,
             _diagnostic(
                 "evidence-source-stale",
-                "/workspace/opks",
+                path,
                 "OPKS evidence basis contains a source that is no longer current.",
             ),
         )
     diagnostics = tuple(diagnostics[:_MAX_DIAGNOSTICS])
+    recoverable_source_correction = bool(diagnostics) and all(
+        diagnostic.code == "evidence-source-stale" for diagnostic in diagnostics
+    )
     return WorkspacePayloadValidation(
-        document=(None if diagnostics else draft),
+        document=(
+            draft if not diagnostics or recoverable_source_correction else None
+        ),
         diagnostics=diagnostics,
         current_sources=current_sources,
         evidence_by_handle=evidence,
@@ -651,7 +665,14 @@ class WorkspaceValidationService:
         loaded_skill_ids: tuple[SkillId, ...],
     ) -> WorkspaceValidationResult:
         sources = tuple(await self._source_loader())
-        basis_digest = evidence_basis_digest(sources)
+        basis_digest = evidence_basis_digest(
+            tuple(
+                source
+                for source in sources
+                if source.processing_status is SourceProcessingStatus.COMMITTED
+                and source.validity is SourceValidity.CURRENT
+            )
+        )
         snapshot = await self._workspace.read_snapshot()
         baseline_digest = approved_document_digest(self._catalog.document)
         last = self._last_result
@@ -727,7 +748,7 @@ class WorkspaceValidationService:
         status = (
             (
                 WorkspaceValidationStatus.CONFLICTED
-                if conflict_diagnostics
+                if payload.diagnostics or conflict_diagnostics
                 else WorkspaceValidationStatus.VALID
             )
             if payload.document is not None

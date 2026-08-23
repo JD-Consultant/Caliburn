@@ -239,6 +239,29 @@ async def test_store_backed_workspace_seeds_once_and_survives_reopen() -> None:
 
 
 @pytest.mark.asyncio
+async def test_store_backed_workspace_advances_unchanged_approved_baseline_revision(
+) -> None:
+    store = InMemoryStore()
+    workspace = StoreBackedWorkspace(store=store, document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(
+        approved_document=_document(),
+        approved_revision=3,
+    )
+    path = "/workspace/header.json"
+    before = (await workspace.read_snapshot()).files[path]
+    after = before.replace("採購專員", "AI 工作草稿職稱")
+    assert (await workspace.backend.aedit(path, before, after)).error is None
+
+    refreshed = await workspace.ensure_initialized(
+        approved_document=_document(),
+        approved_revision=4,
+    )
+
+    assert refreshed.approved_baseline_revision == 4
+    assert (await workspace.read_snapshot()).files[path] == after
+
+
+@pytest.mark.asyncio
 async def test_store_backed_workspace_does_not_seed_over_partial_files_or_manifest() -> None:
     partial = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
     assert (

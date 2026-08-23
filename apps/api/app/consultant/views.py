@@ -33,6 +33,7 @@ from app.consultant.understanding import (
 from app.consultant.workspace_review import WorkspaceReviewProjection
 from app.consultant.workspace_state import (
     WorkspaceDiagnostic,
+    WorkspaceDiagnosticSeverity,
     WorkspaceValidationStatus,
 )
 
@@ -176,7 +177,7 @@ def document_review_projection_from_workspace(
             group.changeset.changeset_id
             for group in workspace_review.groups
             if any(
-                diagnostic.code == "workspace-rebase-conflict"
+                diagnostic.severity is WorkspaceDiagnosticSeverity.ERROR
                 for diagnostic in group.diagnostics
             )
         ),

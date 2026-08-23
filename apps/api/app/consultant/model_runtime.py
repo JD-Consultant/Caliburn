@@ -115,7 +115,6 @@ class RunPolicy(RuntimeModel):
     allowed_tool_ids: tuple[NonEmptyText, ...] = ()
     max_context_tokens: int = Field(ge=512)
     max_model_calls: int = Field(ge=1, le=11)
-    max_lookup_waves: int = Field(ge=0, le=10)
     max_total_tool_calls: int = Field(ge=0, le=100)
     model_retry_count: int = Field(ge=0, le=3)
     tool_retry_count: int = Field(ge=0, le=3)
@@ -157,7 +156,6 @@ class ResolvedExecution(RuntimeModel):
     allowed_tool_ids: tuple[str, ...]
     max_context_tokens: int
     max_model_calls: int
-    max_lookup_waves: int
     max_total_tool_calls: int
     model_retry_count: int
     tool_retry_count: int
@@ -216,7 +214,6 @@ def resolve_execution(
         allowed_tool_ids=policy.allowed_tool_ids,
         max_context_tokens=policy.max_context_tokens,
         max_model_calls=policy.max_model_calls,
-        max_lookup_waves=policy.max_lookup_waves,
         max_total_tool_calls=policy.max_total_tool_calls,
         model_retry_count=policy.model_retry_count,
         tool_retry_count=policy.tool_retry_count,
@@ -319,7 +316,23 @@ def _usage_from_message(message: AIMessage | None) -> AttemptUsage:
     )
 
 
+class ClassifiedConsultantError(RuntimeError):
+    """Internal failure with a payload-free code safe for durable recovery state."""
+
+    def __init__(self, error_code: str, message: str) -> None:
+        if (
+            not error_code
+            or len(error_code) > 80
+            or any(character not in "abcdefghijklmnopqrstuvwxyz0123456789_" for character in error_code)
+        ):
+            raise ValueError("classified consultant error code is invalid")
+        self.error_code = error_code
+        super().__init__(message)
+
+
 def _safe_error_details(error: BaseException) -> tuple[str, str]:
+    if isinstance(error, ClassifiedConsultantError):
+        return error.error_code, f"consultant run failed ({type(error).__name__})"
     if isinstance(error, (TimeoutError, httpx.TimeoutException)):
         return "timeout", "model request timed out"
     if isinstance(error, httpx.HTTPStatusError):

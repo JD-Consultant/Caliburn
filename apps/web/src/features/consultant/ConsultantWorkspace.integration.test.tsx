@@ -10,6 +10,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { jobAnalysisKeys } from "@/shared/query/jobAnalysisQueries";
 import { ApprovedDocumentEditor } from "./ApprovedDocumentEditor";
 import { ConsultantConversation } from "./ConsultantConversation";
+import { ConsultantInsightPanel } from "./ConsultantInsightPanel";
 import { ConsultantWorkspace } from "./ConsultantWorkspace";
 import { DocumentReviewPanel } from "./DocumentReviewPanel";
 import {
@@ -58,6 +59,24 @@ afterEach(() => {
 });
 
 describe("employee consultant workspace integration", () => {
+  it("shows durable question focus and workspace-derived employee decision progress", () => {
+    const snapshot = consultantSnapshotFixture();
+    snapshot.current_interview = null;
+    snapshot.semantic_progress.employee_decisions = {
+      pending: 2,
+      deferred: 1,
+    };
+
+    renderWithClient(
+      <ConsultantInsightPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(screen.getByText("目前要釐清的問題")).toBeTruthy();
+    expect(screen.getByText("異常判斷依據")).toBeTruthy();
+    expect(screen.getByText("待你確認 2 項")).toBeTruthy();
+    expect(screen.getByText("你已延後 1 項")).toBeTruthy();
+  });
+
   it("renders the whole durable workspace, reconnect state and single force-export confirmation", async () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();

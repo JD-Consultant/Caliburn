@@ -1,5 +1,7 @@
 # Deep Agents 虛擬 JD 工作區 Implementation Plan
 
+> 現況註記（2026-08-23）：這是施工時的 frozen plan；其中固定兩波 lookup 限制已被實測否證並由 [ADR 0068](../adr/0068-framework-run-budgets-replace-lookup-wave-cap.md) 取代。現行 runtime 以 framework 總 model／Tool budgets 防 runaway。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 以 Deep Agents 受限 VFS 取代 model-facing candidate mega-form 與三個自寫來源 Tool，讓模型在隔離候選 JD 上讀／增／改／刪、取得 deterministic diagnostics 後發布待審 semantic diff，同時修正 rejection memory 與 edit-accept Evidence 兩個已確認缺口。

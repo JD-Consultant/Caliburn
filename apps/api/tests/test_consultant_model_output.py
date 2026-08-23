@@ -352,3 +352,18 @@ def test_model_output_schema_metrics_are_recorded_without_legacy_editor_schema()
     assert publication_field not in schema["properties"]
     assert "document_draft" not in serialized
     assert "model_offsets" not in serialized
+
+
+def test_provider_output_schema_uses_named_consultant_sections() -> None:
+    schema = ConsultantModelOutput.model_json_schema()
+
+    assert set(schema["properties"]) == {
+        "visible_reply",
+        "analysis_bases",
+        "reply_basis_ordinal",
+        "understanding_changes",
+        "attention_changes",
+        "gaps",
+        "question",
+        "sufficiency",
+    }

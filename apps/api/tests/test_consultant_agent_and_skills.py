@@ -5,15 +5,15 @@ from typing import Any
 from uuid import UUID
 
 import pytest
+from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
 from langchain_core.messages import AIMessage, ToolMessage
 from langgraph.store.memory import InMemoryStore
 
 from app.consultant.agent import (
-    LookupWaveLimitExceeded,
-    LookupWaveLimitMiddleware,
     ProfessionalConsultantAgent,
     RunScopedSkillsMiddleware,
+    SKILLS_SYSTEM_PROMPT,
     WorkspaceAgentAsyncOnlyError,
     build_professional_consultant_agent,
 )
@@ -26,7 +26,6 @@ from app.consultant.skill_backend import (
     CONSULTANT_SKILL_IDS,
     PackageSkillBackend,
     load_packaged_skill_text,
-    skill_path,
 )
 from app.consultant.state import ApprovedDuty, ApprovedJobDocument, ApprovedTask
 from app.consultant.workspace_backend import (
@@ -35,6 +34,7 @@ from app.consultant.workspace_backend import (
 )
 from app.consultant.workspace_resources import WorkspaceCatalog
 from app.consultant.workspace_state import StoreBackedWorkspace
+from app.consultant.workspace_tools import WorkspaceToolWaveMiddleware
 from app.consultant.workspace_validation import WorkspaceValidationMiddleware
 
 
@@ -97,7 +97,6 @@ def _execution(*, tools: tuple[str, ...] = EXPECTED_TOOLS, max_model_calls: int 
             allowed_tool_ids=tools,
             max_context_tokens=24_000,
             max_model_calls=max_model_calls,
-            max_lookup_waves=2,
             max_total_tool_calls=12,
             model_retry_count=0,
             tool_retry_count=0,
@@ -153,7 +152,10 @@ def test_first_release_skills_are_packaged_and_read_only() -> None:
     assert loaded.file_data is not None
     assert "Task 邊界" in loaded.file_data["content"]
     assert backend.loaded_skill_ids == ("task-boundary",)
-    assert backend.read(skill_path("task-boundary"), limit=1000).error is not None
+    repeated = backend.read("/task-boundary/SKILL.md", limit=1000)
+    assert repeated.error is None
+    assert repeated.file_data == loaded.file_data
+    assert backend.loaded_skill_ids == ("task-boundary",)
     assert backend.read("/skills/knowledge/SKILL.md").error is not None
     assert backend.write("/output/SKILL.md", "replace").error is not None
 
@@ -180,11 +182,21 @@ def test_professional_agent_composes_exactly_one_persistent_workspace_tool_surfa
     assert tuple(tool.name for tool in captured["tools"]) == ()
     filesystem = captured["additional_middleware"][1]
     assert {tool.name for tool in filesystem.tools} == set(EXPECTED_TOOLS)
-    assert captured["additional_middleware"][2].run_limit == 2
-    assert isinstance(
-        captured["additional_middleware"][-1],
-        WorkspaceValidationMiddleware,
-    )
+    additional = captured["additional_middleware"]
+    assert len(additional) == 4
+    assert isinstance(additional[0], RunScopedSkillsMiddleware)
+    assert isinstance(additional[1], FilesystemMiddleware)
+    assert isinstance(additional[2], WorkspaceToolWaveMiddleware)
+    assert isinstance(additional[3], WorkspaceValidationMiddleware)
+
+
+def test_agent_contract_batches_one_coherent_edit_then_finalizes_when_valid() -> None:
+    assert "Batch independent reads" in SKILLS_SYSTEM_PROMPT
+    assert "one non-overlapping mutation wave" in SKILLS_SYSTEM_PROMPT
+    assert "return the final structured response" in SKILLS_SYSTEM_PROMPT
+    assert "do not reread /workspace or /review merely to confirm" in SKILLS_SYSTEM_PROMPT
+    assert "grep once for the current source handle" in SKILLS_SYSTEM_PROMPT
+    assert "repair every listed diagnostic" in SKILLS_SYSTEM_PROMPT
 
 
 def test_professional_agent_allows_eleven_calls_but_rejects_a_twelfth() -> None:
@@ -217,73 +229,6 @@ def test_professional_agent_rejects_non_workspace_surface() -> None:
             execution=_execution(tools=EXPECTED_TOOLS[:-1]),
             selected_skill_ids=("output",),
             workspace_binding=workspace,
-        )
-
-
-def test_lookup_waves_count_only_path_aware_external_workspace_reads() -> None:
-    middleware = LookupWaveLimitMiddleware(
-        tool_names=frozenset({"ls", "read_file", "grep"}),
-        run_limit=2,
-    )
-
-    def state(name: str, path: str | None = None, count: int = 0) -> dict[str, Any]:
-        args = {} if path is None else {"file_path": path}
-        return {
-            "messages": [
-                AIMessage(
-                    content="",
-                    tool_calls=[
-                        {"name": name, "args": args, "id": name, "type": "tool_call"}
-                    ],
-                )
-            ],
-            "run_lookup_wave_count": count,
-        }
-
-    assert middleware.after_model(state("read_file", "/workspace/header.json"), None) is None  # type: ignore[arg-type]
-    assert middleware.after_model(state("read_file", "/sources/current/source-001.txt"), None) == {"run_lookup_wave_count": 1}  # type: ignore[arg-type]
-    assert middleware.after_model(state("grep", "/approved" , count=1), None) == {"run_lookup_wave_count": 2}  # type: ignore[arg-type]
-    with pytest.raises(LookupWaveLimitExceeded):
-        middleware.after_model(state("ls", "/review", count=2), None)  # type: ignore[arg-type]
-    assert middleware.after_model(state("grep", count=0), None) == {"run_lookup_wave_count": 1}  # type: ignore[arg-type]
-    assert middleware.after_model(state("grep", "/", count=1), None) == {"run_lookup_wave_count": 2}  # type: ignore[arg-type]
-    assert middleware.after_model(state("grep", "/workspace", count=2), None) is None  # type: ignore[arg-type]
-    with pytest.raises(LookupWaveLimitExceeded):
-        middleware.after_model(state("grep", count=2), None)  # type: ignore[arg-type]
-
-
-def test_skill_activation_does_not_consume_external_data_lookup_waves() -> None:
-    middleware = LookupWaveLimitMiddleware(
-        tool_names=frozenset({"ls", "read_file", "grep"}),
-        run_limit=2,
-    )
-
-    def state(path: str, count: int) -> dict[str, Any]:
-        return {
-            "messages": [
-                AIMessage(
-                    content="",
-                    tool_calls=[
-                        {
-                            "name": "read_file",
-                            "args": {"file_path": path},
-                            "id": path,
-                            "type": "tool_call",
-                        }
-                    ],
-                )
-            ],
-            "run_lookup_wave_count": count,
-        }
-
-    assert middleware.after_model(  # type: ignore[arg-type]
-        state("/skills/task-boundary/SKILL.md", count=2),
-        None,
-    ) is None
-    with pytest.raises(LookupWaveLimitExceeded):
-        middleware.after_model(  # type: ignore[arg-type]
-            state("/review/index.json", count=2),
-            None,
         )
 
 

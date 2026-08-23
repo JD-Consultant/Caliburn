@@ -306,6 +306,21 @@ def test_three_way_rebase_preserves_ai_only_and_applies_employee_only_changes() 
     assert plan.conflicted_paths == ()
 
 
+def test_three_way_rebase_does_not_rewrite_semantically_unchanged_resource() -> None:
+    raw = '{"job_title":"採購專員","notes":null}\n'
+
+    plan = build_workspace_rebase_plan(
+        command_id=COMMAND_ID,
+        old_approved_files={"/workspace/header.json": raw},
+        workspace_files={"/workspace/header.json": raw},
+        new_approved_files={"/workspace/header.json": raw},
+        approved_revision=8,
+        approved_digest=DIGEST,
+    )
+
+    assert plan.changes == ()
+
+
 def test_three_way_rebase_keeps_ai_value_and_marks_true_overlap_conflicted() -> None:
     old = {"/workspace/header.json": '{"job_title":"舊職稱"}\n'}
     working = {"/workspace/header.json": '{"job_title":"AI職稱"}\n'}
@@ -320,8 +335,27 @@ def test_three_way_rebase_keeps_ai_value_and_marks_true_overlap_conflicted() -> 
         approved_digest=DIGEST,
     )
 
-    assert '"job_title": "AI職稱"' in (plan.changes[0].after or "")
+    assert plan.changes == ()
     assert plan.conflicted_paths == ("/workspace/header.json/job_title",)
+
+
+def test_three_way_rebase_treats_employee_accepted_workspace_path_as_resolved() -> None:
+    old = {"/workspace/header.json": '{"job_title":"舊職稱"}\n'}
+    working = {"/workspace/header.json": '{"job_title":"AI職稱"}\n'}
+    new = {"/workspace/header.json": '{"job_title":"核准投影職稱"}\n'}
+
+    plan = build_workspace_rebase_plan(
+        command_id=COMMAND_ID,
+        old_approved_files=old,
+        workspace_files=working,
+        new_approved_files=new,
+        approved_revision=8,
+        approved_digest=DIGEST,
+        resolved_workspace_paths=("/workspace/header.json/job_title",),
+    )
+
+    assert plan.conflicted_paths == ()
+    assert plan.changes == ()
 
 
 def test_recover_passes_document_scope_to_rebase_completion_without_mutable_service_scope() -> None:

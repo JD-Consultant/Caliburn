@@ -22,11 +22,16 @@ from app.consultant.results import (
     UnderstandingChange,
 )
 from app.consultant.state import (
+    ApprovedJobDocument,
+    ApprovedOpksKind,
+    ApprovedTask,
     CalibrationDecision,
     CalibrationKind,
     CalibrationStatus,
     CalibrationTrigger,
     ConsultantThreadState,
+    DocumentChangeStatus,
+    DocumentPatchAction,
     DurableModel,
     EmployeeSourceKind,
     GapItem,
@@ -39,6 +44,7 @@ from app.consultant.state import (
     UnderstandingItem,
     UnderstandingStatus,
 )
+from app.consultant.workspace_review import WorkspaceReviewProjection
 
 
 class OpeningNavigationProjection(DurableModel):
@@ -87,10 +93,16 @@ class UnderstandingProjection(DurableModel):
     calibration: CalibrationProjection | None = None
 
 
+CoverageStatus = InterviewWorkStatus | Literal[
+    "awaiting_employee_decision",
+    "employee_deferred",
+]
+
+
 class CoverageItemProjection(DurableModel):
     work_id: UUID
     title: str
-    status: InterviewWorkStatus
+    status: CoverageStatus
     reason: str
 
 
@@ -423,6 +435,205 @@ def semantic_progress_from_state(
             )
             for item in gaps
         ),
+    )
+
+
+def _review_task_ids(action: DocumentPatchAction) -> tuple[UUID, ...]:
+    parts = action.path.strip("/").split("/")
+    if not parts or parts[0] != "tasks":
+        return ()
+    identities: list[UUID] = []
+    if len(parts) >= 2:
+        try:
+            identities.append(UUID(parts[1]))
+        except ValueError:
+            pass
+    for value in (action.before, action.after):
+        values = value if isinstance(value, list) else [value]
+        for item in values:
+            if not isinstance(item, dict) or item.get("task_id") is None:
+                continue
+            try:
+                identities.append(UUID(str(item["task_id"])))
+            except ValueError:
+                continue
+    return tuple(dict.fromkeys(identities))
+
+
+def _task_review_statuses(
+    workspace_review: WorkspaceReviewProjection,
+) -> dict[UUID, DocumentChangeStatus]:
+    statuses: dict[UUID, DocumentChangeStatus] = {}
+    for changeset in workspace_review.changesets:
+        for action in changeset.actions:
+            if action.status not in {
+                DocumentChangeStatus.PENDING,
+                DocumentChangeStatus.DEFERRED,
+            }:
+                continue
+            for task_id in _review_task_ids(action):
+                if (
+                    statuses.get(task_id) is DocumentChangeStatus.PENDING
+                    or action.status is DocumentChangeStatus.PENDING
+                ):
+                    statuses[task_id] = DocumentChangeStatus.PENDING
+                else:
+                    statuses[task_id] = DocumentChangeStatus.DEFERRED
+    return statuses
+
+
+def _document_task_depth(
+    task: ApprovedTask,
+    document: ApprovedJobDocument,
+) -> WorkDepthProjection:
+    kinds = {
+        item.kind
+        for item in document.opks
+        if task.task_id in item.task_ids
+    }
+    return WorkDepthProjection(
+        work_id=task.task_id,
+        task_boundary=DepthStatus.EVIDENCE_PRESENT,
+        duty_grouping=(
+            DepthStatus.EVIDENCE_PRESENT
+            if task.duty_id is not None
+            else DepthStatus.GAP
+        ),
+        output=(
+            DepthStatus.EVIDENCE_PRESENT
+            if ApprovedOpksKind.OUTPUT in kinds
+            else DepthStatus.NOT_YET_DEEPENED
+        ),
+        performance_indicator=(
+            DepthStatus.EVIDENCE_PRESENT
+            if ApprovedOpksKind.PERFORMANCE_INDICATOR in kinds
+            else DepthStatus.NOT_YET_DEEPENED
+        ),
+        knowledge=(
+            DepthStatus.EVIDENCE_PRESENT
+            if ApprovedOpksKind.KNOWLEDGE in kinds
+            else DepthStatus.NOT_YET_DEEPENED
+        ),
+        skill=(
+            DepthStatus.EVIDENCE_PRESENT
+            if ApprovedOpksKind.SKILL in kinds
+            else DepthStatus.NOT_YET_DEEPENED
+        ),
+    )
+
+
+def _merge_document_depth(
+    base: WorkDepthProjection | None,
+    document_depth: WorkDepthProjection,
+    *,
+    work_id: UUID,
+) -> WorkDepthProjection:
+    if base is None:
+        return document_depth.model_copy(update={"work_id": work_id})
+    updates: dict[str, Any] = {"work_id": work_id}
+    for axis in (
+        "task_boundary",
+        "duty_grouping",
+        "output",
+        "performance_indicator",
+        "knowledge",
+        "skill",
+    ):
+        existing = getattr(base, axis)
+        candidate = getattr(document_depth, axis)
+        updates[axis] = (
+            candidate
+            if existing is DepthStatus.NOT_YET_DEEPENED
+            and candidate is not DepthStatus.NOT_YET_DEEPENED
+            else existing
+        )
+    return WorkDepthProjection(**updates)
+
+
+def semantic_progress_from_workspace(
+    state: ConsultantThreadState,
+    *,
+    working_document: ApprovedJobDocument,
+    workspace_review: WorkspaceReviewProjection,
+) -> SemanticProgressProjection:
+    """Project valid Store workspace facts without persisting another work model."""
+
+    approved = ApprovedJobDocument.model_validate(state["approved_document"])
+    if approved.document_id != working_document.document_id:
+        raise ValueError("workspace progress document scope does not match")
+    base = semantic_progress_from_state(state)
+    base_coverage = {item.work_id: item for item in base.coverage}
+    base_depth = {item.work_id: item for item in base.depth}
+    work_items = tuple(
+        item
+        for item in _work_items(state).values()
+        if item.status is not InterviewWorkStatus.RETIRED
+    )
+    work_by_subject = {
+        item.subject_id: item
+        for item in sorted(work_items, key=lambda value: str(value.work_id))
+        if item.subject_id is not None
+    }
+    work_by_id = {item.work_id: item for item in work_items}
+    review_statuses = _task_review_statuses(workspace_review)
+    approved_tasks = {item.task_id: item for item in approved.tasks}
+    working_tasks = {item.task_id: item for item in working_document.tasks}
+    coverage: dict[UUID, CoverageItemProjection] = dict(base_coverage)
+    depth: dict[UUID, WorkDepthProjection] = dict(base_depth)
+
+    for task_id in sorted(approved_tasks.keys() | working_tasks.keys(), key=str):
+        task = working_tasks.get(task_id) or approved_tasks[task_id]
+        linked_work = work_by_subject.get(task_id) or work_by_id.get(task_id)
+        work_id = linked_work.work_id if linked_work is not None else task_id
+        existing = base_coverage.get(work_id)
+        review_status = review_statuses.get(task_id)
+        if existing is not None:
+            item_status: CoverageStatus = existing.status
+            title = existing.title
+            reason = existing.reason
+        elif review_status is DocumentChangeStatus.PENDING:
+            item_status = "awaiting_employee_decision"
+            title = task.statement
+            reason = "AI 已整理成工作草稿，等待你確認後才會進入正式 JD。"
+        elif review_status is DocumentChangeStatus.DEFERRED:
+            item_status = "employee_deferred"
+            title = task.statement
+            reason = "你已選擇稍後處理；內容仍保留在工作草稿。"
+        else:
+            item_status = InterviewWorkStatus.AVAILABLE
+            title = task.statement
+            reason = "已辨識為工作，可按需要繼續深入訪談。"
+        coverage[work_id] = CoverageItemProjection(
+            work_id=work_id,
+            title=title,
+            status=item_status,
+            reason=reason,
+        )
+        document_depth = _document_task_depth(task, working_document)
+        depth[work_id] = _merge_document_depth(
+            base_depth.get(work_id),
+            document_depth,
+            work_id=work_id,
+        )
+
+    pending = 0
+    deferred = 0
+    for changeset in workspace_review.changesets:
+        for action in changeset.actions:
+            if action.status is DocumentChangeStatus.PENDING:
+                pending += 1
+            elif action.status is DocumentChangeStatus.DEFERRED:
+                deferred += 1
+    return base.model_copy(
+        update={
+            "currently_known_work_count": len(coverage),
+            "coverage": tuple(coverage[key] for key in sorted(coverage, key=str)),
+            "depth": tuple(depth[key] for key in sorted(depth, key=str)),
+            "employee_decisions": EmployeeDecisionProjection(
+                pending=pending,
+                deferred=deferred,
+            ),
+        }
     )
 
 

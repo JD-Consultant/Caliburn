@@ -24,14 +24,28 @@ from app.consultant.results import (
     VisibleGap,
 )
 from app.consultant.state import (
+    ApprovedDuty,
+    ApprovedJobDocument,
+    ApprovedOpksItem,
+    ApprovedOpksKind,
+    ApprovedTask,
     CalibrationDecision,
+    DocumentChangeSet,
+    DocumentChangeStatus,
+    DocumentPatchAction,
+    DocumentPatchOperation,
+    DocumentPathRead,
     EmployeeSourceKind,
     InterviewPriority,
+    InterviewWorkItem,
     InterviewWorkStatus,
     SourceReference,
     UnderstandingImpact,
+    initial_thread_state,
 )
+from app.consultant.understanding import semantic_progress_from_workspace
 from app.consultant.views import snapshot_from_state
+from app.consultant.workspace_review import WorkspaceReviewGroup, WorkspaceReviewProjection
 
 
 def _config(document_id: UUID) -> dict[str, dict[str, str]]:
@@ -362,6 +376,154 @@ async def test_semantic_progress_is_explainable_and_has_no_percentage_or_pause_s
     assert "本輪可停" not in serialized
     assert "pause" not in serialized
     assert "finish_interview" not in serialized
+
+
+def test_workspace_progress_counts_candidate_tasks_and_current_review_actions() -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    duty_id = uuid4()
+    pending_task_id = uuid4()
+    deferred_task_id = uuid4()
+    pending_action_id = uuid4()
+    deferred_action_id = uuid4()
+    state = initial_thread_state(document_id)
+    pending_task = ApprovedTask(
+        task_id=pending_task_id,
+        duty_id=duty_id,
+        statement="彙整採購需求",
+        action="彙整",
+        object="採購需求",
+        display_order=0,
+    )
+    deferred_task = ApprovedTask(
+        task_id=deferred_task_id,
+        duty_id=None,
+        statement="追蹤交期異常",
+        action="追蹤",
+        object="交期異常",
+        display_order=1,
+    )
+    working = ApprovedJobDocument(
+        document_id=document_id,
+        duties=(
+            ApprovedDuty(
+                duty_id=duty_id,
+                statement="採購需求管理",
+                display_order=0,
+            ),
+        ),
+        tasks=(pending_task, deferred_task),
+        opks=(
+            ApprovedOpksItem(
+                item_id=uuid4(),
+                kind=ApprovedOpksKind.OUTPUT,
+                text="完成的採購需求清單",
+                display_order=0,
+                task_ids=(pending_task_id,),
+                evidence_source_ids=(source_id,),
+            ),
+        ),
+    )
+    actions = (
+        DocumentPatchAction(
+            action_id=pending_action_id,
+            operation=DocumentPatchOperation.ADD,
+            path="/tasks",
+            target_key=str(pending_task_id),
+            after=pending_task.model_dump(mode="json"),
+            source_ids=(source_id,),
+            read_set=(DocumentPathRead(path="/tasks", value_sha256="0" * 64),),
+        ),
+        DocumentPatchAction(
+            action_id=deferred_action_id,
+            operation=DocumentPatchOperation.ADD,
+            path="/tasks",
+            target_key=str(deferred_task_id),
+            after=deferred_task.model_dump(mode="json"),
+            source_ids=(source_id,),
+            read_set=(DocumentPathRead(path="/tasks", value_sha256="0" * 64),),
+            status=DocumentChangeStatus.DEFERRED,
+        ),
+    )
+    changeset = DocumentChangeSet(
+        changeset_id=uuid4(),
+        summary="新增兩項候選工作",
+        actions=actions,
+        source_ids=(source_id,),
+        created_revision=0,
+    )
+    review = WorkspaceReviewProjection(
+        workspace_digest="a" * 64,
+        groups=(
+            WorkspaceReviewGroup(
+                changeset=changeset,
+                group_digest="b" * 64,
+                semantic_fingerprint="c" * 64,
+                evidence_digest="d" * 64,
+                employee_request_digest="e" * 64,
+                boundary_digest="f" * 64,
+            ),
+        ),
+    )
+
+    progress = semantic_progress_from_workspace(
+        state,
+        working_document=working,
+        workspace_review=review,
+    )
+
+    assert progress.currently_known_work_count == 2
+    coverage = {item.work_id: item for item in progress.coverage}
+    assert coverage[pending_task_id].status == "awaiting_employee_decision"
+    assert coverage[deferred_task_id].status == "employee_deferred"
+    assert progress.employee_decisions.pending == 1
+    assert progress.employee_decisions.deferred == 1
+    depth = {item.work_id: item for item in progress.depth}
+    assert depth[pending_task_id].task_boundary == "evidence_present"
+    assert depth[pending_task_id].duty_grouping == "evidence_present"
+    assert depth[pending_task_id].output == "evidence_present"
+    assert depth[pending_task_id].knowledge == "not_yet_deepened"
+    assert depth[deferred_task_id].duty_grouping == "gap"
+
+
+def test_workspace_progress_preserves_linked_attention_identity_and_status() -> None:
+    document_id = uuid4()
+    task_id = uuid4()
+    work_id = uuid4()
+    task = ApprovedTask(
+        task_id=task_id,
+        statement="處理採購需求",
+        action="處理",
+        object="採購需求",
+        display_order=0,
+    )
+    document = ApprovedJobDocument(document_id=document_id, tasks=(task,))
+    state = initial_thread_state(document_id)
+    state["approved_document"] = document.model_dump(mode="json")
+    state["interview_work"] = {
+        str(work_id): InterviewWorkItem(
+            work_id=work_id,
+            kind="task_boundary",
+            title="採購需求處理",
+            subject_id=task_id,
+            status=InterviewWorkStatus.ACTIVE,
+            priority=InterviewPriority.TASK_BOUNDARY,
+            priority_reason="目前正在釐清完成結果。",
+            last_changed_revision=0,
+        ).model_dump(mode="json")
+    }
+    state["current_work_id"] = str(work_id)
+
+    progress = semantic_progress_from_workspace(
+        state,
+        working_document=document,
+        workspace_review=WorkspaceReviewProjection(workspace_digest="a" * 64),
+    )
+
+    assert progress.currently_known_work_count == 1
+    assert progress.coverage[0].work_id == work_id
+    assert progress.coverage[0].status == "active"
+    assert progress.coverage[0].reason == "目前正在釐清完成結果。"
 
 
 @pytest.mark.asyncio

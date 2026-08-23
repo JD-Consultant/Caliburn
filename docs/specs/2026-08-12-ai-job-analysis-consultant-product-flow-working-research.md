@@ -4,7 +4,7 @@
 - 狀態：Working Research；隨 owner 討論持續修訂
 - 決策狀態：只記錄已確認的產品方向與待討論問題；不是 ADR，不授權 production 實作
 - 優先順序：先以「產品如何像專業顧問工作」約束架構；核心 runtime 已選 LangChain 1.x＋LangGraph 1.2.x，RAG 明確留待後續另案研究
-- 外部資料查核：截至 2026-08-22 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策
+- 外部資料查核：截至 2026-08-23 可取得的官方／第一手資料整理；大廠做法是設計證據，不是免評測的產品決策。文內早期「固定兩波 lookup」是歷史校準，已由 [ADR 0068](../adr/0068-framework-run-budgets-replace-lookup-wave-cap.md) 以 framework 總 run budgets 取代
 - Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x；§9.19再把候選生命週期收斂為Deep Agents／LangGraph持久working draft＋application semantic review。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例。施工必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等產品目的與framework primitive命名；選型先看效果、功能完整、可靠性與員工體驗，只有效果相當時才比較自寫量
 - 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
 

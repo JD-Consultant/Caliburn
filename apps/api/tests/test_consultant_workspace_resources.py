@@ -168,6 +168,22 @@ def test_workspace_resources_round_trip_editable_jd_without_exposing_a_or_level(
     assert parsed.approved_document.opks[-1].kind.value == "attitude"
 
 
+def test_workspace_catalog_preserves_sparse_handles_after_partial_accept() -> None:
+    candidate_task_id = uuid5(DOCUMENT_ID, "workspace:task:task-001")
+
+    catalog = WorkspaceCatalog.from_snapshot(
+        _document(),
+        handle_registry={
+            "duty-001": DUTY_ID,
+            "task-001": candidate_task_id,
+            "task-002": TASK_ID,
+        },
+    )
+
+    assert catalog.id_for_handle("task-001") == candidate_task_id
+    assert catalog.handle_for_id(TASK_ID) == "task-002"
+
+
 def test_workspace_resource_models_are_frozen_and_forbid_extra_fields() -> None:
     with pytest.raises(ValidationError):
         WorkspaceTaskResource(

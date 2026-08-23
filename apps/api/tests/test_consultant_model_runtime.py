@@ -38,6 +38,7 @@ from app.consultant.model_runtime import (
     RunPolicy,
     build_consultant_agent,
     build_consultant_middleware,
+    classify_consultant_failure,
     resolve_execution,
     verify_attempt_budget,
 )
@@ -69,6 +70,16 @@ def _profile(
     )
 
 
+def test_verification_failure_exposes_only_a_stable_durable_code() -> None:
+    error = ConsultantVerificationError(
+        "unknown_subject",
+        "result mentions private employee text: SECRET",
+    )
+
+    assert classify_consultant_failure(error) == "verification_unknown_subject"
+    assert "SECRET" not in classify_consultant_failure(error)
+
+
 def _policy(*, skills: tuple[str, ...] = ("work-discovery",)):
     return RunPolicy(
         policy_id="interactive-consultation",
@@ -85,7 +96,6 @@ def _policy(*, skills: tuple[str, ...] = ("work-discovery",)):
         ),
         max_context_tokens=24_000,
         max_model_calls=8,
-        max_lookup_waves=2,
         max_total_tool_calls=12,
         model_retry_count=1,
         tool_retry_count=1,
@@ -117,6 +127,13 @@ def test_profile_resolves_to_one_immutable_route_and_effective_parameters() -> N
     assert replacement.provider_allowlist == ("OpenAI",)
     assert replacement.profile_revision == 2
     assert execution.requested_model == "anthropic/claude-opus-5"
+
+
+def test_policy_resolves_without_a_path_specific_lookup_wave_budget() -> None:
+    policy = _policy()
+    execution = resolve_execution(_profile(), policy)
+
+    assert "max_lookup_waves" not in execution.model_dump()
 
 
 def test_gpt_5_6_luna_max_reasoning_is_forwarded_to_openrouter() -> None:
@@ -214,6 +231,44 @@ def test_openrouter_adapter_round_trips_only_resolved_parameters() -> None:
     assert model.max_retries == 0
     assert model.default_headers == {"X-OpenRouter-Metadata": "enabled"}
     assert "test-secret" not in repr(model.metadata)
+
+
+def test_openrouter_adapter_keeps_final_and_vfs_tool_schemas_strict() -> None:
+    execution = resolve_execution(_profile(), _policy())
+    model = build_openrouter_chat_model(
+        execution,
+        api_key="test-secret",
+        base_url="https://openrouter.ai/api/v1",
+    )
+
+    @tool
+    def read_file(file_path: str) -> str:
+        """Read one virtual workspace file."""
+
+        return file_path
+
+    response_format = {
+        "type": "json_schema",
+        "json_schema": {
+            "name": "final_response",
+            "strict": True,
+            "schema": {
+                "type": "object",
+                "properties": {"reply": {"type": "string"}},
+                "required": ["reply"],
+                "additionalProperties": False,
+            },
+        },
+    }
+
+    bound = model.bind_tools(
+        [read_file],
+        strict=True,
+        response_format=response_format,
+    )
+
+    assert bound.kwargs["response_format"]["json_schema"]["strict"] is True
+    assert bound.kwargs["tools"][0]["function"]["strict"] is True
 
 
 def test_openrouter_adapter_preserves_prompt_cache_content_blocks() -> None:

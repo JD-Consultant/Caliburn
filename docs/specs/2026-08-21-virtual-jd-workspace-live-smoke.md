@@ -1,5 +1,7 @@
 # Virtual JD workspace live smoke evidence
 
+> 現況註記（2026-08-23）：本文件記錄當時的失敗與校準歷史；固定兩波 lookup policy 已由 [ADR 0068](../adr/0068-framework-run-budgets-replace-lookup-wave-cap.md) 取代，不再是現行 runtime 規則。
+
 - 日期：2026-08-22
 - 狀態：**partial；exact profile 仍有未解 blocker，不是 live pass**
 - 範圍：current Deep Agents virtual JD workspace、deterministic candidate check／repair、pending-only publication；不接 RAG／Reference、不做能力級別／A、不啟用 auto mode 或正式 eval。
@@ -141,7 +143,23 @@ reload 後各 decision status 保留；API snapshot 顯示 approved 只含員工
 
 這證明的是 deterministic employee authority／semantic review surface；它不證明 exact provider live run 已通過。
 
-## 5. Relevant gates
+## 5. 2026-08-23 持久工作草稿的兩輪 Luna browser/API pass
+
+後續在同一份真 PostgreSQL 文件完成兩輪 `openai/gpt-5.6-luna`／OpenAI／`reasoning=medium`／`max_tokens=8,192` 訪談，不使用 Opus、provider fallback、RAG 或 auto-accept：
+
+1. 第一輪由員工敘述五項採購工作；Luna 透過六個 framework filesystem Tools 建立 2 Duty／5 Task／14 OPKS 的持久 workspace。四次 model attempts、十次 Tool calls合計 47,273 tokens，cache read 25,847、cache write 18,646，cost **US$0.00850244**。員工只接受其中一個 Duty 與相依 Task，另拒絕一個獨立 OPKS、延後一個獨立 OPKS；正式 JD 因此只有 1 Duty／1 Task／0 OPKS，未接受內容仍留在非權威 workspace。
+2. 第二輪回答新增每週「供應商發票／ERP 採購單／收貨紀錄核對、差異確認後送財務請款」，並明確排除實際收貨驗收、退貨、品質異常與供應商評鑑。Luna 新增第六項工作與其 Duty／O／P／K／S，下一題聚焦完成判準；「AI 目前理解」、工作數與 gap 同步更新。正式 JD 仍維持 1 Duty／1 Task／0 OPKS，證明模型續編 working draft 沒有取得 authority。
+3. 第二輪七次 attempts 全部實際路由到 Luna／OpenAI，input 77,837、output 4,508、total 82,345、reasoning 1,291，cache read 35,267、cache write 42,549，provider cost **US$0.01675639**，model latency 合計 43,392 ms；前六次以 `tool_calls` 結束，第七次以 `stop` 形成可見回答。這是一次代表性功能 smoke，不足以單獨決定 production 預設模型。
+
+本輪也揭露兩個環境／產品問題並分開處理：
+
+- 隔離 worktree 不會帶入 ignored `.env`。第一次啟動因此解析到 repo 預設 Opus profile，但在 build model 前就因沒有 key fail closed；attempt receipts 為空，沒有 Opus provider call 或費用。修正方式是測試程序明確注入主 app env 的 key與 Luna profile，不複製或輸出 secret，也不修改 production 預設。
+- 一次受 sandbox 限制的程序對 OpenRouter public models endpoint 同樣在 TCP 層回 `WinError 10061`；兩張 Luna attempt receipts 的 `actual_model／provider` 為空、usage/cost 為零。允許測試程序外連後，重試同一個已保存 source/run 成功，不重送員工原話。
+- 成功續編後，既存 defer record 與語意內容都未改，UI 卻由「1 已延後」退回 pending。RED 證明根因是 defer 綁整份 workspace digest；任何無關檔案變化都使它失效。修正後 decision record 保存所選 action 的 semantic fingerprint，projection 只在該 action/group 或 dependency boundary 真正改變時清除 deferred 狀態；legacy whole-group defer 也可安全恢復。真資料重開後為 **23 pending／1 deferred**、workspace validation 0 diagnostics。
+
+authority command 的安全邊界沒有放寬：accept／edit-accept／reject／defer 提交當下仍必須精確符合 approved revision、workspace generation／digest、group digest 與 action IDs；semantic fingerprint 只用於後續非權威 review metadata 的連續性。這符合 LangGraph 以持久 checkpointer／Store 支援跨時間 HITL、VS Code 只在同一已審內容再次變動時清除 reviewed 狀態，以及 Git 三方合併保留不重疊變更的做法。[LangGraph persistence](https://docs.langchain.com/oss/python/langgraph/persistence) · [LangChain HITL](https://docs.langchain.com/oss/python/langchain/human-in-the-loop) · [VS Code review agent changes](https://code.visualstudio.com/docs/agents/run/review-code-edits) · [Git merge](https://git-scm.com/docs/git-merge)
+
+## 6. Relevant gates
 
 ```text
 cd apps/api

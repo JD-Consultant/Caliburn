@@ -1,5 +1,7 @@
 # Virtual JD workspace upgrade completion
 
+> 現況註記（2026-08-23）：本報告保留交付當時的驗證歷史；固定兩波 lookup policy 已由 [ADR 0068](../adr/0068-framework-run-budgets-replace-lookup-wave-cap.md) 取代。其後 persistent multi-turn Luna／browser pass 見下方新增小節與 [live smoke evidence](2026-08-21-virtual-jd-workspace-live-smoke.md#5-2026-08-23-持久工作草稿的兩輪-luna-browserapi-pass)。
+
 - 日期：2026-08-22
 - 狀態：**Phase C closure recorded；exact profile live smoke 仍為 partial，不是 live pass**
 - 範圍：current virtual JD workspace、deterministic candidate check／repair、pending-only publication 與 employee authority review。
@@ -33,6 +35,12 @@ owner 隨後以 ADR 0065 核准 policy revision 2：11 model calls 與 160,000 c
 
 owner 後續另核准一次 `Luna／xhigh／32,000` 試跑。Caliburn 原 profile literal 漏列 upstream 已支援的 `xhigh`，因此先以 TDD 加入 boundary support，production 預設不變。新 run 完成候選 Task/O/P 編輯與兩次 candidate check，最後 primary response 為 `stop`，沒有 output truncation；十二張 receipts（11 primary＋1 summarization）合計 134,575 tokens，其中 reasoning 8,472，cost US$0.02299813、model latency 125,548 ms。它最後在 semantic commit 前由 `ConsultantVerificationError` fail closed，沒有 pending publication。trace 同時顯示 summarization 後模型重讀五個已載入 Skill並被 one-load backend 拒絕；這是待 deterministic reproduction 的強烈交互訊號，不是已證實的 exact verifier branch。cleanup 後所有相關 persistence counts 仍回到零。
 
+### 2026-08-23 persistent multi-turn Luna pass
+
+在 Store-backed workspace、framework automatic validation 與 ADR 0068 run budget 修正後，`Luna／medium／8,192` 已完成兩輪真 browser/API 訪談。第一輪建立 2 Duty／5 Task／14 OPKS 的工作草稿；員工部分接受、拒絕與延後後，第二輪再從新原話辨識每週發票／採購單／收貨紀錄核對與送請款，並保留不負責收貨驗收、退貨、品質異常、供應商評鑑的理解。第二輪七次 Luna attempts 合計 82,345 tokens、cost US$0.01675639；正式 JD 在員工未接受新內容前仍只有 1 Duty／1 Task／0 OPKS。
+
+真實續編另抓到 defer 狀態被無關 workspace digest 變化清除。依官方 LangGraph persistence、VS Code content-local reviewed-state 與 Git non-overlap merge 原則，decision metadata 改綁 selected action semantic fingerprint；authority command 的 exact revision／generation／digest stale guard不變。TDD 與原 fixture 重開均證明 23 pending／1 deferred、0 workspace diagnostics。完整數據、環境失敗分類與來源見 live smoke §5。
+
 runner 只使用 disposable document，finally 以 exact document identity cleanup；controller evidence 顯示 cleanup 後相關 persistence records 回到零，沒有保留 live fixture 或 secret。
 
 ### Deterministic browser authority review
@@ -43,7 +51,7 @@ fixture document 已精確刪除，相關 persistence records 回到零，server
 
 ## Boundaries and deferred work
 
-RAG／Reference consumer、能力級別／A、auto mode、multi-agent、formal quality eval、lookup-wave／Skill eligibility 與 model fallback 調整仍延後。全域 Tool guard 已依本輪 TDD 調整為 48；finalization model-call policy 已由 ADR 0065 收斂。尚未收斂的是多輪互動 model profile：production `Settings` 在沒有 env override 時仍是 Opus 5／high／4,096；Luna `xhigh／32,000` 已證明可完成候選操作但尚未通過 final commit，故不能只憑較高 reasoning 把它寫成最終 production 選型。下一個 blocker 是 deterministic 定位 final verifier 與摘要後 Skill continuity，不是再付費比較 effort。這次 closure 不引入第二份 document store、第二條 authority seam 或新的 UI production 行為。
+RAG／Reference consumer、能力級別／A、auto mode、multi-agent、formal quality eval、Skill eligibility 與 model fallback 調整仍延後。全域 Tool guard 已依本輪 TDD 調整為 48；finalization model-call policy 已由 ADR 0065 收斂，固定 lookup-wave cap 已由 ADR 0068 移除。`Luna／medium／8,192` 現已證明可完成兩輪持久 workspace 與 structured final，但單一 smoke 不足以直接改 production 預設；production `Settings` 在沒有 env override 時仍是 Opus 5／high／4,096，正式切換要另依效果、跨輪成本與穩定性決定。這次 closure 不引入第二份 document store、第二條 authority seam、RAG、multi-agent 或 auto-accept。
 
 後續 runtime 決策固定採「效果優先、成本與複雜度成比例」：先看代表性情境中的員工可見結果，再比較每份 JD 跨輪累計 token／cache、calls、延遲、provider cost、失敗率與新增維護邊界。少量效果提升不值得大幅成本或複雜度；預設維持單一顧問，不因本次 blocker 引入 multi-agent。現有 durable attempt receipts 已足以按 document 加總，第一版不為此另建 billing subsystem；但單輪 `max_cost_usd` 是 commit 前 fail-closed 驗證，不是 provider 付費前的即時預算器，不得誤稱為費用不會超過該值。
 

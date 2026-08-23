@@ -47,6 +47,8 @@ npm run consultant-storage:setup
 
 複製 `apps/api/.env.example` 為 `.env`，填入 `OPENROUTER_API_KEY`。`CONSULTANT_MODEL`／`CONSULTANT_PROVIDER` 指定一條 exact route，profile／policy revision 與參數會在每輪解析成 immutable execution snapshot；第一版禁止 silent fallback。沒有 key 時，catalog／snapshot 等不需模型的功能仍可使用，AI 回合回 typed unavailable response。
 
+Git worktree 不會自動帶入被 ignore 的 `apps/api/.env`。在隔離 worktree 做 live model smoke 時，應由啟動程序安全注入 key與明確的 `CONSULTANT_MODEL`／`CONSULTANT_PROVIDER` override；不要把 secret 複製、commit 或印到 log。判定實際路由時讀 durable attempt receipt 的 `actual_model`／`actual_provider`，不能只相信 shell 目標值；若 attempt receipt 為空，代表尚未呼叫 provider。
+
 ## RAG（保留、隔離、非 current runtime）
 
 `apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract` 與 `packages/indexer-contract` 不在 current API/Web dependency graph，也不由預設指令啟動：

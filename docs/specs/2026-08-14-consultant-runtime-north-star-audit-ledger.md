@@ -1,10 +1,10 @@
 # AI 職務顧問 runtime：北極星審核與逐 Task 防偏帳本
 
 - 日期：2026-08-14
-- 狀態：Pre-implementation audit、Tasks 1–11與ADR 0063 Tasks 1–7均 **Passed**；paid live canary、完整 monorepo gates與最後獨立審核均完成
-- 決策：ADR 0060 **Accepted**；ADR 0061 **Accepted（schema-only）**；ADR 0062 **Accepted（四個受限唯讀 Tool）**；ADR 0063 **Accepted（hybrid candidate edit loop）**
-- 施工計畫：[`2026-08-13-langgraph-consultant-runtime-big-bang-plan.md`](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md)
-- 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.16
+- 狀態：Pre-implementation audit、Tasks 1–11、ADR 0063 Tasks 1–7與 persistent workspace Tasks 1–9 均已完成；2026-08-23 兩回合 Luna／browser live closure、獨立複審修正與修正後 Final Gate 均已通過
+- 決策：ADR 0060–0068 均 **Accepted**；現行為 Deep Agents Store-backed persistent JD workspace，ADR 0068 已以 framework 總 run budgets 取代自訂兩波 lookup cap
+- 現行施工計畫：[`2026-08-22-persistent-store-backed-jd-working-draft-plan.md`](../plans/2026-08-22-persistent-store-backed-jd-working-draft-plan.md)；前次 Big-bang plan 保留作歷史追溯
+- 產品 SSOT：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md) §1–§8、§9.12–§9.19，以及 [`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md) §1.2／§5／§8
 
 ## 1. 審核目的
 
@@ -44,7 +44,7 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 | 中立產品／工程目的 | 採用的成熟元件 | Caliburn 尚留的最薄政策 | 審核 |
 |---|---|---|---|
 | 模型／provider／參數可換 | `ChatOpenRouter`＋LangChain model binding | provider/model allowlist、資料政策與 versioned profile | 已覆蓋 |
-| bounded consultant loop＋按需工具 | LangChain `create_agent`＋Deep Agents Skills／Filesystem middleware＋三個 LangChain source tools | document scope、lookup wave、總 budget、typed availability | **已實作**；四個唯讀 Tool、精簡 description、application-bound args 與依賴驅動 lookup 依 ADR 0062 |
+| bounded consultant loop＋按需工具 | LangChain `create_agent`＋Deep Agents Skills／Filesystem／Store／Composite backends＋六個 VFS Tool | document scope、唯讀／可寫 root、總 budget、typed availability | **已實作**；依 ADR 0068 由 framework model／Tool 總呼叫與既有 token／費用／時間 guards 防 runaway，不再保留自訂 lookup-wave counter |
 | compact model-facing result | Pydantic compact DTO＋LangChain structured output | 職務語意、pure mapper 的 fail-closed 規則 | **已實作**；LangChain-facing schema 為 0 optional／0 union／0 open object、depth 4，rich framework state 不直接送 provider |
 | contingency finalization | 只在 exact canary 失敗時使用 LangChain tool-free `response_format` | 同 run handoff 與三次總上限 | 非預設；未證實需要前不增加 node／call |
 | call limit／retry | `ModelCallLimitMiddleware`、`ToolCallLimitMiddleware`、`ModelRetryMiddleware`、`ToolRetryMiddleware` | 哪些錯可重試、idempotency、每次 attempt receipt | 已覆蓋；plan 已補明 |
@@ -54,10 +54,10 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 | 動態訪談重點、旁支、延後返回、更正重開 | typed state／reducers／routing／checkpoint | work-unit eligibility、priority reason、reopen rule | 已覆蓋；不是舊 Focus／agenda |
 | 可修訂 AI 理解 | typed state／reducers＋source references | Task／Duty／OPKS identity、dependency、選擇性失效 | 已覆蓋；不是舊 Work Model |
 | coverage／depth／decision／Gap 與足夠性 | typed state＋deterministic projection | 職務分析 reason code、足夠性 rubric、白話說明 | 已覆蓋；不是舊 Progress |
-| 按需專業方法 | Deep Agents `SkillsMiddleware`＋`FilesystemMiddleware(read_file only)` | repo 已驗證方法、eligibility、限縮 package-resource backend 與輸出契約 | 已覆蓋；不使用 host filesystem，Beta 窄介面需 canary |
+| 按需專業方法 | Deep Agents `SkillsMiddleware`＋`FilesystemMiddleware` 六個 VFS verbs＋`CompositeBackend` | repo 已驗證方法、eligibility、唯讀 `/skills` route 與輸出契約 | 已覆蓋；不使用 host filesystem，只有 `/workspace` 可寫 |
 | 最小充分 context | LangChain middleware＋Store read tools＋token budget | 必帶來源、降級順序與 selection receipt | 已覆蓋 |
 | 長 context 壓縮 | `SummarizationMiddleware`＋`ContextEditingMiddleware` | 只壓縮非權威副本；exact source／correction 必須重載 | 已覆蓋；plan 已補明 |
-| 多筆、非阻塞文件變更審核 | LangGraph checkpointed typed queue＋`Command` | patch path、read-set、atomic subgroup、stale／reject memory | 通用生命週期已覆蓋；精確業務政策無現成替代 |
+| 多筆、非阻塞文件變更審核 | Deep Agents `StoreBackend` active workspace＋LangGraph Store decision memory／`Command` | semantic differ、dependency／atomic subgroup、stale／reject／defer語意 | 已覆蓋；review是approved↔workspace即時投影，不再保存第二份queue |
 | 必要結構化澄清 | LangGraph `interrupt`＋`Command(resume)` | 必問門檻、affected branch、answer-as-source | 已覆蓋 |
 | 核准文件 authority | checkpoint authority channel＋deterministic command | 只有 employee command 可寫、文件 invariant | 已覆蓋；不是舊 Current JD writer |
 | input idempotency／失敗恢復 | Store＋Saver＋PostgreSQL constraint | payload hash、pending reconciliation、admission rule | 已覆蓋 |
@@ -425,3 +425,11 @@ Big-bang 只描述最終切換，不表示做到最後才審核。之後每完�
 - Exact live：修正後已實際到達 `openai/gpt-5.6-luna`、OpenAI、`reasoning=max` 與既有八 call／兩 lookup-wave policy，並確認 exact seven-Tool surface 已 bound/exposed；實際 Tool calls 只觀察到 `ls`／`read_file`。模型重複這兩個 lookup，超過兩波 lookup limit，production middleware 以 `LookupWaveLimitExceeded` fail closed。不得提高 budget、換 model/provider、加 fallback 或放寬 policy。
 - Browser authority：controller 以真 local Next＋FastAPI＋disposable PostgreSQL fixture 完成 semantic accept、edit-accept、reject、defer，並保留單一 O pending；reload 後 status 保留，API snapshot 只把員工接受的內容寫入 approved，沒有 raw VFS／Tool leakage。production Web 不需改動，integration test 是唯一 Web coverage 變更；最終 review 只補各鍵盤 command 的 action identity／edit payload assertion。
 - Cleanup／boundary：controller 的 disposable fixture 與 live runner document 均精確清理，相關 persistence tables 回到零。RAG／Reference、能力級別／A、auto mode、multi-agent 與正式 eval 仍延後。
+
+### Persistent Store-backed JD working draft：Task 9 final closure
+
+- 狀態：**Pass after independent review**。Deep Agents `StoreBackend`／`CompositeBackend` 承接跨回合 active workspace 與六個低階 VFS Tool；LangGraph Store／checkpointer 承接文件範圍的工作草稿、決策記憶、對話與 authority receipt；Pydantic 與 Caliburn deterministic rules 承接 JD／Evidence 驗證。沒有另建 workspace table、第二份 proposal queue、business write Tool 或第二 authority。
+- 真實產品證據：兩回合 GPT-5.6 Luna／browser 流程可在同一工作草稿繼續編輯，員工可部分接受、拒絕、延後後重新開頁；approved 最終只含員工接受的 1 Duty／1 Task／0 OPKS，未決草稿為 23 pending＋1 deferred、diagnostics 0。候選工作在進度上明示「待員工決定」，不冒充核准事實。
+- 最後獨立複審：確認 partial reject 曾錯誤隱藏整個 group，以及 direct edit 曾回傳 rebase 前 snapshot。兩項都以 TDD 修正；selected-action semantic fingerprint 只抑制真正被拒 action，direct edit 在 rebase 後重新讀 Store snapshot。scoped re-review 無新 Critical／Important。把每筆 Header／Duty／OPKS action 都算成工作進度的建議經產品 SSOT 複核後不採用，以免把非 Task entity 灌成虛假工作；其變更量仍由 pending／deferred action count 顯示。
+- 修正後 gates：顧問 focused `172 passed`；真 PostgreSQL API `287 passed`；Web `37 passed`；TypeScript、ESLint、contract codegen exit 0；Turbo 5 tasks successful（API `258 passed／29 skipped`、Web `37 passed`、PDF `23 passed`、OCS indexer `53 passed`）；hard-cut 與 `git diff --check` clean。
+- 北極星回歸：一位專業顧問、當前焦點與背景吸收、Task／Duty／OPKS 動態演化、員工原話與更正、必要澄清、Gap、可信進度、未核准草稿跨回合延續、員工唯一文件 authority、自然關閉／續談與單一可強制匯出均保持。沒有引入 RAG／Reference consumer、能力級別／A、auto-accept、multi-agent、正式 eval 或「本輪可停」產品狀態。結果 **Pass**。

@@ -19,6 +19,8 @@ const interviewWorkStatusLabels: Record<string, string> = {
   unknown: "尚待辨識",
   not_applicable: "不適用",
   retired: "已排除",
+  awaiting_employee_decision: "待你確認",
+  employee_deferred: "你已延後",
 };
 
 const understandingStatusLabels: Record<string, string> = {
@@ -125,18 +127,29 @@ export function buildConversationEntries(
 }
 
 export function workspaceSections(snapshot: ConsultantSnapshotView) {
+  const latestQuestion =
+    snapshot.messages[snapshot.messages.length - 1]?.next_question ?? null;
   return {
     openingSteps: snapshot.opening_navigation.visible
       ? snapshot.opening_navigation.steps
       : [],
     focus: snapshot.current_interview
       ? {
+          label: "目前訪談重點",
           title: snapshot.current_interview.title,
           whyNow: snapshot.current_interview.why_now,
           missingBeforeEnough: snapshot.current_interview.missing_before_enough,
           recommendedNextStep: snapshot.current_interview.recommended_next_step,
         }
-      : null,
+      : latestQuestion
+        ? {
+            label: "目前要釐清的問題",
+            title: latestQuestion.answer_target,
+            whyNow: latestQuestion.reason,
+            missingBeforeEnough: null,
+            recommendedNextStep: latestQuestion.text,
+          }
+        : null,
     understanding: {
       label: snapshot.understanding.label,
       items: snapshot.understanding.items,

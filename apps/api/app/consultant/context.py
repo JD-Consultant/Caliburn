@@ -525,8 +525,12 @@ def _prompt(
                 "review_index_path": "/review/index.json",
                 "workspace_root": "/workspace",
                 "instructions": (
-                    "Read the exact source and index paths directly before listing "
-                    "read-only roots. Continue editing the existing persistent "
+                    "The current source is already supplied as the current HumanMessage "
+                    "and recorded in the context receipt; use its source handle for "
+                    "Evidence and do not reread that path in this run. Read the exact "
+                    "approved and review index paths only when their details are needed; "
+                    "prefer those paths over listing read-only roots, and do not reread "
+                    "a path whose result is still in context. Continue editing the existing persistent "
                     "/workspace resources; do not copy or reseed them from approved. "
                     "Approved resources are a read-only authority baseline. Use "
                     "write_file/edit_file/delete only below /workspace. The application "
@@ -554,6 +558,11 @@ def _prompt(
                     ],
                     "workspace_root": "/workspace",
                     "review_root": "/review",
+                    "semantics": (
+                        "This is an application-owned validation result. Trust valid or "
+                        "conflicted status and do not reread files merely to reconfirm it; "
+                        "valid does not mean the current employee turn was already processed."
+                    ),
                 }
             )
             + "</workspace_validation>"

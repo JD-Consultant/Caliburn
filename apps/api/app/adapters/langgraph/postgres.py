@@ -31,6 +31,7 @@ from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.clarification import ClarificationAnswer
 from app.consultant.document_authority import DocumentAuthorityError, edited_action_source_payload
 from app.consultant.interview import VerifiedConsultantCommit
+from app.consultant.understanding import semantic_progress_from_workspace
 from app.consultant.state import (
     ApprovedJobDocument,
     CalibrationDecision,
@@ -409,6 +410,7 @@ class PostgresConsultantRuntime:
         catalog = WorkspaceCatalog.from_snapshot(
             snapshot.approved_document,
             sources=sources,
+            handle_registry=workspace_snapshot.manifest.entity_ids_by_handle,
         )
         validation = validate_workspace_payload(
             workspace_snapshot.files,
@@ -446,15 +448,22 @@ class PostgresConsultantRuntime:
             effective_manifest,
             decisions,
         )
+        updates: dict[str, Any] = {
+            "document_review": document_review_projection_from_workspace(
+                state.values,
+                workspace_generation=workspace_snapshot.manifest.generation,
+                validation_status=effective_manifest.validation_status,
+                workspace_review=projection,
+            )
+        }
+        if validation.document is not None:
+            updates["semantic_progress"] = semantic_progress_from_workspace(
+                state.values,
+                working_document=validation.document.approved_document,
+                workspace_review=projection,
+            )
         return snapshot.model_copy(
-            update={
-                "document_review": document_review_projection_from_workspace(
-                    state.values,
-                    workspace_generation=workspace_snapshot.manifest.generation,
-                    validation_status=effective_manifest.validation_status,
-                    workspace_review=projection,
-                )
-            }
+            update=updates
         )
 
     async def raw_state(self, document_id: UUID) -> dict[str, Any]:
@@ -1141,7 +1150,6 @@ class PostgresConsultantRuntime:
                 )
             except StaleThreadRevision as error:
                 raise StaleRevision(str(error)) from error
-            result = await self._snapshot(document_id)
             await self._touch_catalog(document_id)
             if source is not None:
                 await self._after_source_checkpoint(source)
@@ -1150,7 +1158,7 @@ class PostgresConsultantRuntime:
                 document_id,
                 direct_rebase_command_id,
             )
-            return result
+            return await self._snapshot(document_id)
 
 
     async def decide_workspace_changes(

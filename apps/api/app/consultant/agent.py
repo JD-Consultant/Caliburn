@@ -4,20 +4,18 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from typing import Annotated, Any
+from typing import Any
 
 from deepagents.backends import BackendProtocol
 from deepagents.backends.utils import validate_path
 from deepagents.middleware.filesystem import FilesystemMiddleware
 from deepagents.middleware.skills import SkillsMiddleware, SkillsState
 from langchain.agents.middleware import AgentMiddleware
-from langchain.agents.middleware.types import AgentState, PrivateStateAttr
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.runnables import RunnableConfig
-from langgraph.channels.untracked_value import UntrackedValue
 from langgraph.runtime import Runtime
-from typing_extensions import NotRequired, override
+from typing_extensions import override
 
 from app.consultant.model_runtime import ResolvedExecution, build_consultant_agent
 from app.consultant.model_output import ConsultantModelOutput
@@ -38,7 +36,7 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 
 你是同一位專業職務分析顧問；下列 Skills 是可按需載入的方法，不是多個人格或固定階段。
 本輪只有列出的 Skills 可用。每個實際用來形成結果的 Skill，都必須先用 read_file 完整讀取一次；只能讀取列出的 /skills/<skill-id>/SKILL.md。
-先判斷現有 context 是否已足夠；足夠時不要為了展示而呼叫 Tool。/skills、/sources、/approved、/review 是唯讀；/workspace 是同一份跨 turn 保留、non-authoritative 且唯一可編輯的工作草稿。只有前一波結果產生新的資料依賴時才使用第二波 lookup wave。
+先判斷現有 context 是否已足夠；足夠時不要為了展示而呼叫 Tool。/skills、/sources、/approved、/review 是唯讀；/workspace 是同一份跨 turn 保留、non-authoritative 且唯一可編輯的工作草稿。只有既有結果產生新的明確資料依賴時才繼續讀取；彼此獨立的 reads 應在同一 model response 平行提出。
 
 {skills_locations}{skills_load_warnings}
 
@@ -48,8 +46,9 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 讀完本輪實際選用的方法後，把它們共同整合成一份結構化顧問結果。員工畫面只呈現一位顧問、必要的文件變更與至多一個主要問題；不得把 Skill 編排暴露成員工要操作的流程。
 
 **提交前的最小契約：**
-- 詳細 Current JD、/review、員工來源與方法內容都從對應 VFS 路徑讀取；不要把整份資料複製到回覆或 context。
+- 本輪最新員工原話已是 current HumanMessage，直接使用並以 context 給的 source handle 引用，不要再從 `/sources` 重讀；只有需要舊來源時才查 VFS。詳細 Current JD、/review 與方法內容仍從對應 VFS 路徑按需讀取，不要把整份資料複製到回覆或 context。
 - 直接續編 /workspace 下既有的 canonical resources；不得從 approved 複製或重建另一份草稿。每一波編輯後 application 會自動驗證 workspace。
+- Batch independent reads in the same model response. To see which existing resources already cite this turn, grep once for the current source handle under /workspace before enumerating entity files; matches are orientation, not proof that the source is fully processed. Before editing, decide one coherent current-turn delta; combine all changes to the same file into one enclosing edit and issue the remaining edits as one non-overlapping mutation wave. If validation is invalid, read only the reported paths and repair every listed diagnostic in that wave. Once your mutation is valid or conflicted and no new data dependency remains, do not reread /workspace or /review merely to confirm it; return the final structured response. If no document edit is needed, return the final response directly.
 - Workspace JSON 的 Evidence 只填 `source_handle`、逐字 `quote`、`occurrence`（quote 唯一時填 null，重複時填 1-based 次序）與使用的 `skill_ids`。不要填 offset、stable source UUID、workspace revision、digest 或 action handle。
 - /review 是 application 由 workspace 派生的 semantic review；只有員工決定後，authority 才能把內容整合進 approved。
 - O／P／K／S 文件變更必須以 canonical resource 的 task handle 連到 Task；不得提交沒有 Task linkage 的 O／P／K／S。
@@ -79,88 +78,6 @@ class ProfessionalConsultantAgent:
 
 class WorkspaceAgentAsyncOnlyError(RuntimeError):
     """Raised when a workspace-backed consultant is invoked synchronously."""
-
-
-class LookupWaveLimitExceeded(RuntimeError):
-    pass
-
-
-_LOOKUP_TOOL_NAMES = frozenset({"ls", "read_file", "grep"})
-_EXTERNAL_DATA_LOOKUP_ROOTS = ("/sources", "/approved", "/review")
-
-
-class LookupWaveState(AgentState):
-    run_lookup_wave_count: NotRequired[
-        Annotated[int, UntrackedValue, PrivateStateAttr]
-    ]
-
-
-class LookupWaveLimitMiddleware(AgentMiddleware[LookupWaveState, Any]):
-    """Count one wave for path-aware external document-data reads."""
-
-    state_schema = LookupWaveState
-
-    def __init__(self, *, tool_names: frozenset[str], run_limit: int) -> None:
-        self.tool_names = tool_names
-        self.run_limit = run_limit
-
-    def _is_external_lookup(self, call: Mapping[str, Any]) -> bool:
-        name = call.get("name")
-        if name not in _LOOKUP_TOOL_NAMES or name not in self.tool_names:
-            return False
-        args = call.get("args")
-        if not isinstance(args, Mapping):
-            return False
-        raw_path = args.get("file_path", args.get("path"))
-        if name == "grep" and raw_path is None:
-            return True
-        if not isinstance(raw_path, str):
-            return False
-        try:
-            path = validate_path(raw_path)
-        except (TypeError, ValueError):
-            return False
-        if name == "grep" and path == "/":
-            return True
-        return any(
-            path == root or path.startswith(root + "/")
-            for root in _EXTERNAL_DATA_LOOKUP_ROOTS
-        )
-
-    @override
-    def after_model(
-        self,
-        state: LookupWaveState,
-        runtime: Runtime[Any],
-    ) -> dict[str, Any] | None:
-        del runtime
-        last_ai = next(
-            (
-                message
-                for message in reversed(state.get("messages", []))
-                if isinstance(message, AIMessage)
-            ),
-            None,
-        )
-        if last_ai is None or not any(
-            self._is_external_lookup(call)
-            for call in last_ai.tool_calls
-            if isinstance(call, Mapping)
-        ):
-            return None
-        count = state.get("run_lookup_wave_count", 0) + 1
-        if count > self.run_limit:
-            raise LookupWaveLimitExceeded(
-                f"consultant run exceeded {self.run_limit} lookup waves"
-            )
-        return {"run_lookup_wave_count": count}
-
-    async def aafter_model(
-        self,
-        state: LookupWaveState,
-        runtime: Runtime[Any],
-    ) -> dict[str, Any] | None:
-        return self.after_model(state, runtime)
 
 
 class RunScopedSkillsMiddleware(SkillsMiddleware):
@@ -300,8 +217,6 @@ def build_professional_consultant_agent(
         raise ValueError("resolved run policy must allow the read_file Skill tool")
     if execution.max_model_calls > 11:
         raise ValueError("interactive consultant runs allow at most eleven model calls")
-    if execution.max_lookup_waves > 2:
-        raise ValueError("interactive consultant runs allow at most two lookup waves")
     expected_tools = WORKSPACE_FILESYSTEM_TOOL_NAMES
     if set(execution.allowed_tool_ids) != expected_tools:
         raise ValueError("resolved run policy must allow exactly the workspace Tool surface")
@@ -323,11 +238,6 @@ def build_professional_consultant_agent(
         tool_token_limit_before_evict=None,
         human_message_token_limit_before_evict=None,
     )
-    lookup_cap = LookupWaveLimitMiddleware(
-        tool_names=frozenset({"ls", "read_file", "grep"}),
-        run_limit=execution.max_lookup_waves,
-    )
-
     async def load_document_sources() -> Sequence[Any]:
         return await workspace_binding.source_backend.lookup.runtime.list_sources(
             workspace_binding.document_id
@@ -350,7 +260,6 @@ def build_professional_consultant_agent(
         additional_middleware=(
             skills,
             files,
-            lookup_cap,
             WorkspaceToolWaveMiddleware(
                 workspace_backend=workspace_binding.workspace_backend
             ),

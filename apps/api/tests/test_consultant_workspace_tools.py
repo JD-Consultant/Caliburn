@@ -110,7 +110,6 @@ def _execution() -> Any:
         allowed_tool_ids=tuple(EXPECTED_WORKSPACE_TOOLS),
         max_context_tokens=24_000,
         max_model_calls=8,
-        max_lookup_waves=2,
         max_total_tool_calls=12,
         model_retry_count=0,
         tool_retry_count=0,

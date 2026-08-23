@@ -10,6 +10,7 @@ from uuid import UUID
 from app.consultant.model_runtime import (
     AttemptReceipt,
     AttemptStatus,
+    ClassifiedConsultantError,
     ResolvedExecution,
     verify_attempt_budget,
 )
@@ -23,8 +24,9 @@ if TYPE_CHECKING:
     from app.consultant.state import EmployeeSource
 
 
-class ConsultantVerificationError(RuntimeError):
-    pass
+class ConsultantVerificationError(ClassifiedConsultantError):
+    def __init__(self, code: str, message: str) -> None:
+        super().__init__(f"verification_{code}", message)
 
 
 _RISKY_SPECIFIC_CLAIM = re.compile(
@@ -50,15 +52,25 @@ def verify_context_selection(
         or receipt.policy_revision != execution.policy_revision
     ):
         raise ConsultantVerificationError(
+            "context_execution_mismatch",
             "context receipt does not match the resolved execution"
         )
     if receipt.total_input_tokens > execution.max_context_tokens:
-        raise ConsultantVerificationError("context exceeded its resolved token budget")
+        raise ConsultantVerificationError(
+            "context_token_budget",
+            "context exceeded its resolved token budget",
+        )
     if not set(receipt.selected_skill_ids) <= set(execution.allowed_skill_ids):
-        raise ConsultantVerificationError("context loaded an ineligible Skill")
+        raise ConsultantVerificationError(
+            "context_ineligible_skill",
+            "context loaded an ineligible Skill",
+        )
     source_ids = [item.source_id for item in receipt.loaded_sources]
     if len(source_ids) != len(set(source_ids)):
-        raise ConsultantVerificationError("context loaded a source more than once")
+        raise ConsultantVerificationError(
+            "context_duplicate_source",
+            "context loaded a source more than once",
+        )
 
 
 def verify_model_attempts(
@@ -66,12 +78,21 @@ def verify_model_attempts(
     receipts: Sequence[AttemptReceipt],
 ) -> None:
     if not receipts:
-        raise ConsultantVerificationError("model-bearing run has no attempt receipt")
+        raise ConsultantVerificationError(
+            "attempt_missing",
+            "model-bearing run has no attempt receipt",
+        )
     attempt_ids = [receipt.attempt_id for receipt in receipts]
     if len(attempt_ids) != len(set(attempt_ids)):
-        raise ConsultantVerificationError("model attempt receipt ID was reused")
+        raise ConsultantVerificationError(
+            "attempt_duplicate_id",
+            "model attempt receipt ID was reused",
+        )
     if len({receipt.product_run_id for receipt in receipts}) != 1:
-        raise ConsultantVerificationError("model attempts span more than one product run")
+        raise ConsultantVerificationError(
+            "attempt_mixed_run",
+            "model attempts span more than one product run",
+        )
     for receipt in receipts:
         if (
             receipt.requested_model != execution.requested_model
@@ -83,19 +104,23 @@ def verify_model_attempts(
             or receipt.effective_parameters != execution.effective_parameters
         ):
             raise ConsultantVerificationError(
+                "attempt_execution_mismatch",
                 "model attempt receipt does not match the resolved execution"
             )
         if receipt.status is AttemptStatus.SUCCEEDED:
             if not receipt.actual_model or not receipt.actual_provider:
                 raise ConsultantVerificationError(
+                    "attempt_route_missing",
                     "successful model attempt is missing its actual route"
                 )
             if receipt.usage.total_tokens is None:
                 raise ConsultantVerificationError(
+                    "attempt_usage_missing",
                     "successful model attempt is missing provider usage"
                 )
             if execution.max_cost_usd is not None and receipt.cost_usd is None:
                 raise ConsultantVerificationError(
+                    "attempt_cost_missing",
                     "successful model attempt is missing provider cost"
                 )
     verify_attempt_budget(execution, receipts)
@@ -119,26 +144,47 @@ def verify_consultant_result(
     selected = set(selected_skill_ids)
     loaded = set(loaded_skill_ids)
     if not loaded <= selected:
-        raise ConsultantVerificationError("run loaded an unselected Skill")
+        raise ConsultantVerificationError(
+            "loaded_unselected_skill",
+            "run loaded an unselected Skill",
+        )
     result_skill_ids = {
         skill_id
         for basis in result.analysis_bases()
         for skill_id in basis.skill_ids
     }
     if not result_skill_ids <= selected:
-        raise ConsultantVerificationError("result used an unselected Skill")
+        raise ConsultantVerificationError(
+            "result_unselected_skill",
+            "result used an unselected Skill",
+        )
     if not result_skill_ids <= loaded:
-        raise ConsultantVerificationError("result used a Skill that was not loaded")
+        raise ConsultantVerificationError(
+            "result_unloaded_skill",
+            "result used a Skill that was not loaded",
+        )
     if not selected <= set(execution.allowed_skill_ids):
-        raise ConsultantVerificationError("run selected an ineligible Skill")
+        raise ConsultantVerificationError(
+            "selected_ineligible_skill",
+            "run selected an ineligible Skill",
+        )
 
     source_by_id = {source.source_id: source for source in employee_sources}
     if len(source_by_id) != len(employee_sources):
-        raise ConsultantVerificationError("duplicate employee source supplied to verifier")
+        raise ConsultantVerificationError(
+            "duplicate_employee_source",
+            "duplicate employee source supplied to verifier",
+        )
     if any(source.validity is not SourceValidity.CURRENT for source in employee_sources):
-        raise ConsultantVerificationError("superseded employee source cannot support current result")
+        raise ConsultantVerificationError(
+            "superseded_employee_source",
+            "superseded employee source cannot support current result",
+        )
     if any(source.document_id != document_id for source in employee_sources):
-        raise ConsultantVerificationError("employee source crosses document scope")
+        raise ConsultantVerificationError(
+            "cross_document_source",
+            "employee source crosses document scope",
+        )
 
     if known_work_ids is not None:
         known_work = set(known_work_ids)
@@ -151,6 +197,7 @@ def verify_consultant_result(
             referenced_work.update(result.required_clarification.affected_work_ids)
         if not referenced_work <= known_work:
             raise ConsultantVerificationError(
+                "unknown_work",
                 "result references an unknown application ID for interview work"
             )
     if known_subject_ids is not None:
@@ -162,6 +209,7 @@ def verify_consultant_result(
         }
         if not referenced_subjects <= known_subjects:
             raise ConsultantVerificationError(
+                "unknown_subject",
                 "result references an unknown application ID for a subject"
             )
 
@@ -175,6 +223,7 @@ def verify_consultant_result(
     for text, basis in result.factual_texts():
         if requires_anchored_employee_quote(text) and not basis.quote_anchors:
             raise ConsultantVerificationError(
+                "quote_required",
                 "quantities, named rules and external claims require an anchored employee quote"
             )
 
@@ -186,14 +235,29 @@ def _verify_analysis_basis(
     source_by_id: dict,
 ) -> None:
     if not set(basis.skill_ids) <= selected_skill_ids:
-        raise ConsultantVerificationError("semantic claim depends on an unselected Skill")
+        raise ConsultantVerificationError(
+            "basis_unselected_skill",
+            "semantic claim depends on an unselected Skill",
+        )
     if not set(basis.source_ids) <= set(source_by_id):
-        raise ConsultantVerificationError("semantic claim depends on an unknown source")
+        raise ConsultantVerificationError(
+            "basis_unknown_source",
+            "semantic claim depends on an unknown source",
+        )
     for anchor in basis.quote_anchors:
         source = source_by_id.get(anchor.source_id)
         if source is None:
-            raise ConsultantVerificationError("quote anchor references an unknown source")
+            raise ConsultantVerificationError(
+                "anchor_unknown_source",
+                "quote anchor references an unknown source",
+            )
         if anchor.end > len(source.text):
-            raise ConsultantVerificationError("quote anchor exceeds employee source")
+            raise ConsultantVerificationError(
+                "anchor_out_of_bounds",
+                "quote anchor exceeds employee source",
+            )
         if source.text[anchor.start : anchor.end] != anchor.quote:
-            raise ConsultantVerificationError("quote anchor does not match employee source")
+            raise ConsultantVerificationError(
+                "anchor_mismatch",
+                "quote anchor does not match employee source",
+            )

@@ -262,6 +262,7 @@ describe("employee-facing consultant workspace model", () => {
     expect(EXTERNAL_AI_DISCLOSURE).toContain("外部 AI");
     expect(EXTERNAL_AI_DISCLOSURE).toContain("你確認");
     expect(sections.openingSteps).toHaveLength(3);
+    expect(sections.focus?.label).toBe("目前訪談重點");
     expect(sections.focus?.whyNow).toContain("Duty");
     expect(sections.understanding.label).toBe("AI 目前理解");
     expect(sections.understanding.calibration?.kind).toBe("soft");
@@ -270,6 +271,28 @@ describe("employee-facing consultant workspace model", () => {
     expect(sections.reviewBundles).toHaveLength(1);
     expect(sections.requiredClarification?.question).toContain("本人決定");
     expect(JSON.stringify(sections)).not.toMatch(/pause|resume|finish/i);
+  });
+
+  it("uses only the latest durable next question when no work focus exists", () => {
+    const value = snapshot();
+    value.current_interview = null;
+
+    expect(workspaceSections(value).focus).toEqual({
+      label: "目前要釐清的問題",
+      title: "異常判斷依據",
+      whyNow: "補足績效與知識分析需要的證據",
+      missingBeforeEnough: null,
+      recommendedNextStep: "最近一次遇到差異時，你先看什麼？",
+    });
+
+    value.messages.push({
+      run_id: "00000000-0000-0000-0000-000000000099",
+      answer_source_id: SOURCE_ID,
+      text: "目前不需要再追問。",
+      used_skill_ids: [],
+      next_question: null,
+    });
+    expect(workspaceSections(value).focus).toBeNull();
   });
 
   it("reconstructs employee and consultant messages after reopening", () => {
@@ -406,6 +429,8 @@ describe("employee-facing consultant workspace model", () => {
 
   it("keeps internal enum and JSON-pointer names out of the employee wording", () => {
     expect(interviewWorkStatusLabel("sufficient_for_now")).toBe("目前足夠");
+    expect(interviewWorkStatusLabel("awaiting_employee_decision")).toBe("待你確認");
+    expect(interviewWorkStatusLabel("employee_deferred")).toBe("你已延後");
     expect(understandingStatusLabel("employee_confirmed")).toBe("你已確認");
     expect(documentPathLabel("/tasks/00000000-0000-0000-0000-000000000020/duty_id")).toBe(
       "工作所屬職責",

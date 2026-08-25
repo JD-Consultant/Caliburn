@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 from dataclasses import replace
 from hashlib import sha256
 from types import SimpleNamespace
@@ -8,6 +9,9 @@ from uuid import UUID
 import pytest
 
 from app.consultant.state import (
+    ApprovedDuty,
+    ApprovedJobDocument,
+    ApprovedTask,
     DocumentChangeSet,
     DocumentPatchAction,
     DocumentPatchOperation,
@@ -22,11 +26,18 @@ from app.consultant.workspace_authority import (
     build_workspace_rebase_plan,
     select_workspace_actions,
 )
+from app.consultant.workspace_resources import project_workspace_files
 from app.consultant.workspace_review import (
     WorkspaceReviewGroup,
     WorkspaceReviewProjection,
 )
-from app.consultant.workspace_state import WorkspaceDiagnostic, workspace_resource_digest
+from app.consultant.workspace_state import (
+    WorkspaceDiagnostic,
+    WorkspaceManifest,
+    WorkspaceValidationStatus,
+    approved_document_digest,
+    workspace_resource_digest,
+)
 
 
 DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000901")
@@ -481,3 +492,66 @@ def test_unselected_overlap_keeps_ai_value_and_only_marks_that_path_conflicted()
     result = plan.changes[0].after or ""
     assert '"statement": "C"' in result
     assert '"notes": "E"' in result
+
+
+def test_build_plan_accepts_explicit_employee_override_paths() -> None:
+    duty_id = UUID("00000000-0000-0000-0000-000000000921")
+    task_id = UUID("00000000-0000-0000-0000-000000000922")
+
+    def document(statement: str) -> ApprovedJobDocument:
+        return ApprovedJobDocument(
+            document_id=DOCUMENT_ID,
+            job_title="採購專員",
+            duties=(
+                ApprovedDuty(
+                    duty_id=duty_id,
+                    statement="管理採購作業",
+                    display_order=0,
+                ),
+            ),
+            tasks=(
+                ApprovedTask(
+                    task_id=task_id,
+                    duty_id=duty_id,
+                    statement=statement,
+                    action="核對",
+                    object="訂單",
+                    display_order=0,
+                ),
+            ),
+        )
+
+    approved = document("核准敘述")
+    new_approved = document("員工敘述")
+    projection = project_workspace_files(approved, handle_registry={})
+    workspace_files = dict(projection.files)
+    task_path = "/workspace/tasks/task-001.json"
+    task_payload = workspace_files[task_path].replace("核准敘述", "AI 敘述")
+    workspace_files[task_path] = task_payload
+    manifest = WorkspaceManifest(
+        generation=3,
+        resource_digest=workspace_resource_digest(workspace_files),
+        approved_baseline_revision=7,
+        approved_baseline_digest=approved_document_digest(approved),
+        evidence_basis_digest=DIGEST,
+        validation_status=WorkspaceValidationStatus.VALID,
+        entity_ids_by_handle=dict(projection.handle_registry),
+    )
+
+    plan = asyncio.run(
+        WorkspaceAuthorityService(SimpleNamespace())._build_plan(
+            command_id=COMMAND_ID,
+            old_approved=approved,
+            workspace_files=workspace_files,
+            new_approved=new_approved,
+            manifest=manifest,
+            approved_revision=8,
+            employee_override_paths=(
+                "/workspace/tasks/task-001.json/statement",
+            ),
+        )
+    )
+
+    assert plan.conflicted_paths == ()
+    task_change = next(change for change in plan.changes if change.path == task_path)
+    assert '"statement": "員工敘述"' in (task_change.after or "")

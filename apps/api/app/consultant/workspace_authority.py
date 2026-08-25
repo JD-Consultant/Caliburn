@@ -450,7 +450,7 @@ _COLLECTION_ID_FIELDS = {
 }
 
 
-def _workspace_path_for_action(
+def workspace_path_for_action(
     action: DocumentPatchAction,
     *,
     files: Mapping[str, str],
@@ -796,6 +796,7 @@ class WorkspaceAuthorityService:
         reset_actions: Sequence[DocumentPatchAction] = (),
         accepted_actions: Sequence[DocumentPatchAction] = (),
         employee_override_actions: Sequence[DocumentPatchAction] = (),
+        employee_override_paths: Sequence[str] = (),
     ) -> WorkspaceRebasePlan:
         old_projection = project_workspace_files(
             old_approved,
@@ -819,11 +820,11 @@ class WorkspaceAuthorityService:
             approved_document=old_approved,
             manifest=manifest,
         )
-        employee_override_paths = tuple(
+        derived_employee_override_paths = tuple(
             path
             for action in (*reset_actions, *employee_override_actions)
             if (
-                path := _workspace_path_for_action(
+                path := workspace_path_for_action(
                     action,
                     files=all_projection_files,
                     entity_ids_by_handle=entity_ids_by_handle,
@@ -835,7 +836,7 @@ class WorkspaceAuthorityService:
             path
             for action in accepted_actions
             if (
-                path := _workspace_path_for_action(
+                path := workspace_path_for_action(
                     action,
                     files=all_projection_files,
                     entity_ids_by_handle=entity_ids_by_handle,
@@ -850,7 +851,11 @@ class WorkspaceAuthorityService:
             new_approved_files=new_projection.files,
             approved_revision=approved_revision,
             approved_digest=approved_document_digest(new_approved),
-            employee_override_paths=employee_override_paths,
+            employee_override_paths=tuple(
+                dict.fromkeys(
+                    (*derived_employee_override_paths, *employee_override_paths)
+                )
+            ),
             resolved_workspace_paths=resolved_workspace_paths,
         )
         actual_digest = workspace_resource_digest(workspace_files)
@@ -913,6 +918,7 @@ class WorkspaceAuthorityService:
         old_approved: ApprovedJobDocument,
         new_approved: ApprovedJobDocument,
         approved_revision: int,
+        employee_override_paths: Sequence[str] = (),
     ) -> WorkspaceRebasePlan | None:
         """Persist a direct-edit rebase plan before its graph authority seam."""
 
@@ -930,6 +936,7 @@ class WorkspaceAuthorityService:
             new_approved=new_approved,
             manifest=workspace_snapshot.manifest,
             approved_revision=approved_revision,
+            employee_override_paths=employee_override_paths,
         )
         plan = plan.model_copy(update={"employee_source_id": source_id})
         await self._put_direct_plan(document_id, plan)

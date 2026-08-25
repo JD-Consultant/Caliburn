@@ -456,7 +456,6 @@ class UnderstandingCalibration(DurableModel):
 
 class DocumentChangeStatus(StrEnum):
     PENDING = "pending"
-    DEFERRED = "deferred"
     ACCEPTED = "accepted"
     EDIT_ACCEPTED = "edit_accepted"
     REJECTED = "rejected"
@@ -684,7 +683,6 @@ class ConsultantCommandContext(TypedDict, total=False):
         "accept_changes",
         "edit_and_accept_changes",
         "reject_changes",
-        "defer_changes",
         "workspace_authority_commit",
     ]
     document_id: str

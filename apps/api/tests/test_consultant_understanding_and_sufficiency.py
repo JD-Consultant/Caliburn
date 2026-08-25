@@ -383,9 +383,9 @@ def test_workspace_progress_counts_candidate_tasks_and_current_review_actions() 
     source_id = uuid4()
     duty_id = uuid4()
     pending_task_id = uuid4()
-    deferred_task_id = uuid4()
+    second_pending_task_id = uuid4()
     pending_action_id = uuid4()
-    deferred_action_id = uuid4()
+    second_pending_action_id = uuid4()
     state = initial_thread_state(document_id)
     pending_task = ApprovedTask(
         task_id=pending_task_id,
@@ -395,8 +395,8 @@ def test_workspace_progress_counts_candidate_tasks_and_current_review_actions() 
         object="採購需求",
         display_order=0,
     )
-    deferred_task = ApprovedTask(
-        task_id=deferred_task_id,
+    second_pending_task = ApprovedTask(
+        task_id=second_pending_task_id,
         duty_id=None,
         statement="追蹤交期異常",
         action="追蹤",
@@ -412,7 +412,7 @@ def test_workspace_progress_counts_candidate_tasks_and_current_review_actions() 
                 display_order=0,
             ),
         ),
-        tasks=(pending_task, deferred_task),
+        tasks=(pending_task, second_pending_task),
         opks=(
             ApprovedOpksItem(
                 item_id=uuid4(),
@@ -435,14 +435,13 @@ def test_workspace_progress_counts_candidate_tasks_and_current_review_actions() 
             read_set=(DocumentPathRead(path="/tasks", value_sha256="0" * 64),),
         ),
         DocumentPatchAction(
-            action_id=deferred_action_id,
+            action_id=second_pending_action_id,
             operation=DocumentPatchOperation.ADD,
             path="/tasks",
-            target_key=str(deferred_task_id),
-            after=deferred_task.model_dump(mode="json"),
+            target_key=str(second_pending_task_id),
+            after=second_pending_task.model_dump(mode="json"),
             source_ids=(source_id,),
             read_set=(DocumentPathRead(path="/tasks", value_sha256="0" * 64),),
-            status=DocumentChangeStatus.DEFERRED,
         ),
     )
     changeset = DocumentChangeSet(
@@ -475,15 +474,14 @@ def test_workspace_progress_counts_candidate_tasks_and_current_review_actions() 
     assert progress.currently_known_work_count == 2
     coverage = {item.work_id: item for item in progress.coverage}
     assert coverage[pending_task_id].status == "awaiting_employee_decision"
-    assert coverage[deferred_task_id].status == "employee_deferred"
-    assert progress.employee_decisions.pending == 1
-    assert progress.employee_decisions.deferred == 1
+    assert coverage[second_pending_task_id].status == "awaiting_employee_decision"
+    assert progress.employee_decisions.model_dump(mode="json") == {"pending": 2}
     depth = {item.work_id: item for item in progress.depth}
     assert depth[pending_task_id].task_boundary == "evidence_present"
     assert depth[pending_task_id].duty_grouping == "evidence_present"
     assert depth[pending_task_id].output == "evidence_present"
     assert depth[pending_task_id].knowledge == "not_yet_deepened"
-    assert depth[deferred_task_id].duty_grouping == "gap"
+    assert depth[second_pending_task_id].duty_grouping == "gap"
 
 
 def test_workspace_progress_preserves_linked_attention_identity_and_status() -> None:

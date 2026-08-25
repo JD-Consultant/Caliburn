@@ -14,8 +14,6 @@ from app.consultant.state import (
     ConsultantThreadState,
     DocumentChangeSet,
     DurableModel,
-    InterviewWorkItem,
-    InterviewWorkStatus,
     RequiredClarification,
 )
 from app.consultant.understanding import (
@@ -47,13 +45,6 @@ class ConsultantTurnProjection(DurableModel):
     next_question: dict[str, Any] | None = None
 
 
-class BlockedInterviewBranchProjection(DurableModel):
-    work_id: UUID
-    title: str
-    decision_action_ids: tuple[UUID, ...]
-    reason: str
-
-
 class WorkspaceReviewStatus(StrEnum):
     CLEAN = "clean"
     PENDING = "pending"
@@ -69,10 +60,6 @@ class DocumentReviewProjection(DurableModel):
     bundles: tuple[DocumentChangeSet, ...] = ()
     acceptance_blocked_changeset_ids: tuple[UUID, ...] = ()
     unresolved_action_count: int = Field(ge=0)
-    blocked_branches: tuple[BlockedInterviewBranchProjection, ...] = ()
-    safe_interview_work_available: bool
-    decision_required_before_more_interview: bool
-    explanation: str | None = None
 
 
 class ConsultantSnapshot(DurableModel):
@@ -121,23 +108,6 @@ def _consultant_turns(state: ConsultantThreadState) -> tuple[ConsultantTurnProje
     return tuple(turns)
 
 
-def safe_interview_work_available_from_state(state: ConsultantThreadState) -> bool:
-    work = tuple(
-        InterviewWorkItem.model_validate(raw)
-        for raw in state.get("interview_work", {}).values()
-    )
-    safe_available = any(
-        item.status
-        in {
-            InterviewWorkStatus.ACTIVE,
-            InterviewWorkStatus.AVAILABLE,
-            InterviewWorkStatus.PARKED,
-        }
-        for item in work
-    )
-    return safe_available
-
-
 def document_review_projection_from_workspace(
     state: ConsultantThreadState,
     *,
@@ -167,7 +137,7 @@ def document_review_projection_from_workspace(
     else:
         status = WorkspaceReviewStatus.CLEAN
     unresolved_actions = sum(
-        action.status.value in {"pending", "deferred"}
+        action.status.value == "pending"
         for bundle in bundles
         for action in bundle.actions
     )
@@ -186,10 +156,6 @@ def document_review_projection_from_workspace(
             )
         ),
         unresolved_action_count=unresolved_actions,
-        blocked_branches=(),
-        safe_interview_work_available=safe_interview_work_available_from_state(state),
-        decision_required_before_more_interview=False,
-        explanation=None,
     )
 
 

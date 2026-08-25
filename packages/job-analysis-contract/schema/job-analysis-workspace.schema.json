@@ -242,10 +242,9 @@
     "EmployeeDecisionSummaryView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pending", "deferred"],
+      "required": ["pending"],
       "properties": {
-        "pending": { "type": "integer", "minimum": 0 },
-        "deferred": { "type": "integer", "minimum": 0 }
+        "pending": { "type": "integer", "minimum": 0 }
       }
     },
     "VisibleGapView": {
@@ -338,7 +337,7 @@
         "atomic_subgroup_id": { "type": ["string", "null"], "format": "uuid" },
         "affected_work_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
         "blocks_dependent_analysis": { "type": "boolean" },
-        "status": { "type": "string", "enum": ["pending", "deferred"] }
+        "status": { "type": "string", "enum": ["pending"] }
       }
     },
     "DocumentChangeSetView": {
@@ -354,32 +353,17 @@
         "acceptance_blocked": { "type": "boolean" }
       }
     },
-    "BlockedInterviewBranchView": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["work_id", "title", "decision_action_ids", "reason"],
-      "properties": {
-        "work_id": { "type": "string", "format": "uuid" },
-        "title": { "type": "string" },
-        "decision_action_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
-        "reason": { "type": "string" }
-      }
-    },
     "DocumentReviewView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["workspace_generation", "workspace_digest", "workspace_status", "diagnostics", "bundles", "unresolved_action_count", "blocked_branches", "safe_interview_work_available", "decision_required_before_more_interview", "explanation"],
+      "required": ["workspace_generation", "workspace_digest", "workspace_status", "diagnostics", "bundles", "unresolved_action_count"],
       "properties": {
         "workspace_generation": { "type": "integer", "minimum": 0 },
         "workspace_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
         "workspace_status": { "$ref": "#/$defs/WorkspaceReviewStatus" },
         "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/WorkspaceDiagnosticView" } },
         "bundles": { "type": "array", "items": { "$ref": "#/$defs/DocumentChangeSetView" } },
-        "unresolved_action_count": { "type": "integer", "minimum": 0 },
-        "blocked_branches": { "type": "array", "items": { "$ref": "#/$defs/BlockedInterviewBranchView" } },
-        "safe_interview_work_available": { "type": "boolean" },
-        "decision_required_before_more_interview": { "type": "boolean" },
-        "explanation": { "type": ["string", "null"] }
+        "unresolved_action_count": { "type": "integer", "minimum": 0 }
       }
     },
     "WorkspaceDiagnosticView": {
@@ -580,7 +564,7 @@
       "additionalProperties": false,
       "required": ["command", "action_ids", "edited_after_by_action_id", "rejection_reason"],
       "properties": {
-        "command": { "type": "string", "enum": ["accept_changes", "edit_and_accept_changes", "reject_changes", "defer_changes"] },
+        "command": { "type": "string", "enum": ["accept_changes", "edit_and_accept_changes", "reject_changes"] },
         "action_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "format": "uuid" } },
         "edited_after_by_action_id": {
           "type": "object",

@@ -20,7 +20,6 @@ const interviewWorkStatusLabels: Record<string, string> = {
   not_applicable: "不適用",
   retired: "已排除",
   awaiting_employee_decision: "待你確認",
-  employee_deferred: "你已延後",
 };
 
 const understandingStatusLabels: Record<string, string> = {
@@ -171,7 +170,7 @@ export function workspaceSections(snapshot: ConsultantSnapshotView) {
   };
 }
 
-const REVIEWABLE_STATUSES = new Set(["pending", "deferred"]);
+const REVIEWABLE_STATUSES = new Set(["pending"]);
 
 export function reviewSelectionForAction(
   changeset: DocumentChangeSetView,

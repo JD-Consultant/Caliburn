@@ -595,32 +595,31 @@ def test_accepted_after_state_naturally_disappears_from_review_projection() -> N
     assert review.diagnostics == ()
 
 
-def test_defer_and_reject_are_projected_only_for_matching_fingerprints() -> None:
+def test_untouched_action_stays_pending_across_reopen_and_later_ai_mutation() -> None:
     files, registry = _workspace()
     _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
     pending = _derive(files, registry)
-    group = pending.groups[0]
-    defer = WorkspaceReviewDecision.from_group(
-        WorkspaceReviewDecisionKind.DEFER,
-        group,
-        workspace_digest=pending.workspace_digest,
-    )
-
-    deferred = _derive(files, registry, decisions=(defer,))
+    reopened = _derive(dict(files), registry)
     changed_files = dict(files)
     _edit(
         changed_files,
         "/workspace/tasks/task-001.json",
         statement="再次複核採購訂單",
     )
-    changed_workspace = _derive(changed_files, registry, decisions=(defer,))
+    changed_workspace = _derive(changed_files, registry)
 
-    assert {
-        action.status for action in deferred.groups[0].changeset.actions
-    } == {DocumentChangeStatus.DEFERRED}
-    assert {
-        action.status for action in changed_workspace.groups[0].changeset.actions
-    } == {DocumentChangeStatus.PENDING}
+    for review in (pending, reopened, changed_workspace):
+        assert review.groups
+        assert {
+            action.status for group in review.groups for action in group.changeset.actions
+        } == {DocumentChangeStatus.PENDING}
+
+
+def test_reject_is_projected_only_for_matching_fingerprints() -> None:
+    files, registry = _workspace()
+    _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
+    pending = _derive(files, registry)
+    group = pending.groups[0]
 
     reject = WorkspaceReviewDecision.from_group(
         WorkspaceReviewDecisionKind.REJECT,
@@ -645,16 +644,11 @@ def test_defer_and_reject_are_projected_only_for_matching_fingerprints() -> None
     ]
 
 
-def test_raw_workspace_digest_change_preserves_defer_and_reject() -> None:
+def test_raw_workspace_digest_change_preserves_reject() -> None:
     files, registry = _workspace()
     _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
     pending = _derive(files, registry)
     group = pending.groups[0]
-    defer = WorkspaceReviewDecision.from_group(
-        WorkspaceReviewDecisionKind.DEFER,
-        group,
-        workspace_digest=pending.workspace_digest,
-    )
     reject = WorkspaceReviewDecision.from_group(
         WorkspaceReviewDecisionKind.REJECT,
         group,
@@ -669,37 +663,23 @@ def test_raw_workspace_digest_change_preserves_defer_and_reject() -> None:
         separators=(",", ":"),
     )
 
-    deferred_replay = _derive(raw_changed_files, registry, decisions=(defer,))
     rejected_replay = _derive(raw_changed_files, registry, decisions=(reject,))
 
-    assert deferred_replay.workspace_digest != pending.workspace_digest
-    assert {
-        action.status for action in deferred_replay.groups[0].changeset.actions
-    } == {DocumentChangeStatus.DEFERRED}
+    assert rejected_replay.workspace_digest != pending.workspace_digest
     assert rejected_replay.groups == ()
     assert [item.code for item in rejected_replay.diagnostics] == [
         "rejected-semantic-change"
     ]
 
 
-def test_unrelated_workspace_change_preserves_deferred_group() -> None:
+def test_unrelated_workspace_change_keeps_pending_groups() -> None:
     files, registry = _workspace()
     _edit(files, "/workspace/tasks/task-001.json", statement="複核採購訂單")
     pending = _derive(files, registry)
-    task_group = next(
-        group
-        for group in pending.groups
-        if any(str(TASK_ID) in action.path for action in group.actions)
-    )
-    defer = WorkspaceReviewDecision.from_group(
-        WorkspaceReviewDecisionKind.DEFER,
-        task_group,
-        workspace_digest=pending.workspace_digest,
-    )
 
     changed_files = dict(files)
     _edit(changed_files, "/workspace/header.json", job_title="資深採購專員")
-    replay = _derive(changed_files, registry, decisions=(defer,), generation=4)
+    replay = _derive(changed_files, registry, generation=4)
     replay_task_group = next(
         group
         for group in replay.groups
@@ -712,9 +692,7 @@ def test_unrelated_workspace_change_preserves_deferred_group() -> None:
     )
 
     assert replay.workspace_digest != pending.workspace_digest
-    assert {action.status for action in replay_task_group.actions} == {
-        DocumentChangeStatus.DEFERRED
-    }
+    assert {action.status for action in replay_task_group.actions} == {DocumentChangeStatus.PENDING}
     assert {action.status for action in header_group.actions} == {
         DocumentChangeStatus.PENDING
     }

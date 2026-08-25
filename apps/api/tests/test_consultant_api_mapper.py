@@ -10,7 +10,6 @@ from app.consultant.state import (
     ApprovedJobDocument,
     ApprovedTask,
     DocumentChangeSet,
-    DocumentChangeStatus,
     DocumentPatchAction,
     DocumentPatchOperation,
     DocumentPathRead,
@@ -114,7 +113,6 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
         "INTERVIEW_NOT_YET_SUFFICIENT",
     }
     assert view.readiness.requires_force_confirmation is True
-    assert view.document_review.safe_interview_work_available is True
     payload = view.model_dump(mode="json")
     assert "interview_work" not in payload
     review_state_field = "review_" + "queue"
@@ -123,6 +121,10 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
     assert "execution_evidence" not in payload["run"]
     assert "pause" not in payload
     assert "finish" not in payload
+    assert "deferred" not in payload
+    assert "blocked_branches" not in payload["document_review"]
+    assert "safe_interview_work_available" not in payload["document_review"]
+    assert "decision_required_before_more_interview" not in payload["document_review"]
 
 
 def test_snapshot_mapper_exposes_store_current_document_and_workspace_digest() -> None:
@@ -243,7 +245,6 @@ def test_snapshot_mapper_projects_store_review_status_generation_and_employee_di
                     ),
                 ),
                 atomic_subgroup_id=subgroup_id,
-                status=DocumentChangeStatus.DEFERRED,
             ),
         ),
         source_ids=(source_id,),
@@ -317,7 +318,7 @@ def test_snapshot_mapper_projects_store_review_status_generation_and_employee_di
         if status == "pending":
             assert [action.status.value for action in view.document_review.bundles[0].actions] == [
                 "pending",
-                "deferred",
+                "pending",
             ]
             assert view.document_review.unresolved_action_count == 2
         if status == "conflicted":

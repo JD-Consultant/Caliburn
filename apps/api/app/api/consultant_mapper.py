@@ -273,14 +273,6 @@ def to_consultant_snapshot_view(
                     for item in review.diagnostics
                 ],
                 "unresolved_action_count": review.unresolved_action_count,
-                "blocked_branches": [
-                    item.model_dump(mode="json") for item in review.blocked_branches
-                ],
-                "safe_interview_work_available": review.safe_interview_work_available,
-                "decision_required_before_more_interview": (
-                    review.decision_required_before_more_interview
-                ),
-                "explanation": review.explanation,
             }
         ),
         required_clarification=(

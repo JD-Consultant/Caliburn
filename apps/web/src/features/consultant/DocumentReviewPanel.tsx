@@ -45,7 +45,6 @@ const operationLabels: Record<DocumentPatchActionView["operation"], string> = {
 
 const statusLabels: Record<DocumentPatchActionView["status"], string> = {
   pending: "待確認",
-  deferred: "稍後處理",
 };
 
 function errorText(error: unknown): string {
@@ -187,7 +186,7 @@ function ReviewBundle({
   };
 
   const active = bundle.actions.filter((action) =>
-    ["pending", "deferred"].includes(action.status),
+    action.status === "pending",
   );
 
   return (
@@ -204,7 +203,7 @@ function ReviewBundle({
 
       <div className="mt-4 space-y-3">
         {bundle.actions.map((action, index) => {
-          const reviewable = ["pending", "deferred"].includes(action.status);
+          const reviewable = action.status === "pending";
           const selectionLabel = `選取第 ${bundleOrdinal} 組第 ${index + 1} 項${operationLabels[action.operation]}變更：${documentPathLabel(action.path)}（${bundle.summary}）${action.atomic_subgroup_id ? "；必須整組決定" : ""}`;
           return (
             <div
@@ -310,13 +309,6 @@ function ReviewBundle({
             >
               拒絕
             </Button>
-            <Button
-              variant="ghost"
-              disabled={mutation.isPending}
-              onClick={() => decide("defer_changes")}
-            >
-              稍後處理
-            </Button>
           </div>
         </div>
       ) : null}
@@ -341,7 +333,7 @@ export function DocumentReviewPanel({
   snapshot: ConsultantSnapshotView;
 }) {
   const activeBundles = snapshot.document_review.bundles.filter((bundle) =>
-    bundle.actions.some((action) => ["pending", "deferred"].includes(action.status)),
+    bundle.actions.some((action) => action.status === "pending"),
   );
   const review = snapshot.document_review;
   const diagnosticKeys = diagnosticRenderKeys(review.diagnostics);
@@ -388,19 +380,6 @@ export function DocumentReviewPanel({
             <p key={diagnosticKeys[index]} className="mt-1 text-stone-700">
               {diagnostic.message}
             </p>
-          ))}
-        </div>
-      ) : null}
-      {snapshot.document_review.blocked_branches.length ? (
-        <div className="grid gap-2 sm:grid-cols-2">
-          {snapshot.document_review.blocked_branches.map((branch) => (
-            <div
-              key={branch.work_id}
-              className="rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3"
-            >
-              <p className="text-sm font-semibold">{branch.title}</p>
-              <p className="mt-1 text-xs leading-5 text-stone-600">{branch.reason}</p>
-            </div>
           ))}
         </div>
       ) : null}

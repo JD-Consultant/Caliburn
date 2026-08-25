@@ -98,7 +98,6 @@ _STRUCTURAL_OPERATIONS = {
 
 
 class WorkspaceReviewDecisionKind(StrEnum):
-    DEFER = "defer"
     REJECT = "reject"
 
 
@@ -1205,36 +1204,6 @@ def _rejected_action_ids(
     return selected_ids & {action.action_id for action in group.actions}
 
 
-def _deferred_action_ids(
-    decision: WorkspaceReviewDecision,
-    group: WorkspaceReviewGroup,
-    manifest: WorkspaceManifest,
-) -> set[UUID]:
-    if (
-        decision.kind is not WorkspaceReviewDecisionKind.DEFER
-        or decision.group_digest != group.group_digest
-        or decision.boundary_digest != group.boundary_digest
-    ):
-        return set()
-    selected_fingerprints = set(decision.selected_action_fingerprints)
-    if selected_fingerprints:
-        return {
-            action.action_id
-            for action in group.actions
-            if workspace_action_semantic_fingerprint(action) in selected_fingerprints
-        }
-    if decision.workspace_digest == manifest.resource_digest:
-        return set(decision.selected_action_ids) or {
-            action.action_id for action in group.actions
-        }
-    # Backward compatibility for decision records written before selected
-    # semantic fingerprints were persisted.  A whole unchanged group can be
-    # mapped safely; a partial legacy selection cannot.
-    if len(decision.selected_action_ids) == len(group.actions):
-        return {action.action_id for action in group.actions}
-    return set()
-
-
 def _conflict_affects_action(
     conflict_path: str,
     action: DocumentPatchAction,
@@ -1450,38 +1419,6 @@ def derive_workspace_review(
                         ),
                     }
                 ),
-            )
-        deferred_action_ids = set().union(
-            *(
-                _deferred_action_ids(decision, group, manifest)
-                for decision in decisions
-            )
-        )
-        deferred = bool(deferred_action_ids)
-        if deferred:
-            group = WorkspaceReviewGroup(
-                changeset=group.changeset.model_copy(
-                    update={
-                        "actions": tuple(
-                            (
-                                action.model_copy(
-                                    update={
-                                        "status": DocumentChangeStatus.DEFERRED
-                                    }
-                                )
-                                if action.action_id in deferred_action_ids
-                                else action
-                            )
-                            for action in group.changeset.actions
-                        )
-                    }
-                ),
-                group_digest=group.group_digest,
-                semantic_fingerprint=group.semantic_fingerprint,
-                evidence_digest=group.evidence_digest,
-                employee_request_digest=group.employee_request_digest,
-                boundary_digest=group.boundary_digest,
-                diagnostics=group.diagnostics,
             )
         projected.append(group)
     diagnostics.extend(

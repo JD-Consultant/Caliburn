@@ -71,7 +71,6 @@ class WorkspaceDecisionKind(StrEnum):
     ACCEPT = "accept"
     EDIT_ACCEPT = "edit_and_accept"
     REJECT = "reject"
-    DEFER = "defer"
 
 
 class WorkspaceReviewCommand(DurableModel):
@@ -700,10 +699,7 @@ class WorkspaceAuthorityService:
     ) -> tuple[WorkspaceReviewDecision, ...]:
         decisions: list[WorkspaceReviewDecision] = []
         for record in records:
-            if record.decision not in {
-                WorkspaceDecisionKind.REJECT,
-                WorkspaceDecisionKind.DEFER,
-            }:
+            if record.decision is not WorkspaceDecisionKind.REJECT:
                 continue
             decisions.append(
                 WorkspaceReviewDecision(
@@ -1187,11 +1183,6 @@ class WorkspaceAuthorityService:
         group = self._group_for_command(projection, command)
         selected = select_workspace_actions(projection, command)
         edited = dict(command.edited_after_by_action_id)
-
-        if command.decision is WorkspaceDecisionKind.DEFER:
-            record = self._record(command, group, status=WorkspaceDecisionStatus.COMPLETED)
-            await self._put_record(document_id, record)
-            return await self.runtime._snapshot(document_id)
 
         if command.decision is WorkspaceDecisionKind.REJECT:
             plan = await self._build_plan(

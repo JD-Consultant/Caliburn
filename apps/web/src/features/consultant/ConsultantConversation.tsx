@@ -34,19 +34,9 @@ export function ConsultantConversation({
 }) {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
-  const [correctionSourceId, setCorrectionSourceId] = useState<string | null>(null);
   const entries = useMemo(() => buildConversationEntries(snapshot), [snapshot]);
   const runStatus = consultantRunStatus(snapshot);
   const runFailed = snapshot.run?.status === "failed";
-  const failedSourceId = runFailed ? snapshot.run?.source_id ?? null : null;
-  const correctingFailedSource =
-    runFailed &&
-    failedSourceId !== null &&
-    correctionSourceId === failedSourceId;
-  const answerBlockedByFailure = runFailed && !correctingFailedSource;
-  const answerBlockedByDecision =
-    snapshot.document_review.decision_required_before_more_interview &&
-    correctionSourceId === null;
   const latestQuestion = [...snapshot.messages]
     .reverse()
     .find((message) => message.next_question)?.next_question;
@@ -57,16 +47,13 @@ export function ConsultantConversation({
   const answerMutation = useMutation({
     mutationFn: (operation: {
       text: string;
-      supersedesSourceId: string | null;
       idempotencyKey: string;
     }) =>
       submitConsultantAnswer(documentId, operation.idempotencyKey, {
         text: operation.text,
-        supersedes_source_id: operation.supersedesSourceId,
       }),
     onSuccess: async () => {
       setDraft("");
-      setCorrectionSourceId(null);
       await refresh();
     },
     onError: async (error) => {
@@ -85,22 +72,18 @@ export function ConsultantConversation({
     if (
       !text.trim() ||
       runStatus.busy ||
-      answerBlockedByFailure ||
-      answerBlockedByDecision ||
       answerMutation.isPending
     )
       return;
     const previous = answerMutation.variables;
     const sameFailedInput =
       answerMutation.isError &&
-      previous?.text === text &&
-      previous.supersedesSourceId === correctionSourceId;
+      previous?.text === text;
     answerMutation.mutate(
       sameFailedInput
         ? previous
         : {
             text,
-            supersedesSourceId: correctionSourceId,
             idempotencyKey: crypto.randomUUID(),
           },
     );
@@ -184,24 +167,6 @@ export function ConsultantConversation({
                 >
                   {entry.text}
                 </div>
-                {entry.speaker === "employee" && !entry.superseded ? (
-                  <div className="mt-1 text-right">
-                    <button
-                      type="button"
-                      className="text-xs text-stone-500 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
-                      disabled={
-                        runFailed &&
-                        entry.key.replace("employee:", "") !== failedSourceId
-                      }
-                      onClick={() => {
-                        setCorrectionSourceId(entry.key.replace("employee:", ""));
-                        setDraft(entry.text);
-                      }}
-                    >
-                      更正這段原話
-                    </button>
-                  </div>
-                ) : null}
               </div>
             ))
           )}
@@ -217,28 +182,9 @@ export function ConsultantConversation({
           </div>
         ) : null}
 
-        {correctionSourceId ? (
-          <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-950">
-            <span>這次送出會更正先前那段原話，舊內容仍保留在修訂紀錄中。</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setCorrectionSourceId(null)}
-            >
-              取消更正
-            </Button>
-          </div>
-        ) : null}
-
-        {answerBlockedByDecision ? (
-          <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-            目前沒有其他可安全深入的訪談分支；請先完成下方相關文件決定。你仍可審核、直接編輯或匯出正式內容。
-          </div>
-        ) : null}
-
-        {answerBlockedByFailure ? (
+        {runFailed ? (
           <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-950">
-            上一則回答已保存，但分析失敗。你可以重試同一則回答，或更正該則原話後再送出；為避免跳過未處理內容，目前不接受無關的新回答。
+            上一則回答已保存，但分析失敗。你可以重試同一則回答，也可以直接補充或更正下一則說法；新的訊息會另行保存。
           </div>
         ) : null}
 
@@ -258,8 +204,6 @@ export function ConsultantConversation({
             value={draft}
             disabled={
               runStatus.busy ||
-              answerBlockedByFailure ||
-              answerBlockedByDecision ||
               answerMutation.isPending
             }
             placeholder={
@@ -282,8 +226,6 @@ export function ConsultantConversation({
               disabled={
                 !draft.trim() ||
                 runStatus.busy ||
-                answerBlockedByFailure ||
-                answerBlockedByDecision ||
                 answerMutation.isPending
               }
             >

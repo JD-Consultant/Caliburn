@@ -260,7 +260,6 @@ class EmployeeDecisionSummaryView(BaseModel):
         extra='forbid',
     )
     pending: conint(ge=0, strict=True)
-    deferred: conint(ge=0, strict=True)
 
 
 class Status3(StrEnum):
@@ -334,7 +333,6 @@ class Operation(StrEnum):
 
 class Status4(StrEnum):
     pending = 'pending'
-    deferred = 'deferred'
 
 
 class DocumentPatchActionView(BaseModel):
@@ -367,16 +365,6 @@ class DocumentChangeSetView(BaseModel):
     source_ids: list[UUID]
     created_revision: conint(ge=0, strict=True)
     acceptance_blocked: bool
-
-
-class BlockedInterviewBranchView(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    work_id: UUID
-    title: str
-    decision_action_ids: list[UUID]
-    reason: str
 
 
 class WorkspaceDiagnosticView(BaseModel):
@@ -564,7 +552,6 @@ class Command(StrEnum):
     accept_changes = 'accept_changes'
     edit_and_accept_changes = 'edit_and_accept_changes'
     reject_changes = 'reject_changes'
-    defer_changes = 'defer_changes'
 
 
 class DocumentReviewDecisionWrite(BaseModel):
@@ -696,10 +683,6 @@ class DocumentReviewView(BaseModel):
     diagnostics: list[WorkspaceDiagnosticView]
     bundles: list[DocumentChangeSetView]
     unresolved_action_count: conint(ge=0, strict=True)
-    blocked_branches: list[BlockedInterviewBranchView]
-    safe_interview_work_available: bool
-    decision_required_before_more_interview: bool
-    explanation: str | None
 
 
 class ConsultantSnapshotView(BaseModel):

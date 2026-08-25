@@ -88,10 +88,6 @@ def test_document_review_contract_exposes_workspace_status_without_old_action_li
             diagnostics=diagnostics,
             bundles=[],
             unresolved_action_count=0,
-            blocked_branches=[],
-            safe_interview_work_available=True,
-            decision_required_before_more_interview=False,
-            explanation=None,
         )
         assert review.workspace_generation == 7
         assert review.workspace_status is status
@@ -102,14 +98,22 @@ def test_document_review_contract_exposes_workspace_status_without_old_action_li
     operation = action["operation"]["enum"]
     status = action["status"]["enum"]
     assert operation == ["add", "revise", "withdraw", "reassign", "reorder"]
-    assert status == ["pending", "deferred"]
+    assert status == ["pending"]
     assert {"target_ids", "employee_after", "rejection_reason", "stale_reason"}.isdisjoint(
         action
     )
-    assert set(definitions["EmployeeDecisionSummaryView"]["properties"]) == {
-        "pending",
-        "deferred",
-    }
+    assert set(definitions["EmployeeDecisionSummaryView"]["properties"]) == {"pending"}
+    assert definitions["DocumentReviewDecisionWrite"]["properties"]["command"]["enum"] == [
+        "accept_changes",
+        "edit_and_accept_changes",
+        "reject_changes",
+    ]
+    assert {
+        "blocked_branches",
+        "safe_interview_work_available",
+        "decision_required_before_more_interview",
+        "explanation",
+    }.isdisjoint(definitions["DocumentReviewView"]["properties"])
 
 
 def test_commands_are_typed_and_reject_untrusted_extra_fields() -> None:
@@ -146,7 +150,7 @@ def test_review_edit_map_keeps_a_generated_json_value_index_signature() -> None:
         assert member in generated[start:end]
 
 
-def test_manual_document_surface_keeps_deferred_fields_without_official_codes() -> None:
+def test_manual_document_surface_keeps_employee_fields_without_official_codes() -> None:
     document_id = uuid4()
     task_id = uuid4()
     item_id = uuid4()

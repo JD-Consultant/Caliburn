@@ -404,9 +404,6 @@ export function ConsultantInsightPanel({
           <span className="rounded-full bg-amber-50 px-3 py-1.5 text-amber-900">
             待你確認 {snapshot.semantic_progress.employee_decisions.pending} 項
           </span>
-          <span className="rounded-full bg-stone-100 px-3 py-1.5 text-stone-700">
-            你已延後 {snapshot.semantic_progress.employee_decisions.deferred} 項
-          </span>
         </div>
 
         <div className="mt-4 space-y-3">

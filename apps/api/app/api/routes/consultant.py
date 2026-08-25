@@ -408,7 +408,6 @@ async def review_document_changes(
                 "accept_changes": WorkspaceDecisionKind.ACCEPT,
                 "edit_and_accept_changes": WorkspaceDecisionKind.EDIT_ACCEPT,
                 "reject_changes": WorkspaceDecisionKind.REJECT,
-                "defer_changes": WorkspaceDecisionKind.DEFER,
             }[body.command.value]
             command = WorkspaceReviewCommand(
                 command_id=_command_id(

@@ -64,7 +64,6 @@ describe("employee consultant workspace integration", () => {
     snapshot.current_interview = null;
     snapshot.semantic_progress.employee_decisions = {
       pending: 2,
-      deferred: 1,
     };
 
     renderWithClient(
@@ -74,7 +73,7 @@ describe("employee consultant workspace integration", () => {
     expect(screen.getByText("目前要釐清的問題")).toBeTruthy();
     expect(screen.getByText("異常判斷依據")).toBeTruthy();
     expect(screen.getByText("待你確認 2 項")).toBeTruthy();
-    expect(screen.getByText("你已延後 1 項")).toBeTruthy();
+    expect(screen.queryByText(/你已延後/)).toBeNull();
   });
 
   it("renders the whole durable workspace, reconnect state and single force-export confirmation", async () => {
@@ -117,38 +116,19 @@ describe("employee consultant workspace integration", () => {
     expect(stream?.closed).toBe(true);
   });
 
-  it("shows the blocked branch and prevents only a new AI interview turn when no safe branch remains", () => {
+  it("keeps a pending review from blocking a new AI interview turn", async () => {
+    const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
-    snapshot.document_review = {
-      ...snapshot.document_review,
-      safe_interview_work_available: false,
-      decision_required_before_more_interview: true,
-      explanation: "目前沒有其他可安全深入的工作，需先處理所列文件結構決定。",
-      blocked_branches: [
-        {
-          work_id: snapshot.current_interview!.work_id,
-          title: "月結差異處理",
-          decision_action_ids: [snapshot.document_review.bundles[0].actions[0].action_id],
-          reason: "需先確認這項工作應歸入哪一項主要職責。",
-        },
-      ],
-    };
+    snapshot.document_review.bundles[0].actions[0].status = "pending";
 
-    renderWithClient(
-      <>
-        <ConsultantConversation documentId={DOCUMENT_ID} snapshot={snapshot} />
-        <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />
-      </>,
-    );
+    renderWithClient(<ConsultantConversation documentId={DOCUMENT_ID} snapshot={snapshot} />);
 
-    expect((screen.getByLabelText("回覆顧問") as HTMLTextAreaElement).disabled).toBe(
-      true,
+    const answer = screen.getByLabelText("回覆顧問") as HTMLTextAreaElement;
+    await user.type(answer, "我也會整理供應商名單。");
+    expect(answer.disabled).toBe(false);
+    expect((screen.getByRole("button", { name: "送出回答" }) as HTMLButtonElement).disabled).toBe(
+      false,
     );
-    expect(screen.getByText("月結差異處理")).toBeTruthy();
-    expect(
-      screen.getByText("需先確認這項工作應歸入哪一項主要職責。"),
-    ).toBeTruthy();
-    expect(screen.getByText(/先完成下方相關文件決定/)).toBeTruthy();
   });
 
   it("restores a non-authoritative direct-edit draft after leaving and returning", async () => {
@@ -230,7 +210,6 @@ describe("employee consultant workspace integration", () => {
       accept: "ui-review-accept-internal",
       edit: "ui-review-edit-internal",
       reject: "ui-review-reject-internal",
-      defer: "ui-review-defer-internal",
     };
     snapshot.document_review.bundles = [
       {
@@ -284,25 +263,8 @@ describe("employee consultant workspace integration", () => {
           }),
         ],
       },
-      {
-        changeset_id: "ui-review-changeset-defer",
-        summary: "調整工作順序建議",
-        created_revision: snapshot.revision,
-        source_ids: [snapshot.latest_source_id!],
-        acceptance_blocked: false,
-        actions: [
-          action({
-            action_id: actionIds.defer,
-            operation: "reorder",
-            path: "/tasks/task-1/display_order",
-            target_key: "task-1",
-            before: 0,
-            after: 1,
-          }),
-        ],
-      },
     ];
-    snapshot.document_review.unresolved_action_count = 4;
+    snapshot.document_review.unresolved_action_count = 3;
     const response = structuredClone(snapshot);
     response.revision += 1;
     const fetchMock = vi.fn().mockImplementation(
@@ -373,15 +335,6 @@ describe("employee consultant workspace integration", () => {
       rejection_reason: "目前正式文件仍需要這項內容",
     });
 
-    await selectWithKeyboard("選取第 4 組第 1 項調整順序變更：工作順序（調整工作順序建議）");
-    await decideWithKeyboard("稍後處理");
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
-    expect(
-      JSON.parse(String((fetchMock.mock.calls[3][1] as RequestInit).body)),
-    ).toMatchObject({
-      command: "defer_changes",
-      action_ids: [actionIds.defer],
-    });
   });
 
   it("shows an employee-safe repair state without review actions when the working draft is invalid", () => {
@@ -553,10 +506,6 @@ describe("employee consultant workspace integration", () => {
     ).toBe(true);
     expect(
       (screen.getByRole("button", { name: "拒絕" }) as HTMLButtonElement).disabled,
-    ).toBe(false);
-    expect(
-      (screen.getByRole("button", { name: "稍後處理" }) as HTMLButtonElement)
-        .disabled,
     ).toBe(false);
   });
 
@@ -881,25 +830,15 @@ describe("employee consultant workspace integration", () => {
     });
   });
 
-  it("lets a failed answer be corrected but disables unrelated new answers and corrections", async () => {
+  it("keeps normal typing and retry available after an analysis failure", async () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
-    const unrelatedSourceId = "00000000-0000-0000-0000-000000000040";
     snapshot.run = {
       ...snapshot.run!,
       status: "failed",
       completed_at: null,
       error_code: "provider_unavailable",
     };
-    snapshot.employee_messages.push({
-      source_id: unrelatedSourceId,
-      text: "我也會整理供應商名單。",
-      created_at: "2026-08-14T10:01:00Z",
-      processing_status: "committed",
-      validity: "current",
-      supersedes_source_id: null,
-      superseded_by_source_id: null,
-    });
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -916,24 +855,19 @@ describe("employee consultant workspace integration", () => {
     );
 
     const answer = screen.getByLabelText("回覆顧問") as HTMLTextAreaElement;
-    const correctionButtons = screen.getAllByRole("button", {
-      name: "更正這段原話",
-    }) as HTMLButtonElement[];
-    expect(answer.disabled).toBe(true);
-    expect(correctionButtons[0].disabled).toBe(false);
-    expect(correctionButtons[1].disabled).toBe(true);
-
-    await user.click(correctionButtons[0]);
     expect(answer.disabled).toBe(false);
-    await user.clear(answer);
+    expect(screen.getByRole("button", { name: "重試同一則回答" })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "更正這段原話" })).toBeNull();
     await user.type(answer, "我每月會先核對差異明細，再追查原因。");
+    expect((screen.getByRole("button", { name: "送出回答" }) as HTMLButtonElement).disabled).toBe(
+      false,
+    );
     await user.click(screen.getByRole("button", { name: "送出回答" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 
     const request = fetchMock.mock.calls[0][1] as RequestInit;
     expect(JSON.parse(String(request.body))).toMatchObject({
       text: "我每月會先核對差異明細，再追查原因。",
-      supersedes_source_id: snapshot.run.source_id,
     });
   });
 

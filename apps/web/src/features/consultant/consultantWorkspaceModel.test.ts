@@ -140,7 +140,6 @@ function snapshot(): ConsultantSnapshotView {
       ],
       employee_decisions: {
         pending: 2,
-        deferred: 0,
       },
       gaps: [
         {
@@ -185,10 +184,6 @@ function snapshot(): ConsultantSnapshotView {
       diagnostics: [],
       bundles: [changeset()],
       unresolved_action_count: 2,
-      blocked_branches: [],
-      safe_interview_work_available: true,
-      decision_required_before_more_interview: false,
-      explanation: null,
     },
     required_clarification: {
       clarification_id: "00000000-0000-0000-0000-000000000012",
@@ -457,7 +452,6 @@ describe("employee-facing consultant workspace model", () => {
   it("keeps internal enum and JSON-pointer names out of the employee wording", () => {
     expect(interviewWorkStatusLabel("sufficient_for_now")).toBe("目前足夠");
     expect(interviewWorkStatusLabel("awaiting_employee_decision")).toBe("待你確認");
-    expect(interviewWorkStatusLabel("employee_deferred")).toBe("你已延後");
     expect(understandingStatusLabel("employee_confirmed")).toBe("你已確認");
     expect(documentPathLabel("/tasks/00000000-0000-0000-0000-000000000020/duty_id")).toBe(
       "工作所屬職責",

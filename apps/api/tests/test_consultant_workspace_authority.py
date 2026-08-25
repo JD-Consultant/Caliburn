@@ -193,7 +193,7 @@ def test_owner_ten_tasks_and_nine_outputs_allows_only_tenth_output_rejection() -
     assert tuple(action.action_id for action in rejected) == (output_ids[9],)
 
 
-def test_conflicted_group_only_blocks_approved_writes_not_reject_or_defer() -> None:
+def test_conflicted_group_only_blocks_approved_writes_not_reject() -> None:
     base_group = _projection().groups[0]
     conflicted_group = replace(
         base_group,
@@ -248,10 +248,6 @@ def test_conflicted_group_only_blocks_approved_writes_not_reject_or_defer() -> N
         projection,
         _command(WorkspaceDecisionKind.REJECT, (TASK_ACTION_ID,)),
     )
-    assert select_workspace_actions(
-        projection,
-        _command(WorkspaceDecisionKind.DEFER, (TASK_ACTION_ID,)),
-    )
     clean_command = _command(
         WorkspaceDecisionKind.ACCEPT,
         (OTHER_ACTION_ID,),
@@ -275,7 +271,7 @@ def test_decision_record_keeps_workspace_identity_without_review_payload() -> No
     record = WorkspaceDecisionRecord(
         command_id=COMMAND_ID,
         payload_digest=DIGEST,
-        decision=WorkspaceDecisionKind.DEFER,
+        decision=WorkspaceDecisionKind.REJECT,
         changeset_id=CHANGESET_ID,
         selected_action_ids=(TASK_ACTION_ID,),
         workspace_digest=DIGEST,
@@ -288,6 +284,14 @@ def test_decision_record_keeps_workspace_identity_without_review_payload() -> No
 
     assert record.workspace_digest == DIGEST
     assert "actions" not in record.model_dump(mode="json")
+
+
+def test_review_decisions_have_no_defer_lifecycle() -> None:
+    assert {kind.value for kind in WorkspaceDecisionKind} == {
+        "accept",
+        "edit_and_accept",
+        "reject",
+    }
 
 
 def test_three_way_rebase_preserves_ai_only_and_applies_employee_only_changes() -> None:

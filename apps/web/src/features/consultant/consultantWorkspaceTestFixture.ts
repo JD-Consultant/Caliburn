@@ -120,7 +120,6 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
       ],
       employee_decisions: {
         pending: 2,
-        deferred: 0,
       },
       gaps: [
         {
@@ -165,10 +164,6 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
       diagnostics: [],
       bundles: [changesetFixture()],
       unresolved_action_count: 2,
-      blocked_branches: [],
-      safe_interview_work_available: true,
-      decision_required_before_more_interview: false,
-      explanation: null,
     },
     required_clarification: {
       clarification_id: "00000000-0000-0000-0000-000000000012",

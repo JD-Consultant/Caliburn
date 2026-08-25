@@ -724,21 +724,14 @@ async def test_review_projection_loads_durable_decisions_after_backend_construct
     )
     group = projection.groups[0]
 
-    runtime.review_decisions = (
-        WorkspaceReviewDecision.from_group(
-            WorkspaceReviewDecisionKind.DEFER,
-            group,
-            workspace_digest=projection.workspace_digest,
-        ),
-    )
-    deferred = await binding.composite_backend.aread(
+    pending = await binding.composite_backend.aread(
         "/review/groups/group-001.json"
     )
-    assert deferred.error is None
-    assert deferred.file_data is not None
+    assert pending.error is None
+    assert pending.file_data is not None
     assert (
-        json.loads(deferred.file_data["content"])["actions"][0]["status"]
-        == "deferred"
+        json.loads(pending.file_data["content"])["actions"][0]["status"]
+        == "pending"
     )
 
     runtime.review_decisions = (

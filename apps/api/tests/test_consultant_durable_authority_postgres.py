@@ -254,7 +254,6 @@ async def test_store_snapshot_projects_valid_workspace_progress_and_review_count
         assert snapshot.approved_document.tasks[0].statement != "AI 候選工作內容"
         assert snapshot.semantic_progress.currently_known_work_count == 1
         assert snapshot.semantic_progress.employee_decisions.pending == 1
-        assert snapshot.semantic_progress.employee_decisions.deferred == 0
         assert snapshot.semantic_progress.coverage[0].status == (
             "awaiting_employee_decision"
         )
@@ -545,26 +544,6 @@ async def test_workspace_authority_applies_partial_decisions_and_exact_replay(
         assert json.loads(rejected_workspace.files[task_path]) == json.loads(
             expected_files[task_path]
         )
-
-        await _edit_task_statement(workspace, "AI延後")
-        snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(
-            runtime,
-            document_id,
-        )
-        group = projection.groups[0]
-        action = group.actions[0]
-        defer = _workspace_command(
-            document_id=document_id,
-            snapshot=snapshot,
-            workspace_snapshot=workspace_snapshot,
-            group=group,
-            decision=WorkspaceDecisionKind.DEFER,
-            action_id=action.action_id,
-            reason="稍後再看",
-        )
-        deferred = await runtime.decide_workspace_changes(defer)
-        assert deferred.approved_document.tasks[0].statement == "AI接受"
-        assert json.loads((await workspace.read_snapshot()).files[task_path])["statement"] == "AI延後"
 
         await _edit_task_statement(workspace, "AI編輯前")
         snapshot, _, workspace_snapshot, projection = await _validated_workspace_review(

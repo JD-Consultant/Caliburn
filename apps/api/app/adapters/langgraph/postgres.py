@@ -29,6 +29,7 @@ from psycopg.rows import DictRow, dict_row
 
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.clarification import ClarificationAnswer
+from app.consultant.current_document_edit import plan_current_document_edit
 from app.consultant.document_authority import DocumentAuthorityError, edited_action_source_payload
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.understanding import semantic_progress_from_workspace
@@ -938,6 +939,8 @@ class PostgresConsultantRuntime:
     def _changed_employee_text(
         before: ApprovedJobDocument,
         after: ApprovedJobDocument,
+        *,
+        allowed_paths: Sequence[str] | None = None,
     ) -> tuple[str, tuple[SourcePositionAnchor, ...]] | None:
         """Extract only employee-authored text, never IDs or control values."""
 
@@ -992,10 +995,12 @@ class PostgresConsultantRuntime:
             return fields
 
         before_fields = dict(authored_fields(before))
+        allowed = frozenset(allowed_paths) if allowed_paths is not None else None
         changes = [
             (path, value)
             for path, value in authored_fields(after)
             if before_fields.get(path) != value
+            and (allowed is None or path in allowed)
         ]
         if not changes:
             return None
@@ -1053,6 +1058,192 @@ class PostgresConsultantRuntime:
                 "unknown employee evidence source "
                 + ", ".join(str(source_id) for source_id in unknown)
             )
+
+    @staticmethod
+    def _attach_direct_edit_evidence(
+        document: ApprovedJobDocument,
+        *,
+        employee_text_paths: Sequence[str],
+        source_id: UUID,
+    ) -> ApprovedJobDocument:
+        opk_paths = {
+            f"/opks/{item.item_id}/text"
+            for item in document.opks
+            if f"/opks/{item.item_id}/text" in employee_text_paths
+        }
+        if not opk_paths:
+            return document
+        opks = tuple(
+            item.model_copy(
+                update={
+                    "evidence_source_ids": tuple(
+                        dict.fromkeys((*item.evidence_source_ids, source_id))
+                    )
+                }
+            )
+            if f"/opks/{item.item_id}/text" in opk_paths
+            else item
+            for item in document.opks
+        )
+        return document.model_copy(update={"opks": opks})
+
+    async def apply_current_document_edit(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        workspace_generation: int,
+        workspace_digest: str,
+        document: ApprovedJobDocument,
+        source_id: UUID,
+        command_receipt: CommandReceipt | None = None,
+    ) -> ConsultantSnapshot:
+        """Commit the employee delta from the shared current JD surface.
+
+        The workspace planner is the only source of employee override paths and
+        employee text paths.  This keeps a full current Store catalog in the
+        planner while the existing authority seam remains responsible for the
+        approved checkpoint and replayable Store rebase.
+        """
+
+        async with self._lock_for(document_id):
+            self._require_employee_mutation_admitted(document_id)
+            await self._require_active_catalog(document_id)
+            raw_state = await self.raw_state(document_id)
+            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                await WorkspaceAuthorityService(self).recover(document_id)
+                await self._reconcile_replayed_command_source(
+                    document_id,
+                    source_id,
+                )
+                return await self._snapshot(document_id)
+
+            snapshot, _workspace, workspace_snapshot, review = await (
+                WorkspaceAuthorityService(self)._review_context(document_id)
+            )
+            if snapshot.revision != expected_revision:
+                raise StaleRevision(
+                    f"expected revision {expected_revision}, found {snapshot.revision}"
+                )
+            if workspace_snapshot.manifest.generation != workspace_generation:
+                raise StaleRevision("workspace generation changed")
+            if workspace_snapshot.manifest.resource_digest != workspace_digest:
+                raise StaleRevision("workspace digest changed")
+            current = snapshot.current_document
+            if current is None:
+                raise ConsultantPersistenceError(
+                    "current document projection is unavailable"
+                )
+            document = ApprovedJobDocument.model_validate(
+                document.model_dump(mode="json")
+            )
+            if document.document_id != document_id:
+                raise ValueError("edited document does not match document_id")
+
+            sources = await self.list_sources(document_id)
+            potential_changed = self._changed_employee_text(current, document)
+            catalog_sources = sources
+            if potential_changed is not None and not any(
+                item.source_id == source_id for item in sources
+            ):
+                changed_text, positions = potential_changed
+                catalog_sources = (
+                    *sources,
+                    EmployeeSource.pending(
+                        source_id=source_id,
+                        document_id=document_id,
+                        kind=EmployeeSourceKind.DIRECT_EDIT,
+                        text=changed_text,
+                        positions=positions,
+                    ),
+                )
+            catalog = WorkspaceCatalog.from_snapshot(
+                current,
+                sources=catalog_sources,
+                handle_registry=workspace_snapshot.manifest.entity_ids_by_handle,
+            )
+            plan = plan_current_document_edit(
+                approved=snapshot.approved_document,
+                current=current,
+                submitted=document,
+                workspace_files=workspace_snapshot.files,
+                handle_registry=catalog.handle_to_stable,
+                review=review,
+                employee_source_id=(source_id if potential_changed is not None else None),
+            )
+            changed = self._changed_employee_text(
+                current,
+                document,
+                allowed_paths=plan.employee_text_paths,
+            )
+            source: EmployeeSource | None = None
+            if changed is not None:
+                changed_text, positions = changed
+                requested = EmployeeSource.pending(
+                    source_id=source_id,
+                    document_id=document_id,
+                    kind=EmployeeSourceKind.DIRECT_EDIT,
+                    text=changed_text,
+                    positions=positions,
+                )
+                source = await self._load_or_prepare_source(requested)
+                if source.processing_status is SourceProcessingStatus.PENDING:
+                    await self._after_source_store(source)
+
+            approved_after = self._attach_direct_edit_evidence(
+                plan.approved_after,
+                employee_text_paths=plan.employee_text_paths,
+                source_id=source_id,
+            )
+            workspace_authority = WorkspaceAuthorityService(self)
+            direct_rebase_command_id = (
+                command_receipt.command_id
+                if command_receipt is not None
+                else source_id
+            )
+            await workspace_authority.prepare_direct_edit_rebase(
+                document_id=document_id,
+                command_id=direct_rebase_command_id,
+                source_id=source_id,
+                old_approved=snapshot.approved_document,
+                new_approved=approved_after,
+                approved_revision=snapshot.revision + 1,
+                employee_override_paths=plan.employee_override_paths,
+                employee_evidence_files=plan.employee_evidence_files,
+            )
+            command: dict[str, Any] = {
+                "action": "direct_edit",
+                "document_id": str(document_id),
+                "expected_revision": snapshot.revision,
+                "source_reference": None,
+                "approved_document": approved_after.model_dump(mode="json"),
+            }
+            if command_receipt is not None:
+                command["command_receipt"] = command_receipt.model_dump(mode="json")
+            if source is not None:
+                command["source_reference"] = SourceReference(
+                    source_id=source.source_id,
+                    kind=source.kind,
+                    created_at=source.created_at,
+                ).model_dump(mode="json")
+            try:
+                await self.graph.ainvoke(
+                    {},
+                    self.graph_config(document_id),
+                    context=command,
+                )
+            except StaleThreadRevision as error:
+                raise StaleRevision(str(error)) from error
+            await self._after_workspace_authority_checkpoint()
+            await self._touch_catalog(document_id)
+            if source is not None:
+                await self._after_source_checkpoint(source)
+                await self._mark_source_committed(source)
+            await workspace_authority.finish_direct_edit_rebase(
+                document_id,
+                direct_rebase_command_id,
+            )
+            return await self._snapshot(document_id)
 
     async def apply_direct_edit(
         self,

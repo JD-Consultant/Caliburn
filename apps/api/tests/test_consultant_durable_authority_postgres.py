@@ -18,6 +18,7 @@ from app.adapters.langgraph.postgres import (
     IdempotencyConflict,
     PendingSourceRequiresReconciliation,
     SourceConflict,
+    StaleRevision,
     open_postgres_consultant_runtime,
 )
 from app.consultant.document_authority import apply_document_actions
@@ -36,6 +37,8 @@ from app.consultant.results import (
 from app.consultant.state import (
     ApprovedDuty,
     ApprovedJobDocument,
+    ApprovedOpksItem,
+    ApprovedOpksKind,
     ApprovedTask,
     CommandReceipt,
     EmployeeSource,
@@ -1249,6 +1252,284 @@ async def test_direct_edit_is_authority_idempotent_and_exports_the_approved_docu
         direct_source = await runtime.get_source(document_id, second_source_id)
         assert direct_source.kind is EmployeeSourceKind.DIRECT_EDIT
         assert direct_source.text == revised.work_description
+
+
+@pytest.mark.asyncio
+async def test_current_document_edit_rejects_stale_workspace_without_writes(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="目前 JD stale")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        before = await workspace.read_snapshot()
+        submitted = seeded.approved_document.model_copy(
+            update={"job_title": "不應寫入"}
+        )
+        command = CommandReceipt(
+            command_id=uuid4(),
+            command_kind="direct_document_edit",
+            payload_sha256="a" * 64,
+        )
+
+        approved_before = await runtime.export_approved_document(document_id)
+        sources_before = await runtime.list_sources(document_id)
+        with pytest.raises(StaleRevision):
+            await runtime.apply_current_document_edit(
+                document_id=document_id,
+                expected_revision=seeded.revision,
+                workspace_generation=before.manifest.generation + 1,
+                workspace_digest=before.manifest.resource_digest,
+                document=submitted,
+                source_id=source_id,
+                command_receipt=command,
+            )
+        assert await runtime.export_approved_document(document_id) == approved_before
+        assert await runtime.list_sources(document_id) == sources_before
+        assert (await workspace.read_snapshot()).files == before.files
+        assert (await workspace.read_snapshot()).manifest.resource_digest == (
+            before.manifest.resource_digest
+        )
+
+
+@pytest.mark.asyncio
+async def test_current_document_edit_accepts_employee_added_opks_with_direct_edit_evidence(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="新增 OPKS")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        before = await workspace.read_snapshot()
+        added = ApprovedOpksItem(
+            item_id=uuid4(),
+            kind=ApprovedOpksKind.KNOWLEDGE,
+            text="員工新增的法規知識",
+            display_order=0,
+            evidence_source_ids=(source_id,),
+        )
+        submitted = seeded.approved_document.model_copy(update={"opks": (added,)})
+        command = CommandReceipt(
+            command_id=uuid4(),
+            command_kind="direct_document_edit",
+            payload_sha256="a" * 64,
+        )
+
+        result = await runtime.apply_current_document_edit(
+            document_id=document_id,
+            expected_revision=seeded.revision,
+            workspace_generation=before.manifest.generation,
+            workspace_digest=before.manifest.resource_digest,
+            document=submitted,
+            source_id=source_id,
+            command_receipt=command,
+        )
+
+        assert result.approved_document.opks == (added,)
+        source = await runtime.get_source(document_id, source_id)
+        assert source.processing_status is SourceProcessingStatus.COMMITTED
+        after = await workspace.read_snapshot()
+        added_resource = next(
+            json.loads(raw)
+            for path, raw in after.files.items()
+            if path.startswith("/workspace/opks/k/")
+            and json.loads(raw).get("text") == added.text
+        )
+        assert added_resource["evidence"] == [
+            {
+                "source_handle": next(
+                    handle
+                    for handle, stable_id in after.manifest.entity_ids_by_handle.items()
+                    if stable_id == source_id
+                ),
+                "quote": added.text,
+                "occurrence": 1,
+                "skill_ids": ["knowledge"],
+            }
+        ]
+        assert after.manifest.validation_status is WorkspaceValidationStatus.VALID
+
+
+@pytest.mark.asyncio
+async def test_current_document_edit_replays_after_source_store_crash(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    command = CommandReceipt(
+        command_id=uuid4(),
+        command_kind="direct_document_edit",
+        payload_sha256="a" * 64,
+    )
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="source crash")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        before = await workspace.read_snapshot()
+        submitted = seeded.approved_document.model_copy(
+            update={"work_description": "員工直接補充的工作描述"}
+        )
+
+        class InjectedFailure(RuntimeError):
+            pass
+
+        async def fail_after_source_store(_source: EmployeeSource) -> None:
+            raise InjectedFailure("after current-document source store")
+
+        runtime._after_source_store = fail_after_source_store
+        with pytest.raises(InjectedFailure):
+            await runtime.apply_current_document_edit(
+                document_id=document_id,
+                expected_revision=seeded.revision,
+                workspace_generation=before.manifest.generation,
+                workspace_digest=before.manifest.resource_digest,
+                document=submitted,
+                source_id=source_id,
+                command_receipt=command,
+            )
+        runtime._after_source_store = runtime._noop_source_hook
+
+        pending = [
+            source
+            for source in await runtime.list_sources(document_id)
+            if source.source_id == source_id
+        ]
+        assert len(pending) == 1
+        assert pending[0].processing_status is SourceProcessingStatus.PENDING
+        assert await runtime.export_approved_document(document_id) == seeded.approved_document
+        assert (await workspace.read_snapshot()).files == before.files
+
+        replayed = await runtime.apply_current_document_edit(
+            document_id=document_id,
+            expected_revision=seeded.revision,
+            workspace_generation=before.manifest.generation,
+            workspace_digest=before.manifest.resource_digest,
+            document=submitted,
+            source_id=source_id,
+            command_receipt=command,
+        )
+        assert replayed.approved_document == submitted
+        assert replayed.revision == seeded.revision + 1
+        sources = [
+            source
+            for source in await runtime.list_sources(document_id)
+            if source.source_id == source_id
+        ]
+        assert len(sources) == 1
+        assert sources[0].processing_status is SourceProcessingStatus.COMMITTED
+        assert (await workspace.read_snapshot()).manifest.approved_baseline_revision == (
+            replayed.revision
+        )
+
+
+@pytest.mark.asyncio
+async def test_current_document_edit_recovers_after_approved_checkpoint_and_binds_replay(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    source_id = uuid4()
+    command = CommandReceipt(
+        command_id=uuid4(),
+        command_kind="direct_document_edit",
+        payload_sha256="a" * 64,
+    )
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="checkpoint crash")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        before = await workspace.read_snapshot()
+        submitted = seeded.approved_document.model_copy(
+            update={"job_title": "核准後可恢復"}
+        )
+
+        class InjectedFailure(RuntimeError):
+            pass
+
+        async def fail_after_checkpoint() -> None:
+            raise InjectedFailure("after approved checkpoint")
+
+        runtime._after_workspace_authority_checkpoint = fail_after_checkpoint
+        with pytest.raises(InjectedFailure):
+            await runtime.apply_current_document_edit(
+                document_id=document_id,
+                expected_revision=seeded.revision,
+                workspace_generation=before.manifest.generation,
+                workspace_digest=before.manifest.resource_digest,
+                document=submitted,
+                source_id=source_id,
+                command_receipt=command,
+            )
+        runtime._after_workspace_authority_checkpoint = runtime._noop_workspace_hook
+
+        checkpointed = (await runtime._snapshot(document_id)).approved_document
+        assert checkpointed == submitted
+        assert (await workspace.read_snapshot()).manifest.approved_baseline_revision != (
+            seeded.revision + 1
+        )
+
+        recovered = await runtime.reopen_document(document_id)
+        assert recovered.approved_document == submitted
+        assert recovered.revision == seeded.revision + 1
+        recovered_workspace = await workspace.read_snapshot()
+        assert recovered_workspace.manifest.approved_baseline_revision == recovered.revision
+        source = await runtime.get_source(document_id, source_id)
+        assert source.processing_status is SourceProcessingStatus.COMMITTED
+
+        replayed = await runtime.apply_current_document_edit(
+            document_id=document_id,
+            expected_revision=seeded.revision,
+            workspace_generation=before.manifest.generation,
+            workspace_digest=before.manifest.resource_digest,
+            document=submitted,
+            source_id=source_id,
+            command_receipt=command,
+        )
+        assert replayed.revision == recovered.revision
+        assert len(
+            [
+                source
+                for source in await runtime.list_sources(document_id)
+                if source.source_id == source_id
+            ]
+        ) == 1
+
+        with pytest.raises(IdempotencyConflict):
+            await runtime.apply_current_document_edit(
+                document_id=document_id,
+                expected_revision=recovered.revision,
+                workspace_generation=recovered_workspace.manifest.generation,
+                workspace_digest=recovered_workspace.manifest.resource_digest,
+                document=submitted.model_copy(update={"job_title": "同 key 不得換 payload"}),
+                source_id=source_id,
+                command_receipt=command.model_copy(
+                    update={"payload_sha256": "b" * 64}
+                ),
+            )
+        assert await runtime.export_approved_document(document_id) == submitted
 
 
 @pytest.mark.asyncio

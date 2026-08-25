@@ -102,22 +102,25 @@ def _command_receipt(
     )
 
 
-def _approved_document_from_edit(
+def _candidate_document_for_current_edit(
     body: ApprovedJobDocumentWrite,
     current: ApprovedJobDocument,
     source_id: UUID,
 ) -> ApprovedJobDocument:
-    """Restore server-owned evidence and attach this edit to changed OPKS text."""
+    """Build a parseable candidate; final evidence is planner-path derived.
+
+    The write contract intentionally omits server-owned evidence.  The domain
+    model requires evidence for every OPKS item, so this candidate carries the
+    direct-edit source ID only far enough for Task 2's planner to parse the
+    submitted semantic document.  The runtime attaches durable Evidence again
+    strictly from ``CurrentDocumentEditPlan.employee_text_paths``.
+    """
 
     payload = body.model_dump(mode="json")
     existing = {str(item.item_id): item for item in current.opks}
     for item in payload["opks"]:
         previous = existing.get(str(item["item_id"]))
-        evidence = (
-            list(previous.evidence_source_ids)
-            if previous is not None
-            else []
-        )
+        evidence = list(previous.evidence_source_ids) if previous is not None else []
         if previous is None or item["text"] != previous.text:
             if source_id not in evidence:
                 evidence.append(source_id)
@@ -538,10 +541,10 @@ async def answer_required_clarification(
 
 
 @router.put(
-    "/{document_id}/approved-document",
+    "/{document_id}/current-document",
     response_model=ConsultantSnapshotView,
 )
-async def edit_approved_document(
+async def edit_current_document(
     document_id: UUID,
     body: DirectDocumentEditWrite,
     idempotency_key: IdempotencyKey,
@@ -553,22 +556,33 @@ async def edit_approved_document(
             source_id = _command_id(
                 document_id, "direct-edit-source", idempotency_key
             )
-            current = (await runtime.reopen_document(document_id)).approved_document
-            document = _approved_document_from_edit(
+            current_snapshot = await runtime.reopen_document(document_id)
+            current = (
+                current_snapshot.current_document
+                or current_snapshot.approved_document
+            )
+            document = _candidate_document_for_current_edit(
                 body.document,
                 current,
                 source_id,
             )
-            snapshot = await runtime.apply_direct_edit(
+            snapshot = await runtime.apply_current_document_edit(
                 document_id=document_id,
                 expected_revision=expected_revision,
                 document=document,
                 source_id=source_id,
+                workspace_generation=body.workspace_generation,
+                workspace_digest=body.workspace_digest,
                 command_receipt=_command_receipt(
                     document_id,
                     "direct_document_edit",
                     idempotency_key,
-                    {"document": body.document.model_dump(mode="json")},
+                    {
+                        "document": body.document.model_dump(mode="json"),
+                        "expected_revision": expected_revision,
+                        "workspace_generation": body.workspace_generation,
+                        "workspace_digest": body.workspace_digest,
+                    },
                 ),
             )
             return await _snapshot_view(runtime, snapshot)

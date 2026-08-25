@@ -797,21 +797,42 @@ class WorkspaceAuthorityService:
         accepted_actions: Sequence[DocumentPatchAction] = (),
         employee_override_actions: Sequence[DocumentPatchAction] = (),
         employee_override_paths: Sequence[str] = (),
+        employee_evidence_files: Mapping[str, str] = {},
     ) -> WorkspaceRebasePlan:
+        sources = await self.runtime.list_sources(old_approved.document_id)
+        catalog = WorkspaceCatalog.from_snapshot(
+            old_approved,
+            sources=sources,
+            handle_registry=manifest.entity_ids_by_handle,
+        )
+        full_handle_registry = catalog.handle_to_stable
         old_projection = project_workspace_files(
             old_approved,
-            handle_registry=manifest.entity_ids_by_handle,
+            handle_registry=full_handle_registry,
         )
         new_projection = project_workspace_files(
             new_approved,
-            handle_registry=manifest.entity_ids_by_handle,
+            handle_registry=full_handle_registry,
         )
-        entity_ids_by_handle = dict(manifest.entity_ids_by_handle)
+        new_approved_files = dict(new_projection.files)
+        for path, employee_raw in employee_evidence_files.items():
+            new_raw = new_approved_files.get(path)
+            if new_raw is None:
+                continue
+            new_value = _parse_resource(new_raw)
+            employee_value = _parse_resource(employee_raw)
+            if not isinstance(new_value, dict) or not isinstance(employee_value, dict):
+                continue
+            new_value["evidence"] = employee_value.get("evidence", ())
+            rendered = _render_resource(new_value, original=new_raw)
+            if rendered is not None:
+                new_approved_files[path] = rendered
+        entity_ids_by_handle = dict(full_handle_registry)
         entity_ids_by_handle.update(old_projection.handle_registry)
         entity_ids_by_handle.update(new_projection.handle_registry)
         all_projection_files = {
             **old_projection.files,
-            **new_projection.files,
+            **new_approved_files,
             **workspace_files,
         }
         working = dict(workspace_files)
@@ -848,7 +869,7 @@ class WorkspaceAuthorityService:
             command_id=command_id,
             old_approved_files=old_projection.files,
             workspace_files=working,
-            new_approved_files=new_projection.files,
+            new_approved_files=new_approved_files,
             approved_revision=approved_revision,
             approved_digest=approved_document_digest(new_approved),
             employee_override_paths=tuple(
@@ -919,6 +940,7 @@ class WorkspaceAuthorityService:
         new_approved: ApprovedJobDocument,
         approved_revision: int,
         employee_override_paths: Sequence[str] = (),
+        employee_evidence_files: Mapping[str, str] = {},
     ) -> WorkspaceRebasePlan | None:
         """Persist a direct-edit rebase plan before its graph authority seam."""
 
@@ -937,6 +959,7 @@ class WorkspaceAuthorityService:
             manifest=workspace_snapshot.manifest,
             approved_revision=approved_revision,
             employee_override_paths=employee_override_paths,
+            employee_evidence_files=employee_evidence_files,
         )
         plan = plan.model_copy(update={"employee_source_id": source_id})
         await self._put_direct_plan(document_id, plan)

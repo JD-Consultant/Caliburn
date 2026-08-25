@@ -184,18 +184,24 @@ export function answerRequiredClarification(
   );
 }
 
-export function editApprovedDocument(
+export function editCurrentDocument(
   documentId: string,
   idempotencyKey: string,
   expectedRevision: number,
+  workspaceGeneration: number,
+  workspaceDigest: string,
   document: ApprovedJobDocumentWrite,
 ): Promise<ConsultantSnapshotView> {
   return request<ConsultantSnapshotView>(
-    `/consultant-documents/${documentId}/approved-document`,
+    `/consultant-documents/${documentId}/current-document`,
     {
       method: "PUT",
       headers: commandHeaders(idempotencyKey, expectedRevision),
-      body: JSON.stringify({ document }),
+      body: JSON.stringify({
+        document,
+        workspace_generation: workspaceGeneration,
+        workspace_digest: workspaceDigest,
+      }),
     },
   );
 }

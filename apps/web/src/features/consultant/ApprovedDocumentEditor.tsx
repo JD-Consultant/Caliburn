@@ -9,7 +9,7 @@ import { ChevronDown, FilePenLine, Plus, Save, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import {
-  editApprovedDocument,
+  editCurrentDocument,
   JobAnalysisApiError,
 } from "@/shared/api/jobAnalysisApi";
 import {
@@ -29,9 +29,11 @@ type EnablerDraft = TaskDraft["enablers"][number];
 type DocumentDraftState = {
   draft: ApprovedJobDocumentWrite;
   baselineRevision: number;
+  baselineWorkspaceGeneration: number;
+  baselineWorkspaceDigest: string;
 };
 
-const DRAFT_STORAGE_VERSION = 1;
+const DRAFT_STORAGE_VERSION = 2;
 
 function draftStorageKey(documentId: string): string {
   return `caliburn:consultant-document-draft:${documentId}`;
@@ -44,11 +46,15 @@ function readStoredDraft(documentId: string): DocumentDraftState | null {
     const value = JSON.parse(raw) as {
       version?: unknown;
       baselineRevision?: unknown;
+      baselineWorkspaceGeneration?: unknown;
+      baselineWorkspaceDigest?: unknown;
       draft?: unknown;
     };
     if (
       value.version !== DRAFT_STORAGE_VERSION ||
       !Number.isInteger(value.baselineRevision) ||
+      !Number.isInteger(value.baselineWorkspaceGeneration) ||
+      typeof value.baselineWorkspaceDigest !== "string" ||
       typeof value.draft !== "object" ||
       value.draft === null
     ) {
@@ -68,6 +74,8 @@ function readStoredDraft(documentId: string): DocumentDraftState | null {
     return {
       draft: draft as ApprovedJobDocumentWrite,
       baselineRevision: value.baselineRevision as number,
+      baselineWorkspaceGeneration: value.baselineWorkspaceGeneration as number,
+      baselineWorkspaceDigest: value.baselineWorkspaceDigest,
     };
   } catch {
     localStorage.removeItem(draftStorageKey(documentId));
@@ -220,9 +228,18 @@ export function ApprovedDocumentEditor({
     readStoredDraft(documentId),
   );
   const [validationError, setValidationError] = useState<string | null>(null);
+  const currentDocument =
+    snapshot.current_document ?? snapshot.approved_document;
+  const workspaceGeneration =
+    snapshot.document_review?.workspace_generation ?? 0;
+  const workspaceDigest = snapshot.document_review?.workspace_digest ?? "";
   const draft =
-    draftState?.draft ?? toApprovedDocumentWrite(snapshot.approved_document);
+    draftState?.draft ?? toApprovedDocumentWrite(currentDocument);
   const baselineRevision = draftState?.baselineRevision ?? snapshot.revision;
+  const baselineWorkspaceGeneration =
+    draftState?.baselineWorkspaceGeneration ?? workspaceGeneration;
+  const baselineWorkspaceDigest =
+    draftState?.baselineWorkspaceDigest ?? workspaceDigest;
   const dirty = draftState !== null;
   const conflict = dirty && snapshot.revision > baselineRevision;
 
@@ -244,11 +261,15 @@ export function ApprovedDocumentEditor({
       document: ApprovedJobDocumentWrite;
       idempotencyKey: string;
       expectedRevision: number;
+      workspaceGeneration: number;
+      workspaceDigest: string;
     }) =>
-      editApprovedDocument(
+      editCurrentDocument(
         documentId,
         operation.idempotencyKey,
         operation.expectedRevision,
+        operation.workspaceGeneration,
+        operation.workspaceDigest,
         operation.document,
       ),
     onSuccess: async (result) => {
@@ -267,9 +288,13 @@ export function ApprovedDocumentEditor({
   const change = (update: (draft: ApprovedJobDocumentWrite) => ApprovedJobDocumentWrite) => {
     setDraftState((current) => ({
       draft: update(
-        current?.draft ?? toApprovedDocumentWrite(snapshot.approved_document),
+        current?.draft ?? toApprovedDocumentWrite(currentDocument),
       ),
       baselineRevision: current?.baselineRevision ?? snapshot.revision,
+      baselineWorkspaceGeneration:
+        current?.baselineWorkspaceGeneration ?? workspaceGeneration,
+      baselineWorkspaceDigest:
+        current?.baselineWorkspaceDigest ?? workspaceDigest,
     }));
   };
   const patchHeader = (
@@ -296,14 +321,18 @@ export function ApprovedDocumentEditor({
     const retry =
       mutation.isError &&
       previous?.expectedRevision === baselineRevision &&
+      previous.workspaceGeneration === baselineWorkspaceGeneration &&
+      previous.workspaceDigest === baselineWorkspaceDigest &&
       JSON.stringify(previous.document) === JSON.stringify(document);
     mutation.mutate(
       retry
         ? previous
         : {
-            document,
-            expectedRevision: baselineRevision,
-            idempotencyKey: crypto.randomUUID(),
+          document,
+          expectedRevision: baselineRevision,
+          workspaceGeneration: baselineWorkspaceGeneration,
+          workspaceDigest: baselineWorkspaceDigest,
+          idempotencyKey: crypto.randomUUID(),
           },
     );
   };

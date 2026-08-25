@@ -6,7 +6,7 @@ import {
   createConsultantDocument,
   decideUnderstandingCalibration,
   deleteConsultantDocument,
-  editApprovedDocument,
+  editCurrentDocument,
   exportConsultantDocument,
   getConsultantSnapshot,
   listConsultantDocuments,
@@ -80,7 +80,7 @@ describe("purpose-first consultant API client", () => {
       choice: "我本人決定",
       text: "最後由我核准",
     });
-    await editApprovedDocument(DOCUMENT_ID, "edit-1", 3, {
+    await editCurrentDocument(DOCUMENT_ID, "edit-1", 3, 8, "a".repeat(64), {
       schema_version: 1,
       document_id: DOCUMENT_ID,
       job_title: "採購專員",
@@ -101,11 +101,19 @@ describe("purpose-first consultant API client", () => {
       `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/reviews/${ENTITY_ID}`,
       `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/calibrations/${ENTITY_ID}`,
       `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/clarifications/${ENTITY_ID}`,
-      `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/approved-document`,
+      `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/current-document`,
     ]);
     for (const call of fetchMock.mock.calls) {
       expect(call[1].headers).toMatchObject({ "X-Expected-Revision": "3" });
     }
+    const editCall = fetchMock.mock.calls[3][1];
+    expect(JSON.parse(String(editCall.body))).toMatchObject({
+      workspace_generation: 8,
+      workspace_digest: "a".repeat(64),
+    });
+    expect(JSON.parse(String(editCall.body)).document.document_id).toBe(
+      DOCUMENT_ID,
+    );
   });
 
   it("has one export endpoint and adds force only after explicit confirmation", async () => {

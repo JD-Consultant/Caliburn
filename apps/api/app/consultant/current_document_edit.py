@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import json
 from typing import Any
 from uuid import UUID
@@ -30,6 +30,7 @@ class CurrentDocumentEditPlan:
     employee_override_paths: tuple[str, ...]
     accepted_pending_action_ids: tuple[UUID, ...]
     employee_text_paths: tuple[str, ...]
+    employee_evidence_files: Mapping[str, str] = field(default_factory=dict)
 
 
 _MISSING = object()
@@ -185,6 +186,80 @@ def _preserve_workspace_evidence(
             indent=2,
         ) + "\n"
     return result
+
+
+_DIRECT_EDIT_SKILL_BY_OPKS_KIND = {
+    "output": "output",
+    "indicator": "performance-indicator",
+    "knowledge": "knowledge",
+    "skill": "skill",
+}
+_DIRECT_EDIT_OPKS_PREFIX = {
+    "output": "o",
+    "indicator": "p",
+    "knowledge": "k",
+    "skill": "s",
+}
+
+
+def _append_direct_edit_evidence(
+    files: Mapping[str, str],
+    document: ApprovedJobDocument,
+    *,
+    handle_registry: Mapping[str, UUID],
+    employee_text_paths: Sequence[str],
+    source_handle: str,
+) -> tuple[dict[str, str], dict[str, str]]:
+    """Add server-derived Evidence only for edited OPKS text resources.
+
+    The browser does not supply workspace Evidence.  A direct employee edit is
+    itself the source of the changed text, so the planner creates the minimal
+    resource-level anchor needed to parse and persist that edit.  The returned
+    second mapping is passed to the authority rebase so a newly-added resource
+    does not lose its Evidence when it is projected into the workspace.
+    """
+
+    result = dict(files)
+    evidence_files: dict[str, str] = {}
+    paths = set(employee_text_paths)
+    handles_by_id = {
+        stable_id: handle for handle, stable_id in handle_registry.items()
+    }
+    for item in document.opks:
+        text_path = f"/opks/{item.item_id}/text"
+        if text_path not in paths:
+            continue
+        prefix = _DIRECT_EDIT_OPKS_PREFIX.get(item.kind.value)
+        skill_id = _DIRECT_EDIT_SKILL_BY_OPKS_KIND.get(item.kind.value)
+        handle = handles_by_id.get(item.item_id)
+        if prefix is None or skill_id is None or handle is None:
+            continue
+        resource_path = f"/workspace/opks/{prefix}/{handle}.json"
+        raw = result.get(resource_path)
+        if raw is None:
+            continue
+        payload = _json_value(raw)
+        if not isinstance(payload, dict):
+            continue
+        references = list(payload.get("evidence", ()))
+        direct_reference = {
+            "source_handle": source_handle,
+            "quote": item.text,
+            "occurrence": 1,
+            "skill_ids": [skill_id],
+        }
+        if not any(
+            isinstance(reference, dict)
+            and reference.get("source_handle") == source_handle
+            and reference.get("quote") == item.text
+            for reference in references
+        ):
+            references.append(direct_reference)
+        payload["evidence"] = references
+        rendered = json.dumps(payload, ensure_ascii=False, indent=2) + "\n"
+        result[resource_path] = rendered
+        evidence_files[resource_path] = rendered
+    return result, evidence_files
 
 
 def _employee_text_paths(
@@ -408,6 +483,7 @@ def plan_current_document_edit(
     workspace_files: Mapping[str, str],
     handle_registry: Mapping[str, UUID],
     review: WorkspaceReviewProjection,
+    employee_source_id: UUID | None = None,
 ) -> CurrentDocumentEditPlan:
     """Plan only the semantic delta represented by current -> submitted.
 
@@ -444,6 +520,26 @@ def plan_current_document_edit(
         submitted_projection.files,
         workspace_files,
     )
+    employee_text_paths = _employee_text_paths(current, submitted)
+    employee_evidence_files: dict[str, str] = {}
+    if employee_source_id is not None:
+        source_handle = next(
+            (
+                handle
+                for handle, stable_id in stable_registry.items()
+                if stable_id == employee_source_id and handle.startswith("source-")
+            ),
+            None,
+        )
+        if source_handle is None:
+            raise ValueError("direct-edit source is missing from workspace catalog")
+        submitted_files, employee_evidence_files = _append_direct_edit_evidence(
+            submitted_files,
+            submitted,
+            handle_registry=stable_registry,
+            employee_text_paths=employee_text_paths,
+            source_handle=source_handle,
+        )
 
     parse_workspace_files(
         current.document_id,
@@ -491,7 +587,7 @@ def plan_current_document_edit(
     stable_registry.update(accepted_projection.handle_registry)
     accepted_files = _preserve_workspace_evidence(
         accepted_projection.files,
-        workspace_files,
+        {**workspace_files, **submitted_files},
     )
     merged_files = _overlay_workspace_paths(
         accepted_files,
@@ -510,5 +606,6 @@ def plan_current_document_edit(
         accepted_pending_action_ids=tuple(
             action.action_id for action in accepted_actions
         ),
-        employee_text_paths=_employee_text_paths(current, submitted),
+        employee_text_paths=employee_text_paths,
+        employee_evidence_files=employee_evidence_files,
     )

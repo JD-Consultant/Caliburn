@@ -19,6 +19,7 @@ from app.adapters.langgraph.postgres import (
     ConsultantDocumentCatalogEntry,
     ConsultantRunAlreadyActive,
     DocumentNotFound,
+    StaleRevision,
 )
 from app.api.deps import get_consultant_runtime, get_consultant_turn_processor
 from app.api.problems import CONSULTANT_RUN_ACTIVE, INVALID_REQUEST
@@ -230,6 +231,40 @@ class FakeRuntime:
         self.calls.append(("direct_edit", kwargs))
         self.snapshot = self.snapshot.model_copy(
             update={"approved_document": kwargs["document"]}
+        )
+        return self.snapshot
+
+    async def apply_current_document_edit(self, **kwargs):
+        if self.model_mutation_busy:
+            raise ConsultantRunAlreadyActive(kwargs["document_id"])
+        if kwargs["workspace_generation"] != self.snapshot.document_review.workspace_generation:
+            raise StaleRevision("workspace generation changed")
+        if kwargs["workspace_digest"] != self.snapshot.document_review.workspace_digest:
+            raise StaleRevision("workspace digest changed")
+        document = kwargs["document"]
+        document = document.model_copy(
+            update={
+                "opks": tuple(
+                    item.model_copy(
+                        update={
+                            "evidence_source_ids": tuple(
+                                dict.fromkeys(
+                                    (*item.evidence_source_ids, kwargs["source_id"])
+                                )
+                            )
+                        }
+                    )
+                    for item in document.opks
+                )
+            }
+        )
+        kwargs["document"] = document
+        self.calls.append(("current_document_edit", kwargs))
+        self.snapshot = self.snapshot.model_copy(
+            update={
+                "approved_document": document,
+                "current_document": document,
+            }
         )
         return self.snapshot
 
@@ -557,7 +592,7 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     document = runtime.snapshot.approved_document.model_dump(mode="json")
     document["job_title"] = "採購專員"
     edited = await client.put(
-        f"{BASE}/{document_id}/approved-document",
+        f"{BASE}/{document_id}/current-document",
         headers={"Idempotency-Key": "edit-1", "X-Expected-Revision": "1"},
         json={
             "document": document,
@@ -566,7 +601,7 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
         },
     )
     assert edited.status_code == 200, edited.text
-    assert runtime.calls[-1][0] == "direct_edit"
+    assert runtime.calls[-1][0] == "current_document_edit"
 
 
 async def test_review_and_direct_edit_return_clear_busy_conflict_during_model_mutation(
@@ -593,7 +628,7 @@ async def test_review_and_direct_edit_return_clear_busy_conflict_during_model_mu
     document = runtime.snapshot.approved_document.model_dump(mode="json")
     document["job_title"] = "忙碌時不得交錯寫入"
     direct_edit = await client.put(
-        f"{BASE}/{document_id}/approved-document",
+        f"{BASE}/{document_id}/current-document",
         headers={"Idempotency-Key": "busy-edit", "X-Expected-Revision": "0"},
         json={
             "document": document,
@@ -627,7 +662,7 @@ async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_br
     ]
 
     edited = await client.put(
-        f"{BASE}/{document_id}/approved-document",
+        f"{BASE}/{document_id}/current-document",
         headers={"Idempotency-Key": "edit-opks-1", "X-Expected-Revision": "0"},
         json={
             "document": document,
@@ -641,6 +676,41 @@ async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_br
     assert passed_document.opks[0].evidence_source_ids == (
         consultant._command_id(document_id, "direct-edit-source", "edit-opks-1"),
     )
+
+
+async def test_current_document_rejects_stale_workspace_guards_without_mutation(api) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+    approved_before = runtime.snapshot.approved_document
+    current_before = runtime.snapshot.current_document
+    document = approved_before.model_dump(mode="json")
+    document["job_title"] = "不應寫入"
+
+    stale_generation = await client.put(
+        f"{BASE}/{document_id}/current-document",
+        headers={"Idempotency-Key": "stale-generation", "X-Expected-Revision": "0"},
+        json={
+            "document": document,
+            "workspace_generation": 0,
+            "workspace_digest": "a" * 64,
+        },
+    )
+    stale_digest = await client.put(
+        f"{BASE}/{document_id}/current-document",
+        headers={"Idempotency-Key": "stale-digest", "X-Expected-Revision": "0"},
+        json={
+            "document": document,
+            "workspace_generation": 1,
+            "workspace_digest": "b" * 64,
+        },
+    )
+
+    for response in (stale_generation, stale_digest):
+        assert response.status_code == 409
+        assert response.json()["type"].endswith("/authority-conflict")
+    assert runtime.snapshot.approved_document == approved_before
+    assert runtime.snapshot.current_document == current_before
+    assert not [call for call in runtime.calls if call[0] == "current_document_edit"]
 
 
 async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> None:

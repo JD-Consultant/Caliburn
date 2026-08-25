@@ -18,6 +18,7 @@
 - [`adr/0067-deep-agents-store-backed-jd-working-draft.md`](adr/0067-deep-agents-store-backed-jd-working-draft.md) — **Accepted** 以 Deep Agents `StoreBackend`／LangGraph Store 保存 active workspace；Saver 仍負責對話與核准 authority。
 - [`adr/0068-framework-run-budgets-replace-lookup-wave-cap.md`](adr/0068-framework-run-budgets-replace-lookup-wave-cap.md) — **Accepted** 以 LangChain model／Tool budgets 與既有 token／cost／elapsed guards 取代自寫 lookup-wave 上限。
 - [`specs/2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](specs/2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md) — OpenAI／Anthropic／Microsoft／Google／LangChain 官方做法、方案比較與現行產品邊界。
+- [`specs/2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md`](specs/2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md) — **Proposed** 共用「目前 JD」工作副本、只讀核准基線、語意審核、direct edit 與必要澄清的最新官方研究及建議方案。
 - [`specs/2026-08-23-luna-structured-tools-and-context-official-audit.md`](specs/2026-08-23-luna-structured-tools-and-context-official-audit.md) — Luna／OpenRouter／LangChain／Deep Agents 官方文件重審、strict schema 實測與未提交 workaround 裁決。
 - [`specs/2026-08-22-persistent-store-backed-jd-working-draft-completion.md`](specs/2026-08-22-persistent-store-backed-jd-working-draft-completion.md) — 持久工作草稿升級的產品對照、framework mapping、live evidence、Final Gate 與已知界線。
 - [`plans/2026-08-22-persistent-store-backed-jd-working-draft-plan.md`](plans/2026-08-22-persistent-store-backed-jd-working-draft-plan.md) — 現行持久草稿逐 task 驗證、hard-cut、browser／live gate 與 traceability 計畫。

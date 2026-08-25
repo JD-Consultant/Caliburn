@@ -77,6 +77,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0066](0066-persistent-ai-jd-working-draft-and-semantic-review.md) | 一份 JD 一個持久、非權威的 AI working draft：Deep Agents／LangGraph 保存可續編 workspace，自動驗證後由 application 投影語意 change set，員工可部分接受／修改後接受／拒絕／延後；核准 JD 仍由 employee authority 唯一提交 | **Accepted；部分被 0067 取代**（2026-08-22；取代 0064 的 run-scoped candidate、model-facing check／publication receipt 與第二份 pending lifecycle） |
 | [0067](0067-deep-agents-store-backed-jd-working-draft.md) | 以 Deep Agents `StoreBackend`＋既有Postgres Store承接跨回合JD working draft；Saver保留對話／interrupt／run recovery，employee command與AI共用同一workspace，manifest digest＋approved-first recovery避免雙重truth | **Accepted**（2026-08-22；取代 0066 對workspace使用`StateBackend`的mapping，其餘產品決策不變） |
 | [0068](0068-framework-run-budgets-replace-lookup-wave-cap.md) | 移除自訂兩波 external-data lookup cap，不換成另一個猜測數字；依資料需求讀取與停止規則保留，失控成本由 LangChain model／Tool 總呼叫、token、金額、elapsed、retry、VFS permission 與 deterministic validation 統一防守 | **Accepted**（2026-08-23；取代 0062 決定 8、0065 決定 4 與 0067 沿用的固定兩波限制） |
+| [0069](0069-shared-current-jd-working-copy-and-semantic-approval.md) | 員工與 AI 共用一份「目前 JD」工作副本；核准基線只讀並供匯出，審核是 derived semantic diff；direct edit 只核准員工 touched semantic group，移除 defer／review blocker／source-specific correction UI | **Accepted**（2026-08-26；部分取代 0066／0067 的雙編輯面、direct-edit rebase conflict 與 defer lifecycle） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、契約 #1–#4 登記）。

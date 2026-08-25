@@ -2631,6 +2631,16 @@ Owner進一步澄清：候選工作區不是單次run的暫存區，也不應等
 
 持久workspace不等於每輪把完整JD塞進prompt；Skills、員工來源與workspace仍依目前訪談焦點按需讀取。第一版不做多workspace、版本歷史UI、auto-accept、RAG／Reference、能力級別／A、多Agent或正式eval平台。完整官方資料、方案比較、成本／checkpoint風險與施工gate見[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)；架構裁決見Accepted [ADR 0066](../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)。
 
+### 9.20 共用「目前 JD」編輯面校正（2026-08-25，研究完成、待 owner 核准）
+
+後續 UI 討論釐清：VS Code 是「員工與 AI 對同一目前成果繼續編輯」的概念參考，不應被實作成兩個員工可感知的主要編輯面（正式 JD editor 與 AI working draft）再互相 rebase。建議改為一個員工可見、AI 與員工共同編輯的「目前 JD」工作副本；底層核准 baseline 保留為只讀比較與匯出 authority，待審內容由 baseline ↔ current working copy 即時計算 semantic diff，不另存第三份文件。
+
+本節是目前最新產品校正；若前面探索段落仍提到雙主要編輯面、`defer`，或由 pending review 鎖住聊天，均以本節為準。舊段落只保留為研究歷程，不得直接當成施工需求。
+
+員工直接修改時，其實際 touched semantic component 應同時成為目前值與核准值；若與 AI pending 重疊，員工 after-state 取代該範圍並解決差異，無關 pending 保留。未處理差異自然跨輪存在，不需要 `defer`；pending review 本身也不應鎖聊天，真正缺少只能由員工決定的事實或有重大衝突時，才由獨立 required clarification／LangGraph interrupt 處理。分析失敗後聊天也應保持可輸入，員工可直接用「我剛剛說錯了」等自然語句形成新來源與更正 lineage，不必在主要畫面尋找並操作舊原話。這維持「所有 LLM 文件內容須員工決定、員工直接編輯不審核自己、AI 可跨輪續編、匯出只含核准內容」的大方向。
+
+完整官方來源、方案比較、框架映射、重疊編輯語意與現行 code 差距見 [`2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md`](2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md)。此節尚未取代 Accepted ADR 0066；owner 核准後需另開 successor ADR，不得事後改寫已接受決策。
+
 ## 10. 本稿依據
 
 Repo 研究：

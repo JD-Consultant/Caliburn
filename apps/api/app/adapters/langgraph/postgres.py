@@ -898,6 +898,13 @@ class PostgresConsultantRuntime:
                 if existing.processing_status is SourceProcessingStatus.PENDING:
                     await self._mark_source_committed(existing)
                 return snapshot, False
+            if latest is not None and latest.status is RunStatus.FAILED:
+                same_run = latest.run_id == run_id
+                same_source = latest.source_id == source_id
+                if same_run != same_source:
+                    raise IdempotencyConflict(
+                        "failed consultant run identity conflicts"
+                    )
             if (
                 latest is not None
                 and latest.status is RunStatus.FAILED

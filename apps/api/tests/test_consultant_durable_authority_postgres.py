@@ -2314,6 +2314,37 @@ async def test_failed_run_allows_an_ordinary_new_source_first_turn(
 
 
 @pytest.mark.asyncio
+async def test_failed_run_id_cannot_be_reused_for_a_different_source(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    failed_run_id = uuid4()
+    failed_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=failed_run_id,
+            source_id=failed_source_id,
+            text="我負責核對訂單。",
+        )
+        await runtime.mark_consultant_run_failed(
+            document_id=document_id,
+            run_id=failed_run_id,
+            error_code="model_timeout",
+        )
+
+        with pytest.raises(IdempotencyConflict, match="run identity conflicts"):
+            await runtime.admit_employee_answer(
+                document_id=document_id,
+                run_id=failed_run_id,
+                source_id=uuid4(),
+                text="這是不同的一則回答。",
+            )
+
+
+@pytest.mark.asyncio
 async def test_setup_serializer_and_checkpoint_schema_are_strict(
     consultant_database_url: str,
 ) -> None:

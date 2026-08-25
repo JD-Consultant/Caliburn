@@ -260,6 +260,101 @@ async def test_store_snapshot_projects_valid_workspace_progress_and_review_count
 
 
 @pytest.mark.asyncio
+async def test_pending_task_review_survives_reopen_and_unrelated_ai_workspace_mutation(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    task_statement = "AI 尚待確認的工作內容"
+    updated_job_title = "AI 更新的採購管理職稱"
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="Durable pending review")
+        seeded = await runtime.apply_direct_edit(
+            document_id=document_id,
+            expected_revision=created.revision,
+            document=_document(document_id),
+            source_id=uuid4(),
+        )
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        await workspace.ensure_initialized(
+            approved_document=seeded.approved_document,
+            approved_revision=seeded.revision,
+        )
+        await _edit_task_statement(workspace, task_statement)
+        _, _, _, projection = await _validated_workspace_review(runtime, document_id)
+        task_group = next(
+            group
+            for group in projection.groups
+            if any(action.path.endswith("/statement") for action in group.actions)
+        )
+        task_semantic_fingerprint = task_group.semantic_fingerprint
+
+        assert {action.status.value for action in task_group.actions} == {"pending"}
+        assert not await runtime.store.asearch(
+            runtime.workspace_decision_namespace(document_id),
+            limit=1000,
+        )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        reopened = await runtime.reopen_document(document_id)
+        assert any(
+            action.path.endswith("/statement") and action.status.value == "pending"
+            for bundle in reopened.document_review.bundles
+            for action in bundle.actions
+        )
+
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        before_mutation = await workspace.read_snapshot()
+        header_path = "/workspace/header.json"
+        previous_job_title = json.loads(before_mutation.files[header_path])["job_title"]
+        edit = await workspace.backend.aedit(
+            header_path,
+            json.dumps(previous_job_title, ensure_ascii=False),
+            json.dumps(updated_job_title, ensure_ascii=False),
+        )
+        assert edit.error is None
+
+        _, _, _, projection = await _validated_workspace_review(runtime, document_id)
+        task_group = next(
+            group
+            for group in projection.groups
+            if any(action.path.endswith("/statement") for action in group.actions)
+        )
+        header_group = next(
+            group
+            for group in projection.groups
+            if any(action.path == "/job_title" for action in group.actions)
+        )
+
+        assert task_group.semantic_fingerprint == task_semantic_fingerprint
+        assert {action.status.value for action in task_group.actions} == {"pending"}
+        assert {action.status.value for action in header_group.actions} == {"pending"}
+        assert not await runtime.store.asearch(
+            runtime.workspace_decision_namespace(document_id),
+            limit=1000,
+        )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        reopened = await runtime.reopen_document(document_id)
+        task_actions = tuple(
+            action
+            for bundle in reopened.document_review.bundles
+            for action in bundle.actions
+            if action.path.endswith("/statement")
+        )
+
+        assert reopened.current_document.tasks[0].statement == task_statement
+        assert reopened.current_document.job_title == updated_job_title
+        assert reopened.approved_document.tasks[0].statement != task_statement
+        assert task_actions
+        assert {action.status.value for action in task_actions} == {"pending"}
+        assert not await runtime.store.asearch(
+            runtime.workspace_decision_namespace(document_id),
+            limit=1000,
+        )
+
+
+@pytest.mark.asyncio
 async def test_deep_agents_store_backend_is_application_accessible_and_restart_safe(
     consultant_database_url: str,
 ) -> None:

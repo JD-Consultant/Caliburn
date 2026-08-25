@@ -69,7 +69,12 @@ def _store_enriched_snapshot(state):
         validation_status=WorkspaceValidationStatus.VALID,
         workspace_review=WorkspaceReviewProjection(workspace_digest="a" * 64),
     )
-    return snapshot.model_copy(update={"document_review": review})
+    return snapshot.model_copy(
+        update={
+            "current_document": snapshot.approved_document,
+            "document_review": review,
+        }
+    )
 
 
 class FakeRuntime:
@@ -554,7 +559,11 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     edited = await client.put(
         f"{BASE}/{document_id}/approved-document",
         headers={"Idempotency-Key": "edit-1", "X-Expected-Revision": "1"},
-        json={"document": document},
+        json={
+            "document": document,
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
     )
     assert edited.status_code == 200, edited.text
     assert runtime.calls[-1][0] == "direct_edit"
@@ -586,7 +595,11 @@ async def test_review_and_direct_edit_return_clear_busy_conflict_during_model_mu
     direct_edit = await client.put(
         f"{BASE}/{document_id}/approved-document",
         headers={"Idempotency-Key": "busy-edit", "X-Expected-Revision": "0"},
-        json={"document": document},
+        json={
+            "document": document,
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
     )
 
     for response in (review, direct_edit):
@@ -616,7 +629,11 @@ async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_br
     edited = await client.put(
         f"{BASE}/{document_id}/approved-document",
         headers={"Idempotency-Key": "edit-opks-1", "X-Expected-Revision": "0"},
-        json={"document": document},
+        json={
+            "document": document,
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
     )
 
     assert edited.status_code == 200, edited.text

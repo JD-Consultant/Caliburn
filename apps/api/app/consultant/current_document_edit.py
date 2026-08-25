@@ -346,11 +346,37 @@ def _action_closure(
             return False
         return True
 
+    cancelled_add_ids = frozenset(
+        action.action_id
+        for action in actions.values()
+        if deleted_add_target_is_absent(action)
+    )
+    blocked_action_ids = set(cancelled_add_ids)
+    changed = True
+    while changed:
+        changed = False
+        for action in actions.values():
+            if action.action_id in blocked_action_ids:
+                continue
+            shares_blocked_atomic_group = (
+                action.atomic_subgroup_id is not None
+                and any(
+                    candidate.action_id in blocked_action_ids
+                    and candidate.atomic_subgroup_id == action.atomic_subgroup_id
+                    for candidate in actions.values()
+                )
+            )
+            if (
+                shares_blocked_atomic_group
+                or set(action.depends_on_action_ids) & blocked_action_ids
+            ):
+                blocked_action_ids.add(action.action_id)
+                changed = True
     accepted = {
         action_id
         for action_id in seed_ids
         if (action := actions.get(action_id)) is not None
-        and not deleted_add_target_is_absent(action)
+        and action_id not in blocked_action_ids
     }
     changed = True
     while changed:
@@ -365,12 +391,12 @@ def _action_closure(
                     if candidate.atomic_subgroup_id == action.atomic_subgroup_id
                 }
                 before = len(accepted)
-                accepted.update(subgroup_members)
+                accepted.update(subgroup_members - blocked_action_ids)
                 changed = changed or len(accepted) != before
             dependencies = set(action.depends_on_action_ids)
             known_dependencies = dependencies & actions.keys()
             before = len(accepted)
-            accepted.update(known_dependencies)
+            accepted.update(known_dependencies - blocked_action_ids)
             changed = changed or len(accepted) != before
     return accepted
 
@@ -462,6 +488,7 @@ def plan_current_document_edit(
         accepted,
         handle_registry=stable_registry,
     )
+    stable_registry.update(accepted_projection.handle_registry)
     accepted_files = _preserve_workspace_evidence(
         accepted_projection.files,
         workspace_files,

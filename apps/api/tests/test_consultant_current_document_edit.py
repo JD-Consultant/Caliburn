@@ -398,6 +398,99 @@ def test_editing_one_member_of_a_split_promotes_its_atomic_subgroup() -> None:
     assert plan.approved_after.notes is None
 
 
+def test_cancelled_split_add_is_not_reintroduced_by_atomic_closure() -> None:
+    approved = _document(task_statement="原始任務", frequency="每月").model_copy(
+        update={
+            "opks": (
+                ApprovedOpksItem(
+                    item_id=UUID("00000000-0000-0000-0000-000000000a25"),
+                    kind=ApprovedOpksKind.KNOWLEDGE,
+                    text="完成採購",
+                    display_order=0,
+                    task_ids=(TASK_ID,),
+                    evidence_source_ids=(SOURCE_ID,),
+                ),
+            )
+        }
+    )
+    split_task_ids = (
+        UUID("00000000-0000-0000-0000-000000000a26"),
+        UUID("00000000-0000-0000-0000-000000000a27"),
+    )
+    split_tasks = tuple(
+        ApprovedTask(
+            task_id=task_id,
+            duty_id=DUTY_ID,
+            statement=f"拆分任務 {index}",
+            action="處理",
+            object="訂單",
+            purpose_result="完成採購",
+            display_order=index,
+        )
+        for index, task_id in enumerate(split_task_ids)
+    )
+    current = approved.model_copy(
+        update={
+            "tasks": split_tasks,
+            "opks": (
+                approved.opks[0].model_copy(update={"task_ids": split_task_ids}),
+            ),
+        }
+    )
+    submitted_task = split_tasks[1].model_copy(update={"statement": "員工保留任務"})
+    submitted = current.model_copy(
+        update={
+            "tasks": (submitted_task,),
+            "opks": (
+                approved.opks[0].model_copy(
+                    update={"task_ids": (split_task_ids[1],)}
+                ),
+            ),
+        }
+    )
+    current_projection = project_workspace_files(current, handle_registry={})
+    current_files = dict(current_projection.files)
+    _attach_evidence(current_files, handle="k-001")
+    registry = dict(current_projection.handle_registry)
+    registry["source-001"] = SOURCE_ID
+    review = _review(approved, current_files, registry)
+
+    plan = plan_current_document_edit(
+        approved,
+        current,
+        submitted,
+        current_files,
+        registry,
+        review,
+    )
+
+    all_actions = tuple(action for group in review.groups for action in group.actions)
+    cancelled_action = next(
+        action
+        for action in all_actions
+        if action.path == "/tasks"
+        and isinstance(action.after, dict)
+        and action.after["task_id"] == str(split_task_ids[0])
+    )
+    expected = approved.model_copy(
+        update={
+            "tasks": (submitted_task, *approved.tasks),
+            "opks": (
+                approved.opks[0].model_copy(
+                    update={"task_ids": (split_task_ids[1],)}
+                ),
+            ),
+        }
+    )
+    assert cancelled_action.action_id not in plan.accepted_pending_action_ids
+    assert split_task_ids[0] not in {
+        task.task_id for task in plan.approved_after.tasks
+    }
+    assert plan.approved_after.model_dump(mode="json") == expected.model_dump(
+        mode="json"
+    )
+
+
 def test_removing_an_ai_only_entity_cleans_current_without_changing_approved() -> None:
     ai_task_id = UUID("00000000-0000-0000-0000-000000000a31")
     approved = _document(task_statement="核准敘述", frequency="每月")

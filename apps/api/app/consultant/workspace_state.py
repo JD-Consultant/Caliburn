@@ -271,6 +271,39 @@ class StoreBackedWorkspace:
         expected_digest = plan.expected_workspace_digest
         result_digest = plan.result_workspace_digest
         baseline_digest = approved_document_digest(approved_document)
+
+        files = dict(current.files)
+        restored_files = dict(files)
+        finished_files = dict(files)
+        pending_changes: list[WorkspaceRebaseChange] = []
+        seen_paths: set[str] = set()
+        for change in plan.changes:
+            if change.path in seen_paths:
+                raise ValueError("persisted workspace rebase contains duplicate paths")
+            seen_paths.add(change.path)
+            observed = files.get(change.path)
+            if observed == change.before:
+                pending_changes.append(change)
+            elif observed != change.after:
+                raise ValueError("workspace changed before its persisted rebase")
+
+            if change.before is None:
+                restored_files.pop(change.path, None)
+            else:
+                restored_files[change.path] = change.before
+            if change.after is None:
+                finished_files.pop(change.path, None)
+            else:
+                finished_files[change.path] = change.after
+
+        if workspace_resource_digest(restored_files) != expected_digest:
+            raise ValueError("workspace changed before its persisted rebase")
+        if (
+            result_digest is not None
+            and workspace_resource_digest(finished_files) != result_digest
+        ):
+            raise ValueError("persisted workspace rebase result is inconsistent")
+
         if (
             current.manifest.approved_baseline_revision == approved_revision
             and current.manifest.approved_baseline_digest == baseline_digest
@@ -278,26 +311,8 @@ class StoreBackedWorkspace:
         ):
             return current.manifest
 
-        if actual_digest != expected_digest:
-            if result_digest is None or actual_digest != result_digest:
-                raise ValueError("workspace changed before its persisted rebase")
-            manifest = current.manifest.model_copy(
-                update={
-                    "generation": current.manifest.generation + 1,
-                    "approved_baseline_revision": approved_revision,
-                    "approved_baseline_digest": baseline_digest,
-                    "validation_status": WorkspaceValidationStatus.UNVALIDATED,
-                    "diagnostics": (),
-                }
-            )
-            await self._put_manifest(manifest)
-            return manifest
-
-        files = dict(current.files)
-        for change in plan.changes:
+        for change in pending_changes:
             before = files.get(change.path)
-            if before != change.before:
-                raise ValueError(f"workspace rebase before value changed: {change.path}")
             if change.after is None:
                 if before is not None:
                     result = await self.backend.adelete(change.path)

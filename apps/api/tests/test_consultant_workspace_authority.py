@@ -538,8 +538,13 @@ def test_build_plan_accepts_explicit_employee_override_paths() -> None:
         entity_ids_by_handle=dict(projection.handle_registry),
     )
 
+    async def list_sources(_document_id: UUID) -> tuple[object, ...]:
+        return ()
+
     plan = asyncio.run(
-        WorkspaceAuthorityService(SimpleNamespace())._build_plan(
+        WorkspaceAuthorityService(
+            SimpleNamespace(list_sources=list_sources)
+        )._build_plan(
             command_id=COMMAND_ID,
             old_approved=approved,
             workspace_files=workspace_files,

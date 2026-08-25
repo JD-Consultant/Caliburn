@@ -30,6 +30,10 @@ from app.consultant.workspace_backend import (
     ConsultantWorkspaceBackendBinding,
     build_consultant_workspace_backend,
 )
+from app.consultant.workspace_authority import (
+    WorkspaceRebasePlan,
+    WorkspaceResourceChange,
+)
 from app.consultant.workspace_resources import WorkspaceCatalog, parse_workspace_files
 from app.consultant.workspace_review import (
     WorkspaceReviewDecision,
@@ -40,6 +44,7 @@ from app.consultant.workspace_state import (
     StoreBackedWorkspace,
     WorkspaceDiagnostic,
     WorkspaceValidationStatus,
+    approved_document_digest,
     workspace_resource_digest,
 )
 from app.consultant.workspace_validation import (
@@ -168,6 +173,50 @@ def _document(document_id: UUID = DOCUMENT_ID) -> ApprovedJobDocument:
                 competency_level=4,
             ),
         ),
+    )
+
+
+def _two_file_rebase(
+    files: dict[str, str],
+) -> tuple[ApprovedJobDocument, WorkspaceRebasePlan]:
+    header_path = "/workspace/header.json"
+    task_path = "/workspace/tasks/task-001.json"
+    header_after = files[header_path].replace("採購專員", "資深採購專員")
+    task_after = files[task_path].replace("整理需求", "複核需求")
+    result_files = {
+        **files,
+        header_path: header_after,
+        task_path: task_after,
+    }
+    before_document = _document()
+    approved_after = before_document.model_copy(
+        update={
+            "job_title": "資深採購專員",
+            "tasks": (
+                before_document.tasks[0].model_copy(
+                    update={"statement": "複核需求"}
+                ),
+            ),
+        }
+    )
+    return approved_after, WorkspaceRebasePlan(
+        command_id=uuid4(),
+        expected_workspace_digest=workspace_resource_digest(files),
+        approved_revision=1,
+        approved_digest=approved_document_digest(approved_after),
+        changes=(
+            WorkspaceResourceChange(
+                path=header_path,
+                before=files[header_path],
+                after=header_after,
+            ),
+            WorkspaceResourceChange(
+                path=task_path,
+                before=files[task_path],
+                after=task_after,
+            ),
+        ),
+        result_workspace_digest=workspace_resource_digest(result_files),
     )
 
 
@@ -313,6 +362,115 @@ async def test_store_backed_workspace_marks_digest_mismatch_unvalidated() -> Non
 
     assert snapshot.manifest.validation_status is WorkspaceValidationStatus.UNVALIDATED
     assert snapshot.manifest.resource_digest == workspace_resource_digest(snapshot.files)
+
+
+@pytest.mark.asyncio
+async def test_store_backed_workspace_resumes_a_plan_only_partial_rebase(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workspace = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(
+        approved_document=_document(),
+        approved_revision=0,
+    )
+    before = await workspace.read_snapshot()
+    approved_after, plan = _two_file_rebase(dict(before.files))
+    original_awrite = workspace.backend.awrite
+    completed_writes = 0
+
+    class InjectedFailure(RuntimeError):
+        pass
+
+    async def crash_before_second_write(path: str, content: str):
+        nonlocal completed_writes
+        if completed_writes == 1:
+            raise InjectedFailure("after first workspace rebase write")
+        result = await original_awrite(path, content)
+        completed_writes += 1
+        return result
+
+    monkeypatch.setattr(workspace.backend, "awrite", crash_before_second_write)
+    with pytest.raises(InjectedFailure, match="after first workspace rebase write"):
+        await workspace.apply_rebase(
+            plan=plan,
+            approved_document=approved_after,
+            approved_revision=1,
+        )
+    monkeypatch.setattr(workspace.backend, "awrite", original_awrite)
+
+    partial = await workspace.read_snapshot()
+    first, second = plan.changes
+    assert partial.files[first.path] == first.after
+    assert partial.files[second.path] == second.before
+
+    resumed = await workspace.apply_rebase(
+        plan=plan,
+        approved_document=approved_after,
+        approved_revision=1,
+    )
+    finished = await workspace.read_snapshot()
+
+    assert finished.files[first.path] == first.after
+    assert finished.files[second.path] == second.after
+    assert finished.manifest.resource_digest == plan.result_workspace_digest
+    assert resumed.approved_baseline_revision == 1
+    assert resumed.approved_baseline_digest == approved_document_digest(approved_after)
+
+
+@pytest.mark.asyncio
+async def test_store_backed_workspace_rejects_foreign_value_on_a_changed_path() -> None:
+    workspace = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(
+        approved_document=_document(),
+        approved_revision=0,
+    )
+    before = await workspace.read_snapshot()
+    approved_after, plan = _two_file_rebase(dict(before.files))
+    first, second = plan.changes
+    foreign = first.before.replace("採購專員", "外部覆寫")
+    assert foreign not in {first.before, first.after}
+    assert (await workspace.backend.awrite(first.path, foreign)).error is None
+
+    with pytest.raises(ValueError, match="workspace changed before its persisted rebase"):
+        await workspace.apply_rebase(
+            plan=plan,
+            approved_document=approved_after,
+            approved_revision=1,
+        )
+
+    rejected = await workspace.read_snapshot()
+    assert rejected.files[first.path] == foreign
+    assert rejected.files[second.path] == second.before
+
+
+@pytest.mark.asyncio
+async def test_store_backed_workspace_rejects_partial_rebase_with_external_files() -> None:
+    workspace = StoreBackedWorkspace(store=InMemoryStore(), document_id=DOCUMENT_ID)
+    await workspace.ensure_initialized(
+        approved_document=_document(),
+        approved_revision=0,
+    )
+    before = await workspace.read_snapshot()
+    approved_after, plan = _two_file_rebase(dict(before.files))
+    first, second = plan.changes
+    assert (await workspace.backend.awrite(first.path, first.after)).error is None
+    assert (
+        await workspace.backend.awrite(
+            "/workspace/tasks/task-external.json",
+            '{"handle":"task-external","statement":"外部混合寫入"}\n',
+        )
+    ).error is None
+
+    with pytest.raises(ValueError, match="workspace changed before its persisted rebase"):
+        await workspace.apply_rebase(
+            plan=plan,
+            approved_document=approved_after,
+            approved_revision=1,
+        )
+
+    rejected = await workspace.read_snapshot()
+    assert rejected.files[first.path] == first.after
+    assert rejected.files[second.path] == second.before
 
 
 @pytest.mark.asyncio

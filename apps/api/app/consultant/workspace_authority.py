@@ -982,12 +982,6 @@ class WorkspaceAuthorityService:
             await self._delete_direct_plan(document_id, command_id)
             return
         workspace = StoreBackedWorkspace(store=self.runtime.store, document_id=document_id)
-        current = await workspace.read_snapshot()
-        actual_digest = workspace_resource_digest(current.files)
-        if actual_digest != plan.expected_workspace_digest and actual_digest != plan.result_workspace_digest:
-            raise WorkspaceAuthorityError(
-                "workspace changed outside the persisted direct-edit rebase"
-            )
         await workspace.apply_rebase(
             plan=plan,
             approved_document=snapshot.approved_document,
@@ -1085,15 +1079,6 @@ class WorkspaceAuthorityService:
         if approved_document_digest(snapshot.approved_document) != plan.approved_digest:
             raise WorkspaceAuthorityError("workspace rebase approved document is stale")
         workspace = StoreBackedWorkspace(store=self.runtime.store, document_id=document_id)
-        current = await workspace.read_snapshot()
-        actual_digest = workspace_resource_digest(current.files)
-        if (
-            actual_digest != plan.expected_workspace_digest
-            and actual_digest != record.result_workspace_digest
-        ):
-            raise WorkspaceAuthorityError(
-                "workspace changed outside the persisted rebase plan"
-            )
         manifest = await workspace.apply_rebase(
             plan=plan,
             approved_document=snapshot.approved_document,

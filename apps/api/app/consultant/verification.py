@@ -131,6 +131,7 @@ def verify_consultant_result(
     *,
     execution: ResolvedExecution,
     document_id: UUID,
+    current_source_id: UUID,
     selected_skill_ids: Sequence[str],
     loaded_skill_ids: Sequence[str],
     employee_sources: Sequence[EmployeeSource],
@@ -139,7 +140,7 @@ def verify_consultant_result(
 ) -> None:
     """Fail closed before framework output becomes durable semantic state."""
 
-    from app.consultant.state import SourceValidity
+    from app.consultant.state import SourceProcessingStatus, SourceValidity
 
     selected = set(selected_skill_ids)
     loaded = set(loaded_skill_ids)
@@ -175,15 +176,70 @@ def verify_consultant_result(
             "duplicate_employee_source",
             "duplicate employee source supplied to verifier",
         )
-    if any(source.validity is not SourceValidity.CURRENT for source in employee_sources):
-        raise ConsultantVerificationError(
-            "superseded_employee_source",
-            "superseded employee source cannot support current result",
-        )
     if any(source.document_id != document_id for source in employee_sources):
         raise ConsultantVerificationError(
             "cross_document_source",
             "employee source crosses document scope",
+        )
+    current_source = source_by_id.get(current_source_id)
+    if current_source is None:
+        raise ConsultantVerificationError(
+            "unknown_current_source",
+            "verified result does not include its current answer source",
+        )
+    if current_source.processing_status is not SourceProcessingStatus.COMMITTED:
+        raise ConsultantVerificationError(
+            "pending_current_source",
+            "current answer source is not committed",
+        )
+    exact_pair_replay = False
+    supersession_target_id: UUID | None = None
+    if result.source_supersession is not None:
+        supersession_target_id = result.source_supersession.superseded_source_id
+        superseded_source = source_by_id.get(
+            supersession_target_id
+        )
+        if superseded_source is None:
+            raise ConsultantVerificationError(
+                "unknown_supersession_source",
+                "source supersession targets an unknown source",
+            )
+        if superseded_source.document_id != document_id:
+            raise ConsultantVerificationError(
+                "cross_document_supersession",
+                "source supersession crosses document scope",
+            )
+        if superseded_source.source_id == current_source_id:
+            raise ConsultantVerificationError(
+                "self_supersession",
+                "source supersession cannot target the current answer source",
+            )
+        exact_pair_replay = (
+            superseded_source.validity is SourceValidity.SUPERSEDED
+            and superseded_source.superseded_by_source_id == current_source_id
+            and current_source.supersedes_source_id == superseded_source.source_id
+        )
+        if (
+            superseded_source.validity is not SourceValidity.CURRENT
+            and not exact_pair_replay
+        ):
+            raise ConsultantVerificationError(
+                "superseded_target",
+                "source supersession target is already superseded",
+            )
+        if superseded_source.processing_status is not SourceProcessingStatus.COMMITTED:
+            raise ConsultantVerificationError(
+                "pending_supersession_target",
+                "source supersession target is not committed",
+            )
+    if any(
+        source.validity is not SourceValidity.CURRENT
+        and not (exact_pair_replay and source.source_id == supersession_target_id)
+        for source in employee_sources
+    ):
+        raise ConsultantVerificationError(
+            "superseded_employee_source",
+            "superseded employee source cannot support current result",
         )
 
     if known_work_ids is not None:

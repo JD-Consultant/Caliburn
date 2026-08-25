@@ -256,7 +256,11 @@ async def _execute_admitted_consultant_turn(
         model_output = ConsultantModelOutput.model_validate(
             response["structured_response"]
         )
-        result = map_consultant_model_output(model_output, catalog=catalog)
+        result = map_consultant_model_output(
+            model_output,
+            catalog=catalog,
+            current_source_id=source_id,
+        )
         if not runtime_context.context_receipts:
             raise ValueError("consultant run emitted no context-selection receipt")
         for receipt in runtime_context.context_receipts:
@@ -264,10 +268,17 @@ async def _execute_admitted_consultant_turn(
         verify_model_attempts(execution, callback.receipts)
         referenced_source_ids = tuple(
             dict.fromkeys(
-                source_id
-                for basis in result.analysis_bases()
-                for source_id in basis.source_ids
-                if source_id is not None
+                [
+                    source_id
+                    for basis in result.analysis_bases()
+                    for source_id in basis.source_ids
+                    if source_id is not None
+                ]
+                + (
+                    [result.source_supersession.superseded_source_id]
+                    if result.source_supersession is not None
+                    else []
+                )
             )
         )
         evidence = tuple(
@@ -288,6 +299,7 @@ async def _execute_admitted_consultant_turn(
             result,
             execution=execution,
             document_id=document_id,
+            current_source_id=source_id,
             selected_skill_ids=CONSULTANT_SKILL_IDS,
             loaded_skill_ids=agent.skill_backend.loaded_skill_ids,
             employee_sources=evidence,

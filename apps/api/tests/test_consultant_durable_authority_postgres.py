@@ -4,6 +4,8 @@ import json
 import os
 from collections.abc import AsyncIterator
 from datetime import UTC, datetime
+from decimal import Decimal
+from types import SimpleNamespace
 from typing import Any, TypedDict
 from uuid import UUID, uuid4
 
@@ -21,8 +23,29 @@ from app.adapters.langgraph.postgres import (
     StaleRevision,
     open_postgres_consultant_runtime,
 )
+from app.config import Settings
+from app.consultant.context import ContextSelectionReceipt
 from app.consultant.document_authority import apply_document_actions
 from app.consultant.interview import VerifiedConsultantCommit
+from app.consultant.model_output import (
+    ConsultantModelOutput,
+    OutputAnalysisBasis,
+    OutputQuestion,
+    OutputQuestionKind,
+    OutputSourceSupersession,
+    OutputSufficiency,
+)
+from app.consultant.model_runtime import (
+    AttemptKind,
+    AttemptReceipt,
+    AttemptStatus,
+    AttemptUsage,
+)
+from app.consultant.provider_wire import OutputEvidenceReference
+from app.consultant.run_service import (
+    build_configured_execution,
+    execute_admitted_consultant_turn,
+)
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.results import (
     AnalysisBasis,
@@ -1682,6 +1705,431 @@ async def test_verified_consultant_commit_survives_postgres_runtime_restart(
         assert reopened.latest_run["execution_evidence"]["resolved_execution"][
             "requested_model"
         ] == "anthropic/claude-opus-5"
+
+
+def _source_supersession_commit(
+    *,
+    run_id: UUID,
+    current_source_id: UUID,
+    superseded_source_id: UUID,
+    visible_reply: str = "我已依最新原話重新檢查受影響理解。",
+) -> VerifiedConsultantCommit:
+    now = datetime.now(UTC)
+    basis = AnalysisBasis(
+        source_ids=(current_source_id,),
+        skill_ids=("work-discovery",),
+    )
+    result = ConsultantResult.model_validate(
+        {
+            **ConsultantResult(
+                visible_reply=visible_reply,
+                reply_basis=basis,
+                sufficiency=SufficiencyRecommendation(
+                    currently_enough=True,
+                    reason="目前資訊足以保留這次更正。",
+                    continuing_benefit="繼續訪談仍可補充工作細節。",
+                    basis=basis,
+                ),
+            ).model_dump(mode="json"),
+            "source_supersession": {
+                "superseded_source_id": str(superseded_source_id),
+            },
+        }
+    )
+    return VerifiedConsultantCommit(
+        run_id=run_id,
+        answer_source_id=current_source_id,
+        started_at=now,
+        completed_at=now,
+        result=result,
+    )
+
+
+def _supersession_run_agent_factory(
+    *,
+    superseded_source_handle: str,
+    current_text: str,
+):
+    def factory(**kwargs: Any) -> Any:
+        execution = kwargs["execution"]
+
+        class SupersessionAgent:
+            skill_backend = SimpleNamespace(loaded_skill_ids=CONSULTANT_SKILL_IDS)
+
+            async def ainvoke(self, payload: Any, *, context: Any, config: Any) -> Any:
+                del payload
+                context.context_receipts.append(
+                    ContextSelectionReceipt(
+                        run_id=context.request.run_id,
+                        document_id=context.snapshot.document_id,
+                        state_revision=context.snapshot.revision,
+                        profile_id=execution.profile_id,
+                        profile_revision=execution.profile_revision,
+                        policy_id=execution.policy_id,
+                        policy_revision=execution.policy_revision,
+                        selected_skill_ids=context.request.selected_skill_ids,
+                        loaded_sources=(),
+                        total_input_tokens=100,
+                        context_token_budget=execution.max_context_tokens,
+                    )
+                )
+                now = datetime.now(UTC)
+                callback = config["callbacks"][0]
+                callback.receipts.append(
+                    AttemptReceipt(
+                        attempt_id=uuid4(),
+                        product_run_id=context.request.run_id,
+                        status=AttemptStatus.SUCCEEDED,
+                        attempt_kind=AttemptKind.PRIMARY,
+                        requested_model=execution.requested_model,
+                        provider_allowlist=execution.provider_allowlist,
+                        actual_model=execution.requested_model,
+                        actual_provider=execution.provider_allowlist[0],
+                        profile_id=execution.profile_id,
+                        profile_revision=execution.profile_revision,
+                        policy_id=execution.policy_id,
+                        policy_revision=execution.policy_revision,
+                        effective_parameters=execution.effective_parameters,
+                        started_at=now,
+                        completed_at=now,
+                        latency_ms=0,
+                        usage=AttemptUsage(
+                            input_tokens=80,
+                            output_tokens=20,
+                            total_tokens=100,
+                        ),
+                        cost_usd=Decimal("0"),
+                        finish_reason="stop",
+                    )
+                )
+                basis = OutputAnalysisBasis(
+                    evidence=(
+                        OutputEvidenceReference(
+                            source_handle=context.request.current_source_handle,
+                            quote=current_text,
+                            occurrence=0,
+                            skill_ids=("task-boundary",),
+                        ),
+                    ),
+                )
+                return {
+                    "structured_response": ConsultantModelOutput(
+                        visible_reply="我已依這次原話重新檢查受影響理解。",
+                        analysis_bases=(basis,),
+                        reply_basis_ordinal=1,
+                        understanding_changes=(),
+                        attention_changes=(),
+                        gaps=(),
+                        question=OutputQuestion(
+                            kind=OutputQuestionKind.NONE,
+                            text="",
+                            answer_target="",
+                            reason="",
+                            current_understanding="",
+                            choices=(),
+                            affected_work_ids=(),
+                            affected_branch="",
+                            basis_ordinal=0,
+                        ),
+                        source_supersessions=(
+                            OutputSourceSupersession(
+                                superseded_source_handle=superseded_source_handle
+                            ),
+                        ),
+                        sufficiency=OutputSufficiency(
+                            currently_enough=True,
+                            reason="目前資訊足以保留這次更正。",
+                            remaining_gap_reasons=(),
+                            continuing_benefit="繼續訪談仍可補充細節。",
+                            basis_ordinal=1,
+                        ),
+                    )
+                }
+
+        return SupersessionAgent()
+
+    return factory
+
+
+@pytest.mark.asyncio
+async def test_semantic_source_supersession_persists_store_pair_and_graph_state(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    original_source_id = uuid4()
+    current_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        created = await runtime.create_document(document_id, title="採購職務")
+        await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=original_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我每週整理採購需求。",
+        )
+        current = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=current_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我剛剛說錯了，是每天才對。",
+        )
+        committed = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=current.revision,
+            commit=_source_supersession_commit(
+                run_id=uuid4(),
+                current_source_id=current_source_id,
+                superseded_source_id=original_source_id,
+            ),
+        )
+
+        original = await runtime.get_source(document_id, original_source_id)
+        current_source = await runtime.get_source(document_id, current_source_id)
+        assert committed.revision == created.revision + 3
+        assert committed.source_count == 2
+        assert committed.source_supersessions == {
+            original_source_id: current_source_id
+        }
+        assert original.validity is SourceValidity.SUPERSEDED
+        assert original.superseded_by_source_id == current_source_id
+        assert current_source.supersedes_source_id == original_source_id
+        assert current_source.validity is SourceValidity.CURRENT
+
+
+@pytest.mark.asyncio
+async def test_store_pair_failure_retries_same_source_and_run_without_minting_source(
+    consultant_database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document_id = uuid4()
+    original_source_id = uuid4()
+    current_source_id = uuid4()
+    run_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=original_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我每週整理採購需求。",
+        )
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=current_source_id,
+            text="我剛剛說錯了，是每天才對。",
+        )
+        assert should_process is True
+        commit = _source_supersession_commit(
+            run_id=run_id,
+            current_source_id=current_source_id,
+            superseded_source_id=original_source_id,
+        )
+
+        async def fail_after_pair(_source: EmployeeSource) -> None:
+            raise RuntimeError("after-store-pair")
+
+        monkeypatch.setattr(runtime, "_after_source_store", fail_after_pair)
+        with pytest.raises(RuntimeError, match="after-store-pair"):
+            await runtime.commit_verified_consultant_result(
+                document_id=document_id,
+                expected_revision=admitted.revision,
+                commit=commit,
+            )
+
+        pair_before_retry = await runtime.list_sources(document_id)
+        assert len(pair_before_retry) == 2
+        assert (await runtime.get_source(document_id, original_source_id)).validity is (
+            SourceValidity.SUPERSEDED
+        )
+        assert (
+            await runtime.get_source(document_id, current_source_id)
+        ).supersedes_source_id == original_source_id
+
+        monkeypatch.setattr(runtime, "_after_source_store", runtime._noop_source_hook)
+        replayed_admission, should_replay = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=current_source_id,
+            text="我剛剛說錯了，是每天才對。",
+        )
+        assert should_replay is False
+        assert replayed_admission.revision == admitted.revision
+
+        recovered = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=replayed_admission.revision,
+            commit=commit,
+        )
+        assert recovered.source_count == 2
+        assert len(await runtime.list_sources(document_id)) == 2
+        assert recovered.source_supersessions == {
+            original_source_id: current_source_id
+        }
+
+
+@pytest.mark.asyncio
+async def test_run_service_replays_exact_store_pair_after_checkpoint_failure(
+    consultant_database_url: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    document_id = uuid4()
+    original_source_id = uuid4()
+    current_source_id = uuid4()
+    run_id = uuid4()
+    current_text = "我剛剛說錯了，是每天才對。"
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=original_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我每週整理採購需求。",
+        )
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=current_source_id,
+            text=current_text,
+        )
+        assert should_process is True
+        execution = build_configured_execution(
+            Settings(_env_file=None, openrouter_api_key="test-key")
+        )
+        agent_factory = _supersession_run_agent_factory(
+            superseded_source_handle="source-001",
+            current_text=current_text,
+        )
+
+        async def fail_after_pair(_source: EmployeeSource) -> None:
+            raise RuntimeError("after-store-pair")
+
+        monkeypatch.setattr(runtime, "_after_source_store", fail_after_pair)
+        with pytest.raises(RuntimeError, match="after-store-pair"):
+            await execute_admitted_consultant_turn(
+                runtime=runtime,
+                document_id=document_id,
+                run_id=run_id,
+                source_id=current_source_id,
+                execution=execution,
+                model=object(),
+                agent_factory=agent_factory,
+            )
+
+        pair_before_retry = await runtime.list_sources(document_id)
+        assert len(pair_before_retry) == 2
+        assert (
+            await runtime.get_source(document_id, original_source_id)
+        ).validity is SourceValidity.SUPERSEDED
+
+        monkeypatch.setattr(runtime, "_after_source_store", runtime._noop_source_hook)
+        replayed_admission, should_replay = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=current_source_id,
+            text=current_text,
+        )
+        assert should_replay is True
+        assert replayed_admission.revision > admitted.revision
+
+        recovered = await execute_admitted_consultant_turn(
+            runtime=runtime,
+            document_id=document_id,
+            run_id=run_id,
+            source_id=current_source_id,
+            execution=execution,
+            model=object(),
+            agent_factory=agent_factory,
+        )
+
+        assert recovered.source_count == 2
+        assert len(await runtime.list_sources(document_id)) == 2
+        assert recovered.source_supersessions == {
+            original_source_id: current_source_id
+        }
+
+
+@pytest.mark.asyncio
+async def test_legacy_source_supersession_is_not_applied_twice_by_semantic_replay(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    original_source_id = uuid4()
+    current_source_id = uuid4()
+    run_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        first = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=original_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我每週整理採購需求。",
+        )
+        first_now = datetime.now(UTC)
+        first_basis = AnalysisBasis(
+            source_ids=(original_source_id,),
+            skill_ids=("work-discovery",),
+        )
+        first_result = ConsultantResult(
+            visible_reply="我先記下每週整理採購需求。",
+            reply_basis=first_basis,
+            understanding_changes=(
+                UnderstandingChange(
+                    operation=UnderstandingOperation.ADD,
+                    kind="task_hypothesis",
+                    text="員工每週整理採購需求。",
+                    basis=first_basis,
+                ),
+            ),
+            sufficiency=SufficiencyRecommendation(
+                currently_enough=True,
+                reason="目前可保留這項工作。",
+                continuing_benefit="繼續訪談可補充完成標準。",
+                basis=first_basis,
+            ),
+        )
+        await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=first.revision,
+            commit=VerifiedConsultantCommit(
+                run_id=uuid4(),
+                answer_source_id=original_source_id,
+                started_at=first_now,
+                completed_at=first_now,
+                result=first_result,
+            ),
+        )
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=run_id,
+            source_id=current_source_id,
+            text="我剛剛說錯了，是每天才對。",
+            supersedes_source_id=original_source_id,
+        )
+        assert should_process is True
+        execution = build_configured_execution(
+            Settings(_env_file=None, openrouter_api_key="test-key")
+        )
+        semantic = await execute_admitted_consultant_turn(
+            runtime=runtime,
+            document_id=document_id,
+            run_id=run_id,
+            source_id=current_source_id,
+            execution=execution,
+            model=object(),
+            agent_factory=_supersession_run_agent_factory(
+                superseded_source_handle="source-001",
+                current_text="我剛剛說錯了，是每天才對。",
+            ),
+        )
+
+        assert len(semantic.understanding) == 2
+        assert semantic.source_supersessions == {
+            original_source_id: current_source_id
+        }
 
 
 @pytest.mark.asyncio

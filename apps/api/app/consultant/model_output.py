@@ -28,6 +28,7 @@ from app.consultant.results import (
     NextQuestion,
     RequiredClarificationDraft,
     SkillId,
+    SourceSupersession,
     SufficiencyRecommendation,
     UnderstandingChange,
     UnderstandingOperation,
@@ -36,9 +37,11 @@ from app.consultant.results import (
 from app.consultant.state import (
     InterviewPriority,
     InterviewWorkStatus,
+    SourceProcessingStatus,
+    SourceValidity,
     UnderstandingImpact,
 )
-from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_resources import Handle, WorkspaceCatalog
 
 
 NEUTRAL = "none"
@@ -128,6 +131,10 @@ class OutputSufficiency(OutputModel):
     basis_ordinal: int = Field(description="analysis_bases 的 1-based ordinal")
 
 
+class OutputSourceSupersession(OutputModel):
+    superseded_source_handle: Handle
+
+
 class ConsultantModelOutput(OutputModel):
     visible_reply: str
     analysis_bases: tuple[OutputAnalysisBasis, ...]
@@ -139,6 +146,7 @@ class ConsultantModelOutput(OutputModel):
     gaps: tuple[OutputGap, ...]
     question: OutputQuestion
     sufficiency: OutputSufficiency
+    source_supersessions: tuple[OutputSourceSupersession, ...] = Field(max_length=1)
 
 
 class ConsultantOutputMappingError(ValueError):
@@ -149,12 +157,19 @@ def map_consultant_model_output(
     output: ConsultantModelOutput,
     *,
     catalog: WorkspaceCatalog,
+    current_source_id: UUID,
 ) -> ConsultantResult:
     """Restore one provider wire value without inventing or discarding content."""
 
     try:
         bases = AnalysisBasisTable(output.analysis_bases, catalog=catalog)
         next_question, clarification = _map_question(output.question, bases)
+        source_supersession = _map_source_supersession(
+            output.source_supersessions,
+            question_kind=output.question.kind,
+            catalog=catalog,
+            current_source_id=current_source_id,
+        )
         result = ConsultantResult(
             visible_reply=output.visible_reply,
             reply_basis=bases.resolve(
@@ -170,6 +185,7 @@ def map_consultant_model_output(
             gaps=tuple(_map_gap(item, bases) for item in output.gaps),
             next_question=next_question,
             required_clarification=clarification,
+            source_supersession=source_supersession,
             sufficiency=SufficiencyRecommendation(
                 currently_enough=output.sufficiency.currently_enough,
                 reason=output.sufficiency.reason,
@@ -189,6 +205,79 @@ def map_consultant_model_output(
         raise ConsultantOutputMappingError(
             str(error)
         ) from error
+
+
+def _map_source_supersession(
+    values: tuple[OutputSourceSupersession, ...],
+    *,
+    question_kind: OutputQuestionKind,
+    catalog: WorkspaceCatalog,
+    current_source_id: UUID,
+) -> SourceSupersession | None:
+    if not values:
+        return None
+    if question_kind is OutputQuestionKind.REQUIRED_CLARIFICATION:
+        raise ConsultantOutputMappingError(
+            "required clarification cannot carry a source supersession"
+        )
+    if len(values) > 1:
+        raise ConsultantOutputMappingError(
+            "source supersessions support at most one target"
+        )
+    handles = tuple(item.superseded_source_handle for item in values)
+    if len(handles) != len(set(handles)):
+        raise ConsultantOutputMappingError(
+            "source supersession targets must be unique"
+        )
+
+    try:
+        current_handle = catalog.source_handle_for_id(current_source_id)
+        current_source = catalog.source_for_handle(current_handle)
+    except (KeyError, ValueError) as error:
+        raise ConsultantOutputMappingError(
+            "current answer source is not a materialized source in this document"
+        ) from error
+    if current_source.document_id != catalog.document_id:
+        raise ConsultantOutputMappingError(
+            "current answer source crosses document scope"
+        )
+    if current_source.validity is not SourceValidity.CURRENT:
+        raise ConsultantOutputMappingError(
+            "current answer source is already superseded"
+        )
+    if current_source.processing_status is not SourceProcessingStatus.COMMITTED:
+        raise ConsultantOutputMappingError(
+            "current answer source is not committed"
+        )
+
+    try:
+        target = catalog.source_for_handle(handles[0])
+    except (KeyError, ValueError) as error:
+        raise ConsultantOutputMappingError(
+            "source supersession target is not a known employee source"
+        ) from error
+    if target.document_id != catalog.document_id:
+        raise ConsultantOutputMappingError(
+            "source supersession target crosses document scope"
+        )
+    if target.source_id == current_source_id:
+        raise ConsultantOutputMappingError(
+            "source supersession cannot target itself"
+        )
+    exact_pair_replay = (
+        target.validity is SourceValidity.SUPERSEDED
+        and target.superseded_by_source_id == current_source_id
+        and current_source.supersedes_source_id == target.source_id
+    )
+    if target.validity is not SourceValidity.CURRENT and not exact_pair_replay:
+        raise ConsultantOutputMappingError(
+            "source supersession target is already superseded"
+        )
+    if target.processing_status is not SourceProcessingStatus.COMMITTED:
+        raise ConsultantOutputMappingError(
+            "source supersession target is not committed"
+        )
+    return SourceSupersession(superseded_source_id=target.source_id)
 
 
 def _map_understanding(

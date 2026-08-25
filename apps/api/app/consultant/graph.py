@@ -224,9 +224,37 @@ def _apply_command(
         if source_reference is not None:
             raise ValueError("model semantic commit cannot mint employee evidence")
         commit = VerifiedConsultantCommit.model_validate(command["semantic_commit"])
+        semantic_state = state
+        supersession = commit.result.source_supersession
+        if supersession is not None:
+            superseded_source_id = supersession.superseded_source_id
+            correction_source_id = commit.answer_source_id
+            if superseded_source_id == correction_source_id:
+                raise ValueError("source supersession cannot target itself")
+            registered_source_id = state.get("source_supersessions", {}).get(
+                str(superseded_source_id)
+            )
+            if registered_source_id is not None:
+                if registered_source_id != str(correction_source_id):
+                    raise ValueError(
+                        "source supersession conflicts with existing graph lineage"
+                    )
+            else:
+                correction = apply_source_correction(
+                    state,
+                    document_id=document_id,
+                    superseded_source_id=superseded_source_id,
+                    correction_source_id=correction_source_id,
+                    revision=expected_revision + 1,
+                )
+                supersessions = dict(state.get("source_supersessions", {}))
+                supersessions[str(superseded_source_id)] = str(correction_source_id)
+                correction["source_supersessions"] = supersessions
+                update.update(correction)
+                semantic_state = {**state, **correction}
         update.update(
             apply_verified_consultant_commit(
-                state,
+                semantic_state,
                 document_id=document_id,
                 revision=expected_revision + 1,
                 commit=commit,

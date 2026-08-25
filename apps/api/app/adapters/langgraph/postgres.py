@@ -627,6 +627,90 @@ class PostgresConsultantRuntime:
         await self._put_source(requested)
         return requested
 
+    async def _reconcile_source_supersession(
+        self,
+        *,
+        document_id: UUID,
+        current_source_id: UUID,
+        superseded_source_id: UUID,
+    ) -> None:
+        """Persist one exact old/current source pair before the checkpoint."""
+
+        if current_source_id == superseded_source_id:
+            raise SourceConflict("source supersession cannot target itself")
+        current = await self.get_source(document_id, current_source_id)
+        superseded = await self.get_source(document_id, superseded_source_id)
+        stored_target = await self._stored_supersession_target_for_current(
+            document_id=document_id,
+            current_source=current,
+        )
+        if current.document_id != document_id or superseded.document_id != document_id:
+            raise SourceConflict("source supersession crosses document scope")
+        if current.processing_status is not SourceProcessingStatus.COMMITTED:
+            raise PendingSourceRequiresReconciliation(
+                f"source {current.source_id} is not committed"
+            )
+        if superseded.processing_status is not SourceProcessingStatus.COMMITTED:
+            raise PendingSourceRequiresReconciliation(
+                f"source {superseded.source_id} is not committed"
+            )
+        if current.validity is not SourceValidity.CURRENT:
+            raise SourceConflict(
+                f"source {current.source_id} was superseded before semantic commit"
+            )
+        if stored_target is not None and stored_target != superseded_source_id:
+            raise SourceConflict(
+                "source supersession relation is partial or belongs to another source"
+            )
+        if (
+            current.supersedes_source_id == superseded_source_id
+            and superseded.validity is SourceValidity.SUPERSEDED
+            and superseded.superseded_by_source_id == current_source_id
+        ):
+            return
+        if (
+            current.supersedes_source_id is not None
+            or superseded.superseded_by_source_id is not None
+            or superseded.validity is not SourceValidity.CURRENT
+        ):
+            raise SourceConflict(
+                "source supersession relation is partial or belongs to another source"
+            )
+        updated_superseded = superseded.model_copy(
+            update={
+                "validity": SourceValidity.SUPERSEDED,
+                "superseded_by_source_id": current_source_id,
+            }
+        )
+        updated_current = current.model_copy(
+            update={"supersedes_source_id": superseded_source_id}
+        )
+        await self._put_sources_atomically((updated_superseded, updated_current))
+        await self._after_source_store(updated_current)
+
+    async def _stored_supersession_target_for_current(
+        self,
+        *,
+        document_id: UUID,
+        current_source: EmployeeSource,
+    ) -> UUID | None:
+        incoming = tuple(
+            source
+            for source in await self.list_sources(document_id)
+            if source.superseded_by_source_id == current_source.source_id
+        )
+        if current_source.supersedes_source_id is None:
+            if incoming:
+                raise SourceConflict(
+                    "source supersession relation is partial or belongs to another source"
+                )
+            return None
+        if len(incoming) != 1 or incoming[0].source_id != current_source.supersedes_source_id:
+            raise SourceConflict(
+                "source supersession relation is partial or belongs to another source"
+            )
+        return current_source.supersedes_source_id
+
     async def _load_or_prepare_source(
         self, requested: EmployeeSource
     ) -> EmployeeSource:
@@ -773,8 +857,24 @@ class PostgresConsultantRuntime:
                 supersedes_source_id=supersedes_source_id,
             )
             existing = await self.get_source_or_none(document_id, source_id)
-            if existing is not None and not self._same_immutable_source(
+            same_requested_source = existing is not None and self._same_immutable_source(
                 existing, requested
+            )
+            relation_was_reconciled = (
+                existing is not None
+                and requested.supersedes_source_id is None
+                and existing.supersedes_source_id is not None
+                and self._same_immutable_source(
+                    existing,
+                    requested.model_copy(
+                        update={
+                            "supersedes_source_id": existing.supersedes_source_id
+                        }
+                    ),
+                )
+            )
+            if existing is not None and not (
+                same_requested_source or relation_was_reconciled
             ):
                 raise SourceConflict(
                     f"source {source_id} immutable payload conflicts"
@@ -1592,9 +1692,51 @@ class PostgresConsultantRuntime:
                     f"source {source.source_id} was superseded before semantic commit"
                 )
             snapshot = await self._snapshot(document_id)
+            latest = (
+                RunReceipt.model_validate(snapshot.latest_run)
+                if snapshot.latest_run is not None
+                else None
+            )
+            if (
+                latest is not None
+                and latest.status is RunStatus.COMPLETED
+                and latest.run_id == commit.run_id
+                and latest.source_id == commit.answer_source_id
+            ):
+                return snapshot
             if snapshot.revision != expected_revision:
                 raise StaleRevision(
                     f"expected revision {expected_revision}, found {snapshot.revision}"
+                )
+            stored_target = await self._stored_supersession_target_for_current(
+                document_id=document_id,
+                current_source=source,
+            )
+            requested_target = (
+                commit.result.source_supersession.superseded_source_id
+                if commit.result.source_supersession is not None
+                else None
+            )
+            if stored_target != requested_target:
+                if stored_target is not None and requested_target is None:
+                    registered_target = snapshot.source_supersessions.get(
+                        str(stored_target)
+                    )
+                    if registered_target == str(commit.answer_source_id):
+                        requested_target = stored_target
+                    else:
+                        raise SourceConflict(
+                            "stored source supersession requires an exact semantic replay"
+                        )
+                elif stored_target is not None:
+                    raise SourceConflict(
+                        "source supersession relation is partial or belongs to another source"
+                    )
+            if requested_target is not None:
+                await self._reconcile_source_supersession(
+                    document_id=document_id,
+                    current_source_id=commit.answer_source_id,
+                    superseded_source_id=requested_target,
                 )
             try:
                 await self.graph.ainvoke(

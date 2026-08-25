@@ -36,6 +36,7 @@ from app.consultant.state import (
     InterviewPriority,
     InterviewWorkStatus,
     SourceProcessingStatus,
+    SourceValidity,
     UnderstandingImpact,
 )
 from app.consultant.workspace_resources import WorkspaceCatalog
@@ -57,6 +58,17 @@ def _catalog(source_id: UUID) -> WorkspaceCatalog:
     return WorkspaceCatalog.from_snapshot(
         ApprovedJobDocument(document_id=DOCUMENT_ID),
         sources=(_source(source_id),),
+    )
+
+
+def _catalog_with_sources(
+    *sources: EmployeeSource,
+    handle_registry: dict[str, UUID],
+) -> WorkspaceCatalog:
+    return WorkspaceCatalog.from_snapshot(
+        ApprovedJobDocument(document_id=DOCUMENT_ID),
+        sources=sources,
+        handle_registry=handle_registry,
     )
 
 
@@ -107,9 +119,23 @@ def _output(source_id: UUID, **overrides: Any) -> ConsultantModelOutput:
         "gaps": (),
         "question": _no_question(),
         "sufficiency": _sufficiency(),
+        "source_supersessions": (),
     }
     values.update(overrides)
     return ConsultantModelOutput(**values)
+
+
+def _wire_payload(
+    source_id: UUID,
+    *,
+    source_supersessions: list[dict[str, str]],
+    question: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    payload = _output(source_id).model_dump(mode="json")
+    payload["source_supersessions"] = source_supersessions
+    if question is not None:
+        payload["question"] = question
+    return payload
 
 
 def _walk_schema(node: Any) -> Iterator[dict[str, Any]]:
@@ -191,7 +217,11 @@ def test_model_evidence_is_resolved_by_handle_quote_and_occurrence() -> None:
         ),
     )
 
-    result = map_consultant_model_output(output, catalog=_catalog(source_id))
+    result = map_consultant_model_output(
+        output,
+        catalog=_catalog(source_id),
+        current_source_id=source_id,
+    )
 
     anchor = result.reply_basis.quote_anchors[0]
     assert anchor.source_id == source_id
@@ -222,7 +252,11 @@ def test_occurrence_zero_rejects_an_ambiguous_quote() -> None:
     )
 
     with pytest.raises(ConsultantOutputMappingError, match="multiple times"):
-        map_consultant_model_output(output, catalog=catalog)
+        map_consultant_model_output(
+            output,
+            catalog=catalog,
+            current_source_id=source_id,
+        )
 
 
 def test_unknown_handle_or_quote_fails_before_rich_result_mapping() -> None:
@@ -244,7 +278,11 @@ def test_unknown_handle_or_quote_fails_before_rich_result_mapping() -> None:
     )
 
     with pytest.raises(ConsultantOutputMappingError, match="could not be resolved"):
-        map_consultant_model_output(output, catalog=_catalog(source_id))
+        map_consultant_model_output(
+            output,
+            catalog=_catalog(source_id),
+            current_source_id=source_id,
+        )
 
 
 def test_all_non_document_effects_survive_the_wire_mapping() -> None:
@@ -297,6 +335,7 @@ def test_all_non_document_effects_survive_the_wire_mapping() -> None:
             ),
         ),
         catalog=_catalog(source_id),
+        current_source_id=source_id,
     )
 
     assert result.understanding_changes[0].understanding_id == understanding_id
@@ -325,6 +364,7 @@ def test_required_clarification_maps_to_employee_form() -> None:
             ),
         ),
         catalog=_catalog(source_id),
+        current_source_id=source_id,
     )
 
     assert result.next_question is None
@@ -341,6 +381,7 @@ def test_model_output_rejects_contradictory_none_question() -> None:
                 question=_no_question().model_copy(update={"text": "偷渡問題"}),
             ),
             catalog=_catalog(source_id),
+            current_source_id=source_id,
         )
 
 
@@ -366,4 +407,211 @@ def test_provider_output_schema_uses_named_consultant_sections() -> None:
         "gaps",
         "question",
         "sufficiency",
+        "source_supersessions",
     }
+
+
+def test_provider_requires_an_empty_source_supersessions_array_for_no_correction() -> None:
+    payload = _wire_payload(uuid4(), source_supersessions=[])
+
+    parsed = ConsultantModelOutput.model_validate(payload)
+
+    assert parsed.source_supersessions == ()
+
+
+def test_provider_source_supersession_item_has_only_the_required_handle() -> None:
+    schema = ConsultantModelOutput.model_json_schema()
+
+    item_schema = schema["$defs"]["OutputSourceSupersession"]
+    assert set(item_schema["properties"]) == {"superseded_source_handle"}
+    assert item_schema["required"] == ["superseded_source_handle"]
+
+
+def test_one_prior_current_source_handle_maps_to_one_application_source_id() -> None:
+    old_id = uuid4()
+    current_id = uuid4()
+    catalog = _catalog_with_sources(
+        _source(old_id),
+        _source(current_id),
+        handle_registry={"source-001": old_id, "source-002": current_id},
+    )
+    output = ConsultantModelOutput.model_validate(
+        _wire_payload(
+            current_id,
+            source_supersessions=[
+                {"superseded_source_handle": "source-001"},
+            ],
+        )
+    )
+
+    result = map_consultant_model_output(
+        output,
+        catalog=catalog,
+        current_source_id=current_id,
+    )
+
+    assert result.source_supersession is not None
+    assert result.source_supersession.superseded_source_id == old_id
+
+
+def test_exact_source_pair_replay_maps_its_already_superseded_target() -> None:
+    old_id = uuid4()
+    current_id = uuid4()
+    old = _source(old_id).model_copy(
+        update={
+            "validity": SourceValidity.SUPERSEDED,
+            "superseded_by_source_id": current_id,
+        }
+    )
+    current = _source(current_id).model_copy(
+        update={"supersedes_source_id": old_id}
+    )
+    catalog = _catalog_with_sources(
+        old,
+        current,
+        handle_registry={"source-001": old_id, "source-002": current_id},
+    )
+    payload = _wire_payload(
+        current_id,
+        source_supersessions=[
+            {"superseded_source_handle": "source-001"},
+        ],
+    )
+    payload["analysis_bases"] = [
+        {
+            "evidence": [
+                {
+                    "source_handle": "source-002",
+                    "quote": "整理採購需求",
+                    "occurrence": 0,
+                    "skill_ids": ["task-boundary"],
+                }
+            ]
+        }
+    ]
+    output = ConsultantModelOutput.model_validate(payload)
+
+    result = map_consultant_model_output(
+        output,
+        catalog=catalog,
+        current_source_id=current_id,
+    )
+
+    assert result.source_supersession is not None
+    assert result.source_supersession.superseded_source_id == old_id
+
+
+@pytest.mark.parametrize("handle", ["source-999", "duty-001"])
+def test_unknown_or_non_source_supersession_handle_is_rejected(handle: str) -> None:
+    current_id = uuid4()
+    catalog = WorkspaceCatalog.from_snapshot(
+        ApprovedJobDocument(document_id=DOCUMENT_ID),
+        sources=(_source(current_id),),
+        handle_registry={"source-001": current_id, "duty-001": uuid4()},
+    )
+    output = ConsultantModelOutput.model_validate(
+        _wire_payload(
+            current_id,
+            source_supersessions=[{"superseded_source_handle": handle}],
+        )
+    )
+
+    with pytest.raises(ConsultantOutputMappingError, match="source"):
+        map_consultant_model_output(
+            output,
+            catalog=catalog,
+            current_source_id=current_id,
+        )
+
+
+def test_supersession_cannot_target_the_current_answer_source() -> None:
+    current_id = uuid4()
+    output = ConsultantModelOutput.model_validate(
+        _wire_payload(
+            current_id,
+            source_supersessions=[{"superseded_source_handle": "source-001"}],
+        )
+    )
+
+    with pytest.raises(ConsultantOutputMappingError, match="itself"):
+        map_consultant_model_output(
+            output,
+            catalog=_catalog(current_id),
+            current_source_id=current_id,
+        )
+
+
+def test_supersession_cannot_target_an_already_superseded_source() -> None:
+    old_id = uuid4()
+    current_id = uuid4()
+    superseding_id = uuid4()
+    old = _source(old_id).model_copy(
+        update={
+            "validity": SourceValidity.SUPERSEDED,
+            "superseded_by_source_id": superseding_id,
+        }
+    )
+    catalog = _catalog_with_sources(
+        old,
+        _source(current_id),
+        handle_registry={"source-001": old_id, "source-002": current_id},
+    )
+    output = ConsultantModelOutput.model_validate(
+        _wire_payload(
+            current_id,
+            source_supersessions=[{"superseded_source_handle": "source-001"}],
+        )
+    )
+
+    with pytest.raises(ConsultantOutputMappingError, match="already"):
+        map_consultant_model_output(
+            output,
+            catalog=catalog,
+            current_source_id=current_id,
+        )
+
+
+def test_multiple_source_supersession_targets_are_rejected_by_the_wire_schema() -> None:
+    current_id = uuid4()
+
+    with pytest.raises(ValidationError) as error:
+        ConsultantModelOutput.model_validate(
+            _wire_payload(
+                current_id,
+                source_supersessions=[
+                    {"superseded_source_handle": "source-001"},
+                    {"superseded_source_handle": "source-002"},
+                ],
+            )
+        )
+    assert any(item["type"] == "too_long" for item in error.value.errors())
+
+
+def test_required_clarification_cannot_carry_source_supersession() -> None:
+    current_id = uuid4()
+    work_id = uuid4()
+    clarification = OutputQuestion(
+        kind=OutputQuestionKind.REQUIRED_CLARIFICATION,
+        text="請確認是哪一項工作？",
+        answer_target="",
+        reason="兩個舊來源都可能是你指的內容。",
+        current_understanding="目前無法唯一辨識更正目標。",
+        choices=("第一項", "第二項"),
+        affected_work_ids=(work_id,),
+        affected_branch="source-correction",
+        basis_ordinal=1,
+    )
+    output = ConsultantModelOutput.model_validate(
+        _wire_payload(
+            current_id,
+            source_supersessions=[{"superseded_source_handle": "source-001"}],
+            question=clarification.model_dump(mode="json"),
+        )
+    )
+
+    with pytest.raises(ConsultantOutputMappingError, match="clarification"):
+        map_consultant_model_output(
+            output,
+            catalog=_catalog(current_id),
+            current_source_id=current_id,
+        )

@@ -446,3 +446,78 @@ async def test_source_correction_only_challenges_dependent_understanding() -> No
     assert ordering_work["priority"] == InterviewPriority.CORRECTION.value
     assert ordering_work["status"] == InterviewWorkStatus.ACTIVE.value
     assert shortage_work["priority"] != InterviewPriority.CORRECTION.value
+
+
+@pytest.mark.asyncio
+async def test_semantic_commit_applies_source_correction_with_verified_result_once() -> None:
+    document_id = uuid4()
+    original_source = uuid4()
+    current_source = uuid4()
+    graph, _, _ = await _initialize(document_id)
+
+    state = await _register_source(
+        graph,
+        document_id,
+        revision=0,
+        source_id=original_source,
+    )
+    first_result = ConsultantResult(
+        visible_reply="我先記下這項工作理解。",
+        reply_basis=_basis(original_source),
+        understanding_changes=(
+            UnderstandingChange(
+                operation=UnderstandingOperation.ADD,
+                kind="task_hypothesis",
+                text="員工整理採購需求。",
+                basis=_basis(original_source),
+            ),
+        ),
+        sufficiency=_not_enough(original_source),
+    )
+    state = await _commit(
+        graph,
+        document_id,
+        revision=state["revision"],
+        source_id=original_source,
+        result=first_result,
+    )
+    state = await _register_source(
+        graph,
+        document_id,
+        revision=state["revision"],
+        source_id=current_source,
+    )
+    correction_result = ConsultantResult.model_validate(
+        {
+            **ConsultantResult(
+                visible_reply="我已依你剛才的更正重新檢查受影響理解。",
+                reply_basis=_basis(current_source),
+                sufficiency=_not_enough(current_source),
+            ).model_dump(mode="json"),
+            "source_supersession": {
+                "superseded_source_id": str(original_source),
+            },
+        }
+    )
+
+    corrected = await _commit(
+        graph,
+        document_id,
+        revision=state["revision"],
+        source_id=current_source,
+        result=correction_result,
+    )
+
+    assert corrected["source_count"] == 2
+    assert corrected["source_supersessions"] == {
+        str(original_source): str(current_source)
+    }
+    assert corrected["messages"][-1].content == (
+        "我已依你剛才的更正重新檢查受影響理解。"
+    )
+    understanding = tuple(corrected["understanding"].values())
+    assert len(understanding) == 2
+    assert {item["status"] for item in understanding} == {
+        UnderstandingStatus.SUPERSEDED.value,
+        UnderstandingStatus.CHALLENGED.value,
+    }

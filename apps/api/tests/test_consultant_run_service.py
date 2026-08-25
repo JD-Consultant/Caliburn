@@ -147,6 +147,7 @@ def _model_output(source_id: UUID) -> ConsultantModelOutput:
             affected_branch="",
             basis_ordinal=0,
         ),
+        source_supersessions=(),
         sufficiency=OutputSufficiency(
             currently_enough=True,
             reason="目前資訊足以保留這項工作。",

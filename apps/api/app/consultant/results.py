@@ -263,6 +263,12 @@ class SufficiencyRecommendation(ResultModel):
         return self
 
 
+class SourceSupersession(ResultModel):
+    """One validated prior employee source replaced by the current answer."""
+
+    superseded_source_id: UUID
+
+
 class ConsultantResult(ResultModel):
     """One coherent result owned by the single professional consultant."""
 
@@ -274,6 +280,7 @@ class ConsultantResult(ResultModel):
     next_question: NextQuestion | None = None
     required_clarification: RequiredClarificationDraft | None = None
     sufficiency: SufficiencyRecommendation
+    source_supersession: SourceSupersession | None = None
 
     @model_validator(mode="after")
     def every_claim_uses_a_declared_skill(self) -> ConsultantResult:
@@ -282,6 +289,13 @@ class ConsultantResult(ResultModel):
         if self.next_question is not None and self.required_clarification is not None:
             raise ValueError(
                 "required clarification replaces the ordinary next question"
+            )
+        if (
+            self.required_clarification is not None
+            and self.source_supersession is not None
+        ):
+            raise ValueError(
+                "required clarification cannot carry a source supersession"
             )
         return self
 

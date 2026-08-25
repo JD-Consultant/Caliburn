@@ -55,6 +55,8 @@ SKILLS_SYSTEM_PROMPT = """## Caliburn 專業分析方法
 - `question.kind=none` 時其他 question 欄位全為空、`basis_ordinal=0`。
 - 一般下一題（next）只填 `text`、`answer_target`、`reason`、`basis_ordinal`；`current_understanding、choices、affected_work_ids、affected_branch 全部留空`。
 - 必要澄清（required_clarification）才填 `current_understanding`、2–3 個 `choices`、既有 `affected_work_ids` 與 `affected_branch`，且 `answer_target` 留空。
+- 只有員工明確取代一則唯一可辨識的較早原話時，`source_supersessions` 才填一個舊 source handle；補充或限定不填。
+- 若多個舊來源都可能是目標，填 `required_clarification` 並讓 `source_supersessions` 保持空陣列；不要猜測或填 UUID。
 """
 
 

@@ -22,9 +22,10 @@ import {
   GuardedLink,
   UnsavedChangesGuard,
 } from "@/shared/ui/UnsavedChangesGuard";
-import { ApprovedDocumentEditor } from "./ApprovedDocumentEditor";
 import { ConsultantConversation } from "./ConsultantConversation";
 import { ConsultantInsightPanel } from "./ConsultantInsightPanel";
+import { ConsultantWorkMap } from "./ConsultantWorkMap";
+import { CurrentDocumentEditor } from "./CurrentDocumentEditor";
 import { DocumentReviewPanel } from "./DocumentReviewPanel";
 import { shouldRefetchForEvent } from "./consultantWorkspaceModel";
 
@@ -46,6 +47,8 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   const snapshotQuery = useQuery(consultantSnapshotQueryOptions(documentId));
   const [documentDirty, setDocumentDirty] = useState(false);
   const [showForceExport, setShowForceExport] = useState(false);
+  const [workMapOpen, setWorkMapOpen] = useState(true);
+  const [interviewOpen, setInterviewOpen] = useState(true);
   const [streamState, setStreamState] = useState<"connecting" | "live" | "reconnecting">("connecting");
   const revisionRef = useRef(-1);
 
@@ -95,7 +98,7 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   if (metadata.isPending || snapshotQuery.isPending) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-stone-50 text-sm text-stone-500">
-        正在恢復先前的訪談與正式文件…
+        正在恢復先前的訪談與目前 JD…
       </div>
     );
   }
@@ -115,7 +118,15 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   }
 
   const snapshot = snapshotQuery.data;
-  const title = metadata.data?.title ?? snapshot.approved_document.job_title ?? "職務分析";
+  const title = metadata.data?.title ?? snapshot.current_document.job_title ?? "職務分析";
+  const layout = `${workMapOpen ? "work-map-" : ""}document${interviewOpen ? "-interview" : ""}`;
+  const gridColumns = workMapOpen && interviewOpen
+    ? "xl:grid-cols-[minmax(210px,0.28fr)_minmax(0,1fr)_minmax(340px,0.48fr)]"
+    : workMapOpen
+      ? "xl:grid-cols-[minmax(210px,0.28fr)_minmax(0,1fr)]"
+      : interviewOpen
+        ? "xl:grid-cols-[minmax(0,1fr)_minmax(340px,0.48fr)]"
+        : "xl:grid-cols-1";
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-950">
@@ -187,7 +198,7 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
       {documentDirty ? (
         <div className="mx-auto max-w-[1500px] px-5 pt-4 lg:px-8">
           <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-950">
-            正式文件有未儲存修改；儲存或取消後才能離頁與匯出。
+            目前 JD 有未儲存修改；儲存或取消後才能離頁與匯出。
           </p>
         </div>
       ) : null}
@@ -199,18 +210,83 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
         </div>
       ) : null}
 
-      <main className="mx-auto max-w-[1500px] space-y-9 px-5 py-7 lg:px-8">
-        <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
-          <ConsultantConversation documentId={documentId} snapshot={snapshot} />
-          <ConsultantInsightPanel documentId={documentId} snapshot={snapshot} />
+      <main
+        data-layout={layout}
+        className="mx-auto max-w-[1500px] space-y-9 px-5 py-7 lg:px-8"
+      >
+        {!workMapOpen || !interviewOpen ? (
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div>
+              {!workMapOpen ? (
+                <Button
+                  variant="outline"
+                  aria-expanded={false}
+                  onClick={() => setWorkMapOpen(true)}
+                >
+                  開啟工作地圖
+                </Button>
+              ) : null}
+            </div>
+            <div>
+              {!interviewOpen ? (
+                <Button
+                  variant="outline"
+                  aria-expanded={false}
+                  onClick={() => setInterviewOpen(true)}
+                >
+                  開啟訪談
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        ) : null}
+        <div className={`grid grid-cols-1 items-start gap-6 ${gridColumns}`}>
+          {workMapOpen ? (
+            <ConsultantWorkMap
+              snapshot={snapshot}
+              onToggle={() => setWorkMapOpen(false)}
+            />
+          ) : null}
+          <div className="min-w-0">
+            <CurrentDocumentEditor
+              key={documentId}
+              documentId={documentId}
+              snapshot={snapshot}
+              onDirtyChange={setDocumentDirty}
+            />
+          </div>
+          {interviewOpen ? (
+            <aside aria-label="訪談" className="min-w-0">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold tracking-[0.16em] text-stone-500 uppercase">
+                    AI 職務分析顧問
+                  </p>
+                  <h2 className="mt-1 font-semibold">訪談</h2>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  aria-expanded={true}
+                  onClick={() => setInterviewOpen(false)}
+                >
+                  收合訪談
+                </Button>
+              </div>
+              <div className="space-y-6">
+                <ConsultantConversation
+                  documentId={documentId}
+                  snapshot={snapshot}
+                />
+                <ConsultantInsightPanel
+                  documentId={documentId}
+                  snapshot={snapshot}
+                />
+              </div>
+            </aside>
+          ) : null}
         </div>
         <DocumentReviewPanel documentId={documentId} snapshot={snapshot} />
-        <ApprovedDocumentEditor
-          key={documentId}
-          documentId={documentId}
-          snapshot={snapshot}
-          onDirtyChange={setDocumentDirty}
-        />
       </main>
     </div>
   );

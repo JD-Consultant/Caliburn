@@ -1,17 +1,17 @@
 // @vitest-environment jsdom
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import { act, cleanup, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { DocumentPatchActionView } from "@caliburn/job-analysis-contract";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { jobAnalysisKeys } from "@/shared/query/jobAnalysisQueries";
-import { ApprovedDocumentEditor } from "./ApprovedDocumentEditor";
 import { ConsultantConversation } from "./ConsultantConversation";
 import { ConsultantInsightPanel } from "./ConsultantInsightPanel";
 import { ConsultantWorkspace } from "./ConsultantWorkspace";
+import { CurrentDocumentEditor } from "./CurrentDocumentEditor";
 import { DocumentReviewPanel } from "./DocumentReviewPanel";
 import {
   DOCUMENT_ID,
@@ -51,6 +51,123 @@ function renderWithClient(ui: ReactNode, client = new QueryClient()) {
   };
 }
 
+function hierarchicalSnapshotFixture() {
+  const snapshot = consultantSnapshotFixture();
+  const sourceId = snapshot.latest_source_id!;
+  const dutyId = "00000000-0000-0000-0000-000000000101";
+  const emptyDutyId = "00000000-0000-0000-0000-000000000102";
+  const taskId = "00000000-0000-0000-0000-000000000103";
+  const unassignedTaskId = "00000000-0000-0000-0000-000000000104";
+
+  snapshot.current_document = {
+    ...snapshot.current_document,
+    duties: [
+      { duty_id: dutyId, statement: "客戶服務", display_order: 0 },
+      { duty_id: emptyDutyId, statement: "行政管理", display_order: 1 },
+    ],
+    tasks: [
+      {
+        task_id: taskId,
+        duty_id: dutyId,
+        statement: "處理申訴案件",
+        action: "處理",
+        object: "客戶申訴",
+        purpose_result: "維持服務品質",
+        context: null,
+        frequency_text: "每日",
+        responsibility_role: "primary",
+        enablers: [],
+        display_order: 0,
+        competency_level: null,
+      },
+      {
+        task_id: unassignedTaskId,
+        duty_id: null,
+        statement: "尚待歸類的工作",
+        action: "追蹤",
+        object: "待確認事項",
+        purpose_result: null,
+        context: null,
+        frequency_text: null,
+        responsibility_role: null,
+        enablers: [],
+        display_order: 1,
+        competency_level: null,
+      },
+    ],
+    opks: [
+      {
+        item_id: "00000000-0000-0000-0000-000000000105",
+        kind: "output",
+        text: "完成申訴處理",
+        display_order: 0,
+        task_ids: [taskId],
+        indicator_ids: [],
+        evidence_source_ids: [sourceId],
+      },
+      {
+        item_id: "00000000-0000-0000-0000-000000000106",
+        kind: "indicator",
+        text: "回覆時效",
+        display_order: 0,
+        task_ids: [taskId],
+        indicator_ids: [],
+        evidence_source_ids: [sourceId],
+      },
+      {
+        item_id: "00000000-0000-0000-0000-000000000107",
+        kind: "knowledge",
+        text: "客訴處理規範",
+        display_order: 0,
+        task_ids: [taskId, unassignedTaskId],
+        indicator_ids: [],
+        evidence_source_ids: [sourceId],
+      },
+      {
+        item_id: "00000000-0000-0000-0000-000000000108",
+        kind: "skill",
+        text: "溝通協調",
+        display_order: 0,
+        task_ids: [taskId, unassignedTaskId],
+        indicator_ids: [],
+        evidence_source_ids: [sourceId],
+      },
+      {
+        item_id: "00000000-0000-0000-0000-000000000109",
+        kind: "attitude",
+        text: "耐心",
+        display_order: 0,
+        task_ids: [],
+        indicator_ids: [],
+        evidence_source_ids: [sourceId],
+      },
+    ],
+  };
+  snapshot.approved_document = structuredClone(snapshot.current_document);
+  return snapshot;
+}
+
+function seedWorkspace(client: QueryClient, snapshot: ReturnType<typeof consultantSnapshotFixture>) {
+  client.setQueryData(jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID), snapshot);
+  client.setQueryData(jobAnalysisKeys.consultantDocument(DOCUMENT_ID), {
+    document_id: DOCUMENT_ID,
+    title: "採購專員訪談",
+    created_at: "2026-08-14T10:00:00Z",
+    updated_at: "2026-08-14T10:00:02Z",
+  });
+}
+
+function renderWorkspaceFixture(
+  snapshot = hierarchicalSnapshotFixture(),
+  client = new QueryClient({
+    defaultOptions: { queries: { staleTime: Infinity, retry: false } },
+  }),
+) {
+  seedWorkspace(client, snapshot);
+  vi.stubGlobal("EventSource", FakeEventSource);
+  return renderWithClient(<ConsultantWorkspace documentId={DOCUMENT_ID} />, client);
+}
+
 afterEach(() => {
   cleanup();
   localStorage.clear();
@@ -59,6 +176,216 @@ afterEach(() => {
 });
 
 describe("employee consultant workspace integration", () => {
+  it("renders one current-JD hierarchy with unassigned work and shared K/S", () => {
+    renderWorkspaceFixture();
+
+    expect(screen.getByRole("heading", { name: "目前 JD" })).toBeTruthy();
+    const duty = screen.getByRole("region", { name: "Duty 1 客戶服務" });
+    expect(
+      within(duty).getByRole("heading", { name: "處理申訴案件" }),
+    ).toBeTruthy();
+    const unassigned = screen.getByRole("region", { name: "尚未歸屬" });
+    expect(
+      within(unassigned).getByRole("heading", { name: "尚待歸類的工作" }),
+    ).toBeTruthy();
+    expect(screen.getAllByText("共用於 2 項工作").length).toBeGreaterThan(0);
+    expect(screen.queryByRole("heading", { name: /AI 草稿/ })).toBeNull();
+  });
+
+  it("keeps structural editing inside the current-JD hierarchy", async () => {
+    const user = userEvent.setup();
+    renderWorkspaceFixture();
+
+    await user.click(screen.getByRole("button", { name: "新增工作" }));
+    const unassigned = screen.getByRole("region", { name: "尚未歸屬" });
+    expect(
+      within(unassigned).getByRole("article", { name: "Task 3 新工作" }),
+    ).toBeTruthy();
+
+    await user.selectOptions(screen.getByLabelText("Task 3 所屬職責"), [
+      "客戶服務",
+    ]);
+    const duty = screen.getByRole("region", { name: "Duty 1 客戶服務" });
+    const movedTask = within(duty).getByRole("article", {
+      name: "Task 3 新工作",
+    });
+    await user.click(
+      within(movedTask).getByRole("button", { name: "新增產出 O" }),
+    );
+    expect(
+      within(movedTask).getByLabelText("Task 3 O 1 內容"),
+    ).toBeTruthy();
+  });
+
+  it("does not guess a Task when an unassigned K or S becomes O or P", async () => {
+    const user = userEvent.setup();
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          type: "https://caliburn.dev/problems/job-analysis/invalid-request",
+          title: "Invalid request",
+          status: 422,
+        }),
+        {
+          status: 422,
+          headers: { "Content-Type": "application/problem+json" },
+        },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWorkspaceFixture();
+
+    const unassigned = screen.getByRole("region", { name: "尚未歸屬" });
+    await user.click(
+      within(unassigned).getByRole("button", { name: "未歸屬 K" }),
+    );
+    await user.selectOptions(
+      within(unassigned).getByLabelText("尚未歸屬 K 1 類型"),
+      "output",
+    );
+
+    expect(
+      (
+        within(unassigned).getByLabelText(
+          "尚未歸屬 O 1 連結工作",
+        ) as HTMLSelectElement
+      ).value,
+    ).toBe("");
+
+    await user.click(screen.getByRole("button", { name: "儲存目前 JD" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    const request = fetchMock.mock.calls[0][1] as RequestInit;
+    const body = JSON.parse(String(request.body));
+    expect(body.document.opks.at(-1)).toMatchObject({
+      kind: "output",
+      task_ids: [],
+    });
+    expect(screen.getByRole("alert").textContent).toContain(
+      "送出的內容無法處理",
+    );
+  });
+
+  it("collapses interview and work-map columns without hiding unassigned work", async () => {
+    const user = userEvent.setup();
+    renderWorkspaceFixture();
+    const main = screen.getByRole("main");
+
+    expect(main.getAttribute("data-layout")).toBe(
+      "work-map-document-interview",
+    );
+    expect(
+      screen.getByRole("region", { name: "AI 職務分析顧問對話" }),
+    ).toBeTruthy();
+    await user.click(screen.getByRole("button", { name: "收合訪談" }));
+    expect(main.getAttribute("data-layout")).toBe("work-map-document");
+    expect(screen.getByRole("button", { name: "開啟訪談" })).toBeTruthy();
+    expect(
+      screen.queryByRole("region", { name: "AI 職務分析顧問對話" }),
+    ).toBeNull();
+    expect(screen.getByRole("region", { name: "尚未歸屬" })).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: "收合工作地圖" }));
+    expect(main.getAttribute("data-layout")).toBe("document");
+    expect(screen.getByRole("button", { name: "開啟工作地圖" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "尚未歸屬" })).toBeTruthy();
+  });
+
+  it("saves the current JD with the exact revision and workspace guards", async () => {
+    const user = userEvent.setup();
+    const snapshot = hierarchicalSnapshotFixture();
+    const response = structuredClone(snapshot);
+    response.revision += 1;
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWorkspaceFixture(snapshot);
+
+    const title = screen.getByLabelText("職務名稱");
+    await user.clear(title);
+    await user.type(title, "資深客服專員");
+    await user.click(screen.getByRole("button", { name: "儲存目前 JD" }));
+
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(
+          (call) => (call[1] as RequestInit).method === "PUT",
+        ),
+      ).toBe(true),
+    );
+    const request = fetchMock.mock.calls.find(
+      (call) => (call[1] as RequestInit).method === "PUT",
+    )?.[1] as RequestInit;
+    const headers = new Headers(request.headers);
+    const body = JSON.parse(String(request.body));
+    expect(headers.get("X-Expected-Revision")).toBe(String(snapshot.revision));
+    expect(body).toMatchObject({
+      workspace_generation: snapshot.document_review.workspace_generation,
+      workspace_digest: snapshot.document_review.workspace_digest,
+    });
+    expect(body.document.job_title).toBe("資深客服專員");
+  });
+
+  it("keeps a 409 draft and offers a reload action", async () => {
+    const user = userEvent.setup();
+    const snapshot = hierarchicalSnapshotFixture();
+    const fetchMock = vi.fn().mockImplementation(
+      (_input: RequestInfo | URL, init?: RequestInit) => {
+        if (init?.method === "PUT") {
+          return Promise.resolve(
+            new Response(
+              JSON.stringify({
+                type: "https://caliburn.dev/problems/job-analysis/authority-conflict",
+                title: "Document revision changed",
+                status: 409,
+              }),
+              {
+                status: 409,
+                headers: { "Content-Type": "application/json" },
+              },
+            ),
+          );
+        }
+        const url = String(_input);
+        const payload = url.endsWith("/snapshot")
+          ? snapshot
+          : {
+              document_id: DOCUMENT_ID,
+              title: "採購專員訪談",
+              created_at: "2026-08-14T10:00:00Z",
+              updated_at: "2026-08-14T10:00:02Z",
+            };
+        return Promise.resolve(
+          new Response(JSON.stringify(payload), {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          }),
+        );
+      },
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWorkspaceFixture(snapshot);
+
+    const title = screen.getByLabelText("職務名稱");
+    await user.clear(title);
+    await user.type(title, "保留中的 JD 草稿");
+    await user.click(screen.getByRole("button", { name: "儲存目前 JD" }));
+
+    const editor = screen.getByRole("region", { name: "目前 JD 編輯器" });
+    expect((await within(editor).findByRole("alert")).textContent).toContain(
+      "草稿仍保留",
+    );
+    expect((screen.getByLabelText("職務名稱") as HTMLInputElement).value).toBe(
+      "保留中的 JD 草稿",
+    );
+    expect(
+      screen.getByRole("button", { name: "重新載入並捨棄草稿" }),
+    ).toBeTruthy();
+  });
+
   it("shows durable question focus and workspace-derived employee decision progress", () => {
     const snapshot = consultantSnapshotFixture();
     snapshot.current_interview = null;
@@ -135,7 +462,7 @@ describe("employee consultant workspace integration", () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
     const first = renderWithClient(
-      <ApprovedDocumentEditor
+      <CurrentDocumentEditor
         documentId={DOCUMENT_ID}
         snapshot={snapshot}
         onDirtyChange={() => undefined}
@@ -147,7 +474,7 @@ describe("employee consultant workspace integration", () => {
     first.unmount();
 
     renderWithClient(
-      <ApprovedDocumentEditor
+      <CurrentDocumentEditor
         documentId={DOCUMENT_ID}
         snapshot={snapshot}
         onDirtyChange={() => undefined}
@@ -890,7 +1217,7 @@ describe("employee consultant workspace integration", () => {
       ),
     );
     renderWithClient(
-      <ApprovedDocumentEditor
+      <CurrentDocumentEditor
         documentId={DOCUMENT_ID}
         snapshot={snapshot}
         onDirtyChange={() => undefined}
@@ -900,7 +1227,7 @@ describe("employee consultant workspace integration", () => {
     const title = screen.getByLabelText("職務名稱");
     await user.clear(title);
     await user.type(title, "資深採購專員");
-    await user.click(screen.getByRole("button", { name: "儲存正式文件" }));
+    await user.click(screen.getByRole("button", { name: "儲存目前 JD" }));
 
     expect((await screen.findByRole("alert")).textContent).toContain("草稿仍保留");
     expect((screen.getByLabelText("職務名稱") as HTMLInputElement).value).toBe(

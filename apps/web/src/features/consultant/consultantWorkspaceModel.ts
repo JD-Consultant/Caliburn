@@ -7,6 +7,144 @@ import type {
   DocumentReviewDecisionWrite,
 } from "@caliburn/job-analysis-contract";
 
+type CurrentDocumentDuty = ApprovedJobDocumentView["duties"][number];
+type CurrentDocumentTask = ApprovedJobDocumentView["tasks"][number];
+type CurrentDocumentItem =
+  | ApprovedJobDocumentView["opks"][number]
+  | ApprovedJobDocumentWrite["opks"][number];
+
+export type CurrentDocumentOutlineItem = {
+  item: CurrentDocumentItem;
+  label: string;
+  sharedTaskCount: number;
+};
+
+export type CurrentDocumentOutlineTask = {
+  task: CurrentDocumentTask;
+  label: string;
+  items: CurrentDocumentOutlineItem[];
+};
+
+export type CurrentDocumentOutlineDuty = {
+  duty: CurrentDocumentDuty;
+  tasks: CurrentDocumentOutlineTask[];
+};
+
+export type CurrentDocumentOutlineModel = {
+  duties: CurrentDocumentOutlineDuty[];
+  unassignedTasks: CurrentDocumentOutlineTask[];
+  unassignedItems: CurrentDocumentOutlineItem[];
+  documentItems: CurrentDocumentOutlineItem[];
+};
+
+const currentDocumentItemKindLabels = {
+  output: "O",
+  indicator: "P",
+  knowledge: "K",
+  skill: "S",
+  attitude: "A",
+} as const;
+
+function currentDocumentItemLabel(
+  kind: CurrentDocumentItem["kind"],
+  ordinal: number,
+): string {
+  return `${currentDocumentItemKindLabels[kind]} ${ordinal}`;
+}
+
+function sortByDisplayOrder<T extends { display_order: number }>(values: T[]): T[] {
+  return [...values].sort((left, right) => left.display_order - right.display_order);
+}
+
+function outlineItemsForTask(
+  task: CurrentDocumentTask,
+  items: CurrentDocumentItem[],
+): CurrentDocumentOutlineItem[] {
+  const ordinals = new Map<CurrentDocumentItem["kind"], number>();
+  return sortByDisplayOrder(
+    items.filter((item) => item.task_ids.includes(task.task_id)),
+  ).map((item) => {
+    const ordinal = (ordinals.get(item.kind) ?? 0) + 1;
+    ordinals.set(item.kind, ordinal);
+    return {
+      item,
+      label: currentDocumentItemLabel(item.kind, ordinal),
+      sharedTaskCount:
+        ["knowledge", "skill"].includes(item.kind) ? item.task_ids.length : 0,
+    };
+  });
+}
+
+/**
+ * Builds only the employee-facing projection of the current document.
+ * It groups existing records for display and intentionally does not repair,
+ * validate, or infer Duty/Task/OPKS relationships.
+ */
+export function buildCurrentDocumentOutline(
+  document: ApprovedJobDocumentView | ApprovedJobDocumentWrite,
+): CurrentDocumentOutlineModel {
+  const duties = sortByDisplayOrder(document.duties);
+  const tasks = sortByDisplayOrder(document.tasks);
+  const items = sortByDisplayOrder(document.opks);
+  const taskIds = new Set(tasks.map((task) => task.task_id));
+  const taskLabels = new Map(
+    tasks.map((task, index) => [task.task_id, `Task ${index + 1}`]),
+  );
+  const taskItems = items.filter((item) => item.kind !== "attitude");
+  const toTask = (task: CurrentDocumentTask): CurrentDocumentOutlineTask => ({
+    task,
+    label: taskLabels.get(task.task_id) ?? "Task",
+    items: outlineItemsForTask(task, taskItems),
+  });
+
+  const assignedTaskIds = new Set<string>();
+  const dutyGroups = duties.map((duty) => {
+    const dutyTasks = tasks.filter((task) => task.duty_id === duty.duty_id);
+    dutyTasks.forEach((task) => assignedTaskIds.add(task.task_id));
+    return {
+      duty,
+      tasks: dutyTasks.map(toTask),
+    };
+  });
+
+  const unassignedTasks = tasks
+    .filter((task) => !task.duty_id || !assignedTaskIds.has(task.task_id))
+    .map(toTask);
+  const unassignedOrdinals = new Map<CurrentDocumentItem["kind"], number>();
+  const unassignedItems = taskItems
+    .filter(
+      (item) =>
+        item.task_ids.length === 0 ||
+        !item.task_ids.some((id) => taskIds.has(id)),
+    )
+    .map((item) => {
+      const ordinal = (unassignedOrdinals.get(item.kind) ?? 0) + 1;
+      unassignedOrdinals.set(item.kind, ordinal);
+      return {
+        item,
+        label: currentDocumentItemLabel(item.kind, ordinal),
+        sharedTaskCount:
+          ["knowledge", "skill"].includes(item.kind)
+            ? item.task_ids.length
+            : 0,
+      };
+    });
+  const documentItems = items
+    .filter((item) => item.kind === "attitude")
+    .map((item, index) => ({
+      item,
+      label: currentDocumentItemLabel(item.kind, index + 1),
+      sharedTaskCount: 0,
+    }));
+
+  return {
+    duties: dutyGroups,
+    unassignedTasks,
+    unassignedItems,
+    documentItems,
+  };
+}
+
 export const EXTERNAL_AI_DISCLOSURE =
   "你的訪談內容會送往已設定的外部 AI 服務協助分析；AI 產生的文件內容必須經過你確認，才會進入正式文件。";
 
@@ -265,59 +403,6 @@ export function toApprovedDocumentWrite(
       task_ids: [...item.task_ids],
       indicator_ids: [...item.indicator_ids],
     })),
-  };
-}
-
-export function pruneApprovedDocumentRelations(
-  value: ApprovedJobDocumentWrite,
-): ApprovedJobDocumentWrite {
-  const taskIds = new Set(value.tasks.map((task) => task.task_id));
-  const indicatorIds = new Set(
-    value.opks
-      .filter((item) => item.kind === "indicator")
-      .map((item) => item.item_id),
-  );
-  return {
-    ...value,
-    opks: value.opks.map((item) => {
-      if (item.kind === "attitude") {
-        return { ...item, task_ids: [], indicator_ids: [] };
-      }
-      return {
-        ...item,
-        task_ids: item.task_ids.filter((taskId) => taskIds.has(taskId)),
-        indicator_ids:
-          item.kind === "knowledge" || item.kind === "skill"
-            ? item.indicator_ids.filter((indicatorId) =>
-                indicatorIds.has(indicatorId),
-              )
-            : [],
-      };
-    }),
-  };
-}
-
-export function reconcileDocumentDraft(
-  draft: ApprovedJobDocumentWrite,
-  dirty: boolean,
-  baselineRevision: number,
-  snapshot: ConsultantSnapshotView,
-): {
-  draft: ApprovedJobDocumentWrite;
-  baselineRevision: number;
-  conflict: boolean;
-} {
-  if (dirty) {
-    return {
-      draft,
-      baselineRevision,
-      conflict: snapshot.revision > baselineRevision,
-    };
-  }
-  return {
-    draft: toApprovedDocumentWrite(snapshot.approved_document),
-    baselineRevision: snapshot.revision,
-    conflict: false,
   };
 }
 

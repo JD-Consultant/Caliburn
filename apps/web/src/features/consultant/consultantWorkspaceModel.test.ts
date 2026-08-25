@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import type {
-  ApprovedJobDocumentWrite,
   ConsultantSnapshotEvent,
   ConsultantSnapshotView,
   DocumentChangeSetView,
@@ -9,14 +8,13 @@ import type {
 import {
   EXTERNAL_AI_DISCLOSURE,
   buildConversationEntries,
+  buildCurrentDocumentOutline,
   buildReviewDecision,
   consultantRunStatus,
   documentPathLabel,
   interviewWorkStatusLabel,
-  pruneApprovedDocumentRelations,
   reviewSelectionForAction,
   reviewSelectionForDecision,
-  reconcileDocumentDraft,
   shouldRefetchForEvent,
   toApprovedDocumentWrite,
   understandingStatusLabel,
@@ -356,24 +354,6 @@ describe("employee-facing consultant workspace model", () => {
     ]);
   });
 
-  it("never lets a background refetch overwrite a dirty approved-document draft", () => {
-    const original = toApprovedDocumentWrite(snapshot().approved_document);
-    const dirty: ApprovedJobDocumentWrite = { ...original, job_title: "員工尚未儲存的名稱" };
-    const newer = { ...snapshot(), revision: 4 };
-
-    expect(reconcileDocumentDraft(dirty, true, 3, newer)).toEqual({
-      draft: dirty,
-      baselineRevision: 3,
-      conflict: true,
-    });
-    expect(reconcileDocumentDraft(dirty, false, 3, newer)).toEqual({
-      draft: toApprovedDocumentWrite(newer.approved_document),
-      baselineRevision: 4,
-      conflict: false,
-    });
-    expect(original.opks[0]).not.toHaveProperty("evidence_source_ids");
-  });
-
   it("uses SSE only as a newer-revision refetch hint", () => {
     const newer: ConsultantSnapshotEvent = {
       event: "snapshot_changed",
@@ -394,17 +374,35 @@ describe("employee-facing consultant workspace model", () => {
     expect(consultantRunStatus(value)).toEqual({ busy: false, text: "分析未完成；你的回答已保存，可以重試。" });
   });
 
-  it("removes dangling Task and indicator references before a direct edit is saved", () => {
-    const value = toApprovedDocumentWrite(snapshot().approved_document);
-    const taskId = "00000000-0000-0000-0000-000000000020";
-    const indicatorId = "00000000-0000-0000-0000-000000000021";
-    value.tasks = [
+  it("keeps task labels stable across grouping and numbers unassigned items per kind", () => {
+    const document = toApprovedDocumentWrite(snapshot().current_document);
+    const dutyId = "00000000-0000-0000-0000-000000000020";
+    const unassignedTaskId = "00000000-0000-0000-0000-000000000021";
+    const assignedTaskId = "00000000-0000-0000-0000-000000000022";
+    document.duties = [
+      { duty_id: dutyId, statement: "採購管理", display_order: 0 },
+    ];
+    document.tasks = [
       {
-        task_id: taskId,
+        task_id: assignedTaskId,
+        duty_id: dutyId,
+        statement: "覆核採購",
+        action: "覆核",
+        object: "採購內容",
+        purpose_result: null,
+        context: null,
+        frequency_text: null,
+        responsibility_role: null,
+        enablers: [],
+        display_order: 1,
+        competency_level: null,
+      },
+      {
+        task_id: unassignedTaskId,
         duty_id: null,
-        statement: "追查差異",
-        action: "追查",
-        object: "月結差異",
+        statement: "盤點需求",
+        action: "盤點",
+        object: "需求",
         purpose_result: null,
         context: null,
         frequency_text: null,
@@ -414,39 +412,42 @@ describe("employee-facing consultant workspace model", () => {
         competency_level: null,
       },
     ];
-    value.opks = [
+    document.opks = [
       {
-        item_id: indicatorId,
-        kind: "indicator",
-        text: "差異在兩日內釐清",
+        item_id: "00000000-0000-0000-0000-000000000023",
+        kind: "knowledge",
+        text: "知識一",
         display_order: 0,
-        task_ids: [taskId],
+        task_ids: [],
         indicator_ids: [],
       },
       {
-        item_id: "00000000-0000-0000-0000-000000000022",
-        kind: "knowledge",
-        text: "月結流程",
+        item_id: "00000000-0000-0000-0000-000000000024",
+        kind: "skill",
+        text: "技能一",
         display_order: 0,
-        task_ids: [taskId, "00000000-0000-0000-0000-000000000099"],
-        indicator_ids: [indicatorId, "00000000-0000-0000-0000-000000000098"],
+        task_ids: [],
+        indicator_ids: [],
       },
       {
-        item_id: "00000000-0000-0000-0000-000000000023",
-        kind: "attitude",
-        text: "謹慎",
-        display_order: 0,
-        task_ids: [taskId],
-        indicator_ids: [indicatorId],
+        item_id: "00000000-0000-0000-0000-000000000025",
+        kind: "knowledge",
+        text: "知識二",
+        display_order: 1,
+        task_ids: [],
+        indicator_ids: [],
       },
     ];
 
-    const normalized = pruneApprovedDocumentRelations(value);
+    const outline = buildCurrentDocumentOutline(document);
 
-    expect(normalized.opks[1].task_ids).toEqual([taskId]);
-    expect(normalized.opks[1].indicator_ids).toEqual([indicatorId]);
-    expect(normalized.opks[2].task_ids).toEqual([]);
-    expect(normalized.opks[2].indicator_ids).toEqual([]);
+    expect(outline.duties[0].tasks[0].label).toBe("Task 2");
+    expect(outline.unassignedTasks[0].label).toBe("Task 1");
+    expect(outline.unassignedItems.map((item) => item.label)).toEqual([
+      "K 1",
+      "S 1",
+      "K 2",
+    ]);
   });
 
   it("keeps internal enum and JSON-pointer names out of the employee wording", () => {

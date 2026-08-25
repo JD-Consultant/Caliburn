@@ -32,6 +32,7 @@ from app.consultant.understanding import (
 )
 from app.consultant.workspace_review import WorkspaceReviewProjection
 from app.consultant.workspace_state import (
+    Sha256Digest,
     WorkspaceDiagnostic,
     WorkspaceDiagnosticSeverity,
     WorkspaceValidationStatus,
@@ -62,6 +63,7 @@ class WorkspaceReviewStatus(StrEnum):
 
 class DocumentReviewProjection(DurableModel):
     workspace_generation: int = Field(ge=0)
+    workspace_digest: Sha256Digest
     workspace_status: WorkspaceReviewStatus
     diagnostics: tuple[WorkspaceDiagnostic, ...] = ()
     bundles: tuple[DocumentChangeSet, ...] = ()
@@ -90,6 +92,7 @@ class ConsultantSnapshot(DurableModel):
     # Store-derived only: a checkpoint snapshot cannot truthfully describe
     # workspace generation, validation, or diagnostics before Store is read.
     document_review: DocumentReviewProjection | None = None
+    current_document: ApprovedJobDocument | None = None
     approved_document: ApprovedJobDocument
     required_clarification: RequiredClarification | None = None
     sufficiency: SufficiencyProjection
@@ -170,6 +173,7 @@ def document_review_projection_from_workspace(
     )
     return DocumentReviewProjection(
         workspace_generation=workspace_generation,
+        workspace_digest=workspace_review.workspace_digest,
         workspace_status=status,
         diagnostics=diagnostics,
         bundles=bundles,
@@ -208,6 +212,7 @@ def snapshot_from_state(state: ConsultantThreadState) -> ConsultantSnapshot:
             "gaps": state.get("gaps", {}),
             "semantic_progress": semantic_progress_from_state(state),
             "document_review": None,
+            "current_document": None,
             "approved_document": state["approved_document"],
             "required_clarification": state.get("required_clarification"),
             "sufficiency": sufficiency_projection_from_state(state),

@@ -29,6 +29,10 @@ TYPESCRIPT_PATH = (
 )
 
 
+def schema() -> dict:
+    return json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
+
+
 def test_consultant_contract_covers_the_durable_employee_workspace() -> None:
     definitions = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))["$defs"]
 
@@ -54,6 +58,17 @@ def test_consultant_contract_covers_the_durable_employee_workspace() -> None:
     assert '"finish' not in serialized
 
 
+def test_snapshot_contract_exposes_current_document_and_guarded_edit() -> None:
+    snapshot = schema()["$defs"]["ConsultantSnapshotView"]
+    review = schema()["$defs"]["DocumentReviewView"]
+    direct_edit = schema()["$defs"]["DirectDocumentEditWrite"]
+    assert "current_document" in snapshot["required"]
+    assert "workspace_digest" in review["required"]
+    assert {"document", "workspace_generation", "workspace_digest"} <= set(
+        direct_edit["required"]
+    )
+
+
 def test_document_review_contract_exposes_workspace_status_without_old_action_lifecycle() -> None:
     diagnostic = WorkspaceDiagnosticView(
         code="json-syntax",
@@ -68,6 +83,7 @@ def test_document_review_contract_exposes_workspace_status_without_old_action_li
     ):
         review = DocumentReviewView(
             workspace_generation=7,
+            workspace_digest="a" * 64,
             workspace_status=status,
             diagnostics=diagnostics,
             bundles=[],

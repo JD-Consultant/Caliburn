@@ -209,6 +209,11 @@ def to_consultant_snapshot_view(
         raise ValueError(
             "Store-derived document review must be loaded before public projection"
         )
+    current_document = snapshot.current_document
+    if current_document is None:
+        raise ValueError(
+            "Store-derived current document must be loaded before public projection"
+        )
     return ConsultantSnapshotView(
         document_id=snapshot.document_id,
         revision=snapshot.revision,
@@ -261,6 +266,7 @@ def to_consultant_snapshot_view(
                     for bundle in review.bundles
                 ],
                 "workspace_generation": review.workspace_generation,
+                "workspace_digest": review.workspace_digest,
                 "workspace_status": review.workspace_status.value,
                 "diagnostics": [
                     _employee_workspace_diagnostic(item).model_dump(mode="json")
@@ -286,6 +292,9 @@ def to_consultant_snapshot_view(
         ),
         sufficiency=SufficiencyView.model_validate(
             snapshot.sufficiency.model_dump(mode="json")
+        ),
+        current_document=ApprovedJobDocumentView.model_validate(
+            current_document.model_dump(mode="json")
         ),
         approved_document=ApprovedJobDocumentView.model_validate(
             snapshot.approved_document.model_dump(mode="json")

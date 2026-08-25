@@ -96,7 +96,12 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
         workspace_review=WorkspaceReviewProjection(workspace_digest="a" * 64),
     )
     view = to_consultant_snapshot_view(
-        snapshot.model_copy(update={"document_review": review})
+        snapshot.model_copy(
+            update={
+                "current_document": snapshot.approved_document,
+                "document_review": review,
+            }
+        )
     )
 
     assert view.current_interview is not None
@@ -118,6 +123,54 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
     assert "execution_evidence" not in payload["run"]
     assert "pause" not in payload
     assert "finish" not in payload
+
+
+def test_snapshot_mapper_exposes_store_current_document_and_workspace_digest() -> None:
+    document_id = uuid4()
+    task_id = uuid4()
+    state = initial_thread_state(document_id)
+    approved_document = ApprovedJobDocument(
+        document_id=document_id,
+        tasks=(
+            ApprovedTask(
+                task_id=task_id,
+                statement="核准內容",
+                action="整理",
+                object="採購需求",
+                display_order=0,
+            ),
+        ),
+    )
+    current_document = approved_document.model_copy(
+        update={
+            "tasks": (
+                approved_document.tasks[0].model_copy(
+                    update={"statement": "AI 工作中內容"}
+                ),
+            )
+        }
+    )
+    state["approved_document"] = approved_document.model_dump(mode="json")
+    snapshot = snapshot_from_state(state)
+    workspace_digest = "b" * 64
+    review = document_review_projection_from_workspace(
+        state,
+        workspace_generation=7,
+        validation_status=WorkspaceValidationStatus.VALID,
+        workspace_review=WorkspaceReviewProjection(workspace_digest=workspace_digest),
+    )
+    store_derived_snapshot = snapshot.model_copy(
+        update={
+            "current_document": current_document,
+            "document_review": review,
+        }
+    )
+
+    view = to_consultant_snapshot_view(store_derived_snapshot)
+
+    assert view.approved_document.tasks[0].statement == "核准內容"
+    assert view.current_document.tasks[0].statement == "AI 工作中內容"
+    assert view.document_review.workspace_digest == workspace_digest
 
 
 def test_initial_snapshot_is_naturally_resumable_without_a_pause_state() -> None:
@@ -252,7 +305,10 @@ def test_snapshot_mapper_projects_store_review_status_generation_and_employee_di
         )
         view = to_consultant_snapshot_view(
             snapshot.model_copy(
-                update={"document_review": review}
+                update={
+                    "current_document": snapshot.approved_document,
+                    "document_review": review,
+                }
             )
         )
 

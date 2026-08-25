@@ -448,7 +448,15 @@ class PostgresConsultantRuntime:
             effective_manifest,
             decisions,
         )
+        # Invalid canonical workspace JSON cannot produce a safe current document;
+        # keep the approved checkpoint baseline visible while review carries diagnostics.
+        current_document = (
+            validation.document.approved_document
+            if validation.document is not None
+            else snapshot.approved_document
+        )
         updates: dict[str, Any] = {
+            "current_document": current_document,
             "document_review": document_review_projection_from_workspace(
                 state.values,
                 workspace_generation=workspace_snapshot.manifest.generation,

@@ -80,6 +80,7 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
         source_id=uuid4(),
         started_at=datetime.now(UTC),
         completed_at=datetime.now(UTC),
+        semantic_commit_sha256="a" * 64,
         execution_evidence=RunExecutionEvidence(
             resolved_execution={"profile_id": "primary-consultant"},
             context_selection_receipts=({"loaded_sources": []},),

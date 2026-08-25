@@ -613,6 +613,10 @@ class RunReceipt(DurableModel):
     completed_at: datetime | None = None
     error_code: str | None = None
     execution_evidence: RunExecutionEvidence | None = None
+    semantic_commit_sha256: Annotated[
+        str,
+        StringConstraints(pattern=r"^[0-9a-f]{64}$"),
+    ] | None = None
 
     @model_validator(mode="after")
     def lifecycle_fields_match_status(self) -> RunReceipt:
@@ -622,13 +626,26 @@ class RunReceipt(DurableModel):
                 or self.completed_at is not None
                 or self.error_code
                 or self.execution_evidence is not None
+                or self.semantic_commit_sha256 is not None
             ):
                 raise ValueError("source-saved run requires only its source and start time")
         elif self.status is RunStatus.COMPLETED:
-            if self.source_id is None or self.completed_at is None or self.error_code:
-                raise ValueError("completed run requires source and completion time")
+            if (
+                self.source_id is None
+                or self.completed_at is None
+                or self.error_code
+                or self.semantic_commit_sha256 is None
+            ):
+                raise ValueError(
+                    "completed run requires source, completion time and semantic payload"
+                )
         elif self.status is RunStatus.FAILED:
-            if self.source_id is None or self.completed_at is None or not self.error_code:
+            if (
+                self.source_id is None
+                or self.completed_at is None
+                or not self.error_code
+                or self.semantic_commit_sha256 is not None
+            ):
                 raise ValueError("failed run requires source, completion time and error code")
         return self
 

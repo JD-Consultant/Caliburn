@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 from datetime import datetime
+from hashlib import sha256
 from typing import Any
 from uuid import UUID, uuid5
 
@@ -54,6 +56,23 @@ class VerifiedConsultantCommit(DurableModel):
         if self.answer_source_id not in self.result.reply_basis.source_ids:
             raise ValueError("visible consultant reply must depend on the answer source")
         return self
+
+    def semantic_payload_sha256(self) -> str:
+        """Bind idempotent replay to the state-changing semantic payload."""
+
+        payload = {
+            "run_id": str(self.run_id),
+            "answer_source_id": str(self.answer_source_id),
+            "returning_after_long_gap": self.returning_after_long_gap,
+            "result": self.result.model_dump(mode="json"),
+        }
+        encoded = json.dumps(
+            payload,
+            ensure_ascii=False,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode("utf-8")
+        return sha256(encoded).hexdigest()
 
 
 _PRIORITY_ORDER = {
@@ -440,6 +459,7 @@ def apply_verified_consultant_commit(
         started_at=commit.started_at,
         completed_at=commit.completed_at,
         execution_evidence=commit.execution_evidence,
+        semantic_commit_sha256=commit.semantic_payload_sha256(),
     )
     return {
         "revision": revision,

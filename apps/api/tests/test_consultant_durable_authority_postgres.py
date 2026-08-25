@@ -1970,6 +1970,62 @@ async def test_store_pair_failure_retries_same_source_and_run_without_minting_so
 
 
 @pytest.mark.asyncio
+async def test_completed_semantic_run_replay_is_bound_to_exact_result_payload(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    original_source_id = uuid4()
+    current_source_id = uuid4()
+    run_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=original_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我每週整理採購需求。",
+        )
+        current = await runtime.record_employee_source(
+            document_id=document_id,
+            source_id=current_source_id,
+            kind=EmployeeSourceKind.EMPLOYEE_TURN,
+            text="我剛剛說錯了，是每天才對。",
+        )
+        commit = _source_supersession_commit(
+            run_id=run_id,
+            current_source_id=current_source_id,
+            superseded_source_id=original_source_id,
+        )
+        completed = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=current.revision,
+            commit=commit,
+        )
+
+        exact_replay = await runtime.commit_verified_consultant_result(
+            document_id=document_id,
+            expected_revision=current.revision,
+            commit=commit,
+        )
+        assert exact_replay.revision == completed.revision
+
+        conflicting = commit.model_copy(
+            update={
+                "result": commit.result.model_copy(
+                    update={"source_supersession": None}
+                )
+            }
+        )
+        with pytest.raises(IdempotencyConflict, match="semantic payload"):
+            await runtime.commit_verified_consultant_result(
+                document_id=document_id,
+                expected_revision=current.revision,
+                commit=conflicting,
+            )
+
+
+@pytest.mark.asyncio
 async def test_run_service_replays_exact_store_pair_after_checkpoint_failure(
     consultant_database_url: str,
     monkeypatch: pytest.MonkeyPatch,
@@ -2211,6 +2267,50 @@ async def test_failed_postgres_run_restarts_and_exact_admission_replays(
         )
         assert should_replay is False
         assert replay.revision == restarted.revision
+
+
+@pytest.mark.asyncio
+async def test_failed_run_allows_an_ordinary_new_source_first_turn(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    failed_run_id = uuid4()
+    failed_source_id = uuid4()
+    next_run_id = uuid4()
+    next_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=failed_run_id,
+            source_id=failed_source_id,
+            text="我負責核對訂單。",
+        )
+        await runtime.mark_consultant_run_failed(
+            document_id=document_id,
+            run_id=failed_run_id,
+            error_code="model_timeout",
+        )
+
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=next_run_id,
+            source_id=next_source_id,
+            text="我也會回報核對結果。",
+        )
+
+        assert should_process is True
+        assert admitted.latest_run is not None
+        assert admitted.latest_run["run_id"] == str(next_run_id)
+        assert admitted.latest_run["source_id"] == str(next_source_id)
+        assert admitted.latest_run["status"] == RunStatus.SOURCE_SAVED.value
+        sources = await runtime.list_sources(document_id)
+        assert {source.source_id for source in sources} == {
+            failed_source_id,
+            next_source_id,
+        }
+        assert all(source.validity is SourceValidity.CURRENT for source in sources)
 
 
 @pytest.mark.asyncio

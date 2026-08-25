@@ -9,7 +9,11 @@ from typing import Any
 from uuid import UUID
 
 from app.consultant.document_authority import apply_document_actions
-from app.consultant.state import ApprovedJobDocument, DocumentPatchAction
+from app.consultant.state import (
+    ApprovedJobDocument,
+    DocumentPatchAction,
+    DocumentPatchOperation,
+)
 from app.consultant.workspace_resources import (
     parse_workspace_files,
     project_workspace_files,
@@ -156,6 +160,33 @@ def _overlay_workspace_paths(
     return result
 
 
+def _preserve_workspace_evidence(
+    projected_files: Mapping[str, str],
+    workspace_files: Mapping[str, str],
+) -> dict[str, str]:
+    """Carry canonical evidence bindings across semantic projection rewrites."""
+
+    result = dict(projected_files)
+    for path, projected_raw in projected_files.items():
+        workspace_raw = workspace_files.get(path)
+        if workspace_raw is None:
+            continue
+        projected = _json_value(projected_raw)
+        workspace = _json_value(workspace_raw)
+        if not isinstance(projected, dict) or not isinstance(workspace, dict):
+            continue
+        evidence = workspace.get("evidence", _MISSING)
+        if evidence is _MISSING:
+            continue
+        projected["evidence"] = evidence
+        result[path] = json.dumps(
+            projected,
+            ensure_ascii=False,
+            indent=2,
+        ) + "\n"
+    return result
+
+
 def _employee_text_paths(
     before: ApprovedJobDocument,
     after: ApprovedJobDocument,
@@ -265,13 +296,62 @@ def _matched_action_ids(
 def _action_closure(
     review: WorkspaceReviewProjection,
     seed_ids: set[UUID],
+    *,
+    submitted: ApprovedJobDocument,
 ) -> set[UUID]:
     actions = {
         action.action_id: action
         for group in review.groups
         for action in group.actions
     }
-    accepted = set(seed_ids)
+
+    def added_entity(action: DocumentPatchAction) -> tuple[str, UUID] | None:
+        if action.operation is not DocumentPatchOperation.ADD:
+            return None
+        if not isinstance(action.after, dict):
+            return None
+        collection = action.path.strip("/").split("/", maxsplit=1)[0]
+        id_field = {
+            "duties": "duty_id",
+            "tasks": "task_id",
+            "opks": "item_id",
+        }.get(collection)
+        if id_field is None or action.after.get(id_field) is None:
+            return None
+        try:
+            return collection, UUID(str(action.after[id_field]))
+        except (AttributeError, ValueError):
+            return None
+
+    def document_has_entity(
+        document: ApprovedJobDocument,
+        collection: str,
+        identity: UUID,
+    ) -> bool:
+        values = {
+            "duties": document.duties,
+            "tasks": document.tasks,
+            "opks": document.opks,
+        }[collection]
+        field = {
+            "duties": "duty_id",
+            "tasks": "task_id",
+            "opks": "item_id",
+        }[collection]
+        return any(getattr(value, field) == identity for value in values)
+
+    def deleted_add_target_is_absent(action: DocumentPatchAction) -> bool:
+        target = added_entity(action)
+        if target is None or document_has_entity(submitted, *target):
+            return False
+        return True
+
+    accepted = {
+        action_id
+        for action_id in seed_ids
+        if (action := actions.get(action_id)) is not None
+        and not deleted_add_target_is_absent(action)
+    }
     changed = True
     while changed:
         changed = False
@@ -303,7 +383,11 @@ def plan_current_document_edit(
     handle_registry: Mapping[str, UUID],
     review: WorkspaceReviewProjection,
 ) -> CurrentDocumentEditPlan:
-    """Plan only the semantic delta represented by current -> submitted."""
+    """Plan only the semantic delta represented by current -> submitted.
+
+    ``handle_registry`` must be the full ``WorkspaceCatalog.handle_to_stable``
+    mapping, including source handles used by canonical Evidence references.
+    """
 
     if not (
         approved.document_id == current.document_id == submitted.document_id
@@ -321,40 +405,52 @@ def plan_current_document_edit(
         handle_registry=stable_registry,
     )
     stable_registry = dict(current_projection.handle_registry)
+    current_files = _preserve_workspace_evidence(
+        current_projection.files,
+        workspace_files,
+    )
     submitted_projection = project_workspace_files(
         submitted,
         handle_registry=stable_registry,
     )
     stable_registry.update(submitted_projection.handle_registry)
+    submitted_files = _preserve_workspace_evidence(
+        submitted_projection.files,
+        workspace_files,
+    )
 
     parse_workspace_files(
         current.document_id,
-        current_projection.files,
+        current_files,
         handle_registry=stable_registry,
         baseline_document=approved,
     )
     parse_workspace_files(
         submitted.document_id,
-        submitted_projection.files,
+        submitted_files,
         handle_registry=stable_registry,
         baseline_document=approved,
     )
 
     changed_paths = _changed_workspace_paths(
-        current_projection.files,
-        submitted_projection.files,
+        current_files,
+        submitted_files,
     )
     matched_ids = _matched_action_ids(
         review,
         changed_paths,
         files={
             **workspace_files,
-            **current_projection.files,
-            **submitted_projection.files,
+            **current_files,
+            **submitted_files,
         },
         entity_ids_by_handle=stable_registry,
     )
-    accepted_ids = _action_closure(review, matched_ids)
+    accepted_ids = _action_closure(
+        review,
+        matched_ids,
+        submitted=submitted,
+    )
     accepted_actions = tuple(
         action
         for group in review.groups
@@ -366,9 +462,13 @@ def plan_current_document_edit(
         accepted,
         handle_registry=stable_registry,
     )
-    merged_files = _overlay_workspace_paths(
+    accepted_files = _preserve_workspace_evidence(
         accepted_projection.files,
-        submitted_projection.files,
+        workspace_files,
+    )
+    merged_files = _overlay_workspace_paths(
+        accepted_files,
+        submitted_files,
         changed_paths,
     )
     approved_after = parse_workspace_files(

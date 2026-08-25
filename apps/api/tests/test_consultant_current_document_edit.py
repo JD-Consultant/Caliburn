@@ -104,6 +104,7 @@ def test_employee_edit_approves_only_touched_field_and_keeps_other_ai_diff() -> 
     current_files = dict(current_projection.files)
     _attach_evidence(current_files, handle="k-001")
     registry = dict(current_projection.handle_registry)
+    registry["source-001"] = SOURCE_ID
     review = _review(approved, current_files, registry)
 
     plan = plan_current_document_edit(
@@ -184,6 +185,7 @@ def test_editing_ai_added_task_promotes_required_new_duty_but_not_unrelated_opks
     current_files = dict(current_projection.files)
     _attach_evidence(current_files, handle="k-001")
     registry = dict(current_projection.handle_registry)
+    registry["source-001"] = SOURCE_ID
     review = _review(approved, current_files, registry)
 
     plan = plan_current_document_edit(
@@ -208,6 +210,107 @@ def test_editing_ai_added_task_promotes_required_new_duty_but_not_unrelated_opks
     assert {item.task_id for item in plan.approved_after.tasks} == {new_task_id}
     assert {item.item_id for item in plan.approved_after.opks} == set()
     assert plan.approved_after.tasks[0].statement == "員工修正任務"
+
+
+def test_deleting_ai_added_task_does_not_promote_its_ai_added_duty() -> None:
+    approved = _document(task_statement="核准敘述", frequency="每月").model_copy(
+        update={"duties": (), "tasks": (), "opks": ()}
+    )
+    ai_duty_id = UUID("00000000-0000-0000-0000-000000000a14")
+    ai_task_id = UUID("00000000-0000-0000-0000-000000000a15")
+    ai_duty = ApprovedDuty(
+        duty_id=ai_duty_id,
+        statement="AI 暫存職責",
+        display_order=0,
+    )
+    ai_task = ApprovedTask(
+        task_id=ai_task_id,
+        duty_id=ai_duty_id,
+        statement="AI 暫存任務",
+        action="處理",
+        object="訂單",
+        purpose_result="完成採購",
+        display_order=0,
+    )
+    current = approved.model_copy(
+        update={"duties": (ai_duty,), "tasks": (ai_task,)}
+    )
+    submitted = approved.model_copy(update={"duties": (ai_duty,), "tasks": ()})
+    current_projection = project_workspace_files(current, handle_registry={})
+    current_files = dict(current_projection.files)
+    registry = dict(current_projection.handle_registry)
+    review = _review(approved, current_files, registry)
+
+    plan = plan_current_document_edit(
+        approved,
+        current,
+        submitted,
+        current_files,
+        registry,
+        review,
+    )
+
+    assert plan.approved_after.model_dump(mode="json") == approved.model_dump(mode="json")
+    assert plan.accepted_pending_action_ids == ()
+
+    submitted_projection = project_workspace_files(
+        submitted,
+        handle_registry=registry,
+    )
+    remaining_review = _review(
+        approved,
+        dict(submitted_projection.files),
+        dict(submitted_projection.handle_registry),
+    )
+    remaining_actions = tuple(
+        action
+        for group in remaining_review.groups
+        for action in group.actions
+    )
+    assert {action.path for action in remaining_actions} == {"/duties"}
+    assert remaining_actions[0].after["duty_id"] == str(ai_duty_id)
+
+
+def test_editing_ai_added_opks_preserves_evidence_source_lineage() -> None:
+    approved = _document(task_statement="核准敘述", frequency="每月").model_copy(
+        update={"opks": ()}
+    )
+    ai_opks_id = UUID("00000000-0000-0000-0000-000000000a24")
+    ai_opks = ApprovedOpksItem(
+        item_id=ai_opks_id,
+        kind=ApprovedOpksKind.KNOWLEDGE,
+        text="AI 新知識",
+        display_order=0,
+        evidence_source_ids=(SOURCE_ID,),
+    )
+    current = approved.model_copy(update={"opks": (ai_opks,)})
+    submitted = current.model_copy(
+        update={
+            "opks": (ai_opks.model_copy(update={"text": "員工修正知識"}),),
+        }
+    )
+    current_projection = project_workspace_files(current, handle_registry={})
+    current_files = dict(current_projection.files)
+    _attach_evidence(current_files, handle="k-001")
+    registry = dict(current_projection.handle_registry)
+    registry["source-001"] = SOURCE_ID
+    review = _review(approved, current_files, registry)
+
+    plan = plan_current_document_edit(
+        approved,
+        current,
+        submitted,
+        current_files,
+        registry,
+        review,
+    )
+
+    validated = ApprovedJobDocument.model_validate(
+        plan.approved_after.model_dump()
+    )
+    assert validated.opks[0].item_id == ai_opks_id
+    assert validated.opks[0].text == "員工修正知識"
+    assert validated.opks[0].evidence_source_ids == (SOURCE_ID,)
 
 
 def test_editing_one_member_of_a_split_promotes_its_atomic_subgroup() -> None:
@@ -262,6 +365,7 @@ def test_editing_one_member_of_a_split_promotes_its_atomic_subgroup() -> None:
     current_files = dict(current_projection.files)
     _attach_evidence(current_files, handle="k-001")
     registry = dict(current_projection.handle_registry)
+    registry["source-001"] = SOURCE_ID
     review = _review(approved, current_files, registry)
 
     plan = plan_current_document_edit(
@@ -322,18 +426,5 @@ def test_removing_an_ai_only_entity_cleans_current_without_changing_approved() -
         review,
     )
 
-    add_action = next(
-        action
-        for group in review.groups
-        for action in group.actions
-        if action.path == "/tasks"
-        and isinstance(action.after, dict)
-        and action.after["task_id"] == str(ai_task_id)
-    )
     assert plan.approved_after.model_dump(mode="json") == approved.model_dump(mode="json")
-    assert plan.accepted_pending_action_ids == (add_action.action_id,)
-    assert set(plan.accepted_pending_action_ids) == {
-        action.action_id
-        for group in review.groups
-        for action in group.actions
-    }
+    assert plan.accepted_pending_action_ids == ()

@@ -12,7 +12,7 @@ import { ConsultantConversation } from "./ConsultantConversation";
 import { ConsultantInsightPanel } from "./ConsultantInsightPanel";
 import { ConsultantWorkspace } from "./ConsultantWorkspace";
 import { CurrentDocumentEditor } from "./CurrentDocumentEditor";
-import { DocumentReviewPanel } from "./DocumentReviewPanel";
+import { CurrentDocumentReview } from "./CurrentDocumentReview";
 import {
   DOCUMENT_ID,
   consultantSnapshotFixture,
@@ -147,6 +147,80 @@ function hierarchicalSnapshotFixture() {
   return snapshot;
 }
 
+function semanticReviewSnapshotFixture() {
+  const snapshot = hierarchicalSnapshotFixture();
+  const sourceId = snapshot.latest_source_id!;
+  const [dutyOne, dutyTwo] = snapshot.current_document.duties;
+  const [frequencyTask, reassignedTask] = snapshot.current_document.tasks;
+  const frequencyActionId = "00000000-0000-0000-0000-000000000201";
+  const reassignmentActionId = "00000000-0000-0000-0000-000000000202";
+
+  snapshot.approved_document = structuredClone(snapshot.current_document);
+  snapshot.approved_document.tasks[0].frequency_text = "每月彙整";
+  snapshot.current_document.tasks[0].frequency_text =
+    "每週追蹤；重大修法即時通報";
+  snapshot.approved_document.tasks[1].duty_id = dutyTwo.duty_id;
+  snapshot.current_document.tasks[1].duty_id = dutyOne.duty_id;
+  snapshot.document_review = {
+    ...snapshot.document_review,
+    workspace_status: "pending",
+    unresolved_action_count: 2,
+    bundles: [
+      {
+        changeset_id: "00000000-0000-0000-0000-000000000203",
+        summary: "更新追蹤頻率",
+        source_ids: [sourceId],
+        created_revision: snapshot.revision,
+        acceptance_blocked: false,
+        actions: [
+          {
+            action_id: frequencyActionId,
+            operation: "revise",
+            path: `/tasks/${frequencyTask.task_id}/frequency_text`,
+            target_key: `frequency:${frequencyTask.task_id}`,
+            before: "每月彙整",
+            after: "每週追蹤；重大修法即時通報",
+            source_ids: [sourceId],
+            quote_anchors: [],
+            read_set: [],
+            depends_on_action_ids: [],
+            atomic_subgroup_id: null,
+            affected_work_ids: [],
+            blocks_dependent_analysis: false,
+            status: "pending",
+          },
+        ],
+      },
+      {
+        changeset_id: "00000000-0000-0000-0000-000000000204",
+        summary: "調整工作歸屬",
+        source_ids: [sourceId],
+        created_revision: snapshot.revision,
+        acceptance_blocked: false,
+        actions: [
+          {
+            action_id: reassignmentActionId,
+            operation: "reassign",
+            path: `/tasks/${reassignedTask.task_id}/duty_id`,
+            target_key: `reassign:${reassignedTask.task_id}`,
+            before: dutyTwo.duty_id,
+            after: dutyOne.duty_id,
+            source_ids: [sourceId],
+            quote_anchors: [],
+            read_set: [],
+            depends_on_action_ids: [],
+            atomic_subgroup_id: null,
+            affected_work_ids: [],
+            blocks_dependent_analysis: true,
+            status: "pending",
+          },
+        ],
+      },
+    ],
+  };
+  return snapshot;
+}
+
 function seedWorkspace(client: QueryClient, snapshot: ReturnType<typeof consultantSnapshotFixture>) {
   client.setQueryData(jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID), snapshot);
   client.setQueryData(jobAnalysisKeys.consultantDocument(DOCUMENT_ID), {
@@ -263,6 +337,64 @@ describe("employee consultant workspace integration", () => {
     expect(screen.getByRole("alert").textContent).toContain(
       "送出的內容無法處理",
     );
+  });
+
+  it("reviews a changed field in place on the current-JD skeleton", async () => {
+    const user = userEvent.setup();
+    renderWorkspaceFixture(semanticReviewSnapshotFixture());
+
+    await user.click(screen.getByRole("button", { name: "審核變更 2" }));
+
+    expect(screen.getByRole("heading", { name: "審核變更" })).toBeTruthy();
+    expect(screen.getByText("每月彙整").className).toContain("line-through");
+    expect(
+      screen
+        .getAllByText("每週追蹤；重大修法即時通報")
+        .some((element) => element.className.includes("text-emerald")),
+    ).toBe(true);
+    expect(
+      screen.getByRole("button", { name: "接受這項變更" }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "拒絕這項變更" }),
+    ).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /稍後處理/ })).toBeNull();
+  });
+
+  it("shows one reassignment decision at both its old and new Duty positions", async () => {
+    const user = userEvent.setup();
+    renderWorkspaceFixture(semanticReviewSnapshotFixture());
+
+    await user.click(screen.getByRole("button", { name: "審核變更 2" }));
+    await user.click(screen.getByRole("button", { name: "下一組" }));
+
+    const oldDuty = screen.getByRole("region", {
+      name: "Duty 2 行政管理",
+    });
+    const newDuty = screen.getByRole("region", {
+      name: "Duty 1 客戶服務",
+    });
+    expect(within(oldDuty).getByText("尚待歸類的工作")).toBeTruthy();
+    expect(within(oldDuty).getByText("從此職責移出")).toBeTruthy();
+    expect(within(newDuty).getByText("尚待歸類的工作")).toBeTruthy();
+    expect(within(newDuty).getByText("移入此職責")).toBeTruthy();
+    expect(
+      screen.getAllByRole("button", { name: "接受這項變更" }),
+    ).toHaveLength(1);
+  });
+
+  it("opens the approved export baseline as a secondary read-only view", async () => {
+    const user = userEvent.setup();
+    renderWorkspaceFixture(semanticReviewSnapshotFixture());
+
+    await user.click(
+      screen.getByRole("button", { name: "查看匯出版本" }),
+    );
+
+    const dialog = screen.getByRole("dialog", { name: "匯出版本" });
+    expect(within(dialog).getByText("每月彙整")).toBeTruthy();
+    expect(within(dialog).getByText(/待審 AI 變更不會出現在匯出檔案/)).toBeTruthy();
+    expect(within(dialog).queryByRole("textbox")).toBeNull();
   });
 
   it("collapses interview and work-map columns without hiding unassigned work", async () => {
@@ -507,12 +639,11 @@ describe("employee consultant workspace integration", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={renderedSnapshot} />,
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={renderedSnapshot} />,
       client,
     );
 
-    await user.click(screen.getAllByRole("checkbox")[0]);
-    await user.click(screen.getByRole("button", { name: "接受 AI 建議" }));
+    await user.click(screen.getByRole("button", { name: "接受這項變更" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 
     expect(
@@ -520,6 +651,52 @@ describe("employee consultant workspace integration", () => {
         jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID),
       )?.revision,
     ).toBe(5);
+  });
+
+  it("reuses the idempotency key and decision body when a review is retried", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    const response = structuredClone(snapshot);
+    response.revision += 1;
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            type: "https://caliburn.dev/problems/job-analysis/provider-unavailable",
+            title: "Provider unavailable",
+            status: 503,
+          }),
+          { status: 503, headers: { "Content-Type": "application/json" } },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify(response), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: "接受這項變更" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(screen.getByRole("alert")).toBeTruthy();
+    const firstRequest = fetchMock.mock.calls[0][1] as RequestInit;
+    const firstHeaders = firstRequest.headers as Record<string, string>;
+
+    await user.click(screen.getByRole("button", { name: "接受這項變更" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    const secondRequest = fetchMock.mock.calls[1][1] as RequestInit;
+    const secondHeaders = secondRequest.headers as Record<string, string>;
+
+    expect(secondRequest.body).toBe(firstRequest.body);
+    expect(secondHeaders["Idempotency-Key"]).toBe(firstHeaders["Idempotency-Key"]);
+    expect(secondHeaders["X-Expected-Revision"]).toBe(
+      firstHeaders["X-Expected-Revision"],
+    );
   });
 
   it("supports keyboard semantic review decisions without exposing internal action details", async () => {
@@ -603,28 +780,21 @@ describe("employee consultant workspace integration", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
-    expect(screen.getByRole("region", { name: "AI 文件變更審核" })).toBeTruthy();
+    expect(screen.getByRole("region", { name: "審核變更" })).toBeTruthy();
     expect(document.body.textContent).not.toContain(actionIds.accept);
     expect(document.body.textContent).not.toContain("write_file");
     expect(document.body.textContent).not.toContain("/candidate/");
 
-    const selectWithKeyboard = async (name: string) => {
-      const checkbox = screen.getByRole("checkbox", { name });
-      checkbox.focus();
-      await user.keyboard(" ");
-      expect(checkbox).toHaveProperty("checked", true);
-    };
     const decideWithKeyboard = async (name: string) => {
       const button = screen.getByRole("button", { name });
       button.focus();
       await user.keyboard("{Enter}");
     };
 
-    await selectWithKeyboard("選取第 1 組第 1 項新增變更：職務名稱（接受職務名稱建議）");
-    await decideWithKeyboard("接受 AI 建議");
+    await decideWithKeyboard("接受這項變更");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(
       JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body)),
@@ -633,10 +803,12 @@ describe("employee consultant workspace integration", () => {
       action_ids: [actionIds.accept],
     });
 
+    await user.click(screen.getByRole("button", { name: "下一組" }));
+    expect(screen.getByText("修改工作描述建議")).toBeTruthy();
+    await user.click(screen.getByText("先修改 AI 建議再接受"));
     const description = screen.getByLabelText("工作描述");
     await user.clear(description);
     await user.type(description, "員工確認後的工作描述");
-    await selectWithKeyboard("選取第 2 組第 1 項修改變更：工作描述（修改工作描述建議）");
     await decideWithKeyboard("修改後接受");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(
@@ -649,10 +821,11 @@ describe("employee consultant workspace integration", () => {
       },
     });
 
-    await selectWithKeyboard("選取第 3 組第 1 項移除變更：職務名稱（移除不適用建議）");
-    const rejectionReason = screen.getByLabelText("若要拒絕，可補充原因");
+    await user.click(screen.getByRole("button", { name: "下一組" }));
+    expect(screen.getByText("移除不適用建議")).toBeTruthy();
+    const rejectionReason = screen.getByLabelText("若要拒絕，請簡短說明原因");
     await user.type(rejectionReason, "目前正式文件仍需要這項內容");
-    await decideWithKeyboard("拒絕");
+    await decideWithKeyboard("拒絕這項變更");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
     expect(
       JSON.parse(String((fetchMock.mock.calls[2][1] as RequestInit).body)),
@@ -679,12 +852,12 @@ describe("employee consultant workspace integration", () => {
     };
 
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
-    expect(screen.getByRole("status").textContent).toContain("AI 正在修正工作草稿");
+    expect(screen.getByRole("status").textContent).toContain("AI 正在修正目前 JD 的工作內容");
     expect(screen.getByText("工作草稿有內容需要 AI 修正。")).toBeTruthy();
-    expect(screen.queryByRole("button", { name: "接受 AI 建議" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "接受這項變更" })).toBeNull();
     expect(document.body.textContent).not.toContain("/workspace/");
   });
 
@@ -708,7 +881,7 @@ describe("employee consultant workspace integration", () => {
 
     try {
       renderWithClient(
-        <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+        <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
       );
 
       expect(
@@ -722,89 +895,24 @@ describe("employee consultant workspace integration", () => {
     }
   });
 
-  it("announces pending document changes as a status update", () => {
+  it("shows pending semantic review without a defer action", () => {
     renderWithClient(
-      <DocumentReviewPanel
+      <CurrentDocumentReview
         documentId={DOCUMENT_ID}
         snapshot={consultantSnapshotFixture()}
       />,
     );
 
-    expect(screen.getByRole("status").textContent).toContain("AI 建議的文件變更");
+    expect(screen.getByRole("region", { name: "審核變更" })).toBeTruthy();
+    expect(screen.getByText("更新工作描述")).toBeTruthy();
+    expect(screen.queryByRole("button", { name: /稍後處理/ })).toBeNull();
   });
 
-  it("gives each review checkbox a distinct employee-semantic name", () => {
-    renderWithClient(
-      <DocumentReviewPanel
-        documentId={DOCUMENT_ID}
-        snapshot={consultantSnapshotFixture()}
-      />,
-    );
-
-    expect(
-      screen.getByRole("checkbox", {
-        name: "選取第 1 組第 1 項修改變更：工作敘述（更新工作描述）；必須整組決定",
-      }),
-    ).toBeTruthy();
-    expect(
-      screen.getByRole("checkbox", {
-        name: "選取第 1 組第 2 項修改變更：工作敘述（更新工作描述）；必須整組決定",
-      }),
-    ).toBeTruthy();
-  });
-
-  it("distinguishes identical semantic review controls across groups", () => {
-    const snapshot = consultantSnapshotFixture();
-    const firstBundle = snapshot.document_review.bundles[0];
-    const firstAction = firstBundle.actions[0];
-    snapshot.document_review.bundles = [
-      {
-        ...firstBundle,
-        summary: "更新工作內容",
-        actions: [firstAction],
-      },
-      {
-        ...firstBundle,
-        changeset_id: "second-identical-review-group",
-        summary: "更新工作內容",
-        actions: [
-          {
-            ...firstAction,
-            action_id: "second-identical-review-action",
-          },
-        ],
-      },
-    ];
-
-    renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
-    );
-
-    expect(
-      screen.getByRole("checkbox", {
-        name: "選取第 1 組第 1 項修改變更：工作敘述（更新工作內容）；必須整組決定",
-      }),
-    ).toBeTruthy();
-    expect(
-      screen.getByRole("checkbox", {
-        name: "選取第 2 組第 1 項修改變更：工作敘述（更新工作內容）；必須整組決定",
-      }),
-    ).toBeTruthy();
-  });
-
-  it("explains a working-draft conflict in employee language while leaving safe choices available", async () => {
+  it("blocks acceptance for an unsafe semantic group while leaving rejection available", async () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
     snapshot.document_review = {
       ...snapshot.document_review,
-      workspace_status: "conflicted",
-      diagnostics: [
-        {
-          code: "workspace-rebase-conflict",
-          path: "工作內容",
-          message: "正式文件與工作草稿的同一內容已有變動，請先選擇要保留的內容。",
-        },
-      ],
       bundles: [
         {
           ...snapshot.document_review.bundles[0],
@@ -814,51 +922,58 @@ describe("employee consultant workspace integration", () => {
     };
 
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
-    expect(screen.getByRole("alert").textContent).toContain(
-      "正式文件與工作草稿的同一內容已有變動",
-    );
-    expect(document.body.textContent).not.toMatch(/Store|workspace-rebase-conflict|UUID/i);
-    const checkbox = screen.getAllByRole("checkbox")[0];
-    await user.click(checkbox);
+    expect(document.body.textContent).not.toMatch(/Store|UUID/i);
     expect(
-      (screen.getByRole("button", { name: "接受 AI 建議" }) as HTMLButtonElement)
+      (screen.getByRole("button", { name: "接受這項變更" }) as HTMLButtonElement)
         .disabled,
     ).toBe(true);
+    await user.click(screen.getByText("先修改 AI 建議再接受"));
     expect(
       (screen.getByRole("button", { name: "修改後接受" }) as HTMLButtonElement)
         .disabled,
     ).toBe(true);
     expect(
-      (screen.getByRole("button", { name: "拒絕" }) as HTMLButtonElement).disabled,
+      (screen.getByRole("button", { name: "拒絕這項變更" }) as HTMLButtonElement).disabled,
     ).toBe(false);
   });
 
-  it("lets an employee accept nine changes and reject the remaining one", async () => {
+  it("keeps separate semantic groups as separate decisions", async () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
     const base = snapshot.document_review.bundles[0].actions[0];
-    const actionIds = Array.from(
-      { length: 10 },
-      (_, index) => `00000000-0000-0000-0000-${String(index + 20).padStart(12, "0")}`,
-    );
+    const actionIds = [
+      "00000000-0000-0000-0000-000000000020",
+      "00000000-0000-0000-0000-000000000021",
+    ];
     snapshot.document_review = {
       ...snapshot.document_review,
       bundles: [
         {
           ...snapshot.document_review.bundles[0],
-          acceptance_blocked: false,
-          actions: actionIds.map((actionId, index) => ({
+          summary: "先接受的變更",
+          actions: [{
             ...base,
-            action_id: actionId,
+            action_id: actionIds[0],
             atomic_subgroup_id: null,
-            path: `/tasks/task-${index}/statement`,
-          })),
+            path: "/work_description",
+          }],
+        },
+        {
+          ...snapshot.document_review.bundles[0],
+          changeset_id: "second-independent-review-group",
+          summary: "再拒絕的變更",
+          actions: [{
+            ...base,
+            action_id: actionIds[1],
+            atomic_subgroup_id: null,
+            path: "/job_title",
+          }],
         },
       ],
-      unresolved_action_count: 10,
+      unresolved_action_count: 2,
     };
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(JSON.stringify(snapshot), {
@@ -868,30 +983,24 @@ describe("employee consultant workspace integration", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
-    const checkboxes = screen.getAllByRole("checkbox");
-    for (const checkbox of checkboxes.slice(0, 9)) await user.click(checkbox);
-    expect(screen.getByText("已選 9 項")).toBeTruthy();
-    await user.click(screen.getByRole("button", { name: "接受 AI 建議" }));
+    await user.click(screen.getByRole("button", { name: "接受這項變更" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(
       JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body)).action_ids,
-    ).toEqual(actionIds.slice(0, 9));
+    ).toEqual([actionIds[0]]);
 
-    await user.click(screen.getAllByRole("checkbox")[9]);
-    await user.type(
-      screen.getByLabelText("若要拒絕，可補充原因"),
-      "這項內容不適用目前職務",
-    );
-    await user.click(screen.getByRole("button", { name: "拒絕" }));
+    await user.click(screen.getByRole("button", { name: "下一組" }));
+    await user.type(screen.getByLabelText("若要拒絕，請簡短說明原因"), "這項內容不適用目前職務");
+    await user.click(screen.getByRole("button", { name: "拒絕這項變更" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(
       JSON.parse(String((fetchMock.mock.calls[1][1] as RequestInit).body)),
     ).toMatchObject({
       command: "reject_changes",
-      action_ids: [actionIds[9]],
+      action_ids: [actionIds[1]],
     });
   });
 
@@ -914,12 +1023,11 @@ describe("employee consultant workspace integration", () => {
       ),
     );
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
       client,
     );
 
-    await user.click(screen.getAllByRole("checkbox")[0]);
-    await user.click(screen.getByRole("button", { name: "接受 AI 建議" }));
+    await user.click(screen.getByRole("button", { name: "接受這項變更" }));
 
     await waitFor(() =>
       expect(
@@ -976,14 +1084,14 @@ describe("employee consultant workspace integration", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
+    await user.click(screen.getByText("先修改 AI 建議再接受"));
     const statement = screen.getByLabelText("主要職責內容");
     expect(document.body.textContent).not.toContain(dutyId);
     await user.clear(statement);
     await user.type(statement, "統籌採購與覆核作業");
-    await user.click(screen.getByRole("checkbox"));
     await user.click(screen.getByRole("button", { name: "修改後接受" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 
@@ -1075,7 +1183,7 @@ describe("employee consultant workspace integration", () => {
       quote_anchors: [],
       read_set: [],
       depends_on_action_ids: [],
-      atomic_subgroup_id: null,
+      atomic_subgroup_id: "00000000-0000-0000-0000-000000000040",
       affected_work_ids: [],
       blocks_dependent_analysis: false,
       status: "pending" as const,
@@ -1128,9 +1236,10 @@ describe("employee consultant workspace integration", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
+    await user.click(screen.getByText("先修改 AI 建議再接受"));
     const enablerName = screen.getByLabelText("名稱");
     const taskLinks = screen.getByLabelText("關聯工作");
     const indicatorLinks = screen.getByLabelText("關聯績效指標");
@@ -1142,9 +1251,6 @@ describe("employee consultant workspace integration", () => {
     await user.selectOptions(taskLinks, taskTwo);
     await user.deselectOptions(indicatorLinks, indicatorOne);
     await user.selectOptions(indicatorLinks, indicatorTwo);
-    for (const checkbox of screen.getAllByRole("checkbox")) {
-      await user.click(checkbox);
-    }
     await user.click(screen.getByRole("button", { name: "修改後接受" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 

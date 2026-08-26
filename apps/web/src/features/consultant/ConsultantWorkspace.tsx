@@ -1,8 +1,11 @@
 "use client";
 
-import type { ConsultantSnapshotEvent } from "@caliburn/job-analysis-contract";
+import type {
+  ApprovedJobDocumentView,
+  ConsultantSnapshotEvent,
+} from "@caliburn/job-analysis-contract";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Download, Radio, WifiOff } from "lucide-react";
+import { ArrowLeft, Download, Radio, WifiOff, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -26,7 +29,8 @@ import { ConsultantConversation } from "./ConsultantConversation";
 import { ConsultantInsightPanel } from "./ConsultantInsightPanel";
 import { ConsultantWorkMap } from "./ConsultantWorkMap";
 import { CurrentDocumentEditor } from "./CurrentDocumentEditor";
-import { DocumentReviewPanel } from "./DocumentReviewPanel";
+import { CurrentDocumentReview } from "./CurrentDocumentReview";
+import { CurrentDocumentSemanticOutline } from "./CurrentDocumentOutline";
 import { shouldRefetchForEvent } from "./consultantWorkspaceModel";
 
 function errorText(error: unknown): string {
@@ -40,6 +44,59 @@ function exportFilename(title: string): string {
   return `${safe}.xlsx`;
 }
 
+function ApprovedBaselineDrawer({
+  document,
+  pendingCount,
+  onClose,
+}: {
+  document: ApprovedJobDocumentView;
+  pendingCount: number;
+  onClose: () => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex justify-end bg-stone-950/20" role="presentation">
+      <button className="min-w-8 flex-1 cursor-default" aria-label="關閉匯出版本" onClick={onClose} />
+      <aside
+        role="dialog"
+        aria-modal="true"
+        aria-label="匯出版本"
+        className="h-full w-full max-w-3xl overflow-y-auto border-l border-stone-200 bg-stone-50 p-5 shadow-2xl sm:p-7"
+      >
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <p className="text-xs font-semibold tracking-[0.16em] text-stone-500 uppercase">只讀核准基線</p>
+            <h2 className="mt-1 text-2xl font-semibold">匯出版本</h2>
+            <p className="mt-2 text-sm leading-6 text-stone-600">
+              這是現在實際會匯出的核准內容。{pendingCount
+                ? `目前 ${pendingCount} 項待審 AI 變更不會出現在匯出檔案。`
+                : "目前沒有待審 AI 變更。"}
+            </p>
+          </div>
+          <Button variant="ghost" size="icon-sm" aria-label="關閉匯出版本" onClick={onClose}>
+            <X />
+          </Button>
+        </div>
+        <div className="mt-6 rounded-xl border border-stone-200 bg-white p-5">
+          <p className="text-xs font-medium text-stone-500">職務名稱</p>
+          <p className="mt-1 text-lg font-semibold">{document.job_title ?? "未填"}</p>
+          {document.work_description ? (
+            <>
+              <p className="mt-4 text-xs font-medium text-stone-500">工作描述</p>
+              <p className="mt-1 text-sm leading-6 text-stone-700">{document.work_description}</p>
+            </>
+          ) : null}
+        </div>
+        <div className="mt-5">
+          <CurrentDocumentSemanticOutline
+            document={document}
+            approvedDocument={document}
+          />
+        </div>
+      </aside>
+    </div>
+  );
+}
+
 export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   const router = useRouter();
   const queryClient = useQueryClient();
@@ -49,6 +106,8 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   const [showForceExport, setShowForceExport] = useState(false);
   const [workMapOpen, setWorkMapOpen] = useState(true);
   const [interviewOpen, setInterviewOpen] = useState(true);
+  const [documentMode, setDocumentMode] = useState<"current" | "review">("current");
+  const [approvedOpen, setApprovedOpen] = useState(false);
   const [streamState, setStreamState] = useState<"connecting" | "live" | "reconnecting">("connecting");
   const revisionRef = useRef(-1);
 
@@ -248,12 +307,48 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
             />
           ) : null}
           <div className="min-w-0">
-            <CurrentDocumentEditor
-              key={documentId}
-              documentId={documentId}
-              snapshot={snapshot}
-              onDirtyChange={setDocumentDirty}
-            />
+            <div className="mb-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-stone-200 bg-white p-2 shadow-sm">
+              <div className="flex gap-1" role="group" aria-label="JD 顯示模式">
+                <Button
+                  size="sm"
+                  variant={documentMode === "current" ? "default" : "ghost"}
+                  disabled={documentDirty}
+                  onClick={() => setDocumentMode("current")}
+                >
+                  目前 JD
+                </Button>
+                <Button
+                  size="sm"
+                  variant={documentMode === "review" ? "default" : "ghost"}
+                  disabled={documentDirty}
+                  onClick={() => setDocumentMode("review")}
+                >
+                  審核變更 {snapshot.document_review.unresolved_action_count}
+                </Button>
+              </div>
+              <Button
+                size="sm"
+                variant="outline"
+                disabled={documentDirty}
+                onClick={() => setApprovedOpen(true)}
+              >
+                查看匯出版本
+              </Button>
+            </div>
+            {documentMode === "current" ? (
+              <CurrentDocumentEditor
+                key={documentId}
+                documentId={documentId}
+                snapshot={snapshot}
+                onDirtyChange={setDocumentDirty}
+              />
+            ) : (
+              <CurrentDocumentReview
+                key={`${documentId}:${snapshot.document_review.workspace_digest}`}
+                documentId={documentId}
+                snapshot={snapshot}
+              />
+            )}
           </div>
           {interviewOpen ? (
             <aside aria-label="訪談" className="min-w-0">
@@ -286,8 +381,14 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
             </aside>
           ) : null}
         </div>
-        <DocumentReviewPanel documentId={documentId} snapshot={snapshot} />
       </main>
+      {approvedOpen ? (
+        <ApprovedBaselineDrawer
+          document={snapshot.approved_document}
+          pendingCount={snapshot.document_review.unresolved_action_count}
+          onClose={() => setApprovedOpen(false)}
+        />
+      ) : null}
     </div>
   );
 }

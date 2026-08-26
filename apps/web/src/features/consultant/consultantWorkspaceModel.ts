@@ -4,6 +4,7 @@ import type {
   ConsultantSnapshotEvent,
   ConsultantSnapshotView,
   DocumentChangeSetView,
+  DocumentPatchActionView,
   DocumentReviewDecisionWrite,
 } from "@caliburn/job-analysis-contract";
 
@@ -36,6 +37,44 @@ export type CurrentDocumentOutlineModel = {
   unassignedItems: CurrentDocumentOutlineItem[];
   documentItems: CurrentDocumentOutlineItem[];
 };
+
+export type DocumentReviewSemanticGroup = {
+  key: string;
+  changesetId: string;
+  summary: string;
+  bundle: DocumentChangeSetView;
+  actions: DocumentPatchActionView[];
+};
+
+export function buildDocumentReviewSemanticGroups(
+  bundles: DocumentChangeSetView[],
+): DocumentReviewSemanticGroup[] {
+  const groups: DocumentReviewSemanticGroup[] = [];
+  for (const bundle of bundles) {
+    const byKey = new Map<string, DocumentReviewSemanticGroup>();
+    for (const action of bundle.actions) {
+      if (action.status !== "pending") continue;
+      const key = action.atomic_subgroup_id
+        ? `${bundle.changeset_id}:atomic:${action.atomic_subgroup_id}`
+        : `${bundle.changeset_id}:action:${action.action_id}`;
+      const existing = byKey.get(key);
+      if (existing) {
+        existing.actions.push(action);
+        continue;
+      }
+      const group = {
+        key,
+        changesetId: bundle.changeset_id,
+        summary: bundle.summary,
+        bundle,
+        actions: [action],
+      };
+      byKey.set(key, group);
+      groups.push(group);
+    }
+  }
+  return groups;
+}
 
 const currentDocumentItemKindLabels = {
   output: "O",

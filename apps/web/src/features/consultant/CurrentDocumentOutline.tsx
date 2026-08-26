@@ -1,6 +1,10 @@
 "use client";
 
-import type { ApprovedJobDocumentWrite } from "@caliburn/job-analysis-contract";
+import type {
+  ApprovedJobDocumentView,
+  ApprovedJobDocumentWrite,
+  DocumentPatchActionView,
+} from "@caliburn/job-analysis-contract";
 import { FileText, Link2, Plus, Trash2 } from "lucide-react";
 
 import { Button } from "@/shared/ui/button";
@@ -31,6 +35,14 @@ const enablerLabels: Record<EnablerDraft["kind"], string> = {
   knowledge: "知識",
   skill: "技能",
   other: "其他",
+};
+
+const itemKindCodes: Record<OpksDraft["kind"], string> = {
+  output: "O",
+  indicator: "P",
+  knowledge: "K",
+  skill: "S",
+  attitude: "A",
 };
 
 function TextField({
@@ -594,6 +606,448 @@ export function CurrentDocumentOutline({
           </div>
         </section>
       </div>
+    </section>
+  );
+}
+
+type ReviewDocument = ApprovedJobDocumentView;
+type ReviewTask = ReviewDocument["tasks"][number];
+type ReviewItem = ReviewDocument["opks"][number];
+
+const reviewTaskFields: Array<{
+  field: keyof ReviewTask;
+  label: string;
+}> = [
+  { field: "action", label: "動作" },
+  { field: "object", label: "對象" },
+  { field: "purpose_result", label: "目的／結果" },
+  { field: "context", label: "情境" },
+  { field: "frequency_text", label: "頻率" },
+  { field: "responsibility_role", label: "責任角色" },
+  { field: "enablers", label: "工具／方法／其他促成條件" },
+];
+
+function reviewObject(value: unknown): Record<string, unknown> | null {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function reviewValueText(value: unknown): string {
+  if (value === null || value === undefined || value === "") return "未填";
+  if (Array.isArray(value)) {
+    const names = value.flatMap((entry) => {
+      const object = reviewObject(entry);
+      return object && typeof object.name === "string" ? [object.name] : [];
+    });
+    return names.length ? names.join("、") : value.map(String).join("、") || "未填";
+  }
+  if (typeof value === "object") return JSON.stringify(value);
+  return String(value);
+}
+
+function pathAction(
+  actions: DocumentPatchActionView[],
+  path: string,
+): DocumentPatchActionView | undefined {
+  return actions.find((action) => action.path === path);
+}
+
+function entityAction(
+  actions: DocumentPatchActionView[],
+  collection: "duties" | "tasks" | "opks",
+  identity: string,
+  operation: "add" | "withdraw",
+): DocumentPatchActionView | undefined {
+  const idField = collection === "duties"
+    ? "duty_id"
+    : collection === "tasks"
+      ? "task_id"
+      : "item_id";
+  return actions.find((action) => {
+    if (action.operation !== operation) return false;
+    if (operation === "withdraw") {
+      return action.path === `/${collection}/${identity}`;
+    }
+    const after = reviewObject(action.after);
+    return action.path === `/${collection}` && after?.[idField] === identity;
+  });
+}
+
+function ReviewDiffValue({
+  label,
+  current,
+  action,
+}: {
+  label: string;
+  current: unknown;
+  action?: DocumentPatchActionView;
+}) {
+  if (!action) {
+    return (
+      <div>
+        <p className="text-[11px] font-medium text-stone-500">{label}</p>
+        <p className="mt-0.5 text-sm leading-6 text-stone-700">
+          {reviewValueText(current)}
+        </p>
+      </div>
+    );
+  }
+  return (
+    <div data-change-id={action.action_id}>
+      <p className="text-[11px] font-medium text-stone-500">{label}</p>
+      {action.before !== null ? (
+        <p className="mt-0.5 text-sm leading-6 text-rose-700 line-through decoration-rose-400">
+          {reviewValueText(action.before)}
+        </p>
+      ) : null}
+      {action.after !== null ? (
+        <p className="mt-0.5 rounded-md bg-emerald-50 px-2 py-1 text-sm leading-6 text-emerald-800">
+          {reviewValueText(action.after)}
+        </p>
+      ) : null}
+    </div>
+  );
+}
+
+function ReviewItemCard({
+  item,
+  approvedItem,
+  label,
+  taskId,
+  actions,
+  removedRelation = false,
+}: {
+  item: ReviewItem | null;
+  approvedItem: ReviewItem | null;
+  label: string;
+  taskId: string | null;
+  actions: DocumentPatchActionView[];
+  removedRelation?: boolean;
+}) {
+  const identity = item?.item_id ?? approvedItem!.item_id;
+  const add = entityAction(actions, "opks", identity, "add");
+  const withdraw = entityAction(actions, "opks", identity, "withdraw");
+  const textChange = pathAction(actions, `/opks/${identity}/text`);
+  const relationChange = pathAction(actions, `/opks/${identity}/task_ids`);
+  const currentLinked = taskId ? Boolean(item?.task_ids.includes(taskId)) : false;
+  const approvedLinked = taskId
+    ? Boolean(approvedItem?.task_ids.includes(taskId))
+    : false;
+  const relationAdded = Boolean(relationChange && currentLinked && !approvedLinked);
+  const removed = !item || Boolean(withdraw) || removedRelation;
+  const currentText = item?.text ?? approvedItem?.text ?? "未命名內容";
+
+  return (
+    <div
+      data-change-id={(withdraw ?? add ?? relationChange ?? textChange)?.action_id}
+      className={`rounded-lg border p-3 ${
+        removed
+          ? "border-rose-200 bg-rose-50/60"
+          : add || relationAdded
+            ? "border-emerald-200 bg-emerald-50/60"
+            : "border-stone-200 bg-stone-50/70"
+      }`}
+    >
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <span className="font-semibold text-stone-700">{label}</span>
+        {item && ["knowledge", "skill"].includes(item.kind) && item.task_ids.length > 1 ? (
+          <span className="rounded-full bg-white px-2 py-1 text-stone-600 ring-1 ring-stone-200">
+            共用於 {item.task_ids.length} 項工作
+          </span>
+        ) : null}
+        {removed ? <span className="text-rose-700">{removedRelation ? "從這項工作移除" : "移除"}</span> : null}
+        {add ? <span className="text-emerald-700">新增</span> : null}
+        {relationAdded ? <span className="text-emerald-700">新增關聯</span> : null}
+      </div>
+      {textChange ? (
+        <div className="mt-2">
+          <ReviewDiffValue label="內容" current={currentText} action={textChange} />
+        </div>
+      ) : (
+        <p className={`mt-2 text-sm leading-6 ${removed ? "text-rose-700 line-through" : "text-stone-700"}`}>
+          {currentText}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ReviewTaskCard({
+  task,
+  approvedTask,
+  taskLabel,
+  currentDocument,
+  approvedDocument,
+  actions,
+  movedIn,
+  removed,
+}: {
+  task: ReviewTask | null;
+  approvedTask: ReviewTask | null;
+  taskLabel: string;
+  currentDocument: ReviewDocument;
+  approvedDocument: ReviewDocument;
+  actions: DocumentPatchActionView[];
+  movedIn?: boolean;
+  removed?: boolean;
+}) {
+  const visibleTask = task ?? approvedTask!;
+  const identity = visibleTask.task_id;
+  const add = entityAction(actions, "tasks", identity, "add");
+  const withdraw = entityAction(actions, "tasks", identity, "withdraw");
+  const statementChange = pathAction(actions, `/tasks/${identity}/statement`);
+  const isRemoved = Boolean(removed || withdraw || !task);
+  const currentItems = currentDocument.opks.filter(
+    (item) => item.kind !== "attitude" && item.task_ids.includes(identity),
+  );
+  const approvedItems = approvedDocument.opks.filter(
+    (item) => item.kind !== "attitude" && item.task_ids.includes(identity),
+  );
+  const itemIds = [
+    ...currentItems.map((item) => item.item_id),
+    ...approvedItems
+      .filter((item) => !currentItems.some((current) => current.item_id === item.item_id))
+      .filter((item) => {
+        const current = currentDocument.opks.find((entry) => entry.item_id === item.item_id);
+        return Boolean(
+          entityAction(actions, "opks", item.item_id, "withdraw") ||
+            (current && pathAction(actions, `/opks/${item.item_id}/task_ids`)),
+        );
+      })
+      .map((item) => item.item_id),
+  ];
+  const itemOrdinals = new Map<ReviewItem["kind"], number>();
+
+  return (
+    <article
+      aria-label={`${taskLabel} ${visibleTask.statement || "未命名工作"}`}
+      data-change-id={(withdraw ?? add ?? statementChange)?.action_id}
+      className={`rounded-xl border p-4 ${
+        isRemoved
+          ? "border-rose-200 bg-rose-50/50"
+          : add || movedIn
+            ? "border-emerald-200 bg-emerald-50/45"
+            : "border-stone-200 bg-white"
+      }`}
+    >
+      <div className="flex flex-wrap items-start gap-3">
+        <span className="rounded-md bg-stone-100 px-2 py-1 text-[11px] font-semibold text-stone-600">
+          {taskLabel}
+        </span>
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            {isRemoved ? <span className="text-xs font-medium text-rose-700">{movedIn ? "" : "從此職責移出"}</span> : null}
+            {movedIn ? <span className="text-xs font-medium text-emerald-700">移入此職責</span> : null}
+            {add ? <span className="text-xs font-medium text-emerald-700">新增工作</span> : null}
+          </div>
+          {statementChange ? (
+            <ReviewDiffValue label="工作敘述" current={visibleTask.statement} action={statementChange} />
+          ) : (
+            <h4 className={`mt-1 text-base font-semibold ${isRemoved ? "text-rose-700 line-through" : "text-stone-900"}`}>
+              {visibleTask.statement || "未命名工作"}
+            </h4>
+          )}
+          {!isRemoved ? (
+            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+              {reviewTaskFields.map(({ field, label }) => {
+                const action = pathAction(actions, `/tasks/${identity}/${field}`);
+                const value = task?.[field];
+                if (!action && (value === null || value === "" || (Array.isArray(value) && !value.length))) {
+                  return null;
+                }
+                return <ReviewDiffValue key={field} label={label} current={value} action={action} />;
+              })}
+            </div>
+          ) : null}
+        </div>
+      </div>
+      {itemIds.length ? (
+        <div className="mt-4 border-t border-stone-100 pt-4">
+          <p className="text-xs font-semibold tracking-[0.14em] text-stone-500 uppercase">O／P／K／S</p>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            {itemIds.map((itemId) => {
+              const item = currentDocument.opks.find((entry) => entry.item_id === itemId) ?? null;
+              const approvedItem = approvedDocument.opks.find((entry) => entry.item_id === itemId) ?? null;
+              const kind = item?.kind ?? approvedItem!.kind;
+              const ordinal = (itemOrdinals.get(kind) ?? 0) + 1;
+              itemOrdinals.set(kind, ordinal);
+              return (
+                <ReviewItemCard
+                  key={`${identity}:${itemId}`}
+                  item={item}
+                  approvedItem={approvedItem}
+                  label={`${itemKindCodes[kind]} ${ordinal}`}
+                  taskId={identity}
+                  actions={actions}
+                  removedRelation={Boolean(approvedItem?.task_ids.includes(identity) && !item?.task_ids.includes(identity))}
+                />
+              );
+            })}
+          </div>
+        </div>
+      ) : null}
+    </article>
+  );
+}
+
+export function CurrentDocumentSemanticOutline({
+  document,
+  approvedDocument,
+  actions = [],
+}: {
+  document: ReviewDocument;
+  approvedDocument: ReviewDocument;
+  actions?: DocumentPatchActionView[];
+}) {
+  const currentDuties = [...document.duties].sort((a, b) => a.display_order - b.display_order);
+  const approvedDuties = [...approvedDocument.duties].sort((a, b) => a.display_order - b.display_order);
+  const currentTasks = [...document.tasks].sort((a, b) => a.display_order - b.display_order);
+  const approvedTasks = [...approvedDocument.tasks].sort((a, b) => a.display_order - b.display_order);
+  const taskIds = [
+    ...currentTasks.map((task) => task.task_id),
+    ...approvedTasks
+      .filter((task) => !currentTasks.some((current) => current.task_id === task.task_id))
+      .map((task) => task.task_id),
+  ];
+  const taskLabels = new Map(taskIds.map((id, index) => [id, `Task ${index + 1}`]));
+  const dutyIds = [
+    ...currentDuties.map((duty) => duty.duty_id),
+    ...approvedDuties
+      .filter(
+        (duty) =>
+          !currentDuties.some((current) => current.duty_id === duty.duty_id) &&
+          Boolean(entityAction(actions, "duties", duty.duty_id, "withdraw")),
+      )
+      .map((duty) => duty.duty_id),
+  ];
+
+  const taskCards = (dutyId: string | null) => {
+    const currentAtLocation = currentTasks.filter((task) => task.duty_id === dutyId);
+    const oldTraces = approvedTasks.filter((approvedTask) => {
+      if (approvedTask.duty_id !== dutyId) return false;
+      const current = currentTasks.find((task) => task.task_id === approvedTask.task_id);
+      if (!current) return Boolean(entityAction(actions, "tasks", approvedTask.task_id, "withdraw"));
+      return current.duty_id !== dutyId && Boolean(pathAction(actions, `/tasks/${approvedTask.task_id}/duty_id`));
+    });
+    return (
+      <div className="mt-4 space-y-3">
+        {currentAtLocation.map((task) => {
+          const approvedTask = approvedTasks.find((entry) => entry.task_id === task.task_id) ?? null;
+          const movedIn = Boolean(
+            approvedTask &&
+              approvedTask.duty_id !== task.duty_id &&
+              pathAction(actions, `/tasks/${task.task_id}/duty_id`),
+          );
+          return (
+            <ReviewTaskCard
+              key={`current:${task.task_id}`}
+              task={task}
+              approvedTask={approvedTask}
+              taskLabel={taskLabels.get(task.task_id) ?? "Task"}
+              currentDocument={document}
+              approvedDocument={approvedDocument}
+              actions={actions}
+              movedIn={movedIn}
+            />
+          );
+        })}
+        {oldTraces.map((task) => (
+          <ReviewTaskCard
+            key={`old:${dutyId ?? "unassigned"}:${task.task_id}`}
+            task={null}
+            approvedTask={task}
+            taskLabel={taskLabels.get(task.task_id) ?? "Task"}
+            currentDocument={document}
+            approvedDocument={approvedDocument}
+            actions={actions}
+            removed
+          />
+        ))}
+        {!currentAtLocation.length && !oldTraces.length ? (
+          <p className="rounded-lg border border-dashed border-stone-300 px-3 py-4 text-sm text-stone-500">
+            目前沒有這個位置的工作。
+          </p>
+        ) : null}
+      </div>
+    );
+  };
+
+  const currentUnassignedItems = document.opks.filter(
+    (item) => item.kind !== "attitude" && !item.task_ids.some((id) => currentTasks.some((task) => task.task_id === id)),
+  );
+  const documentItems = document.opks.filter((item) => item.kind === "attitude");
+
+  return (
+    <section aria-label="JD 語意比較" className="space-y-4">
+      {dutyIds.map((dutyId, index) => {
+        const duty = currentDuties.find((entry) => entry.duty_id === dutyId) ?? null;
+        const approvedDuty = approvedDuties.find((entry) => entry.duty_id === dutyId) ?? null;
+        const visibleDuty = duty ?? approvedDuty!;
+        const add = entityAction(actions, "duties", dutyId, "add");
+        const withdraw = entityAction(actions, "duties", dutyId, "withdraw");
+        const statementChange = pathAction(actions, `/duties/${dutyId}/statement`);
+        const dutyLabel = `Duty ${index + 1}`;
+        return (
+          <section
+            key={dutyId}
+            aria-label={`${dutyLabel} ${visibleDuty.statement}`}
+            className={`rounded-2xl border p-4 ${withdraw ? "border-rose-200 bg-rose-50/45" : add ? "border-emerald-200 bg-emerald-50/40" : "border-stone-200 bg-stone-50/80"}`}
+          >
+            <div className="flex items-start gap-3">
+              <span className="rounded-md bg-stone-900 px-2 py-1 text-[11px] font-semibold text-white">{dutyLabel}</span>
+              <div className="min-w-0 flex-1">
+                {statementChange ? (
+                  <ReviewDiffValue label="職責名稱" current={visibleDuty.statement} action={statementChange} />
+                ) : (
+                  <h3 className={`text-lg font-semibold ${withdraw ? "text-rose-700 line-through" : ""}`}>{visibleDuty.statement}</h3>
+                )}
+                {add ? <p className="mt-1 text-xs font-medium text-emerald-700">新增職責</p> : null}
+                {withdraw ? <p className="mt-1 text-xs font-medium text-rose-700">移除職責</p> : null}
+              </div>
+            </div>
+            {taskCards(dutyId)}
+          </section>
+        );
+      })}
+
+      <section aria-label="尚未歸屬" className="rounded-2xl border border-dashed border-stone-300 bg-white p-4">
+        <h3 className="text-lg font-semibold">尚未歸屬</h3>
+        <p className="mt-1 text-sm text-stone-500">尚未分到 Duty／Task 的內容仍會清楚留在這裡。</p>
+        {taskCards(null)}
+        {currentUnassignedItems.length ? (
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {currentUnassignedItems.map((item, index) => (
+              <ReviewItemCard
+                key={`unassigned:${item.item_id}`}
+                item={item}
+                approvedItem={approvedDocument.opks.find((entry) => entry.item_id === item.item_id) ?? null}
+                label={`${itemKindCodes[item.kind]} ${index + 1}`}
+                taskId={null}
+                actions={actions}
+              />
+            ))}
+          </div>
+        ) : null}
+      </section>
+
+      {documentItems.length ? (
+        <section aria-label="文件層級 A" className="rounded-2xl border border-stone-200 bg-white p-4">
+          <h3 className="text-lg font-semibold">文件層級項目</h3>
+          <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            {documentItems.map((item, index) => (
+              <ReviewItemCard
+                key={`document:${item.item_id}`}
+                item={item}
+                approvedItem={approvedDocument.opks.find((entry) => entry.item_id === item.item_id) ?? null}
+                label={`A ${index + 1}`}
+                taskId={null}
+                actions={actions}
+              />
+            ))}
+          </div>
+        </section>
+      ) : null}
     </section>
   );
 }

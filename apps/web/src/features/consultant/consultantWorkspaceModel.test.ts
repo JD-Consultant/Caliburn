@@ -9,6 +9,7 @@ import {
   EXTERNAL_AI_DISCLOSURE,
   buildConversationEntries,
   buildCurrentDocumentOutline,
+  buildDocumentReviewSemanticGroups,
   buildReviewDecision,
   consultantRunStatus,
   documentPathLabel,
@@ -372,6 +373,43 @@ describe("employee-facing consultant workspace model", () => {
     expect(consultantRunStatus(value)).toEqual({ busy: true, text: "回答已保存，AI 正在分析…" });
     value.run = { ...value.run, status: "failed", error_code: "provider_timeout" };
     expect(consultantRunStatus(value)).toEqual({ busy: false, text: "分析未完成；你的回答已保存，可以重試。" });
+  });
+
+  it("groups atomic actions together without merging separate semantic decisions", () => {
+    const bundle = changeset();
+    const independentAction = {
+      ...bundle.actions[0],
+      action_id: "00000000-0000-0000-0000-000000000014",
+      atomic_subgroup_id: null,
+    };
+    const secondAtomicAction = {
+      ...bundle.actions[0],
+      action_id: "00000000-0000-0000-0000-000000000015",
+      atomic_subgroup_id: "00000000-0000-0000-0000-000000000016",
+    };
+
+    const groups = buildDocumentReviewSemanticGroups([
+      {
+        ...bundle,
+        actions: [
+          bundle.actions[0],
+          bundle.actions[1],
+          independentAction,
+          secondAtomicAction,
+        ],
+      },
+    ]);
+
+    expect(groups.map((group) => group.actions.map((action) => action.action_id))).toEqual([
+      [ACTION_ID, ACTION_ID_2],
+      [independentAction.action_id],
+      [secondAtomicAction.action_id],
+    ]);
+    expect(groups.map((group) => group.key)).toEqual([
+      `${CHANGESET_ID}:atomic:${ATOMIC_ID}`,
+      `${CHANGESET_ID}:action:${independentAction.action_id}`,
+      `${CHANGESET_ID}:atomic:${secondAtomicAction.atomic_subgroup_id}`,
+    ]);
   });
 
   it("keeps task labels stable across grouping and numbers unassigned items per kind", () => {

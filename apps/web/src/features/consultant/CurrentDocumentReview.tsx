@@ -30,7 +30,7 @@ import {
   buildDocumentReviewSemanticGroups,
   buildReviewDecision,
   documentPathLabel,
-  reviewSelectionForDecision,
+  reviewActionsForAcceptance,
 } from "./consultantWorkspaceModel";
 
 const headerFields: Array<{
@@ -127,7 +127,11 @@ export function CurrentDocumentReview({
       : Math.max(0, groups.findIndex((group) => group.key === activeKey));
   const currentGroup = activeIndex === null ? null : groups[activeIndex] ?? null;
   const allActions = groups.flatMap((group) => group.actions);
-  const visibleActions = currentGroup?.actions ?? allActions;
+  const primaryActionIds = currentGroup?.actions.map((action) => action.action_id) ?? [];
+  const acceptanceActions = currentGroup
+    ? reviewActionsForAcceptance(currentGroup.bundle, primaryActionIds)
+    : [];
+  const visibleActions = currentGroup ? acceptanceActions : allActions;
   const review = snapshot.document_review;
 
   const mutation = useMutation({
@@ -169,12 +173,10 @@ export function CurrentDocumentReview({
       setDecisionError("拒絕時請簡短說明原因，讓顧問之後不要重複提出同一內容。");
       return;
     }
-    const selectedActionIds = currentGroup.actions.map((action) => action.action_id);
-    const decidedActionIds = reviewSelectionForDecision(
-      currentGroup.bundle,
-      selectedActionIds,
-      command,
-    );
+    const decidedActionIds =
+      command === "reject_changes"
+        ? primaryActionIds
+        : acceptanceActions.map((action) => action.action_id);
     let editedAfter: DocumentReviewDecisionWrite["edited_after_by_action_id"] = {};
     if (command === "edit_and_accept_changes") {
       editedAfter = Object.fromEntries(
@@ -233,6 +235,23 @@ export function CurrentDocumentReview({
 
   return (
     <section aria-label="審核變更" className="space-y-4">
+      {review.workspace_status === "conflicted" ? (
+        <div
+          role="status"
+          aria-label="文件內容需要重新確認"
+          className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm"
+        >
+          <p className="font-semibold">目前文件內容需要重新確認</p>
+          <p className="mt-1 text-stone-700">
+            請先查看最新文件內容，再決定是否接受 AI 變更。
+          </p>
+          {review.diagnostics.map((diagnostic, index) => (
+            <p key={`${diagnostic.code}:${diagnostic.path}:${index}`} className="mt-1 text-stone-700">
+              {diagnostic.message}
+            </p>
+          ))}
+        </div>
+      ) : null}
       <Card className="sticky top-[76px] z-10 border-stone-200 bg-white/95 p-4 shadow-sm backdrop-blur">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -295,6 +314,11 @@ export function CurrentDocumentReview({
                     ? `這是一個決定，包含 ${currentGroup.actions.length} 項相關變更。`
                     : `影響內容：${documentPathLabel(currentGroup.actions[0].path)}`}
                 </p>
+                {acceptanceActions.length > currentGroup.actions.length ? (
+                  <p className="mt-1 text-xs text-stone-600">
+                    接受或修改後接受會一併處理下方列出的前置變更。
+                  </p>
+                ) : null}
               </div>
               <div className="flex flex-wrap gap-2">
                 <Button
@@ -312,6 +336,11 @@ export function CurrentDocumentReview({
                 </Button>
               </div>
             </div>
+            {currentGroup.bundle.acceptance_blocked ? (
+              <p className="mt-3 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-900">
+                這項變更暫時不能接受，請先確認文件目前內容；你仍可拒絕這項建議。
+              </p>
+            ) : null}
             <label className="mt-3 block text-xs text-stone-500" htmlFor={`review-reason-${currentGroup.key}`}>
               若要拒絕，請簡短說明原因
             </label>
@@ -324,7 +353,7 @@ export function CurrentDocumentReview({
             <details className="mt-3 rounded-lg border border-stone-200 bg-stone-50/70 px-3 py-2">
               <summary className="cursor-pointer text-xs font-medium text-stone-600">先修改 AI 建議再接受</summary>
               <div className="mt-3 space-y-3">
-                {currentGroup.actions.map((action) => (
+                {visibleActions.map((action) => (
                   <div key={action.action_id} className="rounded-lg bg-white p-3">
                     <p className="mb-2 text-xs font-medium text-stone-500">{documentPathLabel(action.path)}</p>
                     <DocumentChangeEditor

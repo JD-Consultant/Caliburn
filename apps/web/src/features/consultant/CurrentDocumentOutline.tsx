@@ -646,6 +646,35 @@ function reviewValueText(value: unknown): string {
   return String(value);
 }
 
+function reviewOrderText(value: unknown): string {
+  return typeof value === "number" && Number.isInteger(value) && value >= 0
+    ? `第 ${value + 1} 項`
+    : "未指定";
+}
+
+function buildReviewIndicatorLabels(
+  document: ReviewDocument,
+  approvedDocument: ReviewDocument,
+): Map<string, string> {
+  const byId = new Map<string, ReviewItem>();
+  for (const item of [...approvedDocument.opks, ...document.opks]) {
+    if (item.kind === "indicator") byId.set(item.item_id, item);
+  }
+  return new Map(
+    [...byId.values()]
+      .sort((left, right) => left.display_order - right.display_order || left.item_id.localeCompare(right.item_id))
+      .map((item, index) => [item.item_id, `P ${index + 1}`]),
+  );
+}
+
+function reviewIndicatorText(value: unknown, labels: Map<string, string>): string {
+  if (!Array.isArray(value)) return "未填";
+  const names = value
+    .filter((entry): entry is string => typeof entry === "string")
+    .map((entry) => labels.get(entry) ?? "P（未列出）");
+  return names.length ? names.join("、") : "未連結";
+}
+
 function pathAction(
   actions: DocumentPatchActionView[],
   path: string,
@@ -678,10 +707,12 @@ function ReviewDiffValue({
   label,
   current,
   action,
+  formatValue = reviewValueText,
 }: {
   label: string;
   current: unknown;
   action?: DocumentPatchActionView;
+  formatValue?: (value: unknown) => string;
 }) {
   if (!action) {
     return (
@@ -698,12 +729,12 @@ function ReviewDiffValue({
       <p className="text-[11px] font-medium text-stone-500">{label}</p>
       {action.before !== null ? (
         <p className="mt-0.5 text-sm leading-6 text-rose-700 line-through decoration-rose-400">
-          {reviewValueText(action.before)}
+          {formatValue(action.before)}
         </p>
       ) : null}
       {action.after !== null ? (
         <p className="mt-0.5 rounded-md bg-emerald-50 px-2 py-1 text-sm leading-6 text-emerald-800">
-          {reviewValueText(action.after)}
+          {formatValue(action.after)}
         </p>
       ) : null}
     </div>
@@ -716,6 +747,7 @@ function ReviewItemCard({
   label,
   taskId,
   actions,
+  indicatorLabels,
   removedRelation = false,
 }: {
   item: ReviewItem | null;
@@ -723,6 +755,7 @@ function ReviewItemCard({
   label: string;
   taskId: string | null;
   actions: DocumentPatchActionView[];
+  indicatorLabels: Map<string, string>;
   removedRelation?: boolean;
 }) {
   const identity = item?.item_id ?? approvedItem!.item_id;
@@ -730,6 +763,8 @@ function ReviewItemCard({
   const withdraw = entityAction(actions, "opks", identity, "withdraw");
   const textChange = pathAction(actions, `/opks/${identity}/text`);
   const relationChange = pathAction(actions, `/opks/${identity}/task_ids`);
+  const orderChange = pathAction(actions, `/opks/${identity}/display_order`);
+  const indicatorChange = pathAction(actions, `/opks/${identity}/indicator_ids`);
   const currentLinked = taskId ? Boolean(item?.task_ids.includes(taskId)) : false;
   const approvedLinked = taskId
     ? Boolean(approvedItem?.task_ids.includes(taskId))
@@ -769,6 +804,26 @@ function ReviewItemCard({
           {currentText}
         </p>
       )}
+      {orderChange || indicatorChange ? (
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          {orderChange ? (
+            <ReviewDiffValue
+              label="顯示順序"
+              current={item?.display_order ?? approvedItem?.display_order}
+              action={orderChange}
+              formatValue={reviewOrderText}
+            />
+          ) : null}
+          {indicatorChange ? (
+            <ReviewDiffValue
+              label="關聯績效指標"
+              current={item?.indicator_ids ?? approvedItem?.indicator_ids}
+              action={indicatorChange}
+              formatValue={(value) => reviewIndicatorText(value, indicatorLabels)}
+            />
+          ) : null}
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -780,6 +835,7 @@ function ReviewTaskCard({
   currentDocument,
   approvedDocument,
   actions,
+  indicatorLabels,
   movedIn,
   removed,
 }: {
@@ -789,6 +845,7 @@ function ReviewTaskCard({
   currentDocument: ReviewDocument;
   approvedDocument: ReviewDocument;
   actions: DocumentPatchActionView[];
+  indicatorLabels: Map<string, string>;
   movedIn?: boolean;
   removed?: boolean;
 }) {
@@ -797,6 +854,7 @@ function ReviewTaskCard({
   const add = entityAction(actions, "tasks", identity, "add");
   const withdraw = entityAction(actions, "tasks", identity, "withdraw");
   const statementChange = pathAction(actions, `/tasks/${identity}/statement`);
+  const orderChange = pathAction(actions, `/tasks/${identity}/display_order`);
   const isRemoved = Boolean(removed || withdraw || !task);
   const currentItems = currentDocument.opks.filter(
     (item) => item.kind !== "attitude" && item.task_ids.includes(identity),
@@ -848,6 +906,16 @@ function ReviewTaskCard({
               {visibleTask.statement || "未命名工作"}
             </h4>
           )}
+          {orderChange ? (
+            <div className="mt-2">
+              <ReviewDiffValue
+                label="顯示順序"
+                current={visibleTask.display_order}
+                action={orderChange}
+                formatValue={reviewOrderText}
+              />
+            </div>
+          ) : null}
           {!isRemoved ? (
             <div className="mt-3 grid gap-3 sm:grid-cols-2">
               {reviewTaskFields.map(({ field, label }) => {
@@ -880,6 +948,7 @@ function ReviewTaskCard({
                   label={`${itemKindCodes[kind]} ${ordinal}`}
                   taskId={identity}
                   actions={actions}
+                  indicatorLabels={indicatorLabels}
                   removedRelation={Boolean(approvedItem?.task_ids.includes(identity) && !item?.task_ids.includes(identity))}
                 />
               );
@@ -904,6 +973,7 @@ export function CurrentDocumentSemanticOutline({
   const approvedDuties = [...approvedDocument.duties].sort((a, b) => a.display_order - b.display_order);
   const currentTasks = [...document.tasks].sort((a, b) => a.display_order - b.display_order);
   const approvedTasks = [...approvedDocument.tasks].sort((a, b) => a.display_order - b.display_order);
+  const indicatorLabels = buildReviewIndicatorLabels(document, approvedDocument);
   const taskIds = [
     ...currentTasks.map((task) => task.task_id),
     ...approvedTasks
@@ -948,6 +1018,7 @@ export function CurrentDocumentSemanticOutline({
               currentDocument={document}
               approvedDocument={approvedDocument}
               actions={actions}
+              indicatorLabels={indicatorLabels}
               movedIn={movedIn}
             />
           );
@@ -961,6 +1032,7 @@ export function CurrentDocumentSemanticOutline({
             currentDocument={document}
             approvedDocument={approvedDocument}
             actions={actions}
+            indicatorLabels={indicatorLabels}
             removed
           />
         ))}
@@ -987,6 +1059,7 @@ export function CurrentDocumentSemanticOutline({
         const add = entityAction(actions, "duties", dutyId, "add");
         const withdraw = entityAction(actions, "duties", dutyId, "withdraw");
         const statementChange = pathAction(actions, `/duties/${dutyId}/statement`);
+        const orderChange = pathAction(actions, `/duties/${dutyId}/display_order`);
         const dutyLabel = `Duty ${index + 1}`;
         return (
           <section
@@ -1004,6 +1077,16 @@ export function CurrentDocumentSemanticOutline({
                 )}
                 {add ? <p className="mt-1 text-xs font-medium text-emerald-700">新增職責</p> : null}
                 {withdraw ? <p className="mt-1 text-xs font-medium text-rose-700">移除職責</p> : null}
+                {orderChange ? (
+                  <div className="mt-2">
+                    <ReviewDiffValue
+                      label="顯示順序"
+                      current={visibleDuty.display_order}
+                      action={orderChange}
+                      formatValue={reviewOrderText}
+                    />
+                  </div>
+                ) : null}
               </div>
             </div>
             {taskCards(dutyId)}
@@ -1025,6 +1108,7 @@ export function CurrentDocumentSemanticOutline({
                 label={`${itemKindCodes[item.kind]} ${index + 1}`}
                 taskId={null}
                 actions={actions}
+                indicatorLabels={indicatorLabels}
               />
             ))}
           </div>
@@ -1043,6 +1127,7 @@ export function CurrentDocumentSemanticOutline({
                 label={`A ${index + 1}`}
                 taskId={null}
                 actions={actions}
+                indicatorLabels={indicatorLabels}
               />
             ))}
           </div>

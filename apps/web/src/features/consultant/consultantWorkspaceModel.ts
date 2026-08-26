@@ -414,6 +414,16 @@ export function reviewSelectionForDecision(
     .map((action) => action.action_id);
 }
 
+export function reviewActionsForAcceptance(
+  changeset: DocumentChangeSetView,
+  actionIds: string[],
+): DocumentPatchActionView[] {
+  const acceptedActionIds = new Set(
+    reviewSelectionForDecision(changeset, actionIds, "accept_changes"),
+  );
+  return changeset.actions.filter((action) => acceptedActionIds.has(action.action_id));
+}
+
 export function toApprovedDocumentWrite(
   value: ApprovedJobDocumentView,
 ): ApprovedJobDocumentWrite {

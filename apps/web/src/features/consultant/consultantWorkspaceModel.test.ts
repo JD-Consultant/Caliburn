@@ -14,6 +14,7 @@ import {
   consultantRunStatus,
   documentPathLabel,
   interviewWorkStatusLabel,
+  reviewActionsForAcceptance,
   reviewSelectionForAction,
   reviewSelectionForDecision,
   shouldRefetchForEvent,
@@ -340,12 +341,15 @@ describe("employee-facing consultant workspace model", () => {
     });
   });
 
-  it("adds unresolved dependencies only when accepting a document change", () => {
+  it("keeps the acceptance closure visible while rejection stays primary-only", () => {
     const bundle = changeset();
     bundle.actions[0].atomic_subgroup_id = null;
     bundle.actions[1].atomic_subgroup_id = null;
     bundle.actions[0].depends_on_action_ids = [ACTION_ID_2];
 
+    expect(
+      reviewActionsForAcceptance(bundle, [ACTION_ID]).map((action) => action.action_id),
+    ).toEqual([ACTION_ID, ACTION_ID_2]);
     expect(reviewSelectionForDecision(bundle, [ACTION_ID], "accept_changes")).toEqual([
       ACTION_ID,
       ACTION_ID_2,

@@ -361,6 +361,74 @@ describe("employee consultant workspace integration", () => {
     expect(screen.queryByRole("button", { name: /稍後處理/ })).toBeNull();
   });
 
+  it("shows every dependency included by edit-and-accept before sending it", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    const primaryActionId = "dependency-primary-action";
+    const dependencyActionId = "dependency-prerequisite-action";
+    const baseAction = snapshot.document_review.bundles[0].actions[0];
+    snapshot.document_review.bundles = [
+      {
+        ...snapshot.document_review.bundles[0],
+        changeset_id: "dependency-visibility-changeset",
+        summary: "更新職務內容並補齊前置變更",
+        actions: [
+          {
+            ...baseAction,
+            action_id: primaryActionId,
+            path: "/job_title",
+            target_key: "/job_title",
+            before: "採購專員",
+            after: "資深採購專員",
+            depends_on_action_ids: [dependencyActionId],
+            atomic_subgroup_id: null,
+          },
+          {
+            ...baseAction,
+            action_id: dependencyActionId,
+            path: "/work_description",
+            target_key: "/work_description",
+            before: null,
+            after: "前置工作描述建議",
+            depends_on_action_ids: [],
+            atomic_subgroup_id: null,
+          },
+        ],
+      },
+    ];
+    snapshot.document_review.unresolved_action_count = 2;
+    const response = structuredClone(snapshot);
+    response.revision += 1;
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(screen.getAllByText("工作描述").length).toBeGreaterThan(0);
+    await user.click(screen.getByText("先修改 AI 建議再接受"));
+    expect(screen.getByLabelText("工作描述")).toBeTruthy();
+    const title = screen.getByLabelText("職務名稱");
+    await user.clear(title);
+    await user.type(title, "資深採購與供應專員");
+    await user.click(screen.getByRole("button", { name: "修改後接受" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+    const body = JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body));
+    expect(body).toMatchObject({
+      command: "edit_and_accept_changes",
+      action_ids: [primaryActionId, dependencyActionId],
+      edited_after_by_action_id: {
+        [primaryActionId]: "資深採購與供應專員",
+      },
+    });
+  });
+
   it("shows one reassignment decision at both its old and new Duty positions", async () => {
     const user = userEvent.setup();
     renderWorkspaceFixture(semanticReviewSnapshotFixture());
@@ -381,6 +449,93 @@ describe("employee consultant workspace integration", () => {
     expect(
       screen.getAllByRole("button", { name: "接受這項變更" }),
     ).toHaveLength(1);
+  });
+
+  it("shows friendly order and performance-indicator labels for semantic actions", () => {
+    const snapshot = hierarchicalSnapshotFixture();
+    const sourceId = snapshot.latest_source_id!;
+    const duty = snapshot.current_document.duties[0];
+    const task = snapshot.current_document.tasks[0];
+    const knowledge = snapshot.current_document.opks.find((item) => item.kind === "knowledge")!;
+    const indicator = snapshot.current_document.opks.find((item) => item.kind === "indicator")!;
+    const secondIndicator = {
+      ...indicator,
+      item_id: "00000000-0000-0000-0000-000000000110",
+      text: "申訴結案率",
+      display_order: 1,
+    };
+    snapshot.current_document.opks.push(secondIndicator);
+    snapshot.approved_document = structuredClone(snapshot.current_document);
+    snapshot.approved_document.duties[0].display_order = 0;
+    snapshot.current_document.duties[0].display_order = 1;
+    snapshot.approved_document.tasks[0].display_order = 0;
+    snapshot.current_document.tasks[0].display_order = 1;
+    snapshot.approved_document.opks.find((item) => item.item_id === knowledge.item_id)!.display_order = 0;
+    snapshot.current_document.opks.find((item) => item.item_id === knowledge.item_id)!.display_order = 1;
+    snapshot.approved_document.opks.find((item) => item.item_id === knowledge.item_id)!.indicator_ids = [];
+    snapshot.current_document.opks.find((item) => item.item_id === knowledge.item_id)!.indicator_ids = [
+      indicator.item_id,
+      secondIndicator.item_id,
+    ];
+
+    const baseAction = snapshot.document_review.bundles[0].actions[0];
+    const action = (overrides: Partial<DocumentPatchActionView>): DocumentPatchActionView => ({
+      ...baseAction,
+      atomic_subgroup_id: "order-and-indicator-group",
+      ...overrides,
+    });
+    snapshot.document_review.bundles = [
+      {
+        ...snapshot.document_review.bundles[0],
+        changeset_id: "order-and-indicator-changeset",
+        source_ids: [sourceId],
+        actions: [
+          action({
+            action_id: "duty-order-action",
+            operation: "reorder",
+            path: `/duties/${duty.duty_id}/display_order`,
+            target_key: `duty:${duty.duty_id}`,
+            before: 0,
+            after: 1,
+          }),
+          action({
+            action_id: "task-order-action",
+            operation: "reorder",
+            path: `/tasks/${task.task_id}/display_order`,
+            target_key: `task:${task.task_id}`,
+            before: 0,
+            after: 1,
+          }),
+          action({
+            action_id: "item-order-action",
+            operation: "reorder",
+            path: `/opks/${knowledge.item_id}/display_order`,
+            target_key: `opks:${knowledge.item_id}`,
+            before: 0,
+            after: 1,
+          }),
+          action({
+            action_id: "indicator-relation-action",
+            operation: "revise",
+            path: `/opks/${knowledge.item_id}/indicator_ids`,
+            target_key: `opks:${knowledge.item_id}:indicator_ids`,
+            before: [indicator.item_id],
+            after: [indicator.item_id, secondIndicator.item_id],
+          }),
+        ],
+      },
+    ];
+    snapshot.document_review.unresolved_action_count = 4;
+
+    renderWithClient(
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(screen.getAllByText("第 1 項").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("第 2 項").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("P 1、P 2").length).toBeGreaterThan(0);
+    expect(document.body.textContent).not.toContain(indicator.item_id);
+    expect(document.body.textContent).not.toContain(secondIndicator.item_id);
   });
 
   it("opens the approved export baseline as a secondary read-only view", async () => {
@@ -861,6 +1016,57 @@ describe("employee consultant workspace integration", () => {
     expect(document.body.textContent).not.toContain("/workspace/");
   });
 
+  it("shows conflicted diagnostics safely while keeping rejection available", async () => {
+    const snapshot = consultantSnapshotFixture();
+    const internalCode = "workspace-conflict-internal";
+    const internalPath = "/workspace/private/00000000-0000-0000-0000-000000000099";
+    snapshot.document_review = {
+      ...snapshot.document_review,
+      workspace_status: "conflicted",
+      diagnostics: [
+        {
+          code: internalCode,
+          path: internalPath,
+          message: "目前文件內容需要重新確認，請先查看最新內容。",
+        },
+      ],
+      bundles: [
+        {
+          ...snapshot.document_review.bundles[0],
+          acceptance_blocked: true,
+        },
+      ],
+    };
+
+    renderWithClient(
+      <CurrentDocumentReview documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(
+      screen.getByRole("status", { name: "文件內容需要重新確認" }).textContent,
+    ).toContain("目前文件內容需要重新確認");
+    expect(
+      screen.getByText(/這項變更暫時不能接受，請先確認文件目前內容/),
+    ).toBeTruthy();
+    expect(
+      (screen.getByRole("button", { name: "接受這項變更" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    await userEvent.setup().click(screen.getByText("先修改 AI 建議再接受"));
+    expect(
+      (screen.getByRole("button", { name: "修改後接受" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "拒絕這項變更" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(false);
+    expect(document.body.textContent).not.toContain(internalCode);
+    expect(document.body.textContent).not.toContain(internalPath);
+    expect(document.body.textContent).not.toContain("Store");
+    expect(document.body.textContent).not.toContain("00000000-0000-0000-0000-000000000099");
+  });
+
   it("renders repeated employee-safe diagnostics without React key collisions", () => {
     const snapshot = consultantSnapshotFixture();
     const repeatedDiagnostic = {
@@ -1035,7 +1241,11 @@ describe("employee consultant workspace integration", () => {
           ?.isInvalidated,
       ).toBe(true),
     );
-    expect(screen.queryByText("已選 2 項")).toBeNull();
+    expect(
+      screen.getAllByRole("alert").some((alert) =>
+        alert.textContent?.includes("文件變更已更新，請重新查看後再決定。"),
+      ),
+    ).toBe(true);
   });
 
   it("edits a structural Duty suggestion through employee fields without exposing raw JSON or IDs", async () => {

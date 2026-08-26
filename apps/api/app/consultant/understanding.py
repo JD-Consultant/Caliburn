@@ -580,7 +580,7 @@ def semantic_progress_from_workspace(
         elif review_status is DocumentChangeStatus.PENDING:
             item_status = "awaiting_employee_decision"
             title = task.statement
-            reason = "AI 已整理成工作草稿，等待你確認後才會進入正式 JD。"
+            reason = "AI 已整理到目前 JD，等待你確認後才會進入匯出版本。"
         else:
             item_status = InterviewWorkStatus.AVAILABLE
             title = task.statement

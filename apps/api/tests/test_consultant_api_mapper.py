@@ -326,3 +326,7 @@ def test_snapshot_mapper_projects_store_review_status_generation_and_employee_di
             assert view.document_review.bundles[0].acceptance_blocked is True
             assert view.document_review.diagnostics[0].path == "工作內容"
             assert "Technical" not in view.document_review.diagnostics[0].message
+            assert view.document_review.diagnostics[0].message == (
+                "目前 JD 的同一內容有無法安全自動整合的變動；"
+                "相關變更暫時不能接受。"
+            )

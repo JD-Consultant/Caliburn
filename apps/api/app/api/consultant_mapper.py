@@ -114,15 +114,18 @@ def _employee_workspace_diagnostic(value) -> WorkspaceDiagnosticView:
     elif "/opks/" in path:
         label = "O／P／K／S 內容"
     else:
-        label = "工作草稿"
+        label = "目前 JD"
     messages = {
-        "workspace-rebase-conflict": "正式文件與工作草稿的同一內容已有變動，請先選擇要保留的內容。",
-        "json-syntax": "工作草稿有內容需要 AI 修正。",
+        "workspace-rebase-conflict": (
+            "目前 JD 的同一內容有無法安全自動整合的變動；"
+            "相關變更暫時不能接受。"
+        ),
+        "json-syntax": "目前 JD 有內容需要 AI 修正。",
     }
     return WorkspaceDiagnosticView(
         code=value.code,
         path=label,
-        message=messages.get(value.code, "工作草稿有一項內容需要 AI 確認。"),
+        message=messages.get(value.code, "目前 JD 有一項內容需要 AI 確認。"),
     )
 
 

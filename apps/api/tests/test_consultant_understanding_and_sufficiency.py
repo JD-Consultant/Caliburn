@@ -474,6 +474,9 @@ def test_workspace_progress_counts_candidate_tasks_and_current_review_actions() 
     assert progress.currently_known_work_count == 2
     coverage = {item.work_id: item for item in progress.coverage}
     assert coverage[pending_task_id].status == "awaiting_employee_decision"
+    assert coverage[pending_task_id].reason == (
+        "AI 已整理到目前 JD，等待你確認後才會進入匯出版本。"
+    )
     assert coverage[second_pending_task_id].status == "awaiting_employee_decision"
     assert progress.employee_decisions.model_dump(mode="json") == {"pending": 2}
     depth = {item.work_id: item for item in progress.depth}

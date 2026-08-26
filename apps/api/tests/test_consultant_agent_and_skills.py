@@ -197,6 +197,19 @@ def test_agent_contract_batches_one_coherent_edit_then_finalizes_when_valid() ->
     assert "do not reread /workspace or /review merely to confirm" in SKILLS_SYSTEM_PROMPT
     assert "grep once for the current source handle" in SKILLS_SYSTEM_PROMPT
     assert "repair every listed diagnostic" in SKILLS_SYSTEM_PROMPT
+    assert "唯一可編輯的「目前 JD」" in SKILLS_SYSTEM_PROMPT
+    assert "工作草稿" not in SKILLS_SYSTEM_PROMPT
+
+
+def test_completion_red_team_uses_current_review_lifecycle_language() -> None:
+    backend = PackageSkillBackend(("completion-red-team",))
+    loaded = backend.read("/completion-red-team/SKILL.md", limit=1000)
+
+    assert loaded.error is None
+    assert loaded.file_data is not None
+    content = loaded.file_data["content"]
+    assert "目前 JD、核准／匯出基線" in content
+    assert "延後" not in content
 
 
 def test_professional_agent_allows_eleven_calls_but_rejects_a_twelfth() -> None:

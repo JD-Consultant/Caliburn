@@ -2641,6 +2641,23 @@ Owner進一步澄清：候選工作區不是單次run的暫存區，也不應等
 
 完整官方來源、方案比較、框架映射、重疊編輯語意與現行 code 差距見 [`2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md`](2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md)。此節尚未取代 Accepted ADR 0066；owner 核准後需另開 successor ADR，不得事後改寫已接受決策。
 
+### 9.21 顧問工作區 UI、待審編輯與 OPKS 生命週期收斂（2026-08-27，白話方向已核准、書面待複核）
+
+Owner 以互動 HTML 模擬完成工作區排版、目前 JD、semantic diff、工作地圖、訪談、尚未歸屬與刪除語意的白話對齊；production 只採資訊層級與互動效果，不複製模擬碼。最新方向以 [`2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md`](2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md) 為完整規格，並由 Proposed [ADR 0070](../adr/0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md) 等 owner 書面複核。若本節與 §9.20 的 edit-and-accept 描述衝突，以本節為目前建議；Accepted ADR 0069 在 0070 接受前仍是 production authority。
+
+收斂重點：
+
+1. 員工與 AI 仍共用一份 Store-backed「目前 JD」，approved baseline 只讀且為 export authority，review 是兩者的 derived semantic diff。
+2. 員工修改 AI 綠色 after-state 只更新 working copy，**不等於接受**；可修改同一 atomic group 多處後另按接受，才更新 approved。沒有 active AI diff 的普通員工 edit 則維持 direct authority。
+3. 寬螢幕採「訪談工作地圖｜目前 JD｜AI 顧問」三欄，左右可收合／調寬、三欄獨立滾動，composer 固定底部；中窄 Web 改單側 panel／drawer。中央只有一個主要 JD 編輯面，點 AI 差異才開就近審核控制。
+4. Duty→Task→「工作細節＋OPKS」是閱讀階層；O 是工作產出、P 是行為指標，K／S canonical item 可跨 Task 共用，A 與能力級別第一版仍不交給 AI。
+5. 分析順序不綁文件順序。O／P／K／S 可先成為有來源的待定位線索；進 JD 前才要求合法 linkage。未歸屬 Task 可帶完整 OPKS；O／P 不得脫離 Task；新的 AI K／S 至少連一個 Task 才形成待審變更，既有 K／S 因重組失去最後 link 才進「待重新連結 K／S」。
+6. Duty 是 Task 分組、Task 擁有工作細節與 O／P、K／S 是多對多 reference。解散 Duty 預設保留 Task；cascade delete 才刪 Task／O／P。刪 Task 只 unlink K／S；若要保留 O／P，就移動整個 Task 到未歸屬。
+7. Web framework 方案採現有 Next／React／Tailwind／shadcn／TanStack Query，加 Base UI 1.7.x、TanStack Form v1 與 react-resizable-panels v4；不加入 rich-text／IDE editor、XState、drag framework、第二套 agent frontend 或預先 virtualization。
+8. running 時同 document 暫停傳送；success、error 或 timeout 都解鎖。run failure 保留員工來源，可重試同一 input event或自然補充／更正；待審本身不鎖聊天。
+
+本校正不改 RAG 延後、approved-only export、單一主顧問、按需 Skills、一般 Gap／必要澄清分流、Evidence、deterministic verifier 或 framework-backed authority。現行 snapshot 尚缺 current working document projection，現行 edit-and-accept 亦不能表達「修改但仍待審」；施工前必須依 0070 新增 typed projection／command，而不是只換 CSS。
+
 ## 10. 本稿依據
 
 Repo 研究：

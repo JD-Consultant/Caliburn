@@ -580,6 +580,20 @@ describe("employee consultant workspace integration", () => {
   it("saves the current JD with the exact revision and workspace guards", async () => {
     const user = userEvent.setup();
     const snapshot = hierarchicalSnapshotFixture();
+    snapshot.current_document.duties.forEach((duty, index) => {
+      duty.display_order = (index + 1) * 10;
+    });
+    snapshot.current_document.tasks.forEach((task, index) => {
+      task.display_order = (index + 1) * 10;
+    });
+    snapshot.current_document.opks.forEach((item, index) => {
+      item.display_order = (index + 1) * 10;
+    });
+    const existingOrders = {
+      duties: snapshot.current_document.duties.map((duty) => duty.display_order),
+      tasks: snapshot.current_document.tasks.map((task) => task.display_order),
+      opks: snapshot.current_document.opks.map((item) => item.display_order),
+    };
     const response = structuredClone(snapshot);
     response.revision += 1;
     const fetchMock = vi.fn().mockResolvedValue(
@@ -614,6 +628,15 @@ describe("employee consultant workspace integration", () => {
       workspace_digest: snapshot.document_review.workspace_digest,
     });
     expect(body.document.job_title).toBe("資深客服專員");
+    expect(body.document.duties.map((duty: { display_order: number }) => duty.display_order)).toEqual(
+      existingOrders.duties,
+    );
+    expect(body.document.tasks.map((task: { display_order: number }) => task.display_order)).toEqual(
+      existingOrders.tasks,
+    );
+    expect(body.document.opks.map((item: { display_order: number }) => item.display_order)).toEqual(
+      existingOrders.opks,
+    );
   });
 
   it("keeps a 409 draft and offers a reload action", async () => {

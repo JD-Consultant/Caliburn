@@ -21,7 +21,6 @@ import { Card } from "@/shared/ui/card";
 import { toApprovedDocumentWrite } from "./consultantWorkspaceModel";
 import { CurrentDocumentOutline } from "./CurrentDocumentOutline";
 
-type OpksDraft = ApprovedJobDocumentWrite["opks"][number];
 type DocumentDraftState = {
   draft: ApprovedJobDocumentWrite;
   baselineRevision: number;
@@ -88,7 +87,6 @@ function optionalText(value: string | null): string | null {
 function normalizedDocument(
   value: ApprovedJobDocumentWrite,
 ): ApprovedJobDocumentWrite {
-  const opksOrder = new Map<OpksDraft["kind"], number>();
   return {
     ...value,
     job_title: optionalText(value.job_title),
@@ -99,12 +97,11 @@ function normalizedDocument(
     industry_code: optionalText(value.industry_code),
     work_description: optionalText(value.work_description),
     notes: optionalText(value.notes),
-    duties: value.duties.map((duty, index) => ({
+    duties: value.duties.map((duty) => ({
       ...duty,
       statement: duty.statement.trim(),
-      display_order: index,
     })),
-    tasks: value.tasks.map((task, index) => ({
+    tasks: value.tasks.map((task) => ({
       ...task,
       statement: task.statement.trim(),
       action: task.action.trim(),
@@ -116,17 +113,11 @@ function normalizedDocument(
       enablers: task.enablers
         .map((item) => ({ ...item, name: item.name.trim() }))
         .filter((item) => item.name),
-      display_order: index,
     })),
-    opks: value.opks.map((item) => {
-      const displayOrder = opksOrder.get(item.kind) ?? 0;
-      opksOrder.set(item.kind, displayOrder + 1);
-      return {
-        ...item,
-        text: item.text.trim(),
-        display_order: displayOrder,
-      };
-    }),
+    opks: value.opks.map((item) => ({
+      ...item,
+      text: item.text.trim(),
+    })),
   };
 }
 

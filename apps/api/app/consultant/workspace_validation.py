@@ -645,6 +645,18 @@ def validate_workspace_payload(
 
     current_sources = _current_sources(catalog)
     if not current_sources:
+        pristine = ApprovedJobDocument(document_id=catalog.document_id)
+        if (
+            catalog.document == pristine
+            and draft.approved_document == pristine
+        ):
+            return WorkspacePayloadValidation(
+                document=draft,
+                diagnostics=(),
+                current_sources=(),
+                evidence_by_handle={},
+                default_basis=None,
+            )
         return WorkspacePayloadValidation(
             document=None,
             diagnostics=(

@@ -48,7 +48,7 @@ function ResizableHandle({
       className={cn(
         "relative flex w-px items-center justify-center bg-border outline-none",
         "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
-        "aria-[orientation=vertical]:h-px aria-[orientation=vertical]:w-full",
+        "aria-[orientation=horizontal]:h-px aria-[orientation=horizontal]:w-full",
         className,
       )}
       {...props}

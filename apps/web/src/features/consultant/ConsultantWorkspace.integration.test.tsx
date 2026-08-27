@@ -109,7 +109,14 @@ describe("employee consultant workspace integration", () => {
       </ResizablePanelGroup>,
     );
 
-    expect(screen.getByRole("separator")).toBeTruthy();
+    const separator = screen.getByRole("separator");
+    expect(separator).toBeTruthy();
+    expect(separator.className).toContain(
+      "aria-[orientation=horizontal]:h-px",
+    );
+    expect(separator.className).not.toContain(
+      "aria-[orientation=vertical]:h-px",
+    );
     expect(
       (
         screen.getByRole("button", {
@@ -140,6 +147,16 @@ describe("employee consultant workspace integration", () => {
     expect(screen.getByRole("region", { name: "目前 JD" })).toBeTruthy();
     expect(
       screen.getByRole("complementary", { name: "AI 職務分析顧問" }),
+    ).toBeTruthy();
+    const conversation = screen.getByRole("region", {
+      name: "AI 職務分析顧問對話",
+    });
+    const composer = screen.getByLabelText("回覆顧問");
+    expect(composer.closest("form")?.parentElement).toBe(conversation);
+    expect(
+      screen
+        .getByRole("log", { name: "訪談紀錄" })
+        .closest('[data-slot="conversation-scroll-region"]'),
     ).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "收合訪談工作地圖" }));

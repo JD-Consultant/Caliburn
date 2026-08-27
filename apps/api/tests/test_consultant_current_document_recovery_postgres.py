@@ -247,6 +247,34 @@ async def _edit(runtime, snapshot, document, *, receipt=None, source_id=None):
 
 
 @pytest.mark.asyncio
+async def test_first_employee_edit_on_pristine_document_mints_evidence_and_commits(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="空白職務")
+        current = await runtime.reopen_document(document_id)
+
+        assert current.current_document is not None
+        submitted = current.current_document.model_copy(
+            update={"job_title": "產品驗證職務顧問"}
+        )
+        saved = await _edit(runtime, current, submitted)
+
+        assert saved.current_document is not None
+        assert saved.current_document.job_title == "產品驗證職務顧問"
+        assert saved.approved_document.job_title == "產品驗證職務顧問"
+        sources = [
+            source
+            for source in await runtime.list_sources(document_id)
+            if source.kind is EmployeeSourceKind.DIRECT_EDIT
+            and source.text == "產品驗證職務顧問"
+        ]
+        assert len(sources) == 1
+        assert sources[0].processing_status is SourceProcessingStatus.COMMITTED
+
+
+@pytest.mark.asyncio
 async def test_plan_before_graph_crash_is_discarded_without_changing_current_or_approved(
     consultant_database_url: str,
 ) -> None:

@@ -763,6 +763,60 @@ async def test_risky_non_opks_resource_can_be_repaired_with_exact_quote(
     )
 
 
+def test_pristine_workspace_is_visible_before_the_first_employee_source() -> None:
+    document = ApprovedJobDocument(document_id=DOCUMENT_ID)
+    projection = workspace_validation.project_workspace_files(
+        document,
+        handle_registry={},
+    )
+    catalog = WorkspaceCatalog.from_snapshot(
+        document,
+        sources=(),
+        handle_registry=projection.handle_registry,
+    )
+
+    validation = workspace_validation.validate_workspace_payload(
+        projection.files,
+        catalog=catalog,
+        selected_skill_ids=("output",),
+        loaded_skill_ids=("output",),
+    )
+
+    assert validation.document is not None
+    assert validation.document.approved_document == document
+    assert validation.diagnostics == ()
+    assert validation.default_basis is None
+
+
+def test_ungrounded_content_is_still_rejected_before_the_first_employee_source() -> None:
+    document = ApprovedJobDocument(document_id=DOCUMENT_ID)
+    projection = workspace_validation.project_workspace_files(
+        document,
+        handle_registry={},
+    )
+    files = dict(projection.files)
+    header = json.loads(files["/workspace/header.json"])
+    header["job_title"] = "未經來源支持的職稱"
+    files["/workspace/header.json"] = (
+        json.dumps(header, ensure_ascii=False, indent=2) + "\n"
+    )
+    catalog = WorkspaceCatalog.from_snapshot(
+        document,
+        sources=(),
+        handle_registry=projection.handle_registry,
+    )
+
+    validation = workspace_validation.validate_workspace_payload(
+        files,
+        catalog=catalog,
+        selected_skill_ids=("output",),
+        loaded_skill_ids=("output",),
+    )
+
+    assert validation.document is None
+    assert validation.diagnostics[0].code == "evidence-basis-empty"
+
+
 @pytest.mark.asyncio
 async def test_source_correction_revalidates_unchanged_files_and_invalidates_old_basis(
     validation_harness: tuple[

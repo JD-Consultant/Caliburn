@@ -204,7 +204,8 @@ class StoreBackedWorkspace:
             resource_digest=workspace_resource_digest(files),
             approved_baseline_revision=approved_revision,
             approved_baseline_digest=_approved_document_digest(approved_document),
-            evidence_basis_digest=cast(Sha256Digest, sha256(b"").hexdigest()),
+            # Match evidence_basis_digest(())'s canonical JSON representation.
+            evidence_basis_digest=cast(Sha256Digest, sha256(b"[]").hexdigest()),
             validation_status=validation_status,
             entity_ids_by_handle=dict(projection.handle_registry),
         )

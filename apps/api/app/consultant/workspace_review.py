@@ -1310,6 +1310,11 @@ def derive_workspace_review(
             ),
             entity_ids_by_handle=manifest.entity_ids_by_handle,
         )
+    if valid_workspace.document.approved_document == approved:
+        return WorkspaceReviewProjection(
+            workspace_digest=manifest.resource_digest,
+            entity_ids_by_handle=manifest.entity_ids_by_handle,
+        )
     if valid_workspace.default_basis is None:
         return WorkspaceReviewProjection(
             workspace_digest=manifest.resource_digest,

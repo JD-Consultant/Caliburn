@@ -1,13 +1,26 @@
 // @vitest-environment jsdom
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  render,
+  renderHook,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import type { DocumentPatchActionView } from "@caliburn/job-analysis-contract";
+import { useForm } from "@tanstack/react-form";
 import type { ReactNode } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { jobAnalysisKeys } from "@/shared/query/jobAnalysisQueries";
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from "@/shared/ui/resizable";
 import { ApprovedDocumentEditor } from "./ApprovedDocumentEditor";
 import { ConsultantConversation } from "./ConsultantConversation";
 import { ConsultantInsightPanel } from "./ConsultantInsightPanel";
@@ -42,6 +55,12 @@ class FakeEventSource {
   }
 }
 
+class FakeResizeObserver {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+}
+
 function renderWithClient(ui: ReactNode, client = new QueryClient()) {
   return {
     client,
@@ -59,6 +78,34 @@ afterEach(() => {
 });
 
 describe("employee consultant workspace integration", () => {
+  it("renders the selected resizable and nested-form framework primitives", () => {
+    vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+
+    render(
+      <ResizablePanelGroup orientation="horizontal">
+        <ResizablePanel>
+          <button type="button">收合訪談工作地圖</button>
+        </ResizablePanel>
+        <ResizableHandle />
+        <ResizablePanel>目前 JD</ResizablePanel>
+      </ResizablePanelGroup>,
+    );
+
+    expect(screen.getByRole("separator")).toBeTruthy();
+    expect(
+      (
+        screen.getByRole("button", {
+          name: "收合訪談工作地圖",
+        }) as HTMLButtonElement
+      ).disabled,
+    ).toBe(false);
+
+    const form = renderHook(() =>
+      useForm({ defaultValues: { duties: [] as string[] } }),
+    );
+    expect(form.result.current.state.values.duties).toEqual([]);
+  });
+
   it("shows durable question focus and workspace-derived employee decision progress", () => {
     const snapshot = consultantSnapshotFixture();
     snapshot.current_interview = null;

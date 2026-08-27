@@ -34,6 +34,7 @@ from app.consultant.state import (
     RunStatus,
     initial_thread_state,
 )
+from app.consultant.document_commands import DocumentCommandBlastRadius
 from app.consultant.views import (
     document_review_projection_from_workspace,
     snapshot_from_state,
@@ -244,6 +245,22 @@ class FakeRuntime:
             }
         )
         return self.snapshot
+
+    async def preview_document_structure_command(self, **kwargs):
+        self.calls.append(("document_command_preview", kwargs))
+        return DocumentCommandBlastRadius(
+            preview_digest="b" * 64,
+            confirmation_required=True,
+            duty_count=1,
+            task_count=2,
+            affected_names=("法遵管理", "追蹤修法"),
+        )
+
+    async def apply_document_structure_command(self, **kwargs):
+        if self.model_mutation_busy:
+            raise ConsultantRunAlreadyActive(kwargs["document_id"])
+        self.calls.append(("document_command", kwargs))
+        return self.snapshot, "undo-token-1"
 
     async def delete_document(self, document_id: UUID):
         assert document_id == self.document_id
@@ -689,6 +706,86 @@ async def test_current_document_edit_forwards_full_server_stale_guards(api) -> N
     assert call[1]["workspace_generation"] == 1
     assert call[1]["workspace_digest"] == "a" * 64
     assert response.json()["current_document"]["job_title"] == "資深採購專員"
+
+
+async def test_document_structure_preview_is_server_derived_and_read_only(api) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+
+    response = await client.post(
+        f"{BASE}/{document_id}/current-document/commands/preview",
+        headers={"X-Expected-Revision": "0"},
+        json={
+            "command": {
+                "operation": "cascade_delete_duty",
+                "duty_id": str(uuid4()),
+            },
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    assert response.json()["confirmation_required"] is True
+    assert response.json()["task_count"] == 2
+    call = runtime.calls[-1]
+    assert call[0] == "document_command_preview"
+    assert call[1]["command"].operation == "cascade_delete_duty"
+    assert runtime.employee_admission_entries == 0
+
+
+async def test_document_structure_execute_returns_one_bounded_undo_token(api) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+
+    response = await client.post(
+        f"{BASE}/{document_id}/current-document/commands",
+        headers={
+            "Idempotency-Key": "create-duty-1",
+            "X-Expected-Revision": "0",
+        },
+        json={
+            "command": {"operation": "create_duty", "name": "法遵管理"},
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    assert response.json()["undo_token"] == "undo-token-1"
+    assert response.json()["snapshot"]["document_id"] == str(document_id)
+    call = runtime.calls[-1]
+    assert call[0] == "document_command"
+    assert call[1]["command"].operation == "create_duty"
+    assert call[1]["source_id"] != call[1]["command_receipt"].command_id
+    assert runtime.employee_admission_entries == 1
+
+
+async def test_document_structure_api_maps_indicator_wire_kind_to_domain_p(api) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+
+    response = await client.post(
+        f"{BASE}/{document_id}/current-document/commands",
+        headers={
+            "Idempotency-Key": "create-indicator-1",
+            "X-Expected-Revision": "0",
+        },
+        json={
+            "command": {
+                "operation": "create_opks",
+                "task_id": str(uuid4()),
+                "kind": "indicator",
+                "text": "每週完成一次更新",
+            },
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    command = runtime.calls[-1][1]["command"]
+    assert command.kind.value == "indicator"
 
 
 async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> None:

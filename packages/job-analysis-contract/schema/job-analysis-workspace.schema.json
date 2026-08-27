@@ -537,6 +537,199 @@
         "workspace_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
       }
     },
+    "CreateDutyCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "name"],
+      "properties": {
+        "operation": { "type": "string", "const": "create_duty" },
+        "name": { "type": "string", "minLength": 1 }
+      }
+    },
+    "CreateTaskCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "duty_id", "statement", "action", "object", "competency_level"],
+      "properties": {
+        "operation": { "type": "string", "const": "create_task" },
+        "duty_id": { "type": ["string", "null"], "format": "uuid" },
+        "statement": { "type": "string", "minLength": 1 },
+        "action": { "type": "string", "minLength": 1 },
+        "object": { "type": "string", "minLength": 1 },
+        "competency_level": { "type": ["integer", "null"], "minimum": 1, "maximum": 6 }
+      }
+    },
+    "CreateOpksCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "task_id", "kind", "text"],
+      "properties": {
+        "operation": { "type": "string", "const": "create_opks" },
+        "task_id": { "type": "string", "format": "uuid" },
+        "kind": { "type": "string", "enum": ["output", "indicator", "knowledge", "skill"] },
+        "text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "CreateAttitudeCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "text"],
+      "properties": {
+        "operation": { "type": "string", "const": "create_attitude" },
+        "text": { "type": "string", "minLength": 1 }
+      }
+    },
+    "DissolveDutyCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "duty_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "dissolve_duty" },
+        "duty_id": { "type": "string", "format": "uuid" }
+      }
+    },
+    "CascadeDeleteDutyCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "duty_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "cascade_delete_duty" },
+        "duty_id": { "type": "string", "format": "uuid" },
+        "preview_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$", "default": null }
+      }
+    },
+    "MoveTaskCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "task_id", "destination_duty_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "move_task" },
+        "task_id": { "type": "string", "format": "uuid" },
+        "destination_duty_id": { "type": ["string", "null"], "format": "uuid" }
+      }
+    },
+    "DeleteTaskCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "task_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "delete_task" },
+        "task_id": { "type": "string", "format": "uuid" }
+      }
+    },
+    "ReorderEntityCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "entity_kind", "entity_id", "parent_id", "before_entity_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "reorder_entity" },
+        "entity_kind": { "type": "string", "enum": ["duty", "task", "opks"] },
+        "entity_id": { "type": "string", "format": "uuid" },
+        "parent_id": { "type": ["string", "null"], "format": "uuid" },
+        "before_entity_id": { "type": ["string", "null"], "format": "uuid" }
+      }
+    },
+    "LinkSharedOpksCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "item_id", "task_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "link_shared_opks" },
+        "item_id": { "type": "string", "format": "uuid" },
+        "task_id": { "type": "string", "format": "uuid" }
+      }
+    },
+    "UnlinkSharedOpksCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "item_id", "task_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "unlink_shared_opks" },
+        "item_id": { "type": "string", "format": "uuid" },
+        "task_id": { "type": "string", "format": "uuid" }
+      }
+    },
+    "DeleteOwnedOpksCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "item_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "delete_owned_opks" },
+        "item_id": { "type": "string", "format": "uuid" }
+      }
+    },
+    "DeleteSharedOpksCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "item_id"],
+      "properties": {
+        "operation": { "type": "string", "const": "delete_shared_opks" },
+        "item_id": { "type": "string", "format": "uuid" },
+        "preview_digest": { "type": ["string", "null"], "pattern": "^[0-9a-f]{64}$", "default": null }
+      }
+    },
+    "UndoDocumentCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["operation", "undo_token"],
+      "properties": {
+        "operation": { "type": "string", "const": "undo" },
+        "undo_token": { "type": "string", "minLength": 1 }
+      }
+    },
+    "DocumentStructureCommandWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["command", "workspace_generation", "workspace_digest"],
+      "properties": {
+        "command": {
+          "oneOf": [
+            { "$ref": "#/$defs/CreateDutyCommandWrite" },
+            { "$ref": "#/$defs/CreateTaskCommandWrite" },
+            { "$ref": "#/$defs/CreateOpksCommandWrite" },
+            { "$ref": "#/$defs/CreateAttitudeCommandWrite" },
+            { "$ref": "#/$defs/DissolveDutyCommandWrite" },
+            { "$ref": "#/$defs/CascadeDeleteDutyCommandWrite" },
+            { "$ref": "#/$defs/MoveTaskCommandWrite" },
+            { "$ref": "#/$defs/DeleteTaskCommandWrite" },
+            { "$ref": "#/$defs/ReorderEntityCommandWrite" },
+            { "$ref": "#/$defs/LinkSharedOpksCommandWrite" },
+            { "$ref": "#/$defs/UnlinkSharedOpksCommandWrite" },
+            { "$ref": "#/$defs/DeleteOwnedOpksCommandWrite" },
+            { "$ref": "#/$defs/DeleteSharedOpksCommandWrite" },
+            { "$ref": "#/$defs/UndoDocumentCommandWrite" }
+          ],
+          "discriminator": { "propertyName": "operation" }
+        },
+        "workspace_generation": { "type": "integer", "minimum": 0 },
+        "workspace_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
+    "DocumentStructureCommandPreviewView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["preview_digest", "confirmation_required", "duty_count", "task_count", "output_count", "indicator_count", "shared_item_count", "shared_link_count", "affected_names"],
+      "properties": {
+        "preview_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+        "confirmation_required": { "type": "boolean" },
+        "duty_count": { "type": "integer", "minimum": 0 },
+        "task_count": { "type": "integer", "minimum": 0 },
+        "output_count": { "type": "integer", "minimum": 0 },
+        "indicator_count": { "type": "integer", "minimum": 0 },
+        "shared_item_count": { "type": "integer", "minimum": 0 },
+        "shared_link_count": { "type": "integer", "minimum": 0 },
+        "affected_names": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "DocumentStructureCommandResultView": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["snapshot", "undo_token"],
+      "properties": {
+        "snapshot": { "$ref": "#/$defs/ConsultantSnapshotView" },
+        "undo_token": { "type": ["string", "null"] }
+      }
+    },
     "ExportReadinessIssueView": {
       "type": "object",
       "additionalProperties": false,

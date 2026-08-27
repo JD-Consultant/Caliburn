@@ -548,6 +548,184 @@ class CurrentDocumentEditWrite(BaseModel):
     workspace_digest: constr(pattern=r'^[0-9a-f]{64}$')
 
 
+class CreateDutyCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['create_duty']
+    name: constr(min_length=1)
+
+
+class CreateTaskCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['create_task']
+    duty_id: UUID | None
+    statement: constr(min_length=1)
+    action: constr(min_length=1)
+    object: constr(min_length=1)
+    competency_level: conint(ge=1, le=6, strict=True) | None
+
+
+class Kind4(StrEnum):
+    output = 'output'
+    indicator = 'indicator'
+    knowledge = 'knowledge'
+    skill = 'skill'
+
+
+class CreateOpksCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['create_opks']
+    task_id: UUID
+    kind: Kind4
+    text: constr(min_length=1)
+
+
+class CreateAttitudeCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['create_attitude']
+    text: constr(min_length=1)
+
+
+class DissolveDutyCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['dissolve_duty']
+    duty_id: UUID
+
+
+class CascadeDeleteDutyCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['cascade_delete_duty']
+    duty_id: UUID
+    preview_digest: constr(pattern=r'^[0-9a-f]{64}$') | None = None
+
+
+class MoveTaskCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['move_task']
+    task_id: UUID
+    destination_duty_id: UUID | None
+
+
+class DeleteTaskCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['delete_task']
+    task_id: UUID
+
+
+class EntityKind(StrEnum):
+    duty = 'duty'
+    task = 'task'
+    opks = 'opks'
+
+
+class ReorderEntityCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['reorder_entity']
+    entity_kind: EntityKind
+    entity_id: UUID
+    parent_id: UUID | None
+    before_entity_id: UUID | None
+
+
+class LinkSharedOpksCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['link_shared_opks']
+    item_id: UUID
+    task_id: UUID
+
+
+class UnlinkSharedOpksCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['unlink_shared_opks']
+    item_id: UUID
+    task_id: UUID
+
+
+class DeleteOwnedOpksCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['delete_owned_opks']
+    item_id: UUID
+
+
+class DeleteSharedOpksCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['delete_shared_opks']
+    item_id: UUID
+    preview_digest: constr(pattern=r'^[0-9a-f]{64}$') | None = None
+
+
+class UndoDocumentCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation: Literal['undo']
+    undo_token: constr(min_length=1)
+
+
+class DocumentStructureCommandWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    command: (
+        CreateDutyCommandWrite
+        | CreateTaskCommandWrite
+        | CreateOpksCommandWrite
+        | CreateAttitudeCommandWrite
+        | DissolveDutyCommandWrite
+        | CascadeDeleteDutyCommandWrite
+        | MoveTaskCommandWrite
+        | DeleteTaskCommandWrite
+        | ReorderEntityCommandWrite
+        | LinkSharedOpksCommandWrite
+        | UnlinkSharedOpksCommandWrite
+        | DeleteOwnedOpksCommandWrite
+        | DeleteSharedOpksCommandWrite
+        | UndoDocumentCommandWrite
+    ) = Field(..., discriminator='operation')
+    workspace_generation: conint(ge=0, strict=True)
+    workspace_digest: constr(pattern=r'^[0-9a-f]{64}$')
+
+
+class DocumentStructureCommandPreviewView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    preview_digest: constr(pattern=r'^[0-9a-f]{64}$')
+    confirmation_required: bool
+    duty_count: conint(ge=0, strict=True)
+    task_count: conint(ge=0, strict=True)
+    output_count: conint(ge=0, strict=True)
+    indicator_count: conint(ge=0, strict=True)
+    shared_item_count: conint(ge=0, strict=True)
+    shared_link_count: conint(ge=0, strict=True)
+    affected_names: list[str]
+
+
 class ExportReadinessIssueView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -731,3 +909,11 @@ class ConsultantSnapshotView(BaseModel):
     current_document: ApprovedJobDocumentView
     approved_document: ApprovedJobDocumentView
     readiness: ExportReadinessView
+
+
+class DocumentStructureCommandResultView(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    snapshot: ConsultantSnapshotView
+    undo_token: str | None

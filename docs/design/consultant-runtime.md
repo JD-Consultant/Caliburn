@@ -124,6 +124,17 @@ authority command 在 server 端綁定 exact approved revision、workspace gener
 
 `PUT /current-document` 同時綁定 approved revision、workspace generation 與 workspace digest。跨 Saver／Store 寫入先保存 `current-edit:{command_id}` exact rebase plan，再以 LangGraph command receipt 提交 approved after-state（pending-only 時內容可不變），最後套用 Store current after-state、驗證並刪 plan。reopen／exact replay 以 receipt 而非只比較 approved digest 判斷第一個 seam 是否成功，因此 pending-only crash 也能 exactly-once 完成；receipt 未提交的 plan 與 pending direct-edit source 會安全丟棄。
 
+### Typed 結構命令與一層 Undo
+
+新增／解散／刪除 Duty，新增／移動／刪除 Task，新增 O／P／K／S／A，共享 K／S 的 link／unlink，以及同層排序都走 `POST /current-document/commands` 的 discriminated application command；它們是員工編輯器 intent，不是模型 Tool。browser 不提供 stable UUID、不修剪關聯、不判斷 ownership，也不能以整份文件覆寫來偽造結構。application 產生 identity，pure planner 依 `Duty → Task → 工作細節 + O/P/K/S` 與文件層 A 的規則產生完整 after-state，再交給上述同一 current/approved authority split 與 Saver／Store recovery seam。
+
+- dissolve Duty 只移除 Duty，所屬 Task 連同 O/P/K/S 關係轉為未歸屬；cascade 才移除 Task 與 owned O/P，K/S 只解除 links，零 link canonical K/S 仍保留。
+- delete Task 移除 Task 與 owned O/P，K/S 只 unlink；永久刪除共享 K/S 才從所有 Task 移除 canonical item。A 是文件層，不掛 Task。
+- 高影響 cascade／共享 K/S 永久刪除先以 `POST /current-document/commands/preview` 對 exact current digest 取得 server-derived blast radius 與 preview digest；Web 不自行計數或推測風險。
+- 一般命令完成後，Store metadata 只保留最新一筆完整 inverse 與 resulting revision／workspace digest。Undo 必須三者 exact match；任何後續 authority mutation 或一次 Undo 都使舊 token 失效。這是短期復原，不是第二份 JD、版本歷史、redo 或 hidden merge。
+
+若 typed command 的 target／parent 與 fresh AI pending semantic scope 重疊，after-state 只留在 current 等員工審核；普通 approved scope 則一次同步 approved/current。新增實體會把同類 collection 視為排序邊界：同層已有 AI pending 新增／刪除時採 current-only，避免 current 與 approved 依不同 sibling 集合算出不同順序。命令新產生的 employee 文字沿用 direct-edit Source 與 exact position，OPKS Evidence identity 仍由 server 附加。graph receipt 成功後會先把該 Source 標成 committed，再以同一 committed Evidence basis 驗證 workspace，避免下一個連續編輯被錯判 stale。
+
 ## 員工 authority 與 approved-first recovery
 
 模型與 VFS 永遠沒有 approved write edge。員工有四種 review decision，另可直接編輯核准文件：

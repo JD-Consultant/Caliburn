@@ -22,10 +22,14 @@ from job_analysis_contract import (
     CurrentDocumentEditWrite,
     DirectDocumentEditWrite,
     DocumentReviewDecisionWrite,
+    DocumentStructureCommandPreviewView,
+    DocumentStructureCommandResultView,
+    DocumentStructureCommandWrite,
     EmployeeAnswerWrite,
     RequiredClarificationAnswerWrite,
     UnderstandingCalibrationDecisionWrite,
 )
+from pydantic import TypeAdapter
 
 from app.adapters.langgraph.postgres import (
     ConsultantRunAlreadyActive,
@@ -42,6 +46,7 @@ from app.api.problems import (
     consultant_runtime_error_response,
     problem_response,
 )
+from app.consultant.document_commands import DocumentStructureCommand
 from app.consultant.run_service import ConsultantTurnProcessor
 from app.consultant.state import ApprovedJobDocument, CommandReceipt, RunReceipt
 from app.consultant.workspace_authority import (
@@ -632,6 +637,79 @@ async def edit_current_document(
                 ),
             )
             return await _snapshot_view(runtime, updated)
+    except Exception as error:
+        return _employee_mutation_error_response(error)
+
+
+def _document_structure_command(
+    body: DocumentStructureCommandWrite,
+) -> DocumentStructureCommand:
+    return TypeAdapter(DocumentStructureCommand).validate_python(
+        body.command.model_dump(mode="json")
+    )
+
+
+@router.post(
+    "/{document_id}/current-document/commands/preview",
+    response_model=DocumentStructureCommandPreviewView,
+)
+async def preview_current_document_command(
+    document_id: UUID,
+    body: DocumentStructureCommandWrite,
+    expected_revision: ExpectedRevision,
+    runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
+):
+    try:
+        preview = await runtime.preview_document_structure_command(
+            document_id=document_id,
+            expected_revision=expected_revision,
+            workspace_generation=body.workspace_generation,
+            workspace_digest=body.workspace_digest,
+            command=_document_structure_command(body),
+        )
+        return DocumentStructureCommandPreviewView.model_validate(
+            preview.model_dump(mode="json")
+        )
+    except Exception as error:
+        return _employee_mutation_error_response(error)
+
+
+@router.post(
+    "/{document_id}/current-document/commands",
+    response_model=DocumentStructureCommandResultView,
+)
+async def apply_current_document_command(
+    document_id: UUID,
+    body: DocumentStructureCommandWrite,
+    idempotency_key: IdempotencyKey,
+    expected_revision: ExpectedRevision,
+    runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
+):
+    try:
+        async with runtime.employee_mutation_admission(document_id):
+            receipt = _command_receipt(
+                document_id,
+                "current_document_structure",
+                idempotency_key,
+                body.model_dump(mode="json"),
+            )
+            snapshot, undo_token = await runtime.apply_document_structure_command(
+                document_id=document_id,
+                expected_revision=expected_revision,
+                workspace_generation=body.workspace_generation,
+                workspace_digest=body.workspace_digest,
+                command=_document_structure_command(body),
+                source_id=_command_id(
+                    document_id,
+                    "current-document-structure-source",
+                    idempotency_key,
+                ),
+                command_receipt=receipt,
+            )
+            return DocumentStructureCommandResultView(
+                snapshot=await _snapshot_view(runtime, snapshot),
+                undo_token=undo_token,
+            )
     except Exception as error:
         return _employee_mutation_error_response(error)
 

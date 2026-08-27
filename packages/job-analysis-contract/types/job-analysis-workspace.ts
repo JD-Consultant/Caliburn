@@ -486,22 +486,175 @@ export interface CurrentDocumentEditWrite {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ExportReadinessIssueView".
+ * via the `definition` "CreateDutyCommandWrite".
  */
-export interface ExportReadinessIssueView {
-  code: string;
-  message: string;
-  subject_id: string | null;
+export interface CreateDutyCommandWrite {
+  operation: "create_duty";
+  name: string;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "ExportReadinessView".
+ * via the `definition` "CreateTaskCommandWrite".
  */
-export interface ExportReadinessView {
-  ready: boolean;
-  requires_force_confirmation: boolean;
-  force_export_allowed: true;
-  issues: ExportReadinessIssueView[];
+export interface CreateTaskCommandWrite {
+  operation: "create_task";
+  duty_id: string | null;
+  statement: string;
+  action: string;
+  object: string;
+  competency_level: number | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "CreateOpksCommandWrite".
+ */
+export interface CreateOpksCommandWrite {
+  operation: "create_opks";
+  task_id: string;
+  kind: "output" | "indicator" | "knowledge" | "skill";
+  text: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "CreateAttitudeCommandWrite".
+ */
+export interface CreateAttitudeCommandWrite {
+  operation: "create_attitude";
+  text: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DissolveDutyCommandWrite".
+ */
+export interface DissolveDutyCommandWrite {
+  operation: "dissolve_duty";
+  duty_id: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "CascadeDeleteDutyCommandWrite".
+ */
+export interface CascadeDeleteDutyCommandWrite {
+  operation: "cascade_delete_duty";
+  duty_id: string;
+  preview_digest?: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "MoveTaskCommandWrite".
+ */
+export interface MoveTaskCommandWrite {
+  operation: "move_task";
+  task_id: string;
+  destination_duty_id: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DeleteTaskCommandWrite".
+ */
+export interface DeleteTaskCommandWrite {
+  operation: "delete_task";
+  task_id: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ReorderEntityCommandWrite".
+ */
+export interface ReorderEntityCommandWrite {
+  operation: "reorder_entity";
+  entity_kind: "duty" | "task" | "opks";
+  entity_id: string;
+  parent_id: string | null;
+  before_entity_id: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "LinkSharedOpksCommandWrite".
+ */
+export interface LinkSharedOpksCommandWrite {
+  operation: "link_shared_opks";
+  item_id: string;
+  task_id: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "UnlinkSharedOpksCommandWrite".
+ */
+export interface UnlinkSharedOpksCommandWrite {
+  operation: "unlink_shared_opks";
+  item_id: string;
+  task_id: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DeleteOwnedOpksCommandWrite".
+ */
+export interface DeleteOwnedOpksCommandWrite {
+  operation: "delete_owned_opks";
+  item_id: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DeleteSharedOpksCommandWrite".
+ */
+export interface DeleteSharedOpksCommandWrite {
+  operation: "delete_shared_opks";
+  item_id: string;
+  preview_digest?: string | null;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "UndoDocumentCommandWrite".
+ */
+export interface UndoDocumentCommandWrite {
+  operation: "undo";
+  undo_token: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentStructureCommandWrite".
+ */
+export interface DocumentStructureCommandWrite {
+  command:
+    | CreateDutyCommandWrite
+    | CreateTaskCommandWrite
+    | CreateOpksCommandWrite
+    | CreateAttitudeCommandWrite
+    | DissolveDutyCommandWrite
+    | CascadeDeleteDutyCommandWrite
+    | MoveTaskCommandWrite
+    | DeleteTaskCommandWrite
+    | ReorderEntityCommandWrite
+    | LinkSharedOpksCommandWrite
+    | UnlinkSharedOpksCommandWrite
+    | DeleteOwnedOpksCommandWrite
+    | DeleteSharedOpksCommandWrite
+    | UndoDocumentCommandWrite;
+  workspace_generation: number;
+  workspace_digest: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentStructureCommandPreviewView".
+ */
+export interface DocumentStructureCommandPreviewView {
+  preview_digest: string;
+  confirmation_required: boolean;
+  duty_count: number;
+  task_count: number;
+  output_count: number;
+  indicator_count: number;
+  shared_item_count: number;
+  shared_link_count: number;
+  affected_names: string[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "DocumentStructureCommandResultView".
+ */
+export interface DocumentStructureCommandResultView {
+  snapshot: ConsultantSnapshotView;
+  undo_token: string | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -526,6 +679,25 @@ export interface ConsultantSnapshotView {
   current_document: ApprovedJobDocumentView;
   approved_document: ApprovedJobDocumentView;
   readiness: ExportReadinessView;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ExportReadinessView".
+ */
+export interface ExportReadinessView {
+  ready: boolean;
+  requires_force_confirmation: boolean;
+  force_export_allowed: true;
+  issues: ExportReadinessIssueView[];
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "ExportReadinessIssueView".
+ */
+export interface ExportReadinessIssueView {
+  code: string;
+  message: string;
+  subject_id: string | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema

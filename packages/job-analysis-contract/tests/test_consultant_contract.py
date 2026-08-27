@@ -14,6 +14,7 @@ from job_analysis_contract import (
     CurrentDocumentEditWrite,
     DocumentReviewDecisionWrite,
     DocumentReviewView,
+    DocumentStructureCommandWrite,
     EmployeeAnswerWrite,
     RequiredClarificationAnswerWrite,
     UnderstandingCalibrationDecisionWrite,
@@ -49,6 +50,9 @@ def test_consultant_contract_covers_the_durable_employee_workspace() -> None:
         "ExportReadinessView",
         "ConsultantSnapshotView",
         "ConsultantSnapshotEvent",
+        "DocumentStructureCommandWrite",
+        "DocumentStructureCommandPreviewView",
+        "DocumentStructureCommandResultView",
     } <= set(definitions)
     serialized = json.dumps(definitions, ensure_ascii=False).casefold()
     assert '"pause' not in serialized
@@ -155,6 +159,53 @@ def test_current_document_edit_carries_server_stale_guards() -> None:
             {
                 **body.model_dump(mode="json"),
                 "workspace_digest": "stale-client-guess",
+            }
+        )
+
+
+def test_structure_command_is_discriminated_and_browser_cannot_supply_identity() -> None:
+    body = DocumentStructureCommandWrite.model_validate(
+        {
+            "command": {"operation": "create_duty", "name": "法遵管理"},
+            "workspace_generation": 4,
+            "workspace_digest": "a" * 64,
+        }
+    )
+
+    assert body.command.operation == "create_duty"
+    indicator = DocumentStructureCommandWrite.model_validate(
+        {
+            **body.model_dump(mode="json"),
+            "command": {
+                "operation": "create_opks",
+                "task_id": str(uuid4()),
+                "kind": "indicator",
+                "text": "每週完成一次更新",
+            },
+        }
+    )
+    assert indicator.command.kind == "indicator"
+    with pytest.raises(ValidationError):
+        DocumentStructureCommandWrite.model_validate(
+            {
+                **body.model_dump(mode="json"),
+                "command": {
+                    "operation": "create_duty",
+                    "name": "法遵管理",
+                    "duty_id": str(uuid4()),
+                },
+            }
+        )
+    with pytest.raises(ValidationError):
+        DocumentStructureCommandWrite.model_validate(
+            {
+                **body.model_dump(mode="json"),
+                "command": {
+                    "operation": "create_opks",
+                    "task_id": str(uuid4()),
+                    "kind": "attitude",
+                    "text": "謹慎",
+                },
             }
         )
 

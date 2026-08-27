@@ -162,6 +162,15 @@ class WorkspaceRebasePlan(DurableModel):
     result_workspace_digest: Sha256Digest | None = None
 
 
+class DocumentUndoRecord(DurableModel):
+    """The sole short-lived inverse for the latest employee document command."""
+
+    token: NonEmptyText
+    resulting_revision: int = Field(ge=0)
+    resulting_workspace_digest: Sha256Digest
+    inverse_command: dict[str, JsonValue]
+
+
 class CurrentDocumentRebasePlan(DurableModel):
     """One recoverable Saver/Store commit for the visible current JD."""
 
@@ -170,6 +179,7 @@ class CurrentDocumentRebasePlan(DurableModel):
     pending_task_competency_levels: PendingTaskCompetencyLevels = Field(
         default_factory=PendingTaskCompetencyLevels
     )
+    undo_record: DocumentUndoRecord | None = None
 
 
 _MISSING = object()
@@ -531,6 +541,10 @@ class WorkspaceAuthorityService:
         return f"current-edit:{command_id}"
 
     @staticmethod
+    def _current_undo_key() -> str:
+        return "current-document-undo"
+
+    @staticmethod
     def _employee_source_id(document_id: UUID, command_id: UUID) -> UUID:
         return uuid5(document_id, f"workspace-review-direct-edit:{command_id}")
 
@@ -671,6 +685,35 @@ class WorkspaceAuthorityService:
         await self.runtime.store.adelete(
             self.runtime.workspace_metadata_namespace(document_id),
             self._current_edit_plan_key(command_id),
+        )
+
+    async def current_undo_record(
+        self,
+        document_id: UUID,
+    ) -> DocumentUndoRecord | None:
+        item = await self.runtime.store.aget(
+            self.runtime.workspace_metadata_namespace(document_id),
+            self._current_undo_key(),
+        )
+        if item is None:
+            return None
+        return DocumentUndoRecord.model_validate(item.value)
+
+    async def _replace_current_undo_record(
+        self,
+        document_id: UUID,
+        record: DocumentUndoRecord | None,
+    ) -> None:
+        namespace = self.runtime.workspace_metadata_namespace(document_id)
+        key = self._current_undo_key()
+        if record is None:
+            await self.runtime.store.adelete(namespace, key)
+            return
+        await self.runtime.store.aput(
+            namespace,
+            key,
+            record.model_dump(mode="json"),
+            index=False,
         )
 
     async def _review_context(
@@ -1006,6 +1049,8 @@ class WorkspaceAuthorityService:
         current_after: ApprovedJobDocument,
         approved_revision: int,
         pending_task_competency_levels: PendingTaskCompetencyLevels,
+        undo_token: NonEmptyText | None = None,
+        inverse_command: dict[str, JsonValue] | None = None,
     ) -> CurrentDocumentRebasePlan:
         """Persist the exact Store half before committing LangGraph authority."""
 
@@ -1029,10 +1074,27 @@ class WorkspaceAuthorityService:
                 "employee_source_id": source_id,
             }
         )
+        if (undo_token is None) != (inverse_command is None):
+            raise WorkspaceAuthorityError(
+                "undo token and inverse command must be persisted together"
+            )
+        undo_record = None
+        if undo_token is not None and inverse_command is not None:
+            if rebase.result_workspace_digest is None:
+                raise WorkspaceAuthorityError(
+                    "current-document rebase is missing its result digest"
+                )
+            undo_record = DocumentUndoRecord(
+                token=undo_token,
+                resulting_revision=approved_revision,
+                resulting_workspace_digest=rebase.result_workspace_digest,
+                inverse_command=inverse_command,
+            )
         plan = CurrentDocumentRebasePlan(
             command_receipt=command_receipt,
             rebase=rebase,
             pending_task_competency_levels=pending_task_competency_levels,
+            undo_record=undo_record,
         )
         await self._put_current_edit_plan(document_id, plan)
         return plan
@@ -1071,6 +1133,13 @@ class WorkspaceAuthorityService:
             raise WorkspaceAuthorityError(
                 "current-document approved state does not match its committed plan"
             )
+        if plan.rebase.employee_source_id is not None:
+            source = await self.runtime.get_source_or_none(
+                document_id,
+                plan.rebase.employee_source_id,
+            )
+            if source is not None:
+                await self.runtime._mark_source_committed(source)
         workspace = StoreBackedWorkspace(
             store=self.runtime.store,
             document_id=document_id,
@@ -1107,13 +1176,7 @@ class WorkspaceAuthorityService:
         await workspace.replace_pending_task_competency_levels(
             plan.pending_task_competency_levels
         )
-        if plan.rebase.employee_source_id is not None:
-            source = await self.runtime.get_source_or_none(
-                document_id,
-                plan.rebase.employee_source_id,
-            )
-            if source is not None:
-                await self.runtime._mark_source_committed(source)
+        await self._replace_current_undo_record(document_id, plan.undo_record)
         await self._delete_current_edit_plan(document_id, command_id)
 
     async def finish_direct_edit_rebase(
@@ -1149,6 +1212,7 @@ class WorkspaceAuthorityService:
             snapshot.approved_document,
             plan=plan,
         )
+        await self._replace_current_undo_record(document_id, None)
         if plan.employee_source_id is not None:
             source = await self.runtime.get_source_or_none(
                 document_id,
@@ -1235,6 +1299,13 @@ class WorkspaceAuthorityService:
         snapshot = await self.runtime._snapshot(document_id)
         if approved_document_digest(snapshot.approved_document) != plan.approved_digest:
             raise WorkspaceAuthorityError("workspace rebase approved document is stale")
+        if record.employee_source_id is not None:
+            source = await self.runtime.get_source_or_none(
+                document_id,
+                record.employee_source_id,
+            )
+            if source is not None:
+                await self.runtime._mark_source_committed(source)
         workspace = StoreBackedWorkspace(store=self.runtime.store, document_id=document_id)
         current = await workspace.read_snapshot()
         actual_digest = workspace_resource_digest(current.files)
@@ -1255,13 +1326,7 @@ class WorkspaceAuthorityService:
             snapshot.approved_document,
             plan=plan,
         )
-        if record.employee_source_id is not None:
-            source = await self.runtime.get_source_or_none(
-                document_id,
-                record.employee_source_id,
-            )
-            if source is not None:
-                await self.runtime._mark_source_committed(source)
+        await self._replace_current_undo_record(document_id, None)
         completed = record.model_copy(
             update={
                 "status": WorkspaceDecisionStatus.COMPLETED,

@@ -6,6 +6,7 @@ import pytest
 from langgraph.store.memory import InMemoryStore
 
 from app.consultant.state import (
+    ApprovedDuty,
     ApprovedJobDocument,
     ApprovedOpksItem,
     ApprovedOpksKind,
@@ -14,7 +15,14 @@ from app.consultant.state import (
 )
 from app.consultant.current_document import (
     attach_employee_source_to_current_edit,
+    compose_structural_current_document_edit,
     derive_current_document_edit,
+    document_paths_overlap_pending_review,
+)
+from app.consultant.document_commands import (
+    CreateDuty,
+    CreateTask,
+    plan_document_structure_command,
 )
 from app.consultant.state import (
     DocumentChangeSet,
@@ -40,6 +48,8 @@ DOCUMENT_ID = UUID("00000000-0000-0000-0000-000000000701")
 APPROVED_TASK_ID = UUID("00000000-0000-0000-0000-000000000702")
 PENDING_TASK_ID = UUID("00000000-0000-0000-0000-000000000703")
 SOURCE_ID = UUID("00000000-0000-0000-0000-000000000704")
+PENDING_DUTY_ID = UUID("00000000-0000-0000-0000-000000000705")
+NEW_ENTITY_ID = UUID("00000000-0000-0000-0000-000000000706")
 
 
 def _task(task_id: UUID, statement: str, level: int | None) -> ApprovedTask:
@@ -218,6 +228,149 @@ def test_current_edit_keeps_an_employee_edit_of_ai_after_state_pending() -> None
         f"/tasks/{APPROVED_TASK_ID}/statement",
     )
     assert plan.approved_paths == ()
+
+
+def test_ordinary_structural_intent_updates_both_current_and_approved() -> None:
+    approved = ApprovedJobDocument(document_id=DOCUMENT_ID)
+    command_plan = plan_document_structure_command(
+        approved,
+        CreateDuty(name="法遵管理"),
+        issued_entity_id=NEW_ENTITY_ID,
+        employee_source_id=SOURCE_ID,
+    )
+
+    assert not document_paths_overlap_pending_review(
+        command_plan.touched_paths,
+        _review(),
+    )
+    edit = compose_structural_current_document_edit(
+        approved=approved,
+        current=approved,
+        current_after=command_plan.current_after,
+        approved_after=command_plan.current_after,
+        touched_paths=command_plan.touched_paths,
+        remains_pending=False,
+        task_handle_by_id={},
+    )
+
+    assert edit.current_after.duties[0].statement == "法遵管理"
+    assert edit.approved_after == edit.current_after
+    assert edit.approved_paths == (
+        "/duties",
+        f"/duties/{NEW_ENTITY_ID}",
+    )
+    assert edit.pending_paths == ()
+
+
+def test_structural_intent_under_ai_pending_parent_stays_current_only() -> None:
+    approved = ApprovedJobDocument(document_id=DOCUMENT_ID)
+    pending_duty = ApprovedDuty(
+        duty_id=PENDING_DUTY_ID,
+        statement="AI 待審職責",
+        display_order=0,
+    )
+    current = approved.model_copy(update={"duties": (pending_duty,)})
+    pending_add = DocumentPatchAction(
+        action_id=uuid4(),
+        operation=DocumentPatchOperation.ADD,
+        path="/duties",
+        target_key=str(PENDING_DUTY_ID),
+        after=pending_duty.model_dump(mode="json"),
+        source_ids=(SOURCE_ID,),
+        read_set=(
+            DocumentPathRead(path="/duties", value_sha256="0" * 64),
+        ),
+    )
+    command_plan = plan_document_structure_command(
+        current,
+        CreateTask(
+            duty_id=PENDING_DUTY_ID,
+            statement="追蹤修法",
+            action="追蹤",
+            object="修法",
+            competency_level=3,
+        ),
+        issued_entity_id=NEW_ENTITY_ID,
+        employee_source_id=SOURCE_ID,
+    )
+    review = _review(pending_add)
+
+    assert document_paths_overlap_pending_review(
+        command_plan.touched_paths,
+        review,
+    )
+    edit = compose_structural_current_document_edit(
+        approved=approved,
+        current=current,
+        current_after=command_plan.current_after,
+        approved_after=approved,
+        touched_paths=command_plan.touched_paths,
+        remains_pending=True,
+        task_handle_by_id={NEW_ENTITY_ID: "task-001"},
+    )
+
+    assert edit.approved_after == approved
+    assert edit.current_after.tasks[0].task_id == NEW_ENTITY_ID
+    assert edit.pending_paths == command_plan.touched_paths
+    assert edit.pending_task_competency_levels.by_task_handle == {"task-001": 3}
+
+
+def test_create_in_a_collection_with_an_ai_pending_sibling_stays_current_only() -> None:
+    approved_duty = ApprovedDuty(
+        duty_id=UUID("00000000-0000-0000-0000-000000000707"),
+        statement="核准職責",
+        display_order=0,
+    )
+    approved = ApprovedJobDocument(
+        document_id=DOCUMENT_ID,
+        duties=(approved_duty,),
+    )
+    pending_duty = ApprovedDuty(
+        duty_id=PENDING_DUTY_ID,
+        statement="AI 待審職責",
+        display_order=1,
+    )
+    current = approved.model_copy(
+        update={"duties": (approved_duty, pending_duty)}
+    )
+    pending_add = DocumentPatchAction(
+        action_id=uuid4(),
+        operation=DocumentPatchOperation.ADD,
+        path="/duties",
+        target_key=str(PENDING_DUTY_ID),
+        after=pending_duty.model_dump(mode="json"),
+        source_ids=(SOURCE_ID,),
+        read_set=(
+            DocumentPathRead(path="/duties", value_sha256="0" * 64),
+        ),
+    )
+    command_plan = plan_document_structure_command(
+        current,
+        CreateDuty(name="員工新增職責"),
+        issued_entity_id=NEW_ENTITY_ID,
+        employee_source_id=SOURCE_ID,
+    )
+
+    assert document_paths_overlap_pending_review(
+        command_plan.touched_paths,
+        _review(pending_add),
+    )
+    assert "/duties" in command_plan.touched_paths
+    edit = compose_structural_current_document_edit(
+        approved=approved,
+        current=current,
+        current_after=command_plan.current_after,
+        approved_after=approved,
+        touched_paths=command_plan.touched_paths,
+        remains_pending=True,
+        task_handle_by_id={},
+    )
+    assert [item.statement for item in edit.approved_after.duties] == ["核准職責"]
+    assert [item.statement for item in edit.current_after.duties] == [
+        "核准職責",
+        "AI 待審職責",
+        "員工新增職責",
+    ]
 
 
 def test_current_edit_splits_mixed_ordinary_and_pending_changes_server_side() -> None:

@@ -14,6 +14,7 @@ from app.adapters.langgraph.postgres import (
     open_postgres_consultant_runtime,
 )
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
+from app.consultant.document_commands import CreateDuty, UndoDocumentCommand
 from app.consultant.state import (
     ApprovedDuty,
     ApprovedJobDocument,
@@ -22,7 +23,11 @@ from app.consultant.state import (
     EmployeeSourceKind,
     SourceProcessingStatus,
 )
-from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_resources import (
+    WorkspaceCatalog,
+    WorkspaceDutyResource,
+    canonical_resource_json,
+)
 from app.consultant.workspace_state import StoreBackedWorkspace
 from app.consultant.workspace_validation import WorkspaceValidationService
 
@@ -134,6 +139,38 @@ async def _stage_ai_task_statement(runtime, document_id: UUID, statement: str):
     write = await workspace.backend.awrite(
         task_path,
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+    )
+    assert write.error is None
+    snapshot = await runtime._snapshot(document_id)
+    latest_workspace = await workspace.read_snapshot()
+    validator = WorkspaceValidationService(
+        workspace=workspace,
+        catalog=WorkspaceCatalog.from_snapshot(
+            snapshot.approved_document,
+            sources=await runtime.list_sources(document_id),
+            handle_registry=latest_workspace.manifest.entity_ids_by_handle,
+        ),
+        source_loader=lambda: runtime.list_sources(document_id),
+        selected_skill_ids=CONSULTANT_SKILL_IDS,
+    )
+    validation = await validator.validate_current(
+        loaded_skill_ids=CONSULTANT_SKILL_IDS,
+    )
+    assert validation.document is not None
+    return await runtime.reopen_document(document_id)
+
+
+async def _stage_ai_duty(runtime, document_id: UUID, statement: str):
+    workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+    write = await workspace.backend.awrite(
+        "/workspace/duties/duty-999.json",
+        canonical_resource_json(
+            WorkspaceDutyResource(
+                handle="duty-999",
+                statement=statement,
+                display_order=1,
+            )
+        ),
     )
     assert write.error is None
     snapshot = await runtime._snapshot(document_id)
@@ -317,3 +354,102 @@ async def test_current_document_edit_rejects_every_server_owned_stale_guard(
         unchanged = await runtime.reopen_document(document_id)
         assert unchanged.approved_document.notes is None
         assert unchanged.current_document.notes is None
+
+
+@pytest.mark.asyncio
+async def test_structural_command_updates_one_current_jd_and_undo_restores_it(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await _seed(runtime, document_id)
+        before = await runtime.reopen_document(document_id)
+        created, undo_token = await runtime.apply_document_structure_command(
+            document_id=document_id,
+            expected_revision=before.revision,
+            workspace_generation=before.document_review.workspace_generation,
+            workspace_digest=before.document_review.workspace_digest,
+            command=CreateDuty(name="法遵管理"),
+            source_id=uuid4(),
+            command_receipt=CommandReceipt(
+                command_id=uuid4(),
+                command_kind="current_document_structure",
+                payload_sha256=uuid4().hex * 2,
+            ),
+        )
+
+        assert undo_token is not None
+        assert created.current_document == created.approved_document
+        assert [item.statement for item in created.current_document.duties] == [
+            "物料供應管理",
+            "法遵管理",
+        ]
+
+        restored, next_undo = await runtime.apply_document_structure_command(
+            document_id=document_id,
+            expected_revision=created.revision,
+            workspace_generation=created.document_review.workspace_generation,
+            workspace_digest=created.document_review.workspace_digest,
+            command=UndoDocumentCommand(undo_token=undo_token),
+            source_id=uuid4(),
+            command_receipt=CommandReceipt(
+                command_id=uuid4(),
+                command_kind="current_document_structure",
+                payload_sha256=uuid4().hex * 2,
+            ),
+        )
+
+        assert next_undo is None
+        assert restored.current_document == before.current_document
+        assert restored.approved_document == before.approved_document
+
+        with pytest.raises(StaleRevision, match="undo token is stale"):
+            await runtime.apply_document_structure_command(
+                document_id=document_id,
+                expected_revision=restored.revision,
+                workspace_generation=restored.document_review.workspace_generation,
+                workspace_digest=restored.document_review.workspace_digest,
+                command=UndoDocumentCommand(undo_token=undo_token),
+                source_id=uuid4(),
+                command_receipt=CommandReceipt(
+                    command_id=uuid4(),
+                    command_kind="current_document_structure",
+                    payload_sha256=uuid4().hex * 2,
+                ),
+            )
+
+
+@pytest.mark.asyncio
+async def test_create_with_ai_pending_sibling_never_diverges_approved_order(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await _seed(runtime, document_id)
+        pending = await _stage_ai_duty(runtime, document_id, "AI 待審職責")
+
+        created, _undo_token = await runtime.apply_document_structure_command(
+            document_id=document_id,
+            expected_revision=pending.revision,
+            workspace_generation=pending.document_review.workspace_generation,
+            workspace_digest=pending.document_review.workspace_digest,
+            command=CreateDuty(name="員工新增職責"),
+            source_id=uuid4(),
+            command_receipt=CommandReceipt(
+                command_id=uuid4(),
+                command_kind="current_document_structure",
+                payload_sha256=uuid4().hex * 2,
+            ),
+        )
+
+        assert [item.statement for item in created.approved_document.duties] == [
+            "物料供應管理"
+        ]
+        assert {
+            item.statement: item.display_order
+            for item in created.current_document.duties
+        } == {
+            "物料供應管理": 0,
+            "AI 待審職責": 1,
+            "員工新增職責": 2,
+        }

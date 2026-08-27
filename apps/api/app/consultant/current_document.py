@@ -242,6 +242,59 @@ def _paths_overlap(left: str, right: str) -> bool:
     )
 
 
+def document_paths_overlap_pending_review(
+    paths: tuple[str, ...],
+    workspace_review: WorkspaceReviewProjection,
+) -> bool:
+    """Return whether a typed employee intent touches any fresh AI pending scope."""
+
+    pending_scopes = tuple(
+        _pending_scope(action)
+        for group in workspace_review.groups
+        for action in group.actions
+    )
+    return any(
+        _paths_overlap(path, scope)
+        for path in paths
+        for scope in pending_scopes
+    )
+
+
+def compose_structural_current_document_edit(
+    *,
+    approved: ApprovedJobDocument,
+    current: ApprovedJobDocument,
+    current_after: ApprovedJobDocument,
+    approved_after: ApprovedJobDocument,
+    touched_paths: tuple[str, ...],
+    remains_pending: bool,
+    task_handle_by_id: Mapping[UUID, str],
+) -> CurrentDocumentEditPlan:
+    """Compose a typed structural after-state for the Task 3 commit seam."""
+
+    effective_approved = approved if remains_pending else approved_after
+    source_payload = employee_authored_text_delta(current, current_after)
+    approved_task_ids = {item.task_id for item in effective_approved.tasks}
+    pending_levels = {
+        task_handle_by_id[item.task_id]: item.competency_level
+        for item in current_after.tasks
+        if item.task_id not in approved_task_ids
+        and item.competency_level is not None
+        and item.task_id in task_handle_by_id
+    }
+    return CurrentDocumentEditPlan(
+        approved_after=effective_approved,
+        current_after=current_after,
+        pending_paths=(touched_paths if remains_pending else ()),
+        approved_paths=(() if remains_pending else touched_paths),
+        employee_source_text=(source_payload[0] if source_payload else None),
+        source_positions=(source_payload[1] if source_payload else ()),
+        pending_task_competency_levels=PendingTaskCompetencyLevels(
+            by_task_handle=pending_levels
+        ),
+    )
+
+
 def derive_current_document_edit(
     *,
     approved: ApprovedJobDocument,
@@ -362,5 +415,7 @@ __all__ = [
     "CurrentDocumentEditError",
     "CurrentDocumentEditPlan",
     "attach_employee_source_to_current_edit",
+    "compose_structural_current_document_edit",
     "derive_current_document_edit",
+    "document_paths_overlap_pending_review",
 ]

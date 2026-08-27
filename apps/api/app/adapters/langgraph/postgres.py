@@ -27,17 +27,28 @@ from pydantic import JsonValue
 from psycopg import AsyncConnection
 from psycopg.rows import DictRow, dict_row
 
-from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.clarification import ClarificationAnswer
 from app.consultant.current_document import (
+    CurrentDocumentEditPlan,
     attach_employee_source_to_current_edit,
+    compose_structural_current_document_edit,
     derive_current_document_edit,
+    document_paths_overlap_pending_review,
+)
+from app.consultant.document_commands import (
+    DocumentCommandBlastRadius,
+    DocumentCommandError,
+    DocumentStructureCommand,
+    UndoDocumentCommand,
+    plan_document_structure_command,
+    preview_document_structure_command,
 )
 from app.consultant.document_authority import (
     DocumentAuthorityError,
     edited_action_source_payload,
     employee_authored_text_delta,
 )
+from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.understanding import semantic_progress_from_workspace
 from app.consultant.state import (
@@ -64,6 +75,7 @@ from app.consultant.state import (
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
     apply_pending_task_competency_levels,
+    project_workspace_files,
 )
 from app.consultant.workspace_authority import (
     WorkspaceAuthorityService,
@@ -74,6 +86,7 @@ from app.consultant.workspace_review import (
     derive_workspace_review,
 )
 from app.consultant.workspace_state import (
+    PendingTaskCompetencyLevels,
     StoreBackedWorkspace,
     WorkspaceValidationStatus,
     approved_document_digest,
@@ -1128,6 +1141,101 @@ class PostgresConsultantRuntime:
             )
             return await self._snapshot(document_id)
 
+    async def _commit_current_document_edit_locked(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        snapshot: ConsultantSnapshot,
+        edit: CurrentDocumentEditPlan,
+        source_id: UUID,
+        command_receipt: CommandReceipt,
+        undo_token: str | None = None,
+        inverse_command: dict[str, JsonValue] | None = None,
+    ) -> ConsultantSnapshot:
+        """Commit one already-derived current-JD plan through the shared seam."""
+
+        if snapshot.current_document is None:
+            raise ValueError("current document is unavailable")
+        source: EmployeeSource | None = None
+        if edit.employee_source_text is not None:
+            existing_source = await self.get_source_or_none(
+                document_id,
+                source_id,
+            )
+            if (
+                existing_source is not None
+                and existing_source.processing_status
+                is SourceProcessingStatus.COMMITTED
+            ):
+                raise SourceConflict(
+                    f"current-edit source {source_id} was already used"
+                )
+            requested = EmployeeSource.pending(
+                source_id=source_id,
+                document_id=document_id,
+                kind=EmployeeSourceKind.DIRECT_EDIT,
+                text=edit.employee_source_text,
+                positions=edit.source_positions,
+            )
+            source = await self._load_or_prepare_source(requested)
+            if source.processing_status is SourceProcessingStatus.PENDING:
+                await self._after_source_store(source)
+            edit = attach_employee_source_to_current_edit(edit, source.source_id)
+
+        await self._require_known_evidence_sources(
+            edit.current_after,
+            pending_direct_edit_source_id=(
+                source.source_id if source is not None else None
+            ),
+        )
+        authority = WorkspaceAuthorityService(self)
+        await authority.prepare_current_document_edit(
+            document_id=document_id,
+            command_receipt=command_receipt,
+            source_id=(source.source_id if source is not None else None),
+            approved_before=snapshot.approved_document,
+            current_before=snapshot.current_document,
+            approved_after=edit.approved_after,
+            current_after=edit.current_after,
+            approved_revision=expected_revision + 1,
+            pending_task_competency_levels=(
+                edit.pending_task_competency_levels
+            ),
+            undo_token=undo_token,
+            inverse_command=inverse_command,
+        )
+        await self._after_workspace_decision_record()
+        command: dict[str, Any] = {
+            "action": "workspace_authority_commit",
+            "document_id": str(document_id),
+            "expected_revision": expected_revision,
+            "approved_document": edit.approved_after.model_dump(mode="json"),
+            "command_receipt": command_receipt.model_dump(mode="json"),
+        }
+        if source is not None:
+            command["source_reference"] = SourceReference(
+                source_id=source.source_id,
+                kind=source.kind,
+                created_at=source.created_at,
+            ).model_dump(mode="json")
+        try:
+            await self.graph.ainvoke(
+                {},
+                self.graph_config(document_id),
+                context=command,
+            )
+        except StaleThreadRevision as error:
+            raise StaleRevision(str(error)) from error
+        await self._after_workspace_authority_checkpoint()
+        await authority.finish_current_document_edit(
+            document_id,
+            command_receipt.command_id,
+        )
+        await self._touch_catalog(document_id)
+        await self._after_current_document_store()
+        return await self._snapshot(document_id)
+
     async def apply_current_document_edit(
         self,
         *,
@@ -1196,82 +1304,248 @@ class PostgresConsultantRuntime:
                 and edit.pending_task_competency_levels == existing_levels
             ):
                 return snapshot
-
-            source: EmployeeSource | None = None
-            if edit.employee_source_text is not None:
-                existing_source = await self.get_source_or_none(
-                    document_id,
-                    source_id,
-                )
-                if (
-                    existing_source is not None
-                    and existing_source.processing_status
-                    is SourceProcessingStatus.COMMITTED
-                ):
-                    raise SourceConflict(
-                        f"current-edit source {source_id} was already used"
-                    )
-                requested = EmployeeSource.pending(
-                    source_id=source_id,
-                    document_id=document_id,
-                    kind=EmployeeSourceKind.DIRECT_EDIT,
-                    text=edit.employee_source_text,
-                    positions=edit.source_positions,
-                )
-                source = await self._load_or_prepare_source(requested)
-                if source.processing_status is SourceProcessingStatus.PENDING:
-                    await self._after_source_store(source)
-                edit = attach_employee_source_to_current_edit(edit, source.source_id)
-
-            await self._require_known_evidence_sources(
-                edit.current_after,
-                pending_direct_edit_source_id=(
-                    source.source_id if source is not None else None
-                ),
-            )
-            await authority.prepare_current_document_edit(
+            return await self._commit_current_document_edit_locked(
                 document_id=document_id,
+                expected_revision=expected_revision,
+                snapshot=snapshot,
+                edit=edit,
+                source_id=source_id,
                 command_receipt=command_receipt,
-                source_id=(source.source_id if source is not None else None),
-                approved_before=snapshot.approved_document,
-                current_before=snapshot.current_document,
-                approved_after=edit.approved_after,
-                current_after=edit.current_after,
-                approved_revision=expected_revision + 1,
-                pending_task_competency_levels=(
-                    edit.pending_task_competency_levels
-                ),
             )
-            await self._after_workspace_decision_record()
-            command: dict[str, Any] = {
-                "action": "workspace_authority_commit",
-                "document_id": str(document_id),
-                "expected_revision": expected_revision,
-                "approved_document": edit.approved_after.model_dump(mode="json"),
-                "command_receipt": command_receipt.model_dump(mode="json"),
-            }
-            if source is not None:
-                command["source_reference"] = SourceReference(
-                    source_id=source.source_id,
-                    kind=source.kind,
-                    created_at=source.created_at,
-                ).model_dump(mode="json")
-            try:
-                await self.graph.ainvoke(
-                    {},
-                    self.graph_config(document_id),
-                    context=command,
+
+    @staticmethod
+    def _require_current_workspace_guards(
+        *,
+        snapshot: ConsultantSnapshot,
+        workspace_generation: int,
+        workspace_digest: str,
+        actual_generation: int,
+        actual_digest: str,
+        expected_revision: int,
+    ) -> None:
+        if snapshot.revision != expected_revision:
+            raise StaleRevision(
+                f"expected revision {expected_revision}, found {snapshot.revision}"
+            )
+        if actual_generation != workspace_generation:
+            raise StaleRevision(
+                "expected workspace generation "
+                f"{workspace_generation}, found {actual_generation}"
+            )
+        if actual_digest != workspace_digest:
+            raise StaleRevision("expected workspace digest is stale")
+
+    async def preview_document_structure_command(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        workspace_generation: int,
+        workspace_digest: str,
+        command: DocumentStructureCommand,
+    ) -> DocumentCommandBlastRadius:
+        """Derive one read-only server preview against the exact visible JD."""
+
+        if isinstance(command, UndoDocumentCommand):
+            raise DocumentCommandError("undo does not have a destructive preview")
+        async with self._lock_for(document_id):
+            await self._require_active_catalog(document_id)
+            authority = WorkspaceAuthorityService(self)
+            await authority.recover(document_id)
+            snapshot, _workspace, workspace_snapshot, _projection = (
+                await authority._review_context(document_id)
+            )
+            self._require_current_workspace_guards(
+                snapshot=snapshot,
+                workspace_generation=workspace_generation,
+                workspace_digest=workspace_digest,
+                actual_generation=workspace_snapshot.manifest.generation,
+                actual_digest=workspace_snapshot.manifest.resource_digest,
+                expected_revision=expected_revision,
+            )
+            if snapshot.current_document is None:
+                raise ValueError("current document is unavailable")
+            return preview_document_structure_command(
+                snapshot.current_document,
+                command,
+            )
+
+    async def apply_document_structure_command(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        workspace_generation: int,
+        workspace_digest: str,
+        command: DocumentStructureCommand,
+        source_id: UUID,
+        command_receipt: CommandReceipt,
+    ) -> tuple[ConsultantSnapshot, str | None]:
+        """Apply one employee structure intent and persist one bounded inverse."""
+
+        async with self._lock_for(document_id):
+            self._require_employee_mutation_admitted(document_id)
+            await self._require_active_catalog(document_id)
+            authority = WorkspaceAuthorityService(self)
+            await authority.recover(document_id)
+            raw_state = await self.raw_state(document_id)
+            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                await authority.recover(document_id)
+                await self._reconcile_replayed_command_source(document_id, source_id)
+                record = await authority.current_undo_record(document_id)
+                expected_undo_token = (
+                    None
+                    if isinstance(command, UndoDocumentCommand)
+                    else str(
+                        uuid5(
+                            document_id,
+                            "document-structure-undo:"
+                            f"{command_receipt.command_id}",
+                        )
+                    )
                 )
-            except StaleThreadRevision as error:
-                raise StaleRevision(str(error)) from error
-            await self._after_workspace_authority_checkpoint()
-            await authority.finish_current_document_edit(
-                document_id,
-                command_receipt.command_id,
+                return (
+                    await self._snapshot(document_id),
+                    (
+                        record.token
+                        if record is not None
+                        and record.token == expected_undo_token
+                        else None
+                    ),
+                )
+
+            snapshot, workspace, workspace_snapshot, projection = (
+                await authority._review_context(document_id)
             )
-            await self._touch_catalog(document_id)
-            await self._after_current_document_store()
-            return await self._snapshot(document_id)
+            self._require_current_workspace_guards(
+                snapshot=snapshot,
+                workspace_generation=workspace_generation,
+                workspace_digest=workspace_digest,
+                actual_generation=workspace_snapshot.manifest.generation,
+                actual_digest=workspace_snapshot.manifest.resource_digest,
+                expected_revision=expected_revision,
+            )
+            if snapshot.current_document is None:
+                raise ValueError("current document is unavailable")
+
+            if isinstance(command, UndoDocumentCommand):
+                record = await authority.current_undo_record(document_id)
+                if record is None or record.token != command.undo_token:
+                    raise StaleRevision("document undo token is stale")
+                if (
+                    record.resulting_revision != snapshot.revision
+                    or record.resulting_workspace_digest
+                    != workspace_snapshot.manifest.resource_digest
+                ):
+                    raise StaleRevision("document changed after this undo was offered")
+                inverse = record.inverse_command
+                if inverse.get("operation") != "restore_documents":
+                    raise DocumentCommandError("document undo payload is invalid")
+                try:
+                    approved_after = ApprovedJobDocument.model_validate(
+                        inverse["approved_document"]
+                    )
+                    current_after = ApprovedJobDocument.model_validate(
+                        inverse["current_document"]
+                    )
+                    pending_levels = PendingTaskCompetencyLevels.model_validate(
+                        inverse["pending_task_competency_levels"]
+                    )
+                except (KeyError, ValueError) as error:
+                    raise DocumentCommandError(
+                        "document undo payload is invalid"
+                    ) from error
+                edit = CurrentDocumentEditPlan(
+                    approved_after=approved_after,
+                    current_after=current_after,
+                    pending_task_competency_levels=pending_levels,
+                )
+                updated = await self._commit_current_document_edit_locked(
+                    document_id=document_id,
+                    expected_revision=expected_revision,
+                    snapshot=snapshot,
+                    edit=edit,
+                    source_id=source_id,
+                    command_receipt=command_receipt,
+                )
+                return updated, None
+
+            issued_entity_id = uuid5(
+                document_id,
+                f"document-structure-entity:{command_receipt.command_id}",
+            )
+            current_plan = plan_document_structure_command(
+                snapshot.current_document,
+                command,
+                issued_entity_id=issued_entity_id,
+                employee_source_id=source_id,
+            )
+            if current_plan.current_after == snapshot.current_document:
+                raise DocumentCommandError("document command did not change the JD")
+            remains_pending = document_paths_overlap_pending_review(
+                current_plan.touched_paths,
+                projection,
+            )
+            approved_after = snapshot.approved_document
+            if not remains_pending:
+                approved_after = plan_document_structure_command(
+                    snapshot.approved_document,
+                    command,
+                    issued_entity_id=issued_entity_id,
+                    employee_source_id=source_id,
+                    enforce_confirmation=False,
+                ).current_after
+
+            projected = project_workspace_files(
+                current_plan.current_after,
+                handle_registry=workspace_snapshot.manifest.entity_ids_by_handle,
+            )
+            task_handle_by_id = {
+                stable_id: handle
+                for handle, stable_id in projected.handle_registry.items()
+                if handle.startswith("task-")
+            }
+            edit = compose_structural_current_document_edit(
+                approved=snapshot.approved_document,
+                current=snapshot.current_document,
+                current_after=current_plan.current_after,
+                approved_after=approved_after,
+                touched_paths=current_plan.touched_paths,
+                remains_pending=remains_pending,
+                task_handle_by_id=task_handle_by_id,
+            )
+            pending_levels_before = (
+                await workspace.read_pending_task_competency_levels()
+            )
+            undo_token = str(
+                uuid5(
+                    document_id,
+                    f"document-structure-undo:{command_receipt.command_id}",
+                )
+            )
+            inverse_command: dict[str, JsonValue] = {
+                "operation": "restore_documents",
+                "approved_document": snapshot.approved_document.model_dump(
+                    mode="json"
+                ),
+                "current_document": snapshot.current_document.model_dump(
+                    mode="json"
+                ),
+                "pending_task_competency_levels": (
+                    pending_levels_before.model_dump(mode="json")
+                ),
+            }
+            updated = await self._commit_current_document_edit_locked(
+                document_id=document_id,
+                expected_revision=expected_revision,
+                snapshot=snapshot,
+                edit=edit,
+                source_id=source_id,
+                command_receipt=command_receipt,
+                undo_token=undo_token,
+                inverse_command=inverse_command,
+            )
+            return updated, undo_token
 
 
     async def decide_workspace_changes(

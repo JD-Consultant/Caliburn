@@ -1,5 +1,7 @@
 # 共用「目前 JD」工作副本與語意核准研究
 
+> **後續裁決：** 2026-08-27 owner 撤回本文件中由 application 判斷 `supersede／qualify／rebut` 並維護一般對話來源 lineage 的產品方案。一般補充或更正只新增普通 immutable chat turn，由近期對話、目前理解與目前 JD 承接；詳見 [`2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md`](2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md) 與 Proposed ADR 0070。其餘 shared current JD／derived diff 研究仍有效。
+
 - 日期：2026-08-25
 - 狀態：研究完成；建議方案待 owner 明確核准，尚未修改 Accepted ADR 或 production code
 - 範圍：AI 與員工如何共用同一個 JD 編輯面、待審差異、部分接受／拒絕、員工直接編輯、必要澄清、匯出權威與框架邊界

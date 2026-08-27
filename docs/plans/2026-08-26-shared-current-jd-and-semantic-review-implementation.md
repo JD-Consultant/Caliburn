@@ -1,5 +1,7 @@
 # Shared Current JD and Semantic Review Implementation Plan
 
+> **Superseded — do not execute.** Owner 在 2026-08-27 進一步確認：一般「我剛才說錯了」只是一則普通對話，不使用 source-supersession classifier／schema；active analysis run 期間則鎖住整個工作區的寫入。唯一執行計畫是 [`docs/superpowers/plans/2026-08-27-consultant-workspace-ui-implementation.md`](../superpowers/plans/2026-08-27-consultant-workspace-ui-implementation.md)。本文件保留作歷史，不得執行其 Task 5。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Replace the employee-visible approved-editor/AI-draft split with one durable current JD editing surface, preserve an approved-only export baseline, simplify review to accept/reject, keep chat usable after failures, and ship the agreed hierarchical semantic-diff UI.

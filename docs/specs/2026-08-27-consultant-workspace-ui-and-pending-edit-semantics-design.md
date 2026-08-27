@@ -1,8 +1,8 @@
 # AI 職務分析顧問工作區 UI 與待審編輯語意設計
 
 - 日期：2026-08-27
-- 狀態：產品討論已收斂；書面規格待 owner 複核，尚未授權 production 實作
-- 範圍：顧問工作區資訊架構、目前 JD 編輯、AI 語意差異審核、Duty／Task／OPKS 階層、未歸屬內容、刪除與解除關係、訪談／工作地圖、錯誤恢復，以及 Web UI framework 組合
+- 狀態：產品討論與書面規格已由 owner 於 2026-08-27 複核，已授權依實作計畫執行；ADR 0070 待完整 gate 通過後再升 Accepted
+- 範圍：顧問工作區資訊架構、目前 JD 編輯、AI 語意差異審核、Duty／Task／OPKS 階層、未歸屬內容、刪除與解除關係、訪談／工作地圖、一般對話修正、執行期唯讀、錯誤恢復，以及 Web UI framework 組合
 - 不在本輪：RAG／Reference、A 與能力級別的 AI 分析、auto-accept、多使用者協作、正式 eval 平台、匯出格式變更、公司文件、拖放、進階鍵盤捷徑、版本歷史 UI
 - 上位產品方向：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md)
 - 現行架構：ADR 0060、0067、0069；本設計的 authority 修正由 Proposed ADR 0070 收斂
@@ -54,13 +54,15 @@ Web 組合採 **Next／React／Tailwind／shadcn＋Base UI 1.7.x＋TanStack Form
 
 - [Apple HIG — Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars) 建議大量內容用 disclosure 分組、允許隱藏 sidebar，且深層內容不應全塞進 sidebar。故左欄只放訪談導航與 Duty→Task 大綱，完整 OPKS 留在中央文件。
 - [shadcn/ui — Resizable](https://ui.shadcn.com/docs/components/base/resizable) 以 `react-resizable-panels` 提供可存取的 panel group；其 wrapper 已支援 v4 API。
-- [`react-resizable-panels` releases](https://github.com/bvaughn/react-resizable-panels/releases) 目前 latest 為 4.12.1，並提供 layout persistence、collapse／expand 與標準 separator 語意。
+- [`react-resizable-panels` npm registry](https://www.npmjs.com/package/react-resizable-panels) 目前 stable tag 為 4.12.3；官方 GitHub release notes 說明 4.x 的 layout persistence、collapse／expand 與標準 separator 語意。版本只在 compatibility gate 通過後寫入 lockfile，不因「最新」兩字跳過驗證。
 - [Base UI — Scroll Area](https://base-ui.com/react/components/scroll-area) 保留原生 scroll container，適合讓三欄各自滾動，不讓整頁滾到最底才看得到輸入框。
 
 ### 2.3 複合表單與自動儲存
 
 - [TanStack Form — Arrays](https://tanstack.com/form/latest/docs/framework/react/guides/arrays) 原生處理 nested object arrays 的新增、移除、移動及對應 field state，適合 Duty／Task／OPKS 編輯；它只管理瀏覽器編輯狀態，不成為 document authority。
 - [TanStack Form — Basic concepts](https://tanstack.com/form/latest/docs/framework/react/guides/basic-concepts) 支援細粒度 selector，避免大型 JD 每個按鍵都重繪全部欄位。
+- [TanStack Query — Mutation scopes](https://tanstack.com/query/latest/docs/framework/react/guides/mutations#mutation-scopes) 明載同一 `scope.id` 的 mutations 會序列執行；用它避免同一 JD 的 autosave 彼此覆蓋，且送出訪談訊息前可等待該 scope 清空。
+- [RFC 9110 — `If-Match`](https://www.rfc-editor.org/rfc/rfc9110.html#name-if-match) 以條件式 state-changing request 防止 lost update。Caliburn 的 revision／generation／digest guard 採相同原則；UI 唯讀只是體驗與降低競態，不取代 server guard。
 - [Primer — Customize](https://primer.style/product/scenario-patterns/customize/) 警告同一 form 不要混用含糊的自動與手動儲存，並要求操作結果可感知。因此所有 inline 欄位統一採自動儲存，畫面只顯示「儲存中／已儲存／儲存失敗」，不再出現另一顆 Save。
 - [Atlassian Design System — Inline edit](https://atlassian.design/components/inline-edit) 支持在閱讀位置直接轉入編輯，避免每個短欄位開獨立頁面或 dialog。
 
@@ -77,6 +79,16 @@ Web 組合採 **Next／React／Tailwind／shadcn＋Base UI 1.7.x＋TanStack Form
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/) 強調 Task、competency 與兩者連結；這支持在成為正式職務內容前說清 K／S 支援哪些工作，但不能替代 iCAP 欄位定義。
 
 因此「先發現」不等於「先寫入 JD」：AI 可以先理解任何 O／P／K／S 線索，待 Task 邊界與關係足夠清楚後才形成待審文件變更。
+
+### 2.6 對話延續、Agent 寫入與同輪併發
+
+- [Anthropic — How Claude Code works](https://code.claude.com/docs/en/how-claude-code-works) 把修正描述成同一對話中的 follow-up，並以持久 session history 支援 resume；這支持「員工自然說剛才說錯，顧問依上下文調整」，不支持另造一個一般員工必須理解的 source-supersession workflow。
+- [OpenAI — Model guidance: apply patch](https://developers.openai.com/api/docs/guides/latest-model#the-apply-patch-tool) 的 agent loop 是模型提出結構化操作、application 套用並把成功／錯誤回傳模型；[Codex IDE 說明](https://openai.com/index/introducing-upgrades-to-codex/) 則讓人預覽並直接編輯目前變更。可轉移的是「模型操作受控 working surface、真實 application state 與 verifier 才算數」；不可轉移程式碼 patch 格式與 Git。
+- [VS Code — Send messages while a request is running](https://code.visualstudio.com/docs/chat/chat-overview#_send-messages-while-a-request-is-running) 明確提供 queue／steer／stop 三種政策；Claude 也提供 interrupt／queued correction。這證明「執行中再輸入」必須有明確 harness 語意，並非把 textarea 留著就完成。
+- [LangGraph — Double texting](https://docs.langchain.com/langsmith/double-texting) 正式列出 enqueue／reject／interrupt／rollback；`reject` 會阻止第二個 run 與 concurrent execution，而且這組能力屬 Agent Server／LangSmith Deployment，不是 OSS LangGraph 內建。Caliburn 第一版採 reject，不為尚未需要的 queue／interrupt 引入 Agent Server。
+- [WHATWG HTML](https://html.spec.whatwg.org/multipage/input.html#the-readonly-attribute) 區分 `readonly` 與 `disabled`；[WAI-ARIA 1.2 `aria-busy`](https://www.w3.org/TR/wai-aria-1.2/#aria-busy) 用來表示區域正被更新。故執行期間只停用 mutation controls，閱讀、選取、捲動、展開／收合仍可操作，並以 status／`aria-busy` 說明狀態。
+
+這些來源沒有證明「一般口頭更正應由 application 自動判斷 supersede／qualify／rebut」。因此本設計不把那個 Caliburn 自創機制誤稱為大廠標準；員工原話保留為對話歷史，現在的可修訂理解與目前 JD 才承接語意更新。
 
 ## 3. 員工心智模型與三種狀態
 
@@ -296,17 +308,21 @@ Task、Duty、O、P、K、S 都是按需 Skills；不要求先有 Task 才能在
 
 ### 10.1 對話修正
 
-員工直接在聊天說「我剛才說錯了，是……才對」。新訊息先 durable 保存，再由顧問判斷 supersede／qualify／rebut；target 不唯一時才建立必要澄清。主要畫面不提供「更正這段原話」；source lineage 只留給日後進階追溯。
+員工直接在聊天說「我剛才說錯了，是……才對」，和任何普通補充訊息完全相同：新訊息成為 immutable conversation turn，舊訊息原文不改；application 不先分類 `supersede／qualify／rebut`，不要求 target、不建立專用 model output／表單，也不自動修改 source lineage。
+
+顧問每輪取得本輪訊息、受 token budget 限制的近期員工＋顧問對話、可修訂的目前理解，以及可讀取的目前 JD／待審工作面。它用既有 Skill／Tool 正常更新理解與 JD；若「哪件事說錯」本身真的不清楚，才像顧問一樣在同一聊天室追問必要澄清。較舊原話仍可透過既有同文件 source lookup 按需讀取，不把完整歷史每輪塞入 prompt。
 
 ### 10.2 一個 workspace 同時只跑一輪分析
 
-- idle：composer 與傳送可用。
-- running：顯示「AI 正在分析」，暫時停用輸入與傳送，避免同一 workspace 併行 run。
-- success：立即解鎖並更新 snapshot。
-- error／timeout：一定解鎖；原員工訊息仍在，顯示 inline error 與「重試分析」，也允許員工忽略錯誤後送新訊息。
+- idle：composer、目前 JD 編輯、結構操作與審核操作可用。
+- send preflight：先 flush／等待同 document 已排程的 autosave；若保存失敗，不送出員工訊息、不啟動模型，保留聊天草稿並顯示保存錯誤。
+- running：從送出開始先由 Web 樂觀進入唯讀，durable `SOURCE_SAVED`／active run 是重整與多分頁後的權威狀態。顯示「AI 正在分析；完成後可繼續編輯」，停用 composer、目前 JD 編輯、新增／刪除／移動／重排、Undo、Accept／Reject。
+- running 仍允許閱讀、選取文字、捲動、Duty／Task 展開收合、左右 panel 收合／調寬，以及查看 diff／Evidence；不用全頁 overlay。
+- success：立即解鎖並以最新 snapshot 更新畫面。
+- error／timeout：一定解鎖；原員工訊息仍在，顯示 inline error 與「重試分析」，也允許員工忽略錯誤後送任何普通新訊息。
 - retry 沿用同一 input event，不重複建立員工訊息；provider attempt 另有 identity。
 
-API 對同一 document 的 duplicate active run 回 `409 run_in_progress`。第一版不做 queue、interrupt current run、rollback 或 concurrent branching。
+API 對同一 document 的 duplicate active run 或 employee document mutation 回既有 typed `409 …/consultant-run-active`。guard 同時檢查 process-local admission 與 durable latest run，不能只靠單一 React disabled 或單一 process set。第一版不做 queue、interrupt current run、rollback 或 concurrent branching。
 
 ## 11. Framework 方案 A
 
@@ -320,7 +336,7 @@ API 對同一 document 的 duplicate active run 回 `409 run_in_progress`。第�
 | Nested editing | TanStack Form v1 | generated contract adapter、semantic group／authority policy |
 | Server state／mutations | 現有 TanStack Query v5 | query keys、optimistic boundary、stale／error 文案 |
 | Persistent AI workspace | 現有 Deep Agents StoreBackend／LangGraph Store | JD canonical resources 與 scope policy |
-| Conversation／run recovery | 現有 LangGraph Saver、FastAPI SSE | 產品 snapshot event 與 run-admission |
+| Conversation／run recovery | 現有 LangGraph Saver、FastAPI SSE | token-bounded 雙向近期對話、產品 snapshot event 與 reject run-admission |
 | Schema／validation | 現有 Pydantic＋generated contract | Duty／Task／OPKS invariant、Evidence、atomic closure |
 
 [Base UI releases](https://base-ui.com/react/overview/releases) 顯示 1.7.0 是 2026-08-04 latest stable，包含多項 accessibility、performance 與 bug fixes；現行 Web 為 1.4.1，實作前先跑 compatibility gate 再升級。Base UI 官方也明載其元件依 [WAI-ARIA APG 提供基本鍵盤可及性](https://base-ui.com/react/overview/accessibility)。
@@ -350,8 +366,9 @@ API 對同一 document 的 duplicate active run 回 `409 run_in_progress`。第�
 4. **accept／reject command**：以最新 semantic group identity／digest 操作目前值；editing 與 acceptance 拆開，不把 `edit_and_accept` 當主要 UI 儲存動作。
 5. **結構 command**：以一個 discriminated typed command 承載 dissolve Duty、cascade delete Duty、unassign／move／delete Task、link／unlink K／S。這是 employee UI application command，不是新增 LLM business Tool。
 6. **current projection 狀態**：提供每個 semantic group 的 pending identity、Evidence 摘要、dependency 與 stale guard；Web 只負責呈現。
-7. **run admission**：同 document active run fail `409`；失敗後 snapshot 必須回到可輸入狀態。
-8. **移除舊 lifecycle**：契約與 Web 不再提供 `defer_changes`／`deferred`、source-specific correction UI 或「編輯 AI 新內容即接受」語意。
+7. **durable run admission**：`SOURCE_SAVED`／active run 時，同 document 的第二個 answer、direct edit、pending edit、結構 command、Undo 與 Accept／Reject 都 fail typed `409`；process-local guard 仍保留作同 process 快速互斥。成功、失敗或 timeout 後 snapshot 必須回到可寫狀態。
+8. **一般失敗恢復**：`FAILED` 可 retry 同一 input event，也可建立全新的普通員工訊息；不再要求新訊息必須 `supersedes_source_id` 指向失敗訊息。
+9. **移除專用更正與舊 lifecycle**：契約／composition root／Web 不再提供 `defer_changes`／`deferred`、source-specific correction mode、direct-correction 表單、application correction classifier，或「編輯 AI 新內容即接受」語意。歷史對話與 Evidence 仍保存，但普通訊息不觸發來源 lineage mutation。
 
 現行 O／P 恰一個 Task、K／S 多對多與 approved-only export invariants 全部保留。
 
@@ -360,7 +377,7 @@ API 對同一 document 的 duplicate active run 回 `409 run_in_progress`。第�
 - 使用原生 button／input／textarea 與 Base UI 提供的 focus／Escape／Enter／Space 行為。
 - 第一版只要求 Tab 可到達、Enter／Space 可操作、Escape 可關閉 popup；不自建全域快捷鍵、Ctrl+Z、keyboard drag 或 ARIA tree。
 - review、pending、錯誤與 AI authorship 不能只靠顏色。
-- running 使用 `aria-busy`／status；失敗使用可行動的 alert，但不把整頁鎖死。
+- running 在中央工作區使用 `aria-busy`／status；文字欄位採原生 `readonly` 或 `disabled` 的正確語意，mutation buttons 明確 disabled。失敗使用可行動的 alert，但不把整頁遮住，也不停用純檢視 controls。
 - 每欄獨立 scroll；composer 永遠可在聊天欄底部找到。
 - TanStack Form／Query 使用 field selectors 與局部 mutation，避免每次輸入重繪整份 JD。
 
@@ -385,13 +402,14 @@ API 對同一 document 的 duplicate active run 回 `409 run_in_progress`。第�
 ### 14.3 Workspace 與訪談
 
 1. 左右欄收合／調寬後中央仍可滾完整 JD；各欄 scroll 互不綁定。
-2. running 時不能重複傳送；error／timeout 後立即可輸入、可重試或送新訊息。
-3. 員工以自然語句更正前文，來源 lineage 正確但主畫面不要求找舊訊息按鈕。
-4. 工作地圖 Focus 不綁 Task，待釐清也能保存尚未定位的 OPKS 線索。
+2. running 時 composer、JD 寫入、結構操作、Undo 與 Accept／Reject 都不可用；閱讀、捲動、展開收合、panel 控制及查看 diff／Evidence仍可用。
+3. success／error／timeout 後立即解鎖；error／timeout 可重試或送任何普通新訊息，不進 retry-only 死路。
+4. 員工以自然語句更正前文時只送一般訊息；近期雙向對話與目前理解足以讓模型處理，不出現舊訊息 target、source-specific payload 或自動 lineage mutation。
+5. 工作地圖 Focus 不綁 Task，待釐清也能保存尚未定位的 OPKS 線索。
 
 ### 14.4 驗證層級
 
-- API／domain deterministic tests：projection、pending edit、accept／reject、stale、dependency、delete／unlink、run admission。
+- API／domain deterministic tests：projection、pending edit、accept／reject、stale、dependency、delete／unlink、durable run admission、失敗後新訊息與 context 組裝。自然語句理解品質只做 Luna smoke，不偽裝成 deterministic unit test。
 - generated contract codegen gate。
 - Web component／integration tests：三欄、autosave、semantic diff、popover、panel collapse、chat lock／unlock。
 - browser smoke：寬／中／窄 viewport、長 JD、長聊天、AI pending 修改後仍待審。
@@ -407,5 +425,7 @@ API 對同一 document 的 duplicate active run 回 `409 run_in_progress`。第�
 4. 一般 Gap、必要澄清與待審文件是否仍是三種不同目的？
 5. 是否誤加 RAG、A／能力級別 AI、自動接受、多 Agent、第二份文件 store 或重型 editor？
 6. 是否先使用成熟 framework primitive，再只補有證據的產品差額？
+7. 普通口頭更正是否仍是普通對話，而非 source-specific workflow？
+8. active run 是否只鎖寫入且 server 也能拒絕競態，完成／失敗後必定恢復？
 
 任何一題失敗就暫停該切片，回到本設計與 owner 討論；不得以「舊 code 原本如此」當保留理由。

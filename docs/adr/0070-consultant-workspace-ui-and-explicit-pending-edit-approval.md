@@ -2,10 +2,10 @@
 
 - **狀態**：Proposed
 - **日期**：2026-08-27
-- **Owner 對齊**：owner 已在白話討論中核准產品方向、framework 方案 A、OPKS 未定位邊界與刪除語意；本 ADR 等 owner 複核完整書面規格後再決定是否 Accepted
+- **Owner 對齊**：owner 已於 2026-08-27 複核完整書面規格並授權實作；本 ADR 仍待 implementation gate 全綠後才改為 Accepted
 - **設計與研究**：[`2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md`](../specs/2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md)
-- **Supersedes when Accepted**：ADR 0069 決定 6／7 中「員工編輯重疊 AI pending 就直接更新 approved」與「儲存 AI 新 entity 等同 edit-and-accept」的部分；決定 13 的「不新增任何 Web framework」；並澄清決定 10／12 的 running lock 與完整工作區 UI
-- **保留**：ADR 0060／0067 的 LangGraph／Deep Agents Store-backed workspace、Saver／Store authority、AI 無 approved write edge、derived semantic review、Evidence、stale guard、approved-only export；ADR 0069 的單一目前 JD 主編輯面、只讀核准基線、移除 defer、一般待審不阻塞訪談及自然語句更正
+- **Supersedes when Accepted**：ADR 0069 決定 6／7 中「員工編輯重疊 AI pending 就直接更新 approved」與「儲存 AI 新 entity 等同 edit-and-accept」的部分；決定 10 中由 application 判斷 `supersede／qualify／rebut` 並建立來源更正 lineage 的專用流程；決定 13 的「不新增任何 Web framework」；並澄清決定 12 的 running lock 與完整工作區 UI
+- **保留**：ADR 0060／0067 的 LangGraph／Deep Agents Store-backed workspace、Saver／Store authority、AI 無 approved write edge、derived semantic review、Evidence、stale guard、approved-only export；ADR 0069 的單一目前 JD 主編輯面、只讀核准基線、移除 defer、一般待審不阻塞訪談，以及失敗後可繼續一般對話
 
 ## Context
 
@@ -43,13 +43,19 @@ ADR 0069 已把員工從「正式 editor＋AI draft editor」收斂到一個共�
 
 13. **不引入重型 editor 與重複 workflow。** 不採 Tiptap、Lexical、Monaco、XState、dnd-kit、Carbon／Primer 套件、`@langchain/react`／AG-UI 或預先 virtualization。Base UI 承接 touched popup／focus primitives；現行 Radix／cmdk consumer 在改到時逐步遷移，避免同一 primitive 兩套 lifecycle。
 
-14. **running 鎖傳送，failure 必解鎖。** 同一 document 一次只允許一個 active analysis run；running 時 composer 暫停，成功或錯誤／timeout 都立即解鎖。失敗保留員工原訊息，可重試同一 input event或直接送新訊息；一般待審不鎖聊天。
+14. **active run 使整個工作區的寫入面唯讀，failure 必解鎖。** 員工送出前先等待同 document 已排程的 autosave 完成；保存失敗就不啟動分析並保留聊天草稿。從送出開始至 durable `SOURCE_SAVED`／active run 結束，composer、目前 JD 文字編輯、新增／刪除／移動／重排、Undo 與 Accept／Reject 全部不可寫；閱讀、捲動、展開／收合、panel 調整與查看 diff／Evidence 仍可用，不加全頁遮罩。成功、錯誤或 timeout 都立即解除唯讀。失敗保留員工原訊息，可重試同一 input event，也可直接送全新的普通訊息；一般待審本身不鎖工作區。
 
-15. **本 ADR 不改 export 與分析範圍。** 匯出維持 approved-only 現況；不加入 RAG／Reference、AI 產生 A／能力級別、auto-accept、多 Agent、版本歷史 UI、拖放或正式 eval。
+15. **一般補充或更正就是一般對話。** 員工說「我剛才說錯了，是……才對」時只新增一則 immutable conversation turn；不要求找舊訊息、不新增 source-specific 表單、model output 欄位、`supersede／qualify／rebut` classifier 或自動來源 lineage mutation。顧問讀取本輪訊息、受 token budget 限制的近期雙向對話、目前理解與目前 JD，透過既有理解／文件編輯能力正常修訂；語意真的不明確時才用同一聊天 composer 提出必要澄清。歷史原話不改寫。
+
+16. **第一版採明確 reject，而非 queue／steer。** 同一 document 一次只允許一個 active analysis run；durable run status 與 process-local admission 都要擋第二個 run 或員工文件 mutation。第一版不引入 Agent Server、訊息佇列、中途 steer／interrupt、rollback 或 concurrent branch。
+
+17. **本 ADR 不改 export 與分析範圍。** 匯出維持 approved-only 現況；不加入 RAG／Reference、AI 產生 A／能力級別、auto-accept、多 Agent、版本歷史 UI、拖放或正式 eval。
 
 ## Consequences
 
 - 員工可以像編輯共同文件一樣修正 AI after-state，又不會因 autosave 偷偷核准內容。
+- 分析執行期間沒有員工與 AI 同時改同一份 JD 的競態；代價是該輪完成前不能繼續輸入或修改，但仍可閱讀與整理畫面。
+- 員工的口頭更正不會被 application 擅自分類或改寫舊原話；長期效果由可修訂理解與目前 JD 承接，近期語意由正常對話 context 承接。
 - 後端需要 current working document projection、pending workspace edit command、結構 intent command與契約更新；仍沿用同一 Store workspace、approved checkpoint 與 Postgres，不新增表或第二份 authority。
 - O／P／K／S 可以在分析上任意先後出現，但只有合法結構進 JD；避免為孤立 O／P 放寬核准模型。
 - Duty／Task 刪除結果由 ownership 決定，K／S 共用項目不會因視覺父層刪除而意外消失。
@@ -66,10 +72,17 @@ ADR 0069 已把員工從「正式 editor＋AI draft editor」收斂到一個共�
 - **刪除 Task 後保留孤立 O／P**：O／P 失去定義它的 Task；要保留就應移動整個 Task 到未歸屬。
 - **只改 CSS，不補 current projection／pending edit command**：畫面看似共用文件，authority 行為仍是舊 edit-and-accept。
 - **導入 rich-text／IDE editor framework**：typed JD 不需要其 AST、collaboration 或 language-service 成本。
+- **把普通更正轉成 source supersession protocol**：Codex／Claude 的官方互動證據支持沿同一對話補充與修正，沒有支持一般使用者先定位舊原話或由 application 猜測來源 target；此機制增加 schema、錯誤分類與 Evidence 失效傳播，且偏離 owner 的顧問訪談心智模型。
+- **running 時允許 queue／steer／parallel edit**：VS Code、Claude 與 LangGraph 都把它當成需要明確處理策略的進階能力；本機單一員工、單一結構化 JD 第一版沒有足夠收益承擔中斷與部分寫入恢復。
 
 ## Sources
 
 - [VS Code — Review and revert agent changes](https://code.visualstudio.com/docs/agents/run/review-code-edits)
+- [VS Code — Send messages while a request is running](https://code.visualstudio.com/docs/chat/chat-overview#_send-messages-while-a-request-is-running)
+- [OpenAI — Model guidance: apply patch](https://developers.openai.com/api/docs/guides/latest-model#the-apply-patch-tool)
+- [OpenAI — Introducing upgrades to Codex](https://openai.com/index/introducing-upgrades-to-codex/)
+- [Anthropic — How Claude Code works](https://code.claude.com/docs/en/how-claude-code-works)
+- [LangGraph — Double texting](https://docs.langchain.com/langsmith/double-texting)
 - [Google Docs — Suggest edits](https://support.google.com/docs/answer/6033474)
 - [Apple HIG — Generative AI](https://developer.apple.com/design/human-interface-guidelines/generative-ai)
 - [Apple HIG — Sidebars](https://developer.apple.com/design/human-interface-guidelines/sidebars)
@@ -81,8 +94,12 @@ ADR 0069 已把員工從「正式 editor＋AI draft editor」收斂到一個共�
 - [Base UI — Scroll Area](https://base-ui.com/react/components/scroll-area)
 - [TanStack Form — Arrays](https://tanstack.com/form/latest/docs/framework/react/guides/arrays)
 - [TanStack Form — Basic concepts](https://tanstack.com/form/latest/docs/framework/react/guides/basic-concepts)
+- [TanStack Query — Mutation scopes](https://tanstack.com/query/latest/docs/framework/react/guides/mutations#mutation-scopes)
 - [shadcn/ui — Resizable](https://ui.shadcn.com/docs/components/base/resizable)
 - [`react-resizable-panels` releases](https://github.com/bvaughn/react-resizable-panels/releases)
+- [WHATWG HTML — `readonly` and `disabled`](https://html.spec.whatwg.org/multipage/input.html#the-readonly-attribute)
+- [WAI-ARIA 1.2 — `aria-busy`](https://www.w3.org/TR/wai-aria-1.2/#aria-busy)
+- [RFC 9110 — `If-Match`](https://www.rfc-editor.org/rfc/rfc9110.html#name-if-match)
 - [Kubernetes — Garbage collection](https://kubernetes.io/docs/concepts/architecture/garbage-collection/)
 - [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/)
 - [ADR 0048 — OPKS evidence axes and document-level competencies](0048-opks-evidence-axes-and-document-level-competencies.md)

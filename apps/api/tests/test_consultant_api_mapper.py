@@ -24,6 +24,7 @@ from app.consultant.state import (
     initial_thread_state,
 )
 from app.consultant.views import (
+    CurrentDocumentUnavailable,
     document_review_projection_from_workspace,
     snapshot_from_state,
 )
@@ -96,7 +97,12 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
         workspace_review=WorkspaceReviewProjection(workspace_digest="a" * 64),
     )
     view = to_consultant_snapshot_view(
-        snapshot.model_copy(update={"document_review": review})
+        snapshot.model_copy(
+            update={
+                "current_document": snapshot.approved_document,
+                "document_review": review,
+            }
+        )
     )
 
     assert view.current_interview is not None
@@ -110,6 +116,8 @@ def test_snapshot_mapper_exposes_product_projections_not_raw_framework_state() -
     }
     assert view.readiness.requires_force_confirmation is True
     assert view.document_review.safe_interview_work_available is True
+    assert view.document_review.workspace_digest == "a" * 64
+    assert view.current_document == view.approved_document
     payload = view.model_dump(mode="json")
     assert "interview_work" not in payload
     review_state_field = "review_" + "queue"
@@ -128,8 +136,12 @@ def test_initial_snapshot_is_naturally_resumable_without_a_pause_state() -> None
     assert snapshot.latest_run is None
     assert snapshot.opening_navigation.visible is True
     assert snapshot.messages == ()
+    assert snapshot.current_document is None
     assert snapshot.document_review is None
-    with pytest.raises(ValueError, match="Store-derived document review"):
+    with pytest.raises(
+        CurrentDocumentUnavailable,
+        match="Store-derived current document",
+    ):
         to_consultant_snapshot_view(snapshot)
 
 
@@ -252,11 +264,15 @@ def test_snapshot_mapper_projects_store_review_status_generation_and_employee_di
         )
         view = to_consultant_snapshot_view(
             snapshot.model_copy(
-                update={"document_review": review}
+                update={
+                    "current_document": snapshot.approved_document,
+                    "document_review": review,
+                }
             )
         )
 
         assert view.document_review.workspace_generation == 11
+        assert view.document_review.workspace_digest == "a" * 64
         assert view.document_review.workspace_status.value == status
         if status == "pending":
             assert [action.status.value for action in view.document_review.bundles[0].actions] == [

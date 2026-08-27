@@ -21,7 +21,7 @@ from app.adapters.langgraph.postgres import (
     DocumentNotFound,
 )
 from app.api.deps import get_consultant_runtime, get_consultant_turn_processor
-from app.api.problems import CONSULTANT_RUN_ACTIVE, INVALID_REQUEST
+from app.api.problems import AUTHORITY_CONFLICT, CONSULTANT_RUN_ACTIVE, INVALID_REQUEST
 from app.api.routes import consultant
 from app.consultant.state import (
     EmployeeSource,
@@ -69,7 +69,12 @@ def _store_enriched_snapshot(state):
         validation_status=WorkspaceValidationStatus.VALID,
         workspace_review=WorkspaceReviewProjection(workspace_digest="a" * 64),
     )
-    return snapshot.model_copy(update={"document_review": review})
+    return snapshot.model_copy(
+        update={
+            "current_document": snapshot.approved_document,
+            "document_review": review,
+        }
+    )
 
 
 class FakeRuntime:
@@ -332,6 +337,19 @@ async def test_catalog_create_read_snapshot_and_delete(api) -> None:
     deleted = await client.delete(f"{BASE}/{document_id}")
     assert deleted.status_code == 204
     assert runtime.deleted is True
+
+
+async def test_snapshot_returns_typed_authority_conflict_without_valid_current_document(
+    api,
+) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+    runtime.snapshot = runtime.snapshot.model_copy(update={"current_document": None})
+
+    response = await client.get(f"{BASE}/{document_id}/snapshot")
+
+    assert response.status_code == 409
+    assert response.json()["type"] == AUTHORITY_CONFLICT
 
 
 async def test_snapshot_events_encode_native_sse_from_production_route() -> None:

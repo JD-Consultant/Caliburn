@@ -12,6 +12,35 @@ export const ACTION_ID = "00000000-0000-0000-0000-000000000006";
 export const ACTION_ID_2 = "00000000-0000-0000-0000-000000000007";
 export const ATOMIC_ID = "00000000-0000-0000-0000-000000000008";
 
+export function consultantDocumentFixture(): ConsultantSnapshotView["approved_document"] {
+  return {
+    schema_version: 1,
+    document_id: DOCUMENT_ID,
+    job_title: "採購專員",
+    occupation_category_name: null,
+    occupation_name: null,
+    occupation_code: null,
+    industry_name: null,
+    industry_code: null,
+    work_description: null,
+    competency_level: null,
+    notes: null,
+    duties: [],
+    tasks: [],
+    opks: [
+      {
+        item_id: "00000000-0000-0000-0000-000000000013",
+        kind: "attitude",
+        text: "謹慎",
+        display_order: 0,
+        task_ids: [],
+        indicator_ids: [],
+        evidence_source_ids: [SOURCE_ID],
+      },
+    ],
+  };
+}
+
 export function changesetFixture(): DocumentChangeSetView {
   const action = (actionId: string, atomicSubgroupId: string | null) => ({
     action_id: actionId,
@@ -160,6 +189,8 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
     ],
     document_review: {
       workspace_generation: 4,
+      workspace_digest:
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       workspace_status: "pending",
       diagnostics: [],
       bundles: [changesetFixture()],
@@ -194,32 +225,8 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
       assessed_revision: 3,
       needs_recalculation: false,
     },
-    approved_document: {
-      schema_version: 1,
-      document_id: DOCUMENT_ID,
-      job_title: "採購專員",
-      occupation_category_name: null,
-      occupation_name: null,
-      occupation_code: null,
-      industry_name: null,
-      industry_code: null,
-      work_description: null,
-      competency_level: null,
-      notes: null,
-      duties: [],
-      tasks: [],
-      opks: [
-        {
-          item_id: "00000000-0000-0000-0000-000000000013",
-          kind: "attitude",
-          text: "謹慎",
-          display_order: 0,
-          task_ids: [],
-          indicator_ids: [],
-          evidence_source_ids: [SOURCE_ID],
-        },
-      ],
-    },
+    current_document: consultantDocumentFixture(),
+    approved_document: consultantDocumentFixture(),
     readiness: {
       ready: false,
       requires_force_confirmation: true,

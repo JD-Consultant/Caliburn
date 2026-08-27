@@ -31,7 +31,7 @@ from app.consultant.state import (
     EmployeeSource,
     EmployeeSourceKind,
 )
-from app.consultant.views import ConsultantSnapshot
+from app.consultant.views import ConsultantSnapshot, CurrentDocumentUnavailable
 
 
 def _next_question(value: dict | None) -> NextQuestionView | None:
@@ -204,6 +204,11 @@ def to_consultant_snapshot_view(
         )
         for turn in snapshot.messages
     ]
+    current_document = snapshot.current_document
+    if current_document is None:
+        raise CurrentDocumentUnavailable(
+            "Store-derived current document must be loaded before public projection"
+        )
     review = snapshot.document_review
     if review is None:
         raise ValueError(
@@ -261,6 +266,7 @@ def to_consultant_snapshot_view(
                     for bundle in review.bundles
                 ],
                 "workspace_generation": review.workspace_generation,
+                "workspace_digest": review.workspace_digest,
                 "workspace_status": review.workspace_status.value,
                 "diagnostics": [
                     _employee_workspace_diagnostic(item).model_dump(mode="json")
@@ -289,6 +295,9 @@ def to_consultant_snapshot_view(
         ),
         approved_document=ApprovedJobDocumentView.model_validate(
             snapshot.approved_document.model_dump(mode="json")
+        ),
+        current_document=ApprovedJobDocumentView.model_validate(
+            current_document.model_dump(mode="json")
         ),
         readiness=_readiness(snapshot),
     )

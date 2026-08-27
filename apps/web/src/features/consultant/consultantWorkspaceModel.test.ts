@@ -22,6 +22,7 @@ import {
   understandingStatusLabel,
   workspaceSections,
 } from "./consultantWorkspaceModel";
+import { consultantDocumentFixture } from "./consultantWorkspaceTestFixture";
 
 const DOCUMENT_ID = "00000000-0000-0000-0000-000000000001";
 const SOURCE_ID = "00000000-0000-0000-0000-000000000002";
@@ -180,6 +181,8 @@ function snapshot(): ConsultantSnapshotView {
     ],
     document_review: {
       workspace_generation: 4,
+      workspace_digest:
+        "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       workspace_status: "pending",
       diagnostics: [],
       bundles: [changeset()],
@@ -214,6 +217,7 @@ function snapshot(): ConsultantSnapshotView {
       assessed_revision: 3,
       needs_recalculation: false,
     },
+    current_document: consultantDocumentFixture(),
     approved_document: {
       schema_version: 1,
       document_id: DOCUMENT_ID,

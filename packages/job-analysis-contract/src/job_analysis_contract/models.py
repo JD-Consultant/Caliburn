@@ -689,6 +689,7 @@ class DocumentReviewView(BaseModel):
         extra='forbid',
     )
     workspace_generation: conint(ge=0, strict=True)
+    workspace_digest: constr(pattern=r'^[0-9a-f]{64}$')
     workspace_status: WorkspaceReviewStatus
     diagnostics: list[WorkspaceDiagnosticView]
     bundles: list[DocumentChangeSetView]
@@ -718,5 +719,6 @@ class ConsultantSnapshotView(BaseModel):
     document_review: DocumentReviewView
     required_clarification: RequiredClarificationView | None
     sufficiency: SufficiencyView
+    current_document: ApprovedJobDocumentView
     approved_document: ApprovedJobDocumentView
     readiness: ExportReadinessView

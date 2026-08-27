@@ -331,6 +331,7 @@ export interface BlockedInterviewBranchView {
  */
 export interface DocumentReviewView {
   workspace_generation: number;
+  workspace_digest: string;
   workspace_status: WorkspaceReviewStatus;
   diagnostics: WorkspaceDiagnosticView[];
   bundles: DocumentChangeSetView[];
@@ -513,6 +514,7 @@ export interface ConsultantSnapshotView {
   document_review: DocumentReviewView;
   required_clarification: RequiredClarificationView | null;
   sufficiency: SufficiencyView;
+  current_document: ApprovedJobDocumentView;
   approved_document: ApprovedJobDocumentView;
   readiness: ExportReadinessView;
 }

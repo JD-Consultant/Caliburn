@@ -68,6 +68,7 @@ def test_document_review_contract_exposes_workspace_status_without_old_action_li
     ):
         review = DocumentReviewView(
             workspace_generation=7,
+            workspace_digest="a" * 64,
             workspace_status=status,
             diagnostics=diagnostics,
             bundles=[],
@@ -78,6 +79,7 @@ def test_document_review_contract_exposes_workspace_status_without_old_action_li
             explanation=None,
         )
         assert review.workspace_generation == 7
+        assert review.workspace_digest == "a" * 64
         assert review.workspace_status is status
         assert review.diagnostics == diagnostics
 
@@ -196,5 +198,6 @@ def test_sse_event_is_refetch_only_and_snapshot_has_no_client_owned_history() ->
     assert "messages" not in ConsultantSnapshotEvent.model_fields
     assert "client_history" not in ConsultantSnapshotView.model_fields
     assert "employee_messages" in ConsultantSnapshotView.model_fields
+    assert "current_document" in ConsultantSnapshotView.model_fields
     assert "pause" not in ConsultantSnapshotView.model_fields
     assert "finish" not in ConsultantSnapshotView.model_fields

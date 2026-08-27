@@ -20,6 +20,7 @@ from app.consultant.state import ApprovedJobDocument, DurableModel
 
 
 _MANIFEST_KEY = "manifest"
+_PENDING_TASK_COMPETENCY_LEVELS_KEY = "pending-task-competency-levels"
 
 
 def _document_namespace(document_id: UUID, leaf: str) -> tuple[str, str, str, str]:
@@ -84,6 +85,23 @@ class WorkspaceDiagnostic(DurableModel):
     path: Annotated[str, StringConstraints(min_length=1, max_length=160)] = "/workspace"
     message: Annotated[str, StringConstraints(min_length=1, max_length=240)]
     severity: WorkspaceDiagnosticSeverity = WorkspaceDiagnosticSeverity.ERROR
+
+
+class PendingTaskCompetencyLevels(DurableModel):
+    """Employee-owned L values for Task handles not yet in approved JD."""
+
+    by_task_handle: dict[str, int] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def handles_and_levels_are_valid(self) -> PendingTaskCompetencyLevels:
+        for handle, level in self.by_task_handle.items():
+            if not handle.startswith("task-") or not handle.removeprefix(
+                "task-"
+            ).replace("-", "").isalnum():
+                raise ValueError("pending competency level key must be a Task handle")
+            if not 1 <= level <= 6:
+                raise ValueError("pending competency level must be between 1 and 6")
+        return self
 
 
 class WorkspaceManifest(DurableModel):
@@ -218,6 +236,45 @@ class StoreBackedWorkspace:
             )
             await self._put_manifest(manifest)
         return WorkspaceSnapshot(files=files, manifest=manifest)
+
+    async def read_pending_task_competency_levels(
+        self,
+    ) -> PendingTaskCompetencyLevels:
+        item = await self.store.aget(
+            workspace_metadata_namespace(self.document_id),
+            _PENDING_TASK_COMPETENCY_LEVELS_KEY,
+        )
+        if item is None:
+            return PendingTaskCompetencyLevels()
+        return PendingTaskCompetencyLevels.model_validate(item.value)
+
+    async def replace_pending_task_competency_levels(
+        self,
+        levels: PendingTaskCompetencyLevels,
+    ) -> None:
+        await self.store.aput(
+            workspace_metadata_namespace(self.document_id),
+            _PENDING_TASK_COMPETENCY_LEVELS_KEY,
+            levels.model_dump(mode="json"),
+            index=False,
+        )
+
+    async def prune_pending_task_competency_levels(
+        self,
+        *,
+        retained_task_handles: set[str],
+    ) -> PendingTaskCompetencyLevels:
+        current = await self.read_pending_task_competency_levels()
+        pruned = PendingTaskCompetencyLevels(
+            by_task_handle={
+                handle: level
+                for handle, level in current.by_task_handle.items()
+                if handle in retained_task_handles
+            }
+        )
+        if pruned != current:
+            await self.replace_pending_task_competency_levels(pruned)
+        return pruned
 
     async def commit_validation(
         self,

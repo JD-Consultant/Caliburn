@@ -16,6 +16,7 @@ from app.adapters.langgraph.postgres import (
     StaleRevision,
     UnknownEvidenceSource,
 )
+from app.consultant.views import CurrentDocumentUnavailable
 
 
 DOCUMENT_NOT_FOUND = "https://caliburn.dev/problems/job-analysis/document-not-found"
@@ -85,6 +86,12 @@ def consultant_runtime_error_response(error: Exception) -> JSONResponse:
         return problem_response(
             type_uri=AUTHORITY_CONFLICT,
             title="Document revision changed",
+            status=409,
+        )
+    if isinstance(error, CurrentDocumentUnavailable):
+        return problem_response(
+            type_uri=AUTHORITY_CONFLICT,
+            title="Current document requires workspace reconciliation",
             status=409,
         )
     if isinstance(error, PendingSourceRequiresReconciliation):

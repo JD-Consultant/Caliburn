@@ -368,9 +368,10 @@
     "DocumentReviewView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["workspace_generation", "workspace_status", "diagnostics", "bundles", "unresolved_action_count", "blocked_branches", "safe_interview_work_available", "decision_required_before_more_interview", "explanation"],
+      "required": ["workspace_generation", "workspace_digest", "workspace_status", "diagnostics", "bundles", "unresolved_action_count", "blocked_branches", "safe_interview_work_available", "decision_required_before_more_interview", "explanation"],
       "properties": {
         "workspace_generation": { "type": "integer", "minimum": 0 },
+        "workspace_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
         "workspace_status": { "$ref": "#/$defs/WorkspaceReviewStatus" },
         "diagnostics": { "type": "array", "items": { "$ref": "#/$defs/WorkspaceDiagnosticView" } },
         "bundles": { "type": "array", "items": { "$ref": "#/$defs/DocumentChangeSetView" } },
@@ -550,7 +551,7 @@
     "ConsultantSnapshotView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["document_id", "revision", "source_count", "latest_source_id", "run", "opening_navigation", "current_interview", "visible_work", "understanding", "semantic_progress", "employee_messages", "messages", "document_review", "required_clarification", "sufficiency", "approved_document", "readiness"],
+      "required": ["document_id", "revision", "source_count", "latest_source_id", "run", "opening_navigation", "current_interview", "visible_work", "understanding", "semantic_progress", "employee_messages", "messages", "document_review", "required_clarification", "sufficiency", "current_document", "approved_document", "readiness"],
       "properties": {
         "document_id": { "type": "string", "format": "uuid" },
         "revision": { "type": "integer", "minimum": 0 },
@@ -567,6 +568,7 @@
         "document_review": { "$ref": "#/$defs/DocumentReviewView" },
         "required_clarification": { "anyOf": [{ "$ref": "#/$defs/RequiredClarificationView" }, { "type": "null" }] },
         "sufficiency": { "$ref": "#/$defs/SufficiencyView" },
+        "current_document": { "$ref": "#/$defs/ApprovedJobDocumentView" },
         "approved_document": { "$ref": "#/$defs/ApprovedJobDocumentView" },
         "readiness": { "$ref": "#/$defs/ExportReadinessView" }
       }

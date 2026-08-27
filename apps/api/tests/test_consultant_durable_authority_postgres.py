@@ -249,6 +249,13 @@ async def test_store_snapshot_projects_valid_workspace_progress_and_review_count
         snapshot = await runtime.reopen_document(document_id)
 
         assert snapshot.approved_document.tasks[0].statement != "AI 候選工作內容"
+        assert snapshot.current_document is not None
+        assert snapshot.current_document.tasks[0].statement == "AI 候選工作內容"
+        assert snapshot.document_review is not None
+        assert (
+            snapshot.document_review.workspace_digest
+            == (await workspace.read_snapshot()).manifest.resource_digest
+        )
         assert snapshot.semantic_progress.currently_known_work_count == 1
         assert snapshot.semantic_progress.employee_decisions.pending == 1
         assert snapshot.semantic_progress.employee_decisions.deferred == 0

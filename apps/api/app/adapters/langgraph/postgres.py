@@ -53,7 +53,10 @@ from app.consultant.state import (
     UnderstandingCalibration,
     inspect_command_receipt,
 )
-from app.consultant.workspace_resources import WorkspaceCatalog
+from app.consultant.workspace_resources import (
+    WorkspaceCatalog,
+    apply_pending_task_competency_levels,
+)
 from app.consultant.workspace_authority import (
     WorkspaceAuthorityService,
     WorkspaceReviewCommand,
@@ -456,10 +459,26 @@ class PostgresConsultantRuntime:
                 workspace_review=projection,
             )
         }
-        if validation.document is not None:
+        if (
+            validation.document is not None
+            and effective_manifest.validation_status
+            in {
+                WorkspaceValidationStatus.VALID,
+                WorkspaceValidationStatus.CONFLICTED,
+            }
+        ):
+            current_document = apply_pending_task_competency_levels(
+                validation.document.approved_document,
+                approved_document=snapshot.approved_document,
+                handle_registry=effective_manifest.entity_ids_by_handle,
+                pending_levels=(
+                    await workspace.read_pending_task_competency_levels()
+                ),
+            )
+            updates["current_document"] = current_document
             updates["semantic_progress"] = semantic_progress_from_workspace(
                 state.values,
-                working_document=validation.document.approved_document,
+                working_document=current_document,
                 workspace_review=projection,
             )
         return snapshot.model_copy(

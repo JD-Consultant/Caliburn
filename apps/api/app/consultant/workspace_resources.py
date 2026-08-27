@@ -30,7 +30,11 @@ from app.consultant.state import (
     ApprovedTask,
     EmployeeSource,
 )
-from app.consultant.workspace_state import Sha256Digest, workspace_resource_digest
+from app.consultant.workspace_state import (
+    PendingTaskCompetencyLevels,
+    Sha256Digest,
+    workspace_resource_digest,
+)
 
 
 NonEmptyText = Annotated[str, StringConstraints(min_length=1)]
@@ -519,6 +523,44 @@ def _approved_document_from_editable(
         duties=duties,
         tasks=tasks,
         opks=opks,
+    )
+
+
+def apply_pending_task_competency_levels(
+    current_document: ApprovedJobDocument,
+    *,
+    approved_document: ApprovedJobDocument,
+    handle_registry: Mapping[str, UUID],
+    pending_levels: PendingTaskCompetencyLevels,
+) -> ApprovedJobDocument:
+    """Overlay employee-only L values on AI-new Tasks in the current view.
+
+    Workspace resources intentionally omit competency level, so model-authored
+    edits cannot read or write it.  Approved Tasks retain their approved value;
+    unknown or already-pruned handles are ignored.
+    """
+
+    approved_task_ids = {task.task_id for task in approved_document.tasks}
+    level_by_task_id = {
+        stable_id: pending_levels.by_task_handle[handle]
+        for handle, stable_id in handle_registry.items()
+        if handle in pending_levels.by_task_handle
+        and handle.startswith("task-")
+        and stable_id not in approved_task_ids
+    }
+    if not level_by_task_id:
+        return current_document
+    return current_document.model_copy(
+        update={
+            "tasks": tuple(
+                task.model_copy(
+                    update={"competency_level": level_by_task_id[task.task_id]}
+                )
+                if task.task_id in level_by_task_id
+                else task
+                for task in current_document.tasks
+            )
+        }
     )
 
 

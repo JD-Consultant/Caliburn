@@ -4,6 +4,9 @@ import type {
   ConsultantDocumentCatalogItem,
   ConsultantRunAccepted,
   ConsultantSnapshotView,
+  DocumentStructureCommandPreviewView,
+  DocumentStructureCommandResultView,
+  DocumentStructureCommandWrite,
   DocumentReviewDecisionWrite,
   EmployeeAnswerWrite,
   ProblemDetail,
@@ -16,6 +19,14 @@ const API = `${BASE}/api/v1/job-analysis`;
 const CONSULTANT_API = `${API}/consultant-documents`;
 
 type ReceivedProblem = Omit<ProblemDetail, "type"> & { type: string };
+
+export type CurrentDocumentAuthorityGuards = {
+  expectedRevision: number;
+  workspaceGeneration: number;
+  workspaceDigest: string;
+};
+
+export type CurrentDocumentCommand = DocumentStructureCommandWrite["command"];
 
 export class JobAnalysisApiError extends Error {
   constructor(
@@ -193,6 +204,68 @@ export function editApprovedDocument(
       method: "PUT",
       headers: commandHeaders(idempotencyKey, expectedRevision),
       body: JSON.stringify({ document }),
+    },
+  );
+}
+
+function currentDocumentCommandBody(
+  guards: CurrentDocumentAuthorityGuards,
+  command: CurrentDocumentCommand,
+): DocumentStructureCommandWrite {
+  return {
+    command,
+    workspace_generation: guards.workspaceGeneration,
+    workspace_digest: guards.workspaceDigest,
+  };
+}
+
+export function editCurrentDocument(
+  documentId: string,
+  idempotencyKey: string,
+  guards: CurrentDocumentAuthorityGuards,
+  document: ApprovedJobDocumentWrite,
+): Promise<ConsultantSnapshotView> {
+  return request<ConsultantSnapshotView>(
+    `/consultant-documents/${documentId}/current-document`,
+    {
+      method: "PUT",
+      headers: commandHeaders(idempotencyKey, guards.expectedRevision),
+      body: JSON.stringify({
+        document,
+        workspace_generation: guards.workspaceGeneration,
+        workspace_digest: guards.workspaceDigest,
+      }),
+    },
+  );
+}
+
+export function previewCurrentDocumentCommand(
+  documentId: string,
+  guards: CurrentDocumentAuthorityGuards,
+  command: CurrentDocumentCommand,
+): Promise<DocumentStructureCommandPreviewView> {
+  return request<DocumentStructureCommandPreviewView>(
+    `/consultant-documents/${documentId}/current-document/commands/preview`,
+    {
+      method: "POST",
+      headers: { "X-Expected-Revision": String(guards.expectedRevision) },
+      body: JSON.stringify(currentDocumentCommandBody(guards, command)),
+    },
+  );
+}
+
+export function applyCurrentDocumentCommand(
+  documentId: string,
+  idempotencyKey: string,
+  guards: CurrentDocumentAuthorityGuards,
+  command: CurrentDocumentCommand,
+): Promise<DocumentStructureCommandResultView> {
+  return request<DocumentStructureCommandResultView>(
+    `/consultant-documents/${documentId}/current-document/commands`,
+    {
+      method: "POST",
+      headers: commandHeaders(idempotencyKey, guards.expectedRevision),
+      body: JSON.stringify(currentDocumentCommandBody(guards, command)),
     },
   );
 }

@@ -28,9 +28,12 @@ import {
   GuardedLink,
   UnsavedChangesGuard,
 } from "@/shared/ui/UnsavedChangesGuard";
-import { ApprovedDocumentEditor } from "./ApprovedDocumentEditor";
 import { ConsultantConversation } from "./ConsultantConversation";
 import { ConsultantWorkspaceShell } from "./ConsultantWorkspaceShell";
+import {
+  CurrentJobDocumentEditor,
+  type CurrentJobDocumentEditorHandle,
+} from "./CurrentJobDocumentEditor";
 import { DocumentReviewPanel } from "./DocumentReviewPanel";
 import { InterviewWorkMap } from "./InterviewWorkMap";
 import {
@@ -58,12 +61,14 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   const conversationMutationPending =
     useIsMutating({
       mutationKey: jobAnalysisKeys.consultantAnalysisAdmission(documentId),
+      exact: true,
     }) > 0;
   const [showForceExport, setShowForceExport] = useState(false);
   const [streamState, setStreamState] = useState<
     "connecting" | "live" | "reconnecting"
   >("connecting");
   const revisionRef = useRef(-1);
+  const currentDocumentEditorRef = useRef<CurrentJobDocumentEditorHandle>(null);
 
   useEffect(() => {
     revisionRef.current = snapshotQuery.data?.revision ?? -1;
@@ -136,7 +141,7 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
 
   const snapshot = snapshotQuery.data;
   const title =
-    metadata.data?.title ?? snapshot.approved_document.job_title ?? "職務分析";
+    metadata.data?.title ?? snapshot.current_document.job_title ?? "職務分析";
   const workspaceMutationLocked =
     consultantRunStatus(snapshot).busy || conversationMutationPending;
 
@@ -223,7 +228,7 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
       {documentDirty ? (
         <div className="mx-auto max-w-[1500px] px-5 pt-4 lg:px-8">
           <p className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-950">
-            正式文件有未儲存修改；儲存或取消後才能離頁與匯出。
+            目前 JD 有尚未完成的儲存；完成後才能離頁與匯出。
           </p>
         </div>
       ) : null}
@@ -247,8 +252,9 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
         }
         currentDocument={
           <div className="mx-auto max-w-4xl space-y-6">
-            <ApprovedDocumentEditor
+            <CurrentJobDocumentEditor
               key={documentId}
+              ref={currentDocumentEditorRef}
               documentId={documentId}
               snapshot={snapshot}
               mutationLocked={workspaceMutationLocked}
@@ -266,6 +272,9 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
             documentId={documentId}
             snapshot={snapshot}
             mutationLocked={workspaceMutationLocked}
+            beforeSubmit={() =>
+              currentDocumentEditorRef.current?.flush() ?? Promise.resolve()
+            }
           />
         }
       />

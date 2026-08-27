@@ -50,13 +50,17 @@ export function ConsultantConversation({
   documentId,
   snapshot,
   mutationLocked = false,
+  beforeSubmit,
 }: {
   documentId: string;
   snapshot: ConsultantSnapshotView;
   mutationLocked?: boolean;
+  beforeSubmit?: () => Promise<void>;
 }) {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
+  const [preparingSubmission, setPreparingSubmission] = useState(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
   const entries = useMemo(() => buildConversationEntries(snapshot), [snapshot]);
   const runStatus = consultantRunStatus(snapshot);
   const runFailed = snapshot.run?.status === "failed";
@@ -102,33 +106,50 @@ export function ConsultantConversation({
     onSuccess: refresh,
   });
   const localMutationPending =
-    answerMutation.isPending || retryMutation.isPending;
+    preparingSubmission || answerMutation.isPending || retryMutation.isPending;
 
-  const send = () => {
+  const send = async () => {
     const text = draft;
     if (
       !text.trim() ||
       mutationLocked ||
       runStatus.busy ||
+      preparingSubmission ||
       answerMutation.isPending
     )
       return;
+    setPreparingSubmission(true);
+    setSubmissionError(null);
+    try {
+      await beforeSubmit?.();
+    } catch {
+      setSubmissionError("請先完成目前 JD 儲存，再送出這則訊息。");
+      setPreparingSubmission(false);
+      return;
+    }
+    const latestSnapshot =
+      queryClient.getQueryData<ConsultantSnapshotView>(
+        jobAnalysisKeys.consultantSnapshot(documentId),
+      ) ?? snapshot;
     const previous = answerMutation.variables;
     const sameFailedInput =
       answerMutation.isError &&
       previous?.text === text &&
-      previous.clarificationId === (clarification?.clarification_id ?? null) &&
-      previous.expectedRevision === snapshot.revision;
+      previous.clarificationId ===
+        (latestSnapshot.required_clarification?.clarification_id ?? null) &&
+      previous.expectedRevision === latestSnapshot.revision;
     answerMutation.mutate(
       sameFailedInput
         ? previous
         : {
             text,
             idempotencyKey: crypto.randomUUID(),
-            clarificationId: clarification?.clarification_id ?? null,
-            expectedRevision: snapshot.revision,
+            clarificationId:
+              latestSnapshot.required_clarification?.clarification_id ?? null,
+            expectedRevision: latestSnapshot.revision,
           },
     );
+    setPreparingSubmission(false);
   };
 
   return (
@@ -273,7 +294,7 @@ export function ConsultantConversation({
           className="mt-3 shrink-0 space-y-2 border-t border-stone-200 pt-3"
           onSubmit={(event) => {
             event.preventDefault();
-            send();
+            void send();
           }}
         >
           <label htmlFor="employee-answer" className="sr-only">
@@ -284,7 +305,10 @@ export function ConsultantConversation({
             className="min-h-32 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm leading-6"
             value={draft}
             disabled={
-              mutationLocked || runStatus.busy || answerMutation.isPending
+              mutationLocked ||
+              runStatus.busy ||
+              answerMutation.isPending ||
+              preparingSubmission
             }
             placeholder={
               clarification?.question ??
@@ -296,7 +320,7 @@ export function ConsultantConversation({
             onKeyDown={(event) => {
               if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
                 event.preventDefault();
-                send();
+                void send();
               }
             }}
           />
@@ -310,15 +334,18 @@ export function ConsultantConversation({
                 !draft.trim() ||
                 mutationLocked ||
                 runStatus.busy ||
+                preparingSubmission ||
                 answerMutation.isPending
               }
             >
               <Send />
-              {answerMutation.isPending
-                ? "保存中…"
-                : clarification
-                  ? "送出澄清"
-                  : "送出回答"}
+              {preparingSubmission
+                ? "準備送出…"
+                : answerMutation.isPending
+                  ? "保存中…"
+                  : clarification
+                    ? "送出澄清"
+                    : "送出回答"}
             </Button>
           </div>
         </form>
@@ -338,7 +365,11 @@ export function ConsultantConversation({
             {retryMutation.isPending ? "重新啟動中…" : "重試同一則回答"}
           </Button>
         ) : null}
-        {answerMutation.isError || retryMutation.isError ? (
+        {submissionError ? (
+          <p role="alert" className="mt-2 text-sm text-destructive">
+            {submissionError} 聊天草稿仍保留。
+          </p>
+        ) : answerMutation.isError || retryMutation.isError ? (
           <p role="alert" className="mt-2 text-sm text-destructive">
             {errorText(answerMutation.error ?? retryMutation.error)}
             ；員工原話不會遺失。

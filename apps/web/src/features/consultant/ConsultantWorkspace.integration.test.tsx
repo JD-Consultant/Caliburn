@@ -189,7 +189,7 @@ describe("employee consultant workspace integration", () => {
         .disabled,
     ).toBe(true);
 
-    await user.click(screen.getByText("目前正式職務說明書"));
+    expect(screen.getByRole("heading", { name: "目前 JD" })).toBeTruthy();
     expect(
       (screen.getByLabelText("職務名稱") as HTMLInputElement).readOnly,
     ).toBe(true);
@@ -206,7 +206,6 @@ describe("employee consultant workspace integration", () => {
   });
 
   it("does not confuse pending review with an active analysis lock", async () => {
-    const user = userEvent.setup();
     vi.stubGlobal("ResizeObserver", FakeResizeObserver);
     vi.stubGlobal("EventSource", FakeEventSource);
 
@@ -227,7 +226,7 @@ describe("employee consultant workspace integration", () => {
       (screen.getAllByRole("checkbox")[0] as HTMLInputElement).disabled,
     ).toBe(false);
 
-    await user.click(screen.getByText("目前正式職務說明書"));
+    expect(screen.getByRole("heading", { name: "目前 JD" })).toBeTruthy();
     expect(
       (screen.getByLabelText("職務名稱") as HTMLInputElement).readOnly,
     ).toBe(false);
@@ -280,6 +279,112 @@ describe("employee consultant workspace integration", () => {
         headers: { "Content-Type": "application/json" },
       }),
     );
+  });
+
+  it("flushes the real current JD editor before the workspace admits chat", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    snapshot.required_clarification = null;
+    const savedSnapshot = structuredClone(snapshot);
+    savedSnapshot.revision += 1;
+    savedSnapshot.current_document.job_title = "資深採購專員";
+    savedSnapshot.document_review.workspace_generation += 1;
+    savedSnapshot.document_review.workspace_digest =
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    let finishCurrentDocument!: (response: Response) => void;
+    const fetchMock = vi.fn().mockImplementation((requestUrl: string) => {
+      const url = String(requestUrl);
+      if (url.endsWith("/current-document")) {
+        return new Promise<Response>((resolve) => {
+          finishCurrentDocument = resolve;
+        });
+      }
+      if (url.endsWith("/answers")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              run_id: snapshot.run!.run_id,
+              source_id: snapshot.run!.source_id,
+              status: "source_saved",
+            }),
+            { status: 202, headers: { "Content-Type": "application/json" } },
+          ),
+        );
+      }
+      return Promise.resolve(
+        new Response(JSON.stringify(savedSnapshot), {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        }),
+      );
+    });
+    vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+    vi.stubGlobal("EventSource", FakeEventSource);
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <ConsultantWorkspace documentId={DOCUMENT_ID} />,
+      workspaceClient(snapshot),
+    );
+
+    const title = screen.getByLabelText("職務名稱");
+    fireEvent.change(title, { target: { value: "資深採購專員" } });
+    fireEvent.blur(title);
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(([url]) =>
+          String(url).endsWith("/current-document"),
+        ),
+      ).toBe(true),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(
+      screen
+        .getByRole("main", { name: "職務分析工作區" })
+        .getAttribute("aria-busy"),
+    ).toBe("false");
+
+    const composer = screen.getByLabelText("回覆顧問") as HTMLTextAreaElement;
+    expect(composer.disabled).toBe(false);
+    fireEvent.change(composer, {
+      target: { value: "我想補充這份工作的實際情境。" },
+    });
+    expect(
+      (screen.getByLabelText("回覆顧問") as HTMLTextAreaElement).value,
+    ).toBe("我想補充這份工作的實際情境。");
+    const sendButton = screen.getByRole("button", { name: "送出回答" });
+    expect((sendButton as HTMLButtonElement).disabled).toBe(false);
+    await user.click(sendButton);
+    expect(screen.getByRole("button", { name: "準備送出…" })).toBeTruthy();
+    expect(
+      fetchMock.mock.calls.some(([url]) => String(url).endsWith("/answers")),
+    ).toBe(false);
+
+    finishCurrentDocument(
+      new Response(JSON.stringify(savedSnapshot), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    await waitFor(() =>
+      expect(
+        screen
+          .getAllByRole("status")
+          .some((status) => status.textContent?.includes("已儲存")),
+      ).toBe(true),
+    );
+    await waitFor(() =>
+      expect(
+        fetchMock.mock.calls.some(([url]) => String(url).endsWith("/answers")),
+      ).toBe(true),
+    );
+    const currentIndex = fetchMock.mock.calls.findIndex(([url]) =>
+      String(url).endsWith("/current-document"),
+    );
+    const answerIndex = fetchMock.mock.calls.findIndex(([url]) =>
+      String(url).endsWith("/answers"),
+    );
+    expect(currentIndex).toBeGreaterThanOrEqual(0);
+    expect(answerIndex).toBeGreaterThan(currentIndex);
   });
 
   it("projects unassigned document items in the work map without treating them as interview blockers", () => {
@@ -1179,6 +1284,75 @@ describe("employee consultant workspace integration", () => {
     expect(JSON.parse(String(request.body))).toEqual({
       text: "我每月會先核對差異明細，再追查原因。",
     });
+  });
+
+  it("waits for the current JD flush before admitting an employee answer", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    snapshot.required_clarification = null;
+    let finishFlush!: () => void;
+    const beforeSubmit = vi.fn(
+      () =>
+        new Promise<void>((resolve) => {
+          finishFlush = resolve;
+        }),
+    );
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          run_id: snapshot.run!.run_id,
+          source_id: snapshot.run!.source_id,
+          status: "source_saved",
+        }),
+        { status: 202, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <ConsultantConversation
+        documentId={DOCUMENT_ID}
+        snapshot={snapshot}
+        beforeSubmit={beforeSubmit}
+      />,
+    );
+
+    const answer = screen.getByLabelText("回覆顧問") as HTMLTextAreaElement;
+    await user.type(answer, "我想補充剛才的工作內容。");
+    await user.click(screen.getByRole("button", { name: "送出回答" }));
+
+    expect(beforeSubmit).toHaveBeenCalledTimes(1);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(answer.value).toBe("我想補充剛才的工作內容。");
+
+    finishFlush();
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+  });
+
+  it("keeps the chat draft and does not admit an answer when current JD flush fails", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    snapshot.required_clarification = null;
+    const beforeSubmit = vi.fn().mockRejectedValue(new Error("save failed"));
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <ConsultantConversation
+        documentId={DOCUMENT_ID}
+        snapshot={snapshot}
+        beforeSubmit={beforeSubmit}
+      />,
+    );
+
+    const answer = screen.getByLabelText("回覆顧問") as HTMLTextAreaElement;
+    await user.type(answer, "這段不能因保存失敗而消失。");
+    await user.click(screen.getByRole("button", { name: "送出回答" }));
+
+    expect(await screen.findByRole("alert")).toBeTruthy();
+    expect(screen.getByRole("alert").textContent).toContain(
+      "請先完成目前 JD 儲存",
+    );
+    expect(answer.value).toBe("這段不能因保存失敗而消失。");
+    expect(fetchMock).not.toHaveBeenCalled();
   });
 
   it("uses the conversation composer for free-text required clarification", async () => {

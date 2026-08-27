@@ -149,7 +149,6 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
       ],
       employee_decisions: {
         pending: 2,
-        deferred: 0,
       },
       gaps: [
         {

@@ -20,7 +20,6 @@ const interviewWorkStatusLabels: Record<string, string> = {
   not_applicable: "不適用",
   retired: "已排除",
   awaiting_employee_decision: "待你確認",
-  employee_deferred: "你已延後",
 };
 
 const understandingStatusLabels: Record<string, string> = {
@@ -171,7 +170,7 @@ export function workspaceSections(snapshot: ConsultantSnapshotView) {
   };
 }
 
-const REVIEWABLE_STATUSES = new Set(["pending", "deferred"]);
+const REVIEWABLE_STATUSES = new Set(["pending"]);
 
 export function reviewSelectionForAction(
   changeset: DocumentChangeSetView,
@@ -192,7 +191,6 @@ export function reviewSelectionForAction(
 export function buildReviewDecision(
   command: DocumentReviewDecisionWrite["command"],
   actionIds: string[],
-  editedAfterByActionId: DocumentReviewDecisionWrite["edited_after_by_action_id"] = {},
   rejectionReason: string | null = null,
 ): DocumentReviewDecisionWrite {
   if (actionIds.length === 0) {
@@ -201,7 +199,6 @@ export function buildReviewDecision(
   return {
     command,
     action_ids: actionIds as [string, ...string[]],
-    edited_after_by_action_id: editedAfterByActionId,
     rejection_reason: rejectionReason,
   };
 }
@@ -211,7 +208,7 @@ export function reviewSelectionForDecision(
   actionIds: string[],
   command: DocumentReviewDecisionWrite["command"],
 ): string[] {
-  if (!["accept_changes", "edit_and_accept_changes"].includes(command)) {
+  if (command !== "accept_changes") {
     return actionIds;
   }
   const selected = new Set(actionIds);

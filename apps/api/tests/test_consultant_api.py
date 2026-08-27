@@ -564,7 +564,6 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
         json={
             "command": "accept_changes",
             "action_ids": [str(action_id)],
-            "edited_after_by_action_id": {},
             "rejection_reason": None,
         },
     )
@@ -607,6 +606,41 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     assert runtime.calls[-1][0] == "direct_edit"
 
 
+async def test_legacy_review_edit_and_defer_commands_are_rejected(api) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+    changeset_id = uuid4()
+    action_id = uuid4()
+    runtime.review_changeset_id = changeset_id
+    runtime.review_action_id = action_id
+
+    for index, command in enumerate(
+        ("edit_and_accept_changes", "defer_changes"),
+        start=1,
+    ):
+        response = await client.post(
+            f"{BASE}/{document_id}/reviews/{changeset_id}",
+            headers={
+                "Idempotency-Key": f"legacy-review-{index}",
+                "X-Expected-Revision": "0",
+            },
+            json={
+                "command": command,
+                "action_ids": [str(action_id)],
+                "edited_after_by_action_id": (
+                    {str(action_id): "員工舊式修正"}
+                    if command == "edit_and_accept_changes"
+                    else {}
+                ),
+                "rejection_reason": None,
+            },
+        )
+
+        assert response.status_code == 422
+
+    assert runtime.calls == []
+
+
 async def test_review_and_document_edits_return_clear_busy_conflict_during_model_mutation(
     api,
 ) -> None:
@@ -624,7 +658,6 @@ async def test_review_and_document_edits_return_clear_busy_conflict_during_model
         json={
             "command": "accept_changes",
             "action_ids": [str(action_id)],
-            "edited_after_by_action_id": {},
             "rejection_reason": None,
         },
     )

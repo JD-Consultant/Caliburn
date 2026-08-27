@@ -45,7 +45,6 @@ from app.consultant.document_commands import (
 )
 from app.consultant.document_authority import (
     DocumentAuthorityError,
-    edited_action_source_payload,
     employee_authored_text_delta,
 )
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph

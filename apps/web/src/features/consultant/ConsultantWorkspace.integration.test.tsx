@@ -111,7 +111,6 @@ describe("employee consultant workspace integration", () => {
     snapshot.current_interview = null;
     snapshot.semantic_progress.employee_decisions = {
       pending: 2,
-      deferred: 1,
     };
 
     renderWithClient(
@@ -121,7 +120,6 @@ describe("employee consultant workspace integration", () => {
     expect(screen.getByText("目前要釐清的問題")).toBeTruthy();
     expect(screen.getByText("異常判斷依據")).toBeTruthy();
     expect(screen.getByText("待你確認 2 項")).toBeTruthy();
-    expect(screen.getByText("你已延後 1 項")).toBeTruthy();
   });
 
   it("renders the whole durable workspace, reconnect state and single force-export confirmation", async () => {
@@ -275,9 +273,8 @@ describe("employee consultant workspace integration", () => {
     });
     const actionIds = {
       accept: "ui-review-accept-internal",
-      edit: "ui-review-edit-internal",
+      secondAccept: "ui-review-second-accept-internal",
       reject: "ui-review-reject-internal",
-      defer: "ui-review-defer-internal",
     };
     snapshot.document_review.bundles = [
       {
@@ -305,7 +302,7 @@ describe("employee consultant workspace integration", () => {
         acceptance_blocked: false,
         actions: [
           action({
-            action_id: actionIds.edit,
+            action_id: actionIds.secondAccept,
             operation: "revise",
             path: "/work_description",
             target_key: "/work_description",
@@ -331,25 +328,8 @@ describe("employee consultant workspace integration", () => {
           }),
         ],
       },
-      {
-        changeset_id: "ui-review-changeset-defer",
-        summary: "調整工作順序建議",
-        created_revision: snapshot.revision,
-        source_ids: [snapshot.latest_source_id!],
-        acceptance_blocked: false,
-        actions: [
-          action({
-            action_id: actionIds.defer,
-            operation: "reorder",
-            path: "/tasks/task-1/display_order",
-            target_key: "task-1",
-            before: 0,
-            after: 1,
-          }),
-        ],
-      },
     ];
-    snapshot.document_review.unresolved_action_count = 4;
+    snapshot.document_review.unresolved_action_count = 3;
     const response = structuredClone(snapshot);
     response.revision += 1;
     const fetchMock = vi.fn().mockImplementation(
@@ -391,20 +371,14 @@ describe("employee consultant workspace integration", () => {
       action_ids: [actionIds.accept],
     });
 
-    const description = screen.getByLabelText("工作描述");
-    await user.clear(description);
-    await user.type(description, "員工確認後的工作描述");
     await selectWithKeyboard("選取第 2 組第 1 項修改變更：工作描述（修改工作描述建議）");
-    await decideWithKeyboard("修改後接受");
+    await decideWithKeyboard("接受 AI 建議");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(
       JSON.parse(String((fetchMock.mock.calls[1][1] as RequestInit).body)),
     ).toMatchObject({
-      command: "edit_and_accept_changes",
-      action_ids: [actionIds.edit],
-      edited_after_by_action_id: {
-        [actionIds.edit]: "員工確認後的工作描述",
-      },
+      command: "accept_changes",
+      action_ids: [actionIds.secondAccept],
     });
 
     await selectWithKeyboard("選取第 3 組第 1 項移除變更：職務名稱（移除不適用建議）");
@@ -418,16 +392,6 @@ describe("employee consultant workspace integration", () => {
       command: "reject_changes",
       action_ids: [actionIds.reject],
       rejection_reason: "目前正式文件仍需要這項內容",
-    });
-
-    await selectWithKeyboard("選取第 4 組第 1 項調整順序變更：工作順序（調整工作順序建議）");
-    await decideWithKeyboard("稍後處理");
-    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(4));
-    expect(
-      JSON.parse(String((fetchMock.mock.calls[3][1] as RequestInit).body)),
-    ).toMatchObject({
-      command: "defer_changes",
-      action_ids: [actionIds.defer],
     });
   });
 
@@ -594,17 +558,11 @@ describe("employee consultant workspace integration", () => {
       (screen.getByRole("button", { name: "接受 AI 建議" }) as HTMLButtonElement)
         .disabled,
     ).toBe(true);
-    expect(
-      (screen.getByRole("button", { name: "修改後接受" }) as HTMLButtonElement)
-        .disabled,
-    ).toBe(true);
+    expect(screen.queryByRole("button", { name: "修改後接受" })).toBeNull();
     expect(
       (screen.getByRole("button", { name: "拒絕" }) as HTMLButtonElement).disabled,
     ).toBe(false);
-    expect(
-      (screen.getByRole("button", { name: "稍後處理" }) as HTMLButtonElement)
-        .disabled,
-    ).toBe(false);
+    expect(screen.queryByRole("button", { name: "稍後處理" })).toBeNull();
   });
 
   it("lets an employee accept nine changes and reject the remaining one", async () => {
@@ -701,7 +659,7 @@ describe("employee consultant workspace integration", () => {
     expect(screen.queryByText("已選 2 項")).toBeNull();
   });
 
-  it("edits a structural Duty suggestion through employee fields without exposing raw JSON or IDs", async () => {
+  it("reviews a structural Duty suggestion without a second edit form or raw IDs", async () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
     const actionId = "00000000-0000-0000-0000-000000000020";
@@ -750,24 +708,23 @@ describe("employee consultant workspace integration", () => {
       <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
-    const statement = screen.getByLabelText("主要職責內容");
+    expect(document.body.textContent).toContain("管理採購作業");
+    expect(screen.queryByLabelText("主要職責內容")).toBeNull();
     expect(document.body.textContent).not.toContain(dutyId);
-    await user.clear(statement);
-    await user.type(statement, "統籌採購與覆核作業");
     await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: "修改後接受" }));
+    await user.click(screen.getByRole("button", { name: "接受 AI 建議" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 
     const request = fetchMock.mock.calls[0][1] as RequestInit;
     const body = JSON.parse(String(request.body));
-    expect(body.edited_after_by_action_id[actionId]).toEqual({
-      duty_id: dutyId,
-      statement: "統籌採購與覆核作業",
-      display_order: 0,
+    expect(body).toEqual({
+      command: "accept_changes",
+      action_ids: [actionId],
+      rejection_reason: null,
     });
   });
 
-  it("edits field-level relationships and enablers without showing or stringifying IDs", async () => {
+  it("reviews field-level relationships without a second edit form or stringifying IDs", async () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
     const dutyId = "00000000-0000-0000-0000-000000000030";
@@ -902,29 +859,23 @@ describe("employee consultant workspace integration", () => {
       <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
-    const enablerName = screen.getByLabelText("名稱");
-    const taskLinks = screen.getByLabelText("關聯工作");
-    const indicatorLinks = screen.getByLabelText("關聯績效指標");
+    expect(screen.queryByLabelText("名稱")).toBeNull();
+    expect(screen.queryByLabelText("關聯工作")).toBeNull();
+    expect(screen.queryByLabelText("關聯績效指標")).toBeNull();
     expect(document.body.textContent).not.toContain(taskOne);
     expect(document.body.textContent).not.toContain(indicatorOne);
-    await user.clear(enablerName);
-    await user.type(enablerName, "依採購覆核表逐項核對");
-    await user.deselectOptions(taskLinks, taskOne);
-    await user.selectOptions(taskLinks, taskTwo);
-    await user.deselectOptions(indicatorLinks, indicatorOne);
-    await user.selectOptions(indicatorLinks, indicatorTwo);
     for (const checkbox of screen.getAllByRole("checkbox")) {
       await user.click(checkbox);
     }
-    await user.click(screen.getByRole("button", { name: "修改後接受" }));
+    await user.click(screen.getByRole("button", { name: "接受 AI 建議" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 
     const request = fetchMock.mock.calls[0][1] as RequestInit;
     const body = JSON.parse(String(request.body));
-    expect(body.edited_after_by_action_id).toMatchObject({
-      [enablerAction]: [{ kind: "method", name: "依採購覆核表逐項核對" }],
-      [taskLinkAction]: [taskTwo],
-      [indicatorLinkAction]: [indicatorTwo],
+    expect(body).toMatchObject({
+      command: "accept_changes",
+      action_ids: [enablerAction, taskLinkAction, indicatorLinkAction],
+      rejection_reason: null,
     });
   });
 

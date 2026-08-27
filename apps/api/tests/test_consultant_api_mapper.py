@@ -202,7 +202,7 @@ def test_snapshot_mapper_projects_store_review_status_generation_and_employee_di
                     ),
                 ),
                 atomic_subgroup_id=subgroup_id,
-                status=DocumentChangeStatus.DEFERRED,
+                status=DocumentChangeStatus.PENDING,
             ),
         ),
         source_ids=(source_id,),
@@ -277,7 +277,7 @@ def test_snapshot_mapper_projects_store_review_status_generation_and_employee_di
         if status == "pending":
             assert [action.status.value for action in view.document_review.bundles[0].actions] == [
                 "pending",
-                "deferred",
+                "pending",
             ]
             assert view.document_review.unresolved_action_count == 2
         if status == "conflicted":

@@ -568,23 +568,6 @@ async def test_review_projection_loads_durable_decisions_after_backend_construct
 
     runtime.review_decisions = (
         WorkspaceReviewDecision.from_group(
-            WorkspaceReviewDecisionKind.DEFER,
-            group,
-            workspace_digest=projection.workspace_digest,
-        ),
-    )
-    deferred = await binding.composite_backend.aread(
-        "/review/groups/group-001.json"
-    )
-    assert deferred.error is None
-    assert deferred.file_data is not None
-    assert (
-        json.loads(deferred.file_data["content"])["actions"][0]["status"]
-        == "deferred"
-    )
-
-    runtime.review_decisions = (
-        WorkspaceReviewDecision.from_group(
             WorkspaceReviewDecisionKind.REJECT,
             group,
             workspace_digest=projection.workspace_digest,

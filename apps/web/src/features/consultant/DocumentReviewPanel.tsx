@@ -23,10 +23,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import {
-  DocumentChangeEditor,
   DocumentChangePreview,
-  type ReviewValue,
-  toReviewValue,
 } from "./DocumentChangeEditor";
 import {
   buildReviewDecision,
@@ -45,7 +42,6 @@ const operationLabels: Record<DocumentPatchActionView["operation"], string> = {
 
 const statusLabels: Record<DocumentPatchActionView["status"], string> = {
   pending: "待確認",
-  deferred: "稍後處理",
 };
 
 function errorText(error: unknown): string {
@@ -85,14 +81,6 @@ function ReviewBundle({
 }) {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<string[]>([]);
-  const [edits, setEdits] = useState<Record<string, ReviewValue>>(() =>
-    Object.fromEntries(
-      bundle.actions.map((action) => [
-        action.action_id,
-        toReviewValue(action.after),
-      ]),
-    ),
-  );
   const [rejectionReason, setRejectionReason] = useState("");
   const [editError, setEditError] = useState<string | null>(null);
 
@@ -137,10 +125,7 @@ function ReviewBundle({
 
   const decide = (command: DocumentReviewDecisionWrite["command"]) => {
     if (!selected.length || mutation.isPending) return;
-    if (
-      bundle.acceptance_blocked &&
-      ["accept_changes", "edit_and_accept_changes"].includes(command)
-    ) {
+    if (bundle.acceptance_blocked && command === "accept_changes") {
       return;
     }
     if (command === "reject_changes" && !rejectionReason.trim()) {
@@ -152,27 +137,9 @@ function ReviewBundle({
       selected,
       command,
     );
-    let edited: DocumentReviewDecisionWrite["edited_after_by_action_id"] = {};
-    if (command === "edit_and_accept_changes") {
-      edited = Object.fromEntries(
-        decidedActionIds.flatMap((actionId) => {
-          const action = bundle.actions.find((item) => item.action_id === actionId)!;
-          const value = edits[actionId];
-          return JSON.stringify(value) === JSON.stringify(action.after)
-            ? []
-            : [[actionId, value]];
-        }),
-      );
-      if (Object.keys(edited).length === 0) {
-        setEditError("請先修改至少一項 AI 建議，再選擇「修改後接受」。");
-        return;
-      }
-      setEditError(null);
-    }
     const decision = buildReviewDecision(
       command,
       decidedActionIds,
-      edited,
       command === "reject_changes" ? rejectionReason.trim() || null : null,
     );
     const previous = mutation.variables;
@@ -186,9 +153,7 @@ function ReviewBundle({
     );
   };
 
-  const active = bundle.actions.filter((action) =>
-    ["pending", "deferred"].includes(action.status),
-  );
+  const active = bundle.actions.filter((action) => action.status === "pending");
 
   return (
     <Card className="border-stone-200 bg-white p-5 shadow-sm">
@@ -204,7 +169,7 @@ function ReviewBundle({
 
       <div className="mt-4 space-y-3">
         {bundle.actions.map((action, index) => {
-          const reviewable = ["pending", "deferred"].includes(action.status);
+          const reviewable = action.status === "pending";
           const selectionLabel = `選取第 ${bundleOrdinal} 組第 ${index + 1} 項${operationLabels[action.operation]}變更：${documentPathLabel(action.path)}（${bundle.summary}）${action.atomic_subgroup_id ? "；必須整組決定" : ""}`;
           return (
             <div
@@ -252,21 +217,13 @@ function ReviewBundle({
                     </div>
                     <div>
                       <p className="mb-1 text-xs font-medium text-stone-500">
-                        AI 建議（可直接修改）
+                        目前待審內容
                       </p>
-                      <DocumentChangeEditor
+                      <DocumentChangePreview
                         action={action}
-                        value={edits[action.action_id]}
+                        value={action.after}
                         approvedDocument={approvedDocument}
                         bundle={bundle}
-                        label={documentPathLabel(action.path)}
-                        disabled={!reviewable || mutation.isPending}
-                        onChange={(value) =>
-                          setEdits((current) => ({
-                            ...current,
-                            [action.action_id]: value,
-                          }))
-                        }
                       />
                     </div>
                   </div>
@@ -297,25 +254,11 @@ function ReviewBundle({
               接受 AI 建議
             </Button>
             <Button
-              variant="outline"
-              disabled={mutation.isPending || bundle.acceptance_blocked}
-              onClick={() => decide("edit_and_accept_changes")}
-            >
-              修改後接受
-            </Button>
-            <Button
               variant="destructive"
               disabled={mutation.isPending}
               onClick={() => decide("reject_changes")}
             >
               拒絕
-            </Button>
-            <Button
-              variant="ghost"
-              disabled={mutation.isPending}
-              onClick={() => decide("defer_changes")}
-            >
-              稍後處理
             </Button>
           </div>
         </div>
@@ -341,7 +284,7 @@ export function DocumentReviewPanel({
   snapshot: ConsultantSnapshotView;
 }) {
   const activeBundles = snapshot.document_review.bundles.filter((bundle) =>
-    bundle.actions.some((action) => ["pending", "deferred"].includes(action.status)),
+    bundle.actions.some((action) => action.status === "pending"),
   );
   const review = snapshot.document_review;
   const diagnosticKeys = diagnosticRenderKeys(review.diagnostics);
@@ -367,7 +310,7 @@ export function DocumentReviewPanel({
           </p>
           <h2 className="text-lg font-semibold">{statusMessage}</h2>
           <p className="text-xs text-stone-500">
-            接受或修改後接受，才會更新下方正式文件。
+            你可先直接編輯目前 JD；接受後才會把這組內容提升為核准版本。
           </p>
         </div>
       </div>

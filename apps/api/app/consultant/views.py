@@ -12,6 +12,7 @@ from pydantic import Field
 from app.consultant.state import (
     ApprovedJobDocument,
     ConsultantThreadState,
+    DocumentChangeStatus,
     DocumentChangeSet,
     DurableModel,
     InterviewWorkItem,
@@ -172,7 +173,7 @@ def document_review_projection_from_workspace(
     else:
         status = WorkspaceReviewStatus.CLEAN
     unresolved_actions = sum(
-        action.status.value in {"pending", "deferred"}
+        action.status is DocumentChangeStatus.PENDING
         for bundle in bundles
         for action in bundle.actions
     )

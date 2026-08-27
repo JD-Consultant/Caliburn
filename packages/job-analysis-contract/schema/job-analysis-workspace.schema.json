@@ -242,10 +242,9 @@
     "EmployeeDecisionSummaryView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["pending", "deferred"],
+      "required": ["pending"],
       "properties": {
-        "pending": { "type": "integer", "minimum": 0 },
-        "deferred": { "type": "integer", "minimum": 0 }
+        "pending": { "type": "integer", "minimum": 0 }
       }
     },
     "VisibleGapView": {
@@ -338,7 +337,7 @@
         "atomic_subgroup_id": { "type": ["string", "null"], "format": "uuid" },
         "affected_work_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
         "blocks_dependent_analysis": { "type": "boolean" },
-        "status": { "type": "string", "enum": ["pending", "deferred"] }
+        "status": { "type": "string", "enum": ["pending"] }
       }
     },
     "DocumentChangeSetView": {
@@ -779,23 +778,10 @@
     "DocumentReviewDecisionWrite": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["command", "action_ids", "edited_after_by_action_id", "rejection_reason"],
+      "required": ["command", "action_ids", "rejection_reason"],
       "properties": {
-        "command": { "type": "string", "enum": ["accept_changes", "edit_and_accept_changes", "reject_changes", "defer_changes"] },
+        "command": { "type": "string", "enum": ["accept_changes", "reject_changes"] },
         "action_ids": { "type": "array", "minItems": 1, "items": { "type": "string", "format": "uuid" } },
-        "edited_after_by_action_id": {
-          "type": "object",
-          "additionalProperties": {
-            "anyOf": [
-              { "type": "string" },
-              { "type": "number" },
-              { "type": "boolean" },
-              { "type": "null" },
-              { "type": "array" },
-              { "type": "object" }
-            ]
-          }
-        },
         "rejection_reason": { "type": ["string", "null"] }
       }
     },

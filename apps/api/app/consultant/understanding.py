@@ -93,10 +93,7 @@ class UnderstandingProjection(DurableModel):
     calibration: CalibrationProjection | None = None
 
 
-CoverageStatus = InterviewWorkStatus | Literal[
-    "awaiting_employee_decision",
-    "employee_deferred",
-]
+CoverageStatus = InterviewWorkStatus | Literal["awaiting_employee_decision"]
 
 
 class CoverageItemProjection(DurableModel):
@@ -127,7 +124,6 @@ class WorkDepthProjection(DurableModel):
 
 class EmployeeDecisionProjection(DurableModel):
     pending: int = Field(ge=0)
-    deferred: int = Field(ge=0)
 
 
 class GapProjection(DurableModel):
@@ -421,7 +417,6 @@ def semantic_progress_from_state(
         depth=tuple(depth),
         employee_decisions=EmployeeDecisionProjection(
             pending=0,
-            deferred=0,
         ),
         gaps=tuple(
             GapProjection(
@@ -466,19 +461,10 @@ def _task_review_statuses(
     statuses: dict[UUID, DocumentChangeStatus] = {}
     for changeset in workspace_review.changesets:
         for action in changeset.actions:
-            if action.status not in {
-                DocumentChangeStatus.PENDING,
-                DocumentChangeStatus.DEFERRED,
-            }:
+            if action.status is not DocumentChangeStatus.PENDING:
                 continue
             for task_id in _review_task_ids(action):
-                if (
-                    statuses.get(task_id) is DocumentChangeStatus.PENDING
-                    or action.status is DocumentChangeStatus.PENDING
-                ):
-                    statuses[task_id] = DocumentChangeStatus.PENDING
-                else:
-                    statuses[task_id] = DocumentChangeStatus.DEFERRED
+                statuses[task_id] = DocumentChangeStatus.PENDING
     return statuses
 
 
@@ -595,10 +581,6 @@ def semantic_progress_from_workspace(
             item_status = "awaiting_employee_decision"
             title = task.statement
             reason = "AI 已整理成工作草稿，等待你確認後才會進入正式 JD。"
-        elif review_status is DocumentChangeStatus.DEFERRED:
-            item_status = "employee_deferred"
-            title = task.statement
-            reason = "你已選擇稍後處理；內容仍保留在工作草稿。"
         else:
             item_status = InterviewWorkStatus.AVAILABLE
             title = task.statement
@@ -617,13 +599,10 @@ def semantic_progress_from_workspace(
         )
 
     pending = 0
-    deferred = 0
     for changeset in workspace_review.changesets:
         for action in changeset.actions:
             if action.status is DocumentChangeStatus.PENDING:
                 pending += 1
-            elif action.status is DocumentChangeStatus.DEFERRED:
-                deferred += 1
     return base.model_copy(
         update={
             "currently_known_work_count": len(coverage),
@@ -631,7 +610,6 @@ def semantic_progress_from_workspace(
             "depth": tuple(depth[key] for key in sorted(depth, key=str)),
             "employee_decisions": EmployeeDecisionProjection(
                 pending=pending,
-                deferred=deferred,
             ),
         }
     )

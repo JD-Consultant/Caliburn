@@ -33,21 +33,6 @@ _COLLECTION_IDS = {
     "tasks": "task_id",
     "opks": "item_id",
 }
-_EMPLOYEE_TEXT_FIELDS = {
-    "job_title",
-    "work_description",
-    "notes",
-    "statement",
-    "action",
-    "object",
-    "purpose_result",
-    "context",
-    "frequency_text",
-    "name",
-    "text",
-}
-
-
 def _pointer_parts(path: str) -> list[str]:
     if not path.startswith("/") or path == "/":
         raise DocumentAuthorityError(f"invalid document path: {path}")
@@ -222,12 +207,9 @@ def _attach_opks_evidence(
 def apply_document_actions(
     document: ApprovedJobDocument,
     actions: tuple[DocumentPatchAction, ...],
-    *,
-    edited_after_by_action_id: dict[UUID, JsonValue | None] | None = None,
 ) -> ApprovedJobDocument:
     """Apply one already-authorized action set and validate the final artifact."""
 
-    edited = edited_after_by_action_id or {}
     payload = document.model_dump(mode="json")
     selected_ids = {item.action_id for item in actions}
     remaining = list(actions)
@@ -251,13 +233,12 @@ def apply_document_actions(
         applied_ids.add(ready.action_id)
         remaining.remove(ready)
     for action in ordered:
-        value = edited.get(action.action_id, action.after)
         if action.operation is DocumentPatchOperation.ADD:
-            _add_to_collection(payload, action.path, value)
+            _add_to_collection(payload, action.path, action.after)
         elif action.operation is DocumentPatchOperation.WITHDRAW:
             _withdraw_entity(payload, action.path)
         else:
-            _set_existing_path(payload, action.path, value)
+            _set_existing_path(payload, action.path, action.after)
         _attach_opks_evidence(payload, action)
     try:
         return ApprovedJobDocument.model_validate(payload)
@@ -365,71 +346,5 @@ def employee_authored_text_delta(
                 start=start,
                 end=end,
             )
-        )
-    return "\n".join(chunks), tuple(positions)
-
-
-def _employee_text_leaves(
-    proposed: Any,
-    edited: Any,
-    *,
-    path: str,
-) -> list[tuple[str, str]]:
-    if isinstance(edited, str):
-        field = _pointer_parts(path)[-1]
-        if field in _EMPLOYEE_TEXT_FIELDS and edited != proposed and edited.strip():
-            return [(path, edited.strip())]
-        return []
-    if isinstance(edited, dict):
-        proposed_dict = proposed if isinstance(proposed, dict) else {}
-        changes: list[tuple[str, str]] = []
-        for key, value in edited.items():
-            escaped = str(key).replace("~", "~0").replace("/", "~1")
-            changes.extend(
-                _employee_text_leaves(
-                    proposed_dict.get(key),
-                    value,
-                    path=f"{path}/{escaped}",
-                )
-            )
-        return changes
-    if isinstance(edited, list):
-        proposed_list = proposed if isinstance(proposed, list) else []
-        changes = []
-        for index, value in enumerate(edited):
-            before = proposed_list[index] if index < len(proposed_list) else None
-            changes.extend(
-                _employee_text_leaves(before, value, path=f"{path}/{index}")
-            )
-        return changes
-    return []
-
-
-def edited_action_source_payload(
-    actions: tuple[DocumentPatchAction, ...],
-    edited_after_by_action_id: dict[UUID, JsonValue | None],
-) -> tuple[str, tuple[SourcePositionAnchor, ...]] | None:
-    """Return only employee-authored textual deltas from edit-and-accept."""
-
-    changed: list[tuple[str, str]] = []
-    by_id = {item.action_id: item for item in actions}
-    for action_id, edited in edited_after_by_action_id.items():
-        action = by_id.get(action_id)
-        if action is None:
-            raise DocumentAuthorityError(f"unknown edited patch action {action_id}")
-        changed.extend(_employee_text_leaves(action.after, edited, path=action.path))
-    if not changed:
-        return None
-    chunks: list[str] = []
-    positions: list[SourcePositionAnchor] = []
-    cursor = 0
-    for path, value in changed:
-        if chunks:
-            cursor += 1
-        start = cursor
-        chunks.append(value)
-        cursor += len(value)
-        positions.append(
-            SourcePositionAnchor(document_path=path, start=start, end=cursor)
         )
     return "\n".join(chunks), tuple(positions)

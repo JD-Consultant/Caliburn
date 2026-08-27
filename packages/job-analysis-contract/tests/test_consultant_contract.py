@@ -93,13 +93,12 @@ def test_document_review_contract_exposes_workspace_status_without_old_action_li
     operation = action["operation"]["enum"]
     status = action["status"]["enum"]
     assert operation == ["add", "revise", "withdraw", "reassign", "reorder"]
-    assert status == ["pending", "deferred"]
+    assert status == ["pending"]
     assert {"target_ids", "employee_after", "rejection_reason", "stale_reason"}.isdisjoint(
         action
     )
     assert set(definitions["EmployeeDecisionSummaryView"]["properties"]) == {
         "pending",
-        "deferred",
     }
 
 
@@ -107,13 +106,22 @@ def test_commands_are_typed_and_reject_untrusted_extra_fields() -> None:
     action_id = uuid4()
     decision = DocumentReviewDecisionWrite.model_validate(
         {
-            "command": "edit_and_accept_changes",
+            "command": "accept_changes",
             "action_ids": [str(action_id)],
-            "edited_after_by_action_id": {str(action_id): "員工修正內容"},
             "rejection_reason": None,
         }
     )
     assert decision.action_ids == [action_id]
+
+    for legacy in ("edit_and_accept_changes", "defer_changes"):
+        with pytest.raises(ValidationError):
+            DocumentReviewDecisionWrite.model_validate(
+                {
+                    "command": legacy,
+                    "action_ids": [str(action_id)],
+                    "rejection_reason": None,
+                }
+            )
 
     with pytest.raises(ValidationError):
         EmployeeAnswerWrite.model_validate({"text": "回答", "role": "system"})
@@ -210,14 +218,15 @@ def test_structure_command_is_discriminated_and_browser_cannot_supply_identity()
         )
 
 
-def test_review_edit_map_keeps_a_generated_json_value_index_signature() -> None:
+def test_review_command_has_no_second_edit_payload_or_defer_lifecycle() -> None:
     generated = TYPESCRIPT_PATH.read_text(encoding="utf-8")
     start = generated.index("export interface DocumentReviewDecisionWrite")
     end = generated.index("\n}\n", start)
+    review = generated[start:end]
 
-    assert "[k: string]:" in generated[start:end]
-    for member in ("| string", "| number", "| boolean", "| null", "| unknown[]"):
-        assert member in generated[start:end]
+    assert "edited_after_by_action_id" not in review
+    assert "edit_and_accept_changes" not in review
+    assert "defer_changes" not in review
 
 
 def test_manual_document_surface_keeps_deferred_fields_without_official_codes() -> None:

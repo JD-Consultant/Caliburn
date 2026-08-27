@@ -409,10 +409,6 @@ async def review_document_changes(
 ):
     try:
         async with runtime.employee_mutation_admission(document_id):
-            edited = {
-                UUID(key): value
-                for key, value in body.edited_after_by_action_id.items()
-            }
             _, _, workspace_snapshot, projection = (
                 await runtime.workspace_review_context(document_id)
             )
@@ -425,9 +421,7 @@ async def review_document_changes(
                 raise ValueError(f"workspace changeset {changeset_id} is stale")
             decision = {
                 "accept_changes": WorkspaceDecisionKind.ACCEPT,
-                "edit_and_accept_changes": WorkspaceDecisionKind.EDIT_ACCEPT,
                 "reject_changes": WorkspaceDecisionKind.REJECT,
-                "defer_changes": WorkspaceDecisionKind.DEFER,
             }[body.command.value]
             command = WorkspaceReviewCommand(
                 command_id=_command_id(
@@ -443,7 +437,6 @@ async def review_document_changes(
                 changeset_id=changeset_id,
                 group_digest=groups[0].group_digest,
                 selected_action_ids=tuple(body.action_ids),
-                edited_after_by_action_id=edited,
                 reason=body.rejection_reason,
             )
             snapshot = await runtime.decide_workspace_changes(command)

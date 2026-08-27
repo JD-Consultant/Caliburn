@@ -69,7 +69,6 @@ describe("purpose-first consultant API client", () => {
     await reviewDocumentChanges(DOCUMENT_ID, ENTITY_ID, "review-1", 3, {
       command: "accept_changes",
       action_ids: [ENTITY_ID],
-      edited_after_by_action_id: {},
       rejection_reason: null,
     });
     await decideUnderstandingCalibration(DOCUMENT_ID, ENTITY_ID, "calibrate-1", 3, {

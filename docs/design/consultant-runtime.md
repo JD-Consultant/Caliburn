@@ -22,7 +22,7 @@ LangChain／Deep Agents agent ── six VFS Tools ──▶ StoreBackend /works
                                                     ▲
 approved JD in Saver checkpoint ────────────────────┘
                                                     │
-employee accept／edit-accept／reject／defer ─────────┘
+employee accept／reject ────────────────────────────┘
                          │
                          v
                 deterministic authority seam
@@ -43,7 +43,7 @@ employee accept／edit-accept／reject／defer ─────────┘
 | 核准職務說明書、可修訂理解、訪談工作、Gap、可見顧問結果、必要澄清、run／command receipt 與 source reference | LangGraph `AsyncPostgresSaver` checkpoint |
 | 員工逐字來源、direct-edit 文字、來源更正 lineage | LangGraph `AsyncPostgresStore` 的 document-scoped source namespace |
 | 唯一 active JD 工作草稿的 canonical resources | Deep Agents `StoreBackend`，固定 namespace `("caliburn", "consultant", <document_id>, "workspace")` |
-| 工作草稿 manifest、可恢復 rebase plan、reject／defer decision memory | 同一 LangGraph Store 的獨立 document-scoped metadata／decision namespaces |
+| 工作草稿 manifest、可恢復 rebase plan、reject decision memory | 同一 LangGraph Store 的獨立 document-scoped metadata／decision namespaces |
 | `/approved` 與 `/review` | 即時唯讀 projection；不另存第二份核准文件或 durable review copy |
 
 Saver 負責可恢復的顧問 thread 與文件 authority；Store 負責跨 execution 仍需由 agent 與 employee command 共同讀寫的資料。Saver 不保存 workspace files，Store 不保存第二份核准職務說明書。互動 agent loop 也不建立自己的 checkpointer 或第二個 Store。
@@ -103,7 +103,7 @@ manifest 是薄 metadata，只含 generation、canonical resource digest、appro
 4. approved baseline、Evidence basis 與實際 resource digest 一致性；
 5. rebase conflict 的 path-local diagnostics。
 
-可由模型修復的錯誤以最多五筆短 diagnostics 放回下一次 context；模型若試圖在 invalid workspace 直接結束，middleware 可在同一受限 run 內要求一次 repair。invalid workspace 仍持久保存，讓下一輪可續修，但不產生可接受 review、不修改 approved，也不被 export。`conflicted` 表示 canonical document 仍可解析，但某些路徑有 Evidence 或 rebase 衝突；只有受影響 group 的 accept／edit-accept 被阻擋，安全旁支仍可訪談或審核。
+可由模型修復的錯誤以最多五筆短 diagnostics 放回下一次 context；模型若試圖在 invalid workspace 直接結束，middleware 可在同一受限 run 內要求一次 repair。invalid workspace 仍持久保存，讓下一輪可續修，但不產生可接受 review、不修改 approved，也不被 export。`conflicted` 表示 canonical document 仍可解析，但某些路徑有 Evidence 或 rebase 衝突；只有受影響 group 的 accept 被阻擋，安全旁支仍可訪談或審核。
 
 ## Derived semantic review
 
@@ -137,15 +137,13 @@ authority command 在 server 端綁定 exact approved revision、workspace gener
 
 ## 員工 authority 與 approved-first recovery
 
-模型與 VFS 永遠沒有 approved write edge。員工有四種 review decision，另可直接編輯核准文件：
+模型與 VFS 永遠沒有 approved write edge。員工只有兩種 review decision，另可直接編輯畫面上的目前 JD：
 
-- `accept`：驗證所選 action、dependency／atomic subgroup 與 exact review identity，套用到 prospective approved JD。
-- `edit-and-accept`：先以員工提供的 after value 取代所選 action，再走相同 authority invariant；只有員工實際改寫的文字 delta 會成為 direct-edit employee source。
+- `accept`：驗證所選 action、dependency／atomic subgroup 與 exact review identity，把目前 JD 中該 group 的最新 after-state 提升到 prospective approved JD。review command 不再攜帶另一份編輯值。
 - `reject`：approved 不變；先保存 rejection reason 與 selected-action semantic／Evidence／boundary fingerprints，再把所選差異從 active workspace 撤回。無關的新員工訊息或 workspace 變動不會讓相同內容偷偷復活；只有該內容、相關 Evidence 或工作邊界實質改變時才形成新的可審語意。
-- `defer`：approved 與 workspace 都不變；decision metadata 以 selected-action semantic fingerprint 投影 deferred，下一輪 agent 仍可看到未整合差異。無關 resource／generation 變動保留 deferred；該 action/group 或 dependency boundary 改變才回到 pending。舊版未存 action fingerprint 的 whole-group decision 依相同 group digest安全恢復，partial legacy selection則 fail safe 回 pending。
-- direct edit：員工直接修改 approved，不需審自己的內容；非重疊 workspace 內容確定性 rebase，重疊的 AI working value 不會靜默覆蓋員工，而是留下只阻擋受影響 group 的 conflict diagnostic。
+- current autosave：員工在目前 JD 直接修改文字；若沒有 active AI difference，該 semantic component 同步進 approved 與 current，不需員工審自己的內容；若修改的是 AI pending after-state，只更新 current 並保持整組 pending，直到另按接受或拒絕。未處理的差異自然跨輪保留，不需要 `defer` command。
 
-accept／edit-and-accept 使用 approved-first 的可恢復順序：
+accept 與普通 current autosave 使用 approved-first 的可恢復順序；pending-only autosave 仍保存 receipt，approved after-state 可以不變：
 
 ```text
 persist exact decision + rebase plan in Store
@@ -155,7 +153,7 @@ persist exact decision + rebase plan in Store
     -> mark decision completed and remove the plan
 ```
 
-Store file mutation 與 Saver checkpoint 不是同一筆資料庫 transaction，因此不能宣稱跨兩者的 ACID 原子性。若 process 在 approved checkpoint 成功後、workspace rebase 前中斷，`reopen` 或 exact replay 會以 command receipt、approved digest 與持久 plan 完成剩餘步驟；不會先撤回 workspace 差異再嘗試寫 approved。reject 則先保存可重播 decision record 與 rebase plan，再撤回 workspace 差異；direct edit 也先保存 plan、提交 approved，最後完成 rebase。export 始終只讀 Saver 中的 approved JD。
+Store file mutation 與 Saver checkpoint 不是同一筆資料庫 transaction，因此不能宣稱跨兩者的 ACID 原子性。若 process 在 checkpoint 成功後、workspace rebase 前中斷，`reopen` 或 exact replay 會以 command receipt、approved digest 與持久 plan 完成剩餘步驟；不會先撤回 workspace 差異再嘗試寫 approved。reject 則先保存可重播 decision record 與 rebase plan，再撤回 workspace 差異；current autosave 也先保存 plan、提交 receipt／必要的 approved 更新，最後完成 Store current 更新。export 始終只讀 Saver 中的 approved JD。
 
 ## Process-local document admission
 
@@ -175,7 +173,7 @@ Store file mutation 與 Saver checkpoint 不是同一筆資料庫 transaction，
 
 更正使用新的 immutable source 並以 `supersedes_source_id` 連回舊來源；Store batch 同時把舊來源標成 superseded 並保存新來源，Saver 記錄 lineage 與使相依理解／足夠性失效。Evidence basis 改變會觸發未改 workspace files 的重新驗證：引用舊來源的路徑得到 `evidence-source-stale`，只阻擋直接受影響的 review group；無關 group 與 approved JD 保持可用。`/sources` 只把 current 來源當作可用 Evidence，lineage projection 仍可找回更正歷史。
 
-只有 employee turn、edit-and-accept 或 direct edit 中員工實際輸入的文字可鑄成 Evidence。單純 accept、reject、defer、模型文字與未啟用的 Reference 都不是員工工作事實。
+只有 employee turn 或 current autosave 中員工實際輸入的文字可鑄成 Evidence。單純 accept、reject、模型文字與未啟用的 Reference 都不是員工工作事實。
 
 ## 模型執行與最小充分 Context
 
@@ -209,7 +207,7 @@ Web 只有 `/workspace` 與文件詳情頁，以 TanStack Query 管理 server ca
 ## 現行產品邊界
 
 - 本機單一操作者、每份 JD 一個 active workspace、一位主要 AI 顧問；沒有 multi-agent、planner／writer／critic 或 subagent 產品拓撲。
-- 沒有 auto-accept／Auto mode；任何 AI 產生的正式文件內容都必須由員工 accept 或 edit-and-accept。
+- 沒有 auto-accept／Auto mode；任何 AI 產生的正式文件內容，即使員工先在目前 JD 修改過，也必須另由員工 accept 才能進 approved。
 - current API／Web 沒有 RAG、Reference、semantic retrieval 或外部知識 Tool；`/sources` 的同文件 exact lookup 是員工來源記憶，不是 RAG。repo 保留的 RAG bounded context 仍與 current runtime 隔離。
 - 沒有多 workspace、branch、fork、Git／PR、workspace 版本歷史 UI 或 multi-process 保證。
 - 能力級別與 A 不由 LLM 產生；官方 iCAP 配發代碼不由模型、員工或 export 補造。

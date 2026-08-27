@@ -215,7 +215,6 @@ export interface WorkDepthView {
  */
 export interface EmployeeDecisionSummaryView {
   pending: number;
-  deferred: number;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -301,7 +300,7 @@ export interface DocumentPatchActionView {
   atomic_subgroup_id: string | null;
   affected_work_ids: string[];
   blocks_dependent_analysis: boolean;
-  status: "pending" | "deferred";
+  status: "pending";
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -704,21 +703,11 @@ export interface ExportReadinessIssueView {
  * via the `definition` "DocumentReviewDecisionWrite".
  */
 export interface DocumentReviewDecisionWrite {
-  command: "accept_changes" | "edit_and_accept_changes" | "reject_changes" | "defer_changes";
+  command: "accept_changes" | "reject_changes";
   /**
    * @minItems 1
    */
   action_ids: [string, ...string[]];
-  edited_after_by_action_id: {
-    [k: string]:
-      | string
-      | number
-      | boolean
-      | null
-      | unknown[]
-      | {
-        };
-  };
   rejection_reason: string | null;
 }
 /**

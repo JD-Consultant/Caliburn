@@ -7,7 +7,7 @@ from hashlib import sha256
 import json
 from collections.abc import Mapping, Sequence
 from typing import Any, cast
-from uuid import UUID, uuid5
+from uuid import UUID
 
 from pydantic import Field, JsonValue, StringConstraints, model_validator
 from typing_extensions import Annotated
@@ -15,7 +15,6 @@ from typing_extensions import Annotated
 from app.consultant.document_authority import (
     DocumentAuthorityError,
     apply_document_actions,
-    edited_action_source_payload,
 )
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
 from app.consultant.state import (
@@ -26,14 +25,14 @@ from app.consultant.state import (
 from app.consultant.state import (
     ApprovedJobDocument,
     CommandReceipt,
-    EmployeeSource,
-    EmployeeSourceKind,
-    SourceReference,
-    SourceProcessingStatus,
     inspect_command_receipt,
 )
 from app.consultant.views import ConsultantSnapshot
-from app.consultant.workspace_resources import WorkspaceCatalog, project_workspace_files
+from app.consultant.workspace_resources import (
+    WorkspaceCatalog,
+    apply_pending_task_competency_levels,
+    project_workspace_files,
+)
 from app.consultant.workspace_review import (
     WorkspaceReviewDecision,
     WorkspaceReviewDecisionKind,
@@ -70,9 +69,7 @@ class WorkspaceAuthorityError(ValueError):
 
 class WorkspaceDecisionKind(StrEnum):
     ACCEPT = "accept"
-    EDIT_ACCEPT = "edit_and_accept"
     REJECT = "reject"
-    DEFER = "defer"
 
 
 class WorkspaceReviewCommand(DurableModel):
@@ -85,23 +82,12 @@ class WorkspaceReviewCommand(DurableModel):
     changeset_id: UUID
     group_digest: Sha256Digest | None = None
     selected_action_ids: tuple[UUID, ...] = Field(min_length=1)
-    edited_after_by_action_id: dict[UUID, JsonValue | None] = Field(
-        default_factory=dict
-    )
     reason: NonEmptyText | None = None
 
     @model_validator(mode="after")
     def command_shape_matches_decision(self) -> WorkspaceReviewCommand:
         if len(self.selected_action_ids) != len(set(self.selected_action_ids)):
             raise ValueError("workspace command requires unique action IDs")
-        selected = set(self.selected_action_ids)
-        if not set(self.edited_after_by_action_id) <= selected:
-            raise ValueError("employee edits include an unselected action")
-        if self.decision is WorkspaceDecisionKind.EDIT_ACCEPT:
-            if not self.edited_after_by_action_id:
-                raise ValueError("edit-and-accept requires an employee edit")
-        elif self.edited_after_by_action_id:
-            raise ValueError("only edit-and-accept may carry employee edits")
         if self.decision is WorkspaceDecisionKind.REJECT and self.reason is None:
             raise ValueError("reject requires an employee reason")
         return self
@@ -138,7 +124,6 @@ class WorkspaceDecisionRecord(DurableModel):
     boundary_digest: Sha256Digest
     approved_revision: int = Field(default=0, ge=0)
     workspace_generation: int = Field(default=0, ge=0)
-    employee_source_id: UUID | None = None
     result_workspace_digest: Sha256Digest | None = None
     reason: NonEmptyText | None = None
     status: WorkspaceDecisionStatus = WorkspaceDecisionStatus.PLANNED
@@ -381,10 +366,7 @@ def select_workspace_actions(
         for diagnostic in getattr(group, "diagnostics", ())
         if diagnostic.severity is WorkspaceDiagnosticSeverity.ERROR
     )
-    if conflict_diagnostics and command.decision in {
-        WorkspaceDecisionKind.ACCEPT,
-        WorkspaceDecisionKind.EDIT_ACCEPT,
-    }:
+    if conflict_diagnostics and command.decision is WorkspaceDecisionKind.ACCEPT:
         blocker = (
             "a rebase conflict"
             if any(
@@ -427,10 +409,7 @@ def select_workspace_actions(
                 f"atomic subgroup {subgroup} must be decided together"
             )
 
-    if command.decision in {
-        WorkspaceDecisionKind.ACCEPT,
-        WorkspaceDecisionKind.EDIT_ACCEPT,
-    }:
+    if command.decision is WorkspaceDecisionKind.ACCEPT:
         for action in selected:
             missing = {
                 dependency
@@ -543,10 +522,6 @@ class WorkspaceAuthorityService:
     @staticmethod
     def _current_undo_key() -> str:
         return "current-document-undo"
-
-    @staticmethod
-    def _employee_source_id(document_id: UUID, command_id: UUID) -> UUID:
-        return uuid5(document_id, f"workspace-review-direct-edit:{command_id}")
 
     async def _load_record(
         self,
@@ -801,10 +776,7 @@ class WorkspaceAuthorityService:
     ) -> tuple[WorkspaceReviewDecision, ...]:
         decisions: list[WorkspaceReviewDecision] = []
         for record in records:
-            if record.decision not in {
-                WorkspaceDecisionKind.REJECT,
-                WorkspaceDecisionKind.DEFER,
-            }:
+            if record.decision is not WorkspaceDecisionKind.REJECT:
                 continue
             decisions.append(
                 WorkspaceReviewDecision(
@@ -847,7 +819,6 @@ class WorkspaceAuthorityService:
         command: WorkspaceReviewCommand,
         group: WorkspaceReviewGroup,
         *,
-        source_id: UUID | None = None,
         plan: WorkspaceRebasePlan | None = None,
         status: WorkspaceDecisionStatus = WorkspaceDecisionStatus.PLANNED,
     ) -> WorkspaceDecisionRecord:
@@ -871,7 +842,6 @@ class WorkspaceAuthorityService:
             boundary_digest=group.boundary_digest,
             approved_revision=command.approved_revision,
             workspace_generation=command.workspace_generation,
-            employee_source_id=source_id,
             result_workspace_digest=None,
             reason=command.reason,
             status=status,
@@ -974,36 +944,6 @@ class WorkspaceAuthorityService:
                 ),
                 "entity_ids_by_handle": entity_ids_by_handle,
             }
-        )
-
-    async def _prepare_employee_source(
-        self,
-        document_id: UUID,
-        payload: tuple[str, tuple[Any, ...]] | None,
-        source_id: UUID | None,
-    ) -> tuple[EmployeeSource | None, SourceReference | None]:
-        if payload is None:
-            return None, None
-        if source_id is None:
-            raise WorkspaceAuthorityError(
-                "employee source id is required for direct-edit payload"
-            )
-        text, positions = payload
-        requested = EmployeeSource.pending(
-            source_id=source_id,
-            document_id=document_id,
-            kind=EmployeeSourceKind.DIRECT_EDIT,
-            text=text,
-            positions=tuple(positions),
-        )
-        source = await self.runtime._load_or_prepare_source(requested)
-        if source.processing_status is SourceProcessingStatus.PENDING:
-            await self.runtime._after_source_store(source)
-        return source, SourceReference(
-            source_id=source.source_id,
-            kind=source.kind,
-            created_at=source.created_at,
-            supersedes_source_id=source.supersedes_source_id,
         )
 
     async def prepare_direct_edit_rebase(
@@ -1299,13 +1239,6 @@ class WorkspaceAuthorityService:
         snapshot = await self.runtime._snapshot(document_id)
         if approved_document_digest(snapshot.approved_document) != plan.approved_digest:
             raise WorkspaceAuthorityError("workspace rebase approved document is stale")
-        if record.employee_source_id is not None:
-            source = await self.runtime.get_source_or_none(
-                document_id,
-                record.employee_source_id,
-            )
-            if source is not None:
-                await self.runtime._mark_source_committed(source)
         workspace = StoreBackedWorkspace(store=self.runtime.store, document_id=document_id)
         current = await workspace.read_snapshot()
         actual_digest = workspace_resource_digest(current.files)
@@ -1326,6 +1259,20 @@ class WorkspaceAuthorityService:
             snapshot.approved_document,
             plan=plan,
         )
+        rebased = await workspace.read_snapshot()
+        approved_task_ids = {
+            task.task_id for task in snapshot.approved_document.tasks
+        }
+        retained_pending_task_handles = {
+            handle
+            for handle, stable_id in manifest.entity_ids_by_handle.items()
+            if handle.startswith("task-")
+            and stable_id not in approved_task_ids
+            and f"/workspace/tasks/{handle}.json" in rebased.files
+        }
+        await workspace.prune_pending_task_competency_levels(
+            retained_task_handles=retained_pending_task_handles
+        )
         await self._replace_current_undo_record(document_id, None)
         completed = record.model_copy(
             update={
@@ -1343,10 +1290,7 @@ class WorkspaceAuthorityService:
         records = await self._load_records(document_id)
         raw_state = await self.runtime.raw_state(document_id)
         for record in records:
-            if record.decision in {
-                WorkspaceDecisionKind.ACCEPT,
-                WorkspaceDecisionKind.EDIT_ACCEPT,
-            }:
+            if record.decision is WorkspaceDecisionKind.ACCEPT:
                 if record.status is WorkspaceDecisionStatus.COMPLETED:
                     await self._delete_plan(document_id, record.command_id)
                     continue
@@ -1426,12 +1370,6 @@ class WorkspaceAuthorityService:
             raise WorkspaceAuthorityError("workspace review digest is stale")
         group = self._group_for_command(projection, command)
         selected = select_workspace_actions(projection, command)
-        edited = dict(command.edited_after_by_action_id)
-
-        if command.decision is WorkspaceDecisionKind.DEFER:
-            record = self._record(command, group, status=WorkspaceDecisionStatus.COMPLETED)
-            await self._put_record(document_id, record)
-            return await self.runtime._snapshot(document_id)
 
         if command.decision is WorkspaceDecisionKind.REJECT:
             plan = await self._build_plan(
@@ -1455,45 +1393,19 @@ class WorkspaceAuthorityService:
             await self._finish_rebase(document_id, record)
             return await self.runtime._snapshot(document_id)
 
-        text_payload = edited_action_source_payload(selected, edited)
-        employee_source_id = (
-            (
-                (existing.employee_source_id if existing is not None else None)
-                or self._employee_source_id(document_id, command.command_id)
-            )
-            if text_payload is not None
-            else None
-        )
-        source, source_reference = await self._prepare_employee_source(
-            document_id,
-            text_payload,
-            employee_source_id,
-        )
-        authority_actions = selected
-        if source is not None:
-            authority_actions = tuple(
-                action.model_copy(
-                    update={
-                        "source_ids": tuple(
-                            dict.fromkeys((*action.source_ids, source.source_id))
-                        )
-                    }
-                )
-                for action in selected
-            )
         try:
             prospective = apply_document_actions(
                 snapshot.approved_document,
-                authority_actions,
-                edited_after_by_action_id=edited,
+                selected,
             )
         except DocumentAuthorityError as error:
             raise WorkspaceAuthorityError(str(error)) from error
-        if source is not None:
-            await self.runtime._require_known_evidence_sources(
-                prospective,
-                pending_direct_edit_source_id=source.source_id,
-            )
+        prospective = apply_pending_task_competency_levels(
+            prospective,
+            approved_document=snapshot.approved_document,
+            handle_registry=projection.entity_ids_by_handle,
+            pending_levels=(await workspace.read_pending_task_competency_levels()),
+        )
         plan = await self._build_plan(
             command_id=command.command_id,
             old_approved=snapshot.approved_document,
@@ -1502,14 +1414,10 @@ class WorkspaceAuthorityService:
             manifest=workspace_snapshot.manifest,
             approved_revision=snapshot.revision + 1,
             accepted_actions=selected,
-            employee_override_actions=tuple(
-                action for action in selected if action.action_id in edited
-            ),
         )
         record = self._record(
             command,
             group,
-            source_id=(source.source_id if source is not None else None),
             plan=plan,
         )
         await self._put_plan(document_id, plan)
@@ -1522,8 +1430,6 @@ class WorkspaceAuthorityService:
             "approved_document": prospective.model_dump(mode="json"),
             "command_receipt": receipt.model_dump(mode="json"),
         }
-        if source_reference is not None:
-            context["source_reference"] = source_reference.model_dump(mode="json")
         try:
             await self.runtime.graph.ainvoke(
                 {},

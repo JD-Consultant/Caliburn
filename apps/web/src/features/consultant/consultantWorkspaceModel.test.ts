@@ -141,7 +141,6 @@ function snapshot(): ConsultantSnapshotView {
       ],
       employee_decisions: {
         pending: 2,
-        deferred: 0,
       },
       gaps: [
         {
@@ -306,19 +305,16 @@ describe("employee-facing consultant workspace model", () => {
     ]);
   });
 
-  it("reviews an atomic subgroup together and preserves employee edits", () => {
+  it("reviews an atomic subgroup together without a second edit payload", () => {
     const bundle = changeset();
     const actionIds = reviewSelectionForAction(bundle, ACTION_ID);
 
     expect(actionIds).toEqual([ACTION_ID, ACTION_ID_2]);
     expect(
-      buildReviewDecision("edit_and_accept_changes", actionIds, {
-        [ACTION_ID]: "員工修正後的內容",
-      }),
+      buildReviewDecision("accept_changes", actionIds),
     ).toEqual({
-      command: "edit_and_accept_changes",
+      command: "accept_changes",
       action_ids: [ACTION_ID, ACTION_ID_2],
-      edited_after_by_action_id: { [ACTION_ID]: "員工修正後的內容" },
       rejection_reason: null,
     });
   });
@@ -434,7 +430,6 @@ describe("employee-facing consultant workspace model", () => {
   it("keeps internal enum and JSON-pointer names out of the employee wording", () => {
     expect(interviewWorkStatusLabel("sufficient_for_now")).toBe("目前足夠");
     expect(interviewWorkStatusLabel("awaiting_employee_decision")).toBe("待你確認");
-    expect(interviewWorkStatusLabel("employee_deferred")).toBe("你已延後");
     expect(understandingStatusLabel("employee_confirmed")).toBe("你已確認");
     expect(documentPathLabel("/tasks/00000000-0000-0000-0000-000000000020/duty_id")).toBe(
       "工作所屬職責",

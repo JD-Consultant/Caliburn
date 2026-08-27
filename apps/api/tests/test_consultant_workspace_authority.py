@@ -86,8 +86,6 @@ def _projection() -> WorkspaceReviewProjection:
 def _command(
     kind: WorkspaceDecisionKind,
     action_ids: tuple[UUID, ...],
-    *,
-    edited_after_by_action_id: dict[UUID, object] | None = None,
 ) -> WorkspaceReviewCommand:
     return WorkspaceReviewCommand(
         command_id=COMMAND_ID,
@@ -98,7 +96,6 @@ def _command(
         workspace_digest=DIGEST,
         changeset_id=CHANGESET_ID,
         selected_action_ids=action_ids,
-        edited_after_by_action_id=edited_after_by_action_id or {},
         reason="員工決定",
     )
 
@@ -182,7 +179,7 @@ def test_owner_ten_tasks_and_nine_outputs_allows_only_tenth_output_rejection() -
     assert tuple(action.action_id for action in rejected) == (output_ids[9],)
 
 
-def test_conflicted_group_only_blocks_approved_writes_not_reject_or_defer() -> None:
+def test_conflicted_group_only_blocks_accept_not_reject() -> None:
     base_group = _projection().groups[0]
     conflicted_group = replace(
         base_group,
@@ -223,23 +220,9 @@ def test_conflicted_group_only_blocks_approved_writes_not_reject_or_defer() -> N
             projection,
             _command(WorkspaceDecisionKind.ACCEPT, (TASK_ACTION_ID,)),
         )
-    with pytest.raises(WorkspaceAuthorityError, match="rebase conflict"):
-        select_workspace_actions(
-            projection,
-            _command(
-                WorkspaceDecisionKind.EDIT_ACCEPT,
-                (TASK_ACTION_ID,),
-                edited_after_by_action_id={TASK_ACTION_ID: "C"},
-            ),
-        )
-
     assert select_workspace_actions(
         projection,
         _command(WorkspaceDecisionKind.REJECT, (TASK_ACTION_ID,)),
-    )
-    assert select_workspace_actions(
-        projection,
-        _command(WorkspaceDecisionKind.DEFER, (TASK_ACTION_ID,)),
     )
     clean_command = _command(
         WorkspaceDecisionKind.ACCEPT,
@@ -264,7 +247,7 @@ def test_decision_record_keeps_workspace_identity_without_review_payload() -> No
     record = WorkspaceDecisionRecord(
         command_id=COMMAND_ID,
         payload_digest=DIGEST,
-        decision=WorkspaceDecisionKind.DEFER,
+        decision=WorkspaceDecisionKind.REJECT,
         changeset_id=CHANGESET_ID,
         selected_action_ids=(TASK_ACTION_ID,),
         workspace_digest=DIGEST,

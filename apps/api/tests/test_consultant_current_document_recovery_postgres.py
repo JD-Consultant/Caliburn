@@ -26,7 +26,12 @@ from app.consultant.state import (
 from app.consultant.workspace_resources import (
     WorkspaceCatalog,
     WorkspaceDutyResource,
+    WorkspaceTaskResource,
     canonical_resource_json,
+)
+from app.consultant.workspace_authority import (
+    WorkspaceDecisionKind,
+    WorkspaceReviewCommand,
 )
 from app.consultant.workspace_state import StoreBackedWorkspace
 from app.consultant.workspace_validation import WorkspaceValidationService
@@ -128,17 +133,54 @@ async def _seed(runtime, document_id: UUID):
     )
 
 
-async def _stage_ai_task_statement(runtime, document_id: UUID, statement: str):
+async def _stage_ai_task_fields(runtime, document_id: UUID, **updates: str):
     workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
     workspace_snapshot = await workspace.read_snapshot()
     task_path = next(
         path for path in workspace_snapshot.files if path.startswith("/workspace/tasks/")
     )
     payload = json.loads(workspace_snapshot.files[task_path])
-    payload["statement"] = statement
+    payload.update(updates)
     write = await workspace.backend.awrite(
         task_path,
         json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+    )
+    assert write.error is None
+    snapshot = await runtime._snapshot(document_id)
+    latest_workspace = await workspace.read_snapshot()
+    validator = WorkspaceValidationService(
+        workspace=workspace,
+        catalog=WorkspaceCatalog.from_snapshot(
+            snapshot.approved_document,
+            sources=await runtime.list_sources(document_id),
+            handle_registry=latest_workspace.manifest.entity_ids_by_handle,
+        ),
+        source_loader=lambda: runtime.list_sources(document_id),
+        selected_skill_ids=CONSULTANT_SKILL_IDS,
+    )
+    validation = await validator.validate_current(
+        loaded_skill_ids=CONSULTANT_SKILL_IDS,
+    )
+    assert validation.document is not None
+    return await runtime.reopen_document(document_id)
+
+
+async def _stage_ai_task_statement(runtime, document_id: UUID, statement: str):
+    return await _stage_ai_task_fields(runtime, document_id, statement=statement)
+
+
+async def _stage_ai_task_add(runtime, document_id: UUID):
+    workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+    write = await workspace.backend.awrite(
+        "/workspace/tasks/task-999.json",
+        canonical_resource_json(
+            WorkspaceTaskResource(
+                handle="task-999",
+                statement="AI 彙整採購需求",
+                action="AI 彙整",
+                object="採購需求",
+            )
+        ),
     )
     assert write.error is None
     snapshot = await runtime._snapshot(document_id)
@@ -417,6 +459,85 @@ async def test_structural_command_updates_one_current_jd_and_undo_restores_it(
                     payload_sha256=uuid4().hex * 2,
                 ),
             )
+
+
+@pytest.mark.asyncio
+async def test_two_current_autosaves_remain_pending_until_one_group_accept(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await _seed(runtime, document_id)
+        pending = await _stage_ai_task_add(runtime, document_id)
+        task_id = next(
+            task.task_id
+            for task in pending.current_document.tasks
+            if task.statement == "AI 彙整採購需求"
+        )
+
+        first_document = pending.current_document.model_copy(
+            update={
+                "tasks": tuple(
+                    task.model_copy(update={"statement": "員工彙整採購需求"})
+                    if task.task_id == task_id
+                    else task
+                    for task in pending.current_document.tasks
+                )
+            }
+        )
+        first = await _edit(runtime, pending, first_document)
+        assert len(first.approved_document.tasks) == 1
+        assert first.document_review.unresolved_action_count > 0
+
+        second_document = first.current_document.model_copy(
+            update={
+                "tasks": tuple(
+                    task.model_copy(update={"action": "彙整並確認"})
+                    if task.task_id == task_id
+                    else task
+                    for task in first.current_document.tasks
+                )
+            }
+        )
+        second = await _edit(runtime, first, second_document)
+        assert len(second.approved_document.tasks) == 1
+        assert second.document_review.unresolved_action_count > 0
+
+        snapshot, _workspace, workspace_snapshot, projection = (
+            await runtime.workspace_review_context(document_id)
+        )
+        group = next(
+            group
+            for group in projection.groups
+            if any(
+                isinstance(action.after, dict)
+                and action.after.get("task_id") == str(task_id)
+                for action in group.actions
+            )
+        )
+        accepted = await runtime.decide_workspace_changes(
+            WorkspaceReviewCommand(
+                command_id=uuid4(),
+                document_id=document_id,
+                decision=WorkspaceDecisionKind.ACCEPT,
+                approved_revision=snapshot.revision,
+                workspace_generation=workspace_snapshot.manifest.generation,
+                workspace_digest=workspace_snapshot.manifest.resource_digest,
+                changeset_id=group.changeset.changeset_id,
+                group_digest=group.group_digest,
+                selected_action_ids=tuple(
+                    action.action_id for action in group.actions
+                ),
+            )
+        )
+
+        accepted_task = next(
+            task for task in accepted.approved_document.tasks if task.task_id == task_id
+        )
+        assert accepted_task.statement == "員工彙整採購需求"
+        assert accepted_task.action == "彙整並確認"
+        assert accepted.current_document == accepted.approved_document
+        assert accepted.document_review.unresolved_action_count == 0
 
 
 @pytest.mark.asyncio

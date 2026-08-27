@@ -456,9 +456,7 @@ class UnderstandingCalibration(DurableModel):
 
 class DocumentChangeStatus(StrEnum):
     PENDING = "pending"
-    DEFERRED = "deferred"
     ACCEPTED = "accepted"
-    EDIT_ACCEPTED = "edit_accepted"
     REJECTED = "rejected"
     STALE = "stale"
 
@@ -494,7 +492,6 @@ class DocumentPatchAction(DurableModel):
     affected_work_ids: tuple[UUID, ...] = ()
     blocks_dependent_analysis: bool = False
     status: DocumentChangeStatus = DocumentChangeStatus.PENDING
-    employee_after: JsonValue | None = None
     rejection_reason: NonEmptyText | None = None
     stale_reason: NonEmptyText | None = None
 
@@ -520,11 +517,6 @@ class DocumentPatchAction(DurableModel):
             raise ValueError("rejected patch requires an employee reason")
         if self.status is DocumentChangeStatus.STALE and not self.stale_reason:
             raise ValueError("stale patch requires a presentable reason")
-        if (
-            self.status is DocumentChangeStatus.EDIT_ACCEPTED
-            and self.employee_after is None
-        ):
-            raise ValueError("edit-accepted patch requires the employee value")
         if self.action_id in self.depends_on_action_ids:
             raise ValueError("a patch action cannot depend on itself")
         if self.action_id in self.supersedes_action_ids:
@@ -681,10 +673,6 @@ class ConsultantCommandContext(TypedDict, total=False):
         "direct_edit",
         "commit_consultant_result",
         "decide_understanding_calibration",
-        "accept_changes",
-        "edit_and_accept_changes",
-        "reject_changes",
-        "defer_changes",
         "workspace_authority_commit",
     ]
     document_id: str
@@ -694,10 +682,6 @@ class ConsultantCommandContext(TypedDict, total=False):
     semantic_commit: dict[str, Any]
     calibration_id: str
     calibration_decision: Literal["confirm", "later"]
-    changeset_id: str
-    action_ids: list[str]
-    edited_after_by_action_id: dict[str, Any]
-    rejection_reason: str
     run_receipt: dict[str, Any]
     command_receipt: dict[str, Any]
     run_id: str

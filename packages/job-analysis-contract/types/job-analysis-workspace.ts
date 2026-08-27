@@ -465,13 +465,6 @@ export interface ApprovedJobDocumentWrite {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
- * via the `definition` "DirectDocumentEditWrite".
- */
-export interface DirectDocumentEditWrite {
-  document: ApprovedJobDocumentWrite;
-}
-/**
- * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "CurrentDocumentEditWrite".
  */
 export interface CurrentDocumentEditWrite {

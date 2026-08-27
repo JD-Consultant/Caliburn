@@ -224,15 +224,6 @@ class FakeRuntime:
         self.calls.append(("clarification", kwargs))
         return self.snapshot
 
-    async def apply_direct_edit(self, **kwargs):
-        if self.model_mutation_busy:
-            raise ConsultantRunAlreadyActive(kwargs["document_id"])
-        self.calls.append(("direct_edit", kwargs))
-        self.snapshot = self.snapshot.model_copy(
-            update={"approved_document": kwargs["document"]}
-        )
-        return self.snapshot
-
     async def apply_current_document_edit(self, **kwargs):
         if self.model_mutation_busy:
             raise ConsultantRunAlreadyActive(kwargs["document_id"])
@@ -584,7 +575,7 @@ async def test_failed_run_allows_a_new_ordinary_message_without_replacing_histor
     assert all(source.supersedes_source_id is None for source in runtime.sources)
 
 
-async def test_employee_review_calibration_clarification_and_direct_edit_are_distinct(api) -> None:
+async def test_employee_review_calibration_and_clarification_are_distinct(api) -> None:
     client, runtime, processor = api
     document_id = UUID((await _create(client)).json()["document_id"])
     changeset_id = uuid4()
@@ -630,17 +621,6 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     )
     assert clarified.status_code == 200
     assert runtime.calls[-1][0] == "clarification"
-
-    document = runtime.snapshot.approved_document.model_dump(mode="json")
-    document["job_title"] = "採購專員"
-    edited = await client.put(
-        f"{BASE}/{document_id}/approved-document",
-        headers={"Idempotency-Key": "edit-1", "X-Expected-Revision": "1"},
-        json={"document": document},
-    )
-    assert edited.status_code == 200, edited.text
-    assert runtime.calls[-1][0] == "direct_edit"
-
 
 async def test_legacy_review_edit_and_defer_commands_are_rejected(api) -> None:
     client, runtime, _ = api
@@ -699,11 +679,6 @@ async def test_review_and_document_edits_return_clear_busy_conflict_during_model
     )
     document = runtime.snapshot.approved_document.model_dump(mode="json")
     document["job_title"] = "忙碌時不得交錯寫入"
-    direct_edit = await client.put(
-        f"{BASE}/{document_id}/approved-document",
-        headers={"Idempotency-Key": "busy-edit", "X-Expected-Revision": "0"},
-        json={"document": document},
-    )
     current_edit = await client.put(
         f"{BASE}/{document_id}/current-document",
         headers={"Idempotency-Key": "busy-current", "X-Expected-Revision": "0"},
@@ -736,7 +711,6 @@ async def test_review_and_document_edits_return_clear_busy_conflict_during_model
 
     for response in (
         review,
-        direct_edit,
         current_edit,
         calibration,
         clarification,
@@ -747,37 +721,9 @@ async def test_review_and_document_edits_return_clear_busy_conflict_during_model
         assert response.json()["type"] == CONSULTANT_RUN_ACTIVE
         assert response.json()["title"] == "Document is busy with an active consultant run"
     assert runtime.calls == []
-    assert runtime.employee_admission_entries == 7
+    assert runtime.employee_admission_entries == 6
     assert runtime.busy_preflight_calls == 0
     assert runtime.deleted is False
-
-
-async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_browser(api) -> None:
-    client, runtime, _ = api
-    document_id = UUID((await _create(client)).json()["document_id"])
-    document = runtime.snapshot.approved_document.model_dump(mode="json")
-    document["opks"] = [
-        {
-            "item_id": str(uuid4()),
-            "kind": "attitude",
-            "text": "謹慎",
-            "display_order": 0,
-            "task_ids": [],
-            "indicator_ids": [],
-        }
-    ]
-
-    edited = await client.put(
-        f"{BASE}/{document_id}/approved-document",
-        headers={"Idempotency-Key": "edit-opks-1", "X-Expected-Revision": "0"},
-        json={"document": document},
-    )
-
-    assert edited.status_code == 200, edited.text
-    passed_document = runtime.calls[-1][1]["document"]
-    assert passed_document.opks[0].evidence_source_ids == (
-        consultant._command_id(document_id, "direct-edit-source", "edit-opks-1"),
-    )
 
 
 async def test_current_document_edit_forwards_full_server_stale_guards(api) -> None:

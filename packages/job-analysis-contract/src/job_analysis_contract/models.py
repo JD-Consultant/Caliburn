@@ -520,13 +520,6 @@ class ApprovedJobDocumentWrite(BaseModel):
     opks: list[ApprovedOpksItemWrite]
 
 
-class DirectDocumentEditWrite(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    document: ApprovedJobDocumentWrite
-
-
 class CurrentDocumentEditWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

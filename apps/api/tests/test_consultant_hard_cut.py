@@ -110,6 +110,7 @@ def test_generated_contract_has_only_consultant_and_problem_surfaces() -> None:
     )
     definitions = json.loads(schema_path.read_text(encoding="utf-8"))["$defs"]
     banned_exact = {
+        "DirectDocumentEditWrite",
         "DocumentMetadataWrite",
         "DocumentMetadataView",
         "DocumentSummary",
@@ -135,3 +136,12 @@ def test_generated_contract_has_only_consultant_and_problem_surfaces() -> None:
         for name in definitions
         if name in banned_exact or name.startswith(banned_prefixes)
     ) == []
+
+
+def test_only_current_document_has_a_public_direct_edit_route() -> None:
+    consultant_routes = (
+        APP_ROOT / "api" / "routes" / "consultant.py"
+    ).read_text(encoding="utf-8")
+
+    assert '"/{document_id}/current-document"' in consultant_routes
+    assert '"/{document_id}/approved-document"' not in consultant_routes

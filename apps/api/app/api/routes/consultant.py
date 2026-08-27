@@ -20,7 +20,6 @@ from job_analysis_contract import (
     ConsultantSnapshotEvent,
     ConsultantSnapshotView,
     CurrentDocumentEditWrite,
-    DirectDocumentEditWrite,
     DocumentReviewDecisionWrite,
     DocumentStructureCommandPreviewView,
     DocumentStructureCommandResultView,
@@ -102,29 +101,6 @@ def _command_receipt(
         command_kind=command_kind,
         payload_sha256=sha256(canonical).hexdigest(),
     )
-
-
-def _approved_document_from_edit(
-    body: ApprovedJobDocumentWrite,
-    current: ApprovedJobDocument,
-    source_id: UUID,
-) -> ApprovedJobDocument:
-    """Restore server-owned evidence and attach this edit to changed OPKS text."""
-
-    payload = body.model_dump(mode="json")
-    existing = {str(item.item_id): item for item in current.opks}
-    for item in payload["opks"]:
-        previous = existing.get(str(item["item_id"]))
-        evidence = (
-            list(previous.evidence_source_ids)
-            if previous is not None
-            else []
-        )
-        if previous is None or item["text"] != previous.text:
-            if source_id not in evidence:
-                evidence.append(source_id)
-        item["evidence_source_ids"] = evidence
-    return ApprovedJobDocument.model_validate(payload)
 
 
 def _current_document_from_edit(
@@ -520,45 +496,6 @@ async def answer_required_clarification(
                 ),
             )
         return await _snapshot_view(runtime, snapshot)
-    except Exception as error:
-        return _employee_mutation_error_response(error)
-
-
-@router.put(
-    "/{document_id}/approved-document",
-    response_model=ConsultantSnapshotView,
-)
-async def edit_approved_document(
-    document_id: UUID,
-    body: DirectDocumentEditWrite,
-    idempotency_key: IdempotencyKey,
-    expected_revision: ExpectedRevision,
-    runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
-):
-    try:
-        async with runtime.employee_mutation_admission(document_id):
-            source_id = _command_id(
-                document_id, "direct-edit-source", idempotency_key
-            )
-            current = (await runtime.reopen_document(document_id)).approved_document
-            document = _approved_document_from_edit(
-                body.document,
-                current,
-                source_id,
-            )
-            snapshot = await runtime.apply_direct_edit(
-                document_id=document_id,
-                expected_revision=expected_revision,
-                document=document,
-                source_id=source_id,
-                command_receipt=_command_receipt(
-                    document_id,
-                    "direct_document_edit",
-                    idempotency_key,
-                    {"document": body.document.model_dump(mode="json")},
-                ),
-            )
-            return await _snapshot_view(runtime, snapshot)
     except Exception as error:
         return _employee_mutation_error_response(error)
 

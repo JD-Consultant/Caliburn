@@ -510,14 +510,6 @@
         "opks": { "type": "array", "items": { "$ref": "#/$defs/ApprovedOpksItemWrite" } }
       }
     },
-    "DirectDocumentEditWrite": {
-      "type": "object",
-      "additionalProperties": false,
-      "required": ["document"],
-      "properties": {
-        "document": { "$ref": "#/$defs/ApprovedJobDocumentWrite" }
-      }
-    },
     "CurrentDocumentEditWrite": {
       "type": "object",
       "additionalProperties": false,

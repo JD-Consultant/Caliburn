@@ -1,6 +1,5 @@
 import { describe, expect, it } from "vitest";
 import type {
-  ApprovedJobDocumentWrite,
   ConsultantSnapshotEvent,
   ConsultantSnapshotView,
   DocumentChangeSetView,
@@ -9,16 +8,10 @@ import type {
 import {
   EXTERNAL_AI_DISCLOSURE,
   buildConversationEntries,
-  buildReviewDecision,
   consultantRunStatus,
   documentPathLabel,
   interviewWorkStatusLabel,
-  pruneApprovedDocumentRelations,
-  reviewSelectionForAction,
-  reviewSelectionForDecision,
-  reconcileDocumentDraft,
   shouldRefetchForEvent,
-  toApprovedDocumentWrite,
   understandingStatusLabel,
   workspaceSections,
 } from "./consultantWorkspaceModel";
@@ -302,53 +295,6 @@ describe("employee-facing consultant workspace model", () => {
     ]);
   });
 
-  it("reviews an atomic subgroup together without a second edit payload", () => {
-    const bundle = changeset();
-    const actionIds = reviewSelectionForAction(bundle, ACTION_ID);
-
-    expect(actionIds).toEqual([ACTION_ID, ACTION_ID_2]);
-    expect(
-      buildReviewDecision("accept_changes", actionIds),
-    ).toEqual({
-      command: "accept_changes",
-      action_ids: [ACTION_ID, ACTION_ID_2],
-      rejection_reason: null,
-    });
-  });
-
-  it("adds unresolved dependencies only when accepting a document change", () => {
-    const bundle = changeset();
-    bundle.actions[0].atomic_subgroup_id = null;
-    bundle.actions[1].atomic_subgroup_id = null;
-    bundle.actions[0].depends_on_action_ids = [ACTION_ID_2];
-
-    expect(reviewSelectionForDecision(bundle, [ACTION_ID], "accept_changes")).toEqual([
-      ACTION_ID,
-      ACTION_ID_2,
-    ]);
-    expect(reviewSelectionForDecision(bundle, [ACTION_ID], "reject_changes")).toEqual([
-      ACTION_ID,
-    ]);
-  });
-
-  it("never lets a background refetch overwrite a dirty approved-document draft", () => {
-    const original = toApprovedDocumentWrite(snapshot().approved_document);
-    const dirty: ApprovedJobDocumentWrite = { ...original, job_title: "員工尚未儲存的名稱" };
-    const newer = { ...snapshot(), revision: 4 };
-
-    expect(reconcileDocumentDraft(dirty, true, 3, newer)).toEqual({
-      draft: dirty,
-      baselineRevision: 3,
-      conflict: true,
-    });
-    expect(reconcileDocumentDraft(dirty, false, 3, newer)).toEqual({
-      draft: toApprovedDocumentWrite(newer.approved_document),
-      baselineRevision: 4,
-      conflict: false,
-    });
-    expect(original.opks[0]).not.toHaveProperty("evidence_source_ids");
-  });
-
   it("uses SSE only as a newer-revision refetch hint", () => {
     const newer: ConsultantSnapshotEvent = {
       event: "snapshot_changed",
@@ -369,61 +315,6 @@ describe("employee-facing consultant workspace model", () => {
     expect(consultantRunStatus(value)).toEqual({ busy: false, text: "分析未完成；你的回答已保存，可以重試。" });
   });
 
-  it("removes dangling Task and indicator references before a direct edit is saved", () => {
-    const value = toApprovedDocumentWrite(snapshot().approved_document);
-    const taskId = "00000000-0000-0000-0000-000000000020";
-    const indicatorId = "00000000-0000-0000-0000-000000000021";
-    value.tasks = [
-      {
-        task_id: taskId,
-        duty_id: null,
-        statement: "追查差異",
-        action: "追查",
-        object: "月結差異",
-        purpose_result: null,
-        context: null,
-        frequency_text: null,
-        responsibility_role: null,
-        enablers: [],
-        display_order: 0,
-        competency_level: null,
-      },
-    ];
-    value.opks = [
-      {
-        item_id: indicatorId,
-        kind: "indicator",
-        text: "差異在兩日內釐清",
-        display_order: 0,
-        task_ids: [taskId],
-        indicator_ids: [],
-      },
-      {
-        item_id: "00000000-0000-0000-0000-000000000022",
-        kind: "knowledge",
-        text: "月結流程",
-        display_order: 0,
-        task_ids: [taskId, "00000000-0000-0000-0000-000000000099"],
-        indicator_ids: [indicatorId, "00000000-0000-0000-0000-000000000098"],
-      },
-      {
-        item_id: "00000000-0000-0000-0000-000000000023",
-        kind: "attitude",
-        text: "謹慎",
-        display_order: 0,
-        task_ids: [taskId],
-        indicator_ids: [indicatorId],
-      },
-    ];
-
-    const normalized = pruneApprovedDocumentRelations(value);
-
-    expect(normalized.opks[1].task_ids).toEqual([taskId]);
-    expect(normalized.opks[1].indicator_ids).toEqual([indicatorId]);
-    expect(normalized.opks[2].task_ids).toEqual([]);
-    expect(normalized.opks[2].indicator_ids).toEqual([]);
-  });
-
   it("keeps internal enum and JSON-pointer names out of the employee wording", () => {
     expect(interviewWorkStatusLabel("sufficient_for_now")).toBe("目前足夠");
     expect(interviewWorkStatusLabel("awaiting_employee_decision")).toBe("待你確認");
@@ -432,5 +323,6 @@ describe("employee-facing consultant workspace model", () => {
       "工作所屬職責",
     );
     expect(documentPathLabel("/opks")).toBe("O／P／K／S 清單");
+    expect(documentPathLabel("/competency_level")).toBe("文件能力級別 L");
   });
 });

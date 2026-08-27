@@ -24,6 +24,9 @@ const TASK_ONE = "00000000-0000-0000-0000-000000000102";
 const TASK_TWO = "00000000-0000-0000-0000-000000000103";
 const OUTPUT_ID = "00000000-0000-0000-0000-000000000104";
 const KNOWLEDGE_ID = "00000000-0000-0000-0000-000000000105";
+const DUTY_TWO = "00000000-0000-0000-0000-000000000107";
+const ADDED_TASK = "00000000-0000-0000-0000-000000000108";
+const DELETED_TASK = "00000000-0000-0000-0000-000000000109";
 
 function structuredSnapshot() {
   const snapshot = consultantSnapshotFixture();
@@ -80,6 +83,141 @@ function structuredSnapshot() {
       evidence_source_ids: [snapshot.latest_source_id!],
     },
     ...snapshot.current_document.opks,
+  ];
+  return snapshot;
+}
+
+function semanticSnapshot() {
+  const snapshot = structuredSnapshot();
+  snapshot.current_document.duties.push({
+    duty_id: DUTY_TWO,
+    statement: "教育宣導",
+    display_order: 1,
+  });
+  const baselineTask = structuredClone(snapshot.current_document.tasks[0]);
+  baselineTask.statement = "每月彙整法規";
+  baselineTask.frequency_text = "每月";
+  const deletedTask = {
+    ...structuredClone(baselineTask),
+    task_id: DELETED_TASK,
+    statement: "寄送紙本通知",
+    display_order: 1,
+  };
+  snapshot.approved_document = structuredClone(snapshot.current_document);
+  snapshot.approved_document.tasks = [
+    baselineTask,
+    structuredClone(snapshot.current_document.tasks[1]),
+    deletedTask,
+  ];
+  snapshot.current_document.tasks = [
+    {
+      ...snapshot.current_document.tasks[0],
+      duty_id: DUTY_TWO,
+      statement: "每週追蹤法規",
+      frequency_text: "每週",
+    },
+    snapshot.current_document.tasks[1],
+    {
+      ...structuredClone(snapshot.current_document.tasks[0]),
+      task_id: ADDED_TASK,
+      duty_id: DUTY_ID,
+      statement: "整理教育問答",
+      display_order: 1,
+    },
+  ];
+  const sourceId = snapshot.latest_source_id!;
+  const moveActionId = "00000000-0000-0000-0000-000000000111";
+  const action = (
+    actionId: string,
+    operation: "add" | "revise" | "withdraw" | "reassign",
+    path: string,
+    before: unknown,
+    after: unknown,
+    dependsOn: string[] = [],
+  ) => ({
+    action_id: actionId,
+    operation,
+    path,
+    target_key: path,
+    before,
+    after,
+    source_ids: [sourceId],
+    quote_anchors: [
+      { source_id: sourceId, start: 0, end: 8, quote: "改成每週追蹤" },
+    ],
+    read_set: [],
+    depends_on_action_ids: dependsOn,
+    atomic_subgroup_id: null,
+    affected_work_ids: [],
+    blocks_dependent_analysis: false,
+    status: "pending" as const,
+  });
+  snapshot.document_review.bundles = [
+    {
+      changeset_id: "00000000-0000-0000-0000-000000000121",
+      summary: "移動並修正法規追蹤工作",
+      source_ids: [sourceId],
+      created_revision: snapshot.revision,
+      acceptance_blocked: false,
+      actions: [
+        action(
+          moveActionId,
+          "reassign",
+          `/tasks/${TASK_ONE}/duty_id`,
+          DUTY_ID,
+          DUTY_TWO,
+        ),
+        action(
+          "00000000-0000-0000-0000-000000000112",
+          "revise",
+          `/tasks/${TASK_ONE}/statement`,
+          "每月彙整法規",
+          "每週追蹤法規",
+          [moveActionId],
+        ),
+      ],
+    },
+    {
+      changeset_id: "00000000-0000-0000-0000-000000000122",
+      summary: "新增教育問答工作",
+      source_ids: [sourceId],
+      created_revision: snapshot.revision,
+      acceptance_blocked: false,
+      actions: [
+        action(
+          "00000000-0000-0000-0000-000000000113",
+          "add",
+          "/tasks",
+          null,
+          snapshot.current_document.tasks[2],
+        ),
+      ],
+    },
+    {
+      changeset_id: "00000000-0000-0000-0000-000000000123",
+      summary: "移除紙本通知工作",
+      source_ids: [sourceId],
+      created_revision: snapshot.revision,
+      acceptance_blocked: false,
+      actions: [
+        action(
+          "00000000-0000-0000-0000-000000000114",
+          "withdraw",
+          `/tasks/${DELETED_TASK}`,
+          deletedTask,
+          null,
+        ),
+      ],
+    },
+  ];
+  snapshot.document_review.unresolved_action_count = 4;
+  snapshot.employee_messages = [
+    {
+      source_id: sourceId,
+      text: "我剛才說錯，應該改成每週追蹤，也不再寄紙本通知。",
+      created_at: "2026-08-27T10:00:00Z",
+      processing_status: "committed",
+    },
   ];
   return snapshot;
 }
@@ -168,6 +306,164 @@ describe("one visible current JD editor", () => {
     expect(screen.getByText("採購流程知識")).toBeTruthy();
     expect(screen.getByText("待重新連結 K／S")).toBeTruthy();
     expect(screen.getAllByText("供應商溝通技巧")).toHaveLength(2);
+  });
+
+  it("renders update, add, delete and move semantics inside the same JD skeleton", () => {
+    const snapshot = semanticSnapshot();
+    renderWithClient(
+      <CurrentJobDocumentEditor
+        documentId={DOCUMENT_ID}
+        snapshot={snapshot}
+        onDirtyChange={() => undefined}
+      />,
+    );
+
+    const currentStatement = screen.getByDisplayValue("每週追蹤法規");
+    expect(currentStatement.closest("[data-review-current='true']")).toBeTruthy();
+    expect(
+      screen
+        .getAllByText("每月彙整法規")
+        .some((node) => node.closest("del") !== null),
+    ).toBe(true);
+
+    const added = screen.getByRole("region", {
+      name: "任務 1 整理教育問答",
+    });
+    expect(added.closest("[data-review-operation='add']")).toBeTruthy();
+    expect(
+      screen.getByText("寄送紙本通知").closest("[data-review-operation='delete']"),
+    ).toBeTruthy();
+
+    const movedCurrent = screen.getByRole("region", {
+      name: "任務 1 每週追蹤法規",
+    });
+    expect(movedCurrent.closest("[data-review-operation='move']")).toBeTruthy();
+    expect(
+      document.querySelector(
+        `[data-review-location='from'][data-task-id='${TASK_ONE}']`,
+      ),
+    ).toBeTruthy();
+  });
+
+  it("autosaves edits to green current content without deciding its review group", async () => {
+    const snapshot = semanticSnapshot();
+    const response = structuredClone(snapshot);
+    response.revision += 1;
+    response.current_document.tasks[0].statement = "每週主動追蹤法規";
+    response.document_review.workspace_generation += 1;
+    response.document_review.workspace_digest =
+      "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb";
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <CurrentJobDocumentEditor
+        documentId={DOCUMENT_ID}
+        snapshot={snapshot}
+        onDirtyChange={() => undefined}
+      />,
+    );
+
+    const field = screen.getByDisplayValue("每週追蹤法規");
+    fireEvent.change(field, { target: { value: "每週主動追蹤法規" } });
+    fireEvent.blur(field);
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(String(fetchMock.mock.calls[0][0])).toContain("/current-document");
+    expect(String(fetchMock.mock.calls[0][0])).not.toContain("/reviews/");
+    expect(
+      screen.getByRole("button", {
+        name: "審核修改：任務 1 敘述",
+      }),
+    ).toBeTruthy();
+  });
+
+  it("keeps structured Task and K/S relationship changes reviewable without a separate panel", () => {
+    const snapshot = semanticSnapshot();
+    const template = snapshot.document_review.bundles[0].actions[1];
+    snapshot.approved_document.tasks[0].responsibility_role = "primary";
+    snapshot.current_document.tasks[0].responsibility_role = "shared";
+    snapshot.current_document.tasks[0].enablers = [
+      { kind: "method", name: "使用法規追蹤表" },
+    ];
+    const knowledge = snapshot.current_document.opks.find(
+      (item) => item.item_id === KNOWLEDGE_ID,
+    )!;
+    const previousTaskIds = [...knowledge.task_ids];
+    knowledge.task_ids = [TASK_ONE];
+    snapshot.document_review.bundles.push({
+      changeset_id: "00000000-0000-0000-0000-000000000124",
+      summary: "補充責任與工作方法",
+      source_ids: [snapshot.latest_source_id!],
+      created_revision: snapshot.revision,
+      acceptance_blocked: false,
+      actions: [
+        {
+          ...template,
+          action_id: "00000000-0000-0000-0000-000000000115",
+          path: `/tasks/${TASK_ONE}/responsibility_role`,
+          target_key: `/tasks/${TASK_ONE}/responsibility_role`,
+          before: "primary",
+          after: "shared",
+          depends_on_action_ids: [],
+        },
+        {
+          ...template,
+          action_id: "00000000-0000-0000-0000-000000000116",
+          path: `/tasks/${TASK_ONE}/enablers`,
+          target_key: `/tasks/${TASK_ONE}/enablers`,
+          before: [],
+          after: [{ kind: "method", name: "使用法規追蹤表" }],
+          depends_on_action_ids: [],
+        },
+      ],
+    });
+    snapshot.document_review.bundles.push({
+      changeset_id: "00000000-0000-0000-0000-000000000125",
+      summary: "調整共用知識的任務連結",
+      source_ids: [snapshot.latest_source_id!],
+      created_revision: snapshot.revision,
+      acceptance_blocked: false,
+      actions: [
+        {
+          ...template,
+          action_id: "00000000-0000-0000-0000-000000000117",
+          path: `/opks/${KNOWLEDGE_ID}/task_ids`,
+          target_key: `/opks/${KNOWLEDGE_ID}/task_ids`,
+          before: previousTaskIds,
+          after: [TASK_ONE],
+          depends_on_action_ids: [],
+        },
+      ],
+    });
+
+    renderWithClient(
+      <CurrentJobDocumentEditor
+        documentId={DOCUMENT_ID}
+        snapshot={snapshot}
+        onDirtyChange={() => undefined}
+      />,
+    );
+
+    expect(
+      screen.getByRole("button", {
+        name: "審核修改：任務 1 責任角色",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole("button", {
+        name: "審核修改：任務 1 工具／方法／促成條件",
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.getAllByRole("button", {
+        name: /審核修改：知識 K/,
+      }).length,
+    ).toBeGreaterThan(0);
   });
 
   it("autosaves visible field edits with fresh authority guards and no Save button", async () => {

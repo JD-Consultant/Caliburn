@@ -1,10 +1,8 @@
 import type {
-  ApprovedJobDocumentView,
-  ApprovedJobDocumentWrite,
   ConsultantSnapshotEvent,
   ConsultantSnapshotView,
   DocumentChangeSetView,
-  DocumentReviewDecisionWrite,
+  DocumentPatchActionView,
 } from "@caliburn/job-analysis-contract";
 
 export const EXTERNAL_AI_DISCLOSURE =
@@ -40,8 +38,18 @@ export function understandingStatusLabel(status: string): string {
 
 export function documentPathLabel(path: string): string {
   const [collection, , field] = path.split("/").filter(Boolean);
-  if (collection === "job_title") return "職務名稱";
-  if (collection === "work_description") return "工作描述";
+  const headerLabels: Record<string, string> = {
+    job_title: "職務名稱",
+    occupation_category_name: "職類名稱",
+    occupation_name: "職業名稱",
+    occupation_code: "職業代碼",
+    industry_name: "行業名稱",
+    industry_code: "行業代碼",
+    work_description: "工作描述",
+    competency_level: "文件能力級別 L",
+    notes: "備註",
+  };
+  if (headerLabels[collection]) return headerLabels[collection];
 
   const collectionLabels: Record<string, string> = {
     duties: "職責",
@@ -69,6 +77,186 @@ export function documentPathLabel(path: string): string {
     return collection === "opks" ? `${collectionLabel} 清單` : `${collectionLabel}清單`;
   }
   return field ? `${collectionLabel}${fieldLabels[field] ?? "內容"}` : `${collectionLabel}內容`;
+}
+
+export type SemanticReviewOperation = "add" | "update" | "delete" | "move";
+
+export type SemanticReviewEvidence = {
+  sourceId: string;
+  sourceText: string | null;
+  createdAt: string | null;
+  quote: string | null;
+};
+
+export type SemanticReviewGroup = {
+  changesetId: string;
+  summary: string;
+  actionIds: string[];
+  acceptanceBlocked: boolean;
+  dependencyActionIds: string[];
+  evidence: SemanticReviewEvidence[];
+};
+
+export type ReviewDecoration = {
+  actionId: string;
+  path: string;
+  entityPath: string | null;
+  operation: SemanticReviewOperation;
+  baseline: unknown;
+  current: unknown;
+  group: SemanticReviewGroup;
+};
+
+export type DeletedReviewEntity = ReviewDecoration & { entityPath: string };
+
+export type MovedTaskReview = ReviewDecoration & {
+  entityPath: string;
+  taskId: string;
+  fromDutyId: string | null;
+  toDutyId: string | null;
+  operation: "move";
+};
+
+export type SemanticReviewIndex = {
+  byPath: Map<string, ReviewDecoration>;
+  byEntity: Map<string, ReviewDecoration[]>;
+  deletedEntities: DeletedReviewEntity[];
+  movedTasks: MovedTaskReview[];
+};
+
+function reviewRecord(value: unknown): Record<string, unknown> | null {
+  return value !== null && typeof value === "object" && !Array.isArray(value)
+    ? (value as Record<string, unknown>)
+    : null;
+}
+
+function semanticOperation(
+  operation: DocumentPatchActionView["operation"],
+): SemanticReviewOperation {
+  if (operation === "add") return "add";
+  if (operation === "withdraw") return "delete";
+  if (operation === "reassign") return "move";
+  return "update";
+}
+
+const entityIdFields = {
+  duties: "duty_id",
+  tasks: "task_id",
+  opks: "item_id",
+} as const;
+
+function reviewEntityPath(action: DocumentPatchActionView): string | null {
+  const parts = action.path.split("/").filter(Boolean);
+  const collection = parts[0] as keyof typeof entityIdFields | undefined;
+  if (!collection || !(collection in entityIdFields)) return null;
+  if (parts[1]) return `/${collection}/${parts[1]}`;
+  const entity = reviewRecord(action.after) ?? reviewRecord(action.before);
+  const identity = entity?.[entityIdFields[collection]];
+  return typeof identity === "string" ? `/${collection}/${identity}` : null;
+}
+
+function reviewGroup(
+  snapshot: ConsultantSnapshotView,
+  changeset: DocumentChangeSetView,
+): SemanticReviewGroup {
+  const messages = new Map(
+    snapshot.employee_messages.map((message) => [message.source_id, message]),
+  );
+  const quoteEvidence = changeset.actions.flatMap((action) =>
+    action.quote_anchors.map((anchor) => {
+      const source = messages.get(anchor.source_id);
+      return {
+        sourceId: anchor.source_id,
+        sourceText: source?.text ?? null,
+        createdAt: source?.created_at ?? null,
+        quote: anchor.quote,
+      } satisfies SemanticReviewEvidence;
+    }),
+  );
+  const quotedSources = new Set(quoteEvidence.map((item) => item.sourceId));
+  const sourceEvidence = changeset.source_ids.flatMap((sourceId) => {
+    if (quotedSources.has(sourceId)) return [];
+    const source = messages.get(sourceId);
+    return [
+      {
+        sourceId,
+        sourceText: source?.text ?? null,
+        createdAt: source?.created_at ?? null,
+        quote: null,
+      } satisfies SemanticReviewEvidence,
+    ];
+  });
+  const uniqueEvidence = new Map<string, SemanticReviewEvidence>();
+  for (const item of [...quoteEvidence, ...sourceEvidence]) {
+    uniqueEvidence.set(`${item.sourceId}:${item.quote ?? ""}`, item);
+  }
+  return {
+    changesetId: changeset.changeset_id,
+    summary: changeset.summary,
+    actionIds: changeset.actions.map((action) => action.action_id),
+    acceptanceBlocked: changeset.acceptance_blocked,
+    dependencyActionIds: [
+      ...new Set(
+        changeset.actions.flatMap((action) => action.depends_on_action_ids),
+      ),
+    ],
+    evidence: [...uniqueEvidence.values()],
+  };
+}
+
+export function buildSemanticReviewIndex(
+  snapshot: ConsultantSnapshotView,
+): SemanticReviewIndex {
+  const byPath = new Map<string, ReviewDecoration>();
+  const byEntity = new Map<string, ReviewDecoration[]>();
+  const deletedEntities: DeletedReviewEntity[] = [];
+  const movedTasks: MovedTaskReview[] = [];
+
+  for (const changeset of snapshot.document_review.bundles) {
+    const group = reviewGroup(snapshot, changeset);
+    for (const action of changeset.actions) {
+      const entityPath = reviewEntityPath(action);
+      const decoration: ReviewDecoration = {
+        actionId: action.action_id,
+        path: action.path,
+        entityPath,
+        operation: semanticOperation(action.operation),
+        baseline: action.before,
+        current: action.after,
+        group,
+      };
+      byPath.set(action.path, decoration);
+      if (entityPath) {
+        byEntity.set(entityPath, [
+          ...(byEntity.get(entityPath) ?? []),
+          decoration,
+        ]);
+      }
+      if (entityPath && decoration.operation === "delete") {
+        deletedEntities.push({ ...decoration, entityPath });
+      }
+      const parts = action.path.split("/").filter(Boolean);
+      if (
+        entityPath &&
+        decoration.operation === "move" &&
+        parts[0] === "tasks" &&
+        parts[1] &&
+        parts[2] === "duty_id"
+      ) {
+        movedTasks.push({
+          ...decoration,
+          entityPath,
+          taskId: parts[1],
+          fromDutyId:
+            typeof action.before === "string" ? action.before : null,
+          toDutyId: typeof action.after === "string" ? action.after : null,
+          operation: "move",
+        });
+      }
+    }
+  }
+
+  return { byPath, byEntity, deletedEntities, movedTasks };
 }
 
 export type ConversationEntry = {
@@ -163,155 +351,6 @@ export function workspaceSections(snapshot: ConsultantSnapshotView) {
     },
     reviewBundles: snapshot.document_review.bundles,
     requiredClarification: snapshot.required_clarification,
-  };
-}
-
-const REVIEWABLE_STATUSES = new Set(["pending"]);
-
-export function reviewSelectionForAction(
-  changeset: DocumentChangeSetView,
-  actionId: string,
-): string[] {
-  const action = changeset.actions.find((item) => item.action_id === actionId);
-  if (!action || !REVIEWABLE_STATUSES.has(action.status)) return [];
-  if (!action.atomic_subgroup_id) return [action.action_id];
-  return changeset.actions
-    .filter(
-      (item) =>
-        item.atomic_subgroup_id === action.atomic_subgroup_id &&
-        REVIEWABLE_STATUSES.has(item.status),
-    )
-    .map((item) => item.action_id);
-}
-
-export function buildReviewDecision(
-  command: DocumentReviewDecisionWrite["command"],
-  actionIds: string[],
-  rejectionReason: string | null = null,
-): DocumentReviewDecisionWrite {
-  if (actionIds.length === 0) {
-    throw new Error("At least one review action is required");
-  }
-  return {
-    command,
-    action_ids: actionIds as [string, ...string[]],
-    rejection_reason: rejectionReason,
-  };
-}
-
-export function reviewSelectionForDecision(
-  changeset: DocumentChangeSetView,
-  actionIds: string[],
-  command: DocumentReviewDecisionWrite["command"],
-): string[] {
-  if (command !== "accept_changes") {
-    return actionIds;
-  }
-  const selected = new Set(actionIds);
-  let changed = true;
-  while (changed) {
-    changed = false;
-    for (const action of changeset.actions) {
-      if (!selected.has(action.action_id)) continue;
-      for (const dependencyId of action.depends_on_action_ids) {
-        for (const groupedId of reviewSelectionForAction(
-          changeset,
-          dependencyId,
-        )) {
-          if (!selected.has(groupedId)) {
-            selected.add(groupedId);
-            changed = true;
-          }
-        }
-      }
-    }
-  }
-  return changeset.actions
-    .filter((action) => selected.has(action.action_id))
-    .map((action) => action.action_id);
-}
-
-export function toApprovedDocumentWrite(
-  value: ApprovedJobDocumentView,
-): ApprovedJobDocumentWrite {
-  return {
-    schema_version: value.schema_version,
-    document_id: value.document_id,
-    job_title: value.job_title,
-    occupation_category_name: value.occupation_category_name,
-    occupation_name: value.occupation_name,
-    occupation_code: value.occupation_code,
-    industry_name: value.industry_name,
-    industry_code: value.industry_code,
-    work_description: value.work_description,
-    competency_level: value.competency_level,
-    notes: value.notes,
-    duties: value.duties.map((item) => ({ ...item })),
-    tasks: value.tasks.map((item) => ({
-      ...item,
-      enablers: item.enablers.map((enabler) => ({ ...enabler })),
-    })),
-    opks: value.opks.map((item) => ({
-      item_id: item.item_id,
-      kind: item.kind,
-      text: item.text,
-      display_order: item.display_order,
-      task_ids: [...item.task_ids],
-      indicator_ids: [...item.indicator_ids],
-    })),
-  };
-}
-
-export function pruneApprovedDocumentRelations(
-  value: ApprovedJobDocumentWrite,
-): ApprovedJobDocumentWrite {
-  const taskIds = new Set(value.tasks.map((task) => task.task_id));
-  const indicatorIds = new Set(
-    value.opks
-      .filter((item) => item.kind === "indicator")
-      .map((item) => item.item_id),
-  );
-  return {
-    ...value,
-    opks: value.opks.map((item) => {
-      if (item.kind === "attitude") {
-        return { ...item, task_ids: [], indicator_ids: [] };
-      }
-      return {
-        ...item,
-        task_ids: item.task_ids.filter((taskId) => taskIds.has(taskId)),
-        indicator_ids:
-          item.kind === "knowledge" || item.kind === "skill"
-            ? item.indicator_ids.filter((indicatorId) =>
-                indicatorIds.has(indicatorId),
-              )
-            : [],
-      };
-    }),
-  };
-}
-
-export function reconcileDocumentDraft(
-  draft: ApprovedJobDocumentWrite,
-  dirty: boolean,
-  baselineRevision: number,
-  snapshot: ConsultantSnapshotView,
-): {
-  draft: ApprovedJobDocumentWrite;
-  baselineRevision: number;
-  conflict: boolean;
-} {
-  if (dirty) {
-    return {
-      draft,
-      baselineRevision,
-      conflict: snapshot.revision > baselineRevision,
-    };
-  }
-  return {
-    draft: toApprovedDocumentWrite(snapshot.approved_document),
-    baselineRevision: snapshot.revision,
-    conflict: false,
   };
 }
 

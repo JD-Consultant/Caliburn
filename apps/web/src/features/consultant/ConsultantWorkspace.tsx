@@ -34,7 +34,6 @@ import {
   CurrentJobDocumentEditor,
   type CurrentJobDocumentEditorHandle,
 } from "./CurrentJobDocumentEditor";
-import { DocumentReviewPanel } from "./DocumentReviewPanel";
 import { InterviewWorkMap } from "./InterviewWorkMap";
 import {
   consultantRunStatus,
@@ -251,7 +250,7 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
           />
         }
         currentDocument={
-          <div className="mx-auto max-w-4xl space-y-6">
+          <div className="mx-auto max-w-4xl">
             <CurrentJobDocumentEditor
               key={documentId}
               ref={currentDocumentEditorRef}
@@ -259,11 +258,6 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
               snapshot={snapshot}
               mutationLocked={workspaceMutationLocked}
               onDirtyChange={setDocumentDirty}
-            />
-            <DocumentReviewPanel
-              documentId={documentId}
-              snapshot={snapshot}
-              mutationLocked={workspaceMutationLocked}
             />
           </div>
         }

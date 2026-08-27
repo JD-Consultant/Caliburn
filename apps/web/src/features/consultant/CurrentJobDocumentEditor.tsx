@@ -22,9 +22,11 @@ import {
   useCallback,
   useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from "react";
+import type { ReactNode } from "react";
 
 import {
   applyCurrentDocumentCommand,
@@ -46,6 +48,11 @@ import {
   type LifecycleConfirmation,
   LifecycleConfirmationDialog,
 } from "./DocumentLifecycleMenu";
+import { SemanticReviewPopover } from "./SemanticReviewPopover";
+import {
+  buildSemanticReviewIndex,
+  type ReviewDecoration,
+} from "./consultantWorkspaceModel";
 
 type CurrentDocument = ApprovedJobDocumentWrite;
 type Duty = CurrentDocument["duties"][number];
@@ -227,11 +234,91 @@ function byDisplayOrder<T extends { display_order: number }>(values: T[]): T[] {
   );
 }
 
+function reviewValue(value: unknown, path?: string): string {
+  if (value === null || value === undefined || value === "") return "未填寫";
+  if (path?.endsWith("/responsibility_role") && typeof value === "string") {
+    return (
+      {
+        primary: "主要負責",
+        shared: "共同負責",
+        assist: "協助",
+      }[value] ?? value
+    );
+  }
+  if (path?.endsWith("/competency_level") && typeof value === "number") {
+    return `L${value}`;
+  }
+  if (path?.endsWith("/display_order") && typeof value === "number") {
+    return `第 ${value + 1} 順位`;
+  }
+  if (typeof value === "boolean") return value ? "是" : "否";
+  if (Array.isArray(value)) {
+    const labels = value.map((item) => {
+      if (typeof item === "string" || typeof item === "number") {
+        return String(item);
+      }
+      if (item && typeof item === "object" && "name" in item) {
+        return String((item as { name: unknown }).name);
+      }
+      return "一項內容";
+    });
+    return labels.length ? labels.join("、") : "未填寫";
+  }
+  if (typeof value === "object") return "一項完整內容";
+  return String(value);
+}
+
+function primaryEntityReview(
+  decorations: ReviewDecoration[] | undefined,
+): ReviewDecoration | undefined {
+  if (!decorations?.length) return undefined;
+  return (
+    decorations.find((item) => item.operation === "add") ??
+    decorations.find((item) => item.operation === "move") ??
+    decorations.find((item) => item.operation === "update")
+  );
+}
+
+function ReviewFieldFrame({
+  review,
+  marker,
+  children,
+}: {
+  review?: ReviewDecoration;
+  marker?: ReactNode;
+  children: ReactNode;
+}) {
+  const currentReview = review && review.operation !== "delete" ? review : null;
+  return (
+    <div
+      data-review-current={currentReview ? "true" : undefined}
+      className={
+        currentReview
+          ? "rounded-xl border border-emerald-200 bg-emerald-50/45 p-2"
+          : undefined
+      }
+    >
+      {review?.operation === "update" || review?.operation === "delete" ? (
+        <p className="mb-2 rounded-lg bg-rose-50 px-3 py-2 text-xs leading-5 text-rose-800">
+          <span className="mr-2 font-semibold">
+            {review.operation === "delete" ? "AI 建議移除" : "原內容"}
+          </span>
+          <del>{reviewValue(review.baseline, review.path)}</del>
+        </p>
+      ) : null}
+      {marker ? <div className="mb-1 flex justify-end">{marker}</div> : null}
+      {children}
+    </div>
+  );
+}
+
 function TextField({
   label,
   value,
   multiline = false,
   readOnly,
+  review,
+  reviewMarker,
   onChange,
   onBlur,
 }: {
@@ -239,34 +326,38 @@ function TextField({
   value: string | null;
   multiline?: boolean;
   readOnly: boolean;
+  review?: ReviewDecoration;
+  reviewMarker?: ReactNode;
   onChange: (value: string) => void;
   onBlur: () => void;
 }) {
   const classes =
     "mt-1 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm leading-6 outline-none transition focus:border-blue-400 focus:ring-2 focus:ring-blue-100 read-only:bg-stone-50";
   return (
-    <label className="block text-xs font-medium text-stone-600">
-      {label}
-      {multiline ? (
-        <textarea
-          aria-label={label}
-          className={`${classes} min-h-24 resize-y`}
-          value={value ?? ""}
-          readOnly={readOnly}
-          onChange={(event) => onChange(event.target.value)}
-          onBlur={onBlur}
-        />
-      ) : (
-        <input
-          aria-label={label}
-          className={classes}
-          value={value ?? ""}
-          readOnly={readOnly}
-          onChange={(event) => onChange(event.target.value)}
-          onBlur={onBlur}
-        />
-      )}
-    </label>
+    <ReviewFieldFrame review={review} marker={reviewMarker}>
+      <label className="block text-xs font-medium text-stone-600">
+        {label}
+        {multiline ? (
+          <textarea
+            aria-label={label}
+            className={`${classes} min-h-24 resize-y`}
+            value={value ?? ""}
+            readOnly={readOnly}
+            onChange={(event) => onChange(event.target.value)}
+            onBlur={onBlur}
+          />
+        ) : (
+          <input
+            aria-label={label}
+            className={classes}
+            value={value ?? ""}
+            readOnly={readOnly}
+            onChange={(event) => onChange(event.target.value)}
+            onBlur={onBlur}
+          />
+        )}
+      </label>
+    </ReviewFieldFrame>
   );
 }
 
@@ -288,6 +379,10 @@ export const CurrentJobDocumentEditor = forwardRef<
   );
   const form = useForm({ defaultValues: formDefaultValues });
   const values = useStore(form.store, (state) => state.values);
+  const reviewIndex = useMemo(
+    () => buildSemanticReviewIndex(snapshot),
+    [snapshot],
+  );
   const valuesSerialized = serialized(values);
   const savedDocumentRef = useRef<CurrentDocument>(formDefaultValues);
   const guardsRef = useRef(authorityGuards(snapshot));
@@ -686,6 +781,146 @@ export const CurrentJobDocumentEditor = forwardRef<
   const controlsLocked =
     mutationLocked || structuralOperationPending || previewPending;
 
+  const reviewControl = (
+    review: ReviewDecoration | undefined,
+    label: string,
+  ) =>
+    review ? (
+      <SemanticReviewPopover
+        documentId={documentId}
+        snapshot={snapshot}
+        decoration={review}
+        mutationLocked={controlsLocked}
+        beforeDecision={flush}
+        triggerLabel={`審核${
+          review.operation === "add"
+            ? "新增"
+            : review.operation === "delete"
+              ? "移除"
+              : review.operation === "move"
+                ? "移動"
+                : "修改"
+        }：${label}`}
+      />
+    ) : null;
+
+  const reviewControls = (
+    reviews: Array<ReviewDecoration | undefined>,
+    label: string,
+  ) => {
+    const byGroup = new Map<string, ReviewDecoration>();
+    for (const review of reviews) {
+      if (review) byGroup.set(review.group.changesetId, review);
+    }
+    return [...byGroup.values()].map((review, index) => (
+      <span key={review.group.changesetId}>
+        {reviewControl(
+          review,
+          `${label}${byGroup.size > 1 ? `（第 ${index + 1} 組）` : ""}`,
+        )}
+      </span>
+    ));
+  };
+
+  const fieldReview = (path: string) => reviewIndex.byPath.get(path);
+
+  const approvedTasksById = new Map(
+    snapshot.approved_document.tasks.map((task) => [task.task_id, task]),
+  );
+  const approvedDutiesById = new Map(
+    snapshot.approved_document.duties.map((duty) => [duty.duty_id, duty]),
+  );
+  const approvedOpksById = new Map(
+    snapshot.approved_document.opks.map((item) => [item.item_id, item]),
+  );
+  const deletedDutyIds = new Set(
+    reviewIndex.deletedEntities.flatMap((review) => {
+      const parts = review.entityPath.split("/").filter(Boolean);
+      return parts[0] === "duties" && parts[1] ? [parts[1]] : [];
+    }),
+  );
+
+  const renderTaskGhost = (
+    task: ApprovedJobDocumentView["tasks"][number],
+    review: ReviewDecoration,
+    location: "from" | "deleted",
+  ) => {
+    const formerItems = byDisplayOrder(
+      snapshot.approved_document.opks.filter(
+        (item) =>
+          item.kind !== "attitude" && item.task_ids.includes(task.task_id),
+      ),
+    );
+    return (
+      <div
+        key={`${location}:${task.task_id}:${review.actionId}`}
+        data-review-operation={review.operation}
+        data-review-location={location}
+        data-task-id={task.task_id}
+        className="rounded-2xl border border-rose-200 bg-rose-50/55 p-4"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-[11px] font-semibold tracking-[0.12em] text-rose-600 uppercase">
+              {location === "from" ? "原位置" : "AI 建議移除"}
+            </p>
+            <p className="mt-1 text-sm font-semibold text-rose-900">
+              <del>{task.statement}</del>
+            </p>
+            {[task.frequency_text, task.responsibility_role]
+              .filter(Boolean)
+              .length ? (
+              <p className="mt-1 text-xs text-rose-700/80">
+                <del>
+                  {[task.frequency_text, task.responsibility_role]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </del>
+              </p>
+            ) : null}
+          </div>
+          {reviewControl(
+            review,
+            `${location === "from" ? "任務原位置" : "任務"} ${task.statement}`,
+          )}
+        </div>
+        {formerItems.length ? (
+          <ul className="mt-3 space-y-1 border-t border-rose-200/70 pt-3 text-xs text-rose-800">
+            {formerItems.map((item) => (
+              <li key={item.item_id}>
+                <del>
+                  {OPKS_LABELS[item.kind]}：{item.text}
+                </del>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+      </div>
+    );
+  };
+
+  const taskGhostsForDuty = (dutyId: string | null) => {
+    const moved = reviewIndex.movedTasks.flatMap((review) => {
+      if (review.fromDutyId !== dutyId || review.toDutyId === dutyId) return [];
+      const task = approvedTasksById.get(review.taskId);
+      return task ? [renderTaskGhost(task, review, "from")] : [];
+    });
+    const deleted = reviewIndex.deletedEntities.flatMap((review) => {
+      const parts = review.entityPath.split("/").filter(Boolean);
+      if (parts[0] !== "tasks" || !parts[1]) return [];
+      const task = approvedTasksById.get(parts[1]);
+      if (
+        !task ||
+        task.duty_id !== dutyId ||
+        (task.duty_id !== null && deletedDutyIds.has(task.duty_id))
+      ) {
+        return [];
+      }
+      return [renderTaskGhost(task, review, "deleted")];
+    });
+    return [...moved, ...deleted];
+  };
+
   const renderOpks = (task: Task) => {
     const taskItems = byDisplayOrder(
       values.opks.filter(
@@ -693,6 +928,19 @@ export const CurrentJobDocumentEditor = forwardRef<
           item.kind !== "attitude" && item.task_ids.includes(task.task_id),
       ),
     );
+    const deletedTaskItems = reviewIndex.deletedEntities.flatMap((review) => {
+      const parts = review.entityPath.split("/").filter(Boolean);
+      if (parts[0] !== "opks" || !parts[1]) return [];
+      const item = approvedOpksById.get(parts[1]);
+      if (
+        !item ||
+        item.kind === "attitude" ||
+        !item.task_ids.includes(task.task_id)
+      ) {
+        return [];
+      }
+      return [{ item, review }];
+    });
     const kindCounts = new Map<OpksKind, number>();
     return (
       <div className="space-y-2">
@@ -744,10 +992,24 @@ export const CurrentJobDocumentEditor = forwardRef<
               (candidate) => candidate.item_id === item.item_id,
             );
             const shared = item.kind === "knowledge" || item.kind === "skill";
+            const itemPath = `/opks/${item.item_id}`;
+            const itemEntityReviews = reviewIndex.byEntity.get(itemPath) ?? [];
+            const itemEntityReview = primaryEntityReview(itemEntityReviews);
+            const itemTextReview = fieldReview(`${itemPath}/text`);
+            const itemPlacementReview =
+              itemEntityReview?.operation === "add" ||
+              itemEntityReview?.operation === "move"
+                ? itemEntityReview
+                : undefined;
             return (
               <div
                 key={item.item_id}
-                className="grid gap-2 rounded-xl border border-stone-100 bg-stone-50/70 p-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_auto]"
+                data-review-operation={itemPlacementReview?.operation}
+                className={`grid gap-2 rounded-xl border p-3 sm:grid-cols-[4.5rem_minmax(0,1fr)_auto] ${
+                  itemPlacementReview
+                    ? "border-emerald-200 bg-emerald-50/45"
+                    : "border-stone-100 bg-stone-50/70"
+                }`}
               >
                 <span className="pt-2 text-xs font-semibold text-stone-500">
                   {
@@ -757,17 +1019,31 @@ export const CurrentJobDocumentEditor = forwardRef<
                   }{" "}
                   {ordinal}
                 </span>
-                <input
-                  aria-label={`${OPKS_LABELS[item.kind]} ${ordinal}`}
-                  className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm read-only:bg-stone-50"
-                  value={item.text}
-                  readOnly={controlsLocked}
-                  onChange={(event) =>
-                    updateOpks(item.item_id, { text: event.target.value })
-                  }
-                  onBlur={requestFlush}
-                />
+                <ReviewFieldFrame
+                  review={itemTextReview}
+                  marker={reviewControl(
+                    itemTextReview,
+                    `${OPKS_LABELS[item.kind]} ${ordinal}`,
+                  )}
+                >
+                  <input
+                    aria-label={`${OPKS_LABELS[item.kind]} ${ordinal}`}
+                    className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm read-only:bg-stone-50"
+                    value={item.text}
+                    readOnly={controlsLocked}
+                    onChange={(event) =>
+                      updateOpks(item.item_id, { text: event.target.value })
+                    }
+                    onBlur={requestFlush}
+                  />
+                </ReviewFieldFrame>
                 <div className="flex items-center gap-1">
+                  {reviewControls(
+                    itemEntityReviews.filter(
+                      (review) => review.path !== `${itemPath}/text`,
+                    ),
+                    `${OPKS_LABELS[item.kind]} ${ordinal}`,
+                  )}
                   <Button
                     type="button"
                     size="sm"
@@ -845,6 +1121,21 @@ export const CurrentJobDocumentEditor = forwardRef<
             );
           })
         )}
+        {deletedTaskItems.map(({ item, review }) => (
+          <div
+            key={`deleted-opks:${task.task_id}:${item.item_id}`}
+            data-review-operation="delete"
+            className="flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50/55 px-3 py-2"
+          >
+            <p className="text-sm text-rose-900">
+              <span className="mr-2 text-xs font-semibold text-rose-600">
+                {OPKS_LABELS[item.kind]}
+              </span>
+              <del>{item.text}</del>
+            </p>
+            {reviewControl(review, `${OPKS_LABELS[item.kind]} ${item.text}`)}
+          </div>
+        ))}
       </div>
     );
   };
@@ -853,18 +1144,43 @@ export const CurrentJobDocumentEditor = forwardRef<
     const siblingIndex = siblingTasks.findIndex(
       (candidate) => candidate.task_id === task.task_id,
     );
+    const taskPath = `/tasks/${task.task_id}`;
+    const taskEntityReviews = reviewIndex.byEntity.get(taskPath) ?? [];
+    const taskEntityReview = primaryEntityReview(taskEntityReviews);
+    const taskPlacementReview =
+      taskEntityReview?.operation === "add" ||
+      taskEntityReview?.operation === "move"
+        ? taskEntityReview
+        : undefined;
     return (
-      <CurrentDocumentSection
-        id={`task-${task.task_id}`}
+      <div
         key={task.task_id}
-        ariaLabel={`任務 ${ordinal} ${task.statement}`}
-        eyebrow={`任務 ${ordinal}`}
-        title={task.statement}
-        summary={[task.frequency_text, task.responsibility_role]
-          .filter(Boolean)
-          .join(" · ")}
-        actions={
-          <div className="flex items-center gap-1">
+        data-review-operation={taskPlacementReview?.operation}
+        className={
+          taskPlacementReview
+            ? "rounded-2xl ring-2 ring-emerald-200 ring-offset-2"
+            : undefined
+        }
+      >
+        <CurrentDocumentSection
+          id={`task-${task.task_id}`}
+          ariaLabel={`任務 ${ordinal} ${task.statement}`}
+          eyebrow={`任務 ${ordinal}`}
+          title={task.statement}
+          summary={[task.frequency_text, task.responsibility_role]
+            .filter(Boolean)
+            .join(" · ")}
+          actions={
+            <div className="flex items-center gap-1">
+              {reviewControls(
+                taskEntityReviews.filter(
+                  (review) =>
+                    review === taskPlacementReview ||
+                    review.path === taskPath ||
+                    review.path === `${taskPath}/display_order`,
+                ),
+                `任務 ${ordinal}`,
+              )}
             <Button
               type="button"
               size="sm"
@@ -918,15 +1234,20 @@ export const CurrentJobDocumentEditor = forwardRef<
                 },
               ]}
             />
-          </div>
-        }
-      >
-        <div className="space-y-5">
+            </div>
+          }
+        >
+          <div className="space-y-5">
           <div className="grid gap-3 sm:grid-cols-2">
             <TextField
               label={`任務 ${ordinal} 敘述`}
               value={task.statement}
               readOnly={controlsLocked}
+              review={fieldReview(`${taskPath}/statement`)}
+              reviewMarker={reviewControl(
+                fieldReview(`${taskPath}/statement`),
+                `任務 ${ordinal} 敘述`,
+              )}
               onChange={(statement) => updateTask(task.task_id, { statement })}
               onBlur={requestFlush}
             />
@@ -934,6 +1255,11 @@ export const CurrentJobDocumentEditor = forwardRef<
               label={`任務 ${ordinal} 動作`}
               value={task.action}
               readOnly={controlsLocked}
+              review={fieldReview(`${taskPath}/action`)}
+              reviewMarker={reviewControl(
+                fieldReview(`${taskPath}/action`),
+                `任務 ${ordinal} 動作`,
+              )}
               onChange={(action) => updateTask(task.task_id, { action })}
               onBlur={requestFlush}
             />
@@ -941,6 +1267,11 @@ export const CurrentJobDocumentEditor = forwardRef<
               label={`任務 ${ordinal} 對象`}
               value={task.object}
               readOnly={controlsLocked}
+              review={fieldReview(`${taskPath}/object`)}
+              reviewMarker={reviewControl(
+                fieldReview(`${taskPath}/object`),
+                `任務 ${ordinal} 對象`,
+              )}
               onChange={(object) => updateTask(task.task_id, { object })}
               onBlur={requestFlush}
             />
@@ -948,6 +1279,11 @@ export const CurrentJobDocumentEditor = forwardRef<
               label={`任務 ${ordinal} 目的／結果`}
               value={task.purpose_result}
               readOnly={controlsLocked}
+              review={fieldReview(`${taskPath}/purpose_result`)}
+              reviewMarker={reviewControl(
+                fieldReview(`${taskPath}/purpose_result`),
+                `任務 ${ordinal} 目的／結果`,
+              )}
               onChange={(purpose_result) =>
                 updateTask(task.task_id, {
                   purpose_result: purpose_result || null,
@@ -959,6 +1295,11 @@ export const CurrentJobDocumentEditor = forwardRef<
               label={`任務 ${ordinal} 情境`}
               value={task.context}
               readOnly={controlsLocked}
+              review={fieldReview(`${taskPath}/context`)}
+              reviewMarker={reviewControl(
+                fieldReview(`${taskPath}/context`),
+                `任務 ${ordinal} 情境`,
+              )}
               onChange={(context) =>
                 updateTask(task.task_id, { context: context || null })
               }
@@ -968,6 +1309,11 @@ export const CurrentJobDocumentEditor = forwardRef<
               label={`任務 ${ordinal} 頻率`}
               value={task.frequency_text}
               readOnly={controlsLocked}
+              review={fieldReview(`${taskPath}/frequency_text`)}
+              reviewMarker={reviewControl(
+                fieldReview(`${taskPath}/frequency_text`),
+                `任務 ${ordinal} 頻率`,
+              )}
               onChange={(frequency_text) =>
                 updateTask(task.task_id, {
                   frequency_text: frequency_text || null,
@@ -975,52 +1321,68 @@ export const CurrentJobDocumentEditor = forwardRef<
               }
               onBlur={requestFlush}
             />
-            <label className="block text-xs font-medium text-stone-600">
-              責任角色
-              <select
-                aria-label={`任務 ${ordinal} 責任角色`}
-                className="mt-1 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm"
-                value={task.responsibility_role ?? ""}
-                disabled={controlsLocked}
-                onChange={(event) =>
-                  updateTask(task.task_id, {
-                    responsibility_role:
-                      (event.target.value as Task["responsibility_role"]) ||
-                      null,
-                  })
-                }
-                onBlur={requestFlush}
-              >
-                <option value="">未設定</option>
-                <option value="primary">主要負責</option>
-                <option value="shared">共同負責</option>
-                <option value="assist">協助</option>
-              </select>
-            </label>
-            <label className="block text-xs font-medium text-stone-600">
-              任務能力級別 L（員工填寫）
-              <select
-                aria-label={`任務 ${ordinal} 能力級別 L`}
-                className="mt-1 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm"
-                value={task.competency_level ?? ""}
-                disabled={controlsLocked}
-                onChange={(event) =>
-                  updateTask(task.task_id, {
-                    competency_level: event.target.value
-                      ? Number(event.target.value)
-                      : null,
-                  })
-                }
-                onBlur={requestFlush}
-              >
-                <option value="">未設定</option>
-                {[1, 2, 3, 4, 5, 6].map((level) => (
-                  <option key={level} value={level}>
-                    L{level}
-                  </option>
-                ))}
-              </select>
-            </label>
+            <ReviewFieldFrame
+              review={fieldReview(`${taskPath}/responsibility_role`)}
+              marker={reviewControl(
+                fieldReview(`${taskPath}/responsibility_role`),
+                `任務 ${ordinal} 責任角色`,
+              )}
+            >
+              <label className="block text-xs font-medium text-stone-600">
+                責任角色
+                <select
+                  aria-label={`任務 ${ordinal} 責任角色`}
+                  className="mt-1 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm"
+                  value={task.responsibility_role ?? ""}
+                  disabled={controlsLocked}
+                  onChange={(event) =>
+                    updateTask(task.task_id, {
+                      responsibility_role:
+                        (event.target.value as Task["responsibility_role"]) ||
+                        null,
+                    })
+                  }
+                  onBlur={requestFlush}
+                >
+                  <option value="">未設定</option>
+                  <option value="primary">主要負責</option>
+                  <option value="shared">共同負責</option>
+                  <option value="assist">協助</option>
+                </select>
+              </label>
+            </ReviewFieldFrame>
+            <ReviewFieldFrame
+              review={fieldReview(`${taskPath}/competency_level`)}
+              marker={reviewControl(
+                fieldReview(`${taskPath}/competency_level`),
+                `任務 ${ordinal} 能力級別 L`,
+              )}
+            >
+              <label className="block text-xs font-medium text-stone-600">
+                任務能力級別 L（員工填寫）
+                <select
+                  aria-label={`任務 ${ordinal} 能力級別 L`}
+                  className="mt-1 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm"
+                  value={task.competency_level ?? ""}
+                  disabled={controlsLocked}
+                  onChange={(event) =>
+                    updateTask(task.task_id, {
+                      competency_level: event.target.value
+                        ? Number(event.target.value)
+                        : null,
+                    })
+                  }
+                  onBlur={requestFlush}
+                >
+                  <option value="">未設定</option>
+                  {[1, 2, 3, 4, 5, 6].map((level) => (
+                    <option key={level} value={level}>
+                      L{level}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </ReviewFieldFrame>
           </div>
 
           <label className="block text-xs font-medium text-stone-600">
@@ -1047,7 +1409,14 @@ export const CurrentJobDocumentEditor = forwardRef<
             </select>
           </label>
 
-          <div className="rounded-xl border border-stone-100 bg-stone-50 p-3">
+          <ReviewFieldFrame
+            review={fieldReview(`${taskPath}/enablers`)}
+            marker={reviewControl(
+              fieldReview(`${taskPath}/enablers`),
+              `任務 ${ordinal} 工具／方法／促成條件`,
+            )}
+          >
+            <div className="rounded-xl border border-stone-100 bg-stone-50 p-3">
             <div className="flex items-center justify-between gap-3">
               <p className="text-xs font-semibold text-stone-600">
                 工具／方法／促成條件
@@ -1127,10 +1496,12 @@ export const CurrentJobDocumentEditor = forwardRef<
                 </div>
               ))}
             </div>
+            </div>
+          </ReviewFieldFrame>
+            {renderOpks(task)}
           </div>
-          {renderOpks(task)}
-        </div>
-      </CurrentDocumentSection>
+        </CurrentDocumentSection>
+      </div>
     );
   };
 
@@ -1230,6 +1601,11 @@ export const CurrentJobDocumentEditor = forwardRef<
             label="職務名稱"
             value={values.job_title}
             readOnly={controlsLocked}
+            review={fieldReview("/job_title")}
+            reviewMarker={reviewControl(
+              fieldReview("/job_title"),
+              "職務名稱",
+            )}
             onChange={(value) => patchHeader("job_title", value)}
             onBlur={requestFlush}
           />
@@ -1237,6 +1613,11 @@ export const CurrentJobDocumentEditor = forwardRef<
             label="職類名稱"
             value={values.occupation_category_name}
             readOnly={controlsLocked}
+            review={fieldReview("/occupation_category_name")}
+            reviewMarker={reviewControl(
+              fieldReview("/occupation_category_name"),
+              "職類名稱",
+            )}
             onChange={(value) => patchHeader("occupation_category_name", value)}
             onBlur={requestFlush}
           />
@@ -1244,6 +1625,11 @@ export const CurrentJobDocumentEditor = forwardRef<
             label="職業名稱"
             value={values.occupation_name}
             readOnly={controlsLocked}
+            review={fieldReview("/occupation_name")}
+            reviewMarker={reviewControl(
+              fieldReview("/occupation_name"),
+              "職業名稱",
+            )}
             onChange={(value) => patchHeader("occupation_name", value)}
             onBlur={requestFlush}
           />
@@ -1251,6 +1637,11 @@ export const CurrentJobDocumentEditor = forwardRef<
             label="職業代碼"
             value={values.occupation_code}
             readOnly={controlsLocked}
+            review={fieldReview("/occupation_code")}
+            reviewMarker={reviewControl(
+              fieldReview("/occupation_code"),
+              "職業代碼",
+            )}
             onChange={(value) => patchHeader("occupation_code", value)}
             onBlur={requestFlush}
           />
@@ -1258,6 +1649,11 @@ export const CurrentJobDocumentEditor = forwardRef<
             label="行業名稱"
             value={values.industry_name}
             readOnly={controlsLocked}
+            review={fieldReview("/industry_name")}
+            reviewMarker={reviewControl(
+              fieldReview("/industry_name"),
+              "行業名稱",
+            )}
             onChange={(value) => patchHeader("industry_name", value)}
             onBlur={requestFlush}
           />
@@ -1265,38 +1661,56 @@ export const CurrentJobDocumentEditor = forwardRef<
             label="行業代碼"
             value={values.industry_code}
             readOnly={controlsLocked}
+            review={fieldReview("/industry_code")}
+            reviewMarker={reviewControl(
+              fieldReview("/industry_code"),
+              "行業代碼",
+            )}
             onChange={(value) => patchHeader("industry_code", value)}
             onBlur={requestFlush}
           />
-          <label className="block text-xs font-medium text-stone-600">
-            文件能力級別 L（員工填寫）
-            <select
-              aria-label="文件能力級別 L"
-              className="mt-1 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm"
-              value={values.competency_level ?? ""}
-              disabled={controlsLocked}
-              onChange={(event) =>
-                form.setFieldValue(
-                  "competency_level",
-                  event.target.value ? Number(event.target.value) : null,
-                )
-              }
-              onBlur={requestFlush}
-            >
-              <option value="">未設定</option>
-              {[1, 2, 3, 4, 5, 6].map((level) => (
-                <option key={level} value={level}>
-                  L{level}
-                </option>
-              ))}
-            </select>
-          </label>
+          <ReviewFieldFrame
+            review={fieldReview("/competency_level")}
+            marker={reviewControl(
+              fieldReview("/competency_level"),
+              "文件能力級別 L",
+            )}
+          >
+            <label className="block text-xs font-medium text-stone-600">
+              文件能力級別 L（員工填寫）
+              <select
+                aria-label="文件能力級別 L"
+                className="mt-1 w-full rounded-xl border border-stone-200 bg-white px-3 py-2 text-sm"
+                value={values.competency_level ?? ""}
+                disabled={controlsLocked}
+                onChange={(event) =>
+                  form.setFieldValue(
+                    "competency_level",
+                    event.target.value ? Number(event.target.value) : null,
+                  )
+                }
+                onBlur={requestFlush}
+              >
+                <option value="">未設定</option>
+                {[1, 2, 3, 4, 5, 6].map((level) => (
+                  <option key={level} value={level}>
+                    L{level}
+                  </option>
+                ))}
+              </select>
+            </label>
+          </ReviewFieldFrame>
           <div className="sm:col-span-2">
             <TextField
               label="工作描述"
               value={values.work_description}
               multiline
               readOnly={controlsLocked}
+              review={fieldReview("/work_description")}
+              reviewMarker={reviewControl(
+                fieldReview("/work_description"),
+                "工作描述",
+              )}
               onChange={(value) => patchHeader("work_description", value)}
               onBlur={requestFlush}
             />
@@ -1307,6 +1721,8 @@ export const CurrentJobDocumentEditor = forwardRef<
               value={values.notes}
               multiline
               readOnly={controlsLocked}
+              review={fieldReview("/notes")}
+              reviewMarker={reviewControl(fieldReview("/notes"), "備註")}
               onChange={(value) => patchHeader("notes", value)}
               onBlur={requestFlush}
             />
@@ -1338,16 +1754,39 @@ export const CurrentJobDocumentEditor = forwardRef<
         const dutyTasks = orderedTasks.filter(
           (task) => task.duty_id === duty.duty_id,
         );
+        const dutyPath = `/duties/${duty.duty_id}`;
+        const dutyEntityReviews = reviewIndex.byEntity.get(dutyPath) ?? [];
+        const dutyEntityReview = primaryEntityReview(dutyEntityReviews);
+        const dutyPlacementReview =
+          dutyEntityReview?.operation === "add" ? dutyEntityReview : undefined;
+        const dutyTaskGhosts = taskGhostsForDuty(duty.duty_id);
         return (
-          <CurrentDocumentSection
-            id={`duty-${duty.duty_id}`}
+          <div
             key={duty.duty_id}
-            ariaLabel={`職責 ${dutyIndex + 1} ${duty.statement}`}
-            eyebrow={`職責 ${dutyIndex + 1}`}
-            title={duty.statement}
-            summary={`${dutyTasks.length} 項任務`}
-            actions={
-              <div className="flex items-center gap-1">
+            data-review-operation={dutyPlacementReview?.operation}
+            className={
+              dutyPlacementReview
+                ? "rounded-2xl ring-2 ring-emerald-200 ring-offset-2"
+                : undefined
+            }
+          >
+            <CurrentDocumentSection
+              id={`duty-${duty.duty_id}`}
+              ariaLabel={`職責 ${dutyIndex + 1} ${duty.statement}`}
+              eyebrow={`職責 ${dutyIndex + 1}`}
+              title={duty.statement}
+              summary={`${dutyTasks.length} 項任務`}
+              actions={
+                <div className="flex items-center gap-1">
+                  {reviewControls(
+                    dutyEntityReviews.filter(
+                      (review) =>
+                        review === dutyPlacementReview ||
+                        review.path === dutyPath ||
+                        review.path === `${dutyPath}/display_order`,
+                    ),
+                    `職責 ${dutyIndex + 1}`,
+                  )}
                 <Button
                   type="button"
                   size="sm"
@@ -1418,19 +1857,24 @@ export const CurrentJobDocumentEditor = forwardRef<
                     },
                   ]}
                 />
-              </div>
-            }
-          >
-            <div className="space-y-4">
-              <TextField
-                label={`職責 ${dutyIndex + 1} 名稱`}
-                value={duty.statement}
-                readOnly={controlsLocked}
-                onChange={(statement) =>
-                  updateDuty(duty.duty_id, { statement })
-                }
-                onBlur={requestFlush}
-              />
+                </div>
+              }
+            >
+              <div className="space-y-4">
+                <TextField
+                  label={`職責 ${dutyIndex + 1} 名稱`}
+                  value={duty.statement}
+                  readOnly={controlsLocked}
+                  review={fieldReview(`${dutyPath}/statement`)}
+                  reviewMarker={reviewControl(
+                    fieldReview(`${dutyPath}/statement`),
+                    `職責 ${dutyIndex + 1} 名稱`,
+                  )}
+                  onChange={(statement) =>
+                    updateDuty(duty.duty_id, { statement })
+                  }
+                  onBlur={requestFlush}
+                />
               <div className="flex justify-end">
                 <Button
                   type="button"
@@ -1451,19 +1895,61 @@ export const CurrentJobDocumentEditor = forwardRef<
                   <Plus /> 在職責 {dutyIndex + 1} 新增任務
                 </Button>
               </div>
-              <div className="space-y-3">
-                {dutyTasks.map((task, taskIndex) =>
-                  renderTask(task, taskIndex + 1, dutyTasks),
-                )}
-                {dutyTasks.length === 0 ? (
-                  <p className="rounded-xl border border-dashed border-stone-200 px-4 py-6 text-center text-sm text-stone-500">
-                    這項職責尚未有任務。
-                  </p>
-                ) : null}
+                <div className="space-y-3">
+                  {dutyTasks.map((task, taskIndex) =>
+                    renderTask(task, taskIndex + 1, dutyTasks),
+                  )}
+                  {dutyTaskGhosts}
+                  {dutyTasks.length === 0 && dutyTaskGhosts.length === 0 ? (
+                    <p className="rounded-xl border border-dashed border-stone-200 px-4 py-6 text-center text-sm text-stone-500">
+                      這項職責尚未有任務。
+                    </p>
+                  ) : null}
+                </div>
               </div>
-            </div>
-          </CurrentDocumentSection>
+            </CurrentDocumentSection>
+          </div>
         );
+      })}
+
+      {reviewIndex.deletedEntities.flatMap((review) => {
+        const parts = review.entityPath.split("/").filter(Boolean);
+        if (parts[0] !== "duties" || !parts[1]) return [];
+        const duty = approvedDutiesById.get(parts[1]);
+        if (!duty) return [];
+        const formerTasks = byDisplayOrder(
+          snapshot.approved_document.tasks.filter(
+            (task) => task.duty_id === duty.duty_id,
+          ),
+        );
+        return [
+          <div
+            key={`deleted-duty:${duty.duty_id}`}
+            data-review-operation="delete"
+            className="rounded-2xl border border-rose-200 bg-rose-50/55 p-4"
+          >
+            <div className="flex items-start justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold tracking-[0.12em] text-rose-600 uppercase">
+                  AI 建議移除職責
+                </p>
+                <p className="mt-1 text-sm font-semibold text-rose-900">
+                  <del>{duty.statement}</del>
+                </p>
+              </div>
+              {reviewControl(review, `職責 ${duty.statement}`)}
+            </div>
+            {formerTasks.length ? (
+              <ul className="mt-3 space-y-2 border-t border-rose-200/70 pt-3">
+                {formerTasks.map((task) => (
+                  <li key={task.task_id} className="text-sm text-rose-800">
+                    <del>{task.statement}</del>
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </div>,
+        ];
       })}
 
       <CurrentDocumentSection
@@ -1496,6 +1982,7 @@ export const CurrentJobDocumentEditor = forwardRef<
           {orderedTasks
             .filter((task) => task.duty_id === null)
             .map((task, index, tasks) => renderTask(task, index + 1, tasks))}
+          {taskGhostsForDuty(null)}
         </div>
       </CurrentDocumentSection>
 
@@ -1522,25 +2009,53 @@ export const CurrentJobDocumentEditor = forwardRef<
               <Plus /> 新增態度 A
             </Button>
           </div>
-          {attitudes.map((item, index) => (
-            <div
-              key={item.item_id}
-              className="grid gap-2 sm:grid-cols-[4rem_minmax(0,1fr)_auto]"
-            >
-              <span className="pt-2 text-xs font-semibold text-stone-500">
-                A {index + 1}
-              </span>
-              <input
-                aria-label={`態度 A ${index + 1}`}
-                className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm read-only:bg-stone-50"
-                value={item.text}
-                readOnly={controlsLocked}
-                onChange={(event) =>
-                  updateOpks(item.item_id, { text: event.target.value })
-                }
-                onBlur={requestFlush}
-              />
-              <div className="flex items-center gap-1">
+          {attitudes.map((item, index) => {
+            const itemPath = `/opks/${item.item_id}`;
+            const itemEntityReviews = reviewIndex.byEntity.get(itemPath) ?? [];
+            const itemEntityReview = primaryEntityReview(itemEntityReviews);
+            const itemTextReview = fieldReview(`${itemPath}/text`);
+            const itemPlacementReview =
+              itemEntityReview?.operation === "add"
+                ? itemEntityReview
+                : undefined;
+            return (
+              <div
+                key={item.item_id}
+                data-review-operation={itemPlacementReview?.operation}
+                className={`grid gap-2 rounded-xl p-2 sm:grid-cols-[4rem_minmax(0,1fr)_auto] ${
+                  itemPlacementReview
+                    ? "border border-emerald-200 bg-emerald-50/45"
+                    : ""
+                }`}
+              >
+                <span className="pt-2 text-xs font-semibold text-stone-500">
+                  A {index + 1}
+                </span>
+                <ReviewFieldFrame
+                  review={itemTextReview}
+                  marker={reviewControl(
+                    itemTextReview,
+                    `態度 A ${index + 1}`,
+                  )}
+                >
+                  <input
+                    aria-label={`態度 A ${index + 1}`}
+                    className="w-full rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm read-only:bg-stone-50"
+                    value={item.text}
+                    readOnly={controlsLocked}
+                    onChange={(event) =>
+                      updateOpks(item.item_id, { text: event.target.value })
+                    }
+                    onBlur={requestFlush}
+                  />
+                </ReviewFieldFrame>
+                <div className="flex items-center gap-1">
+                  {reviewControls(
+                    itemEntityReviews.filter(
+                      (review) => review.path !== `${itemPath}/text`,
+                    ),
+                    `態度 A ${index + 1}`,
+                  )}
                 <Button
                   type="button"
                   size="sm"
@@ -1592,9 +2107,29 @@ export const CurrentJobDocumentEditor = forwardRef<
                 >
                   <Trash2 />
                 </Button>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
+          {reviewIndex.deletedEntities.flatMap((review) => {
+            const parts = review.entityPath.split("/").filter(Boolean);
+            if (parts[0] !== "opks" || !parts[1]) return [];
+            const item = approvedOpksById.get(parts[1]);
+            if (!item || item.kind !== "attitude") return [];
+            return [
+              <div
+                key={`deleted-attitude:${item.item_id}`}
+                data-review-operation="delete"
+                className="flex items-center justify-between gap-3 rounded-xl border border-rose-200 bg-rose-50/55 px-3 py-2"
+              >
+                <p className="text-sm text-rose-900">
+                  <span className="mr-2 text-xs font-semibold">態度 A</span>
+                  <del>{item.text}</del>
+                </p>
+                {reviewControl(review, `態度 A ${item.text}`)}
+              </div>,
+            ];
+          })}
         </div>
       </CurrentDocumentSection>
 
@@ -1628,6 +2163,10 @@ export const CurrentJobDocumentEditor = forwardRef<
             const availableTasks = orderedTasks.filter(
               (task) => !item.task_ids.includes(task.task_id),
             );
+            const itemPath = `/opks/${item.item_id}`;
+            const structuralReviews = (
+              reviewIndex.byEntity.get(itemPath) ?? []
+            ).filter((review) => review.path !== `${itemPath}/text`);
             return (
               <div
                 key={item.item_id}
@@ -1645,30 +2184,36 @@ export const CurrentJobDocumentEditor = forwardRef<
                         : "目前未連結任何任務"}
                     </p>
                   </div>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="ghost"
-                    aria-label={`永久刪除${item.text}`}
-                    disabled={controlsLocked}
-                    onClick={() =>
-                      void previewHighImpact(
-                        {
-                          operation: "delete_shared_opks",
-                          item_id: item.item_id,
-                          preview_digest: null,
-                        },
-                        {
-                          title: `永久刪除「${item.text}」？`,
-                          description:
-                            "這會從所有任務移除同一個共用項目；若只是不屬於某項任務，請在該任務內解除連結。",
-                          confirmLabel: "永久刪除",
-                        },
-                      )
-                    }
-                  >
-                    <Trash2 />
-                  </Button>
+                  <div className="flex items-center gap-1">
+                    {reviewControls(
+                      structuralReviews,
+                      `${OPKS_LABELS[item.kind]} ${item.text}`,
+                    )}
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="ghost"
+                      aria-label={`永久刪除${item.text}`}
+                      disabled={controlsLocked}
+                      onClick={() =>
+                        void previewHighImpact(
+                          {
+                            operation: "delete_shared_opks",
+                            item_id: item.item_id,
+                            preview_digest: null,
+                          },
+                          {
+                            title: `永久刪除「${item.text}」？`,
+                            description:
+                              "這會從所有任務移除同一個共用項目；若只是不屬於某項任務，請在該任務內解除連結。",
+                            confirmLabel: "永久刪除",
+                          },
+                        )
+                      }
+                    >
+                      <Trash2 />
+                    </Button>
+                  </div>
                 </div>
                 {availableTasks.length ? (
                   <label className="mt-3 flex items-center gap-2 text-xs text-stone-500">

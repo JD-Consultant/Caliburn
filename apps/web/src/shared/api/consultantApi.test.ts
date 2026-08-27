@@ -7,7 +7,6 @@ import {
   decideUnderstandingCalibration,
   deleteConsultantDocument,
   editCurrentDocument,
-  editApprovedDocument,
   exportConsultantDocument,
   getConsultantSnapshot,
   listConsultantDocuments,
@@ -106,7 +105,7 @@ describe("purpose-first consultant API client", () => {
     });
   });
 
-  it("keeps review, calibration, clarification and direct edit as distinct employee commands", async () => {
+  it("keeps review, calibration and clarification as distinct employee commands", async () => {
     const fetchMock = vi
       .fn()
       .mockImplementation(() =>
@@ -134,28 +133,10 @@ describe("purpose-first consultant API client", () => {
     await answerRequiredClarification(DOCUMENT_ID, ENTITY_ID, "clarify-1", 3, {
       text: "最後由我核准",
     });
-    await editApprovedDocument(DOCUMENT_ID, "edit-1", 3, {
-      schema_version: 1,
-      document_id: DOCUMENT_ID,
-      job_title: "採購專員",
-      occupation_category_name: null,
-      occupation_name: null,
-      occupation_code: null,
-      industry_name: null,
-      industry_code: null,
-      work_description: null,
-      competency_level: null,
-      notes: null,
-      duties: [],
-      tasks: [],
-      opks: [],
-    });
-
     expect(fetchMock.mock.calls.map((call) => call[0])).toEqual([
       `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/reviews/${ENTITY_ID}`,
       `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/calibrations/${ENTITY_ID}`,
       `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/clarifications/${ENTITY_ID}`,
-      `http://127.0.0.1:8001/api/v1/job-analysis/consultant-documents/${DOCUMENT_ID}/approved-document`,
     ]);
     for (const call of fetchMock.mock.calls) {
       expect(call[1].headers).toMatchObject({ "X-Expected-Revision": "3" });

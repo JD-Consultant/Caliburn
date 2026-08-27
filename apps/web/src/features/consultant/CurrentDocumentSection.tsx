@@ -49,7 +49,7 @@ export function CurrentDocumentSection({
             ) : null}
           </div>
           {actions ? (
-            <div onClick={(event) => event.preventDefault()}>{actions}</div>
+            <div onClick={(event) => event.stopPropagation()}>{actions}</div>
           ) : null}
           <ChevronDown className="size-4 shrink-0 text-stone-400" />
         </summary>

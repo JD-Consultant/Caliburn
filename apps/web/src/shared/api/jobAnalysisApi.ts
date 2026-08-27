@@ -192,22 +192,6 @@ export function answerRequiredClarification(
   );
 }
 
-export function editApprovedDocument(
-  documentId: string,
-  idempotencyKey: string,
-  expectedRevision: number,
-  document: ApprovedJobDocumentWrite,
-): Promise<ConsultantSnapshotView> {
-  return request<ConsultantSnapshotView>(
-    `/consultant-documents/${documentId}/approved-document`,
-    {
-      method: "PUT",
-      headers: commandHeaders(idempotencyKey, expectedRevision),
-      body: JSON.stringify({ document }),
-    },
-  );
-}
-
 function currentDocumentCommandBody(
   guards: CurrentDocumentAuthorityGuards,
   command: CurrentDocumentCommand,

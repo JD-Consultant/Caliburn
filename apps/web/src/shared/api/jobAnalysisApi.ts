@@ -151,17 +151,14 @@ export function decideUnderstandingCalibration(
   documentId: string,
   calibrationId: string,
   idempotencyKey: string,
-  expectedRevision: number | null,
+  expectedRevision: number,
   decision: UnderstandingCalibrationDecisionWrite,
-): Promise<ConsultantSnapshotView | ConsultantRunAccepted> {
-  return request<ConsultantSnapshotView | ConsultantRunAccepted>(
+): Promise<ConsultantSnapshotView> {
+  return request<ConsultantSnapshotView>(
     `/consultant-documents/${documentId}/calibrations/${calibrationId}`,
     {
       method: "POST",
-      headers:
-        expectedRevision === null
-          ? mutationHeaders(idempotencyKey)
-          : commandHeaders(idempotencyKey, expectedRevision),
+      headers: commandHeaders(idempotencyKey, expectedRevision),
       body: JSON.stringify(decision),
     },
   );

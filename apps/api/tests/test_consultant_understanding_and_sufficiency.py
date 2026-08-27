@@ -204,7 +204,6 @@ async def test_understanding_is_always_visible_and_calibration_is_triggered_by_i
     assert snapshot.understanding_projection.calibration.kind == "soft"
     assert snapshot.understanding_projection.calibration.allowed_actions == (
         "confirm",
-        "direct_correction",
         "later",
     )
 

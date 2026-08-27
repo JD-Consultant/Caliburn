@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime, timedelta
 from decimal import Decimal
 from uuid import UUID, uuid4
 
 import pytest
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage
 
 from app.consultant.context import (
     ContextRequest,
@@ -26,6 +27,7 @@ from app.consultant.state import (
     EmployeeSourceKind,
     SourceProcessingStatus,
     SourceValidity,
+    UnderstandingItem,
     initial_thread_state,
 )
 from app.consultant.views import (
@@ -96,6 +98,7 @@ def _source(
     source_id: UUID = SOURCE_ID,
     text: str = "我會先檢查缺料，再依交期安排採購。",
     validity: SourceValidity = SourceValidity.CURRENT,
+    created_at: datetime | None = None,
 ) -> EmployeeSource:
     return EmployeeSource.pending(
         source_id=source_id,
@@ -106,6 +109,7 @@ def _source(
         update={
             "processing_status": SourceProcessingStatus.COMMITTED,
             "validity": validity,
+            **({"created_at": created_at} if created_at is not None else {}),
         }
     )
 
@@ -308,17 +312,45 @@ async def test_context_rejects_superseded_current_employee_turn() -> None:
 
 
 @pytest.mark.asyncio
-async def test_context_does_not_fetch_or_claim_recent_source_payloads() -> None:
-    current = _source()
-    recent_sources = (
-        _source(source_id=uuid4(), text="歷史來源一：曾經負責月度盤點。"),
-        _source(source_id=uuid4(), text="歷史來源二：曾經協助供應商評估。"),
+async def test_context_keeps_ordinary_correction_as_immutable_recent_dialogue() -> None:
+    started = datetime(2026, 8, 27, tzinfo=UTC)
+    older = _source(
+        source_id=uuid4(),
+        text="我每月整理採購需求。",
+        created_at=started,
     )
-    runtime = InMemorySourceRuntime((current, *recent_sources))
+    current = _source(
+        text="我剛才說錯，是每週整理。",
+        created_at=started + timedelta(minutes=1),
+    )
+    consultant_turn = ConsultantTurnProjection(
+        run_id=uuid4(),
+        answer_source_id=older.source_id,
+        text="了解，目前先記為每月整理。",
+        used_skill_ids=(),
+    )
+    understanding = UnderstandingItem(
+        understanding_id=uuid4(),
+        version_id=uuid4(),
+        kind="work_story",
+        text="員工會定期整理採購需求。",
+        source_ids=(older.source_id,),
+        created_revision=2,
+    )
+    snapshot = _snapshot(_document(), current).model_copy(
+        update={
+            "source_count": 2,
+            "messages": (consultant_turn,),
+            "understanding": {
+                str(understanding.version_id): understanding.model_dump(mode="json")
+            },
+        }
+    )
+    runtime = InMemorySourceRuntime((older, current))
 
     bundle = await build_consultant_context(
         runtime=runtime,  # type: ignore[arg-type]
-        snapshot=_snapshot(_document(), current),
+        snapshot=snapshot,
         execution=_execution(),
         request=ContextRequest(
             run_id=RUN_ID,
@@ -332,25 +364,50 @@ async def test_context_does_not_fetch_or_claim_recent_source_payloads() -> None:
     assert [item.source_id for item in bundle.receipt.loaded_sources] == [
         current.source_id
     ]
-    assert "omitted_sources" not in bundle.receipt.model_dump(mode="json")
-    assert bundle.messages[0].content == current.text
-    assert recent_sources[0].text not in bundle.system_prompt
-    assert recent_sources[1].text not in bundle.system_prompt
+    assert [type(message) for message in bundle.messages] == [
+        HumanMessage,
+        AIMessage,
+        HumanMessage,
+    ]
+    assert [message.content for message in bundle.messages] == [
+        older.text,
+        consultant_turn.text,
+        current.text,
+    ]
+    assert sum(message.content == current.text for message in bundle.messages) == 1
+    assert older.validity is SourceValidity.CURRENT
+    assert older.superseded_by_source_id is None
+    assert current.supersedes_source_id is None
+    assert understanding.text in bundle.system_prompt
 
 
 @pytest.mark.asyncio
 async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> None:
     document = _document()
-    source = _source()
+    started = datetime(2026, 8, 27, tzinfo=UTC)
+    old_source = _source(
+        source_id=uuid4(),
+        text="較早員工回答：我先整理職務範圍與責任邊界。",
+        created_at=started,
+    )
+    latest_source = _source(
+        source_id=uuid4(),
+        text="近期員工回答：缺料時由我判斷是否先採購。",
+        created_at=started + timedelta(minutes=1),
+    )
+    source = _source(
+        text="本輪補充：重大缺料會通知主管。",
+        created_at=started + timedelta(minutes=2),
+    )
     older = ConsultantTurnProjection(
         run_id=uuid4(),
-        answer_source_id=uuid4(),
+        answer_source_id=old_source.source_id,
         text="較早顧問回覆：先整理職務範圍與責任邊界。",
         used_skill_ids=(),
     )
     latest = ConsultantTurnProjection(
         run_id=uuid4(),
-        answer_source_id=uuid4(),
+        answer_source_id=latest_source.source_id,
         text="最新顧問回覆：請確認缺料處理的決策責任。",
         used_skill_ids=(),
     )
@@ -358,10 +415,8 @@ async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> N
     two_turns = _snapshot(document, source).model_copy(
         update={"messages": (older, latest)}
     )
-    runtime = InMemorySourceRuntime((source,))
-
     one_turn_bundle = await build_consultant_context(
-        runtime=runtime,  # type: ignore[arg-type]
+        runtime=InMemorySourceRuntime((latest_source, source)),  # type: ignore[arg-type]
         snapshot=one_turn,
         execution=_execution(),
         request=ContextRequest(
@@ -372,7 +427,7 @@ async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> N
         ),
     )
     two_turn_bundle = await build_consultant_context(
-        runtime=runtime,  # type: ignore[arg-type]
+        runtime=InMemorySourceRuntime((old_source, latest_source, source)),  # type: ignore[arg-type]
         snapshot=two_turns,
         execution=_execution(),
         request=ContextRequest(
@@ -387,7 +442,7 @@ async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> N
     assert two_turn_bundle.receipt.total_input_tokens > budget
 
     compacted = await build_consultant_context(
-        runtime=runtime,  # type: ignore[arg-type]
+        runtime=InMemorySourceRuntime((old_source, latest_source, source)),  # type: ignore[arg-type]
         snapshot=two_turns,
         execution=_execution(max_context_tokens=budget),
         request=ContextRequest(
@@ -398,10 +453,12 @@ async def test_context_drops_only_oldest_recent_turn_when_budget_requires() -> N
         ),
     )
 
-    assert "recent_consultant_turns" in compacted.receipt.degraded_sections
-    assert latest.text in compacted.system_prompt
-    assert older.text not in compacted.system_prompt
-    assert compacted.messages[0].content == source.text
+    assert "recent_dialogue" in compacted.receipt.degraded_sections
+    assert [message.content for message in compacted.messages] == [
+        latest_source.text,
+        latest.text,
+        source.text,
+    ]
 
 
 @pytest.mark.asyncio

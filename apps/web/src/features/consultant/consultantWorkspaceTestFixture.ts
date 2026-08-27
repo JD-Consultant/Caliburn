@@ -123,7 +123,7 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
         status: "pending",
         affected_work_ids: [WORK_ID],
         changed_understanding_ids: ["00000000-0000-0000-0000-000000000009"],
-        allowed_actions: ["confirm", "direct_correction", "later"],
+        allowed_actions: ["confirm", "later"],
       },
     },
     semantic_progress: {
@@ -168,9 +168,6 @@ export function consultantSnapshotFixture(): ConsultantSnapshotView {
         text: "我每月會追查差異。",
         created_at: "2026-08-14T10:00:00Z",
         processing_status: "committed",
-        validity: "current",
-        supersedes_source_id: null,
-        superseded_by_source_id: null,
       },
     ],
     messages: [

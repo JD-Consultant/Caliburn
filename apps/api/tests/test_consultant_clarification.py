@@ -386,7 +386,6 @@ async def test_required_clarification_survives_restart_and_answer_is_only_eviden
     resumed = await restarted.ainvoke(
         Command(
             resume={
-                "choice": "低於安全庫存",
                 "text": "低於安全庫存時才由我建立請購單。",
                 "source_reference": _source_reference(
                     clarification_source
@@ -424,7 +423,6 @@ async def test_clarification_answer_cannot_smuggle_document_acceptance() -> None
     with pytest.raises(ValueError):
         ClarificationAnswer.model_validate(
             {
-                "choice": "由我負責",
                 "text": "由我負責。",
                 "source_reference": _source_reference(source_id).model_dump(mode="json"),
                 "accept_changeset_id": str(uuid4()),

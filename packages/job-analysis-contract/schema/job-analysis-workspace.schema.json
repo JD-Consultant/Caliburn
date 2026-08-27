@@ -42,12 +42,7 @@
       "additionalProperties": false,
       "required": ["text"],
       "properties": {
-        "text": { "type": "string", "minLength": 1 },
-        "supersedes_source_id": {
-          "type": ["string", "null"],
-          "format": "uuid",
-          "default": null
-        }
+        "text": { "type": "string", "minLength": 1 }
       }
     },
     "ConsultantRunStatus": {
@@ -107,15 +102,12 @@
     "EmployeeMessageView": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["source_id", "text", "created_at", "processing_status", "validity", "supersedes_source_id", "superseded_by_source_id"],
+      "required": ["source_id", "text", "created_at", "processing_status"],
       "properties": {
         "source_id": { "type": "string", "format": "uuid" },
         "text": { "type": "string" },
         "created_at": { "type": "string", "format": "date-time" },
-        "processing_status": { "type": "string", "enum": ["pending", "committed"] },
-        "validity": { "type": "string", "enum": ["current", "superseded"] },
-        "supersedes_source_id": { "type": ["string", "null"], "format": "uuid" },
-        "superseded_by_source_id": { "type": ["string", "null"], "format": "uuid" }
+        "processing_status": { "type": "string", "enum": ["pending", "committed"] }
       }
     },
     "OpeningNavigationView": {
@@ -189,7 +181,7 @@
         "changed_understanding_ids": { "type": "array", "items": { "type": "string", "format": "uuid" } },
         "allowed_actions": {
           "type": "array",
-          "items": { "type": "string", "enum": ["confirm", "direct_correction", "later"] }
+          "items": { "type": "string", "enum": ["confirm", "later"] }
         }
       }
     },
@@ -790,16 +782,15 @@
       "additionalProperties": false,
       "required": ["decision", "employee_text"],
       "properties": {
-        "decision": { "type": "string", "enum": ["confirm", "direct_correction", "later"] },
+        "decision": { "type": "string", "enum": ["confirm", "later"] },
         "employee_text": { "type": ["string", "null"] }
       }
     },
     "RequiredClarificationAnswerWrite": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["choice", "text"],
+      "required": ["text"],
       "properties": {
-        "choice": { "type": "string", "minLength": 1 },
         "text": { "type": "string", "minLength": 1 }
       }
     },

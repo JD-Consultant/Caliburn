@@ -49,7 +49,6 @@ class EmployeeAnswerWrite(BaseModel):
         extra='forbid',
     )
     text: constr(min_length=1)
-    supersedes_source_id: UUID | None = None
 
 
 class ConsultantRunStatus(StrEnum):
@@ -105,11 +104,6 @@ class ProcessingStatus(StrEnum):
     committed = 'committed'
 
 
-class Validity(StrEnum):
-    current = 'current'
-    superseded = 'superseded'
-
-
 class EmployeeMessageView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -118,9 +112,6 @@ class EmployeeMessageView(BaseModel):
     text: str
     created_at: AwareDatetime
     processing_status: ProcessingStatus
-    validity: Validity
-    supersedes_source_id: UUID | None
-    superseded_by_source_id: UUID | None
 
 
 class OpeningNavigationView(BaseModel):
@@ -208,7 +199,6 @@ class Status2(StrEnum):
 
 class AllowedAction(StrEnum):
     confirm = 'confirm'
-    direct_correction = 'direct_correction'
     later = 'later'
 
 
@@ -759,7 +749,6 @@ class DocumentReviewDecisionWrite(BaseModel):
 
 class Decision(StrEnum):
     confirm = 'confirm'
-    direct_correction = 'direct_correction'
     later = 'later'
 
 
@@ -775,7 +764,6 @@ class RequiredClarificationAnswerWrite(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    choice: constr(min_length=1)
     text: constr(min_length=1)
 
 

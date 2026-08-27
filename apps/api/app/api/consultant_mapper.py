@@ -244,9 +244,6 @@ def to_consultant_snapshot_view(
                     "text": source.text,
                     "created_at": source.created_at,
                     "processing_status": source.processing_status.value,
-                    "validity": source.validity.value,
-                    "supersedes_source_id": source.supersedes_source_id,
-                    "superseded_by_source_id": source.superseded_by_source_id,
                 }
             )
             for source in employee_sources

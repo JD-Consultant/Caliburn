@@ -1,11 +1,15 @@
 "use client";
 
-import type { ConsultantSnapshotView } from "@caliburn/job-analysis-contract";
+import type {
+  ConsultantRunAccepted,
+  ConsultantSnapshotView,
+} from "@caliburn/job-analysis-contract";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { Bot, CheckCircle2, RotateCcw, Send, ShieldCheck, UserRound } from "lucide-react";
 import { useMemo, useState } from "react";
 
 import {
+  answerRequiredClarification,
   JobAnalysisApiError,
   retryConsultantRun,
   submitConsultantAnswer,
@@ -25,6 +29,13 @@ function errorText(error: unknown): string {
     : "顧問暫時無法處理，請稍後重試";
 }
 
+type ConversationSubmission = {
+  text: string;
+  idempotencyKey: string;
+  clarificationId: string | null;
+  expectedRevision: number;
+};
+
 export function ConsultantConversation({
   documentId,
   snapshot,
@@ -34,19 +45,10 @@ export function ConsultantConversation({
 }) {
   const queryClient = useQueryClient();
   const [draft, setDraft] = useState("");
-  const [correctionSourceId, setCorrectionSourceId] = useState<string | null>(null);
   const entries = useMemo(() => buildConversationEntries(snapshot), [snapshot]);
   const runStatus = consultantRunStatus(snapshot);
   const runFailed = snapshot.run?.status === "failed";
-  const failedSourceId = runFailed ? snapshot.run?.source_id ?? null : null;
-  const correctingFailedSource =
-    runFailed &&
-    failedSourceId !== null &&
-    correctionSourceId === failedSourceId;
-  const answerBlockedByFailure = runFailed && !correctingFailedSource;
-  const answerBlockedByDecision =
-    snapshot.document_review.decision_required_before_more_interview &&
-    correctionSourceId === null;
+  const clarification = snapshot.required_clarification;
   const latestQuestion = [...snapshot.messages]
     .reverse()
     .find((message) => message.next_question)?.next_question;
@@ -54,19 +56,25 @@ export function ConsultantConversation({
   const refresh = async () => {
     await refreshConsultantQueries(queryClient, documentId);
   };
-  const answerMutation = useMutation({
-    mutationFn: (operation: {
-      text: string;
-      supersedesSourceId: string | null;
-      idempotencyKey: string;
-    }) =>
-      submitConsultantAnswer(documentId, operation.idempotencyKey, {
-        text: operation.text,
-        supersedes_source_id: operation.supersedesSourceId,
-      }),
+  const answerMutation = useMutation<
+    ConsultantSnapshotView | ConsultantRunAccepted,
+    Error,
+    ConversationSubmission
+  >({
+    mutationFn: (operation) =>
+      operation.clarificationId
+        ? answerRequiredClarification(
+            documentId,
+            operation.clarificationId,
+            operation.idempotencyKey,
+            operation.expectedRevision,
+            { text: operation.text },
+          )
+        : submitConsultantAnswer(documentId, operation.idempotencyKey, {
+            text: operation.text,
+          }),
     onSuccess: async () => {
       setDraft("");
-      setCorrectionSourceId(null);
       await refresh();
     },
     onError: async (error) => {
@@ -85,8 +93,6 @@ export function ConsultantConversation({
     if (
       !text.trim() ||
       runStatus.busy ||
-      answerBlockedByFailure ||
-      answerBlockedByDecision ||
       answerMutation.isPending
     )
       return;
@@ -94,14 +100,16 @@ export function ConsultantConversation({
     const sameFailedInput =
       answerMutation.isError &&
       previous?.text === text &&
-      previous.supersedesSourceId === correctionSourceId;
+      previous.clarificationId === (clarification?.clarification_id ?? null) &&
+      previous.expectedRevision === snapshot.revision;
     answerMutation.mutate(
       sameFailedInput
         ? previous
         : {
             text,
-            supersedesSourceId: correctionSourceId,
             idempotencyKey: crypto.randomUUID(),
+            clarificationId: clarification?.clarification_id ?? null,
+            expectedRevision: snapshot.revision,
           },
     );
   };
@@ -173,35 +181,16 @@ export function ConsultantConversation({
                   {entry.speaker === "employee" ? <UserRound /> : <Bot />}
                   {entry.speaker === "employee" ? "你" : "顧問"}
                   {entry.pending ? " · 已保存，待分析" : null}
-                  {entry.superseded ? " · 已被更正" : null}
                 </div>
                 <div
                   className={`rounded-2xl px-4 py-3 text-sm leading-6 whitespace-pre-wrap ${
                     entry.speaker === "employee"
                       ? "bg-stone-900 text-white"
                       : "border border-stone-200 bg-white"
-                  } ${entry.superseded ? "opacity-60" : ""}`}
+                  }`}
                 >
                   {entry.text}
                 </div>
-                {entry.speaker === "employee" && !entry.superseded ? (
-                  <div className="mt-1 text-right">
-                    <button
-                      type="button"
-                      className="text-xs text-stone-500 underline-offset-2 hover:underline disabled:cursor-not-allowed disabled:opacity-40"
-                      disabled={
-                        runFailed &&
-                        entry.key.replace("employee:", "") !== failedSourceId
-                      }
-                      onClick={() => {
-                        setCorrectionSourceId(entry.key.replace("employee:", ""));
-                        setDraft(entry.text);
-                      }}
-                    >
-                      更正這段原話
-                    </button>
-                  </div>
-                ) : null}
               </div>
             ))
           )}
@@ -217,28 +206,37 @@ export function ConsultantConversation({
           </div>
         ) : null}
 
-        {correctionSourceId ? (
-          <div className="mt-4 flex items-center justify-between gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-950">
-            <span>這次送出會更正先前那段原話，舊內容仍保留在修訂紀錄中。</span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => setCorrectionSourceId(null)}
-            >
-              取消更正
-            </Button>
-          </div>
-        ) : null}
-
-        {answerBlockedByDecision ? (
-          <div className="mt-4 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-950">
-            目前沒有其他可安全深入的訪談分支；請先完成下方相關文件決定。你仍可審核、直接編輯或匯出正式內容。
-          </div>
-        ) : null}
-
-        {answerBlockedByFailure ? (
+        {runFailed ? (
           <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-950">
-            上一則回答已保存，但分析失敗。你可以重試同一則回答，或更正該則原話後再送出；為避免跳過未處理內容，目前不接受無關的新回答。
+            上一則回答已保存，但分析失敗。你可以重試同一則回答，也可以直接傳送新的補充或更正；兩則都會保留在訪談紀錄中。
+          </div>
+        ) : null}
+
+        {clarification ? (
+          <div className="mt-4 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3">
+            <p className="text-xs font-semibold text-rose-800">需要先釐清</p>
+            <p className="mt-1 text-sm font-medium text-rose-950">
+              {clarification.question}
+            </p>
+            <p className="mt-1 text-xs leading-5 text-rose-900/75">
+              {clarification.reason}
+            </p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {clarification.choices.map((choice) => (
+                <Button
+                  key={choice}
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  onClick={() => setDraft(choice)}
+                >
+                  {choice}
+                </Button>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-rose-900/70">
+              選項只是快速填入，你也可以在同一個輸入框自由回答。
+            </p>
           </div>
         ) : null}
 
@@ -256,13 +254,9 @@ export function ConsultantConversation({
             id="employee-answer"
             className="min-h-32 w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm leading-6"
             value={draft}
-            disabled={
-              runStatus.busy ||
-              answerBlockedByFailure ||
-              answerBlockedByDecision ||
-              answerMutation.isPending
-            }
+            disabled={runStatus.busy || answerMutation.isPending}
             placeholder={
+              clarification?.question ??
               latestQuestion?.text ??
               snapshot.current_interview?.recommended_next_step ??
               "用自己的話描述實際工作；想到其他工作也可以一起說。"
@@ -282,13 +276,15 @@ export function ConsultantConversation({
               disabled={
                 !draft.trim() ||
                 runStatus.busy ||
-                answerBlockedByFailure ||
-                answerBlockedByDecision ||
                 answerMutation.isPending
               }
             >
               <Send />
-              {answerMutation.isPending ? "保存中…" : "送出回答"}
+              {answerMutation.isPending
+                ? "保存中…"
+                : clarification
+                  ? "送出澄清"
+                  : "送出回答"}
             </Button>
           </div>
         </form>

@@ -123,16 +123,41 @@ def test_commands_are_typed_and_reject_untrusted_extra_fields() -> None:
                 }
             )
 
+    answer = EmployeeAnswerWrite.model_validate({"text": "我剛才說錯，是每週整理。"})
+    assert answer.model_dump(mode="json") == {"text": "我剛才說錯，是每週整理。"}
     with pytest.raises(ValidationError):
-        EmployeeAnswerWrite.model_validate({"text": "回答", "role": "system"})
+        EmployeeAnswerWrite.model_validate(
+            {"text": "回答", "supersedes_source_id": str(uuid4())}
+        )
+
+    clarification = RequiredClarificationAnswerWrite.model_validate(
+        {"text": "最後決定由我負責。"}
+    )
+    assert clarification.model_dump(mode="json") == {"text": "最後決定由我負責。"}
     with pytest.raises(ValidationError):
         RequiredClarificationAnswerWrite.model_validate(
-            {"choice": "員工", "text": "我負責", "accept_changes": True}
+            {"choice": "員工", "text": "我負責"}
+        )
+
+    with pytest.raises(ValidationError):
+        UnderstandingCalibrationDecisionWrite.model_validate(
+            {"decision": "direct_correction", "employee_text": "應改成每週整理"}
         )
     with pytest.raises(ValidationError):
         UnderstandingCalibrationDecisionWrite.model_validate(
             {"decision": "confirm", "employee_text": "我確認", "finish": True}
         )
+
+    definitions = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))["$defs"]
+    assert set(definitions["EmployeeMessageView"]["properties"]) == {
+        "source_id",
+        "text",
+        "created_at",
+        "processing_status",
+    }
+    assert definitions["UnderstandingCalibrationView"]["properties"][
+        "allowed_actions"
+    ]["items"]["enum"] == ["confirm", "later"]
 
 
 def test_current_document_edit_carries_server_stale_guards() -> None:

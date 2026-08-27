@@ -24,14 +24,13 @@ from app.consultant.state import (
 
 
 class ClarificationAnswer(DurableModel):
-    choice: str
     text: str
     source_reference: SourceReference
     command_receipt: CommandReceipt | None = None
 
     @model_validator(mode="after")
     def answer_is_employee_evidence(self) -> ClarificationAnswer:
-        if not self.choice.strip() or not self.text.strip():
+        if not self.text.strip():
             raise ValueError("clarification answer must not be blank")
         if self.source_reference.kind is not EmployeeSourceKind.EMPLOYEE_TURN:
             raise ValueError("clarification answer must be an employee-turn source")
@@ -128,8 +127,6 @@ def resolve_required_clarification(
         and inspect_command_receipt(state, answer.command_receipt) == "replay"
     ):
         return {}
-    if answer.choice not in request.choices:
-        raise ValueError("clarification answer choice is not offered by the request")
     source_id = answer.source_reference.source_id
     if str(source_id) == state.get("latest_source_id"):
         raise ValueError("clarification answer source was already applied")
@@ -157,14 +154,10 @@ def resolve_required_clarification(
                 }
             )
         work[key] = item.model_copy(update=update).model_dump(mode="json")
-    supersessions = dict(state.get("source_supersessions", {}))
-    if answer.source_reference.supersedes_source_id is not None:
-        supersessions[str(answer.source_reference.supersedes_source_id)] = str(source_id)
     update: ConsultantThreadState = {
         "revision": revision,
         "source_count": state.get("source_count", 0) + 1,
         "latest_source_id": str(source_id),
-        "source_supersessions": supersessions,
         "interview_work": work,
         "current_work_id": next(
             (

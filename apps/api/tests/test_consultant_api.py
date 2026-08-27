@@ -149,7 +149,6 @@ class FakeRuntime:
                     document_id=kwargs["document_id"],
                     kind=EmployeeSourceKind.EMPLOYEE_TURN,
                     text=kwargs["text"],
-                    supersedes_source_id=kwargs["supersedes_source_id"],
                 )
             )
         run = RunReceipt(
@@ -483,7 +482,7 @@ async def test_answer_is_source_first_202_idempotent_and_background_owned(api) -
     accepted = await client.post(
         f"{BASE}/{document_id}/answers",
         headers={"Idempotency-Key": "answer-1"},
-        json={"text": "我每天整理採購需求。", "supersedes_source_id": None},
+        json={"text": "我每天整理採購需求。"},
     )
     assert accepted.status_code == 202
     payload = accepted.json()
@@ -498,9 +497,6 @@ async def test_answer_is_source_first_202_idempotent_and_background_owned(api) -
             "text": "我每天整理採購需求。",
             "created_at": reopened.json()["employee_messages"][0]["created_at"],
             "processing_status": "pending",
-            "validity": "current",
-            "supersedes_source_id": None,
-            "superseded_by_source_id": None,
         }
     ]
 
@@ -508,7 +504,7 @@ async def test_answer_is_source_first_202_idempotent_and_background_owned(api) -
     blocked = await client.post(
         f"{BASE}/{document_id}/answers",
         headers={"Idempotency-Key": "answer-2"},
-        json={"text": "另一則回答", "supersedes_source_id": None},
+        json={"text": "另一則回答"},
     )
     assert blocked.status_code == 409
     assert blocked.json()["type"].endswith("/consultant-run-active")
@@ -521,7 +517,7 @@ async def test_failed_run_retries_the_same_durable_source_after_reopening(api) -
     accepted = await client.post(
         f"{BASE}/{document_id}/answers",
         headers={"Idempotency-Key": "answer-to-retry"},
-        json={"text": "這段原話不能重複建立。", "supersedes_source_id": None},
+        json={"text": "這段原話不能重複建立。"},
     )
     run_id = UUID(accepted.json()["run_id"])
     source_id = UUID(accepted.json()["source_id"])
@@ -546,6 +542,46 @@ async def test_failed_run_retries_the_same_durable_source_after_reopening(api) -
     assert retried.json()["source_id"] == str(source_id)
     assert processor.processed == [(document_id, run_id, source_id)]
     assert len(runtime.sources) == 1
+
+
+async def test_failed_run_allows_a_new_ordinary_message_without_replacing_history(api) -> None:
+    client, runtime, processor = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+    first = await client.post(
+        f"{BASE}/{document_id}/answers",
+        headers={"Idempotency-Key": "failed-answer"},
+        json={"text": "我每月整理採購需求。"},
+    )
+    first_run_id = UUID(first.json()["run_id"])
+    first_source_id = UUID(first.json()["source_id"])
+    runtime.snapshot = _snapshot(
+        document_id,
+        revision=2,
+        run=RunReceipt(
+            run_id=first_run_id,
+            status=RunStatus.FAILED,
+            source_id=first_source_id,
+            started_at=datetime.now(UTC),
+            completed_at=datetime.now(UTC),
+            error_code="provider_timeout",
+        ),
+    )
+    processor.processed.clear()
+    processor.claimed.clear()
+
+    second = await client.post(
+        f"{BASE}/{document_id}/answers",
+        headers={"Idempotency-Key": "ordinary-follow-up"},
+        json={"text": "我剛才說錯，是每週整理。"},
+    )
+
+    assert second.status_code == 202, second.text
+    assert UUID(second.json()["source_id"]) != first_source_id
+    assert [source.text for source in runtime.sources] == [
+        "我每月整理採購需求。",
+        "我剛才說錯，是每週整理。",
+    ]
+    assert all(source.supersedes_source_id is None for source in runtime.sources)
 
 
 async def test_employee_review_calibration_clarification_and_direct_edit_are_distinct(api) -> None:
@@ -579,9 +615,9 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     assert runtime.calls[-1][0] == "calibration"
 
     correction = await client.post(
-        f"{BASE}/{document_id}/calibrations/{calibration_id}",
-        headers={"Idempotency-Key": "calibration-correction"},
-        json={"decision": "direct_correction", "employee_text": "應改成每週整理"},
+        f"{BASE}/{document_id}/answers",
+        headers={"Idempotency-Key": "ordinary-correction"},
+        json={"text": "我剛才說錯，應改成每週整理"},
     )
     assert correction.status_code == 202
     assert runtime.calls[-1][0] == "answer"
@@ -590,7 +626,7 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     clarified = await client.post(
         f"{BASE}/{document_id}/clarifications/{clarification_id}",
         headers={"Idempotency-Key": "clarify-1", "X-Expected-Revision": "1"},
-        json={"choice": "主要負責", "text": "這是我主要負責的工作"},
+        json={"text": "這是我主要負責的工作"},
     )
     assert clarified.status_code == 200
     assert runtime.calls[-1][0] == "clarification"
@@ -677,14 +713,43 @@ async def test_review_and_document_edits_return_clear_busy_conflict_during_model
             "workspace_digest": "a" * 64,
         },
     )
+    calibration = await client.post(
+        f"{BASE}/{document_id}/calibrations/{uuid4()}",
+        headers={"Idempotency-Key": "busy-calibration", "X-Expected-Revision": "0"},
+        json={"decision": "later", "employee_text": None},
+    )
+    clarification = await client.post(
+        f"{BASE}/{document_id}/clarifications/{uuid4()}",
+        headers={"Idempotency-Key": "busy-clarification", "X-Expected-Revision": "0"},
+        json={"text": "由主管決定。"},
+    )
+    structure_command = await client.post(
+        f"{BASE}/{document_id}/current-document/commands",
+        headers={"Idempotency-Key": "busy-command", "X-Expected-Revision": "0"},
+        json={
+            "command": {"operation": "create_duty", "name": "法遵管理"},
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
+    )
+    delete = await client.delete(f"{BASE}/{document_id}")
 
-    for response in (review, direct_edit, current_edit):
+    for response in (
+        review,
+        direct_edit,
+        current_edit,
+        calibration,
+        clarification,
+        structure_command,
+        delete,
+    ):
         assert response.status_code == 409
         assert response.json()["type"] == CONSULTANT_RUN_ACTIVE
         assert response.json()["title"] == "Document is busy with an active consultant run"
     assert runtime.calls == []
-    assert runtime.employee_admission_entries == 3
+    assert runtime.employee_admission_entries == 7
     assert runtime.busy_preflight_calls == 0
+    assert runtime.deleted is False
 
 
 async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_browser(api) -> None:

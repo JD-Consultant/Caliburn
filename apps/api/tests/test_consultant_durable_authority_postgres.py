@@ -14,6 +14,8 @@ from deepagents.backends import StoreBackend
 from langgraph.graph import END, START, StateGraph
 
 from app.adapters.langgraph.postgres import (
+    ActiveConsultantRun,
+    ConsultantRunAlreadyActive,
     DocumentNotFound,
     IdempotencyConflict,
     PendingSourceRequiresReconciliation,
@@ -1049,6 +1051,23 @@ async def test_catalog_and_source_admission_are_durable_and_idempotent(
         assert admitted.latest_run is not None
         assert admitted.latest_run["status"] == RunStatus.SOURCE_SAVED.value
 
+        async with runtime.active_consultant_run(document_id):
+            active_replay, active_replay_process = await runtime.admit_employee_answer(
+                document_id=document_id,
+                run_id=run_id,
+                source_id=source_id,
+                text="我每天整理採購需求。",
+            )
+            assert active_replay_process is False
+            assert active_replay.revision == admitted.revision
+            with pytest.raises(ConsultantRunAlreadyActive):
+                await runtime.admit_employee_answer(
+                    document_id=document_id,
+                    run_id=uuid4(),
+                    source_id=uuid4(),
+                    text="分析中不得插入另一則訊息。",
+                )
+
 
 @pytest.mark.asyncio
 async def test_source_is_immutable_and_correction_supersedes_without_quote_copy(
@@ -1298,6 +1317,58 @@ async def test_failed_postgres_run_restarts_and_exact_admission_replays(
         )
         assert should_replay is False
         assert replay.revision == restarted.revision
+
+
+@pytest.mark.asyncio
+async def test_failed_postgres_run_accepts_a_new_ordinary_message_after_reopen(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    first_run_id = uuid4()
+    first_source_id = uuid4()
+    second_run_id = uuid4()
+    second_source_id = uuid4()
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await runtime.create_document(document_id, title="採購職務")
+        await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=first_run_id,
+            source_id=first_source_id,
+            text="我每月整理一次需求。",
+        )
+        await runtime.mark_consultant_run_failed(
+            document_id=document_id,
+            run_id=first_run_id,
+            error_code="model_timeout",
+        )
+
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        admitted, should_process = await runtime.admit_employee_answer(
+            document_id=document_id,
+            run_id=second_run_id,
+            source_id=second_source_id,
+            text="我剛才說錯了，是每週整理一次需求。",
+        )
+        assert should_process is True
+        assert admitted.latest_run is not None
+        assert admitted.latest_run["run_id"] == str(second_run_id)
+        assert admitted.latest_run["status"] == RunStatus.SOURCE_SAVED.value
+        sources = await runtime.list_sources(document_id)
+        assert [source.text for source in sources] == [
+            "我每月整理一次需求。",
+            "我剛才說錯了，是每週整理一次需求。",
+        ]
+        assert all(source.validity is SourceValidity.CURRENT for source in sources)
+        assert all(source.supersedes_source_id is None for source in sources)
+
+        with pytest.raises(ActiveConsultantRun):
+            await runtime.admit_employee_answer(
+                document_id=document_id,
+                run_id=uuid4(),
+                source_id=uuid4(),
+                text="這一則應在分析完成後才能送出。",
+            )
 
 
 @pytest.mark.asyncio

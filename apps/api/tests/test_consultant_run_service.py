@@ -53,11 +53,36 @@ from app.consultant.views import ConsultantSnapshot, snapshot_from_state
 from app.consultant.workspace_state import StoreBackedWorkspace
 
 
-def _admission_only_runtime() -> PostgresConsultantRuntime:
+def _admission_only_runtime(
+    durable_status: RunStatus | None = None,
+) -> PostgresConsultantRuntime:
     runtime = object.__new__(PostgresConsultantRuntime)
     runtime._document_locks = {}  # noqa: SLF001 - isolated admission behavior
     runtime._active_model_runs = set()  # noqa: SLF001 - isolated admission behavior
     runtime._active_employee_mutations = {}  # noqa: SLF001 - isolated admission behavior
+
+    async def durable_snapshot(_document_id: UUID):
+        latest_run = (
+            RunReceipt(
+                run_id=uuid4(),
+                status=durable_status,
+                source_id=uuid4(),
+                started_at=datetime.now(UTC),
+                **(
+                    {
+                        "completed_at": datetime.now(UTC),
+                        "error_code": "provider_timeout",
+                    }
+                    if durable_status is RunStatus.FAILED
+                    else {}
+                ),
+            ).model_dump(mode="json")
+            if durable_status is not None
+            else None
+        )
+        return SimpleNamespace(latest_run=latest_run)
+
+    runtime._snapshot = durable_snapshot  # type: ignore[method-assign]  # noqa: SLF001
 
     async def persistence_must_not_start(_document_id: UUID) -> None:
         raise AssertionError("busy employee command reached persistence")
@@ -347,6 +372,23 @@ async def test_employee_mutation_admission_reserves_document_before_route_prefli
         with pytest.raises(ConsultantRunAlreadyActive):
             async with runtime.active_consultant_run(document_id):
                 pass
+
+
+@pytest.mark.asyncio
+async def test_durable_source_saved_rejects_employee_mutation_before_process_claim() -> None:
+    runtime = _admission_only_runtime(RunStatus.SOURCE_SAVED)
+
+    with pytest.raises(ConsultantRunAlreadyActive):
+        async with runtime.employee_mutation_admission(uuid4()):
+            raise AssertionError("durable active run was not enforced")
+
+
+@pytest.mark.asyncio
+async def test_failed_durable_run_releases_employee_mutation_admission() -> None:
+    runtime = _admission_only_runtime(RunStatus.FAILED)
+
+    async with runtime.employee_mutation_admission(uuid4()):
+        pass
 
 
 @pytest.mark.asyncio

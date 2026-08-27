@@ -75,7 +75,6 @@ export type ConversationEntry = {
   key: string;
   speaker: "employee" | "consultant";
   text: string;
-  superseded: boolean;
   pending: boolean;
 };
 
@@ -97,7 +96,6 @@ export function buildConversationEntries(
       key: `employee:${source.source_id}`,
       speaker: "employee",
       text: source.text,
-      superseded: source.validity === "superseded",
       pending: source.processing_status === "pending",
     });
     for (const message of replies.get(source.source_id) ?? []) {
@@ -105,7 +103,6 @@ export function buildConversationEntries(
         key: `consultant:${message.run_id}`,
         speaker: "consultant",
         text: message.text,
-        superseded: false,
         pending: false,
       });
     }
@@ -117,7 +114,6 @@ export function buildConversationEntries(
         key: `consultant:${message.run_id}`,
         speaker: "consultant",
         text: message.text,
-        superseded: false,
         pending: false,
       });
     }

@@ -42,7 +42,7 @@ describe("purpose-first consultant API client", () => {
     await listConsultantDocuments();
     await createConsultantDocument("採購", "create-1");
     await getConsultantSnapshot(DOCUMENT_ID);
-    await submitConsultantAnswer(DOCUMENT_ID, "answer-1", { text: "我整理需求。", supersedes_source_id: null });
+    await submitConsultantAnswer(DOCUMENT_ID, "answer-1", { text: "我整理需求。" });
     await retryConsultantRun(DOCUMENT_ID, ENTITY_ID);
     await deleteConsultantDocument(DOCUMENT_ID);
 
@@ -76,7 +76,6 @@ describe("purpose-first consultant API client", () => {
       employee_text: "理解正確",
     });
     await answerRequiredClarification(DOCUMENT_ID, ENTITY_ID, "clarify-1", 3, {
-      choice: "我本人決定",
       text: "最後由我核准",
     });
     await editApprovedDocument(DOCUMENT_ID, "edit-1", 3, {

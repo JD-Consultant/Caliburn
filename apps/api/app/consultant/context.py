@@ -11,14 +11,15 @@ from typing import Any, Protocol
 from uuid import UUID
 
 from langchain.agents.middleware import AgentMiddleware, ModelRequest, ModelResponse
-from langchain_core.messages import BaseMessage, HumanMessage, SystemMessage
-from langchain_core.messages.utils import count_tokens_approximately
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage
+from langchain_core.messages.utils import count_tokens_approximately, trim_messages
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.adapters.langgraph.postgres import PostgresConsultantRuntime
 from app.consultant.model_runtime import ResolvedExecution
 from app.consultant.state import (
     EmployeeSource,
+    EmployeeSourceKind,
     RequiredClarification,
     SourceValidity,
 )
@@ -474,7 +475,6 @@ def _prompt(
     *,
     orientation: GlobalOrientationIndex,
     current_work: dict[str, Any] | None,
-    recent_consultant_turns: Sequence[dict[str, Any]],
     required_clarification: RequiredClarification | None,
     understanding: dict[str, dict],
     gaps: dict[str, dict],
@@ -495,9 +495,6 @@ def _prompt(
         "only a required clarification blocks its affected branch.",
         "<global_orientation>" + _json(orientation) + "</global_orientation>",
         "<current_interview_work>" + _json(current_work) + "</current_interview_work>",
-        "<recent_consultant_turns authority=\"none\" evidence=\"false\">"
-        + _json(recent_consultant_turns)
-        + "</recent_consultant_turns>",
         "<required_clarification>"
         + _json(required_clarification)
         + "</required_clarification>",
@@ -578,6 +575,69 @@ def _prompt(
     return "\n".join(sections)
 
 
+def _recent_dialogue(
+    *,
+    sources: Sequence[EmployeeSource],
+    snapshot: ConsultantSnapshot,
+    current_source_id: UUID,
+    token_budget: int,
+) -> tuple[BaseMessage, ...]:
+    """Build recent immutable employee/consultant turns with LangChain trimming."""
+
+    consultant_by_source: dict[UUID, list[str]] = {}
+    for turn in snapshot.messages:
+        consultant_by_source.setdefault(turn.answer_source_id, []).append(turn.text)
+    history: list[BaseMessage] = []
+    employee_turns = sorted(
+        (
+            source
+            for source in sources
+            if source.kind is EmployeeSourceKind.EMPLOYEE_TURN
+            and source.source_id != current_source_id
+        ),
+        key=lambda source: (source.created_at, str(source.source_id)),
+    )
+    for source in employee_turns:
+        history.append(
+            HumanMessage(
+                content=source.text,
+                additional_kwargs={"employee_source_id": str(source.source_id)},
+            )
+        )
+        history.extend(
+            AIMessage(content=text)
+            for text in consultant_by_source.get(source.source_id, ())
+        )
+    if not history or token_budget <= 0:
+        return ()
+    return tuple(
+        trim_messages(
+            history,
+            max_tokens=token_budget,
+            token_counter="approximate",
+            strategy="last",
+            allow_partial=False,
+            start_on=HumanMessage,
+        )
+    )
+
+
+def _drop_oldest_dialogue_turn(
+    messages: tuple[BaseMessage, ...],
+) -> tuple[BaseMessage, ...]:
+    if not messages:
+        return ()
+    next_human = next(
+        (
+            index
+            for index, message in enumerate(messages[1:], start=1)
+            if isinstance(message, HumanMessage)
+        ),
+        len(messages),
+    )
+    return messages[next_human:]
+
+
 def _token_count(system_prompt: str, messages: Sequence[BaseMessage]) -> int:
     return count_tokens_approximately(
         [SystemMessage(content=system_prompt), *messages]
@@ -619,15 +679,29 @@ async def build_consultant_context(
         if request.current_work_id is not None
         else None
     )
-    recent_consultant_turns = tuple(
-        {
-            "text": item.text,
-            "answer_source_id": str(item.answer_source_id),
-            "next_question": item.next_question,
-        }
-        for item in snapshot.messages[-2:]
+    sources = await runtime.list_sources(snapshot.document_id)
+    dialogue_token_budget = min(
+        4_096,
+        max(0, execution.max_context_tokens // 4),
     )
+    all_recent_dialogue = _recent_dialogue(
+        sources=sources,
+        snapshot=snapshot,
+        current_source_id=current_source.source_id,
+        token_budget=dialogue_token_budget,
+    )
+    recent_dialogue = all_recent_dialogue
     degraded: list[str] = []
+    eligible_dialogue_count = sum(
+        source.kind is EmployeeSourceKind.EMPLOYEE_TURN
+        and source.source_id != current_source.source_id
+        for source in sources
+    ) + sum(
+        turn.answer_source_id != current_source.source_id
+        for turn in snapshot.messages
+    )
+    if len(recent_dialogue) < eligible_dialogue_count:
+        degraded.append("recent_dialogue")
     understanding, understanding_degraded = _understanding_slice(
         snapshot.understanding,
         current_work_id=request.current_work_id,
@@ -649,7 +723,6 @@ async def build_consultant_context(
         system_prompt = _prompt(
             orientation=orientation,
             current_work=current_work,
-            recent_consultant_turns=recent_consultant_turns,
             required_clarification=snapshot.required_clarification,
             understanding=understanding,
             gaps=gaps,
@@ -659,6 +732,7 @@ async def build_consultant_context(
             workspace_validation=workspace_validation,
         )
         messages: tuple[BaseMessage, ...] = (
+            *recent_dialogue,
             HumanMessage(
                 content=current_source.text,
                 additional_kwargs={"employee_source_id": str(current_source.source_id)},
@@ -667,6 +741,10 @@ async def build_consultant_context(
         return system_prompt, messages, _token_count(system_prompt, messages)
 
     system_prompt, messages, token_count = render()
+    while token_count > execution.max_context_tokens and recent_dialogue:
+        recent_dialogue = _drop_oldest_dialogue_turn(recent_dialogue)
+        degraded.append("recent_dialogue")
+        system_prompt, messages, token_count = render()
     if token_count > execution.max_context_tokens and dialogue_summary is not None:
         dialogue_summary = None
         degraded.append("non_authoritative_dialogue_summary")
@@ -682,10 +760,6 @@ async def build_consultant_context(
         system_prompt, messages, token_count = render()
     elif orientation.degraded:
         degraded.append("global_orientation")
-    if token_count > execution.max_context_tokens and len(recent_consultant_turns) > 1:
-        recent_consultant_turns = recent_consultant_turns[-1:]
-        degraded.append("recent_consultant_turns")
-        system_prompt, messages, token_count = render()
     if token_count > execution.max_context_tokens:
         raise ContextBudgetExceeded(
             "mandatory consultant context exceeds the configured token budget"

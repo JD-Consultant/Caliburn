@@ -69,10 +69,6 @@ ExpectedRevision = Annotated[
     int,
     Header(alias="X-Expected-Revision", ge=0),
 ]
-OptionalExpectedRevision = Annotated[
-    int | None,
-    Header(alias="X-Expected-Revision", ge=0),
-]
 
 
 def _command_id(document_id: UUID, channel: str, key: str) -> UUID:
@@ -167,7 +163,6 @@ async def _accept_answer(
     *,
     document_id: UUID,
     text: str,
-    supersedes_source_id: UUID | None,
     idempotency_key: str,
     runtime: PostgresConsultantRuntime,
     processor: ConsultantTurnProcessor,
@@ -180,7 +175,6 @@ async def _accept_answer(
         run_id=run_id,
         source_id=source_id,
         text=text,
-        supersedes_source_id=supersedes_source_id,
     )
     receipt = RunReceipt.model_validate(snapshot.latest_run)
     if receipt.status.value == "source_saved" and await processor.claim(
@@ -243,10 +237,11 @@ async def delete_consultant_document(
     runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
 ):
     try:
-        await runtime.delete_document(document_id)
+        async with runtime.employee_mutation_admission(document_id):
+            await runtime.delete_document(document_id)
         return Response(status_code=204)
     except Exception as error:
-        return consultant_runtime_error_response(error)
+        return _employee_mutation_error_response(error)
 
 
 @router.post(
@@ -266,7 +261,6 @@ async def submit_employee_answer(
         return await _accept_answer(
             document_id=document_id,
             text=body.text,
-            supersedes_source_id=body.supersedes_source_id,
             idempotency_key=idempotency_key,
             runtime=runtime,
             processor=processor,
@@ -303,7 +297,6 @@ async def retry_consultant_run(
             run_id=receipt.run_id,
             source_id=source.source_id,
             text=source.text,
-            supersedes_source_id=source.supersedes_source_id,
         )
         active = RunReceipt.model_validate(restarted.latest_run)
         if active.status.value == "source_saved" and await processor.claim(
@@ -447,40 +440,18 @@ async def review_document_changes(
 
 @router.post(
     "/{document_id}/calibrations/{calibration_id}",
-    response_model=ConsultantSnapshotView | ConsultantRunAccepted,
-    responses={202: {"model": ConsultantRunAccepted}},
+    response_model=ConsultantSnapshotView,
 )
 async def decide_understanding_calibration(
     document_id: UUID,
     calibration_id: UUID,
     body: UnderstandingCalibrationDecisionWrite,
     idempotency_key: IdempotencyKey,
-    background_tasks: BackgroundTasks,
-    expected_revision: OptionalExpectedRevision = None,
+    expected_revision: ExpectedRevision,
     runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
-    processor: ConsultantTurnProcessor = Depends(get_consultant_turn_processor),
 ):
     try:
         decision = body.decision.value
-        if decision == "direct_correction":
-            if not body.employee_text or not body.employee_text.strip():
-                raise ValueError("direct correction requires employee text")
-            response = await _accept_answer(
-                document_id=document_id,
-                text=body.employee_text,
-                supersedes_source_id=None,
-                idempotency_key=f"calibration:{calibration_id}:{idempotency_key}",
-                runtime=runtime,
-                processor=processor,
-                background_tasks=background_tasks,
-            )
-            return Response(
-                content=response.model_dump_json(),
-                status_code=202,
-                media_type="application/json",
-            )
-        if expected_revision is None:
-            raise ValueError("calibration decision requires X-Expected-Revision")
         if decision == "confirm":
             if not body.employee_text or not body.employee_text.strip():
                 raise ValueError("confirmation requires employee text")
@@ -493,26 +464,27 @@ async def decide_understanding_calibration(
                 raise ValueError("later decision must not carry employee text")
             employee_text = None
             source_id = None
-        snapshot = await runtime.decide_understanding_calibration(
-            document_id=document_id,
-            expected_revision=expected_revision,
-            calibration_id=calibration_id,
-            decision=decision,
-            employee_text=employee_text,
-            source_id=source_id,
-            command_receipt=_command_receipt(
-                document_id,
-                "understanding_calibration",
-                idempotency_key,
-                {
-                    "calibration_id": str(calibration_id),
-                    "decision": body.model_dump(mode="json"),
-                },
-            ),
-        )
+        async with runtime.employee_mutation_admission(document_id):
+            snapshot = await runtime.decide_understanding_calibration(
+                document_id=document_id,
+                expected_revision=expected_revision,
+                calibration_id=calibration_id,
+                decision=decision,
+                employee_text=employee_text,
+                source_id=source_id,
+                command_receipt=_command_receipt(
+                    document_id,
+                    "understanding_calibration",
+                    idempotency_key,
+                    {
+                        "calibration_id": str(calibration_id),
+                        "decision": body.model_dump(mode="json"),
+                    },
+                ),
+            )
         return await _snapshot_view(runtime, snapshot)
     except Exception as error:
-        return consultant_runtime_error_response(error)
+        return _employee_mutation_error_response(error)
 
 
 @router.post(
@@ -528,28 +500,28 @@ async def answer_required_clarification(
     runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
 ):
     try:
-        snapshot = await runtime.answer_required_clarification(
-            document_id=document_id,
-            expected_revision=expected_revision,
-            clarification_id=clarification_id,
-            choice=body.choice,
-            text=body.text,
-            source_id=_command_id(
-                document_id, "clarification-source", idempotency_key
-            ),
-            command_receipt=_command_receipt(
-                document_id,
-                "required_clarification",
-                idempotency_key,
-                {
-                    "clarification_id": str(clarification_id),
-                    "answer": body.model_dump(mode="json"),
-                },
-            ),
-        )
+        async with runtime.employee_mutation_admission(document_id):
+            snapshot = await runtime.answer_required_clarification(
+                document_id=document_id,
+                expected_revision=expected_revision,
+                clarification_id=clarification_id,
+                text=body.text,
+                source_id=_command_id(
+                    document_id, "clarification-source", idempotency_key
+                ),
+                command_receipt=_command_receipt(
+                    document_id,
+                    "required_clarification",
+                    idempotency_key,
+                    {
+                        "clarification_id": str(clarification_id),
+                        "answer": body.model_dump(mode="json"),
+                    },
+                ),
+            )
         return await _snapshot_view(runtime, snapshot)
     except Exception as error:
-        return consultant_runtime_error_response(error)
+        return _employee_mutation_error_response(error)
 
 
 @router.put(

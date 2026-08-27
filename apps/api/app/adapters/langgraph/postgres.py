@@ -288,6 +288,16 @@ class PostgresConsultantRuntime:
 
         async with self._lock_for(document_id):
             self._require_employee_mutation_admitted(document_id)
+            snapshot = await self._snapshot(document_id)
+            latest = (
+                RunReceipt.model_validate(snapshot.latest_run)
+                if snapshot.latest_run is not None
+                else None
+            )
+            if latest is not None and latest.status is RunStatus.SOURCE_SAVED:
+                raise ConsultantRunAlreadyActive(
+                    f"document {document_id} has a durable active consultant run"
+                )
             self._active_employee_mutations[document_id] = (
                 self._active_employee_mutations.get(document_id, 0) + 1
             )
@@ -808,7 +818,6 @@ class PostgresConsultantRuntime:
         run_id: UUID,
         source_id: UUID,
         text: str,
-        supersedes_source_id: UUID | None = None,
     ) -> tuple[ConsultantSnapshot, bool]:
         """Persist the exact answer before allowing any model-bearing work."""
 
@@ -819,7 +828,6 @@ class PostgresConsultantRuntime:
                 document_id=document_id,
                 kind=EmployeeSourceKind.EMPLOYEE_TURN,
                 text=text,
-                supersedes_source_id=supersedes_source_id,
             )
             existing = await self.get_source_or_none(document_id, source_id)
             if existing is not None and not self._same_immutable_source(
@@ -835,67 +843,80 @@ class PostgresConsultantRuntime:
                 if snapshot.latest_run is not None
                 else None
             )
-            if latest is not None and latest.status in {
-                RunStatus.SOURCE_SAVED,
-                RunStatus.FAILED,
-            }:
-                replaces_failed_source = (
-                    latest.status is RunStatus.FAILED
-                    and supersedes_source_id == latest.source_id
-                    and source_id != latest.source_id
-                    and run_id != latest.run_id
+            mutation_active = (
+                document_id in self._active_model_runs
+                or self._active_employee_mutations.get(document_id, 0) > 0
+            )
+            exact_replay = (
+                latest is not None
+                and existing is not None
+                and latest.run_id == run_id
+                and latest.source_id == source_id
+                and latest.status in {RunStatus.SOURCE_SAVED, RunStatus.COMPLETED}
+            )
+            if mutation_active:
+                if exact_replay:
+                    return snapshot, False
+                raise ConsultantRunAlreadyActive(
+                    f"document mutation already active for {document_id}"
                 )
-                if not replaces_failed_source:
-                    if latest.run_id != run_id or latest.source_id != source_id:
-                        raise ActiveConsultantRun(
-                            f"consultant run {latest.run_id} must be resolved first"
-                        )
-                    if existing is None:
-                        raise ConsultantPersistenceError(
-                            "recoverable run is missing its employee source"
-                        )
-                    if latest.status is RunStatus.SOURCE_SAVED:
-                        if existing.processing_status is SourceProcessingStatus.PENDING:
-                            await self._mark_source_committed(existing)
-                        return snapshot, False
-                    pending = await self._pending_sources(document_id)
-                    if pending:
-                        raise PendingSourceRequiresReconciliation(
-                            f"source {pending[0].source_id} must be reconciled before "
-                            "restarting the failed run"
-                        )
-                    if (
-                        existing.processing_status
-                        is not SourceProcessingStatus.COMMITTED
-                    ):
-                        raise PendingSourceRequiresReconciliation(
-                            f"source {existing.source_id} is not committed"
-                        )
-                    if existing.validity is not SourceValidity.CURRENT:
-                        raise SourceConflict(
-                            f"source {existing.source_id} was superseded before restart"
-                        )
-                    receipt = RunReceipt(
-                        run_id=run_id,
-                        status=RunStatus.SOURCE_SAVED,
-                        source_id=source_id,
-                        started_at=datetime.now(UTC),
+            if latest is not None and latest.status is RunStatus.SOURCE_SAVED:
+                if latest.run_id != run_id or latest.source_id != source_id:
+                    raise ActiveConsultantRun(
+                        f"consultant run {latest.run_id} must be resolved first"
                     )
-                    try:
-                        await self.graph.ainvoke(
-                            {},
-                            self.graph_config(document_id),
-                            context={
-                                "action": "restart_consultant_run",
-                                "document_id": str(document_id),
-                                "expected_revision": snapshot.revision,
-                                "run_receipt": receipt.model_dump(mode="json"),
-                            },
-                        )
-                    except StaleThreadRevision as error:
-                        raise StaleRevision(str(error)) from error
-                    await self._touch_catalog(document_id)
-                    return await self._snapshot(document_id), True
+                if existing is None:
+                    raise ConsultantPersistenceError(
+                        "recoverable run is missing its employee source"
+                    )
+                if existing.processing_status is SourceProcessingStatus.PENDING:
+                    await self._mark_source_committed(existing)
+                return snapshot, False
+            if (
+                latest is not None
+                and latest.status is RunStatus.FAILED
+                and latest.run_id == run_id
+                and latest.source_id == source_id
+            ):
+                if existing is None:
+                    raise ConsultantPersistenceError(
+                        "recoverable run is missing its employee source"
+                    )
+                pending = await self._pending_sources(document_id)
+                if pending:
+                    raise PendingSourceRequiresReconciliation(
+                        f"source {pending[0].source_id} must be reconciled before "
+                        "restarting the failed run"
+                    )
+                if existing.processing_status is not SourceProcessingStatus.COMMITTED:
+                    raise PendingSourceRequiresReconciliation(
+                        f"source {existing.source_id} is not committed"
+                    )
+                if existing.validity is not SourceValidity.CURRENT:
+                    raise SourceConflict(
+                        f"source {existing.source_id} was superseded before restart"
+                    )
+                receipt = RunReceipt(
+                    run_id=run_id,
+                    status=RunStatus.SOURCE_SAVED,
+                    source_id=source_id,
+                    started_at=datetime.now(UTC),
+                )
+                try:
+                    await self.graph.ainvoke(
+                        {},
+                        self.graph_config(document_id),
+                        context={
+                            "action": "restart_consultant_run",
+                            "document_id": str(document_id),
+                            "expected_revision": snapshot.revision,
+                            "run_receipt": receipt.model_dump(mode="json"),
+                        },
+                    )
+                except StaleThreadRevision as error:
+                    raise StaleRevision(str(error)) from error
+                await self._touch_catalog(document_id)
+                return await self._snapshot(document_id), True
             if (
                 latest is not None
                 and latest.status is RunStatus.COMPLETED
@@ -1564,7 +1585,6 @@ class PostgresConsultantRuntime:
         document_id: UUID,
         expected_revision: int,
         clarification_id: UUID,
-        choice: str,
         text: str,
         source_id: UUID,
         command_receipt: CommandReceipt | None = None,
@@ -1600,7 +1620,7 @@ class PostgresConsultantRuntime:
                 raise StaleRevision(
                     f"expected revision {expected_revision}, found {snapshot.revision}"
                 )
-            normalized_text = text if text.strip() else choice
+            normalized_text = text
             requested = EmployeeSource.pending(
                 source_id=source_id,
                 document_id=document_id,
@@ -1618,7 +1638,6 @@ class PostgresConsultantRuntime:
             if source.processing_status is SourceProcessingStatus.PENDING:
                 await self._after_source_store(source)
             answer = ClarificationAnswer(
-                choice=choice,
                 text=normalized_text,
                 source_reference=SourceReference(
                     source_id=source.source_id,

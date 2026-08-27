@@ -162,7 +162,7 @@ describe("employee consultant workspace integration", () => {
     expect(stream?.closed).toBe(true);
   });
 
-  it("shows the blocked branch and prevents only a new AI interview turn when no safe branch remains", () => {
+  it("shows the blocked branch without blocking ordinary employee chat", () => {
     const snapshot = consultantSnapshotFixture();
     snapshot.document_review = {
       ...snapshot.document_review,
@@ -187,13 +187,13 @@ describe("employee consultant workspace integration", () => {
     );
 
     expect((screen.getByLabelText("回覆顧問") as HTMLTextAreaElement).disabled).toBe(
-      true,
+      false,
     );
     expect(screen.getByText("月結差異處理")).toBeTruthy();
     expect(
       screen.getByText("需先確認這項工作應歸入哪一項主要職責。"),
     ).toBeTruthy();
-    expect(screen.getByText(/先完成下方相關文件決定/)).toBeTruthy();
+    expect(screen.queryByText(/先完成下方相關文件決定/)).toBeNull();
   });
 
   it("restores a non-authoritative direct-edit draft after leaving and returning", async () => {
@@ -879,7 +879,7 @@ describe("employee consultant workspace integration", () => {
     });
   });
 
-  it("lets a failed answer be corrected but disables unrelated new answers and corrections", async () => {
+  it("keeps ordinary chat available after failure and offers retry separately", async () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
     const unrelatedSourceId = "00000000-0000-0000-0000-000000000040";
@@ -894,10 +894,8 @@ describe("employee consultant workspace integration", () => {
       text: "我也會整理供應商名單。",
       created_at: "2026-08-14T10:01:00Z",
       processing_status: "committed",
-      validity: "current",
-      supersedes_source_id: null,
-      superseded_by_source_id: null,
     });
+    snapshot.required_clarification = null;
     const fetchMock = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -914,24 +912,50 @@ describe("employee consultant workspace integration", () => {
     );
 
     const answer = screen.getByLabelText("回覆顧問") as HTMLTextAreaElement;
-    const correctionButtons = screen.getAllByRole("button", {
-      name: "更正這段原話",
-    }) as HTMLButtonElement[];
-    expect(answer.disabled).toBe(true);
-    expect(correctionButtons[0].disabled).toBe(false);
-    expect(correctionButtons[1].disabled).toBe(true);
-
-    await user.click(correctionButtons[0]);
     expect(answer.disabled).toBe(false);
-    await user.clear(answer);
+    expect(screen.queryByRole("button", { name: "更正這段原話" })).toBeNull();
+    expect(screen.getByRole("button", { name: "重試同一則回答" })).toBeTruthy();
     await user.type(answer, "我每月會先核對差異明細，再追查原因。");
     await user.click(screen.getByRole("button", { name: "送出回答" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
 
     const request = fetchMock.mock.calls[0][1] as RequestInit;
-    expect(JSON.parse(String(request.body))).toMatchObject({
+    expect(JSON.parse(String(request.body))).toEqual({
       text: "我每月會先核對差異明細，再追查原因。",
-      supersedes_source_id: snapshot.run.source_id,
+    });
+  });
+
+  it("uses the conversation composer for free-text required clarification", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    const response = structuredClone(snapshot);
+    response.revision += 1;
+    response.required_clarification = null;
+    const fetchMock = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify(response), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    renderWithClient(
+      <ConsultantConversation documentId={DOCUMENT_ID} snapshot={snapshot} />,
+    );
+
+    expect(screen.queryByRole("radio")).toBeNull();
+    await user.click(screen.getByRole("button", { name: "主管決定" }));
+    const answer = screen.getByLabelText("回覆顧問") as HTMLTextAreaElement;
+    expect(answer.value).toBe("主管決定");
+    await user.type(answer, "，我負責準備資料。");
+    await user.click(screen.getByRole("button", { name: "送出澄清" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+    const [url, request] = fetchMock.mock.calls[0] as [string, RequestInit];
+    expect(url).toContain(
+      `/clarifications/${snapshot.required_clarification!.clarification_id}`,
+    );
+    expect(JSON.parse(String(request.body))).toEqual({
+      text: "主管決定，我負責準備資料。",
     });
   });
 

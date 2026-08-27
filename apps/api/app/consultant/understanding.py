@@ -68,7 +68,7 @@ class UnderstandingItemProjection(DurableModel):
     source_ids: tuple[UUID, ...]
 
 
-CalibrationAction = Literal["confirm", "direct_correction", "later"]
+CalibrationAction = Literal["confirm", "later"]
 
 
 class CalibrationProjection(DurableModel):
@@ -80,7 +80,6 @@ class CalibrationProjection(DurableModel):
     changed_understanding_ids: tuple[UUID, ...]
     allowed_actions: tuple[CalibrationAction, ...] = (
         "confirm",
-        "direct_correction",
         "later",
     )
 

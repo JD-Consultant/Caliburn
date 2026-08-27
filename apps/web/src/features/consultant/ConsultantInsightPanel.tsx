@@ -1,17 +1,13 @@
 "use client";
 
 import type {
-  ConsultantRunAccepted,
   ConsultantSnapshotView,
-  RequiredClarificationAnswerWrite,
   UnderstandingCalibrationDecisionWrite,
 } from "@caliburn/job-analysis-contract";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { AlertTriangle, CircleHelp, Compass, Lightbulb, ListChecks } from "lucide-react";
-import { useState } from "react";
 
 import {
-  answerRequiredClarification,
   decideUnderstandingCalibration,
   JobAnalysisApiError,
 } from "@/shared/api/jobAnalysisApi";
@@ -52,12 +48,6 @@ const depthStatusLabels: Record<string, string> = {
   held_with_reason: "有理由暫緩",
 };
 
-function isSnapshot(
-  value: ConsultantSnapshotView | ConsultantRunAccepted,
-): value is ConsultantSnapshotView {
-  return "revision" in value;
-}
-
 export function ConsultantInsightPanel({
   documentId,
   snapshot,
@@ -66,9 +56,6 @@ export function ConsultantInsightPanel({
   snapshot: ConsultantSnapshotView;
 }) {
   const queryClient = useQueryClient();
-  const [correction, setCorrection] = useState("");
-  const [clarificationChoice, setClarificationChoice] = useState("");
-  const [clarificationText, setClarificationText] = useState("");
   const calibration = snapshot.understanding.calibration;
   const clarification = snapshot.required_clarification;
   const focus = workspaceSections(snapshot).focus;
@@ -76,12 +63,8 @@ export function ConsultantInsightPanel({
   const refresh = async () => {
     await refreshConsultantQueries(queryClient, documentId);
   };
-  const applySnapshot = async (
-    result: ConsultantSnapshotView | ConsultantRunAccepted,
-  ) => {
-    if (isSnapshot(result)) {
-      cacheConsultantSnapshot(queryClient, documentId, result);
-    }
+  const applySnapshot = async (result: ConsultantSnapshotView) => {
+    cacheConsultantSnapshot(queryClient, documentId, result);
     await refresh();
   };
 
@@ -95,40 +78,11 @@ export function ConsultantInsightPanel({
         documentId,
         operation.calibrationId,
         operation.idempotencyKey,
-        operation.decision.decision === "direct_correction"
-          ? null
-          : snapshot.revision,
+        snapshot.revision,
         operation.decision,
       ),
     onSuccess: async (result) => {
-      setCorrection("");
       await applySnapshot(result);
-    },
-    onError: async (error) => {
-      if (error instanceof JobAnalysisApiError && error.status === 409) {
-        await refresh();
-      }
-    },
-  });
-
-  const clarificationMutation = useMutation({
-    mutationFn: (operation: {
-      clarificationId: string;
-      idempotencyKey: string;
-      answer: RequiredClarificationAnswerWrite;
-    }) =>
-      answerRequiredClarification(
-        documentId,
-        operation.clarificationId,
-        operation.idempotencyKey,
-        snapshot.revision,
-        operation.answer,
-      ),
-    onSuccess: async (result) => {
-      cacheConsultantSnapshot(queryClient, documentId, result);
-      setClarificationChoice("");
-      setClarificationText("");
-      await refresh();
     },
     onError: async (error) => {
       if (error instanceof JobAnalysisApiError && error.status === 409) {
@@ -157,28 +111,6 @@ export function ConsultantInsightPanel({
     );
   };
 
-  const submitClarification = () => {
-    if (!clarification || !clarificationChoice || !clarificationText.trim()) return;
-    const answer = {
-      choice: clarificationChoice,
-      text: clarificationText,
-    };
-    const previous = clarificationMutation.variables;
-    const retry =
-      clarificationMutation.isError &&
-      previous?.clarificationId === clarification.clarification_id &&
-      JSON.stringify(previous.answer) === JSON.stringify(answer);
-    clarificationMutation.mutate(
-      retry
-        ? previous
-        : {
-            clarificationId: clarification.clarification_id,
-            answer,
-            idempotencyKey: crypto.randomUUID(),
-          },
-    );
-  };
-
   return (
     <div className="space-y-5">
       {clarification ? (
@@ -190,56 +122,14 @@ export function ConsultantInsightPanel({
                 <h2 className="font-semibold text-rose-950">這個問題需要你決定</h2>
                 <Badge variant="destructive">只阻擋：{clarification.affected_branch}</Badge>
               </div>
-              <p className="mt-2 text-sm font-medium text-rose-950">
-                {clarification.question}
-              </p>
               <p className="mt-2 text-xs leading-5 text-rose-900/75">
-                目前理解：{clarification.current_understanding}
-                <br />原因：{clarification.reason}
+                必要澄清已顯示在訪談區；回答後 AI 才會繼續受影響的分析分支。
               </p>
-              <div className="mt-4 space-y-2">
-                {clarification.choices.map((choice) => (
-                  <label key={choice} className="flex items-center gap-2 text-sm">
-                    <input
-                      type="radio"
-                      name="required-clarification"
-                      value={choice}
-                      checked={clarificationChoice === choice}
-                      onChange={(event) => setClarificationChoice(event.target.value)}
-                    />
-                    {choice}
-                  </label>
-                ))}
-                <label className="block text-xs font-medium text-rose-900" htmlFor="clarification-detail">
-                  用你的話補充
-                </label>
-                <textarea
-                  id="clarification-detail"
-                  className="min-h-20 w-full rounded-lg border border-rose-300 bg-white px-3 py-2 text-sm"
-                  value={clarificationText}
-                  onChange={(event) => setClarificationText(event.target.value)}
-                />
-                <Button
-                  disabled={
-                    !clarificationChoice ||
-                    !clarificationText.trim() ||
-                    clarificationMutation.isPending
-                  }
-                  onClick={submitClarification}
-                >
-                  {clarificationMutation.isPending ? "保存中…" : "送出決定"}
-                </Button>
-                <p className="text-xs text-rose-900/70">
-                  其他不受影響的工作仍可繼續訪談，不會整頁鎖住。
-                </p>
-              </div>
+              <p className="mt-3 text-sm text-rose-900">
+                請在訪談對話的同一個輸入框回答；選項只會作為快速填入建議，你仍可自由描述。
+              </p>
             </div>
           </div>
-          {clarificationMutation.isError ? (
-            <p role="alert" className="text-sm text-destructive">
-              {errorText(clarificationMutation.error)}
-            </p>
-          ) : null}
         </Card>
       ) : null}
 
@@ -324,12 +214,6 @@ export function ConsultantInsightPanel({
                   </Badge>
                   <span className="text-xs text-stone-500">請確認 AI 是否理解正確</span>
                 </div>
-                <textarea
-                  className="mt-3 min-h-20 w-full rounded-lg border border-stone-300 px-3 py-2 text-sm"
-                  placeholder="若不正確，請直接寫出應如何修正"
-                  value={correction}
-                  onChange={(event) => setCorrection(event.target.value)}
-                />
                 <div className="mt-3 flex flex-wrap gap-2">
                   {calibration.allowed_actions.includes("confirm") ? (
                     <Button
@@ -345,21 +229,6 @@ export function ConsultantInsightPanel({
                       理解正確
                     </Button>
                   ) : null}
-                  {calibration.allowed_actions.includes("direct_correction") ? (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      disabled={!correction.trim() || calibrationMutation.isPending}
-                      onClick={() =>
-                        submitCalibration({
-                          decision: "direct_correction",
-                          employee_text: correction,
-                        })
-                      }
-                    >
-                      送出修正
-                    </Button>
-                  ) : null}
                   {calibration.allowed_actions.includes("later") ? (
                     <Button
                       size="sm"
@@ -373,6 +242,9 @@ export function ConsultantInsightPanel({
                     </Button>
                   ) : null}
                 </div>
+                <p className="mt-2 text-xs text-stone-500">
+                  若理解不正確，直接在訪談對話補充或更正即可。
+                </p>
                 {calibrationMutation.isError ? (
                   <p role="alert" className="mt-2 text-sm text-destructive">
                     {errorText(calibrationMutation.error)}

@@ -56,7 +56,6 @@ export interface ConsultantDocumentCatalog {
  */
 export interface EmployeeAnswerWrite {
   text: string;
-  supersedes_source_id?: string | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -108,9 +107,6 @@ export interface EmployeeMessageView {
   text: string;
   created_at: string;
   processing_status: "pending" | "committed";
-  validity: "current" | "superseded";
-  supersedes_source_id: string | null;
-  superseded_by_source_id: string | null;
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -173,7 +169,7 @@ export interface UnderstandingCalibrationView {
   status: "pending" | "later" | "confirmed" | "superseded";
   affected_work_ids: string[];
   changed_understanding_ids: string[];
-  allowed_actions: ("confirm" | "direct_correction" | "later")[];
+  allowed_actions: ("confirm" | "later")[];
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
@@ -715,7 +711,7 @@ export interface DocumentReviewDecisionWrite {
  * via the `definition` "UnderstandingCalibrationDecisionWrite".
  */
 export interface UnderstandingCalibrationDecisionWrite {
-  decision: "confirm" | "direct_correction" | "later";
+  decision: "confirm" | "later";
   employee_text: string | null;
 }
 /**
@@ -723,7 +719,6 @@ export interface UnderstandingCalibrationDecisionWrite {
  * via the `definition` "RequiredClarificationAnswerWrite".
  */
 export interface RequiredClarificationAnswerWrite {
-  choice: string;
   text: string;
 }
 /**

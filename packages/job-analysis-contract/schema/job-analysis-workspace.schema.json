@@ -527,6 +527,16 @@
         "document": { "$ref": "#/$defs/ApprovedJobDocumentWrite" }
       }
     },
+    "CurrentDocumentEditWrite": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["document", "workspace_generation", "workspace_digest"],
+      "properties": {
+        "document": { "$ref": "#/$defs/ApprovedJobDocumentWrite" },
+        "workspace_generation": { "type": "integer", "minimum": 0 },
+        "workspace_digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+      }
+    },
     "ExportReadinessIssueView": {
       "type": "object",
       "additionalProperties": false,

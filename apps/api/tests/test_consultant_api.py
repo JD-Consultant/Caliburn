@@ -233,6 +233,18 @@ class FakeRuntime:
         )
         return self.snapshot
 
+    async def apply_current_document_edit(self, **kwargs):
+        if self.model_mutation_busy:
+            raise ConsultantRunAlreadyActive(kwargs["document_id"])
+        self.calls.append(("current_document_edit", kwargs))
+        self.snapshot = self.snapshot.model_copy(
+            update={
+                "current_document": kwargs["document"],
+                "approved_document": kwargs["document"],
+            }
+        )
+        return self.snapshot
+
     async def delete_document(self, document_id: UUID):
         assert document_id == self.document_id
         self.deleted = True
@@ -578,7 +590,7 @@ async def test_employee_review_calibration_clarification_and_direct_edit_are_dis
     assert runtime.calls[-1][0] == "direct_edit"
 
 
-async def test_review_and_direct_edit_return_clear_busy_conflict_during_model_mutation(
+async def test_review_and_document_edits_return_clear_busy_conflict_during_model_mutation(
     api,
 ) -> None:
     client, runtime, _ = api
@@ -606,13 +618,22 @@ async def test_review_and_direct_edit_return_clear_busy_conflict_during_model_mu
         headers={"Idempotency-Key": "busy-edit", "X-Expected-Revision": "0"},
         json={"document": document},
     )
+    current_edit = await client.put(
+        f"{BASE}/{document_id}/current-document",
+        headers={"Idempotency-Key": "busy-current", "X-Expected-Revision": "0"},
+        json={
+            "document": document,
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
+    )
 
-    for response in (review, direct_edit):
+    for response in (review, direct_edit, current_edit):
         assert response.status_code == 409
         assert response.json()["type"] == CONSULTANT_RUN_ACTIVE
         assert response.json()["title"] == "Document is busy with an active consultant run"
     assert runtime.calls == []
-    assert runtime.employee_admission_entries == 2
+    assert runtime.employee_admission_entries == 3
     assert runtime.busy_preflight_calls == 0
 
 
@@ -642,6 +663,32 @@ async def test_direct_edit_server_mints_opks_evidence_instead_of_trusting_the_br
     assert passed_document.opks[0].evidence_source_ids == (
         consultant._command_id(document_id, "direct-edit-source", "edit-opks-1"),
     )
+
+
+async def test_current_document_edit_forwards_full_server_stale_guards(api) -> None:
+    client, runtime, _ = api
+    document_id = UUID((await _create(client)).json()["document_id"])
+    document = runtime.snapshot.current_document.model_dump(mode="json")
+    document["job_title"] = "資深採購專員"
+
+    response = await client.put(
+        f"{BASE}/{document_id}/current-document",
+        headers={
+            "Idempotency-Key": "current-edit-1",
+            "X-Expected-Revision": "0",
+        },
+        json={
+            "document": document,
+            "workspace_generation": 1,
+            "workspace_digest": "a" * 64,
+        },
+    )
+
+    assert response.status_code == 200, response.text
+    call = next(item for item in runtime.calls if item[0] == "current_document_edit")
+    assert call[1]["workspace_generation"] == 1
+    assert call[1]["workspace_digest"] == "a" * 64
+    assert response.json()["current_document"]["job_title"] == "資深採購專員"
 
 
 async def test_export_requires_explicit_force_when_readiness_has_gaps(api) -> None:

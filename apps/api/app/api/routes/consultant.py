@@ -19,6 +19,7 @@ from job_analysis_contract import (
     ConsultantRunAccepted,
     ConsultantSnapshotEvent,
     ConsultantSnapshotView,
+    CurrentDocumentEditWrite,
     DirectDocumentEditWrite,
     DocumentReviewDecisionWrite,
     EmployeeAnswerWrite,
@@ -122,6 +123,22 @@ def _approved_document_from_edit(
             if source_id not in evidence:
                 evidence.append(source_id)
         item["evidence_source_ids"] = evidence
+    return ApprovedJobDocument.model_validate(payload)
+
+
+def _current_document_from_edit(
+    body: ApprovedJobDocumentWrite,
+    current: ApprovedJobDocument,
+) -> ApprovedJobDocument:
+    """Restore server-owned Evidence; the browser only edits visible JD fields."""
+
+    payload = body.model_dump(mode="json")
+    existing = {str(item.item_id): item for item in current.opks}
+    for item in payload["opks"]:
+        previous = existing.get(str(item["item_id"]))
+        item["evidence_source_ids"] = (
+            list(previous.evidence_source_ids) if previous is not None else []
+        )
     return ApprovedJobDocument.model_validate(payload)
 
 
@@ -572,6 +589,49 @@ async def edit_approved_document(
                 ),
             )
             return await _snapshot_view(runtime, snapshot)
+    except Exception as error:
+        return _employee_mutation_error_response(error)
+
+
+@router.put(
+    "/{document_id}/current-document",
+    response_model=ConsultantSnapshotView,
+)
+async def edit_current_document(
+    document_id: UUID,
+    body: CurrentDocumentEditWrite,
+    idempotency_key: IdempotencyKey,
+    expected_revision: ExpectedRevision,
+    runtime: PostgresConsultantRuntime = Depends(get_consultant_runtime),
+):
+    try:
+        async with runtime.employee_mutation_admission(document_id):
+            snapshot = await runtime.reopen_document(document_id)
+            if snapshot.current_document is None:
+                raise ValueError("current document is unavailable")
+            document = _current_document_from_edit(
+                body.document,
+                snapshot.current_document,
+            )
+            updated = await runtime.apply_current_document_edit(
+                document_id=document_id,
+                expected_revision=expected_revision,
+                workspace_generation=body.workspace_generation,
+                workspace_digest=body.workspace_digest,
+                document=document,
+                source_id=_command_id(
+                    document_id,
+                    "current-edit-source",
+                    idempotency_key,
+                ),
+                command_receipt=_command_receipt(
+                    document_id,
+                    "current_document_edit",
+                    idempotency_key,
+                    body.model_dump(mode="json"),
+                ),
+            )
+            return await _snapshot_view(runtime, updated)
     except Exception as error:
         return _employee_mutation_error_response(error)
 

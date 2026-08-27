@@ -113,6 +113,17 @@ manifest 是薄 metadata，只含 generation、canonical resource digest、appro
 
 authority command 在 server 端綁定 exact approved revision、workspace generation、workspace resource digest、changeset ID、group digest 與所選 action IDs。任一重疊內容改動後，舊 command fail stale；不重疊差異會從新基線重新投影，仍可繼續決策。相同 idempotency key 只有在 canonical payload 相同時可 exact replay。
 
+### 同一份目前 JD 的 autosave authority split
+
+產品 API 另投影一份由已驗證 Store workspace 組成的 `current_document`；這是員工與 AI 共編、畫面唯一顯示的目前 JD，不是第二份 durable JSON。Saver 中的 approved JD 仍是隱藏核准基線與 export authority。員工 autosave 送回完整目前文件時，browser 不宣告 touched path 或 authority；server 以 stable ID 比較 fresh approved、fresh current、submitted current 與 fresh semantic review：
+
+- 不與 AI pending semantic scope 重疊的員工欄位，立即同時進 approved 與 current。
+- 修改 AI pending after-state 的欄位只更新 current，原 review group 保持待審；員工仍需整組接受或拒絕。
+- AI 新 Task 的員工能力級別暫存在同一 Store metadata overlay，接受前不進 approved，也不開第二份文件。
+- stable ID、父子關係、排序與 Evidence identity 不採信完整文件覆寫；這些結構變更只允許後續 typed application command。
+
+`PUT /current-document` 同時綁定 approved revision、workspace generation 與 workspace digest。跨 Saver／Store 寫入先保存 `current-edit:{command_id}` exact rebase plan，再以 LangGraph command receipt 提交 approved after-state（pending-only 時內容可不變），最後套用 Store current after-state、驗證並刪 plan。reopen／exact replay 以 receipt 而非只比較 approved digest 判斷第一個 seam 是否成功，因此 pending-only crash 也能 exactly-once 完成；receipt 未提交的 plan 與 pending direct-edit source 會安全丟棄。
+
 ## 員工 authority 與 approved-first recovery
 
 模型與 VFS 永遠沒有 approved write edge。員工有四種 review decision，另可直接編輯核准文件：

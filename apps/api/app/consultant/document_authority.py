@@ -7,6 +7,7 @@ general workflow framework cannot infer for Caliburn.
 
 from __future__ import annotations
 
+from collections.abc import Mapping
 from copy import deepcopy
 from hashlib import sha256
 import json
@@ -262,6 +263,110 @@ def apply_document_actions(
         return ApprovedJobDocument.model_validate(payload)
     except ValueError as error:
         raise DocumentAuthorityError(str(error)) from error
+
+
+def apply_document_path_values(
+    document: ApprovedJobDocument,
+    updates: Mapping[str, JsonValue | None],
+) -> ApprovedJobDocument:
+    """Apply server-authorized scalar values and validate the whole document."""
+
+    payload = document.model_dump(mode="json")
+    for path, value in updates.items():
+        _set_existing_path(payload, path, value)
+    try:
+        return ApprovedJobDocument.model_validate(payload)
+    except ValueError as error:
+        raise DocumentAuthorityError(str(error)) from error
+
+
+def employee_authored_text_delta(
+    before: ApprovedJobDocument,
+    after: ApprovedJobDocument,
+) -> tuple[str, tuple[SourcePositionAnchor, ...]] | None:
+    """Extract exact employee-authored text from one validated document edit."""
+
+    def pointer_part(value: object) -> str:
+        return str(value).replace("~", "~0").replace("/", "~1")
+
+    def add_text(
+        fields: list[tuple[str, str]],
+        path: str,
+        value: str | None,
+    ) -> None:
+        if value is not None and value.strip():
+            fields.append((path, value.strip()))
+
+    def authored_fields(document: ApprovedJobDocument) -> list[tuple[str, str]]:
+        fields: list[tuple[str, str]] = []
+        for name in (
+            "job_title",
+            "occupation_category_name",
+            "occupation_name",
+            "occupation_code",
+            "industry_name",
+            "industry_code",
+            "work_description",
+            "notes",
+        ):
+            add_text(fields, f"/{name}", getattr(document, name))
+        for duty in document.duties:
+            duty_path = f"/duties/{pointer_part(duty.duty_id)}"
+            add_text(fields, f"{duty_path}/statement", duty.statement)
+        for task in document.tasks:
+            task_path = f"/tasks/{pointer_part(task.task_id)}"
+            for name in (
+                "statement",
+                "action",
+                "object",
+                "purpose_result",
+                "context",
+                "frequency_text",
+            ):
+                add_text(fields, f"{task_path}/{name}", getattr(task, name))
+            for index, enabler in enumerate(task.enablers):
+                add_text(
+                    fields,
+                    f"{task_path}/enablers/{index}/name",
+                    enabler.name,
+                )
+        for item in document.opks:
+            add_text(
+                fields,
+                f"/opks/{pointer_part(item.item_id)}/text",
+                item.text,
+            )
+        return fields
+
+    before_fields = dict(authored_fields(before))
+    changes = [
+        (path, value)
+        for path, value in authored_fields(after)
+        if before_fields.get(path) != value
+    ]
+    if not changes:
+        return None
+    chunks: list[str] = []
+    spans: dict[str, tuple[int, int]] = {}
+    positions: list[SourcePositionAnchor] = []
+    cursor = 0
+    for path, value in changes:
+        if value not in spans:
+            if chunks:
+                cursor += 1
+            start = cursor
+            chunks.append(value)
+            cursor += len(value)
+            spans[value] = (start, cursor)
+        start, end = spans[value]
+        positions.append(
+            SourcePositionAnchor(
+                document_path=path,
+                start=start,
+                end=end,
+            )
+        )
+    return "\n".join(chunks), tuple(positions)
 
 
 def _employee_text_leaves(

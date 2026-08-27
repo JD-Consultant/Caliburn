@@ -539,6 +539,15 @@ class DirectDocumentEditWrite(BaseModel):
     document: ApprovedJobDocumentWrite
 
 
+class CurrentDocumentEditWrite(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    document: ApprovedJobDocumentWrite
+    workspace_generation: conint(ge=0, strict=True)
+    workspace_digest: constr(pattern=r'^[0-9a-f]{64}$')
+
+
 class ExportReadinessIssueView(BaseModel):
     model_config = ConfigDict(
         extra='forbid',

@@ -43,6 +43,7 @@ from app.consultant.workspace_review import (
     workspace_action_semantic_fingerprint,
 )
 from app.consultant.workspace_state import (
+    PendingTaskCompetencyLevels,
     Sha256Digest,
     StoreBackedWorkspace,
     WorkspaceDiagnostic,
@@ -159,6 +160,16 @@ class WorkspaceRebasePlan(DurableModel):
     entity_ids_by_handle: dict[str, UUID] = Field(default_factory=dict)
     employee_source_id: UUID | None = None
     result_workspace_digest: Sha256Digest | None = None
+
+
+class CurrentDocumentRebasePlan(DurableModel):
+    """One recoverable Saver/Store commit for the visible current JD."""
+
+    command_receipt: CommandReceipt
+    rebase: WorkspaceRebasePlan
+    pending_task_competency_levels: PendingTaskCompetencyLevels = Field(
+        default_factory=PendingTaskCompetencyLevels
+    )
 
 
 _MISSING = object()
@@ -516,6 +527,10 @@ class WorkspaceAuthorityService:
         return f"direct-rebase:{command_id}"
 
     @staticmethod
+    def _current_edit_plan_key(command_id: UUID) -> str:
+        return f"current-edit:{command_id}"
+
+    @staticmethod
     def _employee_source_id(document_id: UUID, command_id: UUID) -> UUID:
         return uuid5(document_id, f"workspace-review-direct-edit:{command_id}")
 
@@ -613,6 +628,49 @@ class WorkspaceAuthorityService:
         await self.runtime.store.adelete(
             self.runtime.workspace_metadata_namespace(document_id),
             self._direct_plan_key(command_id),
+        )
+
+    async def _load_current_edit_plan(
+        self,
+        document_id: UUID,
+        command_id: UUID,
+    ) -> CurrentDocumentRebasePlan | None:
+        item = await self.runtime.store.aget(
+            self.runtime.workspace_metadata_namespace(document_id),
+            self._current_edit_plan_key(command_id),
+        )
+        if item is None:
+            return None
+        return CurrentDocumentRebasePlan.model_validate(item.value["plan"])
+
+    async def _put_current_edit_plan(
+        self,
+        document_id: UUID,
+        plan: CurrentDocumentRebasePlan,
+    ) -> None:
+        existing = await self._load_current_edit_plan(
+            document_id,
+            plan.command_receipt.command_id,
+        )
+        if existing is not None and existing != plan:
+            raise WorkspaceAuthorityError(
+                "current-document command was reused with another persisted plan"
+            )
+        await self.runtime.store.aput(
+            self.runtime.workspace_metadata_namespace(document_id),
+            self._current_edit_plan_key(plan.command_receipt.command_id),
+            {"plan": plan.model_dump(mode="json")},
+            index=False,
+        )
+
+    async def _delete_current_edit_plan(
+        self,
+        document_id: UUID,
+        command_id: UUID,
+    ) -> None:
+        await self.runtime.store.adelete(
+            self.runtime.workspace_metadata_namespace(document_id),
+            self._current_edit_plan_key(command_id),
         )
 
     async def _review_context(
@@ -796,6 +854,7 @@ class WorkspaceAuthorityService:
         reset_actions: Sequence[DocumentPatchAction] = (),
         accepted_actions: Sequence[DocumentPatchAction] = (),
         employee_override_actions: Sequence[DocumentPatchAction] = (),
+        conflict_baseline: ApprovedJobDocument | None = None,
     ) -> WorkspaceRebasePlan:
         old_projection = project_workspace_files(
             old_approved,
@@ -816,7 +875,7 @@ class WorkspaceAuthorityService:
         working = dict(workspace_files)
         existing_conflicts = active_conflict_diagnostics(
             files=workspace_files,
-            approved_document=old_approved,
+            approved_document=conflict_baseline or old_approved,
             manifest=manifest,
         )
         employee_override_paths = tuple(
@@ -934,6 +993,128 @@ class WorkspaceAuthorityService:
         plan = plan.model_copy(update={"employee_source_id": source_id})
         await self._put_direct_plan(document_id, plan)
         return plan
+
+    async def prepare_current_document_edit(
+        self,
+        *,
+        document_id: UUID,
+        command_receipt: CommandReceipt,
+        source_id: UUID | None,
+        approved_before: ApprovedJobDocument,
+        current_before: ApprovedJobDocument,
+        approved_after: ApprovedJobDocument,
+        current_after: ApprovedJobDocument,
+        approved_revision: int,
+        pending_task_competency_levels: PendingTaskCompetencyLevels,
+    ) -> CurrentDocumentRebasePlan:
+        """Persist the exact Store half before committing LangGraph authority."""
+
+        workspace = StoreBackedWorkspace(
+            store=self.runtime.store,
+            document_id=document_id,
+        )
+        workspace_snapshot = await workspace.read_snapshot()
+        rebase = await self._build_plan(
+            command_id=command_receipt.command_id,
+            old_approved=current_before,
+            workspace_files=workspace_snapshot.files,
+            new_approved=current_after,
+            manifest=workspace_snapshot.manifest,
+            approved_revision=approved_revision,
+            conflict_baseline=approved_before,
+        )
+        rebase = rebase.model_copy(
+            update={
+                "approved_digest": approved_document_digest(approved_after),
+                "employee_source_id": source_id,
+            }
+        )
+        plan = CurrentDocumentRebasePlan(
+            command_receipt=command_receipt,
+            rebase=rebase,
+            pending_task_competency_levels=pending_task_competency_levels,
+        )
+        await self._put_current_edit_plan(document_id, plan)
+        return plan
+
+    async def finish_current_document_edit(
+        self,
+        document_id: UUID,
+        command_id: UUID,
+    ) -> None:
+        """Apply or discard one persisted current-JD Store half exactly once."""
+
+        plan = await self._load_current_edit_plan(document_id, command_id)
+        if plan is None:
+            return
+        raw_state = await self.runtime.raw_state(document_id)
+        try:
+            committed = (
+                inspect_command_receipt(raw_state, plan.command_receipt) == "replay"
+            )
+        except ValueError as error:
+            raise WorkspaceAuthorityError(str(error)) from error
+        if not committed:
+            if plan.rebase.employee_source_id is not None:
+                await self.runtime._discard_pending_source(
+                    document_id,
+                    plan.rebase.employee_source_id,
+                )
+            await self._delete_current_edit_plan(document_id, command_id)
+            return
+
+        snapshot = await self.runtime._snapshot(document_id)
+        if (
+            approved_document_digest(snapshot.approved_document)
+            != plan.rebase.approved_digest
+        ):
+            raise WorkspaceAuthorityError(
+                "current-document approved state does not match its committed plan"
+            )
+        workspace = StoreBackedWorkspace(
+            store=self.runtime.store,
+            document_id=document_id,
+        )
+        current = await workspace.read_snapshot()
+        actual_digest = workspace_resource_digest(current.files)
+        if actual_digest not in {
+            plan.rebase.expected_workspace_digest,
+            plan.rebase.result_workspace_digest,
+        }:
+            raise WorkspaceAuthorityError(
+                "workspace changed outside the persisted current-document edit"
+            )
+        already_validated = (
+            current.manifest.approved_baseline_revision
+            == plan.rebase.approved_revision
+            and current.manifest.approved_baseline_digest
+            == plan.rebase.approved_digest
+            and actual_digest == plan.rebase.result_workspace_digest
+            and current.manifest.validation_status
+            is not WorkspaceValidationStatus.UNVALIDATED
+        )
+        if not already_validated:
+            await workspace.apply_rebase(
+                plan=plan.rebase,
+                approved_document=snapshot.approved_document,
+                approved_revision=plan.rebase.approved_revision,
+            )
+            await self._validate_after_rebase(
+                workspace,
+                snapshot.approved_document,
+                plan=plan.rebase,
+            )
+        await workspace.replace_pending_task_competency_levels(
+            plan.pending_task_competency_levels
+        )
+        if plan.rebase.employee_source_id is not None:
+            source = await self.runtime.get_source_or_none(
+                document_id,
+                plan.rebase.employee_source_id,
+            )
+            if source is not None:
+                await self.runtime._mark_source_committed(source)
+        await self._delete_current_edit_plan(document_id, command_id)
 
     async def finish_direct_edit_rebase(
         self,
@@ -1132,14 +1313,23 @@ class WorkspaceAuthorityService:
         )
         for item in metadata_items:
             key = getattr(item, "key", "")
-            if not str(key).startswith("direct-rebase:"):
+            if str(key).startswith("current-edit:"):
+                plan = CurrentDocumentRebasePlan.model_validate(item.value["plan"])
+                await self.finish_current_document_edit(
+                    document_id,
+                    plan.command_receipt.command_id,
+                )
                 continue
-            plan = WorkspaceRebasePlan.model_validate(item.value["plan"])
-            snapshot = await self.runtime._snapshot(document_id)
-            if approved_document_digest(snapshot.approved_document) == plan.approved_digest:
-                await self.finish_direct_edit_rebase(document_id, plan.command_id)
-            else:
-                await self._delete_direct_plan(document_id, plan.command_id)
+            if str(key).startswith("direct-rebase:"):
+                plan = WorkspaceRebasePlan.model_validate(item.value["plan"])
+                snapshot = await self.runtime._snapshot(document_id)
+                if (
+                    approved_document_digest(snapshot.approved_document)
+                    == plan.approved_digest
+                ):
+                    await self.finish_direct_edit_rebase(document_id, plan.command_id)
+                else:
+                    await self._delete_direct_plan(document_id, plan.command_id)
 
     async def decide(self, command: WorkspaceReviewCommand) -> ConsultantSnapshot:
         """Validate and apply one employee review command; the caller holds the lock."""

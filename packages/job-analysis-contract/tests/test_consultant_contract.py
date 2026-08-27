@@ -11,6 +11,7 @@ from job_analysis_contract import (
     ApprovedJobDocumentWrite,
     ConsultantSnapshotEvent,
     ConsultantSnapshotView,
+    CurrentDocumentEditWrite,
     DocumentReviewDecisionWrite,
     DocumentReviewView,
     EmployeeAnswerWrite,
@@ -119,6 +120,42 @@ def test_commands_are_typed_and_reject_untrusted_extra_fields() -> None:
     with pytest.raises(ValidationError):
         UnderstandingCalibrationDecisionWrite.model_validate(
             {"decision": "confirm", "employee_text": "我確認", "finish": True}
+        )
+
+
+def test_current_document_edit_carries_server_stale_guards() -> None:
+    document_id = uuid4()
+    body = CurrentDocumentEditWrite.model_validate(
+        {
+            "document": {
+                "document_id": str(document_id),
+                "job_title": "採購專員",
+                "occupation_category_name": None,
+                "occupation_name": None,
+                "occupation_code": None,
+                "industry_name": None,
+                "industry_code": None,
+                "work_description": None,
+                "competency_level": None,
+                "notes": None,
+                "duties": [],
+                "tasks": [],
+                "opks": [],
+            },
+            "workspace_generation": 12,
+            "workspace_digest": "a" * 64,
+        }
+    )
+
+    assert body.document.document_id == document_id
+    assert body.workspace_generation == 12
+    assert body.workspace_digest == "a" * 64
+    with pytest.raises(ValidationError):
+        CurrentDocumentEditWrite.model_validate(
+            {
+                **body.model_dump(mode="json"),
+                "workspace_digest": "stale-client-guess",
+            }
         )
 
 

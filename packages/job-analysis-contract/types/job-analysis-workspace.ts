@@ -477,6 +477,15 @@ export interface DirectDocumentEditWrite {
 }
 /**
  * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
+ * via the `definition` "CurrentDocumentEditWrite".
+ */
+export interface CurrentDocumentEditWrite {
+  document: ApprovedJobDocumentWrite;
+  workspace_generation: number;
+  workspace_digest: string;
+}
+/**
+ * This interface was referenced by `JobAnalysisWorkspaceContract`'s JSON-Schema
  * via the `definition` "ExportReadinessIssueView".
  */
 export interface ExportReadinessIssueView {

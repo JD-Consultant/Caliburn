@@ -29,7 +29,15 @@ from psycopg.rows import DictRow, dict_row
 
 from app.consultant.graph import StaleThreadRevision, build_consultant_graph
 from app.consultant.clarification import ClarificationAnswer
-from app.consultant.document_authority import DocumentAuthorityError, edited_action_source_payload
+from app.consultant.current_document import (
+    attach_employee_source_to_current_edit,
+    derive_current_document_edit,
+)
+from app.consultant.document_authority import (
+    DocumentAuthorityError,
+    edited_action_source_payload,
+    employee_authored_text_delta,
+)
 from app.consultant.interview import VerifiedConsultantCommit
 from app.consultant.understanding import semantic_progress_from_workspace
 from app.consultant.state import (
@@ -170,6 +178,9 @@ class PostgresConsultantRuntime:
             self._noop_workspace_hook
         )
         self._after_workspace_decision_record: WorkspaceHook = (
+            self._noop_workspace_hook
+        )
+        self._after_current_document_store: WorkspaceHook = (
             self._noop_workspace_hook
         )
 
@@ -697,6 +708,22 @@ class PostgresConsultantRuntime:
             )
         )
 
+    async def _discard_pending_source(
+        self,
+        document_id: UUID,
+        source_id: UUID,
+    ) -> None:
+        """Discard only an uncommitted source whose graph receipt never landed."""
+
+        source = await self.get_source_or_none(document_id, source_id)
+        if source is None:
+            return
+        if source.processing_status is not SourceProcessingStatus.PENDING:
+            raise SourceConflict(
+                f"committed source {source_id} cannot be discarded during recovery"
+            )
+        await self.store.adelete(self.source_namespace(document_id), str(source_id))
+
     @staticmethod
     def _inspect_command_receipt(
         raw_state: Mapping[str, Any],
@@ -952,85 +979,7 @@ class PostgresConsultantRuntime:
     ) -> tuple[str, tuple[SourcePositionAnchor, ...]] | None:
         """Extract only employee-authored text, never IDs or control values."""
 
-        def pointer_part(value: object) -> str:
-            return str(value).replace("~", "~0").replace("/", "~1")
-
-        def add_text(
-            fields: list[tuple[str, str]], path: str, value: str | None
-        ) -> None:
-            if value is not None and value.strip():
-                fields.append((path, value.strip()))
-
-        def authored_fields(document: ApprovedJobDocument) -> list[tuple[str, str]]:
-            fields: list[tuple[str, str]] = []
-            for name in (
-                "job_title",
-                "occupation_category_name",
-                "occupation_name",
-                "occupation_code",
-                "industry_name",
-                "industry_code",
-                "work_description",
-                "notes",
-            ):
-                add_text(fields, f"/{name}", getattr(document, name))
-            for duty in document.duties:
-                duty_path = f"/duties/{pointer_part(duty.duty_id)}"
-                add_text(fields, f"{duty_path}/statement", duty.statement)
-            for task in document.tasks:
-                task_path = f"/tasks/{pointer_part(task.task_id)}"
-                for name in (
-                    "statement",
-                    "action",
-                    "object",
-                    "purpose_result",
-                    "context",
-                    "frequency_text",
-                ):
-                    add_text(fields, f"{task_path}/{name}", getattr(task, name))
-                for index, enabler in enumerate(task.enablers):
-                    add_text(
-                        fields,
-                        f"{task_path}/enablers/{index}/name",
-                        enabler.name,
-                    )
-            for item in document.opks:
-                add_text(
-                    fields,
-                    f"/opks/{pointer_part(item.item_id)}/text",
-                    item.text,
-                )
-            return fields
-
-        before_fields = dict(authored_fields(before))
-        changes = [
-            (path, value)
-            for path, value in authored_fields(after)
-            if before_fields.get(path) != value
-        ]
-        if not changes:
-            return None
-        chunks: list[str] = []
-        spans: dict[str, tuple[int, int]] = {}
-        positions: list[SourcePositionAnchor] = []
-        cursor = 0
-        for path, value in changes:
-            if value not in spans:
-                if chunks:
-                    cursor += 1
-                start = cursor
-                chunks.append(value)
-                cursor += len(value)
-                spans[value] = (start, cursor)
-            start, end = spans[value]
-            positions.append(
-                SourcePositionAnchor(
-                    document_path=path,
-                    start=start,
-                    end=end,
-                )
-            )
-        return "\n".join(chunks), tuple(positions)
+        return employee_authored_text_delta(before, after)
 
     async def _require_known_evidence_sources(
         self,
@@ -1177,6 +1126,151 @@ class PostgresConsultantRuntime:
                 document_id,
                 direct_rebase_command_id,
             )
+            return await self._snapshot(document_id)
+
+    async def apply_current_document_edit(
+        self,
+        *,
+        document_id: UUID,
+        expected_revision: int,
+        workspace_generation: int,
+        workspace_digest: str,
+        document: ApprovedJobDocument,
+        source_id: UUID,
+        command_receipt: CommandReceipt,
+    ) -> ConsultantSnapshot:
+        """Autosave the one visible JD; derive approved-vs-pending authority server-side."""
+
+        async with self._lock_for(document_id):
+            self._require_employee_mutation_admitted(document_id)
+            await self._require_active_catalog(document_id)
+            authority = WorkspaceAuthorityService(self)
+            await authority.recover(document_id)
+            raw_state = await self.raw_state(document_id)
+            if self._inspect_command_receipt(raw_state, command_receipt) == "replay":
+                await authority.recover(document_id)
+                await self._reconcile_replayed_command_source(document_id, source_id)
+                return await self._snapshot(document_id)
+
+            snapshot, workspace, workspace_snapshot, projection = (
+                await authority._review_context(document_id)
+            )
+            if snapshot.revision != expected_revision:
+                raise StaleRevision(
+                    f"expected revision {expected_revision}, found {snapshot.revision}"
+                )
+            if workspace_snapshot.manifest.generation != workspace_generation:
+                raise StaleRevision(
+                    "expected workspace generation "
+                    f"{workspace_generation}, found "
+                    f"{workspace_snapshot.manifest.generation}"
+                )
+            if workspace_snapshot.manifest.resource_digest != workspace_digest:
+                raise StaleRevision("expected workspace digest is stale")
+            if snapshot.current_document is None:
+                raise ValueError("current document is unavailable")
+            submitted = ApprovedJobDocument.model_validate(
+                document.model_dump(mode="json")
+            )
+            if submitted.document_id != document_id:
+                raise ValueError("edited document does not match document_id")
+
+            task_handle_by_id = {
+                stable_id: handle
+                for handle, stable_id in (
+                    workspace_snapshot.manifest.entity_ids_by_handle.items()
+                )
+                if handle.startswith("task-")
+            }
+            edit = derive_current_document_edit(
+                approved=snapshot.approved_document,
+                current=snapshot.current_document,
+                submitted=submitted,
+                workspace_review=projection,
+                task_handle_by_id=task_handle_by_id,
+            )
+            existing_levels = await workspace.read_pending_task_competency_levels()
+            if (
+                edit.approved_after == snapshot.approved_document
+                and edit.current_after == snapshot.current_document
+                and edit.pending_task_competency_levels == existing_levels
+            ):
+                return snapshot
+
+            source: EmployeeSource | None = None
+            if edit.employee_source_text is not None:
+                existing_source = await self.get_source_or_none(
+                    document_id,
+                    source_id,
+                )
+                if (
+                    existing_source is not None
+                    and existing_source.processing_status
+                    is SourceProcessingStatus.COMMITTED
+                ):
+                    raise SourceConflict(
+                        f"current-edit source {source_id} was already used"
+                    )
+                requested = EmployeeSource.pending(
+                    source_id=source_id,
+                    document_id=document_id,
+                    kind=EmployeeSourceKind.DIRECT_EDIT,
+                    text=edit.employee_source_text,
+                    positions=edit.source_positions,
+                )
+                source = await self._load_or_prepare_source(requested)
+                if source.processing_status is SourceProcessingStatus.PENDING:
+                    await self._after_source_store(source)
+                edit = attach_employee_source_to_current_edit(edit, source.source_id)
+
+            await self._require_known_evidence_sources(
+                edit.current_after,
+                pending_direct_edit_source_id=(
+                    source.source_id if source is not None else None
+                ),
+            )
+            await authority.prepare_current_document_edit(
+                document_id=document_id,
+                command_receipt=command_receipt,
+                source_id=(source.source_id if source is not None else None),
+                approved_before=snapshot.approved_document,
+                current_before=snapshot.current_document,
+                approved_after=edit.approved_after,
+                current_after=edit.current_after,
+                approved_revision=expected_revision + 1,
+                pending_task_competency_levels=(
+                    edit.pending_task_competency_levels
+                ),
+            )
+            await self._after_workspace_decision_record()
+            command: dict[str, Any] = {
+                "action": "workspace_authority_commit",
+                "document_id": str(document_id),
+                "expected_revision": expected_revision,
+                "approved_document": edit.approved_after.model_dump(mode="json"),
+                "command_receipt": command_receipt.model_dump(mode="json"),
+            }
+            if source is not None:
+                command["source_reference"] = SourceReference(
+                    source_id=source.source_id,
+                    kind=source.kind,
+                    created_at=source.created_at,
+                ).model_dump(mode="json")
+            try:
+                await self.graph.ainvoke(
+                    {},
+                    self.graph_config(document_id),
+                    context=command,
+                )
+            except StaleThreadRevision as error:
+                raise StaleRevision(str(error)) from error
+            await self._after_workspace_authority_checkpoint()
+            await authority.finish_current_document_edit(
+                document_id,
+                command_receipt.command_id,
+            )
+            await self._touch_catalog(document_id)
+            await self._after_current_document_store()
             return await self._snapshot(document_id)
 
 

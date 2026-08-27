@@ -22,9 +22,7 @@ import {
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
-import {
-  DocumentChangePreview,
-} from "./DocumentChangeEditor";
+import { DocumentChangePreview } from "./DocumentChangeEditor";
 import {
   buildReviewDecision,
   documentPathLabel,
@@ -72,12 +70,14 @@ function ReviewBundle({
   bundleOrdinal,
   bundle,
   approvedDocument,
+  mutationLocked,
 }: {
   documentId: string;
   revision: number;
   bundleOrdinal: number;
   bundle: DocumentChangeSetView;
   approvedDocument: ApprovedJobDocumentView;
+  mutationLocked: boolean;
 }) {
   const queryClient = useQueryClient();
   const [selected, setSelected] = useState<string[]>([]);
@@ -114,6 +114,7 @@ function ReviewBundle({
   });
 
   const toggle = (actionId: string) => {
+    if (mutationLocked) return;
     const group = reviewSelectionForAction(bundle, actionId);
     setSelected((current) => {
       const allSelected = group.every((id) => current.includes(id));
@@ -124,7 +125,7 @@ function ReviewBundle({
   };
 
   const decide = (command: DocumentReviewDecisionWrite["command"]) => {
-    if (!selected.length || mutation.isPending) return;
+    if (!selected.length || mutationLocked || mutation.isPending) return;
     if (bundle.acceptance_blocked && command === "accept_changes") {
       return;
     }
@@ -147,9 +148,7 @@ function ReviewBundle({
       mutation.isError &&
       JSON.stringify(previous?.decision) === JSON.stringify(decision);
     mutation.mutate(
-      retry
-        ? previous!
-        : { decision, idempotencyKey: crypto.randomUUID() },
+      retry ? previous! : { decision, idempotencyKey: crypto.randomUUID() },
     );
   };
 
@@ -186,13 +185,17 @@ function ReviewBundle({
                   type="checkbox"
                   aria-label={selectionLabel}
                   checked={selected.includes(action.action_id)}
-                  disabled={!reviewable || mutation.isPending}
+                  disabled={!reviewable || mutationLocked || mutation.isPending}
                   onChange={() => toggle(action.action_id)}
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="secondary">{operationLabels[action.operation]}</Badge>
-                    <span className="text-xs text-stone-500">{statusLabels[action.status]}</span>
+                    <Badge variant="secondary">
+                      {operationLabels[action.operation]}
+                    </Badge>
+                    <span className="text-xs text-stone-500">
+                      {statusLabels[action.status]}
+                    </span>
                     {action.atomic_subgroup_id ? (
                       <span className="inline-flex items-center gap-1 text-xs text-stone-500">
                         <LockKeyhole className="size-3" /> 必須整組決定
@@ -207,7 +210,9 @@ function ReviewBundle({
                   </p>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <div>
-                      <p className="text-xs font-medium text-stone-500">目前正式內容</p>
+                      <p className="text-xs font-medium text-stone-500">
+                        目前正式內容
+                      </p>
                       <DocumentChangePreview
                         action={action}
                         value={action.before}
@@ -237,25 +242,33 @@ function ReviewBundle({
       {selected.length ? (
         <div className="mt-4 rounded-xl bg-stone-50 p-4">
           <p className="text-sm font-medium">已選 {selected.length} 項</p>
-          <label className="mt-3 block text-xs text-stone-500" htmlFor={`reject-${bundle.changeset_id}`}>
+          <label
+            className="mt-3 block text-xs text-stone-500"
+            htmlFor={`reject-${bundle.changeset_id}`}
+          >
             若要拒絕，可補充原因
           </label>
           <input
             id={`reject-${bundle.changeset_id}`}
             className="mt-1 w-full rounded-lg border border-stone-300 bg-white px-3 py-2 text-sm"
             value={rejectionReason}
+            disabled={mutationLocked || mutation.isPending}
             onChange={(event) => setRejectionReason(event.target.value)}
           />
           <div className="mt-3 flex flex-wrap gap-2">
             <Button
-              disabled={mutation.isPending || bundle.acceptance_blocked}
+              disabled={
+                mutationLocked ||
+                mutation.isPending ||
+                bundle.acceptance_blocked
+              }
               onClick={() => decide("accept_changes")}
             >
               接受 AI 建議
             </Button>
             <Button
               variant="destructive"
-              disabled={mutation.isPending}
+              disabled={mutationLocked || mutation.isPending}
               onClick={() => decide("reject_changes")}
             >
               拒絕
@@ -265,7 +278,9 @@ function ReviewBundle({
       ) : null}
 
       {editError ? (
-        <p role="alert" className="mt-3 text-sm text-destructive">{editError}</p>
+        <p role="alert" className="mt-3 text-sm text-destructive">
+          {editError}
+        </p>
       ) : null}
       {mutation.isError ? (
         <p role="alert" className="mt-3 text-sm text-destructive">
@@ -279,9 +294,11 @@ function ReviewBundle({
 export function DocumentReviewPanel({
   documentId,
   snapshot,
+  mutationLocked = false,
 }: {
   documentId: string;
   snapshot: ConsultantSnapshotView;
+  mutationLocked?: boolean;
 }) {
   const activeBundles = snapshot.document_review.bundles.filter((bundle) =>
     bundle.actions.some((action) => action.status === "pending"),
@@ -342,13 +359,18 @@ export function DocumentReviewPanel({
               className="rounded-xl border border-amber-200 bg-amber-50/60 px-4 py-3"
             >
               <p className="text-sm font-semibold">{branch.title}</p>
-              <p className="mt-1 text-xs leading-5 text-stone-600">{branch.reason}</p>
+              <p className="mt-1 text-xs leading-5 text-stone-600">
+                {branch.reason}
+              </p>
             </div>
           ))}
         </div>
       ) : null}
       {isInvalid ? null : activeBundles.length === 0 ? (
-        <div role="status" className="rounded-xl border border-dashed border-stone-300 bg-white px-5 py-8 text-center text-sm text-stone-500">
+        <div
+          role="status"
+          className="rounded-xl border border-dashed border-stone-300 bg-white px-5 py-8 text-center text-sm text-stone-500"
+        >
           目前沒有等待你決定的文件變更。
         </div>
       ) : (
@@ -360,6 +382,7 @@ export function DocumentReviewPanel({
             bundleOrdinal={index + 1}
             bundle={bundle}
             approvedDocument={snapshot.approved_document}
+            mutationLocked={mutationLocked}
           />
         ))
       )}

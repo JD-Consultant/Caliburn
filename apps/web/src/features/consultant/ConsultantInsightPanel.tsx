@@ -5,7 +5,13 @@ import type {
   UnderstandingCalibrationDecisionWrite,
 } from "@caliburn/job-analysis-contract";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { AlertTriangle, CircleHelp, Compass, Lightbulb, ListChecks } from "lucide-react";
+import {
+  AlertTriangle,
+  CircleHelp,
+  Compass,
+  Lightbulb,
+  ListChecks,
+} from "lucide-react";
 
 import {
   decideUnderstandingCalibration,
@@ -51,9 +57,11 @@ const depthStatusLabels: Record<string, string> = {
 export function ConsultantInsightPanel({
   documentId,
   snapshot,
+  mutationLocked = false,
 }: {
   documentId: string;
   snapshot: ConsultantSnapshotView;
+  mutationLocked?: boolean;
 }) {
   const queryClient = useQueryClient();
   const calibration = snapshot.understanding.calibration;
@@ -94,7 +102,7 @@ export function ConsultantInsightPanel({
   const submitCalibration = (
     decision: UnderstandingCalibrationDecisionWrite,
   ) => {
-    if (!calibration || calibrationMutation.isPending) return;
+    if (!calibration || mutationLocked || calibrationMutation.isPending) return;
     const previous = calibrationMutation.variables;
     const retry =
       calibrationMutation.isError &&
@@ -114,13 +122,20 @@ export function ConsultantInsightPanel({
   return (
     <div className="space-y-5">
       {clarification ? (
-        <Card className="border-rose-300 bg-rose-50 p-5 shadow-sm" aria-label="需要先釐清">
+        <Card
+          className="border-rose-300 bg-rose-50 p-5 shadow-sm"
+          aria-label="需要先釐清"
+        >
           <div className="flex items-start gap-3">
             <CircleHelp className="mt-0.5 size-5 shrink-0 text-rose-700" />
             <div className="min-w-0 flex-1">
               <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-semibold text-rose-950">這個問題需要你決定</h2>
-                <Badge variant="destructive">只阻擋：{clarification.affected_branch}</Badge>
+                <h2 className="font-semibold text-rose-950">
+                  這個問題需要你決定
+                </h2>
+                <Badge variant="destructive">
+                  只阻擋：{clarification.affected_branch}
+                </Badge>
               </div>
               <p className="mt-2 text-xs leading-5 text-rose-900/75">
                 必要澄清已顯示在訪談區；回答後 AI 才會繼續受影響的分析分支。
@@ -142,9 +157,7 @@ export function ConsultantInsightPanel({
             </p>
             {focus ? (
               <>
-                <h2 className="mt-1 text-lg font-semibold">
-                  {focus.title}
-                </h2>
+                <h2 className="mt-1 text-lg font-semibold">{focus.title}</h2>
                 <p className="mt-2 text-sm leading-6 text-stone-700">
                   {focus.whyNow}
                 </p>
@@ -177,7 +190,9 @@ export function ConsultantInsightPanel({
                 <p className="text-xs font-semibold tracking-[0.16em] text-violet-700 uppercase">
                   可修正的理解
                 </p>
-                <h2 className="mt-1 font-semibold">{snapshot.understanding.label}</h2>
+                <h2 className="mt-1 font-semibold">
+                  {snapshot.understanding.label}
+                </h2>
               </div>
               <span className="text-xs text-violet-700">展開／收合</span>
             </div>
@@ -187,7 +202,10 @@ export function ConsultantInsightPanel({
               <p className="text-sm text-violet-900/70">還在建立初步理解。</p>
             ) : (
               snapshot.understanding.items.map((item) => (
-                <div key={item.understanding_id} className="rounded-lg bg-white px-3 py-2 text-sm">
+                <div
+                  key={item.understanding_id}
+                  className="rounded-lg bg-white px-3 py-2 text-sm"
+                >
                   <p>{item.text}</p>
                   <p className="mt-1 text-xs text-stone-500">
                     {understandingStatusLabel(item.status)}
@@ -197,7 +215,9 @@ export function ConsultantInsightPanel({
             )}
             {snapshot.understanding.parked_clues.length ? (
               <div>
-                <p className="text-xs font-medium text-violet-900">稍後處理的線索</p>
+                <p className="text-xs font-medium text-violet-900">
+                  稍後處理的線索
+                </p>
                 <ul className="mt-1 list-disc pl-5 text-sm text-violet-900/80">
                   {snapshot.understanding.parked_clues.map((clue) => (
                     <li key={clue.work_id}>{clue.title}</li>
@@ -209,16 +229,26 @@ export function ConsultantInsightPanel({
             {calibration && calibration.status === "pending" ? (
               <div className="rounded-xl border border-violet-200 bg-white p-4">
                 <div className="flex items-center gap-2">
-                  <Badge variant={calibration.kind === "branch_blocking" ? "destructive" : "secondary"}>
-                    {calibration.kind === "branch_blocking" ? "影響後續分析" : "理解校準"}
+                  <Badge
+                    variant={
+                      calibration.kind === "branch_blocking"
+                        ? "destructive"
+                        : "secondary"
+                    }
+                  >
+                    {calibration.kind === "branch_blocking"
+                      ? "影響後續分析"
+                      : "理解校準"}
                   </Badge>
-                  <span className="text-xs text-stone-500">請確認 AI 是否理解正確</span>
+                  <span className="text-xs text-stone-500">
+                    請確認 AI 是否理解正確
+                  </span>
                 </div>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {calibration.allowed_actions.includes("confirm") ? (
                     <Button
                       size="sm"
-                      disabled={calibrationMutation.isPending}
+                      disabled={mutationLocked || calibrationMutation.isPending}
                       onClick={() =>
                         submitCalibration({
                           decision: "confirm",
@@ -233,9 +263,12 @@ export function ConsultantInsightPanel({
                     <Button
                       size="sm"
                       variant="ghost"
-                      disabled={calibrationMutation.isPending}
+                      disabled={mutationLocked || calibrationMutation.isPending}
                       onClick={() =>
-                        submitCalibration({ decision: "later", employee_text: null })
+                        submitCalibration({
+                          decision: "later",
+                          employee_text: null,
+                        })
                       }
                     >
                       稍後再確認
@@ -264,7 +297,8 @@ export function ConsultantInsightPanel({
               訪談進度
             </p>
             <h2 className="mt-1 font-semibold">
-              目前已辨識 {snapshot.semantic_progress.currently_known_work_count} 項工作
+              目前已辨識 {snapshot.semantic_progress.currently_known_work_count}{" "}
+              項工作
             </h2>
           </div>
         </div>
@@ -280,7 +314,10 @@ export function ConsultantInsightPanel({
 
         <div className="mt-4 space-y-3">
           {snapshot.semantic_progress.coverage.map((item) => (
-            <div key={item.work_id} className="rounded-lg border border-stone-200 px-3 py-2">
+            <div
+              key={item.work_id}
+              className="rounded-lg border border-stone-200 px-3 py-2"
+            >
               <div className="flex items-center justify-between gap-3">
                 <p className="text-sm font-medium">{item.title}</p>
                 <Badge variant="outline">
@@ -291,13 +328,19 @@ export function ConsultantInsightPanel({
               {snapshot.semantic_progress.depth
                 .filter((depth) => depth.work_id === item.work_id)
                 .map((depth) => (
-                  <div key={depth.work_id} className="mt-2 flex flex-wrap gap-1.5">
+                  <div
+                    key={depth.work_id}
+                    className="mt-2 flex flex-wrap gap-1.5"
+                  >
                     {Object.entries(depthLabels).map(([key, label]) => (
                       <span
                         key={key}
                         className="rounded-full bg-stone-100 px-2 py-1 text-[11px] text-stone-600"
                       >
-                        {label}：{depthStatusLabels[depth[key as keyof typeof depthLabels]] ?? depth[key as keyof typeof depthLabels]}
+                        {label}：
+                        {depthStatusLabels[
+                          depth[key as keyof typeof depthLabels]
+                        ] ?? depth[key as keyof typeof depthLabels]}
                       </span>
                     ))}
                   </div>
@@ -308,8 +351,12 @@ export function ConsultantInsightPanel({
 
         <div className="mt-5 border-t border-stone-200 pt-4">
           <p className="text-sm font-semibold">具體待處理缺口</p>
-          {snapshot.semantic_progress.gaps.filter((gap) => gap.status !== "resolved").length === 0 ? (
-            <p className="mt-2 text-sm text-stone-500">目前沒有已知未解缺口。</p>
+          {snapshot.semantic_progress.gaps.filter(
+            (gap) => gap.status !== "resolved",
+          ).length === 0 ? (
+            <p className="mt-2 text-sm text-stone-500">
+              目前沒有已知未解缺口。
+            </p>
           ) : (
             <ul className="mt-2 space-y-2">
               {snapshot.semantic_progress.gaps
@@ -319,7 +366,9 @@ export function ConsultantInsightPanel({
                     <AlertTriangle className="mt-0.5 size-4 shrink-0 text-amber-700" />
                     <span>
                       {gap.description}
-                      {gap.blocks_dependent_analysis ? "（會影響相依分析）" : ""}
+                      {gap.blocks_dependent_analysis
+                        ? "（會影響相依分析）"
+                        : ""}
                     </span>
                   </li>
                 ))}
@@ -327,11 +376,17 @@ export function ConsultantInsightPanel({
           )}
         </div>
 
-        <div className={`mt-5 rounded-xl p-4 ${snapshot.sufficiency.currently_enough ? "bg-emerald-50" : "bg-amber-50"}`}>
+        <div
+          className={`mt-5 rounded-xl p-4 ${snapshot.sufficiency.currently_enough ? "bg-emerald-50" : "bg-amber-50"}`}
+        >
           <p className="text-sm font-semibold">
-            {snapshot.sufficiency.currently_enough ? "目前資訊已足夠" : "目前還值得繼續訪談"}
+            {snapshot.sufficiency.currently_enough
+              ? "目前資訊已足夠"
+              : "目前還值得繼續訪談"}
           </p>
-          <p className="mt-1 text-sm leading-6">{snapshot.sufficiency.why_enough}</p>
+          <p className="mt-1 text-sm leading-6">
+            {snapshot.sufficiency.why_enough}
+          </p>
           <p className="mt-2 text-xs text-stone-600">
             繼續的可能幫助：{snapshot.sufficiency.likely_benefit_of_continuing}
           </p>
@@ -343,7 +398,9 @@ export function ConsultantInsightPanel({
             </ul>
           ) : null}
           {snapshot.sufficiency.needs_recalculation ? (
-            <p className="mt-2 text-xs text-stone-500">內容剛更新，足夠性正在重新計算。</p>
+            <p className="mt-2 text-xs text-stone-500">
+              內容剛更新，足夠性正在重新計算。
+            </p>
           ) : null}
         </div>
       </Card>

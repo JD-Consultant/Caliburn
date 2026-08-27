@@ -4,6 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   act,
   cleanup,
+  fireEvent,
   render,
   renderHook,
   screen,
@@ -13,7 +14,7 @@ import userEvent from "@testing-library/user-event";
 import type { DocumentPatchActionView } from "@caliburn/job-analysis-contract";
 import { useForm } from "@tanstack/react-form";
 import type { ReactNode } from "react";
-import { afterEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { jobAnalysisKeys } from "@/shared/query/jobAnalysisQueries";
 import {
@@ -26,6 +27,7 @@ import { ConsultantConversation } from "./ConsultantConversation";
 import { ConsultantInsightPanel } from "./ConsultantInsightPanel";
 import { ConsultantWorkspace } from "./ConsultantWorkspace";
 import { DocumentReviewPanel } from "./DocumentReviewPanel";
+import { InterviewWorkMap } from "./InterviewWorkMap";
 import {
   DOCUMENT_ID,
   consultantSnapshotFixture,
@@ -61,13 +63,32 @@ class FakeResizeObserver {
   disconnect() {}
 }
 
+beforeEach(() => {
+  vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+});
+
 function renderWithClient(ui: ReactNode, client = new QueryClient()) {
   return {
     client,
-    ...render(
-      <QueryClientProvider client={client}>{ui}</QueryClientProvider>,
-    ),
+    ...render(<QueryClientProvider client={client}>{ui}</QueryClientProvider>),
   };
+}
+
+function workspaceClient(snapshot = consultantSnapshotFixture()) {
+  const client = new QueryClient({
+    defaultOptions: { queries: { staleTime: Infinity, retry: false } },
+  });
+  client.setQueryData(
+    jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID),
+    snapshot,
+  );
+  client.setQueryData(jobAnalysisKeys.consultantDocument(DOCUMENT_ID), {
+    document_id: DOCUMENT_ID,
+    title: "採購專員訪談",
+    created_at: "2026-08-14T10:00:00Z",
+    updated_at: "2026-08-14T10:00:02Z",
+  });
+  return client;
 }
 
 afterEach(() => {
@@ -106,6 +127,203 @@ describe("employee consultant workspace integration", () => {
     expect(form.result.current.state.values.duties).toEqual([]);
   });
 
+  it("keeps one current JD centered between independently collapsible work-map and conversation regions", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+    vi.stubGlobal("EventSource", FakeEventSource);
+
+    renderWithClient(
+      <ConsultantWorkspace documentId={DOCUMENT_ID} />,
+      workspaceClient(),
+    );
+
+    expect(
+      screen.getByRole("complementary", { name: "訪談工作地圖" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("region", { name: "目前 JD" })).toBeTruthy();
+    expect(
+      screen.getByRole("complementary", { name: "AI 職務分析顧問" }),
+    ).toBeTruthy();
+
+    await user.click(screen.getByRole("button", { name: "收合訪談工作地圖" }));
+    expect(
+      screen.getByRole("button", { name: "顯示訪談工作地圖" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("region", { name: "目前 JD" })).toBeTruthy();
+
+    await user.click(
+      screen.getByRole("button", { name: "收合 AI 職務分析顧問" }),
+    );
+    expect(
+      screen.getByRole("button", { name: "顯示 AI 職務分析顧問" }),
+    ).toBeTruthy();
+    expect(screen.getByRole("region", { name: "目前 JD" })).toBeTruthy();
+  });
+
+  it("locks every document mutation while analysis runs but keeps reading and navigation available", async () => {
+    const user = userEvent.setup();
+    const snapshot = consultantSnapshotFixture();
+    snapshot.run = {
+      ...snapshot.run!,
+      status: "source_saved",
+      completed_at: null,
+    };
+    vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+    vi.stubGlobal("EventSource", FakeEventSource);
+
+    renderWithClient(
+      <ConsultantWorkspace documentId={DOCUMENT_ID} />,
+      workspaceClient(snapshot),
+    );
+
+    const workspace = screen.getByRole("main", { name: "職務分析工作區" });
+    expect(workspace.getAttribute("aria-busy")).toBe("true");
+    expect(
+      (screen.getByLabelText("回覆顧問") as HTMLTextAreaElement).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getAllByRole("checkbox")[0] as HTMLInputElement).disabled,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "理解正確" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+
+    await user.click(screen.getByText("目前正式職務說明書"));
+    expect(
+      (screen.getByLabelText("職務名稱") as HTMLInputElement).readOnly,
+    ).toBe(true);
+    expect(
+      (screen.getByRole("button", { name: "新增職責" }) as HTMLButtonElement)
+        .disabled,
+    ).toBe(true);
+
+    await user.click(screen.getByRole("button", { name: "收合訪談工作地圖" }));
+    expect(
+      screen.getByRole("button", { name: "顯示訪談工作地圖" }),
+    ).toBeTruthy();
+    expect(screen.getAllByText("月結差異處理").length).toBeGreaterThan(0);
+  });
+
+  it("does not confuse pending review with an active analysis lock", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal("ResizeObserver", FakeResizeObserver);
+    vi.stubGlobal("EventSource", FakeEventSource);
+
+    renderWithClient(
+      <ConsultantWorkspace documentId={DOCUMENT_ID} />,
+      workspaceClient(),
+    );
+
+    expect(
+      screen
+        .getByRole("main", { name: "職務分析工作區" })
+        .getAttribute("aria-busy"),
+    ).toBe("false");
+    expect(
+      (screen.getByLabelText("回覆顧問") as HTMLTextAreaElement).disabled,
+    ).toBe(false);
+    expect(
+      (screen.getAllByRole("checkbox")[0] as HTMLInputElement).disabled,
+    ).toBe(false);
+
+    await user.click(screen.getByText("目前正式職務說明書"));
+    expect(
+      (screen.getByLabelText("職務名稱") as HTMLInputElement).readOnly,
+    ).toBe(false);
+  });
+
+  it("locks the workspace immediately while the employee answer request is being admitted", async () => {
+    const user = userEvent.setup();
+    vi.stubGlobal("EventSource", FakeEventSource);
+    let finishRequest: ((response: Response) => void) | undefined;
+    const pendingResponse = new Promise<Response>((resolve) => {
+      finishRequest = resolve;
+    });
+    const fetchMock = vi.fn().mockReturnValue(pendingResponse);
+    vi.stubGlobal("fetch", fetchMock);
+
+    const view = renderWithClient(
+      <ConsultantWorkspace documentId={DOCUMENT_ID} />,
+      workspaceClient(),
+    );
+    const answer = screen.getByLabelText("回覆顧問");
+    expect((answer as HTMLTextAreaElement).disabled).toBe(false);
+    fireEvent.change(answer, {
+      target: { value: "這項核准由主管決定，我負責準備資料。" },
+    });
+    const currentAnswer = screen.getByLabelText("回覆顧問");
+    expect((currentAnswer as HTMLTextAreaElement).value).toBe(
+      "這項核准由主管決定，我負責準備資料。",
+    );
+    const sendButton = screen.getByRole("button", { name: "送出澄清" });
+    expect((sendButton as HTMLButtonElement).disabled).toBe(false);
+    await user.click(sendButton);
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+
+    await waitFor(() =>
+      expect(
+        screen
+          .getByRole("main", { name: "職務分析工作區" })
+          .getAttribute("aria-busy"),
+      ).toBe("true"),
+    );
+    expect((currentAnswer as HTMLTextAreaElement).disabled).toBe(true);
+    expect(
+      (screen.getAllByRole("checkbox")[0] as HTMLInputElement).disabled,
+    ).toBe(true);
+
+    view.unmount();
+    finishRequest?.(
+      new Response(JSON.stringify(consultantSnapshotFixture()), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+  });
+
+  it("projects unassigned document items in the work map without treating them as interview blockers", () => {
+    const snapshot = consultantSnapshotFixture();
+    snapshot.current_document.tasks = [
+      {
+        task_id: "00000000-0000-0000-0000-000000000050",
+        duty_id: null,
+        statement: "整理臨時採購需求",
+        action: "整理",
+        object: "臨時採購需求",
+        purpose_result: null,
+        context: null,
+        frequency_text: null,
+        responsibility_role: null,
+        enablers: [],
+        display_order: 0,
+        competency_level: null,
+      },
+    ];
+    snapshot.current_document.opks.push({
+      item_id: "00000000-0000-0000-0000-000000000051",
+      kind: "knowledge",
+      text: "採購法規知識",
+      display_order: 0,
+      task_ids: [],
+      indicator_ids: [],
+      evidence_source_ids: [snapshot.latest_source_id!],
+    });
+
+    renderWithClient(
+      <InterviewWorkMap
+        documentId={DOCUMENT_ID}
+        snapshot={snapshot}
+        mutationLocked={false}
+      />,
+    );
+
+    expect(screen.getByText("尚未分組 1 項")).toBeTruthy();
+    expect(screen.getByText("K／S 待連結 1 項")).toBeTruthy();
+    expect(screen.getByText("整理臨時採購需求")).toBeTruthy();
+    expect(document.body.textContent).not.toContain("阻擋匯出");
+  });
+
   it("shows durable question focus and workspace-derived employee decision progress", () => {
     const snapshot = consultantSnapshotFixture();
     snapshot.current_interview = null;
@@ -128,7 +346,10 @@ describe("employee consultant workspace integration", () => {
     const client = new QueryClient({
       defaultOptions: { queries: { staleTime: Infinity, retry: false } },
     });
-    client.setQueryData(jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID), snapshot);
+    client.setQueryData(
+      jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID),
+      snapshot,
+    );
     client.setQueryData(jobAnalysisKeys.consultantDocument(DOCUMENT_ID), {
       document_id: DOCUMENT_ID,
       title: "採購專員訪談",
@@ -146,16 +367,22 @@ describe("employee consultant workspace integration", () => {
     expect(screen.getByText("先大致盤點工作")).toBeTruthy();
     expect(screen.getByText("還不知道這項工作交付什麼成果。")).toBeTruthy();
     expect(screen.getByText(/再談一個實例可補齊成果與指標/)).toBeTruthy();
-    expect(screen.getByText("這項核准是你本人決定，還是主管決定？")).toBeTruthy();
+    expect(
+      screen.getByText("這項核准是你本人決定，還是主管決定？"),
+    ).toBeTruthy();
 
-    await act(async () => FakeEventSource.latest?.onerror?.(new Event("error")));
+    await act(async () =>
+      FakeEventSource.latest?.onerror?.(new Event("error")),
+    );
     expect(screen.getByText(/連線恢復中/)).toBeTruthy();
     await act(async () => FakeEventSource.latest?.onopen?.(new Event("open")));
     expect(screen.getByText(/已連線；變更會自動更新/)).toBeTruthy();
 
     await user.click(screen.getByRole("button", { name: "匯出 XLSX" }));
     expect(screen.getByText("匯出前仍有以下缺口")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "我已看過，仍要匯出" })).toBeTruthy();
+    expect(
+      screen.getByRole("button", { name: "我已看過，仍要匯出" }),
+    ).toBeTruthy();
 
     const stream = FakeEventSource.latest;
     view.unmount();
@@ -173,7 +400,9 @@ describe("employee consultant workspace integration", () => {
         {
           work_id: snapshot.current_interview!.work_id,
           title: "月結差異處理",
-          decision_action_ids: [snapshot.document_review.bundles[0].actions[0].action_id],
+          decision_action_ids: [
+            snapshot.document_review.bundles[0].actions[0].action_id,
+          ],
           reason: "需先確認這項工作應歸入哪一項主要職責。",
         },
       ],
@@ -186,9 +415,9 @@ describe("employee consultant workspace integration", () => {
       </>,
     );
 
-    expect((screen.getByLabelText("回覆顧問") as HTMLTextAreaElement).disabled).toBe(
-      false,
-    );
+    expect(
+      (screen.getByLabelText("回覆顧問") as HTMLTextAreaElement).disabled,
+    ).toBe(false);
     expect(screen.getByText("月結差異處理")).toBeTruthy();
     expect(
       screen.getByText("需先確認這項工作應歸入哪一項主要職責。"),
@@ -245,7 +474,10 @@ describe("employee consultant workspace integration", () => {
     );
     vi.stubGlobal("fetch", fetchMock);
     renderWithClient(
-      <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={renderedSnapshot} />,
+      <DocumentReviewPanel
+        documentId={DOCUMENT_ID}
+        snapshot={renderedSnapshot}
+      />,
       client,
     );
 
@@ -344,7 +576,9 @@ describe("employee consultant workspace integration", () => {
       <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
-    expect(screen.getByRole("region", { name: "AI 文件變更審核" })).toBeTruthy();
+    expect(
+      screen.getByRole("region", { name: "AI 文件變更審核" }),
+    ).toBeTruthy();
     expect(document.body.textContent).not.toContain(actionIds.accept);
     expect(document.body.textContent).not.toContain("write_file");
     expect(document.body.textContent).not.toContain("/candidate/");
@@ -361,7 +595,9 @@ describe("employee consultant workspace integration", () => {
       await user.keyboard("{Enter}");
     };
 
-    await selectWithKeyboard("選取第 1 組第 1 項新增變更：職務名稱（接受職務名稱建議）");
+    await selectWithKeyboard(
+      "選取第 1 組第 1 項新增變更：職務名稱（接受職務名稱建議）",
+    );
     await decideWithKeyboard("接受 AI 建議");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(
@@ -371,7 +607,9 @@ describe("employee consultant workspace integration", () => {
       action_ids: [actionIds.accept],
     });
 
-    await selectWithKeyboard("選取第 2 組第 1 項修改變更：工作描述（修改工作描述建議）");
+    await selectWithKeyboard(
+      "選取第 2 組第 1 項修改變更：工作描述（修改工作描述建議）",
+    );
     await decideWithKeyboard("接受 AI 建議");
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
     expect(
@@ -381,7 +619,9 @@ describe("employee consultant workspace integration", () => {
       action_ids: [actionIds.secondAccept],
     });
 
-    await selectWithKeyboard("選取第 3 組第 1 項移除變更：職務名稱（移除不適用建議）");
+    await selectWithKeyboard(
+      "選取第 3 組第 1 項移除變更：職務名稱（移除不適用建議）",
+    );
     const rejectionReason = screen.getByLabelText("若要拒絕，可補充原因");
     await user.type(rejectionReason, "目前正式文件仍需要這項內容");
     await decideWithKeyboard("拒絕");
@@ -413,7 +653,9 @@ describe("employee consultant workspace integration", () => {
       <DocumentReviewPanel documentId={DOCUMENT_ID} snapshot={snapshot} />,
     );
 
-    expect(screen.getByRole("status").textContent).toContain("AI 正在修正工作草稿");
+    expect(screen.getByRole("status").textContent).toContain(
+      "AI 正在修正工作草稿",
+    );
     expect(screen.getByText("工作草稿有內容需要 AI 修正。")).toBeTruthy();
     expect(screen.queryByRole("button", { name: "接受 AI 建議" })).toBeNull();
     expect(document.body.textContent).not.toContain("/workspace/");
@@ -461,7 +703,9 @@ describe("employee consultant workspace integration", () => {
       />,
     );
 
-    expect(screen.getByRole("status").textContent).toContain("AI 建議的文件變更");
+    expect(screen.getByRole("status").textContent).toContain(
+      "AI 建議的文件變更",
+    );
   });
 
   it("gives each review checkbox a distinct employee-semantic name", () => {
@@ -533,7 +777,8 @@ describe("employee consultant workspace integration", () => {
         {
           code: "workspace-rebase-conflict",
           path: "工作內容",
-          message: "正式文件與工作草稿的同一內容已有變動，請先選擇要保留的內容。",
+          message:
+            "正式文件與工作草稿的同一內容已有變動，請先選擇要保留的內容。",
         },
       ],
       bundles: [
@@ -551,16 +796,22 @@ describe("employee consultant workspace integration", () => {
     expect(screen.getByRole("alert").textContent).toContain(
       "正式文件與工作草稿的同一內容已有變動",
     );
-    expect(document.body.textContent).not.toMatch(/Store|workspace-rebase-conflict|UUID/i);
+    expect(document.body.textContent).not.toMatch(
+      /Store|workspace-rebase-conflict|UUID/i,
+    );
     const checkbox = screen.getAllByRole("checkbox")[0];
     await user.click(checkbox);
     expect(
-      (screen.getByRole("button", { name: "接受 AI 建議" }) as HTMLButtonElement)
-        .disabled,
+      (
+        screen.getByRole("button", {
+          name: "接受 AI 建議",
+        }) as HTMLButtonElement
+      ).disabled,
     ).toBe(true);
     expect(screen.queryByRole("button", { name: "修改後接受" })).toBeNull();
     expect(
-      (screen.getByRole("button", { name: "拒絕" }) as HTMLButtonElement).disabled,
+      (screen.getByRole("button", { name: "拒絕" }) as HTMLButtonElement)
+        .disabled,
     ).toBe(false);
     expect(screen.queryByRole("button", { name: "稍後處理" })).toBeNull();
   });
@@ -571,7 +822,8 @@ describe("employee consultant workspace integration", () => {
     const base = snapshot.document_review.bundles[0].actions[0];
     const actionIds = Array.from(
       { length: 10 },
-      (_, index) => `00000000-0000-0000-0000-${String(index + 20).padStart(12, "0")}`,
+      (_, index) =>
+        `00000000-0000-0000-0000-${String(index + 20).padStart(12, "0")}`,
     );
     snapshot.document_review = {
       ...snapshot.document_review,
@@ -606,7 +858,8 @@ describe("employee consultant workspace integration", () => {
     await user.click(screen.getByRole("button", { name: "接受 AI 建議" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
     expect(
-      JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body)).action_ids,
+      JSON.parse(String((fetchMock.mock.calls[0][1] as RequestInit).body))
+        .action_ids,
     ).toEqual(actionIds.slice(0, 9));
 
     await user.click(screen.getAllByRole("checkbox")[9]);
@@ -628,7 +881,10 @@ describe("employee consultant workspace integration", () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
     const client = new QueryClient();
-    client.setQueryData(jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID), snapshot);
+    client.setQueryData(
+      jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID),
+      snapshot,
+    );
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
@@ -963,7 +1219,10 @@ describe("employee consultant workspace integration", () => {
     const user = userEvent.setup();
     const snapshot = consultantSnapshotFixture();
     const client = new QueryClient();
-    client.setQueryData(jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID), snapshot);
+    client.setQueryData(
+      jobAnalysisKeys.consultantSnapshot(DOCUMENT_ID),
+      snapshot,
+    );
     vi.stubGlobal(
       "fetch",
       vi.fn().mockResolvedValue(
@@ -990,7 +1249,9 @@ describe("employee consultant workspace integration", () => {
     await user.type(title, "資深採購專員");
     await user.click(screen.getByRole("button", { name: "儲存正式文件" }));
 
-    expect((await screen.findByRole("alert")).textContent).toContain("草稿仍保留");
+    expect((await screen.findByRole("alert")).textContent).toContain(
+      "草稿仍保留",
+    );
     expect((screen.getByLabelText("職務名稱") as HTMLInputElement).value).toBe(
       "資深採購專員",
     );

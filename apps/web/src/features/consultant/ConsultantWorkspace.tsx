@@ -1,7 +1,12 @@
 "use client";
 
 import type { ConsultantSnapshotEvent } from "@caliburn/job-analysis-contract";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import {
+  useIsMutating,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from "@tanstack/react-query";
 import { ArrowLeft, Download, Radio, WifiOff } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -16,6 +21,7 @@ import {
   consultantDocumentQueryOptions,
   consultantInvalidationKeys,
   consultantSnapshotQueryOptions,
+  jobAnalysisKeys,
 } from "@/shared/query/jobAnalysisQueries";
 import { Button } from "@/shared/ui/button";
 import {
@@ -24,9 +30,13 @@ import {
 } from "@/shared/ui/UnsavedChangesGuard";
 import { ApprovedDocumentEditor } from "./ApprovedDocumentEditor";
 import { ConsultantConversation } from "./ConsultantConversation";
-import { ConsultantInsightPanel } from "./ConsultantInsightPanel";
+import { ConsultantWorkspaceShell } from "./ConsultantWorkspaceShell";
 import { DocumentReviewPanel } from "./DocumentReviewPanel";
-import { shouldRefetchForEvent } from "./consultantWorkspaceModel";
+import { InterviewWorkMap } from "./InterviewWorkMap";
+import {
+  consultantRunStatus,
+  shouldRefetchForEvent,
+} from "./consultantWorkspaceModel";
 
 function errorText(error: unknown): string {
   return error instanceof JobAnalysisApiError
@@ -45,8 +55,14 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   const metadata = useQuery(consultantDocumentQueryOptions(documentId));
   const snapshotQuery = useQuery(consultantSnapshotQueryOptions(documentId));
   const [documentDirty, setDocumentDirty] = useState(false);
+  const conversationMutationPending =
+    useIsMutating({
+      mutationKey: jobAnalysisKeys.consultantAnalysisAdmission(documentId),
+    }) > 0;
   const [showForceExport, setShowForceExport] = useState(false);
-  const [streamState, setStreamState] = useState<"connecting" | "live" | "reconnecting">("connecting");
+  const [streamState, setStreamState] = useState<
+    "connecting" | "live" | "reconnecting"
+  >("connecting");
   const revisionRef = useRef(-1);
 
   useEffect(() => {
@@ -106,7 +122,11 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
           <p role="alert" className="text-sm text-destructive">
             {errorText(metadata.error ?? snapshotQuery.error)}
           </p>
-          <Button className="mt-4" variant="outline" onClick={() => router.push("/workspace")}>
+          <Button
+            className="mt-4"
+            variant="outline"
+            onClick={() => router.push("/workspace")}
+          >
             返回文件庫
           </Button>
         </div>
@@ -115,7 +135,10 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   }
 
   const snapshot = snapshotQuery.data;
-  const title = metadata.data?.title ?? snapshot.approved_document.job_title ?? "職務分析";
+  const title =
+    metadata.data?.title ?? snapshot.approved_document.job_title ?? "職務分析";
+  const workspaceMutationLocked =
+    consultantRunStatus(snapshot).busy || conversationMutationPending;
 
   return (
     <div className="min-h-screen bg-stone-50 text-stone-950">
@@ -138,12 +161,18 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
               ) : (
                 <WifiOff className="size-3 text-amber-600" />
               )}
-              {streamState === "live" ? "已連線；變更會自動更新" : "連線恢復中；正式狀態仍保存在本機"}
+              {streamState === "live"
+                ? "已連線；變更會自動更新"
+                : "連線恢復中；正式狀態仍保存在本機"}
             </div>
           </div>
           <Button
             variant="outline"
-            disabled={documentDirty || exportMutation.isPending}
+            disabled={
+              workspaceMutationLocked ||
+              documentDirty ||
+              exportMutation.isPending
+            }
             onClick={() => {
               if (snapshot.readiness.requires_force_confirmation) {
                 setShowForceExport(true);
@@ -164,15 +193,22 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
             <p className="font-semibold">匯出前仍有以下缺口</p>
             <ul className="mt-2 list-disc space-y-1 pl-5">
               {snapshot.readiness.issues.map((issue, index) => (
-                <li key={`${issue.code}-${issue.subject_id ?? index}`}>{issue.message}</li>
+                <li key={`${issue.code}-${issue.subject_id ?? index}`}>
+                  {issue.message}
+                </li>
               ))}
             </ul>
             <p className="mt-3 text-xs leading-5 text-amber-900/75">
-              強制匯出只會輸出目前已核准內容，不會接受 AI 待審變更、補造缺值或隱藏未分組工作。
+              強制匯出只會輸出目前已核准內容，不會接受 AI
+              待審變更、補造缺值或隱藏未分組工作。
             </p>
             <div className="mt-4 flex gap-2">
               <Button
-                disabled={exportMutation.isPending || documentDirty}
+                disabled={
+                  workspaceMutationLocked ||
+                  exportMutation.isPending ||
+                  documentDirty
+                }
                 onClick={() => exportMutation.mutate(true)}
               >
                 我已看過，仍要匯出
@@ -199,19 +235,40 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
         </div>
       ) : null}
 
-      <main className="mx-auto max-w-[1500px] space-y-9 px-5 py-7 lg:px-8">
-        <div className="grid items-start gap-7 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
-          <ConsultantConversation documentId={documentId} snapshot={snapshot} />
-          <ConsultantInsightPanel documentId={documentId} snapshot={snapshot} />
-        </div>
-        <DocumentReviewPanel documentId={documentId} snapshot={snapshot} />
-        <ApprovedDocumentEditor
-          key={documentId}
-          documentId={documentId}
-          snapshot={snapshot}
-          onDirtyChange={setDocumentDirty}
-        />
-      </main>
+      <ConsultantWorkspaceShell
+        documentId={documentId}
+        mutationLocked={workspaceMutationLocked}
+        workMap={
+          <InterviewWorkMap
+            documentId={documentId}
+            snapshot={snapshot}
+            mutationLocked={workspaceMutationLocked}
+          />
+        }
+        currentDocument={
+          <div className="mx-auto max-w-4xl space-y-6">
+            <ApprovedDocumentEditor
+              key={documentId}
+              documentId={documentId}
+              snapshot={snapshot}
+              mutationLocked={workspaceMutationLocked}
+              onDirtyChange={setDocumentDirty}
+            />
+            <DocumentReviewPanel
+              documentId={documentId}
+              snapshot={snapshot}
+              mutationLocked={workspaceMutationLocked}
+            />
+          </div>
+        }
+        conversation={
+          <ConsultantConversation
+            documentId={documentId}
+            snapshot={snapshot}
+            mutationLocked={workspaceMutationLocked}
+          />
+        }
+      />
     </div>
   );
 }

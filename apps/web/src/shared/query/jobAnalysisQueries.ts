@@ -13,6 +13,13 @@ export const jobAnalysisKeys = {
     ["job-analysis", "consultant-documents", documentId] as const,
   consultantSnapshot: (documentId: string) =>
     ["job-analysis", "consultant-documents", documentId, "snapshot"] as const,
+  consultantAnalysisAdmission: (documentId: string) =>
+    [
+      "job-analysis",
+      "consultant-documents",
+      documentId,
+      "analysis-admission",
+    ] as const,
 };
 
 export function consultantDocumentListQueryOptions() {

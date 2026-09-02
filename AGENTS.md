@@ -6,6 +6,8 @@ Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應�
 
 ## 工作紀律
 
+重大研究、架構討論、design review 或施工前，先讀 [`docs/current-decisions.md`](docs/current-decisions.md) 與 [`docs/decision-process.md`](docs/decision-process.md)，確認 topic ID、current stage、有效決策與本輪唯一 blocking question。聊天、研究稿或 plan 若未寫回 current decision register，不得被下一個工作階段當成 durable decision；register 與 Accepted ADR／現行 code 衝突時，仍須 successor ADR 與 implementation gate，不能直接施工。
+
 1. 重大變更先研究，將來源、診斷、選項與取捨寫入 `docs/specs/<date>-*.md`。
 2. 架構決策寫 Nygard 式 ADR，預設 `Proposed`，並更新 `docs/adr/README.md`；翻案開新號。
 3. 多步變更先寫 `docs/plans/`，拆成可獨立驗證的工作。

@@ -5,10 +5,14 @@
 ## 先讀
 
 - [`../AGENTS.md`](../AGENTS.md) — agent 工作紀律與 current-only 邊界。
+- [`current-decisions.md`](current-decisions.md) — **目前有效／未決／暫停事項的唯一閱讀入口**；先看這裡，再決定需不需要打開長研究稿。
+- [`decision-process.md`](decision-process.md) — 從產品目的、研究、Owner 決策、design／spike、ADR、施工到驗收的 gate、停止與翻案規則。
 - [`../ARCHITECTURE.md`](../ARCHITECTURE.md) — 現行 monorepo 與 API／Web 邊界。
 - [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — 安裝、開發、測試與提交。
 - [`runbook.md`](runbook.md) — PostgreSQL、API、Web 起停與 fresh DB。
 - [`product-notes.md`](product-notes.md) — 產品範圍與 UX 優先級。
+
+> 下方是文檔目錄，不是施工授權清單。若標題中的 `latest`／`final`／`approved`、文件內狀態或聊天內容互相衝突，以 [`current-decisions.md`](current-decisions.md) 指定的 current authority 與 stage 為準；它本身也不能越過 Accepted ADR 或現行 code。
 
 ## 現行設計與決策
 

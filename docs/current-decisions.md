@@ -44,6 +44,7 @@
 | `MEM-Q001` | `WORKING` | 採用三層責任：LangGraph Checkpointer 保存每份 JD 的完整員工↔顧問 conversation 與 graph/run/interrupt state；PostgreSQL Store 保存可修訂 semantic Memory collection；Memory manager 只產生 extraction／consolidation 候選；每輪 model context 非破壞性地由兩層資料有界組裝。第一版不建立重複 employee-source 文字 leaf；如日後需要 provenance，只引用 canonical message ID。 | Product Owner 2026-09-03 核准；完整證據與三方案比較見 [`specs/2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md`](specs/2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md)。 | 真 PostgreSQL contract 顯示長 thread 儲存／延遲不可接受；產品加入獨立 event query/export/retention；官方 primitive 改變；或 Owner 改變一 JD／一 thread 邊界。 | 持續約束 `MEM-Q002`／`MEM-Q003` 與 successor ADR；production 現在仍禁止依此施工。 |
 | `MEM-Q002` | `WORKING` | 採 canonical conversation＋選擇性 consolidation：全部案例原始對話耐久保留；重複資訊 no-op；同主題通用新細節 update；需要獨立搜尋／修訂且會影響 JD 的重要差異才 add focused Memory；更正 revise、未解衝突保留兩邊；不採每案例固定一筆。長距離案例指涉必須可按需回查 canonical conversation。 | Product Owner 2026-09-03 核准方案 C；完整官方證據、三方案、A／B／更正情境與八項驗收門檻見 [`specs/2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md`](specs/2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md)。 | 代表性驗證顯示重要案例差異會靜默遺失、同義案例造成近線性膨脹、長距離原始片段無法找回；官方 primitive 改變；或 Owner 改變產品效果。 | 約束 `MEM-Q003`；production 仍須 successor ADR，現在不授權 schema、索引或施工。 |
 | `MEM-Q003` | `WORKING` | 採修正後方案 B：Checkpointer 保存 canonical conversation；Semantic Memory／小型導覽先 routing，按需依 canonical message reference 回讀原始問答；未命中才做有界 exact scan／澄清。第一版不替每則 raw message 建 semantic index；只有代表性 smoke 證明重要久遠細節無法找回，才重開 derived raw-conversation／hybrid index。 | Product Owner 2026-09-03 核准；五家官方共同邊界、OpenAI Codex／Agents SDK 與 Anthropic 實際 read path、三方案與限制見 [`specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md`](specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md)。 | 官方新增原生 Checkpointer conversation search；isolated spike 證明 recall、成本／延遲不可接受；或 Owner 改變完整細節找回要求。 | **G4／G5：**收斂 Semantic Memory routing、canonical reference／read contract 與 isolated spike；production 仍須 successor ADR。 |
+| `MEM-Q004` | `WORKING` | G4 read contract 採 progressive disclosure：先由小型、可重建的 Semantic Memory 導覽定向；需要更多內容時，模型使用 `search_semantic_memory(query)`，Runtime 在目前 JD／文件 scope 內回傳少量但逐筆完整、自成一體的 current Semantic Memory，以及輕量 `message_refs[]`；只有需要核對原句或問答脈絡時才以 `read_conversation_context(message_ref)` 深讀 canonical conversation。兩個 Tool 都只有一個 required string；scope／limit／filter／窗口／retry 由 Runtime 管理。第一版不另建 conversation summary。Isolated spike 只替 focused Semantic Memory 啟用 LangGraph Store semantic index／embedding；raw conversation semantic index 維持 deferred。名稱與最小結果視圖是 Caliburn mapping，不冒充 vendor 標準。 | Product Owner 2026-09-03 核准 read shape、isolated semantic-index mechanism、兩個 Tool 名稱及 Revision 2 G5 隔離實驗；官方、框架及 pinned contract 稽核見 [`specs/2026-09-03-memory-routing-canonical-read-and-isolated-spike-research.md`](specs/2026-09-03-memory-routing-canonical-read-and-isolated-spike-research.md) §3、§6。 | Isolated spike 證明自然語言 routing、canonical deep-read、scope isolation、成本或延遲不可接受；或官方 primitive 改變。 | 執行 G5 隔離實驗並回到 report review；不授權 production。 |
 
 ### 3.3 現有 Memory 文件如何使用
 
@@ -56,6 +57,8 @@
 | `MEM-Q001` 定向 reconciliation | [`specs/2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md`](specs/2026-09-03-memory-conversation-and-semantic-responsibility-reconciliation.md) | **G3 Owner approved**；已成 Working Decision，但仍不授權 production 施工，須由 successor ADR 承接。 |
 | `MEM-Q002` 定向 reconciliation | [`specs/2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md`](specs/2026-09-03-memory-similar-case-detail-and-consolidation-reconciliation.md) | **G3 Owner approved**；已成 Working Decision，只裁決相似案例細節、共同理解、consolidation 與長距離回查責任，不授權 schema／搜尋索引或施工。 |
 | `MEM-Q003` 定向 reconciliation | [`specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md`](specs/2026-09-03-memory-canonical-conversation-search-read-reconciliation.md) | **G3 Owner approved**；已成 Working Decision，採 progressive disclosure＋canonical evidence deep-read，不授權 production schema、索引或 tool 施工。 |
+| `MEM-Q004` read contract／isolated spike design | [`specs/2026-09-03-memory-routing-canonical-read-and-isolated-spike-research.md`](specs/2026-09-03-memory-routing-canonical-read-and-isolated-spike-research.md) | **G4 complete／G5 authorized**；read shape、focused Semantic Memory semantic index、兩個 Tool 名稱與最小 contract 已核准，raw conversation index 維持 deferred；只授權隔離 spike，不授權 production。 |
+| `MEM-Q004` isolated spike plan | [`plans/2026-09-03-memory-routing-canonical-read-isolated-spike.md`](plans/2026-09-03-memory-routing-canonical-read-isolated-spike.md)、[`specs/2026-09-03-memory-read-spike-consensus-and-framework-final-audit.md`](specs/2026-09-03-memory-read-spike-consensus-and-framework-final-audit.md) | **Revision 2／G5 authorized**；已從產品流程、責任層、Context、Tool contract、framework wiring 到實驗參數逐層分類，並修正持久 conversation 與暫態 tool state 混層、強迫 tool call、重疊 error handling及價格上界四項 finding；Product Owner 於 2026-09-03 核准執行，附帶「由廣到細均以可追溯共識為先、未討論自訂不得冒充共識」條件。 |
 | 候選切片與 framework 選擇 | [`specs/2026-09-02-memory-foundation-vertical-slice-design.md`](specs/2026-09-02-memory-foundation-vertical-slice-design.md)、[`specs/2026-09-02-memory-framework-selection-revalidation.md`](specs/2026-09-02-memory-framework-selection-revalidation.md) | **PAUSED**；其中 substrate／authority 結論與後續討論衝突，reconciliation 前不可施工。 |
 | Design review packet | [`specs/2026-09-02-memory-foundation-design-review-packet.md`](specs/2026-09-02-memory-foundation-design-review-packet.md) | **PAUSED**；原核准只適用當時候選，不能越過後續重開的 `MEM-Q001`。 |
 | Isolated spike plan | [`plans/2026-09-02-memory-foundation-isolated-spike.md`](plans/2026-09-02-memory-foundation-isolated-spike.md) | **PAUSED**；保留內容，不執行。待 `MEM-Q003` 與後續 Manager／Store design 收斂後重寫或 supersede。 |
@@ -64,12 +67,11 @@
 ## 4. Memory 下一輪 preflight
 
 ```text
-Topic ID: MEM-Q003
-Current stage: G3 complete → G4／G5 design and isolated spike
-Binding decisions: MEM-D000～MEM-D003、MEM-Q001～MEM-Q003
+Topic ID: MEM-Q004
+Current stage: G5 authorized；isolated spike plan revision 2 開始在隔離 worktree 執行
+Binding decisions: MEM-D000～MEM-D003、MEM-Q001～MEM-Q004
 This turn's only blocking question:
-  無；MEM-Q003 已裁決。下一工作段只收斂並驗證核准後的最小 read path，
-  不重新比較 conversation-search 架構。
+  無；下一個 blocking gate 是實驗 report 是否支持後續設計，須待 G5 完成後由 Product Owner review。
 Already reviewed evidence:
   2026-09-03 MEM-Q001 已核准 Checkpointer 是 canonical conversation owner；
   2026-09-03 MEM-Q002 已核准 canonical conversation＋選擇性 consolidation，
@@ -78,10 +80,26 @@ Already reviewed evidence:
   均把 canonical event list/read 與 semantic retrieval 分離；
   補驗 OpenAI Codex／Agents SDK 與 Anthropic 公開 read path 後，
   Product Owner 已核准 Semantic Memory routing＋canonical evidence deep-read；
-  不再預設建立 raw-message search_text 副本。
+  不再預設建立 raw-message search_text 副本；
+  LangMem 官方有 create_search_memory_tool，LangGraph Store 也有 namespace-scoped search，
+  但自然語言 similarity search 必須配置 embedding index；
+  Product Owner 已核准 isolated spike 只替 focused Semantic Memory 啟用該 index，
+  raw conversation semantic index 仍 deferred；
+  LangGraph Checkpointer 可取 latest state／state history，沒有公開的 message-id 內容搜尋 primitive；
+  Product Owner 已核准 search_semantic_memory(query) 與
+  read_conversation_context(message_ref)；兩者只暴露一個 required string，
+  其餘已知 scope／policy 由 ToolRuntime 注入；
+  框架已覆蓋 typed validation、tool loop、Store search、retry 與 transient context projection，
+  只有 exact-scope guard、canonical message window 與安全結果整形保留為薄 adapter。
+  最終稽核已確認 read-tool graph 應為不掛 checkpointer 的單次暫態 execution，
+  不把 tool chatter 寫回 80 則 synthetic canonical conversation；
+  live prompt 不再直接命令工具順序，而由需要精確原話的任務驗證 search／deep-read 選擇；
+  expected tool errors 統一走一個 typed ToolNode handler；
+  provider 價格無法建立保守上界時不發第一個 paid call。
 Out of scope / parking lot:
-  semantic Memory schema、Manager prompt／tool schema、Reference RAG、production migration、
-  UI、JD 編輯器、跨 JD Memory；方案 B 的 smoke 失敗前，不先決定 embedding、pgvector 或 Qdrant。
+  production Semantic Memory schema、Manager prompt／mutation schema、Reference RAG、production migration、
+  UI、JD 編輯器、跨 JD Memory、raw-message semantic index；
+  production embedding model／top-k／threshold／pgvector／Qdrant 仍不在本輪裁決。
 ```
 
-`MEM-Q003` 已完成並寫回。下一步才收斂 semantic Memory 的正式資料表徵、Manager contract 與 isolated spike；這可避免先寫索引或 schema，再替機制尋找產品理由。
+`MEM-Q003` 已完成；`MEM-Q004` 的 read shape、isolated semantic-index mechanism、Tool 名稱與最小 contract 均已完成 G4 收斂。Product Owner 已於 2026-09-03 核准 [`isolated spike plan`](plans/2026-09-03-memory-routing-canonical-read-isolated-spike.md) Revision 2 進入 G5；本次只可在隔離 worktree 產生實驗證據，完成後回到 report review，不授權 production、merge 或 push。

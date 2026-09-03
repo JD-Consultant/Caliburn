@@ -1,8 +1,8 @@
 # Memory Read Spike：共識、框架與實驗邊界最終稽核
 
 - Topic：`MEM-Q004`
-- Stage：G4 plan review
-- 狀態：**Revision 2 audit complete；Product Owner 已於 2026-09-03 核准 G5 isolated spike**
+- Stage：G5 post-spike correction closure
+- 狀態：**Revision 3 canonical boundary bounded repair 已完成 deterministic verification 與獨立 review；live／report 仍等待下一個 Owner gate**
 - 稽核對象：[`2026-09-03-memory-routing-canonical-read-isolated-spike.md`](../plans/2026-09-03-memory-routing-canonical-read-isolated-spike.md)
 - 核准條件：由整體到細節均先辨識大廠／框架共識；未經討論的 Caliburn 自訂作法不得冒充共識。
 
@@ -30,7 +30,7 @@
 |---|---|---|---|---|
 | 產品流程 | 完整訪談來源＋可修訂 Semantic Memory＋有界召回＋必要時深讀來源 | `共同方向`＋`MEM-D001～D003` | Checkpointer、Store、Tool loop | 通過；spike 只驗 read path，不冒充完整 Memory 系統 |
 | 最終完整性 | 最終全面製作／檢查 JD 才列舉全部 current Memory | Caliburn 必要效果；不是日常 retrieval 共識 | Store 無 query listing／pagination 可提供 primitive | 明確 out of scope；不得由本次 PASS 宣稱 M9 成立 |
-| Conversation authority | 每份 JD 的完整、有序 conversation 由 Checkpointer 保存 | Owner 核准 mapping；與 durable conversation／thread state 的共同責任相符 | `AsyncPostgresSaver`、stable message IDs | 通過；不再另存 employee-source 文字副本 |
+| Conversation authority | 每份 JD 的完整、有序 conversation 由 Checkpointer 保存 | Owner 核准 mapping；與 durable conversation／thread state 的共同責任相符 | `AsyncPostgresSaver`、Runtime-owned stable message IDs | substrate／restart 已通過；Revision 3 已移除 content guard 與 prior-state read，append-only exposed boundary 的 deterministic tests／review 通過 |
 | Semantic authority | focused、current、可修訂 Memory 放 Store | Owner 核准 mapping；Store 是 framework 的 application-defined durable data | `AsyncPostgresStore` | 通過；本次只 seed，不驗 writer／manager |
 | Context | 模型每次只看近期訊息、導覽、按需結果；不刪 canonical state | `共同方向` | transient model-context projection | 通過；「最後 6 則」只是實驗變數 |
 | 導覽 | 從 current Memory title 重建小型主題表 | Caliburn mapping | Store exact-scope listing＋deterministic projection | 通過；不是第二份 persisted Memory |
@@ -79,6 +79,15 @@
 - 修正：只採官方 model／endpoint metadata；若 chat、reasoning、embedding 任一項無法依 input/output caps 建立保守上界，就不送第一個 paid request。每次回應另保存官方 `usage.cost`，在下一 call 前再次檢查。
 - 狀態：已修正計畫。
 
+### `MEM-AUD-005` — P1：把 framework update 能力誤當成產品必須防守的公開操作
+
+- 位置：Revision 2 plan Task 2 與現有 `append_canonical_round`。
+- 官方事實：LangGraph `add_messages` 明確以相同 ID update／replace 既有 message；這是支援 state editing 的能力，不是 collision detector。穩定 identity 應由上游在寫入前附加。
+- 問題：原計畫雖不讓模型填 ID，仍額外設計 same-ID content comparison guard，等於先保留「外部可指定舊 ID」的過寬入口，再自行防守它。
+- 產品影響：多一次 latest-state read、增加自訂判斷，並可能讓後續討論誤以為產品需要開放或支援歷史原話 update。
+- Owner 決策：只提供 append canonical event；新 ID 由可信 Runtime 建立，模型／員工／Web 不提供，員工更正是新事件。移除 content collision guard；transport retry 與並行 writer 另案處理。
+- 狀態：已修復並重驗；TDD RED／GREEN、完整 deterministic suite（58 passed、1 optional skip）與 scoped re-review 均有證據，無剩餘 finding。
+
 ## 4. 刻意保留但不得冒充共識的項目
 
 以下都已討論或屬可重現實驗所需，無須再開產品題，但 report 必須標成 experiment-only：
@@ -92,7 +101,7 @@
 - Luna medium、3 model calls、2 tool calls、1200 output tokens／call、USD 0.20；
 - stable message reference 的字串格式；
 - `invalid_input`、`reference_unavailable`、`temporary_failure` 等 public error code；
-- same-ID same-content no-op、same-ID different-content reject 的 fixture intake guard。
+- Runtime-owned fixture IDs 與 append-only exposed boundary；框架內部 same-ID update 能力不對模型／員工／Web 開放。
 
 這些值若 spike 成功，也不會自動進 successor ADR 或 production。
 
@@ -109,7 +118,7 @@
 - graph loop 與 step bound：`StateGraph`／recursion limit；
 - provider request：`langchain-openrouter`＋OpenRouter SDK。
 
-仍需薄 Caliburn code 的只有：exact namespace equality、Saver message-ID lookup 的最小窗口、安全 result view、synthetic fixture/rubric 與實驗 stop conditions。這些是產品 scope 或框架缺少單一 message read primitive 所造成，不能假稱 framework 內建，也沒有建立第二套 Memory framework。
+仍需薄 Caliburn code 的只有：exact namespace equality、Saver message-ID lookup 的最小窗口、安全 result view、synthetic fixture/rubric 與實驗 stop conditions。Runtime-owned identity 與 append-only public surface 是 composition boundary，不實作第二套 message reducer 或 content collision detector。這些是產品 scope 或框架缺少單一 message read primitive 所造成，不能假稱 framework 內建，也沒有建立第二套 Memory framework。
 
 ## 6. 直接官方來源
 
@@ -120,6 +129,6 @@
 
 ## 7. Verdict
 
-修正後計畫沒有剩餘的未揭露產品選擇，也沒有把 Caliburn mapping 或實驗常數冒充大廠共識。它只足以進入 G5 isolated spike；**不授權 production、Memory writer、完整 JD audit、UI、RAG 或 ADR 翻案**。
+Revision 3 已完成 `MEM-AUD-005` 的 canonical append-only boundary 校正與 bounded code repair，沒有把 Caliburn mapping 或實驗常數冒充大廠共識。deterministic verification 與獨立 review 已通過，但現在仍**不授權 Luna live call、production、Memory writer、完整 JD audit、UI、RAG 或 ADR 翻案**。
 
-核准結果：Product Owner 已於 2026-09-03 核准 revision 2 plan 執行一次隔離 spike。下一個 gate 是實驗 report review；結果不得自行擴大為 production 授權。
+核准結果：Product Owner 已於 2026-09-03 核准 revision 2 plan 執行隔離 spike，並在 post-spike review 核准 Revision 3 的 Runtime-owned ID／append-only exposed boundary 及 bounded repair。下一個 gate 是由 Owner 決定是否恢復一次已凍結的 Luna smoke／report review；結果不得自行擴大為 production 授權。

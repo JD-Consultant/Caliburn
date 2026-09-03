@@ -1,7 +1,7 @@
 # Memory Routing、Canonical Read 與 Isolated Spike 研究
 
 - 日期：2026-09-03
-- 狀態：**G4 read shape、isolated semantic-index mechanism 與兩個模型可見 Tool 名稱已獲 Product Owner 核准；framework contract audit 完成；Product Owner 已於 2026-09-03 核准 Revision 2 進入 G5 隔離實驗，但未授權 production 實作**
+- 狀態：**G4 read shape 與 isolated mechanism 已核准；Revision 3 canonical boundary bounded repair 已完成 TDD、deterministic verification 與獨立 review；是否恢復 Luna smoke 是下一個 Owner gate，未授權 production 實作**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
 - 流程：[`../decision-process.md`](../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
@@ -95,7 +95,7 @@ LangGraph PostgreSQL Store
 1. Checkpointer 以 `thread_id` 保存 graph state snapshot，官方用途包含 conversation continuity、human-in-the-loop、fault tolerance 與 resume。
 2. Store 保存 graph state 外的 application-defined key-value data；namespace／key 由應用程式決定。
 3. LangGraph 將 conversation history 放在 thread state；Store 可放可長期讀取的 semantic data。兩者可同時使用。
-4. `add_messages` 對新 ID append、對相同 ID update，故 message identity 是 reducer 正確性的必要輸入。
+4. `add_messages` 對新 ID append、對相同 ID update；官方明確把後者用於 human-in-the-loop state editing，不把 same-ID different-content 視為 collision。現行 `1.2.11` 實作在同一批 `right` messages 內重複 ID 時也是後者取代前者，而非拋錯。
 5. `ToolRuntime` 的 state、Store、thread／run identity 由 runtime 注入，該參數不出現在模型 tool schema。
 6. context engineering 可在單次 model call 前過濾／組裝 transient context，而不必改掉 persistent state。
 7. Checkpointer 預設每個 super-step 保存完整 channel value；長 thread 可能增加儲存成本。`DeltaChannel` 可只存 delta，但目前仍為 beta，不能未量測就當 production 前提。
@@ -224,12 +224,13 @@ LangGraph PostgreSQL Store
 規則：
 
 1. 模型不填 `message_id`、thread scope、timestamp、version 或 retry metadata；
-2. intake retry 使用同一穩定 ID；同 ID 同內容可視為同一事件，同 ID 不同內容必須失敗，而不是靜默覆寫；
-3. 員工更正是新的 HumanMessage，不改寫歷史原句；Semantic Memory current head 才反映修訂後理解；
-4. 任何 bounded context、trim 或 compaction 都只能改「本次模型看到什麼」，不得破壞 canonical state；
-5. spike 需同時保存 HumanMessage、AIMessage 與必要 tool events，不能重演現行只存 AI 的不完整狀態。
+2. 新 canonical event 的穩定 ID 由可信 Runtime 在寫入 channel 前建立；一般員工、Web、模型工具與 public command 都不接受或重用既有 `message_id`；
+3. 產品只開放 append canonical event，不提供以舊 `message_id` update／delete conversation 的操作；LangGraph 內部雖具有 same-ID update 能力，Caliburn 不把它暴露成產品能力；
+4. 員工更正是新的 HumanMessage，不改寫歷史原句；Semantic Memory current head 才反映修訂後理解；
+5. 任何 bounded context、trim 或 compaction 都只能改「本次模型看到什麼」，不得破壞 canonical state；
+6. spike 需同時保存 HumanMessage、AIMessage 與必要 tool events，不能重演現行只存 AI 的不完整狀態。
 
-第 2 點是 Caliburn 的 deterministic ingestion guard，不是 LangGraph 自動提供的產品語意；LangGraph 只提供 ID-aware reducer primitive。
+第 2～3 點是 Caliburn 對官方 ID-aware reducer 的最小產品映射，不是 LangGraph 自動提供的 append-only 保證。Product Owner 於 2026-09-03 的 post-spike review 決定以**不暴露 update 能力**建立不變量，不再增加 same-ID content comparison guard。transport retry／重複送出與 production 並行 writer 的冪等性是不同問題，留待對應 API／run contract；不得重新以 conversation content guard 混在本輪解決。
 
 ### 6.2 Semantic Memory 測試表徵
 
@@ -427,7 +428,7 @@ read_conversation_context
 
 1. 現行 repo pins 是 `langchain==1.3.15`、`langgraph==1.2.11`、`langgraph-checkpoint-postgres==3.1.2`；截至 2026-09-03，PyPI 最新 stable 分別是 LangChain `1.3.18`、LangGraph `1.2.11`、PostgreSQL checkpointer `3.1.2`。Spike 先用現行 production-compatible pins 驗證 read contract；LangChain patch 升級另列 maintenance finding，不在本實驗偷改依賴。`1.4.0a*` 是 pre-release，不因「版本較新」就當 production baseline；
 2. `HumanMessage／AIMessage` 可由 runtime 指定穩定 ID；
-3. `add_messages` 對不同 ID append、相同 ID update；應用層 guard 能阻止 same-ID different-content；
+3. `add_messages` 對不同 ID append、相同 ID update；本輪只 characterise 此官方語意。Caliburn 以 Runtime-owned fresh ID＋只開放 append 的產品邊界避免走入 update，不另加 content collision guard；
 4. `AsyncPostgresSaver` 可在同 thread restart 後取回完整最新 state；
 5. `AsyncPostgresStore` 可依同一 JD scope 寫入／讀取 focused Memory；
 6. 啟用 semantic index 後，`asearch(query=...)` 會回傳相同 document scope 的完整 stored value，而不是只有不可回讀的片段；另以未配置 index 的 characterization 明確證明該路徑不能假裝是 semantic search；
@@ -461,7 +462,7 @@ Store 以 deterministic fixture seed focused current Memories，避免把 Manage
 4. 相似案例不是每則訊息一筆 Memory，也沒有把 A／B 獨有差異抹平；
 5. 每個有效 pointer 都能在相同 scope 找到 canonical message；
 6. bad／cross-scope pointer 對模型同樣回 `reference_unavailable`，Runtime trace 可診斷但不洩漏其他 JD；
-7. 同一 intake retry 不產生重複 canonical event；
+7. fixture／可信 Runtime 建立的 canonical message ID 非空且在該資料集唯一；員工更正追加新 event，舊 event 保留；transport retry 冪等仍屬後續 API／run contract；
 8. transient context 只含近期窗口＋導覽，不含完整 thread；
 9. `search_semantic_memory` 不接受或洩漏 document／thread scope，且每筆命中完整返回；
 10. `read_conversation_context` 只接受上一層實際回傳的 `message_ref`，能把孤立短答與前一個顧問問題一起還原；
@@ -493,7 +494,7 @@ Store 以 deterministic fixture seed focused current Memories，避免把 Manage
 
 全部成立才算支持方案 A：
 
-1. canonical conversation 完整、隔離、可重啟、可冪等；
+1. canonical conversation 完整、隔離、可重啟，且 append-only exposed path 保留既有 event；本項不宣稱已驗證 transport retry 冪等；
 2. 模型輸入沒有完整 conversation／完整 Memory collection；
 3. A／B 獨有細節可由 natural-language Memory routing＋deep-read 找回；
 4. 更正後 current fact 優先，舊原句仍可稽核但不重新生效；
@@ -557,6 +558,7 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 | Tool result／error 的 payload 放在 JSON `ToolMessage.content` | Pinned framework fact＋Caliburn mapping | 現行 LangChain 會把 Tool 回傳 object JSON-serialize；`ToolMessage` 有 `status／content／artifact`，沒有頂層 `code`；穩定 public error code 由薄 adapter／middleware 正規化 |
 | validation error 由 `ToolNode` 處理；tool execution error 才進 `ToolErrorMiddleware` | Official framework fact | LangGraph `ToolNode` 的 `handle_tool_errors` 明示涵蓋模型提供無效參數造成的 invocation error；LangChain `ToolErrorMiddleware` 明示 argument binding／validation 已在上游處理，不會進入其 handler |
 | source deep-read 使用 stable message reference | Working product decision＋G4 contract | `MEM-Q001／Q003` 已允許；Checkpointer 沒有公開的 message-ID read primitive，需 spike characterise 薄 adapter |
+| canonical message ID 由 Runtime 建立，產品不開放 same-ID update／delete | Official guidance＋Caliburn mapping | LangGraph 要求可跨回合引用的穩定 identity 在寫入前由上游附加；`add_messages` 的 same-ID update 是官方能力，但 append-only exposed command 與不加入 content guard 是 Owner 核准的產品邊界 |
 | 不對模型區分 cross-scope 與 missing | Security mapping | Runtime 內部可診斷；模型只得一致的 unavailable，避免 object existence enumeration |
 | canonical state 不使用 persistent summarization | Official fact＋Caliburn mapping | LangChain 明示 SummarizationMiddleware 會永久取代 state messages；本產品改用 transient model-context override |
 | 不建立獨立 conversation summary | Working product decision | canonical conversation＋Semantic Memory＋可重建導覽已承擔所需責任；需要新 summary 的失敗證據出現前不加第四層 |
@@ -614,11 +616,33 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - [OWASP API Security 2023 — Broken Object Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa1-broken-object-level-authorization/)
 - [OWASP API Security 2023 — Broken Object Property Level Authorization](https://owasp.org/API-Security/editions/2023/en/0xa3-broken-object-property-level-authorization/)
 
-## 12. Review closure（mechanism 已完成）
+## 12. 原 G4 review closure（下一個 gate 已由 §13 取代）
 
 - Decision／finding：`MEM-Q004` read shape、focused Semantic Memory semantic-index mechanism、兩個 Tool 名稱與最小 contract 已收斂；成熟框架覆蓋與 pinned integration caveat 已完成稽核
 - Owner decision：核准小型導覽 → `search_semantic_memory(query)` → 少量完整 Memory＋`message_refs[]` → 必要時 `read_conversation_context(message_ref)`；第一版不另建 conversation summary；只索引 focused Semantic Memory，不索引 raw conversation
-- Status：G4 complete；Revision 2 plan 與 final audit 已完成，Product Owner 已於 2026-09-03 授權 G5 隔離實驗；production 仍未授權
+- Status：G4 complete；Revision 2 plan 與原 final audit 曾獲准進入 G5；post-spike finding `MEM-Q004-F1` 已取代本節的後續 gate，production 仍未授權
 - Affected artifacts：本文件與 [`../current-decisions.md`](../current-decisions.md)；未修改 ADR、plan 或 production
 - Reopen trigger：isolated spike 無法在 scope、完整記憶、source deep-read、成本或延遲門檻內成立；或官方 primitive 改變
-- Next gate：寫 isolated spike plan → plan review → 才能執行 G5
+- Next gate：**superseded by §13**；先核准並完成 bounded code repair，不能依本節直接繼續 G5 live call
+
+## 13. Post-spike correction：canonical ID 能力不等於產品必須開放
+
+### 13.1 Finding
+
+- ID：`MEM-Q004-F1`
+- 位置：G5 `append_canonical_round` 與原 Revision 2 plan 的 same-ID collision guard。
+- 新證據：LangGraph 官方契約及鎖定 `1.2.11` 原始碼都證明 `add_messages` 把相同 ID 定義成 update／replace；它沒有、也不承諾 same-ID different-content collision error。
+- 原判斷問題：先前把「框架允許 update」直接轉成「產品必須以內容 guard 防止 update」，多加了產品不需要暴露的路徑。
+- Owner 決策：canonical write surface 只接受新事件；穩定 ID 由可信 Runtime 產生，模型／員工／Web 不填，員工更正以新事件追加。Caliburn 不提供舊 ID update／delete，也不增加 same-ID content comparison guard。
+- 實作狀態：**isolated bounded repair 已完成**。`append_canonical_round` 保留可信 message type／非空 ID 檢查，移除 prior-state read、內容比較與 collision exception，直接委派 framework graph；fixture ID 唯一性及更正追加另有測試。TDD RED 正確失敗於舊 `aget_state` 呼叫，GREEN 後完整 deterministic suite 為 58 passed、1 個 optional LangMem characterization skipped；獨立 reviewer 修正兩處 stale retry／冪等文字後 verdict `ready`、無剩餘 finding。
+- Parking lot：HTTP／run 重送造成重複事件、production 並行 writer、以及完整 canonical payload identity；這些不是 same-ID reducer 問題，進入其各自 contract 前不在本輪發明機制。
+- Reopen trigger：production framework 強迫 caller 暴露既有 message ID、無法在可信 Runtime 建立新事件 identity，或實測顯示 append-only surface 仍可覆寫既有 canonical event。
+- Next gate：由 Product Owner 決定是否恢復計畫中已凍結、受成本與 call/tool caps 約束的一次 Luna smoke；未明確核准前不發 live request。
+
+### 13.2 直接官方依據
+
+- [LangGraph Graph API／`add_messages`](https://docs.langchain.com/oss/python/langgraph/graph-api)：新 ID append，相同 ID update，明列 human-in-the-loop editing 用途。
+- [LangGraph runtime／stable identity](https://docs.langchain.com/oss/python/langgraph/pregel)：需跨回合引用的 identity 應在寫入 channel 前由上游建立。
+- [LangGraph `message.py`](https://github.com/langchain-ai/langgraph/blob/main/libs/langgraph/langgraph/graph/message.py)：current source 對同 ID 執行 replacement，沒有 collision error。
+- [OpenAI Responses conversation](https://developers.openai.com/api/reference/cli/resources/responses/methods/create)：input／output items 由 conversation service 自動加入持久 conversation。
+- [Anthropic session events](https://platform.claude.com/docs/en/managed-agents/events-and-streaming)：持久 event 具有服務管理的 ID，stream deltas 以該 ID 關聯最終事件。

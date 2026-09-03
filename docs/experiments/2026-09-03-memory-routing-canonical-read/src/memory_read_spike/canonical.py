@@ -14,10 +14,6 @@ from memory_read_spike.scope import (
 )
 
 
-class StableMessageIdConflictError(RuntimeError):
-    pass
-
-
 class ReferenceUnavailableError(RuntimeError):
     def __init__(self, internal_reason: str) -> None:
         super().__init__("reference_unavailable")
@@ -33,10 +29,6 @@ async def latest_canonical_messages(
     return tuple(snapshot.values.get("messages", ()))
 
 
-def _same_canonical_message(left: BaseMessage, right: BaseMessage) -> bool:
-    return type(left) is type(right) and left.content == right.content
-
-
 async def append_canonical_round(
     runtime: Any,
     scope: TrustedReadScope,
@@ -48,26 +40,10 @@ async def append_canonical_round(
     if not human.id or not assistant.id:
         raise ValueError("canonical messages require stable IDs")
 
-    existing = {
-        message.id: message
-        for message in await latest_canonical_messages(runtime, scope)
-        if message.id is not None
-    }
-    pending: list[BaseMessage] = []
-    for candidate in (human, assistant):
-        previous = existing.get(candidate.id)
-        if previous is None:
-            pending.append(candidate)
-        elif not _same_canonical_message(previous, candidate):
-            raise StableMessageIdConflictError(
-                f"stable message ID collision: {candidate.id}"
-            )
-
-    if pending:
-        await runtime.graph.ainvoke(
-            {"messages": pending},
-            scope.checkpoint_config,
-        )
+    await runtime.graph.ainvoke(
+        {"messages": [human, assistant]},
+        scope.checkpoint_config,
+    )
 
 
 async def read_canonical_context(

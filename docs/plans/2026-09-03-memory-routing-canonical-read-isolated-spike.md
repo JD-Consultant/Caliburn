@@ -2,11 +2,11 @@
 
 > **For agentic workers:** 執行前必須先用 `superpowers:using-git-worktrees` 建立隔離 worktree；逐 task 依 `superpowers:executing-plans` 與 `superpowers:test-driven-development` 施工；每個 review checkpoint 使用 `superpowers:requesting-code-review`，完成宣稱前使用 `superpowers:verification-before-completion`。
 
-**狀態：** Product Owner 已於 2026-09-03 核准 Revision 2 進入 G5 隔離實驗。授權只涵蓋本計畫描述的實驗；不授權 production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
+**狀態：** Product Owner 已於 2026-09-03 核准 Revision 2 進入 G5 隔離實驗，並在 post-spike review 核准 Revision 3 canonical append-only boundary。bounded code repair 已完成 TDD、完整 deterministic suite（58 passed、1 個 optional LangMem characterization skipped）與獨立 review；是否恢復凍結的 Luna smoke／report review 是下一個 Owner gate。仍不授權 production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
 
 **目標：** 以最小但可信的隔離實驗，驗證在不替 raw conversation 建 semantic index、不複製員工來源、也不把完整歷史送入每次模型呼叫的條件下，LangGraph PostgreSQL Checkpointer＋Store 能否支撐：小型導覽、focused Semantic Memory 自然語言搜尋、依 stable message reference 回讀 canonical conversation，以及一個有成本上限的 Luna tool loop。
 
-**架構：** 實驗程式全部放在 `docs/experiments/2026-09-03-memory-routing-canonical-read/`，以 `apps/api` 已鎖定的 Python 環境執行，不 import production composition root。PostgreSQL Checkpointer 保存完整、有序的 synthetic 員工↔顧問 canonical conversation；Store 只保存 synthetic、current、focused Semantic Memory。單次 read-tool graph 不掛 checkpointer，只把 canonical conversation 的有界投影放入暫態 agent state，避免把實驗 tool chatter 寫回訪談來源。模型先取得可重建的小型導覽，必要時呼叫兩個窄工具；scope、結果數、窗口、重試與 ID 由 Runtime 管理。實驗不實作 Memory Manager，不產生或修改 JD，也不宣稱已驗證 agent-run resume。
+**架構：** 實驗程式全部放在 `docs/experiments/2026-09-03-memory-routing-canonical-read/`，以 `apps/api` 已鎖定的 Python 環境執行，不 import production composition root。PostgreSQL Checkpointer 保存完整、有序的 synthetic 員工↔顧問 canonical conversation；Store 只保存 synthetic、current、focused Semantic Memory。canonical write surface 只追加由可信 Runtime 配發 fresh stable ID 的新事件，不向模型／員工／Web 開放既有 ID 的 update／delete，也不另做內容碰撞 guard。單次 read-tool graph 不掛 checkpointer，只把 canonical conversation 的有界投影放入暫態 agent state，避免把實驗 tool chatter 寫回訪談來源。模型先取得可重建的小型導覽，必要時呼叫兩個窄工具；scope、結果數、窗口、重試與 ID 由 Runtime 管理。實驗不實作 Memory Manager，不產生或修改 JD，也不宣稱已驗證 agent-run resume。
 
 **技術棧：** Python 3.13；Pydantic 2.13.4；LangChain 1.3.15；LangGraph 1.2.11；LangGraph PostgreSQL Checkpointer／Store 3.1.2；langchain-openrouter 0.2.7；OpenRouter Python SDK 0.10.8；PostgreSQL；pytest／pytest-asyncio；live smoke 使用 `openai/gpt-5.6-luna`、`medium` 與 OpenRouter embeddings API。
 
@@ -72,6 +72,7 @@ docs/experiments/2026-09-03-memory-routing-canonical-read/
 ## 2. 執行前共同 gate
 
 - [x] Product Owner 已於 2026-09-03 明確核准 Revision 2；核准條件是由整體到細節均優先採可追溯的大廠／框架共識，不得把未討論的自訂作法當成共識。
+- [x] Product Owner 已於 2026-09-03 核准 Revision 3 correction：新 canonical ID 由 Runtime 建立，只開放 append；不加入 same-ID content comparison guard。bounded repair 已以 RED→GREEN 完成，完整 deterministic suite 為 58 passed、1 個 optional skip，獨立 review 無剩餘 finding；live call 仍須下一個 Owner gate。
 - [ ] 使用 `superpowers:using-git-worktrees`，從已包含核准研究稿與本計畫的 commit 建立 `codex/memory-routing-canonical-read-spike`。不得從含未提交使用者修改的 main checkout 複製整個 working tree。
 - [ ] 在 worktree 執行 `Get-Location`、`git branch --show-current`、`git status --short`；路徑或分支不符立即停止。
 - [ ] 把實驗 source baseline commit、Python／uv／PostgreSQL 版本、鎖定套件版本寫進 README；不記錄密碼或 API key。
@@ -274,7 +275,7 @@ Tests 必須先紅，然後證明：
 1. `SpikeSettings` 對 database identity 的四個拒絕條件全部成立，且永不讀 production `DATABASE_URL` 當 fallback。
 2. `AsyncPostgresSaver.setup()`／`AsyncPostgresStore.setup()` 只在已核對的 disposable DB 執行。
 3. 40 組 round 寫入後 latest checkpoint 有 80 則依序 messages；關閉並重開 saver/store 後內容、型別與 IDs 相同。
-4. same-ID same-content intake 是 no-op；same-ID different-content 在寫 checkpoint 前由 guard 拒絕；員工更正是新的 `HumanMessage`，舊訊息仍存在。
+4. 所有 fixture／Runtime 建立的 canonical message ID 非空且唯一；模型可見 tool、員工／Web input 與 public command 都不能提供 `message_id`；員工更正是新的 `HumanMessage`，舊訊息仍存在。測試不得要求自訂 content comparison guard，也不得把未暴露的 framework same-ID update 宣稱為產品操作。
 5. Store 只含三筆 focused current Memory；沒有 employee-source text leaf、conversation summary 或舊 B API Memory。
 6. deterministic async embedding spy 只收到由 `title／content` 組合的文字，未收到 message refs、namespace、metadata 或 raw conversation。
 7. `AsyncPostgresStore.asearch` 回傳完整 stored value；無 index 的 control store 不得被包裝成 semantic search 成功。
@@ -287,7 +288,7 @@ Tests 必須先紅，然後證明：
 - Saver 與 Store 都使用 framework `from_conn_string`／`setup`；不建立自製 repository 或 table。
 - Store 以 `index={"dims": D, "embed": async_callable, "fields": ["title", "content"]}` 啟用 isolated semantic index。
 - deterministic tests 注入固定、可預測的向量 callable；不自己計算 similarity 或排序。
-- `append_canonical_round` 只做 stable-ID collision guard，再交給 `MessagesState`／`add_messages` 與 Checkpointer；不複製 conversation 至 Store。
+- `append_canonical_round` 只接受可信 Runtime／fixture 已建立 fresh stable ID 的新 messages，直接交給 `MessagesState`／`add_messages` 與 Checkpointer；不先讀 latest state、不比較 message content，也不複製 conversation 至 Store。產品／模型可見邊界不得接受既有 `message_id`。Revision 3 bounded repair 已移除舊 guard。
 - `read_canonical_context` 從相同 thread latest state 讀完整 canonical messages，再依 stable ID 定位；第一個 spike 的相鄰政策只回「直接前一則 consultant message（若存在）＋目標 employee message」。這是要被 characterise 的 spike policy，不宣稱已定 production window。
 - `search_current_memories` 固定最多 2 筆，且單筆完整、不截斷。`2` 是 frozen experiment variable，不是 production top-k 決策。
 - backend diagnostic 留在 test trace／log capture；模型 success result 不含 key、score、namespace、timestamp。
@@ -452,7 +453,7 @@ git commit -m "test: characterize bounded memory read tools"
 
 `test_storage_growth.py` 依序在 fresh run/thread IDs 建立 40／100／200 組 round，且每個級距至少量測三次 deterministic repetition。記錄而不預設通過：
 
-- 每個 round 的 canonical append wall time（包含 stable-ID guard 的 latest-state read 與 framework checkpoint write；不得誤稱純 DB write latency）；
+- 每個 round 的 canonical append wall time（包含 framework checkpoint write；不得誤稱純 DB write latency）；
 - restart 後 latest-state read wall time；
 - `checkpoints`、`checkpoint_writes`、`checkpoint_blobs` 對該 thread 的 rows 與 `sum(pg_column_size(row))`；
 - restart 後 message equality 與 stable IDs。
@@ -639,7 +640,7 @@ Tag 只在 report、review 與 deterministic verification 都完成後建立；l
 本計畫的「完成」不是 production 可用，而是下列證據都有真實紀錄：
 
 - pinned framework／provider contract 已 characterise；
-- PostgreSQL canonical conversation 可重啟、stable-ID 冪等且未被縮短；
+- PostgreSQL canonical conversation 可重啟、Runtime-owned stable ID 全部唯一、append-only exposed path 不會改寫舊事件，且 canonical history 未被縮短；
 - focused Semantic Memory semantic search 有 exact-scope guard，且沒有 raw source 副本；
 - 兩個一欄 strict tools 經實際 provider request 證明；
 - A／B／更正／缺 route 的唯一 Luna smoke 有完整可見 input、tool results、輸出、成本與延遲；

@@ -14,7 +14,6 @@ from pydantic import SecretStr, ValidationError
 
 from memory_read_spike.canonical import (
     ReferenceUnavailableError,
-    StableMessageIdConflictError,
     append_canonical_round,
     latest_canonical_messages,
     read_canonical_context,
@@ -191,8 +190,48 @@ async def test_canonical_conversation_survives_runtime_restart() -> None:
     ]
 
 
+def test_canonical_fixture_messages_have_non_empty_unique_runtime_ids() -> None:
+    message_ids = [
+        message.id
+        for canonical_round in load_canonical_rounds()
+        for message in canonical_round
+    ]
+
+    assert all(message_ids)
+    assert len(message_ids) == len(set(message_ids))
+
+
 @pytest.mark.asyncio
-async def test_message_idempotency_collision_guard_and_append_only_correction() -> None:
+async def test_append_canonical_round_does_not_load_prior_state() -> None:
+    class AppendOnlyGraph:
+        def __init__(self) -> None:
+            self.invocations: list[tuple[dict[str, object], dict[str, object]]] = []
+
+        async def aget_state(self, _config: dict[str, object]) -> None:
+            raise AssertionError("canonical append loaded prior state")
+
+        async def ainvoke(
+            self,
+            update: dict[str, object],
+            config: dict[str, object],
+        ) -> None:
+            self.invocations.append((update, config))
+
+    scope = _scope()
+    graph = AppendOnlyGraph()
+    runtime = SimpleNamespace(graph=graph)
+    human = HumanMessage(id="runtime-human-new", content="員工新增一則說明。")
+    assistant = AIMessage(id="runtime-assistant-new", content="顧問完成本輪回覆。")
+
+    await append_canonical_round(runtime, scope, human, assistant)
+
+    assert graph.invocations == [
+        ({"messages": [human, assistant]}, scope.checkpoint_config)
+    ]
+
+
+@pytest.mark.asyncio
+async def test_employee_correction_appends_without_rewriting_original() -> None:
     settings = _settings()
     scope = _scope()
     (first_human, first_assistant), *_ = load_canonical_rounds()
@@ -202,31 +241,6 @@ async def test_message_idempotency_collision_guard_and_append_only_correction() 
         embed=DeterministicEmbeddingSpy(),
     ) as runtime:
         await append_canonical_round(runtime, scope, first_human, first_assistant)
-        checkpoints_before_no_op = len(
-            [item async for item in runtime.saver.alist(scope.checkpoint_config)]
-        )
-        await append_canonical_round(runtime, scope, first_human, first_assistant)
-        assert len(await latest_canonical_messages(runtime, scope)) == 2
-        assert len(
-            [item async for item in runtime.saver.alist(scope.checkpoint_config)]
-        ) == checkpoints_before_no_op
-
-        conflicting_human = HumanMessage(
-            id=first_human.id,
-            content="同一 ID 卻換成另一段內容。",
-        )
-        with pytest.raises(StableMessageIdConflictError):
-            await append_canonical_round(
-                runtime,
-                scope,
-                conflicting_human,
-                first_assistant,
-            )
-        assert len(await latest_canonical_messages(runtime, scope)) == 2
-        assert len(
-            [item async for item in runtime.saver.alist(scope.checkpoint_config)]
-        ) == checkpoints_before_no_op
-
         correction = HumanMessage(
             id="h-correction",
             content="我剛才說錯了，應改成每日 CSV。",

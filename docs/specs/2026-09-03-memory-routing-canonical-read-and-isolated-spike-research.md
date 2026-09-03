@@ -1,7 +1,7 @@
 # Memory Routing、Canonical Read 與 Isolated Spike 研究
 
 - 日期：2026-09-03
-- 狀態：**G5 trial revision 2 維持 `FAIL_UNPROVEN`；Windows CLI event-loop bounded repair 已完成，Product Owner 已另行核准一次 frozen live trial revision 3；未授權 revision 4 或 production 實作**
+- 狀態：**G5 trial revision 2 維持 `FAIL_UNPROVEN`；Windows CLI event-loop bounded repair 已完成，Product Owner 已核准 frozen live trial revision 3 的產品 gate；外部傳輸安全 gate 尚待明確授權，未執行 provider request**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
 - 流程：[`../decision-process.md`](../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
@@ -800,5 +800,17 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
   2 tool calls、token／USD 0.20 operational caps 與零 retry 全部不變。
 - 只可執行一次；無論 PASS、rubric FAIL、provider failure 或其他外部錯誤，都保存真實結果並停止。
   本授權不包含 revision 4、條件調整、production、ADR 狀態改變、merge 或 push。
-- 本輪唯一 blocking question 是：在上述 frozen 邊界下，revision 3 的實際結果是否支持這一個
-  代表性 Memory routing＋canonical deep-read 情境。
+- revision 3 實際執行要回答的 evidence question 是：在上述 frozen 邊界下，結果是否支持這一個
+  代表性 Memory routing＋canonical deep-read 情境；但目前必須先完成 §17.1 的外部傳輸安全 gate。
+
+### 17.1 外部傳輸安全 gate
+
+- 付款前 preflight 已確認三個 frozen hash、專用 PostgreSQL identity、key presence、revision 3
+  output path 與完整 deterministic suite；suite 為 60 passed、1 個 optional skip。
+- 啟動 live command 的權限請求在 process 建立前被安全 gate 拒絕。原因是先前的「核准 live
+  attempt」未逐字包含允許把匿名 synthetic frozen fixture、prompt 與 tool results 傳送至特定
+  外部服務 OpenRouter。
+- 因命令未啟動，沒有 metadata、embedding、Luna 或其他 provider request，沒有費用，也沒有
+  revision 3 artifact。這不是試驗結果或新的 plumbing finding。
+- 下一個唯一 gate 是 Product Owner 是否明確同意上述匿名 synthetic payload 的 OpenRouter
+  外部傳輸；未取得前不得以其他方式繞過或重送。

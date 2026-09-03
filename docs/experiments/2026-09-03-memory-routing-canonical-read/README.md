@@ -33,6 +33,11 @@ Psycopg regression 完成 RED→GREEN，沒有在該 repair 中呼叫 Luna／emb
 與 `FAIL_UNPROVEN` verdict 不變。Product Owner 已於 2026-09-04 另行核准一次 frozen live trial
 revision 3；只可執行一次，保存後停止，不授權 revision 4 或 production。
 
+**External-transfer gate：** 付款前 preflight 已通過，但執行環境要求 Product Owner 另行明確允許
+將匿名 synthetic frozen fixture、prompt 與 tool results 傳送至 OpenRouter。第一次啟動請求在
+process 建立前被拒絕，所以沒有 provider request、費用或 revision 3 artifact；取得該明確授權前
+不得重送。
+
 本實驗把兩種容易混淆的 `harness` 分開命名：外層 `live_smoke.py` 是**隔離 smoke
 實驗執行器**，負責 preflight、限制、執行與 receipt；內層 LangGraph model／tool graph 是
 **agent runtime**。本次 SDK wrapper 錯誤發生在前者。單一 smoke 只驗證代表性 read path

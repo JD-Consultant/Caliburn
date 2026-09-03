@@ -1,7 +1,7 @@
 # Memory Routing、Canonical Read 與 Isolated Spike 研究
 
 - 日期：2026-09-03
-- 狀態：**G5 trial revision 2 維持 `FAIL_UNPROVEN`；Product Owner 已核准且完成 Windows CLI event-loop bounded repair，未授權新的 live attempt 或 production 實作**
+- 狀態：**G5 trial revision 2 維持 `FAIL_UNPROVEN`；Windows CLI event-loop bounded repair 已完成，Product Owner 已另行核准一次 frozen live trial revision 3；未授權 revision 4 或 production 實作**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
 - 流程：[`../decision-process.md`](../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
@@ -787,4 +787,18 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - targeted GREEN 1 passed；整份 live-smoke deterministic 測試 28 passed。沒有 provider request，
   完整 isolated deterministic suite 60 passed、1 個 optional skip。沒有修改 Memory read contract、
   trial artifact 或 frozen verdict。
-- 下一個 gate 是 Product Owner 另行決定是否建立新的 bounded live attempt；修復本身不構成授權。
+- 當時的下一個 gate 是 Product Owner 另行決定是否建立新的 bounded live attempt；修復本身不構成授權。
+  該 gate 後來由 §17 的獨立 revision 3 授權完成。
+
+## 17. Live trial revision 3 授權
+
+- Product Owner 於 2026-09-04 review §16.5 的真 CLI Psycopg RED→GREEN 與完整 deterministic
+  suite 後，以「OK／繼續」另行核准一次新的 bounded live attempt。
+- 新 attempt 命名為 **live trial revision 3**，避免覆寫 revision 2 的 reconstructed attempt record；
+  它與較早的文件用語「Revision 3 correction」不是同一個 artifact。
+- case、prompt、rubric、`openai/gpt-5.6-luna`／`medium`、embedding model、3 model calls、
+  2 tool calls、token／USD 0.20 operational caps 與零 retry 全部不變。
+- 只可執行一次；無論 PASS、rubric FAIL、provider failure 或其他外部錯誤，都保存真實結果並停止。
+  本授權不包含 revision 4、條件調整、production、ADR 狀態改變、merge 或 push。
+- 本輪唯一 blocking question 是：在上述 frozen 邊界下，revision 3 的實際結果是否支持這一個
+  代表性 Memory routing＋canonical deep-read 情境。

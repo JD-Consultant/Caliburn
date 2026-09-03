@@ -2,7 +2,7 @@
 
 > **For agentic workers:** 執行前必須先用 `superpowers:using-git-worktrees` 建立隔離 worktree；逐 task 依 `superpowers:executing-plans` 與 `superpowers:test-driven-development` 施工；每個 review checkpoint 使用 `superpowers:requesting-code-review`，完成宣稱前使用 `superpowers:verification-before-completion`。
 
-**狀態：** Trial revision 2 已於 2026-09-03 保存為 `FAIL_UNPROVEN`。Product Owner review report 後只核准 Windows CLI event-loop bounded repair；真 CLI Psycopg regression 已完成有效 RED→GREEN，沒有 embedding／Luna／tool call 或模型語意輸出。原 attempt、結果與 verdict 不變；不授權新的 live attempt、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
+**狀態：** Trial revision 2 已於 2026-09-03 保存為 `FAIL_UNPROVEN`。Product Owner review report 後只核准的 Windows CLI event-loop bounded repair 已完成有效 RED→GREEN，沒有 embedding／Luna／tool call 或模型語意輸出。Product Owner 於 2026-09-04 另行核准一次 live trial revision 3；原 revision 2 attempt、結果與 verdict 不變。Revision 3 沿用全部 frozen 條件，只可執行一次，不論結果均保存並停止；不授權 revision 4、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
 
 **目標：** 以最小但可信的隔離實驗，驗證在不替 raw conversation 建 semantic index、不複製員工來源、也不把完整歷史送入每次模型呼叫的條件下，LangGraph PostgreSQL Checkpointer＋Store 能否支撐：小型導覽、focused Semantic Memory 自然語言搜尋、依 stable message reference 回讀 canonical conversation，以及一個有成本上限的 Luna tool loop。
 
@@ -77,6 +77,7 @@ docs/experiments/2026-09-03-memory-routing-canonical-read/
 - [x] 該唯一 attempt 在 metadata preflight 停止；沒有 embedding／Luna call、沒有語意輸出或 trial receipt。Owner 只核准修正 `ListEndpointsResponse.data.endpoints` 接線並做 deterministic review；修復不構成重跑授權。
 - [x] Product Owner 在理解「隔離 smoke 實驗執行器」與「LangGraph agent runtime」的差別後，明確核准 trial revision 2；案例、prompt、rubric、模型、reasoning 與所有 caps 不變。
 - [x] Product Owner review revision 2 報告後，只核准 Windows CLI event-loop bounded repair 與 regression test；不包含新的 Luna／embedding request。
+- [x] Product Owner 於 2026-09-04 另行核准一次 live trial revision 3；case／prompt／rubric、Luna medium、embedding model、所有 caps 與零 retry 不變，且不論結果均保存並停止。
 - [x] 使用 `superpowers:using-git-worktrees`，從已包含核准研究稿與本計畫的 commit 建立 `codex/memory-routing-canonical-read-spike`。不得從含未提交使用者修改的 main checkout 複製整個 working tree。
 - [x] 在 worktree 執行 `Get-Location`、`git branch --show-current`、`git status --short`；路徑或分支不符立即停止。
 - [x] 把實驗 source baseline commit、Python／uv／PostgreSQL 版本、鎖定套件版本寫進 README；不記錄密碼或 API key。
@@ -535,11 +536,12 @@ git commit -m "test: bound memory read spike cost and growth"
 
 **Review checkpoint D：** 案例、rubric、prompt、模型、reasoning、call/tool/token/cost caps 與 receipt schema 在此凍結。未通過 review 不可執行 live。
 
-## Task 5：只執行一次 Tiny Luna smoke，保存真實結果並做 closure review
+## Task 5：執行已另行核准的 Tiny Luna smoke，保存真實結果並做 closure review
 
 **Files:**
 
-- Create from actual run: `docs/experiments/2026-09-03-memory-routing-canonical-read/trials/revision-2-luna-medium.json`
+- Preserve: `docs/experiments/2026-09-03-memory-routing-canonical-read/trials/revision-2-luna-medium.json`
+- Create from actual run: `docs/experiments/2026-09-03-memory-routing-canonical-read/trials/revision-3-luna-medium.json`
 - Create from actual run: `docs/experiments/2026-09-03-memory-routing-canonical-read/results.csv`
 - Create after observations: `docs/experiments/2026-09-03-memory-routing-canonical-read/report.md`
 - Modify: `docs/experiments/2026-09-03-memory-routing-canonical-read/README.md`
@@ -562,18 +564,20 @@ $env:PYTHONPATH=(Join-Path $spikeRoot 'src')
 $env:MEMORY_ROUTING_SPIKE_ENV_FILE='S:\caliburn\apps\api\.env'
 if (-not (Test-Path -LiteralPath $env:MEMORY_ROUTING_SPIKE_ENV_FILE)) { throw 'missing approved env file' }
 uv run --project apps/api --locked pytest "$spikeRoot\tests" -q
-uv run --project apps/api --locked python -m memory_read_spike.live_smoke --env-file "$env:MEMORY_ROUTING_SPIKE_ENV_FILE" --revision 2
+uv run --project apps/api --locked python -m memory_read_spike.live_smoke --env-file "$env:MEMORY_ROUTING_SPIKE_ENV_FILE" --revision 3
 ```
 
 ### 5.2 真實 trial 規則
 
-- trial revision 2 只重跑 revision 1 未進入模型的同一個 frozen scenario；最多 3 model calls、2 tool calls，沒有 provider/framework retry，也不授權 revision 3。
+- trial revision 3 只重跑前兩次皆未進入模型的同一個 frozen scenario；最多 3 model calls、2 tool calls，沒有 provider/framework retry，也不授權 revision 4。
 - 模型第一次若未依題目需要與 tool description 搜尋、未為精確原句選合法 ref 深讀、或最終答案 fail rubric，保存失敗並停止；不可默默修改 prompt 重跑。
 - 外部暫時失敗也保存 attempt 與錯誤分類。若在第一個 provider call 前即可確認是實驗執行器 plumbing defect，可修正後升 revision；一旦已有模型語意輸出，就不能把不理想結果稱為 plumbing defect。
 - trials 保存模型實際看見的 system/user/tool content 與最終答案；不保存 chain-of-thought。
 - `results.csv` 至少包含 revision、requested/resolved model、provider、reasoning、model_calls、tool_calls、input/output/cache/reasoning tokens、embedding tokens、latency、cost、A detail pass、A/B correction pass、unknown admission pass、scope pass、overall verdict。
 
-**2026-09-03 execution record：** trial revision 1 在免費 endpoint metadata request 後、第一個 embedding／Luna request 前，因隔離 smoke 實驗執行器將 SDK operation response 誤讀為頂層 `endpoints` 而停止。bounded repair 通過 deterministic gate 後，Product Owner 核准 revision 2。Revision 2 同樣只完成 metadata preflight，隨後在 CLI 預設 Windows `ProactorEventLoop` 上建立第一個 Psycopg async connection 時失敗；沒有 embedding／Luna request、tool call 或模型語意輸出。正常 receipt 未寫出，故保存 reconstructed attempt record 並以 `FAIL_UNPROVEN` 停止。Product Owner 隨後只核准 event-loop bounded repair：regression test 以真 CLI＋Psycopg 有效重現 RED，Windows `asyncio.run()` 指定 Selector loop 後 GREEN；未重跑模型。新的 live attempt 仍須重新核准。
+**2026-09-03 execution record：** trial revision 1 在免費 endpoint metadata request 後、第一個 embedding／Luna request 前，因隔離 smoke 實驗執行器將 SDK operation response 誤讀為頂層 `endpoints` 而停止。bounded repair 通過 deterministic gate 後，Product Owner 核准 revision 2。Revision 2 同樣只完成 metadata preflight，隨後在 CLI 預設 Windows `ProactorEventLoop` 上建立第一個 Psycopg async connection 時失敗；沒有 embedding／Luna request、tool call 或模型語意輸出。正常 receipt 未寫出，故保存 reconstructed attempt record 並以 `FAIL_UNPROVEN` 停止。Product Owner 隨後只核准 event-loop bounded repair：regression test 以真 CLI＋Psycopg 有效重現 RED，Windows `asyncio.run()` 指定 Selector loop 後 GREEN；未重跑模型。
+
+**2026-09-04 execution authorization：** Product Owner 在 review 上述 repair 證據後，另行核准一次 live trial revision 3。此授權不修改 frozen scenario 或任何上限，也不延伸為 revision 4；實際結果尚待本次唯一執行寫回。
 
 ### 5.3 Report 必須區分支持與未證明
 

@@ -25,11 +25,13 @@ call 前重新計算並比對，避免案例、判準或 prompt 被靜默修改�
 OpenRouter metadata preflight 完成後，Windows CLI 使用預設 `ProactorEventLoop`，在第一個
 Psycopg async connection 被拒絕；因此沒有 embedding、Luna、tool call 或模型語意輸出。
 正常 receipt 尚未建立便退出，trial JSON 是依保存的 command result 重建之 attempt record。
-結果為 `FAIL_UNPROVEN`；詳見 [`report.md`](report.md)。不得第三次執行或接 production。
+結果為 `FAIL_UNPROVEN`；詳見 [`report.md`](report.md)。該結果當時不授權第三次執行或接 production；
+後續另行授權見下一段。
 
-**Post-report 狀態：** Product Owner 後續只核准 Windows CLI event-loop bounded repair。真 CLI
-Psycopg regression 已依 RED→GREEN 完成，沒有再次呼叫 Luna／embedding；原 trial artifact 與
-`FAIL_UNPROVEN` verdict 不變。是否建立新的 live attempt 仍需另一個明確 gate。
+**Post-report 狀態：** Product Owner 後續只核准的 Windows CLI event-loop bounded repair 已以真 CLI
+Psycopg regression 完成 RED→GREEN，沒有在該 repair 中呼叫 Luna／embedding；原 revision 2 artifact
+與 `FAIL_UNPROVEN` verdict 不變。Product Owner 已於 2026-09-04 另行核准一次 frozen live trial
+revision 3；只可執行一次，保存後停止，不授權 revision 4 或 production。
 
 本實驗把兩種容易混淆的 `harness` 分開命名：外層 `live_smoke.py` 是**隔離 smoke
 實驗執行器**，負責 preflight、限制、執行與 receipt；內層 LangGraph model／tool graph 是

@@ -1,7 +1,7 @@
 # Memory Routing、Canonical Read 與 Isolated Spike 研究
 
 - 日期：2026-09-03
-- 狀態：**G5 trial revision 2 維持 `FAIL_UNPROVEN`；Windows CLI event-loop bounded repair 已完成，Product Owner 已核准 frozen live trial revision 3 及匿名 synthetic payload 的 OpenRouter 外部傳輸；尚未執行**
+- 狀態：**G5 trial revision 3 已執行並保存為 `FAIL_UNPROVEN`；Store／embedding 成功，Luna chat 在 model response 前因 frozen provider capability filter 收到 404；等待 Product Owner review，不授權 revision 4 或 production**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
 - 流程：[`../decision-process.md`](../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
@@ -815,4 +815,94 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - 下一個唯一 gate 是 Product Owner 是否明確同意上述匿名 synthetic payload 的 OpenRouter
   外部傳輸；未取得前不得以其他方式繞過或重送。
 - Product Owner 隨後明確回覆「同意」，完成此外部傳輸 gate，並要求任何新問題都先停止、
-  依既定流程提出討論與研究。下一步只執行一次 revision 3；不授權 revision 4 或自行修復重跑。
+  依既定流程提出討論與研究。當時的授權只允許執行一次 revision 3；不授權 revision 4 或自行修復重跑。
+
+## 18. Live trial revision 3 finding：provider capability filter 無 eligible Luna endpoint
+
+### 18.1 已觀察事實
+
+- frozen hashes、完整 deterministic suite（60 passed、1 optional skip）、專用 PostgreSQL identity、
+  key presence 與 output path preflight 均先通過。
+- revision 3 依 §17 授權只執行一次。Psycopg、LangGraph Store 與 semantic-memory embeddings 成功；
+  三個 embedding request 共 274 tokens，resolved embedding model 是
+  `text-embedding-3-small`，已知費用 USD 0.00000548。
+- 第一次 `openai/gpt-5.6-luna` chat invocation 在回傳任何 model response 前，由 OpenRouter SDK
+  拋出 HTTP 404 `NotFoundResponseError`。沒有 resolved chat model／provider、chat usage、
+  model-visible turn 或 Memory tool call。
+- receipt 已保存為
+  [`../experiments/2026-09-03-memory-routing-canonical-read/trials/revision-3-luna-medium.json`](../experiments/2026-09-03-memory-routing-canonical-read/trials/revision-3-luna-medium.json)；
+  六項 rubric 均為 `NOT_EVALUATED`，overall verdict 是 `FAIL_UNPROVEN`。
+- `model_calls: 1` 是 invocation 前先扣除的 runtime budget，不代表 provider/model 已開始生成；三個
+  保存的 request IDs 皆為 embedding IDs。
+
+### 18.2 Frozen request 與官方 capability metadata
+
+既有 deterministic HTTP-boundary test 已直接捕捉 pinned `langchain-openrouter`＋OpenRouter SDK
+組出的 request，而不只檢查本地 model kwargs。Frozen chat payload 會送出：
+
+- `reasoning: {"effort": "medium"}`；
+- `max_completion_tokens: 1200`；
+- 兩個 `strict: true` read tools；
+- `parallel_tool_calls: false`；
+- `provider.allow_fallbacks: false`；
+- `provider.require_parameters: true`。
+
+2026-09-04 另以不帶 API key、無付費 inference 的 OpenRouter 公開 catalog 做唯讀核對：
+
+| 核對 | 結果 |
+|---|---|
+| `openai/gpt-5.6-luna` model | 存在 |
+| Provider endpoints | 7 |
+| `tools` capability filter | Luna 命中 |
+| `reasoning` capability filter | Luna 命中 |
+| `max_completion_tokens` capability filter | Luna 命中 |
+| `parallel_tool_calls` capability filter | Luna 未命中 |
+| 7 endpoints 的 `supported_parameters` | 全部沒有 `parallel_tool_calls` |
+
+OpenRouter 官方規則明確說明，`require_parameters: true` 會在路由前排除未支援 request **所有參數**
+的 provider；官方 tool-calling 資料也把「沒有 endpoint 支援所需 tool 能力」對應為 404。因而本次
+frozen payload 的 `parallel_tool_calls: false` 與 hard capability filter 組合，在目前 Luna
+capability matrix 上必然沒有 eligible endpoint。`allow_fallbacks: false` 不是單獨根因；當候選
+集合已是空集合時，開啟 provider fallback 也不會補出支援該參數的 Luna endpoint。
+
+這項 finding 不表示 Luna 本身沒有 tool calling。OpenRouter 的 Luna model page明確列出 tools
+與 structured outputs，OpenAI 官方 Luna model page也列出 function calling／structured outputs；
+失敗的是 OpenRouter capability-routing contract 與 frozen optional serial-control parameter 的
+組合。
+
+### 18.3 診斷可信度與 observability 邊界
+
+Pinned OpenRouter SDK 的 `NotFoundResponseError` 物件本來持有 `message`、HTTP `status_code`、
+`body` 與 raw response；但目前 receipt error boundary 只保存 exception type，因此這次無法逐字
+還原 404 body。報告不猜測原始字串。
+
+即使缺少原始 body，三項獨立證據仍閉合：實際 outgoing payload、官方
+`require_parameters` 路由語意、當日 Luna endpoint capability matrix。它們足以證明至少存在一個
+會把全部 endpoint 排除的 frozen request 條件，且與實際 404／零 model response 一致。是否另有
+account-level provider restriction 未驗證，也不是解釋本次失敗所必需。
+
+### 18.4 不應做的事與下一個 gate
+
+本 finding 不授權：
+
+- 移除 `parallel_tool_calls`、關閉 `require_parameters` 或放寬其他 frozen 條件；
+- 更換模型、改 direct OpenAI、升級 provider integration；
+- 再發 Luna request、建立 revision 4；
+- 把 deterministic tests 或 embedding success 外推成 Memory read path 已通過；
+- production、ADR 狀態改變、merge 或 push。
+
+下一個唯一 blocking question 是：Product Owner 是否另開一個 bounded
+**provider capability-routing contract design** gate，先比較「不傳 serial-control、由 Runtime
+fail closed」與「放寬 hard parameter filtering、仍由 Runtime fail closed」等候選。這是新設計問題，
+不是 revision 3 retry；若核准，仍須先做零 provider request 的 contract test／官方稽核，之後才可
+另外決定是否需要新 live evidence。
+
+### 18.5 直接來源
+
+- [OpenRouter — GPT-5.6 Luna model／providers／tool support](https://openrouter.ai/openai/gpt-5.6-luna-20260709)
+- [OpenRouter — requiring providers to support all parameters](https://openrouter.ai/docs/guides/routing/provider-selection#requiring-providers-to-support-all-parameters)
+- [OpenRouter — Provider Routing](https://openrouter.ai/docs/guides/routing/provider-selection)
+- [OpenRouter — Tool Calling Across Any Model](https://openrouter.ai/blog/tutorials/tool-calling/#models-that-dont-support-tools)
+- [OpenRouter — List all endpoints for a model](https://openrouter.ai/docs/api/api-reference/endpoints/list-endpoints)
+- [OpenRouter — Models／supported_parameters](https://openrouter.ai/docs/guides/overview/models#supported-parameters)
+- [OpenAI — GPT-5.6 Luna](https://developers.openai.com/api/docs/models/gpt-5.6-luna)

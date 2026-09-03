@@ -1,0 +1,32 @@
+{
+  "schema_version": 1,
+  "status": "failed",
+  "requested_model": "openai/gpt-5.6-luna",
+  "resolved_model": null,
+  "provider": null,
+  "requested_embedding_model": "openai/text-embedding-3-small",
+  "resolved_embedding_model": "text-embedding-3-small",
+  "reasoning": "medium",
+  "model_calls": 1,
+  "tool_calls": 0,
+  "usage": {
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "embedding_tokens": 274
+  },
+  "latency_ms": 7488,
+  "cost_usd": "0.00000548",
+  "cost_upper_bound_usd": "0.01846144",
+  "request_ids": [
+    "gen-emb-1788453322-eq6CBT8o4iElqRYvryne",
+    "gen-emb-1788453323-MQLPnuj5PRqj7DxpJj73",
+    "gen-emb-1788453323-dGkh7cneAFJTJCX87RVZ"
+  ],
+  "reasoning_payloads_redacted": true,
+  "model_visible_turns": [],
+  "final_answer": null,
+  "error_code": "live_NotFoundResponseError"
+}

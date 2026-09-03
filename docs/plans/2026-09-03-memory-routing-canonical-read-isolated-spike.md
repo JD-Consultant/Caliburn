@@ -2,7 +2,7 @@
 
 > **For agentic workers:** 執行前必須先用 `superpowers:using-git-worktrees` 建立隔離 worktree；逐 task 依 `superpowers:executing-plans` 與 `superpowers:test-driven-development` 施工；每個 review checkpoint 使用 `superpowers:requesting-code-review`，完成宣稱前使用 `superpowers:verification-before-completion`。
 
-**狀態：** Trial revision 2 已於 2026-09-03 保存為 `FAIL_UNPROVEN`。Product Owner review report 後只核准的 Windows CLI event-loop bounded repair 已完成有效 RED→GREEN，沒有 embedding／Luna／tool call 或模型語意輸出。Product Owner 於 2026-09-04 另行核准一次 live trial revision 3；原 revision 2 attempt、結果與 verdict 不變。Revision 3 沿用全部 frozen 條件，只可執行一次，不論結果均保存並停止。付款前 preflight 已通過，Product Owner 也已明確允許把匿名 synthetic fixture／prompt／tool results 傳送至 OpenRouter；不授權 revision 4、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
+**狀態：** Trial revision 3 已於 2026-09-04 執行一次並保存為 `FAIL_UNPROVEN`。修復後的 Windows CLI、Psycopg、Store 與三個 embedding requests 成功；第一個 Luna chat request 則在任何 model response／tool call 前被 OpenRouter capability routing 以 404 拒絕。Frozen `parallel_tool_calls: false`＋`require_parameters: true` 與 Luna endpoint metadata 不相容。六項 rubric 仍未評估；等待 Product Owner review。不授權 revision 4、修改條件後重跑、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
 
 **目標：** 以最小但可信的隔離實驗，驗證在不替 raw conversation 建 semantic index、不複製員工來源、也不把完整歷史送入每次模型呼叫的條件下，LangGraph PostgreSQL Checkpointer＋Store 能否支撐：小型導覽、focused Semantic Memory 自然語言搜尋、依 stable message reference 回讀 canonical conversation，以及一個有成本上限的 Luna tool loop。
 
@@ -578,11 +578,20 @@ uv run --project apps/api --locked python -m memory_read_spike.live_smoke --env-
 
 **2026-09-03 execution record：** trial revision 1 在免費 endpoint metadata request 後、第一個 embedding／Luna request 前，因隔離 smoke 實驗執行器將 SDK operation response 誤讀為頂層 `endpoints` 而停止。bounded repair 通過 deterministic gate 後，Product Owner 核准 revision 2。Revision 2 同樣只完成 metadata preflight，隨後在 CLI 預設 Windows `ProactorEventLoop` 上建立第一個 Psycopg async connection 時失敗；沒有 embedding／Luna request、tool call 或模型語意輸出。正常 receipt 未寫出，故保存 reconstructed attempt record 並以 `FAIL_UNPROVEN` 停止。Product Owner 隨後只核准 event-loop bounded repair：regression test 以真 CLI＋Psycopg 有效重現 RED，Windows `asyncio.run()` 指定 Selector loop 後 GREEN；未重跑模型。
 
-**2026-09-04 execution authorization：** Product Owner 在 review 上述 repair 證據後，另行核准一次 live trial revision 3。此授權不修改 frozen scenario 或任何上限，也不延伸為 revision 4；實際結果尚待本次唯一執行寫回。
+**2026-09-04 execution authorization（歷史紀錄）：** Product Owner 在 review 上述 repair 證據後，另行核准一次 live trial revision 3。此授權不修改 frozen scenario 或任何上限，也不延伸為 revision 4；該次授權後來已由下方 execution record 消耗並寫回結果。
 
 **2026-09-04 external-transfer gate：** frozen hash、完整 deterministic suite、專用 DB identity、API key presence 與 output-path preflight 均通過；外部命令在 process 啟動前被安全 gate 拒絕，因現有授權未逐字涵蓋將測試 payload 傳至 OpenRouter。沒有 provider request、費用或 revision 3 artifact；取得明確外部傳輸授權前不得重送。
 
 Product Owner 隨後明確回覆「同意」，允許本次把匿名 synthetic frozen fixture、prompt 與 tool results 傳送至 OpenRouter；若執行發現新問題，必須先保存並停止，再依本流程研究與討論，不能自行修正或重跑。
+
+**2026-09-04 revision 3 execution record：** 唯一獲准 command 已執行並停止。三個 embedding
+requests 成功（274 tokens、USD 0.00000548）；第一個 Luna chat invocation 由 OpenRouter SDK
+回報 `NotFoundResponseError`，沒有 model response、resolved provider、chat usage、tool call 或
+model-visible turn。Receipt 保存於 `trials/revision-3-luna-medium.json`，`results.csv` 六項 rubric
+皆為 `NOT_EVALUATED`。唯讀公開 catalog 交叉核對證明 Luna 支援 tools、reasoning、
+max_completion_tokens，但 7 個 endpoint 都未宣告 `parallel_tool_calls`；依官方
+`require_parameters=true` 語意，frozen request 沒有 eligible endpoint。完整診斷見 research §18
+與 report §10。沒有修改 runner、沒有重跑，也沒有建立 revision 4。
 
 ### 5.3 Report 必須區分支持與未證明
 
@@ -676,4 +685,7 @@ Tag 只在 report、review 與 deterministic verification 都完成後建立；l
 - [x] 是否明列 M3/M5/M6/M9 與 Memory writer 不在本 spike 證明範圍？
 - [x] 是否每個 stage 都有 stop/review checkpoint，且沒有 production 寫入授權？
 
-> 上述勾選代表設計與 deterministic gate 已覆蓋，不代表 live 模型能力通過。Revision 2 在模型前失敗，因此 live-only criteria 仍依 report 標記為 `NOT_EVALUATED`。
+> 上述勾選代表設計與 deterministic gate 已覆蓋，不代表 live 模型能力通過。Revision 3 在
+> model response 前因 provider capability-routing contract 失敗，因此 live-only criteria 仍依
+> report 標記為 `NOT_EVALUATED`。既有 `memory-routing-canonical-read-spike-v1-failed` tag 保留指向
+> revision 2 closure commit；本輪不擅自移動 tag，也不自行發明新的 tag 名稱。

@@ -21,27 +21,34 @@ call 前重新計算並比對，避免案例、判準或 prompt 被靜默修改�
 
 不驗證 Memory writer、JD 產生／編輯、RAG、UI、跨 JD Memory 或 production migration。
 
-**目前執行狀態（2026-09-03）：** revision 2 已執行並以 infrastructure failure 停止。
+**Revision 2 執行狀態（2026-09-03）：** revision 2 已執行並以 infrastructure failure 停止。
 OpenRouter metadata preflight 完成後，Windows CLI 使用預設 `ProactorEventLoop`，在第一個
 Psycopg async connection 被拒絕；因此沒有 embedding、Luna、tool call 或模型語意輸出。
 正常 receipt 尚未建立便退出，trial JSON 是依保存的 command result 重建之 attempt record。
 結果為 `FAIL_UNPROVEN`；詳見 [`report.md`](report.md)。該結果當時不授權第三次執行或接 production；
 後續另行授權見下一段。
 
-**Post-report 狀態：** Product Owner 後續只核准的 Windows CLI event-loop bounded repair 已以真 CLI
+**Post-report repair：** Product Owner 後續只核准的 Windows CLI event-loop bounded repair 已以真 CLI
 Psycopg regression 完成 RED→GREEN，沒有在該 repair 中呼叫 Luna／embedding；原 revision 2 artifact
 與 `FAIL_UNPROVEN` verdict 不變。Product Owner 已於 2026-09-04 另行核准一次 frozen live trial
-revision 3；只可執行一次，保存後停止，不授權 revision 4 或 production。
+revision 3；該次授權已消耗，結果見下方。
 
 **External-transfer gate：** 付款前 preflight 已通過，但執行環境要求 Product Owner 另行明確允許
 將匿名 synthetic frozen fixture、prompt 與 tool results 傳送至 OpenRouter。第一次啟動請求在
 process 建立前被拒絕，所以沒有 provider request、費用或 revision 3 artifact；取得該明確授權前
-不得重送。Product Owner 隨後已明確同意本次匿名 synthetic payload 的 OpenRouter 外部傳輸；
-現在只可執行一次 frozen revision 3，遇到新問題則保存並停止。
+不得重送。Product Owner 隨後已明確同意本次匿名 synthetic payload 的 OpenRouter 外部傳輸。
+
+**Revision 3 執行狀態（2026-09-04）：** 唯一獲准 attempt 已執行並保存。三個 embedding request
+成功（274 tokens、已知費用 USD 0.00000548），但第一個 Luna chat request 在任何 model response
+或 tool call 前收到 OpenRouter HTTP 404，結果仍為 `FAIL_UNPROVEN`。唯讀官方 capability 核對顯示，
+凍結 request 同時使用 `parallel_tool_calls: false` 與 `require_parameters: true`，但 OpenRouter
+列出的 7 個 Luna endpoint 均未宣告支援 `parallel_tool_calls`，因此沒有 eligible endpoint。
+Revision 4、修改條件後重跑、production、merge 與 push 均未授權；完整證據見
+[`report.md`](report.md) §10。
 
 本實驗把兩種容易混淆的 `harness` 分開命名：外層 `live_smoke.py` 是**隔離 smoke
 實驗執行器**，負責 preflight、限制、執行與 receipt；內層 LangGraph model／tool graph 是
-**agent runtime**。本次 SDK wrapper 錯誤發生在前者。單一 smoke 只驗證代表性 read path
+**agent runtime**。先前 revision 1 的 SDK wrapper 錯誤發生在前者。單一 smoke 只驗證代表性 read path
 能否實際跑通，不是用來泛化模型品質的完整 eval suite。
 
 ## 設計來源與分類
@@ -78,6 +85,7 @@ process 建立前被拒絕，所以沒有 provider request、費用或 revision 
 ## 實際結果
 
 - [Revision 2 attempt record](trials/revision-2-luna-medium.json)
+- [Revision 3 receipt](trials/revision-3-luna-medium.json)
 - [逐 trial 摘要](results.csv)
 - [結案報告](report.md)
 

@@ -45,12 +45,14 @@
 ## 4. 實驗清單
 
 - [`2026-09-03-memory-routing-canonical-read/`](2026-09-03-memory-routing-canonical-read/) —
-  **G5 隔離 smoke：FAIL／模型能力未評估。** Revision 1 在 OpenRouter endpoint metadata wrapper
+  **G5 隔離 smoke：FAIL_UNPROVEN／模型能力未評估。** Revision 1 在 OpenRouter endpoint metadata wrapper
   接線停止；修復後獲准的 revision 2 又在第一個資料庫連線遇到 Psycopg 不支援 Windows 預設
   `ProactorEventLoop`。兩次都沒有 Luna 語意輸出；revision 2 也沒有 embedding 或 tool call。
-  deterministic 元件測試仍保留，但不能冒充 live routing 結論。下一個 gate 是 owner review
-  [報告](2026-09-03-memory-routing-canonical-read/report.md)。其後獲准的 Windows CLI bounded repair
-  已以真 Psycopg RED→GREEN 完成，但沒有重跑模型，也不授權接 production。
+  Windows CLI bounded repair 以真 Psycopg RED→GREEN 完成後，唯一獲准的 revision 3 通過 Store
+  與 embedding（274 tokens），但 frozen `parallel_tool_calls: false`＋`require_parameters: true`
+  被 OpenRouter Luna capability routing 以 404 拒絕，仍沒有 model response 或 tool call。
+  deterministic 元件測試仍保留，但不能冒充 live routing 結論；revision 4 與 production 均未授權。
+  詳見[報告](2026-09-03-memory-routing-canonical-read/report.md)。
 
 - [`2026-07-26-r1-p0-context-representation/`](2026-07-26-r1-p0-context-representation/) —
   **Closed／不執行**（[ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)，2026-07-27）。

@@ -66,8 +66,8 @@ policy。
 Selector loop，並補 entrypoint regression test；不需要改 Memory 架構、升級 SDK、增加
 retry 或更換資料庫。
 
-本報告只記錄候選修法，沒有實作。是否核准 bounded repair，以及修復後是否另核准新的 live
-attempt，是兩個後續 gate。
+本報告初稿只記錄候選修法；其後 Product Owner 另行核准 bounded repair，結果見 §9。原 trial
+verdict 不因此改寫；修復後是否另核准新的 live attempt 仍是獨立 gate。
 
 直接來源：
 
@@ -110,8 +110,19 @@ attempt，是兩個後續 gate。
   usage 與 inference request IDs 均未產生；metadata request 的 response identifier／latency 未由
   runner 保存，也不得推測。
 
-## 8. 下一個 gate
+## 8. 當時的下一個 gate（已由 §9 完成）
 
-先由 Product Owner review 本報告，決定是否只核准 Windows CLI event-loop bounded repair。
-即使 repair 通過 deterministic verification，也不自動授權下一個 Luna attempt；不得在同一決策
-中默認重跑。
+當時先由 Product Owner review 本報告，決定是否只核准 Windows CLI event-loop bounded repair；
+該 gate 後來依 §9 完成。repair 不自動授權下一個 Luna attempt，且沒有在同一決策中默認重跑。
+
+## 9. Post-report bounded repair（不改寫 trial verdict）
+
+Product Owner 於 review 本報告後，只核准 Windows CLI event-loop repair 與 regression test，沒有
+核准再次執行 Luna。修復採 Python 3.13 官方 `asyncio.run(..., loop_factory=...)` 入口：Windows
+使用 `asyncio.SelectorEventLoop`，其他平台維持預設 loop。
+
+regression test 刻意把 pytest policy 還原成 Windows 預設 Proactor，再從真 CLI `main()` 進入
+實際 Psycopg database identity read。RED 精確重現 revision 2 的 `psycopg.InterfaceError`；單行
+runner 修復後 GREEN，整份 live-smoke deterministic 測試為 28 passed。這只證明原 CLI plumbing
+缺口已被覆蓋；完整 isolated deterministic suite 為 60 passed、1 個 optional skip。這不證明任何
+Luna／Memory rubric 項目，§1 的 `FAIL_UNPROVEN` 維持不變。

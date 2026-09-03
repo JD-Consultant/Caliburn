@@ -1,7 +1,7 @@
 # Memory Routing、Canonical Read 與 Isolated Spike 研究
 
 - 日期：2026-09-03
-- 狀態：**G5 trial revision 2 已執行並保存為 `FAIL_UNPROVEN`；Windows CLI event-loop finding 等待 Product Owner review，未授權 runner repair、第三次 live attempt 或 production 實作**
+- 狀態：**G5 trial revision 2 維持 `FAIL_UNPROVEN`；Product Owner 已核准且完成 Windows CLI event-loop bounded repair，未授權新的 live attempt 或 production 實作**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
 - 流程：[`../decision-process.md`](../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
@@ -775,3 +775,16 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - [Psycopg — Concurrent operations／Windows event-loop warning](https://www.psycopg.org/psycopg3/docs/advanced/async.html)
 - [Python 3.13 — asyncio platform support on Windows](https://docs.python.org/3.13/library/asyncio-platforms.html#windows)
 - [Python 3.13 — asyncio runners and `loop_factory`](https://docs.python.org/3.13/library/asyncio-runner.html#running-an-asyncio-program)
+
+### 16.5 Post-report bounded repair
+
+- Product Owner review report 後，明確只核准 Windows CLI event-loop repair 與 regression test；沒有
+  核准新的 Luna／embedding request。
+- regression test 不依賴 pytest 已安裝的 Selector policy：它先切回 Windows 預設 Proactor，從
+  `main()` 進入真實 `_read_current_database()`，實際連線專用 PostgreSQL。
+- 有效 RED 精確重現 revision 2 的 `psycopg.InterfaceError`；修復只在 Windows CLI 的
+  `asyncio.run()` 指定 `asyncio.SelectorEventLoop`，其他平台仍使用預設 loop。
+- targeted GREEN 1 passed；整份 live-smoke deterministic 測試 28 passed。沒有 provider request，
+  完整 isolated deterministic suite 60 passed、1 個 optional skip。沒有修改 Memory read contract、
+  trial artifact 或 frozen verdict。
+- 下一個 gate 是 Product Owner 另行決定是否建立新的 bounded live attempt；修復本身不構成授權。

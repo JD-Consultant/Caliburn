@@ -6,6 +6,7 @@ import argparse
 import asyncio
 import json
 import os
+import sys
 from contextlib import asynccontextmanager
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
@@ -679,7 +680,8 @@ def main() -> None:
         run_live_smoke(
             _settings_from_env_file(args.env_file),
             dry_run=args.dry_run,
-        )
+        ),
+        loop_factory=asyncio.SelectorEventLoop if sys.platform == "win32" else None,
     )
     experiment_root = Path(__file__).resolve().parents[2]
     output = experiment_root / "trials" / f"revision-{args.revision}-luna-medium.json"

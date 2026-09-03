@@ -49,7 +49,8 @@
   接線停止；修復後獲准的 revision 2 又在第一個資料庫連線遇到 Psycopg 不支援 Windows 預設
   `ProactorEventLoop`。兩次都沒有 Luna 語意輸出；revision 2 也沒有 embedding 或 tool call。
   deterministic 元件測試仍保留，但不能冒充 live routing 結論。下一個 gate 是 owner review
-  [報告](2026-09-03-memory-routing-canonical-read/report.md)，不授權自行修復後重跑或接 production。
+  [報告](2026-09-03-memory-routing-canonical-read/report.md)。其後獲准的 Windows CLI bounded repair
+  已以真 Psycopg RED→GREEN 完成，但沒有重跑模型，也不授權接 production。
 
 - [`2026-07-26-r1-p0-context-representation/`](2026-07-26-r1-p0-context-representation/) —
   **Closed／不執行**（[ADR 0041](../adr/0041-r1-p0-closure-first-version-context-and-holdout.md)，2026-07-27）。

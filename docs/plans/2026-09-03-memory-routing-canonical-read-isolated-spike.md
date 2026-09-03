@@ -2,7 +2,7 @@
 
 > **For agentic workers:** 執行前必須先用 `superpowers:using-git-worktrees` 建立隔離 worktree；逐 task 依 `superpowers:executing-plans` 與 `superpowers:test-driven-development` 施工；每個 review checkpoint 使用 `superpowers:requesting-code-review`，完成宣稱前使用 `superpowers:verification-before-completion`。
 
-**狀態：** Trial revision 2 已於 2026-09-03 依凍結條件執行，並在 OpenRouter metadata preflight 後、第一個 Psycopg async connection 停止。Windows CLI 的預設 `ProactorEventLoop` 不受 Psycopg 支援，因此沒有 embedding／Luna／tool call 或模型語意輸出；結果是 `FAIL_UNPROVEN`。attempt、結果與報告均已保存，等待 Product Owner report review。不授權第三次執行、runner repair、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
+**狀態：** Trial revision 2 已於 2026-09-03 保存為 `FAIL_UNPROVEN`。Product Owner review report 後只核准 Windows CLI event-loop bounded repair；真 CLI Psycopg regression 已完成有效 RED→GREEN，沒有 embedding／Luna／tool call 或模型語意輸出。原 attempt、結果與 verdict 不變；不授權新的 live attempt、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
 
 **目標：** 以最小但可信的隔離實驗，驗證在不替 raw conversation 建 semantic index、不複製員工來源、也不把完整歷史送入每次模型呼叫的條件下，LangGraph PostgreSQL Checkpointer＋Store 能否支撐：小型導覽、focused Semantic Memory 自然語言搜尋、依 stable message reference 回讀 canonical conversation，以及一個有成本上限的 Luna tool loop。
 
@@ -76,6 +76,7 @@ docs/experiments/2026-09-03-memory-routing-canonical-read/
 - [x] Product Owner 已明確核准唯一一次凍結的 Luna medium smoke；最多 3 model calls／2 tool calls、零 retry、USD 0.20 operational cap，不論結果均保存並停止。
 - [x] 該唯一 attempt 在 metadata preflight 停止；沒有 embedding／Luna call、沒有語意輸出或 trial receipt。Owner 只核准修正 `ListEndpointsResponse.data.endpoints` 接線並做 deterministic review；修復不構成重跑授權。
 - [x] Product Owner 在理解「隔離 smoke 實驗執行器」與「LangGraph agent runtime」的差別後，明確核准 trial revision 2；案例、prompt、rubric、模型、reasoning 與所有 caps 不變。
+- [x] Product Owner review revision 2 報告後，只核准 Windows CLI event-loop bounded repair 與 regression test；不包含新的 Luna／embedding request。
 - [x] 使用 `superpowers:using-git-worktrees`，從已包含核准研究稿與本計畫的 commit 建立 `codex/memory-routing-canonical-read-spike`。不得從含未提交使用者修改的 main checkout 複製整個 working tree。
 - [x] 在 worktree 執行 `Get-Location`、`git branch --show-current`、`git status --short`；路徑或分支不符立即停止。
 - [x] 把實驗 source baseline commit、Python／uv／PostgreSQL 版本、鎖定套件版本寫進 README；不記錄密碼或 API key。
@@ -572,7 +573,7 @@ uv run --project apps/api --locked python -m memory_read_spike.live_smoke --env-
 - trials 保存模型實際看見的 system/user/tool content 與最終答案；不保存 chain-of-thought。
 - `results.csv` 至少包含 revision、requested/resolved model、provider、reasoning、model_calls、tool_calls、input/output/cache/reasoning tokens、embedding tokens、latency、cost、A detail pass、A/B correction pass、unknown admission pass、scope pass、overall verdict。
 
-**2026-09-03 execution record：** trial revision 1 在免費 endpoint metadata request 後、第一個 embedding／Luna request 前，因隔離 smoke 實驗執行器將 SDK operation response 誤讀為頂層 `endpoints` 而停止。bounded repair 通過 deterministic gate 後，Product Owner 核准 revision 2。Revision 2 同樣只完成 metadata preflight，隨後在 CLI 預設 Windows `ProactorEventLoop` 上建立第一個 Psycopg async connection 時失敗；沒有 embedding／Luna request、tool call 或模型語意輸出。正常 receipt 未寫出，故保存 reconstructed attempt record 並以 `FAIL_UNPROVEN` 停止。是否修 runner 與是否另跑下一個 live attempt 都須重新核准。
+**2026-09-03 execution record：** trial revision 1 在免費 endpoint metadata request 後、第一個 embedding／Luna request 前，因隔離 smoke 實驗執行器將 SDK operation response 誤讀為頂層 `endpoints` 而停止。bounded repair 通過 deterministic gate 後，Product Owner 核准 revision 2。Revision 2 同樣只完成 metadata preflight，隨後在 CLI 預設 Windows `ProactorEventLoop` 上建立第一個 Psycopg async connection 時失敗；沒有 embedding／Luna request、tool call 或模型語意輸出。正常 receipt 未寫出，故保存 reconstructed attempt record 並以 `FAIL_UNPROVEN` 停止。Product Owner 隨後只核准 event-loop bounded repair：regression test 以真 CLI＋Psycopg 有效重現 RED，Windows `asyncio.run()` 指定 Selector loop 後 GREEN；未重跑模型。新的 live attempt 仍須重新核准。
 
 ### 5.3 Report 必須區分支持與未證明
 

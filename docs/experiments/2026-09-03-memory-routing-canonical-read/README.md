@@ -27,6 +27,10 @@ Psycopg async connection 被拒絕；因此沒有 embedding、Luna、tool call �
 正常 receipt 尚未建立便退出，trial JSON 是依保存的 command result 重建之 attempt record。
 結果為 `FAIL_UNPROVEN`；詳見 [`report.md`](report.md)。不得第三次執行或接 production。
 
+**Post-report 狀態：** Product Owner 後續只核准 Windows CLI event-loop bounded repair。真 CLI
+Psycopg regression 已依 RED→GREEN 完成，沒有再次呼叫 Luna／embedding；原 trial artifact 與
+`FAIL_UNPROVEN` verdict 不變。是否建立新的 live attempt 仍需另一個明確 gate。
+
 本實驗把兩種容易混淆的 `harness` 分開命名：外層 `live_smoke.py` 是**隔離 smoke
 實驗執行器**，負責 preflight、限制、執行與 receipt；內層 LangGraph model／tool graph 是
 **agent runtime**。本次 SDK wrapper 錯誤發生在前者。單一 smoke 只驗證代表性 read path

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import sys
@@ -628,6 +629,65 @@ def test_cli_writes_failed_receipt_then_exits_nonzero(
         saved = json.loads(output.read_text(encoding="utf-8"))
         assert saved["status"] == "preflight_blocked"
     finally:
+        output.unlink(missing_ok=True)
+
+
+@pytest.mark.skipif(sys.platform != "win32", reason="Windows event-loop regression")
+def test_windows_cli_uses_psycopg_compatible_event_loop(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import memory_read_spike.live_smoke as live_module
+    from memory_read_spike.runtime import _read_current_database
+
+    receipt = LiveSmokeReceipt(
+        status=LiveSmokeStatus.DRY_RUN,
+        requested_model="openai/gpt-5.6-luna",
+        requested_embedding_model="openai/text-embedding-3-small",
+    )
+    observed_databases: list[str] = []
+
+    async def database_probe(
+        settings: LiveSmokeSettings,
+        **_kwargs: Any,
+    ) -> LiveSmokeReceipt:
+        observed_databases.append(
+            await _read_current_database(settings.database.connection_string)
+        )
+        return receipt
+
+    monkeypatch.setattr(live_module, "run_live_smoke", database_probe)
+    monkeypatch.setattr(live_module, "_settings_from_env_file", lambda _path: _settings())
+    revision = 99992
+    output = (
+        Path(live_module.__file__).resolve().parents[2]
+        / "trials"
+        / f"revision-{revision}-luna-medium.json"
+    )
+    output.unlink(missing_ok=True)
+    monkeypatch.setattr(
+        sys,
+        "argv",
+        [
+            "live-smoke",
+            "--env-file",
+            "unused.env",
+            "--revision",
+            str(revision),
+        ],
+    )
+    original_policy = asyncio.get_event_loop_policy()
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
+
+    try:
+        main()
+
+        assert observed_databases == [
+            os.environ["MEMORY_ROUTING_SPIKE_EXPECTED_DATABASE"]
+        ]
+        saved = json.loads(output.read_text(encoding="utf-8"))
+        assert saved["status"] == "dry_run"
+    finally:
+        asyncio.set_event_loop_policy(original_policy)
         output.unlink(missing_ok=True)
 
 

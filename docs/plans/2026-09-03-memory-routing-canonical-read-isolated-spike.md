@@ -2,7 +2,7 @@
 
 > **For agentic workers:** 執行前必須先用 `superpowers:using-git-worktrees` 建立隔離 worktree；逐 task 依 `superpowers:executing-plans` 與 `superpowers:test-driven-development` 施工；每個 review checkpoint 使用 `superpowers:requesting-code-review`，完成宣稱前使用 `superpowers:verification-before-completion`。
 
-**狀態：** Product Owner 已於 2026-09-03 核准 Revision 2 進入 G5 隔離實驗，並在 post-spike review 核准 Revision 3 canonical append-only boundary。trial revision 1 在免費 metadata preflight 因隔離 smoke 實驗執行器誤讀 OpenRouter SDK operation wrapper 而停止，尚未發 embedding／Luna call。bounded repair 已完成 pinned typed-response RED→GREEN、live-smoke dry-run 27 passed、完整 deterministic suite 59 passed／1 optional skip，以及臨時 LangMem characterization 1 passed。Product Owner 已再核准以完全不變的 frozen case／prompt／rubric、模型與成本／call caps 執行 trial revision 2。執行後無論 PASS／FAIL 都保存並停止；不授權第三次執行、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
+**狀態：** Trial revision 2 已於 2026-09-03 依凍結條件執行，並在 OpenRouter metadata preflight 後、第一個 Psycopg async connection 停止。Windows CLI 的預設 `ProactorEventLoop` 不受 Psycopg 支援，因此沒有 embedding／Luna／tool call 或模型語意輸出；結果是 `FAIL_UNPROVEN`。attempt、結果與報告均已保存，等待 Product Owner report review。不授權第三次執行、runner repair、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
 
 **目標：** 以最小但可信的隔離實驗，驗證在不替 raw conversation 建 semantic index、不複製員工來源、也不把完整歷史送入每次模型呼叫的條件下，LangGraph PostgreSQL Checkpointer＋Store 能否支撐：小型導覽、focused Semantic Memory 自然語言搜尋、依 stable message reference 回讀 canonical conversation，以及一個有成本上限的 Luna tool loop。
 
@@ -76,14 +76,14 @@ docs/experiments/2026-09-03-memory-routing-canonical-read/
 - [x] Product Owner 已明確核准唯一一次凍結的 Luna medium smoke；最多 3 model calls／2 tool calls、零 retry、USD 0.20 operational cap，不論結果均保存並停止。
 - [x] 該唯一 attempt 在 metadata preflight 停止；沒有 embedding／Luna call、沒有語意輸出或 trial receipt。Owner 只核准修正 `ListEndpointsResponse.data.endpoints` 接線並做 deterministic review；修復不構成重跑授權。
 - [x] Product Owner 在理解「隔離 smoke 實驗執行器」與「LangGraph agent runtime」的差別後，明確核准 trial revision 2；案例、prompt、rubric、模型、reasoning 與所有 caps 不變。
-- [ ] 使用 `superpowers:using-git-worktrees`，從已包含核准研究稿與本計畫的 commit 建立 `codex/memory-routing-canonical-read-spike`。不得從含未提交使用者修改的 main checkout 複製整個 working tree。
-- [ ] 在 worktree 執行 `Get-Location`、`git branch --show-current`、`git status --short`；路徑或分支不符立即停止。
-- [ ] 把實驗 source baseline commit、Python／uv／PostgreSQL 版本、鎖定套件版本寫進 README；不記錄密碼或 API key。
-- [ ] 使用匿名 synthetic fixture；不得載入真實員工資料。
-- [ ] 由操作者明確設定 `MEMORY_ROUTING_SPIKE_DATABASE_URL` 與 `MEMORY_ROUTING_SPIKE_EXPECTED_DATABASE`。程式不得 fallback 到 `DATABASE_URL`；必須拒絕非 loopback host、database name 不等於 expected、database name 不含 `memory_routing_spike`，以及 URL 與 app production URL 相同的情況。
-- [ ] 程式不建立、不刪除 database。資料庫不存在、身份不符或無權建立 framework tables 時停止並回報。
-- [ ] OpenRouter key 只從 `apps/api/.env`／process environment 讀取為 secret；dry run 與 deterministic tests 不需要 key。
-- [ ] rubric、case fixture 與 live prompt 在任何模型 call 前先 commit。開始 live call 後不得原地修改；若 plumbing defect 需要修改，升 `experiment_revision`，重新 review，再決定是否重新付費執行。
+- [x] 使用 `superpowers:using-git-worktrees`，從已包含核准研究稿與本計畫的 commit 建立 `codex/memory-routing-canonical-read-spike`。不得從含未提交使用者修改的 main checkout 複製整個 working tree。
+- [x] 在 worktree 執行 `Get-Location`、`git branch --show-current`、`git status --short`；路徑或分支不符立即停止。
+- [x] 把實驗 source baseline commit、Python／uv／PostgreSQL 版本、鎖定套件版本寫進 README；不記錄密碼或 API key。
+- [x] 使用匿名 synthetic fixture；不得載入真實員工資料。
+- [x] 由操作者明確設定 `MEMORY_ROUTING_SPIKE_DATABASE_URL` 與 `MEMORY_ROUTING_SPIKE_EXPECTED_DATABASE`。程式不得 fallback 到 `DATABASE_URL`；必須拒絕非 loopback host、database name 不等於 expected、database name 不含 `memory_routing_spike`，以及 URL 與 app production URL 相同的情況。
+- [x] 程式不建立、不刪除 database。資料庫不存在、身份不符或無權建立 framework tables 時停止並回報。
+- [x] OpenRouter key 只從 `apps/api/.env`／process environment 讀取為 secret；dry run 與 deterministic tests 不需要 key。
+- [x] rubric、case fixture 與 live prompt 在任何模型 call 前先 commit。開始 live call 後不得原地修改；若 plumbing defect 需要修改，升 `experiment_revision`，重新 review，再決定是否重新付費執行。
 
 README 的 baseline 必須有一行可由最終 verification 機器解析的實際 40 字元 commit：
 
@@ -572,7 +572,7 @@ uv run --project apps/api --locked python -m memory_read_spike.live_smoke --env-
 - trials 保存模型實際看見的 system/user/tool content 與最終答案；不保存 chain-of-thought。
 - `results.csv` 至少包含 revision、requested/resolved model、provider、reasoning、model_calls、tool_calls、input/output/cache/reasoning tokens、embedding tokens、latency、cost、A detail pass、A/B correction pass、unknown admission pass、scope pass、overall verdict。
 
-**2026-09-03 execution record：** trial revision 1 在免費 endpoint metadata request 後、第一個 embedding／Luna request 前，因隔離 smoke 實驗執行器將 SDK operation response 誤讀為頂層 `endpoints` 而停止。bounded repair 已通過 deterministic gate；Product Owner 已核准以不變的 frozen contract 執行 trial revision 2。這不是第三次執行授權，也不是完整模型品質 eval。
+**2026-09-03 execution record：** trial revision 1 在免費 endpoint metadata request 後、第一個 embedding／Luna request 前，因隔離 smoke 實驗執行器將 SDK operation response 誤讀為頂層 `endpoints` 而停止。bounded repair 通過 deterministic gate 後，Product Owner 核准 revision 2。Revision 2 同樣只完成 metadata preflight，隨後在 CLI 預設 Windows `ProactorEventLoop` 上建立第一個 Psycopg async connection 時失敗；沒有 embedding／Luna request、tool call 或模型語意輸出。正常 receipt 未寫出，故保存 reconstructed attempt record 並以 `FAIL_UNPROVEN` 停止。是否修 runner 與是否另跑下一個 live attempt 都須重新核准。
 
 ### 5.3 Report 必須區分支持與未證明
 
@@ -653,15 +653,17 @@ Tag 只在 report、review 與 deterministic verification 都完成後建立；l
 - report 清楚區分「支持」「不支持」「未證明」；
 - 結果回到 `MEM-Q003／MEM-Q004` 做下一個單一決策，不由實作者自行擴大架構。
 
-## 5. Plan review checklist（執行授權前）
+## 5. Plan review checklist（執行授權前；2026-09-03 已完成）
 
-- [ ] 是否逐條覆蓋研究稿 §6.4 的 input/result/error contract？
-- [ ] 是否把 strict caveat、ToolNode validation boundary、async embedding callable 都放入 Stage 0 實測？
-- [ ] 是否保留 Checkpointer canonical conversation、Store focused Semantic Memory 的唯一責任，沒有第二份來源，且暫態 tool graph 未污染 canonical checkpoint？
-- [ ] 是否只用框架提供的 Saver、Store semantic search、embedding adapter、ToolNode、ToolRuntime 與 graph execution，沒有自製搜尋／agent loop？
-- [ ] 是否把 experiment-only constants 明確隔離，沒有偷定 production top-k/window/model/schema？
-- [ ] 是否只有一個 Luna live scenario、最多 3 model calls／2 tool calls、medium、零 retry、USD 0.20 cap？
-- [ ] 是否在 live 前凍結 fixture/rubric/prompt，失敗不重跑美化？
-- [ ] 是否測 scope、restart、stable refs、A/B、更正、unknown、storage growth 與真實 outgoing schema？
-- [ ] 是否明列 M3/M5/M6/M9 與 Memory writer 不在本 spike 證明範圍？
-- [ ] 是否每個 stage 都有 stop/review checkpoint，且沒有 production 寫入授權？
+- [x] 是否逐條覆蓋研究稿 §6.4 的 input/result/error contract？
+- [x] 是否把 strict caveat、ToolNode validation boundary、async embedding callable 都放入 Stage 0 實測？
+- [x] 是否保留 Checkpointer canonical conversation、Store focused Semantic Memory 的唯一責任，沒有第二份來源，且暫態 tool graph 未污染 canonical checkpoint？
+- [x] 是否只用框架提供的 Saver、Store semantic search、embedding adapter、ToolNode、ToolRuntime 與 graph execution，沒有自製搜尋／agent loop？
+- [x] 是否把 experiment-only constants 明確隔離，沒有偷定 production top-k/window/model/schema？
+- [x] 是否只有一個 Luna live scenario、最多 3 model calls／2 tool calls、medium、零 retry、USD 0.20 cap？
+- [x] 是否在 live 前凍結 fixture/rubric/prompt，失敗不重跑美化？
+- [x] 是否測 scope、restart、stable refs、A/B、更正、unknown、storage growth 與真實 outgoing schema？
+- [x] 是否明列 M3/M5/M6/M9 與 Memory writer 不在本 spike 證明範圍？
+- [x] 是否每個 stage 都有 stop/review checkpoint，且沒有 production 寫入授權？
+
+> 上述勾選代表設計與 deterministic gate 已覆蓋，不代表 live 模型能力通過。Revision 2 在模型前失敗，因此 live-only criteria 仍依 report 標記為 `NOT_EVALUATED`。

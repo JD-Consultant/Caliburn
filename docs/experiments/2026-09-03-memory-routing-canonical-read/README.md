@@ -21,12 +21,11 @@ call 前重新計算並比對，避免案例、判準或 prompt 被靜默修改�
 
 不驗證 Memory writer、JD 產生／編輯、RAG、UI、跨 JD Memory 或 production migration。
 
-**目前執行狀態（2026-09-03）：** 唯一獲准的 revision-1 attempt 在免費 endpoint metadata
-preflight 因 SDK operation-wrapper 接線錯誤停止；沒有 embedding／Luna call，也沒有模型語意輸出。
-bounded 修復已以 pinned SDK typed response 完成 RED→GREEN，完整 deterministic suite 為
-59 passed／1 optional skip；另以臨時 LangMem 0.0.30 執行該 optional characterization 為
-1 passed。Product Owner 已核准以完全不變的 frozen contract 執行 trial revision 2；結果無論
-PASS／FAIL 都保存並停止。
+**目前執行狀態（2026-09-03）：** revision 2 已執行並以 infrastructure failure 停止。
+OpenRouter metadata preflight 完成後，Windows CLI 使用預設 `ProactorEventLoop`，在第一個
+Psycopg async connection 被拒絕；因此沒有 embedding、Luna、tool call 或模型語意輸出。
+正常 receipt 尚未建立便退出，trial JSON 是依保存的 command result 重建之 attempt record。
+結果為 `FAIL_UNPROVEN`；詳見 [`report.md`](report.md)。不得第三次執行或接 production。
 
 本實驗把兩種容易混淆的 `harness` 分開命名：外層 `live_smoke.py` 是**隔離 smoke
 實驗執行器**，負責 preflight、限制、執行與 receipt；內層 LangGraph model／tool graph 是
@@ -63,6 +62,12 @@ PASS／FAIL 都保存並停止。
 - PostgreSQL tests 必須使用名稱含 `memory_routing_spike` 的 loopback disposable database。
 - live smoke 只能使用 `openai/gpt-5.6-luna`、`medium`，且受 plan 的 call／token／cost 上限約束。
 - live fixture、rubric 與 prompt 一旦凍結，不得為了讓失敗變成功而原地修改。
+
+## 實際結果
+
+- [Revision 2 attempt record](trials/revision-2-luna-medium.json)
+- [逐 trial 摘要](results.csv)
+- [結案報告](report.md)
 
 ## Task 4 的實驗邊界
 

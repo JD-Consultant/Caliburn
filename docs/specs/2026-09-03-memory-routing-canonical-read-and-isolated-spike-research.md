@@ -1,7 +1,7 @@
 # Memory Routing、Canonical Read 與 Isolated Spike 研究
 
 - 日期：2026-09-03
-- 狀態：**G4 read shape 與 isolated mechanism 已核准；Revision 3 canonical boundary bounded repair 已完成 TDD、deterministic verification 與獨立 review；是否恢復 Luna smoke 是下一個 Owner gate，未授權 production 實作**
+- 狀態：**G5 trial revision 2 已執行並保存為 `FAIL_UNPROVEN`；Windows CLI event-loop finding 等待 Product Owner review，未授權 runner repair、第三次 live attempt 或 production 實作**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
 - 流程：[`../decision-process.md`](../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
@@ -637,7 +637,7 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - 實作狀態：**isolated bounded repair 已完成**。`append_canonical_round` 保留可信 message type／非空 ID 檢查，移除 prior-state read、內容比較與 collision exception，直接委派 framework graph；fixture ID 唯一性及更正追加另有測試。TDD RED 正確失敗於舊 `aget_state` 呼叫，GREEN 後完整 deterministic suite 為 58 passed、1 個 optional LangMem characterization skipped；獨立 reviewer 修正兩處 stale retry／冪等文字後 verdict `ready`、無剩餘 finding。
 - Parking lot：HTTP／run 重送造成重複事件、production 並行 writer、以及完整 canonical payload identity；這些不是 same-ID reducer 問題，進入其各自 contract 前不在本輪發明機制。
 - Reopen trigger：production framework 強迫 caller 暴露既有 message ID、無法在可信 Runtime 建立新事件 identity，或實測顯示 append-only surface 仍可覆寫既有 canonical event。
-- Next gate：由 Product Owner 決定是否恢復計畫中已凍結、受成本與 call/tool caps 約束的一次 Luna smoke；未明確核准前不發 live request。
+- 當時的 Next gate：由 Product Owner 決定是否恢復計畫中已凍結、受成本與 call/tool caps 約束的一次 Luna smoke。該 gate 後來已由 §15 的 revision 2 授權完成；實際結果與目前 gate 見 §16。
 
 ### 13.2 直接官方依據
 
@@ -651,7 +651,7 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 
 ### 14.1 已觀察事實
 
-- 唯一獲准的 live attempt 在 endpoint metadata preflight 停止；沒有發 embedding／Luna request，也沒有模型語意輸出。
+- trial revision 1 在 endpoint metadata preflight 停止；沒有發 embedding／Luna request，也沒有模型語意輸出。
 - 鎖定 OpenRouter SDK 0.10.8 的 `endpoints.list_async()` 回傳
   `operations.ListEndpointsResponse`。operation response 只有 `data`；內層 payload 才有
   `endpoints`。隔離 smoke 實驗執行器使用 `response.endpoints`，因此拋出 `AttributeError`。
@@ -680,7 +680,7 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - 不用升級 dependency、不新增 compatibility wrapper、不吞掉 programming error，也不因此取得
   live rerun 授權。
 - plan §5.2 原文只允許「第一個 provider call 前」的 plumbing repair；本次已發免費
-  metadata requests，但尚未發模型／embedding request，因此是否建立新 trial revision 必須另行裁決。
+  metadata requests，但尚未發模型／embedding request，因此當時是否建立新 trial revision 必須另行裁決。該裁決後來記錄於 §15；revision 2 結果見 §16。
 
 ### 14.4 修復與驗證結果
 
@@ -730,6 +730,7 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
   全部不變；只包含已驗證的 `data.endpoints` plumbing 修復。
 - revision 2 無論 PASS／FAIL／外部錯誤都保存並停止；不授權第三次執行、修改條件美化結果、
   production、merge 或 push。
+- revision 2 已依上述條件執行並停止；結果是 §16 所述的 `FAIL_UNPROVEN`，不是模型品質結果。
 
 ### 15.3 直接來源
 
@@ -737,3 +738,40 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - [OpenAI — How evals drive the next chapter in AI for businesses](https://openai.com/index/evals-drive-next-chapter-of-ai/)
 - [LangSmith — Evaluation](https://docs.langchain.com/langsmith/evaluation)
 - [LangSmith — Evaluation concepts](https://docs.langchain.com/langsmith/evaluation-concepts)
+
+## 16. Trial revision 2 finding：Windows event loop 未覆蓋真 CLI entrypoint
+
+### 16.1 已觀察事實
+
+- frozen hash、deterministic suite、專用 DB identity 與 API key presence preflight 均先通過。
+- revision 2 完成 OpenRouter model／embedding availability 與 endpoint-price metadata preflight。
+- 第一個持久層動作是 `_read_current_database()`；Psycopg 在連線前即以
+  `InterfaceError` 拒絕 Windows 預設 `ProactorEventLoop`。
+- 程序 exit code 1、launcher wall time 2,749 ms；沒有 embedding、Luna、tool call、模型語意
+  輸出或 attempt-specific DB write。
+- 例外位於正常 receipt boundary 外，故 runner 沒有建立 `LiveSmokeReceipt`；trial artifact 明確
+  標記為依保存 command result 重建的 attempt record，不假裝 provider receipt。
+
+### 16.2 為何測試綠燈仍會失敗
+
+- spike 的 `tests/conftest.py` 在 Windows 設定 `WindowsSelectorEventLoopPolicy`，所以所有 async
+  PostgreSQL tests 已在相容 loop 下執行。
+- `live_smoke.py:main()` 使用沒有 `loop_factory` 的 `asyncio.run()`；Python 在 Windows 預設為
+  `ProactorEventLoop`。test runner 與真 CLI entrypoint 因此不是同一執行條件。
+- 這是 entrypoint／observability coverage 缺口，不是 Memory read mechanism 或 Luna 品質反例。
+
+### 16.3 官方處理方式與 gate
+
+- Psycopg 官方明示 Windows 預設 Proactor 不相容，要求改用 Selector loop。
+- Python 3.13 官方提供並建議以 `asyncio.run(..., loop_factory=...)` 配置 event loop；這比新增全域
+  policy 更貼近目前 API，也避免依賴後續已進入 deprecation 路徑的 policy system。
+- DB-only、零 provider request 診斷以 `loop_factory=asyncio.SelectorEventLoop` 成功讀回
+  `caliburn_memory_routing_spike`，支持 bounded repair 的技術可行性。
+- 本 finding 不改 G4 read contract。Owner review report 前，不實作 repair、不建立第三次 trial、
+  不將 deterministic tests 外推為 live success。
+
+### 16.4 直接來源
+
+- [Psycopg — Concurrent operations／Windows event-loop warning](https://www.psycopg.org/psycopg3/docs/advanced/async.html)
+- [Python 3.13 — asyncio platform support on Windows](https://docs.python.org/3.13/library/asyncio-platforms.html#windows)
+- [Python 3.13 — asyncio runners and `loop_factory`](https://docs.python.org/3.13/library/asyncio-runner.html#running-an-asyncio-program)

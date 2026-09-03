@@ -33,7 +33,8 @@ source_baseline_commit: 8979494dfe73634708e35a6c4b369e6af0fd8719
 - langchain-openrouter：0.2.7
 - OpenRouter Python SDK：0.10.8
 - LangMem characterization：0.0.30，僅以 `uv --with` 暫時載入
-- PostgreSQL server：Task 2 disposable database gate 時記錄
+- PostgreSQL server：16.15（隔離容器 `pgvector/pgvector:0.8.6-pg16`）
+- pgvector：0.8.6；只供本 spike 的 LangGraph Store semantic index
 
 ## 執行規則
 

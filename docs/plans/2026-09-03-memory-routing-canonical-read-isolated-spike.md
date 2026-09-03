@@ -2,7 +2,7 @@
 
 > **For agentic workers:** 執行前必須先用 `superpowers:using-git-worktrees` 建立隔離 worktree；逐 task 依 `superpowers:executing-plans` 與 `superpowers:test-driven-development` 施工；每個 review checkpoint 使用 `superpowers:requesting-code-review`，完成宣稱前使用 `superpowers:verification-before-completion`。
 
-**狀態：** Trial revision 2 已於 2026-09-03 保存為 `FAIL_UNPROVEN`。Product Owner review report 後只核准的 Windows CLI event-loop bounded repair 已完成有效 RED→GREEN，沒有 embedding／Luna／tool call 或模型語意輸出。Product Owner 於 2026-09-04 另行核准一次 live trial revision 3；原 revision 2 attempt、結果與 verdict 不變。Revision 3 沿用全部 frozen 條件，只可執行一次，不論結果均保存並停止。付款前 preflight 已通過，但執行環境要求另行明確授權把匿名 synthetic fixture／prompt／tool results 傳送至 OpenRouter，因此尚未發出 provider request；不授權 revision 4、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
+**狀態：** Trial revision 2 已於 2026-09-03 保存為 `FAIL_UNPROVEN`。Product Owner review report 後只核准的 Windows CLI event-loop bounded repair 已完成有效 RED→GREEN，沒有 embedding／Luna／tool call 或模型語意輸出。Product Owner 於 2026-09-04 另行核准一次 live trial revision 3；原 revision 2 attempt、結果與 verdict 不變。Revision 3 沿用全部 frozen 條件，只可執行一次，不論結果均保存並停止。付款前 preflight 已通過，Product Owner 也已明確允許把匿名 synthetic fixture／prompt／tool results 傳送至 OpenRouter；不授權 revision 4、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
 
 **目標：** 以最小但可信的隔離實驗，驗證在不替 raw conversation 建 semantic index、不複製員工來源、也不把完整歷史送入每次模型呼叫的條件下，LangGraph PostgreSQL Checkpointer＋Store 能否支撐：小型導覽、focused Semantic Memory 自然語言搜尋、依 stable message reference 回讀 canonical conversation，以及一個有成本上限的 Luna tool loop。
 
@@ -78,7 +78,7 @@ docs/experiments/2026-09-03-memory-routing-canonical-read/
 - [x] Product Owner 在理解「隔離 smoke 實驗執行器」與「LangGraph agent runtime」的差別後，明確核准 trial revision 2；案例、prompt、rubric、模型、reasoning 與所有 caps 不變。
 - [x] Product Owner review revision 2 報告後，只核准 Windows CLI event-loop bounded repair 與 regression test；不包含新的 Luna／embedding request。
 - [x] Product Owner 於 2026-09-04 另行核准一次 live trial revision 3；case／prompt／rubric、Luna medium、embedding model、所有 caps 與零 retry 不變，且不論結果均保存並停止。
-- [ ] 執行環境要求 Product Owner 明確允許將匿名 synthetic frozen fixture／prompt／tool results 傳至 OpenRouter；未取得前不得重送被安全 gate 攔下的命令。
+- [x] Product Owner 已明確允許將匿名 synthetic frozen fixture／prompt／tool results 傳至 OpenRouter；僅限本次 frozen revision 3。
 - [x] 使用 `superpowers:using-git-worktrees`，從已包含核准研究稿與本計畫的 commit 建立 `codex/memory-routing-canonical-read-spike`。不得從含未提交使用者修改的 main checkout 複製整個 working tree。
 - [x] 在 worktree 執行 `Get-Location`、`git branch --show-current`、`git status --short`；路徑或分支不符立即停止。
 - [x] 把實驗 source baseline commit、Python／uv／PostgreSQL 版本、鎖定套件版本寫進 README；不記錄密碼或 API key。
@@ -581,6 +581,8 @@ uv run --project apps/api --locked python -m memory_read_spike.live_smoke --env-
 **2026-09-04 execution authorization：** Product Owner 在 review 上述 repair 證據後，另行核准一次 live trial revision 3。此授權不修改 frozen scenario 或任何上限，也不延伸為 revision 4；實際結果尚待本次唯一執行寫回。
 
 **2026-09-04 external-transfer gate：** frozen hash、完整 deterministic suite、專用 DB identity、API key presence 與 output-path preflight 均通過；外部命令在 process 啟動前被安全 gate 拒絕，因現有授權未逐字涵蓋將測試 payload 傳至 OpenRouter。沒有 provider request、費用或 revision 3 artifact；取得明確外部傳輸授權前不得重送。
+
+Product Owner 隨後明確回覆「同意」，允許本次把匿名 synthetic frozen fixture、prompt 與 tool results 傳送至 OpenRouter；若執行發現新問題，必須先保存並停止，再依本流程研究與討論，不能自行修正或重跑。
 
 ### 5.3 Report 必須區分支持與未證明
 

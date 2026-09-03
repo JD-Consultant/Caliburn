@@ -1,7 +1,7 @@
 # Memory Routing、Canonical Read 與 Isolated Spike 研究
 
 - 日期：2026-09-03
-- 狀態：**G5 trial revision 2 維持 `FAIL_UNPROVEN`；Windows CLI event-loop bounded repair 已完成，Product Owner 已核准 frozen live trial revision 3 的產品 gate；外部傳輸安全 gate 尚待明確授權，未執行 provider request**
+- 狀態：**G5 trial revision 2 維持 `FAIL_UNPROVEN`；Windows CLI event-loop bounded repair 已完成，Product Owner 已核准 frozen live trial revision 3 及匿名 synthetic payload 的 OpenRouter 外部傳輸；尚未執行**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
 - 流程：[`../decision-process.md`](../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
@@ -814,3 +814,5 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
   revision 3 artifact。這不是試驗結果或新的 plumbing finding。
 - 下一個唯一 gate 是 Product Owner 是否明確同意上述匿名 synthetic payload 的 OpenRouter
   外部傳輸；未取得前不得以其他方式繞過或重送。
+- Product Owner 隨後明確回覆「同意」，完成此外部傳輸 gate，並要求任何新問題都先停止、
+  依既定流程提出討論與研究。下一步只執行一次 revision 3；不授權 revision 4 或自行修復重跑。

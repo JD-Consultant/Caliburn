@@ -5,7 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 
 
-EMBEDDING_DIMENSIONS = 8
+EMBEDDING_DIMENSIONS = 1536
 
 
 @dataclass
@@ -31,6 +31,6 @@ class DeterministicEmbeddingSpy:
             ("重複訂位", "尖峰"),
             ("退款", "核准"),
         )
-        vector = [float(sum(text.count(token) for token in tokens)) for tokens in groups]
-        vector.append(0.01)
-        return vector
+        signal = [float(sum(text.count(token) for token in tokens)) for tokens in groups]
+        signal.append(0.01)
+        return signal + [0.0] * (EMBEDDING_DIMENSIONS - len(signal))

@@ -61,6 +61,7 @@ docs/experiments/2026-09-03-memory-routing-canonical-read/
 │  ├─ test_live_smoke_dry_run.py
 │  └─ test_storage_growth.py
 ├─ trials/
+│  ├─ .gitignore
 │  └─ README.md
 ├─ results.csv             # 只由實際 run 產生
 └─ report.md               # 只在所有已執行 gate 完成後撰寫
@@ -288,7 +289,7 @@ Tests 必須先紅，然後證明：
 - deterministic tests 注入固定、可預測的向量 callable；不自己計算 similarity 或排序。
 - `append_canonical_round` 只做 stable-ID collision guard，再交給 `MessagesState`／`add_messages` 與 Checkpointer；不複製 conversation 至 Store。
 - `read_canonical_context` 從相同 thread latest state 讀完整 canonical messages，再依 stable ID 定位；第一個 spike 的相鄰政策只回「直接前一則 consultant message（若存在）＋目標 employee message」。這是要被 characterise 的 spike policy，不宣稱已定 production window。
-- `search_current_memories` 固定最多 4 筆，且單筆完整、不截斷。`4` 是 frozen experiment variable，不是 production top-k 決策。
+- `search_current_memories` 固定最多 2 筆，且單筆完整、不截斷。`2` 是 frozen experiment variable，不是 production top-k 決策。
 - backend diagnostic 留在 test trace／log capture；模型 success result 不含 key、score、namespace、timestamp。
 
 ### 2.3 RED／GREEN 命令
@@ -451,7 +452,7 @@ git commit -m "test: characterize bounded memory read tools"
 
 `test_storage_growth.py` 依序在 fresh run/thread IDs 建立 40／100／200 組 round，且每個級距至少量測三次 deterministic repetition。記錄而不預設通過：
 
-- 每個 round 的 checkpoint write wall time；
+- 每個 round 的 canonical append wall time（包含 stable-ID guard 的 latest-state read 與 framework checkpoint write；不得誤稱純 DB write latency）；
 - restart 後 latest-state read wall time；
 - `checkpoints`、`checkpoint_writes`、`checkpoint_blobs` 對該 thread 的 rows 與 `sum(pg_column_size(row))`；
 - restart 後 message equality 與 stable IDs。
@@ -475,8 +476,8 @@ async def run_live_smoke(settings: LiveSmokeSettings, *, dry_run: bool) -> LiveS
 - provider fallback：false；model/SDK automatic retry：0
 - max model calls：3；max tool calls：2
 - 每次 max completion tokens：1200；三次合計 completion cap：3600
-- 全 run model input token cap：18,000
-- chat＋embedding 可計價總上限：USD 0.20
+- 全 run observed model input token stop cap：18,000；每次回應先如實記錄，超界後不得進下一 call
+- chat＋embedding observed cost stop cap：USD 0.20；同樣在每次官方 usage 回傳後執行
 - timeout：每個外部 request 60 秒；整個 smoke 180 秒
 
 dry-run tests 證明：
@@ -485,10 +486,12 @@ dry-run tests 證明：
 2. OpenRouter SDK chat 與 embedding clients 都設 retry disabled，且 key 不進 repr／receipt。
 3. embedding adapter 呼叫公開 `embeddings.generate_async(input=texts, model=..., dimensions=1536, encoding_format="float")`，依 response `index` 還原輸入順序；缺 index、維度不符或數量不符停止。
 4. 以 `httpx.MockTransport` 注入 OpenRouter SDK 的 async client，捕捉真實 embedding HTTP request；直接 assert `model／input／dimensions／encoding_format`，並用 SDK 的 typed response 驗證 `data[].index／embedding`，不能只 mock 自己的 adapter method。
-5. live 前以官方 model／endpoint metadata 解析 chat／embedding 可用性與價格，並以已凍結的 input／output／reasoning／embedding caps 建立保守上界；若只能取得最低價、缺少任一計價項，或無法證明上界不超過 USD 0.20，就不發第一個 paid model call。每次回應再以官方 `usage.cost` 核對，超界前不得進下一 call。
-6. receipts 只保存 requested/resolved model、provider、call/tool counts、input/output/cache/reasoning token counts（若 provider 有回）、latency、cost（若 provider有回）、HTTP/request ID 與 model-visible input/output；秘密與 hidden reasoning 不保存。
-7. live prompt 是一個 scenario、同時詢問 A 三個細節、A/B 差異與 B 更正、退款核准缺口；不拆成三套最多 3-call scenario。
-8. graph 不以程式或 prompt 強迫特定 tool；rubric 依實際任務需要判定模型是否先 search、再為精確原話核對 deep-read、最後回答。第三個 tool call或第四個 model call直接 fail。
+5. 另以同一 adapter 實際接上 disposable PostgreSQL Store，證明 1536 維向量能 seed 並 semantic search；不能用兩個彼此分離的 unit test 冒充 wiring 已驗證。
+6. live 前以官方 model／endpoint metadata 解析 chat／embedding 可用性與價格，並以已凍結的 input／output／reasoning／embedding caps 建立保守 preflight 估算。`prompt／completion` 等必要單價缺失即阻擋；官方 endpoint 未提供可選的固定 request price 時視為零，未另列 reasoning price 時依官方「reasoning 屬 output tokens」採 completion price。每次回應再以官方 `usage.cost` 核對，超界前不得進下一 call。
+7. OpenRouter 的精確 native-token usage 與 cost 只在回應後提供，所以 18,000／USD 0.20 不得宣稱為第一個 request 付款前的數學 hard cap。Product Owner 未接受此 operational-cap 邊界時，不得發 live call。
+8. receipts 只保存 requested/resolved model、provider、call/tool counts、input/output/cache/reasoning token counts（若 provider 有回）、latency、cost（若 provider有回）、HTTP/request ID 與**已移除 provider-private reasoning 的** model I/O 投影；秘密與 hidden reasoning 不保存。framework 可依 provider 契約在同一 tool loop 暫時續傳原 reasoning blocks，但不得寫入 receipt。
+9. live prompt 是一個 scenario、同時詢問 A 三個細節、A/B 差異與 B 更正、退款核准缺口；不拆成三套最多 3-call scenario。
+10. graph 不以程式或 prompt 強迫特定 tool；rubric 依實際任務需要判定模型是否先 search、再為精確原話核對 deep-read、最後回答。第三個 tool call或第四個 model call直接 fail。
 
 Revision 1 的 model-visible prompt 內容凍結如下；實作只能加入上述 deterministic 導覽與最後六則近期訊息，不能偷偷加入完整 fixture：
 
@@ -517,11 +520,11 @@ uv run --project apps/api --locked pytest "$spikeRoot\tests\test_live_smoke_dry_
 ```
 
 - 先紅後綠；此 Task 不得發真 API call。
-- Reviewer 檢查 cost cap 是否可強制、是否偷開 provider fallback／retry、是否保存 hidden reasoning、是否把三題誤算成三個各自三 call 的 scenario。
+- Reviewer 檢查付款前與回應後 cost control 是否被如實區分、是否偷開 provider fallback／retry、是否保存 hidden reasoning、是否把三題誤算成三個各自三 call 的 scenario。
 
 ```powershell
 git diff --check
-git add docs/experiments/2026-09-03-memory-routing-canonical-read
+git add docs/experiments/2026-09-03-memory-routing-canonical-read docs/plans/2026-09-03-memory-routing-canonical-read-isolated-spike.md
 git commit -m "test: bound memory read spike cost and growth"
 ```
 

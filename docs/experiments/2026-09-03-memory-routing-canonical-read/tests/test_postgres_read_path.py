@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+import json
 import os
 from types import SimpleNamespace
+from typing import Any
 from uuid import UUID, uuid4
 
+import httpx
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.store.memory import InMemoryStore
-from pydantic import ValidationError
+from pydantic import SecretStr, ValidationError
 
 from memory_read_spike.canonical import (
     ReferenceUnavailableError,
@@ -20,6 +23,11 @@ from memory_read_spike.embeddings import DeterministicEmbeddingSpy
 from memory_read_spike.fixtures import (
     load_canonical_rounds,
     semantic_memory_fixtures,
+)
+from memory_read_spike.live_smoke import (
+    LiveSmokeSettings,
+    _OpenRouterEmbeddingAdapter,
+    _build_openrouter_sdk,
 )
 from memory_read_spike.runtime import (
     SemanticIndexUnavailableError,
@@ -273,6 +281,9 @@ async def test_semantic_index_embeds_only_title_content_and_query() -> None:
         await seed_current_memories(runtime, scope, memories)
         result = await search_current_memories(runtime, scope, "每日 CSV 會員匯入")
 
+        assert runtime.store.index_config is not None
+        assert runtime.store.index_config["dims"] == 1536
+
     allowed = {
         text
         for memory in memories
@@ -294,9 +305,85 @@ async def test_semantic_index_embeds_only_title_content_and_query() -> None:
         for embedded in embed.seen_texts
         for forbidden_text in forbidden
     )
+    assert len(result.memories) == 2
     assert result.memories[0].title == "B 案：健身房會員網站"
     assert "每日" in result.memories[0].content
     assert "CSV" in result.memories[0].content
+
+
+@pytest.mark.asyncio
+async def test_real_postgres_store_accepts_and_searches_live_embedding_adapter() -> None:
+    settings = _settings()
+    scope = _scope()
+    memories = semantic_memory_fixtures(scope)
+    captured: list[dict[str, Any]] = []
+
+    def vector_for(text: str) -> list[float]:
+        signal = [
+            float(any(token in text for token in ("B 案", "健身", "CSV", "會員"))),
+            float(any(token in text for token in ("A 案", "餐飲", "預約", "分店"))),
+            float(any(token in text for token in ("需求訪談", "前端", "驗收"))),
+            0.01,
+        ]
+        return signal + [0.0] * (1536 - len(signal))
+
+    async def handler(request: httpx.Request) -> httpx.Response:
+        payload = json.loads(request.content)
+        captured.append(payload)
+        texts = payload["input"]
+        return httpx.Response(
+            200,
+            json={
+                "data": [
+                    {
+                        "embedding": vector_for(text),
+                        "index": index,
+                        "object": "embedding",
+                    }
+                    for index, text in enumerate(texts)
+                ],
+                "model": "openai/text-embedding-3-small",
+                "object": "list",
+                "id": f"embedding-{len(captured)}",
+                "usage": {
+                    "prompt_tokens": len(texts),
+                    "total_tokens": len(texts),
+                    "cost": 0.000001,
+                },
+            },
+        )
+
+    async with httpx.AsyncClient(
+        transport=httpx.MockTransport(handler),
+        base_url="https://openrouter.test",
+    ) as async_client:
+        live_settings = LiveSmokeSettings(
+            database=settings,
+            api_key=SecretStr("test-only"),
+        )
+        sdk = _build_openrouter_sdk(
+            live_settings,
+            async_client=async_client,
+            server_url="https://openrouter.test/api/v1",
+        )
+        async with sdk:
+            adapter = _OpenRouterEmbeddingAdapter(
+                sdk=sdk,
+                settings=live_settings,
+            )
+            async with open_spike_runtime(settings, embed=adapter) as runtime:
+                await seed_current_memories(runtime, scope, memories)
+                result = await search_current_memories(
+                    runtime,
+                    scope,
+                    "每日 CSV 會員匯入",
+                )
+
+    assert result.memories[0].title == "B 案：健身房會員網站"
+    assert captured
+    assert all(request["dimensions"] == 1536 for request in captured)
+    assert all(len(request["input"]) <= 2 for request in captured)
+    assert adapter.request_count == len(captured)
 
 
 @pytest.mark.asyncio

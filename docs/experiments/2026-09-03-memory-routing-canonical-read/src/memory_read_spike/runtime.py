@@ -27,6 +27,9 @@ class SemanticIndexUnavailableError(RuntimeError):
     pass
 
 
+SEMANTIC_SEARCH_LIMIT = 2
+
+
 @dataclass
 class SpikeRuntime:
     saver: AsyncPostgresSaver
@@ -122,7 +125,7 @@ async def search_current_memories(
     rows = await runtime.store.asearch(
         scope.semantic_namespace,
         query=query,
-        limit=4,
+        limit=SEMANTIC_SEARCH_LIMIT,
     )
     exact_rows = [row for row in rows if row.namespace == scope.semantic_namespace]
     return SearchSemanticMemoryResult(

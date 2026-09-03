@@ -654,13 +654,13 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - 唯一獲准的 live attempt 在 endpoint metadata preflight 停止；沒有發 embedding／Luna request，也沒有模型語意輸出。
 - 鎖定 OpenRouter SDK 0.10.8 的 `endpoints.list_async()` 回傳
   `operations.ListEndpointsResponse`。operation response 只有 `data`；內層 payload 才有
-  `endpoints`。harness 使用 `response.endpoints`，因此拋出 `AttributeError`。
+  `endpoints`。隔離 smoke 實驗執行器使用 `response.endpoints`，因此拋出 `AttributeError`。
 - OpenRouter 官方 HTTP response 同樣是 `{ "data": { "endpoints": [...] } }`，不是頂層
   `endpoints`。
 - 0.10.8 並非 2026-09-03 最新 SDK；官方 PyPI 最新是 1.1.113。可是以隔離
   `uvx --from openrouter==1.1.113` 讀取真實 Pydantic model 後，最新版本的 operation
   response 仍只有 `data`，內層 payload 才有 `endpoints`。因此升級版本不會修正這次錯誤；
-  根因是 harness 誤讀 SDK contract。
+  根因是隔離 smoke 實驗執行器誤讀 SDK contract。
 
 ### 14.2 為何 resolver 留在 0.10.8
 
@@ -689,7 +689,7 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
   `SimpleNamespace` 假裝 endpoint operation wrapper。
 - 有效 RED 精確命中原接線的
   `AttributeError: 'ListEndpointsResponse' object has no attribute 'endpoints'`。
-- production-like harness 只改一行為 `chat.data.endpoints`／`embedding.data.endpoints`；沒有
+- production-like provider 接線只改一行為 `chat.data.endpoints`／`embedding.data.endpoints`；沒有
   compatibility fallback、exception swallowing、retry 或 dependency 變更。
 - 修復後 targeted regression 1 passed；整份 live-smoke dry-run 27 passed；完整 isolated
   deterministic suite 59 passed、1 個 optional LangMem characterization skipped；再以
@@ -705,3 +705,35 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - [langchain-openrouter 0.2.8 — PyPI release metadata](https://pypi.org/pypi/langchain-openrouter/0.2.8/json)
 - [OpenRouter 0.11.46 — PyPI release metadata](https://pypi.org/pypi/openrouter/0.11.46/json)
 - [OpenRouter 1.1.113 — PyPI release metadata](https://pypi.org/pypi/openrouter/1.1.113/json)
+
+## 15. Harness 名詞校正與 trial revision 2 授權
+
+### 15.1 名詞與責任
+
+- Anthropic 官方把 evaluation harness 定義為端到端執行 tasks、提供 instructions／tools、記錄
+  steps、評分與彙整結果的基礎設施；把 agent harness／scaffold 定義為包住模型、處理輸入、
+  orchestration tool calls 並回傳結果的系統。兩者不是同一層。
+- 本 spike 的外層 `live_smoke.py` 因此統一稱為**隔離 smoke 實驗執行器**：它負責
+  preflight、成本／call caps、啟動 isolated read path 與保存 receipt。
+- 內層 LangGraph model／tool graph 稱為**agent runtime**。§14 的 SDK operation-wrapper
+  錯誤位於實驗執行器，不是 Memory substrate、read contract 或模型語意失敗。
+- OpenAI 與 LangSmith 的公開 eval 流程同樣把 dataset／case、target、grader／rubric、run／trace
+  與結果分析分離。這些是共同方法；Luna medium、3 model calls、2 tool calls、USD 0.20、
+  零 retry 與本案例內容則是經 Owner 核准的 Caliburn 實驗變數，不冒充 vendor 標準。
+- Anthropic 明確指出模型輸出有變異，正式效果評估通常需要多 trials。Caliburn 此處只有一個
+  bounded scenario，因此只能視為 plumbing／代表性能力 smoke，不能宣稱完整模型品質 eval。
+
+### 15.2 Owner 決策與 gate
+
+- Product Owner 在理解上述責任邊界後，於 2026-09-03 明確核准 trial revision 2。
+- frozen case、prompt、rubric、Luna medium、embedding model、tool/call/token/cost caps 與零 retry
+  全部不變；只包含已驗證的 `data.endpoints` plumbing 修復。
+- revision 2 無論 PASS／FAIL／外部錯誤都保存並停止；不授權第三次執行、修改條件美化結果、
+  production、merge 或 push。
+
+### 15.3 直接來源
+
+- [Anthropic — Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)
+- [OpenAI — How evals drive the next chapter in AI for businesses](https://openai.com/index/evals-drive-next-chapter-of-ai/)
+- [LangSmith — Evaluation](https://docs.langchain.com/langsmith/evaluation)
+- [LangSmith — Evaluation concepts](https://docs.langchain.com/langsmith/evaluation-concepts)

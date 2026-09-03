@@ -25,7 +25,13 @@ call 前重新計算並比對，避免案例、判準或 prompt 被靜默修改�
 preflight 因 SDK operation-wrapper 接線錯誤停止；沒有 embedding／Luna call，也沒有模型語意輸出。
 bounded 修復已以 pinned SDK typed response 完成 RED→GREEN，完整 deterministic suite 為
 59 passed／1 optional skip；另以臨時 LangMem 0.0.30 執行該 optional characterization 為
-1 passed。修復沒有附帶 live rerun 授權。
+1 passed。Product Owner 已核准以完全不變的 frozen contract 執行 trial revision 2；結果無論
+PASS／FAIL 都保存並停止。
+
+本實驗把兩種容易混淆的 `harness` 分開命名：外層 `live_smoke.py` 是**隔離 smoke
+實驗執行器**，負責 preflight、限制、執行與 receipt；內層 LangGraph model／tool graph 是
+**agent runtime**。本次 SDK wrapper 錯誤發生在前者。單一 smoke 只驗證代表性 read path
+能否實際跑通，不是用來泛化模型品質的完整 eval suite。
 
 ## 設計來源與分類
 
@@ -75,7 +81,7 @@ bounded 修復已以 pinned SDK typed response 完成 RED→GREEN，完整 deter
 
 OpenRouter 會在**回應後**以模型原生 tokenizer 回傳精確 token 數與實際 cost；
 官方文件沒有為目前 Chat Completions／OpenRouter SDK 公開等價的付款前精確
-input-token 計數。因此 18,000 input tokens 與 USD 0.20 在目前 harness 是：
+input-token 計數。因此 18,000 input tokens 與 USD 0.20 在目前隔離 smoke 實驗執行器是：
 
 1. call／output／embedding 數量的付款前 deterministic 上限；
 2. endpoint metadata 的保守 preflight 估算；

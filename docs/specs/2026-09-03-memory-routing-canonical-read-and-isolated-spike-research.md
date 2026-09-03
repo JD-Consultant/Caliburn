@@ -646,3 +646,62 @@ Product Owner 已核准以下五點；framework contract audit 已完成，下�
 - [LangGraph `message.py`](https://github.com/langchain-ai/langgraph/blob/main/libs/langgraph/langgraph/graph/message.py)：current source 對同 ID 執行 replacement，沒有 collision error。
 - [OpenAI Responses conversation](https://developers.openai.com/api/reference/cli/resources/responses/methods/create)：input／output items 由 conversation service 自動加入持久 conversation。
 - [Anthropic session events](https://platform.claude.com/docs/en/managed-agents/events-and-streaming)：持久 event 具有服務管理的 ID，stream deltas 以該 ID 關聯最終事件。
+
+## 14. Live preflight finding：SDK 版本落後，但不是 endpoint wrapper 錯誤的原因
+
+### 14.1 已觀察事實
+
+- 唯一獲准的 live attempt 在 endpoint metadata preflight 停止；沒有發 embedding／Luna request，也沒有模型語意輸出。
+- 鎖定 OpenRouter SDK 0.10.8 的 `endpoints.list_async()` 回傳
+  `operations.ListEndpointsResponse`。operation response 只有 `data`；內層 payload 才有
+  `endpoints`。harness 使用 `response.endpoints`，因此拋出 `AttributeError`。
+- OpenRouter 官方 HTTP response 同樣是 `{ "data": { "endpoints": [...] } }`，不是頂層
+  `endpoints`。
+- 0.10.8 並非 2026-09-03 最新 SDK；官方 PyPI 最新是 1.1.113。可是以隔離
+  `uvx --from openrouter==1.1.113` 讀取真實 Pydantic model 後，最新版本的 operation
+  response 仍只有 `data`，內層 payload 才有 `endpoints`。因此升級版本不會修正這次錯誤；
+  根因是 harness 誤讀 SDK contract。
+
+### 14.2 為何 resolver 留在 0.10.8
+
+- app 明確固定 Pydantic 2.13.4 與 `langchain-openrouter` 0.2.7。
+- `langchain-openrouter` 0.2.7 要求 `openrouter>=0.9.2,<1.0.0`；截至 2026-09-03
+  最新 0.2.8 仍維持 `openrouter<1.0.0`。
+- OpenRouter 0.11.46、1.0.0 與最新 1.1.113 都要求
+  `pydantic>=2.11.2,<2.13`，與 app 的 Pydantic 2.13.4 不相容；0.10.8 沒有該上限。
+- 所以這不是單純忘記執行 dependency update，而是目前兩個 integration constraint 的交集。
+  是否改 Pydantic、等待 `langchain-openrouter` 支援 OpenRouter 1.x，或改 provider adapter，
+  應另開 dependency compatibility 題目；不得混入本次 read-path spike 的 bounded repair。
+
+### 14.3 本 finding 的 gate
+
+- Product Owner 已核准 bounded repair：先以 pinned SDK 的真實 typed operation response 補
+  RED regression test，再只把 endpoint 讀取改為 `response.data.endpoints`。
+- 不用升級 dependency、不新增 compatibility wrapper、不吞掉 programming error，也不因此取得
+  live rerun 授權。
+- plan §5.2 原文只允許「第一個 provider call 前」的 plumbing repair；本次已發免費
+  metadata requests，但尚未發模型／embedding request，因此是否建立新 trial revision 必須另行裁決。
+
+### 14.4 修復與驗證結果
+
+- regression test 使用 app 鎖定的 OpenRouter SDK 0.10.8 真實
+  `operations.listendpoints.ListEndpointsResponse` 型別與完整合法 payload；不以自製
+  `SimpleNamespace` 假裝 endpoint operation wrapper。
+- 有效 RED 精確命中原接線的
+  `AttributeError: 'ListEndpointsResponse' object has no attribute 'endpoints'`。
+- production-like harness 只改一行為 `chat.data.endpoints`／`embedding.data.endpoints`；沒有
+  compatibility fallback、exception swallowing、retry 或 dependency 變更。
+- 修復後 targeted regression 1 passed；整份 live-smoke dry-run 27 passed；完整 isolated
+  deterministic suite 59 passed、1 個 optional LangMem characterization skipped；再以
+  `uv --with langmem==0.0.30` 單獨執行該 characterization 為 1 passed。
+- 上述驗證均未讀 API key、未呼叫 OpenRouter model／embedding endpoint、未建立 live trial artifact。
+
+### 14.5 直接來源
+
+- [OpenRouter API — List all endpoints for a model](https://openrouter.ai/docs/api/api-reference/endpoints/list-all-endpoints-for-a-model)
+- [OpenRouter Python SDK — Endpoints](https://openrouter.ai/docs/client-sdks/python/api-reference/endpoints)
+- [OpenRouter SDK — PyPI latest](https://pypi.org/project/openrouter/)
+- [langchain-openrouter 0.2.7 — PyPI release metadata](https://pypi.org/pypi/langchain-openrouter/0.2.7/json)
+- [langchain-openrouter 0.2.8 — PyPI release metadata](https://pypi.org/pypi/langchain-openrouter/0.2.8/json)
+- [OpenRouter 0.11.46 — PyPI release metadata](https://pypi.org/pypi/openrouter/0.11.46/json)
+- [OpenRouter 1.1.113 — PyPI release metadata](https://pypi.org/pypi/openrouter/1.1.113/json)

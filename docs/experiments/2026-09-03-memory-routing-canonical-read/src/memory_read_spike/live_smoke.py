@@ -486,7 +486,7 @@ async def _fetch_preflight_metadata(
         retries=None,
         timeout_ms=timeout_ms,
     )
-    return chat.endpoints, embedding.endpoints
+    return chat.data.endpoints, embedding.data.endpoints
 
 
 def _empty_receipt(

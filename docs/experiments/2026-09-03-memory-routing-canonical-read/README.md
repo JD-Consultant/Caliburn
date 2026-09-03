@@ -21,6 +21,12 @@ call 前重新計算並比對，避免案例、判準或 prompt 被靜默修改�
 
 不驗證 Memory writer、JD 產生／編輯、RAG、UI、跨 JD Memory 或 production migration。
 
+**目前執行狀態（2026-09-03）：** 唯一獲准的 revision-1 attempt 在免費 endpoint metadata
+preflight 因 SDK operation-wrapper 接線錯誤停止；沒有 embedding／Luna call，也沒有模型語意輸出。
+bounded 修復已以 pinned SDK typed response 完成 RED→GREEN，完整 deterministic suite 為
+59 passed／1 optional skip；另以臨時 LangMem 0.0.30 執行該 optional characterization 為
+1 passed。修復沒有附帶 live rerun 授權。
+
 ## 設計來源與分類
 
 - 大廠／框架共同方向、Caliburn mapping 與實驗變數的逐層分類：[`final audit`](../../specs/2026-09-03-memory-read-spike-consensus-and-framework-final-audit.md)

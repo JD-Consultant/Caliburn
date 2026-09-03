@@ -2,7 +2,7 @@
 
 > **For agentic workers:** 執行前必須先用 `superpowers:using-git-worktrees` 建立隔離 worktree；逐 task 依 `superpowers:executing-plans` 與 `superpowers:test-driven-development` 施工；每個 review checkpoint 使用 `superpowers:requesting-code-review`，完成宣稱前使用 `superpowers:verification-before-completion`。
 
-**狀態：** Product Owner 已於 2026-09-03 核准 Revision 2 進入 G5 隔離實驗，並在 post-spike review 核准 Revision 3 canonical append-only boundary。bounded code repair 已完成 TDD、完整 deterministic suite（58 passed、1 個 optional LangMem characterization skipped）與獨立 review；Product Owner 已再核准依凍結條件執行唯一一次 Luna smoke，之後回到 report review。仍不授權 production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
+**狀態：** Product Owner 已於 2026-09-03 核准 Revision 2 進入 G5 隔離實驗，並在 post-spike review 核准 Revision 3 canonical append-only boundary。唯一獲准的 Luna attempt 在免費 metadata preflight 因 harness 誤讀 OpenRouter SDK operation wrapper 而停止，尚未發 embedding／Luna call。Owner 隨後只核准 bounded harness repair；該修復已完成 pinned typed-response RED→GREEN、live-smoke dry-run 27 passed、完整 deterministic suite 59 passed／1 optional skip，以及臨時 LangMem characterization 1 passed。尚未授權新 trial revision、live rerun、production 整合、ADR 狀態改變、UI、JD 編輯、RAG、merge 或 push。
 
 **目標：** 以最小但可信的隔離實驗，驗證在不替 raw conversation 建 semantic index、不複製員工來源、也不把完整歷史送入每次模型呼叫的條件下，LangGraph PostgreSQL Checkpointer＋Store 能否支撐：小型導覽、focused Semantic Memory 自然語言搜尋、依 stable message reference 回讀 canonical conversation，以及一個有成本上限的 Luna tool loop。
 
@@ -74,6 +74,7 @@ docs/experiments/2026-09-03-memory-routing-canonical-read/
 - [x] Product Owner 已於 2026-09-03 明確核准 Revision 2；核准條件是由整體到細節均優先採可追溯的大廠／框架共識，不得把未討論的自訂作法當成共識。
 - [x] Product Owner 已於 2026-09-03 核准 Revision 3 correction：新 canonical ID 由 Runtime 建立，只開放 append；不加入 same-ID content comparison guard。bounded repair 已以 RED→GREEN 完成，完整 deterministic suite 為 58 passed、1 個 optional skip，獨立 review 無剩餘 finding。
 - [x] Product Owner 已明確核准唯一一次凍結的 Luna medium smoke；最多 3 model calls／2 tool calls、零 retry、USD 0.20 operational cap，不論結果均保存並停止。
+- [x] 該唯一 attempt 在 metadata preflight 停止；沒有 embedding／Luna call、沒有語意輸出或 trial receipt。Owner 只核准修正 `ListEndpointsResponse.data.endpoints` 接線並做 deterministic review；修復不構成重跑授權。
 - [ ] 使用 `superpowers:using-git-worktrees`，從已包含核准研究稿與本計畫的 commit 建立 `codex/memory-routing-canonical-read-spike`。不得從含未提交使用者修改的 main checkout 複製整個 working tree。
 - [ ] 在 worktree 執行 `Get-Location`、`git branch --show-current`、`git status --short`；路徑或分支不符立即停止。
 - [ ] 把實驗 source baseline commit、Python／uv／PostgreSQL 版本、鎖定套件版本寫進 README；不記錄密碼或 API key。
@@ -569,6 +570,8 @@ uv run --project apps/api --locked python -m memory_read_spike.live_smoke --env-
 - 外部暫時失敗也保存 attempt 與錯誤分類。若在第一個 provider call 前即可確認是 harness plumbing defect，可修正後升 revision；一旦已有模型語意輸出，就不能把不理想結果稱為 plumbing defect。
 - trials 保存模型實際看見的 system/user/tool content 與最終答案；不保存 chain-of-thought。
 - `results.csv` 至少包含 revision、requested/resolved model、provider、reasoning、model_calls、tool_calls、input/output/cache/reasoning tokens、embedding tokens、latency、cost、A detail pass、A/B correction pass、unknown admission pass、scope pass、overall verdict。
+
+**2026-09-03 execution record：** revision-1 attempt 在免費 endpoint metadata request 後、第一個 embedding／Luna request 前，因 harness 將 SDK operation response 誤讀為頂層 `endpoints` 而停止。bounded repair 已通過 deterministic gate；是否以新 revision 重跑仍須 Product Owner 另行核准。
 
 ### 5.3 Report 必須區分支持與未證明
 

@@ -15,6 +15,7 @@ import psycopg
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_openrouter import ChatOpenRouter
+from openrouter.operations.listendpoints import ListEndpointsResponse
 from pydantic import SecretStr, ValidationError
 
 from memory_read_spike.live_smoke import (
@@ -31,6 +32,7 @@ from memory_read_spike.live_smoke import (
     _build_chat_model,
     _build_openrouter_sdk,
     _conservative_cost_upper_bound,
+    _fetch_preflight_metadata,
     _message_for_receipt,
     main,
     run_live_smoke,
@@ -303,6 +305,91 @@ async def test_missing_chat_cost_makes_aggregate_receipt_cost_unknown() -> None:
 
     assert ledger.spent == Decimal("0.01")
     assert ledger.receipt_cost is None
+
+
+@pytest.mark.asyncio
+async def test_preflight_extracts_endpoints_from_typed_sdk_operation_response() -> None:
+    settings = _settings(api_key="test-only")
+
+    class FakeModels:
+        async def list_async(self, *, q: str, **_kwargs: Any) -> Any:
+            return SimpleNamespace(data=[SimpleNamespace(id=q)])
+
+    class FakeEmbeddings:
+        async def list_models_async(self, **_kwargs: Any) -> Any:
+            return SimpleNamespace(
+                data=[SimpleNamespace(id=settings.embedding_model)]
+            )
+
+    class FakeEndpoints:
+        async def list_async(
+            self,
+            *,
+            author: str,
+            slug: str,
+            **_kwargs: Any,
+        ) -> ListEndpointsResponse:
+            model_id = f"{author}/{slug}"
+            return ListEndpointsResponse.model_validate(
+                {
+                    "data": {
+                        "architecture": {
+                            "input_modalities": ["text"],
+                            "instruct_type": None,
+                            "modality": "text->text",
+                            "output_modalities": ["text"],
+                            "tokenizer": "test",
+                        },
+                        "created": 0,
+                        "description": "typed SDK fixture",
+                        "endpoints": [
+                            {
+                                "context_length": 8192,
+                                "latency_last_30m": None,
+                                "max_completion_tokens": 4096,
+                                "max_prompt_tokens": 8192,
+                                "model_id": model_id,
+                                "model_name": model_id,
+                                "name": "test endpoint",
+                                "pricing": {
+                                    "completion": "0.000002",
+                                    "prompt": "0.000001",
+                                },
+                                "provider_name": "test provider",
+                                "quantization": "unknown",
+                                "supported_parameters": [],
+                                "supports_implicit_caching": False,
+                                "tag": "test",
+                                "throughput_last_30m": None,
+                                "uptime_last_1d": None,
+                                "uptime_last_30m": None,
+                                "uptime_last_5m": None,
+                                "status": 0,
+                            }
+                        ],
+                        "id": model_id,
+                        "name": model_id,
+                    }
+                }
+            )
+
+    sdk = SimpleNamespace(
+        models=FakeModels(),
+        embeddings=FakeEmbeddings(),
+        endpoints=FakeEndpoints(),
+    )
+
+    chat_endpoints, embedding_endpoints = await _fetch_preflight_metadata(
+        sdk,
+        settings,
+    )
+
+    assert [endpoint.model_id for endpoint in chat_endpoints] == [
+        settings.chat_model
+    ]
+    assert [endpoint.model_id for endpoint in embedding_endpoints] == [
+        settings.embedding_model
+    ]
 
 
 @pytest.mark.asyncio

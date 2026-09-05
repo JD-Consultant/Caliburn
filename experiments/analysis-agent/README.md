@@ -1,6 +1,6 @@
-# Analysis-only Agent — first isolated slice
+# Analysis-only Agent — isolated conversation slices
 
-Status: **offline native-continuity wiring only**. This is not a runnable Web app,
+Status: **native continuity + synchronous compiled Agent wiring**. This is not a runnable Web app,
 a Memory implementation, or a live model-quality result. No legacy App imports.
 
 ## Run
@@ -29,6 +29,12 @@ preservation, not actual server-side reasoning or compaction quality.
   latest **inline server** compaction item, retaining later items and matching
   tool metadata. Instructions and Memory guide must be added separately by the
   caller. Never use this to prune standalone `/responses/compact` output.
+- `runtime.build_agent`: official `create_agent` with a request-only middleware;
+  no custom model/tool loop, message repository, or state machine. Caller owns
+  the model/client and Saver lifetime, and invokes with `durability="sync"`.
+- Failed pending step: reopen with the same thread ID and invoke with `None`.
+  Do not append the same employee input again. The offline regression exercises
+  reuse of a committed deterministic tool result, NOT exactly-once external effects.
 - Tests cover configuration, opaque reasoning/phase/function call round-trip,
   canonical serialization, compaction slicing and canonical non-mutation.
 
@@ -36,10 +42,35 @@ The adapter may omit response-top-level effective `reasoning.context` metadata.
 Sending `all_turns` does **not** prove the server selected it. A later tiny native
 response/adapter live comparison is required; do not fabricate this metadata.
 
+## Dedicated PostgreSQL check (not yet passed)
+
+Install uses the pinned official `langgraph-checkpoint-postgres` package. The
+integration test uses `PostgresSaver.from_conn_string(...)` and `.setup()` directly,
+not an additional persistence wrapper. It only allows a database named
+`q019_agent_test`, which must already exist on a test PostgreSQL service. Never
+point it at the application database. Supply `Q019_TEST_DATABASE_URL` externally
+with a bounded `connect_timeout` (for example 5 seconds); do not commit credentials.
+
+```powershell
+uv run --no-sync pytest tests/test_postgres_conversation.py -q -rs
+```
+
+This test runs two separate Python processes, stops the first at a synthetic
+provider error, and resumes its saved model step in the second. It checks input
+visibility from another DB connection before a model response, native items,
+tool-result reuse, compaction view vs full conversation, and thread isolation.
+It deletes only its own random test thread using the official Saver API.
+No DSN means an explicit **skip, not a durability pass**; a provided but failing
+DSN fails the test. Model HTTP is synthetic in both processes (zero paid calls).
+
+On 2026-09-06 Docker Desktop failed before starting its engine because of its
+internal `dockerInference` socket. No DB was created/migrated; no Docker reset
+or existing data deletion was performed. Real DB/process recovery is unverified.
+
 ## Not yet implemented / proved
 
-Compiled agent loop, streaming/async transport, PostgreSQL restart recovery,
-conversation reader, instructions/Memory middleware, context token budget,
+Streaming/async transport, verified PostgreSQL restart recovery,
+conversation reader, Memory-guide injection, context token/run budget,
 B extraction/consolidation, C publication, Skills, UI, paid Luna/medium smoke.
 There is intentionally no JD editor. Standard serializer round-trip is not a
 database durability test. The code is not connected to the existing application.
@@ -48,15 +79,21 @@ database durability test. The code is not connected to the existing application.
 
 Current design lives in the main checkout (not this branch's historical register):
 [Q019](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-design.md),
-[slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-native-continuity-slice.md).
+[first slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-native-continuity-slice.md),
+[second slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-durable-conversation-slice.md).
 The branch keeps an execution copy in `docs/plans` for review/reproduction.
 
 - [Native reasoning / preserve all output items](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-across-calls)
 - [Server vs standalone compaction](https://developers.openai.com/api/docs/guides/compaction)
 - [ChatOpenAI public Responses API](https://docs.langchain.com/oss/python/integrations/chat/openai)
 - [LangGraph persistence / serializer](https://docs.langchain.com/oss/python/langgraph/persistence)
+- [Transient model context vs persistent state](https://docs.langchain.com/oss/python/langchain/context-engineering)
+- [Official PostgreSQL setup](https://docs.langchain.com/oss/python/langchain/short-term-memory)
+- [Sync durability](https://reference.langchain.com/python/langgraph/types/Durability)
 - [HTTPX MockTransport](https://www.python-httpx.org/advanced/transports/#mock-transports)
 
 Version evidence: `uv.lock`, generated 2026-09-06 against PyPI. Core direct pins:
 LangChain 1.4.0, langchain-openai 1.6.0, LangGraph 1.2.11,
 langgraph-checkpoint 4.2.0, OpenAI SDK 3.8.0. Python 3.12.13 used locally.
+Second slice: langgraph-checkpoint-postgres 3.1.2, psycopg/binary 3.3.5
+(resolved in `uv.lock`).

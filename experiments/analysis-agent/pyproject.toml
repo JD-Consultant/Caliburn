@@ -1,0 +1,24 @@
+[project]
+name = "caliburn-analysis-agent"
+version = "0.0.1"
+description = "Isolated analysis-only agent: native continuity slice"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "langchain==1.4.0",
+    "langchain-openai==1.6.0",
+    "langgraph==1.2.11",
+    "langgraph-checkpoint==4.2.0",
+    "openai==3.8.0",
+    "httpx==0.28.1",
+]
+
+[dependency-groups]
+dev = ["pytest==9.1.1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+addopts = "-p no:cacheprovider"
+
+[tool.uv]
+package = false

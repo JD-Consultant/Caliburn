@@ -3,7 +3,7 @@
 from collections.abc import Callable, Sequence
 
 from langchain.agents import create_agent
-from langchain.agents.middleware import ModelRequest, ModelResponse, wrap_model_call
+from langchain.agents.middleware import AgentMiddleware, ModelRequest, ModelResponse, wrap_model_call
 from langchain_core.language_models import BaseChatModel
 from langchain_core.tools import BaseTool
 from langgraph.checkpoint.base import BaseCheckpointSaver
@@ -31,6 +31,7 @@ def build_agent(
     checkpointer: BaseCheckpointSaver,
     instructions: str,
     tools: Sequence[BaseTool] = (),
+    middleware: Sequence[AgentMiddleware] = (),
 ) -> CompiledStateGraph:
     """Return the official compiled loop; caller owns saver/client lifetimes.
 
@@ -43,6 +44,6 @@ def build_agent(
         model=model,
         tools=list(tools),
         system_prompt=instructions,
-        middleware=[native_context_view],
+        middleware=[native_context_view, *middleware],
         checkpointer=checkpointer,
     )

@@ -11,6 +11,7 @@ dependencies = [
     "openai==3.8.0",
     "httpx==0.28.1",
     "langgraph-checkpoint-postgres==3.1.2",
+    "deepagents==0.7.13",
     "psycopg[binary]>=3.2,<4",
 ]
 

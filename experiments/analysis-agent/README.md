@@ -1,7 +1,8 @@
-# Analysis-only Agent — isolated conversation slices
+# Analysis-only Agent — isolated conversation and Memory read slices
 
-Status: **native continuity + synchronous compiled Agent wiring**. This is not a runnable Web app,
-a Memory implementation, or a live model-quality result. No legacy App imports.
+Status: **native continuity + synchronous compiled Agent + Memory artifact/read path**.
+Not a runnable Web app, completed Memory generation/publication system, or live
+model-quality result. No legacy App imports.
 
 ## Run
 
@@ -78,10 +79,38 @@ Test thread rows were cleaned; the dedicated DB/schema remains for another run.
 ## Not yet implemented / proved
 
 Streaming/async transport, abrupt host/DB crash or failover recovery,
-conversation reader, Memory-guide injection, context token/run budget,
-B extraction/consolidation, C publication, Skills, UI, paid Luna/medium smoke.
+context token/run budget, B extraction/consolidation, current-head/receipt/C
+publication, Skills, UI, paid Luna/medium smoke.
 There is intentionally no JD editor. Standard serializer round-trip is not a
 database durability test. The code is not connected to the existing application.
+
+## Memory read slice (2026-09-06)
+
+- `memory.MemoryArtifacts`: fresh StoreBackend extraction files and prepared
+  knowledge/guide versions. Runtime generates addresses and source headers.
+  `save_memory` does **not publish current**; caller selects a `MemoryVersion`.
+- `sources.ConversationReader`: captures completed exact snapshot/message ranges;
+  reads saved visible human/assistant text, with bounded continuation and omitted
+  block kinds. No new archive and no model call; opaque reasoning is not exposed.
+- `memory_tools.memory_access`: fixed document/version guide plus official
+  read-only file tools and `read_conversation`. Pass the returned middleware/tools
+  into `build_agent`. Build a new access bundle when intentionally selecting a
+  new version; no hidden mid-run refresh. Only filesystem `.tools` are registered,
+  not generic offload/scrubbing hooks. Native Responses continuity stays intact.
+- Direct file reads support full fixed-version enumeration; model-visible pages
+  use official size-based pagination. Engineering limits: line <=2,000 chars,
+  guide <=4,000 chars, read output about16,000 chars, source page3,000 chars.
+  Too-large directory listings fail explicitly; keyword top-k isn't inventory.
+- Generated artifacts normalize line separators before storage so backend and
+  native formatter pagination agree; original conversation text is unchanged.
+  Literal runtime interview links are checked across presentation styles,
+  including bare links followed by sentence punctuation.
+- Full suite **32 passed / 0 skipped**, including actual PostgreSQL Store/Saver
+  reopen. Model HTTP synthetic, no API spend. B/C generation/concurrency still
+  needs the next slice; prepared artifacts aren't a publication authority.
+
+[Memory read results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-memory-read-path-results.md)
+records source links, scoped test cleanup, custom seams and remaining gates.
 
 ## Design / evidence
 
@@ -106,3 +135,4 @@ LangChain 1.4.0, langchain-openai 1.6.0, LangGraph 1.2.11,
 langgraph-checkpoint 4.2.0, OpenAI SDK 3.8.0. Python 3.12.13 used locally.
 Second slice: langgraph-checkpoint-postgres 3.1.2, psycopg/binary 3.3.5
 (resolved in `uv.lock`).
+Third slice: Deep Agents0.7.13 (public StoreBackend and filesystem tools).

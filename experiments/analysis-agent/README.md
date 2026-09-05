@@ -42,7 +42,7 @@ The adapter may omit response-top-level effective `reasoning.context` metadata.
 Sending `all_turns` does **not** prove the server selected it. A later tiny native
 response/adapter live comparison is required; do not fabricate this metadata.
 
-## Dedicated PostgreSQL check (not yet passed)
+## Dedicated PostgreSQL check (passed on 2026-09-06)
 
 Install uses the pinned official `langgraph-checkpoint-postgres` package. The
 integration test uses `PostgresSaver.from_conn_string(...)` and `.setup()` directly,
@@ -63,13 +63,21 @@ It deletes only its own random test thread using the official Saver API.
 No DSN means an explicit **skip, not a durability pass**; a provided but failing
 DSN fails the test. Model HTTP is synthetic in both processes (zero paid calls).
 
-On 2026-09-06 Docker Desktop failed before starting its engine because of its
-internal `dockerInference` socket. No DB was created/migrated; no Docker reset
-or existing data deletion was performed. Real DB/process recovery is unverified.
+Docker Desktop initially failed on an inaccessible internal socket. After an
+owner-approved, non-destructive backup/recreation of its socket directories,
+the engine recovered. The dedicated `caliburn-q019-postgres` container now uses
+PostgreSQL 16.14, user `q019`, database `q019_agent_test`, localhost port `55433`,
+and its own `caliburn-q019-postgres-data` volume. Its random password stays out of
+the repo/output. No Docker factory reset or existing-data deletion was performed.
+
+The single PG test passed, then the full suite passed **12 tests, zero skipped**.
+Both worker processes use synthetic provider HTTP: this proves database/process
+continuity, not a live model's reasoning quality or arbitrary power-loss recovery.
+Test thread rows were cleaned; the dedicated DB/schema remains for another run.
 
 ## Not yet implemented / proved
 
-Streaming/async transport, verified PostgreSQL restart recovery,
+Streaming/async transport, abrupt host/DB crash or failover recovery,
 conversation reader, Memory-guide injection, context token/run budget,
 B extraction/consolidation, C publication, Skills, UI, paid Luna/medium smoke.
 There is intentionally no JD editor. Standard serializer round-trip is not a
@@ -81,6 +89,7 @@ Current design lives in the main checkout (not this branch's historical register
 [Q019](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-design.md),
 [first slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-native-continuity-slice.md),
 [second slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-durable-conversation-slice.md).
+[Results and Docker recovery record](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-durable-conversation-results.md).
 The branch keeps an execution copy in `docs/plans` for review/reproduction.
 
 - [Native reasoning / preserve all output items](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-across-calls)

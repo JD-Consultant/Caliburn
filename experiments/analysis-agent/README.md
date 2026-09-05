@@ -79,8 +79,8 @@ Test thread rows were cleaned; the dedicated DB/schema remains for another run.
 ## Not yet implemented / proved
 
 Streaming/async transport, abrupt host/DB crash or failover recovery,
-context token/run budget, B extraction/consolidation, current-head/receipt/C
-publication, Skills, UI, paid Luna/medium smoke.
+context token/run budget, B extraction/consolidation and scheduling, C editing
+and in-run read-view refresh, Skills, UI, paid Luna/medium smoke.
 There is intentionally no JD editor. Standard serializer round-trip is not a
 database durability test. The code is not connected to the existing application.
 
@@ -111,6 +111,37 @@ database durability test. The code is not connected to the existing application.
 
 [Memory read results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-memory-read-path-results.md)
 records source links, scoped test cleanup, custom seams and remaining gates.
+
+## Memory publication slice (2026-09-06)
+
+SQLAlchemy 2.0.52 provides ORM version checking and transaction scope for two
+small metadata tables: current head and durable operation receipts. Full text
+remains in the official Store; this is not another Memory or conversation store.
+
+`PublicationStore(engine, artifacts)` is fixed to one document. Call `setup()`
+explicitly in the isolated database setup, never during a model run. Runtime
+calls `prepare(version, expected_revision=..., kind=...)` after saving artifacts,
+persists that request in its workflow, and sends it to `publish(request)`.
+An absent head has revision 0. `current()` returns a fixed published version
+for `artifacts.reader(head.memory)` and `artifacts.guide(head.memory)` together.
+
+Stale updates fail without overwriting the winning version. Retry an uncertain
+commit with the **same request**, or read its `receipt(operation_id)`; absence
+does not prove the old transaction failed. An existing receipt returns the old
+operation's result without rolling current back. Different content requires a
+new operation after resolving the previous attempt. No automatic model retry.
+No SQL transaction spans model work or Store artifact preparation.
+
+Full suite: **49 passed, zero skipped** with the dedicated PG database. New
+tests exercise first-insert and subsequent-update races and commit-reply loss.
+Failure injection is synthetic, transactions and contention are real. This is
+not production failover or model-quality evidence; paid calls remain zero.
+Reconciliation-query disconnects preserve the same uncertain-result contract;
+they do not imply a previous attempt failed. The B/C model workflows and
+automatic read-view refresh are still not built.
+
+[Publication results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-memory-publication-results.md)
+contains references, custom seams, test limitations, and the next gate.
 
 ## Design / evidence
 

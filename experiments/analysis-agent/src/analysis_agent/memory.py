@@ -1,6 +1,8 @@
 """Immutable-by-construction artifact I/O, not the B/C publication authority."""
 
 from dataclasses import dataclass
+import hashlib
+import json
 import re
 from uuid import uuid4
 
@@ -112,6 +114,14 @@ class MemoryArtifacts:
         """Return a prepared version only. Selecting/publishing current is separate."""
         knowledge = _prepare_text(knowledge)
         guide = _prepare_text(guide, guide=True)
+        self._validate_links(knowledge, guide)
+        version = MemoryVersion(self.document_id, str(uuid4()))
+        backend = self._backend("versions", version.version_id)
+        self._save(backend, "/memory/knowledge.md", knowledge)
+        self._save(backend, "/memory/guide.md", guide)
+        return version
+
+    def _validate_links(self, knowledge: str, guide: str):
         interviews = self._backend("interviews")
         # Addresses are runtime-issued literal ASCII paths, not arbitrary URLs.
         # Validate their occurrences regardless of Markdown presentation (inline,
@@ -122,11 +132,19 @@ class MemoryArtifacts:
             path = path.rstrip(".")
             if interviews.read(path.removeprefix("/interviews"), limit=1).error:
                 raise ValueError("Memory reference is unavailable in this document")
-        version = MemoryVersion(self.document_id, str(uuid4()))
-        backend = self._backend("versions", version.version_id)
-        self._save(backend, "/memory/knowledge.md", knowledge)
-        self._save(backend, "/memory/guide.md", guide)
-        return version
+
+    def verify_version(self, version: MemoryVersion) -> str:
+        """Verify prepared bytes before publication; no writes or semantic claims."""
+        paths = ["/memory/knowledge.md", "/memory/guide.md"]
+        downloaded = self._view(version).download_files(paths)
+        if len(downloaded) != 2 or any(r.error or r.content is None for r in downloaded):
+            raise ValueError("Memory content unavailable; version cannot be published")
+        texts = [r.content.decode("utf-8") for r in downloaded]
+        for index, text in enumerate(texts):
+            if _prepare_text(text, guide=index == 1) != text:
+                raise ValueError("Memory content is not normalized; prepare a new version")
+        self._validate_links(*texts)
+        return hashlib.sha256(json.dumps(dict(zip(paths, texts)), ensure_ascii=False, sort_keys=True).encode()).hexdigest()
 
     def _view(self, version: MemoryVersion):
         if version.document_id != self.document_id:

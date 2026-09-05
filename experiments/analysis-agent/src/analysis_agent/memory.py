@@ -96,14 +96,18 @@ class MemoryArtifacts:
         if loaded.error or loaded.content != content.encode("utf-8"):
             raise RuntimeError("Artifact save could not be verified; not ready for handoff")
 
-    def save_extraction(self, *, summary: str, candidates: str, slug: str, source_reference: str) -> ExtractionFiles:
+    def save_extraction(self, *, summary: str, candidates: str, slug: str, source_reference: str, context_reference: str | None = None) -> ExtractionFiles:
         parse_reference(source_reference, self.document_id)
+        if context_reference is not None:
+            parse_reference(context_reference, self.document_id)
         summary = _prepare_text(summary)
         candidates = _prepare_text(candidates)
         name = re.sub(r"[^\w -]", "", slug, flags=re.UNICODE).strip()[:80] or "訪談詳記"
         batch = str(uuid4())
         backend = self._backend("interviews")
         header = f"# {name}\n\nSource: {source_reference}\nSource scope: complete input range, not per-sentence attribution.\n\n"
+        if context_reference is not None:
+            header += f"Context only (not new source): {context_reference}\n\n"
         summary_path = f"/{batch}/summary.md"
         candidates_path = f"/{batch}/candidates.md"
         self._save(backend, summary_path, header + summary)

@@ -1,6 +1,6 @@
-# Analysis-only Agent — isolated conversation and Memory read slices
+# Analysis-only Agent — isolated conversation and Memory slices
 
-Status: **native continuity + synchronous compiled Agent + Memory artifact/read path**.
+Status: **native continuity + synchronous Agent + Memory read/publication + B1 extraction**.
 Not a runnable Web app, completed Memory generation/publication system, or live
 model-quality result. No legacy App imports.
 
@@ -79,7 +79,7 @@ Test thread rows were cleaned; the dedicated DB/schema remains for another run.
 ## Not yet implemented / proved
 
 Streaming/async transport, abrupt host/DB crash or failover recovery,
-context token/run budget, B extraction/consolidation and scheduling, C editing
+context token/run budget, B2 consolidation and background scheduling, C editing
 and in-run read-view refresh, Skills, UI, paid Luna/medium smoke.
 There is intentionally no JD editor. Standard serializer round-trip is not a
 database durability test. The code is not connected to the existing application.
@@ -142,6 +142,40 @@ automatic read-view refresh are still not built.
 
 [Publication results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-memory-publication-results.md)
 contains references, custom seams, test limitations, and the next gate.
+
+## Interview extraction slice (2026-09-06)
+
+`ExtractionWorkflow(reader, artifacts, model, checkpointer)` runs B1 only:
+completed source references → native three-field extraction → durable checkpoint
+→ Store artifacts. `start(reference)` handles a bounded batch; `resume()` resumes
+the pending node without replacing its input. The caller serializes jobs per
+document. This technical workflow is not another employee conversation.
+
+The model writes detailed notes, candidate information and a short label.
+Runtime supplies real paths and new-source/optional-context references. It does
+not publish current Memory. Empty candidates are valid; incomplete/refused/
+invalid model results are errors. Source completion requires explicit provider
+`completed` status, not only a graph with no next node.
+
+Defaults: 6,000 visible characters per window, up to1,500 previous-turn context,
+4,096 output tokens and16 windows per batch. All are engineering settings, not
+vendor guarantees. Oversize individual turns fail rather than silently truncate.
+Only visible interview text is extracted; opaque reasoning remains canonical.
+
+The latest completed identical source returns its saved result. Older or
+overlapping source ranges are rejected before another call; there is no implicit
+force-reextract or arbitrary historical-result lookup. Message order is read
+from the canonical snapshot, not inferred from UUIDs.
+
+A Store failure after the model-result checkpoint resumes saving, not the model.
+Partial unreferenced artifacts may remain; no current version is changed and no
+GC is provided. A model response lost before checkpoint can still be recomputed.
+Real PG tests reopen all connections after injected pre-write/partial-write
+failures. Full suite: **71 passed / zero skipped**, synthetic HTTP, zero paid calls.
+This proves wiring/recovery, not semantic extraction quality.
+
+[Extraction results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-extraction-results.md)
+records framework sources, review findings, repairs and the remaining B2/C gates.
 
 ## Design / evidence
 

@@ -10,6 +10,29 @@ from analysis_agent.memory import MemoryArtifacts, ReadOnlyFiles
 PATHS = {"knowledge": "/memory/knowledge.md", "guide": "/memory/guide.md"}
 
 
+class StagedMemoryValidationError(ValueError):
+    """Known model-correctable content error, never an arbitrary backend failure."""
+
+
+def _correctable(error: ValueError) -> bool:
+    # The shared validator predates typed errors. Fail closed on new/unknown
+    # reasons, including infrastructure ValueErrors wrapped as reference errors.
+    if str(error) in {
+        "Memory line exceeds 2000 characters; split into lines without removing detail",
+        "Memory guide exceeds 4000 characters; move details to knowledge",
+    }:
+        return True
+    return str(error).startswith("Invalid Memory reference ") and str(error.__cause__) in {
+        "Expected an existing runtime interview artifact address",
+        "Artifact is unavailable in this document",
+        "Invalid conversation reference; copy it from the interview record",
+        "Conversation reference belongs to another document",
+        "Conversation source is unavailable; do not substitute latest text",
+        "Conversation source checkpoint does not match",
+        "Conversation source message range is unavailable",
+    }
+
+
 class StagedFiles(ReadOnlyFiles):
     def write(self, file_path: str, content: str):
         self._check_scope()
@@ -30,8 +53,16 @@ def staged_texts(artifacts: MemoryArtifacts) -> dict[str, str]:
     for name, result in zip(PATHS, StateBackend().download_files(list(PATHS.values())), strict=True):
         if result.error or result.content is None:
             raise ValueError(f"Missing staged {name}; create both memory files")
-        values[name] = result.content.decode("utf-8")
-    return artifacts.validate_texts(**values)
+        content = result.content.decode("utf-8")
+        try:
+            # Reuse the same validator per file to attach the failing location;
+            # this does not introduce different format/reference rules for B2.
+            values[name] = artifacts.validate_texts(**{key: content if key == name else "" for key in PATHS})[name]
+        except ValueError as error:
+            if not _correctable(error):
+                raise
+            raise StagedMemoryValidationError(f"{PATHS[name]}: {error}") from error
+    return values
 
 
 def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
@@ -50,7 +81,7 @@ def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
         backend._check_scope()
         try:
             staged_texts(artifacts)
-        except ValueError as error:
+        except StagedMemoryValidationError as error:
             raise ToolException(str(error)) from error
         return "Both staged files passed format/reference checks. Not yet published."
 

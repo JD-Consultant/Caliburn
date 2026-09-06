@@ -11,10 +11,11 @@ from deepagents.backends import StateBackend
 from deepagents.middleware.filesystem import FilesystemState
 from langchain.agents import create_agent
 from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import HumanMessage
 from langgraph.graph import START, END, StateGraph
 
 from analysis_agent.consolidation_tools import PATHS, consolidation_tools, staged_texts
+from analysis_agent.consolidation_feedback import ConsolidationFeedback, completed_messages
 from analysis_agent.memory import MemoryVersion
 from analysis_agent.publication import PublishRequest, StalePublication
 from analysis_agent.runtime import native_context_view
@@ -184,22 +185,16 @@ class ConsolidationWorkflow:
         tools = consolidation_tools(self.artifacts, self.thread_id)
         agent = create_agent(model=self.model.model_copy(update={"max_tokens": self.max_output_tokens}),
             tools=tools, system_prompt=INSTRUCTIONS, state_schema=FilesystemState,
-            middleware=[native_context_view,
+            # After hooks run in reverse: count the completed model step before
+            # feedback can jump back through the existing before_model limit.
+            middleware=[ConsolidationFeedback(self.artifacts), native_context_view,
                 ModelCallLimitMiddleware(thread_limit=self.max_model_steps-state["used_model_steps"], exit_behavior="error"),
                 ToolCallLimitMiddleware(thread_limit=self.max_tool_calls-state["used_tool_calls"], exit_behavior="error")])
         def seed(s):
             StateBackend().upload_files([(PATHS[name], value.encode("utf-8")) for name, value in s["seed"].items()])
             return {}
         def collect(s):
-            last = s["messages"][-1]
-            messages = [m for m in s["messages"] if isinstance(m, AIMessage)]
-            if (not isinstance(last, AIMessage) or last.tool_calls
-                    or any(m.response_metadata.get("status") != "completed" for m in messages)):
-                raise ValueError("Consolidation response is not complete; no publication")
-            if any(m.invalid_tool_calls for m in messages):
-                raise ValueError("Consolidation has invalid tool calls; not a successful no-op")
-            if any(b.get("type") == "refusal" for m in messages for b in m.content if isinstance(b, dict)):
-                raise ValueError("Consolidation refused; no publication")
+            messages = completed_messages(s)
             return {"material": staged_texts(self.artifacts), "model_steps": len(messages),
                     "tool_calls": sum(len(m.tool_calls) for m in messages)}
         builder = StateGraph(AttemptState)

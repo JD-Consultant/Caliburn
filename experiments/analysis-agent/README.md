@@ -596,6 +596,18 @@ staging and read-only interview artifacts. `validate_memory()` has no model
 arguments and returns format/reference errors for correction within the loop.
 It is application validation, not semantic truth or coverage verification.
 
+Final completed responses without tool calls also validate the staged files via
+public `AgentMiddleware.after_model(can_jump_to=["model"])`. A known application
+format/reference error returns one private, Runtime-labelled Human message with
+the failing file/address and reason, then jumps back to the same Agent. This is
+not employee speech, canonical conversation/source, or a fabricated tool result.
+The hook is first in the middleware list so existing reverse-order after hooks
+count the response before correction returns through the original quota gate.
+There is no outer retry, new correction quota, B1 rerun, or extra successful-path
+model call; `native_context_view` remains in place. The shared validator is reused
+per staged file to identify the location; only known error reasons are classified
+as correctable, including checking the cause of wrapped reference errors.
+
 A per-invocation LangGraph subgraph checkpoints the official Agent's tool steps.
 The completed pair is checked again, saved as immutable Store artifacts, then
 the publication request is checkpointed before the existing CAS/receipt seam.
@@ -612,12 +624,19 @@ guarantees or a hard billing cap: SDK network retries and calls lost before a
 checkpoint may add HTTP requests. No paid API was used.
 
 Incomplete/refused responses or `invalid_tool_calls` anywhere in the attempt
-cannot become successful no-op publications. An invalid final artifact stops
-at validation; `resume()` does not automatically rewrite that invalid artifact.
-Likewise budget exhaustion is a safe stop, not autonomous recovery. The
+cannot become successful no-op publications or final-validation correction.
+Unknown backend/configuration errors still fail closed. Collect, immutable save
+and publication retain their validation defenses. On interruption, `resume()`
+continues the saved correction state, messages, staged edits and official counters;
+it cannot reset exhausted limits. Invalid intermediate files never publish.
+Budget exhaustion is a safe background failure, not autonomous recovery. The
 production retry/cancel/replan interface remains out of scope; do not tell users
-all errors are automatically repaired. Tool-time validation failures can be
-repaired by the model before it finishes.
+all errors are automatically repaired.
+
+This correction path covers new executions and their saved in-agent resumes.
+A pre-upgrade checkpoint already paused at outer `collect` may bypass the new
+hook; recovering that historical state is not supported/proven by this slice.
+No old-job migration, forced replay or rebase is introduced.
 
 Full suite: **96 passed / 0 skipped**, including actual PG client/Saver/Store
 reopen after tool failure, before artifact save and after lost commit reply.

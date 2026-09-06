@@ -3,6 +3,7 @@ import base64
 import json
 
 import pytest
+from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
 from langchain_core.messages import HumanMessage, ToolMessage
 from langgraph.store.memory import InMemoryStore
 
@@ -103,8 +104,9 @@ def test_c_rejects_malformed_raw_reference_without_partial_publication(h):
 def test_b2_cannot_skip_validation_tool_and_publish_bad_reference(harness):
     h = harness
     h.replies.extend([call('write_file', file_path='/memory/knowledge.md', content='conversation:???'), done()])
-    with pytest.raises(ValueError, match='reference'):
-        workflow_class()(h.b1, h.pub, h.model, h.saver).start()
+    with pytest.raises(ModelCallLimitExceededError, match='limit'):
+        workflow_class()(h.b1, h.pub, h.model, h.saver, max_model_steps=2).start()
+    assert len(h.sent) == 3  # No budget for correction; no further HTTP.
     assert h.pub.current() is None
 
 

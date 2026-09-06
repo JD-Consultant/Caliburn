@@ -157,9 +157,11 @@ def test_no_semantic_change_still_advances_source(harness):
     version = h.artifacts.save_memory(knowledge="既有知識", guide="既有導覽")
     h.pub.publish(h.pub.prepare(version, expected_revision=0, kind="repair"))
     h.replies.append(done())
-    cls(h.b1, h.pub, h.model, h.saver).start()
+    result = cls(h.b1, h.pub, h.model, h.saver).start()
     assert h.pub.current().revision == 2 and h.pub.current().processed_source == h.ref
     assert knowledge(h) == "既有知識"
+    assert result["used_model_steps"] == 1 and result["used_tool_calls"] == 0
+    assert len(h.sent) == 2
 
 
 def test_model_budget_stops_and_resume_does_not_reset_it(harness):
@@ -254,12 +256,12 @@ def test_candidate_limit_stops_before_b2_model(harness):
     assert cls(h.b1, h.pub, h.model, h.saver).start()["result"] is not None
 
 
-def test_refusal_or_invalid_final_stage_cannot_publish(harness):
+def test_invalid_final_stage_cannot_publish_when_correction_budget_exhausted(harness):
     cls = workflow_class()
     h = harness
     h.replies.extend([call("write_file", file_path="/memory/knowledge.md", content="/interviews/missing/summary.md"), done()])
-    with pytest.raises(ValueError, match="reference|missing|unavailable|exist"):
-        cls(h.b1, h.pub, h.model, h.saver).start()
+    with pytest.raises(Exception, match="limit"):
+        cls(h.b1, h.pub, h.model, h.saver, max_model_steps=2).start()
     assert h.pub.current() is None
 
 

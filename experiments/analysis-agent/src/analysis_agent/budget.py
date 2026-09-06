@@ -85,7 +85,7 @@ class ResponsesBudget:
         try:
             result = self.counter.responses.input_tokens.count(
                 **{key: value for key, value in body.items() if key in _COUNT_FIELDS})
-        except json.JSONDecodeError:
+        except (json.JSONDecodeError, UnicodeDecodeError):
             raise RequestBudgetConfigurationError('Counter response must be valid JSON') from None
         tokens = getattr(result, 'input_tokens', None)
         if type(tokens) is not int or tokens < 0:

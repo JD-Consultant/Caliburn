@@ -125,15 +125,18 @@ def test_invalid_counter_schema_fails_closed(count):
 @pytest.mark.parametrize('response', [
     httpx.Response(200, json={}), httpx.Response(200, json=[]),
     httpx.Response(200, content=b'not JSON', headers={'content-type': 'application/json'}),
+    pytest.param(httpx.Response(200, content=b'{"input_tokens": "\xff"}',
+                               headers={'content-type': 'application/json'}), id='invalid-utf8'),
     httpx.Response(200, json={'input_tokens': 0}),
 ])
 def test_incomplete_counter_response_is_nonretryable_configuration_error(response):
     with httpx.Client(transport=httpx.MockTransport(lambda r: pytest.fail('generation sent'))) as client:
         model = build_model(model='gpt-5.6-luna', api_key='offline', http_client=client)
         with counter_for(model, respond=lambda r: response) as counted:
-            with pytest.raises(ModelInvalidRequestError) as caught:
+            with pytest.raises(ModelError) as caught:
                 model.invoke('nonempty input', max_output_tokens=30)
-            assert not caught.value.is_retryable and len(counted) == 1
+            assert (len(counted), caught.value.is_retryable,
+                    isinstance(caught.value, ModelInvalidRequestError)) == (1, False, True)
 
 
 def test_strict_endpoint_and_zero_for_empty_input_preserve_exact_serialized_bytes():
@@ -340,6 +343,7 @@ def test_background_budget_blocks_without_repeat_per_tick(tmp_path, stage):
 @pytest.mark.parametrize('fault,code,status,resumable', [
     ('overflow', 'context_budget_exceeded', 'configuration_error', False),
     ('schema', 'configuration_error', 'configuration_error', False),
+    ('utf8', 'configuration_error', 'configuration_error', False),
     ('timeout', 'transport_error', 'interrupted', True),
 ])
 def test_api_surfaces_safe_counter_failure_without_generation(tmp_path, fault, code, status, resumable):
@@ -349,6 +353,9 @@ def test_api_surfaces_safe_counter_failure_without_generation(tmp_path, fault, c
     def failed(request):
         if fault == 'timeout':
             raise httpx.ReadTimeout('PRIVATE transport diagnostic', request=request)
+        if fault == 'utf8':
+            return httpx.Response(200, content=b'{"input_tokens": "\xff"}',
+                                  headers={'content-type': 'application/json'})
         return httpx.Response(200, json={'input_tokens': 101} if fault == 'overflow' else {})
     @contextmanager
     def resources():
@@ -368,6 +375,12 @@ def test_api_surfaces_safe_counter_failure_without_generation(tmp_path, fault, c
         assert 'PRIVATE' not in response.text and 'original case' not in response.text
         assert not observed['sent']
         assert len(observed['counted']) == (3 if fault == 'timeout' else 1)
+        if not resumable:
+            context = observed['service']._context(doc)
+            assert not context.graph.get_state(context.config).next
+            assert web.post(f'/documents/{doc}/runs/{run["id"]}/resume').status_code == 409
+            assert web.get(f'/documents/{doc}/messages').json() == [
+                {'id': run['id'], 'role': 'user', 'text': 'original case'}]
 
 
 @pytest.mark.parametrize('capacity', [None, '', '0', '-1', 'abc', '30', '129'])

@@ -1,5 +1,5 @@
 """C: durable exact edits with public StateBackend; no model of its own."""
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import re
 
 from deepagents.backends import StateBackend
@@ -9,7 +9,8 @@ from pydantic import BaseModel, ConfigDict
 
 from analysis_agent.consolidation_tools import PATHS, staged_texts
 from analysis_agent.memory import MemoryVersion
-from analysis_agent.publication import PublishRequest, StalePublication
+from analysis_agent.publication import PublicationUncertain, PublishRequest, StalePublication
+from sqlalchemy.exc import DBAPIError
 
 
 class MemoryEdit(BaseModel):
@@ -20,6 +21,7 @@ class MemoryEdit(BaseModel):
 
 
 class RepairState(FilesystemState):
+    operation_id: str
     base: dict
     source_reference: str
     edits: list[dict]
@@ -93,9 +95,27 @@ class RepairWorkflow:
         return {"version": asdict(self.artifacts.save_memory(**state["material"]))}
 
     def _prepare(self, state):
-        return {"request": asdict(self.publication.prepare(MemoryVersion(**state["version"]),
+        request = self.publication.prepare(MemoryVersion(**state["version"]),
             expected_revision=state["base"]["revision"], kind="repair",
-            repair_sources=(state["source_reference"],)))}
+            repair_sources=(state["source_reference"],))
+        return {"request": asdict(replace(request, operation_id=state['operation_id']))}
+
+    def reconcile(self, operation_id, source_reference, edits):
+        """Receipt absence is unknown, not permission to run _publish on cancel."""
+        try:
+            receipt = self.publication.receipt(operation_id)
+            if receipt is None:
+                raise PublicationUncertain('Repair result is unknown; explicitly resume or reconcile later')
+            if receipt.kind != 'repair' or receipt.repair_sources != (source_reference,):
+                raise PublicationUncertain('Repair receipt does not match the saved source')
+            current = self.publication.current()
+            if current is None or current.revision < receipt.result.revision:
+                raise PublicationUncertain('Current Memory head is not confirmed')
+            return self._feedback('applied', current,
+                'Edits were published; cancellation did not publish or revert Memory.',
+                applied_head=asdict(receipt.result), changes=edits, source_reference=source_reference)
+        except DBAPIError as error:
+            raise PublicationUncertain('Repair reconciliation is unavailable') from error
 
     def _publish(self, state):
         data = dict(state["request"])

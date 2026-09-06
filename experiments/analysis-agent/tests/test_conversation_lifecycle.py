@@ -297,3 +297,299 @@ def test_malformed_tool_correction_budget_survives_model_interruption(h):
     assert result['turn_outcome']['status'] == 'tool_error'
     assert result['turn_outcome']['model_calls'] == 2 and len(h.sent) == 2
     assert h.pub.current().revision == 1
+
+
+@pytest.mark.parametrize('terminal', ['completed', 'limit', 'configuration_error', 'cancelled'])
+def test_terminal_source_preserves_employee_and_question_with_runtime_boundary(h, terminal):
+    import analysis_agent.conversation as conversation
+    from analysis_agent.sources import ConversationReader
+    graph = compose_memory(h, max_model_steps=1)
+    if terminal in ('completed', 'limit'):
+        h.replies.append(done() if terminal == 'completed' else call('read_file', file_path='/memory/knowledge.md'))
+        result = graph.invoke({'messages': [HumanMessage('不是，是處長', id='h1')]}, h.config, durability='sync')
+    else:
+        from langchain.agents.middleware import wrap_model_call
+        from analysis_agent.live_memory import MemorySession
+        @wrap_model_call
+        def fail(request, handler):
+            raise RuntimeError('injected configuration failure')
+        session = MemorySession(h.pub, h.source)
+        graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
+                                   middleware=[session, fail], tools=session.tools)
+        with pytest.raises(RuntimeError):
+            graph.invoke({'messages': [HumanMessage('不是，是處長', id='h1')]}, h.config, durability='sync')
+        assert hasattr(conversation, 'close_turn'), 'Missing known-quiescent safe closure'
+        result = conversation.close_turn(graph, h.config, reason=terminal, quiescent=True)
+    reader = ConversationReader(graph, 'document-a')
+    ref = reader.capture('h1', result['messages'][-1].id)
+    windows = reader.extraction_windows(ref)
+    page = reader.read(windows[0]['source_reference'])
+    assert page['turns'] == [{'input_id': 'h1', 'status': terminal, 'answer_succeeded': terminal == 'completed'}]
+    assert page['segments'][0]['text'] == '不是，是處長'
+    context = reader.read(windows[0]['context_reference'])
+    assert context['segments'][-1]['text'] == '是由主管核准嗎？'
+    assert not graph.get_state(h.config).next
+    assert [m.id for m in result['messages'] if isinstance(m, HumanMessage)] == ['h0', 'h1']
+
+
+@pytest.mark.parametrize('committed', [False, True])
+def test_nested_uncertain_publication_has_runtime_operation_binding(h, monkeypatch, committed):
+    # T2-B01: C stays tool-hidden, but public persisted state must identify its
+    # exact operation without the caller having the fault injector's variables.
+    h.replies.append(call('repair_memory', edits=[edit()]))
+    publish = h.pub.publish
+    operations = []
+    def unknown(request):
+        operations.append(request.operation_id)
+        if committed:
+            publish(request)
+        raise RuntimeError('injected unknown commit result')
+    monkeypatch.setattr(h.pub, 'publish', unknown)
+    graph = compose_memory(h)
+    with pytest.raises(RuntimeError, match='unknown commit'):
+        graph.invoke({'messages': [HumanMessage('改成處長', id='h1')]}, h.config, durability='sync')
+    child = graph.get_state(h.config, subgraphs=True).tasks[0].state
+    assert child.next == ('tools',)
+    assert child.tasks[0].state is None
+    assert 'request' not in child.values
+    assert not tool_results(child.values)
+    assert [name for name, _ in graph.get_subgraphs(recurse=True)] == ['analysis']
+    binding = child.values.get('memory_repair_binding')
+    assert binding, 'Missing durable tool-call to C operation binding'
+    assert binding['operation_id'] == operations[0]
+    assert binding['call_id'] == child.values['messages'][-1].tool_calls[0]['id']
+    assert (h.pub.receipt(operations[0]) is not None) is committed
+    assert h.pub.current().revision == (2 if committed else 1)
+    assert [m.id for m in graph.get_state(h.config).values['messages'] if isinstance(m, HumanMessage)] == ['h0', 'h1']
+    assert len(h.sent) == 1
+
+
+@pytest.mark.parametrize('committed', [False, True])
+def test_cancel_reconciles_exact_c_without_publishing_or_model_calls(h, monkeypatch, committed):
+    from analysis_agent.live_memory import MemorySession
+    import analysis_agent.conversation as conversation
+    from analysis_agent.publication import PublicationUncertain
+    h.replies.append(call('repair_memory', edits=[edit()]))
+    original = h.pub.publish
+    def lose_reply(request):
+        if committed:
+            original(request)
+        raise PublicationUncertain('injected unknown commit')
+    monkeypatch.setattr(h.pub, 'publish', lose_reply)
+    session = MemorySession(h.pub, h.source)
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
+                               middleware=[session], tools=session.tools)
+    with pytest.raises(PublicationUncertain):
+        graph.invoke({'messages': [HumanMessage('改成處長', id='h1')]}, h.config, durability='sync')
+    before = graph.get_state(h.config, subgraphs=True)
+    raw = [m.model_dump() for m in before.tasks[0].state.values['messages']]
+    assert hasattr(conversation, 'close_turn'), 'Missing safe closure'
+    if not committed:
+        with pytest.raises(PublicationUncertain):
+            conversation.close_turn(graph, h.config, reason='cancelled', quiescent=True, memory_session=session)
+        assert graph.get_state(h.config).config == before.config
+        assert not tool_results(graph.get_state(h.config, subgraphs=True).tasks[0].state.values)
+        assert h.pub.current().revision == 1
+    else:
+        # A later B/C publication must not be reverted to the recovered receipt.
+        newer = h.artifacts.save_memory(knowledge='最新工作內容', guide='最新導覽')
+        original(h.pub.prepare(newer, expected_revision=2, kind='repair'))
+        # Reconstructed runtime uses only durable binding + real publication.
+        session = MemorySession(h.pub, h.source)
+        result = conversation.close_turn(graph, h.config, reason='cancelled', quiescent=True, memory_session=session)
+        feedback = json.loads(tool_results(result)[-1].content)
+        assert feedback['status'] == 'applied'
+        assert feedback['applied_head']['revision'] == 2 and feedback['head']['revision'] == 3
+        assert result['messages'][:len(raw)] == before.tasks[0].state.values['messages']
+        assert [m.model_dump() for m in result['messages'][:len(raw)]] == raw
+        assert h.pub.current().revision == 3 and knowledge(h) == '最新工作內容'
+        assert result['turn_outcome']['status'] == 'cancelled'
+        assert not graph.get_state(h.config).next
+        assert conversation.close_turn(graph, h.config, reason='cancelled', quiescent=True) == result
+    assert len(h.sent) == 1
+
+
+def test_cancel_before_tools_pairs_not_executed_preserving_raw_and_new_input(h):
+    from langchain.agents.middleware import AgentMiddleware
+    from analysis_agent.live_memory import MemorySession
+    import analysis_agent.conversation as conversation
+    class StopBeforeTools(AgentMiddleware):
+        def after_model(self, state, runtime):
+            raise RuntimeError('injected before tools')
+    response = call('repair_memory', edits=[edit()])
+    response['output'].insert(0, {'type': 'reasoning', 'id': 'rs_cancel',
+        'encrypted_content': 'opaque-cancel', 'summary': []})
+    h.replies.append(response)
+    session = MemorySession(h.pub, h.source)
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
+        middleware=[StopBeforeTools(), session], tools=session.tools)
+    with pytest.raises(RuntimeError, match='before tools'):
+        graph.invoke({'messages': [HumanMessage('改成處長', id='h1')]}, h.config, durability='sync')
+    before = graph.get_state(h.config, subgraphs=True).tasks[0].state.values['messages']
+    assert hasattr(conversation, 'close_turn'), 'Missing safe closure'
+    with pytest.raises(ValueError, match='quiescent'):
+        conversation.close_turn(graph, h.config, reason='cancelled', quiescent=False)
+    result = conversation.close_turn(graph, h.config, reason='cancelled', quiescent=True, memory_session=session)
+    paired = tool_results(result)[-1]
+    assert paired.status == 'error' and 'not executed' in paired.content
+    assert paired.tool_call_id == before[-1].tool_calls[0]['id']
+    assert [m.model_dump() for m in result['messages'][:len(before)]] == [m.model_dump() for m in before]
+    assert h.pub.current().revision == 1 and len(h.sent) == 1
+
+
+def test_new_input_requires_safe_abandonment_and_never_reappends_old_human(h):
+    from langchain.agents.middleware import wrap_model_call
+    import analysis_agent.conversation as conversation
+    @wrap_model_call
+    def fail(request, handler):
+        raise RuntimeError('configuration broken')
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test', middleware=[fail])
+    with pytest.raises(RuntimeError):
+        graph.invoke({'messages': [HumanMessage('保留這個案例', id='h1')]}, h.config, durability='sync')
+    assert hasattr(conversation, 'send_input'), 'Missing close-before-new-input entry'
+    with pytest.raises(ValueError, match='pending'):
+        conversation.send_input(graph, h.config, HumanMessage('新案例', id='h2'))
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test')
+    h.replies.append(done())
+    result = conversation.send_input(graph, h.config, HumanMessage('新案例', id='h2'), abandon_pending=True, quiescent=True)
+    assert [m.id for m in result['messages'] if isinstance(m, HumanMessage)] == ['h0', 'h1', 'h2']
+    from analysis_agent.sources import ConversationReader
+    reader = ConversationReader(graph, 'document-a')
+    page = reader.read(reader.capture('h1', result['messages'][-1].id))
+    assert page['turns'] == [
+        {'input_id': 'h1', 'status': 'cancelled', 'answer_succeeded': False},
+        {'input_id': 'h2', 'status': 'completed', 'answer_succeeded': True}]
+    assert result['turn_outcome']['model_calls'] == 1 and len(h.sent) == 1
+
+
+@pytest.mark.parametrize('committed_c', [False, True])
+def test_close_checkpoint_reply_loss_leaves_terminal_child_not_runnable_work(h, monkeypatch, committed_c):
+    from langchain.agents.middleware import wrap_model_call
+    from analysis_agent.live_memory import MemorySession
+    from analysis_agent.conversation import close_turn
+    @wrap_model_call
+    def fail_after_c(request, handler):
+        if not committed_c or any(isinstance(m, ToolMessage) for m in request.messages):
+            raise RuntimeError('model configuration unavailable')
+        return handler(request)
+    session = MemorySession(h.pub, h.source)
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
+        middleware=[session, fail_after_c], tools=session.tools)
+    if committed_c:
+        h.replies.append(call('repair_memory', edits=[edit()]))
+    with pytest.raises(RuntimeError, match='configuration unavailable'):
+        graph.invoke({'messages': [HumanMessage('改成處長', id='h1')]}, h.config, durability='sync')
+    update = graph.update_state
+    def fail_root_update(config, values, **kwargs):
+        if kwargs.get('as_node') == 'analysis':
+            raise RuntimeError('root closure unavailable')
+        return update(config, values, **kwargs)
+    monkeypatch.setattr(graph, 'update_state', fail_root_update)
+    with pytest.raises(RuntimeError, match='root closure unavailable'):
+        close_turn(graph, h.config, reason='cancelled', quiescent=True, memory_session=session)
+    pending = graph.get_state(h.config, subgraphs=True)
+    assert pending.tasks[0].state.next == (), 'Saved closure must not leave model/tools runnable'
+    assert pending.tasks[0].state.values['turn_outcome']['status'] == 'cancelled'
+    before = [m.model_dump() for m in pending.tasks[0].state.values['messages']]
+    monkeypatch.setattr(graph, 'update_state', update)
+    result = close_turn(graph, h.config, reason='configuration_error', quiescent=True, memory_session=session)
+    assert result['turn_outcome']['status'] == 'cancelled', 'Do not rewrite a saved terminal result'
+    assert [m.model_dump() for m in result['messages']] == before
+    assert h.pub.current().revision == (2 if committed_c else 1)
+    assert len(h.sent) == int(committed_c)
+    assert not graph.get_state(h.config).next
+
+
+@pytest.mark.parametrize('stage', ['incomplete', 'unknown_read', 'receipt_unavailable'])
+def test_closure_never_forges_unknown_tool_results_or_provider_metadata(h, monkeypatch, stage):
+    from analysis_agent.conversation import close_turn
+    from analysis_agent.live_memory import MemorySession
+    from analysis_agent.publication import PublicationUncertain
+    from langchain.agents.middleware import wrap_tool_call
+    @wrap_tool_call
+    def interrupted_read(request, handler):
+        if stage == 'unknown_read':
+            raise RuntimeError('read outcome unknown')
+        return handler(request)
+    session = MemorySession(h.pub, h.source)
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
+        middleware=[session, interrupted_read], tools=session.tools)
+    if stage == 'incomplete':
+        answer = done()
+        answer['status'] = 'incomplete'
+        answer['incomplete_details'] = {'reason': 'max_output_tokens'}
+    elif stage == 'unknown_read':
+        answer = call('read_file', file_path='/memory/knowledge.md')
+    else:
+        answer = call('repair_memory', edits=[edit()])
+        original = h.pub.publish
+        def lost_reply(request):
+            original(request)
+            raise PublicationUncertain('lost reply')
+        monkeypatch.setattr(h.pub, 'publish', lost_reply)
+    h.replies.append(answer)
+    with pytest.raises((ValueError, RuntimeError, PublicationUncertain)):
+        graph.invoke({'messages': [HumanMessage('保留工作', id='h1')]}, h.config, durability='sync')
+    before = graph.get_state(h.config, subgraphs=True)
+    if stage == 'incomplete':
+        raw = before.tasks[0].state.values['messages'][-1].model_dump()
+        result = close_turn(graph, h.config, reason='cancelled', quiescent=True, memory_session=session)
+        assert result['messages'][-2].model_dump() == raw
+        assert result['messages'][-2].response_metadata['status'] == 'incomplete'
+    else:
+        if stage == 'receipt_unavailable':
+            from sqlalchemy.exc import OperationalError
+            def unavailable(operation_id):
+                raise OperationalError('injected offline', {}, Exception('database unavailable'))
+            monkeypatch.setattr(h.pub, 'receipt', unavailable)
+        with pytest.raises(PublicationUncertain):
+            close_turn(graph, h.config, reason='cancelled', quiescent=True, memory_session=session)
+        assert graph.get_state(h.config).config == before.config
+        assert not tool_results(graph.get_state(h.config, subgraphs=True).tasks[0].state.values)
+    assert len(h.sent) == 1
+
+
+def test_closure_rejects_historical_checkpoint_and_does_not_fork_cancellation(h):
+    from langchain.agents.middleware import wrap_model_call
+    from analysis_agent.conversation import close_turn, send_input
+    @wrap_model_call
+    def fail(request, handler):
+        raise RuntimeError('pending model')
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test', middleware=[fail])
+    with pytest.raises(RuntimeError):
+        graph.invoke({'messages': [HumanMessage('保留原話', id='h1')]}, h.config, durability='sync')
+    historical = graph.get_state(h.config).config
+    with pytest.raises(ValueError, match='latest'):
+        close_turn(graph, historical, reason='cancelled', quiescent=True)
+    with pytest.raises(ValueError, match='latest'):
+        send_input(graph, historical, HumanMessage('新案例', id='h2'), abandon_pending=True, quiescent=True)
+    assert graph.get_state(h.config).config == historical
+
+
+def test_uncertain_c_blocks_b1_and_new_input_before_any_new_work(h, monkeypatch):
+    from analysis_agent.conversation import send_input
+    from analysis_agent.live_memory import MemorySession
+    from analysis_agent.publication import PublicationUncertain
+    from analysis_agent.extraction import ExtractionWorkflow
+    from analysis_agent.sources import ConversationReader
+    h.replies.append(call('repair_memory', edits=[edit()]))
+    def unknown(request):
+        raise PublicationUncertain('unknown result')
+    monkeypatch.setattr(h.pub, 'publish', unknown)
+    session = MemorySession(h.pub, h.source)
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
+        middleware=[session], tools=session.tools)
+    with pytest.raises(PublicationUncertain):
+        graph.invoke({'messages': [HumanMessage('改成處長', id='h1')]}, h.config, durability='sync')
+    reader = ConversationReader(graph, 'document-a')
+    with pytest.raises(PublicationUncertain):
+        send_input(graph, h.config, HumanMessage('新案例', id='h2'), abandon_pending=True,
+                   quiescent=True, memory_session=session)
+    pending_ref = reader.capture_input('h1')
+    workflow = ExtractionWorkflow(reader, h.artifacts, h.model, h.saver)
+    with pytest.raises(ValueError, match='completed'):
+        workflow.start(pending_ref)
+    assert not workflow.graph.get_state(workflow.config).values
+    assert h.pub.current().processed_source == h.ref and h.pub.current().revision == 1
+    assert [m.id for m in graph.get_state(h.config).values['messages'] if isinstance(m, HumanMessage)] == ['h0', 'h1']
+    assert len(h.sent) == 1

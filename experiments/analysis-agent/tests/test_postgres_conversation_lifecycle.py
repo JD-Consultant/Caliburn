@@ -13,24 +13,26 @@ from sqlalchemy import create_engine, select
 from sqlalchemy.engine import URL
 from sqlalchemy.orm import Session
 
-from analysis_agent.conversation import build_conversation
+from analysis_agent.conversation import build_conversation, close_turn, send_input
 from analysis_agent.live_memory import MemorySession
 from analysis_agent.memory import MemoryArtifacts
 from analysis_agent.provider import build_model
-from analysis_agent.publication import HeadRow, PublicationStore, ReceiptRow
+from analysis_agent.publication import HeadRow, PublicationStore, PublicationUncertain, ReceiptRow
 from analysis_agent.sources import ConversationReader
 from test_consolidation import call, done
 from test_live_memory import edit
 
 
 @pytest.mark.parametrize('committed', [False, True])
-def test_pg_reopen_parent_child_c_preserves_operation_budget_and_sources(committed):
+@pytest.mark.parametrize('finish', ['resume', 'cancel'])
+def test_pg_reopen_parent_child_c_preserves_operation_budget_and_sources(committed, finish):
     dsn = os.environ.get('Q019_TEST_DATABASE_URL')
     if not dsn:
         pytest.skip('Dedicated q019_agent_test required; root/child durability NOT verified')
     params = conninfo_to_dict(dsn)
     assert params.get('dbname') == 'q019_agent_test'
     assert params.get('host') in ('localhost', '127.0.0.1')
+    assert params.get('port') == '55433'
     assert 1 <= int(params.get('connect_timeout', '0')) <= 10
     dsn = make_conninfo(dsn, options='-c statement_timeout=10000 -c lock_timeout=5000')
     document = 'q019-test-' + str(uuid4())
@@ -57,7 +59,7 @@ def test_pg_reopen_parent_child_c_preserves_operation_budget_and_sources(committ
         session = MemorySession(publication, reader)
         return build_conversation(model=model, checkpointer=saver, instructions='test',
                                   middleware=[session], tools=session.tools,
-                                  max_model_steps=3), reader
+                                  max_model_steps=3), reader, session
 
     class LostPublish(PublicationStore):
         def publish(self, request):
@@ -82,7 +84,7 @@ def test_pg_reopen_parent_child_c_preserves_operation_budget_and_sources(committ
                 pub.setup()
                 memory = artifacts.save_memory(knowledge='例外由主管核准。', guide='主管核准')
                 pub.publish(pub.prepare(memory, expected_revision=0, kind='consolidation', processed_source=source))
-                root, _ = compose(model, saver, LostPublish(first_engine, artifacts))
+                root, _, _ = compose(model, saver, LostPublish(first_engine, artifacts))
                 with pytest.raises(RuntimeError, match='injected reply loss'):
                     root.invoke({'messages': [HumanMessage('改成處長', id='h1')]}, config, durability='sync')
                 snapshot = root.get_state(config, subgraphs=True)
@@ -93,6 +95,8 @@ def test_pg_reopen_parent_child_c_preserves_operation_budget_and_sources(committ
                 assert child.values['thread_model_call_count'] == 1
                 assert child.values['thread_tool_call_count']['__all__'] == 1
                 assert not child.values['turn_outcome']
+                assert child.values['memory_repair_binding']['operation_id'] == attempts[0]
+                raw = [m.model_dump() for m in child.values['messages']]
         first_engine.dispose()
         second_engine = engine()
         try:
@@ -100,7 +104,38 @@ def test_pg_reopen_parent_child_c_preserves_operation_budget_and_sources(committ
                 with httpx.Client(transport=httpx.MockTransport(respond)) as client:
                     model = build_model(model='gpt-5.6-luna', api_key='offline', http_client=client)
                     pub = PublicationStore(second_engine, MemoryArtifacts(store, document))
-                    root, reader = compose(model, saver, pub)
+                    root, reader, session = compose(model, saver, pub)
+                    if finish == 'cancel':
+                        if committed:
+                            result = close_turn(root, config, reason='cancelled', quiescent=True, memory_session=session)
+                            assert [m.model_dump() for m in result['messages'][:len(raw)]] == raw
+                            feedback = json.loads(next(m.content for m in result['messages'] if isinstance(m, ToolMessage)))
+                            assert feedback['status'] == 'applied' and feedback['applied_head']['revision'] == 2
+                            assert len(payloads) == 1 and pub.current().revision == 2
+                            assert result['turn_outcome']['status'] == 'cancelled'
+                            ref = reader.capture('h1', result['messages'][-1].id)
+                            windows = reader.extraction_windows(ref)
+                            assert reader.read(windows[0]['source_reference'])['turns'] == [
+                                {'input_id': 'h1', 'status': 'cancelled', 'answer_succeeded': False}]
+                            assert reader.read(windows[0]['context_reference'])['segments'][-1]['text'] == '主管核准嗎？'
+                            replies.append(done())
+                            result = send_input(root, config, HumanMessage('下一個案例', id='h2'))
+                            assert len(payloads) == 2 and pub.current().revision == 2
+                            assert result['turn_outcome']['model_calls'] == 1
+                            assert [m.id for m in result['messages'] if isinstance(m, HumanMessage)] == ['h0', 'h1', 'h2']
+                            assert not root.get_state(config).next
+                            return
+                        before = root.get_state(config, subgraphs=True)
+                        with pytest.raises(PublicationUncertain):
+                            send_input(root, config, HumanMessage('不得先收', id='h2'),
+                                abandon_pending=True, quiescent=True, memory_session=session)
+                        assert root.get_state(config).config == before.config
+                        assert pub.receipt(attempts[0]) is None and pub.current().revision == 1
+                        with pytest.raises(ValueError, match='completed'):
+                            reader.capture('h1', 'h1')
+                        assert len(payloads) == 1
+                        # Receipt absence did NOT publish. Only this explicit
+                        # resume may finish the existing prepared operation.
                     replies.extend([call('read_file', file_path='/memory/knowledge.md'), done()])
                     result = root.invoke(None, config, durability='sync')
                     assert len(payloads) == 3 and not replies

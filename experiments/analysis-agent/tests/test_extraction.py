@@ -138,7 +138,7 @@ def test_oversize_batch_is_bounded_before_any_model_call(harness):
     reader, ref = source(model, saver, turns=[("工作"*8, "問")]*4)
     with pytest.raises(ValueError, match="windows"):
         cls(reader, MemoryArtifacts(store, reader.document_id), model, saver,
-            max_chars=20, context_chars=0, max_windows=2).start(ref)
+            max_chars=20, context_chars=1, max_windows=2).start(ref)
     assert sent == []
 
 
@@ -276,3 +276,176 @@ def test_overlap_with_previously_extracted_source_is_rejected(harness):
     # A rejected overlap does not block the legitimate next range.
     workflow.start(reader.capture("u1", "a1"))
     assert len(sent) == 2
+
+
+def test_b1_receives_failed_turn_metadata_and_all_employee_text_not_error(harness):
+    from analysis_agent.conversation import build_conversation
+    import analysis_agent.conversation as conversation
+    from langchain.agents.middleware import wrap_model_call
+    model, saver, store, _, _, sent, responses = harness
+    @wrap_model_call
+    def fail(request, handler):
+        raise RuntimeError('SECRET_TECHNICAL_ERROR')
+    graph = build_conversation(model=model, checkpointer=saver, instructions='test', middleware=[fail])
+    config = {'configurable': {'thread_id': 'failed-b1'}}
+    graph.update_state(config, {'messages': [HumanMessage('案件細節', id='u0'),
+        AIMessage('誰核准？', id='a0', response_metadata={'status': 'completed'})]}, as_node='analysis')
+    employee = '甲' * 2000 + '中段特殊條件不能漏' + '乙' * 2000
+    with pytest.raises(RuntimeError):
+        graph.invoke({'messages': [HumanMessage(employee, id='u1')]}, config, durability='sync')
+    assert hasattr(conversation, 'close_turn'), 'Missing failed source closure'
+    closed = conversation.close_turn(graph, config, reason='configuration_error', quiescent=True)
+    reader = ConversationReader(graph, 'failed-b1')
+    ref = reader.capture('u1', closed['messages'][-1].id)
+    responses.append(body())
+    result = workflow_class()(reader, MemoryArtifacts(store, 'failed-b1'), model, saver).start(ref)
+    assert len(result['files']) == 1 and len(sent) == 1
+    payload = json.loads(sent[0]['input'][-1]['content'])
+    assert payload['NEW_SOURCE']['turns'] == [
+        {'input_id': 'u1', 'status': 'configuration_error', 'answer_succeeded': False}]
+    assert ''.join(s['text'] for s in payload['NEW_SOURCE']['segments']) == employee
+    assert payload['CONTEXT_ONLY']['segments'][-1]['text'] == '誰核准？'
+    assert 'SECRET_TECHNICAL_ERROR' not in json.dumps(payload)
+
+
+def test_b1_cannot_jump_over_unresolved_middle_turn(harness):
+    model, saver, store, _, _, sent, _ = harness
+    reader, _ = source(model, saver, turns=[('A案', '問A'), ('B案', '問B'), ('C案', '問C')])
+    config = {'configurable': {'thread_id': reader.document_id}}
+    reader.graph.update_state(config, {'messages': [AIMessage('未完成', id='a1')]}, as_node='model')
+    workflow = workflow_class()(reader, MemoryArtifacts(store, reader.document_id), model, saver)
+    workflow.start(reader.capture('u0', 'a0'))
+    with pytest.raises(ValueError, match='completed|contiguous|source'):
+        workflow.start(reader.capture('u2', 'a2'))
+    assert len(sent) == 1
+
+
+def failed_short_correction(harness, *, prior_notice=False, correction='不是，是處長'):
+    """Real long prior turn + visible question, then a safely closed failure."""
+    from langchain.agents.middleware import AgentMiddleware
+    from analysis_agent.conversation import build_conversation, close_turn
+    model, saver, _, _, _, _, responses = harness
+    class ConfigurationFailure(AgentMiddleware):
+        def wrap_model_call(self, request, handler):
+            if request.messages[-1].id in {'short-correction', 'second-correction'}:
+                raise RuntimeError('injected configuration failure')
+            return handler(request)
+
+        def after_model(self, state, runtime):
+            if prior_notice:
+                raise RuntimeError('injected failure after the visible question')
+    graph = build_conversation(model=model, checkpointer=saver, instructions='test',
+                               middleware=[ConfigurationFailure()])
+    config = {'configurable': {'thread_id': 'r01-source'}}
+    responses.append(response_body([assistant_text('是由主管核准嗎？')]))
+    if prior_notice:
+        with pytest.raises(RuntimeError, match='visible question'):
+            graph.invoke({'messages': [HumanMessage('甲' * 1600, id='long-prior')]}, config, durability='sync')
+        close_turn(graph, config, reason='configuration_error', quiescent=True)
+    else:
+        graph.invoke({'messages': [HumanMessage('甲' * 1600, id='long-prior')]}, config, durability='sync')
+    with pytest.raises(RuntimeError, match='configuration failure'):
+        graph.invoke({'messages': [HumanMessage(correction, id='short-correction')]}, config, durability='sync')
+    result = close_turn(graph, config, reason='configuration_error', quiescent=True)
+    reader = ConversationReader(graph, 'r01-source')
+    return reader, reader.capture('short-correction', result['messages'][-1].id)
+
+
+@pytest.mark.parametrize('prior_notice', [False, True])
+def test_r01_b1_long_prior_keeps_short_question_for_failed_correction(harness, prior_notice):
+    model, saver, store, _, _, sent, _ = harness
+    reader, ref = failed_short_correction(harness, prior_notice=prior_notice)
+    canonical = [m.model_dump() for m in reader.graph.get_state(
+        {'configurable': {'thread_id': reader.document_id}}).values['messages']]
+    result = workflow_class()(reader, MemoryArtifacts(store, reader.document_id), model, saver).start(ref)
+    payload = json.loads(sent[-1]['input'][-1]['content'])
+    assert payload['CONTEXT_ONLY'] is not None, 'Lost the necessary question after a long prior turn'
+    assert payload['CONTEXT_ONLY']['segments'] == [{'role': 'assistant', 'text': '是由主管核准嗎？'}]
+    assert payload['NEW_SOURCE']['segments'] == [{'role': 'user', 'text': '不是，是處長'}]
+    assert payload['NEW_SOURCE']['turns'] == [
+        {'input_id': 'short-correction', 'status': 'configuration_error', 'answer_succeeded': False}]
+    context_ref = result['files'][0]['context_reference']
+    assert reader.read(context_ref)['segments'][0]['role'] == 'assistant'
+    assert reader.read(context_ref)['segments'][0]['text'] == '是由主管核准嗎？'
+    assert [m.model_dump() for m in reader.graph.get_state(
+        {'configurable': {'thread_id': reader.document_id}}).values['messages']] == canonical
+    assert len(sent) == 2  # prior consultant + B1; the failed turn made no HTTP call
+
+
+@pytest.mark.parametrize('max_chars,context_chars,accepted', [
+    (6000, 7, False), (13, 8, False), (14, 8, True), (6000, 0, False),
+])
+def test_r01_required_question_respects_context_and_combined_budgets(harness, max_chars, context_chars, accepted):
+    model, saver, store, _, _, sent, _ = harness
+    reader, ref = failed_short_correction(harness)
+    workflow = workflow_class()(reader, MemoryArtifacts(store, reader.document_id), model, saver,
+                                max_chars=max_chars, context_chars=context_chars)
+    if not accepted:
+        with pytest.raises(ValueError, match='question.*budget'):
+            workflow.start(ref)
+        assert len(sent) == 1
+        assert not workflow.graph.get_state(workflow.config).values
+        assert store.search(('q019-memory', reader.document_id)) == []
+    else:
+        workflow.start(ref)
+        payload = json.loads(sent[-1]['input'][-1]['content'])
+        assert payload['CONTEXT_ONLY'] is not None
+        assert sum(len(s['text']) for section in payload.values() for s in section['segments']) == 14
+        assert len(sent) == 2
+
+
+def close_second_correction(reader):
+    from analysis_agent.conversation import close_turn
+    config = {'configurable': {'thread_id': reader.document_id}}
+    with pytest.raises(RuntimeError, match='configuration failure'):
+        reader.graph.invoke({'messages': [HumanMessage('只限特殊案件', id='second-correction')]}, config, durability='sync')
+    result = close_turn(reader.graph, config, reason='configuration_error', quiescent=True)
+    return reader.capture('second-correction', result['messages'][-1].id)
+
+
+@pytest.mark.parametrize('prior_notice', [False, True])
+def test_r01_consecutive_failed_b1_payload_keeps_question_and_intervening_answer(harness, prior_notice):
+    from analysis_agent.sources import parse_reference
+    model, saver, store, _, _, sent, _ = harness
+    reader, first_ref = failed_short_correction(harness, prior_notice=prior_notice)
+    workflow = workflow_class()(reader, MemoryArtifacts(store, reader.document_id), model, saver,
+                                max_chars=20, context_chars=14)
+    workflow.start(first_ref)
+    second_ref = close_second_correction(reader)
+    config = {'configurable': {'thread_id': reader.document_id}}
+    canonical = [m.model_dump() for m in reader.graph.get_state(config).values['messages']]
+    result = workflow.start(second_ref)
+    payload = json.loads(sent[-1]['input'][-1]['content'])
+    assert payload['CONTEXT_ONLY']['segments'] == [
+        {'role': 'assistant', 'text': '是由主管核准嗎？'},
+        {'role': 'user', 'text': '不是，是處長'}]
+    assert payload['NEW_SOURCE']['segments'] == [{'role': 'user', 'text': '只限特殊案件'}]
+    assert payload['CONTEXT_ONLY']['turns'] == [
+        {'input_id': 'short-correction', 'status': 'configuration_error', 'answer_succeeded': False}]
+    assert payload['NEW_SOURCE']['turns'] == [
+        {'input_id': 'second-correction', 'status': 'configuration_error', 'answer_succeeded': False}]
+    context_ref = result['files'][0]['context_reference']
+    assert parse_reference(context_ref, reader.document_id)['last'] == parse_reference(first_ref, reader.document_id)['last']
+    assert reader.read(context_ref)['segments'][0]['role'] == 'assistant'
+    assert 'runtime_notice' in reader.read(context_ref)['omitted_content_types']
+    assert sum(len(s['text']) for section in payload.values() for s in section['segments']) == 20
+    assert [m.model_dump() for m in reader.graph.get_state(config).values['messages']] == canonical
+    assert len(sent) == 3  # one prior advisor + two requested B1 batches
+
+
+@pytest.mark.parametrize('max_chars,context_chars,correction', [
+    (6000, 13, '不是，是處長'),
+    (19, 14, '不是，是處長'),
+    (6000, 1500, '不是，是處長。' + '甲' * 1500),
+], ids=['context-budget', 'total-budget', 'long-middle'])
+def test_r01_consecutive_required_range_over_budget_rejects_before_b1(harness, max_chars, context_chars, correction):
+    model, saver, store, _, _, sent, _ = harness
+    reader, _ = failed_short_correction(harness, correction=correction)
+    second_ref = close_second_correction(reader)
+    workflow = workflow_class()(reader, MemoryArtifacts(store, reader.document_id), model, saver,
+                                max_chars=max_chars, context_chars=context_chars)
+    with pytest.raises(ValueError, match='question.*budget'):
+        workflow.start(second_ref)
+    assert len(sent) == 1
+    assert not workflow.graph.get_state(workflow.config).values
+    assert store.search(('q019-memory', reader.document_id)) == []

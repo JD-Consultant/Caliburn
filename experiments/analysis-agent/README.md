@@ -18,14 +18,15 @@ identity for a new input. To resume pending work use `invoke(None, config)`;
 inspect `get_state(config, subgraphs=True)` for its pending child messages and
 errors, not just root values. While pending, an older root `turn_outcome` is NOT
 the outcome of that pending child. Do not submit new input over pending work;
-admission, cancellation and safe abandonment are not implemented in this slice.
+Task 1 did not include admission/cancellation; see the Task 2 local entry below.
 
 Default limits are configurable 9 model calls / 8 tools. These allow the tested
 deep-read/correct/re-read/final-answer path; they are not price or HTTP-attempt
 limits. Runtime `turn_outcome` distinguishes provider-completed output from
 technical limit termination. Raw provider status/usage is preserved: absent
 usage is unknown, and synthetic limit messages are not successful AI replies.
-The existing source reader still rejects non-successful extraction windows.
+Task 1's reader required successful extraction windows; Task 2 adds explicit
+runtime boundaries for safely closed unsuccessful turns.
 Runtime-generated notices are marked in message metadata and excluded from the
 visible source projection (not deleted from canonical history), so a short
 correction still references the actual preceding consultant question.
@@ -36,7 +37,7 @@ error result without executing a tool, then routes back through the official
 model budget check. One correction is allowed; a second malformed result ends
 with runtime `tool_error`. The retry count survives checkpoint resume. Missing
 call identity / unexpected parallel output remains fail-closed; safe abandonment
-still belongs to the next task. This is a thin application hook, not a private
+is now covered by Task 2 below. This is a thin application hook, not a private
 converter patch or a claim that ToolErrorMiddleware covers every parse error.
 
 Only synchronous provider invocation is wired. Characterization finds certain
@@ -45,13 +46,98 @@ must NOT be interpreted as successful provider completion. Product streaming is
 not enabled or certified here. SDK transient retries have no outer model/graph
 retry wrapper.
 
-Latest full result: **177 passed, 0 skipped** (including 16 existing PG cases + 2 new
+Task 1 full result: **177 passed, 0 skipped** (including 16 existing PG cases + 2 new
 root/child/C PG cases). Initial offline result was159 passed/18 skipped; after
 Docker recovery the existing dedicated DB was available and all tests passed.
 Docker automatic restart remains an unresolved host issue; do not treat DB tests
-as proof of that fix. Task 2 / API / scheduler / UI remain unstarted at this save point.
+as proof of that fix. At the Task 1 save point, Task 2 / API / scheduler / UI had
+not started. The following section describes the subsequent verified Task 2.
 Full evidence, framework links
 and review findings: [Task 1 results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-conversation-lifecycle-results.md).
+
+## Application wiring Task 2 — Checkpoint A passed
+
+`close_turn(graph, config, reason="cancelled" | "configuration_error",
+quiescent=True, memory_session=session)` is a synchronous runtime entry, not a
+worker cancellation mechanism. The caller must first stop/join the worker and
+serialize this document. Pass the latest root document config, not a captured
+checkpoint ID or child namespace. No active thread is killed by this function.
+
+For a new employee input use `send_input(graph, config, HumanMessage(..., id=...))`.
+It rejects pending work by default. An explicit `abandon_pending=True` plus
+`quiescent=True` first closes the previous turn; if reconciliation is unknown,
+the new input is not accepted. A previously saved message ID is rejected, not
+appended again. To explicitly resume the original work, keep using the official
+`graph.invoke(None, config, durability="sync")`; cancellation never calls it.
+This is not Task 3's concurrent API admission/idempotency implementation.
+
+**C binding:** public `MemorySession.after_model` saves a runtime-only binding
+from canonical AI message ID / tool-call ID to an operation UUID in the same
+Saver. UUID5 includes document and employee-input identity; C uses that exact
+UUID in its existing durable `PublishRequest`. The model still supplies only
+edits, not IDs or receipts. No new store/table, publication schema change,
+private namespace discovery, extra model call or custom Agent loop is used.
+The tool-hidden C graph is intentionally not claimed as discoverable.
+
+Closure distinguishes three cases: a saved pre-ToolNode after-model checkpoint
+proves not-started; an existing ToolMessage or exact C receipt proves a known
+result; an entered tool without a known result remains unknown. Missing receipt
+is not proof of failure. Reconciliation only reads `receipt(operation_id)` and
+`current()`, never invokes C or publishes. A recovered receipt reports both its
+applied head and the current read head, without reverting later publications.
+Unknown results retain pending work and cannot advance extraction or accept a
+replacement input. Generic unknown tool outcomes likewise remain pending.
+
+Public `get_state(..., subgraphs=True)` supplies the actual child config.
+`update_state(values, as_node="TurnOutcome.after_agent")` saves head, tool result,
+and terminal outcome together on the final owned child node; a root update
+`as_node="analysis"` then merges canonical messages and the boundary. Neither
+update runs a model/tool. If the root write fails, repeating `close_turn` merges
+the already-terminal child without relabelling it or appending another notice.
+The two checkpoints are not one SQL transaction; while the root is pending,
+B1 remains blocked. Historical raw checkpoints remain intact.
+
+`closed_turns` maps saved input IDs to actual end-message IDs and outcomes.
+`ConversationReader.read(reference, offset)` retains its role-aware 3,000-character
+pagination and adds `turns` metadata (`input_id`, `status`, `answer_succeeded`).
+B1 receives this metadata in both source/context payloads, so safely closed
+failures still supply employee text and prior consultant questions without a
+fabricated successful answer. Runtime notices/tools/opaque items remain in
+canonical storage but are excluded from visible extraction text. Whole-turn
+size bounds still apply, and new B1 ranges cannot skip intervening turns.
+Legacy genuinely provider-completed windows remain readable; an unmarked
+incomplete response does not become an eligible source.
+
+T2-R01: context first locates the nearest genuinely visible assistant message
+before the new window, crossing safely closed turns without visible AI. Its
+canonical range continues through the preceding turn's end, retaining all
+intervening answers/corrections (e.g. the question, then "不是，是處長"). A short
+previous Human-only turn cannot replace this required range. Whole-prior-turn
+context remains optional only when it also contains the required question.
+Runtime notices are not questions; the original roles and visible text remain
+unchanged, with no summary, new reference format or duplicate source store.
+The entire required range must fit both `context_chars` and the combined
+`max_chars` budget; otherwise planning explicitly rejects before B1 runs.
+`context_chars=0` therefore cannot silently discard a necessary question.
+R01 focused source/extraction/lifecycle regression: **88 passed**, including
+consecutive safely closed failures and complete-range budget rejection.
+Independent limited review closed R01 with no newly introduced Important
+findings. `capture_input` / C lookup is unchanged.
+
+Final controller verification: **209 passed / 0 skipped in 25.83s**, including
+dedicated real PG tests and four root/child/C lifecycle combinations
+(resume/cancel × pre/post commit reply loss). Compileall, offline lock and diff
+checks passed. Earlier 196/198/204 counts describe intermediate snapshots.
+Models use fake HTTP transport; paid calls are zero, not a live-model quality
+evaluation. No Docker restart/reset, production changes or API/scheduler/UI
+implementation. Stop here before Task3. Detailed history and sources:
+[Task2 results](../../docs/specs/2026-09-06-analysis-only-agent-safe-turn-closure-results.md).
+
+Public mechanisms: [middleware hooks/state](https://docs.langchain.com/oss/python/langchain/middleware/custom),
+[checkpoint updates/reducers/as_node](https://docs.langchain.com/oss/python/langgraph/checkpointers#update-state),
+[subgraph inspection and tool-hidden limitation](https://docs.langchain.com/oss/python/langgraph/use-subgraphs#view-subgraph-state).
+Operation binding and closure policy are Caliburn application wiring, not
+vendor-prescribed semantic memory or a claim of vendor consensus.
 
 ## Run
 

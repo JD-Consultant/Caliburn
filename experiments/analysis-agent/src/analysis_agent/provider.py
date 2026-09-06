@@ -23,6 +23,7 @@ def build_model(
     *, model: str, api_key: str, http_client: httpx.Client,
     compact_threshold: int | None = None,
     request_timeout: float | None = None,
+    base_url: str | None = None,
 ) -> ChatOpenAI:
     """Bind the configured model to the supplied HTTP transport."""
     if compact_threshold is not None and compact_threshold <= 0:
@@ -32,6 +33,7 @@ def build_model(
     return ChatOpenAI(
         model=model,
         api_key=api_key,
+        base_url=base_url,
         http_client=http_client,
         # LangChain passes this explicitly to the SDK. A timeout on the HTTP
         # client alone is overwritten by request_timeout=None during binding.
@@ -39,6 +41,7 @@ def build_model(
         use_responses_api=True,
         output_version="responses/v1",
         store=False,
+        truncation='disabled',
         reasoning={"effort": "medium", "context": "all_turns"},
         model_kwargs={"parallel_tool_calls": False},
         context_management=(

@@ -10,6 +10,7 @@ from threading import Event, RLock
 
 from langchain.agents.middleware import AgentMiddleware
 from langchain_core.exceptions import ModelError
+from analysis_agent.budget import RequestBudgetExceeded
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.graph import START
 
@@ -291,7 +292,8 @@ class AnalysisService:
             elif isinstance(exc, ModelError):
                 billing = is_billing_error(exc)
                 retryable = exc.is_retryable and not billing
-                code = 'billing_error' if billing else ('transport_error' if retryable else 'configuration_error')
+                code = ('context_budget_exceeded' if isinstance(exc, RequestBudgetExceeded) else
+                        'billing_error' if billing else ('transport_error' if retryable else 'configuration_error'))
                 status = 'interrupted'
                 if not retryable:
                     try:

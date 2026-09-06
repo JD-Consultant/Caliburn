@@ -206,31 +206,38 @@ def test_pg_uncertain_repair_can_explicitly_resume_same_operation(pg_service, mo
 def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_service, monkeypatch):
     from fastapi.testclient import TestClient
     from analysis_agent.api import create_app
-    from analysis_agent import provider
+    from analysis_agent import api
     _, owned = pg_service
     monkeypatch.setenv('Q019_DATABASE_URL', os.environ['Q019_TEST_DATABASE_URL'])
     monkeypatch.setenv('OPENAI_API_KEY', 'offline')
     monkeypatch.setenv('Q019_REQUEST_TIMEOUT_SECONDS', '13')
     monkeypatch.setenv('Q019_MAX_OUTPUT_TOKENS', '1000')
     monkeypatch.setenv('Q019_COMPACT_THRESHOLD', '32000')
+    monkeypatch.setenv('Q019_CONTEXT_WINDOW_TOKENS', '64000')
+    monkeypatch.setenv('OPENAI_BASE_URL', 'https://budget-test.invalid/custom/v1/')
     monkeypatch.setenv('Q019_BACKGROUND_POLL_SECONDS', '60')
     monkeypatch.setenv('Q019_BACKGROUND_MAX_RECOVERIES', '1')
-    captured, clients = [], []
-    actual_build = provider.build_model
-    def bind(**kwargs):
-        # Keep the actual configured resource/SDK. Only replace its public HTTP
-        # send at the network boundary, so this test cannot call a paid model.
-        client = kwargs['http_client']
-        clients.append(client)
-        def send(request, **unused):
-            captured.append(request)
-            return httpx.Response(200, json=done(), request=request)
-        monkeypatch.setattr(client, 'send', send)
-        return actual_build(**kwargs)
-    monkeypatch.setattr(provider, 'build_model', bind)
+    captured, counted, clients = [], [], []
+    actual_client = httpx.Client
+    class MockClient(actual_client):
+        # Keep HTTPX send/event hooks real. Intercept BOTH clients below send;
+        # even a broken hook/endpoint mapping can never make an external request.
+        def __init__(self, **kwargs):
+            def transport(request):
+                assert request.url.host == 'budget-test.invalid'
+                if request.url.path == '/custom/v1/responses/input_tokens':
+                    counted.append(request)
+                    return httpx.Response(200, json={'input_tokens': 100})
+                assert request.url.path == '/custom/v1/responses'
+                captured.append(request)
+                return httpx.Response(200, json=done())
+            super().__init__(**kwargs, transport=httpx.MockTransport(transport))
+            clients.append(self)
+    monkeypatch.setattr(api.httpx, 'Client', MockClient)
     app = create_app()
     with TestClient(app, base_url='http://127.0.0.1') as web:
-        assert not captured and not clients[0].is_closed
+        assert not captured and not counted and len(clients) == 2
+        assert all(not c.is_closed for c in clients)
         doc = web.post('/documents', json={'title': '實際應用啟動'}).json()['id']
         owned.append(doc)
         response = web.post(f'/documents/{doc}/runs', json={'request_key': 'one', 'text': '我是前端工程師'})
@@ -242,4 +249,8 @@ def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_se
         assert payload['context_management'][0]['compact_threshold'] == 32000
         assert payload['reasoning'] == {'effort': 'medium', 'context': 'all_turns'}
         assert captured[0].extensions['timeout']['read'] == 13
-    assert clients[0].is_closed and not app.state.service.accepting
+        from test_context_budget import assert_counted
+        assert_counted([json.loads(r.content) for r in counted], captured)
+        assert counted[0].extensions['timeout']['read'] == 13
+    assert all(c.is_closed for c in clients) and not app.state.service.accepting
+    assert app.state.service.model.root_client.is_closed()

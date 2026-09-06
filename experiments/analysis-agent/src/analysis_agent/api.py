@@ -88,12 +88,14 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
     from psycopg.conninfo import conninfo_to_dict, make_conninfo
     from sqlalchemy import create_engine
     from sqlalchemy.engine import URL
+    from openai import OpenAI
+    from analysis_agent.budget import ResponsesBudget, validate_context_budget
     from analysis_agent.catalog import Catalog
     from analysis_agent.provider import build_model
     from analysis_agent.publication import Base as PublicationBase
 
     required = ('Q019_DATABASE_URL', 'OPENAI_API_KEY', 'Q019_REQUEST_TIMEOUT_SECONDS',
-                'Q019_MAX_OUTPUT_TOKENS', 'Q019_COMPACT_THRESHOLD',
+                'Q019_MAX_OUTPUT_TOKENS', 'Q019_COMPACT_THRESHOLD', 'Q019_CONTEXT_WINDOW_TOKENS',
                 'Q019_BACKGROUND_POLL_SECONDS', 'Q019_BACKGROUND_MAX_RECOVERIES')
     missing = [name for name in required if not os.environ.get(name)]
     if missing:
@@ -104,6 +106,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
     timeout = float(os.environ['Q019_REQUEST_TIMEOUT_SECONDS'])
     output = int(os.environ['Q019_MAX_OUTPUT_TOKENS'])
     compaction = int(os.environ['Q019_COMPACT_THRESHOLD'])
+    capacity = int(os.environ['Q019_CONTEXT_WINDOW_TOKENS'])
+    validate_context_budget(capacity, output, compaction)
     poll_seconds = float(os.environ['Q019_BACKGROUND_POLL_SECONDS'])
     recoveries = int(os.environ['Q019_BACKGROUND_MAX_RECOVERIES'])
     text_threshold = int(os.environ['Q019_MEMORY_TEXT_THRESHOLD']) if os.environ.get('Q019_MEMORY_TEXT_THRESHOLD') else None
@@ -124,11 +128,20 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
         catalog = Catalog(engine)
         catalog.setup()
         PublicationBase.metadata.create_all(engine)
-        client = stack.enter_context(httpx.Client(timeout=httpx.Timeout(timeout, connect=min(timeout, 10))))
-        model = build_model(model=os.environ.get('Q019_MODEL', 'gpt-5.6-luna'),
+        http_timeout = httpx.Timeout(timeout, connect=min(timeout, 10))
+        count_http = stack.enter_context(httpx.Client(timeout=http_timeout))
+        counter = stack.enter_context(OpenAI(api_key=os.environ['OPENAI_API_KEY'],
+                                            http_client=count_http, timeout=http_timeout))
+        model_name = os.environ.get('Q019_MODEL', 'gpt-5.6-luna')
+        budget = ResponsesBudget(counter=counter, model=model_name, context_window_tokens=capacity)
+        client = stack.enter_context(httpx.Client(timeout=http_timeout, event_hooks={'request': [budget]}))
+        # Resolve OPENAI_BASE_URL once through the SDK public property. Both
+        # clients MUST target the same endpoint, including custom path prefixes.
+        model = build_model(model=model_name, base_url=str(counter.base_url),
                             api_key=os.environ['OPENAI_API_KEY'], http_client=client,
                             request_timeout=timeout,
                             compact_threshold=compaction).model_copy(update={'max_tokens': output})
+        stack.callback(model.root_client.close)
         service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model,
             instructions='你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
                          '目前只做訪談分析，不製作或編輯JD。不顯示隱藏推理。'

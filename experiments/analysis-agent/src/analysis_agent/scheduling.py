@@ -13,6 +13,7 @@ from sqlalchemy import ForeignKey, Integer, String
 from sqlalchemy.orm import Mapped, mapped_column
 
 from analysis_agent.catalog import Base, values
+from analysis_agent.budget import RequestBudgetExceeded
 from analysis_agent.consolidation import ConsolidationWorkflow
 from analysis_agent.extraction import ExtractionWorkflow
 from analysis_agent.provider import is_billing_error
@@ -101,6 +102,7 @@ class BackgroundDispatcher:
                     worked = self._step(document)
                 except Exception as exc:
                     code = ('publication_uncertain' if isinstance(exc, PublicationUncertain) else
+                            'context_budget_exceeded' if isinstance(exc, RequestBudgetExceeded) else
                             'billing_error' if isinstance(exc, ModelError) and is_billing_error(exc) else
                             'transport_error' if isinstance(exc, ModelError) and exc.is_retryable else
                             'configuration_error' if isinstance(exc, ModelError) else 'background_error')

@@ -47,16 +47,17 @@ class ReadOnlyFiles(BackendProtocol):
     bounds model-visible pages; direct runtime reads return the requested window.
     """
 
-    def __init__(self, backend: BackendProtocol, document_id: str):
+    def __init__(self, backend: BackendProtocol, document_id: str, *, thread_id: str | None = None):
         self._backend = backend
         self.document_id = document_id
+        self._thread_id = thread_id or document_id
 
     def _check_scope(self):
         try:
             config = get_config()
         except RuntimeError:
             return  # trusted run-external loader; no graph context exists
-        if config.get("configurable", {}).get("thread_id") != self.document_id:
+        if config.get("configurable", {}).get("thread_id") != self._thread_id:
             raise ValueError("Memory read belongs to another document")
 
     def read(self, file_path: str, offset: int = 0, limit: int = 2000):
@@ -85,6 +86,29 @@ class MemoryArtifacts:
     def _backend(self, *suffix: str):
         namespace = ("q019-memory", self.document_id, *suffix)
         return StoreBackend(store=self.store, namespace=lambda _rt: namespace)
+
+    def interview_backend(self) -> BackendProtocol:
+        """Runtime composition only; model-facing callers wrap this as read-only."""
+        return self._backend("interviews")
+
+    def read_text(self, path: str, version: MemoryVersion | None = None) -> str:
+        if version is None:
+            if not path.startswith("/interviews/"):
+                raise ValueError("Expected an interview artifact address")
+            backend, key = self.interview_backend(), path.removeprefix("/interviews")
+        else:
+            if path not in ("/memory/knowledge.md", "/memory/guide.md"):
+                raise ValueError("Expected a memory artifact address")
+            backend, key = self._view(version), path
+        loaded = backend.download_files([key])[0]
+        if loaded.error or loaded.content is None:
+            raise ValueError(f"Artifact unavailable: {path}")
+        return loaded.content.decode("utf-8")
+
+    def validate_texts(self, knowledge: str, guide: str) -> dict[str, str]:
+        knowledge, guide = _prepare_text(knowledge), _prepare_text(guide, guide=True)
+        self._validate_links(knowledge, guide)
+        return {"knowledge": knowledge, "guide": guide}
 
     @staticmethod
     def _save(backend: BackendProtocol, path: str, content: str):

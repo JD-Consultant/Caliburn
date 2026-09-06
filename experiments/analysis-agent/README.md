@@ -1,6 +1,6 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
-Status: **native continuity + synchronous Agent + Memory read/publication + B1 extraction**.
+Status: **native continuity + synchronous Agent + Memory read/publication + B1/B2 extraction/consolidation**.
 Not a runnable Web app, completed Memory generation/publication system, or live
 model-quality result. No legacy App imports.
 
@@ -79,7 +79,7 @@ Test thread rows were cleaned; the dedicated DB/schema remains for another run.
 ## Not yet implemented / proved
 
 Streaming/async transport, abrupt host/DB crash or failover recovery,
-context token/run budget, B2 consolidation and background scheduling, C editing
+total context token budget, background scheduling, C editing
 and in-run read-view refresh, Skills, UI, paid Luna/medium smoke.
 There is intentionally no JD editor. Standard serializer round-trip is not a
 database durability test. The code is not connected to the existing application.
@@ -178,6 +178,52 @@ This proves wiring/recovery, not semantic extraction quality.
 records framework sources, review findings, repairs and the remaining B2/C gates.
 
 ## Design / evidence
+
+### Consolidation slice (2026-09-06)
+
+`ConsolidationWorkflow(extraction, publication, model, checkpointer)` consumes
+the completed `ExtractionWorkflow` checkpoint. Call `start()` for a completed
+B1 batch and `resume()` only for its pending job. A read-only admission check
+rejects invalid/oversize input without reserving a new job. Caller still
+serializes B jobs; this is not a scheduler or a second employee conversation.
+
+B2 receives bounded candidates, real detail-note links and the small guide.
+DeepAgents `StateBackend` holds a private copy of the base knowledge/guide;
+official `ls`, `grep`, `read_file`, `write_file`, `edit_file` tools expose that
+staging and read-only interview artifacts. `validate_memory()` has no model
+arguments and returns format/reference errors for correction within the loop.
+It is application validation, not semantic truth or coverage verification.
+
+A per-invocation LangGraph subgraph checkpoints the official Agent's tool steps.
+The completed pair is checked again, saved as immutable Store artifacts, then
+the publication request is checkpointed before the existing CAS/receipt seam.
+Stale publication keeps B1 and starts a fresh B2 attempt from the winning head
+plus actual bounded repair-source Q/A. It does not reuse the old model output
+with a new expected revision. No raw-search tool or additional summary layer.
+
+Initial limits: 8 successful model steps / 12 tool calls across the B2 job,
+4,096 output tokens per request, candidates24,000 visible chars, repair input
+12,000 chars; 20 repair receipts is a fixed safety limit, not a configurable
+parameter. Stale attempts get only remaining budget; a resumed agent keeps
+its official counters. These are engineering limits, not vendor
+guarantees or a hard billing cap: SDK network retries and calls lost before a
+checkpoint may add HTTP requests. No paid API was used.
+
+Incomplete/refused responses or `invalid_tool_calls` anywhere in the attempt
+cannot become successful no-op publications. An invalid final artifact stops
+at validation; `resume()` does not automatically rewrite that invalid artifact.
+Likewise budget exhaustion is a safe stop, not autonomous recovery. The
+production retry/cancel/replan interface remains out of scope; do not tell users
+all errors are automatically repaired. Tool-time validation failures can be
+repaired by the model before it finishes.
+
+Full suite: **96 passed / 0 skipped**, including actual PG client/Saver/Store
+reopen after tool failure, before artifact save and after lost commit reply.
+Synthetic responses prove wiring/recovery, not real consolidation quality.
+[Consolidation results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-consolidation-results.md)
+records the review, official sources, limits and next C/A gate.
+
+### Earlier design and provider evidence
 
 Current design lives in the main checkout (not this branch's historical register):
 [Q019](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-design.md),

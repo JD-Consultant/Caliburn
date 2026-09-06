@@ -2,8 +2,16 @@
 
 Status: **analysis-only local API + native continuity + Memory read/publication +
 B1/B2 extraction/consolidation + explicit summary re-extraction + durable
-consolidation requests + automatic background dispatcher + on-demand analysis Skills**. No Web UI yet;
+consolidation requests + automatic background dispatcher + on-demand analysis Skills +
+final synchronous Responses context budgeting**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
+
+Latest wiring verification (2026-09-07): **514 passed / 0 skipped (71.95s)**,
+including dedicated PostgreSQL; one existing TestClient deprecation warning.
+Independent Skills, budget and whole-batch reviews are approved; compileall,
+offline lock and diff checks pass. Paid model calls: zero. This covers wiring
+and failure handling, not natural interview quality or live endpoint latency.
+[Current results, official sources and remaining limits](../../docs/specs/2026-09-07-context-budget-and-analysis-skills-results.md).
 
 ## On-demand analysis Skills — SK-01 (2026-09-07)
 
@@ -73,8 +81,9 @@ C's provenance and B2's repair-context read, not the model's Context selection.
 
 Previous Memory-reference slice verification: **370 passed / 0 skipped (103.66s)**, including real dedicated PG
 client reconstruction; compileall and offline lock checks passed. HTTP replies
-are synthetic, paid calls zero. Skills, full request budgeting, raw-history
-discoverability and live interview quality remain separate gates.
+are synthetic, paid calls zero. At that savepoint, Skills and full request
+budgeting were still pending; the current sections above/below supersede that
+status. Raw-history discoverability and live interview quality remain separate gates.
 [Repair results and official sources](../../docs/specs/2026-09-07-memory-reference-repair-results.md).
 
 Use Python 3.12, the locked dependencies, a separate local `q019_` PostgreSQL

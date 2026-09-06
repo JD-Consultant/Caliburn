@@ -518,26 +518,24 @@ def test_close_checkpoint_reply_loss_leaves_terminal_child_not_runnable_work(h, 
     assert not graph.get_state(h.config).next
 
 
-@pytest.mark.parametrize('stage', ['incomplete', 'unknown_read', 'receipt_unavailable'])
+@pytest.mark.parametrize('stage', ['incomplete', 'unknown_tool', 'receipt_unavailable'])
 def test_closure_never_forges_unknown_tool_results_or_provider_metadata(h, monkeypatch, stage):
     from analysis_agent.conversation import close_turn
     from analysis_agent.live_memory import MemorySession
     from analysis_agent.publication import PublicationUncertain
-    from langchain.agents.middleware import wrap_tool_call
-    @wrap_tool_call
-    def interrupted_read(request, handler):
-        if stage == 'unknown_read':
-            raise RuntimeError('read outcome unknown')
-        return handler(request)
+    @tool
+    def untrusted_read() -> str:
+        """A custom tool is not a trusted Memory read capability."""
+        raise RuntimeError('custom tool outcome unknown')
     session = MemorySession(h.pub, h.source)
     graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
-        middleware=[session, interrupted_read], tools=session.tools)
+        middleware=[session], tools=[*session.tools, untrusted_read])
     if stage == 'incomplete':
         answer = done()
         answer['status'] = 'incomplete'
         answer['incomplete_details'] = {'reason': 'max_output_tokens'}
-    elif stage == 'unknown_read':
-        answer = call('read_file', file_path='/memory/knowledge.md')
+    elif stage == 'unknown_tool':
+        answer = call('untrusted_read')
     else:
         answer = call('repair_memory', edits=[edit()])
         original = h.pub.publish

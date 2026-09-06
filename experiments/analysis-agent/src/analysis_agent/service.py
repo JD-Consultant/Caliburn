@@ -13,7 +13,8 @@ from langchain_core.exceptions import ModelError
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.graph import START
 
-from analysis_agent.conversation import build_conversation, close_turn
+from analysis_agent.conversation import build_conversation, close_turn, pending_memory_read
+from analysis_agent.consolidation_request import REQUEST_TOOL_NAME
 from analysis_agent.sources import ConversationReader
 from analysis_agent.publication import PublicationUncertain, PublicationStore
 from analysis_agent.memory import MemoryArtifacts
@@ -313,10 +314,26 @@ class AnalysisService:
             if not any(m.id == run_id for m in snapshot.values.get('messages', [])):
                 row = self.catalog.update_run(run_id, status='not_received', error_code=None)
             repair_resume = row['error_code'] == 'publication_uncertain' and resumable_repair(state)
+            read_call = pending_memory_read(snapshot, context.memory)
+            read_resume = (row['error_code'] in {'runtime_error', 'process_interrupted'}
+                and read_call is not None)
+            at_tools = any(t.name == 'analysis' and hasattr(t.state, 'next')
+                           and 'tools' in t.state.next for t in snapshot.tasks)
+            last = state.get('messages', [])[-1] if state.get('messages') else None
+            notification_pending = (isinstance(last, AIMessage) and not last.invalid_tool_calls
+                and len(last.tool_calls) == 1 and last.tool_calls[0]['name'] == REQUEST_TOOL_NAME)
+            # A process/transport label cannot certify an unknown tool effect.
+            # Only bound reads, the reserved pure notification, and C's saved
+            # receipt identity may re-enter a pending ToolNode.
+            safe_tools = read_call is not None or notification_pending or resumable_repair(state)
             can_resume = (not self._running(document) and row['status'] in {'interrupted', 'uncertain'}
-                and (row['error_code'] in {'transport_error', 'process_interrupted'} or repair_resume)
+                and (row['error_code'] in {'transport_error', 'process_interrupted'} or repair_resume or read_resume)
+                and (not at_tools or safe_tools)
                 and bool(snapshot.next) and pending_input_id(snapshot) == run_id
-                and (state.get('thread_model_call_count', 0) < self.max_model_steps or repair_resume))
+                and (state.get('thread_model_call_count', 0) < self.max_model_steps or repair_resume or read_resume))
+            # A pending trusted read can finish even at the model limit. Resume
+            # uses the existing checkpoint; the next official model guard ends
+            # at the saved quota without another provider call.
             # A completed tool at its exact quota does not prohibit a final
             # answer. Official middleware still guards additional calls; the
             # per-input counters are never reset by this API.

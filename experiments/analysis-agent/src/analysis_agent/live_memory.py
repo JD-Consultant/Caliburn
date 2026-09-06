@@ -46,7 +46,10 @@ class MemorySession(AgentMiddleware):
                 "source_reference": runtime.state["memory_source_reference"]})
             return self._command(result["outcome"], runtime.state, runtime.tool_call_id)
 
-        self.tools = [*memory_read_tools(self.artifacts, None, source), repair_memory]
+        # Keep the actual factory-built capability separate from the write tool.
+        # Conversation composition rejects same-name replacements before binding.
+        self.read_tools = tuple(memory_read_tools(self.artifacts, None, source))
+        self.tools = [*self.read_tools, repair_memory]
 
     def _scope(self, config):
         if config["configurable"]["thread_id"] != self.artifacts.document_id:

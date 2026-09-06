@@ -135,6 +135,11 @@ def build_conversation(
     supplied = [*tools, *(t for item in middleware for t in getattr(item, 'tools', ()))]
     if any(t.name == REQUEST_TOOL_NAME for t in supplied):
         raise ValueError('request_memory_consolidation is reserved for the pure notification tool')
+    from analysis_agent.live_memory import MemorySession
+    for session in (item for item in middleware if isinstance(item, MemorySession)):
+        readers = {t.name: t for t in session.read_tools}
+        if any(t.name in readers and t is not readers[t.name] for t in supplied):
+            raise ValueError('Read tool names are reserved for the bound Memory readers')
     child = build_agent(model=model, checkpointer=None, instructions=instructions,
         tools=[*tools, request_memory_consolidation],
         middleware=[
@@ -155,6 +160,33 @@ def build_conversation(
 def require_latest(config):
     if config.get('configurable', {}).get('checkpoint_id') or config.get('configurable', {}).get('checkpoint_ns'):
         raise ValueError('Use the latest root document config, not a historical/child checkpoint')
+
+
+def pending_memory_read(snapshot, memory_session):
+    """Identify the current unpaired ToolNode call, not an exception/name hint.
+
+    The caller supplies the MemorySession used to compose this conversation.
+    Its factory-built read tools are reserved at composition; arbitrary tools
+    cannot acquire this capability by returning a familiar model-authored name.
+    """
+    if memory_session is None or snapshot.next != ('analysis',):
+        return None
+    child = next((t.state for t in snapshot.tasks if t.name == 'analysis'), None)
+    if not hasattr(child, 'values') or child.next != ('tools',):
+        return None
+    messages = child.values.get('messages', [])
+    human = next((m for m in reversed(messages) if isinstance(m, HumanMessage)), None)
+    if (human is None or child.values.get('memory_turn_id') != human.id
+            or snapshot.config['configurable']['thread_id'] != memory_session.source.document_id):
+        return None
+    last = messages[-1]
+    if (not isinstance(last, AIMessage) or last.invalid_tool_calls
+            or len(last.tool_calls) != 1):
+        return None
+    call = last.tool_calls[0]
+    if call.get('id') and call['name'] in {t.name for t in memory_session.read_tools}:
+        return call
+    return None
 
 
 def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=None):
@@ -186,6 +218,7 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
     if child and hasattr(child, 'values') and not child.values.get('messages'):
         child = None
     state = child.values if child and hasattr(child, 'values') else snapshot.values
+    read_call = pending_memory_read(snapshot, memory_session)
     messages = list(state['messages'])
     human_index = max(i for i, m in enumerate(messages) if isinstance(m, HumanMessage))
     saved = state.get('turn_outcome')
@@ -214,6 +247,12 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
                 # Worker is quiescent. This registered tool has no external
                 # effects; without a saved receipt no request was handed off.
                 messages.append(ToolMessage('整理請求未成功交接；本輪已停止，記憶尚未因此更新。',
+                    name=call['name'], tool_call_id=call['id'], status='error'))
+            elif call == read_call:
+                # A read may have run before its result was lost. Closing it
+                # discards the unavailable result, not an external write effect.
+                messages.append(ToolMessage('Read result unavailable/discarded: this turn was closed. '
+                    'Do not infer absence of data from this result.',
                     name=call['name'], tool_call_id=call['id'], status='error'))
             elif call['name'] == 'repair_memory' and memory_session is not None:
                 command = memory_session.reconcile(state, message, call, config)

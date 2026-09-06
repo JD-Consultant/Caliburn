@@ -86,11 +86,28 @@ multiple workers, reload or multiple server processes against this isolated DB.
   request does not stop the worker. Server shutdown joins before closing clients.
 - `POST /documents/{id}/runs/{run_id}/resume`: explicit same-checkpoint continuation
   only when `can_resume` is true; counters and resume count survive reopening.
+  A pending bound Memory read (`read_conversation`, `read_file`, `ls`, `grep`)
+  can resume after a runtime interruption, including service reconstruction.
+  Only that pending tool is re-entered; previous model calls and saved tool
+  effects are not replayed. Even at the model quota the read may finish; the
+  existing framework guard then ends the turn without another model request.
   The known C repair can reconcile/replay its saved operation, including lost
   publication replies. Arbitrary unknown effects are not declared safe to retry.
+  A process/transport error label alone never authorizes an unknown pending tool.
 - A quiescent interrupted input can be explicitly abandoned when submitting new
   text. Unknown publication must be resolved first. Old employee messages and
   completed Memory publications are never removed or reverted by cancellation.
+  Stopping/abandoning a trusted pending read pairs its original call ID with an
+  error saying the result is unavailable/discarded, not that it never executed
+  or that the data is absent. It does not rerun the read or invoke the model.
+
+ER-A01 recovery uses the actual factory-built `MemorySession.read_tools` and
+the current public child checkpoint, not a model-supplied name allow-list or
+blanket `runtime_error` retry. Conversation composition rejects conflicting
+same-name tools. Direct `close_turn` callers must supply the session bound to
+that conversation. No new automatic retry loop, durable state layer or quota
+reset is introduced; failures outside the pending trusted read stay classified
+by the existing policy, and C still requires its exact receipt reconciliation.
 
 Same-document active work rejects another input. Loopback/Host/same-origin
 restrictions match the single-local-operator scope; this is not authentication
@@ -327,9 +344,11 @@ edits, not IDs or receipts. No new store/table, publication schema change,
 private namespace discovery, extra model call or custom Agent loop is used.
 The tool-hidden C graph is intentionally not claimed as discoverable.
 
-Closure distinguishes three cases: a saved pre-ToolNode after-model checkpoint
+Closure distinguishes these cases: a saved pre-ToolNode after-model checkpoint
 proves not-started; an existing ToolMessage or exact C receipt proves a known
-result; an entered tool without a known result remains unknown. Missing receipt
+result; the reserved pure notification and bound Memory reads can be safely
+closed with honest unavailable-result feedback. An entered unknown tool without
+a known result remains unknown. Missing receipt
 is not proof of failure. Reconciliation only reads `receipt(operation_id)` and
 `current()`, never invokes C or publishes. A recovered receipt reports both its
 applied head and the current read head, without reverting later publications.

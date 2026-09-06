@@ -7,6 +7,16 @@ no live-model quality claim and no legacy App imports.
 
 ## Current application entry — Task3 / Task4
 
+Runtime recovery follow-up (2026-09-07): trusted interrupted reads can resume
+or close safely; B2 final content errors return to its bounded Agent loop; B1
+persists a precise validation-correction allowance; initial guide freshness is
+scoped to the current input. Unknown writes still require reconciliation.
+**427 passed / 0 skipped (67.52s)** including dedicated PG, with one existing
+upstream TestClient deprecation. Compileall, offline lock check and independent
+whole-batch review passed; paid model calls zero. No old pending-job migration,
+production integration or live-model quality claim.
+[Recovery results, official sources and limits](../../docs/specs/2026-09-07-runtime-recovery-repair-results.md).
+
 Memory reference follow-up (2026-09-07): `MemoryArtifacts(..., source=reader)`
 uses the same document's canonical `ConversationReader` at validation, save and
 pre-publication. The service provides this reader automatically. Artifact-only
@@ -30,7 +40,7 @@ turn cannot be silently crossed; runtime notices/tools are not employee words.
 The existing 3,000-character paged reader preserves longer ranges. This repairs
 C's provenance and B2's repair-context read, not the model's Context selection.
 
-Verification: **370 passed / 0 skipped (103.66s)**, including real dedicated PG
+Previous Memory-reference slice verification: **370 passed / 0 skipped (103.66s)**, including real dedicated PG
 client reconstruction; compileall and offline lock checks passed. HTTP replies
 are synthetic, paid calls zero. Skills, full request budgeting, raw-history
 discoverability and live interview quality remain separate gates.

@@ -33,6 +33,14 @@ def memory_access(artifacts: MemoryArtifacts, version: MemoryVersion, source: Co
             )})
             return handler(request.override(system_message=SystemMessage(content=base)))
 
+    return [MemoryGuide()], memory_read_tools(artifacts, version, source)
+
+
+def memory_read_tools(artifacts: MemoryArtifacts, version: MemoryVersion | None, source: ConversationReader):
+    """Public tools bound to one immutable read view, including an empty head."""
+    if source.document_id != artifacts.document_id:
+        raise ValueError("Memory and conversation must belong to the same document")
+
     @tool
     def read_conversation(reference: str, runtime: ToolRuntime, offset: int = 0) -> dict:
         """Read saved visible questions/answers using a Source reference from an interview record.
@@ -56,4 +64,4 @@ def memory_access(artifacts: MemoryArtifacts, version: MemoryVersion, source: Co
     # Public BaseTool instances carry native read formatting/pagination. Do not
     # register the middleware hooks: no automatic chat/tool offload or generic
     # multimodal scrubbing is needed on our native Responses continuity route.
-    return [MemoryGuide()], [*filesystem.tools, read_conversation]
+    return [*filesystem.tools, read_conversation]

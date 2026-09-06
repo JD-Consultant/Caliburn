@@ -179,8 +179,11 @@ class MemoryArtifacts:
             raise ValueError("Memory version belongs to another document")
         return CompositeBackend(default=self._backend("versions", version.version_id), routes={"/interviews/": self._backend("interviews")})
 
-    def reader(self, version: MemoryVersion) -> ReadOnlyFiles:
-        return ReadOnlyFiles(self._view(version), self.document_id)
+    def reader(self, version: MemoryVersion | None) -> ReadOnlyFiles:
+        # No head means no published knowledge. No placeholder files are saved.
+        view = self._view(version) if version else CompositeBackend(
+            default=self._backend("unpublished"), routes={"/interviews/": self.interview_backend()})
+        return ReadOnlyFiles(view, self.document_id)
 
     def guide(self, version: MemoryVersion) -> str:
         result = self._view(version).download_files(["/memory/guide.md"])[0]

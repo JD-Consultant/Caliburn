@@ -64,6 +64,27 @@ class ConversationReader:
         data = {"document": self.document_id, "checkpoint": snapshot.config["configurable"]["checkpoint_id"], "first": start_id, "last": end_id}
         return "conversation:" + base64.urlsafe_b64encode(json.dumps(data, ensure_ascii=False).encode()).decode()
 
+    def capture_input(self, message_id: str) -> str:
+        """Locate an already-saved current input, not a completed B1 window.
+
+        Keep the preceding visible assistant question so short corrections have
+        context. Native reasoning/tool blocks stay canonical, never rendered.
+        """
+        snapshot = self._snapshot()
+        messages = snapshot.values["messages"]
+        humans = [i for i, message in enumerate(messages) if isinstance(message, HumanMessage)]
+        if not humans or messages[humans[-1]].id != message_id:
+            raise ValueError("Current input is not the latest saved employee message")
+        index = humans[-1]
+        first = message_id
+        for message in reversed(messages[:index]):
+            if isinstance(message, HumanMessage):
+                break
+            if isinstance(message, AIMessage) and any(text for _, _, text in self._visible([message])[0]):
+                first = message.id
+                break
+        return self._reference(snapshot, first, message_id)
+
     @staticmethod
     def _visible(messages):
         visible, omitted = [], set()

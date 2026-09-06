@@ -223,6 +223,42 @@ Synthetic responses prove wiring/recovery, not real consolidation quality.
 [Consolidation results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-consolidation-results.md)
 records the review, official sources, limits and next C/A gate.
 
+### Live repair / primary-agent refresh slice (2026-09-06)
+
+Create `MemorySession(publication, source)` and pass it to
+`build_agent(..., middleware=[session], tools=session.tools)`. This sync-only
+composition adds `repair_memory(edits)` to the four existing read tools.
+C is a no-model tool subgraph, not a third agent. The caller owns clients,
+serializes primary runs per document, and invokes with `durability="sync"`.
+Use `invoke(None, config, durability="sync")` to resume a pending run, not a
+second copy of its input. App admission/retry/cancel endpoints are not included.
+
+New employee input pins head, guide, and a real saved input Q/A reference.
+Read tools use public middleware `request.override(tool=...)` to select this
+immutable version. A background publication does not silently switch it.
+C uses exact StateBackend edits in private per-invocation staging; all edits
+must succeed before save -> durable request -> existing publication/receipt.
+No fuzzy edits and no creation of missing Memory. Guide and knowledge publish
+together; C leaves B's processed-source cursor unchanged.
+
+Command updates A's read head and ToolMessage together on success/stale;
+initial system guide stays fixed. The visible result is authoritative about
+the refresh. On a reconciled older successful request, the result distinguishes
+the applied version from the latest read version. Canonical visible Q/A can
+be read from C receipts without exposing opaque reasoning or duplicating text.
+
+Engineering limits: 1–8 edits / 12,000 combined old+new chars per C call; two
+correctable failures per employee input (initial plus one retry), including
+framework schema errors. New input resets; resume does not. This is not an
+overall A cost cap. Storage/uncertain commit faults propagate as pending work.
+No paid API or natural-model repair-quality claims.
+
+Full suite: **120 passed / 0 skipped**, including four real PG reopen cases.
+Independent review found no Critical/Important blockers for this isolated
+savepoint (reviewer reran live20 tests, not the entire PG suite).
+Verification and boundaries:
+[Live repair results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-live-memory-results.md).
+
 ### Earlier design and provider evidence
 
 Current design lives in the main checkout (not this branch's historical register):

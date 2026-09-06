@@ -19,6 +19,8 @@ from analysis_agent.sources import ConversationReader
 from analysis_agent.publication import PublicationUncertain, PublicationStore
 from analysis_agent.memory import MemoryArtifacts
 from analysis_agent.live_memory import MemorySession
+from analysis_agent.memory_tools import readonly_file_tools
+from analysis_agent.skills import SkillAssets, analysis_files, analysis_skills
 from analysis_agent.provider import is_billing_error
 
 
@@ -123,10 +125,14 @@ class AnalysisService:
                           max_model_steps=self.max_model_steps, max_tool_calls=self.max_tool_calls)
             base = build_conversation(**common)
             reader = ConversationReader(base, document)
+            assets = SkillAssets()
             memory = (MemorySession(PublicationStore(self.catalog.engine,
-                       MemoryArtifacts(self.store, document, source=reader)), reader) if self.store is not None else None)
-            graph = build_conversation(**common, tools=memory.tools if memory else (),
-                                       middleware=[*([memory] if memory else []), BackgroundAvailability(self, document), CooperativeStop(stop)])
+                       MemoryArtifacts(self.store, document, source=reader)), reader,
+                       skill_assets=assets) if self.store is not None else None)
+            graph = build_conversation(**common,
+                tools=memory.tools if memory else readonly_file_tools(analysis_files(assets)),
+                middleware=[analysis_skills(assets), *([memory] if memory else []),
+                            BackgroundAvailability(self, document), CooperativeStop(stop)])
             reader.graph = graph
             self.contexts[document] = DocumentRuntime(graph, reader, stop, memory)
         return self.contexts[document]

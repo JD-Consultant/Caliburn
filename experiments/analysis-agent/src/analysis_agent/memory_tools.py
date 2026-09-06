@@ -9,6 +9,7 @@ from langgraph.config import get_config
 
 from analysis_agent.memory import MemoryArtifacts, MemoryVersion
 from analysis_agent.sources import ConversationReader
+from analysis_agent.skills import SkillAssets, analysis_files
 
 
 def memory_access(artifacts: MemoryArtifacts, version: MemoryVersion, source: ConversationReader):
@@ -39,7 +40,8 @@ def memory_access(artifacts: MemoryArtifacts, version: MemoryVersion, source: Co
     return [MemoryGuide()], memory_read_tools(artifacts, version, source)
 
 
-def memory_read_tools(artifacts: MemoryArtifacts, version: MemoryVersion | None, source: ConversationReader):
+def memory_read_tools(artifacts: MemoryArtifacts, version: MemoryVersion | None, source: ConversationReader,
+                      *, skill_assets: SkillAssets | None = None):
     """Public tools bound to one immutable read view, including an empty head."""
     if source.document_id != artifacts.document_id:
         raise ValueError("Memory and conversation must belong to the same document")
@@ -59,12 +61,20 @@ def memory_read_tools(artifacts: MemoryArtifacts, version: MemoryVersion | None,
             raise ToolException(str(exc)) from exc
 
     read_conversation.handle_tool_error = True
+    backend = artifacts.reader(version)
+    if skill_assets is not None:
+        backend = analysis_files(skill_assets, backend)
+    return [*readonly_file_tools(backend), read_conversation]
+
+
+def readonly_file_tools(backend):
+    """One official ls/grep/read_file surface, without offload/scrubbing hooks."""
     filesystem = FilesystemMiddleware(
-        backend=artifacts.reader(version), tools=["ls", "grep", "read_file"],
+        backend=backend, tools=["ls", "grep", "read_file"],
         human_message_token_limit_before_evict=None,
         tool_token_limit_before_evict=4000,
     )
     # Public BaseTool instances carry native read formatting/pagination. Do not
     # register the middleware hooks: no automatic chat/tool offload or generic
     # multimodal scrubbing is needed on our native Responses continuity route.
-    return [*filesystem.tools, read_conversation]
+    return filesystem.tools

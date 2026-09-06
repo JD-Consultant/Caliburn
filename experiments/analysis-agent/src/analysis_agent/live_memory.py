@@ -27,8 +27,9 @@ class MemorySessionState(AgentState):
 class MemorySession(AgentMiddleware):
     state_schema = MemorySessionState
 
-    def __init__(self, publication, source):
+    def __init__(self, publication, source, *, skill_assets=None):
         self.publication, self.source = publication, source
+        self.skill_assets = skill_assets
         self.artifacts = publication.artifacts
         self.repair = RepairWorkflow(self.artifacts, publication, source)
 
@@ -49,7 +50,7 @@ class MemorySession(AgentMiddleware):
 
         # Keep the actual factory-built capability separate from the write tool.
         # Conversation composition rejects same-name replacements before binding.
-        self.read_tools = tuple(memory_read_tools(self.artifacts, None, source))
+        self.read_tools = tuple(memory_read_tools(self.artifacts, None, source, skill_assets=self.skill_assets))
         self.tools = [*self.read_tools, repair_memory]
 
     def _scope(self, config):
@@ -150,6 +151,7 @@ class MemorySession(AgentMiddleware):
             return result
         head = request.state["memory_read_head"]
         version = MemoryVersion(**head["memory"]) if head else None
-        replacements = {t.name: t for t in memory_read_tools(self.artifacts, version, self.source)}
+        replacements = {t.name: t for t in memory_read_tools(self.artifacts, version, self.source,
+                                                           skill_assets=self.skill_assets)}
         replacement = replacements.get(request.tool_call["name"])
         return handler(request.override(tool=replacement)) if replacement else handler(request)

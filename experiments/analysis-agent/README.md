@@ -2,8 +2,39 @@
 
 Status: **analysis-only local API + native continuity + Memory read/publication +
 B1/B2 extraction/consolidation + explicit summary re-extraction + durable
-consolidation requests + automatic background dispatcher**. No Web UI yet;
+consolidation requests + automatic background dispatcher + on-demand analysis Skills**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
+
+## On-demand analysis Skills — SK-01 (2026-09-07)
+
+`AnalysisService` enables three bundled method references for the foreground
+consultant: work-scope interviews, case comparison/common work patterns, and
+outcomes/success criteria/knowledge and skills. They are initial interview
+methods, not new agents, mandatory stages, schemas or employee facts.
+
+The pinned official `SkillsMiddleware` discovers metadata and advertises
+`/skills/<name>/SKILL.md`. Only a requested `read_file` result introduces the
+body into model input; instructions explicitly say not to load all methods on
+every turn. Discovery and reads use the same `CompositeBackend` mount over a
+read-only capability backed by `FilesystemBackend(virtual_mode=True)`, rooted
+at `src/analysis_agent/skills`, never the project root or the current directory.
+Only official `ls`, `grep`, and `read_file` tools are exposed, sharing the
+existing Memory tool names. Filesystem middleware offload/scrubbing hooks are
+not installed, so native reasoning/compaction and canonical items remain intact.
+
+`MemorySession` retains this asset mount when dynamically rebinding its pinned
+Memory version and after C feedback refreshes the read head. Existing Memory
+reads/repairs keep their own permissions; Skills add no write, execute, network
+or JD capability. The non-Store test service also gets the same assets, with an
+empty fallback backend and no host-file or Memory access.
+
+B1/B2 are not given this middleware or asset mount. Skill ToolMessages remain
+canonical, but `ConversationReader` excludes tool content from visible source
+extraction; B1 does not receive method bodies as employee knowledge. Offline
+tests exercise real Service/create_agent/official tools/ChatOpenAI/SDK requests
+with synthetic HTTP, including path rejection, C refresh, read recovery and
+B1 source isolation. This verifies wiring only: natural selection, interview
+quality and prompt tuning are the next owner-authorized gate, not tested here.
 
 ## Current application entry — Task3 / Task4
 
@@ -492,7 +523,7 @@ Test thread rows were cleaned; the dedicated DB/schema remains for another run.
 
 Streaming/async transport, abrupt host/DB crash or failover recovery,
 total context token budget, background scheduling, C editing
-and in-run read-view refresh, Skills, UI, paid Luna/medium smoke.
+and in-run read-view refresh, UI, paid Luna/medium smoke.
 There is intentionally no JD editor. Standard serializer round-trip is not a
 database durability test. The code is not connected to the existing application.
 

@@ -13,6 +13,7 @@ from sqlalchemy.engine import URL
 from sqlalchemy.orm import Session
 
 from analysis_agent.catalog import DocumentRow, RunRow
+from analysis_agent.scheduling import BackgroundRow
 from analysis_agent.memory import MemoryArtifacts
 from analysis_agent.publication import PublicationStore, HeadRow, ReceiptRow
 from test_service import service_harness
@@ -52,8 +53,11 @@ def pg_service(tmp_path):
             with PostgresSaver.from_conn_string(dsn) as saver, PostgresStore.from_conn_string(dsn) as store:
                 for doc in owned:
                     saver.delete_thread(doc)
+                    from uuid import NAMESPACE_URL, uuid5
+                    for prefix in ('q019-b1:', 'q019-b2:'):
+                        saver.delete_thread(str(uuid5(NAMESPACE_URL, prefix + doc)))
                     with Session(engine) as session, session.begin():
-                        for cls in (RunRow, ReceiptRow, HeadRow):
+                        for cls in (BackgroundRow, RunRow, ReceiptRow, HeadRow):
                             for row in session.scalars(select(cls).where(cls.document_id == doc)):
                                 session.delete(row)
                         row = session.get(DocumentRow, doc)
@@ -178,6 +182,8 @@ def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_se
     monkeypatch.setenv('Q019_REQUEST_TIMEOUT_SECONDS', '13')
     monkeypatch.setenv('Q019_MAX_OUTPUT_TOKENS', '1000')
     monkeypatch.setenv('Q019_COMPACT_THRESHOLD', '32000')
+    monkeypatch.setenv('Q019_BACKGROUND_POLL_SECONDS', '60')
+    monkeypatch.setenv('Q019_BACKGROUND_MAX_RECOVERIES', '1')
     captured, clients = [], []
     actual_build = provider.build_model
     def bind(**kwargs):

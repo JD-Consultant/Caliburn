@@ -61,3 +61,31 @@ def test_api_cross_document_access_and_empty_input(tmp_path):
         assert client.post(f'/documents/{other}/runs/{run}/stop').status_code == 404
         assert client.post(f'/documents/{other}/runs', json={'request_key': 'b', 'text': '  '}).status_code == 422
         assert client.get(f'/documents/{other}/messages').json() == []
+
+
+def test_api_background_status_is_safe_and_not_a_manual_consolidation_entry(tmp_path):
+    from fastapi.testclient import TestClient
+    from langgraph.store.memory import InMemoryStore
+    from analysis_agent.api import create_app
+    from analysis_agent.publication import Base
+    from test_scheduling import notify
+    from test_extraction import body
+    @contextmanager
+    def resources():
+        with service_harness(tmp_path, store=InMemoryStore()) as (service, sent, replies):
+            Base.metadata.create_all(service.catalog.engine)
+            service.enable_background(max_recoveries=1)
+            doc = service.create_document('背景狀態')['id']
+            notify(service, doc, replies)
+            bad = body()
+            bad['status'] = 'incomplete'
+            replies.append(bad)
+            service.background.tick()
+            yield service
+    app = create_app(resources)
+    with TestClient(app, base_url='http://localhost') as client:
+        doc = client.get('/documents').json()[0]['id']
+        status = client.get(f'/documents/{doc}/memory-status')
+        assert status.json() == {'status': 'blocked', 'error_code': 'background_error', 'recovery_count': 0}
+        assert client.get('/documents/missing/memory-status').status_code == 404
+        assert client.post(f'/documents/{doc}/memory-status').status_code == 405

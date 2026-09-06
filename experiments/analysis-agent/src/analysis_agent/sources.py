@@ -78,6 +78,61 @@ class ConversationReader:
                 pending.append({'input_id': group[0].id, 'end_id': group[-1].id})
         return pending
 
+    def unprocessed_source(self, after_reference=None, *, through_reference=None):
+        """Snapshot a contiguous closed prefix, never the mutable request view.
+
+        A dispatcher target keeps a partially consumed admission alive even if
+        its notification was in the already published first batch. While A is
+        active, a NEW target waits; an existing immutable target remains usable.
+        """
+        config = {'configurable': {'thread_id': self.document_id}}
+        latest = self.graph.get_state(config)
+        if not latest.values.get('messages'):
+            return None
+        if through_reference:
+            snapshot, groups, _, last, sizes = self._extraction_range(through_reference)
+            groups, sizes = groups[:last + 1], sizes[:last + 1]
+        else:
+            if latest.next or any(t.error or t.interrupts for t in latest.tasks):
+                return None
+            snapshot = latest
+            groups = self._groups(snapshot)
+            safe = next((i for i, g in enumerate(groups) if self._turn_status(snapshot, g) is None), len(groups))
+            groups = groups[:safe]
+            sizes = [sum(len(t) for _, _, t in self._visible(g)[0]) for g in groups]
+        first = 0
+        if after_reference:
+            prior = parse_reference(after_reference, self.document_id)
+            self._extraction_range(after_reference)
+            ends = [g[-1].id for g in groups]
+            if prior['last'] not in ends:
+                if through_reference and self.source_covered(through_reference, after_reference):
+                    return None
+                raise ValueError('Published cursor is not a complete source boundary')
+            first = ends.index(prior['last']) + 1
+        if first >= len(groups):
+            return None
+        return {'reference': self._reference(snapshot, groups[first][0].id, groups[-1][-1].id),
+                'visible_chars': sum(sizes[first:])}
+
+    def source_covered(self, reference, cursor):
+        if not cursor:
+            return False
+        requested = parse_reference(reference, self.document_id)
+        published = parse_reference(cursor, self.document_id)
+        self._extraction_range(cursor)
+        ids = [m.id for m in self._snapshot().values['messages']]
+        if requested['last'] not in ids or published['last'] not in ids:
+            raise ValueError('Source boundary unavailable in canonical conversation')
+        return ids.index(requested['last']) <= ids.index(published['last'])
+
+    def extraction_batch(self, reference, *, max_chars, context_chars, max_windows):
+        """Bound B1's work without consuming or truncating the remaining target."""
+        windows = self.extraction_windows(reference, max_chars=max_chars, context_chars=context_chars)
+        first = parse_reference(windows[0]['source_reference'], self.document_id)
+        last = parse_reference(windows[min(len(windows), max_windows) - 1]['source_reference'], self.document_id)
+        return self._reference(self._snapshot(first['checkpoint']), first['first'], last['last'])
+
     @staticmethod
     def _range(snapshot, first: str, last: str):
         messages = snapshot.values["messages"]

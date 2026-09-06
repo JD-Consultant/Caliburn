@@ -109,9 +109,12 @@ class AnalysisService:
         self.lock = RLock()
         self.executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='q019-analysis')
         self.contexts, self.futures = {}, {}
+        self.background = None
+        self.scheduler = None
         self.accepting = False
 
     def _context(self, document):
+        from analysis_agent.scheduling import BackgroundAvailability
         self.catalog.document(document)
         if document not in self.contexts:
             stop = Event()
@@ -122,10 +125,35 @@ class AnalysisService:
             memory = (MemorySession(PublicationStore(self.catalog.engine,
                        MemoryArtifacts(self.store, document)), reader) if self.store is not None else None)
             graph = build_conversation(**common, tools=memory.tools if memory else (),
-                                       middleware=[*([memory] if memory else []), CooperativeStop(stop)])
+                                       middleware=[*([memory] if memory else []), BackgroundAvailability(self, document), CooperativeStop(stop)])
             reader.graph = graph
             self.contexts[document] = DocumentRuntime(graph, reader, stop, memory)
         return self.contexts[document]
+
+    def enable_background(self, *, max_recoveries, text_threshold=None):
+        from analysis_agent.scheduling import BackgroundDispatcher
+        with self.lock:
+            if self.background is not None:
+                raise ServiceConflict('Background dispatcher is already configured')
+            self.background = BackgroundDispatcher(self, max_recoveries=max_recoveries, text_threshold=text_threshold)
+            return self.background
+
+    def start_background(self, *, poll_seconds):
+        from datetime import datetime, timezone
+        from apscheduler.schedulers.background import BackgroundScheduler
+        from apscheduler.executors.pool import ThreadPoolExecutor as SchedulerExecutor
+        if not 0 < poll_seconds < float('inf'):
+            raise ValueError('Background polling interval must be positive and finite')
+        with self.lock:
+            if not self.accepting or self.background is None or self.scheduler is not None:
+                raise ServiceConflict('Background startup requires one configured, running service')
+            scheduler = BackgroundScheduler(executors={'default': SchedulerExecutor(max_workers=1)}, timezone='UTC')
+            # One reconstructible wake job, not one unlimited executor per JD.
+            scheduler.add_job(self.background.tick, 'interval', seconds=poll_seconds,
+                              id='q019-background-dispatch', coalesce=True, max_instances=1,
+                              next_run_time=datetime.now(timezone.utc))
+            self.scheduler = scheduler
+            scheduler.start()
 
     def start(self):
         with self.lock:
@@ -372,4 +400,11 @@ class AnalysisService:
             self.accepting = False
             for context in self.contexts.values():
                 context.stop.set()
+        if self.scheduler is not None and self.scheduler.running:
+            self.scheduler.shutdown(wait=True)
+        if hasattr(self, 'background_lock'):
+            # Also join an admitted direct dispatcher call (maintenance/tests),
+            # not only work submitted by APScheduler. No lock held over A join.
+            with self.background_lock:
+                pass
         self.executor.shutdown(wait=True, cancel_futures=False)

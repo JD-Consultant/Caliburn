@@ -2,10 +2,10 @@
 
 Status: **analysis-only local API + native continuity + Memory read/publication +
 B1/B2 extraction/consolidation + explicit summary re-extraction + durable
-consolidation requests**. No Web UI or automatic background dispatcher yet;
+consolidation requests + automatic background dispatcher**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
-## Current application entry — Task3
+## Current application entry — Task3 / Task4
 
 Use Python 3.12, the locked dependencies, a separate local `q019_` PostgreSQL
 database and one process. Set credentials externally; this entry never loads
@@ -18,12 +18,17 @@ the old application's `.env`. Required variables:
 | `Q019_REQUEST_TIMEOUT_SECONDS` | Positive finite per-attempt timeout, passed to the actual SDK |
 | `Q019_MAX_OUTPUT_TOKENS` | Positive per-response output bound |
 | `Q019_COMPACT_THRESHOLD` | Explicit positive native compaction threshold for the chosen model |
+| `Q019_BACKGROUND_POLL_SECONDS` | Positive finite infrastructure wake interval; NOT an interview-idle trigger |
+| `Q019_BACKGROUND_MAX_RECOVERIES` | Explicit nonnegative automatic process-interruption recovery allowance per B batch; persisted across restarts |
+| `Q019_MEMORY_TEXT_THRESHOLD` (optional) | Positive new visible-character fallback; omitted = notification-trigger only, no guessed default |
 | `Q019_MODEL` (optional) | Defaults to `gpt-5.6-luna`; medium / all_turns native binding |
 
 There is no guessed universal output/compaction value. The 32,000 / 1,000 / 13s
 values in tests only verify wiring, not recommended product budgets. An output
 cap, SDK attempt timeout and 9-model/8-tool turn limits are not a dollar cap.
 SDK transient retry remains native; no outer model/graph retry is added.
+The configured per-response output bound is carried through A, B1 and B2;
+B2's standalone default does not override the application's explicit setting.
 
 ```powershell
 uv sync --locked
@@ -31,7 +36,9 @@ uv run --no-sync uvicorn analysis_agent.api:create_app --factory --app-dir src -
 ```
 
 Startup initializes the official Saver/Store and small ORM catalog/publication
-tables; it reconciles pending status but does not invoke a paid model. Do not use
+tables; it reconciles A without invoking it. The background scheduler may resume
+eligible B work or process saved notifications, and those B calls can cost money
+when using a real key. Empty/no-eligible-source startup does not call a model. Do not use
 multiple workers, reload or multiple server processes against this isolated DB.
 `/docs` is the generated API reference, **not the planned employee UI**.
 
@@ -42,6 +49,8 @@ multiple workers, reload or multiple server processes against this isolated DB.
 - `GET /documents/{id}/messages` and `/runs[/{run_id}]`: visible human/assistant
   text and safe status/usage projection. Native reasoning and tool internals
   stay in canonical checkpoints and do not cross this UI seam.
+- `GET /documents/{id}/memory-status`: safe background status/error/recovery-count
+  projection, not a transcript, source token, or claim of semantic completeness.
 - `POST /documents/{id}/runs/{run_id}/stop`: cooperative stop, not thread killing.
   An already entered SDK call (including its retries) or tool reaches its safe
   boundary first. Then the next model/tool is not started. Closing a browser
@@ -61,9 +70,61 @@ message body archive. Provider usage comes from returned metadata; unobserved
 failed usage is unknown, not zero or an estimated bill.
 
 Current evidence, review and limitations:
-[Task3 result](../../docs/specs/2026-09-06-analysis-only-agent-api-results.md).
+[Task3 result](../../docs/specs/2026-09-06-analysis-only-agent-api-results.md),
+[Task4 result](../../docs/specs/2026-09-06-background-dispatch-results.md).
 The following sections retain the earlier slice history; their “not yet”
 statements describe those savepoints, not this current application entry.
+
+## Task4 — nonblocking background consolidation
+
+APScheduler 3.11.3 owns one reconstructible interval job and a one-thread executor.
+It calls a dispatcher protected by the application's single-process global B
+lock. `coalesce=True` merges missed clock ticks, not interview text. Model work
+does not run in the foreground pool, API event loop or notification tool.
+
+Eligibility uses safely closed canonical conversation, saved request receipts,
+and the successful publication cursor. A new admission snapshots the whole
+eligible target; B1's bounded batches retain the remaining target until published,
+even if its request was in the first batch. Interleaved new conversation waits
+for the next target. No 90-second idle rule, turn-count trigger, short-input
+filter, classifier model, or extra notification/outbox table is introduced.
+The optional fallback counts visible new human/AI text once, excluding tools,
+reasoning and preceding context. Its product threshold remains undecided.
+
+`q019_background_admission` stores only document routing, exact source/target
+references, running/queued/blocked state and recovery count. B1/B2 official
+checkpoints still own extracted content and execution progress; Store/publication
+still own Memory artifacts and current head. There is no second conversation or
+Memory content archive. This metadata is local application wiring, not a claim
+that APScheduler or OpenAI supplies these exact fields.
+
+- Resume an interrupted old B before admitting new source. Saved B1 is not
+  re-extracted; saved B2 steps continue. A committed publication with a lost
+  reply is reconciled through its existing receipt, without model regeneration.
+- Ordinary caught failures become durable `blocked`. SDK transport retries and
+  model tool-error correction have already had their own bounded opportunity;
+  ticks, new notifications and restarting do not reset a blocked job.
+- An unclean process exit may leave `running`; resume consumes the configured
+  automatic recovery allowance **before** work. Repeated process loss cannot
+  refresh it. This is not the removed arbitrary one-manual-retry limit and not
+  a dollar cap. Tests choose one only to exercise the boundary, not recommend it.
+- Successful B does not wake A or append another tool result. A's next normal
+  run reads current availability; unresolved failure adds a short runtime-only
+  request hint, not an employee message/Memory fact. A recovered target no longer
+  gets that hint. It does not interrupt a model call already in progress.
+- Shutdown stops scheduling and joins B and A before clients close. Do not run
+  multiple API processes against this DB; this is not a distributed job queue.
+
+Blocked model/configuration errors need their cause fixed and explicit technical
+recovery through the existing saved B workflow. No employee-facing manual
+consolidation/retry button is added here. Oversize source/context or candidate
+input blocks visibly rather than silently truncating; prompt/capacity tuning
+belongs to the later bounded live interview stage. Recovery tests reconstruct
+clients and inject process-loss boundaries; they are not an OS power-loss test.
+
+Sources: [APScheduler user guide](https://apscheduler.readthedocs.io/en/3.x/userguide.html),
+[executor](https://apscheduler.readthedocs.io/en/3.x/modules/executors/pool.html),
+[approved local policy](S:/caliburn/docs/specs/2026-09-06-memory-consolidation-request-wiring-design.md).
 
 ## Application wiring Task4a — consolidation request receipt
 

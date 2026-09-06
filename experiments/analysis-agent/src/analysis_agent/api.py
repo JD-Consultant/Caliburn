@@ -70,9 +70,15 @@ class RunOutput(BaseModel):
     can_resume: bool
 
 
+class MemoryStatusOutput(BaseModel):
+    status: str
+    error_code: str | None
+    recovery_count: int
+
+
 @contextmanager
 def open_service():
-    """Fresh isolated local resources; startup does not call a model.
+    """Fresh isolated resources; no automatic A resume. B checks saved work.
 
 Timeout, output and compaction thresholds are explicit deployment values, not
 an undocumented resurrected initial policy or a promised hard dollar cap.
@@ -87,7 +93,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
     from analysis_agent.publication import Base as PublicationBase
 
     required = ('Q019_DATABASE_URL', 'OPENAI_API_KEY', 'Q019_REQUEST_TIMEOUT_SECONDS',
-                'Q019_MAX_OUTPUT_TOKENS', 'Q019_COMPACT_THRESHOLD')
+                'Q019_MAX_OUTPUT_TOKENS', 'Q019_COMPACT_THRESHOLD',
+                'Q019_BACKGROUND_POLL_SECONDS', 'Q019_BACKGROUND_MAX_RECOVERIES')
     missing = [name for name in required if not os.environ.get(name)]
     if missing:
         raise RuntimeError('Required settings missing: ' + ', '.join(missing))
@@ -97,8 +104,13 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
     timeout = float(os.environ['Q019_REQUEST_TIMEOUT_SECONDS'])
     output = int(os.environ['Q019_MAX_OUTPUT_TOKENS'])
     compaction = int(os.environ['Q019_COMPACT_THRESHOLD'])
+    poll_seconds = float(os.environ['Q019_BACKGROUND_POLL_SECONDS'])
+    recoveries = int(os.environ['Q019_BACKGROUND_MAX_RECOVERIES'])
+    text_threshold = int(os.environ['Q019_MEMORY_TEXT_THRESHOLD']) if os.environ.get('Q019_MEMORY_TEXT_THRESHOLD') else None
     if not 0 < timeout < float('inf') or output <= 0 or compaction <= 0:
         raise ValueError('Timeout/output/compaction settings must be positive and finite')
+    if not 0 < poll_seconds < float('inf') or recoveries < 0 or (text_threshold is not None and text_threshold <= 0):
+        raise ValueError('Invalid explicit background settings')
     dsn = make_conninfo(os.environ['Q019_DATABASE_URL'], connect_timeout=5,
                        options='-c statement_timeout=10000 -c lock_timeout=5000')
     with ExitStack() as stack:
@@ -123,6 +135,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
                          '一段訪談已有值得整理的資訊時，可通知背景記憶整理；不必每回合通知。')
         stack.callback(service.close)
         service.start()
+        service.enable_background(max_recoveries=recoveries, text_threshold=text_threshold)
+        service.start_background(poll_seconds=poll_seconds)
         yield service
 
 
@@ -180,6 +194,13 @@ def create_app(resources=open_service):
     @app.get('/documents/{document}/messages', response_model=list[MessageOutput])
     def messages(document: str):
         return app.state.service.messages(document)
+
+    @app.get('/documents/{document}/memory-status', response_model=MemoryStatusOutput)
+    def memory_status(document: str):
+        service = app.state.service
+        service.catalog.document(document)
+        return (service.background.status(document) if service.background else
+                {'status': 'disabled', 'error_code': None, 'recovery_count': 0})
 
     @app.get('/documents/{document}/runs', response_model=list[RunOutput])
     def runs(document: str):

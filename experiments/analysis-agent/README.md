@@ -4,6 +4,55 @@ Status: **native continuity + synchronous Agent + Memory read/publication + B1/B
 Not a runnable Web app, completed Memory generation/publication system, or live
 model-quality result. No legacy App imports.
 
+## Application wiring Task 1 — offline and PG verified
+
+`analysis_agent.conversation.build_conversation` adds a canonical `MessagesState`
+root with a directly registered official Agent subgraph. The child inherits the
+root Saver (`checkpointer=None`) and has fresh state per invocation, including
+the official persisted limits. The root retains full messages between inputs;
+it does not inherit the child's private counter channels. This is an execution
+scope, not a second model or independent conversation archive.
+
+Use a stable document `thread_id`, `durability="sync"`, and saved HumanMessage
+identity for a new input. To resume pending work use `invoke(None, config)`;
+inspect `get_state(config, subgraphs=True)` for its pending child messages and
+errors, not just root values. While pending, an older root `turn_outcome` is NOT
+the outcome of that pending child. Do not submit new input over pending work;
+admission, cancellation and safe abandonment are not implemented in this slice.
+
+Default limits are configurable 9 model calls / 8 tools. These allow the tested
+deep-read/correct/re-read/final-answer path; they are not price or HTTP-attempt
+limits. Runtime `turn_outcome` distinguishes provider-completed output from
+technical limit termination. Raw provider status/usage is preserved: absent
+usage is unknown, and synthetic limit messages are not successful AI replies.
+The existing source reader still rejects non-successful extraction windows.
+Runtime-generated notices are marked in message metadata and excluded from the
+visible source projection (not deleted from canonical history), so a short
+correction still references the actual preceding consultant question.
+
+Malformed tool JSON is distinct from schema validation in ToolNode. A public
+after-model hook preserves the native function call and returns its paired
+error result without executing a tool, then routes back through the official
+model budget check. One correction is allowed; a second malformed result ends
+with runtime `tool_error`. The retry count survives checkpoint resume. Missing
+call identity / unexpected parallel output remains fail-closed; safe abandonment
+still belongs to the next task. This is a thin application hook, not a private
+converter patch or a claim that ToolErrorMiddleware covers every parse error.
+
+Only synchronous provider invocation is wired. Characterization finds certain
+Responses SSE error events do not emerge as adapter exceptions; stream exhaustion
+must NOT be interpreted as successful provider completion. Product streaming is
+not enabled or certified here. SDK transient retries have no outer model/graph
+retry wrapper.
+
+Latest full result: **177 passed, 0 skipped** (including 16 existing PG cases + 2 new
+root/child/C PG cases). Initial offline result was159 passed/18 skipped; after
+Docker recovery the existing dedicated DB was available and all tests passed.
+Docker automatic restart remains an unresolved host issue; do not treat DB tests
+as proof of that fix. Task 2 / API / scheduler / UI remain unstarted at this save point.
+Full evidence, framework links
+and review findings: [Task 1 results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-conversation-lifecycle-results.md).
+
 ## Run
 
 Python 3.12 and uv, from this directory:

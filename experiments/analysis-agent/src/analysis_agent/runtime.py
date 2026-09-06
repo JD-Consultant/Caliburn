@@ -28,7 +28,7 @@ def native_context_view(
 def build_agent(
     *,
     model: BaseChatModel,
-    checkpointer: BaseCheckpointSaver,
+    checkpointer: BaseCheckpointSaver | None,
     instructions: str,
     tools: Sequence[BaseTool] = (),
     middleware: Sequence[AgentMiddleware] = (),
@@ -37,6 +37,8 @@ def build_agent(
 
     Invoke with a stable thread_id and durability="sync". After a failed pending
     step, resume with input=None rather than appending the employee message again.
+    Passing None as a direct subgraph inherits the parent's checkpointer with
+    per-invocation state; do not pass the root saver to that child explicitly.
     This slice is synchronous; async/streaming and concurrent-run admission are
     deliberately not claimed by this factory.
     """

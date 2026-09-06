@@ -89,6 +89,9 @@ class ConversationReader:
     def _visible(messages):
         visible, omitted = [], set()
         for message in messages:
+            if isinstance(message, AIMessage) and message.additional_kwargs.get('analysis_agent_origin') == 'runtime_notice':
+                omitted.add('runtime_notice')
+                continue
             if not isinstance(message, (HumanMessage, AIMessage)):
                 omitted.add(message.type)
                 continue

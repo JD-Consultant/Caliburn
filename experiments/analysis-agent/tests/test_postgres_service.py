@@ -133,6 +133,37 @@ def test_pg_main_service_reads_document_memory_and_keeps_native_items(pg_service
         assert not sent
 
 
+def test_pg_service_rebuild_validates_and_reads_memory_source_links(pg_service):
+    from test_memory_references import changed_reference
+    opened, owned = pg_service
+    with opened() as (service, sent, _):
+        doc = service.create_document('原文引用重建')['id']
+        owned.append(doc)
+        run = service.submit(doc, 'source', 'A案由處長核准。')
+        service.join(doc)
+        assert service.get_run(doc, run['id'])['status'] == 'completed'
+        context = service._context(doc)
+        reader = context.reader
+        last = context.graph.get_state(context.config).values['messages'][-1].id
+        ref = reader.capture(run['id'], last)
+        pub = context.memory.publication
+        detail = pub.artifacts.save_extraction(summary='A案：處長核准', candidates='核准責任',
+            slug='A', source_reference=ref)
+        version = pub.artifacts.save_memory(
+            knowledge=f'__{detail.summary_path}__\n[原話]({ref})', guide='A案')
+        pub.publish(pub.prepare(version, expected_revision=0, kind='repair'))
+    with opened() as (service, sent, _):
+        context = service._context(doc)
+        pub = context.memory.publication
+        pub.artifacts.verify_version(pub.current().memory)
+        assert '處長' in pub.artifacts.read_text(detail.summary_path)
+        assert context.reader.read(ref)['segments'][0]['text'] == 'A案由處長核准。'
+        with pytest.raises(ValueError, match='reference'):
+            pub.artifacts.validate_texts(knowledge=changed_reference(ref, checkpoint='missing'), guide='A')
+        assert pub.current().revision == 1
+        assert not sent, 'validation and deep source read must not call a model'
+
+
 @pytest.mark.parametrize('committed', [False, True])
 def test_pg_uncertain_repair_can_explicitly_resume_same_operation(pg_service, monkeypatch, committed):
     from analysis_agent.publication import PublicationUncertain

@@ -86,6 +86,7 @@ dependencies = [
     { name = "langgraph" },
     { name = "langgraph-checkpoint" },
     { name = "langgraph-checkpoint-postgres" },
+    { name = "markdown-it-py", extra = ["linkify"] },
     { name = "openai" },
     { name = "psycopg", extra = ["binary"] },
     { name = "sqlalchemy" },
@@ -108,6 +109,7 @@ requires-dist = [
     { name = "langgraph", specifier = "==1.2.11" },
     { name = "langgraph-checkpoint", specifier = "==4.2.0" },
     { name = "langgraph-checkpoint-postgres", specifier = "==3.1.2" },
+    { name = "markdown-it-py", extras = ["linkify"], specifier = "==4.2.0" },
     { name = "openai", specifier = "==3.8.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" },
     { name = "sqlalchemy", specifier = "==2.0.52" },
@@ -690,6 +692,41 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/f4/b7/74d0992a461eacad8106e5dcfd7677d7640b5ff4e12ea545856467004f4f/langsmith-0.12.2.tar.gz", hash = "sha256:ff369ba4390e0969dbb109e838281404ae637e76ef73b347336bae05b4f87331", size = 4860106, upload-time = "2026-09-05T20:26:19.925Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/0a/e1/5c751a0f1a14de49f19a2ebc0f5dfadfaf04a07f245c5f749ec31f263715/langsmith-0.12.2-py3-none-any.whl", hash = "sha256:ca2b6386cf452cf8edebf27c9c476503c18bad895e7ad566578393fa0ba7fea2", size = 760692, upload-time = "2026-09-05T20:26:18.166Z" },
+]
+
+[[package]]
+name = "linkify-it-py"
+version = "2.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/45/98/7a1a5f31fd5c7ba93e963b168e244b8e3dd705b3d2a718e3c3307583bf57/linkify_it_py-2.2.0.tar.gz", hash = "sha256:907acd2d17ac1fbb9ddb62c8957ccbd6158cac602231a15c3b0cd1e215f03cee", size = 32939, upload-time = "2026-08-29T07:07:08.305Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/13/d4/1152d1c7ab42d8b908be64fd200ddc870dc9d4925e951198702084aa1a7d/linkify_it_py-2.2.0-py3-none-any.whl", hash = "sha256:3adc40eb5af300b2605fcfdb968c24e1d780a90f1f2221af7c15e5111e94d443", size = 21971, upload-time = "2026-08-29T07:07:07.164Z" },
+]
+
+[[package]]
+name = "markdown-it-py"
+version = "4.2.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "mdurl" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/06/ff/7841249c247aa650a76b9ee4bbaeae59370dc8bfd2f6c01f3630c35eb134/markdown_it_py-4.2.0.tar.gz", hash = "sha256:04a21681d6fbb623de53f6f364d352309d4094dd4194040a10fd51833e418d49", size = 82454, upload-time = "2026-05-07T12:08:28.36Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b3/81/4da04ced5a082363ecfa159c010d200ecbd959ae410c10c0264a38cac0f5/markdown_it_py-4.2.0-py3-none-any.whl", hash = "sha256:9f7ebbcd14fe59494226453aed97c1070d83f8d24b6fc3a3bcf9a38092641c4a", size = 91687, upload-time = "2026-05-07T12:08:27.182Z" },
+]
+
+[package.optional-dependencies]
+linkify = [
+    { name = "linkify-it-py" },
+]
+
+[[package]]
+name = "mdurl"
+version = "0.1.2"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/d6/54/cfe61301667036ec958cb99bd3efefba235e65cdeb9c84d24a8293ba1d90/mdurl-0.1.2.tar.gz", hash = "sha256:bb413d29f5eea38f31dd4754dd7377d4465116fb207585f97bf925588687c1ba", size = 8729, upload-time = "2022-08-14T12:40:10.846Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b3/38/89ba8ad64ae25be8de66a6d463314cf1eb366222074cfda9ee839c56a4b4/mdurl-0.1.2-py3-none-any.whl", hash = "sha256:84008a41e51615a49fc9966191ff91509e3c40b939176e643fd50a5c2196b8f8", size = 9979, upload-time = "2022-08-14T12:40:09.779Z" },
 ]
 
 [[package]]

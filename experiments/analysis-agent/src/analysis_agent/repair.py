@@ -1,6 +1,5 @@
 """C: durable exact edits with public StateBackend; no model of its own."""
 from dataclasses import asdict, replace
-import re
 
 from deepagents.backends import StateBackend
 from deepagents.middleware.filesystem import FilesystemState
@@ -85,8 +84,6 @@ class RepairWorkflow:
     def _validate(self, state):
         try:
             material = staged_texts(self.artifacts)
-            for reference in set(re.findall(r"conversation:[A-Za-z0-9_=-]+", "\n".join(material.values()))):
-                self.source.read(reference)
         except ValueError as error:
             return {"outcome": {"status": "invalid_edit", "detail": str(error), "read_paths": list(PATHS.values())}}
         return {"material": material}

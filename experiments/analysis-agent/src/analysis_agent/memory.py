@@ -11,7 +11,8 @@ from deepagents.backends.protocol import BackendProtocol, LsResult
 from langgraph.config import get_config
 from langgraph.store.base import BaseStore
 
-from analysis_agent.sources import parse_reference
+from analysis_agent.references import controlled_references
+from analysis_agent.sources import ConversationReader, parse_reference
 
 
 @dataclass(frozen=True)
@@ -77,11 +78,14 @@ class ReadOnlyFiles(BackendProtocol):
 
 
 class MemoryArtifacts:
-    def __init__(self, store: BaseStore, document_id: str):
+    def __init__(self, store: BaseStore, document_id: str, *, source: ConversationReader | None = None):
         if not document_id or any(c in document_id for c in ("*", ".", "/", "\\")):
             raise ValueError("Expected runtime document identity, not a path")
         self.store = store
         self.document_id = document_id
+        if source is not None and source.document_id != document_id:
+            raise ValueError("Memory source reader belongs to another document")
+        self.source = source
 
     def _backend(self, *suffix: str):
         namespace = ("q019-memory", self.document_id, *suffix)
@@ -176,15 +180,23 @@ class MemoryArtifacts:
 
     def _validate_links(self, knowledge: str, guide: str):
         interviews = self._backend("interviews")
-        # Addresses are runtime-issued literal ASCII paths, not arbitrary URLs.
-        # Validate their occurrences regardless of Markdown presentation (inline,
-        # reference-style, code or bare path); this is not a Markdown parser.
-        for path in set(re.findall(r"/interviews/[A-Za-z0-9_./-]+", knowledge + "\n" + guide)):
-            # Issued filenames end in .md, never a period. A bare address can
-            # be followed by sentence punctuation without changing its target.
-            path = path.rstrip(".")
-            if interviews.read(path.removeprefix("/interviews"), limit=1).error:
-                raise ValueError("Memory reference is unavailable in this document")
+        for reference in sorted(controlled_references(knowledge) | controlled_references(guide)):
+            try:
+                if reference.startswith('conversation:'):
+                    parse_reference(reference, self.document_id)
+                    if self.source is None:
+                        raise ValueError('Canonical conversation reader is not configured')
+                    self.source.read(reference)
+                else:
+                    if not re.fullmatch(r'/interviews/[0-9a-f-]{36}/(?:summary|candidates)\.md', reference):
+                        raise ValueError('Expected an existing runtime interview artifact address')
+                    if interviews.read(reference.removeprefix('/interviews'), limit=1).error:
+                        raise ValueError('Artifact is unavailable in this document')
+            except ValueError as error:
+                # No semantic claims or new required evidence. This is the same
+                # check for B2 validation, C validation, save and publication.
+                raise ValueError(f'Invalid Memory reference {reference[:160]!r}: {error}. '
+                                 'Read the relevant record and copy its existing address; do not invent or re-encode one.') from error
 
     def verify_version(self, version: MemoryVersion) -> str:
         """Verify prepared bytes before publication; no writes or semantic claims."""

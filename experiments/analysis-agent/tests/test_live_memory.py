@@ -52,7 +52,7 @@ def h():
         graph.update_state(config, {'messages': [HumanMessage('例外由主管核准。', id='h0'), AIMessage('是由主管核准嗎？', id='a0', response_metadata={'status': 'completed'})]}, as_node='model')
         source = ConversationReader(graph, 'document-a')
         ref = source.capture('h0', 'a0')
-        artifacts = MemoryArtifacts(store, 'document-a')
+        artifacts = MemoryArtifacts(store, 'document-a', source=source)
         pub = PublicationStore(engine, artifacts)
         pub.setup()
         base = artifacts.save_memory(knowledge='例外由主管核准。', guide='主管核准：/memory/knowledge.md')

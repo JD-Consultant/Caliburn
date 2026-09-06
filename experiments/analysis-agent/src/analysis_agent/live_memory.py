@@ -117,7 +117,8 @@ class MemorySession(AgentMiddleware):
         failures = state["memory_repair_failures"] + int(failed)
         feedback = {**feedback, "retryable": failed and failures < 2}
         update = {"memory_repair_failures": failures,
-            "messages": [ToolMessage(json.dumps(feedback, ensure_ascii=False), tool_call_id=call_id)]}
+            "messages": [ToolMessage(json.dumps(feedback, ensure_ascii=False), tool_call_id=call_id,
+                status="error" if failed or feedback['status'] == 'repair_limit' else "success")]}
         if "head" in feedback:
             update["memory_read_head"] = feedback["head"]
         return Command(update=update)

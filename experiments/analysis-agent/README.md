@@ -7,6 +7,23 @@ no live-model quality claim and no legacy App imports.
 
 ## Current application entry — Task3 / Task4
 
+Memory reference follow-up (2026-09-07): `MemoryArtifacts(..., source=reader)`
+uses the same document's canonical `ConversationReader` at validation, save and
+pre-publication. The service provides this reader automatically. Artifact-only
+clients may omit it only when Memory contains no `conversation:` references;
+omission never bypasses raw-reference validation. The reader must use the
+compiled canonical conversation root, not a graph with an older state schema.
+
+Markdown presentation is parsed by markdown-it-py 4.2.0 (CommonMark), with its
+official linkify extra (linkify-it-py 2.2.0) recognizing external URI spans. Real detail
+links remain valid inside emphasis, code and reference-style links; malformed or
+unreadable controlled addresses cannot publish through either B2 or C. External
+URLs are not treated as local files. Exact link/code destinations are not silently
+rewritten. Validation preserves the stored Markdown and adds no required model
+fields, evidence requirement, model calls or semantic truth checks. Tool errors
+retain the existing instructive JSON/text and bounded correction path; C now also
+sets native `ToolMessage.status` consistently (not a new Responses wire feature).
+
 Use Python 3.12, the locked dependencies, a separate local `q019_` PostgreSQL
 database and one process. Set credentials externally; this entry never loads
 the old application's `.env`. Required variables:

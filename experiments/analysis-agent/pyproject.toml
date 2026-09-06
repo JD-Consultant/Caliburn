@@ -17,6 +17,7 @@ dependencies = [
     "fastapi==0.141.1",
     "uvicorn==0.52.4",
     "apscheduler==3.11.3",
+    "markdown-it-py[linkify]==4.2.0",
 ]
 
 [dependency-groups]

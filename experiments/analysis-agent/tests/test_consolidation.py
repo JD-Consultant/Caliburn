@@ -55,7 +55,7 @@ def harness():
         model = build_model(model="gpt-5.6-luna", api_key="offline", http_client=client).model_copy(update={"max_retries": 0})
         saver, store = InMemorySaver(), InMemoryStore()
         reader, ref = source(model, saver)
-        artifacts = MemoryArtifacts(store, reader.document_id)
+        artifacts = MemoryArtifacts(store, reader.document_id, source=reader)
         b1 = ExtractionWorkflow(reader, artifacts, model, saver)
         extracted = b1.start(ref)
         pub = PublicationStore(engine, artifacts)

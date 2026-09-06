@@ -123,7 +123,7 @@ class AnalysisService:
             base = build_conversation(**common)
             reader = ConversationReader(base, document)
             memory = (MemorySession(PublicationStore(self.catalog.engine,
-                       MemoryArtifacts(self.store, document)), reader) if self.store is not None else None)
+                       MemoryArtifacts(self.store, document, source=reader)), reader) if self.store is not None else None)
             graph = build_conversation(**common, tools=memory.tools if memory else (),
                                        middleware=[*([memory] if memory else []), BackgroundAvailability(self, document), CooperativeStop(stop)])
             reader.graph = graph

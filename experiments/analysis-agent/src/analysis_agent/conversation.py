@@ -19,6 +19,7 @@ from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 
 from analysis_agent.runtime import build_agent
+from analysis_agent.consolidation_request import REQUEST_TOOL_NAME, request_memory_consolidation
 
 
 def merge_turns(previous: dict, update: dict) -> dict:
@@ -129,7 +130,13 @@ def build_conversation(
     """
     if any(type(n) is not int or n <= 0 for n in (max_model_steps, max_tool_calls)):
         raise ValueError('Conversation limits must be positive integers')
-    child = build_agent(model=model, checkpointer=None, instructions=instructions, tools=tools,
+    # close_turn can classify this one known function as side-effect-free.
+    # A same-name replacement must not silently inherit that cancellation rule.
+    supplied = [*tools, *(t for item in middleware for t in getattr(item, 'tools', ()))]
+    if any(t.name == REQUEST_TOOL_NAME for t in supplied):
+        raise ValueError('request_memory_consolidation is reserved for the pure notification tool')
+    child = build_agent(model=model, checkpointer=None, instructions=instructions,
+        tools=[*tools, request_memory_consolidation],
         middleware=[
             # after_agent runs in reverse order: this is the final owned node.
             TurnOutcome(),
@@ -198,6 +205,11 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
             not_started = child and child.next and all(n.endswith('.after_model') for n in child.next)
             if not_started:
                 messages.append(ToolMessage('Tool not executed: this turn was closed before tool execution.',
+                    name=call['name'], tool_call_id=call['id'], status='error'))
+            elif call['name'] == REQUEST_TOOL_NAME:
+                # Worker is quiescent. This registered tool has no external
+                # effects; without a saved receipt no request was handed off.
+                messages.append(ToolMessage('整理請求未成功交接；本輪已停止，記憶尚未因此更新。',
                     name=call['name'], tool_call_id=call['id'], status='error'))
             elif call['name'] == 'repair_memory' and memory_session is not None:
                 command = memory_session.reconcile(state, message, call, config)

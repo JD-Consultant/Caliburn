@@ -1,8 +1,56 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
-Status: **native continuity + synchronous Agent + Memory read/publication + B1/B2 extraction/consolidation + explicit summary re-extraction**.
+Status: **native continuity + synchronous Agent + Memory read/publication + B1/B2 extraction/consolidation + explicit summary re-extraction + durable consolidation requests**.
 Not a runnable Web app, completed Memory generation/publication system, or live
 model-quality result. No legacy App imports.
+
+## Application wiring Task4a — consolidation request receipt
+
+`build_conversation` registers `request_memory_consolidation()` as a normal
+optional zero-argument tool. It only returns a short acknowledgement and an
+official `ToolMessage.artifact`; ToolNode and the existing Saver persist both.
+It does not call B1/B2, publish Memory, create an external job or wait for B.
+The model normally needs a continuation call to finish its interview answer;
+the existing 9-model/8-tool budget is unchanged. This is not zero-token signalling.
+
+The model sees the receipt, not the artifact. A saved receipt means "requested",
+not "Memory updated". The framework's no-argument StructuredTool ignores extra
+arguments; no model-supplied document, job or reason is consumed. The same-name
+tool is reserved in this composition so another effect cannot silently inherit
+its pure-notification cancellation rule.
+
+After a safely closed turn, use the read-only projection:
+
+```python
+requests = reader.pending_consolidation_turns(
+    after_reference=head.processed_source if head else None,
+)
+```
+
+Here `head` must be the successful current publication, not an in-flight job's
+planned range. Each result has the real `input_id` and `end_id`; it is neither a
+new message nor a queued job. Only an actual parsed notification call paired
+with its saved success/artifact counts. One turn's repeated requests coalesce.
+An unresolved earlier source blocks later turns; a partial published cursor
+does not consume later requests. Comparison uses canonical order, not UUID
+sorting. Reading never clears anything or invokes a model.
+
+After the worker is confirmed quiescent, `close_turn` can seal a notification
+whose result was not saved with one paired error. It preserves an already saved
+success. This does not weaken `repair_memory` receipt reconciliation or classify
+unknown external effects as failed. Both interrupted paths allow a later input
+without discarding the employee's earlier message.
+
+**Still not connected:** Task3 API/worker, the rest of Task4 scheduling/new-text
+fallback, and next-normal-run background failure context. No notification/outbox
+table, idle timer, turn-count trigger, guessed character threshold, UI or paid
+model call is added here. No claim yet that a running background worker cannot
+block the API: that requires the next service integration test.
+
+Evidence and remaining gates:
+[Task4a plan](../../docs/plans/2026-09-06-memory-consolidation-notification-slice.md),
+[Task4a results](../../docs/specs/2026-09-06-memory-consolidation-notification-results.md),
+[approved notification policy](S:/caliburn/docs/specs/2026-09-06-memory-consolidation-request-wiring-design.md).
 
 ## Summary re-extraction — Q019-MEM-SUMMARY-01
 

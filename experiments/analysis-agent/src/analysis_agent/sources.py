@@ -11,6 +11,8 @@ import json
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.graph.state import CompiledStateGraph
 
+from analysis_agent.consolidation_request import has_saved_request
+
 
 def parse_reference(reference: str, document_id: str) -> dict[str, str]:
     try:
@@ -43,6 +45,38 @@ class ConversationReader:
         if checkpoint_id and snapshot.config["configurable"].get("checkpoint_id") != checkpoint_id:
             raise ValueError("Conversation source checkpoint does not match")
         return snapshot
+
+    def pending_consolidation_turns(self, after_reference: str | None = None) -> list[dict[str, str]]:
+        """Read durable requests not yet covered by a successful B source cursor.
+
+        No acknowledgement flag, queue, write or model call. Partial publication
+        cannot consume a later request. The dispatcher must still enforce B job
+        admission, snapshot the actual source and wait for safe source closure.
+        """
+        after_id = None
+        if after_reference is not None:
+            ref = parse_reference(after_reference, self.document_id)
+            self._extraction_range(after_reference)  # actual saved, safe whole turns
+            after_id = ref['last']
+        snapshot = self.graph.get_state({'configurable': {'thread_id': self.document_id}})
+        ids = [m.id for m in snapshot.values.get('messages', [])]
+        if after_id is not None and after_id not in ids:
+            raise ValueError('Processed source is unavailable in the current conversation')
+        if not ids:
+            return []
+        after_index = ids.index(after_id) if after_id is not None else -1
+        positions = {message_id: i for i, message_id in enumerate(ids)}
+        pending = []
+        for group in self._groups(snapshot):
+            boundary = snapshot.values.get('closed_turns', {}).get(group[0].id)
+            # Notifications require our explicit runtime boundary. Older
+            # genuinely completed interview sources still use _turn_status.
+            if self._turn_status(snapshot, group) is None:
+                break
+            if (boundary and positions[group[-1].id] > after_index
+                    and has_saved_request(group)):
+                pending.append({'input_id': group[0].id, 'end_id': group[-1].id})
+        return pending
 
     @staticmethod
     def _range(snapshot, first: str, last: str):

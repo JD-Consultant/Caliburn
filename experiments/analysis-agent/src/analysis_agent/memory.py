@@ -4,7 +4,7 @@ from dataclasses import dataclass
 import hashlib
 import json
 import re
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from deepagents.backends import CompositeBackend, StoreBackend
 from deepagents.backends.protocol import BackendProtocol, LsResult
@@ -129,9 +129,10 @@ class MemoryArtifacts:
         name = re.sub(r"[^\w -]", "", slug, flags=re.UNICODE).strip()[:80] or "訪談詳記"
         batch = str(uuid4())
         backend = self._backend("interviews")
-        header = f"# {name}\n\nSource: {source_reference}\nSource scope: complete input range, not per-sentence attribution.\n\n"
-        if context_reference is not None:
-            header += f"Context only (not new source): {context_reference}\n\n"
+        header = f"<!-- q019-extraction-source:v1 -->\n# {name}\n\nSource: {source_reference}\nSource scope: complete input range, not per-sentence attribution.\n\n"
+        # Explicit empty value and terminator separate runtime metadata from
+        # arbitrary generated prose, even when prose resembles our old header.
+        header += f"Context only (not new source): {context_reference or 'none'}\nEnd source metadata.\n\n"
         summary_path = f"/{batch}/summary.md"
         candidates_path = f"/{batch}/candidates.md"
         self._save(backend, summary_path, header + summary)
@@ -148,6 +149,30 @@ class MemoryArtifacts:
         self._save(backend, "/memory/knowledge.md", knowledge)
         self._save(backend, "/memory/guide.md", guide)
         return version
+
+    def extraction_window(self, summary_path: str) -> dict:
+        """Recover runtime-written source metadata, not model-authored attribution.
+
+        Published artifacts remain immutable. A new extraction gets new paths;
+        this address still identifies the old snapshot, never a mutable case.
+        """
+        match = re.fullmatch(r"/interviews/([0-9a-f-]+)/summary\.md", summary_path)
+        if not match or str(UUID(match[1])) != match[1]:
+            raise ValueError("Expected a runtime interview summary address")
+        text = self.read_text(summary_path)
+        header = re.match(
+            r"\A<!-- q019-extraction-source:v1 -->\n# [^\n]*\n\nSource: ([^\n]+)\n"
+            r"Source scope: complete input range, not per-sentence attribution\.\n\n"
+            r"Context only \(not new source\): ([^\n]+)\nEnd source metadata\.\n\n", text)
+        if header is None:
+            raise ValueError("Unambiguous runtime source header unavailable; historical reading is allowed, automatic re-extraction is not")
+        source, context = header.groups()
+        context = None if context == "none" else context
+        parse_reference(source, self.document_id)
+        if context is not None:
+            parse_reference(context, self.document_id)
+        self.read_text(summary_path.removesuffix("summary.md") + "candidates.md")
+        return {"source_reference": source, "context_reference": context}
 
     def _validate_links(self, knowledge: str, guide: str):
         interviews = self._backend("interviews")

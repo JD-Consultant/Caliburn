@@ -28,7 +28,10 @@ def memory_access(artifacts: MemoryArtifacts, version: MemoryVersion, source: Co
                 "grep /memory/knowledge.md and read_file only when relevant. Follow "
                 "interview links for details, then read_conversation for exact visible "
                 "question/answer text. Use returned offsets until enough, not always to EOF. "
-                "No search match does not prove absence.\n"
+                "No search match does not prove absence. A detail summary is a historical "
+                "source snapshot, not guaranteed current case truth; first check relevant "
+                "knowledge for later corrections and follow its references. If context "
+                "conflicts, verify or ask; do not pick a claim just because it is later.\n"
                 f"<memory_guide version='{version.version_id}'>\n{guide}\n</memory_guide>"
             )})
             return handler(request.override(system_message=SystemMessage(content=base)))

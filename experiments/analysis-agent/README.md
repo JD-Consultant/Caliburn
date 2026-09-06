@@ -1,8 +1,57 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
-Status: **native continuity + synchronous Agent + Memory read/publication + B1/B2 extraction/consolidation**.
+Status: **native continuity + synchronous Agent + Memory read/publication + B1/B2 extraction/consolidation + explicit summary re-extraction**.
 Not a runnable Web app, completed Memory generation/publication system, or live
 model-quality result. No legacy App imports.
+
+## Summary re-extraction — Q019-MEM-SUMMARY-01
+
+This is an explicit runtime maintenance action, not an every-turn tool or a
+separate employee conversation. Use existing B1/B2 objects with the same
+document, official Saver/Store and publication service:
+
+```python
+result = b1.reextract(existing_summary_path)
+published = b2.start_reextraction(existing_summary_path)
+```
+
+After an interrupted B1 use `b1.resume_reextraction(existing_summary_path)`;
+after interrupted B2 use `b2.resume()`. Do not replace a pending job. As with
+ordinary B1/B2, callers must serialize background jobs per document; this slice
+is not a scheduler or concurrent API admission layer. A deliberate new
+`reextract` after success generates new artifacts; replaying the same completed
+B2 artifact batch uses its receipt without another model call, even after other
+jobs. `reextraction_config(path)` is a technical checkpoint address, not a new
+user-visible thread, source copy or case record.
+
+- Runtime reads the saved source/context header and uses that exact range.
+  Oversize input fails rather than dropping its middle. No new model fields:
+  the existing `rollout_summary`, `raw_memory`, `rollout_slug` remain the schema.
+- New summary/candidate paths are saved; old artifacts and original messages
+  remain readable. The summary filename is not a case identity. Explicit empty
+  context, a file-start format marker and a runtime header terminator prevent generated prose being parsed
+  as source metadata. Old experiment artifacts lacking that unambiguous header
+  can still be read, but automatic re-extraction fails instead of guessing; no
+  old data is migrated or deleted by this slice.
+- B2 receives real old/new addresses plus fresh candidates, reviews current
+  knowledge and relevant details, then updates conclusions/references as
+  appropriate. A case-only correction matters even if the general work pattern
+  remains the same. This is an instruction to the model, not a deterministic
+  proof of semantic completeness or that every citation was updated correctly.
+- Re-extraction publishes via existing `repair` semantics: preserve the ordinary
+  processed-source cursor, retain repair source receipts, CAS the head only
+  after prepared artifacts validate. A concurrent C change causes bounded B2
+  reconsideration, not B1 re-extraction. Failed attempts retain the previous head.
+- A follows current knowledge before opening historical details. Old detail
+  addresses do not automatically redirect to later corrections; no all-history
+  rewriting, case CRUD or direct JD editing was added.
+
+Sources, tests and scope: [slice results](../../docs/specs/2026-09-06-summary-reextraction-results.md).
+OpenAI producer/consumer evidence is in the
+[main source review](S:/caliburn/docs/specs/2026-09-06-openai-rollout-summary-correction-source-review.md).
+This implementation maps the approved concepts onto our frameworks; immutable
+versions, technical job IDs and SQL publication are not claims about identical
+OpenAI internals.
 
 ## Application wiring Task 1 — offline and PG verified
 

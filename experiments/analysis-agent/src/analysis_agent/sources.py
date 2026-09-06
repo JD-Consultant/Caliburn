@@ -135,17 +135,14 @@ class ConversationReader:
             return 'completed'
         return None
 
-    def extraction_windows(self, reference: str, *, max_chars: int = 6000, context_chars: int = 1500) -> list[dict]:
-        """Plan complete human-to-final-assistant turns in one saved checkpoint.
-
-        Only references are returned. Oversize turns fail rather than lose their
-        middle. Context must include the nearest prior visible assistant message
-        through the previous turn's end, including intervening employee answers.
-        """
+    @staticmethod
+    def _extraction_limits(max_chars: int, context_chars: int):
         if type(max_chars) is not int or not 1 <= max_chars <= 24000:
             raise ValueError("max_chars must be between 1 and 24000")
         if type(context_chars) is not int or not 0 <= context_chars < max_chars:
             raise ValueError("context_chars must be non-negative and smaller than max_chars")
+
+    def _extraction_range(self, reference: str):
         ref = parse_reference(reference, self.document_id)
         snapshot = self._snapshot(ref["checkpoint"])
         if snapshot.next or any(t.interrupts or t.error for t in snapshot.tasks):
@@ -159,6 +156,34 @@ class ConversationReader:
         if any(self._turn_status(snapshot, g) is None for g in groups[:last + 1]):
             raise ValueError("Extraction requires completed or safely closed turns; cannot skip unresolved source")
         sizes = [sum(len(t) for _, _, t in self._visible(g)[0]) for g in groups]
+        return snapshot, groups, first, last, sizes
+
+    def validate_saved_window(self, source_reference: str, context_reference: str | None,
+                              *, max_chars: int, context_chars: int) -> None:
+        """Validate an existing exact window without selecting new context.
+
+        Source/context were captured by Runtime when this artifact was made.
+        Re-extraction must not enlarge that input just because budgets changed.
+        """
+        self._extraction_limits(max_chars, context_chars)
+        _, _, first, last, sizes = self._extraction_range(source_reference)
+        context_size = 0
+        if context_reference is not None:
+            ref = parse_reference(context_reference, self.document_id)
+            context = self._range(self._snapshot(ref["checkpoint"]), ref["first"], ref["last"])
+            context_size = sum(len(text) for _, _, text in self._visible(context)[0])
+        if context_size > context_chars or context_size + sum(sizes[first:last + 1]) > max_chars:
+            raise ValueError("Saved source/context exceed the extraction budget; not truncated or replanned")
+
+    def extraction_windows(self, reference: str, *, max_chars: int = 6000, context_chars: int = 1500) -> list[dict]:
+        """Plan complete human-to-final-assistant turns in one saved checkpoint.
+
+        Only references are returned. Oversize turns fail rather than lose their
+        middle. Context must include the nearest prior visible assistant message
+        through the previous turn's end, including intervening employee answers.
+        """
+        self._extraction_limits(max_chars, context_chars)
+        snapshot, groups, first, last, sizes = self._extraction_range(reference)
         if any(n > max_chars for n in sizes[first:last + 1]):
             raise ValueError("A complete turn exceeds the extraction limit; do not truncate it")
         windows, index = [], first

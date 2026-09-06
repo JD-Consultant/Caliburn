@@ -49,6 +49,7 @@ rollout_summary 用繁體中文 Markdown 詳記具體工作、案例別名、數
 
 class ExtractionState(TypedDict):
     source_reference: str
+    replaces_summary: str | None
     windows: list[dict]
     position: int
     files: list[dict]
@@ -94,17 +95,44 @@ class ExtractionWorkflow:
         windows = self._plan(source_reference)
         if snapshot.values:
             self.reader.require_new_source_after(source_reference, snapshot.values["source_reference"])
-        return self.graph.invoke({"source_reference": source_reference, "windows": windows, "position": 0,
+        return self.graph.invoke({"source_reference": source_reference, "replaces_summary": None, "windows": windows, "position": 0,
                                   "files": [], "extracted": None, "raw_response": None},
                                  self.config, durability="sync")
 
     def resume(self) -> dict:
-        snapshot = self.graph.get_state(self.config)
+        return self._resume(self.config)
+
+    def _resume(self, config: dict) -> dict:
+        snapshot = self.graph.get_state(config)
         if not snapshot.values:
             raise ValueError("No extraction job to resume")
         if not snapshot.next:
             return snapshot.values
-        return self.graph.invoke(None, self.config, durability="sync")
+        return self.graph.invoke(None, config, durability="sync")
+
+    def reextraction_config(self, summary_path: str) -> dict:
+        """Technical job identity only, not another employee conversation."""
+        self.artifacts.extraction_window(summary_path)
+        route = str(uuid5(NAMESPACE_URL, "q019-b1-reextract:" + self.reader.document_id + ":" + summary_path))
+        return {**self.config, "configurable": {"thread_id": route}}
+
+    def reextract(self, summary_path: str) -> dict:
+        """Explicitly regenerate one saved window; does not move normal B1 state.
+
+        A new call after success is a new extraction. After a failure, resume
+        the saved job instead. The caller serializes B jobs, as for start().
+        """
+        config = self.reextraction_config(summary_path)
+        if self.graph.get_state(config).next:
+            raise ValueError("Re-extraction has a pending job; resume_reextraction instead")
+        window = self.artifacts.extraction_window(summary_path)
+        self.reader.validate_saved_window(**window, max_chars=self.max_chars, context_chars=self.context_chars)
+        return self.graph.invoke({"source_reference": window["source_reference"],
+            "replaces_summary": summary_path, "windows": [window], "position": 0,
+            "files": [], "extracted": None, "raw_response": None}, config, durability="sync")
+
+    def resume_reextraction(self, summary_path: str) -> dict:
+        return self._resume(self.reextraction_config(summary_path))
 
     def _plan(self, source_reference: str) -> list[dict]:
         windows = self.reader.extraction_windows(source_reference, max_chars=self.max_chars, context_chars=self.context_chars)

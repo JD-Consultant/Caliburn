@@ -2,7 +2,7 @@
 
 Caller owns clients and serializes B jobs. No scheduler, JD or C user tool.
 """
-from dataclasses import asdict
+from dataclasses import asdict, replace
 import json
 from typing import TypedDict
 from uuid import NAMESPACE_URL, uuid5
@@ -27,6 +27,10 @@ NEW_CANDIDATES 是尚未整併的候選；提供的詳記地址可按需搜尋�
 按主題去重、補充、修訂並保留條件、例外、案例差異與未知。不要把每個網站案例機械新增成同一工作。
 正文保留適用情況、可搜尋關鍵詞及系統提供的真實 /interviews/.../summary.md 引用。
 詳記保存案例特殊細節；導覽僅放路由／別名，不複製所有細節。不得只靠導覽重建未讀的正文。
+案例更正即使共同工作模式沒有改，也須在相關主題保留目前說法、案例別名和新詳記引用，避免回查誤用舊細節。
+REEXTRACTION 非空表示同段原文重新抽取；不是員工後來改口，也不代表更晚的新事實。
+依提供的新舊詳記地址核對受影響的結論及引用；更新目前依據，不機械覆寫其他案例或後續已核實更正。
+舊詳記可保留歷史引用，但不能把已知錯誤當目前成立；不要為同步而重寫所有詳記。
 已存在正文優先用 read_file/grep 找相關段落再 edit_file；write_file 會覆寫整檔，只有掌握完整內容才用。
 RECENT_REPAIRS 是本次舊基準之後真正發布的修補問答。不得用更早候選靜默蓋回已修補知識。
 原話衝突有歧義時保留未知／引用，不自行判定最新一句一定正確；詳記不足保留不確定，不虛構。
@@ -38,6 +42,7 @@ RECENT_REPAIRS 是本次舊基準之後真正發布的修補問答。不得用�
 
 class JobState(TypedDict):
     source_reference: str
+    replaces_summary: str | None
     files: list[dict]
     attempt: int
     base_revision: int | None
@@ -87,17 +92,30 @@ class ConsolidationWorkflow:
 
     def start(self) -> dict:
         extracted = self.extraction.graph.get_state(self.extraction.config)
+        return self._start(extracted)
+
+    def start_reextraction(self, summary_path: str) -> dict:
+        config = self.extraction.reextraction_config(summary_path)
+        return self._start(self.extraction.graph.get_state(config))
+
+    def _start(self, extracted) -> dict:
         if extracted.next or not extracted.values or not extracted.values.get("files"):
             raise ValueError("B1 must have completed before consolidation starts")
         snapshot = self.graph.get_state(self.config)
         if snapshot.next:
             raise ValueError("Consolidation has a pending job; resume instead")
         ref = extracted.values["source_reference"]
-        if snapshot.values and snapshot.values["source_reference"] == ref:
+        replaced = extracted.values.get("replaces_summary")
+        if (snapshot.values and snapshot.values["source_reference"] == ref
+                and snapshot.values["files"] == extracted.values["files"]
+                and snapshot.values.get("replaces_summary") == replaced):
             return snapshot.values
-        initial = {"source_reference": ref, "files": extracted.values["files"],
+        initial = {"source_reference": ref, "files": extracted.values["files"], "replaces_summary": replaced,
             "attempt": 0, "base_revision": None, "used_model_steps": 0, "used_tool_calls": 0,
             "material": None, "version": None, "request": None, "stale": False, "result": None}
+        receipt = self.publication.receipt(self._operation_id(initial))
+        if receipt:
+            return {**initial, "result": asdict(receipt.result)}
         # Reject unavailable/oversize input before reserving a durable job.
         # The load node still rechecks the current head after admission.
         self._load(initial)
@@ -111,9 +129,10 @@ class ConsolidationWorkflow:
 
     def _load(self, state: JobState) -> dict:
         head = self.publication.current()
-        if head and head.processed_source == state["source_reference"]:
+        replaced = state.get("replaces_summary")
+        if not replaced and head and head.processed_source == state["source_reference"]:
             return {"result": asdict(head), "stale": False}
-        if head and head.processed_source:
+        if not replaced and head and head.processed_source:
             self.reader.require_new_source_after(state["source_reference"], head.processed_source)
         if state["used_model_steps"] >= self.max_model_steps or state["used_tool_calls"] >= self.max_tool_calls:
             raise ValueError("Consolidation job limit reached; no new attempt or publication")
@@ -129,6 +148,7 @@ class ConsolidationWorkflow:
         repairs = self._repair_input(state["base_revision"], revision)
         return {"base_revision": revision, "seed": seed, "attempt": state["attempt"] + 1,
             "payload": {"NEW_CANDIDATES": candidates, "MEMORY_FILES": PATHS,
+                        "REEXTRACTION": {"old_summary_path": replaced, "new_summary_path": state["files"][0]["summary_path"]} if replaced else None,
                         "GUIDE": seed["guide"], "RECENT_REPAIRS": repairs},
             "material": None, "version": None, "request": None, "stale": False}
 
@@ -200,9 +220,20 @@ class ConsolidationWorkflow:
         return {"version": asdict(self.artifacts.save_memory(**state["material"]))}
 
     def _prepare(self, state: JobState) -> dict:
+        replacement = bool(state.get("replaces_summary"))
         request = self.publication.prepare(MemoryVersion(**state["version"]), expected_revision=state["base_revision"],
-            kind="consolidation", processed_source=state["source_reference"])
-        return {"request": asdict(request)}
+            kind="repair" if replacement else "consolidation",
+            processed_source=None if replacement else state["source_reference"],
+            repair_sources=(state["source_reference"],) if replacement else ())
+        return {"request": asdict(replace(request, operation_id=self._operation_id(state)))}
+
+    def _operation_id(self, state: JobState) -> str:
+        # Immutable runtime-issued artifact addresses identify the exact input
+        # batch, including a deliberate regeneration of the same source. Reuse
+        # the existing receipt for retries after other jobs have since run.
+        identity = json.dumps([self.artifacts.document_id, state["source_reference"],
+            state["files"], state.get("replaces_summary")], sort_keys=True)
+        return str(uuid5(NAMESPACE_URL, "q019-b2-artifacts:" + identity))
 
     def _publish(self, state: JobState) -> dict:
         data = dict(state["request"])

@@ -21,6 +21,7 @@ def changed_reference(reference, **changes):
 @pytest.mark.parametrize('format_', [
     '{}', '__{}__', '_{}_', '**{}**', '*{}*', '`{}`', '<{}>',
     '[詳記]({})', '[詳記][a]\n\n[a]: {}', '```text\n{}\n```',
+    '{}（接案前端專案分工與驗收）。',
 ])
 def test_real_summary_in_markdown_is_publishable_and_preserved(h, format_):
     files = h.artifacts.save_extraction(summary='A案例', candidates='核准', slug='A', source_reference=h.ref)
@@ -132,6 +133,7 @@ def test_external_url_is_not_a_local_artifact_reference(h, text):
 @pytest.mark.parametrize('format_', [
     '`{}.`', '```text\n{}.\n```', '[detail]({}.)',
     '`{}。`', '```text\n{}。\n```', '`{}；`', '[detail]({}。)',
+    '`{}（說明）`', '```text\n{}（說明）\n```', '[detail]({}（說明）)',
 ])
 def test_explicit_literal_address_is_not_silently_repaired(h, format_):
     files = h.artifacts.save_extraction(summary='A', candidates='A', slug='A', source_reference=h.ref)

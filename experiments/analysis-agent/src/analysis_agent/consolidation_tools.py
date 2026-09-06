@@ -70,6 +70,10 @@ def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
         "/interviews/": artifacts.interview_backend()}), artifacts.document_id, thread_id=thread_id)
     filesystem = FilesystemMiddleware(backend=backend,
         tools=["ls", "grep", "read_file", "write_file", "edit_file"],
+        custom_tool_descriptions={"ls":
+            "List files in a directory when the file address is unknown. "
+            "Runtime-provided MEMORY_FILES and summary_path addresses are already valid; "
+            "read them directly without listing their directories first."},
         human_message_token_limit_before_evict=None, tool_token_limit_before_evict=4000)
 
     @tool

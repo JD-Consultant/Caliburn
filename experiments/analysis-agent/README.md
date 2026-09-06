@@ -6,10 +6,20 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 final synchronous Responses context budgeting**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
-Latest wiring verification (2026-09-07): **514 passed / 0 skipped (71.95s)**,
+Latest bounded prompt experiment (2026-09-07): **27 real Luna/medium requests,
+US$0.01252361 reported** across three runs. All stopped at the first B2's existing
+8-model-step limit; no published Memory or later correction/recall quality claim.
+Two observed local issues are repaired: known-path B2 discovery uses the official
+tool-description override, and Chinese prose parentheses no longer pollute a
+reference address. Explicit links/code remain exact. **184 focused tests pass**;
+independent review accepted these two fixes only. Analysis prompts/Skills,
+publication rules and limits are unchanged; no broad refactor.
+[Experiment, evidence, fixes and untested boundaries](../../docs/specs/2026-09-07-memory-prompt-live-calibration.md).
+
+Earlier context/Skills wiring verification (2026-09-07): **514 passed / 0 skipped (71.95s)**,
 including dedicated PostgreSQL; one existing TestClient deprecation warning.
 Independent Skills, budget and whole-batch reviews are approved; compileall,
-offline lock and diff checks pass. Paid model calls: zero. This covers wiring
+offline lock and diff checks pass. Paid model calls in that earlier slice: zero. This covers wiring
 and failure handling, not natural interview quality or live endpoint latency.
 [Current results, official sources and remaining limits](../../docs/specs/2026-09-07-context-budget-and-analysis-skills-results.md).
 

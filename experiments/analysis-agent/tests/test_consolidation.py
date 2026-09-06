@@ -110,6 +110,20 @@ def test_invalid_reference_returns_tool_error_then_model_can_repair(harness):
     assert path in knowledge(h) and "missing" not in knowledge(h)
 
 
+def test_known_summary_path_is_read_directly_without_discovery_instruction(harness):
+    # This checks the real tool wire contract/execution, not model compliance.
+    # Removing the description override must restore the conflicting default.
+    h = harness
+    path = h.extracted["files"][0]["summary_path"]
+    h.replies.extend([call("read_file", file_path=path), done()])
+    workflow_class()(h.b1, h.pub, h.model, h.saver).start()
+    listed = next(t for t in h.sent[1]["tools"] if t["name"] == "ls")
+    assert "almost ALWAYS" not in listed["description"]
+    assert "Runtime-provided" in listed["description"]
+    assert "A網站：單次付款" in json.dumps(h.sent[2], ensure_ascii=False)
+    assert h.pub.current().revision == 1
+
+
 @pytest.mark.parametrize("path", ["/interviews/forged.md", "/other-doc/memory.md"])
 def test_tools_cannot_write_outside_staging(harness, path):
     cls = workflow_class()

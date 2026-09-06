@@ -10,7 +10,7 @@ from linkify_it import LinkifyIt
 
 
 PREFIXES = ('/interviews/', 'conversation:')
-_LITERAL = re.compile(r'''(?<![A-Za-z0-9_/:?=&%#@.+~-])(?:/interviews/|conversation:)[^\s<>()\[\]`"'，。；！？：、]*''')
+_LITERAL = re.compile(r'''(?<![A-Za-z0-9_/:?=&%#@.+~-])(?:/interviews/|conversation:)[^\s<>()（）\[\]`"'，。；！？：、]*''')
 _CODE_LITERAL = re.compile(r'''(?<![A-Za-z0-9_/:?=&%#@.+~-])(?:/interviews/|conversation:)[^\s<>()\[\]`"']*''')
 
 

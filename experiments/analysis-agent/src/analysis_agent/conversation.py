@@ -181,6 +181,10 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
         raise ValueError('Unexpected pending conversation node')
     task = next(t for t in snapshot.tasks if t.name == 'analysis')
     child = task.state
+    # An admitted root input can precede the first child checkpoint. The public
+    # state API returns an empty child snapshot, not necessarily None.
+    if child and hasattr(child, 'values') and not child.values.get('messages'):
+        child = None
     state = child.values if child and hasattr(child, 'values') else snapshot.values
     messages = list(state['messages'])
     human_index = max(i for i, m in enumerate(messages) if isinstance(m, HumanMessage))

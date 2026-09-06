@@ -1,8 +1,69 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
-Status: **native continuity + synchronous Agent + Memory read/publication + B1/B2 extraction/consolidation + explicit summary re-extraction + durable consolidation requests**.
-Not a runnable Web app, completed Memory generation/publication system, or live
-model-quality result. No legacy App imports.
+Status: **analysis-only local API + native continuity + Memory read/publication +
+B1/B2 extraction/consolidation + explicit summary re-extraction + durable
+consolidation requests**. No Web UI or automatic background dispatcher yet;
+no live-model quality claim and no legacy App imports.
+
+## Current application entry — Task3
+
+Use Python 3.12, the locked dependencies, a separate local `q019_` PostgreSQL
+database and one process. Set credentials externally; this entry never loads
+the old application's `.env`. Required variables:
+
+| Variable | Meaning |
+|---|---|
+| `Q019_DATABASE_URL` | Dedicated localhost PostgreSQL DSN, not the production DB |
+| `OPENAI_API_KEY` | Provider credential; never commit or print it |
+| `Q019_REQUEST_TIMEOUT_SECONDS` | Positive finite per-attempt timeout, passed to the actual SDK |
+| `Q019_MAX_OUTPUT_TOKENS` | Positive per-response output bound |
+| `Q019_COMPACT_THRESHOLD` | Explicit positive native compaction threshold for the chosen model |
+| `Q019_MODEL` (optional) | Defaults to `gpt-5.6-luna`; medium / all_turns native binding |
+
+There is no guessed universal output/compaction value. The 32,000 / 1,000 / 13s
+values in tests only verify wiring, not recommended product budgets. An output
+cap, SDK attempt timeout and 9-model/8-tool turn limits are not a dollar cap.
+SDK transient retry remains native; no outer model/graph retry is added.
+
+```powershell
+uv sync --locked
+uv run --no-sync uvicorn analysis_agent.api:create_app --factory --app-dir src --host 127.0.0.1 --port 8091 --workers 1 --no-proxy-headers
+```
+
+Startup initializes the official Saver/Store and small ORM catalog/publication
+tables; it reconciles pending status but does not invoke a paid model. Do not use
+multiple workers, reload or multiple server processes against this isolated DB.
+`/docs` is the generated API reference, **not the planned employee UI**.
+
+- `POST/GET /documents`: create/list independent interview documents.
+- `POST /documents/{id}/runs`: `{request_key, text, abandon_pending?}`. The same
+  key/text returns the same saved input; different text under that key conflicts.
+  Accepted means the input is confirmed in Saver, not that AI has finished.
+- `GET /documents/{id}/messages` and `/runs[/{run_id}]`: visible human/assistant
+  text and safe status/usage projection. Native reasoning and tool internals
+  stay in canonical checkpoints and do not cross this UI seam.
+- `POST /documents/{id}/runs/{run_id}/stop`: cooperative stop, not thread killing.
+  An already entered SDK call (including its retries) or tool reaches its safe
+  boundary first. Then the next model/tool is not started. Closing a browser
+  request does not stop the worker. Server shutdown joins before closing clients.
+- `POST /documents/{id}/runs/{run_id}/resume`: explicit same-checkpoint continuation
+  only when `can_resume` is true; counters and resume count survive reopening.
+  The known C repair can reconcile/replay its saved operation, including lost
+  publication replies. Arbitrary unknown effects are not declared safe to retry.
+- A quiescent interrupted input can be explicitly abandoned when submitting new
+  text. Unknown publication must be resolved first. Old employee messages and
+  completed Memory publications are never removed or reverted by cancellation.
+
+Same-document active work rejects another input. Loopback/Host/same-origin
+restrictions match the single-local-operator scope; this is not authentication
+or a cloud/multi-user service. Catalog stores routing/hash/status, not another
+message body archive. Provider usage comes from returned metadata; unobserved
+failed usage is unknown, not zero or an estimated bill.
+
+Current evidence, review and limitations:
+[Task3 result](../../docs/specs/2026-09-06-analysis-only-agent-api-results.md).
+The following sections retain the earlier slice history; their “not yet”
+statements describe those savepoints, not this current application entry.
 
 ## Application wiring Task4a — consolidation request receipt
 
@@ -41,7 +102,7 @@ success. This does not weaken `repair_memory` receipt reconciliation or classify
 unknown external effects as failed. Both interrupted paths allow a later input
 without discarding the employee's earlier message.
 
-**Still not connected:** Task3 API/worker, the rest of Task4 scheduling/new-text
+**Still not connected:** the rest of Task4 scheduling/new-text
 fallback, and next-normal-run background failure context. No notification/outbox
 table, idle timer, turn-count trigger, guessed character threshold, UI or paid
 model call is added here. No claim yet that a running background worker cannot

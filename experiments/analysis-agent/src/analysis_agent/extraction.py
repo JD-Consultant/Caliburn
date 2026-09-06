@@ -13,7 +13,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from analysis_agent.memory import MemoryArtifacts, _prepare_text
 from analysis_agent.sources import ConversationReader, parse_reference
@@ -55,33 +55,47 @@ class ExtractionState(TypedDict):
     files: list[dict]
     extracted: dict | None
     raw_response: AIMessage | None
+    candidate: dict | None
+    validation_error: str | None
+    corrections_used: int
+    correction_limit: int
 
 
 class ExtractionWorkflow:
     def __init__(self, reader: ConversationReader, artifacts: MemoryArtifacts,
                  model: ChatOpenAI, checkpointer: BaseCheckpointSaver, *,
                  max_chars: int = 6000, context_chars: int = 1500, max_output_tokens: int = 4096,
-                 max_windows: int = 16):
+                 max_windows: int = 16, max_validation_corrections: int = 1):
         if reader.document_id != artifacts.document_id:
             raise ValueError("Extraction components belong to different documents")
         if type(max_output_tokens) is not int or max_output_tokens < 1:
             raise ValueError("max_output_tokens must be positive")
         if type(max_windows) is not int or not 1 <= max_windows <= 100:
             raise ValueError("max_windows must be between 1 and 100")
+        if type(max_validation_corrections) is not int or max_validation_corrections < 0:
+            raise ValueError("max_validation_corrections must be a nonnegative integer")
         self.reader, self.artifacts = reader, artifacts
         self.max_chars, self.context_chars = max_chars, context_chars
         self.max_windows = max_windows
+        self.max_validation_corrections = max_validation_corrections
         route = str(uuid5(NAMESPACE_URL, "q019-b1:" + reader.document_id))
-        self.config = {"configurable": {"thread_id": route}, "recursion_limit": 2 * max_windows + 2}
+        self.config = {"configurable": {"thread_id": route},
+                       "recursion_limit": (3 + 3 * max_validation_corrections) * max_windows + 2}
         self.structured = model.with_structured_output(
-            ExtractionOutput, method="json_schema", strict=True, include_raw=True,
+            ExtractionOutput.model_json_schema(), method="json_schema", strict=True, include_raw=True,
             max_output_tokens=max_output_tokens,
         )
         builder = StateGraph(ExtractionState)
         builder.add_node("extract", self._extract)
+        builder.add_node("validate", self._validate)
+        builder.add_node("prepare_correction", self._prepare_correction)
+        builder.add_node("correct", self._correct)
         builder.add_node("save", self._save)
         builder.add_edge(START, "extract")
-        builder.add_edge("extract", "save")
+        builder.add_edge("extract", "validate")
+        builder.add_conditional_edges("validate", lambda s: "prepare_correction" if s["validation_error"] else "save")
+        builder.add_edge("prepare_correction", "correct")
+        builder.add_edge("correct", "validate")
         builder.add_conditional_edges("save", lambda s: "extract" if s["position"] < len(s["windows"]) else END)
         self.graph = builder.compile(checkpointer=checkpointer)
 
@@ -96,7 +110,9 @@ class ExtractionWorkflow:
         if snapshot.values:
             self.reader.require_new_source_after(source_reference, snapshot.values["source_reference"])
         return self.graph.invoke({"source_reference": source_reference, "replaces_summary": None, "windows": windows, "position": 0,
-                                  "files": [], "extracted": None, "raw_response": None},
+                                  "files": [], "extracted": None, "raw_response": None,
+                                  "candidate": None, "validation_error": None, "corrections_used": 0,
+                                  "correction_limit": self.max_validation_corrections},
                                  self.config, durability="sync")
 
     def resume(self) -> dict:
@@ -108,7 +124,13 @@ class ExtractionWorkflow:
             raise ValueError("No extraction job to resume")
         if not snapshot.next:
             return snapshot.values
-        return self.graph.invoke(None, config, durability="sync")
+        # Old partial jobs cannot prove how much correction allowance remains.
+        # Do not migrate them or invent a fresh allowance on deployment/reopen.
+        if not {"correction_limit", "corrections_used"} <= snapshot.values.keys():
+            raise ValueError("Pending extraction checkpoint lacks correction budget metadata; explicit recovery required")
+        resume_config = {**config, "recursion_limit":
+            (3 + 3 * snapshot.values["correction_limit"]) * len(snapshot.values["windows"]) + 2}
+        return self.graph.invoke(None, resume_config, durability="sync")
 
     def reextraction_config(self, summary_path: str) -> dict:
         """Technical job identity only, not another employee conversation."""
@@ -129,7 +151,9 @@ class ExtractionWorkflow:
         self.reader.validate_saved_window(**window, max_chars=self.max_chars, context_chars=self.context_chars)
         return self.graph.invoke({"source_reference": window["source_reference"],
             "replaces_summary": summary_path, "windows": [window], "position": 0,
-            "files": [], "extracted": None, "raw_response": None}, config, durability="sync")
+            "files": [], "extracted": None, "raw_response": None,
+            "candidate": None, "validation_error": None, "corrections_used": 0,
+            "correction_limit": self.max_validation_corrections}, config, durability="sync")
 
     def resume_reextraction(self, summary_path: str) -> dict:
         return self._resume(self.reextraction_config(summary_path))
@@ -154,17 +178,60 @@ class ExtractionWorkflow:
         return {"segments": segments, "turns": page['turns'], "omitted_content_types": sorted(omitted)}
 
     def _extract(self, state: ExtractionState) -> dict:
+        return self._request(state, correction=False)
+
+    def _correct(self, state: ExtractionState) -> dict:
+        return self._request(state, correction=True)
+
+    def _request(self, state: ExtractionState, *, correction: bool) -> dict:
         window = state["windows"][state["position"]]
         payload = {"CONTEXT_ONLY": self._source(window["context_reference"]),
                    "NEW_SOURCE": self._source(window["source_reference"])}
-        outcome = self.structured.invoke([SystemMessage(INSTRUCTIONS), HumanMessage(json.dumps(payload, ensure_ascii=False))])
+        messages = [SystemMessage(INSTRUCTIONS), HumanMessage(json.dumps(payload, ensure_ascii=False))]
+        if correction:
+            # Keep native AI content (including opaque reasoning) unchanged.
+            # Runtime feedback is private B1 context, never employee source.
+            messages.extend([state["raw_response"], SystemMessage(
+                "Runtime validation feedback (not employee speech): " + state["validation_error"] +
+                "\nCorrect the previous candidate using the same source and three fields. Preserve all detail and Markdown semantics.")])
+        outcome = self.structured.invoke(messages)
         raw = outcome["raw"]
-        if raw.response_metadata.get("status") != "completed" or outcome["parsing_error"] is not None or outcome["parsed"] is None:
+        refused = raw.additional_kwargs.get("refusal") or any(
+            isinstance(block, dict) and (block.get("type") == "refusal" or
+                (block.get("type") == "non_standard" and "refusal" in block.get("value", {})))
+            for block in raw.content_blocks)
+        candidate = outcome["parsed"]
+        # A dict parser does not enforce the provider's three-string shape.
+        # Keep native-contract failures at the request boundary as before;
+        # application text validation happens only after the candidate checkpoint.
+        native_shape = (isinstance(candidate, dict) and set(candidate) == set(ExtractionOutput.model_fields)
+                        and all(isinstance(value, str) for value in candidate.values()))
+        if refused or raw.response_metadata.get("status") != "completed" or outcome["parsing_error"] is not None or not native_shape:
             raise ValueError("Extraction refused, incomplete or invalid; no artifacts produced")
-        parsed = outcome["parsed"]
+        return {"candidate": candidate, "raw_response": raw, "extracted": None}
+
+    def _validate(self, state: ExtractionState) -> dict:
+        try:
+            parsed = ExtractionOutput.model_validate(state["candidate"])
+        except ValidationError as error:
+            errors = error.errors(include_url=False, include_context=False, include_input=False)
+            # Native schema violations are not the application formatting loop.
+            # Only the two known text validators produce bounded local reasons.
+            if any(e["type"] != "value_error" or e["loc"] not in
+                   {("rollout_summary",), ("raw_memory",)} for e in errors):
+                raise ValueError("Extraction violates native schema; no artifacts produced") from None
+            return {"extracted": None, "validation_error": "; ".join(
+                f"{e['loc'][0]}: {e['msg']}" for e in errors)}
         if not parsed.rollout_summary.strip():
-            raise ValueError("Extraction summary is empty; not a completed extraction")
-        return {"extracted": parsed.model_dump(), "raw_response": raw}
+            return {"extracted": None, "validation_error": "rollout_summary: summary is empty; supply detailed notes from the source"}
+        return {"extracted": parsed.model_dump(), "validation_error": None}
+
+    def _prepare_correction(self, state: ExtractionState) -> dict:
+        if state["corrections_used"] >= state["correction_limit"]:
+            raise ValueError("Extraction correction allowance exhausted: " + state["validation_error"])
+        # Commit the reservation before HTTP. A transport retry resumes this
+        # same corrective call, not a new application-validation allowance.
+        return {"corrections_used": state["corrections_used"] + 1}
 
     def _save(self, state: ExtractionState) -> dict:
         window = state["windows"][state["position"]]
@@ -172,4 +239,5 @@ class ExtractionWorkflow:
         files = self.artifacts.save_extraction(summary=output.rollout_summary, candidates=output.raw_memory,
             slug=output.rollout_slug, **window)
         return {"files": [*state["files"], {**asdict(files), **window}], "position": state["position"] + 1,
-                "extracted": None, "raw_response": None}
+                "extracted": None, "raw_response": None, "candidate": None,
+                "validation_error": None, "corrections_used": 0}

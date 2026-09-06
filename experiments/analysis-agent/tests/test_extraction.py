@@ -196,20 +196,19 @@ def test_bad_model_outcomes_never_become_empty_success(harness, bad):
     assert len(sent) == 1
 
 
-def test_invalid_artifact_format_is_rejected_before_persisting_model_success(harness):
+def test_invalid_artifact_format_is_corrected_before_persisting_model_success(harness):
     cls = workflow_class()
     model, saver, store, reader, ref, sent, responses = harness
     response = body()
     response["output"][0]["content"][0]["text"] = json.dumps({"rollout_summary": "甲" * 2100, "raw_memory": "候選", "rollout_slug": "案例"}, ensure_ascii=False)
     responses.append(response)
     workflow = cls(reader, MemoryArtifacts(store, reader.document_id), model, saver)
-    with pytest.raises(ValueError):
-        workflow.start(ref)
-    assert store.search(("q019-memory", reader.document_id)) == []
-    # Caller explicitly resumes; a fresh valid extraction must be requested,
-    # not an endless replay of an already-known invalid Store payload.
-    result = workflow.resume()
+    result = workflow.start(ref)
     assert len(result["files"]) == 1 and len(sent) == 2
+    assert "2000" in sent[1]["input"][-1]["content"]
+    saved = json.dumps([s.value for s in store.search(("q019-memory", reader.document_id))], ensure_ascii=False)
+    assert "甲" * 2100 not in saved
+    assert workflow.resume()["files"] == result["files"] and len(sent) == 2
 
 
 def test_incomplete_native_source_is_not_a_completed_extraction_window(harness):

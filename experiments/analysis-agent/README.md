@@ -564,6 +564,45 @@ Defaults: 6,000 visible characters per window, up to1,500 previous-turn context,
 vendor guarantees. Oversize individual turns fail rather than silently truncate.
 Only visible interview text is extracted; opaque reasoning remains canonical.
 
+### B1 bounded validation feedback (2026-09-07, ER-B02)
+
+The [runtime repair plan's public API decision](../../docs/plans/2026-09-07-runtime-recovery-repairs.md)
+keeps the identical `ExtractionOutput.model_json_schema()` on native
+`with_structured_output(method="json_schema", strict=True, include_raw=True)`.
+No tools, manager, model-authored identifiers or extra output fields are added.
+The native candidate/raw response is checkpointed first; a separate application
+validation step retains the existing 2,000-character line boundary and rejects
+empty summaries. Lossless newline normalization remains deterministic; there is
+no truncation or automatic Markdown wrapping.
+
+`max_validation_corrections=1` permits at most one application correction per
+source window (configurable nonnegative integer; zero disables correction).
+This is an engineering initial setting, not vendor consensus. The original
+source input and unchanged native AI candidate, including opaque reasoning,
+precede private Runtime feedback containing only known failing fields/reasons,
+not a Pydantic dump or employee message. No invalid artifacts are saved or
+published. Successful extraction still takes one model call per window and
+retains the configured per-response output cap.
+
+Candidate, error, correction limit and used count are checkpointed before the
+corrective call. Reopening/resuming cannot replenish the saved allowance, even
+if constructor settings change; only the next successfully reached window
+resets its count. Exhaustion remains pending with a precise error. Refusal,
+incomplete responses, malformed native output and transport errors do not enter
+the format-correction loop. A transport-interrupted correction resumes that
+same reserved call under the SDK's existing transport policy, not a new format
+allowance. Saved windows and validated results pending Store writes are not
+re-extracted; explicit summary re-extraction uses the same correction boundary
+without changing the ordinary source cursor or old artifacts.
+
+Old completed checkpoints remain readable. Old *partial* checkpoints lacking
+correction-budget metadata stop explicitly before resume; no allowance is
+guessed and no migration/reset is supplied. A response lost before checkpoint
+can still be recomputed; this is not an exactly-once HTTP or monetary guarantee.
+Offline SDK/MockTransport tests cover correction, exhaustion/reopen, native
+reasoning, source isolation, multiple windows and re-extraction; final full-suite
+and PostgreSQL verification belong to the controller.
+
 The latest completed identical source returns its saved result. Older or
 overlapping source ranges are rejected before another call; there is no implicit
 force-reextract or arbitrary historical-result lookup. Message order is read

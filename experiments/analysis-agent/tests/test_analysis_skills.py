@@ -145,6 +145,34 @@ def test_read_file_rejects_traversal_and_host_paths(tmp_path, with_store, path):
         assert next(i for i in payload(sent[-1])['input'] if i.get('type') == 'function_call_output')['output'] == result.content
 
 
+@pytest.mark.parametrize('with_store', [False, True])
+def test_invalid_routed_ls_directory_is_tool_feedback_not_service_interruption(tmp_path, with_store):
+    with service_harness(tmp_path, store=InMemoryStore() if with_store else None) as (service, sent, replies):
+        document = create_document(service)
+        args = {'path': '/skills/' + Path(__file__).resolve().parent.as_posix() + '/'}
+        replies.extend([call('ls', **args), done()])
+        run = service.submit(document, 'invalid-directory', '只測目錄讀取邊界。')
+        service.join(document)
+        assert service.get_run(document, run['id'])['status'] == 'completed'
+        result = tool_results(state(service, document))[0]
+        assert result.status == 'error'
+        assert len(sent) == 2
+        wire_result = next(i for i in payload(sent[-1])['input'] if i.get('type') == 'function_call_output')
+        assert wire_result['call_id'] == result.tool_call_id and wire_result['output'] == result.content
+
+
+def test_skill_ls_does_not_convert_infrastructure_failure_to_input_error(monkeypatch):
+    from deepagents.backends import FilesystemBackend
+    from analysis_agent.skills import SkillAssets
+
+    def disconnected(*args, **kwargs):
+        raise OperationalError('synthetic listing infrastructure failure')
+
+    monkeypatch.setattr(FilesystemBackend, 'ls', disconnected)
+    with pytest.raises(OperationalError, match='synthetic listing infrastructure failure'):
+        SkillAssets().ls('/')
+
+
 def test_shared_ls_grep_and_read_use_the_same_advertised_mount(tmp_path):
     with service_harness(tmp_path) as (service, sent, replies):
         document = create_document(service)

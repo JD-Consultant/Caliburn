@@ -21,7 +21,11 @@ class SkillAssets(BackendProtocol):
         self._files = FilesystemBackend(root_dir=Path(__file__).with_suffix(''), virtual_mode=True)
 
     def ls(self, path: str):
-        return self._files.ls(path)
+        try:
+            return self._files.ls(path)
+        except ValueError:
+            # Match read's model-correctable containment error after remap.
+            return LsResult(error='Invalid skill asset path; use a listed /skills/ path')
 
     def read(self, file_path: str, offset: int = 0, limit: int = 2000):
         try:

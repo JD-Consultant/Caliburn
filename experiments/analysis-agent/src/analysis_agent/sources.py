@@ -156,8 +156,9 @@ class ConversationReader:
     def capture_input(self, message_id: str) -> str:
         """Locate an already-saved current input, not a completed B1 window.
 
-        Keep the preceding visible assistant question so short corrections have
-        context. Native reasoning/tool blocks stay canonical, never rendered.
+        Keep the preceding visible assistant question and intervening answers
+        across safely closed turns. Native/tool blocks stay canonical, never
+        rendered as an employee statement. This is not model context selection.
         """
         snapshot = self._snapshot()
         messages = snapshot.values["messages"]
@@ -165,13 +166,17 @@ class ConversationReader:
         if not humans or messages[humans[-1]].id != message_id:
             raise ValueError("Current input is not the latest saved employee message")
         index = humans[-1]
+        prior_turn_ends = {group[-1].id: group for group in self._groups(snapshot)[:-1]}
         first = message_id
         for message in reversed(messages[:index]):
-            if isinstance(message, HumanMessage):
-                break
+            group = prior_turn_ends.get(message.id)
+            if group is not None and self._turn_status(snapshot, group) is None:
+                raise ValueError('Prior conversation turn is not safely closed')
             if isinstance(message, AIMessage) and any(text for _, _, text in self._visible([message])[0]):
                 first = message.id
                 break
+            if isinstance(message, HumanMessage):
+                first = message.id
         return self._reference(snapshot, first, message_id)
 
     @staticmethod
@@ -281,8 +286,7 @@ class ConversationReader:
             used = 0
             if index:
                 prior = groups[index - 1]
-                # Unlike capture_input's immediate-turn lookup, B1 must cross
-                # safely closed turns with no visible AI. Keep every intervening
+                # Cross safely closed turns with no visible AI. Keep intervening
                 # answer, not just the old question or the last HumanMessage.
                 question = next((m for group in reversed(groups[:index]) for m in reversed(group)
                     if isinstance(m, AIMessage) and any(text for _, _, text in self._visible([m])[0])), None)

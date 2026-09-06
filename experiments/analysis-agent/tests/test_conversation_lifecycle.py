@@ -71,8 +71,10 @@ def test_native_items_round_trip_through_root_and_child(monkeypatch):
 def compose_memory(h, **limits):
     from analysis_agent.live_memory import MemorySession
     session = MemorySession(h.pub, h.source)
-    return build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
-                              middleware=[session], tools=session.tools, **limits)
+    graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
+                               middleware=[session], tools=session.tools, **limits)
+    h.source.graph = graph  # same canonical root-reader wiring as AnalysisService
+    return graph
 
 
 def test_calibrated_normal_deep_read_correction_and_final_answer(h):
@@ -243,6 +245,22 @@ def test_limit_then_short_correction_keeps_real_question_not_technical_source(h)
     # Runtime notices remain canonical; exclusion is only the source projection.
     assert any('Model call limits exceeded' in m.text for m in result['messages'])
     assert 'runtime_notice' in source['omitted_content_types']
+
+
+def test_tool_only_closed_turn_preserves_correction_in_next_repair_source(h):
+    h.replies.append(call('read_file', file_path='/memory/knowledge.md'))
+    graph = compose_memory(h, max_model_steps=1)
+    first = graph.invoke({'messages': [HumanMessage('不是主管，是處長。', id='h1')]}, h.config, durability='sync')
+    assert first['turn_outcome']['status'] == 'limit'
+    h.replies.append(call('repair_memory', edits=[edit()]))
+    graph.invoke({'messages': [HumanMessage('對，剛剛說的是A案。', id='h2')]}, h.config, durability='sync')
+    receipt = h.pub.repair_receipts(after_revision=1, through_revision=2)[0]
+    source = h.source.read(receipt.repair_sources[0])
+    assert [(s['role'], s['text']) for s in source['segments']] == [
+        ('assistant', '是由主管核准嗎？'),
+        ('user', '不是主管，是處長。'), ('user', '對，剛剛說的是A案。')]
+    assert 'runtime_notice' in source['omitted_content_types']
+    assert knowledge(h) == '例外由處長核准。'
 
 
 @pytest.mark.parametrize('corrected', [True, False])

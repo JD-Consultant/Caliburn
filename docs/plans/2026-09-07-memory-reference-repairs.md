@@ -56,7 +56,7 @@ Task1 相鄰修正：C 已有失敗 JSON，但 `ToolMessage.status` 原本仍為
 
 **Interfaces:** `ConversationReader.capture_input(message_id)` 的引用格式不變。以 `_groups`／`_turn_status` 確認中間回合安全封閉，`_visible` 找最後真正顧問文字；缺問句時仍保留安全連續的員工輸入，不以 runtime notice 作問題。原文不搬家、不要求 B1 封口本輪。
 
-- [ ] RED：compiled root 前輪 h1「不是主管，是處長」只有 read tool 後 limit；h2「對，剛剛說的是 A 案」啟動 C；assert receipt 回查依序包含 a0 問句、h1、h2，而非只有 h2。
+- [x] RED：compiled root 前輪 h1「不是主管，是處長」只有 read tool 後 limit；h2「對，剛剛說的是 A 案」啟動 C；assert receipt 回查依序包含 a0 問句、h1、h2，而非只有 h2。根圖反例1 failed；額外邊界9 failed／2 passed。
 
 ```python
 h.replies.append(call('read_file', file_path='/memory/knowledge.md'))
@@ -69,13 +69,13 @@ assert [s['text'] for s in h.source.read(receipt.repair_sources[0])['segments']]
     '是由主管核准嗎？', '不是主管，是處長。', '對，剛剛說的是A案。']
 ```
 
-- [ ] GREEN：沿現成回合判斷往前定位；不跨 unresolved 回合，不修改對話內容、封口規則或模型 context。
-- [ ] 回歸：多個無可見 AI 的安全回合／runtime notice／沒有舊問句／未安全封閉中間回合／現有普通短答。讀取仍有界、可續頁。
-- [ ] 驗證：source／extraction／lifecycle／C 測試及全套離線測試，綠燈後 scoped commit。
+- [x] GREEN：沿現成回合判斷往前定位；不跨 unresolved 回合，不修改對話內容、封口規則或模型 context。
+- [x] 回歸：多個無可見 AI 的安全回合／runtime notice／沒有舊問句／未安全封閉中間回合／現有普通短答。讀取仍有界、可續頁。`compose_memory` fixture 跟隨真正服務，將 reader 指向 canonical compiled root，才可讀完整 closed_turns schema。
+- [x] 驗證：source／extraction／lifecycle／C：101 passed；最後全套含專用PG **370 passed／0 skipped（103.66s）**。
 
 ## Closure gate
 
-- [ ] 獨立 review 看新增測試實際能否捕捉原缺陷；不只看測試數。
-- [ ] 更新結果：紅→綠、官方原則／本案接法、未驗品質、原有 parked gaps。
-- [ ] 根 register 指向本段結果；確認沒有改 production／額外模型步驟／隱藏語意政策。
-- [ ] 全部檢查通過才建立本地 tag；不 merge／push。若新問題需要產品決策，停在該邊界回報。
+- [x] 獨立 review 看新增測試實際能否捕捉原缺陷；不只看測試數。引用2項Important已修正複核CLOSED；MR-02限定review無finding。
+- [x] 更新[結果](../specs/2026-09-07-memory-reference-repair-results.md)：紅→綠、官方原則／本案接法、未驗品質、原有 parked gaps。
+- [x] 根 register 指向本段結果；確認沒有改 production／額外模型步驟／隱藏語意政策。
+- [x] 全部檢查通過；本地 tag 在本段commit後建立（保存ID由根register記錄），不 merge／push。本段無新的產品blocking decision；未完成能力見結果的下一gate。

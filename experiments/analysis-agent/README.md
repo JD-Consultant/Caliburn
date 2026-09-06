@@ -24,6 +24,18 @@ fields, evidence requirement, model calls or semantic truth checks. Tool errors
 retain the existing instructive JSON/text and bounded correction path; C now also
 sets native `ToolMessage.status` consistently (not a new Responses wire feature).
 
+Current-input source references also retain the nearest visible advisor text and
+intervening employee answers across safely closed tool-only turns. An unresolved
+turn cannot be silently crossed; runtime notices/tools are not employee words.
+The existing 3,000-character paged reader preserves longer ranges. This repairs
+C's provenance and B2's repair-context read, not the model's Context selection.
+
+Verification: **370 passed / 0 skipped (103.66s)**, including real dedicated PG
+client reconstruction; compileall and offline lock checks passed. HTTP replies
+are synthetic, paid calls zero. Skills, full request budgeting, raw-history
+discoverability and live interview quality remain separate gates.
+[Repair results and official sources](../../docs/specs/2026-09-07-memory-reference-repair-results.md).
+
 Use Python 3.12, the locked dependencies, a separate local `q019_` PostgreSQL
 database and one process. Set credentials externally; this entry never loads
 the old application's `.env`. Required variables:

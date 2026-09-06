@@ -126,6 +126,6 @@ class RepairWorkflow:
         # regress A to a historical receipt; report both applied and read heads.
         current = self.publication.current()
         return {"outcome": self._feedback("applied", current,
-            "Edits published. Subsequent reads use this head; initial guide remains historical.",
+            "Edits published. For this input, subsequent reads use this head; its initial guide remains historical.",
             applied_head=asdict(applied), changes=state["edits"],
             source_reference=state["source_reference"])}

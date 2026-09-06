@@ -17,6 +17,7 @@ from analysis_agent.repair import MemoryEdit, RepairWorkflow
 class MemorySessionState(AgentState):
     memory_turn_id: str
     memory_initial_guide: str
+    memory_initial_revision: int
     memory_source_reference: str
     memory_read_head: dict | None
     memory_repair_failures: int
@@ -66,6 +67,7 @@ class MemorySession(AgentMiddleware):
         head = self.publication.current()
         return {"memory_turn_id": current.id, "memory_read_head": asdict(head) if head else None,
             "memory_initial_guide": self.artifacts.guide(head.memory) if head else "No memory has been published yet.",
+            "memory_initial_revision": head.revision if head else 0,
             "memory_source_reference": self.source.capture_input(current.id), "memory_repair_failures": 0,
             "memory_repair_binding": None}
 
@@ -79,8 +81,13 @@ class MemorySession(AgentMiddleware):
             "Interview details describe their source window, not guaranteed current case truth; "
             "check relevant knowledge for later corrections before using an old detail. "
             "Verify conflicts or ask; a later sentence is not automatically more correct. "
-            "C tool feedback explicitly supersedes this guide/read version; do not treat the old guide as current. "
+            "Only C tool feedback whose source_reference matches the Current input reference "
+            "supersedes this input's initial guide/read version, when it provides a refreshed head/guide. "
+            "Previous-input C feedback is historical and cannot override this input's initial view. "
             "Repair is optional and does not run background consolidation. Do not reveal hidden reasoning.\n"
+            # Old pending checkpoints have no proven initial revision. Neither
+            # the refreshed read head nor the latest publication can supply it.
+            f"Initial guide publication revision: {request.state.get('memory_initial_revision', 'unknown')}\n"
             f"<initial_memory_guide>\n{request.state['memory_initial_guide']}\n</initial_memory_guide>\n"
             f"Current input reference (copy only if useful): {request.state['memory_source_reference']}"
         )})
@@ -118,7 +125,8 @@ class MemorySession(AgentMiddleware):
     def _command(self, feedback, state, call_id):
         failed = feedback["status"] in {"invalid_edit", "stale", "no_memory"}
         failures = state["memory_repair_failures"] + int(failed)
-        feedback = {**feedback, "retryable": failed and failures < 2}
+        feedback = {**feedback, "retryable": failed and failures < 2,
+            "source_reference": state["memory_source_reference"]}
         update = {"memory_repair_failures": failures,
             "messages": [ToolMessage(json.dumps(feedback, ensure_ascii=False), tool_call_id=call_id,
                 status="error" if failed or feedback['status'] == 'repair_limit' else "success")]}

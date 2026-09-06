@@ -1,6 +1,7 @@
 """C/A boundary tests: real Agent/Store/Saver/ORM, synthetic provider only."""
 import importlib.util
 import json
+from dataclasses import asdict
 from types import SimpleNamespace
 
 import httpx
@@ -12,6 +13,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
 
 from analysis_agent.memory import MemoryArtifacts
+from analysis_agent.conversation import build_conversation
 from analysis_agent.publication import PublicationStore
 from analysis_agent.provider import build_model
 from analysis_agent.runtime import build_agent
@@ -74,6 +76,89 @@ def tool_results(result):
     return [m for m in result['messages'] if isinstance(m, ToolMessage)]
 
 
+def system_wire(payload):
+    return [item for item in payload['input'] if item.get('role') in ('system', 'developer')]
+
+
+@pytest.mark.parametrize('entrypoint', ['conversation', 'agent'])
+def test_new_input_guide_supersedes_historical_c_feedback_on_sdk_wire(h, entrypoint):
+    session = session_class()(h.pub, h.source)
+    factory = build_conversation if entrypoint == 'conversation' else build_agent
+    graph = factory(model=h.model, checkpointer=h.saver, instructions='訪談',
+                    middleware=[session], tools=session.tools)
+    # The source reader must observe the canonical root, not a child projection.
+    h.source.graph = graph
+    h.replies.extend([call('read_file', file_path='/memory/knowledge.md'),
+        call('repair_memory', edits=[edit(), edit('主管', '處長', '/memory/guide.md')]),
+        call('read_file', file_path='/memory/knowledge.md'), done()])
+    first = graph.invoke({'messages': [HumanMessage('更正為處長核准。', id='h1')]},
+                         h.config, durability='sync')
+    old_result = tool_results(first)[1].model_dump()
+    old_feedback = json.loads(old_result['content'])
+    assert old_feedback['head']['revision'] == 2
+    assert '處長' in tool_results(first)[-1].content
+    # Synthetic B publication between inputs; no B model or scheduler involved.
+    newer = h.artifacts.save_memory(knowledge='例外由總監核准。', guide='總監核准：/memory/knowledge.md')
+    h.pub.publish(h.pub.prepare(newer, expected_revision=2, kind='consolidation',
+        processed_source=h.source.capture('h1', first['messages'][-1].id)))
+    h.replies.extend([call('read_file', file_path='/memory/knowledge.md'), done()])
+    second = graph.invoke({'messages': [HumanMessage('再看目前核准方式。', id='h2')]},
+                          h.config, durability='sync')
+    assert h.pub.current().revision == 3
+    assert '總監' in tool_results(second)[-1].content
+    assert next(m.model_dump() for m in second['messages'] if m.id == old_result['id']) == old_result
+    historical_wire = next(item for item in h.sent[4]['input']
+        if item.get('type') == 'function_call_output' and item['call_id'] == old_result['tool_call_id'])
+    assert historical_wire['output'] == old_result['content']
+    assert len(h.sent) == 6 and not h.replies
+    if entrypoint == 'conversation':
+        assert first['turn_outcome']['model_calls'] == 4
+        assert second['turn_outcome']['model_calls'] == 2
+    first_system, second_system = system_wire(h.sent[0]), system_wire(h.sent[4])
+    assert all(system_wire(p) == first_system for p in h.sent[:4])
+    assert system_wire(h.sent[5]) == second_system
+    first_text = json.dumps(first_system, ensure_ascii=False)
+    second_text = json.dumps(second_system, ensure_ascii=False)
+    assert 'Initial guide publication revision: 1' in first_text
+    assert 'Initial guide publication revision: 3' in second_text
+    assert '總監核准：' in second_text and '處長核准：' not in second_text
+    assert old_feedback['source_reference'] in first_text
+    assert old_feedback['source_reference'] not in second_text
+    assert 'Only C tool feedback whose source_reference matches the Current input reference' in second_text
+    assert 'Previous-input C feedback is historical and cannot override this input' in second_text
+    assert all(p['tools'] == h.sent[0]['tools'] for p in h.sent)
+    schema = next(t for t in h.sent[0]['tools'] if t['name'] == 'repair_memory')['parameters']
+    assert set(schema['properties']) == {'edits'}
+    assert set(schema['properties']['edits']['items']['properties']) == {'path', 'old_text', 'new_text'}
+
+
+def test_old_partial_state_missing_initial_revision_stays_unknown_on_resume(h):
+    agent = h.agent()
+    agent.update_state(h.config, {'messages': [HumanMessage('繼續查核准方式。', id='h1')]}, as_node='model')
+    reference = h.source.capture_input('h1')
+    repaired = h.artifacts.save_memory(knowledge='例外由處長核准。', guide='處長核准')
+    head = h.pub.publish(h.pub.prepare(repaired, expected_revision=1, kind='repair', repair_sources=(reference,)))
+    # Old checkpoint: fixed v1 guide, refreshed v2 read head, no revision label.
+    agent.update_state(h.config, {'memory_turn_id': 'h1',
+        'memory_initial_guide': '主管核准：/memory/knowledge.md',
+        'memory_read_head': asdict(head), 'memory_source_reference': reference,
+        'memory_repair_failures': 0, 'memory_repair_binding': None},
+        as_node='MemorySession.before_agent')
+    newer = h.artifacts.save_memory(knowledge='例外由總監核准。', guide='總監核准')
+    h.pub.publish(h.pub.prepare(newer, expected_revision=2, kind='consolidation', processed_source=h.ref))
+    h.replies.extend([call('read_file', file_path='/memory/knowledge.md'), done()])
+    result = h.agent().invoke(None, h.config, durability='sync')
+    assert result['memory_read_head']['revision'] == 2
+    assert '處長' in tool_results(result)[-1].content
+    assert system_wire(h.sent[0]) == system_wire(h.sent[1])
+    text = json.dumps(system_wire(h.sent[0]), ensure_ascii=False)
+    assert '主管核准：' in text and '總監核准' not in text
+    assert 'Initial guide publication revision: unknown' in text
+    assert 'Initial guide publication revision: 2' not in text
+    assert 'Initial guide publication revision: 3' not in text
+    assert len(h.sent) == 2 and not h.replies
+
+
 def test_repair_refreshes_reads_without_rewriting_initial_guide(h):
     h.replies.extend([call('read_file', file_path='/memory/knowledge.md'),
         call('repair_memory', edits=[edit(), edit('主管', '處長', '/memory/guide.md')]),
@@ -117,6 +202,7 @@ def test_stale_refresh_then_reconsider_uses_new_base(h):
     result = h.agent().invoke({'messages': [HumanMessage('一般例外改成處長', id='h1')]}, h.config, durability='sync')
     feedback = json.loads(tool_results(result)[0].content)
     assert feedback['status'] == 'stale' and feedback['head']['revision'] == 2
+    assert feedback['source_reference'] == result['memory_source_reference']
     assert '特殊例外由總監核准' in tool_results(result)[1].content
     assert knowledge(h) == '一般例外由處長核准；特殊例外由總監核准。'
     assert h.pub.current().revision == 3

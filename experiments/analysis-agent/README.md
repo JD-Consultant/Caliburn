@@ -693,7 +693,8 @@ serializes primary runs per document, and invokes with `durability="sync"`.
 Use `invoke(None, config, durability="sync")` to resume a pending run, not a
 second copy of its input. App admission/retry/cancel endpoints are not included.
 
-New employee input pins head, guide, and a real saved input Q/A reference.
+New employee input pins head, guide, its publication revision, and a real saved
+input Q/A reference. The revision is Runtime-owned (0 means no publication).
 Read tools use public middleware `request.override(tool=...)` to select this
 immutable version. A background publication does not silently switch it.
 C uses exact StateBackend edits in private per-invocation staging; all edits
@@ -702,8 +703,15 @@ No fuzzy edits and no creation of missing Memory. Guide and knowledge publish
 together; C leaves B's processed-source cursor unchanged.
 
 Command updates A's read head and ToolMessage together on success/stale;
-initial system guide stays fixed. The visible result is authoritative about
-the refresh. On a reconciled older successful request, the result distinguishes
+initial system guide and revision stay fixed within the input, including resume.
+Every C result carries the existing Runtime-owned `source_reference`; only a
+result matching the Current input reference can supersede that input's initial
+view when it supplies a refreshed head/guide. Prior-input C results remain
+unchanged canonical history and cannot override a new input's pinned guide.
+An old pending checkpoint without the initial revision is labelled `unknown`,
+never inferred from a refreshed read head or newer publication; no migration.
+This adds no model-authored field, model step, or source-text copy.
+On a reconciled older successful request, the result distinguishes
 the applied version from the latest read version. Canonical visible Q/A can
 be read from C receipts without exposing opaque reasoning or duplicating text.
 

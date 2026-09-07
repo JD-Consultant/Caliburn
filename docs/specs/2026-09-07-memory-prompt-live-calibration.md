@@ -3,6 +3,7 @@
 > 2026-09-07；G5 有限實驗 → 兩個已重現接線缺陷的局部修復。**不是 Memory 品質通過、不是產品可用性驗收。**
 > **最新續測：見 §6。**已保存兩修可跑過前兩次 B2，但整組仍未通過。新提示試驗未通過，已撤回這次四檔試改；保留 `04ce14d8` 程式，不提高上限。下方 §1–5 為先前3次試跑沿革，不把它們當最新累計。
 > 最新決策入口：[主 checkout register](../../../../docs/current-decisions.md)。需求與方法：[Memory 設計／prompt 段](../../../../docs/specs/2026-09-06-analysis-only-agent-memory-design.md#2026-09-07memory-prompt-調整與驗收重點)。不重選 ABC 或五產物。
+> **後續底層複核：**[B2 交付研究](2026-09-07-b2-delivery-official-implementation-review.md)已核對當日 Codex／SDK 實際 runner、patch 與產物檢查。短設計建議先用既有官方工具改善小檔操作、補完成檢查；尚待 Owner 確認，未改程式／新增付費測試。本頁實驗結果不變。
 
 ## 1. 範圍與結果先講
 

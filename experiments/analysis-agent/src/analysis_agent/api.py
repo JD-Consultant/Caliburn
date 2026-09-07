@@ -158,7 +158,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
                          '仍有影響理解的重要未知就自然追問；已說不知道的外部資訊保留限制，不為收尾編造要求。'
                          '收尾說明目前涵蓋與尚未確認之處，不用反覆最後一題或一句完整代替核對；員工可隨時休息或續談。'
                          '目前只做訪談分析，不製作或編輯JD。不顯示隱藏推理。'
-                         '一段訪談已有值得整理的資訊時，可通知背景記憶整理；不必每回合通知。')
+                         '依request_memory_consolidation的使用條件，將有實質進展的訪談通知背景整理；'
+                         '轉向另一工作或回顧收尾前，留意尚未通知的新進展，不以口頭說已記住代替工具。')
         stack.callback(service.close)
         service.start()
         service.enable_background(max_recoveries=recoveries, text_threshold=text_threshold)

@@ -6,6 +6,12 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 native-first Responses context management with optional exact preflight**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
+CT-03 read guidance (2026-09-07): the live Memory session and independent reader
+share conditional deep-reading instructions; sufficient knowledge may answer
+without reopening every source. One Luna/medium comparison completed in 9 calls
+before / 5 after. Exact-source lookup still worked, with a minor extra-quotation
+issue. Limits remain tunable; no new tools. [Results and limits](../../docs/specs/2026-09-07-memory-recall-completion-calibration.md).
+
 CT-02 current result (2026-09-07): **three normal interview turns completed**
 through the real default API factory, dedicated PG and OpenAI direct Luna/medium.
 Employee correction and two-case recall were correct in this synthetic sample.

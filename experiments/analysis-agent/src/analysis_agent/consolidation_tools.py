@@ -5,6 +5,7 @@ from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain_core.tools import ToolException, tool
 
 from analysis_agent.memory import MemoryArtifacts, ReadOnlyFiles
+from analysis_agent.memory_tools import MEMORY_EDIT_GUIDANCE
 
 
 PATHS = {"knowledge": "/memory/knowledge.md", "guide": "/memory/guide.md"}
@@ -85,13 +86,15 @@ def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
                           "complete updated contents fit the output budget. Preserve unchanged details "
                           "and references. Read any existing content not already visible first; "
                           "a paged or truncated read is not the whole file. For large or partially "
-                          "read files use edit_file. Never copy read_file line-number prefixes.",
+                          "read files use edit_file. Never copy read_file line-number prefixes. "
+                          + MEMORY_EDIT_GUIDANCE,
             "edit_file": "Replace an exact old_string in a staged memory file. Use for local changes "
                          "to large or partially read files. Read the affected text first; copy exact "
                          "punctuation and indentation, without read_file line-number prefixes. "
                          "A missing or ambiguous match returns an error; re-read the relevant range "
                          "before correcting it. For a short, fully visible file needing several "
-                         "changes, write_file can replace it once within the output budget."},
+                         "changes, write_file can replace it once within the output budget. "
+                         + MEMORY_EDIT_GUIDANCE},
         human_message_token_limit_before_evict=None, tool_token_limit_before_evict=4000)
 
     @tool

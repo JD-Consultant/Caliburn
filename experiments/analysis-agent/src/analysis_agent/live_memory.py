@@ -10,7 +10,7 @@ from langchain_core.tools import tool
 from langgraph.types import Command
 
 from analysis_agent.memory import MemoryVersion
-from analysis_agent.memory_tools import MEMORY_READ_GUIDANCE, memory_read_tools
+from analysis_agent.memory_tools import MEMORY_EDIT_GUIDANCE, MEMORY_READ_GUIDANCE, memory_read_tools
 from analysis_agent.repair import MemoryEdit, RepairWorkflow
 
 
@@ -47,6 +47,8 @@ class MemorySession(AgentMiddleware):
                 "edits": [edit.model_dump() for edit in edits], "index": 0, "outcome": None,
                 "source_reference": runtime.state["memory_source_reference"]})
             return self._command(result["outcome"], runtime.state, runtime.tool_call_id)
+
+        repair_memory.description += "\n\n" + MEMORY_EDIT_GUIDANCE
 
         # Keep the actual factory-built capability separate from the write tool.
         # Conversation composition rejects same-name replacements before binding.

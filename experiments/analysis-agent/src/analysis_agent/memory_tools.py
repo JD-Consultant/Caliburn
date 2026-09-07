@@ -1,4 +1,4 @@
-"""Official read tools + small canonical-conversation routing seam (sync slice)."""
+"""Shared Memory guidance, official read tools, and canonical source routing."""
 
 from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain.agents.middleware import AgentMiddleware
@@ -10,6 +10,17 @@ from langgraph.config import get_config
 from analysis_agent.memory import MemoryArtifacts, MemoryVersion
 from analysis_agent.sources import ConversationReader
 from analysis_agent.skills import SkillAssets, analysis_files
+
+
+# Both live repair and background editing must retain unaffected knowledge.
+# https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool#str_replace
+MEMORY_EDIT_GUIDANCE = (
+    "Prefer the smallest unique text span that covers the change. "
+    "Preserve established facts, scope, exceptions, and references that the new "
+    "information does not change. Omission from new information is not withdrawal "
+    "of an established fact. If replacing a whole sentence, section, or file, "
+    "carry unchanged details into the replacement; do not summarize them away."
+)
 
 
 # Shared by the independent reader and the live A session. Progressive disclosure

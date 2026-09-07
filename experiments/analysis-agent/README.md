@@ -13,6 +13,15 @@ Skills as needed, without a new agent, schema or fixed questionnaire. Offline
 wiring checks are not semantic-quality acceptance; no new paid trial has run.
 [Scoped repair plan and evidence](../../docs/plans/2026-09-07-ct13-local-quality-and-source-repair.md).
 
+CT13 source lookup: `read_conversation(reference, offset=0, part="source")`
+accepts a known interview summary path; Runtime resolves its saved source.
+Use `part="context"` only to read separately saved preceding Q/A. Missing context
+is explicit, not guessed. Existing direct conversation references remain valid
+for live repairs. Pure reads do not require candidates; re-extraction still does.
+No new tool or storage layer. Completed-source reads do not excuse incomplete
+model answers; diagnostic recalls use the service conversation factory.
+[Repair results, official evidence and remaining quality gate](../../docs/specs/2026-09-07-ct13-local-repair-results.md).
+
 CT11 local editor trial (2026-09-07): B2 exposes `apply_memory_patch(file_path,diff)`
 and C accepts `repair_memory(edits=[{path,diff}])`, both using official
 OpenAI Agents SDK `apply_diff` locally over staged StateBackend files. This

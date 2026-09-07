@@ -154,7 +154,7 @@ class MemoryArtifacts:
         self._save(backend, "/memory/guide.md", guide)
         return version
 
-    def extraction_window(self, summary_path: str) -> dict:
+    def source_window(self, summary_path: str) -> dict:
         """Recover runtime-written source metadata, not model-authored attribution.
 
         Published artifacts remain immutable. A new extraction gets new paths;
@@ -169,14 +169,19 @@ class MemoryArtifacts:
             r"Source scope: complete input range, not per-sentence attribution\.\n\n"
             r"Context only \(not new source\): ([^\n]+)\nEnd source metadata\.\n\n", text)
         if header is None:
-            raise ValueError("Unambiguous runtime source header unavailable; historical reading is allowed, automatic re-extraction is not")
+            raise ValueError("Unambiguous runtime source header unavailable; read the historical artifact, but do not guess its source")
         source, context = header.groups()
         context = None if context == "none" else context
         parse_reference(source, self.document_id)
         if context is not None:
             parse_reference(context, self.document_id)
-        self.read_text(summary_path.removesuffix("summary.md") + "candidates.md")
         return {"source_reference": source, "context_reference": context}
+
+    def extraction_window(self, summary_path: str) -> dict:
+        """Re-extraction requires the paired candidates; pure source reads do not."""
+        window = self.source_window(summary_path)
+        self.read_text(summary_path.removesuffix("summary.md") + "candidates.md")
+        return window
 
     def _validate_links(self, knowledge: str, guide: str):
         interviews = self._backend("interviews")

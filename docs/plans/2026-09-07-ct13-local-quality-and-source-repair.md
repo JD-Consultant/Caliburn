@@ -38,18 +38,18 @@
 
 **Interfaces:** 不改函式或模型 schema；既有三個 B1 文字欄位與現有 Skills 不變。
 
-- [ ] 重看 CT12 Q01／Q03／Q04 首個失真與 Q02 收尾證據。它們是語意 red evidence，不另寫「提示含某句」的假測試。
-- [ ] B1 取代原精簡候選敘述，明確：
+- [x] 重看 CT12 Q01／Q03／Q04 首個失真與 Q02 收尾證據。它們是語意 red evidence，不另寫「提示含某句」的假測試。
+- [x] B1 取代原精簡候選敘述，明確：
 
 ```text
 raw_memory 可比詳記短，但同一事實的對象、本人做法、適用條件、頻率與權限須同義；不能因分組或附近案例而縮窄／擴大範圍。刪條件會改義時保留完整短句。
 ```
 
-- [ ] B1／主顧問：顧問回述不是員工確認；歧義詞保留員工用語與問答脈絡，不把自己的拆詞當新事實。
-- [ ] B2 以條件式深讀補足既有指令：候選與已讀內容不一致、限制不明、或將改變既有工作邊界時，讀相關詳記再整理；不足則保留不確定，不強制每批全讀。
-- [ ] 主顧問／reader 不跨案例套頻率、工具、限制。收尾前對照已談重要範圍的本人做法、責任交接、重要條件、結果及專業判斷；需要方法才用既有 Skills，不逐欄盤問、不要求固定輪数、不對未知外部資料無限重問。
-- [ ] 離線跑受影響 factory／extract／consolidation／memory tests，僅證明接線未退化；語意品質維持 OPEN。核對 diff 無 fixture 答案硬編碼、無新必填欄位、无暴露隱藏推理。
-- [ ] 保存獨立本地 commit；結果記載「提示已校準，品質待真測」，不宣称原失真已消失。
+- [x] B1／主顧問：顧問回述不是員工確認；歧義詞保留員工用語與問答脈絡，不把自己的拆詞當新事實。
+- [x] B2 以條件式深讀補足既有指令：候選與已讀內容不一致、限制不明、或將改變既有工作邊界時，讀相關詳記再整理；不足則保留不確定，不強制每批全讀。
+- [x] 主顧問／reader 不跨案例套頻率、工具、限制。收尾前對照已談重要範圍的本人做法、責任交接、重要條件、結果及專業判斷；需要方法才用既有 Skills，不逐欄盤問、不要求固定輪數、不對未知外部資料無限重問。
+- [x] 離線跑受影響 factory／extract／consolidation／memory tests，僅證明接線未退化；語意品質維持 OPEN。核對 diff 無 fixture 答案硬編碼、無新必填欄位、無暴露隱藏推理。
+- [x] 保存獨立本地 commit；結果記載「提示已校準，品質待真測」，不宣稱原失真已消失。保存點 `ba7b6f9b`。
 
 ### Task 2: A3 同一工具沿詳記地址回查原文
 
@@ -58,6 +58,7 @@ raw_memory 可比詳記短，但同一事實的對象、本人做法、適用條
 - Modify: `experiments/analysis-agent/src/analysis_agent/memory_tools.py`
 - Create: `experiments/analysis-agent/tests/test_conversation_lookup.py`
 - Modify: `experiments/analysis-agent/tests/test_memory_read_path.py`
+- Modify: `experiments/analysis-agent/tests/test_postgres_memory.py`（重開連線後沿詳記 metadata 讀指定 snapshot）
 - Modify: `experiments/analysis-agent/README.md`
 
 **Interfaces:**
@@ -67,7 +68,7 @@ raw_memory 可比詳記短，但同一事實的對象、本人做法、適用條
 - 詳記成功回原有分頁欄位，加 `summary_path/part/context_available`；原始 `reference` 仍是真實來源，便於追溯。C 直接來源且 `part='source'` 完全保留原回傳。
 - 詳記沒有保存 context 且要求 context：回空 `segments`／`next_offset=None`／`reference=None`／`context_available=False`，清楚不是未讀到的新資料；直接來源配 `part='context'` 回 ToolException，不猜相鄰範圍。
 
-- [ ] 先寫 real ToolNode + InMemoryStore/Saver 測試，紅燈驗證缺少摘要路徑模式，不 mock 自己的解析或 reader。
+- [x] 先寫 real ToolNode + InMemoryStore/Saver 測試，紅燈驗證缺少摘要路徑模式，不 mock 自己的解析或 reader。
 
 ```python
 message = invoke_tool(reference=record.summary_path)
@@ -75,10 +76,10 @@ assert message.status == 'success'
 assert json.loads(message.content)['segments'] == source.read(ref)['segments']
 ```
 
-- [ ] 加獨立 source/context 視窗：來源只有「不是」，前置問題在 context；兩者分開、role 正確、沒有 context 不猜。
-- [ ] 缺候選的詳記仍純讀成功；`extraction_window` 同時仍拒絕。缺固定 header、缺詳記、錯 checkpoint、跨文件、body 偽 Source 皆不取最新資料。
-- [ ] direct C 來源無詳記仍可讀；長中文／emoji 沿同一摘要與 part 分頁完整；model schema 無 runtime／document／checkpoint 參數。
-- [ ] 最小實作：移出原 metadata parser，不改 regex、來源 validator、namespace 或 ConversationReader。
+- [x] 加獨立 source/context 視窗：來源只有「不是」，前置問題在 context；兩者分開、role 正確、沒有 context 不猜。
+- [x] 缺候選的詳記仍純讀成功；`extraction_window` 同時仍拒絕。缺固定 header、缺詳記、錯 checkpoint、跨文件、body 偽 Source 皆不取最新資料。
+- [x] direct C 來源無詳記仍可讀；長中文／emoji 沿同一摘要與 part 分頁完整；model schema 無 runtime／document／checkpoint 參數。
+- [x] 最小實作：移出原 metadata parser，不改 regex、來源 validator、namespace 或 ConversationReader。
 
 ```python
 def extraction_window(self, summary_path: str) -> dict:
@@ -87,8 +88,8 @@ def extraction_window(self, summary_path: str) -> dict:
     return window
 ```
 
-- [ ] tool 將 `/interviews/` 路徑交 `source_window`；選已存 reference；其他 direct 路線交原 reader；已知 ValueError 仍走 ToolException／handle_tool_error。
-- [ ] 更新既有 compiled-agent 路由測試改用摘要路徑；保留舊 direct 測試、原生推理／compaction與四個工具 assertion。紅綠後跑來源＋重抽＋live memory 回歸，保存獨立 commit。
+- [x] tool 將 `/interviews/` 路徑交 `source_window`；選已存 reference；其他 direct 路線交原 reader；已知 ValueError 仍走 ToolException／handle_tool_error。
+- [x] 更新既有 compiled-agent 路由測試改用摘要路徑；保留舊 direct 測試、原生推理／compaction與四個工具 assertion。紅綠後跑來源＋重抽＋live memory 回歸；與依賴同一工具的 Task3 一併保存。
 
 ### Task 3: A4 完成判定對齊與整批收尾
 
@@ -99,11 +100,11 @@ def extraction_window(self, summary_path: str) -> dict:
 
 **Interfaces:** 重用 `build_conversation`＋`memory_access`，不是新增 reader factory 或第二套完成 validator。過去 CT12 evidence 不改。
 
-- [ ] 以 public service conversation factory 做新 reader 契約測試：成功原文工具結果後 `completed` 才成功；`incomplete/max_output_tokens` 應拒絕、不當正常結束；下一次付費驗證沿此 factory 或真服務，不能只用裸 build_agent。
-- [ ] 不提升上限、不假裝 semantic PASS；程式已支持的完成規則以 characterization test 固定接線，不為製造 red 而破壞已有行為。
-- [ ] 跑整個 isolated suite，必要 PG 僅現有專用測試資料庫；不重啟 Docker、不碰 current 產品資料。
-- [ ] 獨立 review 依 CT13 規格看 scope／source／runtime／錯誤與測試，不重開框架研究。修正實際 finding 後重跑相關測試。
-- [ ] 結果分列機制與品質，回寫 root register；本地 commit/tag，不 merge/push。
+- [x] 以 public service conversation factory 做新 reader 契約測試：成功原文工具結果後 `completed` 才成功；`incomplete/max_output_tokens` 應拒絕、不當正常結束；下一次付費驗證沿此 factory 或真服務，不能只用裸 build_agent。
+- [x] 不提升上限、不假裝 semantic PASS；程式已支持的完成規則以 characterization test 固定接線，不為製造 red 而破壞已有行為。
+- [x] 跑整個 isolated suite，必要 PG 僅現有專用測試資料庫；不重啟 Docker、不碰 current 產品資料。
+- [x] 獨立 review 依 CT13 規格看 scope／source／runtime／錯誤與測試，不重開框架研究。無待修 finding。
+- [x] 結果分列機制與品質；收尾保存點由 root register 與本地 tag 核對，不 merge/push。
 
 ## 下一 gate 與停止線
 
@@ -113,3 +114,4 @@ def extraction_window(self, summary_path: str) -> dict:
 
 - Task1：提示候選已修改，沒有新測試答案、欄位、Skill 或模型步驟。語意 red 沿 CT12 Q01–Q04；尚無新的語意 green，保留品質 OPEN。94 項抽取／整併／讀取／API 接線回歸通過（13.93s，1項既有上游 warning）。兩次沙箱測試在 pytest 暫存權限失敗，改用沙箱外隔離暫存重跑，未改產品權限或測試行為。獨立唯讀 spec／quality review 無 finding；最後僅修繁中字形。
 - Task2：測試先行，修正一個未關閉回合的 fixture 後，7 failed／9 passed（7.54s）。失敗是尚無摘要路徑／context 選擇介面，不是來源底層找不到；接續最小實作。
+- Task2 完成：最小 adapter、分頁、direct C、header／隔離／重抽界線通過，73 項相關回歸／16.80s；PG 重開也沿新 source_window 讀回指定原文。Task3 用既有 factory 完成兩項完成判定測試；最終新檔18項、整批580項／0 skipped／118.80s 通過。獨立 review 無待修 finding。詳細測試、fixture／環境問題、來源及品質限制只放[本輪結果](../specs/2026-09-07-ct13-local-repair-results.md)。

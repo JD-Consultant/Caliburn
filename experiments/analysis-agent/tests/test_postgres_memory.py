@@ -45,7 +45,9 @@ def test_postgres_reopen_preserves_artifacts_and_original_conversation():
                 backend = artifacts.reader(version)
                 assert extraction.summary_path in backend.read("/memory/knowledge.md").file_data["content"]
                 assert source in backend.read(extraction.summary_path).file_data["content"]
-                page = ConversationReader(graph, document).read(source)
+                window = artifacts.source_window(extraction.summary_path)
+                assert window == {'source_reference': source, 'context_reference': None}
+                page = ConversationReader(graph, document).read(window['source_reference'])
                 assert [s["text"] for s in page["segments"]] == ["例外也是你核准嗎？", "不是，例外由主管核准。"]
                 result = backend.grep("網站交付", "/memory/knowledge.md")
                 assert result.matches and result.matches[0]["path"] == "/memory/knowledge.md"

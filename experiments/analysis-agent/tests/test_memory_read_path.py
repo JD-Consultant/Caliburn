@@ -230,7 +230,7 @@ def test_official_tools_follow_guide_memory_summary_source_in_compiled_agent():
     calls = [("grep", {"pattern": "案例 A", "path": "/memory/knowledge.md"}),
              ("read_file", {"file_path": "/memory/knowledge.md"}),
              ("read_file", {"file_path": record.summary_path}),
-             ("read_conversation", {"reference": ref})]
+             ("read_conversation", {"reference": record.summary_path})]
 
     def respond(request):
         payload = json.loads(request.content)

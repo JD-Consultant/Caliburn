@@ -4,6 +4,8 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
+> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方登記是建立分支時的歷史快照；這條實驗線持續更新的register位於[主repo目前決策](../../../docs/current-decisions.md)。本輪[CT19](specs/2026-09-08-ct19-routing-regression.md)候選失敗並撤回、G8仍OPEN。不要以本頁下方舊日期或缺少CT19誤判新決策未記錄；production規則仍須循正式ADR／implementation gate。
+
 > 本表不取代現行 code、`AGENTS.md` 或 Accepted ADR。它負責指出「現在什麼有效、什麼只是候選、下一步只處理哪一題」。Working Decision 若與 production authority 衝突，必須經 successor ADR 與實作 gate，不能直接施工。
 
 ## 1. 閱讀順序

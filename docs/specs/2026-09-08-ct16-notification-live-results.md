@@ -2,6 +2,8 @@
 
 2026-09-08 · `Q019-MEM-CADENCE-01`／`CT15-R07` · **局部複測完成並封存，品質G8仍OPEN。**
 
+後續：[CT17短更正校準與複測](2026-09-08-ct17-correction-persistence-calibration.md)已完成；新更正經B保存，但漏存更正的重述仍未補存，G8保持OPEN。本頁原實验／失敗不改寫。
+
 結論：實質補充有真通知；原容量阻擋與B2步數不足已用隔離參數對照定位。接續後發布rev3，先前晚期資訊已整理。但「10日前→5日前」短更正及其後重述只反映在回答，沒有進Memory；**不能宣稱通知已穩定或完整訪談驗收通過**。
 
 證據：[完整input/output／方法及hash](evidence/2026-09-08-ct16-notification-live.json) · [本次可見逐字稿](evidence/2026-09-08-ct16-notification-live.transcript.md)。本頁是結論入口，不重貼全部Memory與研究沿革。

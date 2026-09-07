@@ -86,7 +86,14 @@ class MemorySession(AgentMiddleware):
             "Only C tool feedback whose source_reference matches the Current input reference "
             "supersedes this input's initial guide/read version, when it provides a refreshed head/guide. "
             "Previous-input C feedback is historical and cannot override this input's initial view. "
-            "Repair is optional and does not run background consolidation. Do not reveal hidden reasoning.\n"
+            "Repair is on demand, not routine background consolidation. If published Memory "
+            "conflicts with a verified correction in the current conversation, read the affected "
+            "text and use repair_memory before your final response. Correct outdated facts in "
+            "knowledge and, if present, the guide; preserve unaffected details and references. "
+            "A corrected deadline, frequency or case condition matters even when the common "
+            "work pattern is unchanged. If the meaning is unclear, ask instead of guessing. "
+            "If repair cannot preserve the correction, follow request_memory_consolidation's "
+            "guidance and report only what the tool results confirm. Do not reveal hidden reasoning.\n"
             # Old pending checkpoints have no proven initial revision. Neither
             # the refreshed read head nor the latest publication can supply it.
             f"Initial guide publication revision: {request.state.get('memory_initial_revision', 'unknown')}\n"

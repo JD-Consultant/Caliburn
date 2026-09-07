@@ -6,6 +6,16 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 native-first Responses context management with optional exact preflight**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
+CT-02 current result (2026-09-07): **three normal interview turns completed**
+through the real default API factory, dedicated PG and OpenAI direct Luna/medium.
+Employee correction and two-case recall were correct in this synthetic sample.
+547 offline/PG tests passed, zero skipped. Independent Memory recall used the
+remaining allowance and stopped before a final answer; not a full Memory or
+long-interview acceptance. Total 12 actual requests, usage-estimated US$0.00642272.
+No native compaction event was reached. [Results and evidence](../../docs/specs/2026-09-07-native-context-normal-interview-results.md)
+supersede the older mandatory-count/normal-interview blocker below; those paragraphs
+are historical results, not the current entry configuration.
+
 Latest B1 prompt calibration (2026-09-07): preserve who stated what and the
 scope of unanswered questions; candidates include known work and case additions,
 not only unknowns. One fixed Luna/medium sequence completed three B2 publications;

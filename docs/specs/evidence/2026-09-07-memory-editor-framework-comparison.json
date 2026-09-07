@@ -1,0 +1,216 @@
+{
+  "topic": "LLM-Q019/CT10",
+  "type": "offline characterization; no model calls",
+  "evidence_sha256": "d2ed0bea5a1ffa7dfe63d12f13dd39c7c75c4230902d7e82125d88074e684c7e",
+  "versions": {
+    "openai-agents": "0.22.0",
+    "deepagents": "0.7.13",
+    "openai": "3.8.0"
+  },
+  "sdk_apply_diff_sha256": "d09b0c15365b389b58a3d71c4cadfb6719c76ee1f9d3fe253a6e51a743e31e1d",
+  "ct09_failures": [
+    {
+      "request": 40,
+      "old": "  - 客戶選退款後，營運主管核准退款金額、出納負責匯款；員工只核對退款資料、追進度與通知客戶，不能改退款金額或執行匯款。\n",
+      "new": "  - 客戶選退款後，退款金額由財務主管核准、出納負責匯款；員工只核對退款資料、追進度與通知客戶，不能改退款金額或執行匯款。海鷗除濕機案的退款授權與執行分工以此為準；超出規則的退換貨例外仍由營運主管處理。\n",
+      "source_before_sha256": "b038708e557868c3313e26db23d9d23e2f89d0ec1685c9c1374f453529a1c614",
+      "exact_error": "Error: String not found in file: '  - 客戶選退款後，營運主管核准退款金額、出納負責匯款；員工只核對退款資料、追進度與通知客戶，不能改退款金額或執行匯款。\n'",
+      "v4a_fixture": "@@\n-  - 客戶選退款後，營運主管核准退款金額、出納負責匯款；員工只核對退款資料、追進度與通知客戶，不能改退款金額或執行匯款。\n+  - 客戶選退款後，退款金額由財務主管核准、出納負責匯款；員工只核對退款資料、追進度與通知客戶，不能改退款金額或執行匯款。海鷗除濕機案的退款授權與執行分工以此為準；超出規則的退換貨例外仍由營運主管處理。",
+      "patch_matches_hand_audited_span": true,
+      "unaffected_content_and_references_byte_preserved": true,
+      "patch_changed_content": true
+    },
+    {
+      "request": 42,
+      "old": "  - 員工另提到每月案件彙整及新人帶教，表示與個案處理不同；目前尚未確認案件彙整的資料內容、使用對象、產出或用途，具體做法仍未知。\n\n  依據：[/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md](/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md)；[/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md](/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md)；[/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md](/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md)。",
+      "new": "  - 每月第一個工作日從 CRM 匯出上月案件，以試算表整理；同一訂單的多次聯絡要合併，避免誤算成多台故障，並按現象、型號及處理原因分類，保留可回查樣本供產品與營運討論。員工會回查案件與技師結果，維持事實、數字及樣本正確；不自行判定產品設計缺陷，也不把客戶描述的原因當技術結論。\n  - FAQ 只有在產品或技術確認新的標準解法後才整理，且須經主管核准，不是每月固定更新。\n  - 新人僅於到職時接受帶教；員工用去識別化舊案例示範重建案件、依清單提問、升級判斷，以及交技師／倉庫的交接資料。前五案逐件檢查資料完整性、越權承諾與結案證明，之後由班長判定能否獨立處理；員工不是考核主管，也沒有派工權。顧問追問其他低頻需負責或協調至某階段的情況，仍未取得回答。\n\n  依據：[/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md](/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md)；[/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md](/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md)；[/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md](/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md)；[/interviews/ecc5ca75-9d85-46cc-865f-4fa7c479c1e5/summary.md](/interviews/ecc5ca75-9d85-46cc-865f-4fa7c479c1e5/summary.md)。",
+      "source_before_sha256": "daf92ce8547570a49a16b55d95cc565ed8c064dccc5cbc7fca6991c18d28c7a2",
+      "exact_error": "Error: String not found in file: '  - 員工另提到每月案件彙整及新人帶教，表示與個案處理不同；目前尚未確認案件彙整的資料內容、使用對象、產出或用途，具體做法仍未知。\n\n  依據：[/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md](/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md)；[/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md](/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md)；[/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md](/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md)。'",
+      "v4a_fixture": "@@\n-  - 員工另提到每月案件彙整及新人帶教，表示與個案處理不同；目前尚未確認案件彙整的資料內容、使用對象、產出或用途，具體做法仍未知。\n-\n-  依據：[/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md](/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md)；[/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md](/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md)；[/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md](/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md)。\n+  - 每月第一個工作日從 CRM 匯出上月案件，以試算表整理；同一訂單的多次聯絡要合併，避免誤算成多台故障，並按現象、型號及處理原因分類，保留可回查樣本供產品與營運討論。員工會回查案件與技師結果，維持事實、數字及樣本正確；不自行判定產品設計缺陷，也不把客戶描述的原因當技術結論。\n+  - FAQ 只有在產品或技術確認新的標準解法後才整理，且須經主管核准，不是每月固定更新。\n+  - 新人僅於到職時接受帶教；員工用去識別化舊案例示範重建案件、依清單提問、升級判斷，以及交技師／倉庫的交接資料。前五案逐件檢查資料完整性、越權承諾與結案證明，之後由班長判定能否獨立處理；員工不是考核主管，也沒有派工權。顧問追問其他低頻需負責或協調至某階段的情況，仍未取得回答。\n+\n+  依據：[/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md](/interviews/7cec9ed7-4aa7-453d-bf1f-d68199b2b767/summary.md)；[/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md](/interviews/b8abfe18-ee89-452d-ba6a-68e4445079c0/summary.md)；[/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md](/interviews/956e5547-63a8-4ce5-b59b-a9a51e8552d4/summary.md)；[/interviews/ecc5ca75-9d85-46cc-865f-4fa7c479c1e5/summary.md](/interviews/ecc5ca75-9d85-46cc-865f-4fa7c479c1e5/summary.md)。",
+      "patch_matches_hand_audited_span": true,
+      "unaffected_content_and_references_byte_preserved": true,
+      "patch_changed_content": true
+    },
+    {
+      "request": 45,
+      "old": "    - FAQ 只有在產品或技術確認新的標準解法後才整理，且須經主管核准，不是每月固定更新。\n    - 新人僅於到職時接受帶教；員工用去識別化舊案例示範重建案件、依清單提問、升級判斷，以及交技師／倉庫的交接資料。前五案逐件檢查資料完整性、越權承諾與結案證明，之後由班長判定能否獨立處理；員工不是考核主管，也沒有派工權。顧問追問其他低頻需負責或協調至某階段的情況，仍未取得回答。",
+      "new": "  - FAQ 只有在產品或技術確認新的標準解法後才整理，且須經主管核准，不是每月固定更新。\n  - 新人僅於到職時接受帶教；員工用去識別化舊案例示範重建案件、依清單提問、升級判斷，以及交技師／倉庫的交接資料。前五案逐件檢查資料完整性、越權承諾與結案證明，之後由班長判定能否獨立處理；員工不是考核主管，也沒有派工權。顧問追問其他低頻需負責或協調至某階段的情況，仍未取得回答。",
+      "source_before_sha256": "1c78e051839a85ab9c8fe707cda6fdfe64cddab9769cfc66fcfc69d745a975fb",
+      "exact_error": "Error: String not found in file: '    - FAQ 只有在產品或技術確認新的標準解法後才整理，且須經主管核准，不是每月固定更新。\n    - 新人僅於到職時接受帶教；員工用去識別化舊案例示範重建案件、依清單提問、升級判斷，以及交技師／倉庫的交接資料。前五案逐件檢查資料完整性、越權承諾與結案證明，之後由班長判定能否獨立處理；員工不是考核主管，也沒有派工權。顧問追問其他低頻需負責或協調至某階段的情況，仍未取得回答。'",
+      "v4a_fixture": "@@\n-    - FAQ 只有在產品或技術確認新的標準解法後才整理，且須經主管核准，不是每月固定更新。\n-    - 新人僅於到職時接受帶教；員工用去識別化舊案例示範重建案件、依清單提問、升級判斷，以及交技師／倉庫的交接資料。前五案逐件檢查資料完整性、越權承諾與結案證明，之後由班長判定能否獨立處理；員工不是考核主管，也沒有派工權。顧問追問其他低頻需負責或協調至某階段的情況，仍未取得回答。\n+  - FAQ 只有在產品或技術確認新的標準解法後才整理，且須經主管核准，不是每月固定更新。\n+  - 新人僅於到職時接受帶教；員工用去識別化舊案例示範重建案件、依清單提問、升級判斷，以及交技師／倉庫的交接資料。前五案逐件檢查資料完整性、越權承諾與結案證明，之後由班長判定能否獨立處理；員工不是考核主管，也沒有派工權。顧問追問其他低頻需負責或協調至某階段的情況，仍未取得回答。",
+      "patch_matches_hand_audited_span": true,
+      "unaffected_content_and_references_byte_preserved": true,
+      "patch_changed_content": false
+    }
+  ],
+  "safety_cases": [
+    {
+      "case": "unique_whitespace",
+      "source": "# B\n  - 每月彙整\n來源 B\n",
+      "expected": "# B\n  - 每週彙整\n來源 B\n",
+      "patch": "@@\n-    - 每月彙整\n+  - 每週彙整",
+      "patch_outcome": {
+        "error": null,
+        "result": "# B\n  - 每週彙整\n來源 B\n",
+        "changed": true
+      },
+      "exact_outcome": {
+        "error": "Error: String not found in file: '    - 每月彙整'",
+        "result": "# B\n  - 每月彙整\n來源 B\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": true
+    },
+    {
+      "case": "repeated_exact_no_context",
+      "source": "# A\n- 每月彙整\n# B\n- 每月彙整\n",
+      "expected": "# A\n- 每月彙整\n# B\n- 每週彙整\n",
+      "patch": "@@\n-- 每月彙整\n+- 每週彙整",
+      "patch_outcome": {
+        "error": null,
+        "result": "# A\n- 每週彙整\n# B\n- 每月彙整\n",
+        "changed": true
+      },
+      "exact_outcome": {
+        "error": "Error: String '- 每月彙整' appears 2 times in file. Use replace_all=True to replace all instances, or provide a more specific string with surrounding context.",
+        "result": "# A\n- 每月彙整\n# B\n- 每月彙整\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": false
+    },
+    {
+      "case": "repeated_with_extra_indent_no_context",
+      "source": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+      "expected": "# A\n- 每月彙整\n# B\n  - 每週彙整\n",
+      "patch": "@@\n-    - 每月彙整\n+  - 每週彙整",
+      "patch_outcome": {
+        "error": null,
+        "result": "# A\n  - 每週彙整\n# B\n  - 每月彙整\n",
+        "changed": true
+      },
+      "exact_outcome": {
+        "error": "Error: String not found in file: '    - 每月彙整'",
+        "result": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": false
+    },
+    {
+      "case": "same_repeated_content_with_B_anchor",
+      "source": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+      "expected": "# A\n- 每月彙整\n# B\n  - 每週彙整\n",
+      "patch": "@@ # B\n-    - 每月彙整\n+  - 每週彙整",
+      "patch_outcome": {
+        "error": null,
+        "result": "# A\n- 每月彙整\n# B\n  - 每週彙整\n",
+        "changed": true
+      },
+      "exact_outcome": {
+        "error": "Error: String not found in file: '    - 每月彙整'",
+        "result": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": true
+    },
+    {
+      "case": "wrong_single_anchor",
+      "source": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+      "expected": null,
+      "patch": "@@ # 不存在\n-    - 每月彙整\n+  - 每週彙整",
+      "patch_outcome": {
+        "error": null,
+        "result": "# A\n  - 每週彙整\n# B\n  - 每月彙整\n",
+        "changed": true
+      },
+      "exact_outcome": {
+        "error": "Error: String not found in file: '    - 每月彙整'",
+        "result": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": false
+    },
+    {
+      "case": "content_mismatch",
+      "source": "# B\n- 每月彙整\n",
+      "expected": null,
+      "patch": "@@ # B\n-- 每年彙整\n+- 每週彙整",
+      "patch_outcome": {
+        "error": "Invalid Context 1:\n- 每年彙整",
+        "result": "# B\n- 每月彙整\n",
+        "changed": false
+      },
+      "exact_outcome": {
+        "error": "Error: String not found in file: '- 每年彙整'",
+        "result": "# B\n- 每月彙整\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": true
+    },
+    {
+      "case": "chinese_crlf",
+      "source": "# B\r\n- 每月彙整\r\n來源 B\r\n",
+      "expected": "# B\r\n- 每週彙整\r\n來源 B\r\n",
+      "patch": "@@ # B\n-  - 每月彙整\n+- 每週彙整",
+      "patch_outcome": {
+        "error": null,
+        "result": "# B\r\n- 每週彙整\r\n來源 B\r\n",
+        "changed": true
+      },
+      "exact_outcome": {
+        "error": "Error: String not found in file: '  - 每月彙整'",
+        "result": "# B\r\n- 每月彙整\r\n來源 B\r\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": true
+    },
+    {
+      "case": "no_eof_newline",
+      "source": "# B\n- 每月彙整",
+      "expected": "# B\n- 每週彙整",
+      "patch": "@@ # B\n-  - 每月彙整\n+- 每週彙整",
+      "patch_outcome": {
+        "error": null,
+        "result": "# B\n- 每週彙整",
+        "changed": true
+      },
+      "exact_outcome": {
+        "error": "Error: String not found in file: '  - 每月彙整'",
+        "result": "# B\n- 每月彙整",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": true
+    },
+    {
+      "case": "wrong_actual_context",
+      "source": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+      "patch": "@@\n # 不存在\n-    - 每月彙整\n+  - 每週彙整",
+      "patch_outcome": {
+        "error": "Invalid Context 0:\n# 不存在\n    - 每月彙整",
+        "result": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": true
+    },
+    {
+      "case": "second_hunk_failure_no_partial_result",
+      "source": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+      "patch": "@@\n # A\n-- 每月彙整\n+- 每週彙整\n@@\n-不存在的內容\n+不能寫入",
+      "patch_outcome": {
+        "error": "Invalid Context 2:\n不存在的內容",
+        "result": "# A\n- 每月彙整\n# B\n  - 每月彙整\n",
+        "changed": false
+      },
+      "meets_intended_location_or_rejection": true
+    }
+  ],
+  "candidate_safety_gate": false,
+  "safety_findings": [
+    "repeated_exact_no_context",
+    "repeated_with_extra_indent_no_context",
+    "wrong_single_anchor"
+  ],
+  "production_changed": false,
+  "model_requests": 0,
+  "model_cost_usd": 0,
+  "comparison_script_sha256": "a3f5d1048827ecfb9462be67402ebd8229947bc4abd9146955f2a540293364d8"
+}

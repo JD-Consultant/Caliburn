@@ -9,7 +9,7 @@ from langgraph.store.memory import InMemoryStore
 
 from analysis_agent.memory import MemoryArtifacts
 from test_live_memory import h, edit, knowledge
-from test_consolidation import harness, call, done, workflow_class
+from test_consolidation import harness, call, done, workflow_class, with_guide
 
 
 def changed_reference(reference, **changes):
@@ -82,7 +82,7 @@ def test_b2_gets_actionable_raw_reference_error_and_can_correct_it(harness):
     h.replies.extend([
         call('write_file', file_path='/memory/knowledge.md', content='[原話](conversation:???)'),
         call('validate_memory'),
-        call('edit_file', file_path='/memory/knowledge.md', old_string='conversation:???', new_string=h.ref),
+        with_guide(call('edit_file', file_path='/memory/knowledge.md', old_string='conversation:???', new_string=h.ref)),
         call('validate_memory'), done(),
     ])
     workflow_class()(h.b1, h.pub, h.model, h.saver).start()

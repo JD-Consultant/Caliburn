@@ -37,6 +37,6 @@ class ConsolidationFeedback(AgentMiddleware):
             return {"messages": [HumanMessage(
                 "Runtime validation feedback (private B2; not employee source): "
                 f"{error}\nNothing has been published. Edit the staged files to fix "
-                "this error, then validate_memory before finishing. "
+                "this error. Runtime checks again when you finish; validate_memory is an optional preflight. "
                 "The existing model/tool limits still apply.")], "jump_to": "model"}
         return None

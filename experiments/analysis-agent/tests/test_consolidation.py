@@ -32,6 +32,13 @@ def done():
     return response_body([assistant_text("整併完成。")])
 
 
+def with_guide(reply):
+    """A completed body repair also supplies its guide, in the same model step."""
+    reply["output"].extend(call("write_file", file_path="/memory/guide.md",
+                                content="網站案例：見 /memory/knowledge.md")["output"])
+    return reply
+
+
 @pytest.fixture
 def harness():
     sent, replies = [], [body()]
@@ -103,7 +110,7 @@ def test_invalid_reference_returns_tool_error_then_model_can_repair(harness):
     path = h.extracted["files"][0]["summary_path"]
     h.replies.extend([call("write_file", file_path="/memory/knowledge.md", content="見 /interviews/missing/summary.md"),
                       call("validate_memory"),
-                      call("edit_file", file_path="/memory/knowledge.md", old_string="/interviews/missing/summary.md", new_string=path),
+                      with_guide(call("edit_file", file_path="/memory/knowledge.md", old_string="/interviews/missing/summary.md", new_string=path)),
                       call("validate_memory"), done()])
     cls(h.b1, h.pub, h.model, h.saver).start()
     assert "missing" in json.dumps(h.sent[3], ensure_ascii=False)

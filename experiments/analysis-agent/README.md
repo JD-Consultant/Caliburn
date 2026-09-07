@@ -6,17 +6,27 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 final synchronous Responses context budgeting**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
-Latest bounded prompt follow-up (2026-09-07): **39 real Luna/medium requests,
+Latest B2 delivery repair (2026-09-07): final Runtime validation rejects a
+nonempty knowledge body paired with a blank guide, with actionable feedback
+inside the existing bounded Agent loop. `validate_memory` is optional preflight,
+not a required extra model step. Fully visible short files may use native
+`write_file`; long/partially read files retain local `edit_file`. Tool descriptions
+and the B2 prompt agree on these boundaries. No new framework/schema, fuzzy edits,
+read-coverage tracker, quota increase or paid call. Tests prove the mechanics,
+not model compliance, semantic completeness or cost improvement.
+[Repair, official sources, verification and remaining limits](../../docs/specs/2026-09-07-b2-delivery-repair-results.md).
+
+Earlier bounded prompt follow-up (2026-09-07): **39 real Luna/medium requests,
 US$0.01960073 reported** across two new runs. The saved fixes completed two B2
 batches, but the entire correction/recall scenario has not passed. A narrow
 prompt trial improved first-batch candidate coverage yet omitted the guide,
 and later exact edits exhausted B2's existing limit. **That trial was reverted**;
-its exact patch and outputs remain in evidence. Code stays at `04ce14d8`:
+its exact patch and outputs remain in evidence. At that savepoint code stayed at `04ce14d8`:
 known-path tool-description and Chinese prose-reference fixes retained;
 analysis prompts/Skills, publication rules and limits unchanged. No broad
 refactor or production readiness claim. Earlier three runs cost US$0.01252361;
-five runs total 66 requests / US$0.03212434. Next gate is B2 delivery/tool design,
-not more blind prompt retries or quota increases.
+five runs total 66 requests / US$0.03212434. The subsequently approved delivery
+repair above is separate; this failed prompt trial is not reinstated as a bundle.
 [Experiment, evidence, fixes and untested boundaries](../../docs/specs/2026-09-07-memory-prompt-live-calibration.md).
 
 Earlier context/Skills wiring verification (2026-09-07): **514 passed / 0 skipped (71.95s)**,
@@ -726,8 +736,12 @@ B2 receives bounded candidates, real detail-note links and the small guide.
 DeepAgents `StateBackend` holds a private copy of the base knowledge/guide;
 official `ls`, `grep`, `read_file`, `write_file`, `edit_file` tools expose that
 staging and read-only interview artifacts. `validate_memory()` has no model
-arguments and returns format/reference errors for correction within the loop.
-It is application validation, not semantic truth or coverage verification.
+arguments and offers optional format/reference/guide-presence preflight within
+the loop. It is application validation, not semantic truth or coverage verification.
+Use native whole-file writes only for a short, fully visible file that fits the
+output budget; retain local exact edits for long/partially read content. Reading
+one page does not establish full visibility. This is usage guidance, not a
+Runtime-enforced read-coverage or semantic-preservation tracker.
 
 Final completed responses without tool calls also validate the staged files via
 public `AgentMiddleware.after_model(can_jump_to=["model"])`. A known application
@@ -740,6 +754,11 @@ There is no outer retry, new correction quota, B1 rerun, or extra successful-pat
 model call; `native_context_view` remains in place. The shared validator is reused
 per staged file to identify the location; only known error reasons are classified
 as correctable, including checking the cause of wrapped reference errors.
+After both actual files are loaded, a nonempty body with a whitespace-only guide
+is also a correctable completion error. This pair check is B2-specific, not a
+new rule in the per-file/shared artifact validator. Initial empty no-ops and
+unchanged valid guides remain allowed; the model need not call the preflight
+tool or regenerate the guide every time.
 
 A per-invocation LangGraph subgraph checkpoints the official Agent's tool steps.
 The completed pair is checked again, saved as immutable Store artifacts, then

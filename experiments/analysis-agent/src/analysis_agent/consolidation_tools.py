@@ -62,6 +62,12 @@ def staged_texts(artifacts: MemoryArtifacts) -> dict[str, str]:
             if not _correctable(error):
                 raise
             raise StagedMemoryValidationError(f"{PATHS[name]}: {error}") from error
+    # Check the actual pair only after downloading both files. Per-file
+    # validation above deliberately supplies an empty placeholder for its peer.
+    if values["knowledge"].strip() and not values["guide"].strip():
+        raise StagedMemoryValidationError(
+            "/memory/guide.md is empty while /memory/knowledge.md contains knowledge. "
+            "Write a concise topic guide pointing to the knowledge; preserve the body.")
     return values
 
 
@@ -70,24 +76,37 @@ def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
         "/interviews/": artifacts.interview_backend()}), artifacts.document_id, thread_id=thread_id)
     filesystem = FilesystemMiddleware(backend=backend,
         tools=["ls", "grep", "read_file", "write_file", "edit_file"],
-        custom_tool_descriptions={"ls":
-            "List files in a directory when the file address is unknown. "
-            "Runtime-provided MEMORY_FILES and summary_path addresses are already valid; "
-            "read them directly without listing their directories first."},
+        custom_tool_descriptions={
+            "ls": "List files in a directory when the file address is unknown. "
+                  "Runtime-provided MEMORY_FILES and summary_path addresses are already valid; "
+                  "read them directly without listing their directories first.",
+            "write_file": "Write the complete contents of a staged memory file, replacing it entirely. "
+                          "Use for a short file whose complete current contents are visible and whose "
+                          "complete updated contents fit the output budget. Preserve unchanged details "
+                          "and references. Read any existing content not already visible first; "
+                          "a paged or truncated read is not the whole file. For large or partially "
+                          "read files use edit_file. Never copy read_file line-number prefixes.",
+            "edit_file": "Replace an exact old_string in a staged memory file. Use for local changes "
+                         "to large or partially read files. Read the affected text first; copy exact "
+                         "punctuation and indentation, without read_file line-number prefixes. "
+                         "A missing or ambiguous match returns an error; re-read the relevant range "
+                         "before correcting it. For a short, fully visible file needing several "
+                         "changes, write_file can replace it once within the output budget."},
         human_message_token_limit_before_evict=None, tool_token_limit_before_evict=4000)
 
     @tool
     def validate_memory() -> str:
-        """Check both staged memory files for readable format, size and existing references.
+        """Optional preflight for staged format, size, references and a nonempty body's guide.
 
-        Does not check semantic truth. On error edit the staged files then validate again.
+        Runtime always checks again at final completion. Does not check semantic truth.
+        On error fix the named file; calling this tool again is optional, not publication.
         """
         backend._check_scope()
         try:
             staged_texts(artifacts)
         except StagedMemoryValidationError as error:
             raise ToolException(str(error)) from error
-        return "Both staged files passed format/reference checks. Not yet published."
+        return "Both staged files passed format/reference and guide-presence checks. Not yet published."
 
     validate_memory.handle_tool_error = True
     # Only tools, not generic message-eviction/summarization middleware hooks.

@@ -19,7 +19,7 @@ from analysis_agent.provider import build_model
 from analysis_agent.publication import PublicationStore, HeadRow, ReceiptRow
 from analysis_agent.runtime import build_agent
 from analysis_agent.sources import ConversationReader
-from test_consolidation import call, done
+from test_consolidation import call, done, with_guide
 from test_extraction import source, body
 
 
@@ -37,7 +37,7 @@ def test_pg_b2_recovers_same_stage_with_new_clients(failure):
         return create_engine(URL.create("postgresql+psycopg"), connect_args=conninfo_to_dict(dsn), hide_parameters=True)
     document, threads = "q019-test-"+str(uuid4()), set()
     sent = []
-    replies = [body(), call("write_file", file_path="/memory/knowledge.md", content="已暫存的案例细節")]
+    replies = [body(), with_guide(call("write_file", file_path="/memory/knowledge.md", content="已暫存的案例细節"))]
     def respond(request):
         sent.append(json.loads(request.content))
         assert replies, "No model call authorized at this resume point"
@@ -106,6 +106,7 @@ def test_pg_b2_recovers_same_stage_with_new_clients(failure):
                     result = workflow.resume()
                     assert pub.current().revision == 1 and pub.current().processed_source == ref
                     assert artifacts.read_text("/memory/knowledge.md", pub.current().memory) == "已暫存的案例细節"
+                    assert artifacts.read_text("/memory/guide.md", pub.current().memory) == "網站案例：見 /memory/knowledge.md"
                     if failure == "during-agent":
                         assert len(sent) == before + 2
                         assert "已暫存的案例细節" in json.dumps(sent[-1], ensure_ascii=False)

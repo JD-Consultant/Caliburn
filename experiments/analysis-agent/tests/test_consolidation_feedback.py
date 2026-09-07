@@ -8,7 +8,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from openai import APIConnectionError
 
 from analysis_agent.consolidation import ConsolidationWorkflow
-from test_consolidation import harness, call, done, knowledge
+from test_consolidation import harness, call, done, knowledge, with_guide
 
 
 MISSING = "/interviews/00000000-0000-0000-0000-000000000000/summary.md"
@@ -21,8 +21,8 @@ def invalid_then_done(h):
 
 
 def correction(h):
-    return call("edit_file", file_path=KNOWLEDGE, old_string=MISSING,
-                new_string=h.extracted["files"][0]["summary_path"])
+    return with_guide(call("edit_file", file_path=KNOWLEDGE, old_string=MISSING,
+                           new_string=h.extracted["files"][0]["summary_path"]))
 
 
 def agent_state(h, workflow):
@@ -76,7 +76,7 @@ def test_missing_reference_and_done_repairs_inside_same_agent_before_publication
     h.replies.extend([repair_without_early_publication, done()])
     workflow = ConsolidationWorkflow(h.b1, h.pub, h.model, h.saver)
     result = workflow.start()
-    assert result["used_model_steps"] == 4 and result["used_tool_calls"] == 2
+    assert result["used_model_steps"] == 4 and result["used_tool_calls"] == 3
     assert len(h.sent) == 5  # B1 once, B2 write/done/edit/done.
     assert result["attempt"] == 1 and h.pub.current().revision == 1
     assert knowledge(h) == "保留案例條件。\n詳記：" + h.extracted["files"][0]["summary_path"]
@@ -143,7 +143,7 @@ def test_interrupted_correction_reopens_exact_saved_messages_files_and_counters(
     result = reopened.resume()
     assert h.sent[4] == h.sent[3]  # Retry the same pending request, not write/done.
     assert len(h.sent) == 6 and result["used_model_steps"] == 4
-    assert result["used_tool_calls"] == 2 and h.pub.current().revision == 1
+    assert result["used_tool_calls"] == 3 and h.pub.current().revision == 1
     assert "保留案例條件" in knowledge(h) and MISSING not in knowledge(h)
     assert_paired(h.sent[-1])
 
@@ -174,14 +174,18 @@ def test_correction_cannot_execute_past_existing_tool_limit(harness):
 ])
 def test_known_final_format_and_reference_errors_identify_file_for_correction(harness, file_path, invalid, reason):
     h = harness
+    repaired = call("write_file", file_path=file_path, content="已修正")
+    if file_path == KNOWLEDGE:
+        repaired = with_guide(repaired)
     h.replies.extend([call("write_file", file_path=file_path, content=invalid), done(),
-                      call("write_file", file_path=file_path, content="已修正"), done()])
+                      repaired, done()])
     result = ConsolidationWorkflow(h.b1, h.pub, h.model, h.saver).start()
     feedback = runtime_feedback(h.sent[3])
     assert len(feedback) == 1
     assert file_path in json.dumps(feedback) and reason in json.dumps(feedback)
     assert len(json.dumps(feedback, ensure_ascii=False)) < 1000
-    assert result["used_model_steps"] == 4 and result["used_tool_calls"] == 2
+    assert result["used_model_steps"] == 4
+    assert result["used_tool_calls"] == (3 if file_path == KNOWLEDGE else 2)
     assert h.artifacts.read_text(file_path, h.pub.current().memory) == "已修正"
 
 
@@ -237,7 +241,7 @@ def test_corrected_attempt_rebases_on_c_head_with_remaining_budget_and_no_b1_rer
     h.replies.extend([correction(h), concurrent_c, done()])
     result = ConsolidationWorkflow(h.b1, h.pub, h.model, h.saver, max_model_steps=5).start()
     assert result["attempt"] == 2 and result["used_model_steps"] == 5
-    assert result["used_tool_calls"] == 2 and len(h.sent) == 6
+    assert result["used_tool_calls"] == 3 and len(h.sent) == 6
     assert knowledge(h) == "C 已更正：保留年租條件。"
     assert h.pub.current().revision == 2 and h.pub.current().processed_source == h.ref
     assert "RECENT_REPAIRS" in json.dumps(h.sent[-1]) and h.ref in json.dumps(h.sent[-1])

@@ -105,7 +105,7 @@ def test_reextraction_updates_published_refs_without_rewinding_cursor(harness):
     h.replies.append(corrected())
     new = h.b1.reextract(old)["files"][0]["summary_path"]
     assert h.pub.current() == old_head
-    h.replies.extend([call("edit_file", file_path="/memory/knowledge.md", old_string=old, new_string=new),
+    h.replies.extend([call("apply_memory_patch", file_path="/memory/knowledge.md", diff=f"@@\n-詳記：{old}\n+詳記：{new}"),
                       call("validate_memory"), done()])
     result = b2.start_reextraction(old)
     assert h.pub.current().processed_source == latest
@@ -134,7 +134,7 @@ def test_failed_reconsolidation_leaves_head_and_retry_uses_new_artifacts(harness
     with pytest.raises(APIConnectionError, match="Connection error"):
         b2.start_reextraction(old)
     assert h.pub.current() == before
-    h.replies.extend([call("edit_file", file_path="/memory/knowledge.md", old_string=old, new_string=new), done()])
+    h.replies.extend([call("apply_memory_patch", file_path="/memory/knowledge.md", diff=f"@@\n-詳記：{old}\n+詳記：{new}"), done()])
     ConsolidationWorkflow(h.b1, h.pub, h.model, h.saver).resume()
     assert h.pub.current().revision == before.revision + 1
     assert new in knowledge(h)

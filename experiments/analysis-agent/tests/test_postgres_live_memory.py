@@ -38,7 +38,7 @@ def test_c_restart_resumes_durable_request_and_refreshes_a(failure):
     document = 'q019-test-' + str(uuid4())
     config = {'configurable': {'thread_id': document}}
     sent, replies, attempted_ids = [], [call('repair_memory', edits=[edit('不存在')]),
-        call('repair_memory', edits=[edit(), edit('主管', '處長', '/memory/guide.md')])], []
+        call('repair_memory', edits=[edit(), edit('主管核准', '處長核准', '/memory/guide.md')])], []
     def respond(request):
         sent.append(json.loads(request.content))
         assert replies, 'No new model request allowed before recovering the pending C tool'

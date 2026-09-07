@@ -71,7 +71,7 @@ def test_pg_reextraction_recovery_preserves_cursor_and_references(failure):
                 version = artifacts.save_memory(knowledge="案例：" + old, guide="網站案例")
                 pub.publish(pub.prepare(version, expected_revision=0, kind="consolidation", processed_source=ref))
                 new = b1.reextract(old)["files"][0]["summary_path"]
-                replies.extend([call("edit_file", file_path="/memory/knowledge.md", old_string=old, new_string=new), done()])
+                replies.extend([call("apply_memory_patch", file_path="/memory/knowledge.md", diff=f"@@\n-案例：{old}\n+案例：{new}"), done()])
                 if failure == "before-save":
                     b1 = ExtractionWorkflow(reader, FailedSave(store, document), model, saver)
                 else:

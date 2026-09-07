@@ -12,6 +12,7 @@ from langgraph.types import Command
 from analysis_agent.memory import MemoryVersion
 from analysis_agent.memory_tools import MEMORY_EDIT_GUIDANCE, MEMORY_READ_GUIDANCE, memory_read_tools
 from analysis_agent.repair import MemoryEdit, RepairWorkflow
+from analysis_agent.memory_patch import PATCH_GUIDANCE
 
 
 class MemorySessionState(AgentState):
@@ -35,10 +36,12 @@ class MemorySession(AgentMiddleware):
 
         @tool
         def repair_memory(edits: list[MemoryEdit], runtime: ToolRuntime) -> Command:
-            """Repair previously read memory with a small atomic batch of exact edits.
+            """Repair previously read memory with a small atomic batch of V4A patches.
 
             Only /memory/knowledge.md and /memory/guide.md, 1–8 edits, 12000
-            combined old/new characters. Update the guide if routing changed.
+            combined diff characters. Each edit has path and diff only.
+            Update the guide if routing changed. A failed patch prevents the
+            whole batch from being published; retry against current published Memory.
             On stale read the new head and reconsider. On ambiguous employee
             meaning ask them; this tool checks format, not semantic truth.
             """
@@ -48,7 +51,7 @@ class MemorySession(AgentMiddleware):
                 "source_reference": runtime.state["memory_source_reference"]})
             return self._command(result["outcome"], runtime.state, runtime.tool_call_id)
 
-        repair_memory.description += "\n\n" + MEMORY_EDIT_GUIDANCE
+        repair_memory.description += "\n\n" + PATCH_GUIDANCE + "\n\n" + MEMORY_EDIT_GUIDANCE
 
         # Keep the actual factory-built capability separate from the write tool.
         # Conversation composition rejects same-name replacements before binding.

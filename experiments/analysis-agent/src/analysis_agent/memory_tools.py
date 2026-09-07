@@ -17,11 +17,11 @@ from analysis_agent.skills import SkillAssets, analysis_files
 # Display gutter contract: deepagents 0.7.13 read_file / format_content_with_line_numbers.
 # https://github.com/langchain-ai/deepagents/blob/main/libs/deepagents/deepagents/middleware/filesystem.py
 MEMORY_EDIT_GUIDANCE = (
-    "Prefer the smallest unique text span that covers the change. "
+    "Prefer the smallest local change with distinguishing surrounding context. "
     "read_file's line number and two following separator spaces are display only: "
     "'12  - item' has source text '- item'. Preserve actual source indentation, "
-    "not that display prefix. After a missing match, re-read and choose a unique "
-    "in-line fragment instead of guessing leading spaces. "
+    "not that display prefix. After a missing match, re-read the affected range "
+    "instead of guessing source lines or changing unrelated text. "
     "Preserve established facts, scope, exceptions, and references that the new "
     "information does not change. Omission from new information is not withdrawal "
     "of an established fact. If replacing a whole sentence, section, or file, "

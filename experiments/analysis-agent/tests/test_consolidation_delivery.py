@@ -103,14 +103,15 @@ def test_short_read_then_native_overwrite_preserves_other_case_and_reuses_guide(
 
 
 @pytest.mark.parametrize("detail_size", [0, 1200])
-def test_partial_read_then_exact_edit_preserves_unread_long_body(harness, detail_size):
+def test_partial_read_then_patch_preserves_unread_long_body(harness, detail_size):
     h = harness
     original = "\n".join(f"案例 {i}：保留獨特細節" + "細" * detail_size for i in range(120))
     version = h.artifacts.save_memory(knowledge=original, guide="案例目錄")
     h.pub.publish(h.pub.prepare(version, expected_revision=0, kind="repair"))
     h.replies.extend([call("read_file", file_path=BODY),
-                      call("edit_file", file_path=BODY, old_string="案例 10：保留獨特細節",
-                           new_string="案例 10：保留獨特細節；補充驗收條件"), done()])
+                      call("apply_memory_patch", file_path=BODY,
+                           diff="@@\n-案例 10：保留獨特細節" + "細" * detail_size +
+                                "\n+案例 10：保留獨特細節；補充驗收條件" + "細" * detail_size), done()])
     ConsolidationWorkflow(h.b1, h.pub, h.model, h.saver).start()
     read_result = next(item["output"] for item in h.sent[2]["input"]
                        if item.get("type") == "function_call_output")

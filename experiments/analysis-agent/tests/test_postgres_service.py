@@ -182,7 +182,7 @@ def test_pg_uncertain_repair_can_explicitly_resume_same_operation(pg_service, mo
             raise PublicationUncertain('injected lost publication result')
         monkeypatch.setattr(pub, 'publish', fail)
         replies.append(call('repair_memory', edits=[{
-            'path': '/memory/knowledge.md', 'old_text': '每月', 'new_text': '每週'}]))
+            'path': '/memory/knowledge.md', 'diff': '@@\n-每月\n+每週'}]))
         run = service.submit(doc, 'one', '我剛剛說錯，是每週。')
         service.join(doc)
         result = service.get_run(doc, run['id'])

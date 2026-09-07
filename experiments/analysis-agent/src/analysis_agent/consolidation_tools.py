@@ -1,14 +1,12 @@
 """Official virtual filesystem tools over a private attempt's staged files."""
 from deepagents.backends import CompositeBackend, StateBackend
-from deepagents.backends.protocol import EditResult, WriteResult
+from deepagents.backends.protocol import WriteResult
 from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain_core.tools import ToolException, tool
 
 from analysis_agent.memory import MemoryArtifacts, ReadOnlyFiles
 from analysis_agent.memory_tools import MEMORY_EDIT_GUIDANCE
-
-
-PATHS = {"knowledge": "/memory/knowledge.md", "guide": "/memory/guide.md"}
+from analysis_agent.memory_patch import PATHS, PATCH_GUIDANCE, MemoryPatchError, apply_staged_patch
 
 
 class StagedMemoryValidationError(ValueError):
@@ -41,13 +39,6 @@ class StagedFiles(ReadOnlyFiles):
             return WriteResult(error="Write denied: only /memory/knowledge.md and /memory/guide.md are editable")
         return self._backend.write(file_path, content)
 
-    def edit(self, file_path: str, old_string: str, new_string: str, replace_all: bool = False):
-        self._check_scope()
-        if file_path not in PATHS.values():
-            return EditResult(error="Edit denied: only the two staged memory files are editable")
-        return self._backend.edit(file_path, old_string, new_string, replace_all)
-
-
 def staged_texts(artifacts: MemoryArtifacts) -> dict[str, str]:
     """Called in graph context, using public backend download semantics."""
     values = {}
@@ -76,7 +67,7 @@ def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
     backend = StagedFiles(CompositeBackend(default=StateBackend(), routes={
         "/interviews/": artifacts.interview_backend()}), artifacts.document_id, thread_id=thread_id)
     filesystem = FilesystemMiddleware(backend=backend,
-        tools=["ls", "grep", "read_file", "write_file", "edit_file"],
+        tools=["ls", "grep", "read_file", "write_file"],
         custom_tool_descriptions={
             "ls": "List files in a directory when the file address is unknown. "
                   "Runtime-provided MEMORY_FILES and summary_path addresses are already valid; "
@@ -86,16 +77,26 @@ def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
                           "complete updated contents fit the output budget. Preserve unchanged details "
                           "and references. Read any existing content not already visible first; "
                           "a paged or truncated read is not the whole file. For large or partially "
-                          "read files use edit_file. Never copy read_file line-number prefixes. "
-                          + MEMORY_EDIT_GUIDANCE,
-            "edit_file": "Replace an exact old_string in a staged memory file. Use for local changes "
-                         "to large or partially read files. Read the affected text first; copy exact "
-                         "punctuation and indentation, without read_file line-number prefixes. "
-                         "A missing or ambiguous match returns an error; re-read the relevant range "
-                         "before correcting it. For a short, fully visible file needing several "
-                         "changes, write_file can replace it once within the output budget. "
-                         + MEMORY_EDIT_GUIDANCE},
+                          "read files use apply_memory_patch. Never copy read_file line-number prefixes. "
+                          + MEMORY_EDIT_GUIDANCE},
         human_message_token_limit_before_evict=None, tool_token_limit_before_evict=4000)
+
+    @tool
+    def apply_memory_patch(file_path: str, diff: str) -> str:
+        """Patch an existing staged Memory file using a V4A diff (max 12000 characters).
+
+        Read the affected range first. This stages changes, not publication.
+        For initialization or a short fully visible file, write_file remains available.
+        """
+        backend._check_scope()
+        try:
+            changed = apply_staged_patch(file_path, diff)
+        except MemoryPatchError as error:
+            raise ToolException(str(error)) from error
+        return f"{file_path}: {'Patch applied to staging' if changed else 'Content unchanged'}. Not yet published."
+
+    apply_memory_patch.description += "\n\n" + PATCH_GUIDANCE + "\n\n" + MEMORY_EDIT_GUIDANCE
+    apply_memory_patch.handle_tool_error = True
 
     @tool
     def validate_memory() -> str:
@@ -113,4 +114,4 @@ def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
 
     validate_memory.handle_tool_error = True
     # Only tools, not generic message-eviction/summarization middleware hooks.
-    return [*filesystem.tools, validate_memory]
+    return [*filesystem.tools, apply_memory_patch, validate_memory]

@@ -28,7 +28,11 @@ def session_class():
 
 
 def edit(old='主管', new='處長', path='/memory/knowledge.md'):
-    return {'path': path, 'old_text': old, 'new_text': new}
+    # Fixture convenience only: model-facing tool receives an actual line diff.
+    if old in ('主管', '處長', '總監'):
+        template = '{}核准：/memory/knowledge.md' if path.endswith('guide.md') else '例外由{}核准。'
+        old, new = template.format(old), template.format(new)
+    return {'path': path, 'diff': f'@@\n-{old}\n+{new}' if old else ''}
 
 
 @pytest.fixture
@@ -129,7 +133,7 @@ def test_new_input_guide_supersedes_historical_c_feedback_on_sdk_wire(h, entrypo
     assert all(p['tools'] == h.sent[0]['tools'] for p in h.sent)
     schema = next(t for t in h.sent[0]['tools'] if t['name'] == 'repair_memory')['parameters']
     assert set(schema['properties']) == {'edits'}
-    assert set(schema['properties']['edits']['items']['properties']) == {'path', 'old_text', 'new_text'}
+    assert set(schema['properties']['edits']['items']['properties']) == {'path', 'diff'}
 
 
 def test_old_partial_state_missing_initial_revision_stays_unknown_on_resume(h):
@@ -198,7 +202,7 @@ def test_stale_refresh_then_reconsider_uses_new_base(h):
         h.pub.publish(h.pub.prepare(newer, expected_revision=1, kind='repair', repair_sources=(h.ref,)))
         return call('repair_memory', edits=[edit()])
     h.replies.extend([background_wins, call('read_file', file_path='/memory/knowledge.md'),
-        call('repair_memory', edits=[edit('一般例外由主管核准', '一般例外由處長核准')]), done()])
+        call('repair_memory', edits=[edit('一般例外由主管核准；特殊例外由總監核准。', '一般例外由處長核准；特殊例外由總監核准。')]), done()])
     result = h.agent().invoke({'messages': [HumanMessage('一般例外改成處長', id='h1')]}, h.config, durability='sync')
     feedback = json.loads(tool_results(result)[0].content)
     assert feedback['status'] == 'stale' and feedback['head']['revision'] == 2
@@ -262,7 +266,7 @@ def test_bad_schema_is_counted_and_new_employee_input_resets_budget(h):
     assert second['memory_repair_failures'] == 0
 
 
-def test_ambiguous_exact_match_is_not_replace_all(h):
+def test_missing_source_line_does_not_replace_repeated_substrings(h):
     newer = h.artifacts.save_memory(knowledge='主管核准；主管備查', guide='核准')
     h.pub.publish(h.pub.prepare(newer, expected_revision=1, kind='repair'))
     h.replies.extend([call('repair_memory', edits=[edit()]), done()])

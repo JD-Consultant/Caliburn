@@ -21,8 +21,8 @@ def invalid_then_done(h):
 
 
 def correction(h):
-    return with_guide(call("edit_file", file_path=KNOWLEDGE, old_string=MISSING,
-                           new_string=h.extracted["files"][0]["summary_path"]))
+    return with_guide(call("apply_memory_patch", file_path=KNOWLEDGE,
+                           diff="@@\n-詳記：" + MISSING + "\n+詳記：" + h.extracted["files"][0]["summary_path"]))
 
 
 def agent_state(h, workflow):

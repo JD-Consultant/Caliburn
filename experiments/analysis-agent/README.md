@@ -6,6 +6,18 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 native-first Responses context management with optional exact preflight**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
+CT11 local editor trial (2026-09-07): B2 exposes `apply_memory_patch(file_path,diff)`
+and C accepts `repair_memory(edits=[{path,diff}])`, both using official
+OpenAI Agents SDK `apply_diff` locally over staged StateBackend files. This
+does not use an OpenAI key or change the model provider. Read pagination,
+format/reference checks and existing atomic publication remain in place.
+Terminal End Patch is supported; additional file operations are not. SDK
+first-match semantics do not guarantee correct semantic targeting.
+C passed the targeted Luna/medium trial; B2 final live publication remains
+unverified after the trial cap. Not long-interview acceptance. This supersedes
+older exact-edit tool descriptions below; short fully visible files retain write_file.
+[Current results, official sources and limitations](../../docs/specs/2026-09-07-official-memory-patch-trial-results.md).
+
 CT-03 read guidance (2026-09-07): the live Memory session and independent reader
 share conditional deep-reading instructions; sufficient knowledge may answer
 without reopening every source. One Luna/medium comparison completed in 9 calls

@@ -319,7 +319,7 @@ def test_b1_schema_and_b2_read_loop_actual_payload(tmp_path, exact):
             assert payloads[1]['text']['format']['strict'] is True
             assert not payloads[1].get('tools')
             assert {t['name'] for t in payloads[2]['tools']} == {
-                'ls', 'grep', 'read_file', 'write_file', 'edit_file', 'validate_memory'}
+                'ls', 'grep', 'read_file', 'write_file', 'apply_memory_patch', 'validate_memory'}
             assert any(i.get('type') == 'function_call_output' and 'Error' in i['output']
                        for i in payloads[3]['input'])
             assert 'A網站：單次付款' in json.dumps(payloads[4], ensure_ascii=False)

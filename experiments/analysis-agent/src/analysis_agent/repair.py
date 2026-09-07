@@ -1,12 +1,13 @@
-"""C: durable exact edits with public StateBackend; no model of its own."""
+"""C: durable SDK patches with public StateBackend; no model of its own."""
 from dataclasses import asdict, replace
 
 from deepagents.backends import StateBackend
 from deepagents.middleware.filesystem import FilesystemState
 from langgraph.graph import END, START, StateGraph
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, ValidationError
 
 from analysis_agent.consolidation_tools import PATHS, staged_texts
+from analysis_agent.memory_patch import MAX_PATCH_CHARACTERS, MemoryPatchError, apply_staged_patch
 from analysis_agent.memory import MemoryVersion
 from analysis_agent.publication import PublicationUncertain, PublishRequest, StalePublication
 from sqlalchemy.exc import DBAPIError
@@ -15,8 +16,7 @@ from sqlalchemy.exc import DBAPIError
 class MemoryEdit(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     path: str
-    old_text: str
-    new_text: str
+    diff: str
 
 
 class RepairState(FilesystemState):
@@ -57,11 +57,16 @@ class RepairWorkflow:
 
     def _seed(self, state):
         edits = state["edits"]
-        if not 1 <= len(edits) <= 8 or sum(len(e["old_text"]) + len(e["new_text"]) for e in edits) > 12000:
-            return {"outcome": {"status": "invalid_edit", "detail": "Use 1–8 edits, at most 12000 combined old/new characters", "read_paths": list(PATHS.values())}}
-        for index, edit in enumerate(edits):
-            if edit["path"] not in PATHS.values() or not edit["old_text"]:
-                return {"outcome": {"status": "invalid_edit", "detail": f"Edit {index + 1}: only the two existing memory files and nonempty exact old_text are allowed", "read_paths": list(PATHS.values())}}
+        try:
+            # A saved old tool payload is not silently reinterpreted as a patch.
+            patches = [MemoryEdit.model_validate(e) for e in edits]
+        except ValidationError:
+            return {"outcome": {"status": "invalid_edit", "detail": "Each edit needs path and diff. Read current Memory and provide a V4A patch, not old_text/new_text.", "read_paths": list(PATHS.values())}}
+        if not 1 <= len(patches) <= 8 or sum(len(e.diff) for e in patches) > MAX_PATCH_CHARACTERS:
+            return {"outcome": {"status": "invalid_edit", "detail": "Use 1–8 patches, at most 12000 combined diff characters", "read_paths": list(PATHS.values())}}
+        for index, edit in enumerate(patches):
+            if edit.path not in PATHS.values() or not edit.diff.strip():
+                return {"outcome": {"status": "invalid_edit", "detail": f"Edit {index + 1}: only the two existing memory files and nonempty diffs are allowed", "read_paths": list(PATHS.values())}}
         head = self.publication.current()
         if not state["base"]:
             return {"outcome": self._feedback("no_memory", head, "No memory was loaded. Background extraction/consolidation initializes memory; C does not.")}
@@ -74,11 +79,11 @@ class RepairWorkflow:
     def _edit(self, state):
         index = state["index"]
         edit = state["edits"][index]
-        result = StateBackend().edit(edit["path"], edit["old_text"], edit["new_text"], replace_all=False)
-        if result.error:
-            return {"outcome": {"status": "invalid_edit", "detail": f"Edit {index + 1}: {result.error}", "read_paths": [edit["path"]]}}
-        # Backend writes become visible at the next graph step, not guessed
-        # read-your-writes behavior inside a loop over one node's snapshot.
+        try:
+            apply_staged_patch(edit["path"], edit["diff"])
+        except MemoryPatchError as error:
+            return {"outcome": {"status": "invalid_edit", "detail": f"Edit {index + 1}: {error}", "read_paths": [edit["path"]]}}
+        # Preserve the existing per-edit graph checkpoint/resume boundary.
         return {"index": index + 1}
 
     def _validate(self, state):

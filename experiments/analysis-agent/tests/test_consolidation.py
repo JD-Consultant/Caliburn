@@ -96,7 +96,7 @@ def test_saved_candidates_detail_read_and_atomic_publication(harness):
     assert "A網站：單次付款" in json.dumps(h.sent[2], ensure_ascii=False)
     assert "PRIVATE-REASONING" not in json.dumps(h.sent[1:], ensure_ascii=False)
     assert result["used_model_steps"] == 5 and result["used_tool_calls"] == 4
-    assert {t["name"] for t in h.sent[1]["tools"]} == {"ls", "grep", "read_file", "write_file", "edit_file", "validate_memory"}
+    assert {t["name"] for t in h.sent[1]["tools"]} == {"ls", "grep", "read_file", "write_file", "apply_memory_patch", "validate_memory"}
     assert h.sent[1]["max_output_tokens"] == 4096
     count = len(h.sent)
     assert workflow.start()["result"] == result["result"]
@@ -110,31 +110,28 @@ def test_invalid_reference_returns_tool_error_then_model_can_repair(harness):
     path = h.extracted["files"][0]["summary_path"]
     h.replies.extend([call("write_file", file_path="/memory/knowledge.md", content="見 /interviews/missing/summary.md"),
                       call("validate_memory"),
-                      with_guide(call("edit_file", file_path="/memory/knowledge.md", old_string="/interviews/missing/summary.md", new_string=path)),
+                      with_guide(call("apply_memory_patch", file_path="/memory/knowledge.md", diff=f"@@\n-見 /interviews/missing/summary.md\n+見 {path}")),
                       call("validate_memory"), done()])
     cls(h.b1, h.pub, h.model, h.saver).start()
     assert "missing" in json.dumps(h.sent[3], ensure_ascii=False)
     assert path in knowledge(h) and "missing" not in knowledge(h)
 
 
-def test_read_display_gutter_is_not_editable_source_and_retry_preserves_real_indent(harness):
-    # CT06 witness: the model copied read_file's two display spaces into an
-    # exact edit. Exercise the real framework read/edit boundary, not a prompt
-    # string assertion or a claim that a synthetic model learned the guidance.
+def test_patch_handles_display_separator_spaces_preserving_real_indent(harness):
+    # CT06 failure adapted to SDK patch. This is a deterministic wire fixture,
+    # not evidence that a real model always supplies the right patch.
     h = harness
     content = "# 工作\n- 維護每月一次\n  - 正式資料由後端處理"
     h.replies.extend([
         with_guide(call("write_file", file_path="/memory/knowledge.md", content=content)),
         call("read_file", file_path="/memory/knowledge.md"),
-        call("edit_file", file_path="/memory/knowledge.md",
-             old_string="  - 維護每月一次", new_string="  - 維護每月第一個工作日"),
-        call("edit_file", file_path="/memory/knowledge.md",
-             old_string="維護每月一次", new_string="維護每月第一個工作日"),
+        call("apply_memory_patch", file_path="/memory/knowledge.md",
+             diff="@@\n # 工作\n-  - 維護每月一次\n+- 維護每月第一個工作日\n   - 正式資料由後端處理"),
         done(),
     ])
     workflow_class()(h.b1, h.pub, h.model, h.saver).start()
     assert "2  - 維護每月一次" in json.dumps(h.sent[3], ensure_ascii=False)
-    assert "String not found" in json.dumps(h.sent[4], ensure_ascii=False)
+    assert "Patch applied to staging" in json.dumps(h.sent[4], ensure_ascii=False)
     assert knowledge(h) == "# 工作\n- 維護每月第一個工作日\n  - 正式資料由後端處理"
 
 

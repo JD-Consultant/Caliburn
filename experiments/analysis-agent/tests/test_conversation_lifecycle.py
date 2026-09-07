@@ -171,7 +171,7 @@ def test_known_tool_schema_error_goes_back_to_model(h):
     result = compose_memory(h).invoke({'messages': [HumanMessage('改成處長', id='h1')]}, h.config, durability='sync')
     feedback = json.loads(tool_results(result)[0].content)
     assert feedback['status'] == 'invalid_edit' and feedback['retryable']
-    assert 'old_text' in feedback['detail']
+    assert 'diff' in feedback['detail']
     assert result['turn_outcome']['status'] == 'completed'
     assert h.pub.current().revision == 2
 
@@ -182,7 +182,7 @@ def test_stale_c_refresh_is_not_implicit_background_context_change(h):
         h.pub.publish(h.pub.prepare(newer, expected_revision=1, kind='repair', repair_sources=(h.ref,)))
         return call('repair_memory', edits=[edit()])
     h.replies.extend([intervening_publication, call('read_file', file_path='/memory/knowledge.md'),
-                     call('repair_memory', edits=[edit()]), done()])
+                     call('repair_memory', edits=[edit('主管核准；另有特殊例外', '處長核准；另有特殊例外')]), done()])
     result = compose_memory(h).invoke({'messages': [HumanMessage('改成處長', id='h1')]}, h.config, durability='sync')
     assert json.loads(tool_results(result)[0].content)['status'] == 'stale'
     assert '特殊例外' in tool_results(result)[1].content

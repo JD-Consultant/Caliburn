@@ -295,6 +295,44 @@ def test_candidate_limit_stops_before_b2_model(harness):
     assert cls(h.b1, h.pub, h.model, h.saver).start()["result"] is not None
 
 
+def first_batch_payload(h):
+    message = next(item for item in h.sent[1]['input'] if item.get('role') == 'user')
+    content = message['content']
+    return json.loads(content if isinstance(content, str) else content[0]['text'])
+
+
+@pytest.mark.parametrize('at_boundary', [False, True])
+def test_current_batch_detail_is_visible_before_first_b2_tool_call(harness, at_boundary):
+    # Catch Runtime reading the detail but sending only its address to the model.
+    h = harness
+    h.replies.append(done())
+    expected = [{'summary_path':item['summary_path'],
+                 'content':h.artifacts.read_text(item['summary_path'])} for item in h.extracted['files']]
+    size = sum(len(item['content']) for item in expected) + sum(
+        len(h.artifacts.read_text(item['candidates_path'])) for item in h.extracted['files'])
+    options = {'max_candidate_chars':size} if at_boundary else {}
+    workflow_class()(h.b1, h.pub, h.model, h.saver, **options).start()
+    assert first_batch_payload(h)['NEW_DETAILS'] == expected
+    first_input = json.dumps(h.sent[1]['input'], ensure_ascii=False)
+    assert 'A網站：單次付款' in first_input
+    assert 'B網站：月租、權限分級' in first_input
+    assert h.extracted['files'][0]['summary_path'] in first_input
+    assert 'PRIVATE-REASONING' not in first_input
+
+
+def test_large_batch_keeps_full_detail_readable_without_inline_truncation(harness):
+    h = harness
+    path = h.extracted['files'][0]['summary_path']
+    size = len(h.artifacts.read_text(h.extracted['files'][0]['candidates_path']))
+    h.replies.extend([call('read_file', file_path=path), done()])
+    workflow_class()(h.b1, h.pub, h.model, h.saver, max_candidate_chars=size).start()
+    first_input = json.dumps(h.sent[1]['input'], ensure_ascii=False)
+    assert first_batch_payload(h)['NEW_DETAILS'] == []
+    assert 'A網站：單次付款' not in first_input
+    assert path in first_input
+    assert 'A網站：單次付款' in json.dumps(h.sent[2]['input'], ensure_ascii=False)
+
+
 def test_invalid_final_stage_cannot_publish_when_correction_budget_exhausted(harness):
     cls = workflow_class()
     h = harness

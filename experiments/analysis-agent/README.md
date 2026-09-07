@@ -6,6 +6,21 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 native-first Responses context management with optional exact preflight**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
+CT15 bounded grounding (2026-09-08): B1 candidates preserve known case identity
+and scope; B2 distinguishes candidate routing from evidence for precise details.
+Within the existing 24,000-character batch-text allowance, candidates plus the
+complete current-batch summaries enter B2 together as `NEW_DETAILS`. If the
+combined size exceeds that allowance, summaries are omitted from initial input
+as a whole (never truncated) and remain readable by their saved paths. Prior
+Memory, guide, tools and full native Context budgeting are unchanged. No all-history
+injection, new model output fields, Git workspace or storage layer is introduced.
+Official source trace and bounded-probe limitations:
+[CT15 grounding](../../docs/specs/2026-09-07-ct15-openai-consolidation-input-trace.md).
+583 offline/local-PG tests passed. The whole-role trial finished, including an
+owner-approved experiment-only closure retry (4096→8192), but quality remains
+open: qualifier fidelity and late-source consolidation need follow-up.
+[CT15 results and transcript](../../docs/specs/2026-09-08-ct15-grounding-and-whole-interview-results.md).
+
 CT13 prompt calibration (2026-09-07): extraction candidates, consolidation,
 recall and interview paraphrases must preserve factual scope and qualifiers.
 Interview closure checks work breadth and professional depth using existing

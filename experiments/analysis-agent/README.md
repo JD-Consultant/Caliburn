@@ -6,6 +6,16 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 final synchronous Responses context budgeting**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
+Latest B1 prompt calibration (2026-09-07): preserve who stated what and the
+scope of unanswered questions; candidates include known work and case additions,
+not only unknowns. One fixed Luna/medium sequence completed three B2 publications;
+an unanswered question no longer erased the earlier employee statement, and the
+later explicit correction changed A without changing B. This is **single-sample
+improvement, not full Memory acceptance**: fresh-context recall stopped at the
+unchanged 24-request experiment ceiling without a final answer. Cost US$0.01148693.
+B2, schema fields, persistence, tools and limits are unchanged in this slice.
+[Evidence, source rationale and remaining limits](../../docs/specs/2026-09-07-b1-attribution-calibration-results.md).
+
 Latest B2 delivery repair (2026-09-07): final Runtime validation rejects a
 nonempty knowledge body paired with a blank guide, with actionable feedback
 inside the existing bounded Agent loop. `validate_memory` is optional preflight,

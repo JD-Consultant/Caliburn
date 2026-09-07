@@ -24,6 +24,8 @@ Owner 要求繼續研究、調整、優化至正常訪談。唯一問題：**已
 - **已研究官方機制：**[CT-03 §2](2026-09-07-memory-recall-completion-calibration.md#2-診斷與直接來源)保存 LangChain 限制、Anthropic 工具工程與 OpenAI progressive-disclosure 來源；不因換驗證入口而重複研究相同原則。
 - **Caliburn mapping：**合成前端接案、更正與重啟三情境，以及本次測試額度，是本案驗證方法，不稱為大廠唯一流程。
 
+> 後續：本頁保留CT04當時的OPEN結果；CT05針對B2任務提示的修正與最新驗收狀態只見[增量整併品質校準](2026-09-07-incremental-memory-quality-calibration.md)，不要重跑本頁已關閉的付費帳本。
+
 ## 結果／下一 gate
 
 原入口三輪已完成（3＋3＋1 次 A、另 5 次 B，共 12 次／估 US$0.01135661）。C 發布 revision 2；B 補新詳記引用成 revision 3，沒有蓋回旧客服權限；重新開啟後新理解及原生 reasoning 延續。四份詳記已沿引用實際回查原文；重建的 16 則 fixture 訊息逐字不變。

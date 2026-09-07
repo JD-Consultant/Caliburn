@@ -100,6 +100,9 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
     missing = [name for name in required if not os.environ.get(name)]
     if missing:
         raise RuntimeError('Required settings missing: ' + ', '.join(missing))
+    budget_mode = os.environ.get('Q019_CONTEXT_BUDGET_MODE', 'native')
+    if budget_mode not in {'native', 'exact'}:
+        raise ValueError('Q019_CONTEXT_BUDGET_MODE must be native or exact')
     params = conninfo_to_dict(os.environ['Q019_DATABASE_URL'])
     if params.get('host') not in {'localhost', '127.0.0.1'} or not params.get('dbname', '').startswith('q019_'):
         raise ValueError('This isolated entry requires a local q019_ database')
@@ -133,7 +136,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
         counter = stack.enter_context(OpenAI(api_key=os.environ['OPENAI_API_KEY'],
                                             http_client=count_http, timeout=http_timeout))
         model_name = os.environ.get('Q019_MODEL', 'gpt-5.6-luna')
-        budget = ResponsesBudget(counter=counter, model=model_name, context_window_tokens=capacity)
+        budget = ResponsesBudget(counter=counter, model=model_name, context_window_tokens=capacity,
+                                 exact_count=budget_mode == 'exact')
         client = stack.enter_context(httpx.Client(timeout=http_timeout, event_hooks={'request': [budget]}))
         # Resolve OPENAI_BASE_URL once through the SDK public property. Both
         # clients MUST target the same endpoint, including custom path prefixes.

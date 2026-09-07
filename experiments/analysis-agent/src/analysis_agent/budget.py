@@ -1,7 +1,8 @@
-"""Sync Responses preflight over the final SDK-serialized request, without mutation.
+"""Sync Responses request contract with opt-in exact preflight, without mutation.
 
 HTTPX public request hooks run before transport. The independent SDK counter
-owns its normal transport retry; this adapter adds no retry/cache/state store.
+owns its normal transport retry when enabled; native mode never calls it.
+This adapter adds no retry/cache/state store or approximate token guarantee.
 Count cannot predict new inline compaction produced by the pending response.
 """
 from dataclasses import dataclass, field
@@ -50,9 +51,12 @@ class ResponsesBudget:
     counter: OpenAI
     model: str
     context_window_tokens: int
+    exact_count: bool = False
     endpoint: httpx.URL = field(init=False)
 
     def __post_init__(self):
+        if type(self.exact_count) is not bool:
+            raise RequestBudgetConfigurationError('exact_count must be a boolean')
         if type(self.context_window_tokens) is not int or self.context_window_tokens <= 0:
             raise RequestBudgetConfigurationError('Context capacity must be a positive integer')
         if not isinstance(self.model, str) or not self.model.strip():
@@ -75,13 +79,17 @@ class ResponsesBudget:
             raise RequestBudgetConfigurationError('Responses body must be valid JSON') from None
         if not isinstance(body, dict) or body.get('model') != self.model:
             raise RequestBudgetConfigurationError('Responses model must match configured capacity')
-        if body.keys() - _COUNT_FIELDS - _CREATE_ONLY:
-            raise RequestBudgetConfigurationError('Unsupported Responses input/count schema')
         output = body.get('max_output_tokens')
         if type(output) is not int or not 0 < output <= self.context_window_tokens:
             raise RequestBudgetConfigurationError('A valid final max_output_tokens is required')
         if body.get('truncation') != 'disabled':
             raise RequestBudgetConfigurationError('Responses truncation must be disabled')
+        if not self.exact_count:
+            return
+        # Count has a narrower schema than create. Only exact preflight needs
+        # this whitelist; native create remains governed by the SDK/provider.
+        if body.keys() - _COUNT_FIELDS - _CREATE_ONLY:
+            raise RequestBudgetConfigurationError('Unsupported Responses input/count schema')
         try:
             result = self.counter.responses.input_tokens.count(
                 **{key: value for key, value in body.items() if key in _COUNT_FIELDS})

@@ -203,7 +203,8 @@ def test_pg_uncertain_repair_can_explicitly_resume_same_operation(pg_service, mo
         assert len(sent) == 1  # final answer, not regeneration of the repair call
 
 
-def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_service, monkeypatch):
+@pytest.mark.parametrize('mode', [None, 'native', 'exact'])
+def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_service, monkeypatch, mode):
     from fastapi.testclient import TestClient
     from analysis_agent.api import create_app
     from analysis_agent import api
@@ -217,6 +218,10 @@ def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_se
     monkeypatch.setenv('OPENAI_BASE_URL', 'https://budget-test.invalid/custom/v1/')
     monkeypatch.setenv('Q019_BACKGROUND_POLL_SECONDS', '60')
     monkeypatch.setenv('Q019_BACKGROUND_MAX_RECOVERIES', '1')
+    if mode is None:
+        monkeypatch.delenv('Q019_CONTEXT_BUDGET_MODE', raising=False)
+    else:
+        monkeypatch.setenv('Q019_CONTEXT_BUDGET_MODE', mode)
     captured, counted, clients = [], [], []
     actual_client = httpx.Client
     class MockClient(actual_client):
@@ -249,8 +254,11 @@ def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_se
         assert payload['context_management'][0]['compact_threshold'] == 32000
         assert payload['reasoning'] == {'effort': 'medium', 'context': 'all_turns'}
         assert captured[0].extensions['timeout']['read'] == 13
-        from test_context_budget import assert_counted
-        assert_counted([json.loads(r.content) for r in counted], captured)
-        assert counted[0].extensions['timeout']['read'] == 13
+        if mode == 'exact':
+            from test_context_budget import assert_counted
+            assert_counted([json.loads(r.content) for r in counted], captured)
+            assert counted[0].extensions['timeout']['read'] == 13
+        else:
+            assert counted == []
     assert all(c.is_closed for c in clients) and not app.state.service.accepting
     assert app.state.service.model.root_client.is_closed()

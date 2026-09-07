@@ -30,7 +30,7 @@ def budget_module():
 
 
 @contextmanager
-def counter_for(model, *, capacity=10000, count=100, respond=None):
+def counter_for(model, *, capacity=10000, count=100, respond=None, exact_count=True):
     """Attach real request hook to an existing synthetic generation transport."""
     budget = budget_module()
     counted = []
@@ -42,7 +42,7 @@ def counter_for(model, *, capacity=10000, count=100, respond=None):
         with OpenAI(api_key='offline', base_url=str(model.root_client.base_url),
                     http_client=http, timeout=7) as counter:
             guard = budget.ResponsesBudget(counter=counter, model=model.model_name,
-                                           context_window_tokens=capacity)
+                                           context_window_tokens=capacity, exact_count=exact_count)
             model.http_client.event_hooks['request'].append(guard)
             try:
                 yield counted
@@ -151,7 +151,7 @@ def test_strict_endpoint_and_zero_for_empty_input_preserve_exact_serialized_byte
     with httpx.Client(transport=httpx.MockTransport(count)) as count_http:
         with OpenAI(api_key='offline', base_url='https://endpoint.invalid/custom/v1/',
                     http_client=count_http) as counter:
-            guard = budget.ResponsesBudget(counter=counter, model='configured', context_window_tokens=130)
+            guard = budget.ResponsesBudget(counter=counter, model='configured', context_window_tokens=130, exact_count=True)
             with httpx.Client(transport=httpx.MockTransport(generate), event_hooks={'request': [guard]}) as client:
                 for method, url in [
                     ('GET', 'https://endpoint.invalid/custom/v1/responses'),
@@ -207,10 +207,11 @@ def test_counter_failure_uses_only_sdk_retries_never_generates(status):
             assert len(counted) == (3 if status in (500, 'timeout') else 1)
 
 
-def test_a_each_call_counts_skills_memory_guide_results_and_preserves_canonical(tmp_path):
+@pytest.mark.parametrize('exact', [False, True])
+def test_a_each_call_includes_skills_memory_guide_results_and_preserves_canonical(tmp_path, exact):
     with service_harness(tmp_path, store=InMemoryStore()) as (service, sent, replies):
         service.model = service.model.model_copy(update={'max_tokens': 30})
-        with counter_for(service.model) as counted:
+        with counter_for(service.model, exact_count=exact) as counted:
             doc = service.create_document('budget A')['id']
             context = service._context(doc)
             context.memory.publication.setup()
@@ -232,14 +233,18 @@ def test_a_each_call_counts_skills_memory_guide_results_and_preserves_canonical(
             run = service.submit(doc, 'new', '現在案例不同。')
             service.join(doc)
             assert service.get_run(doc, run['id'])['status'] == 'completed'
-            assert_counted(counted, sent)
-            assert len(counted) == 4
-            full = json.dumps(counted[1], ensure_ascii=False)
+            if exact:
+                assert_counted(counted, sent)
+            else:
+                assert counted == []
+            payloads = [json.loads(request.content) for request in sent]
+            assert len(payloads) == 4
+            full = json.dumps(payloads[1], ensure_ascii=False)
             assert '舊案例完整原文。' in full and '現在案例不同。' in full and '導覽：' in full
             assert '/skills/work-scope-interview/SKILL.md' in full
-            assert '# 工作範圍與案例訪談' in json.dumps(counted[2], ensure_ascii=False)
-            assert '主管核准' in json.dumps(counted[3], ensure_ascii=False)
-            opaque = [i for i in counted[2]['input'] if i.get('type') in ('reasoning', 'compaction')]
+            assert '# 工作範圍與案例訪談' in json.dumps(payloads[2], ensure_ascii=False)
+            assert '主管核准' in json.dumps(payloads[3], ensure_ascii=False)
+            opaque = [i for i in payloads[2]['input'] if i.get('type') in ('reasoning', 'compaction')]
             assert [i['encrypted_content'] for i in opaque] == ['opaque-compaction', 'opaque-new']
             saved = context.graph.get_state(context.config).values['messages']
             assert saved[:len(before)] == before
@@ -278,12 +283,13 @@ def test_a_budget_error_closes_unlocks_and_is_not_resumable(tmp_path, after_read
             assert len([m for m in service.messages(doc) if m['role'] == 'user']) == 2
 
 
-def test_b1_schema_and_b2_read_loop_count_actual_payload(tmp_path):
+@pytest.mark.parametrize('exact', [False, True])
+def test_b1_schema_and_b2_read_loop_actual_payload(tmp_path, exact):
     from analysis_agent.consolidation import ConsolidationWorkflow
     from analysis_agent.extraction import ExtractionWorkflow
     with service_harness(tmp_path, store=InMemoryStore()) as (service, sent, replies):
         service.model = service.model.model_copy(update={'max_tokens': 30})
-        with counter_for(service.model) as counted:
+        with counter_for(service.model, exact_count=exact) as counted:
             doc = service.create_document('background payload')['id']
             context = service._context(doc)
             context.memory.publication.setup()
@@ -304,15 +310,19 @@ def test_b1_schema_and_b2_read_loop_count_actual_payload(tmp_path):
             b2 = ConsolidationWorkflow(b1, context.memory.publication, service.model, service.saver)
             b2.start()
             assert context.memory.publication.current().revision == 1
-            assert_counted(counted, sent)
-            assert counted[1]['text']['format']['type'] == 'json_schema'
-            assert counted[1]['text']['format']['strict'] is True
-            assert not counted[1].get('tools')
-            assert {t['name'] for t in counted[2]['tools']} == {
+            if exact:
+                assert_counted(counted, sent)
+            else:
+                assert counted == []
+            payloads = [json.loads(request.content) for request in sent]
+            assert payloads[1]['text']['format']['type'] == 'json_schema'
+            assert payloads[1]['text']['format']['strict'] is True
+            assert not payloads[1].get('tools')
+            assert {t['name'] for t in payloads[2]['tools']} == {
                 'ls', 'grep', 'read_file', 'write_file', 'edit_file', 'validate_memory'}
             assert any(i.get('type') == 'function_call_output' and 'Error' in i['output']
-                       for i in counted[3]['input'])
-            assert 'A網站：單次付款' in json.dumps(counted[4], ensure_ascii=False)
+                       for i in payloads[3]['input'])
+            assert 'A網站：單次付款' in json.dumps(payloads[4], ensure_ascii=False)
             assert context.graph.get_state(context.config).values['messages'] == saved
 
 

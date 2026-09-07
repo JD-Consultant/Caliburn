@@ -1,6 +1,7 @@
 # Q019／MP-02：小額 Memory prompt 真測與局部修復
 
 > 2026-09-07；G5 有限實驗 → 兩個已重現接線缺陷的局部修復。**不是 Memory 品質通過、不是產品可用性驗收。**
+> **最新續測：見 §6。**已保存兩修可跑過前兩次 B2，但整組仍未通過。新提示試驗未通過，已撤回這次四檔試改；保留 `04ce14d8` 程式，不提高上限。下方 §1–5 為先前3次試跑沿革，不把它們當最新累計。
 > 最新決策入口：[主 checkout register](../../../../docs/current-decisions.md)。需求與方法：[Memory 設計／prompt 段](../../../../docs/specs/2026-09-06-analysis-only-agent-memory-design.md#2026-09-07memory-prompt-調整與驗收重點)。不重選 ABC 或五產物。
 
 ## 1. 範圍與結果先講
@@ -81,3 +82,49 @@ HTTP 成功只代表模型回覆完成，不代表 B2 agent／發布成功。以
 **狀態：**MP-02a／b局部修復；MP-02c與多輪 prompt 品質仍未驗收。MP-01計數端點相容仍 OPEN。下一步只重跑同組小額材料，確認整併可完成再看案例補充／更正與回查；若仍不成，先回報具體原因再決定，不提高成本或變更 ABC。不merge／push、不接 JD／UI／production。
 
 費用來源：[OpenRouter Usage accounting](https://openrouter.ai/docs/cookbook/administration/usage-accounting)。提示研究依據：[OpenAI Prompt engineering](https://developers.openai.com/api/docs/guides/prompt-engineering#message-formatting-with-markdown-and-xml)支持清楚區分指令與 Context；不保證單次提示改動一定改善模型行為。這輪以直接試驗結果區分事實、候選與尚未證明的效果。
+
+## 6. 同組材料續測：有進展，但不能只靠再加提示收尾
+
+### 6.1 兩次實測與成本
+
+沿用同組材料、Luna／medium、8個 B2 model steps／12次 tools、每次試跑24次 HTTP／4096輸出上限；沒有加額、升 reasoning、SDK 自動重試、改 publication 或接產品資料庫。
+
+| 續測 | 真實結果 | 請求／provider 回報 USD |
+|---|---|---:|
+| `209c625ee483`，只有已保存 `04ce14d8` 兩修，無 probe 提示覆寫 | 第1／2次 B2 分別6／8步完成發布；第3批 B1完成，但第3次B2尚未完成，測試的24次總上限擋住下一請求 | 24／0.01092880 |
+| `c815bc309340`，局部 prompt 試改 | 第1次 B2 5步發布，但導覽為空；第2次B2兩次精確文字替換失敗，達8步上限，沒有第二次發布；第3批與回查未執行 | 15／0.00867193 |
+| **本輪合計** | **不是39次成功流程，沒有 fresh-context 回查結果** | **39／0.01960073** |
+
+與 §1 的3次試跑合計為66次請求、US$0.03212434。只代表這5次合成材料實驗，不是產品每輪費用。
+
+第一個停止的表面型別是 `OpenAIConnectionError`，但已完成24次 HTTP，下一次被 probe 自身 `before` hook 的總上限擋住；SDK會包裝送出階段的一般例外。本地上限不是 provider 斷線，不能重試連線或放寬產品預算去「修」。其 B2-3 已用7步，尚有獨立的8步job限制，不能宣稱只差提高24次便必然成功。[SDK送出與例外包裝](https://github.com/openai/openai-python/blob/v3.8.0/src/openai/_base_client.py#L1098)
+
+### 6.2 實際發現，而非猜測
+
+1. **MP-02d／候選交接過窄（OPEN）：**`209...` 的首批詳記保留 A／B 各項工作，但 `raw_memory` 只有未答驗收期限。B2只依這個候選建立「驗收時限未知」主題；不是來源丟失，卻不足以讓導覽反映已談工作。試改後首批候選與正文都有 A／B 工作、角色／後端邊界，這是單樣本改善，未證明整體通過。
+2. **MP-02e／未回答被誤當否定（OPEN）：**第2批追問無障礙分工尚未回答，並非新的否認。`209...` 卻將它和原本「我負責檢查」寫成歧義；真正更正是在第3批。試改明講邊界後，`c815...` 暫存正文仍變成「不宜推定由本人負責」。不能以提示已寫就說語意缺陷已修好。
+3. **MP-02f／低階編輯負擔與完成條件（OPEN）：**`c815...` B2-2 把不存在的句尾 `。` 加進 `old_string`，大段替換失敗後又分多次改段落／關鍵詞／引用，引用那次仍多同一個句號而失敗，最後回讀，用完8步。官方 exact edit 正確回錯，不應加 fuzzy match 替模型猜要改哪段。第1次雖發布正文，導覽卻為空；現有 validator只檢查可讀格式／大小／引用，不保證語意或導覽完成，故驗證成功不等於產品效果完整。
+
+詳記中的「員工要求保留已填資料」與「員工只明說測了購物車是否保留」也需區分；不能把尚未描述驗證方式誤寫成需求不確定。此處保留為內容判讀注意，不加入逐欄 schema／自動語意拒絕器。
+
+### 6.3 官方研究與這次試改的效力
+
+- **官方事實：**OpenAI GPT-5.6 提示指引建議用小型真實 traces 找失敗、先消除矛盾與不必要的必做步驟、明訂成果／停止條件後重測；沒有要求越失敗就越加長 prompt 或提高 reasoning。[GPT-5.6 提示指引](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6#simplify-prompts-first)
+- **官方事實：**OpenAI公開 Memory 的抽取產生對話摘要及可整併資訊，整併再歸納模式；不是把候選定義成只有未回答問題。SDK允許以使用情境的額外指示定義重要訊號。研究沿用既有五產物，不重開Memory總流程。[Memory生成與用途調整](https://openai.github.io/openai-agents-python/sandbox/memory/#generate-memory)
+- **官方事實：**LangChain公開 `after_model` 等 middleware接點可驗證並跳回模型。現有 `ConsolidationFeedback` 已在這條路徑執行，collect／保存仍另驗；**不必模型自報驗證通過才安全**。[Middleware hooks／jumps](https://docs.langchain.com/oss/python/langchain/middleware/custom#agent-jumps)
+- **已核對框架實作：**Deep Agents0.7.13 的 edit 是精確替換，會回找不到／多重命中錯誤；工具說明也要求先讀。不能只改應用提示讓它少讀，卻忽略工具自己的指令。`read_file` 的行號不是原文。此次句號錯配不是框架應自動吞掉的錯誤。[固定版本tool factory](https://github.com/langchain-ai/deepagents/blob/deepagents==0.7.13/libs/deepagents/deepagents/middleware/filesystem.py)、[替換規則](https://github.com/langchain-ai/deepagents/blob/deepagents==0.7.13/libs/deepagents/deepagents/backends/utils.py)
+
+本次試改僅澄清 B1候選內容、B2未答問題與 GUIDE已提供，並讓驗證工具變可選預檢；沒有改實際驗證、檔案／來源權限、schema欄位數、步數或原子發布。**整組仍不合格，因此四檔試改已全部還原為 `04ce14d8`，不提交成正式修復。**候選語句與完整 diff 保存於證據JSON，不靠下次回憶重猜。這不表示已證明每一句修改都無效，只表示本試驗不足以採用整包修改。
+
+### 6.4 驗證、剩餘決策與下一步
+
+- 試改期間原6檔回歸 **184 passed／11.65s**。首次 sandbox 執行遇到 pytest暫存目錄 WinError5；改新專用目錄並取得執行權限後通過，未更動程式／Docker處理測試環境。
+- 撤回試改後再跑同6檔：**184 passed／11.84s**；compileall／diff check通過，`git diff --numstat -- experiments/analysis-agent/src`為空。保存的兩修仍在，沒有把本輪未通過提示留在執行路徑。
+- 限定獨立review亦判 **NOT PASS**：導覽完成條件、未答追問誤判、精確編輯恢復三項P2。reviewer另跑21項安全回歸通過；確認GUIDE描述與實際輸入相符、可選preflight沒有移除後端驗證，但不支持以此交付品質修復。這是試改的審核結論，非要求把每項語意都改成程式規則。
+- 既有 `test_consolidation_feedback` 真框架合成HTTP測試已驗證：不呼叫validate工具，invalid final仍回模型修；失敗／refusal／超限不發布。它只能驗機制，不能證明 Luna 自然生成會完成導覽或保留正確語意。
+- 下一題只聚焦 **「B2 的成果交付／工具操作怎麼降低出錯，而不降低記憶完整性」**。先不再追加付費試跑，也不提高額度。
+- 候選1：保留官方檔案編輯，收斂完成條件及重複操作；優點是長正文仍可局部更新，缺點是精確替換仍需要模型複製旧字串。候選2：保留按需讀取，對可完整處理的正文與導覽採框架結構化成果交付；可少掉逐次替換，但整檔輸出有長度／成本邊界，不能未讀就重建長正文。**目前沒有選定或實作候選2**。
+- LangChain `create_agent(response_format=...)` 是官方能力，但同時用工具與結構化輸出要求 provider支援；它保證形狀，不保證語意完整或直接替本產品處理原子發布。[Structured output／provider條件](https://docs.langchain.com/oss/python/langchain/structured-output#response-format)不能因看見這個API就宣稱已能承接所有Memory大小。
+- 保留原文、詳記、理解、導覽及逐層回查，ABC責任不翻案；不新增Memory層、不將案例硬拆Task／OPKS、不做JD／UI，不重構或換框架。若確需改 B2輸出契約／資料流，先給 Owner 短設計確認。
+
+[本輪可攜證據](evidence/2026-09-07-memory-prompt-followup.json)包含2次的實際prompt、精確試改diff、B1產物、已發布快照、可見模型／工具結果、成本與停止診斷；無key／headers／opaque reasoning。先前3次證據檔未覆寫。**本輪停止於已知品質缺口，不宣稱Memory已修完。**

@@ -6,14 +6,17 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 final synchronous Responses context budgeting**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
-Latest bounded prompt experiment (2026-09-07): **27 real Luna/medium requests,
-US$0.01252361 reported** across three runs. All stopped at the first B2's existing
-8-model-step limit; no published Memory or later correction/recall quality claim.
-Two observed local issues are repaired: known-path B2 discovery uses the official
-tool-description override, and Chinese prose parentheses no longer pollute a
-reference address. Explicit links/code remain exact. **184 focused tests pass**;
-independent review accepted these two fixes only. Analysis prompts/Skills,
-publication rules and limits are unchanged; no broad refactor.
+Latest bounded prompt follow-up (2026-09-07): **39 real Luna/medium requests,
+US$0.01960073 reported** across two new runs. The saved fixes completed two B2
+batches, but the entire correction/recall scenario has not passed. A narrow
+prompt trial improved first-batch candidate coverage yet omitted the guide,
+and later exact edits exhausted B2's existing limit. **That trial was reverted**;
+its exact patch and outputs remain in evidence. Code stays at `04ce14d8`:
+known-path tool-description and Chinese prose-reference fixes retained;
+analysis prompts/Skills, publication rules and limits unchanged. No broad
+refactor or production readiness claim. Earlier three runs cost US$0.01252361;
+five runs total 66 requests / US$0.03212434. Next gate is B2 delivery/tool design,
+not more blind prompt retries or quota increases.
 [Experiment, evidence, fixes and untested boundaries](../../docs/specs/2026-09-07-memory-prompt-live-calibration.md).
 
 Earlier context/Skills wiring verification (2026-09-07): **514 passed / 0 skipped (71.95s)**,

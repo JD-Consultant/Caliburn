@@ -51,6 +51,9 @@ MEMORY_READ_GUIDANCE = (
     "memory/details are insufficient. Do not reread sources just because they are cited. "
     "Interview details describe their source window, not guaranteed current case truth; "
     "check relevant knowledge for later corrections before using an old detail. "
+    "When combining facts, preserve each fact's subject, action, conditions, frequency "
+    "and authority. A case-specific tool, frequency or restriction does not apply "
+    "to other work without support. A consultant's paraphrase is not employee confirmation. "
     "Verify conflicts or ask; a later sentence is not automatically more correct.\n"
 )
 

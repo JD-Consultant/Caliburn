@@ -6,6 +6,13 @@ consolidation requests + automatic background dispatcher + on-demand analysis Sk
 native-first Responses context management with optional exact preflight**. No Web UI yet;
 no live-model quality claim and no legacy App imports.
 
+CT13 prompt calibration (2026-09-07): extraction candidates, consolidation,
+recall and interview paraphrases must preserve factual scope and qualifiers.
+Interview closure checks work breadth and professional depth using existing
+Skills as needed, without a new agent, schema or fixed questionnaire. Offline
+wiring checks are not semantic-quality acceptance; no new paid trial has run.
+[Scoped repair plan and evidence](../../docs/plans/2026-09-07-ct13-local-quality-and-source-repair.md).
+
 CT11 local editor trial (2026-09-07): B2 exposes `apply_memory_patch(file_path,diff)`
 and C accepts `repair_memory(edits=[{path,diff}])`, both using official
 OpenAI Agents SDK `apply_diff` locally over staged StateBackend files. This

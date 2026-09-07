@@ -117,6 +117,27 @@ def test_invalid_reference_returns_tool_error_then_model_can_repair(harness):
     assert path in knowledge(h) and "missing" not in knowledge(h)
 
 
+def test_read_display_gutter_is_not_editable_source_and_retry_preserves_real_indent(harness):
+    # CT06 witness: the model copied read_file's two display spaces into an
+    # exact edit. Exercise the real framework read/edit boundary, not a prompt
+    # string assertion or a claim that a synthetic model learned the guidance.
+    h = harness
+    content = "# 工作\n- 維護每月一次\n  - 正式資料由後端處理"
+    h.replies.extend([
+        with_guide(call("write_file", file_path="/memory/knowledge.md", content=content)),
+        call("read_file", file_path="/memory/knowledge.md"),
+        call("edit_file", file_path="/memory/knowledge.md",
+             old_string="  - 維護每月一次", new_string="  - 維護每月第一個工作日"),
+        call("edit_file", file_path="/memory/knowledge.md",
+             old_string="維護每月一次", new_string="維護每月第一個工作日"),
+        done(),
+    ])
+    workflow_class()(h.b1, h.pub, h.model, h.saver).start()
+    assert "2  - 維護每月一次" in json.dumps(h.sent[3], ensure_ascii=False)
+    assert "String not found" in json.dumps(h.sent[4], ensure_ascii=False)
+    assert knowledge(h) == "# 工作\n- 維護每月第一個工作日\n  - 正式資料由後端處理"
+
+
 def test_known_summary_path_is_read_directly_without_discovery_instruction(harness):
     # This checks the real tool wire contract/execution, not model compliance.
     # Removing the description override must restore the conflicting default.

@@ -148,6 +148,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
         stack.callback(model.root_client.close)
         service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model,
             instructions='你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
+                         '根據已知內容簡短回述，優先問一個會影響工作理解的未知；已說清楚的不重問，不逐欄填問卷。'
+                         '不同案例可有共同工作與重要差異；不把個案數字變成通則，也不把同時提及的事情說成因果。'
                          '目前只做訪談分析，不製作或編輯JD。不顯示隱藏推理。'
                          '一段訪談已有值得整理的資訊時，可通知背景記憶整理；不必每回合通知。')
         stack.callback(service.close)

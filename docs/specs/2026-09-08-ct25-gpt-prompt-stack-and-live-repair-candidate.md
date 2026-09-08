@@ -2,6 +2,8 @@
 
 2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **Owner已核准M1＋T1；隔離接線及544項離線回歸通過，只讀review通過，G8 OPEN。§1–6保留原候選研究，最新接線與舊防錯核對見§7；未新增付費生成、未接production。**
 
+> 後續真測：[CT26](2026-09-08-ct26-natural-live-repair-validation.md)首項FAIL，1次模型／0工具、回答5日但Memory仍10日；帳本closed、不promote。下方是接線時研究與離線結果，不代表目前仍未做真測；不重問候選是否可接線。
+
 ## 1. 本輪決策與閱讀入口
 
 Owner同意[CT24](2026-09-08-ct24-live-repair-use-and-background-timing-review.md)後，補充必須看最新GPT的提示建議與撰寫架構。本輪只完成完整提示對照，保留「即時修補優先；背景以LLM段落通知＋文字量後備，低資訊量先累積」。不重新選Memory架構、不加Agent、不強制tool choice、不換Luna／medium、不改reasoning／compaction或JD。

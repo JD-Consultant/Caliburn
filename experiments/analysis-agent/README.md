@@ -1,5 +1,14 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+CT26 natural validation (2026-09-08): **FAIL**, one Luna/medium request,
+estimated USD0.0024523. The actual system and six tools match CT25, but the model
+answered the corrected deadline without calling a tool: knowledge/guide stayed
+at the old deadline, revision 3. No API/patch error or exhausted limit. Ledger
+closed immediately; no further prompt edits or promotion. Original 42 Q/A messages,
+two added messages and four source references passed read-only checks; no write
+occurred, so this does not establish edit-detail preservation. **G8 OPEN**.
+[Evidence, transcript and next gate](../../docs/specs/2026-09-08-ct26-natural-live-repair-validation.md).
+
 CT25 prompt wiring (2026-09-08): owner-approved M1/T1 is now wired locally.
 Verified stale Memory requires live repair even if chat already acknowledged the
 correction; unresolved meaning is checked, not guessed. Low-information background

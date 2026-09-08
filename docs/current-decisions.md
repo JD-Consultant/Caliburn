@@ -4,6 +4,8 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
+**CT38最新入口（2026-09-08，G5局部完成／G8 OPEN）：**[B1 high→B2 medium及增量保留](specs/2026-09-08-ct38-high-extraction-medium-consolidation-results.md)。只升high的現行提示仍失真；封存候選high接現行B2 medium，及追加澄清更新主要檢查通過，措辭瑕疵／測試限制明列。13次估US$0.01693435、帳本closed，118離線通過；實際來源／引用及B1產物交付核驗完成。未改任何產品prompt／模型預設／舊Memory。下一gate：審隔離app採候選並只讓B1 high，主顧問／B2仍medium，再續訪談；CT35/C停放不變。下方沿革不得當作已採用設定。
+
 **CT37最新閱讀入口（2026-09-08）：**[B1提示／medium-high局部對照](specs/2026-09-08-ct37-prompt-effort-comparison-results.md)。medium候選原例仍漏記，high相同輸入單例保留關鍵差異；不是B2／長訪談完成。候選已封存還原、預設不變；9嘗試／6完成、usage估US$0.0116942，未知預留保留，帳本closed。候選及還原各118離線通過。下一gate依[主repo register](../../../docs/current-decisions.md)審背景抽取high局部評估，不再重問Memory架構或復活CT35/C停放候選；下方是歷史路由。
 
 **CT33最新入口（2026-09-08）：**[壓縮來源與漏存恢復核對](specs/2026-09-08-ct33-compaction-provenance-and-recovery-review.md)。唯讀追溯完成：CT32沿用的opaque出自CT16首次口頭更正但漏存的#16；當時仍有optional修補指示，現行CT25已無，且目前規則／revision 3導覽10日與六工具確有送達。不解讀opaque內容、不宣稱壓縮是根因。建議下一gate先審「現行規則首次更正」與「恢復舊漏存」分開驗證；保留長context與原失敗，不改產品，不追加生成。完成檢查／強制tool仍未核准，G8 OPEN。CT32結果不改寫，下方為沿革。

@@ -138,12 +138,13 @@ class AnalysisService:
             self.contexts[document] = DocumentRuntime(graph, reader, stop, memory)
         return self.contexts[document]
 
-    def enable_background(self, *, max_recoveries, text_threshold=None):
+    def enable_background(self, *, max_recoveries, text_threshold=None, extraction_model=None):
         from analysis_agent.scheduling import BackgroundDispatcher
         with self.lock:
             if self.background is not None:
                 raise ServiceConflict('Background dispatcher is already configured')
-            self.background = BackgroundDispatcher(self, max_recoveries=max_recoveries, text_threshold=text_threshold)
+            self.background = BackgroundDispatcher(self, max_recoveries=max_recoveries,
+                text_threshold=text_threshold, extraction_model=extraction_model)
             return self.background
 
     def start_background(self, *, poll_seconds):

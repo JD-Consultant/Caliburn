@@ -1,5 +1,16 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+CT39 current wiring (2026-09-09): the tested CT37 extraction prompt is now
+adopted. `open_service` uses **B1 extraction high; consultant A and consolidation
+B2 medium**, all on the configured Luna model. The two official ChatOpenAI
+bindings share the existing HTTP/context-budget path and output cap. Uncertainty,
+partial answers and attribution stay explicit in the extraction instructions;
+no extra agent, validator, schema or Memory architecture was added. Restart the
+isolated service to load this configuration; existing Memory is not rewritten.
+This is adoption of CT37/CT38 evidence, not a new long-interview quality pass.
+[Implementation, sources, tests and limits](../../docs/specs/2026-09-09-ct39-extraction-adoption-results.md).
+Older CTxx results below are historical, not the latest configuration decision.
+
 CT26 natural validation (2026-09-08): **FAIL**, one Luna/medium request,
 estimated USD0.0024523. The actual system and six tools match CT25, but the model
 answered the corrected deadline without calling a tool: knowledge/guide stayed

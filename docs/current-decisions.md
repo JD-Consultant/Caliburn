@@ -1,5 +1,7 @@
 # Caliburn Current Decision Register
 
+**CT39 current（2026-09-09，LLM-Q019）：**Owner 委由 agent 決定局部修正，已將 CT37 候選提示＋B1 high 接入隔離 app，主顧問／B2 medium；[本輪結果／引用／限制](specs/2026-09-09-ct39-extraction-adoption-results.md)及[計畫](plans/2026-09-09-ct39-extraction-adoption.md)。只改官方 model binding 與既有注入；無新增 Agent／schema／Memory 機制，不改 production／舊 Memory／C 停放政策。整體 G8 OPEN，後續做正常訪談品質驗收；CT38「待接入」是下方歷史狀態。
+
 - 最後核對：**2026-09-08**
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)

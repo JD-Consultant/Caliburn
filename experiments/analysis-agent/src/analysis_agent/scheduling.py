@@ -31,7 +31,8 @@ class BackgroundRow(Base):
 
 
 class BackgroundDispatcher:
-    def __init__(self, service, *, max_recoveries, text_threshold=None, max_windows=16):
+    def __init__(self, service, *, max_recoveries, text_threshold=None, max_windows=16,
+                 extraction_model=None):
         if type(max_recoveries) is not int or max_recoveries < 0:
             raise ValueError('An explicit nonnegative automatic recovery limit is required')
         if text_threshold is not None and (type(text_threshold) is not int or text_threshold < 1):
@@ -41,6 +42,7 @@ class BackgroundDispatcher:
         if service.store is None:
             raise ValueError('Background memory requires the official Store')
         self.service, self.catalog = service, service.catalog
+        self.extraction_model = extraction_model if extraction_model is not None else service.model
         self.max_recoveries, self.text_threshold, self.max_windows = max_recoveries, text_threshold, max_windows
         # Shared by every dispatcher entry in this single-process application.
         with service.lock:
@@ -54,7 +56,7 @@ class BackgroundDispatcher:
         if document not in self.workflows:
             reader = self.service.reader(document)
             publication = self.service._context(document).memory.publication
-            b1 = ExtractionWorkflow(reader, publication.artifacts, self.service.model,
+            b1 = ExtractionWorkflow(reader, publication.artifacts, self.extraction_model,
                                     self.service.saver, max_windows=self.max_windows)
             # Deployment sets one per-response budget on the model. B2 has a
             # standalone default, which must not replace that explicit budget.

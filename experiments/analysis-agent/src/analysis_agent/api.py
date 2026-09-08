@@ -146,6 +146,13 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
                             request_timeout=timeout,
                             compact_threshold=compaction).model_copy(update={'max_tokens': output})
         stack.callback(model.root_client.close)
+        # CT39: only B1 needs the tested higher effort. Keep the same endpoint,
+        # transport/budget hook and output cap; A and B2 retain their binding.
+        extraction_model = build_model(model=model_name, base_url=str(counter.base_url),
+            api_key=os.environ['OPENAI_API_KEY'], http_client=client,
+            request_timeout=timeout, compact_threshold=compaction,
+            reasoning_effort='high').model_copy(update={'max_tokens': output})
+        stack.callback(extraction_model.root_client.close)
         service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model,
             instructions='你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
                          '根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。'
@@ -160,7 +167,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
                          '目前只做訪談分析，不製作或編輯JD。不顯示隱藏推理。')
         stack.callback(service.close)
         service.start()
-        service.enable_background(max_recoveries=recoveries, text_threshold=text_threshold)
+        service.enable_background(max_recoveries=recoveries, text_threshold=text_threshold,
+                                  extraction_model=extraction_model)
         service.start_background(poll_seconds=poll_seconds)
         yield service
 

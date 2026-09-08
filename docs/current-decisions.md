@@ -1,5 +1,7 @@
 # Caliburn Current Decision Register
 
+**CT40局部驗收完成／G8仍OPEN（2026-09-09，LLM-Q019）：**[結果／來源／唯一新問題](specs/2026-09-09-ct40-normal-interview-results.md)、[逐輪訪談](specs/evidence/2026-09-09-ct40-transcript.md)。5輪真API／PG訪談、兩批自然B、一次空近期Context只讀回查；31次估US$0.03033571，帳本closed（agent自訂請求護欄30→40有先說明並留事件，US$0.15不變）。B1 high／其他medium接線、初次不確定保留、案例差異與未回答事項主要通過；C更新核准者成功，但新增雲岸同名段落未移除舊未知，回查建議再次確認，收尾沒有B，矛盾未修好。**CT40-Q01 OPEN**：先審就地更新／修補後回查，不增新機制、不全面high、不重開框架；本輪只測試／記錄，產品src/tests不變，7既有接線測試通過。舊Memory不動，不稱完整長訪談完成。
+
 **CT39 current（2026-09-09，LLM-Q019）：**Owner 委由 agent 決定局部修正，已將 CT37 候選提示＋B1 high 接入隔離 app，主顧問／B2 medium；[本輪結果／引用／限制](specs/2026-09-09-ct39-extraction-adoption-results.md)及[計畫](plans/2026-09-09-ct39-extraction-adoption.md)。只改官方 model binding 與既有注入；無新增 Agent／schema／Memory 機制，不改 production／舊 Memory／C 停放政策。整體 G8 OPEN，後續做正常訪談品質驗收；CT38「待接入」是下方歷史狀態。
 
 - 最後核對：**2026-09-08**

@@ -1,8 +1,25 @@
-# CT23：必要記憶維護不能只靠自願選工具——責任與選項
+# CT23：Memory維護責任候選研究（未採用；回到即時修補）
 
-2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **G2研究完成、G3待Owner選擇；G8仍OPEN。沒有實作或付費測試。**
+2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **Owner已拒絕本稿三方案；背景時機維持原決策，下一題只查C漏用。G8仍OPEN。沒有實作或新增付費測試。**
 
-## 1. 本輪preflight與閱讀路由
+## 0. 最新Owner裁決：不改B，修正C漏用（優先於下方歷史候選）
+
+Owner明確回覆「都不同意」：背景整理以LLM選擇適當段落並通知為主；若段落很長、累積文字過多而未通知，才由既有文字量後備處理。資訊／訊息太少不值得啟動整批整理，不新增逐輪維護、短尾批定時整理或必填判斷。**這不是選擇下方方案1，也沒有接受方案2的延後保存取捨。**字數及最小資訊量的具體數值／實現尚未因此定案。
+
+真正待修的是：主顧問已取得過時Memory，員工又明確核實更正，卻只在回答採用新內容，沒有使用C即時修補。短更正可以足以支持局部修補，**不代表足以／必須啟動B抽取整併**。背景整理時機與即時修補漏用不可混成同一題，也不能用未來B追上來將CT22改判通過。
+
+官方依據已存在於[CT20§2、§5](2026-09-08-ct20-official-memory-tool-prompt-audit.md)，本次再讀確認：
+
+- [OpenAI Sandbox Memory](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)將背景生成與live updates分開；後者使用可寫檔案能力修補過時Memory。本機官方SDK `prompts.py`（版本／hash見§3.1）要求核實替代內容、採用當前證據，並在本輪結束前寫回。這是模型指令及工具能力，不是自動語意分類器，但足以支持本案繼續修好C；不能因非硬保證就取消此目標。
+- [Anthropic Memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool#how-it-works)允許模型在工作中讀寫Memory，應用執行操作並回傳結果；同頁commands提供局部編輯能力。兩家不是提供相同名稱／相同參數的`repair_memory`，也不因此取得相同可靠性保證。
+
+本次回讀CT20、CT22、CT23、實際`live_memory.py`及官方SDK `prompts.py`。CT22的6工具已送入模型、沒有工具呼叫、沒有patch或額度錯誤，是已知定位；**不是本次新找到根因**。現行提示本已要求verified correction先C後final，因此不能再提同一句話當新修法；模型為何省略該動作仍未知。
+
+**下一唯一gate（G2，C-only）：**沿既有trace與官方實作對照「模型看到哪份Memory／修補權限與適用條件／讀取到可編輯目標／工具輸入與回饋／何時結束」，找可證偽的局部差異，再提出有證據的新修法；不重研B時機、不盲目重試同提示。現行提示對「沒有可修補Memory的短更正」仍有直接通知B的條文，與本次資訊不足不整批整理的要求需一併標為待對齊，不能悄悄保留作例外或宣稱已修正。
+
+本次只更新本稿與兩份register路由，不改程式／prompt／排程／資料／模型；CT22失敗原證據與closed帳本保留，不新增付費生成。下方§1–7保留為**未採用研究沿革**，尤其§2「本題主要是第2項」、§5建議與§7待Owner二選一，均不是現行問題或有效指令。只有新證據或Owner另行裁決才能重開B政策。
+
+## 1. 原研究preflight與閱讀路由（歷史）
 
 - **唯一問題：**CT22再次零工具結束後，要繼續接受自主工具的可靠性界線，還是讓Runtime負責觸發必要的記憶處理？
 - **觸發重開：**[CT22§6–7](2026-09-08-ct22-memory-prompt-contract-results.md)的自然更正反例；不是看到新名詞就重選架構。Owner最新「OK」授權研究選項，不授權修改。
@@ -93,7 +110,7 @@ CT22的員工更正與可見回答已保存，AI回答也採用5日；**不是�
 - [F5 LangMem delayed processing](https://langchain-ai.github.io/langmem/guides/delayed_processing/)：應用submit與debounce功能。含過時模型示例，只作既有能力核對，不作最新模型／本案時機依據。
 - [F6 LangChain structured output](https://docs.langchain.com/oss/python/langchain/structured-output)：schema捕捉／驗證與provider支援条件；不自動驗證Memory內容或是否需寫。
 
-## 7. Closure／下一個唯一gate
+## 7. 原Closure／下一個唯一gate（已由§0取代）
 
 Finding：CT22證明單靠自主工具的候選未滿足原自然保存驗收；原文保存沒有壞。官方可支持Runtime觸發背景與自主live update並存，但無同輪必存的共同保證。
 

@@ -4,7 +4,7 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
-> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方登記是建立分支時的歷史快照；持續更新的register位於[主repo目前決策](../../../docs/current-decisions.md)。最新[CT23責任界線研究](specs/2026-09-08-ct23-memory-maintenance-responsibility-review.md)G2完成／G3待審：保留C並由Runtime安排B補齊為建議，非已選／非同輪必存保證。唯一題是可否接受背景延後保存，還是要求回覆前完成維護；未改碼、0付費。[CT22](specs/2026-09-08-ct22-memory-prompt-contract-results.md)自然更正FAIL與closed帳本保留；不promote、不再堆提示／重跑，G8仍OPEN。production仍循正式ADR／implementation gate。
+> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方登記是建立分支時的歷史快照；持續更新的register位於[主repo目前決策](../../../docs/current-decisions.md)。Owner已拒絕CT23三方案，最新裁決只讀[CT23§0](specs/2026-09-08-ct23-memory-maintenance-responsibility-review.md)：B維持LLM適當段落通知為主、文字量後備，不因零碎資訊啟動整批整理；當前G2只查已核實過時Memory卻未用C即時修補，不重開排程。短更正可需局部C，不等於需B。[CT22](specs/2026-09-08-ct22-memory-prompt-contract-results.md)FAIL及closed帳本保留，G8仍OPEN；本次只記錄，未改碼／新增付費生成。production仍循正式ADR／implementation gate。
 
 > 本表不取代現行 code、`AGENTS.md` 或 Accepted ADR。它負責指出「現在什麼有效、什麼只是候選、下一步只處理哪一題」。Working Decision 若與 production authority 衝突，必須經 successor ADR 與實作 gate，不能直接施工。
 

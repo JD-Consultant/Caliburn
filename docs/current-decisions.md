@@ -1,5 +1,7 @@
 # Caliburn Current Decision Register
 
+**CT49–50限定驗收完成／隔離採用（2026-09-09，LLM-Q019/G8）：**[完整11輪與來源驗收](specs/2026-09-09-ct49-fixed-long-interview-results.md)、[CT50設定／官方依據／真服務補驗](specs/2026-09-09-ct50-tested-profile-results.md)。接案前端全職位、含糊→確認、頻率更正、案例細節與原話回查通過；原文／8份詳記引用核對相等，獨立review無未處理重大finding。採A/B2 16模型／15工具；API預設Luna A/B1/B2 high，A/B2可覆寫；已測顯式輸出8192，native compaction12000。135請求估US$0.16871788，兩帳本closed；564離線＋41真PG通過。不是全職位普遍100%或medium4096保證。Minor導覽繞路、重複措辭與修補延遲保留；下一步可試用此隔離配置／有新證據再局部優化，不再為同能力重跑舊研究。無production／JD、merge/push；下方CT48及以前為沿革，舊失敗不翻成成功。
+
 **CT48局部採用／長訪談G8仍OPEN（2026-09-09，LLM-Q019）：**[CT45–48結果、官方來源、實際內容及下一gate](specs/2026-09-09-ct46-48-edit-routing-and-budget-results.md)。背景B2採已測編輯指引、16模型／15工具，A仍12／11；沿框架計數／錯誤／resume，無新Agent/schema/matcher。原CT45八輪第8輪失敗不改判，xhigh未解；候選兩局部replay7及11模型完成（低於12，不能證明加cap是成功原因）。新增引用保留，但label過寬／案例位置兩Minor仍留。112次估US$0.17919779，CT45–48帳本closed、原PG未改。最終560離線＋41真PG通過。預設effort A/B2 medium、B1 high不變；本次語意測試high不能冒稱預設已穩定。下一gate固定新版完整訪談／補充撤銷／回查，毋須重做分層研究；不進production/JD、不merge/push。
 
 **CT44局部採用／完整訪談G8仍OPEN（2026-09-09，LLM-Q019）：**[結果、官方來源、前後正文與完整帳本](specs/2026-09-09-ct44-preservation-results.md)。隔離B2採寫前保留未變子句提示及12模型／12工具上限；8模型對照沒收尾，12模型／11工具對照完成，主要既有細節與兩案引用保留，原PG未變。20次Luna high估US$0.04937714，24次／US$0.10帳本closed。A仍12／11；effort預設A/B2 medium、B1 high，不能將本次high語意測試當成medium通過。最終回歸558＋真PG41通過；G8仍須固定版新補充／撤銷及長訪談驗收。無新Agent／schema／工具／重試loop，不進production／JD。下段未授權、候選還原及8／12均為歷史；舊失敗不改寫，後續只補新證據、不重做廣泛研究。

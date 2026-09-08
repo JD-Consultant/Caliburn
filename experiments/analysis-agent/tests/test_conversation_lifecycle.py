@@ -118,6 +118,32 @@ def test_tool_limit_pairs_unexecuted_call_without_forging_success(h):
     assert not result['messages'][-1].response_metadata.get('status')
 
 
+def test_default_budget_allows_multisource_recall_and_final_answer(h):
+    # CT49 actual empty-context recall needed 14 sequential reads plus final.
+    # Exercise the consuming graph, not a constant/signature assertion.
+    h.replies.extend([
+        *(call('read_file', file_path='/memory/knowledge.md') for _ in range(14)),
+        done(),
+    ])
+    graph = compose_memory(h)
+    result = graph.invoke({'messages': [HumanMessage('查回不同案例及原句', id='h1')]}, h.config)
+    assert result['turn_outcome']['status'] == 'completed'
+    assert len(tool_results(result)) == 14
+    assert not h.replies
+    assert h.pub.current().revision == 1
+
+
+def test_default_budget_stops_runaway_reads_without_false_completion(h):
+    h.replies.extend(call('read_file', file_path='/memory/knowledge.md') for _ in range(20))
+    result = compose_memory(h).invoke({'messages': [HumanMessage('回查', id='h1')]}, h.config)
+    assert result['turn_outcome'] == {
+        'input_id': 'h1', 'status': 'limit', 'model_calls': 16, 'tool_calls': 15,
+    }
+    assert tool_results(result)[-1].status == 'error'
+    assert not result['messages'][-1].response_metadata.get('status')
+    assert h.pub.current().revision == 1
+
+
 @pytest.mark.parametrize('status', ['incomplete', 'failed'])
 def test_invalid_provider_completion_stays_pending_before_tools(h, status):
     response = call('repair_memory', edits=[edit()])

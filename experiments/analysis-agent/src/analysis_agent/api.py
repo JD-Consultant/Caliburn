@@ -103,10 +103,10 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
     budget_mode = os.environ.get('Q019_CONTEXT_BUDGET_MODE', 'native')
     if budget_mode not in {'native', 'exact'}:
         raise ValueError('Q019_CONTEXT_BUDGET_MODE must be native or exact')
-    # CT41: tune effort at the existing SDK binding; no alternate agent loop.
-    # Select effort per role: improving A must not silently raise B2's cost.
-    effort = os.environ.get('Q019_REASONING_EFFORT', 'medium')
-    consolidation_effort = os.environ.get('Q019_CONSOLIDATION_REASONING_EFFORT', 'medium')
+    # CT50: use CT49's tested high profile; explicit per-role overrides remain.
+    # No alternate loop or implicit output/context budget defaults.
+    effort = os.environ.get('Q019_REASONING_EFFORT', 'high')
+    consolidation_effort = os.environ.get('Q019_CONSOLIDATION_REASONING_EFFORT', 'high')
     for setting, value in [('Q019_REASONING_EFFORT', effort),
                            ('Q019_CONSOLIDATION_REASONING_EFFORT', consolidation_effort)]:
         if value not in {'low', 'medium', 'high', 'xhigh', 'max'}:
@@ -154,8 +154,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
                             request_timeout=timeout, reasoning_effort=effort,
                             compact_threshold=compaction).model_copy(update={'max_tokens': output})
         stack.callback(model.root_client.close)
-        # CT39: only B1 needs the tested higher effort. Keep the same endpoint,
-        # transport/budget hook and output cap; A and B2 retain their binding.
+        # B1 keeps its independently calibrated high effort. Keep the same
+        # endpoint, transport/budget hook and output cap as the other roles.
         extraction_model = build_model(model=model_name, base_url=str(counter.base_url),
             api_key=os.environ['OPENAI_API_KEY'], http_client=client,
             request_timeout=timeout, compact_threshold=compaction,

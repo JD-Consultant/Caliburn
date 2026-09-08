@@ -72,7 +72,7 @@ def test_service_background_selects_high_only_for_extraction(tmp_path, separate,
             '0f621a77a1a8f04edb1edac59ef1c2eee349c2467f7d0325049e36b19f7355c5')
 
 
-@pytest.mark.parametrize('main_effort,b2_effort', [(None, None), ('high', None), ('medium', 'high')])
+@pytest.mark.parametrize('main_effort,b2_effort', [(None, None), ('high', None), ('medium', 'high'), ('medium', 'medium')])
 def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, monkeypatch, main_effort, b2_effort):
     """Actual composition root; replace only DB resources and HTTP transport."""
     from contextlib import nullcontext
@@ -142,7 +142,7 @@ def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, m
         assert service.background.status(doc)['status'] == 'idle'
         assert service._context(doc).memory.publication.current().revision == 1
     assert not replies
-    assert budget_calls == [main_effort or 'medium', main_effort or 'medium', 'high', b2_effort or 'medium']
+    assert budget_calls == [main_effort or 'high', main_effort or 'high', 'high', b2_effort or 'high']
     assert [p['reasoning']['effort'] for p in sent] == budget_calls
     assert all(p['reasoning']['context'] == 'all_turns' for p in sent)
     assert all(p['max_output_tokens'] == 6000 for p in sent)

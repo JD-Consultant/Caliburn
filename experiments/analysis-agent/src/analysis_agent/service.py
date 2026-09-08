@@ -106,7 +106,7 @@ def resumable_repair(state):
 
 class AnalysisService:
     def __init__(self, *, catalog, saver, model, instructions, store=None,
-                 max_workers=2, max_model_steps=12, max_tool_calls=11):
+                 max_workers=2, max_model_steps=16, max_tool_calls=15):
         self.catalog, self.saver, self.store = catalog, saver, store
         self.model, self.instructions = model, instructions
         self.max_model_steps, self.max_tool_calls = max_model_steps, max_tool_calls

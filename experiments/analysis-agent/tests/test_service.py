@@ -41,9 +41,11 @@ def service_harness(tmp_path, *, saver=None, respond=None, engine=None, store=No
     catalog.setup()
     with httpx.Client(transport=httpx.MockTransport(transport)) as client:
         model = build_model(model='gpt-5.6-luna', api_key='offline', http_client=client)
+        limits = {name: value for name, value in (
+            ('max_model_steps', max_model_steps), ('max_tool_calls', max_tool_calls),
+        ) if value is not None}
         service = AnalysisService(catalog=catalog, saver=saver or InMemorySaver(), model=model, store=store,
-                                  instructions='訪談', max_workers=2,
-                                  max_model_steps=max_model_steps, max_tool_calls=max_tool_calls)
+                                  instructions='訪談', max_workers=2, **limits)
         service.start()
         try:
             yield service, sent, replies
@@ -75,6 +77,20 @@ def test_accepted_input_is_saved_and_double_submit_does_not_invoke_twice(tmp_pat
         assert service.get_run(doc, run['id'])['status'] == 'completed'
         assert len(sent) == 1
         assert len([m for m in service.messages(doc) if m['role'] == 'user']) == 1
+
+
+def test_service_default_does_not_cut_off_multistep_work_before_final(tmp_path):
+    with service_harness(tmp_path, max_model_steps=None, max_tool_calls=None) as (service, sent, replies):
+        # A registered side-effect-free tool; the scheduler is not started here.
+        replies.extend([*(call('request_memory_consolidation') for _ in range(14)), done()])
+        doc = service.create_document('完整回合')['id']
+        run = service.submit(doc, 'one', '查回案例')
+        service.join(doc)
+        result = service.get_run(doc, run['id'])
+        assert result['status'] == 'completed'
+        assert result['outcome']['model_calls'] == 15
+        assert not replies
+        assert len(service.messages(doc)) == 2
 
 
 def test_stop_waits_for_provider_and_does_not_execute_returned_tool(tmp_path):

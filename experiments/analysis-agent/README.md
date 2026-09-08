@@ -1,5 +1,29 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+## Current isolated profile (CT50, 2026-09-09)
+
+Foreground A and background B2 default to **16 model calls / 15 tools**; the
+existing per-input/recovery accounting and framework stop behavior are unchanged.
+The API defaults to **Luna high for A, B1 and B2**. A/B2 still have independent
+explicit effort overrides. No new agent, Memory schema, prompt or retry loop.
+
+CT49 completed an 11-turn whole-role interview with corrections and layered
+retrieval. CT50 verified the new defaults through the actual service and a
+separate empty-recent-context reader. Combined: 135 requests, estimated
+**USD0.16871788**. Current tests: **564 offline + 41 real PostgreSQL passes**.
+This is a representative scenario, not a guarantee for all roles/lengths.
+Minor duplicate wording, indirect guide routes and repair latency remain visible.
+[Full interview](../../docs/specs/2026-09-09-ct49-fixed-long-interview-results.md) ·
+[Default adoption, official sources and limits](../../docs/specs/2026-09-09-ct50-tested-profile-results.md).
+
+Tested profile: explicit output bound **8192**, native compaction threshold
+**12000**, reasoning `high` / `all_turns`, using the configured Luna model.
+These values do not replace required deployment configuration below. Raising
+the call ceiling does not force the model to consume it; ordinary CT49 turns
+mostly used 1–3 model calls. No production/JD integration or merge is implied.
+
+## Historical checkpoints (not current defaults)
+
 CT48 local adoption (2026-09-09): B2 uses the tested edit-routing guidance,
 keeps still-valid references, and has a configurable 16-model / 15-tool ceiling.
 The shared SDK patch description now explains forward-only hunk order; the
@@ -292,13 +316,13 @@ the old application's `.env`. Required variables:
 | `Q019_BACKGROUND_MAX_RECOVERIES` | Explicit nonnegative automatic process-interruption recovery allowance per B batch; persisted across restarts |
 | `Q019_MEMORY_TEXT_THRESHOLD` (optional) | Positive new visible-character fallback; omitted = notification-trigger only, no guessed default |
 | `Q019_MODEL` (optional) | Defaults to `gpt-5.6-luna`; native `all_turns` binding |
-| `Q019_REASONING_EFFORT` (optional) | A effort; default `medium`. B1 remains `high`; does not change B2 |
-| `Q019_CONSOLIDATION_REASONING_EFFORT` (optional) | B2 effort; default `medium`. Both effort settings accept `low`, `medium`, `high`, `xhigh`, `max`; the configured provider/model must support the selection |
+| `Q019_REASONING_EFFORT` (optional) | A effort; default `high`. B1 remains `high`; does not change B2 |
+| `Q019_CONSOLIDATION_REASONING_EFFORT` (optional) | B2 effort; default `high`. Both effort settings accept `low`, `medium`, `high`, `xhigh`, `max`; the configured provider/model must support the selection |
 | `Q019_CONTEXT_BUDGET_MODE` (optional) | `native` (default): local contract checks + provider compaction/overflow; `exact`: additionally require the official input-token counter before every generation |
 
 There is no guessed universal output/compaction value. The 32,000 / 1,000 / 13s
 values in tests only verify wiring, not recommended product budgets. An output
-cap, SDK attempt timeout and 9-model/8-tool turn limits are not a dollar cap.
+cap, SDK attempt timeout and 16-model/15-tool turn limits are not a dollar cap.
 SDK transient retry remains native; no outer model/graph retry is added.
 The configured per-response output bound is carried through A, B1 and B2;
 B2's standalone default does not override the application's explicit setting.

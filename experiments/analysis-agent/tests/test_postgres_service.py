@@ -218,6 +218,8 @@ def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_se
     monkeypatch.setenv('OPENAI_BASE_URL', 'https://budget-test.invalid/custom/v1/')
     monkeypatch.setenv('Q019_BACKGROUND_POLL_SECONDS', '60')
     monkeypatch.setenv('Q019_BACKGROUND_MAX_RECOVERIES', '1')
+    monkeypatch.delenv('Q019_REASONING_EFFORT', raising=False)
+    monkeypatch.delenv('Q019_CONSOLIDATION_REASONING_EFFORT', raising=False)
     if mode is None:
         monkeypatch.delenv('Q019_CONTEXT_BUDGET_MODE', raising=False)
     else:
@@ -252,7 +254,7 @@ def test_pg_default_api_lifespan_owns_real_clients_and_configures_provider(pg_se
         payload = json.loads(captured[0].content)
         assert payload['max_output_tokens'] == 1000
         assert payload['context_management'][0]['compact_threshold'] == 32000
-        assert payload['reasoning'] == {'effort': 'medium', 'context': 'all_turns'}
+        assert payload['reasoning'] == {'effort': 'high', 'context': 'all_turns'}
         assert captured[0].extensions['timeout']['read'] == 13
         if mode == 'exact':
             from test_context_budget import assert_counted

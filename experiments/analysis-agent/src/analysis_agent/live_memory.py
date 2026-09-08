@@ -15,6 +15,48 @@ from analysis_agent.repair import MemoryEdit, RepairWorkflow
 from analysis_agent.memory_patch import PATCH_GUIDANCE
 
 
+# CT21 reviewed contract: selection policy is separate from tool mechanics.
+# https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions
+MEMORY_ACTION_GUIDANCE = (
+    "## Memory actions before the final reply\n"
+    "Handle persistence separately from what you can answer.\n"
+    "- If published Memory conflicts with a verified employee correction, read the affected text and "
+    "use repair_memory before finalizing. A correction already discussed in chat still matters, "
+    "including a changed deadline, frequency or case condition without a new work pattern.\n"
+    "- If meaning is unresolved, ask; do not select a replacement fact.\n"
+    "- Do not use background notification instead of an applicable, unattempted repair. Follow "
+    "repair_memory's recovery rules when an attempt fails.\n"
+    "- An already-saved, unchanged restatement needs no write. Do not request background work solely "
+    "for a successfully repaired correction; other new progress in the same input may still need "
+    "consolidation.\n"
+    "背景整理時機：新工作範圍、案例中本人做法、成果與完成判準、頻率、條件、例外、責任交接或專業判斷，"
+    "都可能是實質進展；只是例子，不是必填清單。類似案例補充不同條件也算進展，不必產生新任務。"
+    "零碎補充可累積成段；轉向另一工作或回顧收尾前，有尚未通知的實質進展就用request_memory_consolidation。"
+    "明確更正若沒有可修補的已發布Memory，仍需通知保存；不因只改一句或共同模式不變而略過。"
+    "未知與衝突可如實整理，不用等整項工作問完、填滿Task／OPKS或為通知繼續追問。"
+    "只有話題切換不算進展，已有通知且無新進展不重複，不每輪例行整理。\n"
+    "Report only what tool results confirm: answering correctly is not saving; a background receipt is "
+    "not a completed update. Continue the consultant reply without waiting for background work.\n"
+    "\n"
+)
+
+MEMORY_REPAIR_DESCRIPTION = (
+    "Repair verified stale facts in previously read published Memory; not initialization or background "
+    "consolidation.\n"
+    "\n"
+    "Only /memory/knowledge.md and /memory/guide.md; 1–8 edits, at most 12000 combined diff characters. "
+    "Each edit has path and diff only. Correct affected guide facts as well as routing; preserve other "
+    "details and references.\n"
+    "status=applied confirms atomic publication; a failed patch publishes none of the batch. For "
+    "invalid_edit or stale with retryable=true, use detail/read_paths to fix and retry within the "
+    "existing limit, not switch to background after the first failure. no_memory requires background "
+    "initialization. For a failed repair with retryable=false, or status=repair_limit, request "
+    "background consolidation of the unpreserved correction; report it as requested only after the "
+    "receipt, not saved. Never retry an applied result.\n"
+    "For ambiguous meaning, ask. This tool checks edits, not semantic truth."
+)
+
+
 class MemorySessionState(AgentState):
     memory_turn_id: str
     memory_initial_guide: str
@@ -34,17 +76,9 @@ class MemorySession(AgentMiddleware):
         self.artifacts = publication.artifacts
         self.repair = RepairWorkflow(self.artifacts, publication, source)
 
-        @tool
+        @tool(description=MEMORY_REPAIR_DESCRIPTION)
         def repair_memory(edits: list[MemoryEdit], runtime: ToolRuntime) -> Command:
-            """Repair previously read memory with a small atomic batch of V4A patches.
-
-            Only /memory/knowledge.md and /memory/guide.md, 1–8 edits, 12000
-            combined diff characters. Each edit has path and diff only.
-            Update the guide if routing changed. A failed patch prevents the
-            whole batch from being published; retry against current published Memory.
-            On stale read the new head and reconsider. On ambiguous employee
-            meaning ask them; this tool checks format, not semantic truth.
-            """
+            """Apply a bounded patch batch through the existing repair workflow."""
             result = self.repair.graph.invoke({"base": runtime.state["memory_read_head"],
                 "operation_id": runtime.state["memory_repair_binding"]["operation_id"],
                 "edits": [edit.model_dump() for edit in edits], "index": 0, "outcome": None,
@@ -81,19 +115,13 @@ class MemorySession(AgentMiddleware):
         base = request.system_message.content if request.system_message else ""
         blocks = [{"type": "text", "text": base}] if isinstance(base, str) else list(base)
         blocks.append({"type": "text", "text": (
-            MEMORY_READ_GUIDANCE +
+            MEMORY_ACTION_GUIDANCE +
+            "## Memory read view\n"
             "This input starts with the fixed initial guide below. "
             "Only C tool feedback whose source_reference matches the Current input reference "
             "supersedes this input's initial guide/read version, when it provides a refreshed head/guide. "
             "Previous-input C feedback is historical and cannot override this input's initial view. "
-            "Repair is on demand, not routine background consolidation. If published Memory "
-            "conflicts with a verified correction in the current conversation, read the affected "
-            "text and use repair_memory before your final response. Correct outdated facts in "
-            "knowledge and, if present, the guide; preserve unaffected details and references. "
-            "A corrected deadline, frequency or case condition matters even when the common "
-            "work pattern is unchanged. If the meaning is unclear, ask instead of guessing. "
-            "If repair cannot preserve the correction, follow request_memory_consolidation's "
-            "guidance and report only what the tool results confirm. Do not reveal hidden reasoning.\n"
+            "\n## On-demand reading\n" + MEMORY_READ_GUIDANCE +
             # Old pending checkpoints have no proven initial revision. Neither
             # the refreshed read head nor the latest publication can supply it.
             f"Initial guide publication revision: {request.state.get('memory_initial_revision', 'unknown')}\n"

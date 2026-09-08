@@ -1,5 +1,16 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+CT22 prompt contract (2026-09-08): the approved CT21 candidate is wired into the
+existing system and C/B descriptions. Memory selection policy is centralized;
+the framework still executes tools and returns the same failure/success results.
+Tool schemas, read tools, Skills, patch/detail/reference protections and native
+continuity are unchanged. The complete SDK request matches the reviewed fixture;
+251 focused offline tests passed. Natural correction persistence remains untested
+for this candidate, not a long-interview readiness claim.
+[Implementation, sources and current quality gate](../../docs/specs/2026-09-08-ct22-memory-prompt-contract-results.md).
+This contract is for the with-Store application. The no-Store test composition
+cannot run background persistence; its tool-description limitation is recorded there.
+
 Status: **analysis-only local API + native continuity + Memory read/publication +
 B1/B2 extraction/consolidation + explicit summary re-extraction + durable
 consolidation requests + automatic background dispatcher + on-demand analysis Skills +

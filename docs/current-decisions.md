@@ -4,7 +4,7 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
-**CT30最新入口（2026-09-08）：**[漏存的官方執行控制比較](specs/2026-09-08-ct30-missed-memory-write-official-controls.md)。Owner澄清Patch只是例子，要研究漏存解法。已核對Codex／Claude Stop續做、forced tool choice、LangChain after_model接點；不宣稱官方預設有Memory漏存偵測器。建議把完成檢查列局部比較候選，語意判斷會有額外成本與誤判風險。下一gate為Owner審此候選；原context診斷保留。G2完成／修法待審／G8 OPEN，未改產品或付費生成；下方為沿革。
+**CT30最新入口（2026-09-08）：**[漏存機制與§6提示核對](specs/2026-09-08-ct30-missed-memory-write-official-controls.md)。Owner追問是否已明確要求修補；直接核對A2實際請求，規則與六工具均已送達、無同名，不能當未接線。官方有不呼叫工具的排查建議；最新候選是把「何時先查目前Memory」入口與既有提示／context作局部比較，非再加同義MUST。下一gate為Owner審此差異；原context診斷保留。Stop／模型完成檢查尚未核准，不優先新增。G8 OPEN；本輪唯讀核對＋記錄，未改產品／prompt或付費生成。下方為沿革。
 
 > **CT29官方補證（2026-09-08）：**[研究入口](specs/2026-09-08-ct29-stale-memory-official-failure-patterns.md)。A2當前guide已給10日；OpenAI要求核實後同輪真正寫入、Anthropic公開相近過早完成風險，但未證明本案零工具根因。CT25已含聊天≠保存規則，不再堆同義提示。G2補證完成／G8 OPEN；下一gate為拆開舊可見回答與原生延續的診斷設定，本輪無付費生成或產品修改，未重開closed帳本。下方為沿革。
 

@@ -55,7 +55,7 @@ A2 沒有 repair call，也沒有已建立的待修補意圖。不能假設存�
 
 **最小比較的驗收方向（未執行）：**沿用原 A2，確認不是只答5日而是真正發布修補；另有 Memory 已正確、一般新資訊、含糊更正／不同案例等反例，確認不會亂修或無限阻止結束。保留 reasoning／thinking、背景時機及現有工具；記實際保存、誤擋、往返次數、成本，而非只看回答。任何付費測試先另列小額範圍，不重開 CT28 closed 帳本。
 
-**下一唯一 gate：**Owner 審閱是否把方案3納入局部對照。原 context 診斷保留，不把這份研究當成施工同意。研究已找到不同於「多寫提醒」的官方機制；未知的是本案適用性及實際增益，繼續找同義文件無法代替驗證。
+**當時的下一 gate，最新追問見§6：**Owner 審閱是否把方案3納入局部對照。原 context 診斷保留，不把這份研究當成施工同意。研究已找到不同於「多寫提醒」的官方機制；未知的是本案適用性及實際增益，繼續找同義文件無法代替驗證。
 
 ## 5. 查閱與紀錄
 
@@ -63,3 +63,17 @@ A2 沒有 repair call，也沒有已建立的待修補意圖。不能假設存�
 - A-TOOLS、A-HOOKS、F1：同日讀取官方相關章節，特別核對 forced tool use 相容限制、Stop 與 prompt hook 的不同責任、LangChain after-model 的跳轉位置。引用的是當日公開可配置能力，不聲稱產品預設或實測成效。
 - 既有漏存與 context 證據只由 CT28 保存；本稿不複製 transcript、opaque、測試資料或 API 設定。
 - 本輪僅修改研究與 register 路由。G8 仍 OPEN；沒有修好／正常長訪談已通過的宣稱。
+
+## 6. Owner追問：應該用工具卻沒用，是不是提示沒說清楚？
+
+本次為同題的唯讀核對，不另開CT31、未改prompt或呼叫付費API。Owner尚未選方案3，不能把前述推薦當核准。
+
+**Observed：**重讀CT28證據第8次實際請求（history組），不是只看程式碼。system確有「核實過時後read＋repair、結束前完成、不需另請求、聊天確認不等於保存」；六個具名工具均在且無重名，repair契約與範例也已送出。當前導覽寫10日，近期員工重述與AI答覆寫5日，本輪再更正為5日；最後只有文字回答。回放的舊AI訊息保有`final_answer` phase，不能在沒有其他證據時歸因於phase遺失。
+
+**Official fact：**[Anthropic troubleshooting](https://platform.claude.com/docs/en/agents-and-tools/tool-use/troubleshooting-tool-use#claude-calls-the-wrong-tool)直接列出不呼叫工具，建議查名稱衝突、schema與例子，並把工具說明按「何時用」區分。[OpenAI function定義建議](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)要求system說清何時用／不用；也提醒例子對reasoning model未必有益。這些是排查方向，不代表本案已證實命中某個原因。
+
+[OpenAI工具路由與提示整理指南](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6#tool-routing)要求必要查閱不能因最終答案看似已知而略過，並建議逐組去掉重複、核對矛盾，保留真正限制。**當日取得的頁面標題是GPT-5.6 Sol指南；僅參考一般路由原則，不宣稱是Luna專屬保證或切換模型依據。**
+
+**Inference／待審候選：**現有規則偏向「已判定過時之後怎麼做」。可局部對照更直接的查閱入口：收到曾談工作資訊的更正，或當前導覽與本輪內容不一致時，先查相關的目前Memory；已正確不寫，確認過時再修補，不清楚則查來源或詢問。不是再堆一個MUST，也不要求所有聊天都查／寫或初始化Memory。現有正反例已部分表達這個意思，所以不能聲稱完全漏寫、也不能預先保證改寫有效。
+
+**最新建議／next gate：**先把此入口與現有提示／context的差異交Owner審，再選一個最小變因對照；原context隔離保留。Stop／模型完成檢查仍是未核准備選，不因查到官方接點就優先加上。不以寫了提示當成功，也不因一次失敗斷言prompt無效或必須新增Agent。既有A1成功／A2失敗只支持繼續釐清延續context中的動作選擇，不是穩定性結論。

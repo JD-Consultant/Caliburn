@@ -5,8 +5,10 @@ existing system and C/B descriptions. Memory selection policy is centralized;
 the framework still executes tools and returns the same failure/success results.
 Tool schemas, read tools, Skills, patch/detail/reference protections and native
 continuity are unchanged. The complete SDK request matches the reviewed fixture;
-251 focused offline tests passed. Natural correction persistence remains untested
-for this candidate, not a long-interview readiness claim.
+251 focused offline tests passed, but the natural correction trial FAILED:
+one Luna/medium request, zero tools, answer changed to 5 days while published
+Memory remained 10 days. Trial closed at estimated USD0.00242175; no further
+prompt changes or promotion. Candidate retained only for isolated reproduction.
 [Implementation, sources and current quality gate](../../docs/specs/2026-09-08-ct22-memory-prompt-contract-results.md).
 This contract is for the with-Store application. The no-Store test composition
 cannot run background persistence; its tool-description limitation is recorded there.

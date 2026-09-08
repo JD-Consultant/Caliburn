@@ -14,7 +14,8 @@
 - 6工具schema、4讀工具、Skills、patch格式與细節／引用保護、讀取版本權威、背景可用性、B1/B2、provider、額度及ABC架構不變；不接JD／production。
 - CT19是既有語意RED：回答5日但Memory仍10日；不付費重製baseline。
 - 官方依據承接CT20/21；本輪再讀OpenAI [提示精簡](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6#simplify-prompts-first)，保留完成條件與路由，不宣稱官方保證選工具。
-- 本輪唯一未決：小額真測授權（已詢問最多12次／US$0.05、Luna／medium）；未收到同意不得生成。
+- 小額真測授權：Owner接續「OK」已核准最多12次／US$0.05、Luna／medium；包含所有前景／背景／SDK重試，不開啟舊帳本。
+- 實驗沿用CT16最終合成資料庫、8192輸出及12000壓縮門檻，不改產品設定。小額帳本沿用既有短context保守預留（至少64000或完整request bytes×2，取大者，以cache-write費率＋最大output預留）；request限128000 bytes，不假定cache折扣；實際usage獨立核算。這是測試護欄，不是精確token或帳單保證。官方費率於2026-09-08再核對[Pricing](https://developers.openai.com/api/docs/pricing)。
 
 ## Task 1：完整接線、局部回歸與收尾
 
@@ -28,8 +29,9 @@
 - [x] 重跑局部安全網：最終251 passed，18.51s；C成功／失敗／stale／no_memory／有限重試、來源回查、Skills、B通知均保留。本輪不重跑整套PG／scheduler測試，不宣稱其驗收完成。
 - [x] 獨立review：無阻止full-Store候選的finding；no-Store非保存入口的P2限制及實際可達路徑已記於CT22§4，不新增其功能。
 - [x] 保存本地commit／tag；不merge/push。實際保存點只回填主register，避免計畫自我引用commit。
-- [ ] 真測有新授權才用原合成訪談副本，依序測漏存更正、新更正、已保存重述，保留實際payload／工具結果／Memory前後／費用。首個同樣反例再失敗就停止；不改提示重跑、不重跑長訪談。
+- [x] 新授權後真測已執行並按停止條件結束：第一個漏存更正FAIL（1次／US$0.00242175、0工具、Memory仍10日）；新更正與已保存重述未執行。完整payload／Memory／來源已封存，不改提示重跑、不重跑長訪談。
 - [x] 離線結果回寫同topic，明分接線通過與語意未測；保留CT19失敗，不把未測當通過。
+- [x] 真測結果回寫：候選FAIL、不promote、帳本closed；待Owner討論下一個不同依據的局部選項，不將此plan當重跑授權。
 
 ## 自審
 

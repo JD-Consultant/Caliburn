@@ -4,7 +4,7 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
-> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方登記是建立分支時的歷史快照；這條實驗線持續更新的register位於[主repo目前決策](../../../docs/current-decisions.md)。Owner核准CT21 A1後，[CT22接線／驗證](specs/2026-09-08-ct22-memory-prompt-contract-results.md)已完成251項離線回歸及局部review；自然模型真測未執行、新額度待答覆，G8仍OPEN。[CT19](specs/2026-09-08-ct19-routing-regression.md)原失敗仍保留。不要以本頁下方舊日期誤判新研究未記錄；production規則仍須循正式ADR／implementation gate。
+> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方登記是建立分支時的歷史快照；持續更新的register位於[主repo目前決策](../../../docs/current-decisions.md)。[CT22結果](specs/2026-09-08-ct22-memory-prompt-contract-results.md)自然更正FAIL：1次／US$0.00242175、0工具，回答5日但Memory仍10日；依核准規則停止，帳本closed、候選不promote。251離線通過不能當語意成功，G8仍OPEN。[CT19](specs/2026-09-08-ct19-routing-regression.md)原失敗保留。下一gate見CT22§7，不重跑／加提示。production仍循正式ADR／implementation gate。
 
 > 本表不取代現行 code、`AGENTS.md` 或 Accepted ADR。它負責指出「現在什麼有效、什麼只是候選、下一步只處理哪一題」。Working Decision 若與 production authority 衝突，必須經 successor ADR 與實作 gate，不能直接施工。
 

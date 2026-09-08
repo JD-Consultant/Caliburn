@@ -4,6 +4,8 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
+> **CT27後續更新（2026-09-08）：**Owner已同意A局部context診斷；先追問Sandbox patch差異，本輪答覆及框架接點見[CT27§6](specs/2026-09-08-ct27-live-repair-no-call-evidence-review.md#6-owner同意a追問sandbox介面差異與是否學習)。不重問A方向；尚未改介面或執行測試，G8 OPEN。下方「審A」為前次沿革。
+
 > **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**有效入口在[主repo register](../../../docs/current-decisions.md)。最新[CT27官方／實際續談核對](specs/2026-09-08-ct27-live-repair-no-call-evidence-review.md)：CT17／19／22／26沿同一fixture、opaque及可見續談；尚未隔離第一次更正與舊歷史延續。官方SDK Sandbox是custom patch tool，本案共用patch applier不等於相同模型工具介面，但不是已證實零工具根因。下一唯一gate：審A局部context診斷，不改提示、模型或B策略。本輪僅研究／記錄，無付費生成；[CT26](specs/2026-09-08-ct26-natural-live-repair-validation.md)FAIL、closed帳本及G8 OPEN保留，未授權產品改碼。下方為歷史快照，production仍須正式gate。
 
 > 本表不取代現行 code、`AGENTS.md` 或 Accepted ADR。它負責指出「現在什麼有效、什麼只是候選、下一步只處理哪一題」。Working Decision 若與 production authority 衝突，必須經 successor ADR 與實作 gate，不能直接施工。

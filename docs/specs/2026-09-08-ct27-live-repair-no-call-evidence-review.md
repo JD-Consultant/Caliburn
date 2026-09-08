@@ -1,6 +1,6 @@
 # CT27：自然即時修補零工具——官方機制與續談證據核對
 
-2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **G2研究完成，下一局部診斷待審；G8仍OPEN。不是修復完成。**
+2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **G2研究完成；Owner後續同意A局部診斷，新增工具介面說明見§6。G8仍OPEN。不是修復完成。** 下方§1–5保留研究當時狀態，以§6更新為準。
 
 ## 1. Preflight與有效邊界
 
@@ -96,3 +96,27 @@ A是**Caliburn針對此反例的診斷實驗，不冒充兩家指定的標準測
 - **重開條件：**新的對照能分辨動作選擇因素，或官方／框架提供可驗證的新機制；不得只因新名詞重開。
 - **下一唯一gate：**審閱A的局部診斷，確認後才執行；不延伸重做B時機／整份Memory架構。
 - **本輪驗證：**原CT22 SHA256 `932529be827921343ffe5b31e11faeb648c753c0ed35b5760bdc7b12e0d9e3cc`、CT26 SHA256 `ab4583fdf9660cedbae94016d2b00477dd6c4305029e6902f9cb542a53ab103e`未變；無產品src/tests變更。本文21個連結中的本地目標全存在；兩份register的diff check通過。主agent自審修正CT23段落錨點，未做獨立review或產品測試；保存點由主register登記。
+
+## 6. Owner同意A；追問Sandbox介面差異與是否學習
+
+Owner回覆「同意」，並要求先說明官方Sandbox patch具體差異。**A局部診斷方向已核准，不再重問相同方向；B工具介面替换仍只是研究候選**。本次先回答介面問題，未執行付費測試或修改產品；執行A前另登記小額護欄，不重開舊closed帳本。
+
+### 6.1 相同修改，不同封裝
+
+- 本案用普通function tool：`repair_memory({edits: [{path: "/memory/knowledge.md", diff: "@@\n-每月10日前提交月報。\n+每月5日前提交月報。\n"}]})`。這只是最小示意；實際應附足以唯一定位的上下文。`path`與單檔diff body分開，diff字串換行等須經JSON編碼。模型**不填**revision、operation ID、員工ID、來源reference或發布回執，這些由runtime提供。
+- 官方Sandbox用custom tool：輸入整段`*** Begin Patch`／`*** Update File: memory/knowledge.md`／`@@`及刪增行／`*** End Patch`；路徑在patch標頭中，一次可有多個檔案操作。模型仍須給精確patch，不是只說「幫我改正」就由工具分析語意。輸入grammar約束格式，不保證事實正確或修改位置正確。[OpenAI custom tools](https://developers.openai.com/api/docs/guides/function-calling#custom-tools)
+- 本案patch applier已取自官方SDK；差異在**模型工具契約、包裝解析與執行邊界**。本案只允許改兩個既有Memory檔案且整批發布；Sandbox Filesystem提供一般workspace增／改／刪／移。採相似介面不必擴大本案檔案權限，更不要求更換Store或整個agent。[Sandbox capabilities](https://developers.openai.com/api/docs/guides/agents/sandboxes#give-the-agent-capabilities)
+
+### 6.2 框架已有接點，但不是換decorator就完成
+
+官方LangChain現有`langchain_openai.custom_tool(format=...)`支持字串及Lark／regex grammar，能與`ChatOpenAI(use_responses_api=True)`和`create_agent`組合；因此不能說採官方字串工具就必須拋棄LangChain或自行發明傳輸協定。[LangChain custom tools／grammar](https://docs.langchain.com/oss/python/integrations/chat/openai#custom-tools)
+
+已讀本機`langchain-openai 1.6.0`的`tools/custom_tool.py`全檔與`chat_models/base.py`相關轉換：custom call轉為LangChain tool call時，字串放入`args.__arg1`；decorator將函式回傳包成`custom_tool_call_output`。目前`repair_memory`則回傳`Command`，除ToolMessage外更新Memory head及重試狀態，cancel reconcile還會讀`args.edits`。**不能直接套decorator便宣稱狀態更新、錯誤回饋、取消恢复與context刷新都相同**；若進入介面對照，這些必須沿官方擴充點另驗證。本機原始碼hash：`custom_tool.py`為`0eb98bb11e3aa6572359a1985eeee4d86d776b2d15a818e0edf71966e953c33f`；`base.py`為`1be7c48ae74b2552001301ce471fae8e39b79d15e79d544d86cd613fd0a9d71d`。版本為重現基準，不宣稱最新。
+
+### 6.3 建議與未知
+
+**值得學習：**長patch文字減少不必要JSON包裝、成熟grammar與parser、模型交付修改和runtime驗證／保存分責；不是為了保留舊名稱而保留`repair_memory`。少一層編碼是具體格式差異，但較少失誤／較低token成本仍待測，不能由格式直接保證。
+
+**不直接照搬：**一般檔案CRUD權限、Sandbox執行環境或以文字成功回覆取代本案版本／發布回執。模型／provider對custom tool與grammar的实际相容性仍需驗證，不能把LangChain有API當成所有provider都可用。
+
+**下一步仍是已同意的A，而非偷偷換介面。**A通過與否只幫助定位C漏用；若後續比較工具介面，保持記憶流程及發布保護，使用框架／SDK成熟接點。沒有證據表明改成custom patch必然解決CT26零工具；本次也不重跑長訪談或加入新prompt。

@@ -2,6 +2,8 @@
 
 2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **G2研究完成；局部候選待Owner審核，G8 OPEN。未改程式、未新增付費生成。**
 
+> 後續狀態（2026-09-08）：Owner已同意本文方向。完整提示候選及最新GPT架構核對轉至[CT25](2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md)；本文保留原研究與當時gate，不再當成要求重問同一方向的入口。具體候選尚待審核／接線，G8仍OPEN。
+
 ## 1. 本輪只處理什麼
 
 Owner要求研究C何時／如何使用，並順便檢查B時機；不是重開Memory分層。優先遵守[CT23§0](2026-09-08-ct23-memory-maintenance-responsibility-review.md)：**B以LLM適當段落通知為主、累積文字量後備；資訊太少先累積。C處理已核實的過時Memory，不用B追上冒充即時修補通過。**本次允許檢查B現有政策的局部對齊，不復活CT23三個被拒絕方案。

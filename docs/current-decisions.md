@@ -4,7 +4,7 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
-> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方登記是歷史快照；有效入口在[主repo register](../../../docs/current-decisions.md)。[CT23§0](specs/2026-09-08-ct23-memory-maintenance-responsibility-review.md)三方案仍未採用；Owner本輪要求C優先、B同策略內檢查。最新研究見[CT24](specs/2026-09-08-ct24-live-repair-use-and-background-timing-review.md)：核實過時Memory要局部修補，聊天已改不等於Memory已存；B維持段落通知＋文字量後備、低資訊量先累積。下一gate是§5短正反情境候選審核，不是已核准實作；0工具根因仍未知，不增Agent／強制工具／timer。[CT22](specs/2026-09-08-ct22-memory-prompt-contract-results.md)FAIL、closed帳本及G8 OPEN保留；未改碼／新增付費。production仍循正式ADR／implementation gate。
+> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方是歷史快照；有效入口在[主repo register](../../../docs/current-decisions.md)。Owner同意CT24方向並要求最新GPT提示建議；[CT25完整候選](specs/2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md)已寫好：M1即時修補使用契約＋短正反例／B低資訊量對齊，T1以框架公開介面校正讀取工具說明，新增部分待審。下一gate是完整候選審核，不是已接線；2項離線基準測試通過，未改src/tests／新增付費，CT22 FAIL、0工具根因未知及G8 OPEN保留。不加Agent／強制工具／timer／換模型；production仍循正式ADR／implementation gate。
 
 > 本表不取代現行 code、`AGENTS.md` 或 Accepted ADR。它負責指出「現在什麼有效、什麼只是候選、下一步只處理哪一題」。Working Decision 若與 production authority 衝突，必須經 successor ADR 與實作 gate，不能直接施工。
 

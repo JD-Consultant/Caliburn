@@ -237,6 +237,10 @@ def test_official_tools_follow_guide_memory_summary_source_in_compiled_agent():
         requests.append(payload)
         i = len(requests) - 1
         assert "網站案例請搜尋" in json.dumps(payload["input"], ensure_ascii=False)
+        # CT43 checks what the real SDK sends, not natural model obedience.
+        system_text = json.dumps([item for item in payload['input'] if item.get('role') in {'system', 'developer'}], ensure_ascii=False)
+        assert "call read_conversation(reference=<known summary path>)" in system_text
+        assert "not a reconstructed encoded locator" in system_text
         tool_names = {t["name"] for t in payload["tools"]}
         assert tool_names == {"ls", "grep", "read_file", "read_conversation"}
         if i < len(calls):

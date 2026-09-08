@@ -119,7 +119,7 @@ class TurnOutcome(AgentMiddleware):
 def build_conversation(
     *, model: BaseChatModel, checkpointer: BaseCheckpointSaver, instructions: str,
     tools: Sequence[BaseTool] = (), middleware: Sequence[AgentMiddleware] = (),
-    max_model_steps: int = 9, max_tool_calls: int = 8,
+    max_model_steps: int = 12, max_tool_calls: int = 11,
 ):
     """Compile the root and a directly registered, resumable Agent subgraph.
 

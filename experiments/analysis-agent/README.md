@@ -1,5 +1,15 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+CT43 local adoption (2026-09-09): shared reading guidance uses the existing
+interview-summary path resolver for original Q/A and citations. It does not
+require transcribing encoded conversation metadata, add tools, or change storage.
+The foreground default is now 12 model calls / 11 tools per employee input,
+using the existing framework limits and unchanged durable resume accounting.
+Explicit overrides still work. Two original 9/8 failures remain recorded;
+12/11 contrasts completed in 9 and 11 model calls with no locator-copy error.
+B2 effort/defaults and C retry policy are unchanged; G8 semantic-quality issues
+remain open. [Results and limits](../../docs/specs/2026-09-09-ct43-read-routing-results.md).
+
 CT41 local adoption (2026-09-09): live-repair guidance now distinguishes old tool
 snapshots from this input's read view, and requests in-place correction plus a
 small read-back. This is a prompt improvement, **not a guaranteed freshness

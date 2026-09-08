@@ -43,6 +43,13 @@ def assert_reviewed_contract(payloads, *, revision, guide):
             matches += block['text'].count(delta['before'])
             block['text'] = block['text'].replace(delta['before'], delta['after'])
     assert matches == 1
+    read_delta = json.loads((Path(__file__).parent / 'fixtures/ct43-memory-read-delta.json').read_text(encoding='utf-8'))
+    matches = 0
+    for item in expected['system']:
+        for block in item['content']:
+            matches += block['text'].count(read_delta['before'])
+            block['text'] = block['text'].replace(read_delta['before'], read_delta['after'])
+    assert matches == 1
     for payload in payloads:
         system = deepcopy(system_wire(payload))
         for block in system[0]['content']:
@@ -95,3 +102,27 @@ def test_service_initial_memory_request_matches_reviewed_contract(tmp_path):
                                  revision=0, guide='No memory has been published yet.')
         assert context.memory.publication.current() is None
         assert context.reader.pending_consolidation_turns() == []
+
+
+def test_service_default_budget_can_complete_multisource_read(tmp_path):
+    """Budget wiring only; natural retrieval evidence lives in CT43."""
+    from analysis_agent.service import AnalysisService
+    defaults = inspect.signature(AnalysisService).parameters
+    options = {name: defaults[name].default for name in ('max_model_steps', 'max_tool_calls')}
+    assert options == {'max_model_steps': 12, 'max_tool_calls': 11}
+    graph_defaults = inspect.signature(build_conversation).parameters
+    assert {name: graph_defaults[name].default for name in options} == options
+    with service_harness(tmp_path, store=InMemoryStore(), **options) as (service, sent, replies):
+        doc = service.create_document('多來源回查額度')['id']
+        service._context(doc).memory.publication.setup()
+        # Ten real read operations plus an answer. This fixture is not a
+        # recommendation to repeatedly read the same file in a real interview.
+        replies.extend([call('read_file', file_path='/skills/work-scope-interview/SKILL.md') for _ in range(10)])
+        replies.append(done())
+        run = service.submit(doc, 'multi-source-budget', '核對多份訪談的原句。')
+        service.join(doc)
+        state = service.get_run(doc, run['id'])
+        context = service._context(doc)
+        snapshot = context.graph.get_state(context.config, subgraphs=True)
+        assert state['status'] == 'completed', (state['error_code'], str(snapshot.tasks), len(sent))
+        assert len(sent) == 11

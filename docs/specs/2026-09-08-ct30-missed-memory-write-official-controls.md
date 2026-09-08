@@ -77,3 +77,37 @@ A2 沒有 repair call，也沒有已建立的待修補意圖。不能假設存�
 **Inference／待審候選：**現有規則偏向「已判定過時之後怎麼做」。可局部對照更直接的查閱入口：收到曾談工作資訊的更正，或當前導覽與本輪內容不一致時，先查相關的目前Memory；已正確不寫，確認過時再修補，不清楚則查來源或詢問。不是再堆一個MUST，也不要求所有聊天都查／寫或初始化Memory。現有正反例已部分表達這個意思，所以不能聲稱完全漏寫、也不能預先保證改寫有效。
 
 **最新建議／next gate：**先把此入口與現有提示／context的差異交Owner審，再選一個最小變因對照；原context隔離保留。Stop／模型完成檢查仍是未核准備選，不因查到官方接點就優先加上。不以寫了提示當成功，也不因一次失敗斷言prompt無效或必須新增Agent。既有A1成功／A2失敗只支持繼續釐清延續context中的動作選擇，不是穩定性結論。
+
+## 7. 更正何時同輪修補，何時交背景？
+
+**2026-09-08，Owner要求先查清邊界；研究補證，不是新的施工核准。**本節承接[CT24§2–4](2026-09-08-ct24-live-repair-use-and-background-timing-review.md)已有分工，完整回讀CT24及[CT17歷史結果](2026-09-08-ct17-correction-persistence-calibration.md)。CT17曾讓短更正一律通知B，後來已由CT24／CT25對齊Owner「資訊太少先累積」裁決，不能重新把CT17當現行策略。Topic仍為Q019-MEM-CADENCE-01／CT15-R07，G2補證、G8 OPEN；唯一問題是更正的持久化時機，不重開架構／排程、不增加生成請求。
+
+### 7.1 官方實際區分，不把產品混成一套
+
+| 來源與核對位置 | Official fact | 不可推論成 |
+|---|---|---|
+| [OpenAI Sandbox Memory](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)；本機官方SDK `openai-agents 0.22.0` 的 `agents/sandbox/memory/prompts.py`，`MEMORY_LIVE_UPDATE_INSTRUCTIONS`全文 | 啟用live update後，遇到Memory與當前證據衝突，先核實替代內容、工作中採用正確證據，並在同輪final之前寫回Memory；不用等使用者另下修補指令。官方指令明確允許先繼續任務、稍後在同輪寫回 | 不是更正訊息一到就必須先寫、停止所有分析；不是任何更正都先重跑Extraction＋Consolidation；提示要求不等於機械保證模型一定做到 |
+| 同一Sandbox文件的generation lifecycle；本機 `prompts/memory_consolidation_prompt.md` 的 `INCREMENTAL UPDATE behavior`／`Evidence deep-dive rule` | sandbox session期間追加run segments，session關閉時抽取再整併。整併也會以較好／較新證據修正舊知識與矛盾、保留仍成立內容、最後更新導覽 | 背景不只是新增；也不能因背景「有能力修」就說live update要求可以略過。sandbox session關閉不等於每個聊天回合結束 |
+| [Codex local memories：How local Codex memories work](https://learn.chatgpt.com/docs/customization/memories#how-local-codex-memories-work) | 背景選合格舊聊天，跳過活躍或過短session，等待足夠閒置，並受額度門檻影響；不是每聊完一輪立即生成 | 這不是Sandbox SDK同一個排程，也不代表本案要改用閒置timer；本案LLM段落通知不是Codex原生排程 |
+| [Anthropic Memory tool：How it works／Prompting guidance](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool#prompting-guidance) | 模型在工作中讀寫持久檔案，應用實際執行並回傳結果；官方有檢查Memory、記錄進展及維持內容一致的提示 | 該頁未給與OpenAI完全相同的「所有已核實過時Memory同輪final前寫回」條文，也未規定同一套B/C分類 |
+| [Claude Code auto memory](https://code.claude.com/docs/en/memory#auto-memory)，含How it works | Claude會在session中讀寫，依未來用途選擇值得記錄的資訊；不是每session都寫 | 不能由此推定Claude Code有與Codex相同的兩階段背景排程，或「更正可以一律延後」 |
+
+查閱日均為2026-09-08；官網實際開啟／取得相關章節，不只依搜尋摘要。本機SDK版本只用於可重現細節，**不宣稱是最新發行或代表所有OpenAI產品內部**。SDK定位見§3固定版本引用；本次另核對整併提示中的增量更新順序與證據規則。兩家的共同能力是可在使用中修訂持久Memory，**精確寫入時機不是已證實完全一致的跨廠共識**。
+
+### 7.2 對目前問題的映射：看已存內容，不只看「更正」兩字
+
+以下是既有CT24邊界的白話澄清，依OpenAI live-update模式映射，不冒充各廠共用的路由表。
+
+| 本輪實際狀態 | 處理方式 |
+|---|---|
+| 已查到目前Memory仍寫10日，員工明確更正同一件事為5日，替代內容已確認 | 當輪分析／回答立即採用5日；讀取受影響片段、局部修補並取得成功結果，在final前完成。不因只有一句話而等背景 |
+| 更正的事尚未進入已發布Memory，只有原始對話／近期context中的說法改了 | 當輪按已釐清內容繼續；來源照常保存。沒有舊Memory可修，不強行初始化或啟動整套B；依已有段落通知／文字量策略整理。背景前資料仍是尚未整併，不能自稱已更新Memory |
+| 目前Memory已經是5日，員工再重述5日 | 不為同一事實重寫；**先前AI曾回答5日不能代替這項已存狀態證據** |
+| 不清楚是改同一案例、不同情境、歷史值或新的規則 | 正常詢問／查原文，確認後才修；「較新」不單獨證明「較舊錯誤」 |
+| 核實修補需要做，但工具執行失敗 | 依已有回饋／有界重試處理並如實說明；沒有成功寫入就不能算C完成。若轉交背景，也只能算待處理，不改記為即時修補成功；不在本節新增補償機制 |
+
+範圍也要分清：C修補當前可寫Memory，不代表篡改原始訪談，或把所有歷史詳記重寫一遍；詳記及引用後續整理仍走既有B生命週期。本輪沒有為「更正」新增來源操作、獨立旗標或模型必填欄位。
+
+**本案10→5反例屬第一列，不是第二列：**CT28 A2當前導覽已含10日，回答5日卻0工具，Memory未變。不能用「近期對話已知道5日」或「B日後可能修好」把該次C漏用改成通過。反過來，也不應為避免漏用，把所有新資訊／更正一律強制repair。
+
+**剩餘Unknown與下一gate：**這次已查清官方指令與既有策略的邊界，但沒有查明A2為何忽略已收到的指令，也未證明§6新入口提示有效。下一步向Owner呈現本節分類與§6提示差異，再選局部驗證；不要回到廣泛搜尋同義資料。Stop／額外模型完成檢查仍未核准；未改產品、prompt、B時機或模型，未付費測試。只有Owner調整時機要求、新的官方契約或實測反證才重開這條邊界。

@@ -23,6 +23,9 @@ PATCH_GUIDANCE = (
     "the SDK uses the first match and a single label alone is not a strict guard. "
     "On a mismatch, read the affected range and revise the patch, not guessed content. "
     "After a successful change, use the latest staged text for subsequent patches."
+    " In a single diff, arrange hunks in the order their source lines occur in the file; "
+    "the SDK searches forward from the previous hunk, not backward. Use only the real context "
+    "needed to distinguish the target; do not drag unrelated long citation lists into a local patch."
 )
 
 

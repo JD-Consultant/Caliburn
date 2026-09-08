@@ -1,5 +1,7 @@
 # Caliburn Current Decision Register
 
+**CT48局部採用／長訪談G8仍OPEN（2026-09-09，LLM-Q019）：**[CT45–48結果、官方來源、實際內容及下一gate](specs/2026-09-09-ct46-48-edit-routing-and-budget-results.md)。背景B2採已測編輯指引、16模型／15工具，A仍12／11；沿框架計數／錯誤／resume，無新Agent/schema/matcher。原CT45八輪第8輪失敗不改判，xhigh未解；候選兩局部replay7及11模型完成（低於12，不能證明加cap是成功原因）。新增引用保留，但label過寬／案例位置兩Minor仍留。112次估US$0.17919779，CT45–48帳本closed、原PG未改。最終560離線＋41真PG通過。預設effort A/B2 medium、B1 high不變；本次語意測試high不能冒稱預設已穩定。下一gate固定新版完整訪談／補充撤銷／回查，毋須重做分層研究；不進production/JD、不merge/push。
+
 **CT44局部採用／完整訪談G8仍OPEN（2026-09-09，LLM-Q019）：**[結果、官方來源、前後正文與完整帳本](specs/2026-09-09-ct44-preservation-results.md)。隔離B2採寫前保留未變子句提示及12模型／12工具上限；8模型對照沒收尾，12模型／11工具對照完成，主要既有細節與兩案引用保留，原PG未變。20次Luna high估US$0.04937714，24次／US$0.10帳本closed。A仍12／11；effort預設A/B2 medium、B1 high，不能將本次high語意測試當成medium通過。最終回歸558＋真PG41通過；G8仍須固定版新補充／撤銷及長訪談驗收。無新Agent／schema／工具／重試loop，不進production／JD。下段未授權、候選還原及8／12均為歷史；舊失敗不改寫，後續只補新證據、不重做廣泛研究。
 
 **CT43局部採用／CT44待外部測試許可（2026-09-09，LLM-Q019）：**[CT43結果](specs/2026-09-09-ct43-read-routing-results.md)：回查改用既有summary path→原話resolver，兩次9/8額度失敗保留；12/11對照分別9、11模型完成，38次估US$0.02671177，closed。前景預設12模型／11工具，框架及計數／恢復不變；不全面high。[CT42](specs/2026-09-09-ct42-long-interview-results.md)空白11輪完成但舊未知仍存，high另漏兩項有效子句，G8 OPEN；105次估US$0.15032348 closed，不改原結果。[CT44計畫](plans/2026-09-09-ct44-preserve-unchanged-clauses.md)局部寫前刪除核對候選45離線通過，但兩次執行被工具安全審查拒絕外傳；0次CT44請求，候選封存、B2還原未採用。需明確許可這批合成訪談／Memory送相同OpenAI API，以Luna high最多24次／US$0.10續測；不要重做研究或绕過拒絕。不進production／JD、merge／push；其他局部優化依Owner委任，重大才問。

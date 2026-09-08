@@ -50,6 +50,12 @@ def assert_reviewed_contract(payloads, *, revision, guide):
             matches += block['text'].count(read_delta['before'])
             block['text'] = block['text'].replace(read_delta['before'], read_delta['after'])
     assert matches == 1
+    # Reviewed CT48 shared patch-description delta, not a regenerated snapshot.
+    # The preserved historical fixture continues checking every other field.
+    patch_delta = json.loads((Path(__file__).parent / 'fixtures/ct48-patch-guidance-delta.json').read_text(encoding='utf-8'))
+    repair = next(tool for tool in expected['tools'] if tool['name'] == 'repair_memory')
+    assert repair['description'].count(patch_delta['before']) == 1
+    repair['description'] = repair['description'].replace(patch_delta['before'], patch_delta['after'])
     for payload in payloads:
         system = deepcopy(system_wire(payload))
         for block in system[0]['content']:

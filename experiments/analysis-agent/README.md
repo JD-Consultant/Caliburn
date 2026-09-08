@@ -1,5 +1,19 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+CT48 local adoption (2026-09-09): B2 uses the tested edit-routing guidance,
+keeps still-valid references, and has a configurable 16-model / 15-tool ceiling.
+The shared SDK patch description now explains forward-only hunk order; the
+matcher, schemas, atomic publication, recovery and framework accounting are
+unchanged. A stays 12/11. Effort defaults stay A/B2 medium, B1 high; CT45–48
+semantic trials used high (CT46 xhigh), not proof of the medium defaults.
+Two local replays completed in 7 and 11 model calls; both were below 12, so
+they do not prove a causal benefit from raising the ceiling. CT45's failed
+eight-turn interview remains failed; citation labels and case placement still
+need improvement. Full fixed-version interview acceptance remains OPEN.
+Final verification: 560 offline passes plus 41 genuine PostgreSQL passes.
+[Results, primary sources and remaining issues](../../docs/specs/2026-09-09-ct46-48-edit-routing-and-budget-results.md).
+Earlier CTxx configurations below are historical.
+
 CT44 local adoption (2026-09-09): B2 keeps the read-before-write baseline and
 checks removed clauses for correction/equivalent deduplication. Its default
 budget is 12 model calls / 12 tools, preserving framework limit/resume behavior.

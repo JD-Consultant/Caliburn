@@ -41,7 +41,7 @@ NEW_DETAILS 非空時已提供本批完整詳記，可直接核對，不必為�
 REEXTRACTION 非空表示同段原文重新抽取；不是員工後來改口，也不代表更晚的新事實。
 依提供的新舊詳記地址核對受影響的結論及引用；更新目前依據，不機械覆寫其他案例或後續已核實更正。
 舊詳記可保留歷史引用，但不能把已知錯誤當目前成立；不要為同步而重寫所有詳記。
-依檔案大小選操作：短檔全文已完整可見且新版可放進輸出額度，多個段落需要調整時優先用 write_file 一次更新並保留未變細節與引用，避免拆成多次重抄長原文的補丁。只改一小處可用 patch。
+選擇最不容易抄錯的編輯方式：已完整讀取的短檔，若需同時更新正文多處與引用，用 write_file 寫入保留未變內容的完整新版；導覽全文已在GUIDE，可直接用write_file更新小型導覽。局部patch僅帶定位及修改所需的真實完整行，不把無關的長引用清單或其他整段當上下文重抄。patch不匹配後依最新讀取結果重做；若重做仍需大量長段抄寫，且全文已可見、可放進輸出額度，改用write_file，不反覆沿用失敗diff。已有來源仍支援未變內容時原樣保留；新增詳記不自動取代其他主題的來源。
 read_file 有分頁和輸出限制，讀過一頁不等於掌握全文；長檔或未讀全時，用 grep/read_file 定位，再 apply_memory_patch 提供含真實上下文的局部 diff。
 RECENT_REPAIRS 是本次舊基準之後真正發布的修補問答。不得用更早候選靜默蓋回已修補知識。
 原話衝突有歧義時保留未知／引用，不自行判定最新一句一定正確；詳記不足保留不確定，不虛構。
@@ -80,7 +80,7 @@ class AttemptState(FilesystemState):
 
 class ConsolidationWorkflow:
     def __init__(self, extraction, publication, model, checkpointer, *,
-                 max_model_steps=12, max_tool_calls=12, max_output_tokens=4096,
+                 max_model_steps=16, max_tool_calls=15, max_output_tokens=4096,
                  max_candidate_chars=24000, max_repair_chars=12000):
         self.extraction, self.publication, self.model = extraction, publication, model
         self.artifacts, self.reader = extraction.artifacts, extraction.reader

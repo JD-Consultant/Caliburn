@@ -1,0 +1,4 @@
+{
+  "before": "After a successful change, use the latest staged text for subsequent patches.",
+  "after": "After a successful change, use the latest staged text for subsequent patches. In a single diff, arrange hunks in the order their source lines occur in the file; the SDK searches forward from the previous hunk, not backward. Use only the real context needed to distinguish the target; do not drag unrelated long citation lists into a local patch."
+}

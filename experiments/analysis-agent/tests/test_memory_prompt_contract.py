@@ -34,6 +34,15 @@ def application_instructions():
 def assert_reviewed_contract(payloads, *, revision, guide):
     fixture = Path(__file__).resolve().parents[3] / 'docs/specs/evidence/2026-09-08-ct25-memory-prompt-candidate.json'
     expected = json.loads(fixture.read_text(encoding='utf-8'))
+    # CT41 reviewed delta; preserve the CT25 historical evidence unchanged.
+    # This checks SDK prompt routing, NOT whether the model obeys the text.
+    delta = json.loads((Path(__file__).parent / 'fixtures/ct41-memory-action-delta.json').read_text(encoding='utf-8'))
+    matches = 0
+    for item in expected['system']:
+        for block in item['content']:
+            matches += block['text'].count(delta['before'])
+            block['text'] = block['text'].replace(delta['before'], delta['after'])
+    assert matches == 1
     for payload in payloads:
         system = deepcopy(system_wire(payload))
         for block in system[0]['content']:

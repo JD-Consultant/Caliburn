@@ -72,7 +72,8 @@ def test_service_background_selects_high_only_for_extraction(tmp_path, separate,
             '0f621a77a1a8f04edb1edac59ef1c2eee349c2467f7d0325049e36b19f7355c5')
 
 
-def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, monkeypatch):
+@pytest.mark.parametrize('main_effort,b2_effort', [(None, None), ('high', None), ('medium', 'high')])
+def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, monkeypatch, main_effort, b2_effort):
     """Actual composition root; replace only DB resources and HTTP transport."""
     from contextlib import nullcontext
     import sqlalchemy
@@ -92,6 +93,12 @@ def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, m
         'Q019_MEMORY_TEXT_THRESHOLD': '', 'Q019_CONTEXT_BUDGET_MODE': 'native'}
     for name, value in settings.items():
         monkeypatch.setenv(name, value)
+    for name, value in [('Q019_REASONING_EFFORT', main_effort),
+                        ('Q019_CONSOLIDATION_REASONING_EFFORT', b2_effort)]:
+        if value is None:
+            monkeypatch.delenv(name, raising=False)
+        else:
+            monkeypatch.setenv(name, value)
     engine = sqlalchemy.create_engine(f'sqlite:///{tmp_path / "factory.db"}')
     saver, store = InMemorySaver(), InMemoryStore()
     monkeypatch.setattr(sqlalchemy, 'create_engine', lambda *a, **kw: engine)
@@ -123,7 +130,8 @@ def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, m
         service.scheduler.pause()
         high = service.background.extraction_model
         main = service.model
-        assert main.http_client is high.http_client
+        consolidation = service.background.consolidation_model
+        assert main.http_client is high.http_client is consolidation.http_client
         assert not main.http_client.is_closed
         assert main.root_client.timeout == high.root_client.timeout == 7
         assert main.http_client.timeout == httpx.Timeout(7, connect=7)
@@ -134,10 +142,31 @@ def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, m
         assert service.background.status(doc)['status'] == 'idle'
         assert service._context(doc).memory.publication.current().revision == 1
     assert not replies
-    assert budget_calls == ['medium', 'medium', 'high', 'medium']
+    assert budget_calls == [main_effort or 'medium', main_effort or 'medium', 'high', b2_effort or 'medium']
     assert [p['reasoning']['effort'] for p in sent] == budget_calls
     assert all(p['reasoning']['context'] == 'all_turns' for p in sent)
     assert all(p['max_output_tokens'] == 6000 for p in sent)
     assert all(p['context_management'] == [{'type': 'compaction', 'compact_threshold': 10000}] for p in sent)
     assert main.http_client.is_closed
     assert main.root_client.is_closed() and high.root_client.is_closed()
+
+
+@pytest.mark.parametrize('setting', ['Q019_REASONING_EFFORT', 'Q019_CONSOLIDATION_REASONING_EFFORT'])
+def test_invalid_role_effort_fails_before_database_or_network(monkeypatch, setting):
+    from analysis_agent.api import open_service
+    import sqlalchemy
+    required = ('Q019_DATABASE_URL', 'OPENAI_API_KEY', 'Q019_REQUEST_TIMEOUT_SECONDS',
+                'Q019_MAX_OUTPUT_TOKENS', 'Q019_COMPACT_THRESHOLD', 'Q019_CONTEXT_WINDOW_TOKENS',
+                'Q019_BACKGROUND_POLL_SECONDS', 'Q019_BACKGROUND_MAX_RECOVERIES')
+    for name in required:
+        monkeypatch.setenv(name, 'offline')
+    monkeypatch.setenv('Q019_CONTEXT_BUDGET_MODE', 'native')
+    monkeypatch.setenv('Q019_REASONING_EFFORT', 'medium')
+    monkeypatch.setenv('Q019_CONSOLIDATION_REASONING_EFFORT', 'medium')
+    monkeypatch.setenv(setting, 'invented')
+    def forbidden(*args, **kwargs):
+        raise AssertionError('Must reject configuration before opening resources')
+    monkeypatch.setattr(sqlalchemy, 'create_engine', forbidden)
+    with pytest.raises(ValueError, match=setting):
+        with open_service():
+            pytest.fail('Invalid effort accepted')

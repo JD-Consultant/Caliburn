@@ -1,5 +1,26 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+CT41 local adoption (2026-09-09): live-repair guidance now distinguishes old tool
+snapshots from this input's read view, and requests in-place correction plus a
+small read-back. This is a prompt improvement, **not a guaranteed freshness
+guard**. `Q019_REASONING_EFFORT` selects A; the independent optional
+`Q019_CONSOLIDATION_REASONING_EFFORT` selects B2. Both default to medium; B1 stays
+high. All share the existing client, context budget and output cap. Raising A
+does not raise B2 automatically. The current real-service experiment is A high,
+B1 high, B2 medium, not a blanket high deployment. Earlier all-high B2 hit its
+limit; those failures and test-only resume allowances remain in the evidence.
+Consolidation checks the same fact across affected passages without deleting
+different unresolved issues. For a short, fully visible file with multiple
+changes it prefers the existing complete-write tool; large/partially read files
+still use targeted SDK patches. Provenance stays in the body; the small guide
+routes by topic/case keywords instead of appending every source address.
+This is a measured local tool-selection policy, not a new backend or universal
+vendor rule. Final tests: 556 offline and 41 real-PostgreSQL passes. The fresh
+three-turn procurement counterexample completed; the original 11-turn interview
+had failures and maintenance, so overall G8 remains open. CT42 will run the
+fixed final code through a fresh long interview; no production/JD integration.
+[Results, primary sources, transcript and limits](../../docs/specs/2026-09-09-ct41-memory-edit-freshness-results.md).
+
 CT39 current wiring (2026-09-09): the tested CT37 extraction prompt is now
 adopted. `open_service` uses **B1 extraction high; consultant A and consolidation
 B2 medium**, all on the configured Luna model. The two official ChatOpenAI
@@ -238,7 +259,9 @@ the old application's `.env`. Required variables:
 | `Q019_BACKGROUND_POLL_SECONDS` | Positive finite infrastructure wake interval; NOT an interview-idle trigger |
 | `Q019_BACKGROUND_MAX_RECOVERIES` | Explicit nonnegative automatic process-interruption recovery allowance per B batch; persisted across restarts |
 | `Q019_MEMORY_TEXT_THRESHOLD` (optional) | Positive new visible-character fallback; omitted = notification-trigger only, no guessed default |
-| `Q019_MODEL` (optional) | Defaults to `gpt-5.6-luna`; medium / all_turns native binding |
+| `Q019_MODEL` (optional) | Defaults to `gpt-5.6-luna`; native `all_turns` binding |
+| `Q019_REASONING_EFFORT` (optional) | A effort; default `medium`. B1 remains `high`; does not change B2 |
+| `Q019_CONSOLIDATION_REASONING_EFFORT` (optional) | B2 effort; default `medium`. Both effort settings accept `low`, `medium`, `high`, `xhigh`, `max`; the configured provider/model must support the selection |
 | `Q019_CONTEXT_BUDGET_MODE` (optional) | `native` (default): local contract checks + provider compaction/overflow; `exact`: additionally require the official input-token counter before every generation |
 
 There is no guessed universal output/compaction value. The 32,000 / 1,000 / 13s

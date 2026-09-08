@@ -32,7 +32,7 @@ class BackgroundRow(Base):
 
 class BackgroundDispatcher:
     def __init__(self, service, *, max_recoveries, text_threshold=None, max_windows=16,
-                 extraction_model=None):
+                 extraction_model=None, consolidation_model=None):
         if type(max_recoveries) is not int or max_recoveries < 0:
             raise ValueError('An explicit nonnegative automatic recovery limit is required')
         if text_threshold is not None and (type(text_threshold) is not int or text_threshold < 1):
@@ -43,6 +43,7 @@ class BackgroundDispatcher:
             raise ValueError('Background memory requires the official Store')
         self.service, self.catalog = service, service.catalog
         self.extraction_model = extraction_model if extraction_model is not None else service.model
+        self.consolidation_model = consolidation_model if consolidation_model is not None else service.model
         self.max_recoveries, self.text_threshold, self.max_windows = max_recoveries, text_threshold, max_windows
         # Shared by every dispatcher entry in this single-process application.
         with service.lock:
@@ -60,9 +61,9 @@ class BackgroundDispatcher:
                                     self.service.saver, max_windows=self.max_windows)
             # Deployment sets one per-response budget on the model. B2 has a
             # standalone default, which must not replace that explicit budget.
-            output_limit = self.service.model.max_tokens
+            output_limit = self.consolidation_model.max_tokens
             limits = {'max_output_tokens': output_limit} if output_limit is not None else {}
-            b2 = ConsolidationWorkflow(b1, publication, self.service.model, self.service.saver, **limits)
+            b2 = ConsolidationWorkflow(b1, publication, self.consolidation_model, self.service.saver, **limits)
             self.workflows[document] = b1, b2
         return self.workflows[document]
 

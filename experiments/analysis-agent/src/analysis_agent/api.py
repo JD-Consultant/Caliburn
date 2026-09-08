@@ -103,6 +103,14 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
     budget_mode = os.environ.get('Q019_CONTEXT_BUDGET_MODE', 'native')
     if budget_mode not in {'native', 'exact'}:
         raise ValueError('Q019_CONTEXT_BUDGET_MODE must be native or exact')
+    # CT41: tune effort at the existing SDK binding; no alternate agent loop.
+    # Select effort per role: improving A must not silently raise B2's cost.
+    effort = os.environ.get('Q019_REASONING_EFFORT', 'medium')
+    consolidation_effort = os.environ.get('Q019_CONSOLIDATION_REASONING_EFFORT', 'medium')
+    for setting, value in [('Q019_REASONING_EFFORT', effort),
+                           ('Q019_CONSOLIDATION_REASONING_EFFORT', consolidation_effort)]:
+        if value not in {'low', 'medium', 'high', 'xhigh', 'max'}:
+            raise ValueError('Invalid ' + setting)
     params = conninfo_to_dict(os.environ['Q019_DATABASE_URL'])
     if params.get('host') not in {'localhost', '127.0.0.1'} or not params.get('dbname', '').startswith('q019_'):
         raise ValueError('This isolated entry requires a local q019_ database')
@@ -143,7 +151,7 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
         # clients MUST target the same endpoint, including custom path prefixes.
         model = build_model(model=model_name, base_url=str(counter.base_url),
                             api_key=os.environ['OPENAI_API_KEY'], http_client=client,
-                            request_timeout=timeout,
+                            request_timeout=timeout, reasoning_effort=effort,
                             compact_threshold=compaction).model_copy(update={'max_tokens': output})
         stack.callback(model.root_client.close)
         # CT39: only B1 needs the tested higher effort. Keep the same endpoint,
@@ -153,6 +161,9 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
             request_timeout=timeout, compact_threshold=compaction,
             reasoning_effort='high').model_copy(update={'max_tokens': output})
         stack.callback(extraction_model.root_client.close)
+        # LangChain model copies share the same managed client/budget hook.
+        consolidation_model = model.model_copy(update={
+            'reasoning': {**model.reasoning, 'effort': consolidation_effort}})
         service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model,
             instructions='你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
                          '根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。'
@@ -168,7 +179,8 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
         stack.callback(service.close)
         service.start()
         service.enable_background(max_recoveries=recoveries, text_threshold=text_threshold,
-                                  extraction_model=extraction_model)
+                                  extraction_model=extraction_model,
+                                  consolidation_model=consolidation_model)
         service.start_background(poll_seconds=poll_seconds)
         yield service
 

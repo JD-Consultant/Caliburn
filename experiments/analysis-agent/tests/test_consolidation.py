@@ -104,6 +104,28 @@ def test_saved_candidates_detail_read_and_atomic_publication(harness):
     assert len(h.sent) == count
 
 
+def test_navigation_guide_keeps_provenance_in_body_at_sdk_boundary(harness):
+    """Real routing/validation; scripted replies do not prove LLM adherence."""
+    h = harness
+    path = h.extracted["files"][0]["summary_path"]
+    guide = "網站案例：搜尋 /memory/knowledge.md 的網站、計費、權限；需要案例差異時讀正文。"
+    h.replies.extend([
+        call("write_file", file_path="/memory/knowledge.md", content="網站案例各有計費與權限條件。\n詳記：" + path),
+        call("write_file", file_path="/memory/guide.md", content=guide),
+        done(),
+    ])
+    workflow_class()(h.b1, h.pub, h.model, h.saver).start()
+    assert h.artifacts.guide(h.pub.current().memory) == guide
+    assert path in knowledge(h)
+    # Required guidance reaches the actual provider request, rather than only
+    # being present in a local string not consumed by the framework agent.
+    instructions = json.dumps(h.sent[1]["input"], ensure_ascii=False)
+    assert "詳記引用保留在正文相關主題，不在導覽逐批追加引用清單" in instructions
+    assert "多個段落需要調整時優先用 write_file" in instructions
+    write_tool = next(t for t in h.sent[1]["tools"] if t["name"] == "write_file")
+    assert "prefer this for changes across several passages" in write_tool["description"]
+
+
 def test_invalid_reference_returns_tool_error_then_model_can_repair(harness):
     cls = workflow_class()
     h = harness

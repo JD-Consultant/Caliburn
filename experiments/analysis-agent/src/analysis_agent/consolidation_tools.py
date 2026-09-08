@@ -74,7 +74,8 @@ def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
                   "read them directly without listing their directories first.",
             "write_file": "Write the complete contents of a staged memory file, replacing it entirely. "
                           "Use for a short file whose complete current contents are visible and whose "
-                          "complete updated contents fit the output budget. Preserve unchanged details "
+                          "complete updated contents fit the output budget; prefer this for changes across several passages. "
+                          "Minimal semantic changes do not require a patch. Preserve unchanged details "
                           "and references. Read any existing content not already visible first; "
                           "a paged or truncated read is not the whole file. For large or partially "
                           "read files use apply_memory_patch. Never copy read_file line-number prefixes. "

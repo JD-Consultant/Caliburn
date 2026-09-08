@@ -4,6 +4,8 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
+**CT31結果入口（2026-09-08）：**[四情境局部驗證](specs/2026-09-08-ct31-memory-routing-calibration.md)。G5完成、候選不採用、提示已還原。明確更正仍1次／0工具、答5而Memory10；已存正確與完全未發布兩反例不誤寫；含糊組試寫未確認，兩次裸`***` patch被拒後通知B，不能算先釐清通過或已修好。共10次Luna／medium、估US$0.01225069，20次／US$0.10帳本closed，原文／引用及重開保存核驗通過。無production／JD／B時機／工具變更，G8 OPEN。下一gate審CT30既有context隔離或完成檢查；不再疊同义prompt、不自行加Agent／強制tool。下方為沿革。
+
 **CT30最新入口（2026-09-08）：**[§7即時／背景邊界與§6提示核對](specs/2026-09-08-ct30-missed-memory-write-official-controls.md)。Owner要求先分清更正時機；重新核對官方及CT24既有分工：OpenAI live update對已核實的過時Memory要求同輪final前寫回，不是收到更正立即重跑B；無已存目標的新資訊依既有B策略累積，已正確不重寫，未釐清先問。Anthropic支持工作中修訂，但未公開相同的精確時機規則，不稱完全共識。A2仍屬已存舊值卻漏用C，根因未定。下一gate審此邊界與§6局部候選，再選驗證；Stop／額外模型檢查未核准。G8 OPEN；僅研究記錄，未改產品／prompt或付費生成。下方為沿革。
 
 > **CT29官方補證（2026-09-08）：**[研究入口](specs/2026-09-08-ct29-stale-memory-official-failure-patterns.md)。A2當前guide已給10日；OpenAI要求核實後同輪真正寫入、Anthropic公開相近過早完成風險，但未證明本案零工具根因。CT25已含聊天≠保存規則，不再堆同義提示。G2補證完成／G8 OPEN；下一gate為拆開舊可見回答與原生延續的診斷設定，本輪無付費生成或產品修改，未重開closed帳本。下方為沿革。

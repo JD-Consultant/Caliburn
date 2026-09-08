@@ -1,5 +1,13 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+CT44 local adoption (2026-09-09): B2 keeps the read-before-write baseline and
+checks removed clauses for correction/equivalent deduplication. Its default
+budget is 12 model calls / 12 tools, preserving framework limit/resume behavior.
+A saved-input Luna/high contrast completed and retained the prior work clauses;
+the original eight-call failure remains recorded. Effort defaults are unchanged;
+this is not a medium or full-long-interview quality guarantee.
+[Results, official sources and limitations](../../docs/specs/2026-09-09-ct44-preservation-results.md).
+
 CT43 local adoption (2026-09-09): shared reading guidance uses the existing
 interview-summary path resolver for original Q/A and citations. It does not
 require transcribing encoded conversation metadata, add tools, or change storage.

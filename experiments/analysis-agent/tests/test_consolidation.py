@@ -122,6 +122,8 @@ def test_navigation_guide_keeps_provenance_in_body_at_sdk_boundary(harness):
     instructions = json.dumps(h.sent[1]["input"], ensure_ascii=False)
     assert "詳記引用保留在正文相關主題，不在導覽逐批追加引用清單" in instructions
     assert "多個段落需要調整時優先用 write_file" in instructions
+    assert "寫入前以已讀正文為底稿，只更新有依據的子句" in instructions
+    assert "每项刪除須有更正或等義去重依據，本批未提及不是刪除依據" in instructions
     write_tool = next(t for t in h.sent[1]["tools"] if t["name"] == "write_file")
     assert "prefer this for changes across several passages" in write_tool["description"]
 
@@ -137,6 +139,36 @@ def test_invalid_reference_returns_tool_error_then_model_can_repair(harness):
     cls(h.b1, h.pub, h.model, h.saver).start()
     assert "missing" in json.dumps(h.sent[3], ensure_ascii=False)
     assert path in knowledge(h) and "missing" not in knowledge(h)
+
+
+def test_default_budget_allows_preflight_then_late_correction_before_publication(harness):
+    """CT44 shape: twelve model steps; mock HTTP tests limits, not semantics."""
+    h = harness
+    path = h.extracted["files"][0]["summary_path"]
+    initial = "初次交付說明；改版時補充。\n詳記：" + path
+    revised = "初次依案一次交付說明；改版時補充。\n詳記：" + path
+    h.replies.extend([
+        call("read_file", file_path=path),
+        call("read_file", file_path="/memory/guide.md"),
+        call("read_file", file_path="/memory/knowledge.md"),
+        call("read_file", file_path=path),
+        call("write_file", file_path="/memory/knowledge.md", content=initial),
+        call("read_file", file_path="/memory/guide.md"),
+        call("read_file", file_path="/memory/knowledge.md"),
+        call("read_file", file_path=path),
+        call("write_file", file_path="/memory/guide.md", content="交付：見 /memory/knowledge.md"),
+        call("validate_memory"),
+        call("apply_memory_patch", file_path="/memory/knowledge.md",
+             diff="@@\n-初次交付說明；改版時補充。\n+初次依案一次交付說明；改版時補充。"),
+    ])
+    def finish_after_correction():
+        assert h.pub.current() is None  # Neither preflight nor edits publish.
+        return done()
+    h.replies.append(finish_after_correction)
+    result = workflow_class()(h.b1, h.pub, h.model, h.saver).start()
+    assert knowledge(h) == revised
+    assert result["used_model_steps"] == 12 and result["used_tool_calls"] == 11
+    assert h.pub.current().revision == 1
 
 
 def test_patch_handles_display_separator_spaces_preserving_real_indent(harness):

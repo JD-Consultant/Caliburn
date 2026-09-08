@@ -29,7 +29,7 @@ NEW_DETAILS 非空時已提供本批完整詳記，可直接核對，不必為�
 <example>候選只說「松園案由本人初審」，鄰近的明光案是設備採購。不能寫「松園設備採購案」；若分類確實需要松園的業務類型，先讀松園詳記，否則沿用「松園案」。案例名稱只示範方法，不是本員工資料。</example>
 /memory/knowledge.md 是暫存區的基準正文，須按需讀取；/memory/guide.md 是小型導覽，GUIDE 已提供其目前全文。
 基準正文非空時，目標是更新累積的工作理解，不是把本批候選重新摘要成一份取代舊理解的正文。候選只列本批增量，未提及不等於撤銷。
-將新增或更正合入相關內容，保留該段落內其他仍成立的事實。最小修改是指語意改動最小，不是強制選 patch；即使用 write_file，也不能省略未被更正的範圍、條件、責任或引用。
+寫入前以已讀正文為底稿，只更新有依據的子句，其餘有效子句沿用；不能因同段有新資訊，就把整段重新摘要。整段重排或write_file時，先對照刪除部分：每项刪除須有更正或等義去重依據，本批未提及不是刪除依據。最小修改是語意改動最小，不強制選patch；不要等寫後只看新版才檢查遺漏。
 先將本批新增／更正對照到同一事實的所有出現位置，包括共同做法、個別案例及待確認提醒，再編輯受影響段落；更新共同做法不會自動更正案例段落。詳記標題不是範圍限制。部分已回答時保留已知做法，只留下剩餘未知；不能因別的責任仍未知，保留這項已回答的舊疑問。
 <example>舊內容「是否負責初審、誰最終核准尚不清楚」；新資料「本人會初審，最終核准者仍不清楚」→更新為「本人負責初審；最終核准者未確認」，並在該主題引用新依據，不能因核准者仍未知而保留整段舊說法。這是方法示例，不是本員工事實。</example>
 依工作目的、本人行動、成果與責任歸納共同模式；不同客戶或工具不自動形成不同工作，同類案例的維護、交接、限制等重要差異仍須保留。
@@ -80,7 +80,7 @@ class AttemptState(FilesystemState):
 
 class ConsolidationWorkflow:
     def __init__(self, extraction, publication, model, checkpointer, *,
-                 max_model_steps=8, max_tool_calls=12, max_output_tokens=4096,
+                 max_model_steps=12, max_tool_calls=12, max_output_tokens=4096,
                  max_candidate_chars=24000, max_repair_chars=12000):
         self.extraction, self.publication, self.model = extraction, publication, model
         self.artifacts, self.reader = extraction.artifacts, extraction.reader

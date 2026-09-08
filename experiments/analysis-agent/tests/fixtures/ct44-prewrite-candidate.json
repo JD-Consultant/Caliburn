@@ -1,7 +1,7 @@
 {
-  "status": "pending-live-validation-not-adopted",
+  "status": "locally-adopted-after-ct44-high-12-step-contrast",
   "before": "將新增或更正合入相關內容，保留該段落內其他仍成立的事實。最小修改是指語意改動最小，不是強制選 patch；即使用 write_file，也不能省略未被更正的範圍、條件、責任或引用。",
   "after": "寫入前以已讀正文為底稿，只更新有依據的子句，其餘有效子句沿用；不能因同段有新資訊，就把整段重新摘要。整段重排或write_file時，先對照刪除部分：每项刪除須有更正或等義去重依據，本批未提及不是刪除依據。最小修改是語意改動最小，不強制選patch；不要等寫後只看新版才檢查遺漏。",
   "offline": "Candidate SDK assertion initially failed; then 45 consolidation/feedback tests passed with candidate. This does not prove LLM semantic preservation.",
-  "live": "Both CT44 exec attempts rejected before process launch. No CT44 paid request; original prompt restored. Explicit external-processing approval required by tool safety review."
+  "live": "Prior two executions were denied before launch and prompt restored. After explicit owner consent: high8 failed cap; high12 completed with final preservation reviewed. 20 calls/USD0.04937714. See docs/specs/2026-09-09-ct44-preservation-results.md; not medium or full long-interview validation."
 }

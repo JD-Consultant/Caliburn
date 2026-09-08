@@ -52,3 +52,17 @@
 - O2本地`experiments/analysis-agent/.venv/Lib/site-packages/agents/sandbox/memory/prompts.py`，`MEMORY_LIVE_UPDATE_INSTRUCTIONS`；SHA256 `2eb0bf2e2e097a396ca6eba9cbf98c8b0e5e3c72f1cdfc5e7f1ed5194a5f93b0`。
 - O3同目錄`prompts/memory_read_prompt.md`，完整讀取；SHA256 `4dd97a62fc02ad75427a4f34d1fbda30d4d8afd99de99d0edafd672f873705d2`。SDK **0.22.0只是本輪可重現版本，不宣稱最新發行**；SDK公開實作也不等於Codex所有未公開內部機制。
 - 本地核對：`experiments/analysis-agent/src/analysis_agent/live_memory.py`的`MEMORY_ACTION_GUIDANCE`、`MEMORY_REPAIR_DESCRIPTION`；CT25／CT27／CT28完整閱讀。資料與舊失敗仍由CT28證據檔負責，不複製整份trace或新增第二份產品決策。
+
+## 6. Owner核准診斷方向；補充工具防錯研究原則
+
+Owner同意§4的下一步，並要求先找大廠對相近問題的實際解法，包含底層介面，不能只堆提示；以行號易算錯與Patch為例。這是**研究／診斷方向核准，不是已選產品修法**。沿同一topic記錄，不另開重複研究題；付費對照尚未執行。
+
+2026-09-08補查以下直接依據，範圍是驗證研究原則，不重做已研究的patch applier：
+
+- **Official fact — 格式負擔確實被指出：**[Anthropic Building effective agents，Appendix 2](https://www.anthropic.com/engineering/building-effective-agents#appendix-2-prompt-engineering-your-tools)說明傳統diff表頭需預先計算變更行數，JSON包程式碼需額外跳脫，建議減少這類負擔、從模型使用角度設計工具。該文2024-12-19發表，現有工具生態已變，**只引用其觀察，不把整篇當最新框架選型依據**。
+- **Official fact — OpenAI實際介面：**[Codex Apply patch範例](https://developers.openai.com/cookbook/examples/gpt-5/codex_prompting_guide#apply_patch)示範原生Responses與freeform／grammar兩種接法；以`@@`及周圍文字提供上下文，沒有要求傳統hunk起始行／行數表頭。[目前Apply Patch文件](https://developers.openai.com/api/docs/guides/tools-apply-patch)要求應用真正套用diff、按call_id回傳成功／失敗，並提供SDK `apply_diff`／`applyDiff`；Invalid Context可回饋模型重讀修正。引用的是工具契約，不由範例模型名推論本案provider相容或模型效果。
+- **Official fact — 不同公司仍有不同選擇：**[Anthropic目前Text editor工具](https://platform.claude.com/docs/en/agents-and-tools/tool-use/text-editor-tool#str_replace)以old_str／new_str精確替換，包含空白／縮排；另有依行號insert，讀取也可顯示行號。不能宣稱兩家均淘汰行號、精確匹配已過時、所有Patch都免算行號，或Patch原本就是為LLM發明。
+
+**本案採用的研究準則：**先定位失敗層（沒取得資料／沒選動作／參數填錯／實際執行失敗），再查同類官方解法的模型輸入、工具參數、定位方式、結果與恢復，最後對照框架現成能力及本案差異。有合適成熟能力優先用；無公開證據就標Unknown，不假定大廠一定已公開解決完全相同BUG。這是依Owner要求與官方資料收斂的檢查方式，不宣稱為兩家相同的內部流程。
+
+**本段為沿革，最新進度見[CT30漏存執行控制](2026-09-08-ct30-missed-memory-write-official-controls.md)：**Owner隨後澄清Patch只是例子，要求直接研究漏存解法。新補Codex／Claude完成檢查續做、工具選擇控制與LangChain接點；均未授權產品新增強制工具／檢查。原context隔離保留，下一gate改為審官方機制的局部比較候選，不以換Patch修零工具。

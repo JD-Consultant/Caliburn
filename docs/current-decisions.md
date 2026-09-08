@@ -4,6 +4,8 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
+**CT30最新入口（2026-09-08）：**[漏存的官方執行控制比較](specs/2026-09-08-ct30-missed-memory-write-official-controls.md)。Owner澄清Patch只是例子，要研究漏存解法。已核對Codex／Claude Stop續做、forced tool choice、LangChain after_model接點；不宣稱官方預設有Memory漏存偵測器。建議把完成檢查列局部比較候選，語意判斷會有額外成本與誤判風險。下一gate為Owner審此候選；原context診斷保留。G2完成／修法待審／G8 OPEN，未改產品或付費生成；下方為沿革。
+
 > **CT29官方補證（2026-09-08）：**[研究入口](specs/2026-09-08-ct29-stale-memory-official-failure-patterns.md)。A2當前guide已給10日；OpenAI要求核實後同輪真正寫入、Anthropic公開相近過早完成風險，但未證明本案零工具根因。CT25已含聊天≠保存規則，不再堆同義提示。G2補證完成／G8 OPEN；下一gate為拆開舊可見回答與原生延續的診斷設定，本輪無付費生成或產品修改，未重開closed帳本。下方為沿革。
 
 > **CT28對照完成（2026-09-08）：**[唯一結果入口](specs/2026-09-08-ct28-live-repair-context-contrast.md)。A1短context以7次模型／6工具完成修補，首patch多句號被拒、重讀後成功；正文及導覽10→5日、其餘完全保留。A2原延續1次／0工具，仍漏存。共8次Luna／medium、估US$0.01237055，帳本closed；來源及重開保存核驗通過。只支持延續context值得隔離，不定罪compaction／reasoning，不改產品／prompt／工具／B。G8 OPEN；下一gate審是否拆開舊可見回答與opaque延續做進一步診斷。下方為沿革。

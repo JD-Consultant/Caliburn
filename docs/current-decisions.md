@@ -4,7 +4,7 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
-> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方是歷史快照；有效入口在[主repo register](../../../docs/current-decisions.md)。Owner同意CT24方向並要求最新GPT提示建議；[CT25完整候選](specs/2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md)已寫好：M1即時修補使用契約＋短正反例／B低資訊量對齊，T1以框架公開介面校正讀取工具說明，新增部分待審。下一gate是完整候選審核，不是已接線；2項離線基準測試通過，未改src/tests／新增付費，CT22 FAIL、0工具根因未知及G8 OPEN保留。不加Agent／強制工具／timer／換模型；production仍循正式ADR／implementation gate。
+> **LLM-Q019隔離實驗閱讀入口（2026-09-08）：**本worktree下方是歷史快照；有效入口在[主repo register](../../../docs/current-decisions.md)。Owner核准[CT25 M1＋T1](specs/2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md#7-核准接線按錯誤類型整理不逐個bug堆句子)，並要求歷史防錯意圖保留、類似錯誤可合併規則。已局部接入Memory提示及框架公開工具說明，544離線回歸與完整SDK契約通過；只讀review通過，未新增付費。原patch／來源／detail保護、6組schema、Skills、reasoning、背景通知＋文字量後備不變。下一gate為另核准小額Luna／medium自然修補驗證；CT22 FAIL／closed、零工具根因未知及G8 OPEN保留。不加Agent／強制工具／timer／換模型；production仍循正式ADR／implementation gate。
 
 > 本表不取代現行 code、`AGENTS.md` 或 Accepted ADR。它負責指出「現在什麼有效、什麼只是候選、下一步只處理哪一題」。Working Decision 若與 production authority 衝突，必須經 successor ADR 與實作 gate，不能直接施工。
 

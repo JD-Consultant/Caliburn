@@ -1,4 +1,4 @@
-"""Approved CT21 contract at the SDK boundary, not natural model selection.
+"""Approved CT25 contract at the SDK boundary, not natural model selection.
 
 The fixed HTTP responses only let the real middleware/SDK assemble requests.
 The independently reviewed fixture catches missing/duplicated/misrouted prompt
@@ -32,7 +32,7 @@ def application_instructions():
 
 
 def assert_reviewed_contract(payloads, *, revision, guide):
-    fixture = Path(__file__).resolve().parents[3] / 'docs/specs/evidence/2026-09-08-ct21-memory-prompt-candidate.json'
+    fixture = Path(__file__).resolve().parents[3] / 'docs/specs/evidence/2026-09-08-ct25-memory-prompt-candidate.json'
     expected = json.loads(fixture.read_text(encoding='utf-8'))
     for payload in payloads:
         system = deepcopy(system_wire(payload))

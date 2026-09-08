@@ -1,5 +1,17 @@
 # Analysis-only Agent — isolated conversation and Memory slices
 
+CT25 prompt wiring (2026-09-08): owner-approved M1/T1 is now wired locally.
+Verified stale Memory requires live repair even if chat already acknowledged the
+correction; unresolved meaning is checked, not guessed. Low-information background
+work still accumulates, with LLM notification and the existing text-size fallback.
+Official DeepAgents custom_tool_descriptions now describe only the available
+text/read tools. Related failure classes share guidance; historical patch,
+detail/reference, scope and retry protections remain intact. No schema, model,
+Memory architecture, JD or production change. **544 offline tests passed**;
+natural live-repair selection is still unverified, **G8 OPEN**. No paid requests.
+[Approved contract, retained protections and verification](../../docs/specs/2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md#7-核准接線按錯誤類型整理不逐個bug堆句子).
+The CT22 paragraph below records the prior failed trial, not the current prompt.
+
 CT22 prompt contract (2026-09-08): the approved CT21 candidate is wired into the
 existing system and C/B descriptions. Memory selection policy is centralized;
 the framework still executes tools and returns the same failure/success results.

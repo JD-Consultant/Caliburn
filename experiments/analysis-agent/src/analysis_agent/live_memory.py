@@ -15,28 +15,31 @@ from analysis_agent.repair import MemoryEdit, RepairWorkflow
 from analysis_agent.memory_patch import PATCH_GUIDANCE
 
 
-# CT21 reviewed contract: selection policy is separate from tool mechanics.
+# CT25 reviewed contract: preserve evidence constraints; clarify action selection.
 # https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions
 MEMORY_ACTION_GUIDANCE = (
     "## Memory actions before the final reply\n"
-    "Handle persistence separately from what you can answer.\n"
-    "- If published Memory conflicts with a verified employee correction, read the affected text and "
-    "use repair_memory before finalizing. A correction already discussed in chat still matters, "
-    "including a changed deadline, frequency or case condition without a new work pattern.\n"
-    "- If meaning is unresolved, ask; do not select a replacement fact.\n"
-    "- Do not use background notification instead of an applicable, unattempted repair. Follow "
-    "repair_memory's recovery rules when an attempt fails.\n"
-    "- An already-saved, unchanged restatement needs no write. Do not request background work solely "
-    "for a successfully repaired correction; other new progress in the same input may still need "
-    "consolidation.\n"
-    "背景整理時機：新工作範圍、案例中本人做法、成果與完成判準、頻率、條件、例外、責任交接或專業判斷，"
-    "都可能是實質進展；只是例子，不是必填清單。類似案例補充不同條件也算進展，不必產生新任務。"
-    "零碎補充可累積成段；轉向另一工作或回顧收尾前，有尚未通知的實質進展就用request_memory_consolidation。"
-    "明確更正若沒有可修補的已發布Memory，仍需通知保存；不因只改一句或共同模式不變而略過。"
-    "未知與衝突可如實整理，不用等整項工作問完、填滿Task／OPKS或為通知繼續追問。"
-    "只有話題切換不算進展，已有通知且無新進展不重複，不每輪例行整理。\n"
-    "Report only what tool results confirm: answering correctly is not saving; a background receipt is "
-    "not a completed update. Continue the consultant reply without waiting for background work.\n"
+    "Keep published Memory consistent with verified work evidence.\n"
+    "### Live repair\n"
+    "- If published Memory conflicts with a verified employee correction or original-interview evidence "
+    "you checked, read the affected text and use repair_memory before finalizing. Repair your own "
+    "earlier extraction or consolidation errors too; no separate employee request is needed.\n"
+    "- If meaning or case identity is unresolved, ask or read the relevant source. A newer statement "
+    "alone does not establish the replacement.\n"
+    "- An unchanged restatement needs no write only when current published Memory already reflects it; "
+    "chat acknowledgments are not proof of saving.\n"
+    "- Use repair_memory before background notification for an applicable, unattempted repair. Follow "
+    "repair_memory's result and recovery rules.\n"
+    "### Background consolidation\n"
+    "新工作範圍、案例中本人做法、成果與完成判準、頻率、條件、例外、責任交接或專業判斷，都可能是實質進展；只是例子，不是必填清單。類似案例補充不同條件也算進展，不必產生新任務。\n"
+    "依累積尚未通知的實質資訊選適當段落；內容已有整理價值、準備轉題或回顧收尾時，用request_memory_consolidation。零碎或很少的新資訊先累積；無可修補Memory的短更正也依此判斷，不一律通知。文字量後備由系統處理，不用自己計字數。\n"
+    "未知與衝突可如實整理，不用等整項工作問完、填滿Task／OPKS或為通知繼續追問。只有話題切換不算進展，已有通知且無新進展不重複，不每輪例行整理。\n"
+    "修補成功後不為同一更正再通知背景整理；其他累積進展仍可通知。只依工具結果說明已完成的動作；通知回執不等於Memory已更新，不等待背景完成才答覆。\n"
+    "### Contrasting examples — not employee facts\n"
+    "- Chat confirmed employee reviews and supervisor approves, but Memory says employee approves: read "
+    "and repair the affected Memory before finalizing.\n"
+    "- Memory already reflects those responsibilities, with no other new information: no repair or "
+    "background request.\n"
     "\n"
 )
 
@@ -49,10 +52,11 @@ MEMORY_REPAIR_DESCRIPTION = (
     "details and references.\n"
     "status=applied confirms atomic publication; a failed patch publishes none of the batch. For "
     "invalid_edit or stale with retryable=true, use detail/read_paths to fix and retry within the "
-    "existing limit, not switch to background after the first failure. no_memory requires background "
-    "initialization. For a failed repair with retryable=false, or status=repair_limit, request "
-    "background consolidation of the unpreserved correction; report it as requested only after the "
-    "receipt, not saved. Never retry an applied result.\n"
+    "existing limit, not switch to background after the first failure. no_memory has no repair target: "
+    "stop this edit and follow Memory actions for later background initialization. For other failed "
+    "repairs with retryable=false, or status=repair_limit, request background consolidation of the "
+    "unpreserved correction; report it as requested only after the receipt, not saved. Never retry an "
+    "applied result.\n"
     "For ambiguous meaning, ask. This tool checks edits, not semantic truth."
 )
 

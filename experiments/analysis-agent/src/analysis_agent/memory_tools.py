@@ -131,10 +131,51 @@ def memory_read_tools(artifacts: MemoryArtifacts, version: MemoryVersion | None,
     return [*readonly_file_tools(backend), read_conversation]
 
 
+# CT25: describe only this text-only runtime, without enabling extra middleware
+# hooks. Keep the official tool schemas, formatting, pagination and errors.
+# https://github.com/langchain-ai/deepagents/blob/deepagents%3D%3D0.7.13/libs/deepagents/deepagents/middleware/filesystem.py
+READONLY_TOOL_DESCRIPTIONS = {
+    "ls": (
+        "Lists files in a directory to discover unknown paths.\n"
+        "\n"
+        "When the guide or a tool result already provides the relevant file path, use read_file directly. "
+        "Listing a directory is not a prerequisite for every read."
+    ),
+    "read_file": (
+        "Reads available text Memory, interview-detail and Skill files. A missing path returns an error; "
+        "this is not a host-filesystem or general media tool.\n"
+        "\n"
+        "Usage:\n"
+        "- By default, it reads up to 100 lines starting from the beginning of the file. Use "
+        "`offset`/`limit` to page through large files instead of reading them whole.\n"
+        "- Results are returned with line numbers starting at `offset` + 1 (1 by default), then two spaces, "
+        "then the source line. Never include these line-number prefixes when editing.\n"
+        "- Lines over 5,000 characters are split with continuation markers (e.g. 5.1, 5.2); `limit` counts "
+        "source lines, so continuation rows do not consume the budget.\n"
+        "- Use one tool call at a time in this runtime; make further reads only when the preceding result "
+        "leaves relevant information missing.\n"
+        "- An empty file returns a system-reminder warning in place of contents.\n"
+        "- Always read a file before editing it."
+    ),
+    "grep": (
+        "Search for a LITERAL text pattern across files (NOT regex).\n"
+        "\n"
+        "The pattern is matched verbatim: regex metacharacters are ordinary characters, not operators. To "
+        "match any of several strings, run a separate grep for each; `grep(pattern=\"foo|bar\")` searches for "
+        "the literal text \"foo|bar\", and `.*` or `\\.` match those characters literally.\n"
+        "- No execution tool is available here. For alternatives, use separate literal patterns or read the "
+        "relevant file range.\n"
+        "\n"
+        "Returns matching files or content per `output_mode`."
+    ),
+}
+
+
 def readonly_file_tools(backend):
     """One official ls/grep/read_file surface, without offload/scrubbing hooks."""
     filesystem = FilesystemMiddleware(
         backend=backend, tools=["ls", "grep", "read_file"],
+        custom_tool_descriptions=READONLY_TOOL_DESCRIPTIONS,
         human_message_token_limit_before_evict=None,
         tool_token_limit_before_evict=4000,
     )

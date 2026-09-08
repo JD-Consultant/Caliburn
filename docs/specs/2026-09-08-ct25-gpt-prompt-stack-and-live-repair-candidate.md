@@ -1,6 +1,6 @@
 # CT25：GPT 提示架構與即時修補完整候選
 
-2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **CT24方向已獲Owner暫時同意；G4完整候選待審，G8 OPEN。只有研究／候選文件，未接入程式、未新增付費生成。**
+2026-09-08 · Q019-MEM-CADENCE-01／CT15-R07 · **Owner已核准M1＋T1；隔離接線及544項離線回歸通過，只讀review通過，G8 OPEN。§1–6保留原候選研究，最新接線與舊防錯核對見§7；未新增付費生成、未接production。**
 
 ## 1. 本輪決策與閱讀入口
 
@@ -27,7 +27,7 @@ Owner同意[CT24](2026-09-08-ct24-live-repair-use-and-background-timing-review.m
 
 ## 3. 候選的兩組變更
 
-### M1：已同意方向的具體文字，仍待完整候選審核
+### M1：原候選的具體文字（現已核准，接線見§7）
 
 1. **核實後修補：**已發布Memory與員工更正，或已回查核實的原始訪談不一致時，讀受影響內容並呼叫`repair_memory`，依工具結果完成或恢復。涵蓋模型先前整理錯誤，不只等員工說「請改記憶」。
 2. **不能以聊天代替保存：**即使前輪已回答正確，Memory仍舊就仍有修補工作；只有目前Memory已正確、沒有其他新資訊，才是無需寫入的重述。不要求每輪例行查完所有Memory。
@@ -37,7 +37,7 @@ Owner同意[CT24](2026-09-08-ct24-live-repair-use-and-background-timing-review.m
 
 成功修補同一更正後不重複通知背景；同輪另有其他累積進展仍可通知。含糊指涉／案例身分未明時先詢問或回查，不採「比較新一定對」。背景通知回執不等於Memory已更新，不等背景完成才答覆。
 
-### T1：完整提示審核找到的接線落差，新增提請審核
+### T1：完整提示審核找到的接線落差（現已核准，接線見§7）
 
 | 現況 | 候選修正 | 證據／邊界 |
 |---|---|---|
@@ -58,7 +58,7 @@ Owner同意[CT24](2026-09-08-ct24-live-repair-use-and-background-timing-review.m
 - 固定規則→當前guide／狀態→近期／compaction延續的既有責任不變；候選JSON沒有复制所有歷史、opaque reasoning或tool結果，更不把它們當新system規則。
 - 可見system文字由**4,617→4,889字元**，工具描述由**5,576→5,197字元**；合計**10,193→10,086字元（少107）**。只比較字元，**不是token、計費或效果的改善證據**；參數schema未縮減。保留重要防錯條件優先於硬砍字數。
 
-## 5. 核對結果與下一gate
+## 5. 候選階段核對與當時的下一gate（歷史，已由§7推進）
 
 本輪純離線`tests/test_memory_prompt_contract.py`：**2 passed**，證明未改的現行實際請求仍對得上CT21基準，不是CT25已接線、更不是新提示效力通過。第一次測試因Windows暫存目錄ACL受阻；一般權限、新的專用暫存目錄重測成功，沒有為此修改產品。另核對完整候選JSON、6組schema、保留段落與局部差異。
 
@@ -74,3 +74,30 @@ CT22原證據SHA256仍為`932529be827921343ffe5b31e11faeb648c753c0ed35b5760bdc7b
 - [O4 Function calling設計建議](https://developers.openai.com/api/docs/guides/function-calling#best-practices-for-defining-functions)：完整讀取該節；清楚工具用途、不要讓模型填已知資料、例子也可能傷害推理模型。
 - [F1 DeepAgents官方0.7.13 FilesystemMiddleware](https://github.com/langchain-ai/deepagents/blob/deepagents%3D%3D0.7.13/libs/deepagents/deepagents/middleware/filesystem.py)：對照本機已安裝0.7.13的constructor、ls/read_file/grep factories、`_grep_tool_description`／`_with_filtered_grep_description`及model-call接線；公開擴充點是`custom_tool_descriptions`，不呼叫私有hook。版本固定為重現依據，**不宣稱0.7.13是最新發行版**。
 - Memory即時修補的兩家原始依據與適用邊界：沿用[CT24§2、§6](2026-09-08-ct24-live-repair-use-and-background-timing-review.md)，其中同輪修補具體指令有OpenAI依據；背景段落通知＋字量後備是Owner已選的應用策略，不能冠名兩家完全相同的共識。
+
+## 7. 核准接線：按錯誤類型整理，不逐個BUG堆句子
+
+### 7.1 有效決定與歷史防線
+
+Owner核准M1＋T1，並補充：舊prompt可能為修復歷史BUG而加；相似錯誤也可整理成更好的共同指引。**保留防錯目的，不要求保留每句舊文字。**本切片只接核准的Memory動作與工具說明，未擴大重寫B1/B2、顧問或Skills。
+
+GPT官方建議[逐組精簡、保留必要限制](https://developers.openai.com/api/docs/guides/prompt-guidance-gpt-5p6#simplify-prompts-first)：保留成果／停止條件、業務／證據／驗證限制，改一組就重跑同一組檢查。下表的分組是**Caliburn歷史證據整理**，不是兩家官方同一份prompt，也不能由建議推得效果已提升。
+
+| 歷史問題／同類風險 | 保留或整理成的原則 | 本輪驗證邊界 |
+|---|---|---|
+| [CT04](2026-09-07-api-memory-interview-validation.md)整段修改遺失其他既有細節，即時與背景都發生過 | 共用`MEMORY_EDIT_GUIDANCE`：最小修改；新資料未提不等於撤銷；整段替換仍保留未更正的範圍、例外、工作細節與引用 | 共享指引原樣；`test_recorded_luna_background_patch_replays_without_changing_other_cases`驗固定patch保留其他案例，**不保證模型產出的patch保留全部語意** |
+| [CT13](2026-09-07-ct13-local-repair-results.md)案例／頻率／條件錯套、顧問轉述被當成員工確認 | 保留主體、做法、條件、頻率、權責與案例邊界；含糊就查證或問，新句不一定更正確 | `MEMORY_READ_GUIDANCE`、B1/B2、顧問及3份Skill正文不動；自然模型是否遵守仍需真實訪談 |
+| 舊精確編輯失敗與重複片段誤定位 | 保留顯示行號≠原文縮排、真正上下文定位、最新staged文字、失敗重讀及官方V4A格式 | `PATCH_GUIDANCE`不動；`test_background_mismatch_returns_precise_error_and_can_correct`、`test_live_patch_late_failure_does_not_publish_then_retry_succeeds`驗回饋、整批不部分發布與重試 |
+| [CT22](2026-09-08-ct22-memory-prompt-contract-results.md)聊天已更正、Memory仍舊卻零工具 | M1集中動作規則：核實後修補；聊天確認不是保存回執；已存且無新增才不動作；含糊不猜 | 完整SDK請求符合核准候選；**漏選是否改善仍未知**，不以契約測試當自然選擇效果 |
+| 工具說明暗示不可用能力／互相矛盾 | T1只描述實際文字讀取工作面；已知地址可直讀、序列呼叫、literal搜尋，不指示不可用execute | 公開`custom_tool_descriptions`接線；6組schema及回傳不變；`test_official_tools_follow_guide_memory_summary_source_in_compiled_agent`與Skills測試驗工具鏈 |
+
+機械契約不概括成「自行修好」：patch格式、原子發布、`invalid_edit`／`stale`／`retryable`與成功不得重試仍清楚。唯一結果說明調整是已核准的`no_memory`：沒有修補目標時停止編輯，依資訊累積與背景時機處理，不再每個短更正一律通知。
+
+### 7.2 實作、結果與下一步
+
+- [接線計畫](../plans/2026-09-08-ct25-prompt-wiring-and-regression.md)：`live_memory.py`接M1，`memory_tools.py`透過[F1]接T1；不改框架原始碼、schema、patch演算法、Store／Saver、排程、reasoning或模型。Runtime不從docs載入prompt，候選JSON不改。
+- 獨立CT25 fixture先接測試：**2 failed（5.03秒）**，正是舊實際system不符新候選；接線後**2 passed（4.55秒）**；只整理程式字串換行後再驗**2 passed（4.68秒）**。不是由修改後程式生成期望值。
+- 與`044ec71e`比對：排除兩個核准Memory常數、新讀取說明常數及其constructor參數後，兩份src的AST完全一致；其餘src／Skills無diff。CT25候選JSON及CT22原證據不變，後者原檔SHA256仍為§5的值。
+- 全部非PostgreSQL離線測試：**544 passed，45.55秒**，1個既有Starlette／AnyIO deprecation warning；明確排除`test_postgres_*`，暫存目錄`.test-tmp/ct25-offline-regression-20260908-02`。前次全套完成輸出未成功擷取，因此重跑取得可核對結果，沒有猜通過數。
+- 無API請求、無新付費額度；不重跑PostgreSQL／Docker或長訪談。上述驗證是原文分頁、引用回查、版本優先、發布與錯誤恢復、工具／Skills／context接線安全網，**不是提示的語意效果驗收**。
+- 只讀review無Critical／Important／Minor實質finding；已核對完整候選、共享工具入口與舊保護，未擴大範圍。可本地保存（不代表promotion）；本地commit／tag結果以主register收尾紀錄為準。G8 OPEN，CT22 FAIL／closed帳本及原證據不改。下一步另核准小額Luna／medium自然修補驗證：新更正、聊天已正確但Memory未改、已存重述、含糊不誤改，並對比既有工作細節／引用。若仍漏選，回看trace再決定，不無限追加同義prompt、不擅自加Agent或強制工具；局部通過後才恢復長訪談。

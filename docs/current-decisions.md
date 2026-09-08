@@ -4,6 +4,8 @@
 - 狀態：**目前決策與閱讀路由的唯一入口**
 - 流程：[`decision-process.md`](decision-process.md)
 
+**CT37最新閱讀入口（2026-09-08）：**[B1提示／medium-high局部對照](specs/2026-09-08-ct37-prompt-effort-comparison-results.md)。medium候選原例仍漏記，high相同輸入單例保留關鍵差異；不是B2／長訪談完成。候選已封存還原、預設不變；9嘗試／6完成、usage估US$0.0116942，未知預留保留，帳本closed。候選及還原各118離線通過。下一gate依[主repo register](../../../docs/current-decisions.md)審背景抽取high局部評估，不再重問Memory架構或復活CT35/C停放候選；下方是歷史路由。
+
 **CT33最新入口（2026-09-08）：**[壓縮來源與漏存恢復核對](specs/2026-09-08-ct33-compaction-provenance-and-recovery-review.md)。唯讀追溯完成：CT32沿用的opaque出自CT16首次口頭更正但漏存的#16；當時仍有optional修補指示，現行CT25已無，且目前規則／revision 3導覽10日與六工具確有送達。不解讀opaque內容、不宣稱壓縮是根因。建議下一gate先審「現行規則首次更正」與「恢復舊漏存」分開驗證；保留長context與原失敗，不改產品，不追加生成。完成檢查／強制tool仍未核准，G8 OPEN。CT32結果不改寫，下方為沿革。
 
 **CT32本輪結果（2026-09-08）：**[舊可見問答／壓縮延續因素對照](specs/2026-09-08-ct32-context-factor-isolation.md)。G5完成／G8 OPEN：visible_only 8次／7工具，首patch不匹配後重讀，正文及導覽只改10→5日；opaque_only 1次／0工具，答5但Memory仍10。共9次Luna／medium、估US$0.01421874，20次／US$0.10帳本closed。原42＋新2問答、詳記引用與重開保存核驗通過，77離線測試通過。未改產品／提示／工具，不能定罪compaction或直接停用；下一gate唯讀追溯壓縮生成輸入及目前Memory／規則的重新注入，再審局部方案。編輯介面停放，Stop judge／強制tool未核准。下方為沿革。

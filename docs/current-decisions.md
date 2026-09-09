@@ -1,5 +1,7 @@
 # Caliburn Current Decision Register
 
+**CT51／G5比較完成（2026-09-09，LLM-Q019）：**[8K／16K結果、官方依據與內容核驗](specs/2026-09-09-ct51-output-budget-results.md)。相同CT49起點、Luna high、提示/tools/compaction不變，兩組續談／B／回查均完成，35請求估US$0.05009506、closed；34來源頁逐段相等、舊資料／產品source不變。單次最高生成2229／2806，均未用滿8K；未見明確容量或品質收益，維持CT50的顯式8192，16K為本情境測過可用備選，不宣稱更聰明／普遍更省。16項邊界＋68離線測試通過，Docker／helper失敗與兩組措辭限制保留。無production/JD/default改動或merge/push；只有截斷／更大工作量或Owner選擇才重開容量採用，不重做Memory研究。
+
 **CT49–50限定驗收完成／隔離採用（2026-09-09，LLM-Q019/G8）：**[完整11輪與來源驗收](specs/2026-09-09-ct49-fixed-long-interview-results.md)、[CT50設定／官方依據／真服務補驗](specs/2026-09-09-ct50-tested-profile-results.md)。接案前端全職位、含糊→確認、頻率更正、案例細節與原話回查通過；原文／8份詳記引用核對相等，獨立review無未處理重大finding。採A/B2 16模型／15工具；API預設Luna A/B1/B2 high，A/B2可覆寫；已測顯式輸出8192，native compaction12000。135請求估US$0.16871788，兩帳本closed；564離線＋41真PG通過。不是全職位普遍100%或medium4096保證。Minor導覽繞路、重複措辭與修補延遲保留；下一步可試用此隔離配置／有新證據再局部優化，不再為同能力重跑舊研究。無production／JD、merge/push；下方CT48及以前為沿革，舊失敗不翻成成功。
 
 **CT48局部採用／長訪談G8仍OPEN（2026-09-09，LLM-Q019）：**[CT45–48結果、官方來源、實際內容及下一gate](specs/2026-09-09-ct46-48-edit-routing-and-budget-results.md)。背景B2採已測編輯指引、16模型／15工具，A仍12／11；沿框架計數／錯誤／resume，無新Agent/schema/matcher。原CT45八輪第8輪失敗不改判，xhigh未解；候選兩局部replay7及11模型完成（低於12，不能證明加cap是成功原因）。新增引用保留，但label過寬／案例位置兩Minor仍留。112次估US$0.17919779，CT45–48帳本closed、原PG未改。最終560離線＋41真PG通過。預設effort A/B2 medium、B1 high不變；本次語意測試high不能冒稱預設已穩定。下一gate固定新版完整訪談／補充撤銷／回查，毋須重做分層研究；不進production/JD、不merge/push。

@@ -4,6 +4,8 @@ version = "0.0.1"
 description = "Isolated analysis-only agent: native continuity slice"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "caliburn-jd-editor-contract==0.0.1",
+    "jsonschema==4.26.0",
     "langchain==1.4.0",
     "langchain-openai==1.6.0",
     "langgraph==1.2.11",
@@ -31,3 +33,6 @@ addopts = "-p no:cacheprovider"
 
 [tool.uv]
 package = false
+
+[tool.uv.sources]
+caliburn-jd-editor-contract = { path = "../jd-editor/contract", editable = true }

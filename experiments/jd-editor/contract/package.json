@@ -1,0 +1,19 @@
+{
+  "name": "@caliburn/jd-editor-contract",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "codegen": "node scripts/codegen.mjs",
+    "check-codegen": "node scripts/check-codegen.mjs"
+  },
+  "devDependencies": {
+    "json-schema-to-typescript": "15.0.4"
+  },
+  "exports": {
+    "./schema": "./generated/jd-editor-v2.schema.json",
+    ".": {
+      "types": "./types/jd-editor-v2.ts"
+    }
+  }
+}

@@ -9,3 +9,9 @@ apps/api/app/interview_vnext/llm/verifier_policies/** text eol=lf
 apps/api/app/interview_vnext/llm/operations/** text eol=lf
 apps/api/app/interview_vnext/llm/prompts/** text eol=lf
 apps/api/evals/interview_vnext/schemas/** text eol=lf
+
+# JD codegen and fixture hashes must survive Windows checkouts byte-for-byte.
+docs/specs/contracts/jd-editor-v2.schema.json text eol=lf
+experiments/jd-editor/** text eol=lf
+# Preserve upstream license evidence exactly, including its original whitespace.
+experiments/jd-editor/licenses/** -text

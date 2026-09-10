@@ -1,0 +1,16 @@
+{
+  "name": "caliburn-jd-editor",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "contract",
+    "native"
+  ],
+  "overrides": {
+    "@platejs/core": "53.3.11",
+    "@platejs/slate": "53.3.10",
+    "@platejs/utils": "53.3.11",
+    "@platejs/resizable": "53.0.0",
+    "slate": "0.126.2"
+  }
+}

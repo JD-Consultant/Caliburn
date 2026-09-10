@@ -1,0 +1,42 @@
+{
+  "fixture-source:task-1": {
+    "issued_handle": "fixture-source:task-1",
+    "document": "test-r2",
+    "source": "synthetic task 1"
+  },
+  "fixture-source:task-2": {
+    "issued_handle": "fixture-source:task-2",
+    "document": "test-r2",
+    "source": "synthetic task 2"
+  },
+  "fixture-source:task-3": {
+    "issued_handle": "fixture-source:task-3",
+    "document": "test-r2",
+    "source": "synthetic task 3"
+  },
+  "fixture-source:task-4": {
+    "issued_handle": "fixture-source:task-4",
+    "document": "test-r2",
+    "source": "synthetic task 4"
+  },
+  "fixture-source:task-5": {
+    "issued_handle": "fixture-source:task-5",
+    "document": "test-r2",
+    "source": "synthetic task 5"
+  },
+  "fixture-source:task-6": {
+    "issued_handle": "fixture-source:task-6",
+    "document": "test-r2",
+    "source": "synthetic task 6"
+  },
+  "fixture-source:task-7": {
+    "issued_handle": "fixture-source:task-7",
+    "document": "test-r2",
+    "source": "synthetic task 7"
+  },
+  "fixture-source:task-8": {
+    "issued_handle": "fixture-source:task-8",
+    "document": "test-r2",
+    "source": "synthetic task 8"
+  }
+}

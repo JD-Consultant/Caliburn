@@ -1,0 +1,14 @@
+[project]
+name = "caliburn-jd-editor-contract"
+version = "0.0.1"
+requires-python = ">=3.12,<3.13"
+dependencies = ["pydantic==2.13.5", "jsonschema==4.26.0"]
+[build-system]
+requires = ["hatchling==1.29.0"]
+build-backend = "hatchling.build"
+[tool.hatch.build.targets.wheel]
+packages = ["src/jd_editor_contract"]
+[dependency-groups]
+dev = ["datamodel-code-generator==0.71.0", "pytest==9.1.1"]
+[tool.pytest.ini_options]
+pythonpath = ["src"]

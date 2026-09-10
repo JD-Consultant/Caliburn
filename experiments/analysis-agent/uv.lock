@@ -87,9 +87,11 @@ version = "0.0.1"
 source = { virtual = "." }
 dependencies = [
     { name = "apscheduler" },
+    { name = "caliburn-jd-editor-contract" },
     { name = "deepagents" },
     { name = "fastapi" },
     { name = "httpx" },
+    { name = "jsonschema" },
     { name = "langchain" },
     { name = "langchain-openai" },
     { name = "langgraph" },
@@ -111,9 +113,11 @@ dev = [
 [package.metadata]
 requires-dist = [
     { name = "apscheduler", specifier = "==3.11.3" },
+    { name = "caliburn-jd-editor-contract", editable = "../jd-editor/contract" },
     { name = "deepagents", specifier = "==0.7.13" },
     { name = "fastapi", specifier = "==0.141.1" },
     { name = "httpx", specifier = "==0.28.1" },
+    { name = "jsonschema", specifier = "==4.26.0" },
     { name = "langchain", specifier = "==1.4.0" },
     { name = "langchain-openai", specifier = "==1.6.0" },
     { name = "langgraph", specifier = "==1.2.11" },
@@ -129,6 +133,27 @@ requires-dist = [
 
 [package.metadata.requires-dev]
 dev = [{ name = "pytest", specifier = "==9.1.1" }]
+
+[[package]]
+name = "caliburn-jd-editor-contract"
+version = "0.0.1"
+source = { editable = "../jd-editor/contract" }
+dependencies = [
+    { name = "jsonschema" },
+    { name = "pydantic" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "jsonschema", specifier = "==4.26.0" },
+    { name = "pydantic", specifier = "==2.13.5" },
+]
+
+[package.metadata.requires-dev]
+dev = [
+    { name = "datamodel-code-generator", specifier = "==0.71.0" },
+    { name = "pytest", specifier = "==9.1.1" },
+]
 
 [[package]]
 name = "certifi"

@@ -746,7 +746,7 @@ class JdReadModelInput(
         JdReadModelInput4,
     ] = Field(
         ...,
-        description='Read the active JD before planning edits. Use {} for the current saved document and current-base targets, or exactly one issued revision_ref, target_ref, selection_ref or continuation_ref to read a fixed scope. Explicit revision reads are read-only even if that revision happens to be current. Read all relevant pages before changing a whole scope. The App supplies paths and positions; never calculate line numbers or offsets. A failure or unread page does not mean content is absent. read_failed/stop requires App recovery, not repeated model calls. Task targets include knowledge_refs/skill_refs; knowledge/skill targets include used_by_task_refs computed by the App. Read complete affected items/Tasks before changing shared meaning, following issued target refs and pagination. IDs inside saved fragments are not edit refs.',
+        description='Read the active JD before planning edits. Use {} for the current saved document and current-base targets, or exactly one issued revision_ref, target_ref, selection_ref or continuation_ref to read a fixed scope. Explicit revision reads are read-only even if that revision happens to be current. Read all relevant pages before changing a whole scope. The App supplies paths and positions; never calculate line numbers or offsets. A failure or unread page does not mean content is absent. read_failed/stop requires App recovery, not repeated model calls. Task targets include knowledge_refs/skill_refs; knowledge/skill targets include used_by_task_refs computed by the App. Read complete affected items/Tasks before changing shared meaning, following issued target refs and pagination. IDs inside saved fragments are not edit refs. Whole-document current/history reads expose the change that created the returned revision. To inspect earlier saved events, use its issued change_ref with jd_change_read, then read the returned before_revision_ref; stop at the stated baseline. Reading navigation references alone does not read the document content.',
     )
 
 
@@ -1624,7 +1624,10 @@ class JdReadSuccess(BaseModel):
     targets: list[JdReadTarget]
     selection: Optional[JdReadSelection]
     source_refs: JdSourceRefs
-    change_refs: list[OpaqueRef]
+    change_refs: list[OpaqueRef] = Field(
+        ...,
+        description='For whole-document current/history reads, contains exactly the committed change that created revision_ref, or an empty array for an initial revision without a creating change. Content continuation pages retain the same reference. This is not a complete list of earlier changes; inspect that change and follow its before_revision_ref to walk older revisions. No-change receipts are not revision-creating changes.',
+    )
     continuation_ref: Optional[OpaqueRef]
 
 

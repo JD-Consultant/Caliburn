@@ -17,6 +17,7 @@ from starlette.concurrency import run_in_threadpool
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from analysis_agent.service import AnalysisService, ServiceConflict
+from analysis_agent.jd_contract import SelectionCaptureInput
 from analysis_agent.publication import PublicationUncertain
 
 
@@ -37,6 +38,7 @@ class MessageInput(BaseModel):
     request_key: str = Field(min_length=1, max_length=128)
     text: str = Field(min_length=1)
     abandon_pending: bool = False
+    jd_selection: SelectionCaptureInput | None = None
 
     @field_validator('text')
     @classmethod
@@ -240,7 +242,8 @@ def create_app(resources=open_service):
 
     @app.post('/documents/{document}/runs', response_model=RunOutput, status_code=202)
     def submit(document: str, data: MessageInput):
-        return app.state.service.submit(document, data.request_key, data.text, abandon_pending=data.abandon_pending)
+        return app.state.service.submit(document, data.request_key, data.text, abandon_pending=data.abandon_pending,
+            **({"jd_selection": data.jd_selection.model_dump(mode="json")} if data.jd_selection is not None else {}))
 
     @app.get('/documents/{document}/messages', response_model=list[MessageOutput])
     def messages(document: str):

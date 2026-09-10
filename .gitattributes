@@ -18,3 +18,5 @@ experiments/jd-editor/licenses/** -text
 # Preserve raw PostgreSQL snapshots and captured test output for Task 2 evidence.
 docs/specs/evidence/jd-editor-task2/*.jsonl -text
 docs/specs/evidence/jd-editor-task2/*.txt -text
+# Preserve raw captured test output for Task 3 evidence.
+docs/specs/evidence/jd-editor-task3/*.txt -text

@@ -1,0 +1,62 @@
+FFFFFFF                                                                  [100%]
+================================== FAILURES ===================================
+_____ test_r01_partial_selection_does_not_grant_whole_block_write[False] ______
+tests\test_jd_fix1.py:33: in test_r01_partial_selection_does_not_grant_whole_block_write
+    assert values[bad_index]['status']=='invalid_input'
+E   AssertionError: assert 'committed' == 'invalid_input'
+E     
+E     - invalid_input
+E     + committed
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-0ede0797-66da-4e9f-9e3b-2342b3dfbeec.jsonl
+______ test_r01_partial_selection_does_not_grant_whole_block_write[True] ______
+tests\test_jd_fix1.py:33: in test_r01_partial_selection_does_not_grant_whole_block_write
+    assert values[bad_index]['status']=='invalid_input'
+E   AssertionError: assert 'committed' == 'invalid_input'
+E     
+E     - invalid_input
+E     + committed
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-0ede0797-66da-4e9f-9e3b-2342b3dfbeec.jsonl
+_ test_r02_later_model_mutation_is_refused_before_provider_and_manifest[replace_schema] _
+tests\test_jd_fix1.py:56: in test_r02_later_model_mutation_is_refused_before_provider_and_manifest
+    with pytest.raises(ValueError,match='JD model request'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-0ede0797-66da-4e9f-9e3b-2342b3dfbeec.jsonl
+_ test_r02_later_model_mutation_is_refused_before_provider_and_manifest[delete_notice] _
+tests\test_jd_fix1.py:56: in test_r02_later_model_mutation_is_refused_before_provider_and_manifest
+    with pytest.raises(ValueError,match='JD model request'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-0ede0797-66da-4e9f-9e3b-2342b3dfbeec.jsonl
+_ test_r02_later_model_mutation_is_refused_before_provider_and_manifest[change_notice] _
+tests\test_jd_fix1.py:56: in test_r02_later_model_mutation_is_refused_before_provider_and_manifest
+    with pytest.raises(ValueError,match='JD model request'):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   Failed: DID NOT RAISE ValueError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-0ede0797-66da-4e9f-9e3b-2342b3dfbeec.jsonl
+_______ test_r03_four_manual_then_same_turn_ai_reports_actual_omission ________
+tests\test_jd_fix1.py:72: in test_r03_four_manual_then_same_turn_ai_reports_actual_omission
+    assert last['turn_start_interval']['omitted_events']==1
+E   assert 0 == 1
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-0ede0797-66da-4e9f-9e3b-2342b3dfbeec.jsonl
+____ test_r04_fake_later_reader_does_not_grant_original_source_acquisition ____
+tests\test_jd_fix1.py:116: in test_r04_fake_later_reader_does_not_grant_original_source_acquisition
+    assert reference not in result['jd_sources']
+E   AssertionError: assert 'conversation:eyJkb2N1bWVudCI6ICIyOTVjNzUxMC1iODAzLTRiYjItODIzZi1iZjljMjkwZTkxOGYiLCAiY2hlY2twb2ludCI6ICIxZjFhY2I3ZC0z...M1YjUtYzYyNi00ZGVmLTg4MjUtMGU5YzM5MmNiZDRjIiwgImxhc3QiOiAicmVzcF9mZTUyOTUzYy0xZmFkLTQ4M2MtOTllNS01NjNmZjgwZjRjYTAifQ==' not in {'conversation:eyJkb2N1bWVudCI6ICIyOTVjNzUxMC1iODAzLTRiYjItODIzZi1iZjljMjkwZTkxOGYiLCAiY2hlY2twb2ludCI6ICIxZjFhY2I3ZC0...zcF9mZTUyOTUzYy0xZmFkLTQ4M2MtOTllNS01NjNmZjgwZjRjYTAifQ==': {'tool_call': 'call_88ce3d93-99fd-4109-a787-14a72799b45d'}}
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-0ede0797-66da-4e9f-9e3b-2342b3dfbeec.jsonl
+=========================== short test summary info ===========================
+FAILED tests/test_jd_fix1.py::test_r01_partial_selection_does_not_grant_whole_block_write[False]
+FAILED tests/test_jd_fix1.py::test_r01_partial_selection_does_not_grant_whole_block_write[True]
+FAILED tests/test_jd_fix1.py::test_r02_later_model_mutation_is_refused_before_provider_and_manifest[replace_schema]
+FAILED tests/test_jd_fix1.py::test_r02_later_model_mutation_is_refused_before_provider_and_manifest[delete_notice]
+FAILED tests/test_jd_fix1.py::test_r02_later_model_mutation_is_refused_before_provider_and_manifest[change_notice]
+FAILED tests/test_jd_fix1.py::test_r03_four_manual_then_same_turn_ai_reports_actual_omission
+FAILED tests/test_jd_fix1.py::test_r04_fake_later_reader_does_not_grant_original_source_acquisition
+7 failed in 13.77s

@@ -18,7 +18,7 @@ class JdService:
         value = self.engine.validate_value([{'type': 'p', 'id': str(uuid4()), 'children': [{'text': ''}]}]).value
         return self.store.create_document(self.catalog, title, value)
 
-    def read(self, scope, query):
+    def read(self, scope, query, *, cancel=None):
         try:
             revision = self.store.revision(scope, query.revision_id) if query.revision_id else self.store.current(scope)
             fragment = revision.value
@@ -34,7 +34,7 @@ class JdService:
                     raise JdMissing('Target not found')
                 fragment = [target]
             if query.selection:
-                fragment = self.engine.selection(revision.value, query.selection)['fragment']
+                fragment = self.engine.selection(revision.value, query.selection, **({'cancel':cancel} if cancel is not None else {}))['fragment']
             return JdReadView(revision, fragment)
         except JdMissing:
             return JdReadView(status='target_missing')
@@ -59,10 +59,10 @@ class JdService:
     def manual_save(self, intent):
         return self._write(intent, manual=True)
 
-    def edit(self, intent):
-        return self._write(intent, manual=False)
+    def edit(self, intent, *, cancel=None):
+        return self._write(intent, manual=False, cancel=cancel)
 
-    def _write(self, intent, *, manual):
+    def _write(self, intent, *, manual, cancel=None):
         validate_intent_digest(intent)
         try:
             existing = self.store.receipt(intent.scope, intent.operation_id, intent.digest)
@@ -82,7 +82,7 @@ class JdService:
         except (DBAPIError, TimeoutError):
             return failure(intent, 'save_failed', confirmed=False)
         try:
-            candidate = self.engine.validate_value(intent.value) if manual else self.engine.transform(base.value, intent.commands)
+            candidate = self.engine.validate_value(intent.value) if manual else self.engine.transform(base.value, intent.commands, **({"cancel":cancel} if cancel is not None else {}))
         except JdEngineFailure as exc:
             code = engine_error_status(exc.code)
             error = failure(intent, code, base_id=base.id, code=exc.code, command_index=exc.command_index)

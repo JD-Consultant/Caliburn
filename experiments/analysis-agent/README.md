@@ -1144,3 +1144,63 @@ recovery, full JSON snapshots, v2 links and immutable history. Test-generated
 `task-2-pg-*.jsonl` files in the task scratch directory preserve complete scoped
 head/revision/receipt rows for independent review. No paid provider calls or
 production authority adoption are included.
+
+### Task 3 — advisor tools and response-backed JD context
+
+The existing conversation now composes the three factory-built JD tools when
+`AnalysisService` has its isolated `JdService`. `jd_read` supplies saved current
+or read-only historical content, exact targets and admitted native selections;
+`jd_edit` resolves a single read base and validates the full SSOT before Node;
+`jd_change_read` distinguishes an actual committed/no-change receipt from a
+comparison of two revisions. Root-node pagination retains the same immutable
+revision/comparison, does not truncate individual native nodes, and does not
+turn a historical continuation into a current write base. Relationship refs
+come from the complete revision, while only actual content reads authorize edits.
+
+The original factory tools remain in ToolNode. A request-only middleware replaces
+only their model schema views with complete SSOT closures and `strict:false`.
+Non-JD tools keep their schemas and strict settings. The last public tool wrapper
+checks the exact factory and checkpointed call after earlier middleware overrides.
+Input/message/call/operation/digest/base/commands are checkpointed before Node.
+The same document stop Event reaches the existing native cancellation parameter;
+an unconfirmed operation requiring reconciliation preserves its binding and
+blocks another model request. Complete cancellation/reconciliation is Task 5.
+
+Sources use the existing ConversationReader and original Memory reader factories.
+Saved current input is issued by its existing source owner; a historical source
+must have a successful canonical read and a valid closed source window. A
+parseable handle, JD citation, ToolMessage or same-name replacement cannot grant
+original-source acquisition. Source text is never copied to JD SQL, and manual
+text does not become verified just because an old source remains attached.
+
+Each model request receives an `app_jd_context` HumanMessage only after native
+compaction projection. It is labeled untrusted App data and never enters canonical
+interview messages or Memory extraction. The last successful response-backed
+manifest and AI response share the model checkpoint and normal child/root return.
+Committed events since that manifest count manual reverts and metadata-only edits;
+no-change receipts do not count as revisions. The initial turn interval remains
+visible in later requests, alongside the fresh head. Missing/unpaired manifests
+are explicitly unknown; cross-document or unavailable known state fails closed.
+The payload is at most 16 KiB, four event details, and 2 KiB of UTF-8 text preview;
+whole exact native pairs are included only when they fit. Navigation and previews
+never claim complete content, and original model/tool/token limits remain in force.
+
+The optional API `jd_selection` consumes the generated SSOT capture DTO, verifies
+current base, calls the same native read-selection entry, checks head again and
+saves only this run's selection context. Pure interview input clears selection.
+Task 3 tests use actual Plate selection, the API, real ToolNode, SDK MockTransport,
+canonical source reads and separate processes with the official PostgreSQL Saver.
+These are zero-paid offline engineering checks; browser/IME, full cancellation,
+real provider acceptance and natural-model professional quality remain later gates.
+
+Task 3 review fixes keep partial selection targets navigation-only until a full
+block read, verify exact JD schemas and App notice at the final public model
+wrapper, and report event omissions after the shared four-detail cap. Source
+acquisition observes a successful canonical reader projection within the actual
+tool invocation; substituted or altered reader results cannot issue provenance.
+The existing pinned Memory reader, System additions and state commands remain
+on the same framework chain.
+
+The final request guard also compares complete supplied JD ToolMessage projections
+and their visible AI call/message identities against request-local preparation,
+so retaining an ID cannot conceal changed result text or call pairing.

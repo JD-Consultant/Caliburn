@@ -27,6 +27,11 @@ def merge_turns(previous: dict, update: dict) -> dict:
 
 
 class ConversationState(MessagesState):
+    jd_last_model_view: dict | None
+    jd_refs: dict
+    jd_sources: dict
+    jd_results: dict
+    jd_selection: dict | None
     turn_outcome: dict | None
     closed_turns: Annotated[dict[str, dict], merge_turns]
 
@@ -140,6 +145,11 @@ def build_conversation(
         readers = {t.name: t for t in session.read_tools}
         if any(t.name in readers and t is not readers[t.name] for t in supplied):
             raise ValueError('Read tool names are reserved for the bound Memory readers')
+    from analysis_agent.jd_tools import JdToolSession, JdExecutionIdentity, NAMES
+    sessions = [item for item in middleware if isinstance(item, JdToolSession)]
+    jd_tools = {t.name: t for session in sessions for t in session.tools}
+    if len(sessions) > 1 or any(t.name in NAMES and t is not jd_tools.get(t.name) for t in supplied):
+        raise ValueError("JD names are reserved for original factory tools")
     child = build_agent(model=model, checkpointer=None, instructions=instructions,
         tools=[*tools, request_memory_consolidation],
         middleware=[
@@ -149,6 +159,8 @@ def build_conversation(
             *middleware, ToolJsonFeedback(),
             ModelCallLimitMiddleware(thread_limit=max_model_steps, exit_behavior='end'),
             TurnValidation(),
+            # Last wrapper sees the final tool after all prior overrides.
+            *(JdExecutionIdentity(session) for session in sessions),
         ])
     root = StateGraph(ConversationState)
     root.add_node('analysis', child)

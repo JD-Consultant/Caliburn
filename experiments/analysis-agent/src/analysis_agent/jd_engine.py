@@ -138,5 +138,5 @@ class JdEngine:
         r = self._call('transform', {'profile': PROFILE, 'base_value': value, 'commands': commands}, cancel=cancel)
         return JdCandidate(r['value'], r['native_operations'], r['affected_element_ids'])
 
-    def selection(self, value, selection):
-        return self._call('read-selection', {'profile': PROFILE, 'value': value, 'range': selection})
+    def selection(self, value, selection, *, cancel=None):
+        return self._call('read-selection', {'profile': PROFILE, 'value': value, 'range': selection}, cancel=cancel)

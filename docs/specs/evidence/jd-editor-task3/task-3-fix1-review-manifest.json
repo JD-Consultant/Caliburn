@@ -1,0 +1,37 @@
+[
+  {
+    "path": "experiments/analysis-agent/README.md",
+    "sha256": "1ce975ab255d32702b8a65d4c51be277e13de8a8ca7604e002e3afaa1ade5736",
+    "bytes": 82362,
+    "baseline": "initial frozen task-3-snapshot",
+    "before_sha256": "461a5f1f5b28463d60e305d71de3c7308430c71135c3e308dcffd78bb1e9f160"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+    "sha256": "f8e2fbe534b4cc46c6f6bc9ab556fccea173b61393775a46661b8eabc849f255",
+    "bytes": 24779,
+    "baseline": "initial frozen task-3-snapshot",
+    "before_sha256": "f3a492e95364ae9ac494526780c3f9f3e6ccb4d9a53c6ee21d8d4f7a6ffef26c"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_context.py",
+    "sha256": "eda014401fce629fc07426903046a16208230b0491c9b9e1ae2017f3308696ee",
+    "bytes": 6753,
+    "baseline": "initial frozen task-3-snapshot",
+    "before_sha256": "d15520b164be1b1a23a07766602ea9b241515070ca45ccc4eacf3ae324fb3906"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/sources.py",
+    "sha256": "b42f8d98740d5d61295da00dfe8677b4d97758c5ae53339eae6f014e4bbbe2ac",
+    "bytes": 21255,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "before_sha256": "486073c32f5d85ac08ee62592ac392db2b89d89bc626a70ed04d9818279d72c8"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_fix1.py",
+    "sha256": "a2b3e76611e295cfdd11bac4b76a3a177207aedb31eed502ee44884e544b81a8",
+    "bytes": 9001,
+    "baseline": "new fix1 test",
+    "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

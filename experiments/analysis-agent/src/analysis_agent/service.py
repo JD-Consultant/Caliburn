@@ -67,6 +67,7 @@ class DocumentRuntime:
     reader: ConversationReader
     stop: Event
     memory: MemorySession | None
+    jd_session: object | None = None
 
     @property
     def config(self):
@@ -131,12 +132,15 @@ class AnalysisService:
             memory = (MemorySession(PublicationStore(self.catalog.engine,
                        MemoryArtifacts(self.store, document, source=reader)), reader,
                        skill_assets=assets) if self.store is not None else None)
+            from analysis_agent.jd_tools import JdToolSession
+            jd_session = JdToolSession(self.jd, reader, cancel=stop, source_read_tools=memory.read_tools if memory else ()) if self.jd is not None else None
             graph = build_conversation(**common,
-                tools=memory.tools if memory else readonly_file_tools(analysis_files(assets)),
-                middleware=[analysis_skills(assets), *([memory] if memory else []),
+                tools=[*(memory.tools if memory else readonly_file_tools(analysis_files(assets))),
+                       *(jd_session.tools if jd_session else ())],
+                middleware=[analysis_skills(assets), *([jd_session] if jd_session else []), *([memory] if memory else []),
                             BackgroundAvailability(self, document), CooperativeStop(stop)])
             reader.graph = graph
-            self.contexts[document] = DocumentRuntime(graph, reader, stop, memory)
+            self.contexts[document] = DocumentRuntime(graph, reader, stop, memory, jd_session)
         return self.contexts[document]
 
     def enable_background(self, *, max_recoveries, text_threshold=None, extraction_model=None,
@@ -225,10 +229,16 @@ class AnalysisService:
                 error_code=row['error_code'] or 'process_interrupted', usage_complete=False)
         return row
 
-    def submit(self, document, request_key, text, *, abandon_pending=False):
+    def submit(self, document, request_key, text, *, abandon_pending=False, jd_selection=None):
         if not text.strip() or not request_key or len(request_key) > 128:
             raise ValueError('Non-empty text and a request key of at most 128 characters are required')
-        digest = hashlib.sha256(text.encode()).hexdigest()
+        import json
+        from analysis_agent.jd_contract import validate, parse_ref
+        from analysis_agent.jd_types import JdScope
+        if jd_selection is not None:
+            jd_selection=validate('JdSelectionCaptureClientInput',jd_selection)
+        digest = hashlib.sha256((text if jd_selection is None else json.dumps(
+            {'text':text,'jd_selection':jd_selection},sort_keys=True,ensure_ascii=False)).encode()).hexdigest()
         with self.lock:
             if not self.accepting:
                 raise ServiceConflict('Service is stopping')
@@ -254,11 +264,33 @@ class AnalysisService:
                 for old in self.catalog.runs(document):
                     if old['status'] in {'running', 'interrupted', 'uncertain', 'stopping'}:
                         self._reconcile(old)
+            context.stop.clear()
+            selection_context=None
+            if jd_selection is not None:
+                if self.jd is None: raise ServiceConflict('JD selection is unavailable')
+                scope=JdScope(document)
+                try:
+                    base,=parse_ref(jd_selection['base_revision_ref'],'revision',scope)
+                except ValueError as exc:
+                    raise ServiceConflict('JD selection belongs to an invalid saved document reference') from exc
+                current=self.jd.store.current(scope)
+                if current.id!=base: raise ServiceConflict('JD selection base is stale; select saved current content again')
+                from analysis_agent.jd_engine import JdEngineFailure
+                try:
+                    native=self.jd.engine.selection(current.value,jd_selection['range'],cancel=context.stop)
+                except JdEngineFailure as exc:
+                    if exc.code in {'invalid_input','invalid_selection','invalid_span','target_missing','unsupported_content'}:
+                        raise ServiceConflict('JD selection is unavailable; select supported saved content again') from exc
+                    raise
+                if self.jd.store.current(scope).id!=base: raise ServiceConflict('JD selection base changed during admission')
+                selection_context={'document':document,'revision':str(base),'target':native['target_id'],
+                    'range':native['range'],'fragment':native['fragment']}
             row = existing or self.catalog.create_run(document, request_key, digest)
+            if selection_context is not None: selection_context['input']=row['id']
             # as_node START writes the real root input and schedules analysis,
             # without running a model. It is a public update_state operation.
             context.graph.update_state(context.config, {'messages': [HumanMessage(text, id=row['id'])],
-                                                        'turn_outcome': None}, as_node=START)
+                                                        'turn_outcome': None, 'jd_selection': selection_context}, as_node=START)
             saved = context.graph.get_state(context.config)
             if not any(m.id == row['id'] for m in saved.values.get('messages', [])):
                 raise RuntimeError('Input checkpoint was not confirmed')

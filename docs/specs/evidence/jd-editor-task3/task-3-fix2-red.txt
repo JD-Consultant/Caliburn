@@ -1,0 +1,45 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_________ test_final_jd_projection_matches_actual_next_request[True] __________
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001DCFA7956D0>
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001DCFA271D60>
+mutate = True
+
+    @pytest.mark.parametrize('mutate',[True,False])
+    def test_final_jd_projection_matches_actual_next_request(jd,monkeypatch,mutate):
+        import test_jd_tools
+        original=test_jd_tools.offline_model
+        requests=[]; baselines=[]
+        @contextmanager
+        def observe(respond):
+            def counted(request):
+                requests.append(json.loads(request.content))
+                return respond(request)
+            with original(counted) as model: yield model
+        monkeypatch.setattr(test_jd_tools,'offline_model',observe)
+        class Later(AgentMiddleware):
+            def wrap_model_call(self,request,handler):
+                messages=[]
+                for message in request.messages:
+                    if isinstance(message,ToolMessage) and message.name=='jd_read':
+                        baselines.append(request.state['jd_last_model_view'].copy())
+                        if mutate:
+                            body=json.loads(message.content)
+                            body['fragment'][0]['children'][0]['text']='ALTERED WORDS SAME ID'
+                            message=message.model_copy(update={'content':json.dumps(body)})
+                    messages.append(message)
+                return handler(request.override(messages=messages))
+        scope=seed(jd,[{'id':'p','type':'p','children':[{'text':'CANONICAL ORIGINAL'}]}])
+        saver=InMemorySaver()
+        if mutate:
+>           with pytest.raises(ValueError,match='JD model request'):
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ValueError
+
+tests\test_jd_fix2.py:39: Failed
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-ac0ffb4a-7784-419e-80a1-9aafb94ea2d7.jsonl
+=========================== short test summary info ===========================
+FAILED tests/test_jd_fix2.py::test_final_jd_projection_matches_actual_next_request[True]
+1 failed, 1 passed in 6.71s

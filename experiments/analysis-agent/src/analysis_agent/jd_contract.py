@@ -128,3 +128,6 @@ def outcome_from_row(scope, row):
         affected_ids=changes['affected_element_ids'] if changes else [], error_code=error['code'] if error else None,
         error_message=error['message'] if error else None, command_index=error['command_index'] if error else None,
         next_action=wire['next_action'])
+
+
+SelectionCaptureInput = models.JdSelectionCaptureClientInput

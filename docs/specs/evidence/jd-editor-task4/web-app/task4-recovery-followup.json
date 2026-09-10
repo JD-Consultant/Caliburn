@@ -1,0 +1,76 @@
+{
+  "document": "3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+  "head_unchanged_after_pure_chat": true,
+  "head": {
+    "status": "ok",
+    "read_kind": "current",
+    "revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImIxMTk2ZTUwLTU0NjUtNDU1MC1iNDk2LTFhZGYwMDc5MjIzNiJd",
+    "access": "read_only",
+    "fragment": [
+      {
+        "type": "p",
+        "id": "bf593eaf-e505-4d0c-ba63-593bf0b4e6b7",
+        "children": [
+          {
+            "text": "另一頁已保存版本"
+          }
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImIxMTk2ZTUwLTU0NjUtNDU1MC1iNDk2LTFhZGYwMDc5MjIzNiIsInRhcmdldCI6ImJmNTkzZWFmLWU1MDUtNGQwYy1iYTYzLTU5M2JmMGI0ZTZiNyJ9",
+        "element": {
+          "type": "p",
+          "id": "bf593eaf-e505-4d0c-ba63-593bf0b4e6b7",
+          "children": [
+            {
+              "text": "另一頁已保存版本"
+            }
+          ]
+        },
+        "access": "read_only"
+      }
+    ],
+    "selection": null,
+    "source_refs": [],
+    "change_refs": [
+      "WyJjaGFuZ2UiLCIzZjhlMWVhNi02NmUwLTQ3NWQtOWQ2Ni1iMGQ5YmRkMmJhZjEiLCIyZDY2ZWNiYy1hNTk3LTU0MjQtOTMzMy0zZDgzNWI1YWMyYzkiLCJhNWMzNTAyMi00MTFhLTRjNGMtODliOC0yYmYwNzUzNGJjOTIiLCJiMTE5NmU1MC01NDY1LTQ1NTAtYjQ5Ni0xYWRmMDA3OTIyMzYiXQ"
+    ],
+    "continuation_ref": null
+  },
+  "runs": [
+    {
+      "id": "ef6ad5f1-d4c2-4ef2-8399-43162f5086ce",
+      "document_id": "3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "status": "completed",
+      "error_code": null,
+      "resume_count": 0,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 100,
+        "output_tokens": 20,
+        "total_tokens": 120
+      },
+      "outcome": {
+        "input_id": "ef6ad5f1-d4c2-4ef2-8399-43162f5086ce",
+        "status": "completed",
+        "model_calls": 1,
+        "tool_calls": 0
+      },
+      "can_resume": false
+    }
+  ],
+  "messages": [
+    {
+      "id": "ef6ad5f1-d4c2-4ef2-8399-43162f5086ce",
+      "role": "user",
+      "text": "這是逐字保存的純聊天"
+    },
+    {
+      "id": "resp_2c5c0891-4165-4ba6-8347-3bec73bb8b71",
+      "role": "assistant",
+      "text": "已收到你的說明。這是固定離線驗收回覆。"
+    }
+  ]
+}

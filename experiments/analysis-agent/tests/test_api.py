@@ -1,3 +1,4 @@
+from uuid import uuid4
 from contextlib import contextmanager
 from threading import Event
 
@@ -22,7 +23,7 @@ def test_api_lifespan_idempotency_and_private_state_projection(tmp_path):
         closed.set()
     app = create_app(resources)
     with TestClient(app, base_url='http://127.0.0.1') as client:
-        doc = client.post('/documents', json={'title': '網站接案'}).json()['id']
+        doc = client.post('/documents', json={'request_key': str(uuid4()), 'title': '網站接案'}).json()['id']
         try:
             body = {'request_key': 'one', 'text': '我製作網站'}
             result = client.post(f'/documents/{doc}/runs', json=body)
@@ -34,7 +35,7 @@ def test_api_lifespan_idempotency_and_private_state_projection(tmp_path):
             assert client.post(f'/documents/{doc}/runs', json={**body, 'request_key': 'two'}).status_code == 409
             assert client.get(f'/documents/{doc}/messages').json()[0]['text'] == body['text']
             assert client.post(f'/documents/{doc}/runs', json={**body, 'checkpoint_id': 'evil'}).status_code == 422
-            assert client.post('/documents', json={'title': 'X'}, headers={'Origin': 'https://evil.example'}).status_code == 403
+            assert client.post('/documents', json={'request_key': str(uuid4()), 'title': 'X'}, headers={'Origin': 'https://evil.example'}).status_code == 403
             assert client.get('/health', headers={'Host': 'evil.example'}).status_code == 400
         finally:
             release.set()
@@ -54,8 +55,8 @@ def test_api_cross_document_access_and_empty_input(tmp_path):
         with service_harness(tmp_path) as (service, _, _):
             yield service
     with TestClient(create_app(resources), base_url='http://localhost') as client:
-        doc = client.post('/documents', json={'title': 'A'}).json()['id']
-        other = client.post('/documents', json={'title': 'B'}).json()['id']
+        doc = client.post('/documents', json={'request_key': str(uuid4()), 'title': 'A'}).json()['id']
+        other = client.post('/documents', json={'request_key': str(uuid4()), 'title': 'B'}).json()['id']
         run = client.post(f'/documents/{doc}/runs', json={'request_key': 'a', 'text': 'A'}).json()['id']
         assert client.get(f'/documents/{other}/runs/{run}').status_code == 404
         assert client.post(f'/documents/{other}/runs/{run}/stop').status_code == 404

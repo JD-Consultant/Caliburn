@@ -1,0 +1,652 @@
+{
+  "cases": [
+    {
+      "case": "('h1', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('h1', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('blockquote', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('p', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('jd_section', 'identity') pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('h2', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('table', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('h3', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('jd_task', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('lic', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('jd_requirements', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) pure leaf 'x'",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) pure leaf ''",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "JdSavedElementOfBodyType pure text",
+      "definition": "JdSavedElementOfBodyType",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedElementOfBodyType unknown type",
+      "definition": "JdSavedElementOfBodyType",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedBodyElement pure text",
+      "definition": "JdSavedBodyElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedBodyElement unknown type",
+      "definition": "JdSavedBodyElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedBlockquoteChild pure text",
+      "definition": "JdSavedBlockquoteChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedBlockquoteChild unknown type",
+      "definition": "JdSavedBlockquoteChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedList pure text",
+      "definition": "JdSavedList",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedList unknown type",
+      "definition": "JdSavedList",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedListItem pure text",
+      "definition": "JdSavedListItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedListItem unknown type",
+      "definition": "JdSavedListItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedListContent pure text",
+      "definition": "JdSavedListContent",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedListContent unknown type",
+      "definition": "JdSavedListContent",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedTableRow pure text",
+      "definition": "JdSavedTableRow",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedTableRow unknown type",
+      "definition": "JdSavedTableRow",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedTableCell pure text",
+      "definition": "JdSavedTableCell",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedTableCell unknown type",
+      "definition": "JdSavedTableCell",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedCellChild pure text",
+      "definition": "JdSavedCellChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedCellChild unknown type",
+      "definition": "JdSavedCellChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedDutyChild pure text",
+      "definition": "JdSavedDutyChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedDutyChild unknown type",
+      "definition": "JdSavedDutyChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedWorkSectionChild pure text",
+      "definition": "JdSavedWorkSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedWorkSectionChild unknown type",
+      "definition": "JdSavedWorkSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedOutcomes pure text",
+      "definition": "JdSavedOutcomes",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedOutcomes unknown type",
+      "definition": "JdSavedOutcomes",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedRequirements pure text",
+      "definition": "JdSavedRequirements",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedRequirements unknown type",
+      "definition": "JdSavedRequirements",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedKnowledgeItem pure text",
+      "definition": "JdSavedKnowledgeItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedKnowledgeItem unknown type",
+      "definition": "JdSavedKnowledgeItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedSkillItem pure text",
+      "definition": "JdSavedSkillItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedSkillItem unknown type",
+      "definition": "JdSavedSkillItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedTaskChild pure text",
+      "definition": "JdSavedTaskChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedTaskChild unknown type",
+      "definition": "JdSavedTaskChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedKnowledgeSectionChild pure text",
+      "definition": "JdSavedKnowledgeSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedKnowledgeSectionChild unknown type",
+      "definition": "JdSavedKnowledgeSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedSkillsSectionChild pure text",
+      "definition": "JdSavedSkillsSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "JdSavedSkillsSectionChild unknown type",
+      "definition": "JdSavedSkillsSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "task body slot cannot be plain text",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "list prefix lic cannot be plain text",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "required type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "required id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "required children",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "existing forbidden score fixture",
+      "definition": "JdDocumentValue",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    }
+  ],
+  "generated": {
+    "module": "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-schema-candidate2\\src\\jd_editor_contract\\models.py",
+    "r2_roundtrip_exact": true
+  }
+}

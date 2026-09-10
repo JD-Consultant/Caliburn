@@ -1,4 +1,9 @@
-import { createPlateEditor, createPlatePlugin } from "platejs/react";
+import {
+  createPlateEditor,
+  createPlatePlugin,
+  type CreatePlateEditorOptions,
+} from "platejs/react";
+import type { Value } from "platejs";
 import {
   HeadingPlugin,
   BlockquotePlugin,
@@ -27,11 +32,15 @@ export const jdReactPlugins = [
     createPlatePlugin({ key, node: { isElement: true } }),
   ),
 ];
-export function createJdReactEditor(value: JdDocumentValue) {
+export function createJdReactEditor(
+  value: JdDocumentValue,
+  components?: NonNullable<CreatePlateEditorOptions["override"]>["components"],
+) {
   assertJdValue(value);
   return createPlateEditor({
     plugins: jdReactPlugins,
     nodeId,
-    value: structuredClone(value),
+    override: { components },
+    value: structuredClone(value) as Value,
   });
 }

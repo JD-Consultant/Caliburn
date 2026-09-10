@@ -1,0 +1,216 @@
+{
+  "browser": "153.0.8010.37",
+  "channel": "chrome",
+  "headed": true,
+  "cases": [
+    "real browser beforeunload dismissal protects ordinary dirty without claiming crash recovery",
+    "app navigation saves JD but does not send or discard unsent chat",
+    "POST then immediate page close -> exact original receipt on reopen"
+  ],
+  "react": "19.3.0-canary-cbb046ab-20260731",
+  "closedPayload": {
+    "request_key": "ea4dccb1-36be-46ef-b337-b9a0c449e122",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjI0YzUxNDA0LWMyZTAtNDlkMy1hYjlmLTA2N2U3MzYxNDQxYiJd",
+    "value": [
+      {
+        "type": "p",
+        "id": "f2f82816-c18a-4508-b658-2a026177a129",
+        "children": [
+          {
+            "text": "普通未保存送出即關頁"
+          }
+        ]
+      }
+    ]
+  },
+  "closedReceipt": {
+    "status": "committed",
+    "operation_ref": "WyJvcGVyYXRpb24iLCI2YzlhMGMwNS1hYzI3LTQ1ZTgtYWQwYS1kZjcyNGFkNGVhN2UiLCJiMjY0NDRhNC01NTYwLTUxNzgtYWE3NS1mZTIxZmYzZDMwY2UiXQ",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjI0YzUxNDA0LWMyZTAtNDlkMy1hYjlmLTA2N2U3MzYxNDQxYiJd",
+    "result_revision_ref": "WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjliYWM2Njk4LWRkM2YtNGQ3Zi1iOGFjLWIyZjc2NWM3YTgwNiJd",
+    "change_ref": "WyJjaGFuZ2UiLCI2YzlhMGMwNS1hYzI3LTQ1ZTgtYWQwYS1kZjcyNGFkNGVhN2UiLCJiMjY0NDRhNC01NTYwLTUxNzgtYWE3NS1mZTIxZmYzZDMwY2UiLCIyNGM1MTQwNC1jMmUwLTQ5ZDMtYWI5Zi0wNjdlNzM2MTQ0MWIiLCI5YmFjNjY5OC1kZDNmLTRkN2YtYjhhYy1iMmY3NjVjN2E4MDYiXQ",
+    "document_effect": "committed",
+    "receipt_durability": "confirmed",
+    "actual_changes": {
+      "origin": "manual",
+      "before_revision_ref": "WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjI0YzUxNDA0LWMyZTAtNDlkMy1hYjlmLTA2N2U3MzYxNDQxYiJd",
+      "after_revision_ref": "WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjliYWM2Njk4LWRkM2YtNGQ3Zi1iOGFjLWIyZjc2NWM3YTgwNiJd",
+      "native_operations": null,
+      "affected_element_ids": []
+    },
+    "error": null,
+    "next_action": "continue"
+  },
+  "saved": {
+    "status": "ok",
+    "read_kind": "current",
+    "revision_ref": "WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjliYWM2Njk4LWRkM2YtNGQ3Zi1iOGFjLWIyZjc2NWM3YTgwNiJd",
+    "access": "read_only",
+    "fragment": [
+      {
+        "type": "p",
+        "id": "f2f82816-c18a-4508-b658-2a026177a129",
+        "children": [
+          {
+            "text": "普通未保存送出即關頁"
+          }
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6IjliYWM2Njk4LWRkM2YtNGQ3Zi1iOGFjLWIyZjc2NWM3YTgwNiIsInRhcmdldCI6ImYyZjgyODE2LWMxOGEtNDUwOC1iNjU4LTJhMDI2MTc3YTEyOSJ9",
+        "element": {
+          "type": "p",
+          "id": "f2f82816-c18a-4508-b658-2a026177a129",
+          "children": [
+            {
+              "text": "普通未保存送出即關頁"
+            }
+          ]
+        },
+        "access": "read_only"
+      }
+    ],
+    "selection": null,
+    "source_refs": [],
+    "change_refs": [
+      "WyJjaGFuZ2UiLCI2YzlhMGMwNS1hYzI3LTQ1ZTgtYWQwYS1kZjcyNGFkNGVhN2UiLCJiMjY0NDRhNC01NTYwLTUxNzgtYWE3NS1mZTIxZmYzZDMwY2UiLCIyNGM1MTQwNC1jMmUwLTQ5ZDMtYWI5Zi0wNjdlNzM2MTQ0MWIiLCI5YmFjNjY5OC1kZDNmLTRkN2YtYjhhYy1iMmY3NjVjN2E4MDYiXQ"
+    ],
+    "continuation_ref": null
+  },
+  "ok": true,
+  "network": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents",
+      "body": "{\"title\":\"離頁保護 1789010500712\",\"request_key\":\"efb1df7d-8726-4df1-aff5-1050065bb932\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd/manual-save",
+      "body": "{\"request_key\":\"059b0f46-542e-494c-ab9d-130aaf6f6671\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjgwNDZiOWE5LWM2YzEtNGQ1Yy1hNjQyLTk5MjQ0MDU5NDUxZSJd\",\"value\":[{\"type\":\"p\",\"id\":\"f2f82816-c18a-4508-b658-2a026177a129\",\"children\":[{\"text\":\"普通未保存\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd/changes/read",
+      "body": "{\"change_ref\":\"WyJjaGFuZ2UiLCI2YzlhMGMwNS1hYzI3LTQ1ZTgtYWQwYS1kZjcyNGFkNGVhN2UiLCJkMzNhNTc3NS04YTRmLTViOTktYTFkMi0zY2I0MzE0ZTlkYmUiLCI4MDQ2YjlhOS1jNmMxLTRkNWMtYTY0Mi05OTI0NDA1OTQ1MWUiLCIyNGM1MTQwNC1jMmUwLTQ5ZDMtYWI5Zi0wNjdlNzM2MTQ0MWIiXQ\"}"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd/manual-save",
+      "body": "{\"request_key\":\"ea4dccb1-36be-46ef-b337-b9a0c449e122\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjI0YzUxNDA0LWMyZTAtNDlkMy1hYjlmLTA2N2U3MzYxNDQxYiJd\",\"value\":[{\"type\":\"p\",\"id\":\"f2f82816-c18a-4508-b658-2a026177a129\",\"children\":[{\"text\":\"普通未保存送出即關頁\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd/manual-save",
+      "body": "{\"request_key\":\"ea4dccb1-36be-46ef-b337-b9a0c449e122\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjZjOWEwYzA1LWFjMjctNDVlOC1hZDBhLWRmNzI0YWQ0ZWE3ZSIsIjI0YzUxNDA0LWMyZTAtNDlkMy1hYjlmLTA2N2U3MzYxNDQxYiJd\",\"value\":[{\"type\":\"p\",\"id\":\"f2f82816-c18a-4508-b658-2a026177a129\",\"children\":[{\"text\":\"普通未保存送出即關頁\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/6c9a0c05-ac27-45e8-ad0a-df724ad4ea7e/jd/changes/read",
+      "body": "{\"change_ref\":\"WyJjaGFuZ2UiLCI2YzlhMGMwNS1hYzI3LTQ1ZTgtYWQwYS1kZjcyNGFkNGVhN2UiLCJiMjY0NDRhNC01NTYwLTUxNzgtYWE3NS1mZTIxZmYzZDMwY2UiLCIyNGM1MTQwNC1jMmUwLTQ5ZDMtYWI5Zi0wNjdlNzM2MTQ0MWIiLCI5YmFjNjY5OC1kZDNmLTRkN2YtYjhhYy1iMmY3NjVjN2E4MDYiXQ\"}"
+    }
+  ],
+  "errors": []
+}

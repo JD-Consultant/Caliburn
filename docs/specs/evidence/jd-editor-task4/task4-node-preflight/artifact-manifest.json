@@ -1,0 +1,103 @@
+{
+  "preparedAtUtc": "2026-09-10T01:13:26.0303606+00:00",
+  "purpose": "Task 4.0 artifact download and integrity verification only",
+  "osArchitecture": "X64",
+  "processArchitecture": "X64",
+  "verifier": {
+    "path": "D:/Git/usr/bin/gpgv.exe",
+    "version": "GnuPG 2.4.5-unknown; libgcrypt 1.9.4-unknown",
+    "sha256": "fba092f4b8772fa7e0543958c48de3ebc8b0ecd8fa416229fb5dc70964a373d9"
+  },
+  "signature": {
+    "exitCode": 0,
+    "status": "GOODSIG and VALIDSIG",
+    "signer": "Marco Ippolito <marcoippolito54@gmail.com>",
+    "fingerprint": "CC68F5A3106FF448322E48ED27F5E38D5B0A215F",
+    "signatureTimeUtc": "2026-07-29T13:56:01.0000000+00:00",
+    "identityReference": "node-v22.23.2-README.md lines 798-799"
+  },
+  "archiveHashMatchesSignedManifest": true,
+  "unsignedManifestBytesEqualVerifiedPayload": true,
+  "downloadedNodeExecuted": false,
+  "archiveExtracted": false,
+  "runtimeSwitched": false,
+  "files": [
+    {
+      "file": "gpgv-attempt1-unverified-SHASUMS256.txt",
+      "bytes": 3777,
+      "sha256": "778ac5b2fcdbd68d9c0ae9f4310674faa3af0910bd0d18e7f6597787c40a3e39",
+      "sourceUrl": null,
+      "lastWriteUtc": "2026-09-10T01:11:29.9191805Z"
+    },
+    {
+      "file": "gpgv-attempt1.log",
+      "bytes": 820,
+      "sha256": "6471d4bf0d27cae26be5246d778980a258df843ac820fd25a75c6232343d3e7f",
+      "sourceUrl": null,
+      "lastWriteUtc": "2026-09-10T01:11:29.9469525Z"
+    },
+    {
+      "file": "gpgv-verification.log",
+      "bytes": 961,
+      "sha256": "cde359486bd82d4aa170afd532d84e130d9cb2e3887ad98abc460e39940615c4",
+      "sourceUrl": null,
+      "lastWriteUtc": "2026-09-10T01:12:20.1282343Z"
+    },
+    {
+      "file": "node-v22.23.2-LICENSE.txt",
+      "bytes": 145485,
+      "sha256": "c738ae413cf561f174e34f6961f8ca458aae2369a73640dda6234c629b98bcc4",
+      "sourceUrl": "https://raw.githubusercontent.com/nodejs/node/v22.23.2/LICENSE",
+      "lastWriteUtc": "2026-09-10T01:10:35.2152838Z"
+    },
+    {
+      "file": "node-v22.23.2-README.md",
+      "bytes": 42451,
+      "sha256": "1d67547b4471900d412816d78e1642d6a9baa786ab6c841e7a0e2f77a652169d",
+      "sourceUrl": "https://raw.githubusercontent.com/nodejs/node/v22.23.2/README.md",
+      "lastWriteUtc": "2026-09-10T01:12:20.8391604Z"
+    },
+    {
+      "file": "node-v22.23.2-win-x64.zip",
+      "bytes": 35683585,
+      "sha256": "1177b4137ba5adaa56354ae40f1080c7450e8ae09cecb47da459d1c52ac99f97",
+      "sourceUrl": "https://nodejs.org/dist/v22.23.2/node-v22.23.2-win-x64.zip",
+      "lastWriteUtc": "2026-09-10T01:10:32.5767999Z"
+    },
+    {
+      "file": "nodejs-release-keyring.kbx",
+      "bytes": 95960,
+      "sha256": "610b8d249da3d5733f5a128def2dd0294dbbf5b5713e6ca2529db8db419dee00",
+      "sourceUrl": "https://github.com/nodejs/release-keys/raw/HEAD/gpg/pubring.kbx",
+      "lastWriteUtc": "2026-09-10T01:10:34.5712760Z"
+    },
+    {
+      "file": "SHASUMS256.txt",
+      "bytes": 3777,
+      "sha256": "778ac5b2fcdbd68d9c0ae9f4310674faa3af0910bd0d18e7f6597787c40a3e39",
+      "sourceUrl": "https://nodejs.org/dist/v22.23.2/SHASUMS256.txt",
+      "lastWriteUtc": "2026-09-10T01:10:33.5270478Z"
+    },
+    {
+      "file": "SHASUMS256.txt.asc",
+      "bytes": 4696,
+      "sha256": "cfcf12eb3146d641be185d08ca018166b98495b1d8e5f7f94ab77f9965b651d2",
+      "sourceUrl": "https://nodejs.org/dist/v22.23.2/SHASUMS256.txt.asc",
+      "lastWriteUtc": "2026-09-10T01:10:33.0379666Z"
+    },
+    {
+      "file": "verification-result.json",
+      "bytes": 294,
+      "sha256": "59be4d2be8aded4245967273a697af4c84bd6bf4d8bf9fd3fb2c20d41945e387",
+      "sourceUrl": null,
+      "lastWriteUtc": "2026-09-10T01:12:20.2277572Z"
+    },
+    {
+      "file": "verified-SHASUMS256.txt",
+      "bytes": 3777,
+      "sha256": "778ac5b2fcdbd68d9c0ae9f4310674faa3af0910bd0d18e7f6597787c40a3e39",
+      "sourceUrl": null,
+      "lastWriteUtc": "2026-09-10T01:12:20.1022467Z"
+    }
+  ]
+}

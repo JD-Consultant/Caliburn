@@ -1,9 +1,8 @@
-import { NodeApi, type TElement } from "platejs";
-import type { JdEditor } from "./profile.js";
+import { NodeApi, type TElement, type SlateEditor } from "platejs";
 import { assertJdValue, JdInputError } from "./schema.js";
 /** Local same-document UI copy helper, not a model command or Node wire entry. */
 export function copyJdElements(
-  editor: JdEditor,
+  editor: SlateEditor,
   sourceIds: string[],
   at: number[],
 ): void {

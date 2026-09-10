@@ -1,0 +1,3099 @@
+{
+  "before_sha256": "f8a8a5841945b959e578ac2462a5d111b428f0ed2b3e6d80a5768cbc3a695311",
+  "candidate_sha256": "c35def0335adbdf1269c3fdcd886a67353707f435924de34574cd1f79018d8a2",
+  "changed_references": [
+    "#/$defs/JdSavedListItem",
+    "#/$defs/JdSavedListContent",
+    "#/$defs/JdSavedList",
+    "#/$defs/JdSavedTableRow",
+    "#/$defs/JdSavedTableCell",
+    "#/$defs/JdSavedCellChild",
+    "#/$defs/JdSavedBlockquoteChild",
+    "#/$defs/JdSavedTaskChild",
+    "#/$defs/JdSavedBodyElement",
+    "#/$defs/JdSavedDutyChild",
+    "#/$defs/JdSavedWorkSectionChild",
+    "#/$defs/JdSavedKnowledgeSectionChild",
+    "#/$defs/JdSavedSkillsSectionChild",
+    "#/$defs/JdSavedBodyElement",
+    "#/$defs/JdSavedBodyElement"
+  ],
+  "cases": [
+    {
+      "case": "r2-canonical.json",
+      "definition": "JdDocumentValue",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "expected-task8-move.json",
+      "definition": "JdDocumentValue",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "empty-mark.json",
+      "definition": "JdDocumentValue",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 0",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 1",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 2",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 3",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 4",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 5",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 6",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 7",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 8",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 9",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 10",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 11",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 12",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 13",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 14",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 15",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 16",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 17",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 18",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 19",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 20",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 21",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 22",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 23",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 24",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 25",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 26",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 27",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 28",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 29",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 30",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 31",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 32",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 33",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 34",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 35",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 36",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 37",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 38",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 39",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 40",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 41",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 42",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 43",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 44",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 45",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 46",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 47",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 48",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 49",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 50",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 51",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 52",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 53",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 54",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 55",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 56",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 57",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 58",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 59",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 60",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 61",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 62",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 63",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 64",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 65",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 66",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 67",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 68",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 69",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 70",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 71",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 72",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 73",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 74",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 75",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 76",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 77",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 78",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 79",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 80",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 81",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 82",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 83",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 84",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 85",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 86",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 87",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 88",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 89",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 90",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 91",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 92",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 93",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 94",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 95",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 96",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 97",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 98",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 99",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 100",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 101",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 102",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 103",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 104",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 105",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 106",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 107",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 108",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 109",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 110",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 111",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 112",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 113",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 114",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 115",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 116",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 117",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 118",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 119",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 120",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 121",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 122",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 123",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 124",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 125",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 126",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 127",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 128",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 129",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 130",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 131",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 132",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 133",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 134",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 135",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 136",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 137",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 138",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 139",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 140",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 141",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 142",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 143",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 144",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 145",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 146",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 147",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 148",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 149",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 150",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 151",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 152",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 153",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 154",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 155",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 156",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 157",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 158",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 159",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 160",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 161",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 162",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 163",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 164",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 165",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 166",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 167",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 168",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 169",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 170",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 171",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 172",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 173",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 174",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 175",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 176",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 177",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 178",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 179",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 180",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 181",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 182",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 183",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 184",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 185",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 186",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 187",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 188",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "existing element 189",
+      "definition": "JdSavedElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "('h1', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h1', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h1', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h1', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h1', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h1', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h1', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h1', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('blockquote', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('p', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'identity') bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h2', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('table', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('tr', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('th', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('td', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'purpose') bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'work') bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_duty', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('h3', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_task', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_outcomes', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('ul', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('li', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('lic', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_requirements', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'knowledge') bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_knowledge', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'skills') bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_skill', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('jd_section', 'conditions') bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) empty",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) text scalar",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) empty object",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) unknown type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) missing id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) extra property",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "('hr', None) bad leaf mark",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "metadata type",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "metadata id",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "metadata score",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "metadata section_kind",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "metadata colSizes",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "metadata source_refs",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "metadata children",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "missing jd_outcomes",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "duplicate jd_outcomes",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "missing jd_requirements",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "duplicate jd_requirements",
+      "definition": "JdSavedElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedBodyElement",
+      "definition": "JdSavedBodyElement",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedBodyElement",
+      "definition": "JdSavedBodyElement",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedBlockquoteChild",
+      "definition": "JdSavedBlockquoteChild",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedBlockquoteChild",
+      "definition": "JdSavedBlockquoteChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedList",
+      "definition": "JdSavedList",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedList",
+      "definition": "JdSavedList",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedListItem",
+      "definition": "JdSavedListItem",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedListItem",
+      "definition": "JdSavedListItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedListContent",
+      "definition": "JdSavedListContent",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedListContent",
+      "definition": "JdSavedListContent",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedTableRow",
+      "definition": "JdSavedTableRow",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedTableRow",
+      "definition": "JdSavedTableRow",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedTableCell",
+      "definition": "JdSavedTableCell",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedTableCell",
+      "definition": "JdSavedTableCell",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedCellChild",
+      "definition": "JdSavedCellChild",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedCellChild",
+      "definition": "JdSavedCellChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedDutyChild",
+      "definition": "JdSavedDutyChild",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedDutyChild",
+      "definition": "JdSavedDutyChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedWorkSectionChild",
+      "definition": "JdSavedWorkSectionChild",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedWorkSectionChild",
+      "definition": "JdSavedWorkSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedOutcomes",
+      "definition": "JdSavedOutcomes",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedOutcomes",
+      "definition": "JdSavedOutcomes",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedRequirements",
+      "definition": "JdSavedRequirements",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedRequirements",
+      "definition": "JdSavedRequirements",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedKnowledgeItem",
+      "definition": "JdSavedKnowledgeItem",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedKnowledgeItem",
+      "definition": "JdSavedKnowledgeItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedSkillItem",
+      "definition": "JdSavedSkillItem",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedSkillItem",
+      "definition": "JdSavedSkillItem",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedTaskChild",
+      "definition": "JdSavedTaskChild",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedTaskChild",
+      "definition": "JdSavedTaskChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedKnowledgeSectionChild",
+      "definition": "JdSavedKnowledgeSectionChild",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedKnowledgeSectionChild",
+      "definition": "JdSavedKnowledgeSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    },
+    {
+      "case": "standalone JdSavedSkillsSectionChild",
+      "definition": "JdSavedSkillsSectionChild",
+      "old": true,
+      "candidate": true,
+      "expected": true
+    },
+    {
+      "case": "standalone malformed JdSavedSkillsSectionChild",
+      "definition": "JdSavedSkillsSectionChild",
+      "old": false,
+      "candidate": false,
+      "expected": false
+    }
+  ],
+  "timing": [
+    {
+      "schema": "before",
+      "seconds": 3.8138108999992255
+    },
+    {
+      "schema": "candidate",
+      "seconds": 0.09081749999313615
+    }
+  ]
+}

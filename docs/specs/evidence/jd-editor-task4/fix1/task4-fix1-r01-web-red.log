@@ -1,0 +1,35 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/useJdSession.test.tsx (14 tests | 2 failed) 15ms
+   × only an identity-matched explicit rejection unlocks candidate handling (409) 4ms
+   × only an identity-matched explicit rejection unlocks candidate handling (422) 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > only an identity-matched explicit rejection unlocks candidate handling (409)
+ FAIL  src/jd/useJdSession.test.tsx > only an identity-matched explicit rejection unlocks candidate handling (422)
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/jd/useJdSession.test.tsx:188:33
+    186|   session.setText("原問句");
+    187|   expect(await session.save()).toBe(false);
+    188|   expect(session.manualUnknown).toBe(false);
+       |                                 ^
+    189|   expect(session.candidate?.value).toEqual(session.value);
+    190|   expect(session.text).toBe("原問句");
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 12 passed (14)
+   Start at  11:50:31
+   Duration  856ms (transform 55ms, setup 0ms, import 131ms, tests 15ms, environment 569ms)
+

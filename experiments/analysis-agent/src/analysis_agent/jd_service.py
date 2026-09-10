@@ -14,9 +14,12 @@ class JdService:
             raise ValueError('JD and catalog must share one engine')
         self.store, self.engine, self.catalog = store, engine, catalog
 
-    def create_document(self, title):
+    def create_document(self, title, *, request_key=None):
+        existing = self.catalog.created_by_request(request_key, title)
+        if existing:
+            return existing
         value = self.engine.validate_value([{'type': 'p', 'id': str(uuid4()), 'children': [{'text': ''}]}]).value
-        return self.store.create_document(self.catalog, title, value)
+        return self.store.create_document(self.catalog, title, value, request_key=request_key)
 
     def read(self, scope, query, *, cancel=None):
         try:

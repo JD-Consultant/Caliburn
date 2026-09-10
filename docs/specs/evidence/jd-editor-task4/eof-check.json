@@ -1,0 +1,7 @@
+{
+  "path": "experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+  "before_sha256": "078de0ee24033e1c87685f0a39906c7105da9949c7276441d6c5a377615a0974",
+  "after_sha256": "1ea8dfd3634c2b6303b46f51b35144007271cdd23c7d94bde2f8062356530023",
+  "change": "Remove only one final empty line reported by staged whitespace check; executable text unchanged",
+  "tests_repeated": false
+}

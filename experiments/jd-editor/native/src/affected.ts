@@ -15,7 +15,7 @@ export function observeAffectedIds(editor: JdEditor): Set<string> {
   const parents = (path: number[]) => {
     for (const parent of PathApi.ancestors(path)) at(parent);
   };
-  const apply = editor.apply;
+  const apply = editor.apply as (op: Operation) => void;
   const observed = (op: Operation) => {
     const start = editor.operations.length;
     if (
@@ -43,7 +43,7 @@ export function observeAffectedIds(editor: JdEditor): Set<string> {
         case "split_node": {
           const node = NodeApi.get(editor, op.path);
           collect(node);
-          if (node && "children" in node)
+          if (node && "children" in node && Array.isArray(node.children))
             for (const child of node.children.slice(op.position))
               collect(child, true);
           break;

@@ -10,20 +10,20 @@ from datetime import datetime
 import os
 
 import httpx
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Query
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from starlette.concurrency import run_in_threadpool
 from starlette.middleware.trustedhost import TrustedHostMiddleware
+from starlette.middleware.cors import CORSMiddleware
+from jd_editor_contract import models as jd_models
 
 from analysis_agent.service import AnalysisService, ServiceConflict
 from analysis_agent.jd_contract import SelectionCaptureInput
 from analysis_agent.publication import PublicationUncertain
 
 
-class DocumentInput(BaseModel):
-    model_config = ConfigDict(extra='forbid')
-    title: str = Field(min_length=1, max_length=200)
+class DocumentInput(jd_models.JdDocumentCreateInput):
 
     @field_validator('title')
     @classmethod
@@ -48,10 +48,21 @@ class MessageInput(BaseModel):
         return value
 
 
-class DocumentOutput(BaseModel):
-    id: str
-    title: str
-    created_at: datetime
+class DocumentOutput(jd_models.JdDocumentMetadata):
+    pass
+
+
+def document_output(row):
+    return DocumentOutput.model_validate({key: row[key] for key in DocumentOutput.model_fields})
+
+
+class DocumentMetadataInput(jd_models.JdDocumentMetadataCommand):
+    @field_validator('root')
+    @classmethod
+    def nonblank_title(cls, value):
+        if hasattr(value, 'title') and not value.title.strip():
+            raise ValueError('Title cannot be blank')
+        return value
 
 
 class MessageOutput(BaseModel):
@@ -70,6 +81,13 @@ class RunOutput(BaseModel):
     usage: dict[str, int] | None
     outcome: dict | None
     can_resume: bool
+
+
+class RunLookupReceived(jd_models.JdRunLookupReceived):
+    run: RunOutput
+
+
+RunLookupOutput = jd_models.JdRunLookupMissing | RunLookupReceived
 
 
 class MemoryStatusOutput(BaseModel):
@@ -207,12 +225,17 @@ def create_app(resources=open_service):
             await run_in_threadpool(manager.__exit__, None, None, None)
 
     app = FastAPI(title='Caliburn analysis-only API', lifespan=lifespan)
+    from analysis_agent.jd_routes import router as jd_router
+    app.include_router(jd_router)
     app.add_middleware(TrustedHostMiddleware, allowed_hosts=['localhost', '127.0.0.1'])
+    web_origins = ['http://127.0.0.1:3001', 'http://localhost:3001']
+    app.add_middleware(CORSMiddleware, allow_origins=web_origins, allow_credentials=False,
+        allow_methods=['GET', 'POST', 'PATCH'], allow_headers=['Content-Type'])
 
     @app.middleware('http')
     async def same_origin(request: Request, call_next):
         origin = request.headers.get('origin')
-        if origin and origin != str(request.base_url).rstrip('/'):
+        if origin and origin not in web_origins:
             return JSONResponse({'detail': 'Cross-origin access is not enabled'}, status_code=403)
         return await call_next(request)
 
@@ -234,11 +257,20 @@ def create_app(resources=open_service):
 
     @app.post('/documents', response_model=DocumentOutput, status_code=201)
     def create_document(data: DocumentInput):
-        return app.state.service.create_document(data.title)
+        return document_output(app.state.service.create_document(data.title, request_key=str(data.request_key)))
 
     @app.get('/documents', response_model=list[DocumentOutput])
-    def documents():
-        return app.state.service.list_documents()
+    def documents(archived: bool = False):
+        rows = [r for r in app.state.service.list_documents() if r['archived'] == archived]
+        return [document_output(row) for row in sorted(rows, key=lambda r: (r['created_at'], r['id']), reverse=True)]
+
+    @app.get('/documents/{document}', response_model=DocumentOutput)
+    def document_metadata(document: str):
+        return document_output(app.state.service.catalog.document(document))
+
+    @app.patch('/documents/{document}', response_model=DocumentOutput)
+    def update_document(document: str, data: DocumentMetadataInput):
+        return document_output(app.state.service.update_document(document, data.model_dump(mode='json')))
 
     @app.post('/documents/{document}/runs', response_model=RunOutput, status_code=202)
     def submit(document: str, data: MessageInput):
@@ -248,6 +280,16 @@ def create_app(resources=open_service):
     @app.get('/documents/{document}/messages', response_model=list[MessageOutput])
     def messages(document: str):
         return app.state.service.messages(document)
+
+    @app.get('/documents/{document}/sources', response_model=jd_models.JdSourceReadResult)
+    def source(document: str, request: Request, reference: str = Query(min_length=1, max_length=4096), offset: int = Query(default=0, ge=0)):
+        service = request.app.state.service
+        service.catalog.document(document)
+        try:
+            return service.reader(document).read(reference, offset)
+        except ValueError as exc:
+            from fastapi import HTTPException
+            raise HTTPException(422, 'Source is unavailable in this document') from exc
 
     @app.get('/documents/{document}/memory-status', response_model=MemoryStatusOutput)
     def memory_status(document: str):
@@ -259,6 +301,10 @@ def create_app(resources=open_service):
     @app.get('/documents/{document}/runs', response_model=list[RunOutput])
     def runs(document: str):
         return app.state.service.runs(document)
+
+    @app.get('/documents/{document}/runs/by-request', response_model=RunLookupOutput)
+    def run_by_request(document: str, request_key: str = Query(min_length=1, max_length=128)):
+        return app.state.service.run_by_request(document, request_key)
 
     @app.get('/documents/{document}/runs/{run_id}', response_model=RunOutput)
     def get_run(document: str, run_id: str):

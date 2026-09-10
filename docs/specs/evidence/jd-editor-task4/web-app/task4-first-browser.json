@@ -1,0 +1,183 @@
+{
+  "browser": "153.0.8010.37",
+  "channel": "chrome",
+  "headed": true,
+  "url": "http://127.0.0.1:3001/workspace/0b4c7c19-2638-4e82-846e-b33be6e08c75",
+  "editables": 1,
+  "tasks": 8,
+  "tables": 1,
+  "errors": [],
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/workspace/0b4c7c19-2638-4e82-846e-b33be6e08c75",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_src_app_globals_1jfs_-n.css",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_020za4m._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_next-devtools_index_0i-tx06.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_1r4gg59._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-server-dom-turbopack_1qs8bsa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_0eh-wsn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_client_1iy_1f_._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_07c1pr1._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40swc_helpers_cjs_01osh66._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_1anvha4._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/turbopack-experiments_jd-editor_web_10f7rtc._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_011_sho._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_1boebgf._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_server_browser_1dgj2n-.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_0ufbzhn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate_dist_index_es_04tuc_l.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_lodash_0nqrjx6._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_slate_dist_index_154h2_h.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_core_dist_0i5if2i._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate-react_dist_index_es_0fjcxe4.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_table_dist_0owi9th._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_list-classic_dist_0phwazw._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_ajv_dist_1wahgfa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_0ukaxp8._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/0b4c7c19-2638-4e82-846e-b33be6e08c75",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/0b4c7c19-2638-4e82-846e-b33be6e08c75/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/0b4c7c19-2638-4e82-846e-b33be6e08c75/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/0b4c7c19-2638-4e82-846e-b33be6e08c75/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/0b4c7c19-2638-4e82-846e-b33be6e08c75",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/0b4c7c19-2638-4e82-846e-b33be6e08c75/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/0b4c7c19-2638-4e82-846e-b33be6e08c75/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/0b4c7c19-2638-4e82-846e-b33be6e08c75/jd",
+      "body": null
+    }
+  ],
+  "ax": "- main:\n  - link \"← 我的職務說明書\":\n    - /url: /\n  - heading \"設備維護工程師・完整驗收稿\" [level=1]\n  - status: 已保存\n  - region \"顧問訪談\":\n    - heading \"顧問訪談\" [level=2]\n    - paragraph: 先談你的實際工作，資料足夠時顧問會開始整理。你可以隨時補充或更正。\n    - article:\n      - text: 你\n      - paragraph: 我負責設備維護，驗收素材由這次已保存問答提供。\n    - article:\n      - text: 顧問\n      - paragraph: 已收到你的說明。這是固定離線驗收回覆。\n    - text: 補充或更正你的工作\n    - textbox \"補充或更正你的工作\":\n      - /placeholder: 例如：這項工作只在客戶提出需求時執行…\n    - paragraph: 選取正文後送出，可請顧問處理該段；未保存修改會先保存。\n    - button \"送出\" [disabled]\n  - region \"目前職務說明書\":\n    - heading \"職務說明書\" [level=2]\n    - button \"保存\" [disabled]\n    - button \"這次改動\"\n    - button \"讀取上一筆歷史\"\n    - button \"粗體\"\n    - button \"斜體\"\n    - button \"底線\"\n    - button \"刪除線\"\n    - button \"復原\"\n    - button \"重做\"\n    - button \"表格增列\"\n    - button \"表格刪列\"\n    - button \"複製區塊\"\n    - textbox \"職務說明書正文\":\n      - heading \"前端工程師職務說明書\" [level=1]\n      - blockquote:\n        - paragraph: JD-R001/C06 閱讀版 r2；同步2026-09-09聊天中 Owner「大致上同意」的完整樣稿，內容方向仍可修訂。這是虛構職位，不是實際員工文件或 AI 生成驗收；不是固定 UI、資料結構或數量模板。情境依據及本版核對見 樣稿依據與審查。\n      - heading \"職務基本資料\" [level=2]\n      - table:\n        - caption\n        - rowgroup:\n          - row \"項目 內容\":\n            - columnheader \"項目\":\n              - paragraph: 項目\n            - columnheader \"內容\":\n              - paragraph: 內容\n          - row \"職務名稱 前端工程師（客戶網站專案）\":\n            - cell \"職務名稱\":\n              - paragraph: 職務名稱\n            - cell \"前端工程師（客戶網站專案）\":\n              - paragraph: 前端工程師（客戶網站專案）\n          - row \"所屬單位 數位服務部／網站專案組\":\n            - cell \"所屬單位\":\n              - paragraph: 所屬單位\n            - cell \"數位服務部／網站專案組\":\n              - paragraph: 數位服務部／網站專案組\n          - row \"直屬主管 網站專案組主管\":\n            - cell \"直屬主管\":\n              - paragraph: 直屬主管\n            - cell \"網站專案組主管\":\n              - paragraph: 網站專案組主管\n          - row \"主要協作對象 專案經理、視覺設計師、後端工程師及客戶窗口\":\n            - cell \"主要協作對象\":\n              - paragraph: 主要協作對象\n            - cell \"專案經理、視覺設計師、後端工程師及客戶窗口\":\n              - paragraph: 專案經理、視覺設計師、後端工程師及客戶窗口\n      - heading \"職務目的\" [level=2]\n      - paragraph: 將客戶確認的需求與視覺設計實現為可使用、可維護的網站前端，完成品質確認及交付，並依各專案的服務約定處理上線後問題與維護工作。\n      - heading \"主要職責與工作任務\" [level=2]\n      - heading \"一、釐清需求與規劃前端交付\" [level=3]\n      - button \"依據 1\"\n      - paragraph:\n        - strong:\n          - strong: 1. 釐清前端功能、使用情境及驗收範圍。\n      - paragraph: 與專案經理及客戶窗口確認網站需要支援的主要操作、裝置、瀏覽器與關鍵異常情境，整理開發範圍及尚待確認的事項。\n      - heading \"工作成果／產出\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 主要產出：\n          - text: 可供開發與確認的前端需求及驗收範圍紀錄。\n      - heading \"工作執行要求\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 完成要求：\n          - text: 已確認與尚未確認的內容可以區分；不把推測直接當作客戶同意的需求。\n      - strong: 相關知識\n      - group: 調整引用\n      - strong: 相關技能\n      - group: 調整引用\n      - button \"依據 1\"\n      - paragraph:\n        - strong:\n          - strong: 2. 評估前端工作量、依賴條件及需求變更的影響。\n      - paragraph: 依工作範圍評估開發投入，辨識後端介面等依賴，說明變更對既有功能及交付安排的影響，提供調整建議。\n      - heading \"工作成果／產出\" [level=4]\n      - paragraph\n      - heading \"工作執行要求\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 完成要求：\n          - text: 估算包含必要前提與限制；新增或變更工作由專案經理協調確認後納入安排，不自行承諾報價或客戶期限。\n      - strong: 相關知識\n      - group: 調整引用\n      - strong: 相關技能\n      - group: 調整引用\n      - heading \"二、開發網站前端與整合資料介面\" [level=3]\n      - button \"依據 1\"\n      - paragraph:\n        - strong:\n          - strong: 3. 實作網站頁面、版面及互動功能。\n      - paragraph: 依已確認的需求與視覺設計開發前端，處理約定裝置與瀏覽器的差異，讓主要操作符合預期。\n      - heading \"工作成果／產出\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 主要產出：\n          - text: 可供整合與檢查的前端頁面及程式版本。\n      - heading \"工作執行要求\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 完成要求：\n          - text: 主要操作、約定的鍵盤操作與基本可用性要求納入實作；發現設計與需求不一致時，先確認再調整。\n      - strong: 相關知識\n      - group: 調整引用\n      - strong: 相關技能\n      - group: 調整引用\n      - button \"依據 1\"\n      - paragraph:\n        - strong:\n          - strong: 4. 串接後端介面，處理資料與各種操作狀態。\n      - paragraph: 依介面約定實作資料顯示，以及載入、成功、失敗、逾時等情境的前端行為，並與後端工程師釐清問題及責任範圍。\n      - heading \"工作成果／產出\" [level=4]\n      - paragraph\n      - heading \"工作執行要求\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 完成要求：\n          - list:\n            - listitem: 查詢逾時時，保留必要輸入並提供重試方式。\n            - listitem: 訂單送出結果不明時，避免使用者重複送出，並與後端確認實際狀態，不直接判定下單失敗。\n            - listitem: 涉及後端資料或業務規則時，與負責人員確認，不自行改定規則。\n      - strong: 相關知識\n      - group: 前後端介面契約、資料格式與非同步狀態\n      - group: 軟體測試、缺陷追蹤與版本控管\n      - group: 調整引用\n      - strong: 相關技能\n      - group: 介面整合與問題診斷\n      - group: 測試與修正驗證\n      - group: 調整引用\n      - heading \"三、確認品質與完成交付\" [level=3]\n      - button \"依據 1\"\n      - paragraph:\n        - strong:\n          - strong: 5. 檢查前端功能，修正並驗證交付前的缺陷。\n      - paragraph: 檢查主要使用流程、約定的異常情境，以及裝置與瀏覽器的支援情況；記錄問題、修正前端缺陷並確認相關影響。\n      - heading \"工作成果／產出\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 主要產出：\n          - text: 檢查結果、缺陷處理紀錄及待解限制說明。\n      - heading \"工作執行要求\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 完成要求：\n          - text: 修正後確認原問題及受影響操作；未解事項交由專案經理協調，不自行宣稱已通過客戶驗收。\n      - strong: 相關知識\n      - group: 調整引用\n      - strong: 相關技能\n      - group: 調整引用\n      - button \"依據 1\"\n      - paragraph:\n        - strong:\n          - strong: 6. 準備前端交付內容，配合發布、驗收與維護交接。\n      - paragraph: 整理可辨識的交付版本、操作或維護說明、已知限制及交接事項，並配合處理發布過程中的前端問題。\n      - heading \"工作成果／產出\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 主要產出：\n          - text: 交付版本及接收者可使用的交接說明。\n      - heading \"工作執行要求\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 完成要求：\n          - text: 交付版本與檢查結果一致；發布問題能提供重現資訊；涉及服務端部署時，與負責該部署的後端工程師協作。客戶驗收仍由客戶確認。\n      - strong: 相關知識\n      - group: 調整引用\n      - strong: 相關技能\n      - group: 調整引用\n      - heading \"四、處理上線問題與約定維護\" [level=3]\n      - button \"依據 1\"\n      - paragraph:\n        - strong:\n          - strong: 7. 處理約定範圍內的上線後前端問題。\n      - paragraph: 收到問題後，了解影響與重現條件，區分前端缺陷、後端問題或新增需求；依判斷進行修正、驗證或轉交適當人員。\n      - list:\n        - listitem:\n          - strong:\n            - strong: 執行時機：\n          - text: 上線後發生屬於服務範圍的問題時，包含少見但影響主要操作的異常。\n      - heading \"工作成果／產出\" [level=4]\n      - paragraph\n      - heading \"工作執行要求\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 完成要求：\n          - text: 記錄處理結果與未解事項；未排除的問題不能標成已解決。處理優先順序及對外承諾由專案經理協調。\n      - strong: 相關知識\n      - group: 前後端介面契約、資料格式與非同步狀態\n      - group: 調整引用\n      - strong: 相關技能\n      - group: 介面整合與問題診斷\n      - group: 調整引用\n      - button \"依據 1\"\n      - paragraph:\n        - strong:\n          - strong: 8. 依維護約定執行定期前端檢查。\n      - paragraph: 對包含定期維護的專案，檢查主要前端操作，記錄結果並追蹤已知問題或必要調整。\n      - list:\n        - listitem:\n          - strong:\n            - strong: 執行時機：\n          - text: 依各案約定；目前包含月檢服務的專案按月執行。\n      - heading \"工作成果／產出\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 主要產出：\n          - text: 維護檢查及問題追蹤紀錄。\n      - heading \"工作執行要求\" [level=4]\n      - list:\n        - listitem:\n          - strong:\n            - strong: 完成要求：\n          - text: 僅約定交付後缺陷修正的專案，不自動納入固定月檢；超出服務範圍的新增需求另行確認。\n      - strong: 相關知識\n      - group: 專案範圍、驗收及維護約定\n      - group: 調整引用\n      - strong: 相關技能\n      - group: 技術協作與交接\n      - group: 調整引用\n      - heading \"所需知識\" [level=2]\n      - paragraph: 知識範圍\n      - paragraph: 工作上的用途\n      - paragraph: 網頁結構、樣式、互動程式與瀏覽器運作\n      - paragraph: 理解頁面實作、裝置差異及前端行為問題\n      - complementary: 共用於 0 項工作：尚未引用\n      - paragraph: 前後端介面契約、資料格式與非同步狀態\n      - paragraph: 理解資料串接、載入與錯誤情境，釐清前後端責任\n      - complementary: 共用於 2 項工作：4. 串接後端介面，處理資料與各種操作狀態。、7. 處理約定範圍內的上線後前端問題。\n      - paragraph: 基本可用性與約定的鍵盤操作要求\n      - paragraph: 辨識會阻礙使用者完成主要操作的問題\n      - complementary: 共用於 0 項工作：尚未引用\n      - paragraph: 軟體測試、缺陷追蹤與版本控管\n      - paragraph: 支援功能檢查、修正驗證及交付版本辨識\n      - complementary: 共用於 1 項工作：4. 串接後端介面，處理資料與各種操作狀態。\n      - paragraph: 專案範圍、驗收及維護約定\n      - paragraph: 判斷工作是否在服務範圍內，辨識需要再確認的需求\n      - complementary: 共用於 1 項工作：8. 依維護約定執行定期前端檢查。\n      - heading \"所需技能\" [level=2]\n      - paragraph: 技能\n      - paragraph: 具體內涵\n      - paragraph: 需求澄清與工作評估\n      - paragraph: 將模糊要求轉成可確認的操作情境；評估工作量、介面依賴與變更影響，說明估算前提\n      - complementary: 共用於 0 項工作：尚未引用\n      - paragraph: 前端開發與調整\n      - paragraph: 運用網頁技術實現設計與互動，依約定的裝置及操作方式調整頁面\n      - complementary: 共用於 0 項工作：尚未引用\n      - paragraph: 介面整合與問題診斷\n      - paragraph: 處理資料及非同步狀態，運用重現步驟、瀏覽器檢查與介面資料定位問題\n      - complementary: 共用於 2 項工作：4. 串接後端介面，處理資料與各種操作狀態。、7. 處理約定範圍內的上線後前端問題。\n      - paragraph: 測試與修正驗證\n      - paragraph: 從主要操作及失敗情境安排檢查，確認修正效果與相關影響\n      - complementary: 共用於 1 項工作：4. 串接後端介面，處理資料與各種操作狀態。\n      - paragraph: 技術協作與交接\n      - paragraph: 辨識交付版本，向協作者說明依賴、限制及處理結果，留下可供接手的資訊\n      - complementary: 共用於 1 項工作：8. 依維護約定執行定期前端檢查。\n      - heading \"工作條件與責任邊界\" [level=2]\n      - list:\n        - listitem: 日常以電腦開發、檢查及線上協調為主，依專案安排工作；本職位無固定輪班或例行出差。\n        - listitem: 本人負責前端技術處理與建議，不承擔人員管理。專案經理協調優先順序、工作範圍及對外承諾。\n        - listitem: 商務開發、報價、簽約及帳務不屬本職位；視覺設計、後端業務規則、服務端部署及一般客服由相應人員負責。\n        - listitem: 維護依各案服務範圍及周期執行，不因此包含全天候值班或未約定的回應時限。\n      - separator\n      - paragraph: 樣稿編製日：2026-09-09；閱讀版 r2。內容完整性限於本樣稿明示的虛構工作範圍；不是跨職位通用任務清單，也不是個人能力評分。"
+}

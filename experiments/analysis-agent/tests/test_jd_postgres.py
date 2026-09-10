@@ -36,8 +36,8 @@ def jd():
     service = JdService(store, JdEngine(), catalog)
     documents = []
     create = service.create_document
-    def tracked_create(title):
-        result = create(title)
+    def tracked_create(title, **kwargs):
+        result = create(title, **kwargs)
         documents.append(result['id'])
         return result
     service.create_document = tracked_create

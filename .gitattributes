@@ -20,3 +20,5 @@ docs/specs/evidence/jd-editor-task2/*.jsonl -text
 docs/specs/evidence/jd-editor-task2/*.txt -text
 # Preserve raw captured test output for Task 3 evidence.
 docs/specs/evidence/jd-editor-task3/*.txt -text
+# Preserve Task 4 captured browser/runtime/schema evidence and its hash manifests.
+docs/specs/evidence/jd-editor-task4/** -text

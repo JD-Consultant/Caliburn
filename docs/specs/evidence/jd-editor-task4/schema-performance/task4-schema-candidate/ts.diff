@@ -1,0 +1,54 @@
+--- active
++++ candidate
+@@ -587,17 +587,42 @@
+  * This interface was referenced by `JdEditorV2ContractCandidate`'s JSON-Schema
+  * via the `definition` "JdSavedTaskChild".
+  */
+-export type JdSavedTaskChild = JdSavedBodyElement | JdSavedOutcomes | JdSavedRequirements;
++export type JdSavedTaskChild = JdSavedElement &
++  (
++    | JdSavedElementOfBodyType
++    | {
++        type: "jd_outcomes";
++        [k: string]: unknown;
++      }
++    | {
++        type: "jd_requirements";
++        [k: string]: unknown;
++      }
++  );
+ /**
+  * This interface was referenced by `JdEditorV2ContractCandidate`'s JSON-Schema
+  * via the `definition` "JdSavedKnowledgeSectionChild".
+  */
+-export type JdSavedKnowledgeSectionChild = JdSavedBodyElement | JdSavedKnowledgeItem;
++export type JdSavedKnowledgeSectionChild = JdSavedElement &
++  (
++    | JdSavedElementOfBodyType
++    | {
++        type: "jd_knowledge";
++        [k: string]: unknown;
++      }
++  );
+ /**
+  * This interface was referenced by `JdEditorV2ContractCandidate`'s JSON-Schema
+  * via the `definition` "JdSavedSkillsSectionChild".
+  */
+-export type JdSavedSkillsSectionChild = JdSavedBodyElement | JdSavedSkillItem;
++export type JdSavedSkillsSectionChild = JdSavedElement &
++  (
++    | JdSavedElementOfBodyType
++    | {
++        type: "jd_skill";
++        [k: string]: unknown;
++      }
++  );
+ /**
+  * This interface was referenced by `JdEditorV2ContractCandidate`'s JSON-Schema
+  * via the `definition` "JdNewOutcomes".
+@@ -1204,3 +1229,5 @@
+ export type JdEditResult = JdWriteResult;
+ 
+ export type JdManualSaveResult = JdWriteResult;
++
++export type JdChangeReadFailure = JdReadFailure;

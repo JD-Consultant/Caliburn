@@ -1,0 +1,1 @@
+S:\caliburn\.worktrees\analysis-only-agent\.superpowers\sdd\2026-09-10-jd-editor-core-implementation\task4-schema-candidate2\src\jd_editor_contract\models.py

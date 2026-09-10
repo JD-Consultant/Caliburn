@@ -1,0 +1,192 @@
+{
+  "source_directory": "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation",
+  "scope": "Scratch schema factorization and profile evidence only; candidate 1 rejected; candidate 2 pending independent review. No App performance result claimed.",
+  "reproduce": "Preserve the relative scratch layout from source_directory. Scripts retain their observed invocation paths. Do not execute evidence copies as product code.",
+  "files": [
+    {
+      "path": "task4-candidate-codegen.mjs",
+      "bytes": 2888,
+      "sha256": "5d11c4711e587cf4a100bd9ecb32091fa17a3dc0a2bf8effaa8be058fb9605a7"
+    },
+    {
+      "path": "task4-candidate-codegen2.mjs",
+      "bytes": 2912,
+      "sha256": "57d769d37a53b4552aa69c3e276b5ef4a47068ca14b7cb9fc4d2279b022ca359"
+    },
+    {
+      "path": "task4-factorization-supplement.py",
+      "bytes": 3269,
+      "sha256": "cbf2f5e2a2f02d906ef0a5f328aeb941c34c0a22d84f9ddd875fba5b57808407"
+    },
+    {
+      "path": "task4-factorization.py",
+      "bytes": 5990,
+      "sha256": "26fdcdde1b3e5245aa37bfc9b6ff8c1840780c450c68161ad3ecc2828bf41c9a"
+    },
+    {
+      "path": "task4-factorization2.py",
+      "bytes": 6153,
+      "sha256": "907a946f54a17aec14fd80b390028475491c9aebd258dfc4dae45e118274b784"
+    },
+    {
+      "path": "task4-profile.py",
+      "bytes": 2114,
+      "sha256": "ccc06d6a2c0d35949da203da0c0cf827a4557b6df150b9554cfa603d08e581b9"
+    },
+    {
+      "path": "task4-read-profile.json",
+      "bytes": 868,
+      "sha256": "2d524ce7c871e73e4f6a8db048283ee11130a4c89238874990d0f9d1c027b92e"
+    },
+    {
+      "path": "task4-read-profile.txt",
+      "bytes": 6155,
+      "sha256": "24d78369099740c0b08df70b39cda76ea44f5d794fc1210c96c9f2b32b13f46c"
+    },
+    {
+      "path": "task4-schema-candidate/actual-dto-import.txt",
+      "bytes": 158,
+      "sha256": "1d7591592d6e22541ca9eec76e58ad56e71b97ebd44627624f012631a157f724"
+    },
+    {
+      "path": "task4-schema-candidate/analysis-api.ts",
+      "bytes": 3362,
+      "sha256": "1492e6e33d21da5bafb6354f4854f243fd405218b55f5c73c3c8574df76d91dc"
+    },
+    {
+      "path": "task4-schema-candidate/api.diff",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "task4-schema-candidate/before.schema.json",
+      "bytes": 125613,
+      "sha256": "f8a8a5841945b959e578ac2462a5d111b428f0ed2b3e6d80a5768cbc3a695311"
+    },
+    {
+      "path": "task4-schema-candidate/candidate.diff",
+      "bytes": 266977,
+      "sha256": "fb47868609de15199b85e603e3b01085fd7c4bd00c05b5e8cb5e1164bf12a9f9"
+    },
+    {
+      "path": "task4-schema-candidate/candidate.schema.json",
+      "bytes": 121208,
+      "sha256": "c35def0335adbdf1269c3fdcd886a67353707f435924de34574cd1f79018d8a2"
+    },
+    {
+      "path": "task4-schema-candidate/candidate.ts",
+      "bytes": 42645,
+      "sha256": "cb7ddfe7257f8be692936b68aaeba25b66febcb39e2700098fe17039d7be20d9"
+    },
+    {
+      "path": "task4-schema-candidate/codegen-invocation.json",
+      "bytes": 1285,
+      "sha256": "9fc1f887cd48aaf9d535a5bd6e1c1238fe0f3b51abcd574d452c467720335a18"
+    },
+    {
+      "path": "task4-schema-candidate/equivalence-results.json",
+      "bytes": 75304,
+      "sha256": "fe75c5ad76884e6a8155c81f121eacd2a2bc2285731c8eaf28a4b482737dd269"
+    },
+    {
+      "path": "task4-schema-candidate/py.diff",
+      "bytes": 3159,
+      "sha256": "1645f04028b2611ee44330b502a0d0bc41f17b0a3693f1045c4987298e6ba279"
+    },
+    {
+      "path": "task4-schema-candidate/src/jd_editor_contract/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "task4-schema-candidate/src/jd_editor_contract/models.py",
+      "bytes": 46255,
+      "sha256": "e6665dea34cfd30ac36e79319c99a2c7eb0fb187f93ce5e3dd442e9141b1ae15"
+    },
+    {
+      "path": "task4-schema-candidate/ts.diff",
+      "bytes": 1695,
+      "sha256": "b0636cc67896464cc854839306ebcc6d6667263383006003db0e49504178ff76"
+    },
+    {
+      "path": "task4-schema-candidate2/actual-dto-import.txt",
+      "bytes": 159,
+      "sha256": "0a80f0a0ee96da7b442a527c51977035b1560cc2f254b146ae12b9f3c79e1fb1"
+    },
+    {
+      "path": "task4-schema-candidate2/analysis-api.ts",
+      "bytes": 3362,
+      "sha256": "1492e6e33d21da5bafb6354f4854f243fd405218b55f5c73c3c8574df76d91dc"
+    },
+    {
+      "path": "task4-schema-candidate2/api.diff",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "task4-schema-candidate2/before.schema.json",
+      "bytes": 125613,
+      "sha256": "f8a8a5841945b959e578ac2462a5d111b428f0ed2b3e6d80a5768cbc3a695311"
+    },
+    {
+      "path": "task4-schema-candidate2/candidate.diff",
+      "bytes": 267284,
+      "sha256": "c9c20413641a441a4d551ff1ec3fb71fa4110eb325a93e7a2617589398b04117"
+    },
+    {
+      "path": "task4-schema-candidate2/candidate.schema.json",
+      "bytes": 121509,
+      "sha256": "893fdb43fe2696846e74f15f2b5e12ed97a00f5ff1a5bc667c11ce734d7430fc"
+    },
+    {
+      "path": "task4-schema-candidate2/candidate.ts",
+      "bytes": 42264,
+      "sha256": "6376d46cb72b80f4e5e277604269e1dd0153772565191a22f5bbf1033c9ad626"
+    },
+    {
+      "path": "task4-schema-candidate2/codegen-invocation.json",
+      "bytes": 1287,
+      "sha256": "3c30f4d6e93d9a7215826363816545855f3652f473b829a0f21850ee1817252e"
+    },
+    {
+      "path": "task4-schema-candidate2/equivalence-results.json",
+      "bytes": 75340,
+      "sha256": "b11598892794e7874acc5df97244cded8346110d1095b42588b7d047767bcd08"
+    },
+    {
+      "path": "task4-schema-candidate2/py.diff",
+      "bytes": 204,
+      "sha256": "b42486ec8e30356f64a4886b093705ad0fd2040018f0df9b1505776ea944732c"
+    },
+    {
+      "path": "task4-schema-candidate2/review-normalized.diff",
+      "bytes": 10889,
+      "sha256": "ddf9c93e4f22549d7f3146fbfca7c171847dd4b6825e282c3da7e42856b5e320"
+    },
+    {
+      "path": "task4-schema-candidate2/src/jd_editor_contract/__init__.py",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "task4-schema-candidate2/src/jd_editor_contract/models.py",
+      "bytes": 44865,
+      "sha256": "64c0ac14a055883db8c48f1bea0f982aa64f7622408a89692ba5cbf555a8279d"
+    },
+    {
+      "path": "task4-schema-candidate2/supplement-results.json",
+      "bytes": 16603,
+      "sha256": "90ea553c967876650caa92378beb71cb4f6b0728d1c8a771f20ae60bfac62935"
+    },
+    {
+      "path": "task4-schema-candidate2/ts.diff",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "path": "task4-schema-factorization-candidate.md",
+      "bytes": 7859,
+      "sha256": "a70f545b72f80b81f53682724f0532f06be6795e321cf946b50e7fe7f4dab2cc"
+    }
+  ]
+}

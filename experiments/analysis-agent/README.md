@@ -1204,3 +1204,17 @@ on the same framework chain.
 The final request guard also compares complete supplied JD ToolMessage projections
 and their visible AI call/message identities against request-local preparation,
 so retaining an ID cannot conceal changed result text or call pairing.
+
+### Task 4 — 隔離同頁 Web 與 HTTP 接點
+
+`experiments/jd-editor/web` 的 3001 同頁工作畫面接此 8091 API。文件建立要求 App UUID request key；PG 以同交易保存 catalog／key／digest／initial revision／head，同鍵相同輸入回原文件。metadata version 條件更新與 archived 篩選不產生 JD revision，內部 scheduler 仍取得完整 catalog。既有 run admission digest 涵蓋 text、abandon_pending 與 selection；重開的 by-request lookup 只讀 canonical input 是否已收到，不自動送出或繼續。
+
+`jd_routes.py` 將 browser manual/read/change requests 映射至同一內部 ports，沒有 fabricated AI run 或 tool ID。immutable browser refs 核 route document；人工候選完整驗 profile／來源 owner，終局同鍵 receipt 在 busy／archive gate 前回傳。來源按原 ConversationReader 讀取，沒有平行來源儲存。來源引用保留不表示新手改內容已獲原文證實。
+
+兩個允許 origins 僅 `127.0.0.1:3001`／`localhost:3001`；GET／POST／PATCH、Content-Type、不帶 credentials，未知 origin 403，保留 TrustedHost。`scripts/export_web_contract.py` 只從實際 Pydantic models 生成 Web 型別，不啟動 open_service 或讀 key。
+
+既有隔離 DB 先明確執行 `scripts/setup_jd_web.py` 的 additive metadata setup，指定專用 `Q019_TEST_DATABASE_URL`（只准 local `q019_jd_app_20260910`）；不刪表或搬 production 資料，`create_all` 不代替升級。測試保持既有 Memory DB guard。Node 22.23.2 必須在建立 JdEngine 前以 scoped PATH 啟動，不能只在另一 terminal 換版本。
+
+`tests/jd_browser_server.py` 是零付費 browser fixture：實際 AnalysisService／API／JD router、官方 PG Saver／Store、原三工具，僅 model transport 使用固定 MockTransport，沒有讀取真 key 或 live fallback。Task 4 瀏覽器證據分開記 headed Chrome、CDP composition 與 Windows 真人 IME；完整取消／native process owner 屬 Task 5，自然模型與 Skill/E2E 屬後續 gate。
+
+Task4 review fix1：人工保存的明確未 admission 回覆使用實際 Pydantic `ManualSaveRejection`（生成至 Web），含原 request key；只有在同一 service lock 中確認該 identity 無 receipt 後才回覆。已有 receipt 的非法重放、receipt lookup unavailable 與一般 HTTP 409/422 不代表零寫入；原正常 receipt 優先規則保留。Pydantic body validation 失敗也走相同 receipt 查核，UUID 使用與有效 DTO 相同的 canonical identity。

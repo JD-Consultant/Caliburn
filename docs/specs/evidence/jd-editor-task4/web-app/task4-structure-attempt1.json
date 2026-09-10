@@ -1,0 +1,51 @@
+{
+  "browser": "153.0.8010.37",
+  "channel": "chrome",
+  "headed": true,
+  "cases": [],
+  "ok": false,
+  "failure": "Error: expect(locator).toBeEditable() failed\n\nLocator: getByRole('textbox', { name: '職務說明書正文' })\nExpected: editable\nTimeout: 5000ms\nError: element(s) not found\n\nCall log:\n  - Expect \"to.be.editable\" with timeout 5000ms\n  - waiting for getByRole('textbox', { name: '職務說明書正文' })\n",
+  "network": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/e71df3bb-c8b5-419a-b8f7-d0a5a8fb704e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/e71df3bb-c8b5-419a-b8f7-d0a5a8fb704e/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/e71df3bb-c8b5-419a-b8f7-d0a5a8fb704e/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/e71df3bb-c8b5-419a-b8f7-d0a5a8fb704e/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/e71df3bb-c8b5-419a-b8f7-d0a5a8fb704e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/e71df3bb-c8b5-419a-b8f7-d0a5a8fb704e/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/e71df3bb-c8b5-419a-b8f7-d0a5a8fb704e/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/e71df3bb-c8b5-419a-b8f7-d0a5a8fb704e/jd",
+      "body": null
+    }
+  ],
+  "errors": []
+}

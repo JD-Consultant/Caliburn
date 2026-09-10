@@ -1,4 +1,16 @@
-# JD editor — 隔離 Task 1
+# JD editor — 隔離核心與工作畫面
+
+## Task 4 工作畫面
+
+`web/` 現在提供本機 3001 的文件建立／清單／重開，以及同頁聊天與唯一可編 JD。8091 沿同一 AnalysisService、catalog、三個 JD factory tools 與 PostgreSQL 保存 ports；來源回查沿實際 ConversationReader，模型摘要不取代確切前後版本。詳細啟動、非權威 recovery cache、navigation guard 與限制見 [web/README.md](web/README.md)。
+
+Task 4 起使用專案隔離 Node 22.23.2 portable runtime；Next／eslint-config-next 16.3.3、宣告 React／React DOM 19.2.4、Vitest／mocker 4.1.11、browser tooling Playwright 1.61.0 均採 exact lock。Next App Router compiled React／RSC 另依實測記錄，不視為相同於 native 單測 runtime。安裝一律 `--ignore-scripts`，root production lock 不變。
+
+新 create-key／metadata conditional commands／run-by-request defs 仍在 active SSOT；API Pydantic export 經既有 codegen 產生 Web DTO，check-codegen 同時比對。native React profile 的元件 override 與正式 dist exports 供相同 editor／history／copy 實作共用。
+
+以下保留 Task 1 歷史範圍及當時 runtime 說明；DOM、保存與其他驗收以各切片實測報告為準，不改判歷史。
+
+## Task 1 原始範圍
 
 本工作區只提供 v2 JSON Schema 生成契約與官方 Plate 原生編輯核心；不加入 production monorepo，不讀 DB／Memory／API key，也不呼叫模型。正式 authority 仍由 root ADR／current register 管理。實作範圍依 `docs/plans/2026-09-10-jd-editor-core-implementation.md` Task 1。
 

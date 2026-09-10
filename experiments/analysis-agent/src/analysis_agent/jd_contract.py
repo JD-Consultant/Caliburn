@@ -76,10 +76,14 @@ def read_failure_to_wire(view):
         'message': 'Requested JD content could not be read.', 'command_index': None}, 'next_action': action})
 
 
+def manual_operation_id(scope, request_key):
+    return uuid5(NAMESPACE_URL, json.dumps([scope.document_id, request_key]))
+
+
 def manual_intent(scope, body):
     body = validate('JdManualSaveClientInput', body)
     base, = parse_ref(body['base_revision_ref'], 'revision', scope)
-    operation = uuid5(NAMESPACE_URL, json.dumps([scope.document_id, body['request_key']]))
+    operation = manual_operation_id(scope, body['request_key'])
     digest = request_digest(scope, base, body['value'], 'manual')
     request = {'document_ref': _ref('document', scope), 'submission_ref': operation_ref(scope, operation),
                'request_digest': digest, 'base_revision_ref': body['base_revision_ref'],

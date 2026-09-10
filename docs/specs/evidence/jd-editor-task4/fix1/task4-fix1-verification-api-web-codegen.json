@@ -1,0 +1,64 @@
+{
+  "node": "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node.EXE",
+  "PYTHONUTF8": "1",
+  "runs": [
+    {
+      "name": "api",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "-q",
+        "tests/test_jd_api.py",
+        "-k",
+        "manual_rejection or routes_manual"
+      ],
+      "exit_code": 0,
+      "seconds": 9.253696499989019
+    },
+    {
+      "name": "web-tests",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\web",
+      "command": [
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node.EXE",
+        "../node_modules/vitest/vitest.mjs",
+        "run",
+        "src/jd/useJdSession.test.tsx",
+        "src/documents/DocumentList.test.tsx"
+      ],
+      "exit_code": 0,
+      "seconds": 1.5242041000019526
+    },
+    {
+      "name": "codegen-check",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "check-codegen",
+        "-w",
+        "@caliburn/jd-editor-contract"
+      ],
+      "exit_code": 0,
+      "seconds": 6.692046099997242
+    },
+    {
+      "name": "types",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\web",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 2,
+      "seconds": 2.2717810999893118
+    }
+  ]
+}

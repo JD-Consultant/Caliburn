@@ -3,6 +3,20 @@
   "version": "0.0.1",
   "private": true,
   "type": "module",
+  "exports": {
+    "./react-profile": {
+      "types": "./dist/react-profile.d.ts",
+      "default": "./dist/react-profile.js"
+    },
+    "./copy": {
+      "types": "./dist/copy.d.ts",
+      "default": "./dist/copy.js"
+    },
+    "./schema": {
+      "types": "./dist/schema.d.ts",
+      "default": "./dist/schema.js"
+    }
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "vitest run"

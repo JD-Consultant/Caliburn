@@ -1,0 +1,39 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+________ test_pg_manual_rejection_is_explicit_only_after_receipt_check ________
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001CB1A022450>
+tmp_path = WindowsPath('C:/Users/chenb/AppData/Local/Temp/pytest-of-chenb/pytest-564/test_pg_manual_rejection_is_ex0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001CB19866A80>
+
+    def test_pg_manual_rejection_is_explicit_only_after_receipt_check(jd, tmp_path, monkeypatch):
+        from analysis_agent.api import create_app
+        @contextmanager
+        def resources():
+            with service_harness(tmp_path, engine=jd.catalog.engine) as (service, _, _):
+                service.jd = jd
+                yield service
+        with TestClient(create_app(resources), base_url='http://127.0.0.1:8091') as client:
+            document = jd.create_document('拒絕回覆')['id']
+            path = f'/documents/{document}/jd'
+            head = client.get(path).json()
+            body = {'request_key': str(uuid4()), 'base_revision_ref': head['revision_ref'], 'value': head['fragment']}
+            invalid = {**body, 'value': [{'type': 'unknown', 'id': 'bad', 'children': [{'text': '保留'}]}]}
+            rejected = client.post(path+'/manual-save', json=invalid)
+            assert rejected.status_code == 422
+>           assert rejected.json()['admission'] == 'not_admitted'
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'admission'
+
+tests\test_jd_api.py:146: KeyError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-781714c4-11a7-4594-80ff-8fa94fa2691a.jsonl
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_api.py::test_pg_manual_rejection_is_explicit_only_after_receipt_check
+1 failed, 5 deselected, 1 warning in 5.56s

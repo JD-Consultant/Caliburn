@@ -1,0 +1,29 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+ExpectError: expect(received).toBe(expected) // Object.is equality
+
+Expected: "複製保真內容"
+Received: "CONTROLLED SENTINEL MUST NOT PASTE"
+
+Call Log:
+- Timeout 5000ms exceeded while waiting on the predicate
+    at captureRawStack (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright-core\lib\coreBundle.js:3172:17)
+    at callMatcherAsStep (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright\lib\matchers\expect.js:12875:57)
+    at Object.toBe (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright\lib\matchers\expect.js:12865:23)
+    at S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web\browser\task4-fix1-clipboard.mjs:41:80 {
+  matcherResult: {
+    pass: false,
+    message: 'expect(received).toBe(expected) // Object.is equality\n' +
+      '\n' +
+      'Expected: "複製保真內容"\n' +
+      'Received: "CONTROLLED SENTINEL MUST NOT PASTE"\n' +
+      '\n' +
+      'Call Log:\n' +
+      '- Timeout 5000ms exceeded while waiting on the predicate',
+    name: 'toBe'
+  }
+}
+
+Node.js v22.23.2

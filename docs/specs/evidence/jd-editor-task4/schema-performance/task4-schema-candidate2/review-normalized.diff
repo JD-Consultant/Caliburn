@@ -1,0 +1,396 @@
+--- before.schema.json
++++ candidate.schema.json
+@@ -292,312 +292,336 @@
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "enum": [
+                   "ul",
+                   "ol"
+                 ]
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedListItem"
++                  "$ref": "#/$defs/JdSavedListItem/allOf/1"
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "const": "li"
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "minItems": 1,
+                 "prefixItems": [
+                   {
+-                    "$ref": "#/$defs/JdSavedListContent"
++                    "$ref": "#/$defs/JdSavedListContent/allOf/1"
+                   }
+                 ],
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedList"
++                  "$ref": "#/$defs/JdSavedList/allOf/1"
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "const": "table"
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedTableRow"
++                  "$ref": "#/$defs/JdSavedTableRow/allOf/1"
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "const": "tr"
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedTableCell"
++                  "$ref": "#/$defs/JdSavedTableCell/allOf/1"
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "enum": [
+                   "td",
+                   "th"
+                 ]
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedCellChild"
++                  "$ref": "#/$defs/JdSavedCellChild/allOf/1"
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "const": "blockquote"
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedBlockquoteChild"
++                  "$ref": "#/$defs/JdSavedBlockquoteChild/allOf/1"
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "const": "jd_task"
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "minItems": 3,
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedTaskChild"
++                  "oneOf": [
++                    {
++                      "$ref": "#/$defs/JdSavedBodyElement/allOf/1"
++                    },
++                    {
++                      "$ref": "#/$defs/JdSavedOutcomes/allOf/1"
++                    },
++                    {
++                      "$ref": "#/$defs/JdSavedRequirements/allOf/1"
++                    }
++                  ]
+                 },
+                 "allOf": [
+                   {
+                     "contains": {
+                       "type": "object",
+                       "required": [
+                         "type"
+                       ],
+                       "properties": {
+                         "type": {
+                           "const": "jd_outcomes"
+                         }
+                       }
+                     },
+                     "minContains": 1,
+                     "maxContains": 1
+                   },
+                   {
+                     "contains": {
+                       "type": "object",
+                       "required": [
+                         "type"
+                       ],
+                       "properties": {
+                         "type": {
+                           "const": "jd_requirements"
+                         }
+                       }
+                     },
+                     "minContains": 1,
+                     "maxContains": 1
+                   },
+                   {
+                     "contains": {
+-                      "$ref": "#/$defs/JdSavedBodyElement"
++                      "$ref": "#/$defs/JdSavedBodyElement/allOf/1"
+                     },
+                     "minContains": 1
+                   }
+                 ]
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "const": "jd_duty"
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedDutyChild"
++                  "$ref": "#/$defs/JdSavedDutyChild/allOf/1"
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "const": "jd_section"
+               }
+             }
+           },
+           "then": {
+             "required": [
+               "section_kind"
+             ],
+             "if": {
+               "properties": {
+                 "section_kind": {
+                   "const": "work"
+                 }
+               }
+             },
+             "then": {
+               "properties": {
+                 "children": {
+                   "type": "array",
+                   "items": {
+-                    "$ref": "#/$defs/JdSavedWorkSectionChild"
++                    "$ref": "#/$defs/JdSavedWorkSectionChild/allOf/1"
+                   }
+                 }
+               }
+             },
+             "else": {
+               "if": {
+                 "properties": {
+                   "section_kind": {
+                     "const": "knowledge"
+                   }
+                 },
+                 "required": [
+                   "section_kind"
+                 ]
+               },
+               "then": {
+                 "properties": {
+                   "children": {
+                     "type": "array",
+                     "items": {
+-                      "$ref": "#/$defs/JdSavedKnowledgeSectionChild"
++                      "oneOf": [
++                        {
++                          "$ref": "#/$defs/JdSavedBodyElement/allOf/1"
++                        },
++                        {
++                          "$ref": "#/$defs/JdSavedKnowledgeItem/allOf/1"
++                        }
++                      ]
+                     }
+                   }
+                 }
+               },
+               "else": {
+                 "if": {
+                   "properties": {
+                     "section_kind": {
+                       "const": "skills"
+                     }
+                   },
+                   "required": [
+                     "section_kind"
+                   ]
+                 },
+                 "then": {
+                   "properties": {
+                     "children": {
+                       "type": "array",
+                       "items": {
+-                        "$ref": "#/$defs/JdSavedSkillsSectionChild"
++                        "oneOf": [
++                          {
++                            "$ref": "#/$defs/JdSavedBodyElement/allOf/1"
++                          },
++                          {
++                            "$ref": "#/$defs/JdSavedSkillItem/allOf/1"
++                          }
++                        ]
+                       }
+                     }
+                   }
+                 },
+                 "else": {
+                   "properties": {
+                     "children": {
+                       "type": "array",
+                       "items": {
+-                        "$ref": "#/$defs/JdSavedBodyElement"
++                        "$ref": "#/$defs/JdSavedBodyElement/allOf/1"
+                       }
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "properties": {
+               "type": {
+                 "not": {
+                   "const": "jd_section"
+                 }
+               }
+             }
+           },
+           "then": {
+@@ -720,41 +744,41 @@
+             "required": [
+               "type"
+             ],
+             "properties": {
+               "type": {
+                 "enum": [
+                   "jd_outcomes",
+                   "jd_requirements",
+                   "jd_knowledge",
+                   "jd_skill"
+                 ]
+               }
+             }
+           },
+           "then": {
+             "properties": {
+               "children": {
+                 "type": "array",
+                 "minItems": 1,
+                 "items": {
+-                  "$ref": "#/$defs/JdSavedBodyElement"
++                  "$ref": "#/$defs/JdSavedBodyElement/allOf/1"
+                 }
+               }
+             }
+           }
+         },
+         {
+           "if": {
+             "type": "object",
+             "required": [
+               "type"
+             ],
+             "properties": {
+               "type": {
+                 "not": {
+                   "const": "jd_task"
+                 }
+               }
+             }
+           },
+           "then": {

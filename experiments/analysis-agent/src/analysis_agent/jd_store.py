@@ -169,15 +169,21 @@ class JdStore:
             self._scope(conn, deadline, scope)
             return self._receipt(conn, deadline, scope, operation_id, digest)
 
-    def create_document(self, catalog, title, value):
+    def create_document(self, catalog, title, value, *, request_key=None):
         if catalog.engine is not self.engine:
             raise ValueError('Catalog engine mismatch')
         with self._connection() as (conn, deadline), conn.begin():
             # Configure the remaining statement budget before the one catalog
             # INSERT; subsequent JD writes each lower it again.
             self._execute(conn, deadline, text('SELECT 1'))
+            if request_key is not None:
+                # Serialize only this create identity; transaction releases it.
+                self._execute(conn, deadline, text('SELECT pg_advisory_xact_lock(hashtextextended(:key, 0))'), {'key': request_key})
             with Session(bind=conn) as session:
-                document = catalog.create_document(title, session=session)
+                existing = catalog.created_by_request(request_key, title, session=session)
+                if existing:
+                    return existing
+                document = catalog.create_document(title, session=session, request_key=request_key)
             scope, initial = JdScope(document['id']), uuid4()
             self._execute(conn, deadline, revision.insert().values(document_id=scope.document_id, revision_id=initial,
                 parent_revision_id=None, origin='initial', format_version=2, engine_profile='jd-plate-clean-v2', value=value))

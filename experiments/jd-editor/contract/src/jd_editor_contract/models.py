@@ -7,7 +7,16 @@ from enum import Enum, StrEnum
 from typing import Any, Literal, Optional, Union
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field, RootModel, confloat, conint, constr
+from pydantic import (
+    AwareDatetime,
+    BaseModel,
+    ConfigDict,
+    Field,
+    RootModel,
+    confloat,
+    conint,
+    constr,
+)
 
 
 class JdEditorV2ContractCandidate(BaseModel):
@@ -1295,6 +1304,95 @@ class JdResolvedUnsettableProperty(StrEnum):
 
 class JdResolvedPropertyUpdateConstraint(BaseModel):
     pass
+
+
+class JdDocumentCreateInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    title: constr(min_length=1, max_length=200)
+    request_key: UUID
+
+
+class JdDocumentMetadata(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    id: str
+    title: constr(min_length=1, max_length=200)
+    created_at: AwareDatetime
+    archived: bool
+    metadata_version: conint(ge=1, strict=True)
+
+
+class JdDocumentRename(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    command: Literal['rename']
+    title: constr(min_length=1, max_length=200)
+    expected_metadata_version: conint(ge=1, strict=True)
+
+
+class JdDocumentSetArchived(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    command: Literal['set_archived']
+    archived: bool
+    expected_metadata_version: conint(ge=1, strict=True)
+
+
+class JdDocumentMetadataCommand(
+    RootModel[Union[JdDocumentRename, JdDocumentSetArchived]]
+):
+    root: Union[JdDocumentRename, JdDocumentSetArchived]
+
+
+class JdRunLookupMissing(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    found: Literal[False]
+
+
+class JdRunLookupReceived(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    found: Literal[True]
+    input_received: bool
+
+
+class JdSourceSegment(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    message_id: str
+    role: str
+    text: str
+    text_offset: conint(ge=0, strict=True)
+
+
+class JdSourceTurn(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    input_id: str
+    status: str
+    answer_succeeded: bool
+
+
+class JdSourceReadResult(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    reference: str
+    projection: str
+    segments: list[JdSourceSegment]
+    turns: list[JdSourceTurn]
+    omitted_content_types: list[str]
+    next_offset: Optional[conint(ge=0, strict=True)]
 
 
 class JdSavedElement(BaseModel):

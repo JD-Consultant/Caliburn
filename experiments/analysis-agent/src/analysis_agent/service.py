@@ -178,11 +178,30 @@ class AnalysisService:
                     self._reconcile(row, startup=True)
             self.accepting = True
 
-    def create_document(self, title):
+    def create_document(self, title, *, request_key=None):
         if not title.strip() or len(title) > 200:
             raise ValueError('Title must contain 1–200 characters')
         with self.lock:
-            return self.jd.create_document(title) if self.jd is not None else self.catalog.create_document(title)
+            options = {'request_key': request_key} if request_key is not None else {}
+            return self.jd.create_document(title, **options) if self.jd is not None else self.catalog.create_document(title, **options)
+
+    def update_document(self, document, command):
+        with self.lock:
+            self.catalog.document(document)
+            if self._running(document) or any(r['status'] in {'receiving','running','stopping','uncertain','interrupted'} for r in self.catalog.runs(document)):
+                raise ServiceConflict('Close the foreground run before updating metadata')
+            return self.catalog.update_document(document, command)
+
+    def run_by_request(self, document, request_key):
+        with self.lock:
+            self.catalog.document(document)
+            row = next((r for r in self.catalog.runs(document) if r['request_key'] == request_key), None)
+            if row is None:
+                return {'found': False}
+            context = self._context(document)
+            saved = context.graph.get_state(context.config)
+            received = any(isinstance(m, HumanMessage) and m.id == row['id'] for m in saved.values.get('messages', []))
+            return {'found': True, 'run': self.get_run(document, row['id']), 'input_received': received}
 
     def list_documents(self):
         with self.lock:
@@ -237,8 +256,8 @@ class AnalysisService:
         from analysis_agent.jd_types import JdScope
         if jd_selection is not None:
             jd_selection=validate('JdSelectionCaptureClientInput',jd_selection)
-        digest = hashlib.sha256((text if jd_selection is None else json.dumps(
-            {'text':text,'jd_selection':jd_selection},sort_keys=True,ensure_ascii=False)).encode()).hexdigest()
+        digest = hashlib.sha256(json.dumps({'text':text,'jd_selection':jd_selection,
+            'abandon_pending':abandon_pending},sort_keys=True,ensure_ascii=False,separators=(',', ':')).encode()).hexdigest()
         with self.lock:
             if not self.accepting:
                 raise ServiceConflict('Service is stopping')
@@ -253,6 +272,8 @@ class AnalysisService:
                 if any(m.id == existing['id'] for m in saved.values.get('messages', [])):
                     return self.get_run(document, existing['id'])
                 self.catalog.update_run(existing['id'], status='not_received', error_code=None)
+            if self.catalog.document(document)['archived']:
+                raise ServiceConflict('Document is archived')
             if self._running(document):
                 raise ServiceConflict('This document is still running')
             snapshot = context.graph.get_state(context.config)

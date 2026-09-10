@@ -1,0 +1,455 @@
+{
+  "browser": "153.0.8010.37",
+  "channel": "chrome",
+  "headed": true,
+  "cases": [
+    "create lost reply -> reload -> same key same document",
+    "manual server commit/lost reply -> reload exact candidate receipt",
+    "confirmed stale candidate survives two reopenings without overwriting current",
+    "run lost reply -> read-only by-request reconciliation, no POST/resume"
+  ],
+  "document": "3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+  "committed": {
+    "status": "committed",
+    "operation_ref": "WyJvcGVyYXRpb24iLCIzZjhlMWVhNi02NmUwLTQ3NWQtOWQ2Ni1iMGQ5YmRkMmJhZjEiLCI2OTc3ODRjYy1kNDAzLTU3MjQtYmNmMi05ZWFiOGVjMjRhNWIiXQ",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsIjRiODE2YzAxLWU5ZTUtNDczNC1hZDBiLWUzNGFiOTM1MGQ2YSJd",
+    "result_revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImE1YzM1MDIyLTQxMWEtNGM0Yy04OWI4LTJiZjA3NTM0YmM5MiJd",
+    "change_ref": "WyJjaGFuZ2UiLCIzZjhlMWVhNi02NmUwLTQ3NWQtOWQ2Ni1iMGQ5YmRkMmJhZjEiLCI2OTc3ODRjYy1kNDAzLTU3MjQtYmNmMi05ZWFiOGVjMjRhNWIiLCI0YjgxNmMwMS1lOWU1LTQ3MzQtYWQwYi1lMzRhYjkzNTBkNmEiLCJhNWMzNTAyMi00MTFhLTRjNGMtODliOC0yYmYwNzUzNGJjOTIiXQ",
+    "document_effect": "committed",
+    "receipt_durability": "confirmed",
+    "actual_changes": {
+      "origin": "manual",
+      "before_revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsIjRiODE2YzAxLWU5ZTUtNDczNC1hZDBiLWUzNGFiOTM1MGQ2YSJd",
+      "after_revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImE1YzM1MDIyLTQxMWEtNGM0Yy04OWI4LTJiZjA3NTM0YmM5MiJd",
+      "native_operations": null,
+      "affected_element_ids": []
+    },
+    "error": null,
+    "next_action": "continue"
+  },
+  "manualPayload": {
+    "document_id": "3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+    "request_key": "996089a9-ed27-4c89-9d22-736c6b56a8ef",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsIjRiODE2YzAxLWU5ZTUtNDczNC1hZDBiLWUzNGFiOTM1MGQ2YSJd",
+    "value": [
+      {
+        "type": "p",
+        "id": "bf593eaf-e505-4d0c-ba63-593bf0b4e6b7",
+        "children": [
+          {
+            "text": "保留原提交"
+          }
+        ]
+      }
+    ]
+  },
+  "stale": {
+    "receipt": {
+      "status": "stale_base",
+      "operation_ref": "WyJvcGVyYXRpb24iLCIzZjhlMWVhNi02NmUwLTQ3NWQtOWQ2Ni1iMGQ5YmRkMmJhZjEiLCJmNzI5ZDcxYS00NTIyLTVkNWItODM4NC01Y2Y5ZDkyNmRiMzkiXQ",
+      "base_revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImE1YzM1MDIyLTQxMWEtNGM0Yy04OWI4LTJiZjA3NTM0YmM5MiJd",
+      "result_revision_ref": null,
+      "change_ref": null,
+      "document_effect": "unchanged",
+      "receipt_durability": "confirmed",
+      "actual_changes": null,
+      "error": {
+        "code": "stale_base",
+        "message": "JD operation did not complete.",
+        "command_index": null
+      },
+      "next_action": "reread_current"
+    },
+    "payload": {
+      "document_id": "3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "request_key": "7dff50ca-75a3-45a9-91eb-ec1e267f7352",
+      "base_revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImE1YzM1MDIyLTQxMWEtNGM0Yy04OWI4LTJiZjA3NTM0YmM5MiJd",
+      "value": [
+        {
+          "type": "p",
+          "id": "bf593eaf-e505-4d0c-ba63-593bf0b4e6b7",
+          "children": [
+            {
+              "text": "保留原提交本頁候選"
+            }
+          ]
+        }
+      ]
+    },
+    "head": {
+      "status": "ok",
+      "read_kind": "current",
+      "revision_ref": "WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImIxMTk2ZTUwLTU0NjUtNDU1MC1iNDk2LTFhZGYwMDc5MjIzNiJd",
+      "access": "read_only",
+      "fragment": [
+        {
+          "type": "p",
+          "id": "bf593eaf-e505-4d0c-ba63-593bf0b4e6b7",
+          "children": [
+            {
+              "text": "另一頁已保存版本"
+            }
+          ]
+        }
+      ],
+      "targets": [
+        {
+          "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImIxMTk2ZTUwLTU0NjUtNDU1MC1iNDk2LTFhZGYwMDc5MjIzNiIsInRhcmdldCI6ImJmNTkzZWFmLWU1MDUtNGQwYy1iYTYzLTU5M2JmMGI0ZTZiNyJ9",
+          "element": {
+            "type": "p",
+            "id": "bf593eaf-e505-4d0c-ba63-593bf0b4e6b7",
+            "children": [
+              {
+                "text": "另一頁已保存版本"
+              }
+            ]
+          },
+          "access": "read_only"
+        }
+      ],
+      "selection": null,
+      "source_refs": [],
+      "change_refs": [
+        "WyJjaGFuZ2UiLCIzZjhlMWVhNi02NmUwLTQ3NWQtOWQ2Ni1iMGQ5YmRkMmJhZjEiLCIyZDY2ZWNiYy1hNTk3LTU0MjQtOTMzMy0zZDgzNWI1YWMyYzkiLCJhNWMzNTAyMi00MTFhLTRjNGMtODliOC0yYmYwNzUzNGJjOTIiLCJiMTE5NmU1MC01NDY1LTQ1NTAtYjQ5Ni0xYWRmMDA3OTIyMzYiXQ"
+      ],
+      "continuation_ref": null
+    }
+  },
+  "messages": [
+    {
+      "id": "ef6ad5f1-d4c2-4ef2-8399-43162f5086ce",
+      "role": "user",
+      "text": "這是逐字保存的純聊天"
+    },
+    {
+      "id": "resp_2c5c0891-4165-4ba6-8347-3bec73bb8b71",
+      "role": "assistant",
+      "text": "已收到你的說明。這是固定離線驗收回覆。"
+    }
+  ],
+  "ax": "- main:\n  - link \"← 我的職務說明書\":\n    - /url: /\n  - heading \"回覆遺失驗收 1789008780757\" [level=1]\n  - status: 已保存\n  - region \"顧問訪談\":\n    - heading \"顧問訪談\" [level=2]\n    - paragraph: 先談你的實際工作，資料足夠時顧問會開始整理。你可以隨時補充或更正。\n    - article:\n      - text: 你\n      - paragraph: 這是逐字保存的純聊天\n    - article:\n      - text: 顧問\n      - paragraph: 已收到你的說明。這是固定離線驗收回覆。\n    - text: 補充或更正你的工作\n    - textbox \"補充或更正你的工作\":\n      - /placeholder: 例如：這項工作只在客戶提出需求時執行…\n    - paragraph: 選取正文後送出，可請顧問處理該段；未保存修改會先保存。\n    - button \"送出\" [disabled]\n  - region \"目前職務說明書\":\n    - heading \"職務說明書\" [level=2]\n    - button \"保存\" [disabled]\n    - button \"這次改動\"\n    - button \"讀取上一筆歷史\"\n    - button \"粗體\"\n    - button \"斜體\"\n    - button \"底線\"\n    - button \"刪除線\"\n    - button \"復原\"\n    - button \"重做\"\n    - button \"表格增列\"\n    - button \"表格刪列\"\n    - button \"複製區塊\"\n    - textbox \"職務說明書正文\":\n      - paragraph: 另一頁已保存版本",
+  "ok": true,
+  "network": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents",
+      "body": "{\"title\":\"回覆遺失驗收 1789008780757\",\"request_key\":\"c8fde578-f1bf-425d-9c7a-d99d1cecbfc4\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents",
+      "body": "{\"title\":\"回覆遺失驗收 1789008780757\",\"request_key\":\"c8fde578-f1bf-425d-9c7a-d99d1cecbfc4\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd/manual-save",
+      "body": "{\"request_key\":\"996089a9-ed27-4c89-9d22-736c6b56a8ef\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsIjRiODE2YzAxLWU5ZTUtNDczNC1hZDBiLWUzNGFiOTM1MGQ2YSJd\",\"value\":[{\"type\":\"p\",\"id\":\"bf593eaf-e505-4d0c-ba63-593bf0b4e6b7\",\"children\":[{\"text\":\"保留原提交\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd/manual-save",
+      "body": "{\"request_key\":\"996089a9-ed27-4c89-9d22-736c6b56a8ef\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsIjRiODE2YzAxLWU5ZTUtNDczNC1hZDBiLWUzNGFiOTM1MGQ2YSJd\",\"value\":[{\"type\":\"p\",\"id\":\"bf593eaf-e505-4d0c-ba63-593bf0b4e6b7\",\"children\":[{\"text\":\"保留原提交\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd/changes/read",
+      "body": "{\"change_ref\":\"WyJjaGFuZ2UiLCIzZjhlMWVhNi02NmUwLTQ3NWQtOWQ2Ni1iMGQ5YmRkMmJhZjEiLCI2OTc3ODRjYy1kNDAzLTU3MjQtYmNmMi05ZWFiOGVjMjRhNWIiLCI0YjgxNmMwMS1lOWU1LTQ3MzQtYWQwYi1lMzRhYjkzNTBkNmEiLCJhNWMzNTAyMi00MTFhLTRjNGMtODliOC0yYmYwNzUzNGJjOTIiXQ\"}"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd/manual-save",
+      "body": "{\"request_key\":\"7dff50ca-75a3-45a9-91eb-ec1e267f7352\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImE1YzM1MDIyLTQxMWEtNGM0Yy04OWI4LTJiZjA3NTM0YmM5MiJd\",\"value\":[{\"type\":\"p\",\"id\":\"bf593eaf-e505-4d0c-ba63-593bf0b4e6b7\",\"children\":[{\"text\":\"保留原提交本頁候選\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd/manual-save",
+      "body": "{\"request_key\":\"7dff50ca-75a3-45a9-91eb-ec1e267f7352\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImE1YzM1MDIyLTQxMWEtNGM0Yy04OWI4LTJiZjA3NTM0YmM5MiJd\",\"value\":[{\"type\":\"p\",\"id\":\"bf593eaf-e505-4d0c-ba63-593bf0b4e6b7\",\"children\":[{\"text\":\"保留原提交本頁候選\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd/manual-save",
+      "body": "{\"request_key\":\"7dff50ca-75a3-45a9-91eb-ec1e267f7352\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjNmOGUxZWE2LTY2ZTAtNDc1ZC05ZDY2LWIwZDliZGQyYmFmMSIsImE1YzM1MDIyLTQxMWEtNGM0Yy04OWI4LTJiZjA3NTM0YmM5MiJd\",\"value\":[{\"type\":\"p\",\"id\":\"bf593eaf-e505-4d0c-ba63-593bf0b4e6b7\",\"children\":[{\"text\":\"保留原提交本頁候選\"}]}]}"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": "{\"request_key\":\"1e56dffb-9479-4374-8808-35467c1328e2\",\"text\":\"這是逐字保存的純聊天\",\"abandon_pending\":false}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs/by-request?request_key=1e56dffb-9479-4374-8808-35467c1328e2",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs/by-request?request_key=1e56dffb-9479-4374-8808-35467c1328e2",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/3f8e1ea6-66e0-475d-9d66-b0d9bdd2baf1/jd",
+      "body": null
+    }
+  ],
+  "errors": []
+}

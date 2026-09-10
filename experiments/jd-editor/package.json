@@ -4,7 +4,8 @@
   "type": "module",
   "workspaces": [
     "contract",
-    "native"
+    "native",
+    "web"
   ],
   "overrides": {
     "@platejs/core": "53.3.11",

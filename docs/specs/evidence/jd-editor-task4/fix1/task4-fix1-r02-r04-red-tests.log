@@ -1,0 +1,319 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/useJdSession.test.tsx (9 tests | 1 failed) 12ms
+   × unrelated current save cannot consume a reopened confirmed failure candidate 3ms
+ ❯ src/documents/DocumentList.test.tsx (4 tests | 3 failed) 2175ms
+   × reads existing create recovery independently of slow list GET 1026ms
+   × reads existing create recovery independently of failed list GET 1010ms
+   × unreadable create cache blocks handler even when list GET succeeds 112ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/documents/DocumentList.test.tsx > reads existing create recovery independently of slow list GET
+TestingLibraryElementError: Unable to find an element with the text: 確認上次建立結果：原建立. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      class="catalog"
+    >
+      <header>
+        <p
+          class="eyebrow"
+        >
+          CALIBURN · 職務分析
+        </p>
+        <h1>
+          我的職務說明書
+        </h1>
+        <p>
+          從實際工作出發，與顧問一起整理你的職務內容。
+        </p>
+      </header>
+      <form
+        class="create-document"
+      >
+        <label
+          for="document-title"
+        >
+          文件名稱
+        </label>
+        <input
+          id="document-title"
+          maxlength="200"
+          value="未命名職務說明書"
+        />
+        <button
+          class="primary"
+        >
+          建立文件
+        </button>
+      </form>
+      <div
+        class="list-heading"
+      >
+        <h2>
+          工作中的文件
+        </h2>
+        <button>
+          查看已封存
+        </button>
+      </div>
+      <p>
+        讀取中…
+      </p>
+    </main>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <main
+        class="catalog"
+      >
+        <header>
+          <p
+            class="eyebrow"
+          >
+            CALIBURN · 職務分析
+          </p>
+          <h1>
+            我的職務說明書
+          </h1>
+          <p>
+            從實際工作出發，與顧問一起整理你的職務內容。
+          </p>
+        </header>
+        <form
+          class="create-document"
+        >
+          <label
+            for="document-title"
+          >
+            文件名稱
+          </label>
+          <input
+            id="document-title"
+            maxlength="200"
+            value="未命名職務說明書"
+          />
+          <button
+            class="primary"
+          >
+            建立文件
+          </button>
+        </form>
+        <div
+          class="list-heading"
+        >
+          <h2>
+            工作中的文件
+          </h2>
+          <button>
+            查看已封存
+          </button>
+        </div>
+        <p>
+          讀取中…
+        </p>
+      </main>
+    </div>
+  </body>
+</html>
+ ❯ waitForWrapper ../../../../../node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ src/documents/DocumentList.test.tsx:13:9
+     11|   const create = vi.spyOn(api, "create").mockRejectedValue(Error("lost…
+     12|   render(<DocumentList />);
+     13|   await waitFor(() => expect(screen.getByText("確認上次建立結果：原建立")).toBeTru…
+       |         ^
+     14|   expect((screen.getByRole("button", { name: "建立文件", exact: true }) as…
+     15|   fireEvent.submit(screen.getByLabelText("文件名稱").closest("form")!);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/documents/DocumentList.test.tsx > reads existing create recovery independently of failed list GET
+TestingLibraryElementError: Unable to find an element with the text: 確認上次建立結果：原建立. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <main
+      class="catalog"
+    >
+      <header>
+        <p
+          class="eyebrow"
+        >
+          CALIBURN · 職務分析
+        </p>
+        <h1>
+          我的職務說明書
+        </h1>
+        <p>
+          從實際工作出發，與顧問一起整理你的職務內容。
+        </p>
+      </header>
+      <form
+        class="create-document"
+      >
+        <label
+          for="document-title"
+        >
+          文件名稱
+        </label>
+        <input
+          id="document-title"
+          maxlength="200"
+          value="未命名職務說明書"
+        />
+        <button
+          class="primary"
+        >
+          建立文件
+        </button>
+      </form>
+      <div
+        class="list-heading"
+      >
+        <h2>
+          工作中的文件
+        </h2>
+        <button>
+          查看已封存
+        </button>
+      </div>
+      <p
+        role="alert"
+      >
+        暫時無法讀取，請重試。Error: offline
+        <button>
+          重試
+        </button>
+      </p>
+    </main>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<html>
+  <head />
+  <body>
+    <div>
+      <main
+        class="catalog"
+      >
+        <header>
+          <p
+            class="eyebrow"
+          >
+            CALIBURN · 職務分析
+          </p>
+          <h1>
+            我的職務說明書
+          </h1>
+          <p>
+            從實際工作出發，與顧問一起整理你的職務內容。
+          </p>
+        </header>
+        <form
+          class="create-document"
+        >
+          <label
+            for="document-title"
+          >
+            文件名稱
+          </label>
+          <input
+            id="document-title"
+            maxlength="200"
+            value="未命名職務說明書"
+          />
+          <button
+            class="primary"
+          >
+            建立文件
+          </button>
+        </form>
+        <div
+          class="list-heading"
+        >
+          <h2>
+            工作中的文件
+          </h2>
+          <button>
+            查看已封存
+          </button>
+        </div>
+        <p
+          role="alert"
+        >
+          暫時無法讀取，請重試。Error: offline
+          <button>
+            重試
+          </button>
+        </p>
+      </main>
+    </div>
+  </body>
+</html>
+ ❯ waitForWrapper ../../../../../node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ src/documents/DocumentList.test.tsx:13:9
+     11|   const create = vi.spyOn(api, "create").mockRejectedValue(Error("lost…
+     12|   render(<DocumentList />);
+     13|   await waitFor(() => expect(screen.getByText("確認上次建立結果：原建立")).toBeTru…
+       |         ^
+     14|   expect((screen.getByRole("button", { name: "建立文件", exact: true }) as…
+     15|   fireEvent.submit(screen.getByLabelText("文件名稱").closest("form")!);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/documents/DocumentList.test.tsx > unreadable create cache blocks handler even when list GET succeeds
+AssertionError: expected "create" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st create call:
+
+    Array [
+      Object {
+        "request_key": "1243fa87-0ff5-4e6c-8224-a2aa86317787",
+        "title": "未命名職務說明書",
+      },
+    ]
+
+
+Number of calls: 1
+
+ ❯ src/documents/DocumentList.test.tsx:28:22
+     26|   await waitFor(() => expect(screen.getByRole("alert")).toBeTruthy());
+     27|   fireEvent.submit(screen.getByLabelText("文件名稱").closest("form")!);
+     28|   expect(create).not.toHaveBeenCalled();
+       |                      ^
+     29| });
+     30| it("does not present an API failure as an empty catalog", async () => {
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > unrelated current save cannot consume a reopened confirmed failure candidate
+AssertionError: expected "vi.fn()" to be called 1 times, but got 2 times
+ ❯ src/jd/useJdSession.test.tsx:164:21
+    162|   session.edit([{ ...value[0], children: [{ text: "unrelated current e…
+    163|   expect(await session.save()).toBe(false);
+    164|   expect(port.save).toHaveBeenCalledTimes(1);
+       |                     ^
+    165|   expect(submissionCache(disk).read("A")).toEqual(old);
+    166|   const reopened = new JdSession("A", port, disk);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  2 failed (2)
+      Tests  4 failed | 9 passed (13)
+   Start at  11:46:10
+   Duration  3.10s (transform 105ms, setup 0ms, import 331ms, tests 2.19s, environment 1.15s)
+

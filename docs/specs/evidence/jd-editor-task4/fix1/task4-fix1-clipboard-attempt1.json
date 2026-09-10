@@ -1,0 +1,212 @@
+{
+  "browser": "153.0.8010.37",
+  "channel": "chrome",
+  "headed": true,
+  "OS_IME": "NOT RUN",
+  "network": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/workspace/1fee73ac-ff80-46a4-bd10-4b733bf0df3f",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_src_app_globals_1jfs_-n.css",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_020za4m._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_next-devtools_index_0i-tx06.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_1r4gg59._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-server-dom-turbopack_1qs8bsa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_0eh-wsn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_client_1iy_1f_._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_07c1pr1._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40swc_helpers_cjs_01osh66._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_1anvha4._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/turbopack-experiments_jd-editor_web_10f7rtc._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_011_sho._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_1boebgf._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_server_browser_1dgj2n-.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_0ufbzhn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate_dist_index_es_04tuc_l.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_lodash_0nqrjx6._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_slate_dist_index_154h2_h.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_core_dist_0i5if2i._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate-react_dist_index_es_0fjcxe4.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_table_dist_0owi9th._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_list-classic_dist_0phwazw._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_ajv_dist_1wahgfa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_0ukaxp8._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/1fee73ac-ff80-46a4-bd10-4b733bf0df3f",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/1fee73ac-ff80-46a4-bd10-4b733bf0df3f/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/1fee73ac-ff80-46a4-bd10-4b733bf0df3f/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/1fee73ac-ff80-46a4-bd10-4b733bf0df3f/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/1fee73ac-ff80-46a4-bd10-4b733bf0df3f",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/1fee73ac-ff80-46a4-bd10-4b733bf0df3f/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/1fee73ac-ff80-46a4-bd10-4b733bf0df3f/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/1fee73ac-ff80-46a4-bd10-4b733bf0df3f/jd",
+      "body": null
+    }
+  ],
+  "errors": [],
+  "document": "1fee73ac-ff80-46a4-bd10-4b733bf0df3f",
+  "original": [
+    {
+      "type": "p",
+      "id": "7a8cec38-21c1-4bb4-8655-9067c500e0db",
+      "children": [
+        {
+          "text": "複製",
+          "bold": true
+        },
+        {
+          "text": "保真內容"
+        }
+      ]
+    }
+  ],
+  "selection": {
+    "text": "複製保真內容",
+    "anchor": 0,
+    "focus": 4
+  },
+  "failure": "Error: expect(received).toBe(expected) // Object.is equality\n\nExpected: \"複製保真內容\"\nReceived: \"CONTROLLED SENTINEL MUST NOT PASTE\"\n\nCall Log:\n- Timeout 5000ms exceeded while waiting on the predicate",
+  "ok": false,
+  "events": [
+    {
+      "type": "copy",
+      "selected": "複製保真內容",
+      "types": [],
+      "text": "",
+      "html": "",
+      "fragment": ""
+    }
+  ]
+}

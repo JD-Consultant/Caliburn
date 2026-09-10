@@ -1,0 +1,7 @@
+{
+  "SignatureExitCode": 0,
+  "ArchiveSHA256": "1177b4137ba5adaa56354ae40f1080c7450e8ae09cecb47da459d1c52ac99f97",
+  "ExpectedSignedSHA256": "1177b4137ba5adaa56354ae40f1080c7450e8ae09cecb47da459d1c52ac99f97",
+  "ArchiveDigestMatches": true,
+  "UnsignedAndVerifiedSumsBytesMatch": true
+}

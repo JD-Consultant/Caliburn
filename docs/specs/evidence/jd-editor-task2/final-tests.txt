@@ -1,0 +1,35 @@
+.......{"r2_bytes": 18460, "batch_commands": 100, "operations": 200, "request_bytes": 27853, "output_bytes": 18296, "validate_elapsed_seconds": 8.34299999999348, "transform_elapsed_seconds": 8.875, "elapsed_seconds": 17.21799999999348}
+....PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+{"status": "committed", "operation_ref": "WyJvcGVyYXRpb24iLCJiOWRhZjllYy1lMTEyLTQzYjQtYmM1NS04NGUzZTQ2N2UyMDUiLCIyODgyODU0ZC02MzI4LTVjMWMtYjVhNS0xOWZmN2ZlYzdlZjEiXQ", "base_revision_ref": "WyJyZXZpc2lvbiIsImI5ZGFmOWVjLWUxMTItNDNiNC1iYzU1LTg0ZTNlNDY3ZTIwNSIsIjk1OWE0MmMyLTRlNzUtNDAxZS04MGRjLTBhODQwNDY4MTY5YSJd", "result_revision_ref": "WyJyZXZpc2lvbiIsImI5ZGFmOWVjLWUxMTItNDNiNC1iYzU1LTg0ZTNlNDY3ZTIwNSIsImQzZTQ2NGZlLTZiOGMtNGYxOS05Nzc4LTM3N2E3ZGZmZDA1ZSJd", "change_ref": "WyJjaGFuZ2UiLCJiOWRhZjllYy1lMTEyLTQzYjQtYmM1NS04NGUzZTQ2N2UyMDUiLCIyODgyODU0ZC02MzI4LTVjMWMtYjVhNS0xOWZmN2ZlYzdlZjEiLCI5NTlhNDJjMi00ZTc1LTQwMWUtODBkYy0wYTg0MDQ2ODE2OWEiLCJkM2U0NjRmZS02YjhjLTRmMTktOTc3OC0zNzdhN2RmZmQwNWUiXQ", "document_effect": "committed", "receipt_durability": "confirmed", "actual_changes": {"origin": "manual", "before_revision_ref": "WyJyZXZpc2lvbiIsImI5ZGFmOWVjLWUxMTItNDNiNC1iYzU1LTg0ZTNlNDY3ZTIwNSIsIjk1OWE0MmMyLTRlNzUtNDAxZS04MGRjLTBhODQwNDY4MTY5YSJd", "after_revision_ref": "WyJyZXZpc2lvbiIsImI5ZGFmOWVjLWUxMTItNDNiNC1iYzU1LTg0ZTNlNDY3ZTIwNSIsImQzZTQ2NGZlLTZiOGMtNGYxOS05Nzc4LTM3N2E3ZGZmZDA1ZSJd", "native_operations": null, "affected_element_ids": []}, "error": null, "next_action": "continue"}
+
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+.PG exact snapshot: task-2-pg-8795fb0f-c26b-4cc3-9748-877fcaa47eb5.jsonl
+................................................................................................
+============================== warnings summary ===============================
+tests/test_api.py::test_api_lifespan_idempotency_and_private_state_projection
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+130 passed, 1 warning in 79.69s (0:01:19)

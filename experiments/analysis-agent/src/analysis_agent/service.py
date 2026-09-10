@@ -106,8 +106,9 @@ def resumable_repair(state):
 
 class AnalysisService:
     def __init__(self, *, catalog, saver, model, instructions, store=None,
-                 max_workers=2, max_model_steps=16, max_tool_calls=15):
+                 max_workers=2, max_model_steps=16, max_tool_calls=15, jd=None):
         self.catalog, self.saver, self.store = catalog, saver, store
+        self.jd = jd
         self.model, self.instructions = model, instructions
         self.max_model_steps, self.max_tool_calls = max_model_steps, max_tool_calls
         self.lock = RLock()
@@ -177,7 +178,7 @@ class AnalysisService:
         if not title.strip() or len(title) > 200:
             raise ValueError('Title must contain 1–200 characters')
         with self.lock:
-            return self.catalog.create_document(title)
+            return self.jd.create_document(title) if self.jd is not None else self.catalog.create_document(title)
 
     def list_documents(self):
         with self.lock:

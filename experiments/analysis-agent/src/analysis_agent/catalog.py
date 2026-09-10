@@ -48,12 +48,14 @@ class Catalog:
     def setup(self):
         Base.metadata.create_all(self.engine)
 
-    def create_document(self, title):
-        with self.sessions.begin() as session:
-            row = DocumentRow(id=str(uuid4()), title=title, created_at=datetime.now(timezone.utc))
-            session.add(row)
-            session.flush()
-            return values(row)
+    def create_document(self, title, *, session=None):
+        if session is None:
+            with self.sessions.begin() as owned_session:
+                return self.create_document(title, session=owned_session)
+        row = DocumentRow(id=str(uuid4()), title=title, created_at=datetime.now(timezone.utc))
+        session.add(row)
+        session.flush()
+        return values(row)
 
     def documents(self):
         with self.sessions() as session:

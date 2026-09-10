@@ -91,6 +91,9 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
     from openai import OpenAI
     from analysis_agent.budget import ResponsesBudget, validate_context_budget
     from analysis_agent.catalog import Catalog
+    from analysis_agent.jd_store import JdStore
+    from analysis_agent.jd_engine import JdEngine
+    from analysis_agent.jd_service import JdService
     from analysis_agent.provider import build_model
     from analysis_agent.publication import Base as PublicationBase
 
@@ -138,6 +141,9 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
         store.setup()
         catalog = Catalog(engine)
         catalog.setup()
+        jd_store = JdStore(engine)
+        jd_store.setup()
+        jd = JdService(jd_store, JdEngine(), catalog)
         PublicationBase.metadata.create_all(engine)
         http_timeout = httpx.Timeout(timeout, connect=min(timeout, 10))
         count_http = stack.enter_context(httpx.Client(timeout=http_timeout))
@@ -164,7 +170,7 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
         # LangChain model copies share the same managed client/budget hook.
         consolidation_model = model.model_copy(update={
             'reasoning': {**model.reasoning, 'effort': consolidation_effort}})
-        service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model,
+        service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model, jd=jd,
             instructions='你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
                          '根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。'
                          '已說清楚的不重問；員工已說不知道、需查證或暫時答不出來，也算已回應：保留未知，轉問其他有用方向。'

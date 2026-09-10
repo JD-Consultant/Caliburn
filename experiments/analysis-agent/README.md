@@ -1068,3 +1068,79 @@ langgraph-checkpoint 4.2.0, OpenAI SDK 3.8.0. Python 3.12.13 used locally.
 Second slice: langgraph-checkpoint-postgres 3.1.2, psycopg/binary 3.3.5
 (resolved in `uv.lock`).
 Third slice: Deep Agents0.7.13 (public StoreBackend and filesystem tools).
+
+### JD core Task 2 — isolated PostgreSQL working revisions
+
+`open_service` composes `JdService` with the **same engine instance** as Catalog.
+Fresh setup remains catalog/Saver/Store setup, plus `JdStore.setup()` for the three
+ordinary logged tables `jd_head`, `jd_revision`, and `jd_operation`. Build the
+fixed bridge first with `npm run build -w @caliburn/jd-editor-native` from
+`experiments/jd-editor`. No root production workspace/lock or Memory ownership
+changes are involved. These are internal service ports; JD tool/HTTP bindings
+and writer admission are the following slices.
+
+New documents created through the composition receive catalog, canonical empty
+paragraph revision, and head in one short transaction. `Catalog.create_document`
+still supports existing callers and now accepts an existing session. Older
+catalog documents without a JD head are rejected by JD reads/writes; reads never
+backfill them. Every lookup verifies the catalog/document scope; references from
+another document cannot resolve in this one. No migration, reset, cascade delete,
+or background backfill is performed.
+
+The mapper alone imports generated DTOs and checks the SSOT. Internal typed ports
+keep IDs, query/intent/value/outcome data; `jd_store.py` alone owns JD SQL. Each
+write checks the original immutable receipt before Node, locks the same-document
+head, checks that receipt again, and verifies base=current. PostgreSQL JSONB `=`
+decides no_change. Changed writes insert revision → receipt → update head before
+commit. A no_change only records its receipt. Manual saves preserve exact before
+and after revisions but have `native_operations=null` and empty affected IDs;
+candidate normalization is not represented as baseline edits. Empty affected IDs
+do not mean that a committed manual revision made no changes.
+
+Only confirmed terminal results become receipt rows. A lost commit reply is
+reconciled by the same operation/digest, including across fresh processes.
+Definite failures whose receipt is unconfirmed remain unchanged and require
+reconciliation. A saved failure never becomes a later success or changes its
+next_action when replayed. A failed publication is not automatically retried;
+after confirmed rollback, a separate single attempt may record save_failed.
+Receipt lookup with no row is not proof that an earlier writer stopped: the
+following writer-gate/recovery slice must establish that before explicit resume.
+
+The fixed Node argv accepts only stdin JSON, uses no shell, and receives only OS
+runtime environment settings, never DSNs, API keys or NODE_OPTIONS. The starting
+budget is 30 seconds per Node attempt, then terminate/reap for 5 seconds and
+kill/reap for 5 seconds. Input/stdout are bounded at 16 MiB and stderr at 8 KiB;
+overflow is a typed failure, never successful truncated content. OS spawn and
+synchronous validation are not preemptible hard wall-clock guarantees. If a
+process has not been reaped, the failure explicitly remains non-quiescent; no
+writer gate can be released on that result.
+
+Each SQL stage has a monotonic 30-second budget with a driver cancellation
+supervisor, statement limit ≤10 seconds and lock limit ≤5 seconds, reduced to
+the remaining time before statements. Connection acquisition follows the shared
+engine's configured 5-second libpq timeout; cancellation/rollback are cleanup,
+not proof inferred merely from elapsed time. Node, SQL publication, failure
+receipt closure and later lookup have separate budgets, not a combined
+30-second request guarantee. The fixed full r2 fixture and an explicit
+100-command stress batch measure realistic bytes and elapsed time; 100 is a
+test scale, not a product or schema maximum.
+
+The same store provides producer lookup plus direct-parent ancestor interval
+counts and the latest four committed events. Initial revisions and no_change
+receipts are not creating events. Manual edits followed by manual reversion
+remain two events. No new history table, read cursor store or lineage engine
+was added. Source-reference shape and same-revision K/S relations are checked;
+Task 2 tests use synthetic source handles. Task 3 injects the existing source
+owner to validate real source truth; this slice does not claim that integration.
+
+Verification uses explicit loopback `Q019_TEST_DATABASE_URL` with database
+`q019_jd_app_20260910` and `connect_timeout` 1–5 seconds. The existing Memory PG
+tests continue to require their own `q019_agent_test` database. JD tests create
+unique documents and retain their rows; they never clear shared data. Missing
+DSN is a skip and is not a PostgreSQL pass. The tests verify actual PostgreSQL 16
+settings (`fsync=on`, `synchronous_commit=on`, logged tables), two simultaneous
+connections, rollback, lost commit acknowledgement, fresh-process receipt-first
+recovery, full JSON snapshots, v2 links and immutable history. Test-generated
+`task-2-pg-*.jsonl` files in the task scratch directory preserve complete scoped
+head/revision/receipt rows for independent review. No paid provider calls or
+production authority adoption are included.

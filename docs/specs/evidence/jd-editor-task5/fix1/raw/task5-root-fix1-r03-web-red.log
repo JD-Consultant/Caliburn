@@ -1,0 +1,30 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/JdWorkspace.test.tsx (1 test | 1 failed) 378ms
+   × R03 no-run owner failure shows restart steps and keeps draft on state refresh 375ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/JdWorkspace.test.tsx > R03 no-run owner failure shows restart steps and keeps draft on state refresh
+AssertionError: expected '未保存' to contain '需要重新啟動'
+
+Expected: "需要重新啟動"
+Received: "未保存"
+
+ ❯ src/jd/JdWorkspace.test.tsx:18:50
+     16|     restartRequired:true,locked:true,bindHead:vi.fn(),revalidate};
+     17|   render(<JdWorkspace document="A"/>);
+     18|   expect(screen.getByRole('status').textContent).toContain('需要重新啟動');
+       |                                                  ^
+     19|   expect(screen.getByText(/先保留此頁/)).toBeTruthy();
+     20|   expect(screen.getByText(/停止.*重新啟動/)).toBeTruthy();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+   Start at  23:20:56
+   Duration  32.06s (transform 304ms, setup 0ms, import 6.49s, tests 378ms, environment 23.76s)
+

@@ -29,16 +29,20 @@ from test_native_continuity import response_body, assistant_text
 
 ROOT = Path(__file__).resolve().parents[3]
 EVIDENCE = ROOT/'.superpowers/sdd/2026-09-10-jd-editor-core-implementation'
+PREFIX = os.environ.get('Q019_TEST_EVIDENCE_PREFIX','task4')
+assert PREFIX in {'task4','task5','task6'}
 
 
 @contextmanager
 def resources():
+    from analysis_agent.windows_lifecycle import require_bootstrap
+    require_bootstrap()
     dsn = os.environ['Q019_TEST_DATABASE_URL']
     params = conninfo_to_dict(dsn)
     assert params['dbname'] == 'q019_jd_app_20260910' and params['host'] == '127.0.0.1'
     def respond(request):
         body = json.loads(request.content)
-        with (EVIDENCE/'task4-browser-provider.jsonl').open('a',encoding='utf-8') as log:
+        with (EVIDENCE/f'{PREFIX}-browser-provider.jsonl').open('a',encoding='utf-8') as log:
             log.write(json.dumps(body,ensure_ascii=False)+'\n')
         items = body.get('input', [])
         last = max((i for i,item in enumerate(items) if item.get('role') == 'user' and 'app_jd_context' not in json.dumps(item)), default=-1)
@@ -73,7 +77,7 @@ def resources():
         client=stack.enter_context(httpx.Client(transport=httpx.MockTransport(respond)))
         model=build_model(model='gpt-5.6-luna',api_key='offline-not-a-key',http_client=client)
         stack.callback(model.root_client.close)
-        service=AnalysisService(catalog=catalog,saver=saver,store=store,model=model,jd=jd,instructions='固定離線驗收顧問。')
+        service=AnalysisService(catalog=catalog,saver=saver,store=store,model=model,jd=jd,lifecycle=require_bootstrap(),instructions='固定離線驗收顧問。')
         stack.callback(service.close); service.start()
         document=service.create_document('設備維護工程師・完整驗收稿',request_key=str(uuid4()))['id']
         run=service.submit(document,str(uuid4()),'我負責設備維護，驗收素材由這次已保存問答提供。');service.join(document)
@@ -85,13 +89,17 @@ def resources():
                 if 'children' in node:sources(node['children'])
         sources(value)
         scope=JdScope(document);base=jd.store.current(scope)
-        result=jd.manual_save(manual_intent(scope,{'request_key':str(uuid4()),'base_revision_ref':revision_ref(scope,base.id),'value':value}))
+        seed_key=str(uuid4())
+        result=service.save_manual(manual_intent(scope,{'request_key':seed_key,'base_revision_ref':revision_ref(scope,base.id),'value':value}),seed_key)
         assert result.status=='committed'
-        (EVIDENCE/'task4-browser-server.json').write_text(json.dumps({'document':document,'url':'http://127.0.0.1:3001/workspace/'+document,
-            'worker_node':worker.node,'binary':binary,'fixed_transport':True,'real_provider_requests':0,'pid':os.getpid()},ensure_ascii=False,indent=2),encoding='utf-8')
+        (EVIDENCE/f'{PREFIX}-browser-server.json').write_text(json.dumps({'document':document,'url':'http://127.0.0.1:3001/workspace/'+document,
+            'worker_node':worker.node,'binary':binary,'fixed_transport':True,'real_provider_requests':0,'pid':os.getpid(),
+            'lifecycle':require_bootstrap().diagnostics},ensure_ascii=False,indent=2),encoding='utf-8')
         yield service
 
 
 if __name__ == '__main__':
+    from analysis_agent.windows_lifecycle import bootstrap
+    bootstrap()
     import uvicorn
     uvicorn.run(create_app(resources),host='127.0.0.1',port=8091,workers=1,reload=False,proxy_headers=False)

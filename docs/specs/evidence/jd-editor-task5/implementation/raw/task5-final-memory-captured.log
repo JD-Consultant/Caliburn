@@ -1,0 +1,62 @@
+.................................F.............................          [100%]
+================================== FAILURES ===================================
+__ test_cancel_before_tools_pairs_not_executed_preserving_raw_and_new_input ___
+
+h = namespace(replies=[], sent=[{'input': [{'content': [{'type': 'input_text', 'text': 'test'}, {'type': 'input_text', 'te...YzM2YWVhNmI0ZDNmIiwgImZpcnN0IjogImgwIiwgImxhc3QiOiAiYTAifQ==', agent=<function h.<locals>.agent at 0x0000018A8F1C4D60>)
+
+    def test_cancel_before_tools_pairs_not_executed_preserving_raw_and_new_input(h):
+        from langchain.agents.middleware import AgentMiddleware
+        from analysis_agent.live_memory import MemorySession
+        import analysis_agent.conversation as conversation
+        class StopBeforeTools(AgentMiddleware):
+            def after_model(self, state, runtime):
+                raise RuntimeError('injected before tools')
+        response = call('repair_memory', edits=[edit()])
+        response['output'].insert(0, {'type': 'reasoning', 'id': 'rs_cancel',
+            'encrypted_content': 'opaque-cancel', 'summary': []})
+        h.replies.append(response)
+        session = MemorySession(h.pub, h.source)
+        graph = build_conversation(model=h.model, checkpointer=h.saver, instructions='test',
+            middleware=[StopBeforeTools(), session], tools=session.tools)
+        with pytest.raises(RuntimeError, match='before tools'):
+            graph.invoke({'messages': [HumanMessage('改成處長', id='h1')]}, h.config, durability='sync')
+        before = graph.get_state(h.config, subgraphs=True).tasks[0].state.values['messages']
+        assert hasattr(conversation, 'close_turn'), 'Missing safe closure'
+        with pytest.raises(ValueError, match='quiescent'):
+            conversation.close_turn(graph, h.config, reason='cancelled', quiescent=False)
+>       result = conversation.close_turn(graph, h.config, reason='cancelled', quiescent=True, memory_session=session)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_conversation_lifecycle.py:476: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\analysis_agent\conversation.py:311: in close_turn
+    command = memory_session.reconcile(state, message, call, config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+src\analysis_agent\live_memory.py:171: in reconcile
+    feedback = self.repair.reconcile(binding['operation_id'], state['memory_source_reference'], call['args']['edits'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <analysis_agent.repair.RepairWorkflow object at 0x0000018A8EDED670>
+operation_id = '30189ca0-8882-5135-9c31-fa83e2527dfb'
+source_reference = 'conversation:eyJkb2N1bWVudCI6ICJkb2N1bWVudC1hIiwgImNoZWNrcG9pbnQiOiAiMWYxYWNkNmQtNjViMS02MjFmLTgwMDItMWJkYmVhNzM5N2I5IiwgImZpcnN0IjogImEwIiwgImxhc3QiOiAiaDEifQ=='
+edits = [{'path': '/memory/knowledge.md', 'diff': '@@\n-例外由主管核准。\n+例外由處長核准。'}]
+
+    def reconcile(self, operation_id, source_reference, edits):
+        """Receipt absence is unknown, not permission to run _publish on cancel."""
+        try:
+            receipt = self.publication.receipt(operation_id)
+            if receipt is None:
+>               raise PublicationUncertain('Repair result is unknown; explicitly resume or reconcile later')
+E               analysis_agent.publication.PublicationUncertain: Repair result is unknown; explicitly resume or reconcile later
+
+src\analysis_agent\repair.py:110: PublicationUncertain
+============================== warnings summary ===============================
+tests/test_api.py::test_api_lifespan_idempotency_and_private_state_projection
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_conversation_lifecycle.py::test_cancel_before_tools_pairs_not_executed_preserving_raw_and_new_input
+1 failed, 62 passed, 1 warning in 12.47s

@@ -1,0 +1,103 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/useJdSession.test.tsx (22 tests | 3 failed | 19 skipped) 12ms
+   × R02 cachelost committed remains visible after fresh discovery and refresh 9ms
+   × R02 cachelost no_change remains visible after fresh discovery and refresh 1ms
+   × R02 cachelost save_failed remains visible after fresh discovery and refresh 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 3 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > R02 cachelost committed remains visible after fresh discovery and refresh
+AssertionError: expected { status: 'no_pending', …(3) } to deeply equal { status: 'available', …(4) }
+
+- Expected
++ Received
+
+  {
+    "can_recover": false,
+-   "request_key": "original-A",
+-   "result": {
+-     "receipt_durability": "confirmed",
+-     "status": "committed",
+-   },
+-   "status": "available",
++   "request_key": null,
++   "status": "no_pending",
+    "write_blocked": false,
+  }
+
+ ❯ src/jd/useJdSession.test.tsx:260:28
+    258|   await session.recoverManual();
+    259|   await session.refresh();
+    260|   expect(session.recovery).toEqual(terminal);
+       |                            ^
+    261|   expect(session.serverWriteBlocked).toBe(false);
+    262|   expect(session.candidate).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/3]⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > R02 cachelost no_change remains visible after fresh discovery and refresh
+AssertionError: expected { status: 'no_pending', …(3) } to deeply equal { status: 'available', …(4) }
+
+- Expected
++ Received
+
+  {
+    "can_recover": false,
+-   "request_key": "original-A",
+-   "result": {
+-     "receipt_durability": "confirmed",
+-     "status": "no_change",
+-   },
+-   "status": "available",
++   "request_key": null,
++   "status": "no_pending",
+    "write_blocked": false,
+  }
+
+ ❯ src/jd/useJdSession.test.tsx:260:28
+    258|   await session.recoverManual();
+    259|   await session.refresh();
+    260|   expect(session.recovery).toEqual(terminal);
+       |                            ^
+    261|   expect(session.serverWriteBlocked).toBe(false);
+    262|   expect(session.candidate).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/3]⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > R02 cachelost save_failed remains visible after fresh discovery and refresh
+AssertionError: expected { status: 'no_pending', …(3) } to deeply equal { status: 'available', …(4) }
+
+- Expected
++ Received
+
+  {
+    "can_recover": false,
+-   "request_key": "original-A",
+-   "result": {
+-     "receipt_durability": "confirmed",
+-     "status": "save_failed",
+-   },
+-   "status": "available",
++   "request_key": null,
++   "status": "no_pending",
+    "write_blocked": false,
+  }
+
+ ❯ src/jd/useJdSession.test.tsx:260:28
+    258|   await session.recoverManual();
+    259|   await session.refresh();
+    260|   expect(session.recovery).toEqual(terminal);
+       |                            ^
+    261|   expect(session.serverWriteBlocked).toBe(false);
+    262|   expect(session.candidate).toBeNull();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/3]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  3 failed | 19 skipped (22)
+   Start at  19:47:51
+   Duration  838ms (transform 61ms, setup 0ms, import 128ms, tests 12ms, environment 567ms)
+

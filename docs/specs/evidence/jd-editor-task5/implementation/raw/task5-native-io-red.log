@@ -1,0 +1,25 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_______ test_thread_construction_baseexception_keeps_cleanup_reachable ________
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002E1E5500CE0>
+
+    def test_thread_construction_baseexception_keeps_cleanup_reachable(monkeypatch):
+        import analysis_agent.jd_engine as module
+        engine=JdEngine(timeout=.2,cleanup_timeout=.2)
+        def interrupted(*args,**kwargs):
+            raise KeyboardInterrupt('I/O setup interrupted')
+        monkeypatch.setattr(module,'Thread',interrupted)
+        with pytest.raises(KeyboardInterrupt):
+            engine.validate_value(VALUE)
+>       assert engine.native_calls.cleanup(), 'Successful Popen must remain cleanable when I/O construction fails'
+E       AssertionError: Successful Popen must remain cleanable when I/O construction fails
+E       assert False
+E        +  where False = cleanup()
+E        +    where cleanup = <analysis_agent.jd_engine.JdNativeCalls object at 0x000002E1E5500F80>.cleanup
+E        +      where <analysis_agent.jd_engine.JdNativeCalls object at 0x000002E1E5500F80> = <analysis_agent.jd_engine.JdEngine object at 0x000002E1E5500BC0>.native_calls
+
+tests\test_jd_native_lifecycle.py:20: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_jd_native_lifecycle.py::test_thread_construction_baseexception_keeps_cleanup_reachable
+1 failed, 1 passed, 2 deselected in 0.40s

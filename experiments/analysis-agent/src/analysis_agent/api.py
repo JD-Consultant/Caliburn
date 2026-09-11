@@ -103,6 +103,8 @@ def open_service():
 Timeout, output and compaction thresholds are explicit deployment values, not
 an undocumented resurrected initial policy or a promised hard dollar cap.
 """
+    from analysis_agent.windows_lifecycle import require_bootstrap
+    lifecycle = require_bootstrap()
     from langgraph.checkpoint.postgres import PostgresSaver
     from langgraph.store.postgres import PostgresStore
     from psycopg.conninfo import conninfo_to_dict, make_conninfo
@@ -190,7 +192,7 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
         # LangChain model copies share the same managed client/budget hook.
         consolidation_model = model.model_copy(update={
             'reasoning': {**model.reasoning, 'effort': consolidation_effort}})
-        service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model, jd=jd,
+        service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model, jd=jd,lifecycle=lifecycle,
             instructions='你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
                          '根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。'
                          '已說清楚的不重問；員工已說不知道、需查證或暫時答不出來，也算已回應：保留未知，轉問其他有用方向。'
@@ -212,6 +214,9 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
 
 
 def create_app(resources=open_service):
+    if resources is open_service:
+        from analysis_agent.windows_lifecycle import bootstrap
+        bootstrap()
     @asynccontextmanager
     async def lifespan(app):
         manager = resources()

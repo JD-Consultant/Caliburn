@@ -1218,3 +1218,23 @@ so retaining an ID cannot conceal changed result text or call pairing.
 `tests/jd_browser_server.py` 是零付費 browser fixture：實際 AnalysisService／API／JD router、官方 PG Saver／Store、原三工具，僅 model transport 使用固定 MockTransport，沒有讀取真 key 或 live fallback。Task 4 瀏覽器證據分開記 headed Chrome、CDP composition 與 Windows 真人 IME；完整取消／native process owner 屬 Task 5，自然模型與 Skill/E2E 屬後續 gate。
 
 Task4 review fix1：人工保存的明確未 admission 回覆使用實際 Pydantic `ManualSaveRejection`（生成至 Web），含原 request key；只有在同一 service lock 中確認該 identity 無 receipt 後才回覆。已有 receipt 的非法重放、receipt lookup unavailable 與一般 HTTP 409/422 不代表零寫入；原正常 receipt 優先規則保留。Pydantic body validation 失敗也走相同 receipt 查核，UUID 使用與有效 DTO 相同的 canonical identity。
+
+### Task 5 — 同文件 admission、原生程序生命週期與原身分恢復
+
+Windows API 的主執行緒先執行 `windows_lifecycle.bootstrap()`，才建立 DB、model client 或 Node。啟動程序必須設定穩定的 `Q019_LIFECYCLE_INSTALLATION`（1–80 個英數字、底線或連字號），同一隔離安裝的重開沿用同值。私有 mutex 防止第二個 API 搶走正在工作的安裝；私有 Job 保留 kill-on-close 並禁止 handle 繼承，啟動核對 exact 舊 Job 停止後才加入新 Job。未知物件、指派失敗或舊物件仍存在都先拒絕工作。舊未受管服務切換必須先核實並受控停止；不能以換 key 或按 port 殺程序代替。
+
+`tests/jd_browser_server.py` 也走真 bootstrap。既有離線啟動命令加上 process-scoped `Q019_LIFECYCLE_INSTALLATION=jd-editor-offline-20260910`；Node 使用 Task4 isolated 22.23.2，DB 仍是 `q019_jd_app_20260910`。可設 `Q019_TEST_EVIDENCE_PREFIX=task5` 或 `task6`，將離線 fixture 記錄分開，預設保留 task4 名稱。實際 API `create_app()` 在主執行緒 bootstrap；不可用尚未 bootstrap 的 `open_service()` 繞入 resources。
+
+人工儲存、AI、selection、HTTP selection read 及建立文件都由 App owner 保留 spawn／Popen／pipe／I/O 執行緒。原生回傳或 Future.done 不代表已清理；未清理時不發布候選、不新增同文件寫入。等待與有界 cleanup 不持全域 admission lock，另一文件可以繼續。關閉先停 admission、送出取消信號，再等原 Python entry 與 native owner 排空。AI stop 不停掉唯讀使用；唯讀入口只接 App shutdown 的獨立停止信號。
+
+人工 admission 在 Node 前以官方 root checkpoint 保存最多一筆 operation／base／digest／request_key／origin，沒有候選、假 HumanMessage 或 run。結果不明時保留原身分；停止已證後先取得 PG head row lock，下一 statement 查原 receipt，只有 known-none 才閉合原 failure。已提交結果永遠回原 receipt，取消不撤銷它。JD close 核對實際 factory session、原 message/call/input 與全部未閉合 bindings；只補缺失 ToolMessage，保留原訊息及已确认模型投影 manifest，未知不取得一般 resume 權。
+
+App-only `GET /documents/{document}/jd/manual-recovery` 可不附 key 發現原待處理身分，或附原 `request_key` 唯讀查回結果。`POST` 同路徑只收原 UUID key，明示做一次有界恢復，不接收或重跑候選。每個 available／unknown／no_pending 都由同一 server admission 投影 `write_blocked`／`can_recover`；結果已讀但 descriptor 未清仍可明示清理，archive 不遮蔽原結果。GET 不停止程序、不更新 checkpoint、不寫 receipt。
+
+瀏覽器重開／pageshow 只讀查詢，不自動重送人工稿。沒有 cache 也保留原身分恢復入口；有 exact cache 且 no_pending 時，可另次明示完整原 key/base/value，可能是首次送達。查不到不代表零效果；終局失敗保留候選，新 dirty 不被晚到結果覆蓋。最新完整 server gate 讀取失敗仍維持鎖定。新 transport 型別由實際 Pydantic → export → generated Web，三個模型工具與 JD JSON Schema 不變。
+
+Task5 測試與觀測限制列於 `scratch/task-5-report.md`；真 Windows kernel、真 PG/Saver 程序重開、App seam fixture 與 Web mocks 分別記錄，不將它們混成自然模型、真人 IME 或 Task6 成品通過。
+
+Task5 review fix1：輸入在最終 admission 再核封存與原 key；selection reservation 保留到同一鎖區內的最後檢查。manual recovery／stop／放棄中斷回合沿同文件 reservation，在全域鎖外等待 native／PG；shutdown 先禁止新操作，再等這些 entry 完整對帳及結果投影。全域 RLock 仍用於共用 owner 狀態與短 admission，不取代 PG row／advisory lock，也不宣稱效能倍數。
+
+原人工 full-save 先查原 key／digest 的 terminal receipt；descriptor 清理失敗或另有 active owner 仍回原結果並保留寫入 gate。cache 遺失時，明示恢復的原 key／結果在後續重讀仍可查看；無 key discovery 另決定目前 gate，不把已確認結果洗掉。App-only 恢復 DTO 新增 `restart_required`：無 run／manual descriptor 的 native read owner 未能停止時，畫面明示保留目前頁面及 dirty／問句、受控停止原服務、沿原 installation 設定重開後按「重新讀取狀態」。只重新整理網頁不會停止舊程序；本切片不新增一般 cancel route、假 run 或自動重播。正式日常啟停入口仍屬成品 P5。

@@ -8,6 +8,9 @@ not to the lifetime of the document. This is synchronous, not an API service.
 from collections.abc import Sequence
 from typing import Annotated
 from uuid import uuid4
+from weakref import WeakKeyDictionary
+
+_JD_SESSIONS = WeakKeyDictionary()
 
 from langchain.agents.middleware import (
     AgentMiddleware, AgentState, ModelCallLimitMiddleware, ToolCallLimitMiddleware, hook_config,
@@ -27,6 +30,9 @@ def merge_turns(previous: dict, update: dict) -> dict:
 
 
 class ConversationState(MessagesState):
+    jd_manual_pending: dict | None
+    jd_bindings: dict
+    jd_pending_operation: dict | None
     jd_last_model_view: dict | None
     jd_refs: dict
     jd_sources: dict
@@ -166,12 +172,30 @@ def build_conversation(
     root.add_node('analysis', child)
     root.add_edge(START, 'analysis')
     root.add_edge('analysis', END)
-    return root.compile(checkpointer=checkpointer)
+    graph = root.compile(checkpointer=checkpointer)
+    if sessions:
+        _JD_SESSIONS[graph] = sessions[0]
+    return graph
 
 
 def require_latest(config):
     if config.get('configurable', {}).get('checkpoint_id') or config.get('configurable', {}).get('checkpoint_ns'):
         raise ValueError('Use the latest root document config, not a historical/child checkpoint')
+
+
+def save_manual_pending(graph, config, descriptor):
+    """Root-only admitted identity; never invoke analysis or synthesize input."""
+    require_latest(config)
+    snapshot = graph.get_state(config)
+    if snapshot.next:
+        raise ValueError('Manual binding requires an idle root')
+    pending = snapshot.values.get('jd_manual_pending')
+    if pending and descriptor is not None and pending != descriptor:
+        raise ValueError('Another admitted manual identity is pending')
+    graph.update_state(config, {'jd_manual_pending': descriptor}, as_node='analysis')
+    saved = graph.get_state(config)
+    if saved.next or saved.values.get('jd_manual_pending') != descriptor:
+        raise RuntimeError('Manual admission checkpoint was not confirmed')
 
 
 def pending_memory_read(snapshot, memory_session):
@@ -201,7 +225,7 @@ def pending_memory_read(snapshot, memory_session):
     return None
 
 
-def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=None):
+def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=None, jd_session=None):
     """Seal the pending root using public state APIs, without executing any node.
 
     Caller MUST have stopped/joined its worker and serialized this document.
@@ -217,9 +241,19 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
     if reason not in {'cancelled', 'configuration_error'}:
         raise ValueError('Expected cancelled or configuration_error')
     snapshot = graph.get_state(config, subgraphs=True)
+    bound = _JD_SESSIONS.get(graph)
+    if bound is not None and jd_session is not bound:
+        raise PublicationUncertain('Closing JD requires the original graph factory session')
+    if jd_session is not None and bound is not jd_session:
+        raise PublicationUncertain('JD reconciliation factory does not match this graph')
     if not snapshot.values.get('messages'):
         raise ValueError('No saved input to close')
     if not snapshot.next:
+        if jd_session:
+            updates = jd_session.reconcile_all(snapshot.values,config)
+            if any(k!='messages' for k in updates) or updates['messages']:
+                graph.update_state(config,updates,as_node='analysis')
+                return graph.get_state(config).values
         return snapshot.values
     if snapshot.next != ('analysis',):
         raise ValueError('Unexpected pending conversation node')
@@ -230,17 +264,22 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
     if child and hasattr(child, 'values') and not child.values.get('messages'):
         child = None
     state = child.values if child and hasattr(child, 'values') else snapshot.values
+    jd_updates = jd_session.reconcile_all(state,config) if jd_session else {'messages':[]}
+    state = {**state,**{k:v for k,v in jd_updates.items() if k!='messages'}}
     read_call = pending_memory_read(snapshot, memory_session)
-    messages = list(state['messages'])
+    messages = [*state['messages'],*jd_updates['messages']]
+    carried = {k:state[k] for k in ('jd_last_model_view','jd_refs','jd_sources','jd_results','jd_bindings','jd_pending_operation') if k in state}
     human_index = max(i for i, m in enumerate(messages) if isinstance(m, HumanMessage))
     saved = state.get('turn_outcome')
     boundary = state.get('closed_turns', {}).get(messages[human_index].id)
     if (child and not child.next and saved and saved['input_id'] == messages[human_index].id
             and boundary and boundary['end_id'] == messages[-1].id):
-        graph.update_state(snapshot.config, {'messages': messages, 'turn_outcome': saved,
+        if jd_session:
+            graph.update_state(child.config,{**jd_updates},as_node='TurnOutcome.after_agent')
+        graph.update_state(snapshot.config, {**carried,'messages': messages, 'turn_outcome': saved,
             'closed_turns': turn_boundary(saved, messages[-1].id)}, as_node='analysis')
         return graph.get_state(config).values
-    updates = {}
+    updates = {k:v for k,v in jd_updates.items() if k!='messages'}
     for index, message in enumerate(messages[human_index + 1:], human_index + 1):
         if not isinstance(message, AIMessage):
             continue
@@ -251,7 +290,11 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
                 raise PublicationUncertain('Unpaired call has no reliable identity')
             # after_model nodes precede ToolNode for this canonical response.
             # Merely having no task.error at tools does NOT prove not-started.
-            not_started = child and child.next and all(n.endswith('.after_model') for n in child.next)
+            not_started = (child and child.next and all(node.endswith('.after_model') for node in child.next))
+            if call['name'] in {'jd_read','jd_edit','jd_change_read'}:
+                not_started = (not_started and message.id==state['messages'][-1].id
+                    and set(child.next)<= {'TurnValidation.after_model','ModelCallLimitMiddleware.after_model',
+                                          'ToolJsonFeedback.after_model','CooperativeStop.after_model','JdToolSession.after_model'})
             if not_started:
                 messages.append(ToolMessage('Tool not executed: this turn was closed before tool execution.',
                     name=call['name'], tool_call_id=call['id'], status='error'))
@@ -277,7 +320,7 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
     notice = AIMessage('本輪已結束，顧問未完成答覆。', id=str(uuid4()), additional_kwargs={
         'analysis_agent_origin': 'runtime_notice', 'analysis_agent_stop_reason': reason})
     messages.append(notice)
-    terminal = {'messages': messages, 'turn_outcome': outcome,
+    terminal = {**carried,'messages': messages, 'turn_outcome': outcome,
                 'closed_turns': turn_boundary(outcome, notice.id)}
     # The owned final middleware node routes to END. Head, paired result and
     # terminal status are one child checkpoint; neither update executes a node.
@@ -288,7 +331,7 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
 
 
 def send_input(graph, config, message: HumanMessage, *, abandon_pending=False,
-               quiescent=False, memory_session=None):
+               quiescent=False, memory_session=None, jd_session=None):
     """Synchronous local entry; worker/admission orchestration remains Task3."""
     require_latest(config)
     if not isinstance(message, HumanMessage) or not message.id:
@@ -299,5 +342,5 @@ def send_input(graph, config, message: HumanMessage, *, abandon_pending=False,
     if snapshot.next:
         if not abandon_pending:
             raise ValueError('Conversation has pending work; explicitly resume or abandon it')
-        close_turn(graph, config, reason='cancelled', quiescent=quiescent, memory_session=memory_session)
+        close_turn(graph, config, reason='cancelled', quiescent=quiescent, memory_session=memory_session,jd_session=jd_session)
     return graph.invoke({'messages': [message]}, config, durability='sync')

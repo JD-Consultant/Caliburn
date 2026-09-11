@@ -2,13 +2,13 @@
 import base64
 import json
 from uuid import UUID
-from typing import Literal
+from typing import Literal, Annotated
 
-from fastapi import APIRouter, Request, HTTPException
+from fastapi import APIRouter, Request, Response, HTTPException
 from fastapi.routing import APIRoute
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 from starlette.concurrency import run_in_threadpool
 from jd_editor_contract import models
 from jsonschema import ValidationError
@@ -23,6 +23,38 @@ class ManualSaveRejection(BaseModel):
     admission: Literal['not_admitted'] = 'not_admitted'
     request_key: str
     message: str
+
+
+class ManualRecoveryRequest(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    request_key: UUID
+
+
+class ManualRecoveryGate(BaseModel):
+    model_config = ConfigDict(extra='forbid')
+    write_blocked: bool
+    can_recover: bool
+    restart_required: bool = False
+
+
+class ManualRecoveryAvailable(ManualRecoveryGate):
+    status: Literal['available']
+    request_key: UUID
+    result: models.JdManualSaveResult
+
+
+class ManualRecoveryUnknown(ManualRecoveryGate):
+    status: Literal['unknown']
+    request_key: UUID
+
+
+class ManualRecoveryNoPending(ManualRecoveryGate):
+    status: Literal['no_pending']
+    request_key: UUID | None
+
+
+ManualRecoveryResult = Annotated[ManualRecoveryAvailable | ManualRecoveryUnknown | ManualRecoveryNoPending,
+    Field(discriminator='status')]
 
 
 def rejected_manual(request, document, key, message, status=422):
@@ -41,6 +73,9 @@ def rejected_manual(request, document, key, message, status=422):
             raise HTTPException(503, 'Manual receipt is unavailable') from exc
         if original:
             raise HTTPException(409, 'Existing identity requires its exact original payload')
+        pending = service._context(document).graph.get_state(service._context(document).config).values.get('jd_manual_pending')
+        if pending and pending.get('operation') == str(manual_operation_id(scope,canonical_key)):
+            raise HTTPException(409, 'Admitted manual identity requires reconciliation')
         return JSONResponse(status_code=status, content=ManualSaveRejection(
             request_key=key, message=message).model_dump(mode='json'))
 
@@ -101,7 +136,8 @@ def read_document(service, scope, args):
         kind, offset = record['read_kind'], record['offset']
         if not isinstance(offset, int) or offset < 0:
             raise ServiceConflict('Invalid read page')
-    view = service.jd.read(scope, query)
+    with service.jd_read_entry(scope.document_id) as context:
+        view = service.jd.read(scope, query, cancel=context.read_stop, native_calls=context.native_calls)
     if view.status != 'ok':
         return read_failure_to_wire(view)
     revision = view.revision
@@ -171,6 +207,33 @@ def scoped(request, document):
     return service, JdScope(document)
 
 
+def recovery_projection(request, document, key, *, recover=False):
+    service, _ = scoped(request,document)
+    try:
+        value = service.recover_manual(document,key) if recover else service.manual_recovery(document,key)
+        if value['status']=='available':
+            value = {**value,'result':outcome_to_wire(value['result'])}
+        return value
+    except ServiceConflict as exc:
+        raise HTTPException(409,str(exc)) from exc
+    except Exception as exc:
+        raise HTTPException(503,'Manual recovery state is unavailable') from exc
+
+
+@router.get('/documents/{document}/jd/manual-recovery', response_model=ManualRecoveryResult,
+    response_model_exclude_unset=True)
+def manual_recovery_get(document: str, request: Request, response: Response, request_key: UUID | None = None):
+    response.headers['Cache-Control']='no-store'
+    return recovery_projection(request,document,str(request_key) if request_key is not None else None)
+
+
+@router.post('/documents/{document}/jd/manual-recovery', response_model=ManualRecoveryResult,
+    response_model_exclude_unset=True)
+def manual_recovery_post(document: str, request: Request, response: Response, data: ManualRecoveryRequest):
+    response.headers['Cache-Control']='no-store'
+    return recovery_projection(request,document,str(data.request_key),recover=True)
+
+
 @router.get('/documents/{document}/jd', response_model=models.JdReadResult, response_model_exclude_unset=True)
 def current(document: str, request: Request):
     service, scope = scoped(request, document)
@@ -203,19 +266,9 @@ def manual_save(document: str, request: Request, data: models.JdManualSaveClient
         intent = manual_intent(scope, data.model_dump(mode='json', exclude_unset=True))
     except (ValueError, ValidationError):
         return rejected_manual(request, document, str(data.request_key), 'Invalid scoped manual submission')
-    with service.lock:
-        original = service.jd.store.receipt(scope, intent.operation_id, intent.digest)
-        if original:
-            return outcome_to_wire(original)
-        if service.catalog.document(document)['archived']:
-            return rejected_manual(request, document, str(data.request_key), 'Document is archived', 409)
-        if service._running(document) or any(r['status'] in {'receiving','running','stopping','uncertain','interrupted'} for r in service.catalog.runs(document)):
-            return rejected_manual(request, document, str(data.request_key), 'Foreground run must close before manual save', 409)
-        # Sources remain locators in the existing conversation owner.
-        reader = service.reader(document)
-        for reference in source_refs(intent.value):
-            try:
-                reader.read(reference)
-            except ValueError:
-                return rejected_manual(request, document, str(data.request_key), 'Source is unavailable in this document')
-        return outcome_to_wire(service.jd.manual_save(intent))
+    try:
+        return outcome_to_wire(service.save_manual(intent,str(data.request_key)))
+    except ServiceConflict as exc:
+        return rejected_manual(request,document,str(data.request_key),str(exc),409)
+    except ValueError:
+        return rejected_manual(request,document,str(data.request_key),'Invalid manual source or identity')

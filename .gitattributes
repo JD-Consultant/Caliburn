@@ -22,3 +22,5 @@ docs/specs/evidence/jd-editor-task2/*.txt -text
 docs/specs/evidence/jd-editor-task3/*.txt -text
 # Preserve Task 4 captured browser/runtime/schema evidence and its hash manifests.
 docs/specs/evidence/jd-editor-task4/** -text
+# Preserve Task 5 captured process/PG evidence, upstream notices and hash manifests.
+docs/specs/evidence/jd-editor-task5/** -text

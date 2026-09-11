@@ -47,6 +47,8 @@ function harness() {
     save: vi.fn(),
     submit: vi.fn(),
     lookup: vi.fn(),
+    readRecovery: vi.fn(async (_id: string, key?: string) => ({status:'no_pending', request_key:key ?? null, write_blocked:false, can_recover:false})),
+    recover: vi.fn(),
   } as JdApi;
   return { disk, port };
 }
@@ -156,12 +158,13 @@ it("unrelated current save cannot consume a reopened confirmed failure candidate
   const old: Submission = { document_id: "A", request_key: "old-key", base_revision_ref: "old-base",
     value: [{ ...value[0], children: [{ text: "ONLY RECOVERABLE OLD TEXT" }] }] };
   submissionCache(disk).write(old);
-  vi.mocked(port.save).mockResolvedValue({ status: "stale_base", receipt_durability: "confirmed" } as never);
+  vi.mocked(port.readRecovery).mockImplementation(async (_id,key) => ({status:'available', request_key:key ?? 'old-key', write_blocked:false, can_recover:false,
+    result:{status:'stale_base',receipt_durability:'confirmed'}} as never));
   const session = new JdSession("A", port, disk);
   await session.load();
   session.edit([{ ...value[0], children: [{ text: "unrelated current edit" }] }]);
   expect(await session.save()).toBe(false);
-  expect(port.save).toHaveBeenCalledTimes(1);
+  expect(port.save).not.toHaveBeenCalled();
   expect(submissionCache(disk).read("A")).toEqual(old);
   const reopened = new JdSession("A", port, disk);
   await reopened.load();
@@ -172,6 +175,114 @@ it("unrelated current save cannot consume a reopened confirmed failure candidate
   vi.mocked(port.save).mockResolvedValue({ status: "committed", receipt_durability: "confirmed", result_revision_ref: "r1" } as never);
   expect(await reopened.save()).toBe(true);
   expect(reopened.candidate).toBeNull();
+});
+
+it('cache-lost discovery is read-only and exposes one explicit original-key recovery', async () => {
+  const {disk,port}=harness();
+  vi.mocked(port.readRecovery).mockResolvedValue({status:'unknown',request_key:'A-key',write_blocked:true,can_recover:true});
+  vi.mocked(port.recover).mockResolvedValue({status:'unknown',request_key:'A-key',write_blocked:true,can_recover:true});
+  const session=new JdSession('A',port,disk);
+  await session.load();
+  expect(port.save).not.toHaveBeenCalled();
+  expect(port.recover).not.toHaveBeenCalled();
+  expect(session.recovery?.request_key).toBe('A-key');
+  expect(session.candidate).toBeNull();
+  expect(session.locked).toBe(true);
+  await session.recoverManual();
+  expect(port.recover).toHaveBeenCalledExactlyOnceWith('A','A-key');
+  expect(session.busy).toBe(false);
+  expect(session.recovery?.status).toBe('unknown');
+});
+
+it('exact cache with no pending allows only explicit full original submission', async () => {
+  const {disk,port}=harness();
+  const candidate:Submission={document_id:'A',request_key:'original',base_revision_ref:'r1',value};
+  submissionCache(disk).write(candidate);
+  vi.mocked(port.save).mockRejectedValue(Error('lost reply'));
+  const session=new JdSession('A',port,disk);
+  await session.load();
+  expect(port.save).not.toHaveBeenCalled();
+  expect(vi.mocked(port.readRecovery).mock.calls).toEqual([['A','original'],['A',undefined]]);
+  expect(session.canRetryCandidate).toBe(true);
+  await session.save(true);
+  expect(port.save).toHaveBeenCalledExactlyOnceWith('A',{request_key:'original',base_revision_ref:'r1',value});
+  expect(port.recover).not.toHaveBeenCalled();
+  expect(session.candidate).toEqual(candidate);
+});
+
+it('late recovery never overwrites a newer candidate or dirty value', async () => {
+  const {disk,port}=harness();
+  vi.mocked(port.readRecovery).mockResolvedValue({status:'unknown',request_key:'A-key',write_blocked:true,can_recover:true});
+  let resolve!: (value:never)=>void;
+  vi.mocked(port.recover).mockReturnValue(new Promise(done=>{resolve=done;}));
+  const session=new JdSession('A',port,disk);
+  await session.load();
+  const work=session.recoverManual();
+  session.unmount();
+  const newer:Submission={document_id:'A',request_key:'B-key',base_revision_ref:'r1',value};
+  session.candidate=newer;
+  session.edit([{...value[0],children:[{text:'new dirty'}]}]);
+  resolve({status:'available',request_key:'A-key',write_blocked:false,can_recover:false,result:{status:'committed',receipt_durability:'confirmed'}} as never);
+  await work;
+  expect(session.candidate).toEqual(newer);
+  expect(session.value[0].children).toEqual([{text:'new dirty'}]);
+  expect(session.serverWriteBlocked).toBe(true);
+});
+
+it('late GET and a failed fresh gate cannot unlock a newer recovery', async () => {
+  const {disk,port}=harness();
+  const session=new JdSession('A',port,disk);
+  await session.load();
+  let resolve!: (value:never)=>void;
+  vi.mocked(port.readRecovery).mockReturnValueOnce(new Promise(done=>{resolve=done;}));
+  const old=session.refreshRecovery();
+  ++session.generation;
+  vi.mocked(port.readRecovery).mockRejectedValueOnce(Error('new snapshot failed'));
+  await expect(session.refreshRecovery()).rejects.toThrow('new snapshot failed');
+  resolve({status:'no_pending',request_key:null,write_blocked:false,can_recover:false} as never);
+  await old;
+  expect(session.serverWriteBlocked).toBe(true);
+});
+
+it.each(['committed','no_change','save_failed'])('R02 cachelost %s remains visible after fresh discovery and refresh', async (status) => {
+  const {disk,port}=harness();
+  let pending=true;
+  const terminal={status:'available',request_key:'original-A',write_blocked:false,can_recover:false,
+    result:{status,receipt_durability:'confirmed'}} as never;
+  vi.mocked(port.readRecovery).mockImplementation(async (_id,key)=> key ? terminal : pending ?
+    {status:'unknown',request_key:'original-A',write_blocked:true,can_recover:true} :
+    {status:'no_pending',request_key:null,write_blocked:false,can_recover:false});
+  vi.mocked(port.recover).mockImplementation(async ()=>{pending=false;return terminal;});
+  const session=new JdSession('A',port,disk);
+  await session.load();
+  await session.recoverManual();
+  await session.refresh();
+  expect(session.recovery).toEqual(terminal);
+  expect(session.serverWriteBlocked).toBe(false);
+  expect(session.candidate).toBeNull();
+  expect(port.save).not.toHaveBeenCalled();
+});
+it('R03 failed head reads still discover the retained owner and preserve dirty text', async () => {
+  const {disk,port}=harness();
+  const session=new JdSession('A',port,disk);
+  await session.load();
+  session.edit([{...value[0],children:[{text:'尚未保存'}]}]);
+  session.setText('尚未送出的補充');
+  vi.mocked(port.read).mockRejectedValue(Error('native cleanup unconfirmed'));
+  vi.mocked(port.readRecovery).mockResolvedValue({status:'no_pending',request_key:null,
+    write_blocked:true,can_recover:false,restart_required:true} as never);
+  await session.revalidate();
+  expect(session.restartRequired).toBe(true);
+  expect(session.locked).toBe(true);
+  expect(session.text).toBe('尚未送出的補充');
+  expect(session.value[0].children).toEqual([{text:'尚未保存'}]);
+  expect(port.recover).not.toHaveBeenCalled();
+  vi.mocked(port.read).mockResolvedValue(session.head!);
+  vi.mocked(port.readRecovery).mockResolvedValue({status:'no_pending',request_key:null,
+    write_blocked:false,can_recover:false,restart_required:false} as never);
+  await session.revalidate();
+  expect(session.restartRequired).toBe(false);
+  expect(session.dirty).toBe(true);
 });
 it.each([409, 422])("only an identity-matched explicit rejection unlocks candidate handling (%s)", async (status) => {
   const { disk, port } = harness();

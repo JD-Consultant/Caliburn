@@ -10,7 +10,9 @@ export type AnalysisApi =
   | DocumentMetadataInput
   | JdRunLookupMissing
   | RunLookupReceived
-  | ManualSaveRejection;
+  | ManualSaveRejection
+  | ManualRecoveryRequest
+  | (ManualRecoveryAvailable | ManualRecoveryUnknown | ManualRecoveryNoPending);
 export type Title = string;
 export type RequestKey = string;
 export type Id = string;
@@ -63,6 +65,56 @@ export type InputReceived = boolean;
 export type Admission = "not_admitted";
 export type RequestKey2 = string;
 export type Message = string;
+export type RequestKey3 = string;
+export type WriteBlocked = boolean;
+export type CanRecover = boolean;
+export type RestartRequired = boolean;
+export type Status2 = "available";
+export type RequestKey4 = string;
+export type JdWriteStatus =
+  | "committed"
+  | "no_change"
+  | "invalid_input"
+  | "unsupported_content"
+  | "target_missing"
+  | "stale_base"
+  | "engine_failed"
+  | "save_failed"
+  | "outcome_unknown"
+  | "operation_conflict"
+  | "busy";
+export type DocumentEffect = "unchanged" | "committed" | "unknown";
+export type ReceiptDurability = "confirmed" | "unconfirmed";
+export type Origin = "ai" | "manual" | "initial";
+/**
+ * JSON-safe Plate operations when actually captured. Manual saves may use null; snapshots remain authoritative.
+ */
+export type NativeOperations = JsonObject[] | null;
+export type JsonValue =
+  | boolean
+  | number
+  | string
+  | (JsonValue | null)[]
+  | {
+      [k: string]: JsonValue | null;
+    }
+  | null;
+export type AffectedElementId = string;
+export type AffectedElementIds = AffectedElementId[];
+export type Code = string;
+export type Message1 = string;
+export type CommandIndex = number | null;
+export type NextAction1 = "continue" | "correct_arguments" | "reread_current" | "reconcile_operation" | "wait" | "stop";
+export type WriteBlocked1 = boolean;
+export type CanRecover1 = boolean;
+export type RestartRequired1 = boolean;
+export type Status3 = "unknown";
+export type RequestKey5 = string;
+export type WriteBlocked2 = boolean;
+export type CanRecover2 = boolean;
+export type RestartRequired2 = boolean;
+export type Status4 = "no_pending";
+export type RequestKey6 = string | null;
 
 export interface DocumentInput {
   title: Title;
@@ -139,4 +191,56 @@ export interface ManualSaveRejection {
   admission?: Admission;
   request_key: RequestKey2;
   message: Message;
+}
+export interface ManualRecoveryRequest {
+  request_key: RequestKey3;
+}
+export interface ManualRecoveryAvailable {
+  write_blocked: WriteBlocked;
+  can_recover: CanRecover;
+  restart_required?: RestartRequired;
+  status: Status2;
+  request_key: RequestKey4;
+  result: JdManualSaveResult;
+}
+export interface JdManualSaveResult {
+  status: JdWriteStatus;
+  operation_ref: OpaqueRef | null;
+  base_revision_ref: OpaqueRef | null;
+  result_revision_ref: OpaqueRef | null;
+  change_ref: OpaqueRef | null;
+  document_effect: DocumentEffect;
+  receipt_durability: ReceiptDurability;
+  actual_changes: JdActualChanges | null;
+  error: JdToolErrorDetail | null;
+  next_action: NextAction1;
+}
+export interface JdActualChanges {
+  origin: Origin;
+  before_revision_ref: OpaqueRef;
+  after_revision_ref: OpaqueRef;
+  native_operations: NativeOperations;
+  affected_element_ids: AffectedElementIds;
+}
+export interface JsonObject {
+  [k: string]: JsonValue | null;
+}
+export interface JdToolErrorDetail {
+  code: Code;
+  message: Message1;
+  command_index: CommandIndex;
+}
+export interface ManualRecoveryUnknown {
+  write_blocked: WriteBlocked1;
+  can_recover: CanRecover1;
+  restart_required?: RestartRequired1;
+  status: Status3;
+  request_key: RequestKey5;
+}
+export interface ManualRecoveryNoPending {
+  write_blocked: WriteBlocked2;
+  can_recover: CanRecover2;
+  restart_required?: RestartRequired2;
+  status: Status4;
+  request_key: RequestKey6;
 }

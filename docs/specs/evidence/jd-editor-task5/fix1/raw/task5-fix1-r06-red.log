@@ -1,0 +1,58 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_____ test_r06_close_waits_for_admitted_recovery_then_refuses_new_attempt _____
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001C8BA303320>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-fix1-pytest-87f11d2e-6edb-4275-9714-5a86441d280f/test_r06_close_waits_for_admit0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001C8BA14A5D0>
+
+    def test_r06_close_waits_for_admitted_recovery_then_refuses_new_attempt(jd,tmp_path,monkeypatch):
+        with recovery_client(jd,tmp_path) as (client,service):
+            intent,key,context,_=pending(jd,service)
+            entered,release,closed=Event(),Event(),Event()
+            original=context.native_calls.cleanup
+            def wait_cleanup():
+                if not entered.is_set():
+                    entered.set();assert release.wait(5)
+                return original()
+            monkeypatch.setattr(context.native_calls,'cleanup',wait_cleanup)
+            worker=Thread(target=lambda:service.recover_manual(intent.scope.document_id,key));worker.start()
+            assert entered.wait(5)
+            closer=Thread(target=lambda:(service.close(),closed.set()));closer.start()
+            try:
+>               assert not closed.wait(.2)
+E               assert not True
+E                +  where True = wait(0.2)
+E                +    where wait = <threading.Event at 0x1c8bb085ee0: set>.wait
+
+tests\test_jd_fix1_admission.py:95: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-e488f105-9aab-4c19-89c6-17e06d42eac0.jsonl
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+tests/test_jd_fix1_admission.py::test_r06_close_waits_for_admitted_recovery_then_refuses_new_attempt
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\_pytest\threadexception.py:58: PytestUnhandledThreadExceptionWarning: Exception in thread Thread-7 (<lambda>)
+  
+  Traceback (most recent call last):
+    File "C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\threading.py", line 1075, in _bootstrap_inner
+      self.run()
+    File "C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\threading.py", line 1012, in run
+      self._target(*self._args, **self._kwargs)
+    File "S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\tests\test_jd_fix1_admission.py", line 91, in <lambda>
+      worker=Thread(target=lambda:service.recover_manual(intent.scope.document_id,key));worker.start()
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    File "S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\src\analysis_agent\service.py", line 336, in recover_manual
+      raise PublicationUncertain('Manual recovery admission changed')
+  analysis_agent.publication.PublicationUncertain: Manual recovery admission changed
+  
+  Enable tracemalloc to get traceback where the object was allocated.
+  See https://docs.pytest.org/en/stable/how-to/capture-warnings.html#resource-warnings for more info.
+    warnings.warn(pytest.PytestUnhandledThreadExceptionWarning(msg))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_fix1_admission.py::test_r06_close_waits_for_admitted_recovery_then_refuses_new_attempt
+1 failed, 4 deselected, 2 warnings in 5.47s

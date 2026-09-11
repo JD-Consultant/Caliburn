@@ -1,0 +1,56 @@
+F.F                                                                      [100%]
+================================== FAILURES ===================================
+___ test_abandoned_main_thread_still_requires_product_to_stop_exact_old_job ___
+
+    def test_abandoned_main_thread_still_requires_product_to_stop_exact_old_job():
+        key = 'test-'+uuid4().hex
+        first = launch(key)
+        ready = json.loads(first.stdout.readline())
+        first.stdin.write('abandon\n'); first.stdin.flush()
+        second = launch(key)
+        try:
+>           reopened = json.loads(second.stdout.readline())
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_windows_lifecycle.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\__init__.py:346: in loads
+    return _default_decoder.decode(s)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\decoder.py:338: in decode
+    obj, end = self.raw_decode(s, idx=_w(s, 0).end())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.decoder.JSONDecoder object at 0x000002535A1054C0>, s = '', idx = 0
+
+    def raw_decode(self, s, idx=0):
+        """Decode a JSON document from ``s`` (a ``str`` beginning with
+        a JSON document) and return a 2-tuple of the Python
+        representation and the index in ``s`` where the document ended.
+    
+        This can be used to decode a JSON document from a string that may
+        have extraneous data at the end.
+    
+        """
+        try:
+            obj, end = self.scan_once(s, idx)
+        except StopIteration as err:
+>           raise JSONDecodeError("Expecting value", s, err.value) from None
+E           json.decoder.JSONDecodeError: Expecting value: line 1 column 1 (char 0)
+
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\json\decoder.py:356: JSONDecodeError
+_____________ test_incompatible_nested_job_fails_before_app_work ______________
+
+    def test_incompatible_nested_job_fails_before_app_work():
+        child = launch('test-'+uuid4().hex,'nested_failure')
+        output,error = child.communicate(timeout=10)
+        assert child.returncode != 0 and not output
+>       assert 'AssignProcessToJobObject' in error
+E       assert 'AssignProcessToJobObject' in 'Traceback (most recent call last):\n  File "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agen...t(None,None)\n            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\nTypeError: None is not a valid string in this context\n'
+
+tests\test_windows_lifecycle.py:108: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_windows_lifecycle.py::test_abandoned_main_thread_still_requires_product_to_stop_exact_old_job
+FAILED tests/test_windows_lifecycle.py::test_incompatible_nested_job_fails_before_app_work
+2 failed, 1 passed, 3 deselected in 1.04s

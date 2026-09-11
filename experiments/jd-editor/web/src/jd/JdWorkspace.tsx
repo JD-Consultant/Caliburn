@@ -117,6 +117,8 @@ export function JdWorkspace({ document }: { document: string }) {
         <span role="status" className="status">
           {session.loading
             ? "讀取中"
+            : session.restartRequired
+              ? "需要重新啟動，暫停編輯"
             : session.busy
               ? "正在處理"
               : session.metadata?.archived
@@ -144,6 +146,14 @@ export function JdWorkspace({ document }: { document: string }) {
         </div>
       )}
       {session.notice && <p className="notice">{session.notice}</p>}
+      {session.restartRequired && (
+        <aside role="alert" className="candidate">
+          <h3>上一個文件處理尚未停止</h3>
+          <p>先保留此頁；目前畫面中的未保存修改與問句仍在，請勿重新整理或關頁。</p>
+          <p>請在啟動此 App 的視窗停止服務，等待停止完成，再用原啟動入口重新啟動。之後按下方按鈕確認狀態；只重新整理網頁無法停止殘留的工作。</p>
+          <button disabled={session.busy} onClick={() => void session.revalidate()}>重新讀取狀態</button>
+        </aside>
+      )}
       {sourceValue && (
         <aside className="source-panel">
           <h3>依據・已保存的原問答</h3>
@@ -302,14 +312,25 @@ export function JdWorkspace({ document }: { document: string }) {
               </details>
             ))}
           </div>
+          {session.recovery?.request_key && (
+            <aside className="candidate">
+              <h3>{session.recovery.status === 'available' ? '上次人工保存結果' : '上次人工保存结果尚未確認'}</h3>
+              {session.recovery.status === 'available' && <p>{['committed','no_change'].includes(session.recovery.result.status) ? '已確認保存。' : '這次修改未保存：' + session.recovery.result.status}</p>}
+              {!session.candidate && session.recovery.status !== 'available' && <p>本機沒有原候選；仍可確認原保存結果，但無法還原未保存的內容。</p>}
+              {session.recovery.can_recover && <button disabled={session.busy} onClick={() => void session.recoverManual()}>
+                {session.recovery.status === 'available' ? '清理上次保存狀態' : '確認上次保存結果'}
+              </button>}
+              <button disabled={session.busy} onClick={() => void session.revalidate()}>重新讀取狀態</button>
+            </aside>
+          )}
           {session.candidate && (
             <aside className="candidate">
               <h3>尚待處理的送出候選</h3>
               <p>
                 這份材料尚未確認保存；不會覆蓋目前工作稿。未處理前關頁再開仍會保留。
               </p>
-              <button onClick={() => void session.save(true)}>
-                依原記錄再次確認
+              <button disabled={!session.canRetryCandidate} onClick={() => void session.save(true)}>
+                再次送出同一份
               </button>
               <button
                 disabled={session.manualUnknown}

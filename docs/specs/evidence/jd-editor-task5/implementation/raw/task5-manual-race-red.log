@@ -1,0 +1,32 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_manual_descriptor_precedes_native_and_other_document_keeps_working ___
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001EBC9268050>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-8b7133f1-723e-4145-ac37-35dce75acc82/test_manual_descriptor_precede0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001EBC8CAB3E0>
+
+    def test_manual_descriptor_precedes_native_and_other_document_keeps_working(jd, tmp_path, monkeypatch):
+        from threading import Thread
+        from analysis_agent.service import ServiceConflict
+        from analysis_agent.jd_contract import manual_operation_id
+        intent = prepared(jd)
+        # prepared uses an opaque UUID operation derived from its request key.
+        request_key = str(uuid4())
+        from analysis_agent.jd_contract import manual_intent, revision_ref
+        intent = manual_intent(intent.scope, {'request_key':request_key,
+            'base_revision_ref':revision_ref(intent.scope,intent.base_id),'value':intent.value})
+        entered, release, results = Event(), Event(), []
+        with service_harness(tmp_path, engine=jd.catalog.engine) as (service,sent,_):
+            service.jd = jd
+>           assert hasattr(service,'save_manual'), 'Manual/run admission must share the service owner'
+E           AssertionError: Manual/run admission must share the service owner
+E           assert False
+E            +  where False = hasattr(<analysis_agent.service.AnalysisService object at 0x000001EBCC6675F0>, 'save_manual')
+
+tests\test_jd_admission.py:75: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-800b6337-2a67-45ff-8761-fcfbc6d37059.jsonl
+=========================== short test summary info ===========================
+FAILED tests/test_jd_admission.py::test_manual_descriptor_precedes_native_and_other_document_keeps_working
+1 failed, 3 deselected in 5.22s

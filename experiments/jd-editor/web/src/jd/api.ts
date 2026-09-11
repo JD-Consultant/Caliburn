@@ -8,6 +8,7 @@ import type {
   RunLookupReceived,
   JdRunLookupMissing,
   ManualSaveRejection,
+  AnalysisApi,
 } from "../generated/analysis-api";
 import type {
   JdReadSuccess,
@@ -134,5 +135,11 @@ export const api = {
   },
   save: (id: string, body: JdManualSaveClientInput) =>
     request<JdManualSaveResult>(doc(id) + "/jd/manual-save", body),
+  readRecovery: (id: string, key?: string) =>
+    request<Extract<AnalysisApi, {status: 'available' | 'unknown' | 'no_pending'}>>(
+      doc(id) + '/jd/manual-recovery' + (key ? '?request_key=' + encodeURIComponent(key) : '')),
+  recover: (id: string, key: string) =>
+    request<Extract<AnalysisApi, {status: 'available' | 'unknown' | 'no_pending'}>>(
+      doc(id) + '/jd/manual-recovery', {request_key:key}),
 };
 export type JdApi = typeof api;

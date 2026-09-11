@@ -1,0 +1,530 @@
+[
+  {
+    "original": "scratch/task5-admission-green1.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-admission-green1.log",
+    "bytes": 3442,
+    "sha256": "42752c7237669699c447b01522f307fc91b1824f8a89268812d30d9057e6e500"
+  },
+  {
+    "original": "scratch/task5-admission-green2.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-admission-green2.log",
+    "bytes": 100,
+    "sha256": "3e1db68a1e6ebb2158baad14487d2cae39dae0e3d93964aa3e4e0a609fbb4b80"
+  },
+  {
+    "original": "scratch/task5-admission-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-admission-red.log",
+    "bytes": 15253,
+    "sha256": "eab5bfc0bd87400e22d62dd0b6e8d7d516fb57c9bdef2197e19bde1ff6b58502"
+  },
+  {
+    "original": "scratch/task5-admission-red2.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-admission-red2.log",
+    "bytes": 5235,
+    "sha256": "6470bcbcc781101baea5a328d5a0cd08c5c401c5bc7646b40081e6ac5c21904b"
+  },
+  {
+    "original": "scratch/task5-admission-red3.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-admission-red3.log",
+    "bytes": 4671,
+    "sha256": "79e1121060b17ad864f4649bd603b6cd310efb4d41e91d89b1c9793298f25ba4"
+  },
+  {
+    "original": "scratch/task5-bootstrap-entry-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-bootstrap-entry-green.log",
+    "bytes": 114,
+    "sha256": "3296d6fac72f8af2cc60f7149b15f26767fe3a1d343f046abdefc282336e4c58"
+  },
+  {
+    "original": "scratch/task5-bootstrap-entry-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-bootstrap-entry-red.log",
+    "bytes": 3012,
+    "sha256": "4859933393ffca2d70bf027416774cd8db7076d54d17acac2426fa8c155a9148"
+  },
+  {
+    "original": "scratch/task5-close-green1.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-close-green1.log",
+    "bytes": 100,
+    "sha256": "6a09db31132f0d5e6e7f583db4e7126c69d0b12a872f4972241d611eeda5cc60"
+  },
+  {
+    "original": "scratch/task5-close-paired-red2.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-close-paired-red2.log",
+    "bytes": 3906,
+    "sha256": "baf98a38c2fe02b75e31d1c2207202b5f01eb0a2917f76f235808e1c0ff80930"
+  },
+  {
+    "original": "scratch/task5-close-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-close-red.log",
+    "bytes": 11515,
+    "sha256": "7556800496c4418a59566214b06062585f17d0450d409e558a4a557953b06729"
+  },
+  {
+    "original": "scratch/task5-codegen-user-token.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-codegen-user-token.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "original": "scratch/task5-codegen.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-codegen.log",
+    "bytes": 484,
+    "sha256": "d2e7142c0e8d7916fed6a7b62fd424b63bc615322333ea8cec6258db62e050af"
+  },
+  {
+    "original": "scratch/task5-drain-first.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-drain-first.log",
+    "bytes": 3414,
+    "sha256": "c4a8f53452028ce88cffc45b388e4cc063ce1d269545a123dfc95aa4bb2a1aa4"
+  },
+  {
+    "original": "scratch/task5-final-codegen.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-final-codegen.log",
+    "bytes": 39,
+    "sha256": "314c44be1f8206331a4f06eb130d6a5ebe6c5a8de819d1abfa02c0b75fad2c08"
+  },
+  {
+    "original": "scratch/task5-final-jd.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-final-jd.log",
+    "bytes": 661,
+    "sha256": "3ccca2994bbb4242f5f1b9ce67dbae04d2be65f85b3ea5d09741ae6804f86ebf"
+  },
+  {
+    "original": "scratch/task5-final-lint.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-final-lint.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "original": "scratch/task5-final-memory-captured.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-final-memory-captured.log",
+    "bytes": 4611,
+    "sha256": "bc513bc6498715788a7724a2d21e14d3e1afb42a0f42244c30905f7ab8a59bec"
+  },
+  {
+    "original": "scratch/task5-final-memory.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-final-memory.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "original": "scratch/task5-final-types.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-final-types.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "original": "scratch/task5-final-web.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-final-web.log",
+    "bytes": 266,
+    "sha256": "4bdf548a8b6b97bda059812d9ae719c5fb670439c032597f5fc1d6073f75887e"
+  },
+  {
+    "original": "scratch/task5-http-server.stderr.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-http-server.stderr.log",
+    "bytes": 202,
+    "sha256": "7a57938ba04bddea6aa4a21ab53d043cf9740b72cfaf1c3fc36f9724f350b68c"
+  },
+  {
+    "original": "scratch/task5-http-server.stdout.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-http-server.stdout.log",
+    "bytes": 118,
+    "sha256": "e2d462b5b398d492d870d255b1962badc7c83fa59f00d5752cdb45498752ceea"
+  },
+  {
+    "original": "scratch/task5-last-affected.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-last-affected.log",
+    "bytes": 650,
+    "sha256": "b691ddb9ca0d65c1d59b86c0c26458f41245dbd05348a5ff6e65c5ff71c29a1a"
+  },
+  {
+    "original": "scratch/task5-manual-pg-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-manual-pg-green.log",
+    "bytes": 506,
+    "sha256": "867b80c86ceaa422294f579186ea90e9b993bdc3364beb4f0cf49839fbc7d586"
+  },
+  {
+    "original": "scratch/task5-manual-pg-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-manual-pg-red.log",
+    "bytes": 5618,
+    "sha256": "af41aa64426065a62036c00a2dd7274b11007eabcf807bfd52d3653cfbf09a07"
+  },
+  {
+    "original": "scratch/task5-manual-race-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-manual-race-green.log",
+    "bytes": 114,
+    "sha256": "abf3b69bed62c7c9b52f425196de6141f71b126d1f8a0ed1fd8633614fdcdd0b"
+  },
+  {
+    "original": "scratch/task5-manual-race-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-manual-race-red.log",
+    "bytes": 2161,
+    "sha256": "3392a2ce6294b78beaa7660c1887d6592f801f0e4782bc5a0491c78ec217f9f5"
+  },
+  {
+    "original": "scratch/task5-memory-fix-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-memory-fix-green.log",
+    "bytes": 102,
+    "sha256": "a6660a7979df9aced97f901fe90de4e1069a4c4d8ef19e723e5a9710ee6641a4"
+  },
+  {
+    "original": "scratch/task5-native-block-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-native-block-green.log",
+    "bytes": 114,
+    "sha256": "2043ed271939f7a9d9db72bd6fb879cebb22736ce429cb99dc8dcade7263ddac"
+  },
+  {
+    "original": "scratch/task5-native-block-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-native-block-red.log",
+    "bytes": 2279,
+    "sha256": "1c29ebe89937294c94dce3e87769a0808af89d2a55d69614cfe202adbcc35848"
+  },
+  {
+    "original": "scratch/task5-native-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-native-green.log",
+    "bytes": 100,
+    "sha256": "03f7b690fbd4d34690e565d0a9eef4d6dd7b86898d4246c559dcb83a98d23206"
+  },
+  {
+    "original": "scratch/task5-native-io-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-native-io-green.log",
+    "bytes": 114,
+    "sha256": "10d5b1fd1529360bd13e957d913f610bf1c0639df7e66d62b938405b8710626e"
+  },
+  {
+    "original": "scratch/task5-native-io-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-native-io-red.log",
+    "bytes": 1605,
+    "sha256": "31672e552d2dcd9652ee22171d0576a3bf3664a4f1653461a78d7834b0d8dc53"
+  },
+  {
+    "original": "scratch/task5-native-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-native-red.log",
+    "bytes": 1845,
+    "sha256": "0bc256c4899dc1899e5b2bd16201463d9282dcba74795db27f2147b3b8fcc024"
+  },
+  {
+    "original": "scratch/task5-nl10-nl13.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-nl10-nl13.log",
+    "bytes": 5234,
+    "sha256": "ad6b08673e58cefd6e968333f18aa7aab80430bbf6b105a5d937aad3993a4e67"
+  },
+  {
+    "original": "scratch/task5-nl11-nl12.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-nl11-nl12.log",
+    "bytes": 424,
+    "sha256": "02814fc6f43de607d5a114daf438230f0c088b02d5126dc5e1b84881a768606d"
+  },
+  {
+    "original": "scratch/task5-nl12-prelock.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-nl12-prelock.log",
+    "bytes": 1496,
+    "sha256": "2087201d857206e48620c679a7ac18587044093b8794c1964c175402187724ce"
+  },
+  {
+    "original": "scratch/task5-observer-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-observer-green.log",
+    "bytes": 114,
+    "sha256": "fc2d663ce48bd963a1d0b976311fd816934819c241c7b0c69be6188f6e69d7a3"
+  },
+  {
+    "original": "scratch/task5-observer-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-observer-red.log",
+    "bytes": 4508,
+    "sha256": "c60ef21e48044c909cd95a47760dd80dbd8d4aa7c176d210601e87b513384763"
+  },
+  {
+    "original": "scratch/task5-pg-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-pg-green.log",
+    "bytes": 100,
+    "sha256": "25a4cde6a97e597b166ffa7f47aaac507d72107069cc8b8da65b3886e5ff5606"
+  },
+  {
+    "original": "scratch/task5-pg-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-pg-red.log",
+    "bytes": 1132,
+    "sha256": "bb3df715369fb085fd81bbb49f6b24607022285222e1a89daf6366ae4aa7ad44"
+  },
+  {
+    "original": "scratch/task5-pg-red2.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-pg-red2.log",
+    "bytes": 3545,
+    "sha256": "415e46cd6823f7dc95e480c7ad7d6c6d2834bdc9c1f25741f7c2296607c785e3"
+  },
+  {
+    "original": "scratch/task5-process-first.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-process-first.log",
+    "bytes": 6625,
+    "sha256": "6b6b9bf1667f4d132297f498cf50dd452294b7c55b0dffdcc5bde01816259d80"
+  },
+  {
+    "original": "scratch/task5-selection-green.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-selection-green.log",
+    "bytes": 2712,
+    "sha256": "9badb8a234ba7cb4b679290f7e3d480ebe84c2fcbf1e8075c5cc279ce8ad757f"
+  },
+  {
+    "original": "scratch/task5-selection-green2.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-selection-green2.log",
+    "bytes": 114,
+    "sha256": "dff0ab9f1f9ad6f72fd03ee6e0f8ec646cd4735c0814ad03acc8fc8ea80bf670"
+  },
+  {
+    "original": "scratch/task5-selection-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-selection-red.log",
+    "bytes": 2709,
+    "sha256": "8c05427b2394a581996111ea9877af41fdd27c03fa25e2c9f6ef04e39d5a2075"
+  },
+  {
+    "original": "scratch/task5-transport-green1.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-transport-green1.log",
+    "bytes": 649,
+    "sha256": "25cae46fba2acaf188e3b2eef657ef34d734cb5088eb0abc28f4d99008290d29"
+  },
+  {
+    "original": "scratch/task5-transport-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-transport-red.log",
+    "bytes": 10982,
+    "sha256": "1932de9a07adbd1d6afc618de04b5863d1ed400bf7ba76a2e14630d9f76fc7b2"
+  },
+  {
+    "original": "scratch/task5-web-recovery-green1.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-web-recovery-green1.log",
+    "bytes": 264,
+    "sha256": "5955bd35e88ef5640c3a9021b2771cb4805f860acadc7af45ad5ee86c72cb387"
+  },
+  {
+    "original": "scratch/task5-web-recovery-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-web-recovery-red.log",
+    "bytes": 3041,
+    "sha256": "ad63244cecd41a866f170ad7176e6bf4be2f7ec212e3547c7248c1440e124581"
+  },
+  {
+    "original": "scratch/task5-web-recovery-red2.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-web-recovery-red2.log",
+    "bytes": 4271,
+    "sha256": "9db9d68564231029712f0d69bb0aa30583741730c8fa0166b92bd7e3728c12bb"
+  },
+  {
+    "original": "scratch/task5-web-types1.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-web-types1.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "original": "scratch/task5-windows-faults1.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-windows-faults1.log",
+    "bytes": 3171,
+    "sha256": "17fd1eb68ee8bbb133d51caf468d43eb477b003e167b554d829f0ce796cf7f44"
+  },
+  {
+    "original": "scratch/task5-windows-faults2.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-windows-faults2.log",
+    "bytes": 3161,
+    "sha256": "b35077110745c411afdc716827e370b7ea6bd11b8eb111bb39f59d7848956190"
+  },
+  {
+    "original": "scratch/task5-windows-faults3.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-windows-faults3.log",
+    "bytes": 2292,
+    "sha256": "fe0a9e76d0488535a8bd53972affbbb05f2c15d94931119805174b3cfafa2b55"
+  },
+  {
+    "original": "scratch/task5-windows-faults4.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-windows-faults4.log",
+    "bytes": 114,
+    "sha256": "8bbf8c4beeee157edbc7dcf164e80a2dc1b1603f560c07f797bc2ced720d7558"
+  },
+  {
+    "original": "scratch/task5-windows-green1.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-windows-green1.log",
+    "bytes": 1516,
+    "sha256": "a3581feab244ce27e21db7c681ba2c31a7a7e8105fd8e38195d0fa26ccedde4d"
+  },
+  {
+    "original": "scratch/task5-windows-red.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-windows-red.log",
+    "bytes": 1848,
+    "sha256": "c2c62d5a96e30d66cf0cb96f058d5d1b7f0b7af9b00af28fb414e33eea9422e9"
+  },
+  {
+    "original": "scratch/task5-windows-user-token.log",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-windows-user-token.log",
+    "bytes": 100,
+    "sha256": "3ee6c95561a9dae1ff83db8e7e4257ba09555812febf629f8f706af72263b75a"
+  },
+  {
+    "original": "scratch/task5-http-launch.json",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-http-launch.json",
+    "bytes": 71,
+    "sha256": "9f83308ed93e68448b5ae53d48c8bec0f2aa3397ed45f53611e3212cfe421524"
+  },
+  {
+    "original": "scratch/task5-http-observed.json",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-http-observed.json",
+    "bytes": 344,
+    "sha256": "084abf068db679dc433063ae077bf982f8bb25c64be2c8a41af792b91e7d5a29"
+  },
+  {
+    "original": "scratch/task5-legacy-observed.json",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-legacy-observed.json",
+    "bytes": 2526,
+    "sha256": "37eba1a0b13d639a350fda3774c1f52bde29824d68e3a4d46792ca320331174b"
+  },
+  {
+    "original": "scratch/task5-runtime.json",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-runtime.json",
+    "bytes": 296,
+    "sha256": "fe41fc7ae04d7091ad7747f85603ef420877e692814b9b6fe0cccde48d551c93"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-1883c5ee-4f40-41d3-8b51-4ea149c13c72.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-1883c5ee-4f40-41d3-8b51-4ea149c13c72.jsonl",
+    "bytes": 722,
+    "sha256": "b816c6fa1b940770374910083f0b972da12b3fdaae1b5781dc33dfc5885dcc1f"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-1b6162ac-ba48-4d12-8fab-b9c15b938659.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-1b6162ac-ba48-4d12-8fab-b9c15b938659.jsonl",
+    "bytes": 1253,
+    "sha256": "1513c4e6fae0198310c48aff3454f394f654668e6ff8d44733f80706a43a094d"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-1b76ce90-beac-456d-a926-2fe467cff6a7.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-1b76ce90-beac-456d-a926-2fe467cff6a7.jsonl",
+    "bytes": 1693,
+    "sha256": "48127b0311af093f371092b4d0d4051ba99b7c1929789e7692b6cb7659bf9373"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-2a8052f0-0bdb-453a-bf45-7d54d86e8c0d.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-2a8052f0-0bdb-453a-bf45-7d54d86e8c0d.jsonl",
+    "bytes": 1693,
+    "sha256": "bed60ac38a4d8b522b4493bd003768e55c01bf7353d7fd160784d569592f9625"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-2c18a897-5755-40af-ad67-c7d8dc196a43.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-2c18a897-5755-40af-ad67-c7d8dc196a43.jsonl",
+    "bytes": 5876,
+    "sha256": "cd7a65cad514eacf6b2b8c02745782a5862bbf72465581ba31346460cd611c18"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-46c3ac91-8631-4ccc-b105-08bd7d82a66f.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-46c3ac91-8631-4ccc-b105-08bd7d82a66f.jsonl",
+    "bytes": 2938,
+    "sha256": "c0b158720d5c8c062b112dacd93b86351bcd6b0b779655cef909c0f71467fa5d"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-55743e19-f446-4760-a791-580a18982557.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-55743e19-f446-4760-a791-580a18982557.jsonl",
+    "bytes": 5639,
+    "sha256": "d4484b2c3211457fc7250ace2ba30acf1ce4e277d96f5100bb062049c07981c8"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-58052e36-6eab-420d-9099-cc02ae0a0b8d.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-58052e36-6eab-420d-9099-cc02ae0a0b8d.jsonl",
+    "bytes": 5876,
+    "sha256": "e053aa14e2d0148e165fdb75960999cd7219a444ea73457636a60dc8b91009e7"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-63b4294a-bbd3-4a57-a927-e84a3ca713d2.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-63b4294a-bbd3-4a57-a927-e84a3ca713d2.jsonl",
+    "bytes": 3248,
+    "sha256": "1950d5483b4e62543d095814224db3fb2d3cb807ade716b77bc6bc83aef84a40"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-800b6337-2a67-45ff-8761-fcfbc6d37059.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-800b6337-2a67-45ff-8761-fcfbc6d37059.jsonl",
+    "bytes": 722,
+    "sha256": "984a045de0bc8d8191ffc14b9bdf839900593ccb5cf8041143ab6eb30bad2e11"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-8e91422b-36bb-49b1-8949-d9dc51450f12.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-8e91422b-36bb-49b1-8949-d9dc51450f12.jsonl",
+    "bytes": 2938,
+    "sha256": "fa4729e54e36d8d74171020a6da40a9015ab1335e792e34f888a164d7244d906"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-98698680-1efa-4ecf-b858-038f893444ab.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-98698680-1efa-4ecf-b858-038f893444ab.jsonl",
+    "bytes": 6103,
+    "sha256": "44f059b3e198a1b03c4c0ba7951089b5f24d28e91ea4142606c812dcb674072c"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-a6f0c44a-2dce-4ac3-8a34-4255a231cce4.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-a6f0c44a-2dce-4ac3-8a34-4255a231cce4.jsonl",
+    "bytes": 49268,
+    "sha256": "ce71e027326932c6b1ec003fee9b2c26870a3960c7d47760fc4d968dbca11663"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-abbbf286-cfba-4c4c-8ff2-0ba383a8a5a8.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-abbbf286-cfba-4c4c-8ff2-0ba383a8a5a8.jsonl",
+    "bytes": 2166,
+    "sha256": "f379d34fe5db88f4db505ab718f2de3db5450cbf5b904596e8dbccd6eebf0277"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-b3ddbff4-2c58-40eb-8832-011c6bcca4b1.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-b3ddbff4-2c58-40eb-8832-011c6bcca4b1.jsonl",
+    "bytes": 2938,
+    "sha256": "aca10c672a55ce67fd38b4ab38b4047a7dbf2c2fc64de361dbcf464d9ea6b0c4"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-cb6417a8-9c2a-4abb-a19a-184043247cd0.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-cb6417a8-9c2a-4abb-a19a-184043247cd0.jsonl",
+    "bytes": 1253,
+    "sha256": "634e66d2c5a69e97e04024a527d78a498604fe197dd3b812dd831fa0b52db9d4"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-d23a3a5a-488d-481c-8a0f-563ea8960975.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-d23a3a5a-488d-481c-8a0f-563ea8960975.jsonl",
+    "bytes": 3248,
+    "sha256": "7e1b3e86928d9faa3857343c82635e93cd92d5edd7020aac22e231faf2d7a924"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-d5132ac8-b5cd-4147-a4bd-6409b5bb91bd.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-d5132ac8-b5cd-4147-a4bd-6409b5bb91bd.jsonl",
+    "bytes": 11843,
+    "sha256": "f27e168d4c09b218211bf559362431b64373f096f206e23e3782f89aa27bb4dc"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-ddaecc74-be5d-4aab-932b-7477a30d093a.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-ddaecc74-be5d-4aab-932b-7477a30d093a.jsonl",
+    "bytes": 3137,
+    "sha256": "d3b3562c37bd8ace171d722f2f05328c8e224f06a5c4128f9ad02d021494aecb"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-e213ff7f-0053-46e8-b66b-337e0f3f569a.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-e213ff7f-0053-46e8-b66b-337e0f3f569a.jsonl",
+    "bytes": 18303,
+    "sha256": "7ae3c2bc96e7f44de2293b51c7eb9870cd322fb96876446ebe46a59e3370515d"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-e4642395-f71a-4b77-99ff-7d8f49d894b0.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-e4642395-f71a-4b77-99ff-7d8f49d894b0.jsonl",
+    "bytes": 7796,
+    "sha256": "1848b7178ae815b8dc675a22fd824a517dc09498b17c14fbd6e047b07f598a51"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-eedc1c34-d6b3-456a-8ae0-b84c419580f3.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-eedc1c34-d6b3-456a-8ae0-b84c419580f3.jsonl",
+    "bytes": 6103,
+    "sha256": "b18ebc8a0810717bcd8d383d6bfc9834a965955f73b1bda8d1db2a2b25e2e0e2"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-2-pg-f72df403-f5e7-45b8-958d-48f843105f91.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task-2-pg-f72df403-f5e7-45b8-958d-48f843105f91.jsonl",
+    "bytes": 591,
+    "sha256": "02e25a75205cc3ca177e51729fe5455c48c178ff6dc1a0200cfd182a791fe535"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task5-browser-server.json",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-browser-server.json",
+    "bytes": 1516,
+    "sha256": "f058562e0ff2d5ee9b8a161a7ec57396d9d4e15c2111eb7a715dddd2c2bd9e46"
+  },
+  {
+    "original": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task5-browser-provider.jsonl",
+    "path": "docs/specs/evidence/jd-editor-task5/implementation/raw/task5-browser-provider.jsonl",
+    "bytes": 45551,
+    "sha256": "a05165ac8b81465d3eee85b77086a453a11855057876ae91931fc2b130573bbc"
+  }
+]

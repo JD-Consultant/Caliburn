@@ -1,0 +1,55 @@
+.F..                                                                     [100%]
+================================== FAILURES ===================================
+_________ test_close_signals_and_drains_every_native_app_entry[read] __________
+
+jd = <analysis_agent.jd_service.JdService object at 0x000002121FD6CFB0>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-bcdea8f2-ff3d-4edd-8b7d-3257aa32427a/test_close_signals_and_drains_1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002122360EE40>
+entry = 'read'
+
+    @pytest.mark.parametrize('entry',['manual','read','selection','create'])
+    def test_close_signals_and_drains_every_native_app_entry(jd,tmp_path,monkeypatch,entry):
+        from threading import Thread
+        from analysis_agent.jd_contract import manual_intent,revision_ref
+        from analysis_agent.jd_routes import read_document
+        intent=prepared(jd)
+        assert jd.manual_save(intent).status=='committed'
+        base=jd.store.current(intent.scope)
+        key=str(uuid4())
+        intent=manual_intent(intent.scope,{'request_key':key,'base_revision_ref':revision_ref(intent.scope,base.id),'value':intent.value})
+        entered,unwound=Event(),Event()
+        outcomes=[]
+        with service_harness(tmp_path,engine=jd.catalog.engine) as (service,sent,_):
+            service.jd=jd
+            context=service._context(intent.scope.document_id)
+            name='selection' if entry=='selection' else 'validate_value'
+            original=getattr(jd.engine,name)
+            def waiting(*args,**kwargs):
+                entered.set()
+                assert kwargs.get('cancel') is not None,'Each entry must carry its App shutdown signal'
+                assert kwargs['cancel'].wait(5),'App close must signal this native entry'
+                try: return original(*args,**kwargs)
+                finally: unwound.set()
+            monkeypatch.setattr(jd.engine,name,waiting)
+            def work():
+                try:
+                    if entry=='manual': result=service.save_manual(intent,key)
+                    elif entry=='read': result=read_document(service,intent.scope,{})
+                    elif entry=='create': result=service.create_document('shutdown-create',request_key=str(uuid4()))
+                    else: result=service.submit(intent.scope.document_id,'shutdown-select','原句',jd_selection={
+                        'base_revision_ref':revision_ref(intent.scope,base.id),
+                        'range':{'anchor':{'path':[0,0],'offset':0},'focus':{'path':[0,0],'offset':1}}})
+                    outcomes.append(result)
+                except Exception as exc: outcomes.append(type(exc).__name__)
+            worker=Thread(target=work);worker.start()
+>           assert entered.wait(5)
+E           assert False
+E            +  where False = wait(5)
+E            +    where wait = <threading.Event at 0x2122378d070: unset>.wait
+
+tests\test_jd_admission.py:216: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-d5132ac8-b5cd-4147-a4bd-6409b5bb91bd.jsonl
+=========================== short test summary info ===========================
+FAILED tests/test_jd_admission.py::test_close_signals_and_drains_every_native_app_entry[read]
+1 failed, 3 passed, 6 deselected in 13.38s

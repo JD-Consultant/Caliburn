@@ -1,0 +1,30 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ test_unreaped_handle_survives_tool_return_and_explicit_cleanup_uses_same_process _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD6F2C6F30>
+
+    def test_unreaped_handle_survives_tool_return_and_explicit_cleanup_uses_same_process(monkeypatch):
+        engine = JdEngine(timeout=.2, cleanup_timeout=.2)
+>       assert hasattr(engine, 'native_calls'), 'Native ownership must survive _call return'
+E       AssertionError: Native ownership must survive _call return
+E       assert False
+E        +  where False = hasattr(<analysis_agent.jd_engine.JdEngine object at 0x000001FD6F2C5D30>, 'native_calls')
+
+tests\test_jd_native_lifecycle.py:14: AssertionError
+__ test_spawn_in_progress_blocks_quiescence_and_late_return_is_cleaned_once ___
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FD6F2C73E0>
+
+    def test_spawn_in_progress_blocks_quiescence_and_late_return_is_cleaned_once(monkeypatch):
+        engine = JdEngine(timeout=.2, cleanup_timeout=.2)
+>       assert hasattr(engine, 'native_calls'), 'Spawn must register before Popen'
+E       AssertionError: Spawn must register before Popen
+E       assert False
+E        +  where False = hasattr(<analysis_agent.jd_engine.JdEngine object at 0x000001FD6F2C6FC0>, 'native_calls')
+
+tests\test_jd_native_lifecycle.py:42: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_jd_native_lifecycle.py::test_unreaped_handle_survives_tool_return_and_explicit_cleanup_uses_same_process
+FAILED tests/test_jd_native_lifecycle.py::test_spawn_in_progress_blocks_quiescence_and_late_return_is_cleaned_once
+2 failed in 0.31s

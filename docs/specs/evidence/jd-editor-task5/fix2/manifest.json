@@ -1,0 +1,32 @@
+[
+  {
+    "path": "review.diff",
+    "bytes": 5865,
+    "sha256": "117c9b75157bea4aa125080a0886233814dd7a5d5a60bfb15bdd7d3c7082d83b"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 655,
+    "sha256": "1098202a4ed989f1bd1eed30d74132f6c9ce238b1e2a4a8001f2fc2893df48a6"
+  },
+  {
+    "path": "report.md",
+    "bytes": 1626,
+    "sha256": "49300451afce611a0a5f225e83e7d86ed87bdd4d48fade65628399dab5776ea0"
+  },
+  {
+    "path": "red.log",
+    "bytes": 5433,
+    "sha256": "51d760638c8c4f1f8cf545a3cdc3d6b2f458c3e3c94f8eb7a3bde03f91b18d1f"
+  },
+  {
+    "path": "green.log",
+    "bytes": 116,
+    "sha256": "23e4458ddff8933c4bf9f4af130680d2f065f841e8448da82e112fe2cfc49801"
+  },
+  {
+    "path": "review.md",
+    "bytes": 3363,
+    "sha256": "3f92ec88faab925ba13131de011569de981fbe66a0ed50a243ae20ab33c486cc"
+  }
+]

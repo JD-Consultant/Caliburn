@@ -47,6 +47,7 @@ def _jd_message_projection(messages, result_ids):
 
 
 class JdSessionState(AgentState):
+    jd_bindings: dict
     jd_refs: dict
     jd_sources: dict
     jd_results: dict
@@ -61,7 +62,10 @@ class JdSessionState(AgentState):
 class JdToolSession(AgentMiddleware):
     state_schema=JdSessionState
 
-    def __init__(self, service, source, *, page_size=64, cancel=None, source_read_tools=()):
+    def __init__(self, service, source, *, page_size=64, cancel=None, source_read_tools=(), native_calls=None):
+        from analysis_agent.jd_engine import JdNativeCalls
+        self.native_calls = native_calls if native_calls is not None else JdNativeCalls()
+        self.stopped_proof = None
         self.source_read_tools=tuple(t for t in source_read_tools if t.name=="read_conversation")
         self.cancel=cancel
         self.model_preparation=ContextVar("jd_model_preparation",default=None)
@@ -92,7 +96,10 @@ class JdToolSession(AgentMiddleware):
         if previous and not any(isinstance(m,AIMessage) and m.id==previous.get('response_id')
                 and m.response_metadata.get('status')=='completed' for m in state['messages']):
             previous=None
-        return {'jd_last_model_view':previous,'jd_turn_id':current.id,'jd_binding':None,'jd_turn_notice':None,
+        if state.get('jd_pending_operation') or any(not b.get('closed') for b in state.get('jd_bindings',{}).values()):
+            from analysis_agent.publication import PublicationUncertain
+            raise PublicationUncertain('Prior JD calls must close before a new input')
+        return {'jd_last_model_view':previous,'jd_turn_id':current.id,'jd_binding':None,'jd_turn_notice':None,'jd_bindings':{},
             'jd_refs':state.get('jd_refs',{}),'jd_results':state.get('jd_results',{}),
             'jd_sources':{**state.get('jd_sources',{}),source:{'current_input':current.id}}}
 
@@ -118,10 +125,10 @@ class JdToolSession(AgentMiddleware):
                 binding.update(base=str(base),commands=commands,digest=request_digest(self.scope,base,commands,'ai'))
             except (ValueError, SchemaValidationError) as exc:
                 binding['invalid']=str(exc).split('\n')[0][:300]
-        return {'jd_binding':binding}
+        return {'jd_binding':binding,'jd_bindings':{**state.get('jd_bindings',{}),call['id']:binding}}
 
     def before_model(self,state,runtime):
-        if state.get("jd_pending_operation"):
+        if state.get("jd_pending_operation") or not self.native_calls.quiescent:
             from analysis_agent.publication import PublicationUncertain
             raise PublicationUncertain("JD operation requires reconciliation before another model request")
         from analysis_agent.jd_context import prepare_notice
@@ -225,7 +232,7 @@ class JdToolSession(AgentMiddleware):
         elif 'selection_ref' in args:
             r=refs.require(args['selection_ref'],'selection'); kind,access='selection',r['access']
             query=JdReadQuery(UUID(r['revision']),selection=r['range'])
-        view=self.service.read(self.scope,query, **({"cancel":self.cancel} if self.cancel is not None else {}))
+        view=self.service.read(self.scope,query, cancel=self.cancel, native_calls=self.native_calls)
         if view.status!='ok': return read_failure_to_wire(view)
         revision=view.revision; fragment=view.fragment[offset:offset+self.page_size]
         index={n['id']:n for n in elements(revision.value)}
@@ -350,7 +357,7 @@ class JdToolSession(AgentMiddleware):
                         outcome=JdWriteOutcome(self.scope,None,base,None,'stale_view','ai',
                             durability='unconfirmed',next_action='reread_current')
                     else:
-                        outcome=self.service.edit(JdEditIntent(self.scope,operation,base,digest,commands), cancel=self.cancel)
+                        outcome=self.service.edit(JdEditIntent(self.scope,operation,base,digest,commands), cancel=self.cancel, native_calls=self.native_calls)
                 result=outcome_to_wire(outcome)
                 if outcome.status in ('committed','no_change'): self._change(refs,outcome)
         except (ValueError,SchemaValidationError):
@@ -361,8 +368,64 @@ class JdToolSession(AgentMiddleware):
         message=ToolMessage(json.dumps(result,ensure_ascii=False),name=name,tool_call_id=call_id,id='jd-result:'+call_id)
         results={**state.get('jd_results',{}),message.id:{'name':name,'call':call_id,'revision':result.get('revision_ref',result.get('result_revision_ref')),
             'read_kind':result.get('read_kind'),'continuation':result.get('continuation_ref'),'status':result['status']}}
+        pending = result.get('next_action')=='reconcile_operation' or not self.native_calls.quiescent
         return Command(update={'messages':[message],'jd_refs':refs.bindings,'jd_results':results,
-            'jd_pending_operation':deepcopy(binding) if result.get('next_action')=='reconcile_operation' else state.get('jd_pending_operation')})
+            'jd_bindings':{**state.get('jd_bindings',{}),call_id:{**binding,'closed':not pending}},
+            'jd_pending_operation':deepcopy(binding) if pending else state.get('jd_pending_operation')})
+
+    def reconcile(self, state, message, call, config):
+        """Original saved factory identity only; never execute or replay a tool."""
+        from analysis_agent.jd_reconcile import JdAdmittedIdentity, reconcile_identity
+        from analysis_agent.publication import PublicationUncertain
+        self._scope(config)
+        bindings = dict(state.get('jd_bindings',{}))
+        binding = bindings.get(call.get('id'))
+        if binding is None:
+            binding = next((b for b in (state.get('jd_binding'),state.get('jd_pending_operation'))
+                            if b and b.get('call')==call.get('id')), None)
+        identity = [self.scope.document_id, binding.get('input') if binding else None, message.id, call.get('id')]
+        if (not binding or binding.get('document')!=self.scope.document_id
+                or binding.get('message')!=message.id or binding.get('name')!=call.get('name')
+                or binding.get('args')!=call.get('args')
+                or binding.get('operation')!=str(uuid5(NAMESPACE_URL,'jd:'+json.dumps(identity)))
+                or not any(isinstance(m,HumanMessage) and m.id==binding['input'] for m in state['messages'])):
+            raise PublicationUncertain('JD saved call identity cannot be confirmed')
+        if self.stopped_proof is None:
+            raise PublicationUncertain('JD stopped-writer evidence is required')
+        self.stopped_proof.require(self.scope)
+        if call['name']=='jd_edit' and 'invalid' not in binding:
+            if request_digest(self.scope,UUID(binding['base']),binding['commands'],'ai')!=binding['digest']:
+                raise PublicationUncertain('JD saved request digest differs')
+            admitted = JdAdmittedIdentity(self.scope,UUID(binding['operation']),UUID(binding['base']),binding['digest'],'ai')
+            result = outcome_to_wire(reconcile_identity(self.service.store,admitted,self.stopped_proof))
+            content = json.dumps(result,ensure_ascii=False)
+        else:
+            content = 'JD result unavailable/discarded: this turn was closed. Do not infer absence of data.'
+        paired = any(isinstance(m,ToolMessage) and m.tool_call_id==call['id'] for m in state['messages'])
+        bindings[call['id']] = {**binding,'closed':True}
+        return Command(update={'jd_bindings':bindings,'jd_pending_operation':None,
+            'messages':[] if paired else [ToolMessage(content,name=call['name'],tool_call_id=call['id'],id='jd-result:'+call['id'])]})
+
+    def reconcile_all(self, state, config):
+        from analysis_agent.publication import PublicationUncertain
+        working = deepcopy(state)
+        bindings = dict(working.get('jd_bindings',{}))
+        for binding in (working.get('jd_binding'),working.get('jd_pending_operation')):
+            if binding and binding['call'] not in bindings:
+                bindings[binding['call']] = binding
+        working['jd_bindings'] = bindings
+        updates = {'messages':[]}
+        for binding in tuple(bindings.values()):
+            if binding.get('closed'): continue
+            message = next((m for m in working['messages'] if isinstance(m,AIMessage) and m.id==binding['message']),None)
+            call = next((c for c in message.tool_calls if c.get('id')==binding['call']),None) if message else None
+            if call is None: raise PublicationUncertain('JD pending call has no saved response')
+            command = self.reconcile(working,message,call,config)
+            updates['messages'].extend(command.update['messages'])
+            for key,value in command.update.items():
+                if key!='messages': updates[key]=value; working[key]=value
+            working['messages'].extend(command.update['messages'])
+        return updates
 
 
 class JdExecutionIdentity(AgentMiddleware):

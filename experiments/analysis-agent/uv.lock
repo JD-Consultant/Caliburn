@@ -101,6 +101,7 @@ dependencies = [
     { name = "openai" },
     { name = "openai-agents" },
     { name = "psycopg", extra = ["binary"] },
+    { name = "pywin32", marker = "sys_platform == 'win32'" },
     { name = "sqlalchemy" },
     { name = "uvicorn" },
 ]
@@ -127,6 +128,7 @@ requires-dist = [
     { name = "openai", specifier = "==3.8.0" },
     { name = "openai-agents", specifier = "==0.22.0" },
     { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" },
+    { name = "pywin32", marker = "sys_platform == 'win32'", specifier = "==312" },
     { name = "sqlalchemy", specifier = "==2.0.52" },
     { name = "uvicorn", specifier = "==0.52.4" },
 ]

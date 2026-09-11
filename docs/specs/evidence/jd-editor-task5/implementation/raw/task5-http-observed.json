@@ -1,0 +1,17 @@
+{
+  "status": 200,
+  "body": {
+    "write_blocked": false,
+    "can_recover": false,
+    "status": "no_pending",
+    "request_key": null
+  },
+  "server_pid": 12632,
+  "bootstrap": {
+    "key": "jd-editor-offline-20260910",
+    "version": 1,
+    "prior_group_stopped": true,
+    "prior_object": "absent",
+    "pid": 12632
+  }
+}

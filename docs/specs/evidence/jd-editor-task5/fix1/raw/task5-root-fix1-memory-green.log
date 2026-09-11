@@ -1,0 +1,4 @@
+Traceback (most recent call last):
+  File "S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\tests\task5_acceptance_runner.py", line 4, in <module>
+    from analysis_agent.windows_lifecycle import bootstrap
+ModuleNotFoundError: No module named 'analysis_agent'

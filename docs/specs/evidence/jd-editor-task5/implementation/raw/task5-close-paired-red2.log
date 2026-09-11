@@ -1,0 +1,62 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_stop_recovers_committed_original_without_model_native_or_duplicate_result[True] _
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001B3305A3DA0>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-bebe6670-bc88-4806-a81e-24f57102f854/test_stop_recovers_committed_o0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001B3303DE930>
+paired = True
+
+    @pytest.mark.parametrize('paired', [False, True])
+    def test_stop_recovers_committed_original_without_model_native_or_duplicate_result(jd, tmp_path, monkeypatch, paired):
+        attempts = []
+        original = jd.edit
+        def lost(intent, **kwargs):
+            attempts.append(intent)
+            result = original(intent, **kwargs)
+            assert result.status == 'committed'
+            if paired:
+                from analysis_agent.jd_store import failure
+                return failure(intent, 'outcome_unknown', base_id=intent.base_id, confirmed=False)
+            raise RuntimeError('commit succeeded, original ToolMessage checkpoint lost')
+        monkeypatch.setattr(jd, 'edit', lost)
+        def reply(request):
+            outputs = [i for i in json.loads(request.content).get('input', []) if i.get('type') == 'function_call_output']
+            if not outputs: return call('jd_read')
+            if len(outputs) == 1:
+                read = json.loads(outputs[-1]['output'])
+                return call('jd_edit', **replacement(read['targets'][0]['target_ref'], '已提交原工作'))
+            return done()
+        with service_harness(tmp_path, engine=jd.catalog.engine, respond=reply) as (service, sent, _):
+            service.jd = jd
+            document = service.create_document('取消原回執')['id']
+            run = service.submit(document, str(uuid4()), '補完整工作')
+            service.join(document)
+            context = service._context(document)
+            before = context.graph.get_state(context.config, subgraphs=True)
+            from analysis_agent.service import current_values
+            messages = current_values(before)['messages']
+            original_messages = [m.model_dump() for m in messages]
+            head = jd.store.current(JdScope(document))
+            stopped = service.stop(document, run['id'])
+            assert stopped['status'] == 'cancelled', stopped
+            after = context.graph.get_state(context.config)
+            assert not after.next and not after.values.get('jd_pending_operation')
+            assert jd.store.current(JdScope(document)) == head
+            assert len(sent) == 2 and len(attempts) == 1
+            edit_messages = [m for m in after.values['messages'] if isinstance(m,ToolMessage) and m.name == 'jd_edit']
+            assert len(edit_messages) == 1
+            if not paired:
+                assert json.loads(edit_messages[0].content)['status'] == 'committed'
+            saved_by_id = {m.id:m.model_dump() for m in after.values['messages']}
+            assert all(saved_by_id[m['id']] == m for m in original_messages)
+>           assert after.values['jd_last_model_view'] == current_values(before)['jd_last_model_view']
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'jd_last_model_view'
+
+tests\test_jd_close_reconcile.py:57: KeyError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-b3ddbff4-2c58-40eb-8832-011c6bcca4b1.jsonl
+=========================== short test summary info ===========================
+FAILED tests/test_jd_close_reconcile.py::test_stop_recovers_committed_original_without_model_native_or_duplicate_result[True]
+1 failed, 1 deselected in 5.97s

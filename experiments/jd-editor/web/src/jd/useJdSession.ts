@@ -37,6 +37,11 @@ export class JdSession {
   loading = true;
   readUnavailable = false;
   manualUnknown = false;
+  serverWriteBlocked = true;
+  restartRequired = false;
+  recovery: Awaited<ReturnType<JdApi['readRecovery']>> | null = null;
+  candidateRecovery: Awaited<ReturnType<JdApi['readRecovery']>> | null = null;
+  recoverySequence = 0;
   error = "";
   notice = "";
   candidate: Submission | null = null;
@@ -101,6 +106,7 @@ export class JdSession {
     return (
       this.loading ||
       this.readUnavailable ||
+      this.serverWriteBlocked ||
       this.busy ||
       this.manualUnknown ||
       !!this.metadata?.archived ||
@@ -118,10 +124,10 @@ export class JdSession {
     this.emit();
     try {
       this.candidate = submissionCache(this.disk).read(this.document);
+      this.manualUnknown = !!this.candidate;
       this.pendingRun = requestRecoveryCache(this.disk).readRun(this.document);
       if (this.pendingRun) this.text = this.pendingRun.text;
       await this.refresh();
-      if (this.candidate) await this.save(true);
       if (this.pendingRun) await this.lookup();
     } catch (error) {
       this.error = String(error);
@@ -162,16 +168,81 @@ export class JdSession {
         this.notice = "已有新的保存內容；目前未保存修改仍留在畫面，請先處理。";
       this.error = "";
       this.readUnavailable = false;
+      await this.refreshRecovery(generation);
     } catch (error) {
+      if (this.disposed || generation !== this.generation) return;
       this.readUnavailable = true;
       this.error = "暫時無法讀取，請重試。" + String(error);
+      // A failed native read must not hide the independent server owner gate.
+      try { await this.refreshRecovery(generation); } catch { /* keep the gate closed */ }
       throw error;
     } finally {
       this.emit();
     }
   }
+  get canRetryCandidate() {
+    return !!this.candidate && !this.busy && !this.loading && !this.readUnavailable &&
+      !this.serverWriteBlocked && (this.candidateRecovery?.status === 'no_pending' || !this.manualUnknown);
+  }
+  applyRecovery(value: Awaited<ReturnType<JdApi['readRecovery']>>) {
+    if (value.request_key !== this.candidate?.request_key) return;
+    this.candidateRecovery = value;
+    if (value.status !== 'available') return;
+    this.manualUnknown = false;
+    if (['committed','no_change'].includes(value.result.status)) {
+      submissionCache(this.disk).confirm(this.document, value.result);
+      this.candidate = null;
+      this.notice = '已確認上次保存結果；目前工作稿仍保留。';
+    } else this.error = '這次修改尚未保存：' + value.result.status;
+  }
+  async refreshRecovery(generation = this.generation) {
+    const sequence = ++this.recoverySequence;
+    const key = this.candidate?.request_key ?? this.recovery?.request_key ?? undefined;
+    const current = () => !this.disposed && generation === this.generation && sequence === this.recoverySequence;
+    this.serverWriteBlocked = true;
+    try {
+      const exact = key ? await this.port.readRecovery(this.document,key) : null;
+      if (!current()) return;
+      const discovery = await this.port.readRecovery(this.document,undefined);
+      if (!current()) return;
+      if (exact && key === this.candidate?.request_key) this.applyRecovery(exact);
+      this.recovery = discovery.request_key ? discovery : exact ?? discovery;
+      this.serverWriteBlocked = discovery.write_blocked;
+      this.restartRequired = discovery.restart_required === true;
+    } catch (error) {
+      if (!current()) return;
+      this.serverWriteBlocked = true;
+      this.error = '無法確認保存狀態，請重新讀取：' + String(error);
+      throw error;
+    }
+  }
+  async recoverManual() {
+    const recovery = this.recovery;
+    if (this.busy || !recovery?.can_recover || !recovery.request_key) return;
+    const key = recovery.request_key;
+    const generation = ++this.generation;
+    ++this.recoverySequence;
+    this.serverWriteBlocked = true;
+    this.busy = true;
+    this.emit();
+    try {
+      const result = await this.port.recover(this.document,key);
+      if (this.disposed || generation !== this.generation || this.recovery?.request_key !== key) return;
+      this.applyRecovery(result);
+      this.recovery = result;
+      // A fresh complete snapshot is required even after a terminal result.
+      await this.refresh();
+    } catch (error) {
+      if (!this.disposed && generation === this.generation)
+        this.error = '上次保存結果尚待確認：' + String(error);
+    } finally {
+      this.busy = false;
+      this.emit();
+    }
+  }
   async save(reconcile = false) {
     if (!this.head || this.busy) return false;
+    if (reconcile && !this.canRetryCandidate) return false;
     if (!reconcile && !this.dirty) return true;
     if (!reconcile && this.locked) return false;
     if (!reconcile && this.candidate) {
@@ -180,6 +251,9 @@ export class JdSession {
     }
     this.busy = true;
     this.saving = true;
+    const generation = ++this.generation;
+    ++this.recoverySequence;
+    this.serverWriteBlocked = true;
     this.emit();
     try {
       const cache = submissionCache(this.disk);
@@ -198,12 +272,14 @@ export class JdSession {
       const { document_id, ...body } = payload;
       if (document_id !== this.document) throw Error("文件範圍不符");
       const receipt = await this.port.save(this.document, body);
+      if (this.disposed || generation !== this.generation || this.candidate?.request_key !== body.request_key) return false;
       this.manualUnknown = receipt.receipt_durability !== "confirmed";
       if (
         receipt.receipt_durability === "confirmed" &&
         ["committed", "no_change"].includes(receipt.status)
       ) {
         const head = await this.port.read(this.document);
+        if (this.disposed || generation !== this.generation || this.candidate?.request_key !== body.request_key) return false;
         if (head.revision_ref !== receipt.result_revision_ref) {
           this.notice = "本次保存已確認，已有後續版本。";
         }
@@ -236,6 +312,9 @@ export class JdSession {
       } else this.error = "保存尚未確認：" + String(error);
       return false;
     } finally {
+      if (!this.disposed && generation === this.generation) {
+        try { await this.refreshRecovery(generation); } catch { /* Keep the gate blocked. */ }
+      }
       this.busy = false;
       this.saving = false;
       this.emit();
@@ -287,6 +366,9 @@ export class JdSession {
     }
     if (!this.head) return false;
     this.busy = true;
+    ++this.generation;
+    ++this.recoverySequence;
+    this.serverWriteBlocked = true;
     this.emit();
     try {
       const body: MessageInput =
@@ -325,6 +407,9 @@ export class JdSession {
   async stop() {
     if (!this.run) return;
     this.busy = true;
+    ++this.generation;
+    ++this.recoverySequence;
+    this.serverWriteBlocked = true;
     this.emit();
     try {
       this.run = await this.port.stop(this.document, this.run.id);
@@ -339,6 +424,9 @@ export class JdSession {
   async resume() {
     if (!this.run?.can_resume) return;
     this.busy = true;
+    ++this.generation;
+    ++this.recoverySequence;
+    this.serverWriteBlocked = true;
     this.emit();
     try {
       this.run = await this.port.resume(this.document, this.run.id);

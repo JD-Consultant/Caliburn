@@ -1,0 +1,37 @@
+F..                                                                      [100%]
+================================== FAILURES ===================================
+_ test_root_only_manual_binding_preserves_messages_and_first_true_input[False] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-4bdaffcd-68d3-4199-a79f-05651598d4d0/test_root_only_manual_binding_0')
+closed_turn = False
+
+    @pytest.mark.parametrize('closed_turn', [False, True])
+    def test_root_only_manual_binding_preserves_messages_and_first_true_input(tmp_path, closed_turn):
+        import analysis_agent.conversation as conversation
+        assert hasattr(conversation, 'save_manual_pending'), 'Root-only manual identity is missing'
+        with service_harness(tmp_path) as (service, sent, _):
+            document = service.create_document('手改首次文件')['id']
+            if closed_turn:
+                service.submit(document, 'first', '之前真正訪談'); service.join(document)
+            context = service._context(document)
+            before = deepcopy(context.graph.get_state(context.config))
+            count = len(sent)
+            descriptor = {'operation': str(uuid4()), 'base': str(uuid4()), 'digest': 'a'*64,
+                          'request_key': str(uuid4()), 'origin': 'manual'}
+            conversation.save_manual_pending(context.graph, context.config, descriptor)
+            after = context.graph.get_state(context.config)
+            assert not after.next and after.values['jd_manual_pending'] == descriptor
+            for name in ('messages', 'turn_outcome', 'closed_turns'):
+>               assert after.values.get(name) == before.values.get(name)
+E               AssertionError: assert [] == None
+E                +  where [] = <built-in method get of dict object at 0x000002B4A9AA6940>('messages')
+E                +    where <built-in method get of dict object at 0x000002B4A9AA6940> = {'messages': [], 'jd_manual_pending': {'operation': 'bec60422-e5aa-4ac2-8eab-4dd73052a14c', 'base': 'e4a1a8a6-1875-420...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'request_key': '4431734a-c065-48bf-8fa5-a2d8d2feec1f', ...}, 'closed_turns': {}}.get
+E                +      where {'messages': [], 'jd_manual_pending': {'operation': 'bec60422-e5aa-4ac2-8eab-4dd73052a14c', 'base': 'e4a1a8a6-1875-420...aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'request_key': '4431734a-c065-48bf-8fa5-a2d8d2feec1f', ...}, 'closed_turns': {}} = StateSnapshot(values={'messages': [], 'jd_manual_pending': {'operation': 'bec60422-e5aa-4ac2-8eab-4dd73052a14c', 'base... 'step': 0, 'parents': {}}, created_at='2026-09-10T04:30:05.957175+00:00', parent_config=None, tasks=(), interrupts=()).values
+E                +  and   None = <built-in method get of dict object at 0x000002B4A9851AC0>('messages')
+E                +    where <built-in method get of dict object at 0x000002B4A9851AC0> = {}.get
+E                +      where {} = StateSnapshot(values={}, next=(), config={'configurable': {'thread_id': '40c520f8-98b5-48bf-a251-d8df1fed7c45'}}, metadata=None, created_at=None, parent_config=None, tasks=(), interrupts=()).values
+
+tests\test_jd_admission.py:27: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_jd_admission.py::test_root_only_manual_binding_preserves_messages_and_first_true_input[False]
+1 failed, 2 passed in 5.09s

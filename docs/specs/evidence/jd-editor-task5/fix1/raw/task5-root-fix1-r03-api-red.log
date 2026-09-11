@@ -1,0 +1,225 @@
+.....FF.F..                                                              [100%]
+================================== FAILURES ===================================
+_______ test_r03_retained_read_reports_restart_without_fabricating_run ________
+
+jd = <analysis_agent.jd_service.JdService object at 0x000002875EAF04A0>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-root-fix1-pytest-r03-red/test_r03_retained_read_reports0')
+
+    def test_r03_retained_read_reports_restart_without_fabricating_run(jd,tmp_path):
+        with recovery_client(jd,tmp_path) as (client,service):
+            document=service.create_document('retained read')['id']
+            context=service._context(document)
+            token,call=context.native_calls.register(lambda process:False,.01)
+            context.native_calls.finish(token)
+            try:
+                result=client.get(f'/documents/{document}/jd/manual-recovery').json()
+>               assert result['restart_required'] is True
+                       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               KeyError: 'restart_required'
+
+tests\test_jd_fix1_admission.py:110: KeyError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-33aa49ed-294d-41aa-a77a-5aeea118a74a.jsonl
+_____ test_get_only_observes_and_explicit_original_key_closes_known_none ______
+
+jd = <analysis_agent.jd_service.JdService object at 0x000002875FE6DD60>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-root-fix1-pytest-r03-red/test_get_only_observes_and_exp0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000028752BC87A0>
+
+    def test_get_only_observes_and_explicit_original_key_closes_known_none(jd,tmp_path,monkeypatch):
+        with recovery_client(jd,tmp_path) as (client,service):
+            intent,key,context,descriptor=pending(jd,service)
+            path=f'/documents/{intent.scope.document_id}/jd/manual-recovery'
+            before=context.graph.get_state(context.config)
+            native=[]
+            monkeypatch.setattr(jd.engine,'validate_value',lambda *a,**kw:native.append(a))
+            found=client.get(path)
+            assert found.status_code==200,found.text
+            assert found.headers['cache-control']=='no-store'
+            assert found.json()=={'status':'unknown','request_key':key,'write_blocked':True,'can_recover':True}
+            assert context.graph.get_state(context.config).config==before.config
+            assert jd.store.receipt(intent.scope,intent.operation_id) is None
+            recovered=client.post(path,json={'request_key':key})
+            assert recovered.status_code==200,recovered.text
+            result=recovered.json()
+            assert result['status']=='available' and result['result']['status']=='save_failed'
+>           assert not result['write_blocked'] and not result['can_recover']
+E           assert (not True)
+
+tests\test_jd_manual_recovery.py:52: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-33aa49ed-294d-41aa-a77a-5aeea118a74a.jsonl
+___ test_terminal_clear_failure_preserves_result_and_matching_cleanup_exit ____
+
+config = {'configurable': {'thread_id': '01c2d141-a9f5-4a80-8b40-3764d41d2419'}}
+value = {'jd_manual_pending': None}, kwargs = {'as_node': 'analysis'}
+
+    def cannot_clear(config,value,**kwargs):
+        if 'jd_manual_pending' in value and value['jd_manual_pending'] is None:
+>           raise RuntimeError('clear failed')
+E           RuntimeError: clear failed
+
+tests\test_jd_manual_recovery.py:84: RuntimeError
+
+The above exception was the direct cause of the following exception:
+
+jd = <analysis_agent.jd_service.JdService object at 0x0000028760287F20>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-root-fix1-pytest-r03-red/test_terminal_clear_failure_pr0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002876017AE40>
+
+    def test_terminal_clear_failure_preserves_result_and_matching_cleanup_exit(jd,tmp_path,monkeypatch):
+>       with recovery_client(jd,tmp_path) as (client,service):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_jd_manual_recovery.py:76: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:158: in __exit__
+    self.gen.throw(value)
+tests\test_jd_manual_recovery.py:21: in recovery_client
+    with TestClient(create_app(resources),base_url='http://127.0.0.1:8091') as client:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:709: in __exit__
+    self.exit_stack.close()
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:618: in close
+    self.__exit__(None, None, None)
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:610: in __exit__
+    raise exc_details[1]
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:478: in _exit_wrapper
+    callback(*args, **kwds)
+.venv\Lib\site-packages\starlette\testclient.py:702: in wait_shutdown
+    portal.call(self.wait_shutdown)
+.venv\Lib\site-packages\anyio\from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+.venv\Lib\site-packages\anyio\from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:749: in wait_shutdown
+    await receive()
+.venv\Lib\site-packages\starlette\testclient.py:739: in receive
+    self.task.result()
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+.venv\Lib\site-packages\anyio\from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:714: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+.venv\Lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+.venv\Lib\site-packages\starlette\applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\errors.py:151: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\base.py:103: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\cors.py:80: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\trustedhost.py:36: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\exceptions.py:49: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv\Lib\site-packages\fastapi\routing.py:2726: in app
+    await self.lifespan(scope, receive, send)
+.venv\Lib\site-packages\starlette\routing.py:648: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+.venv\Lib\site-packages\fastapi\routing.py:240: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+src\analysis_agent\api.py:230: in lifespan
+    await run_in_threadpool(manager.__exit__, None, None, None)
+.venv\Lib\site-packages\starlette\concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:144: in __exit__
+    next(self.gen)
+tests\test_jd_manual_recovery.py:17: in resources
+    with service_harness(tmp_path,engine=jd.catalog.engine) as (service,sent,_):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:144: in __exit__
+    next(self.gen)
+tests\test_service.py:53: in service_harness
+    service.close()
+src\analysis_agent\service.py:820: in close
+    self._reconcile_manual(context)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <analysis_agent.service.AnalysisService object at 0x00000287602E5DF0>
+context = DocumentRuntime(graph=<langgraph.graph.state.CompiledStateGraph object at 0x0000028760423440>, reader=<analysis_agent....generation=1, prior_execution=False, closing=False, close_entries=0, read_stop=<threading.Event at 0x28760405760: set>)
+
+    def _reconcile_manual(self, context):
+        """Only the root's admitted identity; no candidate reconstruction."""
+        from uuid import UUID
+        import re
+        from analysis_agent.conversation import save_manual_pending
+        from analysis_agent.jd_types import JdScope
+        from analysis_agent.jd_contract import manual_operation_id
+        from analysis_agent.jd_reconcile import JdWriterStopped,JdAdmittedIdentity,reconcile_identity
+        with self.lock:
+            snapshot = context.graph.get_state(context.config)
+            pending = self._manual_pending(context)
+            generation = context.generation
+        if pending is None:
+            return None
+        scope = JdScope(context.reader.document_id)
+        if (snapshot.next or pending.get('origin')!='manual' or
+                set(pending)!= {'operation','base','digest','request_key','origin'} or
+                not re.fullmatch('[0-9a-f]{64}',pending.get('digest','')) or
+                str(manual_operation_id(scope,pending['request_key']))!=pending['operation']):
+            raise PublicationUncertain('Manual admission identity cannot be confirmed')
+        proof = JdWriterStopped(scope,context.native_calls,
+            lambda: not context.active_entries and not self._running(scope.document_id),
+            self.lifecycle,context.prior_execution)
+        identity = JdAdmittedIdentity(scope,UUID(pending['operation']),UUID(pending['base']),pending['digest'],'manual')
+        result = reconcile_identity(self.jd.store,identity,proof)
+        with self.lock:
+            if context.generation!=generation or context.graph.get_state(context.config).values.get('jd_manual_pending')!=pending:
+                raise PublicationUncertain('Manual admission changed during reconciliation')
+            try:
+                save_manual_pending(context.graph,context.config,None)
+            except Exception as exc:
+>               raise PublicationUncertain('Original result is terminal but admission cleanup is unconfirmed') from exc
+E               analysis_agent.publication.PublicationUncertain: Original result is terminal but admission cleanup is unconfirmed
+
+src\analysis_agent\service.py:455: PublicationUncertain
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-33aa49ed-294d-41aa-a77a-5aeea118a74a.jsonl
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_fix1_admission.py::test_r03_retained_read_reports_restart_without_fabricating_run
+FAILED tests/test_jd_manual_recovery.py::test_get_only_observes_and_explicit_original_key_closes_known_none
+FAILED tests/test_jd_manual_recovery.py::test_terminal_clear_failure_preserves_result_and_matching_cleanup_exit
+3 failed, 8 passed, 1 warning in 28.86s

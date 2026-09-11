@@ -1,0 +1,120 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+______________ test_close_waits_for_stop_final_projection[False] ______________
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-fix2-red-pytest/test_close_waits_for_stop_fina0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FA7A8590A0>
+projection_fails = False
+
+    @pytest.mark.parametrize('projection_fails', [False, True])
+    def test_close_waits_for_stop_final_projection(tmp_path, monkeypatch, projection_fails):
+        with service_harness(tmp_path) as (service, _, replies):
+            document = service.create_document('停止結果')['id']
+            replies.extend(httpx.ReadTimeout('offline') for _ in range(3))
+            run = service.submit(document, 'first', '保留原問句')
+            service.join(document)
+            context = service._context(document)
+            entered, release, closed = Event(), Event(), Event()
+            results, errors = [], []
+            original = service.get_run
+            calls = 0
+    
+            def held_projection(*args):
+                nonlocal calls
+                calls += 1
+                if calls == 2:
+                    entered.set()
+                    assert release.wait(5)
+                    if projection_fails:
+                        raise RuntimeError('final projection unavailable')
+                return original(*args)
+    
+            monkeypatch.setattr(service, 'get_run', held_projection)
+    
+            def stopping():
+                try:
+                    results.append(service.stop(document, run['id']))
+                except Exception as exc:
+                    errors.append(exc)
+    
+            def closing():
+                try:
+                    service.close()
+                    closed.set()
+                except Exception as exc:
+                    errors.append(exc)
+    
+            worker = Thread(target=stopping)
+            closer = Thread(target=closing)
+            worker.start()
+            try:
+                assert entered.wait(5)
+                closer.start()
+>               assert not closed.wait(.2), 'Shutdown returned before stop projection unwound'
+E               AssertionError: Shutdown returned before stop projection unwound
+E               assert not True
+E                +  where True = wait(0.2)
+E                +    where wait = <threading.Event at 0x1fa7f27dfa0: set>.wait
+
+tests\test_jd_stop_projection.py:52: AssertionError
+______________ test_close_waits_for_stop_final_projection[True] _______________
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-fix2-red-pytest/test_close_waits_for_stop_fina1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FA7F454080>
+projection_fails = True
+
+    @pytest.mark.parametrize('projection_fails', [False, True])
+    def test_close_waits_for_stop_final_projection(tmp_path, monkeypatch, projection_fails):
+        with service_harness(tmp_path) as (service, _, replies):
+            document = service.create_document('停止結果')['id']
+            replies.extend(httpx.ReadTimeout('offline') for _ in range(3))
+            run = service.submit(document, 'first', '保留原問句')
+            service.join(document)
+            context = service._context(document)
+            entered, release, closed = Event(), Event(), Event()
+            results, errors = [], []
+            original = service.get_run
+            calls = 0
+    
+            def held_projection(*args):
+                nonlocal calls
+                calls += 1
+                if calls == 2:
+                    entered.set()
+                    assert release.wait(5)
+                    if projection_fails:
+                        raise RuntimeError('final projection unavailable')
+                return original(*args)
+    
+            monkeypatch.setattr(service, 'get_run', held_projection)
+    
+            def stopping():
+                try:
+                    results.append(service.stop(document, run['id']))
+                except Exception as exc:
+                    errors.append(exc)
+    
+            def closing():
+                try:
+                    service.close()
+                    closed.set()
+                except Exception as exc:
+                    errors.append(exc)
+    
+            worker = Thread(target=stopping)
+            closer = Thread(target=closing)
+            worker.start()
+            try:
+                assert entered.wait(5)
+                closer.start()
+>               assert not closed.wait(.2), 'Shutdown returned before stop projection unwound'
+E               AssertionError: Shutdown returned before stop projection unwound
+E               assert not True
+E                +  where True = wait(0.2)
+E                +    where wait = <threading.Event at 0x1fa7f643a10: set>.wait
+
+tests\test_jd_stop_projection.py:52: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_jd_stop_projection.py::test_close_waits_for_stop_final_projection[False]
+FAILED tests/test_jd_stop_projection.py::test_close_waits_for_stop_final_projection[True]
+2 failed in 20.17s

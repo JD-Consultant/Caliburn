@@ -1,0 +1,9 @@
+file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/contract/scripts/codegen.mjs:62
+    throw new Error(result.stderr || String(result.error));
+          ^
+
+Error: Error: spawnSync uv EPERM
+    at generate (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/contract/scripts/codegen.mjs:62:11)
+    at async file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/contract/scripts/codegen.mjs:79:3
+
+Node.js v22.23.2

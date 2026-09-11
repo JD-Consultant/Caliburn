@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+
+ Test Files  1 passed (1)
+      Tests  18 passed (18)
+   Start at  13:04:36
+   Duration  855ms (transform 63ms, setup 0ms, import 139ms, tests 14ms, environment 561ms)
+

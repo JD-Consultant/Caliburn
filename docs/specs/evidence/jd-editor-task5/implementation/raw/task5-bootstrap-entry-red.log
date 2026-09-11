@@ -1,0 +1,51 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+___ test_normal_resources_refuse_unmanaged_entry_before_settings_or_clients ___
+
+    def test_normal_resources_refuse_unmanaged_entry_before_settings_or_clients():
+        from analysis_agent.api import open_service
+        from analysis_agent.windows_lifecycle import LifecycleError
+        with pytest.raises(LifecycleError, match='bootstrap_required'):
+>           with open_service():
+                 ^^^^^^^^^^^^^^
+
+tests\test_windows_lifecycle.py:63: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    @contextmanager
+    def open_service():
+        """Fresh isolated resources; no automatic A resume. B checks saved work.
+    
+    Timeout, output and compaction thresholds are explicit deployment values, not
+    an undocumented resurrected initial policy or a promised hard dollar cap.
+    """
+        from langgraph.checkpoint.postgres import PostgresSaver
+        from langgraph.store.postgres import PostgresStore
+        from psycopg.conninfo import conninfo_to_dict, make_conninfo
+        from sqlalchemy import create_engine
+        from sqlalchemy.engine import URL
+        from openai import OpenAI
+        from analysis_agent.budget import ResponsesBudget, validate_context_budget
+        from analysis_agent.catalog import Catalog
+        from analysis_agent.jd_store import JdStore
+        from analysis_agent.jd_engine import JdEngine
+        from analysis_agent.jd_service import JdService
+        from analysis_agent.provider import build_model
+        from analysis_agent.publication import Base as PublicationBase
+    
+        required = ('Q019_DATABASE_URL', 'OPENAI_API_KEY', 'Q019_REQUEST_TIMEOUT_SECONDS',
+                    'Q019_MAX_OUTPUT_TOKENS', 'Q019_COMPACT_THRESHOLD', 'Q019_CONTEXT_WINDOW_TOKENS',
+                    'Q019_BACKGROUND_POLL_SECONDS', 'Q019_BACKGROUND_MAX_RECOVERIES')
+        missing = [name for name in required if not os.environ.get(name)]
+        if missing:
+>           raise RuntimeError('Required settings missing: ' + ', '.join(missing))
+E           RuntimeError: Required settings missing: Q019_DATABASE_URL, OPENAI_API_KEY, Q019_REQUEST_TIMEOUT_SECONDS, Q019_MAX_OUTPUT_TOKENS, Q019_COMPACT_THRESHOLD, Q019_CONTEXT_WINDOW_TOKENS, Q019_BACKGROUND_POLL_SECONDS, Q019_BACKGROUND_MAX_RECOVERIES
+
+src\analysis_agent\api.py:125: RuntimeError
+=========================== short test summary info ===========================
+FAILED tests/test_windows_lifecycle.py::test_normal_resources_refuse_unmanaged_entry_before_settings_or_clients
+1 failed, 2 deselected in 4.29s

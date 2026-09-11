@@ -1,0 +1,128 @@
+[
+  {
+    "source": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-5-fix1-review.diff",
+    "path": "review.diff",
+    "bytes": 79057,
+    "sha256": "2967b4838c40e1c713511d9e7912435ecf114d0f2bb914e6e2d9381f86f3b2db"
+  },
+  {
+    "source": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-5-fix1-review-manifest.json",
+    "path": "source-manifest.json",
+    "bytes": 3309,
+    "sha256": "9e4843968d9f3130185dfad7b6f9b7479b5c9030d007f1c28096f16e68c46f5c"
+  },
+  {
+    "source": "scratch/task-5-fix1-report.md",
+    "path": "report.md",
+    "bytes": 5699,
+    "sha256": "6b3722676ce35ee5826665686ba62869a2d243c8cfbe889c8ae80dfc430f4c3a"
+  },
+  {
+    "source": "scratch/task-5-lock-evidence.md",
+    "path": "lock-evidence.md",
+    "bytes": 4910,
+    "sha256": "beba55de1543ee3bf459e231cc7f3ce965bae35b18d9543c97487d67ec794f7a"
+  },
+  {
+    "source": "scratch/task5-root-fix1-api-green.log",
+    "path": "raw/task5-root-fix1-api-green.log",
+    "bytes": 661,
+    "sha256": "b4a40806d5f7de69c0d81a345214ca5e6ed8e970dea5029cd33e377f5652ddc3"
+  },
+  {
+    "source": "scratch/task5-root-fix1-check-codegen.log",
+    "path": "raw/task5-root-fix1-check-codegen.log",
+    "bytes": 39,
+    "sha256": "314c44be1f8206331a4f06eb130d6a5ebe6c5a8de819d1abfa02c0b75fad2c08"
+  },
+  {
+    "source": "scratch/task5-root-fix1-codegen.log",
+    "path": "raw/task5-root-fix1-codegen.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "scratch/task5-root-fix1-lint.log",
+    "path": "raw/task5-root-fix1-lint.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "scratch/task5-root-fix1-memory-green.log",
+    "path": "raw/task5-root-fix1-memory-green.log",
+    "bytes": 285,
+    "sha256": "59f136d8407c18bc5bfceaf2961dc69bcf4518dfdba7ae4d22e350c2fa1f0407"
+  },
+  {
+    "source": "scratch/task5-root-fix1-memory2-green.log",
+    "path": "raw/task5-root-fix1-memory2-green.log",
+    "bytes": 678,
+    "sha256": "f66e262b059d49f06f48b55669d7c0e9117eea0fe678073e4a9140ddce33425a"
+  },
+  {
+    "source": "scratch/task5-root-fix1-r03-api-red.log",
+    "path": "raw/task5-root-fix1-r03-api-red.log",
+    "bytes": 13913,
+    "sha256": "8c24ea147030e2fde37f056e63009f83ee7eb04e38b0cb3b540871a98e2759f1"
+  },
+  {
+    "source": "scratch/task5-root-fix1-r03-web-red.log",
+    "path": "raw/task5-root-fix1-r03-web-red.log",
+    "bytes": 1276,
+    "sha256": "0b8015e8a5725e95b6c7c278dbb5a99d13b6ccc710dabbde62d3de59b5848440"
+  },
+  {
+    "source": "scratch/task5-root-fix1-service-check.log",
+    "path": "raw/task5-root-fix1-service-check.log",
+    "bytes": 1105,
+    "sha256": "491d9e49715f44f82916dbcd62c2c26de0af7a437bb4f614076fba35d6c144dc"
+  },
+  {
+    "source": "scratch/task5-root-fix1-service-check2.log",
+    "path": "raw/task5-root-fix1-service-check2.log",
+    "bytes": 650,
+    "sha256": "f1cd7f365bcba8544a49a702622d76f6b1e51495ecab7f5987eadd22c73562b5"
+  },
+  {
+    "source": "scratch/task5-root-fix1-types.log",
+    "path": "raw/task5-root-fix1-types.log",
+    "bytes": 0,
+    "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "source": "scratch/task5-root-fix1-web-green.log",
+    "path": "raw/task5-root-fix1-web-green.log",
+    "bytes": 267,
+    "sha256": "51e075a9d0bd18773b6106d7449729a36ace89d5925345797beca9ea607ea7c1"
+  },
+  {
+    "source": "scratch/task5-fix1-service-red.log",
+    "path": "raw/task5-fix1-service-red.log",
+    "bytes": 8542,
+    "sha256": "5731df0e73d74b9a0ceb6882972e92ecd8569dac4f0a5220c58dd8ad9cd077ad"
+  },
+  {
+    "source": "scratch/task5-fix1-r06-red.log",
+    "path": "raw/task5-fix1-r06-red.log",
+    "bytes": 4127,
+    "sha256": "aaa6cd11a3d6316f48cd48d036288331179d251560da912456e15cbd79bcdabb"
+  },
+  {
+    "source": "scratch/task5-fix1-r02-red2.log",
+    "path": "raw/task5-fix1-r02-red2.log",
+    "bytes": 3505,
+    "sha256": "cfc2f36d4c79934ae774f0c73cc769e2dfd8122649f079e07821d68387c66260"
+  },
+  {
+    "source": "scratch/task5-fix1-r02-red.log",
+    "path": "raw/task5-fix1-r02-red.log",
+    "bytes": 277,
+    "sha256": "b683cea730637843513899f20fb1077dc77c1550f241ec61c1c7010f338f898f"
+  },
+  {
+    "source": "scratch/task5-fix1-r02-green.log",
+    "path": "raw/task5-fix1-r02-green.log",
+    "bytes": 276,
+    "sha256": "5187c1811997ab489b029361b3d8b3d1157868454e28ce6d9d216a3b2f472090"
+  }
+]

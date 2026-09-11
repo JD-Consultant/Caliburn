@@ -1,0 +1,180 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+_ test_stop_recovers_committed_original_without_model_native_or_duplicate_result[False] _
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001D91D9A3CE0>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-f9305247-0dbb-453a-ab04-a52f223ae3f1/test_stop_recovers_committed_o0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D91D7D6930>
+paired = False
+
+    @pytest.mark.parametrize('paired', [False, True])
+    def test_stop_recovers_committed_original_without_model_native_or_duplicate_result(jd, tmp_path, monkeypatch, paired):
+        attempts = []
+        original = jd.edit
+        def lost(intent, **kwargs):
+            attempts.append(intent)
+            result = original(intent, **kwargs)
+            assert result.status == 'committed'
+            if paired:
+                return replace(result, durability='unconfirmed', next_action='reconcile_operation')
+            raise RuntimeError('commit succeeded, original ToolMessage checkpoint lost')
+        monkeypatch.setattr(jd, 'edit', lost)
+        def reply(request):
+            outputs = [i for i in json.loads(request.content).get('input', []) if i.get('type') == 'function_call_output']
+            if not outputs: return call('jd_read')
+            if len(outputs) == 1:
+                read = json.loads(outputs[-1]['output'])
+                return call('jd_edit', **replacement(read['targets'][0]['target_ref'], '已提交原工作'))
+            return done()
+        with service_harness(tmp_path, engine=jd.catalog.engine, respond=reply) as (service, sent, _):
+            service.jd = jd
+            document = service.create_document('取消原回執')['id']
+            run = service.submit(document, str(uuid4()), '補完整工作')
+            service.join(document)
+            context = service._context(document)
+            before = context.graph.get_state(context.config, subgraphs=True)
+            from analysis_agent.service import current_values
+            messages = current_values(before)['messages']
+            original_messages = [m.model_dump() for m in messages]
+            head = jd.store.current(JdScope(document))
+>           stopped = service.stop(document, run['id'])
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_jd_close_reconcile.py:44: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\analysis_agent\service.py:469: in stop
+    close_turn(context.graph, context.config, reason='cancelled', quiescent=True,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+graph = <langgraph.graph.state.CompiledStateGraph object at 0x000001D92113C980>
+config = {'configurable': {'thread_id': '75232a84-162d-4f00-9f26-3d98895d342c'}}
+reason = 'cancelled', quiescent = True, memory_session = None
+
+    def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=None):
+        """Seal the pending root using public state APIs, without executing any node.
+    
+        Caller MUST have stopped/joined its worker and serialized this document.
+        This function does not cancel threads. Close child first, then root; a lost
+        root update can only leave an already-terminal child, not runnable tools.
+        Historical checkpoints remain intact (never resume an old checkpoint to
+        cancel). Use the latest document config at this entry.
+        """
+        from analysis_agent.publication import PublicationUncertain
+        require_latest(config)
+        if quiescent is not True:
+            raise ValueError('A confirmed quiescent worker is required')
+        if reason not in {'cancelled', 'configuration_error'}:
+            raise ValueError('Expected cancelled or configuration_error')
+        snapshot = graph.get_state(config, subgraphs=True)
+        if not snapshot.values.get('messages'):
+            raise ValueError('No saved input to close')
+        if not snapshot.next:
+            return snapshot.values
+        if snapshot.next != ('analysis',):
+            raise ValueError('Unexpected pending conversation node')
+        task = next(t for t in snapshot.tasks if t.name == 'analysis')
+        child = task.state
+        # An admitted root input can precede the first child checkpoint. The public
+        # state API returns an empty child snapshot, not necessarily None.
+        if child and hasattr(child, 'values') and not child.values.get('messages'):
+            child = None
+        state = child.values if child and hasattr(child, 'values') else snapshot.values
+        read_call = pending_memory_read(snapshot, memory_session)
+        messages = list(state['messages'])
+        human_index = max(i for i, m in enumerate(messages) if isinstance(m, HumanMessage))
+        saved = state.get('turn_outcome')
+        boundary = state.get('closed_turns', {}).get(messages[human_index].id)
+        if (child and not child.next and saved and saved['input_id'] == messages[human_index].id
+                and boundary and boundary['end_id'] == messages[-1].id):
+            graph.update_state(snapshot.config, {'messages': messages, 'turn_outcome': saved,
+                'closed_turns': turn_boundary(saved, messages[-1].id)}, as_node='analysis')
+            return graph.get_state(config).values
+        updates = {}
+        for index, message in enumerate(messages[human_index + 1:], human_index + 1):
+            if not isinstance(message, AIMessage):
+                continue
+            for call in [*message.tool_calls, *message.invalid_tool_calls]:
+                if any(isinstance(m, ToolMessage) and m.tool_call_id == call.get('id') for m in messages[index + 1:]):
+                    continue
+                if not call.get('id') or not call.get('name'):
+                    raise PublicationUncertain('Unpaired call has no reliable identity')
+                # after_model nodes precede ToolNode for this canonical response.
+                # Merely having no task.error at tools does NOT prove not-started.
+                not_started = child and child.next and all(n.endswith('.after_model') for n in child.next)
+                if not_started:
+                    messages.append(ToolMessage('Tool not executed: this turn was closed before tool execution.',
+                        name=call['name'], tool_call_id=call['id'], status='error'))
+                elif call['name'] == REQUEST_TOOL_NAME:
+                    # Worker is quiescent. This registered tool has no external
+                    # effects; without a saved receipt no request was handed off.
+                    messages.append(ToolMessage('整理請求未成功交接；本輪已停止，記憶尚未因此更新。',
+                        name=call['name'], tool_call_id=call['id'], status='error'))
+                elif call == read_call:
+                    # A read may have run before its result was lost. Closing it
+                    # discards the unavailable result, not an external write effect.
+                    messages.append(ToolMessage('Read result unavailable/discarded: this turn was closed. '
+                        'Do not infer absence of data from this result.',
+                        name=call['name'], tool_call_id=call['id'], status='error'))
+                elif call['name'] == 'repair_memory' and memory_session is not None:
+                    command = memory_session.reconcile(state, message, call, config)
+                    messages.extend(command.update['messages'])
+                    updates.update({k: v for k, v in command.update.items() if k != 'messages'})
+                else:
+>                   raise PublicationUncertain('Tool result is unknown; do not fabricate failure')
+E                   analysis_agent.publication.PublicationUncertain: Tool result is unknown; do not fabricate failure
+
+src\analysis_agent\conversation.py:290: PublicationUncertain
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-2c18a897-5755-40af-ad67-c7d8dc196a43.jsonl
+_ test_stop_recovers_committed_original_without_model_native_or_duplicate_result[True] _
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001D9226E07A0>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-f9305247-0dbb-453a-ab04-a52f223ae3f1/test_stop_recovers_committed_o1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D92297BCB0>
+paired = True
+
+    @pytest.mark.parametrize('paired', [False, True])
+    def test_stop_recovers_committed_original_without_model_native_or_duplicate_result(jd, tmp_path, monkeypatch, paired):
+        attempts = []
+        original = jd.edit
+        def lost(intent, **kwargs):
+            attempts.append(intent)
+            result = original(intent, **kwargs)
+            assert result.status == 'committed'
+            if paired:
+                return replace(result, durability='unconfirmed', next_action='reconcile_operation')
+            raise RuntimeError('commit succeeded, original ToolMessage checkpoint lost')
+        monkeypatch.setattr(jd, 'edit', lost)
+        def reply(request):
+            outputs = [i for i in json.loads(request.content).get('input', []) if i.get('type') == 'function_call_output']
+            if not outputs: return call('jd_read')
+            if len(outputs) == 1:
+                read = json.loads(outputs[-1]['output'])
+                return call('jd_edit', **replacement(read['targets'][0]['target_ref'], '已提交原工作'))
+            return done()
+        with service_harness(tmp_path, engine=jd.catalog.engine, respond=reply) as (service, sent, _):
+            service.jd = jd
+            document = service.create_document('取消原回執')['id']
+            run = service.submit(document, str(uuid4()), '補完整工作')
+            service.join(document)
+            context = service._context(document)
+            before = context.graph.get_state(context.config, subgraphs=True)
+            from analysis_agent.service import current_values
+            messages = current_values(before)['messages']
+            original_messages = [m.model_dump() for m in messages]
+            head = jd.store.current(JdScope(document))
+            stopped = service.stop(document, run['id'])
+>           assert stopped['status'] == 'cancelled', stopped
+E           AssertionError: {'id': '2f08d313-3950-4540-b419-a5752c93f4ab', 'document_id': '22c4e15b-8b35-465a-a586-2d2d3b59d223', 'status': 'completed', 'error_code': None, ...}
+E           assert 'completed' == 'cancelled'
+E             
+E             - cancelled
+E             + completed
+
+tests\test_jd_close_reconcile.py:45: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-2c18a897-5755-40af-ad67-c7d8dc196a43.jsonl
+=========================== short test summary info ===========================
+FAILED tests/test_jd_close_reconcile.py::test_stop_recovers_committed_original_without_model_native_or_duplicate_result[False]
+FAILED tests/test_jd_close_reconcile.py::test_stop_recovers_committed_original_without_model_native_or_duplicate_result[True]
+2 failed in 7.17s

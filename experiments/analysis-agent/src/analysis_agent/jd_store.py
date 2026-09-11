@@ -169,6 +169,26 @@ class JdStore:
             self._scope(conn, deadline, scope)
             return self._receipt(conn, deadline, scope, operation_id, digest)
 
+    def reconcile_after_writer_stopped(self, identity, proof):
+        """Read Committed head lock, then one scoped receipt statement.
+
+        publish synchronously acquires this lock before sending any mutation.
+        Once the originating Python writer cannot send further statements, this
+        barrier distinguishes a committed receipt from known unpublished work.
+        """
+        from analysis_agent.jd_reconcile import JdWriterStopped
+        if not isinstance(proof, JdWriterStopped):
+            raise ValueError('App stopped-writer evidence required')
+        proof.require(identity.scope)
+        with self._connection() as (conn, deadline), conn.begin():
+            self._scope(conn, deadline, identity.scope)
+            locked = self._execute(conn, deadline, select(head.c.current_revision_id)
+                .where(head.c.document_id == identity.scope.document_id).with_for_update()).scalar_one_or_none()
+            if locked is None:
+                raise JdMissing('JD head not found at recovery barrier')
+            proof.require(identity.scope)
+            return self._receipt(conn, deadline, identity.scope, identity.operation_id, identity.digest)
+
     def create_document(self, catalog, title, value, *, request_key=None):
         if catalog.engine is not self.engine:
             raise ValueError('Catalog engine mismatch')

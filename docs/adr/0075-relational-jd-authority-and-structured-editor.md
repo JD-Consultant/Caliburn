@@ -26,7 +26,7 @@ PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與
 
 5. **同一頁採結構化管理畫面。**聊天與唯一 JD 並存；右側以具名欄位、職責／任務卡片、成果／要求子清單、K/S relation selector、歷史／差異／來源抽屜呈現。未分組任務是合法資料。沒有「目前稿／更正稿」雙頁、pending 接受／拒絕或第二份可編正文。Owner 已選[CV-01](../specs/2026-09-12-jd-change-visibility-design.md)：AI 直接改稿，App 在目前稿標記並提供同頁按需差異；完整管理畫面與資料接線仍待驗證。
 
-6. **Plate 不再控制整份 JD。**結構、CRUD、relations、dirty buffer、保存與歷史由 App 處理。Plate 只保留為需要 selection／IME／undo 或富文字的單一長文字欄位候選；普通 text 足夠時不強制啟用。是否使用 leaf Plate 由 bounded UI spike 決定，不改 relational authority。
+6. **Plate 不再控制整份 JD。**結構、CRUD、relations、dirty buffer、保存與歷史由 App 處理。Owner 已選純文字與換行，2026-09-13 [原生框架核對](../specs/2026-09-13-jd-native-framework-and-integration-preflight.md)據此選原生文字欄位，本版不啟用leaf Plate。真瀏覽器仍驗selection／IME／undo；只有具體反例才比較leaf editor等替代，不為啟用候選額外做spike，也不改relational authority。
 
 7. **模型使用具名且能完成完整工作的業務工具。**依工具責任稿提供讀取、完整新增任務、有界內容修訂、單欄／選區與結構操作；不凍結七工具或讓同項更正逐欄提交。strict schema 與 App-issued refs 協助定位；模型不填 document／operation IDs、SQL FK、position、revision 或 line number。人與模型共用 service／validator／transaction 並取得真實結果；具體 variants 與驗收見[完整業務設計](../specs/2026-09-12-jd-business-operations-and-scope-design.md)。
 
@@ -42,7 +42,7 @@ PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與
 
 12. **fresh adoption，不搬舊資料、不雙寫。**新 schema 在專用新 DB 驗證；正式切換一次移除舊 JSONB current write、舊 approved/candidate writers 與 retired routes。conversation／Memory／source owner 仍依其 successor ADR 決定，不由本 ADR 重做。
 
-13. **Excel 是 deterministic projection。**current relational projection 或指定 history snapshot 可映成中立 export model，再由 renderer 產生選定格式；LLM 不產 Excel。實體版型尚未決定，舊 iCAP exporter 只作研究與 oracle，不直接接回 retired package。
+13. **Excel 延後。**2026-09-13 Owner 要求先完整App／業務／LLM接線及測試；本輪不以匯出為驗收門檻。之後恢復時仍由確切current或history版本衍生輸出，LLM不產Excel，不接回retired exporter；原話分開輸出的方向保留。
 
 ## Supersedes when Accepted
 
@@ -59,7 +59,7 @@ Accepted 歷史 ADR 不改原文；只有本 ADR Accepted 且 production G6 完�
 
 員工得到真正能管理 JD 項目與關係的畫面；任務移動、K/S 共享、刪除影響與 Excel 投影不再依文件排版猜測。AI 工具參數更少，也不需生成整份文件或維護 DB metadata。Stable IDs 與 immutable snapshots 讓歷史比較不靠模糊文字定位。
 
-代價是 current save 需同時維護 8 類正文／關係 rows、canonical snapshot 與 receipt；source link 的 typed targets、position normalization、current→snapshot round-trip 及 relation diff 都需專門測試。Leaf Plate 是否值得保留尚需 UI spike，不能把既有 whole-document Plate 測試直接當成新畫面通過。
+代價是 current save 需同時維護 8 類正文／關係 rows、canonical snapshot 與 receipt；source link 的 typed targets、position normalization、current→snapshot round-trip 及 relation diff 都需專門測試。原生文字管理畫面須驗實際輸入與保存，不能把既有whole-document Plate測試直接當成新畫面通過。
 
 13 張表不是產品品質指標，也不是宣稱 JSONB 不可表示關係；它是目前 CRUD、關係完整性與歷史需求下的可審映射。若未來證明每版 relational clone 更簡單可靠，可另以 successor 比較，不在第一版並建兩套。
 

@@ -75,7 +75,7 @@ AI 與員工使用同一份目前工作稿。AI 不必每輪改稿，只有某�
 
 整份 JD 不再是一個 Plate value。結構、卡片、關係選擇、移動、刪除及保存由 App 管理。
 
-Plate 只保留為**單一長文字欄位**的 leaf editor 候選，例如任務完整敘述或知識說明；其 value 必須映回該 relational row 的欄位。第一版若只需普通文字與換行，使用標準文字輸入即可，避免為每個小欄位建立 editor instance。是否啟用 Plate leaf editor 由 bounded UI spike 以 IME、paste、selection、undo 與多卡效能決定，不影響資料庫 schema。
+Owner 已選普通文字與換行，2026-09-13 [框架核對](2026-09-13-jd-native-framework-and-integration-preflight.md)據此採原生文字欄位；第一版不啟用 leaf Plate，也不為啟用它額外做 spike。真瀏覽器仍驗 IME、paste、selection、undo；只有實測反例證明原生欄位無法滿足已定需求，才比較 leaf editor 等有界替代，不影響資料庫 schema。
 
 ## 4. 六章到資料與畫面的對照
 
@@ -208,7 +208,7 @@ relational current projection 可確定性轉成不同輸出，不讓 LLM 生成
 8. commit 回覆遺失，以原 operation 找到 committed receipt，不重複新增。
 9. 繁中、換行、重複文字、相同名稱 K/S、reorder、selection ask-AI 皆以 stable target 處理，不用行號。
 10. 重開 App 後 current relation、歷史 snapshot、原始問答與 Memory scope 一致。
-11. export projection 能將完整樣稿轉成中立表格模型；尚未選定的實體 Excel 版型不列 PASS。
+11. Excel 依 2026-09-13 Owner 指示延後；本輪不以 export projection／實體版型作 App 驗收門檻，完整樣稿仍須驗 current rows／歷史的內容保留。
 12. **反覆修訂完整旅程：**訪談先釐清一項工作並形成初稿 → 員工補充另一工作 → AI 保留原有有效內容並新增 → 員工更正第一项工作的責任邊界 → AI 修正受影響的敘述、要求及引用，不抹去第二項工作 → 員工手改並保存 → 關頁重開續談 → AI 得知人工變更、取得最新版，資訊足夠時再修訂。同一工作不因多次改寫重複新增；每次實際改動可查、過時內容不當成現行工作；純追問／重述回合可不產生 JD 修訂。固定操作只驗資料與操作保真，自然訪談另驗理解、更正及內容完整性；沿[需求 §7](2026-09-12-jd-relational-editing-requirements.md#7-功能目的與使用方式釐清2026-09-12持續討論)，不將初稿或固定流程成功稱為完整個人化 JD。
 
 ## 12. 本輪不做與重開條件
@@ -219,4 +219,4 @@ relational current projection 可確定性轉成不同輸出，不讓 LLM 生成
 
 若外部 review 證明 derived snapshot 無法在同交易保持一致、generic source link 無法提供足夠完整性、Plate leaf editor 對 IME／undo 不成立，或 D01 選擇改變資料生命週期，回到本設計修訂。沒有具體反證時不重開整份關聯方向。
 
-下一步依[設計完成度與剩餘工作](2026-09-12-jd-design-readiness-audit.md)：完整業務操作、範圍與選區已文件閉合，DR-01／HR-02／CV-01 產品方向已選；接完整管理旅程／Excel 版型、暫存相容性及 successor 契約前置，避免把已決效果重列未決。整體 G4 與 Proposed ADR 未通過，尚不能開始正式 migrations。
+下一步依[設計完成度與剩餘工作](2026-09-12-jd-design-readiness-audit.md)：欄位最後審核與[完整管理操作](2026-09-13-jd-complete-app-journey-design.md)已形成，Excel 延後；沿[新版計畫 RS-1](../plans/2026-09-13-jd-relational-app-implementation.md)接精確 successor 契約與離線驗證，暫存相容性並行。整體 G4 與 Proposed ADR 未通過，尚不能開始正式 migrations。

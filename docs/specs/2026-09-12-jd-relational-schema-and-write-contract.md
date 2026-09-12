@@ -47,7 +47,7 @@ erDiagram
     JD_DOCUMENT ||--o{ JD_SOURCE_LINK : has
     JD_DOCUMENT ||--|| JD_HEAD : points_to
     JD_DOCUMENT ||--o{ JD_REVISION : versions
-    JD_REVISION o|--o{ JD_REVISION : parent_of
+    JD_REVISION o|--o| JD_REVISION : parent_of
     JD_DOCUMENT ||--o{ JD_OPERATION : receives
     JD_REVISION o|--o{ JD_OPERATION : base
     JD_REVISION o|--o{ JD_OPERATION : result
@@ -220,7 +220,9 @@ Memory／詳記協助查找原始材料，並非此欄另一種任意可變來�
 | `content_digest` | char(64)，非空 | canonical snapshot SHA-256 |
 | `created_at` | timestamptz，非空 | revision commit 時間 |
 
-固定約束：initial iff parent NULL；每 document 至多一 initial；本版線性 current history，每個非 initial parent 至多一個 successor。revision rows 不提供 UPDATE／DELETE port。非 initial 的 producer 由唯一 committed `jd_operation.result_revision_id` 反查，避免雙向 FK。
+固定約束：initial iff parent NULL；每 document 至多一 initial；本版線性 current history，同文件每個非 NULL `parent_revision_id` 至多出現一次，包含指向 initial 的情況。以 `UNIQUE(document_id, parent_revision_id)` 保證同一修訂至多一個 successor；initial 本身另以原有唯一規則限制，不能依 nullable UNIQUE 單獨保證。revision rows 不提供 UPDATE／DELETE port。非 initial 的 producer 由唯一 committed `jd_operation.result_revision_id` 反查，避免雙向 FK。
+
+2026-09-13 [欄位／關係審核](2026-09-13-jd-field-sufficiency-audit.md)修正 ERD 多分支與上述線性語意的文件不一致；依 [PostgreSQL 16 UNIQUE 與 NULL 規則](https://www.postgresql.org/docs/16/ddl-constraints.html#DDL-CONSTRAINTS-UNIQUE-CONSTRAINTS)。須以同初版 r1 不能同時成為 r2、r3 的 parent 作真 DB 反例驗證；本次未建表或宣稱已阻止 runtime 分叉。
 
 Canonical snapshot 包含 profile、collaborators、duties、tasks、task_details、capabilities、task_capabilities、conditions、source_links；每組按 `position,id` 排序，明確保存 IDs 與 relations。這份 JSON 是 history／diff／export 的 immutable material，不接受為 Web／模型的 current write payload。§6.4 的具名還原由 server 讀自有 immutable snapshot、驗證後形成 relational 候選，沒有開放任意 JSON 覆蓋。
 

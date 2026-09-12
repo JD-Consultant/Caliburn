@@ -1,9 +1,9 @@
 """One-process manual writer ownership, separate from JD rules and checkpoints.
 
-Native futures own the actual SQL callable, not an HTTP waiter. The host must
-still enforce a single live App process and supply cross-restart death evidence.
-An orphaned persisted identity remains blocked here; absence of a local Future
-never becomes stopped proof. This module does not start or rewind an Agent.
+Native futures own the actual SQL callable, not an HTTP waiter. The host supplies
+native process ownership and cross-restart death evidence. Without that capability
+an orphan remains blocked; absence of a local Future never becomes stopped proof.
+This module does not start or rewind an Agent.
 """
 
 from concurrent.futures import Future, ThreadPoolExecutor, wait
@@ -28,6 +28,11 @@ class OperationCheckpoints(Protocol):
     def read(self, document_id: str) -> AdmittedIdentity | None: ...
     def admit(self, identity: AdmittedIdentity) -> None: ...
     def close(self, identity: AdmittedIdentity) -> None: ...
+
+
+class PreviousHost(Protocol):
+    def require_previous_stopped(self) -> None:
+        """Check this host's live OS ownership and prior process-group exit proof."""
 
 
 @dataclass(frozen=True)
@@ -72,6 +77,7 @@ class _Entry:
     token: object = field(default_factory=object)
     write_future: Future | None = None
     observation: WriteObservation | None = None
+    previous_host: PreviousHost | None = None
 
 
 @dataclass
@@ -92,13 +98,21 @@ def _checkpoint_failure(error):
 
 class ManualRuntime:
     def __init__(self, checkpoints: OperationCheckpoints,
-                 storage_factory: Callable[[WriterAuthority], JdStorage], *, max_workers=4):
+                 storage_factory: Callable[[WriterAuthority], JdStorage], *, max_workers=4,
+                 previous_host: PreviousHost | None = None):
         if type(max_workers) is not int or not 1 <= max_workers <= 16:
             raise ValueError("invalid_worker_limit")
+        if previous_host is not None and not callable(getattr(previous_host, "require_previous_stopped", None)):
+            raise ValueError("invalid_previous_host")
         self.checkpoints = checkpoints
         self._slots = {}
         self._registry = Lock()  # Only dictionary/accepting state, never I/O or waits.
         self._accepting = True
+        self._previous_host = previous_host
+        self._startup_lock = Lock()
+        self._startup_done = Event()
+        if previous_host is None:
+            self._startup_done.set()  # Standalone in-process owner, no orphan adoption.
         self._pool = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="jd-manual")
         self._execution = ContextVar("jd_manual_execution", default=None)
         self.storage = storage_factory(self)
@@ -113,6 +127,80 @@ class ManualRuntime:
         with self._registry:
             if not self._accepting:
                 raise RuntimeFailure("runtime_closed")
+
+    def _require_host(self):
+        if self._previous_host is not None:
+            try:
+                self._previous_host.require_previous_stopped()
+            except Exception:
+                raise RuntimeFailure("host_not_valid") from None
+
+    @property
+    def ready(self) -> bool:
+        with self._registry:
+            return self._accepting and self._startup_done.is_set()
+
+    def finish_startup(self, *, timeout=10) -> int:
+        """Close all previous manual descriptors before enabling new admission.
+
+        The host excludes all catalog writers during this scan. Catalog includes
+        archived documents and is never permanently deleted. Timeout retains the
+        actual recovery Future; retry on this same owner cannot duplicate it.
+        """
+        if isinstance(timeout, bool) or not isinstance(timeout, (int, float)) or not 0 < timeout <= 60:
+            raise ValueError("invalid_recovery_timeout")
+        if not self._startup_lock.acquire(blocking=False):
+            raise RuntimeFailure("startup_busy")
+        try:
+            self._require_open()
+            self._require_host()
+            if self._startup_done.is_set():
+                return 0
+            after, recovered = None, 0
+            while True:
+                self._require_open()
+                self._require_host()
+                try:
+                    documents = self.storage.document_ids(after=after, limit=100)
+                except Exception:
+                    raise RuntimeFailure("read_failed") from None
+                for document in documents:
+                    slot = self._slot(document, admit=True)
+                    with slot.lock:
+                        self._require_open()
+                        self._require_host()
+                        try:
+                            pending = self.checkpoints.read(document)
+                        except Exception as error:
+                            raise RuntimeFailure(_checkpoint_failure(error)) from None
+                        if pending is not None and slot.entry is None:
+                            self._manual(pending)
+                            if pending.document_id != document:
+                                raise RuntimeFailure("checkpoint_conflict")
+                            attempt = _attempt("recover")
+                            attempt.completion = Completion(None, False)
+                            attempt.settled.set()
+                            slot.entry = _Entry(pending, attempt, previous_host=self._previous_host)
+                        needs_recovery = slot.entry is not None
+                    if needs_recovery:
+                        try:
+                            result = self.recover(document, timeout=timeout)
+                        except TimeoutError:
+                            raise RuntimeFailure("startup_recovery_pending") from None
+                        if not result.checkpoint_closed:
+                            raise RuntimeFailure("startup_recovery_pending")
+                        recovered += 1
+                if len(documents) < 100:
+                    break
+                after = documents[-1]
+            self._require_host()
+            with self._registry:
+                if not self._accepting:
+                    raise RuntimeFailure("runtime_closed")
+                self._startup_done.set()
+            return recovered
+        finally:
+            self._startup_lock.release()
 
     @staticmethod
     def _manual(identity):
@@ -133,6 +221,9 @@ class ManualRuntime:
         slot = self._slot(identity.document_id, admit=True)
         with slot.lock:
             self._require_open()
+            self._require_host()
+            if not self._startup_done.is_set():
+                raise RuntimeFailure("startup_pending")
             if slot.entry:
                 if slot.entry.identity == identity:
                     return slot.entry.attempt.handle
@@ -148,7 +239,8 @@ class ManualRuntime:
             try:
                 original = self.storage.lookup(identity)
             except Exception as error:
-                code = "operation_conflict" if getattr(error, "code", None) == "operation_conflict" else "read_failed"
+                reported = getattr(error, "code", None)
+                code = reported if reported in {"operation_conflict", "document_missing"} else "read_failed"
                 raise RuntimeFailure(code) from None
             attempt = _attempt("write")
             if original is not None:
@@ -232,6 +324,7 @@ class ManualRuntime:
                 attempt.settled.set()
 
     def require_bound(self, intent):
+        self._require_host()
         context = self._execution.get()
         slot = self._slot(intent.document_id)
         with slot.lock:
@@ -250,11 +343,17 @@ class ManualRuntime:
                     or context != (entry.token, identity.document_id, "recover")
                     or entry.write_future is not None and not entry.write_future.done()):
                 raise RuntimeFailure("writer_not_stopped")
+            if entry.previous_host is not None:
+                try:
+                    entry.previous_host.require_previous_stopped()
+                except Exception:
+                    raise RuntimeFailure("writer_not_stopped") from None
 
     def recover(self, document, *, timeout=10) -> Completion:
         slot = self._slot(document, admit=True)
         with slot.lock:
             self._require_open()
+            self._require_host()
             entry = slot.entry
             if entry is None:
                 # No local entry is never a claim about a previous process.
@@ -266,7 +365,8 @@ class ManualRuntime:
             except Exception as error:
                 raise RuntimeFailure(_checkpoint_failure(error)) from None
             if pending is None:
-                if entry.write_future is None or entry.observation is not None and entry.observation.confirmed:
+                if ((entry.write_future is None and entry.previous_host is None)
+                        or entry.observation is not None and entry.observation.confirmed):
                     slot.entry = None
                     return Completion(entry.observation, True)
                 raise RuntimeFailure("checkpoint_conflict")
@@ -299,6 +399,9 @@ class ManualRuntime:
         with self._registry:
             self._accepting = False
             slots = tuple(self._slots.values())
+        if not self._startup_lock.acquire(timeout=max(0, deadline - monotonic())):
+            return False  # The catalog/Saver scan still owns startup resources.
+        self._startup_lock.release()  # Closed admission prevents another scan starting I/O.
         attempts = []
         for slot in slots:
             if not slot.lock.acquire(timeout=max(0, deadline - monotonic())):

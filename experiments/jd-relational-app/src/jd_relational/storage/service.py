@@ -120,6 +120,33 @@ class JdReader:
         except Exception:
             raise StorageError("read_failed") from None
 
+    def document_ids(self, *, after: str | None = None, limit: int = 100) -> tuple[str, ...]:
+        """List all catalog IDs, including archived documents, without a writer.
+
+        Each page is one short read-only transaction. A startup scan must keep
+        catalog changes/new admission excluded until it has consumed every page;
+        these keyset pages do not retain a database snapshot across calls.
+        An empty page is not evidence about any document's pending operation.
+        """
+        try:
+            if type(limit) is not int or not 1 <= limit <= 500:
+                raise ValueError()
+            if after is not None and (type(after) is not str or str(UUID(after)) != after):
+                raise ValueError()
+        except (ValueError, TypeError, AttributeError):
+            raise StorageError("invalid_input") from None
+        try:
+            statement = sa.select(db.jd_document.c.id).order_by(db.jd_document.c.id).limit(limit)
+            if after is not None:
+                statement = statement.where(db.jd_document.c.id > after)
+            with self._connection(readonly=True) as conn, conn.begin():
+                result = tuple(conn.execute(statement).scalars())
+                if any(type(value) is not str or str(UUID(value)) != value for value in result):
+                    raise ValueError("invalid_stored_document_id")
+                return result
+        except Exception:
+            raise StorageError("read_failed") from None
+
 
 class JdStorage(JdReader):
     def __init__(self, engine: sa.Engine, authority: WriterAuthority):
@@ -220,7 +247,9 @@ class JdStorage(JdReader):
     def lookup(self, identity: AdmittedIdentity) -> WriteObservation | None:
         """Read the original terminal before admission, without writer checks.
 
-        None means no receipt was visible in this short read-only transaction.
+        None means an existing catalog document had no visible receipt in this
+        short read-only transaction. A missing document cannot acquire pending
+        metadata outside the catalog that startup recovery enumerates.
         It proves neither writer death nor absence after a write barrier, and
         cannot authorize recovery or replay. New execution still requires a
         durable descriptor and the real document owner.
@@ -234,9 +263,15 @@ class JdStorage(JdReader):
         try:
             with self._connection(readonly=True) as conn, conn.begin():
                 receipt = self._operation(conn, identity.document_id, identity.operation_id)
-                return self._check_original(receipt, identity) if receipt is not None else None
+                if receipt is not None:
+                    return self._check_original(receipt, identity)
+                present = conn.execute(sa.select(db.jd_document.c.id).where(
+                    db.jd_document.c.id == identity.document_id)).scalar_one_or_none()
+                if present is None:
+                    raise StorageError("document_missing")
+                return None
         except StorageError as error:
-            raise StorageError("operation_conflict" if error.code == "operation_conflict" else "read_failed") from None
+            raise StorageError(error.code if error.code in {"operation_conflict", "document_missing"} else "read_failed") from None
         except Exception:
             raise StorageError("read_failed") from None
 

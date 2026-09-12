@@ -42,6 +42,21 @@ def identity():
     return AdmittedIdentity(str(uuid4()), uuid4(), uuid4(), "manual", None, "a" * 64, "jd_set_text")
 
 
+@PG
+def test_absent_catalog_document_cannot_admit_an_unenumerable_pending(engine):
+    from jd_relational.manual_runtime import ManualRuntime, RuntimeFailure
+    from test_manual_runtime import Checkpoints, intent
+    checkpoints = Checkpoints()
+    owner = ManualRuntime(checkpoints, lambda authority: JdStorage(engine, authority))
+    value = intent()
+    try:
+        with pytest.raises(RuntimeFailure, match="^document_missing$"):
+            owner.submit(value)
+        assert not checkpoints.pending
+    finally:
+        assert owner.close(timeout=2)
+
+
 @pytest.mark.parametrize("field,value", [
     ("document_id", ""), ("document_id", "\x00private"),
     ("operation_id", "not-uuid"), ("base_revision_id", "not-uuid"),
@@ -158,7 +173,8 @@ def test_absence_and_other_document_are_none_without_writing_receipt(engine):
     store.authority = ForbiddenAuthority()
     assert store.lookup(replace(intent.identity, operation_id=uuid4())) is None
     assert store.lookup(replace(intent.identity, document_id=other)) is None
-    assert store.lookup(replace(intent.identity, document_id=str(uuid4()))) is None
+    with pytest.raises(StorageError, match="^document_missing$"):
+        store.lookup(replace(intent.identity, document_id=str(uuid4())))
     assert {doc: row_state(engine, doc) for doc in before} == before
 
 

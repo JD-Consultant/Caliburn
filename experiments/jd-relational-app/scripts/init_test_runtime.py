@@ -1,8 +1,10 @@
 """Explicit native LangGraph initialization in the fixed synthetic test DB.
 
-The 13 JD tables remain owned by public/Alembic. Only jd_runtime_test receives
-the four native PostgresSaver tables. This script never drops or clears data.
+The 13 JD tables remain owned by public/Alembic. The selected fixed test schema
+receives the four native PostgresSaver tables. Never drops or clears data.
 """
+
+import argparse
 
 from langgraph.checkpoint.postgres import PostgresSaver
 from psycopg import Connection, sql
@@ -20,7 +22,9 @@ def _tables(connection, schema):
         "SELECT tablename FROM pg_tables WHERE schemaname = %s", (schema,))}
 
 
-def main():
+def main(schema=RUNTIME_SCHEMA):
+    if schema not in {"jd_runtime_test", "jd_host_test"}:
+        raise ValueError("Only fixed isolated test runtime schemas are supported.")
     # Public synthetic-test credentials, not product configuration.
     with Connection.connect(host="127.0.0.1", port=55436,
         dbname="caliburn_jd_relational_test", user="jd_test", password="jd-local-test-only",
@@ -34,26 +38,28 @@ def main():
         revisions = conn.execute("SELECT version_num FROM public.alembic_version").fetchall()
         if revisions != [{"version_num": "20260913_0001"}]:
             raise RuntimeError("Unexpected JD migration; no runtime setup applied.")
-        existing = _tables(conn, RUNTIME_SCHEMA)
+        existing = _tables(conn, schema)
         if not existing.issubset(NATIVE_TABLES):
             raise RuntimeError("Unexpected runtime tables; no runtime setup applied.")
         conn.execute(sql.SQL("CREATE SCHEMA IF NOT EXISTS {} AUTHORIZATION CURRENT_USER").format(
-            sql.Identifier(RUNTIME_SCHEMA)))
-        conn.execute(sql.SQL("SET search_path TO {}, public").format(sql.Identifier(RUNTIME_SCHEMA)))
+            sql.Identifier(schema)))
+        conn.execute(sql.SQL("SET search_path TO {}, public").format(sql.Identifier(schema)))
         # Saver migrations include CREATE INDEX CONCURRENTLY: native setup must
         # run with autocommit, outside a caller-owned transaction.
         saver = PostgresSaver(conn)
         saver.setup()
-        if _tables(conn, RUNTIME_SCHEMA) != NATIVE_TABLES:
+        if _tables(conn, schema) != NATIVE_TABLES:
             raise RuntimeError("Native setup did not produce the expected four runtime tables.")
-        versions = [row["v"] for row in conn.execute(
-            "SELECT v FROM jd_runtime_test.checkpoint_migrations ORDER BY v")]
+        versions = [row["v"] for row in conn.execute(sql.SQL(
+            "SELECT v FROM {}.checkpoint_migrations ORDER BY v").format(sql.Identifier(schema)))]
         if versions != list(range(len(saver.MIGRATIONS))):
             raise RuntimeError("Unexpected native Saver migration version; no data was cleared.")
         if _tables(conn, "public") != JD_TABLE_NAMES | {"alembic_version"}:
             raise RuntimeError("Public JD table ownership changed unexpectedly.")
-    print("PostgreSQL 18.6: jd_runtime_test contains 4 native Saver tables; public JD schema unchanged.")
+    print(f"PostgreSQL 18.6: {schema} contains 4 native Saver tables; public JD schema unchanged.")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--schema", choices=["jd_runtime_test", "jd_host_test"], default=RUNTIME_SCHEMA)
+    main(parser.parse_args().schema)

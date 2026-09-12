@@ -1,0 +1,42 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+______ test_close_continues_after_one_manual_reconciliation_is_uncertain ______
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/core-close-red2-temp/test_close_continues_after_one0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001FDFE1D7B60>
+
+    def test_close_continues_after_one_manual_reconciliation_is_uncertain(tmp_path, monkeypatch):
+        with service_harness(tmp_path) as (service, sent, _):
+            documents = [service.create_document(title)['id'] for title in ('待確認文件', '另一份文件')]
+            for document in documents:
+                service._context(document)
+            checked = []
+    
+            def reconcile(context):
+                checked.append(context.reader.document_id)
+                if context.reader.document_id == documents[0]:
+                    raise PublicationUncertain('Injected unavailable receipt boundary')
+    
+            monkeypatch.setattr(service, '_reconcile_manual', reconcile)
+            service.jd = object()  # Only enables the real shutdown seam; no JD call is faked as successful.
+            try:
+>               service.close()
+
+tests\test_jd_shutdown_isolation.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+src\analysis_agent\service.py:845: in close
+    self._reconcile_manual(context)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+context = DocumentRuntime(graph=<langgraph.graph.state.CompiledStateGraph object at 0x000001FD82C9E2A0>, reader=<analysis_agent....generation=0, prior_execution=False, closing=False, close_entries=0, read_stop=<threading.Event at 0x1fd82c98440: set>)
+
+    def reconcile(context):
+        checked.append(context.reader.document_id)
+        if context.reader.document_id == documents[0]:
+>           raise PublicationUncertain('Injected unavailable receipt boundary')
+E           analysis_agent.publication.PublicationUncertain: Injected unavailable receipt boundary
+
+tests\test_jd_shutdown_isolation.py:16: PublicationUncertain
+=========================== short test summary info ===========================
+FAILED tests/test_jd_shutdown_isolation.py::test_close_continues_after_one_manual_reconciliation_is_uncertain
+1 failed in 7.12s

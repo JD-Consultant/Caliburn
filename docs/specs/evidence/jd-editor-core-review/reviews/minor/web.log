@@ -1,0 +1,21 @@
+
+> @caliburn/jd-editor-web@0.0.1 pretest
+> npm run build -w @caliburn/jd-editor-native
+
+
+> @caliburn/jd-editor-native@0.0.1 build
+> tsc -p tsconfig.json
+
+
+> @caliburn/jd-editor-web@0.0.1 test
+> vitest run
+
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+
+ Test Files  11 passed (11)
+      Tests  47 passed (47)
+   Start at  12:41:58
+   Duration  2.63s (transform 1.06s, setup 0ms, import 4.89s, tests 1.95s, environment 12.47s)
+

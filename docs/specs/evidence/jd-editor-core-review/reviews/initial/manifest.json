@@ -1,0 +1,2064 @@
+{
+  "head": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef",
+  "base": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9",
+  "files": [
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/__init__.py",
+      "bytes": 56,
+      "sha256": "eb0d84bcf786feed4e0652f5cbaea9d25fc9d3477ef08b39488bc86685931a70",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/__init__.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/api.py",
+      "bytes": 17123,
+      "sha256": "605f1766a19b43219dd76a85f30c974cafb1de0c20d84749cdbb9a356c96d323",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/api.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/api.py.diff",
+      "bytes": 13143,
+      "sha256": "171a67d5724ac313a77ee6b48b8b45865ad7faa083a167049b1c5e4c335af2cb",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/budget.py",
+      "bytes": 5822,
+      "sha256": "c4c9c007220deff2b9d8a410820e123e79dc371cd6603361c87b99f9e497d5ef",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/budget.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/catalog.py",
+      "bytes": 7164,
+      "sha256": "120c04a4b19c9775ab56f4377b1e13b506f6585e0a1fb1c86b6424f61587e5e2",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/catalog.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/catalog.py.diff",
+      "bytes": 5179,
+      "sha256": "993756e7918aaafcd75ab6d207024c5c7e7f053a83b1a1c2660addc0de51768d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/consolidation.py",
+      "bytes": 19554,
+      "sha256": "1ec015eaaf5ea85f6b6d50901d5b002b6115b5aa9ad1dad15892c2c1bf7c8f4e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/consolidation.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/consolidation_feedback.py",
+      "bytes": 2187,
+      "sha256": "60f573a67ffeab0aaf504ecef2465342a615d9d26a5d6f4df8217f85ea55600f",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/consolidation_feedback.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/consolidation_request.py",
+      "bytes": 2354,
+      "sha256": "6965d106a270209e61ef0982bf18be8096e4b72b234091d45c303ccd075414d2",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/consolidation_request.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/consolidation_tools.py",
+      "bytes": 6497,
+      "sha256": "d81efec80bc8e8b32b665f82d97bd0d632948e29daa56e2a38f5bc8b9d1ab6d0",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/consolidation_tools.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/context.py",
+      "bytes": 2030,
+      "sha256": "e2feaa7415171038ac442e4e94ee68f7b23ea354237762181b29ec20dfe7cfc5",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/context.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/conversation.py",
+      "bytes": 18810,
+      "sha256": "725f772bd355650b154a590b4ad48f40692dbc4666db5545b12b65b0a6296d04",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/conversation.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/conversation.py.diff",
+      "bytes": 10203,
+      "sha256": "35e2185b2360e028dc45d2e718b3f4068ce6719373ff494c66b6f72ced8ee755",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/extraction.py",
+      "bytes": 17068,
+      "sha256": "06dd3e8c4d9c76afb461d63ad02c4e733a8509416a98a55211e479b9359eb6ce",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/extraction.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_context.py",
+      "bytes": 6648,
+      "sha256": "5485f24c8e88e271369f6e4b9feeb29cc9a4515e7a2ddbff665199beef2b897b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_context.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_context.py.diff",
+      "bytes": 7032,
+      "sha256": "2a92f8c9783ed7737cdbaa28b60fa4e86fc137f11a997f74f19d2cd25133ad13",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_contract.py",
+      "bytes": 7087,
+      "sha256": "e5a24154bdbaebec6a8488712eb849bb336f3caaf6b2672f81bcced6fc4e7c49",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_contract.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_contract.py.diff",
+      "bytes": 7506,
+      "sha256": "5e2ef69bcecb94eedc2387ec642fb21a802e98d783b78a8dfae1cfa210d13a9c",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_engine.py",
+      "bytes": 9650,
+      "sha256": "b22e38b13a450a40653a6108adfa4fdf98f6a3aa153ce500a06018b94308c6fa",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_engine.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_engine.py.diff",
+      "bytes": 10158,
+      "sha256": "0fa144d5219483e65781f0d1dce24987fe5840e58245c4f10c34ea487d4cd7d4",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_reconcile.py",
+      "bytes": 1800,
+      "sha256": "f0474e9c4e08e35e37b93a5ed085ab250b709633e0d6a1c6bc743f49dd368e9e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_reconcile.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_reconcile.py.diff",
+      "bytes": 2131,
+      "sha256": "a39fe9608f0851f18f04735dab9e43dab266bb8409cf9b1b745c6e73000428e7",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_references.py",
+      "bytes": 3352,
+      "sha256": "a96c4df811165656840bd09d3e55bec038c491e504b83eeebf1ad3e9fedd6108",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_references.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_references.py.diff",
+      "bytes": 3712,
+      "sha256": "ccc1452f627f42800ad5299b382636a27f5c7d883708c5295c46835eee7645b7",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+      "bytes": 13393,
+      "sha256": "4ad2727cdf2e8de07445fb1d730181b73d697e574fb0d34818f38eee2ce57ea2",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_routes.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_routes.py.diff",
+      "bytes": 13943,
+      "sha256": "449ab6bd9df8316f33fd42dc640ad49cc1b31a027430b7c4eed6bc2882a73d95",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_service.py",
+      "bytes": 6936,
+      "sha256": "86087204832701cf6d1bd89897569ddd1362293497c51996e81c2b8095dbb974",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_service.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_service.py.diff",
+      "bytes": 7338,
+      "sha256": "da88cdaae4f37e50449db42ef0a49a957d27b943d7822020778fa68b3b7055dc",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_store.py",
+      "bytes": 20574,
+      "sha256": "113e1273a6d80917b904340144e5858ae7c3c4a12eb012f372beca9af6031768",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_store.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_store.py.diff",
+      "bytes": 21178,
+      "sha256": "1ad745acbd6732360f9c79dfec33570064199c111ae83d761e906b40900f2828",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+      "bytes": 29848,
+      "sha256": "a6682daf5b8491fff5fd41919e3cdad426fa2282101f9a6e8c2766aff8f0b29e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_tools.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_tools.py.diff",
+      "bytes": 30587,
+      "sha256": "a8c91c22d99e0318614ef79d6c3876333f73402b4401878e08204467d1593355",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/jd_types.py",
+      "bytes": 2385,
+      "sha256": "a0a03b857f783902ed8008de37000fd34859f7473a7b14cb6ac345ebae543702",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/jd_types.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/jd_types.py.diff",
+      "bytes": 2768,
+      "sha256": "c851f78ca57f62839c20e6fea071dbc32b0f4ecf7c93a0ed3fb6cb4050fd11de",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/live_memory.py",
+      "bytes": 13433,
+      "sha256": "30c2901760d6d2e0a7173adc7368499d25b9679b9a17bf7344cb20b8e74ac5f2",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/live_memory.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/memory.py",
+      "bytes": 12361,
+      "sha256": "3f383a6ec433490edcef616ec138594d850de0c201c7c6da630253cca117a7d5",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/memory.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/memory_patch.py",
+      "bytes": 3854,
+      "sha256": "b26e5be41214c79664a42e1995bf670406b6c4c8e4af9feefa455be2b534b6fd",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/memory_patch.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/memory_tools.py",
+      "bytes": 11521,
+      "sha256": "facdbfc5e3dc5035326e0af46be58479c720c54f0398ea6453312001dc429e11",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/memory_tools.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/provider.py",
+      "bytes": 2303,
+      "sha256": "b65aebb3d2b696bd31f2b248e9a5a3cdadce99ec9c8a613bfa943e4956408a91",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/provider.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/publication.py",
+      "bytes": 10029,
+      "sha256": "3de2ef91c0ab865d9fed3241b94863db88f6dd516b809fa26c8edeebac6fcdf6",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/publication.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/references.py",
+      "bytes": 2382,
+      "sha256": "0ddaa542f92c8bf0eec5f301a1faba78c56a7a5a0727fc0371b45204e176ae9f",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/references.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/repair.py",
+      "bytes": 7428,
+      "sha256": "8b4fa02e7ff70d6e868b7155e18b46fe6e1454fbfd505b9bfdaf7e625274742d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/repair.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/runtime.py",
+      "bytes": 2066,
+      "sha256": "cc868a54e00d7eac65989efe497cab495dc0f8df7c10953449719bfeda5fc71c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/runtime.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/scheduling.py",
+      "bytes": 12721,
+      "sha256": "06959090f25e0ff50552d4cf8026ade58422d2292e4872c0c383a7c9676c568c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/scheduling.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/service.py",
+      "bytes": 47161,
+      "sha256": "9332ec517c99f9448642a7ddbf230a19da90dc0a506be5a6e37b80decbc80d63",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/service.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/service.py.diff",
+      "bytes": 39343,
+      "sha256": "c856d796e672be28232039b5b9aedc851c71ccf0d048418b7ea452ba9b281bd7",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/skills.py",
+      "bytes": 3887,
+      "sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/skills.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/skills.py.diff",
+      "bytes": 1058,
+      "sha256": "ce74d104b0f094586129662e95de3f6ea58c35409ad806ce5a97c3ec616d5f97",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md",
+      "bytes": 1806,
+      "sha256": "d4e8abc339115f9ae4ad8c321e0696291c0dafa4c745b7606f648f5ad9f783aa",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md.diff",
+      "bytes": 1072,
+      "sha256": "b64f483b86d22854726585a8788e6c884e68ab5b334122b5070ac37e2b93cb03",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md",
+      "bytes": 1866,
+      "sha256": "5856afcf8d7522257a656fb2b6162a3129a145fd91b54225636d72ccf94a6686",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md.diff",
+      "bytes": 1093,
+      "sha256": "a61a5a0e8174354ef96e596e6636ee81c1e72fc4304b757f7dbb7cf73569edf3",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md",
+      "bytes": 1726,
+      "sha256": "dd3c90f7376cb99dce5da91c6aa3172af401ae891ac96213858303edbd260d30",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md.diff",
+      "bytes": 1070,
+      "sha256": "648c3956a476a43544c83b4773b90e46a8359d2ced06617d181aedc9b506ed7d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md",
+      "bytes": 2576,
+      "sha256": "be532fd22cf9ab5c68638510874537fdbe9c687c2d7157f00b119ea5713ef80b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md.diff",
+      "bytes": 2959,
+      "sha256": "bf542db5a416818b5841a27afc54aab3692b4b224f31443a911b4c0f5a73a73f",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md",
+      "bytes": 2956,
+      "sha256": "e09ffbeaf0a5113f49eb97845c97ba3698525fffbbf149852a7fa3e6c4587fa2",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md.diff",
+      "bytes": 3418,
+      "sha256": "161749a9fad0ed369ee5bb5689dcb99a64cece7f91d7f5de101b8718e9fab0a9",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md",
+      "bytes": 3628,
+      "sha256": "abe3ef41181b740c9906e06c44c0785eb297ccd3f7578f4359b937455737e643",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md.diff",
+      "bytes": 4109,
+      "sha256": "812335bfbcf428341f2960257887b80be7e214322ddfac80dd1d771aa0b3124e",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/sources.py",
+      "bytes": 20876,
+      "sha256": "e46232b48ba8dad5ea418732d727ae600c772ce4a10ed53d2803458f28313d0e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/sources.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/sources.py.diff",
+      "bytes": 2287,
+      "sha256": "b9871f519138edf172bf84710bafd56c8f04b744880fe3f1786f5cc807f77364",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/windows_lifecycle.py",
+      "bytes": 5305,
+      "sha256": "81484ec2f59a8bf7804e8910529bff6866fd820a0596c7b3eb5581f072f78d32",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/src/analysis_agent/windows_lifecycle.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/src/analysis_agent/windows_lifecycle.py.diff",
+      "bytes": 5727,
+      "sha256": "2785df6b71815dafe01cebf7700b81433b4b3cc559efdb908f292c3d54ec23c4",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/conftest.py",
+      "bytes": 387,
+      "sha256": "2f4411c52a8c14718f6e6c0f83826dcd5e63507a41fe9fe4dc1f22d4170c0268",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/conftest.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/jd_offline_service.py",
+      "bytes": 9748,
+      "sha256": "9f0ba4c252fdc3ec6b96d4133f4adb4ce136ddbe171edb9e836ec90d328fff89",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/jd_offline_service.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/jd_offline_service.py.diff",
+      "bytes": 10199,
+      "sha256": "dad55f94be1d9674d675ef7d15301b201ec16ae21fa7bb72bbf244e7fec35d8f",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/jd_process_worker.py",
+      "bytes": 1523,
+      "sha256": "d7d9d40250d24245efb043c90df1886bb09559b0d95d10a3340d8f8f13d633bb",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/jd_process_worker.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/jd_process_worker.py.diff",
+      "bytes": 1818,
+      "sha256": "2974a3b430859b974ae23865f2991a636e01ede077796d1776f0663043039d6d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/task5_acceptance_runner.py",
+      "bytes": 267,
+      "sha256": "dc26d6801b8c428be6a0f4d8f35fd5d503d2348171504096bbb3224e216dd403",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/task5_acceptance_runner.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/task5_acceptance_runner.py.diff",
+      "bytes": 552,
+      "sha256": "fcd2f478b6a38486bafbdfb98c12e55ac5fb23f6d1fc64ae60709b4d87592c32",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/task5_memory_runner.py",
+      "bytes": 1241,
+      "sha256": "72c3f39190f1de2be5ad8d52e26c1d0e118751730aa303aaa7878253ebd30098",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/task5_memory_runner.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/task5_memory_runner.py.diff",
+      "bytes": 1527,
+      "sha256": "643ab5242c663787909a9f009ffacde467ac04b80803076cb754918bb710aebc",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_api.py",
+      "bytes": 4858,
+      "sha256": "ad52f60c34a4367fae7f711cf50a21df761d6ba8f4d056cb490bd5dc3f7f7b32",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_api.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_api.py.diff",
+      "bytes": 2650,
+      "sha256": "6d23d8975b7ca8b9c5b0ade4c25ec5c2e0652f8285d1bd0c96d6fcf983771b67",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_conversation_lifecycle.py",
+      "bytes": 35677,
+      "sha256": "5ad3b0ab63917c238487389e87d9df0e525e78f37b1fda60577ececdb8b0f5d6",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_conversation_lifecycle.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_admission.py",
+      "bytes": 13083,
+      "sha256": "363a8350ce59180359c016b3b32ab4b9e3d1d79370b43588dbb460d42a39e2f2",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_admission.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_admission.py.diff",
+      "bytes": 13568,
+      "sha256": "0017e1ad1806cc800943df2a49c6fa2897a8bb1a0074c6ee10d331ece380cf86",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_api.py",
+      "bytes": 11786,
+      "sha256": "d3ab625dced62fbb259b643a7e5fe057c4922c4d30b4adb6264d35a9fa7ccde6",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_api.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_api.py.diff",
+      "bytes": 12226,
+      "sha256": "90d74106bfb5377ed7ca5e164529ac133b809a39b3bcefd61c7927d999ef8e68",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_close_reconcile.py",
+      "bytes": 4254,
+      "sha256": "c0270f50782b92bc1d98f6b49061e32b83d9e62387bdf91381484695bedf15fe",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_close_reconcile.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_close_reconcile.py.diff",
+      "bytes": 4608,
+      "sha256": "6ee5516ff0931543f3ec0fbefa4a6ab60bce40ba7a1f86e28710aa3db475239b",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_current_source_acquisition.py",
+      "bytes": 6483,
+      "sha256": "35f1b759d5d8844b23f618b8f9db8d12e8fe891072d6922a4e6a845379c622e0",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_current_source_acquisition.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_current_source_acquisition.py.diff",
+      "bytes": 6917,
+      "sha256": "5aa13988431c498da3006e3baaf8cd0209a74c394fee27def05fb88e84ddcd48",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_end_to_end.py",
+      "bytes": 10411,
+      "sha256": "36b1a30526944195af3c7941d24f3fbdd33edadcea3aa56308c76d77eab6004c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_end_to_end.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_end_to_end.py.diff",
+      "bytes": 10850,
+      "sha256": "89b0919955cc87851d63e973085374df338d75faaf237225301eb20f345c15ba",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_engine.py",
+      "bytes": 3843,
+      "sha256": "9e18d5754c4e6989f0923deb2364014c493c89ce5f5b49741b531cdc7ee76848",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_engine.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_engine.py.diff",
+      "bytes": 4176,
+      "sha256": "9c9749c45c7aed9f6a9050dcefb4ecbc3d89de810aab5266a253d72a0943ef3b",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_fix1.py",
+      "bytes": 8847,
+      "sha256": "51ab1dacd3813145815107f34db2865ae54d54bca1cc51653133a375b8055b8d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_fix1.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_fix1.py.diff",
+      "bytes": 9247,
+      "sha256": "f880f22f4780aa644c2965a6d41bf33e4a91823980df3871ac76a0fdebf3e9bd",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_fix1_admission.py",
+      "bytes": 7838,
+      "sha256": "f49fdc302dcfeb77ce346a04441c10310ad06527c32e2afd3180c3b51b076100",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_fix1_admission.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_fix1_admission.py.diff",
+      "bytes": 8267,
+      "sha256": "f745bc4e641508e22e5409cee359f2251c83606a32c1ab8b2c69f10791d28d8a",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_fix2.py",
+      "bytes": 2945,
+      "sha256": "073f4753082dc5bc39a65533ddcd48d864faa6118f95388804f075b2ae8343b3",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_fix2.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_fix2.py.diff",
+      "bytes": 3244,
+      "sha256": "0a671a7e6fa78ad717a5aa7a5a6d5353875bd6f262953caddb9566f521d4c80c",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_manual_recovery.py",
+      "bytes": 7819,
+      "sha256": "56fe7233cfabdb410247a93d77dea69c400e878801858328f5677a118e0b3f57",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_manual_recovery.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_manual_recovery.py.diff",
+      "bytes": 8244,
+      "sha256": "e32e03fd33047e6f60f9b3eb9414b0fdaefb56fae4bf80a88ef63d09b43f9b81",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_model_view.py",
+      "bytes": 14229,
+      "sha256": "3d095dcbe5df5fd4ab751f9d5a967dbf7e98e70cb77c3d74a87eaa165966337e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_model_view.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_model_view.py.diff",
+      "bytes": 14750,
+      "sha256": "25262a82b02614e64244a59b29e106d3c26f4f2ad0ab9cf89d76a529899db7e7",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_model_view_recovery.py",
+      "bytes": 5175,
+      "sha256": "a59ef0f745cb71ab0484d0d79dd61bbbd116be5eebbf9bd8c09fc3f75afd6594",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_model_view_recovery.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_model_view_recovery.py.diff",
+      "bytes": 5551,
+      "sha256": "d4c7f30925c01b6251dd96e18397b49070d165e87e9a1a27f2e5e29bc726445d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_native_lifecycle.py",
+      "bytes": 4492,
+      "sha256": "2bbe118b27771504a53f178f2fec1fa227e810fa61333ff77cdcdd16580a377d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_native_lifecycle.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_native_lifecycle.py.diff",
+      "bytes": 4878,
+      "sha256": "a81f3a6f0d3e0d26fe9137f8bdeab4bceabd6b01c6325a0678addb2258a12225",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_postgres.py",
+      "bytes": 24660,
+      "sha256": "a41b6bea8ec4fceec04e95ca1997457ff8379764b7e09fe8adfb1cbeadd3b982",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_postgres.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_postgres.py.diff",
+      "bytes": 25416,
+      "sha256": "fc01b652ef4d7aea769078ec3c6a27dac80b7366674687b37d8ff76554e5758f",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_postgres_recovery.py",
+      "bytes": 5231,
+      "sha256": "50389a5b8c9fa262ad6f0991340d16a66836066163f3c2789b2adb72fbc169cb",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_postgres_recovery.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_postgres_recovery.py.diff",
+      "bytes": 5623,
+      "sha256": "a279fcfe49530752d82a095d84fe4c4b3971f4f38b459daacd5625a396b1c21c",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_process_lifecycle.py",
+      "bytes": 5048,
+      "sha256": "e1b106d397144b52879f4a04b70d3b955225d85e2ebd5077ec5c22e64a4bf0d4",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_process_lifecycle.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_process_lifecycle.py.diff",
+      "bytes": 5420,
+      "sha256": "75ad41d9f9d89a4f8495e2f9fbb004484f7829f7c7262167a559780ae80f7463",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_provider_binding.py",
+      "bytes": 4112,
+      "sha256": "78ef957fc6198981dbce708e7b6a3d44c7c26a0561bef25dd781473b6541975c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_provider_binding.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_provider_binding.py.diff",
+      "bytes": 4476,
+      "sha256": "af0f728a62ba3694ea78971d27bc090493927ad24ff1cd25026fee8092e5bcbe",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_references.py",
+      "bytes": 318,
+      "sha256": "06497e6a2b294e703d804f4b67a2e847b3e34a9e46bff50f1261b30f6586efbc",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_references.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_references.py.diff",
+      "bytes": 588,
+      "sha256": "4b199417c63dac9acc7a3b48e09c91c372245ca5dce42455a28fcb48c3dbf93a",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_skill_contract.py",
+      "bytes": 3299,
+      "sha256": "4f743bd1891579d88201536567e257590721f331a5552f6df9d0596d527e62bc",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_skill_contract.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_skill_contract.py.diff",
+      "bytes": 3638,
+      "sha256": "21ec0bf37268519a779c3f9e6218354c85e66ae9c5fe82a49d25097041ab55a7",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_sources.py",
+      "bytes": 4979,
+      "sha256": "0c92209627442dae9d6e031ab038718518332a7548294f5c49c906f1b3a5b62e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_sources.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_sources.py.diff",
+      "bytes": 5315,
+      "sha256": "1471d76d1ff7e2babdc52dd1b3fe94fffa99ea1f6de27f9389aabee1db5d2b5c",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_stop_projection.py",
+      "bytes": 2367,
+      "sha256": "033aebc0a05ba90eaa2656f73cfa3b9e7917698f11b99b31a4dc2b97a35197f1",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_stop_projection.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_stop_projection.py.diff",
+      "bytes": 2709,
+      "sha256": "896aa6f0d6c08759430370ba0a732a1e6768e9b634364f32b10e3374ea76ae17",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_store.py",
+      "bytes": 4507,
+      "sha256": "18b5c91c937cccccce63a6c5fbf9c1c6a662e8bb7a8f0b5fca19990bdd4cb903",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_store.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_store.py.diff",
+      "bytes": 4840,
+      "sha256": "1e302c2e23576e6401596cfadfddb3df8a07fce4d6c2e4cce0d58fc4e16b99a0",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_tools.py",
+      "bytes": 13715,
+      "sha256": "4a70bfcf10f53aafb3b542f94fd6dcc19addcc772ac3f1ab752ccd642b492e80",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_jd_tools.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_jd_tools.py.diff",
+      "bytes": 14192,
+      "sha256": "30732df9de46d135d09350175cc8cf43fc34530148a68de030703af44e29b02d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_postgres_conversation_lifecycle.py",
+      "bytes": 10891,
+      "sha256": "7013a997d113e49753f68a4a235d4348abfea25192f55589ef02efad82abb4e3",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_postgres_conversation_lifecycle.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_postgres_publication.py",
+      "bytes": 5723,
+      "sha256": "bfcccc9e2a8fbd1229d004c57d4960c10586b727505bbfa2c22a6d62181050d8",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_postgres_publication.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_publication.py",
+      "bytes": 9251,
+      "sha256": "a6b7b32ec2b792322189dc43f9bce19eab3aae035b647cde88a212244bb7c737",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_publication.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_read_recovery.py",
+      "bytes": 11727,
+      "sha256": "65c4f0e93e04a4836edce8734aaabfd83387b48e88e2cb97ec0674090c1d07f6",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_read_recovery.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_read_recovery.py.diff",
+      "bytes": 1103,
+      "sha256": "2c400fef2f71e8e6df00542aa1d60581fa94eab4f97b3d5399d254da8992c644",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_service.py",
+      "bytes": 19053,
+      "sha256": "de2ce7a159604a289603322b0a512a4a209735a26119a3d4a1088f2483d5ecc2",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_service.py"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_windows_lifecycle.py",
+      "bytes": 6224,
+      "sha256": "708c6109314261d79f0c972f9cb66dcacf13c12bce1c116552eb654faa385e37",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/test_windows_lifecycle.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/test_windows_lifecycle.py.diff",
+      "bytes": 6659,
+      "sha256": "e907d37f6bd10f328cc94f4a322247f6ad771d7f1ca265a68b4e8a1ec547e416",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/windows_lifecycle_worker.py",
+      "bytes": 3066,
+      "sha256": "bdb5e540fe882d414bf6f30129271cf6adfd0d339d098ddf3f9612b42aaec55a",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/analysis-agent/tests/windows_lifecycle_worker.py"
+    },
+    {
+      "file": "diff/experiments/analysis-agent/tests/windows_lifecycle_worker.py.diff",
+      "bytes": 3411,
+      "sha256": "02695395fbb24b2e745354b7654097e0d3c10e35fe54383cb4fa6b371a3e5cea",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/ACCEPTANCE.md",
+      "bytes": 4124,
+      "sha256": "de973766bc83a22eee7a2f07861bdc77615d7420852a80e9291ea7c98f9c0bae",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/ACCEPTANCE.md"
+    },
+    {
+      "file": "diff/experiments/jd-editor/ACCEPTANCE.md.diff",
+      "bytes": 4364,
+      "sha256": "f684cec784ee3b086c2cc044c308833549e45433fe35787659d82032b5411fd8",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/README.md",
+      "bytes": 6706,
+      "sha256": "97789a362806372558441f3aeee14ea6abaee268c3b92c168f705b703e5e1654",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/README.md"
+    },
+    {
+      "file": "diff/experiments/jd-editor/README.md.diff",
+      "bytes": 6959,
+      "sha256": "be73a34ef45b924483bd641298f420d255b019c66485c46764948fbf37cb94ba",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/README.md",
+      "bytes": 359,
+      "sha256": "75bfb6e54d5da0f61b588fdcf98d8ebe8600b7c5c0d30030375b492ebbf7144d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/README.md"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/README.md.diff",
+      "bytes": 582,
+      "sha256": "c4ad0d8fd81392ae2cfa39d94a538057da32e22bfbfb605a554e7666ed202a23",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/generated/jd-editor-v2.schema.json",
+      "bytes": 121509,
+      "sha256": "893fdb43fe2696846e74f15f2b5e12ed97a00f5ff1a5bc667c11ce734d7430fc",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/generated/jd-editor-v2.schema.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/generated/jd-editor-v2.schema.json.diff",
+      "bytes": 126847,
+      "sha256": "f3a2f02a38baf01b3d1c8fab10e86f08baf870fe7eee64429e4b921173e61de0",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/package.json",
+      "bytes": 427,
+      "sha256": "59cb6a822475fbb4df201d48d76a7514cdead7cd8b80bee8a8a666c1515c80fd",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/package.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/package.json.diff",
+      "bytes": 676,
+      "sha256": "3bca1ddba194233b398623bad23170d6e3884ce7f2d7c9aa645d366e4faac897",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/pyproject.toml",
+      "bytes": 436,
+      "sha256": "b681f902d0e77ecac97a9680ad26a85fed47e21066c442cc9e93d3f69221714b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/pyproject.toml"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/pyproject.toml.diff",
+      "bytes": 686,
+      "sha256": "4fe1d32af3aa70e7a2aca69ffda9e0a2e225809e9da91c728ef427cf3c5db0e3",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/scripts/check-codegen.mjs",
+      "bytes": 636,
+      "sha256": "b2d9c9e58a2e779f33420b8e286c4685f988080169dca8a63bdfa3955452b60d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/scripts/check-codegen.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/scripts/check-codegen.mjs.diff",
+      "bytes": 924,
+      "sha256": "5f5bc1740bde78f82bf8fe7218895fafe832cedc4777b66f04a78eaf38a5529a",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/scripts/codegen.mjs",
+      "bytes": 3120,
+      "sha256": "1d40e0324dadfa3174f3392ee684963860139f3c1111eb4d81b9e416e88f06d5",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/scripts/codegen.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/scripts/codegen.mjs.diff",
+      "bytes": 3450,
+      "sha256": "941cd73d7478fc2418ac7cef2f50fcffc7dcd61efc6480d4adcace3a822bb501",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/src/jd_editor_contract/__init__.py",
+      "bytes": 69,
+      "sha256": "e8fa2912d352111149a6e2e988a532046b21f51b25e4b4d2acb3805a4d115a73",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/src/jd_editor_contract/__init__.py"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/src/jd_editor_contract/__init__.py.diff",
+      "bytes": 363,
+      "sha256": "9a8b2337ea3d78e75d104350fd8e5d279d53c9e17bb1c91e78681abc3163ca97",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/src/jd_editor_contract/models.py",
+      "bytes": 44868,
+      "sha256": "57ba3234718ecd2df3a05b3a6ceea27ac5b0be9d7efc905043afe341b522822b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/src/jd_editor_contract/models.py"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/src/jd_editor_contract/models.py.diff",
+      "bytes": 47002,
+      "sha256": "91bcaa1d8fb1209e92c34a72c5c98c7f8e52ce2d0a5f0dc926dc58bd7bf9fd66",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/tests/public-types.ts",
+      "bytes": 1130,
+      "sha256": "7d3f31690b8943cce1076b7d1ef1ebd74d2a7e9a3561f15034cfb10f2844a29d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/tests/public-types.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/tests/public-types.ts.diff",
+      "bytes": 1435,
+      "sha256": "dbe1c4997f2f446febe78bca79198bb875f2d47b64adec548ba7453198a69ee0",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/tests/test_schema_contract.py",
+      "bytes": 3221,
+      "sha256": "fb340709078248060987e0c049b6f56d145b4ca34229ba0f14f84686d106c075",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/tests/test_schema_contract.py"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/tests/test_schema_contract.py.diff",
+      "bytes": 3550,
+      "sha256": "b1f945408d8aad1a11d36265f3b1a45de9210daaf814fdc5f3f7ce0dde2ff087",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/types/jd-editor-v2.ts",
+      "bytes": 42264,
+      "sha256": "6376d46cb72b80f4e5e277604269e1dd0153772565191a22f5bbf1033c9ad626",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/types/jd-editor-v2.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/types/jd-editor-v2.ts.diff",
+      "bytes": 43729,
+      "sha256": "7468d5519dd8ec891b05c63d33199530dd4c05d5a8cbe7c70f1b4af95ed7a4d0",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/contract/uv.lock",
+      "bytes": 44518,
+      "sha256": "e3ce831c28fa9a20b3c4df14b7d2b4235368bc2839c303e6b10afda644aa28a2",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/contract/uv.lock"
+    },
+    {
+      "file": "diff/experiments/jd-editor/contract/uv.lock.diff",
+      "bytes": 45174,
+      "sha256": "8bba7a24c9c848c3480673ed8fa572f730207dca3764b59569755e55aec3a00d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/fixtures/core-scenario.json",
+      "bytes": 11712,
+      "sha256": "5b60401f63d0cd66d42664ff0b1b89a944c5a7a4ba09192de55cab55c8e5fd43",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/fixtures/core-scenario.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/fixtures/core-scenario.json.diff",
+      "bytes": 12355,
+      "sha256": "5f5e68992a26afc0dc3a806c1cf253ec061508fceff6bfb83077d586f8aacd7d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/fixtures/empty-mark.json",
+      "bytes": 65,
+      "sha256": "c91018047539143c63bb10de143a90499593816252c83fee691029f53cc51b76",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/fixtures/empty-mark.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/fixtures/empty-mark.json.diff",
+      "bytes": 302,
+      "sha256": "1b190125a2211dc577b272bfcb3c54651089b792ded06aa8d2366718713f440b",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/fixtures/expected-task8-move.json",
+      "bytes": 44626,
+      "sha256": "08e698cf6c68afdd9fcf3befcd1efbd02c6e27bfddaa478629187d8222fbd953",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/fixtures/expected-task8-move.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/fixtures/expected-task8-move.json.diff",
+      "bytes": 46450,
+      "sha256": "11389f3ffaba2a441c05190998dc41318f29c0fe01fca3eae9fb227cc9534da2",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/fixtures/fixture-mapping.json",
+      "bytes": 8262,
+      "sha256": "9e419d8dbe10f953ab319b6707a72dbcaac5326bbd1bb98811927d8f9e9377c5",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/fixtures/fixture-mapping.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/fixtures/fixture-mapping.json.diff",
+      "bytes": 8889,
+      "sha256": "cd4730989a95250b4392885a686e8dd3a8a3c28004fb1a04af477c2868dff171",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/fixtures/r2-canonical.json",
+      "bytes": 44626,
+      "sha256": "f994045df13fd0095593a3333755df9e411dbc52ddeaeeba9aa276298d19a264",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/fixtures/r2-canonical.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/fixtures/r2-canonical.json.diff",
+      "bytes": 46429,
+      "sha256": "9ef2a5219755d93aa5af2f2aef04e5743a4c278f95719dd25a78687d60419634",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/fixtures/source-map.json",
+      "bytes": 1123,
+      "sha256": "cece4b6896e2f723224103b683989f1a8789c58f2b7459ec201c06c5ee40cb2c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/fixtures/source-map.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/fixtures/source-map.json.diff",
+      "bytes": 1404,
+      "sha256": "c48a504b52263a6f993dab881853faa9f3e6f26ee3382ecae022bd95cc3fc90a",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/fixtures/task3-selection.mjs",
+      "bytes": 315,
+      "sha256": "77e5b8d2e673c3c9767baad82cb74a3aeb4e048771855e91782665cb44c26471",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/fixtures/task3-selection.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/fixtures/task3-selection.mjs.diff",
+      "bytes": 570,
+      "sha256": "ffa5e9995046c597600439d171b636ac682028cf849a99c4cd2494b4266e8341",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/license-inventory.json",
+      "bytes": 52468,
+      "sha256": "62a76e1f327ccf88b35907823268ded6481b0760f6c6fcbdf740c3e8f097453e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/license-inventory.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/license-inventory.json.diff",
+      "bytes": 54057,
+      "sha256": "8e2bc5e9ada69f9ec40fb15507188128f244c41e319b290410d44f4d4a3fdae1",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/README.md",
+      "bytes": 327,
+      "sha256": "b9766feafcab84e61a097168cf186a50d8852a7e530b540769e6d5e007244f2f",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/README.md"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/README.md.diff",
+      "bytes": 544,
+      "sha256": "5d7042e627c5b1c393bb1cd6a3ee0159a7af26db7c95e0060789bad4bdc233f6",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/package.json",
+      "bytes": 1015,
+      "sha256": "0e709f6b0bf5be0194a925fe87e2546979d35136dfd1b0ac51388d4ad4cde99c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/package.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/package.json.diff",
+      "bytes": 1282,
+      "sha256": "3e545e1aa3ad6e2cefb5cc8d46dea069d9d39e393c4b10d62d0bbaeb28c851fe",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/affected.ts",
+      "bytes": 2657,
+      "sha256": "86ab156a82297c492847d4320a2ca01d5024ff37db347a11cf4276e33c08cf14",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/affected.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/affected.ts.diff",
+      "bytes": 2965,
+      "sha256": "b24bc32fc06320cdaf8389ffe9cbfffbe90ab759085f8282346b327a394ad765",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/bridge.ts",
+      "bytes": 1260,
+      "sha256": "448a67a20631e34da19960a9ad39c80e72941a9c68bd59886cb88eb3ab9896be",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/bridge.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/bridge.ts.diff",
+      "bytes": 1528,
+      "sha256": "3347705fa070274af4af623ddd6e41ce7e44df82140f3e03da69916273bafcca",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/command-mapper.ts",
+      "bytes": 622,
+      "sha256": "7527689a3972861fcad7d76f622c57fe96e1c7fa861676ef7b841d851074c56e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/command-mapper.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/command-mapper.ts.diff",
+      "bytes": 891,
+      "sha256": "624403412ea13f13a81c04ce587724e9b224f3dce1ebedfe0a2e44877ed9e72b",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/copy.ts",
+      "bytes": 2249,
+      "sha256": "414680239e35f02bc31d70dafd7d03acaa786ad7adb43e56f5d20c0029793fb6",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/copy.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/copy.ts.diff",
+      "bytes": 2534,
+      "sha256": "71ebd438a03d21f1bb28efef7d5823a8a0dcecb8ce2057980c0e5e53aac7eadf",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/profile.ts",
+      "bytes": 1988,
+      "sha256": "9049251f8affb767d86cc2f5340c7ae223dc2ca2feb44d0dddc144d0da1a00b1",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/profile.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/profile.ts.diff",
+      "bytes": 2284,
+      "sha256": "24c81d0bd9716664b557b185418b8f4e3c4cb47cd9cdb438c3167fbaee19de48",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/react-profile.tsx",
+      "bytes": 1265,
+      "sha256": "5acb3df1a1958fa52fe2e2b43bfc9ff64ac6e4f83f7d80cd4f7bee684552aa33",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/react-profile.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/react-profile.tsx.diff",
+      "bytes": 1562,
+      "sha256": "94a5c13495129cbb904e3fda9ae59a60dbefd92fd70965627c2a18eb7e732e2b",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/read-selection.ts",
+      "bytes": 2862,
+      "sha256": "98bca0b76d70e649d096c6f7094da50a57b466d9bae461ba0d3871d68e5203c8",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/read-selection.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/read-selection.ts.diff",
+      "bytes": 3200,
+      "sha256": "b8c318e177643d3fb1d68eca31efea788f3f81821165d990d34f4893cdd66582",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/schema.ts",
+      "bytes": 4105,
+      "sha256": "e39e40eea632527248d9f4d5b3548ece60daef29d96350c7158ed6f03c545adf",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/schema.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/schema.ts.diff",
+      "bytes": 4472,
+      "sha256": "7f7fb9973955b66d0465e212be873bfc2964082a60610c2fd74dc40ef97aa040",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/transform.ts",
+      "bytes": 5239,
+      "sha256": "c7e38dce848e6e187f50693d205aeb3c85b7f86dec3013a94681aaa9e83a83e1",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/transform.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/transform.ts.diff",
+      "bytes": 5628,
+      "sha256": "7ac208179ce7f1f39799d46f5539efcff9127b65ba37ccc693fedbfda77a49d5",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/src/validate.ts",
+      "bytes": 1431,
+      "sha256": "fc88774dc45e208a5b11dd0468d2434bbcc6c9944f7e6c2493139ba78beaf3f7",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/src/validate.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/src/validate.ts.diff",
+      "bytes": 1707,
+      "sha256": "dc792e316af37fc6e764b167d541a294ec9698dd49c639cba88cbe88ac86dfff",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/bridge.test.ts",
+      "bytes": 2169,
+      "sha256": "56427d21af0c98551d1ccd88fe342bbe4f19213b0ecadeeff5a77d3a2fef04bd",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/bridge.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/bridge.test.ts.diff",
+      "bytes": 2495,
+      "sha256": "7bf91ac6a250d2672b36dfdd963a3ed9449ae36f078aa49ba963d26255909dba",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/contract.test.ts",
+      "bytes": 664,
+      "sha256": "f58cb62af32dca0a56c712170dafede7a88a06873c00e5cdeca5f720c840e636",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/contract.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/contract.test.ts.diff",
+      "bytes": 940,
+      "sha256": "79c925caa142cfdd6bf422a45584d6a384e181ff19805df86bff3e26bc3f9d14",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/copy.test.ts",
+      "bytes": 1614,
+      "sha256": "869b941a75392f224fee6be4ed7d06e370f9600f8a3af90405fd6e421971dc79",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/copy.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/copy.test.ts.diff",
+      "bytes": 1898,
+      "sha256": "ead5db1b843b641a4279505f1b8343866a5c7949aea5b946e67f74c6054f0cb5",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/helpers.ts",
+      "bytes": 833,
+      "sha256": "943a0529e5e2f2729fc0fdfc5890a15a433c4a14a4e69c67b2d570d415e0a9a9",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/helpers.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/helpers.ts.diff",
+      "bytes": 1097,
+      "sha256": "dae1c42c9cdb178f5390b5f683278b2d585786c3f9639c8bb75e995fc6d53554",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/integrity.test.ts",
+      "bytes": 2133,
+      "sha256": "8a3f4f94bc7e64d2dc28cf6b216becbed2c3935df17d751fb9580aee14611e9e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/integrity.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/integrity.test.ts.diff",
+      "bytes": 2461,
+      "sha256": "e9f6acf241252e3e95fbc52603a25d1240b4c73e9967596d3a927f3dff335fff",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/profile.test.ts",
+      "bytes": 3119,
+      "sha256": "637d1ae5a88342a83aa2cfe9f182378f4a374dc46ab6cc9cce5c5f92ec5f13af",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/profile.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/profile.test.ts.diff",
+      "bytes": 3465,
+      "sha256": "c018b9aef07e8a66673ab73a95119b83e304b187022faae9ba529e859ba99fc9",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/read-selection.test.ts",
+      "bytes": 982,
+      "sha256": "30d2437ee4e7a1ea800a9e518ef8eb9827934adf34d982819fb6d86c4ebdc041",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/read-selection.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/read-selection.test.ts.diff",
+      "bytes": 1283,
+      "sha256": "abd09e6ed8808ad53f103422197c44c23998c925cafd36795ea393004ad7e1e9",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/review-round1.test.ts",
+      "bytes": 7860,
+      "sha256": "c414a4bcdebfb88dbbf3710ed81bc1a16f75f05bbdff4e809d9c0f318b0ec89c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/review-round1.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/review-round1.test.ts.diff",
+      "bytes": 8409,
+      "sha256": "2b4f44c966c46e79064a38b98215f62a62794b62f8777fb0db1cfaf705e04430",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/span.test.ts",
+      "bytes": 2206,
+      "sha256": "e5acf7bd3378566b3859f3628e9a38de6d3534a98ed17c4af9ebd9c5ed3ed509",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/span.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/span.test.ts.diff",
+      "bytes": 2525,
+      "sha256": "1666ea3ecb853522c2150a17482eee0fee2d5f5079fa83da2a8115e4952d5dfc",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tests/transform.test.ts",
+      "bytes": 5581,
+      "sha256": "4ec19b555b609b944ca2476cfef5c7b226d16f91fa879a30c0cd9ca9d6b598ff",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tests/transform.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tests/transform.test.ts.diff",
+      "bytes": 6044,
+      "sha256": "0d09279759ca09cc956c9a65e08091b9b90c4f721ece2cbcd71859e98457cbda",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/native/tsconfig.json",
+      "bytes": 373,
+      "sha256": "57b1fa5e9392aaf593a762783d37486112b69ad68d2df976c9648b99ec7fdd4b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/native/tsconfig.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/native/tsconfig.json.diff",
+      "bytes": 619,
+      "sha256": "42d95d962fa17f2c4b410b96a919bfacf2d46fe0b7fd2cf3dd6050f7da33f476",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/npm-audit.json",
+      "bytes": 363,
+      "sha256": "8960605eb8ed06b4a93047dc28db0f1b15ef3aa62c8fea69ca2a578939fe052c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/npm-audit.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/npm-audit.json.diff",
+      "bytes": 594,
+      "sha256": "bf9942f02d910c2184054686b0fa88503e39058ff2e50b310b2a8505d29f82b8",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/package-lock.json",
+      "bytes": 304506,
+      "sha256": "33aedab03c000daac196fba7c5ca58bc0d1cf819d8e75d0663c612a4cdb0e378",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/package-lock.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/package-lock.json.diff",
+      "bytes": 313483,
+      "sha256": "cb8d47d722ea8e17f454a2855dee71b1ee2a0d600ec457cc6f5ea4b06fa4c06d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/package.json",
+      "bytes": 316,
+      "sha256": "9625507392a7b70f41c57cde16d46f1824b77d37cc1285ffd77a070158f5bdad",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/package.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/package.json.diff",
+      "bytes": 536,
+      "sha256": "69a04d6b493c9129b8acbc5b6ce95c3c316af791858b708d2478b4804caaf353",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/.env.example",
+      "bytes": 54,
+      "sha256": "c2d0ab73d2e9919670b43ec8d24686066ad3c262e741a8bfe4af4839574169ed",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/.env.example"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/.env.example.diff",
+      "bytes": 267,
+      "sha256": "c82d9bb907988fbe82ef0175f4dc226326a7bedc4e8f3d74223d6e25c50c4de5",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/CLAUDE.md",
+      "bytes": 11,
+      "sha256": "336cc4fbf19beaada7ccf9986414fa91851a8d7a07dfb3ccbe800a69eed0ab49",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/CLAUDE.md"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/CLAUDE.md.diff",
+      "bytes": 215,
+      "sha256": "6db2bd0d6528d89fd6b887d75592182150f7fd0005b6701606a38bc7101b184b",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/README.md",
+      "bytes": 3487,
+      "sha256": "0b600a66f4b6019fe6a00ff7fed7684a80776b0e50da92c9f3f24fd468be96f3",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/README.md"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/README.md.diff",
+      "bytes": 3725,
+      "sha256": "3c7e99c547eb87a9b681bf36ea4e5d9f7d07ba102757d93baf314dd0477c7715",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-dependencies.mjs",
+      "bytes": 3077,
+      "sha256": "f3a84f49b8d3b337cd685260ab52696617e7117d9be0cd12cd9bdd35c67b33fc",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-dependencies.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-dependencies.mjs.diff",
+      "bytes": 3457,
+      "sha256": "f2971290948e9bb26cf638eb06f1f8497dd776292eafb753cbbf909aa3a3317e",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-fix1-clipboard.mjs",
+      "bytes": 4844,
+      "sha256": "2f4e72fb8a62ff66d32de6551e92111c079bf9b193a8cce2fb986d792265aec5",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-fix1-clipboard.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-fix1-clipboard.mjs.diff",
+      "bytes": 5200,
+      "sha256": "9e901c11d4d199dae926779fe87f7f978784f38b47fa438eaf9ad038218d9425",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-fix1-rejection.mjs",
+      "bytes": 4207,
+      "sha256": "e0a237db4164fa5569d580d8d0b940aa69f45047ca0ffc7c36a7a5f3d04dad33",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-fix1-rejection.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-fix1-rejection.mjs.diff",
+      "bytes": 4544,
+      "sha256": "8780314f74215ae5656dfc28e7b12a73bf811828be829185df2b9f5965c2fa04",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-input.mjs",
+      "bytes": 7665,
+      "sha256": "6a3ac784e5c91f0a98e6b298a2db28653cc187cdc3c36f4f6dc349467dd09973",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-input.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-input.mjs.diff",
+      "bytes": 8116,
+      "sha256": "083098ee90c345f969d41d1c4c19caccaf869989d3210a63b3388bb5d591df29",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-navigation.mjs",
+      "bytes": 5084,
+      "sha256": "411c5103f6f099bb0894b4e976e5f5a2f06b7de1324e2666d8023c98351e0a2d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-navigation.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-navigation.mjs.diff",
+      "bytes": 5488,
+      "sha256": "d9a12e810138cfb13d725d0b8eac76d7833e9c68fe1be3f96b2bf2985eee3ae7",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-recovery.mjs",
+      "bytes": 6764,
+      "sha256": "8204c9e3adfa622f37550008f0fffdccbf1c365ecf5eda2a69cb95e72c8f0f74",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-recovery.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-recovery.mjs.diff",
+      "bytes": 7203,
+      "sha256": "956ce570fcb2beb0c6240586c2fcf0b038771595c5244621c502211404ef98dd",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-smoke.mjs",
+      "bytes": 1674,
+      "sha256": "724dfbe32f0d4da072cf764c42013b4168151be74d3cb52f9a528bedb72b4f9a",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-smoke.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-smoke.mjs.diff",
+      "bytes": 1976,
+      "sha256": "b151c431bc107eb644074a99931e0f1d3bc9d668f260b733d8596ed51276b8e6",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-structure-final.mjs",
+      "bytes": 4642,
+      "sha256": "d6897cff8201f618c6a8757039fd1d5db1d7f274836d73ceb3e817f337049bfb",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-structure-final.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-structure-final.mjs.diff",
+      "bytes": 5046,
+      "sha256": "c1d5c1731be6eafd9ffd46550a05602a63e6984ac0a0b5e7819f428a9c21cf26",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task4-structure.mjs",
+      "bytes": 7291,
+      "sha256": "4e813724fbbc5c94cda93b7b4f1d7c54b447d5a74468676d7933279b96167493",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task4-structure.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task4-structure.mjs.diff",
+      "bytes": 7739,
+      "sha256": "19e5ef884ebf37543c7dde55b827a078a8b5e04fadb81df6aab21bc668e7496a",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/task6-journey.mjs",
+      "bytes": 8706,
+      "sha256": "2d17844c67a2c76c7a7d35282ab8e1138bc62c0f63ced79d3bd47644db36c464",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/browser/task6-journey.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/browser/task6-journey.mjs.diff",
+      "bytes": 9091,
+      "sha256": "31b0345e3e510599768fc42ad3e930b8bcccb7869aed5b0a6c7ef2bcd39b6a5e",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/eslint.config.mjs",
+      "bytes": 512,
+      "sha256": "53a7cac70ae60c085f411ffc18b6630c502d50a3a582e58630193264f41f2ecc",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/eslint.config.mjs"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/eslint.config.mjs.diff",
+      "bytes": 757,
+      "sha256": "aa30c9555abaa665d580327fb8f44033b905db79c1610e25890556fdfeaac884",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/license-inventory.json",
+      "bytes": 241966,
+      "sha256": "07f50edbe287f82ee69514ea90ade506ac025baf0acb3d18869751e3c022c600",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/license-inventory.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/license-inventory.json.diff",
+      "bytes": 248414,
+      "sha256": "967667e52d3739dc13234a292ef77a2c25105a39a12b5cbd745a9c36d40a010c",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/next-env.d.ts",
+      "bytes": 288,
+      "sha256": "1862ac4bbbc5192d4bf562161df66ea547ed3e67173100656ab606ae9797db2b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/next-env.d.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/next-env.d.ts.diff",
+      "bytes": 512,
+      "sha256": "23b64776b76be963248082e238379cd9aad9621da65623f93ba96bcdc5b0ae32",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/next.config.ts",
+      "bytes": 193,
+      "sha256": "a47fbe2d8b56cc8fd42884cbf64ba25789a187952f20c5e1fea32aef0a317332",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/next.config.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/next.config.ts.diff",
+      "bytes": 421,
+      "sha256": "41e47de463f10e2dbf6199b8fae393e714f104b4f3f34677614db4a7e4c17bfa",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/npm-audit.json",
+      "bytes": 364,
+      "sha256": "09bf5b4200dff8ba883d698e3acf9bb59dcdf13a5ef61e2a97fc07f10a6a1d4d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/npm-audit.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/npm-audit.json.diff",
+      "bytes": 607,
+      "sha256": "072e7f1860732ef6c1ec49538b7376b98eb56e7fdba5c3842089f07df33ae55e",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/package.json",
+      "bytes": 1281,
+      "sha256": "e32f9e5f6f484bf7eb0f56b843e93e5ee1e5c27677c280b4070eaef8fadc12bf",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/package.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/package.json.diff",
+      "bytes": 1540,
+      "sha256": "032b5a0b69b62f3f1928d08daad400eec5259e4fb526416f690d4ecd3567623e",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/app/globals.css",
+      "bytes": 6329,
+      "sha256": "fd15e2cd9dcfccedc51a3a141809352eb3956259e2e9ed222e38612ad2edb588",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/app/globals.css"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/app/globals.css.diff",
+      "bytes": 6971,
+      "sha256": "bae163cfee70b5aef28eeb46540ab63aa6d12ca178044cbf1086ab9c64a56cef",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/app/layout.tsx",
+      "bytes": 332,
+      "sha256": "4c9013e42f12f0c39d8311ab66aa5000593ef6600d540158ed5265d9df8e6b3b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/app/layout.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/app/layout.tsx.diff",
+      "bytes": 578,
+      "sha256": "b09d1fb5a63e982f25214daa37f5e38e91de7f72f26f1d2fc01eeb99d97c72a4",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/app/page.tsx",
+      "bytes": 120,
+      "sha256": "e0dc31818e81dadc5185323a16d9236aaaf03754000d131be3c2599a9073669d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/app/page.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/app/page.tsx.diff",
+      "bytes": 350,
+      "sha256": "a56caad70e2bab0caa630d7614e527e0d3e82b169b8de452cf251f426f06a603",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/app/workspace/[document_id]/page.tsx",
+      "bytes": 265,
+      "sha256": "7bdd8d2136b7c7e2466f2e247df1083009851b3481751bac1eb89dd72a29841c",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/app/workspace/[document_id]/page.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/app/workspace/[document_id]/page.tsx.diff",
+      "bytes": 572,
+      "sha256": "45024685d4a969b555df69d0b876a42ce9a452bc75f4194df127df0cee7cc9de",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/documents/DocumentActions.tsx",
+      "bytes": 771,
+      "sha256": "2eea494f167b4cd648a9e542085a567138baa3e80f67bf4660804a33d779e936",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/documents/DocumentActions.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/documents/DocumentActions.tsx.diff",
+      "bytes": 1081,
+      "sha256": "ac7bcd3cafd378cca24bb656f7f15f0d4bae1745d11a5198054fd8e3a7d5a327",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/documents/DocumentList.test.tsx",
+      "bytes": 2237,
+      "sha256": "140a1cc5ffc063dd4539bdccdebd41ad5d6a27e2c7321110b8a4454c078c5c4a",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/documents/DocumentList.test.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/documents/DocumentList.test.tsx.diff",
+      "bytes": 2557,
+      "sha256": "8b9e4e11d8fbd20d8f496c44986cdd4e66e7dab27f31169cc784e523fcaf77c9",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/documents/DocumentList.tsx",
+      "bytes": 4394,
+      "sha256": "da3a6fbc384c6bb008561a248e3f5311a6ba30e299dd5dfcdfe7dcce2e50a41f",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/documents/DocumentList.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/documents/DocumentList.tsx.diff",
+      "bytes": 4786,
+      "sha256": "ad5d3db491900b1a03200927a133e9d12370ee9926c50a6f497658908751cd2d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/generated/analysis-api.ts",
+      "bytes": 6777,
+      "sha256": "f2e89beb23ec63a4370631ffa99b2e3cc4c7a8292f38d68f237def941800ab3e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/generated/analysis-api.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/generated/analysis-api.ts.diff",
+      "bytes": 7290,
+      "sha256": "fc51cc2712d8ac9c8ff00e1eff2c29117941afb3d419303798af167c4dc1bd3c",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdChanges.test.tsx",
+      "bytes": 3112,
+      "sha256": "d158482f3da000fc484fdc87556ac164e840ec419b13a13add7e5f0a0bc01536",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdChanges.test.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdChanges.test.tsx.diff",
+      "bytes": 3452,
+      "sha256": "e7726c29636106954810d21649d2d63671b52ab5cfd4084932b66ba1da0239d7",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdChanges.tsx",
+      "bytes": 2943,
+      "sha256": "a4336c73df9d9176edb0ec6e107b3b52482a2b4533298f25c83bf5d842b6d438",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdChanges.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdChanges.tsx.diff",
+      "bytes": 3280,
+      "sha256": "f58f610d6cbf08eada8280dcf074d6d3b37f363b085fc0df4b57c7d329fb7785",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdEditor.tsx",
+      "bytes": 7407,
+      "sha256": "e25022fad010a1410cbb72376906ad4dcbef5f9e50d85dda86cf16a4af564ddf",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdEditor.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdEditor.tsx.diff",
+      "bytes": 7907,
+      "sha256": "8daf6dfd55b81e3dbcfefef1042b4ee36146d6af2f978acb751886e228b684a6",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdLeaf.tsx",
+      "bytes": 1043,
+      "sha256": "b9f330d3772c59f37fba86f1d56caa4907babc286ebb45819aac0124ac22879d",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdLeaf.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdLeaf.tsx.diff",
+      "bytes": 1311,
+      "sha256": "3e2520c909390c83038cfb1bc11a6b91a533090f8f0b3615b72ded01b6bd4fa6",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdNode.test.tsx",
+      "bytes": 2390,
+      "sha256": "83c5ee519c6cfb9ec90aa82d79550ad1336b59409eb76d84e3d648659b57cbd1",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdNode.test.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdNode.test.tsx.diff",
+      "bytes": 2718,
+      "sha256": "96b61963e507f59c1c64d13410478f9369bf58e5647fea109da8477486e45d78",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdNode.tsx",
+      "bytes": 9549,
+      "sha256": "6c21dc6958816d7485f44cd9448836fa36a6116cc9e38154fadc757cdb26dd5b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdNode.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdNode.tsx.diff",
+      "bytes": 10112,
+      "sha256": "ffd40088367845a5683dddb7b77d00106fa9f9792d8ac32e93143545faf4eecf",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdRecoveryWorkspace.test.tsx",
+      "bytes": 1509,
+      "sha256": "ad1b6c904e40107fe78fe953a2c5b4cd2c01d0dc9323b3fc2d4c2700e53cee80",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdRecoveryWorkspace.test.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdRecoveryWorkspace.test.tsx.diff",
+      "bytes": 1818,
+      "sha256": "36f22893df8920e68360f875bbc8426638e0f5737df8a95d7f3b73d7bd496ea2",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx",
+      "bytes": 7000,
+      "sha256": "3d8a0e9afd3344d34b0b63666ad1bdfea395fbcb01751350aa93656fdf483928",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx.diff",
+      "bytes": 7396,
+      "sha256": "ce2bcb9520478fe80528f86ae8a3da85ae152a47456fa6188771a809d4d37804",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdWorkspace.test.tsx",
+      "bytes": 1514,
+      "sha256": "387ee66e6ff254e3148e811370988e99a9dbb3c8b7b76ec489c5ad071a524616",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdWorkspace.test.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdWorkspace.test.tsx.diff",
+      "bytes": 1825,
+      "sha256": "a1c6b0326b73684882bae276324283f76f7dc92580c90038d8c55cdf99f1b900",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+      "bytes": 13777,
+      "sha256": "91be20d3194f4316cfa50cb896cd83b5dc84891ca793653f29dc9f30d0c76b7e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/JdWorkspace.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/JdWorkspace.tsx.diff",
+      "bytes": 14378,
+      "sha256": "9f1a40dea6eb19b9c622e481b25ae44049a50fca03291a11d6c0db4aa5e9a3f7",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/api.ts",
+      "bytes": 5255,
+      "sha256": "4113aa6179952899fe0681c783bd2cbd587eaaec4fb5c18e3af97e06e9cd6e21",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/api.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/api.ts.diff",
+      "bytes": 5619,
+      "sha256": "6c8adc2300923609cd2a051867d73f7704442a2b56e2a1529cab5768cba02e91",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/navigationGuard.test.ts",
+      "bytes": 606,
+      "sha256": "8f7e97f3171509ee19055e33adff41fda7543feb4e88f87f66cdde75495e20f5",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/navigationGuard.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/navigationGuard.test.ts.diff",
+      "bytes": 895,
+      "sha256": "c2516f499bbe006dbb1caa234e2591e9f54de3599fa71997a0f877d26a4f2223",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/navigationGuard.ts",
+      "bytes": 417,
+      "sha256": "9373a29145537b549327a3c6ca9f3feed18339df40f8b9bdc432bbc213d17d2e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/navigationGuard.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/navigationGuard.ts.diff",
+      "bytes": 685,
+      "sha256": "e2b3f7b03283c5e7f1aa1075339b19555f31bca6eea6c8b312c27f26095b2eef",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/requestRecoveryCache.ts",
+      "bytes": 1940,
+      "sha256": "f61fde919e44331a89ed76e59e308128e328c0aca857f6e6e1b3c78bddd74726",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/requestRecoveryCache.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/requestRecoveryCache.ts.diff",
+      "bytes": 2260,
+      "sha256": "508045b0813dd386e933c62cd622c21c06a3943816b3952a1537e700c0338862",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/submissionCache.test.ts",
+      "bytes": 1735,
+      "sha256": "52ce8011e06a8cc440d63f6c3a171c02c6264c094eea9f6f7fe46ee0b2958cd5",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/submissionCache.test.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/submissionCache.test.ts.diff",
+      "bytes": 2056,
+      "sha256": "32b39886c334f8562437489bc60bfd958c2b8532997053a90048bd1b3643e9a3",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/submissionCache.ts",
+      "bytes": 1261,
+      "sha256": "6d846f7ecf1d93b8c9febeb3fd6a67fca501b2dc0c838f8cca0cba4a8a96ca93",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/submissionCache.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/submissionCache.ts.diff",
+      "bytes": 1549,
+      "sha256": "9f005e86c4229dd31225415c07f0b33931d3270c5780dc4af26f04d64c47cc8d",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/useJdSession.test.tsx",
+      "bytes": 14316,
+      "sha256": "db7698a243426e8f92d2ee9ae6e78ce6beb101a1aafa3c9fe9add979dd412f28",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/useJdSession.test.tsx"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/useJdSession.test.tsx.diff",
+      "bytes": 14908,
+      "sha256": "63774001ec57215e24bd05e43065471f8fdc3367bdc2cf7381d8f62a9ac6ea03",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/useJdSession.ts",
+      "bytes": 16727,
+      "sha256": "ca5c602c372b51636596e9a58dd5186e016ca1eccf5914dc3b43f7e74da5aeb3",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/src/jd/useJdSession.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/src/jd/useJdSession.ts.diff",
+      "bytes": 17453,
+      "sha256": "cf39beeb733f60bb6b47d834d4fd660ede89062d48d370ac500bc272944787cd",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/tsconfig.json",
+      "bytes": 607,
+      "sha256": "cc84d31e7ccdc6e9a61725dea734d17dd57bca7d222fb52e5eafed0396511559",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/tsconfig.json"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/tsconfig.json.diff",
+      "bytes": 855,
+      "sha256": "e7609d258a69565c56a9d2e4cf7c781b27593d825cd25f5fc65ca7d644780801",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "source/experiments/jd-editor/web/vitest.config.ts",
+      "bytes": 177,
+      "sha256": "b1b5803c12f06f80ce13d9390f5267426b297fa46c7bfe0dd7a546e451e13462",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:experiments/jd-editor/web/vitest.config.ts"
+    },
+    {
+      "file": "diff/experiments/jd-editor/web/vitest.config.ts.diff",
+      "bytes": 410,
+      "sha256": "d7617a0715ad4ac0d66d193515abd497c40a1645d11a5424b12d62c1c1eb4c00",
+      "origin": "622e548d9d37ce4f8adb2ac0f0e61ce0d7aad3d9..3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef"
+    },
+    {
+      "file": "requirements/2026-09-10-jd-editor-core-implementation.md",
+      "bytes": 71291,
+      "sha256": "784a4e9e5b70648a4434e02fe40f49ca02be3a4cafc039a3ba5de845ca6f6a3d",
+      "origin": "root-supplied technical design/evidence: docs/plans/2026-09-10-jd-editor-core-implementation.md"
+    },
+    {
+      "file": "requirements/2026-09-10-jd-app-tool-contract.md",
+      "bytes": 42105,
+      "sha256": "f00d2d6d7a888839367ce55ba28f15b08be3f0efe6eab098789346d7fb276a3f",
+      "origin": "root-supplied technical design/evidence: docs/specs/2026-09-10-jd-app-tool-contract.md"
+    },
+    {
+      "file": "requirements/2026-09-10-jd-plate-document-profile.md",
+      "bytes": 30114,
+      "sha256": "a14be53ae4a38a08d3629f07d5155b337aaab6b1da5f6d1fbc033986924dc462",
+      "origin": "root-supplied technical design/evidence: docs/specs/2026-09-10-jd-plate-document-profile.md"
+    },
+    {
+      "file": "requirements/2026-09-10-jd-model-view-change-notice-design.md",
+      "bytes": 29974,
+      "sha256": "aa2b17d226d08e0be28418f2ca6f2819115f88fa3674ebf13eb36dc5e11bb348",
+      "origin": "root-supplied technical design/evidence: docs/specs/2026-09-10-jd-model-view-change-notice-design.md"
+    },
+    {
+      "file": "requirements/2026-09-10-jd-native-process-lifecycle-design.md",
+      "bytes": 39300,
+      "sha256": "39cf4710d55e5685c2903c28d5fe37a5f4d56e00bfe15213e43e0e71f02dde3d",
+      "origin": "root-supplied technical design/evidence: docs/specs/2026-09-10-jd-native-process-lifecycle-design.md"
+    },
+    {
+      "file": "requirements/2026-09-10-jd-manual-recovery-transport-design.md",
+      "bytes": 23150,
+      "sha256": "7a46f8f4564972eed3f8a2684204b211d04995e07759effef5c0cfa1d0edeae9",
+      "origin": "root-supplied technical design/evidence: docs/specs/2026-09-10-jd-manual-recovery-transport-design.md"
+    },
+    {
+      "file": "requirements/2026-09-10-jd-employee-journey-design.md",
+      "bytes": 32310,
+      "sha256": "a6e872132566f33bd7e7a13ad026d2a0e5f059df67e2fdc9edd41191b46c2352",
+      "origin": "root-supplied technical design/evidence: docs/specs/2026-09-10-jd-employee-journey-design.md"
+    },
+    {
+      "file": "requirements/2026-09-10-jd-editor-core-integration.md",
+      "bytes": 11505,
+      "sha256": "5fbbe706a40a8d4668882cfd33d994aeb33fb55448b6000be4584056884ea542",
+      "origin": "root-supplied technical design/evidence: docs/specs/evidence/2026-09-10-jd-editor-core-integration.md"
+    },
+    {
+      "file": "requirements/review.md",
+      "bytes": 2558,
+      "sha256": "471c56872952c9abfc89cff63061f8b320c45c90a7a3b3f93a8ff596361321cb",
+      "origin": "root-supplied technical design/evidence: docs/specs/evidence/jd-editor-task6/review.md"
+    },
+    {
+      "file": "requirements/review.md",
+      "bytes": 3363,
+      "sha256": "3f92ec88faab925ba13131de011569de981fbe66a0ed50a243ae20ab33c486cc",
+      "origin": "root-supplied technical design/evidence: docs/specs/evidence/jd-editor-task5/fix2/review.md"
+    },
+    {
+      "file": "requirements/core-review-brief.md",
+      "bytes": 4181,
+      "sha256": "23746466bafad2402448c5cd305c464fa649d0b10b80aa6cbbad4b60d57cd86b",
+      "origin": "root review brief"
+    },
+    {
+      "file": "evidence/task6-final-all.log",
+      "bytes": 12325,
+      "sha256": "5c2c42752949f714679626639b9f030a146d60dd269594d1afac58c9374c731a",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-final-all.log"
+    },
+    {
+      "file": "evidence/task6-final-jd.log",
+      "bytes": 825,
+      "sha256": "282c6cbf5dae947858b74bdd01a58da478565abbfbeaecb11f2d6d94166df417",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-final-jd.log"
+    },
+    {
+      "file": "evidence/task6-final-memory.log",
+      "bytes": 709,
+      "sha256": "c84b39ee2d2273b1505c0f47210c09be0078e7a84025e38e2691c2ebc700af0b",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-final-memory.log"
+    },
+    {
+      "file": "evidence/task6-review-dirty-green.log",
+      "bytes": 266,
+      "sha256": "dbf0ddc3423bca4eb871f8864a73cc6ee9b57e27d8c849c96759b65dc7ece293",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-review-dirty-green.log"
+    },
+    {
+      "file": "evidence/task6-web-tests.log",
+      "bytes": 777,
+      "sha256": "f16eabd2dad3ba0a50c1543b20cdaaecd8570d21a2afcf6514b7628fa6341241",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-web-tests.log"
+    },
+    {
+      "file": "evidence/task6-web-codegen.log",
+      "bytes": 124,
+      "sha256": "488bdb8311c8061c3fb45b2cf50f9f412a3212a76c7b3434352da38defc93111",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-web-codegen.log"
+    },
+    {
+      "file": "evidence/task6-web-fix-checks.json",
+      "bytes": 1622,
+      "sha256": "bd8cd127abb50a6996935d15d5639593749945b40fbf5dca809a3f0933abe54e",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-web-fix-checks.json"
+    },
+    {
+      "file": "evidence/task6-e2e-result.json",
+      "bytes": 3599751,
+      "sha256": "622769dd13cbd16be4b8c3d14c6c67721b907ff6b2c6507b88a7717d6e80b045",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-e2e-result.json"
+    },
+    {
+      "file": "evidence/task6-browser-initial.json",
+      "bytes": 311636,
+      "sha256": "b6a7fc441422a5fe40f53f0e4602b369da49cd257d0d435d5109f06f48f14240",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-browser-initial.json"
+    },
+    {
+      "file": "evidence/task6-browser-reopened.json",
+      "bytes": 268983,
+      "sha256": "c217b754bb9c0c4cd22c0e75915cab3b41cb6c1a87f7359b70aac8a46214069a",
+      "origin": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef:docs/specs/evidence/jd-editor-task6/task6-browser-reopened.json"
+    }
+  ]
+}

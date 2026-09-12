@@ -1,4 +1,5 @@
 # Caliburn Current Decision Register
+**JD-R002／隔離編輯核心通過（2026-09-12，G7）：**Task6已保存3d0445ae；[整體審查及有限修正](specs/evidence/jd-editor-core-review/review.md)F1–3／R1–2 CLOSED，root接受。最後47 Web／86受影響Python／19真JD PG及build/types/lint、真Chrome恢復PASS，原Task6完整旅程證據保留、不累加。當前完成六切片核心交接／本地tag；**下一工作為P3離線費用防護與執行包、A1採用清單**。P3-B01仍OPEN／0產品provider；G6、P5日常維護（含R3/R4呈現Minor）、P6真人與自然品質、P7成品未通過。未merge／push。
 **JD-R002／Task6已接受（2026-09-12，隔離G7）：**[完整固定旅程與結果](specs/evidence/2026-09-10-jd-editor-core-integration.md)及[獨立審查closure](specs/evidence/jd-editor-task6/review.md)通過；來源metadata、JSONB相等、終態讀取及途中手改保護已修正。620離線／156真JD PG／45真Memory PG、68原生／41 Web與建置檢查通過，真瀏覽器及API重開全值一致；不累加重疊案例。**當前gate：精確保存Task6，接整體跨切片review／tag。**0產品provider；Claude工程審查已獲持續授權，非P3自然測試授權。自然品質、G6正式接合、日常維護及真人驗收仍未完成。
 
 **CT51／G5比較完成（2026-09-09，LLM-Q019）：**[8K／16K結果、官方依據與內容核驗](specs/2026-09-09-ct51-output-budget-results.md)。相同CT49起點、Luna high、提示/tools/compaction不變，兩組續談／B／回查均完成，35請求估US$0.05009506、closed；34來源頁逐段相等、舊資料／產品source不變。單次最高生成2229／2806，均未用滿8K；未見明確容量或品質收益，維持CT50的顯式8192，16K為本情境測過可用備選，不宣稱更聰明／普遍更省。16項邊界＋68離線測試通過，Docker／helper失敗與兩組措辭限制保留。無production/JD/default改動或merge/push；只有截斷／更大工作量或Owner選擇才重開容量採用，不重做Memory研究。

@@ -1,0 +1,140 @@
+{
+  "base": "3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef",
+  "files": [
+    {
+      "file": "source/experiments/analysis-agent/src/analysis_agent/service.py",
+      "sha256": "5b42abb13a6e7d455fc8d7d6f05ad81a0c46ecc616aaaf352068d657c5d365dd",
+      "bytes": 47744
+    },
+    {
+      "file": "diff/service.py.diff",
+      "sha256": "b880390822a63153fbedce75ceb485f9228f34a5dd157151fd2cd3fcb0b7414d",
+      "bytes": 972
+    },
+    {
+      "file": "source/experiments/analysis-agent/tests/test_jd_shutdown_isolation.py",
+      "sha256": "669deafdabbd0a743cbc19b50d85bfa218a71af178c737aa5182ebd46980b195",
+      "bytes": 1128
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/useJdSession.ts",
+      "sha256": "ae3271366c516b69af189a5aa02670d5e33a7827a4677ab096b65f3bf7ac1d58",
+      "bytes": 18020
+    },
+    {
+      "file": "diff/useJdSession.ts.diff",
+      "sha256": "bf1e73fcfe1f79abd9cadafb0b94d8d459d32f9964a365f68fb50c6e8e97ad2c",
+      "bytes": 2060
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+      "sha256": "ef4dc66b5d015aaef045e6428ea4e3ed75c5d3d361767d14779e711b98d42d50",
+      "bytes": 14220
+    },
+    {
+      "file": "diff/JdWorkspace.tsx.diff",
+      "sha256": "055c841ab19209b4b3b5b2c04154ae41e7ec9c98d664084279296e29a6a62c24",
+      "bytes": 1423
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdNode.tsx",
+      "sha256": "192d69964983731ba753ecb09c49ac253516c892ffaa72afaded562a7f58aec3",
+      "bytes": 9668
+    },
+    {
+      "file": "diff/JdNode.tsx.diff",
+      "sha256": "684078e875dc2d1e8cbf2c6f1b8062e1cf3c01cebf3e3985639a82ad5eb06341",
+      "bytes": 798
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdStaleCandidate.test.tsx",
+      "sha256": "deade290d98267c8b8cf928553b6f653254461e7ca90f5fcde832c828ab5de0a",
+      "bytes": 6221
+    },
+    {
+      "file": "source/experiments/jd-editor/web/src/jd/JdStaleWorkspace.test.tsx",
+      "sha256": "2c24d90c0c0cd3c4df273fd9142a3abdf01e8129b9e7fdf964a46a970376cca0",
+      "bytes": 2652
+    },
+    {
+      "file": "source/experiments/jd-editor/web/browser/core-stale-recovery.mjs",
+      "sha256": "85bb1646a34a3d5f9d925af8a594794fa8ccffc2979db85d72ff4bcd4bb1a786",
+      "bytes": 5951
+    },
+    {
+      "file": "report.md",
+      "sha256": "2b06d0d4d2574b91c95c7dd3b8ce6194ee7c45c929a950f84a089eddf01a95ee",
+      "bytes": 4353
+    },
+    {
+      "file": "original-review.md",
+      "sha256": "aa59991823f30045bfa3a8b8472bcfcf9a39adb9337b75d55941fbb831a3f6d7",
+      "bytes": 11277
+    },
+    {
+      "file": "evidence/core-stale-red2.log",
+      "sha256": "c68f3074e80cef646ad67f55503e9cbb6765b70cb8850ab2fc0d61343c1be034",
+      "bytes": 1262
+    },
+    {
+      "file": "evidence/core-close-red2.log",
+      "sha256": "372c8ce3e7b8d8822d2a082dbff0f87efb9956abecf2cbf28f6810fcad8054aa",
+      "bytes": 2478
+    },
+    {
+      "file": "evidence/core-fix-python.log",
+      "sha256": "930428279e65df061f0aee9ff06926e860cf214f328ff8df5fcdd4edbfa41993",
+      "bytes": 183
+    },
+    {
+      "file": "evidence/core-fix-pg.log",
+      "sha256": "cc25af3b5adc6a3c770335b7f3b69efa9c26c8131cd87ae76abe83cfc7957fe4",
+      "bytes": 102
+    },
+    {
+      "file": "evidence/core-fix-test.log",
+      "sha256": "779e416fcb02eb18f11587d4bd087ca92f0e9d4f7380d1910ec480aae61448b5",
+      "bytes": 466
+    },
+    {
+      "file": "evidence/core-fix-web-results.json",
+      "sha256": "6cea783c6f62680739705caaa01b0bc4c8a1420b322b88ccef83146ab928427a",
+      "bytes": 2474
+    },
+    {
+      "file": "evidence/core-stale-browser.json",
+      "sha256": "3e9d9b4b8cda51e371ae10fc9ddc90c9a43741dbbf9f327f5f85a525a93d5029",
+      "bytes": 13599
+    },
+    {
+      "file": "evidence/core-stale-browser.log",
+      "sha256": "8affbdbc210dbd62359a0da94180198f973185094c06b2172e5930aba75ce3a9",
+      "bytes": 96
+    },
+    {
+      "file": "context/JdEditor.tsx",
+      "sha256": "e25022fad010a1410cbb72376906ad4dcbef5f9e50d85dda86cf16a4af564ddf",
+      "bytes": 7407
+    },
+    {
+      "file": "context/submissionCache.ts",
+      "sha256": "6d846f7ecf1d93b8c9febeb3fd6a67fca501b2dc0c838f8cca0cba4a8a96ca93",
+      "bytes": 1261
+    },
+    {
+      "file": "context/JdSavedProjection.test.tsx",
+      "sha256": "3d8a0e9afd3344d34b0b63666ad1bdfea395fbcb01751350aa93656fdf483928",
+      "bytes": 7000
+    },
+    {
+      "file": "context/2026-09-10-jd-employee-journey-design.md",
+      "sha256": "a6e872132566f33bd7e7a13ad026d2a0e5f059df67e2fdc9edd41191b46c2352",
+      "bytes": 32310
+    },
+    {
+      "file": "context/2026-09-10-jd-manual-recovery-transport-design.md",
+      "sha256": "7a46f8f4564972eed3f8a2684204b211d04995e07759effef5c0cfa1d0edeae9",
+      "bytes": 23150
+    }
+  ]
+}

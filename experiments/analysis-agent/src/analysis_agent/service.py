@@ -842,7 +842,11 @@ class AnalysisService:
             raise PublicationUncertain('Native cleanup is not confirmed')
         for context in list(self.contexts.values()):
                 if self.jd is not None:
-                    self._reconcile_manual(context)
+                    try:
+                        self._reconcile_manual(context)
+                    except PublicationUncertain:
+                        # Keep this document unresolved; still close other documents.
+                        continue
                 snapshot = context.graph.get_state(context.config)
                 if snapshot.next and context.jd_session is not None:
                     try:

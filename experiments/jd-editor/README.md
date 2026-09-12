@@ -57,3 +57,7 @@ r2-canonical 直接複製 active F03 v2，190 Element、8 Task 各兩組、5 K�
 license-inventory.json 和 licenses 保存安裝 metadata／授權，diff 的原衍生碼為 Apache-2.0，修改部分 Apache-2.0／MIT 雙授權，不能全部稱 MIT。2個 tooling 套件只有 package MIT declaration（inventory明列），其餘授權文字封存。依主線核准的有限安全修補，Vitest已由4.1.9固定升至4.1.11，修復官方GHSA-82fw-gwwq-j7x9；npm-audit.json重新核對為0 vulnerabilities，48個F02 runtime版本不變。
 
 未驗：DOM／IME／clipboard／完整 UI、SQL 保存、取消與對帳、自然模型選工具與 JD 品質、真人使用。這些仍在後續切片與預算 gate；本切片0付費請求。
+
+## 2026-09-12 核心整體審查收尾
+
+六切片與整體review已通過；[修正與實測](../../docs/specs/evidence/jd-editor-core-review/review.md)保存舊版手改同頁出口、逐文件關閉、已知失敗不重送，以及真Chrome／PG結果。僅隔離核心；自然模型、正式接合、日常維護與真人驗收仍待完成。

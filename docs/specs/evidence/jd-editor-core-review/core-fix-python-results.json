@@ -1,0 +1,35 @@
+[
+  {
+    "check": "python",
+    "argv": [
+      "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+      "tests/task5_acceptance_runner.py",
+      "-q",
+      "tests/test_jd_shutdown_isolation.py",
+      "tests/test_service.py",
+      "tests/test_conversation_lifecycle.py",
+      "tests/test_read_recovery.py",
+      "--basetemp=../../scratch/core-fix-python-temp"
+    ],
+    "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent",
+    "exit_code": 0,
+    "seconds": 23.31
+  },
+  {
+    "check": "pg",
+    "argv": [
+      "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+      "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-run.py",
+      "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+      "tests/task5_acceptance_runner.py",
+      "-q",
+      "tests/test_jd_close_reconcile.py",
+      "tests/test_jd_admission.py",
+      "tests/test_jd_postgres_recovery.py",
+      "--basetemp=../../scratch/core-fix-pg-temp"
+    ],
+    "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent",
+    "exit_code": 0,
+    "seconds": 24.91
+  }
+]

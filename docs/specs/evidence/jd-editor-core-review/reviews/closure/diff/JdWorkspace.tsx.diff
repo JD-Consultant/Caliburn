@@ -1,0 +1,28 @@
+diff --git a/experiments/jd-editor/web/src/jd/JdWorkspace.tsx b/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
+index a3d5113b..92d8e2f8 100644
+--- a/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
++++ b/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
+@@ -29,7 +29,7 @@ export function JdWorkspace({ document }: { document: string }) {
+       if (
+         editor.current &&
+         session.head &&
+-        head.revision_ref !== session.head.revision_ref
++        (head.revision_ref !== session.head.revision_ref || session.dirty)
+       ) {
+         if (!applySavedHead(editor.current, session.head, head, change)) {
+           editor.current = null;
+@@ -277,6 +277,14 @@ export function JdWorkspace({ document }: { document: string }) {
+             >
+               保存
+             </button>
++            {session.dirty && (
++              <button disabled={session.locked} onClick={() => {
++                if (window.confirm("載入最新已保存內容？畫面上尚未保存的修改將被捨棄；未送出聊天與下方已送出候選都會保留。"))
++                  void session.loadSavedHead();
++              }}>
++                捨棄畫面修改並載入最新稿
++              </button>
++            )}
+             <button onClick={() => setShowChanges((v) => !v)}>這次改動</button>
+             <button onClick={() => void previous()}>讀取上一筆歷史</button>
+           </div>

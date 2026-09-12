@@ -78,3 +78,7 @@ Memory首跑 **16 fail／25 pass**，既有測試库缺metadata欄位；明示ad
 Claude Opus5經用戶明確授權，只讀相關隔離程式／測試／technical synthetic材料，排除秘密、帳號及真實訪談。保留實際CLI model、Read工具、無MCP與使用結果；CLI估價不是訂閱實際帳單。前三次限定review加本次 correction review 不代稱整體Task6／core approval。F5已由root重現修正；F4所指JD工具覆蓋在 `test_jd_end_to_end.py` 的最終SDK payload逐schema／description比對，無須新增平行golden。其餘低風險建議未構成觀察到的產品缺口，保留範圍說明。
 
 [獨立審查與root closure](jd-editor-task6/review.md)已通過，I1文件計數更正、F5 CLOSED。下一gate：精確本地commit→整體跨切片審查／tag。之後按成品計畫進P3自然模型費用防護與案例授權、P4 successor ADR/G6、P5啟停／備份還原／更新、P6長訪談及三名員工、P7本機交付。現有正式ADR0060權責不變，未merge／push／正式部署。原先AGENTS更新、README11行與其他Memory研究不混入本切片。
+
+## 2026-09-12：核心整體交接
+
+Task6已保存於`3d0445ae2d4b3bb2ef3493f703ea18f0108b0eef`。其後[整體review與有限修正](jd-editor-core-review/review.md)完成，F1–3及R1–2 CLOSED；最後47 Web／86受影響Python／19真PG、build/types/lint與真Chrome短恢復流程通過。R3/R4呈現Minor列P5，原Task6未驗界線不變。六切片隔離核心已接受；自然品質與正式產品未交付。

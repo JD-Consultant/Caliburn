@@ -1,0 +1,46 @@
+--- before/experiments/jd-editor/web/src/jd/useJdSession.ts
++++ after/experiments/jd-editor/web/src/jd/useJdSession.ts
+@@ -218,6 +218,7 @@
+   }
+   get canRetryCandidate() {
+     return !!this.candidate && !this.busy && !this.loading && !this.readUnavailable &&
++      this.candidateRecovery?.status !== 'available' &&
+       !this.serverWriteBlocked && (this.candidateRecovery?.status === 'no_pending' || !this.manualUnknown);
+   }
+   applyRecovery(value: Awaited<ReturnType<JdApi['readRecovery']>>) {
+--- before/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
++++ after/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
+@@ -335,7 +335,9 @@
+             <aside className="candidate">
+               <h3>尚待處理的送出候選</h3>
+               <p>
+-                這份材料尚未確認保存；不會覆蓋目前工作稿。未處理前關頁再開仍會保留。
++                {session.manualUnknown
++                  ? "這份材料尚未確認保存；不會覆蓋目前工作稿。未處理前關頁再開仍會保留。"
++                  : "這份候選未保存，已保留供查看。可先複製需要的文字到目前稿，再捨棄這份候選並保存；未處理前關頁再開仍會保留。"}
+               </p>
+               <button disabled={!session.canRetryCandidate} onClick={() => void session.save(true)}>
+                 再次送出同一份
+--- before/experiments/jd-editor/web/src/jd/JdStaleCandidate.test.tsx
++++ after/experiments/jd-editor/web/src/jd/JdStaleCandidate.test.tsx
+@@ -41,6 +41,9 @@
+   expect(await session.save()).toBe(false);
+   const candidate = submissionCache(disk).read('A');
+   expect(candidate?.value).toEqual(value('尚未保存的員工更正'));
++  expect(session.canRetryCandidate).toBe(false);
++  expect(await session.save(true)).toBe(false);
++  expect(port.save).toHaveBeenCalledOnce();
+   await session.revalidate();
+   expect(session.head?.revision_ref).toBe('r1');
+   expect(await session.loadSavedHead()).toBe(true);
+--- before/experiments/jd-editor/web/browser/core-stale-recovery.mjs
++++ after/experiments/jd-editor/web/browser/core-stale-recovery.mjs
+@@ -44,6 +44,8 @@
+   expect(result.failed.status).toBe('stale_base');
+   expect(result.failed.receipt_durability).toBe('confirmed');
+   await expect(page.getByText('尚待處理的送出候選', { exact: true })).toBeVisible();
++  await expect(page.getByRole('button', { name: '再次送出同一份', exact: true })).toBeDisabled();
++  await expect(page.getByText(/這份候選未保存，已保留供查看/)).toBeVisible();
+   await expect(editor).toContainText('員工尚未保存的更正');
+   result.candidateBefore = await page.evaluate(id => localStorage.getItem('caliburn:jd-plate-clean-v2:submission:' + id), document);
+   page.once('dialog', d => d.accept());

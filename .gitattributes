@@ -26,3 +26,6 @@ docs/specs/evidence/jd-editor-task4/** -text
 docs/specs/evidence/jd-editor-task5/** -text
 # Preserve Task 6 raw regressions, browser captures and independent review inputs.
 docs/specs/evidence/jd-editor-task6/** -text
+
+# Preserve integrated core review captures and exact source snapshots.
+docs/specs/evidence/jd-editor-core-review/** -text

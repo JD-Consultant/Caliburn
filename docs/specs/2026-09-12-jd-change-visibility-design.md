@@ -19,6 +19,8 @@ AI 有足夠資訊時可直接修改並保存 JD，不需要員工每次按接�
 | [Claude Code Desktop](https://code.claude.com/docs/en/desktop#review-changes-with-diff-view) | 自動接受編輯模式與 Manual 分開；修改後可從差異統計查看檔案／內容差異、給局部回饋 | 保存／執行与事後查看可分開；不能把 Manual 的逐次批准當所有模式的必要流程 |
 | [Claude Code in VS Code](https://code.claude.com/docs/en/ide-integrations#review-changes) | Auto／Edit automatically 可直接改一般工作區檔案；Manual 呈現擬改內容與接受／拒絕 | 支持多種審閱策略，不支持「大廠一律要接受按鈕」或「一律不能接受」 |
 | [Claude Artifacts](https://support.claude.com/en/articles/9487310-what-are-artifacts-and-how-do-i-use-them#work-with-artifacts) | 聊天旁顯示內容，Markdown 可選區後 Edit with Claude，修改直接呈現並可切版本 | 支持同頁持續改內容、保留版本。不能推成任意欄位 CRUD、逐字差異演算法或本案 Memory 契約 |
+| [Microsoft Word Track Changes](https://support.microsoft.com/en-us/word/training/track-changes-in-word)，適用 Microsoft 365／Word 2024 等版本 | Simple Markup 在頁邊標記修改位置；All Markup 顯示詳細文字與線條；選取修改可查看完整建議卡片 | 直接支持簡要標記與詳細檢視分層。僅參考呈現，不採其待審接受／拒絕或隱藏標記的資料語意 |
+| [Google Docs 版本與變更](https://support.google.com/docs/answer/190843?hl=en-10)，現行電腦版文件 | Last edit 入口可打開版本歷史、選版本查看修改、展開分組版本再返回目前文件 | 支持按需查看歷史。此頁不足以證明現行 Docs 有 Show changes 核取方塊；隱藏未修改列是 Sheets 功能，不能外推到 Docs |
 | [W3C WCAG 2.2：Use of Color](https://www.w3.org/WAI/WCAG22/Understanding/use-of-color.html) | SC 1.4.1 Level A 要求資訊不能只靠顏色表達；此頁為說明性指南 | 新增／修改／刪除／移動用文字標籤搭配色彩，不能只放紅綠底或細色點 |
 
 **跨來源共同原則：**使用者可辨認修改範圍、檢查結果並提出更正；批准方式依模式與工作目的而異。**本案映射：**職責／任務欄位標示、整輪比較及關係變更清單。公開文件沒有「JD 唯一最佳版型」或資料庫 diff 實作保證。
@@ -55,3 +57,13 @@ A／B 都不新增接受／拒絕待審流程，也不另開「更正稿」頁�
 CV-T01 初稿大量新增仍能讀；T02 改寫／新建／刪除／移動／排序／K/S 引用與共用定義／來源皆可查；T03 同欄改兩次及改回；T04 較晚手改不混成 AI 差異；T05 confirmed／失敗／未知結果分開；T06 非連續 run 不錯標；T07 窄畫面、鍵盤、無色辨識；T08 查看不產接受狀態、不阻擋續談；T09 撤回後只 JD 形成新版本，當時改動仍可查。以上均待執行。
 
 先用合成內容示意 A／B，讓 Owner 看呈現效果；圖中改動不是真實訪談。示意只證明互動外觀，未連 current rows、provider 或保存。後續選定預設，再生成 DTO、核對完整樣稿並做有限瀏覽器驗收；整體 G4 Needs revision／ADR0075 Proposed 保持。
+
+## 7. 依大廠 UI 補核後的明確推薦
+
+Owner 看過示意後詢問研究者推薦，並要求參考大廠 UI。**研究者仍推薦 A 作第一版預設：目前稿正常閱讀、修改位置具名標示、本輪入口持續可查、點開才看完整前後。**本節是推薦補強，尚不改寫為 Owner 已批准預設。
+
+理由是本案員工主要核對是否忠實反映自身工作，JD 又有多層任務／成果／要求；長期同時展開全部改前改後，會增加閱讀篇幅、讓舊文字與現在工作混淆。這是由產品用途及上述公開 UI 推導的取捨，不是已完成員工測試的結論，也不是各大廠唯一相同的版型。
+
+具體預設：目前欄位用「本輪修改／新增／移入」等文字提示；本輪入口列清楚變更種類，**有刪除也直接列出**，不可只靠已消失的卡片或短暫通知。點選後同頁展開完整前後、結構與引用變動；願意細看者可再開欄位內對照。新範圍及較晚手改仍依 §5 分界，舊輪從歷史找回，不增加接受／已讀狀態。所有差異來自 App 已確認的保存材料，不用模型摘要當證據。
+
+本次由 `jd_command_semantics_review` 獨立核 Word／Google 正文，root 再讀兩頁及 Codex review／Claude Desktop 對應段落；查閱日期同為 2026-09-12。停在有明確推薦的 UI 討論，不新增比較引擎、模型工具、已讀資料表或修改示意／產品。入口既有 CV-01／G2 候選狀態保持。

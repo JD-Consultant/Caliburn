@@ -229,8 +229,9 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 | 欄位 | 型別／可空 | 約束與語意 |
 |---|---|---|
 | `document_id`／`operation_id` | varchar／uuid，非空 | 複合 PK；App 配發 |
-| `request_digest` | char(64)，非空 | server 對 document、origin、base revision、完整 canonical commands 計算；同 key 改 base 亦屬不同意圖 |
+| `request_digest` | char(64)，非空 | server 對 document、origin、可信 ai_run_id（manual 為 null）、base revision、完整 canonical commands 計算；同 key 改 base／run 亦屬不同意圖 |
 | `origin` | text，非空 | `manual`／`ai` |
+| `ai_run_id` | varchar，可空 | App 從既有持久回合與可信 binding 注入；CHECK：origin='ai' 當且僅當本欄非 NULL，manual 必為 NULL；不是模型參數 |
 | `base_revision_id` | uuid，可空 | 已核實時的同文件 FK |
 | `result_revision_id` | uuid，可空 | 成功／no_change 的同文件 FK |
 | `status` | text，非空 | §6 終局狀態 |
@@ -238,6 +239,8 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 | `created_at` | timestamptz，非空 | 終局 receipt 保存時間 |
 
 同 `(document_id,operation_id)` 同 digest 重送只回原 receipt；不同 digest 回 `operation_conflict`，不能 UPSERT 覆寫。對 `status='committed'` 建部分唯一索引 `(document_id,result_revision_id)`；no_change 可由多個 operation 指同一 revision。
+
+AI 操作的 run 歸屬連同成功／no_change／已確認失敗回執原子保存；必須經既有 run owner 核對同文件，不從 timestamp、actor 或暫態 jd_bindings 猜測。回合 authority 仍是既有 runtime；不在 JD 新建另一套 run 表或跨 owner cascade。尚未形成可信 binding 的請求拒絕不偽造 AI operation。此欄只識別操作歸屬；完整範圍及閉合判斷依[整輪撤回 §4](2026-09-12-jd-ai-turn-undo-design.md#4-何時可撤回)。
 
 ## 5. 必要 indexes
 
@@ -251,6 +254,7 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 - `jd_condition(document_id, kind, position, condition_id)`
 - `jd_revision(document_id, revision_number DESC)`
 - `jd_operation(document_id, created_at DESC)`
+- `jd_operation(document_id, ai_run_id)`，partial `WHERE ai_run_id IS NOT NULL`；查整輪全部結果，順序依所連 revision number／parent，不依保存時間猜序
 - `jd_source_link` 各 target 的 partial index，僅索引該 target column 非 NULL rows
 
 第一版不加全文搜尋、vector、RAG、跨文件 K/S 去重或統計 materialized view。
@@ -312,6 +316,12 @@ Owner 已選定[需求 HR-01](2026-09-12-jd-relational-editing-requirements.md#1
 - 來源沿[歷史來源政策](2026-09-12-jd-history-and-recovery-design.md#5-身分來源與-ai-續談)：恢復原 source refs／basis，沒有新查核聲明。receipt 記已核的 S，歷史／通知顯示沿用舊版依據；新來源仍走 §3.10。
 - 有變更時新增 R，parent=H、origin=manual、revision number 前進；H、S 與中間 revisions／receipts 保留。相同 canonical 內容回 no_change，不新建 initial 或移 head 回 S。SQL 失敗、failure receipt／COMMIT 未確認與停止恢復都沿 §6.2–7，不能因 restore 另開 replay 邏輯。
 - 只更動 canonical JD；列表命名／封存、原始問答、Memory、聊天及模型已讀基準不變。catalog 解除封存稱 unarchive，與本命令分開。此款為設計，FK 順序、來源及故障尚須專用 DB 驗證。
+
+### 6.5 撤回整輪 AI 的 JD 修改
+
+人工端 `undo_ai_turn` 共用 §6.4 的候選還原／來源／交易，只改 JD。依[HR-02](2026-09-12-jd-ai-turn-undo-design.md)，App 提供可信目標 T／預期 E 與新 operation，server 查 T 全部 committed operations、核完整連續 parent 鏈及 current head=E，推導首 base S。run 閉合及 admission 仍由既有 owner 負責。
+
+先查原 receipt 再驗新資格，避免撤回成功後同 key 重試被新 head 誤拒。`undo_ai_turn`、T／E 納入固定意圖，結果記 S／E／新 R；R 的 parent=E、origin=manual、ai_run_id=NULL。原 T 的 operations 仍保留原成功結果；Memory／案例／訪談與 model-view baseline 不回退。無實際差異回 no_change，沒有任意舊回合的逆操作或第二份稿。
 
 ## 7. 終局 status 與重試
 

@@ -102,6 +102,6 @@ UI「已保存」要求：所有目前畫面可保存輸入皆已確認、沒有
 | 複合命令第二步失敗 | 正文回 base，只留下實際確認的 failure receipt；查不到時不以新意圖重做 |
 | 長輸入與多次保存 | 記錄保存延遲、版本增長與可讀性；不為美化歷史刪除實際保存證據 |
 
-**最新閉合範圍：**Owner 選定歷史對照／局部更正／整份還原，不加最近一步撤回；第一版逐次列真實保存、不按時間合併。具體流程、還原來源及重開 A／B 出口由[歷史與恢復](2026-09-12-jd-history-and-recovery-design.md)承接。**仍須閉合**暫存 schema／容量／資料集識別及 successor 接線。JR-R01／04／05 已通過[完整操作文件複核](evidence/2026-09-12-jd-business-operations-review.md)，R02／03 另見[審查結果](evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)；均未執行新產品實測，不因產品選擇完成就推定全部通過。
+**最新閉合範圍：**歷史對照／局部更正／整份還原保留；Owner 後續選[HR-02 整輪 AI 的 JD 撤回](2026-09-12-jd-ai-turn-undo-design.md)。逐次真實保存保留，整輪呈現依可信 run 歸屬，不按時間猜組。具體還原來源與重開 A／B 出口由[歷史與恢復](2026-09-12-jd-history-and-recovery-design.md)承接；撤回前同樣先處理在途保存及後續輸入，不能丟 B。**仍須閉合**暫存 schema／容量／資料集識別及 successor 接線。JR-R01／04／05 已通過[完整操作文件複核](evidence/2026-09-12-jd-business-operations-review.md)，R02／03 另見[審查結果](evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)；均未執行新產品實測。
 
 下一工程單位依歷史稿 §7 閉合恢復前置，再進有限原生驗證；不補造條件繼承、通用回退或離線同步引擎。

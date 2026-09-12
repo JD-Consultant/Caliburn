@@ -120,11 +120,13 @@ Plate 只保留為**單一長文字欄位**的 leaf editor 候選，例如任務
 
 ### 5.5 歷史、整份還原與重開
 
-Owner 已選歷史對照、局部直接更正及明確整份還原，第一版不加最近一步撤回；零散資料用聊天或未完整任務承接，不加待整理區。依[歷史與恢復設計](2026-09-12-jd-history-and-recovery-design.md)，歷史在同頁唯讀展開，整份還原先看完整影響，再由人工端 `restore_revision` 經共同 domain／保存流程形成新 revision。只還原 JD，保留中間歷史、原始訪談、Memory 與模型已讀基準；下一輪收到新的人工還原事件。
+Owner 已選歷史對照、局部直接更正及明確整份還原；後續 HR-02 加[整輪 AI 的 JD 撤回](2026-09-12-jd-ai-turn-undo-design.md)，只在安全閉合、完整連續範圍與無較晚 JD 修改時提供快捷。零散資料用聊天或未完整任務承接，不加待整理區。依[歷史與恢復設計](2026-09-12-jd-history-and-recovery-design.md)，歷史同頁唯讀展開，人工 `restore_revision`／`undo_ai_turn` 經共同 domain／保存流程形成新 revision。只還原 JD，保留中間歷史、原始訪談、案例、Memory 與模型已讀基準；下一輪收到新的人工事件。
 
 AI 仍可反覆修改；[WS-01 裁決](2026-09-12-jd-agent-workspace-necessity-research.md#7-owner-澄清後的裁決第一版不設持久-ai-試稿區)先不設持久試稿分支，不把單次 App 候選驗證當專業品質保證。取消 AI 不撤銷已保存結果。重開先查原 operation，再處理未提交候選；瀏覽器暫存不是另一份正式 JD，版本／容量／資料集識別尚須工程前置閉合。
 
 ## 6. 差異、歷史與來源
+
+Owner 確認 AI 可直接修改保存、不逐次接受；App 須提供可見提示與確切差異。[CV-01 呈現候選](2026-09-12-jd-change-visibility-design.md)推薦目前稿標記＋同頁按需展開，另比較原位置展開；**預設呈現待討論**。以下是既有資料保真要求，不用 AI 摘要代替。
 
 - 每個 duty、task、detail、capability、condition 都有穩定 UUID；排序或所屬職責不是身分。
 - 當次差異以 operation 的 before revision 與 after revision 比較；按 stable ID 顯示新增、刪除、移動、欄位修改與 relation 增減。
@@ -133,6 +135,7 @@ AI 仍可反覆修改；[WS-01 裁決](2026-09-12-jd-agent-workspace-necessity-r
 - 歷史 view 只讀當時 snapshot，使用當時的名稱、定義與關係；不能以 current relation 重新解譯舊版。
 - source link 使用既有來源 port 發配、可回讀確切原始問答的引用，Memory 協助查找；裸 Memory 路徑不是永久依據，本輪未建立 Memory-version locator。連結保存目標內容 digest；目標文字改變而 digest 不符時標示「修改前的依據，需重新核對」。這不會自動偵測較新訪談已推翻舊說法，顧問仍核对最新理解。
 - AI 摘要可說明這次改了什麼，但不能取代可展開的 actual diff。
+- 整輪比較由持久 run 歸屬及完整連續版本取得；仍可展開逐次事件。較晚人工修改不混入當時 AI 差異；未確認保存不冒稱已完成，刪除及改回不能因目前稿無標記而消失。查看不產生接受／已核准狀態。
 
 ## 7. 刪除與關係生命週期
 

@@ -236,6 +236,8 @@ refs 是 opaque、可驗證 capability，不等於把 DB UUID 直接裸露。App
 
 所有模型 mutation 工具回同一外形；provider adapter 以 OpenAI 的 call ID 或 Anthropic 的 tool-use ID 回到正確工具迴圈。
 
+App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operation 的意圖、base／result 和確認回執一起保存；模型不填此欄，不因下一輪清除暫態 binding 而丟掉歷史歸屬。詳細約束依[保存契約 §4.3](2026-09-12-jd-relational-schema-and-write-contract.md#43-jd_operation)，不以 model-view 通知基準代替回合起點。
+
 ```json
 {
   "status": "committed",
@@ -331,6 +333,8 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 大量改動只放固定上限的事件與預覽，保留總數、界線及 `details_omitted=true`；模型按需讀。改了又改回仍有兩個 manual events，不因 head 文字等於舊版就稱沒有改過。
 
 員工整份還原 JD 有實際變更時，亦產生新的 manual event；App 附具名還原種類、實際 base/result、已核的歷史來源 revision 與 change ref，說明「只還原 JD、沿用舊版依據，未重新核對較新訪談」。no_change 只留下操作結果，不偽造內容事件。不把模型已讀基準、聊天或 Memory 一起倒退，也不把歷史 target refs 當新 current refs。對大量內容仍有界預覽及完整回讀入口；實際 DTO 欄位沿 SSOT 生成，模型無須填這些欄位。[還原與續談](2026-09-12-jd-history-and-recovery-design.md#5-身分來源與-ai-續談)
+
+[HR-02 整輪撤回](2026-09-12-jd-ai-turn-undo-design.md#6-與工作理解案例及原始對話的關係)亦沿 manual notice，附 `undo_ai_turn`、被撤回 T 與實際 JD 前後版本，說明只撤 JD、不代表否定本輪工作資訊。不自動寫 Memory 或重套原稿；沒有原因時由顧問依下一輪意圖釐清。`undo_ai_turn` 只供人工端，模型不新增此工具，也不負責計算是否可撤回。
 
 ## 9. 來源引用契約
 

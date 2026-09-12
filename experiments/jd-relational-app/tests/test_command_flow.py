@@ -7,7 +7,9 @@ import json
 
 import pytest
 
-from jd_relational.domain import CommandContext, DomainError, Ref, Source, build_candidate
+from jd_relational.domain import CommandContext, DomainError, Ref, Source
+from jd_relational.application import prepare_edit as build_candidate
+from jd_relational.selection import Selection
 from jd_relational.transport import manual_command, model_command
 
 
@@ -118,3 +120,63 @@ def test_monthly_check_correction_preserves_other_valid_and_low_frequency_work()
         {"kind": "set_field", "target_field_ref": "monthly-requirement-text", "text": "依 B 系統服務約定檢查", "basis_refs": []},
     ]})
     assert build_candidate(snapshot, command, context) == expected
+
+
+def test_all_eight_operations_share_manual_and_both_model_paths():
+    outputs = []
+    for mode in ("manual", "openai-json", "anthropic-object"):
+        snapshot, context = baseline()
+        refs = dict(context.refs)
+        refs.update({"duties": Ref("scope-a", "base-1", "container", child_kind="duty"),
+                     "title": Ref("scope-a", "base-1", "profile", field="job_title")})
+        context = replace(context, refs=refs)
+        observed = set()
+
+        def apply(tool, payload):
+            nonlocal snapshot
+            before = deepcopy(snapshot)
+            command = (manual_command({"tool": tool, "arguments": payload}) if mode == "manual"
+                       else model_command(tool, json.dumps(payload) if mode == "openai-json" else payload))
+            candidate = build_candidate(snapshot, command, context)
+            assert snapshot == before
+            assert candidate["revision"] == "base-1"  # Preparation only, no simulated commit.
+            snapshot = candidate
+            observed.add(tool)
+
+        apply("jd_set_text", {"target_field_ref": "title", "text": "維護工程師", "basis_refs": []})
+        apply("jd_insert_item", {"item": {"kind": "duty", "container_ref": "duties", "after_ref": None,
+            "name": "例行維護", "scope_text": "只處理 B 系統", "basis_refs": []}})
+        duty_id, = snapshot["duties"]
+        refs["duty"] = Ref("scope-a", "base-1", "duty", duty_id)
+        refs["duty-tasks"] = Ref("scope-a", "base-1", "container", duty_id, child_kind="task")
+        payload = create_arguments()
+        payload.update(container_ref="duty-tasks", description="B 系統每月檢查；其他每月事項另行確認。")
+        apply("jd_create_task", payload)
+        task_id, = snapshot["tasks"]
+        refs["task"] = Ref("scope-a", "base-1", "task", task_id)
+        refs["body"] = Ref("scope-a", "base-1", "task", task_id, field="description")
+        refs["task-name"] = Ref("scope-a", "base-1", "task", task_id, field="name")
+        original_details = deepcopy(snapshot["details"])
+        original_sources = deepcopy(snapshot["source_links"])
+
+        text = snapshot["tasks"][task_id]["description"]
+        start = len(text[:text.index("每月")].encode("utf-16-le")) // 2
+        context = replace(context, selections={"selection": Selection("body", text, start, start + 2, "每月")})
+        apply("jd_replace_selection", {"selection_ref": "selection", "replacement_text": "每季", "basis_refs": []})
+        assert snapshot["tasks"][task_id]["description"] == "B 系統每季檢查；其他每月事項另行確認。"
+        apply("jd_revise_work", {"changes": [{"kind": "set_field", "target_field_ref": "task-name",
+                                               "text": "B 系統例行檢查", "basis_refs": []}]})
+        apply("jd_set_task_capability", {"task_ref": "task", "capability_ref": "picked-skill", "mode": "unlink", "basis_refs": []})
+        apply("jd_set_task_capability", {"task_ref": "task", "capability_ref": "picked-skill", "mode": "link", "basis_refs": []})
+        apply("jd_move_item", {"target_ref": "task", "destination_container_ref": "unassigned", "after_ref": None,
+                                "content_changes": []})
+        apply("jd_delete_item", {"target_ref": "duty", "content_changes": []})
+        assert snapshot["duties"] == {}
+        assert snapshot["tasks"][task_id]["duty_id"] is None
+        assert snapshot["details"] == original_details
+        assert snapshot["source_links"] == original_sources
+        assert [link["capability_id"] for link in snapshot["task_capabilities"]] == ["skill-a"]
+        assert snapshot["capabilities"]["skill-b"]["description"] == "辨識鍵盤操作及可用性障礙"
+        assert len(observed) == 8
+        outputs.append(snapshot)
+    assert outputs[0] == outputs[1] == outputs[2]

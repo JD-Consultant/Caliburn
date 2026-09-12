@@ -1,15 +1,17 @@
 # 關聯式 JD：隔離編輯核心
 
-此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1 首切片。它驗證完整任務建立、一次相依內容更正，以及員工／模型共用規則；框架選擇可替換，產品效果以既有六章 JD 研究為準。
+此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1。已驗證八個編輯操作、完整任務建立、相依內容更正與員工／模型共用規則；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
 **目前沒有可開啟的 App 畫面，也沒有寫入資料庫。**`build_candidate` 回傳保存前的關聯資料候選，保留原 revision；不得把它當已保存結果或可反覆提交的 operation。它不讀寫 Memory／訪談、不呼叫模型、不接正式產品或舊實驗模組。
 
 ## 結構
 
-- `contracts/jd-work.schema.json`：兩工具輸入的唯一 JSON Schema。
+- `contracts/jd-work.schema.json`：八個編輯工具輸入的唯一 JSON Schema。
 - `src/jd_relational/generated`：標準工具生成 Python DTO／TS 型別，禁止手改。
 - `transport.py`：人工與模型轉入同一 command；兩家工具外殼不同。
+- `application.py`：同一準備入口，保留候選／原錯誤，發出固定安全診斷；沒有重試或保存。
 - `domain.py`：同文件／同 base refs、完整候選、正文／引用／排序／来源規則，沒有 SQL 或 SDK。
+- `selection.py`：根據 App 捕捉資料作精確 UTF-16 選區替換；模型不填 offset，不猜相同文字的位置。
 - `tests`：合成工作、格式正反例、共同操作流程、真 SDK 的離線請求捕捉。未完整任務不強迫補欄；多成果和多要求不配對。
 
 ## 重現
@@ -26,10 +28,10 @@ node node_modules/typescript/bin/tsc -p tsconfig.json
 
 若工具預設暫存目錄不可寫，將 uv 的 `--cache-dir` 指到可寫位置。`NODE_BINARY` 可指到正確的 Node 執行檔；在本機不要依賴全機舊版 npm wrapper 選中的 Node。產生器只用標準 CLI stdout，`--check` 不寫生成物。
 
-SDK 測試使用 `httpx2.MockTransport`、固定假 key 與 `offline.invalid`，封鎖 sockets 及環境／本地帳號探索；8 個測試 POST 都在程序內攔截。這只證明 SDK 序列化，未證明 provider 接受或模型自然選用。
+SDK 測試使用 `httpx2.MockTransport`、固定假 key 與 `offline.invalid`，封鎖 sockets 及環境／本地帳號探索；16 個 wire 測試的 32 個 POST 都在程序內攔截。這只證明 SDK 序列化，未證明 provider 接受或模型自然選用。
 
 ## 待接責任
 
-`Ref`／`Source` 為 App 注入的合成已驗讀取材料；正式 refs 發配、讀取 DTO、HTTP envelope、operation／未知結果、其他具名 CRUD、資料庫交易、畫面、顧問 runtime 在後續切片。正式保存格式仍以十三表與 immutable revision 設計為準；此 probe 的 dict 不是另一份文件 authority。
+`Ref`／`Source`／`Selection` 為 App 注入的合成已驗讀取材料；正式 refs 發配、讀取 DTO、HTTP envelope、完整結果與 operation／未知結果、資料庫交易、實際選區捕捉、畫面、顧問 runtime 在後續切片。正式保存格式仍以十三表與 immutable revision 設計為準；此 probe 的 dict 不是另一份文件 authority。
 
-依據、來源 digest 精確化、通過界線及首敗／最後結果見[切片設計與結果](../../docs/specs/2026-09-13-jd-relational-command-slice.md)。
+原兩工具及來源 digest 見[首切片](../../docs/specs/2026-09-13-jd-relational-command-slice.md)；目前八工具、分層與錯誤／診斷、289 項結果及通過界線見[本次設計與結果](../../docs/specs/2026-09-13-jd-management-operations-slice.md)。

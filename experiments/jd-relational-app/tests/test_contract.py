@@ -1,4 +1,4 @@
-"""Check actual transport acceptance against the independent JSON Schema oracle."""
+"""Compare source schema, published schema and generated DTO acceptance."""
 
 from __future__ import annotations
 
@@ -48,6 +48,9 @@ def revise_work() -> dict:
 
 def accepted_by_both(name: str, payload: dict, expected: bool) -> None:
     schema_accepts = oracle(name).is_valid(payload)
+    published_accepts = Draft202012Validator(
+        MODELS[name].model_json_schema(mode="validation")
+    ).is_valid(payload)
     try:
         parsed = MODELS[name].model_validate(payload, strict=True)
     except ValidationError as exc:
@@ -58,6 +61,7 @@ def accepted_by_both(name: str, payload: dict, expected: bool) -> None:
         # A generated DTO must not coerce values or silently inject omitted input.
         assert parsed.model_dump(mode="json") == payload
     assert schema_accepts == expected
+    assert published_accepts == expected
     assert model_accepts == expected, model_errors if not model_accepts else payload
 
 

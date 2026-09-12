@@ -151,9 +151,238 @@ class ReviseWorkInput(BaseModel):
     )
 
 
+class SetTextInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    target_field_ref: StrictStr = Field(
+        ...,
+        description='Issued reference to an existing full-text field, never an item, selection or JSON path.',
+    )
+    text: StrictStr | None = Field(
+        ...,
+        description='Complete replacement value. Null is accepted only if the target field and final item allow it; clearing a field does not delete the item.',
+    )
+    basis_refs: list[StrictStr] = Field(
+        ...,
+        description='Issued sources checked against the resulting content. Empty preserves existing links and their previous basis.',
+    )
+
+
+class DutyItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['duty']
+    container_ref: StrictStr = Field(..., description='Issued duty-list container.')
+    after_ref: StrictStr | None = Field(
+        ..., description='Issued existing sibling or null for first.'
+    )
+    name: StrictStr | None
+    scope_text: StrictStr | None = Field(
+        ...,
+        description='Known duty summary. Necessary task-specific limits remain on the tasks; no implicit condition inheritance.',
+    )
+    basis_refs: list[StrictStr]
+
+
+class CollaboratorItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['collaborator']
+    container_ref: StrictStr = Field(
+        ..., description='Issued collaborator-list container.'
+    )
+    after_ref: StrictStr | None = Field(
+        ..., description='Issued existing sibling or null for first.'
+    )
+    name: StrictStr | None
+    scope_text: StrictStr | None = Field(
+        ...,
+        description='Known cooperation scope; unknown organizational roles are not invented.',
+    )
+    basis_refs: list[StrictStr]
+
+
+class KnowledgeItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['knowledge']
+    container_ref: StrictStr = Field(
+        ..., description='Issued knowledge-list container.'
+    )
+    after_ref: StrictStr | None = Field(
+        ..., description='Issued existing sibling or null for first.'
+    )
+    name: StrictStr | None
+    description: StrictStr | None = Field(
+        ...,
+        description='Known concepts, principles or rules needed for the work, including their use and scope. Names need not be unique.',
+    )
+    basis_refs: list[StrictStr]
+
+
+class SkillItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['skill']
+    container_ref: StrictStr = Field(..., description='Issued skill-list container.')
+    after_ref: StrictStr | None = Field(
+        ..., description='Issued existing sibling or null for first.'
+    )
+    name: StrictStr | None
+    description: StrictStr | None = Field(
+        ...,
+        description='Known methods applied to perform the work and their scope, not an employee score or training plan.',
+    )
+    basis_refs: list[StrictStr]
+
+
+class OutcomeItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['outcome']
+    container_ref: StrictStr = Field(
+        ..., description='Issued outcome-list container of an existing task.'
+    )
+    after_ref: StrictStr | None = Field(
+        ..., description='Issued existing outcome sibling or null for first.'
+    )
+    text: StrictStr = Field(
+        ...,
+        description='Known deliverable, service result or maintained state and its receiver where relevant. No requirement pairing is implied.',
+    )
+    basis_refs: list[StrictStr]
+
+
+class RequirementItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['requirement']
+    container_ref: StrictStr = Field(
+        ..., description='Issued requirement-list container of an existing task.'
+    )
+    after_ref: StrictStr | None = Field(
+        ..., description='Issued existing requirement sibling or null for first.'
+    )
+    text: StrictStr = Field(
+        ...,
+        description='Known execution, quality, safety, timing or exception requirement, with its applicable condition. Kept separate from task description and outcomes.',
+    )
+    basis_refs: list[StrictStr]
+
+
+class ConditionItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    kind: Literal['condition']
+    container_ref: StrictStr = Field(
+        ...,
+        description='Issued sixth-section container identifying the existing condition kind. Only position-wide conditions belong here.',
+    )
+    after_ref: StrictStr | None = Field(
+        ...,
+        description='Issued existing sibling in that condition kind or null for first.',
+    )
+    text: StrictStr = Field(
+        ...,
+        description='Known whole-position condition or boundary. Task-specific scope stays on the task; unknown does not mean no requirement.',
+    )
+    basis_refs: list[StrictStr]
+
+
+class InsertItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    item: DutyItemInput | CollaboratorItemInput | KnowledgeItemInput | SkillItemInput | OutcomeItemInput | RequirementItemInput | ConditionItemInput
+
+
+class DeleteItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    target_ref: StrictStr = Field(
+        ...,
+        description='Issued reference to the existing item; not a field or selection.',
+    )
+    content_changes: list[SetFieldChange | AddTaskDetailChange] = Field(
+        ...,
+        description='Empty for ordinary deletion. Duty deletion may adjust related surviving task fields or add outcomes/requirements so necessary scope is not lost. No unrelated changes or references to newly created items.',
+    )
+
+
+class MoveItemInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    target_ref: StrictStr = Field(
+        ...,
+        description='Issued reference to the existing item, never a newly allocated or reconstructed item.',
+    )
+    destination_container_ref: StrictStr = Field(
+        ...,
+        description='Issued compatible destination container. The App resolves ownership and condition kind.',
+    )
+    after_ref: StrictStr | None = Field(
+        ...,
+        description='Issued existing sibling in the destination container; null means first.',
+    )
+    content_changes: list[SetFieldChange | AddTaskDetailChange] = Field(
+        ...,
+        description='Empty for ordinary reorder. Task regrouping may adjust its fields, add its outcomes/requirements, or update source/destination duty summaries. Only the related targets allowed by the domain may change.',
+    )
+
+
+class SetTaskCapabilityInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    task_ref: StrictStr
+    capability_ref: StrictStr = Field(
+        ...,
+        description='Issued reference to existing knowledge or skill in this JD, not a name or copied definition.',
+    )
+    mode: Literal['link', 'unlink']
+    basis_refs: list[StrictStr] = Field(
+        ...,
+        description='Issued sources for linking. Must be empty for unlink; the shared domain validates that condition.',
+    )
+
+
+class ReplaceSelectionInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    selection_ref: StrictStr = Field(
+        ...,
+        description='Issued selection reference only. Do not provide a field reference, old text, line numbers or offsets.',
+    )
+    replacement_text: StrictStr = Field(
+        ...,
+        description='Replacement for only the selected span, including any intended line breaks. Empty string removes the span; the domain validates the resulting field and item.',
+    )
+    basis_refs: list[StrictStr] = Field(
+        ...,
+        description='Sources checked against the complete resulting source target. Leave empty when only the selected fragment was checked; do not promote fragment support to whole-target support.',
+    )
+
+
 class WorkCommandCatalog(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
     create_task: CreateTaskInput
     revise_work: ReviseWorkInput
+    set_text: SetTextInput
+    insert_item: InsertItemInput
+    delete_item: DeleteItemInput
+    move_item: MoveItemInput
+    set_task_capability: SetTaskCapabilityInput
+    replace_selection: ReplaceSelectionInput

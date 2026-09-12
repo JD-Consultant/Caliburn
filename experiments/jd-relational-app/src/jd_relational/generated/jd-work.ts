@@ -11,6 +11,12 @@
 export interface WorkCommandCatalog {
   create_task: CreateTaskInput;
   revise_work: ReviseWorkInput;
+  set_text: SetTextInput;
+  insert_item: InsertItemInput;
+  delete_item: DeleteItemInput;
+  move_item: MoveItemInput;
+  set_task_capability: SetTaskCapabilityInput;
+  replace_selection: ReplaceSelectionInput;
 }
 /**
  * Create one identifiable task with all currently known outcomes, requirements and existing capability relations as one business effect. The App allocates identities and validates the final task before saving.
@@ -167,4 +173,262 @@ export interface AddConditionChange {
 export interface RemoveConditionChange {
   kind: "remove_condition";
   condition_ref: string;
+}
+/**
+ * Replace one existing field with its complete text. This does not accept a selection reference. Related multi-field corrections use revise_work; the domain validates meaningful final content.
+ *
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "SetTextInput".
+ */
+export interface SetTextInput {
+  /**
+   * Issued reference to an existing full-text field, never an item, selection or JSON path.
+   */
+  target_field_ref: string;
+  /**
+   * Complete replacement value. Null is accepted only if the target field and final item allow it; clearing a field does not delete the item.
+   */
+  text: string | null;
+  /**
+   * Issued sources checked against the resulting content. Empty preserves existing links and their previous basis.
+   */
+  basis_refs: string[];
+}
+/**
+ * Create one duty, collaborator, shared knowledge or skill, task outcome or requirement, or position-wide condition with its currently known content. Create complete tasks with create_task, never as item shells. The domain validates each final item and allocates its identity.
+ *
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "InsertItemInput".
+ */
+export interface InsertItemInput {
+  item:
+    | DutyItemInput
+    | CollaboratorItemInput
+    | KnowledgeItemInput
+    | SkillItemInput
+    | OutcomeItemInput
+    | RequirementItemInput
+    | ConditionItemInput;
+}
+/**
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "DutyItemInput".
+ */
+export interface DutyItemInput {
+  kind: "duty";
+  /**
+   * Issued duty-list container.
+   */
+  container_ref: string;
+  /**
+   * Issued existing sibling or null for first.
+   */
+  after_ref: string | null;
+  name: string | null;
+  /**
+   * Known duty summary. Necessary task-specific limits remain on the tasks; no implicit condition inheritance.
+   */
+  scope_text: string | null;
+  basis_refs: string[];
+}
+/**
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "CollaboratorItemInput".
+ */
+export interface CollaboratorItemInput {
+  kind: "collaborator";
+  /**
+   * Issued collaborator-list container.
+   */
+  container_ref: string;
+  /**
+   * Issued existing sibling or null for first.
+   */
+  after_ref: string | null;
+  name: string | null;
+  /**
+   * Known cooperation scope; unknown organizational roles are not invented.
+   */
+  scope_text: string | null;
+  basis_refs: string[];
+}
+/**
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "KnowledgeItemInput".
+ */
+export interface KnowledgeItemInput {
+  kind: "knowledge";
+  /**
+   * Issued knowledge-list container.
+   */
+  container_ref: string;
+  /**
+   * Issued existing sibling or null for first.
+   */
+  after_ref: string | null;
+  name: string | null;
+  /**
+   * Known concepts, principles or rules needed for the work, including their use and scope. Names need not be unique.
+   */
+  description: string | null;
+  basis_refs: string[];
+}
+/**
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "SkillItemInput".
+ */
+export interface SkillItemInput {
+  kind: "skill";
+  /**
+   * Issued skill-list container.
+   */
+  container_ref: string;
+  /**
+   * Issued existing sibling or null for first.
+   */
+  after_ref: string | null;
+  name: string | null;
+  /**
+   * Known methods applied to perform the work and their scope, not an employee score or training plan.
+   */
+  description: string | null;
+  basis_refs: string[];
+}
+/**
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "OutcomeItemInput".
+ */
+export interface OutcomeItemInput {
+  kind: "outcome";
+  /**
+   * Issued outcome-list container of an existing task.
+   */
+  container_ref: string;
+  /**
+   * Issued existing outcome sibling or null for first.
+   */
+  after_ref: string | null;
+  /**
+   * Known deliverable, service result or maintained state and its receiver where relevant. No requirement pairing is implied.
+   */
+  text: string;
+  basis_refs: string[];
+}
+/**
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "RequirementItemInput".
+ */
+export interface RequirementItemInput {
+  kind: "requirement";
+  /**
+   * Issued requirement-list container of an existing task.
+   */
+  container_ref: string;
+  /**
+   * Issued existing requirement sibling or null for first.
+   */
+  after_ref: string | null;
+  /**
+   * Known execution, quality, safety, timing or exception requirement, with its applicable condition. Kept separate from task description and outcomes.
+   */
+  text: string;
+  basis_refs: string[];
+}
+/**
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "ConditionItemInput".
+ */
+export interface ConditionItemInput {
+  kind: "condition";
+  /**
+   * Issued sixth-section container identifying the existing condition kind. Only position-wide conditions belong here.
+   */
+  container_ref: string;
+  /**
+   * Issued existing sibling in that condition kind or null for first.
+   */
+  after_ref: string | null;
+  /**
+   * Known whole-position condition or boundary. Task-specific scope stays on the task; unknown does not mean no requirement.
+   */
+  text: string;
+  basis_refs: string[];
+}
+/**
+ * Delete one existing item with its defined ownership effects. Deleting a duty retains its tasks unassigned, including necessary scope; deleting linked shared knowledge or skill is rejected. Only duty deletion may include the two bounded content adjustments for its surviving tasks, validated together by the domain.
+ *
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "DeleteItemInput".
+ */
+export interface DeleteItemInput {
+  /**
+   * Issued reference to the existing item; not a field or selection.
+   */
+  target_ref: string;
+  /**
+   * Empty for ordinary deletion. Duty deletion may adjust related surviving task fields or add outcomes/requirements so necessary scope is not lost. No unrelated changes or references to newly created items.
+   */
+  content_changes: (SetFieldChange | AddTaskDetailChange)[];
+}
+/**
+ * Move a task between duties or the unassigned list, or reorder an existing item. Preserve identity, owned content, capability relations and sources. Grouping does not inherit destination conditions. The domain validates permitted related scope adjustments and the structural change as one complete candidate.
+ *
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "MoveItemInput".
+ */
+export interface MoveItemInput {
+  /**
+   * Issued reference to the existing item, never a newly allocated or reconstructed item.
+   */
+  target_ref: string;
+  /**
+   * Issued compatible destination container. The App resolves ownership and condition kind.
+   */
+  destination_container_ref: string;
+  /**
+   * Issued existing sibling in the destination container; null means first.
+   */
+  after_ref: string | null;
+  /**
+   * Empty for ordinary reorder. Task regrouping may adjust its fields, add its outcomes/requirements, or update source/destination duty summaries. Only the related targets allowed by the domain may change.
+   */
+  content_changes: (SetFieldChange | AddTaskDetailChange)[];
+}
+/**
+ * Link or unlink one task and existing shared knowledge or skill using issued references. Names are not identities. Unlinking does not delete the shared definition or change other tasks; reverse uses come from the same relation.
+ *
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "SetTaskCapabilityInput".
+ */
+export interface SetTaskCapabilityInput {
+  task_ref: string;
+  /**
+   * Issued reference to existing knowledge or skill in this JD, not a name or copied definition.
+   */
+  capability_ref: string;
+  mode: "link" | "unlink";
+  /**
+   * Issued sources for linking. Must be empty for unlink; the shared domain validates that condition.
+   */
+  basis_refs: string[];
+}
+/**
+ * Replace exactly the text identified by an App-issued selection in one saved field. This input is replacement text only, never the whole field. The App owns the base, field, exact range and Unicode offset validation; stale or mismatched selections are rejected without searching for matching text.
+ *
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "ReplaceSelectionInput".
+ */
+export interface ReplaceSelectionInput {
+  /**
+   * Issued selection reference only. Do not provide a field reference, old text, line numbers or offsets.
+   */
+  selection_ref: string;
+  /**
+   * Replacement for only the selected span, including any intended line breaks. Empty string removes the span; the domain validates the resulting field and item.
+   */
+  replacement_text: string;
+  /**
+   * Sources checked against the complete resulting source target. Leave empty when only the selected fragment was checked; do not promote fragment support to whole-target support.
+   */
+  basis_refs: string[];
 }

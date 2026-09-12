@@ -1,4 +1,5 @@
 import json
+import traceback
 
 import pytest
 
@@ -95,3 +96,28 @@ def test_schema_returned_to_caller_cannot_mutate_future_tool_definition():
     value = tool_definition("openai", "jd_create_task")
     value["parameters"]["properties"].clear()
     assert "name" in tool_definition("openai", "jd_create_task")["parameters"]["properties"]
+
+
+@pytest.mark.parametrize("status", ["invalid_input", "target_missing", "stale_view", "relationship_conflict",
+                                  "dependent_items", "save_failed", "outcome_unknown", "operation_conflict", "busy", "archived"])
+def test_every_known_failure_status_sets_anthropic_error_flag(status):
+    assert tool_output("anthropic", "toolu", {"status": status})["is_error"] is True
+
+
+@pytest.mark.parametrize("status", ["committed", "no_change", "candidate_ready"])
+def test_nonerror_status_preserves_anthropic_success_flag(status):
+    assert tool_output("anthropic", "toolu", {"status": status})["is_error"] is False
+
+
+def test_unknown_result_status_is_not_silently_misreported_as_success():
+    with pytest.raises(TransportError, match="invalid_result"):
+        tool_output("anthropic", "toolu", {"status": "typo-status"})
+
+
+def test_invalid_payload_does_not_leak_through_standard_exception_traceback():
+    payload = partial_task()
+    payload["name"] = {"private": "SensitiveX"}
+    with pytest.raises(TransportError) as error:
+        model_command("jd_create_task", payload)
+    rendered = "".join(traceback.format_exception(error.value))
+    assert "SensitiveX" not in rendered

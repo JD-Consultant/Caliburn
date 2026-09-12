@@ -25,7 +25,10 @@ from openai import OpenAI
 from jd_relational.transport import model_command, tool_definition, tool_output
 
 
-TOOLS = ("jd_create_task", "jd_revise_work")
+TOOLS = (
+    "jd_create_task", "jd_revise_work", "jd_set_text", "jd_insert_item",
+    "jd_delete_item", "jd_move_item", "jd_set_task_capability", "jd_replace_selection",
+)
 MODEL = "offline-fixture"
 RESULT = {"status": "candidate_ready", "persisted": False}
 PROMPT = "依已知工作內容建立或修訂任務；未知不補造。"
@@ -75,6 +78,32 @@ def arguments_for(tool: str) -> dict[str, Any]:
                 {"capability_ref": "issued-shared-skill", "basis_refs": []},
             ],
         }
+    if tool == "jd_set_text":
+        return {"target_field_ref": "issued-optional-name-field", "text": None, "basis_refs": []}
+    if tool == "jd_insert_item":
+        return {"item": {
+            "kind": "knowledge", "container_ref": "issued-knowledge-container",
+            "after_ref": None, "name": None,
+            "description": "理解前後端資料格式與非同步狀態。\n適用範圍仍依各專案約定。🔎",
+            "basis_refs": [],
+        }}
+    if tool in {"jd_delete_item", "jd_move_item"}:
+        content_changes = [
+            {"kind": "set_field", "target_field_ref": "issued-task-description",
+             "text": "對有月檢約定的專案按月檢查；不套用到僅約定缺陷修正的專案。", "basis_refs": []},
+            {"kind": "add_task_detail", "task_ref": "issued-task", "detail_kind": "requirement",
+             "after_ref": None, "text": "超出服务約定的需求，先由負責窗口確認。", "basis_refs": []},
+        ]
+        if tool == "jd_delete_item":
+            return {"target_ref": "issued-duty", "content_changes": content_changes}
+        return {"target_ref": "issued-task", "destination_container_ref": "issued-unassigned-tasks",
+                "after_ref": None, "content_changes": content_changes}
+    if tool == "jd_set_task_capability":
+        return {"task_ref": "issued-task", "capability_ref": "issued-shared-skill",
+                "mode": "link", "basis_refs": []}
+    if tool == "jd_replace_selection":
+        return {"selection_ref": "issued-selection", "replacement_text": "每季🔎\n依服務約定",
+                "basis_refs": []}
     assert tool == "jd_revise_work"
     return {
         "changes": [
@@ -124,6 +153,20 @@ def resolve_local_ref(schema: dict[str, Any], node: dict[str, Any]) -> dict[str,
     return node
 
 
+def variant_kinds(schema: dict[str, Any], node: dict[str, Any]) -> set[str]:
+    variants = resolve_local_ref(schema, node)["anyOf"]
+    kinds = set()
+    for variant in variants:
+        kind = resolve_local_ref(schema, variant)["properties"]["kind"]
+        if "enum" in kind:
+            assert len(kind["enum"]) == 1
+            kinds.add(kind["enum"][0])
+        else:
+            kinds.add(kind["const"])
+    assert len(kinds) == len(variants)
+    return kinds
+
+
 def assert_wire_schema(definition: dict[str, Any], provider: str, tool: str) -> None:
     assert definition["name"] == tool
     assert isinstance(definition["description"], str) and definition["description"]
@@ -141,6 +184,7 @@ def assert_wire_schema(definition: dict[str, Any], provider: str, tool: str) -> 
             assert set(node["required"]) == set(properties)
 
     args = arguments_for(tool)
+    assert set(schema["properties"]) == set(args)
     validator = Draft202012Validator(schema)
     validator.validate(args)
     assert not validator.is_valid({**args, "operation_id": "model-must-not-supply-this"})
@@ -152,21 +196,9 @@ def assert_wire_schema(definition: dict[str, Any], provider: str, tool: str) -> 
         missing_name = deepcopy(args)
         del missing_name["name"]
         assert not validator.is_valid(missing_name)
-    else:
-        assert set(schema["properties"]) == {"changes"}
+    elif tool == "jd_revise_work":
         changes = resolve_local_ref(schema, schema["properties"]["changes"])
-        items = resolve_local_ref(schema, changes["items"])
-        variants = items["anyOf"]
-        assert len(variants) == 6
-        kinds = set()
-        for variant in variants:
-            kind = resolve_local_ref(schema, variant)["properties"]["kind"]
-            if "enum" in kind:
-                assert len(kind["enum"]) == 1
-                kinds.add(kind["enum"][0])
-            else:
-                kinds.add(kind["const"])
-        assert kinds == {
+        assert variant_kinds(schema, changes["items"]) == {
             "set_field", "add_task_detail", "remove_task_detail",
             "set_task_capability", "add_condition", "remove_condition",
         }
@@ -176,6 +208,20 @@ def assert_wire_schema(definition: dict[str, Any], provider: str, tool: str) -> 
         missing_text = deepcopy(nullable_text)
         del missing_text["changes"][0]["text"]
         assert not validator.is_valid(missing_text)
+    elif tool == "jd_insert_item":
+        assert variant_kinds(schema, schema["properties"]["item"]) == {
+            "duty", "collaborator", "knowledge", "skill", "outcome", "requirement", "condition",
+        }
+    elif tool in {"jd_delete_item", "jd_move_item"}:
+        changes = resolve_local_ref(schema, schema["properties"]["content_changes"])
+        assert variant_kinds(schema, changes["items"]) == {"set_field", "add_task_detail"}
+    elif tool == "jd_set_text":
+        assert args["text"] is None
+        assert not validator.is_valid({key: value for key, value in args.items() if key != "text"})
+    elif tool == "jd_replace_selection":
+        assert set(schema["properties"]) == {"selection_ref", "replacement_text", "basis_refs"}
+        assert not validator.is_valid({**args, "start": 0})
+        assert not validator.is_valid({**args, "replacement_text": None})
 
 
 def mock_transport(provider: str, tool: str, args: dict[str, Any]):

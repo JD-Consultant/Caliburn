@@ -3,7 +3,8 @@
 The App supplies already shape-validated command arguments and trusted fixture refs.
 Ref.kind names an entity; a non-null field denotes a field ref, never an item ref.
 Containers use child_kind=task with entity_id=duty_id (None means unassigned),
-or a condition kind with entity_id=None. This is not production ref issuance.
+outcome/requirement with entity_id=task_id, or duty/collaborator/knowledge/skill
+and each condition kind with entity_id=None. This is not production ref issuance.
 
 Snapshots hold ID-keyed duties/tasks/details/capabilities/conditions/collaborators,
 a profile object, and task_capabilities/source_links lists. Rows use the relational
@@ -13,9 +14,11 @@ constructed rows include it. The enclosing revision is preserved, never advanced
 
 from collections.abc import Callable, Iterable, Mapping
 from copy import deepcopy
-from dataclasses import dataclass
+from dataclasses import dataclass, field as dataclass_field
 import hashlib
 import json
+
+from jd_relational.selection import Selection, SelectionError, replace_utf16
 
 
 MAX_CHANGES = 64
@@ -59,6 +62,7 @@ class CommandContext:
     refs: Mapping[str, Ref]
     sources: Mapping[str, Source]
     new_id: Callable[[], str]
+    selections: Mapping[str, Selection] = dataclass_field(default_factory=dict)
 
 
 class DomainError(ValueError):
@@ -177,7 +181,10 @@ class _Candidate:
             if ref.child_kind == "task":
                 if ref.entity_id is not None and ref.entity_id not in self.base["duties"]:
                     raise DomainError("target_missing", "The duty container no longer exists.", (token,))
-            elif ref.child_kind not in CONDITION_KINDS or ref.entity_id is not None:
+            elif ref.child_kind in {"outcome", "requirement"}:
+                if ref.entity_id not in self.base["tasks"]:
+                    raise DomainError("target_missing", "The task container no longer exists.", (token,))
+            elif ref.child_kind not in CONDITION_KINDS | {"duty", "collaborator", "knowledge", "skill"} or ref.entity_id is not None:
                 _invalid("Unsupported container type.", token)
         elif ref.kind == "profile":
             if ref.entity_id is not None:
@@ -407,6 +414,170 @@ def _apply_revision(work: _Candidate, plans: list[tuple]) -> None:
             work.stage_basis((entity_kind, identity), basis)
 
 
+def _row_group(kind: str, row: dict) -> tuple:
+    if kind == "task":
+        return kind, row["duty_id"], None
+    if kind == "detail":
+        return kind, row["task_id"], row["kind"]
+    if kind in {"capability", "condition"}:
+        return kind, None, row["kind"]
+    return kind, None, None
+
+
+def _container_group(ref: Ref) -> tuple:
+    child = ref.child_kind
+    if child == "task":
+        return "task", ref.entity_id, None
+    if child in {"outcome", "requirement"}:
+        return "detail", ref.entity_id, child
+    if child in {"knowledge", "skill"}:
+        return "capability", None, child
+    if child in CONDITION_KINDS:
+        return "condition", None, child
+    return child, None, None
+
+
+def _group_rows(snapshot: dict, group: tuple) -> list[dict]:
+    kind = group[0]
+    return sorted((row for row in snapshot[COLLECTIONS[kind]].values() if _row_group(kind, row) == group),
+                  key=lambda row: (row["position"], row[f"{kind}_id"]))
+
+
+def _normalize_group(snapshot: dict, group: tuple) -> None:
+    for position, row in enumerate(_group_rows(snapshot, group)):
+        row["position"] = position
+
+
+def _anchor(work: _Candidate, token: str | None, group: tuple, *, moving_id: str | None = None) -> str | None:
+    if token is None:
+        return None
+    ref = work.ref(token, {group[0]})
+    if ref.entity_id == moving_id:
+        _invalid("An item cannot be its own ordering anchor.", token)
+    if _row_group(ref.kind, work.base[COLLECTIONS[ref.kind]][ref.entity_id]) != group:
+        _invalid("The ordering anchor must be a sibling in the same container and kind.", token)
+    return ref.entity_id
+
+
+def _insert_item(work: _Candidate, item: dict) -> None:
+    item_kind = item["kind"]
+    kind = {"duty": "duty", "collaborator": "collaborator", "knowledge": "capability", "skill": "capability",
+            "outcome": "detail", "requirement": "detail", "condition": "condition"}.get(item_kind)
+    if kind is None:
+        _invalid("Use the complete create-task operation for tasks, or one of the seven insert kinds.")
+    container = work.ref(item["container_ref"], {"container"})
+    group = _container_group(container)
+    if group[0] != kind or (item_kind != "condition" and container.child_kind != item_kind):
+        _invalid("The inserted item kind does not match its container.", item["container_ref"])
+    anchor = _anchor(work, item["after_ref"], group)
+    values = {key: _text(item[key], required=kind in {"detail", "condition"}) for key in FIELDS[kind]}
+    if kind not in {"detail", "condition"} and not any(value is not None for value in values.values()):
+        _invalid("An inserted item requires a meaningful name or description/scope.")
+    basis = work.basis(item["basis_refs"])
+    identity = work.new_id()
+    row = work.row(kind, identity, **values, position=0)
+    if kind in {"detail", "capability", "condition"}:
+        row["kind"] = group[2]
+    if kind == "detail":
+        row["task_id"] = group[1]
+    work.insert(_group_rows(work.value, group), row, f"{kind}_id", group, anchor)
+    work.value[COLLECTIONS[kind]][identity] = row
+    work.stage_basis((kind, identity), basis)
+
+
+def _replace_selection(work: _Candidate, args: dict) -> None:
+    token = args["selection_ref"]
+    selection = work.context.selections.get(token)
+    if selection is None:
+        _invalid("Use an App-issued selection reference, not a field reference.", token)
+    ref = work.ref(selection.field_ref, field=True)
+    row = work.base["profile"] if ref.kind == "profile" else work.base[COLLECTIONS[ref.kind]][ref.entity_id]
+    if row.get(ref.field) != selection.field_text:
+        raise DomainError("stale_view", "The captured field text no longer matches the current field.", (token,))
+    try:
+        text = replace_utf16(selection.field_text, selection.start_utf16, selection.end_utf16,
+                             selection.selected_text, args["replacement_text"])
+    except SelectionError as exc:
+        raise DomainError("invalid_input", str(exc), (token,)) from exc
+    _apply_revision(work, _plan_revision(work, [{"kind": "set_field", "target_field_ref": selection.field_ref,
+                                               "text": text, "basis_refs": args["basis_refs"]}]))
+
+
+def _structural_changes(work: _Candidate, changes: list[dict], task_ids: set[str],
+                        duty_ids: set[str] | None = None) -> list[tuple]:
+    if not changes:
+        return []
+    if any(change["kind"] not in {"set_field", "add_task_detail"} for change in changes):
+        _invalid("A structural operation permits only related field changes and new task details.")
+    plans = _plan_revision(work, changes)
+    for kind, *values in plans:
+        if kind == "add_task_detail":
+            allowed = values[0] in task_ids
+        else:
+            ref = values[0]
+            allowed = ((ref.kind == "task" and ref.entity_id in task_ids)
+                or (ref.kind == "detail" and work.base["details"][ref.entity_id]["task_id"] in task_ids)
+                or (ref.kind == "duty" and ref.field == "scope_text" and ref.entity_id in (duty_ids or set())))
+        if not allowed:
+            _invalid("The content change is outside this structural operation's surviving work.")
+    return plans
+
+
+def _delete_item(work: _Candidate, args: dict) -> None:
+    ref = work.ref(args["target_ref"], set(COLLECTIONS))
+    kind, identity = ref.kind, ref.entity_id
+    row = work.base[COLLECTIONS[kind]][identity]
+    group = _row_group(kind, row)
+    if kind != "duty" and args["content_changes"]:
+        _invalid("Only duty deletion can include related surviving task content changes.")
+    if kind == "capability" and any(link["capability_id"] == identity for link in work.base["task_capabilities"]):
+        raise DomainError("dependent_items", "This capability is still used by tasks; inspect its references before removal.",
+                          (args["target_ref"],))
+    if kind == "duty":
+        moved = _group_rows(work.value, ("task", identity, None))
+        plans = _structural_changes(work, args["content_changes"], {task["task_id"] for task in moved})
+        _apply_revision(work, plans)
+        unassigned = _group_rows(work.value, ("task", None, None))
+        # D01 appends preserved tasks in their prior display order; there is no implicit scope inheritance.
+        for position, task in enumerate(unassigned + moved):
+            task["duty_id"] = None
+            task["position"] = position
+    elif kind == "task":
+        detail_ids = {key for key, detail in work.value["details"].items() if detail["task_id"] == identity}
+        for detail_id in detail_ids:
+            del work.value["details"][detail_id]
+            work.remove_sources(("detail", detail_id))
+        relations = [link for link in work.value["task_capabilities"] if link["task_id"] == identity]
+        for link in relations:
+            work.remove_sources(("relation", identity, link["capability_id"]))
+        work.value["task_capabilities"] = [link for link in work.value["task_capabilities"] if link["task_id"] != identity]
+    del work.value[COLLECTIONS[kind]][identity]
+    work.remove_sources((kind, identity))
+    _normalize_group(work.value, group)
+
+
+def _move_item(work: _Candidate, args: dict) -> None:
+    ref = work.ref(args["target_ref"], set(COLLECTIONS))
+    destination = work.ref(args["destination_container_ref"], {"container"})
+    original = work.base[COLLECTIONS[ref.kind]][ref.entity_id]
+    source_group, destination_group = _row_group(ref.kind, original), _container_group(destination)
+    if destination_group[0] != ref.kind or (ref.kind != "task" and source_group != destination_group):
+        _invalid("Only tasks may change containers; other items can only reorder within their current kind and container.")
+    anchor = _anchor(work, args["after_ref"], destination_group, moving_id=ref.entity_id)
+    cross_duty = ref.kind == "task" and source_group != destination_group
+    if args["content_changes"] and not cross_duty:
+        _invalid("A reorder cannot include unrelated content changes.")
+    plans = _structural_changes(work, args["content_changes"], {ref.entity_id} if cross_duty else set(),
+                                {identity for identity in (source_group[1], destination_group[1]) if identity is not None})
+    _apply_revision(work, plans)
+    row = work.value[COLLECTIONS[ref.kind]].pop(ref.entity_id)
+    _normalize_group(work.value, source_group)
+    if ref.kind == "task":
+        row["duty_id"] = destination_group[1]
+    work.insert(_group_rows(work.value, destination_group), row, f"{ref.kind}_id", destination_group, anchor)
+    work.value[COLLECTIONS[ref.kind]][ref.entity_id] = row
+
+
 def _validate_final(snapshot: dict, document_id: str) -> None:
     """Validate final rows, without applying intermediate per-column constraints."""
     for kind, collection in COLLECTIONS.items():
@@ -476,8 +647,19 @@ def build_candidate(snapshot: dict, command: dict, context: CommandContext) -> d
     elif command["tool"] == "jd_revise_work":
         plans = _plan_revision(work, command["arguments"]["changes"])
         _apply_revision(work, plans)
+    elif command["tool"] in {"jd_set_text", "jd_set_task_capability"}:
+        kind = "set_field" if command["tool"] == "jd_set_text" else "set_task_capability"
+        _apply_revision(work, _plan_revision(work, [{"kind": kind, **command["arguments"]}]))
+    elif command["tool"] == "jd_insert_item":
+        _insert_item(work, command["arguments"]["item"])
+    elif command["tool"] == "jd_replace_selection":
+        _replace_selection(work, command["arguments"])
+    elif command["tool"] == "jd_delete_item":
+        _delete_item(work, command["arguments"])
+    elif command["tool"] == "jd_move_item":
+        _move_item(work, command["arguments"])
     else:
-        _invalid("Only complete task creation and bounded work revision are supported.")
+        _invalid("Use one of the eight named JD editing operations.")
     _validate_final(work.value, context.document_id)
     work.finish_sources()
     _validate_final(work.value, context.document_id)

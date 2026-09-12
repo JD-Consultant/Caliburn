@@ -49,7 +49,9 @@ PARKED：Excel 與原始訪談下載、其他電腦安裝、真人顧問流程�
 
 RS-5 的還原／撤回 domain 與 DB 基礎在 RS-2 就實作驗證，RS-5 接全旅程與維護，不把 API 局部通過當整體通過。RS-7 採用研究、驗收材料、維護設計可以先並行；正式切換保留 G6，無須等到切換當天才研究。
 
-2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合 RS-1 首單位所需生成／驗證／SDK離線依賴，UI／資料層／Agent 接點仍待相依施工前驗證。[RS-1 完整任務／一次更正](../specs/2026-09-13-jd-relational-command-slice.md)隔離實作完成：128 tests、codegen、TS型別檢查通過，首敗與修正已記。RS-1 的其他具名操作及讀取／HTTP／錯誤回執契約仍未完成；RS-2–7 尚未執行新版驗收。整體 G4、G6 及成品狀態不因局部 PASS 而改判。
+2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合 RS-1 所需生成／驗證／SDK離線依賴，UI／資料層／Agent 接點仍待相依施工前驗證。[首單位](../specs/2026-09-13-jd-relational-command-slice.md)的兩操作／128 項保留為歷史結果；目前[八個編輯操作與共用 App 準備邊界](../specs/2026-09-13-jd-management-operations-slice.md)隔離驗證為 289 tests、codegen、TS 檢查通過。刪職責保留任務、受限移動、選區及來源規則已實作，人工／AI 同一行為已驗；完整讀取／HTTP／錯誤回執契約仍未完成。RS-2–7 尚未執行新版驗收，整體 G4、G6 及成品狀態不因局部 PASS 而改判。
+
+本輪[分層／錯誤／紀錄官方證據](../specs/evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)已收束。RS-1 下一單位閉合 typed result 合法組合、ref 發配及 HTTP 查回／寫入差異；RS-2 承接 BEL-R01–05 的真 DB 結果、logging 配置／容量／故障及交錯文件歸屬。純候選的安全診斷已驗，不代表宿主 logging 或 DB 保存已完成，不另開 logging 品牌研究。
 
 ## 4. 第一個可執行工程工作單位
 

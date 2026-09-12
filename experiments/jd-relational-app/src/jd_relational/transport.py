@@ -1,18 +1,30 @@
 """Small input adapters for the isolated candidate probe, without execution or I/O."""
 
-from copy import deepcopy
 import json
-from pathlib import Path
 
 from pydantic import ValidationError
 
-from .generated.models import CreateTaskInput, ReviseWorkInput
+from .generated.models import (
+    CreateTaskInput, ReviseWorkInput, SetTextInput, InsertItemInput,
+    DeleteItemInput, MoveItemInput, SetTaskCapabilityInput, ReplaceSelectionInput,
+)
 
 
 REQUEST_LIMIT = 1024 * 1024
-CONTRACT = Path(__file__).resolve().parents[2] / "contracts" / "jd-work.schema.json"
-MODELS = {"jd_create_task": CreateTaskInput, "jd_revise_work": ReviseWorkInput}
+MODELS = {"jd_create_task": CreateTaskInput, "jd_revise_work": ReviseWorkInput,
+          "jd_set_text": SetTextInput, "jd_insert_item": InsertItemInput,
+          "jd_delete_item": DeleteItemInput, "jd_move_item": MoveItemInput,
+          "jd_set_task_capability": SetTaskCapabilityInput, "jd_replace_selection": ReplaceSelectionInput}
+FAILURE_STATUSES = frozenset({"error", "invalid_input", "target_missing", "stale_view", "relationship_conflict",
+    "dependent_items", "save_failed", "outcome_unknown", "operation_conflict", "busy", "archived"})
+NONERROR_STATUSES = frozenset({"committed", "no_change", "candidate_ready"})
 DESCRIPTIONS = {
+    "jd_set_text": "單独修改一個既有欄位的完整文字。多欄相依更正用 jd_revise_work；選區修改用 jd_replace_selection。保留未知，不用清空模擬刪除項目。",
+    "jd_insert_item": "新增職責、協作對象、知識、技能、成果、要求或全職位條件。依種類提供目前已知內容及App發配的容器，未知可空；任務改用 jd_create_task 一次建立。",
+    "jd_delete_item": "依明確意圖刪除項目。刪职責保留其任務及子項並解除分組；仍被任務引用的知識技能不能直接刪。刪職責可同次補齊存活任務的必要範圍，其他刪除不帶內容更正。",
+    "jd_move_item": "將任務移至另一職責或未分組，或在同一清單重排項目；保留身分、子項及引用。任務換組可一併修正相關範圍；不要刪除後重建，也不要改不相關工作。",
+    "jd_set_task_capability": "新增或解除任務對既有知識或技能的引用；使用已發配refs，不用名稱猜測。解除引用不刪共用定義、不影響其他任務；unlink時basis_refs為空。",
+    "jd_replace_selection": "只替換App已提供selection_ref的選取文字。replacement_text只放選區替代文字；不提供行號、offset、舊文或整欄全文。過時先重讀，不能搜尋同字續改；來源須核完整正式target。",
     "jd_create_task": (
         "當某項工作已能辨識時，建立任務及目前已知的成果、要求、既有知識技能引用。"
         "名稱或敘述至少一項有內容；其他清單可空，不為填滿補造。使用 App 已提供的 refs；"
@@ -48,7 +60,7 @@ def _reject_constant(_):
 
 def model_command(tool: str, arguments: str | dict) -> dict:
     """Parse model or manual arguments to the same internal command, no defaults."""
-    if tool not in MODELS:
+    if not isinstance(tool, str) or tool not in MODELS:
         raise TransportError("unknown_tool")
     try:
         raw = arguments if isinstance(arguments, str) else json.dumps(arguments, ensure_ascii=False, allow_nan=False)
@@ -59,9 +71,9 @@ def model_command(tool: str, arguments: str | dict) -> dict:
         return {"tool": tool, "arguments": value.model_dump(mode="json")}
     except TransportError:
         raise
-    except (ValueError, TypeError, UnicodeError, ValidationError, RecursionError) as error:
+    except (ValueError, TypeError, UnicodeError, ValidationError, RecursionError):
         # Never return the SDK context or echo arbitrary input in a tool error.
-        raise TransportError("invalid_input") from error
+        raise TransportError("invalid_input") from None
 
 
 def manual_command(envelope: dict) -> dict:
@@ -74,12 +86,11 @@ def manual_command(envelope: dict) -> dict:
 
 
 def tool_definition(provider: str, tool: str) -> dict:
-    if tool not in MODELS:
+    if not isinstance(tool, str) or tool not in MODELS:
         raise TransportError("unknown_tool")
-    contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
-    title = "CreateTaskInput" if tool == "jd_create_task" else "ReviseWorkInput"
-    schema = deepcopy(contract["$defs"][title])
-    schema["$defs"] = deepcopy(contract["$defs"])
+    # The DTO is generated from SSOT. Pydantic emits only definitions this tool
+    # actually uses, without a custom ref resolver or unrelated catalog entries.
+    schema = MODELS[tool].model_json_schema(mode="validation")
     common = {"name": tool, "description": DESCRIPTIONS[tool], "strict": True}
     if provider == "openai":
         return {"type": "function", **common, "parameters": schema}
@@ -92,9 +103,12 @@ def tool_output(provider: str, call_id: str, result: dict) -> dict:
     """Wire packaging only; callers must supply observed results, never invented saves."""
     if not isinstance(call_id, str) or not call_id or not isinstance(result, dict):
         raise TransportError("invalid_result")
+    status = result.get("status")
+    if not isinstance(status, str) or status not in FAILURE_STATUSES | NONERROR_STATUSES:
+        raise TransportError("invalid_result")
     content = json.dumps(result, ensure_ascii=False, allow_nan=False)
     if provider == "openai":
         return {"type": "function_call_output", "call_id": call_id, "output": content}
     if provider == "anthropic":
-        return {"type": "tool_result", "tool_use_id": call_id, "content": content, "is_error": result.get("status") == "error"}
+        return {"type": "tool_result", "tool_use_id": call_id, "content": content, "is_error": status in FAILURE_STATUSES}
     raise TransportError("unknown_provider")

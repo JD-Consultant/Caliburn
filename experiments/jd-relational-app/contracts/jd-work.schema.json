@@ -7,9 +7,15 @@
   "additionalProperties": false,
   "properties": {
     "create_task": { "$ref": "#/$defs/CreateTaskInput" },
-    "revise_work": { "$ref": "#/$defs/ReviseWorkInput" }
+    "revise_work": { "$ref": "#/$defs/ReviseWorkInput" },
+    "set_text": { "$ref": "#/$defs/SetTextInput" },
+    "insert_item": { "$ref": "#/$defs/InsertItemInput" },
+    "delete_item": { "$ref": "#/$defs/DeleteItemInput" },
+    "move_item": { "$ref": "#/$defs/MoveItemInput" },
+    "set_task_capability": { "$ref": "#/$defs/SetTaskCapabilityInput" },
+    "replace_selection": { "$ref": "#/$defs/ReplaceSelectionInput" }
   },
-  "required": ["create_task", "revise_work"],
+  "required": ["create_task", "revise_work", "set_text", "insert_item", "delete_item", "move_item", "set_task_capability", "replace_selection"],
   "$defs": {
     "TaskDetailInput": {
       "title": "TaskDetailInput",
@@ -142,6 +148,200 @@
         }
       },
       "required": ["changes"]
+    },
+    "SetTextInput": {
+      "title": "SetTextInput",
+      "description": "Replace one existing field with its complete text. This does not accept a selection reference. Related multi-field corrections use revise_work; the domain validates meaningful final content.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_field_ref": { "type": "string", "description": "Issued reference to an existing full-text field, never an item, selection or JSON path." },
+        "text": { "type": ["string", "null"], "description": "Complete replacement value. Null is accepted only if the target field and final item allow it; clearing a field does not delete the item." },
+        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Issued sources checked against the resulting content. Empty preserves existing links and their previous basis." }
+      },
+      "required": ["target_field_ref", "text", "basis_refs"]
+    },
+    "DutyItemInput": {
+      "title": "DutyItemInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "const": "duty" },
+        "container_ref": { "type": "string", "description": "Issued duty-list container." },
+        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling or null for first." },
+        "name": { "type": ["string", "null"] },
+        "scope_text": { "type": ["string", "null"], "description": "Known duty summary. Necessary task-specific limits remain on the tasks; no implicit condition inheritance." },
+        "basis_refs": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["kind", "container_ref", "after_ref", "name", "scope_text", "basis_refs"]
+    },
+    "CollaboratorItemInput": {
+      "title": "CollaboratorItemInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "const": "collaborator" },
+        "container_ref": { "type": "string", "description": "Issued collaborator-list container." },
+        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling or null for first." },
+        "name": { "type": ["string", "null"] },
+        "scope_text": { "type": ["string", "null"], "description": "Known cooperation scope; unknown organizational roles are not invented." },
+        "basis_refs": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["kind", "container_ref", "after_ref", "name", "scope_text", "basis_refs"]
+    },
+    "KnowledgeItemInput": {
+      "title": "KnowledgeItemInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "const": "knowledge" },
+        "container_ref": { "type": "string", "description": "Issued knowledge-list container." },
+        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling or null for first." },
+        "name": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"], "description": "Known concepts, principles or rules needed for the work, including their use and scope. Names need not be unique." },
+        "basis_refs": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["kind", "container_ref", "after_ref", "name", "description", "basis_refs"]
+    },
+    "SkillItemInput": {
+      "title": "SkillItemInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "const": "skill" },
+        "container_ref": { "type": "string", "description": "Issued skill-list container." },
+        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling or null for first." },
+        "name": { "type": ["string", "null"] },
+        "description": { "type": ["string", "null"], "description": "Known methods applied to perform the work and their scope, not an employee score or training plan." },
+        "basis_refs": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["kind", "container_ref", "after_ref", "name", "description", "basis_refs"]
+    },
+    "OutcomeItemInput": {
+      "title": "OutcomeItemInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "const": "outcome" },
+        "container_ref": { "type": "string", "description": "Issued outcome-list container of an existing task." },
+        "after_ref": { "type": ["string", "null"], "description": "Issued existing outcome sibling or null for first." },
+        "text": { "type": "string", "description": "Known deliverable, service result or maintained state and its receiver where relevant. No requirement pairing is implied." },
+        "basis_refs": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["kind", "container_ref", "after_ref", "text", "basis_refs"]
+    },
+    "RequirementItemInput": {
+      "title": "RequirementItemInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "const": "requirement" },
+        "container_ref": { "type": "string", "description": "Issued requirement-list container of an existing task." },
+        "after_ref": { "type": ["string", "null"], "description": "Issued existing requirement sibling or null for first." },
+        "text": { "type": "string", "description": "Known execution, quality, safety, timing or exception requirement, with its applicable condition. Kept separate from task description and outcomes." },
+        "basis_refs": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["kind", "container_ref", "after_ref", "text", "basis_refs"]
+    },
+    "ConditionItemInput": {
+      "title": "ConditionItemInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "kind": { "type": "string", "const": "condition" },
+        "container_ref": { "type": "string", "description": "Issued sixth-section container identifying the existing condition kind. Only position-wide conditions belong here." },
+        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling in that condition kind or null for first." },
+        "text": { "type": "string", "description": "Known whole-position condition or boundary. Task-specific scope stays on the task; unknown does not mean no requirement." },
+        "basis_refs": { "type": "array", "items": { "type": "string" } }
+      },
+      "required": ["kind", "container_ref", "after_ref", "text", "basis_refs"]
+    },
+    "InsertItemInput": {
+      "title": "InsertItemInput",
+      "description": "Create one duty, collaborator, shared knowledge or skill, task outcome or requirement, or position-wide condition with its currently known content. Create complete tasks with create_task, never as item shells. The domain validates each final item and allocates its identity.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "item": {
+          "anyOf": [
+            { "$ref": "#/$defs/DutyItemInput" },
+            { "$ref": "#/$defs/CollaboratorItemInput" },
+            { "$ref": "#/$defs/KnowledgeItemInput" },
+            { "$ref": "#/$defs/SkillItemInput" },
+            { "$ref": "#/$defs/OutcomeItemInput" },
+            { "$ref": "#/$defs/RequirementItemInput" },
+            { "$ref": "#/$defs/ConditionItemInput" }
+          ]
+        }
+      },
+      "required": ["item"]
+    },
+    "DeleteItemInput": {
+      "title": "DeleteItemInput",
+      "description": "Delete one existing item with its defined ownership effects. Deleting a duty retains its tasks unassigned, including necessary scope; deleting linked shared knowledge or skill is rejected. Only duty deletion may include the two bounded content adjustments for its surviving tasks, validated together by the domain.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_ref": { "type": "string", "description": "Issued reference to the existing item; not a field or selection." },
+        "content_changes": {
+          "type": "array",
+          "description": "Empty for ordinary deletion. Duty deletion may adjust related surviving task fields or add outcomes/requirements so necessary scope is not lost. No unrelated changes or references to newly created items.",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/SetFieldChange" },
+              { "$ref": "#/$defs/AddTaskDetailChange" }
+            ]
+          }
+        }
+      },
+      "required": ["target_ref", "content_changes"]
+    },
+    "MoveItemInput": {
+      "title": "MoveItemInput",
+      "description": "Move a task between duties or the unassigned list, or reorder an existing item. Preserve identity, owned content, capability relations and sources. Grouping does not inherit destination conditions. The domain validates permitted related scope adjustments and the structural change as one complete candidate.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_ref": { "type": "string", "description": "Issued reference to the existing item, never a newly allocated or reconstructed item." },
+        "destination_container_ref": { "type": "string", "description": "Issued compatible destination container. The App resolves ownership and condition kind." },
+        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling in the destination container; null means first." },
+        "content_changes": {
+          "type": "array",
+          "description": "Empty for ordinary reorder. Task regrouping may adjust its fields, add its outcomes/requirements, or update source/destination duty summaries. Only the related targets allowed by the domain may change.",
+          "items": {
+            "anyOf": [
+              { "$ref": "#/$defs/SetFieldChange" },
+              { "$ref": "#/$defs/AddTaskDetailChange" }
+            ]
+          }
+        }
+      },
+      "required": ["target_ref", "destination_container_ref", "after_ref", "content_changes"]
+    },
+    "SetTaskCapabilityInput": {
+      "title": "SetTaskCapabilityInput",
+      "description": "Link or unlink one task and existing shared knowledge or skill using issued references. Names are not identities. Unlinking does not delete the shared definition or change other tasks; reverse uses come from the same relation.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "task_ref": { "type": "string" },
+        "capability_ref": { "type": "string", "description": "Issued reference to existing knowledge or skill in this JD, not a name or copied definition." },
+        "mode": { "type": "string", "enum": ["link", "unlink"] },
+        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Issued sources for linking. Must be empty for unlink; the shared domain validates that condition." }
+      },
+      "required": ["task_ref", "capability_ref", "mode", "basis_refs"]
+    },
+    "ReplaceSelectionInput": {
+      "title": "ReplaceSelectionInput",
+      "description": "Replace exactly the text identified by an App-issued selection in one saved field. This input is replacement text only, never the whole field. The App owns the base, field, exact range and Unicode offset validation; stale or mismatched selections are rejected without searching for matching text.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "selection_ref": { "type": "string", "description": "Issued selection reference only. Do not provide a field reference, old text, line numbers or offsets." },
+        "replacement_text": { "type": "string", "description": "Replacement for only the selected span, including any intended line breaks. Empty string removes the span; the domain validates the resulting field and item." },
+        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Sources checked against the complete resulting source target. Leave empty when only the selected fragment was checked; do not promote fragment support to whole-target support." }
+      },
+      "required": ["selection_ref", "replacement_text", "basis_refs"]
     }
   }
 }

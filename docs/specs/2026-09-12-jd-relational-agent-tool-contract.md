@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C02、C03
-- 階段：G4 DRAFT；語意契約供 review，尚未生成 provider／HTTP schema
+- 階段：G4 DRAFT；語意契約供 review。2026-09-13 [八個編輯輸入](2026-09-13-jd-management-operations-slice.md)已生成並通過离線驗證；讀取、完整結果／HTTP schema、持久與自然模型驗證仍待完成。
 - 上層設計：[整體設計](2026-09-12-jd-relational-editor-design.md)
 - 保存契約：[資料庫與保存](2026-09-12-jd-relational-schema-and-write-contract.md)
 
@@ -16,7 +16,7 @@ OpenAI 與 Anthropic 的現行官方資料共同支持「模型回結構化工�
 
 既有 v2 `jd_edit` 面向完整文件樹；本稿原七工具又把部分完整工作拆得過細。依[業務操作研究 §1–2](2026-09-12-jd-business-operations-and-scope-design.md)，採具名操作，補完整新增任務、有界整組內容修訂及選區替換；不凍結工具數，也不直接開任意 command array。OpenAI 的連續功能合併與 Anthropic 的工作流程導向支持這個方向，strict schema 本身不決定操作粒度。
 
-App 將所有 mutation 映入相同 domain command、validator、短交易與結果 owner。一次跨欄責任更正必須用一個原子入口，不讓人工整組保存、模型只能逐欄碰運氣。具體輸入如下，仍待 generated schema／固定操作／自然模型驗證。
+App 將所有 mutation 映入相同 domain command、validator、短交易與結果 owner。一次跨欄責任更正必須用一個原子入口，不讓人工整組保存、模型只能逐欄碰運氣。具體輸入如下；generated schema／固定候選操作的局部結果沿頁首路由，保存與自然模型尚未驗證。
 
 ## 3. Model-facing 工具
 

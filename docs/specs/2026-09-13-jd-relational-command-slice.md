@@ -4,6 +4,8 @@
 - 需求來源：[六章格式](2026-09-10-jd-format-review.md)、[完整 JD 欄位審核](2026-09-13-jd-field-sufficiency-audit.md)、[業務操作](2026-09-12-jd-business-operations-and-scope-design.md)、[模型工具](2026-09-12-jd-relational-agent-tool-contract.md)。
 - 狀態：RS-1 首切片隔離實作／離線驗證完成；不是完整 RS-1、G4／G6 或成品通過。
 
+後續八工具及共用 App 準備邊界見[第二單位](2026-09-13-jd-management-operations-slice.md)。本稿兩工具／128 項描述保留為 `5f92f29e` 的歷史證據，不代表目前整套驗收數。
+
 ## 1. 本次效果與停止邊界
 
 先完成兩個可獨立驗證的效果：建立一項任務，連同多筆成果、多筆要求及既有共享知識技能；依新資訊一次修正正文、要求與引用，保留其他有效工作。員工入口及模型入口轉為同一業務輸入，使用同一驗證及候選建立方式。

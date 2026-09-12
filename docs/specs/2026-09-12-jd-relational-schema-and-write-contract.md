@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C03
-- 階段：G4 WORKING；十三表與[共同保存切片](2026-09-13-jd-transaction-service-slice.md)已隔離驗證；2026-09-13 [讀取與差異切片](2026-09-13-jd-read-change-implementation.md)已接同版 current/history SQL、固定 typed refs、generated `jd_read`／兩家離線 adapter、純差異及原回執投影。公開 `jd_change_read`、實際 writer／停止 proof、source owner／選區發配、人工 notice 基準、HTTP／Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
+- 階段：G4 WORKING；十三表、八操作、共同交易與同版讀取已隔離驗證。2026-09-13 [查詢／恢復接合](2026-09-13-jd-query-api-and-recovery-identity-slice.md)完成原操作差異公開契約、兩個 HTTP 查詢、不依賴 writer 的 JdReader，以及只憑原 AdmittedIdentity 對帳。真持久 runtime／停止 owner、source／選區／人工 notice、寫入 HTTP／Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[JD 關聯式管理編輯器](2026-09-12-jd-relational-editor-design.md)
 - 證據：[官方與本地現況](evidence/2026-09-12-jd-relational-editor-evidence.md)
 
@@ -257,7 +257,7 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 
 同 `(document_id,operation_id)` 同 digest 重送只回原 receipt；不同 digest 回 `operation_conflict`，不能 UPSERT 覆寫。對 `status='committed'` 建部分唯一索引 `(document_id,result_revision_id)`；no_change 可由多個 operation 指同一 revision。
 
-「原 receipt」指原結果、效果、身分、base/result 及錯誤語意固定，並非要求每次 HTTP／tool JSON bytes 相同。對外 operation／revision／change refs 由原材料發配，不能因 head 已前進而改 result；投影失敗不能改寫已保存結果。確切差異由原 immutable base/result snapshots 及 stable IDs 比較，不在 receipt 保存第二份巨大 before/after。request digest 使用 App 已核的固定意圖，不因 JD token 重新簽發而改變原意圖；来源 identity 沿 source owner。永久結果與短期引用的邊界詳[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md#41-永久-receipt-與對外-ref-投影)。外部結果已[生成驗證](2026-09-13-jd-result-and-storage-foundation.md)；永久回執使用[內部 typed module](../../experiments/jd-relational-app/src/jd_relational/storage/receipts.py)，依[交易切片](2026-09-13-jd-transaction-service-slice.md)與 current／revision 同交易保存，只有 COMMIT 確認才回 confirmed。[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已將 `WriteObservation` 的原身分／語意轉為 shared result 與 observation refs；它不查 head、不改 receipt，也不因 token 發配失敗改稱保存失敗。HTTP host／顧問接線與公開 change read 仍待完成。
+「原 receipt」指原結果、效果、身分、base/result 及錯誤語意固定，並非要求每次 HTTP／tool JSON bytes 相同。對外 operation／revision／change refs 由原材料發配，不能因 head 已前進而改 result；投影失敗不能改寫已保存結果。確切差異由原 immutable base/result snapshots 及 stable IDs 比較，不在 receipt 保存第二份巨大 before/after。request digest 使用 App 已核的固定意圖，不因 JD token 重新簽發而改變原意圖；来源 identity 沿 source owner。永久結果與短期引用的邊界詳[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md#41-永久-receipt-與對外-ref-投影)。外部結果已[生成驗證](2026-09-13-jd-result-and-storage-foundation.md)；永久回執使用[內部 typed module](../../experiments/jd-relational-app/src/jd_relational/storage/receipts.py)，依[交易切片](2026-09-13-jd-transaction-service-slice.md)與 current／revision 同交易保存，只有 COMMIT 確認才回 confirmed。[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已將 `WriteObservation` 的原身分／語意轉為 shared result 與 observation refs；它不查 head、不改 receipt，也不因 token 發配失敗改稱保存失敗。公開 change read 與 HTTP 查詢已依[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)驗證；寫入 HTTP／顧問仍待接線。
 
 AI 操作的 run 歸屬連同成功／no_change／已確認失敗回執原子保存；必須經既有 run owner 核對同文件，不從 timestamp、actor 或暫態 jd_bindings 猜測。回合 authority 仍是既有 runtime；不在 JD 新建另一套 run 表或跨 owner cascade。尚未形成可信 binding 的請求拒絕不偽造 AI operation。此欄只識別操作歸屬；完整範圍及閉合判斷依[整輪撤回 §4](2026-09-12-jd-ai-turn-undo-design.md#4-何時可撤回)。
 
@@ -310,6 +310,8 @@ AI 操作的 run 歸屬連同成功／no_change／已確認失敗回執原子保
 **整筆 SQL 失敗與回覆遺失：**尚未跨原 operation 邊界查明不存在時，讀取／連線失敗為 `effect=unknown`，不能以本次尚未寫入推定原操作沒改正文。跨邊界後已證正文 rollback 時為 `effect=unchanged`。COMMIT 未確認時，候選可能改正文者為 unknown；只提交 no_change／failure receipt 則仍為 unchanged。只要無已確認 terminal，均保留原 binding、`receipt_durability=unconfirmed`、`next_action=reconcile_operation`；即使已知正文不變，也不能先解綁再另發新意圖。[交易切片](2026-09-13-jd-transaction-service-slice.md)已對上述差別建立反例。
 
 恢复沿[既有 lifecycle §6.5](2026-09-10-jd-native-process-lifecycle-design.md#65-python-已停止後的-pg-對帳與-known-none)及[手改恢復契約](2026-09-10-jd-manual-recovery-transport-design.md)：先取得原 writer 已停止／不再可送 mutation 的可信證明，再用新的 **READ COMMITTED** transaction 依 document→head 取得相同鎖；取得後在**下一 statement**查原 operation／digest。真 terminal 優先。只有跨過原 DB 邊界且確認 known-none，才用原 identity／digest 走既有 failure-only port 保存 `save_failed`；該回執仍需 COMMIT 確認。不能重播 commands、重跑模型或新造 operation。writer 尚可能執行、缺 head、鎖逾時、DB 不可用或 failure receipt 本身保存失敗時，保持未閉合狀態。
+
+**2026-09-13 實作精確化：**`BoundEdit.identity` 固定保存文件、operation、base、origin、ai_run_id、request_digest、command_kind 七欄；`reconcile_stopped` 僅接受經重驗的 `AdmittedIdentity`，不載入候選、CommandContext、refs 或來源，不重算原 digest。原回執除 digest 亦核對文件／操作／origin／run／command kind；非空 base 必須符合原身分，因無效 base 而保存的 null FK 不偽造 revision。新 Python 程序查回原結果／未執行只記失敗已驗，但 admission descriptor 的真正持久儲存及停止證明仍待 runtime owner 實作；身分形狀驗證本身不是授權。
 
 這個對帳交易不能改用 §9 的 REPEATABLE READ：等待鎖後查回結果須取得新的 statement snapshot，否則可能查不到剛提交的原回執。新 schema 的 mutation 順序若改為 pipeline 或繞過相同鎖，既有停止／DB 邊界證明即不適用，須先重審；不能只以 Python 程序死亡或單次查無 row 認定未寫入。
 
@@ -382,7 +384,7 @@ current UI、AI read、來源目標核對、目前版 Excel export 共用一個�
 
 反例驗收：reader 已讀 r5 的職責後，writer 新增 C、移 T 至 C、提交 r6；本次 reader 的任務、來源目標與 refs 仍全部是 r5。下次 read 才能全部為 r6；不能回沒有職責 C 卻有 T→C 的投影。[交易切片](2026-09-13-jd-transaction-service-slice.md)已驗真 PG reader 首次查詢後停住、writer 提交、reader 仍回完整舊版且新 read 回新版；[讀取切片](2026-09-13-jd-read-change-implementation.md)另驗 issued refs→共同 command→真保存、head 前進後 current cursor／field 拒絕，以及歷史頁保持原版。上述特定「新增職責並移任務」的交錯全旅程仍是驗收義務，不把相鄰反例說成完全相同的實測。
 
-2026-09-13 固定輸出以[讀取 SSOT](../../experiments/jd-relational-app/contracts/jd-read.schema.json)生成 Python／TS；由已 materialize 的內容發配 section／container／item／field refs，正文、關係及來源分成明確 records。current 續頁必須同版，歷史 item／section 續讀指定 immutable revision；即使歷史版等於 head 也保持只讀。欄位完整交付，頁面按 UTF-8 bytes 有界分段；允許的單一大欄位明示 `oversized_unit`，不縮減欄位容量或靜默截句。模型 adapter 已驗兩家 SDK 離線序列化，尚無 HTTP／Web 或自然模型驗收。
+2026-09-13 固定輸出以[讀取 SSOT](../../experiments/jd-relational-app/contracts/jd-read.schema.json)生成 Python／TS；由已 materialize 的內容發配 section／container／item／field refs，正文、關係及來源分成明確 records。current 續頁必須同版，歷史 item／section 續讀指定 immutable revision；即使歷史版等於 head 也保持只讀。欄位完整交付，頁面按 UTF-8 bytes 有界分段；允許的單一大欄位明示 `oversized_unit`，不縮減欄位容量或靜默截句。兩家 SDK 離線與查詢 HTTP／真 PG／新程序已驗，寫入 HTTP／Web 及自然模型尚待接合。
 
 ### 9.2 來源、歷史與輸出
 
@@ -394,9 +396,9 @@ current UI、AI read、來源目標核對、目前版 Excel export 共用一個�
 
 2026-09-13 歷史 SQL 已在 [HistoryReader](../../experiments/jd-relational-app/src/jd_relational/storage/history.py)落地：每次短唯讀 REPEATABLE READ，核 snapshot format/profile/document/digest、版次／parent 與唯一 committed producer 一致；不需要 writer authority。索引首次同次讀 head 凍結 anchor，後續以原 anchor／版號續頁，不混入新 head；包含 initial、origin、時間及原 producer 識別。`read_change` 只回原 SavedOperation 與已驗 base/result：failure 無 snapshot pair，no_change 指同一原版；缺項／損壞拒絕，不猜 current。
 
-[純差異](../../experiments/jd-relational-app/src/jd_relational/changes.py)已比較完整 snapshot 的 profile、正文、關係與來源，回 Python 內部 before/after／改動欄／受影響任務。reorder 比較同容器／種類的存活 sibling 相對順序；position 正規化不偽報內容 update，淨差異也不代表真實操作順序。這份內部資料沒有另成 current authority；原觀察已可發配 `change_ref` 識別，但公開 `jd_change_read` schema／provider／HTTP 與差異 records 的 refs／分頁尚待完成，不能把純函式通過視為公開工具已完成。
+[純差異](../../experiments/jd-relational-app/src/jd_relational/changes.py)比較完整 snapshot 的 profile、正文、關係與來源，回內部 before/after／改動欄／受影響任務。reorder 比較存活 sibling 相對順序；position 正規化不偽報內容 update，淨差異不代表真實操作順序。公開 `jd_change_read` 已重用原材料與欄位投影，生成唯讀 refs、完整分頁 records 及兩家工具外殼，並接 HTTP 查詢；[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)已驗原操作、head 前進後仍讀原版、歷史 refs 拒寫及字節完整性。没有另建 current authority 或通用 diff 引擎。
 
-來源的 basis 狀態已由同版材料投影，並驗人工更正後 `needs_recheck`、明示刷新與歷史保留；readability 仍為 `not_checked`，來源 resolver 的跨 scope／不可讀反例使用合成 Source，實際 owner 查回仍待接線。固定 ref/cursor 的簽章與 document/dataset/revision/purpose 核對已落地；宿主 key／dataset 持久化、還原世代、實際 writer／停止 proof、selection issuer、人工 notice 基準與 HTTP／Web 仍各自待驗，不新增表或第二份權威。完整結果與限制沿[本輪切片](2026-09-13-jd-read-change-implementation.md)維護。
+來源的 basis 狀態已由同版材料投影，並驗人工更正後 `needs_recheck`、明示刷新與歷史保留；readability 仍為 `not_checked`，來源 resolver 的跨 scope／不可讀反例使用合成 Source，實際 owner 查回仍待接線。固定 ref/cursor 的簽章與 document/dataset/revision/purpose 核對已落地；宿主 key／dataset 持久化、還原世代、實際 writer／停止 proof、selection issuer、人工 notice、寫入 HTTP／Web 仍待驗，不新增表或第二份權威。查詢已驗與完整限制沿[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)維護。
 
 ## 10. Migration 與驗證前提
 

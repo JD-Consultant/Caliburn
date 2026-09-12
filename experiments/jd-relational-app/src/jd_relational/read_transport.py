@@ -16,7 +16,7 @@ DESCRIPTION = (
 )
 ERRORS = {
     "invalid_input": (
-        "讀取參數不符；請依工具說明使用 view、target_ref 與 cursor。",
+        "讀取參數不符；請依該工具說明提供必要參數。",
         "correct_arguments",
     ),
     "invalid_ref": ("引用不適用於此文件或用途；請重新讀取目前 JD。", "reread_current"),

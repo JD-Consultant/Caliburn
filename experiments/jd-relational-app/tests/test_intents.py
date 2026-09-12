@@ -1,7 +1,7 @@
 """Offline immutable intent checks; no admission, ref issuer or database evidence."""
 
 from copy import deepcopy
-from dataclasses import FrozenInstanceError, replace
+from dataclasses import FrozenInstanceError, asdict, replace
 import traceback
 from uuid import UUID, uuid4
 
@@ -239,6 +239,7 @@ def all_tool_commands():
 @pytest.mark.parametrize("value", all_tool_commands(), ids=lambda value: value["tool"])
 def test_all_eight_generated_tools_resolve_nested_issued_aliases(context, value):
     original = bind(context, value)
+    assert original.identity.command_kind == value["tool"]
     aliases = {token: "reissued-" + token for token in context.refs}
     aliases["selection"] = "reissued-selection"
     def reissue(item):
@@ -286,3 +287,26 @@ def test_copied_context_values_are_not_original_objects(context):
     assert bound.context.refs["field"] == original_ref and bound.context.refs["field"] is not original_ref
     assert bound.context.sources["qa-original"] == original_source and bound.context.sources["qa-original"] is not original_source
     assert bound.context.selections["selection"] == original_selection and bound.context.selections["selection"] is not original_selection
+
+
+def test_recovery_identity_is_fixed_metadata_without_command_or_context(context, monkeypatch):
+    import jd_relational.intents as intents
+    bound = bind(context, origin="ai", ai_run_id="run-a")
+    identity = bound.identity
+    assert isinstance(identity, intents.AdmittedIdentity)
+    assert identity is bound.identity
+    assert asdict(identity) == {
+        "document_id": "doc", "operation_id": OPERATION, "base_revision_id": BASE,
+        "origin": "ai", "ai_run_id": "run-a", "request_digest": bound.request_digest,
+        "command_kind": "jd_set_text",
+    }
+    assert not hasattr(identity, "command") and not hasattr(identity, "context")
+    def forbidden(*args, **kwargs):
+        pytest.fail("Restoring admitted metadata must not resolve refs, sources or recompute a command digest.")
+    monkeypatch.setattr(intents, "_semantic_command", forbidden)
+    monkeypatch.setattr(intents, "_freeze_context", forbidden)
+    monkeypatch.setattr(intents.hashlib, "sha256", forbidden)
+    restored = intents.AdmittedIdentity(**asdict(identity))
+    assert restored == identity
+    with pytest.raises(FrozenInstanceError):
+        restored.origin = "manual"

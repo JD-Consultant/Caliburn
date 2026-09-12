@@ -16,7 +16,7 @@ from uuid import UUID
 
 from .domain import COLLECTIONS, CONDITION_KINDS, FIELDS, CommandContext, Ref, Source
 from .selection import Selection, replace_utf16
-from .transport import TransportError, manual_command
+from .transport import MODELS, TransportError, manual_command
 
 
 _REF_ROLES = {
@@ -37,6 +37,38 @@ class IntentValidationError(ValueError):
 
 
 @dataclass(frozen=True, slots=True)
+class AdmittedIdentity:
+    """Candidate-free metadata copied from a durably admitted operation.
+
+    Validation proves shape only, never admission or writer death. The runtime
+    must retain these original values; reconstructing this object performs no
+    ref/source reads, command preparation, or request-digest recalculation.
+    """
+
+    document_id: str
+    operation_id: UUID
+    base_revision_id: UUID
+    origin: Literal["manual", "ai"]
+    ai_run_id: str | None
+    request_digest: str
+    command_kind: str
+
+    def __post_init__(self):
+        self.validate()
+
+    def validate(self) -> None:
+        """Check every persisted field, including after a runtime reload."""
+        _require(_persisted_identifier(self.document_id))
+        _require(isinstance(self.operation_id, UUID) and isinstance(self.base_revision_id, UUID))
+        _require(isinstance(self.origin, str) and self.origin in {"manual", "ai"})
+        _require((self.origin == "ai") == (self.ai_run_id is not None))
+        _require(self.ai_run_id is None or _persisted_identifier(self.ai_run_id))
+        _require(isinstance(self.request_digest, str) and len(self.request_digest) == 64
+                 and all(character in "0123456789abcdef" for character in self.request_digest))
+        _require(isinstance(self.command_kind, str) and self.command_kind in MODELS)
+
+
+@dataclass(frozen=True, slots=True)
 class BoundEdit:
     document_id: str
     operation_id: UUID
@@ -46,6 +78,19 @@ class BoundEdit:
     request_digest: str
     _command_json: str = field(repr=False)
     context: CommandContext = field(repr=False)
+    _admitted_identity: AdmittedIdentity = field(init=False, repr=False)
+
+    def __post_init__(self):
+        try:
+            identity = AdmittedIdentity(self.document_id, self.operation_id, self.base_revision_id,
+                self.origin, self.ai_run_id, self.request_digest, self.command["tool"])
+        except (ValueError, TypeError, AttributeError, KeyError):
+            raise IntentValidationError() from None
+        object.__setattr__(self, "_admitted_identity", identity)
+
+    @property
+    def identity(self) -> AdmittedIdentity:
+        return self._admitted_identity
 
     @property
     def command(self) -> dict:
@@ -60,6 +105,16 @@ def _require(condition: bool) -> None:
 
 def _identity(value: object) -> bool:
     return isinstance(value, str) and bool(value.strip())
+
+
+def _persisted_identifier(value: object) -> bool:
+    if not _identity(value) or "\x00" in value:
+        return False
+    try:
+        value.encode("utf-8")
+    except UnicodeError:
+        return False
+    return True
 
 
 def _freeze_context(context: CommandContext) -> CommandContext:

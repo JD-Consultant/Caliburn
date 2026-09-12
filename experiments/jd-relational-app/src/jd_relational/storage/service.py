@@ -20,7 +20,7 @@ from sqlalchemy.exc import IntegrityError
 
 from jd_relational.application import prepare_edit
 from jd_relational.domain import DomainError
-from jd_relational.intents import BoundEdit
+from jd_relational.intents import AdmittedIdentity, BoundEdit, IntentValidationError
 from jd_relational.snapshots import empty_domain, snapshot_from_domain, domain_from_snapshot, snapshot_digest
 from . import schema as db
 from .receipts import SavedOperation, WriteObservation, body_for
@@ -42,7 +42,7 @@ class WriterAuthority(Protocol):
     def require_bound(self, intent: BoundEdit) -> None:
         """Local nonblocking ownership check; raise if this admitted writer is invalid."""
 
-    def require_stopped(self, intent: BoundEdit) -> None:
+    def require_stopped(self, identity: AdmittedIdentity) -> None:
         """Require authoritative proof the original writer cannot submit more SQL."""
 
 
@@ -78,42 +78,19 @@ def _catalog_digest(title):
     return title, hashlib.sha256(encoded).hexdigest()
 
 
-class JdStorage:
-    def __init__(self, engine: sa.Engine, authority: WriterAuthority):
+class JdReader:
+    """Current-document SQL reader; no writer authority or mutation methods."""
+
+    def __init__(self, engine: sa.Engine):
         if engine.dialect.name != "postgresql" or engine.dialect.driver != "psycopg":
             raise ValueError("PostgreSQL with Psycopg is required for this tested adapter.")
         self.engine = engine
-        self.authority = authority
 
-    def _connection(self, *, readonly=False):
+    def _connection(self, *, readonly=True):
         # Configure before the first SQL/autobegin. Separate readers from writers.
         return self.engine.connect().execution_options(
             isolation_level="REPEATABLE READ" if readonly else "READ COMMITTED",
             postgresql_readonly=readonly)
-
-    @staticmethod
-    def _operation(conn, document_id, operation_id):
-        row = conn.execute(sa.select(db.jd_operation).where(db.jd_operation.c.document_id == document_id,
-            db.jd_operation.c.operation_id == operation_id)).mappings().one_or_none()
-        return SavedOperation.from_row(row) if row else None
-
-    @staticmethod
-    def _check_original(receipt, intent):
-        if receipt.request_digest != intent.request_digest:
-            raise StorageError("operation_conflict")
-        return WriteObservation(intent.document_id, intent.operation_id, receipt)
-
-    @staticmethod
-    def _lock_head(conn, document_id):
-        document = conn.execute(sa.select(db.jd_document).where(db.jd_document.c.id == document_id)
-                                .with_for_update()).mappings().one_or_none()
-        if document is None:
-            raise StorageError("document_missing")
-        head = conn.execute(sa.select(db.jd_head).where(db.jd_head.c.document_id == document_id)
-                            .with_for_update()).mappings().one_or_none()
-        if head is None:
-            raise StorageError("head_missing")
-        return document, head
 
     @staticmethod
     def _verified_current(conn, document, head):
@@ -142,6 +119,45 @@ class JdStorage:
             raise
         except Exception:
             raise StorageError("read_failed") from None
+
+
+class JdStorage(JdReader):
+    def __init__(self, engine: sa.Engine, authority: WriterAuthority):
+        if not all(callable(getattr(authority, name, None))
+                   for name in ("require_bound", "require_stopped")):
+            raise ValueError("WriterAuthority is required for this write adapter.")
+        super().__init__(engine)
+        self.authority = authority
+
+    def _connection(self, *, readonly=False):
+        return super()._connection(readonly=readonly)
+
+    @staticmethod
+    def _operation(conn, document_id, operation_id):
+        row = conn.execute(sa.select(db.jd_operation).where(db.jd_operation.c.document_id == document_id,
+            db.jd_operation.c.operation_id == operation_id)).mappings().one_or_none()
+        return SavedOperation.from_row(row) if row else None
+
+    @staticmethod
+    def _check_original(receipt, identity):
+        if (receipt.document_id != identity.document_id or receipt.operation_id != identity.operation_id
+                or receipt.request_digest != identity.request_digest or receipt.origin != identity.origin
+                or receipt.ai_run_id != identity.ai_run_id or receipt.body.command_kind != identity.command_kind
+                or (receipt.base_revision_id is not None and receipt.base_revision_id != identity.base_revision_id)):
+            raise StorageError("operation_conflict")
+        return WriteObservation(identity.document_id, identity.operation_id, receipt)
+
+    @staticmethod
+    def _lock_head(conn, document_id):
+        document = conn.execute(sa.select(db.jd_document).where(db.jd_document.c.id == document_id)
+                                .with_for_update()).mappings().one_or_none()
+        if document is None:
+            raise StorageError("document_missing")
+        head = conn.execute(sa.select(db.jd_head).where(db.jd_head.c.document_id == document_id)
+                            .with_for_update()).mappings().one_or_none()
+        if head is None:
+            raise StorageError("head_missing")
+        return document, head
 
     def create_document(self, request_key: UUID, title: str) -> str:
         """Commit a fresh empty JD once; a lost response is looked up by this key."""
@@ -208,14 +224,14 @@ class JdStorage:
             db.jd_revision.c.revision_id == intent.base_revision_id)).scalar_one_or_none()
 
     @staticmethod
-    def _insert_receipt(conn, intent, base, result, status):
-        body = body_for(intent.command["tool"], status)
-        conn.execute(db.jd_operation.insert().values(document_id=intent.document_id,
-            operation_id=intent.operation_id, request_digest=intent.request_digest,
-            origin=intent.origin, ai_run_id=intent.ai_run_id,
+    def _insert_receipt(conn, identity: AdmittedIdentity, base, result, status):
+        body = body_for(identity.command_kind, status)
+        conn.execute(db.jd_operation.insert().values(document_id=identity.document_id,
+            operation_id=identity.operation_id, request_digest=identity.request_digest,
+            origin=identity.origin, ai_run_id=identity.ai_run_id,
             base_revision_id=base, result_revision_id=result, status=status,
             receipt=body.model_dump(mode="json"), created_at=_now()))
-        return JdStorage._operation(conn, intent.document_id, intent.operation_id)
+        return JdStorage._operation(conn, identity.document_id, identity.operation_id)
 
     def _edit_locked(self, conn, intent, document, head):
         base = self._base_if_known(conn, intent)
@@ -224,9 +240,9 @@ class JdStorage:
             if document["archived"]:
                 raise StorageError("writer_not_valid")
         except Exception:
-            return self._insert_receipt(conn, intent, base, None, "save_failed")
+            return self._insert_receipt(conn, intent.identity, base, None, "save_failed")
         if head["current_revision_id"] != intent.base_revision_id:
-            return self._insert_receipt(conn, intent, base, None, "stale_view")
+            return self._insert_receipt(conn, intent.identity, base, None, "stale_view")
         current = self._verified_current(conn, document, head)
         savepoint = conn.begin_nested()
         try:
@@ -240,41 +256,48 @@ class JdStorage:
             digest = snapshot_digest(actual)
             if digest == snapshot_digest(current.snapshot):
                 savepoint.rollback()
-                return self._insert_receipt(conn, intent, base, base, "no_change")
+                return self._insert_receipt(conn, intent.identity, base, base, "no_change")
             result = uuid4()
             conn.execute(db.jd_revision.insert().values(document_id=intent.document_id, revision_id=result,
                 revision_number=head["revision_number"] + 1, parent_revision_id=base,
                 origin=intent.origin, format_version=3, engine_profile="jd-relational-v1",
                 snapshot=actual, content_digest=digest, created_at=_now()))
-            receipt = self._insert_receipt(conn, intent, base, result, "committed")
+            receipt = self._insert_receipt(conn, intent.identity, base, result, "committed")
             conn.execute(db.jd_head.update().where(db.jd_head.c.document_id == intent.document_id).values(
                 current_revision_id=result, revision_number=head["revision_number"] + 1, updated_at=_now()))
             savepoint.commit()
             return receipt
         except DomainError as error:
             savepoint.rollback()
-            return self._insert_receipt(conn, intent, base, None, error.code)
+            return self._insert_receipt(conn, intent.identity, base, None, error.code)
         except IntegrityError as error:
             # Only this explicitly mapped dependency is a known user-facing constraint.
             if (getattr(error.orig, "sqlstate", None) == "23001"
                     and getattr(getattr(error.orig, "diag", None), "constraint_name", None) == "fk_jd_task_capability_capability"):
                 savepoint.rollback()
-                return self._insert_receipt(conn, intent, base, None, "dependent_items")
+                return self._insert_receipt(conn, intent.identity, base, None, "dependent_items")
             raise
 
     def execute(self, intent: BoundEdit) -> WriteObservation:
         """One admitted command, never an automatic retry or admission mechanism."""
         return self._transaction(intent, recovering=False)
 
-    def reconcile_stopped(self, intent: BoundEdit) -> WriteObservation:
+    def reconcile_stopped(self, identity: AdmittedIdentity) -> WriteObservation:
         """Failure-only closure, requiring caller-owned stopped-writer proof first."""
         try:
-            self.authority.require_stopped(intent)
+            if type(identity) is not AdmittedIdentity:
+                raise IntentValidationError()
+            identity.validate()
+        except (IntentValidationError, TypeError, ValueError, AttributeError):
+            raise StorageError("invalid_input") from None
+        try:
+            self.authority.require_stopped(identity)
         except Exception:
             raise StorageError("writer_not_stopped") from None
-        return self._transaction(intent, recovering=True)
+        return self._transaction(identity, recovering=True)
 
     def _transaction(self, intent, *, recovering):
+        identity = intent if recovering else intent.identity
         started = perf_counter()
         phase = "connecting"
         conn = tx = None
@@ -288,7 +311,7 @@ class JdStorage:
             phase = "working"
             receipt = self._operation(conn, intent.document_id, intent.operation_id)
             if receipt:
-                observed = self._check_original(receipt, intent)
+                observed = self._check_original(receipt, identity)
                 return observed
             if not recovering:
                 self.authority.require_bound(intent)
@@ -297,12 +320,12 @@ class JdStorage:
             # A fresh READ COMMITTED statement after waiting for the same row locks.
             receipt = self._operation(conn, intent.document_id, intent.operation_id)
             if receipt:
-                observed = self._check_original(receipt, intent)
+                observed = self._check_original(receipt, identity)
                 return observed
             absence_proven = True  # No terminal after this operation's document/head barrier.
             if recovering:
-                self.authority.require_stopped(intent)
-                receipt = self._insert_receipt(conn, intent, self._base_if_known(conn, intent), None, "save_failed")
+                self.authority.require_stopped(identity)
+                receipt = self._insert_receipt(conn, identity, self._base_if_known(conn, identity), None, "save_failed")
             else:
                 receipt = self._edit_locked(conn, intent, document, head)
             unchanged_candidate = receipt.status != "committed"

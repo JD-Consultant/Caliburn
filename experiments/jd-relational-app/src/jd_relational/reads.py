@@ -53,6 +53,16 @@ def read_json(value):
     return json.dumps(value, ensure_ascii=False, separators=(",", ":"), allow_nan=False)
 
 
+def pack_read_records(records, page_at, page_bytes):
+    """Pack full records using the actual inner result encoding, including refs."""
+    count = 0
+    for end in range(1, len(records) + 1):
+        if len(read_json(page_at(end)).encode("utf-8")) > page_bytes:
+            break
+        count = end
+    return page_at(1, True) if records and count == 0 else page_at(count)
+
+
 def _section(kind, row=None, field=None):
     if kind == "profile":
         return "purpose" if field == "purpose" else "profile"
@@ -94,6 +104,9 @@ class _Projection:
         self.value = value
         self.codec = codec
         self.purpose = purpose
+        # Projection-local only: no request, document or signer key is retained
+        # beyond this already-materialized read.
+        self._tokens = {}
 
     def token(self, role, kind, entity_id=None, field=None, child_kind=None):
         digest = None
@@ -104,7 +117,10 @@ class _Projection:
                 else self.value[COLLECTIONS[kind]][entity_id]
             )
             digest = field_value_digest(row[field])
-        return self.codec.issue(
+        key = (role, kind, entity_id, field, child_kind, digest)
+        if key in self._tokens:
+            return self._tokens[key]
+        token = self.codec.issue(
             SignedReference(
                 document_id=self.value["document_id"],
                 revision_id=self.value["revision"],
@@ -117,6 +133,8 @@ class _Projection:
                 value_digest=digest,
             )
         )
+        self._tokens[key] = token
+        return token
 
     def _included(self, target):
         value = self.value
@@ -325,6 +343,11 @@ class _Projection:
         return result
 
 
+def content_projection(value, codec, purpose):
+    """Share the fixed JD record/field projection with original change reads."""
+    return _Projection(value, codec, purpose)
+
+
 class ReadService:
     def __init__(self, current_reader, history_reader, codec: ReferenceCodec, *, page_bytes=32768):
         if type(page_bytes) is not int or not 4096 <= page_bytes <= 1024 * 1024:
@@ -390,15 +413,7 @@ class ReadService:
                 oversized_unit=oversized,
             )
 
-        count = 0
-        for end in range(1, len(records) + 1):
-            if len(read_json(page_at(end)).encode("utf-8")) > self.page_bytes:
-                break
-            count = end
-        if records and count == 0:
-            result = page_at(1, True)
-        else:
-            result = page_at(count)
+        result = pack_read_records(records, page_at, self.page_bytes)
         return ReadPage.model_validate(result, strict=True).model_dump(mode="json")
 
     def _index(self, document, cursor):

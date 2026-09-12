@@ -6,6 +6,7 @@ The production runtime must still supply independently verified lifecycle proof.
 
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
+from dataclasses import asdict, replace
 import logging
 import json
 import os
@@ -21,7 +22,7 @@ from sqlalchemy.exc import OperationalError
 
 from test_storage_postgres import engine
 from jd_relational.domain import CommandContext, Ref, Source
-from jd_relational.intents import bind_edit
+from jd_relational.intents import AdmittedIdentity, BoundEdit, bind_edit
 from jd_relational.selection import Selection
 from jd_relational.snapshots import snapshot_from_domain
 from jd_relational.storage import schema as db
@@ -41,11 +42,13 @@ class FakeAuthority:
         self.bound[intent.operation_id] = intent.request_digest
 
     def require_bound(self, intent):
+        assert isinstance(intent, BoundEdit)
         if self.bound.get(intent.operation_id) != intent.request_digest:
             raise ValueError("not_bound")
 
-    def require_stopped(self, intent):
-        if intent.operation_id not in self.stopped:
+    def require_stopped(self, identity):
+        assert isinstance(identity, AdmittedIdentity)
+        if identity.operation_id not in self.stopped:
             raise ValueError("writer_may_run")
 
 
@@ -200,9 +203,9 @@ def test_partial_sql_failure_rolls_back_and_requires_failure_only_reconciliation
     assert store.get_operation(current.document_id, intent.operation_id) is None
     assert store.read_current(current.document_id).snapshot == current.snapshot
     with pytest.raises(StorageError, match="writer_not_stopped"):
-        store.reconcile_stopped(intent)
+        store.reconcile_stopped(intent.identity)
     store.authority.stopped.add(intent.operation_id)  # synthetic runtime proof; not an OS death test
-    closed = store.reconcile_stopped(intent)
+    closed = store.reconcile_stopped(intent.identity)
     assert closed.confirmed and closed.status == "save_failed"
     assert store.execute(intent).receipt == closed.receipt  # failure-only closure must not replay edit
     assert store.read_current(current.document_id).revision_id == current.revision_id
@@ -227,7 +230,7 @@ def test_lost_commit_reply_reads_original_success_without_duplicate_task(store, 
     saved = store.get_operation(current.document_id, intent.operation_id)
     assert saved.status == "committed"
     store.authority.stopped.add(intent.operation_id)
-    assert store.reconcile_stopped(intent).receipt == saved
+    assert store.reconcile_stopped(AdmittedIdentity(**asdict(intent.identity))).receipt == saved
     state = store.read_current(current.document_id)
     assert len(state.domain["tasks"]) == 1 and state.revision_number == 2
 
@@ -282,14 +285,12 @@ def test_new_process_reads_saved_content_and_operation_without_writer_permission
 import json, sys
 from uuid import UUID
 import sqlalchemy as sa
-from jd_relational.storage.service import JdStorage
-class NoWriter:
-    def require_bound(self, intent): raise RuntimeError('not a writer')
-    def require_stopped(self, intent): raise RuntimeError('no death proof')
+from jd_relational.storage.service import JdReader
+from jd_relational.storage.history import HistoryReader
 engine = sa.create_engine('postgresql+psycopg://jd_test:jd-local-test-only@127.0.0.1:55436/caliburn_jd_relational_test', hide_parameters=True)
-store = JdStorage(engine, NoWriter())
+store = JdReader(engine)
 current = store.read_current(sys.argv[1])
-receipt = store.get_operation(sys.argv[1], UUID(sys.argv[2]))
+receipt = HistoryReader(engine).read_change(sys.argv[1], UUID(sys.argv[2])).receipt
 print(json.dumps({'revision':str(current.revision_id), 'task_count':len(current.domain['tasks']), 'status':receipt.status}))
 engine.dispose()
 """
@@ -380,3 +381,122 @@ def test_read_snapshot_stays_consistent_when_another_writer_commits(store, curre
         writer_finished.set()
         sa.event.remove(engine, "after_cursor_execute", interleave)
     assert len(store.read_current(current.document_id).domain["tasks"]) == 1
+
+
+def test_failure_only_recovery_needs_no_command_refs_sources_or_candidate(store, current, monkeypatch):
+    import jd_relational.intents as intents
+    import jd_relational.storage.service as service
+    intent = intent_for(store, current, "jd_create_task", task_args(), origin="ai", ai_run_id="synthetic-run")
+    identity = intents.AdmittedIdentity(**asdict(intent.identity))
+    store.authority.stopped.add(identity.operation_id)  # Synthetic proof only.
+    def forbidden(*args, **kwargs):
+        pytest.fail("Failure-only closure must not read or rebuild an edit candidate.")
+    monkeypatch.setattr(service, "prepare_edit", forbidden)
+    monkeypatch.setattr(service, "read_domain", forbidden)
+    monkeypatch.setattr(intents, "_semantic_command", forbidden)
+    monkeypatch.setattr(intents, "_freeze_context", forbidden)
+    monkeypatch.setattr(service.JdStorage, "_edit_locked", forbidden)
+    result = store.reconcile_stopped(identity)
+    assert result.confirmed and result.status == "save_failed"
+    assert result.receipt.body.command_kind == "jd_create_task"
+    assert result.receipt.request_digest == identity.request_digest
+    assert result.receipt.ai_run_id == "synthetic-run"
+    assert store.reconcile_stopped(identity).receipt == result.receipt
+    assert store.execute(intent).receipt == result.receipt
+
+
+def test_reader_needs_no_authority_and_has_no_write_operations(engine, current):
+    from jd_relational.storage.service import JdReader
+    reader = JdReader(engine)
+    assert reader.read_current(current.document_id) == current
+    for name in ("authority", "execute", "create_document", "reconcile_stopped"):
+        assert not hasattr(reader, name)
+    with reader._connection() as conn, conn.begin():
+        assert conn.execute(sa.text("SHOW transaction_read_only")).scalar_one() == "on"
+        assert conn.execute(sa.text("SHOW transaction_isolation")).scalar_one() == "repeatable read"
+    with pytest.raises(ValueError, match="WriterAuthority is required"):
+        JdStorage(engine, None)
+
+
+@pytest.mark.parametrize("change", ["digest", "base", "origin", "run", "command_kind"])
+def test_recovery_identity_must_match_original_receipt_without_rewriting_it(store, current, change):
+    intent = intent_for(store, current, "jd_create_task", task_args(), origin="ai", ai_run_id="original-run")
+    saved = store.execute(intent)
+    assert saved.status == "committed"
+    changes = {
+        "digest": {"request_digest": "a" * 64}, "base": {"base_revision_id": uuid4()},
+        "origin": {"origin": "manual", "ai_run_id": None}, "run": {"ai_run_id": "different-run"},
+        "command_kind": {"command_kind": "jd_set_text"},
+    }
+    wrong = replace(intent.identity, **changes[change])
+    store.authority.stopped.add(intent.operation_id)
+    with pytest.raises(StorageError, match="operation_conflict"):
+        store.reconcile_stopped(wrong)
+    assert store.get_operation(current.document_id, intent.operation_id) == saved.receipt
+    assert store.reconcile_stopped(intent.identity).receipt == saved.receipt
+    current_after = store.read_current(current.document_id)
+    assert len(current_after.domain["tasks"]) == 1 and current_after.revision_number == 2
+
+
+def test_unknown_base_failure_remains_readable_by_original_identity(store, current):
+    unknown_base = uuid4()
+    context = CommandContext(current.document_id, str(unknown_base),
+        {"field": Ref(current.document_id, str(unknown_base), "profile", field="purpose")}, {}, lambda: str(uuid4()))
+    intent = bind_edit(uuid4(), "manual", None,
+        {"tool": "jd_set_text", "arguments": {"target_field_ref": "field", "text": "晚到", "basis_refs": []}}, context)
+    store.authority.admit(intent)
+    saved = store.execute(intent)
+    assert saved.status == "stale_view" and saved.receipt.base_revision_id is None
+    store.authority.stopped.add(intent.operation_id)
+    assert store.reconcile_stopped(intent.identity).receipt == saved.receipt
+    assert store.read_current(current.document_id) == current
+
+
+@pytest.mark.parametrize("committed", [False, True], ids=["failure-only", "original-success"])
+def test_new_process_recovers_from_identity_without_any_edit_material(store, current, committed):
+    intent = intent_for(store, current, "jd_create_task", task_args(), origin="ai", ai_run_id="synthetic-restart-run")
+    original = store.execute(intent).receipt if committed else None
+    payload = asdict(intent.identity)
+    payload["operation_id"] = str(payload["operation_id"])
+    payload["base_revision_id"] = str(payload["base_revision_id"])
+    code = """
+import json, sys
+from uuid import UUID
+import sqlalchemy as sa
+import jd_relational.intents as intents
+import jd_relational.storage.service as service
+def forbidden(*args, **kwargs):
+    raise AssertionError('No candidate, refs or source reconstruction is allowed.')
+class SyntheticStoppedOwner:
+    # This isolates cross-process metadata recovery, not actual OS death proof.
+    def require_bound(self, intent): forbidden()
+    def require_stopped(self, identity):
+        assert type(identity) is intents.AdmittedIdentity
+payload = json.loads(sys.argv[1])
+payload['operation_id'] = UUID(payload['operation_id'])
+payload['base_revision_id'] = UUID(payload['base_revision_id'])
+intents._freeze_context = forbidden
+intents._semantic_command = forbidden
+service.prepare_edit = forbidden
+service.read_domain = forbidden
+identity = intents.AdmittedIdentity(**payload)
+engine = sa.create_engine('postgresql+psycopg://jd_test:jd-local-test-only@127.0.0.1:55436/caliburn_jd_relational_test', hide_parameters=True)
+result = service.JdStorage(engine, SyntheticStoppedOwner()).reconcile_stopped(identity)
+assert result.confirmed
+print(json.dumps({'operation':str(result.operation_id), 'status':result.status,
+    'digest':result.receipt.request_digest, 'command_kind':result.receipt.body.command_kind}))
+engine.dispose()
+"""
+    env = {**os.environ, "PYTHONUTF8": "1", "PYTHONPATH": str(Path(__file__).resolve().parents[1] / "src")}
+    process = subprocess.run([sys.executable, "-c", code, json.dumps(payload)],
+                             env=env, capture_output=True, text=True, timeout=15)
+    assert process.returncode == 0, process.stderr
+    assert json.loads(process.stdout) == {"operation": str(intent.operation_id),
+        "status": "committed" if committed else "save_failed",
+        "digest": intent.request_digest, "command_kind": "jd_create_task"}
+    saved = store.get_operation(current.document_id, intent.operation_id)
+    if original is not None:
+        assert saved == original
+    after = store.read_current(current.document_id)
+    assert len(after.domain["tasks"]) == int(committed)
+    assert after.revision_number == current.revision_number + int(committed)

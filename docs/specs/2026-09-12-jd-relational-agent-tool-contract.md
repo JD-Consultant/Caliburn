@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C02、C03
-- 階段：G4 WORKING；語意契約與隔離實作並行。[共同保存切片](2026-09-13-jd-transaction-service-slice.md)已驗八操作、永久 snapshot／receipt 與真 PG service；2026-09-13 [讀取與差異切片](2026-09-13-jd-read-change-implementation.md)已接同版 current/history、固定 typed refs、generated `jd_read`／兩家離線 adapter、純差異及原回執投影。公開 `jd_change_read` schema／provider／HTTP、實際 writer／停止 proof、source owner／選區發配、人工 notice 基準與完整 App 仍待完成；不是整體 G4 或 production 採用。
+- 階段：G4 WORKING；八操作、真 PG 共同保存與同版讀取已隔離驗證。2026-09-13 [查詢 API／恢復身分切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)再完成公開 `jd_change_read` schema／兩家 SDK 離線 adapter、兩個 HTTP 查詢、唯讀 JdReader 及原身分恢復。實際 writer／持久 runtime、source owner／選區發配、人工 notice、寫入 HTTP 與完整 App 仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[整體設計](2026-09-12-jd-relational-editor-design.md)
 - 保存契約：[資料庫與保存](2026-09-12-jd-relational-schema-and-write-contract.md)
 
@@ -44,7 +44,7 @@ current read 的 refs 綁定該 revision。正文、head、關係、來源目標
 
 2026-09-13 局部實作：[讀取 SSOT](../../experiments/jd-relational-app/contracts/jd-read.schema.json)已生成 Python／TS 的 `ReadInput`、`ReadPage`、`ReadFailure`，由[讀取投影](../../experiments/jd-relational-app/src/jd_relational/reads.py)及[兩家 adapter](../../experiments/jd-relational-app/src/jd_relational/read_transport.py)共用。`current` 的 target 必須 null；`item`／`section` 使用同類 issued ref；`history` 的 null target 列出固定上界歷史，revision ref 讀指定舊稿。歷史 item／section 可續讀原版，回 `access=history`；即使該版等於 head，其 refs 仍不可寫。
 
-`ReadPage` 固定版本 1，交付 `view`、`access`、`revision_ref`、typed records、`start_index`、`total_records`、`has_more`、`next_cursor`、`oversized_unit`。records 包含章節、容器、項目、完整欄位、任務 K/S 關係、來源，歷史索引另含版次／origin／時間／原 producer 的 operation/change refs。頁面按 UTF-8 bytes 有界分段，過大的單一允許欄位用明示單項頁完整交付，不截斷正文。沿原 view／target 與 cursor 續讀，讀完頁不等於專業內容已完整。source 的 `basis_status` 可由本版材料判斷，`readability` 目前回 `not_checked`；source owner 的真正查回另待接線。真 PG 接合與 SDK 離線序列化證據分列於[本輪結果](2026-09-13-jd-read-change-implementation.md)，不代表 HTTP／顧問或自然模型已接通。
+`ReadPage` 固定版本 1，交付 `view`、`access`、`revision_ref`、typed records、`start_index`、`total_records`、`has_more`、`next_cursor`、`oversized_unit`。records 包含章節、容器、項目、完整欄位、任務 K/S 關係、來源，歷史索引另含版次／origin／時間／原 producer 的 operation/change refs。頁面按 UTF-8 bytes 有界分段，過大的單一允許欄位用明示單項頁完整交付，不截斷正文。沿原 view／target 與 cursor 續讀，讀完頁不等於專業內容已完整。source 的 `basis_status` 可由本版材料判斷，`readability` 目前回 `not_checked`；source owner 的真正查回另待接線。真 PG 接合與 SDK 離線序列化證據分列於[本輪結果](2026-09-13-jd-read-change-implementation.md)，後續 HTTP 查詢已由[接合切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)驗證；顧問／自然模型仍未接通。
 
 ### 3.2 `jd_set_text`
 
@@ -143,7 +143,7 @@ unlink 的 basis_refs 必須為空；不能對已移除的關係新增 current s
 
 App 回確切 before/after revision refs、origin、create/update/delete/move/reorder/link/unlink、field before/after、受影響 item refs、source link 變動及分頁狀態。工具不依 AI 先前摘要重建差異。
 
-2026-09-13 實作界線：上述是公開工具的待完成契約，**尚無 `jd_change_read` generated schema、provider adapter 或 HTTP endpoint**。已落地的是 [HistoryReader](../../experiments/jd-relational-app/src/jd_relational/storage/history.py) 的原 receipt／base／result 材料，以及 [compare_snapshots](../../experiments/jd-relational-app/src/jd_relational/changes.py) 的 Python 內部純差異；不將內部 row／UUID 直接當模型輸出。新增／刪除保留完整 row，更新保留完整 before/after 與改動欄；move 可同時有文字 update，K/S 更新列出兩版受影響任務並集。reorder 比較存活 sibling 的相對順序，不把插入／刪除引起的 position 正規化冒稱更新，也不冒稱還原真實操作順序。`change_ref` 識別已可由原觀察發配；公開差異 records 的只讀 refs／分頁仍須接合驗證，既定完整差異需求不縮減。
+2026-09-13 實作：`ChangeReadInput`／`ChangeReadPage` 已由 read SSOT 生成，[ChangeReadService](../../experiments/jd-relational-app/src/jd_relational/change_reads.py)重用原 `HistoryReader` 的 receipt／base／result 與固定 `compare_snapshots`；兩家 adapter／HTTP 查詢／真 PG 及新程序依[切片結果](2026-09-13-jd-query-api-and-recovery-identity-slice.md)通過。結果含原 operation/change/base/result refs、origin、records/counts/cursor。每個 `change_index` 對應一個淨變更，header、前後完整值、來源 basis/position、排序鄰項及受影響任務可跨頁；每個允許欄位不截斷。所有內容 refs 都是唯讀歷史，cursor 綁原 operation/result，不改用目前 head。reorder 比较存活 sibling 的相對順序，鄰項只表示當版順序，不宣稱還原真實拖動動作；插入／刪除引起的 position 正規化不另冒稱使用者修改。實際來源回查仍未接線。
 
 ### 3.8 `jd_create_task`
 
@@ -284,7 +284,7 @@ App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operatio
 
 Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案將它固定成 machine-readable status＋員工可讀 message＋有限 next action，不讓模型從自由文字猜是否重試。[Anthropic Handle tool calls](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)
 
-2026-09-13 精確化：[結果 SSOT](../../experiments/jd-relational-app/contracts/jd-result.schema.json)固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result，公開入口依 §3.7 完成，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意；[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已由真實 `WriteObservation` 發配原 operation／result／change refs 並驗 shared result，未確認仍先 reconcile。此投影不查新 head、不重播、不改 receipt，投影失敗也不改稱保存失敗；HTTP host 與正式顧問接線仍待完成。永久／對外邊界仍沿[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md)。
+2026-09-13 精確化：[結果 SSOT](../../experiments/jd-relational-app/contracts/jd-result.schema.json)固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result，公開入口依 §3.7 完成，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意；[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已由真實 `WriteObservation` 發配原 operation／result／change refs 並驗 shared result，未確認仍先 reconcile。此投影不查新 head、不重播、不改 receipt，投影失敗也不改稱保存失敗；寫入 HTTP host 與正式顧問接線仍待完成。永久／對外邊界仍沿[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md)。
 
 [HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md#http-與模型外殼)在寫入回應使用 200 成功、202 待對帳及具名 4xx／5xx Problem；成功查回觀察使用 200，body 保留原結果。查回服務自身失敗另由 host 回報。`operation_conflict` 不接受衝突意圖、無本次 operation ref，原 receipt 保留。未 binding 的內部保存前錯誤可回 `save_failed/unchanged/unconfirmed` 並停止；已 binding 而未確認則一律 reconcile。這些是本案映射，非兩家供應商指定的 HTTP 或資料表格式。
 
@@ -358,7 +358,7 @@ Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案�
 
 ## 10. 需要 provider schema spike 的一點
 
-八個編輯工具與 `jd_read` 已由 SSOT 生成並完成兩家 SDK 的離線 serialization fixture；精確範圍見頁首切片。`jd_change_read` 尚待生成與驗證；後續擴充仍沿下列檢查，不因已驗九個入口就凍結工具數或宣稱 provider／模型已接受：
+八個編輯工具、`jd_read` 與 `jd_change_read` 已由 SSOT 生成並完成兩家 SDK 的離線 serialization fixture；精確範圍見頁首切片。後續擴充仍沿下列檢查，不因十個入口已驗便凍結工具數或宣稱 provider／模型已接受：
 
 - 所有 properties required，optional 語意用 nullable；`additionalProperties=false`；strict enabled。
 - tool name、description、enum 大小、refs 長度與 output parsing 在兩家 adapter 各驗一次。
@@ -374,4 +374,4 @@ Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案�
 - 2026-09-13 Owner 延後 Excel，先完整 App／業務／LLM；匯出不進 model tools，也不阻本輪契約。之後優先 Excel／原話分開輸出的方向保留。
 - 不增加模型用 archive、rename、history restore、DB query 或 raw JSON edit。JD 工具不重建 Memory 寫入入口；顧問仍可沿既有即時修補與背景整併反覆修訂工作理解。
 - 不讓 AI 每輪自動改 JD；是否撰寫由顧問方法與已理解資訊決定。
-- 新隔離目錄已有編輯／結果／snapshot／read generated schema、固定 refs、同版 current/history、共同保存、純差異及原回執投影，尚未取代正式產品契約。公開 `jd_change_read`、實際 writer／停止 proof、source owner、selection issuer、人工 notice 基準、HTTP／Web／autosave、還原／整輪撤回及採用仍依新版計畫完成，不混寫舊 v2；完整能力與實測界線見[讀取切片](2026-09-13-jd-read-change-implementation.md)。
+- 新隔離目錄已接 generated 輸入／結果／snapshot／read／query Problem、共同保存、原操作完整差異、兩個 HTTP 查詢及原身分恢復；尚未取代正式產品契約。實際 writer／持久 runtime、source owner、selection issuer、人工 notice、寫入 HTTP／Web／autosave、還原／整輪撤回及採用仍沿新版計畫。不混寫舊 v2；完整驗收界線見[查詢接合](2026-09-13-jd-query-api-and-recovery-identity-slice.md)。

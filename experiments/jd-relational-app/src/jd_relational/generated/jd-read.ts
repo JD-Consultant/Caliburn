@@ -11,11 +11,25 @@
  */
 export type ReadRecord =
   SectionRecord | ContainerRecord | ItemRecord | FieldRecord | RelationRecord | SourceRecord | RevisionRecord;
+/**
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeReadRecord".
+ */
+export type ChangeReadRecord =
+  | ChangeHeaderRecord
+  | ChangeValueRecord
+  | ChangeSourceValueRecord
+  | ChangeItemPlacementRecord
+  | ChangeRelationPlacementRecord
+  | ChangeSourcePlacementRecord
+  | ChangeAffectedTaskRecord;
 
 export interface ReadCatalog {
   read: ReadInput;
   page: ReadPage;
   failure: ReadFailure;
+  change_read: ChangeReadInput;
+  change_page: ChangeReadPage;
 }
 /**
  * Read a complete current JD, an issued item or section, or historical revisions. All arguments are required. Use null target for current or the history index; use a returned cursor to continue exactly the same view. History is read-only.
@@ -170,4 +184,157 @@ export interface ReadFailure {
   code: "invalid_input" | "invalid_ref" | "stale_view" | "target_missing" | "read_failed";
   message: string;
   next_action: "correct_arguments" | "reread_current" | "stop";
+}
+/**
+ * Read the immutable before/after change of an issued committed operation. Continue with the same change_ref and returned cursor until has_more is false. This read never provides writable references.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeReadInput".
+ */
+export interface ChangeReadInput {
+  change_ref: string;
+  cursor: string | null;
+}
+/**
+ * Flat original-operation records grouped by change_index. A page may continue within a change; every full field and each affected task is atomic. Follow next_cursor to completion. Page byte budget measures the exact UTF-8 inner tool result; an unavoidable oversized atomic record is emitted alone and flagged. All content references are history-only; this page is not a current document or a write permission.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeReadPage".
+ */
+export interface ChangeReadPage {
+  format_version: number;
+  view: "change";
+  access: "history";
+  change_ref: string;
+  operation_ref: string;
+  base_revision_ref: string;
+  result_revision_ref: string;
+  origin: "manual" | "ai";
+  records: ChangeReadRecord[];
+  start_index: number;
+  total_records: number;
+  total_changes: number;
+  has_more: boolean;
+  next_cursor: string | null;
+  oversized_unit: boolean;
+}
+/**
+ * Header for one stable-identity net change. changed_fields uses public field names, not database identifiers. Reorder is a relative ordering observation, not the original drag action.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeHeaderRecord".
+ */
+export interface ChangeHeaderRecord {
+  type: "change";
+  change_index: number;
+  kind: "create" | "update" | "delete" | "move" | "reorder" | "link" | "unlink";
+  entity_kind:
+    | "profile"
+    | "collaborator"
+    | "duty"
+    | "task"
+    | "detail"
+    | "capability"
+    | "condition"
+    | "task_capability"
+    | "source_link";
+  before_exists: boolean;
+  after_exists: boolean;
+  changed_fields: (
+    | "job_title"
+    | "organization_unit"
+    | "employee_name"
+    | "reports_to"
+    | "purpose"
+    | "name"
+    | "description"
+    | "scope_text"
+    | "text"
+    | "kind"
+    | "container_ref"
+    | "position"
+    | "task_ref"
+    | "capability_ref"
+    | "target_ref"
+    | "related_capability_ref"
+    | "source_ref"
+    | "basis_digest"
+  )[];
+}
+/**
+ * A complete historical record using the same field projection as jd_read. A text field is never split or truncated.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeValueRecord".
+ */
+export interface ChangeValueRecord {
+  type: "value";
+  change_index: number;
+  side: "before" | "after";
+  record: SectionRecord | ContainerRecord | ItemRecord | FieldRecord | RelationRecord;
+}
+/**
+ * Exact stored source basis and order; basis_status is evaluated in this side snapshot, readability is not checked by this operation.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeSourceValueRecord".
+ */
+export interface ChangeSourceValueRecord {
+  type: "source_value";
+  change_index: number;
+  side: "before" | "after";
+  record: SourceRecord;
+  basis_digest: string;
+  position: number;
+}
+/**
+ * Actual neighboring items in this historical side. It does not claim which item the operator dragged.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeItemPlacementRecord".
+ */
+export interface ChangeItemPlacementRecord {
+  type: "item_placement";
+  change_index: number;
+  side: "before" | "after";
+  container_ref: string;
+  previous_item_ref: string | null;
+  next_item_ref: string | null;
+}
+/**
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeRelationPlacementRecord".
+ */
+export interface ChangeRelationPlacementRecord {
+  type: "relation_placement";
+  change_index: number;
+  side: "before" | "after";
+  task_ref: string;
+  previous_capability_ref: string | null;
+  next_capability_ref: string | null;
+}
+/**
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeSourcePlacementRecord".
+ */
+export interface ChangeSourcePlacementRecord {
+  type: "source_placement";
+  change_index: number;
+  side: "before" | "after";
+  target_ref: string;
+  related_capability_ref: string | null;
+  previous_source_ref: string | null;
+  next_source_ref: string | null;
+}
+/**
+ * One affected task, paired across the two historical snapshots when it exists in both. Shared capabilities include the union of tasks from both sides.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "ChangeAffectedTaskRecord".
+ */
+export interface ChangeAffectedTaskRecord {
+  type: "affected_task";
+  change_index: number;
+  before_task_ref: string | null;
+  after_task_ref: string | null;
 }

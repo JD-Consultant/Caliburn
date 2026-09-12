@@ -156,6 +156,139 @@ class ReadFailure(BaseModel):
     next_action: Literal['correct_arguments', 'reread_current', 'stop']
 
 
+class ChangeReadInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    change_ref: constr(min_length=1, max_length=4096, strict=True)
+    cursor: constr(min_length=1, max_length=4096, strict=True) | None
+
+
+class ChangeHeaderRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['change']
+    change_index: conint(ge=0, strict=True)
+    kind: Literal['create', 'update', 'delete', 'move', 'reorder', 'link', 'unlink']
+    entity_kind: Literal['profile', 'collaborator', 'duty', 'task', 'detail', 'capability', 'condition', 'task_capability', 'source_link']
+    before_exists: StrictBool
+    after_exists: StrictBool
+    changed_fields: list[Literal['job_title', 'organization_unit', 'employee_name', 'reports_to', 'purpose', 'name', 'description', 'scope_text', 'text', 'kind', 'container_ref', 'position', 'task_ref', 'capability_ref', 'target_ref', 'related_capability_ref', 'source_ref', 'basis_digest']]
+
+
+class ChangeValueRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['value']
+    change_index: conint(ge=0, strict=True)
+    side: Literal['before', 'after']
+    record: SectionRecord | ContainerRecord | ItemRecord | FieldRecord | RelationRecord
+
+
+class ChangeSourceValueRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['source_value']
+    change_index: conint(ge=0, strict=True)
+    side: Literal['before', 'after']
+    record: SourceRecord
+    basis_digest: constr(pattern=r'^[a-f0-9]{64}$', strict=True)
+    position: conint(ge=0, strict=True)
+
+
+class ChangeItemPlacementRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['item_placement']
+    change_index: conint(ge=0, strict=True)
+    side: Literal['before', 'after']
+    container_ref: constr(min_length=1, max_length=4096, strict=True)
+    previous_item_ref: constr(min_length=1, max_length=4096, strict=True) | None
+    next_item_ref: constr(min_length=1, max_length=4096, strict=True) | None
+
+
+class ChangeRelationPlacementRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['relation_placement']
+    change_index: conint(ge=0, strict=True)
+    side: Literal['before', 'after']
+    task_ref: constr(min_length=1, max_length=4096, strict=True)
+    previous_capability_ref: constr(min_length=1, max_length=4096, strict=True) | None
+    next_capability_ref: constr(min_length=1, max_length=4096, strict=True) | None
+
+
+class ChangeSourcePlacementRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['source_placement']
+    change_index: conint(ge=0, strict=True)
+    side: Literal['before', 'after']
+    target_ref: constr(min_length=1, max_length=4096, strict=True)
+    related_capability_ref: constr(min_length=1, max_length=4096, strict=True) | None
+    previous_source_ref: StrictStr | None
+    next_source_ref: StrictStr | None
+
+
+class ChangeAffectedTaskRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['affected_task']
+    change_index: conint(ge=0, strict=True)
+    before_task_ref: constr(min_length=1, max_length=4096, strict=True) | None
+    after_task_ref: constr(min_length=1, max_length=4096, strict=True) | None
+
+
+class ChangeReadRecord(
+    RootModel[
+        ChangeHeaderRecord
+        | ChangeValueRecord
+        | ChangeSourceValueRecord
+        | ChangeItemPlacementRecord
+        | ChangeRelationPlacementRecord
+        | ChangeSourcePlacementRecord
+        | ChangeAffectedTaskRecord
+    ]
+):
+    root: (
+        ChangeHeaderRecord
+        | ChangeValueRecord
+        | ChangeSourceValueRecord
+        | ChangeItemPlacementRecord
+        | ChangeRelationPlacementRecord
+        | ChangeSourcePlacementRecord
+        | ChangeAffectedTaskRecord
+    ) = Field(..., title='ChangeReadRecord')
+
+
+class ChangeReadPage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    format_version: conint(ge=1, le=1, strict=True)
+    view: Literal['change']
+    access: Literal['history']
+    change_ref: constr(min_length=1, max_length=4096, strict=True)
+    operation_ref: constr(min_length=1, max_length=4096, strict=True)
+    base_revision_ref: constr(min_length=1, max_length=4096, strict=True)
+    result_revision_ref: constr(min_length=1, max_length=4096, strict=True)
+    origin: Literal['manual', 'ai']
+    records: list[ChangeReadRecord]
+    start_index: conint(ge=0, strict=True)
+    total_records: conint(ge=0, strict=True)
+    total_changes: conint(ge=0, strict=True)
+    has_more: StrictBool
+    next_cursor: constr(min_length=1, max_length=4096, strict=True) | None
+    oversized_unit: StrictBool
+
+
 class ReadCatalog(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -163,3 +296,5 @@ class ReadCatalog(BaseModel):
     read: ReadInput
     page: ReadPage
     failure: ReadFailure
+    change_read: ChangeReadInput
+    change_page: ChangeReadPage

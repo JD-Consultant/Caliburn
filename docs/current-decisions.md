@@ -1,4 +1,5 @@
 # Caliburn Current Decision Register
+**JD-R002／完整操作與持續修訂（2026-09-12，受權裁決／G3，局部設計複核完成）：**Owner 授權研究者決定必要範圍呈現，並提醒 LLM 可反覆改 JD 與 Memory。已依完整工作分析／寫作／樣稿研究形成[完整業務操作、範圍與責任](specs/2026-09-12-jd-business-operations-and-scope-design.md)，同步格式、工具及資料庫責任稿。JR-R01／04／05 與首敗 CS-R01／02 已[DESIGN CLOSED](specs/evidence/2026-09-12-jd-business-operations-review.md)，R02／03 保持前次文件閉合；均非產品實測。下一單位：未歸任務草稿、自動保存後撤回／歷史與重開恢復。整體 G4 Needs revision、ADR0075 Proposed／production0060 不變；未改 runtime／建表／呼叫產品模型。
 **JD-R002／隔離核心已交接（2026-09-12）：**六切片與整體review通過，保存於隔離checkout 54cdfb3420d074d1f4566cb04f12d1fb9a868022／tag jd-editor-core-isolated-20260910；[完整修正與證據](../.worktrees/analysis-only-agent/docs/specs/evidence/jd-editor-core-review/review.md)。最後47 Web／86受影響Python／19真PG、build/types/lint與真Chrome恢復PASS；原Task6完整旅程保留，不累加。**下一工作：P3離線費用防護／執行包及A1受測版本採用清單。**P3-B01仍OPEN、0產品provider；G6正式接合、P5日常維護、P6自然品質／真人與P7成品未通過。R3/R4呈現Minor列P5；未merge／push。
 
 - 最後核對：**2026-09-03**

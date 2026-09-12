@@ -153,6 +153,16 @@ def _basis_content(snapshot: dict, target: tuple) -> dict:
     return {key: row.get(key) for key in keys}
 
 
+def source_target(link: dict) -> tuple:
+    """Read the same fixed source target that mutation validation uses."""
+    return _target_from_link(link)
+
+
+def source_basis_digest(snapshot: dict, target: tuple) -> str:
+    """Exact shared source basis; reads must not invent a second digest."""
+    return hashlib.sha256(_json_bytes(_basis_content(snapshot, target))).hexdigest()
+
+
 class _Candidate:
     """One command's private work. There is no mutable session across calls."""
 
@@ -239,7 +249,7 @@ class _Candidate:
 
     def finish_sources(self) -> None:
         for target, refs in self.pending_basis.items():
-            digest = hashlib.sha256(_json_bytes(_basis_content(self.value, target))).hexdigest()
+            digest = source_basis_digest(self.value, target)
             existing = [link for link in self.value["source_links"] if _target_from_link(link) == target]
             existing.sort(key=lambda link: (link["position"], link["source_link_id"]))
             by_source = {link["source_ref"]: link for link in existing}

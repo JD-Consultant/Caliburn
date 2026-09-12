@@ -2,13 +2,14 @@
 
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
-**目前沒有可開啟的 App 畫面；八操作已透過 Python service 保存到獨立 PostgreSQL 的十三表。**`build_candidate` 仍只回保存前候選；`JdStorage` 在完整交易確認後才回已保存結果。正式 refs、HTTP、實際 writer 資格／停止證明及顧問接線尚未完成。此目錄不讀寫 Memory／訪談、不呼叫模型、不接正式產品或舊實驗模組。
+**目前沒有可開啟的 App 畫面；八操作已透過 Python service 保存到獨立 PostgreSQL 的十三表。**已接同版六章讀取、可驗證定位、歷史材料及確切差異；`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。HTTP、實際 writer 資格／停止證明及顧問接線尚未完成。此目錄不讀寫 Memory／訪談、不呼叫模型、不接正式產品或舊實驗模組。
 
 ## 結構
 
 - `contracts/jd-work.schema.json`：八個編輯工具輸入的唯一 JSON Schema。
 - `contracts/jd-result.schema.json`／`jd-http.schema.json`：合法結果組合與 HTTP Problem，和輸入一樣使用標準產生器。
 - `contracts/jd-snapshot.schema.json`／`snapshots.py`：v3 完整歷史格式、嚴格轉換及 canonical digest；關聯 rows 仍是 current 權威。
+- `contracts/jd-read.schema.json`／`reads.py`／`read_transport.py`：生成式讀取契約、六章完整可續讀投影與兩家模型工具外殼；分頁與實際工具輸出共用 UTF-8 序列化。
 - `src/jd_relational/generated`：標準工具生成 Python DTO／TS 型別，禁止手改。
 - `transport.py`：人工與模型轉入同一 command；兩家工具外殼不同。
 - `application.py`：同一準備入口，保留候選／原錯誤，發出固定安全診斷；沒有重試或保存。
@@ -19,6 +20,9 @@
 - `storage/schema.py`／`migrations`：十三張關聯表與固定 Alembic migration；沒有連線自動初始化或通用 repository。
 - `storage/rows.py`：九組 current 資料增量讀寫；由 caller 控制交易。
 - `storage/receipts.py`／`storage/service.py`：永久回執型別、建立查回、同版讀取、共同保存交易及停止後只記失敗的收尾接點；沒有自動重播。
+- `references.py`：ItsDangerous 2.2.0 標準 signer，固定型別、文件／版本／用途與資料集檢查；沒有自建簽章或 token registry。
+- `storage/history.py`／`changes.py`：短唯讀交易取得原版或原 operation 的 base/result；穩定 IDs 比較完整欄位／關係，不用目前稿重建過去、不重播事件。
+- `observation_projection.py`：只從原保存觀察發配結果 refs；投影故障不把已成功保存改判失敗，也不重跑操作。
 - `tests`：合成工作、格式正反例、共同操作流程、真 SDK 的離線請求捕捉。未完整任務不強迫補欄；多成果和多要求不配對。
 
 ## 重現
@@ -35,7 +39,7 @@ node node_modules/typescript/bin/tsc -p tsconfig.json
 
 若工具預設暫存目錄不可寫，將 uv 的 `--cache-dir` 指到可寫位置。`NODE_BINARY` 可指到正確的 Node 執行檔；在本機不要依賴全機舊版 npm wrapper 選中的 Node。產生器只用標準 CLI stdout，`--check` 不寫生成物。
 
-SDK 測試使用 `httpx2.MockTransport`、固定假 key 與 `offline.invalid`，封鎖 sockets 及環境／本地帳號探索；16 個 wire 測試的 32 個 POST 都在程序內攔截。這只證明 SDK 序列化，未證明 provider 接受或模型自然選用。
+SDK 測試使用 `httpx2.MockTransport`、固定假 key 與 `offline.invalid`，封鎖 sockets 及環境／本地帳號探索；既有 16 個編輯 wire 測試的 32 個 POST，以及 4 個讀取 wire 測試的 8 個 POST 都在程序內攔截。這只證明 SDK 序列化，未證明 provider 接受或模型自然選用。
 
 ### 獨立 PostgreSQL 實測
 
@@ -49,6 +53,7 @@ uv run --frozen --offline python scripts/init_test_database.py
 $env:JD_RELATIONAL_TEST_DB='1'
 uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_storage_postgres.py
 uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_storage_rows.py tests/test_storage_service.py
+uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_storage_history.py tests/test_read_storage_integration.py
 Remove-Item Env:JD_RELATIONAL_TEST_DB
 ```
 
@@ -56,10 +61,12 @@ initializer 先核固定測試 DB／user／PG18.6 與表集合，再明示 migra
 
 ## 待接責任
 
-`Ref`／`Source`／`Selection` 的正式發配、驗證與來源 owner 尚待接線；測試使用合成材料。`WriterAuthority` 是必要注入 port，本輪只有明示測試替身，不能讓 HTTP caller 自稱有寫入資格或程序已停止。正式讀取 DTO／refs、history/change read、HTTP endpoint、實際選區捕捉、畫面及顧問 runtime 在後續切片。
+目前／歷史 item、field、container、section 與觀察 refs 已發配／驗證，`command_context` 用同版讀取材料重核可寫用途、存在性與欄位摘要。來源查核仍是注入 callback，未接實際 source owner；讀取回 `readability=not_checked`。瀏覽器選區發配仍未完成，此接點明示拒絕 selection，不把 field ref 當選區。
+
+`WriterAuthority` 只有明示測試替身，不能让 HTTP caller 自稱有寫入資格或程序已停止。簽章 key／dataset 由宿主注入；同 key 新程序測試不代表已完成宿主持久設定或備份還原世代。`jd_read` 契約／外殼已驗；`jd_change_read` 尚缺對外 DTO、分頁與工具外殼，不能將目前的純差異與 SQL 材料說成完整 UI。HTTP endpoint、畫面、人工變更通知基準及顧問 runtime 仍待接線。
 
 還原／整輪撤回、更名／封存與恢復、autosave 暫存及維護仍未完成。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
 
 原兩工具及來源 digest 見[首切片](../../docs/specs/2026-09-13-jd-relational-command-slice.md)；目前八工具、分層與錯誤／診斷、289 項結果及通過界線見[本次設計與結果](../../docs/specs/2026-09-13-jd-management-operations-slice.md)。
 
-歷史[結果與資料庫基礎](../../docs/specs/2026-09-13-jd-result-and-storage-foundation.md)記錄 404 離線／22 真 PG tests。最新[共同保存交易切片](../../docs/specs/2026-09-13-jd-transaction-service-slice.md)為 525 離線通過／51 PG 跳過；另跑 mapper／service 42 通過，其中 29 是真 PG，13 是離線。首敗、獨立審查及未完成範圍見該稿，歷史數字不累加。
+歷史[結果與資料庫基礎](../../docs/specs/2026-09-13-jd-result-and-storage-foundation.md)與[共同保存交易切片](../../docs/specs/2026-09-13-jd-transaction-service-slice.md)保留當時結果。最新測試、首敗、獨立審查及未完成範圍見[同版讀取與確切差異](../../docs/specs/2026-09-13-jd-read-change-implementation.md)；各批數字不累加。

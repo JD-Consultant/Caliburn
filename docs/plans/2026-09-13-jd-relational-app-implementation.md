@@ -1,6 +1,6 @@
 # JD 關聯式 App：業務、保存、畫面與顧問接線施工計畫
 
-- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1 八操作／結果與 RS-2 共同保存 service 已隔離實作驗證。正式讀取 refs、runtime writer owner、歷史還原及完整 App 尚未完成。
+- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1 八操作／結果／同版讀取 refs 與 RS-2 共同保存／歷史材料已隔離實作驗證。runtime writer owner、公開 change-read、歷史還原及完整 App 尚未完成。
 - Owner 授權：最後核完整客製化 JD 欄位後，繼續推進 App、業務邏輯、LLM 及測試；Excel 延後。沿[最新需求](../specs/2026-09-12-jd-relational-editing-requirements.md)。
 - 本計畫取代[9/10 成品計畫](2026-09-10-jd-product-delivery.md)中**新版 JD 的施工順序／Plate／三工具／v2 前提**，不改寫舊六切片的成果與失敗。舊文件末尾 Task6 不是新工作指令。
 - 正式產品仍依 ADR0060，ADR0075／0074 Proposed；隔離驗證不等於 G6 切換，不混接正式 API／Web。
@@ -13,9 +13,9 @@
 
 ## 1. 成品範圍與可觀察結果
 
-**最新實作進度：**[共同保存交易切片](../specs/2026-09-13-jd-transaction-service-slice.md)完成 v3 snapshot、固定意圖、九組 current mapper、永久回執與真 PG service；八操作、同版讀取、重複操作、部分 SQL 失敗、COMMIT 確認遺失及新程序續讀已驗。完整離線 525 PASS／51 PG SKIP；另跑 mapper／service 42 PASS，其中 29 真 PG、13 離線。停止證明仍為測試替身，完整 runtime 恢復不宣稱通過。前次[結果與資料庫基礎](../specs/2026-09-13-jd-result-and-storage-foundation.md)數字保留為歷史，不累加。
+**最新實作進度：**[同版讀取與確切差異切片](../specs/2026-09-13-jd-read-change-implementation.md)承接保存交易，完成六章／項目／區段／歷史讀取、受控 refs／cursor、原操作的 base/result SQL、完整淨差異及原結果投影；真 PG 驗讀→定位→保存及歷史續讀隔離。精確測試數、首敗、獨立審查依結果稿。停止證明及來源仍為注入測試材料，完整 runtime 恢復不宣稱通過。前次[保存交易](../specs/2026-09-13-jd-transaction-service-slice.md)及[結果與資料庫基礎](../specs/2026-09-13-jd-result-and-storage-foundation.md)保留歷史，不累加數字。
 
-**唯一下一工作：**依[讀取／refs 前置](../specs/evidence/2026-09-13-jd-read-reference-preflight.md)接正式讀取投影、refs、歷史及確切變更，並把 writer 資格／停止 port 接實際 run owner。HTTP endpoint／App／顧問尚未完成；資料集還原身分與游標按相依驗證，不重開同層品牌比較。
+**唯一下一工作：**把已有確切差異材料接成 `jd_change_read` 對外契約，接實際 writer／run owner 與 HTTP，供 RS-3 六章管理畫面使用；來源 owner、選區發配、資料集身分按接點閉合。HTTP endpoint／App／顧問尚未完成，不重開同層品牌比較，也不因局部 PASS 改宣稱完整 App。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 
@@ -53,7 +53,7 @@ PARKED：Excel 與原始訪談下載、其他電腦安裝、真人顧問流程�
 
 RS-5 的還原／撤回 domain 與 DB 基礎在 RS-2 就實作驗證，RS-5 接全旅程與維護，不把 API 局部通過當整體通過。RS-7 採用研究、驗收材料、維護設計可以先並行；正式切換保留 G6，無須等到切換當天才研究。
 
-2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合本切片所需生成／驗證／SDK 離線及資料層依賴；UI／Agent 接點仍待相依施工前驗證。[首單位](../specs/2026-09-13-jd-relational-command-slice.md)與[八操作候選](../specs/2026-09-13-jd-management-operations-slice.md)保留歷史結果；目前 RS-1／2 的共同保存範圍以 §1 最新交易切片為準。正式讀取／refs／HTTP、還原／整輪撤回與實際 writer 生命週期仍未完成；RS-3–7 尚未執行新版驗收，整體 G4、G6 及成品狀態不因局部 PASS 而改判。
+2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合本切片所需生成／驗證／SDK 離線、資料層及標準 signer 依賴；UI／Agent 接點仍待相依施工前驗證。[首單位](../specs/2026-09-13-jd-relational-command-slice.md)與[八操作候選](../specs/2026-09-13-jd-management-operations-slice.md)保留歷史結果；目前 RS-1／2 的共同保存、讀取與差異範圍以 §1 最新切片為準。公開 change-read／HTTP、還原／整輪撤回與實際 writer 生命週期仍未完成；RS-3–7 尚未執行新版驗收，整體 G4、G6 及成品狀態不因局部 PASS 而改判。
 
 本輪[分層／錯誤／紀錄官方證據](../specs/evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)已收束。typed result 合法組合及 HTTP 純投影已完成，service 亦驗真 DB 結果、診斷不含正文、sink 故障不蓋原觀察及不同文件獨立保存。宿主 logging 配置／容量／實際接線仍由相依工作補驗，不另開 logging 品牌研究。
 

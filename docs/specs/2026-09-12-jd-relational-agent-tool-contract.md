@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C02、C03
-- 階段：G4 WORKING；語意契約與隔離實作並行。2026-09-13 [八個編輯輸入](2026-09-13-jd-management-operations-slice.md)及[結果／HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md)已生成；[共同保存切片](2026-09-13-jd-transaction-service-slice.md)已驗八操作、永久 snapshot／receipt 與真 PG service。正式讀取／refs、runtime writer owner、HTTP endpoint 與自然模型驗證仍待完成。
+- 階段：G4 WORKING；語意契約與隔離實作並行。[共同保存切片](2026-09-13-jd-transaction-service-slice.md)已驗八操作、永久 snapshot／receipt 與真 PG service；2026-09-13 [讀取與差異切片](2026-09-13-jd-read-change-implementation.md)已接同版 current/history、固定 typed refs、generated `jd_read`／兩家離線 adapter、純差異及原回執投影。公開 `jd_change_read` schema／provider／HTTP、實際 writer／停止 proof、source owner／選區發配、人工 notice 基準與完整 App 仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[整體設計](2026-09-12-jd-relational-editor-design.md)
 - 保存契約：[資料庫與保存](2026-09-12-jd-relational-schema-and-write-contract.md)
 
@@ -36,11 +36,15 @@ App 將所有 mutation 映入相同 domain command、validator、短交易與結
 
 - `revision_ref`
 - 可讀的 profile／items／relations
-- typed `item_ref`、`field_ref`、`container_ref`
+- typed `section_ref`、`item_ref`、`field_ref`、`container_ref`
 - source refs 及 `current | needs_recheck`
 - 分頁 cursor 與是否還有未讀內容
 
 current read 的 refs 綁定該 revision。正文、head、關係、來源目標狀態及 refs 的一致讀取依[保存契約 §9](2026-09-12-jd-relational-schema-and-write-contract.md#9-歷史diff-與-export-read)：同一次短唯讀交易 materialize 後再產 refs；不得另查最新 head。分頁 cursor 綁 revision，下一頁若 head 改變就要求重讀，不接混版頁面。外部原始問答來源／可讀性另由 source port 查核並分開標示，不承諾跨系統同一快照。名稱可重複，模型靠 ref 定位，不靠名稱搜尋後直接寫。
+
+2026-09-13 局部實作：[讀取 SSOT](../../experiments/jd-relational-app/contracts/jd-read.schema.json)已生成 Python／TS 的 `ReadInput`、`ReadPage`、`ReadFailure`，由[讀取投影](../../experiments/jd-relational-app/src/jd_relational/reads.py)及[兩家 adapter](../../experiments/jd-relational-app/src/jd_relational/read_transport.py)共用。`current` 的 target 必須 null；`item`／`section` 使用同類 issued ref；`history` 的 null target 列出固定上界歷史，revision ref 讀指定舊稿。歷史 item／section 可續讀原版，回 `access=history`；即使該版等於 head，其 refs 仍不可寫。
+
+`ReadPage` 固定版本 1，交付 `view`、`access`、`revision_ref`、typed records、`start_index`、`total_records`、`has_more`、`next_cursor`、`oversized_unit`。records 包含章節、容器、項目、完整欄位、任務 K/S 關係、來源，歷史索引另含版次／origin／時間／原 producer 的 operation/change refs。頁面按 UTF-8 bytes 有界分段，過大的單一允許欄位用明示單項頁完整交付，不截斷正文。沿原 view／target 與 cursor 續讀，讀完頁不等於專業內容已完整。source 的 `basis_status` 可由本版材料判斷，`readability` 目前回 `not_checked`；source owner 的真正查回另待接線。真 PG 接合與 SDK 離線序列化證據分列於[本輪結果](2026-09-13-jd-read-change-implementation.md)，不代表 HTTP／顧問或自然模型已接通。
 
 ### 3.2 `jd_set_text`
 
@@ -92,7 +96,7 @@ kind 的 domain 名稱穩定；requirement 的中文 label 可調整而不改 en
 }
 ```
 
-App 決定 ownership effects 並回 actual changes。capability 還被引用時回 dependent_items。D01 刪 duty 保留 tasks，由 App 一次解除分組再刪 duty，不讓模型逐項改 FK。刪 duty 時 content_changes 只接受 §3.10 的 set_field／add_task_detail：既有欄位限該 duty 下存活任務的 name／description／detail text；新增成果／要求限這些任務，不含被刪 duty 或其他獨立工作。非 duty 刪除只接受空陣列。內容與結構同一候選、同一交易；失敗不丟原 scope。完整相關上下文與來源處理依[業務設計 §3](2026-09-12-jd-business-operations-and-scope-design.md#3-r05-裁決必要範圍隨任務職責摘要不產生繼承)。
+App 決定 ownership effects；保存回傳 §6 的輕量結果，完整實際差異由 §3.7 讀取。capability 還被引用時回 dependent_items。D01 刪 duty 保留 tasks，由 App 一次解除分組再刪 duty，不讓模型逐項改 FK。刪 duty 時 content_changes 只接受 §3.10 的 set_field／add_task_detail：既有欄位限該 duty 下存活任務的 name／description／detail text；新增成果／要求限這些任務，不含被刪 duty 或其他獨立工作。非 duty 刪除只接受空陣列。內容與結構同一候選、同一交易；失敗不丟原 scope。完整相關上下文與來源處理依[業務設計 §3](2026-09-12-jd-business-operations-and-scope-design.md#3-r05-裁決必要範圍隨任務職責摘要不產生繼承)。
 
 ### 3.5 `jd_move_item`
 
@@ -138,6 +142,8 @@ unlink 的 basis_refs 必須為空；不能對已移除的關係新增 current s
 ```
 
 App 回確切 before/after revision refs、origin、create/update/delete/move/reorder/link/unlink、field before/after、受影響 item refs、source link 變動及分頁狀態。工具不依 AI 先前摘要重建差異。
+
+2026-09-13 實作界線：上述是公開工具的待完成契約，**尚無 `jd_change_read` generated schema、provider adapter 或 HTTP endpoint**。已落地的是 [HistoryReader](../../experiments/jd-relational-app/src/jd_relational/storage/history.py) 的原 receipt／base／result 材料，以及 [compare_snapshots](../../experiments/jd-relational-app/src/jd_relational/changes.py) 的 Python 內部純差異；不將內部 row／UUID 直接當模型輸出。新增／刪除保留完整 row，更新保留完整 before/after 與改動欄；move 可同時有文字 update，K/S 更新列出兩版受影響任務並集。reorder 比較存活 sibling 的相對順序，不把插入／刪除引起的 position 正規化冒稱更新，也不冒稱還原真實操作順序。`change_ref` 識別已可由原觀察發配；公開差異 records 的只讀 refs／分頁仍須接合驗證，既定完整差異需求不縮減。
 
 ### 3.8 `jd_create_task`
 
@@ -225,14 +231,16 @@ Web 不向員工顯示 JSON。模型不直接取得這個通用 transport，而�
 | ref | 綁定內容 | 模型能做什麼 | 失效條件 |
 |---|---|---|---|
 | `revision_ref` | document＋revision | 識別讀到的版本 | head 前進仍可歷史讀，不可 current 寫 |
+| `section_ref` | document＋revision＋六章 section kind＋current/history 用途 | 讀完整章節 | current 過時拒絕；history 保留原版且不可寫 |
 | `item_ref` | document＋revision＋entity kind＋stable ID | 刪除、移動、讀完整項目 | target 被刪或 current 已改到不能安全套用 |
 | `field_ref` | item/profile＋field name＋base value digest | 更新完整欄位 | field／revision 過時 |
 | `selection_ref` | field ref＋exact selection digest/range，由 App 產生 | 替換選取內容 | 選取欄位被改或內容不再匹配 |
 | `container_ref` | document＋revision＋允許的 child kind | 新增／移動 | container 被刪或過時 |
 | `source_ref` | source owner＋document scope＋可讀範圍 | 作 basis、回查原文 | scope 不符、來源不存在或權限失效 |
-| `change_ref` | operation＋before／after revisions | 讀真實差異 | 不因 head 前進失效；只讀 |
+| `operation_ref` | document＋原 operation，observation 用途 | 識別原保存結果 | 不因 head 前進改指新操作；只讀 |
+| `change_ref` | document＋原 operation＋原 result revision；base 從原 receipt 查得 | 讀真實差異 | 不因 head 前進失效；只讀 |
 
-refs 是 opaque、可驗證 capability，不等於把 DB UUID 直接裸露。App 解析並核對 scope；模型不能從已知一個 ref 猜另一個。
+refs 是由 App 驗證的固定型別定位字串，不是 writer permission；模型以 opaque token 使用，不能拼接或推導另一個 ref。2026-09-13 [ReferenceCodec](../../experiments/jd-relational-app/src/jd_relational/references.py)已用 ItsDangerous 標準簽章核 document、dataset、revision、purpose 及 ref/cursor 用途；payload 可解碼，沒有加密或身分授權宣稱。`current` refs 才可經 resolver 組成可信 CommandContext；`history`／`observation` 只讀，同版 head 也不升格。source refs 仍由 source owner 發配，不重簽成 JD 來源別名；selection issuer 尚未接線，不將一般 field token 當 selection。宿主 key／dataset 持久化及還原世代仍依 DA-03 完成，不建立第二份資料權威。
 
 ## 6. 統一 mutation result
 
@@ -276,7 +284,7 @@ App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operatio
 
 Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案將它固定成 machine-readable status＋員工可讀 message＋有限 next action，不讓模型從自由文字猜是否重試。[Anthropic Handle tool calls](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)
 
-2026-09-13 精確化：[結果 SSOT](../../experiments/jd-relational-app/contracts/jd-result.schema.json)固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result 由 `jd_change_read` 取得，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意，外部 refs 由該原材料發配；失敗投影不改原 operation，result ref 不升格為最新 head。相關[前置與驗收義務](evidence/2026-09-13-jd-read-reference-preflight.md)不代表讀取 API 已完成。
+2026-09-13 精確化：[結果 SSOT](../../experiments/jd-relational-app/contracts/jd-result.schema.json)固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result，公開入口依 §3.7 完成，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意；[原觀察投影](../../experiments/jd-relational-app/src/jd_relational/observation_projection.py)已由真實 `WriteObservation` 發配原 operation／result／change refs 並驗 shared result，未確認仍先 reconcile。此投影不查新 head、不重播、不改 receipt，投影失敗也不改稱保存失敗；HTTP host 與正式顧問接線仍待完成。永久／對外邊界仍沿[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md)。
 
 [HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md#http-與模型外殼)在寫入回應使用 200 成功、202 待對帳及具名 4xx／5xx Problem；成功查回觀察使用 200，body 保留原結果。查回服務自身失敗另由 host 回報。`operation_conflict` 不接受衝突意圖、無本次 operation ref，原 receipt 保留。未 binding 的內部保存前錯誤可回 `save_failed/unchanged/unconfirmed` 並停止；已 binding 而未確認則一律 reconcile。這些是本案映射，非兩家供應商指定的 HTTP 或資料表格式。
 
@@ -298,7 +306,7 @@ Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案�
 
 ## 8. 人工修改如何進下一輪 context
 
-App 保存一個 response-backed `last_model_view`，只記模型最後確實收到的 JD revision／change boundary。下一輪組 request 前：
+以下為尚待接線的人工 notice 設計；本輪已能讀原歷史與算純差異，尚未實作 response-backed 基準或將 notice 注入顧問。App 保存一個 response-backed `last_model_view`，只記模型最後確實收到的 JD revision／change boundary。下一輪組 request 前：
 
 1. App 先完成手改保存與 AI 交接，依保存契約 §9 在同一次讀取交易取得 current head H；
 2. 由同份讀取材料查 `(last_model_view, H]` 的 committed operations，不能在另一快照接上 H 之後事件；
@@ -339,6 +347,8 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 
 本版 source_ref 限既有 port 實際發配、可回讀精確原始問答的引用。Memory／詳記協助找回材料，不把可變 Memory 路徑當永久來源；尚無 Memory-version locator。沿[既有來源研究 §4](2026-09-10-jd-context-change-and-source-research.md#4-jd-是否要引用-memory)，較新更正的效力仍由顧問核對，不靠 target digest 自動判斷。
 
+2026-09-13 接合已驗來源 resolver 回跨 scope／不可讀時，在 binding 前拒絕；真保存後人工改文令舊 basis 成為 `needs_recheck`，明示刷新才更新 basis，歷史不變。這些測試使用合成 Source；原始問答 owner 尚未接到新版 port，readability 不偽報已查證。
+
 - AI 新增／改寫文字時可提交已發配 `basis_refs`；App 驗來源屬同文件且可讀，再建立 `jd_source_link`。
 - 員工手改不自動新增 source，也不把員工操作當成原始訪談。舊 source link 保留但因 basis digest 不符顯示 `needs_recheck`。
 - AI 可讀原來源後，確認仍支持新文字時重新連結／更新 basis；不能只因 Memory 摘要看起來相似便自動背書。
@@ -348,7 +358,7 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 
 ## 10. 需要 provider schema spike 的一點
 
-工具數與名稱尚屬驗證候選。正式生成 JSON Schema 前，需對實際使用的 OpenAI／Anthropic adapter 做離線、零模型呼叫的 serialization fixture：
+八個編輯工具與 `jd_read` 已由 SSOT 生成並完成兩家 SDK 的離線 serialization fixture；精確範圍見頁首切片。`jd_change_read` 尚待生成與驗證；後續擴充仍沿下列檢查，不因已驗九個入口就凍結工具數或宣稱 provider／模型已接受：
 
 - 所有 properties required，optional 語意用 nullable；`additionalProperties=false`；strict enabled。
 - tool name、description、enum 大小、refs 長度與 output parsing 在兩家 adapter 各驗一次。
@@ -364,4 +374,4 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 - 2026-09-13 Owner 延後 Excel，先完整 App／業務／LLM；匯出不進 model tools，也不阻本輪契約。之後優先 Excel／原話分開輸出的方向保留。
 - 不增加模型用 archive、rename、history restore、DB query 或 raw JSON edit。JD 工具不重建 Memory 寫入入口；顧問仍可沿既有即時修補與背景整併反覆修訂工作理解。
 - 不讓 AI 每輪自動改 JD；是否撰寫由顧問方法與已理解資訊決定。
-- 新隔離目錄已有頁首所連輸入／結果／snapshot generated schema 與保存 service，尚未取代正式產品契約；完整讀取／refs、HTTP 及採用仍依新版計畫完成，不混寫舊 v2。
+- 新隔離目錄已有編輯／結果／snapshot／read generated schema、固定 refs、同版 current/history、共同保存、純差異及原回執投影，尚未取代正式產品契約。公開 `jd_change_read`、實際 writer／停止 proof、source owner、selection issuer、人工 notice 基準、HTTP／Web／autosave、還原／整輪撤回及採用仍依新版計畫完成，不混寫舊 v2；完整能力與實測界線見[讀取切片](2026-09-13-jd-read-change-implementation.md)。

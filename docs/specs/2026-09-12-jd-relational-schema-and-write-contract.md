@@ -252,10 +252,12 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 | `base_revision_id` | uuid，可空 | 已核實時的同文件 FK |
 | `result_revision_id` | uuid，可空 | 成功／no_change 的同文件 FK |
 | `status` | text，非空 | §6 終局狀態 |
-| `receipt` | jsonb，非空 | SSOT write result；actual changes、error、next action；還原結果另記操作種類及已核同文件的歷史來源 revision，供預覽後結果、歷史及模型通知辨識 |
+| `receipt` | jsonb，非空 | 永久結果語意與穩定身分、error／next action；不保存暫時外部 refs 或重複完整 before/after。還原另記操作種類及已核同文件的歷史來源 revision，供歷史與通知辨識；精確永久 receipt schema 尚待 RS-2 完成 |
 | `created_at` | timestamptz，非空 | 終局 receipt 保存時間 |
 
 同 `(document_id,operation_id)` 同 digest 重送只回原 receipt；不同 digest 回 `operation_conflict`，不能 UPSERT 覆寫。對 `status='committed'` 建部分唯一索引 `(document_id,result_revision_id)`；no_change 可由多個 operation 指同一 revision。
+
+「原 receipt」指原結果、效果、身分、base/result 及錯誤語意固定，並非要求每次 HTTP／tool JSON bytes 相同。對外 operation／revision／change refs 由原材料發配，不能因 head 已前進而改 result；投影失敗不能改寫已保存結果。確切差異由原 immutable base/result snapshots 及 stable IDs 比較，不在 receipt 保存第二份巨大 before/after。request digest 使用 App 已核的固定意圖，不因 token 重新簽發而改變原意圖。永久結果與短期引用的邊界詳[讀取前置](evidence/2026-09-13-jd-read-reference-preflight.md#41-永久-receipt-與對外-ref-投影)；外部結果已[實作驗證](2026-09-13-jd-result-and-storage-foundation.md)，永久 receipt mapper／保存仍待施工。
 
 AI 操作的 run 歸屬連同成功／no_change／已確認失敗回執原子保存；必須經既有 run owner 核對同文件，不從 timestamp、actor 或暫態 jd_bindings 猜測。回合 authority 仍是既有 runtime；不在 JD 新建另一套 run 表或跨 owner cascade。尚未形成可信 binding 的請求拒絕不偽造 AI operation。此欄只識別操作歸屬；完整範圍及閉合判斷依[整輪撤回 §4](2026-09-12-jd-ai-turn-undo-design.md#4-何時可撤回)。
 

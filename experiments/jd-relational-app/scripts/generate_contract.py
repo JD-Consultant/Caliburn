@@ -10,7 +10,7 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMA = ROOT / "contracts" / "jd-work.schema.json"
+SCHEMAS = [("jd-work", "models.py"), ("jd-result", "results.py"), ("jd-http", "http_results.py")]
 OUTPUT = ROOT / "src" / "jd_relational" / "generated"
 
 
@@ -39,13 +39,18 @@ def main() -> None:
     options = parser.parse_args()
     # Both standard CLIs support stdout. No intermediate files are necessary,
     # and --check cannot accidentally replace an existing generated artifact.
-    expected = {
-        "models.py": run(
+    expected = {}
+    for name, python_output in SCHEMAS:
+        schema = ROOT / "contracts" / f"{name}.schema.json"
+        references = (["--external-ref-mapping",
+                       f"{ROOT / 'contracts' / 'jd-result.schema.json'}=jd_relational.generated.results"]
+                      if name == "jd-http" else [])
+        expected[python_output] = run(
             [
                 sys.executable,
                 "-m",
                 "datamodel_code_generator",
-                "--input", str(SCHEMA),
+                "--input", str(schema),
                 "--input-file-type", "jsonschema",
                 "--output-model-type", "pydantic_v2.BaseModel",
                 "--target-python-version", "3.12",
@@ -56,17 +61,19 @@ def main() -> None:
                 "--enum-field-as-literal", "all",
                 "--formatters", "builtin",
                 "--disable-timestamp",
+                "--no-allow-remote-refs",
+                "--fail-on-multi-module-stdout",
+                *references,
             ]
-        ),
-        "jd-work.ts": run(
+        )
+        expected[f"{name}.ts"] = run(
             [
                 os.environ.get("NODE_BINARY", "node"),
                 str(ROOT / "node_modules" / "json-schema-to-typescript" / "dist" / "src" / "cli.js"),
-                "--input", str(SCHEMA),
+                "--input", str(schema),
                 "--unreachableDefinitions",
             ]
-        ),
-    }
+        )
     if options.check:
         changed = [
             name for name, text in expected.items()

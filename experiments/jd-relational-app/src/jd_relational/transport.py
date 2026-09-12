@@ -4,6 +4,8 @@ import json
 
 from pydantic import ValidationError
 
+from .result_transport import ResultValidationError, validate_result
+
 from .generated.models import (
     CreateTaskInput, ReviseWorkInput, SetTextInput, InsertItemInput,
     DeleteItemInput, MoveItemInput, SetTaskCapabilityInput, ReplaceSelectionInput,
@@ -15,9 +17,6 @@ MODELS = {"jd_create_task": CreateTaskInput, "jd_revise_work": ReviseWorkInput,
           "jd_set_text": SetTextInput, "jd_insert_item": InsertItemInput,
           "jd_delete_item": DeleteItemInput, "jd_move_item": MoveItemInput,
           "jd_set_task_capability": SetTaskCapabilityInput, "jd_replace_selection": ReplaceSelectionInput}
-FAILURE_STATUSES = frozenset({"error", "invalid_input", "target_missing", "stale_view", "relationship_conflict",
-    "dependent_items", "save_failed", "outcome_unknown", "operation_conflict", "busy", "archived"})
-NONERROR_STATUSES = frozenset({"committed", "no_change", "candidate_ready"})
 DESCRIPTIONS = {
     "jd_set_text": "單独修改一個既有欄位的完整文字。多欄相依更正用 jd_revise_work；選區修改用 jd_replace_selection。保留未知，不用清空模擬刪除項目。",
     "jd_insert_item": "新增職責、協作對象、知識、技能、成果、要求或全職位條件。依種類提供目前已知內容及App發配的容器，未知可空；任務改用 jd_create_task 一次建立。",
@@ -100,15 +99,20 @@ def tool_definition(provider: str, tool: str) -> dict:
 
 
 def tool_output(provider: str, call_id: str, result: dict) -> dict:
-    """Wire packaging only; callers must supply observed results, never invented saves."""
-    if not isinstance(call_id, str) or not call_id or not isinstance(result, dict):
+    """Validate the common observation, then wrap it without executing anything.
+
+    Shape validation cannot prove a commit. Only the App's durable-result owner
+    may supply a confirmed result; preparation candidates are not accepted here.
+    """
+    if not isinstance(call_id, str) or not call_id.strip() or len(call_id) > 4096 or not isinstance(result, dict):
         raise TransportError("invalid_result")
-    status = result.get("status")
-    if not isinstance(status, str) or status not in FAILURE_STATUSES | NONERROR_STATUSES:
-        raise TransportError("invalid_result")
-    content = json.dumps(result, ensure_ascii=False, allow_nan=False)
+    try:
+        value = validate_result(result)
+        content = json.dumps(value, ensure_ascii=False, allow_nan=False)
+    except (ResultValidationError, ValueError, TypeError, UnicodeError):
+        raise TransportError("invalid_result") from None
     if provider == "openai":
         return {"type": "function_call_output", "call_id": call_id, "output": content}
     if provider == "anthropic":
-        return {"type": "tool_result", "tool_use_id": call_id, "content": content, "is_error": status in FAILURE_STATUSES}
+        return {"type": "tool_result", "tool_use_id": call_id, "content": content, "is_error": value["error"] is not None}
     raise TransportError("unknown_provider")

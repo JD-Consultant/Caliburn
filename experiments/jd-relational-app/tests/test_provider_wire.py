@@ -21,6 +21,7 @@ import pytest
 from anthropic import Anthropic
 from jsonschema import Draft202012Validator
 from openai import OpenAI
+from result_fixtures import observed_result
 
 from jd_relational.transport import model_command, tool_definition, tool_output
 
@@ -30,7 +31,7 @@ TOOLS = (
     "jd_delete_item", "jd_move_item", "jd_set_task_capability", "jd_replace_selection",
 )
 MODEL = "offline-fixture"
-RESULT = {"status": "candidate_ready", "persisted": False}
+RESULT = observed_result()  # Synthetic confirmed no_change; no database is used.
 PROMPT = "依已知工作內容建立或修訂任務；未知不補造。"
 APP_FIELDS = {
     "document_id", "dataset_id", "base_view_token", "base_version",

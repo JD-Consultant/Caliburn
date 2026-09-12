@@ -2,6 +2,7 @@ import json
 import traceback
 
 import pytest
+from result_fixtures import observed_result
 
 from jd_relational.transport import (
     TransportError,
@@ -81,14 +82,14 @@ def test_provider_roots_are_objects_with_required_nullable_not_catalog_union():
         assert "revision" not in oa["parameters"]["properties"]
 
 
-def test_candidate_or_error_outputs_preserve_call_identity_not_claim_saved():
-    result = {"status": "candidate_ready", "persisted": False}
+def test_synthetic_observation_outputs_preserve_call_identity():
+    result = observed_result()
     oa = tool_output("openai", "call-7", result)
     cl = tool_output("anthropic", "toolu-7", result)
     assert oa == {"type": "function_call_output", "call_id": "call-7", "output": json.dumps(result, ensure_ascii=False)}
     assert cl["tool_use_id"] == "toolu-7"
     assert json.loads(cl["content"]) == result
-    err = tool_output("anthropic", "toolu-7", {"status": "error", "code": "stale_reference"})
+    err = tool_output("anthropic", "toolu-7", observed_result("stale_view"))
     assert err["is_error"] is True
 
 
@@ -101,12 +102,12 @@ def test_schema_returned_to_caller_cannot_mutate_future_tool_definition():
 @pytest.mark.parametrize("status", ["invalid_input", "target_missing", "stale_view", "relationship_conflict",
                                   "dependent_items", "save_failed", "outcome_unknown", "operation_conflict", "busy", "archived"])
 def test_every_known_failure_status_sets_anthropic_error_flag(status):
-    assert tool_output("anthropic", "toolu", {"status": status})["is_error"] is True
+    assert tool_output("anthropic", "toolu", observed_result(status))["is_error"] is True
 
 
-@pytest.mark.parametrize("status", ["committed", "no_change", "candidate_ready"])
+@pytest.mark.parametrize("status", ["committed", "no_change"])
 def test_nonerror_status_preserves_anthropic_success_flag(status):
-    assert tool_output("anthropic", "toolu", {"status": status})["is_error"] is False
+    assert tool_output("anthropic", "toolu", observed_result(status))["is_error"] is False
 
 
 def test_unknown_result_status_is_not_silently_misreported_as_success():

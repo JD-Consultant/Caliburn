@@ -7,5 +7,5 @@
     "moduleResolution": "bundler",
     "types": []
   },
-  "include": ["src/jd_relational/generated/jd-work.ts"]
+  "include": ["src/jd_relational/generated/*.ts"]
 }

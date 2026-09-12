@@ -4,8 +4,11 @@ version = "0.1.0"
 description = "Isolated structured JD command validation; no production persistence"
 requires-python = ">=3.12,<3.13"
 dependencies = [
+    "alembic==1.20.0",
     "jsonschema==4.26.0",
+    "psycopg[binary]==3.3.5",
     "pydantic==2.13.5",
+    "sqlalchemy==2.0.52",
 ]
 
 [dependency-groups]
@@ -20,3 +23,7 @@ dev = [
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["src"]
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true

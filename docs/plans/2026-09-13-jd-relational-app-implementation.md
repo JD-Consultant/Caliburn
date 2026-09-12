@@ -1,6 +1,6 @@
 # JD 關聯式 App：業務、保存、畫面與顧問接線施工計畫
 
-- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING，分切片前置與通過條件如下，尚未執行新 runtime／migration。
+- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1 八操作／結果已局部實作，RS-2 十三表已隔離初始化，完整 runtime／保存流程尚未完成。
 - Owner 授權：最後核完整客製化 JD 欄位後，繼續推進 App、業務邏輯、LLM 及測試；Excel 延後。沿[最新需求](../specs/2026-09-12-jd-relational-editing-requirements.md)。
 - 本計畫取代[9/10 成品計畫](2026-09-10-jd-product-delivery.md)中**新版 JD 的施工順序／Plate／三工具／v2 前提**，不改寫舊六切片的成果與失敗。舊文件末尾 Task6 不是新工作指令。
 - 正式產品仍依 ADR0060，ADR0075／0074 Proposed；隔離驗證不等於 G6 切換，不混接正式 API／Web。
@@ -12,6 +12,8 @@
 **同日續行收斂：**Owner 要求框架保持可替換並停止無效研究。RS-F 按實際依賴逐項閉合，不作全部技術研究完成才開工的大閘門；已定效果與來源規則先做[RS-1 完整任務／一次更正切片](../specs/2026-09-13-jd-relational-command-slice.md)。新落點為 `experiments/jd-relational-app`，先做純候選與離線契約驗證；其他具名操作、HTTP／讀取／回執契約仍在 RS-1，不因兩工具通過便開始宣稱真 DB／完整 App 已完成。
 
 ## 1. 成品範圍與可觀察結果
+
+**同日實作續行：**[結果與資料庫基礎](../specs/2026-09-13-jd-result-and-storage-foundation.md)完成生成式結果驗證、HTTP 投影及十三表固定 migration；404 離線 tests、22 真 PG tests 通過。資料層沿[官方前置](../specs/evidence/2026-09-13-jd-relational-db-preflight.md)在獨立 PostgreSQL 18.6 驗證，不修改舊資料庫；[讀取／refs 前置](../specs/evidence/2026-09-13-jd-read-reference-preflight.md)已收斂永久 receipt 與對外投影責任。下一工作集中 RS-1／2 的一致讀取、永久 snapshot／receipt 與完整保存／對帳；HTTP endpoint／App／顧問仍未完成，不重開品牌比較。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 

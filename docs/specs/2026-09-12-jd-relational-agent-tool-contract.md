@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C02、C03
-- 階段：G4 DRAFT；語意契約供 review。2026-09-13 [八個編輯輸入](2026-09-13-jd-management-operations-slice.md)已生成並通過离線驗證；讀取、完整結果／HTTP schema、持久與自然模型驗證仍待完成。
+- 階段：G4 DRAFT；語意契約供 review。2026-09-13 [八個編輯輸入](2026-09-13-jd-management-operations-slice.md)及[結果／HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md)已生成並通過離線驗證；十三表已真 PG 初始化。完整讀取／refs、永久 receipt／保存 service、HTTP endpoint 與自然模型驗證仍待完成。
 - 上層設計：[整體設計](2026-09-12-jd-relational-editor-design.md)
 - 保存契約：[資料庫與保存](2026-09-12-jd-relational-schema-and-write-contract.md)
 
@@ -77,7 +77,7 @@ current read 的 refs 綁定該 revision。正文、head、關係、來源目標
 }
 ```
 
-`item` 依 kind 生成明確形狀，外層是固定 object；不把全部 nullable 欄位塞到所有種類：duty／collaborator 用 name＋scope_text；knowledge／skill 用 name＋description；outcome／requirement／condition 用 text。共同項為適型 container_ref、after_ref、basis_refs。每個 variant 的所有 keys 在 strict schema required，可選文字用 null；name／正文任一有意義即可，純 text item 需有正文。App 配發 ID／position，核同文件／container／after sibling 並回新 refs；不要求模型挑 SQL 欄位或從 initial_text 猜名稱。
+`item` 依 kind 生成明確形狀，外層是固定 object；不把全部 nullable 欄位塞到所有種類：duty／collaborator 用 name＋scope_text；knowledge／skill 用 name＋description；outcome／requirement／condition 用 text。共同項為適型 container_ref、after_ref、basis_refs。每個 variant 的所有 keys 在 strict schema required，可選文字用 null；name／正文任一有意義即可，純 text item 需有正文。App 配發 ID／position，核同文件／container／after sibling；成功回 change_ref，下一次寫入以 current read 取得新 refs。不要求模型挑 SQL 欄位或從 initial_text 猜名稱。
 
 kind 的 domain 名稱穩定；requirement 的中文 label 可調整而不改 enum。typed nested variant 的兩家 adapter 相容性列 §10 零副作用驗證，不能因例子可讀就聲稱 provider 已接受。
 
@@ -156,7 +156,7 @@ App 回確切 before/after revision refs、origin、create/update/delete/move/re
 }
 ```
 
-這是合成外形示例，不得拿示例內容當員工事實。name／description 可 null，但至少一個有意義；三個清單可空，不能為填滿補造。清單順序就是希望顯示的順序，ID／FK／position 全由 App 產生。同一 capability 最多引用一次；每項 basis 只屬自己的來源目標。App 在同一候選建立 task、owned details、K/S relations 與來源，全部驗證後一次保存；任何失敗都不留下 task 空殼。新增結果回新 refs 及一筆整組實際差異。
+這是合成外形示例，不得拿示例內容當員工事實。name／description 可 null，但至少一個有意義；三個清單可空，不能為填滿補造。清單順序就是希望顯示的順序，ID／FK／position 全由 App 產生。同一 capability 最多引用一次；每項 basis 只屬自己的來源目標。App 在同一候選建立 task、owned details、K/S relations 與來源，全部驗證後一次保存；任何失敗都不留下 task 空殼。新增結果回原 operation／result revision／change refs，整組確切變更由 change read 取得；續編先讀 current，不由名稱猜新項定位。
 
 ### 3.9 `jd_replace_selection`
 
@@ -245,16 +245,9 @@ App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operatio
   "status": "committed",
   "effect": "changed",
   "receipt_durability": "confirmed",
+  "operation_ref": "op_...",
   "result_revision_ref": "rev_...",
   "change_ref": "chg_...",
-  "actual_changes": [
-    {
-      "kind": "move",
-      "target_ref": "task_...",
-      "before": "職責 A",
-      "after": "職責 B"
-    }
-  ],
   "error": null,
   "next_action": "continue"
 }
@@ -267,9 +260,9 @@ App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operatio
   "status": "stale_view",
   "effect": "unchanged",
   "receipt_durability": "confirmed",
+  "operation_ref": "op_...",
   "result_revision_ref": null,
   "change_ref": null,
-  "actual_changes": null,
   "error": {
     "code": "stale_view",
     "message": "這個任務在你讀取後已被修改；目前文件沒有套用本次內容。",
@@ -282,6 +275,10 @@ App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operatio
 `effect` 與 `receipt_durability` 是兩個獨立事實，沿原 v2 契約區分 confirmed／unconfirmed，不新增第三種 durability：binding 前拒絕為 unchanged／unconfirmed 且無 operation ref；binding 後已證 rollback 但回執未存好，仍是 unchanged／unconfirmed。COMMIT 結果不明才是 unknown／unconfirmed。**只要原 operation 已 binding 但無確認 terminal，App 的 next action 必須先 reconcile_operation，優先於要求模型修正或重讀後新寫。**App 持有 operation identity，不要求 LLM 補填；原結果查回及 failure-only 閉合詳[保存契約 §6.2–7](2026-09-12-jd-relational-schema-and-write-contract.md#62-人工或-ai-保存)。同 key 改 base／payload 拒絕，不可當成重試原意圖。
 
 Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案將它固定成 machine-readable status＋員工可讀 message＋有限 next action，不讓模型從自由文字猜是否重試。[Anthropic Handle tool calls](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)
+
+2026-09-13 精確化：[結果 SSOT](../../experiments/jd-relational-app/contracts/jd-result.schema.json)固定以上八 keys 與合法狀態分支，拒絕 `candidate_ready`。mutation result 保持輕量，移除舊例 `actual_changes`；完整前後文字／結構／來源差異沿原 immutable base/result 由 `jd_change_read` 取得，不以 AI 摘要替代。永久 receipt 只保存穩定身分／結果語意，外部 refs 由該原材料發配；失敗投影不改原 operation，result ref 不升格為最新 head。相關[前置與驗收義務](evidence/2026-09-13-jd-read-reference-preflight.md)不代表讀取 API 已完成。
+
+[HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md#http-與模型外殼)在寫入回應使用 200 成功、202 待對帳及具名 4xx／5xx Problem；成功查回觀察使用 200，body 保留原結果。查回服務自身失敗另由 host 回報。`operation_conflict` 不接受衝突意圖、無本次 operation ref，原 receipt 保留。未 binding 的內部保存前錯誤可回 `save_failed/unchanged/unconfirmed` 並停止；已 binding 而未確認則一律 reconcile。這些是本案映射，非兩家供應商指定的 HTTP 或資料表格式。
 
 ## 7. 錯誤、重讀與重試矩陣
 

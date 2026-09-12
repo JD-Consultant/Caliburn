@@ -26,7 +26,7 @@ PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與
 
 5. **同一頁採結構化管理畫面。**聊天與唯一 JD 並存；右側以具名欄位、職責／任務卡片、成果／要求子清單、K/S relation selector、歷史／差異／來源抽屜呈現。未分組任務是合法資料。沒有「目前稿／更正稿」雙頁、pending 接受／拒絕或第二份可編正文。Owner 已選[CV-01](../specs/2026-09-12-jd-change-visibility-design.md)：AI 直接改稿，App 在目前稿標記並提供同頁按需差異；完整管理畫面與資料接線仍待驗證。
 
-6. **Plate 不再控制整份 JD。**結構、CRUD、relations、dirty buffer、保存與歷史由 App 處理。Owner 已選純文字與換行，2026-09-13 [原生框架核對](../specs/2026-09-13-jd-native-framework-and-integration-preflight.md)據此選原生文字欄位，本版不啟用leaf Plate。真瀏覽器仍驗selection／IME／undo；只有具體反例才比較leaf editor等替代，不為啟用候選額外做spike，也不改relational authority。
+6. **Plate 不再控制整份 JD。**結構、CRUD、relations、dirty buffer、保存與歷史由 App 負責。Owner 已選純文字與換行，並於 2026-09-13 明確撤除現有框架／原生元件優先與舊碼整合前提；依[選型前置](../specs/2026-09-13-jd-native-framework-and-integration-preflight.md)比較現行框架及成熟元件。具體框架尚未選定，真瀏覽器須驗 selection／IME／undo；不由元件選擇改變 relational authority，也不預先把 App 責任全部認定須自製。
 
 7. **模型使用具名且能完成完整工作的業務工具。**依工具責任稿提供讀取、完整新增任務、有界內容修訂、單欄／選區與結構操作；不凍結七工具或讓同項更正逐欄提交。strict schema 與 App-issued refs 協助定位；模型不填 document／operation IDs、SQL FK、position、revision 或 line number。人與模型共用 service／validator／transaction 並取得真實結果；具體 variants 與驗收見[完整業務設計](../specs/2026-09-12-jd-business-operations-and-scope-design.md)。
 
@@ -38,7 +38,7 @@ PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與
 
 10. **刪除政策按 ownership 分開。**刪 task 的 owned details 與 task relations 可在明示 command 中一併移除，共享 capability 保留；仍被引用的 capability 採 RESTRICT。D01 已依 Owner 授權由研究者採[刪職責保留任務](../specs/2026-09-12-jd-relational-editing-requirements.md#8-d01刪除職責時保留任務2026-09-12)：App 同交易解除分組再刪 duty，DB 保留 RESTRICT 防止直接刪除。任務特有必要範圍隨任務卡、職責僅概括；必要內容調整及成果／要求新增與結構操作原子保存，自有來源分開處理、不自動轉掛。人與 AI 共用此業務效果，參照 [AWS 官方分層與生命週期依據](../specs/evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)，不因此採用 AWS 服務。
 
-11. **同文件寫入依固定順序鎖 document／head rows，不用 service-global mutex。**archive／restore 走相同順序；不同 documents 可獨立操作。同文件 manual／AI foreground writer 仍沿既有 admission。模型與 transaction 外的候選計算不持有 SQL row locks；canonical snapshot 在短交易內由 current rows 產生。
+11. **同文件寫入依固定順序鎖 document／head rows，不用 service-global mutex。**archive／restore 走相同順序；不同 documents 可獨立操作。同文件 manual／AI foreground writer 必須協調進入與安全結束，不要求整合舊 admission 程式。模型與 transaction 外的候選計算不持有 SQL row locks；canonical snapshot 在短交易內由 current rows 產生。
 
 12. **fresh adoption，不搬舊資料、不雙寫。**新 schema 在專用新 DB 驗證；正式切換一次移除舊 JSONB current write、舊 approved/candidate writers 與 retired routes。conversation／Memory／source owner 仍依其 successor ADR 決定，不由本 ADR 重做。
 
@@ -49,7 +49,7 @@ PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與
 | 既有決策 | 取代部分 | 保留 |
 |---|---|---|
 | [0073](0073-plate-jd-app-working-document-and-revision-authority.md) | 完整 Plate JSONB 作 current authority、whole-document model edit 與 Plate whole-document UI | 同一工作稿、實際差異、operation receipt、同文件 writer、來源／Memory owner 邊界及既有故障證據 |
-| [0060](0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) JD authority 部分 | Saver／Store 中的 approved／candidate JD writers 與舊文件審核 publication | 顧問 runtime、conversation／Memory 分工；其正式採用另由 0074 或 successor 完成 |
+| [0060](0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) JD authority 部分 | Saver／Store 中的 approved／candidate JD writers 與舊文件審核 publication | conversation／Memory 的能力及責任要求；新 runtime 依證據選定，正式採用由 0074 或 successor 完成。0060 在 successor 採用前仍為正式權威，不構成新碼沿用義務 |
 | [0066](0066-persistent-ai-jd-working-draft-and-semantic-review.md)、[0067](0067-deep-agents-store-backed-jd-working-draft.md)、[0069](0069-shared-current-jd-working-copy-and-semantic-approval.md) 的 JD 保存部分 | Store workspace、current↔approved 雙狀態、semantic accept/reject／rebase | 同文件延續、按需讀取、保存後可查差異等產品目的 |
 | [0070](0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md) 的 JD 表單候選 | 舊 pending lifecycle、舊整份物件寫入與舊欄位形狀 | 舊畫面作 CRUD／relation 需求證據，不作 runtime import |
 
@@ -59,7 +59,7 @@ Accepted 歷史 ADR 不改原文；只有本 ADR Accepted 且 production G6 完�
 
 員工得到真正能管理 JD 項目與關係的畫面；任務移動、K/S 共享、刪除影響與 Excel 投影不再依文件排版猜測。AI 工具參數更少，也不需生成整份文件或維護 DB metadata。Stable IDs 與 immutable snapshots 讓歷史比較不靠模糊文字定位。
 
-代價是 current save 需同時維護 8 類正文／關係 rows、canonical snapshot 與 receipt；source link 的 typed targets、position normalization、current→snapshot round-trip 及 relation diff 都需專門測試。原生文字管理畫面須驗實際輸入與保存，不能把既有whole-document Plate測試直接當成新畫面通過。
+代價是 current save 需同時維護 8 類正文／關係 rows、canonical snapshot 與 receipt；source link 的 typed targets、position normalization、current→snapshot round-trip 及 relation diff 都需專門測試。新管理畫面須驗實際輸入與保存，不能把既有 whole-document Plate 測試直接當成新畫面通過。
 
 13 張表不是產品品質指標，也不是宣稱 JSONB 不可表示關係；它是目前 CRUD、關係完整性與歷史需求下的可審映射。若未來證明每版 relational clone 更簡單可靠，可另以 successor 比較，不在第一版並建兩套。
 
@@ -70,7 +70,7 @@ Accepted 歷史 ADR 不改原文；只有本 ADR Accepted 且 production G6 完�
 - **每個 revision 複製所有 relational rows：**歷史純 relational，但每次小改都複製全部資料，第一版 schema、FK 與查詢顯著擴張；沒有目前需求需要支付此成本。
 - **event sourcing 只存 commands、靠 replay 重建 current：**對本機 JD 的 read、重開與匯出增加 replay／upcaster／snapshot 管理，現有需求可由 current rows＋derived history 完成。
 - **讓 LLM 送 generic CRUD／SQL-like payload：**增加無關欄位、跨類型錯誤與資料庫責任外洩；不符合 strict、small named tool 的證據方向。
-- **所有文字都使用 Plate editor instance：**沒有內容需求證明每欄需要 rich text，並增加多 editor focus／undo／效能風險；先以 leaf spike 決定。
+- **不經比較便為每欄建立 Plate editor instance：**文字與換行需求不足以證明所有欄位都需富文字核心；應與其他成熟元件比較 focus／undo、效能及整合負擔，不預設採 Plate 或裸原生控制項。
 
 ## Open decision and acceptance gate
 

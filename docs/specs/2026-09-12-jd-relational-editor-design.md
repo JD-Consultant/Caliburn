@@ -75,7 +75,7 @@ AI 與員工使用同一份目前工作稿。AI 不必每輪改稿，只有某�
 
 整份 JD 不再是一個 Plate value。結構、卡片、關係選擇、移動、刪除及保存由 App 管理。
 
-Owner 已選普通文字與換行，2026-09-13 [框架核對](2026-09-13-jd-native-framework-and-integration-preflight.md)據此採原生文字欄位；第一版不啟用 leaf Plate，也不為啟用它額外做 spike。真瀏覽器仍驗 IME、paste、selection、undo；只有實測反例證明原生欄位無法滿足已定需求，才比較 leaf editor 等有界替代，不影響資料庫 schema。
+Owner 已選普通文字與換行，並於 2026-09-13 修正「原生元件／現有框架優先」的推論：不要求整合舊代碼。[選型前置](2026-09-13-jd-native-framework-and-integration-preflight.md)據六章管理與聊天需求比較現行框架、成熟元件及必要接合；不先決定裸原生文字欄位或 leaf Plate。真瀏覽器仍驗 IME、paste、selection、undo；內容排版需求與元件選擇分開，不用元件的文件樹取代已定 relational authority。
 
 ## 4. 六章到資料與畫面的對照
 
@@ -133,7 +133,7 @@ Owner 確認 AI 可直接修改保存、不逐次接受；App 須提供可見提
 - 移動任務顯示「職責 A → 職責 B」，不呈現為刪除再新增；任務子項與引用保持相同 ID。
 - 修改共用 K/S 顯示定義前後及受影響任務清單；不聲稱每個任務都已由員工重新核實。
 - 歷史 view 只讀當時 snapshot，使用當時的名稱、定義與關係；不能以 current relation 重新解譯舊版。
-- source link 使用既有來源 port 發配、可回讀確切原始問答的引用，Memory 協助查找；裸 Memory 路徑不是永久依據，本輪未建立 Memory-version locator。連結保存目標內容 digest；目標文字改變而 digest 不符時標示「修改前的依據，需重新核對」。這不會自動偵測較新訪談已推翻舊說法，顧問仍核对最新理解。
+- source link 由 App 的來源能力發配，可回讀確切原始問答，Memory 協助查找；保留來源責任與可回讀效果，不要求包裝舊 port。裸 Memory 路徑不是永久依據，本輪未建立 Memory-version locator。連結保存目標內容 digest；目標文字改變而 digest 不符時標示「修改前的依據，需重新核對」。這不會自動偵測較新訪談已推翻舊說法，顧問仍核對最新理解。
 - AI 摘要可說明這次改了什麼，但不能取代可展開的 actual diff。
 - 整輪比較由持久 run 歸屬及完整連續版本取得；仍可展開逐次事件。較晚人工修改不混入當時 AI 差異；未確認保存不冒稱已完成，刪除及改回不能因目前稿無標記而消失。查看不產生接受／已核准狀態。
 
@@ -173,7 +173,7 @@ relational current projection 可確定性轉成不同輸出，不讓 LLM 生成
 | App／application service | current projection、command mapping、ID／version／position、domain validation、transaction、receipt、人工變更通知、diff/export projection | 猜員工工作、把 tool call 當已完成、把人工文字偽裝成 AI 來源 |
 | PostgreSQL | row identity、同文件 FK、junction uniqueness、delete restriction、atomic commit、head lock、durable current/history/receipt | 判斷文字專業品質或資料是否足夠撰寫 |
 | Web | 結構化卡片、未保存 buffer、清楚操作／錯誤、actual diff/history/source 呈現 | 自行修外鍵、重算 authority、以 client disabled 當 server 安全 |
-| Plate（如啟用） | 單一文字欄位的 selection、IME、paste、undo／redo 與富文字 transforms | 整份 JD schema、跨卡 CRUD、關係、DB 保存及歷史 authority |
+| 所選文字輸入元件 | 單一文字欄位的 selection、IME、paste、undo／redo；具體可用能力須實測 | 整份 JD schema、跨卡 CRUD、關係、DB 保存及歷史 authority |
 | 員工 | 提供自身工作、指出誤解、可直接編輯及確認刪除影響 | 判斷專業 JD 寫作是否完整或維護資料庫關係 |
 
 此分工參考 [AWS ports／adapters 與命令處理](evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)：人工與 AI 的輸入接點可以不同，domain rules 與保存效果共用。只採所需分層，不因此加入 AWS 服務、微服務或另一個資料權威。
@@ -219,4 +219,4 @@ relational current projection 可確定性轉成不同輸出，不讓 LLM 生成
 
 若外部 review 證明 derived snapshot 無法在同交易保持一致、generic source link 無法提供足夠完整性、Plate leaf editor 對 IME／undo 不成立，或 D01 選擇改變資料生命週期，回到本設計修訂。沒有具體反證時不重開整份關聯方向。
 
-下一步依[設計完成度與剩餘工作](2026-09-12-jd-design-readiness-audit.md)：欄位最後審核與[完整管理操作](2026-09-13-jd-complete-app-journey-design.md)已形成，Excel 延後；沿[新版計畫 RS-1](../plans/2026-09-13-jd-relational-app-implementation.md)接精確 successor 契約與離線驗證，暫存相容性並行。整體 G4 與 Proposed ADR 未通過，尚不能開始正式 migrations。
+下一步依[設計完成度與剩餘工作](2026-09-12-jd-design-readiness-audit.md)：欄位最後審核與[完整管理操作](2026-09-13-jd-complete-app-journey-design.md)已形成，Excel 延後；先完成[新版計畫 RS-F](../plans/2026-09-13-jd-relational-app-implementation.md)的有限技術比較，再接 RS-1 精確 successor 契約與離線驗證，恢復需求反例可並行。整體 G4 與 Proposed ADR 未通過，尚不能開始正式 migrations。

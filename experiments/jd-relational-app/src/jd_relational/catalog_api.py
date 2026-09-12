@@ -64,10 +64,12 @@ class CatalogBoundary(ManualBoundary):
         return catalog_problem(scope, error.code) if isinstance(error, CatalogError) else catalog_problem(scope, internal=True)
 
 
-def create_catalog_app(resources, *, allowed_origins):
+def create_catalog_app(resources, *, allowed_origins,
+                       _boundary_factory=CatalogBoundary,
+                       _allowed_headers=("Content-Type", "If-Match")):
     app = create_manual_app(resources, allowed_origins=allowed_origins,
-        _boundary_factory=CatalogBoundary, _allowed_methods=("GET", "POST", "PATCH"),
-        _allowed_headers=("Content-Type", "If-Match"), _expose_headers=("X-Request-ID", "ETag"))
+        _boundary_factory=_boundary_factory, _allowed_methods=("GET", "POST", "PATCH"),
+        _allowed_headers=_allowed_headers, _expose_headers=("X-Request-ID", "ETag"))
     previous_invalid = app.exception_handlers[RequestValidationError]
 
     @app.exception_handler(RequestValidationError)

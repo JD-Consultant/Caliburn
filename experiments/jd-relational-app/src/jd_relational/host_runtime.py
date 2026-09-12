@@ -17,8 +17,8 @@ import sqlalchemy as sa
 
 from .manual_runtime import ManualRuntime
 from .runtime_checkpoints import DocumentCheckpoints, build_document_graph
-from .storage.schema import JD_TABLE_NAMES
 from .storage.service import JdStorage
+from .storage_setup import check_installed
 from .windows_host import HostLease, bootstrap_host
 
 
@@ -49,7 +49,7 @@ class ManualHost:
 
 
 def open_manual_host(instance_key: str, database_url: str, *, checkpoint_schema: str,
-                     consultant: CompiledStateGraph) -> ManualHost:
+                     consultant: CompiledStateGraph, _configuration_check=None) -> ManualHost:
     """One configured local dataset per stable installation key, no migrations.
 
     Call only in a dedicated App process. Failure after bootstrap requires that
@@ -63,11 +63,15 @@ def open_manual_host(instance_key: str, database_url: str, *, checkpoint_schema:
                 or re.fullmatch(r"[a-z][a-z0-9_]{0,62}", checkpoint_schema) is None
                 or checkpoint_schema in {"public", "pg_catalog", "information_schema"}
                 or checkpoint_schema.startswith("pg_")
-                or not isinstance(consultant, CompiledStateGraph)):
+                or not isinstance(consultant, CompiledStateGraph)
+                or _configuration_check is not None and not callable(_configuration_check)):
             raise ValueError()
     except Exception:
         raise HostStorageError("invalid_host_configuration") from None
     lease = bootstrap_host(instance_key)
+    if _configuration_check is not None:
+        lease.require_previous_stopped()
+        _configuration_check()  # Still no database resource has been opened.
     engine, connection = None, None
     try:
         lease.require_previous_stopped()
@@ -75,25 +79,11 @@ def open_manual_host(instance_key: str, database_url: str, *, checkpoint_schema:
             "connect_timeout": 5, "options": "-csearch_path=public"})
         connection = Connection.connect(host=url.host, port=url.port or 5432,
             dbname=url.database, user=url.username, password=url.password,
-            options=f"-csearch_path={checkpoint_schema},public", connect_timeout=5,
+            options=f"-csearch_path={checkpoint_schema}", connect_timeout=5,
             autocommit=True, row_factory=dict_row, prepare_threshold=0)
         # Read-only prerequisite checks: setup remains an explicit operator action.
-        identity = connection.execute("SELECT current_setting('server_version_num')::integer AS v").fetchone()
-        if identity["v"] != 180006:
-            raise ValueError()
-        public = {row["tablename"] for row in connection.execute(
-            "SELECT tablename FROM pg_tables WHERE schemaname = 'public'")}
-        runtime = {row["tablename"] for row in connection.execute(
-            "SELECT tablename FROM pg_tables WHERE schemaname = %s", (checkpoint_schema,))}
-        if (public != JD_TABLE_NAMES | {"alembic_version"}
-                or runtime != {"checkpoints", "checkpoint_blobs", "checkpoint_writes", "checkpoint_migrations"}
-                or connection.execute("SELECT version_num FROM public.alembic_version").fetchall()
-                    != [{"version_num": "20260913_0001"}]):
-            raise ValueError()
+        check_installed(connection, checkpoint_schema)
         saver = PostgresSaver(connection, serde=JsonPlusSerializer(allowed_msgpack_modules=None))
-        versions = [row["v"] for row in connection.execute("SELECT v FROM checkpoint_migrations ORDER BY v")]
-        if versions != list(range(len(saver.MIGRATIONS))):
-            raise ValueError()
         graph = build_document_graph(consultant, saver)
         checkpoints = DocumentCheckpoints(graph)
         owner = ManualRuntime(checkpoints, lambda authority: JdStorage(engine, authority), previous_host=lease)

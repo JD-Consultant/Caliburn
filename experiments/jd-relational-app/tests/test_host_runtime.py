@@ -8,7 +8,6 @@ from langgraph.graph import END, START, MessagesState, StateGraph
 import pytest
 
 import jd_relational.host_runtime as host
-from jd_relational.storage.schema import JD_TABLE_NAMES
 from jd_relational.windows_host import HostError
 
 
@@ -51,30 +50,12 @@ def test_existing_host_blocks_before_any_app_database_resource(monkeypatch):
         host.open_manual_host(str(uuid4()), URL, checkpoint_schema="jd_runtime", consultant=child())
 
 
-class Rows(list):
-    def fetchone(self):
-        return self[0]
-
-    def fetchall(self):
-        return list(self)
-
-
 class Connection:
     def __init__(self, events):
         self.events, self.missing = events, False
 
     def execute(self, statement, params=None):
-        assert statement.startswith("SELECT"), "Host must not initialize or mutate schemas."
-        if "server_version_num" in statement:
-            return Rows([{"v": 180006}])
-        if "pg_tables" in statement:
-            names = JD_TABLE_NAMES | {"alembic_version"} if params is None else {
-                "checkpoints", "checkpoint_blobs", "checkpoint_writes", "checkpoint_migrations"}
-            return Rows({"tablename": name} for name in ([] if self.missing else names))
-        if "alembic_version" in statement:
-            return Rows([{"version_num": "20260913_0001"}])
-        assert "checkpoint_migrations" in statement
-        return Rows([{"v": 0}])
+        pytest.fail("Resource-order tests stub the shared read-only prerequisite helper.")
 
     def close(self):
         self.events.append("connection_closed")
@@ -97,7 +78,13 @@ def resources(monkeypatch):
     def connect(**kwargs):
         events.append("connection")
         assert kwargs["autocommit"] is True and kwargs["prepare_threshold"] == 0
+        assert kwargs["options"] == "-csearch_path=jd_runtime"
         return connection
+    def check(connection, schema):
+        events.append("schema_checked")
+        assert schema == "jd_runtime"
+        if connection.missing:
+            raise ValueError("synthetic schema failure")
     class Saver(InMemorySaver):
         MIGRATIONS = ("synthetic native migration",)
         def __init__(self, connection, **kwargs):
@@ -106,6 +93,7 @@ def resources(monkeypatch):
     monkeypatch.setattr(host.sa, "create_engine", create_engine)
     monkeypatch.setattr(host, "Connection", SimpleNamespace(connect=connect))
     monkeypatch.setattr(host, "PostgresSaver", Saver)
+    monkeypatch.setattr(host, "check_installed", check)
     return events, connection
 
 
@@ -119,6 +107,21 @@ def test_native_bootstrap_precedes_resources_and_open_is_not_write_readiness(res
         assert "connection_closed" not in events and "engine_disposed" not in events
     assert opened.close(timeout=1)
     assert events[-2:] == ["connection_closed", "engine_disposed"]
+
+
+def test_configuration_recheck_failure_precedes_database_resources(monkeypatch):
+    from jd_relational.local_configuration import ConfigurationError
+    events = []
+    monkeypatch.setattr(host, "bootstrap_host", lambda _: SimpleNamespace(
+        require_previous_stopped=lambda: events.append("lease_checked")))
+    monkeypatch.setattr(host.sa, "create_engine", lambda *_, **__: pytest.fail("No database resource."))
+    def changed():
+        events.append("configuration_checked")
+        raise ConfigurationError("configuration_changed")
+    with pytest.raises(ConfigurationError, match="configuration_changed"):
+        host.open_manual_host(str(uuid4()), URL, checkpoint_schema="jd_runtime", consultant=child(),
+            _configuration_check=changed)
+    assert events == ["lease_checked", "configuration_checked"]
 
 
 def test_missing_schema_is_rejected_without_setup_and_resources_are_closed(resources):

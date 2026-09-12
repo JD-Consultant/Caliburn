@@ -1,0 +1,83 @@
+"""Operator entry, using only the one OS-owned configuration location.
+
+No alternate config-path/DSN/identity switches. Init is explicit; serving never
+initializes or invokes a model. The employee UI and graphical launcher follow.
+"""
+import argparse
+import getpass
+import sys
+
+from .config_file import ConfigFile, default_config_path
+from .configured_host import initialize_configuration
+from .local_configuration import parse_configuration
+from .managed_app import open_managed_app, unavailable_consultant
+
+
+_MESSAGES = {
+    "configuration_missing": "尚未找到本機設定。首次使用請明確初始化；已有資料時請先找回設定。",
+    "configuration_exists": "初始化紀錄已存在，請查看狀態並使用原設定接續。",
+    "configuration_busy": "另一個程序正在處理設定，請稍後再查看狀態。",
+    "configuration_changed": "設定已變更，請關閉此程序後重新開啟。",
+    "configuration_invalid": "本機設定無法讀取或版本不符；已保留原檔，未自動重建。",
+    "configuration_write_unconfirmed": "設定保存結果尚未確認，請重新查看狀態後接續。",
+    "configuration_initialization_required": "初始化尚未完成，請明確接續初始化。",
+    "configuration_already_ready": "本機設定已完成初始化，可使用 serve 開啟服務。",
+    "configuration_maintenance": "資料正在維護狀態，請完成原維護程序後再開啟。",
+    "database_not_empty": "指定資料庫已有內容，已停止初始化並保留原資料。",
+    "schema_mismatch": "資料格式與本版本不符，已停止且未自動修改。",
+    "host_already_running": "此 App 已在執行，請使用原視窗或先正常關閉。",
+    "host_storage_unavailable": "目前無法開啟資料，請確認資料庫服務與已完成的初始化。",
+    "storage_unavailable": "目前無法確認初始化結果，請保留原設定並稍後查看狀態。",
+}
+_PHASES = {
+    "initialization_pending": "尚待驗證空資料庫；可使用 resume-init 接續。",
+    "initializing": "初始化未完成；可使用 resume-init 接續。",
+    "ready": "設定已初始化。serve 仍會檢查資料库與恢復狀態。",
+    "maintenance": "維護中；普通開啟已暫停。",
+}
+
+
+def _connection_input():
+    if not sys.stdin.isatty():
+        raise ValueError("interactive_initialization_required")
+    return dict(host="127.0.0.1", port=int(input("本機 PostgreSQL 連接埠：")),
+        database=input("已建立的空資料庫名稱："), username=input("資料庫使用者："),
+        password=getpass.getpass("資料庫密碼（不顯示）："), checkpoint_schema="jd_runtime",
+        api_port=int(input("本機 API 連接埠：")),
+        allowed_origins=(input("本機管理畫面來源，例如 http://127.0.0.1:3002："),))
+
+
+def main(argv=None):
+    parser = argparse.ArgumentParser(description="Caliburn 關聯式 JD 本機服務；管理畫面與 AI 接合仍在施工。")
+    parser.add_argument("action", choices=("status", "init", "resume-init", "serve"))
+    args = parser.parse_args(argv)
+    try:
+        file = ConfigFile(default_config_path())
+        if args.action == "status":
+            print(_PHASES[parse_configuration(file.read()).phase])
+        elif args.action in {"init", "resume-init"}:
+            initialize_configuration(file, connection=_connection_input() if args.action == "init" else None,
+                resume=args.action == "resume-init")
+            print("本機設定及資料結構已初始化。可使用 serve 開啟服務。")
+        else:
+            import uvicorn
+            managed = open_managed_app(file, consultant=unavailable_consultant())
+            try:
+                uvicorn.run(managed.app, host="127.0.0.1", port=managed.port, workers=1,
+                    reload=False, access_log=False, proxy_headers=False, log_level="warning")
+            finally:
+                if not managed.close():
+                    print("服務仍有工作未確認結束，請保留此程序的診斷現場。", file=sys.stderr)
+                    return 1
+        return 0
+    except (KeyboardInterrupt, EOFError):
+        print("操作已中止；請重新查看實際保存狀態後再接續。", file=sys.stderr)
+        return 130
+    except Exception as error:
+        code = getattr(error, "code", None)
+        print(_MESSAGES.get(code, "操作未完成。請保留資料，確認本機設定及資料庫服務後再試。"), file=sys.stderr)
+        return 1
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,7 +1,7 @@
 # JD 本機持久配置：DA-03 有界前置研究
 
 - 查閱日期：2026-09-13；Topic：JD-R002／RS-3／DA-03。
-- 狀態：主代理已採為下一有限驗證方向；尚未實作或完成行為實證。本文件沒有改變 production authority，沒有實作設定、初始化資料庫或執行 DPAPI 加解密。
+- 狀態：前置研究已轉為[配置與初始化切片](../2026-09-13-jd-managed-configuration-slice.md)；原查閱階段未執行加解密或初始化，後續實際結果由該稿維護。production authority 不變。
 - 依據：[目前決策](../../current-decisions.md)、[新版施工計畫](../../plans/2026-09-13-jd-relational-app-implementation.md)、[DA-03 缺口](../2026-09-12-jd-design-readiness-audit.md)、[自動保存 §5](../2026-09-12-jd-autosave-and-handoff-design.md#5-瀏覽器暫存與重開)、[歷史與恢復 §7](../2026-09-12-jd-history-and-recovery-design.md#7-驗收與剩餘工程前置)、[refs 前置](2026-09-13-jd-read-reference-preflight.md)、[Windows 宿主結果](../2026-09-13-jd-host-restart-recovery-slice.md)。
 - 已讀實作：[references.py](../../../experiments/jd-relational-app/src/jd_relational/references.py)、[windows_host.py](../../../experiments/jd-relational-app/src/jd_relational/windows_host.py)、[host_runtime.py](../../../experiments/jd-relational-app/src/jd_relational/host_runtime.py)。本文只處理持久身分與本機配置；瀏覽器恢復記錄的 IndexedDB schema、容量及更新順序仍由 DA-03 後續單位閉合。
 
@@ -49,7 +49,7 @@ UUID 的格式與安全隨機來源有官方契約；以上三種壽命與分工
 
 **推薦一份受保護的完整小型配置內容**，內部用嚴格 JSON／既有 Pydantic 驗證，包含：格式版號、維護階段、上述三個值、固定 loopback DB 連線欄位、checkpoint schema，以及明示 UI origins。DB 密碼與 signer key 都在受保護內容中；HTTP 只能取得所需的公開 scope／狀態，不能回整份配置。設定載入物件不輸出含秘密的 repr、原始錯誤、payload、DSN 或完整路徑。
 
-建議配置讀取上限 64 KiB、解密後同樣受限，UUID／32-byte key／loopback 位址／合法 port／固定 schema／canonical origins／格式與階段各自 strict 驗證。64 KiB 是可調整的本案工程界線，不是 DPAPI 官方上限。拒絕 duplicate JSON keys、未知欄位、未知版本與非法組合，不用 defaults 修補損毀。金鑰若以 base64 放入內部 JSON，必須嚴格解碼及核長度；base64 本身不是保護機制。
+配置讀取上限 80 KiB、解密後上限 64 KiB，以容納 DPAPI framing；這是有限實作對原「兩者皆 64 KiB」提議的修正。UUID／32-byte key／loopback 位址／合法 port／固定 schema／canonical origins／格式與階段各自 strict 驗證。兩個上限是本案工程界線，不是 DPAPI 官方上限。拒絕 duplicate JSON keys、未知欄位、未知版本與非法組合，不用 defaults 修補損毀。金鑰若以 base64 放入內部 JSON，必須嚴格解碼及核長度；base64 本身不是保護機制。
 
 實際 pywin32 b312 介面為：
 
@@ -81,7 +81,7 @@ win32crypt.CryptUnprotectData(
 
 | 操作 | 必须具備的行為 |
 |---|---|
-| 第一次明示初始化 | 一次產生 installation／dataset／key，先以排他建立語意保存 `initializing` 配置並讀回核對；已有配置不得覆蓋。取得同一 installation 的原生 host 所有權後，才執行明示 migration／Saver setup；完整核對後發布 `ready`。 |
+| 第一次明示初始化 | 一次產生 installation／dataset／key，先以排他建立保存 `initialization_pending` 配置及永久空 guard；已有初始化紀錄不得覆蓋。取得同一 installation 的原生 host 所有權後，先核空 DB，再 CAS 為 `initializing` 並讀回核對，才執行固定 migration／Saver setup；完整核對後發布 `ready`。詳見[初始化前置](2026-09-13-jd-managed-initialization-preflight.md)。 |
 | 初始化被中斷 | 配置或 schema 不完整就停止普通開啟。明示續作沿原身分與原已記錄階段，不重新配 key／UUID；現有未知資料庫不當空白庫清除或重新初始化。設定完全遺失時不得換一個新 installation UUID 嘗試繞開可能仍存活的旧宿主。 |
 | 普通開啟 | 只讀既有配置→DPAPI／版本／內容驗證→使用原 UUID 取得 OS host lease→讀檢查實際 schema／PG／checkpoint prerequisites→完成既有 startup reconciliation→才提供寫入。沒有 setup、建立隨機 key 或環境變數備援。 |
 | 配置缺少、截斷、拒絕存取、無法解密、版本不符 | 固定錯誤與維護入口，停止進 DB／模型／新 writer；保留現場。不顯示「空白文件」代替出錯的資料集，不自動刪檔、降級明文或新建資料庫。 |

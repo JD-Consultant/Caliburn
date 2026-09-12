@@ -9,6 +9,8 @@
 
 **同日研究收束：**Owner 澄清框架名稱僅為例子，不記為技術偏好。研究者依[比較與採用理由](../specs/2026-09-13-jd-app-stack-selection.md)選 TypeScript／React／Next.js App Router 與 Python／FastAPI 為方向，MUI 為第一 UI 驗證候選；不是沿舊碼的決定。下方「不預選」描述研究前提，後續框架狀態以該稿為準；精確版本、資料層與 Agent 接點、恢復格式及新實作落點仍待閉合，RS-F 未全部完成。
 
+**同日續行收斂：**Owner 要求框架保持可替換並停止無效研究。RS-F 按實際依賴逐項閉合，不作全部技術研究完成才開工的大閘門；已定效果與來源規則先做[RS-1 完整任務／一次更正切片](../specs/2026-09-13-jd-relational-command-slice.md)。新落點為 `experiments/jd-relational-app`，先做純候選與離線契約驗證；其他具名操作、HTTP／讀取／回執契約仍在 RS-1，不因兩工具通過便開始宣稱真 DB／完整 App 已完成。
+
 ## 1. 成品範圍與可觀察結果
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
@@ -37,7 +39,7 @@ PARKED：Excel 與原始訪談下載、其他電腦安裝、真人顧問流程�
 |---|---|---|---|
 | RS-0 欄位與旅程基線 | 最後內容審核、Excel 延後、完整手動操作及新計畫 | 本輪兩路審核及窄修正 | 沒有重要已知資訊無落點；不增加無用途欄；文件狀態與來源一致 |
 | RS-F 技術方案選型 | 依所需能力比較現行UI／App／保存／Agent方案，固定推薦、版本／授權與新實作邊界 | §1產品需求；官方來源、相容性與必要有限反例；不以已安裝優先 | 每個必要效果有現成能力或有據的有限接合；已棄用路線排除，預覽能力單列限制；最多三個實質方向，不默默增通用引擎 |
-| RS-1 契約及完整業務操作 | 新 schema／generated DTO；純 domain commands 與 validators；完整樣稿的 relational fixture | RS-F；工具 variants／nullable／source 及 HTTP envelope 同一來源；本切片設計獨立複核 | 人工／AI adapter 對同意圖形成相同 command；多成果／要求、K/S、未分組、無名稱草稿、繁中／LF、原子最終候選、跨文件／過時拒絕；兩家離線 wire shape 無 DB／provider 副作用 |
+| RS-1 契約及完整業務操作 | 新 schema／generated DTO；純 domain commands 與 validators；完整樣稿的 relational fixture | RS-F 中本切片實際所需的契約／驗證依賴；工具 variants／nullable／source 及 HTTP envelope 同一來源；各有界單位獨立複核 | 人工／AI adapter 對同意圖形成相同 command；多成果／要求、K/S、未分組、無名稱草稿、繁中／LF、原子最終候選、跨文件／過時拒絕；兩家離線 wire shape 無 DB／provider 副作用 |
 | RS-2 真 DB 保存與恢復 | 建立目錄＋profile＋初始 head/revision；十三表 migration；current rows／snapshot／receipt 共同交易；恢復與 read ports | SSOT＋RS-1；明定 initial 全套初始化、約束、restore順序、receipt未知與同文件writer協調契約 | 真 PG 執行 D01、移動、K/S限制、來源exactly-one、重複operation與COMMIT結果遺失；r1不得兩successors；失敗無半筆發布；新程序重開全值一致 |
 | RS-3 員工完整手動 App | 真 API＋六章 CRUD，同頁完整文本／引用／差異／來源／歷史；自動保存與重開保護 | RS-2；DA-03 恢復儲存方案／格式／容量／版本／資料集識別、所選欄位元件驗證前置 | 不開模型由空白做完完整 JD；A晚回不清B、中文組字、實際選取、移動／刪除、切文件／封存／重開；Web/DB同版，不能靠瀏覽器cache當保存 |
 | RS-4 接 AI 顧問能力 | App注入scope／run／refs／版本；JD具名工具、真實錯誤、人工改動通知；滿足已研究Memory與來源能力 | RS-F/1/2/3交接；所選adapter序列化、provider結果對帳；專業方法與新命令對齊 | 固定模型回應完成初稿→手改→AI續改→純訪談不改→部分成功後取消→安全閉合；真DB/聊天/Memory/歷史一致，沒有強制每輪寫JD |
@@ -47,11 +49,11 @@ PARKED：Excel 與原始訪談下載、其他電腦安裝、真人顧問流程�
 
 RS-5 的還原／撤回 domain 與 DB 基礎在 RS-2 就實作驗證，RS-5 接全旅程與維護，不把 API 局部通過當整體通過。RS-7 採用研究、驗收材料、維護設計可以先並行；正式切換保留 G6，無須等到切換當天才研究。
 
-2026-09-13 進度：RS-0 文件單位完成，欄位／管理旅程及前次框架／計畫已分別獨立審查，首敗與修正留責任文件；Owner 修正後新增的 RS-F 選型尚未完成，原複核不代表新框架已選定。RS-1–7 尚未執行新版實作／驗收。整體 G4、G6 及成品狀態不因局部文件 PASS 而改判。
+2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合 RS-1 首單位所需生成／驗證／SDK離線依賴，UI／資料層／Agent 接點仍待相依施工前驗證。[RS-1 完整任務／一次更正](../specs/2026-09-13-jd-relational-command-slice.md)隔離實作完成：128 tests、codegen、TS型別檢查通過，首敗與修正已記。RS-1 的其他具名操作及讀取／HTTP／錯誤回執契約仍未完成；RS-2–7 尚未執行新版驗收。整體 G4、G6 及成品狀態不因局部 PASS 而改判。
 
 ## 4. 第一個可執行工程工作單位
 
-**先RS-F有限選型，結果成立後接RS-1：具體契約＋兩家工具契約相容性fixture＋純業務反例，零付費、零production接線。**不能先照舊SDK／generator生成一套再補選型理由；兩家必查官方資料，不等於產品必須新增雙provider切換功能。
+**先闭合RS-F中契約生成及離線驗證依賴，接RS-1：具體契約＋兩家工具契約相容性fixture＋純業務反例，零付費、零production接線。**不能先照舊SDK／generator生成一套再補選型理由；兩家必查官方資料，不等於產品必須新增雙provider切換功能。新前端、資料層及 Agent runtime 在其相依切片前各自閉合。
 
 1. 依RS-F固定的新技術與程式落點準備單一契約來源及生成方式；舊DTO／Node bridge只提供反例及正式切換時需退出的路由清單，不要求新碼相容或包裝它們。
 2. 定義 current read、item/field/container refs、具名 commands、保存回執／unknown、人工事件、history/source view 的 SSOT。catalog／run等已驗形狀可沿用語意；新舊版本明確分開，不加允許兩者混寫的fallback。

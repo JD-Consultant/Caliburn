@@ -191,6 +191,21 @@ task FK 採 `ON DELETE CASCADE`，因 link 是 task 的從屬關係；capability
 
 `basis_digest` 不宣稱來源自動證明整筆文字，只表示這條 link 是對哪個 target value 建立。current value digest 改變後，link 在 UI／模型 read 中標成 `needs_recheck`；歷史 snapshot 保留當時的匹配狀態。
 
+**2026-09-13 首切片精確化：**AI 的 `basis_refs=[]` 保留既有 links 及原 basis；非空只新增或刷新明列 ref，不刪未列來源。同 target 在一次更正裡收到的 refs 依輸入順序穩定去重，既有來源順序不變、新來源接在後面；全部以最終候選算 basis，不保存中間欄位版本。刪除 target／unlink 關係仍清除其 current links。人工明示移除來源是另一具名操作，不能由 AI 空陣列暗示。
+
+Canonical target 精確集合如下，均以 LF 正規化後的值計算：
+
+| target | digest 的內容 |
+|---|---|
+| profile field | `{field, value}`，只含被引用的那個正式欄位 |
+| duty／collaborator | `{name, scope_text}` |
+| task | `{name, description}` |
+| detail／condition | `{kind, text}` |
+| capability | `{kind, name, description}` |
+| task-capability relation | `{task:{name,description}, capability:{kind,name,description}}`；共享定義或任務正文更正後，舊 relation basis 也可識別需重查 |
+
+採 Python 標準 JSON encoding：keys 排序、compact separators、`ensure_ascii=False`，UTF-8 bytes 的 SHA-256；顯式 null 保留，不 NFC／trim 有意義文字。不含 ID、position、父分類、其他子項及來源本身；不是通用 JSON canonicalization 標準，所有產生與比較由同一後端責任實作，Web 不重算。未來改這個集合屬格式演進，不能悄悄把舊 basis 當新格式。上述是[首切片](2026-09-13-jd-relational-command-slice.md)對本案既定來源語意的收斂，不宣稱大廠使用同一組欄位。
+
 Memory／詳記協助查找原始材料，並非此欄另一種任意可變來源。沿[既有來源契約](2026-09-10-jd-context-change-and-source-research.md#4-jd-是否要引用-memory)，本輪沒有建立永久 Memory-version locator；較新更正與舊引用是否仍支持目前內容由顧問核對，target digest 不會自動判斷這項語意。
 
 ## 4. Revision 與 operation tables

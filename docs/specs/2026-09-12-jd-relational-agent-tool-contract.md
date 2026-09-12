@@ -203,6 +203,8 @@ replacement_text 永遠只替換選區，不是整欄新全文；不接受 field
 
 任一項無效、過時或整組超限，全部不套用。上限依[業務設計 §2](2026-09-12-jd-business-operations-and-scope-design.md#2-工具粒度保留具名操作補完整工作)，不偷偷拆成多次呼叫。來源逐變更指定，移除不會自動把 link 改掛新項。專業含義由顧問核實，App 負責候選、版本、關係與保存結果。
 
+2026-09-13 精確化：所有具名內容工具的 `basis_refs=[]` 表示此次不新增／刷新來源，保留舊 links 與 basis；非空只新增或刷新列出的 refs，不刪未列者。同 target 多欄更新的 refs 穩定合併，以最終候選正文計算 basis，不能最後一欄覆蓋前一欄的來源。精確集合與去重／順序見[來源保存 §3.10](2026-09-12-jd-relational-schema-and-write-contract.md#310-jd_source_link)。來源能讀或 basis 匹配都不保證專業內容已核實。
+
 ## 4. App command 與模型工具的關係
 
 員工直接編輯可在一次保存中有多個不同 command，例如「改 task 描述、加兩項成果、把 task 移到另一 duty」。Web 送的是 generated `JdManualSaveInput`：

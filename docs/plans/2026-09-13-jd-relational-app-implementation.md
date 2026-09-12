@@ -1,6 +1,6 @@
 # JD 關聯式 App：業務、保存、畫面與顧問接線施工計畫
 
-- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1 八操作／結果／公開讀取 refs 與 RS-2 共同保存／歷史、原身分恢復及兩個查詢 HTTP 已隔離驗證。實際 runtime writer owner、寫入 HTTP、歷史還原及完整 App 尚未完成。
+- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1 八操作／結果／讀取 refs 與 RS-2 共同保存／歷史、查詢 HTTP、單程序人工 writer／持久 checkpoint 已隔離驗證。跨程序宿主／AI 回合、寫入 HTTP、歷史還原及完整 App 尚未完成。
 - Owner 授權：最後核完整客製化 JD 欄位後，繼續推進 App、業務邏輯、LLM 及測試；Excel 延後。沿[最新需求](../specs/2026-09-12-jd-relational-editing-requirements.md)。
 - 本計畫取代[9/10 成品計畫](2026-09-10-jd-product-delivery.md)中**新版 JD 的施工順序／Plate／三工具／v2 前提**，不改寫舊六切片的成果與失敗。舊文件末尾 Task6 不是新工作指令。
 - 正式產品仍依 ADR0060，ADR0075／0074 Proposed；隔離驗證不等於 G6 切換，不混接正式 API／Web。
@@ -13,9 +13,9 @@
 
 ## 1. 成品範圍與可觀察結果
 
-**最新實作進度：**[查詢 API／恢復身分切片](../specs/2026-09-13-jd-query-api-and-recovery-identity-slice.md)完成 `jd_change_read` 公開生成契約、兩家 SDK 離線、兩個真 HTTP 查詢，以及不重建舊候選的操作身分恢復。真 PG／新 Uvicorn 程序查六章、歷史與原次差異且資料不變；871 離線 PASS／89 PG SKIP，受影響接合 69 PASS（13 離線、56 真 PG）。首敗與獨立審查沿結果稿；原生查詢依賴已閉合，不代表寫入 host／實際停止 owner／App 完成。[前次同版讀取](../specs/2026-09-13-jd-read-change-implementation.md)與保存交易保留歷史，不累加數字。
+**最新實作進度：**[人工持久執行流程](../specs/2026-09-13-jd-manual-runtime-slice.md)接好原生 root checkpoint、實際單程序人工 writer、原結果 lookup 及已停止後 failure-only 對帳；955 離線 PASS／108 PG SKIP，受影響接合 131 PASS（84 離線、47 真 PG），生成／TS 與独立審查通過。真 PG 驗先記操作再 SQL、ACK 遺失、訊息保留及跨文件進度；新程序只讀不是 OS 死亡證明。[前次查詢接合](../specs/2026-09-13-jd-query-api-and-recovery-identity-slice.md)保留歷史數字；仍無完整 App／AI 回合。
 
-**唯一下一工作：**接實際持久 runtime 的 admitted descriptor／同文件 writer owner、正常完成與停止／重開恢復，再開共同編輯 HTTP 及 RS-3 六章管理畫面；來源 owner、選區與資料集身分依接點閉合。不雙寫文件 catalog，不以 fake authority 接正式寫入，不重開同層品牌研究。
+**唯一下一工作：**接實際 host 的單程序互斥、跨重啟原 writer 退出證據與 descriptor 對帳，再開共同編輯 HTTP 及 RS-3 六章管理畫面；AI run／call 綁定、來源 owner、選區與資料集身分依接點閉合。不雙寫文件 catalog，不把單程序 Future 擴稱跨程序證明，不重開同層品牌研究。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 

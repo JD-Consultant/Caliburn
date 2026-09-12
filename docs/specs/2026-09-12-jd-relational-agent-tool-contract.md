@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C02、C03
-- 階段：G4 WORKING；八操作、真 PG 共同保存與同版讀取已隔離驗證。2026-09-13 [查詢 API／恢復身分切片](2026-09-13-jd-query-api-and-recovery-identity-slice.md)再完成公開 `jd_change_read` schema／兩家 SDK 離線 adapter、兩個 HTTP 查詢、唯讀 JdReader 及原身分恢復。實際 writer／持久 runtime、source owner／選區發配、人工 notice、寫入 HTTP 與完整 App 仍待完成；不是整體 G4 或 production 採用。
+- 階段：G4 WORKING；八操作、真 PG 共同保存、讀取／原次差異及查詢 HTTP 已隔離驗證。[人工持久 runtime](2026-09-13-jd-manual-runtime-slice.md)再接同一 Storage 的單程序實際 writer、原生 checkpoint 與原結果查回。跨程序 host／AI call 綁定、source owner／選區、人工 notice、寫入 HTTP 與完整 App 仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[整體設計](2026-09-12-jd-relational-editor-design.md)
 - 保存契約：[資料庫與保存](2026-09-12-jd-relational-schema-and-write-contract.md)
 

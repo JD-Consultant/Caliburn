@@ -217,6 +217,29 @@ class JdStorage(JdReader):
         except Exception:
             raise StorageError("read_failed") from None
 
+    def lookup(self, identity: AdmittedIdentity) -> WriteObservation | None:
+        """Read the original terminal before admission, without writer checks.
+
+        None means no receipt was visible in this short read-only transaction.
+        It proves neither writer death nor absence after a write barrier, and
+        cannot authorize recovery or replay. New execution still requires a
+        durable descriptor and the real document owner.
+        """
+        try:
+            if type(identity) is not AdmittedIdentity:
+                raise IntentValidationError()
+            identity.validate()
+        except (IntentValidationError, TypeError, ValueError, AttributeError):
+            raise StorageError("invalid_input") from None
+        try:
+            with self._connection(readonly=True) as conn, conn.begin():
+                receipt = self._operation(conn, identity.document_id, identity.operation_id)
+                return self._check_original(receipt, identity) if receipt is not None else None
+        except StorageError as error:
+            raise StorageError("operation_conflict" if error.code == "operation_conflict" else "read_failed") from None
+        except Exception:
+            raise StorageError("read_failed") from None
+
     @staticmethod
     def _base_if_known(conn, intent):
         return conn.execute(sa.select(db.jd_revision.c.revision_id).where(

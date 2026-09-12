@@ -2,7 +2,7 @@
 
 - 查閱日：2026-09-13；Topic：JD-R002／DA-04、DA-07。
 - 目的：接欄位審核後，依產品需要與現行官方證據比較框架；已有程式僅提供現況及失敗案例，不以框架名稱、已安裝或沿用成本代替採用依據。
-- 效力：G2/G4 本案映射；未升級依賴、建表、修改 runtime 或呼叫產品模型。整體 G4 尚未閉合。
+- 效力：G2/G4 本案映射；本文初稿為選型前置。後續局部實作依 §1.3 路由，不能把初稿未施工狀態當最新結果。整體 G4 尚未閉合。
 
 ## 1. Owner 修正後的選型前提
 
@@ -33,6 +33,8 @@
 ### 1.3 本輪比較後的收束
 
 Owner 後續舉出 TypeScript／React／Next.js／Python，並再次澄清：**不是指定或偏好這些名稱，判準仍為現行主流、大廠公開實務與適用性。**研究者依[主流框架比較](2026-09-13-jd-app-stack-selection.md)選 Next.js App Router＋TypeScript／React、Python＋FastAPI 為 App 框架方向；MUI 免費核心為第一 UI 驗證候選，Cloudscape 備選，SQLAlchemy／Alembic 為資料接合候選。採用理由獨立於舊碼，具體版本組合與 Agent 接點尚未完成，不能把局部選型當整個 RS-F 或 G4 通過。
+
+後續資料層與查詢 HTTP 已依[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)驗證。此次[人工 runtime 切片](2026-09-13-jd-manual-runtime-slice.md#2-官方依据與有限選型)比較 LangGraph、OpenAI Agents／Temporal、Claude Agent SDK 的具體持久責任後，採 LangGraph 1.2.11＋PG Saver 3.1.2 原生 root state；實際單程序 owner／真 PG 已驗，不 import 舊碼。AWS 支持共用 domain／明確操作身分，不指示本案框架與七欄格式。完整 AI middleware、OS 宿主及 UI 尚未完成；只因新證據／實測缺口重開此層選型。
 
 ## 2. 已核官方能力與先前映射參考
 

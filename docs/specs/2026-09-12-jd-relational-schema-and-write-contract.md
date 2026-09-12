@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C03
-- 階段：G4 WORKING；十三表、八操作、共同交易與同版讀取已隔離驗證。2026-09-13 [查詢／恢復接合](2026-09-13-jd-query-api-and-recovery-identity-slice.md)完成原操作差異公開契約、兩個 HTTP 查詢、不依賴 writer 的 JdReader，以及只憑原 AdmittedIdentity 對帳。真持久 runtime／停止 owner、source／選區／人工 notice、寫入 HTTP／Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
+- 階段：G4 WORKING；十三表、八操作、共同交易／讀取／查詢 HTTP 已隔離驗證。[人工持久 runtime](2026-09-13-jd-manual-runtime-slice.md)再接原生 checkpoint、單程序實際 writer 及原回執 lookup。跨程序宿主／退出證據、AI 回合、source／選區／notice、寫入 HTTP／Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[JD 關聯式管理編輯器](2026-09-12-jd-relational-editor-design.md)
 - 證據：[官方與本地現況](evidence/2026-09-12-jd-relational-editor-evidence.md)
 

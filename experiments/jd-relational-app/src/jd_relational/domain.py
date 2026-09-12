@@ -578,7 +578,7 @@ def _move_item(work: _Candidate, args: dict) -> None:
     work.value[COLLECTIONS[ref.kind]][ref.entity_id] = row
 
 
-def _validate_final(snapshot: dict, document_id: str) -> None:
+def validate_content(snapshot: dict, document_id: str) -> None:
     """Validate final rows, without applying intermediate per-column constraints."""
     for kind, collection in COLLECTIONS.items():
         for identity, row in snapshot[collection].items():
@@ -660,7 +660,7 @@ def build_candidate(snapshot: dict, command: dict, context: CommandContext) -> d
         _move_item(work, command["arguments"])
     else:
         _invalid("Use one of the eight named JD editing operations.")
-    _validate_final(work.value, context.document_id)
+    validate_content(work.value, context.document_id)
     work.finish_sources()
-    _validate_final(work.value, context.document_id)
+    validate_content(work.value, context.document_id)
     return work.value

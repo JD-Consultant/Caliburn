@@ -1,5 +1,7 @@
 # JD：真實結果契約與關聯資料庫基礎
 
+> 後續進度：本稿保留此單位當時的結果與未完成事項；八操作共同保存／永久 snapshot／receipt 已由[交易切片](2026-09-13-jd-transaction-service-slice.md)承接驗證。下述「尚無 service」是本單位歷史界線，最新狀態依續篇及決策入口。
+
 - 日期：2026-09-13；Topic：JD-R002；RS-1／RS-2 局部施工成果。
 - 承接[八個共同編輯操作](2026-09-13-jd-management-operations-slice.md)及[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)。框架是可替換的工程選擇；六章內容與管理效果仍由[欄位充分性審核](2026-09-13-jd-field-sufficiency-audit.md)約束。
 - 已完成輸出驗證、HTTP 投影、十三表固定 migration 與獨立 PostgreSQL 實測。**尚無完整 command 保存 service、讀取／ref、HTTP endpoint、App 畫面或自然模型流程。**沒有接正式產品，ADR0060／G6 不變；0 產品模型呼叫。

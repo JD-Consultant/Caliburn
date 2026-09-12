@@ -1,0 +1,440 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdSnapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "format_version": {
+      "type": "integer",
+      "enum": [
+        3
+      ]
+    },
+    "engine_profile": {
+      "type": "string",
+      "enum": [
+        "jd-relational-v1"
+      ]
+    },
+    "document_id": {
+      "$ref": "#/$defs/DocumentId"
+    },
+    "profile": {
+      "$ref": "#/$defs/Profile"
+    },
+    "collaborators": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/CollaboratorRow"
+      }
+    },
+    "duties": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/DutyRow"
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TaskRow"
+      }
+    },
+    "task_details": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TaskDetailRow"
+      }
+    },
+    "capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/CapabilityRow"
+      }
+    },
+    "task_capabilities": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/TaskCapabilityRow"
+      }
+    },
+    "conditions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ConditionRow"
+      }
+    },
+    "source_links": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/SourceLinkRow"
+      }
+    }
+  },
+  "required": [
+    "format_version",
+    "engine_profile",
+    "document_id",
+    "profile",
+    "collaborators",
+    "duties",
+    "tasks",
+    "task_details",
+    "capabilities",
+    "task_capabilities",
+    "conditions",
+    "source_links"
+  ],
+  "description": "Immutable, versioned JD content material. Relation and meaningful-content rules are validated by the shared domain. Scope appears only at the root; revision and transport refs are not content.",
+  "$defs": {
+    "UuidString": {
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "DocumentId": {
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^\\u0000]+$"
+    },
+    "TextValue": {
+      "type": "string"
+    },
+    "NullableText": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/TextValue"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "NullableUuid": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/UuidString"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "Position": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 2147483647
+    },
+    "ProfileField": {
+      "type": "string",
+      "enum": [
+        "job_title",
+        "organization_unit",
+        "employee_name",
+        "reports_to",
+        "purpose"
+      ]
+    },
+    "Profile": {
+      "title": "Profile",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "job_title": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "organization_unit": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "employee_name": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "reports_to": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "purpose": {
+          "$ref": "#/$defs/NullableText"
+        }
+      },
+      "required": [
+        "job_title",
+        "organization_unit",
+        "employee_name",
+        "reports_to",
+        "purpose"
+      ]
+    },
+    "CollaboratorRow": {
+      "title": "CollaboratorRow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "collaborator_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "name": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "scope_text": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "collaborator_id",
+        "name",
+        "scope_text",
+        "position"
+      ]
+    },
+    "DutyRow": {
+      "title": "DutyRow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "duty_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "name": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "scope_text": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "duty_id",
+        "name",
+        "scope_text",
+        "position"
+      ]
+    },
+    "TaskRow": {
+      "title": "TaskRow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "duty_id": {
+          "$ref": "#/$defs/NullableUuid"
+        },
+        "name": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "description": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "task_id",
+        "duty_id",
+        "name",
+        "description",
+        "position"
+      ]
+    },
+    "TaskDetailRow": {
+      "title": "TaskDetailRow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "detail_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "task_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "outcome",
+            "requirement"
+          ]
+        },
+        "text": {
+          "$ref": "#/$defs/TextValue"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "detail_id",
+        "task_id",
+        "kind",
+        "text",
+        "position"
+      ]
+    },
+    "CapabilityRow": {
+      "title": "CapabilityRow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "capability_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "knowledge",
+            "skill"
+          ]
+        },
+        "name": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "description": {
+          "$ref": "#/$defs/NullableText"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "capability_id",
+        "kind",
+        "name",
+        "description",
+        "position"
+      ]
+    },
+    "TaskCapabilityRow": {
+      "title": "TaskCapabilityRow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "task_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "capability_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "task_id",
+        "capability_id",
+        "position"
+      ]
+    },
+    "ConditionRow": {
+      "title": "ConditionRow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "condition_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "work_environment",
+            "schedule_travel",
+            "shared_authority",
+            "shared_collaboration",
+            "qualification"
+          ]
+        },
+        "text": {
+          "$ref": "#/$defs/TextValue"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        }
+      },
+      "required": [
+        "condition_id",
+        "kind",
+        "text",
+        "position"
+      ]
+    },
+    "SourceLinkRow": {
+      "title": "SourceLinkRow",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "source_link_id": {
+          "$ref": "#/$defs/UuidString"
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1,
+          "pattern": "^[^\\u0000]+$"
+        },
+        "basis_digest": {
+          "type": "string",
+          "minLength": 64,
+          "maxLength": 64,
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "position": {
+          "$ref": "#/$defs/Position"
+        },
+        "profile_field": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ProfileField"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "collaborator_id": {
+          "$ref": "#/$defs/NullableUuid"
+        },
+        "duty_id": {
+          "$ref": "#/$defs/NullableUuid"
+        },
+        "task_id": {
+          "$ref": "#/$defs/NullableUuid"
+        },
+        "detail_id": {
+          "$ref": "#/$defs/NullableUuid"
+        },
+        "capability_id": {
+          "$ref": "#/$defs/NullableUuid"
+        },
+        "condition_id": {
+          "$ref": "#/$defs/NullableUuid"
+        },
+        "linked_task_id": {
+          "$ref": "#/$defs/NullableUuid"
+        },
+        "linked_capability_id": {
+          "$ref": "#/$defs/NullableUuid"
+        }
+      },
+      "required": [
+        "source_link_id",
+        "source_ref",
+        "basis_digest",
+        "position",
+        "profile_field",
+        "collaborator_id",
+        "duty_id",
+        "task_id",
+        "detail_id",
+        "capability_id",
+        "condition_id",
+        "linked_task_id",
+        "linked_capability_id"
+      ]
+    }
+  }
+}

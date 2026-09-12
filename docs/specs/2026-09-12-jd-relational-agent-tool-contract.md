@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C02、C03
-- 階段：G4 DRAFT；語意契約供 review。2026-09-13 [八個編輯輸入](2026-09-13-jd-management-operations-slice.md)及[結果／HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md)已生成並通過離線驗證；十三表已真 PG 初始化。完整讀取／refs、永久 receipt／保存 service、HTTP endpoint 與自然模型驗證仍待完成。
+- 階段：G4 WORKING；語意契約與隔離實作並行。2026-09-13 [八個編輯輸入](2026-09-13-jd-management-operations-slice.md)及[結果／HTTP 投影](2026-09-13-jd-result-and-storage-foundation.md)已生成；[共同保存切片](2026-09-13-jd-transaction-service-slice.md)已驗八操作、永久 snapshot／receipt 與真 PG service。正式讀取／refs、runtime writer owner、HTTP endpoint 與自然模型驗證仍待完成。
 - 上層設計：[整體設計](2026-09-12-jd-relational-editor-design.md)
 - 保存契約：[資料庫與保存](2026-09-12-jd-relational-schema-and-write-contract.md)
 
@@ -16,7 +16,7 @@ OpenAI 與 Anthropic 的現行官方資料共同支持「模型回結構化工�
 
 既有 v2 `jd_edit` 面向完整文件樹；本稿原七工具又把部分完整工作拆得過細。依[業務操作研究 §1–2](2026-09-12-jd-business-operations-and-scope-design.md)，採具名操作，補完整新增任務、有界整組內容修訂及選區替換；不凍結工具數，也不直接開任意 command array。OpenAI 的連續功能合併與 Anthropic 的工作流程導向支持這個方向，strict schema 本身不決定操作粒度。
 
-App 將所有 mutation 映入相同 domain command、validator、短交易與結果 owner。一次跨欄責任更正必須用一個原子入口，不讓人工整組保存、模型只能逐欄碰運氣。具體輸入如下；generated schema／固定候選操作的局部結果沿頁首路由，保存與自然模型尚未驗證。
+App 將所有 mutation 映入相同 domain command、validator、短交易與結果 owner。一次跨欄責任更正必須用一個原子入口，不讓人工整組保存、模型只能逐欄碰運氣。具體輸入如下；generated schema、固定操作及真 PG 保存的局部結果沿頁首路由。正式模型接線／自然操作尚未驗證，不能把合成工具序列當自然訪談成果。
 
 ## 3. Model-facing 工具
 
@@ -272,7 +272,7 @@ App 從既有持久 run／可信 binding 注入 `ai_run_id`，與每筆 operatio
 }
 ```
 
-`effect` 與 `receipt_durability` 是兩個獨立事實，沿原 v2 契約區分 confirmed／unconfirmed，不新增第三種 durability：binding 前拒絕為 unchanged／unconfirmed 且無 operation ref；binding 後已證 rollback 但回執未存好，仍是 unchanged／unconfirmed。COMMIT 結果不明才是 unknown／unconfirmed。**只要原 operation 已 binding 但無確認 terminal，App 的 next action 必須先 reconcile_operation，優先於要求模型修正或重讀後新寫。**App 持有 operation identity，不要求 LLM 補填；原結果查回及 failure-only 閉合詳[保存契約 §6.2–7](2026-09-12-jd-relational-schema-and-write-contract.md#62-人工或-ai-保存)。同 key 改 base／payload 拒絕，不可當成重試原意圖。
+`effect` 與 `receipt_durability` 是兩個獨立事實，沿原 v2 契約區分 confirmed／unconfirmed，不新增第三種 durability：binding 前拒絕為 unchanged／unconfirmed 且無 operation ref。binding 後若尚未查明原回執是否存在就讀取／連線失敗，維持 unknown／unconfirmed；不能因本次未寫 SQL 而判定原操作未改內容。已跨原操作邊界並證正文 rollback，但回執未確認時為 unchanged／unconfirmed。COMMIT 未確認時，可能改正文者為 unknown；只提交 no_change／failure receipt 則仍為 unchanged。**只要原 operation 已 binding 但無確認 terminal，App 的 next action 必須先 reconcile_operation，優先於要求模型修正或重讀後新寫。**App 持有 operation identity，不要求 LLM 補填；原結果查回及 failure-only 閉合詳[保存契約 §6.2–7](2026-09-12-jd-relational-schema-and-write-contract.md#62-人工或-ai-保存)。同 key 改 base／payload 拒絕，不可當成重試原意圖。
 
 Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案將它固定成 machine-readable status＋員工可讀 message＋有限 next action，不讓模型從自由文字猜是否重試。[Anthropic Handle tool calls](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)
 
@@ -364,4 +364,4 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 - 2026-09-13 Owner 延後 Excel，先完整 App／業務／LLM；匯出不進 model tools，也不阻本輪契約。之後優先 Excel／原話分開輸出的方向保留。
 - 不增加模型用 archive、rename、history restore、DB query 或 raw JSON edit。JD 工具不重建 Memory 寫入入口；顧問仍可沿既有即時修補與背景整併反覆修訂工作理解。
 - 不讓 AI 每輪自動改 JD；是否撰寫由顧問方法與已理解資訊決定。
-- 本文尚未取代既有 generated schema；通過 design review 後才建立 successor contract 及施工計畫。
+- 新隔離目錄已有頁首所連輸入／結果／snapshot generated schema 與保存 service，尚未取代正式產品契約；完整讀取／refs、HTTP 及採用仍依新版計畫完成，不混寫舊 v2。

@@ -10,7 +10,8 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMAS = [("jd-work", "models.py"), ("jd-result", "results.py"), ("jd-http", "http_results.py")]
+SCHEMAS = [("jd-work", "models.py"), ("jd-result", "results.py"), ("jd-http", "http_results.py"),
+           ("jd-snapshot", "snapshots.py")]
 OUTPUT = ROOT / "src" / "jd_relational" / "generated"
 
 

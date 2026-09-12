@@ -76,7 +76,7 @@ def model_command(tool: str, arguments: str | dict) -> dict:
 
 
 def manual_command(envelope: dict) -> dict:
-    """Probe adapter; the actual generated HTTP envelope is a later RS-1 step."""
+    """Shared inner command shape; ManualSaveInput owns the outer HTTP identity."""
     if not isinstance(envelope, dict) or set(envelope) != {"tool", "arguments"}:
         raise TransportError("invalid_input")
     if not isinstance(envelope["tool"], str) or not isinstance(envelope["arguments"], dict):

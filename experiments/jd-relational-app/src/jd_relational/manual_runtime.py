@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from threading import Event, Lock, RLock, current_thread, main_thread
 from time import monotonic
 from typing import Callable, Protocol
+from uuid import UUID
 
 from .intents import AdmittedIdentity, BoundEdit
 from .storage.receipts import WriteObservation
@@ -227,13 +228,8 @@ class ManualRuntime:
             if slot.entry:
                 if slot.entry.identity == identity:
                     return slot.entry.attempt.handle
-                raise RuntimeFailure("document_busy")
-            try:
-                pending = self.checkpoints.read(identity.document_id)
-            except Exception as error:
-                raise RuntimeFailure(_checkpoint_failure(error)) from None
-            if pending is not None:
-                raise RuntimeFailure("document_busy")
+                if slot.entry.identity.operation_id == identity.operation_id:
+                    raise RuntimeFailure("operation_conflict")
             # This read can find an original result, but None is not stopped
             # proof. A new execution still requires durable admission below.
             try:
@@ -247,6 +243,14 @@ class ManualRuntime:
                 attempt.completion = Completion(original, True)
                 attempt.settled.set()
                 return attempt.handle
+            if slot.entry:
+                raise RuntimeFailure("document_busy")
+            try:
+                pending = self.checkpoints.read(identity.document_id)
+            except Exception as error:
+                raise RuntimeFailure(_checkpoint_failure(error)) from None
+            if pending is not None:
+                raise RuntimeFailure("document_busy")
             entry = _Entry(identity, attempt)
             slot.entry = entry
             try:
@@ -349,7 +353,9 @@ class ManualRuntime:
                 except Exception:
                     raise RuntimeFailure("writer_not_stopped") from None
 
-    def recover(self, document, *, timeout=10) -> Completion:
+    def recover(self, document, *, timeout=10, expected_operation_id: UUID | None = None) -> Completion:
+        if expected_operation_id is not None and not isinstance(expected_operation_id, UUID):
+            raise RuntimeFailure("invalid_input")
         slot = self._slot(document, admit=True)
         with slot.lock:
             self._require_open()
@@ -358,6 +364,8 @@ class ManualRuntime:
             if entry is None:
                 # No local entry is never a claim about a previous process.
                 raise RuntimeFailure("writer_not_stopped")
+            if expected_operation_id is not None and entry.identity.operation_id != expected_operation_id:
+                raise RuntimeFailure("operation_conflict")
             if not entry.attempt.settled.is_set():
                 raise RuntimeFailure("writer_not_stopped")
             try:
@@ -378,6 +386,7 @@ class ManualRuntime:
         return attempt.handle.wait(timeout)
 
     def status(self, document) -> WriterStatus:
+        self._require_host()
         slot = self._slot(document)
         with slot.lock:
             entry = slot.entry

@@ -106,6 +106,48 @@ def test_managed_worker_saves_then_confirms_checkpoint_cleanup(runtime):
     assert len(storage.executed) == 1
 
 
+def test_recovery_for_old_operation_cannot_recover_new_pending(runtime):
+    owner, checkpoint, storage = runtime
+    old = intent()
+    assert owner.submit(old).wait(3).checkpoint_closed
+    new = intent(old.document_id)
+    checkpoint.close_error = True
+    assert not owner.submit(new).wait(3).checkpoint_closed
+    with pytest.raises(RuntimeFailure, match="operation_conflict"):
+        owner.recover(old.document_id, expected_operation_id=old.operation_id)
+    assert checkpoint.pending[old.document_id] == new.identity
+    assert storage.recovered == []
+    checkpoint.close_error = False
+    assert owner.recover(new.document_id, expected_operation_id=new.operation_id).checkpoint_closed
+
+
+def test_same_pending_operation_with_different_intent_is_conflict(runtime):
+    owner, checkpoint, storage = runtime
+    storage.release.clear()
+    value = intent()
+    owner.submit(value)
+    assert storage.started.wait(2)
+    changed = bind_edit(value.operation_id, "manual", None,
+        {"tool": "jd_set_text", "arguments": {
+            "target_field_ref": "purpose", "text": "different", "basis_refs": []}}, value.context)
+    with pytest.raises(RuntimeFailure, match="operation_conflict"):
+        owner.submit(changed)
+    assert checkpoint.pending[value.document_id] == value.identity
+
+
+def test_original_receipt_remains_observable_while_later_operation_runs(runtime):
+    owner, checkpoint, storage = runtime
+    old = intent()
+    original = owner.submit(old).wait(3)
+    storage.release.clear()
+    new = intent(old.document_id)
+    owner.submit(new)
+    repeated = owner.submit(old).wait(0.1)
+    assert repeated.observation == original.observation
+    assert checkpoint.pending[old.document_id] == new.identity
+    assert owner.status(old.document_id).write_blocked
+
+
 def test_same_document_wait_timeout_is_not_cancellation_or_stopped_proof(runtime):
     owner, checkpoints, storage = runtime
     storage.release.clear()

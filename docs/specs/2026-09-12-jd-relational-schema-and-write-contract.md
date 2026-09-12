@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C03
-- 階段：G4 WORKING；十三表、八操作、共同交易／讀取／查詢 HTTP、人工 writer 已隔離驗證。[Windows 宿主恢復](2026-09-13-jd-host-restart-recovery-slice.md)再接舊組退出證據、全 catalog 原操作對帳與原話保留。AI 回合、source／選區／notice、寫入 HTTP／Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
+- 階段：G4 WORKING；十三表、八操作、共同交易／讀取、人工 writer／Windows 重啟恢復已隔離驗證。[人工 HTTP 接合](2026-09-13-jd-manual-http-slice.md)再接真保存／查回／狀態／明示恢復，DB 格式不變。文件入口 HTTP、持久配置、AI 回合、source／選區／notice、Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[JD 關聯式管理編輯器](2026-09-12-jd-relational-editor-design.md)
 - 證據：[官方與本地現況](evidence/2026-09-12-jd-relational-editor-evidence.md)
 

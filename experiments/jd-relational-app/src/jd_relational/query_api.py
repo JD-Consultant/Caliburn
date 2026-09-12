@@ -56,11 +56,23 @@ class QueryBoundary:
 
     Starlette's generic 500 handler re-raises its original exception. This
     boundary consumes pre-response exceptions without forwarding private args.
-    It never changes a write outcome: the query app has no writing entry point.
+    It handles transport failures without creating or changing a write outcome.
     """
 
     def __init__(self, app):
         self.app = app
+
+    routes = frozenset({
+        "/api/documents/{document_id}/jd/read",
+        "/api/documents/{document_id}/jd/changes/read",
+    })
+    interrupted_message = "jd_query_response_interrupted"
+    event_name = "jd.http.query"
+    log_message = "JD query completed"
+
+    def failure_response(self, scope, error):
+        code = error.code if isinstance(error, ReadError) else "read_failed"
+        return _problem(scope, code)
 
     async def __call__(self, scope, receive, send):
         if scope["type"] != "http":
@@ -96,25 +108,21 @@ class QueryBoundary:
             if response_started:
                 # Never emit a second response; a transport loss says nothing
                 # about JD writes. Suppress the private cause in server logs.
-                raise RuntimeError("jd_query_response_interrupted") from None
-            code = error.code if isinstance(error, ReadError) else "read_failed"
-            await _problem(scope, code)(scope, receive, send_safe)
+                raise RuntimeError(self.interrupted_message) from None
+            await self.failure_response(scope, error)(scope, receive, send_safe)
         finally:
             try:
                 route = getattr(scope.get("route"), "path", None)
                 LOG.log(
                     logging.INFO if status < 500 else logging.WARNING,
-                    "JD query completed",
+                    self.log_message,
                     extra={
-                        "event_name": "jd.http.query",
+                        "event_name": self.event_name,
                         "request_id": str(request_id),
                         "route": (
                             route
                             if route
-                            in {
-                                "/api/documents/{document_id}/jd/read",
-                                "/api/documents/{document_id}/jd/changes/read",
-                            }
+                            in self.routes
                             else "unmatched"
                         ),
                         "status_code": status,
@@ -129,6 +137,9 @@ def create_query_app(
     resources: Callable[[], AbstractAsyncContextManager[QueryServices]],
     *,
     allowed_origins: tuple[str, ...] = (),
+    _body_limit: int = 16384,
+    _boundary_factory=QueryBoundary,
+    _allowed_methods: tuple[str, ...] = ("POST",),
 ) -> FastAPI:
     try:
         for origin in allowed_origins:
@@ -175,15 +186,15 @@ def create_query_app(
     )
     # Native body limiter, explicitly installed: FastAPI does not forward the
     # new Starlette constructor's max_body_size argument in this pinned version.
-    app.add_middleware(RequestBodyLimitMiddleware, max_body_size=16384)
+    app.add_middleware(RequestBodyLimitMiddleware, max_body_size=_body_limit)
     app.add_middleware(
         TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost"], www_redirect=False
     )
-    app.add_middleware(QueryBoundary)
+    app.add_middleware(_boundary_factory)
     app.add_middleware(
         CORSMiddleware,
         allow_origins=list(allowed_origins),
-        allow_methods=["POST"],
+        allow_methods=list(_allowed_methods),
         allow_headers=["Content-Type"],
         allow_credentials=False,
         expose_headers=["X-Request-ID"],

@@ -34,7 +34,7 @@
 
 Owner 後續舉出 TypeScript／React／Next.js／Python，並再次澄清：**不是指定或偏好這些名稱，判準仍為現行主流、大廠公開實務與適用性。**研究者依[主流框架比較](2026-09-13-jd-app-stack-selection.md)選 Next.js App Router＋TypeScript／React、Python＋FastAPI 為 App 框架方向；MUI 免費核心為第一 UI 驗證候選，Cloudscape 備選，SQLAlchemy／Alembic 為資料接合候選。採用理由獨立於舊碼，具體版本組合與 Agent 接點尚未完成，不能把局部選型當整個 RS-F 或 G4 通過。
 
-後續資料層與查詢 HTTP 已依[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)驗證。[人工 runtime 切片](2026-09-13-jd-manual-runtime-slice.md#2-官方依据與有限選型)比較 LangGraph、OpenAI Agents／Temporal、Claude Agent SDK 的具體持久責任後，採 LangGraph 1.2.11＋PG Saver 3.1.2 原生 root state；實際單程序 owner／真 PG 已驗，不 import 舊碼。AWS 支持共用 domain／明確操作身分，不指示本案框架與七欄格式。後續[Windows 宿主與重啟恢復切片](2026-09-13-jd-host-restart-recovery-slice.md)已驗人工操作跨程序恢復，補 Win32 官方接點與 pywin32 312，並記錄 default DACL／舊物件退休的實測修正。完整 AI middleware、寫入 HTTP、日常啟停與 UI 尚未完成；只因新證據／實測缺口重開此層選型。
+後續資料層與查詢 HTTP 已依[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)驗證。[人工 runtime 切片](2026-09-13-jd-manual-runtime-slice.md#2-官方依据與有限選型)比較 LangGraph、OpenAI Agents／Temporal、Claude Agent SDK 的具體持久責任後，採 LangGraph 1.2.11＋PG Saver 3.1.2 原生 root state；實際單程序 owner／真 PG 已驗，不 import 舊碼。AWS 支持共用 domain／明確操作身分，不指示本案框架與七欄格式。後續[Windows 宿主與重啟恢復切片](2026-09-13-jd-host-restart-recovery-slice.md)已驗人工操作跨程序恢復，補 Win32 官方接點與 pywin32 312，並記錄 default DACL／舊物件退休的實測修正。[人工 HTTP 接合](2026-09-13-jd-manual-http-slice.md)再驗同一保存 owner、原操作查回、ASGI 斷線界線及本機 Origin，未加框架或升級依賴。完整 AI middleware、文件入口／持久配置、日常啟停與 UI 尚未完成；只因新證據／實測缺口重開此層選型。
 
 ## 2. 已核官方能力與先前映射參考
 

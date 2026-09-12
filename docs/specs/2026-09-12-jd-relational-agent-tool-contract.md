@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C02、C03
-- 階段：G4 WORKING；八操作、真 PG 共同保存、讀取／原次差異及查詢 HTTP、人工 writer 已隔離驗證。[Windows 宿主恢復](2026-09-13-jd-host-restart-recovery-slice.md)再接同安裝舊組退出／全 catalog 人工原操作恢復。AI call 綁定、source owner／選區、人工 notice、寫入 HTTP 與完整 App 仍待完成；不是整體 G4 或 production 採用。
+- 階段：G4 WORKING；八操作、真 PG 共同保存、读取／原次差異及查詢、人工 writer／Windows 重啟恢復已隔離驗證。[人工 HTTP 接合](2026-09-13-jd-manual-http-slice.md)再接保存／原操作查回／狀態／明示恢復，原結果不因斷線或新版本重做。文件入口 HTTP、持久配置、AI call 綁定、source owner／選區、人工 notice 與完整 App 仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[整體設計](2026-09-12-jd-relational-editor-design.md)
 - 保存契約：[資料庫與保存](2026-09-12-jd-relational-schema-and-write-contract.md)
 
@@ -213,13 +213,13 @@ replacement_text 永遠只替換選區，不是整欄新全文；不接受 field
 
 ## 4. App command 與模型工具的關係
 
-員工直接編輯可在一次保存中有多個不同 command，例如「改 task 描述、加兩項成果、把 task 移到另一 duty」。Web 送的是 generated `JdManualSaveInput`：
+員工一次有意義的保存可含多個相依內容變更，例如「改 task 描述、加兩項成果、把 task 移到另一 duty」。2026-09-13 [HTTP 接合](2026-09-13-jd-manual-http-slice.md)釐清早期通用 ordered commands 草案：Web 實際送 generated `ManualSaveInput`，使用同一具名完整業務操作；上述移動及必要內容調整由 `jd_move_item.content_changes` 原子處理，其他相依更正用 `jd_revise_work`，不提供任意 batch：
 
 ```text
 document scope（route 注入）
 base view token（App 持有）
 operation identity（App 配發）
-ordered typed commands（Web 從實際 UI 操作產生）
+command（Web 從實際 UI 意圖選具名操作及 generated arguments）
 ```
 
 Web 不向員工顯示 JSON。模型不直接取得這個通用 transport，而是使用上述完整業務入口；两者映入相同 service、validator、transaction、snapshot 與 receipt。人能在一個已定業務意圖中做的原子更正，AI 也必須有對應入口；不存在「只有人工可以全部成功或全不改」的規則。

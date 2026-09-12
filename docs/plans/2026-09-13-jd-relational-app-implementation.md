@@ -1,6 +1,6 @@
 # JD 關聯式 App：業務、保存、畫面與顧問接線施工計畫
 
-- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1 八操作／結果／讀取 refs 與 RS-2 共同保存／歷史、查詢 HTTP、人工 writer／checkpoint、Windows 宿主跨重啟恢復已隔離驗證。AI 回合、寫入 HTTP、歷史還原及完整 App 尚未完成。
+- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1 八操作／結果／讀取 refs 與 RS-2 共同保存／歷史、人工 writer／checkpoint、Windows 宿主跨重啟恢復、人工保存／查回 HTTP 已隔離驗證。文件入口、持久配置、AI 回合、歷史還原及完整 App 尚未完成。
 - Owner 授權：最後核完整客製化 JD 欄位後，繼續推進 App、業務邏輯、LLM 及測試；Excel 延後。沿[最新需求](../specs/2026-09-12-jd-relational-editing-requirements.md)。
 - 本計畫取代[9/10 成品計畫](2026-09-10-jd-product-delivery.md)中**新版 JD 的施工順序／Plate／三工具／v2 前提**，不改寫舊六切片的成果與失敗。舊文件末尾 Task6 不是新工作指令。
 - 正式產品仍依 ADR0060，ADR0075／0074 Proposed；隔離驗證不等於 G6 切換，不混接正式 API／Web。
@@ -13,9 +13,9 @@
 
 ## 1. 成品範圍與可觀察結果
 
-**最新實作進度：**[宿主重啟恢復](../specs/2026-09-13-jd-host-restart-recovery-slice.md)接 Windows 原生互斥／Job／live lease、先恢復全 catalog 才 ready、原操作查回及不存在文件拒絕；真新宿主在保存前／COMMIT 確認遺失後中斷仍閉合原操作並保留原話。首敗、精確測試分層、獨立審查與版本以結果稿為準。[前次人工 writer](../specs/2026-09-13-jd-manual-runtime-slice.md)保留歷史數字；仍無完整 App／AI 回合。
+**最新實作進度：**[人工 HTTP 接合](../specs/2026-09-13-jd-manual-http-slice.md)接同一業務保存、原操作查回、狀態及明示恢復；真 Windows／PG／Uvicorn 驗斷線後保存一次，後续新工作及新程序重開不重播原操作。首敗、精確測試分層、獨立審查與版本以結果稿為準。[前次宿主恢復](../specs/2026-09-13-jd-host-restart-recovery-slice.md)保留歷史數字；仍無完整 App／AI 回合。
 
-**唯一下一工作：**接同一業務保存的人工寫入 HTTP／操作查回與資源狀態，再接 RS-3 六章管理畫面；安裝／資料集／簽章持久配置、AI run／call 綁定、來源 owner與選區依接點閉合。所有寫入入口使用真 host／startup gate，不雙寫文件 catalog，不重開同層品牌研究。
+**唯一下一工作：**補文件建立／列表／更名／封存恢復入口與安裝／資料集／簽章持久本機配置，使 RS-3 六章管理畫面能從空白使用已接的保存與查回；AI run／call 綁定、來源 owner與選區依接點閉合。所有寫入入口使用真 host／startup gate，不雙寫文件 catalog，不重開同層品牌研究。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 
@@ -53,7 +53,7 @@ PARKED：Excel 與原始訪談下載、其他電腦安裝、真人顧問流程�
 
 RS-5 的還原／撤回 domain 與 DB 基礎在 RS-2 就實作驗證，RS-5 接全旅程與維護，不把 API 局部通過當整體通過。RS-7 採用研究、驗收材料、維護設計可以先並行；正式切換保留 G6，無須等到切換當天才研究。
 
-2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合本切片所需生成／驗證／SDK 離線、資料層、標準 signer、查詢及 Windows 宿主依賴；UI／實際 Agent 接點仍待相依施工前驗證。RS-1／2 的共同保存、讀取／差異及人工跨重啟恢復以 §1 最新切片為準；寫入 HTTP、還原／整輪撤回與 AI 生命週期仍未完成。RS-3–7 尚未執行新版验收，整體 G4、G6 及成品狀態不因局部 PASS 而改判。
+2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合本切片所需生成／驗證／SDK 離線、資料層、標準 signer、查詢／保存 HTTP 及 Windows 宿主依賴；UI／實際 Agent 接點仍待相依施工前驗證。RS-1／2 的共同保存、讀取／差異及人工跨重啟恢復以 §1 最新切片為準；文件入口／持久配置、還原／整輪撤回與 AI 生命週期仍未完成。RS-3–7 尚未執行新版验收，整體 G4、G6 及成品狀態不因局部 PASS 而改判。
 
 本輪[分層／錯誤／紀錄官方證據](../specs/evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)已收束。typed result 合法組合及 HTTP 純投影已完成，service 亦驗真 DB 結果、診斷不含正文、sink 故障不蓋原觀察及不同文件獨立保存。宿主 logging 配置／容量／實際接線仍由相依工作補驗，不另開 logging 品牌研究。
 

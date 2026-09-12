@@ -126,7 +126,7 @@ AI 仍可反覆修改；[WS-01 裁決](2026-09-12-jd-agent-workspace-necessity-r
 
 ## 6. 差異、歷史與來源
 
-Owner 確認 AI 可直接修改保存、不逐次接受；App 須提供可見提示與確切差異。[CV-01 呈現候選](2026-09-12-jd-change-visibility-design.md)推薦目前稿標記＋同頁按需展開，另比較原位置展開；**預設呈現待討論**。以下是既有資料保真要求，不用 AI 摘要代替。
+Owner 確認 AI 可直接修改保存、不逐次接受；App 須提供可見提示與確切差異。[CV-01](2026-09-12-jd-change-visibility-design.md)已選目前稿標記＋同頁按需展開為預設，欄位內對照可按需閱讀。以下是既有資料保真要求，不用 AI 摘要代替；完整管理畫面仍需設計與驗證。
 
 - 每個 duty、task、detail、capability、condition 都有穩定 UUID；排序或所屬職責不是身分。
 - 當次差異以 operation 的 before revision 與 after revision 比較；按 stable ID 顯示新增、刪除、移動、欄位修改與 relation 增減。
@@ -163,7 +163,7 @@ relational current projection 可確定性轉成不同輸出，不讓 LLM 生成
 2. export mapper 將 duty/task/detail/capability relations 轉成輸出模型；
 3. renderer 產生 iCAP、公版或一般 JD Excel；位置碼、欄寬與合併儲存格只在 render-time 生成，不回寫業務 rows。
 
-本輪只保證資料能無損投影。輸出種類、欄名與版型仍 OPEN，沒有宣稱下載功能完成。舊 iCAP XLSX renderer 可當測試 oracle／版型研究，不直接接回 retired packages。
+本輪設計要求資料能無損投影，尚未完成實測。Owner 已選 JD 第一版先提供 Excel；工作表安排、欄名與版型仍待定，完整原始訪談另行匯出且格式待定。沒有宣稱下載功能完成。舊 iCAP XLSX renderer 可當测试 oracle／版型研究，不直接接回 retired packages。
 
 ## 9. 責任分工
 
@@ -219,4 +219,4 @@ relational current projection 可確定性轉成不同輸出，不讓 LLM 生成
 
 若外部 review 證明 derived snapshot 無法在同交易保持一致、generic source link 無法提供足夠完整性、Plate leaf editor 對 IME／undo 不成立，或 D01 選擇改變資料生命週期，回到本設計修訂。沒有具體反證時不重開整份關聯方向。
 
-下一步：本輪完整業務操作、範圍與選區的文件反例已修訂，依[複核紀錄](evidence/2026-09-12-jd-business-operations-review.md)確認局部閉合；接續未歸任務草稿、保存後撤回／歷史分組與暫存恢復等真正未決效果。整體 G4 與 Proposed ADR 未通過，尚不能開始正式 migrations。
+下一步依[設計完成度與剩餘工作](2026-09-12-jd-design-readiness-audit.md)：完整業務操作、範圍與選區已文件閉合，DR-01／HR-02／CV-01 產品方向已選；接完整管理旅程／Excel 版型、暫存相容性及 successor 契約前置，避免把已決效果重列未決。整體 G4 與 Proposed ADR 未通過，尚不能開始正式 migrations。

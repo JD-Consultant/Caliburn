@@ -362,7 +362,7 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 ## 11. 本輪 OPEN 與非目標
 
 - JD-R002/D01 任務保留政策已依 Owner 授權裁決；工具與人工共用完整效果。JR-R02／03 已通過[保存文件窄複核](evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 已通過[完整操作文件複核](evidence/2026-09-12-jd-business-operations-review.md)；均未實測。草稿／還原產品選擇已記[需求 §11](2026-09-12-jd-relational-editing-requirements.md#11-本輪裁決草稿歷史與還原2026-09-12)，恢復工程前置與整體 G4 仍待閉合。
-- Excel profile／下載格式未定，不進 model tools。
+- JD 第一版 Excel 已選；實體版型及完整原始訪談的獨立匯出格式未定，不進 model tools。
 - 不增加模型用 archive、rename、history restore、DB query 或 raw JSON edit。JD 工具不重建 Memory 寫入入口；顧問仍可沿既有即時修補與背景整併反覆修訂工作理解。
 - 不讓 AI 每輪自動改 JD；是否撰寫由顧問方法與已理解資訊決定。
 - 本文尚未取代既有 generated schema；通過 design review 後才建立 successor contract 及施工計畫。

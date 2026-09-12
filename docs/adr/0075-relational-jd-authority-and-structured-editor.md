@@ -24,7 +24,7 @@ PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與
 
 4. **目前內容 relational，歷史 snapshot 唯讀。**每次成功保存由 server 在同一 SQL transaction 從 current rows 產生 immutable canonical JSON snapshot；snapshot 不接受作 current write payload，不能被修改。current、revision、head 與成功 receipt 同交易全成或全敗；語意失敗先撤候選、另確認外層 failure receipt 提交。回覆不明保留原 operation，沿既有停止證明及 DB 邊界對帳，不重播。current 多表讀取、head 與 refs 使用同一短唯讀快照；外部原始問答來源查核分開標示。具體分支由資料庫契約 §6–9 負責。
 
-5. **同一頁採結構化管理畫面。**聊天與唯一 JD 並存；右側以具名欄位、職責／任務卡片、成果／要求子清單、K/S relation selector、歷史／差異／來源抽屜呈現。未分組任務是合法資料。沒有「目前稿／更正稿」雙頁、pending 接受／拒絕或第二份可編正文。Owner 已重申 AI 直接改稿、App 主動提供實際變更；[CV-01](../specs/2026-09-12-jd-change-visibility-design.md)的具體預設呈現尚待討論。
+5. **同一頁採結構化管理畫面。**聊天與唯一 JD 並存；右側以具名欄位、職責／任務卡片、成果／要求子清單、K/S relation selector、歷史／差異／來源抽屜呈現。未分組任務是合法資料。沒有「目前稿／更正稿」雙頁、pending 接受／拒絕或第二份可編正文。Owner 已選[CV-01](../specs/2026-09-12-jd-change-visibility-design.md)：AI 直接改稿，App 在目前稿標記並提供同頁按需差異；完整管理畫面與資料接線仍待驗證。
 
 6. **Plate 不再控制整份 JD。**結構、CRUD、relations、dirty buffer、保存與歷史由 App 處理。Plate 只保留為需要 selection／IME／undo 或富文字的單一長文字欄位候選；普通 text 足夠時不強制啟用。是否使用 leaf Plate 由 bounded UI spike 決定，不改 relational authority。
 

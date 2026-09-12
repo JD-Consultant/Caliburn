@@ -1,4 +1,5 @@
 # Caliburn Current Decision Register
+**JD-R002／隔離核心已交接（2026-09-12）：**六切片與整體review通過，保存於隔離checkout 54cdfb3420d074d1f4566cb04f12d1fb9a868022／tag jd-editor-core-isolated-20260910；[完整修正與證據](../.worktrees/analysis-only-agent/docs/specs/evidence/jd-editor-core-review/review.md)。最後47 Web／86受影響Python／19真PG、build/types/lint與真Chrome恢復PASS；原Task6完整旅程保留，不累加。**下一工作：P3離線費用防護／執行包及A1受測版本採用清單。**P3-B01仍OPEN、0產品provider；G6正式接合、P5日常維護、P6自然品質／真人與P7成品未通過。R3/R4呈現Minor列P5；未merge／push。
 
 - 最後核對：**2026-09-03**
 - 狀態：**目前決策與閱讀路由的唯一入口**

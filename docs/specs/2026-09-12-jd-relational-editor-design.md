@@ -118,6 +118,12 @@ Plate 只保留為**單一長文字欄位**的 leaf editor 候選，例如任務
 
 兩者都能反覆補充、更正、刪去錯誤內容與整理，直到符合實際工作。顧問依證據決定本輪改哪一項、兩者或先追問，不強制每輪雙寫；Memory 沿既有即時修補與背景整併，JD 沿共同業務操作。App 分開提供真實保存／發布結果，不把一方成功當兩方完成，也不因人工通知直接改 Memory。[責任、來源與驗收](2026-09-12-jd-business-operations-and-scope-design.md#6-jd-與-memory-的反覆修訂)不新增 Memory 引擎、跨系統交易或已停放的額外完成檢查。
 
+### 5.5 歷史、整份還原與重開
+
+Owner 已選歷史對照、局部直接更正及明確整份還原，第一版不加最近一步撤回；零散資料用聊天或未完整任務承接，不加待整理區。依[歷史與恢復設計](2026-09-12-jd-history-and-recovery-design.md)，歷史在同頁唯讀展開，整份還原先看完整影響，再由人工端 `restore_revision` 經共同 domain／保存流程形成新 revision。只還原 JD，保留中間歷史、原始訪談、Memory 與模型已讀基準；下一輪收到新的人工還原事件。
+
+AI 仍可反覆修改；[WS-01 裁決](2026-09-12-jd-agent-workspace-necessity-research.md#7-owner-澄清後的裁決第一版不設持久-ai-試稿區)先不設持久試稿分支，不把單次 App 候選驗證當專業品質保證。取消 AI 不撤銷已保存結果。重開先查原 operation，再處理未提交候選；瀏覽器暫存不是另一份正式 JD，版本／容量／資料集識別尚須工程前置閉合。
+
 ## 6. 差異、歷史與來源
 
 - 每個 duty、task、detail、capability、condition 都有穩定 UUID；排序或所屬職責不是身分。

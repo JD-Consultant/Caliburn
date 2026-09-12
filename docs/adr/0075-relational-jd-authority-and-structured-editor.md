@@ -72,7 +72,7 @@ Accepted 歷史 ADR 不改原文；只有本 ADR Accepted 且 production G6 完�
 
 ## Open decision and acceptance gate
 
-**D01 任務保留政策已依 Owner 授權裁決；完整設計仍 Needs revision。**讀取與回執 JR-R02／03 通過[保存文件窄複核](../specs/evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 通過[完整操作文件複核](../specs/evidence/2026-09-12-jd-business-operations-review.md)；均未實測。未歸任務草稿、撤回／歷史及暫存恢復等仍待閉合，本 ADR 保持 Proposed。
+**D01 任務保留政策已依 Owner 授權裁決；完整設計仍 Needs revision。**讀取與回執 JR-R02／03 通過[保存文件窄複核](../specs/evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 通過[完整操作文件複核](../specs/evidence/2026-09-12-jd-business-operations-review.md)；均未實測。Owner 後續已選不另設待整理區、歷史對照／局部更正／整份還原，研究者受權裁決先不设持久 AI 試稿區，見[需求 §10–11](../specs/2026-09-12-jd-relational-editing-requirements.md)。[歷史與恢復設計](../specs/2026-09-12-jd-history-and-recovery-design.md)將還原限定為人工端經同一 domain／交易產生新 JD 修訂；保留中間歷史，不倒退原始問答或 Memory。暫存格式／容量／資料集識別與完整 G4 尚待閉合，本 ADR 保持 Proposed。
 
 進 G6／施工前還必須：
 

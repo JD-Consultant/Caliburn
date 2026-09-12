@@ -330,6 +330,8 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 
 大量改動只放固定上限的事件與預覽，保留總數、界線及 `details_omitted=true`；模型按需讀。改了又改回仍有兩個 manual events，不因 head 文字等於舊版就稱沒有改過。
 
+員工整份還原 JD 有實際變更時，亦產生新的 manual event；App 附具名還原種類、實際 base/result、已核的歷史來源 revision 與 change ref，說明「只還原 JD、沿用舊版依據，未重新核對較新訪談」。no_change 只留下操作結果，不偽造內容事件。不把模型已讀基準、聊天或 Memory 一起倒退，也不把歷史 target refs 當新 current refs。對大量內容仍有界預覽及完整回讀入口；實際 DTO 欄位沿 SSOT 生成，模型無須填這些欄位。[還原與續談](2026-09-12-jd-history-and-recovery-design.md#5-身分來源與-ai-續談)
+
 ## 9. 來源引用契約
 
 本版 source_ref 限既有 port 實際發配、可回讀精確原始問答的引用。Memory／詳記協助找回材料，不把可變 Memory 路徑當永久來源；尚無 Memory-version locator。沿[既有來源研究 §4](2026-09-10-jd-context-change-and-source-research.md#4-jd-是否要引用-memory)，較新更正的效力仍由顧問核對，不靠 target digest 自動判斷。
@@ -339,6 +341,7 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 - AI 可讀原來源後，確認仍支持新文字時重新連結／更新 basis；不能只因 Memory 摘要看起來相似便自動背書。
 - K/S relation 本身是專業主張，可把 basis link 掛在 `jd_task_capability` relation；反向 task list不再另存來源。
 - source 有效只證明能回查原材料，不等於文字完整、專業或沒有誤解；顧問仍做 JD→source 及 work→JD 雙向核對。
+- 人工整份還原的有界分支由 server 從同文件內部歷史恢復原 source links／basis，不因暫時不可讀而靜默丟棄，也不重新宣稱專業支持。這不是 AI 新增来源的豁免；來源的新建／重連仍須查核。還原的範圍與來源提示沿[歷史契約](2026-09-12-jd-history-and-recovery-design.md#5-身分來源與-ai-續談)。
 
 ## 10. 需要 provider schema spike 的一點
 
@@ -354,7 +357,7 @@ App 保存一個 response-backed `last_model_view`，只記模型最後確實收
 
 ## 11. 本輪 OPEN 與非目標
 
-- JD-R002/D01 任務保留政策已依 Owner 授權裁決；工具與人工共用完整效果。JR-R02／03 已通過[保存文件窄複核](evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 已通過[完整操作文件複核](evidence/2026-09-12-jd-business-operations-review.md)；均未實測。未完整草稿／撤回等產品選擇及整體 G4 仍待閉合。
+- JD-R002/D01 任務保留政策已依 Owner 授權裁決；工具與人工共用完整效果。JR-R02／03 已通過[保存文件窄複核](evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 已通過[完整操作文件複核](evidence/2026-09-12-jd-business-operations-review.md)；均未實測。草稿／還原產品選擇已記[需求 §11](2026-09-12-jd-relational-editing-requirements.md#11-本輪裁決草稿歷史與還原2026-09-12)，恢復工程前置與整體 G4 仍待閉合。
 - Excel profile／下載格式未定，不進 model tools。
 - 不增加模型用 archive、rename、history restore、DB query 或 raw JSON edit。JD 工具不重建 Memory 寫入入口；顧問仍可沿既有即時修補與背景整併反覆修訂工作理解。
 - 不讓 AI 每輪自動改 JD；是否撰寫由顧問方法與已理解資訊決定。

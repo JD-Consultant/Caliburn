@@ -187,7 +187,7 @@ task FK 採 `ON DELETE CASCADE`，因 link 是 task 的從屬關係；capability
 | `condition_id` | uuid，可空 | 同文件 FK → condition |
 | `linked_task_id`／`linked_capability_id` | uuid／uuid，可空 | 兩欄同時有值時，複合 FK → task_capability relation |
 
-兩個 relation target 欄位必須同為 NULL 或同為非 NULL；再把這一對視為一個邏輯 target，與其餘七種 target 合計恰為一。各 ID 使用 typed composite FK 且 `ON DELETE CASCADE`，因 source link 是內容 target 的附件。`source_ref` 指向另一 owner，無跨 store FK；App 必須在寫入前以既有 source port 驗 scope、可讀性與種類。
+兩個 relation target 欄位必須同為 NULL 或同為非 NULL；再把這一對視為一個邏輯 target，與其餘七種 target 合計恰為一。各 ID 使用 typed composite FK 且 `ON DELETE CASCADE`，因 source link 是內容 target 的附件。`source_ref` 指向另一 owner，無跨 store FK；App 對新增／重新連結來源必須在寫入前以既有 source port 驗 scope、可讀性與種類。§6.4 的整份歷史還原只允許恢復 server 內部已保存的原 links／basis，不假稱重新核定；不可讀原話另顯示，不任意新增來源或略過同文件完整性。
 
 `basis_digest` 不宣稱來源自動證明整筆文字，只表示這條 link 是對哪個 target value 建立。current value digest 改變後，link 在 UI／模型 read 中標成 `needs_recheck`；歷史 snapshot 保留當時的匹配狀態。
 
@@ -222,7 +222,7 @@ Memory／詳記協助查找原始材料，並非此欄另一種任意可變來�
 
 固定約束：initial iff parent NULL；每 document 至多一 initial；本版線性 current history，每個非 initial parent 至多一個 successor。revision rows 不提供 UPDATE／DELETE port。非 initial 的 producer 由唯一 committed `jd_operation.result_revision_id` 反查，避免雙向 FK。
 
-Canonical snapshot 包含 profile、collaborators、duties、tasks、task_details、capabilities、task_capabilities、conditions、source_links；每組按 `position,id` 排序，明確保存 IDs 與 relations。這份 JSON 是 history／diff／export 的 immutable material，不可當 current write payload。
+Canonical snapshot 包含 profile、collaborators、duties、tasks、task_details、capabilities、task_capabilities、conditions、source_links；每組按 `position,id` 排序，明確保存 IDs 與 relations。這份 JSON 是 history／diff／export 的 immutable material，不接受為 Web／模型的 current write payload。§6.4 的具名還原由 server 讀自有 immutable snapshot、驗證後形成 relational 候選，沒有開放任意 JSON 覆蓋。
 
 ### 4.3 `jd_operation`
 
@@ -234,7 +234,7 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 | `base_revision_id` | uuid，可空 | 已核實時的同文件 FK |
 | `result_revision_id` | uuid，可空 | 成功／no_change 的同文件 FK |
 | `status` | text，非空 | §6 終局狀態 |
-| `receipt` | jsonb，非空 | SSOT write result；actual changes、error、next action |
+| `receipt` | jsonb，非空 | SSOT write result；actual changes、error、next action；還原結果另記操作種類及已核同文件的歷史來源 revision，供預覽後結果、歷史及模型通知辨識 |
 | `created_at` | timestamptz，非空 | 終局 receipt 保存時間 |
 
 同 `(document_id,operation_id)` 同 digest 重送只回原 receipt；不同 digest 回 `operation_conflict`，不能 UPSERT 覆寫。對 `status='committed'` 建部分唯一索引 `(document_id,result_revision_id)`；no_change 可由多個 operation 指同一 revision。
@@ -276,8 +276,8 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 正常寫入使用短 **READ COMMITTED** transaction，SQL 同步逐句執行，不使用 pipeline：
 
 1. 查同 operation；存在時依 digest 回原 receipt 或 conflict，不重新驗候選或覆寫原結果。
-2. 依固定順序鎖同文件 `jd_document`、`jd_head FOR UPDATE`；取得鎖後以後續 statement 再查 operation。所有會改該 JD 的 current／head／receipt 操作與 archive／restore 均遵守此順序；鎖必須在 savepoint **之前**，所有 mutation 必須在取得 head 鎖之後。
-3. 核 base revision、refs、同文件關係及 command 前置條件。既有 admission 必須讓 archive／restore 與 writer binding 互斥；鎖後再驗 archived／writer ownership，若違反已取得的資格，走原 operation 的 `save_failed` 閉合，不套用候選、不回無 binding 的 busy／archived。已確認的 `stale_view`／`target_missing` 等語意拒絕，可直接新增 failure receipt、提交外層交易，正文不變；base FK 只記已驗證的同文件 revision。
+2. 依固定順序鎖同文件 `jd_document`、`jd_head FOR UPDATE`；取得鎖後以後續 statement 再查 operation。所有會改該 JD 的 current／head／receipt 操作（含 §6.4）與 catalog archive／unarchive 均遵守此順序；鎖必須在 savepoint **之前**，所有 mutation 必須在取得 head 鎖之後。
+3. 核 base revision、refs、同文件關係及 command 前置條件。既有 admission 必須讓 catalog archive／unarchive 與 writer binding 互斥；鎖後再驗 archived／writer ownership，若違反已取得的資格，走原 operation 的 `save_failed` 閉合，不套用候選、不回無 binding 的 busy／archived。已確認的 `stale_view`／`target_missing` 等語意拒絕，可直接新增 failure receipt、提交外層交易，正文不變；base FK 只記已驗證的同文件 revision。
 4. 建立候選 savepoint；先按同一 base 解譯所有 refs，拒絕重複／互斥／anchor 被刪等輸入，組出完整最終候選並驗 domain invariant，再以同列最終值修改 current rows，避免逐欄中間狀態誤觸約束。ID、position、relation cleanup 由 App 處理；從同交易 rows 產 canonical snapshot 再核最終一致性。完整新增、內容修訂及結構附帶調整沿[工具契約 §3–4](2026-09-12-jd-relational-agent-tool-contract.md)，不形成第二套 validator。
 5. 候選中的預期語意錯誤，或已知可映射的 constraint 錯誤：`ROLLBACK TO SAVEPOINT` 成功後，保存對應 failure receipt，再提交外層交易。不得保留先前已移動的 task。未知 SQL 錯誤、連線失敗或 rollback 失敗不能一律假裝成輸入錯誤，改走下方整筆失敗分支。
 6. candidate digest 與已核 base 相同：rollback 到 savepoint，保存 `no_change` receipt，result 指 base；不新增 revision、不更新 head。
@@ -301,6 +301,17 @@ Canonical snapshot 包含 profile、collaborators、duties、tasks、task_detail
 - v1 無 permanent document delete；catalog archive 不觸發任何 cascade。
 
 PostgreSQL 官方指出 `CASCADE`、`RESTRICT`、`SET NULL` 要依物件是否能獨立存在選擇；以上是本案 ownership mapping，不稱通用規則。[PostgreSQL 16 Constraints](https://www.postgresql.org/docs/16/ddl-constraints.html)
+
+### 6.4 明示整份 JD 歷史還原
+
+Owner 已選定[需求 HR-01](2026-09-12-jd-relational-editing-requirements.md#11-本輪裁決草稿歷史與還原2026-09-12)。`restore_revision` 是人工端具名 application command；輸入限目前 H、選定歷史 S 的 issued refs 及 App 注入的 operation／scope，不接受 snapshot／任意 SQL 或 LLM 生成的資料庫身分。
+
+- 同文件 writer admission、document→head 鎖、base=H、archived、原 key 與 digest 規則全部沿 §6.2。server 核 S 屬同文件且 format／profile／digest 正確，使用既有 domain model 驗完整候選；預覽不持有交易。目標 S 納入 canonical request digest，改選版本或 base 是新意圖。
+- 這是已確認的整份替換效果，依[完整影響預覽](2026-09-12-jd-history-and-recovery-design.md#4-整份還原的使用流程)處理較新任務移除；不逐項套 D01 刪職責保留任務來改寫使用者選定的完整舊稿。
+- 有界實作方向是在同一 savepoint 內，僅對該 document 的九組正文／關係表，依 FK 子項先移除、父項先重建的順序，重建已驗的 S 候選並保留其歷史 IDs；catalog、head、revision、operation 不被清除。重建期間對外不可見，最终 rows→snapshot 必須與 S canonical 內容相符，否則全部 rollback。這是固定 domain 的整份還原，不生成通用逆命令或繞過驗證的表格 API。
+- 來源沿[歷史來源政策](2026-09-12-jd-history-and-recovery-design.md#5-身分來源與-ai-續談)：恢復原 source refs／basis，沒有新查核聲明。receipt 記已核的 S，歷史／通知顯示沿用舊版依據；新來源仍走 §3.10。
+- 有變更時新增 R，parent=H、origin=manual、revision number 前進；H、S 與中間 revisions／receipts 保留。相同 canonical 內容回 no_change，不新建 initial 或移 head 回 S。SQL 失敗、failure receipt／COMMIT 未確認與停止恢復都沿 §6.2–7，不能因 restore 另開 replay 邏輯。
+- 只更動 canonical JD；列表命名／封存、原始問答、Memory、聊天及模型已讀基準不變。catalog 解除封存稱 unarchive，與本命令分開。此款為設計，FK 順序、來源及故障尚須專用 DB 驗證。
 
 ## 7. 終局 status 與重試
 
@@ -346,7 +357,7 @@ current UI、AI read、來源目標核對、目前版 Excel export 共用一個�
 
 - source `needs_recheck` 只以同份 JD 讀取材料的 target digest 對當時 `basis_digest` 計算，不另存可手改狀態。
 - 外部來源的原文、scope／種類及可讀性，關閉 JD read transaction 後經既有 source port 取得；是另一時間點的來源觀察，須分開標示不可用／已查結果。不可用不刪 source link、不改 history、不冒稱所有來源與 JD 在同一全域交易內。來源可讀與文字是否仍受支持也是不同事實。
-- history UI 讀指定 immutable snapshot；原 source refs／當時目標內容保留，現今回查原文的失敗另顯示，不重寫歷史。
+- history UI 讀指定 immutable snapshot；原 source refs／當時目標內容保留，現今回查原文的失敗另顯示，不重寫歷史。比較／確認後的還原沿 §6.4 形成新寫入，不能在讀歷史時更新 head。
 - change read 由已確認 operation 的 base/result snapshots 按 stable IDs 比較，產出 create/update/delete/move/reorder/link/unlink 及欄位 before/after；失敗或 no_change 不偽造內容差異。
 - current export 使用 §9.1 的版本固定 projection；指定歷史 export 讀該 revision snapshot。兩者使用同一 canonical domain model，標明所輸出版次；Excel renderer 不再查散表或呼叫 LLM。
 
@@ -355,7 +366,7 @@ current UI、AI read、來源目標核對、目前版 Excel export 共用一個�
 本設計採 fresh data，沒有舊 JSONB revision 搬移或雙寫期。正式施工前必須：
 
 1. Proposed ADR 通過 G6；
-2. D01 任務保留政策已依 Owner 授權裁決；仍須閉合 JR-R05 職責條件／來源與相關寫入反例，不能僅通過 FK 就施工；
+2. D01 與 JR-R01–05 已文件閉合；本輪歷史還原及恢復前置須完成設計審查與真實寫入反例，不能僅通過 FK 或文件就施工；
 3. contract schema 由單一來源生成 API／Web／model DTO；
 4. migration 在專用新 DB 執行，初始化與日常啟動分開；
 5. 真 PostgreSQL 測試覆蓋 FK、transaction injection、同 operation replay、同 base 競爭、不同文件不互相阻塞；

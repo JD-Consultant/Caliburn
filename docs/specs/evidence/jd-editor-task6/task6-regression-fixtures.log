@@ -1,0 +1,149 @@
+.......................................................................F [ 75%]
+F.......................                                                 [100%]
+================================== FAILURES ===================================
+___ test_actual_sdk_request_matches_reviewed_contract_through_tool_followup ___
+
+h = namespace(replies=[], sent=[{'input': [{'content': [{'type': 'input_text', 'text': '你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先...YWI3M2I3ZGZkYjJiIiwgImZpcnN0IjogImgwIiwgImxhc3QiOiAiYTAifQ==', agent=<function h.<locals>.agent at 0x0000023B37350400>)
+
+    def test_actual_sdk_request_matches_reviewed_contract_through_tool_followup(h):
+        assets = SkillAssets()
+        memory = MemorySession(h.pub, h.source, skill_assets=assets)
+        graph = build_conversation(model=h.model, checkpointer=h.saver,
+            instructions=application_instructions(), tools=memory.tools,
+            middleware=[analysis_skills(assets), memory])
+        h.source.graph = graph
+        initial = h.pub.current()
+        initial_guide = h.artifacts.guide(initial.memory)
+        h.replies.extend([call('read_file', file_path='/memory/knowledge.md'), done()])
+        graph.invoke({'messages': [HumanMessage('更正為處長核准。', id='ct22-wire')]},
+                     h.config, durability='sync')
+        assert len(h.sent) == 2
+>       assert_reviewed_contract(h.sent, revision=initial.revision, guide=initial_guide)
+
+experiments\analysis-agent\tests\test_memory_prompt_contract.py:89: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payloads = [{'input': [{'content': [{'type': 'input_text', 'text': '你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。根據已知內容簡短回述，優先問一個員工目前可回答、...'model': 'gpt-5.6-luna', 'parallel_tool_calls': False, 'reasoning': {'effort': 'medium', 'context': 'all_turns'}, ...}]
+revision = 1, guide = '主管核准：/memory/knowledge.md'
+
+    def assert_reviewed_contract(payloads, *, revision, guide):
+        fixture = Path(__file__).resolve().parents[3] / 'docs/specs/evidence/2026-09-08-ct25-memory-prompt-candidate.json'
+        expected = json.loads(fixture.read_text(encoding='utf-8'))
+        # CT41 reviewed delta; preserve the CT25 historical evidence unchanged.
+        # This checks SDK prompt routing, NOT whether the model obeys the text.
+        delta = json.loads((Path(__file__).parent / 'fixtures/ct41-memory-action-delta.json').read_text(encoding='utf-8'))
+        matches = 0
+        for item in expected['system']:
+            for block in item['content']:
+                matches += block['text'].count(delta['before'])
+                block['text'] = block['text'].replace(delta['before'], delta['after'])
+        assert matches == 1
+        read_delta = json.loads((Path(__file__).parent / 'fixtures/ct43-memory-read-delta.json').read_text(encoding='utf-8'))
+        matches = 0
+        for item in expected['system']:
+            for block in item['content']:
+                matches += block['text'].count(read_delta['before'])
+                block['text'] = block['text'].replace(read_delta['before'], read_delta['after'])
+        assert matches == 1
+        # Reviewed CT48 shared patch-description delta, not a regenerated snapshot.
+        # The preserved historical fixture continues checking every other field.
+        patch_delta = json.loads((Path(__file__).parent / 'fixtures/ct48-patch-guidance-delta.json').read_text(encoding='utf-8'))
+        repair = next(tool for tool in expected['tools'] if tool['name'] == 'repair_memory')
+        assert repair['description'].count(patch_delta['before']) == 1
+        repair['description'] = repair['description'].replace(patch_delta['before'], patch_delta['after'])
+        for payload in payloads:
+            system = deepcopy(system_wire(payload))
+            for block in system[0]['content']:
+                block['text'] = block['text'].replace(
+                    f"Initial guide publication revision: {revision}",
+                    'Initial guide publication revision: {{initial_memory_revision}}').replace(
+                    guide, '{{initial_memory_guide}}')
+                block['text'] = re.sub(r'(?<=Current input reference \(copy only if useful\): )conversation:\S+',
+                                       '{{current_input_reference}}', block['text'])
+>           assert system == expected['system']
+E           AssertionError: assert [{'content': ...': 'message'}] == [{'content': ...': 'message'}]
+E             
+E             At index 0 diff: {'content': [{'type': 'input_text', 'text': '你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。已說清楚的不重問；員工已說不知道、需查證或暫時答不出來，也算已回應：保留未知，轉問其他有用方向。有新資訊或員工重新提出時才回看該未知；部分已說明就保留已知部分，未知不說成沒有這項工作或固定要求。回述與歸納保留原資訊的對象、本人做法、適用條件、頻率與權限；不把某案例的工具或限制套到其他工作，不把同時提及說成因果。你的改寫不等於員工確認；工作用語有歧義時保留員工用詞，有實際影響才追問。準備收尾時，對照已談的重要工作範圍、本人做法、責任交接、重要條件、成果與實際專業判斷，不只核對工作名稱。用目前對話與按需讀取的Memory核對；需要方法時用現有分析Skills，不每輪全面盤點，也不逐案例重問相同問題。仍有影響理解的重要未知就自然追問；已說不知道的外部資訊保留限制，不為收尾編造要求。收尾說明目前涵蓋與尚未確認之處，不用反覆最後一題或一句完整代替核對；員工可隨時休息或續談。需要撰寫或實質修正JD時，按需讀write-customized-jd方法與目前稿，使用已提供的...
+E             
+E             ...Full output truncated (2 lines hidden), use '-vv' to show
+
+experiments\analysis-agent\tests\test_memory_prompt_contract.py:70: AssertionError
+________ test_service_initial_memory_request_matches_reviewed_contract ________
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-regression-fixtures-temp/test_service_initial_memory_re0')
+
+    def test_service_initial_memory_request_matches_reviewed_contract(tmp_path):
+        # Exercise AnalysisService._context, including the normal Memory and Skills
+        # composition. The official Store is present even before first publication.
+        with service_harness(tmp_path, store=InMemoryStore()) as (service, sent, replies):
+            service.instructions = application_instructions()
+            document = service.create_document('新訪談提示接線')['id']
+            context = service._context(document)
+            context.memory.publication.setup()
+            service.enable_background(max_recoveries=2)
+            replies.extend([call('read_file', file_path='/skills/work-scope-interview/SKILL.md'), done()])
+            run = service.submit(document, 'ct22-service', '我會依照客戶需求製作網站。')
+            service.join(document)
+            assert service.get_run(document, run['id'])['status'] == 'completed'
+            assert len(sent) == 2
+>           assert_reviewed_contract([json.loads(request.content) for request in sent],
+                                     revision=0, guide='No memory has been published yet.')
+
+experiments\analysis-agent\tests\test_memory_prompt_contract.py:109: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+payloads = [{'input': [{'content': [{'type': 'input_text', 'text': '你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。根據已知內容簡短回述，優先問一個員工目前可回答、...'model': 'gpt-5.6-luna', 'parallel_tool_calls': False, 'reasoning': {'effort': 'medium', 'context': 'all_turns'}, ...}]
+revision = 0, guide = 'No memory has been published yet.'
+
+    def assert_reviewed_contract(payloads, *, revision, guide):
+        fixture = Path(__file__).resolve().parents[3] / 'docs/specs/evidence/2026-09-08-ct25-memory-prompt-candidate.json'
+        expected = json.loads(fixture.read_text(encoding='utf-8'))
+        # CT41 reviewed delta; preserve the CT25 historical evidence unchanged.
+        # This checks SDK prompt routing, NOT whether the model obeys the text.
+        delta = json.loads((Path(__file__).parent / 'fixtures/ct41-memory-action-delta.json').read_text(encoding='utf-8'))
+        matches = 0
+        for item in expected['system']:
+            for block in item['content']:
+                matches += block['text'].count(delta['before'])
+                block['text'] = block['text'].replace(delta['before'], delta['after'])
+        assert matches == 1
+        read_delta = json.loads((Path(__file__).parent / 'fixtures/ct43-memory-read-delta.json').read_text(encoding='utf-8'))
+        matches = 0
+        for item in expected['system']:
+            for block in item['content']:
+                matches += block['text'].count(read_delta['before'])
+                block['text'] = block['text'].replace(read_delta['before'], read_delta['after'])
+        assert matches == 1
+        # Reviewed CT48 shared patch-description delta, not a regenerated snapshot.
+        # The preserved historical fixture continues checking every other field.
+        patch_delta = json.loads((Path(__file__).parent / 'fixtures/ct48-patch-guidance-delta.json').read_text(encoding='utf-8'))
+        repair = next(tool for tool in expected['tools'] if tool['name'] == 'repair_memory')
+        assert repair['description'].count(patch_delta['before']) == 1
+        repair['description'] = repair['description'].replace(patch_delta['before'], patch_delta['after'])
+        for payload in payloads:
+            system = deepcopy(system_wire(payload))
+            for block in system[0]['content']:
+                block['text'] = block['text'].replace(
+                    f"Initial guide publication revision: {revision}",
+                    'Initial guide publication revision: {{initial_memory_revision}}').replace(
+                    guide, '{{initial_memory_guide}}')
+                block['text'] = re.sub(r'(?<=Current input reference \(copy only if useful\): )conversation:\S+',
+                                       '{{current_input_reference}}', block['text'])
+>           assert system == expected['system']
+E           AssertionError: assert [{'content': ...': 'message'}] == [{'content': ...': 'message'}]
+E             
+E             At index 0 diff: {'content': [{'type': 'input_text', 'text': '你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。已說清楚的不重問；員工已說不知道、需查證或暫時答不出來，也算已回應：保留未知，轉問其他有用方向。有新資訊或員工重新提出時才回看該未知；部分已說明就保留已知部分，未知不說成沒有這項工作或固定要求。回述與歸納保留原資訊的對象、本人做法、適用條件、頻率與權限；不把某案例的工具或限制套到其他工作，不把同時提及說成因果。你的改寫不等於員工確認；工作用語有歧義時保留員工用詞，有實際影響才追問。準備收尾時，對照已談的重要工作範圍、本人做法、責任交接、重要條件、成果與實際專業判斷，不只核對工作名稱。用目前對話與按需讀取的Memory核對；需要方法時用現有分析Skills，不每輪全面盤點，也不逐案例重問相同問題。仍有影響理解的重要未知就自然追問；已說不知道的外部資訊保留限制，不為收尾編造要求。收尾說明目前涵蓋與尚未確認之處，不用反覆最後一題或一句完整代替核對；員工可隨時休息或續談。需要撰寫或實質修正JD時，按需讀write-customized-jd方法與目前稿，使用已提供的...
+E             
+E             ...Full output truncated (2 lines hidden), use '-vv' to show
+
+experiments\analysis-agent\tests\test_memory_prompt_contract.py:70: AssertionError
+============================== warnings summary ===============================
+experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED experiments\analysis-agent\tests\test_memory_prompt_contract.py::test_actual_sdk_request_matches_reviewed_contract_through_tool_followup
+FAILED experiments\analysis-agent\tests\test_memory_prompt_contract.py::test_service_initial_memory_request_matches_reviewed_contract
+2 failed, 94 passed, 1 warning in 19.69s

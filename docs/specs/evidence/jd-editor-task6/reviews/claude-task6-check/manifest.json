@@ -1,0 +1,82 @@
+[
+  {
+    "source": "experiments/analysis-agent/tests/test_context_budget.py",
+    "copy": "test_context_budget.py",
+    "sha256": "995084be2976e77f38202c9e695aade98a8a60baa4adffaaa258950ba1c99540"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_native_context_budget.py",
+    "copy": "test_native_context_budget.py",
+    "sha256": "4d36a2b1e060f5ea5ef34fadd6ebf0c136fc3f7e76b87da8e2377b425e8a12ef"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_extraction_role.py",
+    "copy": "test_extraction_role.py",
+    "sha256": "ffc116b239b75fb295def6d34cf28cf9a52151ce535c637a2378303fed25b72f"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_postgres_service.py",
+    "copy": "test_postgres_service.py",
+    "sha256": "28047e06be123e11a8fb4db8317dc3d9813e4c68f14c448e2be592180a239388"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_memory_prompt_contract.py",
+    "copy": "test_memory_prompt_contract.py",
+    "sha256": "97152bd2b9f148424e77352a72ca0af24ce53850e5e2b623b205556f972bc5fa"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/fixtures/jd-task6-prompt-delta.json",
+    "copy": "jd-task6-prompt-delta.json",
+    "sha256": "d585e4d12e571342b927b94f6d3836386cac1813c7a830231c8372c468339d3b"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_read_recovery.py",
+    "copy": "test_read_recovery.py",
+    "sha256": "65c4f0e93e04a4836edce8734aaabfd83387b48e88e2cb97ec0674090c1d07f6"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/api.py",
+    "copy": "api.py",
+    "sha256": "605f1766a19b43219dd76a85f30c974cafb1de0c20d84749cdbb9a356c96d323"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/service.py",
+    "copy": "service.py",
+    "sha256": "422179128b9951466cd43f160bb64307daec374146c32f3a586ca3b98473d880"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/skills.py",
+    "copy": "skills.py",
+    "sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/conversation.py",
+    "copy": "conversation.py",
+    "sha256": "1cdabc11e3690c87062b42053dd041256bc44129c9a6c2eb6fdf0e5621376ee4"
+  },
+  {
+    "source": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "copy": "useJdSession.ts",
+    "sha256": "fd509187f8726b7d30f05bb4fcb3854458f60348452e3218ee45a25ef86265d9"
+  },
+  {
+    "source": "experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx",
+    "copy": "JdSavedProjection.test.tsx",
+    "sha256": "c2c09fb03f60409f7da2717beb58feb9f07cbf02775dd359178771af83f873fb"
+  },
+  {
+    "source": "experiments/jd-editor/web/src/jd/useJdSession.test.tsx",
+    "copy": "useJdSession.test.tsx",
+    "sha256": "db7698a243426e8f92d2ee9ae6e78ce6beb101a1aafa3c9fe9add979dd412f28"
+  },
+  {
+    "source": "experiments/jd-editor/web/src/jd/JdEditor.tsx",
+    "copy": "JdEditor.tsx",
+    "sha256": "e25022fad010a1410cbb72376906ad4dcbef5f9e50d85dda86cf16a4af564ddf"
+  },
+  {
+    "source": "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+    "copy": "JdWorkspace.tsx",
+    "sha256": "91be20d3194f4316cfa50cb896cd83b5dc84891ca793653f29dc9f30d0c76b7e"
+  }
+]

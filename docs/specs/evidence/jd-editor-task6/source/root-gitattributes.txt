@@ -1,0 +1,28 @@
+# V3-5 turn eval case artifacts:hash 以 raw bytes/LF 計(plan §6.2/§6.7);
+# 不讓 git autocrlf 在 checkout 時改寫換行,否則 loader 的 no-CR gate 會 hard fail。
+apps/api/evals/interview_vnext/cases/** text eol=lf
+
+# vNext 的歷史契約以 committed LF bytes 鎖 hash；Windows checkout 也不得改成 CRLF。
+apps/api/app/interview_vnext/domain/schemas/** text eol=lf
+apps/api/app/interview_vnext/llm/context_policies/** text eol=lf
+apps/api/app/interview_vnext/llm/verifier_policies/** text eol=lf
+apps/api/app/interview_vnext/llm/operations/** text eol=lf
+apps/api/app/interview_vnext/llm/prompts/** text eol=lf
+apps/api/evals/interview_vnext/schemas/** text eol=lf
+
+# JD codegen and fixture hashes must survive Windows checkouts byte-for-byte.
+docs/specs/contracts/jd-editor-v2.schema.json text eol=lf
+experiments/jd-editor/** text eol=lf
+# Preserve upstream license evidence exactly, including its original whitespace.
+experiments/jd-editor/licenses/** -text
+# Preserve raw PostgreSQL snapshots and captured test output for Task 2 evidence.
+docs/specs/evidence/jd-editor-task2/*.jsonl -text
+docs/specs/evidence/jd-editor-task2/*.txt -text
+# Preserve raw captured test output for Task 3 evidence.
+docs/specs/evidence/jd-editor-task3/*.txt -text
+# Preserve Task 4 captured browser/runtime/schema evidence and its hash manifests.
+docs/specs/evidence/jd-editor-task4/** -text
+# Preserve Task 5 captured process/PG evidence, upstream notices and hash manifests.
+docs/specs/evidence/jd-editor-task5/** -text
+# Preserve Task 6 raw regressions, browser captures and independent review inputs.
+docs/specs/evidence/jd-editor-task6/** -text

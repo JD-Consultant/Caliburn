@@ -1,0 +1,57 @@
+[
+  {
+    "source": "experiments/analysis-agent/tests/test_context_budget.py",
+    "copy": "test_context_budget.py",
+    "sha256": "72d5354cd7c659ac197b15bf66d619a5e3366cb85ae1c1de39042e6b604072b1"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_native_context_budget.py",
+    "copy": "test_native_context_budget.py",
+    "sha256": "aa4cbd5bd70e64f996c48c3398ba62aba9e2dfbf181348d35bbc5b54e0699882"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_extraction_role.py",
+    "copy": "test_extraction_role.py",
+    "sha256": "3e09f16137f55f585bac5565c2da14935dd01ab542380d58137f9ed744f589cf"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_memory_prompt_contract.py",
+    "copy": "test_memory_prompt_contract.py",
+    "sha256": "a9b0838d74baa21fa2613feca527d6109b963222afe551be6098c1f0bac364e7"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_read_recovery.py",
+    "copy": "test_read_recovery.py",
+    "sha256": "9846eaeb03912fb7cd3ba6e9806b8a8fc04a1645364b1311a6a06ee4a2e4488f"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_service.py",
+    "copy": "test_service.py",
+    "sha256": "de2ce7a159604a289603322b0a512a4a209735a26119a3d4a1088f2483d5ecc2"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/api.py",
+    "copy": "api.py",
+    "sha256": "605f1766a19b43219dd76a85f30c974cafb1de0c20d84749cdbb9a356c96d323"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/service.py",
+    "copy": "service.py",
+    "sha256": "422179128b9951466cd43f160bb64307daec374146c32f3a586ca3b98473d880"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/skills.py",
+    "copy": "skills.py",
+    "sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/conversation.py",
+    "copy": "conversation.py",
+    "sha256": "1cdabc11e3690c87062b42053dd041256bc44129c9a6c2eb6fdf0e5621376ee4"
+  },
+  {
+    "source": "scratch/task6-final-all.log",
+    "copy": "task6-final-all.log",
+    "sha256": "0ac1bfc83f678037df3230ec292b1ed8d79b3c9ac02037e3f396c8de672607c9"
+  }
+]

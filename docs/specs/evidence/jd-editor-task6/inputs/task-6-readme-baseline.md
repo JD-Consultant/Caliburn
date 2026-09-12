@@ -1,0 +1,1251 @@
+# Analysis-only Agent — isolated conversation and Memory slices
+
+## Current isolated profile (CT50, 2026-09-09)
+
+Foreground A and background B2 default to **16 model calls / 15 tools**; the
+existing per-input/recovery accounting and framework stop behavior are unchanged.
+The API defaults to **Luna high for A, B1 and B2**. A/B2 still have independent
+explicit effort overrides. No new agent, Memory schema, prompt or retry loop.
+
+CT49 completed an 11-turn whole-role interview with corrections and layered
+retrieval. CT50 verified the new defaults through the actual service and a
+separate empty-recent-context reader. Combined: 135 requests, estimated
+**USD0.16871788**. Current tests: **564 offline + 41 real PostgreSQL passes**.
+This is a representative scenario, not a guarantee for all roles/lengths.
+Minor duplicate wording, indirect guide routes and repair latency remain visible.
+[Full interview](../../docs/specs/2026-09-09-ct49-fixed-long-interview-results.md) ·
+[Default adoption, official sources and limits](../../docs/specs/2026-09-09-ct50-tested-profile-results.md).
+
+Tested profile: explicit output bound **8192**, native compaction threshold
+**12000**, reasoning `high` / `all_turns`, using the configured Luna model.
+These values do not replace required deployment configuration below. Raising
+the call ceiling does not force the model to consume it; ordinary CT49 turns
+mostly used 1–3 model calls. No production/JD integration or merge is implied.
+
+## Historical checkpoints (not current defaults)
+
+CT48 local adoption (2026-09-09): B2 uses the tested edit-routing guidance,
+keeps still-valid references, and has a configurable 16-model / 15-tool ceiling.
+The shared SDK patch description now explains forward-only hunk order; the
+matcher, schemas, atomic publication, recovery and framework accounting are
+unchanged. A stays 12/11. Effort defaults stay A/B2 medium, B1 high; CT45–48
+semantic trials used high (CT46 xhigh), not proof of the medium defaults.
+Two local replays completed in 7 and 11 model calls; both were below 12, so
+they do not prove a causal benefit from raising the ceiling. CT45's failed
+eight-turn interview remains failed; citation labels and case placement still
+need improvement. Full fixed-version interview acceptance remains OPEN.
+Final verification: 560 offline passes plus 41 genuine PostgreSQL passes.
+[Results, primary sources and remaining issues](../../docs/specs/2026-09-09-ct46-48-edit-routing-and-budget-results.md).
+Earlier CTxx configurations below are historical.
+
+CT44 local adoption (2026-09-09): B2 keeps the read-before-write baseline and
+checks removed clauses for correction/equivalent deduplication. Its default
+budget is 12 model calls / 12 tools, preserving framework limit/resume behavior.
+A saved-input Luna/high contrast completed and retained the prior work clauses;
+the original eight-call failure remains recorded. Effort defaults are unchanged;
+this is not a medium or full-long-interview quality guarantee.
+[Results, official sources and limitations](../../docs/specs/2026-09-09-ct44-preservation-results.md).
+
+CT43 local adoption (2026-09-09): shared reading guidance uses the existing
+interview-summary path resolver for original Q/A and citations. It does not
+require transcribing encoded conversation metadata, add tools, or change storage.
+The foreground default is now 12 model calls / 11 tools per employee input,
+using the existing framework limits and unchanged durable resume accounting.
+Explicit overrides still work. Two original 9/8 failures remain recorded;
+12/11 contrasts completed in 9 and 11 model calls with no locator-copy error.
+B2 effort/defaults and C retry policy are unchanged; G8 semantic-quality issues
+remain open. [Results and limits](../../docs/specs/2026-09-09-ct43-read-routing-results.md).
+
+CT41 local adoption (2026-09-09): live-repair guidance now distinguishes old tool
+snapshots from this input's read view, and requests in-place correction plus a
+small read-back. This is a prompt improvement, **not a guaranteed freshness
+guard**. `Q019_REASONING_EFFORT` selects A; the independent optional
+`Q019_CONSOLIDATION_REASONING_EFFORT` selects B2. Both default to medium; B1 stays
+high. All share the existing client, context budget and output cap. Raising A
+does not raise B2 automatically. The current real-service experiment is A high,
+B1 high, B2 medium, not a blanket high deployment. Earlier all-high B2 hit its
+limit; those failures and test-only resume allowances remain in the evidence.
+Consolidation checks the same fact across affected passages without deleting
+different unresolved issues. For a short, fully visible file with multiple
+changes it prefers the existing complete-write tool; large/partially read files
+still use targeted SDK patches. Provenance stays in the body; the small guide
+routes by topic/case keywords instead of appending every source address.
+This is a measured local tool-selection policy, not a new backend or universal
+vendor rule. Final tests: 556 offline and 41 real-PostgreSQL passes. The fresh
+three-turn procurement counterexample completed; the original 11-turn interview
+had failures and maintenance, so overall G8 remains open. CT42 will run the
+fixed final code through a fresh long interview; no production/JD integration.
+[Results, primary sources, transcript and limits](../../docs/specs/2026-09-09-ct41-memory-edit-freshness-results.md).
+
+CT39 current wiring (2026-09-09): the tested CT37 extraction prompt is now
+adopted. `open_service` uses **B1 extraction high; consultant A and consolidation
+B2 medium**, all on the configured Luna model. The two official ChatOpenAI
+bindings share the existing HTTP/context-budget path and output cap. Uncertainty,
+partial answers and attribution stay explicit in the extraction instructions;
+no extra agent, validator, schema or Memory architecture was added. Restart the
+isolated service to load this configuration; existing Memory is not rewritten.
+This is adoption of CT37/CT38 evidence, not a new long-interview quality pass.
+[Implementation, sources, tests and limits](../../docs/specs/2026-09-09-ct39-extraction-adoption-results.md).
+Older CTxx results below are historical, not the latest configuration decision.
+
+CT26 natural validation (2026-09-08): **FAIL**, one Luna/medium request,
+estimated USD0.0024523. The actual system and six tools match CT25, but the model
+answered the corrected deadline without calling a tool: knowledge/guide stayed
+at the old deadline, revision 3. No API/patch error or exhausted limit. Ledger
+closed immediately; no further prompt edits or promotion. Original 42 Q/A messages,
+two added messages and four source references passed read-only checks; no write
+occurred, so this does not establish edit-detail preservation. **G8 OPEN**.
+[Evidence, transcript and next gate](../../docs/specs/2026-09-08-ct26-natural-live-repair-validation.md).
+
+CT25 prompt wiring (2026-09-08): owner-approved M1/T1 is now wired locally.
+Verified stale Memory requires live repair even if chat already acknowledged the
+correction; unresolved meaning is checked, not guessed. Low-information background
+work still accumulates, with LLM notification and the existing text-size fallback.
+Official DeepAgents custom_tool_descriptions now describe only the available
+text/read tools. Related failure classes share guidance; historical patch,
+detail/reference, scope and retry protections remain intact. No schema, model,
+Memory architecture, JD or production change. **544 offline tests passed**;
+natural live-repair selection is still unverified, **G8 OPEN**. No paid requests.
+[Approved contract, retained protections and verification](../../docs/specs/2026-09-08-ct25-gpt-prompt-stack-and-live-repair-candidate.md#7-核准接線按錯誤類型整理不逐個bug堆句子).
+The CT22 paragraph below records the prior failed trial, not the current prompt.
+
+CT22 prompt contract (2026-09-08): the approved CT21 candidate is wired into the
+existing system and C/B descriptions. Memory selection policy is centralized;
+the framework still executes tools and returns the same failure/success results.
+Tool schemas, read tools, Skills, patch/detail/reference protections and native
+continuity are unchanged. The complete SDK request matches the reviewed fixture;
+251 focused offline tests passed, but the natural correction trial FAILED:
+one Luna/medium request, zero tools, answer changed to 5 days while published
+Memory remained 10 days. Trial closed at estimated USD0.00242175; no further
+prompt changes or promotion. Candidate retained only for isolated reproduction.
+[Implementation, sources and current quality gate](../../docs/specs/2026-09-08-ct22-memory-prompt-contract-results.md).
+This contract is for the with-Store application. The no-Store test composition
+cannot run background persistence; its tool-description limitation is recorded there.
+
+Status: **analysis-only local API + native continuity + Memory read/publication +
+B1/B2 extraction/consolidation + explicit summary re-extraction + durable
+consolidation requests + automatic background dispatcher + on-demand analysis Skills +
+native-first Responses context management with optional exact preflight**. No Web UI yet;
+no live-model quality claim and no legacy App imports.
+
+CT15 bounded grounding (2026-09-08): B1 candidates preserve known case identity
+and scope; B2 distinguishes candidate routing from evidence for precise details.
+Within the existing 24,000-character batch-text allowance, candidates plus the
+complete current-batch summaries enter B2 together as `NEW_DETAILS`. If the
+combined size exceeds that allowance, summaries are omitted from initial input
+as a whole (never truncated) and remain readable by their saved paths. Prior
+Memory, guide, tools and full native Context budgeting are unchanged. No all-history
+injection, new model output fields, Git workspace or storage layer is introduced.
+Official source trace and bounded-probe limitations:
+[CT15 grounding](../../docs/specs/2026-09-07-ct15-openai-consolidation-input-trace.md).
+583 offline/local-PG tests passed. The whole-role trial finished, including an
+owner-approved experiment-only closure retry (4096→8192), but quality remains
+open: qualifier fidelity and late-source consolidation need follow-up.
+[CT15 results and transcript](../../docs/specs/2026-09-08-ct15-grounding-and-whole-interview-results.md).
+
+CT13 prompt calibration (2026-09-07): extraction candidates, consolidation,
+recall and interview paraphrases must preserve factual scope and qualifiers.
+Interview closure checks work breadth and professional depth using existing
+Skills as needed, without a new agent, schema or fixed questionnaire. Offline
+wiring checks are not semantic-quality acceptance; no new paid trial has run.
+[Scoped repair plan and evidence](../../docs/plans/2026-09-07-ct13-local-quality-and-source-repair.md).
+
+CT13 source lookup: `read_conversation(reference, offset=0, part="source")`
+accepts a known interview summary path; Runtime resolves its saved source.
+Use `part="context"` only to read separately saved preceding Q/A. Missing context
+is explicit, not guessed. Existing direct conversation references remain valid
+for live repairs. Pure reads do not require candidates; re-extraction still does.
+No new tool or storage layer. Completed-source reads do not excuse incomplete
+model answers; diagnostic recalls use the service conversation factory.
+[Repair results, official evidence and remaining quality gate](../../docs/specs/2026-09-07-ct13-local-repair-results.md).
+
+CT11 local editor trial (2026-09-07): B2 exposes `apply_memory_patch(file_path,diff)`
+and C accepts `repair_memory(edits=[{path,diff}])`, both using official
+OpenAI Agents SDK `apply_diff` locally over staged StateBackend files. This
+does not use an OpenAI key or change the model provider. Read pagination,
+format/reference checks and existing atomic publication remain in place.
+Terminal End Patch is supported; additional file operations are not. SDK
+first-match semantics do not guarantee correct semantic targeting.
+C passed the targeted Luna/medium trial; B2 final live publication remains
+unverified after the trial cap. Not long-interview acceptance. This supersedes
+older exact-edit tool descriptions below; short fully visible files retain write_file.
+[Current results, official sources and limitations](../../docs/specs/2026-09-07-official-memory-patch-trial-results.md).
+
+CT-03 read guidance (2026-09-07): the live Memory session and independent reader
+share conditional deep-reading instructions; sufficient knowledge may answer
+without reopening every source. One Luna/medium comparison completed in 9 calls
+before / 5 after. Exact-source lookup still worked, with a minor extra-quotation
+issue. Limits remain tunable; no new tools. [Results and limits](../../docs/specs/2026-09-07-memory-recall-completion-calibration.md).
+
+CT-02 current result (2026-09-07): **three normal interview turns completed**
+through the real default API factory, dedicated PG and OpenAI direct Luna/medium.
+Employee correction and two-case recall were correct in this synthetic sample.
+547 offline/PG tests passed, zero skipped. Independent Memory recall used the
+remaining allowance and stopped before a final answer; not a full Memory or
+long-interview acceptance. Total 12 actual requests, usage-estimated US$0.00642272.
+No native compaction event was reached. [Results and evidence](../../docs/specs/2026-09-07-native-context-normal-interview-results.md)
+supersede the older mandatory-count/normal-interview blocker below; those paragraphs
+are historical results, not the current entry configuration.
+
+Latest independent recall/provider check (2026-09-07): **12 Luna/medium requests,
+US$0.00411**. Reused prior generated Memory with explicitly rebuilt synthetic
+source references, not another extraction/consolidation run. The reader reached
+knowledge, one detailed record and its original Q/A, but exhausted its existing
+8-step probe limit without a final answer (the product uses a different 9-step
+composition). Native `all_turns` and an opaque item's unchanged replay were
+observed; one native response was incomplete and compaction was not demonstrated.
+Exact token-count endpoint compatibility still blocks the configured gateway.
+No product guards were disabled. **Normal interview acceptance remains OPEN.**
+[Evidence and the required next decision](../../docs/specs/2026-09-07-recall-native-capability-results.md).
+
+Latest B1 prompt calibration (2026-09-07): preserve who stated what and the
+scope of unanswered questions; candidates include known work and case additions,
+not only unknowns. One fixed Luna/medium sequence completed three B2 publications;
+an unanswered question no longer erased the earlier employee statement, and the
+later explicit correction changed A without changing B. This is **single-sample
+improvement, not full Memory acceptance**: fresh-context recall stopped at the
+unchanged 24-request experiment ceiling without a final answer. Cost US$0.01148693.
+B2, schema fields, persistence, tools and limits are unchanged in this slice.
+[Evidence, source rationale and remaining limits](../../docs/specs/2026-09-07-b1-attribution-calibration-results.md).
+
+Latest B2 delivery repair (2026-09-07): final Runtime validation rejects a
+nonempty knowledge body paired with a blank guide, with actionable feedback
+inside the existing bounded Agent loop. `validate_memory` is optional preflight,
+not a required extra model step. Fully visible short files may use native
+`write_file`; long/partially read files retain local `edit_file`. Tool descriptions
+and the B2 prompt agree on these boundaries. No new framework/schema, fuzzy edits,
+read-coverage tracker, quota increase or paid call. Tests prove the mechanics,
+not model compliance, semantic completeness or cost improvement.
+[Repair, official sources, verification and remaining limits](../../docs/specs/2026-09-07-b2-delivery-repair-results.md).
+
+Earlier bounded prompt follow-up (2026-09-07): **39 real Luna/medium requests,
+US$0.01960073 reported** across two new runs. The saved fixes completed two B2
+batches, but the entire correction/recall scenario has not passed. A narrow
+prompt trial improved first-batch candidate coverage yet omitted the guide,
+and later exact edits exhausted B2's existing limit. **That trial was reverted**;
+its exact patch and outputs remain in evidence. At that savepoint code stayed at `04ce14d8`:
+known-path tool-description and Chinese prose-reference fixes retained;
+analysis prompts/Skills, publication rules and limits unchanged. No broad
+refactor or production readiness claim. Earlier three runs cost US$0.01252361;
+five runs total 66 requests / US$0.03212434. The subsequently approved delivery
+repair above is separate; this failed prompt trial is not reinstated as a bundle.
+[Experiment, evidence, fixes and untested boundaries](../../docs/specs/2026-09-07-memory-prompt-live-calibration.md).
+
+Earlier context/Skills wiring verification (2026-09-07): **514 passed / 0 skipped (71.95s)**,
+including dedicated PostgreSQL; one existing TestClient deprecation warning.
+Independent Skills, budget and whole-batch reviews are approved; compileall,
+offline lock and diff checks pass. Paid model calls in that earlier slice: zero. This covers wiring
+and failure handling, not natural interview quality or live endpoint latency.
+[Current results, official sources and remaining limits](../../docs/specs/2026-09-07-context-budget-and-analysis-skills-results.md).
+
+## On-demand analysis Skills — SK-01 (2026-09-07)
+
+`AnalysisService` enables three bundled method references for the foreground
+consultant: work-scope interviews, case comparison/common work patterns, and
+outcomes/success criteria/knowledge and skills. They are initial interview
+methods, not new agents, mandatory stages, schemas or employee facts.
+
+The pinned official `SkillsMiddleware` discovers metadata and advertises
+`/skills/<name>/SKILL.md`. Only a requested `read_file` result introduces the
+body into model input; instructions explicitly say not to load all methods on
+every turn. Discovery and reads use the same `CompositeBackend` mount over a
+read-only capability backed by `FilesystemBackend(virtual_mode=True)`, rooted
+at `src/analysis_agent/skills`, never the project root or the current directory.
+Only official `ls`, `grep`, and `read_file` tools are exposed, sharing the
+existing Memory tool names. Filesystem middleware offload/scrubbing hooks are
+not installed, so native reasoning/compaction and canonical items remain intact.
+
+`MemorySession` retains this asset mount when dynamically rebinding its pinned
+Memory version and after C feedback refreshes the read head. Existing Memory
+reads/repairs keep their own permissions; Skills add no write, execute, network
+or JD capability. The non-Store test service also gets the same assets, with an
+empty fallback backend and no host-file or Memory access.
+
+B1/B2 are not given this middleware or asset mount. Skill ToolMessages remain
+canonical, but `ConversationReader` excludes tool content from visible source
+extraction; B1 does not receive method bodies as employee knowledge. Offline
+tests exercise real Service/create_agent/official tools/ChatOpenAI/SDK requests
+with synthetic HTTP, including path rejection, C refresh, read recovery and
+B1 source isolation. This verifies wiring only: natural selection, interview
+quality and prompt tuning are the next owner-authorized gate, not tested here.
+
+## Current application entry — Task3 / Task4
+
+Runtime recovery follow-up (2026-09-07): trusted interrupted reads can resume
+or close safely; B2 final content errors return to its bounded Agent loop; B1
+persists a precise validation-correction allowance; initial guide freshness is
+scoped to the current input. Unknown writes still require reconciliation.
+**427 passed / 0 skipped (67.52s)** including dedicated PG, with one existing
+upstream TestClient deprecation. Compileall, offline lock check and independent
+whole-batch review passed; paid model calls zero. No old pending-job migration,
+production integration or live-model quality claim.
+[Recovery results, official sources and limits](../../docs/specs/2026-09-07-runtime-recovery-repair-results.md).
+
+Memory reference follow-up (2026-09-07): `MemoryArtifacts(..., source=reader)`
+uses the same document's canonical `ConversationReader` at validation, save and
+pre-publication. The service provides this reader automatically. Artifact-only
+clients may omit it only when Memory contains no `conversation:` references;
+omission never bypasses raw-reference validation. The reader must use the
+compiled canonical conversation root, not a graph with an older state schema.
+
+Markdown presentation is parsed by markdown-it-py 4.2.0 (CommonMark), with its
+official linkify extra (linkify-it-py 2.2.0) recognizing external URI spans. Real detail
+links remain valid inside emphasis, code and reference-style links; malformed or
+unreadable controlled addresses cannot publish through either B2 or C. External
+URLs are not treated as local files. Exact link/code destinations are not silently
+rewritten. Validation preserves the stored Markdown and adds no required model
+fields, evidence requirement, model calls or semantic truth checks. Tool errors
+retain the existing instructive JSON/text and bounded correction path; C now also
+sets native `ToolMessage.status` consistently (not a new Responses wire feature).
+
+Current-input source references also retain the nearest visible advisor text and
+intervening employee answers across safely closed tool-only turns. An unresolved
+turn cannot be silently crossed; runtime notices/tools are not employee words.
+The existing 3,000-character paged reader preserves longer ranges. This repairs
+C's provenance and B2's repair-context read, not the model's Context selection.
+
+Previous Memory-reference slice verification: **370 passed / 0 skipped (103.66s)**, including real dedicated PG
+client reconstruction; compileall and offline lock checks passed. HTTP replies
+are synthetic, paid calls zero. At that savepoint, Skills and full request
+budgeting were still pending; the current sections above/below supersede that
+status. Raw-history discoverability and live interview quality remain separate gates.
+[Repair results and official sources](../../docs/specs/2026-09-07-memory-reference-repair-results.md).
+
+Use Python 3.12, the locked dependencies, a separate local `q019_` PostgreSQL
+database and one process. Set credentials externally; this entry never loads
+the old application's `.env`. Required variables:
+
+| Variable | Meaning |
+|---|---|
+| `Q019_DATABASE_URL` | Dedicated localhost PostgreSQL DSN, not the production DB |
+| `OPENAI_API_KEY` | Provider credential; never commit or print it |
+| `Q019_REQUEST_TIMEOUT_SECONDS` | Positive finite per-attempt timeout, passed to the actual SDK |
+| `Q019_MAX_OUTPUT_TOKENS` | Positive per-response output bound |
+| `Q019_COMPACT_THRESHOLD` | Explicit positive native compaction threshold for the chosen model |
+| `Q019_CONTEXT_WINDOW_TOKENS` | Required positive capacity of the configured model; output must be smaller, and compaction threshold + output must fit |
+| `Q019_BACKGROUND_POLL_SECONDS` | Positive finite infrastructure wake interval; NOT an interview-idle trigger |
+| `Q019_BACKGROUND_MAX_RECOVERIES` | Explicit nonnegative automatic process-interruption recovery allowance per B batch; persisted across restarts |
+| `Q019_MEMORY_TEXT_THRESHOLD` (optional) | Positive new visible-character fallback; omitted = notification-trigger only, no guessed default |
+| `Q019_MODEL` (optional) | Defaults to `gpt-5.6-luna`; native `all_turns` binding |
+| `Q019_REASONING_EFFORT` (optional) | A effort; default `high`. B1 remains `high`; does not change B2 |
+| `Q019_CONSOLIDATION_REASONING_EFFORT` (optional) | B2 effort; default `high`. Both effort settings accept `low`, `medium`, `high`, `xhigh`, `max`; the configured provider/model must support the selection |
+| `Q019_CONTEXT_BUDGET_MODE` (optional) | `native` (default): local contract checks + provider compaction/overflow; `exact`: additionally require the official input-token counter before every generation |
+
+There is no guessed universal output/compaction value. The 32,000 / 1,000 / 13s
+values in tests only verify wiring, not recommended product budgets. An output
+cap, SDK attempt timeout and 16-model/15-tool turn limits are not a dollar cap.
+SDK transient retry remains native; no outer model/graph retry is added.
+The configured per-response output bound is carried through A, B1 and B2;
+B2's standalone default does not override the application's explicit setting.
+
+CT-02 checks **every synchronous A/B1/B2 Responses request** after the SDK has
+serialized its final body, including tool definitions/results, Skill metadata
+and reads, pinned Memory guide, native opaque items, and B1's structured-output
+schema. Both modes validate the endpoint/model, final positive output bound and
+`truncation=disabled`, without rewriting any request or canonical history.
+Default `native` does not call a token-count endpoint: it retains native inline
+compaction, bounded reads and actual usage; no approximate preflight guarantee.
+An unsupported native provider capability still fails, never silently falls back.
+
+Opt-in `exact` additionally calls `responses.input_tokens.count` with only its
+supported parameters. Generation proceeds only when counted input +
+**final** `max_output_tokens` fits the configured capacity. Reasoning is already
+part of the output reserve, not deducted twice. `truncation=disabled` prevents
+silent provider truncation; canonical history and opaque items are not mutated.
+
+Both clients share the SDK-resolved public `base_url` (including externally set
+`OPENAI_BASE_URL`), have explicit finite timeouts, and close after workers stop.
+The hook matches only that Responses origin/path. Query/fragment endpoints,
+model mismatches and missing output bounds fail closed in both modes. In exact
+mode, remote prompt templates, unsupported count fields and invalid counts also
+fail closed; that endpoint/model must support the counting schema. Native mode
+leaves additional create fields to the official SDK/provider contract.
+Fake-only helper construction may omit the guard; real `open_service` cannot.
+Async invocation is **not wired or supported by this budget integration**.
+
+When enabled, exact preflight adds a network count request and latency per
+generation attempt; it is not claimed free or a hard monetary cap. The count
+endpoint does not accept `context_management`, so it cannot anticipate new
+compaction generated by the pending response. Existing inline compaction still
+triggers early; an abrupt large input/tool result may stop before generation.
+Native provider overflow also closes the A turn safely (`configuration_error`
+status AND error code); another message can be submitted. It does not erase old
+input or promise that another equally large request will succeed.
+Oversized canonical history is not automatically recoverable and is never
+silently deleted or summarized. In exact mode, local preflight overflow ends A
+with `configuration_error` status and `context_budget_exceeded` error code, closes safely and
+unlocks, without offering resume. B becomes `blocked` and does not retry each
+tick. Local schema/configuration errors are also nonretryable; genuine counter
+transport failures use the SDK's own retry and existing service classification.
+
+```powershell
+uv sync --locked
+uv run --no-sync uvicorn analysis_agent.api:create_app --factory --app-dir src --host 127.0.0.1 --port 8091 --workers 1 --no-proxy-headers
+```
+
+Startup initializes the official Saver/Store and small ORM catalog/publication
+tables; it reconciles A without invoking it. The background scheduler may resume
+eligible B work or process saved notifications, and those B calls can cost money
+when using a real key. Empty/no-eligible-source startup does not call a model. Do not use
+multiple workers, reload or multiple server processes against this isolated DB.
+`/docs` is the generated API reference, **not the planned employee UI**.
+
+- `POST/GET /documents`: create/list independent interview documents.
+- `POST /documents/{id}/runs`: `{request_key, text, abandon_pending?}`. The same
+  key/text returns the same saved input; different text under that key conflicts.
+  Accepted means the input is confirmed in Saver, not that AI has finished.
+- `GET /documents/{id}/messages` and `/runs[/{run_id}]`: visible human/assistant
+  text and safe status/usage projection. Native reasoning and tool internals
+  stay in canonical checkpoints and do not cross this UI seam.
+- `GET /documents/{id}/memory-status`: safe background status/error/recovery-count
+  projection, not a transcript, source token, or claim of semantic completeness.
+- `POST /documents/{id}/runs/{run_id}/stop`: cooperative stop, not thread killing.
+  An already entered SDK call (including its retries) or tool reaches its safe
+  boundary first. Then the next model/tool is not started. Closing a browser
+  request does not stop the worker. Server shutdown joins before closing clients.
+- `POST /documents/{id}/runs/{run_id}/resume`: explicit same-checkpoint continuation
+  only when `can_resume` is true; counters and resume count survive reopening.
+  A pending bound Memory read (`read_conversation`, `read_file`, `ls`, `grep`)
+  can resume after a runtime interruption, including service reconstruction.
+  Only that pending tool is re-entered; previous model calls and saved tool
+  effects are not replayed. Even at the model quota the read may finish; the
+  existing framework guard then ends the turn without another model request.
+  The known C repair can reconcile/replay its saved operation, including lost
+  publication replies. Arbitrary unknown effects are not declared safe to retry.
+  A process/transport error label alone never authorizes an unknown pending tool.
+- A quiescent interrupted input can be explicitly abandoned when submitting new
+  text. Unknown publication must be resolved first. Old employee messages and
+  completed Memory publications are never removed or reverted by cancellation.
+  Stopping/abandoning a trusted pending read pairs its original call ID with an
+  error saying the result is unavailable/discarded, not that it never executed
+  or that the data is absent. It does not rerun the read or invoke the model.
+
+ER-A01 recovery uses the actual factory-built `MemorySession.read_tools` and
+the current public child checkpoint, not a model-supplied name allow-list or
+blanket `runtime_error` retry. Conversation composition rejects conflicting
+same-name tools. Direct `close_turn` callers must supply the session bound to
+that conversation. No new automatic retry loop, durable state layer or quota
+reset is introduced; failures outside the pending trusted read stay classified
+by the existing policy, and C still requires its exact receipt reconciliation.
+
+Same-document active work rejects another input. Loopback/Host/same-origin
+restrictions match the single-local-operator scope; this is not authentication
+or a cloud/multi-user service. Catalog stores routing/hash/status, not another
+message body archive. Provider usage comes from returned metadata; unobserved
+failed usage is unknown, not zero or an estimated bill.
+
+Current evidence, review and limitations:
+[Task3 result](../../docs/specs/2026-09-06-analysis-only-agent-api-results.md),
+[Task4 result](../../docs/specs/2026-09-06-background-dispatch-results.md).
+The following sections retain the earlier slice history; their “not yet”
+statements describe those savepoints, not this current application entry.
+
+## Task4 — nonblocking background consolidation
+
+APScheduler 3.11.3 owns one reconstructible interval job and a one-thread executor.
+It calls a dispatcher protected by the application's single-process global B
+lock. `coalesce=True` merges missed clock ticks, not interview text. Model work
+does not run in the foreground pool, API event loop or notification tool.
+
+Eligibility uses safely closed canonical conversation, saved request receipts,
+and the successful publication cursor. A new admission snapshots the whole
+eligible target; B1's bounded batches retain the remaining target until published,
+even if its request was in the first batch. Interleaved new conversation waits
+for the next target. No 90-second idle rule, turn-count trigger, short-input
+filter, classifier model, or extra notification/outbox table is introduced.
+The optional fallback counts visible new human/AI text once, excluding tools,
+reasoning and preceding context. Its product threshold remains undecided.
+
+`q019_background_admission` stores only document routing, exact source/target
+references, running/queued/blocked state and recovery count. B1/B2 official
+checkpoints still own extracted content and execution progress; Store/publication
+still own Memory artifacts and current head. There is no second conversation or
+Memory content archive. This metadata is local application wiring, not a claim
+that APScheduler or OpenAI supplies these exact fields.
+
+- Resume an interrupted old B before admitting new source. Saved B1 is not
+  re-extracted; saved B2 steps continue. A committed publication with a lost
+  reply is reconciled through its existing receipt, without model regeneration.
+- Ordinary caught failures become durable `blocked`. SDK transport retries and
+  model tool-error correction have already had their own bounded opportunity;
+  ticks, new notifications and restarting do not reset a blocked job.
+- An unclean process exit may leave `running`; resume consumes the configured
+  automatic recovery allowance **before** work. Repeated process loss cannot
+  refresh it. This is not the removed arbitrary one-manual-retry limit and not
+  a dollar cap. Tests choose one only to exercise the boundary, not recommend it.
+- Successful B does not wake A or append another tool result. A's next normal
+  run reads current availability; unresolved failure adds a short runtime-only
+  request hint, not an employee message/Memory fact. A recovered target no longer
+  gets that hint. It does not interrupt a model call already in progress.
+- Shutdown stops scheduling and joins B and A before clients close. Do not run
+  multiple API processes against this DB; this is not a distributed job queue.
+
+Blocked model/configuration errors need their cause fixed and explicit technical
+recovery through the existing saved B workflow. No employee-facing manual
+consolidation/retry button is added here. Oversize source/context or candidate
+input blocks visibly rather than silently truncating; prompt/capacity tuning
+belongs to the later bounded live interview stage. Recovery tests reconstruct
+clients and inject process-loss boundaries; they are not an OS power-loss test.
+
+Sources: [APScheduler user guide](https://apscheduler.readthedocs.io/en/3.x/userguide.html),
+[executor](https://apscheduler.readthedocs.io/en/3.x/modules/executors/pool.html),
+[approved local policy](S:/caliburn/docs/specs/2026-09-06-memory-consolidation-request-wiring-design.md).
+
+## Application wiring Task4a — consolidation request receipt
+
+`build_conversation` registers `request_memory_consolidation()` as a normal
+optional zero-argument tool. It only returns a short acknowledgement and an
+official `ToolMessage.artifact`; ToolNode and the existing Saver persist both.
+It does not call B1/B2, publish Memory, create an external job or wait for B.
+The model normally needs a continuation call to finish its interview answer;
+the existing 9-model/8-tool budget is unchanged. This is not zero-token signalling.
+
+The model sees the receipt, not the artifact. A saved receipt means "requested",
+not "Memory updated". The framework's no-argument StructuredTool ignores extra
+arguments; no model-supplied document, job or reason is consumed. The same-name
+tool is reserved in this composition so another effect cannot silently inherit
+its pure-notification cancellation rule.
+
+After a safely closed turn, use the read-only projection:
+
+```python
+requests = reader.pending_consolidation_turns(
+    after_reference=head.processed_source if head else None,
+)
+```
+
+Here `head` must be the successful current publication, not an in-flight job's
+planned range. Each result has the real `input_id` and `end_id`; it is neither a
+new message nor a queued job. Only an actual parsed notification call paired
+with its saved success/artifact counts. One turn's repeated requests coalesce.
+An unresolved earlier source blocks later turns; a partial published cursor
+does not consume later requests. Comparison uses canonical order, not UUID
+sorting. Reading never clears anything or invokes a model.
+
+After the worker is confirmed quiescent, `close_turn` can seal a notification
+whose result was not saved with one paired error. It preserves an already saved
+success. This does not weaken `repair_memory` receipt reconciliation or classify
+unknown external effects as failed. Both interrupted paths allow a later input
+without discarding the employee's earlier message.
+
+**Still not connected:** the rest of Task4 scheduling/new-text
+fallback, and next-normal-run background failure context. No notification/outbox
+table, idle timer, turn-count trigger, guessed character threshold, UI or paid
+model call is added here. No claim yet that a running background worker cannot
+block the API: that requires the next service integration test.
+
+Evidence and remaining gates:
+[Task4a plan](../../docs/plans/2026-09-06-memory-consolidation-notification-slice.md),
+[Task4a results](../../docs/specs/2026-09-06-memory-consolidation-notification-results.md),
+[approved notification policy](S:/caliburn/docs/specs/2026-09-06-memory-consolidation-request-wiring-design.md).
+
+## Summary re-extraction — Q019-MEM-SUMMARY-01
+
+This is an explicit runtime maintenance action, not an every-turn tool or a
+separate employee conversation. Use existing B1/B2 objects with the same
+document, official Saver/Store and publication service:
+
+```python
+result = b1.reextract(existing_summary_path)
+published = b2.start_reextraction(existing_summary_path)
+```
+
+After an interrupted B1 use `b1.resume_reextraction(existing_summary_path)`;
+after interrupted B2 use `b2.resume()`. Do not replace a pending job. As with
+ordinary B1/B2, callers must serialize background jobs per document; this slice
+is not a scheduler or concurrent API admission layer. A deliberate new
+`reextract` after success generates new artifacts; replaying the same completed
+B2 artifact batch uses its receipt without another model call, even after other
+jobs. `reextraction_config(path)` is a technical checkpoint address, not a new
+user-visible thread, source copy or case record.
+
+- Runtime reads the saved source/context header and uses that exact range.
+  Oversize input fails rather than dropping its middle. No new model fields:
+  the existing `rollout_summary`, `raw_memory`, `rollout_slug` remain the schema.
+- New summary/candidate paths are saved; old artifacts and original messages
+  remain readable. The summary filename is not a case identity. Explicit empty
+  context, a file-start format marker and a runtime header terminator prevent generated prose being parsed
+  as source metadata. Old experiment artifacts lacking that unambiguous header
+  can still be read, but automatic re-extraction fails instead of guessing; no
+  old data is migrated or deleted by this slice.
+- B2 receives real old/new addresses plus fresh candidates, reviews current
+  knowledge and relevant details, then updates conclusions/references as
+  appropriate. A case-only correction matters even if the general work pattern
+  remains the same. This is an instruction to the model, not a deterministic
+  proof of semantic completeness or that every citation was updated correctly.
+- Re-extraction publishes via existing `repair` semantics: preserve the ordinary
+  processed-source cursor, retain repair source receipts, CAS the head only
+  after prepared artifacts validate. A concurrent C change causes bounded B2
+  reconsideration, not B1 re-extraction. Failed attempts retain the previous head.
+- A follows current knowledge before opening historical details. Old detail
+  addresses do not automatically redirect to later corrections; no all-history
+  rewriting, case CRUD or direct JD editing was added.
+
+Sources, tests and scope: [slice results](../../docs/specs/2026-09-06-summary-reextraction-results.md).
+OpenAI producer/consumer evidence is in the
+[main source review](S:/caliburn/docs/specs/2026-09-06-openai-rollout-summary-correction-source-review.md).
+This implementation maps the approved concepts onto our frameworks; immutable
+versions, technical job IDs and SQL publication are not claims about identical
+OpenAI internals.
+
+## Application wiring Task 1 — offline and PG verified
+
+`analysis_agent.conversation.build_conversation` adds a canonical `MessagesState`
+root with a directly registered official Agent subgraph. The child inherits the
+root Saver (`checkpointer=None`) and has fresh state per invocation, including
+the official persisted limits. The root retains full messages between inputs;
+it does not inherit the child's private counter channels. This is an execution
+scope, not a second model or independent conversation archive.
+
+Use a stable document `thread_id`, `durability="sync"`, and saved HumanMessage
+identity for a new input. To resume pending work use `invoke(None, config)`;
+inspect `get_state(config, subgraphs=True)` for its pending child messages and
+errors, not just root values. While pending, an older root `turn_outcome` is NOT
+the outcome of that pending child. Do not submit new input over pending work;
+Task 1 did not include admission/cancellation; see the Task 2 local entry below.
+
+Default limits are configurable 9 model calls / 8 tools. These allow the tested
+deep-read/correct/re-read/final-answer path; they are not price or HTTP-attempt
+limits. Runtime `turn_outcome` distinguishes provider-completed output from
+technical limit termination. Raw provider status/usage is preserved: absent
+usage is unknown, and synthetic limit messages are not successful AI replies.
+Task 1's reader required successful extraction windows; Task 2 adds explicit
+runtime boundaries for safely closed unsuccessful turns.
+Runtime-generated notices are marked in message metadata and excluded from the
+visible source projection (not deleted from canonical history), so a short
+correction still references the actual preceding consultant question.
+
+Malformed tool JSON is distinct from schema validation in ToolNode. A public
+after-model hook preserves the native function call and returns its paired
+error result without executing a tool, then routes back through the official
+model budget check. One correction is allowed; a second malformed result ends
+with runtime `tool_error`. The retry count survives checkpoint resume. Missing
+call identity / unexpected parallel output remains fail-closed; safe abandonment
+is now covered by Task 2 below. This is a thin application hook, not a private
+converter patch or a claim that ToolErrorMiddleware covers every parse error.
+
+Only synchronous provider invocation is wired. Characterization finds certain
+Responses SSE error events do not emerge as adapter exceptions; stream exhaustion
+must NOT be interpreted as successful provider completion. Product streaming is
+not enabled or certified here. SDK transient retries have no outer model/graph
+retry wrapper.
+
+Task 1 full result: **177 passed, 0 skipped** (including 16 existing PG cases + 2 new
+root/child/C PG cases). Initial offline result was159 passed/18 skipped; after
+Docker recovery the existing dedicated DB was available and all tests passed.
+Docker automatic restart remains an unresolved host issue; do not treat DB tests
+as proof of that fix. At the Task 1 save point, Task 2 / API / scheduler / UI had
+not started. The following section describes the subsequent verified Task 2.
+Full evidence, framework links
+and review findings: [Task 1 results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-conversation-lifecycle-results.md).
+
+## Application wiring Task 2 — Checkpoint A passed
+
+`close_turn(graph, config, reason="cancelled" | "configuration_error",
+quiescent=True, memory_session=session)` is a synchronous runtime entry, not a
+worker cancellation mechanism. The caller must first stop/join the worker and
+serialize this document. Pass the latest root document config, not a captured
+checkpoint ID or child namespace. No active thread is killed by this function.
+
+For a new employee input use `send_input(graph, config, HumanMessage(..., id=...))`.
+It rejects pending work by default. An explicit `abandon_pending=True` plus
+`quiescent=True` first closes the previous turn; if reconciliation is unknown,
+the new input is not accepted. A previously saved message ID is rejected, not
+appended again. To explicitly resume the original work, keep using the official
+`graph.invoke(None, config, durability="sync")`; cancellation never calls it.
+This is not Task 3's concurrent API admission/idempotency implementation.
+
+**C binding:** public `MemorySession.after_model` saves a runtime-only binding
+from canonical AI message ID / tool-call ID to an operation UUID in the same
+Saver. UUID5 includes document and employee-input identity; C uses that exact
+UUID in its existing durable `PublishRequest`. The model still supplies only
+edits, not IDs or receipts. No new store/table, publication schema change,
+private namespace discovery, extra model call or custom Agent loop is used.
+The tool-hidden C graph is intentionally not claimed as discoverable.
+
+Closure distinguishes these cases: a saved pre-ToolNode after-model checkpoint
+proves not-started; an existing ToolMessage or exact C receipt proves a known
+result; the reserved pure notification and bound Memory reads can be safely
+closed with honest unavailable-result feedback. An entered unknown tool without
+a known result remains unknown. Missing receipt
+is not proof of failure. Reconciliation only reads `receipt(operation_id)` and
+`current()`, never invokes C or publishes. A recovered receipt reports both its
+applied head and the current read head, without reverting later publications.
+Unknown results retain pending work and cannot advance extraction or accept a
+replacement input. Generic unknown tool outcomes likewise remain pending.
+
+Public `get_state(..., subgraphs=True)` supplies the actual child config.
+`update_state(values, as_node="TurnOutcome.after_agent")` saves head, tool result,
+and terminal outcome together on the final owned child node; a root update
+`as_node="analysis"` then merges canonical messages and the boundary. Neither
+update runs a model/tool. If the root write fails, repeating `close_turn` merges
+the already-terminal child without relabelling it or appending another notice.
+The two checkpoints are not one SQL transaction; while the root is pending,
+B1 remains blocked. Historical raw checkpoints remain intact.
+
+`closed_turns` maps saved input IDs to actual end-message IDs and outcomes.
+`ConversationReader.read(reference, offset)` retains its role-aware 3,000-character
+pagination and adds `turns` metadata (`input_id`, `status`, `answer_succeeded`).
+B1 receives this metadata in both source/context payloads, so safely closed
+failures still supply employee text and prior consultant questions without a
+fabricated successful answer. Runtime notices/tools/opaque items remain in
+canonical storage but are excluded from visible extraction text. Whole-turn
+size bounds still apply, and new B1 ranges cannot skip intervening turns.
+Legacy genuinely provider-completed windows remain readable; an unmarked
+incomplete response does not become an eligible source.
+
+T2-R01: context first locates the nearest genuinely visible assistant message
+before the new window, crossing safely closed turns without visible AI. Its
+canonical range continues through the preceding turn's end, retaining all
+intervening answers/corrections (e.g. the question, then "不是，是處長"). A short
+previous Human-only turn cannot replace this required range. Whole-prior-turn
+context remains optional only when it also contains the required question.
+Runtime notices are not questions; the original roles and visible text remain
+unchanged, with no summary, new reference format or duplicate source store.
+The entire required range must fit both `context_chars` and the combined
+`max_chars` budget; otherwise planning explicitly rejects before B1 runs.
+`context_chars=0` therefore cannot silently discard a necessary question.
+R01 focused source/extraction/lifecycle regression: **88 passed**, including
+consecutive safely closed failures and complete-range budget rejection.
+Independent limited review closed R01 with no newly introduced Important
+findings. `capture_input` / C lookup is unchanged.
+
+Final controller verification: **209 passed / 0 skipped in 25.83s**, including
+dedicated real PG tests and four root/child/C lifecycle combinations
+(resume/cancel × pre/post commit reply loss). Compileall, offline lock and diff
+checks passed. Earlier 196/198/204 counts describe intermediate snapshots.
+Models use fake HTTP transport; paid calls are zero, not a live-model quality
+evaluation. No Docker restart/reset, production changes or API/scheduler/UI
+implementation. Stop here before Task3. Detailed history and sources:
+[Task2 results](../../docs/specs/2026-09-06-analysis-only-agent-safe-turn-closure-results.md).
+
+Public mechanisms: [middleware hooks/state](https://docs.langchain.com/oss/python/langchain/middleware/custom),
+[checkpoint updates/reducers/as_node](https://docs.langchain.com/oss/python/langgraph/checkpointers#update-state),
+[subgraph inspection and tool-hidden limitation](https://docs.langchain.com/oss/python/langgraph/use-subgraphs#view-subgraph-state).
+Operation binding and closure policy are Caliburn application wiring, not
+vendor-prescribed semantic memory or a claim of vendor consensus.
+
+## Run
+
+Python 3.12 and uv, from this directory:
+
+```powershell
+$env:PYTHONUTF8 = '1'
+$env:UV_CACHE_DIR = "$PWD/.uv-cache"
+uv sync --locked
+uv run --no-sync pytest -q
+uv run --no-sync python -m compileall -q src tests
+```
+
+Tests use the real pinned LangChain adapter, OpenAI SDK and LangGraph serializer;
+only HTTP is synthetic (`httpx.MockTransport`). No `.env`, valid API key or paid
+call is required. Test tracing is disabled. Synthetic encrypted strings verify
+preservation, not actual server-side reasoning or compaction quality.
+
+## What exists
+
+- `provider.build_model`: public `ChatOpenAI` Responses binding, `store=False`,
+  medium / `all_turns`, native content blocks and sequential tool calls. A positive
+  `compact_threshold` is opt-in configuration; there is no universal default.
+- `context.server_compaction_view`: detached request-only conversation from the
+  latest **inline server** compaction item, retaining later items and matching
+  tool metadata. Instructions and Memory guide must be added separately by the
+  caller. Never use this to prune standalone `/responses/compact` output.
+- `runtime.build_agent`: official `create_agent` with a request-only middleware;
+  no custom model/tool loop, message repository, or state machine. Caller owns
+  the model/client and Saver lifetime, and invokes with `durability="sync"`.
+- Failed pending step: reopen with the same thread ID and invoke with `None`.
+  Do not append the same employee input again. The offline regression exercises
+  reuse of a committed deterministic tool result, NOT exactly-once external effects.
+- Tests cover configuration, opaque reasoning/phase/function call round-trip,
+  canonical serialization, compaction slicing and canonical non-mutation.
+
+The adapter may omit response-top-level effective `reasoning.context` metadata.
+Sending `all_turns` does **not** prove the server selected it. A later tiny native
+response/adapter live comparison is required; do not fabricate this metadata.
+
+## Dedicated PostgreSQL check (passed on 2026-09-06)
+
+Install uses the pinned official `langgraph-checkpoint-postgres` package. The
+integration test uses `PostgresSaver.from_conn_string(...)` and `.setup()` directly,
+not an additional persistence wrapper. It only allows a database named
+`q019_agent_test`, which must already exist on a test PostgreSQL service. Never
+point it at the application database. Supply `Q019_TEST_DATABASE_URL` externally
+with a bounded `connect_timeout` (for example 5 seconds); do not commit credentials.
+
+```powershell
+uv run --no-sync pytest tests/test_postgres_conversation.py -q -rs
+```
+
+This test runs two separate Python processes, stops the first at a synthetic
+provider error, and resumes its saved model step in the second. It checks input
+visibility from another DB connection before a model response, native items,
+tool-result reuse, compaction view vs full conversation, and thread isolation.
+It deletes only its own random test thread using the official Saver API.
+No DSN means an explicit **skip, not a durability pass**; a provided but failing
+DSN fails the test. Model HTTP is synthetic in both processes (zero paid calls).
+
+Docker Desktop initially failed on an inaccessible internal socket. After an
+owner-approved, non-destructive backup/recreation of its socket directories,
+the engine recovered. The dedicated `caliburn-q019-postgres` container now uses
+PostgreSQL 16.14, user `q019`, database `q019_agent_test`, localhost port `55433`,
+and its own `caliburn-q019-postgres-data` volume. Its random password stays out of
+the repo/output. No Docker factory reset or existing-data deletion was performed.
+
+The single PG test passed, then the full suite passed **12 tests, zero skipped**.
+Both worker processes use synthetic provider HTTP: this proves database/process
+continuity, not a live model's reasoning quality or arbitrary power-loss recovery.
+Test thread rows were cleaned; the dedicated DB/schema remains for another run.
+
+## Not yet implemented / proved
+
+Streaming/async transport, abrupt host/DB crash or failover recovery,
+total context token budget, background scheduling, C editing
+and in-run read-view refresh, UI, paid Luna/medium smoke.
+There is intentionally no JD editor. Standard serializer round-trip is not a
+database durability test. The code is not connected to the existing application.
+
+## Memory read slice (2026-09-06)
+
+- `memory.MemoryArtifacts`: fresh StoreBackend extraction files and prepared
+  knowledge/guide versions. Runtime generates addresses and source headers.
+  `save_memory` does **not publish current**; caller selects a `MemoryVersion`.
+- `sources.ConversationReader`: captures completed exact snapshot/message ranges;
+  reads saved visible human/assistant text, with bounded continuation and omitted
+  block kinds. No new archive and no model call; opaque reasoning is not exposed.
+- `memory_tools.memory_access`: fixed document/version guide plus official
+  read-only file tools and `read_conversation`. Pass the returned middleware/tools
+  into `build_agent`. Build a new access bundle when intentionally selecting a
+  new version; no hidden mid-run refresh. Only filesystem `.tools` are registered,
+  not generic offload/scrubbing hooks. Native Responses continuity stays intact.
+- Direct file reads support full fixed-version enumeration; model-visible pages
+  use official size-based pagination. Engineering limits: line <=2,000 chars,
+  guide <=4,000 chars, read output about16,000 chars, source page3,000 chars.
+  Too-large directory listings fail explicitly; keyword top-k isn't inventory.
+- Generated artifacts normalize line separators before storage so backend and
+  native formatter pagination agree; original conversation text is unchanged.
+  Literal runtime interview links are checked across presentation styles,
+  including bare links followed by sentence punctuation.
+- Full suite **32 passed / 0 skipped**, including actual PostgreSQL Store/Saver
+  reopen. Model HTTP synthetic, no API spend. B/C generation/concurrency still
+  needs the next slice; prepared artifacts aren't a publication authority.
+
+[Memory read results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-memory-read-path-results.md)
+records source links, scoped test cleanup, custom seams and remaining gates.
+
+## Memory publication slice (2026-09-06)
+
+SQLAlchemy 2.0.52 provides ORM version checking and transaction scope for two
+small metadata tables: current head and durable operation receipts. Full text
+remains in the official Store; this is not another Memory or conversation store.
+
+`PublicationStore(engine, artifacts)` is fixed to one document. Call `setup()`
+explicitly in the isolated database setup, never during a model run. Runtime
+calls `prepare(version, expected_revision=..., kind=...)` after saving artifacts,
+persists that request in its workflow, and sends it to `publish(request)`.
+An absent head has revision 0. `current()` returns a fixed published version
+for `artifacts.reader(head.memory)` and `artifacts.guide(head.memory)` together.
+
+Stale updates fail without overwriting the winning version. Retry an uncertain
+commit with the **same request**, or read its `receipt(operation_id)`; absence
+does not prove the old transaction failed. An existing receipt returns the old
+operation's result without rolling current back. Different content requires a
+new operation after resolving the previous attempt. No automatic model retry.
+No SQL transaction spans model work or Store artifact preparation.
+
+Full suite: **49 passed, zero skipped** with the dedicated PG database. New
+tests exercise first-insert and subsequent-update races and commit-reply loss.
+Failure injection is synthetic, transactions and contention are real. This is
+not production failover or model-quality evidence; paid calls remain zero.
+Reconciliation-query disconnects preserve the same uncertain-result contract;
+they do not imply a previous attempt failed. The B/C model workflows and
+automatic read-view refresh are still not built.
+
+[Publication results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-memory-publication-results.md)
+contains references, custom seams, test limitations, and the next gate.
+
+## Interview extraction slice (2026-09-06)
+
+`ExtractionWorkflow(reader, artifacts, model, checkpointer)` runs B1 only:
+completed source references → native three-field extraction → durable checkpoint
+→ Store artifacts. `start(reference)` handles a bounded batch; `resume()` resumes
+the pending node without replacing its input. The caller serializes jobs per
+document. This technical workflow is not another employee conversation.
+
+The model writes detailed notes, candidate information and a short label.
+Runtime supplies real paths and new-source/optional-context references. It does
+not publish current Memory. Empty candidates are valid; incomplete/refused/
+invalid model results are errors. Source completion requires explicit provider
+`completed` status, not only a graph with no next node.
+
+Defaults: 6,000 visible characters per window, up to1,500 previous-turn context,
+4,096 output tokens and16 windows per batch. All are engineering settings, not
+vendor guarantees. Oversize individual turns fail rather than silently truncate.
+Only visible interview text is extracted; opaque reasoning remains canonical.
+
+### B1 bounded validation feedback (2026-09-07, ER-B02)
+
+The [runtime repair plan's public API decision](../../docs/plans/2026-09-07-runtime-recovery-repairs.md)
+keeps the identical `ExtractionOutput.model_json_schema()` on native
+`with_structured_output(method="json_schema", strict=True, include_raw=True)`.
+No tools, manager, model-authored identifiers or extra output fields are added.
+The native candidate/raw response is checkpointed first; a separate application
+validation step retains the existing 2,000-character line boundary and rejects
+empty summaries. Lossless newline normalization remains deterministic; there is
+no truncation or automatic Markdown wrapping.
+
+`max_validation_corrections=1` permits at most one application correction per
+source window (configurable nonnegative integer; zero disables correction).
+This is an engineering initial setting, not vendor consensus. The original
+source input and unchanged native AI candidate, including opaque reasoning,
+precede private Runtime feedback containing only known failing fields/reasons,
+not a Pydantic dump or employee message. No invalid artifacts are saved or
+published. Successful extraction still takes one model call per window and
+retains the configured per-response output cap.
+
+Candidate, error, correction limit and used count are checkpointed before the
+corrective call. Reopening/resuming cannot replenish the saved allowance, even
+if constructor settings change; only the next successfully reached window
+resets its count. Exhaustion remains pending with a precise error. Refusal,
+incomplete responses, malformed native output and transport errors do not enter
+the format-correction loop. A transport-interrupted correction resumes that
+same reserved call under the SDK's existing transport policy, not a new format
+allowance. Saved windows and validated results pending Store writes are not
+re-extracted; explicit summary re-extraction uses the same correction boundary
+without changing the ordinary source cursor or old artifacts.
+
+Old completed checkpoints remain readable. Old *partial* checkpoints lacking
+correction-budget metadata stop explicitly before resume; no allowance is
+guessed and no migration/reset is supplied. A response lost before checkpoint
+can still be recomputed; this is not an exactly-once HTTP or monetary guarantee.
+Offline SDK/MockTransport tests cover correction, exhaustion/reopen, native
+reasoning, source isolation, multiple windows and re-extraction; final full-suite
+and PostgreSQL verification belong to the controller.
+
+The latest completed identical source returns its saved result. Older or
+overlapping source ranges are rejected before another call; there is no implicit
+force-reextract or arbitrary historical-result lookup. Message order is read
+from the canonical snapshot, not inferred from UUIDs.
+
+A Store failure after the model-result checkpoint resumes saving, not the model.
+Partial unreferenced artifacts may remain; no current version is changed and no
+GC is provided. A model response lost before checkpoint can still be recomputed.
+Real PG tests reopen all connections after injected pre-write/partial-write
+failures. Full suite: **71 passed / zero skipped**, synthetic HTTP, zero paid calls.
+This proves wiring/recovery, not semantic extraction quality.
+
+[Extraction results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-extraction-results.md)
+records framework sources, review findings, repairs and the remaining B2/C gates.
+
+## Design / evidence
+
+### Consolidation slice (2026-09-06)
+
+`ConsolidationWorkflow(extraction, publication, model, checkpointer)` consumes
+the completed `ExtractionWorkflow` checkpoint. Call `start()` for a completed
+B1 batch and `resume()` only for its pending job. A read-only admission check
+rejects invalid/oversize input without reserving a new job. Caller still
+serializes B jobs; this is not a scheduler or a second employee conversation.
+
+B2 receives bounded candidates, real detail-note links and the small guide.
+DeepAgents `StateBackend` holds a private copy of the base knowledge/guide;
+official `ls`, `grep`, `read_file`, `write_file`, `edit_file` tools expose that
+staging and read-only interview artifacts. `validate_memory()` has no model
+arguments and offers optional format/reference/guide-presence preflight within
+the loop. It is application validation, not semantic truth or coverage verification.
+Use native whole-file writes only for a short, fully visible file that fits the
+output budget; retain local exact edits for long/partially read content. Reading
+one page does not establish full visibility. This is usage guidance, not a
+Runtime-enforced read-coverage or semantic-preservation tracker.
+
+Final completed responses without tool calls also validate the staged files via
+public `AgentMiddleware.after_model(can_jump_to=["model"])`. A known application
+format/reference error returns one private, Runtime-labelled Human message with
+the failing file/address and reason, then jumps back to the same Agent. This is
+not employee speech, canonical conversation/source, or a fabricated tool result.
+The hook is first in the middleware list so existing reverse-order after hooks
+count the response before correction returns through the original quota gate.
+There is no outer retry, new correction quota, B1 rerun, or extra successful-path
+model call; `native_context_view` remains in place. The shared validator is reused
+per staged file to identify the location; only known error reasons are classified
+as correctable, including checking the cause of wrapped reference errors.
+After both actual files are loaded, a nonempty body with a whitespace-only guide
+is also a correctable completion error. This pair check is B2-specific, not a
+new rule in the per-file/shared artifact validator. Initial empty no-ops and
+unchanged valid guides remain allowed; the model need not call the preflight
+tool or regenerate the guide every time.
+
+A per-invocation LangGraph subgraph checkpoints the official Agent's tool steps.
+The completed pair is checked again, saved as immutable Store artifacts, then
+the publication request is checkpointed before the existing CAS/receipt seam.
+Stale publication keeps B1 and starts a fresh B2 attempt from the winning head
+plus actual bounded repair-source Q/A. It does not reuse the old model output
+with a new expected revision. No raw-search tool or additional summary layer.
+
+Initial limits: 8 successful model steps / 12 tool calls across the B2 job,
+4,096 output tokens per request, candidates24,000 visible chars, repair input
+12,000 chars; 20 repair receipts is a fixed safety limit, not a configurable
+parameter. Stale attempts get only remaining budget; a resumed agent keeps
+its official counters. These are engineering limits, not vendor
+guarantees or a hard billing cap: SDK network retries and calls lost before a
+checkpoint may add HTTP requests. No paid API was used.
+
+Incomplete/refused responses or `invalid_tool_calls` anywhere in the attempt
+cannot become successful no-op publications or final-validation correction.
+Unknown backend/configuration errors still fail closed. Collect, immutable save
+and publication retain their validation defenses. On interruption, `resume()`
+continues the saved correction state, messages, staged edits and official counters;
+it cannot reset exhausted limits. Invalid intermediate files never publish.
+Budget exhaustion is a safe background failure, not autonomous recovery. The
+production retry/cancel/replan interface remains out of scope; do not tell users
+all errors are automatically repaired.
+
+This correction path covers new executions and their saved in-agent resumes.
+A pre-upgrade checkpoint already paused at outer `collect` may bypass the new
+hook; recovering that historical state is not supported/proven by this slice.
+No old-job migration, forced replay or rebase is introduced.
+
+Full suite: **96 passed / 0 skipped**, including actual PG client/Saver/Store
+reopen after tool failure, before artifact save and after lost commit reply.
+Synthetic responses prove wiring/recovery, not real consolidation quality.
+[Consolidation results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-consolidation-results.md)
+records the review, official sources, limits and next C/A gate.
+
+### Live repair / primary-agent refresh slice (2026-09-06)
+
+Create `MemorySession(publication, source)` and pass it to
+`build_agent(..., middleware=[session], tools=session.tools)`. This sync-only
+composition adds `repair_memory(edits)` to the four existing read tools.
+C is a no-model tool subgraph, not a third agent. The caller owns clients,
+serializes primary runs per document, and invokes with `durability="sync"`.
+Use `invoke(None, config, durability="sync")` to resume a pending run, not a
+second copy of its input. App admission/retry/cancel endpoints are not included.
+
+New employee input pins head, guide, its publication revision, and a real saved
+input Q/A reference. The revision is Runtime-owned (0 means no publication).
+Read tools use public middleware `request.override(tool=...)` to select this
+immutable version. A background publication does not silently switch it.
+C uses exact StateBackend edits in private per-invocation staging; all edits
+must succeed before save -> durable request -> existing publication/receipt.
+No fuzzy edits and no creation of missing Memory. Guide and knowledge publish
+together; C leaves B's processed-source cursor unchanged.
+
+Command updates A's read head and ToolMessage together on success/stale;
+initial system guide and revision stay fixed within the input, including resume.
+Every C result carries the existing Runtime-owned `source_reference`; only a
+result matching the Current input reference can supersede that input's initial
+view when it supplies a refreshed head/guide. Prior-input C results remain
+unchanged canonical history and cannot override a new input's pinned guide.
+An old pending checkpoint without the initial revision is labelled `unknown`,
+never inferred from a refreshed read head or newer publication; no migration.
+This adds no model-authored field, model step, or source-text copy.
+On a reconciled older successful request, the result distinguishes
+the applied version from the latest read version. Canonical visible Q/A can
+be read from C receipts without exposing opaque reasoning or duplicating text.
+
+Engineering limits: 1–8 edits / 12,000 combined old+new chars per C call; two
+correctable failures per employee input (initial plus one retry), including
+framework schema errors. New input resets; resume does not. This is not an
+overall A cost cap. Storage/uncertain commit faults propagate as pending work.
+No paid API or natural-model repair-quality claims.
+
+Full suite: **120 passed / 0 skipped**, including four real PG reopen cases.
+Independent review found no Critical/Important blockers for this isolated
+savepoint (reviewer reran live20 tests, not the entire PG suite).
+Verification and boundaries:
+[Live repair results](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-live-memory-results.md).
+
+### Earlier design and provider evidence
+
+Current design lives in the main checkout (not this branch's historical register):
+[Q019](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-design.md),
+[first slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-native-continuity-slice.md),
+[second slice plan](S:/caliburn/docs/plans/2026-09-06-analysis-only-agent-durable-conversation-slice.md).
+[Results and Docker recovery record](S:/caliburn/docs/specs/2026-09-06-analysis-only-agent-durable-conversation-results.md).
+The branch keeps an execution copy in `docs/plans` for review/reproduction.
+
+- [Native reasoning / preserve all output items](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-across-calls)
+- [Server vs standalone compaction](https://developers.openai.com/api/docs/guides/compaction)
+- [ChatOpenAI public Responses API](https://docs.langchain.com/oss/python/integrations/chat/openai)
+- [LangGraph persistence / serializer](https://docs.langchain.com/oss/python/langgraph/persistence)
+- [Transient model context vs persistent state](https://docs.langchain.com/oss/python/langchain/context-engineering)
+- [Official PostgreSQL setup](https://docs.langchain.com/oss/python/langchain/short-term-memory)
+- [Sync durability](https://reference.langchain.com/python/langgraph/types/Durability)
+- [HTTPX MockTransport](https://www.python-httpx.org/advanced/transports/#mock-transports)
+
+Version evidence: `uv.lock`, generated 2026-09-06 against PyPI. Core direct pins:
+LangChain 1.4.0, langchain-openai 1.6.0, LangGraph 1.2.11,
+langgraph-checkpoint 4.2.0, OpenAI SDK 3.8.0. Python 3.12.13 used locally.
+Second slice: langgraph-checkpoint-postgres 3.1.2, psycopg/binary 3.3.5
+(resolved in `uv.lock`).
+Third slice: Deep Agents0.7.13 (public StoreBackend and filesystem tools).
+
+### JD core Task 2 — isolated PostgreSQL working revisions
+
+`open_service` composes `JdService` with the **same engine instance** as Catalog.
+Fresh setup remains catalog/Saver/Store setup, plus `JdStore.setup()` for the three
+ordinary logged tables `jd_head`, `jd_revision`, and `jd_operation`. Build the
+fixed bridge first with `npm run build -w @caliburn/jd-editor-native` from
+`experiments/jd-editor`. No root production workspace/lock or Memory ownership
+changes are involved. These are internal service ports; JD tool/HTTP bindings
+and writer admission are the following slices.
+
+New documents created through the composition receive catalog, canonical empty
+paragraph revision, and head in one short transaction. `Catalog.create_document`
+still supports existing callers and now accepts an existing session. Older
+catalog documents without a JD head are rejected by JD reads/writes; reads never
+backfill them. Every lookup verifies the catalog/document scope; references from
+another document cannot resolve in this one. No migration, reset, cascade delete,
+or background backfill is performed.
+
+The mapper alone imports generated DTOs and checks the SSOT. Internal typed ports
+keep IDs, query/intent/value/outcome data; `jd_store.py` alone owns JD SQL. Each
+write checks the original immutable receipt before Node, locks the same-document
+head, checks that receipt again, and verifies base=current. PostgreSQL JSONB `=`
+decides no_change. Changed writes insert revision → receipt → update head before
+commit. A no_change only records its receipt. Manual saves preserve exact before
+and after revisions but have `native_operations=null` and empty affected IDs;
+candidate normalization is not represented as baseline edits. Empty affected IDs
+do not mean that a committed manual revision made no changes.
+
+Only confirmed terminal results become receipt rows. A lost commit reply is
+reconciled by the same operation/digest, including across fresh processes.
+Definite failures whose receipt is unconfirmed remain unchanged and require
+reconciliation. A saved failure never becomes a later success or changes its
+next_action when replayed. A failed publication is not automatically retried;
+after confirmed rollback, a separate single attempt may record save_failed.
+Receipt lookup with no row is not proof that an earlier writer stopped: the
+following writer-gate/recovery slice must establish that before explicit resume.
+
+The fixed Node argv accepts only stdin JSON, uses no shell, and receives only OS
+runtime environment settings, never DSNs, API keys or NODE_OPTIONS. The starting
+budget is 30 seconds per Node attempt, then terminate/reap for 5 seconds and
+kill/reap for 5 seconds. Input/stdout are bounded at 16 MiB and stderr at 8 KiB;
+overflow is a typed failure, never successful truncated content. OS spawn and
+synchronous validation are not preemptible hard wall-clock guarantees. If a
+process has not been reaped, the failure explicitly remains non-quiescent; no
+writer gate can be released on that result.
+
+Each SQL stage has a monotonic 30-second budget with a driver cancellation
+supervisor, statement limit ≤10 seconds and lock limit ≤5 seconds, reduced to
+the remaining time before statements. Connection acquisition follows the shared
+engine's configured 5-second libpq timeout; cancellation/rollback are cleanup,
+not proof inferred merely from elapsed time. Node, SQL publication, failure
+receipt closure and later lookup have separate budgets, not a combined
+30-second request guarantee. The fixed full r2 fixture and an explicit
+100-command stress batch measure realistic bytes and elapsed time; 100 is a
+test scale, not a product or schema maximum.
+
+The same store provides producer lookup plus direct-parent ancestor interval
+counts and the latest four committed events. Initial revisions and no_change
+receipts are not creating events. Manual edits followed by manual reversion
+remain two events. No new history table, read cursor store or lineage engine
+was added. Source-reference shape and same-revision K/S relations are checked;
+Task 2 tests use synthetic source handles. Task 3 injects the existing source
+owner to validate real source truth; this slice does not claim that integration.
+
+Verification uses explicit loopback `Q019_TEST_DATABASE_URL` with database
+`q019_jd_app_20260910` and `connect_timeout` 1–5 seconds. The existing Memory PG
+tests continue to require their own `q019_agent_test` database. JD tests create
+unique documents and retain their rows; they never clear shared data. Missing
+DSN is a skip and is not a PostgreSQL pass. The tests verify actual PostgreSQL 16
+settings (`fsync=on`, `synchronous_commit=on`, logged tables), two simultaneous
+connections, rollback, lost commit acknowledgement, fresh-process receipt-first
+recovery, full JSON snapshots, v2 links and immutable history. Test-generated
+`task-2-pg-*.jsonl` files in the task scratch directory preserve complete scoped
+head/revision/receipt rows for independent review. No paid provider calls or
+production authority adoption are included.
+
+### Task 3 — advisor tools and response-backed JD context
+
+The existing conversation now composes the three factory-built JD tools when
+`AnalysisService` has its isolated `JdService`. `jd_read` supplies saved current
+or read-only historical content, exact targets and admitted native selections;
+`jd_edit` resolves a single read base and validates the full SSOT before Node;
+`jd_change_read` distinguishes an actual committed/no-change receipt from a
+comparison of two revisions. Root-node pagination retains the same immutable
+revision/comparison, does not truncate individual native nodes, and does not
+turn a historical continuation into a current write base. Relationship refs
+come from the complete revision, while only actual content reads authorize edits.
+
+The original factory tools remain in ToolNode. A request-only middleware replaces
+only their model schema views with complete SSOT closures and `strict:false`.
+Non-JD tools keep their schemas and strict settings. The last public tool wrapper
+checks the exact factory and checkpointed call after earlier middleware overrides.
+Input/message/call/operation/digest/base/commands are checkpointed before Node.
+The same document stop Event reaches the existing native cancellation parameter;
+an unconfirmed operation requiring reconciliation preserves its binding and
+blocks another model request. Complete cancellation/reconciliation is Task 5.
+
+Sources use the existing ConversationReader and original Memory reader factories.
+Saved current input is issued by its existing source owner; a historical source
+must have a successful canonical read and a valid closed source window. A
+parseable handle, JD citation, ToolMessage or same-name replacement cannot grant
+original-source acquisition. Source text is never copied to JD SQL, and manual
+text does not become verified just because an old source remains attached.
+
+Each model request receives an `app_jd_context` HumanMessage only after native
+compaction projection. It is labeled untrusted App data and never enters canonical
+interview messages or Memory extraction. The last successful response-backed
+manifest and AI response share the model checkpoint and normal child/root return.
+Committed events since that manifest count manual reverts and metadata-only edits;
+no-change receipts do not count as revisions. The initial turn interval remains
+visible in later requests, alongside the fresh head. Missing/unpaired manifests
+are explicitly unknown; cross-document or unavailable known state fails closed.
+The payload is at most 16 KiB, four event details, and 2 KiB of UTF-8 text preview;
+whole exact native pairs are included only when they fit. Navigation and previews
+never claim complete content, and original model/tool/token limits remain in force.
+
+The optional API `jd_selection` consumes the generated SSOT capture DTO, verifies
+current base, calls the same native read-selection entry, checks head again and
+saves only this run's selection context. Pure interview input clears selection.
+Task 3 tests use actual Plate selection, the API, real ToolNode, SDK MockTransport,
+canonical source reads and separate processes with the official PostgreSQL Saver.
+These are zero-paid offline engineering checks; browser/IME, full cancellation,
+real provider acceptance and natural-model professional quality remain later gates.
+
+Task 3 review fixes keep partial selection targets navigation-only until a full
+block read, verify exact JD schemas and App notice at the final public model
+wrapper, and report event omissions after the shared four-detail cap. Source
+acquisition observes a successful canonical reader projection within the actual
+tool invocation; substituted or altered reader results cannot issue provenance.
+The existing pinned Memory reader, System additions and state commands remain
+on the same framework chain.
+
+The final request guard also compares complete supplied JD ToolMessage projections
+and their visible AI call/message identities against request-local preparation,
+so retaining an ID cannot conceal changed result text or call pairing.
+
+### Task 4 — 隔離同頁 Web 與 HTTP 接點
+
+`experiments/jd-editor/web` 的 3001 同頁工作畫面接此 8091 API。文件建立要求 App UUID request key；PG 以同交易保存 catalog／key／digest／initial revision／head，同鍵相同輸入回原文件。metadata version 條件更新與 archived 篩選不產生 JD revision，內部 scheduler 仍取得完整 catalog。既有 run admission digest 涵蓋 text、abandon_pending 與 selection；重開的 by-request lookup 只讀 canonical input 是否已收到，不自動送出或繼續。
+
+`jd_routes.py` 將 browser manual/read/change requests 映射至同一內部 ports，沒有 fabricated AI run 或 tool ID。immutable browser refs 核 route document；人工候選完整驗 profile／來源 owner，終局同鍵 receipt 在 busy／archive gate 前回傳。來源按原 ConversationReader 讀取，沒有平行來源儲存。來源引用保留不表示新手改內容已獲原文證實。
+
+兩個允許 origins 僅 `127.0.0.1:3001`／`localhost:3001`；GET／POST／PATCH、Content-Type、不帶 credentials，未知 origin 403，保留 TrustedHost。`scripts/export_web_contract.py` 只從實際 Pydantic models 生成 Web 型別，不啟動 open_service 或讀 key。
+
+既有隔離 DB 先明確執行 `scripts/setup_jd_web.py` 的 additive metadata setup，指定專用 `Q019_TEST_DATABASE_URL`（只准 local `q019_jd_app_20260910`）；不刪表或搬 production 資料，`create_all` 不代替升級。測試保持既有 Memory DB guard。Node 22.23.2 必須在建立 JdEngine 前以 scoped PATH 啟動，不能只在另一 terminal 換版本。
+
+`tests/jd_browser_server.py` 是零付費 browser fixture：實際 AnalysisService／API／JD router、官方 PG Saver／Store、原三工具，僅 model transport 使用固定 MockTransport，沒有讀取真 key 或 live fallback。Task 4 瀏覽器證據分開記 headed Chrome、CDP composition 與 Windows 真人 IME；完整取消／native process owner 屬 Task 5，自然模型與 Skill/E2E 屬後續 gate。
+
+Task4 review fix1：人工保存的明確未 admission 回覆使用實際 Pydantic `ManualSaveRejection`（生成至 Web），含原 request key；只有在同一 service lock 中確認該 identity 無 receipt 後才回覆。已有 receipt 的非法重放、receipt lookup unavailable 與一般 HTTP 409/422 不代表零寫入；原正常 receipt 優先規則保留。Pydantic body validation 失敗也走相同 receipt 查核，UUID 使用與有效 DTO 相同的 canonical identity。
+
+### Task 5 — 同文件 admission、原生程序生命週期與原身分恢復
+
+Windows API 的主執行緒先執行 `windows_lifecycle.bootstrap()`，才建立 DB、model client 或 Node。啟動程序必須設定穩定的 `Q019_LIFECYCLE_INSTALLATION`（1–80 個英數字、底線或連字號），同一隔離安裝的重開沿用同值。私有 mutex 防止第二個 API 搶走正在工作的安裝；私有 Job 保留 kill-on-close 並禁止 handle 繼承，啟動核對 exact 舊 Job 停止後才加入新 Job。未知物件、指派失敗或舊物件仍存在都先拒絕工作。舊未受管服務切換必須先核實並受控停止；不能以換 key 或按 port 殺程序代替。
+
+`tests/jd_browser_server.py` 也走真 bootstrap。既有離線啟動命令加上 process-scoped `Q019_LIFECYCLE_INSTALLATION=jd-editor-offline-20260910`；Node 使用 Task4 isolated 22.23.2，DB 仍是 `q019_jd_app_20260910`。可設 `Q019_TEST_EVIDENCE_PREFIX=task5` 或 `task6`，將離線 fixture 記錄分開，預設保留 task4 名稱。實際 API `create_app()` 在主執行緒 bootstrap；不可用尚未 bootstrap 的 `open_service()` 繞入 resources。
+
+人工儲存、AI、selection、HTTP selection read 及建立文件都由 App owner 保留 spawn／Popen／pipe／I/O 執行緒。原生回傳或 Future.done 不代表已清理；未清理時不發布候選、不新增同文件寫入。等待與有界 cleanup 不持全域 admission lock，另一文件可以繼續。關閉先停 admission、送出取消信號，再等原 Python entry 與 native owner 排空。AI stop 不停掉唯讀使用；唯讀入口只接 App shutdown 的獨立停止信號。
+
+人工 admission 在 Node 前以官方 root checkpoint 保存最多一筆 operation／base／digest／request_key／origin，沒有候選、假 HumanMessage 或 run。結果不明時保留原身分；停止已證後先取得 PG head row lock，下一 statement 查原 receipt，只有 known-none 才閉合原 failure。已提交結果永遠回原 receipt，取消不撤銷它。JD close 核對實際 factory session、原 message/call/input 與全部未閉合 bindings；只補缺失 ToolMessage，保留原訊息及已确认模型投影 manifest，未知不取得一般 resume 權。
+
+App-only `GET /documents/{document}/jd/manual-recovery` 可不附 key 發現原待處理身分，或附原 `request_key` 唯讀查回結果。`POST` 同路徑只收原 UUID key，明示做一次有界恢復，不接收或重跑候選。每個 available／unknown／no_pending 都由同一 server admission 投影 `write_blocked`／`can_recover`；結果已讀但 descriptor 未清仍可明示清理，archive 不遮蔽原結果。GET 不停止程序、不更新 checkpoint、不寫 receipt。
+
+瀏覽器重開／pageshow 只讀查詢，不自動重送人工稿。沒有 cache 也保留原身分恢復入口；有 exact cache 且 no_pending 時，可另次明示完整原 key/base/value，可能是首次送達。查不到不代表零效果；終局失敗保留候選，新 dirty 不被晚到結果覆蓋。最新完整 server gate 讀取失敗仍維持鎖定。新 transport 型別由實際 Pydantic → export → generated Web，三個模型工具與 JD JSON Schema 不變。
+
+Task5 測試與觀測限制列於 `scratch/task-5-report.md`；真 Windows kernel、真 PG/Saver 程序重開、App seam fixture 與 Web mocks 分別記錄，不將它們混成自然模型、真人 IME 或 Task6 成品通過。
+
+Task5 review fix1：輸入在最終 admission 再核封存與原 key；selection reservation 保留到同一鎖區內的最後檢查。manual recovery／stop／放棄中斷回合沿同文件 reservation，在全域鎖外等待 native／PG；shutdown 先禁止新操作，再等這些 entry 完整對帳及結果投影。全域 RLock 仍用於共用 owner 狀態與短 admission，不取代 PG row／advisory lock，也不宣稱效能倍數。
+
+原人工 full-save 先查原 key／digest 的 terminal receipt；descriptor 清理失敗或另有 active owner 仍回原結果並保留寫入 gate。cache 遺失時，明示恢復的原 key／結果在後續重讀仍可查看；無 key discovery 另決定目前 gate，不把已確認結果洗掉。App-only 恢復 DTO 新增 `restart_required`：無 run／manual descriptor 的 native read owner 未能停止時，畫面明示保留目前頁面及 dirty／問句、受控停止原服務、沿原 installation 設定重開後按「重新讀取狀態」。只重新整理網頁不會停止舊程序；本切片不新增一般 cancel route、假 run 或自動重播。正式日常啟停入口仍屬成品 P5。

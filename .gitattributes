@@ -24,3 +24,5 @@ docs/specs/evidence/jd-editor-task3/*.txt -text
 docs/specs/evidence/jd-editor-task4/** -text
 # Preserve Task 5 captured process/PG evidence, upstream notices and hash manifests.
 docs/specs/evidence/jd-editor-task5/** -text
+# Preserve Task 6 raw regressions, browser captures and independent review inputs.
+docs/specs/evidence/jd-editor-task6/** -text

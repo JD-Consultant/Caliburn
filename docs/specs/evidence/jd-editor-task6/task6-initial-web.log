@@ -1,0 +1,38 @@
+
+> @caliburn/jd-editor-web@0.0.1 predev
+> npm run build -w @caliburn/jd-editor-native
+
+
+> @caliburn/jd-editor-native@0.0.1 build
+> tsc -p tsconfig.json
+
+
+> @caliburn/jd-editor-web@0.0.1 dev
+> next dev --hostname 127.0.0.1 --port 3001
+
+▲ Next.js 16.3.3 (Turbopack)
+- Local:         http://127.0.0.1:3001
+- Network:       http://127.0.0.1:3001
+✓ Ready in 7.1s
+✓ Running next.config.ts took 968ms
+
+ GET / 200 in 1622ms (next.js: 1378ms, application-code: 244ms)
+ GET /workspace/4d838d76-eba9-4c0d-b874-7a640cf0f7c3 200 in 768ms (next.js: 426ms, application-code: 342ms)
+ GET / 200 in 277ms (next.js: 112ms, application-code: 165ms)
+ GET /workspace/4f22c4d2-8989-46ce-bcfb-0e3e69c075f7 200 in 198ms (next.js: 84ms, application-code: 114ms)
+ GET / 200 in 51ms (next.js: 4ms, application-code: 47ms)
+ GET /workspace/e4b75bb4-9145-426c-a111-c5648b226316 200 in 58ms (next.js: 9ms, application-code: 49ms)
+ GET / 200 in 41ms (next.js: 4ms, application-code: 37ms)
+ GET /workspace/371d663b-3d2c-47a2-ba5f-e0d0deab1978 200 in 69ms (next.js: 15ms, application-code: 54ms)
+ GET / 200 in 65ms (next.js: 5ms, application-code: 60ms)
+ GET /workspace/29aed8f3-bdbc-4d4b-99b7-04f00b6f689d 200 in 67ms (next.js: 17ms, application-code: 50ms)
+ GET / 200 in 49ms (next.js: 5ms, application-code: 43ms)
+ GET /workspace/e6eea974-03a2-4524-82c6-e75b98e6bc43 200 in 68ms (next.js: 13ms, application-code: 55ms)
+ GET /workspace/e6eea974-03a2-4524-82c6-e75b98e6bc43 200 in 62ms (next.js: 13ms, application-code: 49ms)
+npm error Lifecycle script `dev` failed with error:
+npm error code 4294967295
+npm error path S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web
+npm error workspace @caliburn/jd-editor-web@0.0.1
+npm error location S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next dev --hostname 127.0.0.1 --port 3001

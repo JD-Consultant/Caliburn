@@ -1,0 +1,67 @@
+[
+  {
+    "path": "docs/specs/2026-09-09-complete-work-analysis-guide.md",
+    "sha256": "ea8f240f9c443c3d0587d7943208476408eba593b6fdbc5ff6dd65858f38672f",
+    "bytes": 19678
+  },
+  {
+    "path": "docs/specs/2026-09-09-customized-jd-depth-and-interview-calibration.md",
+    "sha256": "80d3ebcc6a2331ab189907d791c63955ba5454f99673f10872d74ca1cbb4c446",
+    "bytes": 17835
+  },
+  {
+    "path": "docs/specs/2026-09-09-jd-field-and-writing-guide.md",
+    "sha256": "daa8b5a024b421e18ce5429f3225ba8879b2e575c3272aaab713bb870919197f",
+    "bytes": 27176
+  },
+  {
+    "path": "docs/specs/2026-09-07-work-case-and-understanding-information-selection.md",
+    "sha256": "358fe36882b0a8fe898524b1bc79fd1fd86bd69563b501a6ca157cc98c29909c",
+    "bytes": 11715
+  },
+  {
+    "path": "docs/specs/2026-09-09-employer-job-document-comparison.md",
+    "sha256": "9b817498668502abd3111ea94791a3bfd623c5be3a0dc0fd8672bd518babcdf7",
+    "bytes": 20693
+  },
+  {
+    "path": "docs/specs/2026-09-09-frontend-engineer-jd-sample.md",
+    "sha256": "462dbb78b52e6263c7b13104e8b12d55545c6f9090694a73f042078dd239b7fa",
+    "bytes": 6788
+  },
+  {
+    "path": "docs/specs/2026-09-09-jd-editor-framework-decision-candidate.md",
+    "sha256": "1985883858d464e975d84abdc4da7aef7b4a7c49d05f276044c83a433e9a16f0",
+    "bytes": 22381
+  },
+  {
+    "path": "docs/specs/2026-09-09-jd-sample-basis-and-review.md",
+    "sha256": "5cfa46cd63a74130a71affb5931ae4c5bfc23bfb33eb08a37b56373474e06ed1",
+    "bytes": 25193
+  },
+  {
+    "path": "docs/specs/2026-09-09-job-analysis-and-jd-content-research.md",
+    "sha256": "68c9a54afdc9045c0205bf11212502a21efc0c6f9bde139c5cab56213054640e",
+    "bytes": 20425
+  },
+  {
+    "path": "docs/specs/2026-09-09-job-analysis-international-evidence.md",
+    "sha256": "aff3fcef73d35438dd507d1284cc3599cc59a2631874cbeed88d8b32acdb48f9",
+    "bytes": 27420
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-format-quality-and-storage-review.md",
+    "sha256": "9aaff3bd6180a933b894cfba141a69b3a00515b8c323582f853212c935b3df07",
+    "bytes": 27922
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-format-review.md",
+    "sha256": "0d52cfd49dd96c868ee14efab09ac54f76ae224c8da2cfe0404e90e5fab7b37d",
+    "bytes": 9784
+  },
+  {
+    "path": "docs/specs/evidence/2026-09-10-jd-content-scope-quality-audit.md",
+    "sha256": "4c9d253635b3ed8392c81ae8440ff2c4e2af52ecac1d49fb722adb47ecab60c6",
+    "bytes": 17369
+  }
+]

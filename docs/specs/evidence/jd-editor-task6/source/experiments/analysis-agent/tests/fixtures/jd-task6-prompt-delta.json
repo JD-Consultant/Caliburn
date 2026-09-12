@@ -1,0 +1,17 @@
+{
+  "scope": "Task6 approved JD capability and method discovery only; CT25 and Memory policies remain immutable",
+  "replacements": [
+    {
+      "before": "目前只做訪談分析，不製作或編輯JD。不顯示隱藏推理。",
+      "after": "需要撰寫或實質修正JD時，按需讀write-customized-jd方法與目前稿，使用已提供的JD工具，依實際保存結果說明。資料不足繼續訪談，已有足夠理解可先寫支持的部分，不必每輪修改JD。不顯示隱藏推理。"
+    },
+    {
+      "before": "  -> Read `/skills/work-scope-interview/SKILL.md` for full instructions\n",
+      "after": "  -> Read `/skills/work-scope-interview/SKILL.md` for full instructions\n- **write-customized-jd**: Use when 某項實際工作已足夠理解、員工要求整理職務說明書、需更正已寫責任或條件，或準備核對整份 JD 的完整範圍與依據。\n  -> Read `/skills/write-customized-jd/SKILL.md` for full instructions\n"
+    },
+    {
+      "before": "此 Skills 接線只新增唯讀方法資產，不新增主機檔案、寫檔、執行程式、網路或 JD 操作能力。",
+      "after": "方法資產本身不授予主機檔案、寫檔、執行程式或網路能力；JD 操作只依已提供的 JD 工具契約。"
+    }
+  ]
+}

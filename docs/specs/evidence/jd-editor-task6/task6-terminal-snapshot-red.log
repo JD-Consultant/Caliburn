@@ -1,0 +1,59 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/JdSavedProjection.test.tsx (3 tests | 1 failed) 111ms
+   × a completed run cannot freeze a document and conversation snapshot read before its final write 6ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/JdSavedProjection.test.tsx > a completed run cannot freeze a document and conversation snapshot read before its final write
+AssertionError: expected { status: 'ok', …(9) } to deeply equal { status: 'ok', …(9) }
+
+- Expected
++ Received
+
+  {
+    "access": "read_only",
+-   "change_refs": [
+-     "r1",
+-   ],
++   "change_refs": [],
+    "continuation_ref": null,
+    "fragment": [
+      {
+        "children": [
+          {
+-           "text": "最後保存內容",
++           "text": "",
+          },
+        ],
+-       "id": "work",
++       "id": "empty",
+        "type": "p",
+      },
+    ],
+    "read_kind": "current",
+-   "revision_ref": "r1",
++   "revision_ref": "r0",
+    "selection": null,
+    "source_refs": [],
+    "status": "ok",
+    "targets": [],
+  }
+
+ ❯ src/jd/JdSavedProjection.test.tsx:86:24
+     84|   await refreshing;
+     85|   expect(session.run?.status).toBe('completed');
+     86|   expect(session.head).toEqual(current);
+       |                        ^
+     87|   expect(session.messages).toEqual(messages);
+     88| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 2 passed (3)
+   Start at  02:14:06
+   Duration  1.39s (transform 101ms, setup 0ms, import 620ms, tests 111ms, environment 532ms)
+

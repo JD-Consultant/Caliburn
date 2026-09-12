@@ -1,0 +1,13 @@
+{
+  "pid": 20100,
+  "argv": [
+    "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node.exe",
+    "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\node_modules\\next\\dist\\bin\\next",
+    "start",
+    "--hostname",
+    "127.0.0.1",
+    "--port",
+    "3001"
+  ],
+  "created_utc": "2026-09-11T18:49:39.336928+00:00"
+}

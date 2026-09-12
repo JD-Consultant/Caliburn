@@ -1,0 +1,14 @@
+{
+  "group": "all",
+  "argv": [
+    "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+    "tests/task5_acceptance_runner.py",
+    "-q",
+    "-ra",
+    "--basetemp=../../scratch/task6-final-all-temp"
+  ],
+  "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent",
+  "exit_code": 0,
+  "elapsed_seconds": 90.91,
+  "provider": "offline fixtures only"
+}

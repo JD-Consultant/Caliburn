@@ -1,0 +1,47 @@
+{
+  "init": {
+    "model": "claude-opus-5",
+    "tools": [
+      "Read"
+    ],
+    "mcp_servers": []
+  },
+  "result": {
+    "subtype": "success",
+    "is_error": false,
+    "result": "已完成唯讀檢查。先讀 `manifest.json`，再依清單檔名讀取（未執行任何測試、未修改檔案、未連網）。實際讀取：`useJdSession.ts`、`useJdSession.test.tsx`、`JdSavedProjection.test.tsx`、`JdEditor.tsx`、`JdWorkspace.tsx`、`service.py`、`api.py`、`skills.py`、`jd-task6-prompt-delta.json`、`test_postgres_service.py`、`test_memory_prompt_contract.py`、`test_read_recovery.py`、`test_extraction_role.py`、`test_context_budget.py`、`test_native_context_budget.py`。\n\n---\n\n# 群組一（離線回歸 15 筆修正）：**PASS**（附低風險改善項，非阻擋）\n\n## 已核對且未被削弱的守衛\n\n| 主張 | 核對結果 |\n|---|---|\n| 真實 PG、無假 SQLite/Saver/Store 替身 | `test_postgres_service.py:25-44` 斷言 `dbname == q019_agent_test`、host/port、`connect_timeout` 上限，並設 `statement_timeout/lock_timeout`；`opened()` 用真 `PostgresSaver`/`PostgresStore`/`Engine`。無 env 時 `pytest.skip` 且訊息明示「durability NOT verified」。 |\n| 只做加法式 setup、只清自有 UUID 列 | `:36-44` 僅 `catalog.setup()/upgrade_document_metadata()/JdStore.setup()`（無 drop/truncate/reset）；`:62-85` 清理一律以 `document_id == doc` 或 `delete_thread(doc)`、`('q019-memory', doc)` 為界。 |\n| CT25 golden 不變、delta 僅 3 筆且各只命中一次 | `test_memory_prompt_contract.py:63-70` 逐筆 `assert matches == 1`（不能無聲 no-op），之後 `:80-83` 仍整段比對 `system`、`tools`、`parallel_tool_calls`、`tool_choice`。三筆 `after` 與現行來源一致：replacement#1 ↔ `api.py:37-38`，#3 ↔ `skills.py:76`，#2 只新增一個 `write-customized-jd` 條目（若多加 Skill 會立刻失敗）。 |\n| AST 驗真實 `open_service` 用同模組 `ADVISOR_INSTRUCTIONS` | `test_memory_prompt_contract.py:28-33` 對應 `api.py:210-211`，成立。 |\n| 未知已進入寫入仍封鎖 replay/resume/新輸入 | `test_read_recovery.py:185-198` 仍斷言 `not can_resume`、兩次 `resume` 皆 `ServiceConflict`、`submit(abandon_pending=True)` 仍 `PublicationUncertain`、`effects == ['possibly committed']`（無重播）。`stop` 改以回傳值斷言 `('uncertain','publication_uncertain')`，與 `service.py:800-802`（`_close_turn` 失敗 → 轉 uncertain 而非拋出）一致；此狀態在 `service.py:274` 仍使 `_write_blocked` 為真、在前端 `useJdSession.ts:19-25` 仍屬 `active`（維持鎖定），封鎖語意未鬆動。 |\n| 預算/失敗關閉守衛 | `test_context_budget.py`、`test_native_context_budget.py` 仍保留 fail-closed、不可重試、未產生 generation、`assert_counted` 白名單比對，未見放寬。 |\n\n## 發現\n\n**F1・低・測試汙染風險** — `test_extraction_role.py:120-121`\n- 觸發：`open_service()` 內 `service.start_background()` 以 `next_run_time=datetime.now()` 掛排程（`service.py:188-190`），該 tick 在 `service.scheduler.pause()` 之前就可能先跑；且 `service.start()`（`service.py:198`）會走訪**整個共用測試庫的所有 run 列**，不限本測試文件。\n- 影響：若先前一次執行在 fixture teardown 前中斷而殘留列，啟動 tick 可能先消耗 `replies`，使 `:137` 的 `budget_calls` 序列與 `:136` 的 `assert not replies` 失敗（只會造成假紅，不會造成假綠）。\n- 最小修正：在 `with open_service() as service:` 之後、`pause()` 之前加 `assert not sent and not budget_calls`，讓跨測試殘留變成明確可辨的失敗點。\n\n**F2・低・斷言過寬** — `test_context_budget.py:414`\n- 觸發：`pytest.raises((RuntimeError, ValueError))` 未帶 `match`，而 `open_service` 第一行即 `require_bootstrap()`（`api.py:121-122`）。\n- 影響：7 組 capacity 參數中，任何來自 bootstrap 的 `RuntimeError` 都能讓測試變綠，容量驗證本身未被證明有跑（「未開資源」部分仍由被 monkeypatch 的 `create_engine` 守住）。\n- 最小修正：加上 `match` 鎖定容量錯誤訊息（例如 `'Q019_CONTEXT_WINDOW_TOKENS|Timeout/output/compaction|invalid literal'`）。\n\n**F3・低・「狀態未改變」只驗根層** — `test_read_recovery.py:197`\n- 觸發：`snapshot(...).config == before.config` 取的是 `subgraphs=True` 的**根** config；未知工具實際停在 `analysis` 子圖。\n- 影響：子圖 checkpoint 若被推進，此斷言不會發現；「未改變」的保證弱於敘述。\n- 最小修正：同時比對 `current_values(snapshot)['messages']` 或子任務 `state.config`。\n\n**F4・中・覆蓋邊界（非削弱，屬本封包可見範圍的缺口）** — `test_memory_prompt_contract.py:86-122`\n- 兩個 golden 測試的組裝都**沒有** `jd=`（`h` fixture 與 `service_harness(store=...)`），而真實入口 `api.py:210` 有 `jd=JdService(...)`。因此 `:81` 的 `payload['tools'] == expected['tools']` 只覆蓋 Memory 工具；**模型實際會收到的 JD 工具 schema/描述不在任何已審閱契約斷言下**。3 筆 delta 只覆蓋 system prompt 文字。\n- 最小修正：新增一個 `jd=` 組裝案例，斷言 `tools` 等於 golden tools 加上一份獨立審閱的 JD 工具 fixture。\n- 註：若此覆蓋已存在於本封包以外的測試檔，我看不到，無法排除。\n\n---\n\n# 群組二（重新整理競態）：**CHANGES REQUIRED**\n\n## 排序修正本身：正確，且 RED 為真\n\n- 新順序 `useJdSession.ts:141-151`（先 `document`+`runs`，再 `messages`+`head`）方向正確。伺服端不變量成立：`service.py:639-678` 的 `_execute` 先 `graph.invoke(...)` 回傳（JD 寫入已提交）才 `_reconcile` 寫終態；`get_run` 的觀察式 reconcile（`:683-684`）只在 `not self._running(document)`（即 future 已 done、`_execute` 已回傳）時發生。故「觀察到終態 ⇒ 最終寫入已提交」成立，之後再讀 head/messages 不會凍結舊稿。\n- 重現器為真 RED：`JdSavedProjection.test.tsx:67-88` 中 `port.read`/`port.messages` 的 mock 在**被呼叫當下**即 `structuredClone(current/messages)`；舊的四路 `Promise.all` 會在 `runs` 解析前就抓到 `r0` 與空 messages，`:86-87` 必定失敗。非事後補綠。\n- `stop` 回傳 `uncertain`、`interrupted` 皆在前端 `active`（`:19-25`），輪詢不會誤停；既有 generation 守衛（`:145,152,166,177`）、dirty 保留（`:171-172`）、recovery 閘（`:175,181`）皆保留。key-order 相等性（`fast-deep-equal`）未再檢視。\n\n## 發現\n\n**F5・中・具體資料遺失反例（需修正）** — `useJdSession.ts:156`（dirty 判斷）vs `:163-169`（套用）\n- 觸發：`this.dirty` 在 `:156` 判讀後，程式 `await this.port.changes(...)`（`:163`）；這段 await 期間若使用者打字，`edit()`（`:116-120`）只設 `dirty/value` 而**不動 generation**，因此 `:166` 的守衛通過，`:167-169` 仍會以伺服器 head 覆蓋 `this.value` 並呼叫 `onHead`。\n  可達路徑（編輯器當下未鎖）：輪詢間隔 1s（`:465-468`）而新順序把一次 refresh 拉成三段序列往返，重疊 tick 變多；被取代的舊 refresh 在 `:152` 提早 return 後仍會執行 `finally { this.emit(); }`（`:183-185`），此時 `this.run` 已被新 refresh 在 `:155` 設為 completed → 重繪後 `locked` 為 false（`:104-115`）→ 編輯器解除 `readOnly`（`JdEditor.tsx:225`）→ 使用者打字 → 新 refresh 的 `changes` 回來後覆蓋。另一條路徑：`JdWorkspace.tsx:143` 的「重新讀取」按鈕呼叫 `session.refresh()`，此路徑不設 `loading`、開頭不 `emit`，在 `send()` 409/422 之後（`useJdSession.ts:400-403`，`pendingRun` 已清、可能無 active run）畫面是未鎖狀態。\n- 影響：使用者剛輸入的內容被靜默丟棄。`applySavedHead`（`JdEditor.tsx:26-27`）會因 `editor.children ≠ baseline` 回 `false`，`JdWorkspace.tsx:34-38` 隨即重建編輯器並只提示「復原紀錄已重設」，不提示內容被覆蓋。附帶狀態不一致：該分支不重設 `this.dirty`，於是 `dirty === true` 但 `value === head.fragment`，標頭顯示「未保存」且「保存」鍵可按，會送出一次實質 no-op 的保存。\n- 最小修正：在 `:163` 的 await 之後、`:167` 之前重新檢查 dirty，例如把 `:166` 之後改為「若 `this.dirty` 則走 `:171-172` 的 notice 分支，不呼叫 `onHead`、不覆寫 `this.value`」（單一條件，不新增同步引擎、不改契約）。\n\n**F6・低・metadata 比 head 舊一個往返** — `useJdSession.ts:141-144` vs `:148-151`\n- 觸發：`document`（含 `archived`）在第一段讀，head 在第二段讀。\n- 影響：文件於兩段之間被封存時，本次快照的 `metadata.archived` 為舊值，`locked` 短暫為 false；下一次 refresh 即修正，伺服端 `_write_blocked`（`service.py:271`）仍會擋下寫入，**無資料遺失**，僅短暫誤啟用按鈕。\n- 最小修正：無須處理；若要收斂，把 `document` 移到第二段與 `messages`/`head` 同批即可（不影響 runs 先讀的核心不變量）。\n\n**F7・資訊・延遲增加** — `useJdSession.ts:141-165`：首次載入與每次輪詢由 1 個往返回合變成 2（head 改變時 3）個序列往返。這是此修正的必要代價，僅提高 F5 的重疊機率；本身無需處理。\n\n---\n\n# 本封包無法證明之事\n\n1. 我未執行任何測試：「真 PG 45 passed」「離線全套最終結果」「這些測試檔會通過」皆無法從封包證實。\n2. 封包無 diff／修改前版本，故「保留原測試目的」「來源行為未變更」「僅改 request_key fixture」屬無法驗證的陳述；我只能證明**現況來源與現況斷言彼此一致**。\n3. CT25 golden 本體（`docs/specs/evidence/2026-09-08-ct25-memory-prompt-candidate.json`）與 `ct41/ct43/ct48` delta 不在封包、manifest 亦無其雜湊：三個 `before` 是否各自在 golden 中恰好出現一次、golden 是否確實未被改動，只能靠測試執行時的 `matches == 1` 保證，我無法離線核對。\n4. 不在封包而被我引用為前提的來源：`jd_tools.py`、`jd_store.py`（清理是否涵蓋全部 JD 表，例如 revision/內容附屬表）、`jd_routes.py`、`windows_lifecycle.py`（`require_bootstrap`/`bootstrap` 在測試環境的實際行為，直接影響 F2）、`submissionCache.ts`、`requestRecoveryCache.ts`、前端 `api.ts`、`test_service.py` 的 `service_harness`。\n5. 真實瀏覽器完整流程未進行，F5 的兩條可達路徑是依來源與渲染時序推導，未經實機觀察。\n6. 依指示不重開 key-order 相等性議題；亦不對整體 Task6、JD 產出品質或自然模型行為作任何判斷。",
+    "duration_ms": 140424,
+    "num_turns": 17,
+    "total_cost_usd": 1.938892,
+    "modelUsage": {
+      "claude-haiku-4-5-20251001": {
+        "inputTokens": 1449,
+        "outputTokens": 14,
+        "cacheReadInputTokens": 0,
+        "cacheCreationInputTokens": 0,
+        "webSearchRequests": 0,
+        "costUSD": 0.001519,
+        "contextWindow": 200000,
+        "maxOutputTokens": 32000,
+        "thinkingTokens": 0,
+        "canonicalModel": "claude-haiku-4-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      },
+      "claude-opus-5": {
+        "inputTokens": 22,
+        "outputTokens": 26409,
+        "cacheReadInputTokens": 486416,
+        "cacheCreationInputTokens": 103383,
+        "webSearchRequests": 0,
+        "costUSD": 1.937373,
+        "contextWindow": 1000000,
+        "maxOutputTokens": 64000,
+        "thinkingTokens": 19693,
+        "canonicalModel": "claude-opus-5",
+        "provider": "firstParty",
+        "costBasis": "list"
+      }
+    }
+  }
+}

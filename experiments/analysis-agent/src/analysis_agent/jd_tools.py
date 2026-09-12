@@ -197,7 +197,10 @@ class JdToolSession(AgentMiddleware):
             if reference and not any(all(payload.get(k)==v for k,v in original.items()) for original in observed):
                 raise ValueError('JD source acquisition requires the actual owner read result')
             if reference and any(s.get('role')=='user' for s in payload.get('segments',[])):
-                issued={**request.state.get('jd_sources',{}),reference:{'tool_call':request.tool_call['id']}}
+                prior=request.state.get('jd_sources',{})
+                # Reading an already issued current-input window must not erase
+                # its saved-input authority; that window is not a closed turn yet.
+                issued={**prior,reference:{**prior.get(reference,{}),'tool_call':request.tool_call['id']}}
                 return Command(update={'messages':[result],'jd_sources':issued})
         return result
 

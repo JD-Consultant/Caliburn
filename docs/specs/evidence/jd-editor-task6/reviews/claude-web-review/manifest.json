@@ -1,0 +1,32 @@
+[
+  {
+    "source": "experiments/jd-editor/web/src/jd/JdEditor.tsx",
+    "copy": "JdEditor.tsx",
+    "sha256": "e25022fad010a1410cbb72376906ad4dcbef5f9e50d85dda86cf16a4af564ddf"
+  },
+  {
+    "source": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "copy": "useJdSession.ts",
+    "sha256": "7a980b5f66f3c26bb8b21db02b042f820de478f12a8929406f56a5765169fbf0"
+  },
+  {
+    "source": "experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx",
+    "copy": "JdSavedProjection.test.tsx",
+    "sha256": "642ac857fed61b2aa6ae3eba237e1a07a6f7662d6413513435e18b90ca919d78"
+  },
+  {
+    "source": "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+    "copy": "JdWorkspace.tsx",
+    "sha256": "91be20d3194f4316cfa50cb896cd83b5dc84891ca793653f29dc9f30d0c76b7e"
+  },
+  {
+    "source": "experiments/jd-editor/web/package.json",
+    "copy": "package.json",
+    "sha256": "e32f9e5f6f484bf7eb0f56b843e93e5ee1e5c27677c280b4070eaef8fadc12bf"
+  },
+  {
+    "source": "experiments/jd-editor/package-lock.json",
+    "copy": "package-lock.json",
+    "sha256": "874f1ffa61bb278aded419102494ecf2fc93c329a16405409d06f774580170c1"
+  }
+]

@@ -1,0 +1,4394 @@
+{
+  "candidate": {
+    "request_key": "a340c361-b73f-45cc-bb92-1903fbeaf155",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsIjhhOTVhODI2LWM3ODktNDQ5Mi04MTgxLTE0MGU4M2RmMDhmZCJd",
+    "value": [
+      {
+        "id": "iTP1GhblqZ",
+        "type": "jd_section",
+        "children": [
+          {
+            "id": "h58arEpsa3",
+            "type": "h2",
+            "children": [
+              {
+                "text": "職務基本資料"
+              }
+            ]
+          },
+          {
+            "id": "WmkhBMjaFh",
+            "type": "p",
+            "children": [
+              {
+                "text": "設備維護工程師"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "identity"
+      },
+      {
+        "id": "Mo2mdP1pjt",
+        "type": "jd_section",
+        "children": [
+          {
+            "id": "jjvDWjkHJZ",
+            "type": "h2",
+            "children": [
+              {
+                "text": "職務目的"
+              }
+            ]
+          },
+          {
+            "id": "c6hNtkLxA7",
+            "type": "p",
+            "children": [
+              {
+                "text": "維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "purpose"
+      },
+      {
+        "id": "lb_KNYuV0z",
+        "type": "jd_section",
+        "children": [
+          {
+            "id": "0ByuqJj5no",
+            "type": "h2",
+            "children": [
+              {
+                "text": "主要職責與工作任務"
+              }
+            ]
+          },
+          {
+            "id": "HD7AW5PxAP",
+            "type": "jd_duty",
+            "children": [
+              {
+                "id": "4WyfrHsW33",
+                "type": "h3",
+                "children": [
+                  {
+                    "text": "設備維護與異常處理"
+                  }
+                ]
+              },
+              {
+                "id": "B-AClag9ls",
+                "type": "jd_task",
+                "children": [
+                  {
+                    "id": "CFLVLQiDz_",
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": "設備月檢"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "ptooS9pAeP",
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "n3m0L-qFKl",
+                    "type": "jd_outcomes",
+                    "children": [
+                      {
+                        "id": "2lUtS8gNyy",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "設備狀態紀錄"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "nTMXOAn-K5",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "待處理事項清單"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "8MTDFDxOj3",
+                    "type": "jd_requirements",
+                    "children": [
+                      {
+                        "id": "zZrRjPnUkg",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "記錄設備與檢查日期"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "m9V9eJn8qz",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "異常註明觀察依據"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "8MwUObebSh",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "超出授權範圍交主管決定"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "id": "CtKUByEztb",
+                "type": "jd_task",
+                "children": [
+                  {
+                    "id": "1pFr19EEgR",
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": "故障診斷與處理"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "zHV3GVC_oV",
+                    "type": "p",
+                    "children": [
+                      {
+                        "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                      }
+                    ]
+                  },
+                  {
+                    "id": "VnepE25BcU",
+                    "type": "jd_outcomes",
+                    "children": [
+                      {
+                        "id": "u41uds_MfS",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "完成驗證的處理結果"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "Gz5HOoGvYO",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "可接續的維修紀錄"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "id": "I-zkHGAs5e",
+                    "type": "jd_requirements",
+                    "children": [
+                      {
+                        "id": "arKZVd1IY2",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "保留故障訊息與判斷依據"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "y4dPLhMSWQ",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "未排除問題交接操作員"
+                          }
+                        ]
+                      },
+                      {
+                        "id": "D7wE3G-6rz",
+                        "type": "p",
+                        "children": [
+                          {
+                            "text": "不自行修改電控程式"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "work"
+      },
+      {
+        "id": "qQKhEnBiBj",
+        "type": "jd_section",
+        "children": [
+          {
+            "id": "uFtyxw9n3j",
+            "type": "h2",
+            "children": [
+              {
+                "text": "所需知識"
+              }
+            ]
+          },
+          {
+            "id": "4jfYAmYH8N",
+            "type": "jd_knowledge",
+            "children": [
+              {
+                "id": "1AxjOKOPbi",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "设备訊息與機械狀態的對應"
+                  }
+                ]
+              },
+              {
+                "id": "CW4kIIHjJo",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "用於月檢辨識異常與故障判斷。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "4qytBzT583",
+            "type": "jd_knowledge",
+            "children": [
+              {
+                "id": "855H0aopED",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "機械處置的授權與交接界線"
+                  }
+                ]
+              },
+              {
+                "id": "ZMa7v52Z0t",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "分辨本人處理、主管決定與電控職位責任。"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "knowledge"
+      },
+      {
+        "id": "CHxOACSFr4",
+        "type": "jd_section",
+        "children": [
+          {
+            "id": "j5B3Z8BXY1",
+            "type": "h2",
+            "children": [
+              {
+                "text": "所需技能"
+              }
+            ]
+          },
+          {
+            "id": "-oHAFP7kST",
+            "type": "jd_skill",
+            "children": [
+              {
+                "id": "X696ko4rlJ",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "交叉比對狀態與訊息"
+                  }
+                ]
+              },
+              {
+                "id": "yuXHa5HYGx",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "BcefKU4rv6",
+            "type": "jd_skill",
+            "children": [
+              {
+                "id": "5YZsohdyoQ",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "機械調整後驗證與交接"
+                  }
+                ]
+              },
+              {
+                "id": "9xA3udVhhA",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "確認處理結果並說明尚未排除的問題。"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "skills"
+      },
+      {
+        "id": "Tc9_fhiDUZ",
+        "type": "jd_section",
+        "children": [
+          {
+            "id": "eI4DlCAgI7",
+            "type": "h2",
+            "children": [
+              {
+                "text": "工作條件與必要資格"
+              }
+            ]
+          },
+          {
+            "id": "2PixtO7V6x",
+            "type": "p",
+            "children": [
+              {
+                "text": "本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "conditions"
+      }
+    ]
+  },
+  "saved_base": {
+    "status": "ok",
+    "read_kind": "current",
+    "revision_ref": "WyJyZXZpc2lvbiIsIjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSJd",
+    "access": "read_only",
+    "fragment": [
+      {
+        "type": "jd_section",
+        "id": "iTP1GhblqZ",
+        "children": [
+          {
+            "type": "h2",
+            "id": "h58arEpsa3",
+            "children": [
+              {
+                "text": "職務基本資料"
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "id": "WmkhBMjaFh",
+            "children": [
+              {
+                "text": "設備維護工程師"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "identity"
+      },
+      {
+        "type": "jd_section",
+        "id": "Mo2mdP1pjt",
+        "children": [
+          {
+            "type": "h2",
+            "id": "jjvDWjkHJZ",
+            "children": [
+              {
+                "text": "職務目的"
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "id": "c6hNtkLxA7",
+            "children": [
+              {
+                "text": "維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "purpose"
+      },
+      {
+        "type": "jd_section",
+        "id": "lb_KNYuV0z",
+        "children": [
+          {
+            "type": "h2",
+            "id": "0ByuqJj5no",
+            "children": [
+              {
+                "text": "主要職責與工作任務"
+              }
+            ]
+          },
+          {
+            "type": "jd_duty",
+            "id": "HD7AW5PxAP",
+            "children": [
+              {
+                "type": "h3",
+                "id": "4WyfrHsW33",
+                "children": [
+                  {
+                    "text": "設備維護與異常處理"
+                  }
+                ]
+              },
+              {
+                "type": "jd_task",
+                "id": "B-AClag9ls",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "CFLVLQiDz_",
+                    "children": [
+                      {
+                        "text": "設備月檢"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "ptooS9pAeP",
+                    "children": [
+                      {
+                        "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "n3m0L-qFKl",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "2lUtS8gNyy",
+                        "children": [
+                          {
+                            "text": "設備狀態紀錄"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "nTMXOAn-K5",
+                        "children": [
+                          {
+                            "text": "待處理事項清單"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "8MTDFDxOj3",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "zZrRjPnUkg",
+                        "children": [
+                          {
+                            "text": "記錄設備與檢查日期"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "m9V9eJn8qz",
+                        "children": [
+                          {
+                            "text": "異常註明觀察依據"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "8MwUObebSh",
+                        "children": [
+                          {
+                            "text": "超出授權範圍交主管決定"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "knowledge_ids": [
+                  "4jfYAmYH8N",
+                  "4qytBzT583"
+                ],
+                "skill_ids": [
+                  "-oHAFP7kST"
+                ]
+              },
+              {
+                "type": "jd_task",
+                "id": "CtKUByEztb",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "1pFr19EEgR",
+                    "children": [
+                      {
+                        "text": "故障診斷與處理"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "zHV3GVC_oV",
+                    "children": [
+                      {
+                        "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "VnepE25BcU",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "u41uds_MfS",
+                        "children": [
+                          {
+                            "text": "完成驗證的處理結果"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "Gz5HOoGvYO",
+                        "children": [
+                          {
+                            "text": "可接續的維修紀錄"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "I-zkHGAs5e",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "arKZVd1IY2",
+                        "children": [
+                          {
+                            "text": "保留故障訊息與判斷依據"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "y4dPLhMSWQ",
+                        "children": [
+                          {
+                            "text": "未排除問題交接操作員"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "D7wE3G-6rz",
+                        "children": [
+                          {
+                            "text": "不自行修改電控程式"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "knowledge_ids": [
+                  "4jfYAmYH8N",
+                  "4qytBzT583"
+                ],
+                "skill_ids": [
+                  "-oHAFP7kST",
+                  "BcefKU4rv6"
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "work"
+      },
+      {
+        "type": "jd_section",
+        "id": "qQKhEnBiBj",
+        "children": [
+          {
+            "type": "h2",
+            "id": "uFtyxw9n3j",
+            "children": [
+              {
+                "text": "所需知識"
+              }
+            ]
+          },
+          {
+            "type": "jd_knowledge",
+            "id": "4jfYAmYH8N",
+            "children": [
+              {
+                "type": "p",
+                "id": "1AxjOKOPbi",
+                "children": [
+                  {
+                    "text": "设备訊息與機械狀態的對應"
+                  }
+                ]
+              },
+              {
+                "type": "p",
+                "id": "CW4kIIHjJo",
+                "children": [
+                  {
+                    "text": "用於月檢辨識異常與故障判斷。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "jd_knowledge",
+            "id": "4qytBzT583",
+            "children": [
+              {
+                "type": "p",
+                "id": "855H0aopED",
+                "children": [
+                  {
+                    "text": "機械處置的授權與交接界線"
+                  }
+                ]
+              },
+              {
+                "type": "p",
+                "id": "ZMa7v52Z0t",
+                "children": [
+                  {
+                    "text": "分辨本人處理、主管決定與電控職位責任。"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "knowledge"
+      },
+      {
+        "type": "jd_section",
+        "id": "CHxOACSFr4",
+        "children": [
+          {
+            "type": "h2",
+            "id": "j5B3Z8BXY1",
+            "children": [
+              {
+                "text": "所需技能"
+              }
+            ]
+          },
+          {
+            "type": "jd_skill",
+            "id": "-oHAFP7kST",
+            "children": [
+              {
+                "type": "p",
+                "id": "X696ko4rlJ",
+                "children": [
+                  {
+                    "text": "交叉比對狀態與訊息"
+                  }
+                ]
+              },
+              {
+                "type": "p",
+                "id": "yuXHa5HYGx",
+                "children": [
+                  {
+                    "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "jd_skill",
+            "id": "BcefKU4rv6",
+            "children": [
+              {
+                "type": "p",
+                "id": "5YZsohdyoQ",
+                "children": [
+                  {
+                    "text": "機械調整後驗證與交接"
+                  }
+                ]
+              },
+              {
+                "type": "p",
+                "id": "9xA3udVhhA",
+                "children": [
+                  {
+                    "text": "確認處理結果並說明尚未排除的問題。"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "skills"
+      },
+      {
+        "type": "jd_section",
+        "id": "Tc9_fhiDUZ",
+        "children": [
+          {
+            "type": "h2",
+            "id": "eI4DlCAgI7",
+            "children": [
+              {
+                "text": "工作條件與必要資格"
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "id": "2PixtO7V6x",
+            "children": [
+              {
+                "text": "本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "conditions"
+      }
+    ],
+    "targets": [
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImlUUDFHaGJscVoifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "iTP1GhblqZ",
+          "children": [
+            {
+              "type": "h2",
+              "id": "h58arEpsa3",
+              "children": [
+                {
+                  "text": "職務基本資料"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "WmkhBMjaFh",
+              "children": [
+                {
+                  "text": "設備維護工程師"
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "identity"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Img1OGFyRXBzYTMifQ==",
+        "element": {
+          "type": "h2",
+          "id": "h58arEpsa3",
+          "children": [
+            {
+              "text": "職務基本資料"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ildta2hCTWphRmgifQ==",
+        "element": {
+          "type": "p",
+          "id": "WmkhBMjaFh",
+          "children": [
+            {
+              "text": "設備維護工程師"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ik1vMm1kUDFwanQifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "Mo2mdP1pjt",
+          "children": [
+            {
+              "type": "h2",
+              "id": "jjvDWjkHJZ",
+              "children": [
+                {
+                  "text": "職務目的"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "c6hNtkLxA7",
+              "children": [
+                {
+                  "text": "維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。"
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "purpose"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImpqdkRXamtISloifQ==",
+        "element": {
+          "type": "h2",
+          "id": "jjvDWjkHJZ",
+          "children": [
+            {
+              "text": "職務目的"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImM2aE50a0x4QTcifQ==",
+        "element": {
+          "type": "p",
+          "id": "c6hNtkLxA7",
+          "children": [
+            {
+              "text": "維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImxiX0tOWXVWMHoifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "lb_KNYuV0z",
+          "children": [
+            {
+              "type": "h2",
+              "id": "0ByuqJj5no",
+              "children": [
+                {
+                  "text": "主要職責與工作任務"
+                }
+              ]
+            },
+            {
+              "type": "jd_duty",
+              "id": "HD7AW5PxAP",
+              "children": [
+                {
+                  "type": "h3",
+                  "id": "4WyfrHsW33",
+                  "children": [
+                    {
+                      "text": "設備維護與異常處理"
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_task",
+                  "id": "B-AClag9ls",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "CFLVLQiDz_",
+                      "children": [
+                        {
+                          "text": "設備月檢"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "ptooS9pAeP",
+                      "children": [
+                        {
+                          "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "jd_outcomes",
+                      "id": "n3m0L-qFKl",
+                      "children": [
+                        {
+                          "type": "p",
+                          "id": "2lUtS8gNyy",
+                          "children": [
+                            {
+                              "text": "設備狀態紀錄"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "nTMXOAn-K5",
+                          "children": [
+                            {
+                              "text": "待處理事項清單"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "jd_requirements",
+                      "id": "8MTDFDxOj3",
+                      "children": [
+                        {
+                          "type": "p",
+                          "id": "zZrRjPnUkg",
+                          "children": [
+                            {
+                              "text": "記錄設備與檢查日期"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "m9V9eJn8qz",
+                          "children": [
+                            {
+                              "text": "異常註明觀察依據"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "8MwUObebSh",
+                          "children": [
+                            {
+                              "text": "超出授權範圍交主管決定"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "knowledge_ids": [
+                    "4jfYAmYH8N",
+                    "4qytBzT583"
+                  ],
+                  "skill_ids": [
+                    "-oHAFP7kST"
+                  ]
+                },
+                {
+                  "type": "jd_task",
+                  "id": "CtKUByEztb",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "1pFr19EEgR",
+                      "children": [
+                        {
+                          "text": "故障診斷與處理"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "zHV3GVC_oV",
+                      "children": [
+                        {
+                          "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "jd_outcomes",
+                      "id": "VnepE25BcU",
+                      "children": [
+                        {
+                          "type": "p",
+                          "id": "u41uds_MfS",
+                          "children": [
+                            {
+                              "text": "完成驗證的處理結果"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "Gz5HOoGvYO",
+                          "children": [
+                            {
+                              "text": "可接續的維修紀錄"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "jd_requirements",
+                      "id": "I-zkHGAs5e",
+                      "children": [
+                        {
+                          "type": "p",
+                          "id": "arKZVd1IY2",
+                          "children": [
+                            {
+                              "text": "保留故障訊息與判斷依據"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "y4dPLhMSWQ",
+                          "children": [
+                            {
+                              "text": "未排除問題交接操作員"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "D7wE3G-6rz",
+                          "children": [
+                            {
+                              "text": "不自行修改電控程式"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "knowledge_ids": [
+                    "4jfYAmYH8N",
+                    "4qytBzT583"
+                  ],
+                  "skill_ids": [
+                    "-oHAFP7kST",
+                    "BcefKU4rv6"
+                  ]
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "work"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjBCeXVxSmo1bm8ifQ==",
+        "element": {
+          "type": "h2",
+          "id": "0ByuqJj5no",
+          "children": [
+            {
+              "text": "主要職責與工作任務"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkhEN0FXNVB4QVAifQ==",
+        "element": {
+          "type": "jd_duty",
+          "id": "HD7AW5PxAP",
+          "children": [
+            {
+              "type": "h3",
+              "id": "4WyfrHsW33",
+              "children": [
+                {
+                  "text": "設備維護與異常處理"
+                }
+              ]
+            },
+            {
+              "type": "jd_task",
+              "id": "B-AClag9ls",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "CFLVLQiDz_",
+                  "children": [
+                    {
+                      "text": "設備月檢"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "ptooS9pAeP",
+                  "children": [
+                    {
+                      "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_outcomes",
+                  "id": "n3m0L-qFKl",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "2lUtS8gNyy",
+                      "children": [
+                        {
+                          "text": "設備狀態紀錄"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "nTMXOAn-K5",
+                      "children": [
+                        {
+                          "text": "待處理事項清單"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_requirements",
+                  "id": "8MTDFDxOj3",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "zZrRjPnUkg",
+                      "children": [
+                        {
+                          "text": "記錄設備與檢查日期"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "m9V9eJn8qz",
+                      "children": [
+                        {
+                          "text": "異常註明觀察依據"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "8MwUObebSh",
+                      "children": [
+                        {
+                          "text": "超出授權範圍交主管決定"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "knowledge_ids": [
+                "4jfYAmYH8N",
+                "4qytBzT583"
+              ],
+              "skill_ids": [
+                "-oHAFP7kST"
+              ]
+            },
+            {
+              "type": "jd_task",
+              "id": "CtKUByEztb",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "1pFr19EEgR",
+                  "children": [
+                    {
+                      "text": "故障診斷與處理"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "zHV3GVC_oV",
+                  "children": [
+                    {
+                      "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_outcomes",
+                  "id": "VnepE25BcU",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "u41uds_MfS",
+                      "children": [
+                        {
+                          "text": "完成驗證的處理結果"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "Gz5HOoGvYO",
+                      "children": [
+                        {
+                          "text": "可接續的維修紀錄"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_requirements",
+                  "id": "I-zkHGAs5e",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "arKZVd1IY2",
+                      "children": [
+                        {
+                          "text": "保留故障訊息與判斷依據"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "y4dPLhMSWQ",
+                      "children": [
+                        {
+                          "text": "未排除問題交接操作員"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "D7wE3G-6rz",
+                      "children": [
+                        {
+                          "text": "不自行修改電控程式"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "knowledge_ids": [
+                "4jfYAmYH8N",
+                "4qytBzT583"
+              ],
+              "skill_ids": [
+                "-oHAFP7kST",
+                "BcefKU4rv6"
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRXeWZySHNXMzMifQ==",
+        "element": {
+          "type": "h3",
+          "id": "4WyfrHsW33",
+          "children": [
+            {
+              "text": "設備維護與異常處理"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkItQUNsYWc5bHMifQ==",
+        "element": {
+          "type": "jd_task",
+          "id": "B-AClag9ls",
+          "children": [
+            {
+              "type": "p",
+              "id": "CFLVLQiDz_",
+              "children": [
+                {
+                  "text": "設備月檢"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "ptooS9pAeP",
+              "children": [
+                {
+                  "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                }
+              ]
+            },
+            {
+              "type": "jd_outcomes",
+              "id": "n3m0L-qFKl",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "2lUtS8gNyy",
+                  "children": [
+                    {
+                      "text": "設備狀態紀錄"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "nTMXOAn-K5",
+                  "children": [
+                    {
+                      "text": "待處理事項清單"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_requirements",
+              "id": "8MTDFDxOj3",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "zZrRjPnUkg",
+                  "children": [
+                    {
+                      "text": "記錄設備與檢查日期"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "m9V9eJn8qz",
+                  "children": [
+                    {
+                      "text": "異常註明觀察依據"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "8MwUObebSh",
+                  "children": [
+                    {
+                      "text": "超出授權範圍交主管決定"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "knowledge_ids": [
+            "4jfYAmYH8N",
+            "4qytBzT583"
+          ],
+          "skill_ids": [
+            "-oHAFP7kST"
+          ]
+        },
+        "access": "read_only",
+        "knowledge_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRqZllBbVlIOE4ifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRxeXRCelQ1ODMifQ=="
+        ],
+        "skill_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ii1vSEFGUDdrU1QifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkNGTFZMUWlEel8ifQ==",
+        "element": {
+          "type": "p",
+          "id": "CFLVLQiDz_",
+          "children": [
+            {
+              "text": "設備月檢"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InB0b29TOXBBZVAifQ==",
+        "element": {
+          "type": "p",
+          "id": "ptooS9pAeP",
+          "children": [
+            {
+              "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Im4zbTBMLXFGS2wifQ==",
+        "element": {
+          "type": "jd_outcomes",
+          "id": "n3m0L-qFKl",
+          "children": [
+            {
+              "type": "p",
+              "id": "2lUtS8gNyy",
+              "children": [
+                {
+                  "text": "設備狀態紀錄"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "nTMXOAn-K5",
+              "children": [
+                {
+                  "text": "待處理事項清單"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjJsVXRTOGdOeXkifQ==",
+        "element": {
+          "type": "p",
+          "id": "2lUtS8gNyy",
+          "children": [
+            {
+              "text": "設備狀態紀錄"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Im5UTVhPQW4tSzUifQ==",
+        "element": {
+          "type": "p",
+          "id": "nTMXOAn-K5",
+          "children": [
+            {
+              "text": "待處理事項清單"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjhNVERGRHhPajMifQ==",
+        "element": {
+          "type": "jd_requirements",
+          "id": "8MTDFDxOj3",
+          "children": [
+            {
+              "type": "p",
+              "id": "zZrRjPnUkg",
+              "children": [
+                {
+                  "text": "記錄設備與檢查日期"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "m9V9eJn8qz",
+              "children": [
+                {
+                  "text": "異常註明觀察依據"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "8MwUObebSh",
+              "children": [
+                {
+                  "text": "超出授權範圍交主管決定"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InpaclJqUG5Va2cifQ==",
+        "element": {
+          "type": "p",
+          "id": "zZrRjPnUkg",
+          "children": [
+            {
+              "text": "記錄設備與檢查日期"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Im05VjllSm44cXoifQ==",
+        "element": {
+          "type": "p",
+          "id": "m9V9eJn8qz",
+          "children": [
+            {
+              "text": "異常註明觀察依據"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjhNd1VPYmViU2gifQ==",
+        "element": {
+          "type": "p",
+          "id": "8MwUObebSh",
+          "children": [
+            {
+              "text": "超出授權範圍交主管決定"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ==",
+        "element": {
+          "type": "jd_task",
+          "id": "CtKUByEztb",
+          "children": [
+            {
+              "type": "p",
+              "id": "1pFr19EEgR",
+              "children": [
+                {
+                  "text": "故障診斷與處理"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "zHV3GVC_oV",
+              "children": [
+                {
+                  "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                }
+              ]
+            },
+            {
+              "type": "jd_outcomes",
+              "id": "VnepE25BcU",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "u41uds_MfS",
+                  "children": [
+                    {
+                      "text": "完成驗證的處理結果"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "Gz5HOoGvYO",
+                  "children": [
+                    {
+                      "text": "可接續的維修紀錄"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_requirements",
+              "id": "I-zkHGAs5e",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "arKZVd1IY2",
+                  "children": [
+                    {
+                      "text": "保留故障訊息與判斷依據"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "y4dPLhMSWQ",
+                  "children": [
+                    {
+                      "text": "未排除問題交接操作員"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "D7wE3G-6rz",
+                  "children": [
+                    {
+                      "text": "不自行修改電控程式"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "knowledge_ids": [
+            "4jfYAmYH8N",
+            "4qytBzT583"
+          ],
+          "skill_ids": [
+            "-oHAFP7kST",
+            "BcefKU4rv6"
+          ]
+        },
+        "access": "read_only",
+        "knowledge_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRqZllBbVlIOE4ifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRxeXRCelQ1ODMifQ=="
+        ],
+        "skill_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ii1vSEFGUDdrU1QifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkJjZWZLVTRydjYifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjFwRnIxOUVFZ1IifQ==",
+        "element": {
+          "type": "p",
+          "id": "1pFr19EEgR",
+          "children": [
+            {
+              "text": "故障診斷與處理"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InpIVjNHVkNfb1YifQ==",
+        "element": {
+          "type": "p",
+          "id": "zHV3GVC_oV",
+          "children": [
+            {
+              "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IlZuZXBFMjVCY1UifQ==",
+        "element": {
+          "type": "jd_outcomes",
+          "id": "VnepE25BcU",
+          "children": [
+            {
+              "type": "p",
+              "id": "u41uds_MfS",
+              "children": [
+                {
+                  "text": "完成驗證的處理結果"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "Gz5HOoGvYO",
+              "children": [
+                {
+                  "text": "可接續的維修紀錄"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InU0MXVkc19NZlMifQ==",
+        "element": {
+          "type": "p",
+          "id": "u41uds_MfS",
+          "children": [
+            {
+              "text": "完成驗證的處理結果"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ikd6NUhPb0d2WU8ifQ==",
+        "element": {
+          "type": "p",
+          "id": "Gz5HOoGvYO",
+          "children": [
+            {
+              "text": "可接續的維修紀錄"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkktemtIR0FzNWUifQ==",
+        "element": {
+          "type": "jd_requirements",
+          "id": "I-zkHGAs5e",
+          "children": [
+            {
+              "type": "p",
+              "id": "arKZVd1IY2",
+              "children": [
+                {
+                  "text": "保留故障訊息與判斷依據"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "y4dPLhMSWQ",
+              "children": [
+                {
+                  "text": "未排除問題交接操作員"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "D7wE3G-6rz",
+              "children": [
+                {
+                  "text": "不自行修改電控程式"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImFyS1pWZDFJWTIifQ==",
+        "element": {
+          "type": "p",
+          "id": "arKZVd1IY2",
+          "children": [
+            {
+              "text": "保留故障訊息與判斷依據"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ink0ZFBMaE1TV1EifQ==",
+        "element": {
+          "type": "p",
+          "id": "y4dPLhMSWQ",
+          "children": [
+            {
+              "text": "未排除問題交接操作員"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkQ3d0UzRy02cnoifQ==",
+        "element": {
+          "type": "p",
+          "id": "D7wE3G-6rz",
+          "children": [
+            {
+              "text": "不自行修改電控程式"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InFRS2hFbkJpQmoifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "qQKhEnBiBj",
+          "children": [
+            {
+              "type": "h2",
+              "id": "uFtyxw9n3j",
+              "children": [
+                {
+                  "text": "所需知識"
+                }
+              ]
+            },
+            {
+              "type": "jd_knowledge",
+              "id": "4jfYAmYH8N",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "1AxjOKOPbi",
+                  "children": [
+                    {
+                      "text": "设备訊息與機械狀態的對應"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "CW4kIIHjJo",
+                  "children": [
+                    {
+                      "text": "用於月檢辨識異常與故障判斷。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_knowledge",
+              "id": "4qytBzT583",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "855H0aopED",
+                  "children": [
+                    {
+                      "text": "機械處置的授權與交接界線"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "ZMa7v52Z0t",
+                  "children": [
+                    {
+                      "text": "分辨本人處理、主管決定與電控職位責任。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "knowledge"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InVGdHl4dzluM2oifQ==",
+        "element": {
+          "type": "h2",
+          "id": "uFtyxw9n3j",
+          "children": [
+            {
+              "text": "所需知識"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRqZllBbVlIOE4ifQ==",
+        "element": {
+          "type": "jd_knowledge",
+          "id": "4jfYAmYH8N",
+          "children": [
+            {
+              "type": "p",
+              "id": "1AxjOKOPbi",
+              "children": [
+                {
+                  "text": "设备訊息與機械狀態的對應"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "CW4kIIHjJo",
+              "children": [
+                {
+                  "text": "用於月檢辨識異常與故障判斷。"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only",
+        "used_by_task_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkItQUNsYWc5bHMifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjFBeGpPS09QYmkifQ==",
+        "element": {
+          "type": "p",
+          "id": "1AxjOKOPbi",
+          "children": [
+            {
+              "text": "设备訊息與機械狀態的對應"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkNXNGtJSUhqSm8ifQ==",
+        "element": {
+          "type": "p",
+          "id": "CW4kIIHjJo",
+          "children": [
+            {
+              "text": "用於月檢辨識異常與故障判斷。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRxeXRCelQ1ODMifQ==",
+        "element": {
+          "type": "jd_knowledge",
+          "id": "4qytBzT583",
+          "children": [
+            {
+              "type": "p",
+              "id": "855H0aopED",
+              "children": [
+                {
+                  "text": "機械處置的授權與交接界線"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "ZMa7v52Z0t",
+              "children": [
+                {
+                  "text": "分辨本人處理、主管決定與電控職位責任。"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only",
+        "used_by_task_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkItQUNsYWc5bHMifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ijg1NUgwYW9wRUQifQ==",
+        "element": {
+          "type": "p",
+          "id": "855H0aopED",
+          "children": [
+            {
+              "text": "機械處置的授權與交接界線"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IlpNYTd2NTJaMHQifQ==",
+        "element": {
+          "type": "p",
+          "id": "ZMa7v52Z0t",
+          "children": [
+            {
+              "text": "分辨本人處理、主管決定與電控職位責任。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkNIeE9BQ1NGcjQifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "CHxOACSFr4",
+          "children": [
+            {
+              "type": "h2",
+              "id": "j5B3Z8BXY1",
+              "children": [
+                {
+                  "text": "所需技能"
+                }
+              ]
+            },
+            {
+              "type": "jd_skill",
+              "id": "-oHAFP7kST",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "X696ko4rlJ",
+                  "children": [
+                    {
+                      "text": "交叉比對狀態與訊息"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "yuXHa5HYGx",
+                  "children": [
+                    {
+                      "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_skill",
+              "id": "BcefKU4rv6",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "5YZsohdyoQ",
+                  "children": [
+                    {
+                      "text": "機械調整後驗證與交接"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "9xA3udVhhA",
+                  "children": [
+                    {
+                      "text": "確認處理結果並說明尚未排除的問題。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "skills"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Imo1QjNaOEJYWTEifQ==",
+        "element": {
+          "type": "h2",
+          "id": "j5B3Z8BXY1",
+          "children": [
+            {
+              "text": "所需技能"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ii1vSEFGUDdrU1QifQ==",
+        "element": {
+          "type": "jd_skill",
+          "id": "-oHAFP7kST",
+          "children": [
+            {
+              "type": "p",
+              "id": "X696ko4rlJ",
+              "children": [
+                {
+                  "text": "交叉比對狀態與訊息"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "yuXHa5HYGx",
+              "children": [
+                {
+                  "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only",
+        "used_by_task_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkItQUNsYWc5bHMifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ilg2OTZrbzRybEoifQ==",
+        "element": {
+          "type": "p",
+          "id": "X696ko4rlJ",
+          "children": [
+            {
+              "text": "交叉比對狀態與訊息"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Inl1WEhhNUhZR3gifQ==",
+        "element": {
+          "type": "p",
+          "id": "yuXHa5HYGx",
+          "children": [
+            {
+              "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkJjZWZLVTRydjYifQ==",
+        "element": {
+          "type": "jd_skill",
+          "id": "BcefKU4rv6",
+          "children": [
+            {
+              "type": "p",
+              "id": "5YZsohdyoQ",
+              "children": [
+                {
+                  "text": "機械調整後驗證與交接"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "9xA3udVhhA",
+              "children": [
+                {
+                  "text": "確認處理結果並說明尚未排除的問題。"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only",
+        "used_by_task_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjVZWnNvaGR5b1EifQ==",
+        "element": {
+          "type": "p",
+          "id": "5YZsohdyoQ",
+          "children": [
+            {
+              "text": "機械調整後驗證與交接"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ijl4QTN1ZFZoaEEifQ==",
+        "element": {
+          "type": "p",
+          "id": "9xA3udVhhA",
+          "children": [
+            {
+              "text": "確認處理結果並說明尚未排除的問題。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IlRjOV9maGlEVVoifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "Tc9_fhiDUZ",
+          "children": [
+            {
+              "type": "h2",
+              "id": "eI4DlCAgI7",
+              "children": [
+                {
+                  "text": "工作條件與必要資格"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "2PixtO7V6x",
+              "children": [
+                {
+                  "text": "本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。"
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "conditions"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImVJNERsQ0FnSTcifQ==",
+        "element": {
+          "type": "h2",
+          "id": "eI4DlCAgI7",
+          "children": [
+            {
+              "text": "工作條件與必要資格"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjJQaXh0TzdWNngifQ==",
+        "element": {
+          "type": "p",
+          "id": "2PixtO7V6x",
+          "children": [
+            {
+              "text": "本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。"
+            }
+          ]
+        },
+        "access": "read_only"
+      }
+    ],
+    "selection": null,
+    "source_refs": [
+      "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+    ],
+    "change_refs": [
+      "WyJjaGFuZ2UiLCI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCI3YWQxZDMyZS03NTBjLTVhNTQtOTI0NS05YWQwMWU0NGQwYTkiLCI4YTk1YTgyNi1jNzg5LTQ0OTItODE4MS0xNDBlODNkZjA4ZmQiLCJmNzA5ODU4Yi0wNjczLTQyMTctOWE4MS0wNjg4ODk1ZDliMzkiXQ"
+    ],
+    "continuation_ref": null
+  },
+  "saved_head": {
+    "status": "ok",
+    "read_kind": "current",
+    "revision_ref": "WyJyZXZpc2lvbiIsIjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSJd",
+    "access": "read_only",
+    "fragment": [
+      {
+        "type": "jd_section",
+        "id": "iTP1GhblqZ",
+        "children": [
+          {
+            "type": "h2",
+            "id": "h58arEpsa3",
+            "children": [
+              {
+                "text": "職務基本資料"
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "id": "WmkhBMjaFh",
+            "children": [
+              {
+                "text": "設備維護工程師"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "identity"
+      },
+      {
+        "type": "jd_section",
+        "id": "Mo2mdP1pjt",
+        "children": [
+          {
+            "type": "h2",
+            "id": "jjvDWjkHJZ",
+            "children": [
+              {
+                "text": "職務目的"
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "id": "c6hNtkLxA7",
+            "children": [
+              {
+                "text": "維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "purpose"
+      },
+      {
+        "type": "jd_section",
+        "id": "lb_KNYuV0z",
+        "children": [
+          {
+            "type": "h2",
+            "id": "0ByuqJj5no",
+            "children": [
+              {
+                "text": "主要職責與工作任務"
+              }
+            ]
+          },
+          {
+            "type": "jd_duty",
+            "id": "HD7AW5PxAP",
+            "children": [
+              {
+                "type": "h3",
+                "id": "4WyfrHsW33",
+                "children": [
+                  {
+                    "text": "設備維護與異常處理"
+                  }
+                ]
+              },
+              {
+                "type": "jd_task",
+                "id": "B-AClag9ls",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "CFLVLQiDz_",
+                    "children": [
+                      {
+                        "text": "設備月檢"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "ptooS9pAeP",
+                    "children": [
+                      {
+                        "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "n3m0L-qFKl",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "2lUtS8gNyy",
+                        "children": [
+                          {
+                            "text": "設備狀態紀錄"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "nTMXOAn-K5",
+                        "children": [
+                          {
+                            "text": "待處理事項清單"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "8MTDFDxOj3",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "zZrRjPnUkg",
+                        "children": [
+                          {
+                            "text": "記錄設備與檢查日期"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "m9V9eJn8qz",
+                        "children": [
+                          {
+                            "text": "異常註明觀察依據"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "8MwUObebSh",
+                        "children": [
+                          {
+                            "text": "超出授權範圍交主管決定"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "knowledge_ids": [
+                  "4jfYAmYH8N",
+                  "4qytBzT583"
+                ],
+                "skill_ids": [
+                  "-oHAFP7kST"
+                ]
+              },
+              {
+                "type": "jd_task",
+                "id": "CtKUByEztb",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "1pFr19EEgR",
+                    "children": [
+                      {
+                        "text": "故障診斷與處理"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "zHV3GVC_oV",
+                    "children": [
+                      {
+                        "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "VnepE25BcU",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "u41uds_MfS",
+                        "children": [
+                          {
+                            "text": "完成驗證的處理結果"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "Gz5HOoGvYO",
+                        "children": [
+                          {
+                            "text": "可接續的維修紀錄"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "I-zkHGAs5e",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "arKZVd1IY2",
+                        "children": [
+                          {
+                            "text": "保留故障訊息與判斷依據"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "y4dPLhMSWQ",
+                        "children": [
+                          {
+                            "text": "未排除問題交接操作員"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "D7wE3G-6rz",
+                        "children": [
+                          {
+                            "text": "不自行修改電控程式"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ],
+                "knowledge_ids": [
+                  "4jfYAmYH8N",
+                  "4qytBzT583"
+                ],
+                "skill_ids": [
+                  "-oHAFP7kST",
+                  "BcefKU4rv6"
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "work"
+      },
+      {
+        "type": "jd_section",
+        "id": "qQKhEnBiBj",
+        "children": [
+          {
+            "type": "h2",
+            "id": "uFtyxw9n3j",
+            "children": [
+              {
+                "text": "所需知識"
+              }
+            ]
+          },
+          {
+            "type": "jd_knowledge",
+            "id": "4jfYAmYH8N",
+            "children": [
+              {
+                "type": "p",
+                "id": "1AxjOKOPbi",
+                "children": [
+                  {
+                    "text": "设备訊息與機械狀態的對應"
+                  }
+                ]
+              },
+              {
+                "type": "p",
+                "id": "CW4kIIHjJo",
+                "children": [
+                  {
+                    "text": "用於月檢辨識異常與故障判斷。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "jd_knowledge",
+            "id": "4qytBzT583",
+            "children": [
+              {
+                "type": "p",
+                "id": "855H0aopED",
+                "children": [
+                  {
+                    "text": "機械處置的授權與交接界線"
+                  }
+                ]
+              },
+              {
+                "type": "p",
+                "id": "ZMa7v52Z0t",
+                "children": [
+                  {
+                    "text": "分辨本人處理、主管決定與電控職位責任。"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "knowledge"
+      },
+      {
+        "type": "jd_section",
+        "id": "CHxOACSFr4",
+        "children": [
+          {
+            "type": "h2",
+            "id": "j5B3Z8BXY1",
+            "children": [
+              {
+                "text": "所需技能"
+              }
+            ]
+          },
+          {
+            "type": "jd_skill",
+            "id": "-oHAFP7kST",
+            "children": [
+              {
+                "type": "p",
+                "id": "X696ko4rlJ",
+                "children": [
+                  {
+                    "text": "交叉比對狀態與訊息"
+                  }
+                ]
+              },
+              {
+                "type": "p",
+                "id": "yuXHa5HYGx",
+                "children": [
+                  {
+                    "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "jd_skill",
+            "id": "BcefKU4rv6",
+            "children": [
+              {
+                "type": "p",
+                "id": "5YZsohdyoQ",
+                "children": [
+                  {
+                    "text": "機械調整後驗證與交接"
+                  }
+                ]
+              },
+              {
+                "type": "p",
+                "id": "9xA3udVhhA",
+                "children": [
+                  {
+                    "text": "確認處理結果並說明尚未排除的問題。"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "skills"
+      },
+      {
+        "type": "jd_section",
+        "id": "Tc9_fhiDUZ",
+        "children": [
+          {
+            "type": "h2",
+            "id": "eI4DlCAgI7",
+            "children": [
+              {
+                "text": "工作條件與必要資格"
+              }
+            ]
+          },
+          {
+            "type": "p",
+            "id": "2PixtO7V6x",
+            "children": [
+              {
+                "text": "本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。"
+              }
+            ]
+          }
+        ],
+        "source_refs": [
+          "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+        ],
+        "section_kind": "conditions"
+      }
+    ],
+    "targets": [
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImlUUDFHaGJscVoifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "iTP1GhblqZ",
+          "children": [
+            {
+              "type": "h2",
+              "id": "h58arEpsa3",
+              "children": [
+                {
+                  "text": "職務基本資料"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "WmkhBMjaFh",
+              "children": [
+                {
+                  "text": "設備維護工程師"
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "identity"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Img1OGFyRXBzYTMifQ==",
+        "element": {
+          "type": "h2",
+          "id": "h58arEpsa3",
+          "children": [
+            {
+              "text": "職務基本資料"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ildta2hCTWphRmgifQ==",
+        "element": {
+          "type": "p",
+          "id": "WmkhBMjaFh",
+          "children": [
+            {
+              "text": "設備維護工程師"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ik1vMm1kUDFwanQifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "Mo2mdP1pjt",
+          "children": [
+            {
+              "type": "h2",
+              "id": "jjvDWjkHJZ",
+              "children": [
+                {
+                  "text": "職務目的"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "c6hNtkLxA7",
+              "children": [
+                {
+                  "text": "維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。"
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "purpose"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImpqdkRXamtISloifQ==",
+        "element": {
+          "type": "h2",
+          "id": "jjvDWjkHJZ",
+          "children": [
+            {
+              "text": "職務目的"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImM2aE50a0x4QTcifQ==",
+        "element": {
+          "type": "p",
+          "id": "c6hNtkLxA7",
+          "children": [
+            {
+              "text": "維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImxiX0tOWXVWMHoifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "lb_KNYuV0z",
+          "children": [
+            {
+              "type": "h2",
+              "id": "0ByuqJj5no",
+              "children": [
+                {
+                  "text": "主要職責與工作任務"
+                }
+              ]
+            },
+            {
+              "type": "jd_duty",
+              "id": "HD7AW5PxAP",
+              "children": [
+                {
+                  "type": "h3",
+                  "id": "4WyfrHsW33",
+                  "children": [
+                    {
+                      "text": "設備維護與異常處理"
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_task",
+                  "id": "B-AClag9ls",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "CFLVLQiDz_",
+                      "children": [
+                        {
+                          "text": "設備月檢"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "ptooS9pAeP",
+                      "children": [
+                        {
+                          "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "jd_outcomes",
+                      "id": "n3m0L-qFKl",
+                      "children": [
+                        {
+                          "type": "p",
+                          "id": "2lUtS8gNyy",
+                          "children": [
+                            {
+                              "text": "設備狀態紀錄"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "nTMXOAn-K5",
+                          "children": [
+                            {
+                              "text": "待處理事項清單"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "jd_requirements",
+                      "id": "8MTDFDxOj3",
+                      "children": [
+                        {
+                          "type": "p",
+                          "id": "zZrRjPnUkg",
+                          "children": [
+                            {
+                              "text": "記錄設備與檢查日期"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "m9V9eJn8qz",
+                          "children": [
+                            {
+                              "text": "異常註明觀察依據"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "8MwUObebSh",
+                          "children": [
+                            {
+                              "text": "超出授權範圍交主管決定"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "knowledge_ids": [
+                    "4jfYAmYH8N",
+                    "4qytBzT583"
+                  ],
+                  "skill_ids": [
+                    "-oHAFP7kST"
+                  ]
+                },
+                {
+                  "type": "jd_task",
+                  "id": "CtKUByEztb",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "1pFr19EEgR",
+                      "children": [
+                        {
+                          "text": "故障診斷與處理"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "zHV3GVC_oV",
+                      "children": [
+                        {
+                          "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "jd_outcomes",
+                      "id": "VnepE25BcU",
+                      "children": [
+                        {
+                          "type": "p",
+                          "id": "u41uds_MfS",
+                          "children": [
+                            {
+                              "text": "完成驗證的處理結果"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "Gz5HOoGvYO",
+                          "children": [
+                            {
+                              "text": "可接續的維修紀錄"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "type": "jd_requirements",
+                      "id": "I-zkHGAs5e",
+                      "children": [
+                        {
+                          "type": "p",
+                          "id": "arKZVd1IY2",
+                          "children": [
+                            {
+                              "text": "保留故障訊息與判斷依據"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "y4dPLhMSWQ",
+                          "children": [
+                            {
+                              "text": "未排除問題交接操作員"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "p",
+                          "id": "D7wE3G-6rz",
+                          "children": [
+                            {
+                              "text": "不自行修改電控程式"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
+                  "knowledge_ids": [
+                    "4jfYAmYH8N",
+                    "4qytBzT583"
+                  ],
+                  "skill_ids": [
+                    "-oHAFP7kST",
+                    "BcefKU4rv6"
+                  ]
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "work"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjBCeXVxSmo1bm8ifQ==",
+        "element": {
+          "type": "h2",
+          "id": "0ByuqJj5no",
+          "children": [
+            {
+              "text": "主要職責與工作任務"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkhEN0FXNVB4QVAifQ==",
+        "element": {
+          "type": "jd_duty",
+          "id": "HD7AW5PxAP",
+          "children": [
+            {
+              "type": "h3",
+              "id": "4WyfrHsW33",
+              "children": [
+                {
+                  "text": "設備維護與異常處理"
+                }
+              ]
+            },
+            {
+              "type": "jd_task",
+              "id": "B-AClag9ls",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "CFLVLQiDz_",
+                  "children": [
+                    {
+                      "text": "設備月檢"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "ptooS9pAeP",
+                  "children": [
+                    {
+                      "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_outcomes",
+                  "id": "n3m0L-qFKl",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "2lUtS8gNyy",
+                      "children": [
+                        {
+                          "text": "設備狀態紀錄"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "nTMXOAn-K5",
+                      "children": [
+                        {
+                          "text": "待處理事項清單"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_requirements",
+                  "id": "8MTDFDxOj3",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "zZrRjPnUkg",
+                      "children": [
+                        {
+                          "text": "記錄設備與檢查日期"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "m9V9eJn8qz",
+                      "children": [
+                        {
+                          "text": "異常註明觀察依據"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "8MwUObebSh",
+                      "children": [
+                        {
+                          "text": "超出授權範圍交主管決定"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "knowledge_ids": [
+                "4jfYAmYH8N",
+                "4qytBzT583"
+              ],
+              "skill_ids": [
+                "-oHAFP7kST"
+              ]
+            },
+            {
+              "type": "jd_task",
+              "id": "CtKUByEztb",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "1pFr19EEgR",
+                  "children": [
+                    {
+                      "text": "故障診斷與處理"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "zHV3GVC_oV",
+                  "children": [
+                    {
+                      "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_outcomes",
+                  "id": "VnepE25BcU",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "u41uds_MfS",
+                      "children": [
+                        {
+                          "text": "完成驗證的處理結果"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "Gz5HOoGvYO",
+                      "children": [
+                        {
+                          "text": "可接續的維修紀錄"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "type": "jd_requirements",
+                  "id": "I-zkHGAs5e",
+                  "children": [
+                    {
+                      "type": "p",
+                      "id": "arKZVd1IY2",
+                      "children": [
+                        {
+                          "text": "保留故障訊息與判斷依據"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "y4dPLhMSWQ",
+                      "children": [
+                        {
+                          "text": "未排除問題交接操作員"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "p",
+                      "id": "D7wE3G-6rz",
+                      "children": [
+                        {
+                          "text": "不自行修改電控程式"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ],
+              "knowledge_ids": [
+                "4jfYAmYH8N",
+                "4qytBzT583"
+              ],
+              "skill_ids": [
+                "-oHAFP7kST",
+                "BcefKU4rv6"
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRXeWZySHNXMzMifQ==",
+        "element": {
+          "type": "h3",
+          "id": "4WyfrHsW33",
+          "children": [
+            {
+              "text": "設備維護與異常處理"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkItQUNsYWc5bHMifQ==",
+        "element": {
+          "type": "jd_task",
+          "id": "B-AClag9ls",
+          "children": [
+            {
+              "type": "p",
+              "id": "CFLVLQiDz_",
+              "children": [
+                {
+                  "text": "設備月檢"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "ptooS9pAeP",
+              "children": [
+                {
+                  "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+                }
+              ]
+            },
+            {
+              "type": "jd_outcomes",
+              "id": "n3m0L-qFKl",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "2lUtS8gNyy",
+                  "children": [
+                    {
+                      "text": "設備狀態紀錄"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "nTMXOAn-K5",
+                  "children": [
+                    {
+                      "text": "待處理事項清單"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_requirements",
+              "id": "8MTDFDxOj3",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "zZrRjPnUkg",
+                  "children": [
+                    {
+                      "text": "記錄設備與檢查日期"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "m9V9eJn8qz",
+                  "children": [
+                    {
+                      "text": "異常註明觀察依據"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "8MwUObebSh",
+                  "children": [
+                    {
+                      "text": "超出授權範圍交主管決定"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "knowledge_ids": [
+            "4jfYAmYH8N",
+            "4qytBzT583"
+          ],
+          "skill_ids": [
+            "-oHAFP7kST"
+          ]
+        },
+        "access": "read_only",
+        "knowledge_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRqZllBbVlIOE4ifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRxeXRCelQ1ODMifQ=="
+        ],
+        "skill_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ii1vSEFGUDdrU1QifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkNGTFZMUWlEel8ifQ==",
+        "element": {
+          "type": "p",
+          "id": "CFLVLQiDz_",
+          "children": [
+            {
+              "text": "設備月檢"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InB0b29TOXBBZVAifQ==",
+        "element": {
+          "type": "p",
+          "id": "ptooS9pAeP",
+          "children": [
+            {
+              "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Im4zbTBMLXFGS2wifQ==",
+        "element": {
+          "type": "jd_outcomes",
+          "id": "n3m0L-qFKl",
+          "children": [
+            {
+              "type": "p",
+              "id": "2lUtS8gNyy",
+              "children": [
+                {
+                  "text": "設備狀態紀錄"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "nTMXOAn-K5",
+              "children": [
+                {
+                  "text": "待處理事項清單"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjJsVXRTOGdOeXkifQ==",
+        "element": {
+          "type": "p",
+          "id": "2lUtS8gNyy",
+          "children": [
+            {
+              "text": "設備狀態紀錄"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Im5UTVhPQW4tSzUifQ==",
+        "element": {
+          "type": "p",
+          "id": "nTMXOAn-K5",
+          "children": [
+            {
+              "text": "待處理事項清單"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjhNVERGRHhPajMifQ==",
+        "element": {
+          "type": "jd_requirements",
+          "id": "8MTDFDxOj3",
+          "children": [
+            {
+              "type": "p",
+              "id": "zZrRjPnUkg",
+              "children": [
+                {
+                  "text": "記錄設備與檢查日期"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "m9V9eJn8qz",
+              "children": [
+                {
+                  "text": "異常註明觀察依據"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "8MwUObebSh",
+              "children": [
+                {
+                  "text": "超出授權範圍交主管決定"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InpaclJqUG5Va2cifQ==",
+        "element": {
+          "type": "p",
+          "id": "zZrRjPnUkg",
+          "children": [
+            {
+              "text": "記錄設備與檢查日期"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Im05VjllSm44cXoifQ==",
+        "element": {
+          "type": "p",
+          "id": "m9V9eJn8qz",
+          "children": [
+            {
+              "text": "異常註明觀察依據"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjhNd1VPYmViU2gifQ==",
+        "element": {
+          "type": "p",
+          "id": "8MwUObebSh",
+          "children": [
+            {
+              "text": "超出授權範圍交主管決定"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ==",
+        "element": {
+          "type": "jd_task",
+          "id": "CtKUByEztb",
+          "children": [
+            {
+              "type": "p",
+              "id": "1pFr19EEgR",
+              "children": [
+                {
+                  "text": "故障診斷與處理"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "zHV3GVC_oV",
+              "children": [
+                {
+                  "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+                }
+              ]
+            },
+            {
+              "type": "jd_outcomes",
+              "id": "VnepE25BcU",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "u41uds_MfS",
+                  "children": [
+                    {
+                      "text": "完成驗證的處理結果"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "Gz5HOoGvYO",
+                  "children": [
+                    {
+                      "text": "可接續的維修紀錄"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_requirements",
+              "id": "I-zkHGAs5e",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "arKZVd1IY2",
+                  "children": [
+                    {
+                      "text": "保留故障訊息與判斷依據"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "y4dPLhMSWQ",
+                  "children": [
+                    {
+                      "text": "未排除問題交接操作員"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "D7wE3G-6rz",
+                  "children": [
+                    {
+                      "text": "不自行修改電控程式"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "knowledge_ids": [
+            "4jfYAmYH8N",
+            "4qytBzT583"
+          ],
+          "skill_ids": [
+            "-oHAFP7kST",
+            "BcefKU4rv6"
+          ]
+        },
+        "access": "read_only",
+        "knowledge_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRqZllBbVlIOE4ifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRxeXRCelQ1ODMifQ=="
+        ],
+        "skill_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ii1vSEFGUDdrU1QifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkJjZWZLVTRydjYifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjFwRnIxOUVFZ1IifQ==",
+        "element": {
+          "type": "p",
+          "id": "1pFr19EEgR",
+          "children": [
+            {
+              "text": "故障診斷與處理"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InpIVjNHVkNfb1YifQ==",
+        "element": {
+          "type": "p",
+          "id": "zHV3GVC_oV",
+          "children": [
+            {
+              "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IlZuZXBFMjVCY1UifQ==",
+        "element": {
+          "type": "jd_outcomes",
+          "id": "VnepE25BcU",
+          "children": [
+            {
+              "type": "p",
+              "id": "u41uds_MfS",
+              "children": [
+                {
+                  "text": "完成驗證的處理結果"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "Gz5HOoGvYO",
+              "children": [
+                {
+                  "text": "可接續的維修紀錄"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InU0MXVkc19NZlMifQ==",
+        "element": {
+          "type": "p",
+          "id": "u41uds_MfS",
+          "children": [
+            {
+              "text": "完成驗證的處理結果"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ikd6NUhPb0d2WU8ifQ==",
+        "element": {
+          "type": "p",
+          "id": "Gz5HOoGvYO",
+          "children": [
+            {
+              "text": "可接續的維修紀錄"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkktemtIR0FzNWUifQ==",
+        "element": {
+          "type": "jd_requirements",
+          "id": "I-zkHGAs5e",
+          "children": [
+            {
+              "type": "p",
+              "id": "arKZVd1IY2",
+              "children": [
+                {
+                  "text": "保留故障訊息與判斷依據"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "y4dPLhMSWQ",
+              "children": [
+                {
+                  "text": "未排除問題交接操作員"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "D7wE3G-6rz",
+              "children": [
+                {
+                  "text": "不自行修改電控程式"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImFyS1pWZDFJWTIifQ==",
+        "element": {
+          "type": "p",
+          "id": "arKZVd1IY2",
+          "children": [
+            {
+              "text": "保留故障訊息與判斷依據"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ink0ZFBMaE1TV1EifQ==",
+        "element": {
+          "type": "p",
+          "id": "y4dPLhMSWQ",
+          "children": [
+            {
+              "text": "未排除問題交接操作員"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkQ3d0UzRy02cnoifQ==",
+        "element": {
+          "type": "p",
+          "id": "D7wE3G-6rz",
+          "children": [
+            {
+              "text": "不自行修改電控程式"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InFRS2hFbkJpQmoifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "qQKhEnBiBj",
+          "children": [
+            {
+              "type": "h2",
+              "id": "uFtyxw9n3j",
+              "children": [
+                {
+                  "text": "所需知識"
+                }
+              ]
+            },
+            {
+              "type": "jd_knowledge",
+              "id": "4jfYAmYH8N",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "1AxjOKOPbi",
+                  "children": [
+                    {
+                      "text": "设备訊息與機械狀態的對應"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "CW4kIIHjJo",
+                  "children": [
+                    {
+                      "text": "用於月檢辨識異常與故障判斷。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_knowledge",
+              "id": "4qytBzT583",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "855H0aopED",
+                  "children": [
+                    {
+                      "text": "機械處置的授權與交接界線"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "ZMa7v52Z0t",
+                  "children": [
+                    {
+                      "text": "分辨本人處理、主管決定與電控職位責任。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "knowledge"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6InVGdHl4dzluM2oifQ==",
+        "element": {
+          "type": "h2",
+          "id": "uFtyxw9n3j",
+          "children": [
+            {
+              "text": "所需知識"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRqZllBbVlIOE4ifQ==",
+        "element": {
+          "type": "jd_knowledge",
+          "id": "4jfYAmYH8N",
+          "children": [
+            {
+              "type": "p",
+              "id": "1AxjOKOPbi",
+              "children": [
+                {
+                  "text": "设备訊息與機械狀態的對應"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "CW4kIIHjJo",
+              "children": [
+                {
+                  "text": "用於月檢辨識異常與故障判斷。"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only",
+        "used_by_task_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkItQUNsYWc5bHMifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjFBeGpPS09QYmkifQ==",
+        "element": {
+          "type": "p",
+          "id": "1AxjOKOPbi",
+          "children": [
+            {
+              "text": "设备訊息與機械狀態的對應"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkNXNGtJSUhqSm8ifQ==",
+        "element": {
+          "type": "p",
+          "id": "CW4kIIHjJo",
+          "children": [
+            {
+              "text": "用於月檢辨識異常與故障判斷。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjRxeXRCelQ1ODMifQ==",
+        "element": {
+          "type": "jd_knowledge",
+          "id": "4qytBzT583",
+          "children": [
+            {
+              "type": "p",
+              "id": "855H0aopED",
+              "children": [
+                {
+                  "text": "機械處置的授權與交接界線"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "ZMa7v52Z0t",
+              "children": [
+                {
+                  "text": "分辨本人處理、主管決定與電控職位責任。"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only",
+        "used_by_task_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkItQUNsYWc5bHMifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ijg1NUgwYW9wRUQifQ==",
+        "element": {
+          "type": "p",
+          "id": "855H0aopED",
+          "children": [
+            {
+              "text": "機械處置的授權與交接界線"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IlpNYTd2NTJaMHQifQ==",
+        "element": {
+          "type": "p",
+          "id": "ZMa7v52Z0t",
+          "children": [
+            {
+              "text": "分辨本人處理、主管決定與電控職位責任。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkNIeE9BQ1NGcjQifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "CHxOACSFr4",
+          "children": [
+            {
+              "type": "h2",
+              "id": "j5B3Z8BXY1",
+              "children": [
+                {
+                  "text": "所需技能"
+                }
+              ]
+            },
+            {
+              "type": "jd_skill",
+              "id": "-oHAFP7kST",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "X696ko4rlJ",
+                  "children": [
+                    {
+                      "text": "交叉比對狀態與訊息"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "yuXHa5HYGx",
+                  "children": [
+                    {
+                      "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_skill",
+              "id": "BcefKU4rv6",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "5YZsohdyoQ",
+                  "children": [
+                    {
+                      "text": "機械調整後驗證與交接"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "9xA3udVhhA",
+                  "children": [
+                    {
+                      "text": "確認處理結果並說明尚未排除的問題。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "skills"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Imo1QjNaOEJYWTEifQ==",
+        "element": {
+          "type": "h2",
+          "id": "j5B3Z8BXY1",
+          "children": [
+            {
+              "text": "所需技能"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ii1vSEFGUDdrU1QifQ==",
+        "element": {
+          "type": "jd_skill",
+          "id": "-oHAFP7kST",
+          "children": [
+            {
+              "type": "p",
+              "id": "X696ko4rlJ",
+              "children": [
+                {
+                  "text": "交叉比對狀態與訊息"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "yuXHa5HYGx",
+              "children": [
+                {
+                  "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only",
+        "used_by_task_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkItQUNsYWc5bHMifQ==",
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ilg2OTZrbzRybEoifQ==",
+        "element": {
+          "type": "p",
+          "id": "X696ko4rlJ",
+          "children": [
+            {
+              "text": "交叉比對狀態與訊息"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Inl1WEhhNUhZR3gifQ==",
+        "element": {
+          "type": "p",
+          "id": "yuXHa5HYGx",
+          "children": [
+            {
+              "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkJjZWZLVTRydjYifQ==",
+        "element": {
+          "type": "jd_skill",
+          "id": "BcefKU4rv6",
+          "children": [
+            {
+              "type": "p",
+              "id": "5YZsohdyoQ",
+              "children": [
+                {
+                  "text": "機械調整後驗證與交接"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "9xA3udVhhA",
+              "children": [
+                {
+                  "text": "確認處理結果並說明尚未排除的問題。"
+                }
+              ]
+            }
+          ]
+        },
+        "access": "read_only",
+        "used_by_task_refs": [
+          "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IkN0S1VCeUV6dGIifQ=="
+        ]
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjVZWnNvaGR5b1EifQ==",
+        "element": {
+          "type": "p",
+          "id": "5YZsohdyoQ",
+          "children": [
+            {
+              "text": "機械調整後驗證與交接"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6Ijl4QTN1ZFZoaEEifQ==",
+        "element": {
+          "type": "p",
+          "id": "9xA3udVhhA",
+          "children": [
+            {
+              "text": "確認處理結果並說明尚未排除的問題。"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IlRjOV9maGlEVVoifQ==",
+        "element": {
+          "type": "jd_section",
+          "id": "Tc9_fhiDUZ",
+          "children": [
+            {
+              "type": "h2",
+              "id": "eI4DlCAgI7",
+              "children": [
+                {
+                  "text": "工作條件與必要資格"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "2PixtO7V6x",
+              "children": [
+                {
+                  "text": "本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。"
+                }
+              ]
+            }
+          ],
+          "source_refs": [
+            "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+          ],
+          "section_kind": "conditions"
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6ImVJNERsQ0FnSTcifQ==",
+        "element": {
+          "type": "h2",
+          "id": "eI4DlCAgI7",
+          "children": [
+            {
+              "text": "工作條件與必要資格"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjRkODM4ZDc2LWViYTktNGMwZC1iODc0LTdhNjQwY2YwZjdjMyIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6ImY3MDk4NThiLTA2NzMtNDIxNy05YTgxLTA2ODg4OTVkOWIzOSIsInRhcmdldCI6IjJQaXh0TzdWNngifQ==",
+        "element": {
+          "type": "p",
+          "id": "2PixtO7V6x",
+          "children": [
+            {
+              "text": "本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。"
+            }
+          ]
+        },
+        "access": "read_only"
+      }
+    ],
+    "selection": null,
+    "source_refs": [
+      "conversation:eyJkb2N1bWVudCI6ICI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCAiY2hlY2twb2ludCI6ICIxZjFhZGQ1Ny1iNmIyLTYyZDItODAwMi05YzFkYzhhMDc2N2QiLCAiZmlyc3QiOiAicmVzcF85ZGI5NzU2Yi05ZDdjLTRlODEtYWU5Yi04ODRiOGJlMGVlNTEiLCAibGFzdCI6ICIwMTlhOTBmOS02NTIwLTQ4Y2YtYjgwZi1kNGUxMWE2Mzk2ZGEifQ=="
+    ],
+    "change_refs": [
+      "WyJjaGFuZ2UiLCI0ZDgzOGQ3Ni1lYmE5LTRjMGQtYjg3NC03YTY0MGNmMGY3YzMiLCI3YWQxZDMyZS03NTBjLTVhNTQtOTI0NS05YWQwMWU0NGQwYTkiLCI4YTk1YTgyNi1jNzg5LTQ0OTItODE4MS0xNDBlODNkZjA4ZmQiLCJmNzA5ODU4Yi0wNjczLTQyMTctOWE4MS0wNjg4ODk1ZDliMzkiXQ"
+    ],
+    "continuation_ref": null
+  },
+  "semantic_equal": false,
+  "differences": [
+    [
+      "/2/children/1/children/1/knowledge_ids",
+      null,
+      [
+        "4jfYAmYH8N",
+        "4qytBzT583"
+      ]
+    ],
+    [
+      "/2/children/1/children/1/skill_ids",
+      null,
+      [
+        "-oHAFP7kST"
+      ]
+    ],
+    [
+      "/2/children/1/children/2/knowledge_ids",
+      null,
+      [
+        "4jfYAmYH8N",
+        "4qytBzT583"
+      ]
+    ],
+    [
+      "/2/children/1/children/2/skill_ids",
+      null,
+      [
+        "-oHAFP7kST",
+        "BcefKU4rv6"
+      ]
+    ]
+  ]
+}

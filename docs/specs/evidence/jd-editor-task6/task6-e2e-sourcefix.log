@@ -1,0 +1,54 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_ test_fixed_api_interview_writes_corrects_and_preserves_manual_without_memory_facts _
+
+jd = <analysis_agent.jd_service.JdService object at 0x0000016348B6FA40>
+
+    def test_fixed_api_interview_writes_corrects_and_preserves_manual_without_memory_facts(jd):
+        transport=FixedInterview('../../scratch/task6-e2e-wire.jsonl')
+        fixture=scenario()
+        with app_client(transport) as (client,service):
+            document=client.post('/documents',json={'title':'Task6 合成設備維護','request_key':str(uuid4())}).json()['id']
+            before=read(client,document)
+            intro=submit(client,service,document,'intro')
+            assert read(client,document)['revision_ref']==before['revision_ref']
+            assert service.messages(document)[0]['text']==fixture['utterances']['intro']
+            first=transport.requests[0]
+            assert ADVISOR_INSTRUCTIONS in text_of([i for i in first['input'] if i.get('role') in ('system','developer')])
+            assert '目前只做訪談分析，不製作或編輯JD' not in json.dumps(first,ensure_ascii=False)
+            assert '/skills/write-customized-jd/SKILL.md' in json.dumps(first,ensure_ascii=False)
+            from analysis_agent.jd_tools import NAMES
+            from analysis_agent.jd_contract import SCHEMA_PATH
+            definitions=json.loads(SCHEMA_PATH.read_text(encoding='utf8'))['$defs']
+            tools={t['name']:t for t in first['tools']}
+            for name,definition in NAMES.items():
+                assert {k:v for k,v in tools[name]['parameters'].items() if k!='$defs'}==definitions[definition]
+                assert tools[name]['description']==definitions[definition]['description']
+            draft=submit(client,service,document,'draft')
+            saved=read(client,document)
+            assert plain(saved['fragment'])==fixture['expected_initial_content'], [(i.get('type'),i.get('name'),i.get('output')) for i in transport.requests[-1]['input'] if i.get('type') in ('function_call','function_call_output')]
+            nodes=list(elements(saved['fragment']))
+            tasks=[n for n in nodes if n['type']=='jd_task']
+            assert len(tasks)==2 and len(tasks[0]['knowledge_ids'])==2
+            assert tasks[0]['knowledge_ids']==tasks[1]['knowledge_ids']
+            assert len(tasks[0]['skill_ids'])==1 and len(tasks[1]['skill_ids'])==2
+            source=next(n['source_refs'][0] for n in nodes if n.get('source_refs'))
+            page=client.get(f'/documents/{document}/sources',params={'reference':source}).json()
+>           assert page['segments'][0]['text']==fixture['utterances']['draft']
+E           AssertionError: assert '你平常負責哪些設備工作？可以先說一件你親自處理的例子。' == '我的工作是設備月檢與故障...沒說明。請先整理這些工作。'
+E             
+E             - 我的工作是設備月檢與故障處理，維持服務範圍內設備可用。依服务安排每月檢查狀態，核對異常訊息，留下設備狀態紀錄與待處理清單，記設備與日期、觀察依據；超出授權交主管決定。故障時依操作員描述對照訊息與機械狀況，分辨磨耗與外物干涉，只做已授權機械調整，電控程式由另一職位處理。修後驗證，保留判斷依據與維修紀錄，未排除問題交接操作員。我需要懂訊息與機械狀態對應、授權交接界線，兩項工作都用交叉比對；故障另需調整後驗證與交接。其他資格還沒說明。請先整理這些工作。
+E             + 你平常負責哪些設備工作？可以先說一件你親自處理的例子。
+
+tests\test_jd_end_to_end.py:88: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-42f76de7-b59a-44e1-86da-3ef6b8288061.jsonl
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_end_to_end.py::test_fixed_api_interview_writes_corrects_and_preserves_manual_without_memory_facts
+1 failed, 1 passed, 1 warning in 23.36s

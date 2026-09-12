@@ -1,0 +1,12 @@
+node:internal/process/promises:394
+    triggerUncaughtException(err, true /* fromPromise */);
+    ^
+
+page.waitForResponse: Timeout 30000ms exceeded while waiting for event "response"
+    at send (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web\browser\task6-journey.mjs:31:25)
+    at async file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web/browser/task6-journey.mjs:97:22 {
+  log: [],
+  name: 'TimeoutError'
+}
+
+Node.js v22.23.2

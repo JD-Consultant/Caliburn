@@ -1,0 +1,959 @@
+........................................................................ [  9%]
+........................................................................ [ 18%]
+............FFFF........................................................ [ 28%]
+........................................................................ [ 37%]
+.FFFF.....sssssss...sssssssssss........sssssssss.sssss..ssssssss.sssssss [ 46%]
+ssss.ss....sssssssssssssssssssssssssssssssssssssss.s........ss.......... [ 56%]
+........sssssssssss.....................................FF.............. [ 65%]
+........................................................................ [ 74%]
+...........F........sssssssssssssssssssssssssssssssssssssssss........... [ 84%]
+...................................................FFFF................. [ 93%]
+...................................................                      [100%]
+================================== FAILURES ===================================
+_ test_api_surfaces_safe_counter_failure_without_generation[overflow-context_budget_exceeded-configuration_error-False] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_api_surfaces_safe_counter0')
+fault = 'overflow', code = 'context_budget_exceeded'
+status = 'configuration_error', resumable = False
+
+    @pytest.mark.parametrize('fault,code,status,resumable', [
+        ('overflow', 'context_budget_exceeded', 'configuration_error', False),
+        ('schema', 'configuration_error', 'configuration_error', False),
+        ('utf8', 'configuration_error', 'configuration_error', False),
+        ('timeout', 'transport_error', 'interrupted', True),
+    ])
+    def test_api_surfaces_safe_counter_failure_without_generation(tmp_path, fault, code, status, resumable):
+        from fastapi.testclient import TestClient
+        from analysis_agent.api import create_app
+        observed = {}
+        def failed(request):
+            if fault == 'timeout':
+                raise httpx.ReadTimeout('PRIVATE transport diagnostic', request=request)
+            if fault == 'utf8':
+                return httpx.Response(200, content=b'{"input_tokens": "\xff"}',
+                                      headers={'content-type': 'application/json'})
+            return httpx.Response(200, json={'input_tokens': 101} if fault == 'overflow' else {})
+        @contextmanager
+        def resources():
+            with service_harness(tmp_path) as (service, sent, _):
+                service.model = service.model.model_copy(update={'max_tokens': 30})
+                with counter_for(service.model, capacity=130, respond=failed) as counted:
+                    observed.update(service=service, sent=sent, counted=counted)
+                    yield service
+        with TestClient(create_app(resources), base_url='http://localhost') as web:
+>           doc = web.post('/documents', json={'title': 'safe budget error'}).json()['id']
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'id'
+
+tests\test_context_budget.py:378: KeyError
+_ test_api_surfaces_safe_counter_failure_without_generation[schema-configuration_error-configuration_error-False] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_api_surfaces_safe_counter1')
+fault = 'schema', code = 'configuration_error', status = 'configuration_error'
+resumable = False
+
+    @pytest.mark.parametrize('fault,code,status,resumable', [
+        ('overflow', 'context_budget_exceeded', 'configuration_error', False),
+        ('schema', 'configuration_error', 'configuration_error', False),
+        ('utf8', 'configuration_error', 'configuration_error', False),
+        ('timeout', 'transport_error', 'interrupted', True),
+    ])
+    def test_api_surfaces_safe_counter_failure_without_generation(tmp_path, fault, code, status, resumable):
+        from fastapi.testclient import TestClient
+        from analysis_agent.api import create_app
+        observed = {}
+        def failed(request):
+            if fault == 'timeout':
+                raise httpx.ReadTimeout('PRIVATE transport diagnostic', request=request)
+            if fault == 'utf8':
+                return httpx.Response(200, content=b'{"input_tokens": "\xff"}',
+                                      headers={'content-type': 'application/json'})
+            return httpx.Response(200, json={'input_tokens': 101} if fault == 'overflow' else {})
+        @contextmanager
+        def resources():
+            with service_harness(tmp_path) as (service, sent, _):
+                service.model = service.model.model_copy(update={'max_tokens': 30})
+                with counter_for(service.model, capacity=130, respond=failed) as counted:
+                    observed.update(service=service, sent=sent, counted=counted)
+                    yield service
+        with TestClient(create_app(resources), base_url='http://localhost') as web:
+>           doc = web.post('/documents', json={'title': 'safe budget error'}).json()['id']
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'id'
+
+tests\test_context_budget.py:378: KeyError
+_ test_api_surfaces_safe_counter_failure_without_generation[utf8-configuration_error-configuration_error-False] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_api_surfaces_safe_counter2')
+fault = 'utf8', code = 'configuration_error', status = 'configuration_error'
+resumable = False
+
+    @pytest.mark.parametrize('fault,code,status,resumable', [
+        ('overflow', 'context_budget_exceeded', 'configuration_error', False),
+        ('schema', 'configuration_error', 'configuration_error', False),
+        ('utf8', 'configuration_error', 'configuration_error', False),
+        ('timeout', 'transport_error', 'interrupted', True),
+    ])
+    def test_api_surfaces_safe_counter_failure_without_generation(tmp_path, fault, code, status, resumable):
+        from fastapi.testclient import TestClient
+        from analysis_agent.api import create_app
+        observed = {}
+        def failed(request):
+            if fault == 'timeout':
+                raise httpx.ReadTimeout('PRIVATE transport diagnostic', request=request)
+            if fault == 'utf8':
+                return httpx.Response(200, content=b'{"input_tokens": "\xff"}',
+                                      headers={'content-type': 'application/json'})
+            return httpx.Response(200, json={'input_tokens': 101} if fault == 'overflow' else {})
+        @contextmanager
+        def resources():
+            with service_harness(tmp_path) as (service, sent, _):
+                service.model = service.model.model_copy(update={'max_tokens': 30})
+                with counter_for(service.model, capacity=130, respond=failed) as counted:
+                    observed.update(service=service, sent=sent, counted=counted)
+                    yield service
+        with TestClient(create_app(resources), base_url='http://localhost') as web:
+>           doc = web.post('/documents', json={'title': 'safe budget error'}).json()['id']
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'id'
+
+tests\test_context_budget.py:378: KeyError
+_ test_api_surfaces_safe_counter_failure_without_generation[timeout-transport_error-interrupted-True] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_api_surfaces_safe_counter3')
+fault = 'timeout', code = 'transport_error', status = 'interrupted'
+resumable = True
+
+    @pytest.mark.parametrize('fault,code,status,resumable', [
+        ('overflow', 'context_budget_exceeded', 'configuration_error', False),
+        ('schema', 'configuration_error', 'configuration_error', False),
+        ('utf8', 'configuration_error', 'configuration_error', False),
+        ('timeout', 'transport_error', 'interrupted', True),
+    ])
+    def test_api_surfaces_safe_counter_failure_without_generation(tmp_path, fault, code, status, resumable):
+        from fastapi.testclient import TestClient
+        from analysis_agent.api import create_app
+        observed = {}
+        def failed(request):
+            if fault == 'timeout':
+                raise httpx.ReadTimeout('PRIVATE transport diagnostic', request=request)
+            if fault == 'utf8':
+                return httpx.Response(200, content=b'{"input_tokens": "\xff"}',
+                                      headers={'content-type': 'application/json'})
+            return httpx.Response(200, json={'input_tokens': 101} if fault == 'overflow' else {})
+        @contextmanager
+        def resources():
+            with service_harness(tmp_path) as (service, sent, _):
+                service.model = service.model.model_copy(update={'max_tokens': 30})
+                with counter_for(service.model, capacity=130, respond=failed) as counted:
+                    observed.update(service=service, sent=sent, counted=counted)
+                    yield service
+        with TestClient(create_app(resources), base_url='http://localhost') as web:
+>           doc = web.post('/documents', json={'title': 'safe budget error'}).json()['id']
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'id'
+
+tests\test_context_budget.py:378: KeyError
+_ test_real_factory_routes_models_through_same_budget_and_lifetime[None-None] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_real_factory_routes_model0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001693689DEE0>
+main_effort = None, b2_effort = None
+
+    @pytest.mark.parametrize('main_effort,b2_effort', [(None, None), ('high', None), ('medium', 'high'), ('medium', 'medium')])
+    def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, monkeypatch, main_effort, b2_effort):
+        """Actual composition root; replace only DB resources and HTTP transport."""
+        from contextlib import nullcontext
+        import sqlalchemy
+        from langgraph.checkpoint.memory import InMemorySaver
+        from langgraph.checkpoint.postgres import PostgresSaver
+        from langgraph.store.postgres import PostgresStore
+        from analysis_agent.api import open_service
+        from analysis_agent.budget import ResponsesBudget
+        from test_consolidation import call
+    
+        settings = {'Q019_DATABASE_URL': 'host=127.0.0.1 dbname=q019_offline',
+            'OPENAI_API_KEY': 'offline', 'OPENAI_BASE_URL': 'https://offline.invalid/v1/',
+            'OPENAI_API_BASE': 'https://offline.invalid/v1/', 'Q019_MODEL': 'gpt-5.6-luna',
+            'Q019_REQUEST_TIMEOUT_SECONDS': '7', 'Q019_MAX_OUTPUT_TOKENS': '6000',
+            'Q019_CONTEXT_WINDOW_TOKENS': '20000', 'Q019_COMPACT_THRESHOLD': '10000',
+            'Q019_BACKGROUND_POLL_SECONDS': '600', 'Q019_BACKGROUND_MAX_RECOVERIES': '1',
+            'Q019_MEMORY_TEXT_THRESHOLD': '', 'Q019_CONTEXT_BUDGET_MODE': 'native'}
+        for name, value in settings.items():
+            monkeypatch.setenv(name, value)
+        for name, value in [('Q019_REASONING_EFFORT', main_effort),
+                            ('Q019_CONSOLIDATION_REASONING_EFFORT', b2_effort)]:
+            if value is None:
+                monkeypatch.delenv(name, raising=False)
+            else:
+                monkeypatch.setenv(name, value)
+        engine = sqlalchemy.create_engine(f'sqlite:///{tmp_path / "factory.db"}')
+        saver, store = InMemorySaver(), InMemoryStore()
+        monkeypatch.setattr(sqlalchemy, 'create_engine', lambda *a, **kw: engine)
+        monkeypatch.setattr(PostgresSaver, 'from_conn_string', lambda *a, **kw: nullcontext(saver))
+        monkeypatch.setattr(PostgresStore, 'from_conn_string', lambda *a, **kw: nullcontext(store))
+        monkeypatch.setattr(InMemorySaver, 'setup', lambda self: None, raising=False)
+        monkeypatch.setattr(InMemoryStore, 'setup', lambda self: None, raising=False)
+        sent, budget_calls = [], []
+        replies = [call('request_memory_consolidation'), done(), body(), done()]
+    
+        def transport(self, request):
+            assert str(request.url) == 'https://offline.invalid/v1/responses'
+            sent.append(json.loads(request.content))
+            answer = replies.pop(0)
+            answer['id'] = f'resp_factory_{len(sent)}'
+            for n, item in enumerate(answer['output']):
+                item['id'] = f'item_factory_{len(sent)}_{n}'
+            return httpx.Response(200, json=answer)
+    
+        original_guard = ResponsesBudget.__call__
+    
+        def guard(self, request):
+            budget_calls.append(json.loads(request.content)['reasoning']['effort'])
+            return original_guard(self, request)
+    
+        monkeypatch.setattr(httpx.HTTPTransport, 'handle_request', transport)
+        monkeypatch.setattr(ResponsesBudget, '__call__', guard)
+>       with open_service() as service:
+             ^^^^^^^^^^^^^^
+
+tests\test_extraction_role.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src\analysis_agent\api.py:181: in open_service
+    jd_store = JdStore(engine)
+               ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <analysis_agent.jd_store.JdStore object at 0x0000016936E54860>
+engine = Engine(sqlite:///S:\caliburn\.worktrees\analysis-only-agent\scratch\task6-final-all-temp\test_real_factory_routes_model0\factory.db)
+timeout = 30
+
+    def __init__(self, engine, *, timeout=30):
+        if engine.dialect.name != 'postgresql':
+>           raise ValueError('JD authority requires the catalog PostgreSQL engine')
+E           ValueError: JD authority requires the catalog PostgreSQL engine
+
+src\analysis_agent\jd_store.py:93: ValueError
+_ test_real_factory_routes_models_through_same_budget_and_lifetime[high-None] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_real_factory_routes_model1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001693689E930>
+main_effort = 'high', b2_effort = None
+
+    @pytest.mark.parametrize('main_effort,b2_effort', [(None, None), ('high', None), ('medium', 'high'), ('medium', 'medium')])
+    def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, monkeypatch, main_effort, b2_effort):
+        """Actual composition root; replace only DB resources and HTTP transport."""
+        from contextlib import nullcontext
+        import sqlalchemy
+        from langgraph.checkpoint.memory import InMemorySaver
+        from langgraph.checkpoint.postgres import PostgresSaver
+        from langgraph.store.postgres import PostgresStore
+        from analysis_agent.api import open_service
+        from analysis_agent.budget import ResponsesBudget
+        from test_consolidation import call
+    
+        settings = {'Q019_DATABASE_URL': 'host=127.0.0.1 dbname=q019_offline',
+            'OPENAI_API_KEY': 'offline', 'OPENAI_BASE_URL': 'https://offline.invalid/v1/',
+            'OPENAI_API_BASE': 'https://offline.invalid/v1/', 'Q019_MODEL': 'gpt-5.6-luna',
+            'Q019_REQUEST_TIMEOUT_SECONDS': '7', 'Q019_MAX_OUTPUT_TOKENS': '6000',
+            'Q019_CONTEXT_WINDOW_TOKENS': '20000', 'Q019_COMPACT_THRESHOLD': '10000',
+            'Q019_BACKGROUND_POLL_SECONDS': '600', 'Q019_BACKGROUND_MAX_RECOVERIES': '1',
+            'Q019_MEMORY_TEXT_THRESHOLD': '', 'Q019_CONTEXT_BUDGET_MODE': 'native'}
+        for name, value in settings.items():
+            monkeypatch.setenv(name, value)
+        for name, value in [('Q019_REASONING_EFFORT', main_effort),
+                            ('Q019_CONSOLIDATION_REASONING_EFFORT', b2_effort)]:
+            if value is None:
+                monkeypatch.delenv(name, raising=False)
+            else:
+                monkeypatch.setenv(name, value)
+        engine = sqlalchemy.create_engine(f'sqlite:///{tmp_path / "factory.db"}')
+        saver, store = InMemorySaver(), InMemoryStore()
+        monkeypatch.setattr(sqlalchemy, 'create_engine', lambda *a, **kw: engine)
+        monkeypatch.setattr(PostgresSaver, 'from_conn_string', lambda *a, **kw: nullcontext(saver))
+        monkeypatch.setattr(PostgresStore, 'from_conn_string', lambda *a, **kw: nullcontext(store))
+        monkeypatch.setattr(InMemorySaver, 'setup', lambda self: None, raising=False)
+        monkeypatch.setattr(InMemoryStore, 'setup', lambda self: None, raising=False)
+        sent, budget_calls = [], []
+        replies = [call('request_memory_consolidation'), done(), body(), done()]
+    
+        def transport(self, request):
+            assert str(request.url) == 'https://offline.invalid/v1/responses'
+            sent.append(json.loads(request.content))
+            answer = replies.pop(0)
+            answer['id'] = f'resp_factory_{len(sent)}'
+            for n, item in enumerate(answer['output']):
+                item['id'] = f'item_factory_{len(sent)}_{n}'
+            return httpx.Response(200, json=answer)
+    
+        original_guard = ResponsesBudget.__call__
+    
+        def guard(self, request):
+            budget_calls.append(json.loads(request.content)['reasoning']['effort'])
+            return original_guard(self, request)
+    
+        monkeypatch.setattr(httpx.HTTPTransport, 'handle_request', transport)
+        monkeypatch.setattr(ResponsesBudget, '__call__', guard)
+>       with open_service() as service:
+             ^^^^^^^^^^^^^^
+
+tests\test_extraction_role.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src\analysis_agent\api.py:181: in open_service
+    jd_store = JdStore(engine)
+               ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <analysis_agent.jd_store.JdStore object at 0x0000016936ECD2E0>
+engine = Engine(sqlite:///S:\caliburn\.worktrees\analysis-only-agent\scratch\task6-final-all-temp\test_real_factory_routes_model1\factory.db)
+timeout = 30
+
+    def __init__(self, engine, *, timeout=30):
+        if engine.dialect.name != 'postgresql':
+>           raise ValueError('JD authority requires the catalog PostgreSQL engine')
+E           ValueError: JD authority requires the catalog PostgreSQL engine
+
+src\analysis_agent\jd_store.py:93: ValueError
+_ test_real_factory_routes_models_through_same_budget_and_lifetime[medium-high] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_real_factory_routes_model2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016936902270>
+main_effort = 'medium', b2_effort = 'high'
+
+    @pytest.mark.parametrize('main_effort,b2_effort', [(None, None), ('high', None), ('medium', 'high'), ('medium', 'medium')])
+    def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, monkeypatch, main_effort, b2_effort):
+        """Actual composition root; replace only DB resources and HTTP transport."""
+        from contextlib import nullcontext
+        import sqlalchemy
+        from langgraph.checkpoint.memory import InMemorySaver
+        from langgraph.checkpoint.postgres import PostgresSaver
+        from langgraph.store.postgres import PostgresStore
+        from analysis_agent.api import open_service
+        from analysis_agent.budget import ResponsesBudget
+        from test_consolidation import call
+    
+        settings = {'Q019_DATABASE_URL': 'host=127.0.0.1 dbname=q019_offline',
+            'OPENAI_API_KEY': 'offline', 'OPENAI_BASE_URL': 'https://offline.invalid/v1/',
+            'OPENAI_API_BASE': 'https://offline.invalid/v1/', 'Q019_MODEL': 'gpt-5.6-luna',
+            'Q019_REQUEST_TIMEOUT_SECONDS': '7', 'Q019_MAX_OUTPUT_TOKENS': '6000',
+            'Q019_CONTEXT_WINDOW_TOKENS': '20000', 'Q019_COMPACT_THRESHOLD': '10000',
+            'Q019_BACKGROUND_POLL_SECONDS': '600', 'Q019_BACKGROUND_MAX_RECOVERIES': '1',
+            'Q019_MEMORY_TEXT_THRESHOLD': '', 'Q019_CONTEXT_BUDGET_MODE': 'native'}
+        for name, value in settings.items():
+            monkeypatch.setenv(name, value)
+        for name, value in [('Q019_REASONING_EFFORT', main_effort),
+                            ('Q019_CONSOLIDATION_REASONING_EFFORT', b2_effort)]:
+            if value is None:
+                monkeypatch.delenv(name, raising=False)
+            else:
+                monkeypatch.setenv(name, value)
+        engine = sqlalchemy.create_engine(f'sqlite:///{tmp_path / "factory.db"}')
+        saver, store = InMemorySaver(), InMemoryStore()
+        monkeypatch.setattr(sqlalchemy, 'create_engine', lambda *a, **kw: engine)
+        monkeypatch.setattr(PostgresSaver, 'from_conn_string', lambda *a, **kw: nullcontext(saver))
+        monkeypatch.setattr(PostgresStore, 'from_conn_string', lambda *a, **kw: nullcontext(store))
+        monkeypatch.setattr(InMemorySaver, 'setup', lambda self: None, raising=False)
+        monkeypatch.setattr(InMemoryStore, 'setup', lambda self: None, raising=False)
+        sent, budget_calls = [], []
+        replies = [call('request_memory_consolidation'), done(), body(), done()]
+    
+        def transport(self, request):
+            assert str(request.url) == 'https://offline.invalid/v1/responses'
+            sent.append(json.loads(request.content))
+            answer = replies.pop(0)
+            answer['id'] = f'resp_factory_{len(sent)}'
+            for n, item in enumerate(answer['output']):
+                item['id'] = f'item_factory_{len(sent)}_{n}'
+            return httpx.Response(200, json=answer)
+    
+        original_guard = ResponsesBudget.__call__
+    
+        def guard(self, request):
+            budget_calls.append(json.loads(request.content)['reasoning']['effort'])
+            return original_guard(self, request)
+    
+        monkeypatch.setattr(httpx.HTTPTransport, 'handle_request', transport)
+        monkeypatch.setattr(ResponsesBudget, '__call__', guard)
+>       with open_service() as service:
+             ^^^^^^^^^^^^^^
+
+tests\test_extraction_role.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src\analysis_agent\api.py:181: in open_service
+    jd_store = JdStore(engine)
+               ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <analysis_agent.jd_store.JdStore object at 0x0000016936DA87A0>
+engine = Engine(sqlite:///S:\caliburn\.worktrees\analysis-only-agent\scratch\task6-final-all-temp\test_real_factory_routes_model2\factory.db)
+timeout = 30
+
+    def __init__(self, engine, *, timeout=30):
+        if engine.dialect.name != 'postgresql':
+>           raise ValueError('JD authority requires the catalog PostgreSQL engine')
+E           ValueError: JD authority requires the catalog PostgreSQL engine
+
+src\analysis_agent\jd_store.py:93: ValueError
+_ test_real_factory_routes_models_through_same_budget_and_lifetime[medium-medium] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_real_factory_routes_model3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016936900230>
+main_effort = 'medium', b2_effort = 'medium'
+
+    @pytest.mark.parametrize('main_effort,b2_effort', [(None, None), ('high', None), ('medium', 'high'), ('medium', 'medium')])
+    def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, monkeypatch, main_effort, b2_effort):
+        """Actual composition root; replace only DB resources and HTTP transport."""
+        from contextlib import nullcontext
+        import sqlalchemy
+        from langgraph.checkpoint.memory import InMemorySaver
+        from langgraph.checkpoint.postgres import PostgresSaver
+        from langgraph.store.postgres import PostgresStore
+        from analysis_agent.api import open_service
+        from analysis_agent.budget import ResponsesBudget
+        from test_consolidation import call
+    
+        settings = {'Q019_DATABASE_URL': 'host=127.0.0.1 dbname=q019_offline',
+            'OPENAI_API_KEY': 'offline', 'OPENAI_BASE_URL': 'https://offline.invalid/v1/',
+            'OPENAI_API_BASE': 'https://offline.invalid/v1/', 'Q019_MODEL': 'gpt-5.6-luna',
+            'Q019_REQUEST_TIMEOUT_SECONDS': '7', 'Q019_MAX_OUTPUT_TOKENS': '6000',
+            'Q019_CONTEXT_WINDOW_TOKENS': '20000', 'Q019_COMPACT_THRESHOLD': '10000',
+            'Q019_BACKGROUND_POLL_SECONDS': '600', 'Q019_BACKGROUND_MAX_RECOVERIES': '1',
+            'Q019_MEMORY_TEXT_THRESHOLD': '', 'Q019_CONTEXT_BUDGET_MODE': 'native'}
+        for name, value in settings.items():
+            monkeypatch.setenv(name, value)
+        for name, value in [('Q019_REASONING_EFFORT', main_effort),
+                            ('Q019_CONSOLIDATION_REASONING_EFFORT', b2_effort)]:
+            if value is None:
+                monkeypatch.delenv(name, raising=False)
+            else:
+                monkeypatch.setenv(name, value)
+        engine = sqlalchemy.create_engine(f'sqlite:///{tmp_path / "factory.db"}')
+        saver, store = InMemorySaver(), InMemoryStore()
+        monkeypatch.setattr(sqlalchemy, 'create_engine', lambda *a, **kw: engine)
+        monkeypatch.setattr(PostgresSaver, 'from_conn_string', lambda *a, **kw: nullcontext(saver))
+        monkeypatch.setattr(PostgresStore, 'from_conn_string', lambda *a, **kw: nullcontext(store))
+        monkeypatch.setattr(InMemorySaver, 'setup', lambda self: None, raising=False)
+        monkeypatch.setattr(InMemoryStore, 'setup', lambda self: None, raising=False)
+        sent, budget_calls = [], []
+        replies = [call('request_memory_consolidation'), done(), body(), done()]
+    
+        def transport(self, request):
+            assert str(request.url) == 'https://offline.invalid/v1/responses'
+            sent.append(json.loads(request.content))
+            answer = replies.pop(0)
+            answer['id'] = f'resp_factory_{len(sent)}'
+            for n, item in enumerate(answer['output']):
+                item['id'] = f'item_factory_{len(sent)}_{n}'
+            return httpx.Response(200, json=answer)
+    
+        original_guard = ResponsesBudget.__call__
+    
+        def guard(self, request):
+            budget_calls.append(json.loads(request.content)['reasoning']['effort'])
+            return original_guard(self, request)
+    
+        monkeypatch.setattr(httpx.HTTPTransport, 'handle_request', transport)
+        monkeypatch.setattr(ResponsesBudget, '__call__', guard)
+>       with open_service() as service:
+             ^^^^^^^^^^^^^^
+
+tests\test_extraction_role.py:129: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:137: in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+src\analysis_agent\api.py:181: in open_service
+    jd_store = JdStore(engine)
+               ^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <analysis_agent.jd_store.JdStore object at 0x0000016936902B40>
+engine = Engine(sqlite:///S:\caliburn\.worktrees\analysis-only-agent\scratch\task6-final-all-temp\test_real_factory_routes_model3\factory.db)
+timeout = 30
+
+    def __init__(self, engine, *, timeout=30):
+        if engine.dialect.name != 'postgresql':
+>           raise ValueError('JD authority requires the catalog PostgreSQL engine')
+E           ValueError: JD authority requires the catalog PostgreSQL engine
+
+src\analysis_agent\jd_store.py:93: ValueError
+___ test_actual_sdk_request_matches_reviewed_contract_through_tool_followup ___
+
+h = namespace(replies=[], sent=[], model=ChatOpenAI(metadata={'lc_versions': {'langchain-core': '1.6.2', 'langchain': '1.4...NjU2ZDk3YThlODE4IiwgImZpcnN0IjogImgwIiwgImxhc3QiOiAiYTAifQ==', agent=<function h.<locals>.agent at 0x0000016932D49A80>)
+
+    def test_actual_sdk_request_matches_reviewed_contract_through_tool_followup(h):
+        assets = SkillAssets()
+        memory = MemorySession(h.pub, h.source, skill_assets=assets)
+        graph = build_conversation(model=h.model, checkpointer=h.saver,
+>           instructions=application_instructions(), tools=memory.tools,
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+            middleware=[analysis_skills(assets), memory])
+
+tests\test_memory_prompt_contract.py:78: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_memory_prompt_contract.py:31: in application_instructions
+    return ast.literal_eval(next(k.value for k in factory.keywords if k.arg == 'instructions'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:112: in literal_eval
+    return _convert(node_or_string)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:111: in _convert
+    return _convert_signed_num(node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:85: in _convert_signed_num
+    return _convert_num(node)
+           ^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:76: in _convert_num
+    _raise_malformed_node(node)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+node = <ast.Name object at 0x0000016934154DD0>
+
+    def _raise_malformed_node(node):
+        msg = "malformed node or string"
+        if lno := getattr(node, 'lineno', None):
+            msg += f' on line {lno}'
+>       raise ValueError(msg + f': {node!r}')
+E       ValueError: malformed node or string on line 98: <ast.Name object at 0x0000016934154DD0>
+
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:73: ValueError
+________ test_service_initial_memory_request_matches_reviewed_contract ________
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_service_initial_memory_re0')
+
+    def test_service_initial_memory_request_matches_reviewed_contract(tmp_path):
+        # Exercise AnalysisService._context, including the normal Memory and Skills
+        # composition. The official Store is present even before first publication.
+        with service_harness(tmp_path, store=InMemoryStore()) as (service, sent, replies):
+>           service.instructions = application_instructions()
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_memory_prompt_contract.py:97: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_memory_prompt_contract.py:31: in application_instructions
+    return ast.literal_eval(next(k.value for k in factory.keywords if k.arg == 'instructions'))
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:112: in literal_eval
+    return _convert(node_or_string)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:111: in _convert
+    return _convert_signed_num(node)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:85: in _convert_signed_num
+    return _convert_num(node)
+           ^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:76: in _convert_num
+    _raise_malformed_node(node)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+node = <ast.Name object at 0x000001693491D210>
+
+    def _raise_malformed_node(node):
+        msg = "malformed node or string"
+        if lno := getattr(node, 'lineno', None):
+            msg += f' on line {lno}'
+>       raise ValueError(msg + f': {node!r}')
+E       ValueError: malformed node or string on line 98: <ast.Name object at 0x000001693491D210>
+
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\ast.py:73: ValueError
+_____ test_native_api_two_turns_replay_reasoning_and_report_actual_usage ______
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_native_api_two_turns_repl0')
+
+    def test_native_api_two_turns_replay_reasoning_and_report_actual_usage(tmp_path):
+        observed = {}
+        @contextmanager
+        def resources():
+            with service_harness(tmp_path) as (service, sent, replies):
+                service.model = service.model.model_copy(update={'max_tokens': 128})
+                first = done()
+                first['output'].insert(0, {'type': 'reasoning', 'id': 'synthetic_reasoning',
+                                          'encrypted_content': 'SYNTHETIC-OPAQUE', 'summary': []})
+                replies.extend([first, done()])
+                with counter_for(service.model, exact_count=False) as counted:
+                    observed.update(service=service, sent=sent, counted=counted)
+                    yield service
+        with TestClient(create_app(resources), base_url='http://localhost') as web:
+>           doc = web.post('/documents', json={'title': '網站接案訪談'}).json()['id']
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'id'
+
+tests\test_native_context_budget.py:117: KeyError
+________ test_unknown_entered_tool_stays_blocked[runtime_error-False] _________
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_unknown_entered_tool_stay0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016936C71310>
+reopen = False, error_code = 'runtime_error'
+
+    @pytest.mark.parametrize('reopen', [False, True])
+    @pytest.mark.parametrize('error_code', ['runtime_error', 'process_interrupted'])
+    def test_unknown_entered_tool_stays_blocked(tmp_path, monkeypatch, reopen, error_code):
+        import analysis_agent.service as service_module
+        original = service_module.build_conversation
+        effects = []
+    
+        @tool
+        def unknown_write() -> str:
+            """An external effect with no receipt protocol."""
+            effects.append('possibly committed')
+            raise OperationalError('unknown write outcome')
+    
+        def compose(**kwargs):
+            return original(**{**kwargs, 'tools': [*kwargs.get('tools', ()), unknown_write]})
+    
+        monkeypatch.setattr(service_module, 'build_conversation', compose)
+        saver, store = InMemorySaver(), InMemoryStore()
+    
+        def check(service, doc, run):
+            before = snapshot(service, doc)
+            assert not service.get_run(doc, run['id'])['can_resume']
+            with pytest.raises(ServiceConflict):
+                service.resume(doc, run['id'])
+            with pytest.raises(PublicationUncertain):
+                service.stop(doc, run['id'])
+            with pytest.raises(PublicationUncertain):
+                service.submit(doc, 'new', '新的案例', abandon_pending=True)
+            assert snapshot(service, doc).config == before.config
+            assert effects == ['possibly committed']
+    
+        with service_harness(tmp_path, saver=saver, store=store) as (service, sent, replies):
+            doc, _ = seed(service, sent)
+            replies.append(call('unknown_write'))
+            run = service.submit(doc, 'unknown', '原話')
+            service.join(doc)
+            service.catalog.update_run(run['id'], error_code=error_code)
+>           check(service, doc, run)
+
+tests\test_read_recovery.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+service = <analysis_agent.service.AnalysisService object at 0x0000016934029F10>
+doc = '32cfa2ad-c521-4d47-977a-4a133c101185'
+run = {'id': '0d576996-72d0-4891-a15d-21640aa90be3', 'document_id': '32cfa2ad-c521-4d47-977a-4a133c101185', 'status': 'running', 'error_code': None, ...}
+
+    def check(service, doc, run):
+        before = snapshot(service, doc)
+        assert not service.get_run(doc, run['id'])['can_resume']
+        with pytest.raises(ServiceConflict):
+            service.resume(doc, run['id'])
+>       with pytest.raises(PublicationUncertain):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PublicationUncertain
+
+tests\test_read_recovery.py:190: Failed
+_________ test_unknown_entered_tool_stays_blocked[runtime_error-True] _________
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_unknown_entered_tool_stay1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016935F8C230>
+reopen = True, error_code = 'runtime_error'
+
+    @pytest.mark.parametrize('reopen', [False, True])
+    @pytest.mark.parametrize('error_code', ['runtime_error', 'process_interrupted'])
+    def test_unknown_entered_tool_stays_blocked(tmp_path, monkeypatch, reopen, error_code):
+        import analysis_agent.service as service_module
+        original = service_module.build_conversation
+        effects = []
+    
+        @tool
+        def unknown_write() -> str:
+            """An external effect with no receipt protocol."""
+            effects.append('possibly committed')
+            raise OperationalError('unknown write outcome')
+    
+        def compose(**kwargs):
+            return original(**{**kwargs, 'tools': [*kwargs.get('tools', ()), unknown_write]})
+    
+        monkeypatch.setattr(service_module, 'build_conversation', compose)
+        saver, store = InMemorySaver(), InMemoryStore()
+    
+        def check(service, doc, run):
+            before = snapshot(service, doc)
+            assert not service.get_run(doc, run['id'])['can_resume']
+            with pytest.raises(ServiceConflict):
+                service.resume(doc, run['id'])
+            with pytest.raises(PublicationUncertain):
+                service.stop(doc, run['id'])
+            with pytest.raises(PublicationUncertain):
+                service.submit(doc, 'new', '新的案例', abandon_pending=True)
+            assert snapshot(service, doc).config == before.config
+            assert effects == ['possibly committed']
+    
+        with service_harness(tmp_path, saver=saver, store=store) as (service, sent, replies):
+            doc, _ = seed(service, sent)
+            replies.append(call('unknown_write'))
+            run = service.submit(doc, 'unknown', '原話')
+            service.join(doc)
+            service.catalog.update_run(run['id'], error_code=error_code)
+>           check(service, doc, run)
+
+tests\test_read_recovery.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+service = <analysis_agent.service.AnalysisService object at 0x0000016936067EC0>
+doc = 'c9add925-6132-43d1-ad05-bf00fb34051f'
+run = {'id': '6fc16a2a-e13e-497a-aebc-a0d3412d053a', 'document_id': 'c9add925-6132-43d1-ad05-bf00fb34051f', 'status': 'running', 'error_code': None, ...}
+
+    def check(service, doc, run):
+        before = snapshot(service, doc)
+        assert not service.get_run(doc, run['id'])['can_resume']
+        with pytest.raises(ServiceConflict):
+            service.resume(doc, run['id'])
+>       with pytest.raises(PublicationUncertain):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PublicationUncertain
+
+tests\test_read_recovery.py:190: Failed
+_____ test_unknown_entered_tool_stays_blocked[process_interrupted-False] ______
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_unknown_entered_tool_stay2')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000016934E0CF20>
+reopen = False, error_code = 'process_interrupted'
+
+    @pytest.mark.parametrize('reopen', [False, True])
+    @pytest.mark.parametrize('error_code', ['runtime_error', 'process_interrupted'])
+    def test_unknown_entered_tool_stays_blocked(tmp_path, monkeypatch, reopen, error_code):
+        import analysis_agent.service as service_module
+        original = service_module.build_conversation
+        effects = []
+    
+        @tool
+        def unknown_write() -> str:
+            """An external effect with no receipt protocol."""
+            effects.append('possibly committed')
+            raise OperationalError('unknown write outcome')
+    
+        def compose(**kwargs):
+            return original(**{**kwargs, 'tools': [*kwargs.get('tools', ()), unknown_write]})
+    
+        monkeypatch.setattr(service_module, 'build_conversation', compose)
+        saver, store = InMemorySaver(), InMemoryStore()
+    
+        def check(service, doc, run):
+            before = snapshot(service, doc)
+            assert not service.get_run(doc, run['id'])['can_resume']
+            with pytest.raises(ServiceConflict):
+                service.resume(doc, run['id'])
+            with pytest.raises(PublicationUncertain):
+                service.stop(doc, run['id'])
+            with pytest.raises(PublicationUncertain):
+                service.submit(doc, 'new', '新的案例', abandon_pending=True)
+            assert snapshot(service, doc).config == before.config
+            assert effects == ['possibly committed']
+    
+        with service_harness(tmp_path, saver=saver, store=store) as (service, sent, replies):
+            doc, _ = seed(service, sent)
+            replies.append(call('unknown_write'))
+            run = service.submit(doc, 'unknown', '原話')
+            service.join(doc)
+            service.catalog.update_run(run['id'], error_code=error_code)
+>           check(service, doc, run)
+
+tests\test_read_recovery.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+service = <analysis_agent.service.AnalysisService object at 0x0000016934D918B0>
+doc = 'a8e2594a-3a16-415d-a5d2-9b7354437326'
+run = {'id': 'e2eec0c7-3c76-4e8d-aadf-b0fd41fc408a', 'document_id': 'a8e2594a-3a16-415d-a5d2-9b7354437326', 'status': 'running', 'error_code': None, ...}
+
+    def check(service, doc, run):
+        before = snapshot(service, doc)
+        assert not service.get_run(doc, run['id'])['can_resume']
+        with pytest.raises(ServiceConflict):
+            service.resume(doc, run['id'])
+>       with pytest.raises(PublicationUncertain):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PublicationUncertain
+
+tests\test_read_recovery.py:190: Failed
+______ test_unknown_entered_tool_stays_blocked[process_interrupted-True] ______
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-final-all-temp/test_unknown_entered_tool_stay3')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000169386CB920>
+reopen = True, error_code = 'process_interrupted'
+
+    @pytest.mark.parametrize('reopen', [False, True])
+    @pytest.mark.parametrize('error_code', ['runtime_error', 'process_interrupted'])
+    def test_unknown_entered_tool_stays_blocked(tmp_path, monkeypatch, reopen, error_code):
+        import analysis_agent.service as service_module
+        original = service_module.build_conversation
+        effects = []
+    
+        @tool
+        def unknown_write() -> str:
+            """An external effect with no receipt protocol."""
+            effects.append('possibly committed')
+            raise OperationalError('unknown write outcome')
+    
+        def compose(**kwargs):
+            return original(**{**kwargs, 'tools': [*kwargs.get('tools', ()), unknown_write]})
+    
+        monkeypatch.setattr(service_module, 'build_conversation', compose)
+        saver, store = InMemorySaver(), InMemoryStore()
+    
+        def check(service, doc, run):
+            before = snapshot(service, doc)
+            assert not service.get_run(doc, run['id'])['can_resume']
+            with pytest.raises(ServiceConflict):
+                service.resume(doc, run['id'])
+            with pytest.raises(PublicationUncertain):
+                service.stop(doc, run['id'])
+            with pytest.raises(PublicationUncertain):
+                service.submit(doc, 'new', '新的案例', abandon_pending=True)
+            assert snapshot(service, doc).config == before.config
+            assert effects == ['possibly committed']
+    
+        with service_harness(tmp_path, saver=saver, store=store) as (service, sent, replies):
+            doc, _ = seed(service, sent)
+            replies.append(call('unknown_write'))
+            run = service.submit(doc, 'unknown', '原話')
+            service.join(doc)
+            service.catalog.update_run(run['id'], error_code=error_code)
+>           check(service, doc, run)
+
+tests\test_read_recovery.py:203: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+service = <analysis_agent.service.AnalysisService object at 0x00000169386CA8A0>
+doc = 'c87f545c-f99a-431e-80af-6218177f37d7'
+run = {'id': '8a77d636-75bd-41e0-8671-c6d5634220a9', 'document_id': 'c87f545c-f99a-431e-80af-6218177f37d7', 'status': 'running', 'error_code': None, ...}
+
+    def check(service, doc, run):
+        before = snapshot(service, doc)
+        assert not service.get_run(doc, run['id'])['can_resume']
+        with pytest.raises(ServiceConflict):
+            service.resume(doc, run['id'])
+>       with pytest.raises(PublicationUncertain):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       Failed: DID NOT RAISE PublicationUncertain
+
+tests\test_read_recovery.py:190: Failed
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+SKIPPED [1] tests\test_jd_admission.py:62: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_admission.py:105: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_admission.py:147: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [4] tests\test_jd_admission.py:181: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_api.py:83: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_api.py:136: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_api.py:166: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_close_reconcile.py:14: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_current_source_acquisition.py:26: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_end_to_end.py:58: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_end_to_end.py:140: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_fix1.py:14: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_fix1.py:38: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1.py:74: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_fix1.py:89: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1.py:136: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_fix1_admission.py:29: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1_admission.py:52: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1_admission.py:81: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1_admission.py:107: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_fix2.py:12: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:35: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:58: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:75: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:105: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:133: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:9: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:53: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:74: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:102: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:120: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:141: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:155: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:174: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:186: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:214: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:229: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:246: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view_recovery.py:13: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view_recovery.py:63: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:58: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:70: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:102: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:120: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_postgres.py:146: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:163: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:175: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:188: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:212: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:227: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:250: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:273: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:290: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:305: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:323: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:339: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:385: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:397: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:417: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:435: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:452: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:469: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_postgres_recovery.py:9: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres_recovery.py:57: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_postgres_recovery.py:70: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [5] tests\test_jd_process_lifecycle.py:28: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_process_lifecycle.py:50: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_process_lifecycle.py:71: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_provider_binding.py:12: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_provider_binding.py:67: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_sources.py:8: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_sources.py:37: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:23: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:105: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:116: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:132: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_tools.py:143: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:156: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:168: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:197: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:216: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_postgres_consolidation.py:30: Dedicated q019_agent_test required; not a durability pass
+SKIPPED [3] tests\test_postgres_consolidation_request.py:21: Dedicated q019_agent_test required; notification durability NOT verified
+SKIPPED [1] tests\test_postgres_conversation.py:18: Set Q019_TEST_DATABASE_URL to dedicated q019_agent_test DB; not a durability pass
+SKIPPED [4] tests\test_postgres_conversation_lifecycle.py:31: Dedicated q019_agent_test required; root/child durability NOT verified
+SKIPPED [2] tests\test_postgres_extraction.py:24: Requires dedicated q019_agent_test; not a durability pass
+SKIPPED [4] tests\test_postgres_live_memory.py:30: Dedicated q019_agent_test required; not a durability pass
+SKIPPED [1] tests\test_postgres_memory.py:22: Set Q019_TEST_DATABASE_URL to dedicated q019_agent_test DB; not a persistence pass
+SKIPPED [4] tests\test_postgres_publication.py:57: Dedicated q019_agent_test DSN required; not a concurrency pass
+SKIPPED [1] tests\test_postgres_publication.py:97: Dedicated q019_agent_test DSN required; not a concurrency pass
+SKIPPED [5] tests\test_postgres_scheduling.py:13: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [1] tests\test_postgres_scheduling.py:75: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [3] tests\test_postgres_service.py:76: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [1] tests\test_postgres_service.py:111: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [1] tests\test_postgres_service.py:136: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [2] tests\test_postgres_service.py:167: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [3] tests\test_postgres_service.py:206: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [2] tests\test_postgres_summary_reextraction.py:31: Dedicated q019_agent_test required; not a durability pass
+FAILED tests/test_context_budget.py::test_api_surfaces_safe_counter_failure_without_generation[overflow-context_budget_exceeded-configuration_error-False]
+FAILED tests/test_context_budget.py::test_api_surfaces_safe_counter_failure_without_generation[schema-configuration_error-configuration_error-False]
+FAILED tests/test_context_budget.py::test_api_surfaces_safe_counter_failure_without_generation[utf8-configuration_error-configuration_error-False]
+FAILED tests/test_context_budget.py::test_api_surfaces_safe_counter_failure_without_generation[timeout-transport_error-interrupted-True]
+FAILED tests/test_extraction_role.py::test_real_factory_routes_models_through_same_budget_and_lifetime[None-None]
+FAILED tests/test_extraction_role.py::test_real_factory_routes_models_through_same_budget_and_lifetime[high-None]
+FAILED tests/test_extraction_role.py::test_real_factory_routes_models_through_same_budget_and_lifetime[medium-high]
+FAILED tests/test_extraction_role.py::test_real_factory_routes_models_through_same_budget_and_lifetime[medium-medium]
+FAILED tests/test_memory_prompt_contract.py::test_actual_sdk_request_matches_reviewed_contract_through_tool_followup
+FAILED tests/test_memory_prompt_contract.py::test_service_initial_memory_request_matches_reviewed_contract
+FAILED tests/test_native_context_budget.py::test_native_api_two_turns_replay_reasoning_and_report_actual_usage
+FAILED tests/test_read_recovery.py::test_unknown_entered_tool_stays_blocked[runtime_error-False]
+FAILED tests/test_read_recovery.py::test_unknown_entered_tool_stays_blocked[runtime_error-True]
+FAILED tests/test_read_recovery.py::test_unknown_entered_tool_stays_blocked[process_interrupted-False]
+FAILED tests/test_read_recovery.py::test_unknown_entered_tool_stays_blocked[process_interrupted-True]
+15 failed, 609 passed, 147 skipped, 1 warning in 88.02s (0:01:28)

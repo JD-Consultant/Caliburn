@@ -1238,3 +1238,13 @@ Task5 測試與觀測限制列於 `scratch/task-5-report.md`；真 Windows kerne
 Task5 review fix1：輸入在最終 admission 再核封存與原 key；selection reservation 保留到同一鎖區內的最後檢查。manual recovery／stop／放棄中斷回合沿同文件 reservation，在全域鎖外等待 native／PG；shutdown 先禁止新操作，再等這些 entry 完整對帳及結果投影。全域 RLock 仍用於共用 owner 狀態與短 admission，不取代 PG row／advisory lock，也不宣稱效能倍數。
 
 原人工 full-save 先查原 key／digest 的 terminal receipt；descriptor 清理失敗或另有 active owner 仍回原結果並保留寫入 gate。cache 遺失時，明示恢復的原 key／結果在後續重讀仍可查看；無 key discovery 另決定目前 gate，不把已確認結果洗掉。App-only 恢復 DTO 新增 `restart_required`：無 run／manual descriptor 的 native read owner 未能停止時，畫面明示保留目前頁面及 dirty／問句、受控停止原服務、沿原 installation 設定重開後按「重新讀取狀態」。只重新整理網頁不會停止舊程序；本切片不新增一般 cancel route、假 run 或自動重播。正式日常啟停入口仍屬成品 P5。
+
+### Task 6 — 同顧問按需 JD 方法與完整固定旅程
+
+`ADVISOR_INSTRUCTIONS` 是正式隔離 factory 與離線驗收共用的主提示。只新增按需寫稿／修正能力，既有訪談及 Memory B/C 方法／策略保持；原三個 Skills 澄清「方法資產唯讀」不否定已提供的 JD 工具。`write-customized-jd` 加兩份參考材料採 metadata→需要的正文／引用，保留未知、責任邊界、低頻工作、案例差異及雙向全稿核對。沒有逐輪強制寫稿或自評滿分。
+
+`jd_tools.py` 取得原問答後保留同一已發配來源的 `current_input` 證據，再附加實際 tool-call binding。否則讀取本輪未關閉的原問答會誤丟其有效性；不為未發配、跨文件或 payload 不符的來源新增權限。紅／綠反例與陰性案例均保存。
+
+`tests/jd_offline_service.py` 只換固定 HTTP transport，沿同一 router／AnalysisService／JD ports／PG／native。真 Windows bootstrap 必須在 DB、client、Node 前；明示初始化只限專用測試 DB，不是 production 啟動流程。`tests/test_jd_end_to_end.py` 核完整初稿、共享 K/S、局部更正保留其他工作、連續三次人工保存通知、沒有 Memory／原話雙寫、提交後遺失回覆對帳及純聊天取消。自然選工具與專業品質另驗。
+
+驗收入口：[JD ACCEPTANCE](../jd-editor/ACCEPTANCE.md)／[核心接合結果](../../docs/specs/evidence/2026-09-10-jd-editor-core-integration.md)。Task6 工程檢查通過範圍與獨立審查狀態分列；正式產品仍需 G6，不從 production import 本研究目錄。

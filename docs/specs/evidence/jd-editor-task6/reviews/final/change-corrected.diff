@@ -1,0 +1,2848 @@
+BASE 444416722190fd48c14f4423d101f36b25831de1
+Explicit files: 30 (Claude-authorized subset of the 32-file root review; excludes .gitattributes and analysis-agent/README.md)
+Working-tree snapshot; LF normalized for review only. Raw bytes and hashes retained.
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/api.py b/experiments/analysis-agent/src/analysis_agent/api.py
+--- a/experiments/analysis-agent/src/analysis_agent/api.py
++++ b/experiments/analysis-agent/src/analysis_agent/api.py
+@@ -1,49 +1,64 @@
+ """Loopback-only analysis API; factory owns clients for the entire worker life.
+ 
+ https://fastapi.tiangolo.com/advanced/events/
+ https://fastapi.tiangolo.com/async/
+ Routes are sync (Starlette threadpool), not async functions calling a blocking
+ graph. The graph itself runs in the service executor, never a response task.
+ """
+ from contextlib import ExitStack, asynccontextmanager, contextmanager
+ from datetime import datetime
+ import os
+ 
+ import httpx
+ from fastapi import FastAPI, Request, Query
+ from fastapi.responses import JSONResponse
+ from pydantic import BaseModel, ConfigDict, Field, field_validator
+ from starlette.concurrency import run_in_threadpool
+ from starlette.middleware.trustedhost import TrustedHostMiddleware
+ from starlette.middleware.cors import CORSMiddleware
+ from jd_editor_contract import models as jd_models
+ 
+ from analysis_agent.service import AnalysisService, ServiceConflict
+ from analysis_agent.jd_contract import SelectionCaptureInput
+ from analysis_agent.publication import PublicationUncertain
+ 
++
++# Shared by the managed service and its offline acceptance factory.
++ADVISOR_INSTRUCTIONS = ('你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
++                         '根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。'
++                         '已說清楚的不重問；員工已說不知道、需查證或暫時答不出來，也算已回應：保留未知，轉問其他有用方向。'
++                         '有新資訊或員工重新提出時才回看該未知；部分已說明就保留已知部分，未知不說成沒有這項工作或固定要求。'
++                         '回述與歸納保留原資訊的對象、本人做法、適用條件、頻率與權限；不把某案例的工具或限制套到其他工作，不把同時提及說成因果。'
++                         '你的改寫不等於員工確認；工作用語有歧義時保留員工用詞，有實際影響才追問。'
++                         '準備收尾時，對照已談的重要工作範圍、本人做法、責任交接、重要條件、成果與實際專業判斷，不只核對工作名稱。'
++                         '用目前對話與按需讀取的Memory核對；需要方法時用現有分析Skills，不每輪全面盤點，也不逐案例重問相同問題。'
++                         '仍有影響理解的重要未知就自然追問；已說不知道的外部資訊保留限制，不為收尾編造要求。'
++                         '收尾說明目前涵蓋與尚未確認之處，不用反覆最後一題或一句完整代替核對；員工可隨時休息或續談。'
++                         '需要撰寫或實質修正JD時，按需讀write-customized-jd方法與目前稿，使用已提供的JD工具，依實際保存結果說明。'
++                         '資料不足繼續訪談，已有足夠理解可先寫支持的部分，不必每輪修改JD。不顯示隱藏推理。'
++)
+ 
+ class DocumentInput(jd_models.JdDocumentCreateInput):
+ 
+     @field_validator('title')
+     @classmethod
+     def nonblank(cls, value):
+         if not value.strip():
+             raise ValueError('Title cannot be blank')
+         return value
+ 
+ 
+ class MessageInput(BaseModel):
+     model_config = ConfigDict(extra='forbid')
+     request_key: str = Field(min_length=1, max_length=128)
+     text: str = Field(min_length=1)
+     abandon_pending: bool = False
+     jd_selection: SelectionCaptureInput | None = None
+ 
+     @field_validator('text')
+     @classmethod
+     def nonblank(cls, value):
+         if not value.strip():
+             raise ValueError('Message cannot be blank')
+         return value
+ 
+@@ -171,61 +186,51 @@
+         count_http = stack.enter_context(httpx.Client(timeout=http_timeout))
+         counter = stack.enter_context(OpenAI(api_key=os.environ['OPENAI_API_KEY'],
+                                             http_client=count_http, timeout=http_timeout))
+         model_name = os.environ.get('Q019_MODEL', 'gpt-5.6-luna')
+         budget = ResponsesBudget(counter=counter, model=model_name, context_window_tokens=capacity,
+                                  exact_count=budget_mode == 'exact')
+         client = stack.enter_context(httpx.Client(timeout=http_timeout, event_hooks={'request': [budget]}))
+         # Resolve OPENAI_BASE_URL once through the SDK public property. Both
+         # clients MUST target the same endpoint, including custom path prefixes.
+         model = build_model(model=model_name, base_url=str(counter.base_url),
+                             api_key=os.environ['OPENAI_API_KEY'], http_client=client,
+                             request_timeout=timeout, reasoning_effort=effort,
+                             compact_threshold=compaction).model_copy(update={'max_tokens': output})
+         stack.callback(model.root_client.close)
+         # B1 keeps its independently calibrated high effort. Keep the same
+         # endpoint, transport/budget hook and output cap as the other roles.
+         extraction_model = build_model(model=model_name, base_url=str(counter.base_url),
+             api_key=os.environ['OPENAI_API_KEY'], http_client=client,
+             request_timeout=timeout, compact_threshold=compaction,
+             reasoning_effort='high').model_copy(update={'max_tokens': output})
+         stack.callback(extraction_model.root_client.close)
+         # LangChain model copies share the same managed client/budget hook.
+         consolidation_model = model.model_copy(update={
+             'reasoning': {**model.reasoning, 'effort': consolidation_effort}})
+         service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model, jd=jd,lifecycle=lifecycle,
+-            instructions='你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
+-                         '根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。'
+-                         '已說清楚的不重問；員工已說不知道、需查證或暫時答不出來，也算已回應：保留未知，轉問其他有用方向。'
+-                         '有新資訊或員工重新提出時才回看該未知；部分已說明就保留已知部分，未知不說成沒有這項工作或固定要求。'
+-                         '回述與歸納保留原資訊的對象、本人做法、適用條件、頻率與權限；不把某案例的工具或限制套到其他工作，不把同時提及說成因果。'
+-                         '你的改寫不等於員工確認；工作用語有歧義時保留員工用詞，有實際影響才追問。'
+-                         '準備收尾時，對照已談的重要工作範圍、本人做法、責任交接、重要條件、成果與實際專業判斷，不只核對工作名稱。'
+-                         '用目前對話與按需讀取的Memory核對；需要方法時用現有分析Skills，不每輪全面盤點，也不逐案例重問相同問題。'
+-                         '仍有影響理解的重要未知就自然追問；已說不知道的外部資訊保留限制，不為收尾編造要求。'
+-                         '收尾說明目前涵蓋與尚未確認之處，不用反覆最後一題或一句完整代替核對；員工可隨時休息或續談。'
+-                         '目前只做訪談分析，不製作或編輯JD。不顯示隱藏推理。')
++            instructions=ADVISOR_INSTRUCTIONS)
+         stack.callback(service.close)
+         service.start()
+         service.enable_background(max_recoveries=recoveries, text_threshold=text_threshold,
+                                   extraction_model=extraction_model,
+                                   consolidation_model=consolidation_model)
+         service.start_background(poll_seconds=poll_seconds)
+         yield service
+ 
+ 
+ def create_app(resources=open_service):
+     if resources is open_service:
+         from analysis_agent.windows_lifecycle import bootstrap
+         bootstrap()
+     @asynccontextmanager
+     async def lifespan(app):
+         manager = resources()
+         service = await run_in_threadpool(manager.__enter__)
+         app.state.service = service
+         try:
+             yield
+         finally:
+             # Join workers before their HTTP/DB clients exit. Disconnecting one
+             # browser request never reaches this application-level cleanup.
+             await run_in_threadpool(manager.__exit__, None, None, None)
+ 
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/jd_tools.py b/experiments/analysis-agent/src/analysis_agent/jd_tools.py
+--- a/experiments/analysis-agent/src/analysis_agent/jd_tools.py
++++ b/experiments/analysis-agent/src/analysis_agent/jd_tools.py
+@@ -175,51 +175,54 @@
+                 raise ValueError('JD model view requires a state-only command')
+             update.update(command.update or {})
+         update.update(jd_last_model_view=manifest,jd_refs=refs.bindings,jd_turn_notice=basis)
+         return ExtendedModelResponse(inner,Command(update=update))
+ 
+     def wrap_tool_call(self,request,handler):
+         self._scope(request.runtime.config)
+         if request.tool_call['name'] in NAMES:
+             expected=next(t for t in self.tools if t.name==request.tool_call['name'])
+             if request.tool is not expected: raise ValueError('JD tool factory identity mismatch')
+         observed=[]
+         if any(request.tool is t for t in self.source_read_tools):
+             with self.source.observe_reads() as observed:
+                 result=handler(request)
+         else:
+             result=handler(request)
+         # A successful existing source read is a checkpointed acquisition; a
+         # parseable handle or Memory guide alone is not original source reading.
+         if (any(request.tool is t for t in self.source_read_tools) and isinstance(result,ToolMessage)
+                 and result.status=='success'):
+             payload=json.loads(result.content)
+             reference=payload.get('reference')
+             if reference and not any(all(payload.get(k)==v for k,v in original.items()) for original in observed):
+                 raise ValueError('JD source acquisition requires the actual owner read result')
+             if reference and any(s.get('role')=='user' for s in payload.get('segments',[])):
+-                issued={**request.state.get('jd_sources',{}),reference:{'tool_call':request.tool_call['id']}}
++                prior=request.state.get('jd_sources',{})
++                # Reading an already issued current-input window must not erase
++                # its saved-input authority; that window is not a closed turn yet.
++                issued={**prior,reference:{**prior.get(reference,{}),'tool_call':request.tool_call['id']}}
+                 return Command(update={'messages':[result],'jd_sources':issued})
+         return result
+ 
+     def _revision(self,refs,id):
+         return refs.issue('revision',ref=revision_ref(self.scope,id),revision=str(id),access='read_only')
+ 
+     def _change(self,refs,outcome):
+         wire=outcome_to_wire(outcome)
+         ref=refs.issue('change',ref=wire['change_ref'],operation=str(outcome.operation_id),
+             before=str(outcome.base_id),after=str(outcome.result_id),access='read_only')
+         self._revision(refs,outcome.base_id); self._revision(refs,outcome.result_id)
+         return ref
+ 
+     def _target(self,refs,revision,node,access,*,supplied):
+         # Acquisition is encoded in the issued identity, so a navigation-only
+         # relationship ref never silently gains content-read authority.
+         return refs.issue('target',revision=str(revision.id),target=node['id'],access=access,
+             content_supplied=supplied,element_type=node['type'],input=refs.input_id)
+ 
+     def _read(self,args,state,refs):
+         kind,access,query,offset='current','current_base',JdReadQuery(),0
+         if 'continuation_ref' in args:
+             page=refs.require(args['continuation_ref'],'read_page')
+             kind,access,offset=page['read_kind'],page['access'],page['offset']
+             query=JdReadQuery(UUID(page['revision']),page.get('target'),page.get('range'))
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/skills.py b/experiments/analysis-agent/src/analysis_agent/skills.py
+--- a/experiments/analysis-agent/src/analysis_agent/skills.py
++++ b/experiments/analysis-agent/src/analysis_agent/skills.py
+@@ -51,29 +51,29 @@
+ 
+     def read(self, file_path: str, offset: int = 0, limit: int = 2000):
+         return ReadResult(error='Path is not available')
+ 
+     def grep(self, pattern: str, path: str | None = None, glob: str | None = None, *, max_count: int | None = None):
+         return GrepResult(matches=[]) if path in (None, '/') else GrepResult(error='Path is not available')
+ 
+ 
+ def analysis_files(assets: SkillAssets, memory: BackendProtocol | None = None):
+     # Composite strips /skills/ for the asset backend, and restores it in ls,
+     # grep and download results. Never advertise asset-local paths like /name/.
+     return CompositeBackend(default=memory if memory is not None else _NoFiles(),
+                             routes={'/skills/': assets})
+ 
+ 
+ def analysis_skills(assets: SkillAssets):
+     return SkillsMiddleware(
+         backend=analysis_files(assets), sources=[('/skills/', 'Analysis methods')],
+         system_prompt="""## 按需分析方法
+ {skills_locations}{skills_load_warnings}
+ {skills_list}
+ 以上僅是方法名稱、用途及讀取路徑。需要該方法時，使用既有 read_file 讀取列出的
+ SKILL.md（limit=1000）；已讀且仍在有效上下文的內容不必重讀。不要每回合載入全部
+ Skills，也不必依序套用所有方法。直接接續員工的話，只追問目前重要且不清楚之處。
+ 這些是唯讀方法參考，不是員工事實、不產生新 Agent、沒有必填 skill_ids 或固定表單。
+-此 Skills 接線只新增唯讀方法資產，不新增主機檔案、寫檔、執行程式、網路或 JD 操作能力。
++方法資產本身不授予主機檔案、寫檔、執行程式或網路能力；JD 操作只依已提供的 JD 工具契約。
+ 既有 Memory 讀取、引用回查與 repair 仍依各工具說明使用，不受 Skills 目錄限制。
+ """,
+     )
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md b/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md
+--- a/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md
++++ b/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md
+@@ -2,26 +2,26 @@
+ name: compare-work-patterns
+ description: Use when 已有兩個以上案例、敘述看似重複卻有重要差異，或尚不清楚它們是共同工作模式、條件變化還是不同責任。
+ ---
+ 
+ # 案例比較與共同工作模式
+ 
+ 比較工作意義，不按案例數建立職責，也不因措辭相似就抹掉差異。
+ 
+ ## 比較方法
+ 
+ - 從已知案例比較想達成的結果、處理對象、本人行動與決策責任；優先補問會改變理解的差異。
+ - 若新案例已被既有理解完整涵蓋，可以簡短確認共同模式，不必重講所有問題。
+   若相似但新增條件、限制、例外或交接責任，保留這些細節，讓共同理解更完整。
+ - 不同客戶名稱或使用不同工具，不足以單獨判定為不同工作。反過來，同一工具也可能
+   支援不同目的與責任；遇到不同成果或責任時，再核對是否應分開描述。
+ - 分清「工作原本就依情境不同」與「先前說錯了」。沒有清楚更正時，不自動選較新的說法。
+   需要回查才沿既有 Memory 引用讀詳記或原話，讀到足夠即可。
+ - 用「共同部分＋仍需保留的差異」自然回述，不要求員工選分類代碼或填合併拆分表。
+ 
+ ## 實例
+ 
+ A 網站一次交付、B 網站持續月租維護，兩案都包含需求確認與頁面製作。
+ 可問：「兩案製作時你的責任相同嗎？B 上線後，你還需要持續處理哪些事？」
+ 先保留共同製作工作與持續維護差異；不能只因計價不同就拆工作，也不能只因都是網站就合成一項。
+ 
+-這只是分析方法，不操作 Memory 發布或刪除案例原文；不生成 JD 變更或新的工作識別碼。
++這只是分析方法，不操作 Memory 發布或刪除案例原文，也不生成新的工作識別碼。需要實質撰稿或修正時，另按需讀 write-customized-jd 方法並使用已提供的 JD 工具。
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md b/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md
+--- a/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md
++++ b/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md
+@@ -3,26 +3,26 @@
+ description: Use when 工作動作已出現但產出或成功判準不清，或員工只說專業、溝通、判斷等抽象能力，需要深入實際知識技能與困難處理。
+ ---
+ 
+ # 產出、成功判準與知識技能
+ 
+ 從工作目的、可觀察行動與結果理解專業；可隨訪談需要深入，不必等其他分析全部完成。
+ 
+ ## 深入方法
+ 
+ - 先連到已談過的工作目的：這件事完成後，留下什麼交付物、決定、服務或狀態改變？
+   不是所有產出都是一份文件。
+ - 問本人或接收者如何知道做得合適，選一個實際成功、返工或困難案例了解判斷依據。
+   聚焦當時情境、採取的行動與後果，不把「表現良好」當成可觀察判準。
+ - 探索做出該判斷需要理解什麼、要會做什麼，以及為何那樣做。
+   工具名稱、年資或「溝通能力佳」不足以解釋專業；可追問實際如何辨別、檢查、協調或修正。
+ - 員工提出數字或標準時，釐清它是案例結果、正式要求還是個人期待；來源不明就詢問。
+   不自行添加績效目標、法規條件、能力級別或把推測寫成要求。
+ - 每次只追問目前最重要的未知；若員工已說清楚，就簡短確認並繼續訪談，不逐欄填表。
+ 
+ ## 實例
+ 
+ 員工說：「我會檢查網站上線，這需要細心。」
+ 可以問：「最近一次上線前，你怎麼判斷已經可以交付？有哪個問題是靠你的檢查才發現的？」
+ 依回答再追查判斷與處理方法，不直接推定零缺陷、某個速度指標或一份泛用能力清單。
+ 
+-例子只供問法參考，不是員工證據；不製作 JD、評分表或要求模型回報已用的方法代碼。
++例子只供問法參考，不是員工證據；本方法負責分析，不製作評分表或要求回報方法代碼。需要實質撰稿或修正時，另按需讀 write-customized-jd 方法並使用已提供的 JD 工具。
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md b/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md
+--- a/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md
++++ b/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md
+@@ -2,26 +2,26 @@
+ name: work-scope-interview
+ description: Use when 訪談剛開始、員工只說職稱或工具、工作範圍不明，或需要從最近實際案例釐清本人責任與交接界線。
+ ---
+ 
+ # 工作範圍與案例訪談
+ 
+ 以真實工作建立可修訂的理解，不從職稱猜職責。這是可選方法，不是每輪必跑流程。
+ 
+ ## 訪談方法
+ 
+ - 接住員工剛說的事，請他挑一件最近、記得清楚的實例；已提供案例就從該例開始。
+ - 順著事件了解誰提出需求、希望得到什麼、本人實際做了什麼、交给誰或到哪裡算完成。
+   一次只問最能補足目前理解的一個問題，不一次列出全套問卷。
+ - 分清本人負責、共同參與、他人決定；工具是做事的手段，不能只把工具名稱當工作。
+ - 有了初步輪廓，再問這是平常工作、偶發支援，還是特殊情況；其他尚未談到的重要工作
+   可另找案例。一次案例不能證明所有工作都如此，出現頻率低也不代表不重要。
+ - 用簡短自然語句回述目前理解讓員工更正。已知的內容不重問；有疑點就保留疑點，
+   不為填滿欄位補出責任、成果或組織規則。
+ 
+ ## 實例
+ 
+ 員工說：「我主要用 Figma，也會幫工程師。」
+ 可以接：「拿最近一次交付來說，你接到什麼需求，最後交給工程師的是什麼？」
+ 如果他已說完成畫面設計，下一問可聚焦由誰決定需求與誰確認可交付，而非再問工具清單。
+ 
+-方法中的例子不是這位員工的事實；只以訪談及已讀來源建立理解。本輪不製作或修改 JD。
++方法中的例子不是這位員工的事實；只以訪談及已讀來源建立理解。本方法負責分析；需要實質撰稿或修正時，另按需讀 write-customized-jd 方法並使用已提供的 JD 工具。
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md b/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md
+--- a/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md
++++ b/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md
+@@ -0,0 +1,39 @@
++---
++name: write-customized-jd
++description: Use when 某項實際工作已足夠理解、員工要求整理職務說明書、需更正已寫責任或條件，或準備核對整份 JD 的完整範圍與依據。
++---
++
++# 客製化職務說明書撰寫與修訂
++
++把員工實際工作整理成他自己的 JD。不是套用職稱公版，也不是評分員工。
++這是同一顧問的按需方法；不要求每輪讀取、每輪改稿或等整場訪談完才寫。
++
++## 何時寫、何時繼續談
++
++- 某項工作已能辨識對象、本人行動、目的／結果及重要條件和責任邊界，即可寫有根據的部分。
++  未知成果、要求、知識或技能可以留空；只有職稱或工具名稱不足以造完整稿。
++- 新責任、影響理解的條件或實質更正才修改相應內容。重述、致謝、同類佐證可只訪談。
++  員工要求整理且已有足夠資訊時，不以不相關追問延遲成稿。
++- 有影響的矛盾未釐清先問；已說不知道的資訊保留限制，轉談其他有用方向。
++
++## 寫稿與修正
++
++按需要讀取 `/skills/write-customized-jd/references/writing-and-correction.md`。
++依目前 JD、已取得的工作理解、最新已保存對話整理；背景 Memory 尚未納入的明確更正仍須考慮。
++手改是目前文件，不自動成為訪談事實；收到 App 變更通知後，以最新版續編並保留無關手改。
++
++使用已提供的 JD 工具讀目前稿、定位和保存。只用工具發配的目標／選取／K/S 引用，
++不猜位置或持久識別；初建 K/S 後重新讀取取得引用再連結。来源引用只使用已取得的依據，
++不能用一個存在的來源替不受支持內容背書。
++
++依工具實際結果說明已保存、未改變、失敗或尚待查明。意圖、畫面候選與工具呼叫送出都不等於保存成功。
++結果未知依既有查回／停止方式處理，不為補一個成功回覆重新新增同樣內容。
++
++## 全份核對與收尾
++
++需要補工作範圍或收尾時，按需讀取 `/skills/write-customized-jd/references/complete-work-guide.md`。
++同時核對工作→JD 有無遺漏，及 JD→工作有無補造責任、要求、資格或 K/S。
++重要低頻責任、例外與最新更正不能只因最近沒提就消失。
++說明目前已涵蓋與尚待確認的範圍，讓員工有補充／更正機會；不要把欄位填滿、沉默、輪數或自評滿分當完整證明。
++
++方法資產不是員工事實，不授予主機寫檔、執行、網路或額外 Agent 能力；保存與錯誤恢復依 App 工具契約。
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md b/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md
+--- a/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md
++++ b/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md
+@@ -0,0 +1,43 @@
++# 完整工作理解與核對
++
++分析的是員工完整工作，不只當輪答案。以下是觀察方向，不是必填欄位或逐項問卷。
++
++## 找出值得釐清的缺口
++
++先看服務對象及角色目的，日常、周期、專案、事件觸發、交付後維護、正式低頻與支援工作。
++從員工容易描述的實際案例深入：什麼使工作開始、本人處理什麼、如何判斷與選擇、
++最後形成或維持什麼、交給誰、何時算完成，以及自己能決定到哪裡。
++工具是手段；本人執行、參與、建議與他人核准不能混成全權負責。
++
++只問會影響責任辨識、工作判斷或成文的一個重要問題；中立追問，不在問題裡暗示答案。
++不清楚可改問記得的例子；仍不知道就保留，沒有新資訊不反覆逼答。
++已知部分保留，不把未知說成沒有此工作或不需要這項要求。
++
++比較其他情境時，留意輸入、本人做法、交接、權限、適用頻率及例外差異。
++必要時也理解實際環境、風險、操作／感官辨識與持續注意要求，不只套辦公工作視角；
++不可由職稱推定搬重數字、健康診斷、資格或法規符合性。
++
++## 案例與通則分清
++
++- 案例是支持工作理解的證據；不每案新增永久任務，也不按相似字詞強行合併。
++  若差異會改變本人行動、判斷、責任或適用條件，就在相應敘述保留。
++- 新增 A 不表示撤銷 B。低頻但正式承擔的責任仍重要；一次支援不自動成為經常責任。
++- 「這次剛好」「印象中」不升格成固定頻率、時限或 KPI。已明確確認的數字保留原範圍。
++- 分清現在、以前、未來願望；員工會某技術不代表本職位必須具備。
++  他人工作、團隊成果及批准權，不自動歸给本人。
++- 更正依語意範圍處理。新舊衝突未明說更正時，釐清時間／對象，不因新一句較晚便全面覆蓋。
++- 名稱不是一律刪除：固定負責的平台或產品若能界定責任就保留；單次客戶案例通常留來源詳記。
++
++## 雙向核對
++
++工作→JD：對照全部已知有效工作，含周期、低頻、例外、交付後、本人判斷及交接。
++修某項工作後，再確認其他有效工作沒有因改寫而丟失或被錯誤縮窄。
++
++JD→工作：逐項看責任、成果、要求、K/S、條件與資格是否有根據、確定性與範圍是否一致。
++職業參考或一般常識只能提示追問，不能證明這位員工負責什麼。
++
++同時看 current JD、Memory 已涵蓋範圍及最新已保存對話；需要原話時按需回查。
++來源詳記可保留案例深度，不必把所有分析過程塞入 JD，也不把 Memory 改述當逐字引文。
++
++收尾可說明已整理的範圍、影響結論的未知及讓員工補充的空間。
++不能因欄位有字、員工休息、反覆問「還有嗎」或自稱完整，就說已驗證所有工作。
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md b/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md
+--- a/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md
++++ b/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md
+@@ -0,0 +1,53 @@
++# 成文與有界更正
++
++寫出做什麼、為什麼、負責到哪裡、怎樣適當完成及需要什麼專業。
++客製深度看能否辨識實際對象、判斷、交接與條件，不看字數、頁數或固定任務數。
++
++## 文件內容
++
++沿 App 已提供的六章文件結構。識別資訊據已知填寫；職務目的描述工作價值與服務對象；
++職責按有意義範圍分組，任務用完整敘述；知識與技能各自集中定義，工作條件及必要資格依據成立才列。
++不為整齊補造職級、學歷、組織授權或空泛的其他交辦工作。
++
++職務目的、職責、任務是不同縮放。任務不只剩標題，也不把所有步驟拆成流水帳。
++若其中一部分交給別人後仍無法辨識剩餘责任，考慮分項；不是以動詞數量機械切分。
++保留有影響的觸發／輸入、本人行動與判斷、工作對象、交付及權限，不把團隊結果全歸本人。
++
++## 任務底下的成果與要求
++
++成果／產出說明形成或維持了什麼，未必是報告或物件；要求說明適當完成的條件，
++可約束過程、成果品質、交付或持續狀態。兩組各自可有多項、平行放在任務底下；
++不一對一、不互為父子，也不因敘述已有相似文字就合併或省掉一組。未知項目可留空。
++
++整項任務的頻率／權限／適用限制寫在任務敘述；某要求的條件與該要求放一起。
++要求只針對某成果時文字明指，仍在任務的要求組，不靠位置自動繼承。
++真正跨任務共通的條件才集中，不把局部約定套到所有工作。
++
++已確認的期限和數字保留適用範圍；未說的標準不為專業感補造。
++單次成功、失誤、趕工或願望不是合理完成要求，也不替組織制定 KPI／認證合規。
++
++## 知識、技能与必要資格
++
++知識是需理解的原理、規則與概念；技能是運用方法完成工作、判斷或解決問題的能力。
++寫到可辨識內容、用途與範圍，避免只寫「專業知識」「溝通能力」或堆不會用到的工具名。
++
++同一項可支持多個任務，正文定義一份；按內容／用途／範圍去重，不只比較名稱。
++每條 Task→知識／技能關係都需要已知工作與判斷支持，不把所有項目掛到所有任務。
++先建立內容，再讀取 App 發配的同版引用後連結；反向關係与持久 ID 交 App。
++
++員工持有證照、學過工具或想進修，不等於職位必要資格；有能力也不等於有批准權。
++必要资格／授權據可靠資訊表達，未知保留。倫理／安全／協作若重要，寫成有根據的具體要求，
++不自造態度、能力級別、個人評分或訓練計畫。
++
++## 修正目前稿
++
++讀取最新版及 App 的人工變更通知，核對更正影響的對象、時間与範圍。
++明確更正取代受影響結論，但不連帶刪除其他有效工作；條件應在相關敘述一致，不只改聊天回覆。
++需要來源時查已保存原話；舊引用仍可回看，不能讓它替已失效或未支持的結論背書。
++
++背景 Memory 還沒納入員工剛說的明確更正，也要依最新已保存對話修訂；不假稱已整併。
++員工手改是 current 文件，要保留無關修改，但不自動變新訪談事實、Memory 或已確認責任。
++手改意思會影響責任且沒有根據時可中立詢問；不偽造原話或 source_refs。
++
++修改後看實際保存結果與前後差異；失敗不宣稱完成，未知先沿現有工具查明。
++最后按需作工作→JD、JD→依據的全稿核對，並說明仍影響結論的未知。
+
+diff --git a/experiments/analysis-agent/tests/test_context_budget.py b/experiments/analysis-agent/tests/test_context_budget.py
+--- a/experiments/analysis-agent/tests/test_context_budget.py
++++ b/experiments/analysis-agent/tests/test_context_budget.py
+@@ -1,30 +1,31 @@
+ """CT-01: actual LangChain/SDK serialization; both networks are synthetic."""
+ from contextlib import contextmanager
+ from copy import deepcopy
+ import importlib.util
+ import json
++from uuid import uuid4
+ 
+ import httpx
+ import pytest
+ from langchain_core.exceptions import ContextOverflowError, ModelError, ModelInvalidRequestError
+ from langchain_core.messages import ToolMessage
+ from langgraph.store.memory import InMemoryStore
+ from openai import OpenAI, OpenAIError
+ 
+ from analysis_agent.provider import build_model
+ from test_consolidation import call, done
+ from test_extraction import body
+ from test_service import service_harness
+ 
+ 
+ # Independent documented SDK3.8 whitelist; do not derive expectations from guard.
+ COUNT_FIELDS = {'conversation', 'input', 'instructions', 'model', 'parallel_tool_calls',
+                 'personality', 'previous_response_id', 'reasoning', 'text', 'tool_choice',
+                 'tools', 'truncation'}
+ 
+ 
+ def budget_module():
+     assert importlib.util.find_spec('analysis_agent.budget'), 'Missing serialized Responses budget guard'
+     from analysis_agent import budget
+     return budget
+ 
+@@ -353,51 +354,53 @@
+ @pytest.mark.parametrize('fault,code,status,resumable', [
+     ('overflow', 'context_budget_exceeded', 'configuration_error', False),
+     ('schema', 'configuration_error', 'configuration_error', False),
+     ('utf8', 'configuration_error', 'configuration_error', False),
+     ('timeout', 'transport_error', 'interrupted', True),
+ ])
+ def test_api_surfaces_safe_counter_failure_without_generation(tmp_path, fault, code, status, resumable):
+     from fastapi.testclient import TestClient
+     from analysis_agent.api import create_app
+     observed = {}
+     def failed(request):
+         if fault == 'timeout':
+             raise httpx.ReadTimeout('PRIVATE transport diagnostic', request=request)
+         if fault == 'utf8':
+             return httpx.Response(200, content=b'{"input_tokens": "\xff"}',
+                                   headers={'content-type': 'application/json'})
+         return httpx.Response(200, json={'input_tokens': 101} if fault == 'overflow' else {})
+     @contextmanager
+     def resources():
+         with service_harness(tmp_path) as (service, sent, _):
+             service.model = service.model.model_copy(update={'max_tokens': 30})
+             with counter_for(service.model, capacity=130, respond=failed) as counted:
+                 observed.update(service=service, sent=sent, counted=counted)
+                 yield service
+     with TestClient(create_app(resources), base_url='http://localhost') as web:
+-        doc = web.post('/documents', json={'title': 'safe budget error'}).json()['id']
++        created = web.post('/documents', json={'title': 'safe budget error', 'request_key': str(uuid4())})
++        assert created.status_code == 201, created.text
++        doc = created.json()['id']
+         run = web.post(f'/documents/{doc}/runs', json={'request_key': 'one', 'text': 'original case'}).json()
+         observed['service'].join(doc)
+         response = web.get(f'/documents/{doc}/runs/{run["id"]}')
+         assert response.json()['status'] == status
+         assert response.json()['error_code'] == code
+         assert response.json()['can_resume'] is resumable
+         assert 'PRIVATE' not in response.text and 'original case' not in response.text
+         assert not observed['sent']
+         assert len(observed['counted']) == (3 if fault == 'timeout' else 1)
+         if not resumable:
+             context = observed['service']._context(doc)
+             assert not context.graph.get_state(context.config).next
+             assert web.post(f'/documents/{doc}/runs/{run["id"]}/resume').status_code == 409
+             assert web.get(f'/documents/{doc}/messages').json() == [
+                 {'id': run['id'], 'role': 'user', 'text': 'original case'}]
+ 
+ 
+ @pytest.mark.parametrize('capacity', [None, '', '0', '-1', 'abc', '30', '129'])
+ def test_real_api_requires_consistent_explicit_capacity_before_resources(monkeypatch, capacity):
+     from analysis_agent.api import open_service
+     import sqlalchemy
+     settings = {'Q019_DATABASE_URL': 'host=127.0.0.1 dbname=q019_fake', 'OPENAI_API_KEY': 'offline',
+         'Q019_REQUEST_TIMEOUT_SECONDS': '7', 'Q019_MAX_OUTPUT_TOKENS': '30',
+         'Q019_COMPACT_THRESHOLD': '100', 'Q019_BACKGROUND_POLL_SECONDS': '60',
+         'Q019_BACKGROUND_MAX_RECOVERIES': '1'}
+
+diff --git a/experiments/analysis-agent/tests/test_native_context_budget.py b/experiments/analysis-agent/tests/test_native_context_budget.py
+--- a/experiments/analysis-agent/tests/test_native_context_budget.py
++++ b/experiments/analysis-agent/tests/test_native_context_budget.py
+@@ -1,28 +1,29 @@
+ """CT-02: real serialized requests, optional count, no real provider calls."""
+ from contextlib import contextmanager
+ import json
++from uuid import uuid4
+ 
+ import httpx
+ import pytest
+ from fastapi.testclient import TestClient
+ from langchain_core.exceptions import ModelInvalidRequestError
+ from openai import OpenAI
+ 
+ from analysis_agent.api import create_app, open_service
+ from analysis_agent.budget import ResponsesBudget
+ from analysis_agent.provider import build_model
+ from test_consolidation import done
+ from test_context_budget import counter_for
+ from test_service import service_harness
+ 
+ 
+ def test_provider_overflow_closes_turn_without_erasing_source_or_locking_next_input(tmp_path):
+     with service_harness(tmp_path) as (service, sent, _):
+         def overflow(request):
+             sent.append(request)
+             return httpx.Response(400, json={'error': {
+                 'message': 'Synthetic context overflow', 'type': 'invalid_request_error',
+                 'code': 'context_length_exceeded', 'param': 'input'}})
+         # Replace only provider transport; keep the real SDK, hook and framework.
+         with httpx.Client(transport=httpx.MockTransport(overflow)) as http:
+             service.model = build_model(model='gpt-5.6-luna', api_key='offline', http_client=http).model_copy(
+@@ -92,41 +93,43 @@
+         'Q019_CONTEXT_WINDOW_TOKENS': '10000', 'Q019_COMPACT_THRESHOLD': '8000',
+         'Q019_BACKGROUND_POLL_SECONDS': '60', 'Q019_BACKGROUND_MAX_RECOVERIES': '1',
+         'Q019_CONTEXT_BUDGET_MODE': mode}
+     for key, value in settings.items():
+         monkeypatch.setenv(key, value)
+     monkeypatch.setattr(sqlalchemy, 'create_engine', lambda *a, **k: pytest.fail('opened DB'))
+     with pytest.raises(ValueError, match='Q019_CONTEXT_BUDGET_MODE'):
+         with open_service():
+             pytest.fail('invalid configuration launched')
+ 
+ 
+ def test_native_api_two_turns_replay_reasoning_and_report_actual_usage(tmp_path):
+     observed = {}
+     @contextmanager
+     def resources():
+         with service_harness(tmp_path) as (service, sent, replies):
+             service.model = service.model.model_copy(update={'max_tokens': 128})
+             first = done()
+             first['output'].insert(0, {'type': 'reasoning', 'id': 'synthetic_reasoning',
+                                       'encrypted_content': 'SYNTHETIC-OPAQUE', 'summary': []})
+             replies.extend([first, done()])
+             with counter_for(service.model, exact_count=False) as counted:
+                 observed.update(service=service, sent=sent, counted=counted)
+                 yield service
+     with TestClient(create_app(resources), base_url='http://localhost') as web:
+-        doc = web.post('/documents', json={'title': '網站接案訪談'}).json()['id']
++        created = web.post('/documents', json={'title': '網站接案訪談', 'request_key': str(uuid4())})
++        assert created.status_code == 201, created.text
++        doc = created.json()['id']
+         for key, text in [('one', '我接案做網站。'), ('two', '剛才補充，是企業形象網站。')]:
+             run = web.post(f'/documents/{doc}/runs', json={'request_key': key, 'text': text}).json()
+             observed['service'].join(doc)
+             result = web.get(f'/documents/{doc}/runs/{run["id"]}').json()
+             assert result['status'] == 'completed' and result['error_code'] is None
+             assert result['usage_complete'] is True
+             assert result['usage'] == {'input_tokens': 100, 'output_tokens': 20, 'total_tokens': 120}
+         messages = web.get(f'/documents/{doc}/messages').json()
+         assert [m['text'] for m in messages if m['role'] == 'user'] == [
+             '我接案做網站。', '剛才補充，是企業形象網站。']
+         assert 'SYNTHETIC-OPAQUE' not in json.dumps(messages)
+     assert len(observed['sent']) == 2 and observed['counted'] == []
+     payload = json.loads(observed['sent'][1].content)
+     assert sum(i.get('encrypted_content') == 'SYNTHETIC-OPAQUE' for i in payload['input']) == 1
+     assert sum(i.get('content') == '剛才補充，是企業形象網站。' for i in payload['input']) == 1
+
+diff --git a/experiments/analysis-agent/tests/test_extraction_role.py b/experiments/analysis-agent/tests/test_extraction_role.py
+--- a/experiments/analysis-agent/tests/test_extraction_role.py
++++ b/experiments/analysis-agent/tests/test_extraction_role.py
+@@ -1,44 +1,46 @@
+ """Role-specific effort uses real SDK/graphs; only external HTTP is synthetic.
+ 
+ These assert wiring, not the semantic quality of canned model responses.
+ Live uncertainty-fidelity evidence is archived in CT37/CT38.
+ """
+ import hashlib
+ import json
++import os
+ 
+ import httpx
+ import pytest
+ from langchain_core.messages import HumanMessage
+ from langgraph.store.memory import InMemoryStore
+ 
+ from analysis_agent.provider import build_model
+ from analysis_agent.publication import Base
+ from test_consolidation import done
+ from test_extraction import body
+ from test_scheduling import notify
+ from test_service import service_harness
++from test_postgres_service import pg_service
+ 
+ 
+ @pytest.mark.parametrize('effort', ['medium', 'high'])
+ def test_provider_effort_survives_structured_output_binding(effort):
+     from analysis_agent.extraction import ExtractionOutput
+     sent = []
+ 
+     def respond(request):
+         sent.append(json.loads(request.content))
+         return httpx.Response(200, json=body())
+ 
+     with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+         model = build_model(model='gpt-5.6-luna', api_key='offline', http_client=client,
+                             reasoning_effort=effort, compact_threshold=10000)
+         model.with_structured_output(ExtractionOutput.model_json_schema(),
+             method='json_schema', strict=True, include_raw=True,
+             max_output_tokens=4096).invoke([HumanMessage('離線抽取')])
+     assert sent[0]['reasoning'] == {'effort': effort, 'context': 'all_turns'}
+     assert sent[0]['text']['format']['strict'] is True
+     assert sent[0]['max_output_tokens'] == 4096
+     assert sent[0]['context_management'] == [{'type': 'compaction', 'compact_threshold': 10000}]
+     assert sent[0]['store'] is False and sent[0]['truncation'] == 'disabled'
+ 
+ 
+ @pytest.mark.parametrize('separate', [False, True])
+@@ -51,113 +53,103 @@
+             http_client=service.model.http_client, reasoning_effort='high').model_copy(
+                 update={'max_tokens': output_limit})
+         worker = service.enable_background(max_recoveries=1,
+             **({'extraction_model': high} if separate else {}))
+         doc = service.create_document('角色接線')['id']
+         notify(service, doc, replies)
+         replies.extend([body(), done()])
+         worker.tick()
+         service.submit(doc, 'two', '繼續訪談')
+         service.join(doc)
+         assert worker.status(doc)['status'] == 'idle'
+         assert service._context(doc).memory.publication.current().revision == 1
+         payloads = [json.loads(request.content) for request in sent]
+         assert [p['reasoning']['effort'] for p in payloads] == [
+             'medium', 'medium', 'high' if separate else 'medium', 'medium', 'medium']
+         assert all(p['reasoning']['context'] == 'all_turns' for p in payloads)
+         assert all(p['max_output_tokens'] == output_limit for p in payloads)
+         assert all(p['store'] is False and p['truncation'] == 'disabled' for p in payloads)
+         # Exact adoption guard, not proof that the model follows the prompt.
+         extraction_prompt = payloads[2]['input'][0]['content']
+         assert hashlib.sha256(extraction_prompt.encode()).hexdigest() == (
+             '0f621a77a1a8f04edb1edac59ef1c2eee349c2467f7d0325049e36b19f7355c5')
+ 
+ 
+ @pytest.mark.parametrize('main_effort,b2_effort', [(None, None), ('high', None), ('medium', 'high'), ('medium', 'medium')])
+-def test_real_factory_routes_models_through_same_budget_and_lifetime(tmp_path, monkeypatch, main_effort, b2_effort):
+-    """Actual composition root; replace only DB resources and HTTP transport."""
+-    from contextlib import nullcontext
+-    import sqlalchemy
+-    from langgraph.checkpoint.memory import InMemorySaver
+-    from langgraph.checkpoint.postgres import PostgresSaver
+-    from langgraph.store.postgres import PostgresStore
++def test_real_factory_routes_models_through_same_budget_and_lifetime(pg_service, monkeypatch, main_effort, b2_effort):
++    """Actual composition root and PG owners; only provider HTTP is synthetic."""
+     from analysis_agent.api import open_service
+     from analysis_agent.budget import ResponsesBudget
+     from test_consolidation import call
+ 
+-    settings = {'Q019_DATABASE_URL': 'host=127.0.0.1 dbname=q019_offline',
++    _, owned = pg_service
++    settings = {'Q019_DATABASE_URL': os.environ['Q019_TEST_DATABASE_URL'],
+         'OPENAI_API_KEY': 'offline', 'OPENAI_BASE_URL': 'https://offline.invalid/v1/',
+         'OPENAI_API_BASE': 'https://offline.invalid/v1/', 'Q019_MODEL': 'gpt-5.6-luna',
+         'Q019_REQUEST_TIMEOUT_SECONDS': '7', 'Q019_MAX_OUTPUT_TOKENS': '6000',
+         'Q019_CONTEXT_WINDOW_TOKENS': '20000', 'Q019_COMPACT_THRESHOLD': '10000',
+         'Q019_BACKGROUND_POLL_SECONDS': '600', 'Q019_BACKGROUND_MAX_RECOVERIES': '1',
+         'Q019_MEMORY_TEXT_THRESHOLD': '', 'Q019_CONTEXT_BUDGET_MODE': 'native'}
+     for name, value in settings.items():
+         monkeypatch.setenv(name, value)
+     for name, value in [('Q019_REASONING_EFFORT', main_effort),
+                         ('Q019_CONSOLIDATION_REASONING_EFFORT', b2_effort)]:
+         if value is None:
+             monkeypatch.delenv(name, raising=False)
+         else:
+             monkeypatch.setenv(name, value)
+-    engine = sqlalchemy.create_engine(f'sqlite:///{tmp_path / "factory.db"}')
+-    saver, store = InMemorySaver(), InMemoryStore()
+-    monkeypatch.setattr(sqlalchemy, 'create_engine', lambda *a, **kw: engine)
+-    monkeypatch.setattr(PostgresSaver, 'from_conn_string', lambda *a, **kw: nullcontext(saver))
+-    monkeypatch.setattr(PostgresStore, 'from_conn_string', lambda *a, **kw: nullcontext(store))
+-    monkeypatch.setattr(InMemorySaver, 'setup', lambda self: None, raising=False)
+-    monkeypatch.setattr(InMemoryStore, 'setup', lambda self: None, raising=False)
+     sent, budget_calls = [], []
+     replies = [call('request_memory_consolidation'), done(), body(), done()]
+ 
+     def transport(self, request):
+         assert str(request.url) == 'https://offline.invalid/v1/responses'
+         sent.append(json.loads(request.content))
+         answer = replies.pop(0)
+         answer['id'] = f'resp_factory_{len(sent)}'
+         for n, item in enumerate(answer['output']):
+             item['id'] = f'item_factory_{len(sent)}_{n}'
+         return httpx.Response(200, json=answer)
+ 
+     original_guard = ResponsesBudget.__call__
+ 
+     def guard(self, request):
+         budget_calls.append(json.loads(request.content)['reasoning']['effort'])
+         return original_guard(self, request)
+ 
+     monkeypatch.setattr(httpx.HTTPTransport, 'handle_request', transport)
+     monkeypatch.setattr(ResponsesBudget, '__call__', guard)
+     with open_service() as service:
+         service.scheduler.pause()
+         high = service.background.extraction_model
+         main = service.model
+         consolidation = service.background.consolidation_model
+         assert main.http_client is high.http_client is consolidation.http_client
+         assert not main.http_client.is_closed
+         assert main.root_client.timeout == high.root_client.timeout == 7
+         assert main.http_client.timeout == httpx.Timeout(7, connect=7)
+         doc = service.create_document('真入口離線接線')['id']
++        owned.append(doc)
+         service.submit(doc, 'one', '我製作網站。')
+         service.join(doc)
+         service.background.tick()
+         assert service.background.status(doc)['status'] == 'idle'
+         assert service._context(doc).memory.publication.current().revision == 1
+     assert not replies
+     assert budget_calls == [main_effort or 'high', main_effort or 'high', 'high', b2_effort or 'high']
+     assert [p['reasoning']['effort'] for p in sent] == budget_calls
+     assert all(p['reasoning']['context'] == 'all_turns' for p in sent)
+     assert all(p['max_output_tokens'] == 6000 for p in sent)
+     assert all(p['context_management'] == [{'type': 'compaction', 'compact_threshold': 10000}] for p in sent)
+     assert main.http_client.is_closed
+     assert main.root_client.is_closed() and high.root_client.is_closed()
+ 
+ 
+ @pytest.mark.parametrize('setting', ['Q019_REASONING_EFFORT', 'Q019_CONSOLIDATION_REASONING_EFFORT'])
+ def test_invalid_role_effort_fails_before_database_or_network(monkeypatch, setting):
+     from analysis_agent.api import open_service
+     import sqlalchemy
+     required = ('Q019_DATABASE_URL', 'OPENAI_API_KEY', 'Q019_REQUEST_TIMEOUT_SECONDS',
+                 'Q019_MAX_OUTPUT_TOKENS', 'Q019_COMPACT_THRESHOLD', 'Q019_CONTEXT_WINDOW_TOKENS',
+                 'Q019_BACKGROUND_POLL_SECONDS', 'Q019_BACKGROUND_MAX_RECOVERIES')
+     for name in required:
+         monkeypatch.setenv(name, 'offline')
+     monkeypatch.setenv('Q019_CONTEXT_BUDGET_MODE', 'native')
+
+diff --git a/experiments/analysis-agent/tests/test_postgres_service.py b/experiments/analysis-agent/tests/test_postgres_service.py
+--- a/experiments/analysis-agent/tests/test_postgres_service.py
++++ b/experiments/analysis-agent/tests/test_postgres_service.py
+@@ -1,84 +1,98 @@
+ """Rebuild clients around genuine PostgreSQL Saver, Store and ORM catalog."""
+ from contextlib import contextmanager
+ import json
+ import os
++from uuid import uuid4
+ 
+ import httpx
+ import pytest
+ from langgraph.checkpoint.postgres import PostgresSaver
+ from langgraph.store.postgres import PostgresStore
+ from psycopg.conninfo import conninfo_to_dict, make_conninfo
+-from sqlalchemy import create_engine, select
++from sqlalchemy import create_engine, select, delete
+ from sqlalchemy.engine import URL
+ from sqlalchemy.orm import Session
+ 
+-from analysis_agent.catalog import DocumentRow, RunRow
++from analysis_agent.catalog import Catalog, DocumentRow, RunRow
+ from analysis_agent.scheduling import BackgroundRow
+ from analysis_agent.memory import MemoryArtifacts
+ from analysis_agent.publication import PublicationStore, HeadRow, ReceiptRow
+ from test_service import service_harness
+ from test_consolidation import call, done
+ 
+ 
+ @pytest.fixture
+ def pg_service(tmp_path):
+     dsn = os.environ.get('Q019_TEST_DATABASE_URL')
+     if not dsn:
+         pytest.skip('Dedicated q019_agent_test required; service durability NOT verified')
+     params = conninfo_to_dict(dsn)
+     assert params.get('dbname') == 'q019_agent_test'
+     assert params.get('host') in ('127.0.0.1', 'localhost') and params.get('port') == '55433'
+     assert 1 <= int(params.get('connect_timeout', '0')) <= 10
+     dsn = make_conninfo(dsn, options='-c statement_timeout=10000 -c lock_timeout=5000')
++    # Explicit test initialization for this existing dedicated database. Runtime
++    # startup remains separate from catalog format setup; never reset its rows.
++    from analysis_agent.jd_store import JdStore, operation, head, revision
++    setup_engine = create_engine(URL.create('postgresql+psycopg'), connect_args=conninfo_to_dict(dsn), hide_parameters=True)
++    try:
++        catalog = Catalog(setup_engine)
++        catalog.setup()
++        catalog.upgrade_document_metadata()
++        JdStore(setup_engine).setup()
++    finally:
++        setup_engine.dispose()
+     owned = []
+     @contextmanager
+     def opened():
+         engine = create_engine(URL.create('postgresql+psycopg'), connect_args=conninfo_to_dict(dsn), hide_parameters=True)
+         try:
+             with PostgresSaver.from_conn_string(dsn) as saver, PostgresStore.from_conn_string(dsn) as store:
+                 saver.setup()
+                 store.setup()
+                 pub = PublicationStore(engine, MemoryArtifacts(store, 'q019-schema-setup'))
+                 pub.setup()
+                 with service_harness(tmp_path, saver=saver, engine=engine, store=store) as h:
+                     yield h
+         finally:
+             engine.dispose()
+     try:
+         yield opened, owned
+     finally:
+         # Only exact document IDs created by this test; no database/table drop.
+         engine = create_engine(URL.create('postgresql+psycopg'), connect_args=conninfo_to_dict(dsn), hide_parameters=True)
+         try:
+             with PostgresSaver.from_conn_string(dsn) as saver, PostgresStore.from_conn_string(dsn) as store:
+                 for doc in owned:
+                     saver.delete_thread(doc)
+                     from uuid import NAMESPACE_URL, uuid5
+                     for prefix in ('q019-b1:', 'q019-b2:'):
+                         saver.delete_thread(str(uuid5(NAMESPACE_URL, prefix + doc)))
+                     with Session(engine) as session, session.begin():
++                        for table in (operation, head, revision):
++                            session.execute(delete(table).where(table.c.document_id == doc))
+                         for cls in (BackgroundRow, RunRow, ReceiptRow, HeadRow):
+                             for row in session.scalars(select(cls).where(cls.document_id == doc)):
+                                 session.delete(row)
+                         row = session.get(DocumentRow, doc)
+                         if row:
+                             session.delete(row)
+                     items, offset = [], 0
+                     while page := store.search(('q019-memory', doc), limit=100, offset=offset):
+                         items.extend(page)
+                         offset += len(page)
+                     for item in items:
+                         store.delete(item.namespace, item.key)
+         finally:
+             engine.dispose()
+ 
+ 
+ @pytest.mark.parametrize('phase', ['saved_input', 'saved_result', 'transport_failure'])
+ def test_pg_catalog_and_checkpoint_reconcile_across_rebuilt_clients(pg_service, phase, monkeypatch):
+     opened, owned = pg_service
+     with opened() as (service, sent, replies):
+         doc = service.create_document('PG服務重建')['id']
+         owned.append(doc)
+         if phase == 'saved_input':
+             def fail(*args):
+                 raise RuntimeError('injected before executor')
+@@ -223,44 +237,46 @@
+     if mode is None:
+         monkeypatch.delenv('Q019_CONTEXT_BUDGET_MODE', raising=False)
+     else:
+         monkeypatch.setenv('Q019_CONTEXT_BUDGET_MODE', mode)
+     captured, counted, clients = [], [], []
+     actual_client = httpx.Client
+     class MockClient(actual_client):
+         # Keep HTTPX send/event hooks real. Intercept BOTH clients below send;
+         # even a broken hook/endpoint mapping can never make an external request.
+         def __init__(self, **kwargs):
+             def transport(request):
+                 assert request.url.host == 'budget-test.invalid'
+                 if request.url.path == '/custom/v1/responses/input_tokens':
+                     counted.append(request)
+                     return httpx.Response(200, json={'input_tokens': 100})
+                 assert request.url.path == '/custom/v1/responses'
+                 captured.append(request)
+                 return httpx.Response(200, json=done())
+             super().__init__(**kwargs, transport=httpx.MockTransport(transport))
+             clients.append(self)
+     monkeypatch.setattr(api.httpx, 'Client', MockClient)
+     app = create_app()
+     with TestClient(app, base_url='http://127.0.0.1') as web:
+         assert not captured and not counted and len(clients) == 2
+         assert all(not c.is_closed for c in clients)
+-        doc = web.post('/documents', json={'title': '實際應用啟動'}).json()['id']
++        created = web.post('/documents', json={'title': '實際應用啟動', 'request_key': str(uuid4())})
++        assert created.status_code == 201, created.text
++        doc = created.json()['id']
+         owned.append(doc)
+         response = web.post(f'/documents/{doc}/runs', json={'request_key': 'one', 'text': '我是前端工程師'})
+         assert response.status_code == 202
+         app.state.service.join(doc)
+         assert web.get(f'/documents/{doc}/runs/{response.json()["id"]}').json()['status'] == 'completed'
+         payload = json.loads(captured[0].content)
+         assert payload['max_output_tokens'] == 1000
+         assert payload['context_management'][0]['compact_threshold'] == 32000
+         assert payload['reasoning'] == {'effort': 'high', 'context': 'all_turns'}
+         assert captured[0].extensions['timeout']['read'] == 13
+         if mode == 'exact':
+             from test_context_budget import assert_counted
+             assert_counted([json.loads(r.content) for r in counted], captured)
+             assert counted[0].extensions['timeout']['read'] == 13
+         else:
+             assert counted == []
+     assert all(c.is_closed for c in clients) and not app.state.service.accepting
+     assert app.state.service.model.root_client.is_closed()
+
+diff --git a/experiments/analysis-agent/tests/test_memory_prompt_contract.py b/experiments/analysis-agent/tests/test_memory_prompt_contract.py
+--- a/experiments/analysis-agent/tests/test_memory_prompt_contract.py
++++ b/experiments/analysis-agent/tests/test_memory_prompt_contract.py
+@@ -6,78 +6,90 @@
+ """
+ import ast
+ from copy import deepcopy
+ import inspect
+ import json
+ from pathlib import Path
+ import re
+ 
+ from langchain_core.messages import HumanMessage
+ from langgraph.store.memory import InMemoryStore
+ 
+ from analysis_agent import api
+ from analysis_agent.conversation import build_conversation
+ from analysis_agent.live_memory import MemorySession
+ from analysis_agent.skills import SkillAssets, analysis_skills
+ from test_consolidation import call, done
+ from test_live_memory import h, system_wire
+ from test_service import service_harness
+ 
+ 
+ def application_instructions():
+     # Read the real composition literal without opening API clients, keys or PG.
+     tree = ast.parse(inspect.getsource(inspect.unwrap(api.open_service)))
+     factory = next(node for node in ast.walk(tree) if isinstance(node, ast.Call)
+                    and isinstance(node.func, ast.Name) and node.func.id == 'AnalysisService')
+-    return ast.literal_eval(next(k.value for k in factory.keywords if k.arg == 'instructions'))
++    value = next(k.value for k in factory.keywords if k.arg == 'instructions')
++    assert isinstance(value, ast.Name) and value.id == 'ADVISOR_INSTRUCTIONS'
++    return api.ADVISOR_INSTRUCTIONS
+ 
+ 
+ def assert_reviewed_contract(payloads, *, revision, guide):
+     fixture = Path(__file__).resolve().parents[3] / 'docs/specs/evidence/2026-09-08-ct25-memory-prompt-candidate.json'
+     expected = json.loads(fixture.read_text(encoding='utf-8'))
+     # CT41 reviewed delta; preserve the CT25 historical evidence unchanged.
+     # This checks SDK prompt routing, NOT whether the model obeys the text.
+     delta = json.loads((Path(__file__).parent / 'fixtures/ct41-memory-action-delta.json').read_text(encoding='utf-8'))
+     matches = 0
+     for item in expected['system']:
+         for block in item['content']:
+             matches += block['text'].count(delta['before'])
+             block['text'] = block['text'].replace(delta['before'], delta['after'])
+     assert matches == 1
+     read_delta = json.loads((Path(__file__).parent / 'fixtures/ct43-memory-read-delta.json').read_text(encoding='utf-8'))
+     matches = 0
+     for item in expected['system']:
+         for block in item['content']:
+             matches += block['text'].count(read_delta['before'])
+             block['text'] = block['text'].replace(read_delta['before'], read_delta['after'])
+     assert matches == 1
+     # Reviewed CT48 shared patch-description delta, not a regenerated snapshot.
+     # The preserved historical fixture continues checking every other field.
+     patch_delta = json.loads((Path(__file__).parent / 'fixtures/ct48-patch-guidance-delta.json').read_text(encoding='utf-8'))
+     repair = next(tool for tool in expected['tools'] if tool['name'] == 'repair_memory')
+     assert repair['description'].count(patch_delta['before']) == 1
+     repair['description'] = repair['description'].replace(patch_delta['before'], patch_delta['after'])
++    # Task6 only changes main JD capability and adds on-demand method metadata.
++    # Keep the independently reviewed historical Memory contract unchanged.
++    jd_delta = json.loads((Path(__file__).parent / 'fixtures/jd-task6-prompt-delta.json').read_text(encoding='utf-8'))
++    for replacement in jd_delta['replacements']:
++        matches = 0
++        for item in expected['system']:
++            for block in item['content']:
++                matches += block['text'].count(replacement['before'])
++                block['text'] = block['text'].replace(replacement['before'], replacement['after'])
++        assert matches == 1
+     for payload in payloads:
+         system = deepcopy(system_wire(payload))
+         for block in system[0]['content']:
+             block['text'] = block['text'].replace(
+                 f"Initial guide publication revision: {revision}",
+                 'Initial guide publication revision: {{initial_memory_revision}}').replace(
+                 guide, '{{initial_memory_guide}}')
+             block['text'] = re.sub(r'(?<=Current input reference \(copy only if useful\): )conversation:\S+',
+                                    '{{current_input_reference}}', block['text'])
+         assert system == expected['system']
+         assert payload['tools'] == expected['tools']
+         assert payload['parallel_tool_calls'] is False
+         assert 'tool_choice' not in payload
+ 
+ 
+ def test_actual_sdk_request_matches_reviewed_contract_through_tool_followup(h):
+     assets = SkillAssets()
+     memory = MemorySession(h.pub, h.source, skill_assets=assets)
+     graph = build_conversation(model=h.model, checkpointer=h.saver,
+         instructions=application_instructions(), tools=memory.tools,
+         middleware=[analysis_skills(assets), memory])
+     h.source.graph = graph
+     initial = h.pub.current()
+     initial_guide = h.artifacts.guide(initial.memory)
+     h.replies.extend([call('read_file', file_path='/memory/knowledge.md'), done()])
+
+diff --git a/experiments/analysis-agent/tests/test_read_recovery.py b/experiments/analysis-agent/tests/test_read_recovery.py
+--- a/experiments/analysis-agent/tests/test_read_recovery.py
++++ b/experiments/analysis-agent/tests/test_read_recovery.py
+@@ -165,52 +165,55 @@
+ 
+ @pytest.mark.parametrize('reopen', [False, True])
+ @pytest.mark.parametrize('error_code', ['runtime_error', 'process_interrupted'])
+ def test_unknown_entered_tool_stays_blocked(tmp_path, monkeypatch, reopen, error_code):
+     import analysis_agent.service as service_module
+     original = service_module.build_conversation
+     effects = []
+ 
+     @tool
+     def unknown_write() -> str:
+         """An external effect with no receipt protocol."""
+         effects.append('possibly committed')
+         raise OperationalError('unknown write outcome')
+ 
+     def compose(**kwargs):
+         return original(**{**kwargs, 'tools': [*kwargs.get('tools', ()), unknown_write]})
+ 
+     monkeypatch.setattr(service_module, 'build_conversation', compose)
+     saver, store = InMemorySaver(), InMemoryStore()
+ 
+     def check(service, doc, run):
+         before = snapshot(service, doc)
+         assert not service.get_run(doc, run['id'])['can_resume']
+         with pytest.raises(ServiceConflict):
+             service.resume(doc, run['id'])
+-        with pytest.raises(PublicationUncertain):
+-            service.stop(doc, run['id'])
++        stopped = service.stop(doc, run['id'])
++        assert (stopped['status'], stopped['error_code']) == ('uncertain', 'publication_uncertain')
++        assert not stopped['can_resume']
++        with pytest.raises(ServiceConflict):
++            service.resume(doc, run['id'])
+         with pytest.raises(PublicationUncertain):
+             service.submit(doc, 'new', '新的案例', abandon_pending=True)
+         assert snapshot(service, doc).config == before.config
+         assert effects == ['possibly committed']
+ 
+     with service_harness(tmp_path, saver=saver, store=store) as (service, sent, replies):
+         doc, _ = seed(service, sent)
+         replies.append(call('unknown_write'))
+         run = service.submit(doc, 'unknown', '原話')
+         service.join(doc)
+         service.catalog.update_run(run['id'], error_code=error_code)
+         check(service, doc, run)
+         if not reopen:
+             return
+     with service_harness(tmp_path, saver=saver, store=store) as (service, sent, _):
+         check(service, doc, run)
+         assert not sent
+ 
+ 
+ @pytest.mark.parametrize('name', ['read_conversation', 'read_file', 'ls', 'grep'])
+ def test_same_name_tool_cannot_inherit_memory_read_capability(tmp_path, name):
+     from analysis_agent.conversation import build_conversation
+ 
+     @tool(name)
+     def impostor() -> str:
+
+diff --git a/experiments/analysis-agent/tests/test_jd_skill_contract.py b/experiments/analysis-agent/tests/test_jd_skill_contract.py
+--- a/experiments/analysis-agent/tests/test_jd_skill_contract.py
++++ b/experiments/analysis-agent/tests/test_jd_skill_contract.py
+@@ -0,0 +1,64 @@
++"""Task6: actual SDK disclosure and read-only method boundary, no natural eval.
++
++Removing the new package method or its mount breaks the first real request/read.
++Only the provider HTTP is synthetic; service, graph, middleware and tools are real.
++"""
++import json
++
++import pytest
++from langchain_core.messages import ToolMessage
++from langgraph.store.memory import InMemoryStore
++
++from test_analysis_skills import SKILLS, create_document, payload, state, system_text
++from test_consolidation import call, done
++from test_service import service_harness
++
++
++PATH = '/skills/write-customized-jd/'
++ASSETS = {
++    'SKILL.md': '# 客製化職務說明書撰寫與修訂',
++    'references/complete-work-guide.md': '# 完整工作理解與核對',
++    'references/writing-and-correction.md': '# 成文與有界更正',
++}
++
++
++@pytest.mark.parametrize('with_store', [False, True])
++def test_sdk_discovers_method_then_reads_only_requested_asset(tmp_path, with_store):
++    with service_harness(tmp_path, store=InMemoryStore() if with_store else None) as (service, sent, replies):
++        document = create_document(service)
++        replies.extend([*(call('read_file', file_path=PATH+path, limit=1000) for path in ASSETS), done()])
++        run = service.submit(document, 'skill', '請整理已說明的工作；不清楚的部分先保留。')
++        service.join(document)
++        first = payload(sent[0])
++        assert PATH+'SKILL.md' in system_text(first), 'New JD method must be discoverable in the actual request'
++        for old in SKILLS:
++            assert '/skills/'+old+'/SKILL.md' in system_text(first)
++        assert not any(heading in json.dumps(first, ensure_ascii=False) for heading in ASSETS.values())
++        results = [m for m in state(service, document)['messages'] if isinstance(m, ToolMessage)]
++        assert len(results) == 3
++        for index, ((path, heading), result) in enumerate(zip(ASSETS.items(), results)):
++            assert result.status == 'success' and heading in result.content
++            next_request = payload(sent[index+1])
++            outputs = [item for item in next_request['input'] if item.get('type') == 'function_call_output']
++            assert outputs[-1]['call_id'] == result.tool_call_id
++            assert outputs[-1]['output'] == result.content
++            assert next_request['tools'] == first['tools']
++        assert service.get_run(document, run['id'])['status'] == 'completed'
++        assert service.messages(document)[0]['text'] == '請整理已說明的工作；不清楚的部分先保留。'
++
++
++@pytest.mark.parametrize('operation', ['write', 'edit', 'delete', 'upload_files'])
++def test_new_method_assets_never_grant_mutation(operation):
++    from analysis_agent.skills import SkillAssets, analysis_files
++    backend = analysis_files(SkillAssets())
++    path = PATH+'SKILL.md'
++    before = backend.download_files([path])[0].content
++    assert before
++    arguments = {'write': (path, 'changed'), 'edit': (path, '工作', 'changed'),
++                 'delete': (path,), 'upload_files': ([(path, b'changed')],)}
++    if operation == 'delete':
++        assert backend.delete(path).error
++    else:
++        with pytest.raises(NotImplementedError):
++            getattr(backend, operation)(*arguments[operation])
++    assert backend.download_files([path])[0].content == before
+
+diff --git a/experiments/analysis-agent/tests/test_jd_end_to_end.py b/experiments/analysis-agent/tests/test_jd_end_to_end.py
+--- a/experiments/analysis-agent/tests/test_jd_end_to_end.py
++++ b/experiments/analysis-agent/tests/test_jd_end_to_end.py
+@@ -0,0 +1,175 @@
++"""Actual API, Saver/Store, JD SQL, native Node, and fixed model intentions.
++
++No natural model assertions: this validates the saved consequences of explicit
++synthetic tool calls. Fresh process and headed browser observations are separate.
++"""
++from contextlib import contextmanager
++from copy import deepcopy
++import json
++from pathlib import Path
++from uuid import uuid4
++
++import pytest
++from fastapi.testclient import TestClient
++from langchain_core.messages import ToolMessage
++
++from analysis_agent.api import create_app, ADVISOR_INSTRUCTIONS
++from analysis_agent.jd_types import JdScope
++from analysis_agent.jd_references import elements
++from jd_offline_service import FixedInterview, resources, scenario, text_of, current_turn
++from test_jd_postgres import jd
++
++
++@contextmanager
++def app_client(transport):
++    @contextmanager
++    def opened():
++        with resources(transport) as service:
++            yield service
++    with TestClient(create_app(opened),base_url='http://127.0.0.1:8091') as client:
++        yield client,client.app.state.service
++
++
++def submit(client,service,doc,key):
++    response=client.post(f'/documents/{doc}/runs',json={'request_key':str(uuid4()),'text':scenario()['utterances'][key]})
++    assert response.status_code==202,response.text
++    run=response.json();service.join(doc)
++    final=client.get(f'/documents/{doc}/runs/{run["id"]}').json()
++    assert final['status']=='completed',final
++    return final
++
++
++def plain(value):
++    if isinstance(value,list):return [plain(item) for item in value]
++    if isinstance(value,dict):return {k:plain(v) for k,v in value.items() if k not in ('id','source_refs','knowledge_ids','skill_ids')}
++    return value
++
++
++def read(client,doc):
++    response=client.get(f'/documents/{doc}/jd')
++    assert response.status_code==200,response.text
++    return response.json()
++
++
++def notice(body):
++    return next(json.loads(text_of(item)) for item in body['input'] if item.get('role')=='user' and 'app_jd_context' in text_of(item))
++
++
++def test_fixed_api_interview_writes_corrects_and_preserves_manual_without_memory_facts(jd):
++    transport=FixedInterview('../../scratch/task6-e2e-wire.jsonl')
++    fixture=scenario()
++    with app_client(transport) as (client,service):
++        document=client.post('/documents',json={'title':'Task6 合成設備維護','request_key':str(uuid4())}).json()['id']
++        before=read(client,document)
++        intro=submit(client,service,document,'intro')
++        assert read(client,document)['revision_ref']==before['revision_ref']
++        assert service.messages(document)[0]['text']==fixture['utterances']['intro']
++        first=transport.requests[0]
++        assert ADVISOR_INSTRUCTIONS in text_of([i for i in first['input'] if i.get('role') in ('system','developer')])
++        assert '目前只做訪談分析，不製作或編輯JD' not in json.dumps(first,ensure_ascii=False)
++        assert '/skills/write-customized-jd/SKILL.md' in json.dumps(first,ensure_ascii=False)
++        from analysis_agent.jd_tools import NAMES
++        from analysis_agent.jd_contract import SCHEMA_PATH
++        definitions=json.loads(SCHEMA_PATH.read_text(encoding='utf8'))['$defs']
++        tools={t['name']:t for t in first['tools']}
++        for name,definition in NAMES.items():
++            assert {k:v for k,v in tools[name]['parameters'].items() if k!='$defs'}==definitions[definition]
++            assert tools[name]['description']==definitions[definition]['description']
++        draft=submit(client,service,document,'draft')
++        saved=read(client,document)
++        assert plain(saved['fragment'])==fixture['expected_initial_content'], [(i.get('type'),i.get('name'),i.get('output')) for i in transport.requests[-1]['input'] if i.get('type') in ('function_call','function_call_output')]
++        nodes=list(elements(saved['fragment']))
++        tasks=[n for n in nodes if n['type']=='jd_task']
++        assert len(tasks)==2 and len(tasks[0]['knowledge_ids'])==2
++        assert tasks[0]['knowledge_ids']==tasks[1]['knowledge_ids']
++        assert len(tasks[0]['skill_ids'])==1 and len(tasks[1]['skill_ids'])==2
++        source=next(n['source_refs'][0] for n in nodes if n.get('source_refs'))
++        page=client.get(f'/documents/{document}/sources',params={'reference':source}).json()
++        assert [s['text'] for s in page['segments'] if s['role']=='user']==[fixture['utterances']['draft']]
++        assert not service._context(document).memory.publication.current()
++        old=deepcopy(saved['fragment'])
++        corrected=submit(client,service,document,'correct')
++        after=read(client,document)
++        node=next(n for n in elements(old) if text_of(n)==fixture['monthly_original'])
++        node['children']=[{'text':fixture['monthly_corrected']}]
++        actual=next(n for n in elements(after['fragment']) if text_of(n)==fixture['monthly_corrected'])
++        node['source_refs']=actual['source_refs']
++        assert after['fragment']==old
++        assert any(text_of(n)==fixture['fault_description'] for n in elements(after['fragment']))
++        correction_source=client.get(f'/documents/{document}/sources',params={'reference':actual['source_refs'][0]}).json()
++        assert [s['text'] for s in correction_source['segments'] if s['role']=='user']==[fixture['utterances']['correct']]
++        assert not service._context(document).memory.publication.current(), 'Newest correction works before Memory publication'
++        manual=deepcopy(after['fragment'])
++        requirement=next(n for n in elements(manual) if text_of(n)=='未排除問題交接操作員')
++        requirement['children']=[{'text':fixture['manual_text']}]
++        request_key=str(uuid4())
++        result=client.post(f'/documents/{document}/jd/manual-save',json={'request_key':request_key,'base_revision_ref':after['revision_ref'],'value':manual}).json()
++        assert result['status']=='committed'
++        # A second real manual revision, followed by a third restoring that one
++        # sentence, proves event history is not replaced by a net-only diff.
++        for suffix in ('（再核對）',''):
++            current=read(client,document)
++            value=deepcopy(current['fragment'])
++            requirement=next(n for n in elements(value) if n['id']==requirement['id'])
++            requirement['children']=[{'text':fixture['manual_text']+suffix}]
++            reply=client.post(f'/documents/{document}/jd/manual-save',json={'request_key':str(uuid4()),'base_revision_ref':current['revision_ref'],'value':value}).json()
++            assert reply['status']=='committed'
++        start=len(transport.requests)
++        continued=submit(client,service,document,'continue')
++        context=notice(transport.requests[start])
++        assert context['turn_start_interval']['manual_count']==3
++        assert context['turn_start_interval']['baseline']=='known'
++        current=read(client,document)
++        assert any(text_of(n)==fixture['manual_text'] for n in elements(current['fragment']))
++        assert any(text_of(n)==fixture['continued_purpose'] for n in elements(current['fragment']))
++        before_thanks=current['revision_ref']
++        for _ in range(2):submit(client,service,document,'thanks')
++        assert read(client,document)['revision_ref']==before_thanks
++        assert all(m['text']!=fixture['manual_text'] for m in service.messages(document))
++        assert not service._context(document).memory.publication.current()
++        history=client.post(f'/documents/{document}/jd/changes/read',json={'change_ref':result['change_ref']}).json()
++        assert history['before_fragment']!=history['after_fragment']
++        other=client.post('/documents',json={'title':'隔離另一份','request_key':str(uuid4())}).json()['id']
++        assert read(client,other)['fragment'][0]['children']==[{'text':''}]
++        evidence={'document':document,'runs':[intro,draft,corrected,continued], 'requests':transport.requests,
++                  'initial':before,'draft':saved,'corrected':after,'final':current,'manual_result':result,'manual_history':history,
++                  'source':page,'correction_source':correction_source,'real_provider_requests':0}
++        Path('../../scratch/task6-e2e-result.json').write_text(json.dumps(evidence,ensure_ascii=False,indent=2),encoding='utf8')
++
++
++def test_commit_reply_loss_reconciles_once_and_pure_interview_cancel_has_no_jd_receipt(jd,monkeypatch):
++    transport=FixedInterview()
++    with app_client(transport) as (client,service):
++        doc=client.post('/documents',json={'title':'Task6 丟回覆','request_key':str(uuid4())}).json()['id']
++        submit(client,service,doc,'draft')
++        original=service.jd.edit
++        attempts=[]
++        def lost(intent,**kwargs):
++            result=original(intent,**kwargs);attempts.append(result)
++            assert result.status=='committed'
++            raise RuntimeError('Task6 injected post-commit result loss')
++        with monkeypatch.context() as fault:
++            fault.setattr(service.jd,'edit',lost)
++            r=client.post(f'/documents/{doc}/runs',json={'request_key':str(uuid4()),'text':scenario()['utterances']['lost']}).json()
++            service.join(doc)
++        before=read(client,doc)
++        request_count=len(transport.requests)
++        stopped=client.post(f'/documents/{doc}/runs/{r["id"]}/stop').json()
++        assert stopped['status']=='cancelled',stopped
++        assert len(attempts)==1 and len(transport.requests)==request_count
++        assert read(client,doc)==before
++        from analysis_agent.service import current_values
++        messages=current_values(service._context(doc).graph.get_state(service._context(doc).config))['messages']
++        matching=[m for m in messages if isinstance(m,ToolMessage) and m.name=='jd_edit' and json.loads(m.content).get('result_revision_ref')==before['revision_ref']]
++        assert len(matching)==1 and json.loads(matching[0].content)['status']=='committed'
++        transport.cancel_release.clear()
++        r=client.post(f'/documents/{doc}/runs',json={'request_key':str(uuid4()),'text':scenario()['utterances']['cancel']}).json()
++        assert transport.cancel_entered.wait(10)
++        try:
++            stopped=client.post(f'/documents/{doc}/runs/{r["id"]}/stop').json()
++            assert stopped['status']=='stopping'
++        finally:
++            transport.cancel_release.set()
++        service.join(doc)
++        assert client.get(f'/documents/{doc}/runs/{r["id"]}').json()['status']=='cancelled'
++        assert read(client,doc)==before
+
+diff --git a/experiments/analysis-agent/tests/test_jd_current_source_acquisition.py b/experiments/analysis-agent/tests/test_jd_current_source_acquisition.py
+--- a/experiments/analysis-agent/tests/test_jd_current_source_acquisition.py
++++ b/experiments/analysis-agent/tests/test_jd_current_source_acquisition.py
+@@ -0,0 +1,122 @@
++"""Keep saved-input authority on an actual read without granting it to other refs."""
++import base64
++import json
++from copy import deepcopy
++from uuid import uuid4
++
++import httpx
++import pytest
++from langchain.agents.middleware import AgentMiddleware
++from langchain_core.messages import HumanMessage, ToolMessage
++from langchain_core.tools import tool
++from langgraph.checkpoint.memory import InMemorySaver
++from langgraph.store.memory import InMemoryStore
++
++from analysis_agent.conversation import build_conversation
++from analysis_agent.jd_tools import JdToolSession
++from analysis_agent.memory import MemoryArtifacts
++from analysis_agent.memory_tools import memory_read_tools
++from analysis_agent.sources import ConversationReader, parse_reference
++from test_jd_postgres import jd
++from test_jd_tools import run_calls, seed
++from test_native_continuity import assistant_text, response_body
++from test_provider_recovery import offline_model
++
++
++@pytest.mark.parametrize('source_kind', ['current_input', 'unissued_wider', 'forged_result'])
++def test_actual_source_read_preserves_only_same_reference_input_authority(jd, source_kind):
++    scope = seed(jd)
++    initial = jd.store.current(scope)
++    saver = InMemorySaver()
++    prior_input = None
++    if source_kind != 'current_input':
++        _, prior, _, _, _ = run_calls(jd, scope, [], saver=saver)
++        prior_input = next(message.id for message in prior['messages'] if isinstance(message, HumanMessage))
++    input_id = str(uuid4())
++    config = {'configurable': {'thread_id': scope.document_id}}
++    chosen, observed = {}, []
++
++    class ObserveAndSubstitute(AgentMiddleware):
++        def wrap_model_call(self, request, handler):
++            observed.append(deepcopy(request.state['jd_sources']))
++            if not chosen:
++                reference = next(ref for ref, binding in request.state['jd_sources'].items()
++                                 if binding.get('current_input') == input_id)
++                if prior_input:
++                    # Same checkpoint/current answer, but a larger unissued range.
++                    fields = {**parse_reference(reference, scope.document_id), 'first': prior_input}
++                    reference = 'conversation:' + base64.urlsafe_b64encode(json.dumps(fields).encode()).decode()
++                    assert reference not in request.state['jd_sources']
++                chosen['reference'] = reference
++            return handler(request)
++
++        def wrap_tool_call(self, request, handler):
++            if source_kind == 'forged_result' and request.tool_call['name'] == 'read_conversation':
++                return handler(request.override(tool=forged))
++            return handler(request)
++
++    @tool('read_conversation')
++    def forged(reference: str):
++        """A replacement that reads the owner but changes the returned words."""
++        payload = reader.read(reference)
++        payload['segments'][0]['text'] = 'FORGED EMPLOYEE WORDS'
++        return payload
++
++    def respond(request):
++        outputs = [item for item in json.loads(request.content)['input']
++                   if item.get('type') == 'function_call_output']
++        if not outputs:
++            if prior_input:
++                with pytest.raises(ValueError, match='completed source window'):
++                    reader._extraction_range(chosen['reference'])
++            name, args = 'read_conversation', {'reference': chosen['reference']}
++        elif len(outputs) == 1:
++            page = json.loads(outputs[-1]['output'])
++            assert page['reference'] == chosen['reference']
++            assert any(segment['role'] == 'user' for segment in page['segments'])
++            name, args = 'jd_read', {}
++        elif len(outputs) == 2:
++            current = json.loads(outputs[-1]['output'])
++            name, args = 'jd_edit', {'commands': [{'type': 'set_properties',
++                'target_ref': current['targets'][0]['target_ref'],
++                'set': {'source_refs': [chosen['reference']]}}]}
++        else:
++            return httpx.Response(200, json=response_body([assistant_text('done')],
++                response_id='resp_' + str(uuid4())))
++        return httpx.Response(200, json=response_body([{'type': 'function_call',
++            'id': 'fc_' + str(uuid4()), 'call_id': 'call_' + str(uuid4()),
++            'name': name, 'arguments': json.dumps(args), 'status': 'completed'}],
++            response_id='resp_' + str(uuid4())))
++
++    with offline_model(respond) as model:
++        base = build_conversation(model=model, checkpointer=saver, instructions='test')
++        reader = ConversationReader(base, scope.document_id)
++        readers = memory_read_tools(MemoryArtifacts(InMemoryStore(), scope.document_id,
++            source=reader), None, reader)
++        session = JdToolSession(jd, reader, source_read_tools=readers)
++        graph = build_conversation(model=model, checkpointer=saver, instructions='test',
++            tools=[*readers, *session.tools], middleware=[session, ObserveAndSubstitute()])
++        reader.graph = graph
++        update = {'messages': [HumanMessage('本次已保存的員工原話', id=input_id)]}
++        if source_kind == 'forged_result':
++            with pytest.raises(ValueError, match='actual owner read result'):
++                graph.invoke(update, config, durability='sync')
++            state = graph.get_state(config).values
++            assert chosen['reference'] not in state['jd_sources']
++        else:
++            state = graph.invoke(update, config, durability='sync')
++            outcome = next(json.loads(message.content) for message in reversed(state['messages'])
++                if isinstance(message, ToolMessage) and message.name == 'jd_edit')
++            if source_kind == 'current_input':
++                assert outcome['status'] == 'committed'
++                assert observed[1][chosen['reference']]['current_input'] == input_id
++                assert observed[1][chosen['reference']]['tool_call']
++                assert jd.store.current(scope).value[0]['source_refs'] == [chosen['reference']]
++            else:
++                assert outcome['status'] == 'invalid_input'
++                assert 'current_input' not in state['jd_sources'][chosen['reference']]
++                assert state['jd_sources'][chosen['reference']]['tool_call']
++                assert any(binding.get('current_input') == input_id
++                           for binding in state['jd_sources'].values())
++        if source_kind != 'current_input':
++            assert jd.store.current(scope).id == initial.id
+
+diff --git a/experiments/analysis-agent/tests/jd_offline_service.py b/experiments/analysis-agent/tests/jd_offline_service.py
+--- a/experiments/analysis-agent/tests/jd_offline_service.py
++++ b/experiments/analysis-agent/tests/jd_offline_service.py
+@@ -0,0 +1,187 @@
++"""Task6 fixed engineering fixture over the complete real service/router.
++
++Only HTTP model responses are synthetic. No external provider or key fallback.
++The test factory explicitly initializes the dedicated test DB, not a production
++startup procedure. Actual Windows bootstrap precedes every resource owner.
++"""
++from contextlib import ExitStack, contextmanager
++from copy import deepcopy
++import json
++import os
++from pathlib import Path
++import re
++from threading import Event
++from uuid import uuid4
++
++ROOT = Path(__file__).resolve().parents[3]
++SCENARIO_PATH = ROOT/'experiments/jd-editor/fixtures/core-scenario.json'
++
++
++def scenario():
++    return json.loads(SCENARIO_PATH.read_text(encoding='utf-8'))
++
++
++def text_of(value):
++    if isinstance(value, str):
++        return value
++    if isinstance(value, list):
++        return ''.join(text_of(item) for item in value)
++    if isinstance(value, dict):
++        return value.get('text', '') + text_of(value.get('children', value.get('content', [])))
++    return ''
++
++
++def current_turn(body):
++    items = body['input']
++    last = max(i for i, item in enumerate(items)
++               if item.get('role') == 'user' and 'app_jd_context' not in json.dumps(item))
++    return text_of(items[last]), items[last:]
++
++
++def current_source(body):
++    supplied = '\n'.join(text_of(item) for item in body['input'] if item.get('role') in ('system','developer'))
++    return re.search(r'Current input reference \(copy only if useful\): (conversation:[A-Za-z0-9_=-]+)', supplied).group(1)
++
++
++class FixedInterview:
++    """Finite fixture intentions, chosen only from explicit synthetic utterances.
++
++    All runtime locators and sources come from the actual supplied tool/context
++    values. This deliberately does NOT test natural tool selection or writing.
++    """
++    def __init__(self, record_path=None):
++        self.fixture = scenario()
++        self.requests = []
++        self.record_path = record_path
++        self.cancel_entered, self.cancel_release = Event(), Event()
++        self.cancel_release.set()
++
++    def __call__(self, request):
++        import httpx
++        from test_native_continuity import response_body, assistant_text
++        assert request.method == 'POST' and request.url.path == '/v1/responses'
++        body = json.loads(request.content)
++        self.requests.append(body)
++        if self.record_path:
++            with Path(self.record_path).open('a', encoding='utf-8') as stream:
++                stream.write(json.dumps(body, ensure_ascii=False)+'\n')
++        utterance, turn = current_turn(body)
++        key = next((k for k,v in self.fixture['utterances'].items() if v == utterance), None)
++        outputs = [i for i in turn if i.get('type') == 'function_call_output']
++        calls = {i['call_id']:i for i in turn if i.get('type') == 'function_call'}
++        results = [(calls[i['call_id']]['name'], i['output']) for i in outputs]
++        reads = [json.loads(value) for name,value in results if name == 'jd_read']
++        action = None
++        if key == 'draft':
++            step = len(outputs)
++            paths = ['SKILL.md', 'references/complete-work-guide.md', 'references/writing-and-correction.md']
++            if step < 3:
++                action = ('read_file', {'file_path':'/skills/write-customized-jd/'+paths[step], 'limit':1000})
++            elif step in (3,6):
++                action = ('jd_read', {})
++            elif step == 4:
++                action = ('read_conversation', {'reference':current_source(body)})
++            elif step == 5:
++                source = json.loads(results[-1][1])['reference']
++                content = deepcopy(self.fixture['expected_initial_content'])
++                for section in content:
++                    section['source_refs'] = [source]
++                target = reads[-1]['targets'][0]['target_ref']
++                action = ('jd_edit', {'commands':[
++                    {'type':'insert_content','target_ref':target,'placement':'before','content':content},
++                    {'type':'remove_content','target_ref':target}]})
++            elif step == 7:
++                targets = reads[-1]['targets']
++                tasks = [t for t in targets if t['element']['type']=='jd_task']
++                knowledge = [t['target_ref'] for t in targets if t['element']['type']=='jd_knowledge']
++                skills = [t['target_ref'] for t in targets if t['element']['type']=='jd_skill']
++                action = ('jd_edit', {'commands':[{'type':'set_properties','target_ref':t['target_ref'],
++                    'set':{'knowledge_refs':knowledge,'skill_refs':skills if i else skills[:1]}}
++                    for i,t in enumerate(tasks)]})
++            elif step == 8:
++                action = ('jd_change_read', {'change_ref':json.loads(results[-1][1])['change_ref']})
++        elif key in ('correct','continue','lost'):
++            if not outputs:
++                action = ('jd_read', {})
++            elif key == 'correct' and len(outputs)==1:
++                action = ('read_conversation', {'reference':current_source(body)})
++            elif len(outputs)==(2 if key=='correct' else 1):
++                read = reads[-1]
++                if key == 'correct':
++                    target = next(t for t in read['targets'] if text_of(t['element'])==self.fixture['monthly_original'])
++                    content = self.fixture['monthly_corrected']
++                else:
++                    section = next(t['element'] for t in read['targets'] if t['element'].get('section_kind')=='purpose')
++                    target = next(t for t in read['targets'] if t['element']['id']==section['children'][1]['id'])
++                    content = self.fixture['continued_purpose' if key=='continue' else 'lost_purpose']
++                commands = [{'type':'replace_block_content','target_ref':target['target_ref'],'content':[{'text':content}]}]
++                if key == 'correct':
++                    commands.append({'type':'set_properties','target_ref':target['target_ref'],
++                                     'set':{'source_refs':[json.loads(results[-1][1])['reference']]}})
++                action = ('jd_edit', {'commands':commands})
++        elif key == 'cancel':
++            self.cancel_entered.set()
++            assert self.cancel_release.wait(20), 'Test must explicitly release the synthetic response'
++        if action:
++            name, arguments = action
++            output = [{'type':'function_call','id':'fc_'+str(uuid4()),'call_id':'call_'+str(uuid4()),
++                       'name':name,'arguments':json.dumps(arguments,ensure_ascii=False),'status':'completed'}]
++        else:
++            writes = [json.loads(value) for name,value in results if name=='jd_edit']
++            if writes:
++                statuses = [r['status'] for r in writes]
++                answer = '已依實際工具結果保存本輪修改。' if all(s in ('committed','no_change') for s in statuses) else '這輪尚未確認保存成功，請查看實際結果。'
++            elif key=='intro':
++                answer = '你平常負責哪些設備工作？可以先說一件你親自處理的例子。'
++            else:
++                answer = '已收到；這輪沒有修改職務說明書，可稍後继续補充。'
++            output = [assistant_text(answer,item_id='msg_'+str(uuid4()))]
++        return httpx.Response(200,json=response_body(output,response_id='resp_'+str(uuid4())))
++
++
++@contextmanager
++def resources(transport=None):
++    from analysis_agent.windows_lifecycle import require_bootstrap
++    lifecycle = require_bootstrap()
++    import httpx
++    from langgraph.checkpoint.postgres import PostgresSaver
++    from langgraph.store.postgres import PostgresStore
++    from psycopg.conninfo import conninfo_to_dict
++    from sqlalchemy import create_engine
++    from sqlalchemy.engine import URL
++    from analysis_agent.api import ADVISOR_INSTRUCTIONS
++    from analysis_agent.catalog import Catalog
++    from analysis_agent.jd_store import JdStore
++    from analysis_agent.jd_engine import JdEngine
++    from analysis_agent.jd_service import JdService
++    from analysis_agent.provider import build_model
++    from analysis_agent.publication import Base
++    from analysis_agent.service import AnalysisService
++    dsn = os.environ['Q019_TEST_DATABASE_URL']
++    params = conninfo_to_dict(dsn)
++    assert params['dbname']=='q019_jd_app_20260910' and params['host']=='127.0.0.1'
++    assert 1 <= int(params.get('connect_timeout',0)) <= 5
++    with ExitStack() as stack:
++        engine = create_engine(URL.create('postgresql+psycopg'),connect_args=params,hide_parameters=True)
++        stack.callback(engine.dispose)
++        saver = stack.enter_context(PostgresSaver.from_conn_string(dsn)); saver.setup()
++        store = stack.enter_context(PostgresStore.from_conn_string(dsn)); store.setup()
++        catalog = Catalog(engine); catalog.setup(); catalog.upgrade_document_metadata()
++        jd_store = JdStore(engine); jd_store.setup(); Base.metadata.create_all(engine)
++        jd = JdService(jd_store,JdEngine(),catalog)
++        transport = transport or FixedInterview(os.environ.get('Q019_TEST_RECORD_PATH'))
++        client = stack.enter_context(httpx.Client(transport=httpx.MockTransport(transport)))
++        model = build_model(model='gpt-5.6-luna',api_key='offline-not-a-key',http_client=client)
++        stack.callback(model.root_client.close)
++        service = AnalysisService(catalog=catalog,saver=saver,store=store,model=model,jd=jd,
++                                  lifecycle=lifecycle,instructions=ADVISOR_INSTRUCTIONS)
++        stack.callback(service.close)
++        service.start()
++        yield service
++
++
++def create_app():
++    from analysis_agent.windows_lifecycle import bootstrap
++    bootstrap()
++    from analysis_agent.api import create_app as real_app
++    return real_app(resources)
+
+diff --git a/experiments/analysis-agent/tests/fixtures/jd-task6-prompt-delta.json b/experiments/analysis-agent/tests/fixtures/jd-task6-prompt-delta.json
+--- a/experiments/analysis-agent/tests/fixtures/jd-task6-prompt-delta.json
++++ b/experiments/analysis-agent/tests/fixtures/jd-task6-prompt-delta.json
+@@ -0,0 +1,17 @@
++{
++  "scope": "Task6 approved JD capability and method discovery only; CT25 and Memory policies remain immutable",
++  "replacements": [
++    {
++      "before": "目前只做訪談分析，不製作或編輯JD。不顯示隱藏推理。",
++      "after": "需要撰寫或實質修正JD時，按需讀write-customized-jd方法與目前稿，使用已提供的JD工具，依實際保存結果說明。資料不足繼續訪談，已有足夠理解可先寫支持的部分，不必每輪修改JD。不顯示隱藏推理。"
++    },
++    {
++      "before": "  -> Read `/skills/work-scope-interview/SKILL.md` for full instructions\n",
++      "after": "  -> Read `/skills/work-scope-interview/SKILL.md` for full instructions\n- **write-customized-jd**: Use when 某項實際工作已足夠理解、員工要求整理職務說明書、需更正已寫責任或條件，或準備核對整份 JD 的完整範圍與依據。\n  -> Read `/skills/write-customized-jd/SKILL.md` for full instructions\n"
++    },
++    {
++      "before": "此 Skills 接線只新增唯讀方法資產，不新增主機檔案、寫檔、執行程式、網路或 JD 操作能力。",
++      "after": "方法資產本身不授予主機檔案、寫檔、執行程式或網路能力；JD 操作只依已提供的 JD 工具契約。"
++    }
++  ]
++}
+
+diff --git a/experiments/jd-editor/fixtures/core-scenario.json b/experiments/jd-editor/fixtures/core-scenario.json
+--- a/experiments/jd-editor/fixtures/core-scenario.json
++++ b/experiments/jd-editor/fixtures/core-scenario.json
+@@ -0,0 +1,394 @@
++{
++  "synthetic": true,
++  "purpose": "Fixed engineering fixture; not natural model or P3/P6 quality evidence.",
++  "utterances": {
++    "intro": "我是設備維護工程師，想整理自己的工作。",
++    "draft": "我的工作是設備月檢與故障處理，維持服務範圍內設備可用。依服务安排每月檢查狀態，核對異常訊息，留下設備狀態紀錄與待處理清單，記設備與日期、觀察依據；超出授權交主管決定。故障時依操作員描述對照訊息與機械狀況，分辨磨耗與外物干涉，只做已授權機械調整，電控程式由另一職位處理。修後驗證，保留判斷依據與維修紀錄，未排除問題交接操作員。我需要懂訊息與機械狀態對應、授權交接界線，兩項工作都用交叉比對；故障另需調整後驗證與交接。其他資格還沒說明。請先整理這些工作。",
++    "correct": "更正月檢範圍：僅對已約定服務的設備每月檢查；未約定者不做固定月檢。其他故障處理都不變。",
++    "continue": "我剛在文件补上交接文字，請保留手改，並把職務目的改為維持服務範圍內設備可用，清楚交接異常與未排除問題。",
++    "thanks": "目前先這樣，謝謝。",
++    "lost": "請把職務目的補為維持服務範圍內設備可用，清楚交接異常與未排除問題，供後續維護接續。",
++    "cancel": "我先想一下，這輪請稍候。"
++  },
++  "expected_initial_content": [
++    {
++      "type": "jd_section",
++      "section_kind": "identity",
++      "children": [
++        {
++          "type": "h2",
++          "children": [
++            {
++              "text": "職務基本資料"
++            }
++          ]
++        },
++        {
++          "type": "p",
++          "children": [
++            {
++              "text": "設備維護工程師"
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "type": "jd_section",
++      "section_kind": "purpose",
++      "children": [
++        {
++          "type": "h2",
++          "children": [
++            {
++              "text": "職務目的"
++            }
++          ]
++        },
++        {
++          "type": "p",
++          "children": [
++            {
++              "text": "維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。"
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "type": "jd_section",
++      "section_kind": "work",
++      "children": [
++        {
++          "type": "h2",
++          "children": [
++            {
++              "text": "主要職責與工作任務"
++            }
++          ]
++        },
++        {
++          "type": "jd_duty",
++          "children": [
++            {
++              "type": "h3",
++              "children": [
++                {
++                  "text": "設備維護與異常處理"
++                }
++              ]
++            },
++            {
++              "type": "jd_task",
++              "children": [
++                {
++                  "type": "p",
++                  "children": [
++                    {
++                      "text": "設備月檢"
++                    }
++                  ]
++                },
++                {
++                  "type": "p",
++                  "children": [
++                    {
++                      "text": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。"
++                    }
++                  ]
++                },
++                {
++                  "type": "jd_outcomes",
++                  "children": [
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "設備狀態紀錄"
++                        }
++                      ]
++                    },
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "待處理事項清單"
++                        }
++                      ]
++                    }
++                  ]
++                },
++                {
++                  "type": "jd_requirements",
++                  "children": [
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "記錄設備與檢查日期"
++                        }
++                      ]
++                    },
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "異常註明觀察依據"
++                        }
++                      ]
++                    },
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "超出授權範圍交主管決定"
++                        }
++                      ]
++                    }
++                  ]
++                }
++              ]
++            },
++            {
++              "type": "jd_task",
++              "children": [
++                {
++                  "type": "p",
++                  "children": [
++                    {
++                      "text": "故障診斷與處理"
++                    }
++                  ]
++                },
++                {
++                  "type": "p",
++                  "children": [
++                    {
++                      "text": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。"
++                    }
++                  ]
++                },
++                {
++                  "type": "jd_outcomes",
++                  "children": [
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "完成驗證的處理結果"
++                        }
++                      ]
++                    },
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "可接續的維修紀錄"
++                        }
++                      ]
++                    }
++                  ]
++                },
++                {
++                  "type": "jd_requirements",
++                  "children": [
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "保留故障訊息與判斷依據"
++                        }
++                      ]
++                    },
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "未排除問題交接操作員"
++                        }
++                      ]
++                    },
++                    {
++                      "type": "p",
++                      "children": [
++                        {
++                          "text": "不自行修改電控程式"
++                        }
++                      ]
++                    }
++                  ]
++                }
++              ]
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "type": "jd_section",
++      "section_kind": "knowledge",
++      "children": [
++        {
++          "type": "h2",
++          "children": [
++            {
++              "text": "所需知識"
++            }
++          ]
++        },
++        {
++          "type": "jd_knowledge",
++          "children": [
++            {
++              "type": "p",
++              "children": [
++                {
++                  "text": "设备訊息與機械狀態的對應"
++                }
++              ]
++            },
++            {
++              "type": "p",
++              "children": [
++                {
++                  "text": "用於月檢辨識異常與故障判斷。"
++                }
++              ]
++            }
++          ]
++        },
++        {
++          "type": "jd_knowledge",
++          "children": [
++            {
++              "type": "p",
++              "children": [
++                {
++                  "text": "機械處置的授權與交接界線"
++                }
++              ]
++            },
++            {
++              "type": "p",
++              "children": [
++                {
++                  "text": "分辨本人處理、主管決定與電控職位責任。"
++                }
++              ]
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "type": "jd_section",
++      "section_kind": "skills",
++      "children": [
++        {
++          "type": "h2",
++          "children": [
++            {
++              "text": "所需技能"
++            }
++          ]
++        },
++        {
++          "type": "jd_skill",
++          "children": [
++            {
++              "type": "p",
++              "children": [
++                {
++                  "text": "交叉比對狀態與訊息"
++                }
++              ]
++            },
++            {
++              "type": "p",
++              "children": [
++                {
++                  "text": "將觀察與故障訊息比對，區分需進一步處理的差異。"
++                }
++              ]
++            }
++          ]
++        },
++        {
++          "type": "jd_skill",
++          "children": [
++            {
++              "type": "p",
++              "children": [
++                {
++                  "text": "機械調整後驗證與交接"
++                }
++              ]
++            },
++            {
++              "type": "p",
++              "children": [
++                {
++                  "text": "確認處理結果並說明尚未排除的問題。"
++                }
++              ]
++            }
++          ]
++        }
++      ]
++    },
++    {
++      "type": "jd_section",
++      "section_kind": "conditions",
++      "children": [
++        {
++          "type": "h2",
++          "children": [
++            {
++              "text": "工作條件與必要資格"
++            }
++          ]
++        },
++        {
++          "type": "p",
++          "children": [
++            {
++              "text": "本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。"
++            }
++          ]
++        }
++      ]
++    }
++  ],
++  "monthly_original": "依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。",
++  "monthly_corrected": "僅對已約定服務的設備每月檢查狀態，核對異常訊息並記錄需處理事項；未約定者不做固定月檢，超出本人授權的處置交主管決定。",
++  "fault_description": "接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。",
++  "manual_text": "未排除問題交接操作員，並附設備識別資訊。",
++  "continued_purpose": "維持服務範圍內設備可用，清楚交接異常與未排除問題。",
++  "lost_purpose": "維持服務範圍內設備可用，清楚交接異常與未排除問題，供後續維護接續。",
++  "synthetic_tool_intents": {
++    "draft": [
++      "read_file",
++      "read_file",
++      "read_file",
++      "jd_read",
++      "read_conversation",
++      "jd_edit",
++      "jd_read",
++      "jd_edit",
++      "jd_change_read"
++    ],
++    "correct": [
++      "jd_read",
++      "read_conversation",
++      "jd_edit"
++    ],
++    "continue": [
++      "jd_read",
++      "jd_edit"
++    ],
++    "lost": [
++      "jd_read",
++      "jd_edit"
++    ]
++  }
++}
+
+diff --git a/experiments/jd-editor/web/src/jd/JdEditor.tsx b/experiments/jd-editor/web/src/jd/JdEditor.tsx
+--- a/experiments/jd-editor/web/src/jd/JdEditor.tsx
++++ b/experiments/jd-editor/web/src/jd/JdEditor.tsx
+@@ -1,65 +1,66 @@
+ "use client";
+ import React, { useEffect, useState } from "react";
++import equal from "fast-deep-equal";
+ import { Plate, PlateContent, type PlateElementProps } from "platejs/react";
+ import type { Operation } from "platejs";
+ import { TablePlugin } from "@platejs/table/react";
+ import { createJdReactEditor } from "@caliburn/jd-editor-native/react-profile";
+ import { copyJdElements } from "@caliburn/jd-editor-native/copy";
+ import type {
+   JdDocumentValue,
+   JdReadSuccess,
+   JdChangeReadSuccess,
+   JdText,
+ } from "@caliburn/jd-editor-contract";
+ import { DocumentView, JdNode, type DisplayNode } from "./JdNode";
+ import { JdLeaf } from "./JdLeaf";
+ export type LiveEditor = ReturnType<typeof createJdReactEditor>;
+ export function applySavedHead(
+   editor: LiveEditor,
+   baseline: JdReadSuccess,
+   next: JdReadSuccess,
+   change: JdChangeReadSuccess | null,
+ ) {
+-  if (JSON.stringify(editor.children) === JSON.stringify(next.fragment))
++  if (equal(editor.children, next.fragment))
+     return true;
+-  if (JSON.stringify(editor.children) !== JSON.stringify(baseline.fragment))
++  if (!equal(editor.children, baseline.fragment))
+     return false;
+   if (
+     !change?.native_operations ||
+     change.before_revision_ref !== baseline.revision_ref ||
+     change.after_revision_ref !== next.revision_ref
+   )
+     return false;
+   editor.tf.withNewBatch(() =>
+     editor.tf.withoutNormalizing(() => {
+       for (const operation of change.native_operations ?? [])
+         editor.tf.apply(operation as unknown as Operation);
+     }),
+   );
+   editor.tf.setSplittingOnce(true);
+-  return JSON.stringify(editor.children) === JSON.stringify(next.fragment);
++  return equal(editor.children, next.fragment);
+ }
+ export function JdEditor({
+   value,
+   locked,
+   saving = false,
+   onEdit,
+   onReady,
+   onSelection,
+   source,
+ }: {
+   value: JdDocumentValue;
+   locked: boolean;
+   saving?: boolean;
+   onEdit: (value: JdDocumentValue) => void;
+   onReady: (editor: LiveEditor) => void;
+   onSelection?: () => void;
+   source?: (ref: string) => void;
+ }) {
+   const [editor] = useState(() =>
+     createJdReactEditor(
+       value,
+       Object.fromEntries(
+         [
+           "p",
+           "h1",
+
+diff --git a/experiments/jd-editor/web/src/jd/useJdSession.ts b/experiments/jd-editor/web/src/jd/useJdSession.ts
+--- a/experiments/jd-editor/web/src/jd/useJdSession.ts
++++ b/experiments/jd-editor/web/src/jd/useJdSession.ts
+@@ -1,44 +1,43 @@
+ "use client";
+ import { useEffect, useState } from "react";
++import same from "fast-deep-equal";
+ import type {
+   JdDocumentValue,
+   JdReadSuccess,
+   JdSelectionCaptureClientInput,
+   JdChangeReadSuccess,
+ } from "@caliburn/jd-editor-contract";
+ import type {
+   DocumentOutput,
+   MessageInput,
+   MessageOutput,
+   RunOutput,
+ } from "../generated/analysis-api";
+ import { api, ApiError, type JdApi } from "./api";
+ import { submissionCache, type Disk, type Submission } from "./submissionCache";
+ import { requestRecoveryCache } from "./requestRecoveryCache";
+-const same = (a: unknown, b: unknown) =>
+-  JSON.stringify(a) === JSON.stringify(b);
+ const active = new Set([
+   "receiving",
+   "running",
+   "stopping",
+   "uncertain",
+   "interrupted",
+ ]);
+ export class JdSession {
+   head: JdReadSuccess | null = null;
+   value = [] as unknown as JdDocumentValue;
+   dirty = false;
+   text = "";
+   metadata: DocumentOutput | null = null;
+   messages: MessageOutput[] = [];
+   run: RunOutput | null = null;
+   busy = false;
+   saving = false;
+   loading = true;
+   readUnavailable = false;
+   manualUnknown = false;
+   serverWriteBlocked = true;
+   restartRequired = false;
+   recovery: Awaited<ReturnType<JdApi['readRecovery']>> | null = null;
+   candidateRecovery: Awaited<ReturnType<JdApi['readRecovery']>> | null = null;
+   recoverySequence = 0;
+@@ -117,71 +116,79 @@
+   edit(value: JdDocumentValue) {
+     this.value = structuredClone(value);
+     this.dirty = !same(value, this.head?.fragment);
+     this.emit();
+   }
+   async load() {
+     this.loading = true;
+     this.emit();
+     try {
+       this.candidate = submissionCache(this.disk).read(this.document);
+       this.manualUnknown = !!this.candidate;
+       this.pendingRun = requestRecoveryCache(this.disk).readRun(this.document);
+       if (this.pendingRun) this.text = this.pendingRun.text;
+       await this.refresh();
+       if (this.pendingRun) await this.lookup();
+     } catch (error) {
+       this.error = String(error);
+     } finally {
+       this.loading = false;
+       this.emit();
+     }
+   }
+   async refresh() {
+     const generation = ++this.generation;
+     try {
+-      const [metadata, messages, runs, head] = await Promise.all([
++      const [metadata, runs] = await Promise.all([
+         this.port.document(this.document),
++        this.port.runs(this.document),
++      ]);
++      if (this.disposed || generation !== this.generation) return;
++      // A terminal run stops polling. Read its saved content after observing
++      // that status, so an earlier in-flight read cannot freeze an older draft.
++      const [messages, head] = await Promise.all([
+         this.port.messages(this.document),
+-        this.port.runs(this.document),
+         this.port.read(this.document),
+       ]);
+       if (this.disposed || generation !== this.generation) return;
+       this.metadata = metadata;
+       this.messages = messages;
+       this.run = runs.at(-1) ?? null;
+-      if (!this.dirty) {
+-        let change: JdChangeReadSuccess | null = null;
+-        if (
++      let change: JdChangeReadSuccess | null = null;
++      if (!this.dirty &&
+           this.head &&
+           head.revision_ref !== this.head.revision_ref &&
+           head.change_refs[0]
+-        )
+-          change = await this.port.changes(this.document, {
+-            change_ref: head.change_refs[0],
+-          });
++      ) {
++        change = await this.port.changes(this.document, {
++          change_ref: head.change_refs[0],
++        });
+         if (this.disposed || generation !== this.generation) return;
++      }
++      // Typing can occur while the diff request is in flight. Recheck at the
++      // point of application; a dirty editor keeps its original saved baseline.
++      if (!this.dirty) {
+         this.onHead?.(head, change);
+         this.head = head;
+         this.value = structuredClone(head.fragment) as JdDocumentValue;
+         if (change) this.change = change;
+       } else if (this.head?.revision_ref !== head.revision_ref)
+         this.notice = "已有新的保存內容；目前未保存修改仍留在畫面，請先處理。";
+       this.error = "";
+       this.readUnavailable = false;
+       await this.refreshRecovery(generation);
+     } catch (error) {
+       if (this.disposed || generation !== this.generation) return;
+       this.readUnavailable = true;
+       this.error = "暫時無法讀取，請重試。" + String(error);
+       // A failed native read must not hide the independent server owner gate.
+       try { await this.refreshRecovery(generation); } catch { /* keep the gate closed */ }
+       throw error;
+     } finally {
+       this.emit();
+     }
+   }
+   get canRetryCandidate() {
+     return !!this.candidate && !this.busy && !this.loading && !this.readUnavailable &&
+       !this.serverWriteBlocked && (this.candidateRecovery?.status === 'no_pending' || !this.manualUnknown);
+   }
+   applyRecovery(value: Awaited<ReturnType<JdApi['readRecovery']>>) {
+
+diff --git a/experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx b/experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx
+--- a/experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx
++++ b/experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx
+@@ -0,0 +1,117 @@
++import React from 'react';
++import { act, render } from '@testing-library/react';
++import { expect, it, vi } from 'vitest';
++import type { JdChangeReadSuccess, JdDocumentValue, JdReadSuccess } from '@caliburn/jd-editor-contract';
++import { JdEditor, applySavedHead, type LiveEditor } from './JdEditor';
++import { JdSession } from './useJdSession';
++import { api, type JdApi } from './api';
++
++const initial: JdDocumentValue = [{ type: 'p', id: 'empty', children: [{ text: '' }] }];
++const head = (revision: string, fragment: JdDocumentValue): JdReadSuccess => ({
++  status: 'ok', read_kind: 'current', revision_ref: revision, access: 'read_only', fragment,
++  targets: [], selection: null, source_refs: [], change_refs: revision === 'r0' ? [] : [revision], continuation_ref: null,
++});
++const change = (before: JdReadSuccess, after: JdReadSuccess, operations: JdChangeReadSuccess['native_operations']): JdChangeReadSuccess => ({
++  status: 'ok', mode: 'change', change_ref: after.change_refs[0] ?? null, origin: 'ai',
++  before_revision_ref: before.revision_ref, after_revision_ref: after.revision_ref,
++  before_fragment: before.fragment, after_fragment: after.fragment, native_operations: operations,
++  source_refs: [], presentation_limitations: [], continuation_ref: null,
++});
++function harness() {
++  const port = { ...api, document: vi.fn(async () => ({ id: 'A', title: 'A', created_at: '', archived: false, metadata_version: 1 })),
++    messages: vi.fn(async () => []), runs: vi.fn(async () => []), read: vi.fn(async () => head('r0', initial)),
++    changes: vi.fn(), readRecovery: vi.fn(async () => ({ status: 'no_pending', request_key: null, write_blocked: false, can_recover: false })),
++    save: vi.fn(), submit: vi.fn(async () => ({ id: 'run', status: 'running' })),
++    lookup: vi.fn(async () => ({ found: true, input_received: true, run: { id: 'run', status: 'completed' } })),
++  } as unknown as JdApi;
++  const storage = new Map<string, string>();
++  const session = new JdSession('A', port, { getItem: key => storage.get(key) ?? null, setItem: (key, value) => { storage.set(key, value); }, removeItem: key => { storage.delete(key); } });
++  return { session, port };
++}
++it('serialization key order alone does not become a manual save before the next interview', async () => {
++  const { session, port } = harness();
++  await session.load();
++  session.edit([{ id: 'empty', children: [{ text: '' }], type: 'p' }]);
++  expect(session.dirty).toBe(false);
++  session.setText('繼續訪談');
++  expect(await session.send(() => null)).toBe(true);
++  expect(port.save).not.toHaveBeenCalled();
++  expect(port.submit).toHaveBeenCalledOnce();
++});
++it('two saved native batches stay clean across actual Plate callbacks while manual edits remain dirty', async () => {
++  const { session, port } = harness();
++  await session.load();
++  let editor!: LiveEditor;
++  render(<JdEditor value={session.value} locked={false} onReady={value => { editor = value; }} onEdit={value => session.edit(value)} />);
++  const applied: boolean[] = [];
++  session.bindHead((next, change) => applied.push(applySavedHead(editor, session.head!, next, change)));
++  const first = head('r1', [{ type: 'p', id: 'work', children: [{ text: '工作' }] }]);
++  vi.mocked(port.read).mockResolvedValue(first);
++  vi.mocked(port.changes).mockResolvedValue(change(session.head!, first, [
++    { type: 'insert_node', path: [0], node: { id: 'work', children: [{ text: '工作' }], type: 'p' } },
++    { type: 'remove_node', path: [1], node: { type: 'p', id: 'empty', children: [{ text: '' }] } },
++  ]));
++  await act(async () => { await session.refresh(); });
++  expect(applied).toEqual([true]);
++  expect(session.dirty).toBe(false);
++  const second = head('r2', [{ type: 'p', id: 'work', children: [{ text: '工作條件' }] }]);
++  vi.mocked(port.read).mockResolvedValue(second);
++  vi.mocked(port.changes).mockResolvedValue(change(first, second, [
++    { type: 'insert_text', path: [0, 0], offset: 2, text: '條件' },
++  ]));
++  await act(async () => { await session.refresh(); });
++  expect(applied).toEqual([true, true]);
++  expect(editor.children).toEqual(second.fragment);
++  expect(session.dirty).toBe(false);
++  await act(async () => { editor.tf.select({ path: [0, 0], offset: 4 }); editor.tf.insertText('・手改'); });
++  expect(session.dirty).toBe(true);
++  const candidate = structuredClone(editor.children);
++  await act(async () => { await session.refresh(); });
++  expect(session.value).toEqual(candidate);
++  expect(editor.children).toEqual(candidate);
++});
++it('a completed run cannot freeze a document and conversation snapshot read before its final write', async () => {
++  const { session, port } = harness();
++  await session.load();
++  let current = head('r0', initial);
++  let messages: Awaited<ReturnType<JdApi['messages']>> = [];
++  let completed!: (runs: Awaited<ReturnType<JdApi['runs']>>) => void;
++  const completion = new Promise<Awaited<ReturnType<JdApi['runs']>>>(resolve => { completed = resolve; });
++  vi.mocked(port.runs).mockReturnValue(completion);
++  vi.mocked(port.read).mockImplementation(async () => structuredClone(current));
++  vi.mocked(port.messages).mockImplementation(async () => structuredClone(messages));
++  vi.mocked(port.changes).mockImplementation(async () => change(head('r0', initial), current, []));
++  const refreshing = session.refresh();
++  // The saved read starts before the run response in the old parallel fetch.
++  await Promise.resolve();
++  current = head('r1', [{ type: 'p', id: 'work', children: [{ text: '最後保存內容' }] }]);
++  messages = [{ id: 'answer', role: 'assistant', text: '已保存' }];
++  completed([{ id: 'run', status: 'completed' } as Awaited<ReturnType<JdApi['runs']>>[number]]);
++  await refreshing;
++  expect(session.run?.status).toBe('completed');
++  expect(session.head).toEqual(current);
++  expect(session.messages).toEqual(messages);
++});
++it('typing while a changed-head diff is loading preserves the manual value and its saved baseline', async () => {
++  const { session, port } = harness();
++  await session.load();
++  const baseline = session.head;
++  const applied = vi.fn();
++  session.bindHead(applied);
++  vi.mocked(port.read).mockResolvedValue(head('r1', [{ type: 'p', id: 'empty', children: [{ text: 'AI 新稿' }] }]));
++  let release!: (change: JdChangeReadSuccess) => void;
++  const diff = new Promise<JdChangeReadSuccess>(resolve => { release = resolve; });
++  vi.mocked(port.changes).mockReturnValue(diff);
++  const refreshing = session.refresh();
++  await vi.waitFor(() => expect(port.changes).toHaveBeenCalledOnce());
++  expect(session.locked).toBe(false);
++  const manual: JdDocumentValue = [{ type: 'p', id: 'empty', children: [{ text: '員工尚未保存的更正' }] }];
++  session.edit(manual);
++  release(change(baseline!, await port.read('A'), []));
++  await refreshing;
++  expect(session.value).toEqual(manual);
++  expect(session.head).toEqual(baseline);
++  expect(session.dirty).toBe(true);
++  expect(applied).not.toHaveBeenCalled();
++  expect(session.notice).toContain('未保存修改仍留在畫面');
++});
+
+diff --git a/experiments/jd-editor/web/browser/task6-journey.mjs b/experiments/jd-editor/web/browser/task6-journey.mjs
+--- a/experiments/jd-editor/web/browser/task6-journey.mjs
++++ b/experiments/jd-editor/web/browser/task6-journey.mjs
+@@ -0,0 +1,130 @@
++import { chromium, expect } from '@playwright/test';
++import { readFile, writeFile } from 'node:fs/promises';
++import { resolve } from 'node:path';
++
++const evidence = resolve('../../../scratch');
++const fixture = JSON.parse(await readFile(resolve('../fixtures/core-scenario.json'), 'utf8'));
++const reopened = process.argv.includes('--reopened');
++const previous = reopened ? JSON.parse(await readFile(resolve(evidence, 'task6-browser-initial.json'), 'utf8')) : null;
++const browser = await chromium.launch({ channel: 'chrome', headless: false });
++const context = await browser.newContext({ viewport: { width: 1500, height: 1050 } });
++const page = await context.newPage();
++const network = [], errors = [], cases = [];
++const result = { phase: reopened ? 'reopened' : 'initial', browser: browser.version(), headed: true, OS_IME: 'NOT RUN', network, errors, cases };
++page.on('request', r => network.push({ method: r.method(), url: r.url(), body: r.postData() }));
++page.on('pageerror', error => errors.push(String(error)));
++let document;
++const api = async (path, body) => {
++  const url = `http://127.0.0.1:8091/documents/${document}${path}`;
++  const response = body === undefined ? await context.request.get(url) : await context.request.post(url, { data: body });
++  expect(response.ok(), `${response.status()} ${await response.text()}`).toBeTruthy();
++  return response.json();
++};
++const saved = () => api('/jd');
++const editor = page.getByRole('textbox', { name: '職務說明書正文' });
++const textOf = value => Array.isArray(value) ? value.map(textOf).join('') : typeof value === 'object' ? (value.text ?? textOf(value.children ?? [])) : '';
++const elements = value => value.flatMap(n => n.type ? [n, ...elements(n.children)] : []);
++const plain = value => Array.isArray(value) ? value.map(plain) : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).filter(([k]) => !['id','source_refs','knowledge_ids','skill_ids'].includes(k)).map(([k,v]) => [k,plain(v)])) : value;
++async function send(key) {
++  if (await page.getByRole('button', { name: '改為純聊天', exact: true }).isVisible()) await page.getByRole('button', { name: '改為純聊天', exact: true }).click();
++  await page.getByLabel('補充或更正你的工作').fill(fixture.utterances[key]);
++  const [response] = await Promise.all([
++    page.waitForResponse(r => r.request().method() === 'POST' && r.url().endsWith('/runs')),
++    page.getByRole('button', { name: '送出', exact: true }).click(),
++  ]);
++  expect(response.status()).toBe(202);
++  const run = await response.json();
++  await expect.poll(async () => (await api(`/runs/${run.id}`)).status, { timeout: 45000 }).toBe('completed');
++  await expect(editor).toBeEditable({ timeout: 15000 });
++  return api(`/runs/${run.id}`);
++}
++async function capture() {
++  const current = await saved(), histories = [], sources = {};
++  let head = current;
++  for (let i = 0; head.change_refs.length && i < 20; i++) {
++    const change = await api('/jd/changes/read', { change_ref: head.change_refs[0] });
++    histories.push(change);
++    head = await api('/jd/read', { revision_ref: change.before_revision_ref });
++  }
++  expect(head.change_refs).toEqual([]);
++  for (const ref of new Set(elements(current.fragment).flatMap(n => n.source_refs ?? []))) sources[ref] = await api(`/sources?reference=${encodeURIComponent(ref)}`);
++  return { current, histories, sources, messages: await api('/messages') };
++}
++try {
++  if (reopened) {
++    document = previous.document;
++    await page.goto(`http://127.0.0.1:3001/workspace/${document}`);
++    await expect(editor).toBeEditable();
++    result.recovered = await capture();
++    expect(result.recovered).toEqual(previous.snapshot);
++    for (const run of previous.runs) expect(await api(`/runs/${run.id}`)).toEqual(run);
++    cases.push('new API process + fresh browser context recovered exact current, every history/source, messages and original run results');
++  } else {
++    await page.goto('http://127.0.0.1:3001');
++    await page.getByLabel('文件名稱').fill('Task6 完整旅程 '+Date.now());
++    await page.getByRole('button', { name: '建立文件', exact: true }).click();
++    await page.waitForURL('**/workspace/**');
++    document = page.url().split('/').at(-1);
++    await expect(editor).toBeEditable();
++    const initial = await saved();
++    result.runs = [await send('intro')];
++    expect((await saved()).revision_ref).toBe(initial.revision_ref);
++    cases.push('create blank document and insufficient interview without JD revision');
++    result.runs.push(await send('draft'));
++    const draft = await saved();
++    expect(plain(draft.fragment)).toEqual(fixture.expected_initial_content);
++    expect(elements(draft.fragment).filter(n => n.type === 'jd_task')).toHaveLength(2);
++    await expect(editor).toContainText(fixture.monthly_original);
++    cases.push('same-page first draft through actual native writes and shared knowledge/skill links');
++    result.runs.push(await send('correct'));
++    await expect(editor).toContainText(fixture.monthly_corrected);
++    await expect(editor).toContainText(fixture.fault_description);
++    await page.getByRole('button', { name: '這次改動', exact: true }).click();
++    const changes = page.getByRole('region', { name: '確切改動' });
++    await expect(changes.locator(':scope > details').nth(0).getByText(fixture.monthly_original, { exact: true })).toBeVisible();
++    await expect(changes.locator(':scope > details').nth(1).getByText(fixture.monthly_corrected, { exact: true })).toBeVisible();
++    expect(await page.locator('[contenteditable=true]').count()).toBe(1);
++    cases.push('correction and exact before/after visible alongside one editable JD');
++    const correction = await saved();
++    const requirement = elements(correction.fragment).find(n => textOf(n) === '未排除問題交接操作員');
++    const leaf = page.locator(`.jd-editable [data-jd-id="${requirement.id}"] [data-slate-string]`).first();
++    await leaf.evaluate(el => { const range = document.createRange(); range.selectNodeContents(el); const selection = window.getSelection(); selection.removeAllRanges(); selection.addRange(range); });
++    expect(await page.evaluate(() => window.getSelection().toString())).toBe('未排除問題交接操作員');
++    await page.keyboard.insertText(fixture.manual_text);
++    await expect(editor).toContainText(fixture.manual_text);
++    await page.getByRole('button', { name: '保存', exact: true }).click();
++    await expect.poll(async () => textOf((await saved()).fragment)).toContain(fixture.manual_text);
++    await expect(page.getByRole('button', { name: '保存', exact: true })).toBeDisabled();
++    result.runs.push(await send('continue'));
++    await expect(editor).toContainText(fixture.manual_text);
++    await expect(editor).toContainText(fixture.continued_purpose);
++    const beforeThanks = await saved();
++    result.runs.push(await send('thanks'));
++    expect(await saved()).toEqual(beforeThanks);
++    cases.push('actual DOM text edit/save -> AI continuation preserves manual text -> pure interview does not rewrite');
++    result.snapshot = await capture();
++    expect(result.snapshot.histories).toHaveLength(5);
++  }
++  result.document = document;
++  await page.getByRole('button', { name: '讀取上一筆歷史', exact: true }).click();
++  await expect(page.getByText('歷史 1・顧問修改', { exact: true })).toBeVisible();
++  await page.locator('.jd-editable .source').first().click();
++  await expect(page.getByText('依據・已保存的原問答', { exact: true })).toBeVisible();
++  await expect(page.getByText(fixture.utterances.draft, { exact: true })).toHaveCount(2);
++  expect(await page.locator('[contenteditable=true]').count()).toBe(1);
++  cases.push('history and canonical source read in same page, no second editable document');
++  result.ax = await page.locator('main').ariaSnapshot();
++  await page.screenshot({ path: resolve(evidence, `task6-browser-${result.phase}.png`), fullPage: true });
++  expect(errors).toEqual([]);
++  expect(network.filter(r => !['http://127.0.0.1:3001','http://127.0.0.1:8091'].includes(new URL(r.url).origin))).toEqual([]);
++  result.status = 'PASS';
++} catch (error) {
++  result.status = 'FAIL'; result.failure = String(error); result.document = document;
++  result.ax = await page.locator('body').ariaSnapshot().catch(() => 'unavailable');
++  await page.screenshot({ path: resolve(evidence, `task6-browser-${result.phase}-failure.png`), fullPage: true }).catch(() => {});
++  throw error;
++} finally {
++  await writeFile(resolve(evidence, `task6-browser-${result.phase}.json`), JSON.stringify(result, null, 2));
++  await context.close(); await browser.close();
++}
++console.log(JSON.stringify({ status: result.status, document, cases, headed: true }));
+
+diff --git a/experiments/jd-editor/web/package.json b/experiments/jd-editor/web/package.json
+--- a/experiments/jd-editor/web/package.json
++++ b/experiments/jd-editor/web/package.json
+@@ -1,41 +1,42 @@
+ {
+   "name": "@caliburn/jd-editor-web",
+   "version": "0.0.1",
+   "private": true,
+   "type": "module",
+   "scripts": {
+     "dev": "next dev --hostname 127.0.0.1 --port 3001",
+     "build": "next build",
+     "test": "vitest run",
+     "typecheck": "tsc --noEmit",
+     "lint": "eslint",
+     "predev": "npm run build -w @caliburn/jd-editor-native",
+     "prebuild": "npm run build -w @caliburn/jd-editor-native",
+     "pretest": "npm run build -w @caliburn/jd-editor-native"
+   },
+   "dependencies": {
++    "fast-deep-equal": "3.1.3",
+     "@caliburn/jd-editor-contract": "0.0.1",
+     "@caliburn/jd-editor-native": "0.0.1",
+     "next": "16.3.3",
+     "react": "19.2.4",
+     "react-dom": "19.2.4",
+     "platejs": "53.3.11",
+     "@platejs/basic-nodes": "53.0.0",
+     "@platejs/list-classic": "53.0.0",
+     "@platejs/table": "53.0.9",
+     "@platejs/diff": "53.0.0"
+   },
+   "devDependencies": {
+     "typescript": "5.9.3",
+     "vitest": "4.1.11",
+     "@vitest/mocker": "4.1.11",
+     "jsdom": "28.1.0",
+     "@testing-library/react": "16.3.2",
+     "@testing-library/user-event": "14.6.4",
+     "@types/node": "20.19.43",
+     "@types/react": "19.2.17",
+     "@types/react-dom": "19.2.3",
+     "eslint": "9.39.4",
+     "eslint-config-next": "16.3.3",
+     "@playwright/test": "1.61.0",
+     "vite": "8.1.3"
+
+diff --git a/experiments/jd-editor/package-lock.json b/experiments/jd-editor/package-lock.json
+--- a/experiments/jd-editor/package-lock.json
++++ b/experiments/jd-editor/package-lock.json
+@@ -8709,48 +8709,49 @@
+       "version": "6.2.1",
+       "resolved": "https://registry.npmjs.org/zustand-x/-/zustand-x-6.2.1.tgz",
+       "integrity": "sha512-y3nQMQNx3BORY95vpuodJvh/8AqQu++S3q6mJYBSo1J0Q168Sy+FatqER658YESDqv2bwviXcIT3bgl/Ip6M5g==",
+       "license": "MIT",
+       "dependencies": {
+         "immer": "^10.0.3",
+         "lodash.mapvalues": "^4.6.0",
+         "mutative": "1.1.0",
+         "react-tracked": "^1.7.11",
+         "use-sync-external-store": "1.4.0"
+       },
+       "peerDependencies": {
+         "zustand": ">=5.0.2"
+       }
+     },
+     "web": {
+       "name": "@caliburn/jd-editor-web",
+       "version": "0.0.1",
+       "dependencies": {
+         "@caliburn/jd-editor-contract": "0.0.1",
+         "@caliburn/jd-editor-native": "0.0.1",
+         "@platejs/basic-nodes": "53.0.0",
+         "@platejs/diff": "53.0.0",
+         "@platejs/list-classic": "53.0.0",
+         "@platejs/table": "53.0.9",
++        "fast-deep-equal": "3.1.3",
+         "next": "16.3.3",
+         "platejs": "53.3.11",
+         "react": "19.2.4",
+         "react-dom": "19.2.4"
+       },
+       "devDependencies": {
+         "@playwright/test": "1.61.0",
+         "@testing-library/react": "16.3.2",
+         "@testing-library/user-event": "14.6.4",
+         "@types/node": "20.19.43",
+         "@types/react": "19.2.17",
+         "@types/react-dom": "19.2.3",
+         "@vitest/mocker": "4.1.11",
+         "eslint": "9.39.4",
+         "eslint-config-next": "16.3.3",
+         "jsdom": "28.1.0",
+         "typescript": "5.9.3",
+         "vite": "8.1.3",
+         "vitest": "4.1.11"
+       }
+     }
+   }
+ }
+
+diff --git a/experiments/jd-editor/README.md b/experiments/jd-editor/README.md
+--- a/experiments/jd-editor/README.md
++++ b/experiments/jd-editor/README.md
+@@ -1,26 +1,32 @@
+ # JD editor — 隔離核心與工作畫面
++
++## Task 6 完整固定旅程
++
++同一顧問現在能按需讀取 JD 寫作方法，以既有三工具完成初稿、條件更正與手改後續編。方法不強制每輪改稿，不新增 Agent 或 Memory 策略。實際差異、原問答及五筆歷史在同一画面可查；真 API 程序中斷後全值恢復已驗。固定回應不證明自然模型專業品質；完整範圍與重現方式見 [ACCEPTANCE.md](ACCEPTANCE.md)，Task6 仍待獨立審查閉合。
++
++已保存 JSONB 的 object key 順序沒有語意；Web 使用既有 MIT `fast-deep-equal@3.1.3` 比對正文，陣列順序、內容及 metadata 仍納入。輪詢先觀測執行狀態再讀內容，避免終態停留舊稿；延遲差異回來時再核對 dirty，保留途中手改及其原保存基準。這些是既有框架接點的有限修正，沒有新同步／回退引擎。
+ 
+ ## Task 4 工作畫面
+ 
+ `web/` 現在提供本機 3001 的文件建立／清單／重開，以及同頁聊天與唯一可編 JD。8091 沿同一 AnalysisService、catalog、三個 JD factory tools 與 PostgreSQL 保存 ports；來源回查沿實際 ConversationReader，模型摘要不取代確切前後版本。詳細啟動、非權威 recovery cache、navigation guard 與限制見 [web/README.md](web/README.md)。
+ 
+ Task 4 起使用專案隔離 Node 22.23.2 portable runtime；Next／eslint-config-next 16.3.3、宣告 React／React DOM 19.2.4、Vitest／mocker 4.1.11、browser tooling Playwright 1.61.0 均採 exact lock。Next App Router compiled React／RSC 另依實測記錄，不視為相同於 native 單測 runtime。安裝一律 `--ignore-scripts`，root production lock 不變。
+ 
+ 新 create-key／metadata conditional commands／run-by-request defs 仍在 active SSOT；API Pydantic export 經既有 codegen 產生 Web DTO，check-codegen 同時比對。native React profile 的元件 override 與正式 dist exports 供相同 editor／history／copy 實作共用。
+ 
+ 以下保留 Task 1 歷史範圍及當時 runtime 說明；DOM、保存與其他驗收以各切片實測報告為準，不改判歷史。
+ 
+ ## Task 1 原始範圍
+ 
+ 本工作區只提供 v2 JSON Schema 生成契約與官方 Plate 原生編輯核心；不加入 production monorepo，不讀 DB／Memory／API key，也不呼叫模型。正式 authority 仍由 root ADR／current register 管理。實作範圍依 `docs/plans/2026-09-10-jd-editor-core-implementation.md` Task 1。
+ 
+ 在本目錄執行：
+ 
+ ```text
+ npm ci --ignore-scripts
+ npm run codegen -w @caliburn/jd-editor-contract
+ npm run check-codegen -w @caliburn/jd-editor-contract
+ npm run build -w @caliburn/jd-editor-native
+ npm run test -w @caliburn/jd-editor-native
+ cd contract
+ uv run pytest -q tests/test_schema_contract.py
+
+diff --git a/experiments/jd-editor/ACCEPTANCE.md b/experiments/jd-editor/ACCEPTANCE.md
+--- a/experiments/jd-editor/ACCEPTANCE.md
++++ b/experiments/jd-editor/ACCEPTANCE.md
+@@ -0,0 +1,34 @@
++# JD 隔離核心驗收
++
++2026-09-12；Task1–5 已接受，Task6 工程驗收完成、獨立審查中。這是零產品模型呼叫的固定工程情境；尚未宣稱自然訪談品質或可交付成品。
++
++## 已觀測的完整旅程
++
++`fixtures/core-scenario.json` 明示合成設備維護案例與固定工具意圖。員工文字、預期內容固定；文件身分、來源、目標與 K/S 引用由真 App 發配。`analysis-agent/tests/jd_offline_service.py` 只替換 HTTP 模型回應，使用同一 AnalysisService、router、graph、PostgreSQL Saver／Store、JD service 與原生 Plate 運算；沒有 live fallback。
++
++1. 由 `http://127.0.0.1:3001` 建立空白文件，開始訪談；資訊不足只追問，JD 不增版。
++2. 補足工作後產生六章內容；首建及重新讀取後連結共享知識／技能各保存一次。兩項任務的成果與要求各自保留。
++3. 指出月檢只適用於約定服務，修改對應條件；故障處理及其權限、判斷與交接全值不變。原畫面可查修改前後與原始問答，只有一份可編正文。
++4. 在正文實際選取並輸入繁中更正、保存，再請 AI 續編；保留手改。API 固定案例另連續保存三次，核實下一輪模型請求中的人工變更通知計數與已知基準；不是偽造員工原话或更新 Memory。
++5. 致謝／純訪談不改 JD。另在 API 注入提交後結果遺失，再取消對帳，僅一版、一份原工具結果且無模型重試；純聊天取消不假造 JD receipt。
++6. 關閉瀏覽器、核實並中斷本次測試 API，再用同安裝範圍重新啟動。全新瀏覽器取得相同 current、五筆歷史、來源、原問答及原 run 結果。
++
++真瀏覽器使用 Playwright 的 Chrome channel、headed 1500×1050，實際版本及 network 記在證據 JSON。網頁請求只有 3001／8091，無 8001 或外部 provider。繁中輸入為 DOM／鍵盤插入；**未測 Windows 真人輸入法**。
++
++## 可重現檢查
++
++只在 `S:/caliburn/.worktrees/analysis-only-agent`、既有精確 lock/runtime 與專用測試 DB 執行。Node 使用 `.superpowers/sdd/2026-09-10-jd-editor-core-implementation/task4-runtime/node-v22.23.2-win-x64`；Python 使用 `analysis-agent` 的 uv 環境。Windows managed runner 在任何 DB／client／native 工作前 bootstrap；不能直接用未受管理的 pytest 取代生命週期驗收。
++
++- `analysis-agent/tests/task5_acceptance_runner.py`：完整離線測試。PG opt-in 須另實際執行，不把 skip 稱成功。
++- `task6-python-regression.py jd`：專用 `q019_jd_app_20260910`，真 JD PostgreSQL／native／新程序案例。
++- `task6-python-regression.py memory`：只允許本機 55433 `q019_agent_test`，含四組實際 factory/model-role 檢查。明示 additive test setup，不重建或清空資料庫。
++- `task6-web-checks.py`：契約生成一致性、原生／Web 測試、建置、型別及 lint；`--fix` 只重跑最後受影響建置檢查。
++- `web/browser/task6-journey.mjs`：完整固定畫面旅程；`--reopened` 比對同份已保存證據。須先核對具名測試程序並經真重啟，參數本身不證明已重啟。
++
++上述工作用 helpers 與 raw logs 已封存在[Task6 證據](../../docs/specs/evidence/jd-editor-task6/)。它們不是日常啟動入口，不要求員工操作研究腳本。固定 factory 可依核心計畫以明確測試 DB、穩定 installation key、單 worker／無 reload 的 8091 啟動；正式日常啟停、備份／還原及更新仍屬 P5。
++
++## 證明界線
++
++完整結果、首敗與修正、來源／版本及未驗項目見[核心接合結果](../../docs/specs/evidence/2026-09-10-jd-editor-core-integration.md)。不同測試群可能重疊，不加總為獨立案例數。CLI reviewer 的靜態判斷不冒稱測試執行。
++
++仍未驗：自然模型自行判斷寫稿與工具選擇、不同職位專業品質、長訪談新 JD 影響、真人 IME／三名員工、正式 authority 切換、完整備份還原與日常入口。P3 產品模型測試另需資料／呼叫／費用授權；使用 Claude 作工程審查的授權不等於 P3 授權。
+
+diff --git a/docs/specs/evidence/2026-09-10-jd-editor-core-integration.md b/docs/specs/evidence/2026-09-10-jd-editor-core-integration.md
+--- a/docs/specs/evidence/2026-09-10-jd-editor-core-integration.md
++++ b/docs/specs/evidence/2026-09-10-jd-editor-core-integration.md
+@@ -0,0 +1,80 @@
++# JD 編輯核心：Task6 接合與固定驗收
++
++更新：2026-09-12。JD-R002／隔離 G7；BASE `444416722190fd48c14f4423d101f36b25831de1`（Task5 已接受）。**工程檢查完成，Task6 最終獨立審查中；未提交／未正式採用。** Task1–5 原接受結果不改判，整體跨切片審查在 Task6 接受後完成。
++
++## 完成效果與責任
++
++同一顧問可以按需使用 JD 方法，從空白訪談到產生結構化稿、修正條件、保留員工手改並續編。App 發配身分／來源／定位，Plate 執行原生操作，PG 保存真版本與操作結果。已保存的完整改動、歷史與原問答在同頁可查；只有一份可編 JD。
++
++本切片只改主顧問能力宣告與只讀方法邊界，新增一份按需 Skill／兩份引用，不改 Memory B/C 文字、策略、模型、預算或三工具 schema。`ADVISOR_INSTRUCTIONS` 在同一 `api.py` 定義供实际 factory 及離線 factory 共用。CT25 golden 原件不變；新增明示三筆 JD capability／metadata／asset-boundary delta，每筆須命中一次。
++
++方法涵蓋何時足以寫稿、案例不直接變永久任務、未知／更正／低頻／責任邊界、平行成果與要求、同版共享 K/S，以及工作→JD、JD→依據核對。其存在與按需供給已測；**自然模型會否正確使用仍待 P3／P6**。
++
++## 實際結果（群組可能重疊，不累加）
++
++| 驗收 | 實際結果與界線 | Raw 證據 |
++|---|---|---|
++| 全部隔離 Python、無 PG opt-in | **620 passed、151 skipped**，72.54s；skip 不代表 PG 通過 | `task6-final-all.log`／json |
++| 真 JD PG／native／managed 程序 | **156 passed**，280.81s，23 個 test_jd 檔，包含新增端到端及來源反例 | `task6-final-jd.log`／json |
++| 真 Memory PG／實際 factory | **45 passed**，38.55s；11 個 test_postgres 檔及4組 extraction-role 真 PG factory，保留預算／client／Memory 斷言 | `task6-final-memory.log`／json |
++| 原生 Plate | **68 passed**，9檔 | `task6-web-tests.log` |
++| 最終 Web | **41 passed**，9檔；含 key-order、終態讀取及延遲差異期間手改保護 | `task6-review-dirty-green.log` |
++| SSOT／生成 DTO | **PASS**，same schema and DTOs；無手改生成檔 | `task6-web-codegen.log` |
++| 建置／型別／lint | **全部 PASS**；先保留測試fixture型別首敗，再改為完整生成型別 | `task6-web-fix-*.log`／checks.json |
++| 真 Chrome 完整旅程 | **PASS**；空白→不足只問→六章初稿＋K/S→月檢條件更正→DOM手改保存→AI續編→純聊天→同頁歷史／來源 | `task6-browser-initial.json`／png／`task6-browser-fixed5.log` |
++| 真 API 中斷＋新程序／新瀏覽器 | **PASS**；current、5筆歷史、全部來源／原問答與5次原run結果全相等 | `task6-before-api-crash.json`、`task6-restarted-servers.json`、`task6-browser-reopened.json`／log／png |
++| 提交後回覆遺失、純訪談取消 | **PASS**；一版／一份原 ToolMessage／零模型重試；純訪談取消不改 JD | `task6-e2e-result.json`、端到端測試及上列真 JD PG log |
++| OS 真人 IME、自然品質、真人使用 | **NOT RUN** | P3／P6 原門檻保留 |
++
++Raw 檔案在 [jd-editor-task6](jd-editor-task6/)。真 Chrome 由 Playwright 1.61.0 的 headed channel 驅動，1500×1050；實際 Chrome 版本在 JSON，不能以套件版本代稱瀏覽器版本。初次完整旅程的 Web 版本包含前兩項同步修正；其後 Claude F5 的最後 guard 另有精確反例及41項 Web 回歸。最終built Web重開再次PASS；修正前的第一次重開JSON／log／png以 `*-before-review.*` 保留，不把較早旅程說成最後guard的實機反例。
++
++隔離 Node 22.23.2；Plate 53.3.11、Slate 0.126.2、宣告 React／DOM 19.2.4、Next 16.3.3；Python3.12.13、既有 uv.lock。DeepAgents0.7.13 保持 Beta 分類，不冒稱穩定；未為追新升級。沿同一 PostgreSQL16兩個專用測試庫；Memory fixture 明示 additive metadata／JD setup，只清理該 test 建立的 UUID，沒有 reset/drop/truncate。
++
++## 首敗與有限修正
++
++### T6-R01：讀本輪原問答後遺失已發配有效性
++
++真端到端原始2項失敗：`read_conversation` 後覆寫 `jd_sources[reference]`，把 App 已發配的 `current_input` 消掉；本輪尚未關閉的來源隨後被錯當一般歷史拒絕。修正只保留同一 reference 已有 metadata 再附實際 tool-call。沒有替未發配、跨文件或被改 payload 的來源補權。
++
++原 BASE overlay 的 focused regression **1 fail／2 pass**；修正後 **3 pass**。兩個陰性守衛仍拒絕未發配較大範圍与偽造 payload。原端到端第二次剩1 fail 為測試誤把來源第一段顧問問句當員工答案，改為精確核對全部 user 段；canonical reader 未改。來源靜態 Claude 審查限定通過，但其 test 檔名猜錯，未完整讀兩個 test；獨立 Codex 反例及主代理真 PG 執行才是測試證據。
++
++### T6-R02：JSONB key 順序造成假的未保存內容
++
++第一輪真瀏覽器首稿2次原生寫入後，已保存正文被 `JSON.stringify` 當成 dirty，下一輪誤先保存旧版並收到 stale base。用正式歷史 `POST /jd/read` 核對，正文結構相等，僅 key 順序不同。修正 `JdEditor`／`JdSession` 的正文 equality，使用已安裝 `fast-deep-equal@3.1.3`；direct dependency及lock僅各1行，MIT，無新 engine。陣列次序／文字／marks／ID／metadata 不被忽略。
++
++保留2項 RED、測試 storage／lookup stub 首敗，最後3檔27PASS。最初診斷誤用 GET query 實際讀到 current，不能作本因證據；更正的 POST 歷史診斷另存 `task6-browser-dirty-diagnostic-corrected.json`。Claude 限定靜態審查通過；它稱 root 套件不處理 Date 的附帶說法與已安裝 source 相反，未採用。
++
++### T6-R03：終態讀取與較早的正文回覆組成舊畫面
++
++真瀏覽器第四次嘗試發現 run 已 completed，但早啟動的 parallel head/messages 讀到舊內容，前端不再輪詢。依終態先於其後讀取建立順序：先讀 metadata/runs，再讀 head/messages，保留 generation checks。延遲 mock 在實際呼叫時取 snapshot，舊碼 **1 fail／2 pass**；修正後3檔27PASS。不聲稱多 HTTP 請求為同一 DB snapshot。
++
++中間另外兩次瀏覽器失敗是測試 locator 同時匹配正文／隱藏高亮及 nested details；改為原 changes region 的直接 before/after details。第五次 `waitForResponse` promise 先 reject、`click` 尚未結束導致證據 finally 未執行，保留原 raw log，**沒有新的截圖可供該次作根因證據**。改用 Playwright 官方常見 Promise.all 等待點擊與回應後，完整旅程通過；不把這些測試故障當額外產品修正。
++
++### T6-R04：差異讀取期間手改可能被晚到正文蓋掉
++
++Claude F5 提供具體反例，root建立延遲 change-read 後手改的測試。**RED 1 fail／3 pass**，畫面 buffer 變成「AI 新稿」，確認資料遺失可能。最小修正：await changes 後、套用 head 前再核 dirty；若已手改，保留原 buffer／saved baseline並顯示既有通知。沒有新增保存、重試、rebase或全域鎖。最後 **41 Web PASS**；新增 fixture 以完整生成型別提供資料，首個 build 的 TS2352失敗保留。
++
++### 既有回歸 fixture 與環境故障
++
++全Python首跑 **15 fail／609 pass／147 skip**：5個舊建立文件測試沒帶 Task4已要求的request key；4個 real factory SQLite替身不符現已要求真JD PG；2個CT25 AST只接受literal；4個未知寫入stop仍期待拋錯、而Task5已回uncertain。只修測試接點，保留錯誤封鎖、原 golden／Memory政策、真模型預算／角色／client生命週期。4組factory轉真PG實際執行，不能以新增skip省略。
++
++Memory首跑 **16 fail／25 pass**，既有測試库缺metadata欄位；明示additive test setup後45PASS。另保留sandbox Docker拒絕及舊basetemp權限故障；改用新擁有的測試暫存目錄和允許的managed執行，沒有繞過資料庫守衛或刪舊現場。部分Windows managed測試外層exit0仍可含pytest FAIL，所有結果以raw pytest summary核實。
++
++## 官方依據與本案映射
++
++| 資料／查閱 | 官方事實、版本／授權與限制 | 本案使用 |
++|---|---|---|
++| [OpenAI Skills](https://learn.chatgpt.com/docs/build-skills)、[Anthropic Skills](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)，2026-09-11 | 先metadata、再按需正文／材料。託管產品能力各有條件，不採它們的付費code execution；詳[前置證據](../2026-09-11-jd-skill-current-official-preflight.md) | 一份既有顧問的按需方法，檔案數／JD專業內容是本案取捨，不稱供應商統一方案 |
++| [PostgreSQL16 JSON](https://www.postgresql.org/docs/16/datatype-json.html)，2026-09-12 | jsonb不保留object key順序；PG16 supported、PostgreSQL License | 不用JSON序列字串判斷正文語意相等 |
++| [PostgreSQL16 Read Committed](https://www.postgresql.org/docs/16/transaction-iso.html)，2026-09-12 | statement依起始時的已提交資料讀取；不同讀取可看到不同提交 | 終態先讀、其後才取得內容是App因果順序；不是大廠指定的前端架構／原子快照 |
++| [Plate controlled value](https://platejs.org/docs/controlled)，2026-09-12 | Plate管理editor狀態；原生操作／外部value更新有既定接點。實裝53.3.11 MIT，無付費擴充 | 保留既有native batch及必要重建分支，修正baseline比較，不另造編輯器 |
++| [React useEffect](https://react.dev/reference/react/useEffect)，2026-09-12 | 非同步回覆可亂序，cleanup／忽略舊結果有官方示例；React19 MIT | 沿既有generation與dispose guard，額外在真正套用時重核人工buffer |
++| [fast-deep-equal](https://github.com/epoberezkin/fast-deep-equal#readme)，2026-09-12本機source核對 | 實裝3.1.3、MIT；比較object內容及有序array，已在lock | 宣告直接使用的既有依賴；不把單一套件稱跨廠共識 |
++
++只將有跨來源支持的按需方法、依真工具結果、明確資料責任稱共同原則。資料表、具體refs、UI順序及恢復接法仍是已有設計的本案映射。沒有推測OpenAI／Anthropic未公開的JD資料庫內部實作。
++
++## 審查及剩餘 gate
++
++Claude Opus5經用戶明確授權，只讀相關隔離程式／測試／technical synthetic材料，排除秘密、帳號及真實訪談。保留實際CLI model、Read工具、無MCP與使用結果；CLI估價不是訂閱實際帳單。前三次限定review加本次 correction review 不代稱整體Task6／core approval。F5已由root重現修正；F4所指JD工具覆蓋在 `test_jd_end_to_end.py` 的最終SDK payload逐schema／description比對，無須新增平行golden。其餘低風險建議未構成觀察到的產品缺口，保留範圍說明。
++
++下一gate：Task6凍結包独立審查→精確本地commit→整體跨切片審查／tag。之後按成品計畫進P3自然模型費用防護與案例授權、P4 successor ADR/G6、P5啟停／備份還原／更新、P6長訪談及三名員工、P7本機交付。現有正式ADR0060權責不變，未merge／push／正式部署。原先AGENTS更新、README11行與其他Memory研究不混入本切片。

@@ -1,0 +1,32 @@
+[
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+    "copy": "jd_tools.py",
+    "sha256": "9e85aae99d9bd5a133a099bd6544f91eba7d963b0390cb0623705669ab83bff5"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/jd_references.py",
+    "copy": "jd_references.py",
+    "sha256": "e53c89adfda77a2bc811be32edf678e210d35cf984b5f4fcca3b2e6c0d2ef39f"
+  },
+  {
+    "source": "experiments/analysis-agent/src/analysis_agent/sources.py",
+    "copy": "sources.py",
+    "sha256": "b42f8d98740d5d61295da00dfe8677b4d97758c5ae53339eae6f014e4bbbe2ac"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_jd_sources.py",
+    "copy": "test_jd_sources.py",
+    "sha256": "b2f04816d654efd2650de9d9e8960ac8d1e70c9f48bb4366d0d1743174c2f7a1"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/test_jd_end_to_end.py",
+    "copy": "test_jd_end_to_end.py",
+    "sha256": "36b1a30526944195af3c7941d24f3fbdd33edadcea3aa56308c76d77eab6004c"
+  },
+  {
+    "source": "experiments/analysis-agent/tests/jd_offline_service.py",
+    "copy": "jd_offline_service.py",
+    "sha256": "9f0ba4c252fdc3ec6b96d4133f4adb4ce136ddbe171edb9e836ec90d328fff89"
+  }
+]

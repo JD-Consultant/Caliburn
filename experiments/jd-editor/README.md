@@ -1,5 +1,11 @@
 # JD editor — 隔離核心與工作畫面
 
+## Task 6 完整固定旅程
+
+同一顧問現在能按需讀取 JD 寫作方法，以既有三工具完成初稿、條件更正與手改後續編。方法不強制每輪改稿，不新增 Agent 或 Memory 策略。實際差異、原問答及五筆歷史在同一画面可查；真 API 程序中斷後全值恢復已驗。固定回應不證明自然模型專業品質；完整範圍與重現方式見 [ACCEPTANCE.md](ACCEPTANCE.md)，Task6 獨立審查已閉合，整體跨切片審查接續進行。
+
+已保存 JSONB 的 object key 順序沒有語意；Web 使用既有 MIT `fast-deep-equal@3.1.3` 比對正文，陣列順序、內容及 metadata 仍納入。輪詢先觀測執行狀態再讀內容，避免終態停留舊稿；延遲差異回來時再核對 dirty，保留途中手改及其原保存基準。這些是既有框架接點的有限修正，沒有新同步／回退引擎。
+
 ## Task 4 工作畫面
 
 `web/` 現在提供本機 3001 的文件建立／清單／重開，以及同頁聊天與唯一可編 JD。8091 沿同一 AnalysisService、catalog、三個 JD factory tools 與 PostgreSQL 保存 ports；來源回查沿實際 ConversationReader，模型摘要不取代確切前後版本。詳細啟動、非權威 recovery cache、navigation guard 與限制見 [web/README.md](web/README.md)。

@@ -1,0 +1,118 @@
+........................................................................ [  9%]
+........................................................................ [ 18%]
+........................................................................ [ 28%]
+........................................................................ [ 37%]
+.ssss.....sssssss...sssssssssss........sssssssss.sssss..ssssssss.sssssss [ 46%]
+ssss.ss....sssssssssssssssssssssssssssssssssssssss.s........ss.......... [ 56%]
+........sssssssssss..................................................... [ 65%]
+........................................................................ [ 74%]
+....................sssssssssssssssssssssssssssssssssssssssss........... [ 84%]
+........................................................................ [ 93%]
+...................................................                      [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+SKIPPED [4] tests\test_extraction_role.py:77: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [1] tests\test_jd_admission.py:62: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_admission.py:105: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_admission.py:147: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [4] tests\test_jd_admission.py:181: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_api.py:83: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_api.py:136: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_api.py:166: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_close_reconcile.py:14: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_current_source_acquisition.py:26: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_end_to_end.py:58: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_end_to_end.py:140: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_fix1.py:14: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_fix1.py:38: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1.py:74: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_fix1.py:89: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1.py:136: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_fix1_admission.py:29: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1_admission.py:52: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1_admission.py:81: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_fix1_admission.py:107: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_fix2.py:12: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:35: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:58: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:75: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:105: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_manual_recovery.py:133: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:9: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:53: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:74: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:102: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:120: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:141: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:155: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:174: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:186: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:214: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:229: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view.py:246: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view_recovery.py:13: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_model_view_recovery.py:63: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:58: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:70: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:102: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:120: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_postgres.py:146: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:163: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:175: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:188: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:212: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:227: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:250: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:273: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:290: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:305: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:323: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:339: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:385: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:397: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:417: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:435: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:452: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres.py:469: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_postgres_recovery.py:9: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_postgres_recovery.py:57: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_postgres_recovery.py:70: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [5] tests\test_jd_process_lifecycle.py:28: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_process_lifecycle.py:50: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [2] tests\test_jd_process_lifecycle.py:71: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_provider_binding.py:12: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_provider_binding.py:67: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_sources.py:8: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_sources.py:37: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:23: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:105: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:116: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:132: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_jd_tools.py:143: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:156: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:168: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:197: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [1] tests\test_jd_tools.py:216: Dedicated JD PostgreSQL DSN required; not a persistence pass
+SKIPPED [3] tests\test_postgres_consolidation.py:30: Dedicated q019_agent_test required; not a durability pass
+SKIPPED [3] tests\test_postgres_consolidation_request.py:21: Dedicated q019_agent_test required; notification durability NOT verified
+SKIPPED [1] tests\test_postgres_conversation.py:18: Set Q019_TEST_DATABASE_URL to dedicated q019_agent_test DB; not a durability pass
+SKIPPED [4] tests\test_postgres_conversation_lifecycle.py:31: Dedicated q019_agent_test required; root/child durability NOT verified
+SKIPPED [2] tests\test_postgres_extraction.py:24: Requires dedicated q019_agent_test; not a durability pass
+SKIPPED [4] tests\test_postgres_live_memory.py:30: Dedicated q019_agent_test required; not a durability pass
+SKIPPED [1] tests\test_postgres_memory.py:22: Set Q019_TEST_DATABASE_URL to dedicated q019_agent_test DB; not a persistence pass
+SKIPPED [4] tests\test_postgres_publication.py:57: Dedicated q019_agent_test DSN required; not a concurrency pass
+SKIPPED [1] tests\test_postgres_publication.py:97: Dedicated q019_agent_test DSN required; not a concurrency pass
+SKIPPED [5] tests\test_postgres_scheduling.py:13: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [1] tests\test_postgres_scheduling.py:75: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [3] tests\test_postgres_service.py:90: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [1] tests\test_postgres_service.py:125: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [1] tests\test_postgres_service.py:150: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [2] tests\test_postgres_service.py:181: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [3] tests\test_postgres_service.py:220: Dedicated q019_agent_test required; service durability NOT verified
+SKIPPED [2] tests\test_postgres_summary_reextraction.py:31: Dedicated q019_agent_test required; not a durability pass
+620 passed, 151 skipped, 1 warning in 72.54s (0:01:12)

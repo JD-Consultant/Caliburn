@@ -1,0 +1,35 @@
+
+> @caliburn/jd-editor-native@0.0.1 build
+> tsc -p tsconfig.json
+
+
+> @caliburn/jd-editor-web@0.0.1 prebuild
+> npm run build -w @caliburn/jd-editor-native
+
+
+> @caliburn/jd-editor-native@0.0.1 build
+> tsc -p tsconfig.json
+
+
+> @caliburn/jd-editor-web@0.0.1 build
+> next build
+
+▲ Next.js 16.3.3 (Turbopack)
+✓ Running next.config.ts took 642ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 4.4s
+  Running TypeScript ...
+src/jd/JdSavedProjection.test.tsx(44,45): error TS2352: Conversion of type '{ status: "ok"; before_revision_ref: string; after_revision_ref: string; native_operations: ({ type: string; path: number[]; node: { id: string; children: { text: string; }[]; type: string; }; } | { type: string; path: number[]; node: JdRootSavedElement; })[]; }' to type 'JdChangeReadSuccess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ status: "ok"; before_revision_ref: string; after_revision_ref: string; native_operations: ({ type: string; path: number[]; node: { id: string; children: { text: string; }[]; type: string; }; } | { type: string; path: number[]; node: JdRootSavedElement; })[]; }' is missing the following properties from type 'JdChangeReadSuccess': mode, change_ref, origin, before_fragment, and 4 more.
+src/jd/JdSavedProjection.test.tsx(53,45): error TS2352: Conversion of type '{ status: "ok"; before_revision_ref: string; after_revision_ref: string; native_operations: { type: string; path: number[]; offset: number; text: string; }[]; }' to type 'JdChangeReadSuccess' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type '{ status: "ok"; before_revision_ref: string; after_revision_ref: string; native_operations: { type: string; path: number[]; offset: number; text: string; }[]; }' is missing the following properties from type 'JdChangeReadSuccess': mode, change_ref, origin, before_fragment, and 4 more.
+Failed to type check.
+
+npm error Lifecycle script `build` failed with error:
+npm error code 1
+npm error path S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web
+npm error workspace @caliburn/jd-editor-web@0.0.1
+npm error location S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web
+npm error command failed
+npm error command C:\WINDOWS\system32\cmd.exe /d /s /c next build

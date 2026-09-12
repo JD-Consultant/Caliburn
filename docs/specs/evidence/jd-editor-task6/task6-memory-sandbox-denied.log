@@ -1,0 +1,11 @@
+permission denied while trying to connect to the docker API at npipe:////./pipe/dockerDesktopLinuxEngine
+Traceback (most recent call last):
+  File "S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\tests\task5_memory_runner.py", line 8, in <module>
+    container=json.loads(subprocess.check_output(['docker','inspect','caliburn-q019-postgres'],text=True))[0]
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py", line 466, in check_output
+    return run(*popenargs, stdout=PIPE, timeout=timeout, check=True,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\subprocess.py", line 571, in run
+    raise CalledProcessError(retcode, process.args,
+subprocess.CalledProcessError: Command '['docker', 'inspect', 'caliburn-q019-postgres']' returned non-zero exit status 1.

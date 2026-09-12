@@ -1,0 +1,26 @@
+{
+  "group": "memory",
+  "argv": [
+    "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+    "tests/task5_memory_runner.py",
+    "-q",
+    "-ra",
+    "tests\\test_postgres_consolidation.py",
+    "tests\\test_postgres_consolidation_request.py",
+    "tests\\test_postgres_conversation.py",
+    "tests\\test_postgres_conversation_lifecycle.py",
+    "tests\\test_postgres_extraction.py",
+    "tests\\test_postgres_live_memory.py",
+    "tests\\test_postgres_memory.py",
+    "tests\\test_postgres_publication.py",
+    "tests\\test_postgres_scheduling.py",
+    "tests\\test_postgres_service.py",
+    "tests\\test_postgres_summary_reextraction.py",
+    "tests/test_extraction_role.py::test_real_factory_routes_models_through_same_budget_and_lifetime",
+    "--basetemp=../../scratch/task6-final-memory-temp"
+  ],
+  "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent",
+  "exit_code": 0,
+  "elapsed_seconds": 41.09,
+  "provider": "offline fixtures only"
+}

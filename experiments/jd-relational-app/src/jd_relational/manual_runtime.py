@@ -9,14 +9,17 @@ This module does not start or rewind an Agent.
 from concurrent.futures import Future, ThreadPoolExecutor, wait
 from contextvars import ContextVar
 from dataclasses import dataclass, field
-from threading import Event, Lock, RLock, current_thread, main_thread
+from threading import Event, Lock, RLock, current_thread, get_ident, main_thread
 from time import monotonic
-from typing import Callable, Protocol
+from typing import TYPE_CHECKING, Callable, Protocol
 from uuid import UUID
 
 from .intents import AdmittedIdentity, BoundEdit
 from .storage.receipts import WriteObservation
 from .storage.service import JdStorage, WriterAuthority
+
+if TYPE_CHECKING:
+    from .storage.service import CatalogRecord
 
 
 class RuntimeFailure(ValueError):
@@ -85,6 +88,7 @@ class _Entry:
 class _Slot:
     lock: RLock = field(default_factory=RLock)
     entry: _Entry | None = None
+    catalog_token: object | None = None
 
 
 def _attempt(mode):
@@ -116,6 +120,7 @@ class ManualRuntime:
             self._startup_done.set()  # Standalone in-process owner, no orphan adoption.
         self._pool = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="jd-manual")
         self._execution = ContextVar("jd_manual_execution", default=None)
+        self._catalog_execution = ContextVar("jd_catalog_execution", default=None)
         self.storage = storage_factory(self)
 
     def _slot(self, document, *, admit=False):
@@ -213,6 +218,79 @@ class ManualRuntime:
                 raise ValueError()
         except (ValueError, TypeError, AttributeError):
             raise RuntimeFailure("invalid_input") from None
+
+    def _require_catalog_admission(self, slot):
+        self._require_open()
+        self._require_host()
+        if not self._startup_done.is_set():
+            raise RuntimeFailure("startup_pending")
+        if slot.catalog_token is not None:
+            raise RuntimeFailure("document_busy")
+
+    def create_document(self, request_key: UUID, title: str) -> str:
+        if not isinstance(request_key, UUID) or type(title) is not str:
+            raise RuntimeFailure("invalid_input")
+        key = ("create", request_key)
+        slot = self._slot(key, admit=True)
+        with slot.lock:
+            self._require_catalog_admission(slot)
+            slot.catalog_token = object()
+            context = self._catalog_execution.set((key, slot.catalog_token, get_ident()))
+            try:
+                return self.storage.create_document(request_key, title,
+                    catalog_guard=lambda: self.require_catalog(key))
+            finally:
+                self._catalog_execution.reset(context)
+                slot.catalog_token = None
+
+    def update_catalog(self, document_id: str, metadata_version: int, *,
+                       title: str | None = None, archived: bool | None = None) -> "CatalogRecord":
+        try:
+            if (type(document_id) is not str or str(UUID(document_id)) != document_id
+                    or type(metadata_version) is not int or metadata_version < 1
+                    or title is not None and type(title) is not str
+                    or archived is not None and type(archived) is not bool
+                    or title is None and archived is None):
+                raise ValueError()
+        except (ValueError, TypeError, AttributeError):
+            raise RuntimeFailure("invalid_input") from None
+        slot = self._slot(document_id, admit=True)
+        with slot.lock:
+            self._require_catalog_admission(slot)
+            if slot.entry is not None:
+                raise RuntimeFailure("document_busy")
+            slot.catalog_token = object()
+            context = None
+            try:
+                try:
+                    pending = self.checkpoints.read(document_id)
+                except Exception as error:
+                    raise RuntimeFailure(_checkpoint_failure(error)) from None
+                if pending is not None:
+                    raise RuntimeFailure("document_busy")
+                # Track Saver I/O for close(), but issue SQL authority only
+                # after the native root has proved idle.
+                context = self._catalog_execution.set((document_id, slot.catalog_token, get_ident()))
+                return self.storage.update_catalog(document_id, metadata_version,
+                    title=title, archived=archived,
+                    catalog_guard=lambda: self.require_catalog(document_id))
+            finally:
+                if context is not None:
+                    self._catalog_execution.reset(context)
+                slot.catalog_token = None
+
+    def require_catalog(self, key: str | tuple[str, UUID]) -> None:
+        """Authorize only this active synchronous call, including its final SQL check."""
+        self._require_host()
+        context = self._catalog_execution.get()
+        if context is None or context[0] != key or context[2] != get_ident():
+            raise RuntimeFailure("writer_not_valid")
+        slot = self._slot(key)
+        with slot.lock:
+            if slot.catalog_token is not context[1]:
+                raise RuntimeFailure("writer_not_valid")
+        # Closing admission does not revoke already-admitted SQL. close() must
+        # instead drain this slot through the storage call's COMMIT/exception.
 
     def submit(self, intent: BoundEdit) -> WriterHandle:
         if not isinstance(intent, BoundEdit):
@@ -416,6 +494,8 @@ class ManualRuntime:
             if not slot.lock.acquire(timeout=max(0, deadline - monotonic())):
                 return False  # Admission/checkpoint I/O is still using resources.
             try:
+                if slot.catalog_token is not None:
+                    return False  # A same-thread RLock reentry did not drain its call.
                 entry = slot.entry
                 if entry and entry.attempt.future:
                     attempts.append(entry.attempt)

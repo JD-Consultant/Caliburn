@@ -69,14 +69,15 @@ def manual_problem(scope, code="service_unavailable", *, internal=False):
 
 
 class ManualOriginGate:
-    def __init__(self, app, *, allowed_origins):
+    def __init__(self, app, *, allowed_origins, problem_factory=manual_problem):
         self.app, self.allowed_origins = app, frozenset(allowed_origins)
+        self.problem_factory = problem_factory
 
     async def __call__(self, scope, receive, send):
         if scope["type"] == "http" and scope["method"] in {"POST", "PUT", "PATCH", "DELETE"}:
             origins = [value for name, value in scope.get("headers", []) if name.lower() == b"origin"]
             if len(origins) != 1 or origins[0].decode("latin-1") not in self.allowed_origins:
-                return await manual_problem(scope, "origin_not_allowed")(scope, receive, send)
+                return await self.problem_factory(scope, "origin_not_allowed")(scope, receive, send)
         return await self.app(scope, receive, send)
 
 
@@ -85,9 +86,10 @@ class ManualBoundary(QueryBoundary):
     interrupted_message = "jd_manual_response_interrupted"
     event_name = "jd.http.workspace"
     log_message = "JD workspace request completed"
+    origin_problem = staticmethod(manual_problem)
 
     def __init__(self, app, *, allowed_origins):
-        super().__init__(ManualOriginGate(app, allowed_origins=allowed_origins))
+        super().__init__(ManualOriginGate(app, allowed_origins=allowed_origins, problem_factory=self.origin_problem))
 
     def failure_response(self, scope, error):
         if getattr(scope.get("route"), "path", None) in QueryBoundary.routes:
@@ -100,6 +102,10 @@ class ManualBoundary(QueryBoundary):
 def create_manual_app(
     resources: Callable[[], AbstractAsyncContextManager[ManualServices]],
     *, allowed_origins: tuple[str, ...],
+    _boundary_factory=ManualBoundary,
+    _allowed_methods=("GET", "POST"),
+    _allowed_headers=("Content-Type",),
+    _expose_headers=("X-Request-ID",),
 ) -> FastAPI:
     # This local browser API deliberately requires a single, configured Origin
     # on unsafe methods, including requests from an eventual same-origin UI.
@@ -119,8 +125,9 @@ def create_manual_app(
 
     app = create_query_app(
         resources, allowed_origins=allowed_origins, _body_limit=REQUEST_LIMIT,
-        _boundary_factory=partial(ManualBoundary, allowed_origins=allowed_origins),
-        _allowed_methods=("GET", "POST"),
+        _boundary_factory=partial(_boundary_factory, allowed_origins=allowed_origins),
+        _allowed_methods=_allowed_methods, _allowed_headers=_allowed_headers,
+        _expose_headers=_expose_headers,
     )
     app.title = "Caliburn JD workspace"
 

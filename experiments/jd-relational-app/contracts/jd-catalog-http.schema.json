@@ -1,0 +1,129 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "CatalogHttpCatalog",
+  "description": "Generation catalog for document management. The original creation key and dataset identify a create request; metadata concurrency uses HTTP If-Match, not a second body authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "CatalogDocument": {"$ref": "#/$defs/CatalogDocument"},
+    "CatalogPage": {"$ref": "#/$defs/CatalogPage"},
+    "CatalogCreateInput": {"$ref": "#/$defs/CatalogCreateInput"},
+    "CatalogRenameInput": {"$ref": "#/$defs/CatalogRenameInput"},
+    "CatalogArchiveInput": {"$ref": "#/$defs/CatalogArchiveInput"},
+    "CatalogMetadataInput": {"$ref": "#/$defs/CatalogMetadataInput"},
+    "CatalogCreationResult": {"$ref": "#/$defs/CatalogCreationResult"},
+    "CatalogCreationLookup": {"$ref": "#/$defs/CatalogCreationLookup"},
+    "CatalogProblem": {"$ref": "#/$defs/CatalogProblem"}
+  },
+  "required": ["CatalogDocument", "CatalogPage", "CatalogCreateInput", "CatalogRenameInput", "CatalogArchiveInput", "CatalogMetadataInput", "CatalogCreationResult", "CatalogCreationLookup", "CatalogProblem"],
+  "$defs": {
+    "CatalogUuid": {
+      "title": "CatalogUuid", "type": "string", "minLength": 36, "maxLength": 36,
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "CatalogTitle": {
+      "title": "CatalogTitle", "type": "string", "minLength": 1,
+      "pattern": "^[^\u0000]*[^\\s\u0000\u001c-\u001f][^\u0000]*$",
+      "description": "The unchanged user title; at least one non-whitespace character and no NUL. UTF-8 body and storage byte limits are checked by their owning boundaries."
+    },
+    "CatalogTimestamp": {
+      "title": "CatalogTimestamp", "type": "string", "format": "date-time",
+      "pattern": "^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[12][0-9]|3[01])[Tt]([01][0-9]|2[0-3]):[0-5][0-9]:([0-5][0-9]|60)(\\.[0-9]+)?([Zz]|[+-]([01][0-9]|2[0-3]):[0-5][0-9])$",
+      "description": "RFC 3339 wire string produced from a native database timestamp. The pattern constrains syntax; calendar validity comes from the database datetime, not a custom date parser."
+    },
+    "CatalogDocument": {
+      "title": "CatalogDocument", "type": "object", "additionalProperties": false,
+      "properties": {
+        "document_id": {"$ref": "#/$defs/CatalogUuid"},
+        "title": {"$ref": "#/$defs/CatalogTitle"},
+        "archived": {"type": "boolean"},
+        "metadata_version": {"type": "integer", "minimum": 1, "maximum": 9007199254740991},
+        "created_at": {"$ref": "#/$defs/CatalogTimestamp"},
+        "updated_at": {"$ref": "#/$defs/CatalogTimestamp"}
+      },
+      "required": ["document_id", "title", "archived", "metadata_version", "created_at", "updated_at"]
+    },
+    "CatalogPage": {
+      "title": "CatalogPage", "type": "object", "additionalProperties": false,
+      "properties": {
+        "dataset_id": {"$ref": "#/$defs/CatalogUuid"},
+        "documents": {"type": "array", "maxItems": 100, "items": {"$ref": "#/$defs/CatalogDocument"}},
+        "next_after": {"anyOf": [{"$ref": "#/$defs/CatalogUuid"}, {"type": "null"}]}
+      },
+      "required": ["dataset_id", "documents", "next_after"]
+    },
+    "CatalogCreateInput": {
+      "title": "CatalogCreateInput", "type": "object", "additionalProperties": false,
+      "properties": {
+        "request_key": {"$ref": "#/$defs/CatalogUuid"},
+        "dataset_id": {"$ref": "#/$defs/CatalogUuid"},
+        "title": {"$ref": "#/$defs/CatalogTitle"}
+      },
+      "required": ["request_key", "dataset_id", "title"]
+    },
+    "CatalogRenameInput": {
+      "title": "CatalogRenameInput", "type": "object", "additionalProperties": false,
+      "properties": {"title": {"$ref": "#/$defs/CatalogTitle"}},
+      "required": ["title"]
+    },
+    "CatalogArchiveInput": {
+      "title": "CatalogArchiveInput", "type": "object", "additionalProperties": false,
+      "properties": {"archived": {"type": "boolean"}},
+      "required": ["archived"]
+    },
+    "CatalogMetadataInput": {
+      "title": "CatalogMetadataInput",
+      "description": "One named metadata change on the conditional metadata endpoint; no null, unknown property or combined rename/archive is accepted.",
+      "oneOf": [{"$ref": "#/$defs/CatalogRenameInput"}, {"$ref": "#/$defs/CatalogArchiveInput"}]
+    },
+    "CatalogCreationResult": {
+      "title": "CatalogCreationResult", "type": "object", "additionalProperties": false,
+      "properties": {
+        "request_key": {"$ref": "#/$defs/CatalogUuid"},
+        "dataset_id": {"$ref": "#/$defs/CatalogUuid"},
+        "document_id": {"$ref": "#/$defs/CatalogUuid"}
+      },
+      "required": ["request_key", "dataset_id", "document_id"]
+    },
+    "CatalogCreationFound": {
+      "title": "CatalogCreationFound", "type": "object", "additionalProperties": false,
+      "properties": {
+        "state": {"type": "string", "enum": ["found"]},
+        "request_key": {"$ref": "#/$defs/CatalogUuid"},
+        "dataset_id": {"$ref": "#/$defs/CatalogUuid"},
+        "document_id": {"$ref": "#/$defs/CatalogUuid"}
+      },
+      "required": ["state", "request_key", "dataset_id", "document_id"]
+    },
+    "CatalogCreationNotFound": {
+      "title": "CatalogCreationNotFound", "type": "object", "additionalProperties": false,
+      "description": "No persisted document was found for this original key in this dataset. This does not establish that no request is still in progress or could arrive later.",
+      "properties": {
+        "state": {"type": "string", "enum": ["not_found"]},
+        "request_key": {"$ref": "#/$defs/CatalogUuid"},
+        "dataset_id": {"$ref": "#/$defs/CatalogUuid"},
+        "document_id": {"type": "null"}
+      },
+      "required": ["state", "request_key", "dataset_id", "document_id"]
+    },
+    "CatalogCreationLookup": {
+      "title": "CatalogCreationLookup",
+      "oneOf": [{"$ref": "#/$defs/CatalogCreationFound"}, {"$ref": "#/$defs/CatalogCreationNotFound"}]
+    },
+    "CatalogProblem": {
+      "title": "CatalogProblem", "type": "object", "additionalProperties": false,
+      "description": "RFC 9457 request problem, without an invented JD mutation receipt or rollback assertion. Action selection is a fixed App mapping, never an automatic retry instruction.",
+      "properties": {
+        "type": {"type": "string", "enum": ["about:blank"]},
+        "title": {"type": "string", "minLength": 1, "maxLength": 256},
+        "status": {"type": "integer", "enum": [403, 404, 409, 412, 415, 422, 428, 500, 503]},
+        "detail": {"type": "string", "minLength": 1, "maxLength": 2048},
+        "instance": {"type": "string", "minLength": 45, "maxLength": 45,
+                     "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+        "code": {"type": "string", "enum": ["invalid_input", "document_missing", "creation_conflict", "precondition_required", "metadata_changed", "busy", "service_unavailable", "write_unconfirmed", "origin_not_allowed", "dataset_changed", "unsupported_patch"]},
+        "next_action": {"type": "string", "enum": ["correct_input", "reread", "retry_same_creation", "wait", "stop"]}
+      },
+      "required": ["type", "title", "status", "detail", "instance", "code", "next_action"]
+    }
+  }
+}

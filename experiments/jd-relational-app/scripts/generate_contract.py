@@ -12,7 +12,8 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = [("jd-work", "models.py"), ("jd-result", "results.py"), ("jd-http", "http_results.py"),
            ("jd-snapshot", "snapshots.py"), ("jd-read", "reads.py"),
-           ("jd-query-http", "query_http.py"), ("jd-manual-http", "manual_http.py")]
+           ("jd-query-http", "query_http.py"), ("jd-manual-http", "manual_http.py"),
+           ("jd-catalog-http", "catalog_http.py")]
 OUTPUT = ROOT / "src" / "jd_relational" / "generated"
 
 
@@ -70,6 +71,7 @@ def main() -> None:
                 "--disable-timestamp",
                 "--no-allow-remote-refs",
                 "--fail-on-multi-module-stdout",
+                *(["--type-mappings", "string+date-time=string"] if name == "jd-catalog-http" else []),
                 *references,
             ]
         )

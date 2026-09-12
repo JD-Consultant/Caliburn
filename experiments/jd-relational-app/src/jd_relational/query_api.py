@@ -140,6 +140,8 @@ def create_query_app(
     _body_limit: int = 16384,
     _boundary_factory=QueryBoundary,
     _allowed_methods: tuple[str, ...] = ("POST",),
+    _allowed_headers: tuple[str, ...] = ("Content-Type",),
+    _expose_headers: tuple[str, ...] = ("X-Request-ID",),
 ) -> FastAPI:
     try:
         for origin in allowed_origins:
@@ -195,9 +197,9 @@ def create_query_app(
         CORSMiddleware,
         allow_origins=list(allowed_origins),
         allow_methods=list(_allowed_methods),
-        allow_headers=["Content-Type"],
+        allow_headers=list(_allowed_headers),
         allow_credentials=False,
-        expose_headers=["X-Request-ID"],
+        expose_headers=list(_expose_headers),
     )
 
     @app.exception_handler(RequestValidationError)

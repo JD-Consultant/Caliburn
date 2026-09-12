@@ -16,7 +16,8 @@ import uvicorn
 from host_recovery_worker import DATABASE_URL, SCHEMA, child_graph, write
 from jd_relational.change_reads import ChangeReadService
 from jd_relational.host_runtime import open_manual_host
-from jd_relational.manual_api import ManualServices, create_manual_app
+from jd_relational.catalog_api import CatalogServices, create_catalog_app
+from jd_relational.catalog_service import CatalogService
 from jd_relational.manual_service import ManualService
 from jd_relational.reads import ReadService
 from jd_relational.references import ReferenceCodec
@@ -24,6 +25,7 @@ from jd_relational.storage.history import HistoryReader
 
 
 ORIGIN = "http://127.0.0.1:3007"
+DATASET = "a59866fa-28fa-4d53-a6ee-002fb3a3b814"
 
 
 def main(mode, installation, manifest, report):
@@ -32,7 +34,7 @@ def main(mode, installation, manifest, report):
     write(report.with_suffix(".boot.json"), common)
     # Assignment is deliberately inside this dedicated process's main thread.
     host = open_manual_host(installation, DATABASE_URL, checkpoint_schema=SCHEMA, consultant=child_graph())
-    codec = ReferenceCodec(b"synthetic-manual-http-key-only-0000", "synthetic-manual-http-dataset")
+    codec = ReferenceCodec(b"synthetic-manual-http-key-only-0000", DATASET)
     history = HistoryReader(host.engine)
     release, calls, document = Event(), [], None
     if mode == "resume":
@@ -46,6 +48,16 @@ def main(mode, installation, manifest, report):
         return original_execute(intent)
 
     host.runtime.storage.execute = execute
+    original_create = host.runtime.create_document
+
+    def create_document(key, title):
+        result = original_create(key, title)
+        if mode == "catalog":
+            write(report.with_suffix(".catalog-created.json"), {"document": result, "request_key": str(key)})
+            assert release.wait(40), "Harness must release its own catalog response"
+        return result
+
+    host.runtime.create_document = create_document
 
     @asynccontextmanager
     async def resources():
@@ -54,7 +66,7 @@ def main(mode, installation, manifest, report):
         if mode == "resume":
             document = json.loads(manifest.read_text(encoding="utf-8"))["document"]
         else:
-            assert mode == "new"
+            assert mode in {"new", "catalog"}
             document = host.runtime.storage.create_document(uuid4(), "合成完整 HTTP 共同編輯")
             host.graph.update_state({"configurable": {"thread_id": document}},
                 {"messages": [HumanMessage(content="原始員工說明\n只能追加與更正，不撤回原話", id="http-original")]},
@@ -63,12 +75,13 @@ def main(mode, installation, manifest, report):
         service = ManualService(host.runtime, history, codec, wait_timeout=2)
         write(report, {**common, "document": document, "port": bound.getsockname()[1], "recovered": recovered})
         try:
-            yield ManualServices(ReadService(host.runtime.storage, history, codec), ChangeReadService(history, codec), service)
+            yield CatalogServices(ReadService(host.runtime.storage, history, codec), ChangeReadService(history, codec),
+                                  service, CatalogService(host.runtime, DATASET))
         finally:
             closed = await run_in_threadpool(host.close, timeout=10)
             assert closed
 
-    app = create_manual_app(resources, allowed_origins=(ORIGIN,))
+    app = create_catalog_app(resources, allowed_origins=(ORIGIN,))
     bound = socket.socket()
     bound.bind(("127.0.0.1", 0))
     server = uvicorn.Server(uvicorn.Config(app, host="127.0.0.1", port=bound.getsockname()[1],

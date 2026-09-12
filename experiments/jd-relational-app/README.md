@@ -2,7 +2,7 @@
 
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
-**目前沒有可開啟的 App 畫面；八操作已透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及人工操作查回／狀態／明示恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。文件入口 HTTP、AI 回合、持久本機設定、日常啟動器及畫面尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
+**目前沒有可開啟的 App 畫面；八操作已透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接读取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復 HTTP。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。AI 回合、持久本機設定、日常啟動器及畫面尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
 
 ## 結構
 
@@ -13,6 +13,7 @@
 - `change_reads.py`／`change_transport.py`：共用 read SSOT，將原 operation 的完整前後差異投影為唯讀、可續讀 records；兩家 SDK 離線驗工具與結果外殼。
 - `contracts/jd-query-http.schema.json`／`query_http.py`／`query_api.py`：generated 查詢錯誤與 FastAPI 查詢路由；宿主注入資源，原生 lifespan／threadpool／輸入限制，沒有 mutation 路由或假的 writer owner。
 - `contracts/jd-manual-http.schema.json`／`manual_service.py`／`manual_api.py`：generated 人工保存／狀態／原操作查回；人工 App 由原 query app 增加四個具名路由，仍使用同一 domain／保存 owner。mandatory configured Origin 在 unsafe POST body／admission 前檢查，回覆遺失不取消 writer。
+- `contracts/jd-catalog-http.schema.json`／`catalog_service.py`／`catalog_api.py`：在同一宿主新增文件建立／列表／查回／metadata；create 依原 key 與 dataset，metadata 以 ETag＋CAS 更新單一欄位。目錄更新不增加正文 revision，不新增目錄資料庫。
 - `src/jd_relational/generated`：標準工具生成 Python DTO／TS 型別，禁止手改。
 - `transport.py`：人工與模型轉入同一 command；兩家工具外殼不同。
 - `application.py`：同一準備入口，保留候選／原錯誤，發出固定安全診斷；沒有重試或保存。
@@ -66,6 +67,7 @@ uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_query_postgre
 uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_operation_lookup.py tests/test_manual_runtime_postgres.py
 uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_host_recovery_postgres.py
 uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_manual_service_postgres.py tests/test_manual_http_postgres.py
+uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_catalog_storage.py tests/test_catalog_service_postgres.py tests/test_catalog_native_http.py
 Remove-Item Env:JD_RELATIONAL_TEST_DB
 ```
 
@@ -79,14 +81,16 @@ Windows-only `pywin32==312` 使用 creator token 的 default DACL、不繼承 ha
 
 人工 HTTP 新程序情境以真 `open_manual_host`／Uvicorn／PG 執行，原始連線在 admission 後不接收回覆直接關閉；原操作查回、後續改稿後重送及新程序重開仍保持相同結果。測試沿 `jd_host_test`，證據於 `.research-tmp/jd-manual-http-*`；合成固定 Origin／signing key／dataset 僅屬 fixture，不能用於日常配置。第一次開新資料集／普通開啟的配置責任仍待下一單位接合。
 
+文件目錄真程序情境使用同一 helper／host，在建立已提交後刻意不接收 HTTP 回覆；原 key 查回、後續更名封存與新程序重開仍對應同一文件。證據於 `.research-tmp/jd-catalog-http-*`。一般服務只能經 runtime 建立／改目錄；storage 無 guard 建立只保留內部 fixture 相容，不可直接暴露為 App endpoint。
+
 ## 待接責任
 
 目前／歷史 item、field、container、section 與觀察 refs 已發配／驗證，`command_context` 用同版讀取材料重核可寫用途、存在性與欄位摘要。來源查核仍是注入 callback，未接實際 source owner；讀取回 `readability=not_checked`。瀏覽器選區發配仍未完成，此接點明示拒絕 selection，不把 field ref 當選區。
 
-`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。獨立 query app 仍只供讀取；新 manual app 的寫入由宿主注入同一 `ManualRuntime`。安裝 key／dataset／簽章的持久配置與備份世代、文件入口 HTTP、畫面、人工通知及實際顧問回合尚待接線。
+`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。安裝 key／dataset／簽章的持久配置與備份世代、畫面、人工通知及實際顧問回合尚待接線；無 refs 的既有 recover 也須補预期資料集。
 
-還原／整輪撤回、更名／封存與恢復、autosave 暫存及維護仍未完成。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
+正文歷史還原／整輪撤回、autosave 暫存及維護仍未完成。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
 
 原兩工具及來源 digest 見[首切片](../../docs/specs/2026-09-13-jd-relational-command-slice.md)；目前八工具、分層與錯誤／診斷、289 項結果及通過界線見[本次設計與結果](../../docs/specs/2026-09-13-jd-management-operations-slice.md)。
 
-歷史[結果與資料庫基礎](../../docs/specs/2026-09-13-jd-result-and-storage-foundation.md)、[共同保存交易](../../docs/specs/2026-09-13-jd-transaction-service-slice.md)、[同版讀取](../../docs/specs/2026-09-13-jd-read-change-implementation.md)、[查詢接合](../../docs/specs/2026-09-13-jd-query-api-and-recovery-identity-slice.md)、[人工 writer](../../docs/specs/2026-09-13-jd-manual-runtime-slice.md)及[宿主重啟恢復](../../docs/specs/2026-09-13-jd-host-restart-recovery-slice.md)保留當時結果。最新測試、首敗、獨立審查及下一工作見[人工 HTTP 接合](../../docs/specs/2026-09-13-jd-manual-http-slice.md)；各批數字不累加。
+歷史[结果與資料庫基礎](../../docs/specs/2026-09-13-jd-result-and-storage-foundation.md)、[共同保存交易](../../docs/specs/2026-09-13-jd-transaction-service-slice.md)、[同版讀取](../../docs/specs/2026-09-13-jd-read-change-implementation.md)、[查詢接合](../../docs/specs/2026-09-13-jd-query-api-and-recovery-identity-slice.md)、[人工 writer](../../docs/specs/2026-09-13-jd-manual-runtime-slice.md)、[宿主重啟恢復](../../docs/specs/2026-09-13-jd-host-restart-recovery-slice.md)及[人工 HTTP](../../docs/specs/2026-09-13-jd-manual-http-slice.md)保留當時結果。最新測試、首敗、獨立審查及下一工作見[文件目錄切片](../../docs/specs/2026-09-13-jd-catalog-http-slice.md)；各批數字不累加。

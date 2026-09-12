@@ -2,7 +2,7 @@
 
 - 日期：2026-09-12
 - Topic：JD-R002/C03
-- 階段：G4 WORKING；十三表、八操作、共同交易／讀取、人工 writer／Windows 重啟恢復已隔離驗證。[人工 HTTP 接合](2026-09-13-jd-manual-http-slice.md)再接真保存／查回／狀態／明示恢復，DB 格式不變。文件入口 HTTP、持久配置、AI 回合、source／選區／notice、Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
+- 階段：G4 WORKING；十三表、八操作、共同交易／讀取、人工 writer／Windows 重啟恢復已隔離驗證。[人工 HTTP](2026-09-13-jd-manual-http-slice.md)與[文件目錄入口](2026-09-13-jd-catalog-http-slice.md)接保存、查回、更名與封存恢復；沿原 create unique key／metadata version，DB 格式不變。持久配置、AI 回合、source／選區／notice、Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。
 - 上層設計：[JD 關聯式管理編輯器](2026-09-12-jd-relational-editor-design.md)
 - 證據：[官方與本地現況](evidence/2026-09-12-jd-relational-editor-evidence.md)
 
@@ -384,7 +384,7 @@ current UI、AI read、來源目標核對、目前版 Excel export 共用一個�
 
 反例驗收：reader 已讀 r5 的職責後，writer 新增 C、移 T 至 C、提交 r6；本次 reader 的任務、來源目標與 refs 仍全部是 r5。下次 read 才能全部為 r6；不能回沒有職責 C 卻有 T→C 的投影。[交易切片](2026-09-13-jd-transaction-service-slice.md)已驗真 PG reader 首次查詢後停住、writer 提交、reader 仍回完整舊版且新 read 回新版；[讀取切片](2026-09-13-jd-read-change-implementation.md)另驗 issued refs→共同 command→真保存、head 前進後 current cursor／field 拒絕，以及歷史頁保持原版。上述特定「新增職責並移任務」的交錯全旅程仍是驗收義務，不把相鄰反例說成完全相同的實測。
 
-2026-09-13 固定輸出以[讀取 SSOT](../../experiments/jd-relational-app/contracts/jd-read.schema.json)生成 Python／TS；由已 materialize 的內容發配 section／container／item／field refs，正文、關係及來源分成明確 records。current 續頁必須同版，歷史 item／section 續讀指定 immutable revision；即使歷史版等於 head 也保持只讀。欄位完整交付，頁面按 UTF-8 bytes 有界分段；允許的單一大欄位明示 `oversized_unit`，不縮減欄位容量或靜默截句。兩家 SDK 離線與查詢 HTTP／真 PG／新程序已驗，寫入 HTTP／Web 及自然模型尚待接合。
+2026-09-13 固定輸出以[讀取 SSOT](../../experiments/jd-relational-app/contracts/jd-read.schema.json)生成 Python／TS；由已 materialize 的內容發配 section／container／item／field refs，正文、關係及來源分成明確 records。current 續頁必須同版，歷史 item／section 續讀指定 immutable revision；即使歷史版等於 head 也保持只讀。欄位完整交付，頁面按 UTF-8 bytes 有界分段；允許的單一大欄位明示 `oversized_unit`，不縮減欄位容量或靜默截句。兩家 SDK 離線、查詢及人工寫入 HTTP／真 PG／新程序已驗，Web 及自然模型尚待接合。
 
 ### 9.2 來源、歷史與輸出
 

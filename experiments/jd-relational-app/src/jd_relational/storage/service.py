@@ -11,7 +11,7 @@ import hashlib
 import json
 import logging
 from time import perf_counter
-from typing import Protocol
+from typing import Callable, Protocol
 from uuid import UUID, uuid4
 
 import sqlalchemy as sa
@@ -59,6 +59,29 @@ class CurrentDocument:
     @property
     def domain(self) -> dict:
         return domain_from_snapshot(self.snapshot, str(self.revision_id))
+
+
+@dataclass(frozen=True)
+class CatalogRecord:
+    document_id: str
+    title: str
+    archived: bool
+    metadata_version: int
+    created_at: datetime
+    updated_at: datetime
+
+
+def _catalog_record(row):
+    return CatalogRecord(row["id"], row["title"], row["archived"],
+                         row["metadata_version"], row["created_at"], row["updated_at"])
+
+
+def _catalog_id(value):
+    try:
+        if type(value) is not str or str(UUID(value)) != value:
+            raise ValueError()
+    except (TypeError, ValueError, AttributeError):
+        raise StorageError("invalid_input") from None
 
 
 def _now():
@@ -117,6 +140,38 @@ class JdReader:
                 return self._verified_current(conn, doc, head)
         except StorageError:
             raise
+        except Exception:
+            raise StorageError("read_failed") from None
+
+    def catalog_document(self, document_id: str) -> CatalogRecord:
+        _catalog_id(document_id)
+        try:
+            with self._connection(readonly=True) as conn, conn.begin():
+                row = conn.execute(sa.select(db.jd_document).where(
+                    db.jd_document.c.id == document_id)).mappings().one_or_none()
+                if row is None:
+                    raise StorageError("document_missing")
+                return _catalog_record(row)
+        except StorageError:
+            raise
+        except Exception:
+            raise StorageError("read_failed") from None
+
+    def list_catalog(self, *, archived: bool | None = False, after: str | None = None,
+                     limit: int = 100) -> tuple[CatalogRecord, ...]:
+        if (type(limit) is not int or not 1 <= limit <= 101
+                or archived is not None and type(archived) is not bool):
+            raise StorageError("invalid_input")
+        if after is not None:
+            _catalog_id(after)
+        statement = sa.select(db.jd_document).order_by(db.jd_document.c.id).limit(limit)
+        if after is not None:
+            statement = statement.where(db.jd_document.c.id > after)
+        if archived is not None:
+            statement = statement.where(db.jd_document.c.archived == archived)
+        try:
+            with self._connection(readonly=True) as conn, conn.begin():
+                return tuple(_catalog_record(row) for row in conn.execute(statement).mappings())
         except Exception:
             raise StorageError("read_failed") from None
 
@@ -186,12 +241,21 @@ class JdStorage(JdReader):
             raise StorageError("head_missing")
         return document, head
 
-    def create_document(self, request_key: UUID, title: str) -> str:
-        """Commit a fresh empty JD once; a lost response is looked up by this key."""
+    def create_document(self, request_key: UUID, title: str, *,
+                        catalog_guard: Callable[[], None] | None = None) -> str:
+        """Internal primitive; App callers must use the owned runtime gate.
+
+        The optional guard retains fixture/bootstrap compatibility. Public App
+        composition never exposes this unguarded primitive as a service.
+        """
         if not isinstance(request_key, UUID):
             raise StorageError("invalid_create_key")
+        if catalog_guard is not None and not callable(catalog_guard):
+            raise StorageError("invalid_input")
         title, digest = _catalog_digest(title)
         try:
+            if catalog_guard is not None:
+                catalog_guard()
             with self._connection() as conn, conn.begin():
                 identity = str(uuid4())
                 now = _now()
@@ -215,11 +279,56 @@ class JdStorage(JdReader):
                         content_digest=snapshot_digest(snapshot), created_at=now))
                     conn.execute(db.jd_head.insert().values(document_id=identity, current_revision_id=initial,
                                                             revision_number=1, updated_at=now))
+                if catalog_guard is not None:
+                    catalog_guard()
             return identity  # Only after outer transaction context exit confirmed COMMIT.
         except StorageError:
             raise
         except Exception:
             raise StorageError("create_unconfirmed") from None
+
+    def update_catalog(self, document_id: str, metadata_version: int, *,
+                       title: str | None = None, archived: bool | None = None,
+                       catalog_guard: Callable[[], None]) -> CatalogRecord:
+        """One explicit metadata intent, guarded CAS; never changes JD history.
+
+        A stale version always fails, even if the value currently matches. A
+        caller can reread actual state after uncertainty, but cannot attribute
+        it to this request or silently update its precondition and retry.
+        """
+        _catalog_id(document_id)
+        if (not callable(catalog_guard) or type(metadata_version) is not int
+                or not 1 <= metadata_version <= 9007199254740991
+                or (title is None) == (archived is None)
+                or archived is not None and type(archived) is not bool):
+            raise StorageError("invalid_input")
+        if title is not None:
+            try:
+                title, _ = _catalog_digest(title)
+            except StorageError:
+                raise StorageError("invalid_input") from None
+        try:
+            catalog_guard()
+            with self._connection() as conn, conn.begin():
+                row, _ = self._lock_head(conn, document_id)
+                catalog_guard()  # Ownership checked again after blocking SQL locks.
+                if row["metadata_version"] != metadata_version:
+                    raise StorageError("metadata_changed")
+                desired = {"title": title} if title is not None else {"archived": archived}
+                if any(row[key] != value for key, value in desired.items()):
+                    if metadata_version == 9007199254740991:
+                        raise StorageError("catalog_version_limit")
+                    row = conn.execute(db.jd_document.update().where(
+                        db.jd_document.c.id == document_id,
+                        db.jd_document.c.metadata_version == metadata_version).values(
+                            **desired, metadata_version=metadata_version + 1, updated_at=_now())
+                        .returning(db.jd_document)).mappings().one()
+                result = _catalog_record(row)
+            return result  # COMMIT acknowledgement, not merely UPDATE RETURNING.
+        except StorageError:
+            raise
+        except Exception:
+            raise StorageError("catalog_unconfirmed") from None
 
     def lookup_creation(self, request_key: UUID, title: str) -> str | None:
         if not isinstance(request_key, UUID):

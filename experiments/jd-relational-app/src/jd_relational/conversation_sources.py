@@ -860,6 +860,16 @@ class ConversationSourceService:
         """Shape, signature domain and scope only, with no storage I/O."""
         self._codec._resolve_context(context_ref, document_id)
 
+    def window_bounds(self, window_ref, document_id) -> dict:
+        """This window's own turn bounds, for a caller planning inside it.
+
+        Shape and signature only, like `validate_window_reference`: the bounds
+        come from the reference this owner issued, so a caller never parses a
+        token itself or picks a range the owner did not already fix.
+        """
+        position = self._codec._resolve_window(window_ref, document_id)
+        return {"first_run_id": position.first_run_id, "last_run_id": position.last_run_id}
+
     def validate_window_reference(self, window_ref, document_id) -> None:
         """Verify a completed-window locator issued by this same owner.
 

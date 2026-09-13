@@ -42,8 +42,15 @@
       "source_path": "experiments/analysis-agent/src/analysis_agent/repair.py",
       "source_sha256": "8b4fa02e7ff70d6e868b7155e18b46fe6e1454fbfd505b9bfdaf7e625274742d",
       "adopted_path": "src/caliburn_memory/repair.py",
-      "adopted_sha256": "3fc0c6bebe90474c1d579ae86d8333bc0c3644b1080a972030503c47baf0dff7",
-      "adaptation": "Package imports; typed staged validation; original PublishRequest receipt reconciliation without caller edits; same-document non-regressing current-head guard. Six native graph nodes and publication owner retained."
+      "adopted_sha256": "2e96de84add61679d908f87de67dc105b487b1f1ea1c83c1774a3c91ac1ab879",
+      "adaptation": "Package imports; typed staged validation; original PublishRequest receipt reconciliation without caller edits; same-document non-regressing current-head guard. Six native graph nodes and publication owner retained. Adds build_repair_graph(resolve_workflow), which compiles those same six steps so a host can mount them as a static child; each node resolves its workflow from the native Runtime, so building or inspecting the graph opens no resource."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/memory_tools.py",
+      "source_sha256": "facdbfc5e3dc5035326e0af46be58479c720c54f0398ea6453312001dc429e11",
+      "adopted_path": "src/caliburn_memory/read_tools.py",
+      "adopted_sha256": "090cd033125f5e67b1274d916b05032572ca9755488aeac80b81bbbb74f8f29c",
+      "adaptation": "Extract only READONLY_TOOL_DESCRIPTIONS/readonly_file_tools; drop the Skill-file claim and make comments provider-neutral. No source store, SkillAssets, runner or write tool. See read-tools-results.md."
     }
   ],
   "new_files": {

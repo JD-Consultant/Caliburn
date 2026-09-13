@@ -7,6 +7,7 @@ transaction. Historical identity never falls back to the latest current head.
 from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import datetime
+from typing import Literal
 from uuid import UUID
 
 import sqlalchemy as sa
@@ -48,6 +49,16 @@ class HistoricalRevision:
 @dataclass(frozen=True)
 class ChangeMaterial:
     receipt: SavedOperation
+    base: HistoricalRevision | None
+    result: HistoricalRevision | None
+
+
+@dataclass(frozen=True)
+class RunChangeMaterial:
+    """A captured committed-operation range, not proof of a complete native run."""
+
+    continuity: Literal["none", "continuous", "discontinuous"]
+    receipts: tuple[SavedOperation, ...]
     base: HistoricalRevision | None
     result: HistoricalRevision | None
 
@@ -103,12 +114,10 @@ def _receipt(row) -> SavedOperation:
         raise HistoryError("stored_content_mismatch") from None
 
 
-def _verified_revision(row) -> HistoricalRevision:
+def _revision_producer(row) -> SavedOperation | None:
+    """Shared revision/parent/receipt invariants without loading snapshot JSON."""
     try:
-        snapshot = snapshot_from_domain(domain_from_snapshot(row["snapshot"], str(row["revision_id"])))
-        if (row["format_version"] != FORMAT_VERSION or row["engine_profile"] != ENGINE_PROFILE
-                or snapshot["document_id"] != row["document_id"] or snapshot != row["snapshot"]
-                or snapshot_digest(snapshot) != row["content_digest"]):
+        if row["format_version"] != FORMAT_VERSION or row["engine_profile"] != ENGINE_PROFILE:
             raise HistoryError("stored_content_mismatch")
         producer = None
         if row["origin"] == "initial":
@@ -125,6 +134,20 @@ def _verified_revision(row) -> HistoricalRevision:
                     or producer.base_revision_id != row["parent_revision_id"]
                     or producer.result_revision_id != row["revision_id"] or producer.status != "committed"):
                 raise HistoryError("stored_content_mismatch")
+        return producer
+    except HistoryError:
+        raise
+    except Exception:
+        raise HistoryError("stored_content_mismatch") from None
+
+
+def _verified_revision(row) -> HistoricalRevision:
+    try:
+        snapshot = snapshot_from_domain(domain_from_snapshot(row["snapshot"], str(row["revision_id"])))
+        if (snapshot["document_id"] != row["document_id"] or snapshot != row["snapshot"]
+                or snapshot_digest(snapshot) != row["content_digest"]):
+            raise HistoryError("stored_content_mismatch")
+        producer = _revision_producer(row)
         return HistoricalRevision(
             row["document_id"], row["revision_id"], row["revision_number"], row["parent_revision_id"],
             row["origin"], row["created_at"], producer.operation_id if producer else None,
@@ -221,6 +244,69 @@ class HistoryReader:
             if len(rows) > limit:
                 raise HistoryError("run_operations_limit_exceeded")
             return tuple(_receipt(row) for row in rows)
+
+    def read_run_change(self, document_id: str, run_id: str,
+                        operation_ids: tuple[UUID, ...]) -> RunChangeMaterial:
+        """Read one captured AI change range in one read-only SQL snapshot.
+
+        The caller owns native run membership/completeness. Only these exact
+        committed IDs are read, even if the same run later commits more work.
+        Metadata for every operation is checked in one batch; only a continuous
+        range loads its two full endpoint snapshots. No Saver or current head
+        is consulted and no operation, diff or terminal state is invented.
+        """
+        _document_id(document_id)
+        _document_id(run_id)
+        if (type(operation_ids) is not tuple or len(operation_ids) > 96
+                or any(not isinstance(identity, UUID) for identity in operation_ids)
+                or len(set(operation_ids)) != len(operation_ids)):
+            raise HistoryError("invalid_input")
+        with self._read() as conn:
+            if conn.execute(sa.select(db.jd_document.c.id).where(
+                    db.jd_document.c.id == document_id)).scalar_one_or_none() is None:
+                raise HistoryError("document_missing")
+            if not operation_ids:
+                return RunChangeMaterial("none", (), None, None)
+            # Keep the existing same-document producer/parent joins, but never
+            # materialize intermediate snapshot JSON merely to check a chain.
+            statement = _REVISION_READ.with_only_columns(
+                *[column for column in _REVISION_READ.selected_columns if column.key != "snapshot"],
+            ).where(db.jd_revision.c.document_id == document_id,
+                    _PRODUCER.c.document_id == document_id,
+                    _PRODUCER.c.ai_run_id == run_id,
+                    _PRODUCER.c.origin == "ai",
+                    _PRODUCER.c.operation_id.in_(operation_ids))
+            rows = conn.execute(statement).mappings().all()
+            requested = set(operation_ids)
+            found, revisions, numbers, verified = set(), set(), set(), []
+            for row in rows:
+                producer = _revision_producer(row)
+                if (producer is None or producer.operation_id not in requested
+                        or producer.operation_id in found or producer.document_id != document_id
+                        or producer.origin != "ai" or producer.ai_run_id != run_id
+                        or row["revision_id"] in revisions or row["revision_number"] in numbers):
+                    raise HistoryError("stored_content_mismatch")
+                found.add(producer.operation_id)
+                revisions.add(row["revision_id"])
+                numbers.add(row["revision_number"])
+                verified.append((row["revision_number"], producer))
+            if found != requested:
+                raise HistoryError("operation_missing")
+            verified.sort(key=lambda item: item[0])
+            receipts = tuple(producer for _, producer in verified)
+            if any(right.base_revision_id != left.result_revision_id or right_number != left_number + 1
+                   for (left_number, left), (right_number, right) in zip(verified, verified[1:])):
+                return RunChangeMaterial("discontinuous", receipts, None, None)
+            base = self._revision(conn, document_id, receipts[0].base_revision_id)
+            result = self._revision(conn, document_id, receipts[-1].result_revision_id)
+            if (base.document_id != document_id or result.document_id != document_id
+                    or base.revision_id != receipts[0].base_revision_id
+                    or base.revision_number != verified[0][0] - 1
+                    or result.revision_id != receipts[-1].result_revision_id
+                    or result.revision_number != verified[-1][0]
+                    or result.producer_operation_id != receipts[-1].operation_id):
+                raise HistoryError("stored_content_mismatch")
+            return RunChangeMaterial("continuous", receipts, base, result)
 
     def list_revisions(self, document_id: str, anchor_revision_id: UUID | None = None,
                        before_number: int | None = None, limit: int = 50) -> RevisionPage:

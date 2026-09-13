@@ -13,6 +13,8 @@
 
 ## 1. 成品範圍與可觀察結果
 
+**最新 CV-01 比較材料接點：**[固定 AI 操作集合讀取](../specs/2026-09-13-jd-run-change-material-slice.md)完成單一唯讀交易、版次連續性及首末已保存內容核對；人工／別輪插入不混為同輪，改後改回仍保留操作。新純反例54、獨立真PG13、差異回歸70、原history25（含12真PG）通過，獨審未發現P1／P2。這是內部讀取，公開整輪DTO／HTTP／欄位標記／刪除清單仍待接合。[Fetch有限診斷](../specs/evidence/jd-relational-chat-web/transport-diagnosis.md)另取得第三組TypeError／13ms／未abort；根因OPEN，臨時診斷已移除且乾淨build通過，不再無證據重送。
+
 **最新 RS-3／4 同頁聊天接點：**[原話保護與已保存改動](../specs/2026-09-13-jd-chat-web-slice.md)已接 Web：手改先保存、原聊天 request 重開保護、最新對話、原 run 查回及逐 operation 前後內容。最後 Web 233 PASS、後端與 helper 219 PASS、生成／TS／build 及分工審查通過；真瀏覽器兩輪後 PG 獨立核 head3／operation2 與原生訪談一致。第一輪 fetch 中斷後明示恢復，限定重現仍有未定位的瀏覽器連線問題，不能稱無故障完成。日常 AI 仍未啟用，完整 CV-01／HR-02、Memory／source、自然品質與完整 App 未完成。
 
 **最新 RS-4 聊天 HTTP 接點：**[聊天控制與原修改結果](../specs/2026-09-13-jd-chat-http-slice.md)完成生成契約、原run狀態／取消／恢復、固定root/source對話頁與真SQL效果全集核對。最後完整離線2211 PASS／209 SKIP；三個真PG HTTP情境分批通過，生成／TS及獨立窄審通過，CH-R01收尾誤顯執行中已修。日常入口明確ai_unavailable、不開模型；下一接同頁聊天Web，Memory／source／自然品質與完整App未完成。
@@ -29,7 +31,7 @@
 
 **最新實作進度：**[六章手動管理與恢復切片](../specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)完成 Read v2 穩定 UI 身分、React／Next／MUI 管理畫面、原操作與輸入世代恢復、同頁歷史；真瀏覽器完成多成果／要求、共用知識引用、未完成表單重開、任務移動、刪職責保留任務、封存恢復及續改。Python 全組1540 PASS／180 PG SKIP，Web 99 PASS、生成／TS／build PASS；受影響真 PG 與最終 DB head11 唯讀核對通過。独立審查提出的缺口已修，首敗／層級／未驗範圍以結果稿為準；不是完整 RS-3／AI 成品通過。[配置](../specs/2026-09-13-jd-managed-configuration-slice.md)及[文件目錄](../specs/2026-09-13-jd-catalog-http-slice.md)保留原成果。
 
-**唯一下一工作：**先有限定位[同頁聊天驗收](../specs/2026-09-13-jd-chat-web-slice.md)的 fetch 拒絕；取得安全診斷與可重現原因再修正，沒有證據不弱化 CORS／保存檢查，不反覆重送。獨立可做的完整 CV-01 整輪淨改動／目前稿標記與刪除清單依既定需求接合，不以逐 operation 歷史按鈕代替。日常AI未啟用維持可辨識。較深歷史查找及斷鏈须有可操作後續出口，長訪談前閉合；來源／Memory、選區、其餘故障、歷史還原／整輪 JD 撤回沿契約續補。自然模型費用與真人驗收另外處理，Excel延後。需求不清或可能無據增加複雜度的部分先保留狀態討論，不默默擴功能。
+**唯一下一工作：**把[已驗固定比較材料](../specs/2026-09-13-jd-run-change-material-slice.md)接至原 ChatService 的唯讀 owner、生成整輪比較 DTO／HTTP 與完整 CV-01 同頁呈現；先有界驗證執行中增添操作時的固定續頁及 token 限制，再接目前稿標記與直接可見刪除清單，不以逐 operation 歷史按鈕代替。Fetch 定點診斷已達本輪停止條件，根因保留OPEN；待可取得原 Network 錯誤階段再續查，不弱化 CORS／保存檢查或反覆重送。日常AI未啟用維持可辨識。較深歷史查找及斷鏈須有可操作後續出口，長訪談前閉合；來源／Memory、選區、其餘故障、歷史還原／整輪 JD 撤回沿契約續補。自然模型費用與真人驗收另外處理，Excel延後。需求不清或可能無據增加複雜度的部分先保留狀態討論，不默默擴功能。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 

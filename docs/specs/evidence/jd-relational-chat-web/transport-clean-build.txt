@@ -1,0 +1,24 @@
+2026-09-13 / root / removal of temporary Fetch classification probe
+Frozen Node 24.19.0; web package Next.js 16.3.5.
+Source web/src/lib/api.ts matches HEAD f098fcb2 exactly.
+
+First attempt, ordinary sandbox:
+Creating an optimized production build ...
+Compiled successfully in 1930ms
+Running TypeScript ...
+spawn EPERM
+Exit 1. This is retained as an environment failure, not a code pass.
+
+Same local command, permitted native execution:
+Creating an optimized production build ...
+Compiled successfully in 429ms
+Running TypeScript ...
+Finished TypeScript in 1308ms
+Collecting page data using 4 workers ...
+Generating static pages using 4 workers (0/2) ...
+Generating static pages using 4 workers (2/2) in 835ms
+Finalizing page optimization ...
+Routes: / (dynamic), /_not-found (static)
+Exit 0.
+
+No service launch or browser reproduction was performed after this clean build.

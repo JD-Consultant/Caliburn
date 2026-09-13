@@ -58,7 +58,7 @@
 - `storage/rows.py`：九組 current 資料增量讀寫；由 caller 控制交易。
 - `storage/receipts.py`／`storage/service.py`：永久回執、`JdReader` 同版唯讀及 `JdStorage` 共同保存；`reconcile_stopped` 只接受原 `AdmittedIdentity`，沒有候選重建或自動重播。
 - `references.py`：ItsDangerous 2.2.0 標準 signer，固定型別、文件／版本／用途與資料集檢查；沒有自建簽章或 token registry。
-- `storage/history.py`／`changes.py`：短唯讀交易取得原版或原 operation 的 base/result；穩定 IDs 比較完整欄位／關係，不用目前稿重建過去、不重播事件。
+- `storage/history.py`／`changes.py`：短唯讀交易取得原版或原 operation 的 base/result；另有[固定 AI 操作集合的比較材料](../../docs/specs/2026-09-13-jd-run-change-material-slice.md)，按版次核連續、只讀首末完整版本，不混入人工／別輪。此內部讀取不證原生 run 全集，公開整輪差異及畫面標記仍待接合。穩定 IDs 比較完整欄位／關係，不用目前稿重建過去、不重播事件。
 - `observation_projection.py`：只從原保存觀察發配結果 refs；投影故障不把已成功保存改判失敗，也不重跑操作。
 - `tests`：合成工作、格式正反例、共同操作流程、真 SDK 的離線請求捕捉。未完整任務不強迫補欄；多成果和多要求不配對。
 

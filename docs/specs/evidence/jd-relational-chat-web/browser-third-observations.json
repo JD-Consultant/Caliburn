@@ -1,0 +1,47 @@
+{
+  "format": 1,
+  "model_request_count": 0,
+  "model_requests": [],
+  "closed_model_bodies": 0,
+  "writer_execute_count": 0,
+  "writes": [],
+  "http_counts": {
+    "GET other": 1,
+    "OPTIONS other": 1,
+    "POST other": 1
+  },
+  "http_observations": [
+    {
+      "ordinal": 1,
+      "method": "GET",
+      "route": "other",
+      "status": 200,
+      "response_start_forwarded": true,
+      "response_body_end_forwarded": true,
+      "cors_origin_matches": true,
+      "elapsed_ms": 16.0
+    },
+    {
+      "ordinal": 2,
+      "method": "OPTIONS",
+      "route": "other",
+      "status": 200,
+      "response_start_forwarded": true,
+      "response_body_end_forwarded": true,
+      "cors_origin_matches": true,
+      "elapsed_ms": 0.0
+    },
+    {
+      "ordinal": 3,
+      "method": "POST",
+      "route": "other",
+      "status": 200,
+      "response_start_forwarded": true,
+      "response_body_end_forwarded": true,
+      "cors_origin_matches": true,
+      "elapsed_ms": 16.0
+    }
+  ],
+  "evidence_failed": false,
+  "provider_network": false
+}

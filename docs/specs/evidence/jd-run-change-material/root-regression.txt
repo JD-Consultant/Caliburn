@@ -1,0 +1,17 @@
+2026-09-13 / root / history producer validation extraction regression
+Frozen Python 3.12; uv --offline --frozen --no-sync; no cacheprovider.
+
+1. tests/test_change_reads.py tests/test_changes.py
+   No database opt-in, no provider.
+   70 passed in 19.64s; exit 0.
+
+2. tests/test_storage_history.py
+   JD_RELATIONAL_TEST_DB=1; existing explicit isolated test fixture only.
+   PostgreSQL 18.6, 127.0.0.1:55436, caliburn_jd_relational_test.
+   25 passed in 4.67s; exit 0.
+   Includes 13 pure cases and 12 true PostgreSQL cases previously skipped
+   in the author's non-PG regression. These 13 pure cases overlap that run.
+
+New run-material pure and independent true-PG tests are recorded separately.
+These results do not establish native run completeness, HTTP/Web integration,
+natural model quality or completion of CV-01.

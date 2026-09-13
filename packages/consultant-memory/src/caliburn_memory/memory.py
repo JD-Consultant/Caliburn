@@ -99,6 +99,17 @@ class MemoryArtifacts:
             raise ValueError("Memory source reader belongs to another document")
         self.source.validate_reference(reference)
 
+    def validate_pair(self, source_reference: str, context_reference: str) -> None:
+        """An extraction artifact records the pair it was planned as.
+
+        Both addresses being valid, at one root and inside one budget, does not
+        make them one pair; the owner proves that. Saving or reading back a
+        recombined pair would hand re-extraction the wrong prefix.
+        """
+        if self.source is None:
+            raise ValueError("Canonical source reader is not configured")
+        self.source.validate_pair(source_reference, context_reference)
+
     def _backend(self, *suffix: str):
         namespace = ("q019-memory", self.document_id, *suffix)
         return StoreBackend(store=self.store, namespace=lambda _rt: namespace)
@@ -140,6 +151,7 @@ class MemoryArtifacts:
         self.validate_source(source_reference)
         if context_reference is not None:
             self.validate_source(context_reference)
+            self.validate_pair(source_reference, context_reference)
         summary = _prepare_text(summary)
         candidates = _prepare_text(candidates)
         name = re.sub(r"[^\w -]", "", slug, flags=re.UNICODE).strip()[:80] or "訪談詳記"
@@ -187,6 +199,7 @@ class MemoryArtifacts:
         self.validate_source(source)
         if context is not None:
             self.validate_source(context)
+            self.validate_pair(source, context)
         return {"source_reference": source, "context_reference": context}
 
     def extraction_window(self, summary_path: str) -> dict:

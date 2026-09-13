@@ -17,6 +17,15 @@ class SourceReader(Protocol):
         """Read exact source; invalid address uses InvalidSourceReference, I/O does not."""
         ...
 
+    def validate_pair(self, source_reference: str, context_reference: str) -> None:
+        """Prove the context was issued for that source; no storage I/O.
+
+        Only an extraction artifact carries a pair, so a reader that grants no
+        context purpose refuses by default rather than accepting an unproven
+        combination: such an artifact could not have been saved through it.
+        """
+        raise InvalidSourceReference("invalid_source_reference")
+
 
 class ExtractionSourceReader(SourceReader, Protocol):
     """What B1 needs from the source owner, and nothing more.

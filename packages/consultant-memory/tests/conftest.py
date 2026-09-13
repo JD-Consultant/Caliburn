@@ -25,3 +25,8 @@ class ExampleSource:
         if self.unavailable or reference not in self.material:
             raise ValueError("Source unavailable")
         return self.material[reference]
+
+    def validate_pair(self, source_reference, context_reference):
+        """This double issues no planned pairs, so it only checks addresses."""
+        self.validate_reference(source_reference)
+        self.validate_reference(context_reference)

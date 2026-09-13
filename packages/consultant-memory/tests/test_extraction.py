@@ -27,6 +27,7 @@ class WindowSource(ExampleSource):
         self.order = []
         self.saved_windows = []
         self.planned = []
+        self.pairs = set()
 
     def window(self, name, text, *, turns=None):
         reference = f"conversation:{self.document_id}:{name}"
@@ -38,7 +39,16 @@ class WindowSource(ExampleSource):
 
     def plan(self, reference, windows):
         self.plans[reference] = windows
+        self.pairs.update((window["source_reference"], window["context_reference"])
+                          for window in windows if window["context_reference"])
         return reference
+
+    def validate_pair(self, source_reference, context_reference):
+        """Model the owner: only a pair this planner issued together."""
+        self.validate_reference(source_reference)
+        self.validate_reference(context_reference)
+        if (source_reference, context_reference) not in self.pairs:
+            raise ValueError("Context was not planned for this source")
 
     def extraction_windows(self, reference, *, max_chars, context_chars):
         self.validate_reference(reference)
@@ -275,6 +285,18 @@ def test_reextraction_reads_the_saved_window_and_leaves_normal_state(harness):
     assert source.saved_windows[-1][:2] == (reference, source.reference.replace("original", "context"))
     assert again["replaces_summary"] == saved and again["files"][0]["summary_path"] != saved
     assert workflow.graph.get_state(workflow.config).values["source_reference"] == before
+
+
+def test_a_context_planned_for_another_window_is_never_saved(harness):
+    """The artifact may only record the pair the planner issued together."""
+    source, artifacts, build = harness
+    first = source.window("first", "75326848539f8a713002")
+    second = source.window("second", "4e596848539f8a713002")
+    other = source.window("other", "4e196848539f8a713002")
+    source.plan(first, [{"source_reference": first, "context_reference": other}])
+    with pytest.raises(ValueError, match="not planned for this source"):
+        artifacts.save_extraction(summary="8a738a18", candidates="50199078", slug="4ea453c9",
+                                  source_reference=second, context_reference=other)
 
 
 def test_the_three_output_fields_are_the_adopted_contract():

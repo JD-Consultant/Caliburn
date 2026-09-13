@@ -21,7 +21,8 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 from openai.types.responses import Response
 
-from jd_relational.conversation_sources import WindowBudgetExceeded
+from jd_relational.ai_history import MAX_PARENT_LOOKUPS
+from jd_relational.conversation_sources import ConversationSourceError, WindowBudgetExceeded
 from jd_relational.extraction_app import (
     ExtractionSourceAdapter, accepted, build_extraction_model, build_extraction_workflow,
 )
@@ -323,6 +324,31 @@ def test_later_turns_never_change_what_a_saved_window_extracts(b1, native):
     build().start(whole)
     payload = json.dumps(sent, ensure_ascii=False)
     assert "第三輪原話" in payload and "第四輪原話" not in payload
+
+
+def test_a_reached_lookup_bound_is_reported_as_unavailable_not_an_internal_error(b1, native):
+    """Beyond the bound nothing is proven, so the port reports its own failure.
+
+    The owner raises a checkpoint error there, which is the right signal for it
+    but is not part of this port's contract. Every I/O method has to translate
+    it, and none of them may call the model, write an artifact or guess.
+    """
+    build, windows, document, whole, store, sent, _ = b1
+    graph, *_ = native
+    adapter = ExtractionSourceAdapter(windows, document)
+    for _ in range(MAX_PARENT_LOOKUPS + 4):
+        graph.update_state({"configurable": {"thread_id": document}},
+                           {"jd_manual_pending": None}, as_node="consultant")
+    for call in (lambda: adapter.extraction_windows(whole, max_chars=24, context_chars=12),
+                 lambda: adapter.read(whole),
+                 lambda: adapter.validate_saved_window(whole, None, max_chars=24, context_chars=12),
+                 lambda: adapter.require_new_source_after(whole, whole)):
+        with pytest.raises(ConversationSourceError, match="^source_not_available$"):
+            call()
+    with pytest.raises(ConversationSourceError, match="^source_not_available$"):
+        build().start(whole)
+    assert sent == []
+    assert not list(store.search(("q019-memory", document, "interviews")))
 
 
 def test_the_terminal_evidence_port_reads_only_public_provider_fields():

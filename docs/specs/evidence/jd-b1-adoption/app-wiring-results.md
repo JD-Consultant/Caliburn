@@ -1,6 +1,6 @@
 # B1 OpenAI adapter 與固定接合測試完成
 
-2026-09-14；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與本輪工作單位定義，基準 `353c400b`／tag `jd-b1-core-adoption-20260913`；依[本片審查](app-wiring-review.md) F1–F4 與[複核](app-wiring-followup-review.md) P1 修正後重寫。
+2026-09-14；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與本輪工作單位定義，基準 `353c400b`／tag `jd-b1-core-adoption-20260913`；依[本片審查](app-wiring-review.md) F1–F4 與[複核](app-wiring-followup-review.md) P1／P2 修正後重寫。
 
 **B1 是訪談資料整理進 Memory 的既有階段**，不是重新設計 JD 編輯器，也不是另一個使用者頁面。本片只把已完成的 B1 接上新 App 的來源 owner 與 OpenAI，**不重做 B1、不改整個顧問**。
 
@@ -23,6 +23,7 @@
 | `jd_relational/extraction_app.py` | OpenAI 綁定、`accepted` 終局證據、`ExtractionSourceAdapter`、`build_extraction_workflow` 組裝 |
 | `ConversationSourceService.read_context` 的 `turns` | 審查 F1：由同一 owner 在固定位置投影範圍內可證明的回合終局 |
 | `ConversationSourceService.plan_saved_windows` | 複核 P1：owner **直接收 window 引用**，在該引用自己的固定 root 上驗範圍與 lineage，並在同一 snapshot 切出所有 pair |
+| `ExtractionSourceAdapter._owner_errors` | 複核 P2：單一錯誤邊界，沿 owner 既有轉換把祖先鏈缺失／超限映射成 `source_not_available` |
 
 複核 P1 原本新增的 `window_bounds` 已**刪除**——它只為了那條錯誤流程存在。
 
@@ -47,6 +48,12 @@
 修法**沒有**新增 parser、cursor 或 lineage 引擎：把規劃本體抽成 `_plan(...)`（在一組給定的 snapshot／root 上切 pair），再新增 `plan_saved_windows(window_ref, ...)`，它依序做四件事——在引用自己的固定位置讀回、以既有 `_on_lineage` 證明該 root 在本文件 canonical 鏈上、確認 `first`／`last` 在該 snapshot 上仍是完整的安全收尾回合邊界、然後在**同一個** snapshot 與 root 上發出全部 source／context pair。任一步不成立即 `invalid_ref`／`source_not_available`，不改用目前 head。`plan_windows`（以 run id 規劃目前範圍）沿用同一個 `_plan`，語意不變。
 
 首敗：`plan_saved_windows` 不存在，以及 App 層 `start()` 對 sibling branch token **DID NOT RAISE**。
+
+### 複核 P2：內部 checkpoint 例外穿過了 port 邊界
+
+`plan_saved_windows` 走 `_on_lineage`／`_settled_turns` 時，祖先鏈缺失或超過 256 層查找上限會由 owner 拋出 `AiCheckpointError("original_run_lookup_required")`。adapter 原本只轉換 `ConversationSourceError`，所以 B1 呼叫端收到的是內部型別，而不是契約規定的 `source_not_available`。結果本來就是安全失敗（沒有模型呼叫、沒有 Store 產物、沒有 fallback），問題在錯誤邊界不一致。
+
+修法是把四個做 I/O 的方法收進同一個 `_owner_errors()` 邊界，**沿 owner 既有的 `_pinned` 轉換規則**（`invalid_input` → 可更正位址，其餘 → `source_not_available`）。owner 自己的 `safe_turns` 仍照契約 §8 明示 `original_run_lookup_required`，那是「受限」而不是「沒有更早的回合」，本片沒有改它。**沒有新增錯誤引擎、重試引擎、歷史索引或資料表。**
 
 ### 用途授予（原複核指定隨接合驗的三項之一）
 
@@ -88,9 +95,9 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 
 | 範圍 | 結果 |
 |---|---|
-| B1 接線案例（含審查與複核新增 5 例） | **18 passed** |
+| B1 接線案例（含審查與複核新增 6 例） | **19 passed** |
 | 完成窗口來源案例（含 context turns 與 P1 lineage 新例） | **39 passed** |
-| App 全離線測試 | **2797 passed／257 skipped／40.87s** |
+| App 全離線測試 | **2798 passed／257 skipped／58.21s** |
 | Memory 套件全測 | **146 passed** |
 | 真 PostgreSQL 18：原話來源＋C 顧問接合＋Memory 核心 | **14 passed** |
 
@@ -119,6 +126,7 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 | 重抽（W-13） | 讀回**原**窗口與**原** context，正常 B1 輸入位置不前進 |
 | 固定 root 規劃（P1） | 追加新回合後，同一 saved window 規劃結果**逐字相同**，讀回不含新回合原話 |
 | sibling branch（P1） | 已放棄分支的 token 在 `start()` 即被拒，**0 次 HTTP**、Store 無產物；該 token 仍可作歷史讀取 |
+| 祖先查找上限（P2） | 超過 256 層時四個 I/O 方法與 `start()` 一致回 `source_not_available`（不是內部 `AiCheckpointError`），**0 次 HTTP**、Store 無產物、不回退 latest |
 | 出站請求 | `store=false`、**不送已淘汰的 `truncation`**、`json_schema` + `strict=true`、三欄位 schema、8192、effort high |
 
 替身只有一個：provider 的 HTTP 傳輸（`httpx.MockTransport`，回覆經實際 SDK schema 驗證）。來源 owner、Saver、Store、SDK、結構化輸出綁定全部是真的。**0 provider、付費 0**；`api_key` 是必填參數，程式不讀環境變數、不內建任何端點。

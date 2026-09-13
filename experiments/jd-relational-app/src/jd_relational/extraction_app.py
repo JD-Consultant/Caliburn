@@ -11,6 +11,7 @@ choice. B1 is a structured extraction graph, not a tool-calling agent, so the
 role budget below is its own and is not the consultant's.
 """
 
+from contextlib import contextmanager
 from dataclasses import dataclass
 import math
 from uuid import UUID
@@ -22,6 +23,7 @@ from langchain_core.messages import AIMessage
 from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
+from .ai_checkpoints import AiCheckpointError
 from .conversation_sources import ConversationSourceError, ConversationSourceService
 from .memory_sources import MemorySourceReader
 
@@ -102,12 +104,29 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
             return InvalidSourceReference("invalid_source_reference")
         return error
 
-    def validate_reference(self, reference: str) -> None:
-        """A completed window only; a turn source can never satisfy B1."""
+    @contextmanager
+    def _owner_errors(self):
+        """One boundary: a correctable address, or not available right now.
+
+        A reached ancestor bound or a broken chain surfaces from the owner as
+        its own checkpoint error. That is the right signal there — the limit is
+        reported rather than read as "no earlier turn" — but it is not part of
+        this port's contract, so it maps through the same fixed codes the owner
+        already uses for a pinned read. B1 therefore sees an explicit failure,
+        never an internal type and never a quietly empty plan.
+        """
         try:
-            self.service.validate_window_reference(reference, self.document_id)
+            yield
         except ConversationSourceError as error:
             raise self._address(error) from error
+        except AiCheckpointError as error:
+            raise self._address(ConversationSourceError(
+                "invalid_ref" if error.code == "invalid_input" else "source_not_available")) from error
+
+    def validate_reference(self, reference: str) -> None:
+        """A completed window only; a turn source can never satisfy B1."""
+        with self._owner_errors():
+            self.service.validate_window_reference(reference, self.document_id)
 
     def extraction_windows(self, reference: str, *, max_chars: int, context_chars: int) -> list[dict]:
         """Plan inside the reference's own fixed position, never the latest one.
@@ -117,11 +136,9 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
         was issued. A window pinned to an abandoned branch fails here instead
         of being replanned against whatever is currently canonical.
         """
-        try:
+        with self._owner_errors():
             return list(self.service.plan_saved_windows(
                 reference, self.document_id, max_chars=max_chars, context_chars=context_chars))
-        except ConversationSourceError as error:
-            raise self._address(error) from error
 
     def read(self, reference: str, offset: int = 0) -> dict:
         """One page of a window, or the whole disambiguation range.
@@ -132,7 +149,7 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
         failed context turn from a successful one. Being readable for
         disambiguation still never makes it an admissible window.
         """
-        try:
+        with self._owner_errors():
             try:
                 self.service.validate_window_reference(reference, self.document_id)
             except ConversationSourceError as error:
@@ -144,22 +161,16 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
                 return {**self.service.read_context(reference, self.document_id),
                         "next_offset": None}
             return self.service.read_window(reference, self.document_id, offset)
-        except ConversationSourceError as error:
-            raise self._address(error) from error
 
     def validate_saved_window(self, source_reference: str, context_reference: str | None,
                               *, max_chars: int, context_chars: int) -> None:
-        try:
+        with self._owner_errors():
             self.service.validate_saved_window(source_reference, context_reference, self.document_id,
                                                max_chars=max_chars, context_chars=context_chars)
-        except ConversationSourceError as error:
-            raise self._address(error) from error
 
     def require_new_source_after(self, reference: str, previous: str) -> None:
-        try:
+        with self._owner_errors():
             self.service.follows(reference, previous, self.document_id)
-        except ConversationSourceError as error:
-            raise self._address(error) from error
 
 
 def build_extraction_workflow(*, service: ConversationSourceService, document_id: str, store,

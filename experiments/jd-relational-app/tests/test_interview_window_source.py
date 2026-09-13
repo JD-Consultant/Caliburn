@@ -16,9 +16,13 @@ import pytest
 import sqlalchemy as sa
 from sqlalchemy.pool import StaticPool
 
+from jd_relational.ai_checkpoints import AiRunCheckpoints
 from jd_relational.conversation_sources import ConversationSourceError, _WindowPosition
+
 from jd_relational.memory_sources import MemorySourceReader
-from test_chat_history import native
+from langchain_core.messages import AIMessage, ToolMessage
+
+from test_chat_history import append, native
 from test_conversation_sources import KEY, seed, service
 
 
@@ -106,3 +110,90 @@ def test_consolidation_publishes_its_completed_window_only_through_a_granting_re
         assert publication.current().processed_source == window
     finally:
         engine.dispose()
+
+
+def settled(native, replies, *, text, status="completed"):
+    """Append one turn and give it the App's own settled terminal record."""
+    graph, dataset, document, pending, _, _ = native
+    observed = append(native, replies, text=text, pause=True)
+    adapter = AiRunCheckpoints(graph)
+    observed = adapter.discover(document, dataset)
+    return adapter.close(observed, status=status, messages=observed.messages,
+        bindings=observed.bindings, model_view=observed.model_view,
+        read_binding=observed.read_binding)
+
+
+@pytest.fixture
+def interview(native):
+    graph, dataset, document, *_ = native
+    first = settled(native, [AIMessage(id="a1", content="第一輪回覆")], text="第一輪原話")
+    second = settled(native, [
+        ToolMessage(id="t1", tool_call_id="c1", content="PRIVATE_TOOL"),
+        AIMessage(id="a2", content=[
+            {"type": "thinking", "thinking": "PRIVATE", "signature": "S"},
+            {"type": "text", "text": "第二輪回覆"}])],
+        text="第二輪原話😀", status="cancelled")
+    sources = service(native)
+    windows = sources
+    return windows, document, first.record.run_id, second.record.run_id
+
+
+def test_safe_turns_report_each_terminal_and_stop_before_an_unfinished_turn(interview, native):
+    windows, document, first_run, second_run = interview
+    append(native, [AIMessage(id="a3", content="尚未收尾")], text="第三輪原話", pause=True)
+    turns = windows.safe_turns(document)
+    assert [t["input_id"] for t in turns] == [first_run, second_run]
+    assert [t["status"] for t in turns] == ["completed", "cancelled"]
+    assert [t["answer_succeeded"] for t in turns] == [True, False]
+
+
+def test_a_settled_cancelled_turn_keeps_its_speech_in_the_window(interview):
+    windows, document, first_run, second_run = interview
+    page = windows.read_window(windows.capture_window(
+        document, first_run_id=first_run, last_run_id=second_run), document)
+    spoken = [s for s in page["segments"] if s["role"] == "user"]
+    assert [s["text"] for s in spoken] == ["第一輪原話", "第二輪原話😀"]
+    assert [t["answer_succeeded"] for t in page["turns"]] == [True, False]
+    assert page["omitted_content_types"] == ["thinking", "tool"]
+    assert page["next_offset"] is None
+
+
+def test_a_window_pages_by_unicode_code_points_and_repeats_turns(interview, native):
+    windows, document, first_run, _ = interview
+    # Each emoji is one code point but four UTF-8 bytes: a byte-based pager
+    # would cut this window in a different place.
+    long_turn = settled(native, [AIMessage(id="a9", content="是")], text="😀" * 3300)
+    ref = windows.capture_window(document, first_run_id=first_run,
+                                 last_run_id=long_turn.record.run_id)
+    first_page = windows.read_window(ref, document)
+    assert first_page["next_offset"] == 3000
+    assert sum(len(s["text"]) for s in first_page["segments"]) == 3000
+    second_page = windows.read_window(ref, document, offset=first_page["next_offset"])
+    assert [t["input_id"] for t in second_page["turns"]] == [t["input_id"] for t in first_page["turns"]]
+    joined = "".join(s["text"] for s in (*first_page["segments"], *second_page["segments"]))
+    assert "😀" * 3300 in joined and second_page["next_offset"] is None
+
+
+def test_capture_window_refuses_an_unfinished_end_or_a_gap(interview, native):
+    windows, document, first_run, second_run = interview
+    running = append(native, [AIMessage(id="a4", content="仍在跑")], text="第三輪", pause=True)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.capture_window(document, first_run_id=first_run,
+                               last_run_id=running.record.run_id)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.capture_window(document, first_run_id=second_run, last_run_id=first_run)
+
+
+def test_a_window_whose_bounds_do_not_match_the_fixed_position_is_invalid(interview):
+    windows, document, first_run, second_run = interview
+    issued_ref = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    position = windows._codec._resolve_window(issued_ref, document)
+    forged = window_ref(windows, document, first=first_run, last="no-such-message",
+                        first_run=first_run, last_run=second_run,
+                        root=position.root_checkpoint_id)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.read_window(forged, document)
+    absent_root = window_ref(windows, document, first=first_run, last=position.last,
+                             first_run=first_run, last_run=second_run, root="no-such-root")
+    with pytest.raises(ConversationSourceError, match="^source_not_available$"):
+        windows.read_window(absent_root, document)

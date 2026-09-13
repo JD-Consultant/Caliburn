@@ -32,6 +32,8 @@ _SALT = "caliburn.jd.conversation-source.v1"
 # other. C repair and the turn read tools stay strictly on `source`.
 _WINDOW_PREFIX = "interview-window:"
 _WINDOW_SALT = "caliburn.jd.interview-window.v1"
+# Visible characters per window page, sized as the verified extraction reader.
+MAX_PAGE_CHARACTERS = 3000
 _TOKEN = re.compile(r"[A-Za-z0-9_.-]+\Z")
 _INSTRUCTION = (
     "此來源只涵蓋本輪已保存的員工原話及列明的前一則AI公開上下文。"
@@ -242,6 +244,33 @@ class ConversationSourceCodec:
             raise ConversationSourceError("invalid_ref") from None
 
 
+def _visible(messages):
+    """Saved public question/answer text only, reporting what was left out.
+
+    Tool and system messages, and any non-text content block, are canonical but
+    are not the employee's words. They are named in the omitted kinds rather
+    than silently dropped.
+    """
+    visible, omitted = [], set()
+    for message in messages:
+        if isinstance(message, BaseMessageChunk) or not isinstance(message, (HumanMessage, AIMessage)):
+            omitted.add(getattr(message, "type", "unknown"))
+            continue
+        parts = [message.content] if isinstance(message.content, str) else message.content
+        texts = []
+        for part in parts:
+            if isinstance(part, str):
+                texts.append(part)
+            elif (isinstance(part, dict) and part.get("type") in {"text", "output_text"}
+                    and isinstance(part.get("text"), str)):
+                texts.append(part["text"])
+            else:
+                omitted.add(part.get("type", "unknown") if isinstance(part, dict) else "unknown")
+        visible.append((message.id, "user" if isinstance(message, HumanMessage) else "assistant",
+                        "".join(texts)))
+    return visible, omitted
+
+
 def _selected(messages, run_id):
     """Never reach past another Human to claim an earlier AI as this answer's context."""
     found = [index for index, message in enumerate(messages) if message.id == run_id]
@@ -358,6 +387,122 @@ class ConversationSourceService:
         text supports a Memory statement. read() owns the actual fixed read.
         """
         self._codec._resolve(source_ref, document_id)
+
+    def safe_turns(self, document_id) -> tuple[dict, ...]:
+        """This document's settled turns, each verified at its own terminal.
+
+        A turn is settled only when its own run record is non-running and its
+        observation is closed, which `_settle` writes after confirming every JD
+        receipt and C result. The walk stops at the first unsettled turn: a
+        later terminal never releases an earlier one, and a settled
+        `failed`/`cancelled` turn still keeps the employee's saved words.
+        """
+        try:
+            _uuid(document_id)
+            observed = self._checkpoints.discover(document_id, self.dataset_id)
+        except AiCheckpointError:
+            raise
+        except Exception:
+            raise ConversationSourceError("source_not_available") from None
+        if observed is None:
+            return ()
+        return self._settled_turns(document_id, observed.messages)
+
+    def _settled_turns(self, document_id, messages):
+        from .ai_history import AiRunHistory
+        history = AiRunHistory(self._checkpoints)
+        order = [message.id for message in messages]
+        turns = []
+        for message in messages:
+            if not isinstance(message, HumanMessage):
+                continue
+            terminal = history.find(document_id, message.id, self.dataset_id)
+            if terminal is None or not terminal.closed or terminal.record.status == "running":
+                break
+            saved = [item.id for item in terminal.messages]
+            # Lineage, not identity: this turn's own terminal view must be an
+            # exact prefix of the pinned conversation we are planning over.
+            if not saved or saved != order[:len(saved)]:
+                raise ConversationSourceError("invalid_ref")
+            status = terminal.record.status
+            turns.append({"input_id": message.id, "status": status,
+                          "answer_succeeded": status == "completed",
+                          "first": message.id, "last": saved[-1]})
+        return tuple(turns)
+
+    def capture_window(self, document_id, *, first_run_id, last_run_id) -> str:
+        """Issue one completed-window reference over whole settled turns.
+
+        Both bounds must be settled turns of this document in order; the range
+        is therefore contiguous by construction. The reference is pinned to the
+        last turn's own terminal root, so it never depends on what is latest.
+        """
+        turns = self.safe_turns(document_id)
+        identifiers = [turn["input_id"] for turn in turns]
+        try:
+            start, end = identifiers.index(first_run_id), identifiers.index(last_run_id)
+            if start > end:
+                raise ValueError()
+        except Exception:
+            raise ConversationSourceError("invalid_ref") from None
+        from .ai_history import AiRunHistory
+        terminal = AiRunHistory(self._checkpoints).find(document_id, last_run_id, self.dataset_id)
+        try:
+            position = _WindowPosition(format_version=1, purpose="window",
+                dataset_id=self.dataset_id, document_id=document_id,
+                root_checkpoint_id=terminal.root_config["configurable"]["checkpoint_id"],
+                first=first_run_id, last=turns[end]["last"],
+                first_run_id=first_run_id, last_run_id=last_run_id)
+        except Exception:
+            raise ConversationSourceError("source_not_available") from None
+        return self._codec._issue_window(position)
+
+    def read_window(self, window_ref, document_id, offset: int = 0) -> dict:
+        """Read one page of a completed window at its own fixed position.
+
+        Paging cuts visible text only: every page lists the window's whole
+        turns, so a caller never has to assemble pages to learn a terminal.
+        Offsets count Unicode code points over the concatenated visible text
+        with no separator inserted.
+        """
+        position = self._codec._resolve_window(window_ref, document_id)
+        if type(offset) is not int or type(offset) is bool or offset < 0:
+            raise ConversationSourceError("invalid_ref")
+        try:
+            observed = self._checkpoints.observe_at(document_id, position.last_run_id,
+                self.dataset_id, position.root_config())
+        except AiCheckpointError as error:
+            raise ConversationSourceError(
+                "invalid_ref" if error.code == "invalid_input" else "source_not_available") from None
+        messages = observed.messages
+        order = [message.id for message in messages]
+        try:
+            start, end = order.index(position.first), order.index(position.last)
+            if start > end:
+                raise ValueError()
+        except Exception:
+            raise ConversationSourceError("invalid_ref") from None
+        turns = [turn for turn in self._settled_turns(document_id, messages[:end + 1])
+                 if turn["input_id"] in order[start:end + 1]]
+        if not turns or turns[0]["input_id"] != position.first_run_id or turns[-1]["last"] != position.last:
+            raise ConversationSourceError("invalid_ref")
+        visible, omitted = _visible(messages[start:end + 1])
+        total = sum(len(text) for _, _, text in visible)
+        if offset > total:
+            raise ConversationSourceError("invalid_ref")
+        segments, seen, remaining = [], 0, MAX_PAGE_CHARACTERS
+        for message_id, role, text in visible:
+            begin = max(0, offset - seen)
+            if begin < len(text) and remaining:
+                fragment = text[begin:begin + remaining]
+                segments.append({"message_id": message_id, "role": role,
+                                 "text": fragment, "text_offset": begin})
+                remaining -= len(fragment)
+            seen += len(text)
+        end_offset = offset + MAX_PAGE_CHARACTERS - remaining
+        return {"reference": window_ref, "segments": segments, "turns": turns,
+                "omitted_content_types": sorted(omitted),
+                "next_offset": end_offset if end_offset < total else None}
 
     def validate_window_reference(self, window_ref, document_id) -> None:
         """Verify a completed-window locator issued by this same owner.

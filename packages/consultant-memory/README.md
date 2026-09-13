@@ -1,6 +1,6 @@
 # Caliburn Consultant Memory
 
-工作詳記、目前工作理解／導覽及發布回執的獨立 Python 套件。新 JD App 以一般套件依賴使用；不 import 舊 checkout，不含 JD 編輯、HTTP、排程或模型執行。
+工作詳記、目前工作理解／導覽、發布與已採用 Memory 工作流程的獨立 Python 套件。新 JD App 以一般套件依賴使用；不 import 舊 checkout，不含 JD 編輯、HTTP 入口或宿主排程。B1 會執行 App 注入的 structured runnable；provider client、金鑰、角色配置及資源生命週期由 App 組裝。
 
 ## 保存與來源
 
@@ -20,6 +20,12 @@ App 配發 operation／base／source，模型只提供 path／diff；本核心�
 
 程式採用來源、hash 與實際調整見 [adoption.json](adoption.json)；三核心僅分離來源依賴，沒有重寫 Memory 引擎。[完整接合設計與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)保存官方依據、限制與驗證層級。
 
+## B1 訪談抽取核心
+
+`caliburn_memory.extraction.ExtractionWorkflow` 已自 `4f94fbfb` 採用。三文字欄位、prompt、窗口迴圈、格式更正額度、`start/resume/reextract` 保持已驗語意；`ExtractionSourceReader` 由 App 提供固定窗口與前置消歧，`accepted(raw)` 由 provider adapter 核拒絕／終局。B1 保存詳記／候選，不發布目前理解，也不前進 publication 游標。
+
+新 App `extraction_app.py` 的 OpenAI 固定接合已完成至 `f160be97`；同文件工作須由 caller 串行，已完成 B1 的 `files` 交給 B2 後才可進下一批。**B2 尚未採用，B1 日常觸發、真 PG 與宿主恢復仍待施工。**[目前狀態與證據](../../docs/specs/evidence/jd-b1-adoption/whole-flow-review.md)、[H4 執行計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
+
 ## 安裝與驗證
 
 Python 3.12。App 的 `uv.lock` 固定實測組合；獨立 wheel 由 Hatchling 產生。
@@ -27,12 +33,12 @@ Python 3.12。App 的 `uv.lock` 固定實測組合；獨立 wheel 由 Hatchling 
 ```powershell
 # 在 experiments/jd-relational-app 使用其正式本地依賴
 uv sync --frozen
-uv run --offline --frozen pytest ../../packages/consultant-memory/tests -q -p no:cacheprovider
+uv run --offline --frozen --no-sync pytest -c pyproject.toml ../../packages/consultant-memory/tests -q -p no:cacheprovider
 
 # 在本套件目錄建 wheel，輸出至指定暫存目錄
 uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 ```
 
-Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，本核心沒有建立 provider 或呼叫模型。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
+Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，patch／保存核心不建立 provider；B1 執行由 App 注入的模型 runnable。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
 
-目前完成核心套件、新原話接點及可用的修補子圖。新 App 的[宿主資源／初始化／登記讀取排空與新程序重開](../../docs/specs/2026-09-13-jd-memory-host-integration-slice.md)、[固定 Memory 與原話只讀工具](../../docs/specs/2026-09-13-jd-memory-read-integration-slice.md)亦已接入；修補核心尚須接到 App 原工具／取消收尾／同輪讀取，背景整理、專業指引及完整備份仍未完成，不能以核心驗證代稱完整顧問可用。
+目前完成保存／發布、原話接點、固定只讀工具、C 修補核心及其 App 停止／恢復接合；B1 核心與 OpenAI adapter 只完成固定接合。背景 B1／B2、顧問指引與完整旅程仍未完成；不要再把 C 寫成尚未接入，也不能以 package 測試代稱日常顧問可用。

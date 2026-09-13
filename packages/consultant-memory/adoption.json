@@ -7,8 +7,8 @@
       "source_path": "experiments/analysis-agent/src/analysis_agent/memory.py",
       "source_sha256": "3f383a6ec433490edcef616ec138594d850de0c201c7c6da630253cca117a7d5",
       "adopted_path": "src/caliburn_memory/memory.py",
-      "adopted_sha256": "5aca9aa0cb6638d97401f72d4e36989d1838d03841cb8507bef001c62b021876",
-      "adaptation": "Package imports; SourceReader annotation; validate_source delegates source validation; replace legacy parser calls."
+      "adopted_sha256": "251c5e8f3b20a894d34be9185c9ec8760de74b65c34e138be5aeff7f307422ef",
+      "adaptation": "Package imports; SourceReader annotation; validate_source delegates source validation; replace legacy parser calls. Commit 3921a99d adds validate_pair delegation to the same source owner at extraction save and source-window readback when context is present; source-only readers retain their existing grant policy. Hash refreshed in the 2026-09-14 whole-flow review; this does not attest a rebuilt wheel."
     },
     {
       "source_path": "experiments/analysis-agent/src/analysis_agent/publication.py",

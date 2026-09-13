@@ -23,10 +23,31 @@
       "adopted_path": "src/caliburn_memory/references.py",
       "adopted_sha256": "9a4db6e6dceed11477463965c2c45a2b9bad3f338811b3ce5a0da7f4bf45f01a",
       "adaptation": "No text or logic change; checkout line endings may differ."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/memory_patch.py",
+      "source_sha256": "b26e5be41214c79664a42e1995bf670406b6c4c8e4af9feefa455be2b534b6fd",
+      "adopted_path": "src/caliburn_memory/patch.py",
+      "adopted_sha256": "7ec27fc2b206d1d8f298f0c2abead1082c9eb33757abfb0a7f00c1d606d57dd8",
+      "adaptation": "Package module name and provenance docstring only; original patch AST preserved."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation_tools.py",
+      "source_sha256": "d81efec80bc8e8b32b665f82d97bd0d632948e29daa56e2a38f5bc8b9d1ab6d0",
+      "adopted_path": "src/caliburn_memory/staging.py",
+      "adopted_sha256": "849feb573135a8ec2e29d8ee4ee3137e5577f4728408c926ea7ffb4021f8765e",
+      "adaptation": "Extract only PATHS/staged_texts validation; share PATHS from patch; typed invalid-source port and fixed safe content errors; unknown I/O propagates."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/repair.py",
+      "source_sha256": "8b4fa02e7ff70d6e868b7155e18b46fe6e1454fbfd505b9bfdaf7e625274742d",
+      "adopted_path": "src/caliburn_memory/repair.py",
+      "adopted_sha256": "3fc0c6bebe90474c1d579ae86d8333bc0c3644b1080a972030503c47baf0dff7",
+      "adaptation": "Package imports; typed staged validation; original PublishRequest receipt reconciliation without caller edits; same-document non-regressing current-head guard. Six native graph nodes and publication owner retained."
     }
   ],
   "new_files": {
-    "src/caliburn_memory/sources.py": "SourceReader port only; no old source implementation.",
+    "src/caliburn_memory/sources.py": "SourceReader port and InvalidSourceReference; no original conversation storage or old source implementation.",
     "src/caliburn_memory/__init__.py": "Explicit public exports."
   }
 }

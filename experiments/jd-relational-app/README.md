@@ -14,6 +14,8 @@
 
 ## 結構
 
+**Memory 核心接合：**[獨立套件與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)已驗保存／發布、固定版本讀取、後續修正与真 PG 重開；使用 `packages/consultant-memory` 正常依賴。`memory_sources.py` 只把同一原話 owner 綁到文件；新來源有 `conversation:` 前綴，既有裸 signed v1 原樣可讀。原話及 JD 不雙寫。模型 Memory 工具、背景整理／即時修補與一般宿主 Store 仍須接入，測試初始化不修改一般 host profile。
+
 **最新[聊天HTTP與原修改結果](../../docs/specs/2026-09-13-jd-chat-http-slice.md)已接。**`ChatService` 共用 `AiRuntime`／人工write state，原話、實際執行與JD效果分開回報；`chat_history.py`固定原root/source分頁，只公開原話及AI正文。生成契約／TS、完整離線2211 PASS／209 SKIP、三個真PG HTTP情境與獨審通過。`open_managed_app`預設`enable_chat=False`，日常仍不開provider；新run回`ai_unavailable`，保存對話／原結果可查。下一接Web，不宣稱自然AI或完整App完成。
 
 - `contracts/jd-chat-http.schema.json`／`chat_service.py`／`chat_api.py`：原請求送出、原狀態、取消／恢復與已保存對話；原`BoundResult`及人工狀態直接external ref，不增加run／聊天表。所有同步查讀由同owner排空。
@@ -91,6 +93,7 @@ $env:PYTHONPATH='src'
 uv run --frozen --offline python scripts/init_test_database.py
 uv run --frozen --offline python scripts/init_test_runtime.py
 uv run --frozen --offline python scripts/init_test_runtime.py --schema jd_host_test
+uv run --frozen --offline python scripts/init_test_memory.py
 $env:JD_RELATIONAL_TEST_DB='1'
 uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_storage_postgres.py
 uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_storage_rows.py tests/test_storage_service.py

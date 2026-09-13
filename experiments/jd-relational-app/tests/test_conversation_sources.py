@@ -92,7 +92,7 @@ def test_source_payload_has_exact_position_and_no_original_text(native):
     observed, _ = seed(native)
     _, dataset, document, *_ = native
     excerpt = service(native).capture(document, observed.record.run_id)
-    payload = serializer().loads(excerpt.source_ref)
+    payload = serializer().loads(excerpt.source_ref.removeprefix("conversation:"))
     assert set(payload) == {"format_version", "purpose", "dataset_id", "document_id", "run_id",
         "root_checkpoint_id", "source_namespace", "source_checkpoint_id", "first", "last"}
     assert payload["format_version"] == 1 and payload["purpose"] == "source"
@@ -225,7 +225,7 @@ def test_authenticated_bad_source_shape_or_range_is_not_accepted(native, patch):
     observed, _ = seed(native)
     _, _, document, *_ = native
     source = service(native)
-    payload = serializer().loads(source.capture(document, observed.record.run_id).source_ref)
+    payload = serializer().loads(source.capture(document, observed.record.run_id).source_ref.removeprefix("conversation:"))
     with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
         source.read(serializer().dumps(payload | patch), document)
 
@@ -235,7 +235,7 @@ def test_missing_fixed_native_position_is_unavailable_not_latest(native, positio
     observed, _ = seed(native)
     _, _, document, *_ = native
     source = service(native)
-    payload = serializer().loads(source.capture(document, observed.record.run_id).source_ref)
+    payload = serializer().loads(source.capture(document, observed.record.run_id).source_ref.removeprefix("conversation:"))
     with pytest.raises(ConversationSourceError, match="^source_not_available$"):
         source.read(serializer().dumps(payload | {position: str(uuid4())}), document)
 

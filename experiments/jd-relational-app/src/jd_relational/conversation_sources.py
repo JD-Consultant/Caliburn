@@ -3,6 +3,8 @@
 One saved Human and its preceding public AI context are selected by the App.
 The source has a separate ItsDangerous purpose; it is not a JD or chat cursor.
 Checkpoint decoding and public text projection remain with their existing owners.
+New addresses use conversation: so Memory's existing reference parser can find
+them. Previously issued bare signed v1 addresses remain readable verbatim.
 """
 from dataclasses import dataclass
 import hashlib
@@ -23,6 +25,7 @@ from .reads import ReadError
 
 
 MAX_REFERENCE_BYTES = 4096
+_PREFIX = "conversation:"
 _SALT = "caliburn.jd.conversation-source.v1"
 _TOKEN = re.compile(r"[A-Za-z0-9_.-]+\Z")
 _INSTRUCTION = (
@@ -126,9 +129,9 @@ class ConversationSourceCodec:
             raise ValueError()
 
     @staticmethod
-    def _bounded(position):
+    def _bounded(position, prefix_bytes=0):
         payload = position.model_dump(mode="json")
-        if (4 * len(_json(payload).encode("utf-8")) + 2) // 3 + 44 > MAX_REFERENCE_BYTES:
+        if prefix_bytes + (4 * len(_json(payload).encode("utf-8")) + 2) // 3 + 44 > MAX_REFERENCE_BYTES:
             raise ValueError()
         return payload
 
@@ -137,18 +140,24 @@ class ConversationSourceCodec:
             position = _SourcePosition.model_validate(position, strict=True)
             if position.dataset_id != self.dataset_id:
                 raise ValueError()
-            token = self._serializer.dumps(self._bounded(position))
+            token = self._serializer.dumps(self._bounded(position, len(_PREFIX)))
             self._token(token)
-            return token
+            reference = _PREFIX + token
+            if len(reference) > MAX_REFERENCE_BYTES:
+                raise ValueError()
+            return reference
         except Exception:
             raise ConversationSourceError("source_not_available") from None
 
     def _resolve(self, source_ref, document_id) -> _SourcePosition:
         try:
             _uuid(document_id)
-            self._token(source_ref)
-            position = _SourcePosition.model_validate(self._serializer.loads(source_ref), strict=True)
-            self._bounded(position)
+            if type(source_ref) is not str or not 0 < len(source_ref) <= MAX_REFERENCE_BYTES:
+                raise ValueError()
+            token = source_ref.removeprefix(_PREFIX)
+            self._token(token)
+            position = _SourcePosition.model_validate(self._serializer.loads(token), strict=True)
+            self._bounded(position, len(source_ref) - len(token))
             if position.dataset_id != self.dataset_id or position.document_id != document_id:
                 raise ValueError()
             return position
@@ -264,6 +273,14 @@ class ConversationSourceService:
             raise ConversationSourceError(code) from None
         except Exception:
             raise ConversationSourceError("source_not_available") from None
+
+    def validate_reference(self, source_ref, document_id) -> None:
+        """Verify the original signed locator and scope without storage I/O.
+
+        This makes no claim that the checkpoint still exists or that its public
+        text supports a Memory statement. read() owns the actual fixed read.
+        """
+        self._codec._resolve(source_ref, document_id)
 
     def resolve(self, source_ref, document_id) -> Source:
         try:

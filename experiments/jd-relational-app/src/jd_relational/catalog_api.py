@@ -69,7 +69,7 @@ def create_catalog_app(resources, *, allowed_origins,
                        _allowed_headers=("Content-Type", "If-Match")):
     app = create_manual_app(resources, allowed_origins=allowed_origins,
         _boundary_factory=_boundary_factory, _allowed_methods=("GET", "POST", "PATCH"),
-        _allowed_headers=_allowed_headers, _expose_headers=("X-Request-ID", "ETag"))
+        _allowed_headers=_allowed_headers, _expose_headers=("X-Request-ID", "ETag", "Location"))
     previous_invalid = app.exception_handlers[RequestValidationError]
 
     @app.exception_handler(RequestValidationError)

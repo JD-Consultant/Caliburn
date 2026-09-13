@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 SCHEMAS = [("jd-work", "models.py"), ("jd-result", "results.py"), ("jd-http", "http_results.py"),
            ("jd-snapshot", "snapshots.py"), ("jd-read", "reads.py"),
            ("jd-query-http", "query_http.py"), ("jd-manual-http", "manual_http.py"),
-           ("jd-catalog-http", "catalog_http.py")]
+           ("jd-catalog-http", "catalog_http.py"), ("jd-chat-http", "chat_http.py")]
 OUTPUT = ROOT / "src" / "jd_relational" / "generated"
 
 
@@ -52,7 +52,10 @@ def main() -> None:
                       if name == "jd-query-http" else ["--external-ref-mapping",
                        f"{ROOT / 'contracts' / 'jd-work.schema.json'}=jd_relational.generated.models",
                        f"{ROOT / 'contracts' / 'jd-result.schema.json'}=jd_relational.generated.results"]
-                      if name == "jd-manual-http" else [])
+                      if name == "jd-manual-http" else ["--external-ref-mapping",
+                       f"{ROOT / 'contracts' / 'jd-manual-http.schema.json'}=jd_relational.generated.manual_http",
+                       f"{ROOT / 'contracts' / 'jd-result.schema.json'}=jd_relational.generated.results"]
+                      if name == "jd-chat-http" else [])
         expected[python_output] = run(
             [
                 sys.executable,

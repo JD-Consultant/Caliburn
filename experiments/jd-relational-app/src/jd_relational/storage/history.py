@@ -197,6 +197,31 @@ class HistoryReader:
                 raise HistoryError("stored_content_mismatch")
             return ChangeMaterial(receipt, base, result)
 
+    def read_run_operations(self, document_id: str, run_id: str, *, limit: int = 96) -> tuple[SavedOperation, ...]:
+        """Return this snapshot's saved AI receipts, never a truncated run result.
+
+        UUID ordering is stable presentation only, not transaction execution
+        order. An empty tuple proves no visible saved rows, not a missing run,
+        failed operation, or stopped writer. The native run owner must join its
+        original bindings and establish whether that observation is complete.
+        """
+        _document_id(document_id)
+        _document_id(run_id)  # Preserve existing persisted identifier semantics.
+        if type(limit) is not int or not 1 <= limit <= 96:
+            raise HistoryError("invalid_input")
+        with self._read() as conn:
+            if conn.execute(sa.select(db.jd_document.c.id).where(
+                    db.jd_document.c.id == document_id)).scalar_one_or_none() is None:
+                raise HistoryError("document_missing")
+            rows = conn.execute(sa.select(db.jd_operation).where(
+                db.jd_operation.c.document_id == document_id,
+                db.jd_operation.c.ai_run_id == run_id,
+                db.jd_operation.c.origin == "ai",
+            ).order_by(db.jd_operation.c.operation_id).limit(limit + 1)).mappings().all()
+            if len(rows) > limit:
+                raise HistoryError("run_operations_limit_exceeded")
+            return tuple(_receipt(row) for row in rows)
+
     def list_revisions(self, document_id: str, anchor_revision_id: UUID | None = None,
                        before_number: int | None = None, limit: int = 50) -> RevisionPage:
         _document_id(document_id)

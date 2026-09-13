@@ -30,7 +30,8 @@ from .reads import ReadService, read_json
 from .references import ReferenceCodec
 from .result_transport import validate_result
 from .runtime_checkpoints import DocumentCheckpoints
-from .storage.history import HistoryReader
+from .storage.history import HistoryReader, HistoryError
+from .storage.receipts import WriteObservation
 
 
 class AiRuntimeError(ValueError):
@@ -63,6 +64,19 @@ class AiRunResult:
     status: str
     input_saved: bool
     response_message_id: str | None
+
+
+@dataclass(frozen=True)
+class AiRunSnapshot:
+    """Read-only facts for one original run, not another durable run record."""
+    document_id: str
+    run_id: str
+    run_status: str
+    input_state: str
+    response_message_id: str | None
+    stop_requested: bool | None
+    effects_settled: bool
+    receipts: tuple[WriteObservation, ...]
 
 
 @dataclass
@@ -187,10 +201,12 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None):
 
 
 class AiRuntime:
-    def __init__(self, owner: ManualRuntime, codec: ReferenceCodec, *, source_resolver=None):
+    def __init__(self, owner: ManualRuntime, codec: ReferenceCodec, *, source_resolver=None,
+                 execution_enabled: bool = True):
         if (not isinstance(owner, ManualRuntime) or not isinstance(owner.checkpoints, DocumentCheckpoints)
                 or not isinstance(codec, ReferenceCodec)
-                or source_resolver is not None and not callable(source_resolver)):
+                or source_resolver is not None and not callable(source_resolver)
+                or type(execution_enabled) is not bool):
             raise AiRuntimeError("invalid_ai_runtime")
         self.owner, self.codec = owner, codec
         self.graph = owner.checkpoints.graph
@@ -201,6 +217,7 @@ class AiRuntime:
         self.reads = ReadService(owner.storage, self.history, codec)
         self.changes = ChangeReadService(self.history, codec)
         self.source_resolver = source_resolver
+        self.execution_enabled = execution_enabled
         self._registry = Lock()  # Only handles, never graph/DB I/O.
         self._latest = {}
         self._starts = {}
@@ -290,6 +307,8 @@ class AiRuntime:
         def inspect_original():
             original = self._lookup(document_id, run_id)
             if original is None:
+                if not self.execution_enabled:
+                    raise AiRuntimeError("execution_disabled")
                 return None
             prior = original._attempt.record
             # A legacy request has no confirmed start revision. Read it through
@@ -345,6 +364,121 @@ class AiRuntime:
         _verify_saved_results(original.messages, bindings, receipts, self.codec, run_id=run_id)
         human = next(m for m in original.messages if isinstance(m, HumanMessage) and m.id == run_id)
         return AiRunHandle(self, _Attempt(original.record, human, result=self._result(original)))
+
+    def inspect_run(self, document_id: str, run_id: str) -> AiRunSnapshot:
+        """Pin native input first, then inspect original SQL effects without repair.
+
+        An active run may advance during reads. Only its terminal native record
+        plus actual local closure and the complete SQL set establish settled.
+        The HTTP service separately observes the current document write gate.
+        """
+        try:
+            if type(run_id) is not str or str(UUID(run_id)) != run_id:
+                raise ValueError()
+        except (TypeError, ValueError):
+            raise AiRuntimeError("invalid_input") from None
+        try:
+            return self.owner.inspect_document(document_id, lambda: self._inspect_run(document_id, run_id))
+        except (AiRuntimeError, RuntimeFailure, AiCheckpointError):
+            raise
+        except HistoryError as error:
+            raise AiRuntimeError("document_missing" if error.code == "document_missing"
+                                 else "checkpoint_unavailable") from None
+        except Exception:
+            raise AiRuntimeError("checkpoint_unavailable") from None
+
+    def request_stop(self, document_id: str, run_id: str) -> None:
+        """Stop only the specified local attempt; an old terminal run is a no-op."""
+        handle = self.lookup(document_id, run_id)
+        if handle is not None:
+            handle.request_stop()
+
+    def recover_run(self, document_id: str, run_id: str) -> None:
+        """Explicit original closure only; never resume the model or rebuild edits."""
+        handle = self.lookup(document_id, run_id)
+        if handle is not None:
+            try:
+                handle.wait(0)
+            except TimeoutError:
+                return  # Actual work/automatic closure still owns the attempt.
+            except AiRuntimeError:
+                pass  # Only an already-failed closure can be explicitly retried.
+            self.owner.inspect_document(document_id, handle.recover)
+
+    def _inspect_run(self, document_id, run_id):
+        with self._registry:
+            cached = self._latest.get(document_id)
+        attempt = cached._attempt if cached is not None and cached._attempt.record.run_id == run_id else None
+        observed = self.run_history.find(document_id, run_id, self.codec.dataset_id)
+        # This one read transaction includes every durable operation of this run.
+        saved = self.history.read_run_operations(document_id, run_id)
+        local_result = attempt.result if attempt is not None else None
+        if observed is None:
+            if saved:
+                raise AiRuntimeError("run_recovery_required")
+            if local_result is not None:
+                if local_result.input_saved or local_result.status != "failed":
+                    raise AiRuntimeError("run_recovery_required")
+                return AiRunSnapshot(document_id, run_id, "failed", "not_saved", None, None, True, ())
+            if attempt is None:
+                return AiRunSnapshot(document_id, run_id, "not_found", "unconfirmed", None, None, False, ())
+            status, stopped = self._active_status(attempt)
+            return AiRunSnapshot(document_id, run_id, status, "unconfirmed", None, stopped, False, ())
+        if attempt is not None and observed.record.request_digest != attempt.record.request_digest:
+            raise AiRuntimeError("operation_conflict")
+        bindings = decode_ai_bindings(observed.bindings, dataset_id=self.codec.dataset_id,
+            document_id=document_id, run_id=run_id)
+        if len(bindings) > 96:
+            raise AiRuntimeError("run_recovery_required")
+        by_id = {row.operation_id: row for row in saved}
+        if len(by_id) != len(saved):
+            raise AiRuntimeError("run_recovery_required")
+        receipts = {}
+        for binding in bindings:
+            verify_binding_message(binding, observed.messages)
+            identity = binding.identity
+            row = by_id.get(identity.operation_id)
+            if row is not None and (row.document_id != document_id or row.origin != "ai"
+                    or row.ai_run_id != run_id or row.request_digest != identity.request_digest
+                    or row.base_revision_id != identity.base_revision_id
+                    or row.body.command_kind != identity.command_kind):
+                raise AiRuntimeError("invalid_saved_tool_result")
+            receipts[identity.operation_id] = WriteObservation(document_id, identity.operation_id,
+                row, "unknown" if row is None else None)
+        terminal = observed.record.status != "running"
+        if terminal:
+            if (not observed.closed or _pending_calls(observed.messages)
+                    or set(by_id) != set(receipts) or any(not r.confirmed for r in receipts.values())):
+                raise AiRuntimeError("run_recovery_required")
+            _verify_saved_results(observed.messages, bindings, receipts, self.codec, run_id=run_id)
+        response = self._public_response(observed)
+        if terminal and (attempt is None or local_result is not None):
+            if local_result is not None and (not local_result.input_saved or local_result.status != observed.record.status):
+                raise AiRuntimeError("run_recovery_required")
+            return AiRunSnapshot(document_id, run_id, observed.record.status, "saved", response,
+                                 None, True, tuple(receipts.values()))
+        status, stopped = self._active_status(attempt)
+        return AiRunSnapshot(document_id, run_id, status, "saved", response, stopped, False, tuple(receipts.values()))
+
+    @staticmethod
+    def _active_status(attempt):
+        if attempt is None or attempt.handle is None:
+            return "recovery_required", None
+        stopped = attempt.handle.permit.stop_event.is_set()
+        if attempt.handle.execution_running:
+            return "running", stopped
+        return ("recovery_required" if attempt.closure_error else "closing"), stopped
+
+    @staticmethod
+    def _public_response(observed):
+        from .chat_history import public_chat_text
+        positions = [i for i, m in enumerate(observed.messages)
+                     if isinstance(m, HumanMessage) and m.id == observed.record.run_id]
+        if len(positions) != 1:
+            raise AiRuntimeError("invalid_saved_conversation")
+        responses = [m for m in observed.messages[positions[0] + 1:]
+                     if isinstance(m, AIMessage) and public_chat_text(m) is not None]
+        return responses[-1].id if responses else None
 
     def _finish_automatically(self, attempt):
         # Completion is App work, independent of an HTTP observer staying open.

@@ -1,4 +1,4 @@
-"""Compose the configured manual App before starting an ASGI event loop.
+"""Compose local JD and chat services before starting an ASGI event loop.
 
 No provider is opened here. The caller provides the compiled consultant graph;
 manual-only service retains the real Agent layout with execution disabled so
@@ -10,7 +10,9 @@ from dataclasses import dataclass
 from starlette.concurrency import run_in_threadpool
 
 from .ai_runtime import AiRuntime
-from .catalog_api import CatalogServices
+from .chat_api import ChatServices
+from .chat_service import ChatService
+from .chat_history import ChatHistoryCodec, ChatHistoryService
 from .catalog_service import CatalogService
 from .change_reads import ChangeReadService
 from .configured_api import create_configured_api
@@ -45,16 +47,23 @@ class ManagedApp:
         return self.opened.close(timeout=10)
 
 
-def open_managed_app(file, *, consultant) -> ManagedApp:
-    """Dedicated process/main thread only; fixed config before OS/DB/ASGI."""
+def open_managed_app(file, *, consultant, enable_chat=False) -> ManagedApp:
+    """Dedicated process/main thread; trusted caller explicitly enables new turns.
+
+    The ordinary inspection-only entry keeps enable_chat=False. Original-run
+    lookup, cancellation/recovery and saved messages remain available.
+    """
     opened = open_configured_host(file, consultant=consultant)
     try:
         host, codec = opened.host, opened.codec
-        ai_runtime = AiRuntime(host.runtime, codec)
+        ai_runtime = AiRuntime(host.runtime, codec, execution_enabled=enable_chat)
         history = HistoryReader(host.engine)
-        services = CatalogServices(ReadService(host.runtime.storage, history, codec),
-            ChangeReadService(history, codec), ManualService(host.runtime, history, codec),
-            CatalogService(host.runtime, opened.settings.dataset_id))
+        manual = ManualService(host.runtime, history, codec)
+        chat_history = ChatHistoryService(ai_runtime.checkpoints, ChatHistoryCodec(
+            opened.settings.signing_key_bytes(), opened.settings.dataset_id))
+        services = ChatServices(ReadService(host.runtime.storage, history, codec),
+            ChangeReadService(history, codec), manual,
+            CatalogService(host.runtime, opened.settings.dataset_id), ChatService(ai_runtime, manual, chat_history))
 
         @asynccontextmanager
         async def resources():
@@ -73,7 +82,7 @@ def open_managed_app(file, *, consultant) -> ManagedApp:
                     raise ManagedAppError("shutdown_unconfirmed") from None
 
         app = create_configured_api(resources, allowed_origins=opened.settings.allowed_origins,
-            dataset_id=opened.settings.dataset_id)
+            dataset_id=opened.settings.dataset_id, with_chat=True)
         return ManagedApp(app, opened, ai_runtime)
     except Exception:
         try:

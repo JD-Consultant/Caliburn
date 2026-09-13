@@ -91,6 +91,12 @@ class ForegroundHandle:
     def permit(self) -> ForegroundPermit:
         return self._entry.permit
 
+    @property
+    def execution_running(self) -> bool:
+        """Actual Future still pending/running; callback drain is separate."""
+        future = self._entry.future
+        return future is not None and not future.done()
+
     def request_stop(self) -> None:
         if self._entry.future is None or not self._entry.future.done():
             self.permit.stop_event.set()

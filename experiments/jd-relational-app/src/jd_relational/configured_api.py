@@ -8,6 +8,7 @@ from functools import partial
 from uuid import UUID
 
 from .catalog_api import CatalogBoundary, catalog_problem, create_catalog_app
+from .chat_api import ChatBoundary, attach_chat_routes
 from .generated.catalog_http import CatalogProblem, CatalogUuid
 
 
@@ -28,14 +29,14 @@ class _DatasetGate:
         return await self.app(scope, receive, send)
 
 
-class _ConfiguredBoundary(CatalogBoundary):
+class _ConfiguredBoundary(ChatBoundary):
     def __init__(self, app, *, allowed_origins, dataset_id):
         # Existing safe boundary and Origin gate run before this inner dataset
         # check; the body limiter and all routes remain inside both gates.
         super().__init__(_DatasetGate(app, dataset_id=dataset_id), allowed_origins=allowed_origins)
 
 
-def create_configured_api(resources, *, allowed_origins, dataset_id):
+def create_configured_api(resources, *, allowed_origins, dataset_id, with_chat=False):
     try:
         if type(dataset_id) is not str or str(UUID(dataset_id)) != dataset_id:
             raise ValueError()
@@ -44,6 +45,8 @@ def create_configured_api(resources, *, allowed_origins, dataset_id):
     app = create_catalog_app(resources, allowed_origins=allowed_origins,
         _boundary_factory=partial(_ConfiguredBoundary, dataset_id=dataset_id),
         _allowed_headers=("Content-Type", "If-Match", DATASET_HEADER))
+    if with_chat:
+        attach_chat_routes(app)
     previous_openapi = app.openapi
 
     def configured_openapi():

@@ -12,6 +12,11 @@
 
 ## 結構
 
+**最新[聊天HTTP與原修改結果](../../docs/specs/2026-09-13-jd-chat-http-slice.md)已接。**`ChatService` 共用 `AiRuntime`／人工write state，原話、實際執行與JD效果分開回報；`chat_history.py`固定原root/source分頁，只公開原話及AI正文。生成契約／TS、完整離線2211 PASS／209 SKIP、三個真PG HTTP情境與獨審通過。`open_managed_app`預設`enable_chat=False`，日常仍不開provider；新run回`ai_unavailable`，保存對話／原結果可查。下一接Web，不宣稱自然AI或完整App完成。
+
+- `contracts/jd-chat-http.schema.json`／`chat_service.py`／`chat_api.py`：原請求送出、原狀態、取消／恢復與已保存對話；原`BoundResult`及人工狀態直接external ref，不增加run／聊天表。所有同步查讀由同owner排空。
+- `chat_history.py`：同現有設定key/dataset、不同用途salt的固定native位置；輸出頁有界，底層仍讀完整messages。不是另一份對話保存或LLM context壓縮。
+
 **最新[聊天版次准入與原回合查回](../../docs/specs/2026-09-13-jd-chat-admission-and-original-run-slice.md)已接核心。**新 `start` 必填 canonical `expected_revision_id: UUID`，原請求查回優先；`lookup` 可在後續回合後讀原結果，無模型重播。V1原樣讀取恢復、V2保存起始版次；同owner讀取也納關閉排空。完整離線1961 PASS／201 SKIP，真PG4及新程序PG4通過，獨審缺口已修。尚未接聊天HTTP／Web；歷史256祖先位置上限／缺鏈明示待查回，不能當不存在重送。
 
 - `ai_records.py`／`ai_history.py`：原生 tagged union 讀保存格式、有效父鏈原回合查回；不建立另一份對話或操作權威。新增模型上下文壓縮前，須先維持原始對話與原請求身分可查，不能以摘要沒有 ID 推定新請求。

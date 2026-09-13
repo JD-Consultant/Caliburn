@@ -29,11 +29,14 @@ def composed(monkeypatch):
     monkeypatch.setattr(managed, "ManualService", lambda *args: object())
     monkeypatch.setattr(managed, "CatalogService", lambda *args: SimpleNamespace(list=lambda **_: {
         "dataset_id": value.dataset_id, "documents": [], "next_after": None}))
-    def ai(owner, codec):
+    def ai(owner, codec, *, execution_enabled):
         assert owner is opened.host.runtime and codec is opened.codec
+        assert execution_enabled is False
         events.append("ai-owner")
-        return object()
+        return SimpleNamespace(checkpoints=object())
     monkeypatch.setattr(managed, "AiRuntime", ai)
+    monkeypatch.setattr(managed, "ChatHistoryService", lambda *args: object())
+    monkeypatch.setattr(managed, "ChatService", lambda *args: object())
     return events, opened
 
 

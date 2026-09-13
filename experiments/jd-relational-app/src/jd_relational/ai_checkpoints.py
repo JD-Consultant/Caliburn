@@ -173,9 +173,9 @@ class AiRunCheckpoints:
         """Native graph for fixed history queries; this is not writer authority."""
         return self._graph
 
-    def _get(self, config):
+    def _get(self, config, *, subgraphs=True):
         try:
-            return self._graph.get_state(config, subgraphs=True)
+            return self._graph.get_state(config, subgraphs=subgraphs)
         except Exception:
             raise AiCheckpointError("checkpoint_unavailable") from None
 
@@ -248,8 +248,12 @@ class AiRunCheckpoints:
         return self._observe_current(document_id, None, dataset_id)
 
     def observe_at(self, document_id: str, run_id: str, dataset_id: str,
-                   root_config: dict) -> AiRunObservation:
-        """Inspect one exact root and its fixed child; never fall back to latest."""
+                   root_config: dict, *, source_config: dict | None = None) -> AiRunObservation:
+        """Inspect an exact root, optionally retaining an already-issued source.
+
+        A fixed root can still have an advancing child. Pagination supplies the
+        original source so later reads do not select that child's latest state.
+        """
         try:
             _uuid(document_id); _uuid(run_id); _uuid(dataset_id)
             if type(root_config) is not dict or set(root_config) != {"configurable"}:
@@ -261,11 +265,24 @@ class AiRunCheckpoints:
                     or "\0" in scope["checkpoint_id"]):
                 raise ValueError()
             fixed = deepcopy(root_config)
+            if source_config is not None:
+                if type(source_config) is not dict or set(source_config) != {"configurable"}:
+                    raise ValueError()
+                source = source_config["configurable"]
+                if (type(source) is not dict or set(source) != {"thread_id", "checkpoint_ns", "checkpoint_id"}
+                        or source["thread_id"] != document_id or type(source["checkpoint_ns"]) is not str
+                        or (source["checkpoint_ns"] != "" and not source["checkpoint_ns"].startswith("consultant:"))
+                        or "\0" in source["checkpoint_ns"]
+                        or type(source["checkpoint_id"]) is not str or not source["checkpoint_id"].strip()
+                        or "\0" in source["checkpoint_id"]):
+                    raise ValueError()
+                source_config = deepcopy(source_config)
         except Exception:
             raise AiCheckpointError("invalid_input") from None
-        return self._observe_current(document_id, run_id, dataset_id, root_config=fixed)
+        return self._observe_current(document_id, run_id, dataset_id, root_config=fixed,
+                                     requested_source=source_config)
 
-    def _observe_current(self, document_id, run_id, dataset_id, *, root_config=None):
+    def _observe_current(self, document_id, run_id, dataset_id, *, root_config=None, requested_source=None):
         # Shared fixed-root decoder: discover never calls observe with a second
         # latest read, which could select a different run during publication.
         try:
@@ -279,12 +296,14 @@ class AiRunCheckpoints:
                     if run_id is None:
                         return None
                     raise AiCheckpointError("run_not_found")
-            root = self._get(root_config)
+            root = self._get(root_config, subgraphs=requested_source is None)
             if _config(root, document_id, "") != root_config:
                 raise ValueError()
             if type(root.values) is not dict:
                 raise ValueError()
             if root.next == (START,):
+                if requested_source is not None and requested_source != root_config:
+                    raise ValueError()
                 record, messages, bindings, view, read = self._initial_material(
                     root, root_config, document_id, run_id, dataset_id)
                 return AiRunObservation(_canonical(record.model_dump(mode="json")), _messages_json(messages),
@@ -318,11 +337,22 @@ class AiRunCheckpoints:
                 task = root.tasks[0]
                 if type(task.id) is not str or not task.id:
                     raise ValueError()
-                child_latest = task.state
-                if not isinstance(child_latest, StateSnapshot):
-                    raise ValueError()
                 namespace = f"consultant:{task.id}"
-                child_config = _config(child_latest, document_id, namespace, empty=True)
+                if requested_source is not None:
+                    # Public subgraphs=False preserves the task's native scope
+                    # without loading latest child material as a side effect.
+                    if (type(task.state) is not dict or type(task.state.get("configurable")) is not dict
+                            or task.state["configurable"].get("thread_id") != document_id
+                            or task.state["configurable"].get("checkpoint_ns") != namespace):
+                        raise ValueError()
+                    child_config = None if requested_source == root_config else requested_source
+                    if child_config is not None and child_config["configurable"]["checkpoint_ns"] != namespace:
+                        raise ValueError()
+                else:
+                    child_latest = task.state
+                    if not isinstance(child_latest, StateSnapshot):
+                        raise ValueError()
+                    child_config = _config(child_latest, document_id, namespace, empty=True)
                 if child_config is not None:
                     child = self._get(child_config)
                     if _config(child, document_id, namespace) != child_config:
@@ -337,6 +367,8 @@ class AiRunCheckpoints:
                         raise ValueError()
                     material, source_config = child_material, child_config
             elif root.next or root.interrupts:
+                raise ValueError()
+            elif requested_source is not None and requested_source != root_config:
                 raise ValueError()
             record, messages, bindings, view, read = material
             return AiRunObservation(_canonical(record.model_dump(mode="json")), _messages_json(messages),

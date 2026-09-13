@@ -46,6 +46,13 @@
       "adaptation": "Package imports; typed staged validation; original PublishRequest receipt reconciliation without caller edits; same-document non-regressing current-head guard. Six native graph nodes and publication owner retained. Adds build_repair_graph(resolve_workflow), which compiles those same six steps so a host can mount them as a static child; each node resolves its workflow from the native Runtime, so building or inspecting the graph opens no resource."
     },
     {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation_request.py",
+      "source_sha256": "6965d106a270209e61ef0982bf18be8096e4b72b234091d45c303ccd075414d2",
+      "adopted_path": "src/caliburn_memory/requests.py",
+      "adopted_sha256": "6965d106a270209e61ef0982bf18be8096e4b72b234091d45c303ccd075414d2",
+      "adaptation": "Module renamed only; byte-identical. The tool takes no arguments, returns a durable receipt and never runs B1/B2 or writes Memory. Its description is verified model-facing text and was not reworded. Verified at 4f94fbfb (CT50 profile)."
+    },
+    {
       "source_path": "experiments/analysis-agent/src/analysis_agent/memory_tools.py",
       "source_sha256": "facdbfc5e3dc5035326e0af46be58479c720c54f0398ea6453312001dc429e11",
       "adopted_path": "src/caliburn_memory/read_tools.py",

@@ -397,6 +397,10 @@ class ConversationSourceService:
         later terminal never releases an earlier one, and a settled
         `failed`/`cancelled` turn still keeps the employee's saved words.
         """
+        return self._settled(document_id)[1]
+
+    def _settled(self, document_id):
+        """One pinned read of this document, with its settled turns."""
         try:
             _uuid(document_id)
             observed = self._checkpoints.discover(document_id, self.dataset_id)
@@ -405,8 +409,58 @@ class ConversationSourceService:
         except Exception:
             raise ConversationSourceError("source_not_available") from None
         if observed is None:
-            return ()
-        return self._settled_turns(document_id, observed.messages)
+            return (), ()
+        return observed.messages, self._settled_turns(document_id, observed.messages)
+
+    def _after_cursor(self, messages, turns, after_reference, document_id):
+        """First settled turn the published cursor has not covered.
+
+        `after_reference` may only be the publication head's own completed
+        window. A turn source, or a cursor whose end is not on this lineage,
+        stops admission: it is never reset and never read as "nothing done".
+        """
+        if after_reference is None:
+            return 0
+        position = self._codec._resolve_window(after_reference, document_id)
+        order = [message.id for message in messages]
+        if position.last not in order:
+            raise ConversationSourceError("invalid_ref")
+        boundary = order.index(position.last)
+        for index, turn in enumerate(turns):
+            if order.index(turn["first"]) > boundary:
+                return index
+        return len(turns)
+
+    def pending_windows(self, document_id, after_reference=None) -> tuple[dict, ...]:
+        """Settled turns that explicitly asked for background consolidation.
+
+        This is a trigger list, not a menu of topics: it answers only which
+        turn asked to be scheduled. What a dispatcher may actually process is
+        `unprocessed_source`, whose contiguous range also carries settled turns
+        that never asked. A turn after an unsettled one is not listed at all.
+        """
+        from caliburn_memory.requests import has_saved_request
+        messages, turns = self._settled(document_id)
+        order = [message.id for message in messages]
+        requested = []
+        for turn in turns[self._after_cursor(messages, turns, after_reference, document_id):]:
+            spoken = messages[order.index(turn["first"]):order.index(turn["last"]) + 1]
+            if has_saved_request(spoken):
+                requested.append(dict(turn))
+        return tuple(requested)
+
+    def unprocessed_source(self, document_id, after_reference=None) -> dict | None:
+        """The contiguous settled range after the published cursor, or None.
+
+        Quiet settled turns stay inside the range; the range ends at the first
+        unsettled turn, so a later request can never jump an open gap.
+        """
+        messages, turns = self._settled(document_id)
+        remaining = turns[self._after_cursor(messages, turns, after_reference, document_id):]
+        if not remaining:
+            return None
+        return {"first_run_id": remaining[0]["input_id"],
+                "last_run_id": remaining[-1]["input_id"]}
 
     def _settled_turns(self, document_id, messages):
         from .ai_history import AiRunHistory

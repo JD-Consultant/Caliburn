@@ -9,6 +9,7 @@ import hashlib
 from uuid import uuid4
 
 from caliburn_memory import MemoryArtifacts, PublicationStore
+from caliburn_memory.requests import REQUEST_KIND, REQUEST_TOOL_NAME, has_saved_request
 from caliburn_memory.sources import InvalidSourceReference
 from itsdangerous import URLSafeSerializer
 from langgraph.store.memory import InMemoryStore
@@ -197,3 +198,85 @@ def test_a_window_whose_bounds_do_not_match_the_fixed_position_is_invalid(interv
                              first_run=first_run, last_run=second_run, root="no-such-root")
     with pytest.raises(ConversationSourceError, match="^source_not_available$"):
         windows.read_window(absent_root, document)
+
+
+def asked(number="c1"):
+    """One real, unambiguous saved request pair, as the verified tool emits it."""
+    return [AIMessage(id=f"ai-{number}", content="", tool_calls=[{
+                "name": REQUEST_TOOL_NAME, "id": number, "args": {}, "type": "tool_call"}]),
+            ToolMessage(id=f"tm-{number}", tool_call_id=number, name=REQUEST_TOOL_NAME,
+                        content="收到整理請求", status="success", artifact={"kind": REQUEST_KIND})]
+
+
+def test_settled_turns_without_any_request_trigger_nothing(interview, native):
+    windows, document, first_run, second_run = interview
+    assert windows.pending_windows(document) == ()
+    assert windows.unprocessed_source(document) == {
+        "first_run_id": first_run, "last_run_id": second_run}
+
+
+def test_a_request_only_triggers_while_the_batch_still_covers_quiet_turns(interview, native):
+    windows, document, first_run, second_run = interview
+    third = settled(native, [*asked(), AIMessage(id="a5", content="好")], text="第三輪原話")
+    fourth = settled(native, [AIMessage(id="a6", content="沒有請求")], text="第四輪原話")
+    assert [t["input_id"] for t in windows.pending_windows(document)] == [third.record.run_id]
+    # The quiet fourth turn is still part of the contiguous batch to process.
+    assert windows.unprocessed_source(document) == {
+        "first_run_id": first_run, "last_run_id": fourth.record.run_id}
+
+
+def test_a_request_after_an_unfinished_turn_is_not_admitted_yet(interview, native):
+    windows, document, first_run, second_run = interview
+    append(native, [AIMessage(id="a7", content="仍在跑")], text="第三輪原話", pause=True)
+    assert windows.pending_windows(document) == ()
+    assert windows.unprocessed_source(document) == {
+        "first_run_id": first_run, "last_run_id": second_run}
+
+
+@pytest.mark.parametrize("broken", ["call_only", "text_only", "error_result"])
+def test_only_a_real_saved_request_pair_counts(interview, native, broken):
+    windows, document, *_ = interview
+    call, result = asked()
+    replies = ([call] if broken == "call_only"
+               else [AIMessage(id="a8", content="我已經請系統整理記憶了")] if broken == "text_only"
+               else [call, result.model_copy(update={"status": "error"})])
+    settled(native, replies, text="第三輪原話")
+    assert windows.pending_windows(document) == ()
+
+
+def test_an_ambiguous_request_is_refused_before_it_could_ever_be_saved():
+    """The App's own closure already refuses a duplicated call id.
+
+    Recognition keeps its own ambiguity rule anyway, so a conversation that
+    somehow carried one would still not count as a request.
+    """
+    call, result = asked()
+    assert has_saved_request([call, result]) is True
+    assert has_saved_request([call, result, call.model_copy(update={"id": "ai-again"}),
+                              result.model_copy(update={"id": "tm-again"})]) is False
+
+
+def test_a_published_cursor_moves_the_batch_and_a_turn_source_is_never_one(interview, native):
+    windows, document, first_run, second_run = interview
+    third = settled(native, [*asked(), AIMessage(id="a5", content="好")], text="第三輪原話")
+    processed = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    assert windows.pending_windows(document, processed) == windows.pending_windows(document)
+    assert windows.unprocessed_source(document, processed) == {
+        "first_run_id": third.record.run_id, "last_run_id": third.record.run_id}
+    covered = windows.capture_window(document, first_run_id=first_run,
+                                     last_run_id=third.record.run_id)
+    assert windows.unprocessed_source(document, covered) is None
+    assert windows.pending_windows(document, covered) == ()
+    turn_source = windows.capture(document, third.record.run_id).source_ref
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.unprocessed_source(document, turn_source)
+
+
+def test_an_off_lineage_cursor_stops_admission_instead_of_resetting(interview, native):
+    windows, document, first_run, second_run = interview
+    position = windows._codec._resolve_window(
+        windows.capture_window(document, first_run_id=first_run, last_run_id=second_run), document)
+    stray = window_ref(windows, document, first=first_run, last="not-in-this-conversation",
+                       first_run=first_run, last_run=second_run, root=position.root_checkpoint_id)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.unprocessed_source(document, stray)

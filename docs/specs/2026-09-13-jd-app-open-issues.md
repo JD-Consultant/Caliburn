@@ -29,7 +29,8 @@
 - 契約已交並完成文件審查：[完成窗口source port契約](2026-09-13-jd-interview-window-source-contract.md)定新增`purpose="window"`簽章引用（`last`不綁run_id）、分頁讀取、逐輪終局改用run record＋`observed.closed`、整理請求辨識、觸發與連續範圍分開、B2 `processed_source` 的用途感知驗證、source/context pair、Unicode offset 及 purpose salt 隔離，並列W-01–W-14固定情境。只有契約，尚未實作或驗證。
 - 實作第一片已完成：[用途隔離與B2發布驗證](evidence/jd-interview-window-source/purpose-isolation-results.md)閉合審查F2的整合斷點——未用途感知前，B2的完成結果在`PublicationStore._validate`就會被拒，永遠無法發布。離線2748／套件130／真PG14通過。窗口內容讀取、planner與公開發配路徑**刻意未做**（安全終局只有planner能確立），見該稿界線。
 - 實作第二片已完成：[逐輪安全終局、發配與分頁讀取](evidence/jd-interview-window-source/window-read-results.md)。全部放在同一source owner，沿既有`AiRunHistory`逐輪在該輪自己的終局checkpoint核對，lineage以訊息序列精確前綴證明（不靠ID相同）；分頁只切可見文字、`turns`每頁完整、offset為Unicode code point；省略種類具名。已涵蓋W-03／05／07／08與W-04的停在未收尾之前。離線2753／套件130／真PG16通過（另1個既有OI-05分頁缺陷不變）。
-- 下一最小動作：接**觸發與覆蓋側**——`pending_windows`（整理請求辨識）、`unprocessed_source`連續安全範圍、與publication head `processed_source`的覆蓋比較與B1 admission、以及`max_chars`／`context_chars`窗口切分與`context_reference` pair（超`max_windows`保留尾端、重抽回原窗口）；完成W-01／02／04後半／06／09–14。現有C／只讀工具的source port不動。後續B1／B2、背景持久責任與指引沿映射§6，不重做原顧問、不直接import研究路徑、不建第二份原話或理解。背景表／框架喚醒器按必要責任有限決定，不能用一律禁止取代設計。
+- 實作第三片已完成：[整理通知採用、觸發清單與連續安全範圍](evidence/jd-interview-window-source/trigger-and-coverage-results.md)。整理通知自`4f94fbfb`逐位元採用進`caliburn_memory/requests.py`（工具描述一字未改，已登記adoption）；`pending_windows`只回觸發回合，`unprocessed_source`另回連續安全範圍且納入沒通知的安全回合，範圍止於第一個未收尾回合；游標只接受publication head自己的window引用，離線lineage即停止admission不重設。離線2762／套件130／真PG18通過。已涵蓋W-01–W-05／07／08／11／12。**工具尚未註冊給顧問，顧問目前發不出通知。**
+- 下一最小動作：接**窗口切分與admission**——`max_chars`／`context_chars`預算、`context_reference`消歧pair、`max_windows`超限保留尾端、重抽回原窗口、`follows`不回退且連續（W-06／09／10／13／14），再依映射§6第5項把整理通知註冊給顧問。現有C／只讀工具的source port不動。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋

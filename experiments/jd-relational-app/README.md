@@ -1,8 +1,10 @@
 # 關聯式 JD：隔離編輯核心
 
-此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2 及 RS-3 第一段。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
+此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2、RS-3 第一段及 RS-4 通知／模型保存接點。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
 **已有可開啟的[六章手動管理畫面](web/README.md)，透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；[本次 UI 結果](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)包含自動保存、未完成表單重開及歷史。AI 回合、完整來源回查、歷史還原與圖形啟動器尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
+
+**[RS-4 通知與模型保存](../../docs/specs/2026-09-13-jd-consultant-context-slice.md)已用真 SDK／原生 Agent／PG Saver 及固定離線串流接合。**人工改動投影不改原始對話；完整回覆與通知邊界成對保存，缺結束事件不前進，重開只讀不重播。74 項受影響測試通過（含 13 真 PG），獨立審查缺口已修。日常入口仍未啟用 AI；前景回合、JD 工具 writer、Memory／source 與聊天 HTTP 仍待接合。
 
 ## 結構
 
@@ -28,6 +30,9 @@
 - `selection.py`：根據 App 捕捉資料作精確 UTF-16 選區替換；模型不填 offset，不猜相同文字的位置。
 - `intents.py`：固定 App 配發的操作身分、可信讀取材料與意圖摘要；`AdmittedIdentity` 保存恢復必要原身分，不含候選／refs／來源內容，不取得 writer 資格。
 - `runtime_checkpoints.py`：原生 LangGraph root／直接 child，共用 Saver；只用公開 state API 保存 manual 操作身分，不 invoke 顧問或重寫對話。
+- `notice_history.py`：同版唯讀取得確切變更計數與有限事件；不新增歷史表或讀完整 snapshot。
+- `consultant_context.py`：原生 model middleware 投影通知、綁定完整回覆與通知邊界；固定 root checkpoint 查回。此觀察不授予 writer 資格。
+- `consultant_model.py`：固定相容的 Anthropic 原生 adapter；有限補 terminal 與 response 清理，private seams 升級須重驗，沒有自製 Agent loop／SSE parser。
 - `manual_runtime.py`：每文件實際 writer／Future、保存與收尾確認；有 native lease 時先掃全 catalog 關閉原 pending 才開新修改。foreign pending 不把空本地 Future 當死亡證明。
 - `windows_host.py`／`host_runtime.py`：固定安裝 mutex、舊 Job 退出、新 Job membership 及程序終身 lease；成功後才開 DB／Saver，startup 完成才 ready。只供專用 App 程序，不在目前 Python shell／pytest 主程序直接 bootstrap。
 - `result_transport.py`／`http_results.py`：驗證觀察結果並投影；不執行寫入或自動重試，不把候選當保存完成。

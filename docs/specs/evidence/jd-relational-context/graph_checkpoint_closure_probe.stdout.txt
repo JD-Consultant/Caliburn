@@ -1,0 +1,6 @@
+{"cases": 4, "database_calls": 0, "graph_resume_calls": 0, "provider_calls": 0, "versions": {"langchain-core": "1.6.3", "langgraph": "1.2.11", "langgraph-checkpoint": "4.2.0"}}
+{"children": [], "failure": null, "latest_next": [], "latest_notice": false, "latest_task_count": 0, "pinned_notice": false, "pinned_task_count": 0, "raised": false, "root_schema": "MessagesState", "synthetic_model_node_calls": 1}
+{"children": [], "failure": null, "latest_next": [], "latest_notice": true, "latest_task_count": 0, "pinned_notice": true, "pinned_task_count": 0, "raised": false, "root_schema": "SharedState", "synthetic_model_node_calls": 1}
+{"children": [{"has_notice": true, "message_ids": ["human-one", "ai-one"], "next": []}], "failure": "before_root_put", "latest_next": [], "latest_notice": true, "latest_task_count": 1, "pinned_notice": false, "pinned_task_count": 1, "raised": true, "root_schema": "SharedState", "synthetic_model_node_calls": 1}
+{"children": [], "failure": "after_root_put", "latest_next": [], "latest_notice": true, "latest_task_count": 0, "pinned_notice": true, "pinned_task_count": 0, "raised": true, "root_schema": "SharedState", "synthetic_model_node_calls": 1}
+PASS: 4 native InMemorySaver closure cases; no provider or database calls

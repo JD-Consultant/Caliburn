@@ -185,6 +185,10 @@ def field_value_digest(value: str | None) -> str:
 class ReferenceCodec:
     __slots__ = ("_dataset_id", "_ref_serializer", "_cursor_serializer")
 
+    @property
+    def dataset_id(self) -> str:
+        return self._dataset_id
+
     def __init__(self, secret_key: bytes, dataset_id: str):
         try:
             _require(type(secret_key) is bytes and len(secret_key) >= 32)

@@ -32,6 +32,7 @@ class CheckpointError(ValueError):
 
 class DocumentState(MessagesState):
     jd_manual_pending: dict[str, Any] | None
+    jd_model_view: dict[str, Any] | None
 
 
 class _CheckpointGraph(Protocol):

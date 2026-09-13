@@ -1,0 +1,22 @@
+JD-R002 RS-4 consultant context validation | 2026-09-13
+Synthetic messages and MockTransport only; zero provider calls.
+Real PG: localhost:55436 caliburn_jd_relational_test, existing jd_runtime_test Saver schema.
+Focused final: 74 PASS = 17 context + 30 model + 25 notice (11 PG) + 2 native agent/PG.
+Root/manual regression: 88 PASS = notice_history + manual_runtime_postgres + runtime_checkpoints; overlaps focused.
+Full first: 1593 PASS, 193 opt-in PG SKIP, 31 setup ERROR (Windows pytest temp ACL).
+Fresh workspace basetemp sandbox retry: same 31 setup errors / teardown PermissionError.
+New isolated basetemp outside sandbox, only test_config_file.py: 31 PASS.
+Distinct non-PG regression union: 1624 PASS; not a single all-green full invocation.
+Contract generation: Python and TypeScript match.
+Independent review CC-R01 P2: interleaved streams crossed ContextVar; 2 red cases then fixed, 9 narrow PASS / CLOSED.
+Earlier red evidence: missing module collection, thread mismatch 2, early-close 2; PG fixture API/regex corrected.
+No Web changes, provider quality, AI writer/host admission, Memory/source adoption or production switch proof.
+
+Local raw test outputs retained under .research-tmp (not committed):
+jd-consultant-context-all-tests.txt | sha256=1fa0762bdb4ff5f3dd82b70d9c16bfb63073c5bc0422afceb698040b7ef58132
+1593 passed, 193 skipped, 1 warning, 31 errors in 29.26s
+jd-consultant-context-focused-tests.txt | sha256=2df73f490e795c4d6cf6167cfa6a2c2ae6d3c1349f55547232c077c6b229da2b
+74 passed in 4.46s
+jd-consultant-context-config-retest.txt | sha256=c69cfdf025550d655dbb7ac946871416f0602e541aa0a32ade9bb7ed2cf213b4
+jd-consultant-context-config-confirm.txt | sha256=5d565939857c1296e7fdf76b938d08291bc8e1b83d579e130ecdb05b8ecf2da8
+31 passed in 1.33s

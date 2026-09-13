@@ -13,11 +13,13 @@
 
 ## 1. 成品範圍與可觀察結果
 
+**最新 RS-4 接點：**[人工通知與模型回覆保存](../specs/2026-09-13-jd-consultant-context-slice.md)已完成 LangChain／Anthropic adapter 精確相容導入、真正 wire、同版 notice 及原生 Agent／PG Saver 接合。受影響 74 PASS（13 真 PG），全組及 ACL 補跑合計 1624 非 PG 案例通過／193 PG 未全跑；codegen 與獨立審查通過，交錯串流 P2 已修。這是固定離線回覆接點，沒有完整 AI 生命周期或自然品質完成宣稱。
+
 **本次追加驗收：**[回覆遺失與重開查回](../specs/2026-09-13-jd-browser-reply-loss-slice.md)完成真瀏覽器／原生宿主／PG端到端：真提交但回覆未到，重開以原operation GET查回，1POST／1GET／1execute，head2、任務及digest一致。對話框關閉誤落封存分支已修；新build／TS、Web99及helper23通過，獨立審查PASS。此處承接下方先前UI成果，不重跑或重算其全組數字。
 
 **最新實作進度：**[六章手動管理與恢復切片](../specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)完成 Read v2 穩定 UI 身分、React／Next／MUI 管理畫面、原操作與輸入世代恢復、同頁歷史；真瀏覽器完成多成果／要求、共用知識引用、未完成表單重開、任務移動、刪職責保留任務、封存恢復及續改。Python 全組1540 PASS／180 PG SKIP，Web 99 PASS、生成／TS／build PASS；受影響真 PG 與最終 DB head11 唯讀核對通過。独立審查提出的缺口已修，首敗／層級／未驗範圍以結果稿為準；不是完整 RS-3／AI 成品通過。[配置](../specs/2026-09-13-jd-managed-configuration-slice.md)及[文件目錄](../specs/2026-09-13-jd-catalog-http-slice.md)保留原成果。
 
-**唯一下一工作：**依[顧問context前置](../specs/evidence/2026-09-13-jd-consultant-context-preflight.md)閉合實際Agent／provider adapter的精確相容版本與wire，接人工通知、完整模型回覆及原生graph／Saver共同保存；先以零付費固定回應驗人工改→AI續編、純訪談不改、錯誤與重開，不越過模型費用授權。RS-3其他故障、來源原文、選區、歷史還原／整輪JD撤回沿既定契約續補；實體IME、自然模型與真人分開記錄。文件入口、共用業務與真配置宿主已有，不重造catalog或重開同層品牌廣搜。
+**唯一下一工作：**沿[本次結果的接合界線](../specs/2026-09-13-jd-consultant-context-slice.md#6-下一工作與未完成界線)，接前景 AI run 的准入、取消／退出／重開及 JD 工具實際 writer；使用已驗的原生 Agent／notice／共同保存，先以零付費固定回應完成初稿→手改→AI續編、純訪談不改及錯誤收尾。來源 handle／Memory 採用與聊天 HTTP／Web 隨相依接合，不用 placeholder 冒充完整能力。RS-3其餘故障、選區、歷史還原／整輪JD撤回沿契約續補；實體IME、自然模型與真人分開記錄。精確 adapter／wire 已閉合，不重新研究同一選擇；不越過模型費用授權。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 
@@ -55,7 +57,7 @@ PARKED：Excel 與原始訪談下載、其他電腦安裝、真人顧問流程�
 
 RS-5 的還原／撤回 domain 與 DB 基礎在 RS-2 就實作驗證，RS-5 接全旅程與維護，不把 API 局部通過當整體通過。RS-7 採用研究、驗收材料、維護設計可以先並行；正式切換保留 G6，無須等到切換當天才研究。
 
-2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合生成／驗證／SDK離線、資料層、signer、查詢／保存／目錄HTTP、Windows宿主、持久配置及本次六章UI／瀏覽器恢復依賴；實際Agent接點仍須上述有限驗證。RS-1／2共同保存及RS-3局部結果以§1為準，DA-03已在UI切片實作驗證，不再列成未選定方案。還原／整輪撤回與AI生命週期仍未完成；RS-3–7尚未通過完整驗收，整體G4、G6及成品狀態不因局部PASS改判。
+2026-09-13 進度：RS-0 文件單位完成。RS-F 已閉合生成／驗證／SDK離線、資料層、signer、查詢／保存／目錄HTTP、Windows宿主、持久配置、六章UI／瀏覽器恢復及本次原生Agent／通知保存接點。RS-1／2共同保存及RS-3／4局部結果以§1為準，DA-03已在UI切片實作驗證，不再列成未選定方案。還原／整輪撤回與AI生命週期仍未完成；RS-3–7尚未通過完整驗收，整體G4、G6及成品狀態不因局部PASS改判。
 
 本輪[分層／錯誤／紀錄官方證據](../specs/evidence/2026-09-13-jd-app-boundaries-errors-logging-evidence.md)已收束。typed result 合法組合及 HTTP 純投影已完成，service 亦驗真 DB 結果、診斷不含正文、sink 故障不蓋原觀察及不同文件獨立保存。宿主 logging 配置／容量／實際接線仍由相依工作補驗，不另開 logging 品牌研究。
 

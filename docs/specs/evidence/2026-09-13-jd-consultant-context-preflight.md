@@ -2,6 +2,8 @@
 
 查閱日期：2026-09-13。範圍：JD-R002 已核准的隔離 App；只收斂人工通知、模型回覆保存與既有 Memory／來源的接點。本文不是 production 採用或真模型驗收。
 
+**同日後續施工已完成局部接點：**[RS-4 第一段結果](../2026-09-13-jd-consultant-context-slice.md)已固定並安裝 LangChain 1.4.0／Anthropic adapter 1.7.2，驗真正 wire、人工通知與完整回覆／原生 PG 保存；新增共享 `jd_model_view`。下文「尚未安裝／待驗」是本前置啟動時的實際狀態，後續狀態以結果稿為準，不再重開已閉合項目。AI run lifecycle、工具 writer、Memory／source 與完整 App 仍待接合。
+
 ## 1. 結論與現況
 
 **採當次 request 的 App context 投影，保留原始對話；把通知邊界與實際模型回覆一同持久化後，才前進基準。**模型收到「哪些保存事件可查」不等於讀完所有 JD、理解全部差異或接受改動；`last_model_view` 沿既定命名，但語意是有回覆依據的通知邊界，不能當內容 read receipt。

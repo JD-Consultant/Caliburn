@@ -1,0 +1,61 @@
+{
+  "checked_on": "2026-09-13",
+  "scope": "JD-R002 RS-4 isolated consultant adapter",
+  "verification": "Official PyPI JSON and downloaded wheel METADATA; wheel SHA-256 verified before source inspection. Model probes used synthetic local MockTransport only.",
+  "packages": [
+    {
+      "name": "langchain",
+      "version": "1.4.0",
+      "uploaded_at": "2026-09-03T16:59:31.154831Z",
+      "prerelease": false,
+      "yanked": false,
+      "license": "MIT",
+      "requires_python": "<4.0.0,>=3.10.0",
+      "requires_dist_without_extras": [
+        "langchain-core<2.0.0,>=1.6.0",
+        "langgraph<1.3.0,>=1.2.11",
+        "pydantic<3.0.0,>=2.7.4"
+      ],
+      "pypi": "https://pypi.org/project/langchain/1.4.0/",
+      "metadata": "https://pypi.org/pypi/langchain/1.4.0/json",
+      "wheel_url": "https://files.pythonhosted.org/packages/92/fa/7da07d9977a5e292ef602c1bb911514ff8206e85dc09a66961874345d57a/langchain-1.4.0-py3-none-any.whl",
+      "wheel_sha256": "af1dc0161d30944a52ec7844d9bf890d0497b12ec0703069f3503b4003cbbac3"
+    },
+    {
+      "name": "langchain-anthropic",
+      "version": "1.7.2",
+      "uploaded_at": "2026-09-10T19:12:53.693390Z",
+      "prerelease": false,
+      "yanked": false,
+      "license": "MIT",
+      "requires_python": "<4.0.0,>=3.10.0",
+      "requires_dist_without_extras": [
+        "anthropic<2.0.0,>=0.120.0",
+        "langchain-core<2.0.0,>=1.6.2",
+        "pydantic<3.0.0,>=2.7.4"
+      ],
+      "pypi": "https://pypi.org/project/langchain-anthropic/1.7.2/",
+      "metadata": "https://pypi.org/pypi/langchain-anthropic/1.7.2/json",
+      "wheel_url": "https://files.pythonhosted.org/packages/1d/84/436d1f5dea354ec7357e5cd9756a15765e828da7faebf2837cf60f3a638d/langchain_anthropic-1.7.2-py3-none-any.whl",
+      "wheel_sha256": "9d114c3766f57bbffe8e84093efe396306520c51587263b96d00c055d3bb8370"
+    }
+  ],
+  "compatible_existing_versions": {
+    "python": ">=3.12,<3.13",
+    "langchain-core": "1.6.3",
+    "langgraph": "1.2.11",
+    "anthropic": "1.5.0",
+    "pydantic": "2.13.5"
+  },
+  "private_seams_requiring_upgrade_tests": [
+    "ChatAnthropic._stream and _astream both pass raw SDK events through _make_message_chunk_from_anthropic_event; message_stop is otherwise discarded.",
+    "ChatAnthropic._create and _acreate return SDK raw-response objects with the native http_response, retained only for explicit close/aclose on iterator exit. No parser or mapper replacement.",
+    "The per-iterator ContextVar is set/reset only around each native next/anext and close/aclose, and is reset before yielding a chunk to the caller. Same-thread and same-task interleaved iterators must not share terminal evidence."
+  ],
+  "limits": [
+    "Top-level system projection is supported; the adapter rejects non-consecutive SystemMessages even on models whose HTTP API supports inline system.",
+    "stream_usage and chunk_position=last do not prove receipt of message_stop.",
+    "No public client/root_client/http_client injection field exists in this adapter version; tests patch only the native HTTP-client factory.",
+    "Terminal-event validation is not semantic validation, tool success, checkpoint publication, or a natural-model quality result."
+  ]
+}

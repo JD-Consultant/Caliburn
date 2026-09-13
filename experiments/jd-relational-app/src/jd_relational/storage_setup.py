@@ -10,6 +10,8 @@ import re
 from alembic import command
 from alembic.config import Config
 from langgraph.checkpoint.postgres import PostgresSaver
+from langgraph.store.postgres import PostgresStore
+from caliburn_memory.publication import Base as MemoryPublicationBase
 from psycopg import Connection, sql
 from psycopg.rows import dict_row
 import sqlalchemy as sa
@@ -18,6 +20,7 @@ from sqlalchemy.dialects import postgresql
 from .local_configuration import LocalConfiguration, encode_configuration
 from .storage.schema import metadata
 from .windows_host import HostLease
+from . import storage_memory_profile as memory_profile
 
 
 REVISION = "20260913_0001"
@@ -269,6 +272,43 @@ def _require_jd(connection, snapshot, *, allow_empty):
     _require(rows == [{"version_num": REVISION}])
 
 
+def _store_versions(connection, schema, snapshot):
+    if "store_migrations" not in snapshot:
+        return []
+    return [row["v"] for row in connection.execute(sql.SQL(
+        "SELECT v FROM {}.store_migrations ORDER BY v").format(sql.Identifier(schema)))]
+
+
+def _require_store(snapshot, versions, *, complete):
+    _require(len(PostgresStore.MIGRATIONS) == memory_profile.STORE_VERSION_COUNT)
+    _require(all(type(v) is int for v in versions) and versions == list(range(len(versions)))
+        and len(versions) <= memory_profile.STORE_VERSION_COUNT)
+    if complete:
+        _require(len(versions) == 4 and snapshot == memory_profile.store_expected(3))
+    else:
+        last = len(versions) - 1
+        candidates = [memory_profile.store_expected(last), memory_profile.store_expected(min(last + 1, 3))]
+        if not versions:
+            candidates.append({})
+        _require(snapshot in candidates)
+
+
+def _require_runtime(connection, schema, snapshot, *, complete):
+    native_names = set(_native_expected(9))
+    _require(set(snapshot) <= native_names | memory_profile.STORE_TABLES | memory_profile.PUBLICATION_TABLES)
+    native = {name: table for name, table in snapshot.items() if name in native_names}
+    store = {name: table for name, table in snapshot.items() if name in memory_profile.STORE_TABLES}
+    publication = {name: table for name, table in snapshot.items() if name in memory_profile.PUBLICATION_TABLES}
+    # The explicit sequence is Saver -> Store -> publication. Do not adopt
+    # unrelated later objects behind an unfinished earlier native setup.
+    _require_native(native, _native_versions(connection, schema, native),
+        complete=complete or bool(store) or bool(publication))
+    _require_store(store, _store_versions(connection, schema, store), complete=complete or bool(publication))
+    _require(publication == memory_profile.publication_expected() if complete or publication else True)
+    memory = {**store, **publication}
+    _require(memory_profile.read_index_options(connection, schema) == memory_profile.index_options_expected(memory))
+
+
 def check_installed(connection, checkpoint_schema) -> None:
     """Read-only prerequisite check on an existing psycopg dict-row connection."""
     try:
@@ -276,7 +316,7 @@ def check_installed(connection, checkpoint_schema) -> None:
         _identity(connection)
         _require_jd(connection, _snapshot(connection, "public"), allow_empty=False)
         native = _snapshot(connection, checkpoint_schema)
-        _require_native(native, _native_versions(connection, checkpoint_schema, native), complete=True)
+        _require_runtime(connection, checkpoint_schema, native, complete=True)
         _require(not _other_objects(connection, {"public", checkpoint_schema}))
     except StorageSetupError:
         raise
@@ -302,7 +342,7 @@ def check_empty_database(settings) -> None:
 
 def _require_no_data(connection, schema, snapshot):
     for name in snapshot:
-        if name in {"alembic_version", "checkpoint_migrations"}:
+        if name in {"alembic_version", "checkpoint_migrations", "store_migrations"}:
             continue
         row = connection.execute(sql.SQL("SELECT 1 FROM {}.{} LIMIT 1").format(
             sql.Identifier(schema), sql.Identifier(name))).fetchone()
@@ -322,7 +362,7 @@ def setup_database(settings, lease) -> None:
             jd = _snapshot(connection, "public")
             _require_jd(connection, jd, allow_empty=True)
             native = _snapshot(connection, settings.checkpoint_schema)
-            _require_native(native, _native_versions(connection, settings.checkpoint_schema, native), complete=False)
+            _require_runtime(connection, settings.checkpoint_schema, native, complete=False)
             _require(settings.checkpoint_schema not in _namespaces(connection) or bool(jd))
             _require_no_data(connection, "public", jd)
             _require_no_data(connection, settings.checkpoint_schema, native)
@@ -344,6 +384,16 @@ def setup_database(settings, lease) -> None:
             connection.execute(sql.SQL("SET search_path TO {}").format(sql.Identifier(settings.checkpoint_schema)))
             _lease(lease, settings)
             PostgresSaver(connection).setup()
+            _lease(lease, settings)
+            PostgresStore(connection).setup()
+            _lease(lease, settings)
+            if engine is None:
+                engine = sa.create_engine(settings.database_url(), hide_parameters=True,
+                    connect_args={"connect_timeout": 5, "options": "-csearch_path=public"})
+            with engine.begin() as transaction:
+                _lease(lease, settings)
+                MemoryPublicationBase.metadata.create_all(transaction.execution_options(
+                    schema_translate_map={None: settings.checkpoint_schema}))
             _lease(lease, settings)
             check_installed(connection, settings.checkpoint_schema)
     except StorageSetupError:

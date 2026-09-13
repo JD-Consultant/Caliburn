@@ -37,7 +37,9 @@
 
 **最新 OI-02 核心接點：**[獨立 Memory 套件與新來源](../specs/2026-09-13-jd-memory-core-adoption-slice.md)完成保存／發布／固定讀取，沿既有 CAS／回執規則；新 App 用 proper package，核心44、來源71、受影響113、真 PG1及獨審98通過（重疊不相加），獨立 wheel 可用。只明示初始化專用測試 Memory schema，未改一般 host profile、未加模型工具／provider。
 
-**唯一下一工作：**接同宿主 Store 的資源、明示初始化與排空，接續既有模型 Memory／案例能力、專業指引、完整來源窗口及按需回查，集中完成 OI-01／02 的完整顧問流程；不直接 import 研究路徑、不重做 Memory 研究。日常模型維持明示未啟用，自然案例依 OI-09 的資料／呼叫數／預算另驗。其餘依[唯一收尾清單](../specs/2026-09-13-jd-app-open-issues.md)推進；Fetch 只按新證據診斷，不無據重送。當輪改動 UI 真瀏覽器未驗範圍保留，不增舊對話選輪入口。Excel 延後；需求不清或無據增加複雜度時先記錄並討論。
+**最新 OI-02 宿主接點：**[Memory 資源與明示初始化](../specs/2026-09-13-jd-memory-host-integration-slice.md)已接同設定／native Runtime.store、獨立Store連線與共用pool的publication view；受影響154、初始化33真PG、新Windows／PG1與舊旅程回歸3通過，獨審無P1／P2。普通open不setup，Memory更正不改JD；這不代表模型Memory／背景writer已接。
+
+**唯一下一工作：**接實際顧問固定 Memory head／導覽、只讀工具與原話按需回查，再接既有 C／B1B2 的真正執行／完整窗口與排空及專業指引，集中完成 OI-01／02 的完整顧問流程；不直接 import 研究路徑、不重做 Memory 研究。日常模型維持明示未啟用，自然案例依 OI-09 的資料／呼叫數／預算另驗。其餘依[唯一收尾清單](../specs/2026-09-13-jd-app-open-issues.md)推進；Fetch 只按新證據診斷，不無據重送。當輪改動 UI 真瀏覽器未驗範圍保留，不增舊對話選輪入口。Excel 延後；需求不清或無據增加複雜度時先記錄並討論。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 

@@ -11,6 +11,7 @@ from uuid import UUID
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.graph.state import CompiledStateGraph
+from langgraph.store.base import BaseStore
 from langgraph.types import StateSnapshot
 
 from .intents import AdmittedIdentity
@@ -44,11 +45,14 @@ class _CheckpointGraph(Protocol):
 
 
 def build_document_graph(
-    consultant: CompiledStateGraph, checkpointer: BaseCheckpointSaver,
+    consultant: CompiledStateGraph, checkpointer: BaseCheckpointSaver, *, store: BaseStore | None = None,
 ) -> CompiledStateGraph:
     """Mount a native child directly; its checkpoints inherit the root Saver."""
     if (not isinstance(consultant, CompiledStateGraph)
             or not isinstance(checkpointer, BaseCheckpointSaver)
+            or store is not None and not isinstance(store, BaseStore)
+            or (isinstance(consultant, CompiledStateGraph)
+                and consultant.store is not None and consultant.store is not store)
             or (consultant.checkpointer is not None and consultant.checkpointer is not True
                 and consultant.checkpointer is not checkpointer)):
         raise CheckpointError("invalid_input") from None
@@ -56,7 +60,7 @@ def build_document_graph(
     builder.add_node("consultant", consultant)
     builder.add_edge(START, "consultant")
     builder.add_edge("consultant", END)
-    return builder.compile(checkpointer=checkpointer)
+    return builder.compile(checkpointer=checkpointer, store=store)
 
 
 def _uuid_text(value: object) -> bool:

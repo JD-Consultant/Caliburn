@@ -148,3 +148,14 @@ def test_canonical_profile_is_tied_to_this_fixed_migration():
     assert profile["source_schema_sha256"] == hashlib.sha256(schema.read_bytes()).hexdigest()
     assert profile["checks"]["jd_revision"]["ck_jd_revision_format_version"] == "CHECK ((format_version = 3))"
     assert profile["partial_indexes"]["jd_revision"]["uq_jd_revision_initial"] == "(origin = 'initial'::text)"
+
+
+def test_saver_only_database_is_not_ready_for_memory_host(monkeypatch):
+    monkeypatch.setattr(setup, "_identity", lambda *_: None)
+    monkeypatch.setattr(setup, "_require_jd", lambda *_args, **_kwargs: None)
+    monkeypatch.setattr(setup, "_snapshot", lambda _connection, schema:
+        {} if schema == "public" else setup._native_expected(9))
+    monkeypatch.setattr(setup, "_native_versions", lambda *_: list(range(10)))
+    monkeypatch.setattr(setup, "_other_objects", lambda *_: False)
+    with pytest.raises(setup.StorageSetupError, match="^schema_mismatch$"):
+        setup.check_installed(object(), "jd_runtime")

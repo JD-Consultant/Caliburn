@@ -17,6 +17,7 @@ import pytest
 import sqlalchemy as sa
 
 from host_recovery_worker import SCHEMA, WORKER_CRASH_CODE
+from jd_relational.storage_memory_profile import STORE_TABLES, PUBLICATION_TABLES
 from test_storage_postgres import engine
 
 
@@ -28,7 +29,9 @@ pytestmark = pytest.mark.skipif(sys.platform != "win32" or os.environ.get("JD_RE
 def installation(engine):
     with engine.connect() as conn:
         assert set(conn.execute(sa.text("SELECT tablename FROM pg_tables WHERE schemaname=:schema"),
-            {"schema": SCHEMA}).scalars()) == {"checkpoints", "checkpoint_blobs", "checkpoint_writes", "checkpoint_migrations"}, "Initialize jd_host_test explicitly first."
+            {"schema": SCHEMA}).scalars()) == {"checkpoints", "checkpoint_blobs", "checkpoint_writes", "checkpoint_migrations"} | STORE_TABLES | PUBLICATION_TABLES, "Initialize jd_host_test explicitly first."
+        assert list(conn.execute(sa.text("SELECT v FROM jd_host_test.checkpoint_migrations ORDER BY v")).scalars()) == list(range(10))
+        assert list(conn.execute(sa.text("SELECT v FROM jd_host_test.store_migrations ORDER BY v")).scalars()) == list(range(4))
     # One dataset uses one installation key for all sequential scenarios; fresh
     # per pytest invocation, shared by original/new/contending hosts within it.
     return str(uuid4())

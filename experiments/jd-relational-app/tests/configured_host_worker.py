@@ -69,8 +69,12 @@ def main(mode, path, database, report):
     storage_setup.check_empty_database = forbidden_setup
     storage_setup.setup_database = forbidden_setup
     from langgraph.checkpoint.postgres import PostgresSaver
+    from langgraph.store.postgres import PostgresStore
+    from caliburn_memory.publication import PublicationStore
     from alembic import command
     PostgresSaver.setup = forbidden_setup
+    PostgresStore.setup = forbidden_setup
+    PublicationStore.setup = forbidden_setup
     command.upgrade = forbidden_setup
     if mode == "reject_open":
         configured_host.open_manual_host = forbidden_setup
@@ -84,6 +88,15 @@ def main(mode, path, database, report):
             return
         raise AssertionError("incomplete_configuration_was_opened")
 
+    if mode in {"memory-write", "memory-read"}:
+        from memory_host_journey import child, run
+        consultant, replies, calls, stores = child()
+        managed = open_managed_app(file, consultant=consultant)
+        assert managed.opened.settings.database == database and managed.opened.settings.port == 55436
+        value = run(managed, mode, path.with_name("memory-fixture.json"), replies, calls, stores)
+        assert setup_calls == []
+        write(report, {**common, **value, "setup_calls": 0})
+        return
     assert mode == "serve"
     managed = open_managed_app(file, consultant=child_graph())
     configured = managed.opened
@@ -123,7 +136,7 @@ def main(mode, path, database, report):
             server.should_exit = True
         Thread(target=controls, daemon=True).start()
         server.run(sockets=[bound])
-    assert setup_calls == [] and close_results == [True] and host.saver_connection.closed
+    assert setup_calls == [] and close_results == [True] and host.saver_connection.closed and host.store_connection.closed
     write(report.with_suffix(".finished.json"), {**common, "operations": operations,
         "setup_calls": 0, "closed": True})
 

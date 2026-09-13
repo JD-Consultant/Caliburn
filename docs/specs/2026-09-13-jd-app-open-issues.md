@@ -19,7 +19,8 @@
 - 證據：[Agent 接合界線](2026-09-13-jd-ai-runtime-and-tools-slice.md)、[人工通知與 context 界線](2026-09-13-jd-consultant-context-slice.md)、[工具責任](2026-09-12-jd-relational-agent-tool-contract.md)。
 - 已驗局部：[當輪原話接合](2026-09-13-jd-consultant-source-integration-slice.md)。沒有新增原話表或模型工具；來源故障停止回合、人工來源讀取可排空，兩項獨審缺口已修；當輪固定來源不是所有早期工作已納入的證明。
 - 已驗核心：[獨立 Memory 套件與新來源接合](2026-09-13-jd-memory-core-adoption-slice.md)完成既有保存／發布、固定讀取、來源埠及 proper wheel；核心44、來源71、受影響113、真 PG1及獨審98通過（範圍重疊不相加）。真 Store／發布可修正、阻擋舊整理覆蓋及重開讀原話；模型 Memory 工具、B1/B2/C 與日常宿主尚未接，不等於完整 Memory 通過。
-- 下一最小動作：接同宿主 Store、明示初始化／排空與完整生命週期，再接既有模型 Memory 能力、專業指引及來源按需讀取／UI。不要直接 import 研究路徑、重建另一份理解或讓當輪來源替代完整 Memory；未公開內部實作不猜。
+- 已驗宿主：[Memory 資源／初始化／重開](2026-09-13-jd-memory-host-integration-slice.md)接同設定與原生 Store。受影響154、初始化33真PG、新Windows／PG1與原旅程回歸3通過；只有已登記讀取／既有前景的排空範圍，模型Memory／背景工作尚未接。普通open不setup，JD／原話不雙寫。
+- 下一最小動作：接實際顧問固定 Memory head／導覽、只讀工具與原話按需回查，再接既有 C修補／B1B2完整窗口／背景整理及其真正執行／排空；專業指引与來源 UI 隨完整旅程接入。不要直接 import 研究路徑、重建另一份理解或讓當輪來源替代完整 Memory；未公開內部實作不猜。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋

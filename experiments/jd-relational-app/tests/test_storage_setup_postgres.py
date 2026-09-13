@@ -11,6 +11,7 @@ from uuid import uuid4
 from alembic import command
 from alembic.config import Config
 from langgraph.checkpoint.postgres import PostgresSaver
+from langgraph.store.postgres import PostgresStore
 from psycopg import Connection, errors, sql
 from psycopg.rows import dict_row
 import pytest
@@ -80,6 +81,7 @@ def test_explicit_setup_commits_native_schema_and_can_finish_lost_ready_publicat
     initializing = configuration_phase(settings, "initializing")
     setup.setup_database(initializing, lease)
     setup.check_installed(connection, settings.checkpoint_schema)
+    assert len(setup._snapshot(connection, settings.checkpoint_schema)) == 8
     setup.setup_database(initializing, lease)
     setup.check_installed(connection, settings.checkpoint_schema)
     assert settings.phase == "initialization_pending" and initializing.phase == "initializing"
@@ -177,3 +179,104 @@ def test_same_name_different_business_rule_is_not_installed(database, fault):
                 "ON public.jd_revision(document_id) WHERE origin = 'manual'")
     with pytest.raises(setup.StorageSetupError, match="^schema_mismatch$"):
         setup.check_installed(connection, settings.checkpoint_schema)
+
+
+def prepare_store(connection, last, monkeypatch, *, ahead=False):
+    original = PostgresStore.MIGRATIONS
+    # Use official setup to create its version table and a bounded prefix;
+    # optional next native DDL models commit before its version receipt.
+    with monkeypatch.context() as scoped:
+        scoped.setattr(PostgresStore, "MIGRATIONS", original[:last + 1])
+        PostgresStore(connection).setup()
+    if ahead:
+        connection.execute(original[last + 1])
+
+
+def test_saver_only_existing_database_is_not_installed_or_auto_upgraded(database):
+    settings, _, connection = database
+    prepare_jd(settings)
+    prepare_native(connection, 9)
+    before = setup._snapshot(connection, settings.checkpoint_schema)
+    with pytest.raises(setup.StorageSetupError, match="^schema_mismatch$"):
+        setup.check_installed(connection, settings.checkpoint_schema)
+    assert setup._snapshot(connection, settings.checkpoint_schema) == before
+    assert len(before) == 4
+
+
+@pytest.mark.parametrize("last,ahead", [(-1, False), (-1, True), (0, True), (1, True), (2, True), (3, False)])
+def test_official_store_prefix_resumes_to_all_eight_tables(database, monkeypatch, last, ahead):
+    settings, lease, connection = database
+    prepare_jd(settings)
+    prepare_native(connection, 9)
+    prepare_store(connection, last, monkeypatch, ahead=ahead)
+    setup.setup_database(configuration_phase(settings, "initializing"), lease)
+    setup.check_installed(connection, settings.checkpoint_schema)
+    assert connection.execute("SELECT v FROM store_migrations ORDER BY v").fetchall() == [{"v": v} for v in range(4)]
+    assert connection.execute("SELECT count(*) AS n FROM store").fetchone() == {"n": 0}
+    assert len(setup._snapshot(connection, settings.checkpoint_schema)) == 8
+
+
+@pytest.mark.parametrize("fault", ["prefix_opclass", "prefix_descending", "ttl_predicate", "store_default", "publication_column"])
+def test_same_name_wrong_memory_shape_stops_without_automatic_repair(database, fault):
+    settings, lease, connection = database
+    setup.setup_database(configuration_phase(settings, "initializing"), lease)
+    connection.execute("SET search_path TO jd_runtime")
+    # Only this test's newly-created empty DB; preserve tables and version rows.
+    if fault in {"prefix_opclass", "prefix_descending"}:
+        connection.execute("DROP INDEX store_prefix_idx")
+        expression = "prefix" if fault == "prefix_opclass" else "prefix text_pattern_ops DESC"
+        connection.execute("CREATE INDEX store_prefix_idx ON store (" + expression + ")")
+    elif fault == "ttl_predicate":
+        connection.execute("DROP INDEX idx_store_expires_at")
+        connection.execute("CREATE INDEX idx_store_expires_at ON store(expires_at) WHERE expires_at IS NULL")
+    elif fault == "store_default":
+        connection.execute("ALTER TABLE store ALTER COLUMN created_at SET DEFAULT now()")
+    else:
+        connection.execute("ALTER TABLE q019_document_memory_head ALTER COLUMN revision TYPE bigint")
+    before = setup._snapshot(connection, settings.checkpoint_schema)
+    with pytest.raises(setup.StorageSetupError, match="^schema_mismatch$"):
+        setup.check_installed(connection, settings.checkpoint_schema)
+    with pytest.raises(setup.StorageSetupError, match="^schema_mismatch$"):
+        setup.setup_database(configuration_phase(settings, "initializing"), lease)
+    assert setup._snapshot(connection, settings.checkpoint_schema) == before
+    assert connection.execute("SELECT v FROM store_migrations ORDER BY v").fetchall() == [{"v": v} for v in range(4)]
+
+
+@pytest.mark.parametrize("table", ["store", "q019_document_memory_head"])
+def test_initializing_cannot_adopt_existing_memory_data(database, table):
+    settings, lease, connection = database
+    setup.setup_database(configuration_phase(settings, "initializing"), lease)
+    if table == "store":
+        connection.execute("INSERT INTO jd_runtime.store(prefix,key,value) VALUES ('synthetic','memory','{}')")
+    else:
+        connection.execute("INSERT INTO jd_runtime.q019_document_memory_head "
+            "(document_id,revision,memory_version,last_operation_id) VALUES ('synthetic',1,'version','operation')")
+    setup.check_installed(connection, settings.checkpoint_schema)  # ordinary ready reads allow real data
+    with pytest.raises(setup.StorageSetupError, match="^initialization_recovery_required$"):
+        setup.setup_database(configuration_phase(settings, "initializing"), lease)
+    assert connection.execute(sql.SQL("SELECT count(*) AS n FROM jd_runtime.{}").format(
+        sql.Identifier(table))).fetchone() == {"n": 1}
+
+
+def test_publication_tables_are_created_in_one_transaction_and_resume_after_failure(database, monkeypatch):
+    settings, lease, connection = database
+    original = sa.create_engine
+    failed = []
+
+    def create(*args, **kwargs):
+        engine = original(*args, **kwargs)
+        def fail_second(_conn, _cursor, statement, _parameters, _context, _executemany):
+            if "CREATE TABLE jd_runtime.q019_memory_publication_receipt" in statement and not failed:
+                failed.append(True)
+                raise RuntimeError("synthetic publication DDL failure")
+        sa.event.listen(engine, "before_cursor_execute", fail_second)
+        return engine
+
+    monkeypatch.setattr(sa, "create_engine", create)
+    with pytest.raises(setup.StorageSetupError, match="^storage_unavailable$"):
+        setup.setup_database(configuration_phase(settings, "initializing"), lease)
+    assert failed == [True]
+    assert set(setup._snapshot(connection, settings.checkpoint_schema)) == {
+        "checkpoint_migrations", "checkpoints", "checkpoint_blobs", "checkpoint_writes", "store_migrations", "store"}
+    setup.setup_database(configuration_phase(settings, "initializing"), lease)
+    setup.check_installed(connection, settings.checkpoint_schema)

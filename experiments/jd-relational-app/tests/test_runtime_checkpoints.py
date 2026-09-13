@@ -28,6 +28,34 @@ def config(document_id=DOC):
     return {"configurable": {"thread_id": document_id}}
 
 
+def test_native_child_runtime_receives_the_host_store():
+    from langgraph.runtime import Runtime
+    from langgraph.store.memory import InMemoryStore
+    store = InMemoryStore()
+    seen = []
+    def node(state, runtime: Runtime):
+        seen.append(runtime.store)
+        runtime.store.put(("synthetic-runtime", DOC), "value", {"scope": DOC})
+        return {}
+    child = StateGraph(MessagesState)
+    child.add_node("observe", node)
+    child.add_edge(START, "observe"); child.add_edge("observe", END)
+    graph = build_document_graph(child.compile(), InMemorySaver(), store=store)
+    graph.invoke({"messages": []}, config(), durability="sync")
+    assert seen == [store]
+    assert store.get(("synthetic-runtime", DOC), "value").value == {"scope": DOC}
+
+
+def test_a_child_cannot_bind_another_memory_store():
+    from langgraph.store.memory import InMemoryStore
+    child = StateGraph(MessagesState)
+    child.add_node("observe", lambda state: {})
+    child.add_edge(START, "observe"); child.add_edge("observe", END)
+    child = child.compile(store=InMemoryStore())
+    with pytest.raises(CheckpointError, match="invalid_input"):
+        build_document_graph(child, InMemorySaver(), store=InMemoryStore())
+
+
 def descriptor(identity=IDENTITY):
     return {
         "format_version": 1,

@@ -26,4 +26,4 @@ uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 
 Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；本核心沒有建立 provider 或呼叫模型。未為減少套件數自行複製框架 backend。已驗新版 App 的共同依賴沒有升降版；後續變更按具體相容性驗證，不追逐版本號。
 
-目前完成核心套件與新原話接點、真 PostgreSQL Store／發布及獨立 wheel 驗證。宿主 Store 初始化／排空／備份、模型 Memory 工具、即時修補與背景整理、顧問指引尚須接入；不能以此套件通過代稱完整顧問可用。
+目前完成核心套件與新原話接點、真 PostgreSQL Store／發布及獨立 wheel 驗證。新 App 的[宿主資源／初始化／登記讀取排空與新程序重開](../../docs/specs/2026-09-13-jd-memory-host-integration-slice.md)亦已接入；模型 Memory 工具、即時修補與背景整理、專業指引及完整備份尚須接合，不能以核心通過代稱完整顧問可用。

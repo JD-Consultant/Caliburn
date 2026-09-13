@@ -14,7 +14,9 @@
 
 ## 結構
 
-**Memory 核心接合：**[獨立套件與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)已驗保存／發布、固定版本讀取、後續修正与真 PG 重開；使用 `packages/consultant-memory` 正常依賴。`memory_sources.py` 只把同一原話 owner 綁到文件；新來源有 `conversation:` 前綴，既有裸 signed v1 原樣可讀。原話及 JD 不雙寫。模型 Memory 工具、背景整理／即時修補與一般宿主 Store 仍須接入，測試初始化不修改一般 host profile。
+**Memory 核心接合：**[獨立套件與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)已驗保存／發布、固定版本讀取、後續修正与真 PG 重開；使用 `packages/consultant-memory` 正常依賴。`memory_sources.py` 只把同一原話 owner 綁到文件；新來源有 `conversation:` 前綴，既有裸 signed v1 原樣可讀。原話及 JD 不雙寫。[宿主 Memory 接合](../../docs/specs/2026-09-13-jd-memory-host-integration-slice.md)已完成一般 host 的獨立Store連線、原生Runtime.store、schema-mapped publication view、明示初始化及登記讀取排空；同設定新程序讀回原話／Memory通過。模型工具與背景整理／即時修補尚未接，不冒稱完整顧問可用。
+
+一般 host 現要求既有 `checkpoint_schema` 的八張表（四Saver＋兩Store＋兩publication），public JD仍十三表＋Alembic。原ready實驗資料庫缺Memory時明示拒絕，不自動升級或清資料；新配置只明示初始化fresh DB。本機合成 fixture 的舊host區可由下方專用腳本補齊，不是產品更新流程。
 
 **最新[聊天HTTP與原修改結果](../../docs/specs/2026-09-13-jd-chat-http-slice.md)已接。**`ChatService` 共用 `AiRuntime`／人工write state，原話、實際執行與JD效果分開回報；`chat_history.py`固定原root/source分頁，只公開原話及AI正文。生成契約／TS、完整離線2211 PASS／209 SKIP、三個真PG HTTP情境與獨審通過。`open_managed_app`預設`enable_chat=False`，日常仍不開provider；新run回`ai_unavailable`，保存對話／原結果可查。下一接Web，不宣稱自然AI或完整App完成。
 
@@ -93,6 +95,7 @@ $env:PYTHONPATH='src'
 uv run --frozen --offline python scripts/init_test_database.py
 uv run --frozen --offline python scripts/init_test_runtime.py
 uv run --frozen --offline python scripts/init_test_runtime.py --schema jd_host_test
+uv run --frozen --offline python scripts/init_test_runtime.py --schema jd_ai_host_test
 uv run --frozen --offline python scripts/init_test_memory.py
 $env:JD_RELATIONAL_TEST_DB='1'
 uv run --frozen --offline pytest -q -p no:cacheprovider tests/test_storage_postgres.py

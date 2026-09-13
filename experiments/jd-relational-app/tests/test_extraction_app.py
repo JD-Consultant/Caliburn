@@ -15,11 +15,13 @@ import pytest
 from caliburn_memory import MemoryArtifacts
 from caliburn_memory.extraction import ExtractionOutput
 from caliburn_memory.sources import InvalidSourceReference
+from openai import BadRequestError
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 from openai.types.responses import Response
 
+from jd_relational.conversation_sources import WindowBudgetExceeded
 from jd_relational.extraction_app import (
     ExtractionSourceAdapter, accepted, build_extraction_model, build_extraction_workflow,
 )
@@ -133,7 +135,10 @@ def test_the_request_carries_employee_speech_under_a_strict_schema_without_stora
     request = sent[0]
     payload = json.dumps(request, ensure_ascii=False)
     assert "第一輪原話" in payload and "NEW_SOURCE" in payload
-    assert request["store"] is False and request["truncation"] == "disabled"
+    assert request["store"] is False
+    # `truncation` is deprecated and "disabled" is already the default, under
+    # which an oversize input fails with a 400 instead of being shortened.
+    assert "truncation" not in request
     assert request["text"]["format"]["type"] == "json_schema"
     assert request["text"]["format"]["strict"] is True
     assert sorted(request["text"]["format"]["schema"]["properties"]) == sorted(ExtractionOutput.model_fields)
@@ -236,10 +241,12 @@ def test_the_adapter_reads_windows_and_context_but_refuses_a_turn_source(b1):
     assert planned and set(planned[0]) == {"source_reference", "context_reference"}
     page = adapter.read(planned[0]["source_reference"])
     assert page["turns"] and page["next_offset"] is None
-    # A context range is readable for disambiguation, but never admissible as a
-    # completed window, and it reports no settled turns of its own.
+    # A context range is readable for disambiguation and never admissible as a
+    # completed window, but the owner's turn terminals reach B1 unchanged.
     context = next(pair["context_reference"] for pair in planned if pair["context_reference"])
-    assert adapter.read(context)["turns"] == []
+    page = adapter.read(context)
+    assert page["turns"] == windows.read_context(context, document)["turns"]
+    assert page["next_offset"] is None
     with pytest.raises(InvalidSourceReference):
         adapter.validate_reference(context)
     # A current-turn source is neither.
@@ -258,6 +265,34 @@ def test_a_saved_pair_is_revalidated_at_its_own_position(b1):
     for pair in planned:
         adapter.validate_saved_window(pair["source_reference"], pair["context_reference"],
                                       max_chars=20, context_chars=10)
+
+
+def test_an_oversize_turn_fails_before_the_model_instead_of_being_shortened(b1):
+    """The source budget, not a provider truncation flag, bounds the input."""
+    build, _, _, whole, _, sent, _ = b1
+    with pytest.raises(WindowBudgetExceeded):
+        build(max_chars=8, context_chars=4).start(whole)
+    assert sent == []
+
+
+def test_a_provider_input_overflow_surfaces_instead_of_a_shortened_source(b1):
+    """With truncation at its default, an oversize request is a 400, not a cut."""
+    build, _, document, whole, store, sent, queue = b1
+    queue.append(400)
+    with pytest.raises(BadRequestError):
+        build().start(whole)
+    assert len(sent) == 1
+    assert not list(store.search(("q019-memory", document, "interviews")))
+
+
+def test_a_context_range_carries_its_turn_terminals_into_the_payload(b1):
+    """B1 must be able to tell a cancelled context turn from a successful one."""
+    build, windows, document, whole, _, sent, _ = b1
+    build(max_chars=24, context_chars=12).start(whole)
+    contexts = [json.loads(request["input"][-1]["content"])["CONTEXT_ONLY"]
+                for request in sent]
+    carried = [turn for context in contexts if context for turn in context["turns"]]
+    assert carried and any(turn["answer_succeeded"] is False for turn in carried)
 
 
 def test_the_terminal_evidence_port_reads_only_public_provider_fields():

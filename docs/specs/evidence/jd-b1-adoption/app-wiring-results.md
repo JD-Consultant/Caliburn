@@ -1,8 +1,18 @@
-# B1 接進新 App：完成訪談 → 既有詳記與工作資訊抽取
+# B1 OpenAI adapter 與固定接合測試完成
 
-2026-09-14；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與本輪工作單位定義，基準 `353c400b`／tag `jd-b1-core-adoption-20260913`。
+2026-09-14；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與本輪工作單位定義，基準 `353c400b`／tag `jd-b1-core-adoption-20260913`；依[本片審查](app-wiring-review.md)F1／F2／F3／F4 修正後重寫。
 
 **B1 是訪談資料整理進 Memory 的既有階段**，不是重新設計 JD 編輯器，也不是另一個使用者頁面。本片只把已完成的 B1 接上新 App 的來源 owner 與 OpenAI，**不重做 B1、不改整個顧問**。
+
+完成範圍要分三層講，不能混為一談：
+
+| 層 | 狀態 |
+|---|---|
+| B1 核心採用（套件） | **已完成**（前一片 `353c400b`） |
+| App 端 adapter／provider wiring 的固定接合 | **本片完成**，全部為 MockTransport／InMemorySaver／InMemoryStore 的固定行為證據 |
+| B1 runtime 觸發、背景准入與排空、宿主重開續作、設定與金鑰、真 PostgreSQL 保存 | **未開始** |
+
+**因此本片不代表日常 App 已可使用 B1**，也不代表 H4 或完整旅程有進展。
 
 ## 1. 只新增 App 端適配器
 
@@ -11,6 +21,7 @@
 | 新增 | 內容 |
 |---|---|
 | `jd_relational/extraction_app.py` | OpenAI 綁定、`accepted` 終局證據、`ExtractionSourceAdapter`、`build_extraction_workflow` 組裝 |
+| `ConversationSourceService.read_context` 的 `turns` | 審查 F1：由同一 owner 在固定位置投影範圍內可證明的回合終局 |
 | `ConversationSourceService.window_bounds` | 8 行唯讀存取器：由 owner 自己發出的引用回該窗口的回合界線，讓呼叫端**不必自己解 token**。無 I/O、無新狀態 |
 
 **沒有**新增 parser、Agent loop、資料表、第二份游標、第二套流程或第二個原話 owner。訪談整理、驗證、更正、保存、續作、重抽全部留在 `caliburn_memory.extraction`，本片一行都沒改它。
@@ -37,34 +48,43 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 
 2026-09-14 核 [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs)：官方要求應用在信任結構化輸出前檢查三件事——`status` 為 `completed`、內容不是 `refusal`、符合 schema。**截斷**由同一個 `status` 表示：達到輸出上限的回覆是 `status: "incomplete"`、`incomplete_details.reason: "max_output_tokens"`，不會變成一個短的成功。這正好是上述三項，已驗邏輯不需改寫。
 
-模型綁定另設 `truncation="disabled"`（輸入過長要明示失敗，不默默縮短來源）與 `store=False`（權威記錄是本 App 的 Saver 與 Memory，不是 provider）。B1 的角色預算是**本案實測值**：顯式 `max_output_tokens=8192`、`reasoning.effort="high"`，不是廠商預設，也不是顧問的配置。
+模型綁定設 `store=False`（權威記錄是本 App 的 Saver 與 Memory，不是 provider）。B1 的角色預算是**本案實測值**：顯式 `max_output_tokens=8192`、`reasoning.effort="high"`，不是廠商預設，也不是顧問的配置。
+
+**審查 F3：已移除 `truncation` 參數。**2026-09-14 核 [Responses API create 參考](https://developers.openai.com/api/reference/cli/resources/responses/methods/create)：`truncation` 已標為 deprecated，且 `disabled` **本來就是預設值**，該預設下「輸入超過模型上下文窗口，請求會以 400 失敗」。所以不送這個參數，行為完全不變——「不默默縮短來源」現在由兩件事保證：App 端的 `max_chars`／`context_chars` 來源預算（超大回合在呼叫模型前就 `WindowBudgetExceeded`），以及 provider 的 400。兩者都有固定案例。
 
 **顧問的 Anthropic 設定完全未動**：沒有全 App provider 切換、沒有 fallback、沒有使用者選單。只有 B1 綁 OpenAI。
 
 ## 3. 相依性
 
-`uv add langchain-openai==1.6.0`（與已驗 checkout 同一個 pin）。lock 差異是**純新增**，既有套件一個都沒有升版：
+**審查 F2：已改鎖現行版本。**初版沿用舊 CT checkout 的 `1.6.0`，這是錯的做法。2026-09-14 查官方 PyPI：`langchain-openai` 最新為 **1.6.2**（2026-09-09 發布；1.6.1 為 2026-09-08、1.6.0 為 2026-08-19）。其宣告需求為 `langchain-core>=1.6.2,<2`、`openai>=2.45.0,<4`、`tiktoken>=0.7,<1`，與本工作區既有的 `langchain-core 1.6.3`、`openai 3.13.0` 相容。
 
-| 新增 | 版本 |
+以 1.6.2 重跑**同一組** MockTransport request／structured output／拒絕／截斷／格式錯誤／重試／保存失敗／續作探針：**16 passed**，未見不相容，因此鎖 1.6.2。
+
+| 依賴 | 版本 |
 |---|---|
-| `langchain-openai` | 1.6.0 |
+| `langchain-openai` | **1.6.2**（現行最新） |
 | `regex`（transitive） | 2026.9.10 |
 | `tiktoken`（transitive） | 0.14.0 |
 
-未變：`langchain` 1.4.0、`langchain-core` 1.6.3、`langchain-anthropic` 1.7.2、`langgraph` 1.2.11、`langgraph-checkpoint` 4.2.0、`openai` 3.13.0。
+未變：`langchain` 1.4.0、`langchain-core` 1.6.3、`langchain-anthropic` 1.7.2、`langgraph` 1.2.11、`langgraph-checkpoint` 4.2.0、`openai` 3.13.0。lock 差異只有新增這三個套件與本次的版本號調整，**既有套件一個都沒有升版**。
 
 **要標明的差異：**已驗 CT50 profile 跑的是 `openai==3.8.0`，本工作區是 `3.13.0`。測試的合成回覆一律經**實際安裝的** SDK `Response` schema 驗證，所以線上形狀是對現行版本核過的；但 CT49／CT50 的自然品質結論是在 3.8.0 上取得的，不自動延伸。
 
 ## 4. 實際執行
 
-首敗為 `ModuleNotFoundError: No module named 'jd_relational.extraction_app'`。實作中有 5 個首敗是**測試自身假設錯**（`InMemoryStore.batch` 唯讀故改用真 Store 子類、長訪談窗口的結尾是該輪回覆而非員工原話、預設預算下三輪只切成一個窗口所以沒有 context、LangGraph 會在錯誤訊息後附任務名、`capture` 需要最新一輪），已修測試，**未放寬產品**。
+首敗為 `ModuleNotFoundError: No module named 'jd_relational.extraction_app'`；審查修正的首敗為 context `turns` 的 `KeyError: 'turns'` 與 `assert 'truncation' not in request`。
+
+實作中有 7 個首敗是**測試自身假設錯**，已修測試、**未放寬產品**：`InMemoryStore.batch` 唯讀故改用真 Store 子類、長訪談窗口的結尾是該輪回覆而非員工原話、預設預算下三輪只切成一個窗口所以沒有 context、LangGraph 會在錯誤訊息後附任務名、`capture` 需要最新一輪，以及本輪兩個——payload 的 `content` 是字串不是區塊陣列、原先選的預算組合根本產不出跨越整輪的 context（已改用 `max_chars=24／context_chars=12` 並補第四輪，才同時取得涵蓋 cancelled 與 completed 回合的 context）。
 
 | 範圍 | 結果 |
 |---|---|
-| 新增 B1 接線案例 | **13 passed** |
-| App 全離線測試 | **2789 passed／257 skipped／51.63s** |
+| B1 接線案例（含審查新增 3 例） | **16 passed** |
+| 完成窗口來源案例（含 context turns 新例） | **37 passed** |
+| App 全離線測試 | **2793 passed／257 skipped／62.38s** |
 | Memory 套件全測 | **146 passed** |
 | 真 PostgreSQL 18：原話來源＋C 顧問接合＋Memory 核心 | **14 passed** |
+
+**另外發現並修掉一個既有的不穩定測試（與 B1 無關）。**`test_chat_history.py` 的 cursor 竄改案例把簽章 token 的**最後一個字元**翻掉，但 base64url 尾字元帶有解碼時被丟棄的補位位元，因此翻掉它有機率完全不改變簽章。實測 2000 次取樣：**119 次（5.9%）竄改後仍然合法**，該案例因此本來就會偶發假通過／假失敗。改為竄改 payload 第一個字元（4000 次取樣 0 次仍合法），連跑三次 45 passed。這是既有缺陷，不是本次改動造成，但它會污染所有「全綠」宣稱，所以一併修並分開提交。
 
 固定情境涵蓋工作單位要求的七項與四項驗證：
 
@@ -81,8 +101,11 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 | 分頁讀取 | 超過單頁 3000 字元的窗口逐頁讀回完整原話，每頁都完整列出 turns |
 | 來源重驗 | 同批每個規劃 pair 都在自己的固定位置重驗通過 |
 | context 權限 | context 可讀（供消歧）但**不可**作為 B1 入口；本輪 source 兩者皆拒 |
+| context 回合終局（F1） | 跨越整輪的 context 回報該輪自己的 `status`／`answer_succeeded`，cancelled 與 completed 都有案例；只含前置 AI 問句時為空。adapter 原樣轉交 owner 的投影 |
+| 來源預算 | 超大回合 `WindowBudgetExceeded`，**0 次 HTTP**，不截斷 |
+| provider 輸入過長（F3） | 400 明示失敗、未保存，不默默縮短 |
 | 重抽（W-13） | 讀回**原**窗口與**原** context，正常 B1 輸入位置不前進 |
-| 出站請求 | `store=false`、`truncation=disabled`、`json_schema` + `strict=true`、三欄位 schema、8192、effort high |
+| 出站請求 | `store=false`、**不送已淘汰的 `truncation`**、`json_schema` + `strict=true`、三欄位 schema、8192、effort high |
 
 替身只有一個：provider 的 HTTP 傳輸（`httpx.MockTransport`，回覆經實際 SDK schema 驗證）。來源 owner、Saver、Store、SDK、結構化輸出綁定全部是真的。**0 provider、付費 0**；`api_key` 是必填參數，程式不讀環境變數、不內建任何端點。
 
@@ -90,7 +113,7 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 
 1. **沒有呼叫真模型**，沒有自然品質、真人或成本證據；真模型另需當次明示費用授權。
 2. **B1 尚未被 App runtime 觸發**：`build_extraction_workflow` 可組裝，但宿主啟停、背景准入、排空與新程序續作（映射 §3.3–3.4）未接，模型 id／金鑰／配置也還沒接上本機設定。
-3. **CONTEXT_ONLY 的 `turns` 是空陣列**——這是與已驗 payload 的一項**刻意差異**，需要複核確認：契約上 context 位置不帶回合界線（`_ContextPosition` 無 run bounds），且 CONTEXT_ONLY 只供消歧、不得被當成另一段待整併來源；舊 reader 對 context 範圍會投影 turns。`segments` 與 `omitted_content_types` 沒有差異。
-4. `openai` SDK 版本與 CT profile 不同（3.13.0 vs 3.8.0），見 §3。
+3. **本片證據不能外推成正式 App／資料庫完成（審查 F4）**：13＋3 個接線案例用的是 MockTransport、InMemorySaver、InMemoryStore；表中的 PostgreSQL 14 案例是**原話來源、C 接合與 Memory 核心**，**不是 B1 的 PostgreSQL 執行**，不重複計為 B1 證據。B1 的真 PG 保存／續作／冪等與設定接線留給下一個 runtime 工作單位。
+4. `openai` SDK 版本與 CT profile 不同（3.13.0 vs 3.8.0），見 §3；線上形狀已對現行版本核過，自然品質結論不延伸。
 5. B2 採用、背景接合、整理通知完整單位、H4 完整旅程與自然品質（OI-09）都未開始。
 6. 沒有新增資料表、第二份游標、第二個原話 owner；正式產品（`apps/api`／`apps/web`／`packages/job-analysis-contract`）未改，ADR0074／0075 Proposed、production 0060 不變。

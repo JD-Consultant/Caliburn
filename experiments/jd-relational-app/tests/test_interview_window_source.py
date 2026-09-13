@@ -370,6 +370,41 @@ def test_every_planned_window_in_a_batch_keeps_its_own_pair(interview, native):
                                       document, max_chars=20, context_chars=10)
 
 
+def test_a_context_range_reports_exactly_the_settled_turns_it_covers(interview, native):
+    """Context is never a new source, but its terminals stay provable.
+
+    A disambiguation range that reaches back over a whole turn still says how
+    that turn ended, so a cancelled or failed answer can never be read as a
+    successful one. A range holding only a leading question reports none,
+    because it contains none.
+    """
+    windows, document, first_run, second_run = interview
+    third = settled(native, [AIMessage(id="ctx3", content="第三輪回覆")], text="第三輪原話")
+    fourth = settled(native, [AIMessage(id="ctx4", content="第四輪回覆")], text="第四輪原話")
+    settled_turns = {turn["input_id"]: turn for turn in windows.safe_turns(document)}
+    seen, questions_only = {}, 0
+    for max_chars, context_chars in ((20, 10), (24, 12), (60, 40), (400, 200)):
+        for pair in windows.plan_windows(document, first_run_id=first_run,
+                                         last_run_id=fourth.record.run_id,
+                                         max_chars=max_chars, context_chars=context_chars):
+            if pair["context_reference"] is None:
+                continue
+            page = windows.read_context(pair["context_reference"], document)
+            spoken = [segment["message_id"] for segment in page["segments"]]
+            reported = {turn["input_id"]: turn for turn in page["turns"]}
+            assert set(reported) == {identifier for identifier in settled_turns if identifier in spoken}
+            assert bool(reported) == any(segment["role"] == "user" for segment in page["segments"])
+            questions_only += not reported
+            seen.update(reported)
+    # A context reaching over a whole turn keeps that turn's own terminal, for
+    # a settled failure as much as for a success; a question-only range has none.
+    assert questions_only
+    assert seen[second_run]["status"] == "cancelled"
+    assert seen[second_run]["answer_succeeded"] is False
+    assert seen[third.record.run_id]["status"] == "completed"
+    assert seen[third.record.run_id]["answer_succeeded"] is True
+
+
 def test_admission_refuses_an_earlier_or_skipping_range(interview, native):
     windows, document, first_run, second_run = interview
     third = settled(native, [AIMessage(id="pa5", content="第三輪回覆")], text="第三輪原話")

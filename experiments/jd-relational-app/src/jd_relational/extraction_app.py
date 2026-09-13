@@ -55,9 +55,12 @@ def build_extraction_model(*, model: str, api_key: str, http_client, base_url: s
                            reasoning_effort: str = REASONING_EFFORT) -> ChatOpenAI:
     """Bind B1's own model to the supplied transport; no server-side storage.
 
-    `truncation="disabled"` keeps an oversize input a loud failure instead of a
-    silently shortened source. Server storage stays off: the canonical record is
-    this App's Saver and Memory, never the provider's.
+    An oversize input must fail loudly rather than arrive shortened. That is
+    already the default behaviour — the current reference marks `truncation`
+    deprecated and documents `disabled` as its default, under which an input
+    past the context window returns a 400 — so this sends no such parameter and
+    relies on the source budget plus that 400. Server storage stays off: the
+    canonical record is this App's Saver and Memory, never the provider's.
     """
     if request_timeout is not None and (not math.isfinite(request_timeout) or request_timeout <= 0):
         raise ValueError("request_timeout must be positive and finite")
@@ -67,7 +70,7 @@ def build_extraction_model(*, model: str, api_key: str, http_client, base_url: s
         # HTTP client is overwritten by request_timeout=None during binding.
         timeout=request_timeout if request_timeout is not None else http_client.timeout,
         use_responses_api=True, output_version="responses/v1", store=False,
-        truncation="disabled", reasoning={"effort": reasoning_effort, "context": "all_turns"},
+        reasoning={"effort": reasoning_effort, "context": "all_turns"},
         model_kwargs={"parallel_tool_calls": False},
     )
 
@@ -118,10 +121,11 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
     def read(self, reference: str, offset: int = 0) -> dict:
         """One page of a window, or the whole disambiguation range.
 
-        A context range is bounded by `context_chars` and carries no run bounds
-        of its own, so it is read whole and reports no turns: it exists to
-        disambiguate the window, and must never read as another settled range
-        still awaiting consolidation.
+        A context range is bounded by `context_chars`, so the owner reads it
+        whole and there is no next page. Its turn terminals are the owner's,
+        passed through unchanged: B1 has to be able to tell a cancelled or
+        failed context turn from a successful one. Being readable for
+        disambiguation still never makes it an admissible window.
         """
         try:
             try:
@@ -132,8 +136,8 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
                 self.service.validate_context_reference(reference, self.document_id)
                 if offset:
                     raise ConversationSourceError("invalid_ref")
-                page = self.service.read_context(reference, self.document_id)
-                return {**page, "turns": [], "next_offset": None}
+                return {**self.service.read_context(reference, self.document_id),
+                        "next_offset": None}
             return self.service.read_window(reference, self.document_id, offset)
         except ConversationSourceError as error:
             raise self._address(error) from error

@@ -847,13 +847,28 @@ class ConversationSourceService:
             raise ConversationSourceError("invalid_ref")
 
     def read_context(self, context_ref, document_id) -> dict:
-        """Read a window's disambiguation range at its own fixed position."""
+        """Read a window's disambiguation range at its own fixed position.
+
+        A context range is never a new source and never an admission boundary,
+        but the terminals it does cover stay provable: a settled turn whose
+        input lies inside the range is reported with its own status, so a
+        cancelled or failed answer can never be read as a successful one. A
+        range holding only a leading question reports no turns because it
+        contains none — that is a fact about the range, not a default.
+        """
         position = self._codec._resolve_context(context_ref, document_id)
         observed = self._pinned(document_id, position.root_run_id, position.root_config())
-        visible, omitted = _visible(self._between(observed.messages, position.first, position.last))
+        covered = self._between(observed.messages, position.first, position.last)
+        visible, omitted = _visible(covered)
+        order = [message.id for message in observed.messages]
+        inside = {message.id for message in covered}
+        turns = [turn for turn in self._settled_turns(
+                     document_id, observed.messages[:order.index(position.last) + 1])
+                 if turn["input_id"] in inside]
         return {"reference": context_ref,
                 "segments": [{"message_id": message_id, "role": role, "text": text}
                              for message_id, role, text in visible if text],
+                "turns": turns,
                 "omitted_content_types": sorted(omitted)}
 
     def validate_context_reference(self, context_ref, document_id) -> None:

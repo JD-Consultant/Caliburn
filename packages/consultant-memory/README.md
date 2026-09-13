@@ -24,7 +24,7 @@ App 配發 operation／base／source，模型只提供 path／diff；本核心�
 
 `caliburn_memory.extraction.ExtractionWorkflow` 已自 `4f94fbfb` 採用。三文字欄位、prompt、窗口迴圈、格式更正額度、`start/resume/reextract` 保持已驗語意；`ExtractionSourceReader` 由 App 提供固定窗口與前置消歧，`accepted(raw)` 由 provider adapter 核拒絕／終局。B1 保存詳記／候選，不發布目前理解，也不前進 publication 游標。
 
-新 App `extraction_app.py` 的 OpenAI 固定接合已完成至 `f160be97`；同文件工作須由 caller 串行，已完成 B1 的 `files` 交給 B2 後才可進下一批。**B2 尚未採用，B1 日常觸發、真 PG 與宿主恢復仍待施工。**[目前狀態與證據](../../docs/specs/evidence/jd-b1-adoption/whole-flow-review.md)、[H4 執行計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
+新 App `extraction_app.py` 的 OpenAI 固定接合已完成；同文件工作須由 caller 串行，已完成 B1 的 `files` 交給 B2 後才可進下一批。B1 已在真 `PostgresSaver`／`PostgresStore` 上驗過一批的保存、資源重建後續作、重抽與相同 input 查回（[R1 結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)），套件程式未因此改動。**B2 尚未採用，B1 的日常觸發與宿主恢復仍待施工。**[H4 執行計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
 
 ## 安裝與驗證
 

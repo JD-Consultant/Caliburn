@@ -12,6 +12,7 @@ import json
 from threading import Event, Lock
 from uuid import UUID, uuid4
 
+from caliburn_memory.requests import REQUEST_KIND, REQUEST_TOOL_NAME
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.graph import START
@@ -158,6 +159,17 @@ def _pending_calls(messages):
     return pending
 
 
+def _request_not_executed():
+    """A consolidation notification that never ran, reported in its own terms.
+
+    It borrows neither a JD operation result nor a publication receipt: no
+    effect was attempted on either, so reporting one would state a false fact
+    about a different subject. Nothing asked for scheduling, so nothing may be
+    admitted for it either.
+    """
+    return {"error": "memory_consolidation_not_requested", "next_action": "stop"}
+
+
 def _not_executed():
     return validate_result({"status": "invalid_input", "effect": "unchanged",
         "receipt_durability": "unconfirmed", "operation_ref": None,
@@ -193,6 +205,23 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None,
             if binding is None:
                 if name == "repair_memory":
                     if (message_id, message.tool_call_id) not in verified_repair_calls:
+                        raise AiRuntimeError("invalid_saved_tool_result")
+                    continue
+                if name == REQUEST_TOOL_NAME:
+                    # This tool's own artifact is its whole receipt: there is no
+                    # operation or publication behind it to agree with, and a
+                    # success claim without that artifact is not evidence of one.
+                    if message.name != name:
+                        raise AiRuntimeError("invalid_saved_tool_result")
+                    if message.status == "success":
+                        if message.artifact != {"kind": REQUEST_KIND}:
+                            raise AiRuntimeError("invalid_saved_tool_result")
+                        continue
+                    try:
+                        stopped = json.loads(message.content) == _request_not_executed()
+                    except Exception:
+                        stopped = False
+                    if not stopped:
                         raise AiRuntimeError("invalid_saved_tool_result")
                     continue
                 # Read tools never bind writes. An unbound mutation is legal
@@ -867,7 +896,9 @@ class AiRuntime:
                     failed = value["status"] not in {"committed", "no_change"}
                 else:
                     value = ({"error": "memory_read_not_completed", "next_action": "stop"}
-                        if call["name"] in MEMORY_READ_NAMES else read_failure("read_failed")
+                        if call["name"] in MEMORY_READ_NAMES
+                        else _request_not_executed() if call["name"] == REQUEST_TOOL_NAME
+                        else read_failure("read_failed")
                         if call["name"] in {"jd_read", "jd_change_read"} else _not_executed())
                     failed = True
                 messages.append(ToolMessage(id=str(uuid4()), tool_call_id=call["id"], name=call["name"],

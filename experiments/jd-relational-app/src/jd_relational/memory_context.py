@@ -186,4 +186,6 @@ def bind_memory_read_request(request):
 def build_consultant_tools():
     from .consultant_tools import build_jd_tools
     from .memory_repair_session import build_repair_tool
-    return [*build_jd_tools(), *build_memory_read_tools(), build_repair_tool()]
+    from caliburn_memory.requests import request_memory_consolidation
+    return [*build_jd_tools(), *build_memory_read_tools(), build_repair_tool(),
+            request_memory_consolidation]

@@ -1,6 +1,6 @@
 # 完成窗口：非末尾窗口重驗身分與新窗口 admission 的固定位置
 
-2026-09-13；JD-R002／OI-01、OI-02。依[c1c9f8f7 複核](cursor-lineage-review.md) R-01／R-02 修正，基準 `503ba37e`／tag `jd-window-cursor-lineage-20260913`。0 provider、沒有新增資料表、沒有第二份游標。**本片只修這兩項**，不接 B1、不做整理通知、不改契約。
+2026-09-13；JD-R002／OI-01、OI-02。依[c1c9f8f7 複核](cursor-lineage-review.md) R-01／R-02 修正，基準 `503ba37e`／tag `jd-window-cursor-review-20260913`。0 provider、沒有新增資料表、沒有第二份游標。**本片只修這兩項**，不接 B1、不做整理通知、不改契約。修正提交 `3cbd3ca5` 已經[獨立窄複核](cursor-lineage-review.md)確認兩項 CLOSED。
 
 ## R-01：整批共同 root，重驗卻用了窗口自己的回合身分
 
@@ -54,7 +54,7 @@
 | 受影響來源／Memory／checkpoint 檔案 | **253 passed／13.32s** |
 | App 全離線測試 | **2776 passed／257 skipped／60.63s** |
 | Memory 套件全測 | **130 passed／5.89s** |
-| 真 PG18：原話來源＋C 顧問接合＋Memory 核心 | **14 passed／14.80s** |
+| 真 PostgreSQL 18：原話來源＋C 顧問接合＋Memory 核心 | **14 passed／14.80s** |
 | [複核當時的兩個探針](review-c1c9f8f7-probes.py)（修正後重跑） | **2 passed／4.42s** |
 
 探針檔保留為複核當時的證據，案例已依複核要求轉入 `tests/test_interview_window_source.py`；探針不在 `testpaths` 內，不會被日常收集。真 PG18 為既有 `compose.test.yaml` 的隔離測試庫，未動產品 DB。付費 0，沒有自然模型、真瀏覽器或新 Windows 程序證據。
@@ -63,7 +63,7 @@
 
 - **W-13／`reextract` 與正常 B1 輸入位置不前進**、**保存 pair 的不可變性**、**用途感知讀取**：依複核判定，隨 B1／B2 實際 adapter 一次驗收，**不現在另造配對系統或中間引擎**。
 - 整理通知的工具註冊、結果分類、關閉／停止恢復仍是一個完整工作單位，未開始；不借 JD operation 或 C publication。
-- H4、完整旅程與自然品質（OI-09）未開始；日常 AI 未啟用。
+- H4 已進行來源前置，B1／B2 採用、完整旅程與自然品質（OI-09）未開始；日常 AI 未啟用。
 
 ## 界線
 

@@ -1,6 +1,6 @@
 # JD App：收尾與未解事項
 
-**完成窗口最新狀態（2026-09-13）：**[c1c9f8f7 複核](evidence/jd-interview-window-source/cursor-lineage-review.md)確認 F-03 已閉合、F-01 舊游標側已修；新窗口自身分支核對及非末尾窗口重驗身分仍有兩個已重現缺口。下列各片數字保留歷史；W-13、原 pair 與 reader grant 是 B1／B2 接線驗收，不再列為阻止該 adapter 施工的獨立缺陷。未新增配對引擎需求。
+**完成窗口最新狀態（2026-09-13）：**[3cbd3ca5 窄複核](evidence/jd-interview-window-source/cursor-lineage-review.md)確認 R-01／R-02 CLOSED，獨立來源／歷史及原探針 59 passed；F-03 source 層已閉合。下列各片數字保留歷史；下一採用 B1，W-13、原 pair 與 reader grant 隨 B1／B2 接線驗收。未新增配對引擎需求，H4 整體仍未完成。
 
 **最新複核狀態（2026-09-13）：**H2–H3已完成；H4映射`2e243d15`的[提交後審查](evidence/2026-09-13-jd-b1-b2-adoption-review.md)及完成窗口 `ab483f6c` 的[9/12–9/13 文件審查](evidence/2026-09-13-jd-window-source-contract-review.md)已修正已驗方法／通知漏接、背景恢復誤套、source／publication 接縫、窗口觸發與分頁語意。這些是文件缺口，沒有本輪產品bug或測試通過宣稱。下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)依修正版有限實作；OI-01／02整體退出條件仍未完成。
 
@@ -35,7 +35,7 @@
 - 實作第四片已完成：[切分規劃、消歧pair與admission](evidence/jd-interview-window-source/planner-and-admission-results.md)。切分／批次／重抽驗證／admission沿`4f94fbfb`逐條移接：超大回合與放不下的消歧一律失敗不截斷；新增第三個purpose `context`（獨立salt，不得當成待整併來源），用途授予拆成`window_references`／`context_references`兩旗標，因為套件對source與context走同一個`validate_source`；規劃結果固定同一root，有界批次以`covers_whole_range`防止取前綴宣稱完成，尾端由publication游標接續不需額外狀態。離線2770／套件130／真PG14通過。
 - **契約固定情境 W-01–W-14 都已有測試入口，但最新審查不把它們全部標成完整通過。** W-08尚無同ID分支 lineage／合法 mid-turn cursor；W-13尚無B1 `reextract`及正常輸入位置不前進證據；W-14尚無`>256` ancestor fixture。W-14既有缺鏈案例沿`test_ai_history.py`技法通過並明示`original_run_lookup_required`，屬補證據不是改產品；詳見[source port實作審查](evidence/2026-09-13-jd-window-source-implementation-review.md)。
 - 審查F-01／F-03已修：[游標lineage／完整邊界與查找上限](evidence/jd-interview-window-source/cursor-lineage-results.md)。原本的`_after_cursor`／`follows`**從未打開游標自己的固定root**，只比對訊息ID；新增`AiRunHistory.ancestor_of`（沿`find`同一組parent連結與同一上限）與共用的`_cursor_boundary`，要求在游標自身位置讀回、訊息為精確前綴、root為真祖先、`last`正好是安全回合邊界。三個反例：合法簽章但停在回合中間（原本會跳過該輪其後原話）、游標root讀不到、**同內容兄弟鏈**。另補`>MAX_PARENT_LOOKUPS`固定鏈案例。離線2774／套件130／真PG18通過。**W-13（F-02）與pair交叉配對（F-04）仍開著，依審查留給B1 adapter。**
-- 下一最小動作：先修複核 R-01（多窗口重驗使用既有 `root_run_id`）與 R-02（新窗口固定分支及兩引用的 lineage），窄跑反例。再接完整整理通知／A指引／三項分析Skills，或按映射§6先採用B1；通知若先做，需同時處理註冊、結果分類、關閉／停止恢復，不借JD operation或C publication。W-13、原pair及reader用途讀取隨B1／B2接合驗，不預先另造配對系統。現有C／只讀工具的source port不動。
+- 下一最小動作：R-01／R-02 已閉合，**依映射§6.2 採用 B1**，保留 `4f94fbfb` 的已驗 prompt／輸出與配置，驗原窗口讀取、原 pair、同工作續作及 W-13 重抽不推進正常输入位置。B2／背景／完整通知接合依映射續行；通知不借 JD operation 或 C publication，不拆半步。現有 C／只讀工具的 source port 不動。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋

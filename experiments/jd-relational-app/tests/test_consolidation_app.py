@@ -29,7 +29,7 @@ from jd_relational.extraction_app import build_extraction_model, build_extractio
 from jd_relational.memory_sources import MemorySourceReader
 
 from test_chat_history import native
-from test_extraction_app import assistant_text, completed, response_body
+from test_extraction_app import assistant_text, completed, refused, response_body
 from test_interview_window_source import interview, settled
 
 
@@ -150,12 +150,17 @@ def test_details_are_dropped_from_the_payload_before_a_candidate_is_shortened(b2
         item["content"] for item in payload["NEW_CANDIDATES"])
 
 
-def test_an_incomplete_or_refused_attempt_publishes_nothing(b2):
-    """A response that never completed is not a consolidation."""
-    build, _, publication, _, extracted, _, _, queue = b2
+@pytest.mark.parametrize("ending,reason", [
+    ("incomplete", "Consolidation response is not complete"),
+    ("refusal", "Consolidation refused"),
+])
+def test_an_incomplete_or_refused_attempt_publishes_nothing(b2, ending, reason):
+    """Cut off and declined are both endings, and neither is a consolidation."""
+    build, _, publication, _, _, _, _, queue = b2
     queue.append(response_body([assistant_text("整併完成。")], status="incomplete",
-                               incomplete={"reason": "max_output_tokens"}))
-    with pytest.raises(ValueError, match="Consolidation response is not complete"):
+                               incomplete={"reason": "max_output_tokens"})
+                 if ending == "incomplete" else refused())
+    with pytest.raises(ValueError, match=reason):
         build().start()
     assert publication.current() is None
 
@@ -221,6 +226,7 @@ def test_a_later_repair_makes_b2_reread_its_source_instead_of_bumping_a_version(
     assert payloads[0]["RECENT_REPAIRS"] == []
     later = next(p for p in payloads if p["RECENT_REPAIRS"])
     assert later["RECENT_REPAIRS"][0]["reference"] == corrected_source
+    assert later["GUIDE"] == "更正後導覽", "the reload must seed from C's new head, not the stale base"
     assert any("第一輪原話" in segment["text"]
                for segment in later["RECENT_REPAIRS"][0]["segments"])
     head = publication.current()
@@ -256,3 +262,33 @@ def test_a_lost_publish_reply_is_read_back_by_the_original_request(b2, monkeypat
     assert resumed["result"]["revision"] == 1
     assert len(sent) == calls, "the recorded publication must not be consolidated again"
     assert publication.current() == lost[0]
+
+
+def compacted(*items):
+    """A reply whose window the provider compacted inline, then continued."""
+    return response_body([{"type": "compaction", "id": "cmp_test",
+                           "encrypted_content": "c3ludGhldGlj"}, *items])
+
+
+def test_the_request_after_an_inline_compaction_starts_at_that_point(b2):
+    """The provider's own compaction is what the next request is cut from.
+
+    Without this view the whole earlier window, candidates and all, would be
+    replayed on the wire after the provider already replaced it. Nothing saved
+    is modified: only the request is cut.
+    """
+    build, _, publication, _, extracted, _, sent, queue = b2
+    summary_path = extracted["files"][0]["summary_path"]
+    first = wrote("/memory/knowledge.md", f"整併中。\n詳記：{summary_path}")
+    queue.extend([compacted(*first["output"]),
+                  wrote("/memory/guide.md", "網站案例：見 /memory/knowledge.md"), done()])
+    build().start()
+    assert publication.current().revision == 1
+    assert [item.get("role") for item in sent[0]["input"]] == ["system", "user"]
+    for request in sent[1:]:
+        conversation = request["input"][1:]
+        assert request["input"][0]["role"] == "system", "instructions are supplied apart"
+        assert conversation[0]["type"] == "compaction", \
+            "the request must start at the provider's own compaction item"
+        assert not [item for item in conversation if item.get("role") == "user"], \
+            "the window the provider replaced must not be replayed"

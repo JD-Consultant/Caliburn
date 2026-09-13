@@ -129,14 +129,14 @@ def test_two_batches_hand_over_in_order_and_only_publication_moves_the_work():
 def test_a_finished_b1_batch_waits_durably_until_b2_takes_it():
     """B1 done, B2 not started: the handover survives losing every resource."""
     dataset, document = str(uuid4()), str(uuid4())
-    with opened_b2(dataset, document) as (native, windows, store, saver, _, _, publication):
+    with opened_b2(dataset, document) as (native, windows, store, saver, store_conn, _, publication):
         interviewed(native, 3)
         target = windows.capture_window(document, **windows.unprocessed_source(document))
         batch = windows.plan_saved_batch(target, document, max_windows=1)["source_reference"]
         with stages(windows, document, store, saver, publication) as (b1, _, sent, _):
             files = b1.start(batch)["files"]
             assert len(sent) == 1
-        assert publication.current() is None
+        assert publication.current() is None and published_rows(store_conn, document) == 0
     with opened_b2(dataset, document) as (_, windows, store, saver, store_conn, artifacts, publication):
         with stages(windows, document, store, saver, publication) as (b1, b2, sent, queue):
             queue.extend(staged(files[0]["summary_path"], body="重開後才整併的理解。"))
@@ -146,6 +146,7 @@ def test_a_finished_b1_batch_waits_durably_until_b2_takes_it():
             assert head.revision == 1 and head.processed_source == batch
             assert "重開後才整併的理解。" in artifacts.reader(head.memory).read(
                 "/memory/knowledge.md").file_data["content"]
+            assert published_rows(store_conn, document) == 1
 
 
 def test_a_pending_b2_resumes_on_rebuilt_resources_without_a_second_attempt():
@@ -247,8 +248,10 @@ def test_a_repair_published_mid_job_makes_b2_reload_before_it_publishes(monkeypa
             assert payloads and not payloads[0]["RECENT_REPAIRS"]
             later = next(payload for payload in payloads if payload["RECENT_REPAIRS"])
             assert later["RECENT_REPAIRS"][0]["reference"] == corrected
+            assert later["GUIDE"] == "更正後導覽", "the reload seeds from C's new head"
             head = publication.current()
             assert head.revision == result["result"]["revision"] == 2
             assert head.processed_source == batch
             knowledge = artifacts.reader(head.memory).read("/memory/knowledge.md").file_data["content"]
             assert "更正後：權限由客戶自行設定。" in knowledge and "舊基準下的說法。" not in knowledge
+            assert published_rows(store_conn, document) == 1

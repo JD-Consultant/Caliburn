@@ -56,6 +56,7 @@
 1. B2 從原已完成 B1 checkpoint 的 `files` 取材；保留原 `start`／`resume`／`start_reextraction`、原 request 身分、stale→load、`RECENT_REPAIRS` 與已用預算。prompt、三項分析 Skills 的已驗方法不趁接合改寫。
 2. 先列 `4f94fbfb` B2 直接依赖與現有正常套件逐項對應，再只採用缺少部分；不是整批把所有檔案複製過來。provider assembly 按原 OpenAI 已驗路徑與目前 SDK 核 wire，A 的 Anthropic 配置不動；若需變更 provider 或方法，列成獨立差異，不假稱 CT 品質沿用。
 3. **同文件只能有一筆未交接完的 B 批次。**B1 完成後先 B2；B2 未發布／受阻，不允許 B1 用新範圍重置最近 `files`。不掃 Store 目錄找「可能尚未處理」的詳記來代替原交接。
+   **（2026-09-14 移交 R3）**R2 驗證了正確順序及其耐久性，但**沒有**加入阻擋門閘：獨立審查已重現「B1 在 B2 未發布時用相鄰新範圍重置 `files`，游標隨後永久越過前一批」。`follows()` 只比對 B1 自己的上一個範圍，不看 publication head。**R3 的 admission 必須關掉它**：只讓 `plan_saved_batch(target, after_reference=publication.current().processed_source)` 的輸出進 `b1.start()`，並要求 B1 snapshot 的 `source_reference` 已等於該 `processed_source`（head 為 None 時要求 B1 無 values），並補一條跳號反例。不得因本條寫在 R2 就認為 R2 漏做而重開 R2。
 4. B2 原发布 request／receipt 对帳成功後，以 publication `processed_source` 判覆蓋；未覆蓋原 target 的尾端繼續下一批，沒有新通知也不得漏尾端。完成 B1 或更新准入狀態均不可自行推游標。
 5. 在 B2 讀基準後插入 C 更正；必須沿既有失效基準重讀與修補來源重做，在剩餘預算內發布。不能單換版本號把舊內容蓋回。B2 發布成功但回覆遺失時原 request 查回，不再次模型整併、不倒退現在 head。
 

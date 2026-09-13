@@ -36,7 +36,7 @@ App adapter（`consolidation_app.py`）已接，並在真 `PostgresSaver`／`Pos
 
 ## 安裝與驗證
 
-Python 3.12。App 的 `uv.lock` 固定實測組合；獨立 wheel 由 Hatchling 產生。
+Python 3.12。App 的 `uv.lock` 固定實測組合；獨立 wheel 由 Hatchling 產生。B2 直接使用 `langchain` 的 Agent 與中介 API，故 `langchain==1.4.0` 已明示宣告，不再只靠 Deep Agents 的傳遞依賴。
 
 ```powershell
 # 在 experiments/jd-relational-app 使用其正式本地依賴
@@ -49,4 +49,4 @@ uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 
 Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，patch／保存核心不建立 provider；B1 執行由 App 注入的模型 runnable。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
 
-目前完成保存／發布、原話接點、固定只讀工具、C 修補核心及其 App 停止／恢復接合；B1 核心與 OpenAI adapter 只完成固定接合。背景 B1／B2、顧問指引與完整旅程仍未完成；不要再把 C 寫成尚未接入，也不能以 package 測試代稱日常顧問可用。
+目前完成保存／發布、原話接點、固定只讀工具、C 修補核心及其 App 停止／恢復接合，以及 B1／B2 兩個背景階段的採用與真 PG 交接。**背景排程與准入、顧問指引與完整旅程仍未完成**；不要再把 C 或 B2 寫成尚未採用，也不能以 package 測試代稱日常顧問可用。

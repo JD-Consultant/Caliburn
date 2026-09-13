@@ -120,6 +120,7 @@ version = "0.1.0"
 source = { editable = "../../packages/consultant-memory" }
 dependencies = [
     { name = "deepagents" },
+    { name = "langchain" },
     { name = "langgraph" },
     { name = "markdown-it-py", extra = ["linkify"] },
     { name = "openai-agents" },
@@ -129,6 +130,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "deepagents", specifier = "==0.7.13" },
+    { name = "langchain", specifier = "==1.4.0" },
     { name = "langgraph", specifier = "==1.2.11" },
     { name = "markdown-it-py", extras = ["linkify"], specifier = "==4.2.0" },
     { name = "openai-agents", specifier = "==0.22.0" },

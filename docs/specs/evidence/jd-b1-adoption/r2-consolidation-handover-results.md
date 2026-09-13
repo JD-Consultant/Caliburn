@@ -36,13 +36,15 @@ App 的 `consolidation_app.py` 依已驗 profile 組裝：**effort high、顯式
 
 **App 固定 SDK 層（8 個）**——真 agent 迴圈、真暫存檔工具、真 SDK：
 
-完整整併並發布、請求逐字帶著採用的 prompt 與已驗 profile、超預算先丟內嵌詳記而不截短候選、未完成／被拒回覆不發布、暫存驗證錯誤在同一次嘗試內以**私有** runtime 回饋更正、寫入兩個暫存檔以外被拒且模型看得到、**C 較晚更正造成 stale→重讀**、**發布回覆遺失以原 request 查回**。
+完整整併並發布、請求逐字帶著採用的 prompt 與已驗 profile、超預算先丟內嵌詳記而不截短候選、未完成與被拒回覆各自不發布（兩者分別建立案例）、暫存驗證錯誤在同一次嘗試內以**私有** runtime 回饋更正、寫入兩個暫存檔以外被拒且模型看得到、**C 較晚更正造成 stale→重讀**（斷言重讀後的 `GUIDE` 來自 C 的新 head，不是舊基準）、**發布回覆遺失以原 request 查回**、**provider 內嵌壓縮後請求自該點起算**。
+
+最後一條是本次採用**唯一接縫**的覆蓋：獨立審查指出它原本零覆蓋（把 context view 換成 pass-through，13 個測試仍全過）。補上的案例會在該變異下轉紅。
 
 **真 PostgreSQL 層（5 個）**——真 Saver／Store／publication 表：
 
 兩批有序交接（第二批只因第一批的發布推進游標而存在）、B1 完成但 B2 未開始時交接能撐過所有資源關閉重開、B2 pending 在重建資源後續作且**零次**再呼叫模型、發布已提交但回覆遺失的對帳、C 在 job 中途發布修補後 B2 重讀而非直接覆寫。
 
-每個真 PG 案例都以 SQL 核 `q019_document_memory_head` 的實際列數；**B1 單獨執行時該表恆為 0 列**。
+五個真 PG 案例都以 SQL 核 `q019_document_memory_head` 的實際列數：B1 跑完而 B2 未開始時**實測 0 列**，B2 發布後為 1 列。
 
 ## 4. 實測
 
@@ -70,10 +72,24 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 5. 模擬 C 介入的 monkeypatch 遞迴呼叫了自己（改為呼叫原函式，且先登記再發布）。
 6. 真 PG 案例中 B1／B2 共用一條 transport，payload 過濾把 B1 的請求也算進來（改以 payload 是否含 `RECENT_REPAIRS` 選 B2 自己的請求）。
 
-## 5. 限制與未完成
+## 5. 獨立審查與窄複核
+
+由未參與施工的審查者依 §4 R2／映射 §3.2／§3.4／§4 獨立複核，**沒有找到現存程式缺陷**。審查實測確認：`consolidation.py` 對來源的差異恰為聲稱的四段；prompt 逐字相同（`d4061fc9…`，字串本身亦 byte-equal）；`StagedFiles`／`consolidation_tools` 只多了 docstring，程式碼一字未改；11 筆 adoption hash 全相符；provider profile 與來源等價（來源以 env 取得 8192，App 改成顯式常數）；中介順序與來源一致；`**options` 與 `pop` 的求值順序無 bug。
+
+**審查找到一個實際缺口並已補：**本次採用的**唯一接縫**（provider context view）原本零測試覆蓋——把 `native_context_view` 換成 pass-through，App 與真 PG 共 13 個測試仍全過。已補 `..._request_after_an_inline_compaction_starts_at_that_point`，並確認同一變異下轉紅。
+
+其餘已處理：補上 refusal 分支的獨立案例（原本只驗 incomplete）；兩個真 PG 案例補上實際 SQL 列數斷言，使本稿 §3 的說法成立；stale 重讀補上 `GUIDE` 來自 C 新 head 的斷言（審查指出這才是最強證據，原本只斷言 `RECENT_REPAIRS` 出現）；套件直接 import 頂層 `langchain` 後補宣告 `langchain==1.4.0` 並重跑 `uv lock --offline`（差異只有兩行，113 套件無版本異動）。
+
+審查指出 `build_consolidation_workflow` 若被傳入 `context_middleware=` 會拋 `TypeError`；這是立即失敗而非靜默錯誤，不修改。
+
+**`instructions_sha256` 的算法是「assignment 原碼加一個 LF」**，不是 prompt 字串值的 hash。`.research-tmp/` 裡留著一支較早的檢查腳本 `check-holistic-review-docs.py` 用的是字串值算法，對 B1 與 B2 兩個條目都會給出假的「prompt 不一致」。該檔是未版控暫存物、不在本單位差異內，**本輪未使用也未修改**；重用它之前須先改正第 73 行，或直接重算。本稿與 manifest 的 hash 都是以正確算法實算並由審查獨立複核。
+
+修正後窄複核：B2 App **10 passed**、真 PG **5 passed**、套件＋App B2 **164 passed**。
+
+## 6. 限制與未完成
 
 1. **R2 完成的是採用與交接本身。**通知註冊、背景准入、宿主生命週期、真新 Windows 程序全部未做——那是 R3。
-2. **「同文件只能有一筆未交接完的 B 批次」目前仍靠 caller 串行。**本輪示範了正確順序並驗證其耐久性，但**沒有**在程式中加入阻擋「B2 未發布就開始下一批 B1」的門閘；那是 R3 的准入責任。不得由本稿推導該情形已被擋下。
+2. **「同文件只能有一筆未交接完的 B 批次」目前仍靠 caller 串行。**本輪示範了正確順序並驗證其耐久性，但**沒有**在程式中加入阻擋門閘。獨立審查已重現具體後果：文件尚無 publication 時，B1 跑完 batch1 後不叫 B2、直接以相鄰的下一個範圍 `start()`，`follows()` 會合法通過並覆寫 `files`；B2 接著發布較後那批，游標永久越過 batch1 的詳記，而映射 §3.2 明文禁止掃 Store 補救。這是 R3 的准入責任，已寫進[H4 計畫 §4 R2 第 3 點](../../../plans/2026-09-14-jd-h4-runtime-integration.md)的移交註記。**不得由本稿推導該情形已被擋下。**
 3. 資源重建仍是**同一程序內**關閉再開。真新 Windows 程序取回原 B 工作是 R3 第 7 點。
 4. 固定 SDK 回覆不是自然模型品質；B2 的整併內容由測試指定，不代表模型會自主寫出同樣的理解。**日常 AI 仍未啟用。**
 5. 本輪沒有重建 wheel；`adoption.json` 的 hash 證明的是原始碼，不是已封裝產物。

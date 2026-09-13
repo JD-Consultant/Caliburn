@@ -22,6 +22,7 @@ from .ai_history import AiRunHistory
 from .change_reads import ChangeReadService
 from .consultant_context import ConsultantContext, checked_model_view
 from .consultant_tools import AiToolSession, decode_ai_bindings, verify_binding_message
+from .conversation_sources import ConversationSourceService
 from .manual_runtime import ForegroundIdentity, ManualRuntime, RuntimeFailure
 from .notice_history import NoticeHistoryReader
 from .observation_projection import project_observation
@@ -202,10 +203,15 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None):
 
 class AiRuntime:
     def __init__(self, owner: ManualRuntime, codec: ReferenceCodec, *, source_resolver=None,
+                 conversation_sources: ConversationSourceService | None = None,
                  execution_enabled: bool = True):
         if (not isinstance(owner, ManualRuntime) or not isinstance(owner.checkpoints, DocumentCheckpoints)
                 or not isinstance(codec, ReferenceCodec)
                 or source_resolver is not None and not callable(source_resolver)
+                or conversation_sources is not None and (
+                    not isinstance(conversation_sources, ConversationSourceService)
+                    or conversation_sources.dataset_id != codec.dataset_id
+                    or source_resolver is not None)
                 or type(execution_enabled) is not bool):
             raise AiRuntimeError("invalid_ai_runtime")
         self.owner, self.codec = owner, codec
@@ -216,7 +222,8 @@ class AiRuntime:
         self.notices = NoticeHistoryReader(owner.storage.engine)
         self.reads = ReadService(owner.storage, self.history, codec)
         self.changes = ChangeReadService(self.history, codec)
-        self.source_resolver = source_resolver
+        self.conversation_sources = conversation_sources
+        self.source_resolver = conversation_sources.resolve if conversation_sources is not None else source_resolver
         self.execution_enabled = execution_enabled
         self._registry = Lock()  # Only handles, never graph/DB I/O.
         self._latest = {}
@@ -513,7 +520,9 @@ class AiRuntime:
         session = AiToolSession(self.owner, permit, self.history, self.reads, self.changes,
             self.codec, source_resolver=self.source_resolver)
         context = ConsultantContext(record.dataset_id, record.document_id, record.run_id,
-            self.notices, self.codec, notice, tool_session=session, stop_event=permit.stop_event)
+            self.notices, self.codec, notice, tool_session=session, stop_event=permit.stop_event,
+            source_notice=self.conversation_sources.for_turn(record.document_id, record.run_id)
+                if self.conversation_sources is not None else None)
         # Disable remote traces even if the parent shell enabled them. Safe App
         # diagnostics and the native local Saver remain their separate owners.
         with tracing_context(enabled=False):

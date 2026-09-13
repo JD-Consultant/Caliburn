@@ -50,6 +50,7 @@
 - `runtime_checkpoints.py`：原生 LangGraph root／直接 child，共用 Saver；只用公開 state API 保存 manual 操作身分，不 invoke 顧問或重寫對話。
 - `notice_history.py`：同版唯讀取得確切變更計數與有限事件；不新增歷史表或讀完整 snapshot。
 - `consultant_context.py`：原生 model middleware 投影通知、綁定完整回覆與通知邊界；固定 root checkpoint 查回。此觀察不授予 writer 資格。
+- `conversation_sources.py`：同一 Saver 的固定當輪原話／前 AI 上下文與來源驗證；同持久 key 的獨立來源用途。AI 真 request 仍含完整原話才供 metadata，原文不複製到 system；人工與 AI 共用 resolver，人工準備使用既有讀取排空。來源服務故障停止回合，操作查回不重建引用。這是[當輪來源接合](../../docs/specs/2026-09-13-jd-consultant-source-integration-slice.md)，較早 Memory 來源、專業指引及來源 UI 仍待接合。
 - `consultant_model.py`：固定相容的 Anthropic 原生 adapter；有限補 terminal 與 response 清理，private seams 升級須重驗，沒有自製 Agent loop／SSE parser。
 - `manual_runtime.py`：每文件實際 writer／Future、保存與收尾確認；有 native lease 時先掃全 catalog 關閉原 pending 才開新修改。foreign pending 不把空本地 Future 當死亡證明。
 - `windows_host.py`／`host_runtime.py`：固定安裝 mutex、舊 Job 退出、新 Job membership 及程序終身 lease；成功後才開 DB／Saver，startup 完成才 ready。只供專用 App 程序，不在目前 Python shell／pytest 主程序直接 bootstrap。

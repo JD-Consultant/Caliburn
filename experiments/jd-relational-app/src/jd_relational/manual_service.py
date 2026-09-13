@@ -102,10 +102,15 @@ class ManualService:
         try:
             base = self.codec.resolve(value["base_revision_ref"], document_id=document_id,
                 roles={"revision"}, purposes={"history", "observation"})
-            original = self.history.read_revision(document_id, UUID(base.revision_id))
-            context = command_context(original.domain, value["command"], self.codec,
-                                      self.source_resolver, lambda: str(uuid4()))
-            intent = bind_edit(UUID(value["operation_id"]), "manual", None, value["command"], context)
+            def prepare():
+                original = self.history.read_revision(document_id, UUID(base.revision_id))
+                context = command_context(original.domain, value["command"], self.codec,
+                                          self.source_resolver, lambda: str(uuid4()))
+                return bind_edit(UUID(value["operation_id"]), "manual", None, value["command"], context)
+            # The source owner reads the same Saver that host.close drains.
+            # Materialize preparation under its existing read lifetime token;
+            # submit independently checks writer admission after this read.
+            intent = self.runtime.inspect_document(document_id, prepare)
             handle = self.runtime.submit(intent)
             try:
                 completion = handle.wait(self.wait_timeout)

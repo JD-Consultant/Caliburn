@@ -153,7 +153,7 @@ def _no_sources(*_):
 
 def _error_result(error):
     code = getattr(error, "code", None)
-    if code in {"source_not_available", "selection_not_available"}:
+    if code == "selection_not_available":
         return _unbound("目前沒有可驗證的來源或選區接點；本次未進入保存。", "stop")
     if code in {"invalid_ref", "stale_view", "target_missing", "revision_missing", "read_required"}:
         return _unbound("請先用 jd_read current 取得本輪目前稿與可寫引用；本次未進入保存。", "reread_current")
@@ -275,6 +275,10 @@ class AiToolSession:
                 decode_ai_binding(binding, **self.scope)
                 prepared = _Prepared(name, message.id, call_id, digest, intent=intent, binding=binding)
         except (ReadError, TransportError, IntentValidationError) as error:
+            if isinstance(error, ReadError) and error.code == "source_not_available":
+                # A source-store failure is not a model argument error. Stop
+                # this run; closure uses saved calls/receipts without replay.
+                raise AiToolError("ai_tool_unavailable") from None
             result = read_failure("invalid_input") if name in {"jd_read", "jd_change_read"} else _error_result(error)
             prepared = _Prepared(name, message.id, call_id, digest, error=result)
         except HistoryError as error:

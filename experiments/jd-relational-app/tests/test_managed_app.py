@@ -21,16 +21,27 @@ def composed(monkeypatch):
         return True
     value = settings("ready")
     opened = SimpleNamespace(settings=value, codec=object(), close=close,
-        host=SimpleNamespace(engine=object(), runtime=SimpleNamespace(storage=object(), finish_startup=startup)))
+        host=SimpleNamespace(graph=object(), engine=object(), runtime=SimpleNamespace(storage=object(), finish_startup=startup)))
     monkeypatch.setattr(managed, "open_configured_host", lambda *_, **__: opened)
     monkeypatch.setattr(managed, "HistoryReader", lambda _: object())
     monkeypatch.setattr(managed, "ReadService", lambda *args: object())
     monkeypatch.setattr(managed, "ChangeReadService", lambda *args: object())
-    monkeypatch.setattr(managed, "ManualService", lambda *args: object())
+    sources = SimpleNamespace(resolve=lambda *args: pytest.fail("Composition must not read sources."))
+    def source_owner(checkpoints, codec):
+        assert checkpoints is opened.host.graph
+        assert codec.dataset_id == value.dataset_id
+        return sources
+    monkeypatch.setattr(managed, "AiRunCheckpoints", lambda graph: graph)
+    monkeypatch.setattr(managed, "ConversationSourceService", source_owner)
+    def manual(*args, source_resolver):
+        assert source_resolver is sources.resolve
+        return object()
+    monkeypatch.setattr(managed, "ManualService", manual)
     monkeypatch.setattr(managed, "CatalogService", lambda *args: SimpleNamespace(list=lambda **_: {
         "dataset_id": value.dataset_id, "documents": [], "next_after": None}))
-    def ai(owner, codec, *, execution_enabled):
+    def ai(owner, codec, *, conversation_sources, execution_enabled):
         assert owner is opened.host.runtime and codec is opened.codec
+        assert conversation_sources is sources
         assert execution_enabled is False
         events.append("ai-owner")
         return SimpleNamespace(checkpoints=object())

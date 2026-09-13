@@ -8,6 +8,7 @@ updates Memory, retries a model, or grants writer authority.
 """
 
 from dataclasses import dataclass
+from collections.abc import Callable
 from hashlib import sha256
 import json
 from threading import Event
@@ -91,6 +92,9 @@ class ConsultantContext:
     event_limit: int = 20
     tool_session: object | None = None
     stop_event: Event | None = None
+    # Trusted, run-scoped source owner. It validates the actual request before
+    # supplying metadata; original bodies remain in their original messages.
+    source_notice: Callable | None = None
 
     def __post_init__(self):
         try:
@@ -101,6 +105,8 @@ class ConsultantContext:
             if type(self.event_limit) is not int or not 1 <= self.event_limit <= 20:
                 raise ValueError()
             if self.stop_event is not None and not isinstance(self.stop_event, Event):
+                raise ValueError()
+            if self.source_notice is not None and not callable(self.source_notice):
                 raise ValueError()
         except (ValueError, TypeError, AttributeError):
             raise ConsultantContextError("invalid_consultant_context") from None
@@ -184,7 +190,16 @@ def _project(request):
     if request.tools:
         settings["parallel_tool_calls"] = False
         settings["strict"] = True
-    projected = request.override(system_message=SystemMessage(content=[*blocks, {"type": "text", "text": text}]),
+    blocks.append({"type": "text", "text": text})
+    if context.source_notice is not None:
+        try:
+            source = _json(context.source_notice(request.messages))
+            if len(source.encode("utf-8")) > MAX_NOTICE_BYTES:
+                raise ValueError()
+        except Exception:
+            raise ConsultantContextError("source_not_available") from None
+        blocks.append({"type": "text", "text": source})
+    projected = request.override(system_message=SystemMessage(content=blocks),
         model_settings=settings)
     return projected, context, current.head, text
 

@@ -234,6 +234,11 @@ def test_unavailable_source_and_selection_do_not_fabricate_authority(case):
     _, context, owner, material, codec = setup()
     mutation = call("jd_create_task", {**task_args(), "basis_refs": ["synthetic-not-issued-source"]}) if case == "source" else call(
         "jd_replace_selection", {"selection_ref": "synthetic-not-issued-selection", "replacement_text": "替換", "basis_refs": []})
+    if case == "source":
+        with pytest.raises(AiToolError, match="^ai_tool_unavailable"):
+            run(context, [call("jd_read", {"view": "current", "target_ref": None, "cursor": None}), mutation, done()])
+        assert owner.calls == [] and len(context.last_test_model.requests) == 2
+        return
     state, _, _ = run(context, [call("jd_read", {"view": "current", "target_ref": None, "cursor": None}), mutation, done()])
     assert results(state)[-1].status == "error" and owner.calls == [] and not state.get("jd_ai_bindings")
 

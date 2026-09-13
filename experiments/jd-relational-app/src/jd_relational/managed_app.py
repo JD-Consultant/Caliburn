@@ -10,6 +10,7 @@ from dataclasses import dataclass
 from starlette.concurrency import run_in_threadpool
 
 from .ai_runtime import AiRuntime
+from .ai_checkpoints import AiRunCheckpoints
 from .chat_api import ChatServices
 from .chat_service import ChatService
 from .chat_history import ChatHistoryCodec, ChatHistoryService
@@ -17,6 +18,7 @@ from .catalog_service import CatalogService
 from .change_reads import ChangeReadService
 from .configured_api import create_configured_api
 from .configured_host import open_configured_host
+from .conversation_sources import ConversationSourceCodec, ConversationSourceService
 from .manual_service import ManualService
 from .reads import ReadService
 from .storage.history import HistoryReader
@@ -56,9 +58,11 @@ def open_managed_app(file, *, consultant, enable_chat=False) -> ManagedApp:
     opened = open_configured_host(file, consultant=consultant)
     try:
         host, codec = opened.host, opened.codec
-        ai_runtime = AiRuntime(host.runtime, codec, execution_enabled=enable_chat)
+        sources = ConversationSourceService(AiRunCheckpoints(host.graph), ConversationSourceCodec(
+            opened.settings.signing_key_bytes(), opened.settings.dataset_id))
+        ai_runtime = AiRuntime(host.runtime, codec, conversation_sources=sources, execution_enabled=enable_chat)
         history = HistoryReader(host.engine)
-        manual = ManualService(host.runtime, history, codec)
+        manual = ManualService(host.runtime, history, codec, source_resolver=sources.resolve)
         chat_history = ChatHistoryService(ai_runtime.checkpoints, ChatHistoryCodec(
             opened.settings.signing_key_bytes(), opened.settings.dataset_id))
         services = ChatServices(ReadService(host.runtime.storage, history, codec),

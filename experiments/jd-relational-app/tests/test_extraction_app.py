@@ -385,6 +385,30 @@ def test_a_saved_pair_reads_back_and_re_extracts_as_the_pair_it_was_planned_as(b
     assert again["files"][0]["context_reference"] == result["files"][-1]["context_reference"]
 
 
+def test_a_mismatched_pair_already_on_disk_is_refused_when_read_back(b1):
+    """Saving refuses a crossed pair, and reading one back refuses it too.
+
+    An artifact that already holds a neighbouring window's prefix — however it
+    got there — must not become a re-extraction input. This exercises the
+    read-back check on its own rather than trusting the save-time one.
+    """
+    build, windows, document, whole, store, _, _ = b1
+    adapter = ExtractionSourceAdapter(windows, document)
+    planned = adapter.extraction_windows(whole, max_chars=20, context_chars=10)
+    paired = [pair for pair in planned if pair["context_reference"]]
+    assert len(paired) > 1
+    artifacts = MemoryArtifacts(store, document, source=MemorySourceReader(
+        windows, document, window_references=True, context_references=True))
+    files = artifacts.save_extraction(summary="詳記。", candidates="候選。", slug="原對", **paired[0])
+    assert artifacts.source_window(files.summary_path) == paired[0]
+    crossed = artifacts.read_text(files.summary_path).replace(
+        paired[0]["context_reference"], paired[1]["context_reference"])
+    assert not artifacts.interview_backend().write(
+        files.summary_path.removeprefix("/interviews"), crossed).error
+    with pytest.raises(InvalidSourceReference):
+        artifacts.source_window(files.summary_path)
+
+
 def test_the_terminal_evidence_port_reads_only_public_provider_fields():
     assert accepted(AIMessage("好", response_metadata={"status": "completed"}))
     assert not accepted(AIMessage("好", response_metadata={"status": "incomplete"}))

@@ -14,7 +14,7 @@
 
 **因此本片不代表日常 App 已可使用 B1**，也不代表 H4 或完整旅程有進展。
 
-**審查追補（2026-09-14）：**`beb8aa8f` 已閉合祖先鏈例外的 adapter 邊界，但後續固定探針發現合法 source/context 可以交叉配對；本結果稿的 W-13 只證明正常保存 pair 的重抽，不證明錯配會被拒。B1 adapter 工作單位仍待 pair 完整性窄修與反例通過後才可關閉。
+**審查追補（2026-09-14）：**`beb8aa8f` 已閉合祖先鏈例外的 adapter 邊界；`3921a99d` 再以 v2 context token 的 source window 界線完成 pair proof，交叉 pair、不同 root 與舊 v1 context 均明示拒絕。獨立窄複核 B1／窗口／游標 **108 passed**，只讀／Memory context **40 passed**；固定接合的程式修正可關閉 F-04，但正式 runtime、真 PostgreSQL B1 保存、背景恢復、B2 與自然模型仍未開始。進 runtime 前補一個既有錯配 artifact 讀回反例，並明示 v1 context 的 fresh-data／轉換界線。
 
 ## 1. 只新增 App 端適配器
 
@@ -106,9 +106,9 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 
 | 範圍 | 結果 |
 |---|---|
-| B1 接線案例（含審查與複核新增 8 例） | **21 passed** |
+| B1 接線案例（含審查與複核新增 9 例） | **22 passed** |
 | 完成窗口來源案例（含 context turns、P1 lineage 與 F-04 pair 新例） | **42 passed** |
-| App 全離線測試 | **2803 passed／257 skipped／63.94s** |
+| App 全離線測試 | **2804 passed／257 skipped／71.46s** |
 | Memory 套件全測（含跨 pair 拒絕新例） | **147 passed** |
 | 真 PostgreSQL 18：原話來源＋C 顧問接合＋Memory 核心 | **14 passed** |
 
@@ -140,15 +140,18 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 | 祖先查找上限（P2） | 超過 256 層時四個 I/O 方法與 `start()` 一致回 `source_not_available`（不是內部 `AiCheckpointError`），**0 次 HTTP**、Store 無產物、不回退 latest |
 | 原 pair 不可交叉（F-04） | 相鄰窗口的 source 與另一個 context 組合，在 `validate_saved_window`、`save_extraction` 與套件層皆被拒；v1 context 位址拒絕；不同 root 的 context 拒絕 |
 | 原 pair 往返（F-04） | 保存→`source_window` 讀回→重抽，三處拿到的都是同一對 |
+| 已在磁碟上的錯配（P3） | 直接覆寫成相鄰窗口前綴的 artifact，`source_window` 讀回即拒；**拿掉讀回檢查後此例轉紅**（`DID NOT RAISE`），證明它驗的是該檢查本身 |
 | 出站請求 | `store=false`、**不送已淘汰的 `truncation`**、`json_schema` + `strict=true`、三欄位 schema、8192、effort high |
 
 替身只有一個：provider 的 HTTP 傳輸（`httpx.MockTransport`，回覆經實際 SDK schema 驗證）。來源 owner、Saver、Store、SDK、結構化輸出綁定全部是真的。**0 provider、付費 0**；`api_key` 是必填參數，程式不讀環境變數、不內建任何端點。
 
 ## 5. 限制與未完成
 
-1. **沒有呼叫真模型**，沒有自然品質、真人或成本證據；真模型另需當次明示費用授權。
-2. **B1 尚未被 App runtime 觸發**：`build_extraction_workflow` 可組裝，但宿主啟停、背景准入、排空與新程序續作（映射 §3.3–3.4）未接，模型 id／金鑰／配置也還沒接上本機設定。
-3. **本片證據不能外推成正式 App／資料庫完成（審查 F4）**：13＋3 個接線案例用的是 MockTransport、InMemorySaver、InMemoryStore；表中的 PostgreSQL 14 案例是**原話來源、C 接合與 Memory 核心**，**不是 B1 的 PostgreSQL 執行**，不重複計為 B1 證據。B1 的真 PG 保存／續作／冪等與設定接線留給下一個 runtime 工作單位。
-4. `openai` SDK 版本與 CT profile 不同（3.13.0 vs 3.8.0），見 §3；線上形狀已對現行版本核過，自然品質結論不延伸。
-5. B2 採用、背景接合、整理通知完整單位、H4 完整旅程與自然品質（OI-09）都未開始。
-6. 沒有新增資料表、第二份游標、第二個原話 owner；正式產品（`apps/api`／`apps/web`／`packages/job-analysis-contract`）未改，ADR0074／0075 Proposed、production 0060 不變。
+1. **啟用 B1 runtime 前必須先處理 v1 context 位址。**v2 之前發出的 `purpose="context"` 位址不帶 pair proof，現在會**明示拒絕**，不做任何 fallback。本案尚未正式啟用、也不做舊資料搬移，所以預設走 fresh data；但若屆時已存在舊 artifact，只有兩條路：一次性轉換成帶 proof 的 v2 位址，或**放棄該筆的重抽**（詳記與候選仍可讀，只是不能再以原 pair 重抽）。**不得靜默降級或改用最新內容重規劃。**這是啟用前的檢查項，不是可留到之後的細節。
+2. **`source_first`／`source_last` 是本案的接合設計**，不是 OpenAI 或 Anthropic 規定的 token 欄位；官方資料支持的是「由 App 驗證模型結果與工具錯誤」的責任分工，不是這個格式。
+3. **沒有呼叫真模型**，沒有自然品質、真人或成本證據；真模型另需當次明示費用授權。
+4. **B1 尚未被 App runtime 觸發**：`build_extraction_workflow` 可組裝，但宿主啟停、背景准入、排空與新程序續作（映射 §3.3–3.4）未接，模型 id／金鑰／配置也還沒接上本機設定。
+5. **本片證據不能外推成正式 App／資料庫完成（審查 F4）**：22 個接線案例用的是 MockTransport、InMemorySaver、InMemoryStore；表中的 PostgreSQL 14 案例是**原話來源、C 接合與 Memory 核心**，**不是 B1 的 PostgreSQL 執行**，不重複計為 B1 證據。B1 的真 PG 保存／續作／冪等與設定接線留給下一個 runtime 工作單位。
+6. `openai` SDK 版本與 CT profile 不同（3.13.0 vs 3.8.0），見 §3；線上形狀已對現行版本核過，自然品質結論不延伸。
+7. B2 採用、背景接合、整理通知完整單位、H4 完整旅程與自然品質（OI-09）都未開始。
+8. 沒有新增資料表、第二份游標、第二個原話 owner；正式產品（`apps/api`／`apps/web`／`packages/job-analysis-contract`）未改，ADR0074／0075 Proposed、production 0060 不變。

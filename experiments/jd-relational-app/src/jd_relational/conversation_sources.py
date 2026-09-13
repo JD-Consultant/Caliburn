@@ -466,7 +466,7 @@ class ConversationSourceService:
         later terminal never releases an earlier one, and a settled
         `failed`/`cancelled` turn still keeps the employee's saved words.
         """
-        return self._settled(document_id)[1]
+        return self._settled(document_id)[2]
 
     def _settled(self, document_id):
         """One pinned read of this document, with its settled turns."""
@@ -478,23 +478,47 @@ class ConversationSourceService:
         except Exception:
             raise ConversationSourceError("source_not_available") from None
         if observed is None:
-            return (), ()
-        return observed.messages, self._settled_turns(document_id, observed.messages)
+            return None, (), ()
+        return observed, observed.messages, self._settled_turns(document_id, observed.messages)
 
-    def _after_cursor(self, messages, turns, after_reference, document_id):
+    def _cursor_boundary(self, document_id, reference, observed, turns):
+        """Resolve a published cursor at its own position, on this lineage.
+
+        A valid signature is not a position. The cursor is read where it was
+        issued; its own root must be a real ancestor of the conversation being
+        planned, and its range must end exactly on a settled turn. A shared
+        identifier is never accepted as proof, and a cursor stopping inside a
+        turn is refused rather than moving admission past that turn's speech.
+        """
+        from .ai_history import AiRunHistory
+        position = self._codec._resolve_window(reference, document_id)
+        cursor = self._pinned(document_id, position.root_run_id, position.root_config())
+        saved = [message.id for message in cursor.messages]
+        order = [message.id for message in observed.messages]
+        if (position.first not in saved or position.last not in saved
+                or saved.index(position.first) > saved.index(position.last)
+                or saved != order[:len(saved)]):
+            raise ConversationSourceError("invalid_ref")
+        root = observed.root_config["configurable"]["checkpoint_id"]
+        if position.root_checkpoint_id != root and not AiRunHistory(self._checkpoints).ancestor_of(
+                document_id, position.root_checkpoint_id, observed.root_config):
+            raise ConversationSourceError("invalid_ref")
+        if position.last not in {turn["last"] for turn in turns}:
+            raise ConversationSourceError("invalid_ref")
+        return order.index(position.last)
+
+    def _after_cursor(self, observed, messages, turns, after_reference, document_id):
         """First settled turn the published cursor has not covered.
 
         `after_reference` may only be the publication head's own completed
-        window. A turn source, or a cursor whose end is not on this lineage,
-        stops admission: it is never reset and never read as "nothing done".
+        window. A turn source, or a cursor that cannot be proven on this
+        lineage at a complete boundary, stops admission: it is never reset and
+        never read as "nothing done".
         """
         if after_reference is None:
             return 0
-        position = self._codec._resolve_window(after_reference, document_id)
+        boundary = self._cursor_boundary(document_id, after_reference, observed, turns)
         order = [message.id for message in messages]
-        if position.last not in order:
-            raise ConversationSourceError("invalid_ref")
-        boundary = order.index(position.last)
         for index, turn in enumerate(turns):
             if order.index(turn["first"]) > boundary:
                 return index
@@ -509,10 +533,10 @@ class ConversationSourceService:
         that never asked. A turn after an unsettled one is not listed at all.
         """
         from caliburn_memory.requests import has_saved_request
-        messages, turns = self._settled(document_id)
+        observed, messages, turns = self._settled(document_id)
         order = [message.id for message in messages]
         requested = []
-        for turn in turns[self._after_cursor(messages, turns, after_reference, document_id):]:
+        for turn in turns[self._after_cursor(observed, messages, turns, after_reference, document_id):]:
             spoken = messages[order.index(turn["first"]):order.index(turn["last"]) + 1]
             if has_saved_request(spoken):
                 requested.append(dict(turn))
@@ -524,8 +548,8 @@ class ConversationSourceService:
         Quiet settled turns stay inside the range; the range ends at the first
         unsettled turn, so a later request can never jump an open gap.
         """
-        messages, turns = self._settled(document_id)
-        remaining = turns[self._after_cursor(messages, turns, after_reference, document_id):]
+        observed, messages, turns = self._settled(document_id)
+        remaining = turns[self._after_cursor(observed, messages, turns, after_reference, document_id):]
         if not remaining:
             return None
         return {"first_run_id": remaining[0]["input_id"],
@@ -698,7 +722,7 @@ class ConversationSourceService:
         the nearest prior visible question and include the answers between.
         """
         self._budgets(max_chars, context_chars)
-        messages, turns = self._settled(document_id)
+        _, messages, turns = self._settled(document_id)
         identifiers = [turn["input_id"] for turn in turns]
         try:
             first, last = identifiers.index(first_run_id), identifiers.index(last_run_id)
@@ -791,14 +815,12 @@ class ConversationSourceService:
         treated as an implicit retry.
         """
         new = self._codec._resolve_window(reference, document_id)
-        published = self._codec._resolve_window(previous, document_id)
-        messages, turns = self._settled(document_id)
+        observed, messages, turns = self._settled(document_id)
+        boundary = self._cursor_boundary(document_id, previous, observed, turns)
         order = [message.id for message in messages]
-        if new.first not in order or published.last not in order:
+        if new.first not in order or order.index(new.first) <= boundary:
             raise ConversationSourceError("invalid_ref")
-        if order.index(new.first) <= order.index(published.last):
-            raise ConversationSourceError("invalid_ref")
-        following = [turn for turn in turns if order.index(turn["first"]) > order.index(published.last)]
+        following = [turn for turn in turns if order.index(turn["first"]) > boundary]
         if not following or following[0]["first"] != new.first:
             raise ConversationSourceError("invalid_ref")
 

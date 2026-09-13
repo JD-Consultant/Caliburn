@@ -42,6 +42,45 @@ class AiRunHistory:
             raise AiCheckpointError("invalid_input")
         self._checkpoints = checkpoints
 
+    def ancestor_of(self, document_id: str, checkpoint_id: str, config: dict) -> bool:
+        """Whether a saved checkpoint really lies on this position's own chain.
+
+        Walks the same public parent links, within the same bound, that `find`
+        uses. A shared identifier is never accepted as proof of position:
+        reaching the start of the chain proves it is not an ancestor, while
+        exhausting the bound proves nothing and is reported rather than guessed.
+        """
+        try:
+            _uuid(document_id)
+            if type(checkpoint_id) is not str or not checkpoint_id.strip():
+                raise ValueError()
+            position = _position(config, document_id)
+        except AiCheckpointError:
+            raise
+        except Exception:
+            raise AiCheckpointError("invalid_input") from None
+        graph, visited = self._checkpoints.graph, set()
+        for _ in range(MAX_PARENT_LOOKUPS):
+            current = position["configurable"]["checkpoint_id"]
+            if current == checkpoint_id:
+                return True
+            if current in visited:
+                raise AiCheckpointError("original_run_lookup_required")
+            visited.add(current)
+            try:
+                saved = graph.checkpointer.get_tuple(deepcopy(position))
+            except Exception:
+                raise AiCheckpointError("checkpoint_unavailable") from None
+            if saved is None:
+                raise AiCheckpointError("original_run_lookup_required")
+            if saved.parent_config is None:
+                return False
+            try:
+                position = _position(saved.parent_config, document_id)
+            except Exception:
+                raise AiCheckpointError("invalid_checkpoint") from None
+        raise AiCheckpointError("original_run_lookup_required")
+
     def find(self, document_id: str, run_id: str, dataset_id: str) -> AiRunObservation | None:
         """Return the original observation, or verified absence from full messages.
 

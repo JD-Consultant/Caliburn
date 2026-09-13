@@ -18,6 +18,7 @@ import sqlalchemy as sa
 from sqlalchemy.pool import StaticPool
 
 from jd_relational.ai_checkpoints import AiCheckpointError, AiRunCheckpoints, new_run_record
+from jd_relational.ai_history import MAX_PARENT_LOOKUPS
 from jd_relational.conversation_sources import (
     ConversationSourceError, WindowBudgetExceeded, _ContextPosition, _WindowPosition,
 )
@@ -399,3 +400,71 @@ def test_a_broken_ancestor_chain_is_reported_not_read_as_no_earlier_turns(interv
         windows.safe_turns(document)
     with pytest.raises(AiCheckpointError, match="^original_run_lookup_required$"):
         windows.unprocessed_source(document)
+
+
+def test_a_cursor_stopping_mid_turn_never_counts_as_processed(interview, native):
+    """A legal signature is not a complete boundary.
+
+    Turn two holds a tool message before its final reply. A cursor ending
+    there would otherwise move admission past the whole turn and silently drop
+    the employee speech that follows it.
+    """
+    windows, document, first_run, second_run = interview
+    position = windows._codec._resolve_window(
+        windows.capture_window(document, first_run_id=first_run, last_run_id=second_run), document)
+    mid_turn = window_ref(windows, document, first=first_run, last="t1",
+                          first_run=first_run, last_run=second_run,
+                          root=position.root_checkpoint_id)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.unprocessed_source(document, mid_turn)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.pending_windows(document, mid_turn)
+
+
+def test_a_cursor_whose_own_root_is_unreachable_is_refused(interview, native):
+    """The cursor must be read at its own fixed position, not assumed."""
+    windows, document, first_run, second_run = interview
+    real = windows._codec._resolve_window(
+        windows.capture_window(document, first_run_id=first_run, last_run_id=second_run), document)
+    unreachable = window_ref(windows, document, first=real.first, last=real.last,
+                             first_run=first_run, last_run=second_run,
+                             root="1f000000-0000-0000-0000-000000000000")
+    with pytest.raises(ConversationSourceError):
+        windows.unprocessed_source(document, unreachable)
+
+
+def test_a_cursor_from_another_branch_is_not_an_ancestor(interview, native):
+    """Identical content on a sibling chain is not the canonical lineage.
+
+    Two updates from the same root produce siblings that hold exactly the same
+    messages. Only one is an ancestor of the head, so matching identifiers and
+    matching content are both insufficient: the chain has to reach it.
+    """
+    graph, dataset, document, *_ = native
+    windows, _, first_run, second_run = interview
+    position = windows._codec._resolve_window(
+        windows.capture_window(document, first_run_id=first_run, last_run_id=second_run), document)
+    abandoned = graph.update_state(position.root_config(), {"jd_manual_pending": None},
+                                   as_node="consultant")
+    graph.update_state(position.root_config(), {"jd_manual_pending": None}, as_node="consultant")
+    sibling = window_ref(windows, document, first=position.first, last=position.last,
+                         first_run=first_run, last_run=second_run,
+                         root=abandoned["configurable"]["checkpoint_id"])
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.unprocessed_source(document, sibling)
+
+
+def test_a_chain_deeper_than_the_lookup_bound_is_reported_not_assumed(interview, native):
+    """Beyond the bound nothing is proven, so the limit is surfaced.
+
+    The bound is a lookup limit, never evidence that an earlier turn or its
+    speech does not exist.
+    """
+    graph, dataset, document, *_ = native
+    windows, _, first_run, second_run = interview
+    assert len(windows.safe_turns(document)) == 2
+    for _ in range(MAX_PARENT_LOOKUPS + 4):
+        graph.update_state({"configurable": {"thread_id": document}},
+                           {"jd_manual_pending": None}, as_node="consultant")
+    with pytest.raises(AiCheckpointError, match="^original_run_lookup_required$"):
+        windows.safe_turns(document)

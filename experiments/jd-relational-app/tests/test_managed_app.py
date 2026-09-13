@@ -29,20 +29,26 @@ def composed(monkeypatch):
     monkeypatch.setattr(managed, "ManualService", lambda *args: object())
     monkeypatch.setattr(managed, "CatalogService", lambda *args: SimpleNamespace(list=lambda **_: {
         "dataset_id": value.dataset_id, "documents": [], "next_after": None}))
+    def ai(owner, codec):
+        assert owner is opened.host.runtime and codec is opened.codec
+        events.append("ai-owner")
+        return object()
+    monkeypatch.setattr(managed, "AiRuntime", ai)
     return events, opened
 
 
 def test_resources_recovered_before_first_request_and_drained_on_exit(composed):
     events, _ = composed
     app = managed.open_managed_app(object(), consultant=object())
-    assert events == []
+    assert events == ["ai-owner"]
+    assert app.ai_runtime is not None
     with TestClient(app.app, base_url="http://127.0.0.1") as client:
-        assert events == ["startup"]
+        assert events == ["ai-owner", "startup"]
         # Invalid dataset is rejected without calling a fake writer.
         response = client.post("/api/documents", content="bad-body", headers={
             "Origin": "http://127.0.0.1:3002", "X-JD-Dataset": str(uuid4())})
         assert response.status_code == 409
-    assert events == ["startup", "close"]
+    assert events == ["ai-owner", "startup", "close"]
 
 
 def test_startup_failure_is_sanitized_and_drain_still_occurs(composed):
@@ -55,7 +61,7 @@ def test_startup_failure_is_sanitized_and_drain_still_occurs(composed):
         with TestClient(app.app):
             pytest.fail("No serving before recovery.")
     assert error.value.__suppress_context__
-    assert events == ["close"]
+    assert events == ["ai-owner", "close"]
 
 
 def test_composition_failure_does_not_leak_open_host_or_raw_error(composed, monkeypatch):
@@ -65,12 +71,14 @@ def test_composition_failure_does_not_leak_open_host_or_raw_error(composed, monk
     monkeypatch.setattr(managed, "create_configured_api", failure)
     with pytest.raises(managed.ManagedAppError, match="^app_composition_failed$"):
         managed.open_managed_app(object(), consultant=object())
-    assert events == ["close"]
+    assert events == ["ai-owner", "close"]
 
 
 def test_manual_only_consultant_explicitly_refuses_interview_invocation():
-    with pytest.raises(managed.ManagedAppError, match="consultant_unavailable"):
+    from jd_relational.inspection_model import InspectionExecutionDisabled
+    with pytest.raises(InspectionExecutionDisabled) as error:
         managed.unavailable_consultant().invoke({"messages": []})
+    assert str(error.value) == error.value.code == "execution_disabled"
 
 
 @pytest.fixture

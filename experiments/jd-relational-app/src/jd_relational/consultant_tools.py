@@ -397,7 +397,15 @@ def _message(name, call_id, result):
 class AiToolMiddleware(AgentMiddleware):
     state_schema = AiToolState
 
+    def __init__(self, *, inspection_only=False):
+        if type(inspection_only) is not bool:
+            raise AiToolError("invalid_tool_context")
+        self._inspection_only = inspection_only
+
     def after_model(self, state, runtime):
+        if self._inspection_only:
+            from .inspection_model import InspectionExecutionDisabled
+            raise InspectionExecutionDisabled()
         return _session(runtime).prepare(state)
 
     async def aafter_model(self, state, runtime):

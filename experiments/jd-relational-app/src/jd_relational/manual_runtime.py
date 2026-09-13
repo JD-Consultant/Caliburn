@@ -79,6 +79,7 @@ class _Foreground:
     closed: bool = False
     error: str | None = None
     handle: "ForegroundHandle | None" = None
+    previous_host: "PreviousHost | None" = None
 
 
 class ForegroundHandle:
@@ -204,6 +205,8 @@ class ManualRuntime:
         self._registry = Lock()  # Only dictionary/accepting state, never I/O or waits.
         self._accepting = True
         self._foreground_coordinator_claimed = False
+        self._startup_recover = None
+        self._startup_active = None
         self._previous_host = previous_host
         self._startup_lock = Lock()
         self._startup_done = Event()
@@ -214,6 +217,7 @@ class ManualRuntime:
                                                   thread_name_prefix="jd-foreground")
         self._execution = ContextVar("jd_manual_execution", default=None)
         self._catalog_execution = ContextVar("jd_catalog_execution", default=None)
+        self._startup_execution = ContextVar("jd_startup_execution", default=None)
         self.storage = storage_factory(self)
 
     def _slot(self, document, *, admit=False):
@@ -227,14 +231,22 @@ class ManualRuntime:
             if not self._accepting:
                 raise RuntimeFailure("runtime_closed")
 
-    def claim_foreground_coordinator(self) -> None:
+    def claim_foreground_coordinator(self, *, startup_recover: Callable[[str, float], int] | None = None) -> None:
         """One coordinator owns each host's AI attempts and configured ports."""
-        with self._registry:
-            if not self._accepting:
-                raise RuntimeFailure("runtime_closed")
-            if self._foreground_coordinator_claimed:
-                raise RuntimeFailure("foreground_coordinator_already_configured")
-            self._foreground_coordinator_claimed = True
+        if startup_recover is not None and not callable(startup_recover):
+            raise RuntimeFailure("invalid_input")
+        if not self._startup_lock.acquire(blocking=False):
+            raise RuntimeFailure("startup_busy")
+        try:
+            with self._registry:
+                if not self._accepting:
+                    raise RuntimeFailure("runtime_closed")
+                if self._foreground_coordinator_claimed:
+                    raise RuntimeFailure("foreground_coordinator_already_configured")
+                self._foreground_coordinator_claimed = True
+                self._startup_recover = startup_recover
+        finally:
+            self._startup_lock.release()
 
     def _require_host(self):
         if self._previous_host is not None:
@@ -249,7 +261,7 @@ class ManualRuntime:
             return self._accepting and self._startup_done.is_set()
 
     def finish_startup(self, *, timeout=10) -> int:
-        """Close all previous manual descriptors before enabling new admission.
+        """Close previous AI and manual work before enabling new admission.
 
         The host excludes all catalog writers during this scan. Catalog includes
         archived documents and is never permanently deleted. Timeout retains the
@@ -273,6 +285,25 @@ class ManualRuntime:
                 except Exception:
                     raise RuntimeFailure("read_failed") from None
                 for document in documents:
+                    self._require_open()
+                    self._require_host()
+                    if self._startup_recover is not None:
+                        self._startup_active = (object(), document, get_ident())
+                        token = self._startup_execution.set(self._startup_active)
+                        try:
+                            count = self._startup_recover(document, timeout)
+                            if type(count) is not int or count not in (0, 1):
+                                raise RuntimeFailure("checkpoint_unavailable")
+                            recovered += count
+                        except TimeoutError:
+                            raise RuntimeFailure("startup_recovery_pending") from None
+                        except RuntimeFailure:
+                            raise
+                        except Exception:
+                            raise RuntimeFailure("checkpoint_unavailable") from None
+                        finally:
+                            self._startup_execution.reset(token)
+                            self._startup_active = None
                     slot = self._slot(document, admit=True)
                     with slot.lock:
                         self._require_open()
@@ -281,6 +312,8 @@ class ManualRuntime:
                             pending = self.checkpoints.read(document)
                         except Exception as error:
                             raise RuntimeFailure(_checkpoint_failure(error)) from None
+                        if self._foreground_busy(slot):
+                            raise RuntimeFailure("startup_recovery_pending")
                         if pending is not None and slot.entry is None:
                             self._manual(pending)
                             if pending.document_id != document:
@@ -309,6 +342,54 @@ class ManualRuntime:
             return recovered
         finally:
             self._startup_lock.release()
+
+    def adopt_previous_foreground(self, identity: ForegroundIdentity,
+                                  confirm_original: Callable[[ForegroundIdentity], None]) -> ForegroundHandle:
+        """Adopt an exact persisted run only inside this host's startup callback.
+
+        There is no invented stopped Future. The stored prior-host capability
+        permits only original-result recovery and durable terminal closure.
+        """
+        if type(identity) is not ForegroundIdentity or not callable(confirm_original):
+            raise RuntimeFailure("invalid_input")
+        identity.__post_init__()
+        active = self._startup_active
+        if (self._previous_host is None or self._startup_done.is_set() or active is None
+                or active != self._startup_execution.get()
+                or active[1:] != (identity.document_id, get_ident())
+                or not self._startup_lock.locked()):
+            raise RuntimeFailure("startup_recovery_required")
+        self._require_open()
+        self._require_host()
+        slot = self._slot(identity.document_id, admit=True)
+        with slot.lock:
+            self._require_open()
+            self._require_host()
+            if slot.catalog_token is not None or slot.start_token is not None:
+                raise RuntimeFailure("document_busy")
+            original = slot.foreground
+            if original is not None:
+                if original.previous_host is not self._previous_host or original.future is not None:
+                    raise RuntimeFailure("document_busy")
+                if original.permit.identity != identity:
+                    raise RuntimeFailure("operation_conflict")
+                if slot.entry is not None and slot.entry.foreground is not original.permit:
+                    raise RuntimeFailure("document_busy")
+            elif slot.entry is not None:
+                raise RuntimeFailure("document_busy")
+            self._confirm(confirm_original, identity)
+            self._require_open()
+            self._require_host()
+            if slot.foreground is not original:
+                raise RuntimeFailure("document_busy")
+            if original is not None:
+                return original.handle
+            entry = _Foreground(ForegroundPermit(identity), error="foreground_interrupted",
+                                previous_host=self._previous_host)
+            entry.settled.set()
+            entry.handle = ForegroundHandle(entry)
+            slot.foreground = entry
+            return entry.handle
 
     @staticmethod
     def _manual(identity):
@@ -340,6 +421,26 @@ class ManualRuntime:
                 or current.permit is not permit or current.closed):
             raise RuntimeFailure("writer_not_valid")
         return current
+
+    def _require_foreground_stopped(self, current, *, allow_not_started=False):
+        if not current.settled.is_set():
+            raise RuntimeFailure("writer_not_stopped")
+        if current.previous_host is not None:
+            if current.previous_host is not self._previous_host or current.future is not None:
+                raise RuntimeFailure("writer_not_stopped")
+            try:
+                current.previous_host.require_previous_stopped()
+            except Exception:
+                raise RuntimeFailure("writer_not_stopped") from None
+            return
+        if current.future is None:
+            # Only this owner's known executor-submit failure may close without
+            # a Future. It never authorizes SQL recovery or foreign adoption.
+            if allow_not_started and current.error == "foreground_not_started":
+                return
+            raise RuntimeFailure("writer_not_stopped")
+        if not current.future.done():
+            raise RuntimeFailure("writer_not_stopped")
 
     def inspect_foreground_start(self, document_id: str, read: Callable[[], object]):
         """Track the synchronous original-run lookup through the same host drain.
@@ -446,7 +547,7 @@ class ManualRuntime:
         with slot.lock:
             current = self._foreground_for(slot, permit)
             self._require_open()
-            if current.future is None or not current.future.running():
+            if current.previous_host is not None or current.future is None or not current.future.running():
                 raise RuntimeFailure("writer_not_valid")
             if permit.stop_event.is_set():
                 raise RuntimeFailure("foreground_stopping")
@@ -482,8 +583,7 @@ class ManualRuntime:
         slot = self._slot(identity.document_id)
         with slot.lock:
             current = self._foreground_for(slot, permit)
-            if current.future is None or not current.future.done() or not current.settled.is_set():
-                raise RuntimeFailure("writer_not_stopped")
+            self._require_foreground_stopped(current)
             entry = slot.entry
             if entry is not None:
                 if entry.foreground is not permit or entry.identity != identity:
@@ -506,10 +606,12 @@ class ManualRuntime:
         slot = self._slot(permit.identity.document_id)
         with slot.lock:
             current = self._foreground_for(slot, permit)
-            if (not current.settled.is_set() or current.future is not None and not current.future.done()
-                    or slot.entry is not None):
+            self._require_foreground_stopped(current, allow_not_started=True)
+            if slot.entry is not None:
                 raise RuntimeFailure("writer_not_stopped")
             self._confirm(confirm_closed)
+            self._foreground_for(slot, permit)
+            self._require_foreground_stopped(current, allow_not_started=True)
             current.closed = True
 
     def create_document(self, request_key: UUID, title: str) -> str:
@@ -723,8 +825,7 @@ class ManualRuntime:
                 raise RuntimeFailure("writer_not_stopped")
             if entry.foreground is not None:
                 current = self._foreground_for(slot, entry.foreground)
-                if current.future is None or not current.future.done():
-                    raise RuntimeFailure("writer_not_stopped")
+                self._require_foreground_stopped(current)
             if entry.previous_host is not None:
                 try:
                     entry.previous_host.require_previous_stopped()

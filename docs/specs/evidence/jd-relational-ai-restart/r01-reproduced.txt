@@ -1,0 +1,49 @@
+F
+================================== FAILURES ===================================
+_ test_conflicting_saved_ai_and_manual_pending_is_rejected_before_any_recovery_write _
+
+    def test_conflicting_saved_ai_and_manual_pending_is_rejected_before_any_recovery_write():
+        runtime, record, _, graph, calls, _ = saved_turn()
+        manual = intent(record.document_id)
+        graph.update_state({"configurable": {"thread_id": record.document_id}},
+                           {"jd_manual_pending": _encode(manual.identity)}, as_node="consultant")
+        before = graph.get_state({"configurable": {"thread_id": record.document_id}})
+        try:
+            with pytest.raises((AiRuntimeError, RuntimeFailure)):
+                runtime.owner.finish_startup()
+            after = graph.get_state({"configurable": {"thread_id": record.document_id}})
+>           assert after.config == before.config and after.values == before.values
+E           AssertionError: assert ({'configurabl...3d092b69c6d'}} == {'configurabl...68813d45817'}}
+E
+E             Differing items:
+E             {'configurable': {'thread_id': '967bdc31-a274-440e-9c16-460328a7089c', 'checkpoint_ns': '', 'checkpoint_id': '1f1af210-fb76-6f2a-8003-63d092b69c6d'}} != {'configurable': {'thread_id': '967bdc31-a274-440e-9c16-460328a7089c', 'checkpoint_ns': '', 'checkpoint_id': '1f1af210-fb76-6f29-8002-668813d45817'}}
+E             Use -v to get more diff)
+
+tests\test_ai_restart.py:144: AssertionError
+
+During handling of the above exception, another exception occurred:
+
+    def test_conflicting_saved_ai_and_manual_pending_is_rejected_before_any_recovery_write():
+        runtime, record, _, graph, calls, _ = saved_turn()
+        manual = intent(record.document_id)
+        graph.update_state({"configurable": {"thread_id": record.document_id}},
+                           {"jd_manual_pending": _encode(manual.identity)}, as_node="consultant")
+        before = graph.get_state({"configurable": {"thread_id": record.document_id}})
+        try:
+            with pytest.raises((AiRuntimeError, RuntimeFailure)):
+                runtime.owner.finish_startup()
+            after = graph.get_state({"configurable": {"thread_id": record.document_id}})
+            assert after.config == before.config and after.values == before.values
+            assert not runtime.owner.ready and not runtime.owner.storage.recovered and calls == [1]
+        finally:
+>           assert runtime.owner.close(timeout=2)
+E           assert False
+E            +  where False = close(timeout=2)
+E            +    where close = <jd_relational.manual_runtime.ManualRuntime object at 0x0000021009AD6A20>.close
+E            +      where <jd_relational.manual_runtime.ManualRuntime object at 0x0000021009AD6A20> = <jd_relational.ai_runtime.AiRuntime object at 0x0000021006F7A4B0>.owner
+
+tests\test_ai_restart.py:147: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_ai_restart.py::test_conflicting_saved_ai_and_manual_pending_is_rejected_before_any_recovery_write
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 9 deselected in 1.00s

@@ -8,9 +8,12 @@
 
 **後續[本程序 AI 回合與工具](../../docs/specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)已接共同 owner／JdStorage。**原生 Agent 用 App 注入的身分及真 read 結果編輯；固定 SDK／真 PG 驗 AI→手改→AI、纯訪談不改及保存 ACK 遺失原結果恢復。同 owner 只允許一個 `AiRuntime`；`start` 同原請求回同 handle，App 自動收尾，`wait` 只觀察，`recover` 明示對帳且不重播模型或命令。最後253核心測試及14真PG通過，範圍重疊以結果稿為準。日常入口尚無聊天AI；新宿主AI恢復、Memory／source、選區、聊天HTTP／Web接合仍待完成。
 
+**[新宿主 AI 恢復](../../docs/specs/2026-09-13-jd-ai-restart-recovery-slice.md)已完成。**一般 App 啟動先由同 owner 查原 AI／人工 pending；相同 Agent 結構的檢視模式不開 provider、不重播工具。真新程序／PG四組及既有PG八組通過，最後相關離線293項通過；獨審互斥pending缺口已修。上一段的新宿主待辦由此成果取代；聊天HTTP／Web、Memory／source等仍待完成。
+
 ## 結構
 
 - `ai_runtime.py`／`consultant_tools.py`／`ai_checkpoints.py`：本機前景回合、generated 具名工具、原生固定 root／child 收尾；與人工共用 writer owner，不新增另一組業務規則或資料庫。原始輸入只在 START checkpoint 時仍查原 Saver payload；未保存必須明示，不以缺 run 當停止證據。
+- `inspection_model.py`：透過同一 Agent 工廠建立相容檢視結構；model／tool wraps 與原 after_model hook 明確停用執行。只讀 checkpoint，不構造供應商 SDK；不是任意 invoke 無副作用的沙盒。
 
 [回覆遺失驗收](../../docs/specs/2026-09-13-jd-browser-reply-loss-slice.md)已用真瀏覽器／PG確認：提交成功但回覆未到，重開查回原operation後恢復，沒有新POST／重複任務。重現入口是[測試專用說明](tests/support/ui_response_gate_notes.md)，不將回覆閘門加入產品。人工通知與AI回合接點沿[下一步前置](../../docs/specs/evidence/2026-09-13-jd-consultant-context-preflight.md)；仍未啟用模型。
 

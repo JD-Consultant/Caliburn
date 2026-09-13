@@ -77,6 +77,7 @@ class _Attempt:
     settling: Lock = field(default_factory=Lock)
     settled: Event = field(default_factory=Event)
     closure_error: str | None = None
+    previous_host: bool = False
 
 
 class AiRunHandle:
@@ -179,10 +180,71 @@ class AiRuntime:
         self.reads = ReadService(owner.storage, self.history, codec)
         self.changes = ChangeReadService(self.history, codec)
         self.source_resolver = source_resolver
-        owner.claim_foreground_coordinator()
         self._registry = Lock()  # Only handles, never graph/DB I/O.
         self._latest = {}
         self._starts = {}
+        owner.claim_foreground_coordinator(startup_recover=self._recover_previous)
+
+    def _recover_previous(self, document_id: str, timeout: float) -> int:
+        """Inspect original native state within the host's complete startup scan.
+
+        No model/tool is resumed. A foreign handle is adopted only through the
+        owner's real prior-host capability; absence of a local Future is never
+        substituted for that proof. Terminal turns remain read-only.
+        """
+        try:
+            observed = self.checkpoints.discover(document_id, self.codec.dataset_id)
+            with self._registry:
+                cached = self._latest.get(document_id)
+            if observed is None:
+                if cached is not None:
+                    raise AiRuntimeError("run_recovery_required")
+                return 0
+            record = observed.record
+            if cached is not None:
+                attempt = cached._attempt
+                if (not attempt.previous_host or attempt.record.run_id != record.run_id
+                        or attempt.record.request_digest != record.request_digest):
+                    raise AiRuntimeError("run_recovery_required")
+                if attempt.result is not None:
+                    return 0
+            elif record.status != "running":
+                # Already-closed output must still agree with the original
+                # tool calls and durable SQL results. Never repair a terminal
+                # record by guessing, replaying, or silently relabelling it.
+                bindings, receipts, missing = self._binding_receipts(observed, include_active=False)
+                if not observed.closed or missing or _pending_calls(observed.messages):
+                    raise AiRuntimeError("run_recovery_required")
+                _verify_saved_results(observed.messages, bindings, receipts, self.codec)
+                return 0
+            else:
+                identity = ForegroundIdentity(document_id, record.run_id, record.request_digest)
+                def confirm_original(actual):
+                    if (actual != identity or self.checkpoints.discover(document_id,
+                            self.codec.dataset_id) != observed):
+                        raise AiRuntimeError("run_recovery_required")
+                handle = self.owner.adopt_previous_foreground(identity, confirm_original)
+                human = next(m for m in observed.messages
+                    if isinstance(m, HumanMessage) and m.id == record.run_id)
+                attempt = _Attempt(record, human, handle=handle, previous_host=True)
+                with self._registry:
+                    self._latest[document_id] = AiRunHandle(self, attempt)
+            if not attempt.settling.acquire(blocking=False):
+                raise AiRuntimeError("run_recovery_pending")
+            try:
+                attempt.result = self._settle(attempt, timeout=timeout)
+                attempt.closure_error = None
+            except Exception:
+                attempt.closure_error = "run_recovery_required"
+                raise
+            finally:
+                attempt.settled.set()
+                attempt.settling.release()
+            return 1
+        except AiRuntimeError:
+            raise
+        except Exception:
+            raise AiRuntimeError("run_recovery_required") from None
 
     def start(self, document_id: str, run_id: str, text: str) -> AiRunHandle:
         record, human = new_run_record(self.codec.dataset_id, document_id, run_id, text)
@@ -320,7 +382,27 @@ class AiRuntime:
         if self.owner.checkpoints.read(document) is not None:
             raise AiRuntimeError("run_recovery_required")
 
-    def _settle(self, attempt):
+    def _binding_receipts(self, observed, *, include_active=True):
+        record = observed.record
+        bindings = decode_ai_bindings(observed.bindings, dataset_id=record.dataset_id,
+            document_id=record.document_id, run_id=record.run_id)
+        receipts, missing = {}, []
+        active = self.owner.status(record.document_id).identity if include_active else None
+        if active is not None and all(b.identity != active for b in bindings):
+            raise AiRuntimeError("invalid_ai_binding")
+        for binding in bindings:
+            verify_binding_message(binding, observed.messages)
+            found = self.owner.storage.lookup(binding.identity)
+            if found is not None and found.confirmed:
+                receipts[binding.identity.operation_id] = found
+            # A now-readable receipt does not clear an earlier uncertain SQL
+            # attempt in this host. Reconcile that original attempt too.
+            if binding.identity == active or found is None or not found.confirmed:
+                missing.append(binding)
+        missing.sort(key=lambda binding: binding.identity != active)
+        return bindings, receipts, missing
+
+    def _settle(self, attempt, *, timeout=10):
         try:
             permit = attempt.handle.permit
             execution = attempt.handle.wait(0)  # Actual run Future and callback have finished.
@@ -328,29 +410,13 @@ class AiRuntime:
             try:
                 observed = self.checkpoints.observe(record.document_id, record.run_id, record.dataset_id)
             except AiCheckpointError as error:
-                if error.code != "run_not_found":
+                if error.code != "run_not_found" or attempt.previous_host:
                     raise
                 self.owner.finish_foreground(permit, lambda: self._confirm_input_not_saved(attempt))
                 return AiRunResult(record.document_id, record.run_id, "failed", False, None)
             if observed.record.request_digest != record.request_digest:
                 raise AiRuntimeError("operation_conflict")
-            bindings = decode_ai_bindings(observed.bindings, dataset_id=record.dataset_id,
-                document_id=record.document_id, run_id=record.run_id)
-            receipts = {}
-            missing = []
-            active = self.owner.status(record.document_id).identity
-            if active is not None and all(b.identity != active for b in bindings):
-                raise AiRuntimeError("invalid_ai_binding")
-            for binding in bindings:
-                verify_binding_message(binding, observed.messages)
-                found = self.owner.storage.lookup(binding.identity)
-                if found is not None and found.confirmed:
-                    receipts[binding.identity.operation_id] = found
-                # A now-readable receipt does not clear the owner's earlier
-                # uncertain SQL attempt. Reconcile that original attempt too.
-                if binding.identity == active or found is None or not found.confirmed:
-                    missing.append(binding)
-            missing.sort(key=lambda b: b.identity != active)
+            bindings, receipts, missing = self._binding_receipts(observed)
             for binding in missing:
                 def confirm(identity, expected=binding.identity):
                     if identity != expected:
@@ -358,7 +424,7 @@ class AiRuntime:
                     latest = self.checkpoints.observe(record.document_id, record.run_id, record.dataset_id)
                     if latest.bindings != observed.bindings:
                         raise AiRuntimeError("run_recovery_required")
-                completion = self.owner.recover_foreground(permit, binding.identity, confirm, timeout=10)
+                completion = self.owner.recover_foreground(permit, binding.identity, confirm, timeout=timeout)
                 if completion.observation is None or not completion.observation.confirmed:
                     raise AiRuntimeError("run_recovery_required")
                 receipts[binding.identity.operation_id] = completion.observation
@@ -388,7 +454,8 @@ class AiRuntime:
                 latest = self.checkpoints.observe(record.document_id, record.run_id, record.dataset_id)
                 if latest.record != closed.record or latest.messages != closed.messages:
                     raise AiRuntimeError("run_recovery_required")
-                self.owner.checkpoints.read(record.document_id)  # Includes native idle / terminal gate.
+                if self.owner.checkpoints.read(record.document_id) is not None:
+                    raise AiRuntimeError("run_recovery_required")
             self.owner.finish_foreground(permit, confirm_closed)
             return self._result(closed)
         except AiRuntimeError:

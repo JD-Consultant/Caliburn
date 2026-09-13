@@ -1,15 +1,15 @@
 """Compose the configured manual App before starting an ASGI event loop.
 
-No model is opened here. The caller provides the compiled consultant graph;
-manual-only service uses an explicitly unavailable consultant node until the
-separately verified interview integration is supplied.
+No provider is opened here. The caller provides the compiled consultant graph;
+manual-only service retains the real Agent layout with execution disabled so
+startup can inspect and close interrupted turns without model/tool replay.
 """
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 
-from langgraph.graph import END, START, MessagesState, StateGraph
 from starlette.concurrency import run_in_threadpool
 
+from .ai_runtime import AiRuntime
 from .catalog_api import CatalogServices
 from .catalog_service import CatalogService
 from .change_reads import ChangeReadService
@@ -27,19 +27,15 @@ class ManagedAppError(ValueError):
 
 
 def unavailable_consultant():
-    def unavailable(state):
-        raise ManagedAppError("consultant_unavailable")
-    graph = StateGraph(MessagesState)
-    graph.add_node("consultant", unavailable)
-    graph.add_edge(START, "consultant")
-    graph.add_edge("consultant", END)
-    return graph.compile()
+    from .inspection_model import build_inspection_consultant_node
+    return build_inspection_consultant_node()
 
 
 @dataclass(frozen=True, repr=False)
 class ManagedApp:
     app: object
     opened: object
+    ai_runtime: AiRuntime
 
     @property
     def port(self):
@@ -54,6 +50,7 @@ def open_managed_app(file, *, consultant) -> ManagedApp:
     opened = open_configured_host(file, consultant=consultant)
     try:
         host, codec = opened.host, opened.codec
+        ai_runtime = AiRuntime(host.runtime, codec)
         history = HistoryReader(host.engine)
         services = CatalogServices(ReadService(host.runtime.storage, history, codec),
             ChangeReadService(history, codec), ManualService(host.runtime, history, codec),
@@ -77,7 +74,7 @@ def open_managed_app(file, *, consultant) -> ManagedApp:
 
         app = create_configured_api(resources, allowed_origins=opened.settings.allowed_origins,
             dataset_id=opened.settings.dataset_id)
-        return ManagedApp(app, opened)
+        return ManagedApp(app, opened, ai_runtime)
     except Exception:
         try:
             opened.close(timeout=10)

@@ -135,6 +135,8 @@ def _material(snapshot, document_id, run_id, dataset_id):
     record = AiRunRecord.model_validate(values.get("jd_ai_run"), strict=True)
     if record.document_id != document_id or record.dataset_id != dataset_id or record.run_id != run_id:
         raise ValueError()
+    if record.status == "running" and values.get("jd_manual_pending") is not None:
+        raise ValueError()  # Mutually exclusive admissions; do not partially repair either.
     messages = _messages(values.get("messages", []))
     humans = [m for m in messages if m.id == run_id]
     if len(humans) != 1 or not isinstance(humans[0], HumanMessage):
@@ -216,6 +218,10 @@ class AiRunCheckpoints:
                 or payload["jd_ai_read"] is not None):
             raise ValueError()
         record = AiRunRecord.model_validate(payload["jd_ai_run"], strict=True)
+        # Discovery selects the ID only from this exact saved START payload;
+        # root.values may still contain the previous terminal run here.
+        if run_id is None:
+            run_id = record.run_id
         incoming = _messages(payload["messages"])
         previous = _messages(root.values.get("messages", []))
         if (record.status != "running" or len(incoming) != 1
@@ -239,6 +245,24 @@ class AiRunCheckpoints:
             _uuid(document_id); _uuid(run_id); _uuid(dataset_id)
         except Exception:
             raise AiCheckpointError("invalid_input") from None
+        return self._observe_current(document_id, run_id, dataset_id)
+
+    def discover(self, document_id: str, dataset_id: str) -> AiRunObservation | None:
+        """Read one fixed current position without a caller-supplied run ID.
+
+        None means no AI material exists, not that a manual writer is absent or
+        another host has stopped. Unknown pending work and damaged prior AI
+        material block. This method never invokes/resumes or updates a graph.
+        """
+        try:
+            _uuid(document_id); _uuid(dataset_id)
+        except Exception:
+            raise AiCheckpointError("invalid_input") from None
+        return self._observe_current(document_id, None, dataset_id)
+
+    def _observe_current(self, document_id, run_id, dataset_id):
+        # Shared fixed-root decoder: discover never calls observe with a second
+        # latest read, which could select a different run during publication.
         latest = self._get({"configurable": {"thread_id": document_id}})
         try:
             if not isinstance(latest, StateSnapshot) or type(latest.values) is not dict:
@@ -246,6 +270,8 @@ class AiRunCheckpoints:
             # An absent initial checkpoint is not evidence of admission.
             root_config = _config(latest, document_id, "", empty=True)
             if root_config is None:
+                if run_id is None:
+                    return None
                 raise AiCheckpointError("run_not_found")
             root = self._get(root_config)
             if _config(root, document_id, "") != root_config:
@@ -262,10 +288,20 @@ class AiRunCheckpoints:
                 raise ValueError()
             raw_record = root.values.get("jd_ai_run")
             if raw_record is None:
+                if (root.next or root.tasks or root.interrupts
+                        or _messages(root.values.get("messages", []))
+                        or root.values.get("jd_model_view") is not None
+                        or root.values.get("jd_ai_read") is not None
+                        or ("jd_ai_bindings" in root.values and root.values["jd_ai_bindings"] != [])):
+                    raise ValueError()
+                if run_id is None:
+                    return None
                 raise AiCheckpointError("run_not_found")
             root_record = AiRunRecord.model_validate(raw_record, strict=True)
             if root_record.document_id != document_id or root_record.dataset_id != dataset_id:
                 raise ValueError()
+            if run_id is None:
+                run_id = root_record.run_id
             if root_record.run_id != run_id:
                 raise AiCheckpointError("run_not_found")
             material = _material(root, document_id, run_id, dataset_id)

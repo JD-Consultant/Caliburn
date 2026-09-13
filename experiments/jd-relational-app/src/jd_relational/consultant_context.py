@@ -259,13 +259,25 @@ def build_consultant_node(model, *, tools, guidance: str, extra_middleware=()):
     """
     from langchain.agents import create_agent
     from .consultant_model import ConfirmedChatAnthropic
-    if (not isinstance(model, ConfirmedChatAnthropic) or not model.streaming
-            or model.disable_streaming or not model.stream_usage or model.max_retries != 0
+    from .inspection_model import InspectionOnly, InspectionGuard
+    inspection = type(model) is InspectionOnly
+    provider_valid = (isinstance(model, ConfirmedChatAnthropic) and model.streaming
+        and not model.disable_streaming and model.stream_usage and model.max_retries == 0
+        and model.cache is False)
+    if ((not provider_valid and not inspection)
             or model.cache is not False
             or not isinstance(extra_middleware, (list, tuple))
             or any(not isinstance(value, AgentMiddleware) for value in extra_middleware)
             or not isinstance(guidance, str) or not guidance.strip()):
         raise ConsultantContextError("invalid_consultant_configuration")
+    middleware = [JdNoticeMiddleware(), *extra_middleware]
+    if inspection:
+        from .consultant_tools import AiToolMiddleware
+        # Only this known layout has its non-wrap hook guarded. Unknown hooks
+        # cannot be made inspection-only by wrapping model/tool execution.
+        if len(extra_middleware) != 1 or type(extra_middleware[0]) is not AiToolMiddleware:
+            raise ConsultantContextError("invalid_consultant_configuration")
+        middleware = [InspectionGuard(), JdNoticeMiddleware(), AiToolMiddleware(inspection_only=True)]
     return create_agent(model, tools=tools, system_prompt=guidance,
-        middleware=[JdNoticeMiddleware(), *extra_middleware], state_schema=ConsultantState,
+        middleware=middleware, state_schema=ConsultantState,
         context_schema=ConsultantContext)

@@ -13,6 +13,8 @@
 
 ## 1. 成品範圍與可觀察結果
 
+**最新 RS-4 新宿主接點：**[AI 原回合恢復](../specs/2026-09-13-jd-ai-restart-recovery-slice.md)完成同宿主 startup／foreign proof／原 receipt／native closed 接合；相同 Agent 檢視結構不開 provider、不重播。最終新程序真PG4 PASS、原PG回歸8 PASS、受影響293 PASS；先前全組1830 PASS／197 SKIP，最後互斥pending P2 已修並獨審關閉。這不包含聊天 HTTP、Memory／source 或自然模型驗收。
+
 **最新 RS-4 接點：**[本程序 AI 回合與具名工具](../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)已接同文件 owner、原生 after_model／sync checkpoint、共用 JD writer、取消／原 receipt 恢復與 App 自動閉合。真 PG 固定 SDK 完成 AI→手改→AI、純訪談及 COMMIT 回覆遺失；最後窄組253 PASS、真 PG14 PASS，完整範圍及首敗見結果稿。新宿主 AI 恢復、Memory／來源與聊天入口仍未接，不是完整 RS-4／自然品質完成。
 
 **先前 RS-4 通知接點：**[人工通知與模型回覆保存](../specs/2026-09-13-jd-consultant-context-slice.md)已完成 LangChain／Anthropic adapter 精確相容導入、真正 wire、同版 notice 及原生 Agent／PG Saver 接合。受影響 74 PASS（13 真 PG），全組及 ACL 補跑合計 1624 非 PG 案例通過／193 PG 未全跑；codegen 與獨立審查通過，交錯串流 P2 已修。這是固定離線回覆接點，沒有完整 AI 生命周期或自然品質完成宣稱。
@@ -21,7 +23,7 @@
 
 **最新實作進度：**[六章手動管理與恢復切片](../specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)完成 Read v2 穩定 UI 身分、React／Next／MUI 管理畫面、原操作與輸入世代恢復、同頁歷史；真瀏覽器完成多成果／要求、共用知識引用、未完成表單重開、任務移動、刪職責保留任務、封存恢復及續改。Python 全組1540 PASS／180 PG SKIP，Web 99 PASS、生成／TS／build PASS；受影響真 PG 與最終 DB head11 唯讀核對通過。独立審查提出的缺口已修，首敗／層級／未驗範圍以結果稿為準；不是完整 RS-3／AI 成品通過。[配置](../specs/2026-09-13-jd-managed-configuration-slice.md)及[文件目錄](../specs/2026-09-13-jd-catalog-http-slice.md)保留原成果。
 
-**唯一下一工作：**沿[本次接合界線](../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md#7-未完成界線與下一個最小工作)，先接新宿主原 AI pending 的安全恢復，再接聊天 HTTP 的原請求查回／狀態／取消與 Web。同程序 run／writer／自動閉合已有固定回應證據，不重做同層框架比較；跨程序仍须真 OS 退出證據，不能因沒 local Future 就 replay。來源 handle／Memory 採用隨相依接合，不以 placeholder 冒充；選區、其餘故障、歷史還原／整輪 JD 撤回沿契約續補。自然模型費用與真人驗收另外處理，Excel延後。
+**唯一下一工作：**沿[聊天契約前置](../specs/evidence/jd-relational-ai-restart/chat-contract-preflight.md)先補原生較舊回合定位與員工已保存 JD 預期版本的原子准入，固定相依 run descriptor／生成契約後接同 owner 的聊天 HTTP（查回／狀態／取消／恢复）及 Web。同程序與新宿主回合恢復已有固定證據，不重做同層框架比較；不以 GET 重送原訪談或新建 run 表。來源 handle／Memory 採用隨相依接合，不以 placeholder 冒充；選區、其餘故障、歷史還原／整輪 JD 撤回沿契約續補。自然模型費用與真人驗收另外處理，Excel延後。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 

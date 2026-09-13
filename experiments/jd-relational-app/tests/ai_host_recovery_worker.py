@@ -20,12 +20,18 @@ from langgraph.graph import START
 import pytest
 import sqlalchemy as sa
 
+from caliburn_memory import MemoryArtifacts, PublicationStore
+from caliburn_memory.repair import RepairWorkflow
+
 from jd_relational.ai_checkpoints import AiRunCheckpoints
 from jd_relational.ai_runtime import AiRuntime
 from jd_relational.consultant_context import build_consultant_node
 from jd_relational.consultant_tools import AiToolMiddleware, AiToolSession, build_jd_tools
+from jd_relational.conversation_sources import ConversationSourceCodec, ConversationSourceService
 from jd_relational.host_runtime import open_manual_host
 from jd_relational.inspection_model import build_inspection_consultant_node
+from jd_relational.memory_context import build_consultant_tools
+from jd_relational.memory_sources import MemorySourceReader
 from jd_relational.references import ReferenceCodec
 from jd_relational.storage import schema as db
 from jd_relational.storage.service import JdStorage
@@ -54,6 +60,30 @@ def _receipt(value):
     return json.loads(json.dumps(result, default=str))
 
 
+def conversation_sources(host):
+    return ConversationSourceService(AiRunCheckpoints(host.graph), ConversationSourceCodec(SIGNER, DATASET))
+
+
+def publication_for(host, document):
+    artifacts = MemoryArtifacts(host.store, document, source=MemorySourceReader(
+        conversation_sources(host), document))
+    return artifacts, PublicationStore(host.memory_engine, artifacts)
+
+
+def memory_state(host, document, operations):
+    """Actual published Memory head, body and this document's repair receipts."""
+    artifacts, publication = publication_for(host, document)
+    head = publication.current()
+    receipts = {op: None if (row := publication.receipt(op)) is None
+                else json.loads(json.dumps(asdict(row), default=str)) for op in operations}
+    if head is None:
+        return {"revision": 0, "receipts": receipts}
+    return {"revision": head.revision, "version_id": head.memory.version_id,
+        "processed_source": head.processed_source, "receipts": receipts,
+        "knowledge": artifacts.read_text("/memory/knowledge.md", head.memory),
+        "guide": artifacts.read_text("/memory/guide.md", head.memory)}
+
+
 def state(host, document):
     current = host.runtime.storage.read_current(document)
     observed = AiRunCheckpoints(host.graph).discover(document, DATASET)
@@ -74,13 +104,24 @@ def state(host, document):
         "messages": [m.model_dump(mode="json") for m in observed.messages],
         "bindings": observed.bindings, "model_view": observed.model_view,
         "read_binding": observed.read_binding, "root_config": observed.root_config,
-        "source_config": observed.source_config}
+        "source_config": observed.source_config,
+        "repair_bindings": observed.repair_bindings, "memory_view": observed.memory_view,
+        # Position only: staged patch/file bodies stay inside the fixed child.
+        "repair_child_next": None if observed.repair_checkpoint is None
+                             else observed.repair_checkpoint["next"]}
+    repairs = [] if ai is None else [b["operation_id"] for b in ai["repair_bindings"]]
     return {"document_id": document, "snapshot": current.snapshot,
+        "memory": memory_state(host, document, repairs),
         "revision_id": str(current.revision_id), "revision_number": current.revision_number,
         "archived": current.archived, "revision_count": revisions,
         "receipts": [_receipt(host.runtime.storage.get_operation(document, UUID(str(op)))) for op in operation_ids],
         "ai": ai, "root_next": list(fixed.next),
         "root_config": fixed.config, "root_metadata": fixed.metadata}
+
+
+def _repair(_payload):
+    return "repair_memory", {"edits": [{"path": "/memory/knowledge.md",
+        "diff": "@@\n-只做檢查。\n+只通報異常，維修由外包負責。"}]}
 
 
 def _second_write(payload):
@@ -106,7 +147,7 @@ def main(mode, manifest, report):
     common = {"pid": os.getpid(), "parent_pid": os.getppid(),
               "installation_id": INSTALLATION, "dataset_id": DATASET, "schema": SCHEMA}
     write(report.with_suffix(".boot.json"), common)
-    counts = {"model": 0, "tools": 0, "execute": 0, "setup": 0}
+    counts = {"model": 0, "tools": 0, "execute": 0, "setup": 0, "publish": 0, "patch": 0}
     release, entered, start_entered = Event(), Event(), Event()
     handles, documents, witness = [], [], {}
     with ExitStack() as stack:
@@ -141,20 +182,38 @@ def main(mode, manifest, report):
             def no_execute(*args, **kwargs):
                 counts["execute"] += 1
                 raise AssertionError("recovery_execute_forbidden")
+            def no_publish(*args, **kwargs):
+                counts["publish"] += 1
+                raise AssertionError("recovery_publish_forbidden")
+            def no_patch(*args, **kwargs):
+                counts["patch"] += 1
+                raise AssertionError("recovery_repair_node_forbidden")
             monkeypatch.setattr(InspectionOnly, "_generate", no_model)
             monkeypatch.setattr(InspectionGuard, "wrap_model_call", no_model)
             monkeypatch.setattr(InspectionGuard, "wrap_tool_call", no_tool)
             monkeypatch.setattr(JdStorage, "execute", no_execute)
+            # Recovery reconciles the original request; it never patches, saves
+            # or publishes Memory again. `reconcile` stays available on purpose.
+            monkeypatch.setattr(PublicationStore, "publish", no_publish)
+            monkeypatch.setattr(MemoryArtifacts, "save_memory", no_patch)
+            for node in ("_seed", "_edit", "_validate", "_save", "_prepare", "_publish"):
+                monkeypatch.setattr(RepairWorkflow, node, no_patch)
             child = build_inspection_consultant_node()
         else:
             plans = {"normal": [_read, _create, _final], "sql_pending": [_read, _create],
                 "commit_loss": [_read, _create, _read, _second_write],
-                "two_boundaries": [_final, _read, _create]}
-            model, requests = stack.enter_context(_offline_model(monkeypatch, plans[mode]))
-            child = build_consultant_node(model, tools=build_jd_tools(),
+                "two_boundaries": [_final, _read, _create],
+                "repair_reply_loss": [_final, _repair]}
+            tools = build_consultant_tools() if mode == "repair_reply_loss" else build_jd_tools()
+            model, requests = stack.enter_context(_offline_model(monkeypatch, plans[mode],
+                expected_tool_count=len(tools)))
+            child = build_consultant_node(model, tools=tools,
                 guidance="合成重啟驗收；只記錄員工描述的真實工作。", extra_middleware=[AiToolMiddleware()])
         host = open_manual_host(INSTALLATION, DATABASE_URL, checkpoint_schema=SCHEMA, consultant=child)
-        runtime = AiRuntime(host.runtime, ReferenceCodec(SIGNER, DATASET))
+        # Every mode wires the same host Memory resources the product app does;
+        # a host without them cannot verify a document that used C at all.
+        runtime = AiRuntime(host.runtime, ReferenceCodec(SIGNER, DATASET),
+            conversation_sources=conversation_sources(host), memory_engine=host.memory_engine)
         ready_before = host.runtime.ready
         assert ready_before is False
         recovered = host.runtime.finish_startup(timeout=30)
@@ -211,6 +270,44 @@ def main(mode, manifest, report):
                     witness["local_closure_suppressed"] = True
                     entered.set()
                 monkeypatch.setattr(runtime, "_finish_automatically", suppress_local_closure)
+            if mode == "repair_reply_loss":
+                # A completed first turn supplies the original source window,
+                # then Memory is seeded exactly as an operator fixture would.
+                first_run = str(uuid4())
+                assert runtime.start(document, first_run, "我只做檢查。",
+                    expected_revision_id=runtime.owner.storage.read_current(document).revision_id,
+                    ).wait(25).status == "completed"
+                artifacts, publication = publication_for(host, document)
+                version = artifacts.save_memory(knowledge="只做檢查。", guide="只做檢查")
+                publication.publish(publication.prepare(version, expected_revision=0,
+                    kind="consolidation",
+                    processed_source=conversation_sources(host).capture(document, first_run).source_ref))
+                witness["seeded_revision"] = publication.current().revision
+                losing = []
+                original_publish = PublicationStore.publish
+                def lose_repair_reply(self, request):
+                    if request.kind != "repair":
+                        return original_publish(self, request)
+                    losing.append(request.operation_id)
+                    try:
+                        return original_publish(self, request)
+                    finally:
+                        losing.pop()
+                def fault_publish_commit(connection):
+                    result = original_commit(connection)
+                    if losing:
+                        # The publication transaction really committed; only its
+                        # reply is lost, so no App may assume it did not happen.
+                        witness["repair_operation_id"] = losing[-1]
+                        witness["real_repair_commit_ack_lost"] = True
+                        raise OSError("synthetic_repair_reply_lost")
+                    return result
+                def suppress_repair_closure(attempt):
+                    witness["local_closure_suppressed"] = True
+                    entered.set()
+                monkeypatch.setattr(PublicationStore, "publish", lose_repair_reply)
+                monkeypatch.setattr(host.engine.dialect, "do_commit", fault_publish_commit)
+                monkeypatch.setattr(runtime, "_finish_automatically", suppress_repair_closure)
             if mode == "two_boundaries":
                 second = host.runtime.create_document(uuid4(), "合成 START 保留先前問答")
                 documents.append(second)

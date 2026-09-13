@@ -7,7 +7,7 @@ from uuid import uuid4
 
 import pytest
 from langchain.agents import create_agent
-from langchain.agents.middleware import AgentMiddleware
+from langchain.agents.middleware import AgentMiddleware, hook_config
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
@@ -37,6 +37,10 @@ def canonical(value):
 class AiToolMiddleware(AgentMiddleware):
     """Synthetic hook body; original native node name, no App binding claims."""
     state_schema = ConsultantState
+
+    @hook_config(can_jump_to=["end"])
+    def before_model(self, state, runtime):
+        return None
 
     def after_model(self, state, runtime):
         record, reply = state["jd_ai_run"], state["messages"][-1]

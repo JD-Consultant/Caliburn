@@ -1,8 +1,10 @@
 # JD App：收尾與未解事項
 
+**最新審核狀態（2026-09-13）：**Owner要求核對額度交接後方向。[審核結果](evidence/jd-memory-repair-integration/continuation-audit.md)確認正常C已有WIP接線與真PG固定SDK驗證；原session 3FAIL／1PASS只是交接前首敗。新重現CA-01「call已存、binding未存」、CA-02「C停原生START」兩個恢復缺口，仍OPEN；真新程序C驗證、封裝與本次獨審未完。下一按[接續計畫H2a–c](../plans/2026-09-13-jd-app-continuation-handoff.md)收尾，以下OI退出條件不變。
+
 更新：2026-09-13；JD-R002。依[最新決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及最近結果整理；只集中追蹤，不改需求、保存權責或既有授權。
 
-**目前可看／可驗：**隔離 App 的六章手動管理、真 DB 保存、重開、同頁聊天接點與逐次已保存差異已有實證。**尚不能稱可交付的 AI 專業顧問：**日常 AI 未啟用，Memory／原話來源與自然品質未完成；固定 SDK 回覆不是自然模型驗收。
+**目前可看／可驗：**隔離 App 的六章手動管理、真 DB 保存、重開、同頁聊天接點與已保存差異已有實證。既有非JD顧問的CT49／50真模型成果已完成，不能說成只有固定測試。**新App尚不能稱可交付：**完整顧問／Memory採用及新JD自然品質仍未完，日常AI未啟用；新工具的固定SDK回覆不代替新旅程真模型驗收。
 
 完整度分三層：內部展示可標明限制；受控自然試用須先閉合核心接線及該旅程可靠性；完整第一版仍履行原計畫的還原、撤回、維護與驗收。下列「可稍後」不是默默刪除承諾。技術細節由工程端處理，不要求 Owner 重選欄位或框架。Owner 本輪明確收斂為只看當輪 LLM 改動；從舊對話選看該輪整體改動不列缺口，既有保存歷史仍保留。
 
@@ -22,7 +24,8 @@
 - 已驗宿主：[Memory 資源／初始化／重開](2026-09-13-jd-memory-host-integration-slice.md)接同設定與原生 Store。受影響154、初始化33真PG、新Windows／PG1與原旅程回歸3通過；只有已登記讀取／既有前景的排空範圍，模型Memory／背景工作尚未接。普通open不setup，JD／原話不雙寫。
 - 已驗讀取：[固定 Memory／詳記／原話工具](2026-09-13-jd-memory-read-integration-slice.md)已接真正模型 request、原生四個只讀工具及 native 中斷／收尾。真 SDK／PG 三輪與新 Windows 宿主回歸通過；模型回覆及發布仍是合成測試，不是自然理解或 C／B1B2 已完成。沒有為本功能新增資料表或一般儲存引擎。
 - 已驗修補核心：[C 子圖／官方 patch／原結果查回](2026-09-13-jd-memory-repair-core-slice.md)已在正常套件；真 PG 更正及回覆遺失後原 request 查回、JD／原話保留通過。三個錯誤／結果核對缺口已修且獨審閉合；不等於 App 已有 C 工具／取消收尾或 B1B2。
-- 下一最小動作：把 C 核心接入原 call／原生固定 task／request 觀察、同 owner 的取消與未知結果門閘，完成同輪固定讀取更新；再接 B1B2 完整窗口／背景整理／真正執行與排空。專業指引與來源 UI 隨完整旅程接入。不要直接 import 研究路徑、重建另一份理解或讓當輪來源替代完整 Memory；未公開內部實作不猜。
+- 已驗App接合：[停止收尾、跨程序查回與封裝](2026-09-13-jd-memory-repair-app-integration-slice.md)已修CA-01／02，兩個確定未執行的停止位置能以同一原call收尾，其他位置與缺證據情形仍保持原門閘。真新Windows程序＋真PG的C回覆遺失查回（FH05）只憑原receipt對帳，publish／patch計數為0；乾淨venv完整依賴wheel隔離已通過。App全離線2737／套件130／真PG重啟5（範圍不累加）。這是C接合可驗收，不是完整顧問或自然品質通過。
+- 下一最小動作：採用已驗B1B2完整窗口／背景執行與排空，先交採用映射，再把專業指引及來源UI接入完整旅程。禁止重做原顧問、直接import研究路徑或新增另一份理解。技術細節與驗收沿接續計畫，不在本清單重複一份。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋
@@ -40,6 +43,7 @@
 ### OI-05｜深歷史與長訪談連續性：長訪談／完整首版阻擋
 - 現象／影響：歷史查找有 256 祖先上限及缺鏈出口，底層讀完整 messages；長上下文、壓縮與晚期更正尚未在新 App 完整驗證，不能把上限或缺鏈當「沒有原回合」。
 - 證據：[原回合查回结果](2026-09-13-jd-chat-admission-and-original-run-slice.md)、[聊天歷史界線](2026-09-13-jd-chat-http-slice.md)、[品質 Q09／Q13](2026-09-10-jd-product-quality-acceptance.md)。
+- 已知既有缺陷（2026-09-13 重現）：`tests/test_chat_api_postgres.py::test_http_ai_edit_results_match_original_receipt_change_and_history_after_manual_head_advance` 失敗。`chat_history.read` 的首頁取最新視窗、cursor 往舊移動（原碼註解明示），該測試卻期待 `messages[:1]` 是最舊一筆。`chat_history.py` 與測試自基準 `8403d7e2` 以來都未修改，已在該 tag 的獨立 worktree 重現同一斷言（1 failed／2 passed／5.64s）。**先確定分頁方向的正確語意再改**，不要為了綠燈改測試或翻轉既有 cursor 行為。
 - 下一最小動作：完成既定深歷史可操作查回及 context／Memory 交接，保留原話與原 request 身分；以一個超過現有查找窗口的合成流程核對，再接已規劃長訪談。
 - 退出條件：早期回合與來源仍可定位；超限／缺鏈可處理且不重播，壓縮／重開後早期工作與最新更正不遺失。
 

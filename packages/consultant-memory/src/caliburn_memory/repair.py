@@ -5,10 +5,13 @@ admission, the original saved request and any stopped-worker proof. This core
 does not resume itself or infer that an absent receipt permits another write.
 """
 from dataclasses import asdict, replace
+from collections.abc import Callable
 
 from deepagents.backends import StateBackend
 from deepagents.middleware.filesystem import FilesystemState
 from langgraph.graph import END, START, StateGraph
+from langgraph.graph.state import CompiledStateGraph
+from langgraph.runtime import Runtime
 from pydantic import BaseModel, ConfigDict, ValidationError
 
 from caliburn_memory.staging import PATHS, staged_texts, StagedMemoryValidationError
@@ -35,24 +38,45 @@ class RepairState(FilesystemState):
     outcome: dict | None
 
 
+def build_repair_graph(resolve_workflow: Callable[[Runtime], "RepairWorkflow"]) -> CompiledStateGraph:
+    """Compile the six native steps without resolving resources during inspection.
+
+    Each executing node resolves its workflow from the native run Runtime. The
+    App owns context/scope/admission checks; this core checks the returned type.
+    The per-invocation graph inherits its parent's Saver. No resolver, live
+    resource or side effect is needed to build or inspect the compiled graph.
+    """
+    if not callable(resolve_workflow):
+        raise TypeError("repair_workflow_resolver_required")
+
+    def step(name):
+        def execute(state: RepairState, runtime: Runtime):
+            workflow = resolve_workflow(runtime)
+            if not isinstance(workflow, RepairWorkflow):
+                raise TypeError("repair_workflow_unavailable")
+            return getattr(workflow, "_" + name)(state)
+        return execute
+
+    builder = StateGraph(RepairState)
+    for name in ("seed", "edit", "validate", "save", "prepare", "publish"):
+        builder.add_node(name, step(name))
+    builder.add_edge(START, "seed")
+    builder.add_conditional_edges("seed", lambda s: END if s["outcome"] else "edit")
+    builder.add_conditional_edges("edit", lambda s: END if s["outcome"] else
+        ("edit" if s["index"] < len(s["edits"]) else "validate"))
+    builder.add_conditional_edges("validate", lambda s: END if s["outcome"] else "save")
+    builder.add_edge("save", "prepare")
+    builder.add_edge("prepare", "publish")
+    builder.add_edge("publish", END)
+    return builder.compile()
+
+
 class RepairWorkflow:
     def __init__(self, artifacts, publication, source):
         self.artifacts, self.publication, self.source = artifacts, publication, source
         if len({artifacts.document_id, publication.document_id, source.document_id}) != 1:
             raise ValueError("Repair components belong to different documents")
-        builder = StateGraph(RepairState)
-        for name in ("seed", "edit", "validate", "save", "prepare", "publish"):
-            builder.add_node(name, getattr(self, "_" + name))
-        builder.add_edge(START, "seed")
-        builder.add_conditional_edges("seed", lambda s: END if s["outcome"] else "edit")
-        builder.add_conditional_edges("edit", lambda s: END if s["outcome"] else
-            ("edit" if s["index"] < len(s["edits"]) else "validate"))
-        builder.add_conditional_edges("validate", lambda s: END if s["outcome"] else "save")
-        builder.add_edge("save", "prepare")
-        builder.add_edge("prepare", "publish")
-        builder.add_edge("publish", END)
-        # Per-invocation subgraph inherits A's Saver and durable pending work.
-        self.graph = builder.compile()
+        self.graph = build_repair_graph(lambda runtime: self)
 
     def _feedback(self, status, head, detail, **extra):
         return {"status": status, "head": asdict(head) if head else None,

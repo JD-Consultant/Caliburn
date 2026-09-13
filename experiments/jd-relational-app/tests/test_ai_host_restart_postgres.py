@@ -1,4 +1,4 @@
-"""FH01–FH04: real Windows host/PG restart; only SDK traffic is synthetic.
+"""FH01–FH05: real Windows host/PG restart; only SDK traffic is synthetic.
 
 Opt-in only, fixed dedicated native schema initialized separately. No setup,
 DDL, deletion, provider call, fake Future or supplied stopped proof here.
@@ -105,7 +105,8 @@ def original(manifest):
 def check_recovered(result, count):
     assert result["event"] == "recovered" and result["ready_before"] is False and result["ready_after"] is True
     assert result["recovered_count"] == count
-    assert result["counts"] == {"model": 0, "tools": 0, "execute": 0, "setup": 0}
+    assert result["counts"] == {"model": 0, "tools": 0, "execute": 0, "setup": 0,
+                                "publish": 0, "patch": 0}
     for document in result["documents"]:
         assert document["root_next"] == []
         if document["ai"] is not None:
@@ -140,7 +141,7 @@ def test_fh01_normal_closed_run_is_exactly_read_only_after_real_host_restart():
     directory = evidence_directory()
     manifest = directory / "original.json"
     with worker("normal", directory, manifest) as (old, first, report):
-        assert first["event"] == "completed" and first["counts"] == {"model": 3, "tools": 2, "execute": 1, "setup": 0}
+        assert first["event"] == "completed" and first["counts"] == {"model": 3, "tools": 2, "execute": 1, "setup": 0, "publish": 0, "patch": 0}
         before = original(manifest)
         assert before["documents"][0]["ai"]["record"]["status"] == "completed"
         assert before["documents"][1]["archived"] is True
@@ -200,7 +201,7 @@ def test_fh04_after_model_before_sql_and_original_start_input_are_closed_togethe
     directory = evidence_directory()
     manifest = directory / "original.json"
     with worker("two_boundaries", directory, manifest) as (old, first, _):
-        assert first["event"] == "pending" and first["counts"] == {"model": 3, "tools": 1, "execute": 0, "setup": 0}
+        assert first["event"] == "pending" and first["counts"] == {"model": 3, "tools": 1, "execute": 0, "setup": 0, "publish": 0, "patch": 0}
         data = original(manifest)
         before_a, before_b = data["documents"]
         assert data["witness"]["after_model_binding_put_confirmed"]
@@ -220,4 +221,43 @@ def test_fh04_after_model_before_sql_and_original_start_input_are_closed_togethe
         new_result(before_a, after_a, 0, "save_failed")
         assert len(after_a["receipts"]) == 1 and after_b["receipts"] == []
         assert after_b["ai"]["messages"] == before_b["ai"]["messages"]
+        stop(new, report)
+
+
+def test_fh05_repair_commit_reply_loss_reconciles_the_original_receipt_after_restart():
+    """Real new Windows process, real PG, fixed SDK replies; not a natural model.
+
+    The repair publication really committed and only its reply was lost, so the
+    new host must close that same call from the original receipt alone: no
+    model, tool, patch, save or second publication may run.
+    """
+    directory = evidence_directory()
+    manifest = directory / "original.json"
+    with worker("repair_reply_loss", directory, manifest) as (old, first, _):
+        assert first["event"] == "pending" and first["counts"]["model"] == 2
+        assert first["witness"]["seeded_revision"] == 1
+        assert first["witness"]["real_repair_commit_ack_lost"]
+        assert first["witness"]["local_closure_suppressed"]
+        operation = first["witness"]["repair_operation_id"]
+        before = original(manifest)["documents"][0]
+        assert before["ai"]["record"]["status"] == "running" and not before["ai"]["closed"]
+        assert [b["operation_id"] for b in before["ai"]["repair_bindings"]] == [operation]
+        assert before["ai"]["repair_child_next"] == ["publish"]
+        assert before["ai"]["memory_view"]["revision"] == 1, "The turn-start view never moves."
+        assert before["memory"]["revision"] == 2
+        assert before["memory"]["receipts"][operation]["kind"] == "repair"
+        assert "維修由外包負責" in before["memory"]["knowledge"]
+        assert before["receipts"] == [] and before["revision_count"] == 1
+        crash(old)
+    with worker("recover", directory, manifest) as (new, result, report):
+        check_recovered(result, 1)
+        after = result["documents"][0]
+        preserved(before, after)
+        assert after["memory"] == before["memory"], "Recovery must not publish or patch again."
+        assert after["receipts"] == [] and after["ai"]["repair_bindings"] == before["ai"]["repair_bindings"]
+        message = next(m for m in after["ai"]["messages"]
+                       if m["type"] == "tool" and m["name"] == "repair_memory")
+        assert message["status"] == "success" and message["artifact"]["operation_id"] == operation
+        content = json.loads(message["content"])
+        assert content["status"] == "applied" and "operation_id" not in content
         stop(new, report)

@@ -38,6 +38,7 @@ class DocumentState(MessagesState):
     jd_ai_run: dict[str, Any] | None
     jd_ai_bindings: list[dict[str, Any]]
     jd_ai_read: dict[str, Any] | None
+    jd_memory_repair_bindings: list[dict[str, Any]]
 
 
 class _CheckpointGraph(Protocol):
@@ -59,8 +60,11 @@ def build_document_graph(
         raise CheckpointError("invalid_input") from None
     builder = StateGraph(DocumentState)
     builder.add_node("consultant", consultant)
+    from .memory_repair_session import build_repair_node
+    builder.add_node("memory_repair", build_repair_node())
     builder.add_edge(START, "consultant")
     builder.add_edge("consultant", END)
+    builder.add_edge("memory_repair", "consultant")
     return builder.compile(checkpointer=checkpointer, store=store)
 
 

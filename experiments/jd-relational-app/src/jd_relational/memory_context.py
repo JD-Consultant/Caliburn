@@ -118,8 +118,8 @@ class MemoryReadSession:
                 "guide": self.guide}
 
 
-def memory_session(runtime):
-    """Use App-owned context/state, never model-supplied document or version IDs."""
+def initial_memory_session(runtime):
+    """Validate and return the immutable view selected when this turn began."""
     try:
         context = runtime.context
         session = context.memory_session
@@ -132,6 +132,21 @@ def memory_session(runtime):
                 or context.stop_event is not None and context.stop_event.is_set()):
             raise ValueError()
         return session
+    except Exception:
+        raise MemoryReadError("invalid_memory_session") from None
+
+
+def memory_session(runtime):
+    """Return this turn's fixed read view, including an applied C result."""
+    initial = initial_memory_session(runtime)
+    repair = getattr(runtime.context, "memory_repair_session", None)
+    if repair is None:
+        return initial
+    try:
+        from .memory_repair_session import MemoryRepairSession
+        if not isinstance(repair, MemoryRepairSession) or repair.initial is not initial:
+            raise ValueError()
+        return repair.current_read(runtime.state)
     except Exception:
         raise MemoryReadError("invalid_memory_session") from None
 
@@ -170,4 +185,5 @@ def bind_memory_read_request(request):
 
 def build_consultant_tools():
     from .consultant_tools import build_jd_tools
-    return [*build_jd_tools(), *build_memory_read_tools()]
+    from .memory_repair_session import build_repair_tool
+    return [*build_jd_tools(), *build_memory_read_tools(), build_repair_tool()]

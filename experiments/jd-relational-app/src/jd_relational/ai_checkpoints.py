@@ -138,7 +138,11 @@ def _material(snapshot, document_id, run_id, dataset_id):
     view = _paired_view(values.get("jd_model_view"), messages, dataset_id, document_id)
     memory = checked_memory_view(values.get("jd_memory_view"), dataset_id=dataset_id,
         document_id=document_id, run_id=run_id)
-    return record, messages, deepcopy(bindings), view, deepcopy(read), memory
+    repairs = values.get("jd_memory_repair_bindings", [])
+    if type(repairs) is not list:
+        raise ValueError()
+    _canonical(repairs)  # The App owns binding/request identity and result checks.
+    return record, messages, deepcopy(bindings), view, deepcopy(read), memory, deepcopy(repairs)
 
 
 @dataclass(frozen=True, slots=True)
@@ -153,6 +157,9 @@ class AiRunObservation:
     _source_config_json: str = field(repr=False)
     closed: bool
     _memory_json: str = field(default="null", repr=False)
+    _repair_bindings_json: str = field(default="[]", repr=False)
+    _repair_checkpoint_json: str = field(default="null", repr=False)
+    _consultant_next_json: str = field(default="null", repr=False)
 
     @property
     def record(self): return parse_run_record_json(self._record_json)
@@ -166,6 +173,14 @@ class AiRunObservation:
     def read_binding(self): return json.loads(self._read_json)
     @property
     def memory_view(self): return json.loads(self._memory_json)
+    @property
+    def repair_bindings(self): return json.loads(self._repair_bindings_json)
+    @property
+    def repair_checkpoint(self): return json.loads(self._repair_checkpoint_json)
+    @property
+    def consultant_next(self):
+        """The consultant child's own native next step, when it is the stop layer."""
+        return json.loads(self._consultant_next_json)
     @property
     def root_config(self): return json.loads(self._root_config_json)
     @property
@@ -208,9 +223,12 @@ class AiRunCheckpoints:
             raise ValueError()
         payload = saved.checkpoint["channel_values"].get(START)
         required = {"jd_ai_run", "messages", "jd_ai_bindings", "jd_ai_read"}
-        if (type(payload) is not dict or set(payload) not in (required, required | {"jd_memory_view"})
+        optional = {"jd_memory_view", "jd_memory_repair_bindings"}
+        if (type(payload) is not dict or not required <= set(payload) or set(payload) - required - optional
                 or type(payload["jd_ai_bindings"]) is not list or payload["jd_ai_bindings"]
-                or payload["jd_ai_read"] is not None):
+                or payload["jd_ai_read"] is not None
+                or type(payload.get("jd_memory_repair_bindings", [])) is not list
+                or payload.get("jd_memory_repair_bindings", [])):
             raise ValueError()
         record = parse_run_record(payload["jd_ai_run"])
         # Discovery selects the ID only from this exact saved START payload;
@@ -235,7 +253,8 @@ class AiRunCheckpoints:
         values = {**root.values, **payload, "messages": add_messages(previous, incoming),
             # An older START payload has no selected Memory view. Never infer
             # one from the previous run still visible in the root channels.
-            "jd_memory_view": payload.get("jd_memory_view")}
+            "jd_memory_view": payload.get("jd_memory_view"),
+            "jd_memory_repair_bindings": payload.get("jd_memory_repair_bindings", [])}
         return _material(root._replace(values=values), document_id, run_id, dataset_id)
 
     def observe(self, document_id: str, run_id: str, dataset_id: str) -> AiRunObservation:
@@ -293,6 +312,66 @@ class AiRunCheckpoints:
         return self._observe_current(document_id, run_id, dataset_id, root_config=fixed,
                                      requested_source=source_config)
 
+    def _repair_input(self, fixed_config):
+        """Read the fixed child's own START payload, exactly as the root does.
+
+        LangGraph 1.2.11 keeps the original child input on its START channel
+        before the first child loop checkpoint. Shape only; the App repair
+        session owns operation/base/source/edit identity.
+        """
+        try:
+            saved = self._graph.checkpointer.get_tuple(fixed_config)
+        except Exception:
+            raise AiCheckpointError("checkpoint_unavailable") from None
+        if (saved is None or saved.checkpoint["id"] != fixed_config["configurable"]["checkpoint_id"]
+                or (saved.config or {}).get("configurable", {}).get("checkpoint_ns")
+                != fixed_config["configurable"]["checkpoint_ns"]
+                or saved.metadata.get("source") != "input"
+                or set(saved.checkpoint["channel_values"]) != {START}):
+            raise ValueError()
+        payload = saved.checkpoint["channel_values"][START]
+        if type(payload) is not dict:
+            raise ValueError()
+        return deepcopy(payload)
+
+    def _repair_position(self, task, document_id, *, source_only=False):
+        """One known static C layer, using native returned configs only.
+
+        State shape and task scope belong here. Original operation/request,
+        receipt and source semantics belong to the App repair session.
+        """
+        if type(task.id) is not str or not task.id or "\0" in task.id:
+            raise ValueError()
+        namespace = f"memory_repair:{task.id}"
+        if source_only:
+            # get_state(subgraphs=False) returns a native config signal. A
+            # pinned root conversation must not depend on C storage availability.
+            if (type(task.state) is not dict or type(task.state.get("configurable")) is not dict
+                    or task.state["configurable"].get("thread_id") != document_id
+                    or task.state["configurable"].get("checkpoint_ns") != namespace):
+                raise ValueError()
+            return None
+        if not isinstance(task.state, StateSnapshot):
+            raise ValueError()
+        fixed_config = _config(task.state, document_id, namespace, empty=True)
+        if fixed_config is None:
+            return None  # The native C task exists but has not checkpointed yet.
+        fixed = self._get(fixed_config)
+        if _config(fixed, document_id, namespace) != fixed_config or type(fixed.values) is not dict:
+            raise ValueError()
+        steps = {START, "seed", "edit", "validate", "save", "prepare", "publish"}
+        if (type(fixed.next) is not tuple or len(fixed.next) > 1
+                or any(step not in steps for step in fixed.next)
+                or type(fixed.tasks) is not tuple or len(fixed.tasks) > 1
+                or tuple(t.name for t in fixed.tasks) != fixed.next
+                or any(t.state is not None or type(t.id) is not str or not t.id for t in fixed.tasks)
+                or (not fixed.tasks and fixed.interrupts)):
+            raise ValueError()
+        position = {"config": fixed_config, "next": list(fixed.next), "values": deepcopy(fixed.values),
+            "input": self._repair_input(fixed_config) if fixed.next == (START,) else None}
+        _canonical(position)
+        return position
+
     def _observe_current(self, document_id, run_id, dataset_id, *, root_config=None, requested_source=None):
         # Shared fixed-root decoder: discover never calls observe with a second
         # latest read, which could select a different run during publication.
@@ -315,12 +394,13 @@ class AiRunCheckpoints:
             if root.next == (START,):
                 if requested_source is not None and requested_source != root_config:
                     raise ValueError()
-                record, messages, bindings, view, read, memory = self._initial_material(
+                record, messages, bindings, view, read, memory, repairs = self._initial_material(
                     root, root_config, document_id, run_id, dataset_id)
                 return AiRunObservation(_canonical(record.model_dump(mode="json")), _messages_json(messages),
                     _canonical(bindings), _canonical(view), _canonical(read), _canonical(root_config),
-                    _canonical(root_config), False, _memory_json=_canonical(memory))
-            if root.next not in ((), ("consultant",)):
+                    _canonical(root_config), False, _memory_json=_canonical(memory),
+                    _repair_bindings_json=_canonical(repairs))
+            if root.next not in ((), ("consultant",), ("memory_repair",)):
                 raise ValueError()
             raw_record = root.values.get("jd_ai_run")
             if raw_record is None:
@@ -329,7 +409,8 @@ class AiRunCheckpoints:
                         or root.values.get("jd_model_view") is not None
                         or root.values.get("jd_memory_view") is not None
                         or root.values.get("jd_ai_read") is not None
-                        or ("jd_ai_bindings" in root.values and root.values["jd_ai_bindings"] != [])):
+                        or ("jd_ai_bindings" in root.values and root.values["jd_ai_bindings"] != [])
+                        or root.values.get("jd_memory_repair_bindings", []) != []):
                     raise ValueError()
                 if run_id is None:
                     return None
@@ -343,7 +424,15 @@ class AiRunCheckpoints:
                 raise AiCheckpointError("run_not_found")
             material = _material(root, document_id, run_id, dataset_id)
             source_config = root_config
-            if root.tasks:
+            repair_checkpoint, consultant_next = None, None
+            if root.tasks and root.tasks[0].name == "memory_repair":
+                if len(root.tasks) != 1 or root.next not in ((), ("memory_repair",)):
+                    raise ValueError()
+                if requested_source is not None and requested_source != root_config:
+                    raise ValueError()
+                repair_checkpoint = self._repair_position(root.tasks[0], document_id,
+                    source_only=requested_source is not None)
+            elif root.tasks:
                 if len(root.tasks) != 1 or root.tasks[0].name != "consultant":
                     raise ValueError()
                 task = root.tasks[0]
@@ -371,6 +460,16 @@ class AiRunCheckpoints:
                         raise ValueError()
                     if any(t.state is not None for t in child.tasks):
                         raise ValueError()  # This root has exactly one child layer.
+                    if (type(child.next) is not tuple
+                            or any(type(step) is not str or not step for step in child.next)):
+                        raise ValueError()
+                    # Set ONLY on this branch, where the root's single pending
+                    # task is the consultant subgraph. AiRuntime reads that
+                    # provenance — not the step names — to conclude the root
+                    # never committed the fixed repair step. Never fill this
+                    # field from another branch: doing so would silently let a
+                    # stop inside C be closed as never executed.
+                    consultant_next = list(child.next)
                     child_material = _material(child, document_id, run_id, dataset_id)
                     # This read-only slice cannot refresh the selected Memory
                     # version inside a run; it is fixed by the original input.
@@ -384,11 +483,13 @@ class AiRunCheckpoints:
                 raise ValueError()
             elif requested_source is not None and requested_source != root_config:
                 raise ValueError()
-            record, messages, bindings, view, read, memory = material
+            record, messages, bindings, view, read, memory, repairs = material
             return AiRunObservation(_canonical(record.model_dump(mode="json")), _messages_json(messages),
                 _canonical(bindings), _canonical(view), _canonical(read), _canonical(root_config),
                 _canonical(source_config), not (root.next or root.tasks or root.interrupts),
-                _memory_json=_canonical(memory))
+                _memory_json=_canonical(memory), _repair_bindings_json=_canonical(repairs),
+                _repair_checkpoint_json=_canonical(repair_checkpoint),
+                _consultant_next_json=_canonical(consultant_next))
         except AiCheckpointError:
             raise
         except Exception:
@@ -435,10 +536,15 @@ class AiRunCheckpoints:
             _paired_view(model_view, proposed, record.dataset_id, record.document_id)
             memory = checked_memory_view(observed.memory_view, dataset_id=record.dataset_id,
                 document_id=record.document_id, run_id=record.run_id)
+            repairs = observed.repair_bindings
+            if type(repairs) is not list:
+                raise ValueError()
+            _canonical(repairs)
             target_record = record.model_copy(update={"status": status})
             desired = {"jd_ai_run": target_record.model_dump(mode="json"), "messages": proposed,
                 "jd_ai_bindings": deepcopy(bindings), "jd_model_view": deepcopy(model_view),
-                "jd_ai_read": deepcopy(read_binding), "jd_memory_view": deepcopy(memory)}
+                "jd_ai_read": deepcopy(read_binding), "jd_memory_view": deepcopy(memory),
+                "jd_memory_repair_bindings": deepcopy(repairs)}
         except Exception:
             raise AiCheckpointError("invalid_closure") from None
         current = self.observe(record.document_id, record.run_id, record.dataset_id)
@@ -447,7 +553,8 @@ class AiRunCheckpoints:
             return (result.closed and result.record == target_record
                 and _messages_json(result.messages) == _messages_json(proposed)
                 and result.bindings == bindings and result.model_view == model_view
-                and result.read_binding == read_binding and result.memory_view == memory)
+                and result.read_binding == read_binding and result.memory_view == memory
+                and result.repair_bindings == repairs)
 
         if exact(current):
             return current

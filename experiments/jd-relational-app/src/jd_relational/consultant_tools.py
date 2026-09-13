@@ -11,7 +11,7 @@ import json
 from typing import Any
 from uuid import UUID, uuid4
 
-from langchain.agents.middleware import AgentMiddleware, AgentState
+from langchain.agents.middleware import AgentMiddleware, AgentState, hook_config
 from langchain.tools import ToolRuntime
 from langchain_core.messages import AIMessage, ToolMessage
 from langchain_core.tools import StructuredTool
@@ -47,6 +47,7 @@ class AiToolPending(AiToolError):
 class AiToolState(AgentState):
     jd_ai_bindings: list[dict[str, Any]]
     jd_ai_read: dict[str, Any] | None
+    jd_memory_repair_bindings: list[dict[str, Any]]
 
 
 _BINDING_KEYS = frozenset({"format_version", "dataset_id", "document_id", "run_id", "message_id",
@@ -376,7 +377,7 @@ def _call_identity(call):
         raise AiToolError("invalid_tool_call") from None
 
 
-def _session(runtime):
+def _session(runtime, *, check_stop=True):
     try:
         context = runtime.context
         session = context.tool_session
@@ -384,7 +385,7 @@ def _session(runtime):
                 or any(getattr(context, key) != expected for key, expected in session.scope.items())
                 or get_config().get("configurable", {}).get("thread_id") != session.document_id):
             raise AiToolError("invalid_tool_session")
-        if session.permit.stop_event.is_set():
+        if check_stop and session.permit.stop_event.is_set():
             raise AiToolError("ai_run_stopped")
         return session
     except AiToolError:
@@ -411,10 +412,31 @@ class AiToolMiddleware(AgentMiddleware):
             raise AiToolError("invalid_tool_context")
         self._inspection_only = inspection_only
 
+    @hook_config(can_jump_to=["end"])
+    def before_model(self, state, runtime):
+        """Do not start another model call after the foreground stop signal."""
+        if self._inspection_only:
+            return None  # InspectionGuard owns the explicit disabled result.
+        session = _session(runtime, check_stop=False)
+        if session.permit.stop_event.is_set():
+            return {"jump_to": "end"}
+        return None
+
+    async def abefore_model(self, state, runtime):
+        return self.before_model(state, runtime)
+
     def after_model(self, state, runtime):
         if self._inspection_only:
             from .inspection_model import InspectionExecutionDisabled
             raise InspectionExecutionDisabled()
+        message = state.get("messages", ())[-1]
+        if (isinstance(message, AIMessage) and len(message.tool_calls) == 1
+                and message.tool_calls[0].get("name") == "repair_memory"):
+            # The App always supplies both foreground sessions. Validate the JD
+            # owner as well as C before binding the original provider call.
+            _session(runtime)
+            from .memory_repair_session import repair_session
+            return repair_session(runtime).prepare(state, runtime)
         return _session(runtime).prepare(state)
 
     async def aafter_model(self, state, runtime):
@@ -422,6 +444,19 @@ class AiToolMiddleware(AgentMiddleware):
         return await asyncio.to_thread(self.after_model, state, runtime)
 
     def wrap_tool_call(self, request, handler):
+        if request.tool_call.get("name") == "repair_memory":
+            _session(request.runtime)
+            from .memory_repair_session import repair_session
+            session = repair_session(request.runtime)
+            _, _, outcome, _ = session.prepared(request.state, request.tool_call.get("id"))
+            if outcome is not None:
+                return session.handoff(request.runtime)
+            try:
+                return handler(request)
+            except (AiToolError, GraphBubbleUp):
+                raise
+            except Exception:
+                raise AiToolError("ai_tool_unavailable") from None
         session = _session(request.runtime)
         prepared = session.prepared(request.tool_call, request.state)
         # Reject original inputs before ToolNode injects runtime or fires tool callbacks.
@@ -435,6 +470,19 @@ class AiToolMiddleware(AgentMiddleware):
             raise AiToolError("ai_tool_unavailable") from None
 
     async def awrap_tool_call(self, request, handler):
+        if request.tool_call.get("name") == "repair_memory":
+            _session(request.runtime)
+            from .memory_repair_session import repair_session
+            session = repair_session(request.runtime)
+            _, _, outcome, _ = session.prepared(request.state, request.tool_call.get("id"))
+            if outcome is not None:
+                return session.handoff(request.runtime)
+            try:
+                return await handler(request)
+            except (AiToolError, GraphBubbleUp):
+                raise
+            except Exception:
+                raise AiToolError("ai_tool_unavailable") from None
         session = _session(request.runtime)
         prepared = session.prepared(request.tool_call, request.state)
         if prepared.error is not None:
@@ -445,6 +493,14 @@ class AiToolMiddleware(AgentMiddleware):
             raise
         except Exception:
             raise AiToolError("ai_tool_unavailable") from None
+
+
+# LangChain names each middleware hook node after the middleware itself. This
+# is the node that binds an original repair call. A pinned snapshot listing it
+# as next means its writes are not applied there, so recovery reads it together
+# with the committed bindings, never as a claim on its own. Recovery matches
+# this exact name and keeps its gate when it does not appear.
+BINDING_NODE = f"{AiToolMiddleware.__name__}.after_model"
 
 
 def build_jd_tools() -> list[StructuredTool]:

@@ -14,6 +14,7 @@ from uuid import UUID, uuid4
 
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langgraph.graph import START
 from langgraph.types import StateSnapshot
 from langsmith import tracing_context
 
@@ -21,9 +22,12 @@ from .ai_checkpoints import AiCheckpointError, AiRunCheckpoints, new_run_record
 from .ai_history import AiRunHistory
 from .change_reads import ChangeReadService
 from .consultant_context import ConsultantContext, checked_model_view
-from .consultant_tools import AiToolSession, decode_ai_bindings, verify_binding_message
+from .consultant_tools import (
+    BINDING_NODE, AiToolSession, decode_ai_bindings, verify_binding_message,
+)
 from .conversation_sources import ConversationSourceService
 from .memory_context import MEMORY_READ_NAMES, MemoryReadSession
+from .memory_repair_session import MemoryRepairSession
 from .manual_runtime import ForegroundIdentity, ManualRuntime, RuntimeFailure
 from .notice_history import NoticeHistoryReader
 from .observation_projection import project_observation
@@ -162,24 +166,35 @@ def _not_executed():
         "next_action": "stop"})
 
 
-def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None):
+def _run_messages(messages, run_id):
+    """Slice exactly this run's own saved turn out of the shared conversation."""
+    positions = [i for i, m in enumerate(messages) if isinstance(m, HumanMessage) and m.id == run_id]
+    if len(positions) != 1 or any(isinstance(m, HumanMessage) for m in messages[positions[0] + 1:]):
+        raise AiRuntimeError("invalid_saved_conversation")
+    return messages[positions[0] + 1:]
+
+
+def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None,
+                          verified_repair_calls=frozenset()):
     """A stored tool success is evidence only when its original SQL receipt agrees."""
     if run_id is not None:
-        positions = [i for i, m in enumerate(messages) if isinstance(m, HumanMessage) and m.id == run_id]
-        if len(positions) != 1 or any(isinstance(m, HumanMessage) for m in messages[positions[0] + 1:]):
-            raise AiRuntimeError("invalid_saved_conversation")
-        messages = messages[positions[0] + 1:]
+        messages = _run_messages(messages, run_id)
     by_call = {(b.message_id, b.tool_call_id): b for b in bindings}
     active = {}
     for message in messages:
         if isinstance(message, AIMessage):
-            active = {call["id"]: (call["name"], by_call.get((message.id, call["id"]))) for call in message.tool_calls}
+            active = {call["id"]: (call["name"], by_call.get((message.id, call["id"])), message.id)
+                      for call in message.tool_calls}
         elif isinstance(message, ToolMessage):
             call = active.get(message.tool_call_id)
             if call is None:
                 raise AiRuntimeError("invalid_saved_tool_result")
-            name, binding = call
+            name, binding, message_id = call
             if binding is None:
+                if name == "repair_memory":
+                    if (message_id, message.tool_call_id) not in verified_repair_calls:
+                        raise AiRuntimeError("invalid_saved_tool_result")
+                    continue
                 # Read tools never bind writes. An unbound mutation is legal
                 # only as a validated pre-execution error, never a saved write.
                 if name not in {"jd_read", "jd_change_read", *MEMORY_READ_NAMES}:
@@ -239,6 +254,197 @@ class AiRuntime:
         self._starts = {}
         owner.claim_foreground_coordinator(startup_recover=self._recover_previous)
 
+    def _repair_material(self, observed, *, messages=None):
+        """Reopen the immutable turn-start view and project saved C results."""
+        from hashlib import sha256
+        from caliburn_memory import MemoryArtifacts, MemoryVersion, PublishedHead, PublicationStore
+        from .memory_context import checked_memory_view
+        from .memory_repair_records import decode_repair_bindings
+        from .memory_sources import MemorySourceReader
+
+        record = observed.record
+        bindings = decode_repair_bindings(observed.repair_bindings,
+            dataset_id=record.dataset_id, document_id=record.document_id, run_id=record.run_id)
+        if not bindings:
+            return None, bindings, None
+        if self.memory_engine is None or self.conversation_sources is None or self.graph.store is None:
+            raise ValueError()
+        view = checked_memory_view(observed.memory_view, dataset_id=record.dataset_id,
+            document_id=record.document_id, run_id=record.run_id)
+        first = bindings[0].base
+        if view is None or (view["revision"] == 0) != (first is None):
+            raise ValueError()
+        source = MemorySourceReader(self.conversation_sources, record.document_id)
+        artifacts = MemoryArtifacts(self.graph.store, record.document_id, source=source)
+        if first is None:
+            head, guide = None, ""
+        else:
+            head = PublishedHead(first["revision"], MemoryVersion(**first["memory"]),
+                first["processed_source"])
+            if (view["revision"] != head.revision or view["version_id"] != head.memory.version_id):
+                raise ValueError()
+            guide = artifacts.read_text("/memory/guide.md", head.memory)
+        if sha256(guide.encode("utf-8")).hexdigest() != view["guide_digest"]:
+            raise ValueError()
+        initial = MemoryReadSession(record.dataset_id, record.document_id, record.run_id,
+            artifacts, source, head, guide, artifacts.reader(head.memory if head else None))
+        session = MemoryRepairSession(initial, PublicationStore(self.memory_engine, artifacts))
+        progress = session.progress({"messages": observed.messages if messages is None else messages,
+            "jd_memory_repair_bindings": observed.repair_bindings})
+        return session, bindings, progress
+
+    def _repair_evidence(self, observed, *, messages=None):
+        """Validate saved C calls and their separate publication receipts.
+
+        JD receipts stay owned by `_binding_receipts`. A repair ToolMessage is
+        accepted only after its original binding/result and publication receipt
+        agree; a later background head may legitimately differ from the saved
+        tool feedback.
+        """
+        try:
+            from .memory_repair_session import unbound_repair_results
+            session, bindings, progress = self._repair_material(observed, messages=messages)
+            saved = observed.messages if messages is None else messages
+            # A call closed without any binding carries no operation, so it has
+            # no receipt to agree with; its own original call is the only proof.
+            # Earlier runs keep their own bindings, so scope this to this turn.
+            verified = set(unbound_repair_results(
+                _run_messages(saved, observed.record.run_id), bindings))
+            if session is None:
+                return frozenset(verified)
+            for binding, _, outcome, request in progress.results:
+                receipt = session.workflow.publication.receipt(binding.operation_id)
+                if outcome["status"] == "applied":
+                    confirmed = session.workflow.reconcile(request)
+                    if (receipt is None or confirmed.get("applied_head") != outcome.get("applied_head")
+                            or confirmed.get("source_reference") != binding.source_reference):
+                        raise ValueError()
+                elif receipt is not None:
+                    raise ValueError()
+                verified.add((binding.message_id, binding.tool_call_id))
+            return frozenset(verified)
+        except AiRuntimeError:
+            raise
+        except Exception:
+            raise AiRuntimeError("run_recovery_required") from None
+
+    def _close_unbound_repair(self, observed, messages, key, call, bindings, progress):
+        """Close an original call that never reached a binding at all.
+
+        The evidence is committed state, not an unapplied write: this run's
+        saved bindings hold nothing for this call, and the root's pending task
+        is still the consultant subgraph at its binding node. The tool node
+        therefore never returned `Command.PARENT`, so the fixed C node never
+        ran and no operation, base, source or request exists to record. Any
+        other stopped position keeps the foreground gate.
+        """
+        from .memory_repair_records import make_unbound_repair_message
+        if (observed.consultant_next != [BINDING_NODE] or observed.repair_checkpoint is not None
+                or (progress is not None and len(progress.results) != len(bindings))
+                or (progress is None and bindings)):
+            raise AiRuntimeError("run_recovery_required")
+        origins = [m for m in messages if isinstance(m, AIMessage) and m.id == key[0]]
+        if len(origins) != 1 or call.get("id") != key[1]:
+            raise ValueError()
+        return make_unbound_repair_message(origins[0], key[1]).model_copy(update={"id": str(uuid4())})
+
+    def _verify_repair_start(self, checkpoint, binding, call):
+        """Match the fixed child's own saved START input to this original call."""
+        from .memory_repair_records import parse_repair_input
+        payload = checkpoint.get("input")
+        if (type(payload) is not dict
+                or set(payload) != {"operation_id", "base", "source_reference", "edits"}
+                or payload["operation_id"] != binding.operation_id
+                or payload["base"] != binding.base
+                or payload["source_reference"] != binding.source_reference
+                or payload["edits"] != parse_repair_input(call.get("args"))):
+            raise AiRuntimeError("run_recovery_required")
+
+    def _recover_pending_repair(self, observed, messages, pending):
+        """Close one stopped C call from native request/receipt evidence only."""
+        from .memory_repair_records import (
+            NOT_EXECUTED_DETAIL, REPAIR_NAME, decode_repair_request, make_repair_message,
+        )
+        try:
+            repair_calls = [(key, call) for key, call in pending.items()
+                if call.get("name") == REPAIR_NAME]
+            if not repair_calls:
+                return None
+            if len(repair_calls) != 1:
+                raise ValueError()
+            session, bindings, progress = self._repair_material(observed, messages=messages)
+            key, call = repair_calls[0]
+            if key not in {(b.message_id, b.tool_call_id) for b in bindings}:
+                return self._close_unbound_repair(observed, messages, key, call, bindings, progress)
+            # A bound call came from a single-call response, so nothing else of
+            # that response can still be open beside it.
+            if (session is None or progress is None or not bindings or len(pending) != 1
+                    or len(progress.results) != len(bindings) - 1):
+                raise ValueError()
+            binding = bindings[-1]
+            if (key != (binding.message_id, binding.tool_call_id)
+                    or call.get("id") != binding.tool_call_id):
+                raise ValueError()
+            checkpoint = observed.repair_checkpoint
+            request, outcome = None, None
+            if checkpoint is not None:
+                values = checkpoint.get("values")
+                if type(values) is not dict:
+                    raise ValueError()
+                if values.get("request") is not None:
+                    request = decode_repair_request(values["request"], binding)
+                if values.get("outcome") is not None:
+                    outcome = values["outcome"]
+            receipt = session.workflow.publication.receipt(binding.operation_id)
+            if receipt is not None:
+                if request is None:
+                    raise ValueError()
+                outcome = session.workflow.reconcile(request)
+            elif request is not None and outcome is None:
+                # The saved publish request may have reached COMMIT even when a
+                # current receipt read cannot prove it. Keep the foreground gate.
+                raise AiRuntimeError("run_recovery_required")
+            elif outcome is None:
+                # The stopped native graph can prove publication was not
+                # reached only before the saved `publish` boundary. Earlier
+                # source/Store work may have run, so do not call this whole
+                # tool "not executed". A missing/corrupt later boundary stays
+                # unknown and keeps the foreground gate.
+                next_step = None if checkpoint is None else checkpoint.get("next")
+                if next_step == [START]:
+                    # The fixed child holds only its own START channel, so no
+                    # node has written state: not executed, not merely unpublished.
+                    self._verify_repair_start(checkpoint, binding, call)
+                    outcome = {"status": "not_executed", "detail": NOT_EXECUTED_DETAIL}
+                elif checkpoint is None:
+                    # Without a fixed child checkpoint the position must come
+                    # from the root. `consultant_next` is set only while the
+                    # root's single pending task is the consultant subgraph, so
+                    # its presence — not which step it names — proves the root
+                    # never committed the fixed repair step and C never ran.
+                    # Any other shape leaves the position unknown: a missing
+                    # child checkpoint plus a missing receipt is an absence of
+                    # evidence, not evidence.
+                    if observed.consultant_next is None:
+                        raise AiRuntimeError("run_recovery_required")
+                    outcome = {"status": "not_executed", "detail": NOT_EXECUTED_DETAIL}
+                elif (type(next_step) is not list or len(next_step) != 1
+                        or next_step[0] not in {"seed", "edit", "validate", "save", "prepare"}):
+                    raise AiRuntimeError("run_recovery_required")
+                else:
+                    outcome = {"status": "not_published",
+                        "detail": "Memory 更正未完成，沒有發布新版本；請在下一輪重新讀取後再判斷。"}
+            elif type(outcome) is not dict or outcome.get("status") == "applied":
+                # A publication and its receipt share one transaction, so a
+                # saved applied outcome without a receipt is not self-evidence.
+                raise AiRuntimeError("run_recovery_required")
+            return make_repair_message(binding, outcome, request,
+                failures_before=progress.failures).model_copy(update={"id": str(uuid4())})
+        except AiRuntimeError:
+            raise
+        except Exception:
+            raise AiRuntimeError("run_recovery_required") from None
+
     def _recover_previous(self, document_id: str, timeout: float) -> int:
         """Inspect original native state within the host's complete startup scan.
 
@@ -269,7 +475,9 @@ class AiRuntime:
                 bindings, receipts, missing = self._binding_receipts(observed, include_active=False)
                 if not observed.closed or missing or _pending_calls(observed.messages):
                     raise AiRuntimeError("run_recovery_required")
-                _verify_saved_results(observed.messages, bindings, receipts, self.codec, run_id=record.run_id)
+                repairs = self._repair_evidence(observed)
+                _verify_saved_results(observed.messages, bindings, receipts, self.codec,
+                    run_id=record.run_id, verified_repair_calls=repairs)
                 return 0
             else:
                 identity = ForegroundIdentity(document_id, record.run_id, record.request_digest)
@@ -377,7 +585,9 @@ class AiRuntime:
         bindings, receipts, missing = self._binding_receipts(original, include_active=False)
         if not original.closed or missing or _pending_calls(original.messages):
             raise AiRuntimeError("run_recovery_required")
-        _verify_saved_results(original.messages, bindings, receipts, self.codec, run_id=run_id)
+        repairs = self._repair_evidence(original)
+        _verify_saved_results(original.messages, bindings, receipts, self.codec,
+            run_id=run_id, verified_repair_calls=repairs)
         human = next(m for m in original.messages if isinstance(m, HumanMessage) and m.id == run_id)
         return AiRunHandle(self, _Attempt(original.record, human, result=self._result(original)))
 
@@ -466,7 +676,9 @@ class AiRuntime:
             if (not observed.closed or _pending_calls(observed.messages)
                     or set(by_id) != set(receipts) or any(not r.confirmed for r in receipts.values())):
                 raise AiRuntimeError("run_recovery_required")
-            _verify_saved_results(observed.messages, bindings, receipts, self.codec, run_id=run_id)
+            repairs = self._repair_evidence(observed)
+            _verify_saved_results(observed.messages, bindings, receipts, self.codec,
+                run_id=run_id, verified_repair_calls=repairs)
         response = self._public_response(observed)
         if terminal and (attempt is None or local_result is not None):
             if local_result is not None and (not local_result.input_saved or local_result.status != observed.record.status):
@@ -531,17 +743,24 @@ class AiRuntime:
         memory = MemoryReadSession.open(store=self.graph.store, engine=self.memory_engine,
             sources=self.conversation_sources, dataset_id=record.dataset_id,
             document_id=record.document_id, run_id=record.run_id) if self.memory_engine is not None else None
+        if memory is not None:
+            from caliburn_memory import PublicationStore
+            memory_repair = MemoryRepairSession(memory, PublicationStore(self.memory_engine, memory.artifacts))
+        else:
+            memory_repair = None
         context = ConsultantContext(record.dataset_id, record.document_id, record.run_id,
             self.notices, self.codec, notice, tool_session=session, stop_event=permit.stop_event,
             source_notice=self.conversation_sources.for_turn(record.document_id, record.run_id)
-                if self.conversation_sources is not None else None, memory_session=memory)
+                if self.conversation_sources is not None else None, memory_session=memory,
+            memory_repair_session=memory_repair)
         # Disable remote traces even if the parent shell enabled them. Safe App
         # diagnostics and the native local Saver remain their separate owners.
         with tracing_context(enabled=False):
             attempt.invoked = True
             self.graph.invoke({"messages": [attempt.human], "jd_ai_run": record.model_dump(mode="json"),
                 "jd_ai_bindings": [], "jd_ai_read": None,
-                "jd_memory_view": memory.view if memory else None}, config, context=context, durability="sync")
+                "jd_memory_view": memory.view if memory else None,
+                "jd_memory_repair_bindings": []}, config, context=context, durability="sync")
 
     @staticmethod
     def _result(observed):
@@ -637,7 +856,10 @@ class AiRuntime:
             messages = list(observed.messages)
             pending = _pending_calls(messages)
             by_call = {(b.message_id, b.tool_call_id): b for b in bindings}
-            _verify_saved_results(messages, bindings, receipts, self.codec, run_id=record.run_id)
+            recovered_repair = self._recover_pending_repair(observed, messages, pending)
+            if recovered_repair is not None:
+                messages.append(recovered_repair)
+                pending = _pending_calls(messages)
             for key, call in pending.items():
                 binding = by_call.get(key)
                 if binding is not None:
@@ -652,6 +874,9 @@ class AiRuntime:
                     content=read_json(value), status="error" if failed else "success"))
             if _pending_calls(messages):
                 raise AiRuntimeError("invalid_saved_conversation")
+            repairs = self._repair_evidence(observed, messages=messages)
+            _verify_saved_results(messages, bindings, receipts, self.codec, run_id=record.run_id,
+                verified_repair_calls=repairs)
             if observed.record.status != "running":
                 status = observed.record.status
             else:

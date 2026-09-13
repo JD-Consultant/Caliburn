@@ -80,6 +80,7 @@ class ConsultantState(AgentState):
     jd_ai_run: dict[str, Any] | None
     jd_ai_bindings: list[dict[str, Any]]
     jd_ai_read: dict[str, Any] | None
+    jd_memory_repair_bindings: list[dict[str, Any]]
 
 
 @dataclass(frozen=True)
@@ -97,6 +98,7 @@ class ConsultantContext:
     # supplying metadata; original bodies remain in their original messages.
     source_notice: Callable | None = None
     memory_session: object | None = None
+    memory_repair_session: object | None = None
 
     def __post_init__(self):
         try:
@@ -202,11 +204,11 @@ def _project(request):
             raise ConsultantContextError("source_not_available") from None
         blocks.append({"type": "text", "text": source})
     if context.memory_session is not None:
-        from .memory_context import memory_session
+        from .memory_context import initial_memory_session
         # ModelRequest state is the native step state, not a model parameter.
         from types import SimpleNamespace
-        memory = memory_session(SimpleNamespace(context=context, state=request.state,
-                                                store=request.runtime.store))
+        memory = initial_memory_session(SimpleNamespace(context=context, state=request.state,
+                                                        store=request.runtime.store))
         blocks.append({"type": "text", "text": _json(memory.notice())})
     projected = request.override(system_message=SystemMessage(content=blocks),
         model_settings=settings)

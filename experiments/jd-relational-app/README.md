@@ -1,5 +1,7 @@
 # 關聯式 JD：隔離編輯核心
 
+**目前狀態（2026-09-13）：**[Memory 更正的 App 接合可驗收](../../docs/specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。正常 `repair_memory` 與固定C子圖已接，`build_consultant_tools()` 為十個JD＋四個Memory讀取＋一個修補工具；正常C後讀取、部分故障、取消與原結果查回有真PG／固定SDK證據。審核提出的CA-01／02兩個未執行位置已修：確定沒有執行C的停止位置能以同一原call收尾，其他位置與缺證據情形維持原門閘。跨程序證據改由真新Windows程序的FH05提供，乾淨venv完整依賴wheel隔離已通過。既有非JD顧問已有限定真模型驗收，目前是新App採用未完；B1／B2、完整旅程與自然品質仍未完成，`enable_chat=False`。下文較早切片的「未接」與下一步是歷史界線，以本段為準。
+
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2、RS-3 第一段及 RS-4 通知／模型保存接點。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
 **最新：[同頁整輪改動](../../docs/specs/2026-09-13-jd-run-change-view-slice.md)承接聊天與原話保護。**整輪保存內容、完整前後對照、刪除原文與目前欄位提示沿同一歷史來源；只讀 GET 使用原生確認的固定範圍，Web 不計算業務差異。實測層级及獨審結果見結果稿；新畫面真瀏覽器互動未驗，先前 Fetch 原因仍 OPEN。未完成事項集中在[收尾清單](../../docs/specs/2026-09-13-jd-app-open-issues.md)；Memory／來源、還原撤回、日常 AI 與自然品質仍未完成，`enable_chat=False` 不因測試而改變。下文各切片較早「下一接 Web」為沿革。
@@ -16,7 +18,7 @@
 
 **顧問 Memory 讀取已接：**[固定選版／導覽／原話工具](../../docs/specs/2026-09-13-jd-memory-read-integration-slice.md)以正常 `build_consultant_tools()` 提供十個 JD 工具與四個只讀工具。`open_managed_app` 注入同宿主 Memory engine／原生 Store，前景入圖前固定讀取版本，native START／root／child／close 保留選版；中斷只核原结果不重播。原生 ToolRuntime 提供文件與回合身分，模型只填所需路徑／引用及讀取參數。真 SDK／PG 固定回覆與新宿主回歸通過；C／B1B2 寫入、完整顧問指引／日常 AI／自然品質仍待接，以下較早「模型工具未接」以此段及結果稿為準。
 
-**Memory 更正核心已可採用：**[C 六節點與原結果查回](../../docs/specs/2026-09-13-jd-memory-repair-core-slice.md)位於正常 `caliburn_memory` 套件，使用官方 patch／原生 staging／既有 publication；App 的來源 adapter 同步區分可修地址錯誤與服務故障。真 PG 驗兩檔更正、回覆遺失與新連線查回，JD／原話保留。尚未新增 `repair_memory` 模型工具；原 call／取消收尾／同輪讀取更新仍須接合，維持十四個現行工具及日常 AI 未啟用。
+**Memory 更正核心已可採用：**[C 六節點與原結果查回](../../docs/specs/2026-09-13-jd-memory-repair-core-slice.md)位於正常 `caliburn_memory` 套件，使用官方 patch／原生 staging／既有 publication；App 的來源 adapter 同步區分可修地址錯誤與服務故障。核心真PG驗兩檔更正、回覆遺失與新連線查回，JD／原話保留。後續已新增`repair_memory`接線；十五工具的WIP與恢復缺口見頁首，不把核心完成等同App全部完成。
 
 **Memory 核心接合：**[獨立套件與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)已驗保存／發布、固定版本讀取、後續修正与真 PG 重開；使用 `packages/consultant-memory` 正常依賴。`memory_sources.py` 只把同一原話 owner 綁到文件；新來源有 `conversation:` 前綴，既有裸 signed v1 原樣可讀。原話及 JD 不雙寫。[宿主 Memory 接合](../../docs/specs/2026-09-13-jd-memory-host-integration-slice.md)已完成一般 host 的獨立Store連線、原生Runtime.store、schema-mapped publication view、明示初始化及登記讀取排空；同設定新程序讀回原話／Memory通過。模型工具與背景整理／即時修補尚未接，不冒稱完整顧問可用。
 

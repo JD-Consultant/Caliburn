@@ -2,6 +2,8 @@
 
 2026-09-13；JD-R002／OI-02。接續[方向審核](evidence/jd-memory-repair-integration/continuation-audit.md)指出的兩個缺口，依[接續計畫 §5 H2–H3](../plans/2026-09-13-jd-app-continuation-handoff.md)完成。基準 `8403d7e2`／tag `jd-memory-repair-core-20260913`。0 provider、日常 `enable_chat=False`、ADR0060 不變。
 
+**提交後另經Owner要求複核：**`7181db63`／tag `jd-memory-repair-app-integration-20260913`；[複核稿](evidence/jd-memory-repair-integration/submitted-integration-review.md)保存新的獨立測試命令、結果及封裝產物路由。下列2740／22／130及原獨審過程是實作者的歷史紀錄；本次沒有找到該三組完整原始輸出與原獨審逐字產物，故不冒稱重新核實全部數字。新的窄跑、FH05及wheel檢查分開記錄。
+
 ## 完成效果與界線
 
 **兩個可重現的恢復缺口已修：**已停止但確定沒有執行 C 的回合，現在會用同一個原 call 收尾成明確的「未執行」終局，員工可以繼續手改與開新回合，Memory、JD 與原話都沒有被改寫。**新增真正跨程序的 C 查回：**Memory 發布已提交但回覆遺失時，真正的新 Windows 程序只憑原 receipt 對帳收尾，沒有第二次模型、patch、save 或發布。
@@ -77,7 +79,7 @@ F1 的可達性原本只由讀碼推得，本輪補上**真反例**：注入工�
 窄複核另提三點，處理如下：
 
 - **N1（已收）：**`consultant_next` 現在是安全承重點，但依據是它的**來源分支**（只有 root pending task 為 consultant 時才設值），不是它的值。兩處註解已改為明寫這條契約與「不得從其他分支填入」的後果，避免日後無聲退化。
-- **N2（部分收）：**`tool_handoff` 已加入真 PG 的端到端參數化，取得完整收尾／閘門解除／下一回合准入證據。多 call 情境仍只有單元層覆蓋——端到端需要固定 SDK 送出違反 `disable_parallel_tool_use` 的回應，會與既有 wire 斷言衝突，如實列為界線。
+- **N2（部分收）：**`tool_handoff` 已加入真 PG 的端到端參數化，取得完整收尾／閘門解除／下一回合准入證據。多call當時只有單元層覆蓋；提交後另補原生close診斷，仍未驗完整owner／HTTP流程。更正先前理由：outgoing wire要求`disable_parallel_tool_use`，不妨礙MockTransport刻意回不合約的多call；測試技術上可做，只是本次尚未執行，不作正常路徑的阻擋或新增產品要求。
 - **N3：**即上述 F2 嚴重度更正。
 
 **審查指出的覆蓋損失：**helper 改為所有模式都接 Memory 資源後，`memory_engine=None` 的 JD-only 宿主重啟不再有測試覆蓋。正式入口 `open_managed_app` 一律接上 Memory，因此這不是產品設定；如日後要支援該形態需另補案例。

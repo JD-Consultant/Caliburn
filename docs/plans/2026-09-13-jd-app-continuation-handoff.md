@@ -1,12 +1,12 @@
 # JD App 接續施工與交接計畫
 
-更新：2026-09-13；Topic JD-R002／OI-01、OI-02。**Owner 最新要求先審核額度交接後的方向與實作、補詳細計畫。**已完成[方向審核與兩個恢復反例](../specs/evidence/jd-memory-repair-integration/continuation-audit.md)；本次不擴寫產品功能，C 接合仍是未提交 WIP。原「額度前停止」是上次交接事件，不表示後续沒有施工。
+更新：2026-09-13；Topic JD-R002／OI-01、OI-02。**H2–H3 已提交為 `7181db63`，Owner要求的提交後複核見[審查結果](../specs/evidence/jd-memory-repair-integration/submitted-integration-review.md)。**先前方向審核保留當時首敗，不再代表目前停點。下一施工是H4採用映射；這次複核沒有開始H4。
 
 本文件負責「下一位從哪裡接、分步怎麼做、如何驗收」。產品總範圍仍由[總施工計畫](2026-09-13-jd-relational-app-implementation.md)負責，未解事項由[唯一清單](../specs/2026-09-13-jd-app-open-issues.md)負責，入口只維護[目前決策](../current-decisions.md)。不要重新讀完整舊聊天才能開工。
 
 ## 1. 先讀這一頁：現在停在哪裡
 
-**既有不含 JD 的訪談顧問與 Memory 已有真模型限定驗收成果；新關聯式 JD App 的完整採用及自然產稿驗收尚未完成。**已有真正的六章管理、人工保存、聊天與當輪 JD 改動接點。正在把已驗 Memory 即時修補 C 接到新 App 的原生 Agent 和取消／恢復流程，不是重新開發顧問的理解能力。既有 CT49／CT50 完成依據及適用界線見審核稿 §2。
+**既有不含 JD 的訪談顧問與 Memory 已有真模型限定驗收成果；新關聯式 JD App 的完整採用及自然產稿驗收尚未完成。**已有真正的六章管理、人工保存、聊天與當輪 JD 改動接點，Memory即時修補C的Agent／取消／恢復接合已完成。下一採用既有B1／B2，不是重新開發顧問的理解能力。既有 CT49／CT50 完成依據及適用界線見前次審核稿 §2。
 
 本輪取得的重要反例：把 C 子圖藏在工具函式內，即使提前建立，也不能經公開的原生子圖觀察讀到原發布請求。已用官方文件及有限實測選定：**工具將控制權交回根流程的固定 `memory_repair` 節點，該節點呼叫既有 C 子圖，完成後回顧問。**不增加第二個 Saver、資料表或通用定位引擎。
 
@@ -15,11 +15,11 @@
 | 工作區事實 | 交接值 |
 |---|---|
 | repo／branch | `S:/caliburn`；`refactor/current-only-architecture` |
-| 最後已提交且完成驗證的施工基準 | `8403d7e2e7904d2cd9db55a44bdeea26e105fd45` |
-| 對應本地 tag | `jd-memory-repair-core-20260913` |
+| 目前接續施工基準 | `7181db63f345b2ec91618cc169a29c624414afc2`；前一核心基準 `8403d7e2` |
+| 對應本地 tag | `jd-memory-repair-app-integration-20260913` |
 | 新 App | `experiments/jd-relational-app`；不是舊 Plate 的 `experiments/jd-editor` |
 | 獨立 Memory 套件 | `packages/consultant-memory`；新 App 已以正常 package 依賴使用 |
-| 本輪新增／修改 | **尚未提交的 WIP 與已通過局部測試的基礎**，見 §3；不能以 HEAD 推定它們不存在 |
+| H2–H3 提交範圍 | 已提交34檔；其餘既有dirty不屬本段，不reset或混入下一施工 |
 | 正式產品 | ADR0060 不變；ADR0074／0075 仍 Proposed；沒有正式切換 |
 | 模型費用 | 本輪 0 provider；固定模型／MockTransport 不等於真模型。日常 `enable_chat=False` |
 | 新增資料庫結構 | 本輪沒有新增表、migration 或 setup；原設定／真資料未清除 |
@@ -38,11 +38,13 @@
 
 框架為實現需求的選擇，不是 Owner 的永久偏好。已有[適用性比較](../specs/2026-09-13-jd-app-stack-selection.md)及鎖定版本，不因「最新」二字無據升級或重選；有反證才重開。
 
-## 3. 精確檔案狀態與測試基線
+## 3. 接續基準與前次交接歷史
 
-以下為 Owner 要求審核後的 working tree 狀態。相對路徑從 repo 根起算；接手先看 diff，不覆蓋其他 dirty。HEAD 仍是 C 核心基準，不能把未提交檔當不存在。
+**現況：**原call結果、固定C位置、CA-01／02及無checkpoint但有原生位置的收尾、FH05新宿主查回、adoption／wheel已在`7181db63`完成。下一先做H4映射。實作者完整紀錄見結果稿，提交後獨立窄跑與封裝複核見審查結果；不累加重疊測試數字。
 
-| 檔案／範圍 | 目前已有 | 還要完成 |
+**下表僅為提交前的交接歷史，不是現行待辦。**相對路徑從repo根起算；其「當時未完成」已由上述成果收尾，禁止照表重做。保留為首敗與實作責任對照。
+
+| 檔案／範圍 | 交接當時已有 | 交接當時未完成（現已由H2–H3收尾） |
 |---|---|---|
 | `packages/consultant-memory/src/caliburn_memory/repair.py`、`tests/test_repair_graph_factory.py` | 公開 factory；原流程共用同一六節點；完整套件最後130 PASS | adoption hash、乾淨 wheel 依賴驗證與本次獨審 |
 | `memory_repair_records.py`／`test_memory_repair_records.py` | 原call binding、edits、原request、content/artifact的嚴格核對；含 `not_published` | 配合 CA-01 明確表示無 binding 的原call未執行；不可用假發布結果補缺失 |
@@ -52,7 +54,7 @@
 | `ai_runtime.py` | 另核 C 的原request／publication receipt；同owner drain、未知門閘、終局查回 | CA-01／02；C真新宿主恢復；不混JD receipts |
 | `tests/test_consultant_memory_postgres.py` | 8 PASS：真PG＋固定SDK正常C、查回、故障、取消；重新開資源 | 同程序重開不算新程序；unknown中的稍後receipt由測試輔助建立，不是延遲真交易證據 |
 
-路徑未列前綴者位於 `experiments/jd-relational-app/src/jd_relational` 或對應 `tests`。受影響15檔最後435 PASS／11.35s，套件130 PASS／6.90s，PG全檔8 PASS／9.16s；本次審核未重跑這些整組，範圍不相加。完整證據、hash、限制見[審核稿 §3–4](../specs/evidence/jd-memory-repair-integration/continuation-audit.md)。**新增兩案重現失敗，H2／H3未完成，不能標本段可交付。**
+路徑未列前綴者位於 `experiments/jd-relational-app/src/jd_relational` 或對應 `tests`。前次交接數字為App435／套件130／PG8；兩案當時仍失敗，見[歷史審核 §3–4](../specs/evidence/jd-memory-repair-integration/continuation-audit.md)。它們不是本次最終驗證，也不代表H2／H3仍未完成；現在的结果見頁首路由。
 
 歷史首敗保留：交接前session缺模組，接著3 FAIL／1 PASS（15.18s），三案先止於`invalid_tool_session`；checkpoint首跑12 FAIL／10 PASS。這些已不是目前停點。接续另修過正常C終局誤回`run_recovery_required`與測試資料形狀；不能刪掉真scope／owner檢查只求綠燈。
 
@@ -126,7 +128,7 @@
 
 ### H2｜完成原結果收尾、取消與重啟
 
-**狀態：正常／取消／部分故障已驗，CA-01／02 未修；新 C 的真新程序證據缺少。按 H2a → H2b → H2c 執行，完成後進 H3，不新增另一層通用恢復系統。**
+**狀態：已完成並提交。**下列H2a–c保留實作規範與驗收依據，不是要求下一位重新執行整段。只有新反例才重開，不新增另一層通用恢復系統。
 
 #### H2a｜先把兩個審核探針轉成期待正確行為的紅測
 
@@ -162,8 +164,10 @@ close完成後查回應同時保留原run、messages、JD bindings、Memory view
 
 ### H3｜封裝、獨立審查與本段收尾
 
+**狀態：已完成；下列為保留的收尾規範。**本次提交後複核再次核對來源hash、乾淨venv與wheel，詳見審查結果。
+
 - 僅跑受影響核心／App／真 PG／Windows 新程序案例；範圍見 §7。有新失敗才擴測，不機械重跑幾千案例。
-- 更新 `packages/consultant-memory/adoption.json` 的實際檔hash／factory調整，保留採用來源commit；重建wheel，輸出來源集合／wheel hash。現有修補hash仍屬前一版，不能記完成。
+- `packages/consultant-memory/adoption.json` 已更新實際檔hash／factory調整並保留採用來源commit；wheel已重建。後續修改來源才重新更新hash／封裝，不沿用舊產物冒稱新版本。
 - 乾淨venv依App lock導出的限制安裝wheel及依賴；缺cache先記缺件，沿現有依賴補必要取得，不無據升級。核`caliburn_memory`確實從新wheel載入，沒有`analysis_agent`或舊checkout依賴；只建圖／import不開provider。先前借用App site-packages只算模組隔離smoke，不算此項完成。
 - 安排非作者審查 bindings／context／恢復／scope，修後窄複核；記首敗、最終結果及未驗層級。先確認可驗收再精確提交／本地tag，不混入無關dirty，不merge／push。
 - 結果寫 `docs/specs/` 並連 evidence；更新總計畫／OI-02／App README／package README，入口只短記狀態與下一步。這些完成只代表C接合，不等於整個產品。
@@ -245,7 +249,7 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 Remove-Item Env:JD_RELATIONAL_TEST_DB
 ```
 
-原 `test_memory_repair_postgres.py`只驗上一核心子圖；`test_consultant_memory_postgres.py`已有本次App C測試，`test_ai_host_restart_postgres.py`須補H2c的C資源與案例後才算新C驗證。Windows宿主測試在新Hidden helper跑；真正DPAPI／Win32需要該使用者token時依既有權限流程，不能改ACL或關安全檢查換PASS。
+原 `test_memory_repair_postgres.py`只驗核心子圖；`test_consultant_memory_postgres.py`有App C測試，`test_ai_host_restart_postgres.py`現已接C資源與FH05，才構成新C跨程序驗證。Windows宿主測試在新Hidden helper跑；真正DPAPI／Win32需要該使用者token時依既有權限流程，不能改ACL或關安全檢查換PASS。
 
 一般啟動不得 `setup()`／重建volume／清資料，後端reload保持關閉。只停止身分核實的自有helper，不按port任意kill。交接當下沒有本輪新產品服務需交付控制；舊服務是否存在接手須查證。
 
@@ -255,4 +259,4 @@ H1–H3 的 **C接合可驗收單位已完成**：正常同輪讀取、取消／
 
 這份交接不替下一位默認費用授權。**下一位不必重問是否繼續已同意需求；從 §5 的 H4 開始，先交採用映射。**不得再把「新App接合未完」描述成「原顧問未做完」，也不要重跑已完成的 H2／H3 反例當新工作。
 
-前次交接歷史：當時22處引用存在，另一代理只對當時交接完整性窄核PASS；不是程式獨審。**本次接續H2獨審未完成，不能沿用該PASS。**本次方向審核的實測、文件核對及剩餘問題見審核稿；沒有啟用日常模型或正式切換。
+前次交接的文件窄核不等於程式獨審。H2–H3施工的審查與修正紀錄見結果稿，提交後另一次獨立複核見審查結果，兩者不互相冒用；沒有啟用日常模型或正式切換。

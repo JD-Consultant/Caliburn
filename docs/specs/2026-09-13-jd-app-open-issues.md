@@ -1,6 +1,6 @@
 # JD App：收尾與未解事項
 
-**最新審核狀態（2026-09-13）：**Owner要求核對額度交接後方向。[審核結果](evidence/jd-memory-repair-integration/continuation-audit.md)確認正常C已有WIP接線與真PG固定SDK驗證；原session 3FAIL／1PASS只是交接前首敗。新重現CA-01「call已存、binding未存」、CA-02「C停原生START」兩個恢復缺口，仍OPEN；真新程序C驗證、封裝與本次獨審未完。下一按[接續計畫H2a–c](../plans/2026-09-13-jd-app-continuation-handoff.md)收尾，以下OI退出條件不變。
+**最新複核狀態（2026-09-13）：**[提交後審查](evidence/jd-memory-repair-integration/submitted-integration-review.md)核對`7181db63`，未發現新的程式阻擋；CA-01／02、FH05真新程序及wheel完整依賴再次核實。前次兩案OPEN及WIP僅為歷史，不再是目前待辦。H2–H3完成，下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)先做既有B1B2採用映射；OI-01／02整體退出條件仍未完成。
 
 更新：2026-09-13；JD-R002。依[最新決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及最近結果整理；只集中追蹤，不改需求、保存權責或既有授權。
 
@@ -24,7 +24,7 @@
 - 已驗宿主：[Memory 資源／初始化／重開](2026-09-13-jd-memory-host-integration-slice.md)接同設定與原生 Store。受影響154、初始化33真PG、新Windows／PG1與原旅程回歸3通過；只有已登記讀取／既有前景的排空範圍，模型Memory／背景工作尚未接。普通open不setup，JD／原話不雙寫。
 - 已驗讀取：[固定 Memory／詳記／原話工具](2026-09-13-jd-memory-read-integration-slice.md)已接真正模型 request、原生四個只讀工具及 native 中斷／收尾。真 SDK／PG 三輪與新 Windows 宿主回歸通過；模型回覆及發布仍是合成測試，不是自然理解或 C／B1B2 已完成。沒有為本功能新增資料表或一般儲存引擎。
 - 已驗修補核心：[C 子圖／官方 patch／原結果查回](2026-09-13-jd-memory-repair-core-slice.md)已在正常套件；真 PG 更正及回覆遺失後原 request 查回、JD／原話保留通過。三個錯誤／結果核對缺口已修且獨審閉合；不等於 App 已有 C 工具／取消收尾或 B1B2。
-- 已驗App接合：[停止收尾、跨程序查回與封裝](2026-09-13-jd-memory-repair-app-integration-slice.md)已修CA-01／02，兩個確定未執行的停止位置能以同一原call收尾，其他位置與缺證據情形仍保持原門閘。真新Windows程序＋真PG的C回覆遺失查回（FH05）只憑原receipt對帳，publish／patch計數為0；乾淨venv完整依賴wheel隔離已通過。App全離線2737／套件130／真PG重啟5（範圍不累加）。這是C接合可驗收，不是完整顧問或自然品質通過。
+- 已驗App接合：[停止收尾、跨程序查回與封裝](2026-09-13-jd-memory-repair-app-integration-slice.md)已修CA-01／02；缺證據仍保持門閘。FH05真新程序＋真PG只憑原receipt對帳，publish／patch為0；乾淨venv完整依賴wheel隔離已通過。實作者最終全組數字與本次獨立窄跑分別見結果稿／複核稿，本清單不再保存另一份易過時的數字。這是C接合可驗收，不是完整顧問或自然品質通過。
 - 下一最小動作：採用已驗B1B2完整窗口／背景執行與排空，先交採用映射，再把專業指引及來源UI接入完整旅程。禁止重做原顧問、直接import研究路徑或新增另一份理解。技術細節與驗收沿接續計畫，不在本清單重複一份。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 

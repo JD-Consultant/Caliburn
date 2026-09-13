@@ -490,7 +490,6 @@ class ConversationSourceService:
         identifier is never accepted as proof, and a cursor stopping inside a
         turn is refused rather than moving admission past that turn's speech.
         """
-        from .ai_history import AiRunHistory
         position = self._codec._resolve_window(reference, document_id)
         cursor = self._pinned(document_id, position.root_run_id, position.root_config())
         saved = [message.id for message in cursor.messages]
@@ -499,13 +498,23 @@ class ConversationSourceService:
                 or saved.index(position.first) > saved.index(position.last)
                 or saved != order[:len(saved)]):
             raise ConversationSourceError("invalid_ref")
-        root = observed.root_config["configurable"]["checkpoint_id"]
-        if position.root_checkpoint_id != root and not AiRunHistory(self._checkpoints).ancestor_of(
-                document_id, position.root_checkpoint_id, observed.root_config):
+        if not self._on_lineage(document_id, position.root_checkpoint_id, observed):
             raise ConversationSourceError("invalid_ref")
         if position.last not in {turn["last"] for turn in turns}:
             raise ConversationSourceError("invalid_ref")
         return order.index(position.last)
+
+    def _on_lineage(self, document_id, checkpoint_id, observed):
+        """Whether a pinned root really lies on this observed position's chain.
+
+        The position itself first, then the same bounded public parent walk
+        `find` uses. A sibling branch still reads back at its own root, so
+        being readable is never taken as proof of being on this chain.
+        """
+        from .ai_history import AiRunHistory
+        root = observed.root_config["configurable"]["checkpoint_id"]
+        return checkpoint_id == root or AiRunHistory(self._checkpoints).ancestor_of(
+            document_id, checkpoint_id, observed.root_config)
 
     def _after_cursor(self, observed, messages, turns, after_reference, document_id):
         """First settled turn the published cursor has not covered.
@@ -794,7 +803,10 @@ class ConversationSourceService:
         self._budgets(max_chars, context_chars)
         page = self.read_window(source_reference, document_id)
         position = self._codec._resolve_window(source_reference, document_id)
-        observed = self._pinned(document_id, position.last_run_id, position.root_config())
+        # One batch pins every window on the same root, so the position is read
+        # by the identity that root belongs to, not by this window's own last
+        # turn: only the final window of a batch shares the two.
+        observed = self._pinned(document_id, position.root_run_id, position.root_config())
         source_size = self._size(self._between(observed.messages, position.first, position.last))
         context_size = 0
         if context_reference is not None:
@@ -810,15 +822,25 @@ class ConversationSourceService:
     def follows(self, reference, previous, document_id) -> None:
         """Admit a new range only directly after the published one.
 
-        Compares saved conversation order, never identifiers or timestamps. An
-        overlapping, earlier, or turn-skipping range is refused rather than
-        treated as an implicit retry.
+        Each reference is checked at its own pinned position: the candidate
+        must sit on this document's canonical chain, and the published cursor
+        must be an ancestor of that very position, not merely of whatever is
+        latest. Order then comes from the candidate's own saved conversation,
+        never identifiers or timestamps. An overlapping, earlier, turn-skipping
+        or side-branch range is refused rather than treated as an implicit
+        retry: history that still reads back is not an admissible new input.
         """
         new = self._codec._resolve_window(reference, document_id)
-        observed, messages, turns = self._settled(document_id)
-        boundary = self._cursor_boundary(document_id, previous, observed, turns)
-        order = [message.id for message in messages]
+        current, _, _ = self._settled(document_id)
+        pinned = self._pinned(document_id, new.root_run_id, new.root_config())
+        if current is None or not self._on_lineage(document_id, new.root_checkpoint_id, current):
+            raise ConversationSourceError("invalid_ref")
+        turns = self._settled_turns(document_id, pinned.messages)
+        boundary = self._cursor_boundary(document_id, previous, pinned, turns)
+        order = [message.id for message in pinned.messages]
         if new.first not in order or order.index(new.first) <= boundary:
+            raise ConversationSourceError("invalid_ref")
+        if new.last not in {turn["last"] for turn in turns}:
             raise ConversationSourceError("invalid_ref")
         following = [turn for turn in turns if order.index(turn["first"]) > boundary]
         if not following or following[0]["first"] != new.first:

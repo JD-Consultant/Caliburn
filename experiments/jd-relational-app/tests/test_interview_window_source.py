@@ -18,7 +18,7 @@ import sqlalchemy as sa
 from sqlalchemy.pool import StaticPool
 
 from jd_relational.ai_checkpoints import AiCheckpointError, AiRunCheckpoints, new_run_record
-from jd_relational.ai_history import MAX_PARENT_LOOKUPS
+from jd_relational.ai_history import MAX_PARENT_LOOKUPS, AiRunHistory
 from jd_relational.conversation_sources import (
     ConversationSourceError, WindowBudgetExceeded, _ContextPosition, _WindowPosition,
 )
@@ -346,6 +346,30 @@ def test_a_saved_window_is_revalidated_without_being_replanned(interview, native
                                       document, max_chars=5, context_chars=1)
 
 
+def test_every_planned_window_in_a_batch_keeps_its_own_pair(interview, native):
+    """One batch pins every window on one root, yet only the last ends there.
+
+    Each pair is re-checked at the position it was issued, so a window in the
+    middle of the batch stays as readable as the final one, and a later turn
+    never moves what an already planned pair reads back.
+    """
+    windows, document, first_run, _ = interview
+    third = settled(native, [AIMessage(id="rv1", content="第三輪回覆")], text="第三輪原話")
+    planned = windows.plan_windows(document, first_run_id=first_run,
+                                   last_run_id=third.record.run_id, max_chars=20, context_chars=10)
+    assert len(planned) > 1
+    pages = []
+    for pair in planned:
+        pages.append(windows.read_window(pair["source_reference"], document))
+        windows.validate_saved_window(pair["source_reference"], pair["context_reference"],
+                                      document, max_chars=20, context_chars=10)
+    settled(native, [AIMessage(id="rv2", content="第四輪回覆")], text="第四輪原話")
+    for pair, page in zip(planned, pages):
+        assert windows.read_window(pair["source_reference"], document) == page
+        windows.validate_saved_window(pair["source_reference"], pair["context_reference"],
+                                      document, max_chars=20, context_chars=10)
+
+
 def test_admission_refuses_an_earlier_or_skipping_range(interview, native):
     windows, document, first_run, second_run = interview
     third = settled(native, [AIMessage(id="pa5", content="第三輪回覆")], text="第三輪原話")
@@ -468,3 +492,28 @@ def test_a_chain_deeper_than_the_lookup_bound_is_reported_not_assumed(interview,
                            {"jd_manual_pending": None}, as_node="consultant")
     with pytest.raises(AiCheckpointError, match="^original_run_lookup_required$"):
         windows.safe_turns(document)
+
+
+def test_a_candidate_window_on_a_sibling_branch_is_never_admitted(interview, native):
+    """Readable history is not an admissible input for the next batch.
+
+    Both siblings hold the same messages and the published cursor is a common
+    ancestor of each, so proving the cursor against whatever is latest says
+    nothing about where the candidate itself is pinned. Admission has to reach
+    the candidate's own position on this chain.
+    """
+    graph, dataset, document, *_ = native
+    windows, _, first_run, second_run = interview
+    previous = windows.capture_window(document, first_run_id=first_run, last_run_id=first_run)
+    parent = windows._codec._resolve_window(windows.capture_window(
+        document, first_run_id=second_run, last_run_id=second_run), document).root_config()
+    abandoned = graph.update_state(parent, {"jd_manual_pending": None}, as_node="consultant")
+    candidate = windows.capture_window(document, first_run_id=second_run, last_run_id=second_run)
+    position = windows._codec._resolve_window(candidate, document)
+    assert position.root_checkpoint_id == abandoned["configurable"]["checkpoint_id"]
+    head = graph.update_state(parent, {"jd_manual_pending": None}, as_node="consultant")
+    assert not AiRunHistory(windows._checkpoints).ancestor_of(
+        document, position.root_checkpoint_id, head)
+    windows.read_window(candidate, document)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.follows(candidate, previous, document)

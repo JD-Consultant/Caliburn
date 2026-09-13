@@ -5,6 +5,7 @@ description = "Caliburn Memory artifacts and atomic publication"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "deepagents==0.7.13",
+    "langchain==1.4.0",
     "langgraph==1.2.11",
     "markdown-it-py[linkify]==4.2.0",
     "openai-agents==0.22.0",

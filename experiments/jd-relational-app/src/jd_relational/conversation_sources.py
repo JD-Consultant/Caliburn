@@ -162,9 +162,15 @@ class _ContextPosition(BaseModel):
     It carries no range run bounds and has its own signature domain, so it can
     never be admitted as a range still awaiting consolidation. `root_run_id`
     is only the pinned position's own identity, needed to read it back.
+
+    `source_first`/`source_last` name the window this range was cut for, so the
+    pair itself is the proof: two contexts planned at one root for neighbouring
+    windows are both legitimate, and recombining them would disambiguate the
+    wrong speech. Version 2 adds that proof; a version 1 address carries none
+    and is refused rather than trusted.
     """
     model_config = ConfigDict(strict=True, extra="forbid", frozen=True, revalidate_instances="always")
-    format_version: int = Field(ge=1, le=1)
+    format_version: int = Field(ge=2, le=2)
     purpose: Literal["context"]
     dataset_id: str
     document_id: str
@@ -172,6 +178,8 @@ class _ContextPosition(BaseModel):
     root_run_id: str
     first: str = Field(min_length=1, max_length=512)
     last: str = Field(min_length=1, max_length=512)
+    source_first: str = Field(min_length=1, max_length=512)
+    source_last: str = Field(min_length=1, max_length=512)
 
     @field_validator("dataset_id", "document_id", "root_run_id")
     @classmethod
@@ -181,7 +189,8 @@ class _ContextPosition(BaseModel):
     @model_validator(mode="after")
     def position(self):
         if any("\0" in value or not value.strip()
-               for value in (self.root_checkpoint_id, self.first, self.last)):
+               for value in (self.root_checkpoint_id, self.first, self.last,
+                             self.source_first, self.source_last)):
             raise ValueError()
         return self
 
@@ -711,11 +720,13 @@ class ConversationSourceService:
             raise ConversationSourceError("source_not_available") from None
         return self._codec._issue_window(position)
 
-    def _issue_context_between(self, root, root_run_id, document_id, first, last):
+    def _issue_context_between(self, root, root_run_id, document_id, first, last,
+                               *, source_first, source_last):
         try:
-            position = _ContextPosition(format_version=1, purpose="context",
+            position = _ContextPosition(format_version=2, purpose="context",
                 dataset_id=self.dataset_id, document_id=document_id,
-                root_checkpoint_id=root, root_run_id=root_run_id, first=first, last=last)
+                root_checkpoint_id=root, root_run_id=root_run_id, first=first, last=last,
+                source_first=source_first, source_last=source_last)
         except Exception:
             raise ConversationSourceError("source_not_available") from None
         return self._codec._issue_context(position)
@@ -784,7 +795,7 @@ class ConversationSourceService:
             raise WindowBudgetExceeded("window_budget_exceeded")
         planned, index = [], first
         while index <= last:
-            context, used = None, 0
+            span, used = None, 0
             if index:
                 prior = groups[index - 1]
                 question = next((message for group in reversed(groups[:index])
@@ -795,20 +806,25 @@ class ConversationSourceService:
                     used = self._size(required)
                     if used > context_chars or used + sizes[index] > max_chars:
                         raise WindowBudgetExceeded("window_budget_exceeded")
-                    context = self._issue_context_between(root, root_run_id, document_id, question.id, prior[-1].id)
+                    span = (question.id, prior[-1].id)
                 # A whole prior turn is allowed only when it still carries the
                 # required question; it never replaces an older one.
                 if ((question is None or any(m.id == question.id for m in prior))
                         and sizes[index - 1] <= context_chars
                         and sizes[index - 1] + sizes[index] <= max_chars):
-                    context = self._issue_context_between(root, root_run_id, document_id, prior[0].id, prior[-1].id)
+                    span = (prior[0].id, prior[-1].id)
                     used = sizes[index - 1]
             end = index
             while end <= last and used + sizes[end] <= max_chars:
                 used += sizes[end]
                 end += 1
+            # The window is issued first so its context can name it: the pair is
+            # its own proof, and neighbouring pairs can never be recombined.
             planned.append({"source_reference": self._issue_window_between(
-                root, root_run_id, document_id, turns[index], turns[end - 1]), "context_reference": context})
+                root, root_run_id, document_id, turns[index], turns[end - 1]),
+                "context_reference": None if span is None else self._issue_context_between(
+                    root, root_run_id, document_id, *span,
+                    source_first=turns[index]["first"], source_last=turns[end - 1]["last"])})
             index = end
         return tuple(planned)
 
@@ -848,9 +864,8 @@ class ConversationSourceService:
         source_size = self._size(self._between(observed.messages, position.first, position.last))
         context_size = 0
         if context_reference is not None:
+            self.validate_window_pair(source_reference, context_reference, document_id)
             context = self._codec._resolve_context(context_reference, document_id)
-            if context.root_checkpoint_id != position.root_checkpoint_id:
-                raise ConversationSourceError("invalid_ref")
             context_size = self._size(self._between(observed.messages, context.first, context.last))
         if context_size > context_chars or context_size + source_size > max_chars:
             raise WindowBudgetExceeded("window_budget_exceeded")
@@ -912,6 +927,22 @@ class ConversationSourceService:
     def validate_context_reference(self, context_ref, document_id) -> None:
         """Shape, signature domain and scope only, with no storage I/O."""
         self._codec._resolve_context(context_ref, document_id)
+
+    def validate_window_pair(self, source_reference, context_reference, document_id) -> None:
+        """Prove this context was issued for exactly this window, with no I/O.
+
+        Same owner, same document, same fixed root, and the window bounds the
+        context itself records. Two contexts planned at one root for adjacent
+        windows are both valid addresses and both fit the same budget, so
+        neither of those is evidence of belonging together; re-extraction has
+        to continue on the prefix its own window was planned with.
+        """
+        position = self._codec._resolve_window(source_reference, document_id)
+        context = self._codec._resolve_context(context_reference, document_id)
+        if (context.root_checkpoint_id != position.root_checkpoint_id
+                or context.source_first != position.first
+                or context.source_last != position.last):
+            raise ConversationSourceError("invalid_ref")
 
     def validate_window_reference(self, window_ref, document_id) -> None:
         """Verify a completed-window locator issued by this same owner.

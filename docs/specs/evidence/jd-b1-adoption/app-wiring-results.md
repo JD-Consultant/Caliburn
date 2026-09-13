@@ -1,6 +1,6 @@
 # B1 OpenAI adapter 與固定接合測試完成
 
-2026-09-14；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與本輪工作單位定義，基準 `353c400b`／tag `jd-b1-core-adoption-20260913`；依[本片審查](app-wiring-review.md) F1–F4 與[複核](app-wiring-followup-review.md) P1／P2 修正後重寫。
+2026-09-14；JD-R002／OI-01、OI-02。依[採用映射 §6.2](../../2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)與本輪工作單位定義，基準 `353c400b`／tag `jd-b1-core-adoption-20260913`；依[本片審查](app-wiring-review.md) F1–F4 與[複核](app-wiring-followup-review.md) P1／P2／F-04 修正後重寫。
 
 **B1 是訪談資料整理進 Memory 的既有階段**，不是重新設計 JD 編輯器，也不是另一個使用者頁面。本片只把已完成的 B1 接上新 App 的來源 owner 與 OpenAI，**不重做 B1、不改整個顧問**。
 
@@ -14,6 +14,8 @@
 
 **因此本片不代表日常 App 已可使用 B1**，也不代表 H4 或完整旅程有進展。
 
+**審查追補（2026-09-14）：**`beb8aa8f` 已閉合祖先鏈例外的 adapter 邊界，但後續固定探針發現合法 source/context 可以交叉配對；本結果稿的 W-13 只證明正常保存 pair 的重抽，不證明錯配會被拒。B1 adapter 工作單位仍待 pair 完整性窄修與反例通過後才可關閉。
+
 ## 1. 只新增 App 端適配器
 
 新增兩個檔案層級的東西，其餘全部沿用：
@@ -24,6 +26,7 @@
 | `ConversationSourceService.read_context` 的 `turns` | 審查 F1：由同一 owner 在固定位置投影範圍內可證明的回合終局 |
 | `ConversationSourceService.plan_saved_windows` | 複核 P1：owner **直接收 window 引用**，在該引用自己的固定 root 上驗範圍與 lineage，並在同一 snapshot 切出所有 pair |
 | `ExtractionSourceAdapter._owner_errors` | 複核 P2：單一錯誤邊界，沿 owner 既有轉換把祖先鏈缺失／超限映射成 `source_not_available` |
+| `_ContextPosition` v2 ＋ `validate_window_pair` | 複核 F-04：context 引用自己記錄所屬窗口，pair 本身就是證明 |
 
 複核 P1 原本新增的 `window_bounds` 已**刪除**——它只為了那條錯誤流程存在。
 
@@ -54,6 +57,14 @@
 `plan_saved_windows` 走 `_on_lineage`／`_settled_turns` 時，祖先鏈缺失或超過 256 層查找上限會由 owner 拋出 `AiCheckpointError("original_run_lookup_required")`。adapter 原本只轉換 `ConversationSourceError`，所以 B1 呼叫端收到的是內部型別，而不是契約規定的 `source_not_available`。結果本來就是安全失敗（沒有模型呼叫、沒有 Store 產物、沒有 fallback），問題在錯誤邊界不一致。
 
 修法是把四個做 I/O 的方法收進同一個 `_owner_errors()` 邊界，**沿 owner 既有的 `_pinned` 轉換規則**（`invalid_input` → 可更正位址，其餘 → `source_not_available`）。owner 自己的 `safe_turns` 仍照契約 §8 明示 `original_run_lookup_required`，那是「受限」而不是「沒有更早的回合」，本片沒有改它。**沒有新增錯誤引擎、重試引擎、歷史索引或資料表。**
+
+### 複核 F-04：source/context 可以交叉配對
+
+同一 root 下相鄰兩個 planned window 的 `source_reference` 與另一個的 `context_reference` 組合起來，原本會被接受：`save_extraction` 只各自驗兩個 token，`source_window` 只各自讀回，`validate_saved_window` 只檢查同 root、範圍與預算。**沒有任何東西證明 context 屬於該 source 的原始規劃 pair**，重抽就可能拿到錯誤前文消歧。
+
+修法是讓 pair 自己成為證明，不新增資料表、第二個 cursor 或通用配對引擎：`_ContextPosition` 升到 **v2**，多帶 `source_first`／`source_last`（它被切給哪個窗口）。`_plan` 改成先發窗口、再用該窗口的界線發它的 context。新增 `validate_window_pair()`（無 I/O，只比對同 root 與 context 自己記錄的窗口界線），由三個地方共用：`validate_saved_window`（重抽）、`save_extraction`（保存）與 `source_window`（讀回）。v1 context 位址不帶證明，一律拒絕。
+
+**強制點收斂在有 context 授予的 reader**，也就是 B1 的 artifacts reader：那裡必須由 owner 證明。只讀工具與 C repair 的 source-only reader 兩個位址都是本輪 turn source、沒有 pair 概念，維持 H2–H3 已驗行為不變。
 
 ### 用途授予（原複核指定隨接合驗的三項之一）
 
@@ -95,10 +106,10 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 
 | 範圍 | 結果 |
 |---|---|
-| B1 接線案例（含審查與複核新增 6 例） | **19 passed** |
-| 完成窗口來源案例（含 context turns 與 P1 lineage 新例） | **39 passed** |
-| App 全離線測試 | **2798 passed／257 skipped／58.21s** |
-| Memory 套件全測 | **146 passed** |
+| B1 接線案例（含審查與複核新增 8 例） | **21 passed** |
+| 完成窗口來源案例（含 context turns、P1 lineage 與 F-04 pair 新例） | **42 passed** |
+| App 全離線測試 | **2803 passed／257 skipped／63.94s** |
+| Memory 套件全測（含跨 pair 拒絕新例） | **147 passed** |
 | 真 PostgreSQL 18：原話來源＋C 顧問接合＋Memory 核心 | **14 passed** |
 
 **測試環境差異須記錄：**複核者的環境有 31 個 `WinError 5` 暫存目錄權限錯誤，排除 Windows 設定檔測試後為 2762 passed，無法重現 2793。本機這次跑到 **2797 passed／257 skipped、0 error**，`test_config_file.py`／`test_configured_host*.py` 全過。這些案例用的是 pytest `tmp_path`，所以差異在系統 `TEMP` 的權限或防毒鎖檔，不在產品程式；可用 `pytest --basetemp=<可寫目錄>` 指定另一個位置再核。**在對方環境能跑完之前，不把「全綠」當成跨環境已證實。**
@@ -127,6 +138,8 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 | 固定 root 規劃（P1） | 追加新回合後，同一 saved window 規劃結果**逐字相同**，讀回不含新回合原話 |
 | sibling branch（P1） | 已放棄分支的 token 在 `start()` 即被拒，**0 次 HTTP**、Store 無產物；該 token 仍可作歷史讀取 |
 | 祖先查找上限（P2） | 超過 256 層時四個 I/O 方法與 `start()` 一致回 `source_not_available`（不是內部 `AiCheckpointError`），**0 次 HTTP**、Store 無產物、不回退 latest |
+| 原 pair 不可交叉（F-04） | 相鄰窗口的 source 與另一個 context 組合，在 `validate_saved_window`、`save_extraction` 與套件層皆被拒；v1 context 位址拒絕；不同 root 的 context 拒絕 |
+| 原 pair 往返（F-04） | 保存→`source_window` 讀回→重抽，三處拿到的都是同一對 |
 | 出站請求 | `store=false`、**不送已淘汰的 `truncation`**、`json_schema` + `strict=true`、三欄位 schema、8192、effort high |
 
 替身只有一個：provider 的 HTTP 傳輸（`httpx.MockTransport`，回覆經實際 SDK schema 驗證）。來源 owner、Saver、Store、SDK、結構化輸出綁定全部是真的。**0 provider、付費 0**；`api_key` 是必填參數，程式不讀環境變數、不內建任何端點。

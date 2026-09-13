@@ -61,3 +61,22 @@ class MemorySourceReader(SourceReader):
             if error.code == "invalid_ref":
                 raise InvalidSourceReference("invalid_source_reference") from error
             raise
+
+    def validate_pair(self, source_reference: str, context_reference: str) -> None:
+        """The owner proves the two were planned together; no storage I/O.
+
+        Only a reader granted the context purpose can hold a planned pair, and
+        that is B1's artifact reader: there the owner has to prove the two were
+        issued together, so a window cannot be recombined with a neighbouring
+        window's prefix. A source-only reader holds no context purpose at all —
+        both of its addresses are turn sources, already validated one by one,
+        and it keeps the behaviour the read tools and C repair were verified on.
+        """
+        if not self.context_references:
+            return
+        try:
+            self.service.validate_window_pair(source_reference, context_reference, self.document_id)
+        except ConversationSourceError as error:
+            if error.code == "invalid_ref":
+                raise InvalidSourceReference("invalid_source_reference") from error
+            raise

@@ -20,6 +20,7 @@ from sqlalchemy.pool import StaticPool
 from jd_relational.ai_checkpoints import AiCheckpointError, AiRunCheckpoints, new_run_record
 from jd_relational.ai_history import MAX_PARENT_LOOKUPS, AiRunHistory
 from jd_relational.conversation_sources import (
+    _CONTEXT_PREFIX,
     ConversationSourceError, WindowBudgetExceeded, _ContextPosition, _WindowPosition,
 )
 
@@ -402,6 +403,55 @@ def test_a_window_from_an_abandoned_branch_is_never_replanned_on_the_current_one
         windows.plan_saved_windows(abandoned, document, max_chars=24, context_chars=12)
 
 
+def test_a_context_belongs_to_one_planned_source_and_never_another(interview, native):
+    """Same root and same budget is not proof of the same planned pair.
+
+    Re-extraction must continue from the pair that was issued together. A
+    context cut for a different window would disambiguate the wrong speech,
+    so it is refused even though both tokens are legitimate here.
+    """
+    windows, document, first_run, _ = interview
+    third = settled(native, [AIMessage(id="pair3", content="第三輪回覆")], text="第三輪原話")
+    planned = windows.plan_windows(document, first_run_id=first_run,
+                                   last_run_id=third.record.run_id, max_chars=24, context_chars=12)
+    assert len(planned) > 1 and planned[-1]["context_reference"]
+    for pair in planned:
+        windows.validate_saved_window(pair["source_reference"], pair["context_reference"],
+                                      document, max_chars=24, context_chars=12)
+        if pair["context_reference"]:
+            windows.validate_window_pair(pair["source_reference"], pair["context_reference"], document)
+    crossed = (planned[0]["source_reference"], planned[-1]["context_reference"])
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.validate_saved_window(*crossed, document, max_chars=24, context_chars=12)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.validate_window_pair(*crossed, document)
+
+
+def test_a_context_from_another_root_is_never_paired(interview, native):
+    """A context planned at one fixed position cannot serve another."""
+    windows, document, first_run, second_run = interview
+    early = windows.plan_windows(document, first_run_id=first_run, last_run_id=second_run,
+                                 max_chars=20, context_chars=10)
+    third = settled(native, [AIMessage(id="pair4", content="第三輪回覆")], text="第三輪原話")
+    later = windows.plan_windows(document, first_run_id=first_run,
+                                 last_run_id=third.record.run_id, max_chars=24, context_chars=12)
+    context = next(pair["context_reference"] for pair in early if pair["context_reference"])
+    source = next(pair["source_reference"] for pair in later if pair["context_reference"])
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.validate_window_pair(source, context, document)
+
+
+def test_a_context_issued_before_the_pair_proof_is_refused(interview):
+    """An older context format carries no pair proof, so it cannot be trusted."""
+    windows, document, first_run, second_run = interview
+    legacy = _CONTEXT_PREFIX + windows._codec._context_serializer.dumps({
+        "format_version": 1, "purpose": "context", "dataset_id": windows.dataset_id,
+        "document_id": document, "root_checkpoint_id": "root-checkpoint-1",
+        "root_run_id": second_run, "first": first_run, "last": "a2"})
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.validate_context_reference(legacy, document)
+
+
 def test_a_context_range_reports_exactly_the_settled_turns_it_covers(interview, native):
     """Context is never a new source, but its terminals stay provable.
 
@@ -459,9 +509,10 @@ def test_admission_refuses_an_earlier_or_skipping_range(interview, native):
 
 def test_the_memory_reader_grants_window_and_context_separately(issued, native):
     sources, document, _, source_ref, window = issued
-    context = sources._codec._issue_context(_ContextPosition(format_version=1, purpose="context",
+    context = sources._codec._issue_context(_ContextPosition(format_version=2, purpose="context",
         dataset_id=sources.dataset_id, document_id=document,
-        root_checkpoint_id="r1", root_run_id=str(uuid4()), first="m1", last="m2"))
+        root_checkpoint_id="r1", root_run_id=str(uuid4()), first="m1", last="m2",
+        source_first="m1", source_last="m3"))
     publication_only = MemorySourceReader(sources, document, window_references=True)
     extraction = MemorySourceReader(sources, document, window_references=True,
                                     context_references=True)

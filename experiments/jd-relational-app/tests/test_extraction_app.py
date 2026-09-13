@@ -351,6 +351,40 @@ def test_a_reached_lookup_bound_is_reported_as_unavailable_not_an_internal_error
     assert not list(store.search(("q019-memory", document, "interviews")))
 
 
+def test_a_crossed_pair_is_refused_at_save_and_at_re_extraction(b1):
+    """Artifacts may only ever record the pair that was planned together."""
+    build, windows, document, whole, store, _, _ = b1
+    adapter = ExtractionSourceAdapter(windows, document)
+    planned = adapter.extraction_windows(whole, max_chars=24, context_chars=12)
+    assert len(planned) > 1 and planned[-1]["context_reference"]
+    artifacts = MemoryArtifacts(store, document, source=MemorySourceReader(
+        windows, document, window_references=True, context_references=True))
+    with pytest.raises(InvalidSourceReference):
+        artifacts.save_extraction(summary="詳記。", candidates="候選。", slug="交叉",
+                                  source_reference=planned[0]["source_reference"],
+                                  context_reference=planned[-1]["context_reference"])
+    with pytest.raises(InvalidSourceReference):
+        adapter.validate_saved_window(planned[0]["source_reference"],
+                                      planned[-1]["context_reference"],
+                                      max_chars=24, context_chars=12)
+
+
+def test_a_saved_pair_reads_back_and_re_extracts_as_the_pair_it_was_planned_as(b1):
+    """The whole round trip keeps one pair: save, read back, re-extract."""
+    build, windows, document, whole, store, sent, _ = b1
+    workflow = build(max_chars=24, context_chars=12)
+    result = workflow.start(whole)
+    artifacts = MemoryArtifacts(store, document, source=MemorySourceReader(
+        windows, document, window_references=True, context_references=True))
+    for saved in result["files"]:
+        assert artifacts.source_window(saved["summary_path"]) == {
+            "source_reference": saved["source_reference"],
+            "context_reference": saved["context_reference"]}
+    again = workflow.reextract(result["files"][-1]["summary_path"])
+    assert again["files"][0]["source_reference"] == result["files"][-1]["source_reference"]
+    assert again["files"][0]["context_reference"] == result["files"][-1]["context_reference"]
+
+
 def test_the_terminal_evidence_port_reads_only_public_provider_fields():
     assert accepted(AIMessage("好", response_metadata={"status": "completed"}))
     assert not accepted(AIMessage("好", response_metadata={"status": "incomplete"}))

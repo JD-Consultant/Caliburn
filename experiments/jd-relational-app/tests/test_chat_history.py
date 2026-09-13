@@ -139,7 +139,10 @@ def test_cursor_scope_and_purpose_rejected_without_fallback(native, fault):
     append(native, [AIMessage(id="one", content="one"), AIMessage(id="two", content="two")])
     first = service(native).read(document, limit=1)
     cursor, reader, target = first["next_cursor"], service(native), document
-    if fault == "changed": cursor = cursor[:-1] + ("X" if cursor[-1] != "X" else "Y")
+    # Mutate the first payload character, not the last: a base64url tail
+    # character carries padding bits that decode away, so flipping it leaves
+    # the signature valid about one time in seventeen.
+    if fault == "changed": cursor = ("X" if cursor[0] != "X" else "Y") + cursor[1:]
     elif fault == "dataset": reader = service(native, dataset=str(uuid4()))
     elif fault == "document": target = str(uuid4())
     elif fault == "key": reader = service(native, key=b"another-synthetic-chat-page-key!!")

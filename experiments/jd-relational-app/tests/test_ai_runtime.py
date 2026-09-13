@@ -219,6 +219,33 @@ def test_unanswered_read_is_closed_with_error_without_reinvoking_the_model(make_
     assert saved[-1].tool_call_id == "read-call" and saved[-1].name == "jd_read"
 
 
+@pytest.mark.parametrize("name", ["ls", "grep", "read_file", "read_conversation"])
+@pytest.mark.parametrize("answered", [False, True])
+def test_memory_reads_close_without_write_receipts_or_replay(make_runtime, name, answered):
+    make, _ = make_runtime
+    def read_call(state):
+        messages = [AIMessage(id="memory-call-message", content="", tool_calls=[
+            {"id": "memory-call", "name": name, "args": {}}])]
+        if answered:
+            messages.extend([ToolMessage(id="memory-result", name=name, tool_call_id="memory-call",
+                content="合成原生讀取結果", status="success"), AIMessage(id="memory-final", content="合成回覆")])
+        return {"messages": messages}
+    runtime, graph, calls = make(read_call)
+    document, run = str(uuid4()), str(uuid4())
+    result = runtime.start(document, run, "回查工作理解", expected_revision_id=HEAD).wait(5)
+    assert result.status == ("completed" if answered else "failed")
+    saved = graph.get_state({"configurable": {"thread_id": document}}).values["messages"]
+    assert not _pending_calls(saved) and len(calls) == 1
+    tool = next(m for m in saved if isinstance(m, ToolMessage))
+    if answered:
+        assert tool.content == "合成原生讀取結果" and tool.status == "success"
+    else:
+        assert tool.status == "error" and json.loads(tool.content) == {
+            "error": "memory_read_not_completed", "next_action": "stop"}
+    assert runtime.lookup(document, run).wait() == result
+    assert len(calls) == 1 and not runtime.owner.storage.executed
+
+
 def test_start_checkpoint_error_uses_a_fixed_public_code(make_runtime):
     make, _ = make_runtime
     runtime, graph, _ = make()

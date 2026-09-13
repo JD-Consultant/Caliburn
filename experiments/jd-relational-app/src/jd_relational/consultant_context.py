@@ -75,6 +75,7 @@ class ModelView(BaseModel):
 
 
 class ConsultantState(AgentState):
+    jd_memory_view: dict[str, Any] | None
     jd_model_view: dict[str, Any] | None
     jd_ai_run: dict[str, Any] | None
     jd_ai_bindings: list[dict[str, Any]]
@@ -95,6 +96,7 @@ class ConsultantContext:
     # Trusted, run-scoped source owner. It validates the actual request before
     # supplying metadata; original bodies remain in their original messages.
     source_notice: Callable | None = None
+    memory_session: object | None = None
 
     def __post_init__(self):
         try:
@@ -199,6 +201,13 @@ def _project(request):
         except Exception:
             raise ConsultantContextError("source_not_available") from None
         blocks.append({"type": "text", "text": source})
+    if context.memory_session is not None:
+        from .memory_context import memory_session
+        # ModelRequest state is the native step state, not a model parameter.
+        from types import SimpleNamespace
+        memory = memory_session(SimpleNamespace(context=context, state=request.state,
+                                                store=request.runtime.store))
+        blocks.append({"type": "text", "text": _json(memory.notice())})
     projected = request.override(system_message=SystemMessage(content=blocks),
         model_settings=settings)
     return projected, context, current.head, text

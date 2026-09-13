@@ -111,6 +111,9 @@ def _paired_view(value, messages, dataset_id, document_id):
 
 
 def _material(snapshot, document_id, run_id, dataset_id):
+    # The source owner also depends on this checkpoint adapter. Load only the
+    # shared pure binding validator here, without opening Memory resources.
+    from .memory_context import checked_memory_view
     if type(snapshot.values) is not dict:
         raise ValueError()
     values = snapshot.values
@@ -133,7 +136,9 @@ def _material(snapshot, document_id, run_id, dataset_id):
     # Ownership and receipt validity of these opaque values belong to AiRuntime.
     _canonical(bindings); _canonical(read)
     view = _paired_view(values.get("jd_model_view"), messages, dataset_id, document_id)
-    return record, messages, deepcopy(bindings), view, deepcopy(read)
+    memory = checked_memory_view(values.get("jd_memory_view"), dataset_id=dataset_id,
+        document_id=document_id, run_id=run_id)
+    return record, messages, deepcopy(bindings), view, deepcopy(read), memory
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,6 +152,7 @@ class AiRunObservation:
     _root_config_json: str = field(repr=False)
     _source_config_json: str = field(repr=False)
     closed: bool
+    _memory_json: str = field(default="null", repr=False)
 
     @property
     def record(self): return parse_run_record_json(self._record_json)
@@ -158,6 +164,8 @@ class AiRunObservation:
     def model_view(self): return json.loads(self._view_json)
     @property
     def read_binding(self): return json.loads(self._read_json)
+    @property
+    def memory_view(self): return json.loads(self._memory_json)
     @property
     def root_config(self): return json.loads(self._root_config_json)
     @property
@@ -199,8 +207,8 @@ class AiRunCheckpoints:
                 or saved.metadata.get("source") != "input"):
             raise ValueError()
         payload = saved.checkpoint["channel_values"].get(START)
-        if (type(payload) is not dict or set(payload) != {
-                "jd_ai_run", "messages", "jd_ai_bindings", "jd_ai_read"}
+        required = {"jd_ai_run", "messages", "jd_ai_bindings", "jd_ai_read"}
+        if (type(payload) is not dict or set(payload) not in (required, required | {"jd_memory_view"})
                 or type(payload["jd_ai_bindings"]) is not list or payload["jd_ai_bindings"]
                 or payload["jd_ai_read"] is not None):
             raise ValueError()
@@ -224,7 +232,10 @@ class AiRunCheckpoints:
                 raise ValueError()
         # Native add_messages retains the prior complete conversation. Resetting
         # bindings/read comes from the original new-run input, not recovery edits.
-        values = {**root.values, **payload, "messages": add_messages(previous, incoming)}
+        values = {**root.values, **payload, "messages": add_messages(previous, incoming),
+            # An older START payload has no selected Memory view. Never infer
+            # one from the previous run still visible in the root channels.
+            "jd_memory_view": payload.get("jd_memory_view")}
         return _material(root._replace(values=values), document_id, run_id, dataset_id)
 
     def observe(self, document_id: str, run_id: str, dataset_id: str) -> AiRunObservation:
@@ -304,11 +315,11 @@ class AiRunCheckpoints:
             if root.next == (START,):
                 if requested_source is not None and requested_source != root_config:
                     raise ValueError()
-                record, messages, bindings, view, read = self._initial_material(
+                record, messages, bindings, view, read, memory = self._initial_material(
                     root, root_config, document_id, run_id, dataset_id)
                 return AiRunObservation(_canonical(record.model_dump(mode="json")), _messages_json(messages),
                     _canonical(bindings), _canonical(view), _canonical(read), _canonical(root_config),
-                    _canonical(root_config), False)
+                    _canonical(root_config), False, _memory_json=_canonical(memory))
             if root.next not in ((), ("consultant",)):
                 raise ValueError()
             raw_record = root.values.get("jd_ai_run")
@@ -316,6 +327,7 @@ class AiRunCheckpoints:
                 if (root.next or root.tasks or root.interrupts
                         or _messages(root.values.get("messages", []))
                         or root.values.get("jd_model_view") is not None
+                        or root.values.get("jd_memory_view") is not None
                         or root.values.get("jd_ai_read") is not None
                         or ("jd_ai_bindings" in root.values and root.values["jd_ai_bindings"] != [])):
                     raise ValueError()
@@ -360,7 +372,9 @@ class AiRunCheckpoints:
                     if any(t.state is not None for t in child.tasks):
                         raise ValueError()  # This root has exactly one child layer.
                     child_material = _material(child, document_id, run_id, dataset_id)
-                    if child_material[0] != material[0]:
+                    # This read-only slice cannot refresh the selected Memory
+                    # version inside a run; it is fixed by the original input.
+                    if child_material[0] != material[0] or child_material[5] != material[5]:
                         raise ValueError()
                     root_messages, child_messages = material[1], child_material[1]
                     if _messages_json(child_messages[:len(root_messages)]) != _messages_json(root_messages):
@@ -370,10 +384,11 @@ class AiRunCheckpoints:
                 raise ValueError()
             elif requested_source is not None and requested_source != root_config:
                 raise ValueError()
-            record, messages, bindings, view, read = material
+            record, messages, bindings, view, read, memory = material
             return AiRunObservation(_canonical(record.model_dump(mode="json")), _messages_json(messages),
                 _canonical(bindings), _canonical(view), _canonical(read), _canonical(root_config),
-                _canonical(source_config), not (root.next or root.tasks or root.interrupts))
+                _canonical(source_config), not (root.next or root.tasks or root.interrupts),
+                _memory_json=_canonical(memory))
         except AiCheckpointError:
             raise
         except Exception:
@@ -387,6 +402,7 @@ class AiRunCheckpoints:
         receipts. This method does not test those facts or resume child work.
         """
         try:
+            from .memory_context import checked_memory_view
             if not isinstance(observed, AiRunObservation) or status not in {"completed", "cancelled", "failed"}:
                 raise ValueError()
             record = observed.record
@@ -417,10 +433,12 @@ class AiRunCheckpoints:
                     or model_view != observed.model_view or read_binding != observed.read_binding):
                 raise ValueError()
             _paired_view(model_view, proposed, record.dataset_id, record.document_id)
+            memory = checked_memory_view(observed.memory_view, dataset_id=record.dataset_id,
+                document_id=record.document_id, run_id=record.run_id)
             target_record = record.model_copy(update={"status": status})
             desired = {"jd_ai_run": target_record.model_dump(mode="json"), "messages": proposed,
                 "jd_ai_bindings": deepcopy(bindings), "jd_model_view": deepcopy(model_view),
-                "jd_ai_read": deepcopy(read_binding)}
+                "jd_ai_read": deepcopy(read_binding), "jd_memory_view": deepcopy(memory)}
         except Exception:
             raise AiCheckpointError("invalid_closure") from None
         current = self.observe(record.document_id, record.run_id, record.dataset_id)
@@ -429,7 +447,7 @@ class AiRunCheckpoints:
             return (result.closed and result.record == target_record
                 and _messages_json(result.messages) == _messages_json(proposed)
                 and result.bindings == bindings and result.model_view == model_view
-                and result.read_binding == read_binding)
+                and result.read_binding == read_binding and result.memory_view == memory)
 
         if exact(current):
             return current

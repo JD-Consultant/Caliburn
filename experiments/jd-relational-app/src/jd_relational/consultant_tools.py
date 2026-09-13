@@ -22,6 +22,7 @@ from langgraph.types import Command
 from .change_transport import DESCRIPTION as CHANGE_DESCRIPTION, change_tool_output, parse_change_arguments
 from .generated.reads import ChangeReadInput, ReadInput, ReadPage
 from .intents import AdmittedIdentity, BoundEdit, IntentValidationError, bind_edit
+from .memory_context import MEMORY_READ_NAMES, bind_memory_read_request
 from .observation_projection import project_observation
 from .read_transport import DESCRIPTION as READ_DESCRIPTION, parse_read_arguments, read_failure, read_tool_output
 from .reads import ReadError, command_context
@@ -260,6 +261,10 @@ class AiToolSession:
             if name == "jd_read":
                 parse_read_arguments(call["args"])
                 prepared = _Prepared(name, message.id, call_id, digest)
+            elif name in MEMORY_READ_NAMES:
+                # Native ToolNode owns these tools' argument validation. They
+                # cannot create a JD write binding or operation receipt.
+                prepared = _Prepared(name, message.id, call_id, digest)
             elif name == "jd_change_read":
                 parse_change_arguments(call["args"])
                 prepared = _Prepared(name, message.id, call_id, digest)
@@ -360,7 +365,7 @@ class AiToolSession:
 def _call_identity(call):
     try:
         name, call_id, args = call["name"], call["id"], call["args"]
-        if name not in {*MODELS, "jd_read", "jd_change_read"}:
+        if name not in {*MODELS, "jd_read", "jd_change_read", *MEMORY_READ_NAMES}:
             raise AiToolError("unknown_tool")
         if not _identifier(call_id) or type(args) is not dict:
             raise ValueError()
@@ -423,7 +428,7 @@ class AiToolMiddleware(AgentMiddleware):
         if prepared.error is not None:
             return _message(prepared.name, prepared.call_id, prepared.error)
         try:
-            return handler(request)
+            return handler(bind_memory_read_request(request))
         except (AiToolError, GraphBubbleUp):
             raise
         except Exception:
@@ -435,7 +440,7 @@ class AiToolMiddleware(AgentMiddleware):
         if prepared.error is not None:
             return _message(prepared.name, prepared.call_id, prepared.error)
         try:
-            return await handler(request)
+            return await handler(bind_memory_read_request(request))
         except (AiToolError, GraphBubbleUp):
             raise
         except Exception:

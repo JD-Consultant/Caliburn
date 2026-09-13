@@ -14,6 +14,8 @@
 
 ## 結構
 
+**顧問 Memory 讀取已接：**[固定選版／導覽／原話工具](../../docs/specs/2026-09-13-jd-memory-read-integration-slice.md)以正常 `build_consultant_tools()` 提供十個 JD 工具與四個只讀工具。`open_managed_app` 注入同宿主 Memory engine／原生 Store，前景入圖前固定讀取版本，native START／root／child／close 保留選版；中斷只核原结果不重播。原生 ToolRuntime 提供文件與回合身分，模型只填所需路徑／引用及讀取參數。真 SDK／PG 固定回覆與新宿主回歸通過；C／B1B2 寫入、完整顧問指引／日常 AI／自然品質仍待接，以下較早「模型工具未接」以此段及結果稿為準。
+
 **Memory 核心接合：**[獨立套件與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)已驗保存／發布、固定版本讀取、後續修正与真 PG 重開；使用 `packages/consultant-memory` 正常依賴。`memory_sources.py` 只把同一原話 owner 綁到文件；新來源有 `conversation:` 前綴，既有裸 signed v1 原樣可讀。原話及 JD 不雙寫。[宿主 Memory 接合](../../docs/specs/2026-09-13-jd-memory-host-integration-slice.md)已完成一般 host 的獨立Store連線、原生Runtime.store、schema-mapped publication view、明示初始化及登記讀取排空；同設定新程序讀回原話／Memory通過。模型工具與背景整理／即時修補尚未接，不冒稱完整顧問可用。
 
 一般 host 現要求既有 `checkpoint_schema` 的八張表（四Saver＋兩Store＋兩publication），public JD仍十三表＋Alembic。原ready實驗資料庫缺Memory時明示拒絕，不自動升級或清資料；新配置只明示初始化fresh DB。本機合成 fixture 的舊host區可由下方專用腳本補齊，不是產品更新流程。

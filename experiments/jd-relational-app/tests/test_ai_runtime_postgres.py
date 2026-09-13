@@ -52,7 +52,7 @@ def _sse(identity, name=None, arguments=None):
 
 
 @contextmanager
-def _offline_model(monkeypatch, plan, *, body_factory=SyncBody):
+def _offline_model(monkeypatch, plan, *, body_factory=SyncBody, expected_tool_count=10):
     monkeypatch.setenv("LANGSMITH_TRACING", "false")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
     requests, bodies = [], []
@@ -65,7 +65,7 @@ def _offline_model(monkeypatch, plan, *, body_factory=SyncBody):
         assert len(requests) < len(plan), "No hidden model retry or replay is allowed."
         payload = json.loads(request.content)
         assert payload["stream"] is True
-        assert len(payload["tools"]) == 10 and all(tool["strict"] is True for tool in payload["tools"])
+        assert len(payload["tools"]) == expected_tool_count and all(tool["strict"] is True for tool in payload["tools"])
         assert payload["tool_choice"]["disable_parallel_tool_use"] is True
         requests.append(payload)
         name, arguments = plan[len(requests) - 1](payload)

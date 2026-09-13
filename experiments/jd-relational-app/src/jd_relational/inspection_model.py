@@ -51,7 +51,8 @@ class InspectionGuard(AgentMiddleware):
 def build_inspection_consultant_node():
     """Use the shared native factory and the actual JD tool/middleware layout."""
     from .consultant_context import build_consultant_node
-    from .consultant_tools import AiToolMiddleware, build_jd_tools
+    from .consultant_tools import AiToolMiddleware
+    from .memory_context import build_consultant_tools
     return build_consultant_node(InspectionOnly(cache=False, output_version=None),
-        tools=build_jd_tools(), guidance="Checkpoint inspection only; execution is disabled.",
+        tools=build_consultant_tools(), guidance="Checkpoint inspection only; execution is disabled.",
         extra_middleware=[AiToolMiddleware()])

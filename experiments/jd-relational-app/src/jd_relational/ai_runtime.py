@@ -23,6 +23,7 @@ from .change_reads import ChangeReadService
 from .consultant_context import ConsultantContext, checked_model_view
 from .consultant_tools import AiToolSession, decode_ai_bindings, verify_binding_message
 from .conversation_sources import ConversationSourceService
+from .memory_context import MEMORY_READ_NAMES, MemoryReadSession
 from .manual_runtime import ForegroundIdentity, ManualRuntime, RuntimeFailure
 from .notice_history import NoticeHistoryReader
 from .observation_projection import project_observation
@@ -181,7 +182,7 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None):
             if binding is None:
                 # Read tools never bind writes. An unbound mutation is legal
                 # only as a validated pre-execution error, never a saved write.
-                if name not in {"jd_read", "jd_change_read"}:
+                if name not in {"jd_read", "jd_change_read", *MEMORY_READ_NAMES}:
                     try:
                         value = validate_result(json.loads(message.content))
                         if (message.status != "error" or message.name != name
@@ -204,6 +205,7 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None):
 class AiRuntime:
     def __init__(self, owner: ManualRuntime, codec: ReferenceCodec, *, source_resolver=None,
                  conversation_sources: ConversationSourceService | None = None,
+                 memory_engine=None,
                  execution_enabled: bool = True):
         if (not isinstance(owner, ManualRuntime) or not isinstance(owner.checkpoints, DocumentCheckpoints)
                 or not isinstance(codec, ReferenceCodec)
@@ -225,6 +227,13 @@ class AiRuntime:
         self.conversation_sources = conversation_sources
         self.source_resolver = conversation_sources.resolve if conversation_sources is not None else source_resolver
         self.execution_enabled = execution_enabled
+        if memory_engine is not None:
+            from sqlalchemy.engine import Engine
+            from langgraph.store.base import BaseStore
+            if (not isinstance(memory_engine, Engine) or conversation_sources is None
+                    or not isinstance(self.graph.store, BaseStore)):
+                raise AiRuntimeError("invalid_ai_runtime")
+        self.memory_engine = memory_engine
         self._registry = Lock()  # Only handles, never graph/DB I/O.
         self._latest = {}
         self._starts = {}
@@ -519,16 +528,20 @@ class AiRuntime:
             raise AiRuntimeError("stale_view")
         session = AiToolSession(self.owner, permit, self.history, self.reads, self.changes,
             self.codec, source_resolver=self.source_resolver)
+        memory = MemoryReadSession.open(store=self.graph.store, engine=self.memory_engine,
+            sources=self.conversation_sources, dataset_id=record.dataset_id,
+            document_id=record.document_id, run_id=record.run_id) if self.memory_engine is not None else None
         context = ConsultantContext(record.dataset_id, record.document_id, record.run_id,
             self.notices, self.codec, notice, tool_session=session, stop_event=permit.stop_event,
             source_notice=self.conversation_sources.for_turn(record.document_id, record.run_id)
-                if self.conversation_sources is not None else None)
+                if self.conversation_sources is not None else None, memory_session=memory)
         # Disable remote traces even if the parent shell enabled them. Safe App
         # diagnostics and the native local Saver remain their separate owners.
         with tracing_context(enabled=False):
             attempt.invoked = True
             self.graph.invoke({"messages": [attempt.human], "jd_ai_run": record.model_dump(mode="json"),
-                "jd_ai_bindings": [], "jd_ai_read": None}, config, context=context, durability="sync")
+                "jd_ai_bindings": [], "jd_ai_read": None,
+                "jd_memory_view": memory.view if memory else None}, config, context=context, durability="sync")
 
     @staticmethod
     def _result(observed):
@@ -631,7 +644,9 @@ class AiRuntime:
                     value = project_observation(receipts[binding.identity.operation_id], self.codec)
                     failed = value["status"] not in {"committed", "no_change"}
                 else:
-                    value = read_failure("read_failed") if call["name"] in {"jd_read", "jd_change_read"} else _not_executed()
+                    value = ({"error": "memory_read_not_completed", "next_action": "stop"}
+                        if call["name"] in MEMORY_READ_NAMES else read_failure("read_failed")
+                        if call["name"] in {"jd_read", "jd_change_read"} else _not_executed())
                     failed = True
                 messages.append(ToolMessage(id=str(uuid4()), tool_call_id=call["id"], name=call["name"],
                     content=read_json(value), status="error" if failed else "success"))

@@ -60,7 +60,8 @@ def open_managed_app(file, *, consultant, enable_chat=False) -> ManagedApp:
         host, codec = opened.host, opened.codec
         sources = ConversationSourceService(AiRunCheckpoints(host.graph), ConversationSourceCodec(
             opened.settings.signing_key_bytes(), opened.settings.dataset_id))
-        ai_runtime = AiRuntime(host.runtime, codec, conversation_sources=sources, execution_enabled=enable_chat)
+        ai_runtime = AiRuntime(host.runtime, codec, conversation_sources=sources,
+            memory_engine=host.memory_engine, execution_enabled=enable_chat)
         history = HistoryReader(host.engine)
         manual = ManualService(host.runtime, history, codec, source_resolver=sources.resolve)
         chat_history = ChatHistoryService(ai_runtime.checkpoints, ChatHistoryCodec(

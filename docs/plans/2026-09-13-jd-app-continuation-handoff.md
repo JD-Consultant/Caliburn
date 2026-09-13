@@ -1,5 +1,7 @@
 # JD App 接續施工與交接計畫
 
+**H4 最新接續修正（2026-09-13）：**以[c1c9f8f7 複核](../specs/evidence/jd-interview-window-source/cursor-lineage-review.md)取代下文舊審查的「未驗 W-13 不進 B1」門檻。F-03 已閉合；先窄修正常多窗口重驗的 root 身分及新窗口 admission 的固定分支核對。W-13／不可變 pair／用途感知讀取隨 B1／B2 實際 adapter 驗收，不為它們另造中間引擎。通知可先做，但須完整處理註冊、結果分類與停止恢復；不是 B1 的必要前置。不重開既有顧問研究。
+
 更新：2026-09-13；Topic JD-R002／OI-01、OI-02。**H2–H3 已提交為 `7181db63`，提交後複核見[審查結果](../specs/evidence/jd-memory-repair-integration/submitted-integration-review.md)。H4 映射 `2e243d15` 已完成提交後[審查修訂](../specs/evidence/2026-09-13-jd-b1-b2-adoption-review.md)；完成窗口契約 `ab483f6c` 亦已完成[9/12–9/13 文件審查](../specs/evidence/2026-09-13-jd-window-source-contract-review.md)。下一從修正版的有限實作接續。**本次只修文檔，沒有實作 H4；先前首敗與停點保留為歷史。
 
 本文件負責「下一位從哪裡接、分步怎麼做、如何驗收」。產品總範圍仍由[總施工計畫](2026-09-13-jd-relational-app-implementation.md)負責，未解事項由[唯一清單](../specs/2026-09-13-jd-app-open-issues.md)負責，入口只維護[目前決策](../current-decisions.md)。不要重新讀完整舊聊天才能開工。

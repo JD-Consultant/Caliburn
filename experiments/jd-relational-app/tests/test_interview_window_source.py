@@ -568,6 +568,19 @@ def test_a_cursor_stopping_mid_turn_never_counts_as_processed(interview, native)
         windows.pending_windows(document, mid_turn)
 
 
+def test_a_cursor_with_reused_message_id_but_changed_content_is_not_a_prefix(interview, native):
+    """Lineage plus IDs must not hide a same-ID content replacement."""
+    windows, document, first_run, second_run = interview
+    cursor = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    graph, dataset, *_ = native
+    observed = windows._checkpoints.discover(document, dataset)
+    graph.update_state(observed.root_config,
+                       {"messages": [AIMessage(id="a2", content="同 ID 的新內容")]},
+                       as_node="consultant")
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.unprocessed_source(document, cursor)
+
+
 def test_a_cursor_whose_own_root_is_unreachable_is_refused(interview, native):
     """The cursor must be read at its own fixed position, not assumed."""
     windows, document, first_run, second_run = interview

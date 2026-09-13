@@ -501,7 +501,14 @@ class ConversationSourceService:
         """
         position = self._codec._resolve_window(reference, document_id)
         cursor = self._pinned(document_id, position.root_run_id, position.root_config())
-        saved = [message.id for message in cursor.messages]
+        # IDs are stable addresses, not proof that the saved prefix has the
+        # same content. Native message updates can retain an ID, so compare
+        # the complete immutable message values before using the cursor to
+        # advance admission.
+        cursor_messages = cursor.messages
+        if cursor_messages != observed.messages[:len(cursor_messages)]:
+            raise ConversationSourceError("invalid_ref")
+        saved = [message.id for message in cursor_messages]
         order = [message.id for message in observed.messages]
         if (position.first not in saved or position.last not in saved
                 or saved.index(position.first) > saved.index(position.last)

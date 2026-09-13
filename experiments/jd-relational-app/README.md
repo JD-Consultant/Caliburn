@@ -1,6 +1,6 @@
 # 關聯式 JD：隔離編輯核心
 
-**目前狀態（2026-09-13）：**[Memory 更正的 App 接合可驗收](../../docs/specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。正常 `repair_memory` 與固定C子圖已接，`build_consultant_tools()` 為十個JD＋四個Memory讀取＋一個修補工具；正常C後讀取、部分故障、取消與原結果查回有真PG／固定SDK證據。審核提出的CA-01／02兩個未執行位置已修：確定沒有執行C的停止位置能以同一原call收尾，其他位置與缺證據情形維持原門閘。跨程序證據改由真新Windows程序的FH05提供，乾淨venv完整依賴wheel隔離已通過。既有非JD顧問已有限定真模型驗收，目前是新App採用未完；B1／B2、完整旅程與自然品質仍未完成，`enable_chat=False`。下文較早切片的「未接」與下一步是歷史界線，以本段為準。
+**目前狀態（2026-09-14）：**C 的 App 接合／停止收尾／新程序查回已完成；source 與 B1 核心／OpenAI adapter 固定接合至 `f160be97`。獨立受影響測試及 Memory 套件211項通過。[整體審查](../../docs/specs/evidence/jd-b1-adoption/whole-flow-review.md)與[H4 runtime執行計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)是接續路由：先一批B1真PG及批次接合，再B2／完整通知／宿主；這些尚未完成。既有非JD顧問有CT49／50限定真模型成果；新App日常AI未啟用，不等於顧問從未做好。下文早期切片保留當時結果，不能把當時「下一步」當目前待辦。
 
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2、RS-3 第一段及 RS-4 通知／模型保存接點。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 

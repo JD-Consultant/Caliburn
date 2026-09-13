@@ -51,7 +51,7 @@ def message():
 
 def history():
     return {"dataset_id": DATASET, "document_id": DOCUMENT,
-            "anchor": "fixed-checkpoint-anchor", "messages": [message()], "next_cursor": None}
+            "anchor": "fixed-checkpoint-anchor", "anchor_run_id": RUN, "messages": [message()], "next_cursor": None}
 
 
 def problem():
@@ -239,11 +239,13 @@ def test_output_literal_boolean_limit_is_explicit_and_raw_contract_remains_stric
 
 
 def test_history_empty_state_cannot_invent_an_anchor_cursor_or_message():
-    empty = {**history(), "anchor": None, "messages": [], "next_cursor": None}
+    empty = {**history(), "anchor": None, "anchor_run_id": None, "messages": [], "next_cursor": None}
     accepts("ChatHistoryPage", empty, True)
     accepts("ChatHistoryPage", {**empty, "messages": [message()]}, False)
     accepts("ChatHistoryPage", {**empty, "next_cursor": "later-page"}, False)
-    accepts("ChatHistoryPage", {**empty, "anchor": "fixed-anchor"}, True)
+    accepts("ChatHistoryPage", {**empty, "anchor": "fixed-anchor", "anchor_run_id": RUN}, True)
+    accepts("ChatHistoryPage", {**empty, "anchor_run_id": RUN}, False)
+    accepts("ChatHistoryPage", {**empty, "anchor": "fixed-anchor"}, False)
 
 
 def test_history_keeps_native_message_ids_roles_and_exact_public_text_only():
@@ -288,3 +290,10 @@ def test_disabled_ai_has_a_distinct_stop_problem_while_manual_work_remains_avail
     accepts("ChatProblem", {**problem(), "status": 503, "title": "Service Unavailable",
         "code": "ai_unavailable", "next_action": "stop",
         "detail": "AI 訪談尚未啟用；請保留輸入。目前仍可查看原有對話及編輯 JD。"}, True)
+
+
+def test_anchored_history_exposes_its_required_canonical_run_identity():
+    payload = {**history(), "anchor_run_id": RUN}
+    accepts("ChatHistoryPage", payload, True)
+    for wrong in (None, "", RUN.upper(), RUN + "\n", 1, True):
+        accepts("ChatHistoryPage", {**payload, "anchor_run_id": wrong}, False)

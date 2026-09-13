@@ -99,12 +99,16 @@ const unsavedResponse: ChatRunFailedNotSaved = { ...unsaved, response_message_id
 const publicMessage: ChatMessage = { message_id: "native-id", run_id: request.run_id,
   role: "assistant", text: "請補充這項工作的範圍。" };
 const history: ChatHistoryPage = { dataset_id: scope.dataset_id, document_id: scope.document_id,
-  anchor: "fixed-snapshot", messages: [publicMessage], next_cursor: null };
-const empty: ChatHistoryPage = { ...history, anchor: null, messages: [], next_cursor: null };
+  anchor: "fixed-snapshot", anchor_run_id: request.run_id, messages: [publicMessage], next_cursor: null };
+const empty: ChatHistoryPage = { ...history, anchor: null, anchor_run_id: null, messages: [], next_cursor: null };
 // @ts-expect-error An empty history cannot invent a next page without an anchor.
 const emptyCursor: ChatHistoryPage = { ...empty, next_cursor: "cursor" };
 // @ts-expect-error An empty history cannot invent a message without an anchor.
 const emptyMessage: ChatHistoryPage = { ...empty, messages: [publicMessage] };
+// @ts-expect-error An empty history cannot claim an anchored run.
+const emptyRun: ChatHistoryPage = { ...empty, anchor_run_id: request.run_id };
+// @ts-expect-error An anchored history cannot lose its original run.
+const missingRun: ChatHistoryPage = { ...history, anchor_run_id: null };
 // @ts-expect-error Tool messages are not public chat messages.
 const privateRole: ChatMessage = { ...publicMessage, role: "tool" };
 // @ts-expect-error Provider internal data has no public projection field.

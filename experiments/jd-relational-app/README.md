@@ -2,6 +2,8 @@
 
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2、RS-3 第一段及 RS-4 通知／模型保存接點。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
+**最新：[同頁聊天與原話保護](../../docs/specs/2026-09-13-jd-chat-web-slice.md)已接 Web。**手改保存後送出、原話及原請求重開保護、原回合狀態與逐次實際差異共用既有資料權威。固定 SDK／真瀏覽器旅程完成兩輪及 PG 獨立核對；瀏覽器 fetch 首敗仍有未定位原因，不宣稱無故障完成。下文各切片的「下一接 Web」保留為沿革；Memory／來源、整輪差異與撤回、日常 AI 啟用及自然品質仍未完成。日常 `enable_chat=False` 不因測試而改變。
+
 **已有可開啟的[六章手動管理畫面](web/README.md)，透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；[本次 UI 結果](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)包含自動保存、未完成表單重開及歷史。完整 AI 生命週期、来源回查、歷史還原與圖形啟動器尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
 
 **[RS-4 通知與模型保存](../../docs/specs/2026-09-13-jd-consultant-context-slice.md)已用真 SDK／原生 Agent／PG Saver 及固定離線串流接合。**人工改動投影不改原始對話；完整回覆與通知邊界成對保存，缺結束事件不前進，重開只讀不重播。74 項受影響測試通過（含 13 真 PG），獨立審查缺口已修。日常入口仍未啟用 AI；本輪前景回合與工具接合見下段。
@@ -15,7 +17,7 @@
 **最新[聊天HTTP與原修改結果](../../docs/specs/2026-09-13-jd-chat-http-slice.md)已接。**`ChatService` 共用 `AiRuntime`／人工write state，原話、實際執行與JD效果分開回報；`chat_history.py`固定原root/source分頁，只公開原話及AI正文。生成契約／TS、完整離線2211 PASS／209 SKIP、三個真PG HTTP情境與獨審通過。`open_managed_app`預設`enable_chat=False`，日常仍不開provider；新run回`ai_unavailable`，保存對話／原結果可查。下一接Web，不宣稱自然AI或完整App完成。
 
 - `contracts/jd-chat-http.schema.json`／`chat_service.py`／`chat_api.py`：原請求送出、原狀態、取消／恢復與已保存對話；原`BoundResult`及人工狀態直接external ref，不增加run／聊天表。所有同步查讀由同owner排空。
-- `chat_history.py`：同現有設定key/dataset、不同用途salt的固定native位置；輸出頁有界，底層仍讀完整messages。不是另一份對話保存或LLM context壓縮。
+- `chat_history.py`：同現有設定key/dataset、不同用途salt的固定native位置；初頁取最新公開文字、頁內正序，cursor 固定同 anchor 向前取較早頁，`anchor_run_id` 是該 snapshot 的 run。私有 token v2 明確拒絕舊 forward token；原生歷史不改寫。輸出頁有界，底層仍讀完整messages。不是另一份對話保存或LLM context壓縮。
 
 **最新[聊天版次准入與原回合查回](../../docs/specs/2026-09-13-jd-chat-admission-and-original-run-slice.md)已接核心。**新 `start` 必填 canonical `expected_revision_id: UUID`，原請求查回優先；`lookup` 可在後續回合後讀原結果，無模型重播。V1原樣讀取恢復、V2保存起始版次；同owner讀取也納關閉排空。完整離線1961 PASS／201 SKIP，真PG4及新程序PG4通過，獨審缺口已修。尚未接聊天HTTP／Web；歷史256祖先位置上限／缺鏈明示待查回，不能當不存在重送。
 

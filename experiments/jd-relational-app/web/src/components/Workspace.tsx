@@ -90,11 +90,11 @@ export default function Workspace({ apiOrigin }: { apiOrigin: string | null }) {
   return <><AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: '1px solid #dce2df' }}><Toolbar sx={{ gap: 2, flexWrap: 'wrap', py: 1 }}>
     <Typography variant="h6" sx={{ fontWeight: 800 }}>Caliburn</Typography>
     <Typography color="text.secondary">我的職務說明書</Typography><Box sx={{ flex: 1 }} />
-    <Button onClick={() => { setTitle(''); setDialog('create'); }} disabled={busy || !safeToLeave || !!creation}>建立文件</Button>
+    <Button onClick={() => { setError(''); setTitle(''); setDialog('create'); }} disabled={busy || !safeToLeave || !!creation}>建立文件</Button>
   </Toolbar></AppBar>
   <Container maxWidth="xl" sx={{ py: 3 }}>
-    {error && <Alert severity="error" sx={{ mb: 2 }} action={<Button disabled={busy} onClick={() => void refresh().catch(e => setError(message(e)))}>重新查看</Button>}>{error}</Alert>}
-    {creation && <Alert severity="warning" sx={{ mb: 2 }} action={<Button disabled={busy} onClick={() => void createDocument(true)}>查回並繼續原建立</Button>}>
+    {dialog === null && error && <Alert severity="error" sx={{ mb: 2 }} action={<Button disabled={busy} onClick={() => void refresh().catch(e => setError(message(e)))}>重新查看</Button>}>{error}</Alert>}
+    {dialog === null && creation && <Alert severity="warning" sx={{ mb: 2 }} action={<Button disabled={busy} onClick={() => void createDocument(true)}>查回並繼續原建立</Button>}>
       「{creation.title}」的建立結果尚待確認。原操作已保留，可查回或繼續同一次建立。
     </Alert>}
     {loading ? <CircularProgress aria-label="讀取文件" /> : <>
@@ -106,24 +106,33 @@ export default function Workspace({ apiOrigin }: { apiOrigin: string | null }) {
             <MenuItem key={item.document_id} value={item.document_id}>{item.title}{item.archived ? '（已封存）' : ''}</MenuItem>)}
         </TextField>
         <Button onClick={() => setShowArchived(value => !value)}>{showArchived ? '顯示使用中文件' : '查看封存'}</Button>
-        {current && <><Button disabled={!safeToLeave || busy} onClick={() => { setTitle(current.title); setDialog('rename'); }}>更名</Button>
-          <Button disabled={!safeToLeave || busy} onClick={() => setDialog('archive')}>{current.archived ? '恢復' : '封存'}</Button></>}
+        {current && <><Button disabled={!safeToLeave || busy} onClick={() => { setError(''); setTitle(current.title); setDialog('rename'); }}>更名</Button>
+          <Button disabled={!safeToLeave || busy} onClick={() => { setError(''); setDialog('archive'); }}>{current.archived ? '恢復' : '封存'}</Button></>}
       </Stack>
       {current ? <DocumentWorkspace key={JSON.stringify([api.origin, api.datasetId, current.document_id])}
         api={api} document={current} onSafeToLeave={setSafeToLeave} /> : <Paper sx={{ p: { xs: 3, md: 6 } }}>
         <Chip label="從你的實際工作開始" color="primary" variant="outlined" />
         <Typography variant="h4" sx={{ mt: 2, mb: 2 }}>把你的工作，整理成自己的職務說明書。</Typography>
         <Typography color="text.secondary" sx={{ maxWidth: 650 }}>先建立一份文件，再逐步整理職責、任務、成果與所需專業。已知的先寫下，尚未釐清的可以日後補充。</Typography>
-        <Divider sx={{ my: 3 }} /><Button variant="contained" disabled={busy || !!creation} onClick={() => { setTitle(''); setDialog('create'); }}>建立第一份文件</Button>
+        <Divider sx={{ my: 3 }} /><Button variant="contained" disabled={busy || !!creation} onClick={() => { setError(''); setTitle(''); setDialog('create'); }}>建立第一份文件</Button>
       </Paper>}
     </>}
   </Container>
   {dialog !== null && <Dialog open onClose={() => { if (!busy) setDialog(null); }} fullWidth maxWidth="sm">
     <DialogTitle>{dialog === 'create' ? '建立職務說明書' : dialog === 'rename' ? '更改文件名稱' : current?.archived ? '恢復這份文件' : '封存這份文件'}</DialogTitle>
-    <DialogContent>{dialog === 'archive' ? <Typography>「{current?.title}」{current?.archived ? '恢復後可以繼續編輯。' : '會保留全部內容與歷史，日後可從封存列表恢復。'}</Typography> :
-      <TextField autoFocus fullWidth label="文件名稱" value={title} disabled={busy} sx={{ mt: 1 }} onChange={event => setTitle(event.target.value)} helperText="例如：王小明的工作說明。職稱可在文件內另外填寫。" />}</DialogContent>
+    <DialogContent>
+      {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+      {dialog === 'create' && creation && <Alert severity="warning" sx={{ mb: 2 }}>
+        「{creation.title}」的建立結果尚待確認。原名稱與操作已保留，請查回並繼續同一次建立。
+      </Alert>}
+      {dialog === 'archive' ? <Typography>「{current?.title}」{current?.archived ? '恢復後可以繼續編輯。' : '會保留全部內容與歷史，日後可從封存列表恢復。'}</Typography> :
+        <TextField autoFocus fullWidth label="文件名稱" value={dialog === 'create' && creation ? creation.title : title}
+          disabled={busy || (dialog === 'create' && !!creation)} sx={{ mt: 1 }} onChange={event => setTitle(event.target.value)}
+          helperText="例如：王小明的工作說明。職稱可在文件內另外填寫。" />}
+    </DialogContent>
     <DialogActions><Button disabled={busy} onClick={() => setDialog(null)}>取消</Button>
-      <Button variant="contained" disabled={busy || (dialog !== 'archive' && !title.trim())} onClick={() => void (dialog === 'create' ? createDocument(false) : changeMetadata())}>
-        {busy ? '處理中…' : dialog === 'create' ? '建立' : dialog === 'rename' ? '儲存名稱' : current?.archived ? '恢復' : '封存'}</Button></DialogActions>
+      <Button variant="contained" disabled={busy || (dialog !== 'archive' && !(dialog === 'create' && creation ? creation.title : title).trim())}
+        onClick={() => void (dialog === 'create' ? createDocument(!!creation) : changeMetadata())}>
+        {busy ? '處理中…' : dialog === 'create' ? creation ? '查回並繼續原建立' : '建立' : dialog === 'rename' ? '儲存名稱' : current?.archived ? '恢復' : '封存'}</Button></DialogActions>
   </Dialog>}</>;
 }

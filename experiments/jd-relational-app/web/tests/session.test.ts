@@ -5,9 +5,11 @@ import type { SessionSnapshot } from '../src/lib/session.ts';
 import { ApiError } from '../src/lib/api.ts';
 import type { JdApi } from '../src/lib/api.ts';
 import { acknowledgeSubmissionRecord, claimDraftRecord, draftHandle, fieldKey, persistFieldRecord,
-  persistFormRecord, prepareSubmissionRecord, rebindFieldRecord } from '../src/lib/drafts.ts';
+  persistFormRecord, prepareSubmissionRecord, rebindFieldRecord, persistChatRecord, prepareChatRecord,
+  acknowledgeChatRecord, restoreChatRecord, rejectUnavailableChatRecord } from '../src/lib/drafts.ts';
 import type { DraftHandle, DraftRow, DraftScope, DraftStore, FieldDraft, FormDraft, PrepareSubmission,
-  RebindField, SubmissionAcknowledgment } from '../src/lib/drafts.ts';
+  RebindField, SubmissionAcknowledgment, ChatDraft, PrepareChat, ChatAcknowledgment } from '../src/lib/drafts.ts';
+import type { ChatRunState } from '../../src/jd_relational/generated/jd-chat-http.ts';
 import type { ReadInput, ReadPage, ReadRecord } from '../../src/jd_relational/generated/jd-read.ts';
 import type { ManualDocumentState, ManualSaveInput } from '../../src/jd_relational/generated/jd-manual-http.ts';
 import type { MutationResult } from '../../src/jd_relational/generated/jd-result.ts';
@@ -52,6 +54,16 @@ class RecordStore {
   async persistForm(handle: DraftHandle, form: FormDraft) {
     if (this.failForm) { this.failForm = false; throw new Error('simulated IDB failure'); }
     return this.row = persistFormRecord(this.row!, handle, form);
+  }
+  async persistChat(handle: DraftHandle, input: ChatDraft) {
+    if (this.gate) await this.gate.promise;
+    return this.row = persistChatRecord(this.row!, handle, input);
+  }
+  async prepareChat(handle: DraftHandle, input: PrepareChat) { return this.row = prepareChatRecord(this.row!, handle, input); }
+  async acknowledgeChat(handle: DraftHandle, input: ChatAcknowledgment) { return this.row = acknowledgeChatRecord(this.row!, handle, input); }
+  async restoreChat(handle: DraftHandle, input: ChatAcknowledgment) { return this.row = restoreChatRecord(this.row!, handle, input); }
+  async rejectUnavailableChat(handle: DraftHandle, input: { runId: string; submissionGeneration: number }) {
+    return this.row = rejectUnavailableChatRecord(this.row!, handle, input);
   }
   async prepareSubmission(handle: DraftHandle, input: PrepareSubmission) { return this.row = prepareSubmissionRecord(this.row!, handle, input); }
   async acknowledgeSubmission(handle: DraftHandle, input: SubmissionAcknowledgment) { return this.row = acknowledgeSubmissionRecord(this.row!, handle, input); }
@@ -119,6 +131,89 @@ test('A response preserves later B and sends B against the confirmed new field r
     assert.equal(h.last.values[key], 'B'); h.commit(1, 'B'); await flush;
     assert.equal(h.last.dirty, false); assert.equal(h.last.view!.fields[0].value, 'B');
   } finally { await h.stop(); }
+});
+
+function terminalChat(runId: string): ChatRunState {
+  return { dataset_id: scope.datasetId, document_id: scope.documentId, run_id: runId,
+    run_status: 'completed', input_state: 'saved', response_message_id: 'reply', stop_requested: null,
+    write_state: writable, jd_effects: { state: 'settled', results: [] } };
+}
+test('chat handoff waits for real manual save and binds the new saved revision', async () => {
+  const h = await setup();
+  try {
+    h.session.edit(h.last.view!.fields[0], '先手動更正'); h.session.chatEdit('原話\n下一行');
+    const preparing = h.session.chatPrepare(); await until(() => h.saves.length === 1);
+    assert.equal(h.session.chatOriginal(), null); assert.equal(h.last.readOnly, true);
+    h.session.edit(h.last.view!.fields[0], '不應插入'); h.session.chatEdit('不應蓋掉交接中的原話');
+    h.commit(0, '先手動更正'); const original = await preparing;
+    assert.equal(original.request.expected_jd_revision_ref, '1:revision');
+    assert.equal(original.request.text, '原話\n下一行'); assert.equal(h.saves.length, 1);
+    assert.deepEqual(h.store.row?.chatSubmission, original); assert.equal(h.last.chatText, '');
+    h.session.chatRequestFinished(); assert.equal(h.last.readOnly, true, 'pending original still fences JD');
+  } finally { await h.stop(); }
+});
+test('an unfinished JD form is preserved and blocks chat instead of being silently saved', async () => {
+  const h = await setup();
+  try {
+    h.session.form({ name: '尚未完成的任務' }); h.session.chatEdit('想補充工作');
+    await assert.rejects(h.session.chatPrepare(), { code: 'not_ready' });
+    assert.equal(h.session.chatOriginal(), null); assert.equal(h.last.chatText, '想補充工作');
+    assert.equal(h.store.row?.forms.editor.value && (h.store.row.forms.editor.value as {name:string}).name, '尚未完成的任務');
+    assert.equal(h.saves.length, 0);
+  } finally { await h.stop(); }
+});
+test('chat does not treat a failed manual flush as permission to send', async () => {
+  const h = await setup();
+  try {
+    h.session.edit(h.last.view!.fields[0], '仍待保存'); h.session.chatEdit('原話');
+    const preparing = h.session.chatPrepare(); await until(() => h.saves.length === 1);
+    h.replies[0].reject(new ApiError('response_unknown'));
+    await assert.rejects(preparing, { code: 'not_ready' });
+    assert.equal(h.session.chatOriginal(), null); assert.ok(h.store.row?.submission);
+    assert.equal(h.last.chatText, '原話');
+  } finally { await h.stop(); }
+});
+test('both JD and chat composition block handoff without generating a request', async () => {
+  const h = await setup();
+  try {
+    h.session.chatEdit('輸入法尚未選字'); h.session.chatComposition(true);
+    await assert.rejects(h.session.chatPrepare(), { code: 'not_ready' });
+    h.session.chatComposition(false); h.session.composition(true);
+    await assert.rejects(h.session.chatPrepare(), { code: 'not_ready' });
+    assert.equal(h.session.chatOriginal(), null);
+  } finally { await h.stop(); }
+});
+test('saved terminal A acknowledges only A and preserves the next chat draft B', async () => {
+  const h = await setup();
+  try {
+    h.session.chatEdit('A'); const original = await h.session.chatPrepare(); h.session.chatRequestFinished();
+    h.session.chatEdit('B'); await until(() => h.store.row?.chatDraft?.text === 'B');
+    await h.session.chatObserve(terminalChat(original.request.run_id));
+    assert.equal(h.session.chatOriginal(), null); assert.equal(h.last.chatText, 'B');
+    assert.equal(h.last.readOnly, false); assert.equal(h.last.chatReady, true);
+  } finally { await h.stop(); }
+});
+test('an unavailable exact start restores A for editing without inventing a saved run', async () => {
+  const h = await setup();
+  try {
+    h.session.chatEdit('  原話\n'); const original = await h.session.chatPrepare();
+    await h.session.chatUnavailable(original); h.session.chatRequestFinished();
+    assert.equal(h.session.chatOriginal(), null); assert.equal(h.last.chatText, '  原話\n');
+    assert.equal(h.last.readOnly, false); assert.equal(h.saves.length, 0);
+  } finally { await h.stop(); }
+});
+test('unknown original survives reopen and is not mistaken for a manual draft review', async () => {
+  const h = await setup(); let saved: DraftRow;
+  try {
+    h.session.chatEdit('已送出但結果不明'); await h.session.chatPrepare(); h.session.chatRequestFinished();
+    saved = structuredClone(h.store.row!);
+  } finally { await h.stop(); }
+  const next = await setup(saved!);
+  try {
+    assert.deepEqual(next.session.chatOriginal(), saved!.chatSubmission);
+    assert.equal(next.last.needsReview, false); assert.equal(next.last.readOnly, true);
+    assert.equal(next.saves.length, 0); assert.equal(next.last.chatReady, false);
+  } finally { await next.stop(); }
 });
 
 test('A confirmed but writer still blocked must not dispatch B', async () => {

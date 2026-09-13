@@ -9,20 +9,35 @@ import { fieldLabels } from '../lib/view';
 import type { CatalogDocument } from '../../../src/jd_relational/generated/jd-catalog-http';
 import JdEditor from './JdEditor';
 import HistoryPanel from './HistoryPanel';
+import ChatPanel from './ChatPanel';
+import { ChatController } from '../lib/chat-session';
+import type { ChatSnapshot } from '../lib/chat-session';
+
+const emptyChat: ChatSnapshot = { messages: [], page: null, run: null, runId: null, loading: true, busy: false, error: null, canRetry: false };
 
 export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   api: JdApi; document: CatalogDocument; onSafeToLeave: (value: boolean) => void;
 }) {
   const [snapshot, setSnapshot] = useState(emptySession);
   const session = useRef<JdSession | null>(null);
+  const chatController = useRef<ChatController | null>(null);
+  const [chat, setChat] = useState(emptyChat);
   const [history, setHistory] = useState(false);
+  const [selectedChange, setSelectedChange] = useState<{ ref: string; sequence: number } | null>(null);
   const [restoreChoice, setRestoreChoice] = useState<'continue' | 'discard' | null>(null);
   const [restoreBusy, setRestoreBusy] = useState(false);
   const previousArchive = useRef(document.archived);
   useEffect(() => {
-    const active = new JdSession(api, document.document_id, setSnapshot); session.current = active;
+    setChat(emptyChat);
+    const active = new JdSession(api, document.document_id, value => {
+      setSnapshot(value);
+      if (!value.loading && value.view && !chatController.current) {
+        const reader = new ChatController(api, document.document_id, active, setChat);
+        chatController.current = reader; void reader.start();
+      }
+    }); session.current = active;
     void active.start();
-    return () => { session.current = null; void active.dispose(); };
+    return () => { chatController.current?.dispose(); chatController.current = null; session.current = null; void active.dispose(); };
   }, [api, document.document_id]);
   useEffect(() => {
     if (previousArchive.current !== document.archived) {
@@ -30,12 +45,12 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     }
   }, [document.archived]);
   useEffect(() => {
-    onSafeToLeave(!snapshot.dirty && !snapshot.submitting);
-    if (!snapshot.dirty && !snapshot.submitting) return;
+    onSafeToLeave(!snapshot.dirty && !snapshot.submitting && !snapshot.chatSaving);
+    if (!snapshot.dirty && !snapshot.submitting && !snapshot.chatSaving) return;
     const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
     window.addEventListener('beforeunload', warn);
     return () => window.removeEventListener('beforeunload', warn);
-  }, [snapshot.dirty, snapshot.submitting, onSafeToLeave]);
+  }, [snapshot.dirty, snapshot.submitting, snapshot.chatSaving, onSafeToLeave]);
 
   const restore = async () => {
     setRestoreBusy(true);
@@ -45,13 +60,10 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   // Only the redundant clean-archive notice is replaced by the archive explanation.
   const archiveNoticeOnly = document.archived && !snapshot.dirty && !snapshot.needsReview && !snapshot.row?.submission
     && snapshot.error === '服務目前暫停編輯，請稍後再查看；尚未保存的內容繼續保留。';
-  return <div className="work-grid"><Paper sx={{ p: 3, alignSelf: 'start' }}>
-    <Chip label="你的工作顧問" size="small" variant="outlined" />
-    <Typography variant="h6" sx={{ mt: 2 }}>從實際工作，逐步整理。</Typography>
-    <Typography color="text.secondary" sx={{ mt: 2 }}>你可以先寫下平常負責什麼，再加入成果、執行要求，以及所需的知識與技能。</Typography>
-    <Divider sx={{ my: 3 }} /><Alert severity="info" icon={false}>AI 訪談正在接合中。目前可以手動完整建立與管理這份 JD。</Alert>
-    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>不用一次填完。只填已知內容，日後可以繼續補充與更正。</Typography>
-  </Paper><Box sx={{ minWidth: 0 }}>
+  return <div className="work-grid"><ChatPanel snapshot={snapshot} chat={chat} controller={chatController.current} archived={document.archived}
+    onText={text => session.current?.chatEdit(text)} onComposition={active => session.current?.chatComposition(active)}
+    onChange={ref => { setSelectedChange(previous => ({ ref, sequence: (previous?.sequence ?? 0) + 1 })); setHistory(true); }} />
+    <Box sx={{ minWidth: 0 }}>
     <Stack direction="row" sx={{ mb: 2, gap: 2, alignItems: 'center' }}>
       <Typography variant="h5" component="h1" sx={{ flex: 1, overflowWrap: 'anywhere' }}>{document.title}</Typography>
       <Chip label={document.archived ? '已封存' : snapshot.status} color={snapshot.dirty ? 'warning' : 'default'} variant="outlined" aria-live="polite" />
@@ -78,7 +90,7 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
       <Stack direction="row" spacing={1}><Button variant="contained" onClick={() => setRestoreChoice('continue')}>使用找回內容繼續</Button>
         <Button color="inherit" onClick={() => setRestoreChoice('discard')}>捨棄未提交內容</Button></Stack>
     </Paper>}
-    {history && <HistoryPanel api={api} documentId={document.document_id} revisionRef={snapshot.view?.revisionRef ?? null} />}
+    {history && <HistoryPanel api={api} documentId={document.document_id} revisionRef={snapshot.view?.revisionRef ?? null} selectedChange={selectedChange} />}
     {snapshot.loading ? <CircularProgress aria-label="讀取職務說明書" /> : snapshot.view && <JdEditor view={snapshot.view}
       disabled={document.archived || snapshot.readOnly} commandsDisabled={snapshot.submitting || !!Object.keys(snapshot.row?.fields ?? {}).length}
       values={snapshot.values} onField={(field, text) => session.current?.edit(field, text)}

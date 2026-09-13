@@ -1,9 +1,10 @@
 import { openDB } from 'idb';
 import type { DBSchema, IDBPDatabase } from 'idb';
-import { decode, validateManualRequest, validateOrigin } from './api.ts';
+import { decode, validateChatRequest, validateManualRequest, validateOrigin } from './api.ts';
 import type { ManualSaveInput, ManualCommand } from '../../../src/jd_relational/generated/jd-manual-http.ts';
 import type { MutationResult } from '../../../src/jd_relational/generated/jd-result.ts';
 import type { CatalogCreateInput } from '../../../src/jd_relational/generated/jd-catalog-http.ts';
+import type { ChatStartInput, ChatRunState } from '../../../src/jd_relational/generated/jd-chat-http.ts';
 
 export interface DraftScope { apiOrigin: string; datasetId: string; documentId: string }
 export interface DraftHandle { scope: DraftScope; draftId: string; ownerEpoch: string }
@@ -17,12 +18,22 @@ export interface DraftSubmission {
   request: ManualSaveInput; submissionGeneration: number;
   coveredFields: Record<string, number>; coveredForms: Record<string, number>;
 }
-export interface DraftRow {
-  format: 1; scope: DraftScope; draftId: string; ownerEpoch: string;
+interface DraftBase {
+  scope: DraftScope; draftId: string; ownerEpoch: string;
   generation: number; inputSeq: number;
   fields: Record<string, FieldDraft>; forms: Record<string, FormDraft>;
   submission: DraftSubmission | null;
 }
+export interface LegacyDraftRow extends DraftBase { format: 1 }
+export interface ChatDraft { text: string; seq: number }
+export interface ChatSubmission { request: ChatStartInput; submissionGeneration: number; coveredSeq: number }
+export interface DraftRow extends DraftBase {
+  format: 2; chatDraft: ChatDraft | null; chatSubmission: ChatSubmission | null;
+}
+export type StoredDraftRow = LegacyDraftRow | DraftRow;
+export interface PrepareChat { request: ChatStartInput; coveredSeq: number }
+export interface ChatSubmissionIdentity { runId: string; submissionGeneration: number }
+export interface ChatAcknowledgment extends ChatSubmissionIdentity { state: ChatRunState }
 export interface PrepareSubmission {
   request: ManualSaveInput; coveredFields: Record<string, number>; coveredForms: Record<string, number>;
 }
@@ -100,13 +111,15 @@ export function fieldKey(itemId: string | null, fieldName: string): string { ret
 function sameScope(a: DraftScope, b: DraftScope) {
   return a.apiOrigin === b.apiOrigin && a.datasetId === b.datasetId && a.documentId === b.documentId;
 }
-export function draftHandle(row: DraftRow): DraftHandle {
+export function draftHandle(row: StoredDraftRow): DraftHandle {
   return { scope: { ...row.scope }, draftId: row.draftId, ownerEpoch: row.ownerEpoch };
 }
-export function validateDraftRecord(value: unknown): DraftRow {
+export function validateStoredDraftRecord(value: unknown): StoredDraftRow {
   checkJson(value);
-  exact(value, ['format', 'scope', 'draftId', 'ownerEpoch', 'generation', 'inputSeq', 'fields', 'forms', 'submission']);
-  demand(value.format === 1 && uuid(value.draftId) && uuid(value.ownerEpoch)
+  demand(plain(value));
+  const keys = ['format', 'scope', 'draftId', 'ownerEpoch', 'generation', 'inputSeq', 'fields', 'forms', 'submission'];
+  exact(value, value.format === 2 ? [...keys, 'chatDraft', 'chatSubmission'] : keys);
+  demand((value.format === 1 || value.format === 2) && uuid(value.draftId) && uuid(value.ownerEpoch)
     && integer(value.generation, 1) && integer(value.inputSeq) && plain(value.fields) && plain(value.forms));
   checkScope(value.scope);
   const inputSeq = value.inputSeq;
@@ -140,7 +153,31 @@ export function validateDraftRecord(value: unknown): DraftRow {
       if (field.seq === s.coveredFields[keys[0]]) demand(field.text === s.request.command.arguments.text);
     }
   }
-  return value as unknown as DraftRow;
+  if (value.format === 2) {
+    if (value.chatDraft !== null) {
+      checkChatDraft(value.chatDraft); demand(value.chatDraft.seq <= inputSeq);
+    }
+    if (value.chatSubmission !== null) {
+      const s = value.chatSubmission;
+      exact(s, ['request', 'submissionGeneration', 'coveredSeq']);
+      demand(integer(s.submissionGeneration, 1) && s.submissionGeneration <= value.generation
+        && integer(s.coveredSeq, 1) && s.coveredSeq <= inputSeq);
+      checkChatRequest(s.request);
+      demand(value.submission === null && Object.keys(value.fields).length === 0 && Object.keys(value.forms).length === 0);
+      demand(value.chatDraft === null || value.chatDraft.seq > s.coveredSeq);
+    }
+  }
+  return value as unknown as StoredDraftRow;
+}
+export function validateDraftRecord(value: unknown): DraftRow {
+  const row = validateStoredDraftRecord(value); demand(row.format === 2); return row;
+}
+function checkChatDraft(value: unknown): asserts value is ChatDraft {
+  exact(value, ['text', 'seq']); demand(typeof value.text === 'string' && integer(value.seq, 1));
+}
+function checkChatRequest(value: unknown): asserts value is ChatStartInput {
+  try { validateChatRequest(value); } catch { throw new DraftError('invalid_draft'); }
+  demand(new TextEncoder().encode(JSON.stringify(value)).byteLength <= 1024 * 1024, 'draft_too_large');
 }
 function owned(row: DraftRow, handle: DraftHandle): void {
   validateDraftRecord(row); checkScope(handle.scope);
@@ -152,17 +189,22 @@ function changed(row: DraftRow): DraftRow {
 }
 
 // Bounded immutable transitions are also tested without claiming a mock is a browser.
-export function claimDraftRecord(previous: DraftRow | null, scope: DraftScope, ownerEpoch: string, newDraftId: string): DraftRow {
+export function claimDraftRecord(previous: StoredDraftRow | null, scope: DraftScope, ownerEpoch: string, newDraftId: string): DraftRow {
   checkScope(scope); demand(uuid(ownerEpoch) && uuid(newDraftId));
-  if (previous) {
-    validateDraftRecord(previous); demand(sameScope(previous.scope, scope), 'scope_changed');
-    return changed({ ...structuredClone(previous), ownerEpoch });
+  if (previous !== null) {
+    validateStoredDraftRecord(previous); demand(sameScope(previous.scope, scope), 'scope_changed');
+    // Only claim under the document Web Lock upgrades one validated row; reads do not rewrite legacy data.
+    const next: DraftRow = previous.format === 1
+      ? { ...structuredClone(previous), format: 2, chatDraft: null, chatSubmission: null, ownerEpoch }
+      : { ...structuredClone(previous), ownerEpoch };
+    return changed(next);
   }
-  return validateDraftRecord({ format: 1, scope: { ...scope }, draftId: newDraftId, ownerEpoch,
-    generation: 1, inputSeq: 0, fields: {}, forms: {}, submission: null });
+  return validateDraftRecord({ format: 2, scope: { ...scope }, draftId: newDraftId, ownerEpoch,
+    generation: 1, inputSeq: 0, fields: {}, forms: {}, submission: null, chatDraft: null, chatSubmission: null });
 }
 export function persistFieldRecord(row: DraftRow, handle: DraftHandle, field: FieldDraft): DraftRow {
   owned(row, handle); checkField(field);
+  demand(row.chatSubmission === null, 'chat_submission_pending');
   const key = fieldKey(field.itemId, field.fieldName);
   demand(!own(row.fields, key) || field.seq > row.fields[key].seq, 'input_changed');
   const next = structuredClone(row); next.fields[key] = structuredClone(field);
@@ -174,12 +216,14 @@ export function persistFieldRecord(row: DraftRow, handle: DraftHandle, field: Fi
 }
 export function persistFormRecord(row: DraftRow, handle: DraftHandle, form: FormDraft): DraftRow {
   owned(row, handle); checkForm(form);
+  demand(row.chatSubmission === null, 'chat_submission_pending');
   demand(!own(row.forms, form.key) || form.seq > row.forms[form.key].seq, 'input_changed');
   const next = structuredClone(row); next.forms[form.key] = structuredClone(form);
   next.inputSeq = Math.max(next.inputSeq, form.seq); return changed(next);
 }
 export function prepareSubmissionRecord(row: DraftRow, handle: DraftHandle, input: PrepareSubmission): DraftRow {
   owned(row, handle); demand(row.submission === null, 'submission_pending');
+  demand(row.chatSubmission === null, 'chat_submission_pending');
   checkCoverage(input.coveredFields); checkCoverage(input.coveredForms);
   try { validateManualRequest(input.request); } catch { throw new DraftError('invalid_draft'); }
   for (const [key, seq] of Object.entries(input.coveredFields)) demand(own(row.fields, key) && row.fields[key].seq === seq, 'input_changed');
@@ -227,8 +271,65 @@ export function rebindFieldRecord(row: DraftRow, handle: DraftHandle, input: Reb
   return changed(next);
 }
 
+export function persistChatRecord(row: DraftRow, handle: DraftHandle, input: ChatDraft): DraftRow {
+  owned(row, handle); checkChatDraft(input);
+  demand(input.seq > row.inputSeq, 'input_changed');
+  const next = structuredClone(row); next.chatDraft = structuredClone(input); next.inputSeq = input.seq;
+  return changed(next);
+}
+export function prepareChatRecord(row: DraftRow, handle: DraftHandle, input: PrepareChat): DraftRow {
+  owned(row, handle); exact(input, ['request', 'coveredSeq']); checkChatRequest(input.request);
+  demand(row.chatSubmission === null, 'chat_submission_pending');
+  demand(row.submission === null && Object.keys(row.fields).length === 0 && Object.keys(row.forms).length === 0, 'manual_pending');
+  demand(integer(input.coveredSeq, 1) && row.chatDraft !== null && row.chatDraft.seq === input.coveredSeq
+    && row.chatDraft.text === input.request.text, 'input_changed');
+  const next = structuredClone(row);
+  next.chatSubmission = { ...structuredClone(input), submissionGeneration: next.generation + 1 };
+  // The complete original text is now held by the immutable request, before any POST.
+  next.chatDraft = null; return changed(next);
+}
+function matchingChat(row: DraftRow, handle: DraftHandle, input: ChatSubmissionIdentity): void {
+  owned(row, handle);
+  demand(uuid(input.runId) && integer(input.submissionGeneration, 1));
+  demand(row.chatSubmission !== null && row.chatSubmission.request.run_id === input.runId
+    && row.chatSubmission.submissionGeneration === input.submissionGeneration, 'submission_changed');
+}
+function chatAcknowledgment(row: DraftRow, handle: DraftHandle, input: ChatAcknowledgment): ChatRunState {
+  exact(input, ['runId', 'submissionGeneration', 'state']); matchingChat(row, handle, input);
+  let state: ChatRunState;
+  try { state = decode<ChatRunState>('chat-http', 'ChatRunState', input.state); }
+  catch { throw new DraftError('invalid_draft'); }
+  demand(state.dataset_id === row.scope.datasetId && state.document_id === row.scope.documentId
+    && state.run_id === input.runId, 'scope_changed');
+  demand(['completed', 'failed', 'cancelled'].includes(state.run_status) && state.jd_effects.state === 'settled', 'result_unconfirmed');
+  return state;
+}
+export function acknowledgeChatRecord(row: DraftRow, handle: DraftHandle, input: ChatAcknowledgment): DraftRow {
+  const state = chatAcknowledgment(row, handle, input);
+  demand(state.input_state === 'saved', 'result_unconfirmed');
+  const next = structuredClone(row); next.chatSubmission = null; return changed(next);
+}
+export function restoreChatRecord(row: DraftRow, handle: DraftHandle, input: ChatAcknowledgment): DraftRow {
+  // Explicit controller action, with the original App's known-not-saved result. Unknown/timeout is never proof.
+  const state = chatAcknowledgment(row, handle, input);
+  demand(state.input_state === 'not_saved', 'result_unconfirmed');
+  return takeOriginalChatBack(row);
+}
+function takeOriginalChatBack(row: DraftRow): DraftRow {
+  demand(row.chatDraft === null || row.chatDraft.text === '', 'input_changed');
+  const next = structuredClone(row); next.inputSeq += 1;
+  next.chatDraft = { text: row.chatSubmission!.request.text, seq: next.inputSeq };
+  next.chatSubmission = null; return changed(next);
+}
+export function rejectUnavailableChatRecord(row: DraftRow, handle: DraftHandle, input: ChatSubmissionIdentity): DraftRow {
+  // ONLY the original start POST's validated ai_unavailable response proves this pre-admission rejection.
+  // The controller must never use this for GET not_found, timeout, or other errors; no run state is fabricated.
+  exact(input, ['runId', 'submissionGeneration']); matchingChat(row, handle, input);
+  return takeOriginalChatBack(row);
+}
+
 interface DraftDatabase extends DBSchema {
-  drafts: { key: [string, string, string]; value: DraftRow; indexes: { document: [string, string] } };
+  drafts: { key: [string, string, string]; value: StoredDraftRow; indexes: { document: [string, string] } };
   creations: { key: string; value: CatalogCreateInput };
 }
 const dbKey = (scope: DraftScope): [string, string, string] => [scope.apiOrigin, scope.datasetId, scope.documentId];
@@ -239,22 +340,22 @@ export class DraftStore {
   private readonly db: IDBPDatabase<DraftDatabase>;
   constructor(db: IDBPDatabase<DraftDatabase>) { this.db = db; }
   close(): void { this.db.close(); }
-  async read(scope: DraftScope): Promise<DraftRow | null> {
+  async read(scope: DraftScope): Promise<StoredDraftRow | null> {
     checkScope(scope);
-    try { const row = await this.db.get('drafts', dbKey(scope)); return row ? validateDraftRecord(row) : null; }
+    try { const row = await this.db.get('drafts', dbKey(scope)); return row === undefined ? null : validateStoredDraftRecord(row); }
     catch (error) { if (error instanceof DraftError) throw error; throw new DraftError('storage_unavailable'); }
   }
-  async listForDocument(apiOrigin: string, documentId: string): Promise<DraftRow[]> {
+  async listForDocument(apiOrigin: string, documentId: string): Promise<StoredDraftRow[]> {
     validateOrigin(apiOrigin); demand(uuid(documentId));
-    try { return (await this.db.getAllFromIndex('drafts', 'document', [apiOrigin, documentId])).map(validateDraftRecord); }
+    try { return (await this.db.getAllFromIndex('drafts', 'document', [apiOrigin, documentId])).map(validateStoredDraftRecord); }
     catch (error) { if (error instanceof DraftError) throw error; throw new DraftError('storage_unavailable'); }
   }
-  private async update(scope: DraftScope, transform: (row: DraftRow | null) => DraftRow): Promise<DraftRow> {
+  private async update(scope: DraftScope, transform: (row: StoredDraftRow | null) => DraftRow): Promise<DraftRow> {
     checkScope(scope);
     const tx = this.db.transaction('drafts', 'readwrite', { durability: 'strict' });
     try {
       const old = await tx.store.get(dbKey(scope));
-      const next = transform(old ? validateDraftRecord(old) : null);
+      const next = transform(old === undefined ? null : validateStoredDraftRecord(old));
       await Promise.all([tx.store.put(next, dbKey(scope)), tx.done]);
       return next;
     } catch (error) {
@@ -269,12 +370,27 @@ export class DraftStore {
     const newDraftId = crypto.randomUUID();
     return this.update(scope, row => claimDraftRecord(row, scope, ownerEpoch, newDraftId));
   }
-  private current(row: DraftRow | null): DraftRow { demand(row, 'owner_changed'); return row; }
+  private current(row: StoredDraftRow | null): DraftRow { demand(row?.format === 2, 'owner_changed'); return row; }
   persistField(handle: DraftHandle, field: FieldDraft): Promise<DraftRow> {
     return this.update(handle.scope, row => persistFieldRecord(this.current(row), handle, field));
   }
   persistForm(handle: DraftHandle, form: FormDraft): Promise<DraftRow> {
     return this.update(handle.scope, row => persistFormRecord(this.current(row), handle, form));
+  }
+  persistChat(handle: DraftHandle, input: ChatDraft): Promise<DraftRow> {
+    return this.update(handle.scope, row => persistChatRecord(this.current(row), handle, input));
+  }
+  prepareChat(handle: DraftHandle, input: PrepareChat): Promise<DraftRow> {
+    return this.update(handle.scope, row => prepareChatRecord(this.current(row), handle, input));
+  }
+  acknowledgeChat(handle: DraftHandle, input: ChatAcknowledgment): Promise<DraftRow> {
+    return this.update(handle.scope, row => acknowledgeChatRecord(this.current(row), handle, input));
+  }
+  restoreChat(handle: DraftHandle, input: ChatAcknowledgment): Promise<DraftRow> {
+    return this.update(handle.scope, row => restoreChatRecord(this.current(row), handle, input));
+  }
+  rejectUnavailableChat(handle: DraftHandle, input: ChatSubmissionIdentity): Promise<DraftRow> {
+    return this.update(handle.scope, row => rejectUnavailableChatRecord(this.current(row), handle, input));
   }
   prepareSubmission(handle: DraftHandle, input: PrepareSubmission): Promise<DraftRow> {
     return this.update(handle.scope, row => prepareSubmissionRecord(this.current(row), handle, input));
@@ -376,10 +492,13 @@ export const storeCreation = (store: DraftStore, apiOrigin: string, input: Catal
 export const clearCreation = (store: DraftStore, apiOrigin: string, datasetId: string, requestKey: string) => store.clearCreation(apiOrigin, datasetId, requestKey);
 export async function openDraftStore(options: DraftStoreOptions = {}): Promise<DraftStore> {
   try {
-    const db = await openDB<DraftDatabase>(options.name ?? 'caliburn-jd-browser-drafts', 1, {
-      upgrade(database) {
-        const store = database.createObjectStore('drafts'); store.createIndex('document', ['scope.apiOrigin', 'scope.documentId']);
-        database.createObjectStore('creations');
+    const db = await openDB<DraftDatabase>(options.name ?? 'caliburn-jd-browser-drafts', 2, {
+      upgrade(database, oldVersion) {
+        if (oldVersion < 1) {
+          const store = database.createObjectStore('drafts'); store.createIndex('document', ['scope.apiOrigin', 'scope.documentId']);
+          database.createObjectStore('creations');
+        }
+        // Version 2 fences old connections; rows are validated/upgraded only by claim, never cleared in bulk.
       },
       blocked() { options.blocked?.(); },
       blocking() { db.close(); options.blocking?.(); },

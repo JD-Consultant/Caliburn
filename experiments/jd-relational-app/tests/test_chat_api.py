@@ -148,9 +148,10 @@ def test_completed_original_lookup_retry_and_history_do_not_replay_or_replace_in
         original = assert_result(value.client.get(value.run_path), ChatRunState)
         messages_path = f"/api/documents/{value.document}/chat/messages"
         page = assert_result(value.client.get(messages_path, params={"limit": 1}), ChatHistoryPage)
-        assert page["messages"] == [{"message_id": value.run, "run_id": value.run,
-                                      "role": "user", "text": value.payload["text"]}]
+        assert page["messages"] == [{"message_id": original["response_message_id"], "run_id": value.run,
+                                      "role": "assistant", "text": "合成完整回覆"}]
         assert page["anchor"] and page["next_cursor"]
+        assert page["anchor_run_id"] == value.run
         before = value.graph.get_state({"configurable": {"thread_id": value.document}}, subgraphs=True)
         assert_result(value.client.get(value.run_path), ChatRunState)
         assert value.api_calls.count("start") == 1
@@ -167,8 +168,11 @@ def test_completed_original_lookup_retry_and_history_do_not_replay_or_replace_in
         continuation = assert_result(value.client.get(messages_path,
             params={"cursor": page["next_cursor"], "limit": 1}), ChatHistoryPage)
         assert continuation["anchor"] == page["anchor"] and continuation["next_cursor"] is None
-        assert continuation["messages"][0]["message_id"] == original["response_message_id"]
-        assert continuation["messages"][0]["run_id"] == value.run
+        assert continuation["anchor_run_id"] == page["anchor_run_id"] == value.run
+        assert continuation["messages"] == [{"message_id": value.run, "run_id": value.run,
+                                              "role": "user", "text": value.payload["text"]}]
+        fresh = assert_result(value.client.get(messages_path, params={"limit": 1}), ChatHistoryPage)
+        assert fresh["anchor_run_id"] == second["run_id"]
         assert assert_result(value.client.get(value.run_path), ChatRunState) == original
         unknown = assert_result(value.client.get(value.path + "/" + str(uuid4())), ChatRunState)
         assert unknown["run_status"] == "not_found" and unknown["input_state"] == "unconfirmed"

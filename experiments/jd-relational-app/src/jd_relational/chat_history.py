@@ -22,7 +22,7 @@ from .ai_checkpoints import AiCheckpointError, AiRunCheckpoints
 MAX_PAGE_BYTES = 1024 * 1024
 MAX_PAGE_MESSAGES = 50
 MAX_CURSOR_BYTES = 4096
-_SALT = "caliburn.jd.chat-history.v1"
+_SALT = "caliburn.jd.chat-history.v2"
 _TOKEN = re.compile(r"[A-Za-z0-9_.-]+\Z")
 
 
@@ -44,7 +44,7 @@ def _json(value):
 
 class _Position(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid", frozen=True, revalidate_instances="always")
-    format_version: Literal[1]
+    format_version: Literal[2]
     purpose: Literal["anchor", "cursor"]
     dataset_id: str
     document_id: str
@@ -52,12 +52,13 @@ class _Position(BaseModel):
     root_checkpoint_id: str = Field(min_length=1, max_length=256)
     source_namespace: str = Field(max_length=256)
     source_checkpoint_id: str = Field(min_length=1, max_length=256)
+    # Anchor uses zero; a cursor is the exclusive end of its next older page.
     offset: int = Field(ge=0, le=2**63 - 1)
 
     @field_validator("format_version", mode="before")
     @classmethod
     def exact_version(cls, value):
-        if type(value) is not int or value != 1:
+        if type(value) is not int or value != 2:
             raise ValueError()
         return value
 
@@ -72,7 +73,8 @@ class _Position(BaseModel):
                 or not self.root_checkpoint_id.strip() or not self.source_checkpoint_id.strip()
                 or (self.source_namespace != "" and not self.source_namespace.startswith("consultant:"))
                 or (self.source_namespace == "" and self.source_checkpoint_id != self.root_checkpoint_id)
-                or (self.purpose == "anchor" and self.offset != 0)):
+                or (self.purpose == "anchor" and self.offset != 0)
+                or (self.purpose == "cursor" and self.offset == 0)):
             raise ValueError()
         return self
 
@@ -197,8 +199,8 @@ class ChatHistoryService:
                 observed = self._checkpoints.discover(document_id, dataset_id)
                 if observed is None:
                     return {"dataset_id": dataset_id, "document_id": document_id,
-                            "anchor": None, "messages": [], "next_cursor": None}
-                position = _Position(format_version=1, purpose="anchor", dataset_id=dataset_id,
+                            "anchor": None, "anchor_run_id": None, "messages": [], "next_cursor": None}
+                position = _Position(format_version=2, purpose="anchor", dataset_id=dataset_id,
                     document_id=document_id, run_id=observed.record.run_id,
                     root_checkpoint_id=observed.root_config["configurable"]["checkpoint_id"],
                     source_namespace=observed.source_config["configurable"]["checkpoint_ns"],
@@ -207,24 +209,26 @@ class ChatHistoryService:
                 observed = self._checkpoints.observe_at(document_id, position.run_id, dataset_id,
                     position.root_config(), source_config=position.source_config())
             messages = _public_messages(observed)
-            if position.offset >= len(messages):
+            end = len(messages) if position.purpose == "anchor" else position.offset
+            if not 0 < end <= len(messages):
                 raise ChatHistoryError("invalid_cursor")
             anchor = self._codec._issue(position.model_copy(update={"purpose": "anchor", "offset": 0}))
-            count = min(limit, len(messages) - position.offset)
-            # Count each public row once. Shrinking a page must not repeatedly
-            # serialize every large body; only the small cursor envelope varies.
-            prefix_bytes = [0]
-            for row in messages[position.offset:position.offset + count]:
-                prefix_bytes.append(prefix_bytes[-1] + len(_json(row).encode("utf-8")))
+            count = min(limit, end)
+            # Initial page is the latest window; cursors move to older windows.
+            # Keep the newest whole rows when shrinking to the byte limit, and
+            # serialize each candidate row only once. Page order stays forward.
+            suffix_bytes = [0]
+            for row in reversed(messages[end - count:end]):
+                suffix_bytes.append(suffix_bytes[-1] + len(_json(row).encode("utf-8")))
             while count > 0:
-                next_offset = position.offset + count
-                next_cursor = self._codec._issue(position.model_copy(update={"purpose": "cursor", "offset": next_offset})) \
-                    if next_offset < len(messages) else None
+                start = end - count
+                next_cursor = self._codec._issue(position.model_copy(update={"purpose": "cursor", "offset": start})) \
+                    if start > 0 else None
                 page = {"dataset_id": dataset_id, "document_id": document_id, "anchor": anchor,
-                        "messages": [], "next_cursor": next_cursor}
-                byte_size = len(_json(page).encode("utf-8")) + prefix_bytes[count] + count - 1
+                        "anchor_run_id": position.run_id, "messages": [], "next_cursor": next_cursor}
+                byte_size = len(_json(page).encode("utf-8")) + suffix_bytes[count] + count - 1
                 if byte_size <= MAX_PAGE_BYTES:
-                    page["messages"] = messages[position.offset:next_offset]
+                    page["messages"] = messages[start:end]
                     return page
                 count -= 1  # Whole messages only; never truncate a body.
             raise ChatHistoryError("history_page_too_large")

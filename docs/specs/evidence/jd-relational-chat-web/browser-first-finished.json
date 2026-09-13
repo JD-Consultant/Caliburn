@@ -1,0 +1,68 @@
+{
+  "pid": 80536,
+  "closed": true,
+  "saver_connection_closed": true,
+  "reason": "requested",
+  "format": 1,
+  "model_request_count": 4,
+  "model_requests": [
+    {
+      "request_number": 1,
+      "payload_bytes": 22645,
+      "tool": "jd_read",
+      "response": "synthetic_complete_stream"
+    },
+    {
+      "request_number": 2,
+      "payload_bytes": 39024,
+      "tool": "jd_create_task",
+      "response": "synthetic_complete_stream"
+    },
+    {
+      "request_number": 3,
+      "payload_bytes": 41672,
+      "tool": null,
+      "response": "synthetic_complete_stream"
+    },
+    {
+      "request_number": 4,
+      "payload_bytes": 41414,
+      "tool": null,
+      "response": "synthetic_complete_stream"
+    }
+  ],
+  "closed_model_bodies": 4,
+  "writer_execute_count": 2,
+  "writes": [
+    {
+      "document_id": "f3249666-14fa-4134-9d34-2ee2f763711e",
+      "origin": "ai",
+      "run_id": "f8fd4e7b-f41b-4cdb-9a9a-a4113a5e5f31",
+      "operation_id": "24ffbade-d4a5-4feb-85b6-e9ef3b5d006e",
+      "confirmed": true,
+      "status": "committed",
+      "result_revision_id": "3b59a8c8-8777-45c2-8585-6799245bd397"
+    },
+    {
+      "document_id": "f3249666-14fa-4134-9d34-2ee2f763711e",
+      "origin": "manual",
+      "run_id": null,
+      "operation_id": "feafe1f9-3644-4074-b856-7cbb232c61ce",
+      "confirmed": true,
+      "status": "committed",
+      "result_revision_id": "4478ca19-d7bb-4c12-b1b0-19263f6d3bf7"
+    }
+  ],
+  "http_counts": {
+    "GET other": 15,
+    "OPTIONS other": 32,
+    "POST other": 20,
+    "OPTIONS chat_messages": 5,
+    "GET chat_messages": 5,
+    "OPTIONS chat_runs": 5,
+    "POST chat_runs": 2,
+    "GET chat_runs": 3
+  },
+  "evidence_failed": false,
+  "provider_network": false
+}

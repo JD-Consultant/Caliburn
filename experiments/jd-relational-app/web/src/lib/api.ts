@@ -7,6 +7,7 @@ import httpSchema from '../../../contracts/jd-http.schema.json' with { type: 'js
 import querySchema from '../../../contracts/jd-query-http.schema.json' with { type: 'json' };
 import manualSchema from '../../../contracts/jd-manual-http.schema.json' with { type: 'json' };
 import catalogSchema from '../../../contracts/jd-catalog-http.schema.json' with { type: 'json' };
+import chatSchema from '../../../contracts/jd-chat-http.schema.json' with { type: 'json' };
 import type { ReadInput, ReadPage, ChangeReadPage } from '../../../src/jd_relational/generated/jd-read';
 import type { ManualSaveInput, ManualOperationState, ManualDocumentState } from '../../../src/jd_relational/generated/jd-manual-http';
 import type { MutationResult } from '../../../src/jd_relational/generated/jd-result';
@@ -15,6 +16,11 @@ import type { CatalogProblem } from '../../../src/jd_relational/generated/jd-cat
 import type { ManualProblem } from '../../../src/jd_relational/generated/jd-manual-http';
 import type { HttpProblem } from '../../../src/jd_relational/generated/jd-http';
 import type { QueryProblem } from '../../../src/jd_relational/generated/jd-query-http';
+import type { ChatStartInput, ChatRunState, ChatHistoryPage, ChatProblem } from '../../../src/jd_relational/generated/jd-chat-http';
+
+export type ChatMessagesOptions =
+  | { cursor?: null; anchor?: never; anchorRunId?: never; limit?: number }
+  | { cursor: string; anchor: string; anchorRunId: string; limit?: number };
 
 export class ApiError extends Error {
   code: string;
@@ -26,7 +32,8 @@ export class ApiError extends Error {
 const ajv = new Ajv2020({ strict: true, coerceTypes: false, useDefaults: false, removeAdditional: false });
 addFormats(ajv);
 for (const [name, schema] of Object.entries({ work: workSchema, read: readSchema, result: resultSchema,
-  http: httpSchema, 'query-http': querySchema, 'manual-http': manualSchema, 'catalog-http': catalogSchema })) {
+  http: httpSchema, 'query-http': querySchema, 'manual-http': manualSchema, 'catalog-http': catalogSchema,
+  'chat-http': chatSchema })) {
   ajv.addSchema(schema, `jd-${name}.schema.json`);
 }
 const checks = new Map<string, ReturnType<typeof ajv.compile>>();
@@ -50,6 +57,14 @@ function strongEtag(value: string | null): string {
 export function validateManualRequest(value: unknown): asserts value is ManualSaveInput {
   decode<ManualSaveInput>('manual-http', 'ManualSaveInput', value);
 }
+export function validateChatRequest(value: unknown): asserts value is ChatStartInput {
+  let input: ChatStartInput;
+  try { input = decode<ChatStartInput>('chat-http', 'ChatStartInput', value); }
+  catch { throw new ApiError('invalid_input', '這次訪談內容不符送出格式；請保留輸入並確認內容。'); }
+  // The existing server boundary measures original UTF-8, not code points.
+  if (!input.text.isWellFormed() || new TextEncoder().encode(input.text).length > 128 * 1024)
+    throw new ApiError('invalid_input', '這次訪談文字無法送出；請保留輸入並確認內容與長度。');
+}
 export function validateOrigin(value: string): string {
   let url: URL;
   try { url = new URL(value); } catch { throw new ApiError('configuration_required', '尚未設定本機資料服務。'); }
@@ -64,7 +79,9 @@ export class JdApi {
   private fetcher: typeof fetch;
   constructor(origin: string, fetcher: typeof fetch = fetch) { this.origin = validateOrigin(origin); this.fetcher = fetcher; }
 
-  private async request(path: string, body?: unknown, options: { method?: string; etag?: string; mutation?: boolean } = {}) {
+  private async request(path: string, body?: unknown, options: {
+    method?: string; etag?: string; mutation?: boolean; chat?: boolean; accepted?: boolean;
+  } = {}) {
     const method = options.method ?? (body === undefined ? 'GET' : 'POST');
     if (method !== 'GET' && !this.datasetId) throw new ApiError('dataset_required', '請先讀取文件列表。');
     let response: Response;
@@ -76,7 +93,9 @@ export class JdApi {
           ...(this.datasetId ? { 'X-JD-Dataset': this.datasetId } : {}),
           ...(options.etag ? { 'If-Match': options.etag } : {}),
         }, body: body === undefined ? undefined : JSON.stringify(body) });
-    } catch { throw new ApiError('response_unknown', '連線中斷或服務未回應；保存結果須用原操作查回。'); }
+    } catch { throw new ApiError('response_unknown', options.chat
+      ? '連線中斷或服務未回應；請保留原輸入，並用原回合查看狀態。'
+      : '連線中斷或服務未回應；保存結果須用原操作查回。'); }
     const media = response.headers.get('Content-Type')?.split(';')[0].trim().toLowerCase();
     if (media !== (response.ok ? 'application/json' : 'application/problem+json')) invalid();
     let value: unknown;
@@ -88,6 +107,11 @@ export class JdApi {
         if (!options.mutation || problem.status !== response.status) invalid();
         return { value: problem.jd_result, response };
       }
+      if (options.chat) {
+        const problem = decode<ChatProblem>('chat-http', 'ChatProblem', value);
+        if (problem.status !== response.status) invalid();
+        throw new ApiError(problem.code, problem.detail);
+      }
       let problem: CatalogProblem | ManualProblem | QueryProblem | null = null;
       const definitions = [['catalog-http', 'CatalogProblem'], ['manual-http', 'ManualProblem'], ['query-http', 'QueryProblem']];
       for (const [file, name] of definitions) {
@@ -96,7 +120,7 @@ export class JdApi {
       if (!problem || problem.status !== response.status) invalid();
       throw new ApiError('jd_read_error' in problem ? problem.jd_read_error.code : problem.code, problem.detail);
     }
-    if (response.status !== 200 && !(options.mutation && response.status === 202)) invalid();
+    if (response.status !== 200 && !((options.mutation || options.accepted) && response.status === 202)) invalid();
     return { value, response };
   }
 
@@ -197,6 +221,94 @@ export class JdApi {
       (await this.request(path + (recover ? '/recover' : ''), recover ? {} : undefined)).value);
     if (result.operation_id !== operationId) throw new ApiError('invalid_response');
     return result;
+  }
+  private chatScope(id: string, runId?: string): string {
+    if (!this.datasetId) throw new ApiError('dataset_required', '請先讀取文件列表。');
+    decode('chat-http', 'ChatUuid', this.datasetId);
+    decode('chat-http', 'ChatUuid', id);
+    if (runId !== undefined) decode('chat-http', 'ChatUuid', runId);
+    return this.datasetId;
+  }
+  private sameChatDataset(dataset: string) {
+    if (this.datasetId !== dataset)
+      throw new ApiError('dataset_changed', '資料集已變更，原輸入已保留。請重新查看文件。');
+  }
+  private chatResult(id: string, runId: string, dataset: string, value: unknown, response: Response, control: boolean) {
+    this.sameChatDataset(dataset);
+    const result = decode<ChatRunState>('chat-http', 'ChatRunState', value);
+    if (result.dataset_id !== dataset || result.document_id !== id || result.run_id !== runId) invalid();
+    if (control) {
+      const pending = ['running', 'closing', 'recovery_required'].includes(result.run_status);
+      if (response.status !== (pending ? 202 : 200)) invalid();
+      const location = response.headers.get('Location');
+      if (!location) invalid();
+      let target: URL;
+      try { target = new URL(location, this.origin); } catch { invalid(); }
+      if (target.origin !== this.origin || target.pathname !== `/api/documents/${id}/chat/runs/${runId}`
+          || target.search || target.hash || target.username || target.password) invalid();
+    }
+    return result;
+  }
+  async chatStart(id: string, input: ChatStartInput): Promise<ChatRunState> {
+    const dataset = this.chatScope(id);
+    validateChatRequest(input);
+    const runId = input.run_id;
+    const { value, response } = await this.request(`/api/documents/${id}/chat/runs`, input, { chat: true, accepted: true });
+    return this.chatResult(id, runId, dataset, value, response, true);
+  }
+  async chatStatus(id: string, runId: string): Promise<ChatRunState> {
+    const dataset = this.chatScope(id, runId);
+    const { value, response } = await this.request(`/api/documents/${id}/chat/runs/${runId}`, undefined, { chat: true });
+    return this.chatResult(id, runId, dataset, value, response, false);
+  }
+  private async chatControl(id: string, runId: string, action: 'cancel' | 'recover'): Promise<ChatRunState> {
+    const dataset = this.chatScope(id, runId);
+    const { value, response } = await this.request(`/api/documents/${id}/chat/runs/${runId}/${action}`, {}, { chat: true, accepted: true });
+    return this.chatResult(id, runId, dataset, value, response, true);
+  }
+  async chatCancel(id: string, runId: string): Promise<ChatRunState> { return this.chatControl(id, runId, 'cancel'); }
+  async chatRecover(id: string, runId: string): Promise<ChatRunState> { return this.chatControl(id, runId, 'recover'); }
+  async chatMessages(id: string, options: ChatMessagesOptions = {}): Promise<ChatHistoryPage> {
+    const dataset = this.chatScope(id);
+    if (options === null || typeof options !== 'object' || Array.isArray(options)
+        || Object.keys(options).some(key => !['cursor', 'anchor', 'anchorRunId', 'limit'].includes(key))) invalid();
+    const cursor = options.cursor ?? null;
+    const limit = options.limit === undefined ? 50 : options.limit;
+    if (!Number.isInteger(limit) || limit < 1 || limit > 50) invalid();
+    if (cursor === null) {
+      if ('anchor' in options || 'anchorRunId' in options) invalid();
+    } else {
+      decode('chat-http', 'ChatOpaqueRef', cursor);
+      decode('chat-http', 'ChatOpaqueRef', options.anchor);
+      decode('chat-http', 'ChatUuid', options.anchorRunId);
+    }
+    const query = new URLSearchParams({ limit: String(limit) });
+    if (cursor !== null) query.set('cursor', cursor);
+    const { value } = await this.request(`/api/documents/${id}/chat/messages?${query}`, undefined, { chat: true });
+    this.sameChatDataset(dataset);
+    const page = decode<ChatHistoryPage>('chat-http', 'ChatHistoryPage', value);
+    if (page.dataset_id !== dataset || page.document_id !== id
+        || page.messages.length > limit || page.next_cursor !== null && page.messages.length === 0
+        || cursor === null && page.anchor !== null && page.messages.at(-1)?.run_id !== page.anchor_run_id
+        || cursor !== null && (page.anchor !== options.anchor || page.anchor_run_id !== options.anchorRunId
+          || page.messages.length === 0 || page.next_cursor === cursor)) invalid();
+    const seen = new Set<string>();
+    let messageRun: string | null = null;
+    for (const message of page.messages) {
+      if (seen.has(message.message_id)) invalid();
+      seen.add(message.message_id);
+      if (message.role === 'user') {
+        if (message.message_id !== message.run_id) invalid();
+        messageRun = message.run_id;
+      } else {
+        if (messageRun !== null && message.run_id !== messageRun) invalid();
+        messageRun = message.run_id;
+      }
+    }
+    // One fixed page only: initial page is the latest window, later pages are
+    // older (all pages remain chronological). The UI prepends older pages and
+    // checks cross-page duplicates; disposed views must ignore late responses.
+    return page;
   }
   async changes(id: string, changeRef: string): Promise<ChangeReadPage> {
     let all: ChangeReadPage | null = null, cursor: string | null = null;

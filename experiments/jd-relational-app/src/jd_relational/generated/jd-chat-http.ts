@@ -84,7 +84,7 @@ export type ChatConfirmedResult =
   | ConfirmedDependentItems
   | ConfirmedSaveFailed;
 /**
- * At most fifty public messages from one fixed root/child checkpoint range, with scoped signed anchor/cursor. No checkpoint means the explicit empty branch, not guessed history or a new chat authority.
+ * The initial page contains the latest at most fifty public messages; next_cursor requests an older page at the same fixed root/child snapshot, and every page remains chronological. anchor_run_id is the run at that fixed anchor, not the first visible message or the latest run on later pages. No checkpoint means null anchor and anchor_run_id in the explicit empty branch, not guessed history or a new chat authority.
  *
  * This interface was referenced by `ChatHttpCatalog`'s JSON-Schema
  * via the `definition` "ChatHistoryPage".
@@ -512,6 +512,7 @@ export interface ChatEmptyHistoryPage {
   dataset_id: ChatUuid;
   document_id: ChatUuid;
   anchor: null;
+  anchor_run_id: null;
   /**
    * @maxItems 0
    */
@@ -526,6 +527,7 @@ export interface ChatAnchoredHistoryPage {
   dataset_id: ChatUuid;
   document_id: ChatUuid;
   anchor: ChatOpaqueRef;
+  anchor_run_id: ChatUuid;
   /**
    * @maxItems 50
    */

@@ -1,20 +1,23 @@
-import { ApiError, JdApi } from './api.ts';
+import { ApiError, JdApi, validateChatRequest } from './api.ts';
 import { openDraftStore, draftHandle } from './drafts.ts';
-import type { DraftHandle, DraftRow, DraftStore, DraftSubmission, JsonValue, FieldDraft } from './drafts.ts';
+import type { DraftHandle, DraftRow, DraftStore, DraftSubmission, JsonValue, FieldDraft, ChatSubmission } from './drafts.ts';
 import { projectView } from './view.ts';
 import { settleItemForm } from './item-form.ts';
 import type { JdView, FieldView } from './view.ts';
 import type { ManualCommand, ManualDocumentState } from '../../../src/jd_relational/generated/jd-manual-http.ts';
 import type { MutationResult } from '../../../src/jd_relational/generated/jd-result.ts';
+import type { ChatRunState } from '../../../src/jd_relational/generated/jd-chat-http.ts';
 
 export interface SessionSnapshot {
   view: JdView | null; values: Record<string, string>; form: JsonValue | null;
   row: DraftRow | null; loading: boolean; readOnly: boolean; submitting: boolean;
   needsReview: boolean; dirty: boolean; error: string; status: string;
   recoveryFields: Record<string, FieldDraft>;
+  chatText: string; chatSaving: boolean; chatSending: boolean; chatReady: boolean;
 }
 export const emptySession: SessionSnapshot = { view: null, values: {}, form: null, row: null,
-  loading: true, readOnly: true, submitting: false, needsReview: false, dirty: false, error: '', status: '讀取中', recoveryFields: {} };
+  loading: true, readOnly: true, submitting: false, needsReview: false, dirty: false, error: '', status: '讀取中', recoveryFields: {},
+  chatText: '', chatSaving: false, chatSending: false, chatReady: false };
 const explain = (error: unknown) => error instanceof ApiError ? error.message :
   '本機暫存或操作未完成，內容仍保留在畫面中。請先查看狀態。';
 
@@ -31,6 +34,8 @@ export class JdSession {
   private local: Promise<void> = Promise.resolve(); private flight: Promise<void> | null = null;
   private timer: ReturnType<typeof setTimeout> | null = null; private release: (() => void) | null = null;
   private state: ManualDocumentState | null = null;
+  private chatCandidate: { text: string; seq: number } | null = null;
+  private chatHandoff = false; private chatComposing = false;
   constructor(api: JdApi, id: string, notify: (snapshot: SessionSnapshot) => void,
     options: { openStore?: typeof openDraftStore; locks?: Pick<LockManager, 'request'> } = {}) {
     this.api = api; this.id = id; this.notify = notify;
@@ -51,10 +56,13 @@ export class JdSession {
       || !!Object.keys(this.row?.forms ?? {}).length;
     this.notify({ view: this.view, values, recoveryFields, row: this.row, form: this.review && !this.pendingForm ? null :
       this.pendingForm ? this.pendingForm.value : this.row?.forms.editor?.value ?? null,
-      loading: this.loading, readOnly: !this.writable || this.review || this.state?.write_blocked !== false,
+      loading: this.loading, readOnly: !this.writable || this.review || this.chatHandoff || !!this.row?.chatSubmission || this.state?.write_blocked !== false,
       submitting: !!this.flight, needsReview: this.review, dirty,
       error: this.error, status: this.row?.submission ? (this.flight ? '保存中' : '保存結果待確認') :
-        this.review ? '找回內容，待確認' : dirty ? '尚未保存' : !this.writable ? '唯讀' : '已保存' });
+        this.review ? '找回內容，待確認' : dirty ? '尚未保存' : !this.writable ? '唯讀' : '已保存',
+      chatText: this.chatCandidate?.text ?? this.row?.chatDraft?.text ?? '', chatSaving: !!this.chatCandidate || this.chatHandoff, chatSending: this.chatHandoff,
+      chatReady: this.writable && !this.loading && !this.review && !this.chatHandoff && !this.row?.chatSubmission
+        && this.state?.write_blocked === false });
   }
   private async queue(work: () => Promise<void>): Promise<void> {
     const current = this.local.then(work);
@@ -93,7 +101,7 @@ export class JdSession {
   }
   composition(active: boolean) { this.composing = active; if (active && this.timer) clearTimeout(this.timer); if (!active) this.schedule(); }
   edit(field: FieldView, text: string) {
-    if (!this.writable || this.review || this.disposed || this.state?.write_blocked !== false) return;
+    if (!this.writable || this.review || this.disposed || this.chatHandoff || this.row?.chatSubmission || this.state?.write_blocked !== false) return;
     const seq = ++this.seq; this.input.set(field.key, { field, text, seq }); this.emit();
     void this.queue(async () => {
       const current = this.row?.fields[field.key];
@@ -106,7 +114,7 @@ export class JdSession {
     }).then(() => this.schedule()).catch(() => undefined);
   }
   form(value: JsonValue | null) {
-    if (!this.writable || this.review || this.flight || this.disposed || this.state?.write_blocked !== false) return;
+    if (!this.writable || this.review || this.flight || this.disposed || this.chatHandoff || this.row?.chatSubmission || this.state?.write_blocked !== false) return;
     const seq = ++this.seq;
     this.pendingForm = { value, seq }; this.emit();
     void this.queue(async () => {
@@ -120,7 +128,7 @@ export class JdSession {
   }
   private schedule() {
     if (this.timer) clearTimeout(this.timer);
-    if (this.disposed || this.composing || this.review || this.row?.submission || this.flight || !this.writable
+    if (this.disposed || this.composing || this.review || this.chatHandoff || this.row?.chatSubmission || this.row?.submission || this.flight || !this.writable
       || this.state?.write_blocked !== false || (!this.input.size && !Object.keys(this.row?.fields ?? {}).length)) return;
     this.timer = setTimeout(() => { void this.flush().catch(() => undefined); }, 800);
   }
@@ -177,7 +185,7 @@ export class JdSession {
   }
   async flush(): Promise<void> {
     if (this.flight) return this.flight;
-    if (this.disposed || this.review || this.composing || !this.writable || this.state?.write_blocked !== false) return;
+    if (this.disposed || this.review || this.composing || this.row?.chatSubmission || !this.writable || this.state?.write_blocked !== false) return;
     const work = async () => {
       await this.local;
       while (!this.disposed && !this.review && !this.composing && !this.row?.submission && this.state?.write_blocked === false) {
@@ -191,10 +199,10 @@ export class JdSession {
     try { await this.flight; } finally { this.flight = null; this.emit(); this.schedule(); }
   }
   async command(command: ManualCommand, options: { preserveForm?: boolean } = {}): Promise<void> {
-    if (this.disposed || this.review || !this.writable || this.composing || this.state?.write_blocked !== false) throw new ApiError('not_ready', '請先處理尚未保存的內容。');
+    if (this.disposed || this.review || !this.writable || this.composing || this.chatHandoff || this.row?.chatSubmission || this.state?.write_blocked !== false) throw new ApiError('not_ready', '請先處理尚未保存的內容。');
     if (this.flight || this.input.size || Object.keys(this.row?.fields ?? {}).length) throw new ApiError('not_ready', '文字正在保存，請保存完成後再操作。');
     await this.local;
-    if (this.row?.submission || this.review || Object.keys(this.row?.fields ?? {}).length)
+    if (this.flight || this.row?.submission || this.row?.chatSubmission || this.chatHandoff || this.review || Object.keys(this.row?.fields ?? {}).length)
       throw new ApiError('not_ready', '請先確認文字保存結果，再完成這項操作。');
     // Commands in the open form refer to the displayed revision; never rewrite refs.
     const coveredForms: Record<string, number> = !options.preserveForm && this.row?.forms.editor ? { editor: this.row.forms.editor.seq } : {};
@@ -226,6 +234,13 @@ export class JdSession {
       const next = await this.fresh();
       if (next.state.write_blocked && !discard) throw new ApiError('busy', '目前仍暫停編輯，請稍後再試；輸入繼續保留。');
       await this.queue(async () => {
+        // This action only discards JD candidates. A chat draft that failed to
+        // reach IndexedDB must still be saved, never silently cleared or stranded.
+        if (this.chatCandidate) {
+          const candidate = this.chatCandidate;
+          this.row = await this.store!.persistChat(this.handle!, candidate);
+          if (this.chatCandidate?.seq === candidate.seq) this.chatCandidate = null;
+        }
         if (!discard) for (const [key, candidate] of this.input) {
           const actual = next.view.fields.find(item => item.key === key);
           if (!actual) throw new ApiError('target_missing', '原欄位已移除，請先複製保留輸入內容。');
@@ -264,5 +279,92 @@ export class JdSession {
     } catch (error) { this.error = explain(error); this.emit(); } })();
     this.emit();
     try { await this.flight; } finally { this.flight = null; this.emit(); this.schedule(); }
+  }
+
+  // Chat uses this same document owner and local transaction queue. Its reader
+  // controls HTTP observation only; it does not own another editable JD/cache.
+  chatEdit(text: string) {
+    if (!this.writable || this.loading || this.disposed || this.chatHandoff || this.state?.archived) return;
+    const seq = ++this.seq; this.chatCandidate = { text, seq }; this.emit();
+    void this.queue(async () => {
+      this.row = await this.store!.persistChat(this.handle!, { text, seq });
+      if (this.chatCandidate?.seq === seq) this.chatCandidate = null;
+      this.emit();
+    }).catch(() => undefined);
+  }
+  chatComposition(active: boolean) { this.chatComposing = active; }
+  chatOriginal(): ChatSubmission | null { return this.row?.chatSubmission ? structuredClone(this.row.chatSubmission) : null; }
+  async chatPrepare(): Promise<ChatSubmission> {
+    if (this.disposed || !this.writable || this.loading || this.review || this.chatHandoff || this.row?.chatSubmission
+        || this.composing || this.chatComposing || this.state?.write_blocked !== false)
+      throw new ApiError('not_ready', '請先完成輸入並確認目前保存狀態，再送出訪談。');
+    this.chatHandoff = true; if (this.timer) clearTimeout(this.timer); this.emit();
+    try {
+      await this.local; await this.flush(); await this.local;
+      // flush can return early. Only actual clean state permits a handoff.
+      if (this.disposed || !this.writable || this.review || this.composing || this.chatComposing || this.flight
+          || this.row?.submission || this.row?.chatSubmission || this.input.size || this.pendingForm
+          || Object.keys(this.row?.fields ?? {}).length || Object.keys(this.row?.forms ?? {}).length || this.chatCandidate)
+        throw new ApiError('not_ready', '請先完成或取消尚未完成的 JD 表單，並確認文字已保存。訪談輸入繼續保留。');
+      const next = await this.fresh();
+      if (this.disposed || !this.writable || next.state.write_blocked)
+        throw new ApiError('not_ready', '目前暫停編輯，請稍後查看狀態；訪談輸入繼續保留。');
+      this.view = next.view; this.state = next.state;
+      const draft = this.row?.chatDraft;
+      const request = { run_id: crypto.randomUUID(), text: draft?.text ?? '', expected_jd_revision_ref: next.view.revisionRef };
+      validateChatRequest(request);
+      await this.queue(async () => {
+        this.row = await this.store!.prepareChat(this.handle!, { request, coveredSeq: draft!.seq });
+      });
+      this.emit(); return this.chatOriginal()!;
+    } catch (error) { this.chatHandoff = false; this.emit(); this.schedule(); throw error; }
+  }
+  chatRequestFinished(): void { this.chatHandoff = false; this.emit(); this.schedule(); }
+  async chatObserve(observed: ChatRunState): Promise<void> {
+    if (this.disposed) return;
+    if (observed.document_id !== this.id || observed.dataset_id !== this.api.datasetId)
+      throw new ApiError('invalid_response');
+    this.state = observed.write_state; this.emit();
+    await this.flight;
+    if (this.disposed) return;
+    this.flight = this.receiveChatObservation(observed); this.emit();
+    try { await this.flight; } finally { this.flight = null; this.emit(); this.schedule(); }
+  }
+  private async receiveChatObservation(observed: ChatRunState): Promise<void> {
+    const next = await this.fresh();
+    if (this.disposed) return;
+    if (next.view.revisionRef !== this.view?.revisionRef && (this.input.size || this.pendingForm
+        || Object.keys(this.row?.fields ?? {}).length || Object.keys(this.row?.forms ?? {}).length)) {
+      this.review = true; this.error = 'JD 已有改動，請先比較尚未保存的內容。';
+    }
+    this.view = next.view; this.state = next.state;
+    const original = this.chatOriginal();
+    if (this.writable && original?.request.run_id === observed.run_id && observed.input_state === 'saved'
+        && observed.jd_effects.state === 'settled') {
+      await this.queue(async () => {
+        this.row = await this.store!.acknowledgeChat(this.handle!, { runId: observed.run_id,
+          submissionGeneration: original.submissionGeneration, state: observed });
+      });
+    }
+    this.emit();
+  }
+  async chatUnavailable(original: ChatSubmission): Promise<void> {
+    if (this.disposed || !this.writable) return;
+    // Only the controller's exact start POST with validated ai_unavailable calls
+    // this path. Network errors / empty GET never prove the input was not saved.
+    await this.queue(async () => {
+      this.row = await this.store!.rejectUnavailableChat(this.handle!, { runId: original.request.run_id,
+        submissionGeneration: original.submissionGeneration });
+      this.seq = Math.max(this.seq, this.row.inputSeq); this.emit();
+    });
+  }
+  async chatRestore(state: ChatRunState): Promise<void> {
+    const original = this.chatOriginal();
+    if (this.disposed || !this.writable || !original) throw new ApiError('not_ready');
+    await this.queue(async () => {
+      this.row = await this.store!.restoreChat(this.handle!, { runId: original.request.run_id,
+        submissionGeneration: original.submissionGeneration, state });
+      this.seq = Math.max(this.seq, this.row.inputSeq); this.emit();
+    });
   }
 }

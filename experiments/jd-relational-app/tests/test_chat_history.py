@@ -64,7 +64,7 @@ def service(native, *, key=KEY, dataset=None):
 def test_empty_history_has_exact_empty_wire_shape(native):
     _, dataset, document, *_ = native
     assert service(native).read(document) == {"dataset_id": dataset, "document_id": document,
-        "anchor": None, "messages": [], "next_cursor": None}
+        "anchor": None, "anchor_run_id": None, "messages": [], "next_cursor": None}
 
 
 def test_projection_preserves_original_public_text_without_private_fields(native):
@@ -82,7 +82,7 @@ def test_projection_preserves_original_public_text_without_private_fields(native
     observed = append(native, [ai, tool, blank])
     before = graph.get_state(observed.root_config).values
     page = service(native).read(document)
-    assert set(page) == {"dataset_id", "document_id", "anchor", "messages", "next_cursor"}
+    assert set(page) == {"dataset_id", "document_id", "anchor", "anchor_run_id", "messages", "next_cursor"}
     assert page["dataset_id"] == dataset and page["document_id"] == document
     assert page["messages"] == [
         {"message_id": observed.record.run_id, "run_id": observed.record.run_id,
@@ -103,7 +103,8 @@ def test_pages_keep_original_anchor_after_new_run_and_new_codec(native):
     second = service(native).read(document, cursor=first["next_cursor"])
     third = service(native).read(document, cursor=second["next_cursor"])
     assert first["anchor"] == second["anchor"] == third["anchor"]
-    combined = first["messages"] + second["messages"] + third["messages"]
+    assert first["anchor_run_id"] == second["anchor_run_id"] == third["anchor_run_id"] == old.record.run_id
+    combined = third["messages"] + second["messages"] + first["messages"]
     assert [row["message_id"] for row in combined] == [message.id for message in old.messages]
     assert len(combined) == 106 and third["next_cursor"] is None and len(calls) == 2
     assert service(native).read(document)["anchor"] != first["anchor"]
@@ -119,7 +120,8 @@ def test_active_child_advance_cannot_change_remaining_fixed_page(native):
         {"messages": [AIMessage(id="late-child-message", content="late-child-public")]}, as_node="model")
     second = service(native).read(document, cursor=first["next_cursor"])
     assert first["anchor"] == second["anchor"] and second["next_cursor"] is None
-    assert [row["message_id"] for row in first["messages"] + second["messages"]] == [m.id for m in observed.messages]
+    assert first["anchor_run_id"] == second["anchor_run_id"] == observed.record.run_id
+    assert [row["message_id"] for row in second["messages"] + first["messages"]] == [m.id for m in observed.messages]
 
 
 @pytest.mark.parametrize("limit", [0, 51, True, 1.0, "2", None])
@@ -154,7 +156,7 @@ def test_cursor_signed_payload_has_only_position_and_no_conversation(native):
     _, dataset, document, *_ = native
     observed = append(native, [AIMessage(id="reply", content="never-place-text-in-token")])
     first = service(native).read(document, limit=1)
-    serializer = URLSafeSerializer(KEY, salt="caliburn.jd.chat-history.v1",
+    serializer = URLSafeSerializer(KEY, salt="caliburn.jd.chat-history.v2",
         signer_kwargs={"digest_method": hashlib.sha256})
     payload = serializer.loads(first["next_cursor"])
     assert payload["document_id"] == document and payload["dataset_id"] == dataset
@@ -167,10 +169,8 @@ def test_cursor_signed_payload_has_only_position_and_no_conversation(native):
 def test_large_message_is_not_silently_truncated(native):
     _, _, document, *_ = native
     append(native, [AIMessage(id="too-large", content="文" * 400000)])
-    first = service(native).read(document)
-    assert len(first["messages"]) == 1 and first["next_cursor"]
     with pytest.raises(ChatHistoryError, match="^history_page_too_large$"):
-        service(native).read(document, cursor=first["next_cursor"])
+        service(native).read(document)
 
 
 def test_unknown_checkpoint_failure_never_exposes_details(native, monkeypatch):
@@ -182,18 +182,19 @@ def test_unknown_checkpoint_failure_never_exposes_details(native, monkeypatch):
     assert failure.value.__suppress_context__ and "private" not in repr(failure.value)
 
 
-@pytest.mark.parametrize("fault", ["float_version", "boolean_version", "extra", "negative_offset", "past_end", "missing_root", "missing_source", "wrong_namespace"])
+@pytest.mark.parametrize("fault", ["float_version", "boolean_version", "extra", "negative_offset", "zero_offset", "past_end", "missing_root", "missing_source", "wrong_namespace"])
 def test_even_signed_invalid_position_never_selects_another_snapshot(native, fault):
     _, dataset, document, *_ = native
     append(native, [AIMessage(id="one", content="one")], pause=True)
     first = service(native).read(document, limit=1)
-    serializer = URLSafeSerializer(KEY, salt="caliburn.jd.chat-history.v1",
+    serializer = URLSafeSerializer(KEY, salt="caliburn.jd.chat-history.v2",
         signer_kwargs={"digest_method": hashlib.sha256})
     payload = serializer.loads(first["next_cursor"])
-    if fault == "float_version": payload["format_version"] = 1.0
+    if fault == "float_version": payload["format_version"] = 2.0
     elif fault == "boolean_version": payload["format_version"] = True
     elif fault == "extra": payload["unexpected"] = "must not be accepted"
     elif fault == "negative_offset": payload["offset"] = -1
+    elif fault == "zero_offset": payload["offset"] = 0
     elif fault == "past_end": payload["offset"] = 500
     elif fault == "missing_root": payload["root_checkpoint_id"] = str(uuid4())
     elif fault == "missing_source": payload["source_checkpoint_id"] = str(uuid4())
@@ -253,11 +254,12 @@ def test_start_history_uses_saved_original_human_and_prior_complete_messages():
     reader = ChatHistoryService(AiRunCheckpoints(graph), ChatHistoryCodec(KEY, DATASET))
     first = reader.read(DOCUMENT, limit=1)
     second = reader.read(DOCUMENT, cursor=first["next_cursor"])
-    combined = first["messages"] + second["messages"]
+    combined = second["messages"] + first["messages"]
     assert [row["message_id"] for row in combined] == [m.id for m in previous.values["messages"]] + [human.id]
     assert combined[-1] == {"message_id": human.id, "run_id": record.run_id,
                             "role": "user", "text": human.content}
     assert first["anchor"] == second["anchor"] and len(calls) == 1
+    assert first["anchor_run_id"] == second["anchor_run_id"] == record.run_id
 
 
 def test_public_text_function_never_promotes_a_partial_ai_chunk():
@@ -277,8 +279,67 @@ def test_page_byte_limit_keeps_complete_messages_and_agrees_with_wire_size(nativ
         assert 0 < len(page["messages"]) <= 50
         anchor = anchor or page["anchor"]
         assert anchor == page["anchor"]
-        rows.extend(page["messages"])
+        rows[0:0] = page["messages"]
         cursor = page["next_cursor"]
         if cursor is None: break
     assert [row["message_id"] for row in rows] == [m.id for m in observed.messages]
     assert all(row["text"] == "文" * 60000 for row in rows[1:])
+
+
+def test_page_reports_its_fixed_run_even_when_its_first_message_belongs_to_an_older_run(native):
+    _, _, document, *_ = native
+    earlier = append(native, [AIMessage(id="earlier-reply", content="早一輪公開文字")])
+    current = append(native, [AIMessage(id="current-reply", content="目前公開文字")])
+    first = service(native).read(document, limit=3)
+    assert first["messages"][0]["run_id"] == earlier.record.run_id
+    assert first["anchor_run_id"] == current.record.run_id
+    later = append(native, [AIMessage(id="later-reply", content="稍後的新回合")])
+    second = service(native).read(document, cursor=first["next_cursor"], limit=1)
+    assert second["anchor"] == first["anchor"]
+    assert second["anchor_run_id"] == first["anchor_run_id"] == current.record.run_id
+    assert service(native).read(document, limit=1)["anchor_run_id"] == later.record.run_id
+
+
+def test_empty_page_has_no_anchor_run_identity(native):
+    _, _, document, *_ = native
+    assert service(native).read(document)["anchor_run_id"] is None
+
+
+def test_initial_page_is_latest_window_and_continuations_prepend_older_chronological_pages(native):
+    _, dataset, document, *_ = native
+    observed = append(native, [AIMessage(id=f"window-{i}", content=f"公開 {i}") for i in range(104)])
+    first = service(native).read(document)
+    assert [row["message_id"] for row in first["messages"]] == [m.id for m in observed.messages[-50:]]
+    serializer = URLSafeSerializer(KEY, salt="caliburn.jd.chat-history.v2",
+        signer_kwargs={"digest_method": hashlib.sha256})
+    position = serializer.loads(first["next_cursor"])
+    assert position["format_version"] == 2 and position["offset"] == 55
+    assert position["dataset_id"] == dataset
+    second = service(native).read(document, cursor=first["next_cursor"])
+    third = service(native).read(document, cursor=second["next_cursor"])
+    assert [row["message_id"] for row in third["messages"] + second["messages"] + first["messages"]] == [m.id for m in observed.messages]
+    assert third["next_cursor"] is None
+
+
+def test_previous_forward_cursor_format_and_salt_are_not_reinterpreted(native):
+    _, _, document, *_ = native
+    append(native, [AIMessage(id="reply", content="公開回覆")])
+    first = service(native).read(document, limit=1)
+    current = URLSafeSerializer(KEY, salt="caliburn.jd.chat-history.v2", signer_kwargs={"digest_method": hashlib.sha256})
+    old = URLSafeSerializer(KEY, salt="caliburn.jd.chat-history.v1", signer_kwargs={"digest_method": hashlib.sha256})
+    payload = current.loads(first["next_cursor"])
+    for token in (old.dumps({**payload, "format_version": 1}), current.dumps({**payload, "format_version": 1})):
+        with pytest.raises(ChatHistoryError, match="^invalid_cursor$"):
+            service(native).read(document, cursor=token)
+
+
+def test_size_limit_keeps_latest_whole_message_and_does_not_skip_an_oversized_older_message(native):
+    _, _, document, *_ = native
+    observed = append(native, [AIMessage(id="large-older", content="文" * 400000),
+                               AIMessage(id="small-latest", content="最新完整回覆")])
+    first = service(native).read(document)
+    assert first["messages"] == [{"message_id": "small-latest", "run_id": observed.record.run_id,
+        "role": "assistant", "text": "最新完整回覆"}]
+    assert first["anchor_run_id"] == observed.record.run_id and first["next_cursor"]
+    with pytest.raises(ChatHistoryError, match="^history_page_too_large$"):
+        service(native).read(document, cursor=first["next_cursor"])

@@ -75,8 +75,8 @@ test('prepare refuses replacing an unsettled original operation or stale coverag
 });
 
 test('local format and generated HTTP contract are checked before accepting recovered rows', () => {
-  const row = prepared(); assert.equal(validateDraftRecord(row).format, 1);
-  assert.throws(() => validateDraftRecord({ ...row, format: 2 }), /invalid_draft/);
+  const row = prepared(); assert.equal(validateDraftRecord(row).format, 2);
+  assert.throws(() => validateDraftRecord({ ...row, format: 3 }), /invalid_draft/);
   assert.throws(() => validateDraftRecord({ ...row, submission: { ...row.submission, request: { ...request(), extra: true } } }), /invalid_draft/);
   assert.throws(() => claimDraftRecord(row, { ...scope, datasetId: uuid(66) }, uuid(9), uuid(10)), /scope_changed/);
 });

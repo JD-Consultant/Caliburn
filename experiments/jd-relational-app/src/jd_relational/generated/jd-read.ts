@@ -67,6 +67,10 @@ export interface ReadPage {
 export interface SectionRecord {
   type: "section";
   section_ref: string;
+  /**
+   * Stable App-provided chapter identity for display. Not a writable locator.
+   */
+  section_key: "profile" | "purpose" | "duties_tasks" | "knowledge" | "skills" | "conditions";
   title: string;
 }
 /**
@@ -99,6 +103,10 @@ export interface ContainerRecord {
 export interface ItemRecord {
   type: "item";
   item_ref: string;
+  /**
+   * Stable App-provided database item identity within this document and dataset, retained across edits and moves. Display only; commands must use current signed refs.
+   */
+  item_id: string;
   section_ref: string;
   container_ref: string;
   kind:

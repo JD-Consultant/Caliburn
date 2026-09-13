@@ -32,6 +32,8 @@ from .storage.history import HistoryError
 from .storage.service import StorageError
 from .transport import manual_command, TransportError
 
+READ_FORMAT_VERSION = 2
+
 SECTIONS = {
     "profile": "基本資料",
     "purpose": "職務目的",
@@ -213,7 +215,7 @@ class _Projection:
         section_refs = {name: token("section", "section", name) for name in SECTIONS}
         for name, title in SECTIONS.items():
             if name in section_ids:
-                result.append(dict(type="section", section_ref=section_refs[name], title=title))
+                result.append(dict(type="section", section_ref=section_refs[name], section_key=name, title=title))
         containers = [
             ("collaborator", None, "profile", None),
             ("duty", None, "duties_tasks", None),
@@ -272,6 +274,7 @@ class _Projection:
                     dict(
                         type="item",
                         item_ref=item_ref,
+                        item_id=identity,
                         section_ref=section_refs[section],
                         kind=item_type,
                         container_ref=token("container", "container", parent, child_kind=item_type),
@@ -401,7 +404,7 @@ class ReadService:
                 else None
             )
             return dict(
-                format_version=1,
+                format_version=READ_FORMAT_VERSION,
                 view=view,
                 access=access,
                 revision_ref=self._revision_ref(document, revision),

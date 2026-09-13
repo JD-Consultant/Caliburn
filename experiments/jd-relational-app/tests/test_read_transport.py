@@ -3,6 +3,7 @@
 from copy import deepcopy
 import json
 from pathlib import Path
+from uuid import UUID
 import pytest
 from jsonschema import Draft202012Validator
 from pydantic import ValidationError
@@ -16,7 +17,7 @@ from test_snapshots import uid, complete_domain
 from jd_relational.snapshots import empty_domain
 from jd_relational.references import ReferenceCodec
 from jd_relational.reads import ReadService, ReadError
-from jd_relational.generated.reads import ReadInput, ReadPage
+from jd_relational.generated.reads import ReadInput, ReadPage, SectionRecord, ItemRecord
 from jd_relational.read_transport import (
     parse_read_arguments,
     read_tool_definition,
@@ -31,6 +32,52 @@ def result_page():
     return ReadService(CurrentReader(empty_domain("document-a", uid(901))), None, codec).read(
         "document-a", {"view": "current", "target_ref": None, "cursor": None}
     )
+
+
+def test_read_v2_requires_stable_section_and_item_keys_and_rejects_v1():
+    codec = ReferenceCodec(b"public-synthetic-read-test-key-0000", "dataset")
+    service = ReadService(CurrentReader(complete_domain()), None, codec)
+    records, pages = all_pages(service, "document-a")
+    assert all(page["format_version"] == 2 for page in pages)
+    schema = json.loads((Path(__file__).resolve().parents[1] / "contracts/jd-read.schema.json").read_text(encoding="utf-8"))
+    source = {"$defs": schema["$defs"], "$ref": "#/$defs/ReadPage"}
+    for page in pages:
+        assert Draft202012Validator(source).is_valid(page)
+        assert not Draft202012Validator(source).is_valid({**page, "format_version": 1})
+        with pytest.raises(ValidationError):
+            ReadPage.model_validate({**page, "format_version": 1}, strict=True)
+    for record in records:
+        if record["type"] == "section":
+            assert record["section_key"] in {"profile", "purpose", "duties_tasks", "knowledge", "skills", "conditions"}
+        elif record["type"] == "item":
+            assert str(UUID(record["item_id"])) == record["item_id"]
+
+
+@pytest.mark.parametrize("kind,key,bad", [
+    ("section", "section_key", "missing"),
+    ("section", "section_key", "custom"),
+    ("section", "section_key", 1),
+    ("item", "item_id", "missing"),
+    ("item", "item_id", "not-a-uuid"),
+    ("item", "item_id", "ABCDEFAB-0000-0000-0000-000000000001"),
+    ("item", "item_id", 1),
+])
+def test_display_identity_source_and_generated_schema_reject_invalid_metadata(kind, key, bad):
+    codec = ReferenceCodec(b"public-synthetic-read-test-key-0000", "dataset")
+    records, _ = all_pages(ReadService(CurrentReader(complete_domain()), None, codec), "document-a")
+    record = next(r for r in records if r["type"] == kind)
+    dto = SectionRecord if kind == "section" else ItemRecord
+    schema = json.loads((Path(__file__).resolve().parents[1] / "contracts/jd-read.schema.json").read_text(encoding="utf-8"))
+    original = {"$defs": schema["$defs"], "$ref": f"#/$defs/{dto.__name__}"}
+    assert Draft202012Validator(original).is_valid(record)
+    if bad == "missing":
+        record.pop(key)
+    else:
+        record[key] = bad
+    assert not Draft202012Validator(original).is_valid(record)
+    assert not Draft202012Validator(dto.model_json_schema()).is_valid(record)
+    with pytest.raises(ValidationError):
+        dto.model_validate(record, strict=True)
 
 
 @pytest.mark.parametrize(

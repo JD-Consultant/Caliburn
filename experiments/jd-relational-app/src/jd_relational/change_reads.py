@@ -12,7 +12,7 @@ from pydantic import ValidationError
 from .changes import compare_snapshots
 from .domain import COLLECTIONS, FIELDS, SOURCE_COLUMNS, source_target
 from .generated.reads import ChangeReadInput, ChangeReadPage
-from .reads import ReadError, content_projection, pack_read_records
+from .reads import READ_FORMAT_VERSION, ReadError, content_projection, pack_read_records
 from .references import ReadCursor, ReferenceValidationError, SignedReference
 from .snapshots import domain_from_snapshot
 from .storage.history import ChangeMaterial, HistoryError
@@ -200,7 +200,7 @@ class ChangeReadService:
                 more = start + end < len(records)
                 next_cursor = self.codec.issue_cursor(ReadCursor(document_id=document_id, view="change",
                     revision_id=target.revision_id, operation_id=target.entity_id, offset=start + end)) if more else None
-                return dict(format_version=1, view="change", access="history", change_ref=request.change_ref,
+                return dict(format_version=READ_FORMAT_VERSION, view="change", access="history", change_ref=request.change_ref,
                             operation_ref=operation_ref, base_revision_ref=base_ref, result_revision_ref=result_ref,
                             origin=receipt.origin, records=remaining[:end], start_index=start, total_records=len(records),
                             total_changes=len(changes), has_more=more, next_cursor=next_cursor, oversized_unit=oversized)

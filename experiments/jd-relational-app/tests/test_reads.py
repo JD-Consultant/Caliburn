@@ -48,7 +48,7 @@ def all_pages(service, doc, view="current", target=None):
         assert len(pages) < 1000
 
 
-def test_complete_read_preserves_fields_relations_sources_and_no_raw_row_ids(codec):
+def test_complete_read_preserves_fields_relations_sources_and_display_identity(codec):
     value = complete_domain()
     service, _ = reader(value, codec)
     records, pages = all_pages(service, value["document_id"])
@@ -68,7 +68,47 @@ def test_complete_read_preserves_fields_relations_sources_and_no_raw_row_ids(cod
         len(json.dumps(p, ensure_ascii=False, separators=(",", ":")).encode()) <= 12000
         for p in pages
     )
-    assert uid(3) not in json.dumps(records)
+    items = [r for r in records if r["type"] == "item"]
+    assert {r["item_id"] for r in items} == {
+        identity for collection in COLLECTIONS.values() for identity in value[collection]
+    }
+    assert all(set(r).isdisjoint({"item_id", "section_key"}) for r in records
+               if r["type"] not in {"item", "section"})
+
+
+def test_display_identity_survives_real_task_move_and_field_edit_but_refs_do_not(codec):
+    value = complete_domain()
+    service, current = reader(value, codec)
+    original, _ = all_pages(service, "document-a")
+    task = next(r for r in original if r["type"] == "item" and r["item_id"] == uid(3))
+    unassigned = next(r for r in original if r["type"] == "container"
+                      and r["child_kind"] == "task" and r["owner_ref"] is None)
+    move = {"tool": "jd_move_item", "arguments": {
+        "target_ref": task["item_ref"], "destination_container_ref": unassigned["container_ref"],
+        "after_ref": None, "content_changes": []}}
+    current.value = build_candidate(value, move, command_context(value, move, codec, lambda *_: None, lambda: str(uuid4())))
+    current.value["revision"] = uid(902)
+    moved, _ = all_pages(service, "document-a")
+    moved_task = next(r for r in moved if r["type"] == "item" and r["item_id"] == uid(3))
+    name = next(r for r in moved if r["type"] == "field" and r["item_ref"] == moved_task["item_ref"] and r["name"] == "name")
+    edit = {"tool": "jd_set_text", "arguments": {
+        "target_field_ref": name["field_ref"], "text": "更正後名稱", "basis_refs": []}}
+    current.value = build_candidate(current.value, edit, command_context(current.value, edit, codec, lambda *_: None, lambda: str(uuid4())))
+    current.value["revision"] = uid(903)
+    edited, _ = all_pages(service, "document-a")
+    for rows in (moved, edited):
+        assert {r["item_id"] for r in rows if r["type"] == "item"} == {
+            r["item_id"] for r in original if r["type"] == "item"}
+        assert {r["section_key"] for r in rows if r["type"] == "section"} == {
+            "profile", "purpose", "duties_tasks", "knowledge", "skills", "conditions"}
+        assert {r["item_ref"] for r in rows if r["type"] == "item"}.isdisjoint(
+            r["item_ref"] for r in original if r["type"] == "item")
+    assert moved_task["container_ref"] != task["container_ref"]
+    assert current.value["tasks"][uid(3)]["duty_id"] is None
+    assert current.value["tasks"][uid(3)]["name"] == "更正後名稱"
+    with pytest.raises(ReadError, match="invalid_ref"):
+        bad = {**move, "arguments": {**move["arguments"], "target_ref": uid(3)}}
+        command_context(current.value, bad, codec, lambda *_: None, lambda: str(uuid4()))
 
 
 def test_empty_document_exposes_all_sections_profile_fields_and_root_containers(codec):

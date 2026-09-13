@@ -1,10 +1,12 @@
 # 關聯式 JD：隔離編輯核心
 
-此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
+此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2 及 RS-3 第一段。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
-**目前沒有可開啟的 App 畫面；八操作已透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接读取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復 HTTP。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；AI 回合、圖形啟動器及畫面尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
+**已有可開啟的[六章手動管理畫面](web/README.md)，透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；[本次 UI 結果](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)包含自動保存、未完成表單重開及歷史。AI 回合、完整來源回查、歷史還原與圖形啟動器尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
 
 ## 結構
+
+- `web/`：React／Next／MUI 六章管理、IndexedDB 候選及 Web Locks；從正式 Schema／generated 型別接同一 API，不另存正式 JD。
 
 - `contracts/jd-work.schema.json`：八個編輯工具輸入的唯一 JSON Schema。
 - `contracts/jd-result.schema.json`／`jd-http.schema.json`：合法結果組合與 HTTP Problem，和輸入一樣使用標準產生器。
@@ -88,7 +90,7 @@ Windows-only `pywin32==312` 使用 creator token 的 default DACL、不繼承 ha
 
 ### 本機維運入口
 
-在此目錄、固定 lock 環境執行。這是目前人工 API 的維運入口，管理畫面及圖形啟停尚在施工：
+在此目錄、固定 lock 環境執行。這是目前人工 API 的維運入口；六章管理畫面已接，圖形啟停尚在施工：
 
 ```powershell
 $env:PYTHONUTF8='1'
@@ -109,10 +111,10 @@ uv run --offline --frozen python -m jd_relational serve
 
 目前／歷史 item、field、container、section 與觀察 refs 已發配／驗證，`command_context` 用同版讀取材料重核可寫用途、存在性與欄位摘要。來源查核仍是注入 callback，未接實際 source owner；讀取回 `readability=not_checked`。瀏覽器選區發配仍未完成，此接點明示拒絕 selection，不把 field ref 當選區。
 
-`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。固定設定已接，日常 configured API 包含無 refs recover 的資料集門閘；備份還原世代流程、畫面、人工通知及實際顧問回合尚待接線。
+`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。固定設定與手動管理畫面已接，日常 configured API 包含無 refs recover 的資料集門閘；備份還原世代流程、人工通知及實際顧問回合尚待接線。
 
-正文歷史還原／整輪撤回、autosave 暫存及維護仍未完成。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
+文字自動保存、管理表單與原請求暫存已接，真瀏覽器重開可找回未完成內容；原生故障注入、實體 IME 及 AI 交接仍待驗。正文歷史還原／整輪撤回與維護尚未完成。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
 
 原兩工具及來源 digest 見[首切片](../../docs/specs/2026-09-13-jd-relational-command-slice.md)；目前八工具、分層與錯誤／診斷、289 項結果及通過界線見[本次設計與結果](../../docs/specs/2026-09-13-jd-management-operations-slice.md)。
 
-歷史[结果與資料庫基礎](../../docs/specs/2026-09-13-jd-result-and-storage-foundation.md)、[共同保存交易](../../docs/specs/2026-09-13-jd-transaction-service-slice.md)、[同版讀取](../../docs/specs/2026-09-13-jd-read-change-implementation.md)、[查詢接合](../../docs/specs/2026-09-13-jd-query-api-and-recovery-identity-slice.md)、[人工 writer](../../docs/specs/2026-09-13-jd-manual-runtime-slice.md)、[宿主重啟恢復](../../docs/specs/2026-09-13-jd-host-restart-recovery-slice.md)、[人工 HTTP](../../docs/specs/2026-09-13-jd-manual-http-slice.md)及[文件目錄](../../docs/specs/2026-09-13-jd-catalog-http-slice.md)保留當時結果。最新測試、首敗、獨立審查及下一工作見[配置與初始化切片](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)；各批數字不累加。
+歷史[结果與資料庫基礎](../../docs/specs/2026-09-13-jd-result-and-storage-foundation.md)、[共同保存交易](../../docs/specs/2026-09-13-jd-transaction-service-slice.md)、[同版讀取](../../docs/specs/2026-09-13-jd-read-change-implementation.md)、[查詢接合](../../docs/specs/2026-09-13-jd-query-api-and-recovery-identity-slice.md)、[人工 writer](../../docs/specs/2026-09-13-jd-manual-runtime-slice.md)、[宿主重啟恢復](../../docs/specs/2026-09-13-jd-host-restart-recovery-slice.md)、[人工 HTTP](../../docs/specs/2026-09-13-jd-manual-http-slice.md)、[文件目錄](../../docs/specs/2026-09-13-jd-catalog-http-slice.md)及[配置與初始化](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)保留當時結果。最新測試、首敗、獨立審查及下一工作見[六章手動管理與恢復切片](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)；各批數字不累加。

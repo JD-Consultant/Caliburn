@@ -7,6 +7,7 @@ import pytest
 
 from jd_relational.domain import COLLECTIONS, FIELDS, Source, source_target
 from jd_relational.intents import bind_edit
+from jd_relational.observation_projection import project_observation
 from jd_relational.reads import ReadError, ReadService, command_context
 from jd_relational.references import ReferenceCodec
 from jd_relational.storage.history import HistoryReader
@@ -47,6 +48,7 @@ def pages(reads, document, view="current", target=None, first=None):
     page = first or reads.read(document, request(view, target))
     result, received, cursors = [], [], set()
     while True:
+        assert page["format_version"] == 2
         received.append(page)
         result.extend(page["records"])
         assert page["has_more"] == (page["next_cursor"] is not None)
@@ -138,6 +140,7 @@ def assert_complete_projection(rows, current, codec, *, purpose):
             actual_fields[key] = row["value"]
         elif row["type"] == "item":
             ref = decode(codec, row["item_ref"], doc, "item")
+            assert row["item_id"] == ref.entity_id
             owner = decode(codec, row["container_ref"], doc, "container")
             assert ref.purpose == owner.purpose == purpose
             actual_items[(ref.kind, ref.entity_id)] = (row["kind"], owner.entity_id, row["position"])
@@ -155,6 +158,8 @@ def assert_complete_projection(rows, current, codec, *, purpose):
     assert actual_relations == {(r["task_id"], r["capability_id"], r["position"]) for r in value["task_capabilities"]}
     assert actual_sources == {(source_target(row), row["source_ref"]) for row in value["source_links"]}
     assert len([row for row in rows if row["type"] == "section"]) == 6
+    assert {row["section_key"] for row in rows if row["type"] == "section"} == {
+        "profile", "purpose", "duties_tasks", "knowledge", "skills", "conditions"}
 
 
 def test_issued_container_item_and_field_reach_the_same_real_save(reads, store, codec, current):
@@ -169,11 +174,14 @@ def test_issued_container_item_and_field_reach_the_same_real_save(reads, store, 
     assert saved.receipt.base_revision_id != saved.receipt.result_revision_id
     rows = records(reads, current)
     task = item(rows, "task")
+    initial_task = task
     current, _, _ = apply_issued(store, codec, current, "jd_set_text", {
         "target_field_ref": field(rows, "description", task["item_ref"])["field_ref"],
         "text": "只檢查授權範圍；未知不補造。", "basis_refs": []})
     rows = records(reads, current)
     task = item(rows, "task")
+    assert task["item_id"] == initial_task["item_id"]
+    assert task["item_ref"] != initial_task["item_ref"]
     before = current.domain
     current, _, _ = apply_issued(store, codec, current, "jd_move_item", {
         "target_ref": task["item_ref"], "destination_container_ref": container(rows, "task")["container_ref"],
@@ -182,6 +190,10 @@ def test_issued_container_item_and_field_reach_the_same_real_save(reads, store, 
     assert current.domain["tasks"][identity]["duty_id"] is None
     assert current.domain["tasks"][identity]["description"] == "只檢查授權範圍；未知不補造。"
     assert current.domain["details"] == before["details"] and current.domain["duties"] == before["duties"]
+    moved = item(records(reads, current), "task")
+    assert moved["item_id"] == task["item_id"] == identity
+    assert moved["item_ref"] != task["item_ref"]
+    assert moved["container_ref"] != task["container_ref"]
     assert_complete_projection(records(reads, current), current, codec, purpose="current")
 
 
@@ -215,6 +227,44 @@ def test_history_pages_reassemble_old_fields_and_original_producer_refs(reads, s
     assert_complete_projection(again, rich, codec, purpose="history")
     initial = index[-1]
     assert initial["origin"] == "initial" and initial["operation_ref"] is None and initial["change_ref"] is None
+
+
+@pytest.mark.parametrize("status", ["committed", "no_change"])
+def test_original_receipt_revision_normalizes_through_history_without_writable_scope(reads, store, codec, current, status):
+    """Observation refs differ textually; ordinary history reads normalize them."""
+    initial_rows = records(reads, current)
+    text = "自己的工作與必要範圍" if status == "committed" else None
+    command = {"tool": "jd_set_text", "arguments": {
+        "target_field_ref": field(initial_rows, "purpose")["field_ref"], "text": text, "basis_refs": []}}
+    context = command_context(current.domain, command, codec, lambda *_: None, lambda: str(uuid4()))
+    intent = bind_edit(operation_id=uuid4(), origin="manual", ai_run_id=None, command=command, context=context)
+    store.authority.admit(intent)
+    saved = store.execute(intent)
+    assert saved.confirmed and saved.status == status
+    result = project_observation(saved, codec)
+    current = store.read_current(current.document_id)
+    current_page = reads.read(current.document_id, request())
+    # The browser's former direct-token comparison reports a false conflict.
+    assert result["result_revision_ref"] != current_page["revision_ref"]
+    historical_rows, historical_pages = pages(reads, current.document_id, "history", result["result_revision_ref"])
+    canonical = historical_pages[0]["revision_ref"]
+    assert all(page["revision_ref"] == canonical == current_page["revision_ref"]
+               and page["access"] == "history" for page in historical_pages)
+    assert field(historical_rows, "purpose")["value"] == text
+    forbidden = {"tool": "jd_set_text", "arguments": {
+        "target_field_ref": field(historical_rows, "purpose")["field_ref"], "text": "不能用歷史寫", "basis_refs": []}}
+    with pytest.raises(ReadError, match="invalid_ref"):
+        command_context(current.domain, forbidden, codec, lambda *_: None, lambda: str(uuid4()))
+    current_rows = records(reads, current)
+    newer, _, _ = apply_issued(store, codec, current, "jd_set_text", {
+        "target_field_ref": field(current_rows, "purpose")["field_ref"], "text": "後來補充的不同版本", "basis_refs": []})
+    later_rows, later_pages = pages(reads, current.document_id, "history", result["result_revision_ref"])
+    assert field(later_rows, "purpose")["value"] == text
+    assert all(page["revision_ref"] == canonical for page in later_pages)
+    assert reads.read(current.document_id, request())["revision_ref"] != canonical
+    assert reads.history.read_change(current.document_id, intent.operation_id).receipt.result_revision_id == current.revision_id
+    assert newer.revision_id != current.revision_id
+    assert project_observation(saved, codec) == result
 
 
 @pytest.mark.parametrize("role", ["field", "item", "container"])

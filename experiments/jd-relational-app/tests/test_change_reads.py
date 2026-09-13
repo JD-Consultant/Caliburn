@@ -4,10 +4,15 @@ from copy import deepcopy
 from dataclasses import replace
 from datetime import datetime, timezone
 from uuid import UUID
+from pathlib import Path
+import json
 
 import pytest
+from jsonschema import Draft202012Validator
+from pydantic import ValidationError
 
 from jd_relational.change_reads import ChangeReadService
+from jd_relational.generated.reads import ChangeReadPage
 from jd_relational.domain import CommandContext, Ref, build_candidate
 from jd_relational.references import ReferenceCodec, SignedReference, ReadCursor
 from jd_relational.reads import ReadError, command_context, read_json
@@ -89,7 +94,23 @@ def test_changed_item_full_before_after_fields_use_original_history_only_refs(co
                 {"tool": "jd_set_text", "arguments": {"target_field_ref": row["record"]["field_ref"], "text": "不得寫歷史", "basis_refs": []}},
                 codec, lambda *_: None, lambda: uid(980))
     assert all(call == (DOC, UUID(OP)) for call in history.calls)
-    assert uid(3) not in read_json(rows)
+    items = [row for row in rows if row["type"] == "value" and row["record"]["type"] == "item"]
+    assert len(items) == 2 and {row["record"]["item_id"] for row in items} == {uid(3)}
+    assert len({row["record"]["item_ref"] for row in items}) == 2
+    assert all(page["format_version"] == 2 for page in pages)
+
+
+@pytest.mark.parametrize("version", [1, True, 3])
+def test_change_v2_source_and_generated_schemas_refuse_old_or_invalid_versions(codec, version):
+    page = ChangeReadService(History(material()), codec).read(DOC, {"change_ref": change_ref(codec), "cursor": None})
+    schema = json.loads((Path(__file__).resolve().parents[1] / "contracts/jd-read.schema.json").read_text(encoding="utf-8"))
+    source = {"$defs": schema["$defs"], "$ref": "#/$defs/ChangeReadPage"}
+    assert Draft202012Validator(source).is_valid(page)
+    page["format_version"] = version
+    assert not Draft202012Validator(source).is_valid(page)
+    assert not Draft202012Validator(ChangeReadPage.model_json_schema()).is_valid(page)
+    with pytest.raises(ValidationError):
+        ChangeReadPage.model_validate(page, strict=True)
 
 
 def test_long_fields_are_never_truncated_and_affected_tasks_are_individually_paged(codec):

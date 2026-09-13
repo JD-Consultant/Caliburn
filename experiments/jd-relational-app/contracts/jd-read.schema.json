@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://caliburn.local/contracts/jd-read-v1.schema.json",
+  "$id": "https://caliburn.local/contracts/jd-read-v2.schema.json",
   "title": "ReadCatalog",
   "type": "object",
   "additionalProperties": false,
@@ -91,6 +91,11 @@
           "minLength": 1,
           "maxLength": 4096
         },
+        "section_key": {
+          "type": "string",
+          "enum": ["profile", "purpose", "duties_tasks", "knowledge", "skills", "conditions"],
+          "description": "Stable App-provided chapter identity for display. Not a writable locator."
+        },
         "title": {
           "type": "string"
         }
@@ -98,6 +103,7 @@
       "required": [
         "type",
         "section_ref",
+        "section_key",
         "title"
       ]
     },
@@ -176,6 +182,13 @@
           "minLength": 1,
           "maxLength": 4096
         },
+        "item_id": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "description": "Stable App-provided database item identity within this document and dataset, retained across edits and moves. Display only; commands must use current signed refs."
+        },
         "section_ref": {
           "type": "string",
           "minLength": 1,
@@ -211,6 +224,7 @@
       "required": [
         "type",
         "item_ref",
+        "item_id",
         "section_ref",
         "container_ref",
         "kind",
@@ -492,8 +506,8 @@
       "properties": {
         "format_version": {
           "type": "integer",
-          "minimum": 1,
-          "maximum": 1
+          "minimum": 2,
+          "maximum": 2
         },
         "view": {
           "type": "string",
@@ -1094,8 +1108,8 @@
       "properties": {
         "format_version": {
           "type": "integer",
-          "minimum": 1,
-          "maximum": 1
+          "minimum": 2,
+          "maximum": 2
         },
         "view": {
           "type": "string",

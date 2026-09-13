@@ -1,0 +1,92 @@
+{
+  "format": 1,
+  "checked_at_utc": "2026-09-13T00:38:43.657716+00:00",
+  "database": "caliburn_jd_setup_test_d5261157fbcc42897a9f26ef28dba317",
+  "port": 55436,
+  "mode": "REPEATABLE READ / READ ONLY",
+  "provider_calls": 0,
+  "database_writes": 0,
+  "previous_report": "browser-db-readonly-review.json",
+  "documents": [
+    {
+      "document_id": "4c3939cb-333d-4c22-b039-7cafcc94b823",
+      "head_revision_id": "acef0a2c-febf-428b-bf87-aff92a97bb14",
+      "head_revision_number": 11,
+      "revision_count": 11,
+      "operation_count": 10,
+      "operation_status_counts": {
+        "committed": 10
+      },
+      "content_digest": "329c10a831513cf484888a62f0d1588958f950c873f96e564eb0d884616cb097",
+      "counts": {
+        "duties": 0,
+        "tasks": 2,
+        "outcomes": 2,
+        "requirements": 1,
+        "knowledge": 1,
+        "skills": 0,
+        "task_capabilities": 2
+      },
+      "archived": false,
+      "metadata_version": 3,
+      "previous_head7_digest_retained": true,
+      "job_title_matches_final_browser_save": true,
+      "task_checks": {
+        "b3574799-1284-4fe6-be6b-3e1e4b123940": {
+          "unassigned": true,
+          "name_present": true,
+          "contract_scope_present": true,
+          "production_release_scope_present": true,
+          "no_approval_phrase_present": true
+        },
+        "05db9dcd-feb8-4604-af68-919a89623f32": {
+          "unassigned": true,
+          "name_present": false,
+          "contract_scope_present": true,
+          "production_release_scope_present": true,
+          "no_approval_phrase_present": true
+        }
+      },
+      "tail_commands": [
+        {
+          "revision": 8,
+          "command_kind": "jd_create_task",
+          "operation_id": "ba2c4e82-38de-4182-8928-3c0dd26f9458"
+        },
+        {
+          "revision": 9,
+          "command_kind": "jd_move_item",
+          "operation_id": "8ed06516-3a7b-457d-b81b-fcf3c7d7cba5"
+        },
+        {
+          "revision": 10,
+          "command_kind": "jd_delete_item",
+          "operation_id": "5fd76ec2-51a7-4227-9bd1-e71b1737bf4a"
+        },
+        {
+          "revision": 11,
+          "command_kind": "jd_set_text",
+          "operation_id": "70919ce6-7d9e-4238-9962-a9d668fd74f0"
+        }
+      ],
+      "checks": {
+        "current_equals_head_snapshot": true,
+        "all_revision_digests_parent_chain": true,
+        "exact_original_operation_results": true,
+        "no_duplicate_operation_or_relation": true,
+        "duty_delete_preserved_two_task_ids": true,
+        "duty_delete_and_two_scope_edits_same_revision": true,
+        "details_shared_capability_and_links_unchanged_by_duty_delete": true,
+        "final_title_edit_only_changed_profile_job_title": true,
+        "no_extra_body_revisions_for_two_metadata_writes": true
+      }
+    }
+  ],
+  "snapshot_at_utc": "2026-09-13T00:38:43.680931+00:00",
+  "passed": true,
+  "limitations": [
+    "Latest DB snapshot confirms archived=false and metadata_version=3; it does not independently reconstruct the intermediate archived=true state because catalog metadata has no event history.",
+    "Tail body revisions are exactly create task, move task, delete duty with task scope edits, and job title edit; no body revision is attributable to archive/restore.",
+    "Synthetic browser fixture only; no natural model or real employee validation."
+  ]
+}

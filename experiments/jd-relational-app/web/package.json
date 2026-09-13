@@ -1,0 +1,35 @@
+{
+  "name": "@caliburn/jd-relational-web",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
+  "scripts": {
+    "dev": "next dev --hostname 127.0.0.1 --port 3002",
+    "build": "next build",
+    "start": "next start --hostname 127.0.0.1 --port 3002",
+    "typecheck": "tsc --noEmit",
+    "test": "node --experimental-strip-types --test tests/*.test.ts"
+  },
+  "dependencies": {
+    "@emotion/cache": "11.14.0",
+    "@emotion/react": "11.14.0",
+    "@emotion/styled": "11.14.1",
+    "@mui/material": "9.4.0",
+    "@mui/material-nextjs": "9.4.0",
+    "ajv": "8.20.0",
+    "ajv-formats": "3.0.1",
+    "idb": "8.0.3",
+    "next": "16.3.5",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "devDependencies": {
+    "@types/node": "24.13.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
+    "typescript": "7.0.2"
+  }
+}

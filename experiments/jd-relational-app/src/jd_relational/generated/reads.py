@@ -32,6 +32,12 @@ class SectionRecord(BaseModel):
     )
     type: Literal['section']
     section_ref: constr(min_length=1, max_length=4096, strict=True)
+    section_key: Literal['profile', 'purpose', 'duties_tasks', 'knowledge', 'skills', 'conditions'] = (
+        Field(
+            ...,
+            description='Stable App-provided chapter identity for display. Not a writable locator.',
+        )
+    )
     title: StrictStr
 
 
@@ -52,6 +58,12 @@ class ItemRecord(BaseModel):
     )
     type: Literal['item']
     item_ref: constr(min_length=1, max_length=4096, strict=True)
+    item_id: constr(pattern=r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', min_length=36, max_length=36, strict=True) = (
+        Field(
+            ...,
+            description='Stable App-provided database item identity within this document and dataset, retained across edits and moves. Display only; commands must use current signed refs.',
+        )
+    )
     section_ref: constr(min_length=1, max_length=4096, strict=True)
     container_ref: constr(min_length=1, max_length=4096, strict=True)
     kind: Literal['duty', 'task', 'outcome', 'requirement', 'knowledge', 'skill', 'collaborator', 'work_environment', 'schedule_travel', 'shared_authority', 'shared_collaboration', 'qualification']
@@ -134,7 +146,7 @@ class ReadPage(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    format_version: conint(ge=1, le=1, strict=True)
+    format_version: conint(ge=2, le=2, strict=True)
     view: Literal['current', 'item', 'section', 'history']
     access: Literal['current', 'history']
     revision_ref: constr(min_length=1, max_length=4096, strict=True)
@@ -272,7 +284,7 @@ class ChangeReadPage(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    format_version: conint(ge=1, le=1, strict=True)
+    format_version: conint(ge=2, le=2, strict=True)
     view: Literal['change']
     access: Literal['history']
     change_ref: constr(min_length=1, max_length=4096, strict=True)

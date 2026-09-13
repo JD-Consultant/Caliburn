@@ -11,18 +11,21 @@ from .conversation_sources import ConversationSourceError, ConversationSourceSer
 class MemorySourceReader(SourceReader):
     """One document's Memory port over the single conversation source owner.
 
-    `window_references` grants the completed-interview purpose as well. Only
-    the background extraction/consolidation path needs it, so that B2 can hold
-    a completed window as its published `processed_source`. C repair and the
-    turn read tools keep the default and stay source-only.
+    The extra purposes are granted one at a time, because they are not needed
+    together: B2 holds a completed window as its published `processed_source`
+    and must never store a disambiguation range there, while B1's extraction
+    artifact validates both of its own references. C repair and the turn read
+    tools keep the defaults and stay source-only.
     """
     service: ConversationSourceService
     document_id: str
     window_references: bool = False
+    context_references: bool = False
 
     def __post_init__(self):
         if (not isinstance(self.service, ConversationSourceService)
-                or type(self.window_references) is not bool):
+                or type(self.window_references) is not bool
+                or type(self.context_references) is not bool):
             raise ConversationSourceError("source_not_available")
         try:
             if type(self.document_id) is not str or str(UUID(self.document_id)) != self.document_id:
@@ -32,12 +35,20 @@ class MemorySourceReader(SourceReader):
 
     def validate_reference(self, reference: str) -> None:
         try:
+            granted = ([self.service.validate_window_reference] if self.window_references else []) \
+                + ([self.service.validate_context_reference] if self.context_references else [])
             try:
                 self.service.validate_reference(reference, self.document_id)
             except ConversationSourceError as error:
-                if not (self.window_references and error.code == "invalid_ref"):
+                if error.code != "invalid_ref" or not granted:
                     raise
-                self.service.validate_window_reference(reference, self.document_id)
+                for index, accepts in enumerate(granted):
+                    try:
+                        accepts(reference, self.document_id)
+                        break
+                    except ConversationSourceError:
+                        if index == len(granted) - 1:
+                            raise
         except ConversationSourceError as error:
             if error.code == "invalid_ref":
                 raise InvalidSourceReference("invalid_source_reference") from error

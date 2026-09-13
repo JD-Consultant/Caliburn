@@ -32,6 +32,15 @@ _SALT = "caliburn.jd.conversation-source.v1"
 # other. C repair and the turn read tools stay strictly on `source`.
 _WINDOW_PREFIX = "interview-window:"
 _WINDOW_SALT = "caliburn.jd.interview-window.v1"
+# A window's disambiguation context is a third purpose, not a smaller window:
+# it starts on a prior question rather than a turn boundary and must never be
+# mistaken for a range still awaiting consolidation.
+_CONTEXT_PREFIX = "interview-context:"
+_CONTEXT_SALT = "caliburn.jd.interview-context.v1"
+# Verified B1 extraction budgets; this case's values, not a provider default.
+MAX_WINDOW_CHARACTERS = 6000
+MAX_CONTEXT_CHARACTERS = 1500
+MAX_PLANNED_WINDOWS = 16
 # Visible characters per window page, sized as the verified extraction reader.
 MAX_PAGE_CHARACTERS = 3000
 _TOKEN = re.compile(r"[A-Za-z0-9_.-]+\Z")
@@ -97,6 +106,16 @@ class _SourcePosition(BaseModel):
                                   "checkpoint_id": self.source_checkpoint_id}}
 
 
+class WindowBudgetExceeded(ValueError):
+    """A complete turn, or the context it needs, does not fit the planned budget.
+
+    Planning fails loudly instead of trimming: the caller raises the budget or
+    leaves the range for a later batch. This is not a reference-resolution
+    error, so it keeps its own type rather than widening the fixed public
+    source error codes.
+    """
+
+
 class _WindowPosition(BaseModel):
     """One completed interview range on the root lineage, spanning whole turns.
 
@@ -112,10 +131,11 @@ class _WindowPosition(BaseModel):
     root_checkpoint_id: str = Field(min_length=1, max_length=256)
     first: str = Field(min_length=1, max_length=512)
     last: str = Field(min_length=1, max_length=512)
+    root_run_id: str
     first_run_id: str
     last_run_id: str
 
-    @field_validator("dataset_id", "document_id", "first_run_id", "last_run_id")
+    @field_validator("dataset_id", "document_id", "root_run_id", "first_run_id", "last_run_id")
     @classmethod
     def scope(cls, value):
         return _uuid(value)
@@ -128,6 +148,40 @@ class _WindowPosition(BaseModel):
                 # the HumanMessage id; if that changes this must fail loudly
                 # rather than silently accept a mid-turn start.
                 or self.first != self.first_run_id):
+            raise ValueError()
+        return self
+
+    def root_config(self):
+        return {"configurable": {"thread_id": self.document_id, "checkpoint_ns": "",
+                                  "checkpoint_id": self.root_checkpoint_id}}
+
+
+class _ContextPosition(BaseModel):
+    """One window's disambiguation range: a prior question through a turn end.
+
+    It carries no range run bounds and has its own signature domain, so it can
+    never be admitted as a range still awaiting consolidation. `root_run_id`
+    is only the pinned position's own identity, needed to read it back.
+    """
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True, revalidate_instances="always")
+    format_version: int = Field(ge=1, le=1)
+    purpose: Literal["context"]
+    dataset_id: str
+    document_id: str
+    root_checkpoint_id: str = Field(min_length=1, max_length=256)
+    root_run_id: str
+    first: str = Field(min_length=1, max_length=512)
+    last: str = Field(min_length=1, max_length=512)
+
+    @field_validator("dataset_id", "document_id", "root_run_id")
+    @classmethod
+    def scope(cls, value):
+        return _uuid(value)
+
+    @model_validator(mode="after")
+    def position(self):
+        if any("\0" in value or not value.strip()
+               for value in (self.root_checkpoint_id, self.first, self.last)):
             raise ValueError()
         return self
 
@@ -150,7 +204,7 @@ class SourceExcerpt:
 
 
 class ConversationSourceCodec:
-    __slots__ = ("_dataset_id", "_serializer", "_window_serializer")
+    __slots__ = ("_dataset_id", "_serializer", "_window_serializer", "_context_serializer")
 
     def __init__(self, secret_key: bytes, dataset_id: str):
         try:
@@ -164,6 +218,7 @@ class ConversationSourceCodec:
                     serializer_kwargs={"sort_keys": True, "ensure_ascii": False, "allow_nan": False})
             self._serializer = domain(_SALT)
             self._window_serializer = domain(_WINDOW_SALT)
+            self._context_serializer = domain(_CONTEXT_SALT)
         except Exception:
             raise ConversationSourceError("source_not_available") from None
 
@@ -199,34 +254,48 @@ class ConversationSourceCodec:
             raise ConversationSourceError("source_not_available") from None
 
     def _issue_window(self, position: _WindowPosition) -> str:
+        return self._issue_purpose(position, _WindowPosition, self._window_serializer, _WINDOW_PREFIX)
+
+    def _issue_context(self, position: _ContextPosition) -> str:
+        return self._issue_purpose(position, _ContextPosition, self._context_serializer, _CONTEXT_PREFIX)
+
+    def _resolve_context(self, context_ref, document_id) -> _ContextPosition:
+        return self._resolve_purpose(context_ref, document_id, _ContextPosition,
+                                     self._context_serializer, _CONTEXT_PREFIX)
+
+    def _issue_purpose(self, position, model, serializer, prefix):
         try:
-            position = _WindowPosition.model_validate(position, strict=True)
+            position = model.model_validate(position, strict=True)
             if position.dataset_id != self.dataset_id:
                 raise ValueError()
-            token = self._window_serializer.dumps(self._bounded(position, len(_WINDOW_PREFIX)))
+            token = serializer.dumps(self._bounded(position, len(prefix)))
             self._token(token)
-            reference = _WINDOW_PREFIX + token
+            reference = prefix + token
             if len(reference) > MAX_REFERENCE_BYTES:
                 raise ValueError()
             return reference
         except Exception:
             raise ConversationSourceError("source_not_available") from None
 
-    def _resolve_window(self, window_ref, document_id) -> _WindowPosition:
+    def _resolve_purpose(self, reference, document_id, model, serializer, prefix):
         try:
             _uuid(document_id)
-            if (type(window_ref) is not str or not 0 < len(window_ref) <= MAX_REFERENCE_BYTES
-                    or not window_ref.startswith(_WINDOW_PREFIX)):
+            if (type(reference) is not str or not 0 < len(reference) <= MAX_REFERENCE_BYTES
+                    or not reference.startswith(prefix)):
                 raise ValueError()
-            token = window_ref.removeprefix(_WINDOW_PREFIX)
+            token = reference.removeprefix(prefix)
             self._token(token)
-            position = _WindowPosition.model_validate(self._window_serializer.loads(token), strict=True)
-            self._bounded(position, len(window_ref) - len(token))
+            position = model.model_validate(serializer.loads(token), strict=True)
+            self._bounded(position, len(reference) - len(token))
             if position.dataset_id != self.dataset_id or position.document_id != document_id:
                 raise ValueError()
             return position
         except Exception:
             raise ConversationSourceError("invalid_ref") from None
+
+    def _resolve_window(self, window_ref, document_id) -> _WindowPosition:
+        return self._resolve_purpose(window_ref, document_id, _WindowPosition,
+                                     self._window_serializer, _WINDOW_PREFIX)
 
     def _resolve(self, source_ref, document_id) -> _SourcePosition:
         try:
@@ -506,7 +575,7 @@ class ConversationSourceService:
                 dataset_id=self.dataset_id, document_id=document_id,
                 root_checkpoint_id=terminal.root_config["configurable"]["checkpoint_id"],
                 first=first_run_id, last=turns[end]["last"],
-                first_run_id=first_run_id, last_run_id=last_run_id)
+                root_run_id=last_run_id, first_run_id=first_run_id, last_run_id=last_run_id)
         except Exception:
             raise ConversationSourceError("source_not_available") from None
         return self._codec._issue_window(position)
@@ -523,7 +592,7 @@ class ConversationSourceService:
         if type(offset) is not int or type(offset) is bool or offset < 0:
             raise ConversationSourceError("invalid_ref")
         try:
-            observed = self._checkpoints.observe_at(document_id, position.last_run_id,
+            observed = self._checkpoints.observe_at(document_id, position.root_run_id,
                 self.dataset_id, position.root_config())
         except AiCheckpointError as error:
             raise ConversationSourceError(
@@ -557,6 +626,195 @@ class ConversationSourceService:
         return {"reference": window_ref, "segments": segments, "turns": turns,
                 "omitted_content_types": sorted(omitted),
                 "next_offset": end_offset if end_offset < total else None}
+
+    @staticmethod
+    def _budgets(max_chars, context_chars):
+        if (type(max_chars) is not int or type(max_chars) is bool or not 1 <= max_chars <= 24000
+                or type(context_chars) is not int or type(context_chars) is bool
+                or not 0 <= context_chars < max_chars):
+            raise ConversationSourceError("invalid_ref")
+
+    def _groups(self, messages, turns):
+        order = [message.id for message in messages]
+        return [messages[order.index(turn["first"]):order.index(turn["last"]) + 1] for turn in turns]
+
+    @staticmethod
+    def _size(messages):
+        return sum(len(text) for _, _, text in _visible(messages)[0])
+
+    @staticmethod
+    def _between(messages, first, last):
+        order = [message.id for message in messages]
+        try:
+            start, end = order.index(first), order.index(last)
+            if start > end:
+                raise ValueError()
+        except Exception:
+            raise ConversationSourceError("invalid_ref") from None
+        return messages[start:end + 1]
+
+    def _window_root(self, document_id, last_run_id):
+        """The pinned root is that last turn's own terminal, never the latest."""
+        from .ai_history import AiRunHistory
+        terminal = AiRunHistory(self._checkpoints).find(document_id, last_run_id, self.dataset_id)
+        if terminal is None:
+            raise ConversationSourceError("invalid_ref")
+        return terminal.root_config["configurable"]["checkpoint_id"]
+
+    def _pinned(self, document_id, run_id, root_config):
+        try:
+            return self._checkpoints.observe_at(document_id, run_id, self.dataset_id, root_config)
+        except AiCheckpointError as error:
+            raise ConversationSourceError(
+                "invalid_ref" if error.code == "invalid_input" else "source_not_available") from None
+
+    def _issue_window_between(self, root, root_run_id, document_id, first_turn, last_turn):
+        try:
+            position = _WindowPosition(format_version=1, purpose="window",
+                dataset_id=self.dataset_id, document_id=document_id, root_checkpoint_id=root,
+                first=first_turn["first"], last=last_turn["last"],
+                root_run_id=root_run_id, first_run_id=first_turn["input_id"], last_run_id=last_turn["input_id"])
+        except Exception:
+            raise ConversationSourceError("source_not_available") from None
+        return self._codec._issue_window(position)
+
+    def _issue_context_between(self, root, root_run_id, document_id, first, last):
+        try:
+            position = _ContextPosition(format_version=1, purpose="context",
+                dataset_id=self.dataset_id, document_id=document_id,
+                root_checkpoint_id=root, root_run_id=root_run_id, first=first, last=last)
+        except Exception:
+            raise ConversationSourceError("source_not_available") from None
+        return self._codec._issue_context(position)
+
+    def plan_windows(self, document_id, *, first_run_id, last_run_id,
+                     max_chars: int = MAX_WINDOW_CHARACTERS,
+                     context_chars: int = MAX_CONTEXT_CHARACTERS) -> tuple[dict, ...]:
+        """Plan whole-turn windows, each with the context needed to read it.
+
+        Ported from the verified extraction planner: an oversize turn fails
+        rather than losing its middle, and a disambiguation prefix that cannot
+        fit is reported instead of being trimmed. Context must reach back to
+        the nearest prior visible question and include the answers between.
+        """
+        self._budgets(max_chars, context_chars)
+        messages, turns = self._settled(document_id)
+        identifiers = [turn["input_id"] for turn in turns]
+        try:
+            first, last = identifiers.index(first_run_id), identifiers.index(last_run_id)
+            if first > last:
+                raise ValueError()
+        except Exception:
+            raise ConversationSourceError("invalid_ref") from None
+        groups = self._groups(messages, turns)
+        sizes = [self._size(group) for group in groups]
+        root = self._window_root(document_id, last_run_id)
+        if any(size > max_chars for size in sizes[first:last + 1]):
+            raise WindowBudgetExceeded("window_budget_exceeded")
+        planned, index = [], first
+        while index <= last:
+            context, used = None, 0
+            if index:
+                prior = groups[index - 1]
+                question = next((message for group in reversed(groups[:index])
+                                 for message in reversed(group)
+                                 if isinstance(message, AIMessage) and self._size([message])), None)
+                if question is not None:
+                    required = self._between(messages, question.id, prior[-1].id)
+                    used = self._size(required)
+                    if used > context_chars or used + sizes[index] > max_chars:
+                        raise WindowBudgetExceeded("window_budget_exceeded")
+                    context = self._issue_context_between(root, last_run_id, document_id, question.id, prior[-1].id)
+                # A whole prior turn is allowed only when it still carries the
+                # required question; it never replaces an older one.
+                if ((question is None or any(m.id == question.id for m in prior))
+                        and sizes[index - 1] <= context_chars
+                        and sizes[index - 1] + sizes[index] <= max_chars):
+                    context = self._issue_context_between(root, last_run_id, document_id, prior[0].id, prior[-1].id)
+                    used = sizes[index - 1]
+            end = index
+            while end <= last and used + sizes[end] <= max_chars:
+                used += sizes[end]
+                end += 1
+            planned.append({"source_reference": self._issue_window_between(
+                root, last_run_id, document_id, turns[index], turns[end - 1]), "context_reference": context})
+            index = end
+        return tuple(planned)
+
+    def plan_batch(self, document_id, *, first_run_id, last_run_id,
+                   max_chars: int = MAX_WINDOW_CHARACTERS,
+                   context_chars: int = MAX_CONTEXT_CHARACTERS,
+                   max_windows: int = MAX_PLANNED_WINDOWS) -> dict:
+        """Bound one B1 batch without consuming or dropping the remaining tail.
+
+        The tail needs no extra state: the published cursor decides where the
+        next batch starts. `covers_whole_range` exists so a caller can never
+        take a prefix and report the whole range as done.
+        """
+        if type(max_windows) is not int or type(max_windows) is bool or max_windows < 1:
+            raise ConversationSourceError("invalid_ref")
+        planned = self.plan_windows(document_id, first_run_id=first_run_id,
+                                    last_run_id=last_run_id, max_chars=max_chars,
+                                    context_chars=context_chars)
+        return {"windows": planned[:max_windows],
+                "covers_whole_range": len(planned) <= max_windows}
+
+    def validate_saved_window(self, source_reference, context_reference, document_id, *,
+                              max_chars: int = MAX_WINDOW_CHARACTERS,
+                              context_chars: int = MAX_CONTEXT_CHARACTERS) -> None:
+        """Re-check one already planned pair; never widen or replan it.
+
+        Re-extraction reads the window it was given. A budget change must fail
+        loudly rather than quietly select a different range.
+        """
+        self._budgets(max_chars, context_chars)
+        page = self.read_window(source_reference, document_id)
+        position = self._codec._resolve_window(source_reference, document_id)
+        observed = self._pinned(document_id, position.last_run_id, position.root_config())
+        source_size = self._size(self._between(observed.messages, position.first, position.last))
+        context_size = 0
+        if context_reference is not None:
+            context = self._codec._resolve_context(context_reference, document_id)
+            if context.root_checkpoint_id != position.root_checkpoint_id:
+                raise ConversationSourceError("invalid_ref")
+            context_size = self._size(self._between(observed.messages, context.first, context.last))
+        if context_size > context_chars or context_size + source_size > max_chars:
+            raise WindowBudgetExceeded("window_budget_exceeded")
+        if not page["turns"]:
+            raise ConversationSourceError("invalid_ref")
+
+    def follows(self, reference, previous, document_id) -> None:
+        """Admit a new range only directly after the published one.
+
+        Compares saved conversation order, never identifiers or timestamps. An
+        overlapping, earlier, or turn-skipping range is refused rather than
+        treated as an implicit retry.
+        """
+        new = self._codec._resolve_window(reference, document_id)
+        published = self._codec._resolve_window(previous, document_id)
+        messages, turns = self._settled(document_id)
+        order = [message.id for message in messages]
+        if new.first not in order or published.last not in order:
+            raise ConversationSourceError("invalid_ref")
+        if order.index(new.first) <= order.index(published.last):
+            raise ConversationSourceError("invalid_ref")
+        following = [turn for turn in turns if order.index(turn["first"]) > order.index(published.last)]
+        if not following or following[0]["first"] != new.first:
+            raise ConversationSourceError("invalid_ref")
+
+    def read_context(self, context_ref, document_id) -> dict:
+        """Read a window's disambiguation range at its own fixed position."""
+        position = self._codec._resolve_context(context_ref, document_id)
+        observed = self._pinned(document_id, position.root_run_id, position.root_config())
+        visible, omitted = _visible(self._between(observed.messages, position.first, position.last))
+        return {"reference": context_ref,
+                "segments": [{"message_id": message_id, "role": role, "text": text}
+                             for message_id, role, text in visible if text],
+                "omitted_content_types": sorted(omitted)}
+
+    def validate_context_reference(self, context_ref, document_id) -> None:
+        """Shape, signature domain and scope only, with no storage I/O."""
+        self._codec._resolve_context(context_ref, document_id)
 
     def validate_window_reference(self, window_ref, document_id) -> None:
         """Verify a completed-window locator issued by this same owner.

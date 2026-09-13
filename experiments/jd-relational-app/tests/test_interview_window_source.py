@@ -18,7 +18,9 @@ import sqlalchemy as sa
 from sqlalchemy.pool import StaticPool
 
 from jd_relational.ai_checkpoints import AiRunCheckpoints
-from jd_relational.conversation_sources import ConversationSourceError, _WindowPosition
+from jd_relational.conversation_sources import (
+    ConversationSourceError, WindowBudgetExceeded, _ContextPosition, _WindowPosition,
+)
 
 from jd_relational.memory_sources import MemorySourceReader
 from langchain_core.messages import AIMessage, ToolMessage
@@ -31,7 +33,7 @@ def window_ref(sources, document, *, first, last, first_run, last_run, root="roo
     """Issue directly: the public issuing path belongs with the window planner."""
     position = _WindowPosition(format_version=1, purpose="window",
         dataset_id=sources.dataset_id, document_id=document, root_checkpoint_id=root,
-        first=first, last=last, first_run_id=first_run, last_run_id=last_run)
+        first=first, last=last, root_run_id=last_run, first_run_id=first_run, last_run_id=last_run)
     return sources._codec._issue_window(position)
 
 
@@ -280,3 +282,93 @@ def test_an_off_lineage_cursor_stops_admission_instead_of_resetting(interview, n
                        first_run=first_run, last_run=second_run, root=position.root_checkpoint_id)
     with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
         windows.unprocessed_source(document, stray)
+
+
+def plain(native, count, *, size=10, start=1):
+    return [settled(native, [AIMessage(id=f"pa{start + i}", content="回" * size)],
+                    text="問" * size) for i in range(count)]
+
+
+def test_planned_windows_pair_each_range_with_its_disambiguating_context(interview, native):
+    windows, document, first_run, second_run = interview
+    third = settled(native, [AIMessage(id="pa9", content="第三輪回覆")], text="第三輪原話")
+    planned = windows.plan_windows(document, first_run_id=first_run,
+                                   last_run_id=third.record.run_id, max_chars=20, context_chars=10)
+    assert len(planned) > 1
+    assert planned[0]["context_reference"] is None, "The first window has no prior question."
+    for window in planned[1:]:
+        assert window["context_reference"] is not None
+        context = windows.read_context(window["context_reference"], document)
+        assert context["segments"][0]["role"] == "assistant"
+    covered = [windows.read_window(w["source_reference"], document) for w in planned]
+    assert [t["input_id"] for page in covered for t in page["turns"]] == [
+        t["input_id"] for t in windows.safe_turns(document)]
+
+
+def test_an_oversize_turn_fails_instead_of_losing_its_middle(interview, native):
+    windows, document, first_run, _ = interview
+    big = settled(native, [AIMessage(id="pa8", content="長" * 200)], text="長" * 200)
+    with pytest.raises(WindowBudgetExceeded):
+        windows.plan_windows(document, first_run_id=first_run,
+                             last_run_id=big.record.run_id, max_chars=100, context_chars=20)
+
+
+def test_a_context_that_does_not_fit_is_reported_not_truncated(interview, native):
+    windows, document, first_run, second_run = interview
+    third = settled(native, [AIMessage(id="pa7", content="第三輪回覆")], text="第三輪原話")
+    with pytest.raises(WindowBudgetExceeded):
+        windows.plan_windows(document, first_run_id=first_run,
+                             last_run_id=third.record.run_id, max_chars=30, context_chars=1)
+
+
+def test_a_bounded_batch_keeps_its_unprocessed_tail(interview, native):
+    windows, document, first_run, _ = interview
+    tail = plain(native, 3)
+    batch = windows.plan_batch(document, first_run_id=first_run,
+                               last_run_id=tail[-1].record.run_id, max_chars=40, context_chars=20, max_windows=2)
+    assert len(batch["windows"]) == 2 and batch["covers_whole_range"] is False
+    whole = windows.plan_batch(document, first_run_id=first_run,
+                               last_run_id=tail[-1].record.run_id, max_chars=40, context_chars=20, max_windows=99)
+    assert whole["covers_whole_range"] is True
+
+
+def test_a_saved_window_is_revalidated_without_being_replanned(interview, native):
+    windows, document, first_run, second_run = interview
+    third = settled(native, [AIMessage(id="pa6", content="第三輪回覆")], text="第三輪原話")
+    planned = windows.plan_windows(document, first_run_id=first_run,
+                                   last_run_id=third.record.run_id, max_chars=40, context_chars=20)
+    saved = planned[-1]
+    windows.validate_saved_window(saved["source_reference"], saved["context_reference"],
+                                  document, max_chars=40, context_chars=20)
+    with pytest.raises(WindowBudgetExceeded):
+        windows.validate_saved_window(saved["source_reference"], saved["context_reference"],
+                                      document, max_chars=5, context_chars=1)
+
+
+def test_admission_refuses_an_earlier_or_skipping_range(interview, native):
+    windows, document, first_run, second_run = interview
+    third = settled(native, [AIMessage(id="pa5", content="第三輪回覆")], text="第三輪原話")
+    processed = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    ahead = windows.capture_window(document, first_run_id=third.record.run_id,
+                                   last_run_id=third.record.run_id)
+    windows.follows(ahead, processed, document)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.follows(processed, processed, document)
+    skipping = windows.capture_window(document, first_run_id=first_run,
+                                      last_run_id=third.record.run_id)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.follows(skipping, processed, document)
+
+
+def test_the_memory_reader_grants_window_and_context_separately(issued, native):
+    sources, document, _, source_ref, window = issued
+    context = sources._codec._issue_context(_ContextPosition(format_version=1, purpose="context",
+        dataset_id=sources.dataset_id, document_id=document,
+        root_checkpoint_id="r1", root_run_id=str(uuid4()), first="m1", last="m2"))
+    publication_only = MemorySourceReader(sources, document, window_references=True)
+    extraction = MemorySourceReader(sources, document, window_references=True,
+                                    context_references=True)
+    publication_only.validate_reference(window)
+    with pytest.raises(InvalidSourceReference):
+        publication_only.validate_reference(context)
+    extraction.validate_reference(context)

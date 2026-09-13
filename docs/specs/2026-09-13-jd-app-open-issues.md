@@ -30,7 +30,8 @@
 - 實作第一片已完成：[用途隔離與B2發布驗證](evidence/jd-interview-window-source/purpose-isolation-results.md)閉合審查F2的整合斷點——未用途感知前，B2的完成結果在`PublicationStore._validate`就會被拒，永遠無法發布。離線2748／套件130／真PG14通過。窗口內容讀取、planner與公開發配路徑**刻意未做**（安全終局只有planner能確立），見該稿界線。
 - 實作第二片已完成：[逐輪安全終局、發配與分頁讀取](evidence/jd-interview-window-source/window-read-results.md)。全部放在同一source owner，沿既有`AiRunHistory`逐輪在該輪自己的終局checkpoint核對，lineage以訊息序列精確前綴證明（不靠ID相同）；分頁只切可見文字、`turns`每頁完整、offset為Unicode code point；省略種類具名。已涵蓋W-03／05／07／08與W-04的停在未收尾之前。離線2753／套件130／真PG16通過（另1個既有OI-05分頁缺陷不變）。
 - 實作第三片已完成：[整理通知採用、觸發清單與連續安全範圍](evidence/jd-interview-window-source/trigger-and-coverage-results.md)。整理通知自`4f94fbfb`逐位元採用進`caliburn_memory/requests.py`（工具描述一字未改，已登記adoption）；`pending_windows`只回觸發回合，`unprocessed_source`另回連續安全範圍且納入沒通知的安全回合，範圍止於第一個未收尾回合；游標只接受publication head自己的window引用，離線lineage即停止admission不重設。離線2762／套件130／真PG18通過。已涵蓋W-01–W-05／07／08／11／12。**工具尚未註冊給顧問，顧問目前發不出通知。**
-- 下一最小動作：接**窗口切分與admission**——`max_chars`／`context_chars`預算、`context_reference`消歧pair、`max_windows`超限保留尾端、重抽回原窗口、`follows`不回退且連續（W-06／09／10／13／14），再依映射§6第5項把整理通知註冊給顧問。現有C／只讀工具的source port不動。
+- 實作第四片已完成：[切分規劃、消歧pair與admission](evidence/jd-interview-window-source/planner-and-admission-results.md)。切分／批次／重抽驗證／admission沿`4f94fbfb`逐條移接：超大回合與放不下的消歧一律失敗不截斷；新增第三個purpose `context`（獨立salt，不得當成待整併來源），用途授予拆成`window_references`／`context_references`兩旗標，因為套件對source與context走同一個`validate_source`；規劃結果固定同一root，有界批次以`covers_whole_range`防止取前綴宣稱完成，尾端由publication游標接續不需額外狀態。離線2769／套件130／真PG14通過。已涵蓋W-01–W-13。
+- 下一最小動作：補**W-14**（>256祖先／缺鏈明示受限）案例；再依映射§6第5項把整理通知註冊給顧問，然後才進B1／B2採用。現有C／只讀工具的source port不動。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋

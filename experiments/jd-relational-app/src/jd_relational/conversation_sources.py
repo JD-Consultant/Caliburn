@@ -809,9 +809,9 @@ class ConversationSourceService:
         that is only true when the target really lies inside the published
         range on the cursor's own chain: the cursor is read where it was issued
         and the target proven there, never inferred from a longer window or a
-        shared identifier. The target's own first turn is the floor, so a batch
-        never grows backwards; whether a new range may be admitted at all stays
-        with `follows`, which is the one rule for that.
+        shared identifier. A cursor stopping before the target begins is
+        refused rather than closed over; whether a new range may be admitted
+        at all stays with `follows`, which is the one rule for that.
         """
         position, pinned, turns, first = self._pinned_range(through_reference, document_id)
         if after_reference is None:
@@ -820,7 +820,13 @@ class ConversationSourceService:
         published = self._pinned(document_id, cursor.root_run_id, cursor.root_config())
         if len(published.messages) <= len(pinned.messages):
             start = self._after_cursor(pinned, pinned.messages, turns, after_reference, document_id)
-            return max(start, first), turns, position, pinned
+            # Turns sitting between the cursor and the target's own start are
+            # unconsolidated. Planning the target anyway would hand B1 a batch
+            # that jumps them, and publishing it would carry the cursor past
+            # that speech for good, so the gap fails here instead.
+            if start < first:
+                raise ConversationSourceError("invalid_ref")
+            return start, turns, position, pinned
         covered = self._cursor_boundary(document_id, after_reference, published,
                                         self._settled_turns(document_id, published.messages))
         order = [message.id for message in published.messages]

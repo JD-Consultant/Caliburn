@@ -1,5 +1,7 @@
 # B1／B2 與顧問方法的採用映射
 
+**目前狀態（2026-09-14）：**source port、B1 核心／OpenAI adapter 固定接合及 **§3.6 的批次接點都已完成並在真 PG 上驗過（H4-R1）**；B2／背景／完整通知尚未接。§3.3 仍是未實作的隔離施工設計，未建表。下一依[H4 執行計畫 R2](../plans/2026-09-14-jd-h4-runtime-integration.md)採用 B2 並做 B1→B2→publication 有序交接；下方9/13初稿狀態只保留出處，不要求重做採用映射。
+
 2026-09-13；JD-R002／OI-01、OI-02。[接續計畫 §5 H4](../plans/2026-09-13-jd-app-continuation-handoff.md) 要求的第一份交付。基準 `b76254f6`／tag `jd-memory-repair-app-review-20260913`。**本稿只做映射與差距判定，沒有改任何產品程式、沒有新增資料表、0 provider、日常 `enable_chat=False`。**
 
 **提交後審查修訂：**原稿提交 `2e243d15`；[審查紀錄](evidence/2026-09-13-jd-b1-b2-adoption-review.md)發現已驗方法／整理通知漏接、背景恢復規則誤套及 source 契約不足，已在本稿改正。完成窗口契約另經[9/12–9/13 文件審查](evidence/2026-09-13-jd-window-source-contract-review.md)，補上觸發與連續範圍、B2 `processed_source` 用途感知驗證、source/context pair、offset 單位及 purpose salt 隔離。下文是接續依據；這是文件修正，不代表新 App 的 B1／B2 已通過驗收，也沒有決定新增背景資料表。
@@ -29,11 +31,11 @@
 | `publication.PublicationStore`／`PublishRequest`／`Receipt` | **已在** `caliburn_memory.publication` | `host_runtime` 的 `memory_engine`（schema-mapped） | 已沿用 | 無 |
 | `live_memory`／`repair`（C） | **已在** `caliburn_memory.repair`（含 `build_repair_graph`） | `memory_repair_session`／`memory_repair_records`／固定 `memory_repair` 節點 | 已沿用 | 已於[C 接合](2026-09-13-jd-memory-repair-app-integration-slice.md)補完 |
 | `memory_tools.readonly_file_tools` | **已在** `caliburn_memory.read_tools` | `memory_context.build_consultant_tools()` 的四個只讀工具 | 已沿用 | 無 |
-| `extraction.ExtractionWorkflow`／`ExtractionOutput`／`INSTRUCTIONS`（B1） | **尚未採用** → 建議 `caliburn_memory.extraction` | 完成窗口 source port，包含驗證、解碼及分頁內容（§3.1） | `test_extraction.py`(450)／`_feedback`(207)／`_role`(164)／`test_summary_reextraction.py`(269) | 新引用格式、來源投影、同一工作續作及重抽接合 |
+| `extraction.ExtractionWorkflow`／`ExtractionOutput`／`INSTRUCTIONS`（B1） | **已在** `caliburn_memory.extraction`；App OpenAI adapter 固定接合完成 | `ExtractionSourceAdapter`／同一 source owner；原生 structured runnable，provider 接受條件由 App 組裝 | 原檔盤點：`test_extraction.py`(450)／`_feedback`(207)／`_role`(164)／`test_summary_reextraction.py`(269)；新實測見[B1 結果](evidence/jd-b1-adoption/app-wiring-results.md) | 有界整批引用、真 PG／新程序、B2 交接與 runtime；不是再做已閉合 pair／W-13 |
 | `consolidation.ConsolidationWorkflow`／`INSTRUCTIONS`（B2） | **尚未採用** → 建議 `caliburn_memory.consolidation` | 沿既有 `PublicationStore`／CAS；需與 C 的 receipt 權責銜接 | `test_consolidation.py`(503)／`_delivery`(126)／`_feedback`(271)／`_request`(212) | C 更正不被晚到舊候選蓋回的配對案例 |
 | `sources.ConversationReader` 的窗口／批次、`validate_saved_window`、`read`、`unprocessed_source`、`source_covered`／`require_new_source_after` | **不整批採用實作**（綁舊圖）；保留已驗語意 | package source interface＋App `conversation_sources`／`memory_sources` adapter（§3.1） | 原窗口、分頁、角色與範圍案例 | 新簽章引用、逐輪安全終局及有界歷史缺鏈 |
 | `consolidation_request.request_memory_consolidation`／`has_saved_request`、`sources.pending_consolidation_turns`、`live_memory.MEMORY_ACTION_GUIDANCE` | 採用純通知與辨識規則；正常 package／App 接點於接線前具體定名 | 新 Agent 註冊工具、原 call/result 驗證、終局後來源投影（§3.5） | 原整理請求／節奏案例，CT51 自然通知證據 | 不能把終局當整理請求；不能只靠文字冒充成功通知 |
-| `scheduling.BackgroundDispatcher`／`BackgroundRow`／`BackgroundAvailability` | 不整批搬舊 host／表；**保留背景工作狀態、限制與可用性通知的責任** | 同一宿主生命週期下的背景執行／恢復接點；持久落點待有限設計（§3.3–4） | 原續作／排空／停止／可用性語意 | 新宿主重開後保留原工作、目標、錯誤及剩餘預算 |
+| `scheduling.BackgroundDispatcher`／`BackgroundRow`／`BackgroundAvailability` | 不整批搬舊 host；**保留背景工作狀態、限制與可用性通知的責任** | 同一宿主生命週期；六欄准入表設計已在 §3.3 收斂，尚未實作 | 原續作／排空／停止／可用性語意 | 新宿主重開後保留原工作、目標、錯誤及剩餘預算 |
 | `api` 的 A 指引、三項分析 Skills、`skills.SkillAssets`／分析 Skills middleware 路由 | 採用已驗內容／讀取行為，不沿用舊 host（§5） | 新顧問 system／Skill 接點與唯讀檔案路由 | CT49／50／51 限定自然證據及既有 Skills 案例 | 已有「不製作 JD」範圍句改成新 JD 接點；其餘改動另列差異 |
 | `service.AnalysisService`／`conversation.build_conversation`／`api` 的組裝與資源管理 | **不整批採用**（新 App 有自己的 host／HTTP／owner） | `managed_app.open_managed_app`／`ai_runtime.AiRuntime`／`chat_service` | 原組裝承載的行為按上述各列採用 | 角色配置與必要原生 context／budget helpers，不能因不搬 host 就漏方法 |
 | `jd_*` 十餘模組、`jd_store`／`jd_engine`／`jd_tools` | **不採用** | 新關聯式十三表與 `build_consultant_tools()` 的十個 JD 工具 | 無 | 無 |
@@ -69,7 +71,22 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 
 採用時共用本機宿主的啟停／資源管理；**不把背景工作硬套前景手改門閘，也不把「不能雙寫」誤寫成禁止必要背景表或框架喚醒器**。不整批搬舊 service、全域鎖或另一宿主，不新造通用排程器。
 
-在背景接線前，以一份有限責任映射閉合：誰保存固定目標／未完成批次、queued/running/blocked、錯誤與恢復預算；誰防止兩個 worker 同時處理同一工作；何時停止准入、等待真工作退出再關 Store／Saver；新程序如何找到原工作。若能用既有框架持久狀態承載，要指出實際來源及恢復方式；若需最小准入表，列欄位／單一責任與明示初始化後依既有流程處理。**本稿不預先批准新增表，也不預先禁止。**
+**2026-09-14 隔離施工候選：先保留已驗 `BackgroundRow` 的六欄准入責任作最小基線，但尚未決定增加新表。**Saver 已保存 B1/B2 進度，但尚未開始的 target、未消耗尾端及跨重開的受阻／恢復額度並不在這兩個 workflow 的正式 state 中。將這些硬塞 B1、掃歷史猜測或另造調度 StateGraph 都增加額外接合；沿已驗小表語意可作為待驗替代。這不是 production adoption，也不要求沿用舊 host／constructor setup。R3 先驗證既有 Saver／catalog 是否確實無法承載准入責任；在該缺口成立並完成 migration／ADR 前，不建立此表。
+
+| 欄位 | 最小保存內容／約束 | 單一責任 |
+|---|---|---|
+| `document_id` | PK、同型別 FK 指新 `jd_document.id`，一文件至多一列 | 不建立新文件身分；不含租戶／帳號／ACL |
+| `status` | 非空；`idle/queued/running/blocked` 的 CHECK | 准入狀態，不代替 LangGraph node／pending 狀態 |
+| `target_reference` | 可空的簽章 window ref | 原先准入的固定目標；後續新原話不能偷偷擴大此目標 |
+| `source_reference` | 可空的簽章 window ref | 當前固定批次；invoke B1 前保存，不是已處理游標 |
+| `error_code` | 可空、有界安全錯誤碼 | 不保存 stack、key 或原話；根因未變不重試 |
+| `recovery_count` | 非空整數、預設0、CHECK >= 0 | 原工作已用的宿主恢復次數；與 B1 格式更正、B2 模型步分開 |
+
+若 R3 證明需要，候選表的 schema 才以明示 Alembic migration 管理，暫名 `jd_memory_admission`。這是一張 runtime 准入表，**原十三張 JD scope 表不增減正文欄位**；未核准前不得先建表。普通 open 只檢查已安裝；不搬 q019 資料、不雙寫舊表。queued 必有 target、source 可尚未切出；running 必有 target/source；blocked 可在來源規劃之前發生，不能為填欄造假 ref；idle 清掉當前目標／批次／錯誤，不當成永久工作歷史。恢復計數只在確立新的工作或完成舊目標時重置，不因重新開程式歸零。DDL 與原生保存交接須在 R3 實測；這張候選表不是已存在的事實。
+
+同一宿主管理有界 B worker；同文件 B1→B2→發布交接完前不可開始下一批或並行重抽。原生 `files`／工作進度仍在 Saver，發布及唯一 `processed_source` 仍在 PublicationStore。單一 B worker 的容量限制不阻擋所有文件的前景與人工操作；不持 DB／全 App 鎖等待模型。關閉先停新准入、等待已登記實際工作退出，再關 client／Store／Saver。原生續作及原回執處理見 §3.4；完整接線／新程序驗收見執行計畫 R2–R3。
+
+封存後不准入新的 B 批次；已在執行的有限批次可完成保存／發布，未完成目標保留，恢復文件後再查原工作續作。封存不刪除准入資料或重設額度；不是另一套Memory撤回。R3須用既有封存／恢復操作驗證此生命週期，不新增背景管理頁。
 
 保留 `BackgroundAvailability` 的已驗效果：本輪開場獲得整理受阻／尚未涵蓋的通知，通知不冒充員工原話、不從 context getter 啟動 B，不把未處理資料說成已入 Memory。
 
@@ -92,6 +109,23 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 採用既有無參數 `request_memory_consolidation` 及 `MEMORY_ACTION_GUIDANCE`。模型只通知累積訪談值得整理；工具的原生 call/result artifact 表示收到請求，**不執行 B、不寫 Memory、不回報整理完成**。App 在安全終局後辨識 `has_saved_request`，再用 publication 游標判斷哪些請求尚未涵蓋；不得把普通文字、孤立 call 或不匹配 result 當請求。
 
 沒有有效請求且沒有明示啟用的字數後備條件時，不啟動新批次；已存在的未完成工作則走 §3.4。語意請求決定何時開始，不讓模型挑哪些原話可被忽略：批次涵蓋連續、未處理且安全收尾的內容。新 App 的工具註冊、結果分類、關閉與停止路徑都須識別此純通知，不借 JD operation 或 C publication。**十五是 H1–H3 的既有工具清單數，不是 H4 不可增加的上限。**
+
+### 3.6 固定目標到有界批次（2026-09-14 接續設計）
+
+**狀態（2026-09-14）：**本節設計已由 R1 實作並驗證，見[批次接點結果](evidence/jd-b1-adoption/fixed-target-batch-results.md)與[R1 真 PG 結果](evidence/jd-b1-adoption/r1-postgres-batch-results.md)。下文保留原始設計語意；`through_reference` 只放准入列保存的固定 target，不放上一批的 batch ref。
+這是尚未接 runtime 的有限缺口，不推翻現有 B1 adapter：`plan_batch()` 現在只回 `{windows, covers_whole_range}`，B1 `start()` 卻需要單一 source ref；舊 `ConversationReader.extraction_batch()` 所做的整批引用投影尚未移接。`unprocessed_source()` 目前只回 `{first_run_id,last_run_id}` bounds，而且沒有契約 §7.1 的 `through_reference` 參數；它是相對目前原話 head 的未處理範圍，不等於某個**已固定 target** 的剩餘範圍。
+
+下一在同一 source owner 補兩個最小公開接點（名稱可依現有 API 慣例調整）：先讓 `unprocessed_source(after_reference, through_reference=None)` 在固定 canonical root 內回連續安全 bounds，並由 owner 發出一個固定的 `purpose="window"` target ref；再由 `plan_saved_batch(target_reference, document_id, *, after_reference=None, max_chars, context_chars, max_windows)` 回 `{source_reference: str | None, covers_whole_range: bool}`。這是 App 內部 port，不是新增 LLM 工具；不可讓 caller 用 first／last 自行拼 token。
+
+- `after_reference` 只取 publication head 的 `processed_source`；`through_reference` 只由准入列保存的固定 target 傳入。兩引用各自驗固定位置、同文件、用途、安全邊界及實際祖先關係。不得因 UUID／時間／最後一個 message ID 相同推定已覆蓋。
+- 在 target 原 snapshot 內選連續未處理的前綴，沿既有 `_plan` 最多取 N 窗口；回從該前綴第一個完整回合到最後一個完整回合的 **batch ref**，固定同一 target root。模型不產生任何其中的欄位。
+- 已完整涵蓋 target 時回 `source_reference=None, covers_whole_range=True`；有批次時布林表示本批是否涵蓋 target 的全部剩餘範圍，不表示已完成保存／發布。若引用完整相同範圍可原樣返回，避免不必要的 input identity 變動。
+- publication cursor 比 target 較晚時，必須沿既有 history owner 證明 target 在其固定有效鏈及覆蓋內才能回「已涵蓋」。缺鏈／超限／分支不明示為來源受限或無效，不回空成功。
+- 長 target 分批時保留其尾端；B2 發佈本批後才帶新 publication cursor 求下一批，不需新通知、不換成 latest target。新原話另待後續准入。新 B1 的原生輸入仍是單一 batch ref，不新增另一種 windows 注入模式。
+- 舊 `plan_batch()` 可保留為已有測試／規劃介面；runtime 不用它自行拼 token。錯誤與發配沿現有 owner、codec、history；不新增 parser、游標或配對引擎。
+- `through_reference` 的 target 是本批要完成的上界；它不前進 publication cursor，也不代表 B1/B2 已成功。若 target 已被 publication 覆蓋，owner 回明確已涵蓋；若 target 分支、缺鏈或超限，回既有 source error，不把 bounds 當空成功。
+
+必驗超過一批、第一批發布後接尾端、追加原話不擴大 target、原 target 已被同鏈游標涵蓋、合法簽章旁支仍拒絕。**這些已在 R1 建立並通過**（另加：較晚但未涵蓋的游標須拒絕、游標與 target 間留有回合須拒絕）；R2 的交接測試仍未做。
 
 ## 4. 保持已驗語意不動的部分
 
@@ -123,6 +157,8 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 
 ## 6. 建議的施工順序
 
+**現行執行順序已由[H4 runtime 計畫](../plans/2026-09-14-jd-h4-runtime-integration.md)收斂。**以下1–5是初稿階段分工沿革；1及2的固定接合已完成，不按其中「下一有限實作」重做。新的有界 batch 與背景狀態接點以 §3.3／3.6 為準。
+
 1. **完成窗口 source port**（§3.1／3.5）：先交 package interface／App adapter 的具體契約及固定情境，再完成有限實作。包含簽章驗證、分頁角色、逐輪終局、整理請求辨識、來源順序／覆蓋；publication 游標不另存。這是 B1 前置，無需為它重開框架廣搜。**契約已交付：**[完成訪談窗口 source port 契約與固定情境](2026-09-13-jd-interview-window-source-contract.md)，含 W-01–W-14 十四個固定情境；下一是依該契約的有限實作，契約本身尚未實作或驗證。
 2. **B1 採用**：接來源及必要 package helpers，原 prompt／輸出保持；沿用原窗口、重抽、角色與故障案例，補新引用及同工作續作接合。不是只驗正常抽取。
 3. **B2 採用**：沿原發布、stale／RECENT_REPAIRS 與原工作預算，補 C／B2 新來源配對及發布回覆遺失；不另造 Memory writer。
@@ -134,5 +170,5 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 1. 本稿是映射與差距判定，**沒有任何實作或測試執行**；上表的「沿用案例」是舊 checkout 既有檔案的行數盤點，不是已在新 App 通過的證據。
 2. B1／B2 的既有案例綁舊 `ConversationReader` 與舊 service；實際可沿用比例要到接上新 source port 才能確定，本稿不預估百分比。
 3. CT49／CT50／CT51 是代表性單一職位及有限續談的真模型驗收，不是所有職位或百輪成功率；採用不會自動延伸該結論。
-4. 後加 `sources.py` 增量與 `write-customized-jd` 不整批採用；`4f94fbfb` 已有的方法依 §2／5 採用。真正待閉合的是完成窗口契約與背景狀態落點，不是是否重做顧問。
+4. 後加 `sources.py` 增量與 `write-customized-jd` 不整批採用；`4f94fbfb` 已有的方法依 §2／5 採用。目前待實作的是 §3.3／3.6 的批次／背景接合與 B2／通知／宿主驗收，不是重新做已驗來源或顧問。
 5. H4 完成條件（零 provider 固定完整旅程可初始化、反覆修正、保留早期工作與案例、重開續談）**尚未開始驗證**；自然品質仍屬 OI-09。

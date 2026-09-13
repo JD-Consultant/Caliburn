@@ -165,8 +165,11 @@ def test_one_bounded_batch_saves_durably_and_the_cursor_alone_takes_the_tail():
             tail = workflow.start(rest["source_reference"])
             assert len(tail["files"]) == 2 and len(sent) == 4
             assert saved_rows(store_conn, document) == 8 and published_rows(store_conn, document) == 0
-            print(f"B1 real PG document={document} windows={len(planned)} files=4 "
-                  f"http={len(sent)} published=0 provider_calls=0")
+            # Every number here is measured; none is written in by hand.
+            print(f"B1 real PG document={document} windows={len(planned)} "
+                  f"files={len(result['files']) + len(tail['files'])} http={len(sent)} "
+                  f"rows={saved_rows(store_conn, document)} "
+                  f"published={published_rows(store_conn, document)}")
 
 
 def test_a_store_fault_resumes_on_rebuilt_resources_without_calling_the_model_again():

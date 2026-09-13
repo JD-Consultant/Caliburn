@@ -37,7 +37,7 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 | 相鄰真 PG 回歸（來源、Memory 核心、C 接合、C context、C 修補核心） | **17 passed／11.79s** |
 | App 全離線測試 | **2812 passed／263 skipped／42.52s**（skip 較先前 +6，即本檔在未啟用時正確跳過） |
 
-一批的實際數字（測試自行印出）：`windows=4 files=4 http=4 published=0 provider_calls=0`——4 個規劃窗口分兩批各 2 個，模型呼叫數等於窗口數，沒有重複呼叫。
+一批的實際數字（測試印出，每個值都是量到的）：`windows=4 files=4 http=4 rows=8 published=0`——4 個規劃窗口分兩批各 2 個，模型呼叫數等於窗口數沒有重複，Store 有 8 列產物，publication head 0 列。初版這行把 `files` 與 `provider_calls` 寫成常數，經獨立審查指出後改為實測值；`provider_calls` 已移除，因為那是設計事實（transport 在程序內），不是這次量到的數。
 
 三個首敗全部是**測試自身**的假設錯，沒有為了通過而放寬產品：
 
@@ -50,6 +50,16 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 在該位置，`save` 節點自己的輸出已被寫成持久 pending write，所以續作是**套用已記錄的結果**，不是重跑該節點——因此沒有第二對產物，也沒有第二次模型呼叫。
 
 **這是對這個位置的觀察，不是外部副作用 exactly-once 保證。**同一份工作在別的位置（例如模型已回覆但結果尚未 checkpoint）不適用；本輪**沒有**模擬那個未知位置，因此對它不做任何「零次重呼叫」宣稱。上表第三列的落單產物案例已經證明：位置不同，結果就不同。
+
+## 獨立審查與窄複核
+
+由未參與施工的審查者依 §3.6／契約 §7－§8／計畫 §4－§6 獨立複核，**沒有找到現存程式缺陷**，並獨立重跑了本稿宣稱的兩個變異（皆被殺）、以 84+5 次差異比對確認 `plan_saved_windows` 重構後行為完全不變、實跑 `test_extraction_postgres.py` 得到與本稿逐字相同的輸出。
+
+審查提出的可重現問題已在本輪修掉：**游標停在 target 起點之前時，批次規劃會靜默跳過中間回合**（重現條件 cursor=`t0..t0`、target=`t2..t3`）。已改為明示 `invalid_ref` 並補反例，詳見[批次接點結果](fixed-target-batch-results.md)第八個案例。另外本稿引用的印出行原本含硬寫常數，已改為實測值。
+
+其餘 finding 均為「下一片未接」或「可延後」：R3 的 dispatcher 須先 `follows()` 再切批次並沿用 `_owner_errors()` 錯誤邊界；`through_reference` 不得放上一批的 batch ref。這些已寫進批次接點結果稿的限制。
+
+修正後窄複核：受影響組 **309 passed**、真 PG **6 passed**、全離線 **2812 passed／263 skipped**。
 
 ## 限制與未完成
 

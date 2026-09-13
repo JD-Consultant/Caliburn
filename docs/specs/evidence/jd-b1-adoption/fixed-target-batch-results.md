@@ -30,6 +30,8 @@
 
 第七個案例 `..._later_cursor_that_stops_short_of_the_target_is_refused_not_covered` **一寫就通過**，故另做變異確認鑑別力（見下）：游標雖然較晚發出但其發布範圍未達 target 結尾時，必須 `invalid_ref`，不得回「已涵蓋」而把中間回合埋掉。
 
+第八個案例 `..._target_leaving_turns_behind_the_cursor_is_refused_not_skipped` 由**獨立審查**提出反例後補上：游標停在 target 起點**之前**時，原先的實作會把下限夾到 target 自己的起點，靜默產出跳過中間回合的批次並回 `covers_whole_range=True`。審查者的重現條件（cursor=`t0..t0`、target=`t2..t3`，`t1` 被跳過）先轉紅，改成明示 `invalid_ref` 後轉綠。這不是第二套 admission 規則——「新範圍可否被准入」仍只由 `follows()` 決定；owner 只是拒絕自己無法安全服務的輸入，符合契約 §7.2「不得跳過中間的員工回合」與 §8「明示失敗、不靜默降級」。
+
 ## 變異檢查
 
 兩次都由本次實作者執行，改動前後以 `git hash-object` 核對還原（兩次皆回到 `9e30fc96…`）：
@@ -50,9 +52,9 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 
 | 範圍 | 結果 |
 |---|---|
-| `tests/test_interview_window_source.py` | **50 passed／5.97s** |
-| 受影響組（窗口來源＋B1 adapter＋來源＋聊天歷史＋Memory 套件） | **308 passed／11.12s** |
-| App 全離線測試 | **2812 passed／257 skipped／42.18s** |
+| `tests/test_interview_window_source.py` | **51 passed**（含審查後補的跳號反例） |
+| 受影響組（窗口來源＋B1 adapter＋來源＋聊天歷史＋Memory 套件） | **309 passed／11.28s** |
+| App 全離線測試 | **2812 passed／257 skipped／42.18s**（跳號修正前的數字；修正後的全跑見 R1 結果稿） |
 
 首敗（實作後）只有一個，且是**測試自身**的假設錯：斷言批次不含 `問`×10，但批次合法涵蓋第一個 plain 回合。已改成斷言批次回合是 target 回合的真前綴，沒有放寬產品。
 
@@ -62,4 +64,6 @@ uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cac
 2. 全部為 InMemory 固定 fixture，**0 provider**。既有 C／source 的 14 條真 PG 案例不算 B1 已驗。
 3. 背景准入狀態的持久落點仍未決（映射 §3.3）；本片沒有建表，也沒有第二份游標。
 4. 游標較晚但未涵蓋 target 時本片選擇**明示拒絕**而非規劃剩餘範圍。這在「同文件只能有一筆未交接完批次」的前提下只會由 caller 誤用造成；拒絕不會靜默跳過回合。若日後證明需要在該情形續作，須另立反例，不在此擴張。
-5. 「新範圍是否可被准入」仍只由 `follows()` 決定；批次規劃只把 target 自己的起點當下限，不重複一套 admission 規則。
+5. 「新範圍是否可被准入」仍只由 `follows()` 決定。批次規劃現在會拒絕游標與 target 之間留有未整併回合的輸入（見第八個案例），這是拒絕不安全輸入，不是第二套 admission 規則；R3 接 dispatcher 時仍應先 `follows()` 再切批次。
+6. 新接點目前沒有自己的錯誤碼邊界：祖先查找超限時會直接拋既有 `AiCheckpointError(original_run_lookup_required)`，與 `plan_saved_windows` 相同。這符合 §8「明示受限」，但 R3 的 caller 須沿用 `ExtractionSourceAdapter._owner_errors()` 的同一層翻譯。
+7. `through_reference` 只放准入列保存的**固定 target**。把上一批的 batch ref 當 target 傳回會得到 `invalid_ref`（其 root 比自身範圍長，走到較晚游標分支）；這是拒絕，不會靜默跳過回合，R2 的准入落點文件須寫明此界線。

@@ -782,3 +782,22 @@ def test_a_later_cursor_that_stops_short_of_the_target_is_refused_not_covered(in
     with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
         windows.plan_saved_batch(older, document, after_reference=ahead,
                                  max_chars=40, context_chars=20)
+
+
+def test_a_target_leaving_turns_behind_the_cursor_is_refused_not_skipped(interview, native):
+    """A gap between the cursor and the target is not this owner's to close.
+
+    Planning the target anyway would hand B1 a batch that jumps the turns in
+    between, and publishing it would carry the cursor permanently past speech
+    nobody consolidated. Refusing keeps the failure explicit; whether a range
+    may be admitted at all is still `follows`'s one rule.
+    """
+    windows, document, first_run, second_run = interview
+    tail = plain(native, 2)
+    cursor = target_over(windows, document, first_run, first_run)
+    skipping = target_over(windows, document, tail[0].record.run_id, tail[-1].record.run_id)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.plan_saved_batch(skipping, document, after_reference=cursor,
+                                 max_chars=40, context_chars=20)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.unprocessed_source(document, cursor, skipping)

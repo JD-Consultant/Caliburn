@@ -370,6 +370,38 @@ def test_every_planned_window_in_a_batch_keeps_its_own_pair(interview, native):
                                       document, max_chars=20, context_chars=10)
 
 
+def test_planning_inside_a_saved_window_stays_at_its_own_root(interview, native):
+    """The saved reference decides where planning reads, not what is latest."""
+    windows, document, first_run, second_run = interview
+    saved = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    before = windows.plan_saved_windows(saved, document, max_chars=24, context_chars=12)
+    settled(native, [AIMessage(id="later1", content="第三輪回覆")], text="第三輪原話")
+    assert windows.plan_saved_windows(saved, document, max_chars=24, context_chars=12) == before
+    for pair in before:
+        page = windows.read_window(pair["source_reference"], document)
+        assert {turn["input_id"] for turn in page["turns"]} <= {first_run, second_run}
+        assert "第三輪原話" not in "".join(segment["text"] for segment in page["segments"])
+
+
+def test_a_window_from_an_abandoned_branch_is_never_replanned_on_the_current_one(interview, native):
+    """A readable history reference is still not an admissible planning input.
+
+    Both siblings hold the same turns, so only the chain distinguishes them. A
+    token pinned to the abandoned one must fail rather than quietly produce
+    pairs cut from the branch that happens to be current.
+    """
+    graph, dataset, document, *_ = native
+    windows, _, first_run, second_run = interview
+    parent = windows._codec._resolve_window(windows.capture_window(
+        document, first_run_id=second_run, last_run_id=second_run), document).root_config()
+    graph.update_state(parent, {"jd_manual_pending": None}, as_node="consultant")
+    abandoned = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    graph.update_state(parent, {"jd_manual_pending": None}, as_node="consultant")
+    windows.read_window(abandoned, document)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.plan_saved_windows(abandoned, document, max_chars=24, context_chars=12)
+
+
 def test_a_context_range_reports_exactly_the_settled_turns_it_covers(interview, native):
     """Context is never a new source, but its terminals stay provable.
 
@@ -380,12 +412,15 @@ def test_a_context_range_reports_exactly_the_settled_turns_it_covers(interview, 
     """
     windows, document, first_run, second_run = interview
     third = settled(native, [AIMessage(id="ctx3", content="第三輪回覆")], text="第三輪原話")
-    fourth = settled(native, [AIMessage(id="ctx4", content="第四輪回覆")], text="第四輪原話")
+    settled(native, [AIMessage(id="ctx4", content="第四輪回覆")], text="第四輪原話")
+    stopped = settled(native, [AIMessage(id="ctx5", content="第五輪回覆")],
+                      text="第五輪原話", status="failed")
+    sixth = settled(native, [AIMessage(id="ctx6", content="第六輪回覆")], text="第六輪原話")
     settled_turns = {turn["input_id"]: turn for turn in windows.safe_turns(document)}
     seen, questions_only = {}, 0
     for max_chars, context_chars in ((20, 10), (24, 12), (60, 40), (400, 200)):
         for pair in windows.plan_windows(document, first_run_id=first_run,
-                                         last_run_id=fourth.record.run_id,
+                                         last_run_id=sixth.record.run_id,
                                          max_chars=max_chars, context_chars=context_chars):
             if pair["context_reference"] is None:
                 continue
@@ -403,6 +438,8 @@ def test_a_context_range_reports_exactly_the_settled_turns_it_covers(interview, 
     assert seen[second_run]["answer_succeeded"] is False
     assert seen[third.record.run_id]["status"] == "completed"
     assert seen[third.record.run_id]["answer_succeeded"] is True
+    assert seen[stopped.record.run_id]["status"] == "failed"
+    assert seen[stopped.record.run_id]["answer_succeeded"] is False
 
 
 def test_admission_refuses_an_earlier_or_skipping_range(interview, native):

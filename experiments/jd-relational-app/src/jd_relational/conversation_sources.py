@@ -732,6 +732,40 @@ class ConversationSourceService:
         """
         self._budgets(max_chars, context_chars)
         _, messages, turns = self._settled(document_id)
+        first, last = self._bounds(turns, first_run_id, last_run_id)
+        return self._plan(document_id, messages, turns, first, last,
+                          root=self._window_root(document_id, last_run_id), root_run_id=last_run_id,
+                          max_chars=max_chars, context_chars=context_chars)
+
+    def plan_saved_windows(self, window_ref, document_id, *,
+                           max_chars: int = MAX_WINDOW_CHARACTERS,
+                           context_chars: int = MAX_CONTEXT_CHARACTERS) -> tuple[dict, ...]:
+        """Plan inside one already issued window, at that window's own position.
+
+        The reference decides where this reads. Its own pinned root must lie on
+        this document's chain and still carry the exact range it names as whole
+        settled turns; every pair is then cut from that one fixed snapshot. A
+        range that cannot be proven there fails rather than being replanned
+        against whatever is latest, so a window issued on an abandoned branch
+        can never hand B1 another branch's work under the saved reference.
+        """
+        self._budgets(max_chars, context_chars)
+        position = self._codec._resolve_window(window_ref, document_id)
+        current, _, _ = self._settled(document_id)
+        pinned = self._pinned(document_id, position.root_run_id, position.root_config())
+        if current is None or not self._on_lineage(document_id, position.root_checkpoint_id, current):
+            raise ConversationSourceError("invalid_ref")
+        messages = pinned.messages
+        turns = self._settled_turns(document_id, messages)
+        first, last = self._bounds(turns, position.first_run_id, position.last_run_id)
+        if position.first != turns[first]["first"] or position.last != turns[last]["last"]:
+            raise ConversationSourceError("invalid_ref")
+        return self._plan(document_id, messages, turns, first, last,
+                          root=position.root_checkpoint_id, root_run_id=position.root_run_id,
+                          max_chars=max_chars, context_chars=context_chars)
+
+    @staticmethod
+    def _bounds(turns, first_run_id, last_run_id):
         identifiers = [turn["input_id"] for turn in turns]
         try:
             first, last = identifiers.index(first_run_id), identifiers.index(last_run_id)
@@ -739,9 +773,13 @@ class ConversationSourceService:
                 raise ValueError()
         except Exception:
             raise ConversationSourceError("invalid_ref") from None
+        return first, last
+
+    def _plan(self, document_id, messages, turns, first, last, *, root, root_run_id,
+              max_chars, context_chars):
+        """Cut every pair from one fixed snapshot, at one fixed root."""
         groups = self._groups(messages, turns)
         sizes = [self._size(group) for group in groups]
-        root = self._window_root(document_id, last_run_id)
         if any(size > max_chars for size in sizes[first:last + 1]):
             raise WindowBudgetExceeded("window_budget_exceeded")
         planned, index = [], first
@@ -757,20 +795,20 @@ class ConversationSourceService:
                     used = self._size(required)
                     if used > context_chars or used + sizes[index] > max_chars:
                         raise WindowBudgetExceeded("window_budget_exceeded")
-                    context = self._issue_context_between(root, last_run_id, document_id, question.id, prior[-1].id)
+                    context = self._issue_context_between(root, root_run_id, document_id, question.id, prior[-1].id)
                 # A whole prior turn is allowed only when it still carries the
                 # required question; it never replaces an older one.
                 if ((question is None or any(m.id == question.id for m in prior))
                         and sizes[index - 1] <= context_chars
                         and sizes[index - 1] + sizes[index] <= max_chars):
-                    context = self._issue_context_between(root, last_run_id, document_id, prior[0].id, prior[-1].id)
+                    context = self._issue_context_between(root, root_run_id, document_id, prior[0].id, prior[-1].id)
                     used = sizes[index - 1]
             end = index
             while end <= last and used + sizes[end] <= max_chars:
                 used += sizes[end]
                 end += 1
             planned.append({"source_reference": self._issue_window_between(
-                root, last_run_id, document_id, turns[index], turns[end - 1]), "context_reference": context})
+                root, root_run_id, document_id, turns[index], turns[end - 1]), "context_reference": context})
             index = end
         return tuple(planned)
 
@@ -874,16 +912,6 @@ class ConversationSourceService:
     def validate_context_reference(self, context_ref, document_id) -> None:
         """Shape, signature domain and scope only, with no storage I/O."""
         self._codec._resolve_context(context_ref, document_id)
-
-    def window_bounds(self, window_ref, document_id) -> dict:
-        """This window's own turn bounds, for a caller planning inside it.
-
-        Shape and signature only, like `validate_window_reference`: the bounds
-        come from the reference this owner issued, so a caller never parses a
-        token itself or picks a range the owner did not already fix.
-        """
-        position = self._codec._resolve_window(window_ref, document_id)
-        return {"first_run_id": position.first_run_id, "last_run_id": position.last_run_id}
 
     def validate_window_reference(self, window_ref, document_id) -> None:
         """Verify a completed-window locator issued by this same owner.

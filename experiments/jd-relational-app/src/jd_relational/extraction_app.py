@@ -110,11 +110,16 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
             raise self._address(error) from error
 
     def extraction_windows(self, reference: str, *, max_chars: int, context_chars: int) -> list[dict]:
+        """Plan inside the reference's own fixed position, never the latest one.
+
+        The owner is handed the window itself rather than bounds read out of
+        it, so the range is proven and every pair is cut where that reference
+        was issued. A window pinned to an abandoned branch fails here instead
+        of being replanned against whatever is currently canonical.
+        """
         try:
-            bounds = self.service.window_bounds(reference, self.document_id)
-            return list(self.service.plan_windows(
-                self.document_id, first_run_id=bounds["first_run_id"],
-                last_run_id=bounds["last_run_id"], max_chars=max_chars, context_chars=context_chars))
+            return list(self.service.plan_saved_windows(
+                reference, self.document_id, max_chars=max_chars, context_chars=context_chars))
         except ConversationSourceError as error:
             raise self._address(error) from error
 

@@ -295,6 +295,36 @@ def test_a_context_range_carries_its_turn_terminals_into_the_payload(b1):
     assert carried and any(turn["answer_succeeded"] is False for turn in carried)
 
 
+def test_a_sibling_branch_window_is_refused_before_the_first_model_call(b1, native):
+    """A token pinned to an abandoned branch must never reach the model.
+
+    Both siblings hold the same turns, so accepting it would hand B1 whichever
+    branch happens to be current as if it were the saved window.
+    """
+    build, windows, document, _, store, sent, _ = b1
+    graph, *_ = native
+    turns = windows.safe_turns(document)
+    last = turns[-1]["input_id"]
+    parent = windows._codec._resolve_window(windows.capture_window(
+        document, first_run_id=last, last_run_id=last), document).root_config()
+    graph.update_state(parent, {"jd_manual_pending": None}, as_node="consultant")
+    abandoned = windows.capture_window(document, first_run_id=turns[0]["input_id"], last_run_id=last)
+    graph.update_state(parent, {"jd_manual_pending": None}, as_node="consultant")
+    with pytest.raises(InvalidSourceReference):
+        build().start(abandoned)
+    assert sent == []
+    assert not list(store.search(("q019-memory", document, "interviews")))
+
+
+def test_later_turns_never_change_what_a_saved_window_extracts(b1, native):
+    """Planning reads the reference's own root, so new speech stays out of it."""
+    build, _, _, whole, _, sent, _ = b1
+    settled(native, [AIMessage(id="b1a4", content="第四輪回覆")], text="第四輪原話")
+    build().start(whole)
+    payload = json.dumps(sent, ensure_ascii=False)
+    assert "第三輪原話" in payload and "第四輪原話" not in payload
+
+
 def test_the_terminal_evidence_port_reads_only_public_provider_fields():
     assert accepted(AIMessage("好", response_metadata={"status": "completed"}))
     assert not accepted(AIMessage("好", response_metadata={"status": "incomplete"}))

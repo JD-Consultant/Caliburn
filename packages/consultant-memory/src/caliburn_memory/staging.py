@@ -1,12 +1,18 @@
-"""Validate the two existing native staged Memory files, without publishing.
+"""The staged Memory pair: its validation, and the tools that edit it.
 
-Extracted from the verified consolidation_tools.py. Only known content errors
-are model-correctable; unknown backend/source exceptions must stop execution.
+Adopted from the verified consolidation_tools.py. Only known content errors are
+model-correctable; unknown backend/source exceptions must stop execution. The
+editable surface is exactly the two staged files: interview details stay
+readable and every other path is denied a writer rather than being absent.
 """
-from deepagents.backends import StateBackend
+from deepagents.backends import CompositeBackend, StateBackend
+from deepagents.backends.protocol import WriteResult
+from deepagents.middleware.filesystem import FilesystemMiddleware
+from langchain_core.tools import ToolException, tool
 
-from .memory import MemoryArtifacts
-from .patch import PATHS
+from .memory import MemoryArtifacts, ReadOnlyFiles
+from .patch import PATCH_GUIDANCE, PATHS, MemoryPatchError, apply_staged_patch
+from .read_tools import MEMORY_EDIT_GUIDANCE
 from .sources import InvalidSourceReference
 
 
@@ -52,3 +58,74 @@ def staged_texts(artifacts: MemoryArtifacts) -> dict[str, str]:
     if values["knowledge"].strip() and not values["guide"].strip():
         raise StagedMemoryValidationError("/memory/guide.md is empty while knowledge contains work; write a concise guide.")
     return values
+
+
+class StagedFiles(ReadOnlyFiles):
+    """Reads reach the details; writes reach only the two staged Memory files."""
+
+    def write(self, file_path: str, content: str):
+        self._check_scope()
+        if file_path not in PATHS.values():
+            return WriteResult(error="Write denied: only /memory/knowledge.md and /memory/guide.md are editable")
+        return self._backend.write(file_path, content)
+
+
+def consolidation_tools(artifacts: MemoryArtifacts, thread_id: str):
+    """Official virtual filesystem tools over one private attempt's staged files.
+
+    Only the tools are taken from the middleware: no model or message hook, no
+    automatic offload and no summarisation. Staging is not publication, and the
+    interview details routed in here stay read-only.
+    """
+    backend = StagedFiles(CompositeBackend(default=StateBackend(), routes={
+        "/interviews/": artifacts.interview_backend()}), artifacts.document_id, thread_id=thread_id)
+    filesystem = FilesystemMiddleware(backend=backend,
+        tools=["ls", "grep", "read_file", "write_file"],
+        custom_tool_descriptions={
+            "ls": "List files in a directory when the file address is unknown. "
+                  "Runtime-provided MEMORY_FILES and summary_path addresses are already valid; "
+                  "read them directly without listing their directories first.",
+            "write_file": "Write the complete contents of a staged memory file, replacing it entirely. "
+                          "Use for a short file whose complete current contents are visible and whose "
+                          "complete updated contents fit the output budget; prefer this for changes across several passages. "
+                          "Minimal semantic changes do not require a patch. Preserve unchanged details "
+                          "and references. Read any existing content not already visible first; "
+                          "a paged or truncated read is not the whole file. For large or partially "
+                          "read files use apply_memory_patch. Never copy read_file line-number prefixes. "
+                          + MEMORY_EDIT_GUIDANCE},
+        human_message_token_limit_before_evict=None, tool_token_limit_before_evict=4000)
+
+    @tool
+    def apply_memory_patch(file_path: str, diff: str) -> str:
+        """Patch an existing staged Memory file using a V4A diff (max 12000 characters).
+
+        Read the affected range first. This stages changes, not publication.
+        For initialization or a short fully visible file, write_file remains available.
+        """
+        backend._check_scope()
+        try:
+            changed = apply_staged_patch(file_path, diff)
+        except MemoryPatchError as error:
+            raise ToolException(str(error)) from error
+        return f"{file_path}: {'Patch applied to staging' if changed else 'Content unchanged'}. Not yet published."
+
+    apply_memory_patch.description += "\n\n" + PATCH_GUIDANCE + "\n\n" + MEMORY_EDIT_GUIDANCE
+    apply_memory_patch.handle_tool_error = True
+
+    @tool
+    def validate_memory() -> str:
+        """Optional preflight for staged format, size, references and a nonempty body's guide.
+
+        Runtime always checks again at final completion. Does not check semantic truth.
+        On error fix the named file; calling this tool again is optional, not publication.
+        """
+        backend._check_scope()
+        try:
+            staged_texts(artifacts)
+        except StagedMemoryValidationError as error:
+            raise ToolException(str(error)) from error
+        return "Both staged files passed format/reference and guide-presence checks. Not yet published."
+
+    validate_memory.handle_tool_error = True
+    # Only tools, not generic message-eviction/summarization middleware hooks.
+    return [*filesystem.tools, apply_memory_patch, validate_memory]

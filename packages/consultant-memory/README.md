@@ -1,6 +1,6 @@
 # Caliburn Consultant Memory
 
-工作詳記、目前工作理解／導覽、發布與已採用 Memory 工作流程的獨立 Python 套件。新 JD App 以一般套件依賴使用；不 import 舊 checkout，不含 JD 編輯、HTTP 入口或宿主排程。B1 會執行 App 注入的 structured runnable；provider client、金鑰、角色配置及資源生命週期由 App 組裝。
+工作詳記、目前工作理解／導覽、發布與已採用 Memory 工作流程的獨立 Python 套件。新 JD App 以一般套件依賴使用；不 import 舊 checkout，不含 JD 編輯、HTTP 入口或宿主排程。B1 會執行 App 注入的 structured runnable，B2 會執行 App 注入的 chat model 與 context 中介；provider client、金鑰、角色配置及資源生命週期由 App 組裝。
 
 ## 保存與來源
 
@@ -24,7 +24,15 @@ App 配發 operation／base／source，模型只提供 path／diff；本核心�
 
 `caliburn_memory.extraction.ExtractionWorkflow` 已自 `4f94fbfb` 採用。三文字欄位、prompt、窗口迴圈、格式更正額度、`start/resume/reextract` 保持已驗語意；`ExtractionSourceReader` 由 App 提供固定窗口與前置消歧，`accepted(raw)` 由 provider adapter 核拒絕／終局。B1 保存詳記／候選，不發布目前理解，也不前進 publication 游標。
 
-新 App `extraction_app.py` 的 OpenAI 固定接合已完成；同文件工作須由 caller 串行，已完成 B1 的 `files` 交給 B2 後才可進下一批。B1 已在真 `PostgresSaver`／`PostgresStore` 上驗過一批的保存、資源重建後續作、重抽與相同 input 查回（[R1 結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)），套件程式未因此改動。**B2 尚未採用，B1 的日常觸發與宿主恢復仍待施工。**[H4 執行計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
+新 App `extraction_app.py` 的 OpenAI 固定接合已完成；同文件工作須由 caller 串行，已完成 B1 的 `files` 交給 B2 後才可進下一批。B1 已在真 `PostgresSaver`／`PostgresStore` 上驗過一批的保存、資源重建後續作、重抽與相同 input 查回（[R1 結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)），套件程式未因此改動。
+
+## B2 整併核心
+
+`caliburn_memory.consolidation.ConsolidationWorkflow` 已自 `4f94fbfb` 採用。prompt 逐字相同（`instructions_sha256`）、`JobState`、`stale→load`、模型／工具／輸出／候選／修補五項預算、`_repair_input`、由產物推導的 `_operation_id` 與 publish／receipt 路徑都未改。暫存兩檔的編輯工具（`staging.consolidation_tools`）與最終回饋迴圈（`consolidation_feedback`）同批採用。
+
+**唯一接縫是本套件不綁 provider**：原本 import 的 `native_context_view` 改由 caller 以 `context_middleware=` 傳入，中介順序不變。B2 只從**已完成**的 B1 checkpoint 取 `files`；它推進 `processed_source`，C 的修補不推進背景游標。
+
+**尚未接 runtime：**B2 的 App adapter、真 PG 交接、發布回覆遺失查回與 C 較晚更正的配對驗收仍待施工。[H4 執行計畫 R2](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
 
 ## 安裝與驗證
 

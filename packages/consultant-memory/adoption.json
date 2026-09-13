@@ -35,8 +35,8 @@
       "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation_tools.py",
       "source_sha256": "d81efec80bc8e8b32b665f82d97bd0d632948e29daa56e2a38f5bc8b9d1ab6d0",
       "adopted_path": "src/caliburn_memory/staging.py",
-      "adopted_sha256": "849feb573135a8ec2e29d8ee4ee3137e5577f4728408c926ea7ffb4021f8765e",
-      "adaptation": "Extract only PATHS/staged_texts validation; share PATHS from patch; typed invalid-source port and fixed safe content errors; unknown I/O propagates."
+      "adopted_sha256": "9afc5308bb31005df37c84610c8583d4577e26dc2eb667a33c845473c02f3e85",
+      "adaptation": "Extract only PATHS/staged_texts validation; share PATHS from patch; typed invalid-source port and fixed safe content errors; unknown I/O propagates. 2026-09-14 adopts the rest of this source file for B2: StagedFiles and consolidation_tools() are byte-identical apart from package imports, so the tool allowlist, the custom descriptions, the eviction limits, apply_memory_patch and validate_memory keep their verified behaviour. staged_texts keeps this package's earlier typed-error split, which makes a missing staged file correctable feedback rather than a hard failure."
     },
     {
       "source_path": "experiments/analysis-agent/src/analysis_agent/repair.py",
@@ -56,8 +56,8 @@
       "source_path": "experiments/analysis-agent/src/analysis_agent/memory_tools.py",
       "source_sha256": "facdbfc5e3dc5035326e0af46be58479c720c54f0398ea6453312001dc429e11",
       "adopted_path": "src/caliburn_memory/read_tools.py",
-      "adopted_sha256": "090cd033125f5e67b1274d916b05032572ca9755488aeac80b81bbbb74f8f29c",
-      "adaptation": "Extract only READONLY_TOOL_DESCRIPTIONS/readonly_file_tools; drop the Skill-file claim and make comments provider-neutral. No source store, SkillAssets, runner or write tool. See read-tools-results.md."
+      "adopted_sha256": "2e0c0c15b515b71f72c8f308b598c57d14b689bac81a2c62344bbb885cd92bee",
+      "adaptation": "Extract only READONLY_TOOL_DESCRIPTIONS/readonly_file_tools; drop the Skill-file claim and make comments provider-neutral. No source store, SkillAssets, runner or write tool. See read-tools-results.md. 2026-09-14 also adopts MEMORY_EDIT_GUIDANCE verbatim from the same source file, with its comment references, because the B2 staged-file tool descriptions carry it."
     },
     {
       "source_path": "experiments/analysis-agent/src/analysis_agent/extraction.py",
@@ -66,6 +66,21 @@
       "adopted_sha256": "af728c46261fd0efea32fb8109bbd12ea64906f1ffbd4d606ae5e497c76821f5",
       "instructions_sha256": "83b1437619f6618fd776f3fec6fcf37397d1b5b476390b15f06016b55ec62398",
       "adaptation": "B1 workflow adopted at 4f94fbfb (CT50 profile). INSTRUCTIONS is byte-identical (see instructions_sha256), as are ExtractionOutput's three fields and validators, the window loop, correction allowance, save, resume, reextract and reextraction_config. Two seams: package imports plus reader.validate_reference in place of the unsigned legacy parse_reference; and provider assembly moved to the caller, which supplies the already-configured structured runnable (built from ExtractionOutput.model_json_schema() with include_raw) and an accepted(raw) port carrying that provider's terminal/refusal evidence. The OpenAI-shaped refusal-block and response_metadata['status'] checks were the only provider-specific logic and now live behind that port; max_output_tokens moved with them. Not yet verified against a real provider on this stack."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation.py",
+      "source_sha256": "1ec015eaaf5ea85f6b6d50901d5b002b6115b5aa9ad1dad15892c2c1bf7c8f4e",
+      "adopted_path": "src/caliburn_memory/consolidation.py",
+      "adopted_sha256": "c64eb183bd14586445ac25b19bea73613309aa9c8fe9317afb677c9ca4a467a8",
+      "instructions_sha256": "d4061fc9ac3d5b51335af54dde9e9b7338b6050188ebca84875fbc6e56ea520c",
+      "adaptation": "B2 workflow adopted at 4f94fbfb (CT50 profile) on 2026-09-14. INSTRUCTIONS is byte-identical (see instructions_sha256). The graph, JobState, stale->load, budgets (16 model steps, 15 tool calls, 4096 output, 24000 candidate chars, 12000 repair chars), the candidate/detail budget rule, _repair_input, the artifact-derived _operation_id and the publish/receipt path are unchanged. One seam: this package binds no provider, so runtime.native_context_view is no longer imported and the caller passes context_middleware instead; everything else in the middleware list keeps its order, including the after-hook ordering comment. Not yet verified against a real provider on this stack."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation_feedback.py",
+      "source_sha256": "60f573a67ffeab0aaf504ecef2465342a615d9d26a5d6f4df8217f85ea55600f",
+      "adopted_path": "src/caliburn_memory/consolidation_feedback.py",
+      "adopted_sha256": "9462dadba4de4fe2857dcac14724416d8dffd5d9365523e5f98922120c140fb6",
+      "adaptation": "Adopted 2026-09-14 with package imports only; completed_messages and the can_jump_to model feedback hook are otherwise byte-identical."
     }
   ],
   "new_files": {

@@ -6,6 +6,8 @@
 
 ## 結構
 
+[回覆遺失驗收](../../docs/specs/2026-09-13-jd-browser-reply-loss-slice.md)已用真瀏覽器／PG確認：提交成功但回覆未到，重開查回原operation後恢復，沒有新POST／重複任務。重現入口是[測試專用說明](tests/support/ui_response_gate_notes.md)，不將回覆閘門加入產品。人工通知與AI回合接點沿[下一步前置](../../docs/specs/evidence/2026-09-13-jd-consultant-context-preflight.md)；仍未啟用模型。
+
 - `web/`：React／Next／MUI 六章管理、IndexedDB 候選及 Web Locks；從正式 Schema／generated 型別接同一 API，不另存正式 JD。
 
 - `contracts/jd-work.schema.json`：八個編輯工具輸入的唯一 JSON Schema。

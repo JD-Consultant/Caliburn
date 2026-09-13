@@ -66,7 +66,7 @@ export default function Workspace({ apiOrigin }: { apiOrigin: string | null }) {
   }
 
   async function changeMetadata() {
-    if (!api || !current || !safeToLeave) return;
+    if (!api || !current || !safeToLeave || (dialog !== 'rename' && dialog !== 'archive')) return;
     setBusy(true); setError('');
     try {
       const original = await api.metadata(current.document_id);
@@ -118,12 +118,12 @@ export default function Workspace({ apiOrigin }: { apiOrigin: string | null }) {
       </Paper>}
     </>}
   </Container>
-  <Dialog open={dialog !== null} onClose={() => { if (!busy) setDialog(null); }} fullWidth maxWidth="sm">
+  {dialog !== null && <Dialog open onClose={() => { if (!busy) setDialog(null); }} fullWidth maxWidth="sm">
     <DialogTitle>{dialog === 'create' ? '建立職務說明書' : dialog === 'rename' ? '更改文件名稱' : current?.archived ? '恢復這份文件' : '封存這份文件'}</DialogTitle>
     <DialogContent>{dialog === 'archive' ? <Typography>「{current?.title}」{current?.archived ? '恢復後可以繼續編輯。' : '會保留全部內容與歷史，日後可從封存列表恢復。'}</Typography> :
       <TextField autoFocus fullWidth label="文件名稱" value={title} disabled={busy} sx={{ mt: 1 }} onChange={event => setTitle(event.target.value)} helperText="例如：王小明的工作說明。職稱可在文件內另外填寫。" />}</DialogContent>
     <DialogActions><Button disabled={busy} onClick={() => setDialog(null)}>取消</Button>
       <Button variant="contained" disabled={busy || (dialog !== 'archive' && !title.trim())} onClick={() => void (dialog === 'create' ? createDocument(false) : changeMetadata())}>
         {busy ? '處理中…' : dialog === 'create' ? '建立' : dialog === 'rename' ? '儲存名稱' : current?.archived ? '恢復' : '封存'}</Button></DialogActions>
-  </Dialog></>;
+  </Dialog>}</>;
 }

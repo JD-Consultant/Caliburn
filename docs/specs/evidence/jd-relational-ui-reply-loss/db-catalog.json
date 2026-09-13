@@ -1,0 +1,19 @@
+{
+  "stage": "catalog",
+  "checked_at_utc": "2026-09-13T01:02:44.672084+00:00",
+  "database": "caliburn_jd_setup_test_5f6c67d9efb74d9db1482648845b4137",
+  "port": 55436,
+  "mode": "REPEATABLE READ / READ ONLY",
+  "provider_calls": 0,
+  "database_writes": 0,
+  "document_id": "1bcd7f2a-060f-454c-97bb-06b15c7c6dc4",
+  "head_revision_id": "ba607c15-fd18-49eb-9c8a-d67fd833e6fa",
+  "revision_number": 1,
+  "revision_count": 1,
+  "operation_count": 0,
+  "tasks": [],
+  "task_count": 0,
+  "content_digest": "8e95c1447978467adec487a62e4f09f78d1da6da4738957b78a4819b78d47597",
+  "operation_ids": [],
+  "current_equals_head_snapshot": true
+}

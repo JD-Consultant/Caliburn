@@ -653,3 +653,132 @@ def test_a_candidate_window_on_a_sibling_branch_is_never_admitted(interview, nat
     windows.read_window(candidate, document)
     with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
         windows.follows(candidate, previous, document)
+
+
+def target_over(windows, document, first_run, last_run):
+    """The admission target: one fixed window the owner issued, not a head."""
+    return windows.capture_window(document, first_run_id=first_run, last_run_id=last_run)
+
+
+def test_a_fixed_target_is_never_widened_by_later_speech(interview, native):
+    """Admission was granted over a range, not over "everything since".
+
+    The unbounded question still follows the head, so the two answers have to
+    differ once the employee keeps talking: a batch already under way must not
+    silently grow to cover turns nobody admitted.
+    """
+    windows, document, first_run, second_run = interview
+    target = target_over(windows, document, first_run, second_run)
+    later = settled(native, [AIMessage(id="tw1", content="第三輪回覆")], text="第三輪原話")
+    assert windows.unprocessed_source(document, None, target) == {
+        "first_run_id": first_run, "last_run_id": second_run}
+    assert windows.unprocessed_source(document) == {
+        "first_run_id": first_run, "last_run_id": later.record.run_id}
+
+
+def test_a_bounded_batch_hands_b1_one_reference_and_keeps_the_tail(interview, native):
+    """B1 takes a single window, so the owner issues the batch as one.
+
+    The caller never assembles a token out of first and last identifiers: it
+    receives a reference that plans back to exactly the bounded prefix, and a
+    flag that stops it reporting the whole target as done.
+    """
+    windows, document, first_run, _ = interview
+    tail = plain(native, 3)
+    target = target_over(windows, document, first_run, tail[-1].record.run_id)
+    whole = windows.plan_saved_windows(target, document, max_chars=40, context_chars=20)
+    batch = windows.plan_saved_batch(target, document, max_chars=40, context_chars=20,
+                                     max_windows=2)
+    assert batch["covers_whole_range"] is False
+    windows.validate_window_reference(batch["source_reference"], document)
+    assert windows.plan_saved_windows(batch["source_reference"], document,
+                                      max_chars=40, context_chars=20) == whole[:2]
+    covered = windows.read_window(batch["source_reference"], document)["turns"]
+    assert [turn["input_id"] for turn in covered] == [
+        turn["input_id"] for turn in windows.safe_turns(document)][:3]
+
+
+def test_the_published_cursor_alone_moves_the_next_batch_to_the_tail(interview, native):
+    """A target outlives one batch; only the cursor decides where the next starts.
+
+    No new consolidation request is needed for the tail, and the target is
+    never swapped for whatever is latest by the time B2 publishes.
+    """
+    windows, document, first_run, _ = interview
+    tail = plain(native, 3)
+    target = target_over(windows, document, first_run, tail[-1].record.run_id)
+    whole = windows.plan_saved_windows(target, document, max_chars=40, context_chars=20)
+    first_batch = windows.plan_saved_batch(target, document, max_chars=40, context_chars=20,
+                                           max_windows=2)
+    rest = windows.plan_saved_batch(target, document, after_reference=first_batch["source_reference"],
+                                    max_chars=40, context_chars=20, max_windows=99)
+    assert rest["covers_whole_range"] is True
+    assert windows.plan_saved_windows(rest["source_reference"], document,
+                                      max_chars=40, context_chars=20) == whole[2:]
+    assert windows.plan_saved_batch(target, document, after_reference=rest["source_reference"],
+                                    max_chars=40, context_chars=20, max_windows=99) == {
+        "source_reference": None, "covers_whole_range": True}
+
+
+def test_a_target_already_covered_by_a_later_cursor_is_reported_covered(interview, native):
+    """A cursor past the target is an empty remainder, not a planning failure.
+
+    It is only empty because the target really lies inside that published
+    range on the same chain, so the owner proves it there instead of comparing
+    identifiers or trusting that a longer window must include a shorter one.
+    """
+    windows, document, first_run, second_run = interview
+    target = target_over(windows, document, first_run, second_run)
+    later = settled(native, [AIMessage(id="tc1", content="第三輪回覆")], text="第三輪原話")
+    published = target_over(windows, document, first_run, later.record.run_id)
+    assert windows.unprocessed_source(document, published, target) is None
+    assert windows.plan_saved_batch(target, document, after_reference=published,
+                                    max_chars=40, context_chars=20) == {
+        "source_reference": None, "covers_whole_range": True}
+
+
+def test_a_batch_over_the_whole_target_reuses_that_very_reference(interview, native):
+    """An unchanged range keeps its identity so B1 sees no new input."""
+    windows, document, first_run, second_run = interview
+    target = target_over(windows, document, first_run, second_run)
+    assert windows.plan_saved_batch(target, document, max_chars=40, context_chars=20) == {
+        "source_reference": target, "covers_whole_range": True}
+
+
+def test_a_target_pinned_to_an_abandoned_branch_is_refused_not_replanned(interview, native):
+    """A legitimately signed target still has to be on this conversation.
+
+    Both siblings carry the same turns, so only the chain separates them. The
+    batch must fail rather than hand B1 work cut from the branch that happens
+    to be canonical now.
+    """
+    graph, dataset, document, *_ = native
+    windows, _, first_run, second_run = interview
+    parent = windows._codec._resolve_window(target_over(
+        windows, document, second_run, second_run), document).root_config()
+    graph.update_state(parent, {"jd_manual_pending": None}, as_node="consultant")
+    abandoned = target_over(windows, document, first_run, second_run)
+    graph.update_state(parent, {"jd_manual_pending": None}, as_node="consultant")
+    windows.read_window(abandoned, document)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.unprocessed_source(document, None, abandoned)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.plan_saved_batch(abandoned, document, max_chars=40, context_chars=20)
+
+
+def test_a_later_cursor_that_stops_short_of_the_target_is_refused_not_covered(interview, native):
+    """Being issued later is not coverage; the published range has to reach.
+
+    A cursor cut from a longer target ends before this older target does. The
+    silent failure to avoid is calling that "already consolidated" and burying
+    the turns between, so the owner refuses instead of answering empty.
+    """
+    windows, document, first_run, _ = interview
+    tail = plain(native, 3)
+    older = target_over(windows, document, first_run, tail[0].record.run_id)
+    longer = target_over(windows, document, first_run, tail[-1].record.run_id)
+    ahead = windows.plan_saved_batch(longer, document, max_chars=40, context_chars=20,
+                                     max_windows=1)["source_reference"]
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.plan_saved_batch(older, document, after_reference=ahead,
+                                 max_chars=40, context_chars=20)

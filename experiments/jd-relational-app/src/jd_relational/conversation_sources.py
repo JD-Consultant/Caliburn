@@ -567,14 +567,24 @@ class ConversationSourceService:
                 requested.append(dict(turn))
         return tuple(requested)
 
-    def unprocessed_source(self, document_id, after_reference=None) -> dict | None:
+    def unprocessed_source(self, document_id, after_reference=None,
+                           through_reference=None) -> dict | None:
         """The contiguous settled range after the published cursor, or None.
 
         Quiet settled turns stay inside the range; the range ends at the first
-        unsettled turn, so a later request can never jump an open gap.
+        unsettled turn, so a later request can never jump an open gap. Given a
+        fixed target the range is read inside that target and ends where it
+        does: speech saved after admission waits for an admission of its own
+        rather than quietly enlarging work already under way.
         """
-        observed, messages, turns = self._settled(document_id)
-        remaining = turns[self._after_cursor(observed, messages, turns, after_reference, document_id):]
+        if through_reference is None:
+            observed, messages, turns = self._settled(document_id)
+            start = self._after_cursor(observed, messages, turns, after_reference, document_id)
+        else:
+            start, turns = self._target_start(document_id, through_reference, after_reference)[:2]
+            if start is None:
+                return None
+        remaining = turns[start:]
         if not remaining:
             return None
         return {"first_run_id": remaining[0]["input_id"],
@@ -768,19 +778,88 @@ class ConversationSourceService:
         can never hand B1 another branch's work under the saved reference.
         """
         self._budgets(max_chars, context_chars)
+        position, pinned, turns, first = self._pinned_range(window_ref, document_id)
+        return self._plan(document_id, pinned.messages, turns, first, len(turns) - 1,
+                          root=position.root_checkpoint_id, root_run_id=position.root_run_id,
+                          max_chars=max_chars, context_chars=context_chars)
+
+    def _pinned_range(self, window_ref, document_id):
+        """One issued window, read where it was issued, with its settled turns.
+
+        The reference decides the position: its own pinned root must lie on
+        this document's chain and still carry the exact range it names as whole
+        settled turns. The turns stop at that range's end, so nothing saved
+        after the reference was issued can be planned under it.
+        """
         position = self._codec._resolve_window(window_ref, document_id)
         current, _, _ = self._settled(document_id)
         pinned = self._pinned(document_id, position.root_run_id, position.root_config())
         if current is None or not self._on_lineage(document_id, position.root_checkpoint_id, current):
             raise ConversationSourceError("invalid_ref")
-        messages = pinned.messages
-        turns = self._settled_turns(document_id, messages)
+        turns = self._settled_turns(document_id, pinned.messages)
         first, last = self._bounds(turns, position.first_run_id, position.last_run_id)
         if position.first != turns[first]["first"] or position.last != turns[last]["last"]:
             raise ConversationSourceError("invalid_ref")
-        return self._plan(document_id, messages, turns, first, last,
-                          root=position.root_checkpoint_id, root_run_id=position.root_run_id,
-                          max_chars=max_chars, context_chars=context_chars)
+        return position, pinned, turns[:last + 1], first
+
+    def _target_start(self, document_id, through_reference, after_reference):
+        """Where admission resumes inside a fixed target, or None when covered.
+
+        A cursor already reaching past the target leaves it nothing to do, but
+        that is only true when the target really lies inside the published
+        range on the cursor's own chain: the cursor is read where it was issued
+        and the target proven there, never inferred from a longer window or a
+        shared identifier. The target's own first turn is the floor, so a batch
+        never grows backwards; whether a new range may be admitted at all stays
+        with `follows`, which is the one rule for that.
+        """
+        position, pinned, turns, first = self._pinned_range(through_reference, document_id)
+        if after_reference is None:
+            return first, turns, position, pinned
+        cursor = self._codec._resolve_window(after_reference, document_id)
+        published = self._pinned(document_id, cursor.root_run_id, cursor.root_config())
+        if len(published.messages) <= len(pinned.messages):
+            start = self._after_cursor(pinned, pinned.messages, turns, after_reference, document_id)
+            return max(start, first), turns, position, pinned
+        covered = self._cursor_boundary(document_id, after_reference, published,
+                                        self._settled_turns(document_id, published.messages))
+        order = [message.id for message in published.messages]
+        if (not self._on_lineage(document_id, position.root_checkpoint_id, published)
+                or position.last not in order or order.index(position.last) > covered):
+            raise ConversationSourceError("invalid_ref")
+        return None, turns, position, pinned
+
+    def plan_saved_batch(self, target_reference, document_id, *, after_reference=None,
+                         max_chars: int = MAX_WINDOW_CHARACTERS,
+                         context_chars: int = MAX_CONTEXT_CHARACTERS,
+                         max_windows: int = MAX_PLANNED_WINDOWS) -> dict:
+        """Cut one bounded batch out of an already fixed target.
+
+        B1 takes a single window, so the batch is issued as one at the target's
+        own root: no caller assembles a token out of bounds, and no batch is
+        replanned against whatever is latest. The published cursor decides
+        where this batch begins and the target where it may end, so a long
+        target keeps its tail for a later batch without needing a new request.
+        `covers_whole_range` reports planning coverage only, never that the
+        batch was saved or published. A batch covering an untouched target is
+        that target, so an unchanged range keeps its input identity.
+        """
+        self._budgets(max_chars, context_chars)
+        if type(max_windows) is not int or type(max_windows) is bool or max_windows < 1:
+            raise ConversationSourceError("invalid_ref")
+        start, turns, position, pinned = self._target_start(
+            document_id, target_reference, after_reference)
+        if start is None or start >= len(turns):
+            return {"source_reference": None, "covers_whole_range": True}
+        planned = self._plan(document_id, pinned.messages, turns, start, len(turns) - 1,
+                             root=position.root_checkpoint_id, root_run_id=position.root_run_id,
+                             max_chars=max_chars, context_chars=context_chars)
+        batch = planned[:max_windows]
+        edge = self._codec._resolve_window(batch[-1]["source_reference"], document_id)
+        return {"source_reference": self._issue_window_between(
+                    position.root_checkpoint_id, position.root_run_id, document_id, turns[start],
+                    next(turn for turn in turns if turn["input_id"] == edge.last_run_id)),
+                "covers_whole_range": len(planned) <= max_windows}
 
     @staticmethod
     def _bounds(turns, first_run_id, last_run_id):

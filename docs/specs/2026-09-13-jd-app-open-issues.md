@@ -1,6 +1,6 @@
 # JD App：收尾與未解事項
 
-**最新複核狀態（2026-09-13）：**[提交後審查](evidence/jd-memory-repair-integration/submitted-integration-review.md)核對`7181db63`，未發現新的程式阻擋；CA-01／02、FH05真新程序及wheel完整依賴再次核實。前次兩案OPEN及WIP僅為歷史，不再是目前待辦。H2–H3完成，下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)先做既有B1B2採用映射；OI-01／02整體退出條件仍未完成。
+**最新複核狀態（2026-09-13）：**H2–H3已完成；H4映射`2e243d15`的[提交後審查](evidence/2026-09-13-jd-b1-b2-adoption-review.md)修正已驗方法／通知漏接、背景恢復誤套與source契約不足。這些是文件缺口，沒有本輪產品bug或測試通過宣稱。下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)先定完成窗口介面再有限實作；OI-01／02整體退出條件仍未完成。
 
 更新：2026-09-13；JD-R002。依[最新決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及最近結果整理；只集中追蹤，不改需求、保存權責或既有授權。
 
@@ -25,8 +25,8 @@
 - 已驗讀取：[固定 Memory／詳記／原話工具](2026-09-13-jd-memory-read-integration-slice.md)已接真正模型 request、原生四個只讀工具及 native 中斷／收尾。真 SDK／PG 三輪與新 Windows 宿主回歸通過；模型回覆及發布仍是合成測試，不是自然理解或 C／B1B2 已完成。沒有為本功能新增資料表或一般儲存引擎。
 - 已驗修補核心：[C 子圖／官方 patch／原結果查回](2026-09-13-jd-memory-repair-core-slice.md)已在正常套件；真 PG 更正及回覆遺失後原 request 查回、JD／原話保留通過。三個錯誤／結果核對缺口已修且獨審閉合；不等於 App 已有 C 工具／取消收尾或 B1B2。
 - 已驗App接合：[停止收尾、跨程序查回與封裝](2026-09-13-jd-memory-repair-app-integration-slice.md)已修CA-01／02；缺證據仍保持門閘。FH05真新程序＋真PG只憑原receipt對帳，publish／patch為0；乾淨venv完整依賴wheel隔離已通過。實作者最終全組數字與本次獨立窄跑分別見結果稿／複核稿，本清單不再保存另一份易過時的數字。這是C接合可驗收，不是完整顧問或自然品質通過。
-- 採用映射已交付：[B1／B2 與顧問方法的採用映射](2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)定出已驗來源commit（顧問層為`4f94fbfb`，其後2853行屬舊JD編輯器不採用）、package落點、新App adapter與差距。只有映射與差距判定，沒有實作或測試執行。
-- 下一最小動作：先補**完成窗口source port**——新App的`ConversationSourceService`只有本輪scope，B1需要的跨輪範圍／待整併清單／游標都缺，回合完成改以AI run record為權威；再依映射§6接B1、B2、背景歸屬與專業指引。禁止重做原顧問、直接import研究路徑、搬第二套排程器或新增另一份理解。技術細節與驗收沿接續計畫，不在本清單重複一份。
+- 採用映射已交並修正：[採用映射](2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)保留`4f94fbfb`已驗來源與13模組hash結論；補回A指引／三项分析Skills／整理通知，分清C查回與B有界續作、來源介面及各角色限制。只有文件，不是H4實作通過。
+- 下一最小動作：先定**完成窗口source port**的引用／分頁／逐輪終局與請求辨識契約，再有限實作；來源比較沿publication既有游標。後續B1／B2、背景持久責任與指引沿映射§6，不重做原顧問、不直接import研究路徑、不建第二份原話或理解。背景表／框架喚醒器按必要責任有限決定，不能用一律禁止取代設計。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋

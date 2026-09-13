@@ -1,6 +1,6 @@
 # JD App 接續施工與交接計畫
 
-更新：2026-09-13；Topic JD-R002／OI-01、OI-02。**H2–H3 已提交為 `7181db63`，Owner要求的提交後複核見[審查結果](../specs/evidence/jd-memory-repair-integration/submitted-integration-review.md)。**先前方向審核保留當時首敗，不再代表目前停點。下一施工是H4採用映射；這次複核沒有開始H4。
+更新：2026-09-13；Topic JD-R002／OI-01、OI-02。**H2–H3 已提交為 `7181db63`，提交後複核見[審查結果](../specs/evidence/jd-memory-repair-integration/submitted-integration-review.md)。H4 映射 `2e243d15` 已完成提交後[審查修訂](../specs/evidence/2026-09-13-jd-b1-b2-adoption-review.md)，下一從修正版的完成窗口契約及有限實作接續。**本次只修文檔，沒有實作 H4；先前首敗與停點保留為歷史。
 
 本文件負責「下一位從哪裡接、分步怎麼做、如何驗收」。產品總範圍仍由[總施工計畫](2026-09-13-jd-relational-app-implementation.md)負責，未解事項由[唯一清單](../specs/2026-09-13-jd-app-open-issues.md)負責，入口只維護[目前決策](../current-decisions.md)。不要重新讀完整舊聊天才能開工。
 
@@ -10,7 +10,7 @@
 
 本輪取得的重要反例：把 C 子圖藏在工具函式內，即使提前建立，也不能經公開的原生子圖觀察讀到原發布請求。已用官方文件及有限實測選定：**工具將控制權交回根流程的固定 `memory_repair` 節點，該節點呼叫既有 C 子圖，完成後回顧問。**不增加第二個 Saver、資料表或通用定位引擎。
 
-**H2–H3 已完成（2026-09-13），結果見[App 接合結果稿](../specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。**CA-01「call 已存、binding 未存」與 CA-02「C 停在原生 START」已修並各有真 PG 回歸；真新 Windows 程序的 C 回覆遺失查回（FH05）、adoption／wheel 乾淨安裝與獨審已收尾。**唯一下一施工單位改為 §5 的 H4**：採用已驗 B1／B2 與顧問方法，先交採用映射。不要重做已接 H1–H3，也不能把日常 `enable_chat` 打開代替驗收。下方 §3 的檔案狀態與 §5 H2／H3 的「還要完成」是當時交接界線，以本段與結果稿為準。
+**H2–H3 已完成（2026-09-13），結果見[App 接合結果稿](../specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。**CA-01／02、FH05、adoption／wheel 與獨審已收尾。**下一施工單位是 §5 H4 的完成窗口 source port**：採用映射已交且修正，先定具體來源介面再有限實作。不要重做 H1–H3，不能只打開日常 `enable_chat` 代替驗收。下方 §3 與 H2／H3 的早期交接狀態以結果稿為準。
 
 | 工作區事實 | 交接值 |
 |---|---|
@@ -40,7 +40,7 @@
 
 ## 3. 接續基準與前次交接歷史
 
-**現況：**原call結果、固定C位置、CA-01／02及無checkpoint但有原生位置的收尾、FH05新宿主查回、adoption／wheel已在`7181db63`完成。下一先做H4映射。實作者完整紀錄見結果稿，提交後獨立窄跑與封裝複核見審查結果；不累加重疊測試數字。
+**現況：**原call結果、固定C位置、CA-01／02及無checkpoint但有原生位置的收尾、FH05新宿主查回、adoption／wheel已在`7181db63`完成。H4映射已提交並依審查修正，下一是完成窗口契約與有限實作。H2–H3實作者紀錄及提交後獨立窄跑分別見結果稿／審查結果，不累加重疊測試數字。
 
 **下表僅為提交前的交接歷史，不是現行待辦。**相對路徑從repo根起算；其「當時未完成」已由上述成果收尾，禁止照表重做。保留為首敗與實作責任對照。
 
@@ -178,7 +178,14 @@ close完成後查回應同時保留原run、messages、JD bindings、Memory view
 
 先交一張採用映射：已驗來源symbol／commit → 正常package落點 → 新App source／owner adapter → 沿用案例 → 只因新接點需補的案例。原prompt、詳記／候選、B1/B2工作規則及模型配置先保持已驗語意；JD新增工具與成稿方法另列差異。舊checkout提供來源，正式／新App不得直接import研究路徑；不整批複製另一套host、source或業務權威。
 
-**映射已交付（2026-09-13）：**[B1／B2 與顧問方法的採用映射](../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)。三項須先知道的結論：(1) 顧問層的已驗來源是 `4f94fbfb`（CT50 profile），`622e548d` 之後的 2853 行是**舊 JD 編輯器，不採用**；(2) B1／B2／C 與 Memory 相關的 13 個模組在 `309eaf21..033540ce` 全程 blob hash 相同，`adoption.json` 現有 hash 對 CT 已驗狀態同樣成立；(3) 最大差距是**完成窗口 source port**——新 App 的 `ConversationSourceService` 只有本輪 scope，B1 需要的跨輪範圍／待整併清單／游標都還沒有，且回合完成的權威改用更嚴格的 AI run record，不移植舊 `closed_turns`／`_turn_status` 推斷。施工順序見該稿 §6，下一步是完成窗口 source port。
+**映射已交付並修正（2026-09-13）：**以[B1／B2 與顧問方法映射](../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)為唯一細節依據；[審查紀錄](../specs/evidence/2026-09-13-jd-b1-b2-adoption-review.md)保留原稿問題。已驗顧問來源仍是 `4f94fbfb`，CT51延續其配置，13模組blob相同；後加舊JD接合不整批採用。**新增施工規範：**
+
+- A基本指引、三項已驗分析Skills及無參數整理通知都要採用；不固定「十五個工具」而漏掉能力，也不把15次工具呼叫預算套到B1。
+- source port先列引用驗證／解碼、分頁內容與角色、逐輪安全終局、整理請求及來源覆蓋契約；安全失敗／取消仍保留員工原話。`processed_source`已在publication head，不能另造游標。
+- C的原結果只讀查回不變；B1／B2保留已驗同工作原生續作、預算、stale／更正來源與冪等發布，不能整批套C不重播政策。
+- 新host目前沒有背景狀態與排空。背景接線前須有限定出原工作、固定目標、錯誤／預算與啟停的持久責任；不搬另一宿主，不預先禁止所有必要表或框架喚醒器，不把背景硬套前景手改門閘。
+
+下一按映射§6先定完成窗口source介面與固定情境、隨即有限實作；不重開顧問廣搜，背景落點在其接線前閉合。
 
 - B1 从**已完成的訪談窗口**產生詳記及工作資訊候選；C 的本輪source不是B1完成窗口。保留原文位置、案例條件／更正、低頻工作，不建第二原話庫。
 - B2 將候選整併成目前工作理解與導覽，沿既有 PublicationStore/CAS；C更正不能被晚到的舊B候選蓋回。保留已研究的詳記重抽與來源關係，不退化成每輪一段聊天摘要。

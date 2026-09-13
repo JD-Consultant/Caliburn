@@ -123,7 +123,7 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 
 ## 6. 建議的施工順序
 
-1. **完成窗口 source port**（§3.1／3.5）：先交 package interface／App adapter 的具體契約及固定情境，再完成有限實作。包含簽章驗證、分頁角色、逐輪終局、整理請求辨識、來源順序／覆蓋；publication 游標不另存。這是 B1 前置，無需為它重開框架廣搜。
+1. **完成窗口 source port**（§3.1／3.5）：先交 package interface／App adapter 的具體契約及固定情境，再完成有限實作。包含簽章驗證、分頁角色、逐輪終局、整理請求辨識、來源順序／覆蓋；publication 游標不另存。這是 B1 前置，無需為它重開框架廣搜。**契約已交付：**[完成訪談窗口 source port 契約與固定情境](2026-09-13-jd-interview-window-source-contract.md)，含 W-01–W-14 十四個固定情境；下一是依該契約的有限實作，契約本身尚未實作或驗證。
 2. **B1 採用**：接來源及必要 package helpers，原 prompt／輸出保持；沿用原窗口、重抽、角色與故障案例，補新引用及同工作續作接合。不是只驗正常抽取。
 3. **B2 採用**：沿原發布、stale／RECENT_REPAIRS 與原工作預算，補 C／B2 新來源配對及發布回覆遺失；不另造 Memory writer。
 4. **背景接合**：在寫啟停程式前閉合 §3.3 的有限狀態／owner 映射，再接新宿主排空、新程序續作及受阻通知。不以缺回執推定可重跑，也不為零新表硬刪已驗責任。

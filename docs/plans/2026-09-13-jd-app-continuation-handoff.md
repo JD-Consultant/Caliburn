@@ -10,7 +10,7 @@
 
 本輪取得的重要反例：把 C 子圖藏在工具函式內，即使提前建立，也不能經公開的原生子圖觀察讀到原發布請求。已用官方文件及有限實測選定：**工具將控制權交回根流程的固定 `memory_repair` 節點，該節點呼叫既有 C 子圖，完成後回顧問。**不增加第二個 Saver、資料表或通用定位引擎。
 
-**H2–H3 已完成（2026-09-13），結果見[App 接合結果稿](../specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。**CA-01／02、FH05、adoption／wheel 與獨審已收尾。**下一施工單位是 §5 H4 的完成窗口 source port**：採用映射已交且修正，先定具體來源介面再有限實作。不要重做 H1–H3，不能只打開日常 `enable_chat` 代替驗收。下方 §3 與 H2／H3 的早期交接狀態以結果稿為準。
+**H2–H3 已完成（2026-09-13），結果見[App 接合結果稿](../specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。**CA-01／02、FH05、adoption／wheel 與獨審已收尾。**下一施工單位是 §5 H4 的完成窗口 source port；其契約已交付**（[契約與固定情境](../specs/2026-09-13-jd-interview-window-source-contract.md)，W-01–W-14），下一是依該契約的有限實作。採用映射已交且修正。不要重做 H1–H3，不能只打開日常 `enable_chat` 代替驗收。下方 §3 與 H2／H3 的早期交接狀態以結果稿為準。
 
 | 工作區事實 | 交接值 |
 |---|---|

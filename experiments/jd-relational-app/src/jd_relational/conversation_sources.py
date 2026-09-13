@@ -27,6 +27,11 @@ from .reads import ReadError
 MAX_REFERENCE_BYTES = 4096
 _PREFIX = "conversation:"
 _SALT = "caliburn.jd.conversation-source.v1"
+# A completed interview window shares this owner, key and dataset, but never
+# its signature domain: a token issued for one purpose must not verify as the
+# other. C repair and the turn read tools stay strictly on `source`.
+_WINDOW_PREFIX = "interview-window:"
+_WINDOW_SALT = "caliburn.jd.interview-window.v1"
 _TOKEN = re.compile(r"[A-Za-z0-9_.-]+\Z")
 _INSTRUCTION = (
     "此來源只涵蓋本輪已保存的員工原話及列明的前一則AI公開上下文。"
@@ -90,6 +95,45 @@ class _SourcePosition(BaseModel):
                                   "checkpoint_id": self.source_checkpoint_id}}
 
 
+class _WindowPosition(BaseModel):
+    """One completed interview range on the root lineage, spanning whole turns.
+
+    Unlike a turn source this is not pinned to a single run: `last` is the
+    range's own final message. The namespace is always the root chain, so a
+    window never depends on one turn's consultant child.
+    """
+    model_config = ConfigDict(strict=True, extra="forbid", frozen=True, revalidate_instances="always")
+    format_version: int = Field(ge=1, le=1)
+    purpose: Literal["window"]
+    dataset_id: str
+    document_id: str
+    root_checkpoint_id: str = Field(min_length=1, max_length=256)
+    first: str = Field(min_length=1, max_length=512)
+    last: str = Field(min_length=1, max_length=512)
+    first_run_id: str
+    last_run_id: str
+
+    @field_validator("dataset_id", "document_id", "first_run_id", "last_run_id")
+    @classmethod
+    def scope(cls, value):
+        return _uuid(value)
+
+    @model_validator(mode="after")
+    def position(self):
+        values = (self.root_checkpoint_id, self.first, self.last)
+        if (any("\0" in value or not value.strip() for value in values)
+                # A window starts on a turn boundary. Run identity is currently
+                # the HumanMessage id; if that changes this must fail loudly
+                # rather than silently accept a mid-turn start.
+                or self.first != self.first_run_id):
+            raise ValueError()
+        return self
+
+    def root_config(self):
+        return {"configurable": {"thread_id": self.document_id, "checkpoint_ns": "",
+                                  "checkpoint_id": self.root_checkpoint_id}}
+
+
 @dataclass(frozen=True, slots=True, repr=False)
 class SourceMessage:
     message_id: str
@@ -104,7 +148,7 @@ class SourceExcerpt:
 
 
 class ConversationSourceCodec:
-    __slots__ = ("_dataset_id", "_serializer")
+    __slots__ = ("_dataset_id", "_serializer", "_window_serializer")
 
     def __init__(self, secret_key: bytes, dataset_id: str):
         try:
@@ -112,9 +156,12 @@ class ConversationSourceCodec:
             if type(secret_key) is not bytes or len(secret_key) < 32:
                 raise ValueError()
             self._dataset_id = dataset_id
-            self._serializer = URLSafeSerializer(secret_key, salt=_SALT,
-                signer_kwargs={"digest_method": hashlib.sha256},
-                serializer_kwargs={"sort_keys": True, "ensure_ascii": False, "allow_nan": False})
+            def domain(salt):
+                return URLSafeSerializer(secret_key, salt=salt,
+                    signer_kwargs={"digest_method": hashlib.sha256},
+                    serializer_kwargs={"sort_keys": True, "ensure_ascii": False, "allow_nan": False})
+            self._serializer = domain(_SALT)
+            self._window_serializer = domain(_WINDOW_SALT)
         except Exception:
             raise ConversationSourceError("source_not_available") from None
 
@@ -148,6 +195,36 @@ class ConversationSourceCodec:
             return reference
         except Exception:
             raise ConversationSourceError("source_not_available") from None
+
+    def _issue_window(self, position: _WindowPosition) -> str:
+        try:
+            position = _WindowPosition.model_validate(position, strict=True)
+            if position.dataset_id != self.dataset_id:
+                raise ValueError()
+            token = self._window_serializer.dumps(self._bounded(position, len(_WINDOW_PREFIX)))
+            self._token(token)
+            reference = _WINDOW_PREFIX + token
+            if len(reference) > MAX_REFERENCE_BYTES:
+                raise ValueError()
+            return reference
+        except Exception:
+            raise ConversationSourceError("source_not_available") from None
+
+    def _resolve_window(self, window_ref, document_id) -> _WindowPosition:
+        try:
+            _uuid(document_id)
+            if (type(window_ref) is not str or not 0 < len(window_ref) <= MAX_REFERENCE_BYTES
+                    or not window_ref.startswith(_WINDOW_PREFIX)):
+                raise ValueError()
+            token = window_ref.removeprefix(_WINDOW_PREFIX)
+            self._token(token)
+            position = _WindowPosition.model_validate(self._window_serializer.loads(token), strict=True)
+            self._bounded(position, len(window_ref) - len(token))
+            if position.dataset_id != self.dataset_id or position.document_id != document_id:
+                raise ValueError()
+            return position
+        except Exception:
+            raise ConversationSourceError("invalid_ref") from None
 
     def _resolve(self, source_ref, document_id) -> _SourcePosition:
         try:
@@ -281,6 +358,16 @@ class ConversationSourceService:
         text supports a Memory statement. read() owns the actual fixed read.
         """
         self._codec._resolve(source_ref, document_id)
+
+    def validate_window_reference(self, window_ref, document_id) -> None:
+        """Verify a completed-window locator issued by this same owner.
+
+        Shape, signature domain and scope only, with no storage I/O — the same
+        boundary `validate_reference` keeps for a turn source. Publication may
+        record this reference before its content is read, and a turn source can
+        never satisfy it.
+        """
+        self._codec._resolve_window(window_ref, document_id)
 
     def resolve(self, source_ref, document_id) -> Source:
         try:

@@ -27,7 +27,8 @@
 - 已驗App接合：[停止收尾、跨程序查回與封裝](2026-09-13-jd-memory-repair-app-integration-slice.md)已修CA-01／02；缺證據仍保持門閘。FH05真新程序＋真PG只憑原receipt對帳，publish／patch為0；乾淨venv完整依賴wheel隔離已通過。實作者最終全組數字與本次獨立窄跑分別見結果稿／複核稿，本清單不再保存另一份易過時的數字。這是C接合可驗收，不是完整顧問或自然品質通過。
 - 採用映射已交並修正：[採用映射](2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)保留`4f94fbfb`已驗來源與13模組hash結論；補回A指引／三项分析Skills／整理通知，分清C查回與B有界續作、來源介面及各角色限制。只有文件，不是H4實作通過。
 - 契約已交並完成文件審查：[完成窗口source port契約](2026-09-13-jd-interview-window-source-contract.md)定新增`purpose="window"`簽章引用（`last`不綁run_id）、分頁讀取、逐輪終局改用run record＋`observed.closed`、整理請求辨識、觸發與連續範圍分開、B2 `processed_source` 的用途感知驗證、source/context pair、Unicode offset 及 purpose salt 隔離，並列W-01–W-14固定情境。只有契約，尚未實作或驗證。
-- 下一最小動作：依審查修正版做**有限實作**並建立W-01–W-14案例，另補 B2 publication validation；現有C／只讀工具的source port不動。後續B1／B2、背景持久責任與指引沿映射§6，不重做原顧問、不直接import研究路徑、不建第二份原話或理解。背景表／框架喚醒器按必要責任有限決定，不能用一律禁止取代設計。
+- 實作第一片已完成：[用途隔離與B2發布驗證](evidence/jd-interview-window-source/purpose-isolation-results.md)閉合審查F2的整合斷點——未用途感知前，B2的完成結果在`PublicationStore._validate`就會被拒，永遠無法發布。離線2748／套件130／真PG14通過。窗口內容讀取、planner與公開發配路徑**刻意未做**（安全終局只有planner能確立），見該稿界線。
+- 下一最小動作：接窗口**分頁讀取與planner**——逐輪安全終局、連續安全範圍、source/context pair、Unicode offset、lineage證明，完成W-01–W-14其餘案例；現有C／只讀工具的source port不動。後續B1／B2、背景持久責任與指引沿映射§6，不重做原顧問、不直接import研究路徑、不建第二份原話或理解。背景表／框架喚醒器按必要責任有限決定，不能用一律禁止取代設計。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋

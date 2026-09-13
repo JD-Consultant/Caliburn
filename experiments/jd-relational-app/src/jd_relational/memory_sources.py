@@ -9,11 +9,20 @@ from .conversation_sources import ConversationSourceError, ConversationSourceSer
 
 @dataclass(frozen=True, slots=True, repr=False)
 class MemorySourceReader(SourceReader):
+    """One document's Memory port over the single conversation source owner.
+
+    `window_references` grants the completed-interview purpose as well. Only
+    the background extraction/consolidation path needs it, so that B2 can hold
+    a completed window as its published `processed_source`. C repair and the
+    turn read tools keep the default and stay source-only.
+    """
     service: ConversationSourceService
     document_id: str
+    window_references: bool = False
 
     def __post_init__(self):
-        if not isinstance(self.service, ConversationSourceService):
+        if (not isinstance(self.service, ConversationSourceService)
+                or type(self.window_references) is not bool):
             raise ConversationSourceError("source_not_available")
         try:
             if type(self.document_id) is not str or str(UUID(self.document_id)) != self.document_id:
@@ -23,7 +32,12 @@ class MemorySourceReader(SourceReader):
 
     def validate_reference(self, reference: str) -> None:
         try:
-            self.service.validate_reference(reference, self.document_id)
+            try:
+                self.service.validate_reference(reference, self.document_id)
+            except ConversationSourceError as error:
+                if not (self.window_references and error.code == "invalid_ref"):
+                    raise
+                self.service.validate_window_reference(reference, self.document_id)
         except ConversationSourceError as error:
             if error.code == "invalid_ref":
                 raise InvalidSourceReference("invalid_source_reference") from error

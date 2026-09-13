@@ -1,6 +1,6 @@
 # JD App：收尾與未解事項
 
-**最新複核狀態（2026-09-13）：**H2–H3已完成；H4映射`2e243d15`的[提交後審查](evidence/2026-09-13-jd-b1-b2-adoption-review.md)修正已驗方法／通知漏接、背景恢復誤套與source契約不足。這些是文件缺口，沒有本輪產品bug或測試通過宣稱。下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)先定完成窗口介面再有限實作；OI-01／02整體退出條件仍未完成。
+**最新複核狀態（2026-09-13）：**H2–H3已完成；H4映射`2e243d15`的[提交後審查](evidence/2026-09-13-jd-b1-b2-adoption-review.md)及完成窗口 `ab483f6c` 的[9/12–9/13 文件審查](evidence/2026-09-13-jd-window-source-contract-review.md)已修正已驗方法／通知漏接、背景恢復誤套、source／publication 接縫、窗口觸發與分頁語意。這些是文件缺口，沒有本輪產品bug或測試通過宣稱。下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)依修正版有限實作；OI-01／02整體退出條件仍未完成。
 
 更新：2026-09-13；JD-R002。依[最新決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及最近結果整理；只集中追蹤，不改需求、保存權責或既有授權。
 
@@ -26,8 +26,8 @@
 - 已驗修補核心：[C 子圖／官方 patch／原結果查回](2026-09-13-jd-memory-repair-core-slice.md)已在正常套件；真 PG 更正及回覆遺失後原 request 查回、JD／原話保留通過。三個錯誤／結果核對缺口已修且獨審閉合；不等於 App 已有 C 工具／取消收尾或 B1B2。
 - 已驗App接合：[停止收尾、跨程序查回與封裝](2026-09-13-jd-memory-repair-app-integration-slice.md)已修CA-01／02；缺證據仍保持門閘。FH05真新程序＋真PG只憑原receipt對帳，publish／patch為0；乾淨venv完整依賴wheel隔離已通過。實作者最終全組數字與本次獨立窄跑分別見結果稿／複核稿，本清單不再保存另一份易過時的數字。這是C接合可驗收，不是完整顧問或自然品質通過。
 - 採用映射已交並修正：[採用映射](2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)保留`4f94fbfb`已驗來源與13模組hash結論；補回A指引／三项分析Skills／整理通知，分清C查回與B有界續作、來源介面及各角色限制。只有文件，不是H4實作通過。
-- 契約已交：[完成窗口source port契約](2026-09-13-jd-interview-window-source-contract.md)定新增`purpose="window"`簽章引用（`last`不綁run_id）、分頁讀取、逐輪終局改用run record＋`observed.closed`、整理請求辨識、覆蓋沿publication既有游標不另存，並列W-01–W-14固定情境。只有契約，尚未實作或驗證。
-- 下一最小動作：依該契約做**有限實作**並建立W-01–W-14案例；現有C／只讀工具的source port不動。後續B1／B2、背景持久責任與指引沿映射§6，不重做原顧問、不直接import研究路徑、不建第二份原話或理解。背景表／框架喚醒器按必要責任有限決定，不能用一律禁止取代設計。
+- 契約已交並完成文件審查：[完成窗口source port契約](2026-09-13-jd-interview-window-source-contract.md)定新增`purpose="window"`簽章引用（`last`不綁run_id）、分頁讀取、逐輪終局改用run record＋`observed.closed`、整理請求辨識、觸發與連續範圍分開、B2 `processed_source` 的用途感知驗證、source/context pair、Unicode offset 及 purpose salt 隔離，並列W-01–W-14固定情境。只有契約，尚未實作或驗證。
+- 下一最小動作：依審查修正版做**有限實作**並建立W-01–W-14案例，另補 B2 publication validation；現有C／只讀工具的source port不動。後續B1／B2、背景持久責任與指引沿映射§6，不重做原顧問、不直接import研究路徑、不建第二份原話或理解。背景表／框架喚醒器按必要責任有限決定，不能用一律禁止取代設計。
 - 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋

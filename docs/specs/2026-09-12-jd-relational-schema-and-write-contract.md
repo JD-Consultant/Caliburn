@@ -189,6 +189,8 @@ task FK 採 `ON DELETE CASCADE`，因 link 是 task 的從屬關係；capability
 
 兩個 relation target 欄位必須同為 NULL 或同為非 NULL；再把這一對視為一個邏輯 target，與其餘七種 target 合計恰為一。各 ID 使用 typed composite FK 且 `ON DELETE CASCADE`，因 source link 是內容 target 的附件。`source_ref` 指向另一 owner，無跨 store FK；App 對新增／重新連結來源必須在寫入前以既有 source port 驗 scope、可讀性與種類。§6.4 的整份歷史還原只允許恢復 server 內部已保存的原 links／basis，不假稱重新核定；不可讀原話另顯示，不任意新增來源或略過同文件完整性。
 
+**2026-09-13 H4 接合界線：**`source_ref` 仍只能是 source owner 發配且可回讀確切原始問答的 opaque ref；完成窗口的 `purpose="window"` 是在[窗口契約](2026-09-13-jd-interview-window-source-contract.md)及用途感知 adapter 通過後可採用的來源種類。它不會變成 JD 自己重簽的別名；在 adapter 尚未接通前，寫入／Memory publication 應拒絕該 purpose，不得默認降級成現有 `purpose="source"`。
+
 `basis_digest` 不宣稱來源自動證明整筆文字，只表示這條 link 是對哪個 target value 建立。current value digest 改變後，link 在 UI／模型 read 中標成 `needs_recheck`；歷史 snapshot 保留當時的匹配狀態。
 
 **2026-09-13 首切片精確化：**AI 的 `basis_refs=[]` 保留既有 links 及原 basis；非空只新增或刷新明列 ref，不刪未列來源。同 target 在一次更正裡收到的 refs 依輸入順序穩定去重，既有來源順序不變、新來源接在後面；全部以最終候選算 basis，不保存中間欄位版本。刪除 target／unlink 關係仍清除其 current links。人工明示移除來源是另一具名操作，不能由 AI 空陣列暗示。

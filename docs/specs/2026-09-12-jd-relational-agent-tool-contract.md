@@ -345,7 +345,7 @@ Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案�
 
 ## 9. 來源引用契約
 
-本版 source_ref 限既有 port 實際發配、可回讀精確原始問答的引用。Memory／詳記協助找回材料，不把可變 Memory 路徑當永久來源；尚無 Memory-version locator。沿[既有來源研究 §4](2026-09-10-jd-context-change-and-source-research.md#4-jd-是否要引用-memory)，較新更正的效力仍由顧問核對，不靠 target digest 自動判斷。
+本版 source_ref 限 source owner 實際發配、可回讀精確原始問答的引用；H4 的 `purpose="window"` 只有在[完成窗口契約](2026-09-13-jd-interview-window-source-contract.md)及用途感知 owner adapter 通過後才是合法種類，不能由 JD 端重簽或把 `purpose="source"` 默認改解。Memory／詳記協助找回材料，不把可變 Memory 路徑當永久來源；尚無 Memory-version locator。沿[既有來源研究 §4](2026-09-10-jd-context-change-and-source-research.md#4-jd-是否要引用-memory)，較新更正的效力仍由顧問核對，不靠 target digest 自動判斷。
 
 2026-09-13 接合已驗來源 resolver 回跨 scope／不可讀時，在 binding 前拒絕；真保存後人工改文令舊 basis 成為 `needs_recheck`，明示刷新才更新 basis，歷史不變。這些測試使用合成 Source；原始問答 owner 尚未接到新版 port，readability 不偽報已查證。
 

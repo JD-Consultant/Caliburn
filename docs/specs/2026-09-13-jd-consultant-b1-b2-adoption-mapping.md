@@ -2,7 +2,7 @@
 
 2026-09-13；JD-R002／OI-01、OI-02。[接續計畫 §5 H4](../plans/2026-09-13-jd-app-continuation-handoff.md) 要求的第一份交付。基準 `b76254f6`／tag `jd-memory-repair-app-review-20260913`。**本稿只做映射與差距判定，沒有改任何產品程式、沒有新增資料表、0 provider、日常 `enable_chat=False`。**
 
-**提交後審查修訂：**原稿提交 `2e243d15`；[審查紀錄](evidence/2026-09-13-jd-b1-b2-adoption-review.md)發現已驗方法／整理通知漏接、背景恢復規則誤套及 source 契約不足，已在本稿改正。下文是接續依據；這是文件修正，不代表新 App 的 B1／B2 已通過驗收，也沒有決定新增背景資料表。
+**提交後審查修訂：**原稿提交 `2e243d15`；[審查紀錄](evidence/2026-09-13-jd-b1-b2-adoption-review.md)發現已驗方法／整理通知漏接、背景恢復規則誤套及 source 契約不足，已在本稿改正。完成窗口契約另經[9/12–9/13 文件審查](evidence/2026-09-13-jd-window-source-contract-review.md)，補上觸發與連續範圍、B2 `processed_source` 用途感知驗證、source/context pair、offset 單位及 purpose salt 隔離。下文是接續依據；這是文件修正，不代表新 App 的 B1／B2 已通過驗收，也沒有決定新增背景資料表。
 
 這是**採用已完成的顧問**，不是重新研究顧問。CT49／CT50 已驗的訪談理解、詳記、整併與即時更正能力一律沿用；新 App 只補「新接點確實需要」的部分。
 

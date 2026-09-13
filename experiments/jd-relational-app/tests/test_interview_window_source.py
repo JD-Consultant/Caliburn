@@ -17,7 +17,7 @@ import pytest
 import sqlalchemy as sa
 from sqlalchemy.pool import StaticPool
 
-from jd_relational.ai_checkpoints import AiRunCheckpoints
+from jd_relational.ai_checkpoints import AiCheckpointError, AiRunCheckpoints, new_run_record
 from jd_relational.conversation_sources import (
     ConversationSourceError, WindowBudgetExceeded, _ContextPosition, _WindowPosition,
 )
@@ -372,3 +372,30 @@ def test_the_memory_reader_grants_window_and_context_separately(issued, native):
     with pytest.raises(InvalidSourceReference):
         publication_only.validate_reference(context)
     extraction.validate_reference(context)
+
+
+def test_a_broken_ancestor_chain_is_reported_not_read_as_no_earlier_turns(interview, native):
+    graph, dataset, document, pending, _, _ = native
+    windows, _, first_run, second_run = interview
+    assert len(windows.safe_turns(document)) == 2
+    record, human = new_run_record(dataset, document, str(uuid4()), "第三輪原話",
+                                   start_revision_id=str(uuid4()))
+    put, failed = graph.checkpointer.put, []
+    def break_the_chain(conf, checkpoint, metadata, versions):
+        if not failed and not conf["configurable"].get("checkpoint_ns") and metadata["source"] == "input":
+            failed.append(True)
+            raise OSError("synthetic private fault")
+        return put(conf, checkpoint, metadata, versions)
+    graph.checkpointer.put = break_the_chain
+    try:
+        with pytest.raises(OSError):
+            graph.invoke({"jd_ai_run": record.model_dump(mode="json"), "messages": [human],
+                          "jd_ai_bindings": [], "jd_ai_read": None},
+                         {"configurable": {"thread_id": document}}, durability="sync")
+    finally:
+        graph.checkpointer.put = put
+    # The limit is surfaced; it never degrades into "there are no earlier turns".
+    with pytest.raises(AiCheckpointError, match="^original_run_lookup_required$"):
+        windows.safe_turns(document)
+    with pytest.raises(AiCheckpointError, match="^original_run_lookup_required$"):
+        windows.unprocessed_source(document)

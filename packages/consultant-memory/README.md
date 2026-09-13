@@ -32,7 +32,7 @@ App 配發 operation／base／source，模型只提供 path／diff；本核心�
 
 **唯一接縫是本套件不綁 provider**：原本 import 的 `native_context_view` 改由 caller 以 `context_middleware=` 傳入，中介順序不變。B2 只從**已完成**的 B1 checkpoint 取 `files`；它推進 `processed_source`，C 的修補不推進背景游標。
 
-**尚未接 runtime：**B2 的 App adapter、真 PG 交接、發布回覆遺失查回與 C 較晚更正的配對驗收仍待施工。[H4 執行計畫 R2](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
+App adapter（`consolidation_app.py`）已接，並在真 `PostgresSaver`／`PostgresStore`／publication 上驗過兩批有序交接、pending 續作、發布回覆遺失查回與 C 較晚更正（[R2 結果](../../docs/specs/evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。**尚未接 runtime：**通知註冊、背景准入與宿主生命週期仍待施工；「B2 未發布不得開始下一批」目前由 caller 串行負責。[H4 執行計畫 R3](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
 
 ## 安裝與驗證
 

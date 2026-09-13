@@ -54,7 +54,8 @@ def main() -> None:
                        f"{ROOT / 'contracts' / 'jd-result.schema.json'}=jd_relational.generated.results"]
                       if name == "jd-manual-http" else ["--external-ref-mapping",
                        f"{ROOT / 'contracts' / 'jd-manual-http.schema.json'}=jd_relational.generated.manual_http",
-                       f"{ROOT / 'contracts' / 'jd-result.schema.json'}=jd_relational.generated.results"]
+                       f"{ROOT / 'contracts' / 'jd-result.schema.json'}=jd_relational.generated.results",
+                       f"{ROOT / 'contracts' / 'jd-read.schema.json'}=jd_relational.generated.reads"]
                       if name == "jd-chat-http" else [])
         expected[python_output] = run(
             [

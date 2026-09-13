@@ -17,12 +17,12 @@ CONTRACTS = Path(__file__).resolve().parents[1] / "contracts"
 SCHEMA = json.loads((CONTRACTS / "jd-chat-http.schema.json").read_text(encoding="utf-8"))
 REGISTRY = Registry().with_resources(
     (name, Resource.from_contents(json.loads((CONTRACTS / name).read_text(encoding="utf-8"))))
-    for name in ("jd-work.schema.json", "jd-result.schema.json", "jd-manual-http.schema.json")
+    for name in ("jd-work.schema.json", "jd-result.schema.json", "jd-manual-http.schema.json", "jd-read.schema.json")
 )
 DATASET = "12345678-90ab-cdef-1234-567890abcdef"
 DOCUMENT = "22345678-90ab-cdef-1234-567890abcdef"
 RUN = "32345678-90ab-cdef-1234-567890abcdef"
-ROOTS = ("ChatStartInput", "ChatRunState", "ChatHistoryPage", "ChatMessage", "ChatProblem")
+ROOTS = ("ChatStartInput", "ChatRunState", "ChatHistoryPage", "ChatMessage", "ChatProblem", "ChatRunChangePage")
 
 
 def write_state(blocked=False):
@@ -60,7 +60,16 @@ def problem():
             "code": "run_conflict", "next_action": "lookup_run"}
 
 
-FACTORIES = dict(zip(ROOTS, (start, run, history, message, problem), strict=True))
+def run_changes():
+    return {"format_version": 1, "view": "run_change", "access": "history", "dataset_id": DATASET,
+            "document_id": DOCUMENT, "run_id": RUN, "capture_ref": "signed-original-capture",
+            "effects_state": "settled", "continuity": "none", "captured_operation_count": 0,
+            "base_revision_ref": None, "result_revision_ref": None, "records": [], "start_index": 0,
+            "total_records": 0, "total_changes": 0, "has_more": False, "next_cursor": None,
+            "oversized_unit": False}
+
+
+FACTORIES = dict(zip(ROOTS, (start, run, history, message, problem, run_changes), strict=True))
 
 
 def oracle(name):

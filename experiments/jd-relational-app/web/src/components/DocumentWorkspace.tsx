@@ -2,16 +2,18 @@
 import { useEffect, useRef, useState } from 'react';
 import { Alert, Box, Button, Chip, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,
   Divider, Paper, Stack, Typography } from '@mui/material';
-import { JdApi } from '../lib/api';
+import { ApiError, JdApi } from '../lib/api';
 import { JdSession, emptySession } from '../lib/session';
 import type { JsonValue } from '../lib/drafts';
-import { fieldLabels } from '../lib/view';
+import { fieldLabels, projectView } from '../lib/view';
 import type { CatalogDocument } from '../../../src/jd_relational/generated/jd-catalog-http';
 import JdEditor from './JdEditor';
 import HistoryPanel from './HistoryPanel';
 import ChatPanel from './ChatPanel';
 import { ChatController } from '../lib/chat-session';
 import type { ChatSnapshot } from '../lib/chat-session';
+import RunChangesPanel from './RunChangesPanel';
+import { currentRunChanges, matchingRun, runChangeKey, visibleRunMarkers, type LoadedRunChange, type RunChangeScope } from '../lib/run-changes';
 
 const emptyChat: ChatSnapshot = { messages: [], page: null, run: null, runId: null, loading: true, busy: false, error: null, canRetry: false };
 
@@ -26,6 +28,12 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   const [selectedChange, setSelectedChange] = useState<{ ref: string; sequence: number } | null>(null);
   const [restoreChoice, setRestoreChoice] = useState<'continue' | 'discard' | null>(null);
   const [restoreBusy, setRestoreBusy] = useState(false);
+  const [runLoad, setRunLoad] = useState<(RunChangeScope & { loading: boolean; error: string | null; selection: LoadedRunChange | null }) | null>(null);
+  const [retryChanges, setRetryChanges] = useState(0);
+  const datasetId = api.datasetId;
+  const run = matchingRun(chat, snapshot.row?.chatSubmission?.request.run_id ?? null, { datasetId, documentId: document.document_id });
+  const changeKey = runChangeKey(run);
+  const changeScope = { api, datasetId, documentId: document.document_id, key: changeKey };
   const previousArchive = useRef(document.archived);
   useEffect(() => {
     setChat(emptyChat);
@@ -39,6 +47,30 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     void active.start();
     return () => { chatController.current?.dispose(); chatController.current = null; session.current = null; void active.dispose(); };
   }, [api, document.document_id]);
+  useEffect(() => {
+    let live = true;
+    if (!changeKey || !run) return () => { live = false; };
+    const scope = { api, datasetId, documentId: document.document_id, key: changeKey };
+    setRunLoad({ ...scope, loading: true, error: null, selection: null });
+    void (async () => {
+      try {
+        const page = await api.runChanges(scope.documentId, run.run_id);
+        if (!live) return;
+        const [before, after] = page.continuity === 'continuous' ? await Promise.all(
+          [page.base_revision_ref, page.result_revision_ref].map(target_ref =>
+            api.read(scope.documentId, { view: 'history', target_ref, cursor: null }).then(projectView))) : [null, null];
+        if (before && after && (before.revisionRef !== page.base_revision_ref || after.revisionRef !== page.result_revision_ref))
+          throw new ApiError('invalid_response');
+        if (live) setRunLoad({ ...scope, loading: false, error: null, selection: { ...scope, page, before, after } });
+      } catch (error) {
+        if (live) setRunLoad({ ...scope, loading: false, selection: null, error: error instanceof ApiError ? error.message :
+          '這輪改動暫時無法完整讀取。已保存的內容仍保留，請重新查看改動。' });
+      }
+    })();
+    return () => { live = false; };
+    // The key changes only with run/scope, the confirmed operation set or settled
+    // evidence. Repeated status observations do not re-read identical captures.
+  }, [api, datasetId, document.document_id, changeKey, run?.run_id, retryChanges]);
   useEffect(() => {
     if (previousArchive.current !== document.archived) {
       previousArchive.current = document.archived; void session.current?.refreshStatus();
@@ -60,6 +92,16 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   // Only the redundant clean-archive notice is replaced by the archive explanation.
   const archiveNoticeOnly = document.archived && !snapshot.dirty && !snapshot.needsReview && !snapshot.row?.submission
     && snapshot.error === '服務目前暫停編輯，請稍後再查看；尚未保存的內容繼續保留。';
+  const selectedRunChange = currentRunChanges(runLoad?.selection ?? null, changeScope);
+  const matchingLoad = runLoad?.api === api && runLoad.datasetId === datasetId
+    && runLoad.documentId === document.document_id && runLoad.key === changeKey;
+  // Final-render gate: an effect cleanup alone would leave one frame of A's
+  // labels on B or on a later/manual document. Dirty candidates never get labels.
+  const markers = visibleRunMarkers(selectedRunChange, changeScope, snapshot);
+  const showRunChange = (index: number) => {
+    const detail = globalThis.document.getElementById(`jd-run-change-detail-${index}`);
+    if (detail instanceof HTMLDetailsElement) detail.open = true;
+  };
   return <div className="work-grid"><ChatPanel snapshot={snapshot} chat={chat} controller={chatController.current} archived={document.archived}
     onText={text => session.current?.chatEdit(text)} onComposition={active => session.current?.chatComposition(active)}
     onChange={ref => { setSelectedChange(previous => ({ ref, sequence: (previous?.sequence ?? 0) + 1 })); setHistory(true); }} />
@@ -90,10 +132,13 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
       <Stack direction="row" spacing={1}><Button variant="contained" onClick={() => setRestoreChoice('continue')}>使用找回內容繼續</Button>
         <Button color="inherit" onClick={() => setRestoreChoice('discard')}>捨棄未提交內容</Button></Stack>
     </Paper>}
+    {changeKey && <RunChangesPanel selection={selectedRunChange} loading={!matchingLoad || !!runLoad?.loading}
+      error={matchingLoad ? runLoad?.error ?? null : null} currentRevisionRef={snapshot.view?.revisionRef ?? null}
+      onRetry={() => setRetryChanges(value => value + 1)} />}
     {history && <HistoryPanel api={api} documentId={document.document_id} revisionRef={snapshot.view?.revisionRef ?? null} selectedChange={selectedChange} />}
     {snapshot.loading ? <CircularProgress aria-label="讀取職務說明書" /> : snapshot.view && <JdEditor view={snapshot.view}
       disabled={document.archived || snapshot.readOnly} commandsDisabled={snapshot.submitting || !!Object.keys(snapshot.row?.fields ?? {}).length}
-      values={snapshot.values} onField={(field, text) => session.current?.edit(field, text)}
+      values={snapshot.values} markers={markers} onShowChange={showRunChange} onField={(field, text) => session.current?.edit(field, text)}
       onComposition={active => session.current?.composition(active)} form={snapshot.form}
       onFormChange={value => session.current?.form(value as JsonValue | null)}
       onCommand={async (command, options) => { await session.current?.command(command, options); }} />}

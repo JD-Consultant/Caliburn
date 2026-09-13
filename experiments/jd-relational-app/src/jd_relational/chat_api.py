@@ -10,7 +10,8 @@ from starlette.responses import JSONResponse
 
 from .catalog_api import CatalogBoundary, CatalogServices
 from .chat_service import ChatError, ChatService, parse_chat_input
-from .generated.chat_http import ChatStartInput, ChatRunState, ChatHistoryPage, ChatProblem
+from .run_change_reads import run_change_openapi_conditions
+from .generated.chat_http import ChatStartInput, ChatRunState, ChatHistoryPage, ChatProblem, ChatRunChangePage
 
 
 START_ROUTE = '/api/documents/{document_id}/chat/runs'
@@ -18,7 +19,8 @@ RUN_ROUTE = START_ROUTE + '/{run_id}'
 CANCEL_ROUTE = RUN_ROUTE + '/cancel'
 RECOVER_ROUTE = RUN_ROUTE + '/recover'
 HISTORY_ROUTE = '/api/documents/{document_id}/chat/messages'
-CHAT_ROUTES = frozenset({START_ROUTE, RUN_ROUTE, CANCEL_ROUTE, RECOVER_ROUTE, HISTORY_ROUTE})
+CHANGES_ROUTE = RUN_ROUTE + '/changes'
+CHAT_ROUTES = frozenset({START_ROUTE, RUN_ROUTE, CANCEL_ROUTE, RECOVER_ROUTE, HISTORY_ROUTE, CHANGES_ROUTE})
 
 
 @dataclass(frozen=True)
@@ -116,11 +118,17 @@ def attach_chat_routes(app):
                  limit: Annotated[int, Query(ge=1, le=50)] = 50):
         return request.app.state.jd_queries.chat.messages(str(document_id), cursor=cursor, limit=limit)
 
+    @app.get(CHANGES_ROUTE, response_model=ChatRunChangePage, responses=errors)
+    def changes(document_id: UUID, run_id: UUID, request: Request,
+                cursor: Annotated[str | None, Query(min_length=1, max_length=4096)] = None):
+        return request.app.state.jd_queries.chat.changes(str(document_id), str(run_id), cursor=cursor)
+
     previous_openapi = app.openapi
     def chat_openapi():
         schema = previous_openapi()
+        schema['components']['schemas']['ChatRunChangePage']['allOf'] = run_change_openapi_conditions()
         for path, method in ((START_ROUTE,'post'),(RUN_ROUTE,'get'),(CANCEL_ROUTE,'post'),
-                             (RECOVER_ROUTE,'post'),(HISTORY_ROUTE,'get')):
+                             (RECOVER_ROUTE,'post'),(HISTORY_ROUTE,'get'),(CHANGES_ROUTE,'get')):
             for status in errors:
                 content = schema['paths'][path][method]['responses'][str(status)]['content']
                 if 'application/json' in content:

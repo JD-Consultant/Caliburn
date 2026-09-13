@@ -16,7 +16,7 @@ import type { CatalogProblem } from '../../../src/jd_relational/generated/jd-cat
 import type { ManualProblem } from '../../../src/jd_relational/generated/jd-manual-http';
 import type { HttpProblem } from '../../../src/jd_relational/generated/jd-http';
 import type { QueryProblem } from '../../../src/jd_relational/generated/jd-query-http';
-import type { ChatStartInput, ChatRunState, ChatHistoryPage, ChatProblem } from '../../../src/jd_relational/generated/jd-chat-http';
+import type { ChatStartInput, ChatRunState, ChatHistoryPage, ChatProblem, ChatRunChangePage } from '../../../src/jd_relational/generated/jd-chat-http';
 
 export type ChatMessagesOptions =
   | { cursor?: null; anchor?: never; anchorRunId?: never; limit?: number }
@@ -309,6 +309,45 @@ export class JdApi {
     // older (all pages remain chronological). The UI prepends older pages and
     // checks cross-page duplicates; disposed views must ignore late responses.
     return page;
+  }
+  async runChanges(id: string, runId: string): Promise<ChatRunChangePage> {
+    const dataset = this.chatScope(id, runId);
+    let all: ChatRunChangePage | null = null, cursor: string | null = null;
+    const seen = new Set<string>();
+    do {
+      const suffix = cursor === null ? '' : `?${new URLSearchParams({ cursor })}`;
+      const { value } = await this.request(`/api/documents/${id}/chat/runs/${runId}/changes${suffix}`, undefined, { chat: true });
+      this.sameChatDataset(dataset);
+      const page = decode<ChatRunChangePage>('chat-http', 'ChatRunChangePage', value);
+      if (page.dataset_id !== dataset || page.document_id !== id || page.run_id !== runId
+          || page.has_more !== (page.next_cursor !== null) || page.has_more && page.records.length === 0
+          || page.oversized_unit && page.records.length !== 1
+          || (all && (page.format_version !== all.format_version || page.capture_ref !== all.capture_ref
+            || page.effects_state !== all.effects_state || page.continuity !== all.continuity
+            || page.captured_operation_count !== all.captured_operation_count
+            || page.base_revision_ref !== all.base_revision_ref || page.result_revision_ref !== all.result_revision_ref
+            || page.total_records !== all.total_records || page.total_changes !== all.total_changes
+            || page.start_index !== all.records.length))) invalid();
+      if (!all && page.start_index !== 0) invalid();
+      all ??= { ...page, records: [] };
+      all.records.push(...page.records);
+      if (all.records.length > all.total_records || page.has_more !== (all.records.length < all.total_records)) invalid();
+      cursor = page.next_cursor;
+      if (cursor && seen.has(cursor)) invalid();
+      if (cursor) seen.add(cursor);
+    } while (cursor);
+    if (all.total_records !== all.records.length) invalid();
+    // Validate complete transport framing, not the meaning of the JD changes.
+    let group = -1;
+    for (const row of all.records) {
+      if (row.type === 'change') {
+        if (row.change_index !== group + 1) invalid();
+        group = row.change_index;
+      } else if (group < 0 || row.change_index !== group) invalid();
+      if (row.change_index >= all.total_changes) invalid();
+    }
+    if (group + 1 !== all.total_changes) invalid();
+    return { ...all, has_more: false, next_cursor: null };
   }
   async changes(id: string, changeRef: string): Promise<ChangeReadPage> {
     let all: ChangeReadPage | null = null, cursor: string | null = null;

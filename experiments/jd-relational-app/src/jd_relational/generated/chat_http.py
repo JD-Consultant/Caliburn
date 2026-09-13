@@ -6,6 +6,7 @@ from __future__ import annotations
 from typing import Literal
 
 from jd_relational.generated.manual_http import ManualBlockedState, ManualDocumentState
+from jd_relational.generated.reads import ChangeReadRecord
 from jd_relational.generated.results import (
     CommittedResult,
     ConfirmedDependentItems,
@@ -23,7 +24,7 @@ from jd_relational.generated.results import (
     UnconfirmedTargetMissing,
     UnknownOutcomeResult,
 )
-from pydantic import BaseModel, ConfigDict, Field, RootModel, StrictBool, constr
+from pydantic import BaseModel, ConfigDict, Field, RootModel, StrictBool, conint, constr
 
 
 class ChatUuid(
@@ -360,6 +361,31 @@ class ChatProblem(BaseModel):
     next_action: Literal['correct_input', 'reread', 'lookup_run', 'wait', 'recover', 'stop']
 
 
+class ChatRunChangePage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    format_version: conint(ge=1, le=1, strict=True)
+    view: Literal['run_change']
+    access: Literal['history']
+    dataset_id: ChatUuid
+    document_id: ChatUuid
+    run_id: ChatUuid
+    capture_ref: ChatOpaqueRef
+    effects_state: Literal['settled', 'unconfirmed']
+    continuity: Literal['none', 'continuous', 'discontinuous']
+    captured_operation_count: conint(ge=0, le=96, strict=True)
+    base_revision_ref: ChatOpaqueRef | None
+    result_revision_ref: ChatOpaqueRef | None
+    records: list[ChangeReadRecord]
+    start_index: conint(ge=0, strict=True)
+    total_records: conint(ge=0, strict=True)
+    total_changes: conint(ge=0, strict=True)
+    has_more: StrictBool
+    next_cursor: ChatOpaqueRef | None
+    oversized_unit: StrictBool
+
+
 class ChatHttpCatalog(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -369,3 +395,4 @@ class ChatHttpCatalog(BaseModel):
     ChatHistoryPage_1: ChatHistoryPage = Field(..., alias='ChatHistoryPage')
     ChatMessage_1: ChatMessage = Field(..., alias='ChatMessage')
     ChatProblem_1: ChatProblem = Field(..., alias='ChatProblem')
+    ChatRunChangePage_1: ChatRunChangePage = Field(..., alias='ChatRunChangePage')

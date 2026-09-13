@@ -2,7 +2,7 @@
 
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2、RS-3 第一段及 RS-4 通知／模型保存接點。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
-**最新：[同頁聊天與原話保護](../../docs/specs/2026-09-13-jd-chat-web-slice.md)已接 Web。**手改保存後送出、原話及原請求重開保護、原回合狀態與逐次實際差異共用既有資料權威。固定 SDK／真瀏覽器旅程完成兩輪及 PG 獨立核對；瀏覽器 fetch 首敗仍有未定位原因，不宣稱無故障完成。下文各切片的「下一接 Web」保留為沿革；Memory／來源、整輪差異與撤回、日常 AI 啟用及自然品質仍未完成。日常 `enable_chat=False` 不因測試而改變。
+**最新：[同頁整輪改動](../../docs/specs/2026-09-13-jd-run-change-view-slice.md)承接聊天與原話保護。**整輪保存內容、完整前後對照、刪除原文與目前欄位提示沿同一歷史來源；只讀 GET 使用原生確認的固定範圍，Web 不計算業務差異。實測層级及獨審結果見結果稿；新畫面真瀏覽器互動未驗，先前 Fetch 原因仍 OPEN。未完成事項集中在[收尾清單](../../docs/specs/2026-09-13-jd-app-open-issues.md)；Memory／來源、還原撤回、日常 AI 與自然品質仍未完成，`enable_chat=False` 不因測試而改變。下文各切片較早「下一接 Web」為沿革。
 
 **已有可開啟的[六章手動管理畫面](web/README.md)，透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；[本次 UI 結果](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)包含自動保存、未完成表單重開及歷史。完整 AI 生命週期、来源回查、歷史還原與圖形啟動器尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
 
@@ -58,7 +58,8 @@
 - `storage/rows.py`：九組 current 資料增量讀寫；由 caller 控制交易。
 - `storage/receipts.py`／`storage/service.py`：永久回執、`JdReader` 同版唯讀及 `JdStorage` 共同保存；`reconcile_stopped` 只接受原 `AdmittedIdentity`，沒有候選重建或自動重播。
 - `references.py`：ItsDangerous 2.2.0 標準 signer，固定型別、文件／版本／用途與資料集檢查；沒有自建簽章或 token registry。
-- `storage/history.py`／`changes.py`：短唯讀交易取得原版或原 operation 的 base/result；另有[固定 AI 操作集合的比較材料](../../docs/specs/2026-09-13-jd-run-change-material-slice.md)，按版次核連續、只讀首末完整版本，不混入人工／別輪。此內部讀取不證原生 run 全集，公開整輪差異及畫面標記仍待接合。穩定 IDs 比較完整欄位／關係，不用目前稿重建過去、不重播事件。
+- `storage/history.py`／`changes.py`：短唯讀交易取得原版或原 operation 的 base/result；另有[固定 AI 操作集合的比較材料](../../docs/specs/2026-09-13-jd-run-change-material-slice.md)，按版次核連續、只讀首末完整版本，不混入人工／別輪。內部讀取不證原生 run 全集；由 `ChatService` 首讀取得原生確認集合再交 `run_change_reads.py` 投影，公開續頁不擴張原捕捉。穩定 IDs 比較完整欄位／關係，不用目前稿重建過去、不重播事件。
+- `run_change_reads.py`：原整輪材料與 `change_reads.py` 共用完整差異投影；生成 chat DTO，原 `jsonschema` registry 從固定 `contracts` 補出站條件。正式封裝須攜帶相同來源，不能將 generated DTO 當成來源条件已全部生成。
 - `observation_projection.py`：只從原保存觀察發配結果 refs；投影故障不把已成功保存改判失敗，也不重跑操作。
 - `tests`：合成工作、格式正反例、共同操作流程、真 SDK 的離線請求捕捉。未完整任務不強迫補欄；多成果和多要求不配對。
 

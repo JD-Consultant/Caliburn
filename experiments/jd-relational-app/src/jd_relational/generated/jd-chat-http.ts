@@ -90,6 +90,21 @@ export type ChatConfirmedResult =
  * via the `definition` "ChatHistoryPage".
  */
 export type ChatHistoryPage = ChatEmptyHistoryPage | ChatAnchoredHistoryPage;
+/**
+ * One fixed captured run range, not a fabricated operation. capture_ref signs the exact committed IDs and captured settled state at offset zero; continuation preserves this range. Only continuous ranges have net comparison records and immutable S/E. Unconfirmed remains a partial run observation; zero net records with positive captured count preserves saved events. Historical fields are complete atomic records using the existing jd_read contract.
+ *
+ * This interface was referenced by `ChatHttpCatalog`'s JSON-Schema
+ * via the `definition` "ChatRunChangePage".
+ */
+export type ChatRunChangePage = ChatRunChangePage1;
+export type ChangeReadRecord =
+  | ChangeHeaderRecord
+  | ChangeValueRecord
+  | ChangeSourceValueRecord
+  | ChangeItemPlacementRecord
+  | ChangeRelationPlacementRecord
+  | ChangeSourcePlacementRecord
+  | ChangeAffectedTaskRecord;
 
 /**
  * Generation catalog, not an endpoint body. App-only chat controls reuse manual write state and original mutation result contracts; no provider tool schema or persistence table is introduced.
@@ -100,6 +115,7 @@ export interface ChatHttpCatalog {
   ChatHistoryPage: ChatHistoryPage;
   ChatMessage: ChatMessage;
   ChatProblem: ChatProblem;
+  ChatRunChangePage: ChatRunChangePage;
 }
 /**
  * One original browser request. Route/document and dataset header are not duplicated in this body or passed to the model as tool arguments.
@@ -571,4 +587,208 @@ export interface ChatProblem {
     | "ai_unavailable"
     | "origin_not_allowed";
   next_action: "correct_input" | "reread" | "lookup_run" | "wait" | "recover" | "stop";
+}
+export interface ChatRunChangePage1 {
+  format_version: number;
+  view: "run_change";
+  access: "history";
+  dataset_id: ChatUuid;
+  document_id: ChatUuid;
+  run_id: ChatUuid;
+  capture_ref: ChatOpaqueRef;
+  effects_state: "settled" | "unconfirmed";
+  continuity: "none" | "continuous" | "discontinuous";
+  captured_operation_count: number;
+  base_revision_ref: ChatOpaqueRef | null;
+  result_revision_ref: ChatOpaqueRef | null;
+  records: ChangeReadRecord[];
+  start_index: number;
+  total_records: number;
+  total_changes: number;
+  has_more: boolean;
+  next_cursor: ChatOpaqueRef | null;
+  oversized_unit: boolean;
+}
+/**
+ * Header for one stable-identity net change. changed_fields uses public field names, not database identifiers. Reorder is a relative ordering observation, not the original drag action.
+ */
+export interface ChangeHeaderRecord {
+  type: "change";
+  change_index: number;
+  kind: "create" | "update" | "delete" | "move" | "reorder" | "link" | "unlink";
+  entity_kind:
+    | "profile"
+    | "collaborator"
+    | "duty"
+    | "task"
+    | "detail"
+    | "capability"
+    | "condition"
+    | "task_capability"
+    | "source_link";
+  before_exists: boolean;
+  after_exists: boolean;
+  changed_fields: (
+    | "job_title"
+    | "organization_unit"
+    | "employee_name"
+    | "reports_to"
+    | "purpose"
+    | "name"
+    | "description"
+    | "scope_text"
+    | "text"
+    | "kind"
+    | "container_ref"
+    | "position"
+    | "task_ref"
+    | "capability_ref"
+    | "target_ref"
+    | "related_capability_ref"
+    | "source_ref"
+    | "basis_digest"
+  )[];
+}
+/**
+ * A complete historical record using the same field projection as jd_read. A text field is never split or truncated.
+ */
+export interface ChangeValueRecord {
+  type: "value";
+  change_index: number;
+  side: "before" | "after";
+  record: SectionRecord | ContainerRecord | ItemRecord | FieldRecord | RelationRecord;
+}
+export interface SectionRecord {
+  type: "section";
+  section_ref: string;
+  /**
+   * Stable App-provided chapter identity for display. Not a writable locator.
+   */
+  section_key: "profile" | "purpose" | "duties_tasks" | "knowledge" | "skills" | "conditions";
+  title: string;
+}
+export interface ContainerRecord {
+  type: "container";
+  container_ref: string;
+  section_ref: string;
+  owner_ref: string | null;
+  child_kind:
+    | "duty"
+    | "task"
+    | "outcome"
+    | "requirement"
+    | "knowledge"
+    | "skill"
+    | "collaborator"
+    | "work_environment"
+    | "schedule_travel"
+    | "shared_authority"
+    | "shared_collaboration"
+    | "qualification";
+}
+export interface ItemRecord {
+  type: "item";
+  item_ref: string;
+  /**
+   * Stable App-provided database item identity within this document and dataset, retained across edits and moves. Display only; commands must use current signed refs.
+   */
+  item_id: string;
+  section_ref: string;
+  container_ref: string;
+  kind:
+    | "duty"
+    | "task"
+    | "outcome"
+    | "requirement"
+    | "knowledge"
+    | "skill"
+    | "collaborator"
+    | "work_environment"
+    | "schedule_travel"
+    | "shared_authority"
+    | "shared_collaboration"
+    | "qualification";
+  position: number;
+}
+export interface FieldRecord {
+  type: "field";
+  item_ref: string | null;
+  section_ref: string;
+  field_ref: string;
+  name:
+    | "job_title"
+    | "organization_unit"
+    | "employee_name"
+    | "reports_to"
+    | "purpose"
+    | "name"
+    | "description"
+    | "scope_text"
+    | "text";
+  value: string | null;
+}
+export interface RelationRecord {
+  type: "task_capability";
+  section_ref: string;
+  task_ref: string;
+  capability_ref: string;
+  capability_kind: "knowledge" | "skill";
+  position: number;
+}
+/**
+ * Exact stored source basis and order; basis_status is evaluated in this side snapshot, readability is not checked by this operation.
+ */
+export interface ChangeSourceValueRecord {
+  type: "source_value";
+  change_index: number;
+  side: "before" | "after";
+  record: SourceRecord;
+  basis_digest: string;
+  position: number;
+}
+export interface SourceRecord {
+  type: "source";
+  section_ref: string;
+  target_ref: string;
+  related_capability_ref: string | null;
+  source_ref: string;
+  basis_status: "current" | "needs_recheck";
+  readability: "not_checked" | "available" | "unavailable";
+}
+/**
+ * Actual neighboring items in this historical side. It does not claim which item the operator dragged.
+ */
+export interface ChangeItemPlacementRecord {
+  type: "item_placement";
+  change_index: number;
+  side: "before" | "after";
+  container_ref: string;
+  previous_item_ref: string | null;
+  next_item_ref: string | null;
+}
+export interface ChangeRelationPlacementRecord {
+  type: "relation_placement";
+  change_index: number;
+  side: "before" | "after";
+  task_ref: string;
+  previous_capability_ref: string | null;
+  next_capability_ref: string | null;
+}
+export interface ChangeSourcePlacementRecord {
+  type: "source_placement";
+  change_index: number;
+  side: "before" | "after";
+  target_ref: string;
+  related_capability_ref: string | null;
+  previous_source_ref: string | null;
+  next_source_ref: string | null;
+}
+/**
+ * One affected task, paired across the two historical snapshots when it exists in both. Shared capabilities include the union of tasks from both sides.
+ */
+export interface ChangeAffectedTaskRecord {
+  type: "affected_task";
+  change_index: number;
+  before_task_ref: string | null;
+  after_task_ref: string | null;
 }

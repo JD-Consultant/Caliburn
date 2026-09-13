@@ -11,6 +11,7 @@ There is deliberately no clock expiry: revision/purpose/dataset checks remain
 mandatory even when an old token has a valid signature.
 """
 
+import base64
 import hashlib
 import json
 import re
@@ -31,6 +32,7 @@ Role = Literal["item", "field", "container", "section", "revision", "operation",
 View = Literal["current", "item", "section", "history", "change"]
 _REF_SALT = "caliburn.jd.reference.v1"
 _CURSOR_SALT = "caliburn.jd.cursor.v1"
+_RUN_CURSOR_SALT = "caliburn.jd.run-change-cursor.v1"
 _DIGEST = re.compile(r"[0-9a-f]{64}\Z")
 _TOKEN = re.compile(r"[A-Za-z0-9_.-]+\Z")
 
@@ -146,6 +148,51 @@ class ReadCursor(_Strict):
         return self
 
 
+def _run_operation_ids(value: str) -> tuple[UUID, ...]:
+    # UUID.bytes and standard URL-safe base64 are only a bounded transport
+    # representation. ItsDangerous still authenticates the complete envelope.
+    _require(type(value) is str and len(value) <= 2048)
+    packed = base64.b64decode(value, altchars=b"-_", validate=True)
+    _require(len(packed) <= 96 * 16 and len(packed) % 16 == 0)
+    _require(base64.urlsafe_b64encode(packed).decode("ascii") == value)
+    identities = tuple(UUID(bytes=packed[index:index + 16]) for index in range(0, len(packed), 16))
+    _require(len(set(identities)) == len(identities))
+    return identities
+
+
+class RunChangeCursor(_Strict):
+    """Captured committed IDs, never a new run lookup or authority to write."""
+
+    document_id: str
+    run_id: str
+    operations_b64: str = Field(max_length=2048)
+    settled: bool
+    offset: int = Field(ge=0, le=2**63 - 1)
+
+    @model_validator(mode="after")
+    def check_capture(self) -> Self:
+        _require(_uuid(self.document_id) and _uuid(self.run_id))
+        _run_operation_ids(self.operations_b64)
+        return self
+
+    @property
+    def operation_ids(self) -> tuple[UUID, ...]:
+        return _run_operation_ids(self.operations_b64)
+
+    @classmethod
+    def capture(cls, document_id: str, run_id: str, operation_ids: tuple[UUID, ...], settled: bool) -> Self:
+        try:
+            _require(type(operation_ids) is tuple and len(operation_ids) <= 96)
+            _require(all(isinstance(identity, UUID) for identity in operation_ids))
+            _require(len(set(operation_ids)) == len(operation_ids))
+            packed = b"".join(identity.bytes for identity in sorted(operation_ids))
+            return cls(document_id=document_id, run_id=run_id,
+                       operations_b64=base64.urlsafe_b64encode(packed).decode("ascii"),
+                       settled=settled, offset=0)
+        except (ValueError, TypeError, UnicodeError):
+            raise ReferenceValidationError() from None
+
+
 class _Envelope(_Strict):
     format_version: Literal[1]
     dataset_id: str
@@ -172,6 +219,10 @@ class _CursorEnvelope(_Envelope):
     cursor: ReadCursor
 
 
+class _RunCursorEnvelope(_Envelope):
+    cursor: RunChangeCursor
+
+
 def field_value_digest(value: str | None) -> str:
     """Digest the saved scalar exactly; null, empty text and whitespace differ."""
     try:
@@ -183,7 +234,7 @@ def field_value_digest(value: str | None) -> str:
 
 
 class ReferenceCodec:
-    __slots__ = ("_dataset_id", "_ref_serializer", "_cursor_serializer")
+    __slots__ = ("_dataset_id", "_ref_serializer", "_cursor_serializer", "_run_cursor_serializer")
 
     @property
     def dataset_id(self) -> str:
@@ -200,12 +251,14 @@ class ReferenceCodec:
                    "serializer_kwargs": {"sort_keys": True, "ensure_ascii": False, "allow_nan": False}}
         self._ref_serializer = URLSafeSerializer(secret_key, salt=_REF_SALT, **options)
         self._cursor_serializer = URLSafeSerializer(secret_key, salt=_CURSOR_SALT, **options)
+        self._run_cursor_serializer = URLSafeSerializer(secret_key, salt=_RUN_CURSOR_SALT, **options)
 
     @staticmethod
     def _token(token: str) -> None:
         _require(type(token) is str and 0 < len(token) <= MAX_TOKEN_BYTES and bool(_TOKEN.fullmatch(token)))
 
-    def _dump(self, envelope: _RefEnvelope | _CursorEnvelope, serializer: URLSafeSerializer) -> str:
+    def _dump(self, envelope: _RefEnvelope | _CursorEnvelope | _RunCursorEnvelope,
+              serializer: URLSafeSerializer) -> str:
         # Admission size is independent of zlib's compression ratio. Worst-case
         # SHA-256 URLSafeSerializer output is ceil(4*n/3)+44 ASCII bytes.
         payload = envelope.model_dump(mode="json")
@@ -260,3 +313,22 @@ class ReferenceCodec:
         if revision_id is not None and cursor.revision_id != revision_id:
             raise ReferenceValidationError("stale_view")
         return cursor
+
+    def issue_run_cursor(self, cursor: RunChangeCursor) -> str:
+        try:
+            _require(isinstance(cursor, RunChangeCursor))
+            envelope = _RunCursorEnvelope(format_version=1, dataset_id=self._dataset_id, cursor=cursor)
+            return self._dump(envelope, self._run_cursor_serializer)
+        except (ValueError, TypeError, UnicodeError):
+            raise ReferenceValidationError() from None
+
+    def resolve_run_cursor(self, token: str, *, document_id: str, run_id: str) -> RunChangeCursor:
+        try:
+            self._token(token)
+            envelope = _RunCursorEnvelope.model_validate(self._run_cursor_serializer.loads(token), strict=True)
+            cursor = envelope.cursor
+            _require(envelope.dataset_id == self._dataset_id and cursor.document_id == document_id
+                     and cursor.run_id == run_id)
+            return cursor
+        except (BadData, ValidationError, ValueError, TypeError, UnicodeError):
+            raise ReferenceValidationError() from None

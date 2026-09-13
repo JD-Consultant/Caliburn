@@ -10,6 +10,8 @@ from .ai_runtime import AiRuntime
 from .generated.chat_http import ChatStartInput, ChatRunState, ChatHistoryPage
 from .manual_service import ManualService
 from .observation_projection import project_observation
+from .references import RunChangeCursor
+from .run_change_reads import RunChangeReadService
 from .transport import REQUEST_LIMIT
 
 
@@ -133,6 +135,23 @@ class ChatService:
             self.runtime.owner.storage.read_current(document_id)
             result = self.history.read(document_id, cursor=cursor, limit=limit)
             return ChatHistoryPage.model_validate(result, strict=True).model_dump(mode='json')
+        try:
+            return self.runtime.owner.inspect_document(document_id, read)
+        except Exception as error:
+            raise _failure(error) from None
+
+    def changes(self, document_id, run_id, *, cursor=None):
+        def read():
+            captured = None
+            if cursor is None:
+                state = self.runtime.inspect_run(document_id, run_id)
+                if state.run_status == "not_found":
+                    raise ChatError("invalid_ref")
+                captured = RunChangeCursor.capture(document_id, run_id,
+                    tuple(item.operation_id for item in state.receipts
+                          if item.confirmed and item.status == "committed"), state.effects_settled)
+            return RunChangeReadService(self.runtime.history, self.runtime.codec).read(
+                document_id, run_id, cursor=cursor, captured=captured)
         try:
             return self.runtime.owner.inspect_document(document_id, read)
         except Exception as error:

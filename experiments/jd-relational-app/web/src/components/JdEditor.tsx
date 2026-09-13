@@ -5,6 +5,7 @@ import type { ContainerRecord } from '../../../src/jd_relational/generated/jd-re
 import type { ManualCommand } from '../../../src/jd_relational/generated/jd-manual-http.ts';
 import { containerKey, fieldLabels, kindLabels, type FieldView, type ItemView, type JdView } from '../lib/view';
 import ItemDialog, { itemText, manageItemForm, newItemForm, type CommandOptions } from './ItemDialog';
+import type { ChangeMarker, RunMarkers } from '../lib/run-changes';
 
 export interface JdEditorProps {
   view: JdView; disabled: boolean; commandsDisabled?: boolean;
@@ -13,9 +14,10 @@ export interface JdEditorProps {
   onComposition: (active: boolean) => void;
   onCommand: (command: ManualCommand, options?: CommandOptions) => Promise<void>;
   form: unknown | null; onFormChange: (value: unknown | null) => void;
+  markers?: RunMarkers | null; onShowChange?: (changeIndex: number) => void;
 }
 export default function JdEditor({ view, disabled, commandsDisabled = false, values, onField,
-  onComposition, onCommand, form, onFormChange }: JdEditorProps) {
+  onComposition, onCommand, form, onFormChange, markers, onShowChange }: JdEditorProps) {
   const [error, setError] = useState(''); const [moving, setMoving] = useState(false);
   const structuralDisabled = disabled || commandsDisabled || moving || form !== null;
   const itemsFor = (container: ContainerRecord) => view.items.filter(item => item.container_ref === container.container_ref)
@@ -39,16 +41,22 @@ export default function JdEditor({ view, disabled, commandsDisabled = false, val
     catch { setError('排序尚未完成，請查看保存狀態。原保存結果未確認前，不會重做。'); }
     finally { setMoving(false); }
   }
+  function markerLinks(values: ChangeMarker[] | undefined) {
+    return values?.map(marker => <Button key={marker.changeIndex} size="small" variant="outlined"
+      href={`#jd-run-change-${marker.changeIndex}`} onClick={() => onShowChange?.(marker.changeIndex)}>{marker.label} · 查看</Button>);
+  }
   function fieldEditor(field: FieldView) {
     const text = Object.hasOwn(values, field.key) ? values[field.key] : field.value ?? '';
-    return <TextField key={field.key} id={`jd-field-${field.itemId ?? 'profile'}-${field.name}`}
+    return <Stack key={field.key} spacing={0.5}>
+      {!!markers?.fields[field.key]?.length && <Stack direction="row" sx={{ gap: 0.5, flexWrap: 'wrap' }}>{markerLinks(markers.fields[field.key])}</Stack>}
+      <TextField id={`jd-field-${field.itemId ?? 'profile'}-${field.name}`}
       label={fieldLabels[field.name]} multiline minRows={field.name === 'name' || field.name === 'job_title' ? 1 : 2}
       value={text} disabled={disabled} onChange={event => onField(field, event.target.value)}
       onCompositionStart={() => onComposition(true)} onCompositionEnd={event => {
         const target = event.target;
         if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) onField(field, target.value);
         onComposition(false);
-      }} />;
+      }} /></Stack>;
   }
   function itemCard(item: ItemView, container: ContainerRecord, index: number, total: number) {
     const displayOrder: Partial<Record<FieldView['name'], number>> = { name: 0, description: 1, scope_text: 1, text: 2 };
@@ -59,6 +67,7 @@ export default function JdEditor({ view, disabled, commandsDisabled = false, val
     return <Box key={item.item_id} id={`jd-item-${item.item_id}`} className="jd-item" sx={{ scrollMarginTop: 100, py: 1 }}>
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 1.5 }}>
         <Typography variant="subtitle2" sx={{ flex: 1 }}>{kindLabels[item.kind]} {index + 1}</Typography>
+        {markerLinks(markers?.items[item.item_id])}
         <Button size="small" disabled={structuralDisabled || index === 0} aria-label={`${kindLabels[item.kind]} ${index + 1} 上移`} onClick={() => void reorder(item, -1)}>上移</Button>
         <Button size="small" disabled={structuralDisabled || index === total - 1} aria-label={`${kindLabels[item.kind]} ${index + 1} 下移`} onClick={() => void reorder(item, 1)}>下移</Button>
         {item.kind === 'task' && <><Button size="small" disabled={structuralDisabled} onClick={() => openManage(item, 'move')}>移動至職責</Button>

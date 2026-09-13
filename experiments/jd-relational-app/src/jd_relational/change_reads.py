@@ -138,6 +138,17 @@ def _records(changes, before, after):
     return result
 
 
+def project_revision_changes(base, result, codec):
+    """The same complete, fixed before/after projection for an operation or run."""
+    left = domain_from_snapshot(base.snapshot, str(base.revision_id))
+    right = domain_from_snapshot(result.snapshot, str(result.revision_id))
+    if (base.document_id != result.document_id or left["document_id"] != base.document_id
+            or right["document_id"] != result.document_id):
+        raise ReadError("read_failed")
+    changes = compare_snapshots(base.snapshot, result.snapshot)
+    return len(changes), _records(changes, _Side(left, codec), _Side(right, codec))
+
+
 class ChangeReadService:
     def __init__(self, history_reader, codec, *, page_bytes=32768):
         if type(page_bytes) is not int or not 4096 <= page_bytes <= 1024 * 1024:
@@ -179,12 +190,7 @@ class ChangeReadService:
                 or result.parent_revision_id != base.revision_id or result.producer_operation_id != receipt.operation_id
                 or result.origin != receipt.origin):
                 raise ValueError("invalid_material_pair")
-            left = domain_from_snapshot(base.snapshot, str(base.revision_id))
-            right = domain_from_snapshot(result.snapshot, str(result.revision_id))
-            if left["document_id"] != document_id or right["document_id"] != document_id:
-                raise ValueError("invalid_snapshot_scope")
-            changes = compare_snapshots(base.snapshot, result.snapshot)
-            records = _records(changes, _Side(left, self.codec), _Side(right, self.codec))
+            total_changes, records = project_revision_changes(base, result, self.codec)
             start = cursor.offset if cursor else 0
             if start > len(records) or cursor is not None and start == len(records):
                 raise ReadError("invalid_ref")
@@ -203,7 +209,7 @@ class ChangeReadService:
                 return dict(format_version=READ_FORMAT_VERSION, view="change", access="history", change_ref=request.change_ref,
                             operation_ref=operation_ref, base_revision_ref=base_ref, result_revision_ref=result_ref,
                             origin=receipt.origin, records=remaining[:end], start_index=start, total_records=len(records),
-                            total_changes=len(changes), has_more=more, next_cursor=next_cursor, oversized_unit=oversized)
+                            total_changes=total_changes, has_more=more, next_cursor=next_cursor, oversized_unit=oversized)
 
             page = pack_read_records(remaining, page_at, self.page_bytes)
             return ChangeReadPage.model_validate(page, strict=True).model_dump(mode="json")

@@ -1,0 +1,32 @@
+{
+  "format_version": 1,
+  "adopted_on": "2026-09-13",
+  "source_commit": "033540cef870d1f92baa5c69133a799231c46d48",
+  "files": [
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/memory.py",
+      "source_sha256": "3f383a6ec433490edcef616ec138594d850de0c201c7c6da630253cca117a7d5",
+      "adopted_path": "src/caliburn_memory/memory.py",
+      "adopted_sha256": "5aca9aa0cb6638d97401f72d4e36989d1838d03841cb8507bef001c62b021876",
+      "adaptation": "Package imports; SourceReader annotation; validate_source delegates source validation; replace legacy parser calls."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/publication.py",
+      "source_sha256": "3de2ef91c0ab865d9fed3241b94863db88f6dd516b809fa26c8edeebac6fcdf6",
+      "adopted_path": "src/caliburn_memory/publication.py",
+      "adopted_sha256": "a7a8236e91d30b8246b5e4a049729a2defd72726729b69bae0949b675b2c648a",
+      "adaptation": "Package imports; source validation delegates MemoryArtifacts; publication transactions unchanged."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/references.py",
+      "source_sha256": "0ddaa542f92c8bf0eec5f301a1faba78c56a7a5a0727fc0371b45204e176ae9f",
+      "adopted_path": "src/caliburn_memory/references.py",
+      "adopted_sha256": "9a4db6e6dceed11477463965c2c45a2b9bad3f338811b3ce5a0da7f4bf45f01a",
+      "adaptation": "No text or logic change; checkout line endings may differ."
+    }
+  ],
+  "new_files": {
+    "src/caliburn_memory/sources.py": "SourceReader port only; no old source implementation.",
+    "src/caliburn_memory/__init__.py": "Explicit public exports."
+  }
+}

@@ -1,6 +1,8 @@
 """Native persisted turns and real recovery Futures; SQL/OS are synthetic ports."""
 
 from dataclasses import replace
+from hashlib import sha256
+import json
 from threading import Event
 from uuid import uuid4
 
@@ -9,7 +11,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import START, END, StateGraph
 
-from jd_relational.ai_checkpoints import new_run_record
+from jd_relational.ai_checkpoints import AiRunRecordV1
 from jd_relational.ai_runtime import AiRuntime, AiRuntimeError
 from jd_relational.manual_runtime import ManualRuntime, RuntimeFailure
 from jd_relational.runtime_checkpoints import DocumentCheckpoints, DocumentState, build_document_graph, _encode
@@ -39,8 +41,15 @@ def saved_turn(*, calls=False, terminal=False, initial=False):
     receipts = {key: replace(value, receipt=replace(value.receipt,
         origin=binding.identity.origin, ai_run_id=binding.identity.ai_run_id))
         for key, value in receipts.items()}
-    record, human = new_run_record(codec.dataset_id, binding.identity.document_id,
-                                  binding.identity.ai_run_id, "原始訪談\n  不可改寫")
+    # Keep an actual legacy record; recovery must not invent a start revision.
+    text = "原始訪談\n  不可改寫"
+    digest = sha256(json.dumps({"dataset_id": codec.dataset_id,
+        "document_id": binding.identity.document_id, "text": text},
+        ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
+    record = AiRunRecordV1(format_version=1, dataset_id=codec.dataset_id,
+        document_id=binding.identity.document_id, run_id=binding.identity.ai_run_id,
+        request_digest=digest, status="running")
+    human = HumanMessage(id=record.run_id, content=text)
     model_calls = []
     def work(state):
         model_calls.append(1)
@@ -87,8 +96,12 @@ def test_restart_preserves_original_input_and_stops_without_replaying(initial):
         assert observed.record.status == "failed" and observed.closed
         assert observed.messages[0] == HumanMessage(id=record.run_id, content="原始訪談\n  不可改寫")
         assert len(calls) == before and runtime.owner.storage.executed == []
-        original = runtime.start(record.document_id, record.run_id, "原始訪談\n  不可改寫")
+        original = runtime.lookup(record.document_id, record.run_id)
         assert original.wait().input_saved and original.wait().status == "failed"
+        assert observed.record.format_version == 1 and "start_revision_id" not in observed.record.model_dump()
+        with pytest.raises(AiRuntimeError, match="^original_run_lookup_required$"):
+            runtime.start(record.document_id, record.run_id, "原始訪談\n  不可改寫",
+                          expected_revision_id=runtime.owner.storage.read_current(record.document_id).revision_id)
         assert runtime.owner.finish_startup() == 0
     finally:
         assert runtime.owner.close(timeout=2)
@@ -101,7 +114,7 @@ def test_terminal_restart_is_read_only_and_does_not_relabel_a_complete_turn():
         assert runtime.owner.finish_startup() == 0
         assert graph.get_state(before.config) == before
         assert graph.get_state({"configurable": {"thread_id": record.document_id}}).config == before.config
-        result = runtime.start(record.document_id, record.run_id, "原始訪談\n  不可改寫").wait()
+        result = runtime.lookup(record.document_id, record.run_id).wait()
         assert result.status == "completed" and result.response_message_id == "saved-response"
         assert calls == [1] and not runtime.owner.storage.recovered
     finally:

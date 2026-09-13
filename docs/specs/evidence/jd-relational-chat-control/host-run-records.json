@@ -1,0 +1,400 @@
+[
+  {
+    "directory": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa",
+    "files": [
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa\\original.json",
+        "sha256": "de7b513772cff032d2a84881e1221881d520c70608b09e056248658730fc56a0",
+        "evidence": {
+          "mode": "two_boundaries",
+          "pid": 130028,
+          "counts": {
+            "model": 3,
+            "tools": 1,
+            "execute": 0,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa\\recover-43c88c02faec46e5a1f6d538a5f05d4c.boot.json",
+        "sha256": "b1f59fb89d44634a1d041c3f09a9ee6fe504a02ded692f0c1908c6707f72c0f7",
+        "evidence": {
+          "pid": 62208
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa\\recover-43c88c02faec46e5a1f6d538a5f05d4c.finished.json",
+        "sha256": "8b27b2e0cea67ae1201e7eb52fad02ab63f8231ea778e9bda692c18152ab2861",
+        "evidence": {
+          "pid": 62208,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          },
+          "closed": true
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa\\recover-43c88c02faec46e5a1f6d538a5f05d4c.json",
+        "sha256": "ce7085b9043dc516ca57cb39f8ba1e1e2e6817af2613099d8477b4acd981fb5d",
+        "evidence": {
+          "event": "recovered",
+          "pid": 62208,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa\\recover-43c88c02faec46e5a1f6d538a5f05d4c.process.json",
+        "sha256": "fd8adaa165ce0b225be224328f09bfcb2c902042d46180c17dff0fb15377c79b",
+        "evidence": {
+          "exit_code": 0
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa\\two_boundaries-1e7e629bf8d84b6c9abc9ba11007a072.boot.json",
+        "sha256": "85a789f4dbd4fc320c591798eafc03d45510d7bcbb676d99de1ec96fbf007620",
+        "evidence": {
+          "pid": 130028
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa\\two_boundaries-1e7e629bf8d84b6c9abc9ba11007a072.json",
+        "sha256": "b0e22d73f093c57362fc637786b4a37ecc32458ba2df2d4bd942cd6b4334643b",
+        "evidence": {
+          "event": "pending",
+          "pid": 130028,
+          "counts": {
+            "model": 3,
+            "tools": 1,
+            "execute": 0,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-b4c9561fac5a467190c8ae5a4fb03ffa\\two_boundaries-1e7e629bf8d84b6c9abc9ba11007a072.process.json",
+        "sha256": "e3f777e0da8acb41b5cb7c28335a2454dbfa2a43cf045752646d8b819a584a7c",
+        "evidence": {
+          "exit_code": 73
+        }
+      }
+    ]
+  },
+  {
+    "directory": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc",
+    "files": [
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc\\commit_loss-5e83f17d30b2420ea4d62c20557c3976.boot.json",
+        "sha256": "d518f5d444eb155c786aa95cb5dddaf66db5419d176c2753ecde7c7e9f2cc38d",
+        "evidence": {
+          "pid": 52816
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc\\commit_loss-5e83f17d30b2420ea4d62c20557c3976.json",
+        "sha256": "9632b4ac0a2320af2c435e8b74139d4dc3ac27d98519c6543fac8222c9737410",
+        "evidence": {
+          "event": "pending",
+          "pid": 52816,
+          "counts": {
+            "model": 4,
+            "tools": 4,
+            "execute": 2,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc\\commit_loss-5e83f17d30b2420ea4d62c20557c3976.process.json",
+        "sha256": "ad2dc898e7842e2119f1464ccb8430ca6571158b4ac9e5b357bfb537194aca3e",
+        "evidence": {
+          "exit_code": 73
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc\\original.json",
+        "sha256": "c12bd398bd827cdd5808bb62e6d55014c775094c068af4f179df4c059148d85d",
+        "evidence": {
+          "mode": "commit_loss",
+          "pid": 52816,
+          "counts": {
+            "model": 4,
+            "tools": 4,
+            "execute": 2,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc\\recover-8ebedae9480e4896b975aa5260d41a17.boot.json",
+        "sha256": "88d2b99c5c1e8f925c5ddddfcd37f4afa6716c724e84b0325ef0a7eb7c49a13c",
+        "evidence": {
+          "pid": 50148
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc\\recover-8ebedae9480e4896b975aa5260d41a17.finished.json",
+        "sha256": "206a9182b06f3e2416f8ef9229139a58f5f293680ecb48b49d083dbfc16d80c0",
+        "evidence": {
+          "pid": 50148,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          },
+          "closed": true
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc\\recover-8ebedae9480e4896b975aa5260d41a17.json",
+        "sha256": "3d16ffa718449495ec800b9951777dc0872e313c5ff706fc9664c1788891df54",
+        "evidence": {
+          "event": "recovered",
+          "pid": 50148,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-4ae18eb2311b44a795ca2e6eeada7afc\\recover-8ebedae9480e4896b975aa5260d41a17.process.json",
+        "sha256": "e8a77081b951e89ec76a02d3eefec44e976289fc892fc70a283391be35da5ca4",
+        "evidence": {
+          "exit_code": 0
+        }
+      }
+    ]
+  },
+  {
+    "directory": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c",
+    "files": [
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\contend-ac38d01f0b6347e299daf0b05b0ac626.boot.json",
+        "sha256": "5c238463f75578473c73a3937d6860eda345d5b2573697a2be7e63b825b887ec",
+        "evidence": {
+          "pid": 58840
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\contend-ac38d01f0b6347e299daf0b05b0ac626.json",
+        "sha256": "bd42620d6754e0361ac93151a3755adc9329143f8428965681ce5e482fe5a81e",
+        "evidence": {
+          "event": "blocked",
+          "pid": 58840,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\contend-ac38d01f0b6347e299daf0b05b0ac626.process.json",
+        "sha256": "de788f7d64e972c1374158b96a9221d88079fc1db8d3a196f3c98b94628a369b",
+        "evidence": {
+          "exit_code": 0
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\original.json",
+        "sha256": "fc4d79f68cc888e1b86cf8cd71d8194c1049a8b6516a2cd6b42c9e63d2c3ab09",
+        "evidence": {
+          "mode": "sql_pending",
+          "pid": 13284,
+          "counts": {
+            "model": 2,
+            "tools": 2,
+            "execute": 1,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\recover-f61de9779e1d477aaef096802e38ad75.boot.json",
+        "sha256": "2dac77a61ee46c2ff559b884d53d9c40a2a8270841cedf6cc97449cd1773331b",
+        "evidence": {
+          "pid": 138408
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\recover-f61de9779e1d477aaef096802e38ad75.finished.json",
+        "sha256": "448f4f9b189432b671106731d927f6a2830f7add4d1169e3214babc95a4572b0",
+        "evidence": {
+          "pid": 138408,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          },
+          "closed": true
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\recover-f61de9779e1d477aaef096802e38ad75.json",
+        "sha256": "f686f8c6b9b11acaeaab2fbd1c364227c57b98b2a1cf3df9665b4f90fa39a5ae",
+        "evidence": {
+          "event": "recovered",
+          "pid": 138408,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\recover-f61de9779e1d477aaef096802e38ad75.process.json",
+        "sha256": "c79c889f5e6b3a722dca701dd7d07545a011ce5a7a779d28932fe8d9e1165a33",
+        "evidence": {
+          "exit_code": 0
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\sql_pending-d5052d6535e64145802d73859429911f.boot.json",
+        "sha256": "8aaf446a355813b2192f604641ea9ccb0b6420cb24850b0169da3b68512f6fbf",
+        "evidence": {
+          "pid": 13284
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\sql_pending-d5052d6535e64145802d73859429911f.json",
+        "sha256": "d7d75fed86462dc36a9c2fb94a0ccd9d68c2ad641c80bdaad9b73a609743513e",
+        "evidence": {
+          "event": "pending",
+          "pid": 13284,
+          "counts": {
+            "model": 2,
+            "tools": 2,
+            "execute": 1,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-af2fab5b504e4e16b227a651a9ec0c4c\\sql_pending-d5052d6535e64145802d73859429911f.process.json",
+        "sha256": "4e34ab62b43a266b56654264daf66d95a784f0a627cbc59949dad15c9a0e2618",
+        "evidence": {
+          "exit_code": 73
+        }
+      }
+    ]
+  },
+  {
+    "directory": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a",
+    "files": [
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\normal-147d3b5d8a5f4514833fe88889c478a2.boot.json",
+        "sha256": "1e3133e7989c3dfaff6c0fa520aaf3896340c1fdb5f8b8a3bee427e72c66a58f",
+        "evidence": {
+          "pid": 12260
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\normal-147d3b5d8a5f4514833fe88889c478a2.finished.json",
+        "sha256": "a19e4c8597064426e76c59d39ae8c9cd62babf1875f6e8bcf820171e3c038c3f",
+        "evidence": {
+          "pid": 12260,
+          "counts": {
+            "model": 3,
+            "tools": 2,
+            "execute": 1,
+            "setup": 0
+          },
+          "closed": true
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\normal-147d3b5d8a5f4514833fe88889c478a2.json",
+        "sha256": "7ec726dfa66d03aebb880e19d070f2a3907746f8f32864b1a345ccb8473051b3",
+        "evidence": {
+          "event": "completed",
+          "pid": 12260,
+          "counts": {
+            "model": 3,
+            "tools": 2,
+            "execute": 1,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\normal-147d3b5d8a5f4514833fe88889c478a2.process.json",
+        "sha256": "d61e656ac1568a7a864487d914a78d2f3a7e9ab64cfa0d750f69e5d1107d3a8a",
+        "evidence": {
+          "exit_code": 0
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\original.json",
+        "sha256": "eaa9255d6f4458d28a4d7000fcba9abc8d35a9cc883b51978ea32ee9b15ae6a2",
+        "evidence": {
+          "mode": "normal",
+          "pid": 12260,
+          "counts": {
+            "model": 3,
+            "tools": 2,
+            "execute": 1,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\recover-5aa78ae4752349479560d3e6d5de8a8f.boot.json",
+        "sha256": "daef0ad882e2c22b140c6c02545f03b17e10604b20cb9a3418c711e97c61f6fb",
+        "evidence": {
+          "pid": 118904
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\recover-5aa78ae4752349479560d3e6d5de8a8f.finished.json",
+        "sha256": "4277b66599e415033dc5104c62e8ef95dae7efb0ed5880f30f32ed5694bdd7cc",
+        "evidence": {
+          "pid": 118904,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          },
+          "closed": true
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\recover-5aa78ae4752349479560d3e6d5de8a8f.json",
+        "sha256": "9550db1cf51c4bc85191b5189a25711b764c80add9fc4b34e27791f00d91d63f",
+        "evidence": {
+          "event": "recovered",
+          "pid": 118904,
+          "counts": {
+            "model": 0,
+            "tools": 0,
+            "execute": 0,
+            "setup": 0
+          }
+        }
+      },
+      {
+        "file": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-c1c1a323a67f417aa31f9ac5a54cd74a\\recover-5aa78ae4752349479560d3e6d5de8a8f.process.json",
+        "sha256": "e5bb8351d204e6e8581304f53651a26f796f5aefb7b4711c898d99842ab02bd4",
+        "evidence": {
+          "exit_code": 0
+        }
+      }
+    ]
+  }
+]

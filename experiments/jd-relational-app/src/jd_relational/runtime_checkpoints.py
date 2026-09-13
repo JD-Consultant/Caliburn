@@ -143,9 +143,9 @@ class DocumentCheckpoints:
         if run is not None:
             # A finished graph is not necessarily a settled App run. The AI
             # owner must confirm all writes and persist terminal closure first.
-            from .ai_checkpoints import AiRunRecord
+            from .ai_records import parse_run_record
             try:
-                record = AiRunRecord.model_validate(run, strict=True)
+                record = parse_run_record(run)
                 if record.document_id != document_id:
                     raise ValueError()
             except Exception:

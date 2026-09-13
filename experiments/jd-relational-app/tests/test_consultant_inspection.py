@@ -58,7 +58,7 @@ def pending_fixture(pending):
         state_schema=ConsultantState, interrupt_before=[pending])
     saver = InMemorySaver()
     graph = build_document_graph(child, saver)
-    record, human = new_run_record(*(str(uuid4()) for _ in range(3)), "完整原話\r\n保留")
+    record, human = new_run_record(*(str(uuid4()) for _ in range(3)), "完整原話\r\n保留", start_revision_id=str(uuid4()))
     graph.invoke({"messages": [human], "jd_ai_run": record.model_dump(),
         "jd_ai_bindings": [], "jd_ai_read": None},
         {"configurable": {"thread_id": record.document_id}}, durability="sync")
@@ -100,7 +100,7 @@ def test_inspection_layout_equals_confirmed_provider_factory_without_invoking_pr
 def test_native_invocation_is_disabled_before_business_hooks(entry, asynchronous, monkeypatch):
     if entry == "model":
         graph = build_document_graph(build_inspection_consultant_node(), InMemorySaver())
-        record, human = new_run_record(*(str(uuid4()) for _ in range(3)), "合成不可執行")
+        record, human = new_run_record(*(str(uuid4()) for _ in range(3)), "合成不可執行", start_revision_id=str(uuid4()))
         value = {"messages": [human], "jd_ai_run": record.model_dump(), "jd_ai_bindings": [], "jd_ai_read": None}
         config = {"configurable": {"thread_id": record.document_id}}
     else:

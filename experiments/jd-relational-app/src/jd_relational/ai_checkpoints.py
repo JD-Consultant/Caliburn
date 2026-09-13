@@ -19,8 +19,11 @@ from langchain_core.messages import (
 from langgraph.graph.message import add_messages
 from langgraph.graph import START
 from langgraph.types import StateSnapshot
-from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from .ai_records import (
+    AiRecordError, AiRunRecord, AiRunRecordV1, AiRunRecordV2, build_run_record,
+    parse_run_record, parse_run_record_json, request_digest_for_record,
+)
 from .consultant_context import checked_model_view
 
 
@@ -50,33 +53,12 @@ def _text(value):
     return value
 
 
-def _request_digest(dataset_id, document_id, text):
-    return sha256(_canonical({"dataset_id": dataset_id, "document_id": document_id,
-                              "text": text}).encode("utf-8")).hexdigest()
-
-
-class AiRunRecord(BaseModel):
-    model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
-    format_version: int = Field(ge=1, le=1)
-    dataset_id: str
-    document_id: str
-    run_id: str
-    request_digest: str = Field(pattern="^[0-9a-f]{64}$")
-    status: Literal["running", "completed", "cancelled", "failed"]
-
-    @field_validator("dataset_id", "document_id", "run_id")
-    @classmethod
-    def validate_uuid(cls, value):
-        return _uuid(value)
-
-
 def new_run_record(dataset_id: str, document_id: str, run_id: str,
-                   text: str) -> tuple[AiRunRecord, HumanMessage]:
+                   text: str, *, start_revision_id: str) -> tuple[AiRunRecordV2, HumanMessage]:
     try:
-        _uuid(dataset_id); _uuid(document_id); _uuid(run_id); _text(text)
-        record = AiRunRecord(format_version=1, dataset_id=dataset_id,
-            document_id=document_id, run_id=run_id,
-            request_digest=_request_digest(dataset_id, document_id, text), status="running")
+        _uuid(dataset_id); _uuid(document_id); _uuid(run_id); _uuid(start_revision_id); _text(text)
+        record = build_run_record(dataset_id, document_id, run_id, text,
+                                  start_revision_id=start_revision_id)
         return record, HumanMessage(id=run_id, content=text)
     except Exception:
         raise AiCheckpointError("invalid_input") from None
@@ -132,7 +114,7 @@ def _material(snapshot, document_id, run_id, dataset_id):
     if type(snapshot.values) is not dict:
         raise ValueError()
     values = snapshot.values
-    record = AiRunRecord.model_validate(values.get("jd_ai_run"), strict=True)
+    record = parse_run_record(values.get("jd_ai_run"))
     if record.document_id != document_id or record.dataset_id != dataset_id or record.run_id != run_id:
         raise ValueError()
     if record.status == "running" and values.get("jd_manual_pending") is not None:
@@ -142,7 +124,7 @@ def _material(snapshot, document_id, run_id, dataset_id):
     if len(humans) != 1 or not isinstance(humans[0], HumanMessage):
         raise ValueError()
     text = _text(humans[0].content)
-    if _request_digest(dataset_id, document_id, text) != record.request_digest:
+    if request_digest_for_record(record, text) != record.request_digest:
         raise ValueError()
     bindings = values.get("jd_ai_bindings")
     read = values.get("jd_ai_read")
@@ -167,7 +149,7 @@ class AiRunObservation:
     closed: bool
 
     @property
-    def record(self): return AiRunRecord.model_validate_json(self._record_json, strict=True)
+    def record(self): return parse_run_record_json(self._record_json)
     @property
     def messages(self): return messages_from_dict(json.loads(self._messages_json))
     @property
@@ -185,6 +167,11 @@ class AiRunObservation:
 class AiRunCheckpoints:
     def __init__(self, graph):
         self._graph = graph
+
+    @property
+    def graph(self):
+        """Native graph for fixed history queries; this is not writer authority."""
+        return self._graph
 
     def _get(self, config):
         try:
@@ -217,7 +204,7 @@ class AiRunCheckpoints:
                 or type(payload["jd_ai_bindings"]) is not list or payload["jd_ai_bindings"]
                 or payload["jd_ai_read"] is not None):
             raise ValueError()
-        record = AiRunRecord.model_validate(payload["jd_ai_run"], strict=True)
+        record = parse_run_record(payload["jd_ai_run"])
         # Discovery selects the ID only from this exact saved START payload;
         # root.values may still contain the previous terminal run here.
         if run_id is None:
@@ -231,7 +218,7 @@ class AiRunCheckpoints:
             raise ValueError()
         prior_record = root.values.get("jd_ai_run")
         if prior_record is not None:
-            prior = AiRunRecord.model_validate(prior_record, strict=True)
+            prior = parse_run_record(prior_record)
             if (prior.status == "running" or prior.run_id == run_id
                     or prior.document_id != document_id or prior.dataset_id != dataset_id):
                 raise ValueError()
@@ -260,19 +247,38 @@ class AiRunCheckpoints:
             raise AiCheckpointError("invalid_input") from None
         return self._observe_current(document_id, None, dataset_id)
 
-    def _observe_current(self, document_id, run_id, dataset_id):
+    def observe_at(self, document_id: str, run_id: str, dataset_id: str,
+                   root_config: dict) -> AiRunObservation:
+        """Inspect one exact root and its fixed child; never fall back to latest."""
+        try:
+            _uuid(document_id); _uuid(run_id); _uuid(dataset_id)
+            if type(root_config) is not dict or set(root_config) != {"configurable"}:
+                raise ValueError()
+            scope = root_config["configurable"]
+            if (type(scope) is not dict or set(scope) != {"thread_id", "checkpoint_ns", "checkpoint_id"}
+                    or scope["thread_id"] != document_id or scope["checkpoint_ns"] != ""
+                    or type(scope["checkpoint_id"]) is not str or not scope["checkpoint_id"].strip()
+                    or "\0" in scope["checkpoint_id"]):
+                raise ValueError()
+            fixed = deepcopy(root_config)
+        except Exception:
+            raise AiCheckpointError("invalid_input") from None
+        return self._observe_current(document_id, run_id, dataset_id, root_config=fixed)
+
+    def _observe_current(self, document_id, run_id, dataset_id, *, root_config=None):
         # Shared fixed-root decoder: discover never calls observe with a second
         # latest read, which could select a different run during publication.
-        latest = self._get({"configurable": {"thread_id": document_id}})
         try:
-            if not isinstance(latest, StateSnapshot) or type(latest.values) is not dict:
-                raise ValueError()
-            # An absent initial checkpoint is not evidence of admission.
-            root_config = _config(latest, document_id, "", empty=True)
             if root_config is None:
-                if run_id is None:
-                    return None
-                raise AiCheckpointError("run_not_found")
+                latest = self._get({"configurable": {"thread_id": document_id}})
+                if not isinstance(latest, StateSnapshot) or type(latest.values) is not dict:
+                    raise ValueError()
+                # An absent initial checkpoint is not evidence of admission.
+                root_config = _config(latest, document_id, "", empty=True)
+                if root_config is None:
+                    if run_id is None:
+                        return None
+                    raise AiCheckpointError("run_not_found")
             root = self._get(root_config)
             if _config(root, document_id, "") != root_config:
                 raise ValueError()
@@ -297,7 +303,7 @@ class AiRunCheckpoints:
                 if run_id is None:
                     return None
                 raise AiCheckpointError("run_not_found")
-            root_record = AiRunRecord.model_validate(raw_record, strict=True)
+            root_record = parse_run_record(raw_record)
             if root_record.document_id != document_id or root_record.dataset_id != dataset_id:
                 raise ValueError()
             if run_id is None:

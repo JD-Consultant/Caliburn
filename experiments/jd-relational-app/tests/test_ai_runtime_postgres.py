@@ -201,7 +201,8 @@ def test_real_owner_ai_manual_ai_journey_preserves_body_and_native_conversation(
             monkeypatch.setattr(owner.storage, "execute", require_persisted_binding)
             first_run, second_run = str(uuid4()), str(uuid4())
             first_text = "原話\n  我收到通知後檢查設備，先確認隔離，留檢查記錄並交接異常。"
-            first_handle = runtime.start(document, first_run, first_text)
+            first_base = owner.storage.read_current(document).revision_id
+            first_handle = runtime.start(document, first_run, first_text, expected_revision_id=first_base)
             first = first_handle.wait(15)
             assert first.status == "completed" and first.input_saved and first.response_message_id, (len(requests), _failure(first_handle))
             first_current = owner.storage.read_current(document)
@@ -220,7 +221,8 @@ def test_real_owner_ai_manual_ai_journey_preserves_body_and_native_conversation(
             manual = _manual_description(runtime, document)
             assert _state(graph, document).values["messages"] == original_messages
             second_text = "依我手動更正的範圍，把任務名稱也寫清楚。"
-            second = runtime.start(document, second_run, second_text).wait(15)
+            second_base = owner.storage.read_current(document).revision_id
+            second = runtime.start(document, second_run, second_text, expected_revision_id=second_base).wait(15)
             assert second.status == "completed" and second.response_message_id
             current = owner.storage.read_current(document)
             task = next(iter(current.domain["tasks"].values()))
@@ -245,7 +247,12 @@ def test_real_owner_ai_manual_ai_journey_preserves_body_and_native_conversation(
             assert len(requests) == 6 and owner.checkpoints.read(document) is None
             assert len(saved_before_sql) == 2 and len(set(saved_before_sql)) == 2
             # Same request identity returns the original local run; no new model request.
-            assert runtime.start(document, second_run, second_text).wait(1) == second
+            assert runtime.start(document, second_run, second_text, expected_revision_id=second_base).wait(1) == second
+            # A later run replaced the local slot: lookup A through native
+            # history and its true SQL receipts, without requiring today's head.
+            assert runtime.lookup(document, first_run).wait(0) == first_handle.wait(0)
+            assert runtime.start(document, first_run, first_text,
+                expected_revision_id=first_base).wait(0) == first_handle.wait(0)
             assert len(requests) == 6
 
 
@@ -270,7 +277,7 @@ def test_real_ai_sql_commit_ack_loss_reads_original_receipt_without_next_model(m
                     return original_execute(intent)
 
             monkeypatch.setattr(owner.storage, "execute", execute)
-            handle = runtime.start(document, run_id, "合成原話：建立設備檢查工作。")
+            handle = runtime.start(document, run_id, "合成原話：建立設備檢查工作。", expected_revision_id=runtime.owner.storage.read_current(document).revision_id)
             result = handle.wait(15)
             assert result.status == "failed" and result.input_saved and result.response_message_id is None
             assert executions and lost and len(requests) == 2, (len(requests), _failure(handle))
@@ -300,7 +307,7 @@ def test_real_pure_interview_has_no_revision_and_reopened_saver_only_reads(monke
             document = owner.create_document(uuid4(), "合成純訪談不強迫改稿")
             run_id, text = str(uuid4()), "先問我這項工作的範圍，現在還不用改 JD。"
             original = owner.storage.read_current(document)
-            result = runtime.start(document, run_id, text).wait(15)
+            result = runtime.start(document, run_id, text, expected_revision_id=runtime.owner.storage.read_current(document).revision_id).wait(15)
             assert result.status == "completed" and result.input_saved
             assert counts(engine, document) == (1, 0)
             assert owner.storage.read_current(document) == original
@@ -329,7 +336,7 @@ def test_cancel_waits_for_actual_stream_future_before_closing_pg_run(monkeypatch
     with _offline_model(monkeypatch, [_final], body_factory=BlockedBody) as (model, requests):
         with _runtime(engine, model) as (runtime, owner, graph):
             document = owner.create_document(uuid4(), "合成取消等待真串流停止")
-            handle = runtime.start(document, str(uuid4()), "合成原话，尚未完成回覆。")
+            handle = runtime.start(document, str(uuid4()), "合成原话，尚未完成回覆。", expected_revision_id=runtime.owner.storage.read_current(document).revision_id)
             try:
                 assert entered.wait(5)
                 handle.request_stop()

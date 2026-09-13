@@ -12,11 +12,12 @@ from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.types import interrupt
 
 from jd_relational.ai_checkpoints import (
-    AiCheckpointError, AiRunCheckpoints, AiRunRecord, new_run_record,
+    AiCheckpointError, AiRunCheckpoints, AiRunRecordV2, new_run_record, parse_run_record,
 )
 
 
 DATASET, DOCUMENT, RUN = (str(uuid4()) for _ in range(3))
+REVISION = str(uuid4())
 TEXT = "原話\r\n  每月處理異常。"
 
 
@@ -31,7 +32,16 @@ def config():
     return {"configurable": {"thread_id": DOCUMENT}}
 
 
-def native(*, paused=False, malformed_view=False, saver=None, root_failure=None):
+def legacy_run(dataset, document, run, text):
+    # Original format is constructed explicitly, never through the V2 builder.
+    canonical = json.dumps({"dataset_id": dataset, "document_id": document, "text": text},
+                           ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    value = {"format_version": 1, "dataset_id": dataset, "document_id": document,
+        "run_id": run, "status": "running", "request_digest": sha256(canonical.encode()).hexdigest()}
+    return parse_run_record(value), HumanMessage(id=run, content=text)
+
+
+def native(*, paused=False, malformed_view=False, saver=None, root_failure=None, record_format=2):
     calls = []
 
     def model(state):
@@ -84,7 +94,8 @@ def native(*, paused=False, malformed_view=False, saver=None, root_failure=None)
             return result
 
         saver.put = fail_root
-    record, human = new_run_record(DATASET, DOCUMENT, RUN, TEXT)
+    record, human = (legacy_run(DATASET, DOCUMENT, RUN, TEXT) if record_format == 1 else
+                    new_run_record(DATASET, DOCUMENT, RUN, TEXT, start_revision_id=REVISION))
     values = {"jd_ai_run": record.model_dump(mode="json"), "messages": [human],
         "jd_ai_bindings": [], "jd_ai_read": None}
     if root_failure:
@@ -128,30 +139,32 @@ def close(adapter, observed, *, status="completed", **changes):
 
 
 def test_new_run_keeps_exact_human_and_canonical_digest():
-    record, human = new_run_record(DATASET, DOCUMENT, RUN, TEXT)
-    assert isinstance(record, AiRunRecord)
+    record, human = new_run_record(DATASET, DOCUMENT, RUN, TEXT, start_revision_id=REVISION)
+    assert isinstance(record, AiRunRecordV2)
     assert human.id == RUN and human.content == TEXT
-    canonical = json.dumps({"dataset_id": DATASET, "document_id": DOCUMENT, "text": TEXT},
+    canonical = json.dumps({"format_version": 2, "dataset_id": DATASET, "document_id": DOCUMENT,
+                           "text": TEXT, "start_revision_id": REVISION},
         ensure_ascii=False, sort_keys=True, separators=(",", ":"))
     assert record.request_digest == sha256(canonical.encode()).hexdigest()
     assert record.status == "running"
-    assert new_run_record(DATASET, DOCUMENT, str(uuid4()), TEXT)[0].request_digest == record.request_digest
+    assert new_run_record(DATASET, DOCUMENT, str(uuid4()), TEXT,
+                          start_revision_id=REVISION)[0].request_digest == record.request_digest
 
 
 @pytest.mark.parametrize("text", ["", " \n", "x\0y", "\ud800", "文" * 50000, None],
     ids=["empty", "blank", "nul", "surrogate", "oversized", "none"])
 def test_bad_human_input_rejected(text):
     with pytest.raises(AiCheckpointError, match="^invalid_input$"):
-        new_run_record(DATASET, DOCUMENT, RUN, text)
+        new_run_record(DATASET, DOCUMENT, RUN, text, start_revision_id=REVISION)
 
 
 @pytest.mark.parametrize("field,value", [("format_version", True), ("status", "unknown"),
     ("dataset_id", "not-uuid"), ("request_digest", "0" * 63), ("extra", "x")])
 def test_record_is_strict(field, value):
-    data = new_run_record(DATASET, DOCUMENT, RUN, TEXT)[0].model_dump()
+    data = new_run_record(DATASET, DOCUMENT, RUN, TEXT, start_revision_id=REVISION)[0].model_dump()
     data[field] = value
     with pytest.raises(ValueError):
-        AiRunRecord.model_validate(data)
+        parse_run_record(data)
 
 
 def test_observe_complete_root_and_explicit_close_keep_original_messages():
@@ -269,7 +282,7 @@ def test_previous_run_model_view_remains_valid_without_new_model_reply():
     graph, _ = native()
     old = observe(AiRunCheckpoints(graph))
     new_run = str(uuid4())
-    record, human = new_run_record(DATASET, DOCUMENT, new_run, "新的原話，尚未回覆")
+    record, human = new_run_record(DATASET, DOCUMENT, new_run, "新的原話，尚未回覆", start_revision_id=REVISION)
     graph.update_state(config(), {"jd_ai_run": record.model_dump(mode="json"),
         "messages": [human], "jd_ai_bindings": [], "jd_ai_read": None}, as_node="consultant")
     adapter = AiRunCheckpoints(graph)
@@ -299,7 +312,7 @@ def test_child_initial_checkpoint_failure_observes_only_fixed_root():
     root.add_edge(START, "consultant")
     root.add_edge("consultant", END)
     graph = root.compile(checkpointer=saver)
-    record, human = new_run_record(DATASET, DOCUMENT, RUN, TEXT)
+    record, human = new_run_record(DATASET, DOCUMENT, RUN, TEXT, start_revision_id=REVISION)
     with pytest.raises(OSError):
         graph.invoke({"jd_ai_run": record.model_dump(mode="json"), "messages": [human],
             "jd_ai_bindings": [], "jd_ai_read": None}, config(), durability="sync")
@@ -367,9 +380,9 @@ def test_fixed_root_does_not_mistake_pending_writes_for_closed_checkpoint(failur
     assert calls == ["model"] and len(wrapped.updates) == 1
 
 
-def initial_input_failure(*, prior=False):
+def initial_input_failure(*, prior=False, record_format=2, prior_format=2):
     if prior:
-        graph, calls = native()
+        graph, calls = native(record_format=prior_format)
         close(AiRunCheckpoints(graph), observe(AiRunCheckpoints(graph)))
     else:
         calls = []
@@ -384,7 +397,8 @@ def initial_input_failure(*, prior=False):
         root.add_edge(START, "consultant"); root.add_edge("consultant", END)
         graph = root.compile(checkpointer=InMemorySaver())
     before = graph.get_state(config(), subgraphs=True)
-    record, human = new_run_record(DATASET, DOCUMENT, str(uuid4()), "新回合原話\r\n完整保留")
+    record, human = (legacy_run(DATASET, DOCUMENT, str(uuid4()), "新回合原話\r\n完整保留") if record_format == 1 else
+        new_run_record(DATASET, DOCUMENT, str(uuid4()), "新回合原話\r\n完整保留", start_revision_id=REVISION))
     original_put = graph.checkpointer.put
     def fail_loop(config, checkpoint, metadata, new_versions):
         if not config["configurable"].get("checkpoint_ns") and metadata["source"] == "loop":
@@ -447,3 +461,121 @@ def test_native_start_payload_must_match_exact_original_input(fault):
         def checkpointer(self): return BadSaver()
     with pytest.raises(AiCheckpointError, match="^invalid_checkpoint$"):
         AiRunCheckpoints(BadInput(graph)).observe(DOCUMENT, record.run_id, DATASET)
+
+
+@pytest.mark.parametrize("paused", [False, True])
+def test_legacy_root_and_child_close_without_rewriting_record_version(paused):
+    graph, calls = native(paused=paused, record_format=1)
+    adapter = AiRunCheckpoints(graph)
+    seen = observe(adapter)
+    original = seen.record.model_dump(mode="json")
+    assert original["format_version"] == 1 and "start_revision_id" not in original
+    assert seen.record == legacy_run(DATASET, DOCUMENT, RUN, TEXT)[0]
+    result = close(adapter, seen, status="failed")
+    assert result.record.model_dump(mode="json") == {**original, "status": "failed"}
+    assert result.messages == seen.messages and result.bindings == seen.bindings
+    assert result.model_view == seen.model_view and result.read_binding == seen.read_binding
+    assert calls == ["model"]
+
+
+@pytest.mark.parametrize("prior,prior_format,record_format", [
+    (False, 1, 1), (True, 1, 1), (True, 1, 2), (True, 2, 2),
+])
+def test_saved_start_preserves_actual_format_and_mixed_prior_history(prior, prior_format, record_format):
+    graph, calls, record, human, previous = initial_input_failure(
+        prior=prior, prior_format=prior_format, record_format=record_format)
+    adapter = AiRunCheckpoints(graph)
+    seen = adapter.observe(DOCUMENT, record.run_id, DATASET)
+    assert seen.record.format_version == record_format and seen.messages[-1] == human
+    if prior:
+        assert previous.values["jd_ai_run"]["format_version"] == prior_format
+        assert seen.messages[:-1] == previous.values["messages"]
+    exact = adapter.observe_at(DOCUMENT, record.run_id, DATASET, seen.root_config)
+    assert exact == seen
+    closed = close(adapter, exact, status="failed")
+    assert closed.record.model_dump(mode="json") == {**record.model_dump(mode="json"), "status": "failed"}
+    assert closed.messages == seen.messages and len(calls) == int(prior)
+
+
+def test_observe_at_keeps_original_root_after_a_new_start_exists():
+    graph, _, new_record, _, previous = initial_input_failure(prior=True, prior_format=1)
+    class FixedOnly(Wrapper):
+        def __init__(self, graph): super().__init__(graph); self.locations = []
+        def get_state(self, config, **kwargs):
+            assert config["configurable"].get("checkpoint_id"), "Do not silently select latest."
+            self.locations.append(deepcopy(config))
+            return super().get_state(config, **kwargs)
+    wrapped = FixedOnly(graph)
+    adapter = AiRunCheckpoints(wrapped)
+    assert adapter.graph is wrapped
+    root = {"configurable": {key: previous.config["configurable"][key]
+                             for key in ("thread_id", "checkpoint_ns", "checkpoint_id")}}
+    old = adapter.observe_at(DOCUMENT, RUN, DATASET, root)
+    assert old.record.run_id == RUN and old.record.format_version == 1 and old.closed
+    assert old.messages == previous.values["messages"]
+    assert all(m.id != new_record.run_id for m in old.messages)
+    assert len(wrapped.locations) == 1
+    with pytest.raises(AiCheckpointError, match="^run_not_found$"):
+        adapter.observe_at(DOCUMENT, new_record.run_id, DATASET, root)
+
+
+@pytest.mark.parametrize("change", ["missing", "latest", "document", "child", "blank", "nul", "type", "extra"])
+def test_observe_at_requires_a_fixed_same_document_root_before_io(change):
+    class NeverRead:
+        def get_state(self, *_args, **_kwargs):
+            raise AssertionError("invalid_input_must_not_touch_saver")
+    root = {"configurable": {"thread_id": DOCUMENT, "checkpoint_ns": "", "checkpoint_id": "known-checkpoint"}}
+    if change == "missing": root = None
+    elif change == "latest": del root["configurable"]["checkpoint_id"]
+    elif change == "document": root["configurable"]["thread_id"] = str(uuid4())
+    elif change == "child": root["configurable"]["checkpoint_ns"] = "consultant:some-task"
+    elif change == "blank": root["configurable"]["checkpoint_id"] = " "
+    elif change == "nul": root["configurable"]["checkpoint_id"] = "bad\0id"
+    elif change == "type": root["configurable"]["checkpoint_id"] = 1
+    elif change == "extra": root["unexpected"] = True
+    with pytest.raises(AiCheckpointError, match="^invalid_input$"):
+        AiRunCheckpoints(NeverRead()).observe_at(DOCUMENT, RUN, DATASET, root)
+
+
+@pytest.mark.parametrize("fault", ["revision", "version"])
+def test_v2_saved_request_digest_cannot_be_reinterpreted_as_another_request(fault):
+    graph, _ = native(paused=True)
+    class Changed(Wrapper):
+        def get_state(self, config, **kwargs):
+            state = super().get_state(config, **kwargs)
+            if state.values.get("jd_ai_run") is not None:
+                values = deepcopy(state.values)
+                if fault == "revision": values["jd_ai_run"]["start_revision_id"] = str(uuid4())
+                else:
+                    values["jd_ai_run"]["format_version"] = 1
+                    del values["jd_ai_run"]["start_revision_id"]
+                state = state._replace(values=values)
+            return state
+    with pytest.raises(AiCheckpointError, match="^invalid_checkpoint$"):
+        observe(AiRunCheckpoints(Changed(graph)))
+
+
+@pytest.mark.parametrize("version", [1, 2])
+def test_manual_gate_reads_both_record_formats_and_keeps_busy_until_closed(version):
+    from jd_relational.runtime_checkpoints import CheckpointError, DocumentCheckpoints
+    graph, _ = native(record_format=version)
+    manual = DocumentCheckpoints(graph)
+    with pytest.raises(CheckpointError, match="^document_busy$"):
+        manual.read(DOCUMENT)
+    close(AiRunCheckpoints(graph), observe(AiRunCheckpoints(graph)), status="failed")
+    assert manual.read(DOCUMENT) is None
+
+
+@pytest.mark.parametrize("tag", [True, 1.0, 2.0])
+def test_manual_gate_never_accepts_coerced_record_version(tag):
+    from jd_relational.runtime_checkpoints import CheckpointError, DocumentCheckpoints
+    graph, _ = native()
+    close(AiRunCheckpoints(graph), observe(AiRunCheckpoints(graph)), status="failed")
+    class Invalid(Wrapper):
+        def get_state(self, config, **kwargs):
+            state = super().get_state(config, **kwargs)
+            values = deepcopy(state.values)
+            values["jd_ai_run"]["format_version"] = tag
+            return state._replace(values=values)
+    with pytest.raises(CheckpointError, match="^invalid_checkpoint$"):
+        DocumentCheckpoints(Invalid(graph)).read(DOCUMENT)

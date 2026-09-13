@@ -10,7 +10,7 @@ from dataclasses import dataclass, field
 from copy import deepcopy
 import json
 from threading import Event, Lock
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
@@ -18,6 +18,7 @@ from langgraph.types import StateSnapshot
 from langsmith import tracing_context
 
 from .ai_checkpoints import AiCheckpointError, AiRunCheckpoints, new_run_record
+from .ai_history import AiRunHistory
 from .change_reads import ChangeReadService
 from .consultant_context import ConsultantContext, checked_model_view
 from .consultant_tools import AiToolSession, decode_ai_bindings, verify_binding_message
@@ -145,16 +146,35 @@ def _not_executed():
         "next_action": "stop"})
 
 
-def _verify_saved_results(messages, bindings, receipts, codec):
+def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None):
     """A stored tool success is evidence only when its original SQL receipt agrees."""
+    if run_id is not None:
+        positions = [i for i, m in enumerate(messages) if isinstance(m, HumanMessage) and m.id == run_id]
+        if len(positions) != 1 or any(isinstance(m, HumanMessage) for m in messages[positions[0] + 1:]):
+            raise AiRuntimeError("invalid_saved_conversation")
+        messages = messages[positions[0] + 1:]
     by_call = {(b.message_id, b.tool_call_id): b for b in bindings}
     active = {}
     for message in messages:
         if isinstance(message, AIMessage):
-            active = {call["id"]: by_call.get((message.id, call["id"])) for call in message.tool_calls}
+            active = {call["id"]: (call["name"], by_call.get((message.id, call["id"]))) for call in message.tool_calls}
         elif isinstance(message, ToolMessage):
-            binding = active.get(message.tool_call_id)
+            call = active.get(message.tool_call_id)
+            if call is None:
+                raise AiRuntimeError("invalid_saved_tool_result")
+            name, binding = call
             if binding is None:
+                # Read tools never bind writes. An unbound mutation is legal
+                # only as a validated pre-execution error, never a saved write.
+                if name not in {"jd_read", "jd_change_read"}:
+                    try:
+                        value = validate_result(json.loads(message.content))
+                        if (message.status != "error" or message.name != name
+                                or value["operation_ref"] is not None or value["effect"] != "unchanged"
+                                or value["receipt_durability"] != "unconfirmed" or value["error"] is None):
+                            raise ValueError()
+                    except Exception:
+                        raise AiRuntimeError("invalid_saved_tool_result") from None
                 continue
             expected = project_observation(receipts[binding.identity.operation_id], codec)
             expected_status = "success" if expected["status"] in {"committed", "no_change"} else "error"
@@ -175,6 +195,7 @@ class AiRuntime:
         self.owner, self.codec = owner, codec
         self.graph = owner.checkpoints.graph
         self.checkpoints = AiRunCheckpoints(self.graph)
+        self.run_history = AiRunHistory(self.checkpoints)
         self.history = HistoryReader(owner.storage.engine)
         self.notices = NoticeHistoryReader(owner.storage.engine)
         self.reads = ReadService(owner.storage, self.history, codec)
@@ -215,7 +236,7 @@ class AiRuntime:
                 bindings, receipts, missing = self._binding_receipts(observed, include_active=False)
                 if not observed.closed or missing or _pending_calls(observed.messages):
                     raise AiRuntimeError("run_recovery_required")
-                _verify_saved_results(observed.messages, bindings, receipts, self.codec)
+                _verify_saved_results(observed.messages, bindings, receipts, self.codec, run_id=record.run_id)
                 return 0
             else:
                 identity = ForegroundIdentity(document_id, record.run_id, record.request_digest)
@@ -246,8 +267,11 @@ class AiRuntime:
         except Exception:
             raise AiRuntimeError("run_recovery_required") from None
 
-    def start(self, document_id: str, run_id: str, text: str) -> AiRunHandle:
-        record, human = new_run_record(self.codec.dataset_id, document_id, run_id, text)
+    def start(self, document_id: str, run_id: str, text: str, *, expected_revision_id: UUID) -> AiRunHandle:
+        if not isinstance(expected_revision_id, UUID):
+            raise AiRuntimeError("invalid_input")
+        record, human = new_run_record(self.codec.dataset_id, document_id, run_id, text,
+                                      start_revision_id=str(expected_revision_id))
         with self._registry:
             start_lock = self._starts.setdefault(document_id, Lock())
         # Serialize handle publication only for this document. The owner remains
@@ -263,34 +287,24 @@ class AiRuntime:
     def _start(self, record, human):
         document_id, run_id = record.document_id, record.run_id
         identity = ForegroundIdentity(document_id, run_id, record.request_digest)
-        with self._registry:
-            cached = self._latest.get(document_id)
-            if cached is not None and cached._attempt.record.run_id == run_id:
-                if cached._attempt.record.request_digest != record.request_digest:
-                    raise AiRuntimeError("operation_conflict")
-                return cached
-        # Original prompts are durable IDs. An old request must never become a
-        # fresh model invocation just because another run replaced the live slot.
         def inspect_original():
-            current = self.graph.get_state({"configurable": {"thread_id": document_id}}, subgraphs=True)
-            if any(isinstance(m, HumanMessage) and m.id == run_id for m in current.values.get("messages", [])):
-                return self.checkpoints.observe(document_id, run_id, self.codec.dataset_id)
-            return None
-        try:
-            original = self.owner.inspect_foreground_start(document_id, inspect_original)
-        except AiCheckpointError as error:
-            if error.code == "run_not_found":
-                raise AiRuntimeError("original_run_lookup_required") from None
-            raise
-        if original is not None:
-            if original.record.request_digest != record.request_digest:
+            original = self._lookup(document_id, run_id)
+            if original is None:
+                return None
+            prior = original._attempt.record
+            # A legacy request has no confirmed start revision. Read it through
+            # lookup, never infer a base and pretend it passed the new contract.
+            if prior.format_version != record.format_version:
+                raise AiRuntimeError("original_run_lookup_required")
+            if prior.request_digest != record.request_digest:
                 raise AiRuntimeError("operation_conflict")
-            if original.record.status == "running":
-                raise AiRuntimeError("run_recovery_required")
-            attempt = _Attempt(record, human, result=self._result(original))
-            return AiRunHandle(self, attempt)
+            return original
         attempt = _Attempt(record, human)
-        attempt.handle = self.owner.start_foreground(identity, lambda permit: self._run(attempt, permit))
+        admission = self.owner.admit_foreground(identity, lambda permit: self._run(attempt, permit),
+            expected_revision=UUID(record.start_revision_id), lookup_original=inspect_original)
+        if admission.original is not None:
+            return admission.original
+        attempt.handle = admission.handle
         result = AiRunHandle(self, attempt)
         with self._registry:
             existing = self._latest.get(document_id)
@@ -299,6 +313,38 @@ class AiRuntime:
             self._latest[document_id] = result
         attempt.handle.add_done_callback(lambda _: self._finish_automatically(attempt))
         return result
+
+    def lookup(self, document_id: str, run_id: str) -> AiRunHandle | None:
+        """Inspect the original request; no model invocation or implicit repair."""
+        try:
+            if type(run_id) is not str or str(UUID(run_id)) != run_id:
+                raise ValueError()
+        except (TypeError, ValueError):
+            raise AiRuntimeError("invalid_input") from None
+        try:
+            return self.owner.inspect_document(document_id, lambda: self._lookup(document_id, run_id))
+        except (AiRuntimeError, RuntimeFailure, AiCheckpointError):
+            raise
+        except Exception:
+            raise AiRuntimeError("checkpoint_unavailable") from None
+
+    def _lookup(self, document_id, run_id):
+        # The owner tracks these reads or holds new-admission reservation.
+        with self._registry:
+            cached = self._latest.get(document_id)
+        if cached is not None and cached._attempt.record.run_id == run_id:
+            return cached
+        original = self.run_history.find(document_id, run_id, self.codec.dataset_id)
+        if original is None:
+            return None
+        if original.record.status == "running":
+            raise AiRuntimeError("run_recovery_required")
+        bindings, receipts, missing = self._binding_receipts(original, include_active=False)
+        if not original.closed or missing or _pending_calls(original.messages):
+            raise AiRuntimeError("run_recovery_required")
+        _verify_saved_results(original.messages, bindings, receipts, self.codec, run_id=run_id)
+        human = next(m for m in original.messages if isinstance(m, HumanMessage) and m.id == run_id)
+        return AiRunHandle(self, _Attempt(original.record, human, result=self._result(original)))
 
     def _finish_automatically(self, attempt):
         # Completion is App work, independent of an HTTP observer staying open.
@@ -317,6 +363,8 @@ class AiRuntime:
         current = self.owner.storage.read_current(record.document_id)
         if current.archived:
             raise AiRuntimeError("document_archived")
+        if str(current.revision_id) != record.start_revision_id:
+            raise AiRuntimeError("stale_view")
         config = {"configurable": {"thread_id": record.document_id},
             "callbacks": [_StopOnToken(permit.stop_event, attempt.tool_started)], "max_concurrency": 1,
             "recursion_limit": 96}
@@ -326,6 +374,8 @@ class AiRuntime:
         previous = checked_model_view(before.values.get("jd_model_view"),
             dataset_id=record.dataset_id, document_id=record.document_id)
         notice = self.notices.read(record.document_id, previous.boundary if previous else None)
+        if str(notice.head.revision_id) != record.start_revision_id:
+            raise AiRuntimeError("stale_view")
         session = AiToolSession(self.owner, permit, self.history, self.reads, self.changes,
             self.codec, source_resolver=self.source_resolver)
         context = ConsultantContext(record.dataset_id, record.document_id, record.run_id,
@@ -431,7 +481,7 @@ class AiRuntime:
             messages = list(observed.messages)
             pending = _pending_calls(messages)
             by_call = {(b.message_id, b.tool_call_id): b for b in bindings}
-            _verify_saved_results(messages, bindings, receipts, self.codec)
+            _verify_saved_results(messages, bindings, receipts, self.codec, run_id=record.run_id)
             for key, call in pending.items():
                 binding = by_call.get(key)
                 if binding is not None:

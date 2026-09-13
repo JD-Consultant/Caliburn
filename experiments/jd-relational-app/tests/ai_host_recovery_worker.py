@@ -214,7 +214,7 @@ def main(mode, manifest, report):
             if mode == "two_boundaries":
                 second = host.runtime.create_document(uuid4(), "合成 START 保留先前問答")
                 documents.append(second)
-                previous = runtime.start(second, str(uuid4()), "先前已完成原話；不得刪除。\r\n  保留空白😀")
+                previous = runtime.start(second, str(uuid4()), "先前已完成原話；不得刪除。\r\n  保留空白😀", expected_revision_id=runtime.owner.storage.read_current(second).revision_id)
                 assert previous.wait(20).status == "completed"
                 witness["previous_second"] = state(host, second)["ai"]
                 original_put = host.graph.checkpointer.put
@@ -234,7 +234,7 @@ def main(mode, manifest, report):
                         assert release.wait(90), "owned_binding_barrier_expired"
                     return result
                 monkeypatch.setattr(host.graph.checkpointer, "put", pause_checkpoint)
-            handles.append(runtime.start(document, str(uuid4()), "收到通知檢查約定設備，留下記錄並交接異常；不修理外包設備。"))
+            handles.append(runtime.start(document, str(uuid4()), "收到通知檢查約定設備，留下記錄並交接異常；不修理外包設備。", expected_revision_id=runtime.owner.storage.read_current(document).revision_id))
             if mode == "normal":
                 assert handles[0].wait(25).status == "completed"
                 archived = host.runtime.create_document(uuid4(), "合成封存空稿")
@@ -243,7 +243,7 @@ def main(mode, manifest, report):
             else:
                 assert entered.wait(25), "requested_fault_boundary_not_reached"
                 if mode == "two_boundaries":
-                    handles.append(runtime.start(second, str(uuid4()), "新回合尚未進模型的完整原話。\r\n原樣保留😀"))
+                    handles.append(runtime.start(second, str(uuid4()), "新回合尚未進模型的完整原話。\r\n原樣保留😀", expected_revision_id=runtime.owner.storage.read_current(second).revision_id))
                     assert start_entered.wait(15), "native_start_boundary_not_reached"
                     latest = host.graph.get_state({"configurable": {"thread_id": second}}, subgraphs=True)
                     saved = host.graph.checkpointer.get_tuple(latest.config)

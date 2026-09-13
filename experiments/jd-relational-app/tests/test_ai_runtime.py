@@ -11,7 +11,7 @@ import json
 from threading import Event
 from time import monotonic, sleep
 from types import SimpleNamespace
-from uuid import uuid4
+from uuid import UUID, uuid4
 
 import pytest
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
@@ -29,8 +29,17 @@ from test_foreground_runtime import ForegroundStorage, ai_intent, run_identity
 from test_manual_runtime import observation
 
 
+HEAD = UUID("5d0edc37-c9d9-40c9-a4f1-70b79f5b1cd2")
+
+
 class SyntheticStorage(ForegroundStorage):
     engine = SimpleNamespace(dialect=SimpleNamespace(name="postgresql", driver="psycopg"))
+    revision_id = HEAD
+    archived = False
+
+    def read_current(self, document_id):
+        return SimpleNamespace(document_id=document_id, revision_id=self.revision_id,
+                               archived=self.archived)
 
 
 class SyntheticRuntime(AiRuntime):
@@ -83,12 +92,12 @@ def test_pure_interview_closes_native_root_and_original_request_never_replays(ma
     make, _ = make_runtime
     runtime, graph, calls = make()
     document, run = str(uuid4()), str(uuid4())
-    handle = runtime.start(document, run, "原始問答\r\n  保留空白。")
+    handle = runtime.start(document, run, "原始問答\r\n  保留空白。", expected_revision_id=HEAD)
     result = handle.wait(5)
     assert result.status == "completed" and result.input_saved and result.response_message_id
-    assert runtime.start(document, run, "原始問答\r\n  保留空白。") is handle
+    assert runtime.start(document, run, "原始問答\r\n  保留空白。", expected_revision_id=HEAD) is handle
     with pytest.raises(AiRuntimeError, match="^operation_conflict$"):
-        runtime.start(document, run, "不能更換同一請求的原話")
+        runtime.start(document, run, "不能更換同一請求的原話", expected_revision_id=HEAD)
     assert calls == [run] and not runtime.owner.storage.executed
     assert not runtime.owner.status(document).write_blocked
     state = graph.get_state({"configurable": {"thread_id": document}})
@@ -98,7 +107,7 @@ def test_pure_interview_closes_native_root_and_original_request_never_replays(ma
     reopened_owner = ManualRuntime(DocumentCheckpoints(graph), SyntheticStorage)
     try:
         reopened = SyntheticRuntime(reopened_owner, runtime.codec)
-        original = reopened.start(document, run, "原始問答\r\n  保留空白。")
+        original = reopened.start(document, run, "原始問答\r\n  保留空白。", expected_revision_id=HEAD)
         assert original.wait() == original.recover() == result
     finally:
         assert reopened_owner.close(timeout=1)
@@ -133,8 +142,8 @@ def test_failed_new_turn_never_reports_the_previous_turn_response(make_runtime):
         return {"messages": [AIMessage(id="previous-reply", content="第一轮回覆")]}
     runtime, graph, calls = make(node)
     document = str(uuid4())
-    assert runtime.start(document, str(uuid4()), "第一轮").wait(5).response_message_id == "previous-reply"
-    failed = runtime.start(document, str(uuid4()), "第二轮").wait(5)
+    assert runtime.start(document, str(uuid4()), "第一轮", expected_revision_id=HEAD).wait(5).response_message_id == "previous-reply"
+    failed = runtime.start(document, str(uuid4()), "第二轮", expected_revision_id=HEAD).wait(5)
     assert failed.status == "failed" and failed.input_saved and failed.response_message_id is None
     assert len(calls) == 2 and not runtime.owner.status(document).write_blocked
     assert [m.content for m in graph.get_state({"configurable": {"thread_id": document}}).values["messages"]
@@ -157,10 +166,10 @@ def test_concurrent_same_request_returns_the_same_attempt_and_other_document_pro
         return original(config, **kwargs)
     graph.get_state = delayed
     with ThreadPoolExecutor(max_workers=3) as pool:
-        first_start = pool.submit(runtime.start, document, run, "同一原話")
+        first_start = pool.submit(runtime.start, document, run, "同一原話", expected_revision_id=HEAD)
         assert entered.wait(2)
-        repeated = pool.submit(runtime.start, document, run, "同一原話")
-        other = runtime.start(str(uuid4()), str(uuid4()), "另一份可繼續")
+        repeated = pool.submit(runtime.start, document, run, "同一原話", expected_revision_id=HEAD)
+        other = runtime.start(str(uuid4()), str(uuid4()), "另一份可繼續", expected_revision_id=HEAD)
         assert other.wait(5).status == "completed"
         release.set()
         first_handle, repeated_handle = first_start.result(5), repeated.result(5)
@@ -179,7 +188,7 @@ def test_stop_waits_for_actual_run_and_preserves_original_messages(make_runtime)
         return {"messages": [AIMessage(id="actually-saved-reply", content="保存的實際結果")]}
     runtime, graph, calls = make(blocked)
     document, run = str(uuid4()), str(uuid4())
-    handle = runtime.start(document, run, "取消不能抹掉原始問答")
+    handle = runtime.start(document, run, "取消不能抹掉原始問答", expected_revision_id=HEAD)
     assert entered.wait(2)
     handle.request_stop()
     with pytest.raises(TimeoutError):
@@ -202,7 +211,7 @@ def test_unanswered_read_is_closed_with_error_without_reinvoking_the_model(make_
             {"id": "read-call", "name": "jd_read", "args": {"view": "current", "target_ref": None, "cursor": None}}])]}
     runtime, graph, calls = make(read_call)
     document = str(uuid4())
-    result = runtime.start(document, str(uuid4()), "查讀失敗").wait(5)
+    result = runtime.start(document, str(uuid4()), "查讀失敗", expected_revision_id=HEAD).wait(5)
     assert result.status == "failed" and result.response_message_id is None
     saved = graph.get_state({"configurable": {"thread_id": document}}).values["messages"]
     assert len(calls) == 1 and not _pending_calls(saved)
@@ -219,7 +228,7 @@ def test_start_checkpoint_error_uses_a_fixed_public_code(make_runtime):
     graph.get_state = unavailable
     try:
         with pytest.raises(AiRuntimeError, match="^checkpoint_unavailable$"):
-            runtime.start(str(uuid4()), str(uuid4()), "原話")
+            runtime.start(str(uuid4()), str(uuid4()), "原話", expected_revision_id=HEAD)
     finally:
         graph.get_state = original
 
@@ -236,7 +245,7 @@ def test_start_read_is_drained_before_the_shared_owner_can_close(make_runtime):
         return original(*args, **kwargs)
     graph.get_state = blocked
     with ThreadPoolExecutor(max_workers=1) as pool:
-        starting = pool.submit(runtime.start, str(uuid4()), str(uuid4()), "原話")
+        starting = pool.submit(runtime.start, str(uuid4()), str(uuid4()), "原話", expected_revision_id=HEAD)
         assert entered.wait(2)
         try:
             assert not runtime.owner.close(timeout=0.01)
@@ -250,7 +259,7 @@ def test_run_closes_without_a_waiting_client_and_shutdown_does_not_relabel_succe
     make, _ = make_runtime
     runtime, _, calls = make()
     document, run = str(uuid4()), str(uuid4())
-    handle = runtime.start(document, run, "視窗已離開但仍應由App收尾")
+    handle = runtime.start(document, run, "視窗已離開但仍應由App收尾", expected_revision_id=HEAD)
     deadline = monotonic() + 2
     while runtime.owner.status(document).write_blocked and monotonic() < deadline:
         sleep(0.01)
@@ -278,7 +287,7 @@ def test_done_callback_registration_waits_for_the_owner_callback_that_is_still_r
     monkeypatch.setattr(runtime.owner, "_foreground_finished", delayed_done)
     monkeypatch.setattr(ForegroundHandle, "add_done_callback", late_registration)
     with ThreadPoolExecutor(max_workers=1) as pool:
-        starting = pool.submit(runtime.start, str(uuid4()), str(uuid4()), "完整回合")
+        starting = pool.submit(runtime.start, str(uuid4()), str(uuid4()), "完整回合", expected_revision_id=HEAD)
         assert registering.wait(3)
         # Registration on an already-done Future runs in this registering thread.
         # The owner's earlier callback is still executing on the original worker.
@@ -302,7 +311,7 @@ def test_background_closure_failure_requires_explicit_reconciliation_without_mod
         raise OSError("SYNTHETIC_PRIVATE_CLOSURE_DETAIL")
     graph.update_state = unavailable
     document, run = str(uuid4()), str(uuid4())
-    handle = runtime.start(document, run, "回覆已保存但閉合暫不可用")
+    handle = runtime.start(document, run, "回覆已保存但閉合暫不可用", expected_revision_id=HEAD)
     try:
         with pytest.raises(AiRuntimeError, match="^run_recovery_required$"):
             handle.wait(5)
@@ -335,7 +344,7 @@ def test_short_wait_does_not_block_on_background_saver_closure(make_runtime):
         return original_done(*args)
     runtime.owner._foreground_finished = delayed_done
     with ThreadPoolExecutor(max_workers=1) as pool:
-        starting = pool.submit(runtime.start, str(uuid4()), str(uuid4()), "等待保存")
+        starting = pool.submit(runtime.start, str(uuid4()), str(uuid4()), "等待保存", expected_revision_id=HEAD)
         registered.set()
         assert entered.wait(3)
         # If the Future completed before callback registration, start itself can
@@ -361,7 +370,7 @@ def test_initial_saver_failure_preserves_the_actual_input_state_without_model_re
     runtime, graph, calls = make(saver=saver)
     document, run = str(uuid4()), str(uuid4())
     if prior:
-        assert runtime.start(document, str(uuid4()), "先前原話").wait(5).status == "completed"
+        assert runtime.start(document, str(uuid4()), "先前原話", expected_revision_id=HEAD).wait(5).status == "completed"
     previous_calls = len(calls)
     previous = graph.get_state({"configurable": {"thread_id": document}})
     original, injected = saver.put, []
@@ -379,7 +388,7 @@ def test_initial_saver_failure_preserves_the_actual_input_state_without_model_re
         return original(config, checkpoint, metadata, new_versions)
     saver.put = failing
     try:
-        result = runtime.start(document, run, "新原始問答\n  不可遺漏").wait(5)
+        result = runtime.start(document, run, "新原始問答\n  不可遺漏", expected_revision_id=HEAD).wait(5)
         assert result.status == "failed" and result.response_message_id is None
         assert result.input_saved is (failure != "all_puts")
         assert len(calls) == previous_calls

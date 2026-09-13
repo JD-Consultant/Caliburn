@@ -2,13 +2,17 @@
 from typing import Protocol
 
 
+class InvalidSourceReference(ValueError):
+    """The caller may correct this address; never use for source storage I/O."""
+
+
 class SourceReader(Protocol):
     document_id: str
 
     def validate_reference(self, reference: str) -> None:
-        """Validate address shape and document scope only, without storage I/O."""
+        """Validate without I/O; invalid shape/scope raises InvalidSourceReference."""
         ...
 
     def read(self, reference: str) -> object:
-        """Read the exact saved source or raise; never substitute latest content."""
+        """Read exact source; invalid address uses InvalidSourceReference, I/O does not."""
         ...

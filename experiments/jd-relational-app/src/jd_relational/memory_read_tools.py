@@ -7,6 +7,7 @@ https://docs.langchain.com/oss/python/langchain/tools#access-context
 """
 from typing import Literal
 from uuid import UUID
+from caliburn_memory.sources import InvalidSourceReference
 
 from langchain.tools import ToolRuntime, tool
 from langchain_core.tools import BaseTool, ToolException
@@ -75,6 +76,8 @@ def _window(artifacts, reference):
         raise ToolException(_REF_ERROR) from None
     try:
         return artifacts.source_window(reference)
+    except InvalidSourceReference:
+        raise ToolException(_REF_ERROR) from None
     except ConversationSourceError as error:
         _source_error(error)
     except ValueError as error:
@@ -129,6 +132,8 @@ def build_conversation_read_tool() -> BaseTool:
             locator = reference
         try:
             excerpt = session.source.read(locator)
+        except InvalidSourceReference:
+            raise ToolException(_REF_ERROR) from None
         except ConversationSourceError as error:
             _source_error(error)
         except Exception:

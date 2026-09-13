@@ -2,7 +2,7 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from caliburn_memory.sources import SourceReader
+from caliburn_memory.sources import InvalidSourceReference, SourceReader
 
 from .conversation_sources import ConversationSourceError, ConversationSourceService, SourceExcerpt
 
@@ -22,7 +22,17 @@ class MemorySourceReader(SourceReader):
             raise ConversationSourceError("invalid_ref") from None
 
     def validate_reference(self, reference: str) -> None:
-        self.service.validate_reference(reference, self.document_id)
+        try:
+            self.service.validate_reference(reference, self.document_id)
+        except ConversationSourceError as error:
+            if error.code == "invalid_ref":
+                raise InvalidSourceReference("invalid_source_reference") from error
+            raise
 
     def read(self, reference: str) -> SourceExcerpt:
-        return self.service.read(reference, self.document_id)
+        try:
+            return self.service.read(reference, self.document_id)
+        except ConversationSourceError as error:
+            if error.code == "invalid_ref":
+                raise InvalidSourceReference("invalid_source_reference") from error
+            raise

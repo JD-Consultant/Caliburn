@@ -6,7 +6,7 @@ from uuid import uuid4
 
 from caliburn_memory.memory import MemoryArtifacts
 from caliburn_memory.references import controlled_references
-from caliburn_memory.sources import SourceReader
+from caliburn_memory.sources import InvalidSourceReference, SourceReader
 from langgraph.store.memory import InMemoryStore
 import pytest
 
@@ -68,7 +68,7 @@ def test_validation_checks_signature_and_scope_without_saver_or_body_read(native
     absent = serializer().dumps(payload | {"root_checkpoint_id": "absent",
                                           "source_checkpoint_id": "absent"})
     assert reader.validate_reference(PREFIX + absent) is None
-    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+    with pytest.raises(InvalidSourceReference, match="^invalid_source_reference$"):
         MemorySourceReader(source, str(uuid4())).validate_reference(token)
 
 
@@ -89,7 +89,7 @@ def test_memory_reader_rejects_untrusted_reference_before_storage(native, monkey
     monkeypatch.setattr(graph, "get_state", never)
     reader = MemorySourceReader(source, document)
     for action in (reader.validate_reference, reader.read):
-        with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        with pytest.raises(InvalidSourceReference, match="^invalid_source_reference$"):
             action(token)
 
 
@@ -130,3 +130,21 @@ def test_reader_keeps_one_fixed_document_and_delegates_exact_original_reference(
         reader.document_id = str(uuid4())
     with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
         MemorySourceReader(source, "not-document")
+
+
+@pytest.mark.parametrize("operation", ["read", "validate_reference"])
+@pytest.mark.parametrize("failure", [ConversationSourceError("source_not_available"),
+                                     ValueError("private synthetic source failure"),
+                                     OSError("synthetic storage failure")])
+def test_memory_source_adapter_does_not_reclassify_source_failures(native, monkeypatch, operation, failure):
+    observed, _ = seed(native)
+    _, _, document, *_ = native
+    source = service(native)
+    reference = source.capture(document, observed.record.run_id).source_ref
+    def fail(*_args, **_kwargs):
+        raise failure
+    monkeypatch.setattr(source, operation, fail)
+    with pytest.raises(type(failure)) as caught:
+        getattr(MemorySourceReader(source, document), operation)(reference)
+    assert caught.value is failure
+    assert not isinstance(caught.value, InvalidSourceReference)

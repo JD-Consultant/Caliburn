@@ -323,7 +323,7 @@ class UnboundInvalidInput(BaseModel):
     result_revision_ref: None
     change_ref: None
     error: InvalidInputError
-    next_action: Literal['correct_arguments', 'stop']
+    next_action: Literal['correct_arguments', 'reread_current', 'stop']
 
 
 class UnboundOperationConflict(BaseModel):

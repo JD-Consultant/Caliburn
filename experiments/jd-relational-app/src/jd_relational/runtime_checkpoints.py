@@ -33,6 +33,9 @@ class CheckpointError(ValueError):
 class DocumentState(MessagesState):
     jd_manual_pending: dict[str, Any] | None
     jd_model_view: dict[str, Any] | None
+    jd_ai_run: dict[str, Any] | None
+    jd_ai_bindings: list[dict[str, Any]]
+    jd_ai_read: dict[str, Any] | None
 
 
 class _CheckpointGraph(Protocol):
@@ -115,6 +118,10 @@ class DocumentCheckpoints:
     def __init__(self, graph: _CheckpointGraph):
         self._graph = graph
 
+    @property
+    def graph(self):
+        return self._graph
+
     @staticmethod
     def _config(document_id: str) -> dict:
         if not _uuid_text(document_id):
@@ -132,6 +139,19 @@ class DocumentCheckpoints:
             raise CheckpointError("invalid_checkpoint") from None
         if snapshot.next or snapshot.tasks or snapshot.interrupts:
             raise CheckpointError("document_busy") from None
+        run = snapshot.values.get("jd_ai_run")
+        if run is not None:
+            # A finished graph is not necessarily a settled App run. The AI
+            # owner must confirm all writes and persist terminal closure first.
+            from .ai_checkpoints import AiRunRecord
+            try:
+                record = AiRunRecord.model_validate(run, strict=True)
+                if record.document_id != document_id:
+                    raise ValueError()
+            except Exception:
+                raise CheckpointError("invalid_checkpoint") from None
+            if record.status == "running":
+                raise CheckpointError("document_busy") from None
         return _decode(snapshot.values.get("jd_manual_pending"), document_id)
 
     def admit(self, identity: AdmittedIdentity) -> None:

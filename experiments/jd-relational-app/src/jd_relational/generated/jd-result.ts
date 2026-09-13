@@ -348,7 +348,7 @@ export interface UnboundInvalidInput {
   result_revision_ref: null;
   change_ref: null;
   error: InvalidInputError;
-  next_action: "correct_arguments" | "stop";
+  next_action: "correct_arguments" | "reread_current" | "stop";
 }
 /**
  * This interface was referenced by `ResultCatalog`'s JSON-Schema

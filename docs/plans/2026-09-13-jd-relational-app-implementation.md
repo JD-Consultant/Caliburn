@@ -1,6 +1,6 @@
 # JD 關聯式 App：業務、保存、畫面與顧問接線施工計畫
 
-- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1／2 核心、人工 HTTP 與配置已隔離驗證；RS-3 第一段六章管理畫面、自動保存與瀏覽器候選恢復已接真 API／DB。AI 回合、歷史還原、其餘故障／IME 驗收及完整 App 尚未完成。
+- 日期：2026-09-13；Topic：JD-R002；狀態：G4 WORKING；RS-1／2 核心、人工 HTTP 與配置已隔離驗證；RS-3 第一段六章管理畫面、自動保存與瀏覽器候選恢復已接真 API／DB。完整 AI 生命週期、歷史還原、其餘故障／IME 驗收及完整 App 尚未完成。
 - Owner 授權：最後核完整客製化 JD 欄位後，繼續推進 App、業務邏輯、LLM 及測試；Excel 延後。沿[最新需求](../specs/2026-09-12-jd-relational-editing-requirements.md)。
 - 本計畫取代[9/10 成品計畫](2026-09-10-jd-product-delivery.md)中**新版 JD 的施工順序／Plate／三工具／v2 前提**，不改寫舊六切片的成果與失敗。舊文件末尾 Task6 不是新工作指令。
 - 正式產品仍依 ADR0060，ADR0075／0074 Proposed；隔離驗證不等於 G6 切換，不混接正式 API／Web。
@@ -13,13 +13,15 @@
 
 ## 1. 成品範圍與可觀察結果
 
-**最新 RS-4 接點：**[人工通知與模型回覆保存](../specs/2026-09-13-jd-consultant-context-slice.md)已完成 LangChain／Anthropic adapter 精確相容導入、真正 wire、同版 notice 及原生 Agent／PG Saver 接合。受影響 74 PASS（13 真 PG），全組及 ACL 補跑合計 1624 非 PG 案例通過／193 PG 未全跑；codegen 與獨立審查通過，交錯串流 P2 已修。這是固定離線回覆接點，沒有完整 AI 生命周期或自然品質完成宣稱。
+**最新 RS-4 接點：**[本程序 AI 回合與具名工具](../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)已接同文件 owner、原生 after_model／sync checkpoint、共用 JD writer、取消／原 receipt 恢復與 App 自動閉合。真 PG 固定 SDK 完成 AI→手改→AI、純訪談及 COMMIT 回覆遺失；最後窄組253 PASS、真 PG14 PASS，完整範圍及首敗見結果稿。新宿主 AI 恢復、Memory／來源與聊天入口仍未接，不是完整 RS-4／自然品質完成。
+
+**先前 RS-4 通知接點：**[人工通知與模型回覆保存](../specs/2026-09-13-jd-consultant-context-slice.md)已完成 LangChain／Anthropic adapter 精確相容導入、真正 wire、同版 notice 及原生 Agent／PG Saver 接合。受影響 74 PASS（13 真 PG），全組及 ACL 補跑合計 1624 非 PG 案例通過／193 PG 未全跑；codegen 與獨立審查通過，交錯串流 P2 已修。這是固定離線回覆接點，沒有完整 AI 生命周期或自然品質完成宣稱。
 
 **本次追加驗收：**[回覆遺失與重開查回](../specs/2026-09-13-jd-browser-reply-loss-slice.md)完成真瀏覽器／原生宿主／PG端到端：真提交但回覆未到，重開以原operation GET查回，1POST／1GET／1execute，head2、任務及digest一致。對話框關閉誤落封存分支已修；新build／TS、Web99及helper23通過，獨立審查PASS。此處承接下方先前UI成果，不重跑或重算其全組數字。
 
 **最新實作進度：**[六章手動管理與恢復切片](../specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)完成 Read v2 穩定 UI 身分、React／Next／MUI 管理畫面、原操作與輸入世代恢復、同頁歷史；真瀏覽器完成多成果／要求、共用知識引用、未完成表單重開、任務移動、刪職責保留任務、封存恢復及續改。Python 全組1540 PASS／180 PG SKIP，Web 99 PASS、生成／TS／build PASS；受影響真 PG 與最終 DB head11 唯讀核對通過。独立審查提出的缺口已修，首敗／層級／未驗範圍以結果稿為準；不是完整 RS-3／AI 成品通過。[配置](../specs/2026-09-13-jd-managed-configuration-slice.md)及[文件目錄](../specs/2026-09-13-jd-catalog-http-slice.md)保留原成果。
 
-**唯一下一工作：**沿[本次結果的接合界線](../specs/2026-09-13-jd-consultant-context-slice.md#6-下一工作與未完成界線)，接前景 AI run 的准入、取消／退出／重開及 JD 工具實際 writer；使用已驗的原生 Agent／notice／共同保存，先以零付費固定回應完成初稿→手改→AI續編、純訪談不改及錯誤收尾。來源 handle／Memory 採用與聊天 HTTP／Web 隨相依接合，不用 placeholder 冒充完整能力。RS-3其餘故障、選區、歷史還原／整輪JD撤回沿契約續補；實體IME、自然模型與真人分開記錄。精確 adapter／wire 已閉合，不重新研究同一選擇；不越過模型費用授權。
+**唯一下一工作：**沿[本次接合界線](../specs/2026-09-13-jd-ai-runtime-and-tools-slice.md#7-未完成界線與下一個最小工作)，先接新宿主原 AI pending 的安全恢復，再接聊天 HTTP 的原請求查回／狀態／取消與 Web。同程序 run／writer／自動閉合已有固定回應證據，不重做同層框架比較；跨程序仍须真 OS 退出證據，不能因沒 local Future 就 replay。來源 handle／Memory 採用隨相依接合，不以 placeholder 冒充；選區、其餘故障、歷史還原／整輪 JD 撤回沿契約續補。自然模型費用與真人驗收另外處理，Excel延後。
 
 員工可以從空白手動建完整 JD，也可主要透過訪談取得客製化內容。職責、任務、多成果、多要求及共享知識技能在同一 App 真正保存為關聯式資料；可反覆改、看差異、回查依據、自動保存、重開及續談。
 

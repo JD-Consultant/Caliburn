@@ -1147,6 +1147,7 @@
           "type": "string",
           "enum": [
             "correct_arguments",
+            "reread_current",
             "stop"
           ]
         }

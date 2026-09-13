@@ -1,0 +1,397 @@
+"""Owned local AI turns over native Agent/Saver and the shared JD writer.
+
+No HTTP server, provider configuration, Memory substitute or automatic model
+replay is created here. Foreground ownership is the same per-document owner used
+by manual edits. Native run/SQL Futures must finish before recovery can publish
+a terminal root. Only actual durable tool receipts become recovered results.
+"""
+
+from dataclasses import dataclass, field
+from copy import deepcopy
+import json
+from threading import Event, Lock
+from uuid import uuid4
+
+from langchain_core.callbacks import BaseCallbackHandler
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langgraph.types import StateSnapshot
+from langsmith import tracing_context
+
+from .ai_checkpoints import AiCheckpointError, AiRunCheckpoints, new_run_record
+from .change_reads import ChangeReadService
+from .consultant_context import ConsultantContext, checked_model_view
+from .consultant_tools import AiToolSession, decode_ai_bindings, verify_binding_message
+from .manual_runtime import ForegroundIdentity, ManualRuntime, RuntimeFailure
+from .notice_history import NoticeHistoryReader
+from .observation_projection import project_observation
+from .read_transport import read_failure
+from .reads import ReadService, read_json
+from .references import ReferenceCodec
+from .result_transport import validate_result
+from .runtime_checkpoints import DocumentCheckpoints
+from .storage.history import HistoryReader
+
+
+class AiRuntimeError(ValueError):
+    def __init__(self, code):
+        self.code = code
+        super().__init__(code)
+
+
+class _StopOnToken(BaseCallbackHandler):
+    """A cooperative stop; a blocked socket still needs its configured timeout."""
+    raise_error = True
+
+    def __init__(self, stop_event, tool_started=None):
+        self.stop_event = stop_event
+        self.tool_started = tool_started
+
+    def on_tool_start(self, serialized, input_str, **kwargs):
+        if self.tool_started is not None:
+            self.tool_started.set()
+
+    def on_llm_new_token(self, token, **kwargs):
+        if self.stop_event.is_set():
+            raise AiRuntimeError("run_cancelled")
+
+
+@dataclass(frozen=True)
+class AiRunResult:
+    document_id: str
+    run_id: str
+    status: str
+    input_saved: bool
+    response_message_id: str | None
+
+
+@dataclass
+class _Attempt:
+    record: object
+    human: HumanMessage
+    invoked: bool = False
+    before_config: dict | None = None
+    before_state: object | None = field(default=None, repr=False)
+    tool_started: Event = field(default_factory=Event, repr=False)
+    handle: object | None = None
+    result: AiRunResult | None = None
+    settling: Lock = field(default_factory=Lock)
+    settled: Event = field(default_factory=Event)
+    closure_error: str | None = None
+
+
+class AiRunHandle:
+    def __init__(self, service, attempt):
+        self._service, self._attempt = service, attempt
+
+    def request_stop(self):
+        if self._attempt.handle is not None:
+            self._attempt.handle.request_stop()
+
+    def wait(self, timeout=None):
+        if self._attempt.result is not None:
+            return self._attempt.result
+        if not self._attempt.settled.wait(timeout):
+            raise TimeoutError("run_closure_pending")
+        if self._attempt.closure_error is not None:
+            raise AiRuntimeError(self._attempt.closure_error)
+        return self._attempt.result
+
+    def recover(self):
+        """Explicit receipt/closure reconciliation; never reruns the model or edit."""
+        if self._attempt.result is not None:
+            return self._attempt.result
+        if not self._attempt.settled.is_set() or not self._attempt.settling.acquire(blocking=False):
+            raise AiRuntimeError("run_recovery_pending")
+        try:
+            if self._attempt.result is None:
+                self._attempt.result = self._service._settle(self._attempt)
+                self._attempt.closure_error = None
+            return self._attempt.result
+        finally:
+            self._attempt.settling.release()
+
+
+def _pending_calls(messages):
+    """Inspect native call/result order, without reconstructing or executing tools."""
+    pending = {}
+    for message in messages:
+        if isinstance(message, AIMessage):
+            if pending:
+                raise AiRuntimeError("invalid_saved_conversation")
+            for call in message.tool_calls:
+                key = (message.id, call["id"])
+                if key in pending:
+                    raise AiRuntimeError("invalid_saved_conversation")
+                pending[key] = call
+        elif isinstance(message, ToolMessage):
+            matches = [key for key in pending if key[1] == message.tool_call_id]
+            if len(matches) != 1:
+                raise AiRuntimeError("invalid_saved_conversation")
+            key = matches[0]
+            if message.name is not None and message.name != pending[key]["name"]:
+                raise AiRuntimeError("invalid_saved_conversation")
+            del pending[key]
+        elif isinstance(message, HumanMessage) and pending:
+            raise AiRuntimeError("invalid_saved_conversation")
+    return pending
+
+
+def _not_executed():
+    return validate_result({"status": "invalid_input", "effect": "unchanged",
+        "receipt_durability": "unconfirmed", "operation_ref": None,
+        "result_revision_ref": None, "change_ref": None,
+        "error": {"code": "invalid_input", "message": "這次工具尚未執行；回合已停止。", "related_refs": []},
+        "next_action": "stop"})
+
+
+def _verify_saved_results(messages, bindings, receipts, codec):
+    """A stored tool success is evidence only when its original SQL receipt agrees."""
+    by_call = {(b.message_id, b.tool_call_id): b for b in bindings}
+    active = {}
+    for message in messages:
+        if isinstance(message, AIMessage):
+            active = {call["id"]: by_call.get((message.id, call["id"])) for call in message.tool_calls}
+        elif isinstance(message, ToolMessage):
+            binding = active.get(message.tool_call_id)
+            if binding is None:
+                continue
+            expected = project_observation(receipts[binding.identity.operation_id], codec)
+            expected_status = "success" if expected["status"] in {"committed", "no_change"} else "error"
+            try:
+                if (type(message.content) is not str or json.loads(message.content) != expected
+                        or message.status != expected_status or message.name != binding.command_kind):
+                    raise ValueError()
+            except Exception:
+                raise AiRuntimeError("invalid_saved_tool_result") from None
+
+
+class AiRuntime:
+    def __init__(self, owner: ManualRuntime, codec: ReferenceCodec, *, source_resolver=None):
+        if (not isinstance(owner, ManualRuntime) or not isinstance(owner.checkpoints, DocumentCheckpoints)
+                or not isinstance(codec, ReferenceCodec)
+                or source_resolver is not None and not callable(source_resolver)):
+            raise AiRuntimeError("invalid_ai_runtime")
+        self.owner, self.codec = owner, codec
+        self.graph = owner.checkpoints.graph
+        self.checkpoints = AiRunCheckpoints(self.graph)
+        self.history = HistoryReader(owner.storage.engine)
+        self.notices = NoticeHistoryReader(owner.storage.engine)
+        self.reads = ReadService(owner.storage, self.history, codec)
+        self.changes = ChangeReadService(self.history, codec)
+        self.source_resolver = source_resolver
+        owner.claim_foreground_coordinator()
+        self._registry = Lock()  # Only handles, never graph/DB I/O.
+        self._latest = {}
+        self._starts = {}
+
+    def start(self, document_id: str, run_id: str, text: str) -> AiRunHandle:
+        record, human = new_run_record(self.codec.dataset_id, document_id, run_id, text)
+        with self._registry:
+            start_lock = self._starts.setdefault(document_id, Lock())
+        # Serialize handle publication only for this document. The owner remains
+        # the shared admission authority; another document can proceed freely.
+        with start_lock:
+            try:
+                return self._start(record, human)
+            except (AiRuntimeError, RuntimeFailure):
+                raise
+            except Exception:
+                raise AiRuntimeError("checkpoint_unavailable") from None
+
+    def _start(self, record, human):
+        document_id, run_id = record.document_id, record.run_id
+        identity = ForegroundIdentity(document_id, run_id, record.request_digest)
+        with self._registry:
+            cached = self._latest.get(document_id)
+            if cached is not None and cached._attempt.record.run_id == run_id:
+                if cached._attempt.record.request_digest != record.request_digest:
+                    raise AiRuntimeError("operation_conflict")
+                return cached
+        # Original prompts are durable IDs. An old request must never become a
+        # fresh model invocation just because another run replaced the live slot.
+        def inspect_original():
+            current = self.graph.get_state({"configurable": {"thread_id": document_id}}, subgraphs=True)
+            if any(isinstance(m, HumanMessage) and m.id == run_id for m in current.values.get("messages", [])):
+                return self.checkpoints.observe(document_id, run_id, self.codec.dataset_id)
+            return None
+        try:
+            original = self.owner.inspect_foreground_start(document_id, inspect_original)
+        except AiCheckpointError as error:
+            if error.code == "run_not_found":
+                raise AiRuntimeError("original_run_lookup_required") from None
+            raise
+        if original is not None:
+            if original.record.request_digest != record.request_digest:
+                raise AiRuntimeError("operation_conflict")
+            if original.record.status == "running":
+                raise AiRuntimeError("run_recovery_required")
+            attempt = _Attempt(record, human, result=self._result(original))
+            return AiRunHandle(self, attempt)
+        attempt = _Attempt(record, human)
+        attempt.handle = self.owner.start_foreground(identity, lambda permit: self._run(attempt, permit))
+        result = AiRunHandle(self, attempt)
+        with self._registry:
+            existing = self._latest.get(document_id)
+            if existing is not None and existing._attempt.handle is attempt.handle:
+                return existing
+            self._latest[document_id] = result
+        attempt.handle.add_done_callback(lambda _: self._finish_automatically(attempt))
+        return result
+
+    def _finish_automatically(self, attempt):
+        # Completion is App work, independent of an HTTP observer staying open.
+        # A failed reconciliation is retained for an explicit recover(), not a
+        # repeated model/tool call or an unbounded background retry loop.
+        with attempt.settling:
+            try:
+                attempt.result = self._settle(attempt)
+            except Exception:
+                attempt.closure_error = "run_recovery_required"
+            finally:
+                attempt.settled.set()
+
+    def _run(self, attempt, permit):
+        record = attempt.record
+        current = self.owner.storage.read_current(record.document_id)
+        if current.archived:
+            raise AiRuntimeError("document_archived")
+        config = {"configurable": {"thread_id": record.document_id},
+            "callbacks": [_StopOnToken(permit.stop_event, attempt.tool_started)], "max_concurrency": 1,
+            "recursion_limit": 96}
+        before = self.graph.get_state({"configurable": {"thread_id": record.document_id}}, subgraphs=True)
+        attempt.before_config = before.config
+        attempt.before_state = deepcopy(before)
+        previous = checked_model_view(before.values.get("jd_model_view"),
+            dataset_id=record.dataset_id, document_id=record.document_id)
+        notice = self.notices.read(record.document_id, previous.boundary if previous else None)
+        session = AiToolSession(self.owner, permit, self.history, self.reads, self.changes,
+            self.codec, source_resolver=self.source_resolver)
+        context = ConsultantContext(record.dataset_id, record.document_id, record.run_id,
+            self.notices, self.codec, notice, tool_session=session, stop_event=permit.stop_event)
+        # Disable remote traces even if the parent shell enabled them. Safe App
+        # diagnostics and the native local Saver remain their separate owners.
+        with tracing_context(enabled=False):
+            attempt.invoked = True
+            self.graph.invoke({"messages": [attempt.human], "jd_ai_run": record.model_dump(mode="json"),
+                "jd_ai_bindings": [], "jd_ai_read": None}, config, context=context, durability="sync")
+
+    @staticmethod
+    def _result(observed):
+        messages = observed.messages
+        positions = [i for i, m in enumerate(messages)
+                     if isinstance(m, HumanMessage) and m.id == observed.record.run_id]
+        if len(positions) != 1:
+            raise AiRuntimeError("invalid_saved_conversation")
+        responses = [m for m in messages[positions[0] + 1:]
+                     if isinstance(m, AIMessage) and not m.tool_calls]
+        return AiRunResult(observed.record.document_id, observed.record.run_id,
+            observed.record.status, True, responses[-1].id if responses else None)
+
+    def _confirm_input_not_saved(self, attempt):
+        """Only the known local invocation with an unchanged idle root can release.
+
+        A missing run alone is insufficient. Native sync ordering, no tool entry,
+        actual Future completion and exact before/after state must all agree.
+        """
+        document = attempt.record.document_id
+        if self.owner.status(document).identity is not None or attempt.tool_started.is_set():
+            raise AiRuntimeError("run_recovery_required")
+        if attempt.invoked:
+            before = attempt.before_state
+            current = self.graph.get_state({"configurable": {"thread_id": document}}, subgraphs=True)
+            def position(state):
+                if not isinstance(state, StateSnapshot) or state.next or state.tasks or state.interrupts:
+                    raise AiRuntimeError("run_recovery_required")
+                config = (state.config or {}).get("configurable", {})
+                if config.get("thread_id") != document or config.get("checkpoint_ns", ""):
+                    raise AiRuntimeError("run_recovery_required")
+                return config.get("checkpoint_id")
+            before_id, current_id = position(before), position(current)
+            if before_id != current_id:
+                raise AiRuntimeError("run_recovery_required")
+            if current_id is not None:
+                current = self.graph.get_state({"configurable": {"thread_id": document,
+                    "checkpoint_ns": "", "checkpoint_id": current_id}}, subgraphs=True)
+                if position(current) != before_id:
+                    raise AiRuntimeError("run_recovery_required")
+            if (current.values != before.values or any(isinstance(m, HumanMessage) and m.id == attempt.record.run_id
+                    for m in current.values.get("messages", []))):
+                raise AiRuntimeError("run_recovery_required")
+        if self.owner.checkpoints.read(document) is not None:
+            raise AiRuntimeError("run_recovery_required")
+
+    def _settle(self, attempt):
+        try:
+            permit = attempt.handle.permit
+            execution = attempt.handle.wait(0)  # Actual run Future and callback have finished.
+            record = attempt.record
+            try:
+                observed = self.checkpoints.observe(record.document_id, record.run_id, record.dataset_id)
+            except AiCheckpointError as error:
+                if error.code != "run_not_found":
+                    raise
+                self.owner.finish_foreground(permit, lambda: self._confirm_input_not_saved(attempt))
+                return AiRunResult(record.document_id, record.run_id, "failed", False, None)
+            if observed.record.request_digest != record.request_digest:
+                raise AiRuntimeError("operation_conflict")
+            bindings = decode_ai_bindings(observed.bindings, dataset_id=record.dataset_id,
+                document_id=record.document_id, run_id=record.run_id)
+            receipts = {}
+            missing = []
+            active = self.owner.status(record.document_id).identity
+            if active is not None and all(b.identity != active for b in bindings):
+                raise AiRuntimeError("invalid_ai_binding")
+            for binding in bindings:
+                verify_binding_message(binding, observed.messages)
+                found = self.owner.storage.lookup(binding.identity)
+                if found is not None and found.confirmed:
+                    receipts[binding.identity.operation_id] = found
+                # A now-readable receipt does not clear the owner's earlier
+                # uncertain SQL attempt. Reconcile that original attempt too.
+                if binding.identity == active or found is None or not found.confirmed:
+                    missing.append(binding)
+            missing.sort(key=lambda b: b.identity != active)
+            for binding in missing:
+                def confirm(identity, expected=binding.identity):
+                    if identity != expected:
+                        raise AiRuntimeError("invalid_ai_binding")
+                    latest = self.checkpoints.observe(record.document_id, record.run_id, record.dataset_id)
+                    if latest.bindings != observed.bindings:
+                        raise AiRuntimeError("run_recovery_required")
+                completion = self.owner.recover_foreground(permit, binding.identity, confirm, timeout=10)
+                if completion.observation is None or not completion.observation.confirmed:
+                    raise AiRuntimeError("run_recovery_required")
+                receipts[binding.identity.operation_id] = completion.observation
+            messages = list(observed.messages)
+            pending = _pending_calls(messages)
+            by_call = {(b.message_id, b.tool_call_id): b for b in bindings}
+            _verify_saved_results(messages, bindings, receipts, self.codec)
+            for key, call in pending.items():
+                binding = by_call.get(key)
+                if binding is not None:
+                    value = project_observation(receipts[binding.identity.operation_id], self.codec)
+                    failed = value["status"] not in {"committed", "no_change"}
+                else:
+                    value = read_failure("read_failed") if call["name"] in {"jd_read", "jd_change_read"} else _not_executed()
+                    failed = True
+                messages.append(ToolMessage(id=str(uuid4()), tool_call_id=call["id"], name=call["name"],
+                    content=read_json(value), status="error" if failed else "success"))
+            if _pending_calls(messages):
+                raise AiRuntimeError("invalid_saved_conversation")
+            if observed.record.status != "running":
+                status = observed.record.status
+            else:
+                status = "cancelled" if permit.stop_event.is_set() else "failed" if execution.error or pending or not observed.closed else "completed"
+            closed = self.checkpoints.close(observed, status=status, messages=messages,
+                bindings=observed.bindings, model_view=observed.model_view, read_binding=observed.read_binding)
+            def confirm_closed():
+                latest = self.checkpoints.observe(record.document_id, record.run_id, record.dataset_id)
+                if latest.record != closed.record or latest.messages != closed.messages:
+                    raise AiRuntimeError("run_recovery_required")
+                self.owner.checkpoints.read(record.document_id)  # Includes native idle / terminal gate.
+            self.owner.finish_foreground(permit, confirm_closed)
+            return self._result(closed)
+        except AiRuntimeError:
+            raise
+        except Exception:
+            raise AiRuntimeError("run_recovery_required") from None

@@ -10,6 +10,7 @@ updates Memory, retries a model, or grants writer authority.
 from dataclasses import dataclass
 from hashlib import sha256
 import json
+from threading import Event
 from typing import Any
 from uuid import UUID, uuid4
 
@@ -74,6 +75,9 @@ class ModelView(BaseModel):
 
 class ConsultantState(AgentState):
     jd_model_view: dict[str, Any] | None
+    jd_ai_run: dict[str, Any] | None
+    jd_ai_bindings: list[dict[str, Any]]
+    jd_ai_read: dict[str, Any] | None
 
 
 @dataclass(frozen=True)
@@ -85,6 +89,8 @@ class ConsultantContext:
     codec: ReferenceCodec
     turn_notice: NoticeMaterial
     event_limit: int = 20
+    tool_session: object | None = None
+    stop_event: Event | None = None
 
     def __post_init__(self):
         try:
@@ -93,6 +99,8 @@ class ConsultantContext:
             if self.codec.dataset_id != self.dataset_id or self.turn_notice.document_id != self.document_id:
                 raise ValueError()
             if type(self.event_limit) is not int or not 1 <= self.event_limit <= 20:
+                raise ValueError()
+            if self.stop_event is not None and not isinstance(self.stop_event, Event):
                 raise ValueError()
         except (ValueError, TypeError, AttributeError):
             raise ConsultantContextError("invalid_consultant_context") from None
@@ -146,6 +154,8 @@ def _project(request):
     # Check the native runnable context before any document read/model call.
     if get_config().get("configurable", {}).get("thread_id") != context.document_id:
         raise ConsultantContextError("consultant_thread_mismatch")
+    if context.stop_event is not None and context.stop_event.is_set():
+        raise ConsultantContextError("consultant_cancelled")
     previous = checked_model_view(request.state.get("jd_model_view"),
         dataset_id=context.dataset_id, document_id=context.document_id)
     # The first notice remains reachable throughout this AI turn, even after
@@ -173,6 +183,7 @@ def _project(request):
     settings = dict(request.model_settings)
     if request.tools:
         settings["parallel_tool_calls"] = False
+        settings["strict"] = True
     projected = request.override(system_message=SystemMessage(content=[*blocks, {"type": "text", "text": text}]),
         model_settings=settings)
     return projected, context, current.head, text
@@ -240,7 +251,7 @@ def read_closed_model_view(graph, *, document_id, dataset_id, run_id):
     return view
 
 
-def build_consultant_node(model, *, tools, guidance: str):
+def build_consultant_node(model, *, tools, guidance: str, extra_middleware=()):
     """Build the native child; the host injects owned tools/run context later.
 
     No checkpointer, provider configuration or document is created here. Scope
@@ -251,8 +262,10 @@ def build_consultant_node(model, *, tools, guidance: str):
     if (not isinstance(model, ConfirmedChatAnthropic) or not model.streaming
             or model.disable_streaming or not model.stream_usage or model.max_retries != 0
             or model.cache is not False
+            or not isinstance(extra_middleware, (list, tuple))
+            or any(not isinstance(value, AgentMiddleware) for value in extra_middleware)
             or not isinstance(guidance, str) or not guidance.strip()):
         raise ConsultantContextError("invalid_consultant_configuration")
     return create_agent(model, tools=tools, system_prompt=guidance,
-        middleware=[JdNoticeMiddleware()], state_schema=ConsultantState,
+        middleware=[JdNoticeMiddleware(), *extra_middleware], state_schema=ConsultantState,
         context_schema=ConsultantContext)

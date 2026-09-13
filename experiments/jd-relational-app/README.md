@@ -2,11 +2,15 @@
 
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2、RS-3 第一段及 RS-4 通知／模型保存接點。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
-**已有可開啟的[六章手動管理畫面](web/README.md)，透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；[本次 UI 結果](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)包含自動保存、未完成表單重開及歷史。AI 回合、完整來源回查、歷史還原與圖形啟動器尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
+**已有可開啟的[六章手動管理畫面](web/README.md)，透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；[本次 UI 結果](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)包含自動保存、未完成表單重開及歷史。完整 AI 生命週期、来源回查、歷史還原與圖形啟動器尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
 
-**[RS-4 通知與模型保存](../../docs/specs/2026-09-13-jd-consultant-context-slice.md)已用真 SDK／原生 Agent／PG Saver 及固定離線串流接合。**人工改動投影不改原始對話；完整回覆與通知邊界成對保存，缺結束事件不前進，重開只讀不重播。74 項受影響測試通過（含 13 真 PG），獨立審查缺口已修。日常入口仍未啟用 AI；前景回合、JD 工具 writer、Memory／source 與聊天 HTTP 仍待接合。
+**[RS-4 通知與模型保存](../../docs/specs/2026-09-13-jd-consultant-context-slice.md)已用真 SDK／原生 Agent／PG Saver 及固定離線串流接合。**人工改動投影不改原始對話；完整回覆與通知邊界成對保存，缺結束事件不前進，重開只讀不重播。74 項受影響測試通過（含 13 真 PG），獨立審查缺口已修。日常入口仍未啟用 AI；本輪前景回合與工具接合見下段。
+
+**後續[本程序 AI 回合與工具](../../docs/specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)已接共同 owner／JdStorage。**原生 Agent 用 App 注入的身分及真 read 結果編輯；固定 SDK／真 PG 驗 AI→手改→AI、纯訪談不改及保存 ACK 遺失原結果恢復。同 owner 只允許一個 `AiRuntime`；`start` 同原請求回同 handle，App 自動收尾，`wait` 只觀察，`recover` 明示對帳且不重播模型或命令。最後253核心測試及14真PG通過，範圍重疊以結果稿為準。日常入口尚無聊天AI；新宿主AI恢復、Memory／source、選區、聊天HTTP／Web接合仍待完成。
 
 ## 結構
+
+- `ai_runtime.py`／`consultant_tools.py`／`ai_checkpoints.py`：本機前景回合、generated 具名工具、原生固定 root／child 收尾；與人工共用 writer owner，不新增另一組業務規則或資料庫。原始輸入只在 START checkpoint 時仍查原 Saver payload；未保存必須明示，不以缺 run 當停止證據。
 
 [回覆遺失驗收](../../docs/specs/2026-09-13-jd-browser-reply-loss-slice.md)已用真瀏覽器／PG確認：提交成功但回覆未到，重開查回原operation後恢復，沒有新POST／重複任務。重現入口是[測試專用說明](tests/support/ui_response_gate_notes.md)，不將回覆閘門加入產品。人工通知與AI回合接點沿[下一步前置](../../docs/specs/evidence/2026-09-13-jd-consultant-context-preflight.md)；仍未啟用模型。
 

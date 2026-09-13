@@ -1,14 +1,16 @@
-"""One-process manual writer ownership, separate from JD rules and checkpoints.
+"""One-process document writer ownership, separate from JD rules/checkpoints.
 
 Native futures own the actual SQL callable, not an HTTP waiter. The host supplies
 native process ownership and cross-restart death evidence. Without that capability
 an orphan remains blocked; absence of a local Future never becomes stopped proof.
-This module does not start or rewind an Agent.
+Foreground callbacks may invoke the native Agent; this owner never rewinds it
+or writes an active child checkpoint. AI and SQL use separate native pools.
 """
 
 from concurrent.futures import Future, ThreadPoolExecutor, wait
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+import re
 from threading import Event, Lock, RLock, current_thread, get_ident, main_thread
 from time import monotonic
 from typing import TYPE_CHECKING, Callable, Protocol
@@ -26,6 +28,90 @@ class RuntimeFailure(ValueError):
     def __init__(self, code):
         self.code = code
         super().__init__(code)
+
+
+@dataclass(frozen=True)
+class ForegroundIdentity:
+    document_id: str
+    run_id: str
+    request_digest: str
+
+    def __post_init__(self):
+        try:
+            if (any(type(value) is not str or str(UUID(value)) != value
+                    for value in (self.document_id, self.run_id))
+                    or type(self.request_digest) is not str
+                    or re.fullmatch(r"[0-9a-f]{64}", self.request_digest) is None):
+                raise ValueError()
+        except (ValueError, TypeError, AttributeError):
+            raise RuntimeFailure("invalid_input") from None
+
+
+class ForegroundPermit:
+    """App-held capability; only the exact live object in its slot is valid."""
+    __slots__ = ("_identity", "_stop_event")
+
+    def __init__(self, identity: ForegroundIdentity):
+        self._identity = identity
+        self._stop_event = Event()
+
+    @property
+    def identity(self) -> ForegroundIdentity:
+        return self._identity
+
+    @property
+    def stop_event(self) -> Event:
+        return self._stop_event
+
+
+@dataclass(frozen=True)
+class ForegroundStatus:
+    running: bool
+    write_blocked: bool
+    error: str | None
+
+
+@dataclass
+class _Foreground:
+    permit: ForegroundPermit
+    future: Future | None = None
+    settled: Event = field(default_factory=Event)
+    closed: bool = False
+    error: str | None = None
+    handle: "ForegroundHandle | None" = None
+
+
+class ForegroundHandle:
+    """Only observes and requests a cooperative stop; never exposes worker errors."""
+    def __init__(self, entry: _Foreground):
+        self._entry = entry
+
+    @property
+    def permit(self) -> ForegroundPermit:
+        return self._entry.permit
+
+    def request_stop(self) -> None:
+        if self._entry.future is None or not self._entry.future.done():
+            self.permit.stop_event.set()
+
+    def add_done_callback(self, callback: Callable[["ForegroundHandle"], None]) -> None:
+        """Observe native completion and the owner's actual callback completion."""
+        if not callable(callback):
+            raise RuntimeFailure("invalid_input")
+        def after_owner(_):
+            # A newly registered callback on a FINISHED Future runs immediately
+            # in its registering thread, even while earlier callbacks still run.
+            self._entry.settled.wait()
+            callback(self)
+        if self._entry.future is None:
+            after_owner(None)
+        else:
+            self._entry.future.add_done_callback(after_owner)
+
+    def wait(self, timeout=None) -> ForegroundStatus:
+        if not self._entry.settled.wait(timeout):
+            raise TimeoutError("foreground_still_running")
+        return ForegroundStatus(False, not self._entry.closed, self._entry.error)
 
 
 class OperationCheckpoints(Protocol):
@@ -57,6 +143,7 @@ class WriterStatus:
 @dataclass
 class _Attempt:
     mode: str
+    token: object = field(default_factory=object, repr=False)
     future: Future | None = None
     settled: Event = field(default_factory=Event)
     completion: Completion | None = None
@@ -82,6 +169,7 @@ class _Entry:
     write_future: Future | None = None
     observation: WriteObservation | None = None
     previous_host: PreviousHost | None = None
+    foreground: ForegroundPermit | None = None
 
 
 @dataclass
@@ -89,6 +177,8 @@ class _Slot:
     lock: RLock = field(default_factory=RLock)
     entry: _Entry | None = None
     catalog_token: object | None = None
+    start_token: object | None = None
+    foreground: _Foreground | None = None
 
 
 def _attempt(mode):
@@ -113,12 +203,15 @@ class ManualRuntime:
         self._slots = {}
         self._registry = Lock()  # Only dictionary/accepting state, never I/O or waits.
         self._accepting = True
+        self._foreground_coordinator_claimed = False
         self._previous_host = previous_host
         self._startup_lock = Lock()
         self._startup_done = Event()
         if previous_host is None:
             self._startup_done.set()  # Standalone in-process owner, no orphan adoption.
         self._pool = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="jd-manual")
+        self._foreground_pool = ThreadPoolExecutor(max_workers=max_workers,
+                                                  thread_name_prefix="jd-foreground")
         self._execution = ContextVar("jd_manual_execution", default=None)
         self._catalog_execution = ContextVar("jd_catalog_execution", default=None)
         self.storage = storage_factory(self)
@@ -133,6 +226,15 @@ class ManualRuntime:
         with self._registry:
             if not self._accepting:
                 raise RuntimeFailure("runtime_closed")
+
+    def claim_foreground_coordinator(self) -> None:
+        """One coordinator owns each host's AI attempts and configured ports."""
+        with self._registry:
+            if not self._accepting:
+                raise RuntimeFailure("runtime_closed")
+            if self._foreground_coordinator_claimed:
+                raise RuntimeFailure("foreground_coordinator_already_configured")
+            self._foreground_coordinator_claimed = True
 
     def _require_host(self):
         if self._previous_host is not None:
@@ -224,8 +326,191 @@ class ManualRuntime:
         self._require_host()
         if not self._startup_done.is_set():
             raise RuntimeFailure("startup_pending")
-        if slot.catalog_token is not None:
+        if slot.catalog_token is not None or slot.start_token is not None or self._foreground_busy(slot):
             raise RuntimeFailure("document_busy")
+
+    @staticmethod
+    def _foreground_busy(slot):
+        return slot.foreground is not None and not slot.foreground.closed
+
+    def _foreground_for(self, slot, permit):
+        self._require_host()
+        current = slot.foreground
+        if (type(permit) is not ForegroundPermit or current is None
+                or current.permit is not permit or current.closed):
+            raise RuntimeFailure("writer_not_valid")
+        return current
+
+    def inspect_foreground_start(self, document_id: str, read: Callable[[], object]):
+        """Track the synchronous original-run lookup through the same host drain.
+
+        This grants no storage writer capability. A same-thread reentrant close
+        must also see the in-flight read before releasing its Saver connection.
+        """
+        try:
+            if type(document_id) is not str or str(UUID(document_id)) != document_id or not callable(read):
+                raise ValueError()
+        except (TypeError, ValueError):
+            raise RuntimeFailure("invalid_input") from None
+        slot = self._slot(document_id, admit=True)
+        with slot.lock:
+            self._require_catalog_admission(slot)
+            if slot.entry is not None:
+                raise RuntimeFailure("document_busy")
+            slot.start_token = object()
+            try:
+                return read()
+            finally:
+                slot.start_token = None
+
+    def start_foreground(self, identity: ForegroundIdentity,
+                         work: Callable[[ForegroundPermit], object]) -> ForegroundHandle:
+        if type(identity) is not ForegroundIdentity or not callable(work):
+            raise RuntimeFailure("invalid_input")
+        identity.__post_init__()
+        slot = self._slot(identity.document_id, admit=True)
+        with slot.lock:
+            self._require_open()
+            self._require_host()
+            if not self._startup_done.is_set():
+                raise RuntimeFailure("startup_pending")
+            original = slot.foreground
+            if original is not None and original.permit.identity.run_id == identity.run_id:
+                if original.permit.identity != identity:
+                    raise RuntimeFailure("operation_conflict")
+                return original.handle
+            if self._foreground_busy(slot) or slot.entry is not None or slot.catalog_token is not None or slot.start_token is not None:
+                raise RuntimeFailure("document_busy")
+            try:
+                pending = self.checkpoints.read(identity.document_id)
+            except Exception as error:
+                raise RuntimeFailure(_checkpoint_failure(error)) from None
+            if pending is not None:
+                raise RuntimeFailure("document_busy")
+            entry = _Foreground(ForegroundPermit(identity))
+            entry.handle = ForegroundHandle(entry)
+            slot.foreground = entry
+            try:
+                entry.future = self._foreground_pool.submit(self._run_foreground, slot, entry, work)
+            except RuntimeError:
+                entry.error = "foreground_not_started"
+                entry.settled.set()
+                return entry.handle
+            entry.future.add_done_callback(lambda future: self._foreground_finished(slot, entry, future))
+            return entry.handle
+
+    def _run_foreground(self, slot, entry, work):
+        # start_foreground retains this lock until the actual Future is attached.
+        with slot.lock:
+            self._foreground_for(slot, entry.permit)
+        return work(entry.permit)
+
+    def _foreground_finished(self, slot, entry, future):
+        with slot.lock:
+            if slot.foreground is not entry:
+                entry.error = "obsolete_attempt"
+            elif future.cancelled():
+                entry.error = "foreground_not_started"
+            elif future.exception() is not None:
+                entry.error = "foreground_failed"
+            entry.settled.set()  # Never claims the durable graph is closed.
+
+    @staticmethod
+    def _confirm(callback, *args):
+        if not callable(callback):
+            raise RuntimeFailure("invalid_input")
+        try:
+            if callback(*args) is not None:
+                raise ValueError()
+        except Exception:
+            raise RuntimeFailure("checkpoint_unavailable") from None
+
+    @staticmethod
+    def _foreground_identity(permit, identity):
+        try:
+            if type(permit) is not ForegroundPermit or type(identity) is not AdmittedIdentity:
+                raise ValueError()
+            identity.validate()
+            if (identity.origin != "ai" or identity.document_id != permit.identity.document_id
+                    or identity.ai_run_id != permit.identity.run_id):
+                raise ValueError()
+        except (ValueError, TypeError, AttributeError):
+            raise RuntimeFailure("invalid_input") from None
+
+    def execute_foreground(self, permit: ForegroundPermit, intent: BoundEdit,
+                           confirm_bound: Callable[[AdmittedIdentity], None]) -> WriterHandle:
+        if not isinstance(intent, BoundEdit):
+            raise RuntimeFailure("invalid_input")
+        self._foreground_identity(permit, intent.identity)
+        slot = self._slot(intent.document_id)
+        with slot.lock:
+            current = self._foreground_for(slot, permit)
+            self._require_open()
+            if current.future is None or not current.future.running():
+                raise RuntimeFailure("writer_not_valid")
+            if permit.stop_event.is_set():
+                raise RuntimeFailure("foreground_stopping")
+            if slot.entry is not None:
+                if slot.entry.foreground is permit and slot.entry.identity == intent.identity:
+                    return slot.entry.attempt.handle
+                if slot.entry.identity.operation_id == intent.operation_id:
+                    raise RuntimeFailure("operation_conflict")
+                raise RuntimeFailure("document_busy")
+            self._confirm(confirm_bound, intent.identity)
+            self._foreground_for(slot, permit)
+            if permit.stop_event.is_set():
+                raise RuntimeFailure("foreground_stopping")
+            try:
+                original = self.storage.lookup(intent.identity)
+            except Exception as error:
+                code = getattr(error, "code", None)
+                raise RuntimeFailure(code if code in {"operation_conflict", "document_missing"}
+                                     else "read_failed") from None
+            attempt = _attempt("write")
+            if original is not None:
+                attempt.completion = Completion(original, False)
+                attempt.settled.set()
+                return attempt.handle
+            entry = _Entry(intent.identity, attempt, foreground=permit)
+            slot.entry = entry
+            self._schedule(slot, entry, attempt, intent)
+            return attempt.handle
+
+    def recover_foreground(self, permit: ForegroundPermit, identity: AdmittedIdentity,
+                           confirm_bound: Callable[[AdmittedIdentity], None], *, timeout=10) -> Completion:
+        self._foreground_identity(permit, identity)
+        slot = self._slot(identity.document_id)
+        with slot.lock:
+            current = self._foreground_for(slot, permit)
+            if current.future is None or not current.future.done() or not current.settled.is_set():
+                raise RuntimeFailure("writer_not_stopped")
+            entry = slot.entry
+            if entry is not None:
+                if entry.foreground is not permit or entry.identity != identity:
+                    raise RuntimeFailure("operation_conflict")
+                if not entry.attempt.settled.is_set():
+                    raise RuntimeFailure("writer_not_stopped")
+            self._confirm(confirm_bound, identity)
+            if entry is None:
+                entry = _Entry(identity, _attempt("recover"), foreground=permit)
+                slot.entry = entry
+            attempt = _attempt("recover")
+            entry.attempt = attempt
+            self._schedule(slot, entry, attempt)
+        return attempt.handle.wait(timeout)
+
+    def finish_foreground(self, permit: ForegroundPermit,
+                          confirm_closed: Callable[[], None]) -> None:
+        if type(permit) is not ForegroundPermit:
+            raise RuntimeFailure("invalid_input")
+        slot = self._slot(permit.identity.document_id)
+        with slot.lock:
+            current = self._foreground_for(slot, permit)
+            if (not current.settled.is_set() or current.future is not None and not current.future.done()
+                    or slot.entry is not None):
+                raise RuntimeFailure("writer_not_stopped")
+            self._confirm(confirm_closed)
+            current.closed = True
 
     def create_document(self, request_key: UUID, title: str) -> str:
         if not isinstance(request_key, UUID) or type(title) is not str:
@@ -321,7 +606,7 @@ class ManualRuntime:
                 attempt.completion = Completion(original, True)
                 attempt.settled.set()
                 return attempt.handle
-            if slot.entry:
+            if slot.entry or self._foreground_busy(slot) or slot.catalog_token is not None or slot.start_token is not None:
                 raise RuntimeFailure("document_busy")
             try:
                 pending = self.checkpoints.read(identity.document_id)
@@ -356,7 +641,10 @@ class ManualRuntime:
         attempt.future.add_done_callback(lambda future: self._finished(slot, entry, attempt, future))
 
     def _run(self, entry, attempt, intent):
-        token = self._execution.set((entry.token, entry.identity.document_id, attempt.mode))
+        # Each recovery gets its own native Future and capability. An old copied
+        # context cannot borrow a later attempt or survive its own Future ending.
+        token = self._execution.set((entry.token, attempt.token, entry.identity.document_id,
+                                     attempt.mode, get_ident()))
         try:
             if attempt.mode == "write":
                 return self.storage.execute(intent)
@@ -391,8 +679,9 @@ class ManualRuntime:
             closed = False
             try:
                 if entry.observation is not None and entry.observation.confirmed:
-                    self.checkpoints.close(entry.identity)
-                    closed = True
+                    if entry.foreground is None:
+                        self.checkpoints.close(entry.identity)
+                        closed = True
                     slot.entry = None
             except BaseException as cleanup_error:
                 error = "checkpoint_unavailable"
@@ -412,19 +701,30 @@ class ManualRuntime:
         with slot.lock:
             entry = slot.entry
             if (entry is None or entry.identity != intent.identity
-                    or context != (entry.token, intent.document_id, "write")
+                    or entry.attempt.mode != "write"
+                    or context != (entry.token, entry.attempt.token, intent.document_id, "write", get_ident())
+                    or entry.write_future is not entry.attempt.future
                     or entry.write_future is None or not entry.write_future.running()):
                 raise RuntimeFailure("writer_not_valid")
+            if entry.foreground is not None:
+                self._foreground_for(slot, entry.foreground)
 
     def require_stopped(self, identity):
+        self._require_host()
         context = self._execution.get()
         slot = self._slot(identity.document_id)
         with slot.lock:
             entry = slot.entry
             if (entry is None or entry.identity != identity
-                    or context != (entry.token, identity.document_id, "recover")
+                    or entry.attempt.mode != "recover"
+                    or context != (entry.token, entry.attempt.token, identity.document_id, "recover", get_ident())
+                    or entry.attempt.future is None or not entry.attempt.future.running()
                     or entry.write_future is not None and not entry.write_future.done()):
                 raise RuntimeFailure("writer_not_stopped")
+            if entry.foreground is not None:
+                current = self._foreground_for(slot, entry.foreground)
+                if current.future is None or not current.future.done():
+                    raise RuntimeFailure("writer_not_stopped")
             if entry.previous_host is not None:
                 try:
                     entry.previous_host.require_previous_stopped()
@@ -438,6 +738,8 @@ class ManualRuntime:
         with slot.lock:
             self._require_open()
             self._require_host()
+            if self._foreground_busy(slot):
+                raise RuntimeFailure("document_busy")
             entry = slot.entry
             if entry is None:
                 # No local entry is never a claim about a previous process.
@@ -468,6 +770,12 @@ class ManualRuntime:
         slot = self._slot(document)
         with slot.lock:
             entry = slot.entry
+            foreground = slot.foreground if self._foreground_busy(slot) else None
+            if foreground is not None:
+                running = (foreground.future is not None and not foreground.future.done()
+                           or entry is not None and not entry.attempt.settled.is_set())
+                return WriterStatus(entry.identity if entry is not None else None, running, True,
+                                    foreground.error)
             if entry:
                 completion = entry.attempt.completion
                 return WriterStatus(entry.identity, not entry.attempt.settled.is_set(), True,
@@ -489,13 +797,17 @@ class ManualRuntime:
         if not self._startup_lock.acquire(timeout=max(0, deadline - monotonic())):
             return False  # The catalog/Saver scan still owns startup resources.
         self._startup_lock.release()  # Closed admission prevents another scan starting I/O.
-        attempts = []
+        attempts, foregrounds = [], []
         for slot in slots:
             if not slot.lock.acquire(timeout=max(0, deadline - monotonic())):
                 return False  # Admission/checkpoint I/O is still using resources.
             try:
-                if slot.catalog_token is not None:
+                if slot.catalog_token is not None or slot.start_token is not None:
                     return False  # A same-thread RLock reentry did not drain its call.
+                if self._foreground_busy(slot):
+                    foregrounds.append(slot.foreground)
+                    if slot.foreground.future is None or not slot.foreground.future.done():
+                        slot.foreground.permit.stop_event.set()
                 entry = slot.entry
                 if entry and entry.attempt.future:
                     attempts.append(entry.attempt)
@@ -503,12 +815,18 @@ class ManualRuntime:
                 slot.lock.release()
         # Graceful shutdown drains admitted work. This is not the user's
         # cancel-edit action and does not invent a failure for queued writes.
-        _, running = wait([attempt.future for attempt in attempts],
+        futures = [attempt.future for attempt in attempts]
+        futures.extend(entry.future for entry in foregrounds if entry.future is not None)
+        _, running = wait(futures,
                           timeout=max(0, deadline - monotonic()))
         if running:
             return False
         for attempt in attempts:
             if not attempt.settled.wait(max(0, deadline - monotonic())):
                 return False  # Future.done can precede checkpoint cleanup.
+        for entry in foregrounds:
+            if not entry.settled.wait(max(0, deadline - monotonic())) or not entry.closed:
+                return False  # The actual run ending is not native checkpoint closure.
+        self._foreground_pool.shutdown(wait=True)
         self._pool.shutdown(wait=True)
         return True

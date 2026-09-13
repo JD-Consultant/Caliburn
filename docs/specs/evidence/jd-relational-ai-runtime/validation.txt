@@ -1,0 +1,21 @@
+JD-R002 RS-4 foreground AI/tools | 2026-09-13
+Synthetic model/tool contents only. Zero provider calls; no production authority change.
+Final focused: 253 PASS = runtime25 + AI checkpoints52 + tools37 + context17 + model30 + owner/manual/catalog/startup92.
+Final real PG: 14 PASS = new AI4 + existing manual8 + existing context2.
+New PG4: actual Anthropic SDK/Agent/Saver/shared writer, 10 requests all MockTransport; no provider socket.
+Earlier full invocation: 1766 PASS, 197 opt-in PG SKIP, one upstream AnyIO alias DeprecationWarning.
+Last callback/claim fixes and four added tests are covered by final focused253; no claim of another full invocation.
+Python/TypeScript generation matches; project TypeScript noEmit PASS; no Web code/build change.
+OR-R01: captured recovery context, four FAIL then fixed exact attempt/Future; independently rechecked.
+CR-R01/02: safe start error, start/close drain, absent observer: three FAIL then fixed.
+CR-R02 follow-up: finished-Future callback registration race, one FAIL then explicit owner-settled wait fixed.
+Initial native START helper: four FAIL then fixed pinned original input read/closure; component52 PASS.
+Remaining: foreign-host AI orphan adoption, chat HTTP/Web, Memory/source/selection, full journey/natural quality.
+Final independent review: PASS, no unresolved P1/P2 within this slice; 126-test narrow run and final coordinator25 recheck are separate overlapping evidence.
+
+full: jd-ai-runtime-full-tests.txt | sha256=e3ee2dfe11f18f5f89842b0b864786cc7a3893aee2f12914d6eeab3b82e7c8f1
+1766 passed, 197 skipped, 1 warning in 26.93s
+focused: jd-ai-runtime-focused-tests.txt | sha256=89d6fa468294412292cbe1fa65bc68f258fc9861fdc153b903e7df89b7b7107a
+253 passed in 4.04s
+postgres: jd-ai-runtime-postgres-tests.txt | sha256=1ce2b27b7e380f230fd8b7ef3770a734d8e696b282c3efe866b7a7139a28914d
+14 passed in 6.43s

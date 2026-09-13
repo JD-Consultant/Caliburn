@@ -19,6 +19,25 @@ from deepagents.middleware.filesystem import FilesystemMiddleware
 from langchain_core.tools import BaseTool
 
 
+# Both live repair and background editing must retain unaffected knowledge.
+# https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool#str_replace
+# Display gutter contract: deepagents 0.7.13 read_file / format_content_with_line_numbers.
+# https://github.com/langchain-ai/deepagents/blob/main/libs/deepagents/deepagents/middleware/filesystem.py
+MEMORY_EDIT_GUIDANCE = (
+    "Prefer the smallest local change with distinguishing surrounding context. "
+    "read_file's line number and two following separator spaces are display only: "
+    "'12  - item' has source text '- item'. Preserve actual source indentation, "
+    "not that display prefix. After a missing match, re-read the affected range "
+    "instead of guessing source lines or changing unrelated text. "
+    "Preserve established facts, scope, exceptions, and references that the new "
+    "information does not change. Omission from new information is not withdrawal "
+    "of an established fact. If replacing a whole sentence, section, or file, "
+    "carry unchanged job-relevant details into the replacement; do not summarize "
+    "them away. Unrelated chatter and repeated wording may be omitted, but "
+    "low-frequency work, responsibility boundaries and meaningful case differences "
+    "are not irrelevant merely because they are uncommon."
+)
+
 READONLY_TOOL_DESCRIPTIONS = {
     "ls": (
         "Lists files in a directory to discover unknown paths.\n"

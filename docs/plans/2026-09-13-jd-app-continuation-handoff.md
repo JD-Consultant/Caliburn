@@ -178,6 +178,8 @@ close完成後查回應同時保留原run、messages、JD bindings、Memory view
 
 先交一張採用映射：已驗來源symbol／commit → 正常package落點 → 新App source／owner adapter → 沿用案例 → 只因新接點需補的案例。原prompt、詳記／候選、B1/B2工作規則及模型配置先保持已驗語意；JD新增工具與成稿方法另列差異。舊checkout提供來源，正式／新App不得直接import研究路徑；不整批複製另一套host、source或業務權威。
 
+**映射已交付（2026-09-13）：**[B1／B2 與顧問方法的採用映射](../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)。三項須先知道的結論：(1) 顧問層的已驗來源是 `4f94fbfb`（CT50 profile），`622e548d` 之後的 2853 行是**舊 JD 編輯器，不採用**；(2) B1／B2／C 與 Memory 相關的 13 個模組在 `309eaf21..033540ce` 全程 blob hash 相同，`adoption.json` 現有 hash 對 CT 已驗狀態同樣成立；(3) 最大差距是**完成窗口 source port**——新 App 的 `ConversationSourceService` 只有本輪 scope，B1 需要的跨輪範圍／待整併清單／游標都還沒有，且回合完成的權威改用更嚴格的 AI run record，不移植舊 `closed_turns`／`_turn_status` 推斷。施工順序見該稿 §6，下一步是完成窗口 source port。
+
 - B1 从**已完成的訪談窗口**產生詳記及工作資訊候選；C 的本輪source不是B1完成窗口。保留原文位置、案例條件／更正、低頻工作，不建第二原話庫。
 - B2 將候選整併成目前工作理解與導覽，沿既有 PublicationStore/CAS；C更正不能被晚到的舊B候選蓋回。保留已研究的詳記重抽與來源關係，不退化成每輪一段聊天摘要。
 - 先核原流程與新 source port／owner／完整窗口、故障重開與背景排空的差距，再用正常套件抽出必要部分；不因旧檔大量存在就整批import，不重新發明Memory。

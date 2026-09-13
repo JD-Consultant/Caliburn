@@ -58,10 +58,18 @@
       "adopted_path": "src/caliburn_memory/read_tools.py",
       "adopted_sha256": "090cd033125f5e67b1274d916b05032572ca9755488aeac80b81bbbb74f8f29c",
       "adaptation": "Extract only READONLY_TOOL_DESCRIPTIONS/readonly_file_tools; drop the Skill-file claim and make comments provider-neutral. No source store, SkillAssets, runner or write tool. See read-tools-results.md."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/extraction.py",
+      "source_sha256": "06dd3e8c4d9c76afb461d63ad02c4e733a8509416a98a55211e479b9359eb6ce",
+      "adopted_path": "src/caliburn_memory/extraction.py",
+      "adopted_sha256": "af728c46261fd0efea32fb8109bbd12ea64906f1ffbd4d606ae5e497c76821f5",
+      "instructions_sha256": "83b1437619f6618fd776f3fec6fcf37397d1b5b476390b15f06016b55ec62398",
+      "adaptation": "B1 workflow adopted at 4f94fbfb (CT50 profile). INSTRUCTIONS is byte-identical (see instructions_sha256), as are ExtractionOutput's three fields and validators, the window loop, correction allowance, save, resume, reextract and reextraction_config. Two seams: package imports plus reader.validate_reference in place of the unsigned legacy parse_reference; and provider assembly moved to the caller, which supplies the already-configured structured runnable (built from ExtractionOutput.model_json_schema() with include_raw) and an accepted(raw) port carrying that provider's terminal/refusal evidence. The OpenAI-shaped refusal-block and response_metadata['status'] checks were the only provider-specific logic and now live behind that port; max_output_tokens moved with them. Not yet verified against a real provider on this stack."
     }
   ],
   "new_files": {
-    "src/caliburn_memory/sources.py": "SourceReader port and InvalidSourceReference; no original conversation storage or old source implementation.",
+    "src/caliburn_memory/sources.py": "SourceReader port and InvalidSourceReference; no original conversation storage or old source implementation. ExtractionSourceReader adds the planning, paged read, saved-window and admission methods B1 needs from the source owner.",
     "src/caliburn_memory/__init__.py": "Explicit public exports."
   }
 }

@@ -1,5 +1,7 @@
 # AI 職務顧問 runtime 設計
 
+> **現況／目標邊界（2026-08-28）**：本文以下主體描述目前 production code，包含即將退役的 source correction、獨立 Gap／calibration、JD Evidence、`defer`／`edit-accept`、固定 structured root、model-authored occurrence／Skill 與舊充分性 shape。下一版目標以 [Proposed ADR 0071](../adr/0071-revisable-work-understanding-context-and-review-provenance.md)、[LLM 應填欄位與 Tool Contract 審查](../specs/2026-08-28-llm-authored-field-contract-audit.md)及 [Proposed ADR 0070](../adr/0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md) 為準；[2026-08-28 實作計畫](../superpowers/plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md) 仍含已撤回 snippets，尚不可執行。計畫尚未重寫／執行前，不把目標敘述冒充現況，也不得依本文舊欄位反推新需求。
+
 - Durable authority 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
 - 持久工作草稿與語意審核決策：[ADR 0066](../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)、[ADR 0067](../adr/0067-deep-agents-store-backed-jd-working-draft.md)；0067 的 `StoreBackend` mapping 取代 0066 原先的 `StateBackend` 假設
 - 實作：`apps/api/app/consultant`、`apps/api/app/adapters/langgraph`、`apps/api/app/adapters/openrouter/langchain.py`
@@ -190,5 +192,5 @@ Web 只有 `/workspace` 與文件詳情頁，以 TanStack Query 管理 server ca
 - 沒有 auto-accept／Auto mode；任何 AI 產生的正式文件內容都必須由員工 accept 或 edit-and-accept。
 - current API／Web 沒有 RAG、Reference、semantic retrieval 或外部知識 Tool；`/sources` 的同文件 exact lookup 是員工來源記憶，不是 RAG。repo 保留的 RAG bounded context 仍與 current runtime 隔離。
 - 沒有多 workspace、branch、fork、Git／PR、workspace 版本歷史 UI 或 multi-process 保證。
-- 能力級別與 A 不由 LLM 產生；官方 iCAP 配發代碼不由模型、員工或 export 補造。
+- 第一版核心 JD、Web 編輯器與匯出均不包含 A／能力級別；官方 iCAP 配發代碼不由模型、員工或 export 補造。
 - 沒有正式 quality eval 平台或 billing subsystem；execution receipts 只提供目前 runtime 的窄量測與 fail-closed guard。

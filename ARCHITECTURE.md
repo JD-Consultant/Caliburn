@@ -73,7 +73,7 @@ Web 只有 `/workspace` 與 `/workspace/[document_id]`，以 TanStack Query 管 
 - 沒有 auto-accept／Auto mode；所有 AI 文件內容都須員工接受或修改後接受。
 - 每份 JD 只有一個 active workspace；沒有 branch、fork、Git／PR、workspace 版本歷史 UI 或多人 review。
 - current API／Web 沒有 RAG、Reference、semantic retrieval 或外部知識 Tool；同文件 `/sources` exact lookup 是來源記憶，不是 RAG。
-- 能力級別與 A 不由 LLM 產生；官方 iCAP 配發代碼不由模型、員工或 export 補造。
+- 下一版第一版核心 JD、Web 編輯器與匯出均不包含 A／能力級別；官方 iCAP 配發代碼不由模型、員工或 export 補造。
 - 本機第一版不提供 multi-process guarantee；擴張為多 process 或多人寫入前必須另開 ADR 加入真正 CAS／lease 與衝突政策。
 
 ## RAG 供應鏈（保留、隔離）

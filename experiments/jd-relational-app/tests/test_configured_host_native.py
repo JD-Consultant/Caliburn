@@ -125,7 +125,7 @@ def test_real_initialize_open_edit_and_restart_keep_original_dataset_and_signer(
         process.communicate(timeout=15)
         assert process.returncode == 0
     with Connection.connect(**{**CONNECTION, "dbname": database}) as connection:
-        assert connection.execute("SELECT version_num FROM public.alembic_version").fetchone() == ("20260913_0001",)
+        assert connection.execute("SELECT version_num FROM public.alembic_version").fetchone() == ("20260914_0002",)
         assert connection.execute("SELECT count(*) FROM jd_runtime.checkpoint_migrations").fetchone() == (10,)
         assert connection.execute("SELECT count(*) FROM public.jd_document").fetchone() == (0,)
     initial = value

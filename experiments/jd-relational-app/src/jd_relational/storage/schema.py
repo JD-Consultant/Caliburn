@@ -1,4 +1,5 @@
-"""SQLAlchemy Core metadata for the thirteen JD business tables.
+"""SQLAlchemy Core metadata for the thirteen JD business tables, plus one
+runtime admission row for this App's own background work (ADR0076).
 
 This module defines no engine, connection, repository or write transaction. Text
 normalization, immutable-history ports, source checks and receipt durability remain
@@ -268,5 +269,43 @@ for target in ("profile_field", "collaborator_id", "duty_id", "task_id", "detail
 sa.Index("ix_jd_source_link_relation", jd_source_link.c.document_id, jd_source_link.c.linked_task_id,
          jd_source_link.c.linked_capability_id, jd_source_link.c.position, jd_source_link.c.source_link_id,
          postgresql_where=sa.text("linked_task_id IS NOT NULL"))
+
+JD_CONTENT_TABLE_NAMES = frozenset(metadata.tables)
+
+# Everything above is JD content. What follows is runtime state for this App's
+# own background work: which interview range was admitted, which batch is in
+# flight, why it stopped and how many host recoveries it has spent. It is kept
+# in the same database and migration chain, and deliberately apart from the
+# thirteen content tables, which gain no column for it. See ADR0076.
+jd_memory_admission = sa.Table(
+    "jd_memory_admission", metadata,
+    sa.Column("document_id", sa.String(), nullable=False),
+    # The admitted range's fixed end. Later interview turns never widen it.
+    sa.Column("target_reference", sa.Text()),
+    # The batch currently being handed over; never a processed cursor, which
+    # stays with publication.
+    sa.Column("source_reference", sa.Text()),
+    sa.Column("status", sa.Text(), nullable=False),
+    # A bounded, safe reason only: never a stack, a key or employee speech.
+    sa.Column("error_code", sa.Text()),
+    sa.Column("recovery_count", sa.Integer(), nullable=False, server_default=sa.text("0")),
+    sa.PrimaryKeyConstraint("document_id", name="pk_jd_memory_admission"),
+    sa.ForeignKeyConstraint(["document_id"], ["jd_document.id"],
+                            name="fk_jd_memory_admission_document", ondelete="RESTRICT"),
+    sa.CheckConstraint("status IN ('idle', 'queued', 'running', 'blocked')",
+                       name="ck_jd_memory_admission_status"),
+    sa.CheckConstraint("recovery_count >= 0", name="ck_jd_memory_admission_recovery"),
+    # A queued row has an admitted target; a running row also has its batch;
+    # an idle row holds nothing. A blocked row may have neither, because the
+    # block can happen before any range could be planned.
+    sa.CheckConstraint(
+        "(status = 'idle' AND target_reference IS NULL AND source_reference IS NULL "
+        "AND error_code IS NULL)"
+        " OR (status = 'queued' AND target_reference IS NOT NULL AND error_code IS NULL)"
+        " OR (status = 'running' AND target_reference IS NOT NULL "
+        "AND source_reference IS NOT NULL AND error_code IS NULL)"
+        " OR (status = 'blocked' AND error_code IS NOT NULL)",
+        name="ck_jd_memory_admission_state"),
+)
 
 JD_TABLE_NAMES = frozenset(metadata.tables)

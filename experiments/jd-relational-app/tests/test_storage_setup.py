@@ -142,8 +142,10 @@ def test_canonical_profile_is_tied_to_this_fixed_migration():
     import hashlib
     from pathlib import Path
     profile = setup._ddl_profile()
-    migration = Path(__file__).resolve().parents[1] / "migrations/versions/0001_jd_relational_initial.py"
-    assert profile["source_migration_sha256"] == hashlib.sha256(migration.read_bytes()).hexdigest()
+    versions = Path(__file__).resolve().parents[1] / "migrations/versions"
+    assert profile["source_migrations_sha256"] == {
+        name: hashlib.sha256((versions / name).read_bytes()).hexdigest()
+        for name in ("0001_jd_relational_initial.py", "0002_jd_memory_admission.py")}
     schema = Path(__file__).resolve().parents[1] / "src/jd_relational/storage/schema.py"
     assert profile["source_schema_sha256"] == hashlib.sha256(schema.read_bytes()).hexdigest()
     assert profile["checks"]["jd_revision"]["ck_jd_revision_format_version"] == "CHECK ((format_version = 3))"

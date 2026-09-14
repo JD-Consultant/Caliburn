@@ -23,7 +23,7 @@ from .windows_host import HostLease
 from . import storage_memory_profile as memory_profile
 
 
-REVISION = "20260913_0001"
+REVISION = "20260914_0002"
 SAVER_VERSION_COUNT = 10
 
 

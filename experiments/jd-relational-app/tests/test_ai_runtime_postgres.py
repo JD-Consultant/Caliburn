@@ -52,7 +52,11 @@ def _sse(identity, name=None, arguments=None):
 
 
 @contextmanager
-def _offline_model(monkeypatch, plan, *, body_factory=SyncBody, expected_tool_count=10):
+def _offline_model(monkeypatch, plan, *, body_factory=SyncBody, expected_tools=None):
+    # Identity, not a count: the wire must carry exactly the tools this
+    # consultant was given, so adding one is a deliberate, visible change.
+    expected_names = {getattr(tool, "name", tool) for tool in
+                      (build_jd_tools() if expected_tools is None else expected_tools)}
     monkeypatch.setenv("LANGSMITH_TRACING", "false")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
     requests, bodies = [], []
@@ -65,7 +69,9 @@ def _offline_model(monkeypatch, plan, *, body_factory=SyncBody, expected_tool_co
         assert len(requests) < len(plan), "No hidden model retry or replay is allowed."
         payload = json.loads(request.content)
         assert payload["stream"] is True
-        assert len(payload["tools"]) == expected_tool_count and all(tool["strict"] is True for tool in payload["tools"])
+        assert {tool["name"] for tool in payload["tools"]} == expected_names
+        assert len(payload["tools"]) == len(expected_names)
+        assert all(tool["strict"] is True for tool in payload["tools"])
         assert payload["tool_choice"]["disable_parallel_tool_use"] is True
         requests.append(payload)
         name, arguments = plan[len(requests) - 1](payload)

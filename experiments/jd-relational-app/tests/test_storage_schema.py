@@ -14,7 +14,7 @@ from sqlalchemy import CheckConstraint, ForeignKeyConstraint, UniqueConstraint
 from sqlalchemy.dialects import postgresql
 from sqlalchemy.schema import AddConstraint, CreateColumn, CreateIndex
 
-from jd_relational.storage.schema import metadata
+from jd_relational.storage.schema import JD_CONTENT_TABLE_NAMES, metadata
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,7 +42,10 @@ def indexes(table):
 
 
 def test_exact_thirteen_business_tables_and_history_only_jsonb():
-    assert set(metadata.tables) == TABLES
+    # The runtime admission row (ADR0076) shares this metadata and migration
+    # chain, and is deliberately not one of the thirteen content tables.
+    assert set(metadata.tables) == TABLES | {"jd_memory_admission"}
+    assert JD_CONTENT_TABLE_NAMES == TABLES
     assert "alembic_version" not in metadata.tables
     json_columns = {(table.name, column.name) for table in metadata.tables.values() for column in table.columns
                     if isinstance(column.type, postgresql.JSONB)}
@@ -203,14 +206,15 @@ def test_alembic_offline_upgrade_and_downgrade_need_no_connection(monkeypatch):
     config = Config(str(ROOT / "alembic.ini"), output_buffer=output)
     command.upgrade(config, "head", sql=True)
     ddl = output.getvalue()
-    assert ddl.count("CREATE TABLE jd_") == 13
+    # Thirteen content tables plus the runtime admission row of ADR0076.
+    assert ddl.count("CREATE TABLE jd_") == 14
     assert "CREATE TABLE alembic_version" in ddl
     assert "BEGIN;" in ddl and "COMMIT;" in ddl
     assert "MATCH FULL" not in ddl
     output.seek(0)
     output.truncate()
-    command.downgrade(config, "20260913_0001:base", sql=True)
-    assert output.getvalue().count("DROP TABLE jd_") == 13
+    command.downgrade(config, "head:base", sql=True)
+    assert output.getvalue().count("DROP TABLE jd_") == 14
 
 
 def test_online_migration_requires_explicit_connection_instead_of_loading_credentials():

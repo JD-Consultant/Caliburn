@@ -130,7 +130,7 @@ def test_sdk_reads_fixed_memory_summary_original_then_writes_and_reopens(monkeyp
         return _final(payload)
     plan = [_final, publish_later, read_summary, read_original, check_original_then_jd,
             create, _final, read_latest, latest_final]
-    with _offline_model(monkeypatch, plan, expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, plan, expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), "合成Memory按需讀取驗收")
             fixture["first_run"] = str(uuid4())
@@ -203,7 +203,7 @@ def test_sdk_repairs_memory_from_this_turn_then_reads_the_applied_version(monkey
         assert "只通報異常，維修由外包負責。" in last_tool(payload)
         return _final(payload)
 
-    with _offline_model(monkeypatch, [_final, repair, read_applied, finish], expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, [_final, repair, read_applied, finish], expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), "合成本輪Memory更正")
             first_run = str(uuid4())
@@ -243,7 +243,7 @@ def test_repair_commit_reply_loss_reconciles_original_request_without_replay(mon
         return "repair_memory", {"edits": [{"path": "/memory/knowledge.md",
             "diff": "@@\n-原本只檢查。\n+只通報異常，維修由外包負責。"}]}
 
-    with _offline_model(monkeypatch, [_final, repair], expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, [_final, repair], expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), "合成Memory提交回覆遺失")
             first_run = str(uuid4())
@@ -295,7 +295,7 @@ def test_unknown_repair_result_keeps_the_gate_until_the_original_receipt_appears
         return "repair_memory", {"edits": [{"path": "/memory/knowledge.md",
             "diff": "@@\n-只做檢查。\n+只通報異常，維修由外包負責。"}]}
 
-    with _offline_model(monkeypatch, [_final, repair], expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, [_final, repair], expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), "合成Memory未知發布結果")
             current = owner.storage.read_current(document)
@@ -353,7 +353,7 @@ def test_repair_source_or_store_failure_closes_as_not_published(monkeypatch, eng
         return "repair_memory", {"edits": [{"path": "/memory/knowledge.md",
             "diff": "@@\n-只做檢查。\n+只通報異常，維修由外包負責。"}]}
 
-    with _offline_model(monkeypatch, [_final, repair], expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, [_final, repair], expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), f"合成Memory {failure}失敗")
             current = owner.storage.read_current(document)
@@ -396,7 +396,7 @@ def test_repair_root_close_ack_loss_uses_exact_readback_without_replay(monkeypat
         return "repair_memory", {"edits": [{"path": "/memory/knowledge.md",
             "diff": "@@\n-只做檢查。\n+只通報異常，維修由外包負責。"}]}
 
-    with _offline_model(monkeypatch, [_final, repair, _final], expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, [_final, repair, _final], expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), "合成Memory閉合回覆遺失")
             current = owner.storage.read_current(document)
@@ -444,7 +444,7 @@ def test_cancel_during_repair_drains_publication_and_blocks_the_next_model(monke
     def forbidden(_):
         pytest.fail("Cancellation during C must not start another model request")
 
-    with _offline_model(monkeypatch, [_final, repair, forbidden], expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, [_final, repair, forbidden], expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), "合成Memory取消排空")
             current = owner.storage.read_current(document)
@@ -498,7 +498,7 @@ def test_repair_stopped_before_c_closes_the_original_call_as_not_executed(monkey
         return "repair_memory", {"edits": [{"path": "/memory/knowledge.md",
             "diff": "@@\n-只做檢查。\n+只通報異常，維修由外包負責。"}]}
 
-    with _offline_model(monkeypatch, [_final, repair, _final], expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, [_final, repair, _final], expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), f"合成Memory停止位置 {stop}")
             current = owner.storage.read_current(document)
@@ -596,7 +596,7 @@ def test_a_later_memory_head_does_not_invalidate_the_original_applied_repair(mon
         return "repair_memory", {"edits": [{"path": "/memory/knowledge.md",
             "diff": "@@\n-只做檢查。\n+只通報異常，維修由外包負責。"}]}
 
-    with _offline_model(monkeypatch, [_final, repair, _final, _final], expected_tool_count=15) as (model, requests):
+    with _offline_model(monkeypatch, [_final, repair, _final, _final], expected_tools=build_consultant_tools()) as (model, requests):
         with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
             document = owner.create_document(uuid4(), "合成Memory晚到背景版本")
             current = owner.storage.read_current(document)

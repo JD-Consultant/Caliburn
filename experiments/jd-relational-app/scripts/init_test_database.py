@@ -6,7 +6,7 @@ from alembic import command
 from alembic.config import Config
 import sqlalchemy as sa
 
-from jd_relational.storage.schema import JD_TABLE_NAMES
+from jd_relational.storage.schema import JD_CONTENT_TABLE_NAMES, JD_TABLE_NAMES
 
 
 def main():
@@ -23,7 +23,13 @@ def main():
             if identity != ("caliburn_jd_relational_test", "jd_test", 180006):
                 raise RuntimeError("Unexpected test database identity/version; no migration applied.")
             tables = set(sa.inspect(connection).get_table_names(schema="public"))
-            if tables and tables != JD_TABLE_NAMES | {"alembic_version"}:
+            # Fresh, or already at a known head of this chain. Listing the
+            # earlier head explicitly is what lets 0002 upgrade an existing test
+            # database; anything not on this list is not this database and gets
+            # no migration.
+            if tables not in (set(),
+                              JD_CONTENT_TABLE_NAMES | {"alembic_version"},
+                              JD_TABLE_NAMES | {"alembic_version"}):
                 raise RuntimeError("Unexpected existing tables; no migration applied.")
             config = Config(str(Path(__file__).resolve().parents[1] / "alembic.ini"))
             config.attributes["connection"] = connection
@@ -32,7 +38,8 @@ def main():
             if actual != JD_TABLE_NAMES | {"alembic_version"}:
                 raise RuntimeError("Initialization did not produce the expected tables; rolling back.")
             revision = connection.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one()
-        print(f"PostgreSQL 18.6: 13 JD tables + Alembic metadata; migration {revision} committed.")
+        print(f"PostgreSQL 18.6: 13 JD content tables + 1 runtime admission table "
+              f"+ Alembic metadata; migration {revision} committed.")
     finally:
         engine.dispose()
 

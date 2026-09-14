@@ -39,7 +39,7 @@ def engine():
             assert conn.execute(sa.text(
                 "SELECT current_database(), current_user, current_setting('server_version_num')::integer"
             )).one() == ("caliburn_jd_relational_test", "jd_test", 180006)
-            assert conn.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one() == "20260913_0001"
+            assert conn.execute(sa.text("SELECT version_num FROM alembic_version")).scalar_one() == "20260914_0002"
         yield value
         assert calls and not any(calls), "This probe must not implicitly enter executemany."
     finally:

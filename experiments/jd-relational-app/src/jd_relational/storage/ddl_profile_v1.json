@@ -1,10 +1,9 @@
 {
   "profile_version": 1,
   "postgresql_server_version_num": 180006,
-  "alembic_revision": "20260913_0001",
-  "source_migration_sha256": "4abccba7242a383ef51fe4395eee4606c0e997e23ede9915d67e2238c6d4c2d0",
-  "source_schema_sha256": "ff5ab01eff51bdb866822ca4b5385de0184a8c8029669fcab07b35200fdf7f54",
-  "captured_at": "2026-09-13",
+  "alembic_revision": "20260914_0002",
+  "source_schema_sha256": "72cb4fc967df35d2ef92fead50b3b0d728500c9c919c237d5931e969d32aba25",
+  "captured_at": "2026-09-14T06:08:44Z",
   "purpose": "Compatibility expectations captured from a fresh synthetic PostgreSQL database after the fixed migration; not document or migration authority.",
   "checks": {
     "jd_capability": {
@@ -29,6 +28,11 @@
     },
     "jd_head": {
       "ck_jd_head_revision_number": "CHECK ((revision_number >= 1))"
+    },
+    "jd_memory_admission": {
+      "ck_jd_memory_admission_recovery": "CHECK ((recovery_count >= 0))",
+      "ck_jd_memory_admission_state": "CHECK ((((status = 'idle'::text) AND (target_reference IS NULL) AND (source_reference IS NULL) AND (error_code IS NULL)) OR ((status = 'queued'::text) AND (target_reference IS NOT NULL) AND (error_code IS NULL)) OR ((status = 'running'::text) AND (target_reference IS NOT NULL) AND (source_reference IS NOT NULL) AND (error_code IS NULL)) OR ((status = 'blocked'::text) AND (error_code IS NOT NULL))))",
+      "ck_jd_memory_admission_status": "CHECK ((status = ANY (ARRAY['idle'::text, 'queued'::text, 'running'::text, 'blocked'::text])))"
     },
     "jd_operation": {
       "ck_jd_operation_origin": "CHECK ((origin = ANY (ARRAY['manual'::text, 'ai'::text])))",
@@ -82,5 +86,9 @@
     "jd_task": {
       "ix_jd_task_unassigned": "(duty_id IS NULL)"
     }
+  },
+  "source_migrations_sha256": {
+    "0001_jd_relational_initial.py": "4abccba7242a383ef51fe4395eee4606c0e997e23ede9915d67e2238c6d4c2d0",
+    "0002_jd_memory_admission.py": "b0c8e9f8c227f923e22d7e2a43667bb171c19efa260256e2af53e773d414cdad"
   }
 }

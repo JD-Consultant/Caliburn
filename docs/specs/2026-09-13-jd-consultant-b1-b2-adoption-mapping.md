@@ -71,7 +71,9 @@ C 寫 `kind="repair"` 的 publication receipt 並推進 head；B2 寫 `kind="con
 
 採用時共用本機宿主的啟停／資源管理；**不把背景工作硬套前景手改門閘，也不把「不能雙寫」誤寫成禁止必要背景表或框架喚醒器**。不整批搬舊 service、全域鎖或另一宿主，不新造通用排程器。
 
-**2026-09-14 隔離施工候選：先保留已驗 `BackgroundRow` 的六欄准入責任作最小基線，但尚未決定增加新表。**Saver 已保存 B1/B2 進度，但尚未開始的 target、未消耗尾端及跨重開的受阻／恢復額度並不在這兩個 workflow 的正式 state 中。將這些硬塞 B1、掃歷史猜測或另造調度 StateGraph 都增加額外接合；沿已驗小表語意可作為待驗替代。這不是 production adoption，也不要求沿用舊 host／constructor setup。R3 先驗證既有 Saver／catalog 是否確實無法承載准入責任；在該缺口成立並完成 migration／ADR 前，不建立此表。
+**2026-09-14 已選定：**缺口驗證已完成且成立（真 PG 逐欄實測 B1／B2 Saver state、publication head 與 `jd_document`，`target_reference`／`status`／`error_code`／`recovery_count` 皆不在其中；批次是 target 的前綴，不能代替它）。因此採用已驗 `BackgroundRow` 的六欄責任，新增 runtime 准入表 `jd_memory_admission`，決定見 [ADR0076](../adr/0076-jd-background-admission-record.md)、狀態機與恢復程序見[背景准入設計](2026-09-14-jd-background-admission-design.md)。**十三張 JD 內容表不增減欄位，但 App 總表數自十三增為十四。**下文保留當時的候選論證作為出處。
+
+**（以下為 2026-09-14 選定前的候選敘述）先保留已驗 `BackgroundRow` 的六欄准入責任作最小基線，但尚未決定增加新表。**Saver 已保存 B1/B2 進度，但尚未開始的 target、未消耗尾端及跨重開的受阻／恢復額度並不在這兩個 workflow 的正式 state 中。將這些硬塞 B1、掃歷史猜測或另造調度 StateGraph 都增加額外接合；沿已驗小表語意可作為待驗替代。這不是 production adoption，也不要求沿用舊 host／constructor setup。R3 先驗證既有 Saver／catalog 是否確實無法承載准入責任；在該缺口成立並完成 migration／ADR 前，不建立此表。
 
 | 欄位 | 最小保存內容／約束 | 單一責任 |
 |---|---|---|

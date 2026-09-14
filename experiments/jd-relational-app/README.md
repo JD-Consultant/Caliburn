@@ -1,6 +1,6 @@
 # 關聯式 JD：隔離編輯核心
 
-**目前狀態（2026-09-14）：**C 的 App 接合／停止收尾／新程序查回已完成；source 與 B1 核心／OpenAI adapter 固定接合。[H4 runtime執行計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md) **R1 已完成**：source owner 發固定 target 並切有界批次（[結果](../../docs/specs/evidence/jd-b1-adoption/fixed-target-batch-results.md)），一批 B1 在真 PostgresSaver／PostgresStore 上保存、故障後關閉重建資源續作、重抽與查回（[結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。**R2 也已完成**：B2 已採用，B1→B2→publication 兩批有序交接、B2 pending 重建資源續作、發布回覆遺失查回與 C 較晚更正都在真 PG 上驗過（[結果](../../docs/specs/evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。**R3（通知註冊、背景准入、宿主生命週期、真新 Windows 程序）尚未開始**；「B2 未發布不得開始下一批」目前仍靠 caller 串行，未加程式門閘。日常 AI 未啟用。既有非JD顧問有CT49／50限定真模型成果；新App日常AI未啟用，不等於顧問從未做好。下文早期切片保留當時結果，不能把當時「下一步」當目前待辦。
+**目前狀態（2026-09-14）：**C 的 App 接合／停止收尾／新程序查回已完成；source 與 B1 核心／OpenAI adapter 固定接合。[H4 runtime執行計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md) **R1 已完成**：source owner 發固定 target 並切有界批次（[結果](../../docs/specs/evidence/jd-b1-adoption/fixed-target-batch-results.md)），一批 B1 在真 PostgresSaver／PostgresStore 上保存、故障後關閉重建資源續作、重抽與查回（[結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。**R2 也已完成**：B2 已採用，B1→B2→publication 兩批有序交接、B2 pending 重建資源續作、發布回覆遺失查回與 C 較晚更正都在真 PG 上驗過（[結果](../../docs/specs/evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。**R3 進行中**（[結果](../../docs/specs/evidence/jd-b1-adoption/r3-notification-and-background-results.md)）：純通知工具已註冊並有自己的結果分類（不借用 JD operation）；「B2 未發布不得開始下一批」已由 `require_handed_over` 以 publication head 關閉；背景准入列 `jd_memory_admission` 已依 [ADR0076](../../docs/adr/0076-jd-background-admission-record.md) 建立並在真 PG 驗過保存、對帳、重複喚醒、受阻與封存。**宿主生命週期、有界背景 worker 與真新 Windows 程序恢復尚未做；顧問指引／Skills／BackgroundAvailability 與 JD 編輯器共用 writer 的接合也未做。**日常 AI 未啟用。既有非JD顧問有CT49／50限定真模型成果；新App日常AI未啟用，不等於顧問從未做好。下文早期切片保留當時結果，不能把當時「下一步」當目前待辦。
 
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2、RS-3 第一段及 RS-4 通知／模型保存接點。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
@@ -22,7 +22,7 @@
 
 **Memory 核心接合：**[獨立套件與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)已驗保存／發布、固定版本讀取、後續修正与真 PG 重開；使用 `packages/consultant-memory` 正常依賴。`memory_sources.py` 只把同一原話 owner 綁到文件；新來源有 `conversation:` 前綴，既有裸 signed v1 原樣可讀。原話及 JD 不雙寫。[宿主 Memory 接合](../../docs/specs/2026-09-13-jd-memory-host-integration-slice.md)已完成一般 host 的獨立Store連線、原生Runtime.store、schema-mapped publication view、明示初始化及登記讀取排空；同設定新程序讀回原話／Memory通過。模型工具與背景整理／即時修補尚未接，不冒稱完整顧問可用。
 
-一般 host 現要求既有 `checkpoint_schema` 的八張表（四Saver＋兩Store＋兩publication），public JD仍十三表＋Alembic。原ready實驗資料庫缺Memory時明示拒絕，不自動升級或清資料；新配置只明示初始化fresh DB。本機合成 fixture 的舊host區可由下方專用腳本補齊，不是產品更新流程。
+一般 host 現要求既有 `checkpoint_schema` 的八張表（四Saver＋兩Store＋兩publication）；public 是**十三張 JD 內容表＋一張 runtime 背景准入表（`jd_memory_admission`，[ADR0076](../../docs/adr/0076-jd-background-admission-record.md)）＋Alembic**，內容表本身未增減欄位。原ready實驗資料庫缺Memory時明示拒絕，不自動升級或清資料；新配置只明示初始化fresh DB。本機合成 fixture 的舊host區可由下方專用腳本補齊，不是產品更新流程。
 
 **最新[聊天HTTP與原修改結果](../../docs/specs/2026-09-13-jd-chat-http-slice.md)已接。**`ChatService` 共用 `AiRuntime`／人工write state，原話、實際執行與JD效果分開回報；`chat_history.py`固定原root/source分頁，只公開原話及AI正文。生成契約／TS、完整離線2211 PASS／209 SKIP、三個真PG HTTP情境與獨審通過。`open_managed_app`預設`enable_chat=False`，日常仍不開provider；新run回`ai_unavailable`，保存對話／原結果可查。下一接Web，不宣稱自然AI或完整App完成。
 
@@ -65,7 +65,7 @@
 - `manual_runtime.py`：每文件實際 writer／Future、保存與收尾確認；有 native lease 時先掃全 catalog 關閉原 pending 才開新修改。foreign pending 不把空本地 Future 當死亡證明。
 - `windows_host.py`／`host_runtime.py`：固定安裝 mutex、舊 Job 退出、新 Job membership 及程序終身 lease；成功後才開 DB／Saver，startup 完成才 ready。只供專用 App 程序，不在目前 Python shell／pytest 主程序直接 bootstrap。
 - `result_transport.py`／`http_results.py`：驗證觀察結果並投影；不執行寫入或自動重試，不把候選當保存完成。
-- `storage/schema.py`／`migrations`：十三張關聯表與固定 Alembic migration；沒有連線自動初始化或通用 repository。
+- `storage/schema.py`／`migrations`：十三張關聯內容表、一張 runtime 背景准入表與固定 Alembic migration（目前 head `20260914_0002`）；沒有連線自動初始化或通用 repository。
 - `storage/rows.py`：九組 current 資料增量讀寫；由 caller 控制交易。
 - `storage/receipts.py`／`storage/service.py`：永久回執、`JdReader` 同版唯讀及 `JdStorage` 共同保存；`reconcile_stopped` 只接受原 `AdmittedIdentity`，沒有候選重建或自動重播。
 - `references.py`：ItsDangerous 2.2.0 標準 signer，固定型別、文件／版本／用途與資料集檢查；沒有自建簽章或 token registry。

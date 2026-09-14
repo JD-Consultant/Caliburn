@@ -206,7 +206,7 @@ def main(mode, manifest, report):
                 "repair_reply_loss": [_final, _repair]}
             tools = build_consultant_tools() if mode == "repair_reply_loss" else build_jd_tools()
             model, requests = stack.enter_context(_offline_model(monkeypatch, plans[mode],
-                expected_tool_count=len(tools)))
+                expected_tools=tools))
             child = build_consultant_node(model, tools=tools,
                 guidance="合成重啟驗收；只記錄員工描述的真實工作。", extra_middleware=[AiToolMiddleware()])
         host = open_manual_host(INSTALLATION, DATABASE_URL, checkpoint_schema=SCHEMA, consultant=child)

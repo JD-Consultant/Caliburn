@@ -1,0 +1,1216 @@
+{
+  "schema": "docs/specs/contracts/jd-editor-v1.schema.json",
+  "sha256": "ced26a3b625de891989a63d5f12e4ac884484083d7f677cf10ad8c54e318b973",
+  "validator": "AJV 8.20.0",
+  "defs": 86,
+  "checks": [
+    {
+      "name": "TF01_model_overlap_source_refs",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_resolved_overlap_source_refs",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_model_overlap_colSizes",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_resolved_overlap_colSizes",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_model_overlap_marginLeft",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_resolved_overlap_marginLeft",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_model_overlap_size",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_resolved_overlap_size",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_model_overlap_colSpan",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_resolved_overlap_colSpan",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_model_overlap_rowSpan",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_resolved_overlap_rowSpan",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_model_overlap_background",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_resolved_overlap_background",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_model_overlap_borders",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_resolved_overlap_borders",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF01_disjoint_update",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF01_set_only",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF01_unset_only",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF01_empty_update_rejected",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF02_numeric_new_cell",
+      "definition": "JdNewElement",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF02_new_cell_attributes_rejected",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF02_set_attributes_rejected",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF02_unset_attributes_rejected",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF02_zero_span_rejected",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF02_saved_native_attributes_retained",
+      "definition": "JdSavedElement",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF03_move_without_repeated_sources",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF03_top_level_sources_rejected",
+      "definition": "JdEditModelInput",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF03_new_content_attached_sources",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF03_explicit_source_replacement",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF03_explicit_source_clear",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_committed_continue",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_committed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_continue",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_no_change_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_invalid_input_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_invalid_input_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_invalid_input_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_invalid_input_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_invalid_input_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_invalid_input_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_unsupported_content_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_unsupported_content_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_unsupported_content_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_unsupported_content_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_unsupported_content_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_unsupported_content_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_target_missing_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_target_missing_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_target_missing_reread_current",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_target_missing_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_target_missing_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_target_missing_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_stale_base_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_stale_base_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_stale_base_reread_current",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_stale_base_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_stale_base_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_stale_base_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_engine_failed_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_engine_failed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_engine_failed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_engine_failed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_engine_failed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_engine_failed_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_save_failed_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_save_failed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_save_failed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_save_failed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_save_failed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_save_failed_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_operation_conflict_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_operation_conflict_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_operation_conflict_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_operation_conflict_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_operation_conflict_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_operation_conflict_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_busy_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_busy_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_busy_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_busy_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_busy_wait",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_busy_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_prebinding_invalid_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_prebinding_invalid_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_prebinding_invalid_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_prebinding_invalid_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_prebinding_invalid_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_prebinding_invalid_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_busy_must_not_bind_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_conflict_requires_original_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_confirmed_receipt_requires_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unknown_no_claimed_result",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_manual_uses_same_result_boundary",
+      "definition": "JdManualSaveResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_invalid_input_no_result_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_invalid_input_no_change_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_unsupported_content_no_result_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_unsupported_content_no_change_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_target_missing_no_result_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_target_missing_no_change_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_stale_base_no_result_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_stale_base_no_change_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_engine_failed_no_result_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_engine_failed_no_change_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_save_failed_no_result_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_save_failed_no_change_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_busy_no_result_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_failure_busy_no_change_ref",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_conflict_can_locate_original_result",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "DB04_no_change_cannot_publish_transient_operations",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "DB04_no_change_has_no_affected_ids",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_invalid_input_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_invalid_input_reread_current",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_invalid_input_wait",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_invalid_input_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_unsupported_content_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_unsupported_content_reread_current",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_unsupported_content_wait",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_unsupported_content_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_target_missing_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_target_missing_reread_current",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_target_missing_wait",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_target_missing_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_busy_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_busy_reread_current",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_busy_wait",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_busy_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_read_failed_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_read_failed_reread_current",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_read_failed_wait",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_read_failed_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_jd_read_infra_failure",
+      "definition": "JdReadResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_change_read_infra_failure",
+      "definition": "JdChangeReadResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "baseline_full_official_r2_still_valid",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "baseline_model_cannot_supply_id",
+      "definition": "JdEditModelInput",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "baseline_current_read_no_model_offsets",
+      "definition": "JdReadModelInput",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "baseline_read_modes_exclusive",
+      "definition": "JdReadModelInput",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "baseline_source_scope_is_not_a_schema_claim",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "current_companion_example_1",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "current_companion_example_2",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "current_companion_example_3",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "current_companion_example_4",
+      "definition": "JdManualSaveClientInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "source_attachment_example_1",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "source_attachment_example_2",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "source_attachment_example_3",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true
+    }
+  ],
+  "errors": [],
+  "scope": "schema only; no editor, source validation, database, provider, DOM, or natural-model claim"
+}

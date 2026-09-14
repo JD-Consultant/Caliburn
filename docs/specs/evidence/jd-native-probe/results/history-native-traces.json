@@ -1,0 +1,5143 @@
+{
+  "H01": {
+    "baseline": [
+      {
+        "type": "p",
+        "id": "a",
+        "sourceRefs": [
+          "source:a"
+        ],
+        "children": [
+          {
+            "text": "確認需求。"
+          }
+        ]
+      },
+      {
+        "type": "p",
+        "id": "b",
+        "children": [
+          {
+            "text": "維護僅限約定範圍。"
+          }
+        ]
+      }
+    ],
+    "sourceAfter": {
+      "value": [
+        {
+          "type": "p",
+          "id": "a",
+          "sourceRefs": [
+            "source:a"
+          ],
+          "children": [
+            {
+              "text": "先確認需求。",
+              "bold": true
+            }
+          ],
+          "scope": {
+            "covered": [
+              "客戶網站"
+            ],
+            "approved": false
+          }
+        },
+        {
+          "type": "p",
+          "id": "c",
+          "children": [
+            {
+              "text": "保留未解事項。"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "id": "b",
+          "children": [
+            {
+              "text": "維護"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "text": "僅限約定範圍。"
+            }
+          ],
+          "type": "p",
+          "id": "history-new-1"
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 0,
+                "text": "先"
+              },
+              {
+                "type": "set_node",
+                "path": [
+                  0
+                ],
+                "properties": {},
+                "newProperties": {
+                  "scope": {
+                    "covered": [
+                      "客戶網站"
+                    ],
+                    "approved": false
+                  }
+                }
+              },
+              {
+                "type": "set_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "properties": {},
+                "newProperties": {
+                  "bold": true
+                }
+              },
+              {
+                "type": "insert_node",
+                "path": [
+                  2
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "c",
+                  "children": [
+                    {
+                      "text": "保留未解事項。"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "move_node",
+                "path": [
+                  2
+                ],
+                "newPath": [
+                  1
+                ]
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  2,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  2
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-new-1"
+                }
+              }
+            ],
+            "selectionBefore": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "operationsJsonRoundtrip": [
+      {
+        "type": "insert_text",
+        "path": [
+          0,
+          0
+        ],
+        "offset": 0,
+        "text": "先"
+      },
+      {
+        "type": "set_node",
+        "path": [
+          0
+        ],
+        "properties": {},
+        "newProperties": {
+          "scope": {
+            "covered": [
+              "客戶網站"
+            ],
+            "approved": false
+          }
+        }
+      },
+      {
+        "type": "set_node",
+        "path": [
+          0,
+          0
+        ],
+        "properties": {},
+        "newProperties": {
+          "bold": true
+        }
+      },
+      {
+        "type": "insert_node",
+        "path": [
+          2
+        ],
+        "node": {
+          "type": "p",
+          "id": "c",
+          "children": [
+            {
+              "text": "保留未解事項。"
+            }
+          ]
+        }
+      },
+      {
+        "type": "move_node",
+        "path": [
+          2
+        ],
+        "newPath": [
+          1
+        ]
+      },
+      {
+        "type": "split_node",
+        "path": [
+          2,
+          0
+        ],
+        "position": 2,
+        "properties": {}
+      },
+      {
+        "type": "split_node",
+        "path": [
+          2
+        ],
+        "position": 1,
+        "properties": {
+          "type": "p",
+          "id": "history-new-1"
+        }
+      }
+    ],
+    "targetAfter": {
+      "value": [
+        {
+          "type": "p",
+          "id": "a",
+          "sourceRefs": [
+            "source:a"
+          ],
+          "children": [
+            {
+              "text": "先確認需求。",
+              "bold": true
+            }
+          ],
+          "scope": {
+            "covered": [
+              "客戶網站"
+            ],
+            "approved": false
+          }
+        },
+        {
+          "type": "p",
+          "id": "c",
+          "children": [
+            {
+              "text": "保留未解事項。"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "id": "b",
+          "children": [
+            {
+              "text": "維護"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "text": "僅限約定範圍。"
+            }
+          ],
+          "type": "p",
+          "id": "history-new-1"
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 0,
+                "text": "先"
+              },
+              {
+                "type": "set_node",
+                "path": [
+                  0
+                ],
+                "properties": {},
+                "newProperties": {
+                  "scope": {
+                    "covered": [
+                      "客戶網站"
+                    ],
+                    "approved": false
+                  }
+                }
+              },
+              {
+                "type": "set_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "properties": {},
+                "newProperties": {
+                  "bold": true
+                }
+              },
+              {
+                "type": "insert_node",
+                "path": [
+                  2
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "c",
+                  "children": [
+                    {
+                      "text": "保留未解事項。"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "move_node",
+                "path": [
+                  2
+                ],
+                "newPath": [
+                  1
+                ]
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  2,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  2
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-new-1"
+                }
+              }
+            ],
+            "selectionBefore": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "targetUndo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "a",
+          "sourceRefs": [
+            "source:a"
+          ],
+          "children": [
+            {
+              "text": "確認需求。"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "id": "b",
+          "children": [
+            {
+              "text": "維護僅限約定範圍。"
+            }
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 0,
+                "text": "先"
+              },
+              {
+                "type": "set_node",
+                "path": [
+                  0
+                ],
+                "properties": {},
+                "newProperties": {
+                  "scope": {
+                    "covered": [
+                      "客戶網站"
+                    ],
+                    "approved": false
+                  }
+                }
+              },
+              {
+                "type": "set_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "properties": {},
+                "newProperties": {
+                  "bold": true
+                }
+              },
+              {
+                "type": "insert_node",
+                "path": [
+                  2
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "c",
+                  "children": [
+                    {
+                      "text": "保留未解事項。"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "move_node",
+                "path": [
+                  2
+                ],
+                "newPath": [
+                  1
+                ]
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  2,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  2
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-new-1"
+                }
+              }
+            ],
+            "selectionBefore": null,
+            "selectionAfter": null
+          }
+        ],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "targetRedo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "a",
+          "sourceRefs": [
+            "source:a"
+          ],
+          "children": [
+            {
+              "text": "先確認需求。",
+              "bold": true
+            }
+          ],
+          "scope": {
+            "covered": [
+              "客戶網站"
+            ],
+            "approved": false
+          }
+        },
+        {
+          "type": "p",
+          "id": "c",
+          "children": [
+            {
+              "text": "保留未解事項。"
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "id": "b",
+          "children": [
+            {
+              "text": "維護"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "text": "僅限約定範圍。"
+            }
+          ],
+          "type": "p",
+          "id": "history-new-2"
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 0,
+                "text": "先"
+              },
+              {
+                "type": "set_node",
+                "path": [
+                  0
+                ],
+                "properties": {},
+                "newProperties": {
+                  "scope": {
+                    "covered": [
+                      "客戶網站"
+                    ],
+                    "approved": false
+                  }
+                }
+              },
+              {
+                "type": "set_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "properties": {},
+                "newProperties": {
+                  "bold": true
+                }
+              },
+              {
+                "type": "insert_node",
+                "path": [
+                  2
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "c",
+                  "children": [
+                    {
+                      "text": "保留未解事項。"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "move_node",
+                "path": [
+                  2
+                ],
+                "newPath": [
+                  1
+                ]
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  2,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  2
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-new-1"
+                }
+              }
+            ],
+            "selectionBefore": null,
+            "selectionAfter": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    }
+  },
+  "H02": {
+    "beforeAI": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterAI": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前AI"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "A"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3,
+                "text": "I"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterHuman": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前AI人"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 5
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 5
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "A"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3,
+                "text": "I"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "firstUndo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "A"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3,
+                "text": "I"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5
+              }
+            }
+          }
+        ],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "secondUndo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "A"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3,
+                "text": "I"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "firstRedo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "A"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3,
+                "text": "I"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5
+              }
+            }
+          }
+        ],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "secondRedo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前AI人"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 5
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 5
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "A"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3,
+                "text": "I"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    }
+  },
+  "H03": {
+    "beforeAI": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterAI": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前AI"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "A"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3,
+                "text": "I"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterHuman": {
+      "value": [
+        {
+          "type": "p",
+          "id": "p",
+          "children": [
+            {
+              "text": "本前AI人改"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 6
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 6
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "前"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "A"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3,
+                "text": "I"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4,
+                "text": "人"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 5,
+                "text": "改"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "undos": [
+      {
+        "value": [
+          {
+            "type": "p",
+            "id": "p",
+            "children": [
+              {
+                "text": "本前AI"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "anchor": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 4
+          },
+          "focus": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 4
+          }
+        },
+        "history": {
+          "redos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4,
+                  "text": "人"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 5,
+                  "text": "改"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                }
+              }
+            }
+          ],
+          "undos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1,
+                  "text": "前"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                }
+              }
+            },
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2,
+                  "text": "A"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 3,
+                  "text": "I"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        },
+        "operations": [],
+        "diagnosticFlags": {
+          "saving": null,
+          "merging": null,
+          "splittingOnce": null,
+          "normalizing": true
+        }
+      },
+      {
+        "value": [
+          {
+            "type": "p",
+            "id": "p",
+            "children": [
+              {
+                "text": "本前"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "anchor": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 2
+          },
+          "focus": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 2
+          }
+        },
+        "history": {
+          "redos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4,
+                  "text": "人"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 5,
+                  "text": "改"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                }
+              }
+            },
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2,
+                  "text": "A"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 3,
+                  "text": "I"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              }
+            }
+          ],
+          "undos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1,
+                  "text": "前"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                }
+              }
+            }
+          ]
+        },
+        "operations": [],
+        "diagnosticFlags": {
+          "saving": null,
+          "merging": null,
+          "splittingOnce": null,
+          "normalizing": true
+        }
+      },
+      {
+        "value": [
+          {
+            "type": "p",
+            "id": "p",
+            "children": [
+              {
+                "text": "本"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "anchor": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 1
+          },
+          "focus": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 1
+          }
+        },
+        "history": {
+          "redos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4,
+                  "text": "人"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 5,
+                  "text": "改"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                }
+              }
+            },
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2,
+                  "text": "A"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 3,
+                  "text": "I"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              }
+            },
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1,
+                  "text": "前"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              }
+            }
+          ],
+          "undos": []
+        },
+        "operations": [],
+        "diagnosticFlags": {
+          "saving": null,
+          "merging": null,
+          "splittingOnce": null,
+          "normalizing": true
+        }
+      }
+    ],
+    "redos": [
+      {
+        "value": [
+          {
+            "type": "p",
+            "id": "p",
+            "children": [
+              {
+                "text": "本前"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "anchor": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 2
+          },
+          "focus": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 2
+          }
+        },
+        "history": {
+          "redos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4,
+                  "text": "人"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 5,
+                  "text": "改"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                }
+              }
+            },
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2,
+                  "text": "A"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 3,
+                  "text": "I"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              }
+            }
+          ],
+          "undos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1,
+                  "text": "前"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              }
+            }
+          ]
+        },
+        "operations": [],
+        "diagnosticFlags": {
+          "saving": null,
+          "merging": null,
+          "splittingOnce": null,
+          "normalizing": true
+        }
+      },
+      {
+        "value": [
+          {
+            "type": "p",
+            "id": "p",
+            "children": [
+              {
+                "text": "本前AI"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "anchor": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 4
+          },
+          "focus": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 4
+          }
+        },
+        "history": {
+          "redos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4,
+                  "text": "人"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 5,
+                  "text": "改"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                }
+              }
+            }
+          ],
+          "undos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1,
+                  "text": "前"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              }
+            },
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2,
+                  "text": "A"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 3,
+                  "text": "I"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              }
+            }
+          ]
+        },
+        "operations": [],
+        "diagnosticFlags": {
+          "saving": null,
+          "merging": null,
+          "splittingOnce": null,
+          "normalizing": true
+        }
+      },
+      {
+        "value": [
+          {
+            "type": "p",
+            "id": "p",
+            "children": [
+              {
+                "text": "本前AI人改"
+              }
+            ]
+          }
+        ],
+        "selection": {
+          "anchor": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 6
+          },
+          "focus": {
+            "path": [
+              0,
+              0
+            ],
+            "offset": 6
+          }
+        },
+        "history": {
+          "redos": [],
+          "undos": [
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1,
+                  "text": "前"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 1
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              }
+            },
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2,
+                  "text": "A"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 3,
+                  "text": "I"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 2
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              }
+            },
+            {
+              "operations": [
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4,
+                  "text": "人"
+                },
+                {
+                  "type": "insert_text",
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 5,
+                  "text": "改"
+                }
+              ],
+              "selectionBefore": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 4
+                }
+              },
+              "selectionAfter": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 6
+                }
+              }
+            }
+          ]
+        },
+        "operations": [],
+        "diagnosticFlags": {
+          "saving": null,
+          "merging": null,
+          "splittingOnce": null,
+          "normalizing": true
+        }
+      }
+    ]
+  },
+  "H04": {
+    "beforeSetValue": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原A"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "B"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3
+              }
+            }
+          }
+        ],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "A"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterSetValue": {
+      "value": [
+        {
+          "type": "p",
+          "id": "replacement",
+          "children": [
+            {
+              "text": "另一份"
+            }
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "A"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "remove_node",
+                "path": [
+                  0
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "original",
+                  "children": [
+                    {
+                      "text": "原A"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "insert_node",
+                "path": [
+                  0
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "replacement",
+                  "children": [
+                    {
+                      "text": "另一份"
+                    }
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "undoSetValue": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原A"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "remove_node",
+                "path": [
+                  0
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "original",
+                  "children": [
+                    {
+                      "text": "原A"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "insert_node",
+                "path": [
+                  0
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "replacement",
+                  "children": [
+                    {
+                      "text": "另一份"
+                    }
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": null
+          }
+        ],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "A"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "undoEarlierHuman": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "remove_node",
+                "path": [
+                  0
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "original",
+                  "children": [
+                    {
+                      "text": "原A"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "insert_node",
+                "path": [
+                  0
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "replacement",
+                  "children": [
+                    {
+                      "text": "另一份"
+                    }
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": null
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "A"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "redoSetValue": {
+      "value": [
+        {
+          "type": "p",
+          "id": "replacement",
+          "children": [
+            {
+              "text": "另一份"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "A"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "remove_node",
+                "path": [
+                  0
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "original",
+                  "children": [
+                    {
+                      "text": "原A"
+                    }
+                  ]
+                }
+              },
+              {
+                "type": "insert_node",
+                "path": [
+                  0
+                ],
+                "node": {
+                  "type": "p",
+                  "id": "replacement",
+                  "children": [
+                    {
+                      "text": "另一份"
+                    }
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    }
+  },
+  "H05": {
+    "beforeReset": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原A"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "B"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 3
+              }
+            }
+          }
+        ],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "A"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterReset": {
+      "value": [
+        {
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "type": "p",
+          "id": "history-new-1"
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterUndo": {
+      "value": [
+        {
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "type": "p",
+          "id": "history-new-1"
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterRedo": {
+      "value": [
+        {
+          "children": [
+            {
+              "text": ""
+            }
+          ],
+          "type": "p",
+          "id": "history-new-1"
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    }
+  },
+  "H06": {
+    "savedHuman": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原人"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterUnsavedReplacement": {
+      "value": [
+        {
+          "type": "p",
+          "id": "external",
+          "children": [
+            {
+              "text": "完全不同"
+            }
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterStaleUndo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "external",
+          "children": [
+            {
+              "text": "完不同"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            },
+            "selectionAfter": null
+          }
+        ],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterStaleRedo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "external",
+          "children": [
+            {
+              "text": "完人不同"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            },
+            "selectionAfter": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    }
+  },
+  "H07": {
+    "beforeAI": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原人"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "applyError": "Cannot find a descendant at path [99,0] in node: {\"children\":[{\"type\":\"p\",\"id\":\"original\",\"children\":[{\"text\":\"原人AI\"}]}],\"operations\":[{\"type\":\"insert_text\",\"path\":[0,0],\"offset\":2,\"text\":\"AI\"}],\"selection\":{\"anchor\":{\"path\":[0,0],\"offset\":4},\"focus\":{\"path\":[0,0],\"offset\":4}},\"marks\":null,\"history\":{\"redos\":[],\"undos\":[{\"operations\":[{\"type\":\"insert_text\",\"path\":[0,0],\"offset\":1,\"text\":\"人\"}],\"selectionBefore\":{\"anchor\":{\"path\":[0,0],\"offset\":1},\"focus\":{\"path\":[0,0],\"offset\":1}}},{\"operations\":[{\"type\":\"insert_text\",\"path\":[0,0],\"offset\":2,\"text\":\"AI\"},{\"type\":\"insert_text\",\"path\":[99,0],\"offset\":0,\"text\":\"錯\"}],\"selectionBefore\":{\"anchor\":{\"path\":[0,0],\"offset\":2},\"focus\":{\"path\":[0,0],\"offset\":2}}}]},\"meta\":{\"isNormalizing\":false,\"key\":\"jcdsaYSFgia3EQgOONWpr\",\"isFallback\":false,\"pluginList\":[{\"key\":\"root\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"root\"},\"options\":{},\"override\":{\"components\":{}},\"parser\":{},\"parsers\":{},\"plugins\":[{\"key\":\"debug\",\"__apiExtensions\":[{\"isPluginSpecific\":false}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"debug\"},\"options\":{\"isProduction\":false,\"logger\":{},\"logLevel\":\"log\",\"throwErrors\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"slateExtension\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"slateExtension\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"dom\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"dom\"},\"options\":{\"scrollMode\":\"last\",\"scrollOperations\":{\"insert_node\":true,\"insert_text\":true},\"scrollOptions\":{\"scrollMode\":\"if-needed\"}},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"navigationFeedback\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"navigationFeedback\"},\"options\":{\"activeTarget\":null,\"duration\":1600},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"history\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"history\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"inputRules\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"inputRules\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"editOnly\":true},{\"key\":\"override\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"override\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"parser\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"parser\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"length\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"length\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"html\",\"__apiExtensions\":[{\"isPluginSpecific\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"html\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"text/html\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"ast\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"ast\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"application/x-slate-fragment\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"nodeId\",\"__apiExtensions\":[{\"isPluginSpecific\":true,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[null],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"nodeId\"},\"options\":{\"filterInline\":true,\"filterText\":true,\"idKey\":\"id\"},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"affinity\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"affinity\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"p\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"p\",\"isElement\":true},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{\"html\":{\"deserializer\":{\"rules\":[{\"validNodeName\":\"P\"}]}}},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{\"merge\":{\"removeEmpty\":true}},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"chunking\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"chunking\"},\"options\":{\"chunkSize\":1000,\"contentVisibilityAuto\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}}],\"priority\":10000,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"root\",\"actions\":{},\"selectors\":{}}},{\"key\":\"debug\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"debug\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"debug\"},\"options\":{\"isProduction\":false,\"logger\":{},\"logLevel\":\"log\",\"throwErrors\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"debug\",\"actions\":{},\"selectors\":{}}},{\"key\":\"slateExtension\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"slateExtension\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"slateExtension\",\"actions\":{},\"selectors\":{}}},{\"key\":\"dom\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"dom\"},\"options\":{\"scrollMode\":\"last\",\"scrollOperations\":{\"insert_node\":true,\"insert_text\":true},\"scrollOptions\":{\"scrollMode\":\"if-needed\"}},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"dom\",\"actions\":{},\"selectors\":{}}},{\"key\":\"navigationFeedback\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"navigation\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"navigationFeedback\"},\"options\":{\"activeTarget\":null,\"duration\":1600},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{\"navigation\":{}},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"navigationFeedback\",\"actions\":{},\"selectors\":{}}},{\"key\":\"history\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"history\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"history\",\"actions\":{},\"selectors\":{}}},{\"key\":\"inputRules\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"inputRules\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"editOnly\":true,\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"inputRules\",\"actions\":{},\"selectors\":{}}},{\"key\":\"override\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"create\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"override\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"override\",\"actions\":{},\"selectors\":{}}},{\"key\":\"parser\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"parser\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"parser\",\"actions\":{},\"selectors\":{}}},{\"key\":\"length\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"length\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"length\",\"actions\":{},\"selectors\":{}}},{\"key\":\"html\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"html\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"html\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"text/html\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"html\",\"actions\":{},\"selectors\":{}}},{\"key\":\"ast\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"ast\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"application/x-slate-fragment\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"ast\",\"actions\":{},\"selectors\":{}}},{\"key\":\"nodeId\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"nodeId\"},\"options\":{\"filterInline\":true,\"filterText\":true,\"idKey\":\"id\"},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{\"nodeId\":{}},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"nodeId\",\"actions\":{},\"selectors\":{}}},{\"key\":\"affinity\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"affinity\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"affinity\",\"actions\":{},\"selectors\":{}}},{\"key\":\"p\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"p\",\"isElement\":true},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{\"html\":{\"deserializer\":{\"rules\":[{\"validNodeName\":\"P\"}]}}},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{\"merge\":{\"removeEmpty\":true}},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"p\",\"actions\":{},\"selectors\":{}}},{\"key\":\"chunking\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"chunking\"},\"options\":{\"chunkSize\":1000,\"contentVisibilityAuto\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"chunking\",\"actions\":{},\"selectors\":{}}}],\"inputRules\":{\"insertBreak\":[],\"insertData\":[],\"insertText\":{\"all\":[],\"byTrigger\":{}},\"plugins\":{\"root\":{\"rules\":[]},\"debug\":{\"rules\":[]},\"slateExtension\":{\"rules\":[]},\"dom\":{\"rules\":[]},\"navigationFeedback\":{\"rules\":[]},\"history\":{\"rules\":[]},\"inputRules\":{\"rules\":[]},\"override\":{\"rules\":[]},\"parser\":{\"rules\":[]},\"length\":{\"rules\":[]},\"html\":{\"rules\":[]},\"ast\":{\"rules\":[]},\"nodeId\":{\"rules\":[]},\"affinity\":{\"rules\":[]},\"p\":{\"rules\":[]},\"chunking\":{\"rules\":[]}}},\"shortcuts\":{},\"components\":{},\"pluginCache\":{\"decorate\":[],\"handlers\":{\"onChange\":[],\"onNodeChange\":[],\"onTextChange\":[]},\"inject\":{\"nodeProps\":[]},\"node\":{\"isContainer\":[],\"isLeaf\":[],\"isMetadataProp\":[\"nodeId\"],\"isText\":[],\"leafProps\":[],\"textProps\":[],\"types\":{\"root\":\"root\",\"debug\":\"debug\",\"slateExtension\":\"slateExtension\",\"dom\":\"dom\",\"navigationFeedback\":\"navigationFeedback\",\"history\":\"history\",\"inputRules\":\"inputRules\",\"override\":\"override\",\"parser\":\"parser\",\"length\":\"length\",\"html\":\"html\",\"ast\":\"ast\",\"nodeId\":\"nodeId\",\"affinity\":\"affinity\",\"p\":\"p\",\"chunking\":\"chunking\"}},\"transformInitialValue\":[\"nodeId\"],\"render\":{\"aboveEditable\":[],\"aboveNodes\":[],\"aboveSlate\":[],\"afterContainer\":[],\"afterEditable\":[],\"beforeContainer\":[],\"beforeEditable\":[],\"belowNodes\":[],\"belowRootNodes\":[]},\"rules\":{\"match\":[]},\"useHooks\":[]}},\"api\":{\"create\":{},\"operations\":[{\"type\":\"set_selection\",\"properties\":null,\"newProperties\":{\"anchor\":{\"path\":[0,0],\"offset\":1},\"focus\":{\"path\":[0,0],\"offset\":1}}}],\"debug\":{},\"navigation\":{},\"html\":{}},\"tf\":{\"navigation\":{},\"nodeId\":{}},\"transforms\":{\"navigation\":{},\"nodeId\":{}},\"id\":\"_bG4_pjeUgieQxcUWnQ08\",\"dom\":{\"composing\":false,\"currentKeyboardEvent\":null,\"focused\":false,\"prevSelection\":null,\"readOnly\":false},\"plugins\":{\"root\":{\"key\":\"root\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"root\"},\"options\":{},\"override\":{\"components\":{}},\"parser\":{},\"parsers\":{},\"plugins\":[{\"key\":\"debug\",\"__apiExtensions\":[{\"isPluginSpecific\":false}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"debug\"},\"options\":{\"isProduction\":false,\"logger\":{},\"logLevel\":\"log\",\"throwErrors\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"slateExtension\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"slateExtension\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"dom\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"dom\"},\"options\":{\"scrollMode\":\"last\",\"scrollOperations\":{\"insert_node\":true,\"insert_text\":true},\"scrollOptions\":{\"scrollMode\":\"if-needed\"}},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"navigationFeedback\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"navigationFeedback\"},\"options\":{\"activeTarget\":null,\"duration\":1600},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"history\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"history\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"inputRules\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"inputRules\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"editOnly\":true},{\"key\":\"override\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"override\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"parser\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"parser\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"length\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"length\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"html\",\"__apiExtensions\":[{\"isPluginSpecific\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"html\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"text/html\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"ast\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"ast\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"application/x-slate-fragment\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"nodeId\",\"__apiExtensions\":[{\"isPluginSpecific\":true,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[null],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"nodeId\"},\"options\":{\"filterInline\":true,\"filterText\":true,\"idKey\":\"id\"},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"affinity\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"affinity\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"p\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"p\",\"isElement\":true},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{\"html\":{\"deserializer\":{\"rules\":[{\"validNodeName\":\"P\"}]}}},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{\"merge\":{\"removeEmpty\":true}},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"chunking\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"chunking\"},\"options\":{\"chunkSize\":1000,\"contentVisibilityAuto\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}}],\"priority\":10000,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"root\",\"actions\":{},\"selectors\":{}}},\"debug\":{\"key\":\"debug\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"debug\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"debug\"},\"options\":{\"isProduction\":false,\"logger\":{},\"logLevel\":\"log\",\"throwErrors\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"debug\",\"actions\":{},\"selectors\":{}}},\"slateExtension\":{\"key\":\"slateExtension\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"slateExtension\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"slateExtension\",\"actions\":{},\"selectors\":{}}},\"dom\":{\"key\":\"dom\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"dom\"},\"options\":{\"scrollMode\":\"last\",\"scrollOperations\":{\"insert_node\":true,\"insert_text\":true},\"scrollOptions\":{\"scrollMode\":\"if-needed\"}},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"dom\",\"actions\":{},\"selectors\":{}}},\"navigationFeedback\":{\"key\":\"navigationFeedback\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"navigation\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"navigationFeedback\"},\"options\":{\"activeTarget\":null,\"duration\":1600},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{\"navigation\":{}},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"navigationFeedback\",\"actions\":{},\"selectors\":{}}},\"history\":{\"key\":\"history\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"history\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"history\",\"actions\":{},\"selectors\":{}}},\"inputRules\":{\"key\":\"inputRules\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"inputRules\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"editOnly\":true,\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"inputRules\",\"actions\":{},\"selectors\":{}}},\"override\":{\"key\":\"override\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"create\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"override\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"override\",\"actions\":{},\"selectors\":{}}},\"parser\":{\"key\":\"parser\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"parser\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"parser\",\"actions\":{},\"selectors\":{}}},\"length\":{\"key\":\"length\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"length\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"length\",\"actions\":{},\"selectors\":{}}},\"html\":{\"key\":\"html\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"html\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"html\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"text/html\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"html\",\"actions\":{},\"selectors\":{}}},\"ast\":{\"key\":\"ast\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"ast\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"application/x-slate-fragment\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"ast\",\"actions\":{},\"selectors\":{}}},\"nodeId\":{\"key\":\"nodeId\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"nodeId\"},\"options\":{\"filterInline\":true,\"filterText\":true,\"idKey\":\"id\"},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{\"nodeId\":{}},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"nodeId\",\"actions\":{},\"selectors\":{}}},\"affinity\":{\"key\":\"affinity\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"affinity\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"affinity\",\"actions\":{},\"selectors\":{}}},\"p\":{\"key\":\"p\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"p\",\"isElement\":true},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{\"html\":{\"deserializer\":{\"rules\":[{\"validNodeName\":\"P\"}]}}},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{\"merge\":{\"removeEmpty\":true}},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"p\",\"actions\":{},\"selectors\":{}}},\"chunking\":{\"key\":\"chunking\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"chunking\"},\"options\":{\"chunkSize\":1000,\"contentVisibilityAuto\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"chunking\",\"actions\":{},\"selectors\":{}}}}}",
+    "afterThrow": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原人AI"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "AI"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  99,
+                  0
+                ],
+                "offset": 0,
+                "text": "錯"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": true,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "observedBatches": [
+      {
+        "operations": [
+          {
+            "type": "insert_text",
+            "path": [
+              0,
+              0
+            ],
+            "offset": 2,
+            "text": "AI"
+          }
+        ],
+        "value": [
+          {
+            "type": "p",
+            "id": "original",
+            "children": [
+              {
+                "text": "原人AI"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "undoError": "Cannot find a descendant at path [99,0] in node: {\"children\":[{\"type\":\"p\",\"id\":\"original\",\"children\":[{\"text\":\"原人AI\"}]}],\"operations\":[],\"selection\":{\"anchor\":{\"path\":[0,0],\"offset\":4},\"focus\":{\"path\":[0,0],\"offset\":4}},\"marks\":null,\"history\":{\"redos\":[],\"undos\":[{\"operations\":[{\"type\":\"insert_text\",\"path\":[0,0],\"offset\":1,\"text\":\"人\"}],\"selectionBefore\":{\"anchor\":{\"path\":[0,0],\"offset\":1},\"focus\":{\"path\":[0,0],\"offset\":1}}},{\"operations\":[{\"type\":\"insert_text\",\"path\":[0,0],\"offset\":2,\"text\":\"AI\"},{\"type\":\"insert_text\",\"path\":[99,0],\"offset\":0,\"text\":\"錯\"}],\"selectionBefore\":{\"anchor\":{\"path\":[0,0],\"offset\":2},\"focus\":{\"path\":[0,0],\"offset\":2}}}]},\"meta\":{\"isNormalizing\":false,\"key\":\"jcdsaYSFgia3EQgOONWpr\",\"isFallback\":false,\"pluginList\":[{\"key\":\"root\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"root\"},\"options\":{},\"override\":{\"components\":{}},\"parser\":{},\"parsers\":{},\"plugins\":[{\"key\":\"debug\",\"__apiExtensions\":[{\"isPluginSpecific\":false}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"debug\"},\"options\":{\"isProduction\":false,\"logger\":{},\"logLevel\":\"log\",\"throwErrors\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"slateExtension\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"slateExtension\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"dom\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"dom\"},\"options\":{\"scrollMode\":\"last\",\"scrollOperations\":{\"insert_node\":true,\"insert_text\":true},\"scrollOptions\":{\"scrollMode\":\"if-needed\"}},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"navigationFeedback\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"navigationFeedback\"},\"options\":{\"activeTarget\":null,\"duration\":1600},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"history\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"history\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"inputRules\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"inputRules\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"editOnly\":true},{\"key\":\"override\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"override\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"parser\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"parser\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"length\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"length\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"html\",\"__apiExtensions\":[{\"isPluginSpecific\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"html\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"text/html\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"ast\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"ast\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"application/x-slate-fragment\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"nodeId\",\"__apiExtensions\":[{\"isPluginSpecific\":true,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[null],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"nodeId\"},\"options\":{\"filterInline\":true,\"filterText\":true,\"idKey\":\"id\"},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"affinity\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"affinity\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"p\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"p\",\"isElement\":true},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{\"html\":{\"deserializer\":{\"rules\":[{\"validNodeName\":\"P\"}]}}},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{\"merge\":{\"removeEmpty\":true}},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"chunking\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"chunking\"},\"options\":{\"chunkSize\":1000,\"contentVisibilityAuto\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}}],\"priority\":10000,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"root\",\"actions\":{},\"selectors\":{}}},{\"key\":\"debug\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"debug\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"debug\"},\"options\":{\"isProduction\":false,\"logger\":{},\"logLevel\":\"log\",\"throwErrors\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"debug\",\"actions\":{},\"selectors\":{}}},{\"key\":\"slateExtension\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"slateExtension\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"slateExtension\",\"actions\":{},\"selectors\":{}}},{\"key\":\"dom\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"dom\"},\"options\":{\"scrollMode\":\"last\",\"scrollOperations\":{\"insert_node\":true,\"insert_text\":true},\"scrollOptions\":{\"scrollMode\":\"if-needed\"}},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"dom\",\"actions\":{},\"selectors\":{}}},{\"key\":\"navigationFeedback\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"navigation\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"navigationFeedback\"},\"options\":{\"activeTarget\":null,\"duration\":1600},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{\"navigation\":{}},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"navigationFeedback\",\"actions\":{},\"selectors\":{}}},{\"key\":\"history\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"history\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"history\",\"actions\":{},\"selectors\":{}}},{\"key\":\"inputRules\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"inputRules\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"editOnly\":true,\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"inputRules\",\"actions\":{},\"selectors\":{}}},{\"key\":\"override\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"create\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"override\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"override\",\"actions\":{},\"selectors\":{}}},{\"key\":\"parser\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"parser\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"parser\",\"actions\":{},\"selectors\":{}}},{\"key\":\"length\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"length\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"length\",\"actions\":{},\"selectors\":{}}},{\"key\":\"html\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"html\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"html\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"text/html\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"html\",\"actions\":{},\"selectors\":{}}},{\"key\":\"ast\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"ast\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"application/x-slate-fragment\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"ast\",\"actions\":{},\"selectors\":{}}},{\"key\":\"nodeId\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"nodeId\"},\"options\":{\"filterInline\":true,\"filterText\":true,\"idKey\":\"id\"},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{\"nodeId\":{}},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"nodeId\",\"actions\":{},\"selectors\":{}}},{\"key\":\"affinity\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"affinity\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"affinity\",\"actions\":{},\"selectors\":{}}},{\"key\":\"p\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"p\",\"isElement\":true},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{\"html\":{\"deserializer\":{\"rules\":[{\"validNodeName\":\"P\"}]}}},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{\"merge\":{\"removeEmpty\":true}},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"p\",\"actions\":{},\"selectors\":{}}},{\"key\":\"chunking\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"chunking\"},\"options\":{\"chunkSize\":1000,\"contentVisibilityAuto\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"chunking\",\"actions\":{},\"selectors\":{}}}],\"inputRules\":{\"insertBreak\":[],\"insertData\":[],\"insertText\":{\"all\":[],\"byTrigger\":{}},\"plugins\":{\"root\":{\"rules\":[]},\"debug\":{\"rules\":[]},\"slateExtension\":{\"rules\":[]},\"dom\":{\"rules\":[]},\"navigationFeedback\":{\"rules\":[]},\"history\":{\"rules\":[]},\"inputRules\":{\"rules\":[]},\"override\":{\"rules\":[]},\"parser\":{\"rules\":[]},\"length\":{\"rules\":[]},\"html\":{\"rules\":[]},\"ast\":{\"rules\":[]},\"nodeId\":{\"rules\":[]},\"affinity\":{\"rules\":[]},\"p\":{\"rules\":[]},\"chunking\":{\"rules\":[]}}},\"shortcuts\":{},\"components\":{},\"pluginCache\":{\"decorate\":[],\"handlers\":{\"onChange\":[],\"onNodeChange\":[],\"onTextChange\":[]},\"inject\":{\"nodeProps\":[]},\"node\":{\"isContainer\":[],\"isLeaf\":[],\"isMetadataProp\":[\"nodeId\"],\"isText\":[],\"leafProps\":[],\"textProps\":[],\"types\":{\"root\":\"root\",\"debug\":\"debug\",\"slateExtension\":\"slateExtension\",\"dom\":\"dom\",\"navigationFeedback\":\"navigationFeedback\",\"history\":\"history\",\"inputRules\":\"inputRules\",\"override\":\"override\",\"parser\":\"parser\",\"length\":\"length\",\"html\":\"html\",\"ast\":\"ast\",\"nodeId\":\"nodeId\",\"affinity\":\"affinity\",\"p\":\"p\",\"chunking\":\"chunking\"}},\"transformInitialValue\":[\"nodeId\"],\"render\":{\"aboveEditable\":[],\"aboveNodes\":[],\"aboveSlate\":[],\"afterContainer\":[],\"afterEditable\":[],\"beforeContainer\":[],\"beforeEditable\":[],\"belowNodes\":[],\"belowRootNodes\":[]},\"rules\":{\"match\":[]},\"useHooks\":[]}},\"api\":{\"create\":{},\"operations\":[{\"type\":\"set_selection\",\"properties\":null,\"newProperties\":{\"anchor\":{\"path\":[0,0],\"offset\":1},\"focus\":{\"path\":[0,0],\"offset\":1}}}],\"debug\":{},\"navigation\":{},\"html\":{}},\"tf\":{\"navigation\":{},\"nodeId\":{}},\"transforms\":{\"navigation\":{},\"nodeId\":{}},\"id\":\"_bG4_pjeUgieQxcUWnQ08\",\"dom\":{\"composing\":false,\"currentKeyboardEvent\":null,\"focused\":false,\"prevSelection\":null,\"readOnly\":false},\"plugins\":{\"root\":{\"key\":\"root\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"root\"},\"options\":{},\"override\":{\"components\":{}},\"parser\":{},\"parsers\":{},\"plugins\":[{\"key\":\"debug\",\"__apiExtensions\":[{\"isPluginSpecific\":false}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"debug\"},\"options\":{\"isProduction\":false,\"logger\":{},\"logLevel\":\"log\",\"throwErrors\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"slateExtension\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"slateExtension\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"dom\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"dom\"},\"options\":{\"scrollMode\":\"last\",\"scrollOperations\":{\"insert_node\":true,\"insert_text\":true},\"scrollOptions\":{\"scrollMode\":\"if-needed\"}},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"navigationFeedback\",\"__apiExtensions\":[{\"isPluginSpecific\":false},{\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"navigationFeedback\"},\"options\":{\"activeTarget\":null,\"duration\":1600},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"history\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"history\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"inputRules\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"inputRules\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"editOnly\":true},{\"key\":\"override\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"override\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"parser\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"parser\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"length\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"length\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"html\",\"__apiExtensions\":[{\"isPluginSpecific\":true}],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"html\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"text/html\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"ast\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"ast\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"application/x-slate-fragment\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"nodeId\",\"__apiExtensions\":[{\"isPluginSpecific\":true,\"isTransform\":true},{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[null],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"nodeId\"},\"options\":{\"filterInline\":true,\"filterText\":true,\"idKey\":\"id\"},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"affinity\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"affinity\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"p\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"p\",\"isElement\":true},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{\"html\":{\"deserializer\":{\"rules\":[{\"validNodeName\":\"P\"}]}}},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{\"merge\":{\"removeEmpty\":true}},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}},{\"key\":\"chunking\",\"__apiExtensions\":[{\"isOverride\":true,\"isPluginSpecific\":false,\"isTransform\":true}],\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"chunking\"},\"options\":{\"chunkSize\":1000,\"contentVisibilityAuto\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{}}],\"priority\":10000,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"root\",\"actions\":{},\"selectors\":{}}},\"debug\":{\"key\":\"debug\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"debug\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"debug\"},\"options\":{\"isProduction\":false,\"logger\":{},\"logLevel\":\"log\",\"throwErrors\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"debug\",\"actions\":{},\"selectors\":{}}},\"slateExtension\":{\"key\":\"slateExtension\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"slateExtension\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"slateExtension\",\"actions\":{},\"selectors\":{}}},\"dom\":{\"key\":\"dom\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"dom\"},\"options\":{\"scrollMode\":\"last\",\"scrollOperations\":{\"insert_node\":true,\"insert_text\":true},\"scrollOptions\":{\"scrollMode\":\"if-needed\"}},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"dom\",\"actions\":{},\"selectors\":{}}},\"navigationFeedback\":{\"key\":\"navigationFeedback\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"navigation\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"navigationFeedback\"},\"options\":{\"activeTarget\":null,\"duration\":1600},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{\"navigation\":{}},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"navigationFeedback\",\"actions\":{},\"selectors\":{}}},\"history\":{\"key\":\"history\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"history\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"history\",\"actions\":{},\"selectors\":{}}},\"inputRules\":{\"key\":\"inputRules\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"inputRules\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"editOnly\":true,\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"inputRules\",\"actions\":{},\"selectors\":{}}},\"override\":{\"key\":\"override\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"create\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"override\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"override\",\"actions\":{},\"selectors\":{}}},\"parser\":{\"key\":\"parser\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"parser\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"parser\",\"actions\":{},\"selectors\":{}}},\"length\":{\"key\":\"length\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"length\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"length\",\"actions\":{},\"selectors\":{}}},\"html\":{\"key\":\"html\",\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{\"html\":{}},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"html\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"text/html\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"html\",\"actions\":{},\"selectors\":{}}},\"ast\":{\"key\":\"ast\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"ast\"},\"options\":{},\"override\":{},\"parser\":{\"format\":\"application/x-slate-fragment\"},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"ast\",\"actions\":{},\"selectors\":{}}},\"nodeId\":{\"key\":\"nodeId\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"nodeId\"},\"options\":{\"filterInline\":true,\"filterText\":true,\"idKey\":\"id\"},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{\"nodeId\":{}},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"nodeId\",\"actions\":{},\"selectors\":{}}},\"affinity\":{\"key\":\"affinity\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"affinity\"},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"affinity\",\"actions\":{},\"selectors\":{}}},\"p\":{\"key\":\"p\",\"__apiExtensions\":[],\"__configuration\":null,\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"p\",\"isElement\":true},\"options\":{},\"override\":{},\"parser\":{},\"parsers\":{\"html\":{\"deserializer\":{\"rules\":[{\"validNodeName\":\"P\"}]}}},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{\"merge\":{\"removeEmpty\":true}},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"optionsStore\":{\"store\":{},\"name\":\"p\",\"actions\":{},\"selectors\":{}}},\"chunking\":{\"key\":\"chunking\",\"__extensions\":[],\"__selectorExtensions\":[],\"api\":{},\"dependencies\":[],\"editor\":{},\"handlers\":{},\"inject\":{},\"node\":{\"type\":\"chunking\"},\"options\":{\"chunkSize\":1000,\"contentVisibilityAuto\":true},\"override\":{},\"parser\":{},\"parsers\":{},\"plugins\":[],\"priority\":100,\"render\":{},\"rules\":{},\"shortcuts\":{},\"inputRules\":[],\"transforms\":{},\"__resolved\":true,\"enabled\":true,\"optionsStore\":{\"store\":{},\"name\":\"chunking\",\"actions\":{},\"selectors\":{}}}}}",
+    "afterFailedUndo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原人AI"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          },
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2,
+                "text": "AI"
+              },
+              {
+                "type": "insert_text",
+                "path": [
+                  99,
+                  0
+                ],
+                "offset": 0,
+                "text": "錯"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 2
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": false,
+        "merging": true,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    }
+  },
+  "H08": {
+    "savedHuman": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原人"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 2
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "callbackError": "固定 probe：callback 中途停止",
+    "afterThrow": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原人暫"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 3
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 3
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": false,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterLaterHuman": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原人暫後"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 4
+        }
+      },
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            }
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": false,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "afterUndo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "original",
+          "children": [
+            {
+              "text": "原暫後"
+            }
+          ]
+        }
+      ],
+      "selection": {
+        "anchor": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        },
+        "focus": {
+          "path": [
+            0,
+            0
+          ],
+          "offset": 1
+        }
+      },
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "insert_text",
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1,
+                "text": "人"
+              }
+            ],
+            "selectionBefore": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 1
+              }
+            },
+            "selectionAfter": {
+              "anchor": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4
+              },
+              "focus": {
+                "path": [
+                  0,
+                  0
+                ],
+                "offset": 4
+              }
+            }
+          }
+        ],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": false,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    }
+  },
+  "H09": {
+    "baseline": [
+      {
+        "type": "p",
+        "id": "split-base",
+        "sourceRefs": [
+          "source:split"
+        ],
+        "children": [
+          {
+            "text": "確認範圍。"
+          }
+        ]
+      }
+    ],
+    "profile": {
+      "nodeIdEnabled": true,
+      "configuredVia": "NodeIdPlugin.configure",
+      "idCreator": "deliberately different deterministic streams history-source-N / history-target-N",
+      "reuseId": true,
+      "initialValueIds": "always",
+      "shouldNormalizeEditor": "not supplied; no forced initialization normalization",
+      "operationNormalization": "normal native normalization; deferred while applying fixed batch",
+      "initialValueIdsGapCoverage": "baseline already has IDs; missing-initial-ID fill is not experimentally covered"
+    },
+    "sourceAfter": {
+      "value": [
+        {
+          "type": "p",
+          "id": "split-base",
+          "sourceRefs": [
+            "source:split"
+          ],
+          "children": [
+            {
+              "text": "確認"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "text": "範圍。"
+            }
+          ],
+          "type": "p",
+          "id": "history-source-1",
+          "sourceRefs": [
+            "source:split"
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "split_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  0
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-source-1",
+                  "sourceRefs": [
+                    "source:split"
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "operations": [
+      {
+        "type": "split_node",
+        "path": [
+          0,
+          0
+        ],
+        "position": 2,
+        "properties": {}
+      },
+      {
+        "type": "split_node",
+        "path": [
+          0
+        ],
+        "position": 1,
+        "properties": {
+          "type": "p",
+          "id": "history-source-1",
+          "sourceRefs": [
+            "source:split"
+          ]
+        }
+      }
+    ],
+    "targetAfter": {
+      "value": [
+        {
+          "type": "p",
+          "id": "split-base",
+          "sourceRefs": [
+            "source:split"
+          ],
+          "children": [
+            {
+              "text": "確認"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "text": "範圍。"
+            }
+          ],
+          "type": "p",
+          "id": "history-source-1",
+          "sourceRefs": [
+            "source:split"
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "split_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  0
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-source-1",
+                  "sourceRefs": [
+                    "source:split"
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "targetUndo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "split-base",
+          "sourceRefs": [
+            "source:split"
+          ],
+          "children": [
+            {
+              "text": "確認範圍。"
+            }
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "split_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  0
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-source-1",
+                  "sourceRefs": [
+                    "source:split"
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": null,
+            "selectionAfter": null
+          }
+        ],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "targetRedo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "split-base",
+          "sourceRefs": [
+            "source:split"
+          ],
+          "children": [
+            {
+              "text": "確認"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "text": "範圍。"
+            }
+          ],
+          "type": "p",
+          "id": "history-source-1",
+          "sourceRefs": [
+            "source:split"
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "split_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  0
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-source-1",
+                  "sourceRefs": [
+                    "source:split"
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": null,
+            "selectionAfter": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "sourceUndo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "split-base",
+          "sourceRefs": [
+            "source:split"
+          ],
+          "children": [
+            {
+              "text": "確認範圍。"
+            }
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [
+          {
+            "operations": [
+              {
+                "type": "split_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  0
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-source-1",
+                  "sourceRefs": [
+                    "source:split"
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": null,
+            "selectionAfter": null
+          }
+        ],
+        "undos": []
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    },
+    "sourceRedo": {
+      "value": [
+        {
+          "type": "p",
+          "id": "split-base",
+          "sourceRefs": [
+            "source:split"
+          ],
+          "children": [
+            {
+              "text": "確認"
+            }
+          ]
+        },
+        {
+          "children": [
+            {
+              "text": "範圍。"
+            }
+          ],
+          "type": "p",
+          "id": "history-source-1",
+          "sourceRefs": [
+            "source:split"
+          ]
+        }
+      ],
+      "selection": null,
+      "history": {
+        "redos": [],
+        "undos": [
+          {
+            "operations": [
+              {
+                "type": "split_node",
+                "path": [
+                  0,
+                  0
+                ],
+                "position": 2,
+                "properties": {}
+              },
+              {
+                "type": "split_node",
+                "path": [
+                  0
+                ],
+                "position": 1,
+                "properties": {
+                  "type": "p",
+                  "id": "history-source-1",
+                  "sourceRefs": [
+                    "source:split"
+                  ]
+                }
+              }
+            ],
+            "selectionBefore": null,
+            "selectionAfter": null
+          }
+        ]
+      },
+      "operations": [],
+      "diagnosticFlags": {
+        "saving": null,
+        "merging": null,
+        "splittingOnce": null,
+        "normalizing": true
+      }
+    }
+  }
+}

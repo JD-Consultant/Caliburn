@@ -1,0 +1,52 @@
+[
+  {
+    "path": "experiments/analysis-agent/README.md",
+    "bytes": 89738,
+    "sha256": "d25a77199992eed39a19b9e0e21e555a05ad87a5540dd228f74e95597e4ab2eb"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+    "bytes": 13538,
+    "sha256": "b1b27debd195a285186673e7c9c4465a2222125b3f3bf3c8d9dc44da778d1dbd"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/service.py",
+    "bytes": 47457,
+    "sha256": "549a17442c6e3661c32e5152e9876b1e60b43b634216c6f5a1ac079ce57459f4"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_manual_recovery.py",
+    "bytes": 7819,
+    "sha256": "56fe7233cfabdb410247a93d77dea69c400e878801858328f5677a118e0b3f57"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/generated/analysis-api.ts",
+    "bytes": 6777,
+    "sha256": "f2e89beb23ec63a4370631ffa99b2e3cc4c7a8292f38d68f237def941800ab3e"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "bytes": 16333,
+    "sha256": "5c8a13bcfcac805ef8570179cb4a4c41cdc87a9a18ffb846302f64be30e7f0c2"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/useJdSession.test.tsx",
+    "bytes": 14316,
+    "sha256": "db7698a243426e8f92d2ee9ae6e78ce6beb101a1aafa3c9fe9add979dd412f28"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+    "bytes": 13777,
+    "sha256": "91be20d3194f4316cfa50cb896cd83b5dc84891ca793653f29dc9f30d0c76b7e"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_fix1_admission.py",
+    "bytes": 7838,
+    "sha256": "f49fdc302dcfeb77ce346a04441c10310ad06527c32e2afd3180c3b51b076100"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdWorkspace.test.tsx",
+    "bytes": 1509,
+    "sha256": "ad1b6c904e40107fe78fe953a2c5b4cd2c01d0dc9323b3fc2d4c2700e53cee80"
+  }
+]

@@ -1,0 +1,75 @@
+{
+  "synthetic": true,
+  "title": "操作示範（固定回覆）｜設備維護工程師",
+  "create_key": "562a3006-1873-4b54-a1ac-1b6cf8acad20",
+  "run_keys": {
+    "intro": "77d6a642-7ca6-4fa8-b43a-d7968dc65e7f",
+    "draft": "97fc2ce2-89ca-4434-8781-1e96b785db85",
+    "correct": "7015549d-2256-40f2-91df-d9c488639ee1"
+  },
+  "runs": {
+    "intro": {
+      "id": "9f4f5085-e6fe-4c8d-ab9f-64222777deec",
+      "document_id": "b927ea12-5d1e-4a5e-afec-4d0de199f92d",
+      "status": "completed",
+      "error_code": null,
+      "resume_count": 0,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 100,
+        "output_tokens": 20,
+        "total_tokens": 120
+      },
+      "outcome": {
+        "input_id": "9f4f5085-e6fe-4c8d-ab9f-64222777deec",
+        "status": "completed",
+        "model_calls": 1,
+        "tool_calls": 0
+      },
+      "can_resume": false
+    },
+    "draft": {
+      "id": "04a523f6-f52b-491f-a436-e63d4c671618",
+      "document_id": "b927ea12-5d1e-4a5e-afec-4d0de199f92d",
+      "status": "completed",
+      "error_code": null,
+      "resume_count": 0,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 1000,
+        "output_tokens": 200,
+        "total_tokens": 1200
+      },
+      "outcome": {
+        "input_id": "04a523f6-f52b-491f-a436-e63d4c671618",
+        "status": "completed",
+        "model_calls": 10,
+        "tool_calls": 9
+      },
+      "can_resume": false
+    },
+    "correct": {
+      "id": "6e6beabe-e053-49c3-9e13-ed3635b25e3d",
+      "document_id": "b927ea12-5d1e-4a5e-afec-4d0de199f92d",
+      "status": "completed",
+      "error_code": null,
+      "resume_count": 0,
+      "usage_complete": true,
+      "usage": {
+        "input_tokens": 400,
+        "output_tokens": 80,
+        "total_tokens": 480
+      },
+      "outcome": {
+        "input_id": "6e6beabe-e053-49c3-9e13-ed3635b25e3d",
+        "status": "completed",
+        "model_calls": 4,
+        "tool_calls": 3
+      },
+      "can_resume": false
+    }
+  },
+  "document": "b927ea12-5d1e-4a5e-afec-4d0de199f92d",
+  "revision_ref": "WyJyZXZpc2lvbiIsImI5MjdlYTEyLTVkMWUtNGE1ZS1hZmVjLTRkMGRlMTk5ZjkyZCIsIjliYTYxM2FmLTllNDMtNGY2My1hMDM0LTFkYTI0YzI4ZDA4NyJd",
+  "url": "http://127.0.0.1:3001/workspace/b927ea12-5d1e-4a5e-afec-4d0de199f92d"
+}

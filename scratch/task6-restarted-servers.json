@@ -1,0 +1,28 @@
+{
+  "observed_utc": "2026-09-11T18:39:34.300102+00:00",
+  "phase": "restarted",
+  "processes": [
+    {
+      "name": "api",
+      "pid": 90116,
+      "argv": [
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "uvicorn",
+        "jd_offline_service:create_app",
+        "--factory",
+        "--app-dir",
+        "tests",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8091",
+        "--workers",
+        "1",
+        "--no-proxy-headers"
+      ],
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent"
+    }
+  ],
+  "provider": "httpx.MockTransport only"
+}

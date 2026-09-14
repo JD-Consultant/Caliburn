@@ -1,0 +1,157 @@
+[
+  {
+    "path": "experiments/analysis-agent/README.md",
+    "bytes": 88583,
+    "sha256": "c51d0f8e168e7b06636f56a1ed2bfd583aaab53c7761fd4b96a66d71f10b3a35"
+  },
+  {
+    "path": "experiments/analysis-agent/pyproject.toml",
+    "bytes": 997,
+    "sha256": "f65f1b8e1ce845e1587c506c2252e9f3f05fd3619d684cae46f6c2c02bc730ea"
+  },
+  {
+    "path": "experiments/analysis-agent/uv.lock",
+    "bytes": 162440,
+    "sha256": "5fde00c7a94cedac91f47d5a1873f10fe0ebe718757782979c37a0b9cc1796cb"
+  },
+  {
+    "path": "experiments/analysis-agent/scripts/export_web_contract.py",
+    "bytes": 736,
+    "sha256": "896bc7df3b34afc68b76af12f029ef320b2cdbff6f1559756cb52f61accb01ad"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/api.py",
+    "bytes": 17046,
+    "sha256": "7303e302b5d3db8e6426e354a168cc7069efca7851a2db9cbdd4cd42829b2e50"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/conversation.py",
+    "bytes": 19095,
+    "sha256": "1cdabc11e3690c87062b42053dd041256bc44129c9a6c2eb6fdf0e5621376ee4"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_engine.py",
+    "bytes": 9752,
+    "sha256": "70868b90cac83983a98bdf66b7dcafedbba2140d94109561ad6886d7b393d67d"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_reconcile.py",
+    "bytes": 1800,
+    "sha256": "f0474e9c4e08e35e37b93a5ed085ab250b709633e0d6a1c6bc743f49dd368e9e"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+    "bytes": 13503,
+    "sha256": "d5dc13690028a76ab02c2b66bc1c05de57f80407d4ca3d8006db3ab410dd5988"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_service.py",
+    "bytes": 7030,
+    "sha256": "b703a65ea46a25b9ff27db0767eb649dda47153c3ac88c3a173e358b0d008fbb"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_store.py",
+    "bytes": 20574,
+    "sha256": "113e1273a6d80917b904340144e5858ae7c3c4a12eb012f372beca9af6031768"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+    "bytes": 30022,
+    "sha256": "de497f516f12f1d13e262ef191a5e10957e3f395d1fcee760f89fad6a4d68f5e"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/service.py",
+    "bytes": 43716,
+    "sha256": "f08d4e9b286799cff3d5063b241424456281d052ec737b77eccbb61c44732fdc"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/windows_lifecycle.py",
+    "bytes": 5305,
+    "sha256": "81484ec2f59a8bf7804e8910529bff6866fd820a0596c7b3eb5581f072f78d32"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/jd_browser_server.py",
+    "bytes": 6027,
+    "sha256": "3179d923c8adc9270b26966d2690c63c161344f214b480d8d609d278c95b4eb3"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/jd_lifecycle_process_worker.py",
+    "bytes": 7727,
+    "sha256": "043078f4061937a255e9fd5573f04a3e308bb8ef6edbf96fb9b3e5dd20582c9f"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/task5_acceptance_runner.py",
+    "bytes": 267,
+    "sha256": "dc26d6801b8c428be6a0f4d8f35fd5d503d2348171504096bbb3224e216dd403"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/task5_memory_runner.py",
+    "bytes": 1241,
+    "sha256": "72c3f39190f1de2be5ad8d52e26c1d0e118751730aa303aaa7878253ebd30098"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_admission.py",
+    "bytes": 13083,
+    "sha256": "363a8350ce59180359c016b3b32ab4b9e3d1d79370b43588dbb460d42a39e2f2"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_close_reconcile.py",
+    "bytes": 4254,
+    "sha256": "c0270f50782b92bc1d98f6b49061e32b83d9e62387bdf91381484695bedf15fe"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_manual_recovery.py",
+    "bytes": 7769,
+    "sha256": "0a05b96cff2af5dc45189799e19c22fa412ac2a3b29e48d123dc82cb337560a4"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_native_lifecycle.py",
+    "bytes": 4492,
+    "sha256": "2bbe118b27771504a53f178f2fec1fa227e810fa61333ff77cdcdd16580a377d"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_postgres_recovery.py",
+    "bytes": 5231,
+    "sha256": "50389a5b8c9fa262ad6f0991340d16a66836066163f3c2789b2adb72fbc169cb"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_process_lifecycle.py",
+    "bytes": 5048,
+    "sha256": "e1b106d397144b52879f4a04b70d3b955225d85e2ebd5077ec5c22e64a4bf0d4"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_windows_lifecycle.py",
+    "bytes": 6224,
+    "sha256": "708c6109314261d79f0c972f9cb66dcacf13c12bce1c116552eb654faa385e37"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/windows_lifecycle_worker.py",
+    "bytes": 3066,
+    "sha256": "bdb5e540fe882d414bf6f30129271cf6adfd0d339d098ddf3f9612b42aaec55a"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/generated/analysis-api.ts",
+    "bytes": 6542,
+    "sha256": "0b24e5a58660050021aa0997ba18fa8a2adaafee1fcb1f7a4c0eecdabed88f36"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/api.ts",
+    "bytes": 5255,
+    "sha256": "4113aa6179952899fe0681c783bd2cbd587eaaec4fb5c18e3af97e06e9cd6e21"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "bytes": 15960,
+    "sha256": "aac27ccfdff4defcf6cc30d5111f1778b5d144a1bd86d88de3320ca84afb2a7f"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/useJdSession.test.tsx",
+    "bytes": 12118,
+    "sha256": "b04e827bffe5f52947a26048078e8aafc132ce2698839bc4cd6a1613961cdf02"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+    "bytes": 13086,
+    "sha256": "9ca392fe0109944dc7951fec56a6394ba43a759920639798df6df07bf555a20f"
+  }
+]

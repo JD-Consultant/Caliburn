@@ -1,0 +1,53 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_fixed_api_interview_writes_corrects_and_preserves_manual_without_memory_facts _
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001C13230BEC0>
+
+    def test_fixed_api_interview_writes_corrects_and_preserves_manual_without_memory_facts(jd):
+        transport=FixedInterview('../../scratch/task6-e2e-wire.jsonl')
+        fixture=scenario()
+        with app_client(transport) as (client,service):
+            document=client.post('/documents',json={'title':'Task6 合成設備維護','request_key':str(uuid4())}).json()['id']
+            before=read(client,document)
+            intro=submit(client,service,document,'intro')
+            assert read(client,document)['revision_ref']==before['revision_ref']
+            assert service.messages(document)[0]['text']==fixture['utterances']['intro']
+            first=transport.requests[0]
+            assert ADVISOR_INSTRUCTIONS in text_of([i for i in first['input'] if i.get('role') in ('system','developer')])
+            assert '目前只做訪談分析，不製作或編輯JD' not in json.dumps(first,ensure_ascii=False)
+            assert '/skills/write-customized-jd/SKILL.md' in json.dumps(first,ensure_ascii=False)
+            from analysis_agent.jd_tools import NAMES
+            from analysis_agent.jd_contract import SCHEMA_PATH
+            definitions=json.loads(SCHEMA_PATH.read_text(encoding='utf8'))['$defs']
+            tools={t['name']:t for t in first['tools']}
+            for name,definition in NAMES.items():
+                assert {k:v for k,v in tools[name]['parameters'].items() if k!='$defs'}==definitions[definition]
+                assert tools[name]['description']==definitions[definition]['description']
+            draft=submit(client,service,document,'draft')
+            saved=read(client,document)
+>           assert plain(saved['fragment'])==fixture['expected_initial_content'], [(i.get('type'),i.get('name'),i.get('output')) for i in transport.requests[-1]['input'] if i.get('type') in ('function_call','function_call_output')]
+E           AssertionError: [('function_call', 'read_file', None), ('function_call_output', None, ' 1  ---
+E              2  name: write-customized-jd
+E              3  des...中立詢問；不偽造原話或 source_refs。
+E             51  
+E             52  修改後看實際保存結果與前後差異；失敗不宣稱完成，未知先沿現有工具查明。
+E             53  最后按需作工作→JD、JD→依據的全稿核對，並說明仍影響結論的未知。'), ...]
+E           assert [{'type': 'p'...'text': ''}]}] == [{'type': 'jd...資格尚未說明。'}]}]}]
+E             
+E             At index 0 diff: {'type': 'p', 'children': [{'text': ''}]} != {'type': 'jd_section', 'section_kind': 'identity', 'children': [{'type': 'h2', 'children': [{'text': '職務基本資料'}]}, {'type': 'p', 'children': [{'text': '設備維護工程師'}]}]}
+E             Right contains 5 more items, first extra item: {'type': 'jd_section', 'section_kind': 'purpose', 'children': [{'type': 'h2', 'children': [{'text': '職務目的'}]}, {'type': 'p', 'children': [{'text': '維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。'}]}]}
+E             Use -v to get more diff
+
+tests\test_jd_end_to_end.py:80: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-4a269fdf-4c66-4b21-b248-991049fca9d0.jsonl
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_end_to_end.py::test_fixed_api_interview_writes_corrects_and_preserves_manual_without_memory_facts
+1 failed, 1 deselected, 1 warning in 8.54s

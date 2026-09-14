@@ -1,0 +1,41 @@
+{
+  "observed_utc": "2026-09-11T11:36:59.193966+00:00",
+  "phase": "initial",
+  "processes": [
+    {
+      "name": "api",
+      "pid": 23964,
+      "argv": [
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+        "-m",
+        "uvicorn",
+        "jd_offline_service:create_app",
+        "--factory",
+        "--app-dir",
+        "tests",
+        "--host",
+        "127.0.0.1",
+        "--port",
+        "8091",
+        "--workers",
+        "1",
+        "--no-proxy-headers"
+      ],
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent"
+    },
+    {
+      "name": "web",
+      "pid": 60728,
+      "argv": [
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node.exe",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node_modules\\npm\\bin\\npm-cli.js",
+        "run",
+        "dev",
+        "-w",
+        "@caliburn/jd-editor-web"
+      ],
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor"
+    }
+  ],
+  "provider": "httpx.MockTransport only"
+}

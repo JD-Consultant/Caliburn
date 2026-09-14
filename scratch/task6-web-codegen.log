@@ -1,0 +1,5 @@
+
+> @caliburn/jd-editor-contract@0.0.1 check-codegen
+> node scripts/check-codegen.mjs
+
+Generated schema and DTOs match SSOT.

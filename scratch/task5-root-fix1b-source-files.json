@@ -1,0 +1,12 @@
+[
+  "experiments/analysis-agent/README.md",
+  "experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+  "experiments/analysis-agent/src/analysis_agent/service.py",
+  "experiments/analysis-agent/tests/test_jd_manual_recovery.py",
+  "experiments/jd-editor/web/src/generated/analysis-api.ts",
+  "experiments/jd-editor/web/src/jd/useJdSession.ts",
+  "experiments/jd-editor/web/src/jd/useJdSession.test.tsx",
+  "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+  "experiments/analysis-agent/tests/test_jd_fix1_admission.py",
+  "experiments/jd-editor/web/src/jd/JdRecoveryWorkspace.test.tsx"
+]

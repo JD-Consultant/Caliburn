@@ -1,0 +1,8 @@
+{"fault": "before_assign_crash", "app_work": false}
+.{"fault": "after_assign_crash", "app_work": false}
+.{"fault": "old_job_termination_sent", "app_work": false}
+..PG exact snapshot: task-2-pg-abbbf286-cfba-4c4c-8ff2-0ba383a8a5a8.jsonl
+.PG exact snapshot: task-2-pg-abbbf286-cfba-4c4c-8ff2-0ba383a8a5a8.jsonl
+.PG exact snapshot: task-2-pg-abbbf286-cfba-4c4c-8ff2-0ba383a8a5a8.jsonl
+
+6 passed, 10 deselected in 5.40s

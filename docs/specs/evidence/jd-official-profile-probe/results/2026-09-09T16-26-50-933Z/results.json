@@ -1,0 +1,132 @@
+{
+  "date": "2026-09-10",
+  "executedAt": "2026-09-09T16:26:52.654Z",
+  "pid": 4264,
+  "node": "v22.12.0",
+  "profile": {
+    "name": "jd-plate-clean-v1 F02 headless",
+    "nodeId": {
+      "reuseId": true,
+      "initialValueIds": "always"
+    },
+    "idCreator": "native default nanoid(10); not overridden",
+    "normalization": "native core + official basic/list/table; no custom normalizer; explicit force normalize at durable observation boundaries",
+    "plugins": [
+      "BaseHeadingPlugin(levels:[1,2,3])",
+      "BaseBlockquotePlugin",
+      "BaseHorizontalRulePlugin",
+      "BaseBoldPlugin",
+      "BaseItalicPlugin",
+      "BaseUnderlinePlugin",
+      "BaseStrikethroughPlugin",
+      "BaseListPlugin(default)",
+      "BaseTablePlugin(default)",
+      "jd_section/jd_duty/jd_task ordinary isElement:true"
+    ]
+  },
+  "total": 4,
+  "passed": 4,
+  "failed": 0,
+  "results": [
+    {
+      "id": "F02-A",
+      "description": "官方 canonical 全 r2 與新程序 JSON 重開",
+      "passed": true,
+      "checks": [
+        {
+          "name": "全部 r2 文字與非空 leaf 格式逐一保留",
+          "passed": true
+        },
+        {
+          "name": "所有輸入 Element ID 存在、唯一且來源未变",
+          "passed": true
+        },
+        {
+          "name": "原生官方 plugins 與形狀生效",
+          "passed": true
+        },
+        {
+          "name": "clean value 無 undefined 等 JSON 非值",
+          "passed": true
+        },
+        {
+          "name": "不同 Node PID／新 editor／normalization 後完整 JSON 相等",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "F02-B",
+      "description": "修改段落與清單文字、官方表格插入及刪除一列",
+      "passed": true,
+      "checks": [
+        {
+          "name": "官方插入一列，原來各列精確保留",
+          "passed": true
+        },
+        {
+          "name": "原生刪新列後整張表的全文／格式／ID 精確回原表",
+          "passed": true
+        },
+        {
+          "name": "两處固定文字更新且其餘全稿精確保留",
+          "passed": true
+        },
+        {
+          "name": "確有原生 insert_node／remove_node，非整表替換",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "F02-C",
+      "description": "Task8 移動、Duty4 unwrap 保留完整工作後新程序重開",
+      "passed": true,
+      "checks": [
+        {
+          "name": "Task8 全 subtree／ID／來源保留且屬 Duty1",
+          "passed": true
+        },
+        {
+          "name": "unwrap 只取消 Duty4；Task4／7／8、原標題與八項工作保留",
+          "passed": true
+        },
+        {
+          "name": "移動／unwrap 後檔案→不同 Node PID 新 editor 全等",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "F02-D",
+      "description": "原生格式 operations 的普通 JSON 保存與 fresh apply",
+      "passed": true,
+      "checks": [
+        {
+          "name": "原文不变；目的加底線、既有粗體 label 確實移除",
+          "passed": true
+        },
+        {
+          "name": "原生 operations 無 own undefined，普通 JSON 檔精確往返",
+          "passed": true
+        },
+        {
+          "name": "同基底全新 process 原生 apply 後完整 clean value 相等",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "sourceSha256": {
+    "README.md": "c6a1eeb6e2f78369c111fb18f5ed5a587fc93341c4616a4160636bf9ef175689",
+    "package.json": "8109ac4811ec2fd6c9e7f06f7a4c8985f6b156e4394ae8a235e3d865b56b2416",
+    "package-lock.json": "59f0bb0ea215c1eb85116a4c35d013e8e61c5226498d04ae65e55871cd78656f",
+    "prepare-fixture.mjs": "aa90b27db90ba0b2aaeb8d362851789abc71f329ed2d047004d9e5aaad198b46",
+    "engine.mjs": "ce78beb628323e8c21b5aba593d7442d0264a5f974f77e3f5b272653e1a10a5f",
+    "fresh-editor.mjs": "ff276106acb772facd6c3858cd232a464c06bb6e4a879fccad91307e3da42fcb",
+    "probe.mjs": "f9d76367c8f96ff9691021998c6c5e7b1454cbfdb8eac235cd255e3ae210a43b",
+    "fixture.json": "afde327ffbed706c8578e77d40bdea0a8f9db13507088ca2c885b0e79f35a219",
+    "fixture-original-f01.json": "a06e8eb499f1d5174a685086408336dcb484fdd1f1b388f6ddc6d107b2d02f9f",
+    "fixture-mapping.json": "cd730e0a9e24e4ef122ca8c72bcc2259d5bab5bcbf5f5f6d00ed7edd9aeab2a1"
+  }
+}

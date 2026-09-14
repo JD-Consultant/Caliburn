@@ -187,6 +187,17 @@ No native compaction event was reached. [Results and evidence](../../docs/specs/
 supersede the older mandatory-count/normal-interview blocker below; those paragraphs
 are historical results, not the current entry configuration.
 
+Latest independent recall/provider check (2026-09-07): **12 Luna/medium requests,
+US$0.00411**. Reused prior generated Memory with explicitly rebuilt synthetic
+source references, not another extraction/consolidation run. The reader reached
+knowledge, one detailed record and its original Q/A, but exhausted its existing
+8-step probe limit without a final answer (the product uses a different 9-step
+composition). Native `all_turns` and an opaque item's unchanged replay were
+observed; one native response was incomplete and compaction was not demonstrated.
+Exact token-count endpoint compatibility still blocks the configured gateway.
+No product guards were disabled. **Normal interview acceptance remains OPEN.**
+[Evidence and the required next decision](../../docs/specs/2026-09-07-recall-native-capability-results.md).
+
 Latest B1 prompt calibration (2026-09-07): preserve who stated what and the
 scope of unanswered questions; candidates include known work and case additions,
 not only unknowns. One fixed Luna/medium sequence completed three B2 publications;

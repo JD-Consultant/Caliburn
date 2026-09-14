@@ -1,0 +1,294 @@
+{
+  "status": "PASS",
+  "browser": "153.0.8010.37",
+  "headed": true,
+  "OS_IME": "NOT RUN",
+  "product_provider_calls": 0,
+  "requests": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/1sxgnap1u7d53.css",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/28um7m88gh754.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/2wmnm5pm56m3u.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/39kpg2_l7xb5r.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/turbopack-3cdiiarkxh26r.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0vsdoaqr3dcfw.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0vjyednuu-ho3.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents",
+      "body": "{\"title\":\"核心審查・舊版手改恢復 1789188303553\",\"request_key\":\"d226ee85-1d0d-4cbe-9619-683aceccfd35\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/workspace/522255ac-c124-4d48-ae8c-fee9821967ea",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/1sxgnap1u7d53.css",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/28um7m88gh754.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/2wmnm5pm56m3u.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/39kpg2_l7xb5r.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/turbopack-3cdiiarkxh26r.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0vsdoaqr3dcfw.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0adwo-o7syqhh.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/1cw_k-4ce1uqa.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-recovery",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-save",
+      "body": "{\"request_key\":\"b88e99c5-cb75-4bd2-9e4d-d96e7adec498\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjQ1N2YzOTgzLTRiNTYtNDA1My05YzY0LWJjYTdkMWI1OWYzYiJd\",\"value\":[{\"type\":\"p\",\"id\":\"af5e24da-4e92-4311-85a3-c78009e1dbad\",\"children\":[{\"text\":\"員工尚未保存的更正\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-recovery?request_key=b88e99c5-cb75-4bd2-9e4d-d96e7adec498",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-recovery",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-save",
+      "body": "{\"request_key\":\"a314a3fd-c176-4157-9ef6-adc2bed0c706\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjVkMDk2ZjNiLTE1NTQtNDJiZS1iMDcwLTNjYjljMmU0MTg2MCJd\",\"value\":[{\"type\":\"p\",\"id\":\"af5e24da-4e92-4311-85a3-c78009e1dbad\",\"children\":[{\"text\":\"伺服器已保存的新工作；員工尚未保存的更正\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/changes/read",
+      "body": "{\"change_ref\":\"WyJjaGFuZ2UiLCI1MjIyNTVhYy1jMTI0LTRkNDgtYWU4Yy1mZWU5ODIxOTY3ZWEiLCJlNmI3OWI0Mi1hYjczLTUxODgtYWVjYy1mOTI3NWI2ZjkwNjIiLCI1ZDA5NmYzYi0xNTU0LTQyYmUtYjA3MC0zY2I5YzJlNDE4NjAiLCI1ZjMwMmEwYS04MzExLTRlODctOWQ3OC02ZGM3OWY0YTU4NzMiXQ\"}"
+    }
+  ],
+  "errors": [],
+  "document": "522255ac-c124-4d48-ae8c-fee9821967ea",
+  "before": {
+    "status": "ok",
+    "read_kind": "current",
+    "revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjQ1N2YzOTgzLTRiNTYtNDA1My05YzY0LWJjYTdkMWI1OWYzYiJd",
+    "access": "read_only",
+    "fragment": [
+      {
+        "type": "p",
+        "id": "af5e24da-4e92-4311-85a3-c78009e1dbad",
+        "children": [
+          {
+            "text": ""
+          }
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6IjQ1N2YzOTgzLTRiNTYtNDA1My05YzY0LWJjYTdkMWI1OWYzYiIsInRhcmdldCI6ImFmNWUyNGRhLTRlOTItNDMxMS04NWEzLWM3ODAwOWUxZGJhZCJ9",
+        "element": {
+          "type": "p",
+          "id": "af5e24da-4e92-4311-85a3-c78009e1dbad",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        },
+        "access": "read_only"
+      }
+    ],
+    "selection": null,
+    "source_refs": [],
+    "change_refs": [],
+    "continuation_ref": null
+  },
+  "other": {
+    "status": "committed",
+    "operation_ref": "WyJvcGVyYXRpb24iLCI1MjIyNTVhYy1jMTI0LTRkNDgtYWU4Yy1mZWU5ODIxOTY3ZWEiLCJlYWZmYjhkNy03YmY1LTUyZjMtOTg1MS0zMjY2YWMzYTU0MjEiXQ",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjQ1N2YzOTgzLTRiNTYtNDA1My05YzY0LWJjYTdkMWI1OWYzYiJd",
+    "result_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjVkMDk2ZjNiLTE1NTQtNDJiZS1iMDcwLTNjYjljMmU0MTg2MCJd",
+    "change_ref": "WyJjaGFuZ2UiLCI1MjIyNTVhYy1jMTI0LTRkNDgtYWU4Yy1mZWU5ODIxOTY3ZWEiLCJlYWZmYjhkNy03YmY1LTUyZjMtOTg1MS0zMjY2YWMzYTU0MjEiLCI0NTdmMzk4My00YjU2LTQwNTMtOWM2NC1iY2E3ZDFiNTlmM2IiLCI1ZDA5NmYzYi0xNTU0LTQyYmUtYjA3MC0zY2I5YzJlNDE4NjAiXQ",
+    "document_effect": "committed",
+    "receipt_durability": "confirmed",
+    "actual_changes": {
+      "origin": "manual",
+      "before_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjQ1N2YzOTgzLTRiNTYtNDA1My05YzY0LWJjYTdkMWI1OWYzYiJd",
+      "after_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjVkMDk2ZjNiLTE1NTQtNDJiZS1iMDcwLTNjYjljMmU0MTg2MCJd",
+      "native_operations": null,
+      "affected_element_ids": []
+    },
+    "error": null,
+    "next_action": "continue"
+  },
+  "failed": {
+    "status": "stale_base",
+    "operation_ref": "WyJvcGVyYXRpb24iLCI1MjIyNTVhYy1jMTI0LTRkNDgtYWU4Yy1mZWU5ODIxOTY3ZWEiLCJkODFjZDhhZC0yNjJmLTU0MWEtYWZkYi1kYmVjZDhkYTA5MjMiXQ",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjQ1N2YzOTgzLTRiNTYtNDA1My05YzY0LWJjYTdkMWI1OWYzYiJd",
+    "result_revision_ref": null,
+    "change_ref": null,
+    "document_effect": "unchanged",
+    "receipt_durability": "confirmed",
+    "actual_changes": null,
+    "error": {
+      "code": "stale_base",
+      "message": "JD operation did not complete.",
+      "command_index": null
+    },
+    "next_action": "reread_current"
+  },
+  "candidateBefore": "{\"document_id\":\"522255ac-c124-4d48-ae8c-fee9821967ea\",\"request_key\":\"b88e99c5-cb75-4bd2-9e4d-d96e7adec498\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjQ1N2YzOTgzLTRiNTYtNDA1My05YzY0LWJjYTdkMWI1OWYzYiJd\",\"value\":[{\"type\":\"p\",\"id\":\"af5e24da-4e92-4311-85a3-c78009e1dbad\",\"children\":[{\"text\":\"員工尚未保存的更正\"}]}]}",
+  "recoveredAX": "- main:\n  - link \"← 我的職務說明書\":\n    - /url: /\n  - heading \"核心審查・舊版手改恢復 1789188303553\" [level=1]\n  - status: 已保存\n  - paragraph: 已載入最新保存稿；先前送出的候選仍在下方，可複製需要的文字到目前稿。未送出聊天也已保留。\n  - region \"顧問訪談\":\n    - heading \"顧問訪談\" [level=2]\n    - paragraph: 先談你的實際工作，資料足夠時顧問會開始整理。你可以隨時補充或更正。\n    - text: 補充或更正你的工作\n    - textbox \"補充或更正你的工作\":\n      - /placeholder: 例如：這項工作只在客戶提出需求時執行…\n      - text: 這段補充先不要送出\n    - paragraph: 選取正文後送出，可請顧問處理該段；未保存修改會先保存。\n    - button \"送出\"\n  - region \"目前職務說明書\":\n    - heading \"職務說明書\" [level=2]\n    - button \"保存\" [disabled]\n    - button \"這次改動\"\n    - button \"讀取上一筆歷史\"\n    - button \"粗體\"\n    - button \"斜體\"\n    - button \"底線\"\n    - button \"刪除線\"\n    - button \"復原\"\n    - button \"重做\"\n    - button \"表格增列\"\n    - button \"表格刪列\"\n    - button \"複製區塊\"\n    - textbox \"職務說明書正文\":\n      - paragraph: 伺服器已保存的新工作\n    - complementary:\n      - heading \"上次人工保存結果\" [level=3]\n      - paragraph: 這次修改未保存：stale_base\n      - button \"重新讀取狀態\"\n    - complementary:\n      - heading \"尚待處理的送出候選\" [level=3]\n      - paragraph: 這份候選未保存，已保留供查看。可先複製需要的文字到目前稿，再捨棄這份候選並保存；未處理前關頁再開仍會保留。\n      - button \"再次送出同一份\" [disabled]\n      - button \"捨棄這份候選\"\n      - paragraph: 員工尚未保存的更正",
+  "saved": {
+    "status": "committed",
+    "operation_ref": "WyJvcGVyYXRpb24iLCI1MjIyNTVhYy1jMTI0LTRkNDgtYWU4Yy1mZWU5ODIxOTY3ZWEiLCJlNmI3OWI0Mi1hYjczLTUxODgtYWVjYy1mOTI3NWI2ZjkwNjIiXQ",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjVkMDk2ZjNiLTE1NTQtNDJiZS1iMDcwLTNjYjljMmU0MTg2MCJd",
+    "result_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjVmMzAyYTBhLTgzMTEtNGU4Ny05ZDc4LTZkYzc5ZjRhNTg3MyJd",
+    "change_ref": "WyJjaGFuZ2UiLCI1MjIyNTVhYy1jMTI0LTRkNDgtYWU4Yy1mZWU5ODIxOTY3ZWEiLCJlNmI3OWI0Mi1hYjczLTUxODgtYWVjYy1mOTI3NWI2ZjkwNjIiLCI1ZDA5NmYzYi0xNTU0LTQyYmUtYjA3MC0zY2I5YzJlNDE4NjAiLCI1ZjMwMmEwYS04MzExLTRlODctOWQ3OC02ZGM3OWY0YTU4NzMiXQ",
+    "document_effect": "committed",
+    "receipt_durability": "confirmed",
+    "actual_changes": {
+      "origin": "manual",
+      "before_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjVkMDk2ZjNiLTE1NTQtNDJiZS1iMDcwLTNjYjljMmU0MTg2MCJd",
+      "after_revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjVmMzAyYTBhLTgzMTEtNGU4Ny05ZDc4LTZkYzc5ZjRhNTg3MyJd",
+      "native_operations": null,
+      "affected_element_ids": []
+    },
+    "error": null,
+    "next_action": "continue"
+  },
+  "after": {
+    "status": "ok",
+    "read_kind": "current",
+    "revision_ref": "WyJyZXZpc2lvbiIsIjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsIjVmMzAyYTBhLTgzMTEtNGU4Ny05ZDc4LTZkYzc5ZjRhNTg3MyJd",
+    "access": "read_only",
+    "fragment": [
+      {
+        "type": "p",
+        "id": "af5e24da-4e92-4311-85a3-c78009e1dbad",
+        "children": [
+          {
+            "text": "伺服器已保存的新工作；員工尚未保存的更正"
+          }
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjUyMjI1NWFjLWMxMjQtNGQ0OC1hZThjLWZlZTk4MjE5NjdlYSIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6IjVmMzAyYTBhLTgzMTEtNGU4Ny05ZDc4LTZkYzc5ZjRhNTg3MyIsInRhcmdldCI6ImFmNWUyNGRhLTRlOTItNDMxMS04NWEzLWM3ODAwOWUxZGJhZCJ9",
+        "element": {
+          "type": "p",
+          "id": "af5e24da-4e92-4311-85a3-c78009e1dbad",
+          "children": [
+            {
+              "text": "伺服器已保存的新工作；員工尚未保存的更正"
+            }
+          ]
+        },
+        "access": "read_only"
+      }
+    ],
+    "selection": null,
+    "source_refs": [],
+    "change_refs": [
+      "WyJjaGFuZ2UiLCI1MjIyNTVhYy1jMTI0LTRkNDgtYWU4Yy1mZWU5ODIxOTY3ZWEiLCJlNmI3OWI0Mi1hYjczLTUxODgtYWVjYy1mOTI3NWI2ZjkwNjIiLCI1ZDA5NmYzYi0xNTU0LTQyYmUtYjA3MC0zY2I5YzJlNDE4NjAiLCI1ZjMwMmEwYS04MzExLTRlODctOWQ3OC02ZGM3OWY0YTU4NzMiXQ"
+    ],
+    "continuation_ref": null
+  }
+}

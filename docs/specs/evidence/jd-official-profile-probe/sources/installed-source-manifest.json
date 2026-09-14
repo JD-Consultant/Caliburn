@@ -1,0 +1,192 @@
+{
+  "checkedOn": "2026-09-10",
+  "note": "Exact actual npm dist source; no edits or vendor patches",
+  "files": [
+    {
+      "package": "@platejs/core",
+      "source": "node_modules/@platejs/core/dist/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__core/index.d.ts",
+      "sha256": "52fe48f6d251a382ad97d0ff83aefbef239e019864335c37756115f4bb7cef4b"
+    },
+    {
+      "package": "@platejs/core",
+      "source": "node_modules/@platejs/core/dist/react/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__core/react/index.d.ts",
+      "sha256": "ced95adce9425805de892f86a69ab89a194115bc3d5981d01611f803697d1851"
+    },
+    {
+      "package": "@platejs/core",
+      "source": "node_modules/@platejs/core/dist/static/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__core/static/index.d.ts",
+      "sha256": "429293e83f82d735f7d3c9bfced243b104973c50bd633e0ab721e2b986145a63"
+    },
+    {
+      "package": "@platejs/core",
+      "source": "node_modules/@platejs/core/dist/withSlate-CGuPv-qn.js",
+      "archivedAs": "sources/installed/@platejs__core/withSlate-CGuPv-qn.js",
+      "sha256": "8703e6a73fe92a0d0ee0a4744cfd1791c10a3a06270648b7e6890dff9555339d"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/BaseKbdPlugin-C5TGzG3P.js",
+      "archivedAs": "sources/installed/@platejs__basic-nodes/BaseKbdPlugin-C5TGzG3P.js",
+      "sha256": "fba0a94e9116a696910f917770a8c337af16aeadf90003214752e5370453eba9"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/index-B_h8MhaV.d.ts",
+      "archivedAs": "sources/installed/@platejs__basic-nodes/index-B_h8MhaV.d.ts",
+      "sha256": "2ca0b836509c13bdc7c3384267342bc3b17dfcebe97c553ee845e067fe963947"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__basic-nodes/index.d.ts",
+      "sha256": "e8482aa36319c6ba2ae7c731ffe38e6531e2c25831d9618e8af1970b8bc24eb2"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/index.js",
+      "archivedAs": "sources/installed/@platejs__basic-nodes/index.js",
+      "sha256": "a6f8946f22205ba946a42b8af27477f7ec289b61a80f8b4af5b88800e3e64cf8"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/react/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__basic-nodes/react/index.d.ts",
+      "sha256": "ee28e665163b98a19cff53498d0a5f1bdc410287c50a633479d288f6fdb92ff4"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/react/index.js",
+      "archivedAs": "sources/installed/@platejs__basic-nodes/react/index.js",
+      "sha256": "5b5e882041ae6670720e5e5d934101afa7de4120b91a70d23336b9f35a061223"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/BaseListPlugin-n9uuTtLe.js",
+      "archivedAs": "sources/installed/@platejs__list-classic/BaseListPlugin-n9uuTtLe.js",
+      "sha256": "ea155ba43142d53b2e74f5624f0d1eff5635abe91b3ca2d2ed8bae082ca3b860"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/BaseTodoListPlugin-C3ztdXje.d.ts",
+      "archivedAs": "sources/installed/@platejs__list-classic/BaseTodoListPlugin-C3ztdXje.d.ts",
+      "sha256": "9c448b1058ec60f4884c0cdf661ae2a6f122f4ed006e7b3c286e1676bdadacfa"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__list-classic/index.d.ts",
+      "sha256": "29a59e029cb2bb05aa21bf96fb798250ab409f6f210ca22ea87a07fbb11a6e4f"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/index.js",
+      "archivedAs": "sources/installed/@platejs__list-classic/index.js",
+      "sha256": "b67058f0f73d8f654684501cbab1f53366d7a2d6611155b975830fa5aa304507"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/react/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__list-classic/react/index.d.ts",
+      "sha256": "1ac56fcc4caecd8895e61f3a9df488f3ca6d4563dd245313046ad86b4af5d06c"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/react/index.js",
+      "archivedAs": "sources/installed/@platejs__list-classic/react/index.js",
+      "sha256": "6b760de882ce9a5c50175e0cc12e0e3d2d01efa7b0c11771221eb13b556fa47f"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/constants-6xljcM3U.js",
+      "archivedAs": "sources/installed/@platejs__table/constants-6xljcM3U.js",
+      "sha256": "ace1a1a1a785fe2e4d3758c82e63991aee265d00688571bbb603b35a6d193abf"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/index-BYg7T9gA.d.ts",
+      "archivedAs": "sources/installed/@platejs__table/index-BYg7T9gA.d.ts",
+      "sha256": "fab144ce46658ab9a340248246f0ea8e9b0c81dd598b37339ae539a960d6b362"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__table/index.d.ts",
+      "sha256": "8788533f12b948f67243f0292e3dd969b094d7cadeb0cbccad89563ee0bc205d"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/index.js",
+      "archivedAs": "sources/installed/@platejs__table/index.js",
+      "sha256": "9975b4d6948ea4f881c9750facd57c5906699edeeac02e8eae108fa7463fbc06"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/react/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__table/react/index.d.ts",
+      "sha256": "2814dc2ab173c22c4b5cb141486d8a9651f61ee3fce39f86e34d00db94949fc5"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/react/index.js",
+      "archivedAs": "sources/installed/@platejs__table/react/index.js",
+      "sha256": "c5a10a5c7610a750947d3c6389cf61602fa719b15ac3b754ff0db7eb1a004326"
+    },
+    {
+      "package": "@platejs/slate",
+      "source": "node_modules/@platejs/slate/dist/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__slate/index.d.ts",
+      "sha256": "d798f575c676503badce42a12b4f197d5000e631af6e2b2308b05abecc72f7de"
+    },
+    {
+      "package": "@platejs/slate",
+      "source": "node_modules/@platejs/slate/dist/index.js",
+      "archivedAs": "sources/installed/@platejs__slate/index.js",
+      "sha256": "84ec566e5689d7558200a65505a5610b773fc2252057b57063dd14c1cf7a6e8c"
+    },
+    {
+      "package": "@platejs/utils",
+      "source": "node_modules/@platejs/utils/dist/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__utils/index.d.ts",
+      "sha256": "5a86739820ee4ab94fe525ef5ec79348f9726f9cc87f57d1acddf882f18dc4ed"
+    },
+    {
+      "package": "@platejs/utils",
+      "source": "node_modules/@platejs/utils/dist/index.js",
+      "archivedAs": "sources/installed/@platejs__utils/index.js",
+      "sha256": "5adb7649d69f5e6656ce6278946de9c94093b79b1d1dacf8e3ba5f3bf8708ab5"
+    },
+    {
+      "package": "@platejs/utils",
+      "source": "node_modules/@platejs/utils/dist/react/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__utils/react/index.d.ts",
+      "sha256": "a800896603075c5e96a172db5cfbe2678f18a9aefdd26a932b2542b0b821d21a"
+    },
+    {
+      "package": "@platejs/utils",
+      "source": "node_modules/@platejs/utils/dist/react/index.js",
+      "archivedAs": "sources/installed/@platejs__utils/react/index.js",
+      "sha256": "d0f19129bb9ed91758e4990cbc64e2bf83d7464f48128beea880b35a7fd73ac2"
+    },
+    {
+      "package": "@platejs/diff",
+      "source": "node_modules/@platejs/diff/dist/index.d.ts",
+      "archivedAs": "sources/installed/@platejs__diff/index.d.ts",
+      "sha256": "23bc4b399e97e5e2b0022b02806a2fee0b15d7968468e0b41583c74cd0732067"
+    },
+    {
+      "package": "@platejs/diff",
+      "source": "node_modules/@platejs/diff/dist/index.js",
+      "archivedAs": "sources/installed/@platejs__diff/index.js",
+      "sha256": "bebb501cb9b1df2a36155dd08959e792c7c8de22aaaff6fcfa0a31fde7ac4d49"
+    },
+    {
+      "package": "slate",
+      "source": "node_modules/slate/dist/index.es.js",
+      "archivedAs": "sources/installed/slate/index.es.js",
+      "sha256": "eb85d66a23ffc1f72d8e5fe518fa3b6f6a9e40335ec29aa3fed42f4bf403f187"
+    }
+  ]
+}

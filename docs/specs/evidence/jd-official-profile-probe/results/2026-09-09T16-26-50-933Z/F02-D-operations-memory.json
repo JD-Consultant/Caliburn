@@ -1,0 +1,99 @@
+[
+  {
+    "type": "set_selection",
+    "properties": null,
+    "newProperties": {
+      "anchor": {
+        "path": [
+          3,
+          1,
+          0
+        ],
+        "offset": 0
+      },
+      "focus": {
+        "path": [
+          3,
+          1,
+          0
+        ],
+        "offset": 62
+      }
+    }
+  },
+  {
+    "type": "set_node",
+    "path": [
+      3,
+      1,
+      0
+    ],
+    "properties": {},
+    "newProperties": {
+      "underline": true
+    }
+  },
+  {
+    "type": "set_selection",
+    "properties": {
+      "anchor": {
+        "path": [
+          3,
+          1,
+          0
+        ],
+        "offset": 0
+      },
+      "focus": {
+        "path": [
+          3,
+          1,
+          0
+        ],
+        "offset": 62
+      }
+    },
+    "newProperties": {
+      "anchor": {
+        "path": [
+          4,
+          2,
+          2,
+          2,
+          0,
+          0,
+          0
+        ],
+        "offset": 0
+      },
+      "focus": {
+        "path": [
+          4,
+          2,
+          2,
+          2,
+          0,
+          0,
+          0
+        ],
+        "offset": 5
+      }
+    }
+  },
+  {
+    "type": "set_node",
+    "path": [
+      4,
+      2,
+      2,
+      2,
+      0,
+      0,
+      0
+    ],
+    "properties": {
+      "bold": true
+    },
+    "newProperties": {}
+  }
+]

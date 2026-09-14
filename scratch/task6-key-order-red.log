@@ -1,0 +1,55 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/JdSavedProjection.test.tsx (2 tests | 2 failed) 168ms
+   × serialization key order alone does not become a manual save before the next interview 16ms
+   × two saved native batches stay clean across actual Plate callbacks while manual edits remain dirty 150ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/JdSavedProjection.test.tsx > serialization key order alone does not become a manual save before the next interview
+AssertionError: expected true to be false // Object.is equality
+
+- Expected
++ Received
+
+- false
++ true
+
+ ❯ src/jd/JdSavedProjection.test.tsx:27:25
+     25|   await session.load();
+     26|   session.edit([{ id: 'empty', children: [{ text: '' }], type: 'p' }]);
+     27|   expect(session.dirty).toBe(false);
+       |                         ^
+     28|   session.setText('繼續訪談');
+     29|   expect(await session.send(() => null)).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/jd/JdSavedProjection.test.tsx > two saved native batches stay clean across actual Plate callbacks while manual edits remain dirty
+AssertionError: expected [ false ] to deeply equal [ true ]
+
+- Expected
++ Received
+
+  [
+-   true,
++   false,
+  ]
+
+ ❯ src/jd/JdSavedProjection.test.tsx:47:19
+     45|   ] } as JdChangeReadSuccess);
+     46|   await act(async () => { await session.refresh(); });
+     47|   expect(applied).toEqual([true]);
+       |                   ^
+     48|   expect(session.dirty).toBe(false);
+     49|   const second = head('r2', [{ type: 'p', id: 'work', children: [{ tex…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed (2)
+   Start at  02:00:09
+   Duration  30.21s (transform 361ms, setup 0ms, import 13.19s, tests 168ms, environment 16.00s)
+

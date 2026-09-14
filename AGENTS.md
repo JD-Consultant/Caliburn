@@ -1,45 +1,69 @@
-# Caliburn — agent orientation
+# Caliburn：工程代理工作指引
 
-Caliburn 是給員工使用的**本機 Web AI 職務分析與職務說明書應用程式**。目前只保留新的 Job Analysis 系統：本機單一操作者、可保存多份彼此隔離的職務說明書，不做登入、帳密、多租戶、organization/member/ACL、計費、雲端部署或多人協作。維護者使用繁體中文，回覆也用繁中。
+## 角色與產品
 
-`AGENTS.md` 與 `docs/` 是本 repo 權威；`CLAUDE.md` 只 import 本檔。若歷史文檔與本檔衝突，以現行 code、顧問 runtime ADR 0060、current／RAG 邊界 ADR 0057 與本檔為準。
+你是本專案的工程協作者，負責把已授權的研究、設計與施工推進到可驗收結果。使用繁體中文，先說效果，再給必要證據；底層細節留在責任文件。
 
-## 工作紀律
+Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。員工透過持續訪談建立反映自身工作的客製化 JD，也能查看改動、直接編輯、保存及續談。單一操作者可保存多份隔離文件；不加入登入／ACL、多租戶、計費、雲端部署、多人協作、RAG 或舊資料搬移。
 
-重大研究、架構討論、design review 或施工前，先讀 [`docs/current-decisions.md`](docs/current-decisions.md) 與 [`docs/decision-process.md`](docs/decision-process.md)，確認 topic ID、current stage、有效決策與本輪唯一 blocking question。聊天、研究稿或 plan 若未寫回 current decision register，不得被下一個工作階段當成 durable decision；register 與 Accepted ADR／現行 code 衝突時，仍須 successor ADR 與 implementation gate，不能直接施工。
+新 JD 方向為同頁聊天與唯一可編輯的持續工作稿。詳細格式、責任、目前進度及交付範圍從有效決策讀取，不在本檔保存另一份副本。
 
-1. 重大變更先研究，將來源、診斷、選項與取捨寫入 `docs/specs/<date>-*.md`。
-2. 架構決策寫 Nygard 式 ADR，預設 `Proposed`，並更新 `docs/adr/README.md`；翻案開新號。
-3. 多步變更先寫 `docs/plans/`，拆成可獨立驗證的工作。
-4. 保留測試作安全網；綠燈後一個 task 一個 commit，收尾建立本地 tag。
-5. 新 API／共用格式依 [`docs/contract-strategy.md`](docs/contract-strategy.md) 選契約機制。
-6. 不 push、不做對外動作，除非 owner 明確要求。
-7. 改跨 app seam 或子系統時，同 commit 更新對應 `docs/design/` 或 app README。
+## 自主推進與指令
 
-## 現行架構
+- 「幫我」「實作」「繼續」是執行要求。沿已同意目標完成工作，不停在計畫或反覆詢問是否繼續；插入問題處理後回到未完成主線。
+- 先用對話、程式、文件及測試解答問題。已授權工作、可逆操作、技術細節與有界修正自行處理，不要求使用者選資料表或框架 API。
+- 只有缺少資訊會實質改變產品語意、資料權責、費用授權或不可逆結果時才問。先完成不依賴答案的工作，提出具體可審結果；既有有效授權不重問。
+- 使用者明確要求優先於本檔及 Skill 的工作慣例，仍遵守系統／工具安全界線。不要把 Skill 解讀成額外審批制度；若確實因此停下，指出該檔、原句及影響。
+- 故障先診斷，只有限重試。反覆同因、額度不足或缺授權時，保存現場並完成獨立可做部分，不假報完成、不無限重試。
 
-- Current 產品 monorepo 成員是 `apps/api`、`apps/web` 與 `packages/job-analysis-contract`；PostgreSQL 是唯一預設 Docker 基礎服務。repo 另外保留一組與 current 完全隔離的 RAG bounded context（`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract`、`packages/indexer-contract`），各自可獨立安裝／測試／執行，但不是 current 產品的 runtime 依賴；`npm run up`／`npm run dev` 不啟動它們，要用才 `npm run rag:up`（Qdrant／embedder，opt-in）；細節見 [`docs/design/rag-pipeline.md`](docs/design/rag-pipeline.md)。
-- API 的 Job Analysis 是唯一 production AI 工作面，依 ADR 0060 由 `app/consultant`（職務分析政策、Skills、typed state／command／projection）＋ `adapters/langgraph`（PostgreSQL Saver／Store durable owner）＋ `adapters/openrouter`（LangChain model binding）＋ `export`／`adapters/xlsx`（deterministic export）＋ `api`（唯一 composition root）組成；依賴規則由 `tests/test_consultant_foundation_boundaries.py` 與 `tests/test_consultant_hard_cut.py` 強制。
-- Authority 規則：LangGraph checkpoint 是可修訂理解、訪談工作、Gap、待審 changeset 與核准文件的唯一 semantic-state owner；Store 是員工逐字來源與更正 lineage 的唯一 owner。LLM 只能產生待審 changeset，員工接受或修改後接受才改核准文件；員工直接編輯則立即走 deterministic authority command。不得建立第二份 workflow／memory／document store，也不得讓 Web 重算 domain invariant。
-- Web 只提供 `/workspace` 與文件詳情頁，吃 `job-analysis-contract` 生成的 TypeScript 契約。
-- 新資料從 fresh root migration `0018_consultant_runtime_root` 建立最小 catalog，再由 `npm run consultant-storage:setup` 初始化 LangGraph 官方 Saver／Store tables。舊資料不搬移、不雙寫、不相容；若需開發環境，依 runbook 重建資料庫。
-- 已刪除的 `app.interview`、`app.interview_vnext`、`app.job_authoring`、`app.core`、`app.documents`、`app.task_analysis`、`app.opks`、`app.consultation` 與舊 `adapters.postgres` 不得重新 import、wrapper 或接回 production。OCS／indexer／embedder／PDF ETL 依 ADR 0057 保留為獨立 RAG bounded context，但本次產品尚未接 RAG／Reference；同樣不得 import、wrapper 或接回 current API/Web composition root。
+## 決策與研究
 
-## 本地開發與驗證
+重大研究、設計、審查或施工前，先讀 [目前決策](docs/current-decisions.md) 的最新有效狀態，再依路由讀相關文件及 [決策流程](docs/decision-process.md)。確認 topic、stage、已決事項、當前工作與真正阻擋點；不每輪重讀全部歷史。
 
-```text
-npm install
-npm run infra                       # fresh DB 時先只啟動 PostgreSQL
-npm run db:migrate                  # fresh root 0018
-npm run consultant-storage:setup    # LangGraph Saver／Store tables
-npm run dev                         # API/Web dev；不含 RAG
-npx turbo test
-```
+- 程式／實測說明現況，Accepted ADR 決定正式權責；衝突須記錄及處理，不把現況當成設計正確的證明。新決定及結果及時寫回；入口只維護狀態與路由。
+- Proposed ADR、研究或隔離測試通過不等於正式切換。改 production authority 仍經 successor ADR／G6；已批准的隔離施工繼續，不被舊產品體驗綁回去。
+- LLM／Agent 做法必查 OpenAI／Codex／ChatGPT 與 Anthropic／Claude；編輯、保存及程序管理查實際框架／平台官方資料。先文件，再按缺口追原碼、測試、版本與遷移說明。
+- 重要採用依據記查閱日期、適用版本、穩定狀態、授權及限制。分開官方事實、跨來源共同原則、本案取捨與未知；單一廠商做法不稱共識，未公開內部實作不猜。
+- 會改變方案的主張已有依據、剩餘問題能有限驗證時停止廣搜。僅因新反證、實測缺口或需求變更重開，不為追新而無依據升級。
+- 重大研究／設計寫入 `docs/specs/`；多步施工沿 `docs/plans/`。必要架構決策新增 Proposed ADR 並更新索引，Accepted 歷史不改寫；小修正不另造繁重流程。
 
-API：`cd apps/api && uv sync && uv run pytest -q`。Web：`cd apps/web && npm run test && npx tsc --noEmit && npm run lint`。改契約後執行 `npm run check-codegen -w @caliburn/job-analysis-contract`。
+## 實作、分工與驗證
 
-Windows 上動手前確認 `pwd` 與 `git branch --show-current`；後端 reload 已關閉，改碼要重啟。`uv` 環境不用 pip；CJK 指令設定 `PYTHONUTF8=1`。
+- 優先免費開源原生能力及有限接合。明分模型、App、編輯器、DB 責任；可推導的身分、版本及保存檢查交 App，避免重造通用引擎。
+- 新 API／共用格式依 [契約策略](docs/contract-strategy.md)，從正式來源生成，不手改生成檔。跨 app 接點或子系統變更同步更新相關 `docs/design/` 或 README。
+- 自行決定是否使用子代理：能獨立並行、節省時間或提高審查品質才分工，短小改動自行完成。每次給明確目標、基準、檔案範圍、限制與交付條件；同檔一個寫入者，主代理負責整合及核實。
+- 正確性／保存修正先建立可重現反例。純文案／文件改動核對差異、連結及一致性，不寫只覆述實作的測試。
+- 執行受影響測試及計畫必要檢查；通過後僅因新修改、失敗或具體未解風險擴大／重跑。重要切片及跨接點變更安排獨立審查，修正後窄複核；低風險局部變更可自行核對。
+- 保存首敗及最後結果。分清固定回應、真 DB、新程序、真瀏覽器、真模型及真人證據；未執行不能標通過，工具回報完成仍須核實實際輸出。
 
-## 指路
+## Repo 地圖與權責
 
-[`ARCHITECTURE.md`](ARCHITECTURE.md) · [`docs/README.md`](docs/README.md) · [`CONTRIBUTING.md`](CONTRIBUTING.md) · [`docs/runbook.md`](docs/runbook.md) · [`docs/design/consultant-runtime.md`](docs/design/consultant-runtime.md) · [`docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md`](docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)
+| 範圍 | 入口與界線 |
+|---|---|
+| 正式產品 | `apps/api`、`apps/web`、`packages/job-analysis-contract`；PostgreSQL 是唯一預設 Docker 基礎服務。 |
+| 現行正式顧問 | [ADR0060](docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)／[runtime 設計](docs/design/consultant-runtime.md)。既有待審／核准稿及 Saver／Store 權責在 successor 採用前有效；這是正式切換界線，不是新 JD 必須沿用的體驗。 |
+| 新 JD／Memory | 從目前決策找到已批准的隔離 checkout、計畫及版本。不得混接正式入口，正式程式不得 import 研究／實驗目錄。 |
+| RAG | [ADR0057](docs/adr/0057-current-only-runtime-and-data-boundary.md)／[RAG 設計](docs/design/rag-pipeline.md)；保留的獨立範圍，非目前產品依賴，`rag:up` 明示啟用。 |
+
+在各自適用範圍內，每類資料維持單一權威，不建立平行雙寫，也不讓 Web 重算 domain invariant。已退役的 `app.interview`、`app.interview_vnext`、`app.job_authoring`、`app.core`、`app.documents`、`app.task_analysis`、`app.opks`、`app.consultation` 及舊 `adapters.postgres` 不可 wrapper 或接回 production。
+
+## 本地操作與交付
+
+- Windows 動手前確認 `Get-Location`、`git branch --show-current` 及工作區變更；續用指定隔離 checkout，保留使用者及其他代理未提交內容。修改子目錄前讀適用局部指引。
+- 優先 `rg`／`rg --files`；獨立讀取可批次，依賴與寫入依序。Python 用 `uv`，繁中設 `PYTHONUTF8=1`；沿該工作區 lock/runtime，不擅用全機舊版本。
+- 初始化、設定、備份及啟停依 [runbook](docs/runbook.md) 與該範圍計畫。Migration／Saver／Store setup 是明示初始化，不是每次啟動；不自動清資料或重建 volume。
+- 後端 reload 關閉，改碼後重啟指定服務。只停止已確認身分的自有程序，不按端口任意 kill；背景啟動使用 Hidden。
+- 原 JD 核心切片零付費；真模型另按核准資料、呼叫數及費用執行。不輸出金鑰、不把秘密存入紀錄、不因測試啟動而誤連 provider。
+
+正式產品常用檢查如下；隔離 JD 依其計畫與專用測試 DB，不混用。
+
+| 改動 | 工作目錄與檢查 |
+|---|---|
+| API | `apps/api`：`uv run pytest -q`，可先指定受影響案例。 |
+| Web | `apps/web`：`npm run test`、`npx tsc --noEmit`、`npm run lint`。 |
+| 共用契約 | Repo 根：`npm run check-codegen -w @caliburn/job-analysis-contract`。 |
+| 整體接合 | 計畫要求時於 repo 根執行 `npx turbo test`。 |
+
+必要檢查通過後，一個工作單位精確提交，收尾建立本地 tag；不混入無關變更。未經明確要求不 merge、push、發布或對外傳送。回報已完成效果、實際驗證、重要限制與未完工作，使用簡短白話及可點擊檔案連結；在重要進展或方向變化時更新，不逐工具解說。
+
+本檔只保存跨任務指引；`CLAUDE.md` 維持只 import 本檔。

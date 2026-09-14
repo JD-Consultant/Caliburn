@@ -1,0 +1,44 @@
+INFO:     Started server process [125656]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8091 (Press CTRL+C to quit)
+INFO:     127.0.0.1:59172 - "GET /documents?archived=false HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59172 - "OPTIONS /documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59172 - "POST /documents HTTP/1.1" 201 Created
+INFO:     127.0.0.1:59172 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64604 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64604 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/messages HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59172 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59172 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/manual-recovery HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64609 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64609 - "POST /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59172 - "OPTIONS /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64604 - "POST /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64604 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/manual-recovery?request_key=cd6199fc-86ff-4245-aad5-c6374e6a47dd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64604 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/manual-recovery HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64604 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64604 - "OPTIONS /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59172 - "POST /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59172 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:59172 - "OPTIONS /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd/changes/read HTTP/1.1" 200 OK
+INFO:     127.0.0.1:64609 - "GET /documents/1a5e196e-e398-47b9-aae1-129d01352ea7/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "GET /documents?archived=false HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "OPTIONS /documents HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "POST /documents HTTP/1.1" 201 Created
+INFO:     127.0.0.1:52687 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56341 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/runs HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56341 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/messages HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-recovery HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56345 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56345 - "POST /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "OPTIONS /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56341 - "POST /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56341 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-recovery?request_key=b88e99c5-cb75-4bd2-9e4d-d96e7adec498 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56341 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-recovery HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56341 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56341 - "OPTIONS /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "POST /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/manual-save HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52687 - "OPTIONS /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd/changes/read HTTP/1.1" 200 OK
+INFO:     127.0.0.1:56345 - "GET /documents/522255ac-c124-4d48-ae8c-fee9821967ea/jd HTTP/1.1" 200 OK

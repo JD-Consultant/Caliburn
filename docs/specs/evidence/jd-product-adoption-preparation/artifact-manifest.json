@@ -1,0 +1,21 @@
+{
+  "status": "PREPARATION ONLY",
+  "files": [
+    {
+      "path": "task-adoption-retirement-inventory.md",
+      "bytes": 24339,
+      "sha256": "1df00ef1784b5f99cc58abdabe44c2ed03a5567d9ea4c5d3c1067bfb07c8c1cd"
+    },
+    {
+      "path": "task-adoption-retirement-baseline-hashes.json",
+      "bytes": 41950,
+      "sha256": "75f21d0d0e517f2051b4397ca48f140b950643dbd0721af17e62f4b404cadafc"
+    },
+    {
+      "path": "task-adoption-input-preview.json",
+      "bytes": 32187,
+      "sha256": "a03a0317b8e446e82711346170ac79ed7532eeedfa4bc13a3e7fbdb15806189c"
+    }
+  ],
+  "hashes_itself": false
+}

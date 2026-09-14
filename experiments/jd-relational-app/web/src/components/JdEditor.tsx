@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Alert, Box, Button, Divider, Paper, Stack, TextField, Typography } from '@mui/material';
 import type { ContainerRecord } from '../../../src/jd_relational/generated/jd-read.ts';
 import type { ManualCommand } from '../../../src/jd_relational/generated/jd-manual-http.ts';
-import { containerKey, fieldLabels, kindLabels, sourceSummary, type FieldView, type ItemView, type JdView } from '../lib/view';
+import { containerKey, fieldLabels, kindLabels, sourceSummary, sourcesFor, type FieldView, type ItemView, type JdView } from '../lib/view';
 import ItemDialog, { itemText, manageItemForm, newItemForm, type CommandOptions } from './ItemDialog';
 import type { ChangeMarker, RunMarkers } from '../lib/run-changes';
 
@@ -15,9 +15,10 @@ export interface JdEditorProps {
   onCommand: (command: ManualCommand, options?: CommandOptions) => Promise<void>;
   form: unknown | null; onFormChange: (value: unknown | null) => void;
   markers?: RunMarkers | null; onShowChange?: (changeIndex: number) => void;
+  onOpenSource?: (sourceRef: string) => void;
 }
 export default function JdEditor({ view, disabled, commandsDisabled = false, values, onField,
-  onComposition, onCommand, form, onFormChange, markers, onShowChange }: JdEditorProps) {
+  onComposition, onCommand, form, onFormChange, markers, onShowChange, onOpenSource }: JdEditorProps) {
   const [error, setError] = useState(''); const [moving, setMoving] = useState(false);
   const structuralDisabled = disabled || commandsDisabled || moving || form !== null;
   const itemsFor = (container: ContainerRecord) => view.items.filter(item => item.container_ref === container.container_ref)
@@ -46,15 +47,21 @@ export default function JdEditor({ view, disabled, commandsDisabled = false, val
       href={`#jd-run-change-${marker.changeIndex}`} onClick={() => onShowChange?.(marker.changeIndex)}>{marker.label} · 查看</Button>);
   }
   // Where this content came from. The server says readability is not checked,
-  // so this never promises the original words can be opened.
+  // so this never promises the original words open; pressing asks, and a
+  // refusal is reported as a refusal.
   function sourceNote(targetRef: string) {
     const summary = sourceSummary(view, targetRef);
     if (!summary) return null;
-    return <Typography variant="caption" color={summary.needsRecheck ? 'warning.main' : 'text.secondary'}>
-      {summary.needsRecheck
-        ? `依據你說過的 ${summary.count} 段訪談；這段內容後來改過，原始依據可能不再吻合。`
-        : `依據你說過的 ${summary.count} 段訪談。`}
-    </Typography>;
+    return <Stack direction="row" sx={{ gap: 1, alignItems: 'center', flexWrap: 'wrap' }}>
+      <Typography variant="caption" color={summary.needsRecheck ? 'warning.main' : 'text.secondary'}>
+        {summary.needsRecheck
+          ? `依據你說過的 ${summary.count} 段訪談；這段內容後來改過，原始依據可能不再吻合。`
+          : `依據你說過的 ${summary.count} 段訪談。`}
+      </Typography>
+      {onOpenSource && sourcesFor(view, targetRef).map((source, index) =>
+        <Button key={source.source_ref + index} size="small" sx={{ minWidth: 0, px: 0.5 }}
+          onClick={() => onOpenSource(source.source_ref)}>{`看第 ${index + 1} 段原話`}</Button>)}
+    </Stack>;
   }
   function fieldEditor(field: FieldView) {
     const text = Object.hasOwn(values, field.key) ? values[field.key] : field.value ?? '';

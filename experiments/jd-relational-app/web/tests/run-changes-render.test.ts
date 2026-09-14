@@ -190,3 +190,23 @@ test('content with no recorded basis claims none', () => {
     onFormChange() {}, onField() {}, onComposition() {}, async onCommand() {} }));
   assert.doesNotMatch(html, /依據你說過的/);
 });
+
+test('each recorded basis offers to open its own interview, without decoding the token', () => {
+  const { before } = fixture();
+  const task = before.items.find(row => row.item_id === 'task-id')!;
+  const source = (ref: string) => ({ type: 'source' as const, section_ref: task.section_ref,
+    target_ref: task.item_ref, related_capability_ref: null, source_ref: ref,
+    basis_status: 'current' as const, readability: 'not_checked' as const });
+  const opened: string[] = [];
+  const view = { ...before, sources: [source('first-opaque'), source('second-opaque')] };
+  const props = (onOpenSource?: (ref: string) => void) => ({
+    view, values: {}, disabled: false, form: null, onFormChange() {}, onField() {},
+    onComposition() {}, async onCommand() {}, onOpenSource });
+  const html = renderToStaticMarkup(React.createElement(JdEditor, props(ref => opened.push(ref))));
+  assert.match(html, /看第 1 段原話/); assert.match(html, /看第 2 段原話/);
+  assert.doesNotMatch(html, /first-opaque|second-opaque/);
+  // Without a handler the page offers nothing it cannot do.
+  const plain = renderToStaticMarkup(React.createElement(JdEditor, props(undefined)));
+  assert.doesNotMatch(plain, /看第 1 段原話/);
+  assert.match(plain, /依據你說過的 2 段訪談。/);
+});

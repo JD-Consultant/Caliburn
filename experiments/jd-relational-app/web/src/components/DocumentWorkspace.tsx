@@ -6,6 +6,7 @@ import { ApiError, JdApi } from '../lib/api';
 import { JdSession, emptySession } from '../lib/session';
 import type { JsonValue } from '../lib/drafts';
 import { fieldLabels, projectView } from '../lib/view';
+import type { SourceReadPage } from '../../../src/jd_relational/generated/jd-read';
 import type { CatalogDocument } from '../../../src/jd_relational/generated/jd-catalog-http';
 import JdEditor from './JdEditor';
 import HistoryPanel from './HistoryPanel';
@@ -34,6 +35,7 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   const [undoing, setUndoing] = useState(false);
   const [undoError, setUndoError] = useState('');
   const [restoreHold, setRestoreHold] = useState(false);
+  const [source, setSource] = useState<{ ref: string; page: SourceReadPage | null; error: string } | null>(null);
   const [undoHold, setUndoHold] = useState(false);
   const datasetId = api.datasetId;
   const run = matchingRun(chat, snapshot.row?.chatSubmission?.request.run_id ?? null, { datasetId, documentId: document.document_id });
@@ -124,6 +126,13 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   // While the employee is deciding on a restore or an undo, the JD they are
   // comparing must not move: editing and new turns wait for that decision.
   const holding = restoreHold || undoHold;
+  // Reading only. A refusal is shown as a refusal; an empty panel would read
+  // as "you never said anything", which is not what the server answered.
+  async function openSource(ref: string) {
+    setSource({ ref, page: null, error: '' });
+    try { setSource({ ref, page: await api.sourceRead(document.document_id, ref), error: '' }); }
+    catch (error) { setSource({ ref, page: null, error: message(error) }); }
+  }
   return <div className="work-grid"><ChatPanel snapshot={snapshot} chat={chat} controller={chatController.current} archived={document.archived}
     holding={holding}
     onText={text => session.current?.chatEdit(text)} onComposition={active => session.current?.chatComposition(active)}
@@ -167,9 +176,24 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
       commandsDisabled={holding || snapshot.submitting || !!Object.keys(snapshot.row?.fields ?? {}).length}
       values={snapshot.values} markers={markers} onShowChange={showRunChange} onField={(field, text) => session.current?.edit(field, text)}
       onComposition={active => session.current?.composition(active)} form={snapshot.form}
+      onOpenSource={ref => void openSource(ref)}
       onFormChange={value => session.current?.form(value as JsonValue | null)}
       onCommand={async (command, options) => { await session.current?.command(command, options); }} />}
-  </Box><Dialog open={restoreChoice !== null} onClose={() => { if (!restoreBusy) setRestoreChoice(null); }}>
+  </Box><Dialog open={source !== null} onClose={() => setSource(null)} fullWidth maxWidth="sm">
+    <DialogTitle>你當初說過的話</DialogTitle>
+    <DialogContent>
+      {source?.error && <Alert severity="warning">{source.error}</Alert>}
+      {source && !source.page && !source.error && <Typography role="status">讀取這段訪談…</Typography>}
+      {source?.page?.messages.map(item => <Box key={item.message_id} sx={{ py: 1.5, borderTop: '1px solid #eee' }}>
+        <Typography variant="caption" color="text.secondary">{item.role === 'user' ? '你說的' : '顧問當時的回覆'}</Typography>
+        <Typography className="jd-text">{item.text}</Typography>
+      </Box>)}
+      {source?.page && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
+        顧問的回覆是當時的整理用語，不是你確認過的事實。這段訪談本身不會因為 JD 改動而變。
+      </Typography>}
+    </DialogContent>
+    <DialogActions><Button onClick={() => setSource(null)}>關閉</Button></DialogActions>
+  </Dialog><Dialog open={restoreChoice !== null} onClose={() => { if (!restoreBusy) setRestoreChoice(null); }}>
     <DialogTitle>{restoreChoice === 'discard' ? '捨棄找回的內容？' : '繼續這些修改？'}</DialogTitle>
     <DialogContent><Typography>{restoreChoice === 'discard' ? '只會捨棄尚未提交的文字與表單。資料庫中的 JD 與歷史保持保存。' :
       '找回的文字會套用至目前對應欄位，並開始自動保存。若目前內容已有變更，請先確認上述比較。未完成表單仍需你完成操作。'}</Typography></DialogContent>

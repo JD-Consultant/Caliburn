@@ -286,3 +286,28 @@ test('a preview whose declared total does not match what arrived is refused', as
   const { api } = client(json(preview({ total_records: 2 })));
   await assert.rejects(() => api.restorePreview(DOC, 'older'), (error: ApiError) => error.code === 'invalid_response');
 });
+
+const sourcePage = (overrides: object = {}) => ({ format_version: 2, view: 'source_read', access: 'history',
+  source_ref: 'opaque-source', messages: [{ message_id: 'm1', role: 'user', text: '我每週巡檢設備。' }], ...overrides });
+
+test('a marker reads back its own interview and nothing else', async () => {
+  const { api, calls } = client(json(sourcePage()));
+  const page = await api.sourceRead(DOC, 'opaque-source');
+  assert.equal(page.view, 'source_read');
+  assert.deepEqual(page.messages.map(m => [m.role, m.text]), [['user', '我每週巡檢設備。']]);
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].url, /\/jd\/sources\/read$/);
+  assert.deepEqual(JSON.parse(String(calls[0].init.body)), { source_ref: 'opaque-source' });
+});
+
+test('an answer about another source is refused rather than shown', async () => {
+  const { api } = client(json(sourcePage({ source_ref: 'someone-elses-source' })));
+  await assert.rejects(() => api.sourceRead(DOC, 'opaque-source'),
+    (error: ApiError) => error.code === 'invalid_response');
+});
+
+test('an interview with no messages is refused, because that is not an answer', async () => {
+  const { api } = client(json(sourcePage({ messages: [] })));
+  await assert.rejects(() => api.sourceRead(DOC, 'opaque-source'),
+    (error: ApiError) => error.code === 'invalid_response');
+});

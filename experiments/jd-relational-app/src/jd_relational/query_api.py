@@ -7,7 +7,7 @@ writer. Blocking read services run in FastAPI's native sync endpoint threadpool.
 
 from collections.abc import Callable
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import logging
 from time import perf_counter
 from typing import Annotated, Protocol
@@ -24,10 +24,13 @@ from starlette.responses import JSONResponse
 from .generated.query_http import QueryProblem
 from .generated.reads import (
     ChangeReadInput, ChangeReadPage, ReadInput, ReadPage, RestorePreviewInput, RestorePreviewPage,
+    SourceReadInput, SourceReadPage,
 )
 from .query_http import query_problem
 from .read_transport import parse_read_arguments
-from .change_transport import parse_change_arguments, parse_restore_preview_arguments
+from .change_transport import (
+    parse_change_arguments, parse_restore_preview_arguments, parse_source_read_arguments,
+)
 from .reads import ReadError
 
 LOG = logging.getLogger("caliburn.jd.http")
@@ -41,6 +44,10 @@ class QueryReader(Protocol):
 class QueryServices:
     reads: QueryReader
     changes: QueryReader
+    # Keyword-only with a default so an assembly that has no conversation owner
+    # -- a query-only probe, for instance -- still constructs. The route below
+    # refuses rather than inventing an answer when it is absent.
+    sources: QueryReader | None = field(default=None, kw_only=True)
 
 
 def _problem(scope, code):
@@ -223,6 +230,12 @@ def create_query_app(
         except UnicodeError:
             raise ReadError("invalid_input") from None
 
+    async def source_arguments(request: Request, body: SourceReadInput):
+        try:
+            return parse_source_read_arguments((await request.body()).decode("utf-8"))
+        except UnicodeError:
+            raise ReadError("invalid_input") from None
+
     async def preview_arguments(request: Request, body: RestorePreviewInput):
         try:
             return parse_restore_preview_arguments((await request.body()).decode("utf-8"))
@@ -261,6 +274,20 @@ def create_query_app(
         """Reading only: this says what a restore would change, and writes nothing."""
         return request.app.state.jd_queries.changes.preview_restore(str(document_id), arguments)
 
+    @app.post(
+        "/api/documents/{document_id}/jd/sources/read",
+        response_model=SourceReadPage,
+        responses=errors,
+    )
+    def source_read(
+        document_id: UUID, request: Request, arguments: Annotated[dict, Depends(source_arguments)]
+    ):
+        """Reading only: the employee's own saved words behind one JD marker."""
+        service = request.app.state.jd_queries.sources
+        if service is None:
+            raise ReadError("read_failed")
+        return service.read(str(document_id), arguments)
+
     # Keep schemas generated from the DTOs. FastAPI associates the default JSON
     # media type with every additional response model; these four responses use
     # RFC 9457, so relocate only that generated media entry via its public hook.
@@ -272,6 +299,7 @@ def create_query_app(
             "/api/documents/{document_id}/jd/read",
             "/api/documents/{document_id}/jd/changes/read",
             "/api/documents/{document_id}/jd/restore/preview",
+            "/api/documents/{document_id}/jd/sources/read",
         ):
             for status in errors:
                 content = schema["paths"][path]["post"]["responses"][str(status)]["content"]

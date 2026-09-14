@@ -8,7 +8,7 @@ import querySchema from '../../../contracts/jd-query-http.schema.json' with { ty
 import manualSchema from '../../../contracts/jd-manual-http.schema.json' with { type: 'json' };
 import catalogSchema from '../../../contracts/jd-catalog-http.schema.json' with { type: 'json' };
 import chatSchema from '../../../contracts/jd-chat-http.schema.json' with { type: 'json' };
-import type { ReadInput, ReadPage, ChangeReadPage, RestorePreviewPage } from '../../../src/jd_relational/generated/jd-read';
+import type { ReadInput, ReadPage, ChangeReadPage, RestorePreviewPage, SourceReadPage } from '../../../src/jd_relational/generated/jd-read';
 import type { ManualSaveInput, ManualOperationState, ManualDocumentState } from '../../../src/jd_relational/generated/jd-manual-http';
 import type { MutationResult } from '../../../src/jd_relational/generated/jd-result';
 import type { CatalogPage, CatalogCreateInput, CatalogCreationResult, CatalogCreationLookup, CatalogDocument, CatalogMetadataInput } from '../../../src/jd_relational/generated/jd-catalog-http';
@@ -371,6 +371,15 @@ export class JdApi {
     } while (cursor);
     if (all.total_records !== all.records.length) throw new ApiError('invalid_response');
     return { ...all, has_more: false, next_cursor: null };
+  }
+
+  /** The saved interview behind one JD marker. One page; the server bounds it. */
+  async sourceRead(id: string, sourceRef: string): Promise<SourceReadPage> {
+    const page: SourceReadPage = decode('read', 'SourceReadPage',
+      (await this.request(`/api/documents/${encodeURIComponent(id)}/jd/sources/read`,
+        { source_ref: sourceRef })).value);
+    if (page.source_ref !== sourceRef) invalid();
+    return page;
   }
 
   async changes(id: string, changeRef: string): Promise<ChangeReadPage> {

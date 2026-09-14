@@ -32,6 +32,8 @@ export interface ReadCatalog {
   change_page: ChangeReadPage;
   restore_preview_read: RestorePreviewInput;
   restore_preview_page: RestorePreviewPage;
+  source_read: SourceReadInput;
+  source_read_page: SourceReadPage;
 }
 /**
  * Read a complete current JD, an issued item or section, or historical revisions. All arguments are required. Use null target for current or the history index; use a returned cursor to continue exactly the same view. History is read-only.
@@ -386,4 +388,39 @@ export interface RestorePreviewPage {
    * The saved revision whose content would become current.
    */
   target_revision_ref: string;
+}
+/**
+ * Read back the saved interview behind one JD source marker; reading never writes.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "SourceReadInput".
+ */
+export interface SourceReadInput {
+  source_ref: string;
+}
+/**
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "SourceReadPage".
+ */
+export interface SourceReadPage {
+  format_version: number;
+  view: "source_read";
+  access: "history";
+  source_ref: string;
+  /**
+   * @minItems 1
+   * @maxItems 200
+   */
+  messages: [SourceMessageRecord, ...SourceMessageRecord[]];
+}
+/**
+ * One saved message exactly as it was stored. An assistant message is the consultant's own wording, never an employee fact.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "SourceMessageRecord".
+ */
+export interface SourceMessageRecord {
+  message_id: string;
+  role: "user" | "assistant";
+  text: string;
 }

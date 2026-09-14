@@ -3,7 +3,7 @@
 import json
 
 from .generated.reads import (
-    ChangeReadInput, ChangeReadPage, ReadFailure, RestorePreviewInput,
+    ChangeReadInput, ChangeReadPage, ReadFailure, RestorePreviewInput, SourceReadInput,
 )
 from .read_transport import ERRORS
 from .reads import ReadError, read_json
@@ -34,6 +34,11 @@ def change_tool_definition(provider):
 def parse_restore_preview_arguments(arguments):
     """The same strict re-parse as a saved-change read, for the preview shape."""
     return _parse_arguments(arguments, RestorePreviewInput)
+
+
+def parse_source_read_arguments(arguments):
+    """The same strict re-parse, for reading back one marker's own interview."""
+    return _parse_arguments(arguments, SourceReadInput)
 
 
 def parse_change_arguments(arguments):

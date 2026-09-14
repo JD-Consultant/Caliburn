@@ -21,6 +21,7 @@ from .configured_host import open_configured_host
 from .conversation_sources import ConversationSourceCodec, ConversationSourceService
 from .manual_service import ManualService
 from .reads import ReadService
+from .source_reads import SourceReadService
 from .storage.history import HistoryReader
 
 
@@ -68,7 +69,8 @@ def open_managed_app(file, *, consultant, enable_chat=False) -> ManagedApp:
             opened.settings.signing_key_bytes(), opened.settings.dataset_id))
         services = ChatServices(ReadService(host.runtime.storage, history, codec),
             ChangeReadService(history, codec), manual,
-            CatalogService(host.runtime, opened.settings.dataset_id), ChatService(ai_runtime, manual, chat_history))
+            CatalogService(host.runtime, opened.settings.dataset_id),
+            ChatService(ai_runtime, manual, chat_history), sources=SourceReadService(sources))
 
         @asynccontextmanager
         async def resources():

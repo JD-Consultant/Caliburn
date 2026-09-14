@@ -337,6 +337,33 @@ class RestorePreviewInput(BaseModel):
     cursor: constr(min_length=1, max_length=4096, strict=True) | None
 
 
+class SourceReadInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    source_ref: constr(min_length=1, max_length=4096, strict=True)
+
+
+class SourceMessageRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    message_id: constr(min_length=1, max_length=512, strict=True)
+    role: Literal['user', 'assistant']
+    text: constr(max_length=200000, strict=True)
+
+
+class SourceReadPage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    format_version: conint(ge=2, le=2, strict=True)
+    view: Literal['source_read']
+    access: Literal['history']
+    source_ref: constr(min_length=1, max_length=4096, strict=True)
+    messages: list[SourceMessageRecord] = Field(..., max_length=200, min_length=1)
+
+
 class ReadCatalog(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -348,3 +375,5 @@ class ReadCatalog(BaseModel):
     change_page: ChangeReadPage
     restore_preview_read: RestorePreviewInput
     restore_preview_page: RestorePreviewPage
+    source_read: SourceReadInput
+    source_read_page: SourceReadPage

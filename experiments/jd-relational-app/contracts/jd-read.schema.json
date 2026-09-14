@@ -25,6 +25,12 @@
     },
     "restore_preview_page": {
       "$ref": "#/$defs/RestorePreviewPage"
+    },
+    "source_read": {
+      "$ref": "#/$defs/SourceReadInput"
+    },
+    "source_read_page": {
+      "$ref": "#/$defs/SourceReadPage"
     }
   },
   "required": [
@@ -34,7 +40,9 @@
     "change_read",
     "change_page",
     "restore_preview_read",
-    "restore_preview_page"
+    "restore_preview_page",
+    "source_read",
+    "source_read_page"
   ],
   "$defs": {
     "ReadInput": {
@@ -1332,6 +1340,95 @@
       "required": [
         "target_revision_ref",
         "cursor"
+      ]
+    },
+    "SourceReadInput": {
+      "title": "SourceReadInput",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Read back the saved interview behind one JD source marker; reading never writes.",
+      "properties": {
+        "source_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "source_ref"
+      ]
+    },
+    "SourceMessageRecord": {
+      "title": "SourceMessageRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One saved message exactly as it was stored. An assistant message is the consultant's own wording, never an employee fact.",
+      "properties": {
+        "message_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "user",
+            "assistant"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 200000
+        }
+      },
+      "required": [
+        "message_id",
+        "role",
+        "text"
+      ]
+    },
+    "SourceReadPage": {
+      "title": "SourceReadPage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format_version": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 2
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "source_read"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "history"
+          ]
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "messages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/SourceMessageRecord"
+          }
+        }
+      },
+      "required": [
+        "format_version",
+        "view",
+        "access",
+        "source_ref",
+        "messages"
       ]
     }
   }

@@ -28,13 +28,13 @@ class NoCurrent:
         raise AssertionError("A change or preview read must not call the current reader")
 
 
-def app_for(reads, changes=None, observed=None):
+def app_for(reads, changes=None, observed=None, sources=None):
     @asynccontextmanager
     async def resources():
         if observed is not None:
             observed.append("startup")
         try:
-            yield QueryServices(reads, changes or NoChanges())
+            yield QueryServices(reads, changes or NoChanges(), sources=sources)
         finally:
             if observed is not None:
                 observed.append("shutdown")
@@ -289,3 +289,60 @@ def test_the_preview_route_refuses_a_body_that_is_not_its_own_shape():
         assert client.post(path, json={"target_revision_ref": "t", "cursor": None,
                                        "document_id": "App owns this"}).status_code == 422
     assert changes.calls == []
+
+
+SOURCE_PATH = f"/api/documents/{DOCUMENT}/jd/sources/read"
+
+
+class SourceReader:
+    """Answers like the real service: a page, or one of the shared read codes."""
+
+    def __init__(self, page=None, code=None):
+        self.page, self.code, self.asked = page, code, []
+
+    def read(self, document_id, arguments):
+        self.asked.append((document_id, arguments))
+        if self.code:
+            raise ReadError(self.code)
+        return self.page
+
+
+def source_page():
+    return {"format_version": 2, "view": "source_read", "access": "history",
+            "source_ref": "interview-source:opaque",
+            "messages": [{"message_id": "m1", "role": "user", "text": "我每週巡檢設備。"}]}
+
+
+def test_a_marker_reads_back_its_own_interview_over_http(codec):
+    reader_service = SourceReader(page=source_page())
+    value = complete_domain(); value["document_id"] = DOCUMENT
+    reads, _ = reader(value, codec)
+    with TestClient(app_for(reads, sources=reader_service), base_url="http://127.0.0.1") as client:
+        result = client.post(SOURCE_PATH, json={"source_ref": "interview-source:opaque"})
+        assert result.status_code == 200
+        assert result.json() == source_page()
+        assert reader_service.asked == [(DOCUMENT, {"source_ref": "interview-source:opaque"})]
+        assert result.headers["cache-control"] == "no-store"
+
+
+@pytest.mark.parametrize("code,status", [("invalid_ref", 422), ("target_missing", 404),
+                                         ("invalid_input", 422), ("read_failed", 500)])
+def test_a_refused_source_read_uses_the_shared_problem_shape(codec, code, status):
+    value = complete_domain(); value["document_id"] = DOCUMENT
+    reads, _ = reader(value, codec)
+    with TestClient(app_for(reads, sources=SourceReader(code=code)),
+                    base_url="http://127.0.0.1", raise_server_exceptions=False) as client:
+        result = client.post(SOURCE_PATH, json={"source_ref": "interview-source:opaque"})
+        assert result.status_code == status
+        assert result.headers["content-type"].startswith("application/problem+json")
+        assert result.json()["jd_read_error"]["code"] == code
+
+
+def test_an_installation_without_a_source_owner_refuses_rather_than_inventing(codec):
+    value = complete_domain(); value["document_id"] = DOCUMENT
+    reads, _ = reader(value, codec)
+    with TestClient(app_for(reads), base_url="http://127.0.0.1",
+                    raise_server_exceptions=False) as client:
+        result = client.post(SOURCE_PATH, json={"source_ref": "interview-source:opaque"})
+        assert result.status_code == 500
+        assert result.json()["jd_read_error"]["code"] == "read_failed"

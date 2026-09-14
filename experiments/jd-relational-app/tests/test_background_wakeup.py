@@ -1,0 +1,109 @@
+"""Where background work is woken: a settled turn, and startup recovery.
+
+Waking is all these two places do for the background; they never decide what
+runs. A turn that could not be closed wakes nothing, because the background
+must never be pointed at a turn whose own ending is still unknown. And a wake
+that fails is the background's own problem: it must not change what the
+employee's turn did, nor stop a host from starting.
+"""
+from uuid import uuid4
+
+import pytest
+
+from jd_relational.ai_checkpoints import AiRunCheckpoints
+from jd_relational.ai_runtime import AiRuntime, AiRuntimeError
+
+from test_ai_runtime import HEAD, make_runtime  # noqa: F401
+from test_ai_restart import saved_turn
+
+
+class Woken:
+    """Records the documents the runtime asked the background to look at."""
+
+    def __init__(self, fail=False):
+        self.documents = []
+        self._fail = fail
+
+    def __call__(self, document_id):
+        self.documents.append(document_id)
+        if self._fail:
+            raise RuntimeError("synthetic background failure")
+
+
+def test_a_settled_turn_wakes_the_background_for_its_own_document(make_runtime):
+    """One safe ending, one wake, naming the document that just finished."""
+    make, _ = make_runtime
+    woken = Woken()
+    runtime, _, calls = make(background=woken)
+    document, run = str(uuid4()), str(uuid4())
+    result = runtime.start(document, run, "第一輪原話", expected_revision_id=HEAD).wait(5)
+    assert result.status == "completed" and len(calls) == 1
+    assert woken.documents == [document]
+
+
+def test_a_turn_that_could_not_be_closed_wakes_nothing(make_runtime, monkeypatch):
+    """An unknown ending is not something to point the background at."""
+    make, _ = make_runtime
+    woken = Woken()
+    runtime, _, _ = make(background=woken)
+
+    def refuse(*args, **kwargs):
+        raise OSError("synthetic close failure")
+
+    monkeypatch.setattr(AiRunCheckpoints, "close", refuse)
+    handle = runtime.start(str(uuid4()), str(uuid4()), "第一輪原話", expected_revision_id=HEAD)
+    with pytest.raises(AiRuntimeError, match="^run_recovery_required$"):
+        handle.wait(5)
+    assert woken.documents == []
+    # Leave the turn settled: an explicit reconciliation is what ends it, and
+    # it is also the point at which the background finally hears about it.
+    monkeypatch.undo()
+    assert handle.recover().status in {"completed", "failed"}
+    assert woken.documents, "the recovered ending is what the background gets"
+
+
+def test_a_failing_wake_never_changes_what_the_turn_did(make_runtime):
+    """Background trouble is recorded by the background, not by the employee."""
+    make, _ = make_runtime
+    woken = Woken(fail=True)
+    runtime, graph, _ = make(background=woken)
+    document, run = str(uuid4()), str(uuid4())
+    result = runtime.start(document, run, "第一輪原話", expected_revision_id=HEAD).wait(5)
+    assert result.status == "completed" and result.input_saved
+    assert woken.documents == [document]
+    saved = graph.get_state({"configurable": {"thread_id": document}}).values["messages"]
+    assert saved and runtime.lookup(document, run).wait() == result
+
+
+def test_startup_recovery_wakes_each_document_it_inspected():
+    """Reopening asks the background to look again, without deciding for it."""
+    woken = Woken()
+    runtime, record, *_ = saved_turn(background=woken)
+    assert runtime.owner.finish_startup() == 1
+    # Waking is idempotent by design, so this pins which document, not a count.
+    assert woken.documents and set(woken.documents) == {record.document_id}
+
+
+def test_a_failing_wake_never_stops_a_host_from_starting():
+    """A host must open even when background work cannot be considered."""
+    woken = Woken(fail=True)
+    runtime, record, *_ = saved_turn(background=woken)
+    assert runtime.owner.finish_startup() == 1
+    assert runtime.owner.ready
+    assert woken.documents and set(woken.documents) == {record.document_id}
+
+
+def test_a_runtime_without_a_background_entry_still_settles(make_runtime):
+    """The background is optional wiring, not a requirement of a turn."""
+    make, _ = make_runtime
+    runtime, _, _ = make()
+    document = str(uuid4())
+    assert runtime.start(document, str(uuid4()), "第一輪原話",
+                         expected_revision_id=HEAD).wait(5).status == "completed"
+
+
+def test_an_uncallable_background_entry_is_refused_at_assembly(make_runtime):
+    """Bad wiring fails where it is assembled, not inside an employee's turn."""
+    make, _ = make_runtime
+    with pytest.raises(AiRuntimeError, match="^invalid_ai_runtime$"):
+        make(background="not callable")

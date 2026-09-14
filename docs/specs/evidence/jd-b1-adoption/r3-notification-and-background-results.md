@@ -203,3 +203,40 @@ B1／B2 的節點、`files` 與模型預算仍由原 Saver 負責，**不複製�
 2. 測試以 inline worker 驅動決定邏輯；真背景 worker 的排空與關閉由 §3 的真宿主案例涵蓋，兩者不互相代稱。
 3. **真新 Windows 程序取回原 B 工作仍未做**（計畫 R3 第 7 點的四個停點）。
 4. 顧問指引、Skills、`BackgroundAvailability` 與 JD 編輯器共用 writer 仍未做。
+
+## 5. 兩個喚醒呼叫點
+
+計畫要求「安全回合與啟動恢復時喚醒同一背景入口」。`AiRuntime` 取得一個**可選**的 `background` 入口，在兩個位置呼叫，兩處都**只喚醒、不決定**：
+
+| 位置 | 何時 |
+|---|---|
+| `_settle()` | 回合真的收尾之後。收尾失敗（`run_recovery_required`）**不喚醒**——結局未知的回合不該交給背景 |
+| `_recover_previous()` | 啟動恢復檢視完一份文件之後。恢復拋錯則不喚醒 |
+
+**喚醒失敗是背景自己的事**：不改變員工回合的結果，也不擋住宿主啟動。下一次喚醒會從同樣的持久狀態重新判斷。啟動恢復途中若順帶收尾了一個回合，會喚醒兩次——**這是設計上的冪等**，案例因此釘住「哪一份文件」而不是次數。
+
+### 反例
+
+| 案例 | 釘住的事 |
+|---|---|
+| `..._settled_turn_wakes_the_background_for_its_own_document` | 一次安全收尾、一次喚醒、指名該文件 |
+| `..._turn_that_could_not_be_closed_wakes_nothing` | 收尾失敗不喚醒；明示 `recover()` 收尾後才喚醒 |
+| `..._failing_wake_never_changes_what_the_turn_did` | 喚醒拋錯，回合結果、保存內容與查回都不變 |
+| `..._startup_recovery_wakes_each_document_it_inspected` | 重開會請背景再看一次 |
+| `..._failing_wake_never_stops_a_host_from_starting` | 背景不可用時宿主仍然 `ready` |
+| `..._runtime_without_a_background_entry_still_settles` | 背景是可選接線，不是回合的前提 |
+| `..._uncallable_background_entry_is_refused_at_assembly` | 錯誤接線在組裝時就失敗，不在員工回合裡爆 |
+
+### 實測
+
+| 範圍 | 結果 |
+|---|---|
+| `tests/test_background_wakeup.py` | **7 passed** |
+| 受影響真 PG（AI runtime、C 接合、喚醒、准入、宿主、宿主恢復） | **39 passed／83.64s** |
+| App 全離線測試 | **2846 passed／289 skipped／45.42s** |
+
+### 本節限制
+
+1. `AiRuntime` 現在會喚醒，但**日常組裝尚未把 `BackgroundDispatcher` 傳進去**——`managed_app`／`configured_host` 的接線還沒做，所以產品路徑上仍然沒有背景執行。
+2. **真新 Windows 程序取回原 B 工作仍未做**（計畫 R3 第 7 點的四個停點）。
+3. 顧問指引、Skills、`BackgroundAvailability` 與 JD 編輯器共用 writer 仍未做。

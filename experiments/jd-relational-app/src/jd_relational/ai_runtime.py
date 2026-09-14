@@ -249,7 +249,7 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None,
 class AiRuntime:
     def __init__(self, owner: ManualRuntime, codec: ReferenceCodec, *, source_resolver=None,
                  conversation_sources: ConversationSourceService | None = None,
-                 memory_engine=None,
+                 memory_engine=None, background=None,
                  execution_enabled: bool = True):
         if (not isinstance(owner, ManualRuntime) or not isinstance(owner.checkpoints, DocumentCheckpoints)
                 or not isinstance(codec, ReferenceCodec)
@@ -258,6 +258,7 @@ class AiRuntime:
                     not isinstance(conversation_sources, ConversationSourceService)
                     or conversation_sources.dataset_id != codec.dataset_id
                     or source_resolver is not None)
+                or background is not None and not callable(background)
                 or type(execution_enabled) is not bool):
             raise AiRuntimeError("invalid_ai_runtime")
         self.owner, self.codec = owner, codec
@@ -269,6 +270,7 @@ class AiRuntime:
         self.reads = ReadService(owner.storage, self.history, codec)
         self.changes = ChangeReadService(self.history, codec)
         self.conversation_sources = conversation_sources
+        self._background = background
         self.source_resolver = conversation_sources.resolve if conversation_sources is not None else source_resolver
         self.execution_enabled = execution_enabled
         if memory_engine is not None:
@@ -474,7 +476,35 @@ class AiRuntime:
         except Exception:
             raise AiRuntimeError("run_recovery_required") from None
 
+    def _wake_background(self, document_id: str) -> None:
+        """Tell the background this document is worth looking at again.
+
+        Waking decides nothing: what may run is read from durable admission,
+        Saver and publication state by whoever was wired in here. A failure to
+        even consider background work is that side's own problem -- it must not
+        change what the employee's turn did, nor stop a host from starting --
+        and the next wake reconsiders from the same durable state.
+        """
+        if self._background is None:
+            return
+        try:
+            self._background(document_id)
+        except Exception:
+            pass
+
     def _recover_previous(self, document_id: str, timeout: float) -> int:
+        """Inspect original state, then let the background look at it again.
+
+        The host is reopening, so work admitted before it stopped is
+        reconsidered from durable state rather than assumed finished or
+        abandoned. A recovery that raised wakes nothing: the document's own
+        ending is still unknown.
+        """
+        recovered = self._recover_previous_run(document_id, timeout)
+        self._wake_background(document_id)
+        return recovered
+
+    def _recover_previous_run(self, document_id: str, timeout: float) -> int:
         """Inspect original native state within the host's complete startup scan.
 
         No model/tool is resumed. A foreign handle is adopted only through the
@@ -921,7 +951,9 @@ class AiRuntime:
                 if self.owner.checkpoints.read(record.document_id) is not None:
                     raise AiRuntimeError("run_recovery_required")
             self.owner.finish_foreground(permit, confirm_closed)
-            return self._result(closed)
+            result = self._result(closed)
+            self._wake_background(record.document_id)
+            return result
         except AiRuntimeError:
             raise
         except Exception:

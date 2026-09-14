@@ -58,7 +58,7 @@ class SyntheticRuntime(AiRuntime):
 def make_runtime():
     owners, releases, runtimes = [], [], []
 
-    def make(node=None, *, saver=None):
+    def make(node=None, *, saver=None, background=None):
         calls = []
         def work(state):
             calls.append(state["jd_ai_run"]["run_id"])
@@ -72,7 +72,7 @@ def make_runtime():
         graph = build_document_graph(child.compile(), saver or InMemorySaver())
         owner = ManualRuntime(DocumentCheckpoints(graph), SyntheticStorage, max_workers=2)
         codec = ReferenceCodec(b"synthetic-ai-runtime-test-key-32", str(uuid4()))
-        runtime = SyntheticRuntime(owner, codec)
+        runtime = SyntheticRuntime(owner, codec, background=background)
         owners.append(owner); runtimes.append(runtime)
         return runtime, graph, calls
 

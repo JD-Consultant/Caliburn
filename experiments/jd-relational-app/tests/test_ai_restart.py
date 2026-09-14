@@ -35,7 +35,7 @@ class RestartStorage(SyntheticStorage):
         return result
 
 
-def saved_turn(*, calls=False, terminal=False, initial=False):
+def saved_turn(*, calls=False, terminal=False, initial=False, background=None):
     messages, bindings, receipts, codec = _receipt_fixture()
     binding = bindings[0]
     receipts = {key: replace(value, receipt=replace(value.receipt,
@@ -81,7 +81,7 @@ def saved_turn(*, calls=False, terminal=False, initial=False):
             as_node="consultant")
     owner = ManualRuntime(DocumentCheckpoints(graph), RestartStorage, previous_host=PreviousHost())
     owner.storage.documents.append(record.document_id)
-    runtime = AiRuntime(owner, codec)
+    runtime = AiRuntime(owner, codec, background=background)
     return runtime, record, binding, graph, model_calls, receipts
 
 

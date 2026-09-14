@@ -69,3 +69,31 @@ def test_a_reinstatement_is_only_claimed_by_a_command_that_puts_one_back():
                     ("undo_ai_turn", "save_failed")):
         with pytest.raises(ValueError, match="invalid_reinstatement"):
             body_for(*refused, proof)
+
+
+def test_a_stored_reinstatement_is_refused_on_a_command_that_cannot_reinstate():
+    """The writer refuses this shape; a stored row claiming it must not be read.
+
+    A reinstatement on an AI edit would reach the next turn as "the employee
+    took your whole turn back", which is a different event entirely.
+    """
+    value = row()
+    value["receipt"].update({"format_version": 2, "command_kind": "jd_set_text",
+                             "reinstated": {"reinstated_revision_id": str(uuid4()),
+                                            "undone_ai_run_id": str(uuid4())}})
+    with pytest.raises(ValidationError):
+        SavedOperation.from_row(value)
+
+
+def test_only_an_undo_may_name_the_turn_it_took_back():
+    proof = {"reinstated_revision_id": str(uuid4())}
+    assert body_for("restore_revision", "committed", proof).reinstated.undone_ai_run_id is None
+    with pytest.raises(ValidationError):
+        body_for("restore_revision", "committed", {**proof, "undone_ai_run_id": str(uuid4())})
+
+
+def test_nothing_put_back_claims_nothing_put_back():
+    """no_change succeeded, but no revision was reinstated by it."""
+    proof = {"reinstated_revision_id": str(uuid4())}
+    with pytest.raises(ValueError, match="invalid_reinstatement"):
+        body_for("undo_ai_turn", "no_change", proof)

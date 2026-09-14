@@ -294,7 +294,9 @@ def test_a_taken_back_turn_is_named_in_the_notice_and_nothing_else_is():
     undo = NoticeEvent(uuid4(), uuid4(), 2, head.revision_id, 3, "manual", "undo_ai_turn", run)
     edit = NoticeEvent(uuid4(), uuid4(), 1, uuid4(), 2, "ai", "jd_set_text")
     notice = _material_notice(NoticeMaterial(document, None, head, (undo, edit), 1, 1, 0), codec)
-    assert notice["events"][0]["took_back_ai_run"] == run
-    assert "took_back_ai_run" not in notice["events"][1], "an ordinary edit took nothing back"
-    assert "took_back_ai_run" in NOTICE_INSTRUCTION
+    assert notice["events"][0]["took_back_an_ai_turn"] is True
+    assert "took_back_an_ai_turn" not in notice["events"][1], "an ordinary edit took nothing back"
+    # A marker, never the run identity: every identity here is signed.
+    assert run not in json.dumps(notice, ensure_ascii=False)
+    assert "took_back_an_ai_turn" in NOTICE_INSTRUCTION
     assert "訪談" in NOTICE_INSTRUCTION and "工作理解" in NOTICE_INSTRUCTION

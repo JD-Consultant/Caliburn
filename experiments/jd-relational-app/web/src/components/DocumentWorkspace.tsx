@@ -36,6 +36,7 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   const [undoError, setUndoError] = useState('');
   const [restoreHold, setRestoreHold] = useState(false);
   const [source, setSource] = useState<{ ref: string; page: SourceReadPage | null; error: string } | null>(null);
+  const sourceGeneration = useRef(0);
   const [undoHold, setUndoHold] = useState(false);
   const datasetId = api.datasetId;
   const run = matchingRun(chat, snapshot.row?.chatSubmission?.request.run_id ?? null, { datasetId, documentId: document.document_id });
@@ -128,10 +129,17 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   const holding = restoreHold || undoHold;
   // Reading only. A refusal is shown as a refusal; an empty panel would read
   // as "you never said anything", which is not what the server answered.
+  // A late answer must not reopen a closed panel or replace a different
+  // marker's words, so each request only writes if it is still the current one.
   async function openSource(ref: string) {
+    const generation = ++sourceGeneration.current;
     setSource({ ref, page: null, error: '' });
-    try { setSource({ ref, page: await api.sourceRead(document.document_id, ref), error: '' }); }
-    catch (error) { setSource({ ref, page: null, error: message(error) }); }
+    try {
+      const page = await api.sourceRead(document.document_id, ref);
+      if (sourceGeneration.current === generation) setSource({ ref, page, error: '' });
+    } catch (error) {
+      if (sourceGeneration.current === generation) setSource({ ref, page: null, error: message(error) });
+    }
   }
   return <div className="work-grid"><ChatPanel snapshot={snapshot} chat={chat} controller={chatController.current} archived={document.archived}
     holding={holding}
@@ -179,7 +187,7 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
       onOpenSource={ref => void openSource(ref)}
       onFormChange={value => session.current?.form(value as JsonValue | null)}
       onCommand={async (command, options) => { await session.current?.command(command, options); }} />}
-  </Box><Dialog open={source !== null} onClose={() => setSource(null)} fullWidth maxWidth="sm">
+  </Box><Dialog open={source !== null} onClose={() => { sourceGeneration.current++; setSource(null); }} fullWidth maxWidth="sm">
     <DialogTitle>你當初說過的話</DialogTitle>
     <DialogContent>
       {source?.error && <Alert severity="warning">{source.error}</Alert>}
@@ -194,7 +202,7 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
           : '這段訪談本身不會因為 JD 改動而變。'}
       </Typography>}
     </DialogContent>
-    <DialogActions><Button onClick={() => setSource(null)}>關閉</Button></DialogActions>
+    <DialogActions><Button onClick={() => { sourceGeneration.current++; setSource(null); }}>關閉</Button></DialogActions>
   </Dialog><Dialog open={restoreChoice !== null} onClose={() => { if (!restoreBusy) setRestoreChoice(null); }}>
     <DialogTitle>{restoreChoice === 'discard' ? '捨棄找回的內容？' : '繼續這些修改？'}</DialogTitle>
     <DialogContent><Typography>{restoreChoice === 'discard' ? '只會捨棄尚未提交的文字與表單。資料庫中的 JD 與歷史保持保存。' :

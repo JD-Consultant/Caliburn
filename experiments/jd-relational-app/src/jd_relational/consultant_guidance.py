@@ -17,7 +17,7 @@ Nothing here starts a provider, registers a tool or decides what a turn does.
 
 from caliburn_memory.guidance import MEMORY_ACTION_GUIDANCE
 
-# Verified verbatim; do not edit. Ten sentences, in their original order.
+# Verified verbatim; do not edit. Eleven sentences, in their original order.
 ADVISOR_INSTRUCTIONS = (
     "你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。"
     "根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。"

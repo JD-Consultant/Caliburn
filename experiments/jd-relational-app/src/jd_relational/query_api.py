@@ -74,6 +74,8 @@ class QueryBoundary:
     routes = frozenset({
         "/api/documents/{document_id}/jd/read",
         "/api/documents/{document_id}/jd/changes/read",
+        "/api/documents/{document_id}/jd/restore/preview",
+        "/api/documents/{document_id}/jd/sources/read",
     })
     interrupted_message = "jd_query_response_interrupted"
     event_name = "jd.http.query"

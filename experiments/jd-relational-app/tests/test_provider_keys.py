@@ -5,6 +5,7 @@ removes again. No provider is called, no configuration file is read or written,
 and no key is ever printed or written to an artifact.
 """
 
+from contextlib import contextmanager
 import os
 import sys
 
@@ -129,3 +130,63 @@ def test_a_non_interactive_set_refuses_rather_than_taking_a_key_from_argv(owned,
 def test_set_and_remove_need_the_service_named(owned):
     from jd_relational.__main__ import main
     assert main(["set-key"]) == 2 and main(["remove-key"]) == 2
+
+
+@contextmanager
+def failing(name, winerror):
+    """Fail the way Windows really does, and undo only this one patch.
+
+    A shared monkeypatch would also revert the fixture's test targets, which
+    would send the cleanup at a real credential and leak the test one.
+    """
+    import pywintypes
+    import win32cred
+
+    def explode(*args, **kwargs):
+        raise pywintypes.error(winerror, name, "synthetic credential failure")
+
+    with pytest.MonkeyPatch.context() as patch:
+        patch.setattr(win32cred, name, explode)
+        yield
+
+
+ACCESS_DENIED = 5
+
+
+def test_a_credential_store_failure_is_not_reported_as_no_key(owned):
+    """Absent and unreadable are different answers; only one may say 'not set'."""
+    store_key("anthropic", SECRET)
+    with failing("CredRead", ACCESS_DENIED):
+        with pytest.raises(ProviderKeyError) as error:
+            read_key("anthropic")
+    assert error.value.code == "credential_store_unavailable"
+
+
+def test_status_does_not_claim_not_configured_when_it_could_not_look(owned):
+    store_key("openai", SECRET)
+    with failing("CredRead", ACCESS_DENIED):
+        with pytest.raises(ProviderKeyError):
+            configured_roles()
+
+
+def test_a_removal_that_did_not_happen_is_never_reported_as_already_absent(owned):
+    """Telling the operator the key was never there would leave the secret behind."""
+    store_key("anthropic", SECRET)
+    with failing("CredDelete", ACCESS_DENIED):
+        with pytest.raises(ProviderKeyError) as error:
+            remove_key("anthropic")
+        assert error.value.code == "credential_delete_failed"
+    assert read_key("anthropic") == SECRET, "the key really is still there"
+
+
+def test_removing_a_key_that_is_genuinely_absent_is_still_success(owned):
+    assert remove_key("anthropic") is False
+
+
+def test_a_non_interactive_set_says_there_is_nowhere_to_type(owned, capsys, monkeypatch):
+    from jd_relational.__main__ import main
+    monkeypatch.setattr("sys.stdin.isatty", lambda: False)
+    assert main(["set-key", "--service", "anthropic"]) == 1
+    printed = capsys.readouterr().err
+    assert "需要可輸入的終端機" in printed
+    assert "不符合格式" not in printed, "a missing terminal is not a malformed key"

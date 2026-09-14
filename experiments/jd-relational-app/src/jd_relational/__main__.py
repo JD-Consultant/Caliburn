@@ -32,6 +32,8 @@ _MESSAGES = {
     "unknown_provider_role": "沒有這個 AI 服務名稱。可設定的是 anthropic 或 openai。",
     "invalid_provider_key": "金鑰內容不符合格式，未保存；原有設定沒有變動。",
     "credential_write_failed": "Windows 認證管理員未確認保存，請重新查看狀態後再設定一次。",
+    "credential_delete_failed": "Windows 認證管理員未確認移除；金鑰可能仍在，請重新查看狀態後再移除一次。",
+    "interactive_key_entry_required": "設定金鑰需要可輸入的終端機；金鑰不從命令參數或環境傳入。",
     "credential_store_unavailable": "此作業系統沒有 Windows 認證管理員；AI 功能維持未啟用。",
     "stored_key_unreadable": "已保存的金鑰無法讀取；請重新設定該項，人工 JD 不受影響。",
 }
@@ -74,7 +76,8 @@ def main(argv=None):
                       "人工 JD 不受影響。")
                 return 0
             if not sys.stdin.isatty():
-                raise ProviderKeyError("invalid_provider_key")
+                # Nothing is wrong with the key; there is nowhere to type it.
+                raise ProviderKeyError("interactive_key_entry_required")
             # getpass keeps the key off the screen, the shell history and argv.
             store_key(args.service, getpass.getpass(
                 f"{_ROLE_LABELS[args.service]} 金鑰（不顯示）："))

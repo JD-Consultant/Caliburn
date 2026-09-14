@@ -29,6 +29,10 @@ TARGETS = {
 }
 ROLES = tuple(TARGETS)
 MAX_KEY_CHARACTERS = 512
+# Windows says "no such credential" with this one code. Every other failure
+# means the store could not answer -- which is not the same as having no key,
+# and must never be reported as one.
+NOT_FOUND = 1168
 
 
 class ProviderKeyError(ValueError):
@@ -58,10 +62,14 @@ def read_key(role: str) -> str | None:
     import win32cred
     try:
         found = win32cred.CredRead(target, win32cred.CRED_TYPE_GENERIC, 0)
-    except pywintypes.error:
-        # Not found, or this user cannot read it. Either way there is no key
-        # here; the reason is never forwarded, because it can carry the target.
-        return None
+    except pywintypes.error as error:
+        if getattr(error, "winerror", None) == NOT_FOUND:
+            return None  # Genuinely not set: an ordinary answer.
+        # The store could not answer. Saying "not configured" here would tell
+        # the operator to set a key that may already be there, and would let
+        # status claim a capability is off when it is only unreadable. The
+        # reason is not forwarded, because it can carry the target name.
+        raise ProviderKeyError("credential_store_unavailable") from None
     blob = found.get("CredentialBlob")
     if not blob:
         return None
@@ -103,8 +111,12 @@ def remove_key(role: str) -> bool:
     try:
         win32cred.CredDelete(target, win32cred.CRED_TYPE_GENERIC, 0)
         return True
-    except pywintypes.error:
-        return False
+    except pywintypes.error as error:
+        if getattr(error, "winerror", None) == NOT_FOUND:
+            return False  # Already absent is success, not an error.
+        # Anything else means the key may still be there. Reporting "there was
+        # never a key" would leave a live secret behind a done message.
+        raise ProviderKeyError("credential_delete_failed") from None
 
 
 def configured_roles() -> dict[str, bool]:
@@ -114,10 +126,6 @@ def configured_roles() -> dict[str, bool]:
     from the credential store alone: a stored key is not proof that the key
     works, and finding out would cost money.
     """
-    answer = {}
-    for role in ROLES:
-        try:
-            answer[role] = read_key(role) is not None
-        except ProviderKeyError:
-            answer[role] = False
-    return answer
+    # A role this cannot read is not reported as unconfigured: the caller is
+    # told the store could not answer, and says so instead of guessing.
+    return {role: read_key(role) is not None for role in ROLES}

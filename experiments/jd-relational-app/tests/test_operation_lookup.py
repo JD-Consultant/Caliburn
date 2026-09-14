@@ -125,10 +125,12 @@ def test_original_terminal_lookup_is_readonly_and_unchanged_after_new_head(engin
     assert store.execute(later).confirmed
     before = row_state(engine, current.document_id)
     # Cover every table this document can own rows in, so a lookup that wrote
-    # anywhere -- including the background admission row -- is caught. Derived
-    # from the schema rather than counted by hand, so adding a table widens the
-    # comparison instead of silently escaping it.
-    assert set(before) == db.JD_TABLE_NAMES
+    # anywhere is caught. Comparing against JD_TABLE_NAMES alone cannot fail,
+    # because row_state builds its keys from the same metadata; this names the
+    # content tables and the background admission row separately, so a new
+    # table has to be placed deliberately rather than slipping in.
+    assert set(before) == set(db.JD_CONTENT_TABLE_NAMES) | {"jd_memory_admission"}
+    assert "jd_memory_admission" in before, "the admission row must be under this check too"
     store.authority = ForbiddenAuthority()
     def forbidden(*args, **kwargs):
         pytest.fail("Lookup must not reconstruct content, source or command material.")

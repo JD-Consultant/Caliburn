@@ -497,8 +497,8 @@ class JdStorage(JdReader):
             digest = snapshot_digest(actual)
             if digest == snapshot_digest(current.snapshot):
                 savepoint.rollback()
-                return self._insert_receipt(conn, intent.identity, base, base, "no_change",
-                                            reinstated)
+                # Nothing was put back, so nothing may claim it was.
+                return self._insert_receipt(conn, intent.identity, base, base, "no_change")
             result = uuid4()
             conn.execute(db.jd_revision.insert().values(document_id=intent.document_id, revision_id=result,
                 revision_number=head["revision_number"] + 1, parent_revision_id=base,

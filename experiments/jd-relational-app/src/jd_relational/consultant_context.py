@@ -31,7 +31,7 @@ NOTICE_INSTRUCTION = (
     "工作以目前內容為準；需要文字與確切變更時使用jd_read或jd_change_read。"
     "事件改了又改回仍算修改；沒有列完的事件可依history_anchor讀原歷史。"
     "知道有改動不代表本輪必須修改JD；JD還原不代表撤回訪談或Memory。"
-    "標了took_back_ai_run的事件，是員工把那一輪對JD的改動整輪取回；"
+    "標了took_back_an_ai_turn的事件，是員工把那一輪對JD的改動整輪取回；"
     "那一輪的對話、原話與工作理解都還在，不要當成沒發生過，也不要自行重做一次。"
 )
 
@@ -149,7 +149,9 @@ def _material_notice(material, codec):
         "omitted_count": material.omitted_count,
         "events": [{
             "origin": event.origin, "kind": event.command_kind,
-            **({"took_back_ai_run": event.undone_ai_run_id} if event.undone_ai_run_id else {}),
+            # A marker, not an identity: every other identity in this notice is
+            # a signed reference, and the model has no tool that takes a run id.
+            **({"took_back_an_ai_turn": True} if event.undone_ai_run_id else {}),
             "result_revision_number": event.result_revision_number,
             "change_ref": codec.issue(SignedReference(document_id=material.document_id,
                 revision_id=str(event.result_revision_id), purpose="observation", role="change",

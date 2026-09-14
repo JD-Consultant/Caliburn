@@ -58,6 +58,15 @@ class ReceiptBody(BaseModel):
         # appearing there is a rewritten row, not a readable older receipt.
         if self.format_version == 1 and self.reinstated is not None:
             raise ValueError("invalid_receipt_version")
+        # The writer already refuses to create these shapes. Refusing to read
+        # them too means a rewritten row cannot reach the next turn as an event
+        # that never happened -- an edit claiming it put a revision back, or a
+        # restore claiming it took an AI turn back.
+        if self.reinstated is not None:
+            if self.command_kind not in {"restore_revision", "undo_ai_turn"}:
+                raise ValueError("invalid_reinstatement")
+            if self.reinstated.undone_ai_run_id is not None and self.command_kind != "undo_ai_turn":
+                raise ValueError("invalid_reinstatement")
         return self
 
 
@@ -75,9 +84,10 @@ def body_for(command_kind: str, status: str, reinstated: dict | None = None) -> 
     if status not in {*ERRORS, "committed", "no_change"}:
         raise ValueError("invalid_terminal_status")
     message, action = ERRORS[status] if status in ERRORS else (None, "continue")
-    if reinstated is not None and (message or command_kind not in {"restore_revision", "undo_ai_turn"}):
-        # Only a command that really put a saved revision back may claim one,
-        # and only when it succeeded.
+    # Only a command that really put a saved revision back may claim one, and
+    # only when it did: `no_change` succeeded without reinstating anything.
+    if reinstated is not None and (status != "committed"
+                                   or command_kind not in {"restore_revision", "undo_ai_turn"}):
         raise ValueError("invalid_reinstatement")
     return ReceiptBody(format_version=2, command_kind=command_kind,
                        error=ReceiptError(code=status, message=message) if message else None,

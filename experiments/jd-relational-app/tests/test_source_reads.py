@@ -58,11 +58,20 @@ def test_a_reference_this_document_cannot_claim_is_refused():
     assert error.value.code == "invalid_ref"
 
 
-def test_a_source_that_is_gone_says_so_instead_of_returning_nothing():
-    """An empty answer would read as 'you never said anything'. It must not."""
+def test_an_unavailable_source_is_reported_as_unconfirmed_not_as_gone():
+    """The owner cannot tell 'gone' from 'the store just failed'.
+
+    `ConversationSourceService.read` funnels a missing native run AND any
+    unexpected failure into the same `source_not_available`. Calling that a
+    missing target would tell the employee their interview is gone and invite
+    them to carry on, when the truth may be that nothing could be read. The
+    only honest answer is that the result is unconfirmed: stop.
+    """
     with pytest.raises(ReadError) as error:
         SourceReadService(Owner(code="source_not_available")).read(DOCUMENT, {"source_ref": REF})
-    assert error.value.code == "target_missing"
+    assert error.value.code == "read_failed", "an unknown outcome was reported as a definite one"
+    from jd_relational.read_transport import ERRORS
+    assert ERRORS[error.value.code][1] == "stop"
 
 
 @pytest.mark.parametrize("arguments", [
@@ -77,7 +86,12 @@ def test_an_unusable_request_never_reaches_the_owner(arguments):
     assert owner.asked == [], "a bad request was forwarded to the source owner"
 
 
-def test_an_unexpected_owner_failure_stays_a_safe_code():
+def test_an_owner_that_breaks_its_own_contract_still_leaves_a_safe_code():
+    """Defensive only: the real owner raises nothing but ConversationSourceError.
+
+    Kept so a future owner that leaks a driver exception cannot put a
+    connection string in front of the employee.
+    """
     class Exploding(Owner):
         def read(self, source_ref, document_id):
             raise RuntimeError("connection to 127.0.0.1:55436 failed: password ...")
@@ -86,6 +100,18 @@ def test_an_unexpected_owner_failure_stays_a_safe_code():
         SourceReadService(Exploding()).read(DOCUMENT, {"source_ref": REF})
     assert error.value.code == "read_failed"
     assert "password" not in str(error.value)
+
+
+def test_the_owners_real_failure_shapes_are_the_ones_covered():
+    """Whatever the owner raises, only its own two codes can reach this service."""
+    from jd_relational.conversation_sources import ConversationSourceError
+    assert ConversationSourceError("anything_else").code == "source_not_available"
+    seen = set()
+    for code in ("invalid_ref", "source_not_available"):
+        with pytest.raises(ReadError) as error:
+            SourceReadService(Owner(code=code)).read(DOCUMENT, {"source_ref": REF})
+        seen.add(error.value.code)
+    assert seen == {"invalid_ref", "read_failed"}
 
 
 def test_the_service_has_no_way_to_write():

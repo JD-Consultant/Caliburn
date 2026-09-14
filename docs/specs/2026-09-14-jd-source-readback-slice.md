@@ -42,9 +42,9 @@
 | 契約型別（由 SSOT 生成，`--check` 相符） | `contracts/jd-read.schema.json` 的 `SourceReadInput`／`SourceMessageRecord`／`SourceReadPage` |
 | 畫面：來源標記旁的「看第 N 段原話」與逐則標示角色的對話框 | [JdEditor.tsx](../../experiments/jd-relational-app/web/src/components/JdEditor.tsx)、[DocumentWorkspace.tsx](../../experiments/jd-relational-app/web/src/components/DocumentWorkspace.tsx) |
 
-**實際行為：**別的文件的引用回 `invalid_ref`（422）；來源真的不在了回 `target_missing`（404）而不是空陣列——空陣列會被讀成「你從來沒說過」；不合格的請求連 source owner 都不會碰到；未預期的失敗只留 `read_failed`，錯誤訊息不含連線字串。沒有裝 source owner 的組裝（例如純查詢探針）拒絕作答，不編造。畫面只在拿得到 handler 時才顯示「看第 N 段原話」，不透明 token 永遠不出現在畫面上；對話框底下明說顧問的回覆是當時的整理用語、不是員工確認過的事實。
+**實際行為：**別的文件的引用回 `invalid_ref`（422）。其餘失敗一律回 `read_failed`（500、`stop`）——**這是獨立審查改正的一點**：原本把它們當成 `target_missing`（404、`reread_current`），但 source owner 把「原回合真的不在了」和「讀取當下失敗」都收斂成同一個 `source_not_available`，這一層分不出來。分不出來就不能說「你的訪談不見了」還請員工繼續；不確定就照實說不確定。空陣列一樣不允許，那會被讀成「你從來沒說過」。不合格的請求連 source owner 都不會碰到；錯誤訊息不含連線字串。沒有裝 source owner 的組裝（例如純查詢探針）拒絕作答，不編造。畫面只在拿得到 handler 時才顯示「看第 N 段原話」，不透明 token 永遠不出現在畫面上；對話框底下明說顧問的回覆是當時的整理用語、不是員工確認過的事實。
 
-**驗證：**服務層 12 項、HTTP 層 6 項、Web client 3 項、畫面 1 項，全部通過；全組真 PG **3248 passed**（只剩既有 OI-05 缺陷）、Web **305 passed**、`tsc`／build／`generate_contract --check` 通過。變異驗證：拿掉「回傳的 source_ref 必須是問的那一個」，對應反例立刻失敗（改動後以 `git hash-object` 確認還原）。
+**驗證：**服務層 14 項、HTTP 層 6 項、Web client 3 項、畫面 1 項，全部通過；全組真 PG **3248 passed**（只剩既有 OI-05 缺陷）、Web **305 passed**、`tsc`／build／`generate_contract --check` 通過。變異驗證：拿掉「回傳的 source_ref 必須是問的那一個」，對應反例立刻失敗（改動後以 `git hash-object` 確認還原）。
 
 **真瀏覽器（2026-09-14 補）：**固定離線訪談腳本改成引用 App 當輪發給它的來源後，[整輪撤回旅程](evidence/2026-09-14-jd-restore-and-undo-browser-results.md)在真 Chrome 上走完：AI 寫完後 JD 顯示「依據你說過的 1 段訪談。」、四個項目各有一顆「看第 1 段原話」，按下去看到**員工原話一字不差**，顧問當時的回覆另行標示並註明不是員工確認過的事實；那一輪的改動清單也多出四筆「加入引用 · 「…」的依據」。撤回之後 `jd_source_link` 回到 0 筆，因為來源隨那一輪的項目一起被取回。
 

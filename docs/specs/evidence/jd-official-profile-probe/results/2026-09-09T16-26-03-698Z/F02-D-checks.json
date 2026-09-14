@@ -1,0 +1,20 @@
+{
+  "id": "F02-D",
+  "description": "原生格式 operations 的普通 JSON 保存與 fresh apply",
+  "passed": false,
+  "checks": [
+    {
+      "name": "原文不变；目的加底線、既有粗體 label 確實移除",
+      "passed": true
+    },
+    {
+      "name": "原生 operations 無 own undefined，普通 JSON 檔精確往返",
+      "passed": true
+    },
+    {
+      "name": "execution",
+      "passed": false,
+      "message": "ENOENT: no such file or directory, open 'S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\results\\2026-09-09T16-26-03-698Z\\F02-D-replay-fresh.json'"
+    }
+  ]
+}

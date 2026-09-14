@@ -1,0 +1,490 @@
+{
+  "accessed": "2026-09-09",
+  "count": 46,
+  "packages": [
+    {
+      "name": "@esbuild/win32-x64",
+      "version": "0.25.12",
+      "license": "MIT",
+      "path": "node_modules/@esbuild/win32-x64",
+      "resolved": "https://registry.npmjs.org/@esbuild/win32-x64/-/win32-x64-0.25.12.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/evanw/esbuild.git"
+      }
+    },
+    {
+      "name": "@juggle/resize-observer",
+      "version": "3.4.0",
+      "license": "Apache-2.0",
+      "path": "node_modules/@juggle/resize-observer",
+      "resolved": "https://registry.npmjs.org/@juggle/resize-observer/-/resize-observer-3.4.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+ssh://git@github.com/juggle/resize-observer.git"
+      }
+    },
+    {
+      "name": "@platejs/core",
+      "version": "53.3.11",
+      "license": "MIT",
+      "path": "node_modules/@platejs/core",
+      "resolved": "https://registry.npmjs.org/@platejs/core/-/core-53.3.11.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/plate.git",
+        "directory": "packages/core"
+      }
+    },
+    {
+      "name": "@platejs/diff",
+      "version": "53.0.0",
+      "license": null,
+      "path": "node_modules/@platejs/diff",
+      "resolved": "https://registry.npmjs.org/@platejs/diff/-/diff-53.0.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/plate.git",
+        "directory": "packages/diff"
+      },
+      "note": "Read package LICENSE: slate-diff Apache-2.0; Plate modifications dual Apache-2.0/MIT."
+    },
+    {
+      "name": "@platejs/slate",
+      "version": "53.3.10",
+      "license": "MIT",
+      "path": "node_modules/@platejs/slate",
+      "resolved": "https://registry.npmjs.org/@platejs/slate/-/slate-53.3.10.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/plate.git",
+        "directory": "packages/slate"
+      }
+    },
+    {
+      "name": "@platejs/utils",
+      "version": "53.3.11",
+      "license": "MIT",
+      "path": "node_modules/@platejs/utils",
+      "resolved": "https://registry.npmjs.org/@platejs/utils/-/utils-53.3.11.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/plate.git",
+        "directory": "packages/utils"
+      }
+    },
+    {
+      "name": "@radix-ui/react-compose-refs",
+      "version": "1.1.5",
+      "license": "MIT",
+      "path": "node_modules/@radix-ui/react-compose-refs",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-compose-refs/-/react-compose-refs-1.1.5.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/radix-ui/primitives.git",
+        "directory": "packages/react/compose-refs"
+      }
+    },
+    {
+      "name": "@radix-ui/react-slot",
+      "version": "1.3.3",
+      "license": "MIT",
+      "path": "node_modules/@radix-ui/react-slot",
+      "resolved": "https://registry.npmjs.org/@radix-ui/react-slot/-/react-slot-1.3.3.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/radix-ui/primitives.git",
+        "directory": "packages/react/slot"
+      }
+    },
+    {
+      "name": "@udecode/react-hotkeys",
+      "version": "52.0.11",
+      "license": "MIT",
+      "path": "node_modules/@udecode/react-hotkeys",
+      "resolved": "https://registry.npmjs.org/@udecode/react-hotkeys/-/react-hotkeys-52.0.11.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/plate.git",
+        "directory": "packages/udecode/react-hotkeys"
+      }
+    },
+    {
+      "name": "@udecode/react-utils",
+      "version": "52.3.4",
+      "license": "MIT",
+      "path": "node_modules/@udecode/react-utils",
+      "resolved": "https://registry.npmjs.org/@udecode/react-utils/-/react-utils-52.3.4.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/plate.git",
+        "directory": "packages/udecode/react-utils"
+      }
+    },
+    {
+      "name": "@udecode/utils",
+      "version": "52.3.4",
+      "license": "MIT",
+      "path": "node_modules/@udecode/utils",
+      "resolved": "https://registry.npmjs.org/@udecode/utils/-/utils-52.3.4.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/plate.git",
+        "directory": "packages/udecode/utils"
+      }
+    },
+    {
+      "name": "clsx",
+      "version": "2.1.1",
+      "license": "MIT",
+      "path": "node_modules/clsx",
+      "resolved": "https://registry.npmjs.org/clsx/-/clsx-2.1.1.tgz",
+      "repository": "lukeed/clsx"
+    },
+    {
+      "name": "compute-scroll-into-view",
+      "version": "3.1.1",
+      "license": "MIT",
+      "path": "node_modules/compute-scroll-into-view",
+      "resolved": "https://registry.npmjs.org/compute-scroll-into-view/-/compute-scroll-into-view-3.1.1.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/scroll-into-view/compute-scroll-into-view.git"
+      }
+    },
+    {
+      "name": "dequal",
+      "version": "2.0.3",
+      "license": "MIT",
+      "path": "node_modules/dequal",
+      "resolved": "https://registry.npmjs.org/dequal/-/dequal-2.0.3.tgz",
+      "repository": "lukeed/dequal"
+    },
+    {
+      "name": "diff-match-patch-ts",
+      "version": "0.6.0",
+      "license": "MIT",
+      "path": "node_modules/diff-match-patch-ts",
+      "resolved": "https://registry.npmjs.org/diff-match-patch-ts/-/diff-match-patch-ts-0.6.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/rars/diff-match-patch-ts"
+      }
+    },
+    {
+      "name": "direction",
+      "version": "1.0.4",
+      "license": "MIT",
+      "path": "node_modules/direction",
+      "resolved": "https://registry.npmjs.org/direction/-/direction-1.0.4.tgz",
+      "repository": "wooorm/direction"
+    },
+    {
+      "name": "esbuild",
+      "version": "0.25.12",
+      "license": "MIT",
+      "path": "node_modules/esbuild",
+      "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.25.12.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/evanw/esbuild.git"
+      }
+    },
+    {
+      "name": "immer",
+      "version": "10.2.0",
+      "license": "MIT",
+      "path": "node_modules/immer",
+      "resolved": "https://registry.npmjs.org/immer/-/immer-10.2.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/immerjs/immer.git"
+      }
+    },
+    {
+      "name": "is-hotkey",
+      "version": "0.2.0",
+      "license": "MIT",
+      "path": "node_modules/is-hotkey",
+      "resolved": "https://registry.npmjs.org/is-hotkey/-/is-hotkey-0.2.0.tgz",
+      "repository": "git://github.com/ianstormtaylor/is-hotkey.git"
+    },
+    {
+      "name": "is-plain-object",
+      "version": "5.1.0",
+      "license": "MIT",
+      "path": "node_modules/is-plain-object",
+      "resolved": "https://registry.npmjs.org/is-plain-object/-/is-plain-object-5.1.0.tgz",
+      "repository": "jonschlinkert/is-plain-object"
+    },
+    {
+      "name": "jotai",
+      "version": "2.8.4",
+      "license": "MIT",
+      "path": "node_modules/jotai",
+      "resolved": "https://registry.npmjs.org/jotai/-/jotai-2.8.4.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pmndrs/jotai.git"
+      }
+    },
+    {
+      "name": "jotai-optics",
+      "version": "0.4.0",
+      "license": "MIT",
+      "path": "node_modules/jotai-optics",
+      "resolved": "https://registry.npmjs.org/jotai-optics/-/jotai-optics-0.4.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/jotaijs/jotai-optics.git"
+      }
+    },
+    {
+      "name": "jotai-x",
+      "version": "2.3.4",
+      "license": "MIT",
+      "path": "node_modules/jotai-x",
+      "resolved": "https://registry.npmjs.org/jotai-x/-/jotai-x-2.3.4.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/jotai-x.git",
+        "directory": "packages/jotai-x"
+      }
+    },
+    {
+      "name": "lodash",
+      "version": "4.18.1",
+      "license": "MIT",
+      "path": "node_modules/lodash",
+      "resolved": "https://registry.npmjs.org/lodash/-/lodash-4.18.1.tgz",
+      "repository": "lodash/lodash"
+    },
+    {
+      "name": "lodash.mapvalues",
+      "version": "4.6.0",
+      "license": "MIT",
+      "path": "node_modules/lodash.mapvalues",
+      "resolved": "https://registry.npmjs.org/lodash.mapvalues/-/lodash.mapvalues-4.6.0.tgz",
+      "repository": "lodash/lodash"
+    },
+    {
+      "name": "mutative",
+      "version": "1.1.0",
+      "license": "MIT",
+      "path": "node_modules/mutative",
+      "resolved": "https://registry.npmjs.org/mutative/-/mutative-1.1.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/unadlib/mutative.git"
+      }
+    },
+    {
+      "name": "nanoid",
+      "version": "5.1.16",
+      "license": "MIT",
+      "path": "node_modules/nanoid",
+      "resolved": "https://registry.npmjs.org/nanoid/-/nanoid-5.1.16.tgz",
+      "repository": "ai/nanoid"
+    },
+    {
+      "name": "optics-ts",
+      "version": "2.4.1",
+      "license": "MIT",
+      "path": "node_modules/optics-ts",
+      "resolved": "https://registry.npmjs.org/optics-ts/-/optics-ts-2.4.1.tgz",
+      "repository": "https://github.com/akheron/optics-ts"
+    },
+    {
+      "name": "platejs",
+      "version": "53.3.11",
+      "license": "MIT",
+      "path": "node_modules/platejs",
+      "resolved": "https://registry.npmjs.org/platejs/-/platejs-53.3.11.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/plate.git",
+        "directory": "packages/plate"
+      }
+    },
+    {
+      "name": "proxy-compare",
+      "version": "2.6.0",
+      "license": "MIT",
+      "path": "node_modules/proxy-compare",
+      "resolved": "https://registry.npmjs.org/proxy-compare/-/proxy-compare-2.6.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dai-shi/proxy-compare.git"
+      }
+    },
+    {
+      "name": "react",
+      "version": "19.2.4",
+      "license": "MIT",
+      "path": "node_modules/react",
+      "resolved": "https://registry.npmjs.org/react/-/react-19.2.4.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/facebook/react.git",
+        "directory": "packages/react"
+      }
+    },
+    {
+      "name": "react-compiler-runtime",
+      "version": "1.0.0",
+      "license": "MIT",
+      "path": "node_modules/react-compiler-runtime",
+      "resolved": "https://registry.npmjs.org/react-compiler-runtime/-/react-compiler-runtime-1.0.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/facebook/react.git",
+        "directory": "compiler/packages/react-compiler-runtime"
+      }
+    },
+    {
+      "name": "react-dom",
+      "version": "19.2.4",
+      "license": "MIT",
+      "path": "node_modules/react-dom",
+      "resolved": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.4.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/facebook/react.git",
+        "directory": "packages/react-dom"
+      }
+    },
+    {
+      "name": "react-tracked",
+      "version": "1.7.14",
+      "license": "MIT",
+      "path": "node_modules/react-tracked",
+      "resolved": "https://registry.npmjs.org/react-tracked/-/react-tracked-1.7.14.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dai-shi/react-tracked.git"
+      }
+    },
+    {
+      "name": "scheduler",
+      "version": "0.27.0",
+      "license": "MIT",
+      "path": "node_modules/scheduler",
+      "resolved": "https://registry.npmjs.org/scheduler/-/scheduler-0.27.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/facebook/react.git",
+        "directory": "packages/scheduler"
+      }
+    },
+    {
+      "name": "scroll-into-view-if-needed",
+      "version": "3.1.0",
+      "license": "MIT",
+      "path": "node_modules/scroll-into-view-if-needed",
+      "resolved": "https://registry.npmjs.org/scroll-into-view-if-needed/-/scroll-into-view-if-needed-3.1.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/scroll-into-view/scroll-into-view-if-needed.git"
+      }
+    },
+    {
+      "name": "slate",
+      "version": "0.126.2",
+      "license": "MIT",
+      "path": "node_modules/slate",
+      "resolved": "https://registry.npmjs.org/slate/-/slate-0.126.2.tgz",
+      "repository": "git://github.com/ianstormtaylor/slate.git"
+    },
+    {
+      "name": "slate-dom",
+      "version": "0.126.0",
+      "license": "MIT",
+      "path": "node_modules/slate-dom",
+      "resolved": "https://registry.npmjs.org/slate-dom/-/slate-dom-0.126.0.tgz",
+      "repository": "git://github.com/ianstormtaylor/slate.git"
+    },
+    {
+      "name": "slate-hyperscript",
+      "version": "0.125.0",
+      "license": "MIT",
+      "path": "node_modules/slate-hyperscript",
+      "resolved": "https://registry.npmjs.org/slate-hyperscript/-/slate-hyperscript-0.125.0.tgz",
+      "repository": "git://github.com/ianstormtaylor/slate.git"
+    },
+    {
+      "name": "slate-react",
+      "version": "0.126.4",
+      "license": "MIT",
+      "path": "node_modules/slate-react",
+      "resolved": "https://registry.npmjs.org/slate-react/-/slate-react-0.126.4.tgz",
+      "repository": "git://github.com/ianstormtaylor/slate.git"
+    },
+    {
+      "name": "tiny-invariant",
+      "version": "1.3.1",
+      "license": "MIT",
+      "path": "node_modules/tiny-invariant",
+      "resolved": "https://registry.npmjs.org/tiny-invariant/-/tiny-invariant-1.3.1.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/alexreardon/tiny-invariant.git"
+      }
+    },
+    {
+      "name": "use-context-selector",
+      "version": "1.4.4",
+      "license": "MIT",
+      "path": "node_modules/use-context-selector",
+      "resolved": "https://registry.npmjs.org/use-context-selector/-/use-context-selector-1.4.4.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/dai-shi/use-context-selector.git"
+      }
+    },
+    {
+      "name": "use-deep-compare",
+      "version": "1.3.0",
+      "license": "MIT",
+      "path": "node_modules/use-deep-compare",
+      "resolved": "https://registry.npmjs.org/use-deep-compare/-/use-deep-compare-1.3.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/sandiiarov/use-deep-compare.git"
+      }
+    },
+    {
+      "name": "use-sync-external-store",
+      "version": "1.4.0",
+      "license": "MIT",
+      "path": "node_modules/use-sync-external-store",
+      "resolved": "https://registry.npmjs.org/use-sync-external-store/-/use-sync-external-store-1.4.0.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/facebook/react.git",
+        "directory": "packages/use-sync-external-store"
+      }
+    },
+    {
+      "name": "zustand",
+      "version": "5.0.15",
+      "license": "MIT",
+      "path": "node_modules/zustand",
+      "resolved": "https://registry.npmjs.org/zustand/-/zustand-5.0.15.tgz",
+      "repository": {
+        "type": "git",
+        "url": "git+https://github.com/pmndrs/zustand.git"
+      }
+    },
+    {
+      "name": "zustand-x",
+      "version": "6.2.1",
+      "license": "MIT",
+      "path": "node_modules/zustand-x",
+      "resolved": "https://registry.npmjs.org/zustand-x/-/zustand-x-6.2.1.tgz",
+      "repository": {
+        "type": "git",
+        "url": "https://github.com/udecode/zustand-x.git"
+      }
+    }
+  ]
+}

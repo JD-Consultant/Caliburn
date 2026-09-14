@@ -1167,6 +1167,8 @@ Codex 開源 harness 提供更直接的實作證據：[apply-patch handler](http
 
 ### 19.3 Caliburn 的產品推論：共同小型 envelope，不做巨型 error union
 
+> **2026-09-04 supersession：**本節的模型可見 `status／workspace_effect／errors[]` 通用 envelope 已由 [`LLM-Q014` G4.2](./2026-09-04-llm-machine-effects-and-sibling-results-working-design.md) 方案 B 取代，不得作為 implementation baseline。Provider call/result pairing、依恢復者分流及 domain diagnostic 原則仍有效；實作改用 framework-native `ToolMessage` success／error，模型只取得下一步必要的最小內容。
+
 官方資料沒有規定 JD application 必須使用哪一組 error codes；以下是把上述共同模式套到 Caliburn 的產品推論。比較三種方案後，第一版採 C：
 
 1. **A．只回自由文字**：程式最少，Claude／OpenAI 也能讀，但模型必須從 prose 猜 operation、target、是否已套用與下一個 read 範圍，難以跨 provider 測試；現況已有這種不一致，淘汰。

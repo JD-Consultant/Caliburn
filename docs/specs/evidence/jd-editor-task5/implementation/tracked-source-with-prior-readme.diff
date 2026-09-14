@@ -1,0 +1,1914 @@
+diff --git a/experiments/analysis-agent/README.md b/experiments/analysis-agent/README.md
+index 85505d7a..f96ceddb 100644
+--- a/experiments/analysis-agent/README.md
++++ b/experiments/analysis-agent/README.md
+@@ -187,6 +187,17 @@ No native compaction event was reached. [Results and evidence](../../docs/specs/
+ supersede the older mandatory-count/normal-interview blocker below; those paragraphs
+ are historical results, not the current entry configuration.
+ 
++Latest independent recall/provider check (2026-09-07): **12 Luna/medium requests,
++US$0.00411**. Reused prior generated Memory with explicitly rebuilt synthetic
++source references, not another extraction/consolidation run. The reader reached
++knowledge, one detailed record and its original Q/A, but exhausted its existing
++8-step probe limit without a final answer (the product uses a different 9-step
++composition). Native `all_turns` and an opaque item's unchanged replay were
++observed; one native response was incomplete and compaction was not demonstrated.
++Exact token-count endpoint compatibility still blocks the configured gateway.
++No product guards were disabled. **Normal interview acceptance remains OPEN.**
++[Evidence and the required next decision](../../docs/specs/2026-09-07-recall-native-capability-results.md).
++
+ Latest B1 prompt calibration (2026-09-07): preserve who stated what and the
+ scope of unanswered questions; candidates include known work and case additions,
+ not only unknowns. One fixed Luna/medium sequence completed three B2 publications;
+@@ -1218,3 +1229,19 @@ so retaining an ID cannot conceal changed result text or call pairing.
+ `tests/jd_browser_server.py` 是零付費 browser fixture：實際 AnalysisService／API／JD router、官方 PG Saver／Store、原三工具，僅 model transport 使用固定 MockTransport，沒有讀取真 key 或 live fallback。Task 4 瀏覽器證據分開記 headed Chrome、CDP composition 與 Windows 真人 IME；完整取消／native process owner 屬 Task 5，自然模型與 Skill/E2E 屬後續 gate。
+ 
+ Task4 review fix1：人工保存的明確未 admission 回覆使用實際 Pydantic `ManualSaveRejection`（生成至 Web），含原 request key；只有在同一 service lock 中確認該 identity 無 receipt 後才回覆。已有 receipt 的非法重放、receipt lookup unavailable 與一般 HTTP 409/422 不代表零寫入；原正常 receipt 優先規則保留。Pydantic body validation 失敗也走相同 receipt 查核，UUID 使用與有效 DTO 相同的 canonical identity。
++
++### Task 5 — 同文件 admission、原生程序生命週期與原身分恢復
++
++Windows API 的主執行緒先執行 `windows_lifecycle.bootstrap()`，才建立 DB、model client 或 Node。啟動程序必須設定穩定的 `Q019_LIFECYCLE_INSTALLATION`（1–80 個英數字、底線或連字號），同一隔離安裝的重開沿用同值。私有 mutex 防止第二個 API 搶走正在工作的安裝；私有 Job 保留 kill-on-close 並禁止 handle 繼承，啟動核對 exact 舊 Job 停止後才加入新 Job。未知物件、指派失敗或舊物件仍存在都先拒絕工作。舊未受管服務切換必須先核實並受控停止；不能以換 key 或按 port 殺程序代替。
++
++`tests/jd_browser_server.py` 也走真 bootstrap。既有離線啟動命令加上 process-scoped `Q019_LIFECYCLE_INSTALLATION=jd-editor-offline-20260910`；Node 使用 Task4 isolated 22.23.2，DB 仍是 `q019_jd_app_20260910`。可設 `Q019_TEST_EVIDENCE_PREFIX=task5` 或 `task6`，將離線 fixture 記錄分開，預設保留 task4 名稱。實際 API `create_app()` 在主執行緒 bootstrap；不可用尚未 bootstrap 的 `open_service()` 繞入 resources。
++
++人工儲存、AI、selection、HTTP selection read 及建立文件都由 App owner 保留 spawn／Popen／pipe／I/O 執行緒。原生回傳或 Future.done 不代表已清理；未清理時不發布候選、不新增同文件寫入。等待與有界 cleanup 不持全域 admission lock，另一文件可以繼續。關閉先停 admission、送出取消信號，再等原 Python entry 與 native owner 排空。AI stop 不停掉唯讀使用；唯讀入口只接 App shutdown 的獨立停止信號。
++
++人工 admission 在 Node 前以官方 root checkpoint 保存最多一筆 operation／base／digest／request_key／origin，沒有候選、假 HumanMessage 或 run。結果不明時保留原身分；停止已證後先取得 PG head row lock，下一 statement 查原 receipt，只有 known-none 才閉合原 failure。已提交結果永遠回原 receipt，取消不撤銷它。JD close 核對實際 factory session、原 message/call/input 與全部未閉合 bindings；只補缺失 ToolMessage，保留原訊息及已确认模型投影 manifest，未知不取得一般 resume 權。
++
++App-only `GET /documents/{document}/jd/manual-recovery` 可不附 key 發現原待處理身分，或附原 `request_key` 唯讀查回結果。`POST` 同路徑只收原 UUID key，明示做一次有界恢復，不接收或重跑候選。每個 available／unknown／no_pending 都由同一 server admission 投影 `write_blocked`／`can_recover`；結果已讀但 descriptor 未清仍可明示清理，archive 不遮蔽原結果。GET 不停止程序、不更新 checkpoint、不寫 receipt。
++
++瀏覽器重開／pageshow 只讀查詢，不自動重送人工稿。沒有 cache 也保留原身分恢復入口；有 exact cache 且 no_pending 時，可另次明示完整原 key/base/value，可能是首次送達。查不到不代表零效果；終局失敗保留候選，新 dirty 不被晚到結果覆蓋。最新完整 server gate 讀取失敗仍維持鎖定。新 transport 型別由實際 Pydantic → export → generated Web，三個模型工具與 JD JSON Schema 不變。
++
++Task5 測試與觀測限制列於 `scratch/task-5-report.md`；真 Windows kernel、真 PG/Saver 程序重開、App seam fixture 與 Web mocks 分別記錄，不將它們混成自然模型、真人 IME 或 Task6 成品通過。
+diff --git a/experiments/analysis-agent/pyproject.toml b/experiments/analysis-agent/pyproject.toml
+index 554f68f9..b4cf6638 100644
+--- a/experiments/analysis-agent/pyproject.toml
++++ b/experiments/analysis-agent/pyproject.toml
+@@ -21,6 +21,7 @@ dependencies = [
+     "uvicorn==0.52.4",
+     "apscheduler==3.11.3",
+     "markdown-it-py[linkify]==4.2.0",
++    "pywin32==312 ; sys_platform == 'win32'",
+ ]
+ 
+ [dependency-groups]
+diff --git a/experiments/analysis-agent/scripts/export_web_contract.py b/experiments/analysis-agent/scripts/export_web_contract.py
+index 2707d7f5..733d30ba 100644
+--- a/experiments/analysis-agent/scripts/export_web_contract.py
++++ b/experiments/analysis-agent/scripts/export_web_contract.py
+@@ -1,11 +1,12 @@
+ """Export actual API Pydantic models without constructing services or clients."""
+ import json
+ from pydantic import TypeAdapter
+-from analysis_agent.jd_routes import ManualSaveRejection
++from analysis_agent.jd_routes import ManualSaveRejection, ManualRecoveryRequest, ManualRecoveryResult
+ from analysis_agent.api import (DocumentInput, DocumentOutput, MessageInput, MessageOutput,
+     RunOutput, MemoryStatusOutput, DocumentMetadataInput, RunLookupOutput)
+ 
+ if __name__ == '__main__':
+     schema = TypeAdapter(DocumentInput | DocumentOutput | MessageInput | MessageOutput |
+-        RunOutput | MemoryStatusOutput | DocumentMetadataInput | RunLookupOutput | ManualSaveRejection).json_schema()
++        RunOutput | MemoryStatusOutput | DocumentMetadataInput | RunLookupOutput | ManualSaveRejection |
++        ManualRecoveryRequest | ManualRecoveryResult).json_schema()
+     print(json.dumps(schema, ensure_ascii=False))
+diff --git a/experiments/analysis-agent/src/analysis_agent/api.py b/experiments/analysis-agent/src/analysis_agent/api.py
+index d20ea553..ac26bec2 100644
+--- a/experiments/analysis-agent/src/analysis_agent/api.py
++++ b/experiments/analysis-agent/src/analysis_agent/api.py
+@@ -103,6 +103,8 @@ def open_service():
+ Timeout, output and compaction thresholds are explicit deployment values, not
+ an undocumented resurrected initial policy or a promised hard dollar cap.
+ """
++    from analysis_agent.windows_lifecycle import require_bootstrap
++    lifecycle = require_bootstrap()
+     from langgraph.checkpoint.postgres import PostgresSaver
+     from langgraph.store.postgres import PostgresStore
+     from psycopg.conninfo import conninfo_to_dict, make_conninfo
+@@ -190,7 +192,7 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
+         # LangChain model copies share the same managed client/budget hook.
+         consolidation_model = model.model_copy(update={
+             'reasoning': {**model.reasoning, 'effort': consolidation_effort}})
+-        service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model, jd=jd,
++        service = AnalysisService(catalog=catalog, saver=saver, store=store, model=model, jd=jd,lifecycle=lifecycle,
+             instructions='你是職務訪談顧問。理解員工實際工作，按需追問不清楚的內容；遇到矛盾先確認。'
+                          '根據已知內容簡短回述，優先問一個員工目前可回答、會影響工作理解的問題，不逐欄填問卷。'
+                          '已說清楚的不重問；員工已說不知道、需查證或暫時答不出來，也算已回應：保留未知，轉問其他有用方向。'
+@@ -212,6 +214,9 @@ an undocumented resurrected initial policy or a promised hard dollar cap.
+ 
+ 
+ def create_app(resources=open_service):
++    if resources is open_service:
++        from analysis_agent.windows_lifecycle import bootstrap
++        bootstrap()
+     @asynccontextmanager
+     async def lifespan(app):
+         manager = resources()
+diff --git a/experiments/analysis-agent/src/analysis_agent/conversation.py b/experiments/analysis-agent/src/analysis_agent/conversation.py
+index 2330b330..98c291f3 100644
+--- a/experiments/analysis-agent/src/analysis_agent/conversation.py
++++ b/experiments/analysis-agent/src/analysis_agent/conversation.py
+@@ -8,6 +8,9 @@ not to the lifetime of the document. This is synchronous, not an API service.
+ from collections.abc import Sequence
+ from typing import Annotated
+ from uuid import uuid4
++from weakref import WeakKeyDictionary
++
++_JD_SESSIONS = WeakKeyDictionary()
+ 
+ from langchain.agents.middleware import (
+     AgentMiddleware, AgentState, ModelCallLimitMiddleware, ToolCallLimitMiddleware, hook_config,
+@@ -27,6 +30,9 @@ def merge_turns(previous: dict, update: dict) -> dict:
+ 
+ 
+ class ConversationState(MessagesState):
++    jd_manual_pending: dict | None
++    jd_bindings: dict
++    jd_pending_operation: dict | None
+     jd_last_model_view: dict | None
+     jd_refs: dict
+     jd_sources: dict
+@@ -166,7 +172,10 @@ def build_conversation(
+     root.add_node('analysis', child)
+     root.add_edge(START, 'analysis')
+     root.add_edge('analysis', END)
+-    return root.compile(checkpointer=checkpointer)
++    graph = root.compile(checkpointer=checkpointer)
++    if sessions:
++        _JD_SESSIONS[graph] = sessions[0]
++    return graph
+ 
+ 
+ def require_latest(config):
+@@ -174,6 +183,21 @@ def require_latest(config):
+         raise ValueError('Use the latest root document config, not a historical/child checkpoint')
+ 
+ 
++def save_manual_pending(graph, config, descriptor):
++    """Root-only admitted identity; never invoke analysis or synthesize input."""
++    require_latest(config)
++    snapshot = graph.get_state(config)
++    if snapshot.next:
++        raise ValueError('Manual binding requires an idle root')
++    pending = snapshot.values.get('jd_manual_pending')
++    if pending and descriptor is not None and pending != descriptor:
++        raise ValueError('Another admitted manual identity is pending')
++    graph.update_state(config, {'jd_manual_pending': descriptor}, as_node='analysis')
++    saved = graph.get_state(config)
++    if saved.next or saved.values.get('jd_manual_pending') != descriptor:
++        raise RuntimeError('Manual admission checkpoint was not confirmed')
++
++
+ def pending_memory_read(snapshot, memory_session):
+     """Identify the current unpaired ToolNode call, not an exception/name hint.
+ 
+@@ -201,7 +225,7 @@ def pending_memory_read(snapshot, memory_session):
+     return None
+ 
+ 
+-def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=None):
++def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=None, jd_session=None):
+     """Seal the pending root using public state APIs, without executing any node.
+ 
+     Caller MUST have stopped/joined its worker and serialized this document.
+@@ -217,9 +241,19 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
+     if reason not in {'cancelled', 'configuration_error'}:
+         raise ValueError('Expected cancelled or configuration_error')
+     snapshot = graph.get_state(config, subgraphs=True)
++    bound = _JD_SESSIONS.get(graph)
++    if bound is not None and jd_session is not bound:
++        raise PublicationUncertain('Closing JD requires the original graph factory session')
++    if jd_session is not None and bound is not jd_session:
++        raise PublicationUncertain('JD reconciliation factory does not match this graph')
+     if not snapshot.values.get('messages'):
+         raise ValueError('No saved input to close')
+     if not snapshot.next:
++        if jd_session:
++            updates = jd_session.reconcile_all(snapshot.values,config)
++            if any(k!='messages' for k in updates) or updates['messages']:
++                graph.update_state(config,updates,as_node='analysis')
++                return graph.get_state(config).values
+         return snapshot.values
+     if snapshot.next != ('analysis',):
+         raise ValueError('Unexpected pending conversation node')
+@@ -230,17 +264,22 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
+     if child and hasattr(child, 'values') and not child.values.get('messages'):
+         child = None
+     state = child.values if child and hasattr(child, 'values') else snapshot.values
++    jd_updates = jd_session.reconcile_all(state,config) if jd_session else {'messages':[]}
++    state = {**state,**{k:v for k,v in jd_updates.items() if k!='messages'}}
+     read_call = pending_memory_read(snapshot, memory_session)
+-    messages = list(state['messages'])
++    messages = [*state['messages'],*jd_updates['messages']]
++    carried = {k:state[k] for k in ('jd_last_model_view','jd_refs','jd_sources','jd_results','jd_bindings','jd_pending_operation') if k in state}
+     human_index = max(i for i, m in enumerate(messages) if isinstance(m, HumanMessage))
+     saved = state.get('turn_outcome')
+     boundary = state.get('closed_turns', {}).get(messages[human_index].id)
+     if (child and not child.next and saved and saved['input_id'] == messages[human_index].id
+             and boundary and boundary['end_id'] == messages[-1].id):
+-        graph.update_state(snapshot.config, {'messages': messages, 'turn_outcome': saved,
++        if jd_session:
++            graph.update_state(child.config,{**jd_updates},as_node='TurnOutcome.after_agent')
++        graph.update_state(snapshot.config, {**carried,'messages': messages, 'turn_outcome': saved,
+             'closed_turns': turn_boundary(saved, messages[-1].id)}, as_node='analysis')
+         return graph.get_state(config).values
+-    updates = {}
++    updates = {k:v for k,v in jd_updates.items() if k!='messages'}
+     for index, message in enumerate(messages[human_index + 1:], human_index + 1):
+         if not isinstance(message, AIMessage):
+             continue
+@@ -251,7 +290,11 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
+                 raise PublicationUncertain('Unpaired call has no reliable identity')
+             # after_model nodes precede ToolNode for this canonical response.
+             # Merely having no task.error at tools does NOT prove not-started.
+-            not_started = child and child.next and all(n.endswith('.after_model') for n in child.next)
++            not_started = (child and child.next and all(node.endswith('.after_model') for node in child.next))
++            if call['name'] in {'jd_read','jd_edit','jd_change_read'}:
++                not_started = (not_started and message.id==state['messages'][-1].id
++                    and set(child.next)<= {'TurnValidation.after_model','ModelCallLimitMiddleware.after_model',
++                                          'ToolJsonFeedback.after_model','CooperativeStop.after_model','JdToolSession.after_model'})
+             if not_started:
+                 messages.append(ToolMessage('Tool not executed: this turn was closed before tool execution.',
+                     name=call['name'], tool_call_id=call['id'], status='error'))
+@@ -277,7 +320,7 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
+     notice = AIMessage('本輪已結束，顧問未完成答覆。', id=str(uuid4()), additional_kwargs={
+         'analysis_agent_origin': 'runtime_notice', 'analysis_agent_stop_reason': reason})
+     messages.append(notice)
+-    terminal = {'messages': messages, 'turn_outcome': outcome,
++    terminal = {**carried,'messages': messages, 'turn_outcome': outcome,
+                 'closed_turns': turn_boundary(outcome, notice.id)}
+     # The owned final middleware node routes to END. Head, paired result and
+     # terminal status are one child checkpoint; neither update executes a node.
+@@ -288,7 +331,7 @@ def close_turn(graph, config, *, reason: str, quiescent: bool, memory_session=No
+ 
+ 
+ def send_input(graph, config, message: HumanMessage, *, abandon_pending=False,
+-               quiescent=False, memory_session=None):
++               quiescent=False, memory_session=None, jd_session=None):
+     """Synchronous local entry; worker/admission orchestration remains Task3."""
+     require_latest(config)
+     if not isinstance(message, HumanMessage) or not message.id:
+@@ -299,5 +342,5 @@ def send_input(graph, config, message: HumanMessage, *, abandon_pending=False,
+     if snapshot.next:
+         if not abandon_pending:
+             raise ValueError('Conversation has pending work; explicitly resume or abandon it')
+-        close_turn(graph, config, reason='cancelled', quiescent=quiescent, memory_session=memory_session)
++        close_turn(graph, config, reason='cancelled', quiescent=quiescent, memory_session=memory_session,jd_session=jd_session)
+     return graph.invoke({'messages': [message]}, config, durability='sync')
+diff --git a/experiments/analysis-agent/src/analysis_agent/jd_engine.py b/experiments/analysis-agent/src/analysis_agent/jd_engine.py
+index a4b93abe..76913438 100644
+--- a/experiments/analysis-agent/src/analysis_agent/jd_engine.py
++++ b/experiments/analysis-agent/src/analysis_agent/jd_engine.py
+@@ -5,7 +5,8 @@ import os
+ from pathlib import Path
+ import shutil
+ import subprocess
+-from threading import Event, Thread
++from threading import Event, Thread, RLock
++from dataclasses import dataclass, field
+ import time
+ from jsonschema import ValidationError
+ 
+@@ -19,6 +20,81 @@ class JdEngineFailure(RuntimeError):
+         self.code, self.quiescent, self.command_index = code, quiescent, command_index
+ 
+ 
++@dataclass
++class _NativeCall:
++    reap: object
++    budget: float
++    process: object = None
++    threads: list = field(default_factory=list)
++    ready: bool = False
++    cleanup_pending: bool = False
++    lock: object = field(default_factory=RLock)
++
++
++class JdNativeCalls:
++    """Ephemeral handles, never a receipt or a durable execution registry."""
++    def __init__(self):
++        self._entries = {}
++        self._lock = RLock()
++
++    @property
++    def quiescent(self):
++        with self._lock:
++            return not self._entries
++
++    def snapshot(self):
++        with self._lock:
++            return tuple({'spawning': not c.ready,
++                          'process_present': c.process is not None,
++                          'io_alive': sum(t.is_alive() for t in c.threads)}
++                         for c in self._entries.values())
++
++    @property
++    def blocked(self):
++        with self._lock:
++            return any(c.cleanup_pending for c in self._entries.values())
++
++    def register(self, reap, budget):
++        token, call = object(), _NativeCall(reap, budget)
++        with self._lock:
++            if any(c.cleanup_pending for c in self._entries.values()):
++                raise JdEngineFailure('engine_failed',quiescent=False)
++            self._entries[token] = call
++        return token, call
++
++    def finish(self, token, *, terminate=False):
++        with self._lock:
++            call = self._entries.get(token)
++        if call is None:
++            return True
++        with call.lock:
++            call.cleanup_pending = True
++            if not call.ready:
++                return False
++            process = call.process
++            if process is not None:
++                if process.poll() is None and (not terminate or not call.reap(process)):
++                    return False
++                deadline = time.monotonic() + call.budget
++                for thread in call.threads:
++                    if thread.ident is not None:
++                        thread.join(max(0, deadline - time.monotonic()))
++                if any(t.is_alive() for t in call.threads):
++                    return False
++                for pipe in (process.stdin, process.stdout, process.stderr):
++                    if pipe is not None and not pipe.closed:
++                        pipe.close()
++            with self._lock:
++                self._entries.pop(token, None)
++            return True
++
++    def cleanup(self):
++        with self._lock:
++            tokens = tuple(self._entries)
++        results = [self.finish(token, terminate=True) for token in tokens]
++        return all(results) and self.quiescent
++
++
+ class JdEngine:
+     def __init__(self, *, timeout=30, cleanup_timeout=5, max_bytes=16 * 1024 * 1024):
+         if not all(math.isfinite(x) and x > 0 for x in (timeout, cleanup_timeout, max_bytes)):
+@@ -26,8 +102,9 @@ class JdEngine:
+         self.timeout, self.cleanup_timeout, self.max_bytes = timeout, cleanup_timeout, int(max_bytes)
+         self.node = shutil.which('node')
+         self.entry = Path(__file__).resolve().parents[3] / 'jd-editor/native/dist/bridge.js'
++        self.native_calls = JdNativeCalls()
+ 
+-    def _call(self, entry, request, *, cancel=None):
++    def _call(self, entry, request, *, cancel=None, native_calls=None):
+         names = {'transform': 'JdPlateTransform', 'validate-value': 'JdPlateValidateValue',
+                  'read-selection': 'JdPlateReadSelection'}
+         name = names[entry]
+@@ -47,12 +124,22 @@ class JdEngine:
+         # provider settings, original interview text, NODE_OPTIONS or loader.
+         env = {k: v for k, v in os.environ.items() if k.upper() in
+                {'SYSTEMROOT', 'WINDIR', 'TEMP', 'TMP', 'PATH', 'PATHEXT'}}
++        owner = native_calls if native_calls is not None else self.native_calls
++        if owner.blocked:
++            raise JdEngineFailure('engine_failed',quiescent=False)
++        token, call = owner.register(lambda p: self._reap(p), self.cleanup_timeout)
+         try:
+             process = subprocess.Popen([self.node, str(self.entry), entry], shell=False,
+                 stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env,
++                close_fds=True,
+                 creationflags=getattr(subprocess, 'CREATE_NO_WINDOW', 0))
+-        except OSError as exc:
+-            raise JdEngineFailure() from exc
++            call.process = process
++        except BaseException as exc:
++            call.ready = True
++            owner.finish(token)
++            if isinstance(exc, OSError):
++                raise JdEngineFailure() from exc
++            raise
+         overflow, io_error = Event(), Event()
+         output = bytearray()
+ 
+@@ -74,17 +161,20 @@ class JdEngine:
+         def write():
+             try:
+                 process.stdin.write(data)
+-                process.stdin.close()
+             except OSError:
+                 io_error.set()
++            finally:
++                process.stdin.close()
+ 
+-        threads = [Thread(target=read, args=(process.stdout, self.max_bytes, True), daemon=True),
+-                   Thread(target=read, args=(process.stderr, 8192, False), daemon=True),
+-                   Thread(target=write, daemon=True)]
+-        for thread in threads:
+-            thread.start()
+         failure = None
+         try:
++            threads = [Thread(target=read, args=(process.stdout, self.max_bytes, True), daemon=True),
++                       Thread(target=read, args=(process.stderr, 8192, False), daemon=True),
++                       Thread(target=write, daemon=True)]
++            call.threads = threads
++            for thread in threads:
++                thread.start()
++            call.ready = True
+             while process.poll() is None:
+                 if overflow.is_set() or io_error.is_set():
+                     failure = 'engine_failed'
+@@ -97,15 +187,15 @@ class JdEngine:
+                     break
+                 time.sleep(min(.01, max(.001, self.timeout - (time.monotonic() - started))))
+         except BaseException:
+-            self._reap(process)
++            call.ready = True
++            owner.finish(token, terminate=True)
+             raise
+         if failure:
+-            quiet = self._reap(process)
++            quiet = owner.finish(token, terminate=True)
+             raise JdEngineFailure(failure, quiescent=quiet)
+-        for thread in threads:
+-            thread.join(max(0, self.timeout - (time.monotonic() - started)))
+-        if process.returncode != 0 or overflow.is_set() or io_error.is_set() or any(t.is_alive() for t in threads):
+-            raise JdEngineFailure()
++        quiet = owner.finish(token)
++        if process.returncode != 0 or overflow.is_set() or io_error.is_set() or not quiet:
++            raise JdEngineFailure(quiescent=quiet)
+         try:
+             result = validate(name + 'Result', json.loads(output))
+         except (ValueError, TypeError, ValidationError) as exc:
+@@ -130,13 +220,13 @@ class JdEngine:
+                     return True
+         return process.poll() is not None
+ 
+-    def validate_value(self, value, *, cancel=None):
+-        r = self._call('validate-value', {'profile': PROFILE, 'value': value}, cancel=cancel)
++    def validate_value(self, value, *, cancel=None, native_calls=None):
++        r = self._call('validate-value', {'profile': PROFILE, 'value': value}, cancel=cancel, native_calls=native_calls)
+         return JdCandidate(r['value'], r['native_operations'], r['affected_element_ids'])
+ 
+-    def transform(self, value, commands, *, cancel=None):
+-        r = self._call('transform', {'profile': PROFILE, 'base_value': value, 'commands': commands}, cancel=cancel)
++    def transform(self, value, commands, *, cancel=None, native_calls=None):
++        r = self._call('transform', {'profile': PROFILE, 'base_value': value, 'commands': commands}, cancel=cancel, native_calls=native_calls)
+         return JdCandidate(r['value'], r['native_operations'], r['affected_element_ids'])
+ 
+-    def selection(self, value, selection, *, cancel=None):
+-        return self._call('read-selection', {'profile': PROFILE, 'value': value, 'range': selection}, cancel=cancel)
++    def selection(self, value, selection, *, cancel=None, native_calls=None):
++        return self._call('read-selection', {'profile': PROFILE, 'value': value, 'range': selection}, cancel=cancel, native_calls=native_calls)
+diff --git a/experiments/analysis-agent/src/analysis_agent/jd_routes.py b/experiments/analysis-agent/src/analysis_agent/jd_routes.py
+index ea3321f2..2ee8bdd9 100644
+--- a/experiments/analysis-agent/src/analysis_agent/jd_routes.py
++++ b/experiments/analysis-agent/src/analysis_agent/jd_routes.py
+@@ -2,13 +2,13 @@
+ import base64
+ import json
+ from uuid import UUID
+-from typing import Literal
++from typing import Literal, Annotated
+ 
+-from fastapi import APIRouter, Request, HTTPException
++from fastapi import APIRouter, Request, Response, HTTPException
+ from fastapi.routing import APIRoute
+ from fastapi.exceptions import RequestValidationError
+ from fastapi.responses import JSONResponse
+-from pydantic import BaseModel, ConfigDict
++from pydantic import BaseModel, ConfigDict, Field
+ from starlette.concurrency import run_in_threadpool
+ from jd_editor_contract import models
+ from jsonschema import ValidationError
+@@ -25,6 +25,37 @@ class ManualSaveRejection(BaseModel):
+     message: str
+ 
+ 
++class ManualRecoveryRequest(BaseModel):
++    model_config = ConfigDict(extra='forbid')
++    request_key: UUID
++
++
++class ManualRecoveryGate(BaseModel):
++    model_config = ConfigDict(extra='forbid')
++    write_blocked: bool
++    can_recover: bool
++
++
++class ManualRecoveryAvailable(ManualRecoveryGate):
++    status: Literal['available']
++    request_key: UUID
++    result: models.JdManualSaveResult
++
++
++class ManualRecoveryUnknown(ManualRecoveryGate):
++    status: Literal['unknown']
++    request_key: UUID
++
++
++class ManualRecoveryNoPending(ManualRecoveryGate):
++    status: Literal['no_pending']
++    request_key: UUID | None
++
++
++ManualRecoveryResult = Annotated[ManualRecoveryAvailable | ManualRecoveryUnknown | ManualRecoveryNoPending,
++    Field(discriminator='status')]
++
++
+ def rejected_manual(request, document, key, message, status=422):
+     # Never infer zero-write from HTTP status or a failed receipt lookup.
+     service, scope = scoped(request, document)
+@@ -41,6 +72,9 @@ def rejected_manual(request, document, key, message, status=422):
+             raise HTTPException(503, 'Manual receipt is unavailable') from exc
+         if original:
+             raise HTTPException(409, 'Existing identity requires its exact original payload')
++        pending = service._context(document).graph.get_state(service._context(document).config).values.get('jd_manual_pending')
++        if pending and pending.get('operation') == str(manual_operation_id(scope,canonical_key)):
++            raise HTTPException(409, 'Admitted manual identity requires reconciliation')
+         return JSONResponse(status_code=status, content=ManualSaveRejection(
+             request_key=key, message=message).model_dump(mode='json'))
+ 
+@@ -101,7 +135,8 @@ def read_document(service, scope, args):
+         kind, offset = record['read_kind'], record['offset']
+         if not isinstance(offset, int) or offset < 0:
+             raise ServiceConflict('Invalid read page')
+-    view = service.jd.read(scope, query)
++    with service.jd_read_entry(scope.document_id) as context:
++        view = service.jd.read(scope, query, cancel=context.read_stop, native_calls=context.native_calls)
+     if view.status != 'ok':
+         return read_failure_to_wire(view)
+     revision = view.revision
+@@ -171,6 +206,33 @@ def scoped(request, document):
+     return service, JdScope(document)
+ 
+ 
++def recovery_projection(request, document, key, *, recover=False):
++    service, _ = scoped(request,document)
++    try:
++        value = service.recover_manual(document,key) if recover else service.manual_recovery(document,key)
++        if value['status']=='available':
++            value = {**value,'result':outcome_to_wire(value['result'])}
++        return value
++    except ServiceConflict as exc:
++        raise HTTPException(409,str(exc)) from exc
++    except Exception as exc:
++        raise HTTPException(503,'Manual recovery state is unavailable') from exc
++
++
++@router.get('/documents/{document}/jd/manual-recovery', response_model=ManualRecoveryResult,
++    response_model_exclude_unset=True)
++def manual_recovery_get(document: str, request: Request, response: Response, request_key: UUID | None = None):
++    response.headers['Cache-Control']='no-store'
++    return recovery_projection(request,document,str(request_key) if request_key is not None else None)
++
++
++@router.post('/documents/{document}/jd/manual-recovery', response_model=ManualRecoveryResult,
++    response_model_exclude_unset=True)
++def manual_recovery_post(document: str, request: Request, response: Response, data: ManualRecoveryRequest):
++    response.headers['Cache-Control']='no-store'
++    return recovery_projection(request,document,str(data.request_key),recover=True)
++
++
+ @router.get('/documents/{document}/jd', response_model=models.JdReadResult, response_model_exclude_unset=True)
+ def current(document: str, request: Request):
+     service, scope = scoped(request, document)
+@@ -203,19 +265,9 @@ def manual_save(document: str, request: Request, data: models.JdManualSaveClient
+         intent = manual_intent(scope, data.model_dump(mode='json', exclude_unset=True))
+     except (ValueError, ValidationError):
+         return rejected_manual(request, document, str(data.request_key), 'Invalid scoped manual submission')
+-    with service.lock:
+-        original = service.jd.store.receipt(scope, intent.operation_id, intent.digest)
+-        if original:
+-            return outcome_to_wire(original)
+-        if service.catalog.document(document)['archived']:
+-            return rejected_manual(request, document, str(data.request_key), 'Document is archived', 409)
+-        if service._running(document) or any(r['status'] in {'receiving','running','stopping','uncertain','interrupted'} for r in service.catalog.runs(document)):
+-            return rejected_manual(request, document, str(data.request_key), 'Foreground run must close before manual save', 409)
+-        # Sources remain locators in the existing conversation owner.
+-        reader = service.reader(document)
+-        for reference in source_refs(intent.value):
+-            try:
+-                reader.read(reference)
+-            except ValueError:
+-                return rejected_manual(request, document, str(data.request_key), 'Source is unavailable in this document')
+-        return outcome_to_wire(service.jd.manual_save(intent))
++    try:
++        return outcome_to_wire(service.save_manual(intent,str(data.request_key)))
++    except ServiceConflict as exc:
++        return rejected_manual(request,document,str(data.request_key),str(exc),409)
++    except ValueError:
++        return rejected_manual(request,document,str(data.request_key),'Invalid manual source or identity')
+diff --git a/experiments/analysis-agent/src/analysis_agent/jd_service.py b/experiments/analysis-agent/src/analysis_agent/jd_service.py
+index faa9d06c..a1798b0a 100644
+--- a/experiments/analysis-agent/src/analysis_agent/jd_service.py
++++ b/experiments/analysis-agent/src/analysis_agent/jd_service.py
+@@ -14,14 +14,22 @@ class JdService:
+             raise ValueError('JD and catalog must share one engine')
+         self.store, self.engine, self.catalog = store, engine, catalog
+ 
+-    def create_document(self, title, *, request_key=None):
++    def create_document(self, title, *, request_key=None, cancel=None, native_calls=None):
+         existing = self.catalog.created_by_request(request_key, title)
+         if existing:
+             return existing
+-        value = self.engine.validate_value([{'type': 'p', 'id': str(uuid4()), 'children': [{'text': ''}]}]).value
++        options = self._native_options(cancel, native_calls)
++        value = self.engine.validate_value([{'type': 'p', 'id': str(uuid4()), 'children': [{'text': ''}]}], **options).value
++        if (native_calls is not None and not native_calls.quiescent) or (cancel and cancel.is_set()):
++            raise JdEngineFailure('cancelled', quiescent=native_calls is None or native_calls.quiescent)
+         return self.store.create_document(self.catalog, title, value, request_key=request_key)
+ 
+-    def read(self, scope, query, *, cancel=None):
++    @staticmethod
++    def _native_options(cancel, native_calls):
++        return {**({'cancel':cancel} if cancel is not None else {}),
++                **({'native_calls':native_calls} if native_calls is not None else {})}
++
++    def read(self, scope, query, *, cancel=None, native_calls=None):
+         try:
+             revision = self.store.revision(scope, query.revision_id) if query.revision_id else self.store.current(scope)
+             fragment = revision.value
+@@ -37,7 +45,7 @@ class JdService:
+                     raise JdMissing('Target not found')
+                 fragment = [target]
+             if query.selection:
+-                fragment = self.engine.selection(revision.value, query.selection, **({'cancel':cancel} if cancel is not None else {}))['fragment']
++                fragment = self.engine.selection(revision.value, query.selection, **self._native_options(cancel, native_calls))['fragment']
+             return JdReadView(revision, fragment)
+         except JdMissing:
+             return JdReadView(status='target_missing')
+@@ -59,13 +67,13 @@ class JdService:
+             # their original exception for the runtime owner; no catch-all retry.
+             raise
+ 
+-    def manual_save(self, intent):
+-        return self._write(intent, manual=True)
++    def manual_save(self, intent, *, cancel=None, native_calls=None):
++        return self._write(intent, manual=True, cancel=cancel, native_calls=native_calls)
+ 
+-    def edit(self, intent, *, cancel=None):
+-        return self._write(intent, manual=False, cancel=cancel)
++    def edit(self, intent, *, cancel=None, native_calls=None):
++        return self._write(intent, manual=False, cancel=cancel, native_calls=native_calls)
+ 
+-    def _write(self, intent, *, manual, cancel=None):
++    def _write(self, intent, *, manual, cancel=None, native_calls=None):
+         validate_intent_digest(intent)
+         try:
+             existing = self.store.receipt(intent.scope, intent.operation_id, intent.digest)
+@@ -85,13 +93,18 @@ class JdService:
+         except (DBAPIError, TimeoutError):
+             return failure(intent, 'save_failed', confirmed=False)
+         try:
+-            candidate = self.engine.validate_value(intent.value) if manual else self.engine.transform(base.value, intent.commands, **({"cancel":cancel} if cancel is not None else {}))
++            options = self._native_options(cancel, native_calls)
++            candidate = self.engine.validate_value(intent.value, **options) if manual else self.engine.transform(base.value, intent.commands, **options)
+         except JdEngineFailure as exc:
+             code = engine_error_status(exc.code)
+             error = failure(intent, code, base_id=base.id, code=exc.code, command_index=exc.command_index)
+-            if not exc.quiescent:
++            if not exc.quiescent or (native_calls is not None and not native_calls.quiescent):
+                 return failure(intent, code, base_id=base.id, code=exc.code, confirmed=False)
+             return self.store.publish(intent, error=error)
++        if native_calls is not None and not native_calls.quiescent:
++            return failure(intent, 'save_failed', base_id=base.id, confirmed=False)
++        if cancel and cancel.is_set():
++            return self.store.publish(intent, error=failure(intent, 'save_failed', base_id=base.id, code='cancelled'))
+         return self.store.publish(intent, candidate)
+ 
+     def change_read(self, scope, query):
+diff --git a/experiments/analysis-agent/src/analysis_agent/jd_store.py b/experiments/analysis-agent/src/analysis_agent/jd_store.py
+index 24a1020c..697574fc 100644
+--- a/experiments/analysis-agent/src/analysis_agent/jd_store.py
++++ b/experiments/analysis-agent/src/analysis_agent/jd_store.py
+@@ -169,6 +169,26 @@ class JdStore:
+             self._scope(conn, deadline, scope)
+             return self._receipt(conn, deadline, scope, operation_id, digest)
+ 
++    def reconcile_after_writer_stopped(self, identity, proof):
++        """Read Committed head lock, then one scoped receipt statement.
++
++        publish synchronously acquires this lock before sending any mutation.
++        Once the originating Python writer cannot send further statements, this
++        barrier distinguishes a committed receipt from known unpublished work.
++        """
++        from analysis_agent.jd_reconcile import JdWriterStopped
++        if not isinstance(proof, JdWriterStopped):
++            raise ValueError('App stopped-writer evidence required')
++        proof.require(identity.scope)
++        with self._connection() as (conn, deadline), conn.begin():
++            self._scope(conn, deadline, identity.scope)
++            locked = self._execute(conn, deadline, select(head.c.current_revision_id)
++                .where(head.c.document_id == identity.scope.document_id).with_for_update()).scalar_one_or_none()
++            if locked is None:
++                raise JdMissing('JD head not found at recovery barrier')
++            proof.require(identity.scope)
++            return self._receipt(conn, deadline, identity.scope, identity.operation_id, identity.digest)
++
+     def create_document(self, catalog, title, value, *, request_key=None):
+         if catalog.engine is not self.engine:
+             raise ValueError('Catalog engine mismatch')
+diff --git a/experiments/analysis-agent/src/analysis_agent/jd_tools.py b/experiments/analysis-agent/src/analysis_agent/jd_tools.py
+index fdd96f02..90c0f79a 100644
+--- a/experiments/analysis-agent/src/analysis_agent/jd_tools.py
++++ b/experiments/analysis-agent/src/analysis_agent/jd_tools.py
+@@ -47,6 +47,7 @@ def _jd_message_projection(messages, result_ids):
+ 
+ 
+ class JdSessionState(AgentState):
++    jd_bindings: dict
+     jd_refs: dict
+     jd_sources: dict
+     jd_results: dict
+@@ -61,7 +62,10 @@ class JdSessionState(AgentState):
+ class JdToolSession(AgentMiddleware):
+     state_schema=JdSessionState
+ 
+-    def __init__(self, service, source, *, page_size=64, cancel=None, source_read_tools=()):
++    def __init__(self, service, source, *, page_size=64, cancel=None, source_read_tools=(), native_calls=None):
++        from analysis_agent.jd_engine import JdNativeCalls
++        self.native_calls = native_calls if native_calls is not None else JdNativeCalls()
++        self.stopped_proof = None
+         self.source_read_tools=tuple(t for t in source_read_tools if t.name=="read_conversation")
+         self.cancel=cancel
+         self.model_preparation=ContextVar("jd_model_preparation",default=None)
+@@ -92,7 +96,10 @@ class JdToolSession(AgentMiddleware):
+         if previous and not any(isinstance(m,AIMessage) and m.id==previous.get('response_id')
+                 and m.response_metadata.get('status')=='completed' for m in state['messages']):
+             previous=None
+-        return {'jd_last_model_view':previous,'jd_turn_id':current.id,'jd_binding':None,'jd_turn_notice':None,
++        if state.get('jd_pending_operation') or any(not b.get('closed') for b in state.get('jd_bindings',{}).values()):
++            from analysis_agent.publication import PublicationUncertain
++            raise PublicationUncertain('Prior JD calls must close before a new input')
++        return {'jd_last_model_view':previous,'jd_turn_id':current.id,'jd_binding':None,'jd_turn_notice':None,'jd_bindings':{},
+             'jd_refs':state.get('jd_refs',{}),'jd_results':state.get('jd_results',{}),
+             'jd_sources':{**state.get('jd_sources',{}),source:{'current_input':current.id}}}
+ 
+@@ -118,10 +125,10 @@ class JdToolSession(AgentMiddleware):
+                 binding.update(base=str(base),commands=commands,digest=request_digest(self.scope,base,commands,'ai'))
+             except (ValueError, SchemaValidationError) as exc:
+                 binding['invalid']=str(exc).split('\n')[0][:300]
+-        return {'jd_binding':binding}
++        return {'jd_binding':binding,'jd_bindings':{**state.get('jd_bindings',{}),call['id']:binding}}
+ 
+     def before_model(self,state,runtime):
+-        if state.get("jd_pending_operation"):
++        if state.get("jd_pending_operation") or not self.native_calls.quiescent:
+             from analysis_agent.publication import PublicationUncertain
+             raise PublicationUncertain("JD operation requires reconciliation before another model request")
+         from analysis_agent.jd_context import prepare_notice
+@@ -225,7 +232,7 @@ class JdToolSession(AgentMiddleware):
+         elif 'selection_ref' in args:
+             r=refs.require(args['selection_ref'],'selection'); kind,access='selection',r['access']
+             query=JdReadQuery(UUID(r['revision']),selection=r['range'])
+-        view=self.service.read(self.scope,query, **({"cancel":self.cancel} if self.cancel is not None else {}))
++        view=self.service.read(self.scope,query, cancel=self.cancel, native_calls=self.native_calls)
+         if view.status!='ok': return read_failure_to_wire(view)
+         revision=view.revision; fragment=view.fragment[offset:offset+self.page_size]
+         index={n['id']:n for n in elements(revision.value)}
+@@ -350,7 +357,7 @@ class JdToolSession(AgentMiddleware):
+                         outcome=JdWriteOutcome(self.scope,None,base,None,'stale_view','ai',
+                             durability='unconfirmed',next_action='reread_current')
+                     else:
+-                        outcome=self.service.edit(JdEditIntent(self.scope,operation,base,digest,commands), cancel=self.cancel)
++                        outcome=self.service.edit(JdEditIntent(self.scope,operation,base,digest,commands), cancel=self.cancel, native_calls=self.native_calls)
+                 result=outcome_to_wire(outcome)
+                 if outcome.status in ('committed','no_change'): self._change(refs,outcome)
+         except (ValueError,SchemaValidationError):
+@@ -361,8 +368,64 @@ class JdToolSession(AgentMiddleware):
+         message=ToolMessage(json.dumps(result,ensure_ascii=False),name=name,tool_call_id=call_id,id='jd-result:'+call_id)
+         results={**state.get('jd_results',{}),message.id:{'name':name,'call':call_id,'revision':result.get('revision_ref',result.get('result_revision_ref')),
+             'read_kind':result.get('read_kind'),'continuation':result.get('continuation_ref'),'status':result['status']}}
++        pending = result.get('next_action')=='reconcile_operation' or not self.native_calls.quiescent
+         return Command(update={'messages':[message],'jd_refs':refs.bindings,'jd_results':results,
+-            'jd_pending_operation':deepcopy(binding) if result.get('next_action')=='reconcile_operation' else state.get('jd_pending_operation')})
++            'jd_bindings':{**state.get('jd_bindings',{}),call_id:{**binding,'closed':not pending}},
++            'jd_pending_operation':deepcopy(binding) if pending else state.get('jd_pending_operation')})
++
++    def reconcile(self, state, message, call, config):
++        """Original saved factory identity only; never execute or replay a tool."""
++        from analysis_agent.jd_reconcile import JdAdmittedIdentity, reconcile_identity
++        from analysis_agent.publication import PublicationUncertain
++        self._scope(config)
++        bindings = dict(state.get('jd_bindings',{}))
++        binding = bindings.get(call.get('id'))
++        if binding is None:
++            binding = next((b for b in (state.get('jd_binding'),state.get('jd_pending_operation'))
++                            if b and b.get('call')==call.get('id')), None)
++        identity = [self.scope.document_id, binding.get('input') if binding else None, message.id, call.get('id')]
++        if (not binding or binding.get('document')!=self.scope.document_id
++                or binding.get('message')!=message.id or binding.get('name')!=call.get('name')
++                or binding.get('args')!=call.get('args')
++                or binding.get('operation')!=str(uuid5(NAMESPACE_URL,'jd:'+json.dumps(identity)))
++                or not any(isinstance(m,HumanMessage) and m.id==binding['input'] for m in state['messages'])):
++            raise PublicationUncertain('JD saved call identity cannot be confirmed')
++        if self.stopped_proof is None:
++            raise PublicationUncertain('JD stopped-writer evidence is required')
++        self.stopped_proof.require(self.scope)
++        if call['name']=='jd_edit' and 'invalid' not in binding:
++            if request_digest(self.scope,UUID(binding['base']),binding['commands'],'ai')!=binding['digest']:
++                raise PublicationUncertain('JD saved request digest differs')
++            admitted = JdAdmittedIdentity(self.scope,UUID(binding['operation']),UUID(binding['base']),binding['digest'],'ai')
++            result = outcome_to_wire(reconcile_identity(self.service.store,admitted,self.stopped_proof))
++            content = json.dumps(result,ensure_ascii=False)
++        else:
++            content = 'JD result unavailable/discarded: this turn was closed. Do not infer absence of data.'
++        paired = any(isinstance(m,ToolMessage) and m.tool_call_id==call['id'] for m in state['messages'])
++        bindings[call['id']] = {**binding,'closed':True}
++        return Command(update={'jd_bindings':bindings,'jd_pending_operation':None,
++            'messages':[] if paired else [ToolMessage(content,name=call['name'],tool_call_id=call['id'],id='jd-result:'+call['id'])]})
++
++    def reconcile_all(self, state, config):
++        from analysis_agent.publication import PublicationUncertain
++        working = deepcopy(state)
++        bindings = dict(working.get('jd_bindings',{}))
++        for binding in (working.get('jd_binding'),working.get('jd_pending_operation')):
++            if binding and binding['call'] not in bindings:
++                bindings[binding['call']] = binding
++        working['jd_bindings'] = bindings
++        updates = {'messages':[]}
++        for binding in tuple(bindings.values()):
++            if binding.get('closed'): continue
++            message = next((m for m in working['messages'] if isinstance(m,AIMessage) and m.id==binding['message']),None)
++            call = next((c for c in message.tool_calls if c.get('id')==binding['call']),None) if message else None
++            if call is None: raise PublicationUncertain('JD pending call has no saved response')
++            command = self.reconcile(working,message,call,config)
++            updates['messages'].extend(command.update['messages'])
++            for key,value in command.update.items():
++                if key!='messages': updates[key]=value; working[key]=value
++            working['messages'].extend(command.update['messages'])
++        return updates
+ 
+ 
+ class JdExecutionIdentity(AgentMiddleware):
+diff --git a/experiments/analysis-agent/src/analysis_agent/service.py b/experiments/analysis-agent/src/analysis_agent/service.py
+index 07b0514d..4d4d4cd1 100644
+--- a/experiments/analysis-agent/src/analysis_agent/service.py
++++ b/experiments/analysis-agent/src/analysis_agent/service.py
+@@ -4,9 +4,10 @@ The executor outlives HTTP requests. Stops are cooperative at public middleware
+ boundaries; no Future.cancel(), private graph state, or second message archive.
+ """
+ from concurrent.futures import ThreadPoolExecutor
+-from dataclasses import dataclass
++from dataclasses import dataclass, field
+ import hashlib
+-from threading import Event, RLock
++from threading import Event, RLock, Condition
++from contextlib import contextmanager
+ 
+ from langchain.agents.middleware import AgentMiddleware
+ from langchain_core.exceptions import ModelError
+@@ -23,6 +24,7 @@ from analysis_agent.live_memory import MemorySession
+ from analysis_agent.memory_tools import readonly_file_tools
+ from analysis_agent.skills import SkillAssets, analysis_files, analysis_skills
+ from analysis_agent.provider import is_billing_error
++from analysis_agent.jd_engine import JdNativeCalls
+ 
+ 
+ class ServiceConflict(Exception):
+@@ -68,6 +70,13 @@ class DocumentRuntime:
+     stop: Event
+     memory: MemorySession | None
+     jd_session: object | None = None
++    native_calls: object = field(default_factory=JdNativeCalls)
++    active_entries: int = 0
++    manual_active: bool = False
++    generation: int = 0
++    prior_execution: bool = False
++    closing: bool = False
++    read_stop: Event = field(default_factory=Event)
+ 
+     @property
+     def config(self):
+@@ -107,12 +116,16 @@ def resumable_repair(state):
+ 
+ class AnalysisService:
+     def __init__(self, *, catalog, saver, model, instructions, store=None,
+-                 max_workers=2, max_model_steps=16, max_tool_calls=15, jd=None):
++                 max_workers=2, max_model_steps=16, max_tool_calls=15, jd=None, lifecycle=None):
+         self.catalog, self.saver, self.store = catalog, saver, store
+         self.jd = jd
++        self.lifecycle = lifecycle
++        self.create_calls, self.create_stop = JdNativeCalls(), Event()
++        self.create_active = 0
+         self.model, self.instructions = model, instructions
+         self.max_model_steps, self.max_tool_calls = max_model_steps, max_tool_calls
+         self.lock = RLock()
++        self.entries_changed = Condition(self.lock)
+         self.executor = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix='q019-analysis')
+         self.contexts, self.futures = {}, {}
+         self.background = None
+@@ -133,14 +146,20 @@ class AnalysisService:
+                        MemoryArtifacts(self.store, document, source=reader)), reader,
+                        skill_assets=assets) if self.store is not None else None)
+             from analysis_agent.jd_tools import JdToolSession
+-            jd_session = JdToolSession(self.jd, reader, cancel=stop, source_read_tools=memory.read_tools if memory else ()) if self.jd is not None else None
++            native_calls = JdNativeCalls()
++            jd_session = JdToolSession(self.jd, reader, cancel=stop, native_calls=native_calls, source_read_tools=memory.read_tools if memory else ()) if self.jd is not None else None
+             graph = build_conversation(**common,
+                 tools=[*(memory.tools if memory else readonly_file_tools(analysis_files(assets))),
+                        *(jd_session.tools if jd_session else ())],
+                 middleware=[analysis_skills(assets), *([jd_session] if jd_session else []), *([memory] if memory else []),
+                             BackgroundAvailability(self, document), CooperativeStop(stop)])
+             reader.graph = graph
+-            self.contexts[document] = DocumentRuntime(graph, reader, stop, memory, jd_session)
++            prior = graph.get_state({'configurable':{'thread_id':document}},subgraphs=True)
++            self.contexts[document] = DocumentRuntime(graph, reader, stop, memory, jd_session,native_calls,
++                prior_execution=bool(prior.values.get('jd_manual_pending') or
++                    current_values(prior).get('jd_pending_operation') or
++                    (current_values(prior).get('jd_binding') and not current_values(prior).get('jd_bindings')) or
++                    any(not b.get('closed') for b in current_values(prior).get('jd_bindings',{}).values())))
+         return self.contexts[document]
+ 
+     def enable_background(self, *, max_recoveries, text_threshold=None, extraction_model=None,
+@@ -173,22 +192,46 @@ class AnalysisService:
+ 
+     def start(self):
+         with self.lock:
++            if self.lifecycle is not None:
++                self.lifecycle.verify()
+             for row in self.catalog.runs():
+                 if row['status'] in {'receiving', 'running', 'stopping', 'interrupted', 'uncertain'}:
+-                    self._reconcile(row, startup=True)
++                    try:
++                        self._reconcile(row, startup=True)
++                    except PublicationUncertain:
++                        self.catalog.update_run(row['id'],status='uncertain',error_code='publication_uncertain')
++            if self.jd is not None:
++                for document in self.catalog.documents():
++                    saved = self.saver.get_tuple({'configurable':{'thread_id':document['id']}})
++                    if saved and saved.checkpoint['channel_values'].get('jd_manual_pending'):
++                        context = self._context(document['id'])
++                        try:
++                            self._reconcile_manual(context)
++                        except PublicationUncertain:
++                            # Identity remains durable; explicit recovery can retry.
++                            pass
+             self.accepting = True
+ 
+     def create_document(self, title, *, request_key=None):
+         if not title.strip() or len(title) > 200:
+             raise ValueError('Title must contain 1–200 characters')
+         with self.lock:
++            if not self.accepting:
++                raise ServiceConflict('Service is stopping')
+             options = {'request_key': request_key} if request_key is not None else {}
+-            return self.jd.create_document(title, **options) if self.jd is not None else self.catalog.create_document(title, **options)
++            self.create_active += 1
++        try:
++            return self.jd.create_document(title,cancel=self.create_stop,native_calls=self.create_calls,**options) if self.jd is not None else self.catalog.create_document(title, **options)
++        finally:
++            with self.entries_changed:
++                self.create_active -= 1
++                self.entries_changed.notify_all()
+ 
+     def update_document(self, document, command):
+         with self.lock:
+             self.catalog.document(document)
+-            if self._running(document) or any(r['status'] in {'receiving','running','stopping','uncertain','interrupted'} for r in self.catalog.runs(document)):
++            context = self._context(document)
++            if not self.accepting or self._jd_busy(context) or self._running(document) or any(r['status'] in {'receiving','running','stopping','uncertain','interrupted'} for r in self.catalog.runs(document)):
+                 raise ServiceConflict('Close the foreground run before updating metadata')
+             return self.catalog.update_document(document, command)
+ 
+@@ -215,7 +258,202 @@ class AnalysisService:
+         future = self.futures.get(document)
+         return future is not None and not future.done()
+ 
+-    def _reconcile(self, row, *, startup=False):
++    def _jd_busy(self, context):
++        state = current_values(context.graph.get_state(context.config,subgraphs=True))
++        return (context.closing or context.manual_active or context.active_entries or not context.native_calls.quiescent or
++            context.graph.get_state(context.config).values.get('jd_manual_pending') is not None or
++            bool(state.get('jd_pending_operation')) or
++            any(not b.get('closed') for b in state.get('jd_bindings',{}).values()))
++
++    def _write_blocked(self, context):
++        document = context.reader.document_id
++        return bool(not self.accepting or self.catalog.document(document)['archived'] or
++            self._jd_busy(context) or self._running(document) or
++            context.graph.get_state(context.config).next or
++            any(r['status'] in {'receiving','running','stopping','uncertain','interrupted'}
++                for r in self.catalog.runs(document)))
++
++    def _manual_pending(self, context):
++        from uuid import UUID
++        import re
++        from analysis_agent.jd_contract import manual_operation_id
++        from analysis_agent.jd_types import JdScope
++        pending = context.graph.get_state(context.config).values.get('jd_manual_pending')
++        if pending is None:
++            return None
++        try:
++            valid = (set(pending)=={'operation','base','digest','request_key','origin'} and
++                pending['origin']=='manual' and re.fullmatch('[0-9a-f]{64}',pending['digest']) and
++                str(UUID(pending['request_key']))==pending['request_key'] and
++                str(UUID(pending['base']))==pending['base'] and
++                str(manual_operation_id(JdScope(context.reader.document_id),pending['request_key']))==pending['operation'])
++        except (TypeError,ValueError,KeyError):
++            valid = False
++        if not valid:
++            raise PublicationUncertain('Manual admission identity cannot be confirmed')
++        return pending
++
++    def manual_recovery(self, document, request_key=None):
++        """Pure projection of an original receipt and the same admission owner."""
++        from analysis_agent.jd_contract import manual_operation_id
++        from analysis_agent.jd_types import JdScope
++        with self.lock:
++            context = self._context(document)
++            pending = self._manual_pending(context)
++            key = request_key if request_key is not None else pending['request_key'] if pending else None
++            original = self.jd.store.receipt(JdScope(document),manual_operation_id(JdScope(document),key)) if key else None
++            matched = pending is not None and pending['request_key']==key
++            can_recover = bool(matched and not context.manual_active and not context.closing and
++                not context.active_entries and not self._running(document))
++            result = {'status':'available' if original else 'unknown' if matched else 'no_pending',
++                'request_key':key,'write_blocked':self._write_blocked(context),'can_recover':can_recover}
++            if original:
++                if original.durability!='confirmed' or original.status=='operation_conflict':
++                    raise PublicationUncertain('Original terminal receipt cannot be confirmed')
++                result['result'] = original
++            return result
++
++    def recover_manual(self, document, request_key):
++        """One explicit attempt on the exact original identity; never replay."""
++        with self.lock:
++            initial = self.manual_recovery(document,request_key)
++            context = self._context(document)
++            pending = self._manual_pending(context)
++            if not pending or pending['request_key']!=request_key:
++                return initial
++            if not initial['can_recover']:
++                if initial['status']=='available':
++                    return initial
++                raise ServiceConflict('Original manual publisher or recovery is active')
++            context.closing = True
++            context.generation += 1
++            generation = context.generation
++        try:
++            # This owner retains the original handles. No global lock while waiting.
++            context.native_calls.cleanup()
++            with self.lock:
++                if context.generation!=generation or self._manual_pending(context)!=pending:
++                    raise PublicationUncertain('Manual recovery admission changed')
++                try:
++                    self._reconcile_manual(context)
++                except PublicationUncertain:
++                    pass
++        finally:
++            with self.lock:
++                context.closing = False
++        return self.manual_recovery(document,request_key)
++
++    @contextmanager
++    def jd_read_entry(self, document):
++        with self.lock:
++            if not self.accepting:
++                raise ServiceConflict('Service is stopping')
++            context = self._context(document)
++            context.active_entries += 1
++        try:
++            yield context
++        finally:
++            with self.entries_changed:
++                context.active_entries -= 1
++                self.entries_changed.notify_all()
++
++    def save_manual(self, intent, request_key):
++        from analysis_agent.conversation import save_manual_pending
++        from analysis_agent.jd_contract import validate_intent_digest, manual_operation_id
++        from analysis_agent.jd_references import source_refs
++        validate_intent_digest(intent)
++        if manual_operation_id(intent.scope,request_key)!=intent.operation_id:
++            raise ValueError('Manual request identity differs')
++        document = intent.scope.document_id
++        with self.lock:
++            context = self._context(document)
++            pending = context.graph.get_state(context.config).values.get('jd_manual_pending')
++            if pending and pending.get('request_key')==request_key and not context.manual_active:
++                if pending.get('digest')!=intent.digest:
++                    raise ServiceConflict('Original manual payload differs')
++                return self._reconcile_manual(context)
++            original = self.jd.store.receipt(intent.scope,intent.operation_id,intent.digest)
++            if original:
++                if pending and pending['operation']==str(intent.operation_id) and original.status!='operation_conflict':
++                    save_manual_pending(context.graph,context.config,None)
++                return original
++            if self._write_blocked(context):
++                raise ServiceConflict('Close the admitted foreground/manual operation first')
++            for reference in source_refs(intent.value):
++                context.reader.read(reference)
++            descriptor = {'operation':str(intent.operation_id),'base':str(intent.base_id),
++                'digest':intent.digest,'request_key':request_key,'origin':'manual'}
++            # No candidate or synthetic input is written into this root channel.
++            save_manual_pending(context.graph,context.config,descriptor)
++            context.stop.clear()
++            context.manual_active = True
++            context.active_entries += 1
++            context.generation += 1
++        try:
++            result = self.jd.manual_save(intent,cancel=context.stop,native_calls=context.native_calls)
++            with self.lock:
++                if result.durability=='confirmed' and result.status!='operation_conflict' and context.native_calls.quiescent:
++                    save_manual_pending(context.graph,context.config,None)
++            return result
++        finally:
++            with self.entries_changed:
++                context.manual_active = False
++                context.active_entries -= 1
++                self.entries_changed.notify_all()
++
++    def _reconcile_manual(self, context):
++        """Only the root's admitted identity; no candidate reconstruction."""
++        from uuid import UUID
++        import re
++        from analysis_agent.conversation import save_manual_pending
++        from analysis_agent.jd_types import JdScope
++        from analysis_agent.jd_contract import manual_operation_id
++        from analysis_agent.jd_reconcile import JdWriterStopped,JdAdmittedIdentity,reconcile_identity
++        snapshot = context.graph.get_state(context.config)
++        pending = self._manual_pending(context)
++        if pending is None:
++            return None
++        scope = JdScope(context.reader.document_id)
++        if (snapshot.next or pending.get('origin')!='manual' or
++                set(pending)!= {'operation','base','digest','request_key','origin'} or
++                not re.fullmatch('[0-9a-f]{64}',pending.get('digest','')) or
++                str(manual_operation_id(scope,pending['request_key']))!=pending['operation']):
++            raise PublicationUncertain('Manual admission identity cannot be confirmed')
++        proof = JdWriterStopped(scope,context.native_calls,
++            lambda: not context.active_entries and not self._running(scope.document_id),
++            self.lifecycle,context.prior_execution)
++        identity = JdAdmittedIdentity(scope,UUID(pending['operation']),UUID(pending['base']),pending['digest'],'manual')
++        result = reconcile_identity(self.jd.store,identity,proof)
++        if context.graph.get_state(context.config).values.get('jd_manual_pending')!=pending:
++            raise PublicationUncertain('Manual admission changed during reconciliation')
++        try:
++            save_manual_pending(context.graph,context.config,None)
++        except Exception as exc:
++            raise PublicationUncertain('Original result is terminal but admission cleanup is unconfirmed') from exc
++        context.prior_execution = False
++        return result
++
++    def _close_turn(self, context, *, reason='cancelled', worker_unwound=False):
++        """Caller has reserved this document; no wait while holding admission."""
++        from analysis_agent.jd_reconcile import JdWriterStopped
++        document = context.reader.document_id
++        idle = lambda: (not context.active_entries and
++                        (worker_unwound or not self._running(document)))
++        proof = JdWriterStopped(context.jd_session.scope if context.jd_session else None,
++            context.native_calls,idle,self.lifecycle,context.prior_execution)
++        if context.jd_session:
++            proof.require(context.jd_session.scope)
++            context.jd_session.stopped_proof = proof
++        elif not idle():
++            raise PublicationUncertain('Foreground execution has not stopped')
++        try:
++            return close_turn(context.graph,context.config,reason=reason,quiescent=True,
++                memory_session=context.memory,jd_session=context.jd_session)
++        finally:
++            if context.jd_session:
++                context.jd_session.stopped_proof = None
++
++    def _reconcile(self, row, *, startup=False, observer=False):
+         context = self._context(row['document_id'])
+         snapshot = context.graph.get_state(context.config, subgraphs=True)
+         if not any(m.id == row['id'] for m in snapshot.values.get('messages', [])):
+@@ -226,21 +464,22 @@ class AnalysisService:
+             if child.get('closed_turns', {}).get(row['id']):
+                 # The child finished but the root merge reply was lost. This
+                 # public closure copies the actual terminal result, no model.
+-                if not self._running(row['document_id']):
+-                    close_turn(context.graph, context.config,
+-                        reason='cancelled', quiescent=True, memory_session=context.memory)
++                if not observer and not self._running(row['document_id']):
++                    self._close_turn(context)
+                     snapshot = context.graph.get_state(context.config)
+                     boundary = snapshot.values.get('closed_turns', {}).get(row['id'])
+         if boundary:
++            state = current_values(snapshot)
++            if state.get('jd_pending_operation') or any(not b.get('closed') for b in state.get('jd_bindings',{}).values()) or not context.native_calls.quiescent:
++                return self.catalog.update_run(row['id'],status='uncertain',error_code='publication_uncertain')
+             outcome = snapshot.values.get('turn_outcome')
+             if not outcome or outcome['input_id'] != row['id']:
+                 outcome = row['outcome']
+             return self.catalog.update_run(row['id'], status=boundary['status'], outcome=outcome)
+         if startup:
+-            if row['status'] == 'stopping' and pending_input_id(snapshot) == row['id']:
++            if not observer and row['status'] == 'stopping' and pending_input_id(snapshot) == row['id']:
+                 try:
+-                    close_turn(context.graph, context.config, reason='cancelled', quiescent=True,
+-                               memory_session=context.memory)
++                    self._close_turn(context)
+                 except PublicationUncertain:
+                     return self.catalog.update_run(row['id'], status='uncertain', error_code='publication_uncertain')
+                 return self._reconcile(row)
+@@ -276,12 +515,13 @@ class AnalysisService:
+                 raise ServiceConflict('Document is archived')
+             if self._running(document):
+                 raise ServiceConflict('This document is still running')
++            if self._jd_busy(context):
++                raise ServiceConflict('JD operation must be reconciled before new input')
+             snapshot = context.graph.get_state(context.config)
+             if snapshot.next:
+                 if not abandon_pending:
+                     raise ServiceConflict('Resume or explicitly close the interrupted run first')
+-                close_turn(context.graph, context.config, reason='cancelled', quiescent=True,
+-                           memory_session=context.memory)
++                self._close_turn(context)
+                 for old in self.catalog.runs(document):
+                     if old['status'] in {'running', 'interrupted', 'uncertain', 'stopping'}:
+                         self._reconcile(old)
+@@ -296,17 +536,32 @@ class AnalysisService:
+                     raise ServiceConflict('JD selection belongs to an invalid saved document reference') from exc
+                 current=self.jd.store.current(scope)
+                 if current.id!=base: raise ServiceConflict('JD selection base is stale; select saved current content again')
++                context.active_entries += 1
++                context.generation += 1
++                selection_generation = context.generation
++        if jd_selection is not None:
++            try:
+                 from analysis_agent.jd_engine import JdEngineFailure
+                 try:
+-                    native=self.jd.engine.selection(current.value,jd_selection['range'],cancel=context.stop)
++                    native=self.jd.engine.selection(current.value,jd_selection['range'],cancel=context.stop,native_calls=context.native_calls)
+                 except JdEngineFailure as exc:
+                     if exc.code in {'invalid_input','invalid_selection','invalid_span','target_missing','unsupported_content'}:
+                         raise ServiceConflict('JD selection is unavailable; select supported saved content again') from exc
+                     raise
+-                if self.jd.store.current(scope).id!=base: raise ServiceConflict('JD selection base changed during admission')
+                 selection_context={'document':document,'revision':str(base),'target':native['target_id'],
+                     'range':native['range'],'fragment':native['fragment']}
++            finally:
++                with self.entries_changed:
++                    context.active_entries -= 1
++                    self.entries_changed.notify_all()
++        with self.lock:
++            if not self.accepting or self._running(document) or self._jd_busy(context):
++                raise ServiceConflict('Document admission changed while preparing input')
++            if jd_selection is not None and (context.generation!=selection_generation or
++                    context.stop.is_set() or self.jd.store.current(scope).id!=base):
++                raise ServiceConflict('JD selection base or owner changed during admission')
+             row = existing or self.catalog.create_run(document, request_key, digest)
++            context.generation += 1
+             if selection_context is not None: selection_context['input']=row['id']
+             # as_node START writes the real root input and schedules analysis,
+             # without running a model. It is a public update_state operation.
+@@ -328,8 +583,7 @@ class AnalysisService:
+             context.graph.invoke(None, context.config, durability='sync')
+         except StopRequested:
+             try:
+-                close_turn(context.graph, context.config, reason='cancelled', quiescent=True,
+-                           memory_session=context.memory)
++                self._close_turn(context, worker_unwound=True)
+             except PublicationUncertain:
+                 self.catalog.update_run(run_id, status='uncertain', error_code='publication_uncertain')
+                 return
+@@ -338,8 +592,7 @@ class AnalysisService:
+                 # The model/tool has now unwound, even when it failed. Honor
+                 # the requested stop; do not offer an unwanted network resume.
+                 try:
+-                    close_turn(context.graph, context.config, reason='cancelled', quiescent=True,
+-                               memory_session=context.memory)
++                    self._close_turn(context, worker_unwound=True)
+                 except PublicationUncertain:
+                     code, status = 'publication_uncertain', 'uncertain'
+                 else:
+@@ -354,8 +607,7 @@ class AnalysisService:
+                 status = 'interrupted'
+                 if not retryable:
+                     try:
+-                        close_turn(context.graph, context.config, reason='configuration_error',
+-                                   quiescent=True, memory_session=context.memory)
++                        self._close_turn(context, reason='configuration_error', worker_unwound=True)
+                         status = 'configuration_error'
+                     except PublicationUncertain:
+                         code, status = 'publication_uncertain', 'uncertain'
+@@ -372,7 +624,7 @@ class AnalysisService:
+         with self.lock:
+             row = self.catalog.run(document, run_id)
+             if not self._running(document) and row['status'] in {'receiving', 'running', 'stopping'}:
+-                row = self._reconcile(row, startup=True)
++                row = self._reconcile(row, startup=True, observer=True)
+             context = self._context(document)
+             snapshot = context.graph.get_state(context.config, subgraphs=True)
+             state = current_values(snapshot)
+@@ -392,6 +644,9 @@ class AnalysisService:
+             # receipt identity may re-enter a pending ToolNode.
+             safe_tools = read_call is not None or notification_pending or resumable_repair(state)
+             can_resume = (not self._running(document) and row['status'] in {'interrupted', 'uncertain'}
++                and not context.manual_active and not context.closing and context.native_calls.quiescent
++                and not state.get('jd_pending_operation')
++                and not any(not b.get('closed') for b in state.get('jd_bindings',{}).values())
+                 and (row['error_code'] in {'transport_error', 'process_interrupted'} or repair_resume or read_resume)
+                 and (not at_tools or safe_tools)
+                 and bool(snapshot.next) and pending_input_id(snapshot) == run_id
+@@ -460,16 +715,33 @@ class AnalysisService:
+             row = self.catalog.run(document, run_id)
+             context = self._context(document)
+             snapshot = context.graph.get_state(context.config)
+-            if not snapshot.next or pending_input_id(snapshot) != run_id:
++            state = current_values(context.graph.get_state(context.config,subgraphs=True))
++            pending_jd = state.get('jd_pending_operation') or any(not b.get('closed') for b in state.get('jd_bindings',{}).values())
++            if (not snapshot.next and not pending_jd) or pending_input_id(snapshot) != run_id:
+                 return self.get_run(document, run_id)
+-            if row['status'] in {'running', 'stopping'} and self._running(document):
++            if self._running(document):
+                 context.stop.set()
+                 self.catalog.update_run(run_id, status='stopping')
+-            elif not self._running(document) and row['status'] in {'interrupted', 'uncertain', 'receiving'}:
+-                close_turn(context.graph, context.config, reason='cancelled', quiescent=True,
+-                           memory_session=context.memory)
++                return self.get_run(document,run_id)
++            if context.closing:
++                return self.get_run(document,run_id)
++            context.stop.set()
++            context.closing = True
++            generation = context.generation
++            self.catalog.update_run(run_id,status='stopping')
++        # Same handles only, outside global admission. GET never reaches here.
++        cleaned = context.native_calls.cleanup()
++        with self.lock:
++            try:
++                if not cleaned or generation!=context.generation:
++                    raise PublicationUncertain('JD cleanup/generation is unconfirmed')
++                self._close_turn(context)
+                 self._reconcile(row)
+-            return self.get_run(document, run_id)
++            except PublicationUncertain:
++                self.catalog.update_run(run_id,status='uncertain',error_code='publication_uncertain')
++            finally:
++                context.closing = False
++            return self.get_run(document,run_id)
+ 
+     def join(self, document):
+         """Wait for quiescence without holding admission lock (also used at shutdown)."""
+@@ -480,8 +752,10 @@ class AnalysisService:
+     def close(self):
+         with self.lock:
+             self.accepting = False
++            self.create_stop.set()
+             for context in self.contexts.values():
+                 context.stop.set()
++                context.read_stop.set()
+         if self.scheduler is not None and self.scheduler.running:
+             self.scheduler.shutdown(wait=True)
+         if hasattr(self, 'background_lock'):
+@@ -490,3 +764,26 @@ class AnalysisService:
+             with self.background_lock:
+                 pass
+         self.executor.shutdown(wait=True, cancel_futures=False)
++        with self.entries_changed:
++            drained = self.entries_changed.wait_for(lambda: not self.create_active and
++                all(not context.active_entries for context in self.contexts.values()),timeout=10)
++        if not drained:
++            raise PublicationUncertain('App entry drain is not confirmed')
++        owners = [self.create_calls,*(c.native_calls for c in self.contexts.values())]
++        cleaned = [owner.cleanup() for owner in owners]
++        if not all(cleaned):
++            raise PublicationUncertain('Native cleanup is not confirmed')
++        with self.lock:
++            for context in self.contexts.values():
++                if self.jd is not None:
++                    self._reconcile_manual(context)
++                snapshot = context.graph.get_state(context.config)
++                if snapshot.next and context.jd_session is not None:
++                    try:
++                        self._close_turn(context)
++                    except PublicationUncertain:
++                        # Keep saved unknown work; do not fabricate a result.
++                        continue
++                    for row in self.catalog.runs(context.reader.document_id):
++                        if row['status'] in {'receiving','running','stopping','uncertain','interrupted'}:
++                            self._reconcile(row)
+diff --git a/experiments/analysis-agent/tests/jd_browser_server.py b/experiments/analysis-agent/tests/jd_browser_server.py
+index d32f7fe3..ba011933 100644
+--- a/experiments/analysis-agent/tests/jd_browser_server.py
++++ b/experiments/analysis-agent/tests/jd_browser_server.py
+@@ -29,16 +29,20 @@ from test_native_continuity import response_body, assistant_text
+ 
+ ROOT = Path(__file__).resolve().parents[3]
+ EVIDENCE = ROOT/'.superpowers/sdd/2026-09-10-jd-editor-core-implementation'
++PREFIX = os.environ.get('Q019_TEST_EVIDENCE_PREFIX','task4')
++assert PREFIX in {'task4','task5','task6'}
+ 
+ 
+ @contextmanager
+ def resources():
++    from analysis_agent.windows_lifecycle import require_bootstrap
++    require_bootstrap()
+     dsn = os.environ['Q019_TEST_DATABASE_URL']
+     params = conninfo_to_dict(dsn)
+     assert params['dbname'] == 'q019_jd_app_20260910' and params['host'] == '127.0.0.1'
+     def respond(request):
+         body = json.loads(request.content)
+-        with (EVIDENCE/'task4-browser-provider.jsonl').open('a',encoding='utf-8') as log:
++        with (EVIDENCE/f'{PREFIX}-browser-provider.jsonl').open('a',encoding='utf-8') as log:
+             log.write(json.dumps(body,ensure_ascii=False)+'\n')
+         items = body.get('input', [])
+         last = max((i for i,item in enumerate(items) if item.get('role') == 'user' and 'app_jd_context' not in json.dumps(item)), default=-1)
+@@ -73,7 +77,7 @@ def resources():
+         client=stack.enter_context(httpx.Client(transport=httpx.MockTransport(respond)))
+         model=build_model(model='gpt-5.6-luna',api_key='offline-not-a-key',http_client=client)
+         stack.callback(model.root_client.close)
+-        service=AnalysisService(catalog=catalog,saver=saver,store=store,model=model,jd=jd,instructions='固定離線驗收顧問。')
++        service=AnalysisService(catalog=catalog,saver=saver,store=store,model=model,jd=jd,lifecycle=require_bootstrap(),instructions='固定離線驗收顧問。')
+         stack.callback(service.close); service.start()
+         document=service.create_document('設備維護工程師・完整驗收稿',request_key=str(uuid4()))['id']
+         run=service.submit(document,str(uuid4()),'我負責設備維護，驗收素材由這次已保存問答提供。');service.join(document)
+@@ -85,13 +89,17 @@ def resources():
+                 if 'children' in node:sources(node['children'])
+         sources(value)
+         scope=JdScope(document);base=jd.store.current(scope)
+-        result=jd.manual_save(manual_intent(scope,{'request_key':str(uuid4()),'base_revision_ref':revision_ref(scope,base.id),'value':value}))
++        seed_key=str(uuid4())
++        result=service.save_manual(manual_intent(scope,{'request_key':seed_key,'base_revision_ref':revision_ref(scope,base.id),'value':value}),seed_key)
+         assert result.status=='committed'
+-        (EVIDENCE/'task4-browser-server.json').write_text(json.dumps({'document':document,'url':'http://127.0.0.1:3001/workspace/'+document,
+-            'worker_node':worker.node,'binary':binary,'fixed_transport':True,'real_provider_requests':0,'pid':os.getpid()},ensure_ascii=False,indent=2),encoding='utf-8')
++        (EVIDENCE/f'{PREFIX}-browser-server.json').write_text(json.dumps({'document':document,'url':'http://127.0.0.1:3001/workspace/'+document,
++            'worker_node':worker.node,'binary':binary,'fixed_transport':True,'real_provider_requests':0,'pid':os.getpid(),
++            'lifecycle':require_bootstrap().diagnostics},ensure_ascii=False,indent=2),encoding='utf-8')
+         yield service
+ 
+ 
+ if __name__ == '__main__':
++    from analysis_agent.windows_lifecycle import bootstrap
++    bootstrap()
+     import uvicorn
+     uvicorn.run(create_app(resources),host='127.0.0.1',port=8091,workers=1,reload=False,proxy_headers=False)
+diff --git a/experiments/analysis-agent/uv.lock b/experiments/analysis-agent/uv.lock
+index 0e3facdb..37189db9 100644
+--- a/experiments/analysis-agent/uv.lock
++++ b/experiments/analysis-agent/uv.lock
+@@ -101,6 +101,7 @@ dependencies = [
+     { name = "openai" },
+     { name = "openai-agents" },
+     { name = "psycopg", extra = ["binary"] },
++    { name = "pywin32", marker = "sys_platform == 'win32'" },
+     { name = "sqlalchemy" },
+     { name = "uvicorn" },
+ ]
+@@ -127,6 +128,7 @@ requires-dist = [
+     { name = "openai", specifier = "==3.8.0" },
+     { name = "openai-agents", specifier = "==0.22.0" },
+     { name = "psycopg", extras = ["binary"], specifier = ">=3.2,<4" },
++    { name = "pywin32", marker = "sys_platform == 'win32'", specifier = "==312" },
+     { name = "sqlalchemy", specifier = "==2.0.52" },
+     { name = "uvicorn", specifier = "==0.52.4" },
+ ]
+diff --git a/experiments/jd-editor/web/src/generated/analysis-api.ts b/experiments/jd-editor/web/src/generated/analysis-api.ts
+index 59ac506d..af9601b6 100644
+--- a/experiments/jd-editor/web/src/generated/analysis-api.ts
++++ b/experiments/jd-editor/web/src/generated/analysis-api.ts
+@@ -10,7 +10,9 @@ export type AnalysisApi =
+   | DocumentMetadataInput
+   | JdRunLookupMissing
+   | RunLookupReceived
+-  | ManualSaveRejection;
++  | ManualSaveRejection
++  | ManualRecoveryRequest
++  | (ManualRecoveryAvailable | ManualRecoveryUnknown | ManualRecoveryNoPending);
+ export type Title = string;
+ export type RequestKey = string;
+ export type Id = string;
+@@ -63,6 +65,53 @@ export type InputReceived = boolean;
+ export type Admission = "not_admitted";
+ export type RequestKey2 = string;
+ export type Message = string;
++export type RequestKey3 = string;
++export type WriteBlocked = boolean;
++export type CanRecover = boolean;
++export type Status2 = "available";
++export type RequestKey4 = string;
++export type JdWriteStatus =
++  | "committed"
++  | "no_change"
++  | "invalid_input"
++  | "unsupported_content"
++  | "target_missing"
++  | "stale_base"
++  | "engine_failed"
++  | "save_failed"
++  | "outcome_unknown"
++  | "operation_conflict"
++  | "busy";
++export type DocumentEffect = "unchanged" | "committed" | "unknown";
++export type ReceiptDurability = "confirmed" | "unconfirmed";
++export type Origin = "ai" | "manual" | "initial";
++/**
++ * JSON-safe Plate operations when actually captured. Manual saves may use null; snapshots remain authoritative.
++ */
++export type NativeOperations = JsonObject[] | null;
++export type JsonValue =
++  | boolean
++  | number
++  | string
++  | (JsonValue | null)[]
++  | {
++      [k: string]: JsonValue | null;
++    }
++  | null;
++export type AffectedElementId = string;
++export type AffectedElementIds = AffectedElementId[];
++export type Code = string;
++export type Message1 = string;
++export type CommandIndex = number | null;
++export type NextAction1 = "continue" | "correct_arguments" | "reread_current" | "reconcile_operation" | "wait" | "stop";
++export type WriteBlocked1 = boolean;
++export type CanRecover1 = boolean;
++export type Status3 = "unknown";
++export type RequestKey5 = string;
++export type WriteBlocked2 = boolean;
++export type CanRecover2 = boolean;
++export type Status4 = "no_pending";
++export type RequestKey6 = string | null;
+ 
+ export interface DocumentInput {
+   title: Title;
+@@ -140,3 +189,52 @@ export interface ManualSaveRejection {
+   request_key: RequestKey2;
+   message: Message;
+ }
++export interface ManualRecoveryRequest {
++  request_key: RequestKey3;
++}
++export interface ManualRecoveryAvailable {
++  write_blocked: WriteBlocked;
++  can_recover: CanRecover;
++  status: Status2;
++  request_key: RequestKey4;
++  result: JdManualSaveResult;
++}
++export interface JdManualSaveResult {
++  status: JdWriteStatus;
++  operation_ref: OpaqueRef | null;
++  base_revision_ref: OpaqueRef | null;
++  result_revision_ref: OpaqueRef | null;
++  change_ref: OpaqueRef | null;
++  document_effect: DocumentEffect;
++  receipt_durability: ReceiptDurability;
++  actual_changes: JdActualChanges | null;
++  error: JdToolErrorDetail | null;
++  next_action: NextAction1;
++}
++export interface JdActualChanges {
++  origin: Origin;
++  before_revision_ref: OpaqueRef;
++  after_revision_ref: OpaqueRef;
++  native_operations: NativeOperations;
++  affected_element_ids: AffectedElementIds;
++}
++export interface JsonObject {
++  [k: string]: JsonValue | null;
++}
++export interface JdToolErrorDetail {
++  code: Code;
++  message: Message1;
++  command_index: CommandIndex;
++}
++export interface ManualRecoveryUnknown {
++  write_blocked: WriteBlocked1;
++  can_recover: CanRecover1;
++  status: Status3;
++  request_key: RequestKey5;
++}
++export interface ManualRecoveryNoPending {
++  write_blocked: WriteBlocked2;
++  can_recover: CanRecover2;
++  status: Status4;
++  request_key: RequestKey6;
++}
+diff --git a/experiments/jd-editor/web/src/jd/JdWorkspace.tsx b/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
+index 8ce10365..ddba55c1 100644
+--- a/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
++++ b/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
+@@ -302,14 +302,25 @@ export function JdWorkspace({ document }: { document: string }) {
+               </details>
+             ))}
+           </div>
++          {session.recovery?.request_key && (
++            <aside className="candidate">
++              <h3>{session.recovery.status === 'available' ? '上次人工保存結果' : '上次人工保存结果尚未確認'}</h3>
++              {session.recovery.status === 'available' && <p>{['committed','no_change'].includes(session.recovery.result.status) ? '已確認保存。' : '這次修改未保存：' + session.recovery.result.status}</p>}
++              {!session.candidate && session.recovery.status !== 'available' && <p>本機沒有原候選；仍可確認原保存結果，但無法還原未保存的內容。</p>}
++              {session.recovery.can_recover && <button disabled={session.busy} onClick={() => void session.recoverManual()}>
++                {session.recovery.status === 'available' ? '清理上次保存狀態' : '確認上次保存結果'}
++              </button>}
++              <button disabled={session.busy} onClick={() => void session.revalidate()}>重新讀取狀態</button>
++            </aside>
++          )}
+           {session.candidate && (
+             <aside className="candidate">
+               <h3>尚待處理的送出候選</h3>
+               <p>
+                 這份材料尚未確認保存；不會覆蓋目前工作稿。未處理前關頁再開仍會保留。
+               </p>
+-              <button onClick={() => void session.save(true)}>
+-                依原記錄再次確認
++              <button disabled={!session.canRetryCandidate} onClick={() => void session.save(true)}>
++                再次送出同一份
+               </button>
+               <button
+                 disabled={session.manualUnknown}
+diff --git a/experiments/jd-editor/web/src/jd/api.ts b/experiments/jd-editor/web/src/jd/api.ts
+index 06752793..ef73b831 100644
+--- a/experiments/jd-editor/web/src/jd/api.ts
++++ b/experiments/jd-editor/web/src/jd/api.ts
+@@ -8,6 +8,7 @@ import type {
+   RunLookupReceived,
+   JdRunLookupMissing,
+   ManualSaveRejection,
++  AnalysisApi,
+ } from "../generated/analysis-api";
+ import type {
+   JdReadSuccess,
+@@ -134,5 +135,11 @@ export const api = {
+   },
+   save: (id: string, body: JdManualSaveClientInput) =>
+     request<JdManualSaveResult>(doc(id) + "/jd/manual-save", body),
++  readRecovery: (id: string, key?: string) =>
++    request<Extract<AnalysisApi, {status: 'available' | 'unknown' | 'no_pending'}>>(
++      doc(id) + '/jd/manual-recovery' + (key ? '?request_key=' + encodeURIComponent(key) : '')),
++  recover: (id: string, key: string) =>
++    request<Extract<AnalysisApi, {status: 'available' | 'unknown' | 'no_pending'}>>(
++      doc(id) + '/jd/manual-recovery', {request_key:key}),
+ };
+ export type JdApi = typeof api;
+diff --git a/experiments/jd-editor/web/src/jd/useJdSession.test.tsx b/experiments/jd-editor/web/src/jd/useJdSession.test.tsx
+index 226aa7d8..2ad7e5b9 100644
+--- a/experiments/jd-editor/web/src/jd/useJdSession.test.tsx
++++ b/experiments/jd-editor/web/src/jd/useJdSession.test.tsx
+@@ -47,6 +47,8 @@ function harness() {
+     save: vi.fn(),
+     submit: vi.fn(),
+     lookup: vi.fn(),
++    readRecovery: vi.fn(async (_id: string, key?: string) => ({status:'no_pending', request_key:key ?? null, write_blocked:false, can_recover:false})),
++    recover: vi.fn(),
+   } as JdApi;
+   return { disk, port };
+ }
+@@ -156,12 +158,13 @@ it("unrelated current save cannot consume a reopened confirmed failure candidate
+   const old: Submission = { document_id: "A", request_key: "old-key", base_revision_ref: "old-base",
+     value: [{ ...value[0], children: [{ text: "ONLY RECOVERABLE OLD TEXT" }] }] };
+   submissionCache(disk).write(old);
+-  vi.mocked(port.save).mockResolvedValue({ status: "stale_base", receipt_durability: "confirmed" } as never);
++  vi.mocked(port.readRecovery).mockImplementation(async (_id,key) => ({status:'available', request_key:key ?? 'old-key', write_blocked:false, can_recover:false,
++    result:{status:'stale_base',receipt_durability:'confirmed'}} as never));
+   const session = new JdSession("A", port, disk);
+   await session.load();
+   session.edit([{ ...value[0], children: [{ text: "unrelated current edit" }] }]);
+   expect(await session.save()).toBe(false);
+-  expect(port.save).toHaveBeenCalledTimes(1);
++  expect(port.save).not.toHaveBeenCalled();
+   expect(submissionCache(disk).read("A")).toEqual(old);
+   const reopened = new JdSession("A", port, disk);
+   await reopened.load();
+@@ -173,6 +176,73 @@ it("unrelated current save cannot consume a reopened confirmed failure candidate
+   expect(await reopened.save()).toBe(true);
+   expect(reopened.candidate).toBeNull();
+ });
++
++it('cache-lost discovery is read-only and exposes one explicit original-key recovery', async () => {
++  const {disk,port}=harness();
++  vi.mocked(port.readRecovery).mockResolvedValue({status:'unknown',request_key:'A-key',write_blocked:true,can_recover:true});
++  vi.mocked(port.recover).mockResolvedValue({status:'unknown',request_key:'A-key',write_blocked:true,can_recover:true});
++  const session=new JdSession('A',port,disk);
++  await session.load();
++  expect(port.save).not.toHaveBeenCalled();
++  expect(port.recover).not.toHaveBeenCalled();
++  expect(session.recovery?.request_key).toBe('A-key');
++  expect(session.candidate).toBeNull();
++  expect(session.locked).toBe(true);
++  await session.recoverManual();
++  expect(port.recover).toHaveBeenCalledExactlyOnceWith('A','A-key');
++  expect(session.busy).toBe(false);
++  expect(session.recovery?.status).toBe('unknown');
++});
++
++it('exact cache with no pending allows only explicit full original submission', async () => {
++  const {disk,port}=harness();
++  const candidate:Submission={document_id:'A',request_key:'original',base_revision_ref:'r1',value};
++  submissionCache(disk).write(candidate);
++  vi.mocked(port.save).mockRejectedValue(Error('lost reply'));
++  const session=new JdSession('A',port,disk);
++  await session.load();
++  expect(port.save).not.toHaveBeenCalled();
++  expect(vi.mocked(port.readRecovery).mock.calls).toEqual([['A','original'],['A',undefined]]);
++  expect(session.canRetryCandidate).toBe(true);
++  await session.save(true);
++  expect(port.save).toHaveBeenCalledExactlyOnceWith('A',{request_key:'original',base_revision_ref:'r1',value});
++  expect(port.recover).not.toHaveBeenCalled();
++  expect(session.candidate).toEqual(candidate);
++});
++
++it('late recovery never overwrites a newer candidate or dirty value', async () => {
++  const {disk,port}=harness();
++  vi.mocked(port.readRecovery).mockResolvedValue({status:'unknown',request_key:'A-key',write_blocked:true,can_recover:true});
++  let resolve!: (value:never)=>void;
++  vi.mocked(port.recover).mockReturnValue(new Promise(done=>{resolve=done;}));
++  const session=new JdSession('A',port,disk);
++  await session.load();
++  const work=session.recoverManual();
++  session.unmount();
++  const newer:Submission={document_id:'A',request_key:'B-key',base_revision_ref:'r1',value};
++  session.candidate=newer;
++  session.edit([{...value[0],children:[{text:'new dirty'}]}]);
++  resolve({status:'available',request_key:'A-key',write_blocked:false,can_recover:false,result:{status:'committed',receipt_durability:'confirmed'}} as never);
++  await work;
++  expect(session.candidate).toEqual(newer);
++  expect(session.value[0].children).toEqual([{text:'new dirty'}]);
++  expect(session.serverWriteBlocked).toBe(true);
++});
++
++it('late GET and a failed fresh gate cannot unlock a newer recovery', async () => {
++  const {disk,port}=harness();
++  const session=new JdSession('A',port,disk);
++  await session.load();
++  let resolve!: (value:never)=>void;
++  vi.mocked(port.readRecovery).mockReturnValueOnce(new Promise(done=>{resolve=done;}));
++  const old=session.refreshRecovery();
++  ++session.generation;
++  vi.mocked(port.readRecovery).mockRejectedValueOnce(Error('new snapshot failed'));
++  await expect(session.refreshRecovery()).rejects.toThrow('new snapshot failed');
++  resolve({status:'no_pending',request_key:null,write_blocked:false,can_recover:false} as never);
++  await old;
++  expect(session.serverWriteBlocked).toBe(true);
++});
+ it.each([409, 422])("only an identity-matched explicit rejection unlocks candidate handling (%s)", async (status) => {
+   const { disk, port } = harness();
+   vi.mocked(port.save).mockImplementation(async (_id, body) => {
+diff --git a/experiments/jd-editor/web/src/jd/useJdSession.ts b/experiments/jd-editor/web/src/jd/useJdSession.ts
+index dc439206..3f7d0523 100644
+--- a/experiments/jd-editor/web/src/jd/useJdSession.ts
++++ b/experiments/jd-editor/web/src/jd/useJdSession.ts
+@@ -37,6 +37,10 @@ export class JdSession {
+   loading = true;
+   readUnavailable = false;
+   manualUnknown = false;
++  serverWriteBlocked = true;
++  recovery: Awaited<ReturnType<JdApi['readRecovery']>> | null = null;
++  candidateRecovery: Awaited<ReturnType<JdApi['readRecovery']>> | null = null;
++  recoverySequence = 0;
+   error = "";
+   notice = "";
+   candidate: Submission | null = null;
+@@ -101,6 +105,7 @@ export class JdSession {
+     return (
+       this.loading ||
+       this.readUnavailable ||
++      this.serverWriteBlocked ||
+       this.busy ||
+       this.manualUnknown ||
+       !!this.metadata?.archived ||
+@@ -118,10 +123,10 @@ export class JdSession {
+     this.emit();
+     try {
+       this.candidate = submissionCache(this.disk).read(this.document);
++      this.manualUnknown = !!this.candidate;
+       this.pendingRun = requestRecoveryCache(this.disk).readRun(this.document);
+       if (this.pendingRun) this.text = this.pendingRun.text;
+       await this.refresh();
+-      if (this.candidate) await this.save(true);
+       if (this.pendingRun) await this.lookup();
+     } catch (error) {
+       this.error = String(error);
+@@ -162,6 +167,7 @@ export class JdSession {
+         this.notice = "已有新的保存內容；目前未保存修改仍留在畫面，請先處理。";
+       this.error = "";
+       this.readUnavailable = false;
++      await this.refreshRecovery(generation);
+     } catch (error) {
+       this.readUnavailable = true;
+       this.error = "暫時無法讀取，請重試。" + String(error);
+@@ -170,8 +176,68 @@ export class JdSession {
+       this.emit();
+     }
+   }
++  get canRetryCandidate() {
++    return !!this.candidate && !this.busy && !this.loading && !this.readUnavailable &&
++      !this.serverWriteBlocked && (this.candidateRecovery?.status === 'no_pending' || !this.manualUnknown);
++  }
++  applyRecovery(value: Awaited<ReturnType<JdApi['readRecovery']>>) {
++    if (value.request_key !== this.candidate?.request_key) return;
++    this.candidateRecovery = value;
++    if (value.status !== 'available') return;
++    this.manualUnknown = false;
++    if (['committed','no_change'].includes(value.result.status)) {
++      submissionCache(this.disk).confirm(this.document, value.result);
++      this.candidate = null;
++      this.notice = '已確認上次保存結果；目前工作稿仍保留。';
++    } else this.error = '這次修改尚未保存：' + value.result.status;
++  }
++  async refreshRecovery(generation = this.generation) {
++    const sequence = ++this.recoverySequence;
++    const key = this.candidate?.request_key;
++    const current = () => !this.disposed && generation === this.generation && sequence === this.recoverySequence;
++    this.serverWriteBlocked = true;
++    try {
++      const exact = key ? await this.port.readRecovery(this.document,key) : null;
++      if (!current()) return;
++      const discovery = await this.port.readRecovery(this.document,undefined);
++      if (!current()) return;
++      if (exact && key === this.candidate?.request_key) this.applyRecovery(exact);
++      this.recovery = discovery.request_key ? discovery : exact ?? discovery;
++      this.serverWriteBlocked = discovery.write_blocked;
++    } catch (error) {
++      if (!current()) return;
++      this.serverWriteBlocked = true;
++      this.error = '無法確認保存狀態，請重新讀取：' + String(error);
++      throw error;
++    }
++  }
++  async recoverManual() {
++    const recovery = this.recovery;
++    if (this.busy || !recovery?.can_recover || !recovery.request_key) return;
++    const key = recovery.request_key;
++    const generation = ++this.generation;
++    ++this.recoverySequence;
++    this.serverWriteBlocked = true;
++    this.busy = true;
++    this.emit();
++    try {
++      const result = await this.port.recover(this.document,key);
++      if (this.disposed || generation !== this.generation || this.recovery?.request_key !== key) return;
++      this.applyRecovery(result);
++      this.recovery = result;
++      // A fresh complete snapshot is required even after a terminal result.
++      await this.refresh();
++    } catch (error) {
++      if (!this.disposed && generation === this.generation)
++        this.error = '上次保存結果尚待確認：' + String(error);
++    } finally {
++      this.busy = false;
++      this.emit();
++    }
++  }
+   async save(reconcile = false) {
+     if (!this.head || this.busy) return false;
++    if (reconcile && !this.canRetryCandidate) return false;
+     if (!reconcile && !this.dirty) return true;
+     if (!reconcile && this.locked) return false;
+     if (!reconcile && this.candidate) {
+@@ -180,6 +246,9 @@ export class JdSession {
+     }
+     this.busy = true;
+     this.saving = true;
++    const generation = ++this.generation;
++    ++this.recoverySequence;
++    this.serverWriteBlocked = true;
+     this.emit();
+     try {
+       const cache = submissionCache(this.disk);
+@@ -198,12 +267,14 @@ export class JdSession {
+       const { document_id, ...body } = payload;
+       if (document_id !== this.document) throw Error("文件範圍不符");
+       const receipt = await this.port.save(this.document, body);
++      if (this.disposed || generation !== this.generation || this.candidate?.request_key !== body.request_key) return false;
+       this.manualUnknown = receipt.receipt_durability !== "confirmed";
+       if (
+         receipt.receipt_durability === "confirmed" &&
+         ["committed", "no_change"].includes(receipt.status)
+       ) {
+         const head = await this.port.read(this.document);
++        if (this.disposed || generation !== this.generation || this.candidate?.request_key !== body.request_key) return false;
+         if (head.revision_ref !== receipt.result_revision_ref) {
+           this.notice = "本次保存已確認，已有後續版本。";
+         }
+@@ -236,6 +307,9 @@ export class JdSession {
+       } else this.error = "保存尚未確認：" + String(error);
+       return false;
+     } finally {
++      if (!this.disposed && generation === this.generation) {
++        try { await this.refreshRecovery(generation); } catch { /* Keep the gate blocked. */ }
++      }
+       this.busy = false;
+       this.saving = false;
+       this.emit();
+@@ -287,6 +361,9 @@ export class JdSession {
+     }
+     if (!this.head) return false;
+     this.busy = true;
++    ++this.generation;
++    ++this.recoverySequence;
++    this.serverWriteBlocked = true;
+     this.emit();
+     try {
+       const body: MessageInput =
+@@ -325,6 +402,9 @@ export class JdSession {
+   async stop() {
+     if (!this.run) return;
+     this.busy = true;
++    ++this.generation;
++    ++this.recoverySequence;
++    this.serverWriteBlocked = true;
+     this.emit();
+     try {
+       this.run = await this.port.stop(this.document, this.run.id);
+@@ -339,6 +419,9 @@ export class JdSession {
+   async resume() {
+     if (!this.run?.can_resume) return;
+     this.busy = true;
++    ++this.generation;
++    ++this.recoverySequence;
++    this.serverWriteBlocked = true;
+     this.emit();
+     try {
+       this.run = await this.port.resume(this.document, this.run.id);

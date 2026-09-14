@@ -1,0 +1,62 @@
+{
+  "bugs": {
+    "url": "https://github.com/facebook/react/issues"
+  },
+  "dist": {
+    "shasum": "ee565c2cd3437a41e7fc31d8ab6c662f6b568fc0",
+    "tarball": "https://registry.npmjs.org/react-compiler-runtime/-/react-compiler-runtime-1.0.0.tgz",
+    "fileCount": 6,
+    "integrity": "sha512-rRfjYv66HlG8896yPUDONgKzG5BxZD1nV9U6rkm+7VCuvQc903C4MjcoZR4zPw53IKSOX9wMQVpA1IAbRtzQ7w==",
+    "signatures": [
+      {
+        "sig": "MEUCIQDOefDV6YX+Xpu705wR93jZ2krBR5TDKZTcKlaR8IF1aQIgYw6NFcvqx7PwNDOfSUQ7v6wldS+js2cEUyaXVdNjTYg=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "unpackedSize": 45698
+  },
+  "main": "dist/index.js",
+  "name": "react-compiler-runtime",
+  "gitHead": "5c15c1cd3442f28044217703b5625f98c40042ee",
+  "license": "MIT",
+  "scripts": {
+    "test": "echo 'no tests'",
+    "build": "rimraf dist && tsup",
+    "watch": "yarn build --watch"
+  },
+  "typings": "dist/index.d.ts",
+  "_npmUser": {
+    "name": "react-bot",
+    "email": "react-core@meta.com"
+  },
+  "homepage": "https://github.com/facebook/react#readme",
+  "repository": {
+    "url": "git+https://github.com/facebook/react.git",
+    "type": "git",
+    "directory": "compiler/packages/react-compiler-runtime"
+  },
+  "_npmVersion": "10.8.2",
+  "description": "Runtime for React Compiler",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "fb",
+      "email": "opensource+npm@fb.com"
+    },
+    {
+      "name": "react-bot",
+      "email": "react-core@meta.com"
+    }
+  ],
+  "_nodeVersion": "20.19.0",
+  "_hasShrinkwrap": false,
+  "peerDependencies": {
+    "react": "^17.0.0 || ^18.0.0 || ^19.0.0 || ^0.0.0-experimental"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/react-compiler-runtime_1.0.0_1759864747359_0.6359724726665108",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "react-compiler-runtime@1.0.0",
+  "version": "1.0.0"
+}

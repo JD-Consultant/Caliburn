@@ -1,0 +1,39 @@
+{
+  "id": "F03-D",
+  "description": "原生 unwrap／delete 與最終候選邊界",
+  "passed": true,
+  "checks": [
+    {
+      "name": "單 unwrap 原生執行但產生非法 group parent，不假稱原生拒絕",
+      "passed": true
+    },
+    {
+      "name": "明示同批先兩組後Task：全文／文字格式保留、最終有效",
+      "passed": true
+    },
+    {
+      "name": "合法 flatten 新程序全等",
+      "passed": true
+    },
+    {
+      "name": "單刪群組原生不阻擋，但 final group-count 不成立",
+      "passed": true
+    },
+    {
+      "name": "清空內容保留原要求組與合法空 p，不生成假工作",
+      "passed": true
+    },
+    {
+      "name": "刪被引用K原生不阻擋，固定端點檢查辨識所有受影響Task",
+      "passed": true
+    },
+    {
+      "name": "同批明示解除全部相關links後可刪K，Task／其他引用不連帶刪除",
+      "passed": true
+    },
+    {
+      "name": "合法解除／刪除後新程序全等",
+      "passed": true
+    }
+  ]
+}

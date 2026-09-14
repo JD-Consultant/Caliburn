@@ -1,0 +1,5899 @@
+{
+  'R01-F1': {
+    fixedResolutionIds: [
+      'ZGXJMoVuecTRW9aHmyE5d',
+      '5IE5qwahRmkLHapfW5AEX',
+      'm3B3MrQpdikPTtR3cTYVP'
+    ],
+    steps: [
+      {
+        resolvedId: 'ZGXJMoVuecTRW9aHmyE5d',
+        action: 'accept',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。',
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600871,
+                    type: 'remove',
+                    userId: 'human'
+                  }
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'remove',
+                    userId: 'ai'
+                  }
+                },
+                {
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          monthlyAllStoredText: '所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          suggestionEntries: [
+            {
+              path: [
+                0,
+                0
+              ],
+              nodeId: null,
+              data: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                0
+              ],
+              nodeId: null,
+              data: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600871,
+                type: 'remove',
+                userId: 'human'
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                2
+              ],
+              nodeId: null,
+              data: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'insert',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5IE5qwahRmkLHapfW5AEX',
+            'm3B3MrQpdikPTtR3cTYVP'
+          ],
+          allRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5IE5qwahRmkLHapfW5AEX',
+            'm3B3MrQpdikPTtR3cTYVP',
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  node: {
+                    text: '僅有月檢約定的專案按月檢查。',
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600822,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        resolvedId: '5IE5qwahRmkLHapfW5AEX',
+        action: 'accept',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'remove',
+                    userId: 'ai'
+                  }
+                },
+                {
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查，並記錄結果。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          suggestionEntries: [
+            {
+              path: [
+                0,
+                0
+              ],
+              nodeId: null,
+              data: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              }
+            },
+            {
+              path: [
+                0,
+                0
+              ],
+              nodeId: null,
+              data: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'insert',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [
+            '5IE5qwahRmkLHapfW5AEX',
+            'm3B3MrQpdikPTtR3cTYVP'
+          ],
+          allRemainingIds: [
+            '5IE5qwahRmkLHapfW5AEX',
+            'm3B3MrQpdikPTtR3cTYVP',
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  node: {
+                    text: '僅有月檢約定的專案按月檢查。',
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600822,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  node: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600818,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true,
+                    text: '所有專案都按月檢查。',
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600871,
+                      type: 'remove',
+                      userId: 'human'
+                    }
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        resolvedId: 'm3B3MrQpdikPTtR3cTYVP',
+        action: 'accept',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          suggestionEntries: [
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [],
+          allRemainingIds: [
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  node: {
+                    text: '僅有月檢約定的專案按月檢查。',
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600822,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  node: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600818,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true,
+                    text: '所有專案都按月檢查。',
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600871,
+                      type: 'remove',
+                      userId: 'human'
+                    }
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    1
+                  ],
+                  properties: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  node: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600870,
+                      type: 'insert',
+                      userId: 'human'
+                    },
+                    suggestion: true,
+                    text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'remove',
+                      userId: 'ai'
+                    }
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    before: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。',
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600822,
+                type: 'remove',
+                userId: 'ai'
+              },
+              suggestion: true
+            },
+            {
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '所有專案都按月檢查。',
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600871,
+                type: 'remove',
+                userId: 'human'
+              }
+            },
+            {
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              },
+              suggestion: true,
+              text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+              suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          nodeId: null,
+          data: {
+            id: 'ZGXJMoVuecTRW9aHmyE5d',
+            createdAt: 1788964600822,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          nodeId: null,
+          data: {
+            id: 'ZGXJMoVuecTRW9aHmyE5d',
+            createdAt: 1788964600818,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          nodeId: null,
+          data: {
+            id: '5IE5qwahRmkLHapfW5AEX',
+            createdAt: 1788964600871,
+            type: 'remove',
+            userId: 'human'
+          }
+        },
+        {
+          path: [
+            0,
+            2
+          ],
+          nodeId: null,
+          data: {
+            id: '5IE5qwahRmkLHapfW5AEX',
+            createdAt: 1788964600870,
+            type: 'insert',
+            userId: 'human'
+          }
+        },
+        {
+          path: [
+            0,
+            2
+          ],
+          nodeId: null,
+          data: {
+            id: 'm3B3MrQpdikPTtR3cTYVP',
+            createdAt: 1788964600879,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            3
+          ],
+          nodeId: null,
+          data: {
+            id: 'm3B3MrQpdikPTtR3cTYVP',
+            createdAt: 1788964600879,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [
+        'ZGXJMoVuecTRW9aHmyE5d',
+        '5IE5qwahRmkLHapfW5AEX',
+        'm3B3MrQpdikPTtR3cTYVP'
+      ],
+      allRemainingIds: [
+        'ZGXJMoVuecTRW9aHmyE5d',
+        '5IE5qwahRmkLHapfW5AEX',
+        'm3B3MrQpdikPTtR3cTYVP',
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: []
+    },
+    after: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [],
+      allRemainingIds: [
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                0
+              ],
+              node: {
+                text: '僅有月檢約定的專案按月檢查。',
+                suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                  id: 'ZGXJMoVuecTRW9aHmyE5d',
+                  createdAt: 1788964600822,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。',
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600871,
+                    type: 'remove',
+                    userId: 'human'
+                  }
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'remove',
+                    userId: 'ai'
+                  }
+                },
+                {
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                0
+              ],
+              node: {
+                suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                  id: 'ZGXJMoVuecTRW9aHmyE5d',
+                  createdAt: 1788964600818,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                suggestion: true,
+                text: '所有專案都按月檢查。',
+                suggestion_5IE5qwahRmkLHapfW5AEX: {
+                  id: '5IE5qwahRmkLHapfW5AEX',
+                  createdAt: 1788964600871,
+                  type: 'remove',
+                  userId: 'human'
+                }
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'remove',
+                    userId: 'ai'
+                  }
+                },
+                {
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                1
+              ],
+              properties: {
+                suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                  id: 'm3B3MrQpdikPTtR3cTYVP',
+                  createdAt: 1788964600879,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            },
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                0
+              ],
+              node: {
+                suggestion_5IE5qwahRmkLHapfW5AEX: {
+                  id: '5IE5qwahRmkLHapfW5AEX',
+                  createdAt: 1788964600870,
+                  type: 'insert',
+                  userId: 'human'
+                },
+                suggestion: true,
+                text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                  id: 'm3B3MrQpdikPTtR3cTYVP',
+                  createdAt: 1788964600879,
+                  type: 'remove',
+                  userId: 'ai'
+                }
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        }
+      ]
+    },
+    afterFinalReopen: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [],
+      allRemainingIds: [
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: []
+    }
+  },
+  'R01-F2': {
+    fixedResolutionIds: [
+      'm3B3MrQpdikPTtR3cTYVP',
+      '5IE5qwahRmkLHapfW5AEX',
+      'ZGXJMoVuecTRW9aHmyE5d'
+    ],
+    steps: [
+      {
+        resolvedId: 'm3B3MrQpdikPTtR3cTYVP',
+        action: 'accept',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600822,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。',
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600871,
+                    type: 'remove',
+                    userId: 'human'
+                  }
+                },
+                {
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          suggestionEntries: [
+            {
+              path: [
+                0,
+                0
+              ],
+              nodeId: null,
+              data: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600822,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600871,
+                type: 'remove',
+                userId: 'human'
+              }
+            },
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5IE5qwahRmkLHapfW5AEX'
+          ],
+          allRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5IE5qwahRmkLHapfW5AEX',
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    3
+                  ],
+                  properties: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  node: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600870,
+                      type: 'insert',
+                      userId: 'human'
+                    },
+                    suggestion: true,
+                    text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'remove',
+                      userId: 'ai'
+                    }
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        resolvedId: '5IE5qwahRmkLHapfW5AEX',
+        action: 'accept',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600822,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          suggestionEntries: [
+            {
+              path: [
+                0,
+                0
+              ],
+              nodeId: null,
+              data: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600822,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d'
+          ],
+          allRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    3
+                  ],
+                  properties: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  node: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600870,
+                      type: 'insert',
+                      userId: 'human'
+                    },
+                    suggestion: true,
+                    text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'remove',
+                      userId: 'ai'
+                    }
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    1
+                  ],
+                  node: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600818,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true,
+                    text: '所有專案都按月檢查。',
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600871,
+                      type: 'remove',
+                      userId: 'human'
+                    }
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        resolvedId: 'ZGXJMoVuecTRW9aHmyE5d',
+        action: 'accept',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          suggestionEntries: [
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [],
+          allRemainingIds: [
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    3
+                  ],
+                  properties: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  node: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600870,
+                      type: 'insert',
+                      userId: 'human'
+                    },
+                    suggestion: true,
+                    text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'remove',
+                      userId: 'ai'
+                    }
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    1
+                  ],
+                  node: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600818,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true,
+                    text: '所有專案都按月檢查。',
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600871,
+                      type: 'remove',
+                      userId: 'human'
+                    }
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  node: {
+                    text: '僅有月檢約定的專案按月檢查。',
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600822,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    before: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。',
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600822,
+                type: 'remove',
+                userId: 'ai'
+              },
+              suggestion: true
+            },
+            {
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '所有專案都按月檢查。',
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600871,
+                type: 'remove',
+                userId: 'human'
+              }
+            },
+            {
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              },
+              suggestion: true,
+              text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+              suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          nodeId: null,
+          data: {
+            id: 'ZGXJMoVuecTRW9aHmyE5d',
+            createdAt: 1788964600822,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          nodeId: null,
+          data: {
+            id: 'ZGXJMoVuecTRW9aHmyE5d',
+            createdAt: 1788964600818,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          nodeId: null,
+          data: {
+            id: '5IE5qwahRmkLHapfW5AEX',
+            createdAt: 1788964600871,
+            type: 'remove',
+            userId: 'human'
+          }
+        },
+        {
+          path: [
+            0,
+            2
+          ],
+          nodeId: null,
+          data: {
+            id: '5IE5qwahRmkLHapfW5AEX',
+            createdAt: 1788964600870,
+            type: 'insert',
+            userId: 'human'
+          }
+        },
+        {
+          path: [
+            0,
+            2
+          ],
+          nodeId: null,
+          data: {
+            id: 'm3B3MrQpdikPTtR3cTYVP',
+            createdAt: 1788964600879,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            3
+          ],
+          nodeId: null,
+          data: {
+            id: 'm3B3MrQpdikPTtR3cTYVP',
+            createdAt: 1788964600879,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [
+        'ZGXJMoVuecTRW9aHmyE5d',
+        '5IE5qwahRmkLHapfW5AEX',
+        'm3B3MrQpdikPTtR3cTYVP'
+      ],
+      allRemainingIds: [
+        'ZGXJMoVuecTRW9aHmyE5d',
+        '5IE5qwahRmkLHapfW5AEX',
+        'm3B3MrQpdikPTtR3cTYVP',
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: []
+    },
+    after: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [],
+      allRemainingIds: [
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                3
+              ],
+              properties: {
+                suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                  id: 'm3B3MrQpdikPTtR3cTYVP',
+                  createdAt: 1788964600879,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            },
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                2
+              ],
+              node: {
+                suggestion_5IE5qwahRmkLHapfW5AEX: {
+                  id: '5IE5qwahRmkLHapfW5AEX',
+                  createdAt: 1788964600870,
+                  type: 'insert',
+                  userId: 'human'
+                },
+                suggestion: true,
+                text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                  id: 'm3B3MrQpdikPTtR3cTYVP',
+                  createdAt: 1788964600879,
+                  type: 'remove',
+                  userId: 'ai'
+                }
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600822,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。',
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600871,
+                    type: 'remove',
+                    userId: 'human'
+                  }
+                },
+                {
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                1
+              ],
+              node: {
+                suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                  id: 'ZGXJMoVuecTRW9aHmyE5d',
+                  createdAt: 1788964600818,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                suggestion: true,
+                text: '所有專案都按月檢查。',
+                suggestion_5IE5qwahRmkLHapfW5AEX: {
+                  id: '5IE5qwahRmkLHapfW5AEX',
+                  createdAt: 1788964600871,
+                  type: 'remove',
+                  userId: 'human'
+                }
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600822,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                0
+              ],
+              node: {
+                text: '僅有月檢約定的專案按月檢查。',
+                suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                  id: 'ZGXJMoVuecTRW9aHmyE5d',
+                  createdAt: 1788964600822,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        }
+      ]
+    },
+    afterFinalReopen: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [],
+      allRemainingIds: [
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: []
+    }
+  },
+  'R01-F3': {
+    fixedResolutionIds: [
+      'ZGXJMoVuecTRW9aHmyE5d',
+      '5IE5qwahRmkLHapfW5AEX',
+      'm3B3MrQpdikPTtR3cTYVP'
+    ],
+    steps: [
+      {
+        resolvedId: 'ZGXJMoVuecTRW9aHmyE5d',
+        action: 'reject',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。',
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600871,
+                    type: 'remove',
+                    userId: 'human'
+                  }
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'remove',
+                    userId: 'ai'
+                  }
+                },
+                {
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          suggestionEntries: [
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600871,
+                type: 'remove',
+                userId: 'human'
+              }
+            },
+            {
+              path: [
+                0,
+                2
+              ],
+              nodeId: null,
+              data: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              }
+            },
+            {
+              path: [
+                0,
+                2
+              ],
+              nodeId: null,
+              data: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                3
+              ],
+              nodeId: null,
+              data: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'insert',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5IE5qwahRmkLHapfW5AEX',
+            'm3B3MrQpdikPTtR3cTYVP'
+          ],
+          allRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5IE5qwahRmkLHapfW5AEX',
+            'm3B3MrQpdikPTtR3cTYVP',
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  properties: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600822,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。'
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        resolvedId: '5IE5qwahRmkLHapfW5AEX',
+        action: 'reject',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  text: '所有專案都按月檢查。'
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'remove',
+                    userId: 'ai'
+                  }
+                },
+                {
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+          suggestionEntries: [
+            {
+              path: [
+                0,
+                2
+              ],
+              nodeId: null,
+              data: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              }
+            },
+            {
+              path: [
+                0,
+                2
+              ],
+              nodeId: null,
+              data: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                3
+              ],
+              nodeId: null,
+              data: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'insert',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [
+            '5IE5qwahRmkLHapfW5AEX',
+            'm3B3MrQpdikPTtR3cTYVP'
+          ],
+          allRemainingIds: [
+            '5IE5qwahRmkLHapfW5AEX',
+            'm3B3MrQpdikPTtR3cTYVP',
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  properties: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600822,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。'
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    1
+                  ],
+                  properties: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600871,
+                      type: 'remove',
+                      userId: 'human'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。'
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      text: '所有專案都按月檢查。'
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        resolvedId: 'm3B3MrQpdikPTtR3cTYVP',
+        action: 'reject',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  text: '所有專案都按月檢查。'
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。',
+          suggestionEntries: [
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [],
+          allRemainingIds: [
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  properties: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600822,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。'
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    1
+                  ],
+                  properties: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600871,
+                      type: 'remove',
+                      userId: 'human'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。'
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      text: '所有專案都按月檢查。'
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'remove',
+                        userId: 'ai'
+                      }
+                    },
+                    {
+                      suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                        id: 'm3B3MrQpdikPTtR3cTYVP',
+                        createdAt: 1788964600879,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  properties: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    3
+                  ],
+                  node: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true,
+                    text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。'
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      text: '所有專案都按月檢查。'
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    before: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。',
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600822,
+                type: 'remove',
+                userId: 'ai'
+              },
+              suggestion: true
+            },
+            {
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '所有專案都按月檢查。',
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600871,
+                type: 'remove',
+                userId: 'human'
+              }
+            },
+            {
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              },
+              suggestion: true,
+              text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+              suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          nodeId: null,
+          data: {
+            id: 'ZGXJMoVuecTRW9aHmyE5d',
+            createdAt: 1788964600822,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          nodeId: null,
+          data: {
+            id: 'ZGXJMoVuecTRW9aHmyE5d',
+            createdAt: 1788964600818,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          nodeId: null,
+          data: {
+            id: '5IE5qwahRmkLHapfW5AEX',
+            createdAt: 1788964600871,
+            type: 'remove',
+            userId: 'human'
+          }
+        },
+        {
+          path: [
+            0,
+            2
+          ],
+          nodeId: null,
+          data: {
+            id: '5IE5qwahRmkLHapfW5AEX',
+            createdAt: 1788964600870,
+            type: 'insert',
+            userId: 'human'
+          }
+        },
+        {
+          path: [
+            0,
+            2
+          ],
+          nodeId: null,
+          data: {
+            id: 'm3B3MrQpdikPTtR3cTYVP',
+            createdAt: 1788964600879,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            3
+          ],
+          nodeId: null,
+          data: {
+            id: 'm3B3MrQpdikPTtR3cTYVP',
+            createdAt: 1788964600879,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [
+        'ZGXJMoVuecTRW9aHmyE5d',
+        '5IE5qwahRmkLHapfW5AEX',
+        'm3B3MrQpdikPTtR3cTYVP'
+      ],
+      allRemainingIds: [
+        'ZGXJMoVuecTRW9aHmyE5d',
+        '5IE5qwahRmkLHapfW5AEX',
+        'm3B3MrQpdikPTtR3cTYVP',
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: []
+    },
+    after: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。'
+            },
+            {
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              },
+              text: '所有專案都按月檢查。'
+            },
+            {
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              },
+              text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。',
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [],
+      allRemainingIds: [
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                  id: 'ZGXJMoVuecTRW9aHmyE5d',
+                  createdAt: 1788964600822,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。',
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600871,
+                    type: 'remove',
+                    userId: 'human'
+                  }
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'remove',
+                    userId: 'ai'
+                  }
+                },
+                {
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                1
+              ],
+              properties: {
+                suggestion_5IE5qwahRmkLHapfW5AEX: {
+                  id: '5IE5qwahRmkLHapfW5AEX',
+                  createdAt: 1788964600871,
+                  type: 'remove',
+                  userId: 'human'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  text: '所有專案都按月檢查。'
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'remove',
+                    userId: 'ai'
+                  }
+                },
+                {
+                  suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                    id: 'm3B3MrQpdikPTtR3cTYVP',
+                    createdAt: 1788964600879,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                2
+              ],
+              properties: {
+                suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                  id: 'm3B3MrQpdikPTtR3cTYVP',
+                  createdAt: 1788964600879,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            },
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                3
+              ],
+              node: {
+                suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                  id: 'm3B3MrQpdikPTtR3cTYVP',
+                  createdAt: 1788964600879,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                suggestion: true,
+                text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  text: '所有專案都按月檢查。'
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        }
+      ]
+    },
+    afterFinalReopen: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。'
+            },
+            {
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              },
+              text: '所有專案都按月檢查。'
+            },
+            {
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              },
+              text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。',
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [],
+      allRemainingIds: [
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: []
+    }
+  },
+  'R01-F4': {
+    fixedResolutionIds: [
+      'm3B3MrQpdikPTtR3cTYVP',
+      '5IE5qwahRmkLHapfW5AEX',
+      'ZGXJMoVuecTRW9aHmyE5d'
+    ],
+    steps: [
+      {
+        resolvedId: 'm3B3MrQpdikPTtR3cTYVP',
+        action: 'reject',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600822,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。',
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600871,
+                    type: 'remove',
+                    userId: 'human'
+                  }
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，並記錄結果。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。',
+          suggestionEntries: [
+            {
+              path: [
+                0,
+                0
+              ],
+              nodeId: null,
+              data: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600822,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              nodeId: null,
+              data: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600871,
+                type: 'remove',
+                userId: 'human'
+              }
+            },
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5IE5qwahRmkLHapfW5AEX'
+          ],
+          allRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5IE5qwahRmkLHapfW5AEX',
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  properties: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    3
+                  ],
+                  node: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true,
+                    text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        resolvedId: '5IE5qwahRmkLHapfW5AEX',
+        action: 'reject',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600822,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  text: '所有專案都按月檢查。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '所有專案都按月檢查。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。',
+          suggestionEntries: [
+            {
+              path: [
+                0,
+                0
+              ],
+              nodeId: null,
+              data: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600822,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d'
+          ],
+          allRemainingIds: [
+            'ZGXJMoVuecTRW9aHmyE5d',
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  properties: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    3
+                  ],
+                  node: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true,
+                    text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    1
+                  ],
+                  properties: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600871,
+                      type: 'remove',
+                      userId: 'human'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  node: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600870,
+                      type: 'insert',
+                      userId: 'human'
+                    },
+                    text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      text: '所有專案都按月檢查。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      },
+      {
+        resolvedId: 'ZGXJMoVuecTRW9aHmyE5d',
+        action: 'reject',
+        after: {
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          selection: null,
+          monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查。',
+          monthlyAllStoredText: '僅有月檢約定的專案按月檢查。',
+          suggestionEntries: [
+            {
+              path: [
+                2
+              ],
+              nodeId: 'fault',
+              data: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ],
+          monthlyRemainingIds: [],
+          allRemainingIds: [
+            '5XwiFDd56xGxBbJcx_TD2'
+          ],
+          batches: [
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  properties: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    3
+                  ],
+                  node: {
+                    suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                      id: 'm3B3MrQpdikPTtR3cTYVP',
+                      createdAt: 1788964600879,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    suggestion: true,
+                    text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      suggestion: true,
+                      text: '所有專案都按月檢查。',
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600871,
+                        type: 'remove',
+                        userId: 'human'
+                      }
+                    },
+                    {
+                      suggestion_5IE5qwahRmkLHapfW5AEX: {
+                        id: '5IE5qwahRmkLHapfW5AEX',
+                        createdAt: 1788964600870,
+                        type: 'insert',
+                        userId: 'human'
+                      },
+                      text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    1
+                  ],
+                  properties: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600871,
+                      type: 'remove',
+                      userId: 'human'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    2
+                  ],
+                  node: {
+                    suggestion_5IE5qwahRmkLHapfW5AEX: {
+                      id: '5IE5qwahRmkLHapfW5AEX',
+                      createdAt: 1788964600870,
+                      type: 'insert',
+                      userId: 'human'
+                    },
+                    text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。',
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600822,
+                        type: 'remove',
+                        userId: 'ai'
+                      },
+                      suggestion: true
+                    },
+                    {
+                      suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                        id: 'ZGXJMoVuecTRW9aHmyE5d',
+                        createdAt: 1788964600818,
+                        type: 'insert',
+                        userId: 'ai'
+                      },
+                      text: '所有專案都按月檢查。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            },
+            {
+              operations: [
+                {
+                  type: 'set_node',
+                  path: [
+                    0,
+                    0
+                  ],
+                  properties: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600822,
+                      type: 'remove',
+                      userId: 'ai'
+                    },
+                    suggestion: true
+                  },
+                  newProperties: {}
+                },
+                {
+                  type: 'remove_node',
+                  path: [
+                    0,
+                    1
+                  ],
+                  node: {
+                    suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                      id: 'ZGXJMoVuecTRW9aHmyE5d',
+                      createdAt: 1788964600818,
+                      type: 'insert',
+                      userId: 'ai'
+                    },
+                    text: '所有專案都按月檢查。'
+                  }
+                }
+              ],
+              value: [
+                {
+                  type: 'p',
+                  id: 'monthly',
+                  children: [
+                    {
+                      text: '僅有月檢約定的專案按月檢查。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'delivery',
+                  children: [
+                    {
+                      text: '交付版本與檢查結果一致。'
+                    }
+                  ]
+                },
+                {
+                  type: 'p',
+                  id: 'fault',
+                  children: [
+                    {
+                      text: '記錄故障處理結果與未解事項。'
+                    }
+                  ],
+                  suggestion: {
+                    id: '5XwiFDd56xGxBbJcx_TD2',
+                    createdAt: 1788964600846,
+                    type: 'insert',
+                    userId: 'ai'
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      }
+    ],
+    before: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。',
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600822,
+                type: 'remove',
+                userId: 'ai'
+              },
+              suggestion: true
+            },
+            {
+              suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                id: 'ZGXJMoVuecTRW9aHmyE5d',
+                createdAt: 1788964600818,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '所有專案都按月檢查。',
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600871,
+                type: 'remove',
+                userId: 'human'
+              }
+            },
+            {
+              suggestion_5IE5qwahRmkLHapfW5AEX: {
+                id: '5IE5qwahRmkLHapfW5AEX',
+                createdAt: 1788964600870,
+                type: 'insert',
+                userId: 'human'
+              },
+              suggestion: true,
+              text: '僅有月檢約定的專案按月檢查，並記錄結果。',
+              suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'remove',
+                userId: 'ai'
+              }
+            },
+            {
+              suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                id: 'm3B3MrQpdikPTtR3cTYVP',
+                createdAt: 1788964600879,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。',
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          nodeId: null,
+          data: {
+            id: 'ZGXJMoVuecTRW9aHmyE5d',
+            createdAt: 1788964600822,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          nodeId: null,
+          data: {
+            id: 'ZGXJMoVuecTRW9aHmyE5d',
+            createdAt: 1788964600818,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          nodeId: null,
+          data: {
+            id: '5IE5qwahRmkLHapfW5AEX',
+            createdAt: 1788964600871,
+            type: 'remove',
+            userId: 'human'
+          }
+        },
+        {
+          path: [
+            0,
+            2
+          ],
+          nodeId: null,
+          data: {
+            id: '5IE5qwahRmkLHapfW5AEX',
+            createdAt: 1788964600870,
+            type: 'insert',
+            userId: 'human'
+          }
+        },
+        {
+          path: [
+            0,
+            2
+          ],
+          nodeId: null,
+          data: {
+            id: 'm3B3MrQpdikPTtR3cTYVP',
+            createdAt: 1788964600879,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            3
+          ],
+          nodeId: null,
+          data: {
+            id: 'm3B3MrQpdikPTtR3cTYVP',
+            createdAt: 1788964600879,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [
+        'ZGXJMoVuecTRW9aHmyE5d',
+        '5IE5qwahRmkLHapfW5AEX',
+        'm3B3MrQpdikPTtR3cTYVP'
+      ],
+      allRemainingIds: [
+        'ZGXJMoVuecTRW9aHmyE5d',
+        '5IE5qwahRmkLHapfW5AEX',
+        'm3B3MrQpdikPTtR3cTYVP',
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: []
+    },
+    after: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查。',
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [],
+      allRemainingIds: [
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                2
+              ],
+              properties: {
+                suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                  id: 'm3B3MrQpdikPTtR3cTYVP',
+                  createdAt: 1788964600879,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            },
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                3
+              ],
+              node: {
+                suggestion_m3B3MrQpdikPTtR3cTYVP: {
+                  id: 'm3B3MrQpdikPTtR3cTYVP',
+                  createdAt: 1788964600879,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                suggestion: true,
+                text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600822,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。',
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600871,
+                    type: 'remove',
+                    userId: 'human'
+                  }
+                },
+                {
+                  suggestion_5IE5qwahRmkLHapfW5AEX: {
+                    id: '5IE5qwahRmkLHapfW5AEX',
+                    createdAt: 1788964600870,
+                    type: 'insert',
+                    userId: 'human'
+                  },
+                  text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                1
+              ],
+              properties: {
+                suggestion_5IE5qwahRmkLHapfW5AEX: {
+                  id: '5IE5qwahRmkLHapfW5AEX',
+                  createdAt: 1788964600871,
+                  type: 'remove',
+                  userId: 'human'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            },
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                2
+              ],
+              node: {
+                suggestion_5IE5qwahRmkLHapfW5AEX: {
+                  id: '5IE5qwahRmkLHapfW5AEX',
+                  createdAt: 1788964600870,
+                  type: 'insert',
+                  userId: 'human'
+                },
+                text: '僅有月檢約定的專案按月檢查，並記錄結果。'
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600822,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                    id: 'ZGXJMoVuecTRW9aHmyE5d',
+                    createdAt: 1788964600818,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  text: '所有專案都按月檢查。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                  id: 'ZGXJMoVuecTRW9aHmyE5d',
+                  createdAt: 1788964600822,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            },
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                1
+              ],
+              node: {
+                suggestion_ZGXJMoVuecTRW9aHmyE5d: {
+                  id: 'ZGXJMoVuecTRW9aHmyE5d',
+                  createdAt: 1788964600818,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                text: '所有專案都按月檢查。'
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: '5XwiFDd56xGxBbJcx_TD2',
+                createdAt: 1788964600846,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        }
+      ]
+    },
+    afterFinalReopen: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      monthlyNativeTextProjection: '僅有月檢約定的專案按月檢查。',
+      monthlyAllStoredText: '僅有月檢約定的專案按月檢查。',
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          nodeId: 'fault',
+          data: {
+            id: '5XwiFDd56xGxBbJcx_TD2',
+            createdAt: 1788964600846,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      monthlyRemainingIds: [],
+      allRemainingIds: [
+        '5XwiFDd56xGxBbJcx_TD2'
+      ],
+      batches: []
+    }
+  }
+}

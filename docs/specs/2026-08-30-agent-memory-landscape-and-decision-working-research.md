@@ -702,6 +702,8 @@ revision history 只能可靠回答前者，不能自動回答後者。若使用
 
 ### D6. 更新一致性與失敗行為（Owner 已確認）
 
+> **2026-09-04 reconciliation：**`MEM-Q005` 進一步區分「使用某份語意內容」與「該內容已持久化成 Memory」。本節原本把所有 durable／對外可觀察 effect 都視為 read-after-publish dependency，範圍過大。同一 Context 與同一份已驗證理解形成的 Memory mutation 和 JD 待審變更是並列 effects；Memory 技術性持久化失敗不會自行使 JD 候選失效。只有真正必須重新讀取新 Memory head 的後續步驟，以及全面完整性宣稱，才保留 publication barrier。完整裁決見 [`2026-09-04-memory-persistence-and-jd-effect-reconciliation.md`](./2026-09-04-memory-persistence-and-jd-effect-reconciliation.md)。
+
 先拆開四個容易被誤寫成同一件事的時間點：
 
 1. **來源已保存**：使用者訊息／事件已耐久保存，不會因後續 Memory 失敗而遺失；
@@ -739,7 +741,7 @@ revision history 只能可靠回答前者，不能自動回答後者。若使用
 
 1. **來源耐久化與衍生 Memory 生成是兩階段。** Memory pipeline 失敗時，原始 conversation／event 仍須存在，才能重試或重建。
 2. **受理、執行、完成與失敗必須可區分。** 不得把「已排程」回報成「已記住」。
-3. **同步或非同步不是全域二選一，而是依賴關係。** 當下或下一個分析需要新理解時要等到發布；不影響正確性的 consolidation 才可 eventual。
+3. **同步或非同步不是全域二選一，而是實際 read dependency。** 下一步若必須重新讀取新發布 head 才能計算，才等待發布；同一份已驗證理解形成的並列 effects 不需為持久化順序虛構依賴，不影響正確性的 consolidation 可 eventual。
 4. **未完成的新版本不得污染 current head。** 生成、驗證或儲存失敗時，舊 head 繼續有效；不能讀到半成品，也不能假裝更新成功。
 5. **並行更新不能靜默覆蓋。** 成熟做法使用 version／hash precondition；衝突時重讀最新狀態並重新整理，而非 last-write-wins。
 6. **重試必須有限、依錯誤類型且冪等。** timeout、429、暫時性 409／5xx 可 backoff 重試；無效輸入、權限、找不到資源或語意驗證失敗不能無限重送同一內容。
@@ -754,7 +756,7 @@ revision history 只能可靠回答前者，不能自動回答後者。若使用
 | --- | --- | --- | --- |
 | A. 全同步強一致 | 每則訊息都等所有 extraction、consolidation 與 Memory 寫入完全成功後才回覆 | 行為最直觀，下一輪一定讀到 | 每輪延遲與成本最高；任何非關鍵背景整理失敗都會阻塞訪談；不符合 Google／AWS／LangMem 對非依賴工作的現行建議 |
 | B. 全背景 eventual | 先回覆，所有 Memory 都在背景更新；下輪讀到舊版也接受 | 最低互動延遲 | 更正或衝突可能在後續分析仍使用舊理解；不適合需要連續正確理解的長期互動 |
-| C. 依賴 barrier＋版本化發布 | 原始事件先保存；Memory generation 有明確執行狀態。下一個步驟若依賴新理解，就等相關更新完成發布；無依賴的重整可背景。更新以 expected revision／hash 防止覆蓋，成功才切換 current head；失敗保留舊 head、原因與可重跑工作 | 同時保住正確性與互動速度；直接組合大廠與 LangGraph／LangMem 已提供的成熟 primitive；不要求全庫每輪鎖住 | 必須明確標示依賴更新；背景與必要更新有兩種完成時效，觀測與測試比 A 多一些 |
+| C. 實際依賴 barrier＋版本化發布 | 原始事件先保存；Memory generation 有明確執行狀態。下一個步驟若必須重新讀取新 Memory head，就等相關更新完成發布；同一分析的並列 effects 與無依賴重整不受此 gate。更新以 expected revision／hash 防止覆蓋，成功才切換 current head；失敗保留舊 head、原因與可重跑工作 | 同時保住正確性與互動速度；直接組合大廠與 LangGraph／LangMem 已提供的成熟 primitive；不要求全庫每輪鎖住，也不把持久化誤當語意依賴 | 必須分清 read-after-publish 與 sibling effect；背景與必要更新有兩種完成時效，觀測與測試比 A 多一些 |
 
 #### D6-d. 建議採 C，但先把邊界說死
 
@@ -762,16 +764,16 @@ revision history 只能可靠回答前者，不能自動回答後者。若使用
 
 1. 收到使用者訊息後，先耐久保存 raw conversation／event；這一步失敗就不能假裝已收到。
 2. Memory generation 進入可辨識的執行狀態；名稱與 schema 留到實作研究，不先發明欄位。
-3. 同一 run 的一般回答或澄清，可直接使用已保存的本輪訊息、舊 current head 與本輪已驗證的暫時結果，不必為了先寫入 durable Memory 而停住。下一個 run，或任何會形成 durable／對外可觀察效果、且正確性確實依賴本輪新理解的步驟，才必須等相關 Memory revision 驗證並發布；若發布失敗，依賴它的效果停止，但系統仍可說明失敗或提出不會把未定內容冒充事實的澄清問題。
+3. 同一 run 的一般回答、澄清與其他由相同已驗證理解形成的並列 effect，可直接使用已保存的本輪訊息、舊 current head 與本輪暫時結果，不必先寫入 durable Memory。只有下一個步驟必須重新讀取新 Memory revision，或要宣稱已全面處理所有來源時，才等相關 revision 發布；若發布失敗，只停止真正依賴該新 head 的效果。
 4. 發布採 expected revision／content hash；若 current head 已改變，重讀最新 head 後做**有限次**重新整理，不覆蓋別人的更新。
 5. 同一個來源事件或 generation 重試時沿用系統產生的 idempotency key，避免建立重複 Memory／revision。
 6. 暫時性基礎設施錯誤使用 bounded exponential backoff；不可重試錯誤直接標示失敗。模型輸出不合法可進有上限的修正回路，但不歸類成網路重試。
-7. generation 失敗時，raw conversation 與舊 current head 都保留；依賴新理解的後續步驟停止，非依賴流程不必一起報廢。
+7. generation 失敗時，raw conversation 與舊 current head 都保留；真正需要重新讀取新 head 的後續步驟停止，非依賴流程與同一分析形成、已通過自身驗證的 sibling effects 不必一起報廢。
 8. 每筆 topic Memory 的 head 切換必須原子；若一次 generation 產生多筆互相依賴的變更，下一個依賴者須等該組全部完成。通用基線不因此要求「所有 Memory 全庫原子提交」。
 
 第 8 點是基於 D2「Memory 可獨立修訂」與各家公開行為做出的最小產品推論，不宣稱任何廠商公開保證相同的 grouped transaction。若實作 mapping 發現既有框架能以單一 checkpoint 原生提供整組發布，再於後續 ADR 比較；現在不先做自訂 transaction engine。
 
-**狀態：Owner 於 2026-08-30 確認採 C「依賴 barrier＋版本化發布」。** 尚未決定正式狀態名稱、資料結構、retry 次數、timeout、queue、transaction 或使用 Checkpoint／Store；這些屬後續框架 mapping 與實作研究。此裁決仍可因後續新證據或產品需求經討論翻案，但不得未經 Owner 討論自行改成全同步或全背景。
+**狀態：Owner 於 2026-08-30 確認採 C，並於 2026-09-04 以 `MEM-Q005` 把 barrier 縮到真正的 read-after-publish dependency。** 尚未決定正式狀態名稱、資料結構、retry 次數、timeout、queue、transaction 或使用 Checkpoint／Store；這些屬後續框架 mapping 與實作研究。此裁決不得未經 Owner 討論自行改成全同步、全背景，或重新把所有 JD durable effects 一律視為 Memory hard dependency。
 
 ### D7. 使用者控制程度（Owner 已確認）
 
@@ -892,13 +894,13 @@ Google 官方把 blocking 與 background generation 依「目前工作是否需�
 
 建議只修文字、不翻案：
 
-- 同一 run 的一般回答或澄清，可以直接使用已保存的本輪訊息、舊 current head 與本輪已驗證的暫時結果，不必為了先寫入 durable Memory 而停住；
-- 下一個 run，或任何會形成 durable／對外可觀察效果、且正確性確實依賴新理解的步驟，才必須等新 revision 成功發布；
-- 如果 Memory 發布失敗，依賴它的效果停止，但仍可向使用者說明失敗或提出不需要把未定內容冒充事實的澄清問題。
+- 同一 run 的一般回答、澄清或由同一份已驗證理解形成的並列 effects，可以直接使用已保存的本輪訊息、舊 current head 與本輪暫時結果，不必先寫入 durable Memory；
+- 只有下一個步驟確實要重新讀取新 head，或全面完整性宣稱要確認所有來源均已處理，才必須等新 revision 成功發布；
+- 如果 Memory 發布失敗，只停止真正依賴該新 head 的效果；同輪已通過自身驗證的 JD 待審候選不因技術性持久化失敗自動消失或 stale。
 
-這是 D1 與 D6 的邊界修正，不等於取消依賴 barrier。
+這是 D1 與 D6 的邊界修正，不等於取消真正的 read-after-publish barrier；2026-09-04 `MEM-Q005` 再明確排除同一分析的 sibling effects。
 
-**狀態：Owner 於 2026-08-30 確認。** D6-d 第 3 點已依上述行為修正；當時沒有連帶改動後續邊界，F2～F9 已在各自章節另行研究，也沒有預選 checkpoint、queue 或其他實作機制。
+**狀態：Owner 於 2026-08-30 確認，2026-09-04 由 `MEM-Q005` 補充 sibling-effect 邊界。**沒有預選 checkpoint、queue 或其他實作機制。
 
 ##### F2. 「未解問題生效」只代表它以未解狀態生效（Owner 已確認）
 
@@ -1431,7 +1433,7 @@ Owner 接受 C「分層 provenance」：raw conversation／events 是獨立 sour
 
 ### 2026-08-30：D6 更新一致性與失敗行為已對齊
 
-OpenAI、Anthropic、Google、AWS、LangGraph 與 LangMem 的官方資料共同支持：來源事件耐久化、Memory 工作受理、current head 發布與下一個依賴分析讀到新版本是不同承諾；排程成功不能冒充已記住。Owner 接受 C「依賴 barrier＋版本化發布」：需要新理解的下一步等待相關 revision 成功發布，非關鍵 consolidation 可背景；以 optimistic concurrency 防止靜默覆蓋，以 idempotency＋typed bounded retry 避免重複與無限重試；失敗保留 raw source、舊 head、失敗原因與可安全重跑的工作。
+OpenAI、Anthropic、Google、AWS、LangGraph 與 LangMem 的官方資料共同支持：來源事件耐久化、Memory 工作受理、current head 發布與下一個依賴分析讀到新版本是不同承諾；排程成功不能冒充已記住。Owner 接受 C「實際依賴 barrier＋版本化發布」：真正需要重新讀取新 head 的下一步才等待 revision 成功發布，非關鍵 consolidation 與同一分析的 sibling effects 不因持久化順序被阻擋；以 optimistic concurrency 防止靜默覆蓋，以 idempotency＋typed bounded retry 避免重複與無限重試；失敗保留 raw source、舊 head、失敗原因與可安全重跑的工作。
 
 此處仍只裁決可觀察行為，未選擇 Checkpoint／Store、資料表、狀態 enum、queue 或 transaction。跨多筆 Memory 的 ACID 原子性不是目前大廠公開共同保證，因此不先自建全庫 transaction；只要求單筆 head 原子切換，以及後續依賴者不得讀取未完整發布的相依更新組。
 
@@ -1443,7 +1445,7 @@ Owner 接受通用方案 C「分層控制」：一般對話是主要更正方式
 
 ### 2026-08-30：整體審核 F1 已對齊
 
-Owner 接受縮小 D6 barrier：同一 run 的一般回答與澄清可直接使用本輪訊息及已驗證的暫時結果，不必先等 durable Memory 發布；只有下一個 run，或會形成 durable／對外可觀察效果且正確性確實依賴新理解的步驟，才等待相關 revision 成功發布。此修正只消除 D1／D6 的文字衝突，不取消 correctness barrier；F2～F9 後續均已分題研究。
+Owner 接受縮小 D6 barrier：同一 run 的一般回答、澄清與由同一份已驗證理解形成的並列 effects 可直接使用本輪訊息及暫時結果，不必先等 durable Memory 發布；只有下一個步驟真正需要重新讀取新 head，或全面完整性宣稱需要確認全部來源已處理時，才等待相關 revision。2026-09-04 `MEM-Q005` 明確裁決 Memory 技術性持久化失敗不丟棄同輪有效 JD 候選；此修正不取消真正的 correctness barrier。
 
 ### 2026-08-30：整體審核 F2 已對齊
 

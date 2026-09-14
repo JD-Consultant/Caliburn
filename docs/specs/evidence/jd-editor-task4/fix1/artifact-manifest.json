@@ -1,0 +1,255 @@
+{
+  "source_files": [
+    {
+      "path": "experiments/analysis-agent/README.md",
+      "bytes": 85125,
+      "sha256": "fc1a44c4c21511cf92508f87566d6f2e2f1c778583936a9f7d8c3dabf2ffacbe"
+    },
+    {
+      "path": "experiments/analysis-agent/scripts/export_web_contract.py",
+      "bytes": 636,
+      "sha256": "f49ba547ec7b666db62c8f2e9034ec65b60ea8becd2e0ccbb2ea1341fe5329d3"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_contract.py",
+      "bytes": 7218,
+      "sha256": "d2f35131e229df0c9c9ee73f2814e26ebda8149dda9a3a2b2357dcc084b2e171"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+      "bytes": 11698,
+      "sha256": "078de0ee24033e1c87685f0a39906c7105da9949c7276441d6c5a377615a0974"
+    },
+    {
+      "path": "experiments/analysis-agent/tests/test_jd_api.py",
+      "bytes": 11786,
+      "sha256": "d3ab625dced62fbb259b643a7e5fe057c4922c4d30b4adb6264d35a9fa7ccde6"
+    },
+    {
+      "path": "experiments/jd-editor/web/README.md",
+      "bytes": 3487,
+      "sha256": "0b600a66f4b6019fe6a00ff7fed7684a80776b0e50da92c9f3f24fd468be96f3"
+    },
+    {
+      "path": "experiments/jd-editor/web/browser/task4-fix1-clipboard.mjs",
+      "bytes": 4844,
+      "sha256": "2f4e72fb8a62ff66d32de6551e92111c079bf9b193a8cce2fb986d792265aec5"
+    },
+    {
+      "path": "experiments/jd-editor/web/browser/task4-fix1-rejection.mjs",
+      "bytes": 4207,
+      "sha256": "e0a237db4164fa5569d580d8d0b940aa69f45047ca0ffc7c36a7a5f3d04dad33"
+    },
+    {
+      "path": "experiments/jd-editor/web/browser/task4-input.mjs",
+      "bytes": 7665,
+      "sha256": "6a3ac784e5c91f0a98e6b298a2db28653cc187cdc3c36f4f6dc349467dd09973"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/documents/DocumentList.test.tsx",
+      "bytes": 2237,
+      "sha256": "140a1cc5ffc063dd4539bdccdebd41ad5d6a27e2c7321110b8a4454c078c5c4a"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/documents/DocumentList.tsx",
+      "bytes": 4394,
+      "sha256": "da3a6fbc384c6bb008561a248e3f5311a6ba30e299dd5dfcdfe7dcce2e50a41f"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/generated/analysis-api.ts",
+      "bytes": 3604,
+      "sha256": "e77ecea6460b31d21838cb7209b7cc20fe9477072093512c79d3018b8c47e18a"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/api.ts",
+      "bytes": 4828,
+      "sha256": "22381a48529817807e93e43c669ec58b5cc5d1c72900627d952289a292561f72"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/useJdSession.test.tsx",
+      "bytes": 8413,
+      "sha256": "605ae5422edad5d2ac93d05094a02bc0c25e7fd703104bb1141b0d8b228efa6e"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+      "bytes": 12181,
+      "sha256": "7fb4d715c8bf79bdacfbe652256282ca29c345c629fc4bc50f46e6a552638b4e"
+    }
+  ],
+  "raw_files": [
+    {
+      "file": "task4-fix1-browser-server.json",
+      "bytes": 1353,
+      "sha256": "780851d40345f35b63cbc7f7cca2490f9924329edfde0ec0f445408d2047577a"
+    },
+    {
+      "file": "task4-fix1-clipboard-attempt1.json",
+      "bytes": 6124,
+      "sha256": "958fae920c04d9481bbf1dbb1abdb1887cb17ecd4d2658c43483f218903f65a7"
+    },
+    {
+      "file": "task4-fix1-clipboard-attempt1.log",
+      "bytes": 1233,
+      "sha256": "742eb0e85af4eaff9cc91aea78fcaddc1ee31e307331482c2a25239386b73f1f"
+    },
+    {
+      "file": "task4-fix1-clipboard-browser.json",
+      "bytes": 17643,
+      "sha256": "82df9d2f64a80d33fc92d97f3bf2952e291d542eaecbd5aeef1eed12128b3b90"
+    },
+    {
+      "file": "task4-fix1-clipboard-screen.png",
+      "bytes": 50520,
+      "sha256": "df30ab450ab2c56a80549672326280d4490cef299d9cd5fcfb623bb4bf027495"
+    },
+    {
+      "file": "task4-fix1-clipboard.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "task4-fix1-codegen.log",
+      "bytes": 78,
+      "sha256": "e31fbe437347d9e1ed763e918f6de6f1190dcfa6fbf37a721160c8af1b65b0b5"
+    },
+    {
+      "file": "task4-fix1-final-api.log",
+      "bytes": 663,
+      "sha256": "4f88042613c98bede53f0a26da4f7692c7f1f26aec3ff6007ab844fa3939b616"
+    },
+    {
+      "file": "task4-fix1-final-build.log",
+      "bytes": 806,
+      "sha256": "738fecfa727863fa3b96557e3715467c7728017269f7cbdafa3dc7742ec1ef29"
+    },
+    {
+      "file": "task4-fix1-final-codegen-check.log",
+      "bytes": 129,
+      "sha256": "3faa3aecd5a930f6a6ec7efb9d34f91449d2c833285b703bbf57bd8e3c979661"
+    },
+    {
+      "file": "task4-fix1-final-lint.log",
+      "bytes": 52,
+      "sha256": "3bc43ebff97e4ac84e6eb7258eaa110c410116cb891846fafda0043214f68c79"
+    },
+    {
+      "file": "task4-fix1-final-types.log",
+      "bytes": 63,
+      "sha256": "bc541812b7503c894f68bae865c488a102906951f560b3e2c25d854f3586671b"
+    },
+    {
+      "file": "task4-fix1-final-web-tests.log",
+      "bytes": 266,
+      "sha256": "ad9f241eb9fc2df14647ce96e4da7dea52e76365396c234f8d8ea0296514d476"
+    },
+    {
+      "file": "task4-fix1-original-clipboard-script-lint.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "task4-fix1-owned-processes.json",
+      "bytes": 2526,
+      "sha256": "37eba1a0b13d639a350fda3774c1f52bde29824d68e3a4d46792ca320331174b"
+    },
+    {
+      "file": "task4-fix1-r01-api-green.log",
+      "bytes": 5115,
+      "sha256": "153b4789fa9b21194a683437c79cebe64b97faa925f0b169061c4ad417ccfd34"
+    },
+    {
+      "file": "task4-fix1-r01-api-green2.log",
+      "bytes": 663,
+      "sha256": "439aefb12d31c0822fd85ed5def8231f788c1aa222815a11c44e6ea3d3cc166f"
+    },
+    {
+      "file": "task4-fix1-r01-api-red.log",
+      "bytes": 2571,
+      "sha256": "e5ca3cf6d05400bb66006cd550af20df76ba4449d8c36d4a186592bd7192c4ee"
+    },
+    {
+      "file": "task4-fix1-r01-web-red.log",
+      "bytes": 1365,
+      "sha256": "16070d9519ed8c66550e83676177a5e3734b5179ff9a0340a74ead929ec227bc"
+    },
+    {
+      "file": "task4-fix1-r02-r04-green.log",
+      "bytes": 266,
+      "sha256": "ad60db830b00726bca8df9d90892d7cf9ea5b72270ffc4589be771562883fdef"
+    },
+    {
+      "file": "task4-fix1-r02-r04-red-tests.log",
+      "bytes": 9220,
+      "sha256": "8da3d9d2bc14e10250ca87a5843160f7189f2c52c811b5a20560eda638db6183"
+    },
+    {
+      "file": "task4-fix1-r02-r04-red.log",
+      "bytes": 301,
+      "sha256": "3f36b7284d2a750c7e3e3e41673b7b448700c007cf93d96c23bce7f21c07dcca"
+    },
+    {
+      "file": "task4-fix1-rejection-attempt1.json",
+      "bytes": 12554,
+      "sha256": "e1751be0a12d3e0cc40e1eb7981240e6692bff976e376ef4cce82fa7dd874869"
+    },
+    {
+      "file": "task4-fix1-rejection-attempt1.log",
+      "bytes": 3822,
+      "sha256": "ef40c72f41a4bf21feb9ec476859db55458d3b61916e084f13ab3a37a6c76228"
+    },
+    {
+      "file": "task4-fix1-rejection-before-normalization.json",
+      "bytes": 12783,
+      "sha256": "f0d2c325eb7c4c4bbd1e0c7512361764905746ac8ff73e06966c5d3e799e4b34"
+    },
+    {
+      "file": "task4-fix1-rejection-browser.json",
+      "bytes": 12783,
+      "sha256": "bc49e90e87fecdd7a4769c89e362ad8d9cb81576a5d7b31a2a15dd2f70e496fa"
+    },
+    {
+      "file": "task4-fix1-rejection-final.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "task4-fix1-rejection-screen.png",
+      "bytes": 71208,
+      "sha256": "6595e11759e02a4b9556aae8f65b13ba5ad1d0392315201acad685d5d762cc8a"
+    },
+    {
+      "file": "task4-fix1-rejection.log",
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "task4-fix1-session-list-green.log",
+      "bytes": 266,
+      "sha256": "abe2e458d38ef5629bbb12ae0288f8e603bddd614bb4e80cd998ebb27ad28d36"
+    },
+    {
+      "file": "task4-fix1-types-first-failure.log",
+      "bytes": 2124,
+      "sha256": "e5e5b3fb99649effe15c9140b87a7a7ac70d7129ae43bc4cf620c2dd0cd8e53f"
+    },
+    {
+      "file": "task4-fix1-verification-api-web-codegen.json",
+      "bytes": 2140,
+      "sha256": "6547e98dad2eeb56e3e51dbe67b371d2053c73504b91aee04f802e3d7040b27b"
+    },
+    {
+      "file": "task4-fix1-verification.json",
+      "bytes": 1622,
+      "sha256": "419fb10d51b510c72124f178e4bb88b076f18947a907312bcd63b99718cd73c9"
+    },
+    {
+      "file": "task4-fix1-verify.py",
+      "bytes": 1865,
+      "sha256": "4a3deeb3fbd3a9e0fb1cc8a39b410b3912aadaa42865db77409c12b667ca2ce9"
+    }
+  ],
+  "copy_hash_mismatches": 0,
+  "initial_web_app_files_checked": 38,
+  "initial_web_app_hash_mismatches": [],
+  "scope": "Task4 fix1 only; original evidence retained unchanged"
+}

@@ -1,0 +1,53 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+___ test_recovery_waits_for_original_head_lock_before_scoped_receipt[False] ___
+
+jd = <analysis_agent.jd_service.JdService object at 0x00000202497C4D10>
+commit = False
+
+    @pytest.mark.parametrize('commit', [False, True])
+    def test_recovery_waits_for_original_head_lock_before_scoped_receipt(jd, commit):
+>       assert hasattr(jd.store, 'reconcile_after_writer_stopped'), 'Stopped-writer PG barrier is missing'
+E       AssertionError: Stopped-writer PG barrier is missing
+E       assert False
+E        +  where False = hasattr(<analysis_agent.jd_store.JdStore object at 0x0000020249505BE0>, 'reconcile_after_writer_stopped')
+E        +    where <analysis_agent.jd_store.JdStore object at 0x0000020249505BE0> = <analysis_agent.jd_service.JdService object at 0x00000202497C4D10>.store
+
+tests\test_jd_postgres_recovery.py:11: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-f72df403-f5e7-45b8-958d-48f843105f91.jsonl
+___ test_recovery_waits_for_original_head_lock_before_scoped_receipt[True] ____
+
+jd = <analysis_agent.jd_service.JdService object at 0x00000202497ED0A0>
+commit = True
+
+    @pytest.mark.parametrize('commit', [False, True])
+    def test_recovery_waits_for_original_head_lock_before_scoped_receipt(jd, commit):
+>       assert hasattr(jd.store, 'reconcile_after_writer_stopped'), 'Stopped-writer PG barrier is missing'
+E       AssertionError: Stopped-writer PG barrier is missing
+E       assert False
+E        +  where False = hasattr(<analysis_agent.jd_store.JdStore object at 0x00000202497ED160>, 'reconcile_after_writer_stopped')
+E        +    where <analysis_agent.jd_store.JdStore object at 0x00000202497ED160> = <analysis_agent.jd_service.JdService object at 0x00000202497ED0A0>.store
+
+tests\test_jd_postgres_recovery.py:11: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-f72df403-f5e7-45b8-958d-48f843105f91.jsonl
+_________ test_recovery_refuses_live_native_before_any_receipt_lookup _________
+
+jd = <analysis_agent.jd_service.JdService object at 0x00000202497EF6E0>
+
+    def test_recovery_refuses_live_native_before_any_receipt_lookup(jd):
+>       assert hasattr(jd.store, 'reconcile_after_writer_stopped'), 'Stopped-writer PG barrier is missing'
+E       AssertionError: Stopped-writer PG barrier is missing
+E       assert False
+E        +  where False = hasattr(<analysis_agent.jd_store.JdStore object at 0x00000202497EF710>, 'reconcile_after_writer_stopped')
+E        +    where <analysis_agent.jd_store.JdStore object at 0x00000202497EF710> = <analysis_agent.jd_service.JdService object at 0x00000202497EF6E0>.store
+
+tests\test_jd_postgres_recovery.py:58: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-f72df403-f5e7-45b8-958d-48f843105f91.jsonl
+=========================== short test summary info ===========================
+FAILED tests/test_jd_postgres_recovery.py::test_recovery_waits_for_original_head_lock_before_scoped_receipt[False]
+FAILED tests/test_jd_postgres_recovery.py::test_recovery_waits_for_original_head_lock_before_scoped_receipt[True]
+FAILED tests/test_jd_postgres_recovery.py::test_recovery_refuses_live_native_before_any_receipt_lookup
+3 failed in 0.73s

@@ -1,0 +1,37 @@
+{
+  "python": "3.12.13",
+  "node": "v22.12.0",
+  "psycopg_implementation": "binary",
+  "libpq_client_version": 180004,
+  "packages": [
+    {
+      "name": "psycopg",
+      "version": "3.3.5",
+      "license_expression": "LGPL-3.0-only",
+      "license": null,
+      "license_classifiers": []
+    },
+    {
+      "name": "psycopg-binary",
+      "version": "3.3.5",
+      "license_expression": "LGPL-3.0-only",
+      "license": null,
+      "license_classifiers": []
+    },
+    {
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "license_expression": "PSF-2.0",
+      "license": null,
+      "license_classifiers": []
+    },
+    {
+      "name": "tzdata",
+      "version": "2026.3",
+      "license_expression": null,
+      "license": "Apache-2.0",
+      "license_classifiers": []
+    }
+  ],
+  "scope": "Existing installed runtimes; no installation, DB or model calls. Package licenses do not replace bundled third-party license notices."
+}

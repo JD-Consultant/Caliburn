@@ -1,0 +1,121 @@
+{
+  "type": "jd_task",
+  "id": "task-8",
+  "source_refs": [
+    "fixture-source:task-8"
+  ],
+  "children": [
+    {
+      "type": "p",
+      "id": "r2-81",
+      "children": [
+        {
+          "text": "8. 依維護約定執行定期前端檢查。",
+          "bold": true
+        }
+      ]
+    },
+    {
+      "type": "p",
+      "id": "task8-description",
+      "children": [
+        {
+          "text": "對包含定期維護的專案，檢查主要前端操作，記錄結果並追蹤已知問題或必要調整。"
+        }
+      ]
+    },
+    {
+      "type": "ul",
+      "id": "r2-88",
+      "children": [
+        {
+          "type": "li",
+          "id": "r2-83",
+          "children": [
+            {
+              "type": "lic",
+              "id": "r2-82",
+              "children": [
+                {
+                  "text": "執行時機：",
+                  "bold": true
+                },
+                {
+                  "text": "依各案約定；目前包含月檢服務的專案按月執行。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jd_outcomes",
+      "id": "f03-task-8-outcomes",
+      "children": [
+        {
+          "type": "ul",
+          "id": "f03-task-8-outcomes-list",
+          "children": [
+            {
+              "type": "li",
+              "id": "r2-85",
+              "children": [
+                {
+                  "type": "lic",
+                  "id": "r2-84",
+                  "children": [
+                    {
+                      "text": "主要產出：",
+                      "bold": true
+                    },
+                    {
+                      "text": "維護檢查及問題追蹤紀錄。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jd_requirements",
+      "id": "f03-task-8-requirements",
+      "children": [
+        {
+          "type": "ul",
+          "id": "f03-task-8-requirements-list",
+          "children": [
+            {
+              "type": "li",
+              "id": "r2-87",
+              "children": [
+                {
+                  "type": "lic",
+                  "id": "r2-86",
+                  "children": [
+                    {
+                      "text": "完成要求：",
+                      "bold": true
+                    },
+                    {
+                      "text": "僅約定交付後缺陷修正的專案，不自動納入固定月檢；超出服務範圍的新增需求另行確認。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "knowledge_ids": [
+    "f03-jd_knowledge-5"
+  ],
+  "skill_ids": [
+    "f03-jd_skill-5"
+  ]
+}

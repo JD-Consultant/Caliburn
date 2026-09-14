@@ -211,24 +211,30 @@ Memory 只負責保存、修訂、搜尋、讀取與完整列舉工作資訊。�
 ```text
 員工訊息先耐久保存
         ↓
-若本輪回答、澄清或 JD 判斷依賴新資訊，必要 Memory mutation 先成功發布
+目前 Memory + 相關 conversation + 本輪訊息 + 目前 JD
         ↓
-依已發布的 current Memory 繼續判斷
-        ↓
-不影響本輪正確性的去重、重整與導覽更新可背景處理
+形成本輪已驗證的語意理解
+        ├─ Semantic Memory mutation
+        └─ optional JD 待審變更
 ```
 
-- 這是 dependency-aware hybrid，不是每回合固定全同步或固定全背景。
-- 任何依賴尚未成功發布 Memory 的 JD 變更都不能生成或套用。
+- 這仍是 dependency-aware hybrid，但依賴必須按**實際讀取關係**判斷，不是把所有 durable effects 一律串在 Memory publication 後。
+- 同一 run 由同一組輸入與同一份已驗證理解形成的 Memory mutation 與 JD 待審變更是並列 effects；JD 依賴語意內容，不依賴該內容先寫入 Store。
+- Memory 因格式、暫時性基礎設施或 Store 寫入問題失敗，不刪除、不阻擋、也不自行標 stale 已通過自身驗證的 JD 待審變更。只有重新分析後的理解或 JD base state 實質改變，相關候選才重驗／stale。
+- 真正需要重新讀取已發布 new head 的下一個獨立步驟仍須等待；最終全面製作／檢查也必須先處理全部有效來源與 Memory，才能宣稱完整涵蓋。
 - 員工明確更正時，原始訊息一定先耐久保存，但「更正」這個事件名稱本身不構成一律同步的跨家規則：本輪後續實質判斷若依賴修訂後的持久 Memory，才必須等待發布；若本輪只需依目前訊息與近期對話正常回應，Memory Manager 可以背景更新。
 - Memory 更新不會自行修改 JD。
 - 員工直接修改 JD 也不會自動改寫 Memory；後續若 LLM 發現文件與工作資訊衝突，透過正常訪談釐清。
 
-> **跨家更新時序與 writer 複核（2026-09-01；Owner 暫時同意的 Working Baseline）**：官方公開機制不支持「一律由主 agent 在 hot path 寫入」或「一律交給背景 worker」任何一個極端作為跨家共識。OpenAI Codex 對合適的歷史對話採背景 extraction／consolidation；Anthropic 讓同一 agent 可在工作途中用 Memory Tool 即時讀寫，另以仍屬 research preview 的 Dreams 做非同步整頓；Google Memory Bank 同時提供 blocking 與 background generation，並明示本輪不需要結果時通常應背景執行；AWS AgentCore 將 long-term extraction／consolidation 放在背景；LangChain／LangMem 則把 hot path 與 background 都列為正式模式並公開其即時性、延遲與品質取捨。因此目前採用的共同原則是：**新 Memory 若被目前或下一個實質判斷依賴，必須在該依賴前可用；其餘抽取、去重與重整可以延後或背景化。**
+> **2026-09-04 `MEM-Q005` reconciliation（Owner 已核准）**：本節先前把「提出或修改 JD」整類視為 Memory publication hard gate，混淆了「JD 使用哪份語意內容」與「同一份語意內容是否已成功持久化」。OpenAI Codex Memory 可背景更新且可能延後／略過；Anthropic 則明確把 dependent／independent Tool 的排序交給 application。這些官方事實不支持 Memory 技術性持久化失敗必須一併丟棄由相同 Context 形成的 JD 候選。完整事實、Caliburn mapping、失敗矩陣與重開條件見 [`2026-09-04-memory-persistence-and-jd-effect-reconciliation.md`](./2026-09-04-memory-persistence-and-jd-effect-reconciliation.md)。
+
+> **跨家更新時序與 writer 複核（2026-09-01；2026-09-04 依 `MEM-Q005` 校正）**：官方公開機制不支持「一律由主 agent 在 hot path 寫入」或「一律交給背景 worker」任何一個極端作為跨家共識。OpenAI Codex 對合適的歷史對話採背景 extraction／consolidation；Anthropic 讓同一 agent 可在工作途中用 Memory Tool 即時讀寫；Google Memory Bank 同時提供 blocking 與 background generation；AWS AgentCore 將 long-term extraction／consolidation 放在背景；LangChain／LangMem 則把 hot path 與 background 都列為正式模式。因此共同原則是：**只有下一個動作必須讀取新發布 Memory 結果時才等待；同一 Context／理解形成的並列 effect 不因 Memory 尚未持久化而自動失效。**其餘抽取、去重與重整可以延後或背景化。
 >
-> 語意 writer 暫定只有**一套 Memory Manager**：它使用同一組 admission、extraction 與 consolidation 規則，分析 conversation 與候選 current Memories，產生 add／update／remove／no-op；同步與背景只是這套 Manager 的兩種排程方式，不得另寫兩套會產生不同語意的 writer。主顧問可以指出「後續判斷是否立即依賴最新 Memory」並請求處理，但不直接管理 scope、ID、revision 或持久化；Runtime／Store 驗證並發布 mutation。這不要求常駐第二個 agent，也尚未決定 Manager 使用哪個模型、framework class 或實體部署方式。
+> **2026-09-05 supersession：**下列「固定由單一 Memory Manager 作語意 writer」與其後「第一版只由主顧問 direct Tool 寫入、不加入背景 manager」都已是歷史候選。Product Owner 已在 [`LLM-Q014` G4.3b-4a](./2026-09-04-llm-machine-effects-and-sibling-results-working-design.md#13-g43b-4a-三路-memory-生命週期product-owner-已核准) 核准三條互補責任：每輪即時讀取／Context、背景 extraction＋consolidation，以及只針對已明確過時 Memory 的窄幅 live repair。它們可以共用相同的職務領域保存政策，但不是固定每輪先跑的同一個步驟；scope、ID、revision、排程與持久化仍由 Runtime／Store 負責。exact manager、Tool、模型與排程 wiring 留待後續 gate。
 >
-> **排程權責（2026-09-01；Owner 暫時同意的 Working Baseline）**：Memory Manager／LLM 只判斷語意上的 add／update／remove／no-op 與內容；Application／Runtime 根據即將執行的動作是否依賴最新已發布 Memory，決定同步等待或排入背景。不得要求模型另外填寫 `needs_sync`、時序、重試或基礎設施狀態。一般回答若不依賴發布結果可以背景處理；當模型選擇執行一個被 Runtime 定義為必須使用最新 Memory 的操作時，該操作的 gate 自動等待 Manager 完成，模型不能自行略過。這是從跨家「模型決定語意／工具請求，應用決定執行與排程」的責任分離整理出的架構結論，而非宣稱各產品內部使用完全相同的 graph。
+> ~~語意 writer 暫定只有**一套 Memory Manager**：它使用同一組 admission、extraction 與 consolidation 規則，分析 conversation 與候選 current Memories，產生 add／update／remove／no-op；同步與背景只是這套 Manager 的兩種排程方式，不得另寫兩套會產生不同語意的 writer。主顧問可以指出「後續判斷是否立即依賴最新 Memory」並請求處理，但不直接管理 scope、ID、revision 或持久化；Runtime／Store 驗證並發布 mutation。這不要求常駐第二個 agent，也尚未決定 Manager 使用哪個模型、framework class 或實體部署方式。~~
+>
+> **排程權責（2026-09-01；2026-09-04 依 `MEM-Q005` 校正）**：Memory Manager／LLM 只判斷語意上的 add／update／remove／no-op 與內容；Application／Runtime 根據下一個動作是否真的需要**重新讀取新發布 Memory**，決定同步等待或排入背景。不得要求模型另外填寫 `needs_sync`、時序、重試或基礎設施狀態。Runtime 不得只因 JD 是 durable effect 就虛構 hard dependency；JD 與 Memory 若來自同一份已驗證理解，必須分別回報與保存各自結果。
 
 #### 6.1 Hard gate 動作映射
 
@@ -238,14 +244,14 @@ Memory 只負責保存、修訂、搜尋、讀取與完整列舉工作資訊。�
 | --- | --- | --- |
 | 一般訪談回答 | 可背景 | 本輪訊息與必要近期對話仍在目前 Context，不需先等待持久 Memory 發布 |
 | 提出澄清問題 | 可背景 | 問題可由目前訊息、既有 current Memory 與近期對話形成 |
-| 提出或修改 JD 變更 | 有尚未發布且會影響該變更的新資訊時同步 | 不能以舊 Memory 產生依賴新資訊的持久文件變更 |
+| 提出或修改 JD 變更 | 可與 Memory mutation 形成並列 effect；分別驗證 | JD 使用的是同一 run 的語意內容，不必等待該內容先寫入 Store；Memory 技術失敗不丟棄有效候選 |
 | 全面檢查 JD 或宣稱完整涵蓋 | 同步等待相關 pending Memory，並對穩定 current-head 集合全量盤點 | 完整性宣稱不能忽略仍在處理的有效來源 |
 | 結束本輪、休息或關閉應用 | 不阻塞 | 原始來源先耐久保存；Memory 工作必須可在背景續跑或下次恢復 |
 | 去重、重整與導覽更新 | 背景 | 不影響目前語意正確性的維護工作不應增加互動延遲 |
 
-只有兩類操作構成 hard gate：第一，依 Memory 產生或修改持久結果；第二，宣稱已全面盤點或完整涵蓋。若下一輪在背景 Memory 尚未發布前開始，仍可使用目前 conversation；真正進入 hard-gated 操作時，Runtime 才等待該 JD scope 的相關 pending 工作完成。是否屬「相關 pending」及盤點期間採 serial writer、遇變更重啟或 snapshot，留待實際 writer 模式決定；不得預設一定要 snapshot，也不得靠模型聲稱「應該完成了」。
+只有兩類情況需要 publication barrier：第一，下一個步驟確實要重新讀取新 Memory head；第二，全面盤點或完整涵蓋宣稱需要確認所有有效來源均已成功形成 Memory 或合法 no-op。JD 待審變更若與 Memory mutation 來自同一份已驗證理解，不屬第一類。是否屬「相關 pending」及盤點期間採 serial writer、遇變更重啟或 snapshot，留待實際 writer 模式決定；不得預設一定要 snapshot，也不得靠模型聲稱「應該完成了」。
 
-直接官方依據：[OpenAI Codex Memories](https://learn.chatgpt.com/docs/customization/memories)、[Anthropic Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)、[Anthropic Tool-use contract](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)、[Anthropic Dreams](https://platform.claude.com/docs/en/managed-agents/dreams)、[Google Memory Bank Generate Memories](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/generate-memories)、[AWS AgentCore Memory types](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory-types.html)、[AWS CreateEvent](https://docs.aws.amazon.com/bedrock-agentcore/latest/APIReference/API_CreateEvent.html)、[LangChain Memory overview](https://docs.langchain.com/oss/python/concepts/memory)、[LangMem conceptual guide](https://langchain-ai.github.io/langmem/concepts/conceptual_guide/)。這些資料共同支持可修訂 Memory、同步／背景兩種時序，以及模型語意選擇與應用執行責任分離，但**不支持「明確更正一律同步」是跨家共識**；dependency-aware 與 Runtime action gate 是根據公開取捨形成的架構推論。Caliburn mapping 的詳細由來另見：[通用 Memory 研究 D1、D6、§8～§9](./2026-08-30-agent-memory-landscape-and-decision-working-research.md)、[Memory mapping §9.40.3](./2026-08-30-caliburn-memory-requirements-mapping-working-research.md)。
+直接官方依據：[OpenAI Codex Memories](https://learn.chatgpt.com/zh-Hant/docs/customization/memories)、[OpenAI Tools](https://developers.openai.com/api/docs/guides/tools)、[Anthropic Memory Tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)、[Anthropic Tool-use contract](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)、[Anthropic Parallel Tool Use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/parallel-tool-use)、[Google Memory Bank Generate Memories](https://docs.cloud.google.com/gemini-enterprise-agent-platform/scale/memory-bank/generate-memories)、[AWS AgentCore Memory types](https://docs.aws.amazon.com/bedrock-agentcore/latest/devguide/memory-types.html)、[AWS CreateEvent](https://docs.aws.amazon.com/bedrock-agentcore/latest/APIReference/API_CreateEvent.html)、[LangChain Memory overview](https://docs.langchain.com/oss/python/concepts/memory)、[LangMem conceptual guide](https://langchain-ai.github.io/langmem/concepts/conceptual_guide/)。這些資料共同支持可修訂 Memory、同步／背景兩種時序、真正相依的 Tool sequencing，以及模型語意選擇與應用執行責任分離；**它們沒有規定 Memory 技術性持久化失敗必須丟棄同一 Context 形成的 JD 候選。**該部分是 Owner 核准的 Caliburn mapping，不冒充廠商原生規則。
 
 ## 7. 模型與 Runtime 的輸入責任
 
@@ -322,7 +328,7 @@ Memory 只負責保存、修訂、搜尋、讀取與完整列舉工作資訊。�
 4. 三模式召回已確認；仍未決定的是一般回合的候選筆數、token／tool-call budget、分數門檻、排序融合、query rewrite，以及 embedding／lexical index 的具體實作；
 5. Admission 的產品語意已確認；仍未決定的是正式 Prompt／topic／few-shot、案例細節提升門檻、一次案例何時併入既有主題，以及 extraction 漏失的量測與修復方式；
 6. 未知／衝突的現行 Working Baseline 是只以既有 `title／topic＋content` 表達，不新增模型欄位或專用型別；仍可在新證據證明效果不足時經 Owner 討論翻案。尚未決定的是正式 Prompt／few-shot，以及是否、何時把它們投影到可重建導覽供提醒或查看；
-7. 已暫定只有一套 Memory Manager，並依 Runtime action dependency 同步或背景執行；尚未決定的是 Manager 採用的 framework／model、部署形狀，以及背景 trigger／debounce 的具體參數；
+7. 已核准即時讀取、背景 extraction＋consolidation、窄幅 live repair 三條互補責任；尚未決定的是共用保存政策如何落入 manager／Tool、各自採用的 framework／model、部署形狀，以及 background trigger／debounce 與 live-repair 門檻；
 8. exact inventory 是必要效果，但底層尚未裁決；官方非語意 listing＋exact namespace equality＋同 scope serial writer＋checkpoint worklist＋pinned-backend 測試只是候選映射。它沒有 opaque cursor／snapshot 保證，須先與 managed pager、可信單批上限及最小 keyset／catalog 路徑比較並經 Owner 同意；
 9. replay 不重複是必要效果，但底層尚未裁決；serial writer＋LangGraph task＋Runtime deterministic key／既有結果查核與 Pydantic Harness 原生 CAS＋idempotency 都是正式候選，不能先把任何一個寫成共同底層；
 10. 真正的成本、延遲、召回率與 record 成長門檻。

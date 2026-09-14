@@ -1,0 +1,33 @@
+{
+  "accessed": "2026-09-09",
+  "installedCount": 2,
+  "packageLockSha256": "20d97929080fa95c75c96cffbbc24a46c6a0407508464a955c60ab05a1d3aec8",
+  "packages": [
+    {
+      "name": "copy-anything",
+      "version": "4.1.0",
+      "license": "MIT",
+      "dependencies": {},
+      "engines": {
+        "node": ">=18"
+      },
+      "resolved": "https://registry.npmjs.org/copy-anything/-/copy-anything-4.1.0.tgz",
+      "integrity": "sha512-ufbM3smX/Jbnpk5wcQjzd1MgBpzmqfNETUAyZNrGwU9foRlyHoGzMMBBCRzEhQLBjZfFDE1W2ufPXX2vdWkV8Q==",
+      "licenseSha256": "91d090a8e06fd0f8b599f7bd5bc9e3d97896548037ef43ee1926c6109b7cd342"
+    },
+    {
+      "name": "superjson",
+      "version": "2.2.6",
+      "license": "MIT",
+      "dependencies": {
+        "copy-anything": "^4"
+      },
+      "engines": {
+        "node": ">=16"
+      },
+      "resolved": "https://registry.npmjs.org/superjson/-/superjson-2.2.6.tgz",
+      "integrity": "sha512-H+ue8Zo4vJmV2nRjpx86P35lzwDT3nItnIsocgumgr0hHMQ+ZGq5vrERg9kJBo5AWGmxZDhzDo+WVIJqkB0cGA==",
+      "licenseSha256": "d6b3a220bde9bf72fd0f9aecf71cd48c43ddc652abea727fc98a9b21a9534bb9"
+    }
+  ]
+}

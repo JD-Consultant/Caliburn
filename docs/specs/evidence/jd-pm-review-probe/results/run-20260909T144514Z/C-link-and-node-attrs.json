@@ -1,0 +1,2499 @@
+{
+  "id": "C-link-and-node-attrs",
+  "checks": [
+    {
+      "name": "link-href-title: vendor produces pending metadata",
+      "passed": true,
+      "detail": {
+        "stepTypes": [
+          {
+            "class": "RemoveMarkStep",
+            "json": {
+              "stepType": "removeMark",
+              "mark": {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v1",
+                  "title": "原版手冊"
+                }
+              },
+              "from": 32,
+              "to": 36
+            }
+          },
+          {
+            "class": "AddMarkStep",
+            "json": {
+              "stepType": "addMark",
+              "mark": {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v2",
+                  "title": "新版手冊"
+                }
+              },
+              "from": 32,
+              "to": 36
+            }
+          }
+        ],
+        "pending": [
+          {
+            "from": 32,
+            "to": 36,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v1",
+                  "title": "原版手冊"
+                }
+              },
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 36,
+            "to": 40,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 40,
+            "to": 44,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v2",
+                  "title": "新版手冊"
+                }
+              },
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "link-href-title: JSON doc and pending preserved",
+      "passed": true
+    },
+    {
+      "name": "link-href-title: reject restores original attrs and marks",
+      "passed": false,
+      "detail": {
+        "type": "paragraph",
+        "attrs": {
+          "id": "task-C",
+          "scope": "所有班別",
+          "sourceRefs": [
+            "utterance-3"
+          ]
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "參閱"
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v1",
+                  "title": "原版手冊"
+                }
+              }
+            ],
+            "text": "設備手冊"
+          },
+          {
+            "type": "text",
+            "text": "設備手冊。"
+          }
+        ]
+      }
+    },
+    {
+      "name": "link-href-title: accept keeps latest attrs",
+      "passed": true,
+      "detail": {
+        "type": "paragraph",
+        "attrs": {
+          "id": "task-C",
+          "scope": "所有班別",
+          "sourceRefs": [
+            "utterance-3"
+          ]
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "參閱"
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v2",
+                  "title": "新版手冊"
+                }
+              }
+            ],
+            "text": "設備手冊"
+          },
+          {
+            "type": "text",
+            "text": "。"
+          }
+        ]
+      }
+    },
+    {
+      "name": "link-href-title: both reviews clear pending",
+      "passed": true
+    },
+    {
+      "name": "node-scope-attr: complete without exception",
+      "passed": false,
+      "detail": {
+        "name": "RangeError",
+        "message": "Position undefined out of range",
+        "stack": "RangeError: Position undefined out of range\n    at ResolvedPos.resolve (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1045:19)\n    at ResolvedPos.resolveCached (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1077:56)\n    at Node.resolve (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1376:39)\n    at Node.slice (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1318:26)\n    at file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/dist/index.js:362:61\n    at Array.forEach (<anonymous>)\n    at file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/dist/index.js:353:35\n    at Array.forEach (<anonymous>)\n    at Plugin.appendTransaction (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/dist/index.js:335:26)\n    at EditorState.applyTransaction (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-state/dist/index.js:808:55)"
+      }
+    }
+  ],
+  "traces": [
+    {
+      "label": "link-href-title:actual-step-types",
+      "stepTypes": [
+        {
+          "class": "RemoveMarkStep",
+          "json": {
+            "stepType": "removeMark",
+            "mark": {
+              "type": "link",
+              "attrs": {
+                "href": "https://example.invalid/manual-v1",
+                "title": "原版手冊"
+              }
+            },
+            "from": 32,
+            "to": 36
+          }
+        },
+        {
+          "class": "AddMarkStep",
+          "json": {
+            "stepType": "addMark",
+            "mark": {
+              "type": "link",
+              "attrs": {
+                "href": "https://example.invalid/manual-v2",
+                "title": "新版手冊"
+              }
+            },
+            "from": 32,
+            "to": 36
+          }
+        }
+      ]
+    },
+    {
+      "label": "link-href-title",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      },
+      "requestedSteps": [
+        {
+          "stepType": "removeMark",
+          "mark": {
+            "type": "link",
+            "attrs": {
+              "href": "https://example.invalid/manual-v1",
+              "title": "原版手冊"
+            }
+          },
+          "from": 32,
+          "to": 36
+        },
+        {
+          "stepType": "addMark",
+          "mark": {
+            "type": "link",
+            "attrs": {
+              "href": "https://example.invalid/manual-v2",
+              "title": "新版手冊"
+            }
+          },
+          "from": 32,
+          "to": 36
+        }
+      ],
+      "requestedStepClasses": [
+        "RemoveMarkStep",
+        "AddMarkStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每月檢查一次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v2",
+                      "title": "新版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "removeMark",
+              "mark": {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v1",
+                  "title": "原版手冊"
+                }
+              },
+              "from": 32,
+              "to": 36
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v2",
+                  "title": "新版手冊"
+                }
+              },
+              "from": 32,
+              "to": 36
+            }
+          ],
+          "stepClasses": [
+            "RemoveMarkStep",
+            "AddMarkStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每月檢查一次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v2",
+                          "title": "新版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 32,
+              "to": 32,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  }
+                ]
+              }
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              },
+              "from": 32,
+              "to": 36
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              },
+              "from": 36,
+              "to": 40
+            },
+            {
+              "stepType": "replace",
+              "from": 36,
+              "to": 36,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "設備手冊"
+                  }
+                ]
+              }
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              },
+              "from": 36,
+              "to": 40
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep",
+            "AddMarkStep",
+            "AddMarkStep",
+            "ReplaceStep",
+            "AddMarkStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每月檢查一次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      },
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "C-link",
+                            "stage": "link-href-title"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "C-link",
+                            "stage": "link-href-title"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v2",
+                          "title": "新版手冊"
+                        }
+                      },
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "C-link",
+                            "stage": "link-href-title"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    },
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v2",
+                        "title": "新版手冊"
+                      }
+                    },
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 32,
+            "to": 36,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v1",
+                  "title": "原版手冊"
+                }
+              },
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 36,
+            "to": 40,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 40,
+            "to": 44,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v2",
+                  "title": "新版手冊"
+                }
+              },
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "C-link-href-title-before-review:new-EditorState-from-file",
+      "artifact": {
+        "file": "results/run-20260909T144514Z/C-link-href-title-before-review.doc.json",
+        "sha256": "5c25969e17266c78ffc24ec145ee793f20993085683bc05a5f76452704dc11cb"
+      },
+      "documentEqual": true,
+      "pendingEqual": true,
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    },
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v2",
+                        "title": "新版手冊"
+                      }
+                    },
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 32,
+            "to": 36,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v1",
+                  "title": "原版手冊"
+                }
+              },
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 36,
+            "to": 40,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 40,
+            "to": 44,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v2",
+                  "title": "新版手冊"
+                }
+              },
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "reject:C-link",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    },
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v2",
+                        "title": "新版手冊"
+                      }
+                    },
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 32,
+            "to": 36,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v1",
+                  "title": "原版手冊"
+                }
+              },
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 36,
+            "to": 40,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 40,
+            "to": 44,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v2",
+                  "title": "新版手冊"
+                }
+              },
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requestedSteps": [
+        {
+          "stepType": "removeMark",
+          "mark": {
+            "type": "suggestion_delete",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "C-link",
+                "stage": "link-href-title"
+              }
+            }
+          },
+          "from": 32,
+          "to": 36
+        },
+        {
+          "stepType": "removeMark",
+          "mark": {
+            "type": "suggestion_delete",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "C-link",
+                "stage": "link-href-title"
+              }
+            }
+          },
+          "from": 36,
+          "to": 40
+        },
+        {
+          "stepType": "replace",
+          "from": 40,
+          "to": 44
+        }
+      ],
+      "requestedStepClasses": [
+        "RemoveMarkStep",
+        "RemoveMarkStep",
+        "ReplaceStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每月檢查一次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "設備手冊。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "removeMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              },
+              "from": 32,
+              "to": 36
+            },
+            {
+              "stepType": "removeMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              },
+              "from": 36,
+              "to": 40
+            },
+            {
+              "stepType": "replace",
+              "from": 40,
+              "to": 44
+            }
+          ],
+          "stepClasses": [
+            "RemoveMarkStep",
+            "RemoveMarkStep",
+            "ReplaceStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每月檢查一次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "設備手冊。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "設備手冊。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      }
+    },
+    {
+      "label": "vendor-range-command-result",
+      "action": "reject",
+      "groupId": "C-link",
+      "range": {
+        "from": 32,
+        "to": 44
+      },
+      "returned": true,
+      "dispatchCount": 1
+    },
+    {
+      "label": "accept:C-link",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    },
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v2",
+                        "title": "新版手冊"
+                      }
+                    },
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "C-link",
+                          "stage": "link-href-title"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 32,
+            "to": 36,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v1",
+                  "title": "原版手冊"
+                }
+              },
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 36,
+            "to": 40,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 40,
+            "to": 44,
+            "text": "設備手冊",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "link",
+                "attrs": {
+                  "href": "https://example.invalid/manual-v2",
+                  "title": "新版手冊"
+                }
+              },
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requestedSteps": [
+        {
+          "stepType": "replace",
+          "from": 32,
+          "to": 36
+        },
+        {
+          "stepType": "replace",
+          "from": 32,
+          "to": 36
+        },
+        {
+          "stepType": "removeMark",
+          "mark": {
+            "type": "suggestion_insert",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "C-link",
+                "stage": "link-href-title"
+              }
+            }
+          },
+          "from": 32,
+          "to": 36
+        }
+      ],
+      "requestedStepClasses": [
+        "ReplaceStep",
+        "ReplaceStep",
+        "RemoveMarkStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每月檢查一次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v2",
+                      "title": "新版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 32,
+              "to": 36
+            },
+            {
+              "stepType": "replace",
+              "from": 32,
+              "to": 36
+            },
+            {
+              "stepType": "removeMark",
+              "mark": {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "C-link",
+                    "stage": "link-href-title"
+                  }
+                }
+              },
+              "from": 32,
+              "to": 36
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep",
+            "ReplaceStep",
+            "RemoveMarkStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每月檢查一次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v2",
+                          "title": "新版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v2",
+                        "title": "新版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      }
+    },
+    {
+      "label": "vendor-range-command-result",
+      "action": "accept",
+      "groupId": "C-link",
+      "range": {
+        "from": 32,
+        "to": 44
+      },
+      "returned": true,
+      "dispatchCount": 1
+    },
+    {
+      "label": "node-scope-attr:actual-step-types",
+      "stepTypes": [
+        {
+          "class": "AttrStep",
+          "json": {
+            "stepType": "attr",
+            "pos": 29,
+            "attr": "scope",
+            "value": "僅白班"
+          }
+        }
+      ]
+    },
+    {
+      "label": "node-scope-attr",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      },
+      "requestedSteps": [
+        {
+          "stepType": "attr",
+          "pos": 29,
+          "attr": "scope",
+          "value": "僅白班"
+        }
+      ],
+      "requestedStepClasses": [
+        "AttrStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每月檢查一次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "僅白班",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "error": {
+        "name": "RangeError",
+        "message": "Position undefined out of range",
+        "stack": "RangeError: Position undefined out of range\n    at ResolvedPos.resolve (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1045:19)\n    at ResolvedPos.resolveCached (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1077:56)\n    at Node.resolve (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1376:39)\n    at Node.slice (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1318:26)\n    at file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/dist/index.js:362:61\n    at Array.forEach (<anonymous>)\n    at file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/dist/index.js:353:35\n    at Array.forEach (<anonymous>)\n    at Plugin.appendTransaction (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/dist/index.js:335:26)\n    at EditorState.applyTransaction (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-state/dist/index.js:808:55)"
+      },
+      "callerStateAfterThrow": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      }
+    }
+  ],
+  "status": "GAP_OBSERVED"
+}

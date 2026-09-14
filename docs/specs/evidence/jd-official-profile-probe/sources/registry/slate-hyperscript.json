@@ -1,0 +1,104 @@
+{
+  "umd": "dist/slate-hyperscript.js",
+  "bugs": {
+    "url": "https://github.com/ianstormtaylor/slate/issues"
+  },
+  "dist": {
+    "shasum": "8564a0f640cd54559790329d18c247b754bce7bf",
+    "tarball": "https://registry.npmjs.org/slate-hyperscript/-/slate-hyperscript-0.125.0.tgz",
+    "fileCount": 18,
+    "integrity": "sha512-tH6AYvTrTnSdUo+L5cUvqcHRzQ3muEkcSEN7APM9NtEdWk9L7lqEbmpyeKfv7oyzCUW2WbR/lPhlnOSu8/jUcA==",
+    "signatures": [
+      {
+        "sig": "MEQCIFvu5sc3gQ3RUHm8nzI3HUsf0P1ztzYfV0XImvEOcPCZAiBjf1jdMzGFHH8A5eFuTZjjsbl56YoTFkEm4S2mRWqemQ==",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/slate-hyperscript@0.125.0",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "unpackedSize": 190024
+  },
+  "main": "dist/index.js",
+  "name": "slate-hyperscript",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.es.js",
+  "umdMin": "dist/slate-hyperscript.min.js",
+  "gitHead": "19a7dff89a475403f64446b03fc118f2afd820f2",
+  "license": "MIT",
+  "_npmUser": {
+    "name": "GitHub Actions",
+    "email": "npm-oidc-no-reply@github.com",
+    "trustedPublisher": {
+      "id": "github",
+      "oidcConfigId": "oidc:e964bf40-3786-4f24-b4d4-187d8657b035"
+    }
+  },
+  "homepage": "https://github.com/ianstormtaylor/slate#readme",
+  "keywords": [
+    "deserialize",
+    "h",
+    "html",
+    "hyperscript",
+    "jsx",
+    "serialize",
+    "slate",
+    "xml"
+  ],
+  "repository": {
+    "url": "git://github.com/ianstormtaylor/slate.git",
+    "type": "git"
+  },
+  "umdGlobals": {
+    "slate": "Slate"
+  },
+  "_npmVersion": "11.16.0",
+  "description": "A hyperscript helper for creating Slate documents.",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "ianstormtaylor",
+      "email": "ian@ianstormtaylor.com"
+    },
+    {
+      "name": "thesunny",
+      "email": "thesunny@gmail.com"
+    },
+    {
+      "name": "timbuckley",
+      "email": "timothypbuckley@gmail.com"
+    },
+    {
+      "name": "dylans",
+      "email": "dylan@dojotoolkit.org"
+    },
+    {
+      "name": "damareyoh",
+      "email": "cameron_ackerman@outlook.com"
+    },
+    {
+      "name": "brentfarese",
+      "email": "brent.farese@arity.co"
+    }
+  ],
+  "sideEffects": false,
+  "_nodeVersion": "22.17.1",
+  "_hasShrinkwrap": false,
+  "devDependencies": {
+    "slate": "^0.124.0",
+    "@babel/runtime": "^7.23.2",
+    "source-map-loader": "^4.0.1"
+  },
+  "peerDependencies": {
+    "slate": ">=0.114.3"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/slate-hyperscript_0.125.0_1780149175818_0.0054521010152079885",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "slate-hyperscript@0.125.0",
+  "version": "0.125.0"
+}

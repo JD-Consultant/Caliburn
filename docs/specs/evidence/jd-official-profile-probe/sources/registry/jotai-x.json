@@ -1,0 +1,91 @@
+{
+  "bugs": {
+    "url": "https://github.com/udecode/jotai-x/issues"
+  },
+  "dist": {
+    "shasum": "60cc2466a9e1a81db1abe2546dc3735253c1d437",
+    "tarball": "https://registry.npmjs.org/jotai-x/-/jotai-x-2.3.4.tgz",
+    "fileCount": 8,
+    "integrity": "sha512-FirSJ2ZwJtWXpg1EP5iTZdXZE4ilXUvHnMR6DqvSfUuDADl2LNEvFBjdenyxmUdE5Fqru6qLrArw2MMRAFFIdA==",
+    "signatures": [
+      {
+        "sig": "MEQCIHOMZmKZkAAu4f17t3IRrCMeaACem4y9rXEld0IsnK8KAiBWlcjKkRlgforM4AGER39FF8B0VY6okb/xjR2Jixzghw==",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "unpackedSize": 161817
+  },
+  "main": "dist/index.js",
+  "name": "jotai-x",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "module": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    }
+  },
+  "gitHead": "11cf4bb2e565c7d1734537bea3bf947e474d9a59",
+  "license": "MIT",
+  "scripts": {
+    "brl": "yarn p:brl",
+    "lint": "yarn p:lint",
+    "test": "yarn p:test",
+    "bench": "yarn build && node ./scripts/bench-store-alternatives.cjs",
+    "build": "yarn p:build",
+    "clean": "yarn p:clean",
+    "lint:fix": "yarn p:lint:fix",
+    "typecheck": "yarn p:typecheck",
+    "test:watch": "yarn p:test:watch",
+    "build:watch": "yarn p:build:watch"
+  },
+  "_npmUser": {
+    "name": "zbeyens",
+    "email": "zbeyens@udecode.dev"
+  },
+  "homepage": "https://jotai-x.udecode.dev/",
+  "keywords": [
+    "jotai"
+  ],
+  "repository": {
+    "url": "git+https://github.com/udecode/jotai-x.git",
+    "type": "git",
+    "directory": "packages/jotai-x"
+  },
+  "_npmVersion": "10.8.2",
+  "description": "Jotai store factory for a best-in-class developer experience.",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "zbeyens",
+      "email": "zbeyens@udecode.dev"
+    }
+  ],
+  "sideEffects": false,
+  "_nodeVersion": "20.20.1",
+  "publishConfig": {
+    "access": "public"
+  },
+  "_hasShrinkwrap": false,
+  "peerDependencies": {
+    "jotai": ">=2.0.0",
+    "react": ">=17.0.0",
+    "@types/react": ">=17.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "@types/react": {
+      "optional": true
+    }
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/jotai-x_2.3.4_1775083208281_0.994442611046503",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "jotai-x@2.3.4",
+  "version": "2.3.4"
+}

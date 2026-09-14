@@ -1,0 +1,139 @@
+{
+  "node": "v22.12.0",
+  "profile": {
+    "name": "jd-plate-clean-v2 F03 headless candidate",
+    "format_version": 2,
+    "nodeId": {
+      "reuseId": true,
+      "initialValueIds": "always"
+    },
+    "idCreator": "native nanoid(10), not overridden",
+    "normalization": "official core/basic/list/table; no custom normalizer; force at observation boundary",
+    "semanticTypes": [
+      "jd_section",
+      "jd_duty",
+      "jd_task",
+      "jd_outcomes",
+      "jd_requirements",
+      "jd_knowledge",
+      "jd_skill"
+    ]
+  },
+  "results": [
+    {
+      "id": "F03-A",
+      "description": "完整 r2 v2 分組／K-S 項目、空草稿與新程序重開",
+      "passed": true,
+      "checks": [
+        {
+          "name": "全部 r2 文字及含格式 leaf 序列保留",
+          "passed": true
+        },
+        {
+          "name": "四種普通 block、兩組數量／位置及兩組端點符合候選",
+          "passed": true
+        },
+        {
+          "name": "普通 JSON／不同 PID 的新 editor normalize 後全值相等",
+          "passed": true
+        },
+        {
+          "name": "無 Duty／無 links／空敘述及空兩組可由原生補 ID 並保留",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "F03-B",
+      "description": "先建立無 links 內容，讀原生 ID 再設引用／續改",
+      "passed": true,
+      "checks": [
+        {
+          "name": "輸入無 IDs／links；原生建立完整未連線草稿",
+          "passed": true
+        },
+        {
+          "name": "未連線首建中間稿可 JSON 新程序重開",
+          "passed": true
+        },
+        {
+          "name": "setNodes 只建立指定 Task 兩組 links，共享 K 改名保留身分",
+          "passed": true
+        },
+        {
+          "name": "原生 set_node operations 真的包含兩组 ID 陣列且普通 JSON 保留",
+          "passed": true
+        },
+        {
+          "name": "連線與完整續編結果新程序重開全等",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "F03-C",
+      "description": "固定 Task 複製／包含 K-S 複製與明列映射／移動",
+      "passed": true,
+      "checks": [
+        {
+          "name": "只複製 Task：全部複本 ID 新配，共享定義及 links 保留",
+          "passed": true
+        },
+        {
+          "name": "原生只配節點 IDs，不自動重寫自訂 links",
+          "passed": true
+        },
+        {
+          "name": "明列映射只改複本內部 links；外部共用及原引用者不變；Task8移動保全",
+          "passed": true
+        },
+        {
+          "name": "複本映射／移動完整 JSON 新程序全等",
+          "passed": true
+        }
+      ]
+    },
+    {
+      "id": "F03-D",
+      "description": "原生 unwrap／delete 與最終候選邊界",
+      "passed": true,
+      "checks": [
+        {
+          "name": "單 unwrap 原生執行但產生非法 group parent，不假稱原生拒絕",
+          "passed": true
+        },
+        {
+          "name": "明示同批先兩組後Task：全文／文字格式保留、最終有效",
+          "passed": true
+        },
+        {
+          "name": "合法 flatten 新程序全等",
+          "passed": true
+        },
+        {
+          "name": "單刪群組原生不阻擋，但 final group-count 不成立",
+          "passed": true
+        },
+        {
+          "name": "清空內容保留原要求組與合法空 p，不生成假工作",
+          "passed": true
+        },
+        {
+          "name": "刪被引用K原生不阻擋，固定端點檢查辨識所有受影響Task",
+          "passed": true
+        },
+        {
+          "name": "同批明示解除全部相關links後可刪K，Task／其他引用不連帶刪除",
+          "passed": true
+        },
+        {
+          "name": "合法解除／刪除後新程序全等",
+          "passed": true
+        }
+      ]
+    }
+  ],
+  "passed": 4,
+  "failed": 0,
+  "checkCount": 21
+}

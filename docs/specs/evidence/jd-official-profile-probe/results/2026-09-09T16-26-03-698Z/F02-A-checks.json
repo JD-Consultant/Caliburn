@@ -1,0 +1,28 @@
+{
+  "id": "F02-A",
+  "description": "官方 canonical 全 r2 與新程序 JSON 重開",
+  "passed": false,
+  "checks": [
+    {
+      "name": "全部 r2 文字與非空 leaf 格式逐一保留",
+      "passed": true
+    },
+    {
+      "name": "所有輸入 Element ID 存在、唯一且來源未变",
+      "passed": true
+    },
+    {
+      "name": "原生官方 plugins 與形狀生效",
+      "passed": true
+    },
+    {
+      "name": "clean value 無 undefined 等 JSON 非值",
+      "passed": true
+    },
+    {
+      "name": "execution",
+      "passed": false,
+      "message": "ENOENT: no such file or directory, open 'S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\results\\2026-09-09T16-26-03-698Z\\F02-A-canonical-fresh.json'"
+    }
+  ]
+}

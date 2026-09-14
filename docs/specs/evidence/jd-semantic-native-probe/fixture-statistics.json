@@ -1,0 +1,214 @@
+{
+  "origin": "Static extraction after F03; no additional editor execution",
+  "fixtureSha256": "f994045df13fd0095593a3333755df9e411dbc52ddeaeeba9aa276298d19a264",
+  "elements": 190,
+  "counts": {
+    "h1": 1,
+    "blockquote": 1,
+    "p": 56,
+    "jd_section": 6,
+    "h2": 6,
+    "table": 1,
+    "tr": 5,
+    "th": 2,
+    "td": 8,
+    "jd_duty": 4,
+    "h3": 4,
+    "jd_task": 8,
+    "jd_outcomes": 8,
+    "ul": 17,
+    "li": 22,
+    "lic": 22,
+    "jd_requirements": 8,
+    "jd_knowledge": 5,
+    "jd_skill": 5,
+    "hr": 1
+  },
+  "sourceNodes": [
+    {
+      "id": "task-1",
+      "source_refs": [
+        "fixture-source:task-1"
+      ]
+    },
+    {
+      "id": "task-2",
+      "source_refs": [
+        "fixture-source:task-2"
+      ]
+    },
+    {
+      "id": "task-3",
+      "source_refs": [
+        "fixture-source:task-3"
+      ]
+    },
+    {
+      "id": "task-4",
+      "source_refs": [
+        "fixture-source:task-4"
+      ]
+    },
+    {
+      "id": "task-5",
+      "source_refs": [
+        "fixture-source:task-5"
+      ]
+    },
+    {
+      "id": "task-6",
+      "source_refs": [
+        "fixture-source:task-6"
+      ]
+    },
+    {
+      "id": "task-7",
+      "source_refs": [
+        "fixture-source:task-7"
+      ]
+    },
+    {
+      "id": "task-8",
+      "source_refs": [
+        "fixture-source:task-8"
+      ]
+    }
+  ],
+  "retiredWrapperCount": 38,
+  "textUtf16Length": 2133,
+  "task8": {
+    "from": {
+      "parent": "duty-4",
+      "index": 2
+    },
+    "to": {
+      "parent": "duty-1",
+      "index": 3
+    },
+    "subtree": "task8-subtree-expected.json",
+    "fullExpected": "task8-move-full-expected.json",
+    "fullExpectedScope": "Explicit fixture oracle for a future isolated Task8-only move. F03-C actually performs copies, explicit link mapping, then Task8 move; its entire actual after is F03-C.json. No claim that this separate full expected was executed as a standalone native case.",
+    "actualObservedAfter": "results/2026-09-09T22-38-20-172Z/F03-C.json",
+    "actualObservedTask8": {
+      "type": "jd_task",
+      "id": "task-8",
+      "source_refs": [
+        "fixture-source:task-8"
+      ],
+      "children": [
+        {
+          "type": "p",
+          "id": "r2-81",
+          "children": [
+            {
+              "text": "8. 依維護約定執行定期前端檢查。",
+              "bold": true
+            }
+          ]
+        },
+        {
+          "type": "p",
+          "id": "task8-description",
+          "children": [
+            {
+              "text": "對包含定期維護的專案，檢查主要前端操作，記錄結果並追蹤已知問題或必要調整。"
+            }
+          ]
+        },
+        {
+          "type": "ul",
+          "id": "r2-88",
+          "children": [
+            {
+              "type": "li",
+              "id": "r2-83",
+              "children": [
+                {
+                  "type": "lic",
+                  "id": "r2-82",
+                  "children": [
+                    {
+                      "text": "執行時機：",
+                      "bold": true
+                    },
+                    {
+                      "text": "依各案約定；目前包含月檢服務的專案按月執行。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "jd_outcomes",
+          "id": "f03-task-8-outcomes",
+          "children": [
+            {
+              "type": "ul",
+              "id": "f03-task-8-outcomes-list",
+              "children": [
+                {
+                  "type": "li",
+                  "id": "r2-85",
+                  "children": [
+                    {
+                      "type": "lic",
+                      "id": "r2-84",
+                      "children": [
+                        {
+                          "text": "主要產出：",
+                          "bold": true
+                        },
+                        {
+                          "text": "維護檢查及問題追蹤紀錄。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "jd_requirements",
+          "id": "f03-task-8-requirements",
+          "children": [
+            {
+              "type": "ul",
+              "id": "f03-task-8-requirements-list",
+              "children": [
+                {
+                  "type": "li",
+                  "id": "r2-87",
+                  "children": [
+                    {
+                      "type": "lic",
+                      "id": "r2-86",
+                      "children": [
+                        {
+                          "text": "完成要求：",
+                          "bold": true
+                        },
+                        {
+                          "text": "僅約定交付後缺陷修正的專案，不自動納入固定月檢；超出服務範圍的新增需求另行確認。"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "knowledge_ids": [
+        "f03-jd_knowledge-5"
+      ],
+      "skill_ids": [
+        "f03-jd_skill-5"
+      ]
+    }
+  }
+}

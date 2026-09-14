@@ -54,9 +54,9 @@
 
 ## 固定情境進度
 
-**W-01–W-14 全部涵蓋。**
+**W-01–W-14 都有對應的測試入口，但不能把它們全部標成完整通過。** 目前 W-08 只測不存在的 bounds／root，沒有同 ID 分支 lineage 或合法 mid-turn cursor；W-13 只測 `validate_saved_window`，尚未接 B1 `reextract` 及「正常輸入位置不前進」；W-14 只測缺鏈，沒有 `>256` ancestor 的 fixture。這三項依審查紀錄列為部分證據，不能作為 H4／B1 已完成的宣稱。
 
-W-14 沿既有做法建立（讓新回合的 root `input` checkpoint 保存失敗以造成祖先缺鏈，同 `test_ai_history.py` 的技法），確認 `safe_turns`／`unprocessed_source` 會**明示** `original_run_lookup_required`，不退化成「沒有更早的回合」。**這個案例一寫就通過**：明示受限的行為本來就由既有 `AiRunHistory` 提供並向上傳遞，本案例是補上缺的證據，不是驅動產品改動。
+W-14 的缺鏈案例沿既有做法建立（讓新回合的 root `input` checkpoint 保存失敗，同 `test_ai_history.py` 的技法），確認 `safe_turns`／`unprocessed_source` 會**明示** `original_run_lookup_required`，不退化成「沒有更早的回合」。**這個案例一寫就通過**：明示受限的行為本來就由既有 `AiRunHistory` 提供並向上傳遞，本案例是補上缺的證據，不是驅動產品改動。完整的 `>256` 深度案例及 W-08／W-13 補驗列在[實作審查](../2026-09-13-jd-window-source-implementation-review.md)。
 
 ## 明確**沒有**做的
 

@@ -1,0 +1,320 @@
+[
+  {
+    "path": "capture-materials.mjs",
+    "source": ".research-tmp/jd-editor-codec-probe/capture-materials.mjs",
+    "sourceSha256": "3BCA2968BE37EB1F15F0E690618656DB58FA959700C94955CBD766F98B00F0A3",
+    "archiveSha256": "3BCA2968BE37EB1F15F0E690618656DB58FA959700C94955CBD766F98B00F0A3"
+  },
+  {
+    "path": "codec-probe.mjs",
+    "source": ".research-tmp/jd-editor-codec-probe/codec-probe.mjs",
+    "sourceSha256": "54D2C07A205A69DFD3C21E575FC921D0AFB6CE97C0C9C1093DFAFE744F9737FB",
+    "archiveSha256": "54D2C07A205A69DFD3C21E575FC921D0AFB6CE97C0C9C1093DFAFE744F9737FB"
+  },
+  {
+    "path": "package-lock.json",
+    "source": ".research-tmp/jd-editor-codec-probe/package-lock.json",
+    "sourceSha256": "20D97929080FA95C75C96CFFBBC24A46C6A0407508464A955C60AB05A1D3AEC8",
+    "archiveSha256": "20D97929080FA95C75C96CFFBBC24A46C6A0407508464A955C60AB05A1D3AEC8"
+  },
+  {
+    "path": "package.json",
+    "source": ".research-tmp/jd-editor-codec-probe/package.json",
+    "sourceSha256": "90C7259463B4E2EB9CC4A485FDFF16D3A1DD883E4F6AEC3C1227E1858D6F0C51",
+    "archiveSha256": "90C7259463B4E2EB9CC4A485FDFF16D3A1DD883E4F6AEC3C1227E1858D6F0C51"
+  },
+  {
+    "path": "README.md",
+    "source": ".research-tmp/jd-editor-codec-probe/README.md",
+    "sourceSha256": "89DBC6540D80B5D8A539312A64D0F8C57589B4822C2A9847C2BDF7CE58143A3E",
+    "archiveSha256": "89DBC6540D80B5D8A539312A64D0F8C57589B4822C2A9847C2BDF7CE58143A3E"
+  },
+  {
+    "path": "registry-metadata.json",
+    "source": ".research-tmp/jd-editor-codec-probe/registry-metadata.json",
+    "sourceSha256": "C949109CFF24653012D95D1FD14E150DCDC33D6093A986E52D113D892A435692",
+    "archiveSha256": "C949109CFF24653012D95D1FD14E150DCDC33D6093A986E52D113D892A435692"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/codec-results.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/codec-results.json",
+    "sourceSha256": "2941C1CFB6C21D19A64950F79BB9ECB224C7CC073403DD771206E82F7732EB98",
+    "archiveSha256": "2941C1CFB6C21D19A64950F79BB9ECB224C7CC073403DD771206E82F7732EB98"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/codec-traces.inspect.txt",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/codec-traces.inspect.txt",
+    "sourceSha256": "BF0361E8F67102DC9AB019FFC7B3FF21C43E6DCD2156B851AE9D4A8A0A252E9D",
+    "archiveSha256": "BF0361E8F67102DC9AB019FFC7B3FF21C43E6DCD2156B851AE9D4A8A0A252E9D"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/codec-traces.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/codec-traces.json",
+    "sourceSha256": "9CE77CC6DEAC01B7667A63E9D50546E9D53AC2AA76EA1915ACA748DB71BD941B",
+    "archiveSha256": "9CE77CC6DEAC01B7667A63E9D50546E9D53AC2AA76EA1915ACA748DB71BD941B"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/format-pending-raw-json-control.inspect.txt",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/format-pending-raw-json-control.inspect.txt",
+    "sourceSha256": "7F2DEE87EC18AB41AE683099ED816423FA40BE2F1A73717680003B22F08FD25A",
+    "archiveSha256": "7F2DEE87EC18AB41AE683099ED816423FA40BE2F1A73717680003B22F08FD25A"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/format-pending-raw-json-control.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/format-pending-raw-json-control.json",
+    "sourceSha256": "BBAF3665821E738FDFA472E5B2F70CA5500162741D9443C7EC6A984FC913D108",
+    "archiveSha256": "BBAF3665821E738FDFA472E5B2F70CA5500162741D9443C7EC6A984FC913D108"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/format-pending-superjson-envelope.inspect.txt",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/format-pending-superjson-envelope.inspect.txt",
+    "sourceSha256": "86C3BADD96118F80170636D0386DBA59AF8D658A734C921476B9040DF3B82B66",
+    "archiveSha256": "86C3BADD96118F80170636D0386DBA59AF8D658A734C921476B9040DF3B82B66"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/format-pending-superjson-envelope.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/format-pending-superjson-envelope.json",
+    "sourceSha256": "94DEF6518E9D087A68AF55012E9EF351F8D6BD80FDB3902F9C4103F6E2614FB1",
+    "archiveSha256": "94DEF6518E9D087A68AF55012E9EF351F8D6BD80FDB3902F9C4103F6E2614FB1"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/run-hashes.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/run-hashes.json",
+    "sourceSha256": "211A1780DF5A2888816FEE48CF0F87859C6F1632ABADE187CF8B4595C377341B",
+    "archiveSha256": "211A1780DF5A2888816FEE48CF0F87859C6F1632ABADE187CF8B4595C377341B"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/two-pending-native-raw-value.inspect.txt",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/two-pending-native-raw-value.inspect.txt",
+    "sourceSha256": "9A614788C9CC36B6F234295C144B8E8DD27A6698AEF13369E0ED78B0B4D22248",
+    "archiveSha256": "9A614788C9CC36B6F234295C144B8E8DD27A6698AEF13369E0ED78B0B4D22248"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/two-pending-native-raw-value.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/two-pending-native-raw-value.json",
+    "sourceSha256": "88FC7C21F9DB37299F11ACD9C84B9D8DCB31DE04FD24C0793CC6950C2EB08BB7",
+    "archiveSha256": "88FC7C21F9DB37299F11ACD9C84B9D8DCB31DE04FD24C0793CC6950C2EB08BB7"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/two-pending-superjson-envelope.inspect.txt",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/two-pending-superjson-envelope.inspect.txt",
+    "sourceSha256": "948747C93B8D5154F6AC72BB6DC2923A8FDF1FCA9D1556A45FB66ED89A1FEDE8",
+    "archiveSha256": "948747C93B8D5154F6AC72BB6DC2923A8FDF1FCA9D1556A45FB66ED89A1FEDE8"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/two-pending-superjson-envelope.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/two-pending-superjson-envelope.json",
+    "sourceSha256": "16AD916814FDACCAA52D5A6D00913F734C8AD051A231DBFDAB8B0DFEF62651C3",
+    "archiveSha256": "16AD916814FDACCAA52D5A6D00913F734C8AD051A231DBFDAB8B0DFEF62651C3"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/undefined-null-missing-superjson-envelope.inspect.txt",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/undefined-null-missing-superjson-envelope.inspect.txt",
+    "sourceSha256": "BA0EC43B04A4B4FC9F3A37E374E3796DCFDF715C854D990957B9DD3D94A23A87",
+    "archiveSha256": "BA0EC43B04A4B4FC9F3A37E374E3796DCFDF715C854D990957B9DD3D94A23A87"
+  },
+  {
+    "path": "results/2026-09-09T15-28-48-170Z/undefined-null-missing-superjson-envelope.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/2026-09-09T15-28-48-170Z/undefined-null-missing-superjson-envelope.json",
+    "sourceSha256": "6615A91EF04ED076106138A3088C416C8EADFC79F4FB6C425281832FC69506E0",
+    "archiveSha256": "6615A91EF04ED076106138A3088C416C8EADFC79F4FB6C425281832FC69506E0"
+  },
+  {
+    "path": "results/original-probes-preserved.json",
+    "source": ".research-tmp/jd-editor-codec-probe/results/original-probes-preserved.json",
+    "sourceSha256": "23751E1BE8741F35B023768D75F4243FAED3EA0421F61929602BA972A2832EC3",
+    "archiveSha256": "23751E1BE8741F35B023768D75F4243FAED3EA0421F61929602BA972A2832EC3"
+  },
+  {
+    "path": "source/borrowed-platejs/LICENSE",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-platejs/LICENSE",
+    "sourceSha256": "8B649E3569682298F50ED2048210E8F528034FEB56F5D43A9977A7D60B0F7065",
+    "archiveSha256": "8B649E3569682298F50ED2048210E8F528034FEB56F5D43A9977A7D60B0F7065"
+  },
+  {
+    "path": "source/borrowed-platejs/package.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-platejs/package.json",
+    "sourceSha256": "C6D4F25418A3B5E51E3F8D3A05F178D0E0273518B206CEDE0D713D7332F73480",
+    "archiveSha256": "C6D4F25418A3B5E51E3F8D3A05F178D0E0273518B206CEDE0D713D7332F73480"
+  },
+  {
+    "path": "source/borrowed-review-probe/package-lock.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-review-probe/package-lock.json",
+    "sourceSha256": "DABB5E05ED949D538605F9464839DD88034DA97A007214F0C81EFEDDA7444EFF",
+    "archiveSha256": "DABB5E05ED949D538605F9464839DD88034DA97A007214F0C81EFEDDA7444EFF"
+  },
+  {
+    "path": "source/borrowed-review-probe/package.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-review-probe/package.json",
+    "sourceSha256": "F791443865AF15AD0E42FC47D0159CCAB7D072AFD1694AC21E9E01C998AA1C7E",
+    "archiveSha256": "F791443865AF15AD0E42FC47D0159CCAB7D072AFD1694AC21E9E01C998AA1C7E"
+  },
+  {
+    "path": "source/borrowed-suggestion/dist/index.d.ts",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-suggestion/dist/index.d.ts",
+    "sourceSha256": "568B028AF5190F72F968F3CD7E940201C78B93AD63BD2E26534317FEA40E452E",
+    "archiveSha256": "568B028AF5190F72F968F3CD7E940201C78B93AD63BD2E26534317FEA40E452E"
+  },
+  {
+    "path": "source/borrowed-suggestion/dist/index.js",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-suggestion/dist/index.js",
+    "sourceSha256": "D5EE50EEFCBBFAC71BC0422F71138BA5C0E0FC3ABB26FC9B6217EFD6CB7A7335",
+    "archiveSha256": "D5EE50EEFCBBFAC71BC0422F71138BA5C0E0FC3ABB26FC9B6217EFD6CB7A7335"
+  },
+  {
+    "path": "source/borrowed-suggestion/dist/src-CMqLOrDd.js",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-suggestion/dist/src-CMqLOrDd.js",
+    "sourceSha256": "0188CBA49494DA891B18261CDA039A56809324FD655F252D14D2A8C3E5CC1919",
+    "archiveSha256": "0188CBA49494DA891B18261CDA039A56809324FD655F252D14D2A8C3E5CC1919"
+  },
+  {
+    "path": "source/borrowed-suggestion/LICENSE",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-suggestion/LICENSE",
+    "sourceSha256": "8B649E3569682298F50ED2048210E8F528034FEB56F5D43A9977A7D60B0F7065",
+    "archiveSha256": "8B649E3569682298F50ED2048210E8F528034FEB56F5D43A9977A7D60B0F7065"
+  },
+  {
+    "path": "source/borrowed-suggestion/package.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/borrowed-suggestion/package.json",
+    "sourceSha256": "122ECE31D11757B813D315ACD37878576B95C10FA8014E096B734729CC2C7AE5",
+    "archiveSha256": "122ECE31D11757B813D315ACD37878576B95C10FA8014E096B734729CC2C7AE5"
+  },
+  {
+    "path": "source/dependency-inventory.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/dependency-inventory.json",
+    "sourceSha256": "52C38BB1464D3944FF5C4E951C317136F4A0B69D217D43E27E8F80C80D037C6C",
+    "archiveSha256": "52C38BB1464D3944FF5C4E951C317136F4A0B69D217D43E27E8F80C80D037C6C"
+  },
+  {
+    "path": "source/installed-copy-anything/dist/index.js",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-copy-anything/dist/index.js",
+    "sourceSha256": "4FFB0CBC0F6DD305332C43AC26F98B5BDC9DEC600A74E13067F2A62FFC066431",
+    "archiveSha256": "4FFB0CBC0F6DD305332C43AC26F98B5BDC9DEC600A74E13067F2A62FFC066431"
+  },
+  {
+    "path": "source/installed-copy-anything/LICENSE",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-copy-anything/LICENSE",
+    "sourceSha256": "91D090A8E06FD0F8B599F7BD5BC9E3D97896548037EF43EE1926C6109B7CD342",
+    "archiveSha256": "91D090A8E06FD0F8B599F7BD5BC9E3D97896548037EF43EE1926C6109B7CD342"
+  },
+  {
+    "path": "source/installed-copy-anything/package.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-copy-anything/package.json",
+    "sourceSha256": "7BBEB74A9F0EF8014A778412B53143D8FC2F5FD7BC55DE5356C3FF53B1936AF9",
+    "archiveSha256": "7BBEB74A9F0EF8014A778412B53143D8FC2F5FD7BC55DE5356C3FF53B1936AF9"
+  },
+  {
+    "path": "source/installed-copy-anything/README.md",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-copy-anything/README.md",
+    "sourceSha256": "01B88AE987959A379CF076F5E9BA99D6BC9B9B21BC31EFCDB8F40404440A6348",
+    "archiveSha256": "01B88AE987959A379CF076F5E9BA99D6BC9B9B21BC31EFCDB8F40404440A6348"
+  },
+  {
+    "path": "source/installed-superjson/dist/index.d.ts",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/dist/index.d.ts",
+    "sourceSha256": "7C11A1BA7E6C12AC8F50BA8C40B1126A154799343F135C221D0407A5F29ED6F9",
+    "archiveSha256": "7C11A1BA7E6C12AC8F50BA8C40B1126A154799343F135C221D0407A5F29ED6F9"
+  },
+  {
+    "path": "source/installed-superjson/dist/index.js",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/dist/index.js",
+    "sourceSha256": "232D0662F8CEAFCE122CCFCBE5EA6179C5ACD898DA2C4E6DD9F73E802DA48392",
+    "archiveSha256": "232D0662F8CEAFCE122CCFCBE5EA6179C5ACD898DA2C4E6DD9F73E802DA48392"
+  },
+  {
+    "path": "source/installed-superjson/dist/is.js",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/dist/is.js",
+    "sourceSha256": "CAC1AFCC1645724711C78EEA1A8CC3137DBABDDA7A035AA758FCB4A3C537AE2E",
+    "archiveSha256": "CAC1AFCC1645724711C78EEA1A8CC3137DBABDDA7A035AA758FCB4A3C537AE2E"
+  },
+  {
+    "path": "source/installed-superjson/dist/plainer.js",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/dist/plainer.js",
+    "sourceSha256": "B94448285FF7C47F47DAA4137816B6CA16045C4217702825660598E14B8BB731",
+    "archiveSha256": "B94448285FF7C47F47DAA4137816B6CA16045C4217702825660598E14B8BB731"
+  },
+  {
+    "path": "source/installed-superjson/dist/transformer.js",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/dist/transformer.js",
+    "sourceSha256": "6B5A821E2A572CDDA9D2E2E00E7A6A01EA03758E20F3D42AAE417F1EA1877260",
+    "archiveSha256": "6B5A821E2A572CDDA9D2E2E00E7A6A01EA03758E20F3D42AAE417F1EA1877260"
+  },
+  {
+    "path": "source/installed-superjson/dist/util.js",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/dist/util.js",
+    "sourceSha256": "0A44AB73CD32F5157038DF95FF6AD0A8125D9FAB06301C0FFC9B11BA549C6F70",
+    "archiveSha256": "0A44AB73CD32F5157038DF95FF6AD0A8125D9FAB06301C0FFC9B11BA549C6F70"
+  },
+  {
+    "path": "source/installed-superjson/LICENSE",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/LICENSE",
+    "sourceSha256": "D6B3A220BDE9BF72FD0F9AECF71CD48C43DDC652ABEA727FC98A9B21A9534BB9",
+    "archiveSha256": "D6B3A220BDE9BF72FD0F9AECF71CD48C43DDC652ABEA727FC98A9B21A9534BB9"
+  },
+  {
+    "path": "source/installed-superjson/package.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/package.json",
+    "sourceSha256": "D05EE30464BFD26BBDECDAA628B9937925F23C8D205D7DB662C8B779C4EF6971",
+    "archiveSha256": "D05EE30464BFD26BBDECDAA628B9937925F23C8D205D7DB662C8B779C4EF6971"
+  },
+  {
+    "path": "source/installed-superjson/README.md",
+    "source": ".research-tmp/jd-editor-codec-probe/source/installed-superjson/README.md",
+    "sourceSha256": "25AC33EFB2407BA318994C4CBC73D0558B5F6B01F2746164D63D81395CC851BE",
+    "archiveSha256": "25AC33EFB2407BA318994C4CBC73D0558B5F6B01F2746164D63D81395CC851BE"
+  },
+  {
+    "path": "source/materials-manifest.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/materials-manifest.json",
+    "sourceSha256": "8535A222B19BC0D120A8DF23922072D0B5BD47A6F26D49DA4A5730541088CC62",
+    "archiveSha256": "8535A222B19BC0D120A8DF23922072D0B5BD47A6F26D49DA4A5730541088CC62"
+  },
+  {
+    "path": "source/official-source-manifest.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/official-source-manifest.json",
+    "sourceSha256": "0E23A794D9892FD74848C62BAE43E505E026ED81E6809E9540420FAB17CF54AD",
+    "archiveSha256": "0E23A794D9892FD74848C62BAE43E505E026ED81E6809E9540420FAB17CF54AD"
+  },
+  {
+    "path": "source/official-superjson/LICENSE",
+    "source": ".research-tmp/jd-editor-codec-probe/source/official-superjson/LICENSE",
+    "sourceSha256": "D6B3A220BDE9BF72FD0F9AECF71CD48C43DDC652ABEA727FC98A9B21A9534BB9",
+    "archiveSha256": "D6B3A220BDE9BF72FD0F9AECF71CD48C43DDC652ABEA727FC98A9B21A9534BB9"
+  },
+  {
+    "path": "source/official-superjson/package.json",
+    "source": ".research-tmp/jd-editor-codec-probe/source/official-superjson/package.json",
+    "sourceSha256": "D05EE30464BFD26BBDECDAA628B9937925F23C8D205D7DB662C8B779C4EF6971",
+    "archiveSha256": "D05EE30464BFD26BBDECDAA628B9937925F23C8D205D7DB662C8B779C4EF6971"
+  },
+  {
+    "path": "source/official-superjson/README.md",
+    "source": ".research-tmp/jd-editor-codec-probe/source/official-superjson/README.md",
+    "sourceSha256": "25AC33EFB2407BA318994C4CBC73D0558B5F6B01F2746164D63D81395CC851BE",
+    "archiveSha256": "25AC33EFB2407BA318994C4CBC73D0558B5F6B01F2746164D63D81395CC851BE"
+  },
+  {
+    "path": "source/official-superjson/src/index.ts",
+    "source": ".research-tmp/jd-editor-codec-probe/source/official-superjson/src/index.ts",
+    "sourceSha256": "570F0E01A9D0BC43B87165C42430422F46DE26917AA2272E7751EE67A1F7FA66",
+    "archiveSha256": "570F0E01A9D0BC43B87165C42430422F46DE26917AA2272E7751EE67A1F7FA66"
+  },
+  {
+    "path": "source/official-superjson/src/plainer.ts",
+    "source": ".research-tmp/jd-editor-codec-probe/source/official-superjson/src/plainer.ts",
+    "sourceSha256": "7B4619A8A8DD0C0EFF2D035AE6F8E3E3FEC3F5FF42C041E891A1CD21C527F344",
+    "archiveSha256": "7B4619A8A8DD0C0EFF2D035AE6F8E3E3FEC3F5FF42C041E891A1CD21C527F344"
+  },
+  {
+    "path": "source/official-superjson/src/transformer.ts",
+    "source": ".research-tmp/jd-editor-codec-probe/source/official-superjson/src/transformer.ts",
+    "sourceSha256": "F2876D9D8DB559B167637FFB633A6F006FE3C766356AA152964C0FA4F4144F19",
+    "archiveSha256": "F2876D9D8DB559B167637FFB633A6F006FE3C766356AA152964C0FA4F4144F19"
+  },
+  {
+    "path": "artifact-hashes.json",
+    "source": ".research-tmp/jd-editor-codec-probe/artifact-hashes.json",
+    "sourceSha256": "C60C71E0E9711490012B90BFCEF052B81DDBFF5A3EED3E75149C527A85E73D8F",
+    "archiveSha256": "C60C71E0E9711490012B90BFCEF052B81DDBFF5A3EED3E75149C527A85E73D8F"
+  }
+]

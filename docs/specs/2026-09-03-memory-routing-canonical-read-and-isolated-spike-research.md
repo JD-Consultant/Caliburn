@@ -3,6 +3,8 @@
 - 日期：2026-09-03
 - 狀態：**G4 read shape、isolated semantic-index mechanism 與兩個模型可見 Tool 名稱已獲 Product Owner 核准；framework contract audit 完成；Product Owner 已於 2026-09-03 核准 Revision 2 進入 G5 隔離實驗，但未授權 production 實作**
 - 決策來源：[`../current-decisions.md`](../current-decisions.md) 的 `MEM-D000～MEM-D003`、`MEM-Q001～MEM-Q004`
+
+> **2026-09-04 G4.3a 窄幅後繼裁決**：本文記錄的原 G5 search-result 實驗形狀曾排除 Store key／`memory_ref`；該實驗已以 `FAIL_UNPROVEN` 關閉，歷史驗收內容不回寫。後續 G4.1 選用 LangMem native `manage_memory` 後，官方契約顯示 update／delete 必須取得既有 `id`。Product Owner 因此核准 production Working contract 的每筆 search hit 增加 Runtime-issued、model-safe、LangMem-compatible `id`；模型只可原樣帶回，scope／namespace／version 等仍隱藏。最新裁決以 [`2026-09-04 G4 working design §8`](./2026-09-04-llm-machine-effects-and-sibling-results-working-design.md) 為準；本文其餘無 ID 的敘述只描述已結束的歷史 spike，不得再當最新 production input。
 - 流程：[`../decision-process.md`](../decision-process.md)
 - 本輪只處理：Semantic Memory routing、canonical message reference／read contract，以及驗證它們所需的最小 isolated spike
 

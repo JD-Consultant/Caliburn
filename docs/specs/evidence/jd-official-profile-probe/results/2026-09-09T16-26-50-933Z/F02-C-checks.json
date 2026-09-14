@@ -1,0 +1,19 @@
+{
+  "id": "F02-C",
+  "description": "Task8 移動、Duty4 unwrap 保留完整工作後新程序重開",
+  "passed": true,
+  "checks": [
+    {
+      "name": "Task8 全 subtree／ID／來源保留且屬 Duty1",
+      "passed": true
+    },
+    {
+      "name": "unwrap 只取消 Duty4；Task4／7／8、原標題與八項工作保留",
+      "passed": true
+    },
+    {
+      "name": "移動／unwrap 後檔案→不同 Node PID 新 editor 全等",
+      "passed": true
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+[
+  {
+    "path": "docs/specs/2026-09-10-jd-product-quality-acceptance.md",
+    "before": "無額外 judge／模擬員工 LLM。這是本案首批提案，不延用 CT49–51 舊授權。",
+    "after": "不另啟 provider 員工／評分模型；容許本 task 既有 AI controller 依公開卡模擬合成員工回答。這是本案首批費用提案，不延用 CT49–51 舊授權。"
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-product-quality-acceptance.md",
+    "before": "由人依卡扮演員工並對自然追問回答；不提示 tool name、不塞「先 read 再 edit」指令、不以外部腳本強迫 Memory 整併。資料揭露可隨追問改順序，逐筆記錄；到上限仍不完整就如實停止。",
+    "after": "由本 task 既有 AI controller 依卡模擬合成員工，對真顧問的自然追問回答；controller 是 AI、非真人，已接觸 oracle、非盲，同操作者判讀非獨立人工評量。不提示 tool name、不塞「先 read 再 edit」指令、不以外部腳本強迫 Memory 整併；不傳 oracle、完整卡或研究指令。資料揭露可隨追問改順序，逐筆記錄；到上限仍不完整就如實停止。"
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-product-quality-acceptance.md",
+    "before": "### 自然操作與成本提案（待另行授權）",
+    "after": "### 自然操作與成本提案（待另行授權）\r\n\r\n測法沿革（2026-09-10）：root 依有限 spec／quality PASS 採用[AI controller 操作設計](2026-09-10-jd-natural-calibration-operator-design.md)，僅作待付費授權的 P3 執行測法；不是 Owner 既有真人豁免、自然驗收通過或付費授權。只校準真模型工程縱切及初步語意品質；Q 標準不降低，真人／獨立人工評讀缺證仍待驗，P6 三名真員工與未見案例不變。Controller 平台資源不假稱免費，也不冒稱已含於 App 前背景 provider 的 US$1 帳本；不新增員工／judge API 呼叫。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/employee-card.md",
+    "before": "版本：1。",
+    "after": "版本：2。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/employee-card.md",
+    "before": "只供人員扮演，不整份送給待測顧問。",
+    "after": "供已採測法的既有 AI controller 模擬合成員工；非真人、已見 oracle、非盲，不整份送給待測顧問。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/release-protocol.md",
+    "before": "版本：1。人員執行；0次自然 trial。",
+    "after": "版本：2。既有 AI controller 模擬合成員工，非真人、已見 oracle、非盲；同操作者判讀非獨立。0次自然 trial。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/release-protocol.md",
+    "before": "或讓模擬員工LLM代答。",
+    "after": "或另啟provider員工／評分模型。既有controller本身是AI，依本版明示測法供應卡內回答，不冒稱真人；平台資源與App費用帳本分開揭露。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/oracle.md",
+    "before": "版本：1；公開calibration，非held-out。",
+    "after": "版本：2；公開calibration，非held-out。操作者為已見oracle的AI controller，非盲；同操作者初步判讀非獨立人工評量。原語意規則不變。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/README.md",
+    "before": "版本1；2026-09-10。",
+    "after": "版本2；2026-09-10。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/README.md",
+    "before": "人員扮演卡，開場與W01–W10",
+    "after": "AI controller 合成員工卡，開場與W01–W10"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/README.md",
+    "before": "此包沒有金鑰、provider連線、模擬員工LLM、judge或任何推論執行；準備材料不等於批准執行。",
+    "after": "此包沒有金鑰、provider連線或任何推論執行；已採測法容許既有AI controller模擬合成員工，但不另啟provider員工／評分模型。準備材料不等於批准執行。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/README.md",
+    "before": "獲授權後，人員按自然追問扮演",
+    "after": "獲授權後，既有AI controller按自然追問模擬合成員工"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/README.md",
+    "before": "## 曝光與準備限制",
+    "after": "## v2 測法沿革\r\n\r\n2026-09-10 root 依有限設計 review 的 spec／quality PASS 採用[操作設計](../../2026-09-10-jd-natural-calibration-operator-design.md)，只作待付費授權的P3執行測法；不是Owner既有真人豁免或自然驗收通過。[archive/v1/snapshot-manifest.json](archive/v1/snapshot-manifest.json)保留v1五檔、原manifest與品質來源的逐byte封存，原W／M／Q不改。\r\n\r\nController是AI，已見oracle、非盲；同操作者判讀非獨立人工評量，僅供工程縱切與初步語意校準。不得向待測顧問傳oracle／完整卡／研究指令／expected tools，洩題或錯卡保留首敗並標污染／不可判定。Controller的平台資源不假稱免費，也不假稱已含於App前背景provider的US$1帳本；不新增provider員工／judge呼叫。P6未見案例、三名真員工及原人工評讀缺證仍待驗。\r\n\r\n## 曝光與準備限制"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/results-template.md",
+    "before": "# C-W P3 trial 空結果帳本",
+    "after": "# C-W P3 trial 空結果帳本\r\n\r\n版本2；已採AI controller公開卡測法，未執行。Controller是AI、已見oracle、非盲；同操作者判讀不算獨立人工評量。僅記工程縱切／初步語意證據；P6真員工與未見案例不變。平台資源與App provider費用分開，不冒稱全部AI運算免費。"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/results-template.md",
+    "before": "| Trial ID／開始結束／操作者／判讀者 | 待填 |",
+    "after": "| Trial ID／開始結束／AI controller操作者／判讀者及是否同一方 | 待填；非真人，已見oracle、非盲，初步判讀不稱獨立人工核准 |"
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-natural-calibration-operator-design.md",
+    "before": "**有限 G4 候選／未採用／未執行**。只提出一個 P3 測法；不改品質原件、C-W 卡包、manifest、register、runtime、模型或 Memory。不授權任何付費請求；不阻擋 Task4 修正／review、Task5／6 工程。",
+    "after": "**root 已採用為待付費授權的 P3 執行測法／文件同步中／未執行**。2026-09-10 有限獨立 review：spec／quality PASS（僅測法設計與誠實揭露），受審候選 SHA256 為 3016d934f2ad174c83f7925b56e9abe16ec8261f7969b42b62eec2d2eb109d43；review 見[有限審查](../../.superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-p3-operator-design-review.md)。採用不是 Owner 既有真人豁免、自然驗收通過或付費授權。原候選全文下列保留作設計沿革，其中未採用／尚未同步語句描述受審時點；當前同步與驗證见[同步紀錄](../../.superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-p3-operator-adoption-sync.md)。不改模型／Memory，不阻擋 Task4／5／6。"
+  },
+  {
+    "path": ".superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-p3-budget-preflight.md",
+    "before": "",
+    "after": "\r\n## 2026-09-10 操作者來源效力與採用補記\r\n\r\n原§6『待指定真正的人員card operator』是當時品質§6測法的假設，不是已找到的Owner硬裁決。Root經有限spec／quality PASS採用既有AI controller按公開C-W卡供應合成回答，作待付費授權的P3測法；controller是AI、已見oracle、非盲，同操作者判讀非獨立人工評量，不另啟provider員工／judge模型。平台資源與App美元帳本分開揭露，不冒稱真人或全部AI運算免費。依操作設計同步品質§6及卡包v2，P6未見案例／三名真員工與人工評讀缺證保留。此补記不閉合P3-B01–04、不改OFF01–09或12／180／US$1提案，不授權任何付費，也不稱防護／P3已驗。\r\n"
+  },
+  {
+    "path": "docs/specs/evidence/jd-product-p3-calibration/manifest.json",
+    "before": "{\r\n  \"package_id\": \"jd-product-p3-calibration-c-w\",\r\n  \"version\": 1,\r\n  \"created_at_utc\": \"2026-09-10T02:26:18.6212397Z\",\r\n  \"author\": \"Codex mechanical preparation from accepted C-W materials\",\r\n  \"case\": \"C-W\",\r\n  \"classification\": \"calibration\",\r\n  \"exposed\": true,\r\n  \"held_out\": false,\r\n  \"synthetic\": true,\r\n  \"exposure\": [\r\n    \"Original public quality-acceptance material exposed to research/implementation workflow\",\r\n    \"Codex preparation task and root review workflow\"\r\n  ],\r\n  \"source\": {\r\n    \"path\": \"S:/caliburn/.worktrees/analysis-only-agent/docs/specs/2026-09-10-jd-product-quality-acceptance.md\",\r\n    \"sha256\": \"1407e42b0a3c0d87c73caff6d37c05faa74020973f8f3d6441594bbdc6bbd92c\",\r\n    \"sections\": [\r\n      \"4 Q01-Q15\",\r\n      \"5 C-W W01-W10 and M-W1\",\r\n      \"6 P3 zero-cost preparation items 2 and 4 and execution boundary\"\r\n    ]\r\n  },\r\n  \"official_context_only\": [\r\n    \"https://www.onetonline.org/link/summary/43-5071.00\"\r\n  ],\r\n  \"official_context_note\": \"Original material occupational plausibility only; no newly researched employer facts\",\r\n  \"execution\": {\r\n    \"status\": \"NOT RUN\",\r\n    \"authorization\": \"NOT AUTHORIZED\",\r\n    \"natural_trials\": 0,\r\n    \"model_requests\": 0,\r\n    \"proposed_employee_turn_cap\": 12,\r\n    \"proposed_provider_request_cap\": 180,\r\n    \"proposed_usd_cap\": \"1.00\",\r\n    \"includes_background_and_failures\": true\r\n  },\r\n  \"runtime\": {\r\n    \"status\": \"PENDING CORE TASKS 1-6 COMPLETION\",\r\n    \"commit\": null,\r\n    \"lock_hashes\": null,\r\n    \"prompt_hash\": null,\r\n    \"skill_hashes\": null,\r\n    \"schema_hash\": null,\r\n    \"model_id\": null,\r\n    \"effort\": null,\r\n    \"output_limit\": null,\r\n    \"budgets_and_compaction\": null\r\n  },\r\n  \"scope_excludes\": [\r\n    \"P6 held-out packages\",\r\n    \"Other calibration roles\",\r\n    \"Model execution\",\r\n    \"Runtime or design changes\"\r\n  ],\r\n  \"files\": [\r\n    {\r\n      \"path\": \"employee-card.md\",\r\n      \"sha256\": \"231d8020e72a11b607f35be8a7daf8ac4ec38b1a8733b5fa516110c8a669262a\",\r\n      \"bytes\": 3238\r\n    },\r\n    {\r\n      \"path\": \"release-protocol.md\",\r\n      \"sha256\": \"923686b5c4fe6d55186bdbdbefb5218646bbcf73fd2a1e609c9a32cdea9728dc\",\r\n      \"bytes\": 4377\r\n    },\r\n    {\r\n      \"path\": \"oracle.md\",\r\n      \"sha256\": \"8b157e14dc1097e1129098a26a42b23b279925352f8a2d2ea44c074e21edbf52\",\r\n      \"bytes\": 7283\r\n    },\r\n    {\r\n      \"path\": \"README.md\",\r\n      \"sha256\": \"910042a810869dd9e93864eaf8f4f45bc0d43a08ccbd29d6d3c776d60c9563cb\",\r\n      \"bytes\": 3147\r\n    },\r\n    {\r\n      \"path\": \"results-template.md\",\r\n      \"sha256\": \"cf3d1087c94e8de9fc0231cf6da66e0534db56c1dd78534d961f48e53b011f79\",\r\n      \"bytes\": 3798\r\n    }\r\n  ],\r\n  \"manifest_hashes_itself\": false\r\n}\r\n",
+    "after": "{\r\n  \"package_id\": \"jd-product-p3-calibration-c-w\",\r\n  \"version\": 2,\r\n  \"created_at_utc\": \"2026-09-10T02:26:18.6212397Z\",\r\n  \"author\": \"Codex mechanical preparation from accepted C-W materials\",\r\n  \"case\": \"C-W\",\r\n  \"classification\": \"calibration\",\r\n  \"exposed\": true,\r\n  \"held_out\": false,\r\n  \"synthetic\": true,\r\n  \"exposure\": [\r\n    \"Original public quality-acceptance material exposed to research/implementation workflow\",\r\n    \"Codex preparation task and root review workflow\",\r\n    \"Version 2: existing task AI controller has seen oracle; not blind; same-controller interpretation is not independent human evaluation\"\r\n  ],\r\n  \"source\": {\r\n    \"path\": \"S:/caliburn/.worktrees/analysis-only-agent/docs/specs/2026-09-10-jd-product-quality-acceptance.md\",\r\n    \"sha256\": \"0a81e44018e55bdcf2d38780d229709750d7dfba932a0cd4c638a9533f47215e\",\r\n    \"sections\": [\r\n      \"4 Q01-Q15\",\r\n      \"5 C-W W01-W10 and M-W1\",\r\n      \"6 P3 zero-cost preparation items 2 and 4 and execution boundary\"\r\n    ]\r\n  },\r\n  \"official_context_only\": [\r\n    \"https://www.onetonline.org/link/summary/43-5071.00\"\r\n  ],\r\n  \"official_context_note\": \"Original material occupational plausibility only; no newly researched employer facts\",\r\n  \"execution\": {\r\n    \"status\": \"NOT RUN\",\r\n    \"authorization\": \"NOT AUTHORIZED\",\r\n    \"natural_trials\": 0,\r\n    \"model_requests\": 0,\r\n    \"proposed_employee_turn_cap\": 12,\r\n    \"proposed_provider_request_cap\": 180,\r\n    \"proposed_usd_cap\": \"1.00\",\r\n    \"includes_background_and_failures\": true\r\n  },\r\n  \"runtime\": {\r\n    \"status\": \"PENDING CORE TASKS 1-6 COMPLETION\",\r\n    \"commit\": null,\r\n    \"lock_hashes\": null,\r\n    \"prompt_hash\": null,\r\n    \"skill_hashes\": null,\r\n    \"schema_hash\": null,\r\n    \"model_id\": null,\r\n    \"effort\": null,\r\n    \"output_limit\": null,\r\n    \"budgets_and_compaction\": null\r\n  },\r\n  \"scope_excludes\": [\r\n    \"P6 held-out packages\",\r\n    \"Other calibration roles\",\r\n    \"Model execution\",\r\n    \"Product runtime or architecture changes (operator test method is revised in version 2)\"\r\n  ],\r\n  \"files\": [\r\n    {\r\n      \"path\": \"employee-card.md\",\r\n      \"sha256\": \"bd54e73337ffd0cbd41b8578f430d647ed433802bd9295fbf724f2ee04170281\",\r\n      \"bytes\": 3314\r\n    },\r\n    {\r\n      \"path\": \"release-protocol.md\",\r\n      \"sha256\": \"4db446fea06d51b8451bac58e7734aa1c9f7600c67231c4b9248180aeb57a46f\",\r\n      \"bytes\": 4617\r\n    },\r\n    {\r\n      \"path\": \"oracle.md\",\r\n      \"sha256\": \"61f08183f5a85ef7be29cdf9e984f440013fab61d206b48f7c023b7b95c33b60\",\r\n      \"bytes\": 7407\r\n    },\r\n    {\r\n      \"path\": \"README.md\",\r\n      \"sha256\": \"0c2d1275ce251e68ead12246a25cb67bb406cc49a54d2d58a91f1be58dbdfee8\",\r\n      \"bytes\": 4153\r\n    },\r\n    {\r\n      \"path\": \"results-template.md\",\r\n      \"sha256\": \"aef13928a9a28adaafbbd6543903bd4b003912e5c49ef7043cf3607e7c34752d\",\r\n      \"bytes\": 4205\r\n    }\r\n  ],\r\n  \"manifest_hashes_itself\": false,\r\n  \"revised_at_utc\": \"2026-09-10T03:58:24.563814Z\",\r\n  \"operator_method\": {\r\n    \"status\": \"ROOT ADOPTED METHOD; PAID EXECUTION NOT AUTHORIZED\",\r\n    \"operator\": \"Existing task AI controller simulating the synthetic employee from public C-W card\",\r\n    \"is_human\": false,\r\n    \"oracle_exposed\": true,\r\n    \"blind\": false,\r\n    \"independent_human_evaluation\": false,\r\n    \"additional_provider_employee_or_judge_models\": false,\r\n    \"scope\": \"Engineering vertical slice and preliminary semantic calibration only; P6 unseen cases and three real employees unchanged\",\r\n    \"cost_boundary\": \"Controller platform resources disclosed separately; not claimed free or covered by App foreground/background provider USD1 ledger\",\r\n    \"design\": \"../../2026-09-10-jd-natural-calibration-operator-design.md\",\r\n    \"reviewed_candidate_sha256\": \"3016d934f2ad174c83f7925b56e9abe16ec8261f7969b42b62eec2d2eb109d43\"\r\n  },\r\n  \"revision_history\": [\r\n    {\r\n      \"version\": 1,\r\n      \"archive\": \"archive/v1/snapshot-manifest.json\",\r\n      \"manifest_sha256\": \"5d4598ceca456f3451fd594c23687902b7596bf9154a204f0b24d43df5201eeb\",\r\n      \"source_sha256\": \"1407e42b0a3c0d87c73caff6d37c05faa74020973f8f3d6441594bbdc6bbd92c\",\r\n      \"note\": \"Original byte-exact public calibration package preserved; original human-operator proposal remains historical\"\r\n    },\r\n    {\r\n      \"version\": 2,\r\n      \"date\": \"2026-09-10\",\r\n      \"note\": \"Root adoption following finite spec/quality PASS; operator and evidence metadata only. W/M/Q and P6 thresholds unchanged; no execution authorization.\"\r\n    }\r\n  ]\r\n}\r\n"
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-natural-calibration-operator-design.md",
+    "before": "../../.superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-p3-operator-design-review.md",
+    "after": "evidence/2026-09-10-jd-natural-calibration-operator-review.md"
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-natural-calibration-operator-design.md",
+    "before": "../../.superpowers/sdd/2026-09-10-jd-editor-core-implementation/task-p3-operator-adoption-sync.md",
+    "after": "evidence/jd-product-p3-calibration/operator-adoption/task-p3-operator-adoption-sync.md"
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-natural-trial-budget-preflight.md",
+    "before": "",
+    "after": "\r\n## 2026-09-10 操作者來源效力與採用補記\r\n\r\n原§6『待指定真正的人員card operator』是當時品質§6測法的假設，不是已找到的Owner硬裁決。Root經有限spec／quality PASS採用既有AI controller按公開C-W卡供應合成回答，作待付費授權的P3測法；controller是AI、已見oracle、非盲，同操作者判讀非獨立人工評量，不另啟provider員工／judge模型。平台資源與App美元帳本分開揭露，不冒稱真人或全部AI運算免費。依操作設計同步品質§6及卡包v2，P6未見案例／三名真員工與人工評讀缺證保留。此补記不閉合P3-B01–04、不改OFF01–09或12／180／US$1提案，不授權任何付費，也不稱防護／P3已驗。\r\n"
+  }
+]

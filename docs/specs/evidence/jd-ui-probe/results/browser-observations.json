@@ -1,0 +1,45 @@
+{
+  "checkedOn": "2026-09-09",
+  "surface": "Codex in-app browser via CUA",
+  "url": "http://127.0.0.1:4391/",
+  "status": "fixed_readonly_presentation_observed_with_limits",
+  "observations": {
+    "allThreeViewsTableCount": 9,
+    "nativeDiffView": {
+      "tableCount": 3,
+      "tableChildTags": [["TBODY"], ["TBODY"], ["TBODY"]],
+      "rowParentTags": ["TBODY"],
+      "cellParentTags": ["TR"],
+      "nestedUlCount": 1,
+      "task3DescriptionSameIdCount": 2,
+      "task3Classes": ["slate-p diff-delete", "slate-p diff-insert"],
+      "bothBeforeAndAfterTextPresent": true
+    },
+    "reloadButton": {
+      "resetToFullR2View": true,
+      "tableCountAfterReload": 9,
+      "sameIdBeforeAndAfterStillPresent": true,
+      "counterexampleSavedJsonAndOperationsStillReadableAfterTabSwitch": true
+    },
+    "knownFailuresStillVisible": [
+      "Text leaf score 1 to 0: saved after and set_node have 0; original native diff represents new value as undefined.",
+      "Empty text bold to italic: before/after and captured set_node are shown; native diff has no update operation."
+    ],
+    "screenshotsInspectedInToolTrace": [
+      "Three-column header and beginning of full r2.",
+      "Real table cells and job-purpose paragraph with green insertion highlights."
+    ],
+    "browserWarningOrErrorLogsObserved": [],
+    "finalRebuildReload": {"neutralUndefinedLabelPresent": true, "oldAmbiguousLabelAbsent": true, "tableCount": 9}
+  },
+  "limits": [
+    "Readonly fixed fixtures only; no editing, IME, undo, DB transaction, process crash or real LLM validation.",
+    "Task 3 scope is only available in expanded raw JSON/materials. All business metadata readable by employees is not proven.",
+    "The two native diff counterexamples remain failures; this report does not certify complete diff coverage.",
+    "Screenshots are in the CUA conversation trace, not standalone screenshot files in this evidence bundle."
+  ],
+  "automationNotes": [
+    "Initial AX exposed pressed buttons as checkboxes; the Playwright DOM snapshot identified real buttons and button locators worked.",
+    "After reload, scoped locator evaluation timed out despite the label being present. Fresh DOM inspection and documented readonly page DOM evaluation confirmed the expected two nodes. No application warning/error was observed."
+  ]
+}

@@ -1,0 +1,234 @@
+{
+  "checkedOn": "2026-09-09",
+  "scope": "Installed native probe lockfile metadata, not a production dependency audit",
+  "packageCount": 44,
+  "packages": [
+    {
+      "package": "node_modules/@juggle/resize-observer",
+      "version": "3.4.0",
+      "declaredLicense": "Apache-2.0"
+    },
+    {
+      "package": "node_modules/@platejs/core",
+      "version": "53.3.11",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/@platejs/diff",
+      "version": "53.0.0",
+      "declaredLicense": null
+    },
+    {
+      "package": "node_modules/@platejs/slate",
+      "version": "53.3.10",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/@platejs/utils",
+      "version": "53.3.11",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/@radix-ui/react-compose-refs",
+      "version": "1.1.5",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/@radix-ui/react-slot",
+      "version": "1.3.3",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/@udecode/react-hotkeys",
+      "version": "52.0.11",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/@udecode/react-utils",
+      "version": "52.3.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/@udecode/utils",
+      "version": "52.3.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/clsx",
+      "version": "2.1.1",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/compute-scroll-into-view",
+      "version": "3.1.1",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/dequal",
+      "version": "2.0.3",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/diff-match-patch-ts",
+      "version": "0.6.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/direction",
+      "version": "1.0.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/immer",
+      "version": "10.2.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/is-hotkey",
+      "version": "0.2.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/is-plain-object",
+      "version": "5.1.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/jotai",
+      "version": "2.8.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/jotai-optics",
+      "version": "0.4.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/jotai-x",
+      "version": "2.3.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/lodash",
+      "version": "4.18.1",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/lodash.mapvalues",
+      "version": "4.6.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/mutative",
+      "version": "1.1.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/nanoid",
+      "version": "5.1.16",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/optics-ts",
+      "version": "2.4.1",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/platejs",
+      "version": "53.3.11",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/proxy-compare",
+      "version": "2.6.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/react",
+      "version": "19.2.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/react-compiler-runtime",
+      "version": "1.0.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/react-dom",
+      "version": "19.2.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/react-tracked",
+      "version": "1.7.14",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/scheduler",
+      "version": "0.27.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/scroll-into-view-if-needed",
+      "version": "3.1.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/slate",
+      "version": "0.126.2",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/slate-dom",
+      "version": "0.126.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/slate-hyperscript",
+      "version": "0.125.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/slate-react",
+      "version": "0.126.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/tiny-invariant",
+      "version": "1.3.1",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/use-context-selector",
+      "version": "1.4.4",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/use-deep-compare",
+      "version": "1.3.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/use-sync-external-store",
+      "version": "1.4.0",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/zustand",
+      "version": "5.0.15",
+      "declaredLicense": "MIT"
+    },
+    {
+      "package": "node_modules/zustand-x",
+      "version": "6.2.1",
+      "declaredLicense": "MIT"
+    }
+  ],
+  "exception": {
+    "package": "@platejs/diff",
+    "registryLicenseFieldAbsent": true,
+    "derivedCode": "Apache-2.0",
+    "evidence": "Installed package LICENSE",
+    "modifications": "Apache-2.0 and MIT dual-licensed"
+  }
+}

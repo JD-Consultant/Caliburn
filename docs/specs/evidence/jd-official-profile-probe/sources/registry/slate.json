@@ -1,0 +1,114 @@
+{
+  "umd": "dist/slate.js",
+  "bugs": {
+    "url": "https://github.com/ianstormtaylor/slate/issues"
+  },
+  "dist": {
+    "shasum": "a4e8543e1798466c7b0efbd3407f5273e2ce31ff",
+    "tarball": "https://registry.npmjs.org/slate/-/slate-0.126.2.tgz",
+    "fileCount": 244,
+    "integrity": "sha512-38C8GU9awiEbroZm+DzXEFUWKptb1QV9xcgcUjseas4PtqQdBnEPITocosYzFHXEVrlkafjZEv8KH8pjhe0esQ==",
+    "signatures": [
+      {
+        "sig": "MEYCIQDJzoTjJ0Nqin/jvHA48zYujHyWa+/MES6ObHEM5vItcgIhAIEOkg0mLT+Z6iUlPWrs8zsJMZyK/EcSrhdAIwcyHZli",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      },
+      {
+        "sig": "MEUCIF0YvL++7pZcgJOVkwnpTtEXrC0Qa8zEARPMmTrlHm8vAiEAr417ac58AEm5Q2q3e6jwFhPyTS5oMIE11TeyYf9LWTw=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "attestations": {
+      "url": "https://registry.npmjs.org/-/npm/v1/attestations/slate@0.126.2",
+      "provenance": {
+        "predicateType": "https://slsa.dev/provenance/v1"
+      }
+    },
+    "unpackedSize": 2281743
+  },
+  "main": "dist/index.js",
+  "name": "slate",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.es.js",
+  "umdMin": "dist/slate.min.js",
+  "gitHead": "ec793483ada7f7e21ebc82c2b3aa9ea674605ce3",
+  "license": "MIT",
+  "_npmUser": {
+    "name": "GitHub Actions",
+    "email": "npm-oidc-no-reply@github.com",
+    "trustedPublisher": {
+      "id": "github",
+      "oidcConfigId": "oidc:34672901-2661-4873-9ec2-e053c6f425ca"
+    }
+  },
+  "homepage": "https://github.com/ianstormtaylor/slate#readme",
+  "keywords": [
+    "canvas",
+    "contenteditable",
+    "custom",
+    "document",
+    "edit",
+    "editor",
+    "html",
+    "immutable",
+    "markdown",
+    "medium",
+    "paper",
+    "react",
+    "rich",
+    "richtext",
+    "richtext",
+    "slate",
+    "text",
+    "wysiwyg",
+    "wysiwym"
+  ],
+  "repository": {
+    "url": "git://github.com/ianstormtaylor/slate.git",
+    "type": "git"
+  },
+  "_npmVersion": "11.18.0",
+  "description": "A completely customizable framework for building rich text editors.",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "ianstormtaylor",
+      "email": "ian@ianstormtaylor.com"
+    },
+    {
+      "name": "thesunny",
+      "email": "thesunny@gmail.com"
+    },
+    {
+      "name": "timbuckley",
+      "email": "timothypbuckley@gmail.com"
+    },
+    {
+      "name": "dylans",
+      "email": "dylan@dojotoolkit.org"
+    },
+    {
+      "name": "damareyoh",
+      "email": "cameron_ackerman@outlook.com"
+    },
+    {
+      "name": "brentfarese",
+      "email": "brent.farese@arity.co"
+    }
+  ],
+  "sideEffects": false,
+  "_nodeVersion": "22.17.1",
+  "_hasShrinkwrap": false,
+  "devDependencies": {
+    "lodash": "^4.17.21",
+    "@babel/runtime": "^7.23.2",
+    "slate-hyperscript": "^0.125.0",
+    "source-map-loader": "^4.0.1"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/slate_0.126.2_1786166514469_0.19743746255616879",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "slate@0.126.2",
+  "version": "0.126.2"
+}

@@ -1,0 +1,77 @@
+{
+  "bugs": {
+    "url": "https://github.com/facebook/react/issues"
+  },
+  "dist": {
+    "shasum": "438e57baa19b77cb23aab516cf635cd0579ee09a",
+    "tarball": "https://registry.npmjs.org/react/-/react-19.2.4.tgz",
+    "fileCount": 27,
+    "integrity": "sha512-9nfp2hYpCwOjAN+8TZFGhtWEwgvWHXqESH8qT89AT/lWklpLON22Lc8pEtnpsZz7VmawabSU0gCjnj8aC0euHQ==",
+    "signatures": [
+      {
+        "sig": "MEYCIQDtINiyI1xyyR38fHnz7I9vIwnUEVUrjV0m4srQU5+IiQIhALB4gdmEpZ0XKyzirlvwN60Tb2LuANIalyI74Jg73fWj",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "unpackedSize": 171604
+  },
+  "main": "index.js",
+  "name": "react",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "exports": {
+    ".": {
+      "default": "./index.js",
+      "react-server": "./react.react-server.js"
+    },
+    "./jsx-runtime": {
+      "default": "./jsx-runtime.js",
+      "react-server": "./jsx-runtime.react-server.js"
+    },
+    "./package.json": "./package.json",
+    "./jsx-dev-runtime": {
+      "default": "./jsx-dev-runtime.js",
+      "react-server": "./jsx-dev-runtime.react-server.js"
+    },
+    "./compiler-runtime": {
+      "default": "./compiler-runtime.js",
+      "react-server": "./compiler-runtime.js"
+    }
+  },
+  "license": "MIT",
+  "_npmUser": {
+    "name": "react-bot",
+    "email": "react-core@meta.com"
+  },
+  "homepage": "https://react.dev/",
+  "keywords": [
+    "react"
+  ],
+  "repository": {
+    "url": "git+https://github.com/facebook/react.git",
+    "type": "git",
+    "directory": "packages/react"
+  },
+  "_npmVersion": "10.8.2",
+  "description": "React is a JavaScript library for building user interfaces.",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "fb",
+      "email": "opensource+npm@fb.com"
+    },
+    {
+      "name": "react-bot",
+      "email": "react-core@meta.com"
+    }
+  ],
+  "_nodeVersion": "20.19.0",
+  "_hasShrinkwrap": false,
+  "_npmOperationalInternal": {
+    "tmp": "tmp/react_19.2.4_1769451790087_0.07071191062189386",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "react@19.2.4",
+  "version": "19.2.4"
+}

@@ -1,0 +1,85 @@
+{
+  "started": "2026-09-09T22:38:20.174Z",
+  "node": "v22.12.0",
+  "executable": "D:\\nodejs\\node.exe",
+  "profile": {
+    "name": "jd-plate-clean-v2 F03 headless candidate",
+    "format_version": 2,
+    "nodeId": {
+      "reuseId": true,
+      "initialValueIds": "always"
+    },
+    "idCreator": "native nanoid(10), not overridden",
+    "normalization": "official core/basic/list/table; no custom normalizer; force at observation boundary",
+    "semanticTypes": [
+      "jd_section",
+      "jd_duty",
+      "jd_task",
+      "jd_outcomes",
+      "jd_requirements",
+      "jd_knowledge",
+      "jd_skill"
+    ]
+  },
+  "dependencyVersions": {
+    "platejs": {
+      "version": "53.3.11",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\platejs\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\platejs\\dist\\index.js"
+    },
+    "@platejs/core": {
+      "version": "53.3.11",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\core\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\core\\dist\\index.js"
+    },
+    "@platejs/slate": {
+      "version": "53.3.10",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\slate\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\slate\\dist\\index.js"
+    },
+    "slate": {
+      "version": "0.126.2",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\slate\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\slate\\dist\\index.js"
+    },
+    "@platejs/basic-nodes": {
+      "version": "53.0.0",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\basic-nodes\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\basic-nodes\\dist\\index.js"
+    },
+    "@platejs/list-classic": {
+      "version": "53.0.0",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\list-classic\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\list-classic\\dist\\index.js"
+    },
+    "@platejs/table": {
+      "version": "53.0.9",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\table\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\table\\dist\\index.js"
+    },
+    "@platejs/diff": {
+      "version": "53.0.0",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\diff\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\diff\\dist\\index.js"
+    },
+    "react": {
+      "version": "19.2.4",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react\\index.js"
+    },
+    "react-dom": {
+      "version": "19.2.4",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react-dom\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react-dom\\index.js"
+    }
+  },
+  "inputHashes": {
+    "README.md": "2767ea6e1cc45ffb5e1cc08c3460e487a28076e7c6009e9a4c18cbbb208f0068",
+    "engine.mjs": "625732fa94cb25fc21908f1d24dc5bf4eeb8eb93133d46a0f944aaf776817e21",
+    "prepare-fixture.mjs": "b52e0e9f248ce2180c4c4cccf0e0cc4fdb633d93d7e4dc81e4445191b8f20430",
+    "fresh-editor.mjs": "2690f06b896ecb6b7ca5e14fb2365e9d03df4fea703fe69413c4a3af23031915",
+    "probe.mjs": "c878b15aefb91aa86d101abe45285ff3a3a53f9fd8411b0ec7a4e5170a5e0f9c",
+    "fixture.json": "f994045df13fd0095593a3333755df9e411dbc52ddeaeeba9aa276298d19a264",
+    "fixture-mapping.json": "9e419d8dbe10f953ab319b6707a72dbcaac5326bbd1bb98811927d8f9e9377c5"
+  }
+}

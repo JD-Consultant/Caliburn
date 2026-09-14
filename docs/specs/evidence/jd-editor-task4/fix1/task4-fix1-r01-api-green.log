@@ -1,0 +1,70 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+_______ test_pg_routes_manual_receipt_history_and_cross_document_scope ________
+
+jd = <analysis_agent.jd_service.JdService object at 0x0000027B498360F0>
+tmp_path = WindowsPath('C:/Users/chenb/AppData/Local/Temp/pytest-of-chenb/pytest-565/test_pg_routes_manual_receipt_0')
+
+    def test_pg_routes_manual_receipt_history_and_cross_document_scope(jd, tmp_path):
+        from analysis_agent.api import create_app
+        # Compose exactly the existing service and JD owner on the same PG engine.
+        @contextmanager
+        def resources():
+            with service_harness(tmp_path, engine=jd.catalog.engine) as (service, _, _):
+                service.jd = jd
+                yield service
+        with TestClient(create_app(resources), base_url='http://127.0.0.1:8091') as client:
+            a = jd.create_document('A')['id']
+            b = jd.create_document('B')['id']
+            path = f'/documents/{a}/jd'
+            read = client.get(path)
+            assert read.status_code == 200
+            before = read.json()
+            value = before['fragment']
+            value[0]['children'] = [{'text': '第一次工作，第二次工作'}]
+            body = {'request_key': str(uuid4()), 'base_revision_ref': before['revision_ref'], 'value': value}
+            saved = client.post(path+'/manual-save', json=body)
+            assert saved.status_code == 200, saved.text
+            assert saved.json()['status'] == 'committed'
+            assert client.post(path+'/manual-save', json=body).json() == saved.json()
+            current = client.get(path).json()
+            assert current['fragment'] == value
+            changes = client.post(path+'/changes/read', json={'change_ref': saved.json()['change_ref']}).json()
+            assert changes['after_fragment'] == value
+            assert changes['before_fragment'][0]['children'] == [{'text': ''}]
+            wrong = client.post(f'/documents/{b}/jd/read', json={'revision_ref': current['revision_ref']})
+            assert wrong.status_code in (409, 422)
+            assert client.get(f'/documents/{b}/jd').json()['fragment'] != value
+            selected = {'request_key': 'selection-'+str(uuid4()), 'text': '保留這句原話',
+                'jd_selection': {'base_revision_ref': current['revision_ref'],
+                    'range': {'anchor': {'path': [0, 0], 'offset': 0}, 'focus': {'path': [0, 0], 'offset': 2}}}}
+            run = client.post(f'/documents/{a}/runs', json=selected)
+            assert run.status_code == 202
+            client.app.state.service.join(a)
+            import copy
+            different = copy.deepcopy(selected)
+            different['jd_selection']['range']['focus']['offset'] = 3
+            assert client.post(f'/documents/{a}/runs', json=different).status_code == 409
+            assert client.get(f'/documents/{a}/messages').json()[0]['text'] == selected['text']
+            # An exact terminal receipt remains a read even while new writes are forbidden.
+            service = client.app.state.service
+            pending = service.catalog.create_run(a, 'busy-'+str(uuid4()), 'digest')
+            assert client.post(path+'/manual-save', json=body).json() == saved.json()
+>           assert client.post(path+'/manual-save', json={**body, 'request_key': str(uuid4())}).status_code == 409
+E           AssertionError: assert 422 == 409
+E            +  where 422 = <Response [422 Unprocessable Content]>.status_code
+E            +    where <Response [422 Unprocessable Content]> = post(('/documents/b939aff7-362a-4183-91b7-b295c9b0ebaa/jd' + '/manual-save'), json={'request_key': '29ae0f10-9026-489b-969c-c8ba48526019', 'base_revision_ref': 'WyJyZXZpc2lvbiIsImI5MzlhZmY3LTM2MmEtNDE4...Q0YiJd', 'value': [{'type': 'p', 'id': '04a77c50-05c1-4575-9005-7831136da4bc', 'children': [{'text': '第一次工作，第二次工作'}]}]})
+E            +      where post = <starlette.testclient.TestClient object at 0x0000027B4C100E00>.post
+
+tests\test_jd_api.py:128: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-fe72dd11-8b55-4f32-aeab-bf7120d30178.jsonl
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_api.py::test_pg_routes_manual_receipt_history_and_cross_document_scope
+1 failed, 1 passed, 4 deselected, 1 warning in 7.64s

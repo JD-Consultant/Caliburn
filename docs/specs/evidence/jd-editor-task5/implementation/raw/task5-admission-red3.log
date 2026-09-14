@@ -1,0 +1,65 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_ test_root_only_manual_binding_preserves_messages_and_first_true_input[False] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-cb708287-f167-4e63-aaa4-e596580c71ad/test_root_only_manual_binding_0')
+closed_turn = False
+
+    @pytest.mark.parametrize('closed_turn', [False, True])
+    def test_root_only_manual_binding_preserves_messages_and_first_true_input(tmp_path, closed_turn):
+        import analysis_agent.conversation as conversation
+>       assert hasattr(conversation, 'save_manual_pending'), 'Root-only manual identity is missing'
+E       AssertionError: Root-only manual identity is missing
+E       assert False
+E        +  where False = hasattr(<module 'analysis_agent.conversation' from 'S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\src\\analysis_agent\\conversation.py'>, 'save_manual_pending')
+
+tests\test_jd_admission.py:13: AssertionError
+_ test_root_only_manual_binding_preserves_messages_and_first_true_input[True] _
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-cb708287-f167-4e63-aaa4-e596580c71ad/test_root_only_manual_binding_1')
+closed_turn = True
+
+    @pytest.mark.parametrize('closed_turn', [False, True])
+    def test_root_only_manual_binding_preserves_messages_and_first_true_input(tmp_path, closed_turn):
+        import analysis_agent.conversation as conversation
+>       assert hasattr(conversation, 'save_manual_pending'), 'Root-only manual identity is missing'
+E       AssertionError: Root-only manual identity is missing
+E       assert False
+E        +  where False = hasattr(<module 'analysis_agent.conversation' from 'S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\src\\analysis_agent\\conversation.py'>, 'save_manual_pending')
+
+tests\test_jd_admission.py:13: AssertionError
+_____ test_stop_after_native_cleanup_does_not_publish_computed_candidate ______
+
+    def test_stop_after_native_cleanup_does_not_publish_computed_candidate():
+        from analysis_agent.jd_contract import manual_intent, revision_ref
+        from analysis_agent.jd_types import JdScope, JdRevision, JdCandidate
+        from analysis_agent.jd_service import JdService
+        from analysis_agent.jd_engine import JdNativeCalls
+        scope, marker, stop, publications = JdScope('manual'), object(), Event(), []
+        base = JdRevision(scope, uuid4(), None, 'initial', [{'id':'p','type':'p','children':[{'text':''}]}])
+        intent = manual_intent(scope, {'request_key':str(uuid4()), 'base_revision_ref':revision_ref(scope,base.id),
+            'value':[{'id':'p','type':'p','children':[{'text':'candidate'}]}]})
+        def compute(value, **kwargs):
+            stop.set()
+            return JdCandidate(value, [], [])
+        def publish(intent, candidate=None, **kwargs):
+            publications.append((candidate, kwargs))
+            return kwargs.get('error')
+        service = JdService(SimpleNamespace(engine=marker, receipt=lambda *a:None,
+            current=lambda *a:base, revision=lambda *a:base, publish=publish),
+            SimpleNamespace(validate_value=compute), SimpleNamespace(engine=marker))
+        import inspect
+>       assert 'cancel' in inspect.signature(service.manual_save).parameters, 'Manual cancel admission missing'
+E       AssertionError: Manual cancel admission missing
+E       assert 'cancel' in mappingproxy(OrderedDict({'intent': <Parameter "intent">}))
+E        +  where mappingproxy(OrderedDict({'intent': <Parameter "intent">})) = <Signature (intent)>.parameters
+E        +    where <Signature (intent)> = <function signature at 0x0000016C400F5E40>(manual_save)
+E        +      where <function signature at 0x0000016C400F5E40> = <module 'inspect' from 'C:\\Users\\chenb\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\Lib\\inspect.py'>.signature
+E        +      and   manual_save = <analysis_agent.jd_service.JdService object at 0x0000016C4BC5E960>.manual_save
+
+tests\test_jd_admission.py:54: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_jd_admission.py::test_root_only_manual_binding_preserves_messages_and_first_true_input[False]
+FAILED tests/test_jd_admission.py::test_root_only_manual_binding_preserves_messages_and_first_true_input[True]
+FAILED tests/test_jd_admission.py::test_stop_after_native_cleanup_does_not_publish_computed_candidate
+3 failed in 3.13s

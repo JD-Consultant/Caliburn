@@ -1,0 +1,35 @@
+F                                                                        [100%]
+================================== FAILURES ===================================
+_ test_unreaped_handle_survives_tool_return_and_explicit_cleanup_uses_same_process _
+
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x00000222A9BEB7A0>
+
+    def test_unreaped_handle_survives_tool_return_and_explicit_cleanup_uses_same_process(monkeypatch):
+        engine = JdEngine(timeout=.2, cleanup_timeout=.2)
+        assert hasattr(engine, 'native_calls'), 'Native ownership must survive _call return'
+        actual, launched = subprocess.Popen, []
+        def launch(argv, **kwargs):
+            process = actual([sys.executable, '-c', 'import time; time.sleep(60)'], **kwargs)
+            launched.append(process)
+            return process
+        monkeypatch.setattr(subprocess, 'Popen', launch)
+        original_reap = engine._reap
+        monkeypatch.setattr(engine, '_reap', lambda process: False)
+        try:
+            with pytest.raises(JdEngineFailure) as caught:
+                engine.validate_value(VALUE)
+            assert not caught.value.quiescent
+            assert not engine.native_calls.quiescent
+            assert len(engine.native_calls.snapshot()) == 1
+            with pytest.raises(JdEngineFailure) as second:
+                engine.validate_value(VALUE)
+>           assert not second.value.quiescent and len(launched) == 1
+E           AssertionError: assert (not False and 2 == 1)
+E            +  where False = JdEngineFailure('Fixed JD engine failed: engine_timeout').quiescent
+E            +    where JdEngineFailure('Fixed JD engine failed: engine_timeout') = <ExceptionInfo JdEngineFailure('Fixed JD engine failed: engine_timeout') tblen=3>.value
+E            +  and   2 = len([<Popen: returncode: None args: ['S:\\caliburn\\.worktrees\\analysis-only-age...>, <Popen: returncode: None args: ['S:\\caliburn\\.worktrees\\analysis-only-age...>])
+
+tests\test_jd_native_lifecycle.py:31: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_jd_native_lifecycle.py::test_unreaped_handle_survives_tool_return_and_explicit_cleanup_uses_same_process
+1 failed, 1 deselected in 0.70s

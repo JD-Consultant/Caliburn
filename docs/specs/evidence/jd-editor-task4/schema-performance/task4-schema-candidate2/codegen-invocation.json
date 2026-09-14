@@ -1,0 +1,24 @@
+{
+  "args": [
+    "run",
+    "--project",
+    "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\contract",
+    "datamodel-codegen",
+    "--input",
+    "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-schema-candidate2\\candidate.schema.json",
+    "--input-file-type",
+    "jsonschema",
+    "--output",
+    "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-schema-candidate2\\src\\jd_editor_contract\\models.py",
+    "--output-model-type",
+    "pydantic_v2.BaseModel",
+    "--target-python-version",
+    "3.12",
+    "--strict-types",
+    "int",
+    "--disable-timestamp",
+    "--no-use-union-operator"
+  ],
+  "status": 0,
+  "stderr": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\contract\\.venv\\Lib\\site-packages\\datamodel_code_generator\\format.py:278: FutureWarning: The default external formatters (black, isort) will become opt-in in a future version. To keep the current behavior, specify formatters=[Formatter.BLACK, Formatter.ISORT]. To prepare for dependency-free formatting, use formatters=[Formatter.BUILTIN]. To suppress this warning, specify formatters explicitly.\r\n  warn_deprecated(\r\n"
+}

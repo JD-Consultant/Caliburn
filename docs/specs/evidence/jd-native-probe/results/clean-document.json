@@ -1,0 +1,130 @@
+[
+  {
+    "id": "purpose",
+    "type": "p",
+    "children": [
+      {
+        "text": "將確認的需求轉成可使用的介面；尚待確認發布責任。"
+      }
+    ]
+  },
+  {
+    "id": "d1",
+    "type": "jd_duty",
+    "title": "已更名職責",
+    "children": [
+      {
+        "id": "t1",
+        "type": "jd_task",
+        "sourceRefs": [
+          "source:1"
+        ],
+        "children": [
+          {
+            "id": "t1-description",
+            "type": "p",
+            "children": [
+              {
+                "text": "協助確認需求。"
+              }
+            ]
+          },
+          {
+            "id": "t1-condition",
+            "type": "p",
+            "children": [
+              {
+                "text": "對特殊案件提供建議；核准由專案經理負責。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "t2",
+        "type": "jd_task",
+        "sourceRefs": [
+          "source:2"
+        ],
+        "children": [
+          {
+            "id": "t2-description",
+            "type": "p",
+            "children": [
+              {
+                "text": "協助確認需求。"
+              }
+            ]
+          },
+          {
+            "id": "t2-condition",
+            "type": "p",
+            "children": [
+              {
+                "text": "僅有維護約定的案件按月檢查；其他案件不適用。"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "d2",
+    "type": "jd_duty",
+    "title": "其他工作",
+    "children": [
+      {
+        "id": "t3",
+        "type": "jd_task",
+        "children": [
+          {
+            "id": "t3-description",
+            "type": "p",
+            "children": [
+              {
+                "text": "處理上線後異常，保留未解事項。"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "knowledge",
+    "type": "jd_knowledge",
+    "scope": {
+      "uses": [
+        "整合",
+        "診斷"
+      ]
+    },
+    "children": [
+      {
+        "id": "k1",
+        "type": "p",
+        "children": [
+          {
+            "text": "理解介面契約與非同步狀態。"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": "unassigned",
+    "type": "jd_unassigned",
+    "children": [
+      {
+        "id": "u1",
+        "type": "p",
+        "children": [
+          {
+            "text": "先記錄交接成果，任務歸屬尚未確認。"
+          }
+        ]
+      }
+    ]
+  }
+]

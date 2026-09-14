@@ -1,0 +1,106 @@
+{
+  "bugs": {
+    "url": "https://github.com/udecode/plate/issues"
+  },
+  "dist": {
+    "shasum": "0685126a466af3a28c0493dc1f119ce7ff925ca1",
+    "tarball": "https://registry.npmjs.org/platejs/-/platejs-53.3.11.tgz",
+    "fileCount": 9,
+    "integrity": "sha512-HNS7fYURSrWQjtKEDnqnlvJbBQ//ykpOGFV5xgyICiJmWmjmMrupXUXVwJy+Wm2SfsQEViGXfZZxG1vzopZAFA==",
+    "signatures": [
+      {
+        "sig": "MEUCIC4hkHwyc77J1gxGU5fErH6qGuO3fHeDo0gDVMNqSn3XAiEApZxcPoJeej+gWct4qgfQb6mOOHVZWmtXl5LQXyS8aJM=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      },
+      {
+        "sig": "MEUCIGkm8C8MWXS95FLdTaxEy+FwaAO+WzKcl9OcWAWLSIoAAiEA5zy3nye8JL904v/9EfJBRKQMjrLVOW+wuGcWQ1xxJLk=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "unpackedSize": 3644
+  },
+  "main": "./dist/index.js",
+  "name": "platejs",
+  "type": "module",
+  "_from": "file:platejs-53.3.11.tgz",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./react": "./dist/react/index.js",
+    "./static": "./dist/static/index.js",
+    "./package.json": "./package.json"
+  },
+  "gitHead": "c6801761b10a81e54b8f2e91e5ecbd20414e2939",
+  "license": "MIT",
+  "scripts": {
+    "lint": "plate-pkg p:lint",
+    "test": "plate-pkg p:test",
+    "build": "plate-pkg p:build",
+    "clean": "plate-pkg p:clean",
+    "lint:fix": "plate-pkg p:lint:fix",
+    "typecheck": "plate-pkg p:typecheck",
+    "test:watch": "plate-pkg p:test:watch",
+    "build:watch": "plate-pkg p:build:watch"
+  },
+  "_npmUser": {
+    "name": "zbeyens",
+    "email": "zbeyens@udecode.dev"
+  },
+  "homepage": "https://platejs.org",
+  "keywords": [
+    "contentEditable",
+    "editor",
+    "framework",
+    "html",
+    "plate",
+    "plugin",
+    "rich text",
+    "slate",
+    "wysiwyg"
+  ],
+  "_resolved": "/tmp/b6faaa266618eb5aa400c80f8ddca0d6/platejs-53.3.11.tgz",
+  "_integrity": "sha512-HNS7fYURSrWQjtKEDnqnlvJbBQ//ykpOGFV5xgyICiJmWmjmMrupXUXVwJy+Wm2SfsQEViGXfZZxG1vzopZAFA==",
+  "repository": {
+    "url": "git+https://github.com/udecode/plate.git",
+    "type": "git",
+    "directory": "packages/plate"
+  },
+  "_npmVersion": "10.9.8",
+  "description": "Plate – a framework for building rich text editors on the web",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "zbeyens",
+      "email": "zbeyens@udecode.dev"
+    }
+  ],
+  "sideEffects": false,
+  "_nodeVersion": "22.23.2",
+  "dependencies": {
+    "@platejs/core": "^53.3.11",
+    "@platejs/slate": "^53.3.10",
+    "@platejs/utils": "^53.3.11",
+    "@udecode/utils": "^52.3.4",
+    "@udecode/react-utils": "^52.3.4",
+    "@udecode/react-hotkeys": "^52.0.11",
+    "react-compiler-runtime": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "_hasShrinkwrap": false,
+  "devDependencies": {
+    "@plate/scripts": "1.0.0"
+  },
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/platejs_53.3.11_1788545069201_0.926190698227406",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "platejs@53.3.11",
+  "version": "53.3.11"
+}

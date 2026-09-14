@@ -1,0 +1,154 @@
+{
+  "probe": "P01-fixed-python-node-postgresql",
+  "database": "jd_editor_probe_p01_20260909",
+  "engine_profile": "platejs@53.3.11/reuseId:true/initialValueIds:always",
+  "runtime_versions": {
+    "python": "3.12.13",
+    "psycopg": "3.3.5",
+    "node": "v22.12.0",
+    "postgresql": "16.14 (Debian 16.14-1.pgdg13+1)"
+  },
+  "source_sha256": {
+    "save_probe.py": "bfa84497bc8e3919dfef687917e7a1c070465b0a6de6747345d8095dab0fc83d",
+    "node_bridge.mjs": "3192cba3aeb34df183a33dcd888530785cc7ef25f8beb86cdc551fb5fbb9230d",
+    "fixture.json": "96a62cf44be51c746ad2d157a3fa39acb45c2fc66f909040ae0f9d08efa6d7f1",
+    "PROTOCOL.md": "8dd84f7bdd77ca5ea906da67b125a2aa5dcd476372e780e27353d74f7f87e73a"
+  },
+  "started_at": "2026-09-09T14:20:57.865108+00:00",
+  "fixture": {
+    "sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4",
+    "counts": {
+      "root_nodes": 43,
+      "elements": 174,
+      "text_leaves": 102,
+      "characters": 2133,
+      "ids": 174,
+      "unique_ids": 174
+    }
+  },
+  "scenarios": {
+    "fullr2_save_reopen_and_receipt": {
+      "document_id": "p01-fullr2-7a59779f-faf9-452e-9279-a21484fc278b",
+      "operation_id": "p01-fullr2-ai-save",
+      "before_sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4",
+      "after_sha256": "55d28aaddf7ec95c6882506a53d8b0b7ed902be67e84540b580d7fd76007a480",
+      "before_counts": {
+        "root_nodes": 43,
+        "elements": 174,
+        "text_leaves": 102,
+        "characters": 2133,
+        "ids": 174,
+        "unique_ids": 174
+      },
+      "after_counts": {
+        "root_nodes": 44,
+        "elements": 175,
+        "text_leaves": 103,
+        "characters": 2148,
+        "ids": 175,
+        "unique_ids": 175
+      },
+      "table_counts": {
+        "heads": 1,
+        "revisions": 2,
+        "operations": 1
+      },
+      "same_operation": "same receipt; no new rows",
+      "inserted_paragraph_occurrences_after_replay": 1,
+      "remove_inserted_paragraph_equals_original_value": true,
+      "same_id_different_payload": "rejected",
+      "saved_value_query": "SELECT value FROM jd_revision WHERE document_id = <document_id> AND revision = 2"
+    },
+    "partial_bridge_failure": {
+      "document_id": "p01-partial-24645481-a7ec-4257-83ef-ff09a4b81469",
+      "error": {
+        "code": "target_missing",
+        "command_index": 1
+      },
+      "before_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "after_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "before_head_sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4",
+      "after_head_sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4",
+      "head_objects_equal": true,
+      "operation_row": null,
+      "durable_effect": "none"
+    },
+    "base_value_binding": {
+      "document_id": "p01-base-mismatch-7b9657a4-2938-4a9d-9410-3091d37b9431",
+      "revision": 1,
+      "saved_base_sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4",
+      "supplied_wrong_base_sha256": "6d47411358b807e5d68fcbb8b45bd980defcf29f954bf1e89fbf6537d3259347",
+      "result": "rejected before bridge/save",
+      "before_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "after_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      }
+    },
+    "transaction_rollback": {
+      "document_id": "p01-rollback-8f926ebc-1d94-4803-a98b-bd717683d449",
+      "fault_at": "after_head",
+      "before_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "after_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "head_sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4"
+    },
+    "lost_reply_reconciliation": {
+      "document_id": "p01-lostreply-69d78b63-f5e9-45c9-8daa-ab3d7e18df45",
+      "operation_id": "p01-lost-reply",
+      "writer_exit_after_commit": 91,
+      "writer_response_bytes": 0,
+      "new_process_status": "committed",
+      "result_revision": 2,
+      "result_value_sha256": "4165005641b56e11fff62f127f84af9578c2a9b165ebcf3513eb896b1bde95c3",
+      "table_counts": {
+        "heads": 1,
+        "revisions": 2,
+        "operations": 1
+      }
+    },
+    "interleaved_connections_cas_human_and_no_change": {
+      "document_id": "p01-race-b8d4d47b-521c-4627-98ef-3e3276b6e44c",
+      "concurrency_claim": "two candidates completed before sequential commits on separate connections; not a simultaneous concurrency test",
+      "human_operation": "committed",
+      "already_computed_ai_operation": "stale_base",
+      "already_computed_no_change_operation": "stale_base",
+      "stale_no_change_before_revision": 2,
+      "stale_no_change_after_revision": 2,
+      "stale_no_change_before_sha256": "2e698b514b45ed626098ee84aa8a9217b999ca407c5c3ecf0243bbc087a2c8dc",
+      "stale_no_change_after_sha256": "2e698b514b45ed626098ee84aa8a9217b999ca407c5c3ecf0243bbc087a2c8dc",
+      "no_change_operation": "no_change",
+      "final_revision": 2,
+      "table_counts": {
+        "heads": 1,
+        "revisions": 2,
+        "operations": 4
+      },
+      "final_sha256": "2e698b514b45ed626098ee84aa8a9217b999ca407c5c3ecf0243bbc087a2c8dc"
+    }
+  },
+  "finished_at": "2026-09-09T14:21:02.711102+00:00",
+  "status": "passed",
+  "report_file": "results\\save-probe-20260909T142102Z.json",
+  "snapshots_file": "results\\save-probe-20260909T142102Z-snapshots.json"
+}

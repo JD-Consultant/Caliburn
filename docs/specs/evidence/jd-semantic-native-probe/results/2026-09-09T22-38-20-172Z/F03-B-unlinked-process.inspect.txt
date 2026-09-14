@@ -1,0 +1,8 @@
+{
+  pid: 936,
+  status: 0,
+  signal: null,
+  error: undefined,
+  stdout: '',
+  stderr: ''
+}

@@ -1,0 +1,24 @@
+{
+  "name": "jd-editor-pm-review-probe",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Isolated fixed-version read/transaction experiment; no production integration",
+  "dependencies": {
+    "prosemirror-suggestion-mode": "1.0.79",
+    "prosemirror-keymap": "1.2.2",
+    "prosemirror-menu": "1.2.4",
+    "prosemirror-model": "1.25.0",
+    "prosemirror-state": "1.4.3",
+    "prosemirror-transform": "1.10.3",
+    "prosemirror-view": "1.38.1"
+  },
+  "overrides": {
+    "prosemirror-keymap": "1.2.2",
+    "prosemirror-menu": "1.2.4",
+    "prosemirror-model": "1.25.0",
+    "prosemirror-state": "1.4.3",
+    "prosemirror-transform": "1.10.3",
+    "prosemirror-view": "1.38.1"
+  }
+}

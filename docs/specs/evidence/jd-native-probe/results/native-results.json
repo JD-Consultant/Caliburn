@@ -1,0 +1,91 @@
+{
+  "runtime": "v22.12.0",
+  "packages": {
+    "platejs": "53.3.11",
+    "@platejs/diff": "53.0.0"
+  },
+  "total": 13,
+  "passed": 11,
+  "failed": 2,
+  "results": [
+    {
+      "name": "native initialization preserves complete nested fixture",
+      "passed": true
+    },
+    {
+      "name": "targeted traditional Chinese edit preserves repeated text elsewhere",
+      "passed": true
+    },
+    {
+      "name": "move task across duties preserves identity and all children",
+      "passed": true,
+      "detail": {
+        "diffOperations": [
+          "delete",
+          "insert"
+        ]
+      }
+    },
+    {
+      "name": "split paragraph gives fresh identity and preserves source metadata",
+      "passed": true,
+      "detail": {
+        "ids": [
+          "split",
+          "probe-new-1"
+        ]
+      }
+    },
+    {
+      "name": "undo redo restore native text operation",
+      "passed": true
+    },
+    {
+      "name": "JSON disk roundtrip creates fresh editor without content or metadata loss",
+      "passed": true,
+      "detail": {
+        "note": "JSON file I/O only; not PostgreSQL, crash recovery or durable undo history"
+      }
+    },
+    {
+      "name": "marks additions and removals are reported",
+      "passed": true
+    },
+    {
+      "name": "element properties include falsy values and object metadata",
+      "passed": true
+    },
+    {
+      "name": "element property removal remains visible",
+      "passed": true
+    },
+    {
+      "name": "same ID with simultaneous attributes and text change remains visible",
+      "passed": true,
+      "detail": {
+        "diffOperations": [
+          "delete",
+          "insert"
+        ],
+        "ids": [
+          "x",
+          "x"
+        ]
+      }
+    },
+    {
+      "name": "canonical snapshots stay unchanged by computeDiff",
+      "passed": true
+    },
+    {
+      "name": "counterexample: falsy text-leaf metadata preserved in diff output",
+      "passed": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert(compare('leaf-falsy',before,after).some(x=>x.operation.newProperties?.score===0))\n"
+    },
+    {
+      "name": "counterexample: empty text mark-only change is reported",
+      "passed": false,
+      "error": "The expression evaluated to a falsy value:\n\n  assert(compare('empty-mark',before,after).length>0)\n"
+    }
+  ]
+}

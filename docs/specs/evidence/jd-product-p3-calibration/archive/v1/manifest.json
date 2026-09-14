@@ -1,0 +1,84 @@
+{
+  "package_id": "jd-product-p3-calibration-c-w",
+  "version": 1,
+  "created_at_utc": "2026-09-10T02:26:18.6212397Z",
+  "author": "Codex mechanical preparation from accepted C-W materials",
+  "case": "C-W",
+  "classification": "calibration",
+  "exposed": true,
+  "held_out": false,
+  "synthetic": true,
+  "exposure": [
+    "Original public quality-acceptance material exposed to research/implementation workflow",
+    "Codex preparation task and root review workflow"
+  ],
+  "source": {
+    "path": "S:/caliburn/.worktrees/analysis-only-agent/docs/specs/2026-09-10-jd-product-quality-acceptance.md",
+    "sha256": "1407e42b0a3c0d87c73caff6d37c05faa74020973f8f3d6441594bbdc6bbd92c",
+    "sections": [
+      "4 Q01-Q15",
+      "5 C-W W01-W10 and M-W1",
+      "6 P3 zero-cost preparation items 2 and 4 and execution boundary"
+    ]
+  },
+  "official_context_only": [
+    "https://www.onetonline.org/link/summary/43-5071.00"
+  ],
+  "official_context_note": "Original material occupational plausibility only; no newly researched employer facts",
+  "execution": {
+    "status": "NOT RUN",
+    "authorization": "NOT AUTHORIZED",
+    "natural_trials": 0,
+    "model_requests": 0,
+    "proposed_employee_turn_cap": 12,
+    "proposed_provider_request_cap": 180,
+    "proposed_usd_cap": "1.00",
+    "includes_background_and_failures": true
+  },
+  "runtime": {
+    "status": "PENDING CORE TASKS 1-6 COMPLETION",
+    "commit": null,
+    "lock_hashes": null,
+    "prompt_hash": null,
+    "skill_hashes": null,
+    "schema_hash": null,
+    "model_id": null,
+    "effort": null,
+    "output_limit": null,
+    "budgets_and_compaction": null
+  },
+  "scope_excludes": [
+    "P6 held-out packages",
+    "Other calibration roles",
+    "Model execution",
+    "Runtime or design changes"
+  ],
+  "files": [
+    {
+      "path": "employee-card.md",
+      "sha256": "231d8020e72a11b607f35be8a7daf8ac4ec38b1a8733b5fa516110c8a669262a",
+      "bytes": 3238
+    },
+    {
+      "path": "release-protocol.md",
+      "sha256": "923686b5c4fe6d55186bdbdbefb5218646bbcf73fd2a1e609c9a32cdea9728dc",
+      "bytes": 4377
+    },
+    {
+      "path": "oracle.md",
+      "sha256": "8b157e14dc1097e1129098a26a42b23b279925352f8a2d2ea44c074e21edbf52",
+      "bytes": 7283
+    },
+    {
+      "path": "README.md",
+      "sha256": "910042a810869dd9e93864eaf8f4f45bc0d43a08ccbd29d6d3c776d60c9563cb",
+      "bytes": 3147
+    },
+    {
+      "path": "results-template.md",
+      "sha256": "cf3d1087c94e8de9fc0231cf6da66e0534db56c1dd78534d961f48e53b011f79",
+      "bytes": 3798
+    }
+  ],
+  "manifest_hashes_itself": false
+}

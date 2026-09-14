@@ -1,0 +1,38 @@
+FF                                                                       [100%]
+================================== FAILURES ===================================
+___ test_abandoned_main_thread_still_requires_product_to_stop_exact_old_job ___
+
+    def test_abandoned_main_thread_still_requires_product_to_stop_exact_old_job():
+        key = 'test-'+uuid4().hex
+        first = launch(key)
+        ready = json.loads(first.stdout.readline())
+        first.stdin.write('abandon\n'); first.stdin.flush()
+        second = launch(key)
+        try:
+            raw = second.stdout.readline()
+>           assert raw, second.stderr.read()
+E           AssertionError: Traceback (most recent call last):
+E               File "S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\tests\windows_lifecycle_worker.py", line 14, in <module>
+E                 owner = bootstrap(sys.argv[1], mutex_timeout=.2, cleanup_timeout=2)
+E                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E               File "S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\src\analysis_agent\windows_lifecycle.py", line 102, in bootstrap
+E                 raise LifecycleError('prior_job_object_still_exists')
+E             analysis_agent.windows_lifecycle.LifecycleError: prior_job_object_still_exists
+E             
+E           assert ''
+
+tests\test_windows_lifecycle.py:77: AssertionError
+_____________ test_incompatible_nested_job_fails_before_app_work ______________
+
+    def test_incompatible_nested_job_fails_before_app_work():
+        child = launch('test-'+uuid4().hex,'nested_failure')
+        output,error = child.communicate(timeout=10)
+>       assert child.returncode != 0 and not output
+E       AssertionError: assert (0 != 0)
+E        +  where 0 = <Popen: returncode: 0 args: ['S:\\caliburn\\.worktrees\\analysis-only-agent\...>.returncode
+
+tests\test_windows_lifecycle.py:111: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_windows_lifecycle.py::test_abandoned_main_thread_still_requires_product_to_stop_exact_old_job
+FAILED tests/test_windows_lifecycle.py::test_incompatible_nested_job_fails_before_app_work
+2 failed, 4 deselected in 0.59s

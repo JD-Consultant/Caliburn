@@ -1,0 +1,23 @@
+{
+  "id": "F03-A",
+  "description": "完整 r2 v2 分組／K-S 項目、空草稿與新程序重開",
+  "passed": true,
+  "checks": [
+    {
+      "name": "全部 r2 文字及含格式 leaf 序列保留",
+      "passed": true
+    },
+    {
+      "name": "四種普通 block、兩組數量／位置及兩組端點符合候選",
+      "passed": true
+    },
+    {
+      "name": "普通 JSON／不同 PID 的新 editor normalize 後全值相等",
+      "passed": true
+    },
+    {
+      "name": "無 Duty／無 links／空敘述及空兩組可由原生補 ID 並保留",
+      "passed": true
+    }
+  ]
+}

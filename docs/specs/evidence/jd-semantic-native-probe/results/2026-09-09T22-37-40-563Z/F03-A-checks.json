@@ -1,0 +1,21 @@
+{
+  "id": "F03-A",
+  "description": "完整 r2 v2 分組／K-S 項目、空草稿與新程序重開",
+  "passed": false,
+  "checks": [
+    {
+      "name": "全部 r2 文字及含格式 leaf 序列保留",
+      "passed": false,
+      "message": "Failed to execute 'structuredClone': Options cannot be converted to a dictionary"
+    },
+    {
+      "name": "四種普通 block、兩組數量／位置及兩組端點符合候選",
+      "passed": true
+    },
+    {
+      "name": "execution",
+      "passed": false,
+      "message": "spawnSync D:\\nodejs\\node.exe EPERM"
+    }
+  ]
+}

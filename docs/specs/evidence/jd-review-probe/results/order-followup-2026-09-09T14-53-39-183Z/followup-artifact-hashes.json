@@ -1,0 +1,121 @@
+{
+  "accessed": "2026-09-09",
+  "note": "First follow-up artifact inventory; excludes this manifest itself. Original R01 run is not modified.",
+  "files": [
+    {
+      "file": "review-order-followup.mjs",
+      "sha256": "825629f9a59afbafcc80b050abebd71d6ab6790a891970d872a6013b5e9ef971",
+      "bytes": 10028
+    },
+    {
+      "file": "RESULTS.md",
+      "sha256": "5ed5365cc2df5b1c531e68f7c0665f2c0192c947540e0fa20ebe7363ecdc931d",
+      "bytes": 16207
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F1-final-value.inspect.txt",
+      "sha256": "32de421b5ae649af6645be8ffa06570d146818cb5927b616cbade6c5d0c42712",
+      "bytes": 585
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F1-final-value.json",
+      "sha256": "8b4ed3fcb6b428914093422b27b5a9252863d390bbcca8290ba0d480995eab0a",
+      "bytes": 619
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F1-input-value.inspect.txt",
+      "sha256": "5e43a41b14453cc6dcbd2df196518f8c4726b487f24c65169984243a15352d22",
+      "bytes": 2003
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F1-input-value.json",
+      "sha256": "b2c8ba40e2fdbff866a9cda147ac0edaed59ad7a7da9475b5035f70ca79b8266",
+      "bytes": 2111
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F2-final-value.inspect.txt",
+      "sha256": "32de421b5ae649af6645be8ffa06570d146818cb5927b616cbade6c5d0c42712",
+      "bytes": 585
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F2-final-value.json",
+      "sha256": "8b4ed3fcb6b428914093422b27b5a9252863d390bbcca8290ba0d480995eab0a",
+      "bytes": 619
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F2-input-value.inspect.txt",
+      "sha256": "5e43a41b14453cc6dcbd2df196518f8c4726b487f24c65169984243a15352d22",
+      "bytes": 2003
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F2-input-value.json",
+      "sha256": "b2c8ba40e2fdbff866a9cda147ac0edaed59ad7a7da9475b5035f70ca79b8266",
+      "bytes": 2111
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F3-final-value.inspect.txt",
+      "sha256": "63209ba93cc0df0e9716b520a958ca928f898a89dedde24252eae2359649b40e",
+      "bytes": 1068
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F3-final-value.json",
+      "sha256": "1801f0c5450a8bbd208b537b4fca88dfc99b8e3b23e533d4dafecaf1250ed435",
+      "bytes": 1126
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F3-input-value.inspect.txt",
+      "sha256": "5e43a41b14453cc6dcbd2df196518f8c4726b487f24c65169984243a15352d22",
+      "bytes": 2003
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F3-input-value.json",
+      "sha256": "b2c8ba40e2fdbff866a9cda147ac0edaed59ad7a7da9475b5035f70ca79b8266",
+      "bytes": 2111
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F4-final-value.inspect.txt",
+      "sha256": "6f7790661936a1924d41db402b0ec58002a6ac4c39df98f19a508ea898a338e6",
+      "bytes": 549
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F4-final-value.json",
+      "sha256": "f1023779172543f6a1ba507f697c4cf37c21c6cb6a7976d362299dd5bb4c6905",
+      "bytes": 583
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F4-input-value.inspect.txt",
+      "sha256": "5e43a41b14453cc6dcbd2df196518f8c4726b487f24c65169984243a15352d22",
+      "bytes": 2003
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/R01-F4-input-value.json",
+      "sha256": "b2c8ba40e2fdbff866a9cda147ac0edaed59ad7a7da9475b5035f70ca79b8266",
+      "bytes": 2111
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/review-order-results.json",
+      "sha256": "dace9652461d6916dc111ab6e1ed129e608d6d7aad901992c7e433d6873ce975",
+      "bytes": 10535
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/review-order-traces.inspect.txt",
+      "sha256": "3a25b6d071cd89c2abed810de6965870dd11954ed0e8b4b806d97f53133fa3f9",
+      "bytes": 180847
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/review-order-traces.json",
+      "sha256": "a5970bcef441a8b6fd80dd0463b9d8e08ff20ce58a8d9e9c3f0db135b134aa87",
+      "bytes": 187657
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/run-hashes.json",
+      "sha256": "a012da4c6686e2f13118970acbbdcf0924fcf9ea5d5ddcd795bd6d15e7e458ed",
+      "bytes": 1210
+    },
+    {
+      "file": "results/order-followup-2026-09-09T14-53-39-183Z/SkipSuggestionDeletes.source.ts",
+      "sha256": "4fe19c7a37bc9d4a6562a6ec2a19cfde05c933439ab6c0844224a8f6a84f1e67",
+      "bytes": 1017
+    }
+  ]
+}

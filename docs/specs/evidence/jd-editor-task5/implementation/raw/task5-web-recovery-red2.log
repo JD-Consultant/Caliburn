@@ -1,0 +1,126 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/useJdSession.test.tsx (18 tests | 4 failed) 20ms
+   × unrelated current save cannot consume a reopened confirmed failure candidate 5ms
+   × cache-lost discovery is read-only and exposes one explicit original-key recovery 2ms
+   × exact cache with no pending allows only explicit full original submission 1ms
+   × late recovery never overwrites a newer candidate or dirty value 1ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > unrelated current save cannot consume a reopened confirmed failure candidate
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "A",
+      Object {
+        "base_revision_ref": "old-base",
+        "request_key": "old-key",
+        "value": Array [
+          Object {
+            "children": Array [
+              Object {
+                "text": "ONLY RECOVERABLE OLD TEXT",
+              },
+            ],
+            "id": "p",
+            "type": "p",
+          },
+        ],
+      },
+    ]
+
+
+Number of calls: 1
+
+ ❯ src/jd/useJdSession.test.tsx:167:25
+    165|   session.edit([{ ...value[0], children: [{ text: "unrelated current e…
+    166|   expect(await session.save()).toBe(false);
+    167|   expect(port.save).not.toHaveBeenCalled();
+       |                         ^
+    168|   expect(submissionCache(disk).read("A")).toEqual(old);
+    169|   const reopened = new JdSession("A", port, disk);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > cache-lost discovery is read-only and exposes one explicit original-key recovery
+AssertionError: expected undefined to be 'A-key' // Object.is equality
+
+- Expected:
+"A-key"
+
++ Received:
+undefined
+
+ ❯ src/jd/useJdSession.test.tsx:188:41
+    186|   expect(port.save).not.toHaveBeenCalled();
+    187|   expect(port.recover).not.toHaveBeenCalled();
+    188|   expect(session.recovery?.request_key).toBe('A-key');
+       |                                         ^
+    189|   expect(session.candidate).toBeNull();
+    190|   expect(session.locked).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > exact cache with no pending allows only explicit full original submission
+AssertionError: expected "vi.fn()" to not be called at all, but actually been called 1 times
+
+Received:
+
+  1st vi.fn() call:
+
+    Array [
+      "A",
+      Object {
+        "base_revision_ref": "r1",
+        "request_key": "original",
+        "value": Array [
+          Object {
+            "children": Array [
+              Object {
+                "text": "工作工作",
+              },
+            ],
+            "id": "p",
+            "type": "p",
+          },
+        ],
+      },
+    ]
+
+
+Number of calls: 1
+
+ ❯ src/jd/useJdSession.test.tsx:204:25
+    202|   const session=new JdSession('A',port,disk);
+    203|   await session.load();
+    204|   expect(port.save).not.toHaveBeenCalled();
+       |                         ^
+    205|   expect(vi.mocked(port.readRecovery).mock.calls).toEqual([['A','origi…
+    206|   expect(session.canRetryCandidate).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/jd/useJdSession.test.tsx > late recovery never overwrites a newer candidate or dirty value
+TypeError: session.recoverManual is not a function
+ ❯ src/jd/useJdSession.test.tsx:220:22
+    218|   const session=new JdSession('A',port,disk);
+    219|   await session.load();
+    220|   const work=session.recoverManual();
+       |                      ^
+    221|   session.unmount();
+    222|   const newer:Submission={document_id:'A',request_key:'B-key',base_rev…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 14 passed (18)
+   Start at  13:03:00
+   Duration  1.13s (transform 68ms, setup 0ms, import 156ms, tests 20ms, environment 801ms)
+

@@ -1,11 +1,11 @@
 # AI 職務分析顧問工作區 UI 與待審編輯語意設計
 
 - 日期：2026-08-27
-- 狀態：產品討論與書面規格已由 owner 於 2026-08-27 複核，已授權依實作計畫執行；ADR 0070 待完整 gate 通過後再升 Accepted
+- 狀態：UI／編輯規格已由 owner 於 2026-08-27 複核；2026-08-28 最新工作理解、Context、來源與拒絕記憶裁決見 ADR 0071；2026-08-29 核心 JD 欄位、關聯與 K／S 生命週期已依欄位契約稽核 §18 同步。舊 8/27 實作計畫不得執行
 - 範圍：顧問工作區資訊架構、目前 JD 編輯、AI 語意差異審核、Duty／Task／OPKS 階層、未歸屬內容、刪除與解除關係、訪談／工作地圖、一般對話修正、執行期唯讀、錯誤恢復，以及 Web UI framework 組合
-- 不在本輪：RAG／Reference、A 與能力級別的 AI 分析、auto-accept、多使用者協作、正式 eval 平台、匯出格式變更、公司文件、拖放、進階鍵盤捷徑、版本歷史 UI
+- 不在本輪：RAG／Reference、A 與能力級別、auto-accept、多使用者協作、正式 eval 平台、公司文件、拖放、進階鍵盤捷徑、版本歷史 UI
 - 上位產品方向：[`2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md`](2026-08-12-ai-job-analysis-consultant-product-flow-working-research.md)
-- 現行架構：ADR 0060、0067、0069；本設計的 authority 修正由 Proposed ADR 0070 收斂
+- 現行架構：ADR 0060、0067、0069；UI／編輯由 Proposed ADR 0070 收斂，工作理解／Context／provenance 由 Proposed ADR 0071 收斂
 
 這份文件記錄 2026-08-25 至 2026-08-27 的 UI 模擬、產品討論、現行 code 稽核與官方資料查核。模擬 HTML 只用來確認資訊層級、互動與視覺方向；production 不複製其 `contenteditable`、狀態管理或事件程式。
 
@@ -26,20 +26,20 @@ Web 組合採 **Next／React／Tailwind／shadcn＋Base UI 1.7.x＋TanStack Form
 | 產品目的 | 本設計怎麼做到 | 不採的偏離方向 |
 |---|---|---|
 | AI 像專業顧問持續訪談 | 右欄是一條可恢復對話；工作地圖顯示方向與待釐清，不做固定 wizard | 欄位填表精靈、一步一階段、員工自己規劃每一題 |
-| 當下有焦點、背景不漏線索 | 工作地圖顯示白話訪談焦點；任何 O／P／K／S 線索可先保存為分析線索 | 強迫 Focus 綁定某個 Task 或 JD path |
+| 當下有焦點、背景不漏線索 | 工作地圖顯示白話訪談焦點；任何成果、完成標準或 K／S 線索可先保存於工作理解 | 強迫 Focus 綁定某個 Task 或 JD path |
 | AI 可持續修訂目前成果 | AI 與員工讀寫同一份持久 working copy | 每回合一次性候選、另開一份 AI 文件 |
 | LLM 不能偷改核准 JD | AI 差異永遠保持待審；員工修改綠色內容也不會暗中接受 | 把 Tool 執行當員工核准、把儲存等同接受 |
 | 員工可接受、修改、拒絕 | 同骨架 semantic diff＋就近 review popover＋atomic group | 模型填 proposal 表單、逐個低階 Tool approval |
-| Task／Duty／OPKS 可動態演化 | 支援新增、改名、重新歸類、重排、一般增刪組合與原子審核 | 固定 Duty 盒子、先完成 Task 才能分析 OPKS |
-| 員工知道進度與缺口 | 工作地圖顯示 coverage、depth、一般待釐清與必要澄清，不顯示假百分比 | 以模型自評百分比假裝完成度 |
+| Task／Duty／相關內容可動態演化 | 支援新增、改名、重新歸類、重排、一般增刪組合與原子審核 | 固定 Duty 盒子、先完成 Task 才能辨識成果／標準／K／S |
+| 員工知道進度與缺口 | 工作地圖顯示 coverage、depth、一般待釐清與「需要你的確認」，不顯示假百分比 | 以模型自評百分比假裝完成度 |
 | 長訪談可恢復且成本受控 | UI 只取投影；context／Skills 仍按需載入，不因顯示完整 JD 就每輪傳完整 JD | 把整份畫面狀態每輪塞入 prompt |
-| 匯出可靠 | 匯出仍只讀核准基線；本設計不改 exporter | 把待審 working copy 或未定位線索帶入匯出 |
+| 匯出可靠 | 匯出只讀核准基線，並依同一核心 JD contract 產生 Caliburn 自有格式 | 把待審 working copy、未定位線索或舊 iCAP schema 帶入匯出 |
 
 稽核結論：方向未偏離。這是既有顧問 runtime 的工作面升級，不是重新發明訪談 engine，也不把 UI framework 反過來定義產品流程。
 
 ## 2. 官方資料與可轉移邊界
 
-以下查核日均為 2026-08-27。官方產品證明互動機制成熟，不等於它已驗證繁中職務分析品質；職務分析語意仍以本 repo 研究、iCAP 與員工 authority 為準。
+以下查核日均為 2026-08-27。官方產品證明互動機制成熟，不等於它已驗證繁中職務分析品質；職務分析語意仍以本 repo 最新欄位研究、跨國官方資料與員工 authority 為準。iCAP 是研究來源之一，不是產品 schema／匯出版面 authority。
 
 ### 2.1 同一工作面與事後審核
 
@@ -59,7 +59,7 @@ Web 組合採 **Next／React／Tailwind／shadcn＋Base UI 1.7.x＋TanStack Form
 
 ### 2.3 複合表單與自動儲存
 
-- [TanStack Form — Arrays](https://tanstack.com/form/latest/docs/framework/react/guides/arrays) 原生處理 nested object arrays 的新增、移除、移動及對應 field state，適合 Duty／Task／OPKS 編輯；它只管理瀏覽器編輯狀態，不成為 document authority。
+- [TanStack Form — Arrays](https://tanstack.com/form/latest/docs/framework/react/guides/arrays) 原生處理 nested object arrays 的新增、移除、移動及對應 field state，適合 Duty／Task／關鍵產出／完成標準與 K／S links 編輯；它只管理瀏覽器編輯狀態，不成為 document authority。
 - [TanStack Form — Basic concepts](https://tanstack.com/form/latest/docs/framework/react/guides/basic-concepts) 支援細粒度 selector，避免大型 JD 每個按鍵都重繪全部欄位。
 - [TanStack Query — Mutation scopes](https://tanstack.com/query/latest/docs/framework/react/guides/mutations#mutation-scopes) 明載同一 `scope.id` 的 mutations 會序列執行；用它避免同一 JD 的 autosave 彼此覆蓋，且送出訪談訊息前可等待該 scope 清空。
 - [RFC 9110 — `If-Match`](https://www.rfc-editor.org/rfc/rfc9110.html#name-if-match) 以條件式 state-changing request 防止 lost update。Caliburn 的 revision／generation／digest guard 採相同原則；UI 唯讀只是體驗與降低競態，不取代 server guard。
@@ -71,14 +71,14 @@ Web 組合採 **Next／React／Tailwind／shadcn＋Base UI 1.7.x＋TanStack Form
 - [Primer — Delete](https://www.primer.style/product/scenario-patterns/delete/) 明確區分 `Remove`（解除關係）與 `Delete`（實體消失），建議可逆操作用 Undo，高影響且不可逆操作才增加確認摩擦，並在確認前說清 blast radius。
 - [Kubernetes — Garbage collection](https://kubernetes.io/docs/concepts/architecture/garbage-collection/) 的 cascade／orphan 是成熟的 ownership 類比：是否連帶刪除取決於真正 ownership，而不是 UI 階層看起來誰包住誰。它只作生命週期類比，不是職務分析來源。
 
-因此 Duty→Task 是分組關係；Task→工作細節／O／P 是組成關係；Task↔K／S 是多對多參照。刪除規則必須依此，而不是一律全刪。
+因此 Duty→Task 是可選分組關係；Task→關鍵產出／完成標準是 ownership；Task↔K／S 是多對多參照。刪除規則必須依此，而不是一律全刪。
 
 ### 2.5 Job Analysis 關係
 
-- [ADR 0048](../adr/0048-opks-evidence-axes-and-document-level-competencies.md) 依 iCAP F3-3 收斂：O／P 掛 Task；K／S 是文件層 canonical item，與 Task／Indicator 多對多；UI 可以在 Task 下投影 K／S。
-- [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/) 強調 Task、competency 與兩者連結；這支持在成為正式職務內容前說清 K／S 支援哪些工作，但不能替代 iCAP 欄位定義。
+- [LLM 欄位契約稽核](2026-08-28-llm-authored-field-contract-audit.md) §18 綜合 O*NET、OPM、UK NOS、iCAP 與企業產品研究，將產品語意收斂為 Task 下的可選關鍵產出、完成標準，以及文件層 canonical K／S 與 Task 多對多關聯。
+- [U.S. OPM — Job Analysis](https://www.opm.gov/policy-data-oversight/assessment-and-selection/job-analysis/) 強調 Task、competency 與兩者連結；這支持在成為正式職務內容前說清 K／S 支援哪些工作，但不替 Caliburn 定義欄位名稱或版面。
 
-因此「先發現」不等於「先寫入 JD」：AI 可以先理解任何 O／P／K／S 線索，待 Task 邊界與關係足夠清楚後才形成待審文件變更。
+因此「先發現」不等於「先寫入 JD」：AI 可以先理解任何成果、完成標準或 K／S 線索，待 Task 邊界與關係足夠清楚後才形成待審文件變更。
 
 ### 2.6 對話延續、Agent 寫入與同輪併發
 
@@ -108,7 +108,7 @@ AI 下一輪從這份 working copy 繼續，不因員工尚未審核而忘記先
 
 ### 3.3 審核變更
 
-application 由核准基線與目前 JD 即時計算的 semantic diff。它不是第三份 draft、patch queue、Git index 或模型填寫的 proposal form。review metadata 只保存穩定 identity、Evidence、dependency、decision memory 與 stale guard。
+application 由核准基線與目前 JD 即時計算 semantic diff。它不是第三份 draft、patch queue、Git index 或模型填寫的 proposal form。review metadata 只保存穩定 identity、1～N 筆工作理解 references、AI 短理由、dependency、stale guard 與最小 command／rejection fingerprint；逐字來源與 quote 留在工作理解，實際 Skill 使用留在 execution receipt。
 
 ## 4. 工作區資訊架構
 
@@ -147,32 +147,47 @@ application 由核准基線與目前 JD 即時計算的 semantic diff。它不�
 ### 5.1 訪談概況
 
 - 已辨識的工作範圍數量；
-- 各工作目前分析深度，例如 Task 邊界、Duty 分組、O、P、K、S 的 `尚待辨識／已有線索／目前足夠／需重看`；
-- 待審變更、未歸屬 Task 與待重新連結 K／S 的數量；
+- 各工作目前分析深度，例如 Task 邊界、Duty 分組、成果／完成標準與 K／S 的 `尚待辨識／已有線索／目前足夠`；分析成功後立即依最新工作理解重算，分析失敗則顯示失敗，不另保存容易過時的「需重看」狀態；
+- 待審變更與未歸屬 Task 數量；
 - 不顯示模型自評的總完成百分比。
 
 ### 5.2 目前訪談焦點
 
 - 使用白話顯示「現在主要要理解什麼」與原因；
 - Focus 可以是責任邊界、故事、決策權、完成界線或缺口，不強迫對應 Task／OPKS ID；
+- Focus 是可恢復但沒有員工來源、不可由員工直接編輯的 runtime attention bookmark；員工可用自然對話改變方向；
 - 放在工作地圖正常內容流，不長期 sticky 佔住畫面。
 
 ### 5.3 一般待釐清
 
-- 顯示 AI 與員工都應記得的未解問題、矛盾、旁支線索與尚待定位的 O／P／K／S 線索；
+- 只顯示 AI 與員工都應記得、具體可回答且會影響工作理解或 JD 的未解問題與矛盾；
+- 單純「Task 尚缺完成標準／K／S」或「尚未跑某個 Skill」只作內部完整度訊號，不直接顯示成待釐清；已有工作線索只有在能形成具體、可回答且確實需要員工補充的問題時才轉成白話問題；
 - 不一定屬於目前 Task，也不要求員工立刻回答；
 - 點擊後回到聊天脈絡，員工用自然對話回答；不以 checkbox 假裝完成分析。
 
-### 5.4 必要澄清
+### 5.4 需要你的確認（內部：required input／interrupt）
 
-- 只用於存在衝突、責任歸屬不明或缺少員工選擇，使相依分析無法安全繼續的情況；
-- 第一版在工作地圖與聊天中清楚呈現問題，但不另做 Claude 式選單表單；
-- 一般 Gap 與待審文件差異都不得冒充必要澄清。
+- 產品名稱固定為「需要你的確認」；只用於存在衝突、責任歸屬不明或缺少員工選擇，使相依分析無法安全繼續的情況。
+- 每題引用 1～N 筆相關工作理解；不要求 Task、Duty、branch、quote 或 Skill ID，也不把內部 understanding ID 顯示給員工。本輪才出現的衝突先在同一結果建立 unresolved／contradicted understanding，再用 local handle 引用。
+- 模型本輪先保存可安全成立的理解，停止依賴該歧義的文件分析；transition durable commit 後才進 LangGraph interrupt。UI 此時不是顯示失敗或分析完成，而是在聊天輸入區顯示確認卡；員工關頁再回來仍可回答。
+- 第一版每次只顯示一題最高優先、真正 blocking 的確認；其他未知繼續留在工作理解。員工回答並完成下一輪分析後，AI 再依最新理解決定是否仍需提出下一題，避免批次問題互相依賴或過時。
+- 有真正互斥的答案時提供 2～4 個簡短選項，永遠保留「其他／自行輸入」；若沒有誠實的離散選項，就只顯示必填文字回答，不硬湊選單。
+- 員工答案保存為一般 immutable employee message／source，resume 後啟動下一次正常顧問分析，先修訂工作理解，再完成相依 JD 分析；選項只是輸入輔助，不是工作事實來源。
+- 等待回答時中央 JD 暫時唯讀：保留閱讀／查看差異，停用直接編輯、Undo 與接受／拒絕；確認卡是唯一寫入入口。員工回答並完成下一輪 analysis 後再解鎖，避免 blocking 歧義尚未解決時又產生新 delta。
+- 一般待釐清、普通下一題、待審文件差異、拒絕結果、執行錯誤與產品問題都不得冒充「需要你的確認」。完整語意與官方依據見 [`2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md`](2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md) §12。
 
-### 5.5 JD 大綱
+### 5.5 AI 目前的理解
+
+- 工作理解必須讓員工可查看，否則員工無法知道 AI 目前如何理解其工作；但它不是第二份 JD，也不長期完整攤在工作地圖。
+- 工作地圖只顯示摘要與入口；完整內容放在可收合、唯讀的次要面板，依「目前理解／待釐清／有不同說法／已更新」分組，其他未定位工作線索只在需要時顯示。
+- 員工不直接編輯工作理解；發現錯誤時在一般聊天中補充或更正，由下一輪顧問分析依 immutable employee source 修訂。
+- exact quote、來源 lineage 與歷史版本預設收在按需進階查看，不和日常訪談導航搶畫面。
+- `Gap` 不作產品名稱或第二份可寫 authority：真正未知投影為「待釐清」，阻塞歧義投影為「需要你的確認」，單純欄位／coverage 缺失留作內部訊號。
+
+### 5.6 JD 大綱
 
 - 只顯示 Duty→Task 導覽與狀態；
-- 不展開完整工作細節與 OPKS，避免左欄複製中央文件；
+- 不展開 Task 子內容，避免左欄複製中央文件；
 - 點擊定位中央相應章節。
 
 ## 6. 目前 JD 結構
@@ -181,63 +196,59 @@ application 由核准基線與目前 JD 即時計算的 semantic diff。它不�
 
 主要區顯示：
 
-- 職務名稱；
-- 工作描述；
-- 文件職能基準級別 L（1–6，第一版員工手動）；
+- 職務名稱（必填）；
+- 職務目的（必填）；
 - 儲存狀態與待審 AI 變更數。
 
-可展開 metadata 顯示職業／職類／行業名稱與分類代碼。iCAP 配發的職能基準代碼與職類別代碼保持不可編輯空白；AI 不生成任何官方代碼。補充說明置於文件底部。
-
-A 是文件層欄位，第一版保留員工手動；Task L 也是員工手動。A 與能力級別尚無核准 Skill，因此 AI 不得新增或修改。
+有可靠 authority 時才顯示所屬單位／團隊、直接回報職位與管理責任。職務層另有整區可選的「工作關係與重要條件」；無內容時不顯示。核心 JD 不包含 iCAP 代碼、A 或能力級別。
 
 ### 6.2 文件階層
 
 ```text
 Duty
 └─ Task
-   ├─ 工作細節
-   └─ OPKS
-      ├─ O 工作產出
-      ├─ P 行為指標
-      ├─ K 所需知識
-      └─ S 所需技能
+   ├─ 關鍵產出（0..N）
+   ├─ 完成標準（0..N）
+   ├─ K 所需知識（0..N links）
+   └─ S 所需技能（0..N links）
+
+職務層：所需知識與技能總覽（同一 canonical K／S 的去重 projection）
 ```
 
-工作細節與 OPKS 是 Task 下的同層內容，不是先後階段。工作細節至少包含：動作、對象、目的／結果、情境、頻率、責任角色、工具／方法／促成條件。
+Task 的唯一必要成品文字是一段 canonical statement。動作、對象、目的／結果、情境、頻率、責任角色、工具與方法是工作理解或 Task Skill 的分析／寫作品質資訊，不各自成為正式 JD 欄位。Duty 可暫時沒有 Task；Task 可暫時沒有 Duty，後者顯示在「尚未歸屬」。
 
-一個 Task 可以有多個 O、P、K、S。K／S canonical item 可被多個 Task 共用；中央 UI 在每個相關 Task 下投影同一 stable item，並標示「共用於 N 個任務」。在 Task 下移除 K／S 代表解除連結，不是刪除 canonical item。
+一個 Task 可以有多個關鍵產出、完成標準、K 與 S。K／S canonical item 可被多個 Task 共用；中央 UI 在每個相關 Task 下投影同一 stable item，並標示「共用於 N 個任務」。在 Task 下移除 K／S 代表解除連結；若仍有其他 links 就保留 canonical item，若失去最後 link 則在同一 server command 中移出核心 JD。
 
 ### 6.3 編號
 
 - stable UUID／workspace handle 只供 application、AI VFS 與 stale guard，不作員工主要識別。
-- 編輯畫面不持久顯示容易因移動而跳號的 D1／T1／O1／P1／K1／S1；使用「職責／工作任務／O／P／K／S」標籤、標題與局部數量辨識。
-- XLSX 的 T1、T1.1、O1.1.1 等仍在 render-time 依核准排序決定性產生；本設計不改 export identity 規則。
+- 編輯畫面不持久顯示容易因移動而跳號的 D1／T1／O1／P1／K1／S1；使用「職責／工作任務／關鍵產出／完成標準／知識／技能」標籤、標題與局部數量辨識。
+- stable ID 與排序由 application 管理；Caliburn 自有匯出依核准排序決定性投影，不沿用 iCAP 的 T1／T1.1／O1.1.1 位置碼作內容 identity。
 
 ## 7. 分析順序與尚未定位內容
 
 ### 7.1 分析可以先於結構
 
-Task、Duty、O、P、K、S 都是按需 Skills；不要求先有 Task 才能在訪談中辨識 O／P／K／S，也不要求 Task 穩定後才分析 OPKS。
+Task、Duty、關鍵產出、完成標準、K、S 都可由按需 Skills 協助分析；不要求先有 Task 才能在訪談中辨識相關線索，也不要求 Task 穩定後才分析 K／S。
 
-例：員工先說「每週會交異常分析報告」。AI 可以立即保存有來源的「工作產出線索」，但在確定是哪一項工作產生之前，不把它偽裝成合法 JD `O`。後續確認 Task 後，AI 可一次提出 Task＋O＋P 的 atomic group。
+例：員工先說「每週會交異常分析報告」。AI 可以立即保存有來源的「關鍵產出線索」，但在確定是哪一項工作產生之前，不把它偽裝成合法 JD 子項。後續確認 Task 後，AI 可一次提出 Task＋關鍵產出＋完成標準的 atomic group。
 
 ### 7.2 工作地圖與 JD 的邊界
 
-- 未定位 O／P／K／S：放工作地圖「一般待釐清／待定位線索」，保留來源與狀態；不是 JD item。
-- 未歸屬 Task：已是 Task，只是沒有 Duty；可有完整工作細節與任意數量 O／P／K／S。
-- O／P：成為目前 JD item 時必須恰好連到一個 Task。
+- 未定位的成果／完成標準／K／S：先保留在有來源的工作理解，不是 JD item；只有形成具體、可回答且會影響分析的問題時，才投影到工作地圖「一般待釐清」。
+- 未歸屬 Task：已是 Task，只是沒有 Duty；可有自己的關鍵產出、完成標準與已連結 K／S。
+- 關鍵產出／完成標準：成為目前 JD item 時必須恰好連到一個 Task。
 - 新的 AI K／S：在能說明至少一個 Task linkage 後才形成待審 JD 變更，避免累積通用空話。
-- 已核准 K／S 若因 Task 重組失去最後一個 link：保留在隱藏時不佔空間的「待重新連結 K／S」區，等待重新連結或明確刪除。
+- 已核准 K／S 若因 Task 重組失去最後一個 link：在同一 server authority command 中移出核心 JD，並列入 dependency closure／blast radius；不自動修改 Work Understanding。
 
 因此中央文件的尚未歸屬區為：
 
 ```text
 尚未歸屬
-├─ 未歸屬 Task（可有完整工作細節與 OPKS）
-└─ 待重新連結 K／S（只在真的存在時顯示）
+└─ 未歸屬 Task（可有合法的 Task 子內容與 K／S links）
 ```
 
-不建立「未連結 O／P」文件狀態，也不建立一般性的空 K／S 倉庫。
+不建立未連結的關鍵產出／完成標準、孤立 K／S 或「待重新連結 K／S」文件狀態。
 
 ## 8. 編輯與語意審核
 
@@ -267,17 +278,18 @@ Task、Duty、O、P、K、S 都是按需 Skills；不要求先有 Task 才能在
 
 - 中央只有一個「目前 JD」工作面，不另開 AI 草稿 editor 或 proposal 清單頁。
 - 點擊 AI 差異才在附近開 contextual review popover；點擊其他地方關閉。
-- popover 顯示目前 atomic group 的白話摘要、AI 說明、Evidence 摘要，以及「接受／拒絕」。詳細來源按需展開，不在主畫面長期佔空間。
-- 接受：把整個最小合法 atomic group 的目前值提升到核准基線，working copy 不跳動。
-- 拒絕：將該 group 還原核准基線並保存拒絕理由；AI 下一輪只記得真實核准內容與拒絕結果。
+- popover 顯示目前 atomic group 的白話摘要、AI 短理由、1～N 筆相關工作理解摘要，以及「接受／拒絕」。不把「修改」設成第三種審核決定；員工直接在綠色 after-state 編輯，逐字來源只在工作理解的按需進階查看出現。
+- 編輯 group 內任一欄位只更新待審 working copy；整組仍保持 pending，不得把單一欄位 autosave 解讀成局部或整組接受。
+- 接受：把整個最小合法 atomic group 的最新值提升到核准基線，working copy 不跳動。彼此獨立的變更應形成不同 group；具相依關係的 Task／OPKS 由 application 重新推導 dependency closure 與 digest，不能只靠模型或 UI hunk 任意分組。
+- 拒絕：將該 group 還原核准基線，不要求員工填理由；AI 下一輪只記得真實核准內容與精簡拒絕結果。員工若在聊天中另行說明，該訊息才是可修訂工作理解的新來源。
 - 第一版不做全域「全部接受」、`稍後處理`、每個 Tool approval 或另一套 review drawer。
 
 ## 9. 新增、移動、解除與刪除
 
 ### 9.1 新增與移動
 
-- Duty 章節、Duty 下 Task、Task 下 O／P／K／S 都有就近 `＋`。
-- 新 Task 建立後立即顯示名稱、Task L、工作細節，以及四個空的 O／P／K／S 區塊。
+- Duty 章節、Duty 下 Task、Task 下關鍵產出／完成標準／K／S 都有就近 `＋`。
+- 新 Task 建立後立即顯示 canonical statement 與可按需新增的子區塊；不預建空白子 entity，也不要求同輪補滿完成標準或 K／S。
 - K／S 新增入口提供「新增 K／S」與「連結既有 K／S」；大量既有項目使用 Base UI Combobox 搜尋。
 - 第一版 Task 移動使用「移至其他職責」可搜尋 menu／combobox，不做 drag-and-drop。
 - 重排使用簡單上移／下移或位置 menu；不建立自訂鍵盤拖放。
@@ -286,21 +298,20 @@ Task、Duty、O、P、K、S 都是按需 Skills；不要求先有 Task 才能在
 
 | 操作 | Authority 結果 |
 |---|---|
-| 解散 Duty、保留工作 | Duty 消失；Task 整棵移到未歸屬，工作細節與 OPKS 保留 |
-| 刪除 Duty 及其工作 | Duty、所含 Task、工作細節與 O／P 刪除；K／S 只解除相關 Task links |
+| 解散 Duty、保留工作 | Duty 消失；Task 整棵移到未歸屬，其合法子內容與 K／S links 保留 |
+| 刪除 Duty 及其工作 | Duty、所含 Task、關鍵產出與完成標準刪除；K／S 解除相關 Task links，失去最後 link 者移出核心 JD |
 | 移動／取消 Task 歸屬 | Task 移到其他 Duty 或未歸屬；整棵內容保留 |
-| 刪除 Task | Task、工作細節與 O／P 刪除；K／S 只解除該 Task link |
-| K／S 失去最後 link | 保留為待重新連結 K／S，不自動刪除 |
-| Task 內移除 K／S | 只解除 link |
-| 永久刪除 K／S | 只從 canonical K／S 管理位置執行；先列出受影響 Task |
+| 刪除 Task | Task、關鍵產出與完成標準刪除；K／S 解除該 Task link，失去最後 link 者移出核心 JD |
+| Task 內移除 K／S | 解除 link；若是最後 link，同 command 將 canonical K／S 移出核心 JD |
+| 刪除仍被多 Task 使用的 canonical K／S | 先列出所有受影響 Tasks，再明確確認並移除其全部 links 與 canonical item |
 
-若員工想保留 O／P，就必須保留 Task，改用移至未歸屬；不提供「刪 Task 但保留孤立 O／P」。
+若員工想保留關鍵產出／完成標準，就必須保留 Task，改用移至未歸屬；不提供「刪 Task 但保留孤立子項」。
 
 ### 9.3 操作摩擦
 
 - 解散、移動、取消連結等可逆操作立即生效，顯示短暫 Undo。
 - 一般單項刪除若可完整逆轉，可立即執行並提供 Undo。
-- 「刪除 Duty 及其多個 Task」等高影響 cascade 必須先列出 Task／O／P 數量及會解除的 K／S links，再要求確認。
+- 「刪除 Duty 及其多個 Task」等高影響 cascade 必須先列出 Task／關鍵產出／完成標準數量、會解除的 K／S links，以及會因失去最後 link 而移出核心 JD 的 K／S，再要求確認。
 - 選單文字使用「解散／移除／解除連結／刪除」準確描述結果；不使用模糊的 `×` 代表所有生命週期。
 - Undo 是一個短期反向 authority command，仍須通過 expected revision／generation；若期間已有新改動而 stale，就保留新狀態並說明無法自動復原，不做隱藏 merge。
 
@@ -310,19 +321,21 @@ Task、Duty、O、P、K、S 都是按需 Skills；不要求先有 Task 才能在
 
 員工直接在聊天說「我剛才說錯了，是……才對」，和任何普通補充訊息完全相同：新訊息成為 immutable conversation turn，舊訊息原文不改；application 不先分類 `supersede／qualify／rebut`，不要求 target、不建立專用 model output／表單，也不自動修改 source lineage。
 
-顧問每輪取得本輪訊息、受 token budget 限制的近期員工＋顧問對話、可修訂的目前理解，以及可讀取的目前 JD／待審工作面。它用既有 Skill／Tool 正常更新理解與 JD；若「哪件事說錯」本身真的不清楚，才像顧問一樣在同一聊天室追問必要澄清。較舊原話仍可透過既有同文件 source lookup 按需讀取，不把完整歷史每輪塞入 prompt。
+顧問每輪取得本輪訊息、受 token budget 限制的近期員工＋顧問對話、可修訂的目前理解，以及可讀取的目前 JD／待審工作面。它用既有 Skill／Tool 正常更新理解與 JD；若「哪件事說錯」本身真的不清楚，才像顧問一樣在同一聊天室追問；只有不回答就無法安全繼續時才進「需要你的確認」。較舊原話仍可透過既有同文件 source lookup 按需讀取，不把完整歷史每輪塞入 prompt。
+
+員工來源高於 AI 推論，但不採「最新訊息自動覆蓋舊訊息」。新舊說法能依期間、例外或範圍同時成立時，工作理解改為帶條件的多筆事實；明確口頭更正時修訂目前理解並保留舊 source；無法判定時保留矛盾、停止受影響的 JD 推導並詢問員工，不依時間或模型信心猜答案。
 
 ### 10.2 一個 workspace 同時只跑一輪分析
 
 - idle：composer、目前 JD 編輯、結構操作與審核操作可用。
 - send preflight：先 flush／等待同 document 已排程的 autosave；若保存失敗，不送出員工訊息、不啟動模型，保留聊天草稿並顯示保存錯誤。
 - running：從送出開始先由 Web 樂觀進入唯讀，durable `SOURCE_SAVED`／active run 是重整與多分頁後的權威狀態。顯示「AI 正在分析；完成後可繼續編輯」，停用 composer、目前 JD 編輯、新增／刪除／移動／重排、Undo、Accept／Reject。
-- running 仍允許閱讀、選取文字、捲動、Duty／Task 展開收合、左右 panel 收合／調寬，以及查看 diff／Evidence；不用全頁 overlay。
+- running 仍允許閱讀、選取文字、捲動、Duty／Task 展開收合、左右 panel 收合／調寬，以及查看 diff／工作理解來源；不用全頁 overlay。
 - success：立即解鎖並以最新 snapshot 更新畫面。
 - error／timeout：一定解鎖；原員工訊息仍在，顯示 inline error 與「重試分析」，也允許員工忽略錯誤後送任何普通新訊息。
 - retry 沿用同一 input event，不重複建立員工訊息；provider attempt 另有 identity。
 
-API 對同一 document 的 duplicate active run 或 employee document mutation 回既有 typed `409 …/consultant-run-active`。guard 同時檢查 process-local admission 與 durable latest run，不能只靠單一 React disabled 或單一 process set。第一版不做 queue、interrupt current run、rollback 或 concurrent branching。
+API 對同一 document 的 duplicate active run 或 employee document mutation 回既有 typed `409 …/consultant-run-active`。guard 同時檢查 process-local admission 與 durable latest run，不能只靠單一 React disabled 或單一 process set。第一版不做 queue、正在生成時的 steer／interrupt、rollback 或 concurrent branching；真正 blocking 的「需要你的確認」仍在本輪 model output 與 deterministic commit 完成後，由專用 wait node 使用 [LangGraph durable interrupt](https://docs.langchain.com/oss/python/langgraph/interrupts)。
 
 ## 11. Framework 方案 A
 
@@ -337,7 +350,7 @@ API 對同一 document 的 duplicate active run 或 employee document mutation �
 | Server state／mutations | 現有 TanStack Query v5 | query keys、optimistic boundary、stale／error 文案 |
 | Persistent AI workspace | 現有 Deep Agents StoreBackend／LangGraph Store | JD canonical resources 與 scope policy |
 | Conversation／run recovery | 現有 LangGraph Saver、FastAPI SSE | token-bounded 雙向近期對話、產品 snapshot event 與 reject run-admission |
-| Schema／validation | 現有 Pydantic＋generated contract | Duty／Task／OPKS invariant、Evidence、atomic closure |
+| Schema／validation | 現有 Pydantic＋generated contract | Duty／Task／OPKS invariant、工作理解 references／來源、atomic closure |
 
 [Base UI releases](https://base-ui.com/react/overview/releases) 顯示 1.7.0 是 2026-08-04 latest stable，包含多項 accessibility、performance 與 bug fixes；現行 Web 為 1.4.1，實作前先跑 compatibility gate 再升級。Base UI 官方也明載其元件依 [WAI-ARIA APG 提供基本鍵盤可及性](https://base-ui.com/react/overview/accessibility)。
 
@@ -354,7 +367,7 @@ API 對同一 document 的 duplicate active run 或 employee document mutation �
 
 - 新畫面統一使用 Base UI primitives；改到既有 Radix Popover／cmdk consumer 時逐一遷移，沒有 consumer 後才移除依賴。
 - 不同 primitive library 不得同時承接同一種 popup／focus lifecycle。
-- framework 只擁有通用 UI／form／server-state mechanism；semantic diff、Evidence、dependency closure 與 authority transaction 留在 application，因通用 framework 不理解 Duty／Task／OPKS。
+- framework 只擁有通用 UI／form／server-state mechanism；semantic diff、工作理解／來源規則、dependency closure 與 authority transaction 留在 application，因通用 framework 不理解 Duty／Task／OPKS。
 
 ## 12. 必要後端與契約變更
 
@@ -365,10 +378,12 @@ API 對同一 document 的 duplicate active run 或 employee document mutation �
 3. **普通 direct edit command**：沒有重疊 AI pending 的 touched semantic group 繼續由 server-derived delta 更新 working＋approved；client 不自稱 accepted paths。
 4. **accept／reject command**：以最新 semantic group identity／digest 操作目前值；editing 與 acceptance 拆開，不把 `edit_and_accept` 當主要 UI 儲存動作。
 5. **結構 command**：以一個 discriminated typed command 承載 dissolve Duty、cascade delete Duty、unassign／move／delete Task、link／unlink K／S。這是 employee UI application command，不是新增 LLM business Tool。
-6. **current projection 狀態**：提供每個 semantic group 的 pending identity、Evidence 摘要、dependency 與 stale guard；Web 只負責呈現。
+6. **current projection 狀態**：提供每個 semantic group 的 pending identity、1～N 筆相關工作理解摘要、AI 短理由、dependency 與 stale guard；Web 只負責呈現。逐字來源／quote 由工作理解按需展開，不複製到每個 JD action。
 7. **durable run admission**：`SOURCE_SAVED`／active run 時，同 document 的第二個 answer、direct edit、pending edit、結構 command、Undo 與 Accept／Reject 都 fail typed `409`；process-local guard 仍保留作同 process 快速互斥。成功、失敗或 timeout 後 snapshot 必須回到可寫狀態。
 8. **一般失敗恢復**：`FAILED` 可 retry 同一 input event，也可建立全新的普通員工訊息；不再要求新訊息必須 `supersedes_source_id` 指向失敗訊息。
-9. **移除專用更正與舊 lifecycle**：契約／composition root／Web 不再提供 `defer_changes`／`deferred`、source-specific correction mode、direct-correction 表單、application correction classifier，或「編輯 AI 新內容即接受」語意。歷史對話與 Evidence 仍保存，但普通訊息不觸發來源 lineage mutation。
+9. **移除專用更正與舊 lifecycle**：契約／composition root／Web 不再提供 `defer_changes`／`deferred`、`edit_and_accept` 狀態、必填拒絕理由、source-specific correction mode、direct-correction 表單、application correction classifier，或「編輯 AI 新內容即接受」語意。歷史 employee turns 與工作理解來源仍保存，但普通訊息不觸發 application 自動來源 lineage mutation。
+10. **工作理解 hard cut**：`GapItem`、下一題與 understanding calibration 不再各自擁有未知；改成單一 source-linked 工作理解 collection＋當輪問題 projection。員工直接改 JD 只留下下一輪 delta，不鑄 employee source。
+11. **執行來源分層**：移除 model-authored `skill_ids`；framework receipt 自動記錄真實載入 Skill，待審 JD 只引用工作理解與短理由，核准 JD 不保存理由。
 
 現行 O／P 恰一個 Task、K／S 多對多與 approved-only export invariants 全部保留。
 
@@ -385,27 +400,27 @@ API 對同一 document 的 duplicate active run 或 employee document mutation �
 
 ### 14.1 Authority
 
-1. AI 修改一個已核准頻率：舊值紅色、新值綠色；匯出仍是舊值。
+1. AI 修改一個已核准 Task statement：舊值紅色、新值綠色；匯出仍是舊值。
 2. 員工把綠色新值改兩次：working copy 跨重整保留，仍顯示待審；匯出仍是舊值。
 3. 員工接受：目前畫面不跳動，核准基線與匯出改為最新值。
-4. 員工拒絕：working copy 還原舊值，拒絕理由保留給 AI。
+4. 員工拒絕：working copy 還原舊值，不要求理由；AI 只取得精簡拒絕結果，不把拒絕本身推論成新的工作事實。
 5. 員工修改沒有 AI pending 的核准內容：自動儲存後直接成為核准內容，不要求審核自己的修改。
 
 ### 14.2 結構
 
-1. 新 Task 可在沒有 Duty 時存在，且可逐步加入 O／P／K／S。
-2. 先發現 O／P／K／S 時先進工作地圖線索；確認 Task 後才能成為待審文件 group。
-3. 移動 Task 時整棵工作細節與 OPKS 不遺失，review 在舊／新位置顯示同一 identity。
-4. 解散 Duty 時 Tasks 移到未歸屬；cascade delete 才刪 Tasks／O／P。
-5. 刪除 Task 不會刪掉仍被其他 Task 使用的 K／S；最後 link 消失時進待重新連結區。
+1. 新 Task 可在沒有 Duty 時存在，且可逐步加入關鍵產出、完成標準與 K／S links。
+2. 先發現成果／完成標準／K／S 時先進工作理解；確認 Task 關聯後才能成為待審文件 group。
+3. 移動 Task 時其關鍵產出、完成標準與 K／S links 不遺失，review 在舊／新位置顯示同一 identity。
+4. 解散 Duty 時 Tasks 移到未歸屬；cascade delete 才刪 Tasks 及其 owned 子項。
+5. 刪除 Task 不會刪掉仍被其他 Task 使用的 K／S；最後 link 消失時，同一 command 將該 K／S 移出核心 JD並可 Undo。
 
 ### 14.3 Workspace 與訪談
 
 1. 左右欄收合／調寬後中央仍可滾完整 JD；各欄 scroll 互不綁定。
-2. running 時 composer、JD 寫入、結構操作、Undo 與 Accept／Reject 都不可用；閱讀、捲動、展開收合、panel 控制及查看 diff／Evidence仍可用。
+2. running 時 composer、JD 寫入、結構操作、Undo 與 Accept／Reject 都不可用；閱讀、捲動、展開收合、panel 控制及查看 diff／工作理解來源仍可用。
 3. success／error／timeout 後立即解鎖；error／timeout 可重試或送任何普通新訊息，不進 retry-only 死路。
 4. 員工以自然語句更正前文時只送一般訊息；近期雙向對話與目前理解足以讓模型處理，不出現舊訊息 target、source-specific payload 或自動 lineage mutation。
-5. 工作地圖 Focus 不綁 Task，待釐清也能保存尚未定位的 OPKS 線索。
+5. 工作地圖 Focus 不綁 Task；單純缺 O／P／K／S 不顯示成待釐清，只有具體可回答的未解工作問題才顯示。
 
 ### 14.4 驗證層級
 
@@ -422,10 +437,12 @@ API 對同一 document 的 duplicate active run 或 employee document mutation �
 1. AI 內容是否仍需員工明確接受才進核准基線？
 2. 員工與 AI 是否仍在同一目前 JD 上持續工作？
 3. Task／Duty／OPKS 是否仍可按證據動態演化，而非固定 wizard？
-4. 一般 Gap、必要澄清與待審文件是否仍是三種不同目的？
+4. 一般待釐清、「需要你的確認」與待審文件是否仍是三種不同目的？
 5. 是否誤加 RAG、A／能力級別 AI、自動接受、多 Agent、第二份文件 store 或重型 editor？
 6. 是否先使用成熟 framework primitive，再只補有證據的產品差額？
 7. 普通口頭更正是否仍是普通對話，而非 source-specific workflow？
 8. active run 是否只鎖寫入且 server 也能拒絕競態，完成／失敗後必定恢復？
+9. 員工直接改 JD 是否仍只是文件 authority delta，而沒有被偽造成 employee source？
+10. 待審 JD 是否只引用工作理解與短理由，Skill 使用由真實 framework receipt 證明，Accept／Reject 後沒有把理由塞進核准 JD？
 
 任何一題失敗就暫停該切片，回到本設計與 owner 討論；不得以「舊 code 原本如此」當保留理由。

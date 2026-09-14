@@ -12,9 +12,9 @@
 | App 端 adapter／provider wiring 的固定接合 | **本片完成**，全部為 MockTransport／InMemorySaver／InMemoryStore 的固定行為證據 |
 | B1 runtime 觸發、背景准入與排空、宿主重開續作、設定與金鑰、真 PostgreSQL 保存 | **未開始** |
 
-**因此本片不代表日常 App 已可使用 B1**，也不代表 H4 或完整旅程有進展。
+**本片是 H4 的局部進展；不代表日常 App 已可使用 B1，也不代表 H4 或完整旅程完成。**
 
-**審查追補（2026-09-14）：**`beb8aa8f` 已閉合祖先鏈例外的 adapter 邊界；`3921a99d` 再以 v2 context token 的 source window 界線完成 pair proof，交叉 pair、不同 root 與舊 v1 context 均明示拒絕。獨立窄複核 B1／窗口／游標 **108 passed**，只讀／Memory context **40 passed**；固定接合的程式修正可關閉 F-04，但正式 runtime、真 PostgreSQL B1 保存、背景恢復、B2 與自然模型仍未開始。進 runtime 前補一個既有錯配 artifact 讀回反例，並明示 v1 context 的 fresh-data／轉換界線。
+**審查追補（2026-09-14）：**P1／P2／F-04／P3固定接合已收尾至 `f160be97`。P3 是 InMemoryStore 上的已保存 artifact 讀回反例；變異轉紅由實作者執行，獨立正常重跑不代稱獨立變異測試。最新[整體審查](whole-flow-review.md)獨立受影響組與Memory套件211項通過；真PG／新程序／自然模型未執行。[H4計畫](../../../plans/2026-09-14-jd-h4-runtime-integration.md)接續一批B1真PG、有界batch及其後B2／宿主，不重做source port。
 
 ## 1. 只新增 App 端適配器
 
@@ -140,14 +140,14 @@ B1 的 extraction artifact 要驗 **source 與 context 兩個**引用，所以�
 | 祖先查找上限（P2） | 超過 256 層時四個 I/O 方法與 `start()` 一致回 `source_not_available`（不是內部 `AiCheckpointError`），**0 次 HTTP**、Store 無產物、不回退 latest |
 | 原 pair 不可交叉（F-04） | 相鄰窗口的 source 與另一個 context 組合，在 `validate_saved_window`、`save_extraction` 與套件層皆被拒；v1 context 位址拒絕；不同 root 的 context 拒絕 |
 | 原 pair 往返（F-04） | 保存→`source_window` 讀回→重抽，三處拿到的都是同一對 |
-| 已在磁碟上的錯配（P3） | 直接覆寫成相鄰窗口前綴的 artifact，`source_window` 讀回即拒；**拿掉讀回檢查後此例轉紅**（`DID NOT RAISE`），證明它驗的是該檢查本身 |
+| 已保存 artifact 上的錯配（P3） | 在測試 Store 直接覆寫成相鄰窗口前綴，`source_window` 讀回即拒；**拿掉讀回檢查後此例轉紅**（`DID NOT RAISE`），證明它驗的是該檢查本身；不等同真 PostgreSQL／實體磁碟證據 |
 | 出站請求 | `store=false`、**不送已淘汰的 `truncation`**、`json_schema` + `strict=true`、三欄位 schema、8192、effort high |
 
 替身只有一個：provider 的 HTTP 傳輸（`httpx.MockTransport`，回覆經實際 SDK schema 驗證）。來源 owner、Saver、Store、SDK、結構化輸出綁定全部是真的。**0 provider、付費 0**；`api_key` 是必填參數，程式不讀環境變數、不內建任何端點。
 
 ## 5. 限制與未完成
 
-1. **啟用 B1 runtime 前必須先處理 v1 context 位址。**v2 之前發出的 `purpose="context"` 位址不帶 pair proof，現在會**明示拒絕**，不做任何 fallback。本案尚未正式啟用、也不做舊資料搬移，所以預設走 fresh data；但若屆時已存在舊 artifact，只有兩條路：一次性轉換成帶 proof 的 v2 位址，或**放棄該筆的重抽**（詳記與候選仍可讀，只是不能再以原 pair 重抽）。**不得靜默降級或改用最新內容重規劃。**這是啟用前的檢查項，不是可留到之後的細節。
+1. **v1 context 繼續明示不支援，不新增舊資料搬移工作。**本案採 fresh data，B1 runtime尚未啟用，新合成fixture用v2。這是試用資料相容性檢查，不是R1開工前必須做轉換／全庫掃描；本輪沒有查證真DB是否存在v1。若日常啟用時實際發現需要保留的舊工作，保留資料、具體報告受影響重抽，不猜pair或改讀最新來源；沒有預先授權清資料／自動轉換。
 2. **`source_first`／`source_last` 是本案的接合設計**，不是 OpenAI 或 Anthropic 規定的 token 欄位；官方資料支持的是「由 App 驗證模型結果與工具錯誤」的責任分工，不是這個格式。
 3. **沒有呼叫真模型**，沒有自然品質、真人或成本證據；真模型另需當次明示費用授權。
 4. **B1 尚未被 App runtime 觸發**：`build_extraction_workflow` 可組裝，但宿主啟停、背景准入、排空與新程序續作（映射 §3.3–3.4）未接，模型 id／金鑰／配置也還沒接上本機設定。

@@ -1,0 +1,47 @@
+A-independent-pending: PASS_FIXED_CASE
+B-ai-human-ai: PASS_FIXED_CASE
+C-link-and-node-attrs: GAP_OBSERVED
+{
+  "status": "GAPS_PRESERVED",
+  "firstGap": {
+    "group": "C-link-and-node-attrs",
+    "name": "link-href-title: reject restores original attrs and marks",
+    "detail": {
+      "type": "paragraph",
+      "attrs": {
+        "id": "task-C",
+        "scope": "所有班別",
+        "sourceRefs": [
+          "utterance-3"
+        ]
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "參閱"
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "link",
+              "attrs": {
+                "href": "https://example.invalid/manual-v1",
+                "title": "原版手冊"
+              }
+            }
+          ],
+          "text": "設備手冊"
+        },
+        {
+          "type": "text",
+          "text": "設備手冊。"
+        }
+      ]
+    }
+  },
+  "reportFile": {
+    "file": "results/run-20260909T144514Z/report.json",
+    "sha256": "cf52931703b94c36204f3b588ecbbb3d39a206f4dd416df2fda4b3d74bcb60e5"
+  }
+}

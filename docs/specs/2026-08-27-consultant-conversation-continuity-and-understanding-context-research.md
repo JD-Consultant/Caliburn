@@ -294,7 +294,7 @@ AI 與員工持續看到並編輯同一份最新 working copy；核准基線仍�
   → 若缺少只能由員工裁決且當下不能安全繼續的資訊，才建立「需要你的確認」 interrupt
 ```
 
-這個順序表示「工作理解先於依賴它的 JD 變更」的語意依賴，不要求額外 memory agent；但 **一次員工可見的產品 run 不等於只能有一次 model call**。先前把工作理解、JD changes、reply 與 optional follow-up 全放進同一份 Structured Output，只能證明 schema／local reference 可解析，不能證明 JD 判斷實際讀過 deterministic verifier 驗證後的最新工作理解。Owner 於 2026-08-28 依 §14 裁決採一個有界 Tool-feedback consultant loop：不固定一次或兩次 call，也不建立 `should_edit_jd` 預分類；只有 JD 需要依賴本輪新／修訂理解時，才必須先取得 application 驗證並提交後的 canonical understanding tool result，再由同一個 product run 繼續文件工作。
+這個順序表示 JD 必須使用本輪形成的語意理解，不表示該理解必須先成功持久化成 Semantic Memory。**一次員工可見的產品 run 不等於只能有一次 model call**；同一 Context 與同一份已驗證理解可以形成 Memory mutation、JD changes、reply 與 optional follow-up 等並列 effects，各自驗證。只有後續步驟真的需要重新讀取已發布的 Memory head，才等待該 Tool result。Owner 於 2026-09-04 以 [`MEM-Q005`](../current-decisions.md) 取代本段原本過度寬泛的 canonical-understanding hard gate；完整依據與失敗行為見 [`2026-09-04-memory-persistence-and-jd-effect-reconciliation.md`](./2026-09-04-memory-persistence-and-jd-effect-reconciliation.md)。模型 call 數與 framework steps 仍不固定，也不建立 `should_edit_jd` 預分類。
 
 員工當輪若在問問題，顧問不能只顧著產生下一題：能回答時先回答；答案需要關鍵事實但目前沒有時，清楚說明限制；只有無法安全繼續時才進「需要你的確認」。普通追問最多保留一個主要問題，其他未知留在工作理解，避免把訪談變成問卷清單。
 

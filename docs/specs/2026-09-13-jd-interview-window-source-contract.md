@@ -61,6 +61,8 @@ B1 要的是**輸入→答覆**的已完成回合，而且跨輪；現有投影�
 - 沒有必要的前置 AI 公開問題時，`context_reference` 明確為 `null`；不可用空字串、另一種 reference 或自行拼接文字代替。
 - B1 adapter 必須以此 pair 送入既有 `source_reference`／`context_reference` 欄位；B2 只接收保留這對不可變來源 metadata 的 extraction artifact，不重新猜測窗口。不得只回一個範圍而讓呼叫者猜 context。
 
+**Pair proof（實作後補充）：**`context_reference` 使用獨立的 `purpose="context"` 簽章格式。v2 位址除了固定 root／context 範圍，還記錄它所屬 source window 的 `source_first`／`source_last`；source owner 以這兩個界線及同一 root 驗證 pair。保存、讀回及重抽都必須呼叫同一驗證，v1 context 位址因沒有這項證明而明示拒絕。只讀工具及 C repair 沒有 context 授予，維持既有 source-only 行為；這是本案接合選擇，不宣稱所有供應商都採用相同 token 欄位。
+
 ## 4. 讀取契約
 
 `read_window(ref, offset=0)` 回一頁，欄位沿已驗的舊形狀，語意逐項重新定義在新 App 的證據上：

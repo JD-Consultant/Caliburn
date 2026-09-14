@@ -1,0 +1,15 @@
+file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1797
+    err(str) { throw new SyntaxError(str + " (in content expression '" + this.string + "')"); }
+                     ^
+
+SyntaxError: Only non-generatable nodes (paragraph) in a required position (see https://prosemirror.net/docs/guide/#generatable) (in content expression 'paragraph+')
+    at TokenStream.err (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1797:22)
+    at checkForDeadEnds (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:2024:20)
+    at ContentMatch.parse (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:1628:9)
+    at new Schema (file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/dist/index.js:2441:63)
+    at file:///S:/caliburn/.research-tmp/jd-editor-pm-review-probe/probe.mjs:19:16
+    at ModuleJob.run (node:internal/modules/esm/module_job:271:25)
+    at async onImport.tracePromise.__proto__ (node:internal/modules/esm/loader:547:26)
+    at async asyncRunEntryPointWithESMLoader (node:internal/modules/run_main:116:5)
+
+Node.js v22.12.0

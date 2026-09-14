@@ -1,0 +1,4 @@
+Root-only actual PG: {'before': {}, 'after': {'messages': [], 'jd_manual_pending': {'operation': 'b7b88435-6660-51da-b04e-524f823f067d', 'base': 'd92684ff-14e7-4279-9fe3-4cb88f14d010', 'digest': 'db5b7bbb2f033149df44b1822c76d7b521929b4ddbd0f0a3182f598b6ae54781', 'request_key': '8f036344-9b66-43dc-802e-f574d2d7323d', 'origin': 'manual'}, 'closed_turns': {}}, 'next': (), 'provider_attempts': 0}
+.PG exact snapshot: task-2-pg-1b76ce90-beac-456d-a926-2fe467cff6a7.jsonl
+
+1 passed, 4 deselected in 5.22s

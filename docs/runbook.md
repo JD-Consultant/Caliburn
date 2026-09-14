@@ -15,6 +15,8 @@ Current 產品只有 PostgreSQL、FastAPI 與 Next.js；OpenRouter 是外部 LLM
 
 ## Fresh DB 與首次啟動
 
+若 Docker Desktop 在啟動時報 Windows socket／`The file cannot be accessed by the system`，先讀[2026-09-06 維運紀錄](specs/2026-09-06-docker-desktop-startup-repair.md)。不要直接重設／刪除 volumes，也不要把一次成功啟動當成重啟已穩定；該次自動啟動問題仍未證明根治。
+
 ```bash
 npm install
 npm run infra

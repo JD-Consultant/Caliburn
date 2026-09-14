@@ -1,8 +1,6 @@
 # JD App 接續施工與交接計畫
 
-**H4 最新接續修正（2026-09-13）：**[3cbd3ca5 窄複核](../specs/evidence/jd-interview-window-source/cursor-lineage-review.md)已閉合 R-01／R-02，F-03 source 層也已閉合。**下一唯一單位依映射 §6.2 採用 B1。**W-13／不可變 pair／用途感知讀取隨 B1／B2 實際 adapter 驗收，不為它們另造中間引擎；下文舊「未驗 W-13 不進 B1」與先修來源的指令不再有效。通知留完整註冊、結果分類與停止恢復單位，不是 B1 的必要前置。不重開既有顧問研究、日常 AI 不提前啟用。
-
-更新：2026-09-13；Topic JD-R002／OI-01、OI-02。**H2–H3 已提交為 `7181db63`，提交後複核見[審查結果](../specs/evidence/jd-memory-repair-integration/submitted-integration-review.md)。H4 映射 `2e243d15` 已完成提交後[審查修訂](../specs/evidence/2026-09-13-jd-b1-b2-adoption-review.md)；完成窗口契約 `ab483f6c` 亦已完成[9/12–9/13 文件審查](../specs/evidence/2026-09-13-jd-window-source-contract-review.md)。下一從修正版的有限實作接續。**本次只修文檔，沒有實作 H4；先前首敗與停點保留為歷史。
+**目前接續（2026-09-14）：**H1–H3、完成窗口來源及 B1 核心／OpenAI adapter 固定接合已完成至 `f160be97`。本次[整體審查](../specs/evidence/jd-b1-adoption/whole-flow-review.md)確認方向，修正批次交接、背景責任與文件落差；獨立固定測試211項通過。**下一從[H4 runtime 計畫 R1](2026-09-14-jd-h4-runtime-integration.md)做一批 B1 真 PostgreSQL 保存／恢復及有界 batch 接合**，不是重做來源或採用映射。B2、背景宿主、完整通知及新 App 自然模型仍未完成；日常 AI 未啟用。
 
 本文件負責「下一位從哪裡接、分步怎麼做、如何驗收」。產品總範圍仍由[總施工計畫](2026-09-13-jd-relational-app-implementation.md)負責，未解事項由[唯一清單](../specs/2026-09-13-jd-app-open-issues.md)負責，入口只維護[目前決策](../current-decisions.md)。不要重新讀完整舊聊天才能開工。
 
@@ -12,7 +10,7 @@
 
 本輪取得的重要反例：把 C 子圖藏在工具函式內，即使提前建立，也不能經公開的原生子圖觀察讀到原發布請求。已用官方文件及有限實測選定：**工具將控制權交回根流程的固定 `memory_repair` 節點，該節點呼叫既有 C 子圖，完成後回顧問。**不增加第二個 Saver、資料表或通用定位引擎。
 
-**H2–H3 已完成（2026-09-13），結果見[App 接合結果稿](../specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。**CA-01／02、FH05、adoption／wheel 與獨審已收尾。**下一施工單位是 §5 H4 的完成窗口 source port；其契約已交付並經文件審查修正**（[契約與固定情境](../specs/2026-09-13-jd-interview-window-source-contract.md)、[審查稿](../specs/evidence/2026-09-13-jd-window-source-contract-review.md)，W-01–W-14），下一是先做用途感知 source adapter、窗口規劃 pair 與固定案例，再接 B1／B2。採用映射已交且修正。不要重做 H1–H3，不能只打開日常 `enable_chat` 代替驗收。下方 §3 與 H2／H3 的早期交接狀態以結果稿為準。
+**H2–H3 已完成。**[App 接合結果](../specs/2026-09-13-jd-memory-repair-app-integration-slice.md)與提交後複核保留 CA-01／02、FH05 和封裝證據。下方 H1–H3 是完成歷史；H4 依頁首的新執行計畫，不再先做 source port 或重交採用映射。
 
 | 工作區事實 | 交接值 |
 |---|---|
@@ -42,7 +40,7 @@
 
 ## 3. 接續基準與前次交接歷史
 
-**現況：**原call結果、固定C位置、CA-01／02及無checkpoint但有原生位置的收尾、FH05新宿主查回、adoption／wheel已在`7181db63`完成。H4映射已提交並依審查修正，下一是完成窗口契約與有限實作。H2–H3實作者紀錄及提交後獨立窄跑分別見結果稿／審查結果，不累加重疊測試數字。
+**現況：**H2–H3 在 `7181db63` 收尾；B1／來源固定接合完成至 `f160be97`。本節是舊 C 施工材料，不是目前待辦；現行 H4 缺口與測試層級見頁首路由。
 
 **下表僅為提交前的交接歷史，不是現行待辦。**相對路徑從repo根起算；其「當時未完成」已由上述成果收尾，禁止照表重做。保留為首敗與實作責任對照。
 
@@ -174,28 +172,17 @@ close完成後查回應同時保留原run、messages、JD bindings、Memory view
 - 安排非作者審查 bindings／context／恢復／scope，修後窄複核；記首敗、最終結果及未驗層級。先確認可驗收再精確提交／本地tag，不混入無關dirty，不merge／push。
 - 結果寫 `docs/specs/` 並連 evidence；更新總計畫／OI-02／App README／package README，入口只短記狀態與下一步。這些完成只代表C接合，不等於整個產品。
 
-### H4｜既有 B1／B2／詳記、完整來源窗口及顧問指引
+### H4｜既有顧問採用與完整 Memory 接合
 
-**這是採用已完成顧問，不是從零研究顧問。**先讀[CT49完整長訪談](../../.worktrees/analysis-only-agent/docs/specs/2026-09-09-ct49-fixed-long-interview-results.md)與[CT50已測配置](../../.worktrees/analysis-only-agent/docs/specs/2026-09-09-ct50-tested-profile-results.md)，找其固定來源及已接受能力；再按實際接點讀[Memory設計](../specs/2026-09-06-analysis-only-agent-memory-design.md)、[產生節奏與連續性](../specs/2026-09-06-memory-generation-cadence-and-continuity-review.md)、[即時更正成果](../specs/2026-09-06-analysis-only-agent-live-memory-results.md)及[詳記更正](../specs/2026-09-06-interview-summary-correction-routing-proposal.md)。較早文件不是推翻最新完成版的指令。
+**詳細施工只維護在[H4 runtime 執行計畫](2026-09-14-jd-h4-runtime-integration.md)。**產品／採用責任在[映射 §3–5](../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)；本節不重複保存另一份易過期步驟。
 
-先交一張採用映射：已驗來源symbol／commit → 正常package落點 → 新App source／owner adapter → 沿用案例 → 只因新接點需補的案例。原prompt、詳記／候選、B1/B2工作規則及模型配置先保持已驗語意；JD新增工具與成稿方法另列差異。舊checkout提供來源，正式／新App不得直接import研究路徑；不整批複製另一套host、source或業務權威。
+1. R1：固定 target 的有界批次引用，一批 B1 真 PG 保存／原工作恢復。
+2. R2：B1→B2→publication，未交接完不換下一批；C 晚期更正與發布回覆遺失。
+3. R3：純通知完整註冊／結果／停止恢復，A 指引與三項分析 Skills，背景准入、設定、排空、新程序續作與固定完整 JD 旅程。
 
-**映射已交付並修正（2026-09-13）：**以[B1／B2 與顧問方法映射](../specs/2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)為唯一細節依據；[審查紀錄](../specs/evidence/2026-09-13-jd-b1-b2-adoption-review.md)保留原稿問題。已驗顧問來源仍是 `4f94fbfb`，CT51延續其配置，13模組blob相同；後加舊JD接合不整批採用。**新增施工規範：**
+CT49／CT50 已有真模型限定顧問成果，採用來源固定 `4f94fbfb`，不重做理解方法。B1／B2 prompt 保持，JD 方法依完整工作分析、客製化深度與六章研究映射。窗口／P1／P2／F-04／P3 固定接合不再重開，除非出現新反例。
 
-- A基本指引、三項已驗分析Skills及無參數整理通知都要採用；不固定「十五個工具」而漏掉能力，也不把15次工具呼叫預算套到B1。
-- source port先列引用驗證／解碼、分頁內容與角色、逐輪安全終局、整理請求及來源覆蓋契約；安全失敗／取消仍保留員工原話。`processed_source`已在publication head，不能另造游標；窗口 `purpose` 的用途隔離、B2 可驗證的 source adapter、source/context pair 與 Unicode offset 依審查稿施工。
-- C的原結果只讀查回不變；B1／B2保留已驗同工作原生續作、預算、stale／更正來源與冪等發布，不能整批套C不重播政策。
-- 新host目前沒有背景狀態與排空。背景接線前須有限定出原工作、固定目標、錯誤／預算與啟停的持久責任；不搬另一宿主，不預先禁止所有必要表或框架喚醒器，不把背景硬套前景手改門閘。
-
-下一按映射§6先定完成窗口source介面與固定情境、隨即有限實作；不重開顧問廣搜，背景落點在其接線前閉合。
-
-- B1 从**已完成的訪談窗口**產生詳記及工作資訊候選；C 的本輪source不是B1完成窗口。保留原文位置、案例條件／更正、低頻工作，不建第二原話庫。
-- B2 將候選整併成目前工作理解與導覽，沿既有 PublicationStore/CAS；C更正不能被晚到的舊B候選蓋回。保留已研究的詳記重抽與來源關係，不退化成每輪一段聊天摘要。
-- 先核原流程與新 source port／owner／完整窗口、故障重開與背景排空的差距，再用正常套件抽出必要部分；不因旧檔大量存在就整批import，不重新發明Memory。
-- 顧問指引从[工作完整分析](../specs/2026-09-09-complete-work-analysis-guide.md)、[客製化深度](../specs/2026-09-09-customized-jd-depth-and-interview-calibration.md)、[欄位寫作](../specs/2026-09-09-jd-field-and-writing-guide.md)及[品質門檻](../specs/2026-09-10-jd-product-quality-acceptance.md)映射新JD工具。
-- 要會「資料不足追問、局部足夠撰寫、晚期更正、工作→JD／JD→依據核對」，不加讓LLM填滿大量內部欄位的要求。最後訪談尚未進Memory時，收尾仍核最新原話。
-
-**完成條件：**零provider的固定完整旅程能初始化、反覆修正、保留早期工作與案例、重開續談；即時／背景資料權責一致，所有工作可排空。還不是自然品質PASS。
+**完成條件：**零 provider 完整旅程能初始化、反覆修正、保留早期工作與案例、重開續談；背景與前景責任一致，所有工作可排空。還不是自然品質 PASS；v1 合成資料不支援重抽的檢查不擴張為舊資料搬移工作。
 
 ### H5｜App完整旅程與日常交付，再做自然验收
 
@@ -241,10 +228,9 @@ git diff -- experiments/jd-relational-app/src/jd_relational/ai_checkpoints.py pa
 ```powershell
 Set-Location S:/caliburn/experiments/jd-relational-app
 $env:PYTHONUTF8='1'
-# 先讀審核反例；下列session是既有回歸，CA-01/02須另補期待正常收尾的红測。
-uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cache pytest -q -p no:cacheprovider tests/test_memory_repair_session.py --tb=short
-# 相依基礎與checkpoint回歸；本次修正後只重跑受影響範圍。
-uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cache pytest -q -p no:cacheprovider tests/test_memory_repair_records.py tests/test_memory_repair_checkpoints.py tests/test_ai_checkpoints.py tests/test_memory_read_recovery.py tests/test_consultant_memory_context.py
+# H4接續的受影響基準；R1再加入自己的B1真PG案例。
+uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cache pytest -q -p no:cacheprovider tests/test_extraction_app.py tests/test_interview_window_source.py --tb=short
+# 只有R2/R3動到C交接或前景收尾，才選相應既有C回歸；CA-01/02已完成，不重建紅測。
 # 跨App/package目錄測試用App的pytest設定，保留src導入路徑。
 uv run --offline --frozen --no-sync --cache-dir S:/caliburn/.research-tmp/uv-cache pytest -c pyproject.toml -q -p no:cacheprovider ../../packages/consultant-memory/tests
 ```
@@ -268,6 +254,6 @@ Remove-Item Env:JD_RELATIONAL_TEST_DB
 
 H1–H3 的 **C接合可驗收單位已完成**：正常同輪讀取、取消／未知保存、兩個停止位置收尾與真新程序查回，獨審、精確commit/tag、單一結果稿及路由都已收。接著 H4、H5 按依賴完成成品，未解問題仍用既有 OI ID。
 
-這份交接不替下一位默認費用授權。**下一位不必重問是否繼續已同意需求；從 §5 的 H4 開始，先交採用映射。**不得再把「新App接合未完」描述成「原顧問未做完」，也不要重跑已完成的 H2／H3 反例當新工作。
+這份交接不替下一位默認費用授權。**下一位不必重問已同意需求；從 H4 runtime 計畫 R1 開始，不再重交已完成的採用映射。**不得再把「新App接合未完」描述成「原顧問未做完」，也不要重跑已完成的 H2／H3 反例當新工作。
 
 前次交接的文件窄核不等於程式獨審。H2–H3施工的審查與修正紀錄見結果稿，提交後另一次獨立複核見審查結果，兩者不互相冒用；沒有啟用日常模型或正式切換。

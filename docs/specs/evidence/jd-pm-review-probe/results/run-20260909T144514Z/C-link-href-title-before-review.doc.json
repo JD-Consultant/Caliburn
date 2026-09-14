@@ -1,0 +1,119 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "attrs": {
+        "id": "task-A",
+        "scope": "例行設備檢查",
+        "sourceRefs": [
+          "utterance-1"
+        ]
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "每月檢查一次，記錄結果。"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "id": "task-B",
+        "scope": "故障通報",
+        "sourceRefs": [
+          "utterance-2"
+        ]
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "故障時通報主管，記錄原因。"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "id": "task-C",
+        "scope": "所有班別",
+        "sourceRefs": [
+          "utterance-3"
+        ]
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "參閱"
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "link",
+              "attrs": {
+                "href": "https://example.invalid/manual-v1",
+                "title": "原版手冊"
+              }
+            },
+            {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            }
+          ],
+          "text": "設備手冊"
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            }
+          ],
+          "text": "設備手冊"
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "link",
+              "attrs": {
+                "href": "https://example.invalid/manual-v2",
+                "title": "新版手冊"
+              }
+            },
+            {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "C-link",
+                  "stage": "link-href-title"
+                }
+              }
+            }
+          ],
+          "text": "設備手冊"
+        },
+        {
+          "type": "text",
+          "text": "。"
+        }
+      ]
+    }
+  ]
+}

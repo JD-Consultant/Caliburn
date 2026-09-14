@@ -1,0 +1,825 @@
+{
+  "move-task": {
+    "before": [
+      {
+        "id": "purpose",
+        "type": "p",
+        "children": [
+          {
+            "text": "將確認的需求轉成可使用的介面；尚待確認發布責任。"
+          }
+        ]
+      },
+      {
+        "id": "d1",
+        "type": "jd_duty",
+        "title": "需求與交付",
+        "children": [
+          {
+            "id": "t1",
+            "type": "jd_task",
+            "sourceRefs": [
+              "source:1"
+            ],
+            "children": [
+              {
+                "id": "t1-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "協助確認需求。"
+                  }
+                ]
+              },
+              {
+                "id": "t1-condition",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "對特殊案件提供建議；核准由專案經理負責。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t2",
+            "type": "jd_task",
+            "sourceRefs": [
+              "source:2"
+            ],
+            "children": [
+              {
+                "id": "t2-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "協助確認需求。"
+                  }
+                ]
+              },
+              {
+                "id": "t2-condition",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "僅有維護約定的案件按月檢查；其他案件不適用。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d2",
+        "type": "jd_duty",
+        "title": "其他工作",
+        "children": [
+          {
+            "id": "t3",
+            "type": "jd_task",
+            "children": [
+              {
+                "id": "t3-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "處理上線後異常，保留未解事項。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "knowledge",
+        "type": "jd_knowledge",
+        "scope": {
+          "uses": [
+            "整合",
+            "診斷"
+          ]
+        },
+        "children": [
+          {
+            "id": "k1",
+            "type": "p",
+            "children": [
+              {
+                "text": "理解介面契約與非同步狀態。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "unassigned",
+        "type": "jd_unassigned",
+        "children": [
+          {
+            "id": "u1",
+            "type": "p",
+            "children": [
+              {
+                "text": "先記錄交接成果，任務歸屬尚未確認。"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "purpose",
+        "type": "p",
+        "children": [
+          {
+            "text": "將確認的需求轉成可使用的介面；尚待確認發布責任。"
+          }
+        ]
+      },
+      {
+        "id": "d1",
+        "type": "jd_duty",
+        "title": "需求與交付",
+        "children": [
+          {
+            "id": "t1",
+            "type": "jd_task",
+            "sourceRefs": [
+              "source:1"
+            ],
+            "children": [
+              {
+                "id": "t1-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "協助確認需求。"
+                  }
+                ]
+              },
+              {
+                "id": "t1-condition",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "對特殊案件提供建議；核准由專案經理負責。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "d2",
+        "type": "jd_duty",
+        "title": "其他工作",
+        "children": [
+          {
+            "id": "t3",
+            "type": "jd_task",
+            "children": [
+              {
+                "id": "t3-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "處理上線後異常，保留未解事項。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t2",
+            "type": "jd_task",
+            "sourceRefs": [
+              "source:2"
+            ],
+            "children": [
+              {
+                "id": "t2-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "協助確認需求。"
+                  }
+                ]
+              },
+              {
+                "id": "t2-condition",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "僅有維護約定的案件按月檢查；其他案件不適用。"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "knowledge",
+        "type": "jd_knowledge",
+        "scope": {
+          "uses": [
+            "整合",
+            "診斷"
+          ]
+        },
+        "children": [
+          {
+            "id": "k1",
+            "type": "p",
+            "children": [
+              {
+                "text": "理解介面契約與非同步狀態。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "unassigned",
+        "type": "jd_unassigned",
+        "children": [
+          {
+            "id": "u1",
+            "type": "p",
+            "children": [
+              {
+                "text": "先記錄交接成果，任務歸屬尚未確認。"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "id": "purpose",
+        "type": "p",
+        "children": [
+          {
+            "text": "將確認的需求轉成可使用的介面；尚待確認發布責任。"
+          }
+        ]
+      },
+      {
+        "id": "d1",
+        "type": "jd_duty",
+        "title": "需求與交付",
+        "children": [
+          {
+            "id": "t1",
+            "type": "jd_task",
+            "sourceRefs": [
+              "source:1"
+            ],
+            "children": [
+              {
+                "id": "t1-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "協助確認需求。"
+                  }
+                ]
+              },
+              {
+                "id": "t1-condition",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "對特殊案件提供建議；核准由專案經理負責。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t2",
+            "type": "jd_task",
+            "sourceRefs": [
+              "source:2"
+            ],
+            "children": [
+              {
+                "id": "t2-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "協助確認需求。"
+                  }
+                ]
+              },
+              {
+                "id": "t2-condition",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "僅有維護約定的案件按月檢查；其他案件不適用。"
+                  }
+                ]
+              }
+            ],
+            "diff": true,
+            "diffOperation": {
+              "type": "delete"
+            }
+          }
+        ]
+      },
+      {
+        "id": "d2",
+        "type": "jd_duty",
+        "title": "其他工作",
+        "children": [
+          {
+            "id": "t3",
+            "type": "jd_task",
+            "children": [
+              {
+                "id": "t3-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "處理上線後異常，保留未解事項。"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "id": "t2",
+            "type": "jd_task",
+            "sourceRefs": [
+              "source:2"
+            ],
+            "children": [
+              {
+                "id": "t2-description",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "協助確認需求。"
+                  }
+                ]
+              },
+              {
+                "id": "t2-condition",
+                "type": "p",
+                "children": [
+                  {
+                    "text": "僅有維護約定的案件按月檢查；其他案件不適用。"
+                  }
+                ]
+              }
+            ],
+            "diff": true,
+            "diffOperation": {
+              "type": "insert"
+            }
+          }
+        ]
+      },
+      {
+        "id": "knowledge",
+        "type": "jd_knowledge",
+        "scope": {
+          "uses": [
+            "整合",
+            "診斷"
+          ]
+        },
+        "children": [
+          {
+            "id": "k1",
+            "type": "p",
+            "children": [
+              {
+                "text": "理解介面契約與非同步狀態。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "unassigned",
+        "type": "jd_unassigned",
+        "children": [
+          {
+            "id": "u1",
+            "type": "p",
+            "children": [
+              {
+                "text": "先記錄交接成果，任務歸屬尚未確認。"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "split": [
+    {
+      "id": "split",
+      "type": "p",
+      "sourceRefs": [
+        "source:3"
+      ],
+      "children": [
+        {
+          "text": "繁中段落"
+        }
+      ]
+    },
+    {
+      "children": [
+        {
+          "text": "拆分測試。"
+        }
+      ],
+      "id": "probe-new-1",
+      "type": "p",
+      "sourceRefs": [
+        "source:3"
+      ]
+    }
+  ],
+  "mark-add": {
+    "before": [
+      {
+        "id": "m",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作"
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "m",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作",
+            "bold": true
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "id": "m",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作",
+            "bold": true,
+            "diff": true,
+            "diffOperation": {
+              "newProperties": {
+                "bold": true
+              },
+              "properties": {},
+              "type": "update"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "mark-remove": {
+    "before": [
+      {
+        "id": "m",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作",
+            "bold": true
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "m",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作"
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "id": "m",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作",
+            "diff": true,
+            "diffOperation": {
+              "newProperties": {},
+              "properties": {
+                "bold": true
+              },
+              "type": "update"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "element-properties": {
+    "before": [
+      {
+        "id": "x",
+        "type": "p",
+        "score": 1,
+        "verified": true,
+        "scope": {
+          "name": "一般"
+        },
+        "children": [
+          {
+            "text": "工作"
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "x",
+        "type": "p",
+        "score": 0,
+        "verified": false,
+        "scope": {
+          "name": "特殊"
+        },
+        "children": [
+          {
+            "text": "工作"
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "id": "x",
+        "type": "p",
+        "score": 0,
+        "verified": false,
+        "scope": {
+          "name": "特殊"
+        },
+        "children": [
+          {
+            "text": "工作"
+          }
+        ],
+        "diff": true,
+        "diffOperation": {
+          "newProperties": {
+            "score": 0,
+            "verified": false,
+            "scope": {
+              "name": "特殊"
+            }
+          },
+          "properties": {
+            "score": 1,
+            "verified": true,
+            "scope": {
+              "name": "一般"
+            }
+          },
+          "type": "update"
+        }
+      }
+    ]
+  },
+  "element-remove-prop": {
+    "before": [
+      {
+        "id": "x",
+        "type": "p",
+        "scope": "僅特殊案件",
+        "children": [
+          {
+            "text": "工作"
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "x",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作"
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "id": "x",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作"
+          }
+        ],
+        "diff": true,
+        "diffOperation": {
+          "newProperties": {},
+          "properties": {
+            "scope": "僅特殊案件"
+          },
+          "type": "update"
+        }
+      }
+    ]
+  },
+  "same-id-both-change": {
+    "before": [
+      {
+        "id": "x",
+        "type": "p",
+        "scope": "特殊",
+        "children": [
+          {
+            "text": "協助上線"
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "x",
+        "type": "p",
+        "scope": "全部",
+        "children": [
+          {
+            "text": "負責核准上線"
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "id": "x",
+        "type": "p",
+        "scope": "特殊",
+        "children": [
+          {
+            "text": "協助上線"
+          }
+        ],
+        "diff": true,
+        "diffOperation": {
+          "type": "delete"
+        }
+      },
+      {
+        "id": "x",
+        "type": "p",
+        "scope": "全部",
+        "children": [
+          {
+            "text": "負責核准上線"
+          }
+        ],
+        "diff": true,
+        "diffOperation": {
+          "type": "insert"
+        }
+      }
+    ]
+  },
+  "normalized-diff": [
+    {
+      "id": "x",
+      "type": "p",
+      "scope": "特殊",
+      "children": [
+        {
+          "text": "協助上線"
+        }
+      ],
+      "diff": true,
+      "diffOperation": {
+        "type": "delete"
+      }
+    },
+    {
+      "id": "x",
+      "type": "p",
+      "scope": "全部",
+      "children": [
+        {
+          "text": "負責核准上線"
+        }
+      ],
+      "diff": true,
+      "diffOperation": {
+        "type": "insert"
+      }
+    }
+  ],
+  "leaf-falsy": {
+    "before": [
+      {
+        "id": "x",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作",
+            "score": 1
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "x",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作",
+            "score": 0
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "id": "x",
+        "type": "p",
+        "children": [
+          {
+            "text": "工作",
+            "diff": true,
+            "diffOperation": {
+              "newProperties": {},
+              "properties": {
+                "score": 1
+              },
+              "type": "update"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "empty-mark": {
+    "before": [
+      {
+        "id": "x",
+        "type": "p",
+        "children": [
+          {
+            "text": "",
+            "bold": true
+          }
+        ]
+      }
+    ],
+    "after": [
+      {
+        "id": "x",
+        "type": "p",
+        "children": [
+          {
+            "text": "",
+            "italic": true
+          }
+        ]
+      }
+    ],
+    "diff": [
+      {
+        "id": "x",
+        "type": "p",
+        "children": [
+          {
+            "text": "",
+            "italic": true
+          }
+        ]
+      }
+    ]
+  }
+}

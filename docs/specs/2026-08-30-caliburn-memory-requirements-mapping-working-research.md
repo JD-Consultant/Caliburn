@@ -1068,24 +1068,22 @@ O\*NET 2025 Emerging Tasks 流程提供最接近的職務分析證據：分析�
 ```text
 員工訊息先耐久保存
         ↓
-成熟 Memory 機制整理／修訂目前有效工作知識
+目前 Memory＋相關 conversation＋本輪訊息＋目前 JD workspace
         ↓
-顧問判斷本輪是否已有足夠、穩定且會改變 JD 的資訊
-        ├─ 否：繼續訪談／no JD change
-        └─ 是：讀目前理解＋目前 JD workspace
-                    ↓
-          no-op／修改／新增／移除／先澄清
-                    ↓
-          AI working diff，員工審核後才改 approved JD
+形成並驗證本輪語意理解
+        ├─ Memory add／update／remove／no-op
+        └─ optional JD no-op／修改／新增／移除／先澄清
+                            ↓
+                  AI working diff，員工審核後才改 approved JD
 ```
 
-這可以在一個主顧問 run 的多個 framework steps 完成，也可以讓非相依 Memory 整理在背景處理；唯一時序要求是：某項 JD 判斷若依賴本輪新理解，就必須讀到已成功發布的 current revision。這不是要求固定兩次 LLM call。
+這可以在一個主顧問 run 的一或多個 framework steps 完成，也可以讓非相依 Memory 整理在背景處理。2026-09-04 `MEM-Q005` 已校正時序：某項後續判斷只有在必須重新讀取新 Memory head 時才等待發布；同一 Context 與同一份已驗證理解形成的 Memory mutation 和 JD 待審變更是並列 effects，不要求 Memory 先寫入 Store，也不要求固定兩次 LLM call。詳見 [`2026-09-04-memory-persistence-and-jd-effect-reconciliation.md`](./2026-09-04-memory-persistence-and-jd-effect-reconciliation.md)。
 
 #### 9.35.3 兩邊如何避免互相偷偷覆蓋
 
 1. **Memory 變了不會自行操作 JD。** 下一次需要判斷時，LLM 取得更新後的 Memory 與目前 JD，再自行決定 no-op、局部比較或全域比較；任何 JD 變更仍先成為 AI working diff，經員工審核才核准。
 2. **員工直接改 JD 不自動改理解。** 下一輪顧問取得 JD delta；若只是文件表達調整，保留理解；若透露新的工作事實或與目前理解衝突，透過一般訪談確認後再修訂理解。
-3. **待審變更需綁建立時讀到的 JD／Memory revision。** 這是 stale-safety metadata，不是 JD 欄位，也不要求模型填 ID／version。相依理解或 JD 已變時，application 重新驗證或標示 stale，不能把舊決定硬套到新內容。
+3. **待審變更需由 Runtime 保留建立時的 JD base 與本輪 Context 身分。**這是 stale-safety metadata，不是 JD 欄位，也不要求模型填 ID／version。Memory 技術性持久化失敗本身不使候選 stale；只有重新分析後的工作理解或 JD base 實質改變時，application 才重新驗證或標示 stale。
 4. **接受後不把理由塞進正式 JD。** 待審期間可顯示模型以工作理解撰寫的簡短理由；員工接受後，正式 JD 只保留成品內容。是否保留非權威 audit receipt 由 review lifecycle 決定，不得成為第二份工作真相。
 5. **拒絕 JD 變更不等於否定工作事實。** 沒有員工新說明時，只撤回該 working diff；顧問可在後續自然對話中釐清拒絕是否代表文件寫法、抽象層級或工作理解有誤。
 
@@ -1299,12 +1297,12 @@ OpenAI 公開 Prompt 把 `memory_summary.md` 定位為 prompt-loaded、high-sign
 ```text
 來源訊息：先耐久保存
         ↓
-若本輪後續回答／澄清／JD 判斷依賴新資訊：必要 Memory mutation 先成功發布
-        ↓
-不影響本輪正確性的去重、重整、導覽更新：可背景處理
+同一 Context／理解可形成 Memory mutation 與 optional JD 待審變更
+        ├─ 真正要重新讀取新 Memory head 的下一步：等待發布
+        └─ sibling effect／去重／重整／導覽更新：各自驗證或背景處理
 ```
 
-這裡的 hot／background 是依賴關係，不是「某一類資料永遠同步」。員工明確更正、未解衝突或會立即影響本輪判斷的資訊，不能等到不確定何時完成的 background job；普通整理與導覽重建則不應阻塞員工每一則訊息。
+這裡的 hot／background 是實際 read dependency，不是「某一類資料永遠同步」。員工明確更正或本輪新資訊可以直接進入同一 run 的已驗證暫時理解；若後續步驟必須從 Store 重新讀取 new head 才能計算，就等待發布。由同一份理解形成的 JD 待審變更不因 Memory 技術性持久化失敗而丟棄；普通整理與導覽重建也不應阻塞員工每一則訊息。
 
 #### 9.40.4 Memory Prompt 應定義語意政策，不承擔系統欄位
 

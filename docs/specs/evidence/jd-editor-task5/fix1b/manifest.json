@@ -1,0 +1,22 @@
+[
+  {
+    "path": "review.diff",
+    "bytes": 77528,
+    "sha256": "069a35ee9684988136ffb006224db74553ca5c0221345e7cf0ec8a3f76a2b8b5"
+  },
+  {
+    "path": "source-manifest.json",
+    "bytes": 3295,
+    "sha256": "169a72d4edec421c9444b44e676b28e642a518d9f3181f9a369a6a4fed79accc"
+  },
+  {
+    "path": "web-restored.log",
+    "bytes": 268,
+    "sha256": "88cb6d7a7ae24f37fc10ef5fb5baf6fdff87828ec1160746b46f593471681085"
+  },
+  {
+    "path": "report.md",
+    "bytes": 1960,
+    "sha256": "227fdcb9a2309cf35ea58bd7e89829dd34e7f92880483b5bbe476bb223017950"
+  }
+]

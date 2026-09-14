@@ -1,0 +1,3135 @@
+{
+  "id": "B-ai-human-ai",
+  "checks": [
+    {
+      "name": "continued insertion contains latest wording",
+      "passed": true,
+      "detail": [
+        {
+          "from": 1,
+          "to": 7,
+          "text": "每月檢查一次",
+          "mark": {
+            "type": "suggestion_delete",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "A",
+                "stage": "AI-initial"
+              }
+            }
+          },
+          "allMarks": [
+            {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "from": 7,
+          "to": 13,
+          "text": "每週巡檢兩次",
+          "mark": {
+            "type": "suggestion_insert",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "A",
+                "stage": "AI-initial"
+              }
+            }
+          },
+          "allMarks": [
+            {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "continued pending survives doc JSON reopen",
+      "passed": true
+    },
+    {
+      "name": "reject latest A restores original wording and attrs",
+      "passed": true,
+      "detail": {
+        "type": "paragraph",
+        "attrs": {
+          "id": "task-A",
+          "scope": "例行設備檢查",
+          "sourceRefs": [
+            "utterance-1"
+          ]
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "每月檢查一次，記錄結果。"
+          }
+        ]
+      }
+    },
+    {
+      "name": "reject clears pending",
+      "passed": true,
+      "detail": []
+    },
+    {
+      "name": "accept retains latest AI-human-AI wording and attrs",
+      "passed": true,
+      "detail": {
+        "type": "paragraph",
+        "attrs": {
+          "id": "task-A",
+          "scope": "例行設備檢查",
+          "sourceRefs": [
+            "utterance-1"
+          ]
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "每週巡檢兩次，記錄結果。"
+          }
+        ]
+      }
+    },
+    {
+      "name": "accept clears pending",
+      "passed": true,
+      "detail": []
+    }
+  ],
+  "traces": [
+    {
+      "label": "AI-initial",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      },
+      "requestedSteps": [
+        {
+          "stepType": "replace",
+          "from": 1,
+          "to": 7,
+          "slice": {
+            "content": [
+              {
+                "type": "text",
+                "text": "每週檢查一次"
+              }
+            ]
+          }
+        }
+      ],
+      "requestedStepClasses": [
+        "ReplaceStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每週檢查一次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 1,
+              "to": 7,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每週檢查一次"
+                  }
+                ]
+              }
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每週檢查一次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 1,
+              "to": 1,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每月檢查一次"
+                  }
+                ]
+              }
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              },
+              "from": 1,
+              "to": 7
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              },
+              "from": 7,
+              "to": 13
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep",
+            "AddMarkStep",
+            "AddMarkStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每月檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每週檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查一次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查一次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "human-continues-A",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查一次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查一次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requestedSteps": [
+        {
+          "stepType": "replace",
+          "from": 11,
+          "to": 13,
+          "slice": {
+            "content": [
+              {
+                "type": "text",
+                "text": "兩次"
+              }
+            ]
+          }
+        }
+      ],
+      "requestedStepClasses": [
+        "ReplaceStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_delete",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "A",
+                        "stage": "AI-initial"
+                      }
+                    }
+                  }
+                ],
+                "text": "每月檢查一次"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_insert",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "A",
+                        "stage": "AI-initial"
+                      }
+                    }
+                  }
+                ],
+                "text": "每週檢查"
+              },
+              {
+                "type": "text",
+                "text": "兩次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 11,
+              "to": 13,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "兩次"
+                  }
+                ]
+              }
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每月檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每週檢查"
+                  },
+                  {
+                    "type": "text",
+                    "text": "兩次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "steps": [
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              },
+              "from": 11,
+              "to": 13
+            }
+          ],
+          "stepClasses": [
+            "AddMarkStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每月檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每週檢查兩次"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查兩次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查兩次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "AI-continues-A",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查兩次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查兩次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requestedSteps": [
+        {
+          "stepType": "replace",
+          "from": 9,
+          "to": 11,
+          "slice": {
+            "content": [
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_insert",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "A",
+                        "stage": "AI-initial"
+                      }
+                    }
+                  }
+                ],
+                "text": "巡檢"
+              }
+            ]
+          }
+        }
+      ],
+      "requestedStepClasses": [
+        "ReplaceStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_delete",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "A",
+                        "stage": "AI-initial"
+                      }
+                    }
+                  }
+                ],
+                "text": "每月檢查一次"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_insert",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "A",
+                        "stage": "AI-initial"
+                      }
+                    }
+                  }
+                ],
+                "text": "每週巡檢兩次"
+              },
+              {
+                "type": "text",
+                "text": "，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 9,
+              "to": 11,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "巡檢"
+                  }
+                ]
+              }
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每月檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每週巡檢兩次"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "steps": [],
+          "stepClasses": [],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每月檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每週巡檢兩次"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週巡檢兩次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週巡檢兩次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "B-before-review:new-EditorState-from-file",
+      "artifact": {
+        "file": "results/run-20260909T144514Z/B-before-review.doc.json",
+        "sha256": "de9be7aebd1ad4a8cef54a2746877f3e5c71dd07986a8d133b93ca62241f2693"
+      },
+      "documentEqual": true,
+      "pendingEqual": true,
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週巡檢兩次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週巡檢兩次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "reject:A",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週巡檢兩次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週巡檢兩次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requestedSteps": [
+        {
+          "stepType": "removeMark",
+          "mark": {
+            "type": "suggestion_delete",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "A",
+                "stage": "AI-initial"
+              }
+            }
+          },
+          "from": 1,
+          "to": 7
+        },
+        {
+          "stepType": "replace",
+          "from": 7,
+          "to": 13
+        }
+      ],
+      "requestedStepClasses": [
+        "RemoveMarkStep",
+        "ReplaceStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每月檢查一次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "removeMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              },
+              "from": 1,
+              "to": 7
+            },
+            {
+              "stepType": "replace",
+              "from": 7,
+              "to": 13
+            }
+          ],
+          "stepClasses": [
+            "RemoveMarkStep",
+            "ReplaceStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每月檢查一次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      }
+    },
+    {
+      "label": "vendor-range-command-result",
+      "action": "reject",
+      "groupId": "A",
+      "range": {
+        "from": 1,
+        "to": 13
+      },
+      "returned": true,
+      "dispatchCount": 1
+    },
+    {
+      "label": "accept:A",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週巡檢兩次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週巡檢兩次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requestedSteps": [
+        {
+          "stepType": "replace",
+          "from": 1,
+          "to": 7
+        },
+        {
+          "stepType": "removeMark",
+          "mark": {
+            "type": "suggestion_insert",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "A",
+                "stage": "AI-initial"
+              }
+            }
+          },
+          "from": 1,
+          "to": 7
+        }
+      ],
+      "requestedStepClasses": [
+        "ReplaceStep",
+        "RemoveMarkStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每週巡檢兩次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 1,
+              "to": 7
+            },
+            {
+              "stepType": "removeMark",
+              "mark": {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "AI-initial"
+                  }
+                }
+              },
+              "from": 1,
+              "to": 7
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep",
+            "RemoveMarkStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每週巡檢兩次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每週巡檢兩次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      }
+    },
+    {
+      "label": "vendor-range-command-result",
+      "action": "accept",
+      "groupId": "A",
+      "range": {
+        "from": 1,
+        "to": 13
+      },
+      "returned": true,
+      "dispatchCount": 1
+    }
+  ],
+  "status": "PASS_FIXED_CASE"
+}

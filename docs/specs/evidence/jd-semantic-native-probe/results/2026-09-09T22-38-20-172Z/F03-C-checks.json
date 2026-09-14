@@ -1,0 +1,23 @@
+{
+  "id": "F03-C",
+  "description": "固定 Task 複製／包含 K-S 複製與明列映射／移動",
+  "passed": true,
+  "checks": [
+    {
+      "name": "只複製 Task：全部複本 ID 新配，共享定義及 links 保留",
+      "passed": true
+    },
+    {
+      "name": "原生只配節點 IDs，不自動重寫自訂 links",
+      "passed": true
+    },
+    {
+      "name": "明列映射只改複本內部 links；外部共用及原引用者不變；Task8移動保全",
+      "passed": true
+    },
+    {
+      "name": "複本映射／移動完整 JSON 新程序全等",
+      "passed": true
+    }
+  ]
+}

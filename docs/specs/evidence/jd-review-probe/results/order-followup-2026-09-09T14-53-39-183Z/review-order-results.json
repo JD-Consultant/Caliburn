@@ -1,0 +1,323 @@
+{
+  "topic": "JD-R002/C03/R01-F",
+  "executedAt": "2026-09-09T14:53:39.269Z",
+  "node": "v22.12.0",
+  "versions": {
+    "platejs": "53.3.11",
+    "@platejs/core": "53.3.11",
+    "@platejs/slate": "53.3.10",
+    "@platejs/suggestion": "53.2.3",
+    "@platejs/diff": "53.0.0",
+    "slate": "0.126.2",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "sourceInput": "results\\2026-09-09T14-36-40-805Z\\ai-human-ai-pending-value.json",
+  "sourceInputSha256": "b2c8ba40e2fdbff866a9cda147ac0edaed59ad7a7da9475b5035f70ca79b8266",
+  "fixedMonthlyIds": [
+    "ZGXJMoVuecTRW9aHmyE5d",
+    "5IE5qwahRmkLHapfW5AEX",
+    "m3B3MrQpdikPTtR3cTYVP"
+  ],
+  "fixedFaultId": "5XwiFDd56xGxBbJcx_TD2",
+  "profile": {
+    "nodeId": {
+      "reuseId": true,
+      "initialValueIds": "always"
+    },
+    "currentUserId": "ai",
+    "isSuggesting": true,
+    "normalization": "native defaults",
+    "visibleTextObservation": "native SkipSuggestionDeletes projection; not DOM/React verification"
+  },
+  "groups": [
+    {
+      "id": "R01-F1",
+      "action": "accept",
+      "order": "chronological",
+      "ids": [
+        "ZGXJMoVuecTRW9aHmyE5d",
+        "5IE5qwahRmkLHapfW5AEX",
+        "m3B3MrQpdikPTtR3cTYVP"
+      ],
+      "checks": [
+        {
+          "name": "JSON→全新 editor 保留原 R3 完整 pending value",
+          "pass": true
+        },
+        {
+          "name": "固定月檢範圍恰含已明列三個原生 ID",
+          "pass": true
+        },
+        {
+          "name": "初始原生目前文字投影為最新版",
+          "pass": true
+        },
+        {
+          "name": "原生目前文字投影得到預期完整正文",
+          "pass": true
+        },
+        {
+          "name": "月檢為預期乾淨節點，無額外正文或 metadata",
+          "pass": true
+        },
+        {
+          "name": "月檢沒有剩餘原生修訂 ID",
+          "pass": true
+        },
+        {
+          "name": "組外交付段完全不變",
+          "pass": true
+        },
+        {
+          "name": "組外故障全文及 pending metadata 完全不變",
+          "pass": true
+        },
+        {
+          "name": "整份只剩故障 pending ID",
+          "pass": true
+        },
+        {
+          "name": "整份根節點數不變",
+          "pass": true
+        },
+        {
+          "name": "最終 value 再 JSON→全新 editor 完全相等",
+          "pass": true
+        },
+        {
+          "name": "最終重開後原生文字投影仍是預期正文",
+          "pass": true
+        }
+      ],
+      "observation": {
+        "nativeTextProjection": "僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。",
+        "allStoredText": "僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。",
+        "monthlyRemainingIds": [],
+        "allRemainingIds": [
+          "5XwiFDd56xGxBbJcx_TD2"
+        ]
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "R01-F2",
+      "action": "accept",
+      "order": "reverse",
+      "ids": [
+        "m3B3MrQpdikPTtR3cTYVP",
+        "5IE5qwahRmkLHapfW5AEX",
+        "ZGXJMoVuecTRW9aHmyE5d"
+      ],
+      "checks": [
+        {
+          "name": "JSON→全新 editor 保留原 R3 完整 pending value",
+          "pass": true
+        },
+        {
+          "name": "固定月檢範圍恰含已明列三個原生 ID",
+          "pass": true
+        },
+        {
+          "name": "初始原生目前文字投影為最新版",
+          "pass": true
+        },
+        {
+          "name": "原生目前文字投影得到預期完整正文",
+          "pass": true
+        },
+        {
+          "name": "月檢為預期乾淨節點，無額外正文或 metadata",
+          "pass": true
+        },
+        {
+          "name": "月檢沒有剩餘原生修訂 ID",
+          "pass": true
+        },
+        {
+          "name": "組外交付段完全不變",
+          "pass": true
+        },
+        {
+          "name": "組外故障全文及 pending metadata 完全不變",
+          "pass": true
+        },
+        {
+          "name": "整份只剩故障 pending ID",
+          "pass": true
+        },
+        {
+          "name": "整份根節點數不變",
+          "pass": true
+        },
+        {
+          "name": "最終 value 再 JSON→全新 editor 完全相等",
+          "pass": true
+        },
+        {
+          "name": "最終重開後原生文字投影仍是預期正文",
+          "pass": true
+        }
+      ],
+      "observation": {
+        "nativeTextProjection": "僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。",
+        "allStoredText": "僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。",
+        "monthlyRemainingIds": [],
+        "allRemainingIds": [
+          "5XwiFDd56xGxBbJcx_TD2"
+        ]
+      },
+      "status": "PASS"
+    },
+    {
+      "id": "R01-F3",
+      "action": "reject",
+      "order": "chronological",
+      "ids": [
+        "ZGXJMoVuecTRW9aHmyE5d",
+        "5IE5qwahRmkLHapfW5AEX",
+        "m3B3MrQpdikPTtR3cTYVP"
+      ],
+      "checks": [
+        {
+          "name": "JSON→全新 editor 保留原 R3 完整 pending value",
+          "pass": true
+        },
+        {
+          "name": "固定月檢範圍恰含已明列三個原生 ID",
+          "pass": true
+        },
+        {
+          "name": "初始原生目前文字投影為最新版",
+          "pass": true
+        },
+        {
+          "name": "原生目前文字投影得到預期完整正文",
+          "pass": false,
+          "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。'\n- '僅有月檢約定的專案按月檢查。'\n                 ^\n"
+        },
+        {
+          "name": "月檢為預期乾淨節點，無額外正文或 metadata",
+          "pass": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    children: [\n      {\n        text: '僅有月檢約定的專案按月檢查。'\n      },\n+     {\n+       suggestion_ZGXJMoVuecTRW9aHmyE5d: {\n+         createdAt: 1788964600818,\n+         id: 'ZGXJMoVuecTRW9aHmyE5d',\n+         type: 'insert',\n+         userId: 'ai'\n+       },\n+       text: '所有專案都按月檢查。'\n+     },\n+     {\n+       suggestion_5IE5qwahRmkLHapfW5AEX: {\n+         createdAt: 1788964600870,\n+         id: '5IE5qwahRmkLHapfW5AEX',\n+         type: 'insert',\n+         userId: 'human'\n+       },\n+       text: '僅有月檢約定的專案按月檢查，並記錄結果。'\n+     }\n    ],\n    id: 'monthly',\n    type: 'p'\n  }\n"
+        },
+        {
+          "name": "月檢沒有剩餘原生修訂 ID",
+          "pass": true
+        },
+        {
+          "name": "組外交付段完全不變",
+          "pass": true
+        },
+        {
+          "name": "組外故障全文及 pending metadata 完全不變",
+          "pass": true
+        },
+        {
+          "name": "整份只剩故障 pending ID",
+          "pass": true
+        },
+        {
+          "name": "整份根節點數不變",
+          "pass": true
+        },
+        {
+          "name": "最終 value 再 JSON→全新 editor 完全相等",
+          "pass": true
+        },
+        {
+          "name": "最終重開後原生文字投影仍是預期正文",
+          "pass": false,
+          "error": "Expected values to be strictly equal:\n+ actual - expected\n\n+ '僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。'\n- '僅有月檢約定的專案按月檢查。'\n                 ^\n"
+        }
+      ],
+      "observation": {
+        "nativeTextProjection": "僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。",
+        "allStoredText": "僅有月檢約定的專案按月檢查。所有專案都按月檢查。僅有月檢約定的專案按月檢查，並記錄結果。",
+        "monthlyRemainingIds": [],
+        "allRemainingIds": [
+          "5XwiFDd56xGxBbJcx_TD2"
+        ]
+      },
+      "status": "FAIL"
+    },
+    {
+      "id": "R01-F4",
+      "action": "reject",
+      "order": "reverse",
+      "ids": [
+        "m3B3MrQpdikPTtR3cTYVP",
+        "5IE5qwahRmkLHapfW5AEX",
+        "ZGXJMoVuecTRW9aHmyE5d"
+      ],
+      "checks": [
+        {
+          "name": "JSON→全新 editor 保留原 R3 完整 pending value",
+          "pass": true
+        },
+        {
+          "name": "固定月檢範圍恰含已明列三個原生 ID",
+          "pass": true
+        },
+        {
+          "name": "初始原生目前文字投影為最新版",
+          "pass": true
+        },
+        {
+          "name": "原生目前文字投影得到預期完整正文",
+          "pass": true
+        },
+        {
+          "name": "月檢為預期乾淨節點，無額外正文或 metadata",
+          "pass": true
+        },
+        {
+          "name": "月檢沒有剩餘原生修訂 ID",
+          "pass": true
+        },
+        {
+          "name": "組外交付段完全不變",
+          "pass": true
+        },
+        {
+          "name": "組外故障全文及 pending metadata 完全不變",
+          "pass": true
+        },
+        {
+          "name": "整份只剩故障 pending ID",
+          "pass": true
+        },
+        {
+          "name": "整份根節點數不變",
+          "pass": true
+        },
+        {
+          "name": "最終 value 再 JSON→全新 editor 完全相等",
+          "pass": true
+        },
+        {
+          "name": "最終重開後原生文字投影仍是預期正文",
+          "pass": true
+        }
+      ],
+      "observation": {
+        "nativeTextProjection": "僅有月檢約定的專案按月檢查。",
+        "allStoredText": "僅有月檢約定的專案按月檢查。",
+        "monthlyRemainingIds": [],
+        "allRemainingIds": [
+          "5XwiFDd56xGxBbJcx_TD2"
+        ]
+      },
+      "status": "PASS"
+    }
+  ],
+  "passGroups": 3,
+  "failGroups": 1,
+  "executionErrorGroups": 0,
+  "limitations": [
+    "Known fixture members and two explicit orders only; no grouping/dependency algorithm.",
+    "No metadata writes, before-image restore, vendor fixes, codec, or custom review engine.",
+    "Original R01 four groups and 2 PASS/2 FAIL results are unchanged.",
+    "No DOM/IME/React UI, LLM, production, DB, or dependency installation."
+  ]
+}

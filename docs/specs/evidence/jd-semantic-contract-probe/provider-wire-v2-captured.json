@@ -1,0 +1,1761 @@
+{
+  "input": [
+    {
+      "content": "fixed serialization only",
+      "role": "system",
+      "type": "message"
+    },
+    {
+      "content": "fixed serialization",
+      "role": "user",
+      "type": "message"
+    }
+  ],
+  "model": "gpt-5.6-luna",
+  "parallel_tool_calls": false,
+  "reasoning": {
+    "effort": "medium",
+    "context": "all_turns"
+  },
+  "store": false,
+  "stream": false,
+  "tools": [
+    {
+      "type": "function",
+      "name": "jd_read",
+      "description": "Read the active JD before planning edits. Use {} for the current saved document and current-base targets, or exactly one issued revision_ref, target_ref, selection_ref or continuation_ref to read a fixed scope. Explicit revision reads are read-only even if that revision happens to be current. Read all relevant pages before changing a whole scope. The App supplies paths and positions; never calculate line numbers or offsets. A failure or unread page does not mean content is absent. read_failed/stop requires App recovery, not repeated model calls. Task targets include knowledge_refs/skill_refs; knowledge/skill targets include used_by_task_refs computed by the App. Read complete affected items/Tasks before changing shared meaning, following issued target refs and pagination. IDs inside saved fragments are not edit refs.",
+      "parameters": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {}
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "revision_ref"
+            ],
+            "properties": {
+              "revision_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "target_ref"
+            ],
+            "properties": {
+              "target_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "selection_ref"
+            ],
+            "properties": {
+              "selection_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "continuation_ref"
+            ],
+            "properties": {
+              "continuation_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              }
+            }
+          }
+        ],
+        "description": "Read the active JD before planning edits. Use {} for the current saved document and current-base targets, or exactly one issued revision_ref, target_ref, selection_ref or continuation_ref to read a fixed scope. Explicit revision reads are read-only even if that revision happens to be current. Read all relevant pages before changing a whole scope. The App supplies paths and positions; never calculate line numbers or offsets. A failure or unread page does not mean content is absent. read_failed/stop requires App recovery, not repeated model calls. Task targets include knowledge_refs/skill_refs; knowledge/skill targets include used_by_task_refs computed by the App. Read complete affected items/Tasks before changing shared meaning, following issued target refs and pagination. IDs inside saved fragments are not edit refs.",
+        "$defs": {
+          "OpaqueRef": {
+            "type": "string",
+            "minLength": 1,
+            "description": "App- or existing-source-owner-issued opaque reference. Its encoding is not a model contract."
+          }
+        }
+      },
+      "strict": false
+    },
+    {
+      "type": "function",
+      "name": "jd_edit",
+      "description": "Edit the one active JD only after reading its current saved content with jd_read. Write when the interview provides enough understanding of a task or a substantive correction; a conversation turn need not edit. Submit one meaningful atomic batch of supported commands using only issued current targets/selection. Include source_refs once on new elements or explicit set_properties, never as a top-level list. The App supplies document/base/operation identity, checks references, runs native edits and saves. Trust the returned saved result, not your intended change. For correct_arguments repair a new call; for reread_current read and replan; for wait, reconcile_operation or stop do not issue another write—the App handles recovery. History stays read-only. New Tasks contain separate jd_outcomes and jd_requirements groups (one each, empty paragraph allowed). Knowledge/skill items are standalone typed blocks. First create items without links; after confirmed saving reread the new base, then set Task knowledge_refs/skill_refs. Never invent temporary IDs or reuse previous-base refs. For shared item edits read affected Tasks; for deleting a referenced item explicitly unlink/relink all affected Tasks in the same batch or keep the item.",
+      "parameters": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "commands"
+        ],
+        "properties": {
+          "commands": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "$ref": "#/$defs/JdEditCommand"
+            }
+          }
+        },
+        "description": "Edit the one active JD only after reading its current saved content with jd_read. Write when the interview provides enough understanding of a task or a substantive correction; a conversation turn need not edit. Submit one meaningful atomic batch of supported commands using only issued current targets/selection. Include source_refs once on new elements or explicit set_properties, never as a top-level list. The App supplies document/base/operation identity, checks references, runs native edits and saves. Trust the returned saved result, not your intended change. For correct_arguments repair a new call; for reread_current read and replan; for wait, reconcile_operation or stop do not issue another write—the App handles recovery. History stays read-only. New Tasks contain separate jd_outcomes and jd_requirements groups (one each, empty paragraph allowed). Knowledge/skill items are standalone typed blocks. First create items without links; after confirmed saving reread the new base, then set Task knowledge_refs/skill_refs. Never invent temporary IDs or reuse previous-base refs. For shared item edits read affected Tasks; for deleting a referenced item explicitly unlink/relink all affected Tasks in the same batch or keep the item.",
+        "$defs": {
+          "JdEditCommand": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/JdInsertContentCommand"
+              },
+              {
+                "$ref": "#/$defs/JdReplaceBlockContentCommand"
+              },
+              {
+                "$ref": "#/$defs/JdReplaceSelectionCommand"
+              },
+              {
+                "$ref": "#/$defs/JdSetPropertiesCommand"
+              },
+              {
+                "$ref": "#/$defs/JdMoveContentCommand"
+              },
+              {
+                "$ref": "#/$defs/JdUnwrapGroupCommand"
+              },
+              {
+                "$ref": "#/$defs/JdRemoveContentCommand"
+              }
+            ]
+          },
+          "JdRemoveContentCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target_ref"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "remove_content"
+              },
+              "target_ref": {
+                "$ref": "#/$defs/OpaqueRef",
+                "description": "Copy an App-issued current-base reference from jd_read. Do not use a raw ID, path, history reference or guessed value."
+              }
+            },
+            "description": "Delete only the explicit target subtree. Its previous content and source attachments remain in history. Read the whole affected scope first; do not delete unrelated work during a correction."
+          },
+          "OpaqueRef": {
+            "type": "string",
+            "minLength": 1,
+            "description": "App- or existing-source-owner-issued opaque reference. Its encoding is not a model contract."
+          },
+          "JdUnwrapGroupCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target_ref"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "unwrap_group"
+              },
+              "target_ref": {
+                "$ref": "#/$defs/OpaqueRef",
+                "description": "Copy an App-issued current-base reference from jd_read. Do not use a raw ID, path, history reference or guessed value."
+              }
+            },
+            "description": "Remove a jd_section, jd_duty or jd_task container while keeping its existing children and their IDs/content/attachments. Sources attached only to the removed wrapper remain in history; do not automatically assign them to every child. Explicitly reattach a relevant source to a surviving issued child when needed."
+          },
+          "JdMoveContentCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target_ref",
+              "destination_ref",
+              "placement"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "move_content"
+              },
+              "target_ref": {
+                "$ref": "#/$defs/OpaqueRef",
+                "description": "Copy an App-issued current-base reference from jd_read. Do not use a raw ID, path, history reference or guessed value."
+              },
+              "destination_ref": {
+                "$ref": "#/$defs/OpaqueRef",
+                "description": "Copy an App-issued current-base reference from jd_read. Do not use a raw ID, path, history reference or guessed value."
+              },
+              "placement": {
+                "type": "string",
+                "enum": [
+                  "before",
+                  "after",
+                  "prepend_child",
+                  "append_child"
+                ]
+              }
+            },
+            "description": "Move the entire existing subtree to a compatible issued destination, preserving IDs, content and source attachments. Do not recreate it with insert/delete. All targets must share the current base."
+          },
+          "JdSetPropertiesCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target_ref"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "set_properties"
+              },
+              "target_ref": {
+                "$ref": "#/$defs/OpaqueRef",
+                "description": "Copy an App-issued current-base reference from jd_read. Do not use a raw ID, path, history reference or guessed value."
+              },
+              "set": {
+                "$ref": "#/$defs/JdEditableProperties"
+              },
+              "unset": {
+                "type": "array",
+                "minItems": 1,
+                "uniqueItems": true,
+                "items": {
+                  "$ref": "#/$defs/JdUnsettableProperty"
+                }
+              }
+            },
+            "anyOf": [
+              {
+                "type": "object",
+                "required": [
+                  "set"
+                ]
+              },
+              {
+                "type": "object",
+                "required": [
+                  "unset"
+                ]
+              }
+            ],
+            "description": "Replace specified properties and/or remove named properties on one issued target. The sets must be disjoint. Preserve omitted fields. source_refs is a complete attachment list; [] or unset clears it. Cell spans use numeric values; the App handles saved HTML fallback attributes. Task knowledge_refs/skill_refs replace complete ordered relations; [] or unset clears them. App resolves endpoint kind, access and scope, then maps both set and unset to saved IDs. Never enter raw or temporary IDs.",
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdPropertyUpdateConstraint"
+              }
+            ]
+          },
+          "JdPropertyUpdateConstraint": {
+            "type": "object",
+            "description": "A property cannot be set and unset in one command. The App must also enforce this finite invariant before native transforms.",
+            "allOf": [
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "source_refs"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "source_refs"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "colSizes"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "colSizes"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "marginLeft"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "marginLeft"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "size"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "size"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "colSpan"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "colSpan"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "rowSpan"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "rowSpan"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "background"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "background"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "borders"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "borders"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "knowledge_refs"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "knowledge_refs"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "not": {
+                  "type": "object",
+                  "required": [
+                    "set",
+                    "unset"
+                  ],
+                  "properties": {
+                    "set": {
+                      "type": "object",
+                      "required": [
+                        "skill_refs"
+                      ]
+                    },
+                    "unset": {
+                      "type": "array",
+                      "contains": {
+                        "const": "skill_refs"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "JdUnsettableProperty": {
+            "type": "string",
+            "enum": [
+              "source_refs",
+              "colSizes",
+              "marginLeft",
+              "size",
+              "colSpan",
+              "rowSpan",
+              "background",
+              "borders",
+              "knowledge_refs",
+              "skill_refs"
+            ]
+          },
+          "JdEditableProperties": {
+            "type": "object",
+            "additionalProperties": false,
+            "minProperties": 1,
+            "properties": {
+              "source_refs": {
+                "$ref": "#/$defs/JdSourceRefs"
+              },
+              "section_kind": {
+                "$ref": "#/$defs/JdSectionKind"
+              },
+              "colSizes": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "marginLeft": {
+                "type": "number",
+                "minimum": 0
+              },
+              "size": {
+                "type": "number",
+                "minimum": 0
+              },
+              "colSpan": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "rowSpan": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "background": {
+                "type": "string"
+              },
+              "borders": {
+                "$ref": "#/$defs/JdBorders"
+              },
+              "knowledge_refs": {
+                "$ref": "#/$defs/JdItemRefs"
+              },
+              "skill_refs": {
+                "$ref": "#/$defs/JdItemRefs"
+              }
+            },
+            "description": "Explicit property replacements only. Omitted properties remain unchanged. source_refs replaces the whole attachment list and is not an automatic verification claim. Numeric cell spans are intent, not grid merge/split commands. knowledge_refs/skill_refs apply only to a saved Task and replace the complete ordered link set. [] or unset clears; omission preserves. Copy issued refs after reading the relevant current-base items."
+          },
+          "JdItemRefs": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/$defs/OpaqueRef"
+            },
+            "description": "Ordered App-issued target references from the exact read revision. They are capabilities, not saved item IDs. App checks document/base, access and endpoint kind."
+          },
+          "JdBorders": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "top": {
+                "$ref": "#/$defs/JdBorder"
+              },
+              "right": {
+                "$ref": "#/$defs/JdBorder"
+              },
+              "bottom": {
+                "$ref": "#/$defs/JdBorder"
+              },
+              "left": {
+                "$ref": "#/$defs/JdBorder"
+              }
+            }
+          },
+          "JdBorder": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+              "size": {
+                "type": "number",
+                "minimum": 0
+              },
+              "color": {
+                "type": "string"
+              },
+              "style": {
+                "type": "string"
+              }
+            }
+          },
+          "JdSectionKind": {
+            "type": "string",
+            "enum": [
+              "identity",
+              "purpose",
+              "work",
+              "knowledge",
+              "skills",
+              "conditions",
+              "other"
+            ]
+          },
+          "JdSourceRefs": {
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+              "$ref": "#/$defs/OpaqueRef"
+            }
+          },
+          "JdReplaceSelectionCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "selection_ref",
+              "content"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "replace_selection"
+              },
+              "selection_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              },
+              "content": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/$defs/JdText"
+                }
+              }
+            },
+            "description": "Replace the exact App-issued UI selection inside one supported text block. Empty content deletes the selection. Never calculate offsets or search for the first matching string. Attachments remain unless explicitly changed."
+          },
+          "JdText": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string"
+              },
+              "bold": {
+                "type": "boolean",
+                "const": true
+              },
+              "italic": {
+                "type": "boolean",
+                "const": true
+              },
+              "underline": {
+                "type": "boolean",
+                "const": true
+              },
+              "strikethrough": {
+                "type": "boolean",
+                "const": true
+              }
+            }
+          },
+          "JdReplaceBlockContentCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target_ref",
+              "content"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "replace_block_content"
+              },
+              "target_ref": {
+                "$ref": "#/$defs/OpaqueRef",
+                "description": "Copy an App-issued current-base reference from jd_read. Do not use a raw ID, path, history reference or guessed value."
+              },
+              "content": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/JdText"
+                }
+              }
+            },
+            "description": "Replace only the text/marks inside one fully read p, h1, h2, h3 or lic block. Preserve the outer identity and attachments. To change sources, add explicit set_properties in the same batch; do not replace a whole task to rename its heading."
+          },
+          "JdInsertContentCommand": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "target_ref",
+              "placement",
+              "content"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "const": "insert_content"
+              },
+              "target_ref": {
+                "$ref": "#/$defs/OpaqueRef",
+                "description": "Copy an App-issued current-base reference from jd_read. Do not use a raw ID, path, history reference or guessed value."
+              },
+              "placement": {
+                "type": "string",
+                "enum": [
+                  "before",
+                  "after",
+                  "prepend_child",
+                  "append_child"
+                ]
+              },
+              "content": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "$ref": "#/$defs/JdNewElement"
+                }
+              }
+            },
+            "description": "Insert new supported elements at an issued current target. before/after means sibling; prepend_child/append_child means child of a compatible container. Do not supply IDs. Existing content stays intact."
+          },
+          "JdNewElement": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "type",
+              "children"
+            ],
+            "properties": {
+              "type": {
+                "$ref": "#/$defs/JdElementType"
+              },
+              "children": {
+                "type": "array",
+                "minItems": 1,
+                "items": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/$defs/JdText"
+                    },
+                    {
+                      "$ref": "#/$defs/JdNewElement"
+                    }
+                  ]
+                }
+              },
+              "source_refs": {
+                "$ref": "#/$defs/JdSourceRefs"
+              },
+              "section_kind": {
+                "$ref": "#/$defs/JdSectionKind"
+              },
+              "colSizes": {
+                "type": "array",
+                "items": {
+                  "type": "number",
+                  "minimum": 0
+                }
+              },
+              "marginLeft": {
+                "type": "number",
+                "minimum": 0
+              },
+              "size": {
+                "type": "number",
+                "minimum": 0
+              },
+              "colSpan": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "rowSpan": {
+                "type": "integer",
+                "minimum": 1
+              },
+              "background": {
+                "type": "string"
+              },
+              "borders": {
+                "$ref": "#/$defs/JdBorders"
+              }
+            },
+            "allOf": [
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "p",
+                        "h1",
+                        "h2",
+                        "h3",
+                        "lic"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/JdText"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "hr"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "minItems": 1,
+                      "maxItems": 1,
+                      "items": {
+                        "$ref": "#/$defs/JdEmptyText"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "ul",
+                        "ol"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/JdNewListItem"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "li"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "minItems": 1,
+                      "prefixItems": [
+                        {
+                          "$ref": "#/$defs/JdNewListContent"
+                        }
+                      ],
+                      "items": {
+                        "$ref": "#/$defs/JdNewList"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "table"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/JdNewTableRow"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "tr"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/JdNewTableCell"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "td",
+                        "th"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/JdNewCellChild"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "blockquote"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/JdNewBlockquoteChild"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "jd_task"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "minItems": 3,
+                      "items": {
+                        "$ref": "#/$defs/JdNewTaskChild"
+                      },
+                      "allOf": [
+                        {
+                          "contains": {
+                            "type": "object",
+                            "required": [
+                              "type"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "jd_outcomes"
+                              }
+                            }
+                          },
+                          "minContains": 1,
+                          "maxContains": 1
+                        },
+                        {
+                          "contains": {
+                            "type": "object",
+                            "required": [
+                              "type"
+                            ],
+                            "properties": {
+                              "type": {
+                                "const": "jd_requirements"
+                              }
+                            }
+                          },
+                          "minContains": 1,
+                          "maxContains": 1
+                        },
+                        {
+                          "contains": {
+                            "$ref": "#/$defs/JdNewBodyElement"
+                          },
+                          "minContains": 1
+                        }
+                      ]
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "jd_duty"
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/$defs/JdNewDutyChild"
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "const": "jd_section"
+                    }
+                  }
+                },
+                "then": {
+                  "required": [
+                    "section_kind"
+                  ],
+                  "if": {
+                    "properties": {
+                      "section_kind": {
+                        "const": "work"
+                      }
+                    }
+                  },
+                  "then": {
+                    "properties": {
+                      "children": {
+                        "type": "array",
+                        "items": {
+                          "$ref": "#/$defs/JdNewWorkSectionChild"
+                        }
+                      }
+                    }
+                  },
+                  "else": {
+                    "if": {
+                      "properties": {
+                        "section_kind": {
+                          "const": "knowledge"
+                        }
+                      },
+                      "required": [
+                        "section_kind"
+                      ]
+                    },
+                    "then": {
+                      "properties": {
+                        "children": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/$defs/JdNewKnowledgeSectionChild"
+                          }
+                        }
+                      }
+                    },
+                    "else": {
+                      "if": {
+                        "properties": {
+                          "section_kind": {
+                            "const": "skills"
+                          }
+                        },
+                        "required": [
+                          "section_kind"
+                        ]
+                      },
+                      "then": {
+                        "properties": {
+                          "children": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/$defs/JdNewSkillsSectionChild"
+                            }
+                          }
+                        }
+                      },
+                      "else": {
+                        "properties": {
+                          "children": {
+                            "type": "array",
+                            "items": {
+                              "$ref": "#/$defs/JdNewBodyElement"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "not": {
+                        "const": "jd_section"
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "not": {
+                    "type": "object",
+                    "required": [
+                      "section_kind"
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "not": {
+                        "const": "table"
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "colSizes"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "marginLeft"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "not": {
+                        "enum": [
+                          "tr",
+                          "td",
+                          "th"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "not": {
+                    "type": "object",
+                    "required": [
+                      "size"
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "not": {
+                        "enum": [
+                          "td",
+                          "th"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "then": {
+                  "not": {
+                    "anyOf": [
+                      {
+                        "type": "object",
+                        "required": [
+                          "colSpan"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "rowSpan"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "background"
+                        ]
+                      },
+                      {
+                        "type": "object",
+                        "required": [
+                          "borders"
+                        ]
+                      }
+                    ]
+                  }
+                }
+              },
+              {
+                "if": {
+                  "type": "object",
+                  "required": [
+                    "type"
+                  ],
+                  "properties": {
+                    "type": {
+                      "enum": [
+                        "jd_outcomes",
+                        "jd_requirements",
+                        "jd_knowledge",
+                        "jd_skill"
+                      ]
+                    }
+                  }
+                },
+                "then": {
+                  "properties": {
+                    "children": {
+                      "type": "array",
+                      "minItems": 1,
+                      "items": {
+                        "$ref": "#/$defs/JdNewBodyElement"
+                      }
+                    }
+                  }
+                }
+              }
+            ],
+            "description": "New content has no Element IDs or semantic link fields. Create items first, confirm saving, reread the current base, then link saved Tasks with set_properties. Use empty paragraphs for unknown group content, never invented facts."
+          },
+          "JdNewBodyElement": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "p",
+                      "h1",
+                      "h2",
+                      "h3",
+                      "blockquote",
+                      "ul",
+                      "ol",
+                      "table",
+                      "hr"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewSkillsSectionChild": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/JdNewBodyElement"
+              },
+              {
+                "$ref": "#/$defs/JdNewSkillItem"
+              }
+            ]
+          },
+          "JdNewSkillItem": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "jd_skill"
+                  }
+                }
+              }
+            ]
+          },
+          "JdNewKnowledgeSectionChild": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/JdNewBodyElement"
+              },
+              {
+                "$ref": "#/$defs/JdNewKnowledgeItem"
+              }
+            ]
+          },
+          "JdNewKnowledgeItem": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "jd_knowledge"
+                  }
+                }
+              }
+            ]
+          },
+          "JdNewWorkSectionChild": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "p",
+                      "h1",
+                      "h2",
+                      "h3",
+                      "blockquote",
+                      "ul",
+                      "ol",
+                      "table",
+                      "hr",
+                      "jd_duty",
+                      "jd_task"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewDutyChild": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "p",
+                      "h1",
+                      "h2",
+                      "h3",
+                      "blockquote",
+                      "ul",
+                      "ol",
+                      "table",
+                      "hr",
+                      "jd_task"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewTaskChild": {
+            "oneOf": [
+              {
+                "$ref": "#/$defs/JdNewBodyElement"
+              },
+              {
+                "$ref": "#/$defs/JdNewOutcomes"
+              },
+              {
+                "$ref": "#/$defs/JdNewRequirements"
+              }
+            ]
+          },
+          "JdNewRequirements": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "jd_requirements"
+                  }
+                }
+              }
+            ]
+          },
+          "JdNewOutcomes": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "const": "jd_outcomes"
+                  }
+                }
+              }
+            ]
+          },
+          "JdNewBlockquoteChild": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "p",
+                      "h1",
+                      "h2",
+                      "h3",
+                      "ul",
+                      "ol",
+                      "table",
+                      "hr"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewCellChild": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "p",
+                      "ul",
+                      "ol"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewTableCell": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "td",
+                      "th"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewTableRow": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "tr"
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewList": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "enum": [
+                      "ul",
+                      "ol"
+                    ]
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewListContent": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "lic"
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdNewListItem": {
+            "allOf": [
+              {
+                "$ref": "#/$defs/JdNewElement"
+              },
+              {
+                "type": "object",
+                "properties": {
+                  "type": {
+                    "const": "li"
+                  }
+                },
+                "required": [
+                  "type"
+                ]
+              }
+            ]
+          },
+          "JdEmptyText": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "text"
+            ],
+            "properties": {
+              "text": {
+                "type": "string",
+                "const": ""
+              }
+            }
+          },
+          "JdElementType": {
+            "type": "string",
+            "enum": [
+              "p",
+              "h1",
+              "h2",
+              "h3",
+              "blockquote",
+              "ul",
+              "ol",
+              "li",
+              "lic",
+              "table",
+              "tr",
+              "td",
+              "th",
+              "hr",
+              "jd_section",
+              "jd_duty",
+              "jd_task",
+              "jd_outcomes",
+              "jd_requirements",
+              "jd_knowledge",
+              "jd_skill"
+            ]
+          }
+        }
+      },
+      "strict": false
+    },
+    {
+      "type": "function",
+      "name": "jd_change_read",
+      "description": "Read actual saved changes using one issued change_ref, a same-document before_revision_ref and after_revision_ref pair, or the issued continuation_ref for that comparison. Before/after snapshots are authoritative; limited highlighting is not proof that nothing else changed. This tool cannot edit, accept, reject or restore a revision. On a read failure do not infer missing content or loop; follow the returned recovery action.",
+      "parameters": {
+        "type": "object",
+        "oneOf": [
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "change_ref"
+            ],
+            "properties": {
+              "change_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "before_revision_ref",
+              "after_revision_ref"
+            ],
+            "properties": {
+              "before_revision_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              },
+              "after_revision_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              }
+            }
+          },
+          {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "continuation_ref"
+            ],
+            "properties": {
+              "continuation_ref": {
+                "$ref": "#/$defs/OpaqueRef"
+              }
+            },
+            "description": "Continue the exact previously issued change or before/after comparison; it cannot select another pair."
+          }
+        ],
+        "description": "Read actual saved changes using one issued change_ref, a same-document before_revision_ref and after_revision_ref pair, or the issued continuation_ref for that comparison. Before/after snapshots are authoritative; limited highlighting is not proof that nothing else changed. This tool cannot edit, accept, reject or restore a revision. On a read failure do not infer missing content or loop; follow the returned recovery action.",
+        "$defs": {
+          "OpaqueRef": {
+            "type": "string",
+            "minLength": 1,
+            "description": "App- or existing-source-owner-issued opaque reference. Its encoding is not a model contract."
+          }
+        }
+      },
+      "strict": false
+    },
+    {
+      "type": "function",
+      "name": "unchanged_existing_shape",
+      "description": "Non-JD control tool; not executed.",
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
+        ]
+      }
+    }
+  ],
+  "truncation": "disabled"
+}

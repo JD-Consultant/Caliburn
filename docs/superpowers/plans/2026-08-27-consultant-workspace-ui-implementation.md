@@ -1,10 +1,10 @@
 # 顧問工作區、目前 JD 與明確審核語意實作計畫
 
-> **狀態：owner 已於 2026-08-27 複核並授權執行。** 依本計畫在隔離 worktree 逐 Task 實作、驗證與複核；ADR 0070 仍須等完整 gate 通過後才升為 Accepted。
+> **狀態：Superseded／禁止執行。** 2026-08-28 最新討論已取代本計畫的 direct-edit Evidence、Gap／calibration、review lifecycle、required-input UI／interrupt、Context 與 A／能力級別規則。第一版核心 JD、Web 與匯出均不包含 A／能力級別；本檔後續所有 A／L／competency-level 段落只保留歷史。唯一可執行版本改為 [`2026-08-28-consultant-work-understanding-and-workspace-implementation.md`](2026-08-28-consultant-work-understanding-and-workspace-implementation.md)。本檔只保留 2026-08-27 歷史，不得從其中挑 Task 施工。
 
 > **執行者必讀：** REQUIRED SUB-SKILL：以 `superpowers:executing-plans` 逐 task 執行；每個行為改動先依 `superpowers:test-driven-development` 寫紅燈測試；完成宣告前依 `superpowers:verification-before-completion` 重跑證據。
 
-> **唯一執行計畫：** 本計畫取代 `docs/plans/2026-08-26-shared-current-jd-and-semantic-review-implementation.md`。不得執行舊計畫的 source-supersession Task 5，也不得從舊 code 反推產品需求。
+> **歷史關係：** 本計畫曾取代 `docs/plans/2026-08-26-shared-current-jd-and-semantic-review-implementation.md`，現已再由 2026-08-28 計畫完整取代。不得執行任何舊計畫的 source-supersession、direct-edit source、自由文字 clarification composer、`defer／edit-accept` 或 model-authored `skill_ids` 步驟，也不得從舊 code 反推產品需求。
 
 **Goal：** 把 Current 產品收斂成一個以「目前 JD」為中央工作面的三欄 Web 顧問工作區。員工與 AI 持續編輯同一份 Store-backed working copy；AI 變更保持待審，員工可先修改再另行接受／拒絕；員工直接修改沒有 AI 差異的內容則立即成為核准文件。Duty／Task／工作細節／OPKS、未歸屬內容、K／S 多對多、生命週期與必要澄清均由後端權威規則投影，Web 不重算 domain invariant。員工補充或更正前文只是一般聊天；active analysis run 期間整個工作區只讀，完成、失敗或 timeout 後解鎖。
 

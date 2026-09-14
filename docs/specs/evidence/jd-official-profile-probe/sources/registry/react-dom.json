@@ -1,0 +1,133 @@
+{
+  "bugs": {
+    "url": "https://github.com/facebook/react/issues"
+  },
+  "dist": {
+    "shasum": "6fac6bd96f7db477d966c7ec17c1a2b1ad8e6591",
+    "tarball": "https://registry.npmjs.org/react-dom/-/react-dom-19.2.4.tgz",
+    "fileCount": 43,
+    "integrity": "sha512-AXJdLo8kgMbimY95O2aKQqsz2iWi9jMgKJhRBAxECE4IFxfcazB2LmzloIoibJI3C12IlY20+KFaLv+71bUJeQ==",
+    "signatures": [
+      {
+        "sig": "MEUCIQDa9BOXPz6cs9uO0bqcq5hGpnoxA8OuAfQ2ES8Re/Mu+AIgTV7VVj65hlfp+kNyo9qBuU80N4PMb9KxS5uL6CaeIwg=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "unpackedSize": 7319413
+  },
+  "main": "index.js",
+  "name": "react-dom",
+  "browser": {
+    "./server.js": "./server.browser.js",
+    "./static.js": "./static.browser.js"
+  },
+  "exports": {
+    ".": {
+      "default": "./index.js",
+      "react-server": "./react-dom.react-server.js"
+    },
+    "./client": {
+      "default": "./client.js",
+      "react-server": "./client.react-server.js"
+    },
+    "./server": {
+      "bun": "./server.bun.js",
+      "deno": "./server.browser.js",
+      "node": "./server.node.js",
+      "worker": "./server.browser.js",
+      "browser": "./server.browser.js",
+      "default": "./server.node.js",
+      "workerd": "./server.edge.js",
+      "edge-light": "./server.edge.js",
+      "react-server": "./server.react-server.js"
+    },
+    "./static": {
+      "deno": "./static.browser.js",
+      "node": "./static.node.js",
+      "worker": "./static.browser.js",
+      "browser": "./static.browser.js",
+      "default": "./static.node.js",
+      "workerd": "./static.edge.js",
+      "edge-light": "./static.edge.js",
+      "react-server": "./static.react-server.js"
+    },
+    "./profiling": {
+      "default": "./profiling.js",
+      "react-server": "./profiling.react-server.js"
+    },
+    "./server.bun": {
+      "default": "./server.bun.js",
+      "react-server": "./server.react-server.js"
+    },
+    "./test-utils": "./test-utils.js",
+    "./server.edge": {
+      "default": "./server.edge.js",
+      "react-server": "./server.react-server.js"
+    },
+    "./server.node": {
+      "default": "./server.node.js",
+      "react-server": "./server.react-server.js"
+    },
+    "./static.edge": {
+      "default": "./static.edge.js",
+      "react-server": "./static.react-server.js"
+    },
+    "./static.node": {
+      "default": "./static.node.js",
+      "react-server": "./static.react-server.js"
+    },
+    "./package.json": "./package.json",
+    "./server.browser": {
+      "default": "./server.browser.js",
+      "react-server": "./server.react-server.js"
+    },
+    "./static.browser": {
+      "default": "./static.browser.js",
+      "react-server": "./static.react-server.js"
+    }
+  },
+  "license": "MIT",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "_npmUser": {
+    "name": "react-bot",
+    "email": "react-core@meta.com"
+  },
+  "homepage": "https://react.dev/",
+  "keywords": [
+    "react"
+  ],
+  "repository": {
+    "url": "git+https://github.com/facebook/react.git",
+    "type": "git",
+    "directory": "packages/react-dom"
+  },
+  "_npmVersion": "10.8.2",
+  "description": "React package for working with the DOM.",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "fb",
+      "email": "opensource+npm@fb.com"
+    },
+    {
+      "name": "react-bot",
+      "email": "react-core@meta.com"
+    }
+  ],
+  "_nodeVersion": "20.19.0",
+  "dependencies": {
+    "scheduler": "^0.27.0"
+  },
+  "_hasShrinkwrap": false,
+  "peerDependencies": {
+    "react": "^19.2.4"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/react-dom_19.2.4_1769451798364_0.20624754690830227",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "react-dom@19.2.4",
+  "version": "19.2.4"
+}

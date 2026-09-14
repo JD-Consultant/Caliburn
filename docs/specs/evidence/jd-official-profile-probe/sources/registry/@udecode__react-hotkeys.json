@@ -1,0 +1,89 @@
+{
+  "bugs": {
+    "url": "https://github.com/udecode/plate/issues"
+  },
+  "dist": {
+    "shasum": "eaf6221f7483f317598f79c7679d9a2c15ce5007",
+    "tarball": "https://registry.npmjs.org/@udecode/react-hotkeys/-/react-hotkeys-52.0.11.tgz",
+    "fileCount": 4,
+    "integrity": "sha512-MwdQlfTZhrP0O+BazuNgY9g2qJSZAB05ykdVCdWmBsjv5VQvQ3R9RkXLUMGD20TqUR62iT/Phb/ca8toxiCm0w==",
+    "signatures": [
+      {
+        "sig": "MEYCIQCf020mu/TYj8x84gXmUoM3vkPj5BOYwYEY0Xx8CmSDugIhAIaelLUFpzdi3gJOBauBTriJyBAcG27RTx1+9b/oin36",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "unpackedSize": 65174
+  },
+  "main": "./dist/index.js",
+  "name": "@udecode/react-hotkeys",
+  "type": "module",
+  "types": "./dist/index.d.ts",
+  "module": "./dist/index.js",
+  "exports": {
+    ".": "./dist/index.js",
+    "./package.json": "./package.json"
+  },
+  "gitHead": "0a02e15d2f704bf60d28176b97c3761fe7aa4923",
+  "license": "MIT",
+  "scripts": {
+    "brl": "yarn p:brl",
+    "lint": "yarn p:lint",
+    "test": "yarn p:test",
+    "build": "yarn p:build",
+    "clean": "yarn p:clean",
+    "lint:fix": "yarn p:lint:fix",
+    "typecheck": "yarn p:typecheck",
+    "test:watch": "yarn p:test:watch",
+    "build:watch": "yarn p:build:watch"
+  },
+  "_npmUser": {
+    "name": "zbeyens",
+    "email": "zbeyens@udecode.dev"
+  },
+  "homepage": "https://github.com/udecode/plate#readme",
+  "keywords": [
+    "react-hotkeys-hook"
+  ],
+  "repository": {
+    "url": "git+https://github.com/udecode/plate.git",
+    "type": "git",
+    "directory": "packages/udecode/react-hotkeys"
+  },
+  "_npmVersion": "10.9.4",
+  "description": "Fork of react-hotkeys-hook",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "zbeyens",
+      "email": "zbeyens@udecode.dev"
+    },
+    {
+      "name": "dylans",
+      "email": "dylan@dojotoolkit.org"
+    },
+    {
+      "name": "12joan",
+      "email": "joe_npmjs@osbert.me"
+    }
+  ],
+  "sideEffects": false,
+  "_nodeVersion": "22.21.1",
+  "dependencies": {
+    "react-compiler-runtime": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "_hasShrinkwrap": false,
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/react-hotkeys_52.0.11_1765564466693_0.22438974203619466",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "@udecode/react-hotkeys@52.0.11",
+  "version": "52.0.11"
+}

@@ -1,0 +1,89 @@
+{
+  "steps": [
+    {
+      "step": 0,
+      "name": "opened",
+      "screenshot": "00-opened.png",
+      "status_chip": null
+    },
+    {
+      "step": 1,
+      "name": "created",
+      "screenshot": "01-created.png",
+      "status_chip": "讀取中",
+      "title": "整輪撤回驗收",
+      "duties_before": []
+    },
+    {
+      "step": 2,
+      "name": "ai-turn-done",
+      "screenshot": "02-ai-turn-done.png",
+      "status_chip": "已保存",
+      "duties_after": [],
+      "edit_calls": 0
+    },
+    {
+      "step": 3,
+      "name": "source-marker",
+      "screenshot": "03-source-marker.png",
+      "status_chip": "已保存",
+      "marker": "依據你說過的 1 段訪談。",
+      "open_buttons": 4
+    }
+  ],
+  "failed_at": 4,
+  "error": "element_covered:(() => { const label = \"\\u770b\\u7b2c 1 \\u6bb5\\u539f\\u8a71\"; return [...document.querySelectorAll('button')].find(item =>",
+  "screenshot": "99-failure.png",
+  "alerts": [],
+  "last_click_the_page_received": {
+    "tag": "BUTTON",
+    "trusted": true,
+    "x": 262,
+    "y": 568,
+    "intended": true,
+    "text": "送出"
+  },
+  "buttons_now": [
+    "建立文件",
+    "查看封存",
+    "更名",
+    "封存",
+    "查看第 1 次實際改動",
+    "重新查看",
+    "送出",
+    "改動與歷史",
+    "撤回這輪 JD 改動",
+    "新增協作對象",
+    "新增職責",
+    "新增任務",
+    "看第 1 段原話",
+    "上移",
+    "下移",
+    "移動至職責",
+    "完整修訂",
+    "刪除",
+    "選擇知識與技能",
+    "新增成果",
+    "看第 1 段原話",
+    "上移",
+    "下移",
+    "刪除",
+    "看第 1 段原話",
+    "上移",
+    "下移",
+    "刪除",
+    "新增要求",
+    "看第 1 段原話",
+    "上移",
+    "下移",
+    "刪除",
+    "新增知識",
+    "新增技能",
+    "新增任職條件",
+    "新增工時與出差",
+    "新增共同權責界線",
+    "新增共同協作",
+    "新增工作環境"
+  ],
+  "edit_calls": []
+}

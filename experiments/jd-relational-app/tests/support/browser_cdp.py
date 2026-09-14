@@ -167,6 +167,13 @@ class Chrome:
         pointer between measuring and pressing, which sends the press to
         whatever moved into that place instead.
         """
+        # A control below the fold is not unreachable, it is not scrolled to.
+        # An employee scrolls; so does this, and only when it is needed.
+        self.evaluate("(() => { const el = " + selector_js + ";"
+                      " if (!el) return false;"
+                      " const r = el.getBoundingClientRect();"
+                      " if (r.top >= 0 && r.bottom <= innerHeight) return false;"
+                      " el.scrollIntoView({ block: 'center' }); return true; })()")
         previous = self.reachable(selector_js)
         for _ in range(tries):
             time.sleep(gap)

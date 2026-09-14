@@ -78,6 +78,8 @@ def journey(chrome):
     step(chrome, "created", title=TITLE, duties_before=chrome.evaluate(DUTY_NAMES))
 
     # 1. One real interview turn. The AI writes the JD through its own tools.
+    # The box stays disabled until this document's session has really loaded.
+    chrome.until(f"!{CHAT_INPUT}.disabled", timeout=40, what="interview_box_ready")
     chrome.type_into(CHAT_INPUT, INTERVIEW)
     chrome.until(f"!!{text_button('送出', exact=True)}", timeout=20, what="send_ready")
     chrome.click(text_button("送出", exact=True))
@@ -86,7 +88,37 @@ def journey(chrome):
     step(chrome, "ai-turn-done", duties_after=chrome.evaluate(DUTY_NAMES),
          edit_calls=len(traced_calls(chrome, "/jd/edits")))
 
-    # 2. The turn's own changes, offered as one thing to take back.
+    # 2. The JD says where it came from, and those words open. This has to
+    #    happen before the undo, because taking the turn back takes its content
+    #    -- and therefore its markers -- with it.
+    chrome.until("document.body.innerText.includes('依據你說過的')", timeout=30,
+                 what="source_marker")
+    step(chrome, "source-marker",
+         marker=chrome.evaluate(
+             "(() => { const found = document.body.innerText.split('\\n')"
+             ".find(line => line.includes('依據你說過的')); return found || null; })()"),
+         open_buttons=len(chrome.evaluate(
+             "[...document.querySelectorAll('button')].map(b => b.textContent.trim())"
+             ".filter(t => t.startsWith('看第'))")))
+    chrome.click(text_button("看第 1 段原話"))
+    chrome.until("document.body.innerText.includes('你當初說過的話')", timeout=30,
+                 what="source_dialog")
+    chrome.until(f"document.body.innerText.includes({json.dumps(INTERVIEW[:20])})", timeout=30,
+                 what="own_words_shown")
+    opened = {
+        "own_words_shown": chrome.evaluate(
+            f"document.body.innerText.includes({json.dumps(INTERVIEW)})"),
+        "labels_who_said_it": chrome.evaluate("document.body.innerText.includes('你說的')"),
+        "consultant_wording_marked": chrome.evaluate(
+            "document.body.innerText.includes('不是你確認過的事實')"),
+    }
+    step(chrome, "source-opened", **opened)
+    assert all(opened.values()), opened
+    chrome.click(text_button("關閉", exact=True))
+    chrome.until("!document.body.innerText.includes('你當初說過的話')", timeout=20,
+                 what="source_dialog_closed")
+
+    # 3. The turn's own changes, offered as one thing to take back.
     chrome.until(f"!!{text_button('撤回這輪 JD 改動')}", timeout=60, what="undo_offered")
     step(chrome, "undo-offered", run_change_summary=chrome.evaluate(
         "(() => { const s = document.querySelector('section[aria-label=\"本輪 JD 改動\"]');"
@@ -106,7 +138,7 @@ def journey(chrome):
          undo_call=[dict(item, body=None, response=(item.get("response") or "")[:120])
                     for item in traced_calls(chrome, "/jd/edits")][-1:])
 
-    # 3. Only JD moved: the conversation and the turn's record are still there.
+    # 4. Only JD moved: the conversation and the turn's record are still there.
     kept = {
         "reply_still_shown": chrome.evaluate(
             "document.body.innerText.includes('已依合成訪談建立設備檢查任務')"),

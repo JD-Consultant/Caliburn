@@ -152,6 +152,28 @@ class Evidence:
                 self._save()
 
 
+def _cite(created, payload):
+    """Quote this turn's own saved interview as the basis, as a consultant should.
+
+    The reference is the one the App issued for this turn; nothing here invents
+    or edits a token. Without it the JD carries no source links at all and the
+    page's "where did this come from" markers never appear.
+
+    Driving the model directly, without the App's consultant context, means
+    there is no notice to quote. That path simply does not cite, and the
+    journey checks for real source links afterwards rather than assuming.
+    """
+    from test_conversation_sources_postgres import _source_notice
+    name, arguments = created
+    if not isinstance(payload.get("system"), list):
+        return name, arguments
+    source_ref = _source_notice(payload)["source_ref"]
+    arguments["basis_refs"] = [source_ref]
+    for detail in [*arguments.get("outcomes", []), *arguments.get("requirements", [])]:
+        detail["basis_refs"] = [source_ref]
+    return name, arguments
+
+
 @contextmanager
 def offline_model(evidence):
     """Pinned native SDK/adapter; exactly four synthetic model responses.
@@ -181,7 +203,9 @@ def offline_model(evidence):
                     or not all(tool.get("strict") is True for tool in payload["tools"])
                     or payload.get("tool_choice", {}).get("disable_parallel_tool_use") is not True):
                 raise ValueError("synthetic_tool_contract_mismatch")
-            name, arguments = (_read(payload) if position == 0 else _create(payload) if position == 1 else (None, None))
+            name, arguments = (_read(payload) if position == 0
+                               else _cite(_create(payload), payload)
+                               if position == 1 else (None, None))
             chunks = _sse(f"ui_{prefix}_{position + 1}", name, arguments)
             if name is None:
                 # Edit synthetic event fixture data only; native SDK owns parsing.

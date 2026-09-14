@@ -2,7 +2,7 @@
 
 日期：2026-09-14；Topic：JD-R002。這份只做一件事：把施工順序的五項，逐項對到**可以自己去看的證據**（tag、結果稿、測試），並說明剩下什麼、為什麼剩下。不重述設計，不代替[收尾清單](2026-09-13-jd-app-open-issues.md)。
 
-基準 `f160be97`。下列 tag 都是本地 tag，沒有 merge、push 或切換 production authority。
+基準 `f160be97`；本階段最後一個 tag `jd-review-fixes-20260914` 指在目前 HEAD。下列 tag 都是本地 tag，沒有 merge、push 或切換 production authority。
 
 ## 1. H4-R1：固定 target 與有界批次，真 PostgreSQL
 
@@ -61,10 +61,14 @@ B2 逐字採用，兩批有序交接、B2 pending 重建資源續作、發布回
 | 配置與啟停訊息 | 完成（tag `jd-operations-acceptance-20260914`）；**未做**：本機建立正式安裝後的 CLI 真程序啟停 |
 | 備份還原 | 完成（tag `jd-backup-restore-drill-20260914`）；**未做**：世代輪替、異地保存、同名覆蓋還原 |
 | 代表性真瀏覽器 | 完成三條旅程（還原、整輪撤回、來源點回原話）；**未做**：實體 IME、觸控、並行分頁、修改／刪除／移動的辨認（[OI-04](2026-09-13-jd-app-open-issues.md)） |
-| 真 PG | 完成；全組 **3249 passed，0 failed**。先前那一項 [OI-05](2026-09-13-jd-app-open-issues.md) 分頁失敗已定案：錯的是那條斷言，不是實作或契約 |
+| 真 PG | 完成；全組 **3258 passed，0 failed**。先前那一項 [OI-05](2026-09-13-jd-app-open-issues.md) 分頁失敗已定案：錯的是那條斷言，不是實作或契約 |
 | Windows 新程序 | 完成（背景四停點、宿主恢復） |
 | 自然模型 3 職位各 2 次 | **未做**，需費用授權（[OI-09](2026-09-13-jd-app-open-issues.md)） |
 | 3 名員工自行試用 | **未做**，需 Owner 安排真人（[OI-10](2026-09-13-jd-app-open-issues.md)） |
+
+## 5.1 獨立審查
+
+本階段 19 個提交已由非實作者[獨立審查](evidence/2026-09-14-jd-phase-independent-review.md)：八項發現全部修正（兩項 HIGH 都是「把不知道說成知道」），兩條沒有鑑別力的測試一併重寫，一句在當時不成立的文件宣稱已更正。採用保真度、撤回來源推導與不可偏離的產品效果由審查者獨立核對通過。窄複核進行中。
 
 ## 6. 唯一擋住「持續訪談」的東西
 

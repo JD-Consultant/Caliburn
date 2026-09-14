@@ -12,7 +12,7 @@ from threading import Event
 import traceback
 from uuid import uuid4
 
-import httpx2
+import httpx
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
@@ -29,8 +29,8 @@ from jd_relational.reads import command_context
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import DocumentCheckpoints, build_document_graph
 from jd_relational.storage.service import JdStorage
+from support.openai_replies import reply as _reply
 from test_consultant_context_postgres import _notice
-from test_consultant_model import SyncBody, events
 from test_manual_runtime_postgres import NATIVE_TABLES, RUNTIME_SCHEMA, connect, counts
 from test_storage_postgres import engine
 
@@ -59,36 +59,32 @@ def _offline_model(monkeypatch, plan, *, body_factory=SyncBody, expected_tools=N
                       (build_jd_tools() if expected_tools is None else expected_tools)}
     monkeypatch.setenv("LANGSMITH_TRACING", "false")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
-    requests, bodies = [], []
+    requests = []
     prefix = uuid4().hex
 
     def receive(request):
         assert get_tracing_context()["enabled"] is False
-        assert request.url.host == "api.anthropic.com"
-        assert request.headers["x-api-key"] == "synthetic-ai-runtime-not-a-key"
+        assert request.url.host == "api.openai.com"
+        assert request.headers["authorization"] == "Bearer synthetic-ai-runtime-not-a-key"
         assert len(requests) < len(plan), "No hidden model retry or replay is allowed."
         payload = json.loads(request.content)
-        assert payload["stream"] is True
+        # This product never allows parallel tool calls and never lets the
+        # provider keep the conversation: the durable record is this App's.
+        assert payload["parallel_tool_calls"] is False
+        assert payload["store"] is False
         assert {tool["name"] for tool in payload["tools"]} == expected_names
         assert len(payload["tools"]) == len(expected_names)
         assert all(tool["strict"] is True for tool in payload["tools"])
-        assert payload["tool_choice"]["disable_parallel_tool_use"] is True
         requests.append(payload)
         name, arguments = plan[len(requests) - 1](payload)
-        body = body_factory(_sse(f"{prefix}_{len(requests)}", name, arguments))
-        bodies.append(body)
-        return httpx2.Response(200, headers={"content-type": "text/event-stream"}, stream=body, request=request)
+        return httpx.Response(200, json=reply_factory(f"{prefix}_{len(requests)}", name, arguments),
+                              request=request)
 
-    def no_async(**kwargs):
-        raise AssertionError("The synchronous test must not create an unmocked HTTP client.")
-
-    with httpx2.Client(transport=httpx2.MockTransport(receive), trust_env=False) as client:
-        monkeypatch.setattr("langchain_anthropic.chat_models._get_default_httpx_client", lambda **kwargs: client)
-        monkeypatch.setattr("langchain_anthropic.chat_models._get_default_async_httpx_client", no_async)
-        model = create_consultant_model(model_name="synthetic", api_key="synthetic-ai-runtime-not-a-key",
-                                       timeout=5, max_tokens=2048)
+    with httpx.Client(transport=httpx.MockTransport(receive), trust_env=False, timeout=5) as client:
+        model = create_consultant_model(model="gpt-5.6-luna",
+                                        api_key="synthetic-ai-runtime-not-a-key",
+                                        http_client=client)
         yield model, requests
-    assert all(body.closed for body in bodies)
 
 
 @contextmanager

@@ -26,30 +26,13 @@ from langgraph.checkpoint.base import BaseCheckpointSaver
 from .ai_checkpoints import AiCheckpointError
 from .conversation_sources import ConversationSourceError, ConversationSourceService
 from .memory_sources import MemorySourceReader
+from .openai_responses import accepted
 
 
 # This case's tested B1 profile, not a provider default: explicit visible output
 # and effort, verified for this role rather than inherited from the class.
 MAX_OUTPUT_TOKENS = 8192
 REASONING_EFFORT = "high"
-
-
-def accepted(raw: AIMessage) -> bool:
-    """Terminal evidence for one structured response, from public SDK fields.
-
-    A saved artifact requires a normally completed, unrefused response. The
-    official guide names the same three checks an application must make before
-    trusting a structured output: the response reached `completed`, no content
-    block is a refusal, and the payload matches the schema (the workflow owns
-    that last one). `status` is also what reports truncation: a response cut off
-    at the output ceiling arrives as `incomplete`, never as a short success.
-    HTTP 200 alone, or text that merely parses, is not evidence of any of this.
-    """
-    refused = raw.additional_kwargs.get("refusal") or any(
-        isinstance(block, dict) and (block.get("type") == "refusal" or
-            (block.get("type") == "non_standard" and "refusal" in block.get("value", {})))
-        for block in raw.content_blocks)
-    return not refused and raw.response_metadata.get("status") == "completed"
 
 
 def build_extraction_model(*, model: str, api_key: str, http_client, base_url: str | None = None,

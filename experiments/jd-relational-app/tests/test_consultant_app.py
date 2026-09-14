@@ -19,8 +19,11 @@ KEY = "synthetic-consultant-assembly-not-a-key"
 
 @pytest.fixture
 def model():
-    return create_consultant_model(model_name="synthetic", api_key=KEY, timeout=5,
-                                   max_tokens=2048)
+    """The real assembly on a local transport; nothing here invokes it."""
+    import httpx
+    with httpx.Client(transport=httpx.MockTransport(lambda request: httpx.Response(500)),
+                      timeout=5) as client:
+        yield create_consultant_model(model="gpt-5.6-luna", api_key=KEY, http_client=client)
 
 
 class Admissions:

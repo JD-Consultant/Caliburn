@@ -23,6 +23,7 @@ from langgraph.types import Command
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from .notice_history import NoticeBoundary, NoticeHistoryReader, NoticeMaterial
+from .openai_responses import accepted
 from .references import ReferenceCodec, SignedReference
 
 MAX_NOTICE_BYTES = 65536
@@ -224,8 +225,11 @@ def _bound_response(response, context, head, notice):
     if not isinstance(response, ModelResponse) or len(response.result) != 1:
         raise ConsultantContextError("invalid_consultant_response")
     message = response.result[0]
-    if (not isinstance(message, AIMessage) or message.type != "ai" or message.invalid_tool_calls
-            or message.response_metadata.get("stop_reason") not in {"end_turn", "tool_use", "stop_sequence"}):
+    # The same terminal rule every role uses: a reply cut off at the output
+    # ceiling arrives as `incomplete`, never as a short success, and a refusal
+    # is not an answer. HTTP 200 alone proves neither.
+    if (not isinstance(message, AIMessage) or message.type != "ai"
+            or message.invalid_tool_calls or not accepted(message)):
         raise ConsultantContextError("incomplete_consultant_response")
     if not message.id:
         message = message.model_copy(update={"id": str(uuid4())})
@@ -289,19 +293,28 @@ def build_consultant_node(model, *, tools, guidance: str, extra_middleware=()):
     and tool-call execution stay with the App, not generated model parameters.
     """
     from langchain.agents import create_agent
-    from .consultant_model import ConfirmedChatAnthropic
+    from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
+    from langchain_openai import ChatOpenAI
+    from .consultant_model import MAX_MODEL_STEPS, MAX_TOOL_CALLS
     from .inspection_model import InspectionOnly, InspectionGuard
     inspection = type(model) is InspectionOnly
-    provider_valid = (isinstance(model, ConfirmedChatAnthropic) and model.streaming
-        and not model.disable_streaming and model.stream_usage and model.max_retries == 0
-        and model.cache is False)
+    # One provider, checked by what the assembly actually configured. A model
+    # that stores the conversation server-side, retries on its own or answers
+    # with parallel tool calls is not this role's model.
+    provider_valid = (isinstance(model, ChatOpenAI) and model.use_responses_api
+        and model.output_version == "responses/v1" and model.store is False
+        and model.max_retries == 0
+        and model.model_kwargs.get("parallel_tool_calls") is False
+        and (model.reasoning or {}).get("effort") == "high")
     if ((not provider_valid and not inspection)
-            or model.cache is not False
             or not isinstance(extra_middleware, (list, tuple))
             or any(not isinstance(value, AgentMiddleware) for value in extra_middleware)
             or not isinstance(guidance, str) or not guidance.strip()):
         raise ConsultantContextError("invalid_consultant_configuration")
-    middleware = [JdNoticeMiddleware(), *extra_middleware]
+    # This role's verified budgets, declared where the agent is assembled.
+    middleware = [JdNoticeMiddleware(), *extra_middleware,
+                  ModelCallLimitMiddleware(thread_limit=MAX_MODEL_STEPS, exit_behavior="end"),
+                  ToolCallLimitMiddleware(thread_limit=MAX_TOOL_CALLS, exit_behavior="end")]
     if inspection:
         from .consultant_tools import AiToolMiddleware
         # Only this known layout has its non-wrap hook guarded. Unknown hooks

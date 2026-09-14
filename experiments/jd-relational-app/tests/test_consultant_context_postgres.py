@@ -1,4 +1,4 @@
-"""Real JD SQL + native PG Saver + agent/SDK, with offline synthetic SSE only.
+"""Real JD SQL + native PG Saver + agent/SDK, with offline synthetic replies only.
 
 The imported FakeAuthority prepares manual fixture edits; it is not evidence of
 AI writer admission. No Saver setup, persisted-data cleanup, real provider or
@@ -12,7 +12,7 @@ import json
 import os
 from uuid import uuid4
 
-import httpx2
+import httpx
 from langchain_core.messages import AIMessage, HumanMessage
 from langgraph.checkpoint.postgres import PostgresSaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
@@ -27,7 +27,7 @@ from jd_relational.notice_history import NoticeHistoryReader
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import build_document_graph
 from jd_relational.storage.service import JdStorage
-from test_consultant_model import SyncBody, events
+from support.openai_replies import reply as _reply, system_blocks, truncated as _truncated
 from test_manual_runtime_postgres import NATIVE_TABLES, RUNTIME_SCHEMA, connect
 from test_storage_postgres import engine
 from test_storage_service import FakeAuthority, change, intent_for
@@ -49,47 +49,38 @@ def _purpose(store, current, text):
 
 
 def _data(mode, number):
-    """Give each native response its own id, just as separate SDK messages do."""
-    chunks = []
-    for chunk in events(mode=mode):
-        item = json.loads(chunk.decode().split("data: ", 1)[1])
-        if item["type"] == "message_start":
-            item["message"]["id"] = f"msg_synthetic_pg_{number}"
-        elif item["type"] == "content_block_delta":
-            item["delta"]["text"] = f"第 {number} 次合成回覆"
-        chunks.append(f"event: {item['type']}\ndata: {json.dumps(item)}\n\n".encode())
-    return chunks
+    """Give each response its own id, just as separate SDK replies do.
+
+    `incomplete` is the provider's own way of reporting a reply cut off at the
+    output ceiling; it must never read as a short success.
+    """
+    identity = f"synthetic_pg_{number}"
+    if mode == "complete":
+        return _reply(identity, text=f"第 {number} 次合成回覆")
+    return _truncated(identity)
 
 
 @contextmanager
 def _offline_model(monkeypatch, modes):
     monkeypatch.setenv("LANGSMITH_TRACING", "false")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
-    requests, bodies = [], []
+    requests = []
 
     def receive(request):
         # MockTransport receives the real SDK request; it never opens a socket.
-        assert request.url.host == "api.anthropic.com"
-        assert request.headers["x-api-key"] == "synthetic-pg-not-a-key"
+        assert request.url.host == "api.openai.com"
+        assert request.headers["authorization"] == "Bearer synthetic-pg-not-a-key"
         assert len(requests) < len(modes), "No hidden model retry or replay is allowed."
         payload = json.loads(request.content)
-        assert payload["stream"] is True
+        assert payload["store"] is False and payload["parallel_tool_calls"] is False
         requests.append(payload)
-        body = SyncBody(_data(modes[len(requests) - 1], len(requests)))
-        bodies.append(body)
-        return httpx2.Response(200, headers={"content-type": "text/event-stream"},
-                               stream=body, request=request)
+        return httpx.Response(200, json=_data(modes[len(requests) - 1], len(requests)),
+                              request=request)
 
-    def no_async(**kwargs):
-        raise AssertionError("This synchronous PG slice must not construct another HTTP client.")
-
-    with httpx2.Client(transport=httpx2.MockTransport(receive), trust_env=False) as client:
-        monkeypatch.setattr("langchain_anthropic.chat_models._get_default_httpx_client", lambda **kwargs: client)
-        monkeypatch.setattr("langchain_anthropic.chat_models._get_default_async_httpx_client", no_async)
-        model = create_consultant_model(model_name="synthetic", api_key="synthetic-pg-not-a-key",
-                                       timeout=5, max_tokens=64)
-        yield model, requests, bodies
-    assert all(body.closed for body in bodies)
+    with httpx.Client(transport=httpx.MockTransport(receive), trust_env=False, timeout=5) as client:
+        model = create_consultant_model(model="gpt-5.6-luna", api_key="synthetic-pg-not-a-key",
+                                        http_client=client)
+        yield model, requests, []
 
 
 @contextmanager
@@ -113,9 +104,21 @@ def _context(history, codec, document_id, previous=None):
                              history.read(document_id, baseline))
 
 
+def _said(item):
+    """The employee's words out of one request item, ignoring the block label.
+
+    A Responses input block is typed `input_text` where a saved HumanMessage
+    block is typed `text`; the words themselves must be identical.
+    """
+    content = item["content"]
+    if isinstance(content, str):
+        return content
+    return "".join(block.get("text", "") for block in content)
+
+
 def _notice(payload):
     notices = []
-    for block in payload["system"]:
+    for block in system_blocks(payload):
         if block["type"] != "text":
             continue
         try:
@@ -142,8 +145,8 @@ def _assert_pair(state, context):
                if isinstance(message, AIMessage) and message.id == view.response_message_id]
     assert len(replies) == 1
     reply = replies[0]
-    assert reply.response_metadata["stop_reason"] == "end_turn"
-    assert reply.usage_metadata["output_tokens"] == 9
+    assert reply.response_metadata["status"] == "completed"
+    assert reply.usage_metadata["output_tokens"] == 20
     assert _digest(reply.model_dump(mode="json")) == view.response_digest
     assert sha256(view.notice_json.encode()).hexdigest() == view.notice_digest
     return view
@@ -168,7 +171,8 @@ def test_real_notice_two_turns_and_pg_reopen_preserve_paired_response_without_re
             first_notice = _notice(requests[0])
             assert first_notice["turn_start"]["manual_change_count"] == 1
             assert first_notice["turn_start"]["ai_change_count"] == 0
-            assert requests[0]["messages"] == [{"role": "user", "content": humans[0].content}]
+            assert [item for item in requests[0]["input"] if item.get("role") == "user"] == [
+                {"role": "user", "content": humans[0].content, "type": "message"}]
             first_ref = codec.resolve(first_notice["turn_start"]["events"][0]["change_ref"],
                 document_id=current.document_id, roles={"change"}, purposes={"observation"})
             assert first_ref.entity_id == str(first_edit.operation_id)
@@ -193,9 +197,10 @@ def test_real_notice_two_turns_and_pg_reopen_preserve_paired_response_without_re
                                   roles={"change"}, purposes={"observation"}).entity_id
                     for row in notice["turn_start"]["events"]] == [str(reverted.operation_id), str(changed.operation_id)]
             assert notice["turn_start"]["content_included"] is False
-            assert [message["role"] for message in requests[1]["messages"]] == ["user", "assistant", "user"]
-            assert [message["content"] for message in requests[1]["messages"] if message["role"] == "user"] == [
-                humans[0].content, humans[1].content]
+            assert [item["role"] for item in requests[1]["input"] if item.get("role")] == [
+                "system", "user", "assistant", "user"]
+            assert [_said(item) for item in requests[1]["input"] if item.get("role") == "user"] == [
+                _said({"content": humans[0].content}), _said({"content": humans[1].content})]
             assert "合成工作 A" not in second.notice_json and "合成工作 B" not in second.notice_json
             state = graph.get_state(config)
             assert not state.next and not state.tasks and not state.interrupts
@@ -211,7 +216,7 @@ def test_real_notice_two_turns_and_pg_reopen_preserve_paired_response_without_re
                     _assert_pair(persisted, second_context)
                     paired_checkpoints += 1
             assert paired_checkpoints >= 2
-        assert len(requests) == 2 and all(body.closed for body in bodies)
+        assert len(requests) == 2
         with _graph(model) as reopened:
             restored = read_closed_model_view(reopened, document_id=current.document_id,
                 dataset_id=codec.dataset_id, run_id=second_context.run_id)
@@ -233,19 +238,22 @@ def test_missing_terminal_event_keeps_previous_pg_boundary_and_reopen_does_not_r
     original = HumanMessage(id="human-" + str(uuid4()), content="完整第一輪原話")
     next_human = HumanMessage(id="human-" + str(uuid4()), content="第二輪原話仍要保留\n不可冒稱回覆完成")
     originals = [deepcopy(message.model_dump()) for message in (original, next_human)]
-    with _offline_model(monkeypatch, ["complete", "missing_stop"]) as (model, requests, bodies):
+    with _offline_model(monkeypatch, ["complete", "incomplete"]) as (model, requests, bodies):
         with _graph(model) as graph:
             graph.invoke({"messages": [original]}, config, context=first_context, durability="sync")
             first = read_closed_model_view(graph, document_id=current.document_id,
                 dataset_id=codec.dataset_id, run_id=first_context.run_id)
             current, _, _ = _purpose(store, current, "人工已保存而模型回覆尚未完成")
             second_context = _context(history, codec, current.document_id, first)
-            with pytest.raises(ConsultantModelError) as failure:
+            with pytest.raises(ConsultantContextError) as failure:
                 graph.invoke({"messages": [next_human]}, config, context=second_context, durability="sync")
-            assert failure.value.code == str(failure.value) == "incomplete_model_response"
+            # The reply is rejected one layer higher now: the provider reports an
+            # unfinished reply as `incomplete` status rather than a truncated
+            # stream, so the consultant node is what refuses it.
+            assert failure.value.code == str(failure.value) == "incomplete_consultant_response"
             assert _notice(requests[1])["turn_start"]["manual_change_count"] == 1
-            assert [message["content"] for message in requests[1]["messages"] if message["role"] == "user"] == [
-                original.content, next_human.content]
+            assert [_said(item) for item in requests[1]["input"] if item.get("role") == "user"] == [
+                _said({"content": original.content}), _said({"content": next_human.content})]
             with pytest.raises(ConsultantContextError, match="^consultant_checkpoint_unconfirmed$"):
                 read_closed_model_view(graph, document_id=current.document_id,
                     dataset_id=codec.dataset_id, run_id=second_context.run_id)
@@ -255,7 +263,7 @@ def test_missing_terminal_event_keeps_previous_pg_boundary_and_reopen_does_not_r
             assert [message.model_dump() for message in latest.values["messages"]
                     if isinstance(message, HumanMessage)] == originals
             assert len([message for message in latest.values["messages"] if isinstance(message, AIMessage)]) == 1
-        assert len(requests) == 2 and all(body.closed for body in bodies)
+        assert len(requests) == 2
         with _graph(model) as reopened:
             latest = reopened.get_state(config, subgraphs=True)
             assert _assert_pair(latest, first_context) == first

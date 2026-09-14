@@ -12,7 +12,7 @@ LOG = logging.getLogger("caliburn.jd.commands")
 # Diagnostic allowlists deliberately fail closed; they do not validate commands.
 _COMMAND_LABELS = frozenset({"jd_create_task", "jd_revise_work", "jd_set_text", "jd_insert_item",
     "jd_delete_item", "jd_move_item", "jd_set_task_capability", "jd_replace_selection",
-    "restore_revision"})
+    "restore_revision", "undo_ai_turn"})
 _ERROR_LABELS = frozenset({"invalid_input", "target_missing", "stale_view", "relationship_conflict", "dependent_items"})
 
 

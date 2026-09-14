@@ -8,7 +8,7 @@ from .result_transport import ResultValidationError, validate_result
 
 from .generated.models import (
     CreateTaskInput, ReviseWorkInput, SetTextInput, InsertItemInput,
-    DeleteItemInput, MoveItemInput, RestoreRevisionInput, SetTaskCapabilityInput,
+    DeleteItemInput, MoveItemInput, RestoreRevisionInput, SetTaskCapabilityInput, UndoAiTurnInput,
     ReplaceSelectionInput,
 )
 
@@ -17,7 +17,7 @@ REQUEST_LIMIT = 1024 * 1024
 # Manual-only business operations. They share this transport, the same command
 # shape and the same writer, but are never offered to the model: taking a whole
 # document back is the employee's decision, not something a turn may choose.
-MANUAL_MODELS = {"restore_revision": RestoreRevisionInput}
+MANUAL_MODELS = {"restore_revision": RestoreRevisionInput, "undo_ai_turn": UndoAiTurnInput}
 MODELS = {"jd_create_task": CreateTaskInput, "jd_revise_work": ReviseWorkInput,
           "jd_set_text": SetTextInput, "jd_insert_item": InsertItemInput,
           "jd_delete_item": DeleteItemInput, "jd_move_item": MoveItemInput,

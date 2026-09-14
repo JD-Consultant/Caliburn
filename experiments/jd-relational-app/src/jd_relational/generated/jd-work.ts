@@ -18,6 +18,7 @@ export interface WorkCommandCatalog {
   set_task_capability: SetTaskCapabilityInput;
   replace_selection: ReplaceSelectionInput;
   restore_revision: RestoreRevisionInput;
+  undo_ai_turn: UndoAiTurnInput;
 }
 /**
  * Create one identifiable task with all currently known outcomes, requirements and existing capability relations as one business effect. The App allocates identities and validates the final task before saving.
@@ -444,4 +445,20 @@ export interface RestoreRevisionInput {
    * A saved revision of this same document whose complete content becomes the new current JD.
    */
   target_revision_id: string;
+}
+/**
+ * Manual undo of one AI turn's JD changes. Never offered to the model, and never carries where to go back to: the server derives that from the turn's own committed operations.
+ *
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "UndoAiTurnInput".
+ */
+export interface UndoAiTurnInput {
+  /**
+   * The AI turn whose JD changes should be taken back.
+   */
+  ai_run_id: string;
+  /**
+   * The revision the App showed as that turn's end; a different current head refuses the undo.
+   */
+  expected_result_revision_id: string;
 }

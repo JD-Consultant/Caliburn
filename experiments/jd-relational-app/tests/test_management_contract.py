@@ -22,6 +22,7 @@ ROOTS = {
     # Manual-only, and generated from the same SSOT so its shape is not
     # hand-written; it is deliberately not offered to the model.
     "restore_revision": "RestoreRevisionInput",
+    "undo_ai_turn": "UndoAiTurnInput",
 }
 KINDS = ("duty", "collaborator", "knowledge", "skill", "outcome", "requirement", "condition")
 
@@ -59,10 +60,15 @@ def management_input(name):
         "ReplaceSelectionInput": {"selection_ref": "issued-selection", "replacement_text": "每季🔎\n依約定",
                                   "basis_refs": []},
         "RestoreRevisionInput": {"target_revision_id": "issued-revision"},
+        "UndoAiTurnInput": {"ai_run_id": "issued-run", "expected_result_revision_id": "issued-revision"},
     }[name]
 
 
 MANAGEMENT_ROOTS = tuple(name for name in ROOTS.values() if name not in {"CreateTaskInput", "ReviseWorkInput"})
+# The model never sees the manual-only entries, so App-context rules that exist
+# to stop a model stating what the App owns do not apply to them.
+MANUAL_ONLY_ROOTS = ("RestoreRevisionInput", "UndoAiTurnInput")
+MODEL_ROOTS = tuple(name for name in MANAGEMENT_ROOTS if name not in MANUAL_ONLY_ROOTS)
 
 
 def accepted_by_both(name, payload, expected):
@@ -134,12 +140,23 @@ def test_insert_has_exactly_seven_distinct_item_shapes(kind):
 
 
 @pytest.mark.parametrize("name", MANAGEMENT_ROOTS)
-def test_all_root_keys_required_and_app_context_rejected(name):
+def test_every_root_key_is_required(name):
     payload = management_input(name)
     for key in payload:
         missing = deepcopy(payload)
         del missing[key]
         accepted_by_both(name, missing, False)
+
+
+@pytest.mark.parametrize("name", MODEL_ROOTS)
+def test_app_context_is_rejected_in_every_model_input(name):
+    """What the App owns is never something a model may state.
+
+    The manual-only commands are excluded because they are the App's own
+    entries: undoing a turn names that turn, which is what it is for, and no
+    model can ask for it at all.
+    """
+    payload = management_input(name)
     for key in ("document_id", "base_revision", "operation_id", "ai_run_id", "position"):
         accepted_by_both(name, {**payload, key: "App owns this"}, False)
 

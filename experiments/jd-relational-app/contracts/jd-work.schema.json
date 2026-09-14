@@ -32,6 +32,9 @@
     },
     "restore_revision": {
       "$ref": "#/$defs/RestoreRevisionInput"
+    },
+    "undo_ai_turn": {
+      "$ref": "#/$defs/UndoAiTurnInput"
     }
   },
   "required": [
@@ -43,7 +46,8 @@
     "move_item",
     "set_task_capability",
     "replace_selection",
-    "restore_revision"
+    "restore_revision",
+    "undo_ai_turn"
   ],
   "$defs": {
     "TaskDetailInput": {
@@ -915,6 +919,26 @@
       },
       "required": [
         "target_revision_id"
+      ]
+    },
+    "UndoAiTurnInput": {
+      "title": "UndoAiTurnInput",
+      "description": "Manual undo of one AI turn's JD changes. Never offered to the model, and never carries where to go back to: the server derives that from the turn's own committed operations.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "ai_run_id": {
+          "type": "string",
+          "description": "The AI turn whose JD changes should be taken back."
+        },
+        "expected_result_revision_id": {
+          "type": "string",
+          "description": "The revision the App showed as that turn's end; a different current head refuses the undo."
+        }
+      },
+      "required": [
+        "ai_run_id",
+        "expected_result_revision_id"
       ]
     }
   }

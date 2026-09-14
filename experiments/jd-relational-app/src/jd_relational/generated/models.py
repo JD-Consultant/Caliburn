@@ -384,6 +384,19 @@ class RestoreRevisionInput(BaseModel):
     )
 
 
+class UndoAiTurnInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ai_run_id: StrictStr = Field(
+        ..., description='The AI turn whose JD changes should be taken back.'
+    )
+    expected_result_revision_id: StrictStr = Field(
+        ...,
+        description="The revision the App showed as that turn's end; a different current head refuses the undo.",
+    )
+
+
 class WorkCommandCatalog(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -397,3 +410,4 @@ class WorkCommandCatalog(BaseModel):
     set_task_capability: SetTaskCapabilityInput
     replace_selection: ReplaceSelectionInput
     restore_revision: RestoreRevisionInput
+    undo_ai_turn: UndoAiTurnInput

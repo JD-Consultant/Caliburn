@@ -403,6 +403,49 @@ class JdStorage(JdReader):
 
     
     @staticmethod
+    def _undo_target(conn, intent, head):
+        """The JD this document had before one AI turn wrote to it.
+
+        The range is that turn's own committed operations, proven to be one
+        unbroken chain that still ends exactly where the App said it did and
+        where the document still is. A turn that wrote nothing, a chain broken
+        by somebody else's edit, or a head that has moved all refuse: taking a
+        turn back may never quietly discard what happened afterwards, and the
+        range is never guessed from timestamps or from origin alone.
+        """
+        arguments = intent.command["arguments"]
+        rows = conn.execute(sa.select(
+            db.jd_operation.c.base_revision_id, db.jd_operation.c.result_revision_id).where(
+            db.jd_operation.c.document_id == intent.document_id,
+            db.jd_operation.c.ai_run_id == arguments["ai_run_id"],
+            db.jd_operation.c.status == "committed")).mappings().all()
+        rows = [row for row in rows if row["base_revision_id"] and row["result_revision_id"]]
+        if not rows:
+            raise DomainError("target_missing", "這一輪沒有對 JD 的已保存修改可以撤回。")
+        broken = DomainError("stale_view", "這一輪的修改不連續或已不是目前版本，無法整輪撤回。")
+        links = {row["base_revision_id"]: row["result_revision_id"] for row in rows}
+        results = set(links.values())
+        starts = [base for base in links if base not in results]
+        if len(links) != len(rows) or len(starts) != 1:
+            raise broken
+        chain, node = [], starts[0]
+        while node in links:
+            node = links[node]
+            chain.append(node)
+        try:
+            expected = UUID(arguments["expected_result_revision_id"])
+        except (TypeError, ValueError):
+            raise DomainError("invalid_input", "撤回目標不是一個版本識別。") from None
+        if len(chain) != len(rows) or chain[-1] != expected or head["current_revision_id"] != expected:
+            raise broken
+        stored = conn.execute(sa.select(db.jd_revision.c.snapshot).where(
+            db.jd_revision.c.document_id == intent.document_id,
+            db.jd_revision.c.revision_id == starts[0])).scalar_one_or_none()
+        if stored is None:
+            raise DomainError("target_missing", "這一輪之前的版本已無法取得。")
+        return stored
+
+    @staticmethod
     def _restore_target(conn, intent):
         """This document's own saved revision, read from its immutable history.
 
@@ -433,8 +476,13 @@ class JdStorage(JdReader):
         current = self._verified_current(conn, document, head)
         savepoint = conn.begin_nested()
         try:
+            kind = intent.identity.command_kind
+            # Restoring and undoing differ only in how the target revision is
+            # proven; both then rebuild through the one restore service.
             candidate = (prepare_restore(current.domain, self._restore_target(conn, intent))
-                         if intent.identity.command_kind in MANUAL_MODELS
+                         if kind == "restore_revision"
+                         else prepare_restore(current.domain, self._undo_target(conn, intent, head))
+                         if kind == "undo_ai_turn"
                          else prepare_edit(current.domain, intent.command, intent.context,
                                            request_id=intent.operation_id))
             wanted = snapshot_from_domain(candidate)

@@ -135,7 +135,8 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     {changeKey && <RunChangesPanel selection={selectedRunChange} loading={!matchingLoad || !!runLoad?.loading}
       error={matchingLoad ? runLoad?.error ?? null : null} currentRevisionRef={snapshot.view?.revisionRef ?? null}
       onRetry={() => setRetryChanges(value => value + 1)} />}
-    {history && <HistoryPanel api={api} documentId={document.document_id} revisionRef={snapshot.view?.revisionRef ?? null} selectedChange={selectedChange} />}
+    {history && <HistoryPanel api={api} documentId={document.document_id} revisionRef={snapshot.view?.revisionRef ?? null} selectedChange={selectedChange}
+      onRestored={() => void session.current?.refreshStatus()} />}
     {snapshot.loading ? <CircularProgress aria-label="讀取職務說明書" /> : snapshot.view && <JdEditor view={snapshot.view}
       disabled={document.archived || snapshot.readOnly} commandsDisabled={snapshot.submitting || !!Object.keys(snapshot.row?.fields ?? {}).length}
       values={snapshot.values} markers={markers} onShowChange={showRunChange} onField={(field, text) => session.current?.edit(field, text)}

@@ -260,3 +260,29 @@ test('safe manual and configured dataset Problems preserve their generated error
     await assert.rejects(api.save(DOC, request), (error: unknown) => error instanceof ApiError && error.code === code);
   }
 });
+
+const preview = (overrides: object = {}) => ({ format_version: 2, view: 'restore_preview', access: 'current',
+  base_revision_ref: 'head-now', target_revision_ref: 'older',
+  records: [{ type: 'change', change_index: 0, kind: 'delete', entity_kind: 'duty', before_exists: true, after_exists: false, changed_fields: [] }],
+  start_index: 0, total_records: 1, total_changes: 1, has_more: false, next_cursor: null, oversized_unit: false, ...overrides });
+
+test('a restore preview reads only, and says which head it compared against', async () => {
+  const { api, calls } = client(json(preview()));
+  const page = await api.restorePreview(DOC, 'older');
+  assert.equal(page.view, 'restore_preview');
+  assert.equal(page.base_revision_ref, 'head-now');
+  assert.equal(page.total_changes, 1);
+  assert.equal(calls.length, 1);
+  assert.match(calls[0].url, /\/jd\/restore\/preview$/);
+  assert.deepEqual(JSON.parse(String(calls[0].init.body)), { target_revision_ref: 'older', cursor: null });
+});
+
+test('a preview page that answers about another revision is refused', async () => {
+  const { api } = client(json(preview({ target_revision_ref: 'someone-else' })));
+  await assert.rejects(() => api.restorePreview(DOC, 'older'), (error: ApiError) => error.code === 'invalid_response');
+});
+
+test('a preview whose declared total does not match what arrived is refused', async () => {
+  const { api } = client(json(preview({ total_records: 2 })));
+  await assert.rejects(() => api.restorePreview(DOC, 'older'), (error: ApiError) => error.code === 'invalid_response');
+});

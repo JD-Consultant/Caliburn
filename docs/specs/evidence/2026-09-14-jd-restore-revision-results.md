@@ -193,3 +193,41 @@ OI-06 是「已承諾未接線」：可以直接更正、可以看歷史，但**
 2. 設計 §4.2 要求「還原確認期間停手改與新 AI 回合」——目前**沒有**這個保留機制；靠的是保存時的 `stale_view` 拒絕，這能防止覆蓋，但不會在確認前先擋住。
 3. 回執仍只記 `command_kind`（見 §10.3）。
 4. 沒有真瀏覽器驗收。
+
+---
+
+# Web 畫面：員工按得到的還原
+
+## 17. 按鈕在歷史裡，流程是「先看再確認」
+
+「改動與歷史」面板每一版多一個「還原到第 N 版」。按下去**不會寫入**：先取預覽，逐項列出會回復與移除的內容，並明說「以這份歷史內容取代目前 JD；之後的內容仍可在歷史找到。這只會改 JD，不會動到訪談、工作理解或案例。」內容完全相同時直接說「不會產生新版本」。
+
+確認時把**預覽當下的 head** 當作 `base_revision_ref` 送回；head 若已移動，保存端以 `stale_view` 拒絕，畫面顯示原因而不覆蓋。取消只關閉預覽，沒有任何寫入。
+
+差異由既有的 `ChangeDetails` 呈現，用的是伺服器投影的記錄——**Web 不計算業務差異**。
+
+## 18. 撤回按鈕還沒有位置
+
+`RevisionRecord` 沒有 `ai_run_id`，所以歷史面板無法提供「撤回這一輪」。撤回天生屬於**當輪改動**面板（那裡才知道 run id）。要把它接上需要 run 改動頁帶出該輪的終點版本引用——**本輪沒有做，也沒有為它改契約**。
+
+## 19. 反例與實測
+
+| 案例 | 釘住的事 |
+|---|---|
+| `a restore preview reads only, and says which head it compared against` | 只打預覽路由、body 是 `{target_revision_ref, cursor}`、回傳指名比較時的 head |
+| `a preview page that answers about another revision is refused` | 回覆換了目標版本就是 `invalid_response` |
+| `a preview whose declared total does not match what arrived is refused` | 宣告筆數與實到不符即拒絕 |
+
+| 範圍 | 結果 |
+|---|---|
+| `npm test`（Web） | **296 passed** |
+| `tsc --noEmit` | **通過** |
+| `npm run build` | **通過** |
+
+## 20. 仍未完成
+
+1. **撤回沒有 Web 入口**（見 §18）。
+2. **沒有真瀏覽器驗收。**型別檢查、單元測試與 build 通過都不等於真的在瀏覽器按過；計畫第 5 項的代表性真瀏覽器旅程**尚未執行**。
+3. 設計 §4.2 的「確認期間停手改與新 AI 回合」仍未實作；目前靠保存時拒絕。
+4. 回執仍只記 `command_kind`。
+5. **OI-06 仍未關閉。**

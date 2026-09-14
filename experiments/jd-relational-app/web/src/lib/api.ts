@@ -8,7 +8,7 @@ import querySchema from '../../../contracts/jd-query-http.schema.json' with { ty
 import manualSchema from '../../../contracts/jd-manual-http.schema.json' with { type: 'json' };
 import catalogSchema from '../../../contracts/jd-catalog-http.schema.json' with { type: 'json' };
 import chatSchema from '../../../contracts/jd-chat-http.schema.json' with { type: 'json' };
-import type { ReadInput, ReadPage, ChangeReadPage } from '../../../src/jd_relational/generated/jd-read';
+import type { ReadInput, ReadPage, ChangeReadPage, RestorePreviewPage } from '../../../src/jd_relational/generated/jd-read';
 import type { ManualSaveInput, ManualOperationState, ManualDocumentState } from '../../../src/jd_relational/generated/jd-manual-http';
 import type { MutationResult } from '../../../src/jd_relational/generated/jd-result';
 import type { CatalogPage, CatalogCreateInput, CatalogCreationResult, CatalogCreationLookup, CatalogDocument, CatalogMetadataInput } from '../../../src/jd_relational/generated/jd-catalog-http';
@@ -349,6 +349,30 @@ export class JdApi {
     if (group + 1 !== all.total_changes) invalid();
     return { ...all, has_more: false, next_cursor: null };
   }
+  async restorePreview(id: string, targetRevisionRef: string): Promise<RestorePreviewPage> {
+    // Reading only. Framing is checked exactly as a saved change is; the
+    // business difference itself is never recomputed here.
+    let all: RestorePreviewPage | null = null, cursor: string | null = null;
+    const seen = new Set<string>();
+    do {
+      const page: RestorePreviewPage = decode('read', 'RestorePreviewPage',
+        (await this.request(`/api/documents/${encodeURIComponent(id)}/jd/restore/preview`,
+          { target_revision_ref: targetRevisionRef, cursor })).value);
+      if (page.target_revision_ref !== targetRevisionRef || page.has_more !== (page.next_cursor !== null)
+          || page.has_more && page.records.length === 0 || page.oversized_unit && page.records.length !== 1
+          || (all && (page.base_revision_ref !== all.base_revision_ref || page.start_index !== all.records.length
+            || page.total_records !== all.total_records || page.total_changes !== all.total_changes))) invalid();
+      if (!all && page.start_index !== 0) invalid();
+      all ??= { ...page, records: [] };
+      all.records.push(...page.records); cursor = page.next_cursor;
+      if (all.records.length > all.total_records || page.has_more !== (all.records.length < all.total_records)) invalid();
+      if (cursor && seen.has(cursor)) throw new ApiError('invalid_response');
+      if (cursor) seen.add(cursor);
+    } while (cursor);
+    if (all.total_records !== all.records.length) throw new ApiError('invalid_response');
+    return { ...all, has_more: false, next_cursor: null };
+  }
+
   async changes(id: string, changeRef: string): Promise<ChangeReadPage> {
     let all: ChangeReadPage | null = null, cursor: string | null = null;
     const seen = new Set<string>();

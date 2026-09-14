@@ -2,10 +2,12 @@
 
 from caliburn_memory.consolidation import ConsolidationWorkflow
 from caliburn_memory.extraction import INSTRUCTIONS, ExtractionOutput, ExtractionWorkflow
+from caliburn_memory.guidance import MEMORY_ACTION_GUIDANCE
 from caliburn_memory.memory import ExtractionFiles, MemoryArtifacts, MemoryVersion, ReadOnlyFiles
 from caliburn_memory.publication import (
     PublicationStore, PublicationUncertain, PublishedHead, PublishRequest, Receipt, StalePublication,
 )
+from caliburn_memory.skills import SkillAssets, analysis_files, analysis_skills
 from caliburn_memory.sources import ExtractionSourceReader, SourceReader
 
 __all__ = [
@@ -13,5 +15,6 @@ __all__ = [
     "PublicationStore", "PublicationUncertain", "PublishedHead", "PublishRequest",
     "Receipt", "StalePublication", "SourceReader",
     "INSTRUCTIONS", "ExtractionOutput", "ExtractionSourceReader", "ExtractionWorkflow",
-    "ConsolidationWorkflow",
+    "ConsolidationWorkflow", "MEMORY_ACTION_GUIDANCE",
+    "SkillAssets", "analysis_files", "analysis_skills",
 ]

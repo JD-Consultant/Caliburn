@@ -1,0 +1,12 @@
+{
+  "pid": 85828,
+  "parent_pid": 51392,
+  "status": "ready",
+  "api_origin": "http://127.0.0.1:8771",
+  "ui_origin": "http://127.0.0.1:3002",
+  "dataset_id": "1feaebf3-95fe-49ad-9322-35dd8d4566da",
+  "installation_id": "8f04a566-b884-4b89-9684-44694c81cf0d",
+  "database": "caliburn_jd_setup_test_ded73964f2af4091b487676f8599548f",
+  "provider_enabled": false,
+  "gate_timeout": 60.0
+}

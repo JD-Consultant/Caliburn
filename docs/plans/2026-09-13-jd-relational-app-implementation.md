@@ -31,6 +31,8 @@
 
 **先前 RS-4 通知接點：**[人工通知與模型回覆保存](../specs/2026-09-13-jd-consultant-context-slice.md)已完成 LangChain／Anthropic adapter 精確相容導入、真正 wire、同版 notice 及原生 Agent／PG Saver 接合。受影響 74 PASS（13 真 PG），全組及 ACL 補跑合計 1624 非 PG 案例通過／193 PG 未全跑；codegen 與獨立審查通過，交錯串流 P2 已修。這是固定離線回覆接點，沒有完整 AI 生命周期或自然品質完成宣稱。
 
+**最新真瀏覽器驗收：**[還原與整輪撤回](../specs/evidence/2026-09-14-jd-restore-and-undo-browser-results.md)在真 Chrome、真 Next production build、原生 Windows 宿主與各自新建的真 PG 上跑完兩條旅程：建立→打字→自動保存→歷史→「還原到第 2 版」→逐項比較→「確認還原」；以及一次真訪談讓 AI 寫入後「撤回這輪 JD 改動」→「確認撤回」。獨立唯讀連線核對各新增一版、被取代版本仍可讀、conversation checkpoint 未減少；還原旅程零模型請求，撤回旅程 3 次請求全走既有離線傳輸、零付費。本次未改任何產品程式，只新增 CDP 測試 helper 與實證腳本。首敗（點擊落到位移後的元素）與未驗範圍見結果稿，**不代表完整成品驗收通過**。
+
 **本次追加驗收：**[回覆遺失與重開查回](../specs/2026-09-13-jd-browser-reply-loss-slice.md)完成真瀏覽器／原生宿主／PG端到端：真提交但回覆未到，重開以原operation GET查回，1POST／1GET／1execute，head2、任務及digest一致。對話框關閉誤落封存分支已修；新build／TS、Web99及helper23通過，獨立審查PASS。此處承接下方先前UI成果，不重跑或重算其全組數字。
 
 **最新實作進度：**[六章手動管理與恢復切片](../specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)完成 Read v2 穩定 UI 身分、React／Next／MUI 管理畫面、原操作與輸入世代恢復、同頁歷史；真瀏覽器完成多成果／要求、共用知識引用、未完成表單重開、任務移動、刪職責保留任務、封存恢復及續改。Python 全組1540 PASS／180 PG SKIP，Web 99 PASS、生成／TS／build PASS；受影響真 PG 與最終 DB head11 唯讀核對通過。独立審查提出的缺口已修，首敗／層級／未驗範圍以結果稿為準；不是完整 RS-3／AI 成品通過。[配置](../specs/2026-09-13-jd-managed-configuration-slice.md)及[文件目錄](../specs/2026-09-13-jd-catalog-http-slice.md)保留原成果。

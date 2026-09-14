@@ -1,0 +1,95 @@
+{
+  "format": 1,
+  "journey": "undo_ai_turn",
+  "ran_at_utc": "2026-09-14T07:23:23.338946+00:00",
+  "ui_origin": "http://127.0.0.1:3002",
+  "provider_network": false,
+  "model_transport": "httpx2.MockTransport",
+  "paid_model_calls": 0,
+  "title": "整輪撤回驗收",
+  "steps": [
+    {
+      "step": 0,
+      "name": "opened",
+      "screenshot": "00-opened.png",
+      "status_chip": null
+    },
+    {
+      "step": 1,
+      "name": "created",
+      "screenshot": "01-created.png",
+      "status_chip": "已保存",
+      "title": "整輪撤回驗收",
+      "duties_before": []
+    },
+    {
+      "step": 2,
+      "name": "ai-turn-done",
+      "screenshot": "02-ai-turn-done.png",
+      "status_chip": "已保存",
+      "duties_after": [
+        "合成設備检查",
+        "收到通知後檢查約定設備。",
+        "檢查記錄",
+        "異常交接",
+        "先確認隔離再檢查"
+      ],
+      "edit_calls": 0
+    },
+    {
+      "step": 3,
+      "name": "undo-offered",
+      "screenshot": "03-undo-offered.png",
+      "status_chip": "已保存",
+      "run_change_summary": "本輪 JD 改動\n\n以下是這輪已確認範圍的修改前後；查看不會更動 JD。\n\n這次比較涵蓋 1 次已保存修改。\n\n新增 · 任務：合成設備检查\n\n所屬分類、說明、名稱、順序\n\n查看完整修改前後\n\n新增 · 要求：先確認隔離再檢查\n\n所屬分類、類型、順序、內容\n\n查看完整修改前後\n\n新增 · 成果：檢查記錄\n\n所屬分類、類型、順序、內容\n\n查看完整修改前後\n\n新增 · 成果：異常交接\n\n所屬分類、類型、順序、內容\n\n查看完整修改前後\n撤回這輪 JD 改動"
+    },
+    {
+      "step": 4,
+      "name": "undo-explained",
+      "screenshot": "04-undo-explained.png",
+      "status_chip": "已保存",
+      "notice": "一次取回這輪對 JD 的全部改動，不是只取消最後一項。這只會改 JD：這輪的對話、工作理解與案例都會保留，歷史也保留這輪的紀錄。",
+      "duties_still_there": [
+        "合成設備检查",
+        "收到通知後檢查約定設備。",
+        "檢查記錄",
+        "異常交接",
+        "先確認隔離再檢查"
+      ]
+    },
+    {
+      "step": 5,
+      "name": "undone",
+      "screenshot": "05-undone.png",
+      "status_chip": "已保存",
+      "duties_after_undo": [],
+      "undo_call": [
+        {
+          "url": "http://127.0.0.1:8771/api/documents/604e9765-d7f2-4920-a3e1-2d56b8bcbbea/jd/edits",
+          "method": "POST",
+          "body": null,
+          "status": 200,
+          "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj0tuhDAQRO_SayzZxmDgMsif"
+        }
+      ]
+    },
+    {
+      "step": 6,
+      "name": "conversation-kept",
+      "screenshot": "06-conversation-kept.png",
+      "status_chip": "已保存",
+      "reply_still_shown": true,
+      "own_words_still_shown": true,
+      "turn_change_record_still_listed": true
+    }
+  ],
+  "edit_calls": [
+    {
+      "url": "http://127.0.0.1:8771/api/documents/604e9765-d7f2-4920-a3e1-2d56b8bcbbea/jd/edits",
+      "method": "POST",
+      "body": null,
+      "status": 200,
+      "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj0tuhDAQRO_SayzZxmDgMsifcmLFAyNjkEajuXtMmGSRTS9KXf1eP8mbYjaUOXqaqJWtG-womGiHgSmnODPQjgntuFESXd9xaiis-WbKfCBvcV1oEg1lBGQsDjQ9yX3G5OevuNSby55SQ351-w3LG9NzhVH3HfM6SKZGWTEtBJO-6-1gnbUwFVP3Y3m8zSrbBQ2meF-H5JyNo5bMBATjpfAI7WkWkf6glwCtd2RTTtGG7nu-rxvO1G7Ix2-eccTzlx_Y1c5rwr_2YdKO2ccPbOVae72-AXSOZvY.DSdlKMf4fKrM"
+    }
+  ]
+}

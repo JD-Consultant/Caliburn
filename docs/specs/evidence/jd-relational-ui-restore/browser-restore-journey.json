@@ -1,0 +1,115 @@
+{
+  "format": 1,
+  "journey": "restore_revision",
+  "ran_at_utc": "2026-09-14T07:21:14.692191+00:00",
+  "ui_origin": "http://127.0.0.1:3002",
+  "provider_calls": 0,
+  "chat_enabled": false,
+  "title": "還原與撤回驗收",
+  "steps": [
+    {
+      "step": 0,
+      "name": "opened",
+      "screenshot": "00-opened.png",
+      "status_chip": null
+    },
+    {
+      "step": 1,
+      "name": "created",
+      "screenshot": "01-created.png",
+      "status_chip": "已保存",
+      "title": "還原與撤回驗收"
+    },
+    {
+      "step": 2,
+      "name": "saved-job-title",
+      "screenshot": "02-saved-job-title.png",
+      "status_chip": "已保存",
+      "job_title": "資深設備維運工程師"
+    },
+    {
+      "step": 3,
+      "name": "saved-purpose",
+      "screenshot": "03-saved-purpose.png",
+      "status_chip": "已保存",
+      "job_title": "資深設備維運工程師",
+      "purpose": "維持產線設備可用，讓生產排程不因設備停機而延誤。"
+    },
+    {
+      "step": 4,
+      "name": "history-open",
+      "screenshot": "04-history-open.png",
+      "status_chip": "已保存",
+      "restore_buttons": [
+        "還原到第 3 版",
+        "還原到第 2 版",
+        "還原到第 1 版"
+      ]
+    },
+    {
+      "step": 5,
+      "name": "restore-preview",
+      "screenshot": "05-restore-preview.png",
+      "status_chip": "已保存",
+      "preview_text": "會有 1 處變動；以下逐項列出將回復與移除的內容。",
+      "preview_shows_removed_purpose": true,
+      "jd_unchanged_by_preview": "維持產線設備可用，讓生產排程不因設備停機而延誤。",
+      "edit_calls_so_far": 2
+    },
+    {
+      "step": 6,
+      "name": "restored",
+      "screenshot": "06-restored.png",
+      "status_chip": "已保存",
+      "job_title": "資深設備維運工程師",
+      "purpose": "",
+      "restore_call": [
+        {
+          "url": "http://127.0.0.1:8771/api/documents/78daf1e9-2cb3-4f5c-ad60-5776262dd86e/jd/edits",
+          "method": "POST",
+          "body": null,
+          "status": 200,
+          "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj0FuhDAMRe_iNZYgkAS4DDKx"
+        }
+      ]
+    },
+    {
+      "step": 7,
+      "name": "history-after-restore",
+      "screenshot": "07-history-after-restore.png",
+      "status_chip": "已保存",
+      "restore_buttons": [
+        "還原到第 4 版",
+        "還原到第 3 版",
+        "還原到第 2 版",
+        "還原到第 1 版"
+      ],
+      "conversation_panel_present": true
+    }
+  ],
+  "final_job_title": "資深設備維運工程師",
+  "final_purpose": "",
+  "edit_calls": [
+    {
+      "url": "http://127.0.0.1:8771/api/documents/78daf1e9-2cb3-4f5c-ad60-5776262dd86e/jd/edits",
+      "method": "POST",
+      "body": null,
+      "status": 200,
+      "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj9FuhCAQRf-FZydBEFj8GTMyQ0vKygbRpNnsv1dr24e-3pw7585TEDZcuU2JxCj6yMhz1OBNZBg8EnitFGhDdKPBWEsoOhFLvWObdq5rKosY-05Ujlx5CSzGpwjvKdP0kZbj5rLl3AkqYbvz8qNxN8LYswcVZg1DNAGQrATjnFVWHS7Lh-bgU_u8Kl4erNMOFMoIg0IDs5YKvNNSs9OBJZ3LEuc_6TVAlAdXbOfQTjy2-igrn-m8ct1_88p7On_5ll3tWjL_a--YN54ovfHaLuz1-gKOfmdn.QMojgiP4H4G-jTS"
+    },
+    {
+      "url": "http://127.0.0.1:8771/api/documents/78daf1e9-2cb3-4f5c-ad60-5776262dd86e/jd/edits",
+      "method": "POST",
+      "body": null,
+      "status": 200,
+      "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj0tuhDAQRO_SayyBf3wug2x3d2LFg5ExSNFo7h4ISRbZlqr6vX4Cuuo2qnNEmKBjcuRZidEwCT06FKOSUiiDOKA21qKDBjiXh6vzQWWLeYGpa6AQU6ElEExPCO8x4fwRl_PmsqfUAOawP2j5wfQDOu5oFDJ4JTSbIBzaVpi-t9LKk2XpxJz9WD_vie9b1fLgTymlhVbSCOc7Iziw7w15q4kvs0jpD3oLQF6puHqJNrDuZc0bXanfqBy_eaEjXr98w-51yYn-rQ-XdpoxvtFW79rr9QXcqWgJ.o5uGk7uhjVlPFh5"
+    },
+    {
+      "url": "http://127.0.0.1:8771/api/documents/78daf1e9-2cb3-4f5c-ad60-5776262dd86e/jd/edits",
+      "method": "POST",
+      "body": null,
+      "status": 200,
+      "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj0FuhDAMRe_iNZYgkAS4DDKx00bNEBQCUjWauxdK20W3X__5fT-BqdAmZQoMIzReSGbf4qC9YDcQ49Aqha1m7rnTxjBBBT7lB5XpkLyFtMDYVJDFS5bFCYxPcO8h8vQRlvPmssdYASe3P2T50dieyTcyoHJzi53XDolNjdpao4w6XUZOzdkP5fNGnNFWtX2PZJsGu44N9rMolEHq2Sqlaltfy4LEP-k9ANIqmco1tIJ1z2va5ErnTfLxm2c5wvXLt-ymc4ryjz4o7jJxeJOt3LXX6wtos2cZ.v1TBmJj1PQF8Mz6"
+    }
+  ]
+}

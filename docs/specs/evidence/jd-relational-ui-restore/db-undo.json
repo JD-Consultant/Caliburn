@@ -1,0 +1,41 @@
+{
+  "stage": "undo",
+  "checked_at_utc": "2026-09-14T07:23:29.725315+00:00",
+  "database": "caliburn_jd_setup_test_cdf2665358474c909700b8039e9f44d4",
+  "port": 55436,
+  "mode": "REPEATABLE READ / READ ONLY",
+  "provider_calls": 0,
+  "database_writes": 0,
+  "document_id": "604e9765-d7f2-4920-a3e1-2d56b8bcbbea",
+  "title": "整輪撤回驗收",
+  "archived": false,
+  "head_revision_number": 3,
+  "revision_count": 3,
+  "operation_count": 2,
+  "revision_origins": [
+    "initial",
+    "ai",
+    "manual"
+  ],
+  "operation_kinds": [
+    "jd_create_task",
+    "undo_ai_turn"
+  ],
+  "operation_statuses": [
+    "committed",
+    "committed"
+  ],
+  "content_digest": "bbec73fa507005c980aa13650e38d5948004cd9baf21ecc18d3a74364f58b3bb",
+  "current_equals_head_snapshot": true,
+  "job_title": null,
+  "purpose": null,
+  "task_count": 0,
+  "duty_count": 0,
+  "ai_run_id": "7ec2af16-1b7e-4c0d-b5ad-411723093ae6",
+  "ai_operation_count": 1,
+  "undo_reproduces_state_before_the_turn": true,
+  "undo_added_a_new_revision": true,
+  "conversation_checkpoints": 19,
+  "conversation_writes": 51,
+  "memory_store_rows": 0
+}

@@ -1,0 +1,17 @@
+{
+  "checked": "tasklist /FO CSV python.exe",
+  "serve_pids": {
+    "cdf2665358474c909700b8039e9f44d4": 77212,
+    "ded73964f2af4091b487676f8599548f": 85828,
+    "ba41eb18a0ae40e49eba8013b613ecca": 22372,
+    "7a494be0f3254ec3b9c595b987f4453e": 101068,
+    "259524f7b4924eac9f7531b8f24204a4": 83552
+  },
+  "still_running": {
+    "cdf2665358474c909700b8039e9f44d4": false,
+    "ded73964f2af4091b487676f8599548f": false,
+    "ba41eb18a0ae40e49eba8013b613ecca": false,
+    "7a494be0f3254ec3b9c595b987f4453e": false,
+    "259524f7b4924eac9f7531b8f24204a4": false
+  }
+}

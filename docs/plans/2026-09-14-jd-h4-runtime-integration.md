@@ -8,7 +8,7 @@
 |---|---|
 | 程式 | `S:/caliburn`；`refactor/current-only-architecture`；**R1 完成於 tag `jd-h4-r1-postgres-batch-20260914`**（原基準 `f160be97` 是 R1 之前）。先核實 HEAD 是否被後續合法提交推進，保留其他 dirty |
 | 已完成 | 關聯式 JD 管理／共同保存、前景聊天固定接合、C 即時 Memory 修補與恢復、source port、B1 核心與 OpenAI 固定 adapter。**R1 亦已完成**：固定 target→有界批次、一批 B1 的真 PG 保存與資源重建續作（[批次接點](../specs/evidence/jd-b1-adoption/fixed-target-batch-results.md)、[R1 結果](../specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。不可重做 CA-01／02、window parser、pair proof、B1 prompt 或 R1 |
-| 本段待做 | **下一是 R2**：B2 採用及發布／C 競爭；再 R3 的純通知完整接合、背景准入、設定、排空與新程序恢復、A 分析 Skills 與 JD 指引接合 |
+| 本段待做 | **R2 已完成**（tag `jd-h4-r2-consolidation-20260914`）。**R3 進行中**：純通知辨識、准入表與 dispatch、宿主有限 worker 與排空已完成；[顧問指引、三項分析 Skills、Memory 行動指引與背景可用性](../specs/2026-09-14-jd-consultant-guidance-and-skills-slice.md)已完成（tag `jd-consultant-guidance-skills-20260914`）。**剩下 R3 第 7 項**：真新 Windows 程序＋真 PG 的四個停點續作；以及把 `build_consultant()` 接進日常入口 |
 | 此刻禁止宣稱 | 日常自然訪談可用、H4 完成、**B1 已有新 Windows 程序證據**。既有 C／source 的 14 PG 案例不算 B1 PG；R1 的真 PG 證據只涵蓋同程序內的資源重建 |
 | 真模型 | 工程全程合成 HTTP、假 key、0 provider；API key 設定接線不等於獲准呼叫。自然驗收及正式採用沿 H5 |
 

@@ -240,3 +240,22 @@ B1／B2 的節點、`files` 與模型預算仍由原 Saver 負責，**不複製�
 1. `AiRuntime` 現在會喚醒，但**日常組裝尚未把 `BackgroundDispatcher` 傳進去**——`managed_app`／`configured_host` 的接線還沒做，所以產品路徑上仍然沒有背景執行。
 2. **真新 Windows 程序取回原 B 工作仍未做**（計畫 R3 第 7 點的四個停點）。
 3. 顧問指引、Skills、`BackgroundAvailability` 與 JD 編輯器共用 writer 仍未做。
+
+## 新 Windows 程序續作（2026-09-14）
+
+**關掉程式再打開，背景工作還是原來那一份。**H4 計畫 R3 第 7 項的四個停點，每一個都由**兩個真的 Windows 程序**完成：第一個把持久狀態做到該停點就結束，第二個冷啟動、只憑 PostgreSQL 找回同一份工作並收尾。中間沒有交接任何 Python 物件、連線或 checkpoint。
+
+[探針](../../../../experiments/jd-relational-app/tests/support/background_recovery_probe.py)重用既有真 PG 測試的資源組裝（`opened_b2`／`stages`／`FaultyStore`），只換 OpenAI 的 HTTP 傳輸；零 provider、零付費。[四次執行紀錄](new-process-recovery/runs.json)、[執行腳本](new-process-recovery/run_recovery.py)。
+
+| 停點 | 第一個程序留下的狀態 | 第二個程序的決定與花費 |
+|---|---|---|
+| B1 模型結果已保存 | B1 pending，已呼叫模型 1 次，未發布 | `resume_extraction` → **0 次模型請求**（已保存的結果不再買一次），再 `consolidate` 才付 B2 的費用 |
+| B1 完成／B2 未開始 | B1 完成，未發布 | `consolidate` 一次，完成交接並發布 |
+| B2 未發布 | B2 pending，已試過模型 | `resume_consolidation` → **0 次模型請求**，已保存的嘗試不重新整併 |
+| B2 已發布、回覆遺失 | head revision 1 已提交，呼叫端收到例外 | 冷啟動就讀到 revision 1；`resume_consolidation` → **0 次模型請求**，不重新發布 |
+
+四個停點共同成立：目標仍是原來那一個（沒有換新 target）、發布只有 **revision 1**（沒有重複發布）、准入列的批次已交接清空、`recovery_count` 不因重開而被花掉。
+
+[固定測試](../../../../experiments/jd-relational-app/tests/test_background_new_process_postgres.py) 4 項通過（47 秒，真 PG、真新程序）。變異驗證：拿掉「B1 有 pending 就先續作」→ 保存模型結果那一項失敗（新程序改去 consolidate，B1 未完成）；拿掉「B2 有 pending 就先續作」→ B2 未發布與回覆遺失兩項失敗。兩次變異後都以 `git hash-object` 確認還原。
+
+**限制：**停點是明示注入的故障，不是真的斷電或 OS 崩潰；探針用共享測試資料庫的新文件 id 隔離，不是每次新建資料庫；訪談原話與 JD 在這四個情境都沒有被背景直接寫入，但這裡沒有驗宿主 worker 的排空（見同檔前段）與日常喚醒入口。

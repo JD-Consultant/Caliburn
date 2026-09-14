@@ -1,0 +1,257 @@
+{
+  "format": 1,
+  "probe": "experiments\\jd-relational-app\\tests\\support\\background_recovery_probe.py",
+  "runs": [
+    {
+      "stop": "b1_model_saved",
+      "fixture": "jd-b-recovery-568b8412c4564dea967f36d12ba09deb",
+      "stage_exit": 0,
+      "resume_exit": 0,
+      "stage": {
+        "pid": 73712,
+        "stop": "b1_model_saved",
+        "at": "2026-09-14T07:46:13.789152+00:00",
+        "dataset_id": "087b775b-00c9-4515-ade6-b5c19a79830f",
+        "document_id": "3e411a91-1cd2-44fd-bce9-60afa5a08ff6",
+        "target_reference": "interview-window:.eJyVkM1OxDAMhN8l57WUfyf7MpUTJ1DBNlXa7h4Q707EUnGFo0fzzVjzIZh22so-zSyuQgZMiC6BlDmCdcoBcfGQXFaRMAYjq7gIbvm4leUHMsUqRVGByqzB2sqQcongJVVyJEOtfkB17ts-7DrZ6CpKiMFVsBkZCIkhUygKIyUd1Gmf-rE8S_5KtX6jfbqXvs1tEVd1Ee_0Xbu-AGnxPH9jnefkQkjgURqwbCIk1gGKDqh1rCWgGdB69LVtZQCPeeH2GFJvbZ_ya8lva5vPKVRVSSrpRojRYwBHEKREQOdTZERtSj3Z__3w-QWmLXqz.W2LyaDZ3T--wRlnqflPu2MjKyap7wptON2veCfMwE08",
+        "batch": "interview-window:.eJyNkMFOxDAMRP8l57UUJ03t7M9UTpxABdtUbZc9IP6dLLBw5Whr3ow970blkL0c06zmbCxTIgoJrM0RhoABRMsIKWSMQpG9reZktOXrpSw_kC8DokQEzOpgGKpCyiXCaKVKEMu1jh2q87YfXe7SEEMlC5FDhSGTgpAoZOGCFCU5xod82q7Ld8h_qbZd5JjeyrbPbTFnPJlX-Ypdn0Duivv4Z8vOB0GuoMj9YUUBiS4CDTkkK1GtpQ6t121te-nAbV603fpqa-2Y8nPJL2ubH1VgxWTRBkjqXS8gCHB3AApjikrkfKkP9veGMGoKzAlGsr7f4GPHHUNxTM7FWpi8-fgEr7N6xw.PvSDcMc1w9L3SdfV4GoYXclxrpckJo3WMq04hSO9Hfc",
+        "model_requests": 1,
+        "failure": "synthetic store fault",
+        "queued_answers_left": 0,
+        "admission_status": "running",
+        "admission_target": "interview-window:.eJyVkM1OxDAMhN8l57WUfyf7MpUTJ1DBNlXa7h4Q707EUnGFo0fzzVjzIZh22so-zSyuQgZMiC6BlDmCdcoBcfGQXFaRMAYjq7gIbvm4leUHMsUqRVGByqzB2sqQcongJVVyJEOtfkB17ts-7DrZ6CpKiMFVsBkZCIkhUygKIyUd1Gmf-rE8S_5KtX6jfbqXvs1tEVd1Ee_0Xbu-AGnxPH9jnefkQkjgURqwbCIk1gGKDqh1rCWgGdB69LVtZQCPeeH2GFJvbZ_ya8lva5vPKVRVSSrpRojRYwBHEKREQOdTZERtSj3Z__3w-QWmLXqz.W2LyaDZ3T--wRlnqflPu2MjKyap7wptON2veCfMwE08",
+        "admission_batch": "interview-window:.eJyNkMFOxDAMRP8l57UUJ03t7M9UTpxABdtUbZc9IP6dLLBw5Whr3ow970blkL0c06zmbCxTIgoJrM0RhoABRMsIKWSMQpG9reZktOXrpSw_kC8DokQEzOpgGKpCyiXCaKVKEMu1jh2q87YfXe7SEEMlC5FDhSGTgpAoZOGCFCU5xod82q7Ld8h_qbZd5JjeyrbPbTFnPJlX-Ypdn0Duivv4Z8vOB0GuoMj9YUUBiS4CDTkkK1GtpQ6t121te-nAbV603fpqa-2Y8nPJL2ubH1VgxWTRBkjqXS8gCHB3AApjikrkfKkP9veGMGoKzAlGsr7f4GPHHUNxTM7FWpi8-fgEr7N6xw.PvSDcMc1w9L3SdfV4GoYXclxrpckJo3WMq04hSO9Hfc",
+        "admission_recoveries": 0,
+        "b1_source_reference": "interview-window:.eJyNkMFOxDAMRP8l57UUJ03t7M9UTpxABdtUbZc9IP6dLLBw5Whr3ow970blkL0c06zmbCxTIgoJrM0RhoABRMsIKWSMQpG9reZktOXrpSw_kC8DokQEzOpgGKpCyiXCaKVKEMu1jh2q87YfXe7SEEMlC5FDhSGTgpAoZOGCFCU5xod82q7Ld8h_qbZd5JjeyrbPbTFnPJlX-Ypdn0Duivv4Z8vOB0GuoMj9YUUBiS4CDTkkK1GtpQ6t121te-nAbV603fpqa-2Y8nPJL2ubH1VgxWTRBkjqXS8gCHB3AApjikrkfKkP9veGMGoKzAlGsr7f4GPHHUNxTM7FWpi8-fgEr7N6xw.PvSDcMc1w9L3SdfV4GoYXclxrpckJo3WMq04hSO9Hfc",
+        "b1_pending": true,
+        "published_revision": null,
+        "published_source": null
+      },
+      "resume": {
+        "pid": 63104,
+        "stop": "b1_model_saved",
+        "at": "2026-09-14T07:46:19.397541+00:00",
+        "staged_by_pid": 73712,
+        "steps": [
+          "resume_extraction",
+          "consolidate"
+        ],
+        "decisions": [
+          "resume_extraction",
+          "consolidate"
+        ],
+        "model_requests_per_step": [
+          0,
+          3
+        ],
+        "model_requests_in_this_process": 3,
+        "opening": {
+          "admission_status": "running",
+          "admission_target": "interview-window:.eJyVkM1OxDAMhN8l57WUfyf7MpUTJ1DBNlXa7h4Q707EUnGFo0fzzVjzIZh22so-zSyuQgZMiC6BlDmCdcoBcfGQXFaRMAYjq7gIbvm4leUHMsUqRVGByqzB2sqQcongJVVyJEOtfkB17ts-7DrZ6CpKiMFVsBkZCIkhUygKIyUd1Gmf-rE8S_5KtX6jfbqXvs1tEVd1Ee_0Xbu-AGnxPH9jnefkQkjgURqwbCIk1gGKDqh1rCWgGdB69LVtZQCPeeH2GFJvbZ_ya8lva5vPKVRVSSrpRojRYwBHEKREQOdTZERtSj3Z__3w-QWmLXqz.W2LyaDZ3T--wRlnqflPu2MjKyap7wptON2veCfMwE08",
+          "admission_batch": "interview-window:.eJyNkMFOxDAMRP8l57UUJ03t7M9UTpxABdtUbZc9IP6dLLBw5Whr3ow970blkL0c06zmbCxTIgoJrM0RhoABRMsIKWSMQpG9reZktOXrpSw_kC8DokQEzOpgGKpCyiXCaKVKEMu1jh2q87YfXe7SEEMlC5FDhSGTgpAoZOGCFCU5xod82q7Ld8h_qbZd5JjeyrbPbTFnPJlX-Ypdn0Duivv4Z8vOB0GuoMj9YUUBiS4CDTkkK1GtpQ6t121te-nAbV603fpqa-2Y8nPJL2ubH1VgxWTRBkjqXS8gCHB3AApjikrkfKkP9veGMGoKzAlGsr7f4GPHHUNxTM7FWpi8-fgEr7N6xw.PvSDcMc1w9L3SdfV4GoYXclxrpckJo3WMq04hSO9Hfc",
+          "admission_recoveries": 0,
+          "b1_source_reference": "interview-window:.eJyNkMFOxDAMRP8l57UUJ03t7M9UTpxABdtUbZc9IP6dLLBw5Whr3ow970blkL0c06zmbCxTIgoJrM0RhoABRMsIKWSMQpG9reZktOXrpSw_kC8DokQEzOpgGKpCyiXCaKVKEMu1jh2q87YfXe7SEEMlC5FDhSGTgpAoZOGCFCU5xod82q7Ld8h_qbZd5JjeyrbPbTFnPJlX-Ypdn0Duivv4Z8vOB0GuoMj9YUUBiS4CDTkkK1GtpQ6t121te-nAbV603fpqa-2Y8nPJL2ubH1VgxWTRBkjqXS8gCHB3AApjikrkfKkP9veGMGoKzAlGsr7f4GPHHUNxTM7FWpi8-fgEr7N6xw.PvSDcMc1w9L3SdfV4GoYXclxrpckJo3WMq04hSO9Hfc",
+          "b1_pending": true,
+          "published_revision": null,
+          "published_source": null
+        },
+        "same_target_as_staged": true,
+        "published_covers_staged_batch": true,
+        "admission_status": "queued",
+        "admission_target": "interview-window:.eJyVkM1OxDAMhN8l57WUfyf7MpUTJ1DBNlXa7h4Q707EUnGFo0fzzVjzIZh22so-zSyuQgZMiC6BlDmCdcoBcfGQXFaRMAYjq7gIbvm4leUHMsUqRVGByqzB2sqQcongJVVyJEOtfkB17ts-7DrZ6CpKiMFVsBkZCIkhUygKIyUd1Gmf-rE8S_5KtX6jfbqXvs1tEVd1Ee_0Xbu-AGnxPH9jnefkQkjgURqwbCIk1gGKDqh1rCWgGdB69LVtZQCPeeH2GFJvbZ_ya8lva5vPKVRVSSrpRojRYwBHEKREQOdTZERtSj3Z__3w-QWmLXqz.W2LyaDZ3T--wRlnqflPu2MjKyap7wptON2veCfMwE08",
+        "admission_batch": null,
+        "admission_recoveries": 0,
+        "b1_source_reference": "interview-window:.eJyNkMFOxDAMRP8l57UUJ03t7M9UTpxABdtUbZc9IP6dLLBw5Whr3ow970blkL0c06zmbCxTIgoJrM0RhoABRMsIKWSMQpG9reZktOXrpSw_kC8DokQEzOpgGKpCyiXCaKVKEMu1jh2q87YfXe7SEEMlC5FDhSGTgpAoZOGCFCU5xod82q7Ld8h_qbZd5JjeyrbPbTFnPJlX-Ypdn0Duivv4Z8vOB0GuoMj9YUUBiS4CDTkkK1GtpQ6t121te-nAbV603fpqa-2Y8nPJL2ubH1VgxWTRBkjqXS8gCHB3AApjikrkfKkP9veGMGoKzAlGsr7f4GPHHUNxTM7FWpi8-fgEr7N6xw.PvSDcMc1w9L3SdfV4GoYXclxrpckJo3WMq04hSO9Hfc",
+        "b1_pending": false,
+        "published_revision": 1,
+        "published_source": "interview-window:.eJyNkMFOxDAMRP8l57UUJ03t7M9UTpxABdtUbZc9IP6dLLBw5Whr3ow970blkL0c06zmbCxTIgoJrM0RhoABRMsIKWSMQpG9reZktOXrpSw_kC8DokQEzOpgGKpCyiXCaKVKEMu1jh2q87YfXe7SEEMlC5FDhSGTgpAoZOGCFCU5xod82q7Ld8h_qbZd5JjeyrbPbTFnPJlX-Ypdn0Duivv4Z8vOB0GuoMj9YUUBiS4CDTkkK1GtpQ6t121te-nAbV603fpqa-2Y8nPJL2ubH1VgxWTRBkjqXS8gCHB3AApjikrkfKkP9veGMGoKzAlGsr7f4GPHHUNxTM7FWpi8-fgEr7N6xw.PvSDcMc1w9L3SdfV4GoYXclxrpckJo3WMq04hSO9Hfc"
+      }
+    },
+    {
+      "stop": "b1_done",
+      "fixture": "jd-b-recovery-c42551811bd84112a626f160be6e53af",
+      "stage_exit": 0,
+      "resume_exit": 0,
+      "stage": {
+        "pid": 78116,
+        "stop": "b1_done",
+        "at": "2026-09-14T07:46:25.144965+00:00",
+        "dataset_id": "d30a8f51-3dd7-4736-9ff0-f04804d13d02",
+        "document_id": "149f464b-6ece-467f-8d7f-879e470efbe5",
+        "target_reference": "interview-window:.eJyVkM1OAzEMhN8l51pyEidO-jKrbJzACrpZ7Q89IN6dlFK4wsXSWP5mRn5Xkva0lX2YRJ2VWEyhOg1WhIHYeoi1IlSkgCTaChp1UtLycSnzN6QpVvI0gi-5AHmuEOQ2OBZiLHUsrkN1Wre9nwfM2hjU4E0egaLXkEzskiNXRkTH5XE-rMd8D_kr1dZL2oe3sm5Tm9VZn9Rr-opdnjqg7vLX1giTJcvgfHDdNjOk6gzU0TgOOpJB7NByrEvbSgeu0yzt2ldra_uQn0t-Wdr084qqR9TowdwKemMFAiJDIe9T0BLJhQf7vw4fn-xQdeo.INEdYIQESNEz0RMOqOFOAOS43E2DrCQMiqlbPf24mI4",
+        "batch": "interview-window:.eJyNkE1uAyEMhe_COpYMGAy5zIjB0I7aDKP5aRZV717SNOm2G0u2_L337E8laU9b2YdJ1FmJxRSq02BFGIith1grQkUKSKKtoFEnJS0flzL_QppiJU8j-JILkOcKQW6FYyHGUsfiOlSnddv7esCsjUEN3uQRKHoNycTecuTKiOi4PNaH9ZjvJv-l2npJ-_BR1m1qszrrk3pPP7bLCySt7u2frCuRbEwWqBB1WYoQJWvQoV-UAorD1KHlWJe2lQ5cp1natY_W1vYhv5b8trTp-YqqR9TowdwCemMFAiJDIe9T0BLJhQf7zGCEyZJlcD64niEzpOoM1NE4DjqSQVRf3yKXdkk.YyGO769EFo7W28bt2LIldpAEhD0imy2zXOwSQMNdLa8",
+        "model_requests": 1,
+        "failure": null,
+        "queued_answers_left": 0,
+        "admission_status": "running",
+        "admission_target": "interview-window:.eJyVkM1OAzEMhN8l51pyEidO-jKrbJzACrpZ7Q89IN6dlFK4wsXSWP5mRn5Xkva0lX2YRJ2VWEyhOg1WhIHYeoi1IlSkgCTaChp1UtLycSnzN6QpVvI0gi-5AHmuEOQ2OBZiLHUsrkN1Wre9nwfM2hjU4E0egaLXkEzskiNXRkTH5XE-rMd8D_kr1dZL2oe3sm5Tm9VZn9Rr-opdnjqg7vLX1giTJcvgfHDdNjOk6gzU0TgOOpJB7NByrEvbSgeu0yzt2ldra_uQn0t-Wdr084qqR9TowdwKemMFAiJDIe9T0BLJhQf7vw4fn-xQdeo.INEdYIQESNEz0RMOqOFOAOS43E2DrCQMiqlbPf24mI4",
+        "admission_batch": "interview-window:.eJyNkE1uAyEMhe_COpYMGAy5zIjB0I7aDKP5aRZV717SNOm2G0u2_L337E8laU9b2YdJ1FmJxRSq02BFGIith1grQkUKSKKtoFEnJS0flzL_QppiJU8j-JILkOcKQW6FYyHGUsfiOlSnddv7esCsjUEN3uQRKHoNycTecuTKiOi4PNaH9ZjvJv-l2npJ-_BR1m1qszrrk3pPP7bLCySt7u2frCuRbEwWqBB1WYoQJWvQoV-UAorD1KHlWJe2lQ5cp1natY_W1vYhv5b8trTp-YqqR9TowdwCemMFAiJDIe9T0BLJhQf7zGCEyZJlcD64niEzpOoM1NE4DjqSQVRf3yKXdkk.YyGO769EFo7W28bt2LIldpAEhD0imy2zXOwSQMNdLa8",
+        "admission_recoveries": 0,
+        "b1_source_reference": "interview-window:.eJyNkE1uAyEMhe_COpYMGAy5zIjB0I7aDKP5aRZV717SNOm2G0u2_L337E8laU9b2YdJ1FmJxRSq02BFGIith1grQkUKSKKtoFEnJS0flzL_QppiJU8j-JILkOcKQW6FYyHGUsfiOlSnddv7esCsjUEN3uQRKHoNycTecuTKiOi4PNaH9ZjvJv-l2npJ-_BR1m1qszrrk3pPP7bLCySt7u2frCuRbEwWqBB1WYoQJWvQoV-UAorD1KHlWJe2lQ5cp1natY_W1vYhv5b8trTp-YqqR9TowdwCemMFAiJDIe9T0BLJhQf7zGCEyZJlcD64niEzpOoM1NE4DjqSQVRf3yKXdkk.YyGO769EFo7W28bt2LIldpAEhD0imy2zXOwSQMNdLa8",
+        "b1_pending": false,
+        "published_revision": null,
+        "published_source": null
+      },
+      "resume": {
+        "pid": 48956,
+        "stop": "b1_done",
+        "at": "2026-09-14T07:46:30.805779+00:00",
+        "staged_by_pid": 78116,
+        "steps": [
+          "consolidate"
+        ],
+        "decisions": [
+          "consolidate"
+        ],
+        "model_requests_per_step": [
+          3
+        ],
+        "model_requests_in_this_process": 3,
+        "opening": {
+          "admission_status": "running",
+          "admission_target": "interview-window:.eJyVkM1OAzEMhN8l51pyEidO-jKrbJzACrpZ7Q89IN6dlFK4wsXSWP5mRn5Xkva0lX2YRJ2VWEyhOg1WhIHYeoi1IlSkgCTaChp1UtLycSnzN6QpVvI0gi-5AHmuEOQ2OBZiLHUsrkN1Wre9nwfM2hjU4E0egaLXkEzskiNXRkTH5XE-rMd8D_kr1dZL2oe3sm5Tm9VZn9Rr-opdnjqg7vLX1giTJcvgfHDdNjOk6gzU0TgOOpJB7NByrEvbSgeu0yzt2ldra_uQn0t-Wdr084qqR9TowdwKemMFAiJDIe9T0BLJhQf7vw4fn-xQdeo.INEdYIQESNEz0RMOqOFOAOS43E2DrCQMiqlbPf24mI4",
+          "admission_batch": "interview-window:.eJyNkE1uAyEMhe_COpYMGAy5zIjB0I7aDKP5aRZV717SNOm2G0u2_L337E8laU9b2YdJ1FmJxRSq02BFGIith1grQkUKSKKtoFEnJS0flzL_QppiJU8j-JILkOcKQW6FYyHGUsfiOlSnddv7esCsjUEN3uQRKHoNycTecuTKiOi4PNaH9ZjvJv-l2npJ-_BR1m1qszrrk3pPP7bLCySt7u2frCuRbEwWqBB1WYoQJWvQoV-UAorD1KHlWJe2lQ5cp1natY_W1vYhv5b8trTp-YqqR9TowdwCemMFAiJDIe9T0BLJhQf7zGCEyZJlcD64niEzpOoM1NE4DjqSQVRf3yKXdkk.YyGO769EFo7W28bt2LIldpAEhD0imy2zXOwSQMNdLa8",
+          "admission_recoveries": 0,
+          "b1_source_reference": "interview-window:.eJyNkE1uAyEMhe_COpYMGAy5zIjB0I7aDKP5aRZV717SNOm2G0u2_L337E8laU9b2YdJ1FmJxRSq02BFGIith1grQkUKSKKtoFEnJS0flzL_QppiJU8j-JILkOcKQW6FYyHGUsfiOlSnddv7esCsjUEN3uQRKHoNycTecuTKiOi4PNaH9ZjvJv-l2npJ-_BR1m1qszrrk3pPP7bLCySt7u2frCuRbEwWqBB1WYoQJWvQoV-UAorD1KHlWJe2lQ5cp1natY_W1vYhv5b8trTp-YqqR9TowdwCemMFAiJDIe9T0BLJhQf7zGCEyZJlcD64niEzpOoM1NE4DjqSQVRf3yKXdkk.YyGO769EFo7W28bt2LIldpAEhD0imy2zXOwSQMNdLa8",
+          "b1_pending": false,
+          "published_revision": null,
+          "published_source": null
+        },
+        "same_target_as_staged": true,
+        "published_covers_staged_batch": true,
+        "admission_status": "queued",
+        "admission_target": "interview-window:.eJyVkM1OAzEMhN8l51pyEidO-jKrbJzACrpZ7Q89IN6dlFK4wsXSWP5mRn5Xkva0lX2YRJ2VWEyhOg1WhIHYeoi1IlSkgCTaChp1UtLycSnzN6QpVvI0gi-5AHmuEOQ2OBZiLHUsrkN1Wre9nwfM2hjU4E0egaLXkEzskiNXRkTH5XE-rMd8D_kr1dZL2oe3sm5Tm9VZn9Rr-opdnjqg7vLX1giTJcvgfHDdNjOk6gzU0TgOOpJB7NByrEvbSgeu0yzt2ldra_uQn0t-Wdr084qqR9TowdwKemMFAiJDIe9T0BLJhQf7vw4fn-xQdeo.INEdYIQESNEz0RMOqOFOAOS43E2DrCQMiqlbPf24mI4",
+        "admission_batch": null,
+        "admission_recoveries": 0,
+        "b1_source_reference": "interview-window:.eJyNkE1uAyEMhe_COpYMGAy5zIjB0I7aDKP5aRZV717SNOm2G0u2_L337E8laU9b2YdJ1FmJxRSq02BFGIith1grQkUKSKKtoFEnJS0flzL_QppiJU8j-JILkOcKQW6FYyHGUsfiOlSnddv7esCsjUEN3uQRKHoNycTecuTKiOi4PNaH9ZjvJv-l2npJ-_BR1m1qszrrk3pPP7bLCySt7u2frCuRbEwWqBB1WYoQJWvQoV-UAorD1KHlWJe2lQ5cp1natY_W1vYhv5b8trTp-YqqR9TowdwCemMFAiJDIe9T0BLJhQf7zGCEyZJlcD64niEzpOoM1NE4DjqSQVRf3yKXdkk.YyGO769EFo7W28bt2LIldpAEhD0imy2zXOwSQMNdLa8",
+        "b1_pending": false,
+        "published_revision": 1,
+        "published_source": "interview-window:.eJyNkE1uAyEMhe_COpYMGAy5zIjB0I7aDKP5aRZV717SNOm2G0u2_L337E8laU9b2YdJ1FmJxRSq02BFGIith1grQkUKSKKtoFEnJS0flzL_QppiJU8j-JILkOcKQW6FYyHGUsfiOlSnddv7esCsjUEN3uQRKHoNycTecuTKiOi4PNaH9ZjvJv-l2npJ-_BR1m1qszrrk3pPP7bLCySt7u2frCuRbEwWqBB1WYoQJWvQoV-UAorD1KHlWJe2lQ5cp1natY_W1vYhv5b8trTp-YqqR9TowdwCemMFAiJDIe9T0BLJhQf7zGCEyZJlcD64niEzpOoM1NE4DjqSQVRf3yKXdkk.YyGO769EFo7W28bt2LIldpAEhD0imy2zXOwSQMNdLa8"
+      }
+    },
+    {
+      "stop": "b2_pending",
+      "fixture": "jd-b-recovery-6e4e0612cc114260bc51f2d059b4714c",
+      "stage_exit": 0,
+      "resume_exit": 0,
+      "stage": {
+        "pid": 61184,
+        "stop": "b2_pending",
+        "at": "2026-09-14T07:46:36.744391+00:00",
+        "dataset_id": "9599a675-3a69-4275-b691-0de914ed3a1d",
+        "document_id": "6de1f754-ce70-4254-9ade-dbd41724f483",
+        "target_reference": "interview-window:.eJyVkMFOxDAMRP8l57WUNG4S789UTuxABdtUbZc9IP6dwLLiCrexNW_G8rsRPnjXY5rFnA2NRBziCJ4DAQ5d5UAOrCg5VPHsxJyMtHK96PIDBVFX44hQNNoOdUUsCpIFXRywYvIdqvO2H91uEYdEIUJ2PgNqKZB4IODKTJhQa3IP-7Rdl3vJX6m2XfiY3nTb57aYszuZV_6uXZ-AB3Mff2MTR85cK_iQBNBGBlYeoHeNNCbxWL5i1-u2tl07cJsXabe-2lo7pvKs5WVt8-MVrrpsnQ1AwUUIiA6StRHUq1KOGCXQg_3fDR-fv056sA.uhNbSZg2iUH-gDg-hNo1QPyk2TOwszM1MBkzyRjvYUE",
+        "batch": "interview-window:.eJyNkEFOxDAMRe-S9ViKGzeJ5zKVkzhQwTRV22EWiLuTAQa27L6t__xtv5sih-x6THMxZ8Mjs_gwghPPQENXyTOCLcpIWpxgMSdTWr5edPmBfFGsYSTIGmyHumIpCiUVwjBQpeg6VOdtP7rdEg2RfYCELgFpzhBlYJAqwhRJa8SHfdquy3fIf6m2XeSY3nTb57aYM57Mq3zFrk8gd8e9_BvrMQ7BkgW0qe8-KkHEVMFTUk_WcR5th9brtrZdO3Cbl9JuvbW1dkz5WfPL2ubHK7Bismg9sMfQhxBCtDaAOlVOgULx_GB_d4gSJEmt4HwsQDYIiMoA_d6Rx1gcZTQfn_aDeXk.5qrtJSdTMsbbOuxeDD-G8aa67EOaoMhbIZsjqjM2XQ8",
+        "model_requests": 4,
+        "failure": "synthetic store fault",
+        "queued_answers_left": 0,
+        "admission_status": "running",
+        "admission_target": "interview-window:.eJyVkMFOxDAMRP8l57WUNG4S789UTuxABdtUbZc9IP6dwLLiCrexNW_G8rsRPnjXY5rFnA2NRBziCJ4DAQ5d5UAOrCg5VPHsxJyMtHK96PIDBVFX44hQNNoOdUUsCpIFXRywYvIdqvO2H91uEYdEIUJ2PgNqKZB4IODKTJhQa3IP-7Rdl3vJX6m2XfiY3nTb57aYszuZV_6uXZ-AB3Mff2MTR85cK_iQBNBGBlYeoHeNNCbxWL5i1-u2tl07cJsXabe-2lo7pvKs5WVt8-MVrrpsnQ1AwUUIiA6StRHUq1KOGCXQg_3fDR-fv056sA.uhNbSZg2iUH-gDg-hNo1QPyk2TOwszM1MBkzyRjvYUE",
+        "admission_batch": "interview-window:.eJyNkEFOxDAMRe-S9ViKGzeJ5zKVkzhQwTRV22EWiLuTAQa27L6t__xtv5sih-x6THMxZ8Mjs_gwghPPQENXyTOCLcpIWpxgMSdTWr5edPmBfFGsYSTIGmyHumIpCiUVwjBQpeg6VOdtP7rdEg2RfYCELgFpzhBlYJAqwhRJa8SHfdquy3fIf6m2XeSY3nTb57aYM57Mq3zFrk8gd8e9_BvrMQ7BkgW0qe8-KkHEVMFTUk_WcR5th9brtrZdO3Cbl9JuvbW1dkz5WfPL2ubHK7Bismg9sMfQhxBCtDaAOlVOgULx_GB_d4gSJEmt4HwsQDYIiMoA_d6Rx1gcZTQfn_aDeXk.5qrtJSdTMsbbOuxeDD-G8aa67EOaoMhbIZsjqjM2XQ8",
+        "admission_recoveries": 0,
+        "b1_source_reference": "interview-window:.eJyNkEFOxDAMRe-S9ViKGzeJ5zKVkzhQwTRV22EWiLuTAQa27L6t__xtv5sih-x6THMxZ8Mjs_gwghPPQENXyTOCLcpIWpxgMSdTWr5edPmBfFGsYSTIGmyHumIpCiUVwjBQpeg6VOdtP7rdEg2RfYCELgFpzhBlYJAqwhRJa8SHfdquy3fIf6m2XeSY3nTb57aYM57Mq3zFrk8gd8e9_BvrMQ7BkgW0qe8-KkHEVMFTUk_WcR5th9brtrZdO3Cbl9JuvbW1dkz5WfPL2ubHK7Bismg9sMfQhxBCtDaAOlVOgULx_GB_d4gSJEmt4HwsQDYIiMoA_d6Rx1gcZTQfn_aDeXk.5qrtJSdTMsbbOuxeDD-G8aa67EOaoMhbIZsjqjM2XQ8",
+        "b1_pending": false,
+        "published_revision": null,
+        "published_source": null
+      },
+      "resume": {
+        "pid": 71172,
+        "stop": "b2_pending",
+        "at": "2026-09-14T07:46:42.054415+00:00",
+        "staged_by_pid": 61184,
+        "steps": [
+          "resume_consolidation"
+        ],
+        "decisions": [
+          "resume_consolidation"
+        ],
+        "model_requests_per_step": [
+          0
+        ],
+        "model_requests_in_this_process": 0,
+        "opening": {
+          "admission_status": "running",
+          "admission_target": "interview-window:.eJyVkMFOxDAMRP8l57WUNG4S789UTuxABdtUbZc9IP6dwLLiCrexNW_G8rsRPnjXY5rFnA2NRBziCJ4DAQ5d5UAOrCg5VPHsxJyMtHK96PIDBVFX44hQNNoOdUUsCpIFXRywYvIdqvO2H91uEYdEIUJ2PgNqKZB4IODKTJhQa3IP-7Rdl3vJX6m2XfiY3nTb57aYszuZV_6uXZ-AB3Mff2MTR85cK_iQBNBGBlYeoHeNNCbxWL5i1-u2tl07cJsXabe-2lo7pvKs5WVt8-MVrrpsnQ1AwUUIiA6StRHUq1KOGCXQg_3fDR-fv056sA.uhNbSZg2iUH-gDg-hNo1QPyk2TOwszM1MBkzyRjvYUE",
+          "admission_batch": "interview-window:.eJyNkEFOxDAMRe-S9ViKGzeJ5zKVkzhQwTRV22EWiLuTAQa27L6t__xtv5sih-x6THMxZ8Mjs_gwghPPQENXyTOCLcpIWpxgMSdTWr5edPmBfFGsYSTIGmyHumIpCiUVwjBQpeg6VOdtP7rdEg2RfYCELgFpzhBlYJAqwhRJa8SHfdquy3fIf6m2XeSY3nTb57aYM57Mq3zFrk8gd8e9_BvrMQ7BkgW0qe8-KkHEVMFTUk_WcR5th9brtrZdO3Cbl9JuvbW1dkz5WfPL2ubHK7Bismg9sMfQhxBCtDaAOlVOgULx_GB_d4gSJEmt4HwsQDYIiMoA_d6Rx1gcZTQfn_aDeXk.5qrtJSdTMsbbOuxeDD-G8aa67EOaoMhbIZsjqjM2XQ8",
+          "admission_recoveries": 0,
+          "b1_source_reference": "interview-window:.eJyNkEFOxDAMRe-S9ViKGzeJ5zKVkzhQwTRV22EWiLuTAQa27L6t__xtv5sih-x6THMxZ8Mjs_gwghPPQENXyTOCLcpIWpxgMSdTWr5edPmBfFGsYSTIGmyHumIpCiUVwjBQpeg6VOdtP7rdEg2RfYCELgFpzhBlYJAqwhRJa8SHfdquy3fIf6m2XeSY3nTb57aYM57Mq3zFrk8gd8e9_BvrMQ7BkgW0qe8-KkHEVMFTUk_WcR5th9brtrZdO3Cbl9JuvbW1dkz5WfPL2ubHK7Bismg9sMfQhxBCtDaAOlVOgULx_GB_d4gSJEmt4HwsQDYIiMoA_d6Rx1gcZTQfn_aDeXk.5qrtJSdTMsbbOuxeDD-G8aa67EOaoMhbIZsjqjM2XQ8",
+          "b1_pending": false,
+          "published_revision": null,
+          "published_source": null
+        },
+        "same_target_as_staged": true,
+        "published_covers_staged_batch": true,
+        "admission_status": "queued",
+        "admission_target": "interview-window:.eJyVkMFOxDAMRP8l57WUNG4S789UTuxABdtUbZc9IP6dwLLiCrexNW_G8rsRPnjXY5rFnA2NRBziCJ4DAQ5d5UAOrCg5VPHsxJyMtHK96PIDBVFX44hQNNoOdUUsCpIFXRywYvIdqvO2H91uEYdEIUJ2PgNqKZB4IODKTJhQa3IP-7Rdl3vJX6m2XfiY3nTb57aYszuZV_6uXZ-AB3Mff2MTR85cK_iQBNBGBlYeoHeNNCbxWL5i1-u2tl07cJsXabe-2lo7pvKs5WVt8-MVrrpsnQ1AwUUIiA6StRHUq1KOGCXQg_3fDR-fv056sA.uhNbSZg2iUH-gDg-hNo1QPyk2TOwszM1MBkzyRjvYUE",
+        "admission_batch": null,
+        "admission_recoveries": 0,
+        "b1_source_reference": "interview-window:.eJyNkEFOxDAMRe-S9ViKGzeJ5zKVkzhQwTRV22EWiLuTAQa27L6t__xtv5sih-x6THMxZ8Mjs_gwghPPQENXyTOCLcpIWpxgMSdTWr5edPmBfFGsYSTIGmyHumIpCiUVwjBQpeg6VOdtP7rdEg2RfYCELgFpzhBlYJAqwhRJa8SHfdquy3fIf6m2XeSY3nTb57aYM57Mq3zFrk8gd8e9_BvrMQ7BkgW0qe8-KkHEVMFTUk_WcR5th9brtrZdO3Cbl9JuvbW1dkz5WfPL2ubHK7Bismg9sMfQhxBCtDaAOlVOgULx_GB_d4gSJEmt4HwsQDYIiMoA_d6Rx1gcZTQfn_aDeXk.5qrtJSdTMsbbOuxeDD-G8aa67EOaoMhbIZsjqjM2XQ8",
+        "b1_pending": false,
+        "published_revision": 1,
+        "published_source": "interview-window:.eJyNkEFOxDAMRe-S9ViKGzeJ5zKVkzhQwTRV22EWiLuTAQa27L6t__xtv5sih-x6THMxZ8Mjs_gwghPPQENXyTOCLcpIWpxgMSdTWr5edPmBfFGsYSTIGmyHumIpCiUVwjBQpeg6VOdtP7rdEg2RfYCELgFpzhBlYJAqwhRJa8SHfdquy3fIf6m2XeSY3nTb57aYM57Mq3zFrk8gd8e9_BvrMQ7BkgW0qe8-KkHEVMFTUk_WcR5th9brtrZdO3Cbl9JuvbW1dkz5WfPL2ubHK7Bismg9sMfQhxBCtDaAOlVOgULx_GB_d4gSJEmt4HwsQDYIiMoA_d6Rx1gcZTQfn_aDeXk.5qrtJSdTMsbbOuxeDD-G8aa67EOaoMhbIZsjqjM2XQ8"
+      }
+    },
+    {
+      "stop": "b2_published_reply_lost",
+      "fixture": "jd-b-recovery-b9b08d02e1454f03be6d946c04188378",
+      "stage_exit": 0,
+      "resume_exit": 0,
+      "stage": {
+        "pid": 100360,
+        "stop": "b2_published_reply_lost",
+        "at": "2026-09-14T07:46:47.881979+00:00",
+        "dataset_id": "bda07b87-4846-4f64-b366-5b8bd844f58b",
+        "document_id": "ed9841ec-4307-4f84-98fd-5c98a9b51392",
+        "target_reference": "interview-window:.eJyVkM1OxDAMhN8l57WUpE7i7MtUTuJABdtU_WEPiHcnC1Rc4WZb83lG864K77zJPk5FXVUqrEOiAEjoAatHSIP34BKlQojVUVIXVVo-bjL_QFIioZEMOOhOVkKIVAu4HIljcmaItkN1Wre9y4vBbF1xUFMqgMFaIK4CKbNIFyNyOeXjeszfJn-l2nrjfXyTdZvarK7mol75y3Z5An7EeKy_b5mz80MhCBIcIDMCkfUgRicryYWshw4tx7q0TTpwn-bS7v20traP-Vnyy9KmswpTTdKmt6B1sODJR6A-gsHYgxrraZCT_V-Gj0-LhnvC.mkVgMIYxr2CF81h-yRqfIJQNxQwUpJOo6ATcLWBWYJM",
+        "batch": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc",
+        "model_requests": 4,
+        "failure": "synthetic reply loss after commit",
+        "queued_answers_left": 0,
+        "admission_status": "running",
+        "admission_target": "interview-window:.eJyVkM1OxDAMhN8l57WUpE7i7MtUTuJABdtU_WEPiHcnC1Rc4WZb83lG864K77zJPk5FXVUqrEOiAEjoAatHSIP34BKlQojVUVIXVVo-bjL_QFIioZEMOOhOVkKIVAu4HIljcmaItkN1Wre9y4vBbF1xUFMqgMFaIK4CKbNIFyNyOeXjeszfJn-l2nrjfXyTdZvarK7mol75y3Z5An7EeKy_b5mz80MhCBIcIDMCkfUgRicryYWshw4tx7q0TTpwn-bS7v20traP-Vnyy9KmswpTTdKmt6B1sODJR6A-gsHYgxrraZCT_V-Gj0-LhnvC.mkVgMIYxr2CF81h-yRqfIJQNxQwUpJOo6ATcLWBWYJM",
+        "admission_batch": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc",
+        "admission_recoveries": 0,
+        "b1_source_reference": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc",
+        "b1_pending": false,
+        "published_revision": 1,
+        "published_source": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc"
+      },
+      "resume": {
+        "pid": 19932,
+        "stop": "b2_published_reply_lost",
+        "at": "2026-09-14T07:46:53.202675+00:00",
+        "staged_by_pid": 100360,
+        "steps": [
+          "resume_consolidation"
+        ],
+        "decisions": [
+          "resume_consolidation"
+        ],
+        "model_requests_per_step": [
+          0
+        ],
+        "model_requests_in_this_process": 0,
+        "opening": {
+          "admission_status": "running",
+          "admission_target": "interview-window:.eJyVkM1OxDAMhN8l57WUpE7i7MtUTuJABdtU_WEPiHcnC1Rc4WZb83lG864K77zJPk5FXVUqrEOiAEjoAatHSIP34BKlQojVUVIXVVo-bjL_QFIioZEMOOhOVkKIVAu4HIljcmaItkN1Wre9y4vBbF1xUFMqgMFaIK4CKbNIFyNyOeXjeszfJn-l2nrjfXyTdZvarK7mol75y3Z5An7EeKy_b5mz80MhCBIcIDMCkfUgRicryYWshw4tx7q0TTpwn-bS7v20traP-Vnyy9KmswpTTdKmt6B1sODJR6A-gsHYgxrraZCT_V-Gj0-LhnvC.mkVgMIYxr2CF81h-yRqfIJQNxQwUpJOo6ATcLWBWYJM",
+          "admission_batch": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc",
+          "admission_recoveries": 0,
+          "b1_source_reference": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc",
+          "b1_pending": false,
+          "published_revision": 1,
+          "published_source": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc"
+        },
+        "same_target_as_staged": true,
+        "published_covers_staged_batch": true,
+        "admission_status": "queued",
+        "admission_target": "interview-window:.eJyVkM1OxDAMhN8l57WUpE7i7MtUTuJABdtU_WEPiHcnC1Rc4WZb83lG864K77zJPk5FXVUqrEOiAEjoAatHSIP34BKlQojVUVIXVVo-bjL_QFIioZEMOOhOVkKIVAu4HIljcmaItkN1Wre9y4vBbF1xUFMqgMFaIK4CKbNIFyNyOeXjeszfJn-l2nrjfXyTdZvarK7mol75y3Z5An7EeKy_b5mz80MhCBIcIDMCkfUgRicryYWshw4tx7q0TTpwn-bS7v20traP-Vnyy9KmswpTTdKmt6B1sODJR6A-gsHYgxrraZCT_V-Gj0-LhnvC.mkVgMIYxr2CF81h-yRqfIJQNxQwUpJOo6ATcLWBWYJM",
+        "admission_batch": null,
+        "admission_recoveries": 0,
+        "b1_source_reference": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc",
+        "b1_pending": false,
+        "published_revision": 1,
+        "published_source": "interview-window:.eJyNkM1OxDAMhN8l57WUHydx9mUqJ06ggm2qtsseEO9OYFm4crOt-cajeVfCB-_1mGZRZ5WFdcwUAQkDYAsI2YUAPlMWQmyesjop6eV6qcsPVCURmloAnR5kI4RETcCXRJyyNy7ZAbV5248hF4PFevHQchbAaC0Qtwq5cK1DjMjykE_bdbk_-S_Vtwsf01vd9rkv6mxO6pW_365PwEbd1z_bxuRSZg-oXfiyFWAKAq5hCcZFF6QOaL1ua9_rAG7zIv02Tlvvx1Sea3lZ-_yowjSTtRktaB0tBAoJaIxgMI2gxgZy9cH-ZmAuPjghiDWOIMwIRDZANTrbmn0s2qmPT3E7e5w.UMTWSK_bfS6TtCwUlOPPXRkpJjaHfPvktVkm8ekf2Oc"
+      }
+    }
+  ]
+}

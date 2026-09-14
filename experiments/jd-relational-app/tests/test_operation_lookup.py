@@ -124,7 +124,11 @@ def test_original_terminal_lookup_is_readonly_and_unchanged_after_new_head(engin
     later = intent_for(store, latest, "jd_set_text", {"target_field_ref": "profile.purpose", "text": "較晚手改", "basis_refs": []})
     assert store.execute(later).confirmed
     before = row_state(engine, current.document_id)
-    assert len(before) == 13
+    # Cover every table this document can own rows in, so a lookup that wrote
+    # anywhere -- including the background admission row -- is caught. Derived
+    # from the schema rather than counted by hand, so adding a table widens the
+    # comparison instead of silently escaping it.
+    assert set(before) == db.JD_TABLE_NAMES
     store.authority = ForbiddenAuthority()
     def forbidden(*args, **kwargs):
         pytest.fail("Lookup must not reconstruct content, source or command material.")

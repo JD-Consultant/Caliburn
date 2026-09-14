@@ -13,6 +13,7 @@ import ChatPanel from './ChatPanel';
 import { ChatController } from '../lib/chat-session';
 import type { ChatSnapshot } from '../lib/chat-session';
 import RunChangesPanel from './RunChangesPanel';
+import { message } from './Workspace';
 import { currentRunChanges, matchingRun, runChangeKey, visibleRunMarkers, type LoadedRunChange, type RunChangeScope } from '../lib/run-changes';
 
 const emptyChat: ChatSnapshot = { messages: [], page: null, run: null, runId: null, loading: true, busy: false, error: null, canRetry: false };
@@ -30,6 +31,8 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   const [restoreBusy, setRestoreBusy] = useState(false);
   const [runLoad, setRunLoad] = useState<(RunChangeScope & { loading: boolean; error: string | null; selection: LoadedRunChange | null }) | null>(null);
   const [retryChanges, setRetryChanges] = useState(0);
+  const [undoing, setUndoing] = useState(false);
+  const [undoError, setUndoError] = useState('');
   const datasetId = api.datasetId;
   const run = matchingRun(chat, snapshot.row?.chatSubmission?.request.run_id ?? null, { datasetId, documentId: document.document_id });
   const changeKey = runChangeKey(run);
@@ -89,6 +92,20 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     try { await session.current?.resume(restoreChoice === 'discard'); setRestoreChoice(null); }
     finally { setRestoreBusy(false); }
   };
+  const undoRun = async (runId: string, expectedResultRef: string) => {
+    // The turn's own end goes back as the base, so a document that has moved
+    // since is refused rather than having the later work quietly discarded.
+    setUndoing(true); setUndoError('');
+    try {
+      const result = await api.save(document.document_id, { operation_id: crypto.randomUUID(),
+        base_revision_ref: expectedResultRef,
+        command: { tool: 'undo_ai_turn', arguments: { ai_run_id: runId, expected_result_ref: expectedResultRef } } });
+      if (result.status === 'committed' || result.status === 'no_change') {
+        setRetryChanges(value => value + 1); await session.current?.refreshStatus();
+      } else setUndoError(result.error?.message ?? '這次撤回未套用；請重新查看目前 JD。');
+    } catch (error) { setUndoError(message(error)); }
+    finally { setUndoing(false); }
+  };
   // Only the redundant clean-archive notice is replaced by the archive explanation.
   const archiveNoticeOnly = document.archived && !snapshot.dirty && !snapshot.needsReview && !snapshot.row?.submission
     && snapshot.error === '服務目前暫停編輯，請稍後再查看；尚未保存的內容繼續保留。';
@@ -134,7 +151,9 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     </Paper>}
     {changeKey && <RunChangesPanel selection={selectedRunChange} loading={!matchingLoad || !!runLoad?.loading}
       error={matchingLoad ? runLoad?.error ?? null : null} currentRevisionRef={snapshot.view?.revisionRef ?? null}
-      onRetry={() => setRetryChanges(value => value + 1)} />}
+      onRetry={() => setRetryChanges(value => value + 1)} undoing={undoing}
+      onUndo={(runId, expectedResultRef) => void undoRun(runId, expectedResultRef)} />}
+    {undoError && <Alert severity="warning" sx={{ mb: 3 }}>{undoError}</Alert>}
     {history && <HistoryPanel api={api} documentId={document.document_id} revisionRef={snapshot.view?.revisionRef ?? null} selectedChange={selectedChange}
       onRestored={() => void session.current?.refreshStatus()} />}
     {snapshot.loading ? <CircularProgress aria-label="讀取職務說明書" /> : snapshot.view && <JdEditor view={snapshot.view}

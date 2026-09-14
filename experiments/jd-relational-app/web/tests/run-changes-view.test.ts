@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import type { ChatRunState, ChatRunChangePage } from '../../src/jd_relational/generated/jd-chat-http.ts';
 import type { ChangeReadRecord } from '../../src/jd_relational/generated/jd-read.ts';
 import { fieldKey, type JdView } from '../src/lib/view.ts';
-import { matchingRun, runChangeKey, groupChanges, projectRunMarkers, visibleRunMarkers, currentRunChanges, runChangeSummary } from '../src/lib/run-changes.ts';
+import { matchingRun, runChangeKey, groupChanges, projectRunMarkers, visibleRunMarkers, currentRunChanges, runChangeSummary, undoOffer } from '../src/lib/run-changes.ts';
 
 const api = {};
 const scope = { api, datasetId: 'dataset', documentId: 'doc', key: 'capture-key' };
@@ -133,4 +133,31 @@ test('deleted item never produces a current editor marker, even when another ite
     { type: 'value', change_index: 0, side: 'before', record: removed.field },
   ];
   assert.deepEqual(projectRunMarkers(records, before, after), { fields: {}, items: {} });
+});
+
+test('undoing a whole turn is offered only when it can be taken back as one range', () => {
+  const settled = (overrides: object = {}) => ({ format_version: 1, view: 'run_change', access: 'history',
+    dataset_id: 'dataset', document_id: 'doc', run_id: 'turn-A', capture_ref: 'capture',
+    effects_state: 'settled', continuity: 'continuous', captured_operation_count: 2,
+    base_revision_ref: 'before', result_revision_ref: 'after', records: [], start_index: 0,
+    total_records: 0, total_changes: 3, has_more: false, next_cursor: null, oversized_unit: false,
+    ...overrides }) as ChatRunChangePage;
+
+  assert.deepEqual(undoOffer(settled(), 'after'),
+    { available: true, runId: 'turn-A', expectedResultRef: 'after' });
+  // The document moved on: undoing would discard whatever came after.
+  assert.equal(undoOffer(settled(), 'later-head').available, false);
+  assert.equal(undoOffer(settled(), null).available, false);
+  // Nothing finished, nothing net, or interleaved with other edits.
+  assert.equal(undoOffer(settled({ effects_state: 'unconfirmed' }), 'after').available, false);
+  assert.equal(undoOffer(settled({ total_changes: 0 }), 'after').available, false);
+  assert.equal(undoOffer(settled({ continuity: 'none', result_revision_ref: null }), 'after').available, false);
+  assert.equal(undoOffer(settled({ continuity: 'discontinuous' }), 'after').available, false);
+  // Every refusal explains itself rather than leaving a dead button.
+  for (const page of [settled({ effects_state: 'unconfirmed' }), settled({ total_changes: 0 }),
+                      settled({ continuity: 'discontinuous' })]) {
+    const offer = undoOffer(page, 'after');
+    assert.equal(offer.available, false);
+    assert.ok(!offer.available && offer.reason.length > 0);
+  }
 });

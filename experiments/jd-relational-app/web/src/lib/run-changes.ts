@@ -77,6 +77,25 @@ export function runChangeSummary(page: ChatRunChangePage): string {
   if (page.total_changes === 0) return '這次範圍沒有淨變更，但曾有保存紀錄。';
   return '以下是這輪已確認範圍的修改前後；查看不會更動 JD。';
 }
+export type UndoOffer =
+  | { available: true; runId: string; expectedResultRef: string }
+  | { available: false; reason: string };
+
+// Undoing is offered only when this turn can be taken back as one range: it has
+// finished, its saved changes are unbroken, it really wrote something, and the
+// document is still exactly where it left it. Anything else would risk
+// discarding work done afterwards, so the reason is shown instead of a button.
+export function undoOffer(page: ChatRunChangePage, currentRevisionRef: string | null): UndoOffer {
+  if (page.effects_state !== 'settled') return { available: false, reason: '這輪還沒有全部確認，先查看結果再決定是否撤回。' };
+  if (page.continuity === 'none' || page.total_changes === 0 || !page.result_revision_ref)
+    return { available: false, reason: '這輪沒有對 JD 的淨變更，沒有可撤回的內容。' };
+  if (page.continuity !== 'continuous')
+    return { available: false, reason: '這輪改動之間夾有其他修改，無法整輪撤回；可在歷史逐次查看或直接修正目前稿。' };
+  if (currentRevisionRef === null || currentRevisionRef !== page.result_revision_ref)
+    return { available: false, reason: '這輪之後已有新的修改，整輪撤回會蓋掉後來的工作，因此不提供；可在歷史查看或直接修正目前稿。' };
+  return { available: true, runId: page.run_id, expectedResultRef: page.result_revision_ref };
+}
+
 export function projectRunMarkers(records: ChangeReadRecord[], before: JdView, after: JdView): RunMarkers {
   const markers: RunMarkers = { fields: {}, items: {} };
   const add = (map: RunMarkers['fields'], key: string, label: string, changeIndex: number) => {

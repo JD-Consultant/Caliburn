@@ -150,3 +150,56 @@ B1／B2 的節點、`files` 與模型預算仍由原 Saver 負責，**不複製�
 2. **真新 Windows 程序取回原 B 工作仍未做**（計畫 R3 第 7 點的四個停點）。本節的關閉／重開仍是同一程序。
 3. 模型 client 的關閉屬 App 組裝層，不由 `ManualHost` 擁有；本節只驗它擁有的 Store／Saver／engine。
 4. 顧問指引、Skills、`BackgroundAvailability` 與 JD 編輯器共用 writer 的接合仍未做。
+
+## 4. 喚醒接點
+
+### 一個入口，決定權在持久狀態
+
+`BackgroundDispatcher.wake()` 是這份文件背景工作的**唯一入口**。喚醒本身便宜且可重複；**能不能執行由持久狀態決定，不由誰敲了幾次決定**。每次喚醒最多交出**一個有界批次**給宿主的背景 worker 然後返回——沒有迴圈、沒有佇列、批次之間不留常駐物。
+
+決定順序完全沿用[設計 §5](../../2026-09-14-jd-background-admission-design.md) 的對帳表：`reconcile()` 先看 Saver 的 pending、再看 publication head，最後才看准入列想做什麼。
+
+**新 target 必須有真正已保存的整理請求。**已驗 dispatcher 的字數後備**刻意不啟用**：由員工自己的通知決定何時開始背景工作。
+
+### 各步驟實際做什麼
+
+| 步驟 | 動作 |
+|---|---|
+| `wait` | 什麼都不做 |
+| `busy` | 本文件的批次還在跑；**不再開一批** |
+| `blocked` | 維持受阻；喚醒不得覆蓋具名決定 |
+| `next_batch` | 從 target 切下一批、**先提交再** invoke B1 |
+| `start_batch` | 批次已提交但 B1 沒跑過，就在該批次上啟動 B1 |
+| `consolidate`／`resume_consolidation` | 交給 B2；只有**確認發布**後才推進准入列 |
+| `resume_extraction` | 以原 config 續作 B1 |
+| `settle_idle` | target 已涵蓋，轉 `idle` |
+
+`_after_publication` 只在 publication head **真的**等於本批時才推進；沒發布成功就原地不動，下一次喚醒看到的仍是同一份未完成的工作。
+
+### 反例與變異
+
+| 案例 | 釘住的事 |
+|---|---|
+| `..._wakeup_without_a_saved_request_starts_nothing` | 安靜回合再怎麼喚醒都不啟動；准入列仍是 `idle`，零模型呼叫 |
+| `..._saved_request_admits_a_target_and_runs_exactly_one_batch` | 請求決定何時開始、target 決定範圍；**只跑一批**（2 次呼叫而非整個 target） |
+| `..._next_wakeup_hands_the_finished_batch_to_b2_and_publishes` | B1 完成／B2 未開始時，下一次喚醒做的就是交接；發布後本批清掉、target 保留 |
+| `..._wakeup_after_publication_takes_the_tail_without_a_new_request` | 游標推進即接尾端，**不需要第二次通知**，target 不變 |
+| `..._wakeup_on_blocked_work_changes_nothing` | 受阻是決定，不是喚醒可以覆蓋的狀態 |
+| `..._waking_again_while_a_batch_runs_is_not_a_second_batch` | 連續三次喚醒只得到 `busy`，工作與准入列都不變 |
+
+變異確認：拿掉「必須有有效整理請求」的條件後，第一條案例從 `wait` 變成 `next_batch` 並轉紅；還原後 hash 核對相符。
+
+### 實測
+
+| 範圍 | 結果 |
+|---|---|
+| `tests/test_background_dispatch_postgres.py`（真 PG） | **6 passed** |
+| 背景相關真 PG 全組（喚醒、准入、責任歸屬、宿主、B1、B2） | **32 passed／45.31s** |
+| App 全離線測試 | **2839 passed／289 skipped／45.68s** |
+
+### 本節限制
+
+1. **還沒有東西呼叫 `wake()`。**計畫要求「安全回合與啟動恢復時喚醒同一背景入口」——那兩個呼叫點尚未接上 `AiRuntime._settle` 與宿主啟動。
+2. 測試以 inline worker 驅動決定邏輯；真背景 worker 的排空與關閉由 §3 的真宿主案例涵蓋，兩者不互相代稱。
+3. **真新 Windows 程序取回原 B 工作仍未做**（計畫 R3 第 7 點的四個停點）。
+4. 顧問指引、Skills、`BackgroundAvailability` 與 JD 編輯器共用 writer 仍未做。

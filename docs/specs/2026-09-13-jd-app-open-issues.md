@@ -59,7 +59,7 @@
 ### OI-05｜深歷史與長訪談連續性：長訪談／完整首版阻擋
 - 現象／影響：歷史查找有 256 祖先上限及缺鏈出口，底層讀完整 messages；長上下文、壓縮與晚期更正尚未在新 App 完整驗證，不能把上限或缺鏈當「沒有原回合」。
 - 證據：[原回合查回结果](2026-09-13-jd-chat-admission-and-original-run-slice.md)、[聊天歷史界線](2026-09-13-jd-chat-http-slice.md)、[品質 Q09／Q13](2026-09-10-jd-product-quality-acceptance.md)。
-- 已知既有缺陷（2026-09-13 重現）：`tests/test_chat_api_postgres.py::test_http_ai_edit_results_match_original_receipt_change_and_history_after_manual_head_advance` 失敗。`chat_history.read` 的首頁取最新視窗、cursor 往舊移動（原碼註解明示），該測試卻期待 `messages[:1]` 是最舊一筆。`chat_history.py` 與測試自基準 `8403d7e2` 以來都未修改，已在該 tag 的獨立 worktree 重現同一斷言（1 failed／2 passed／5.64s）。**先確定分頁方向的正確語意再改**，不要為了綠燈改測試或翻轉既有 cursor 行為。
+- **2026-09-14 已定案並修好：**分頁方向由四個各自獨立的來源一致指向同一個語意——契約 `ChatHistoryPage` 明寫「初始頁是**最新**的至多五十則，`next_cursor` 取**更舊**的一頁，每頁內部維持時序」；`chat_history.py` 的註解寫同一句；Web 的 `chat-session.ts` 把續頁**前插**到已顯示訊息之前（`[...page.messages, ...this.messages]`）；離線測試更有一條專門命名的 `test_initial_page_is_latest_window_and_continuations_prepend_older_chronological_pages`。唯一相反的是那條真 PG 斷言，它假設 `limit=1` 會拿到最舊一則——**它才是錯的**，而且因為只在明示啟用 PG 時才跑，長期沒被看見。已改成依契約斷言：`limit=1` 取最新一則、用 `next_cursor` 往回取到較舊那則、anchor 不變。這不是為綠燈改測試：實作與契約沒有動，變異驗證（把取窗改成最舊）會讓包含那條專門測試在內的多項失敗，改動後以 `git hash-object` 確認 `chat_history.py` 還原。**OI-05 其餘部分仍開著**：256 祖先上限、缺鏈出口、長上下文與壓縮、晚期更正在新 App 的完整驗證都還沒做。
 - 下一最小動作：完成既定深歷史可操作查回及 context／Memory 交接，保留原話與原 request 身分；以一個超過現有查找窗口的合成流程核對，再接已規劃長訪談。
 - 退出條件：早期回合與來源仍可定位；超限／缺鏈可處理且不重播，壓縮／重開後早期工作與最新更正不遺失。
 

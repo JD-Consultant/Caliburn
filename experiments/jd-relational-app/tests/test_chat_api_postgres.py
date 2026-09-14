@@ -152,9 +152,17 @@ def test_http_ai_edit_results_match_original_receipt_change_and_history_after_ma
                 assert [(row["role"], row["run_id"]) for row in history["messages"]] == [("user", run), ("assistant", run)]
                 assert history["messages"][0]["text"] == original_text
                 assert history["messages"][1]["message_id"] == state["response_message_id"]
+                # The contract states the initial page holds the LATEST messages and
+                # next_cursor asks for an older page, each page chronological. A limit
+                # of one therefore starts at the newest message, and paging back with
+                # that cursor reaches the older one.
                 anchored = assert_result(client.get(f"/api/documents/{document}/chat/messages",
                     params={"limit": 1}), ChatHistoryPage)
-                assert anchored["next_cursor"] and anchored["messages"] == history["messages"][:1]
+                assert anchored["next_cursor"] and anchored["messages"] == history["messages"][-1:]
+                older = assert_result(client.get(f"/api/documents/{document}/chat/messages",
+                    params={"limit": 1, "cursor": anchored["next_cursor"]}), ChatHistoryPage)
+                assert older["messages"] == history["messages"][:1]
+                assert older["anchor"] == anchored["anchor"], "paging back must keep the same anchor"
                 saved_native = deepcopy(graph.get_state({"configurable": {"thread_id": document}}).values["messages"])
 
                 # Same public composition, real manual owner; no fixture authority or direct SQL write.
@@ -178,7 +186,9 @@ def test_http_ai_edit_results_match_original_receipt_change_and_history_after_ma
                 continued = assert_result(client.get(f"/api/documents/{document}/chat/messages",
                     params={"cursor": anchored["next_cursor"], "limit": 1}), ChatHistoryPage)
                 assert continued["anchor"] == anchored["anchor"] and continued["next_cursor"] is None
-                assert continued["messages"] == history["messages"][1:]
+                # Same cursor, same older page: continuing later never re-reads the
+                # newest message, and the older page is where the cursor pointed.
+                assert continued["messages"] == history["messages"][:1]
                 assert graph.get_state({"configurable": {"thread_id": document}}).values["messages"] == saved_native
                 assert len(requests) == 3 and len(runtime.history.read_run_operations(document, run)) == 1
 

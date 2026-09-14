@@ -8,8 +8,9 @@ import type { ChangeReadPage, RestorePreviewPage, RevisionRecord } from '../../.
 import { message } from './Workspace';
 import ChangeDetails from './ChangeDetails';
 
-export default function HistoryPanel({ api, documentId, revisionRef, selectedChange, onRestored }: { api: JdApi; documentId: string; revisionRef: string | null;
-  selectedChange?: { ref: string; sequence: number } | null; onRestored?: () => void }) {
+export default function HistoryPanel({ api, documentId, revisionRef, selectedChange, onRestored, onHold }: { api: JdApi; documentId: string; revisionRef: string | null;
+  selectedChange?: { ref: string; sequence: number } | null; onRestored?: () => void;
+  onHold?: (holding: boolean) => void }) {
   const [history, setHistory] = useState<RevisionRecord[]>([]);
   const [selection, setSelection] = useState<{ change: ChangeReadPage; before: JdView; after: JdView } | null>(null);
   const [proposal, setProposal] = useState<
@@ -17,6 +18,10 @@ export default function HistoryPanel({ api, documentId, revisionRef, selectedCha
   const [error, setError] = useState(''); const [busy, setBusy] = useState(false);
   const selectionGeneration = useRef(0);
   useEffect(() => () => { selectionGeneration.current++; }, [api, documentId]);
+  // A comparison the employee is still deciding on holds editing and new
+  // turns, so the JD cannot move under the version they are looking at.
+  useEffect(() => { onHold?.(proposal !== null); }, [proposal, onHold]);
+  useEffect(() => () => onHold?.(false), [onHold]);
   useEffect(() => { if (selectedChange) void show(selectedChange.ref); }, [selectedChange, api, documentId]);
   useEffect(() => { let live = true;
     void api.read(documentId, { view: 'history', target_ref: null, cursor: null }).then(page => {

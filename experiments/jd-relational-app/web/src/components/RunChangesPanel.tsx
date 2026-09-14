@@ -1,15 +1,18 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { runChangeSummary, undoOffer, type LoadedRunChange } from '../lib/run-changes';
 import ChangeDetails from './ChangeDetails';
 
-export default function RunChangesPanel({ selection, loading, error, currentRevisionRef, onRetry, onUndo, undoing }: {
+export default function RunChangesPanel({ selection, loading, error, currentRevisionRef, onRetry, onUndo, undoing, onHold }: {
   selection: LoadedRunChange | null; loading: boolean; error: string | null; currentRevisionRef: string | null; onRetry: () => void;
   onUndo?: (runId: string, expectedResultRef: string) => void; undoing?: boolean;
+  onHold?: (holding: boolean) => void;
 }) {
   const page = selection?.page;
   const [confirming, setConfirming] = useState(false);
+  useEffect(() => { onHold?.(confirming); }, [confirming, onHold]);
+  useEffect(() => () => onHold?.(false), [onHold]);
   const offer = page ? undoOffer(page, currentRevisionRef) : null;
   return <Paper component="section" aria-label="本輪 JD 改動" variant="outlined" sx={{ p: 3, mb: 3 }}>
     <Typography variant="h6">本輪 JD 改動</Typography>

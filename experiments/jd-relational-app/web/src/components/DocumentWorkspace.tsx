@@ -33,6 +33,8 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
   const [retryChanges, setRetryChanges] = useState(0);
   const [undoing, setUndoing] = useState(false);
   const [undoError, setUndoError] = useState('');
+  const [restoreHold, setRestoreHold] = useState(false);
+  const [undoHold, setUndoHold] = useState(false);
   const datasetId = api.datasetId;
   const run = matchingRun(chat, snapshot.row?.chatSubmission?.request.run_id ?? null, { datasetId, documentId: document.document_id });
   const changeKey = runChangeKey(run);
@@ -119,7 +121,11 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     const detail = globalThis.document.getElementById(`jd-run-change-detail-${index}`);
     if (detail instanceof HTMLDetailsElement) detail.open = true;
   };
+  // While the employee is deciding on a restore or an undo, the JD they are
+  // comparing must not move: editing and new turns wait for that decision.
+  const holding = restoreHold || undoHold;
   return <div className="work-grid"><ChatPanel snapshot={snapshot} chat={chat} controller={chatController.current} archived={document.archived}
+    holding={holding}
     onText={text => session.current?.chatEdit(text)} onComposition={active => session.current?.chatComposition(active)}
     onChange={ref => { setSelectedChange(previous => ({ ref, sequence: (previous?.sequence ?? 0) + 1 })); setHistory(true); }} />
     <Box sx={{ minWidth: 0 }}>
@@ -151,13 +157,14 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     </Paper>}
     {changeKey && <RunChangesPanel selection={selectedRunChange} loading={!matchingLoad || !!runLoad?.loading}
       error={matchingLoad ? runLoad?.error ?? null : null} currentRevisionRef={snapshot.view?.revisionRef ?? null}
-      onRetry={() => setRetryChanges(value => value + 1)} undoing={undoing}
+      onRetry={() => setRetryChanges(value => value + 1)} undoing={undoing} onHold={setUndoHold}
       onUndo={(runId, expectedResultRef) => void undoRun(runId, expectedResultRef)} />}
     {undoError && <Alert severity="warning" sx={{ mb: 3 }}>{undoError}</Alert>}
     {history && <HistoryPanel api={api} documentId={document.document_id} revisionRef={snapshot.view?.revisionRef ?? null} selectedChange={selectedChange}
-      onRestored={() => void session.current?.refreshStatus()} />}
+      onRestored={() => void session.current?.refreshStatus()} onHold={setRestoreHold} />}
     {snapshot.loading ? <CircularProgress aria-label="讀取職務說明書" /> : snapshot.view && <JdEditor view={snapshot.view}
-      disabled={document.archived || snapshot.readOnly} commandsDisabled={snapshot.submitting || !!Object.keys(snapshot.row?.fields ?? {}).length}
+      disabled={document.archived || snapshot.readOnly || holding}
+      commandsDisabled={holding || snapshot.submitting || !!Object.keys(snapshot.row?.fields ?? {}).length}
       values={snapshot.values} markers={markers} onShowChange={showRunChange} onField={(field, text) => session.current?.edit(field, text)}
       onComposition={active => session.current?.composition(active)} form={snapshot.form}
       onFormChange={value => session.current?.form(value as JsonValue | null)}

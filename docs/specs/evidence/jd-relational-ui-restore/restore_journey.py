@@ -113,7 +113,30 @@ def journey(chrome):
          jd_unchanged_by_preview=value_of(chrome, "purpose"),
          edit_calls_so_far=len(traced_calls(chrome, "/jd/edits")))
 
-    # 4. Confirm, and check the page the employee is looking at.
+    # 4. While the comparison is open, the JD must not move under it.
+    held = {"job_title_field_disabled": chrome.box(field("job_title"))["disabled"],
+            "purpose_field_disabled": chrome.box(field("purpose"))["disabled"],
+            "send_disabled": chrome.box(text_button("送出", exact=True))["disabled"],
+            "hold_explained": chrome.evaluate(
+                f"{visible_text()}.includes('正在確認一次還原，暫停送出')")}
+    step(chrome, "held-while-deciding", **held)
+    assert all(held.values()), held
+
+    # Cancelling the comparison gives the editor straight back.
+    chrome.click(text_button("取消", exact=True))
+    chrome.until(f"!{field('job_title')}.disabled", timeout=20, what="editing_returns_on_cancel")
+    # The send button stays disabled here for its own reason -- the interview
+    # box is empty -- so only the hold itself is asserted, not that button.
+    released = {"job_title_field_disabled": chrome.box(field("job_title"))["disabled"],
+                "still_holding": chrome.evaluate(
+                    f"{visible_text()}.includes('正在確認一次還原，暫停送出')")}
+    step(chrome, "released-on-cancel", **released,
+         send_disabled_for_empty_input=chrome.box(text_button("送出", exact=True))["disabled"])
+    assert not any(released.values()), released
+
+    # 5. Ask again, then confirm, and check the page the employee is looking at.
+    chrome.click(text_button("還原到第 2 版"))
+    chrome.until(f"!!{text_button('確認還原')}", timeout=30, what="preview_again")
     chrome.click(text_button("確認還原"))
     chrome.until(f"(() => {{ const el = {field('purpose')}; return !!el && el.value === ''; }})()",
                  timeout=40, what="purpose_restored_away")
@@ -123,7 +146,7 @@ def journey(chrome):
          restore_call=[dict(item, body=None, response=item.get("response", "")[:120])
                        for item in traced_calls(chrome, "/jd/edits")][-1:])
 
-    # 5. Restoring adds a revision; nothing in history was removed.
+    # 6. Restoring adds a revision; nothing in history was removed.
     chrome.until(f"!!{text_button('還原到第 4 版')}", timeout=30, what="restore_made_new_revision")
     step(chrome, "history-after-restore", restore_buttons=chrome.evaluate(
         "[...document.querySelectorAll('button')].map(b => b.textContent.trim())"

@@ -1,12 +1,12 @@
 {
-  "pid": 85828,
-  "parent_pid": 51392,
+  "pid": 137512,
+  "parent_pid": 70344,
   "status": "ready",
   "api_origin": "http://127.0.0.1:8771",
   "ui_origin": "http://127.0.0.1:3002",
-  "dataset_id": "1feaebf3-95fe-49ad-9322-35dd8d4566da",
-  "installation_id": "8f04a566-b884-4b89-9684-44694c81cf0d",
-  "database": "caliburn_jd_setup_test_ded73964f2af4091b487676f8599548f",
+  "dataset_id": "64e85040-ac99-4388-b0e8-e7710caceb49",
+  "installation_id": "d9a9e174-a050-48e4-97fc-5d8f768f006c",
+  "database": "caliburn_jd_setup_test_23c344cbab3f4412943c90091cb7cb08",
   "provider_enabled": false,
   "gate_timeout": 60.0
 }

@@ -8,7 +8,7 @@
 
 兩條旅程都不是靠單元測試或型別檢查推斷，而是**實際的滑鼠事件落在員工看得到的按鈕上**，並由獨立唯讀連線另外核對 PostgreSQL。
 
-本次**沒有改動任何產品程式**。新增的只有測試 helper [browser_cdp.py](../../../experiments/jd-relational-app/tests/support/browser_cdp.py) 與本目錄的旅程／探針腳本。
+產品程式只改了一處，就是設計 §4.2 的暫停：比較開著時停用 JD 欄位與訪談送出（[ChatPanel](../../../experiments/jd-relational-app/web/src/components/ChatPanel.tsx)、[HistoryPanel](../../../experiments/jd-relational-app/web/src/components/HistoryPanel.tsx)、[RunChangesPanel](../../../experiments/jd-relational-app/web/src/components/RunChangesPanel.tsx)、[DocumentWorkspace](../../../experiments/jd-relational-app/web/src/components/DocumentWorkspace.tsx)）。其餘新增的是測試 helper [browser_cdp.py](../../../experiments/jd-relational-app/tests/support/browser_cdp.py) 與本目錄的旅程／探針腳本；沒有改 domain、資料表、HTTP 契約或保存流程。
 
 ## 2. 官方依據與本案映射
 
@@ -25,7 +25,7 @@ Windows 11 原生 DPAPI 設定檔與 host；PostgreSQL 18.6 專用 55436，每�
 
 | 旅程 | fixture／資料庫 | 模型 |
 |---|---|---|
-| 還原 | `jd-ui-gate-ded73964f2af4091b487676f8599548f` | 完全未啟用聊天，**零模型請求** |
+| 還原 | `jd-ui-gate-23c344cbab3f4412943c90091cb7cb08` | 完全未啟用聊天，**零模型請求** |
 | 整輪撤回 | `jd-ui-gate-cdf2665358474c909700b8039e9f44d4` | 真 Agent／Saver／SQL，只有 Anthropic HTTP 傳輸換成既有 helper 的固定離線腳本；[3 次請求全部離線](jd-relational-ui-restore/undo-chat.observations.json)，`provider_network: false` |
 
 ## 4. 還原旅程的實際步驟與觀察
@@ -39,7 +39,9 @@ Windows 11 原生 DPAPI 設定檔與 host；PostgreSQL 18.6 專用 55436，每�
 | 在「職務目的」打字後離開欄位 | 自動保存到第 3 版。 |
 | 按「改動與歷史」 | 出現「還原到第 3／2／1 版」。 |
 | 按「還原到第 2 版」 | 顯示「會有 1 處變動；以下逐項列出將回復與移除的內容」，並列出修改前後。此時 **JD 欄位仍是第 3 版內容**，預覽沒有寫入任何東西（頁面送出的 `/jd/edits` 仍只有 2 次，都是前面的自動保存）。 |
-| 按「確認還原」 | POST `/jd/edits` 回 `committed`／`changed`；畫面上「職務目的」清空、「職稱」保留，狀態回到「已保存」。 |
+| 比較開著時，試著繼續編輯或送出訪談 | **做不到，而且說得出為什麼。**「職稱」「職務目的」欄位都被停用，訪談送出鍵停用，畫面寫「正在確認一次還原，暫停送出。你的輸入會保留。」——正在比較的那一版不會在腳下移動。 |
+| 按「取消」 | 欄位立刻回到可編輯，暫停說明消失。（送出鍵此時仍停用，原因是訪談框是空的，與還原無關，已另記。） |
+| 再按一次「還原到第 2 版」，然後按「確認還原」 | POST `/jd/edits` 回 `committed`／`changed`；畫面上「職務目的」清空、「職稱」保留，狀態回到「已保存」。 |
 | 再看歷史 | 變成「還原到第 4／3／2／1 版」——還原是**新增一版**，先前版本一版都沒有消失。 |
 
 [獨立唯讀核對](jd-relational-ui-restore/db-restore.json)（REPEATABLE READ／READ ONLY、另一條連線）：4 版、3 筆 operation 全部 committed，最後一筆 `command_kind` 為 `restore_revision`；第 4 版的 `content_digest` 與第 2 版相同但 `revision_id` 不同、parent 是第 3 版；第 3 版的 snapshot 仍保有被取代的職務目的。[writer 觀察](jd-relational-ui-restore/restore-writer.observations.json)同樣是 3 次執行。
@@ -70,10 +72,10 @@ Windows 11 原生 DPAPI 設定檔與 host；PostgreSQL 18.6 專用 55436，每�
 
 - 只驗了這兩條旅程各一次成功路徑。**沒有**驗斷電、瀏覽器崩潰、還原確認中途的網路中斷、並行分頁、實體 IME、觸控或鍵盤操作。
 - 撤回旅程的模型回覆是固定離線腳本，**不是**模型品質或判斷能力的驗收；`memory_store_rows` 為 0，本次沒有觸發 B1／B2，**不能**當作 Memory 流程的證據。
-- 還原確認期間仍未擋下手改與新 AI 回合（設計 §4.2），本次也沒有驗這個情境；目前只有保存時的 `stale_view` 拒絕。
-- 收據目前只記 `command_kind`，還沒記下被撤回的回合與實際起點。
+- 還原確認期間的暫停（設計 §4.2）已實作並在真瀏覽器驗過**還原**這一側；**撤回**那一側的暫停由同一個 `onHold` 接點提供，但沒有在真瀏覽器單獨驗過。保存時的 `stale_view` 拒絕仍是最後一道。
+- 「取消後送出鍵恢復」無法由這條旅程證明：該鍵此時被空輸入這個獨立原因停用。這裡只證明欄位恢復可編輯、暫停說明消失。
 - headless Chrome，不是實體視窗操作。旅程結束後[五個 helper 程序都確認退出](jd-relational-ui-restore/process-exit-check.json)，Saver 連線關閉；沒有刪資料庫或清 volume。
 
 ## 7. 下一步
 
-真瀏覽器這一項已閉合；其餘仍照[收尾清單](../2026-09-13-jd-app-open-issues.md)推進：R3 的顧問指引與三個分析 Skill、`MEMORY_ACTION_GUIDANCE`、`BackgroundAvailability`，以及新 Windows 程序＋真 PG 的四個中斷點恢復。設計 §4.2 的還原確認期間暫停手改、收據記錄被撤回回合，列為後續修正。
+真瀏覽器這一項已閉合。本稿列為後續的兩項也已完成並各自另有結果：[顧問指引與分析 Skills](../2026-09-14-jd-consultant-guidance-and-skills-slice.md)、[新 Windows 程序續作](jd-b1-adoption/r3-notification-and-background-results.md)、以及收據記錄被撤回回合（tag `jd-undo-provenance-20260914`）。其餘仍照[收尾清單](../2026-09-13-jd-app-open-issues.md)推進。

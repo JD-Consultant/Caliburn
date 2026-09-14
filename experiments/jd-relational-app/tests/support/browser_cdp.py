@@ -104,9 +104,18 @@ class Chrome:
         return self.loop.run_until_complete(exchange())
 
     # -- page -------------------------------------------------------------
-    def open(self, url, *, ready="document.readyState === 'complete'", timeout=60):
+    # Server-rendered markup is clickable long before React attaches to it, and
+    # a press that lands in that gap does nothing at all. React marks the nodes
+    # it has taken over, so wait for that rather than for paint.
+    HYDRATED = ("[...document.querySelectorAll('button, input, textarea')].some("
+                "el => Object.keys(el).some(key => key.startsWith('__reactFiber$')))")
+
+    def open(self, url, *, ready="document.readyState === 'complete'", timeout=60,
+             hydrated=True):
         self.send("Page.navigate", url=url)
         self.until(ready, timeout=timeout, what="page_ready")
+        if hydrated:
+            self.until(self.HYDRATED, timeout=timeout, what="page_hydrated")
 
     def evaluate(self, expression, *, await_promise=False):
         result = self.send("Runtime.evaluate", expression=expression, returnByValue=True,

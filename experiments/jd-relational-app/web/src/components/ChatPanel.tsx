@@ -16,8 +16,9 @@ function runLabel(run: ChatRunState): string {
   }
 }
 
-export default function ChatPanel({ snapshot, chat, controller, archived, onText, onComposition, onChange }: {
+export default function ChatPanel({ snapshot, chat, controller, archived, holding, onText, onComposition, onChange }: {
   snapshot: SessionSnapshot; chat: ChatSnapshot; controller: ChatController | null; archived: boolean;
+  holding?: boolean;
   onText: (text: string) => void; onComposition: (active: boolean) => void; onChange: (ref: string) => void;
 }) {
   const original = snapshot.row?.chatSubmission;
@@ -72,9 +73,10 @@ export default function ChatPanel({ snapshot, chat, controller, archived, onText
       slotProps={{ htmlInput: { onCompositionStart: () => onComposition(true), onCompositionEnd: () => onComposition(false) } }} />
     <Stack direction="row" sx={{ mt: 1, gap: 1, alignItems: 'center', justifyContent: 'space-between' }}>
       <Typography variant="caption" color="text.secondary">{snapshot.chatSaving ? '保留輸入中…' : snapshot.chatText ? '輸入已暫存於此瀏覽器' : 'Enter 換行，按送出開始訪談'}</Typography>
-      <Button variant="contained" disabled={!snapshot.chatReady || chat.busy || chat.loading || !snapshot.chatText.trim() || archived}
+      <Button variant="contained" disabled={!snapshot.chatReady || chat.busy || chat.loading || !snapshot.chatText.trim() || archived || !!holding}
         onClick={() => void controller?.send()}>送出</Button>
     </Stack>
+    {holding && <Typography variant="caption" color="text.secondary">正在確認一次還原，暫停送出。你的輸入會保留。</Typography>}
     {run?.run_status === 'running' && <Typography variant="caption" color="text.secondary">JD 暫停手改。可以先輸入下一段，完成本輪後再送出。</Typography>}
   </Paper>;
 }

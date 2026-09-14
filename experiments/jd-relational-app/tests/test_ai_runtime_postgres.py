@@ -39,20 +39,8 @@ pytestmark = pytest.mark.skipif(os.environ.get("JD_RELATIONAL_TEST_DB") != "1",
     reason="explicit isolated PostgreSQL test opt-in required")
 
 
-def _sse(identity, name=None, arguments=None):
-    values = [json.loads(chunk.decode().split("data: ", 1)[1]) for chunk in events()]
-    values[0]["message"]["id"] = f"msg_{identity}"
-    if name is not None:
-        values[1]["content_block"] = {"type": "tool_use", "id": f"toolu_{identity}",
-                                     "name": name, "input": {}}
-        values[2]["delta"] = {"type": "input_json_delta",
-            "partial_json": json.dumps(arguments, ensure_ascii=False)}
-        values[-2]["delta"]["stop_reason"] = "tool_use"
-    return [f"event: {value['type']}\ndata: {json.dumps(value)}\n\n".encode() for value in values]
-
-
 @contextmanager
-def _offline_model(monkeypatch, plan, *, body_factory=SyncBody, expected_tools=None):
+def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None):
     # Identity, not a count: the wire must carry exactly the tools this
     # consultant was given, so adding one is a deliberate, visible change.
     expected_names = {getattr(tool, "name", tool) for tool in
@@ -77,7 +65,10 @@ def _offline_model(monkeypatch, plan, *, body_factory=SyncBody, expected_tools=N
         assert all(tool["strict"] is True for tool in payload["tools"])
         requests.append(payload)
         name, arguments = plan[len(requests) - 1](payload)
-        return httpx.Response(200, json=reply_factory(f"{prefix}_{len(requests)}", name, arguments),
+        if before_reply is not None:
+            # The test owns this pause; it holds the real in-flight call open.
+            before_reply()
+        return httpx.Response(200, json=_reply(f"{prefix}_{len(requests)}", name, arguments),
                               request=request)
 
     with httpx.Client(transport=httpx.MockTransport(receive), trust_env=False, timeout=5) as client:
@@ -328,14 +319,11 @@ def test_real_pure_interview_has_no_revision_and_reopened_saver_only_reads(monke
 def test_cancel_waits_for_actual_stream_future_before_closing_pg_run(monkeypatch, engine):
     entered, release = Event(), Event()
 
-    class BlockedBody(SyncBody):
-        def __iter__(self):
-            yield self.data[0]
-            entered.set()
-            assert release.wait(5), "Test-owned stream must be released within its budget."
-            yield from self.data[1:]
+    def hold():
+        entered.set()
+        assert release.wait(5), "The test-owned call must be released within its budget."
 
-    with _offline_model(monkeypatch, [_final], body_factory=BlockedBody) as (model, requests):
+    with _offline_model(monkeypatch, [_final], before_reply=hold) as (model, requests):
         with _runtime(engine, model) as (runtime, owner, graph):
             document = owner.create_document(uuid4(), "合成取消等待真串流停止")
             handle = runtime.start(document, str(uuid4()), "合成原话，尚未完成回覆。", expected_revision_id=runtime.owner.storage.read_current(document).revision_id)

@@ -167,8 +167,8 @@ class ResolvedExecution(RuntimeModel):
     tool_result_clear_trigger_tokens: int
     tool_result_keep: int
     max_orientation_items: int
-    adapter_version: Literal["langchain-openrouter/0.2.7"] = (
-        "langchain-openrouter/0.2.7"
+    adapter_version: Literal["langchain-openrouter/0.2.8"] = (
+        "langchain-openrouter/0.2.8"
     )
     resolved_at: datetime = Field(default_factory=lambda: datetime.now(UTC))
 
@@ -588,7 +588,7 @@ class PolicyBoundSummarizationMiddleware(SummarizationMiddleware):
 
     def __init__(self, model: BaseChatModel, **kwargs: Any) -> None:
         super().__init__(model, **kwargs)
-        # LangChain 1.3.15 otherwise installs model.with_retry() with three attempts.
+        # LangChain's summarization middleware otherwise installs model.with_retry().
         # The consultant run owns one explicit attempt budget and receipt chain.
         self._summary_model = model
 

@@ -135,11 +135,11 @@ def test_runtime_framework_versions_are_exactly_pinned() -> None:
     } == {
         "fastapi": "0.141.1",
         "httpx": "0.28.1",
-        "langchain": "1.3.15",
+        "langchain": "1.4.0",
         "langgraph": "1.2.11",
         "langgraph-checkpoint-postgres": "3.1.2",
-        "langchain-openrouter": "0.2.7",
-        "deepagents": "0.7.5",
+        "langchain-openrouter": "0.2.8",
+        "deepagents": "0.7.13",
     }
 
 

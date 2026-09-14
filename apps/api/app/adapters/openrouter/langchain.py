@@ -28,7 +28,7 @@ def _selected_router_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
 
 
 class ReceiptChatOpenRouter(ChatOpenRouter):
-    """Keep route facts that langchain-openrouter 0.2.7 otherwise discards."""
+    """Keep route facts that the LangChain OpenRouter integration discards."""
 
     def _create_chat_result(self, response: Any):
         payload = (

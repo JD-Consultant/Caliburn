@@ -771,8 +771,14 @@ def parse_workspace_files(
             ),
             evidence_source_ids=(
                 tuple(
-                    _workspace_referenced_id(source_ids, reference.source_handle, "source")
-                    for reference in resource.evidence
+                    dict.fromkeys(
+                        _workspace_referenced_id(
+                            source_ids,
+                            reference.source_handle,
+                            "source",
+                        )
+                        for reference in resource.evidence
+                    )
                 )
                 if resource.evidence
                 else (

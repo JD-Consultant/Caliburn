@@ -817,6 +817,43 @@ def test_ungrounded_content_is_still_rejected_before_the_first_employee_source()
     assert validation.diagnostics[0].code == "evidence-basis-empty"
 
 
+def test_opks_without_employee_evidence_is_a_diagnostic_not_an_exception() -> None:
+    document = _document()
+    source = _source()
+    projection = workspace_validation.project_workspace_files(
+        document,
+        handle_registry={},
+    )
+    files = dict(projection.files)
+    files["/workspace/opks/o/o-001.json"] = json.dumps(
+        {
+            "handle": "o-001",
+            "kind": "output",
+            "text": "沒有來源的產出",
+            "task_handles": ["task-001"],
+            "indicator_handles": [],
+            "evidence": [],
+        },
+        ensure_ascii=False,
+        indent=2,
+    ) + "\n"
+    catalog = WorkspaceCatalog.from_snapshot(
+        document,
+        sources=(source,),
+        handle_registry=projection.handle_registry,
+    )
+
+    validation = workspace_validation.validate_workspace_payload(
+        files,
+        catalog=catalog,
+        selected_skill_ids=("output",),
+        loaded_skill_ids=("output",),
+    )
+
+    assert validation.document is None
+    assert validation.diagnostics[0].code == "jd-invariant"
+
+
 @pytest.mark.asyncio
 async def test_source_correction_revalidates_unchanged_files_and_invalidates_old_basis(
     validation_harness: tuple[

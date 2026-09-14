@@ -492,14 +492,7 @@ class PostgresConsultantRuntime:
                 workspace_review=projection,
             )
         }
-        if (
-            validation.document is not None
-            and effective_manifest.validation_status
-            in {
-                WorkspaceValidationStatus.VALID,
-                WorkspaceValidationStatus.CONFLICTED,
-            }
-        ):
+        if validation.document is not None:
             current_document = apply_pending_task_competency_levels(
                 validation.document.approved_document,
                 approved_document=snapshot.approved_document,

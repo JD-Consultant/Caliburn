@@ -264,6 +264,43 @@ def test_workspace_draft_keeps_evidence_owner_for_each_opks_handle() -> None:
     ] == [("輸出原話", ("output",)), ("技能原話", ("skill",))]
 
 
+def test_workspace_opks_deduplicates_authority_source_ids_without_losing_evidence() -> None:
+    catalog = WorkspaceCatalog.from_snapshot(_document())
+    projection = project_workspace_files(
+        catalog.document,
+        handle_registry=catalog.handle_to_stable,
+    )
+    files = dict(projection.files)
+    output_path = "/workspace/opks/o/o-001.json"
+    output_payload = json.loads(files[output_path])
+    output_payload["evidence"] = [
+        {
+            "source_handle": "source-001",
+            "quote": "訪談使用者",
+            "skill_ids": ["story-interview"],
+        },
+        {
+            "source_handle": "source-001",
+            "quote": "整理需求",
+            "skill_ids": ["output"],
+        },
+    ]
+    files[output_path] = json.dumps(output_payload, ensure_ascii=False)
+
+    draft = parse_workspace_files(
+        DOCUMENT_ID,
+        files,
+        handle_registry=projection.handle_registry,
+        baseline_document=catalog.document,
+    )
+
+    assert draft.approved_document.opks[0].evidence_source_ids == (SOURCE_ID,)
+    assert [reference.quote for reference in draft.evidence_bindings[0].references] == [
+        "訪談使用者",
+        "整理需求",
+    ]
+
+
 def test_new_workspace_entity_id_is_stable_per_handle() -> None:
     catalog = WorkspaceCatalog.from_snapshot(_document())
 

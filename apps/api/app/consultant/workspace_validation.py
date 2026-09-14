@@ -642,6 +642,16 @@ def validate_workspace_payload(
             evidence_by_handle={},
             default_basis=None,
         )
+    try:
+        draft.approved_document
+    except ValueError as error:
+        return WorkspacePayloadValidation(
+            document=None,
+            diagnostics=(_resource_error_diagnostic(error, normalized),),
+            current_sources=_current_sources(catalog),
+            evidence_by_handle={},
+            default_basis=None,
+        )
 
     current_sources = _current_sources(catalog)
     if not current_sources:

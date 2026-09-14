@@ -14,10 +14,16 @@ from app.adapters.langgraph.postgres import (
     open_postgres_consultant_runtime,
 )
 from app.consultant.skill_backend import CONSULTANT_SKILL_IDS
-from app.consultant.document_commands import CreateDuty, UndoDocumentCommand
+from app.consultant.document_commands import (
+    CreateDuty,
+    CreateOpks,
+    CreateTask,
+    UndoDocumentCommand,
+)
 from app.consultant.state import (
     ApprovedDuty,
     ApprovedJobDocument,
+    ApprovedOpksKind,
     ApprovedTask,
     CommandReceipt,
     EmployeeSourceKind,
@@ -33,7 +39,10 @@ from app.consultant.workspace_authority import (
     WorkspaceDecisionKind,
     WorkspaceReviewCommand,
 )
-from app.consultant.workspace_state import StoreBackedWorkspace
+from app.consultant.workspace_state import (
+    StoreBackedWorkspace,
+    WorkspaceValidationStatus,
+)
 from app.consultant.workspace_validation import WorkspaceValidationService
 
 
@@ -272,6 +281,100 @@ async def test_first_employee_edit_on_pristine_document_mints_evidence_and_commi
         ]
         assert len(sources) == 1
         assert sources[0].processing_status is SourceProcessingStatus.COMMITTED
+
+
+@pytest.mark.asyncio
+async def test_employee_created_opks_keeps_its_evidence_after_workspace_reopen(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        current = await runtime.create_document(document_id, title="OPKS evidence")
+
+        async def apply(command):
+            nonlocal current
+            current, _ = await runtime.apply_document_structure_command(
+                document_id=document_id,
+                expected_revision=current.revision,
+                workspace_generation=current.document_review.workspace_generation,
+                workspace_digest=current.document_review.workspace_digest,
+                command=command,
+                source_id=uuid4(),
+                command_receipt=CommandReceipt(
+                    command_id=uuid4(),
+                    command_kind="current_document_structure",
+                    payload_sha256=uuid4().hex * 2,
+                ),
+            )
+
+        await apply(CreateDuty(name="產品需求與驗證"))
+        assert current.current_document is not None
+        duty_id = current.current_document.duties[0].duty_id
+        await apply(
+            CreateTask(
+                duty_id=duty_id,
+                statement="訪談使用者並整理需求",
+                action="訪談並整理",
+                object="使用者需求",
+            )
+        )
+        assert current.current_document is not None
+        task_id = current.current_document.tasks[0].task_id
+        await apply(
+            CreateOpks(
+                task_id=task_id,
+                kind=ApprovedOpksKind.OUTPUT,
+                text="經確認的產品需求清單",
+            )
+        )
+
+        reopened = await runtime.reopen_document(document_id)
+        assert reopened.current_document is not None
+        assert reopened.current_document.opks[0].text == "經確認的產品需求清單"
+        assert len(reopened.current_document.opks[0].evidence_source_ids) == 1
+        source = await runtime.get_source(
+            document_id,
+            reopened.current_document.opks[0].evidence_source_ids[0],
+        )
+        assert source.kind is EmployeeSourceKind.DIRECT_EDIT
+        assert source.processing_status is SourceProcessingStatus.COMMITTED
+
+
+@pytest.mark.asyncio
+async def test_parseable_unvalidated_ai_workspace_stays_visible_for_run_recovery(
+    consultant_database_url: str,
+) -> None:
+    document_id = uuid4()
+    async with open_postgres_consultant_runtime(consultant_database_url) as runtime:
+        await _seed(runtime, document_id)
+        workspace = StoreBackedWorkspace(store=runtime.store, document_id=document_id)
+        before = await workspace.read_snapshot()
+        task_path = next(
+            path for path in before.files if path.startswith("/workspace/tasks/")
+        )
+        payload = json.loads(before.files[task_path])
+        payload["statement"] = "AI 尚未完成驗證的工作內容"
+
+        write = await workspace.backend.awrite(
+            task_path,
+            json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        )
+        assert write.error is None
+        dirty = await workspace.read_snapshot()
+        assert (
+            dirty.manifest.validation_status
+            is WorkspaceValidationStatus.UNVALIDATED
+        )
+
+        reopened = await runtime.reopen_document(document_id)
+
+        assert reopened.current_document is not None
+        assert (
+            reopened.current_document.tasks[0].statement
+            == "AI 尚未完成驗證的工作內容"
+        )
+        assert reopened.document_review is not None
+        assert reopened.document_review.workspace_status.value == "invalid"
 
 
 @pytest.mark.asyncio

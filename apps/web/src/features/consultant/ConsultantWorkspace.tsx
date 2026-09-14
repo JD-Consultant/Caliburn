@@ -119,7 +119,11 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
       </div>
     );
   }
-  if (metadata.isError || snapshotQuery.isError || !snapshotQuery.data) {
+  if (
+    (metadata.isError && !metadata.data) ||
+    (snapshotQuery.isError && !snapshotQuery.data) ||
+    !snapshotQuery.data
+  ) {
     return (
       <div className="flex min-h-screen items-center justify-center bg-stone-50 p-6">
         <div className="max-w-md rounded-2xl border border-stone-200 bg-white p-6 text-center shadow-sm">
@@ -139,6 +143,7 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
   }
 
   const snapshot = snapshotQuery.data;
+  const showingLastReadableSnapshot = snapshotQuery.isError;
   const title =
     metadata.data?.title ?? snapshot.current_document.job_title ?? "職務分析";
   const workspaceMutationLocked =
@@ -160,14 +165,16 @@ export function ConsultantWorkspace({ documentId }: { documentId: string }) {
           <div className="min-w-0 flex-1">
             <h1 className="truncate text-lg font-semibold">{title}</h1>
             <div className="mt-0.5 flex items-center gap-2 text-xs text-stone-500">
-              {streamState === "live" ? (
+              {streamState === "live" && !showingLastReadableSnapshot ? (
                 <Radio className="size-3 text-emerald-600" />
               ) : (
                 <WifiOff className="size-3 text-amber-600" />
               )}
-              {streamState === "live"
-                ? "已連線；變更會自動更新"
-                : "連線恢復中；正式狀態仍保存在本機"}
+              {showingLastReadableSnapshot
+                ? "正在重新整理；目前顯示上次可讀版本"
+                : streamState === "live"
+                  ? "已連線；變更會自動更新"
+                  : "連線恢復中；正式狀態仍保存在本機"}
             </div>
           </div>
           <Button

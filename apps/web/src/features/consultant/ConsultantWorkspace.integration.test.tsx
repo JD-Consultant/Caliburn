@@ -42,13 +42,23 @@ class FakeEventSource {
   onopen: ((event: Event) => void) | null = null;
   onerror: ((event: Event) => void) | null = null;
   closed = false;
+  private readonly listeners = new Map<string, Set<EventListener>>();
 
   constructor(readonly url: string) {
     FakeEventSource.latest = this;
   }
 
-  addEventListener() {}
-  removeEventListener() {}
+  addEventListener(type: string, listener: EventListener) {
+    const listeners = this.listeners.get(type) ?? new Set<EventListener>();
+    listeners.add(listener);
+    this.listeners.set(type, listeners);
+  }
+  removeEventListener(type: string, listener: EventListener) {
+    this.listeners.get(type)?.delete(listener);
+  }
+  emit(type: string, event: Event) {
+    for (const listener of this.listeners.get(type) ?? []) listener(event);
+  }
   close() {
     this.closed = true;
   }
@@ -172,6 +182,61 @@ describe("employee consultant workspace integration", () => {
       screen.getByRole("button", { name: "顯示 AI 職務分析顧問" }),
     ).toBeTruthy();
     expect(screen.getByRole("region", { name: "目前 JD" })).toBeTruthy();
+  });
+
+  it("keeps the last readable workspace when a transient snapshot refresh fails", async () => {
+    const snapshot = consultantSnapshotFixture();
+    const client = workspaceClient(snapshot);
+    const metadata = {
+      document_id: DOCUMENT_ID,
+      title: "採購專員訪談",
+      created_at: "2026-08-14T10:00:00Z",
+      updated_at: "2026-08-14T10:00:02Z",
+    };
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.endsWith("/snapshot")) {
+        return new Response(
+          JSON.stringify({
+            type: "https://caliburn.dev/problems/job-analysis/authority-conflict",
+            title: "Current document requires workspace reconciliation",
+            status: 409,
+          }),
+          { status: 409, headers: { "Content-Type": "application/problem+json" } },
+        );
+      }
+      return new Response(JSON.stringify(metadata), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      });
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("EventSource", FakeEventSource);
+
+    renderWithClient(
+      <ConsultantWorkspace documentId={DOCUMENT_ID} />,
+      client,
+    );
+    expect(screen.getByRole("region", { name: "目前 JD" })).toBeTruthy();
+
+    await act(async () => {
+      FakeEventSource.latest?.emit(
+        "snapshot",
+        new MessageEvent("snapshot", {
+          data: JSON.stringify({
+            event: "snapshot_changed",
+            document_id: DOCUMENT_ID,
+            revision: snapshot.revision + 1,
+          }),
+        }),
+      );
+    });
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(screen.getByRole("region", { name: "目前 JD" })).toBeTruthy();
+    expect(
+      screen.queryByText("文件已更新，請重新整理後再確認。"),
+    ).toBeNull();
   });
 
   it("locks every document mutation while analysis runs but keeps reading and navigation available", async () => {

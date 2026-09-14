@@ -392,8 +392,8 @@ class JdStorage(JdReader):
             db.jd_revision.c.revision_id == intent.base_revision_id)).scalar_one_or_none()
 
     @staticmethod
-    def _insert_receipt(conn, identity: AdmittedIdentity, base, result, status):
-        body = body_for(identity.command_kind, status)
+    def _insert_receipt(conn, identity: AdmittedIdentity, base, result, status, reinstated=None):
+        body = body_for(identity.command_kind, status, reinstated)
         conn.execute(db.jd_operation.insert().values(document_id=identity.document_id,
             operation_id=identity.operation_id, request_digest=identity.request_digest,
             origin=identity.origin, ai_run_id=identity.ai_run_id,
@@ -443,7 +443,8 @@ class JdStorage(JdReader):
             db.jd_revision.c.revision_id == starts[0])).scalar_one_or_none()
         if stored is None:
             raise DomainError("target_missing", "這一輪之前的版本已無法取得。")
-        return stored
+        return stored, {"reinstated_revision_id": str(starts[0]),
+                        "undone_ai_run_id": arguments["ai_run_id"]}
 
     @staticmethod
     def _restore_target(conn, intent):
@@ -461,7 +462,7 @@ class JdStorage(JdReader):
             db.jd_revision.c.revision_id == target)).scalar_one_or_none()
         if stored is None:
             raise DomainError("target_missing", "還原目標不是這份文件的版本。")
-        return stored
+        return stored, {"reinstated_revision_id": str(target)}
 
     def _edit_locked(self, conn, intent, document, head):
         base = self._base_if_known(conn, intent)
@@ -478,13 +479,16 @@ class JdStorage(JdReader):
         try:
             kind = intent.identity.command_kind
             # Restoring and undoing differ only in how the target revision is
-            # proven; both then rebuild through the one restore service.
-            candidate = (prepare_restore(current.domain, self._restore_target(conn, intent))
-                         if kind == "restore_revision"
-                         else prepare_restore(current.domain, self._undo_target(conn, intent, head))
-                         if kind == "undo_ai_turn"
-                         else prepare_edit(current.domain, intent.command, intent.context,
-                                           request_id=intent.operation_id))
+            # proven; both then rebuild through the one restore service, and
+            # both record which revision they proved so history can say so.
+            reinstated = None
+            if kind in {"restore_revision", "undo_ai_turn"}:
+                stored, reinstated = (self._restore_target(conn, intent) if kind == "restore_revision"
+                                      else self._undo_target(conn, intent, head))
+                candidate = prepare_restore(current.domain, stored)
+            else:
+                candidate = prepare_edit(current.domain, intent.command, intent.context,
+                                         request_id=intent.operation_id)
             wanted = snapshot_from_domain(candidate)
             write_candidate(conn, current.domain, candidate)
             actual = snapshot_from_domain(read_domain(conn, intent.document_id, str(intent.base_revision_id)))
@@ -493,13 +497,15 @@ class JdStorage(JdReader):
             digest = snapshot_digest(actual)
             if digest == snapshot_digest(current.snapshot):
                 savepoint.rollback()
-                return self._insert_receipt(conn, intent.identity, base, base, "no_change")
+                return self._insert_receipt(conn, intent.identity, base, base, "no_change",
+                                            reinstated)
             result = uuid4()
             conn.execute(db.jd_revision.insert().values(document_id=intent.document_id, revision_id=result,
                 revision_number=head["revision_number"] + 1, parent_revision_id=base,
                 origin=intent.origin, format_version=3, engine_profile="jd-relational-v1",
                 snapshot=actual, content_digest=digest, created_at=_now()))
-            receipt = self._insert_receipt(conn, intent.identity, base, result, "committed")
+            receipt = self._insert_receipt(conn, intent.identity, base, result, "committed",
+                                           reinstated)
             conn.execute(db.jd_head.update().where(db.jd_head.c.document_id == intent.document_id).values(
                 current_revision_id=result, revision_number=head["revision_number"] + 1, updated_at=_now()))
             savepoint.commit()

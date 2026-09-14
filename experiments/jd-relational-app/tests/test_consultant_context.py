@@ -281,3 +281,20 @@ def test_factory_sdk_tool_round_trip_keeps_native_blocks_and_real_result(monkeyp
     view = read_closed_model_view(root, document_id=context.document_id,
         dataset_id=context.dataset_id, run_id=context.run_id)
     assert view.response_message_id == result['messages'][-1].id
+
+
+def test_a_taken_back_turn_is_named_in_the_notice_and_nothing_else_is():
+    """The next turn must be able to tell "taken back" from an ordinary edit."""
+    from jd_relational.consultant_context import NOTICE_INSTRUCTION, _material_notice
+    from jd_relational.notice_history import NoticeBoundary, NoticeEvent, NoticeMaterial
+    from jd_relational.references import ReferenceCodec
+    codec = ReferenceCodec(b"x" * 32, str(uuid4()))
+    document, run = str(uuid4()), str(uuid4())
+    head = NoticeBoundary(uuid4(), 3)
+    undo = NoticeEvent(uuid4(), uuid4(), 2, head.revision_id, 3, "manual", "undo_ai_turn", run)
+    edit = NoticeEvent(uuid4(), uuid4(), 1, uuid4(), 2, "ai", "jd_set_text")
+    notice = _material_notice(NoticeMaterial(document, None, head, (undo, edit), 1, 1, 0), codec)
+    assert notice["events"][0]["took_back_ai_run"] == run
+    assert "took_back_ai_run" not in notice["events"][1], "an ordinary edit took nothing back"
+    assert "took_back_ai_run" in NOTICE_INSTRUCTION
+    assert "訪談" in NOTICE_INSTRUCTION and "工作理解" in NOTICE_INSTRUCTION

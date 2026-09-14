@@ -31,6 +31,9 @@ class NoticeEvent:
     result_revision_number: int
     origin: Literal["manual", "ai"]
     command_kind: CommandKind
+    # Set only when this manual revision took one AI turn's JD changes back.
+    # The turn itself, its answers and Memory are untouched by that.
+    undone_ai_run_id: str | None = None
 
 
 @dataclass(frozen=True)
@@ -118,7 +121,9 @@ def _event(row) -> NoticeEvent:
             raise HistoryError("stored_content_mismatch")
         return NoticeEvent(receipt.operation_id, receipt.base_revision_id, row["_parent_number"],
                            receipt.result_revision_id, row["revision_number"],
-                           receipt.origin, receipt.body.command_kind)
+                           receipt.origin, receipt.body.command_kind,
+                           receipt.body.reinstated.undone_ai_run_id
+                           if receipt.body.reinstated else None)
     except HistoryError:
         raise
     except Exception:

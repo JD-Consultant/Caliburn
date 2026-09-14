@@ -31,7 +31,8 @@ def test_terminal_row_reconstructs_same_stable_result_and_no_external_tokens(sta
 
 
 @pytest.mark.parametrize("patch", [
-    {"format_version": 2}, {"unexpected": "silently discarded data"},
+    {"format_version": 3}, {"unexpected": "silently discarded data"},
+    {"format_version": 1, "reinstated": {"reinstated_revision_id": "a" * 36}},
     {"next_action": "reconcile_operation"}, {"command_kind": "arbitrary_sql"},
 ])
 def test_unsupported_stored_body_is_not_silently_upgraded(patch):
@@ -56,3 +57,15 @@ def test_observation_cannot_confirm_a_different_operation_or_arbitrary_effect():
         WriteObservation(saved.document_id, saved.operation_id, None, "changed")
     with pytest.raises(ValueError, match="invalid_terminal_status"):
         body_for("jd_set_text", "outcome_unknown")
+
+
+def test_a_reinstatement_is_only_claimed_by_a_command_that_puts_one_back():
+    """A receipt may not name a revision no command of its kind could reinstate."""
+    proof = {"reinstated_revision_id": str(uuid4())}
+    assert body_for("restore_revision", "committed", proof).reinstated is not None
+    assert body_for("undo_ai_turn", "committed",
+                    {**proof, "undone_ai_run_id": str(uuid4())}).reinstated is not None
+    for refused in (("jd_set_text", "committed"), ("restore_revision", "stale_view"),
+                    ("undo_ai_turn", "save_failed")):
+        with pytest.raises(ValueError, match="invalid_reinstatement"):
+            body_for(*refused, proof)

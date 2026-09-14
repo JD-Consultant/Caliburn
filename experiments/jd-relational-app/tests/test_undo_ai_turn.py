@@ -148,3 +148,33 @@ def test_a_turn_whose_writes_cancelled_out_reports_no_change(store, current):
     _, result = undo(store, removed, run, removed.revision_id)
     assert result.confirmed and result.status == "no_change"
     assert store.read_current(current.document_id).revision_id == removed.revision_id
+
+
+def test_the_receipt_says_which_turn_was_taken_back_and_where_it_started(store, current):
+    """History must be able to explain an undo without re-deriving its range."""
+    run, before = str(uuid4()), current
+    after = turn(store, current, run,
+                 ("jd_create_task", task_args()),
+                 ("jd_set_text", {"target_field_ref": "profile.purpose",
+                                  "text": "本輪寫入的職務目的", "basis_refs": []}))
+    _, result = undo(store, after, run, after.revision_id)
+    assert result.confirmed and result.status == "committed"
+    reinstated = result.receipt.body.reinstated
+    assert reinstated is not None, "an undo receipt that names no turn explains nothing"
+    assert reinstated.undone_ai_run_id == run
+    assert reinstated.reinstated_revision_id == str(before.revision_id)
+
+
+def test_an_ordinary_edit_receipt_claims_no_reinstatement(store, current):
+    _, _, result = change(store, current, "jd_set_text",
+                          {"target_field_ref": "profile.purpose", "text": "手改", "basis_refs": []})
+    assert result.receipt.body.reinstated is None
+
+
+def test_a_refused_undo_records_no_reinstatement(store, current):
+    """Nothing was put back, so nothing may claim it was."""
+    run = str(uuid4())
+    after = turn(store, current, run, ("jd_create_task", task_args()))
+    _, result = undo(store, after, run, uuid4())
+    assert result.receipt.status == "stale_view"
+    assert result.receipt.body.reinstated is None

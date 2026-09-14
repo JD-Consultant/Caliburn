@@ -9,7 +9,7 @@ from datetime import datetime
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from jd_relational.result_transport import validate_result
 
@@ -29,12 +29,36 @@ class ReceiptError(BaseModel):
     message: str = Field(min_length=1, max_length=2048)
 
 
+class ReceiptReinstatement(BaseModel):
+    """Which saved revision an undo or restore actually put back, and whose turn.
+
+    The employee's request carries a run or a target, but the request itself is
+    not kept -- only its digest is. Without this, history can say a manual
+    revision happened but not that it took back a particular AI turn, or where
+    that turn began. It records what the server proved, never what was asked.
+    """
+    model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
+    reinstated_revision_id: str = Field(min_length=36, max_length=36)
+    undone_ai_run_id: str | None = None
+
+
 class ReceiptBody(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True, frozen=True)
-    format_version: Literal[1]
+    # Version 1 rows predate reinstatement provenance and simply have none;
+    # they stay readable exactly as written.
+    format_version: Literal[1, 2]
     command_kind: CommandKind
     error: ReceiptError | None
     next_action: Literal["continue", "correct_arguments", "reread_current", "resolve_dependencies", "stop"]
+    reinstated: ReceiptReinstatement | None = None
+
+    @model_validator(mode="after")
+    def version_owns_its_shape(self):
+        # A version 1 row was written before reinstatement existed, so one
+        # appearing there is a rewritten row, not a readable older receipt.
+        if self.format_version == 1 and self.reinstated is not None:
+            raise ValueError("invalid_receipt_version")
+        return self
 
 
 ERRORS = {
@@ -47,13 +71,18 @@ ERRORS = {
 }
 
 
-def body_for(command_kind: str, status: str) -> ReceiptBody:
+def body_for(command_kind: str, status: str, reinstated: dict | None = None) -> ReceiptBody:
     if status not in {*ERRORS, "committed", "no_change"}:
         raise ValueError("invalid_terminal_status")
     message, action = ERRORS[status] if status in ERRORS else (None, "continue")
-    return ReceiptBody(format_version=1, command_kind=command_kind,
+    if reinstated is not None and (message or command_kind not in {"restore_revision", "undo_ai_turn"}):
+        # Only a command that really put a saved revision back may claim one,
+        # and only when it succeeded.
+        raise ValueError("invalid_reinstatement")
+    return ReceiptBody(format_version=2, command_kind=command_kind,
                        error=ReceiptError(code=status, message=message) if message else None,
-                       next_action=action)
+                       next_action=action,
+                       reinstated=ReceiptReinstatement(**reinstated) if reinstated else None)
 
 
 @dataclass(frozen=True)

@@ -115,7 +115,9 @@ def test_reverting_content_remains_two_events_and_no_change_or_failure_add_none(
     assert notice.events[1].base_revision_id == current.revision_id
     assert all(event.command_kind == "jd_set_text" for event in notice.events)
     assert all(set(asdict(event)) == {"operation_id", "base_revision_id", "base_revision_number",
-        "result_revision_id", "result_revision_number", "origin", "command_kind"} for event in notice.events)
+        "result_revision_id", "result_revision_number", "origin", "command_kind",
+        "undone_ai_run_id"} for event in notice.events)
+    assert all(event.undone_ai_run_id is None for event in notice.events)
     assert current.snapshot["profile"]["purpose"] == third.snapshot["profile"]["purpose"]
     assert reader.read(current.document_id).events == notice.events
     assert reader.read(current.document_id, boundary(third)).total_count == 0
@@ -267,3 +269,19 @@ def test_event_uses_valid_original_receipt_and_matching_origin(reader, store, cu
         with engine.begin() as conn:
             conn.execute(db.jd_operation.update().where(operation).values(**original))
     assert reader.read(current.document_id, boundary(current)).head == boundary(second)
+
+
+@requires_pg
+def test_the_next_turn_is_told_which_turn_the_employee_took_back(reader, store, current):
+    """Taking back a turn's JD changes is news the next turn must not miss."""
+    run = "synthetic-notice-run"
+    written, _, _ = set_purpose(store, current, "本輪寫入", origin="ai")
+    taken_back = intent_for(store, written, "undo_ai_turn",
+                            {"ai_run_id": run,
+                             "expected_result_revision_id": str(written.revision_id)})
+    assert store.execute(taken_back).status == "committed"
+    notice = reader.read(current.document_id, boundary(current))
+    undo_event, ai_event = notice.events
+    assert undo_event.command_kind == "undo_ai_turn" and undo_event.origin == "manual"
+    assert undo_event.undone_ai_run_id == run
+    assert ai_event.undone_ai_run_id is None, "an ordinary edit took nothing back"

@@ -107,3 +107,46 @@ B1／B2 的節點、`files` 與模型預算仍由原 Saver 負責，**不複製�
 2. 資源重建仍是同一程序內；跨程序證據是 R3 未完成的部分。
 3. 顧問指引、三項分析 Skills、`MEMORY_ACTION_GUIDANCE`／`BackgroundAvailability` 與 JD 編輯器共用 writer 的接合都未做。
 4. **`test_chat_api_postgres.py::test_http_ai_edit_results_match_original_receipt_change_and_history_after_manual_head_advance` 目前失敗，且與本輪無關。**把本輪對 `ai_runtime.py`／`memory_context.py` 的改動暫時還原後**仍然重現**（還原後 hash 核對相符）。失敗點是 anchored 聊天歷史回傳 assistant 訊息而非預期的 user 訊息。這是既有問題，記錄於此不代表已診斷或已修；不得因它與本輪同時出現而歸因於背景准入。
+
+## 3. 宿主生命週期與有界背景 worker
+
+### 沿用既有接點，不新造
+
+計畫要求「採既有宿主的有限 worker 接點…不加入新長駐服務、分散式 queue 或無限 Future loop」。`ManualRuntime` 已經有每文件 slot、前景登記與 `close()` 的排空；背景工作**沿同一組機制登記**：
+
+- `admit_background(document_id, work)` 把一個**有界批次**交給宿主自己的單一背景 worker，回傳 Future 由 caller 擁有。**沒有迴圈、沒有輪詢、批次之間不留常駐物**。
+- `close()` 依既有順序多排空一項：停止新准入 → 取消尚未開始的批次 → 等已開始的批次真的退出 → 關 client／Store／Saver／engine。
+- 尚未開始的批次直接取消，**不在程序內保留佇列**：讓它續作的是持久准入列，不是這個 process。
+
+**單一背景 worker 是容量選擇，不是鎖。**前景與人工各有自己的 pool，所以一份文件的長批次不會擋住另一份文件。
+
+背景准入另外要等 `finish_startup()`：**啟動恢復先決定原工作怎麼續作**，新批次不得與它競爭。
+
+### 反例
+
+| 案例 | 釘住的事 |
+|---|---|
+| `..._registered_background_job_is_drained_before_close_returns` | 關閉真的等已登記工作退出 |
+| `..._close_stops_new_background_admission_before_it_drains` | 關閉後不再受理，新工作不會加入正在排空的集合 |
+| `..._background_job_never_blocks_another_document` | 背景忙碌時另一份文件的讀取立即完成 |
+| `..._background_batches_run_one_at_a_time` | 第二批等待，worker 空出後才開始 |
+| `..._overrunning_job_is_reported_rather_than_left_hanging` | 超時回 `False`，不無限等待；釋放後再關可成功 |
+| `..._real_host_gates_admits_drains_and_then_closes_its_resources`（真 PG 真宿主） | 啟動前拒絕；批次在關閉期間仍可用 Store 與准入列；關閉回 True 後兩條連線都已關；此後不再受理 |
+
+### 實測
+
+| 範圍 | 結果 |
+|---|---|
+| `tests/test_background_host.py`（離線） | **5 passed** |
+| `tests/test_background_host_postgres.py`（真 PG 真宿主） | **1 passed** |
+| 宿主相關真 PG 全組（背景宿主、宿主恢復、manual runtime／service、准入） | **37 passed／75.19s** |
+| App 全離線測試 | **2839 passed／283 skipped／64.60s** |
+
+真宿主案例是**單一測試涵蓋整個生命週期**：一個 process 只能 bootstrap 一個宿主，所以啟動閘門、排空與關閉後拒絕受理合併在同一條，而不是拆成三條各開一個宿主。
+
+### 本節限制
+
+1. **沒有任何東西會自動喚醒背景。**`admit_background` 是接點，喚醒條件（安全收尾後、啟動恢復後）與 dispatcher 尚未接上。
+2. **真新 Windows 程序取回原 B 工作仍未做**（計畫 R3 第 7 點的四個停點）。本節的關閉／重開仍是同一程序。
+3. 模型 client 的關閉屬 App 組裝層，不由 `ManualHost` 擁有；本節只驗它擁有的 Store／Saver／engine。
+4. 顧問指引、Skills、`BackgroundAvailability` 與 JD 編輯器共用 writer 的接合仍未做。

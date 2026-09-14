@@ -198,6 +198,7 @@ class _Slot:
     start_token: object | None = None
     foreground: _Foreground | None = None
     read_tokens: dict[object, tuple[int, Event]] = field(default_factory=dict)
+    background: list = field(default_factory=list)
 
 
 def _attempt(mode):
@@ -233,6 +234,11 @@ class ManualRuntime:
         self._pool = ThreadPoolExecutor(max_workers=max_workers, thread_name_prefix="jd-manual")
         self._foreground_pool = ThreadPoolExecutor(max_workers=max_workers,
                                                   thread_name_prefix="jd-foreground")
+        # One background worker is this host's deliberate capacity for B work,
+        # not a lock: manual and foreground calls keep their own pools, so a
+        # long batch on one document never stops another document being used.
+        self._background_pool = ThreadPoolExecutor(max_workers=1,
+                                                  thread_name_prefix="jd-background")
         self._execution = ContextVar("jd_manual_execution", default=None)
         self._catalog_execution = ContextVar("jd_catalog_execution", default=None)
         self._startup_execution = ContextVar("jd_startup_execution", default=None)
@@ -507,6 +513,32 @@ class ManualRuntime:
             with slot.lock:
                 slot.read_tokens.pop(token)
                 completed.set()
+
+    def admit_background(self, document_id: str, work: Callable[[], object]):
+        """Register one bounded background batch and return its Future.
+
+        Nothing here loops, polls or lives between batches: the caller owns the
+        Future and decides what a result means. Admission closes before a
+        shutdown drains, so a batch never joins work already being waited on,
+        and an unstarted batch simply never runs -- its durable admission state
+        is what continues it later, not a queue held in this process.
+        """
+        try:
+            if type(document_id) is not str or str(UUID(document_id)) != document_id or not callable(work):
+                raise ValueError()
+        except (TypeError, ValueError):
+            raise RuntimeFailure("invalid_input") from None
+        slot = self._slot(document_id, admit=True)
+        with slot.lock:
+            self._require_open()
+            self._require_host()
+            if not self._startup_done.is_set():
+                # Startup recovery decides what original work continues. A new
+                # batch before that could race the very job it would replace.
+                raise RuntimeFailure("startup_pending")
+            future = self._background_pool.submit(work)
+            slot.background.append(future)
+        return future
 
     def admit_foreground(self, identity: ForegroundIdentity,
                          work: Callable[[ForegroundPermit], object], *,
@@ -1013,7 +1045,7 @@ class ManualRuntime:
         if not self._startup_lock.acquire(timeout=max(0, deadline - monotonic())):
             return False  # The catalog/Saver scan still owns startup resources.
         self._startup_lock.release()  # Closed admission prevents another scan starting I/O.
-        attempts, foregrounds, readers = [], [], []
+        attempts, foregrounds, readers, backgrounds = [], [], [], []
         for slot in slots:
             if not slot.lock.acquire(timeout=max(0, deadline - monotonic())):
                 return False  # Admission/checkpoint I/O is still using resources.
@@ -1024,6 +1056,7 @@ class ManualRuntime:
                     if thread_id == get_ident():
                         return False  # The current callback cannot wait for itself.
                     readers.append(completed)
+                backgrounds.extend(future for future in slot.background if not future.done())
                 if self._foreground_busy(slot):
                     foregrounds.append(slot.foreground)
                     if slot.foreground.future is None or not slot.foreground.future.done():
@@ -1037,6 +1070,9 @@ class ManualRuntime:
         # cancel-edit action and does not invent a failure for queued writes.
         futures = [attempt.future for attempt in attempts]
         futures.extend(entry.future for entry in foregrounds if entry.future is not None)
+        # Registered background batches drain on the same deadline. A batch that
+        # never started is simply cancelled: its durable admission continues it.
+        futures.extend(future for future in backgrounds if not future.cancel())
         _, running = wait(futures,
                           timeout=max(0, deadline - monotonic()))
         if running:
@@ -1050,6 +1086,7 @@ class ManualRuntime:
         for entry in foregrounds:
             if not entry.settled.wait(max(0, deadline - monotonic())) or not entry.closed:
                 return False  # The actual run ending is not native checkpoint closure.
+        self._background_pool.shutdown(wait=True)
         self._foreground_pool.shutdown(wait=True)
         self._pool.shutdown(wait=True)
         return True

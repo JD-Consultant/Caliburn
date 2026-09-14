@@ -23,6 +23,7 @@
 ### OI-02｜Memory、工作理解與來源原文：核心阻擋
 - 現象／影響：已接當輪原話 source owner、真 request 引用通知及人工／AI 共用保存驗證，真 PG 更正與重新開啟資源可讀原來源。完整 Memory／案例能力、較早來源檢索及來源 UI 尚未接；頁面 metadata／`not_checked` 仍不代表使用者已能回查原話。這直接影響反覆更正、忠實度與客製化，不能當美化缺口。
 - 證據：[Agent 接合界線](2026-09-13-jd-ai-runtime-and-tools-slice.md)、[人工通知與 context 界線](2026-09-13-jd-consultant-context-slice.md)、[工具責任](2026-09-12-jd-relational-agent-tool-contract.md)。
+- **2026-09-14 來源 UI 局部：**讀取視圖一直都回傳每個欄位／項目依據哪些訪談、以及那份依據是否仍吻合目前內容，但畫面驗證完就丟掉。現在每個欄位與項目下方會說「依據你說過的 N 段訪談」，內容在那之後被改過時改說「原始依據可能不再吻合」。不顯示不透明的 source token，也**不顯示 readability**——伺服器明說那項未核對，畫面不得暗示原話點得開。**仍未接：**由來源點回原話的讀取路徑（需要新的唯讀 HTTP 路由與契約），以及較早來源檢索。
 - 已驗局部：[當輪原話接合](2026-09-13-jd-consultant-source-integration-slice.md)。沒有新增原話表或模型工具；來源故障停止回合、人工來源讀取可排空，兩項獨審缺口已修；當輪固定來源不是所有早期工作已納入的證明。
 - 已驗核心：[獨立 Memory 套件與新來源接合](2026-09-13-jd-memory-core-adoption-slice.md)完成既有保存／發布、固定讀取、來源埠及 proper wheel；核心44、來源71、受影響113、真 PG1及獨審98通過（範圍重疊不相加）。真 Store／發布可修正、阻擋舊整理覆蓋及重開讀原話；模型 Memory 工具、B1/B2/C 與日常宿主尚未接，不等於完整 Memory 通過。
 - 已驗宿主：[Memory 資源／初始化／重開](2026-09-13-jd-memory-host-integration-slice.md)接同設定與原生 Store。受影響154、初始化33真PG、新Windows／PG1與原旅程回歸3通過；只有已登記讀取／既有前景的排空範圍，模型Memory／背景工作尚未接。普通open不setup，JD／原話不雙寫。

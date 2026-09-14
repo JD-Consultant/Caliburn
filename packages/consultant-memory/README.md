@@ -34,6 +34,14 @@ App 配發 operation／base／source，模型只提供 path／diff；本核心�
 
 App adapter（`consolidation_app.py`）已接，並在真 `PostgresSaver`／`PostgresStore`／publication 上驗過兩批有序交接、pending 續作、發布回覆遺失查回與 C 較晚更正（[R2 結果](../../docs/specs/evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。**尚未接 runtime：**通知註冊、背景准入與宿主生命週期仍待施工；「B2 未發布不得開始下一批」目前由 caller 串行負責。[H4 執行計畫 R3](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
 
+## 顧問方法資產
+
+`caliburn_memory.skills` 與三項分析 Skills（`work-scope-interview`／`compare-work-patterns`／`outcomes-and-expertise`）已自 `033540ce` **位元組相同**採用；`SkillAssets` 只讀，沒有 write／edit／delete／execute，`upload_files` 不實作。`analysis_skills(SkillAssets())` 以官方 Skills middleware 把方法**名稱、用途與讀取路徑**放進 system prompt，SKILL.md 內文由模型按需以既有 `read_file` 讀取，不每輪全載。後加的 `write-customized-jd` **不採用**。
+
+`caliburn_memory.guidance.MEMORY_ACTION_GUIDANCE` 逐字採用（`instructions_sha256`），描述的 `repair_memory` 與 `request_memory_consolidation` 都由本套件提供。舊 `live_memory.py` 的其餘部分是舊 host 組裝，不採用。
+
+wheel 已含這些 `.md` 資產（`uv build` 後於 `caliburn_memory/skills/*/SKILL.md` 可見）。
+
 ## 安裝與驗證
 
 Python 3.12。App 的 `uv.lock` 固定實測組合；獨立 wheel 由 Hatchling 產生。B2 直接使用 `langchain` 的 Agent 與中介 API，故 `langchain==1.4.0` 已明示宣告，不再只靠 Deep Agents 的傳遞依賴。
@@ -49,4 +57,4 @@ uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 
 Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，patch／保存核心不建立 provider；B1 執行由 App 注入的模型 runnable。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
 
-目前完成保存／發布、原話接點、固定只讀工具、C 修補核心及其 App 停止／恢復接合，以及 B1／B2 兩個背景階段的採用與真 PG 交接。**背景排程與准入、顧問指引與完整旅程仍未完成**；不要再把 C 或 B2 寫成尚未採用，也不能以 package 測試代稱日常顧問可用。
+目前完成保存／發布、原話接點、固定只讀工具、C 修補核心及其 App 停止／恢復接合，B1／B2 兩個背景階段的採用與真 PG 交接，以及顧問方法資產（A 指引、三項分析 Skills、Memory 行動指引）的採用與 App 組裝。**新宿主程序恢復與完整旅程仍未完成**；不要把 package 測試或固定組裝測試代稱日常顧問可用，也不能宣稱自然訪談品質已驗。

@@ -81,6 +81,42 @@
       "adopted_path": "src/caliburn_memory/consolidation_feedback.py",
       "adopted_sha256": "9462dadba4de4fe2857dcac14724416d8dffd5d9365523e5f98922120c140fb6",
       "adaptation": "Adopted 2026-09-14 with package imports only; completed_messages and the can_jump_to model feedback hook are otherwise byte-identical."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/skills.py",
+      "source_sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce",
+      "adopted_path": "src/caliburn_memory/skills.py",
+      "adopted_sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce",
+      "adaptation": "Adopted 2026-09-14 byte-identical. SkillAssets resolves its assets from Path(__file__).with_suffix(''), so the adopted skills/ directory sits beside this module exactly as it did at source. No host import existed to change."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md",
+      "source_sha256": "dd3c90f7376cb99dce5da91c6aa3172af401ae891ac96213858303edbd260d30",
+      "adopted_path": "src/caliburn_memory/skills/work-scope-interview/SKILL.md",
+      "adopted_sha256": "dd3c90f7376cb99dce5da91c6aa3172af401ae891ac96213858303edbd260d30",
+      "adaptation": "Adopted 2026-09-14 byte-identical."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md",
+      "source_sha256": "d4e8abc339115f9ae4ad8c321e0696291c0dafa4c745b7606f648f5ad9f783aa",
+      "adopted_path": "src/caliburn_memory/skills/compare-work-patterns/SKILL.md",
+      "adopted_sha256": "d4e8abc339115f9ae4ad8c321e0696291c0dafa4c745b7606f648f5ad9f783aa",
+      "adaptation": "Adopted 2026-09-14 byte-identical."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md",
+      "source_sha256": "5856afcf8d7522257a656fb2b6162a3129a145fd91b54225636d72ccf94a6686",
+      "adopted_path": "src/caliburn_memory/skills/outcomes-and-expertise/SKILL.md",
+      "adopted_sha256": "5856afcf8d7522257a656fb2b6162a3129a145fd91b54225636d72ccf94a6686",
+      "adaptation": "Adopted 2026-09-14 byte-identical."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/live_memory.py",
+      "source_sha256": "30c2901760d6d2e0a7173adc7368499d25b9679b9a17bf7344cb20b8e74ac5f2",
+      "adopted_path": "src/caliburn_memory/guidance.py",
+      "adopted_sha256": "06cdbbe6eed56d7ce429e03697891ed6dd53a08bddc6239b7d8e1f59b74b1cb5",
+      "instructions_sha256": "680d4a61b42ac7c5260b0dc4c9f437563efe9b5f624acb45cb0e300bb988b3e5",
+      "adaptation": "Only MEMORY_ACTION_GUIDANCE is adopted, on 2026-09-14, and its text is byte-identical (instructions_sha256 is the sha256 of the constant's value; a test re-reads it from the source commit and compares). The rest of live_memory.py is that host's own C assembly and is NOT adopted -- this App has its own memory_context, repair session and notice path. The adopted file is therefore an extract with a new docstring, not a copy of the source file, which is why the file hashes differ. The guidance names repair_memory and request_memory_consolidation, both of which this package owns."
     }
   ],
   "new_files": {

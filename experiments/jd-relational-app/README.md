@@ -151,7 +151,7 @@ uv run --offline --frozen python -m jd_relational serve
 
 目前／歷史 item、field、container、section 與觀察 refs 已發配／驗證，`command_context` 用同版讀取材料重核可寫用途、存在性與欄位摘要。來源查核仍是注入 callback，未接實際 source owner；讀取回 `readability=not_checked`。瀏覽器選區發配仍未完成，此接點明示拒絕 selection，不把 field ref 當選區。
 
-`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。固定設定與手動管理畫面已接，日常 configured API 包含無 refs recover 的資料集門閘；備份還原世代流程、人工通知及實際顧問回合尚待接線。
+`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。固定設定與手動管理畫面已接，日常 configured API 包含無 refs recover 的資料集門閘。[備份與還原演練](../../docs/specs/2026-09-14-jd-backup-and-restore-slice.md)已完成：一份完整備份＝整個資料庫的 `pg_dump`（**不要用 `-n`**，`jd_runtime` 的對話與 Memory 在裡面）＋ `host.v1.dpapi`；還原後 JD 逐版 digest 與訪談 checkpoint 都相同，已發出的引用只有備份下來的簽章金鑰解得開，provider 金鑰不在備份內、還原後重新 `set-key`。世代輪替、異地保存與同名覆蓋還原尚未演練；人工通知及實際顧問回合尚待接線。
 
 文字自動保存、管理表單與原請求暫存已接，真瀏覽器重開可找回未完成內容；原生故障注入、實體 IME 及 AI 交接仍待驗。正文歷史還原／整輪撤回與維護尚未完成。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
 

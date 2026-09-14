@@ -43,7 +43,7 @@ function fixture(revision = 'original'): JdView {
   container('conditions', 'conditions', 'work_environment');
   item(10, 'conditions', 'conditions', 'work_environment', 0, { text: '室內環境' });
   item(11, 'conditions', 'conditions', 'work_environment', 1, { text: '少量現場工作' });
-  return { revisionRef: ref('revision'), sections, containers, items, fields, relations: [{ type: 'task_capability',
+  return { revisionRef: ref('revision'), sections, containers, items, fields, sources: [], relations: [{ type: 'task_capability',
     section_ref: ref('duties_tasks'), task_ref: ref('item-3'), capability_ref: ref('item-7'), capability_kind: 'knowledge', position: 0 }] };
 }
 const item = (view: JdView, number: number) => view.items.find(row => row.item_id === uuid(number))!;

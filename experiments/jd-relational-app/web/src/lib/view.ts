@@ -21,6 +21,26 @@ export interface JdView {
   fields: FieldView[];
   containers: ContainerRecord[];
   relations: RelationRecord[];
+  sources: SourceRecord[];
+}
+
+/** The stored bases for one field or item; refs stay opaque to the page. */
+export function sourcesFor(view: JdView, targetRef: string): SourceRecord[] {
+  return view.sources.filter(source => source.target_ref === targetRef);
+}
+
+/** What the page may say about where this content came from, or nothing.
+ *
+ * Reuse of one interview for several targets is valid, so this counts the
+ * stored bases for this target, not distinct interviews. `readability` is
+ * deliberately not reported: the server states it is not checked, so the page
+ * must never imply the original words are reachable. */
+export function sourceSummary(view: JdView, targetRef: string):
+    { count: number; needsRecheck: boolean } | null {
+  const found = sourcesFor(view, targetRef);
+  if (found.length === 0) return null;
+  return { count: found.length,
+           needsRecheck: found.some(source => source.basis_status === "needs_recheck") };
 }
 
 export const fieldLabels = {
@@ -170,7 +190,7 @@ export function projectView(page: ReadPage): JdView {
     if (task.section_ref !== relation.section_ref || task.kind !== "task"
         || capability.kind !== relation.capability_kind) invalid();
   }
-  // Sources are displayed elsewhere, but cannot hide dangling page associations.
+  // Sources are shown beside their target, and cannot hide dangling associations.
   // Reusing one source for multiple targets is valid and is not deduplicated.
   for (const source of sources) {
     resolve(sectionByRef, source.section_ref);
@@ -182,5 +202,6 @@ export function projectView(page: ReadPage): JdView {
     }
   }
 
-  return { revisionRef: page.revision_ref, sections, items, fields, containers, relations };
+  return { revisionRef: page.revision_ref, sections, items, fields, containers, relations,
+           sources };
 }

@@ -163,3 +163,30 @@ test('deleted identical requirements under identical tasks remain distinguishabl
   assert.match(visibleB, /職責 B/); assert.doesNotMatch(visibleB, /職責 A/);
   assert.match(visibleA, /驗證/); assert.match(visibleA, /完成檢查/);
 });
+
+test('the editor says where content came from, and never promises the words are readable', () => {
+  const { before } = fixture();
+  const task = before.items.find(row => row.item_id === 'task-id')!;
+  const duty = before.items.find(row => row.item_id === 'duty-id')!;
+  const source = (target: string, basis_status: 'current' | 'needs_recheck') => ({
+    type: 'source' as const, section_ref: task.section_ref, target_ref: target,
+    related_capability_ref: null, source_ref: 'opaque-source-token',
+    basis_status, readability: 'not_checked' as const });
+  const view = { ...before, sources: [source(task.item_ref, 'current'), source(task.item_ref, 'current'),
+                                      source(duty.item_ref, 'needs_recheck')] };
+  const html = renderToStaticMarkup(React.createElement(JdEditor, {
+    view, values: {}, disabled: false, form: null, onFormChange() {}, onField() {},
+    onComposition() {}, async onCommand() {} }));
+  assert.match(html, /依據你說過的 2 段訪談。/);
+  assert.match(html, /依據你說過的 1 段訪談；這段內容後來改過，原始依據可能不再吻合。/);
+  assert.doesNotMatch(html, /opaque-source-token/);
+  assert.doesNotMatch(html, /可讀|已核對|開啟原話/);
+});
+
+test('content with no recorded basis claims none', () => {
+  const { before } = fixture();
+  const html = renderToStaticMarkup(React.createElement(JdEditor, {
+    view: { ...before, sources: [] }, values: {}, disabled: false, form: null,
+    onFormChange() {}, onField() {}, onComposition() {}, async onCommand() {} }));
+  assert.doesNotMatch(html, /依據你說過的/);
+});

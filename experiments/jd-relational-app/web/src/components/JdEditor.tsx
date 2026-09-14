@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Alert, Box, Button, Divider, Paper, Stack, TextField, Typography } from '@mui/material';
 import type { ContainerRecord } from '../../../src/jd_relational/generated/jd-read.ts';
 import type { ManualCommand } from '../../../src/jd_relational/generated/jd-manual-http.ts';
-import { containerKey, fieldLabels, kindLabels, type FieldView, type ItemView, type JdView } from '../lib/view';
+import { containerKey, fieldLabels, kindLabels, sourceSummary, type FieldView, type ItemView, type JdView } from '../lib/view';
 import ItemDialog, { itemText, manageItemForm, newItemForm, type CommandOptions } from './ItemDialog';
 import type { ChangeMarker, RunMarkers } from '../lib/run-changes';
 
@@ -45,6 +45,17 @@ export default function JdEditor({ view, disabled, commandsDisabled = false, val
     return values?.map(marker => <Button key={marker.changeIndex} size="small" variant="outlined"
       href={`#jd-run-change-${marker.changeIndex}`} onClick={() => onShowChange?.(marker.changeIndex)}>{marker.label} · 查看</Button>);
   }
+  // Where this content came from. The server says readability is not checked,
+  // so this never promises the original words can be opened.
+  function sourceNote(targetRef: string) {
+    const summary = sourceSummary(view, targetRef);
+    if (!summary) return null;
+    return <Typography variant="caption" color={summary.needsRecheck ? 'warning.main' : 'text.secondary'}>
+      {summary.needsRecheck
+        ? `依據你說過的 ${summary.count} 段訪談；這段內容後來改過，原始依據可能不再吻合。`
+        : `依據你說過的 ${summary.count} 段訪談。`}
+    </Typography>;
+  }
   function fieldEditor(field: FieldView) {
     const text = Object.hasOwn(values, field.key) ? values[field.key] : field.value ?? '';
     return <Stack key={field.key} spacing={0.5}>
@@ -56,7 +67,7 @@ export default function JdEditor({ view, disabled, commandsDisabled = false, val
         const target = event.target;
         if (target instanceof HTMLTextAreaElement || target instanceof HTMLInputElement) onField(field, target.value);
         onComposition(false);
-      }} /></Stack>;
+      }} />{sourceNote(field.field_ref)}</Stack>;
   }
   function itemCard(item: ItemView, container: ContainerRecord, index: number, total: number) {
     const displayOrder: Partial<Record<FieldView['name'], number>> = { name: 0, description: 1, scope_text: 1, text: 2 };
@@ -66,7 +77,10 @@ export default function JdEditor({ view, disabled, commandsDisabled = false, val
     const uses = view.relations.filter(relation => relation.capability_ref === item.item_ref);
     return <Box key={item.item_id} id={`jd-item-${item.item_id}`} className="jd-item" sx={{ scrollMarginTop: 100, py: 1 }}>
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 1.5 }}>
-        <Typography variant="subtitle2" sx={{ flex: 1 }}>{kindLabels[item.kind]} {index + 1}</Typography>
+        <Stack sx={{ flex: 1 }}>
+          <Typography variant="subtitle2">{kindLabels[item.kind]} {index + 1}</Typography>
+          {sourceNote(item.item_ref)}
+        </Stack>
         {markerLinks(markers?.items[item.item_id])}
         <Button size="small" disabled={structuralDisabled || index === 0} aria-label={`${kindLabels[item.kind]} ${index + 1} 上移`} onClick={() => void reorder(item, -1)}>上移</Button>
         <Button size="small" disabled={structuralDisabled || index === total - 1} aria-label={`${kindLabels[item.kind]} ${index + 1} 下移`} onClick={() => void reorder(item, 1)}>下移</Button>

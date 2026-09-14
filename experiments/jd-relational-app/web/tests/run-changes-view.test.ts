@@ -7,7 +7,7 @@ import { matchingRun, runChangeKey, groupChanges, projectRunMarkers, visibleRunM
 
 const api = {};
 const scope = { api, datasetId: 'dataset', documentId: 'doc', key: 'capture-key' };
-const emptyView = (revisionRef: string): JdView => ({ revisionRef, sections: [], items: [], fields: [], containers: [], relations: [] });
+const emptyView = (revisionRef: string): JdView => ({ revisionRef, sections: [], items: [], fields: [], containers: [], relations: [], sources: [] });
 const state = (runId = 'A', effects = 'unconfirmed', operations: string[] = ['op-a']): ChatRunState => ({
   dataset_id: 'dataset', document_id: 'doc', run_id: runId, run_status: 'running', input_state: 'saved',
   response_message_id: null, stop_requested: false, write_state: {}, jd_effects: { state: effects,

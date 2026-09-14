@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 import type { ReadPage, ReadRecord } from "../../src/jd_relational/generated/jd-read.ts";
-import { containerKey, fieldKey, fieldLabels, kindLabels, projectView } from "../src/lib/view.ts";
+import { containerKey, fieldKey, fieldLabels, kindLabels, projectView, sourceSummary, sourcesFor } from "../src/lib/view.ts";
 
 const ids = {
   duty: "00000000-0000-4000-8000-000000000001",
@@ -154,4 +154,25 @@ test("all generated field and item kinds have Chinese labels", () => {
   assert.equal(kindLabels.requirement, "要求");
   assert.equal(Object.keys(fieldLabels).length, 9);
   assert.equal(Object.keys(kindLabels).length, 12);
+});
+
+test("sources reach the view so the page can say where content came from", () => {
+  const view = projectView(page());
+  assert.equal(view.sources.length, 2);
+  const forTitle = sourcesFor(view, view.fields.find(f => f.name === "job_title")!.field_ref);
+  assert.equal(forTitle.length, 1);
+  assert.equal(forTitle[0].basis_status, "current");
+  const forTask = sourcesFor(view, view.items.find(i => i.item_id === ids.first)!.item_ref);
+  assert.equal(forTask.length, 1);
+  assert.equal(forTask[0].basis_status, "needs_recheck");
+  assert.deepEqual(sourcesFor(view, view.items.find(i => i.item_id === ids.second)!.item_ref), []);
+});
+
+test("a source summary counts turns and warns only when a basis needs rechecking", () => {
+  const view = projectView(page());
+  const title = view.fields.find(f => f.name === "job_title")!.field_ref;
+  const task = view.items.find(i => i.item_id === ids.first)!.item_ref;
+  assert.deepEqual(sourceSummary(view, title), { count: 1, needsRecheck: false });
+  assert.deepEqual(sourceSummary(view, task), { count: 1, needsRecheck: true });
+  assert.equal(sourceSummary(view, view.items.find(i => i.item_id === ids.second)!.item_ref), null);
 });

@@ -30,6 +30,8 @@ export interface ReadCatalog {
   failure: ReadFailure;
   change_read: ChangeReadInput;
   change_page: ChangeReadPage;
+  restore_preview_read: RestorePreviewInput;
+  restore_preview_page: RestorePreviewPage;
 }
 /**
  * Read a complete current JD, an issued item or section, or historical revisions. All arguments are required. Use null target for current or the history index; use a returned cursor to continue exactly the same view. History is read-only.
@@ -345,4 +347,43 @@ export interface ChangeAffectedTaskRecord {
   change_index: number;
   before_task_ref: string | null;
   after_task_ref: string | null;
+}
+/**
+ * Ask what restoring one saved revision would change; reading never writes.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "RestorePreviewInput".
+ */
+export interface RestorePreviewInput {
+  target_revision_ref: string;
+  cursor: string | null;
+}
+/**
+ * What restoring a chosen revision would change, compared against the head it was read at. There is no operation and no origin here: nothing has happened yet.
+ *
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "RestorePreviewPage".
+ */
+export interface RestorePreviewPage {
+  format_version: number;
+  view: "restore_preview";
+  /**
+   * The comparison is against the current head, which may move before a restore is confirmed.
+   */
+  access: "current";
+  /**
+   * The head this comparison was read at; confirming a restore sends it back, and a head that moved is refused.
+   */
+  base_revision_ref: string;
+  records: ChangeReadRecord[];
+  start_index: number;
+  total_records: number;
+  total_changes: number;
+  has_more: boolean;
+  next_cursor: string | null;
+  oversized_unit: boolean;
+  /**
+   * The saved revision whose content would become current.
+   */
+  target_revision_ref: string;
 }

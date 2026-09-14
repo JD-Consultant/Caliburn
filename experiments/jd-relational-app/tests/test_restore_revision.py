@@ -16,6 +16,7 @@ import sqlalchemy as sa
 
 from jd_relational.memory_context import build_consultant_tools
 from jd_relational.snapshots import snapshot_digest
+from jd_relational.references import SignedReference
 from jd_relational.storage import schema as db
 from jd_relational.transport import MODELS, TransportError, manual_command, model_command
 
@@ -124,3 +125,53 @@ def test_restored_source_links_come_back_as_they_were_recorded(store, current):
     assert result.status == "committed"
     restored = store.read_current(current.document_id)
     assert {row["source_ref"] for row in restored.domain["source_links"]} == links
+
+
+def preview(reads, document_id, target_ref, cursor=None):
+    return reads.preview_restore(document_id, {"target_revision_ref": target_ref, "cursor": cursor})
+
+
+def test_the_preview_shows_the_whole_difference_before_anything_happens(store, current):
+    """What restoring would change, named against the head it was read at."""
+    from jd_relational.change_reads import ChangeReadService
+    from jd_relational.references import ReferenceCodec
+    from jd_relational.storage.history import HistoryReader
+
+    codec = ReferenceCodec(b"synthetic-restore-preview-signing-key", str(uuid4()))
+    reads = ChangeReadService(HistoryReader(store.engine), codec)
+    after_task, _, _ = change(store, current, "jd_create_task", task_args())
+    with_extra, _, _ = change(store, after_task, "jd_insert_item",
+                              insert_item("duty", name="後來新增的職責", scope_text=None))
+
+    target_ref = codec.issue(SignedReference(document_id=current.document_id,
+        revision_id=str(after_task.revision_id), purpose="history", role="revision", kind="revision"))
+    page = preview(reads, current.document_id, target_ref)
+    assert page["view"] == "restore_preview" and page["access"] == "current"
+    assert page["target_revision_ref"] == target_ref
+    assert page["total_changes"] > 0 and page["records"]
+    # Nothing happened: the head is exactly where it was.
+    assert store.read_current(current.document_id).revision_id == with_extra.revision_id
+    # The head it compared against is named, so confirming can send it back.
+    base = codec.resolve(page["base_revision_ref"], document_id=current.document_id,
+                         roles={"revision"}, purposes={"history"})
+    assert base.revision_id == str(with_extra.revision_id)
+    # The duty added after the target is what would be removed.
+    removed = [record for record in page["records"]
+               if record["type"] == "change" and record["entity_kind"] == "duty"]
+    assert removed and all(record["after_exists"] is False for record in removed)
+
+
+def test_previewing_the_current_content_reports_no_difference(store, current):
+    """Nothing to show is a real answer, and still does not write."""
+    from jd_relational.change_reads import ChangeReadService
+    from jd_relational.references import ReferenceCodec
+    from jd_relational.storage.history import HistoryReader
+
+    codec = ReferenceCodec(b"synthetic-restore-preview-signing-key", str(uuid4()))
+    reads = ChangeReadService(HistoryReader(store.engine), codec)
+    after_task, _, _ = change(store, current, "jd_create_task", task_args())
+    target_ref = codec.issue(SignedReference(document_id=current.document_id,
+        revision_id=str(after_task.revision_id), purpose="history", role="revision", kind="revision"))
+    page = preview(reads, current.document_id, target_ref)
+    assert page["total_changes"] == 0 and page["records"] == [] and page["has_more"] is False
+    assert store.read_current(current.document_id).revision_id == after_task.revision_id

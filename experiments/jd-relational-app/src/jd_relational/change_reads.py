@@ -11,7 +11,9 @@ from pydantic import ValidationError
 
 from .changes import compare_snapshots
 from .domain import COLLECTIONS, FIELDS, SOURCE_COLUMNS, source_target
-from .generated.reads import ChangeReadInput, ChangeReadPage
+from .generated.reads import (
+    ChangeReadInput, ChangeReadPage, RestorePreviewInput, RestorePreviewPage,
+)
 from .reads import READ_FORMAT_VERSION, ReadError, content_projection, pack_read_records
 from .references import ReadCursor, ReferenceValidationError, SignedReference
 from .snapshots import domain_from_snapshot
@@ -217,6 +219,69 @@ class ChangeReadService:
             raise
         except HistoryError as exc:
             raise ReadError("target_missing" if exc.code in {"document_missing", "operation_missing", "revision_missing"}
+                            else "read_failed") from None
+        except Exception:
+            raise ReadError("read_failed") from None
+
+
+    def preview_restore(self, document_id, arguments):
+        """What restoring one saved revision would change, before anything happens.
+
+        The comparison is the current head against the chosen revision, and the
+        answer names the head it was read at: confirming a restore sends that
+        head back, so a head that moved meanwhile is refused at save time rather
+        than being quietly applied to a different version.
+
+        There is no operation and no origin here, and no receipt is invented to
+        fill a shape: nothing has been written. This is the same projection the
+        saved-change view uses, so Web never computes a business difference.
+        """
+        try:
+            request = RestorePreviewInput.model_validate(arguments, strict=True)
+            target = self.codec.resolve(request.target_revision_ref, document_id=document_id,
+                                        roles={"revision"}, purposes={"history", "observation"})
+            cursor = (self.codec.resolve_cursor(request.cursor, document_id=document_id,
+                                                view="restore_preview", revision_id=target.revision_id)
+                      if request.cursor is not None else None)
+        except ReferenceValidationError:
+            raise ReadError("invalid_ref") from None
+        except ValidationError:
+            raise ReadError("invalid_input") from None
+        except Exception:
+            raise ReadError("read_failed") from None
+        try:
+            head = self.history.read_head_revision(document_id)
+            chosen = self.history.read_revision(document_id, UUID(target.revision_id))
+            if head.document_id != document_id or chosen.document_id != document_id:
+                raise ValueError("invalid_material_scope")
+            total_changes, records = project_revision_changes(head, chosen, self.codec)
+            start = cursor.offset if cursor else 0
+            if start > len(records) or cursor is not None and start == len(records):
+                raise ReadError("invalid_ref")
+            remaining = records[start:]
+
+            def revision_ref(revision):
+                return self.codec.issue(SignedReference(document_id=document_id, revision_id=str(revision),
+                    purpose="history", role="revision", kind="revision"))
+
+            def page_at(end, oversized=False):
+                more = start + end < len(records)
+                next_cursor = self.codec.issue_cursor(ReadCursor(document_id=document_id,
+                    view="restore_preview", revision_id=target.revision_id,
+                    offset=start + end)) if more else None
+                return dict(format_version=READ_FORMAT_VERSION, view="restore_preview", access="current",
+                            base_revision_ref=revision_ref(head.revision_id),
+                            target_revision_ref=revision_ref(chosen.revision_id),
+                            records=remaining[:end], start_index=start, total_records=len(records),
+                            total_changes=total_changes, has_more=more, next_cursor=next_cursor,
+                            oversized_unit=oversized)
+
+            page = pack_read_records(remaining, page_at, self.page_bytes)
+            return RestorePreviewPage.model_validate(page, strict=True).model_dump(mode="json")
+        except ReadError:
+            raise
+        except HistoryError as exc:
+            raise ReadError("target_missing" if exc.code in {"document_missing", "revision_missing"}
                             else "read_failed") from None
         except Exception:
             raise ReadError("read_failed") from None

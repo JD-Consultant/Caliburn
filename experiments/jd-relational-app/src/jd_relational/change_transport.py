@@ -2,7 +2,9 @@
 
 import json
 
-from .generated.reads import ChangeReadInput, ChangeReadPage, ReadFailure
+from .generated.reads import (
+    ChangeReadInput, ChangeReadPage, ReadFailure, RestorePreviewInput,
+)
 from .read_transport import ERRORS
 from .reads import ReadError, read_json
 from .transport import TransportError
@@ -29,7 +31,16 @@ def change_tool_definition(provider):
     raise TransportError("unknown_provider")
 
 
+def parse_restore_preview_arguments(arguments):
+    """The same strict re-parse as a saved-change read, for the preview shape."""
+    return _parse_arguments(arguments, RestorePreviewInput)
+
+
 def parse_change_arguments(arguments):
+    return _parse_arguments(arguments, ChangeReadInput)
+
+
+def _parse_arguments(arguments, model):
     def unique(pairs):
         result = {}
         for key, value in pairs:
@@ -46,7 +57,7 @@ def parse_change_arguments(arguments):
         if len(raw.encode("utf-8")) > 16384:
             raise ValueError("input_too_large")
         value = json.loads(raw, object_pairs_hook=unique, parse_constant=invalid_constant)
-        return ChangeReadInput.model_validate(value, strict=True).model_dump(mode="json")
+        return model.model_validate(value, strict=True).model_dump(mode="json")
     except (ValueError, TypeError, UnicodeError, RecursionError):
         raise ReadError("invalid_input") from None
 

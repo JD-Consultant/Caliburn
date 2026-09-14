@@ -22,10 +22,12 @@ from starlette.middleware.trustedhost import TrustedHostMiddleware
 from starlette.responses import JSONResponse
 
 from .generated.query_http import QueryProblem
-from .generated.reads import ReadInput, ReadPage, ChangeReadInput, ChangeReadPage
+from .generated.reads import (
+    ChangeReadInput, ChangeReadPage, ReadInput, ReadPage, RestorePreviewInput, RestorePreviewPage,
+)
 from .query_http import query_problem
 from .read_transport import parse_read_arguments
-from .change_transport import parse_change_arguments
+from .change_transport import parse_change_arguments, parse_restore_preview_arguments
 from .reads import ReadError
 
 LOG = logging.getLogger("caliburn.jd.http")
@@ -221,6 +223,12 @@ def create_query_app(
         except UnicodeError:
             raise ReadError("invalid_input") from None
 
+    async def preview_arguments(request: Request, body: RestorePreviewInput):
+        try:
+            return parse_restore_preview_arguments((await request.body()).decode("utf-8"))
+        except UnicodeError:
+            raise ReadError("invalid_input") from None
+
     errors = {
         status: {"model": QueryProblem, "content": {"application/problem+json": {}}}
         for status in (404, 409, 422, 500)
@@ -242,6 +250,17 @@ def create_query_app(
     ):
         return request.app.state.jd_queries.changes.read(str(document_id), arguments)
 
+    @app.post(
+        "/api/documents/{document_id}/jd/restore/preview",
+        response_model=RestorePreviewPage,
+        responses=errors,
+    )
+    def restore_preview(
+        document_id: UUID, request: Request, arguments: Annotated[dict, Depends(preview_arguments)]
+    ):
+        """Reading only: this says what a restore would change, and writes nothing."""
+        return request.app.state.jd_queries.changes.preview_restore(str(document_id), arguments)
+
     # Keep schemas generated from the DTOs. FastAPI associates the default JSON
     # media type with every additional response model; these four responses use
     # RFC 9457, so relocate only that generated media entry via its public hook.
@@ -252,6 +271,7 @@ def create_query_app(
         for path in (
             "/api/documents/{document_id}/jd/read",
             "/api/documents/{document_id}/jd/changes/read",
+            "/api/documents/{document_id}/jd/restore/preview",
         ):
             for status in errors:
                 content = schema["paths"][path]["post"]["responses"][str(status)]["content"]

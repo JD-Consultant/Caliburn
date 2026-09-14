@@ -308,6 +308,21 @@ class HistoryReader:
                 raise HistoryError("stored_content_mismatch")
             return RunChangeMaterial("continuous", receipts, base, result)
 
+    def read_head_revision(self, document_id: str) -> HistoricalRevision:
+        """The document's current revision, with its own saved content.
+
+        Reading the head is the only way to say what a comparison was made
+        against; it is not a claim that the head will still be there when
+        something is confirmed.
+        """
+        _document_id(document_id)
+        with self._read() as conn:
+            head = conn.execute(sa.select(db.jd_head).where(
+                db.jd_head.c.document_id == document_id)).mappings().one_or_none()
+            if head is None:
+                raise HistoryError("head_missing")
+            return self._revision(conn, document_id, head["current_revision_id"])
+
     def list_revisions(self, document_id: str, anchor_revision_id: UUID | None = None,
                        before_number: int | None = None, limit: int = 50) -> RevisionPage:
         _document_id(document_id)

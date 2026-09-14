@@ -301,6 +301,42 @@ class ChangeReadPage(BaseModel):
     oversized_unit: StrictBool
 
 
+class RestorePreviewPage(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    format_version: conint(ge=2, le=2, strict=True)
+    view: Literal['restore_preview']
+    access: Literal['current'] = Field(
+        ...,
+        description='The comparison is against the current head, which may move before a restore is confirmed.',
+    )
+    base_revision_ref: constr(min_length=1, max_length=4096, strict=True) = (
+        Field(
+            ...,
+            description='The head this comparison was read at; confirming a restore sends it back, and a head that moved is refused.',
+        )
+    )
+    records: list[ChangeReadRecord]
+    start_index: conint(ge=0, strict=True)
+    total_records: conint(ge=0, strict=True)
+    total_changes: conint(ge=0, strict=True)
+    has_more: StrictBool
+    next_cursor: constr(min_length=1, max_length=4096, strict=True) | None
+    oversized_unit: StrictBool
+    target_revision_ref: constr(min_length=1, max_length=4096, strict=True) = (
+        Field(..., description='The saved revision whose content would become current.')
+    )
+
+
+class RestorePreviewInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    target_revision_ref: constr(min_length=1, max_length=4096, strict=True)
+    cursor: constr(min_length=1, max_length=4096, strict=True) | None
+
+
 class ReadCatalog(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -310,3 +346,5 @@ class ReadCatalog(BaseModel):
     failure: ReadFailure
     change_read: ChangeReadInput
     change_page: ChangeReadPage
+    restore_preview_read: RestorePreviewInput
+    restore_preview_page: RestorePreviewPage

@@ -152,3 +152,44 @@ OI-06 是「已承諾未接線」：可以直接更正、可以看歷史，但**
 2. **Web 畫面沒有按鈕。**型別檢查通過只代表生成的 TS 可編譯，不代表畫面接了這兩個操作。
 3. 回執仍只記 `command_kind`，沒有記被撤回的 T 與實際 S（見限制 §10.3）。
 4. 沒有真瀏覽器驗收。
+
+---
+
+# 還原預覽：先看整份差異，再決定
+
+## 14. 為什麼不能沿用已保存的差異形狀
+
+設計 §4 要求還原前先看 **H→S 的整份差異**，且「Web 不計算業務差異」。投影本身已經有了：`project_revision_changes(base, result, codec)` 本來就能對比任意兩版。
+
+但**回應形狀不能沿用 `ChangeReadPage`**：它必填 `operation_ref` 與 `origin`。預覽時什麼都還沒發生，硬塞就等於假造一個回執。因此新增 `RestorePreviewPage`——同一份 SSOT 生成，同樣的 `ChangeReadRecord`，但：
+
+- `view: "restore_preview"`，`access: "current"`——這個比較**會過時**，形狀本身就說出來了。
+- `base_revision_ref` 是**比較時的 head**；確認還原時把它送回去，head 若已移動會在保存時被 `stale_view` 擋下。
+- `target_revision_ref` 是要還原成的那一版。**沒有** `operation_ref`、`origin`、`result_revision_ref`——它們在預覽裡都沒有意義。
+
+路由 `POST /api/documents/{id}/jd/restore/preview` 只讀不寫，沿用既有 query app 的嚴格重解析與 RFC 9457 錯誤處理。`ReadCursor` 的 view 列舉多一個 `restore_preview`（cursor 仍是不透明簽章 token）。
+
+## 15. 反例與實測
+
+| 案例 | 釘住的事 |
+|---|---|
+| `..._preview_shows_the_whole_difference_before_anything_happens` | 列出整份差異、指名比較時的 head、**目前版完全沒動**；之後新增的職責顯示為會被移除 |
+| `..._previewing_the_current_content_reports_no_difference` | 內容相同時 `total_changes == 0`，仍然不寫入 |
+| `..._preview_route_forwards_the_reparsed_arguments_and_writes_nothing` | 路由只到達預覽讀取器，不碰目前讀取器與已保存差異讀取器 |
+| `..._preview_route_refuses_a_body_that_is_not_its_own_shape` | 缺欄或夾帶 App 欄位都回 422，不到達讀取器 |
+
+| 範圍 | 結果 |
+|---|---|
+| App 全離線測試 | **2858 passed／307 skipped／46.11s** |
+| 受影響真 PG（還原、撤回、查詢、人工 service） | **35 passed／12.16s** |
+| `generate_contract.py --check` | **相符** |
+| `npx tsc --noEmit` | **通過** |
+
+首敗兩個：`ReadCursor.view` 沒有 `restore_preview`（分頁時才會踩到，第一頁不會），以及一次 `@app.post` 被我的批次編輯削成 `.post`。前者是真實缺口並已補，後者是編輯失誤。
+
+## 16. 仍未完成
+
+1. **Web 畫面沒有按鈕。**API 與預覽都在了，但六章管理畫面還沒接上「查看差異 → 確認還原／撤回」。**OI-06 仍未關閉。**
+2. 設計 §4.2 要求「還原確認期間停手改與新 AI 回合」——目前**沒有**這個保留機制；靠的是保存時的 `stale_view` 拒絕，這能防止覆蓋，但不會在確認前先擋住。
+3. 回執仍只記 `command_kind`（見 §10.3）。
+4. 沒有真瀏覽器驗收。

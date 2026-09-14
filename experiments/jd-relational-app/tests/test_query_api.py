@@ -23,6 +23,11 @@ class NoChanges:
         raise AssertionError("A current read must not call change reader")
 
 
+class NoCurrent:
+    def read(self, *args):
+        raise AssertionError("A change or preview read must not call the current reader")
+
+
 def app_for(reads, changes=None, observed=None):
     @asynccontextmanager
     async def resources():
@@ -245,3 +250,42 @@ def test_diagnostic_sink_failure_does_not_replace_success(app, monkeypatch):
         result = client.post(PATH, json=BODY)
     assert result.status_code == 200
     assert result.json()["view"] == "current"
+
+
+class PreviewOnly:
+    """Records the arguments the preview route actually forwards."""
+
+    def __init__(self):
+        self.calls = []
+
+    def read(self, *args):
+        raise AssertionError("A restore preview must not call the saved-change reader")
+
+    def preview_restore(self, document_id, arguments):
+        self.calls.append((document_id, arguments))
+        return {"format_version": 2, "view": "restore_preview", "access": "current",
+                "base_revision_ref": "head-ref", "target_revision_ref": "target-ref",
+                "records": [], "start_index": 0, "total_records": 0, "total_changes": 0,
+                "has_more": False, "next_cursor": None, "oversized_unit": False}
+
+
+def test_the_preview_route_forwards_the_reparsed_arguments_and_writes_nothing():
+    """A preview is a read: it reaches the preview reader and nothing else."""
+    changes = PreviewOnly()
+    path = f"/api/documents/{DOCUMENT}/jd/restore/preview"
+    with TestClient(app_for(NoCurrent(), changes), base_url="http://127.0.0.1") as client:
+        response = client.post(path, json={"target_revision_ref": "target-ref", "cursor": None})
+    assert response.status_code == 200
+    assert response.json()["view"] == "restore_preview"
+    assert changes.calls == [(DOCUMENT, {"target_revision_ref": "target-ref", "cursor": None})]
+
+
+def test_the_preview_route_refuses_a_body_that_is_not_its_own_shape():
+    """Its shape is generated, so an extra or missing key never reaches the reader."""
+    changes = PreviewOnly()
+    path = f"/api/documents/{DOCUMENT}/jd/restore/preview"
+    with TestClient(app_for(NoCurrent(), changes), base_url="http://127.0.0.1") as client:
+        assert client.post(path, json={"target_revision_ref": "target-ref"}).status_code == 422
+        assert client.post(path, json={"target_revision_ref": "t", "cursor": None,
+                                       "document_id": "App owns this"}).status_code == 422
+    assert changes.calls == []

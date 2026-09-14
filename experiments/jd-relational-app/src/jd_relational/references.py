@@ -29,7 +29,9 @@ MAX_SCOPE_BYTES = 256
 SECTION_IDS = frozenset({"profile", "purpose", "duties_tasks", "knowledge", "skills", "conditions"})
 Purpose = Literal["current", "history", "observation"]
 Role = Literal["item", "field", "container", "section", "revision", "operation", "change"]
-View = Literal["current", "item", "section", "history", "change"]
+# `restore_preview` pages a comparison that has not been written; the cursor is
+# still an opaque signed token, like every other view's.
+View = Literal["current", "item", "section", "history", "change", "restore_preview"]
 _REF_SALT = "caliburn.jd.reference.v1"
 _CURSOR_SALT = "caliburn.jd.cursor.v1"
 _RUN_CURSOR_SALT = "caliburn.jd.run-change-cursor.v1"

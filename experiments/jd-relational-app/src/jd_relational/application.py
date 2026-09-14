@@ -4,13 +4,15 @@ import logging
 from time import perf_counter
 from uuid import UUID, uuid4
 
-from .domain import CommandContext, DomainError, build_candidate
+from .domain import CommandContext, DomainError, build_candidate, validate_content
+from .snapshots import domain_from_snapshot
 
 
 LOG = logging.getLogger("caliburn.jd.commands")
 # Diagnostic allowlists deliberately fail closed; they do not validate commands.
 _COMMAND_LABELS = frozenset({"jd_create_task", "jd_revise_work", "jd_set_text", "jd_insert_item",
-    "jd_delete_item", "jd_move_item", "jd_set_task_capability", "jd_replace_selection"})
+    "jd_delete_item", "jd_move_item", "jd_set_task_capability", "jd_replace_selection",
+    "restore_revision"})
 _ERROR_LABELS = frozenset({"invalid_input", "target_missing", "stale_view", "relationship_conflict", "dependent_items"})
 
 
@@ -50,3 +52,17 @@ def prepare_edit(snapshot: dict, command: dict, context: CommandContext, *, requ
         raise
     record(logging.INFO, "prepared", None)
     return candidate
+
+
+def prepare_restore(current: dict, stored: dict) -> dict:
+    """Build the candidate that puts this document back to one of its revisions.
+
+    The content is historical; the rules are today's, so a revision that no
+    longer satisfies them is refused whole rather than partly applied. Stable
+    identities come back as themselves and recorded source links come back as
+    recorded: this restores existing basis, it does not re-approve it against
+    newer interviews. Nothing here saves, retries or decides eligibility.
+    """
+    restored = domain_from_snapshot(stored, current["revision"])
+    validate_content(restored, current["document_id"])
+    return restored

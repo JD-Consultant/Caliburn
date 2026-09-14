@@ -18,8 +18,9 @@ import sqlalchemy as sa
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 
-from jd_relational.application import prepare_edit
+from jd_relational.application import prepare_edit, prepare_restore
 from jd_relational.domain import DomainError
+from jd_relational.transport import MANUAL_MODELS
 from jd_relational.intents import AdmittedIdentity, BoundEdit, IntentValidationError
 from jd_relational.snapshots import empty_domain, snapshot_from_domain, domain_from_snapshot, snapshot_digest
 from . import schema as db
@@ -400,6 +401,25 @@ class JdStorage(JdReader):
             receipt=body.model_dump(mode="json"), created_at=_now()))
         return JdStorage._operation(conn, identity.document_id, identity.operation_id)
 
+    
+    @staticmethod
+    def _restore_target(conn, intent):
+        """This document's own saved revision, read from its immutable history.
+
+        A revision identity means nothing outside the document that owns it, so
+        one from anywhere else is simply not a target that exists here.
+        """
+        try:
+            target = UUID(intent.command["arguments"]["target_revision_id"])
+        except (KeyError, TypeError, ValueError):
+            raise DomainError("target_missing", "還原目標不是這份文件的版本。") from None
+        stored = conn.execute(sa.select(db.jd_revision.c.snapshot).where(
+            db.jd_revision.c.document_id == intent.document_id,
+            db.jd_revision.c.revision_id == target)).scalar_one_or_none()
+        if stored is None:
+            raise DomainError("target_missing", "還原目標不是這份文件的版本。")
+        return stored
+
     def _edit_locked(self, conn, intent, document, head):
         base = self._base_if_known(conn, intent)
         try:
@@ -413,8 +433,10 @@ class JdStorage(JdReader):
         current = self._verified_current(conn, document, head)
         savepoint = conn.begin_nested()
         try:
-            candidate = prepare_edit(current.domain, intent.command, intent.context,
-                                     request_id=intent.operation_id)
+            candidate = (prepare_restore(current.domain, self._restore_target(conn, intent))
+                         if intent.identity.command_kind in MANUAL_MODELS
+                         else prepare_edit(current.domain, intent.command, intent.context,
+                                           request_id=intent.operation_id))
             wanted = snapshot_from_domain(candidate)
             write_candidate(conn, current.domain, candidate)
             actual = snapshot_from_domain(read_domain(conn, intent.document_id, str(intent.base_revision_id)))

@@ -19,6 +19,9 @@ ROOTS = {
     "delete_item": "DeleteItemInput", "move_item": "MoveItemInput",
     "set_task_capability": "SetTaskCapabilityInput",
     "replace_selection": "ReplaceSelectionInput",
+    # Manual-only, and generated from the same SSOT so its shape is not
+    # hand-written; it is deliberately not offered to the model.
+    "restore_revision": "RestoreRevisionInput",
 }
 KINDS = ("duty", "collaborator", "knowledge", "skill", "outcome", "requirement", "condition")
 
@@ -55,6 +58,7 @@ def management_input(name):
                                    "mode": "unlink", "basis_refs": []},
         "ReplaceSelectionInput": {"selection_ref": "issued-selection", "replacement_text": "每季🔎\n依約定",
                                   "basis_refs": []},
+        "RestoreRevisionInput": {"target_revision_id": "issued-revision"},
     }[name]
 
 
@@ -86,7 +90,7 @@ def nested_objects(value):
             yield from nested_objects(child)
 
 
-def test_catalog_has_eight_named_closed_tool_roots():
+def test_catalog_has_named_closed_roots_for_every_command():
     assert SCHEMA["properties"] == {key: {"$ref": f"#/$defs/{name}"} for key, name in ROOTS.items()}
     assert set(SCHEMA["required"]) == set(ROOTS)
     Draft202012Validator.check_schema(SCHEMA)

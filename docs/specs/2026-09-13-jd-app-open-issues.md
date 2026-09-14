@@ -4,7 +4,9 @@
 
 **最新複核狀態（2026-09-13）：**H2–H3已完成；H4映射`2e243d15`的[提交後審查](evidence/2026-09-13-jd-b1-b2-adoption-review.md)及完成窗口 `ab483f6c` 的[9/12–9/13 文件審查](evidence/2026-09-13-jd-window-source-contract-review.md)已修正已驗方法／通知漏接、背景恢復誤套、source／publication 接縫、窗口觸發與分頁語意。這些是文件缺口，沒有本輪產品bug或測試通過宣稱。下一按[接續計畫H4](../plans/2026-09-13-jd-app-continuation-handoff.md)依修正版有限實作；OI-01／02整體退出條件仍未完成。
 
-更新：2026-09-13；JD-R002。依[最新決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及最近結果整理；只集中追蹤，不改需求、保存權責或既有授權。
+**最新整體審查（2026-09-14）：**B1／source固定接合已到 `f160be97`；W-13、F-04、P3 的早期 OPEN 為下方歷史，不重做。[整體審查](evidence/jd-b1-adoption/whole-flow-review.md)補上同 ID 內容替換的 source owner 窄修、批次→B1接縫與背景狀態責任，獨立 B1／來源＋Memory 套件212項通過；未跑B1真PG或新程序。**下一依[H4 runtime計畫 R1](../plans/2026-09-14-jd-h4-runtime-integration.md)**做一批 B1 真PG保存／恢復與固定有界批次，再接B2／通知／宿主。v1 context明示不支援、fresh fixture用v2；沒有舊資料轉換工作，也不因假設中的v1資料阻施工。
+
+更新：2026-09-14；JD-R002。依[最新決策](../current-decisions.md)、[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)及最近結果整理；9/13 詳細切片仍保留作沿革，當前施工以頁首最新狀態及 H4 計畫為準；只集中追蹤，不改需求、保存權責或既有授權。
 
 **目前可看／可驗：**隔離 App 的六章手動管理、真 DB 保存、重開、同頁聊天接點與已保存差異已有實證。既有非JD顧問的CT49／50真模型成果已完成，不能說成只有固定測試。**新App尚不能稱可交付：**完整顧問／Memory採用及新JD自然品質仍未完，日常AI未啟用；新工具的固定SDK回覆不代替新旅程真模型驗收。
 
@@ -27,6 +29,7 @@
 - 已驗讀取：[固定 Memory／詳記／原話工具](2026-09-13-jd-memory-read-integration-slice.md)已接真正模型 request、原生四個只讀工具及 native 中斷／收尾。真 SDK／PG 三輪與新 Windows 宿主回歸通過；模型回覆及發布仍是合成測試，不是自然理解或 C／B1B2 已完成。沒有為本功能新增資料表或一般儲存引擎。
 - 已驗修補核心：[C 子圖／官方 patch／原結果查回](2026-09-13-jd-memory-repair-core-slice.md)已在正常套件；真 PG 更正及回覆遺失後原 request 查回、JD／原話保留通過。三個錯誤／結果核對缺口已修且獨審閉合；不等於 App 已有 C 工具／取消收尾或 B1B2。
 - 已驗App接合：[停止收尾、跨程序查回與封裝](2026-09-13-jd-memory-repair-app-integration-slice.md)已修CA-01／02；缺證據仍保持門閘。FH05真新程序＋真PG只憑原receipt對帳，publish／patch為0；乾淨venv完整依賴wheel隔離已通過。實作者最終全組數字與本次獨立窄跑分別見結果稿／複核稿，本清單不再保存另一份易過時的數字。這是C接合可驗收，不是完整顧問或自然品質通過。
+> **以下 source port 與 B1 adapter 條目是 9/13–9/14 沿革，不是目前待辦；目前接續以本頁最新段落及 H4 runtime 計畫為準。**
 - 採用映射已交並修正：[採用映射](2026-09-13-jd-consultant-b1-b2-adoption-mapping.md)保留`4f94fbfb`已驗來源與13模組hash結論；補回A指引／三项分析Skills／整理通知，分清C查回與B有界續作、來源介面及各角色限制。只有文件，不是H4實作通過。
 - 契約已交並完成文件審查：[完成窗口source port契約](2026-09-13-jd-interview-window-source-contract.md)定新增`purpose="window"`簽章引用（`last`不綁run_id）、分頁讀取、逐輪終局改用run record＋`observed.closed`、整理請求辨識、觸發與連續範圍分開、B2 `processed_source` 的用途感知驗證、source/context pair、Unicode offset 及 purpose salt 隔離，並列W-01–W-14固定情境。其後五個隔離切片已完成固定測試，但最新[實作審查](evidence/2026-09-13-jd-window-source-implementation-review.md)指出W-08／W-13／W-14及cursor lineage／boundary仍不完整；不能宣稱H4或B1／B2已接通。
 - 實作第一片已完成：[用途隔離與B2發布驗證](evidence/jd-interview-window-source/purpose-isolation-results.md)閉合審查F2的整合斷點——未用途感知前，B2的完成結果在`PublicationStore._validate`就會被拒，永遠無法發布。離線2748／套件130／真PG14通過。窗口內容讀取、planner與公開發配路徑**刻意未做**（安全終局只有planner能確立），見該稿界線。
@@ -35,8 +38,9 @@
 - 實作第四片已完成：[切分規劃、消歧pair與admission](evidence/jd-interview-window-source/planner-and-admission-results.md)。切分／批次／重抽驗證／admission沿`4f94fbfb`逐條移接：超大回合與放不下的消歧一律失敗不截斷；新增第三個purpose `context`（獨立salt，不得當成待整併來源），用途授予拆成`window_references`／`context_references`兩旗標，因為套件對source與context走同一個`validate_source`；規劃結果固定同一root，有界批次以`covers_whole_range`防止取前綴宣稱完成，尾端由publication游標接續不需額外狀態。離線2770／套件130／真PG14通過。
 - **契約固定情境 W-01–W-14 都已有測試入口，但最新審查不把它們全部標成完整通過。** W-08尚無同ID分支 lineage／合法 mid-turn cursor；W-13尚無B1 `reextract`及正常輸入位置不前進證據；W-14尚無`>256` ancestor fixture。W-14既有缺鏈案例沿`test_ai_history.py`技法通過並明示`original_run_lookup_required`，屬補證據不是改產品；詳見[source port實作審查](evidence/2026-09-13-jd-window-source-implementation-review.md)。
 - 審查F-01／F-03已修：[游標lineage／完整邊界與查找上限](evidence/jd-interview-window-source/cursor-lineage-results.md)。原本的`_after_cursor`／`follows`**從未打開游標自己的固定root**，只比對訊息ID；新增`AiRunHistory.ancestor_of`（沿`find`同一組parent連結與同一上限）與共用的`_cursor_boundary`，要求在游標自身位置讀回、訊息為精確前綴、root為真祖先、`last`正好是安全回合邊界。三個反例：合法簽章但停在回合中間（原本會跳過該輪其後原話）、游標root讀不到、**同內容兄弟鏈**。另補`>MAX_PARENT_LOOKUPS`固定鏈案例。離線2774／套件130／真PG18通過。**W-13（F-02）與pair交叉配對（F-04）仍開著，依審查留給B1 adapter。**
-- 下一最小動作：R-01／R-02 已閉合，**依映射§6.2 採用 B1**，保留 `4f94fbfb` 的已驗 prompt／輸出與配置，驗原窗口讀取、原 pair、同工作續作及 W-13 重抽不推進正常输入位置。B2／背景／完整通知接合依映射續行；通知不借 JD operation 或 C publication，不拆半步。現有 C／只讀工具的 source port 不動。
-- 退出條件：跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
+**目前下一最小動作：**依[H4 runtime 計畫](../plans/2026-09-14-jd-h4-runtime-integration.md)完成 R1→R2→R3；固定批次／真PG保存、B2發布／C競爭、完整通知與背景生命週期。詳細步驟與六欄准入責任不在此重抄。上方各切片的「未接」依本段最新狀態閱讀，不重新安排已完成 source／adapter 測試。
+
+**目前退出條件：**跨輪／重開後能取回早期有效工作，晚期更正不被舊 Memory 蓋回；JD→原話與工作→JD 均可核對，手改通知不冒充原話，也不自動寫入 Memory。
 
 ### OI-03｜瀏覽器 Fetch 拒絕：OPEN，可靠試用阻擋
 - 現象／影響：建立文件與聊天後刷新曾發生 `response_unknown`；服務端 200 不等於瀏覽器取得結果，不能保證員工能順暢自行完成。
@@ -57,8 +61,9 @@
 - 下一最小動作：完成既定深歷史可操作查回及 context／Memory 交接，保留原話與原 request 身分；以一個超過現有查找窗口的合成流程核對，再接已規劃長訪談。
 - 退出條件：早期回合與來源仍可定位；超限／缺鏈可處理且不重播，壓縮／重開後早期工作與最新更正不遺失。
 
-### OI-06｜整份還原與整輪 JD 撤回：已承諾未接線
-- 現象／影響：可以直接更正及看歷史，但尚未完整提供整份還原／符合條件的整輪撤回；不能把 AI 取消當作撤回。
+### OI-06｜整份還原與整輪 JD 撤回：伺服器端還原已接，其餘未接線
+- **2026-09-14 進度：**`restore_revision` 的伺服器端操作已實作並在真 PG 驗收（[結果](evidence/2026-09-14-jd-restore-revision-results.md)）：新修訂、歷史保留、`no_change`／`stale_view`／`target_missing`、同 operation 查回、來源沿用、身分保留；模型永遠沒有這個工具。**預覽流程、HTTP／Web 入口與整輪 AI 撤回仍未做，本項尚未關閉。**
+- 現象／影響：可以直接更正及看歷史，但尚未完整提供整份還原的員工入口／符合條件的整輪撤回；不能把 AI 取消當作撤回。
 - 證據：[歷史與恢復](2026-09-12-jd-history-and-recovery-design.md)、[HR-02](2026-09-12-jd-ai-turn-undo-design.md)、[目前施工界線](../plans/2026-09-13-jd-relational-app-implementation.md)。
 - 下一最小動作：沿既有業務／保存接點實作已定效果與 UI，使用 OI-04 的真實比較材料；不新增通用 undo stack 或任意早期局部拒絕引擎。
 - 退出條件：還原／撤回形成新 JD 版本，原對話、Memory、案例與歷史保留；有較晚修改時不覆蓋，結果遺失查回原操作不重複套用。

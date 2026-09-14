@@ -15,7 +15,10 @@ from jd_relational.result_transport import validate_result
 
 
 CommandKind = Literal["jd_create_task", "jd_revise_work", "jd_set_text", "jd_insert_item",
-                      "jd_delete_item", "jd_move_item", "jd_set_task_capability", "jd_replace_selection"]
+                      "jd_delete_item", "jd_move_item", "jd_set_task_capability",
+                      "jd_replace_selection",
+                      # Manual-only; the model is never given this one.
+                      "restore_revision"]
 FailureCode = Literal["invalid_input", "target_missing", "stale_view", "relationship_conflict",
                       "dependent_items", "save_failed"]
 

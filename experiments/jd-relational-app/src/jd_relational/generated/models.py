@@ -374,6 +374,16 @@ class ReplaceSelectionInput(BaseModel):
     )
 
 
+class RestoreRevisionInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    target_revision_id: StrictStr = Field(
+        ...,
+        description='A saved revision of this same document whose complete content becomes the new current JD.',
+    )
+
+
 class WorkCommandCatalog(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -386,3 +396,4 @@ class WorkCommandCatalog(BaseModel):
     move_item: MoveItemInput
     set_task_capability: SetTaskCapabilityInput
     replace_selection: ReplaceSelectionInput
+    restore_revision: RestoreRevisionInput

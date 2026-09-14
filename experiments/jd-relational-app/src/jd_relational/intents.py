@@ -16,7 +16,7 @@ from uuid import UUID
 
 from .domain import COLLECTIONS, CONDITION_KINDS, FIELDS, CommandContext, Ref, Source
 from .selection import Selection, replace_utf16
-from .transport import MODELS, TransportError, manual_command
+from .transport import MANUAL_MODELS, MODELS, TransportError, manual_command
 
 
 _REF_ROLES = {
@@ -65,7 +65,7 @@ class AdmittedIdentity:
         _require(self.ai_run_id is None or _persisted_identifier(self.ai_run_id))
         _require(isinstance(self.request_digest, str) and len(self.request_digest) == 64
                  and all(character in "0123456789abcdef" for character in self.request_digest))
-        _require(isinstance(self.command_kind, str) and self.command_kind in MODELS)
+        _require(isinstance(self.command_kind, str) and self.command_kind in {**MODELS, **MANUAL_MODELS})
 
 
 @dataclass(frozen=True, slots=True)

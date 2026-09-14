@@ -8,11 +8,16 @@ from .result_transport import ResultValidationError, validate_result
 
 from .generated.models import (
     CreateTaskInput, ReviseWorkInput, SetTextInput, InsertItemInput,
-    DeleteItemInput, MoveItemInput, SetTaskCapabilityInput, ReplaceSelectionInput,
+    DeleteItemInput, MoveItemInput, RestoreRevisionInput, SetTaskCapabilityInput,
+    ReplaceSelectionInput,
 )
 
 
 REQUEST_LIMIT = 1024 * 1024
+# Manual-only business operations. They share this transport, the same command
+# shape and the same writer, but are never offered to the model: taking a whole
+# document back is the employee's decision, not something a turn may choose.
+MANUAL_MODELS = {"restore_revision": RestoreRevisionInput}
 MODELS = {"jd_create_task": CreateTaskInput, "jd_revise_work": ReviseWorkInput,
           "jd_set_text": SetTextInput, "jd_insert_item": InsertItemInput,
           "jd_delete_item": DeleteItemInput, "jd_move_item": MoveItemInput,
@@ -57,16 +62,16 @@ def _reject_constant(_):
     raise TransportError("invalid_input")
 
 
-def model_command(tool: str, arguments: str | dict) -> dict:
-    """Parse model or manual arguments to the same internal command, no defaults."""
-    if not isinstance(tool, str) or tool not in MODELS:
+def _command(tool: str, arguments: str | dict, catalog: dict) -> dict:
+    """Parse arguments to the internal command shape, with no defaults."""
+    if not isinstance(tool, str) or tool not in catalog:
         raise TransportError("unknown_tool")
     try:
         raw = arguments if isinstance(arguments, str) else json.dumps(arguments, ensure_ascii=False, allow_nan=False)
         if len(raw.encode("utf-8")) > REQUEST_LIMIT:
             raise TransportError("request_too_large")
         payload = json.loads(raw, object_pairs_hook=_unique_object, parse_constant=_reject_constant)
-        value = MODELS[tool].model_validate(payload, strict=True)
+        value = catalog[tool].model_validate(payload, strict=True)
         return {"tool": tool, "arguments": value.model_dump(mode="json")}
     except TransportError:
         raise
@@ -75,13 +80,26 @@ def model_command(tool: str, arguments: str | dict) -> dict:
         raise TransportError("invalid_input") from None
 
 
+def model_command(tool: str, arguments: str | dict) -> dict:
+    """Parse model or manual arguments to the same internal command, no defaults.
+
+    Manual-only operations are deliberately absent here: a model asking for one
+    is an unknown tool, not a permission failure to explain away.
+    """
+    return _command(tool, arguments, MODELS)
+
+
 def manual_command(envelope: dict) -> dict:
-    """Shared inner command shape; ManualSaveInput owns the outer HTTP identity."""
+    """Shared inner command shape; ManualSaveInput owns the outer HTTP identity.
+
+    The employee may also ask for the manual-only operations, which parse and
+    validate exactly as every other command does.
+    """
     if not isinstance(envelope, dict) or set(envelope) != {"tool", "arguments"}:
         raise TransportError("invalid_input")
     if not isinstance(envelope["tool"], str) or not isinstance(envelope["arguments"], dict):
         raise TransportError("invalid_input")
-    return model_command(envelope["tool"], envelope["arguments"])
+    return _command(envelope["tool"], envelope["arguments"], {**MODELS, **MANUAL_MODELS})
 
 
 def tool_definition(provider: str, tool: str) -> dict:

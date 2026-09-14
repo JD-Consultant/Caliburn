@@ -6,36 +6,89 @@
   "type": "object",
   "additionalProperties": false,
   "properties": {
-    "create_task": { "$ref": "#/$defs/CreateTaskInput" },
-    "revise_work": { "$ref": "#/$defs/ReviseWorkInput" },
-    "set_text": { "$ref": "#/$defs/SetTextInput" },
-    "insert_item": { "$ref": "#/$defs/InsertItemInput" },
-    "delete_item": { "$ref": "#/$defs/DeleteItemInput" },
-    "move_item": { "$ref": "#/$defs/MoveItemInput" },
-    "set_task_capability": { "$ref": "#/$defs/SetTaskCapabilityInput" },
-    "replace_selection": { "$ref": "#/$defs/ReplaceSelectionInput" }
+    "create_task": {
+      "$ref": "#/$defs/CreateTaskInput"
+    },
+    "revise_work": {
+      "$ref": "#/$defs/ReviseWorkInput"
+    },
+    "set_text": {
+      "$ref": "#/$defs/SetTextInput"
+    },
+    "insert_item": {
+      "$ref": "#/$defs/InsertItemInput"
+    },
+    "delete_item": {
+      "$ref": "#/$defs/DeleteItemInput"
+    },
+    "move_item": {
+      "$ref": "#/$defs/MoveItemInput"
+    },
+    "set_task_capability": {
+      "$ref": "#/$defs/SetTaskCapabilityInput"
+    },
+    "replace_selection": {
+      "$ref": "#/$defs/ReplaceSelectionInput"
+    },
+    "restore_revision": {
+      "$ref": "#/$defs/RestoreRevisionInput"
+    }
   },
-  "required": ["create_task", "revise_work", "set_text", "insert_item", "delete_item", "move_item", "set_task_capability", "replace_selection"],
+  "required": [
+    "create_task",
+    "revise_work",
+    "set_text",
+    "insert_item",
+    "delete_item",
+    "move_item",
+    "set_task_capability",
+    "replace_selection",
+    "restore_revision"
+  ],
   "$defs": {
     "TaskDetailInput": {
       "title": "TaskDetailInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "text": { "type": "string", "description": "The complete outcome or execution requirement, supported by the interview." },
-        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Issued source references supporting only this item; empty when none are available." }
+        "text": {
+          "type": "string",
+          "description": "The complete outcome or execution requirement, supported by the interview."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Issued source references supporting only this item; empty when none are available."
+        }
       },
-      "required": ["text", "basis_refs"]
+      "required": [
+        "text",
+        "basis_refs"
+      ]
     },
     "TaskCapabilityInput": {
       "title": "TaskCapabilityInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "capability_ref": { "type": "string", "description": "Issued reference to existing knowledge or skill in this JD." },
-        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Issued sources supporting this task-to-capability relation." }
+        "capability_ref": {
+          "type": "string",
+          "description": "Issued reference to existing knowledge or skill in this JD."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Issued sources supporting this task-to-capability relation."
+        }
       },
-      "required": ["capability_ref", "basis_refs"]
+      "required": [
+        "capability_ref",
+        "basis_refs"
+      ]
     },
     "CreateTaskInput": {
       "title": "CreateTaskInput",
@@ -43,88 +96,258 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "container_ref": { "type": "string", "description": "Issued duty or unassigned-task container reference." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling reference; null places the task first." },
-        "name": { "type": ["string", "null"], "description": "Known task name. At least name or description must contain meaningful content." },
-        "description": { "type": ["string", "null"], "description": "Complete known task description and necessary task-specific scope; unknown content is not invented." },
-        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Issued sources for the task itself, not automatically for its children or capability relations." },
-        "outcomes": { "type": "array", "items": { "$ref": "#/$defs/TaskDetailInput" } },
-        "requirements": { "type": "array", "items": { "$ref": "#/$defs/TaskDetailInput" } },
-        "capabilities": { "type": "array", "items": { "$ref": "#/$defs/TaskCapabilityInput" } }
+        "container_ref": {
+          "type": "string",
+          "description": "Issued duty or unassigned-task container reference."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing sibling reference; null places the task first."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Known task name. At least name or description must contain meaningful content."
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Complete known task description and necessary task-specific scope; unknown content is not invented."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Issued sources for the task itself, not automatically for its children or capability relations."
+        },
+        "outcomes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TaskDetailInput"
+          }
+        },
+        "requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TaskDetailInput"
+          }
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/TaskCapabilityInput"
+          }
+        }
       },
-      "required": ["container_ref", "after_ref", "name", "description", "basis_refs", "outcomes", "requirements", "capabilities"]
+      "required": [
+        "container_ref",
+        "after_ref",
+        "name",
+        "description",
+        "basis_refs",
+        "outcomes",
+        "requirements",
+        "capabilities"
+      ]
     },
     "SetFieldChange": {
       "title": "SetFieldChange",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "set_field" },
-        "target_field_ref": { "type": "string", "description": "Issued reference to one existing full-text field, never a selection or arbitrary JSON path." },
-        "text": { "type": ["string", "null"], "description": "The complete replacement field value. Null is allowed only when the final domain item permits it." },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "set_field"
+        },
+        "target_field_ref": {
+          "type": "string",
+          "description": "Issued reference to one existing full-text field, never a selection or arbitrary JSON path."
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "The complete replacement field value. Null is allowed only when the final domain item permits it."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "target_field_ref", "text", "basis_refs"]
+      "required": [
+        "kind",
+        "target_field_ref",
+        "text",
+        "basis_refs"
+      ]
     },
     "AddTaskDetailChange": {
       "title": "AddTaskDetailChange",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "add_task_detail" },
-        "task_ref": { "type": "string" },
-        "detail_kind": { "type": "string", "enum": ["outcome", "requirement"] },
-        "after_ref": { "type": ["string", "null"], "description": "Issued surviving sibling of the same detail kind; null means first." },
-        "text": { "type": "string" },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "add_task_detail"
+        },
+        "task_ref": {
+          "type": "string"
+        },
+        "detail_kind": {
+          "type": "string",
+          "enum": [
+            "outcome",
+            "requirement"
+          ]
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued surviving sibling of the same detail kind; null means first."
+        },
+        "text": {
+          "type": "string"
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "task_ref", "detail_kind", "after_ref", "text", "basis_refs"]
+      "required": [
+        "kind",
+        "task_ref",
+        "detail_kind",
+        "after_ref",
+        "text",
+        "basis_refs"
+      ]
     },
     "RemoveTaskDetailChange": {
       "title": "RemoveTaskDetailChange",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "remove_task_detail" },
-        "detail_ref": { "type": "string", "description": "Issued reference to an existing outcome or requirement." }
+        "kind": {
+          "type": "string",
+          "const": "remove_task_detail"
+        },
+        "detail_ref": {
+          "type": "string",
+          "description": "Issued reference to an existing outcome or requirement."
+        }
       },
-      "required": ["kind", "detail_ref"]
+      "required": [
+        "kind",
+        "detail_ref"
+      ]
     },
     "SetTaskCapabilityChange": {
       "title": "SetTaskCapabilityChange",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "set_task_capability" },
-        "task_ref": { "type": "string" },
-        "capability_ref": { "type": "string" },
-        "mode": { "type": "string", "enum": ["link", "unlink"] },
-        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Issued sources for linking. Must be empty when unlinking; the shared domain validates this condition." }
+        "kind": {
+          "type": "string",
+          "const": "set_task_capability"
+        },
+        "task_ref": {
+          "type": "string"
+        },
+        "capability_ref": {
+          "type": "string"
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "link",
+            "unlink"
+          ]
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Issued sources for linking. Must be empty when unlinking; the shared domain validates this condition."
+        }
       },
-      "required": ["kind", "task_ref", "capability_ref", "mode", "basis_refs"]
+      "required": [
+        "kind",
+        "task_ref",
+        "capability_ref",
+        "mode",
+        "basis_refs"
+      ]
     },
     "AddConditionChange": {
       "title": "AddConditionChange",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "add_condition" },
-        "container_ref": { "type": "string", "description": "Issued sixth-section container for an existing condition kind." },
-        "after_ref": { "type": ["string", "null"] },
-        "text": { "type": "string" },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "add_condition"
+        },
+        "container_ref": {
+          "type": "string",
+          "description": "Issued sixth-section container for an existing condition kind."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "text": {
+          "type": "string"
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "container_ref", "after_ref", "text", "basis_refs"]
+      "required": [
+        "kind",
+        "container_ref",
+        "after_ref",
+        "text",
+        "basis_refs"
+      ]
     },
     "RemoveConditionChange": {
       "title": "RemoveConditionChange",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "remove_condition" },
-        "condition_ref": { "type": "string" }
+        "kind": {
+          "type": "string",
+          "const": "remove_condition"
+        },
+        "condition_ref": {
+          "type": "string"
+        }
       },
-      "required": ["kind", "condition_ref"]
+      "required": [
+        "kind",
+        "condition_ref"
+      ]
     },
     "ReviseWorkInput": {
       "title": "ReviseWorkInput",
@@ -137,17 +360,31 @@
           "description": "At least one change. The App validates configured limits, final content, references and relations before saving.",
           "items": {
             "anyOf": [
-              { "$ref": "#/$defs/SetFieldChange" },
-              { "$ref": "#/$defs/AddTaskDetailChange" },
-              { "$ref": "#/$defs/RemoveTaskDetailChange" },
-              { "$ref": "#/$defs/SetTaskCapabilityChange" },
-              { "$ref": "#/$defs/AddConditionChange" },
-              { "$ref": "#/$defs/RemoveConditionChange" }
+              {
+                "$ref": "#/$defs/SetFieldChange"
+              },
+              {
+                "$ref": "#/$defs/AddTaskDetailChange"
+              },
+              {
+                "$ref": "#/$defs/RemoveTaskDetailChange"
+              },
+              {
+                "$ref": "#/$defs/SetTaskCapabilityChange"
+              },
+              {
+                "$ref": "#/$defs/AddConditionChange"
+              },
+              {
+                "$ref": "#/$defs/RemoveConditionChange"
+              }
             ]
           }
         }
       },
-      "required": ["changes"]
+      "required": [
+        "changes"
+      ]
     },
     "SetTextInput": {
       "title": "SetTextInput",
@@ -155,106 +392,343 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "target_field_ref": { "type": "string", "description": "Issued reference to an existing full-text field, never an item, selection or JSON path." },
-        "text": { "type": ["string", "null"], "description": "Complete replacement value. Null is accepted only if the target field and final item allow it; clearing a field does not delete the item." },
-        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Issued sources checked against the resulting content. Empty preserves existing links and their previous basis." }
+        "target_field_ref": {
+          "type": "string",
+          "description": "Issued reference to an existing full-text field, never an item, selection or JSON path."
+        },
+        "text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Complete replacement value. Null is accepted only if the target field and final item allow it; clearing a field does not delete the item."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Issued sources checked against the resulting content. Empty preserves existing links and their previous basis."
+        }
       },
-      "required": ["target_field_ref", "text", "basis_refs"]
+      "required": [
+        "target_field_ref",
+        "text",
+        "basis_refs"
+      ]
     },
     "DutyItemInput": {
       "title": "DutyItemInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "duty" },
-        "container_ref": { "type": "string", "description": "Issued duty-list container." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling or null for first." },
-        "name": { "type": ["string", "null"] },
-        "scope_text": { "type": ["string", "null"], "description": "Known duty summary. Necessary task-specific limits remain on the tasks; no implicit condition inheritance." },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "duty"
+        },
+        "container_ref": {
+          "type": "string",
+          "description": "Issued duty-list container."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing sibling or null for first."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Known duty summary. Necessary task-specific limits remain on the tasks; no implicit condition inheritance."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "container_ref", "after_ref", "name", "scope_text", "basis_refs"]
+      "required": [
+        "kind",
+        "container_ref",
+        "after_ref",
+        "name",
+        "scope_text",
+        "basis_refs"
+      ]
     },
     "CollaboratorItemInput": {
       "title": "CollaboratorItemInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "collaborator" },
-        "container_ref": { "type": "string", "description": "Issued collaborator-list container." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling or null for first." },
-        "name": { "type": ["string", "null"] },
-        "scope_text": { "type": ["string", "null"], "description": "Known cooperation scope; unknown organizational roles are not invented." },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "collaborator"
+        },
+        "container_ref": {
+          "type": "string",
+          "description": "Issued collaborator-list container."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing sibling or null for first."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope_text": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Known cooperation scope; unknown organizational roles are not invented."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "container_ref", "after_ref", "name", "scope_text", "basis_refs"]
+      "required": [
+        "kind",
+        "container_ref",
+        "after_ref",
+        "name",
+        "scope_text",
+        "basis_refs"
+      ]
     },
     "KnowledgeItemInput": {
       "title": "KnowledgeItemInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "knowledge" },
-        "container_ref": { "type": "string", "description": "Issued knowledge-list container." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling or null for first." },
-        "name": { "type": ["string", "null"] },
-        "description": { "type": ["string", "null"], "description": "Known concepts, principles or rules needed for the work, including their use and scope. Names need not be unique." },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "knowledge"
+        },
+        "container_ref": {
+          "type": "string",
+          "description": "Issued knowledge-list container."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing sibling or null for first."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Known concepts, principles or rules needed for the work, including their use and scope. Names need not be unique."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "container_ref", "after_ref", "name", "description", "basis_refs"]
+      "required": [
+        "kind",
+        "container_ref",
+        "after_ref",
+        "name",
+        "description",
+        "basis_refs"
+      ]
     },
     "SkillItemInput": {
       "title": "SkillItemInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "skill" },
-        "container_ref": { "type": "string", "description": "Issued skill-list container." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling or null for first." },
-        "name": { "type": ["string", "null"] },
-        "description": { "type": ["string", "null"], "description": "Known methods applied to perform the work and their scope, not an employee score or training plan." },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "skill"
+        },
+        "container_ref": {
+          "type": "string",
+          "description": "Issued skill-list container."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing sibling or null for first."
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "description": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Known methods applied to perform the work and their scope, not an employee score or training plan."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "container_ref", "after_ref", "name", "description", "basis_refs"]
+      "required": [
+        "kind",
+        "container_ref",
+        "after_ref",
+        "name",
+        "description",
+        "basis_refs"
+      ]
     },
     "OutcomeItemInput": {
       "title": "OutcomeItemInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "outcome" },
-        "container_ref": { "type": "string", "description": "Issued outcome-list container of an existing task." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing outcome sibling or null for first." },
-        "text": { "type": "string", "description": "Known deliverable, service result or maintained state and its receiver where relevant. No requirement pairing is implied." },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "outcome"
+        },
+        "container_ref": {
+          "type": "string",
+          "description": "Issued outcome-list container of an existing task."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing outcome sibling or null for first."
+        },
+        "text": {
+          "type": "string",
+          "description": "Known deliverable, service result or maintained state and its receiver where relevant. No requirement pairing is implied."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "container_ref", "after_ref", "text", "basis_refs"]
+      "required": [
+        "kind",
+        "container_ref",
+        "after_ref",
+        "text",
+        "basis_refs"
+      ]
     },
     "RequirementItemInput": {
       "title": "RequirementItemInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "requirement" },
-        "container_ref": { "type": "string", "description": "Issued requirement-list container of an existing task." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing requirement sibling or null for first." },
-        "text": { "type": "string", "description": "Known execution, quality, safety, timing or exception requirement, with its applicable condition. Kept separate from task description and outcomes." },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "requirement"
+        },
+        "container_ref": {
+          "type": "string",
+          "description": "Issued requirement-list container of an existing task."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing requirement sibling or null for first."
+        },
+        "text": {
+          "type": "string",
+          "description": "Known execution, quality, safety, timing or exception requirement, with its applicable condition. Kept separate from task description and outcomes."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "container_ref", "after_ref", "text", "basis_refs"]
+      "required": [
+        "kind",
+        "container_ref",
+        "after_ref",
+        "text",
+        "basis_refs"
+      ]
     },
     "ConditionItemInput": {
       "title": "ConditionItemInput",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "kind": { "type": "string", "const": "condition" },
-        "container_ref": { "type": "string", "description": "Issued sixth-section container identifying the existing condition kind. Only position-wide conditions belong here." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling in that condition kind or null for first." },
-        "text": { "type": "string", "description": "Known whole-position condition or boundary. Task-specific scope stays on the task; unknown does not mean no requirement." },
-        "basis_refs": { "type": "array", "items": { "type": "string" } }
+        "kind": {
+          "type": "string",
+          "const": "condition"
+        },
+        "container_ref": {
+          "type": "string",
+          "description": "Issued sixth-section container identifying the existing condition kind. Only position-wide conditions belong here."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing sibling in that condition kind or null for first."
+        },
+        "text": {
+          "type": "string",
+          "description": "Known whole-position condition or boundary. Task-specific scope stays on the task; unknown does not mean no requirement."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
       },
-      "required": ["kind", "container_ref", "after_ref", "text", "basis_refs"]
+      "required": [
+        "kind",
+        "container_ref",
+        "after_ref",
+        "text",
+        "basis_refs"
+      ]
     },
     "InsertItemInput": {
       "title": "InsertItemInput",
@@ -264,17 +738,33 @@
       "properties": {
         "item": {
           "anyOf": [
-            { "$ref": "#/$defs/DutyItemInput" },
-            { "$ref": "#/$defs/CollaboratorItemInput" },
-            { "$ref": "#/$defs/KnowledgeItemInput" },
-            { "$ref": "#/$defs/SkillItemInput" },
-            { "$ref": "#/$defs/OutcomeItemInput" },
-            { "$ref": "#/$defs/RequirementItemInput" },
-            { "$ref": "#/$defs/ConditionItemInput" }
+            {
+              "$ref": "#/$defs/DutyItemInput"
+            },
+            {
+              "$ref": "#/$defs/CollaboratorItemInput"
+            },
+            {
+              "$ref": "#/$defs/KnowledgeItemInput"
+            },
+            {
+              "$ref": "#/$defs/SkillItemInput"
+            },
+            {
+              "$ref": "#/$defs/OutcomeItemInput"
+            },
+            {
+              "$ref": "#/$defs/RequirementItemInput"
+            },
+            {
+              "$ref": "#/$defs/ConditionItemInput"
+            }
           ]
         }
       },
-      "required": ["item"]
+      "required": [
+        "item"
+      ]
     },
     "DeleteItemInput": {
       "title": "DeleteItemInput",
@@ -282,19 +772,29 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "target_ref": { "type": "string", "description": "Issued reference to the existing item; not a field or selection." },
+        "target_ref": {
+          "type": "string",
+          "description": "Issued reference to the existing item; not a field or selection."
+        },
         "content_changes": {
           "type": "array",
           "description": "Empty for ordinary deletion. Duty deletion may adjust related surviving task fields or add outcomes/requirements so necessary scope is not lost. No unrelated changes or references to newly created items.",
           "items": {
             "anyOf": [
-              { "$ref": "#/$defs/SetFieldChange" },
-              { "$ref": "#/$defs/AddTaskDetailChange" }
+              {
+                "$ref": "#/$defs/SetFieldChange"
+              },
+              {
+                "$ref": "#/$defs/AddTaskDetailChange"
+              }
             ]
           }
         }
       },
-      "required": ["target_ref", "content_changes"]
+      "required": [
+        "target_ref",
+        "content_changes"
+      ]
     },
     "MoveItemInput": {
       "title": "MoveItemInput",
@@ -302,21 +802,42 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "target_ref": { "type": "string", "description": "Issued reference to the existing item, never a newly allocated or reconstructed item." },
-        "destination_container_ref": { "type": "string", "description": "Issued compatible destination container. The App resolves ownership and condition kind." },
-        "after_ref": { "type": ["string", "null"], "description": "Issued existing sibling in the destination container; null means first." },
+        "target_ref": {
+          "type": "string",
+          "description": "Issued reference to the existing item, never a newly allocated or reconstructed item."
+        },
+        "destination_container_ref": {
+          "type": "string",
+          "description": "Issued compatible destination container. The App resolves ownership and condition kind."
+        },
+        "after_ref": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Issued existing sibling in the destination container; null means first."
+        },
         "content_changes": {
           "type": "array",
           "description": "Empty for ordinary reorder. Task regrouping may adjust its fields, add its outcomes/requirements, or update source/destination duty summaries. Only the related targets allowed by the domain may change.",
           "items": {
             "anyOf": [
-              { "$ref": "#/$defs/SetFieldChange" },
-              { "$ref": "#/$defs/AddTaskDetailChange" }
+              {
+                "$ref": "#/$defs/SetFieldChange"
+              },
+              {
+                "$ref": "#/$defs/AddTaskDetailChange"
+              }
             ]
           }
         }
       },
-      "required": ["target_ref", "destination_container_ref", "after_ref", "content_changes"]
+      "required": [
+        "target_ref",
+        "destination_container_ref",
+        "after_ref",
+        "content_changes"
+      ]
     },
     "SetTaskCapabilityInput": {
       "title": "SetTaskCapabilityInput",
@@ -324,12 +845,34 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "task_ref": { "type": "string" },
-        "capability_ref": { "type": "string", "description": "Issued reference to existing knowledge or skill in this JD, not a name or copied definition." },
-        "mode": { "type": "string", "enum": ["link", "unlink"] },
-        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Issued sources for linking. Must be empty for unlink; the shared domain validates that condition." }
+        "task_ref": {
+          "type": "string"
+        },
+        "capability_ref": {
+          "type": "string",
+          "description": "Issued reference to existing knowledge or skill in this JD, not a name or copied definition."
+        },
+        "mode": {
+          "type": "string",
+          "enum": [
+            "link",
+            "unlink"
+          ]
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Issued sources for linking. Must be empty for unlink; the shared domain validates that condition."
+        }
       },
-      "required": ["task_ref", "capability_ref", "mode", "basis_refs"]
+      "required": [
+        "task_ref",
+        "capability_ref",
+        "mode",
+        "basis_refs"
+      ]
     },
     "ReplaceSelectionInput": {
       "title": "ReplaceSelectionInput",
@@ -337,11 +880,42 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "selection_ref": { "type": "string", "description": "Issued selection reference only. Do not provide a field reference, old text, line numbers or offsets." },
-        "replacement_text": { "type": "string", "description": "Replacement for only the selected span, including any intended line breaks. Empty string removes the span; the domain validates the resulting field and item." },
-        "basis_refs": { "type": "array", "items": { "type": "string" }, "description": "Sources checked against the complete resulting source target. Leave empty when only the selected fragment was checked; do not promote fragment support to whole-target support." }
+        "selection_ref": {
+          "type": "string",
+          "description": "Issued selection reference only. Do not provide a field reference, old text, line numbers or offsets."
+        },
+        "replacement_text": {
+          "type": "string",
+          "description": "Replacement for only the selected span, including any intended line breaks. Empty string removes the span; the domain validates the resulting field and item."
+        },
+        "basis_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Sources checked against the complete resulting source target. Leave empty when only the selected fragment was checked; do not promote fragment support to whole-target support."
+        }
       },
-      "required": ["selection_ref", "replacement_text", "basis_refs"]
+      "required": [
+        "selection_ref",
+        "replacement_text",
+        "basis_refs"
+      ]
+    },
+    "RestoreRevisionInput": {
+      "title": "RestoreRevisionInput",
+      "description": "Manual whole-document restore. Never offered to the model: taking a document back is the employee's decision.",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "target_revision_id": {
+          "type": "string",
+          "description": "A saved revision of this same document whose complete content becomes the new current JD."
+        }
+      },
+      "required": [
+        "target_revision_id"
+      ]
     }
   }
 }

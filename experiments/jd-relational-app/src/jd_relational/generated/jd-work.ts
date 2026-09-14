@@ -17,6 +17,7 @@ export interface WorkCommandCatalog {
   move_item: MoveItemInput;
   set_task_capability: SetTaskCapabilityInput;
   replace_selection: ReplaceSelectionInput;
+  restore_revision: RestoreRevisionInput;
 }
 /**
  * Create one identifiable task with all currently known outcomes, requirements and existing capability relations as one business effect. The App allocates identities and validates the final task before saving.
@@ -431,4 +432,16 @@ export interface ReplaceSelectionInput {
    * Sources checked against the complete resulting source target. Leave empty when only the selected fragment was checked; do not promote fragment support to whole-target support.
    */
   basis_refs: string[];
+}
+/**
+ * Manual whole-document restore. Never offered to the model: taking a document back is the employee's decision.
+ *
+ * This interface was referenced by `WorkCommandCatalog`'s JSON-Schema
+ * via the `definition` "RestoreRevisionInput".
+ */
+export interface RestoreRevisionInput {
+  /**
+   * A saved revision of this same document whose complete content becomes the new current JD.
+   */
+  target_revision_id: string;
 }

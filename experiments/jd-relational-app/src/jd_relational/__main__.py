@@ -11,6 +11,7 @@ from .config_file import ConfigFile, default_config_path
 from .configured_host import initialize_configuration
 from .local_configuration import parse_configuration
 from .managed_app import open_managed_app, unavailable_consultant
+from .provider_keys import ROLES, ProviderKeyError, configured_roles, remove_key, store_key
 
 
 _MESSAGES = {
@@ -28,7 +29,14 @@ _MESSAGES = {
     "host_already_running": "此 App 已在執行，請使用原視窗或先正常關閉。",
     "host_storage_unavailable": "目前無法開啟資料，請確認資料庫服務與已完成的初始化。",
     "storage_unavailable": "目前無法確認初始化結果，請保留原設定並稍後查看狀態。",
+    "unknown_provider_role": "沒有這個 AI 服務名稱。可設定的是 anthropic 或 openai。",
+    "invalid_provider_key": "金鑰內容不符合格式，未保存；原有設定沒有變動。",
+    "credential_write_failed": "Windows 認證管理員未確認保存，請重新查看狀態後再設定一次。",
+    "credential_store_unavailable": "此作業系統沒有 Windows 認證管理員；AI 功能維持未啟用。",
+    "stored_key_unreadable": "已保存的金鑰無法讀取；請重新設定該項，人工 JD 不受影響。",
 }
+# Naming a capability, never a key: nothing here prints or logs a stored value.
+_ROLE_LABELS = {"anthropic": "訪談顧問（Anthropic）", "openai": "背景整理（OpenAI）"}
 _PHASES = {
     "initialization_pending": "尚待驗證空資料庫；可使用 resume-init 接續。",
     "initializing": "初始化未完成；可使用 resume-init 接續。",
@@ -49,12 +57,35 @@ def _connection_input():
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description="Caliburn 關聯式 JD 本機服務；管理畫面與 AI 接合仍在施工。")
-    parser.add_argument("action", choices=("status", "init", "resume-init", "serve"))
+    parser.add_argument("action",
+                        choices=("status", "init", "resume-init", "serve", "set-key", "remove-key"))
+    parser.add_argument("--service", choices=ROLES,
+                        help="set-key／remove-key 指定哪一項 AI 服務。")
     args = parser.parse_args(argv)
     try:
         file = ConfigFile(default_config_path())
+        if args.action in {"set-key", "remove-key"}:
+            if not args.service:
+                print("請以 --service 指定 anthropic 或 openai。", file=sys.stderr)
+                return 2
+            if args.action == "remove-key":
+                removed = remove_key(args.service)
+                print(f"{_ROLE_LABELS[args.service]}：{'金鑰已移除' if removed else '原本就沒有金鑰'}。"
+                      "人工 JD 不受影響。")
+                return 0
+            if not sys.stdin.isatty():
+                raise ProviderKeyError("invalid_provider_key")
+            # getpass keeps the key off the screen, the shell history and argv.
+            store_key(args.service, getpass.getpass(
+                f"{_ROLE_LABELS[args.service]} 金鑰（不顯示）："))
+            print(f"{_ROLE_LABELS[args.service]}：金鑰已保存在 Windows 認證管理員。"
+                  "此 App 的資料備份不會匯出金鑰；換電腦或還原後請重新設定。")
+            return 0
         if args.action == "status":
             print(_PHASES[parse_configuration(file.read()).phase])
+            for role, ready in configured_roles().items():
+                # Configured is not proof the key works; finding that out costs money.
+                print(f"{_ROLE_LABELS[role]}：{'已設定金鑰' if ready else '尚未設定，功能未啟用'}")
         elif args.action in {"init", "resume-init"}:
             initialize_configuration(file, connection=_connection_input() if args.action == "init" else None,
                 resume=args.action == "resume-init")

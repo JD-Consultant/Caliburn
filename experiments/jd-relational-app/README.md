@@ -51,6 +51,7 @@
 - `local_configuration.py`／`config_file.py`：固定 Known Folder 的 DPAPI 設定；永久空 guard、防重複初始化、原設定 CAS。普通開啟不讀環境補值、不重配 key／UUID。
 - `configured_host.py`／`storage_setup.py`：明示初始化及原身分續作，普通開啟共用唯讀 schema 核對；`initialization_pending → initializing → ready`。固定 migration、Saver 原生 setup、不自動修復未知 schema。
 - `configured_api.py`／`managed_app.py`／`__main__.py`：真配置與 lifecycle 組合，unsafe HTTP 另需單一正確 `X-JD-Dataset`；先同 host startup 恢復才受理寫入。CLI 的 init／resume 與一般 serve 分開，無模型啟動。
+- `provider_keys.py`：provider 金鑰只存 Windows 認證管理員（`win32cred` generic credential，同一 Windows 使用者、同一電腦，跨重開保留），Anthropic 與 OpenAI 分開保存。金鑰不進設定檔、資料庫、prompt、對話、checkpoint、前端或日誌，也不在 App 資料備份內；換電腦或還原後重新設定。`jd-relational set-key --service anthropic|openai` 以不顯示的輸入設定或替換，`remove-key` 移除，`status` 只說已設定或未設定——**已設定不代表金鑰可用**，確認那件事要付費。缺金鑰時人工 JD 照常，對應 AI 功能顯示未啟用，不改用其他供應商，也不為了檢查而發出付費呼叫。
 - `src/jd_relational/generated`：標準工具生成 Python DTO／TS 型別，禁止手改。
 - `transport.py`：人工與模型轉入同一 command；兩家工具外殼不同。
 - `application.py`：同一準備入口，保留候選／原錯誤，發出固定安全診斷；沒有重試或保存。

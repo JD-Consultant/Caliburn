@@ -189,7 +189,9 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
         <Typography className="jd-text">{item.text}</Typography>
       </Box>)}
       {source?.page && <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mt: 2 }}>
-        顧問的回覆是當時的整理用語，不是你確認過的事實。這段訪談本身不會因為 JD 改動而變。
+        {source.page.messages.some(item => item.role === 'assistant')
+          ? '顧問的回覆是當時的整理用語，不是你確認過的事實。這段訪談本身不會因為 JD 改動而變。'
+          : '這段訪談本身不會因為 JD 改動而變。'}
       </Typography>}
     </DialogContent>
     <DialogActions><Button onClick={() => setSource(null)}>關閉</Button></DialogActions>

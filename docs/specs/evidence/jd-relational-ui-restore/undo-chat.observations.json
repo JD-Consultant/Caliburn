@@ -4,19 +4,19 @@
   "model_requests": [
     {
       "request_number": 1,
-      "payload_bytes": 24785,
+      "payload_bytes": 24782,
       "tool": "jd_read",
       "response": "synthetic_complete_stream"
     },
     {
       "request_number": 2,
-      "payload_bytes": 41157,
+      "payload_bytes": 41249,
       "tool": "jd_create_task",
       "response": "synthetic_complete_stream"
     },
     {
       "request_number": 3,
-      "payload_bytes": 45437,
+      "payload_bytes": 45519,
       "tool": null,
       "response": "synthetic_complete_stream"
     }
@@ -25,22 +25,22 @@
   "writer_execute_count": 2,
   "writes": [
     {
-      "document_id": "1f290ad3-77a9-4a3c-a96e-d8aa885829af",
+      "document_id": "228975c6-a55d-4dc3-b26e-93ad669f1dbe",
       "origin": "ai",
-      "run_id": "c8399bdd-8a9d-47c1-a835-caef135bd702",
-      "operation_id": "6c3dae72-76f9-4705-bd71-3a165089a480",
+      "run_id": "0773a380-3a08-4eea-af3d-de7b88305bf5",
+      "operation_id": "9ec4f4c9-7752-4180-8254-bca064e4c610",
       "confirmed": true,
       "status": "committed",
-      "result_revision_id": "4bb55199-bb15-46a1-aa3c-9f8418d24a21"
+      "result_revision_id": "d44f1941-44a3-4c2c-a21f-be02b21f5136"
     },
     {
-      "document_id": "1f290ad3-77a9-4a3c-a96e-d8aa885829af",
+      "document_id": "228975c6-a55d-4dc3-b26e-93ad669f1dbe",
       "origin": "manual",
       "run_id": null,
-      "operation_id": "e99e8b87-d39a-44be-8dfe-05fb54b6067e",
+      "operation_id": "29e8d0a0-b782-4a11-929e-84cc84b594b1",
       "confirmed": true,
       "status": "committed",
-      "result_revision_id": "53563925-7963-4f00-b5a7-b3f5277d7874"
+      "result_revision_id": "a0bfb03f-b50b-453a-a47b-1d045e694a52"
     }
   ],
   "http_counts": {
@@ -49,8 +49,8 @@
     "POST other": 4,
     "OPTIONS jd_read": 12,
     "OPTIONS jd_state": 5,
-    "GET jd_state": 5,
     "POST jd_read": 12,
+    "GET jd_state": 5,
     "OPTIONS chat_messages": 2,
     "GET chat_messages": 2,
     "OPTIONS chat_runs": 2,
@@ -86,7 +86,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 15.0
+      "elapsed_ms": 0.0
     },
     {
       "ordinal": 4,
@@ -106,7 +106,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 16.0
+      "elapsed_ms": 15.0
     },
     {
       "ordinal": 6,
@@ -116,7 +116,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 16.0
+      "elapsed_ms": 0.0
     },
     {
       "ordinal": 7,
@@ -126,7 +126,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 0.0
+      "elapsed_ms": 16.0
     },
     {
       "ordinal": 8,
@@ -150,23 +150,23 @@
     },
     {
       "ordinal": 10,
-      "method": "GET",
-      "route": "jd_state",
-      "status": 200,
-      "response_start_forwarded": true,
-      "response_body_end_forwarded": true,
-      "cors_origin_matches": true,
-      "elapsed_ms": 32.0
-    },
-    {
-      "ordinal": 11,
       "method": "POST",
       "route": "jd_read",
       "status": 200,
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 47.0
+      "elapsed_ms": 46.0
+    },
+    {
+      "ordinal": 11,
+      "method": "GET",
+      "route": "jd_state",
+      "status": 200,
+      "response_start_forwarded": true,
+      "response_body_end_forwarded": true,
+      "cors_origin_matches": true,
+      "elapsed_ms": 46.0
     },
     {
       "ordinal": 12,
@@ -186,7 +186,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 15.0
+      "elapsed_ms": 32.0
     },
     {
       "ordinal": 14,
@@ -206,7 +206,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 0.0
+      "elapsed_ms": 16.0
     },
     {
       "ordinal": 16,
@@ -226,7 +226,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 31.0
+      "elapsed_ms": 16.0
     },
     {
       "ordinal": 18,
@@ -236,7 +236,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 0.0
+      "elapsed_ms": 16.0
     },
     {
       "ordinal": 19,
@@ -256,7 +256,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 0.0
+      "elapsed_ms": 15.0
     },
     {
       "ordinal": 21,
@@ -276,7 +276,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 32.0
+      "elapsed_ms": 63.0
     },
     {
       "ordinal": 23,
@@ -286,7 +286,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 32.0
+      "elapsed_ms": 16.0
     },
     {
       "ordinal": 24,
@@ -346,7 +346,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 46.0
+      "elapsed_ms": 32.0
     },
     {
       "ordinal": 30,
@@ -366,7 +366,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 78.0
+      "elapsed_ms": 109.0
     },
     {
       "ordinal": 32,
@@ -376,7 +376,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 16.0
+      "elapsed_ms": 0.0
     },
     {
       "ordinal": 33,
@@ -386,7 +386,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 47.0
+      "elapsed_ms": 78.0
     },
     {
       "ordinal": 34,
@@ -396,7 +396,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 0.0
+      "elapsed_ms": 16.0
     },
     {
       "ordinal": 35,
@@ -416,20 +416,10 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 47.0
-    },
-    {
-      "ordinal": 37,
-      "method": "POST",
-      "route": "jd_read",
-      "status": 200,
-      "response_start_forwarded": true,
-      "response_body_end_forwarded": true,
-      "cors_origin_matches": true,
       "elapsed_ms": 46.0
     },
     {
-      "ordinal": 38,
+      "ordinal": 37,
       "method": "OPTIONS",
       "route": "chat_messages",
       "status": 200,
@@ -439,6 +429,16 @@
       "elapsed_ms": 0.0
     },
     {
+      "ordinal": 38,
+      "method": "POST",
+      "route": "jd_read",
+      "status": 200,
+      "response_start_forwarded": true,
+      "response_body_end_forwarded": true,
+      "cors_origin_matches": true,
+      "elapsed_ms": 78.0
+    },
+    {
       "ordinal": 39,
       "method": "GET",
       "route": "chat_messages",
@@ -446,7 +446,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 47.0
+      "elapsed_ms": 62.0
     },
     {
       "ordinal": 40,
@@ -466,7 +466,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 16.0
+      "elapsed_ms": 31.0
     },
     {
       "ordinal": 42,
@@ -476,7 +476,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 0.0
+      "elapsed_ms": 16.0
     },
     {
       "ordinal": 43,
@@ -486,7 +486,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 15.0
+      "elapsed_ms": 172.0
     },
     {
       "ordinal": 44,
@@ -506,7 +506,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 203.0
+      "elapsed_ms": 78.0
     },
     {
       "ordinal": 46,
@@ -526,7 +526,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 16.0
+      "elapsed_ms": 0.0
     },
     {
       "ordinal": 48,
@@ -536,7 +536,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 31.0
+      "elapsed_ms": 63.0
     },
     {
       "ordinal": 49,
@@ -546,7 +546,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 15.0
+      "elapsed_ms": 47.0
     },
     {
       "ordinal": 50,
@@ -556,7 +556,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 0.0
+      "elapsed_ms": 15.0
     },
     {
       "ordinal": 51,
@@ -566,7 +566,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 47.0
+      "elapsed_ms": 63.0
     },
     {
       "ordinal": 52,
@@ -596,7 +596,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 16.0
+      "elapsed_ms": 47.0
     },
     {
       "ordinal": 55,
@@ -606,7 +606,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 16.0
+      "elapsed_ms": 63.0
     },
     {
       "ordinal": 56,
@@ -616,7 +616,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 16.0
+      "elapsed_ms": 0.0
     },
     {
       "ordinal": 57,
@@ -626,7 +626,7 @@
       "response_start_forwarded": true,
       "response_body_end_forwarded": true,
       "cors_origin_matches": true,
-      "elapsed_ms": 15.0
+      "elapsed_ms": 16.0
     }
   ],
   "evidence_failed": false,

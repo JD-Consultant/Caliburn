@@ -101,22 +101,27 @@ def journey(chrome):
              "[...document.querySelectorAll('button')].map(b => b.textContent.trim())"
              ".filter(t => t.startsWith('看第'))")))
     chrome.click(text_button("看第 1 段原話"))
-    chrome.until("document.body.innerText.includes('你當初說過的話')", timeout=30,
-                 what="source_dialog")
-    chrome.until(f"document.body.innerText.includes({json.dumps(INTERVIEW[:20])})", timeout=30,
-                 what="own_words_shown")
+    # Read the panel itself, not the page: the employee's own words also appear
+    # in the interview column, so a page-wide match would prove nothing.
+    panel = ("(() => { const found = [...document.querySelectorAll('.MuiDialog-root')]"
+             ".find(node => node.innerText.includes('你當初說過的話'));"
+             " return found ? found.innerText : ''; })()")
+    chrome.until(f"{panel}.includes({json.dumps(INTERVIEW[:20])})", timeout=30,
+                 what="own_words_in_the_panel")
+    # This source holds the employee's own input for that turn and nothing
+    # else, so the panel must show exactly that -- and must not caveat a
+    # consultant line that is not in it.
     opened = {
-        "own_words_shown": chrome.evaluate(
-            f"document.body.innerText.includes({json.dumps(INTERVIEW)})"),
-        "labels_who_said_it": chrome.evaluate("document.body.innerText.includes('你說的')"),
-        "consultant_wording_marked": chrome.evaluate(
-            "document.body.innerText.includes('不是你確認過的事實')"),
+        "own_words_shown": chrome.evaluate(f"{panel}.includes({json.dumps(INTERVIEW)})"),
+        "labels_who_said_it": chrome.evaluate(f"{panel}.includes('你說的')"),
+        "says_the_interview_itself_does_not_change": chrome.evaluate(
+            f"{panel}.includes('這段訪談本身不會因為 JD 改動而變')"),
+        "no_consultant_line_claimed": not chrome.evaluate(f"{panel}.includes('顧問當時的回覆')"),
     }
     step(chrome, "source-opened", **opened)
     assert all(opened.values()), opened
     chrome.click(text_button("關閉", exact=True))
-    chrome.until("!document.body.innerText.includes('你當初說過的話')", timeout=20,
-                 what="source_dialog_closed")
+    chrome.until(f"{panel} === ''", timeout=20, what="source_dialog_closed")
 
     # 3. The turn's own changes, offered as one thing to take back.
     chrome.until(f"!!{text_button('撤回這輪 JD 改動')}", timeout=60, what="undo_offered")

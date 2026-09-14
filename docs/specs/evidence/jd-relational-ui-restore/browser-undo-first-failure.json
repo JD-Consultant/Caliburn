@@ -10,7 +10,7 @@
       "step": 1,
       "name": "created",
       "screenshot": "01-created.png",
-      "status_chip": "讀取中",
+      "status_chip": "已保存",
       "title": "整輪撤回驗收",
       "duties_before": []
     },
@@ -19,7 +19,13 @@
       "name": "ai-turn-done",
       "screenshot": "02-ai-turn-done.png",
       "status_chip": "已保存",
-      "duties_after": [],
+      "duties_after": [
+        "合成設備检查",
+        "收到通知後檢查約定設備。",
+        "檢查記錄",
+        "異常交接",
+        "先確認隔離再檢查"
+      ],
       "edit_calls": 0
     },
     {
@@ -29,17 +35,27 @@
       "status_chip": "已保存",
       "marker": "依據你說過的 1 段訪談。",
       "open_buttons": 4
+    },
+    {
+      "step": 4,
+      "name": "source-opened",
+      "screenshot": "04-source-opened.png",
+      "status_chip": "已保存",
+      "own_words_shown": true,
+      "labels_who_said_it": true,
+      "says_the_interview_itself_does_not_change": true,
+      "no_consultant_line_claimed": true
     }
   ],
-  "failed_at": 4,
-  "error": "element_covered:(() => { const label = \"\\u770b\\u7b2c 1 \\u6bb5\\u539f\\u8a71\"; return [...document.querySelectorAll('button')].find(item =>",
+  "failed_at": 5,
+  "error": "condition_never_true:second_turn_saved:False",
   "screenshot": "99-failure.png",
   "alerts": [],
   "last_click_the_page_received": {
     "tag": "BUTTON",
     "trusted": true,
     "x": 262,
-    "y": 568,
+    "y": 844,
     "intended": true,
     "text": "送出"
   },
@@ -55,6 +71,10 @@
     "撤回這輪 JD 改動",
     "新增協作對象",
     "新增職責",
+    "上移",
+    "下移",
+    "刪除",
+    "新增任務",
     "新增任務",
     "看第 1 段原話",
     "上移",

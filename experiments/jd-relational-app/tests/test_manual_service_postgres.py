@@ -324,3 +324,35 @@ def test_recovery_for_old_key_cannot_clear_another_pending_operation(app, engine
     assert result["result"]["status"] == "committed" and not result["write_state"]["write_blocked"]
     assert owner.storage.read_current(document).domain["profile"]["purpose"] == "操作 B"
     assert calls == [] and counts(engine, document) == (3, 2)
+
+
+def test_the_employee_can_restore_a_revision_and_take_back_an_ai_turn(app, engine):
+    """Both manual-only entries reach the writer over the same save route.
+
+    The employee names revisions by issued reference, never by raw identity,
+    and the model has no way to ask for either of them.
+    """
+    service, owner, _, _, _, document, _, _ = app
+    first = current_page(app)
+    assert service.save(document, edit(app, "原本的工作目的。", page=first))["status"] == "committed"
+    changed = current_page(app)
+    assert changed["revision_ref"] != first["revision_ref"]
+
+    restored = service.save(document, {"operation_id": str(uuid4()),
+        "base_revision_ref": changed["revision_ref"],
+        "command": {"tool": "restore_revision",
+                    "arguments": {"target_revision_ref": first["revision_ref"]}}})
+    assert restored["status"] == "committed"
+    assert owner.storage.read_current(document).domain["profile"]["purpose"] is None
+
+    # Undoing reaches the writer over the same route and by the same kind of
+    # reference. A turn that wrote nothing has nothing to take back, which is
+    # what proves the reference really became the identity the writer checked.
+    now = current_page(app)
+    nothing = service.save(document, {"operation_id": str(uuid4()),
+        "base_revision_ref": now["revision_ref"],
+        "command": {"tool": "undo_ai_turn",
+                    "arguments": {"ai_run_id": str(uuid4()),
+                                  "expected_result_ref": now["revision_ref"]}}})
+    assert nothing["status"] == "target_missing"
+    assert current_page(app)["revision_ref"] == now["revision_ref"]

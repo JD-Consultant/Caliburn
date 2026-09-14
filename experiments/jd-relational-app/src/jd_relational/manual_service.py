@@ -96,17 +96,35 @@ class ManualService:
         self.source_resolver = source_resolver or _no_sources
         self.wait_timeout = wait_timeout
 
+    # Manual-only commands name a revision. Over HTTP that is always an issued
+    # reference, exactly as base_revision_ref is; the command the writer stores
+    # carries the identity that reference named.
+    _REVISION_ARGUMENTS = {"restore_revision": ("target_revision_ref", "target_revision_id"),
+                           "undo_ai_turn": ("expected_result_ref", "expected_result_revision_id")}
+
+    def _resolved_command(self, document_id: str, command: dict) -> dict:
+        """Turn the employee's issued revision reference into its identity."""
+        names = self._REVISION_ARGUMENTS.get(command.get("tool"))
+        if names is None:
+            return command
+        reference, identity = names
+        arguments = dict(command["arguments"])
+        resolved = self.codec.resolve(arguments.pop(reference), document_id=document_id,
+                                      roles={"revision"}, purposes={"history", "observation"})
+        return {**command, "arguments": {**arguments, identity: resolved.revision_id}}
+
     def save(self, document_id: str, envelope: dict | str) -> dict:
         _uuid(document_id)
         value = parse_manual_save(envelope)
         try:
             base = self.codec.resolve(value["base_revision_ref"], document_id=document_id,
                 roles={"revision"}, purposes={"history", "observation"})
+            command = self._resolved_command(document_id, value["command"])
             def prepare():
                 original = self.history.read_revision(document_id, UUID(base.revision_id))
-                context = command_context(original.domain, value["command"], self.codec,
+                context = command_context(original.domain, command, self.codec,
                                           self.source_resolver, lambda: str(uuid4()))
-                return bind_edit(UUID(value["operation_id"]), "manual", None, value["command"], context)
+                return bind_edit(UUID(value["operation_id"]), "manual", None, command, context)
             # The source owner reads the same Saver that host.close drains.
             # Materialize preparation under its existing read lifetime token;
             # submit independently checks writer admission after this read.

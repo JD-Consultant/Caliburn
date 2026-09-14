@@ -117,3 +117,38 @@ OI-06 是「已承諾未接線」：可以直接更正、可以看歷史，但**
 2. 設計 §4 的前置條件中，「該輪 runtime 已閉合、沒有未解操作與仍可寫入的 writer」由既有 foreground admission 與 writer 門閘負責；本輪**沒有**為它新增證據，也沒有測試那條路徑。
 3. 設計 §5 要求的「新回執記 `undo_ai_turn`、被撤回 T 及實際 S／E／R」目前只記到 `command_kind`；**被撤回的 T 與 S 沒有寫進回執**，查詢要靠 operation 的參數。這是已知缺口。
 4. 沒有真瀏覽器驗收；沒有自然模型。
+
+---
+
+# HTTP 入口：兩個人工操作接到同一條保存路由
+
+## 11. 同一條路由，同一種引用
+
+還原與撤回沒有新增路由，也沒有第二個 writer：它們是 `ManualCommand` 的兩個新變體，走既有的人工保存路由。契約由 SSOT 生成（`contracts/jd-manual-http.schema.json` → Python 與 TypeScript），`generate_contract.py --check` 相符。
+
+**HTTP 說引用，內部命令說身分。**員工手上只有 App 發配的 `revision_ref`，不會有原始 UUID；`ManualService` 把它解析成身分再交給 writer——與 `base_revision_ref` 早就有的翻譯完全相同的一層。因此：
+
+- `ManualRestoreRevisionCommand.arguments` 是 `{target_revision_ref}`
+- `ManualUndoAiTurnCommand.arguments` 是 `{ai_run_id, expected_result_ref}`
+
+`ManualCommand` 的 `oneOf` 從 8 個變體增為 10 個；模型那一側的 `MODELS` 仍是 8 個，兩者不相通。
+
+## 12. 反例與實測
+
+`..._employee_can_restore_a_revision_and_take_back_an_ai_turn`：員工改了工作目的，再以**第一版的引用**還原，內容回到原樣；接著以引用請求撤回一個沒有寫過 JD 的回合，得到 `target_missing` 且目前版不動——這正好證明引用真的變成了 writer 檢查的那個身分，而不是被當字串放行。
+
+| 範圍 | 結果 |
+|---|---|
+| `tests/test_manual_service_postgres.py` ＋ `tests/test_manual_http_postgres.py`（真 PG） | **14 passed** |
+| App 全離線測試 | **2856 passed／305 skipped／45.34s** |
+| `generate_contract.py --check` | **相符** |
+| `npx tsc --noEmit`（Web 型別） | **通過** |
+
+首敗兩個都是測試自身的錯：AI 那筆改動用了 codec 發配的 `field_ref` 而非 `intent_for` 的別名慣例；以及該 fixture 的 authority 是真 `ManualRuntime`、沒有測試用的 `admit`。第二個讓我把 HTTP 層的撤回案例改成**驗證翻譯與路由**（完整撤回語意已在 storage 層以真 PG 驗過），而不是在 HTTP 測試裡硬造一個 AI 回合。
+
+## 13. 限制
+
+1. **預覽流程仍未做。**設計 §4 要求還原前先看 H→S 的整份差異、確認文案、並在確認期間停手改與新 AI 回合；目前只有「送出就執行」。**OI-06 仍未關閉。**
+2. **Web 畫面沒有按鈕。**型別檢查通過只代表生成的 TS 可編譯，不代表畫面接了這兩個操作。
+3. 回執仍只記 `command_kind`，沒有記被撤回的 T 與實際 S（見限制 §10.3）。
+4. 沒有真瀏覽器驗收。

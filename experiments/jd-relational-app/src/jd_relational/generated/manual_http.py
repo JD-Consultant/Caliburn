@@ -107,39 +107,6 @@ class ManualReplaceSelectionCommand(BaseModel):
     arguments: ReplaceSelectionInput
 
 
-class ManualCommand(
-    RootModel[
-        ManualCreateTaskCommand
-        | ManualReviseWorkCommand
-        | ManualSetTextCommand
-        | ManualInsertItemCommand
-        | ManualDeleteItemCommand
-        | ManualMoveItemCommand
-        | ManualSetTaskCapabilityCommand
-        | ManualReplaceSelectionCommand
-    ]
-):
-    root: (
-        ManualCreateTaskCommand
-        | ManualReviseWorkCommand
-        | ManualSetTextCommand
-        | ManualInsertItemCommand
-        | ManualDeleteItemCommand
-        | ManualMoveItemCommand
-        | ManualSetTaskCapabilityCommand
-        | ManualReplaceSelectionCommand
-    ) = Field(..., description='Exactly one named business effect; no generic batch or arbitrary database operation is accepted.', title='ManualCommand')
-
-
-class ManualSaveInput(BaseModel):
-    model_config = ConfigDict(
-        extra='forbid',
-    )
-    operation_id: ManualOperationId
-    base_revision_ref: constr(min_length=1, max_length=4096, strict=True)
-    command: ManualCommand
-
-
 class ManualWritableState(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
@@ -273,6 +240,82 @@ class ManualProblem(BaseModel):
     instance: constr(pattern=r'^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', min_length=45, max_length=45, strict=True)
     code: Literal['invalid_input', 'invalid_ref', 'target_missing', 'stale_view', 'operation_conflict', 'busy', 'service_unavailable', 'selection_not_available', 'origin_not_allowed']
     next_action: Literal['correct_input', 'reread', 'lookup_operation', 'wait', 'stop']
+
+
+class ManualRestoreRevisionArguments(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    target_revision_ref: constr(min_length=1, max_length=4096, strict=True)
+
+
+class ManualRestoreRevisionCommand(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    tool: Literal['restore_revision']
+    arguments: ManualRestoreRevisionArguments = Field(
+        ...,
+        description='The employee names a saved revision by its issued reference; the App never handles raw identities.',
+        title='ManualRestoreRevisionArguments',
+    )
+
+
+class ManualUndoAiTurnArguments(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    ai_run_id: constr(min_length=1, max_length=4096, strict=True)
+    expected_result_ref: constr(min_length=1, max_length=4096, strict=True)
+
+
+class ManualUndoAiTurnCommand(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    tool: Literal['undo_ai_turn']
+    arguments: ManualUndoAiTurnArguments = Field(
+        ...,
+        description='The turn to take back, and the revision the App showed as its end, by issued reference.',
+        title='ManualUndoAiTurnArguments',
+    )
+
+
+class ManualCommand(
+    RootModel[
+        ManualCreateTaskCommand
+        | ManualReviseWorkCommand
+        | ManualSetTextCommand
+        | ManualInsertItemCommand
+        | ManualDeleteItemCommand
+        | ManualMoveItemCommand
+        | ManualSetTaskCapabilityCommand
+        | ManualReplaceSelectionCommand
+        | ManualRestoreRevisionCommand
+        | ManualUndoAiTurnCommand
+    ]
+):
+    root: (
+        ManualCreateTaskCommand
+        | ManualReviseWorkCommand
+        | ManualSetTextCommand
+        | ManualInsertItemCommand
+        | ManualDeleteItemCommand
+        | ManualMoveItemCommand
+        | ManualSetTaskCapabilityCommand
+        | ManualReplaceSelectionCommand
+        | ManualRestoreRevisionCommand
+        | ManualUndoAiTurnCommand
+    ) = Field(..., description="Exactly one named business effect; no generic batch or arbitrary database operation is accepted. The last two are the employee's own entries and are never offered to the model.", title='ManualCommand')
+
+
+class ManualSaveInput(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    operation_id: ManualOperationId
+    base_revision_ref: constr(min_length=1, max_length=4096, strict=True)
+    command: ManualCommand
 
 
 class ManualHttpCatalog(BaseModel):

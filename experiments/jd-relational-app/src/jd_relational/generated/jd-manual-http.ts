@@ -11,7 +11,7 @@
  */
 export type ManualOperationId = string;
 /**
- * Exactly one named business effect; no generic batch or arbitrary database operation is accepted.
+ * Exactly one named business effect; no generic batch or arbitrary database operation is accepted. The last two are the employee's own entries and are never offered to the model.
  *
  * This interface was referenced by `ManualHttpCatalog`'s JSON-Schema
  * via the `definition` "ManualCommand".
@@ -24,7 +24,9 @@ export type ManualCommand =
   | ManualDeleteItemCommand
   | ManualMoveItemCommand
   | ManualSetTaskCapabilityCommand
-  | ManualReplaceSelectionCommand;
+  | ManualReplaceSelectionCommand
+  | ManualRestoreRevisionCommand
+  | ManualUndoAiTurnCommand;
 /**
  * This interface was referenced by `ManualHttpCatalog`'s JSON-Schema
  * via the `definition` "ManualDocumentState".
@@ -478,6 +480,35 @@ export interface ReplaceSelectionInput {
    * Sources checked against the complete resulting source target. Leave empty when only the selected fragment was checked; do not promote fragment support to whole-target support.
    */
   basis_refs: string[];
+}
+/**
+ * This interface was referenced by `ManualHttpCatalog`'s JSON-Schema
+ * via the `definition` "ManualRestoreRevisionCommand".
+ */
+export interface ManualRestoreRevisionCommand {
+  tool: "restore_revision";
+  arguments: ManualRestoreRevisionArguments;
+}
+/**
+ * The employee names a saved revision by its issued reference; the App never handles raw identities.
+ */
+export interface ManualRestoreRevisionArguments {
+  target_revision_ref: string;
+}
+/**
+ * This interface was referenced by `ManualHttpCatalog`'s JSON-Schema
+ * via the `definition` "ManualUndoAiTurnCommand".
+ */
+export interface ManualUndoAiTurnCommand {
+  tool: "undo_ai_turn";
+  arguments: ManualUndoAiTurnArguments;
+}
+/**
+ * The turn to take back, and the revision the App showed as its end, by issued reference.
+ */
+export interface ManualUndoAiTurnArguments {
+  ai_run_id: string;
+  expected_result_ref: string;
 }
 /**
  * An unblocked document must be ready, active and idle with no pending operation or error.

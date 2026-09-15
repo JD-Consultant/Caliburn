@@ -1,5 +1,7 @@
 # JD App／LLM 顧問接線文件對齊工作稿
 
+> **2026-09-16 最新效力：**Owner 已結束「等待 OpenRouter／A-B2 direct OpenAI／替代策略」三選一，採 [OpenRouter／Luna App-side continuity compaction](../2026-09-16-openrouter-continuation-compaction-design.md)。canonical 原文不裁，summary＋涵蓋邊界只作 request-only 衍生 Context，不是第二套 Memory；A 按文件保存，B2 按 attempt 保存且 stale 清空。2026-09-15 adapter contract 與真 smoke 的 `SERVER-UNVERIFIED` 結果繼續作 transport 證據，但下文所有「等待 Owner transport 裁決」均已 superseded。此決定不重做顧問 Prompt、Skills、Memory ABC、JD writer 或 publication，也不表示正式 dispatcher／完整 App 驗收已完成。
+
 日期：2026-09-15
 狀態：CURRENT ALIGNMENT／第一個正式組裝切片已完成、尚未提交；本稿同時是後續接線盤點入口，不是 production authority 切換證明。
 
@@ -486,7 +488,7 @@ OpenRouter 的 `context-compression` plugin 是移除／截短 prompt 中段的�
 |---|---|---|---|---|
 | G1 | 正式 `serve` 沒有建立已完成的 Luna consultant，仍使用 inspection／unavailable graph | **第一刀已閉合** | 有 OpenRouter key 時建立既有 `build_consultant()` graph；缺 key 才用 inspection graph | 否，Owner 已確認 framework／OpenRouter／OpenAI Luna |
 | G2 | 正式入口沒有明確啟用日常 chat；`enable_chat` 仍維持安全的預設關閉 | **第一刀已閉合** | 正式入口有 key 時明確 `True`，無 key 時 `False`；仍待真 PG／新程序完整驗收 | 否，除非要改產品啟用策略 |
-| G3 | OpenRouter credential、Luna profile、runtime factory 與 App host 的基本組裝已接，但 A／B2 的已驗長對話能力沒有在目標 transport 閉合 | **A／B1 基本 wire 已接；A compaction 遺失；B2 暫留 direct Responses；adapter gate CLOSED／候選 CLIENT-PASS／真服務端 smoke UNVERIFIED** | 單一 `openrouter` credential、OpenAI-only／no-fallback adapter、process-owned clients 與 B1 strict structured output 已接。零成本同一考卷確認 direct Responses 與 `ChatOpenAI Responses`→OpenRouter 候選都完整往返，也確認 current `ChatOpenRouter` 保留文字／工具／reasoning、只遺失 Responses compaction content；鎖定 `openrouter` SDK 本身仍沒有完整 compaction 契約。真 smoke 已確認 OpenAI Luna route 與 input 23,725 > threshold 12,000，但服務端回 0 個 item，故不能進入續用驗收 | **需要 Owner 裁決等待 OpenRouter、允許 A／B2 direct OpenAI Responses，或另驗替代長上下文策略** |
+| G3 | OpenRouter credential、Luna profile、runtime factory 與 App host 的基本組裝已接；A／B2 長對話尚待 App-side compaction 程式切片 | **Owner 已裁決 `CTX-C001`；G4 CLOSED／G7 OPEN** | 單一 `openrouter` credential、OpenAI-only／no-fallback、canonical 原文不裁；2026-09-15 adapter gate／真 smoke 只保留為 native item `SERVER-UNVERIFIED` 證據 | **依 2026-09-16 設計與 H4 R2C 實作 summary＋安全 boundary＋digest，修正 JdNotice Command 組合，完成 A／B2 受影響離線回歸** |
 | G4 | `ConsultantContext` 已能按 document／run 組裝，但 `BackgroundAvailability` 的固定 document scope 是否可服務共用 graph 尚未被正式證明 | **第二切片已閉合；第三窄修校正同輪版本語意** | middleware 從每次 trusted runtime 取得 `document_id` 與本回合目前的 Memory 讀取基準；同一實例跨兩文件反例通過。C 成功後固定在 applied head，後續 B 發布不偷推基準；無 registry、模型不提供 scope | 否 |
 | G5 | `AiRuntime` 有 wake 呼叫點，`BackgroundDispatcher` 有 bounded wake，但正式 `managed_app` 沒有把 callback／dispatcher 傳入 | 實作未接 | 先補 composition，不把 middleware 當 dispatcher | 否，已有 R3／ADR 的背景責任方向 |
 | G6 | 工具結果封裝仍有 Anthropic serializer 線索，且 provider wire 測試同時覆蓋兩種格式 | **已核實，非 provider route bug** | 該 helper 只投影框架 `ToolMessage`；OpenRouter 真 adapter 的讀取→工具→結果→最終回覆離線路徑已通過。歷史 serializer 測試保留，不全域刪除 | 否 |

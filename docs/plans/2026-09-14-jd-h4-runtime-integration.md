@@ -1,6 +1,6 @@
 # H4：B1／B2／顧問接入新 JD App 的執行計畫
 
-> 2026-09-15 閱讀校正：產品目標為 [一個由人與 LLM 共編 current JD 的 App](../product-notes.md)。下方 Anthropic、直連 OpenAI、模型未選與完整 JD 歷史／還原等敘述有施工時間差；目前模型路徑以 [目前決策](../current-decisions.md) 的 framework＋OpenRouter＋OpenAI Luna 為準。首版只需當輪 LLM 的 JD 差異與整輪撤回，原始對話／Memory 不撤回。R3 新程序結果見 [R3 證據](../specs/evidence/jd-b1-adoption/r3-notification-and-background-results.md)。正式組裝已把既有顧問 graph、單一 OpenRouter credential 與 `enable_chat=True` 接進日常 `serve`；B1 也已走同一 OpenRouter 邊界，背景提示的文件與本回合目前 Memory 讀取基準改由每次 runtime 執行提供。一般讀取不追逐背景最新 head；C 準備修改時才明確刷新，保存仍使用既有 CAS，成功後本回合固定在 C 實際產生的版本。B2 若依舊版完成候選，必須 stale→讀新版→重新整理，不能換版號重送；B2 後續發布也不自動推進前景本回合。缺 key 時仍只開人工 JD。A／B2 的原生 inline compaction 是共同 transport 門：離線 candidate 已 `CLIENT-PASS`，但 [真 OpenRouter smoke](../specs/evidence/2026-09-15-openrouter-inline-compaction-live-smoke.md) 在 OpenAI Luna route、23,725 input tokens、12,000 門檻下仍回 0 個 item，故維持 `SERVER-UNVERIFIED`，不得再做未知 pass-through 猜測或正式改線。此門暫停在 Owner 的 transport／credential 裁決，沒有因此修改 prompt、graph 或 Memory 語意。背景 dispatcher、真 PG／新程序完整 App 旅程與之後的完整自然 smoke仍待後續。C 是前景即時 Memory 修補，B1/B2 是背景抽取／整併，不得把舊狀態當成新需求。
+> 2026-09-16 閱讀校正：產品目標為 [一個由人與 LLM 共編 current JD 的 App](../product-notes.md)。下方 Anthropic、直連 OpenAI、模型未選與完整 JD 歷史／還原等敘述有施工時間差；目前模型路徑以 [目前決策](../current-decisions.md) 的 framework＋OpenRouter＋OpenAI Luna 為準。首版只需當輪 LLM 的 JD 差異與整輪撤回，原始對話／Memory 不撤回。R3 新程序結果見 [R3 證據](../specs/evidence/jd-b1-adoption/r3-notification-and-background-results.md)。正式組裝已把既有顧問 graph、單一 OpenRouter credential 與 `enable_chat=True` 接進日常 `serve`；B1 也已走同一 OpenRouter 邊界，背景提示的文件與本回合目前 Memory 讀取基準改由每次 runtime 執行提供。一般讀取不追逐背景最新 head；C 準備修改時才明確刷新，保存仍使用既有 CAS，成功後本回合固定在 C 實際產生的版本。B2 若依舊版完成候選，必須 stale→讀新版→重新整理，不能換版號重送；B2 後續發布也不自動推進前景本回合。缺 key 時仍只開人工 JD。2026-09-15 的 OpenRouter native compaction smoke 保留為 `SERVER-UNVERIFIED` 證據，但 Owner 已於 2026-09-16 結束 transport 三選一：A／B2 改採 [OpenRouter／Luna App-side continuity compaction](../specs/2026-09-16-openrouter-continuation-compaction-design.md)，不切 direct OpenAI、不等待原生 item、不改主顧問 Prompt 或 Memory 語意。背景 dispatcher、真 PG／新程序完整 App 旅程與之後的完整自然 smoke仍待後續。C 是前景即時 Memory 修補，B1/B2 是背景抽取／整併，不得把舊狀態當成新需求。
 
 2026-09-15 接縫進度：既有 Responses request-only view 已抽為 A／B2 可共用、未綁 provider 的 Responses middleware；B2 保持原組裝，A factory 已可注入，但正式 A runtime 刻意不注入任何未驗候選。這只先閉合 graph 接點，不是 transport 選擇、正式改線或長對話通過。同步邊界已沿實際呼叫鏈核對：A 的 admission 背景工作最終使用 `graph.invoke(..., durability="sync")`，B2 的 start／resume／attempt 也使用同步 `invoke()`；沒有真實 A／B2 async 模型入口，因此不加 `awrap_model_call`。B2 的 context 是單次有界整併嘗試，不是全員工訪談；Memory、B1、C 與原話範圍不變。本次沒有引入或核准全歷史替代方案；transport 未決只限此 context 切片，dispatcher 與完整 App 驗收仍按本計畫另行閉合。
 
@@ -12,7 +12,7 @@
 |---|---|
 | 程式 | `S:/caliburn`；`refactor/current-only-architecture`；**R1 完成於 tag `jd-h4-r1-postgres-batch-20260914`**（原基準 `f160be97` 是 R1 之前）。先核實 HEAD 是否被後續合法提交推進，保留其他 dirty |
 | 已完成 | 關聯式 JD 管理／共同保存、前景聊天固定接合、C 即時 Memory 修補與恢復、source port、B1 核心與 OpenRouter／OpenAI-only Luna adapter。**R1 亦已完成**：固定 target→有界批次、一批 B1 的真 PG 保存與資源重建續作（[批次接點](../specs/evidence/jd-b1-adoption/fixed-target-batch-results.md)、[R1 結果](../specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。不可重做 CA-01／02、window parser、pair proof、B1 prompt 或 R1 |
-| 本段待做 | **R2 已完成**（tag `jd-h4-r2-consolidation-20260914`）。純通知辨識、准入表與 dispatch、宿主有限 worker／排空、顧問指引／Skills／Memory 行動指引都有既有成果；`build_consultant()` 的正式前景入口、B1 OpenRouter route 與 runtime 動態文件 scope 已於 2026-09-15 閉合。A／B2 長對話 transport 在真 OpenRouter smoke 後仍 `SERVER-UNVERIFIED`，等待 Owner 裁決；正式 background callback／dispatcher 與真 PG／新程序完整旅程仍未閉合，不重做顧問方法 |
+| 本段待做 | **R2 已完成**（tag `jd-h4-r2-consolidation-20260914`）。純通知辨識、准入表與 dispatch、宿主有限 worker／排空、顧問指引／Skills／Memory 行動指引都有既有成果；`build_consultant()` 的正式前景入口、B1 OpenRouter route 與 runtime 動態文件 scope 已於 2026-09-15 閉合。A／B2 長對話已由 Owner 裁決採 App-side continuity compaction，下一先做下方 R2C 單一切片；正式 background callback／dispatcher 與真 PG／新程序完整旅程仍未閉合，不重做顧問方法 |
 | 此刻禁止宣稱 | 日常自然訪談已由本切片重新驗收、H4 完成、背景已接入正式入口。既有分段 PG／新程序證據不能取代新的完整 App 組合證據 |
 | 真模型 | 本計畫原工程切片使用合成 HTTP／假 key；其後另經 Owner 授權完成 1 次有界 OpenRouter compaction smoke（US$0.00556460，結果 `UNVERIFIED`）。這不等於自然顧問、完整 App 或正式採用驗收；其餘仍沿 H5 |
 
@@ -59,13 +59,25 @@
 
 1. B2 從原已完成 B1 checkpoint 的 `files` 取材；保留原 `start`／`resume`／`start_reextraction`、原 request 身分、stale→load、`RECENT_REPAIRS` 與已用預算。prompt、三項分析 Skills 的已驗方法不趁接合改寫。
 2. 先列 `4f94fbfb` B2 直接依赖與現有正常套件逐項對應，再只採用缺少部分；不是整批把所有檔案複製過來。workflow／prompt 沿已驗結果，provider assembly 統一走 OpenRouter profile；A、B1、B2 都固定 OpenAI provider 並禁止 fallback，但可保留各自模型參數。9/14 的「A Anthropic 配置不動」已失效，不得照做。
-   **2026-09-15 接線註記：**A 與 B1 已完成 OpenRouter 基本組裝，但 A／B2 的長對話 convergence 尚未閉合。完成版 A／B2 的已驗接縫使用 Responses inline `context_management`／compaction 12000。官方契約複核確認 OpenAI Responses 支援該欄位與 `/responses/compact`；OpenRouter 公開 request contract 與鎖定 `openrouter==0.10.8` 都沒有完整生成／接收契約。其後真 smoke 已把欄位送到 OpenAI Luna route，服務端回報 23,725 input tokens 並成功回答，仍沒有 compaction item。因此取消「以合成 wire 或 HTTP 200 猜測未知 pass-through」這條施工；在 Owner 裁決等待 OpenRouter、允許 A／B2 direct OpenAI Responses，或另驗新長上下文策略之前，不改既有 `native_context_view`／prompt／graph，也不宣稱 convergence 完成。
+   **2026-09-16 接線註記：**A 與 B1 已完成 OpenRouter 基本組裝；完成版 A／B2 的舊接縫使用 Responses inline `context_management`／compaction 12000。官方契約與真 smoke 仍只證明 OpenRouter 此路徑沒有產生必要 item，不能再以 synthetic wire 或 HTTP 200 猜測未知 pass-through。Owner 已裁決不等待該能力、也不切 direct OpenAI；下一以 R2C 的 App-side continuity compaction 閉合 A／B2，既有 `native_context_view` 與 adapter gate 留作歷史／characterization 證據，不再是正式路徑。
 3. **同文件只能有一筆未交接完的 B 批次。**B1 完成後先 B2；B2 未發布／受阻，不允許 B1 用新範圍重置最近 `files`。不掃 Store 目錄找「可能尚未處理」的詳記來代替原交接。
    **（2026-09-14 移交 R3）**R2 驗證了正確順序及其耐久性，但**沒有**加入阻擋門閘：獨立審查已重現「B1 在 B2 未發布時用相鄰新範圍重置 `files`，游標隨後永久越過前一批」。`follows()` 只比對 B1 自己的上一個範圍，不看 publication head。**R3 的 admission 必須關掉它**：只讓 `plan_saved_batch(target, after_reference=publication.current().processed_source)` 的輸出進 `b1.start()`，並要求 B1 snapshot 的 `source_reference` 已等於該 `processed_source`（head 為 None 時要求 B1 無 values），並補一條跳號反例。不得因本條寫在 R2 就認為 R2 漏做而重開 R2。
 4. B2 原发布 request／receipt 对帳成功後，以 publication `processed_source` 判覆蓋；未覆蓋原 target 的尾端繼續下一批，沒有新通知也不得漏尾端。完成 B1 或更新准入狀態均不可自行推游標。
 5. 在 B2 讀基準後插入 C 更正；必須沿既有失效基準重讀與修補來源重做，在剩餘預算內發布。不能單換版本號把舊內容蓋回。B2 發布成功但回覆遺失時原 request 查回，不再次模型整併、不倒退現在 head。
 
 **完成：**固定 SDK＋真 PG 至少一條兩批交接、B1完/B2未開始、B2 pending、發布回覆遺失及 C 介入更正情境；JD／原話完全不被背景直接寫入。可以在測試宿主直接驅動，不代表日常喚醒已接。
+
+### R2C｜A／B2 的 OpenRouter／Luna App-side continuity compaction
+
+本切片只依[正式設計](../specs/2026-09-16-openrouter-continuation-compaction-design.md)施工，不再重開 transport 或 Memory 原理：
+
+1. 以公開 LangChain／LangGraph middleware 接點新增 typed `continuation_compaction`，只保存 summary＋安全邊界＋canonical prefix digest；canonical `messages`、B1 source、Memory／JD authority 不變，不新增 table、migration、dependency 或歷史 UI。
+2. 沿既有 OpenRouter model factory 進行摘要，固定 OpenAI-only／no-fallback／hidden retry 0，納入 route／usage／token／cost receipt。起始 profile 為 16k trigger、至少 8 messages、2048 summary output；完整 request 計算包含 instructions、JD／Memory context、tools 與輸出預留。
+3. 修正 `JdNoticeMiddleware` 接受並保留內層 `ExtendedModelResponse` command，使 `jd_model_view` 與 `continuation_compaction` 同時保存；不改主顧問 Prompt。正式 A 注入 middleware。
+4. B2 改走同一 OpenRouter boundary；同 attempt 可恢復，stale 新 attempt summary 為空。移除其正式 direct Responses／native compaction 依賴，但保留原 adapter contract／smoke 文件作歷史證據。
+5. 跑設計 §9 的受影響離線反例與既有 A／B2／C／JD 鄰接回歸。通過後先回報；付費自然 smoke 另依既有授權，不由本切片自動執行。
+
+**完成：**A／B2 都能在 canonical 原文未變、工具配對完整、文件隔離與 stale attempt 清空成立時，從保存的 continuity summary 接續；失敗不前移 boundary、不隱藏成本。這只關閉長對話接線，不代表 dispatcher 或完整 App 旅程已完成。
 
 ### R3｜完整通知、宿主生命週期與顧問方法一起接好
 

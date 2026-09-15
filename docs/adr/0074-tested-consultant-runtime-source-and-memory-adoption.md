@@ -1,6 +1,6 @@
 # 0074. 採用已驗顧問 runtime、原始訪談與 Memory authority
 
-- 狀態：**Proposed**；尚未改production。
+- 狀態：**Proposed**；尚未改production。2026-09-16 依 Owner 的 `CTX-C001` 裁決，把未能由 OpenRouter 驗證的 provider-native compaction 前提改為 App-side 非破壞式 continuity compaction；其餘顧問／Memory 採用不變。
 - 日期：2026-09-10。
 - Topic：JD-R002/R5、LLM-Q019。
 - 依據：Owner要求實作[完整成品計畫](../plans/2026-09-10-jd-product-delivery.md)；詳細候選、現行證據、版本及驗收見[正式採用設計](../specs/2026-09-10-jd-production-adoption-design.md)。
@@ -11,7 +11,7 @@
 
 ## Decision
 
-1. 採核心接線驗收後固定manifest中的既有顧問、原生context／compaction、Memory／來源實作與Skill；保留受測Python3.12、精確框架／模型binding配置，不重做Memory、不接回舊candidate/approved loop。
+1. 採核心接線驗收後固定manifest中的既有顧問、Memory／來源實作與Skill；保留受測Python3.12、精確框架／模型binding配置，不重做Memory、不接回舊candidate/approved loop。模型路徑維持單一 OpenRouter／OpenAI-only Luna；A／B2 的長對話改由 [App-side 非破壞式 continuity compaction](../specs/2026-09-16-openrouter-continuation-compaction-design.md)承接，canonical conversation 不裁切，摘要不具來源／Memory／JD authority。OpenAI Responses native compaction 只保留為可選 adapter optimization，不再是正式採用前置條件。
 2. 原始對話及執行項目由官方PostgresSaver唯一保存；確切原文由既有ConversationReader按document/checkpoint/message範圍讀。Memory內容由官方PostgresStore／StoreBackend保存，既有PublicationStore的head/receipt選擇有效版本。JD唯一authority依0073，checkpoint不另存可寫JD。
 3. 正式runtime納入apps/api單composition，正式contract歸job-analysis-contract，原生editor模組納入正式package。無worktree／research import、雙寫或compatibility wrapper；現有架構邊界測試依此successor改成新實際責任，而非刪測試逃避邊界。
 4. 明示新本機DB及fresh-root initialization；官方Saver/Store.setup與app migration在維護階段執行。日常啟動驗版本不改schema，不搬舊資料、不清現有DB。
@@ -21,7 +21,7 @@
 
 ## Consequences
 
-保留已驗能力並讓日常App使用同一資料責任；代價是有限namespace/import/config映射、正式契約、fresh setup及恢復回歸。原始來源依賴確切歷史checkpoint，不能套一般歷史清理建議。自然模型JD品質、延遲及員工可用性仍以成品P3/P6證據判定。
+保留已驗能力並讓日常App使用同一資料責任；代價是有限namespace/import/config映射、正式契約、fresh setup、continuity summary state 與恢復回歸。原始來源依賴確切歷史checkpoint，不能套一般歷史清理建議；App-side summary 只縮小 request view，且其額外模型呼叫必須納入既有 route／usage／成本上限。自然模型JD品質、延遲及員工可用性仍以成品P3/P6證據判定。
 
 Windows Job 是程序生命週期 owner，不是文件或 Memory semantic owner；整個 API 異常結束會影響該 App 的其他文件與背景工作，沿既有 checkpoint／Memory 恢復。cache-lost恢復另需同一路徑GET/POST與actual API DTO→generated Web的有限seam；原完整manual-save仍獨立。此代價與 nested Job 相容條件須實驗記錄，不新增外部 supervisor、DB running 表或通用重播引擎。
 

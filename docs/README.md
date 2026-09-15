@@ -25,6 +25,7 @@
 ## 現行設計與決策
 
 - [`plans/2026-09-10-jd-product-delivery.md`](plans/2026-09-10-jd-product-delivery.md) — **從現有成果到本機可用成品的執行總計畫**：Owner已要求實作；核心由原六切片Task1開始，完整旅程／品質驗收／正式採用並行。只在目前電腦App內使用，封存／恢復保留資料；各階段完成狀態依register及計畫，不以設計或離線驗證代稱產品完成。
+- [`specs/2026-09-16-consultant-interview-working-state-design.md`](specs/2026-09-16-consultant-interview-working-state-design.md) — **JD-R002／CTX-W001 主顧問訪談工作面 G4 候選**：從滿分 JD、完整工作分析與官方長任務設計反推最小欄位，讓 A 在第一輪尚無 Memory、一次問不完或尚未 compaction 時保存 Focus 與待追查事項。它是 Checkpointer 中的非權威工作狀態，不是第二套 Memory、Agenda、固定問卷或 B1／B2 來源；欄位待 Owner 複核後才進窄 G7。
 - [`specs/2026-09-16-openrouter-continuation-compaction-design.md`](specs/2026-09-16-openrouter-continuation-compaction-design.md) — **JD-R002／CTX-C001 Owner 已裁決的長對話施工入口**：維持單一 OpenRouter／Luna，以 App-side 非破壞式 continuity summary 縮小 A／B2 request；canonical 原文、Memory／JD authority 不變，不切 direct OpenAI、不等待原生 compaction item。下一依 H4 R2C 做一個 G7 切片與受影響離線回歸。
 - [`specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md`](specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md) — **JD-R002／MEM-L001 最新 G3 Memory 產品語意**：B1 維護完整且可修正的案例／任務／事件與案例 guide，B2 維護穩定工作理解與理解 guide；兩層暫採同一 publication，C 可直接原子發布緊急更正。此方向取代舊固定窗口詳記作最終案例層的映射，下一先完成 G4 差距設計，不沿舊 H4 B1／B2 步驟直接施工。
 

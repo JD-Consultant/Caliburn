@@ -1,5 +1,7 @@
 # B1／B2 與顧問方法的採用映射
 
+**SUPERSEDED 產品映射，2026-09-16：**本稿的已驗程式、來源窗口、checkpoint、Store／Saver、provider、publication、receipt、通知與宿主證據繼續有效；但「B1 固定抽取詳記／候選，B2 才維護兩檔 Memory」的產品責任已由 Owner 的 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 取代。後續須先完成 B1 案例 Agent＋案例 guide、B2 工作理解 Agent＋理解 guide、共同 publication 與 C 跨層修補的 G4 差距設計，不沿本稿的舊採用主表直接施工或宣稱既有 B1／B2 已滿足新效果。
+
 **目前狀態（2026-09-14）：**source port、B1 核心／OpenAI adapter 固定接合及 **§3.6 的批次接點都已完成並在真 PG 上驗過（H4-R1）**；B2／背景／完整通知尚未接。§3.3 仍是未實作的隔離施工設計，未建表。下一依[H4 執行計畫 R2](../plans/2026-09-14-jd-h4-runtime-integration.md)採用 B2 並做 B1→B2→publication 有序交接；下方9/13初稿狀態只保留出處，不要求重做採用映射。
 
 2026-09-13；JD-R002／OI-01、OI-02。[接續計畫 §5 H4](../plans/2026-09-13-jd-app-continuation-handoff.md) 要求的第一份交付。基準 `b76254f6`／tag `jd-memory-repair-app-review-20260913`。**本稿只做映射與差距判定，沒有改任何產品程式、沒有新增資料表、0 provider、日常 `enable_chat=False`。**

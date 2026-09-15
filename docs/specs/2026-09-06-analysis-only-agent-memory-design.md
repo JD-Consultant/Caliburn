@@ -12,6 +12,8 @@
 
 > **2026-09-16 分層／版本精確化：**「已發布 artifact 不原地改寫」不等於「詳記永遠不能更正」。同一來源窗口整理錯誤時，沿既有 reextraction 另存修正版詳記／候選，再由 B2 核對 knowledge 與引用；使用者後來才補充或更正時，保存新的 canonical 原話與新詳記，由 C／B2 維護目前 knowledge，不要求把所有早期詳記改寫成彷彿當時就已說對。publication revision 選出一組一致可解析的 knowledge／guide／references；未變的詳記可被新版 publication 繼續引用，不必全部重產或擁有相同版號。一個案例也可能由多份不同時點的詳記共同承接；歷史詳記不是會自動吸收所有後續資訊的「案例目前全文」。這是既有設計澄清，不新增 artifact／table／writer 或測試工作。
 
+> **SUPERSEDED 產品映射，2026-09-16：**上段及本稿把固定窗口 `rollout_summary` 作為案例細節的最終承接層，已由 Owner 後續確認的 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 取代。現行產品要求 B1 維護可持續修正的目前案例／任務／事件及案例 guide，B2 再維護穩定工作理解及理解 guide，暫採同一文件級 publication；C 可同次修正受影響兩層。以下 Q019 內容保留為原始訪談、固定 source、抽取、Store／Saver、重抽、漸進回查、CAS／receipt 與故障測試證據，不再直接指導新的 B1／B2 產品責任或 artifact 數量。
+
 > **Codex 參考界線：**[OpenAI Docs 的 local memories 說明](https://learn.chatgpt.com/docs/customization/memories#how-local-codex-memories-work)直接支持背景處理合格舊聊天、生成 summaries／durable entries／recent inputs／supporting evidence，以及 extraction／consolidation model 可分開設定；它沒有規定 Caliburn 的五產物 schema、同版號、immutable Store 或 publication CAS。公開 source trace 中的 `rollout_summary`／`raw_memory`／同步與 upsert 行為可作研究參考，但本稿的重抽另存、引用穩定與版本基準仍是 Caliburn 自己的產品／保存契約，不冒稱 OpenAI 官方要求。
 
 同一訪談範圍內，使用三種資料責任：

@@ -4,7 +4,9 @@
 - Topic：`JD-R002／CTX-C001`
 - Stage：**G4 WORKING DESIGN；Owner 已裁決方向，可進 G7 小型施工**
 - 取代：2026-09-15「等待 OpenRouter、改 direct OpenAI、另選長上下文策略」三選一的未決狀態
-- 不取代：Q019 顧問 Prompt、Skills、Memory A／B1／B2／C、JD relational writer、publication CAS、背景通知與准入規則
+- 不取代：Q019 顧問 Prompt、Skills、JD relational writer、publication CAS、背景通知與准入規則；Memory 的最新 B1／B2／C 產品語意改由 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 持有
+
+> **2026-09-16 MEM-L001 影響：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 現已將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。B1 的具體 state／門檻與測試留給 MEM-L001 的 G4 設計補齊，不從本稿舊範圍推論已完成，也不因此重開 OpenRouter transport 選擇。
 
 ## 1. 決定與產品效果
 
@@ -31,7 +33,7 @@ continuation_compaction = 摘要文字＋涵蓋邊界＋來源指紋
 | LangChain／LangGraph | 繼續負責 agent loop、Tool 配對、middleware、state reducer、Saver／Store 與恢復 |
 | OpenRouter／Luna | 產生顧問回答及需要時的 continuity summary；沿同一 route／receipt／成本邊界 |
 | Caliburn 薄 middleware | 只負責安全切點、摘要狀態、request-only view 與失敗語意 |
-| 工作理解 Memory | 沿既有 B1 詳記／候選、B2 knowledge／guide、C 即時修補及 publication 版本規則，完全不由 continuity summary 取代 |
+| 分層 Memory | 沿 MEM-L001 的案例／案例 guide、工作理解／理解 guide、C 即時修補及共同 publication，完全不由 continuity summary 取代 |
 
 不直接採 LangChain `SummarizationMiddleware`，因鎖定版本會以摘要與尾段更新 graph `messages`，不符合 canonical 原文不可被有損投影覆寫的要求。第一個切片也不直接採 Deep Agents summarizer：其額外 history offload 與 overflow 分支超出本次薄接合；`ExtendedModelResponse` 的 middleware 組合則由鎖定的 LangChain 1.4.0 原生承接，不是拒用理由。LangMem 目前未安裝，且既有研究已找到多工具切點與保存時點仍需產品接合；第一版不為了包住相同缺口新增依賴。
 

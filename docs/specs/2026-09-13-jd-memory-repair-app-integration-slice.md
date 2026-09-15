@@ -1,5 +1,7 @@
 # JD App 的 Memory 更正接合：停止收尾、跨程序查回與封裝
 
+**2026-09-16 MEM-L001 影響：**本稿證明的 C 停止位置、原 operation／receipt 對帳、跨程序恢復、stale 與本回合版本行為繼續沿用；當時 C 只修 `knowledge.md`／`guide.md` 的產品範圍已由 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 取代。新 C 必須在明確更正時受控修改受影響案例／案例 guide 及必要的工作理解／理解 guide，並以同一完整 Memory publication 原子發布。這是後續 G4／施工差距，不能把本稿的歷史通過誤報成新跨層 C 已完成。
+
 2026-09-13；JD-R002／OI-02。接續[方向審核](evidence/jd-memory-repair-integration/continuation-audit.md)指出的兩個缺口，依[接續計畫 §5 H2–H3](../plans/2026-09-13-jd-app-continuation-handoff.md)完成。基準 `8403d7e2`／tag `jd-memory-repair-core-20260913`。0 provider、日常 `enable_chat=False`、ADR0060 不變。
 
 **提交後另經Owner要求複核：**`7181db63`／tag `jd-memory-repair-app-integration-20260913`；[複核稿](evidence/jd-memory-repair-integration/submitted-integration-review.md)保存新的獨立測試命令、結果及封裝產物路由。下列2740／22／130及原獨審過程是實作者的歷史紀錄；本次沒有找到該三組完整原始輸出與原獨審逐字產物，故不冒稱重新核實全部數字。新的窄跑、FH05及wheel檢查分開記錄。

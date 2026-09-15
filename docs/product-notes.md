@@ -8,6 +8,7 @@ Caliburn 是供人與 LLM 共同編輯 JD 的本機 Web 應用程式。Owner 以
 
 - 產品只有一個 App／後端服務。人工編輯與 LLM 聊天可以使用不同 endpoint，但兩者最後都呼叫同一套 JD application service、業務規則、validator、writer 與 transaction；LLM tool 不直接寫資料表。
 - LLM 顧問是 App 的內部功能，不是另一個產品或獨立服務。保留已完成且經自然模型反覆校準的 LangChain／LangGraph runtime、訪談方法、prompt、Skills、context、工具執行、checkpoint、錯誤處理、有限重試與恢復能力；接線以這份顧問為基準，不重新設計它。顧問在資訊累積足夠時自行呼叫純通知工具，表示值得進行背景 Memory 整理；通知本身不執行 B1／B2、不寫 Memory，也不表示整理已完成。新增 JD tools 與 App context 不得順帶改寫既有通知的模型可見描述、判斷時機或觸發語意；除非出現可重現的框架相容性或正確性問題，才作有證據的最小修正。
+- 顧問維護的 Memory 不是只有一份共同工作摘要。產品資料鏈為「完整 canonical 原始訪談 ↔ 可持續新增、補充與更正的完整工作案例／任務／事件 ↔ 從案例歸納的穩定共同工作理解 → JD」。案例層保留各案自己的流程、責任、條件、結果、例外、更正與未知，並以小型 guide 導覽；工作理解層另有小型 guide，保留跨案例確實成立的任務、責任與差異。兩層均可沿引用按需深入下一層直到原話，不要求每輪全量載入。精確 B1／B2／C 與共同版本語意見 [MEM-L001](specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
 - 模型路徑固定理解為「framework → OpenRouter adapter → OpenRouter → OpenAI provider → `openai/gpt-5.6-luna`」。第一版不做 provider fallback；模型與參數放在可更換 profile，日後換模型不改 JD 業務邏輯或工具。
 - App 提供當前文件的 context 和 JD tools。人工與 LLM 修改都作用於同一份 current JD，產生相同的 operation／保存結果；可以記錄 `manual`／`ai` 與 AI run 身分，但不形成第二份 candidate／approved JD。
 - 第一版**不要求 JD 版本歷史、任意舊版瀏覽、revision diff 或整份舊版還原**。已經完成且穩定的相關能力可以保留，不必拆除；內部 revision／snapshot／operation 也可繼續服務保存一致性、冪等、故障對帳、本輪差異及整輪撤回。但它們不是接線前置，也不據此繼續擴張歷史產品、重構核心或新增通用復原引擎。

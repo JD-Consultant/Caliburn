@@ -26,6 +26,7 @@
 
 - [`plans/2026-09-10-jd-product-delivery.md`](plans/2026-09-10-jd-product-delivery.md) — **從現有成果到本機可用成品的執行總計畫**：Owner已要求實作；核心由原六切片Task1開始，完整旅程／品質驗收／正式採用並行。只在目前電腦App內使用，封存／恢復保留資料；各階段完成狀態依register及計畫，不以設計或離線驗證代稱產品完成。
 - [`specs/2026-09-16-openrouter-continuation-compaction-design.md`](specs/2026-09-16-openrouter-continuation-compaction-design.md) — **JD-R002／CTX-C001 Owner 已裁決的長對話施工入口**：維持單一 OpenRouter／Luna，以 App-side 非破壞式 continuity summary 縮小 A／B2 request；canonical 原文、Memory／JD authority 不變，不切 direct OpenAI、不等待原生 compaction item。下一依 H4 R2C 做一個 G7 切片與受影響離線回歸。
+- [`specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md`](specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md) — **JD-R002／MEM-L001 最新 G3 Memory 產品語意**：B1 維護完整且可修正的案例／任務／事件與案例 guide，B2 維護穩定工作理解與理解 guide；兩層暫採同一 publication，C 可直接原子發布緊急更正。此方向取代舊固定窗口詳記作最終案例層的映射，下一先完成 G4 差距設計，不沿舊 H4 B1／B2 步驟直接施工。
 
 - [`specs/2026-09-12-jd-relational-editing-requirements.md`](specs/2026-09-12-jd-relational-editing-requirements.md) — **JD-R002/C01／C03 最新 Owner 方向**：關聯式資料與 duty／task／成果／要求／K/S 項目管理取代完整 Plate JSONB 作後續 current-authority 前提；格式不重議。
 - [`specs/evidence/2026-09-12-jd-relational-editor-evidence.md`](specs/evidence/2026-09-12-jd-relational-editor-evidence.md) — **官方證據層**：OpenAI、Anthropic、PostgreSQL、Plate、iCAP、Microsoft／Notion 與本地新舊實作的事實／推論／本案映射／unknown。

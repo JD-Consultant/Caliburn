@@ -72,9 +72,9 @@
 本切片只依[正式設計](../specs/2026-09-16-openrouter-continuation-compaction-design.md)施工，不再重開 transport 或 Memory 原理：
 
 1. 以公開 LangChain／LangGraph middleware 接點新增 typed `continuation_compaction`，只保存 summary＋安全邊界＋canonical prefix digest；canonical `messages`、B1 source、Memory／JD authority 不變，不新增 table、migration、dependency 或歷史 UI。
-2. 沿既有 OpenRouter model factory 進行摘要，固定 OpenAI-only／no-fallback／hidden retry 0，納入 route／usage／token／cost receipt。起始 profile 為 16k trigger、至少 8 messages、2048 summary output；完整 request 計算包含 instructions、JD／Memory context、tools 與輸出預留。
-3. 修正 `JdNoticeMiddleware` 接受並保留內層 `ExtendedModelResponse` command，使 `jd_model_view` 與 `continuation_compaction` 同時保存；不改主顧問 Prompt。正式 A 注入 middleware。
-4. B2 改走同一 OpenRouter boundary；同 attempt 可恢復，stale 新 attempt summary 為空。移除其正式 direct Responses／native compaction 依賴，但保留原 adapter contract／smoke 文件作歷史證據。
+2. 沿既有 OpenRouter model factory 進行摘要，固定 OpenAI-only／no-fallback／hidden retry 0。起始 profile 為 16k trigger、至少 8 messages、2048 summary output；是否觸發要計算套用既有 summary 後真正送出的 view，包含 instructions、JD／Memory context、tools、B2 固定任務原文與輸出預留。摘要呼叫沿同輪 callback／停止訊號；摘要後若已取消，不得再送主模型。現碼沒有持久通用美元帳本，本切片不另建；route／usage 可觀察與付費 smoke 外送／費用上限仍須驗收。
+3. 正式 A 注入 middleware；以鎖定 LangChain 1.4.0 的真實 `create_agent` 組裝回歸證明框架會累積內外 Commands，讓 `jd_model_view` 與 `continuation_compaction` 同時保存。不要預先修改 `JdNoticeMiddleware`；只有反例重現實際遺失時才做最小修正。不改主顧問 Prompt。
+4. B2 改走同一 OpenRouter boundary；初始任務 `HumanMessage` 全 attempt 逐字固定，任務未完成時可摘要其後已配對完成的舊工具 wave；同 attempt 可恢復，stale 新 attempt summary 為空。移除其正式 direct Responses／native compaction 依賴，但保留原 adapter contract／smoke 文件作歷史證據。
 5. 跑設計 §9 的受影響離線反例與既有 A／B2／C／JD 鄰接回歸。通過後先回報；付費自然 smoke 另依既有授權，不由本切片自動執行。
 
 **完成：**A／B2 都能在 canonical 原文未變、工具配對完整、文件隔離與 stale attempt 清空成立時，從保存的 continuity summary 接續；失敗不前移 boundary、不隱藏成本。這只關閉長對話接線，不代表 dispatcher 或完整 App 旅程已完成。

@@ -4,6 +4,8 @@
 
 ## 先讀
 
+- [產品核心目標](product-notes.md) — 一個 JD App；人與 LLM 共用 relational JD 業務邏輯，framework 經 OpenRouter 使用 Luna。第一版只要求看／撤回當輪 LLM 的 JD 變更；既有完整歷史可保留但不再擴張，對話或 Memory 不隨 JD 撤回。
+
 - [`../AGENTS.md`](../AGENTS.md) — agent 工作紀律與 current-only 邊界。
 - [`current-decisions.md`](current-decisions.md) — **目前有效／未決／暫停事項的唯一閱讀入口**；先看這裡，再決定需不需要打開長研究稿。
 - [`decision-process.md`](decision-process.md) — 從產品目的、研究、Owner 決策、design／spike、ADR、施工到驗收的 gate、停止與翻案規則。

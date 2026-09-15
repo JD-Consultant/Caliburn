@@ -136,10 +136,20 @@ def test_stale_head_is_read_back_without_reapplying_candidate(fixture):
     assert fixture.source.reads == [] and fixture.pub.current() == later
 
 
-def test_missing_loaded_memory_does_not_initialize_from_c(fixture):
+def test_missing_turn_start_memory_refreshes_when_background_has_initialized(fixture):
     result = parent(RepairWorkflow(fixture.artifacts, fixture.pub, fixture.source)).invoke(
         payload(fixture, base={}), config())
-    assert result["outcome"]["status"] == "no_memory" and fixture.pub.current() == fixture.head
+    assert result["outcome"]["status"] == "stale"
+    assert result["outcome"]["head"] == asdict(fixture.head)
+    assert fixture.pub.current() == fixture.head
+
+
+def test_missing_turn_start_and_current_memory_stays_no_memory(fixture, monkeypatch):
+    monkeypatch.setattr(fixture.pub, "current", lambda: None)
+    result = parent(RepairWorkflow(fixture.artifacts, fixture.pub, fixture.source)).invoke(
+        payload(fixture, base={}), config())
+    assert result["outcome"]["status"] == "no_memory"
+    assert result["outcome"]["head"] is None and result["outcome"]["guide"] == ""
 
 
 def test_source_port_read_can_return_an_opaque_object(fixture, monkeypatch):
@@ -216,7 +226,8 @@ def test_reconcile_historical_receipt_never_regresses_current_or_publishes(fixtu
     request = saved_request(result)
     recovered = workflow.reconcile(request)
     assert recovered["applied_head"] == applied
-    assert recovered["head"] == asdict(later) and recovered["guide"] == "新導覽"
+    assert recovered["head"] == applied
+    assert recovered["guide"] == fixture.artifacts.guide(MemoryVersion(**applied["memory"]))
     assert "changes" not in recovered and recovered["source_reference"] == original["source_reference"]
     assert fixture.pub.current() == later
     with pytest.raises(PublicationUncertain):
@@ -298,7 +309,7 @@ def test_publish_does_not_claim_applied_with_unconfirmed_current_head(fixture, m
         workflow._publish(result)
 
 
-def test_publish_replayed_receipt_keeps_a_genuinely_later_current_head(fixture):
+def test_publish_replayed_receipt_keeps_the_applied_turn_baseline(fixture):
     workflow = RepairWorkflow(fixture.artifacts, fixture.pub, fixture.source)
     original = payload(fixture)
     result = parent(workflow).invoke(original, config())
@@ -308,7 +319,8 @@ def test_publish_replayed_receipt_keeps_a_genuinely_later_current_head(fixture):
         processed_source=fixture.source.context_reference))
     replayed = workflow._publish(result)["outcome"]
     assert replayed["status"] == "applied" and replayed["applied_head"] == applied
-    assert replayed["head"] == asdict(later) and replayed["guide"] == "新版導覽"
+    assert replayed["head"] == applied
+    assert replayed["guide"] == fixture.artifacts.guide(MemoryVersion(**applied["memory"]))
     assert fixture.pub.current() == later
 
 

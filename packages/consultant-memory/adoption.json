@@ -42,8 +42,8 @@
       "source_path": "experiments/analysis-agent/src/analysis_agent/repair.py",
       "source_sha256": "8b4fa02e7ff70d6e868b7155e18b46fe6e1454fbfd505b9bfdaf7e625274742d",
       "adopted_path": "src/caliburn_memory/repair.py",
-      "adopted_sha256": "2e96de84add61679d908f87de67dc105b487b1f1ea1c83c1774a3c91ac1ab879",
-      "adaptation": "Package imports; typed staged validation; original PublishRequest receipt reconciliation without caller edits; same-document non-regressing current-head guard. Six native graph nodes and publication owner retained. Adds build_repair_graph(resolve_workflow), which compiles those same six steps so a host can mount them as a static child; each node resolves its workflow from the native Runtime, so building or inspecting the graph opens no resource."
+      "adopted_sha256": "e41b12b9ff78d228615999a4ba9f064297a7f5b6656c050cc33331429f2d1e4b",
+      "adaptation": "Package imports; typed staged validation; original PublishRequest receipt reconciliation without caller edits; same-document non-regressing current-head guard. Six native graph nodes and publication owner retained. Adds build_repair_graph(resolve_workflow), which compiles those same six steps so a host can mount them as a static child; each node resolves its workflow from the native Runtime, so building or inspecting the graph opens no resource. 2026-09-15 Owner version-baseline correction: if the turn-start base is absent but a current publication now exists, repair returns stale so the model can read and reconsider from that explicit head; successful publish/reconciliation still verifies the non-regressing current head, but reports the exact applied head as this turn's read baseline. Prompt, graph nodes, patch validation, publication CAS and retry limits are unchanged."
     },
     {
       "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation_request.py",

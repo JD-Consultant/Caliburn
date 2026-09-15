@@ -8,6 +8,8 @@
 
 > **2026-09-16 MEM-L001 影響：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 現已將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。B1 的具體 state／門檻與測試留給 MEM-L001 的 G4 設計補齊，不從本稿舊範圍推論已完成，也不因此重開 OpenRouter transport 選擇。
 
+> **2026-09-16 CTX-W001 邊界：**主顧問在尚無 Memory、尚未觸發 compaction 或一次無法問完時所需的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)另行承接。它與 continuity summary 都是非權威衍生狀態，但責任不同；summary 不可成為 Working State 的唯一 owner，Working State 也不取代長對話 compaction。
+
 ## 1. 決定與產品效果
 
 採用 **LangChain／LangGraph → OpenRouter → OpenAI-only route → Luna** 的既定單一模型路徑，在 App 內加入一個薄的、非破壞式 `ContinuationCompactionMiddleware`：
@@ -39,7 +41,7 @@ continuation_compaction = 摘要文字＋涵蓋邊界＋來源指紋
 
 這不是另寫 agent loop、tokenizer、Checkpointer 或工作理解引擎。只使用公開 middleware／`ModelRequest.override`／`ExtendedModelResponse`／`Command`／模型 Runnable 接點；不複製框架 private helper。
 
-## 3. 唯一新增的衍生狀態
+## 3. 本 compaction 切片新增的衍生狀態
 
 在各 agent 的 typed state 增加一個可為空的整體欄位；欄位名稱與最小內容固定如下：
 
@@ -88,6 +90,8 @@ middleware 只摘要**已完成的舊互動 wave**。「完成」是指一組模
 - 保留不確定性、衝突與失敗，不補造員工未說的事；
 - 不把摘要宣稱成 employee evidence、Memory、JD 或 source of truth。
 
+若 A 另有 `CTX-W001` 的 current Focus／待追查項目，摘要可保留當時與對話延續有關的簡短投影，但不用複製完整 item collection；下一次 request 仍由 Runtime 從獨立 Working State 注入最新 orientation。摘要未提到某 item，不能據此刪除或視為已解決。
+
 摘要模型不取得 JD 編輯、Memory 修改、背景通知或其他業務 Tool。它只收到上一份 summary 與選定的 canonical prefix。
 
 ## 5. 預算、呼叫與保存時點
@@ -117,7 +121,7 @@ middleware 只摘要**已完成的舊互動 wave**。「完成」是指一組模
 - 每次 attempt 唯一的初始任務 `HumanMessage` 始終逐字放在 summary 前；summary 只涵蓋它之後已完整配對的舊模型／工具 wave，當前未完成 wave 保留在尾段。因此 B2 可在任務尚未結束時壓縮，不必等 publication 完成。
 - 同一 attempt 中斷後可沿原 state 恢復。
 - publication stale 後既有流程建立新版重整 attempt；新 attempt 從空的 `continuation_compaction` 開始，只讀新版 Memory 及 runtime 受控提供的更正來源。不得沿用舊 attempt 的 summary、opaque context 或工具尾段。
-- B1 仍讀固定 canonical source windows，不使用 continuity summary，也不因本決定增加 compaction。
+- B1 依 `MEM-L001` 已升格為可多步讀寫的案例 Agent；它不使用 continuity summary 或 A 的 Working State 作來源，但若實際 request 達門檻，須沿本稿相同的 canonical 不破壞、安全工具 wave、失敗不前移邊界與 request-only 原則處理。B1 的固定任務／source、attempt scope、摘要保留比重與 stale 重整驗收由 `MEM-L001` 後續 G4 固定，不能從本稿舊 A／B2 範圍推定已完成。
 
 ## 7. Middleware Command 組合：由鎖定框架承接，先驗收而非先改碼
 

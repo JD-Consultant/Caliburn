@@ -5,58 +5,59 @@ user-facing page. The workflow, prompt, three output fields, correction
 allowance, save and resume rules stay in `caliburn_memory.extraction`; nothing
 here re-implements them, adds a parser, an agent loop or a second flow.
 
-Only B1 is bound to OpenAI. The conversation consultant keeps its pinned
-Anthropic runtime; there is no app-wide provider switch, fallback or user
-choice. B1 is a structured extraction graph, not a tool-calling agent, so the
-role budget below is its own and is not the consultant's.
+B1 now uses the App's shared OpenRouter transport and pinned OpenAI Luna route.
+It remains a structured extraction graph, not a tool-calling agent, so its
+prompt, output contract, window budget and retry profile remain its own.
 """
 
 from contextlib import contextmanager
 from dataclasses import dataclass
-import math
 from uuid import UUID
 
 from caliburn_memory import MemoryArtifacts
 from caliburn_memory.extraction import ExtractionOutput, ExtractionWorkflow
 from caliburn_memory.sources import ExtractionSourceReader, InvalidSourceReference
 from langchain_core.messages import AIMessage
-from langchain_openai import ChatOpenAI
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
 from .ai_checkpoints import AiCheckpointError
 from .conversation_sources import ConversationSourceError, ConversationSourceService
 from .memory_sources import MemorySourceReader
 from .openai_responses import accepted
+from .openrouter_model import (
+    OPENROUTER_BASE_URL, REQUEST_TIMEOUT_SECONDS, ReceiptChatOpenRouter,
+    create_openrouter_model,
+)
 
 
 # This case's tested B1 profile, not a provider default: explicit visible output
 # and effort, verified for this role rather than inherited from the class.
 MAX_OUTPUT_TOKENS = 8192
 REASONING_EFFORT = "high"
+EXTRACTION_MODEL = "openai/gpt-5.6-luna"
+MAX_RETRIES = 2
 
 
-def build_extraction_model(*, model: str, api_key: str, http_client, base_url: str | None = None,
-                           request_timeout: float | None = None,
-                           reasoning_effort: str = REASONING_EFFORT) -> ChatOpenAI:
-    """Bind B1's own model to the supplied transport; no server-side storage.
+def build_extraction_model(*, api_key: str, http_client, async_http_client,
+                           model: str = EXTRACTION_MODEL,
+                           base_url: str = OPENROUTER_BASE_URL,
+                           request_timeout: float = REQUEST_TIMEOUT_SECONDS,
+                           reasoning_effort: str = REASONING_EFFORT,
+                           max_retries: int = MAX_RETRIES) -> ReceiptChatOpenRouter:
+    """Bind B1's profile to caller-owned OpenRouter transports.
 
     An oversize input must fail loudly rather than arrive shortened. That is
-    already the default behaviour — the current reference marks `truncation`
-    deprecated and documents `disabled` as its default, under which an input
-    past the context window returns a 400 — so this sends no such parameter and
-    relies on the source budget plus that 400. Server storage stays off: the
-    canonical record is this App's Saver and Memory, never the provider's.
+    the Chat Completions default, so this sends no context-compression plugin
+    and relies on the source budget plus the provider error. The canonical
+    record remains this App's Saver and Memory; OpenRouter receives no store
+    instruction and owns no conversation state.
     """
-    if request_timeout is not None and (not math.isfinite(request_timeout) or request_timeout <= 0):
-        raise ValueError("request_timeout must be positive and finite")
-    return ChatOpenAI(
-        model=model, api_key=api_key, base_url=base_url, http_client=http_client,
-        # LangChain passes this to the SDK explicitly; a timeout set only on the
-        # HTTP client is overwritten by request_timeout=None during binding.
-        timeout=request_timeout if request_timeout is not None else http_client.timeout,
-        use_responses_api=True, output_version="responses/v1", store=False,
-        reasoning={"effort": reasoning_effort, "context": "all_turns"},
-        model_kwargs={"parallel_tool_calls": False},
+    return create_openrouter_model(
+        component="background-extraction", model=model, api_key=api_key,
+        http_client=http_client, async_http_client=async_http_client,
+        base_url=base_url, request_timeout=request_timeout,
+        reasoning_effort=reasoning_effort, max_output_tokens=MAX_OUTPUT_TOKENS,
+        max_retries=max_retries,
     )
 
 
@@ -157,7 +158,7 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
 
 
 def build_extraction_workflow(*, service: ConversationSourceService, document_id: str, store,
-                              model: ChatOpenAI, checkpointer: BaseCheckpointSaver,
+                              model: ReceiptChatOpenRouter, checkpointer: BaseCheckpointSaver,
                               **options) -> ExtractionWorkflow:
     """Assemble B1 for one document: owner adapter, artifacts, provider binding.
 
@@ -171,6 +172,5 @@ def build_extraction_workflow(*, service: ConversationSourceService, document_id
         service, document_id, window_references=True, context_references=True))
     structured = model.with_structured_output(
         ExtractionOutput.model_json_schema(), method="json_schema", strict=True, include_raw=True,
-        max_output_tokens=MAX_OUTPUT_TOKENS,
     )
     return ExtractionWorkflow(reader, artifacts, structured, accepted, checkpointer, **options)

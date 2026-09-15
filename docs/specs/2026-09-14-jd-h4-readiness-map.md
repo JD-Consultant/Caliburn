@@ -1,5 +1,7 @@
 # 新 JD App：施工順序五項的現況與唯一阻擋
 
+> **2026-09-15 閱讀校正：本稿保存 9/14 的施工結果，但「Anthropic 模型尚未選」不是目前阻擋。產品路徑已確認為 LangChain／LangGraph → OpenRouter → OpenAI-only route → `openai/gpt-5.6-luna`，不重做既有自然模型與 prompt 校準。完整 JD 歷史與整份舊版還原是已完成、可保留的額外能力，不是第一版接線前置，也不需為接線拆除或擴張；首版必要範圍只要求顯示當輪 LLM 的實際 JD 差異，並安全撤回整輪 JD 效果，不撤回對話或 Memory。B2 因 OpenRouter 沒有受支援的 inline compaction 等價接點而進入 Owner 決策門；最新證據與選項見 [接線對齊稿](evidence/2026-09-15-jd-integration-document-reconciliation.md) §7.4。**
+
 日期：2026-09-14；Topic：JD-R002。這份只做一件事：把施工順序的五項，逐項對到**可以自己去看的證據**（tag、結果稿、測試），並說明剩下什麼、為什麼剩下。不重述設計，不代替[收尾清單](2026-09-13-jd-app-open-issues.md)。
 
 基準 `f160be97`；本階段最後一個 tag `jd-review-fixes-20260914` 指在目前 HEAD。下列 tag 都是本地 tag，沒有 merge、push 或切換 production authority。
@@ -63,19 +65,17 @@ B2 逐字採用，兩批有序交接、B2 pending 重建資源續作、發布回
 | 代表性真瀏覽器 | 完成三條旅程（還原、整輪撤回、來源點回原話）；**未做**：實體 IME、觸控、並行分頁、修改／刪除／移動的辨認（[OI-04](2026-09-13-jd-app-open-issues.md)） |
 | 真 PG | 完成；全組 **3258 passed，0 failed**。先前那一項 [OI-05](2026-09-13-jd-app-open-issues.md) 分頁失敗已定案：錯的是那條斷言，不是實作或契約 |
 | Windows 新程序 | 完成（背景四停點、宿主恢復） |
-| 自然模型 3 職位各 2 次 | **未做**，需費用授權（[OI-09](2026-09-13-jd-app-open-issues.md)） |
+| 顧問自然模型／prompt | **已完成** Luna 試用與 prompt 校準；尚未做的是正式 App 接線後的最小自然 E2E（[OI-09](2026-09-13-jd-app-open-issues.md)） |
 | 3 名員工自行試用 | **未做**，需 Owner 安排真人（[OI-10](2026-09-13-jd-app-open-issues.md)） |
 
 ## 5.1 獨立審查
 
 本階段 19 個提交已由非實作者[獨立審查](evidence/2026-09-14-jd-phase-independent-review.md)：八項發現全部修正（兩項 HIGH 都是「把不知道說成知道」），兩條沒有鑑別力的測試一併重寫，一句在當時不成立的文件宣稱已更正。採用保真度、撤回來源推導與不可偏離的產品效果由審查者獨立核對通過。窄複核進行中。
 
-## 6. 唯一擋住「持續訪談」的東西
+## 6. 2026-09-15 現況：阻擋是正式接線，不是選 Anthropic 模型
 
-**A 顧問要用哪個 Anthropic 模型，還沒有人選。**
+9/14 把「A 顧問要選 Anthropic model id」列成唯一阻擋，是施工期誤解，已由 Owner 更正。顧問應沿已完成的 LangChain／LangGraph runtime，經 OpenRouter 的 OpenAI-only route 使用 `openai/gpt-5.6-luna`，禁止 fallback；自然模型試用與 prompt 校準不重做。
 
-其餘都在位：金鑰讀取（Windows 認證管理員）、顧問指引與三項分析 Skills、十六個已註冊工具、純通知辨識、背景整理與發布、同一 writer、當輪差異、撤回與還原。`create_consultant_model(model_name=..., api_key=..., ...)` 只缺 `model_name` 這一個值。
+目前真正未閉合的是剩餘 composition：2026-09-15 已完成正式 `serve` 的 OpenRouter/Luna consultant、日常 chat 啟用、B1 OpenRouter route 與 runtime 動態文件 scope。B2 provider convergence 已確認不能在不改語意下直接接到目前 OpenRouter contract，須由 Owner 在「單一 OpenRouter 下的有界完整歷史」、「B2 例外 direct OpenAI／另一 credential」或「暫緩 B2」之間裁決；實作者不得自行以未知 pass-through 或通用 context-compression 取代。正式 B1／B2 dispatcher 的 wake、恢復與關閉生命週期、真 PG／新程序的 LLM tools／人工共同 writer／完整 App 結果也仍待閉合。最後只需一條最小自然 E2E 核對真 route，不先重做廣泛品質批次。
 
-這是費用決定，不是施工選擇：本 App 把 A 釘在 Anthropic 是既有決定，但已驗來源那邊的 A 走的是 OpenAI，所以沒有可沿用的既驗 model id。依指引「遇到會改變費用的問題，先停止回報，不要自行補做法」，這裡停住等 Owner 指名。
-
-指名之後要做的事很小：`serve` 以該 id 與已保存的金鑰組出顧問、把 `build_consultant()` 接上日常入口，然後才是 OI-09 的付費自然驗收與 OI-10 的員工試用。**在那之前，日常 AI 維持未啟用，不能宣稱持續訪談可用。**
+完整 JD 歷史與整份還原已實作，可保留；它們不是上述接線的阻擋，也不應在本輪繼續擴張。當輪 LLM 差異與安全整輪 JD 撤回則是要在 E2E 中維持的產品效果；原始對話、來源、Memory、案例、工作理解、checkpoint 與原回合紀錄不撤回。

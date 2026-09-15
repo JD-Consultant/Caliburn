@@ -1,13 +1,10 @@
 """B1 application wiring: adopted workflow, this App's source owner, real SDK.
 
-Every provider request is answered in-process by httpx.MockTransport with a
-body validated against the pinned OpenAI response schema, so the adapter, the
-SDK and the structured-output binding are real and the network is not. No
-provider access, no model-quality claim, no publication and no JD tool.
-
-The conversation consultant keeps its Anthropic runtime; only B1 is bound to
-OpenAI here.
+Every B1 provider request is answered in-process by httpx.MockTransport using
+the real OpenRouter SDK and strict structured-output binding. The network is
+not used. No provider access, model-quality claim, publication or JD tool.
 """
+import asyncio
 import json
 
 import httpx
@@ -15,7 +12,7 @@ import pytest
 from caliburn_memory import MemoryArtifacts
 from caliburn_memory.extraction import ExtractionOutput
 from caliburn_memory.sources import InvalidSourceReference
-from openai import BadRequestError
+from openrouter.errors import BadRequestResponseError
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
@@ -27,6 +24,11 @@ from jd_relational.extraction_app import (
     ExtractionSourceAdapter, accepted, build_extraction_model, build_extraction_workflow,
 )
 from jd_relational.memory_sources import MemorySourceReader
+from jd_relational.openrouter_model import OPENROUTER_HEADERS
+from support.openrouter_replies import (
+    refused as openrouter_refused, reply as openrouter_reply,
+    truncated as openrouter_truncated,
+)
 
 from test_chat_history import native
 from test_interview_window_source import interview, settled
@@ -59,6 +61,7 @@ def fields(summary="甲案：單次付款、無障礙。\n乙案：月租、權�
 
 
 def completed(**kwargs) -> dict:
+    """Legacy Responses fixture retained only while B2 remains on that seam."""
     return response_body([assistant_text(fields(**kwargs))])
 
 
@@ -71,6 +74,25 @@ def refused() -> dict:
 def truncated() -> dict:
     return response_body([assistant_text('{"rollout_summary": "甲案：單次付')], status="incomplete",
                          incomplete={"reason": "max_output_tokens"})
+
+
+def router_completed(**kwargs) -> dict:
+    return openrouter_reply("b1", text=fields(**kwargs))
+
+
+def router_refused() -> dict:
+    return openrouter_refused("b1")
+
+
+def router_truncated() -> dict:
+    value = openrouter_truncated("b1")
+    value["choices"][0]["message"]["content"] = '{"rollout_summary":"甲案：單次付'
+    return value
+
+
+def router_invalid() -> dict:
+    return openrouter_reply("b1", text=json.dumps({"rollout_summary": "只有一欄"},
+                                                    ensure_ascii=False))
 
 
 class FlakyStore(InMemoryStore):
@@ -98,22 +120,27 @@ def b1(interview, native):
 
     def respond(request):
         sent.append(json.loads(request.content))
-        item = queue.pop(0) if queue else completed()
+        item = queue.pop(0) if queue else router_completed()
         if isinstance(item, int):
-            return httpx.Response(item, json={"error": {"message": "synthetic", "type": "server_error"}})
+            return httpx.Response(item, json={"error": {"code": item, "message": "synthetic"}})
+        item = json.loads(json.dumps(item))
+        item["id"] = f"chat_{len(sent)}"
         return httpx.Response(200, json=item)
 
     store = FlakyStore()
-    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
-        model = build_extraction_model(model="gpt-5.6-luna", api_key="offline",
-                                       http_client=client).model_copy(update={"max_retries": 0})
-
+    transport = httpx.MockTransport(respond)
+    with httpx.Client(transport=transport, headers=OPENROUTER_HEADERS) as client:
+        async_client = httpx.AsyncClient(transport=transport, headers=OPENROUTER_HEADERS)
         def build(*, retries=0, **options):
+            model = build_extraction_model(api_key="offline", http_client=client,
+                async_http_client=async_client, max_retries=retries)
             return build_extraction_workflow(service=windows, document_id=document, store=store,
-                model=model.model_copy(update={"max_retries": retries}),
-                checkpointer=InMemorySaver(), **options)
+                model=model, checkpointer=InMemorySaver(), **options)
 
-        yield build, windows, document, whole, store, sent, queue
+        try:
+            yield build, windows, document, whole, store, sent, queue
+        finally:
+            asyncio.run(async_client.aclose())
 
 
 def test_a_completed_interview_becomes_memory_artifacts_over_the_real_source(b1):
@@ -136,19 +163,21 @@ def test_the_request_carries_employee_speech_under_a_strict_schema_without_stora
     request = sent[0]
     payload = json.dumps(request, ensure_ascii=False)
     assert "第一輪原話" in payload and "NEW_SOURCE" in payload
-    assert request["store"] is False
-    # `truncation` is deprecated and "disabled" is already the default, under
-    # which an oversize input fails with a 400 instead of being shortened.
-    assert "truncation" not in request
-    assert request["text"]["format"]["type"] == "json_schema"
-    assert request["text"]["format"]["strict"] is True
-    assert sorted(request["text"]["format"]["schema"]["properties"]) == sorted(ExtractionOutput.model_fields)
-    assert request["max_output_tokens"] == 8192 and request["reasoning"]["effort"] == "high"
+    assert "store" not in request and "plugins" not in request
+    assert request["response_format"]["type"] == "json_schema"
+    schema = request["response_format"]["json_schema"]
+    assert schema["strict"] is True
+    assert sorted(schema["schema"]["properties"]) == sorted(ExtractionOutput.model_fields)
+    assert request["max_tokens"] == 8192 and request["reasoning"] == {"effort": "high"}
+    assert request["provider"] == {"only": ["OpenAI"], "order": ["OpenAI"],
+        "allow_fallbacks": False, "require_parameters": True}
+    assert request["parallel_tool_calls"] is False
+    assert request["model"] == "openai/gpt-5.6-luna"
 
 
 def test_a_refusal_is_never_saved_as_an_empty_success(b1):
     build, _, document, whole, store, _, queue = b1
-    queue.append(refused())
+    queue.append(router_refused())
     with pytest.raises(ValueError, match="^Extraction refused, incomplete or invalid"):
         build().start(whole)
     assert not list(store.search(("q019-memory", document, "interviews")))
@@ -156,7 +185,7 @@ def test_a_refusal_is_never_saved_as_an_empty_success(b1):
 
 def test_a_truncated_response_is_never_saved_as_an_empty_success(b1):
     build, _, document, whole, store, _, queue = b1
-    queue.append(truncated())
+    queue.append(router_truncated())
     with pytest.raises(ValueError):
         build().start(whole)
     assert not list(store.search(("q019-memory", document, "interviews")))
@@ -164,7 +193,7 @@ def test_a_truncated_response_is_never_saved_as_an_empty_success(b1):
 
 def test_a_structurally_invalid_response_is_never_saved(b1):
     build, _, document, whole, store, _, queue = b1
-    queue.append(response_body([assistant_text(json.dumps({"rollout_summary": "只有一欄"}))]))
+    queue.append(router_invalid())
     with pytest.raises(ValueError):
         build().start(whole)
     assert not list(store.search(("q019-memory", document, "interviews")))
@@ -172,7 +201,7 @@ def test_a_structurally_invalid_response_is_never_saved(b1):
 
 def test_an_unreadable_artifact_format_is_corrected_before_it_is_persisted(b1):
     build, _, _, whole, _, sent, queue = b1
-    queue.extend([completed(summary="甲" * 2100), completed()])
+    queue.extend([router_completed(summary="甲" * 2100), router_completed()])
     result = build().start(whole)
     assert len(sent) >= 2 and result["files"]
     assert "Runtime validation feedback (not employee speech)" in json.dumps(sent[1], ensure_ascii=False)
@@ -180,7 +209,7 @@ def test_an_unreadable_artifact_format_is_corrected_before_it_is_persisted(b1):
 
 def test_a_transport_retry_is_one_model_step_not_a_second_saved_window(b1):
     build, _, _, whole, _, sent, queue = b1
-    queue.extend([500, completed()])
+    queue.extend([500, router_completed()])
     result = build(retries=1).start(whole)
     # Two HTTP attempts, one accepted model step, one artifact pair for it.
     assert len(sent) == 2 and len(result["files"]) == 1
@@ -280,7 +309,7 @@ def test_a_provider_input_overflow_surfaces_instead_of_a_shortened_source(b1):
     """With truncation at its default, an oversize request is a 400, not a cut."""
     build, _, document, whole, store, sent, queue = b1
     queue.append(400)
-    with pytest.raises(BadRequestError):
+    with pytest.raises(BadRequestResponseError):
         build().start(whole)
     assert len(sent) == 1
     assert not list(store.search(("q019-memory", document, "interviews")))
@@ -290,7 +319,7 @@ def test_a_context_range_carries_its_turn_terminals_into_the_payload(b1):
     """B1 must be able to tell a cancelled context turn from a successful one."""
     build, windows, document, whole, _, sent, _ = b1
     build(max_chars=24, context_chars=12).start(whole)
-    contexts = [json.loads(request["input"][-1]["content"])["CONTEXT_ONLY"]
+    contexts = [json.loads(request["messages"][-1]["content"])["CONTEXT_ONLY"]
                 for request in sent]
     carried = [turn for context in contexts if context for turn in context["turns"]]
     assert carried and any(turn["answer_succeeded"] is False for turn in carried)

@@ -97,6 +97,9 @@ class RepairWorkflow:
                 return {"outcome": {"status": "invalid_edit", "detail": f"Edit {index + 1}: only the two existing memory files and nonempty diffs are allowed", "read_paths": list(PATHS.values())}}
         head = self.publication.current()
         if not state["base"]:
+            if head is not None:
+                return {"outcome": self._feedback("stale", head,
+                    "Memory became available after this turn began. Read it, then reconsider the edits.")}
             return {"outcome": self._feedback("no_memory", head, "No memory was loaded. Background extraction/consolidation initializes memory; C does not.")}
         if not head or asdict(head) != state["base"]:
             return {"outcome": self._feedback("stale", head, "Read the refreshed memory, then reconsider the edits. Do not just repeat them.")}
@@ -163,8 +166,8 @@ class RepairWorkflow:
                     or receipt.result.memory != request.memory
                     or receipt.result.revision != receipt.base_revision + 1):
                 raise PublicationUncertain("Repair receipt does not match the saved request")
-            current = self._current_after(receipt.result)
-            return self._feedback('applied', current,
+            self._current_after(receipt.result)
+            return self._feedback('applied', receipt.result,
                 'Edits were published; cancellation did not publish or revert Memory.',
                 applied_head=asdict(receipt.result), source_reference=receipt.repair_sources[0])
         except PublicationUncertain:
@@ -180,10 +183,11 @@ class RepairWorkflow:
             applied = self.publication.publish(PublishRequest(**data))
         except StalePublication as error:
             return {"outcome": self._feedback("stale", error.current, "Read refreshed memory and reconsider edits; nothing from this attempt was published.")}
-        # Receipt reconciliation may happen after a later B publication. Never
-        # regress A to a historical receipt; report both applied and read heads.
-        current = self._current_after(applied)
-        return {"outcome": self._feedback("applied", current,
-            "Edits published. For this input, subsequent reads use this head; its initial guide remains historical.",
+        # A later B publication may already be current by the time this receipt
+        # is returned. Confirm that publication did not regress or cross scope,
+        # but keep this foreground turn on the exact version C produced.
+        self._current_after(applied)
+        return {"outcome": self._feedback("applied", applied,
+            "Edits published. For this input, subsequent reads use the version this repair produced.",
             applied_head=asdict(applied), changes=state["edits"],
             source_reference=state["source_reference"])}

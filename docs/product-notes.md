@@ -1,5 +1,24 @@
 # 產品 / UX 決策與延後項
 
+## 產品核心目標（2026-09-15 Owner 確認）
+
+Caliburn 是供人與 LLM 共同編輯 JD 的本機 Web 應用程式。Owner 以 Codex／VS Code 的編輯體驗作類比：使用者能直接編輯文件，也能透過對話讓 LLM 使用工具編輯同一份文件；Caliburn 編輯的內容是 JD。
+
+這個類比約束產品體驗，不指定 VS Code 外掛、程式碼檔案格式或其內部架構。既有本機、單一操作者、多份隔離文件的範圍維持有效。
+
+- 產品只有一個 App／後端服務。人工編輯與 LLM 聊天可以使用不同 endpoint，但兩者最後都呼叫同一套 JD application service、業務規則、validator、writer 與 transaction；LLM tool 不直接寫資料表。
+- LLM 顧問是 App 的內部功能，不是另一個產品或獨立服務。保留已完成且經自然模型反覆校準的 LangChain／LangGraph runtime、訪談方法、prompt、Skills、context、工具執行、checkpoint、錯誤處理、有限重試與恢復能力；接線以這份顧問為基準，不重新設計它。顧問在資訊累積足夠時自行呼叫純通知工具，表示值得進行背景 Memory 整理；通知本身不執行 B1／B2、不寫 Memory，也不表示整理已完成。新增 JD tools 與 App context 不得順帶改寫既有通知的模型可見描述、判斷時機或觸發語意；除非出現可重現的框架相容性或正確性問題，才作有證據的最小修正。
+- 模型路徑固定理解為「framework → OpenRouter adapter → OpenRouter → OpenAI provider → `openai/gpt-5.6-luna`」。第一版不做 provider fallback；模型與參數放在可更換 profile，日後換模型不改 JD 業務邏輯或工具。
+- App 提供當前文件的 context 和 JD tools。人工與 LLM 修改都作用於同一份 current JD，產生相同的 operation／保存結果；可以記錄 `manual`／`ai` 與 AI run 身分，但不形成第二份 candidate／approved JD。
+- 第一版**不要求 JD 版本歷史、任意舊版瀏覽、revision diff 或整份舊版還原**。已經完成且穩定的相關能力可以保留，不必拆除；內部 revision／snapshot／operation 也可繼續服務保存一致性、冪等、故障對帳、本輪差異及整輪撤回。但它們不是接線前置，也不據此繼續擴張歷史產品、重構核心或新增通用復原引擎。
+- 每輪 LLM 完成後，畫面只需顯示**該輪實際造成的 JD 變更**。`撤回這輪 JD 改動` 只撤回該 AI run 對 current JD 的整組效果，走同一套 JD 業務邏輯形成新的安全寫入；不得倒退資料庫 head、不得覆蓋較晚的人工作業或其他回合，也不是通用 undo stack。
+- JD 撤回**不刪除、不倒退**原始對話、來源、案例、Semantic Memory、工作理解、checkpoint 或原 AI 回合紀錄。原始對話保存使用者實際說過的內容；Memory／案例保存可修訂的工作理解。事實有誤時由後續更正流程修訂理解，不靠 JD 撤回抹除。撤回事件本身可提供給下一輪 LLM，讓它知道文件改動已被使用者取回，但不能推論該工作事實不存在。
+- JD、原始對話、Memory 與 runtime checkpoint 可以使用**同一個 PostgreSQL 服務與同一個 App database**，不需各開一套資料庫服務；不同資料仍維持各自的 table／schema owner，全部以 `document_id` 隔離。一次模型回合只綁一份文件，不建立跨文件混合 context。
+- App 在安全回合完成或啟動恢復時可以喚醒背景 dispatcher，但喚醒只負責檢查已保存通知／既有未完工作，不能自行創造整理需求。沒有有效通知且沒有未完工作時，B1／B2 不啟動；長 target 的既有尾端可以在同一通知下分批完成，不要求 LLM 重複通知。
+- 驗收旅程：人先編輯 → LLM 讀取並修改同一份 current JD → 人查看該輪實際差異 → 選擇保留、接續手改或撤回該輪 JD 變更 → 下一輪 LLM 取得最新 JD、對話與 Memory → 重開後仍能續談。保存失敗或結果未知時，畫面須如實呈現。
+
+本段記錄產品目標，不宣稱完整旅程已驗收。Luna／prompt 與 relational JD 核心沿已確認基線；目前工作是文件與接線理解對齊，進度由 [目前決策](current-decisions.md) 路由。下方帶日期的直連 OpenAI、Anthropic、完整 JD 歷史／還原、提案／核准稿與優先級敘述只保留其歷史範圍，不可覆蓋本段。
+
 > 不夠「架構」到要開 ADR、但需要被記住的產品 / UX 決策與**刻意延後**的項目。
 > 每項標清楚:**現況是不是刻意的**、**為什麼延後**、**未定的取捨**。
 

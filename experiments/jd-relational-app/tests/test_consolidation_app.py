@@ -8,6 +8,7 @@ No provider access and no model-quality claim.
 B1 runs first over this App's own source owner, because B2 may only take a
 batch that B1 actually finished.
 """
+import asyncio
 import json
 from uuid import uuid4
 
@@ -27,9 +28,12 @@ from jd_relational.consolidation_app import (
 )
 from jd_relational.extraction_app import build_extraction_model, build_extraction_workflow
 from jd_relational.memory_sources import MemorySourceReader
+from jd_relational.openrouter_model import OPENROUTER_HEADERS
 
 from test_chat_history import native
-from test_extraction_app import assistant_text, completed, refused, response_body
+from test_extraction_app import (
+    assistant_text, completed, refused, response_body, router_completed,
+)
 from test_interview_window_source import interview, settled
 
 
@@ -54,6 +58,10 @@ def b2(interview, native):
 
     def respond(request):
         sent.append(json.loads(request.content))
+        if request.url.path.endswith("/chat/completions"):
+            answer = json.loads(json.dumps(router_completed()))
+            answer["id"] = f"chat_{len(sent)}"
+            return httpx.Response(200, json=answer)
         answer = queue.pop(0) if queue else completed()
         if callable(answer):
             answer = answer()
@@ -69,15 +77,17 @@ def b2(interview, native):
     store = InMemoryStore()
     engine = sa.create_engine("sqlite://", connect_args={"check_same_thread": False},
                               poolclass=StaticPool)
-    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+    transport = httpx.MockTransport(respond)
+    with httpx.Client(transport=transport, headers=OPENROUTER_HEADERS) as client:
+        async_client = httpx.AsyncClient(transport=transport, headers=OPENROUTER_HEADERS)
         reader = MemorySourceReader(windows, document, window_references=True, context_references=True)
         artifacts = MemoryArtifacts(store, document, source=reader)
         publication = PublicationStore(engine, artifacts)
         publication.setup()
         saver = InMemorySaver()
         b1 = build_extraction_workflow(service=windows, document_id=document, store=store,
-            model=build_extraction_model(model="gpt-5.6-luna", api_key="offline",
-                                         http_client=client).model_copy(update={"max_retries": 0}),
+            model=build_extraction_model(api_key="offline", http_client=client,
+                                         async_http_client=async_client, max_retries=0),
             checkpointer=saver)
         extracted = b1.start(batch)
         assert len(sent) == len(extracted["files"])
@@ -92,6 +102,7 @@ def b2(interview, native):
         try:
             yield build, artifacts, publication, batch, extracted, store, sent, queue
         finally:
+            asyncio.run(async_client.aclose())
             engine.dispose()
 
 
@@ -204,9 +215,11 @@ def test_a_later_repair_makes_b2_reread_its_source_instead_of_bumping_a_version(
     summary_path = extracted["files"][0]["summary_path"]
     original = PublicationStore.publish
     intervened = []
+    background_requests = []
 
     def repair_first(self, request):
         """C publishes between B2 reading its base and B2 publishing."""
+        background_requests.append(request)
         if not intervened:
             intervened.append(True)
             version = artifacts.save_memory(knowledge="更正：權限分級由客戶自行設定。",
@@ -229,6 +242,11 @@ def test_a_later_repair_makes_b2_reread_its_source_instead_of_bumping_a_version(
     assert later["GUIDE"] == "更正後導覽", "the reload must seed from C's new head, not the stale base"
     assert any("第一輪原話" in segment["text"]
                for segment in later["RECENT_REPAIRS"][0]["segments"])
+    assert [request.expected_revision for request in background_requests] == [0, 1]
+    assert background_requests[0].memory != background_requests[1].memory
+    receipt = publication.receipt(background_requests[1].operation_id)
+    assert receipt.request_digest == background_requests[1].digest()
+    assert receipt.request_digest != background_requests[0].digest()
     head = publication.current()
     assert head.revision == result["result"]["revision"] == 2
     assert head.processed_source == batch
@@ -292,3 +310,73 @@ def test_the_request_after_an_inline_compaction_starts_at_that_point(b2):
             "the request must start at the provider's own compaction item"
         assert not [item for item in conversation if item.get("role") == "user"], \
             "the window the provider replaced must not be replayed"
+
+
+def test_a_stale_b2_restart_does_not_reuse_the_old_attempts_compaction(
+        b2, interview, monkeypatch):
+    """A stale candidate gets a fresh run over the new Memory head.
+
+    The first attempt's provider-owned opaque window belongs only to that
+    attempt.  After C moves the publication head, B2 must reload and recompute
+    without carrying the stale attempt's compaction item into its new graph.
+    """
+    build, artifacts, publication, _, extracted, _, sent, queue = b2
+    windows, document, first_run, _ = interview
+    corrected_source = windows.capture_window(
+        document, first_run_id=first_run, last_run_id=first_run)
+    summary_path = extracted["files"][0]["summary_path"]
+    original_publish = PublicationStore.publish
+    intervened = []
+
+    def repair_before_first_background_publish(self, request):
+        if not intervened:
+            version = artifacts.save_memory(
+                knowledge="更正：權限分級由客戶自行設定。",
+                guide="更正後導覽",
+            )
+            intervened.append(original_publish(
+                self,
+                self.prepare(
+                    version,
+                    expected_revision=0,
+                    kind="repair",
+                    repair_sources=(corrected_source,),
+                ),
+            ))
+        return original_publish(self, request)
+
+    monkeypatch.setattr(PublicationStore, "publish", repair_before_first_background_publish)
+    first_write = wrote(
+        "/memory/knowledge.md",
+        f"第一次整併的說法。\n詳記：{summary_path}",
+    )
+    queue.extend([
+        compacted(*first_write["output"]),
+        wrote("/memory/guide.md", "第一次導覽"),
+        done(),
+        *staged(summary_path, body="更正後：權限分級由客戶自行設定。"),
+    ])
+
+    result = build().start()
+
+    restart_candidates = []
+    for index, request in enumerate(sent):
+        input_items = request["input"]
+        if len(input_items) < 2 or input_items[1].get("role") != "user":
+            continue
+        payload = json.loads(input_items[1]["content"])
+        if payload["RECENT_REPAIRS"]:
+            restart_candidates.append((index, request, payload))
+
+    assert restart_candidates
+    restart_index, restart, payload = restart_candidates[0]
+    assert [item.get("role") for item in restart["input"]] == ["system", "user"]
+    assert payload["GUIDE"] == "更正後導覽"
+    assert "c3ludGhldGlj" in json.dumps(sent[:restart_index], ensure_ascii=False)
+    assert "c3ludGhldGlj" not in json.dumps(sent[restart_index:], ensure_ascii=False)
+    assert not any(item.get("type") == "compaction" for item in restart["input"])
+    assert publication.current().revision == result["result"]["revision"] == 2
+    knowledge = artifacts.reader(publication.current().memory).read(
+        "/memory/knowledge.md").file_data["content"]
+    assert "更正後：權限分級由客戶自行設定。" in knowledge
+    assert "第一次整併的說法。" not in knowledge

@@ -1,5 +1,7 @@
 # JD 關聯式資料庫與保存契約
 
+> **2026-09-15 產品範圍校正：本稿的 relational current rows、共同 writer／validator／transaction、operation receipt 與故障對帳仍是有效技術基線。`jd_revision`／snapshot 可保留作內部一致性、冪等、當輪 LLM 差異與安全整輪撤回；已完成且穩定的完整歷史／整份還原也不必拆除，但不是第一版接線前置，不再為此擴張或重構。原始對話、來源、案例、Memory、工作理解與 checkpoint 不隨 JD 撤回而倒退。以 [產品核心目標](../product-notes.md) 與 [ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md) 為準。**
+
 - 日期：2026-09-12
 - Topic：JD-R002/C03
 - 階段：G4 WORKING；十三表、八操作、共同交易／讀取、人工 writer／Windows 重啟恢復已隔離驗證。[人工 HTTP](2026-09-13-jd-manual-http-slice.md)與[文件目錄入口](2026-09-13-jd-catalog-http-slice.md)接保存、查回、更名與封存恢復；沿原 create unique key／metadata version，DB 格式不變。持久配置、AI 回合、source／選區／notice、Web 與歷史還原仍待完成；不是整體 G4 或 production 採用。

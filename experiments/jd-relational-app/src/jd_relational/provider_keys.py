@@ -7,11 +7,10 @@ database, the front end, a log line or a diagnostic file, and it is never part
 of an App data backup -- the local configuration file is untouched by this
 module, so restoring a backup on another machine means setting the key again.
 
-Each role is stored separately: the conversation consultant is pinned to
-Anthropic and the background stages to OpenAI, so one being configured never
-stands in for the other. A missing key means that capability is not enabled;
-it is never a reason to switch provider, and checking configuration never
-calls a provider.
+The App has one OpenRouter credential. Model profiles can change without
+creating another secret role; provider selection and fallback policy remain in
+the model adapter. A missing key means AI is not enabled, and checking the
+configuration never calls a provider.
 
 Checked 2026-09-14: Windows Credential Manager generic credentials through
 pywin32 312's `win32cred` (CredRead/CredWrite/CredDelete,
@@ -22,11 +21,8 @@ new dependency and no second secret store.
 
 import sys
 
-# One target per role, named so they are recognisable in the Windows UI.
-TARGETS = {
-    "anthropic": "Caliburn JD/anthropic",
-    "openai": "Caliburn JD/openai",
-}
+# One App-owned gateway credential, named so it is recognisable in Windows UI.
+TARGETS = {"openrouter": "Caliburn JD/openrouter"}
 ROLES = tuple(TARGETS)
 MAX_KEY_CHARACTERS = 512
 # Windows says "no such credential" with this one code. Every other failure

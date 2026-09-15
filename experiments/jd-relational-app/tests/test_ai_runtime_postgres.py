@@ -6,6 +6,7 @@ These are local foreground-run proofs, not cross-process host-death proofs.
 
 from contextlib import contextmanager
 from copy import deepcopy
+import asyncio
 import json
 import os
 from threading import Event
@@ -29,7 +30,7 @@ from jd_relational.reads import command_context
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import DocumentCheckpoints, build_document_graph
 from jd_relational.storage.service import JdStorage
-from support.openai_replies import reply as _reply
+from support.openrouter_replies import reply as _reply
 from test_consultant_context_postgres import _notice
 from test_manual_runtime_postgres import NATIVE_TABLES, RUNTIME_SCHEMA, connect, counts
 from test_storage_postgres import engine
@@ -52,17 +53,18 @@ def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None)
 
     def receive(request):
         assert get_tracing_context()["enabled"] is False
-        assert request.url.host == "api.openai.com"
+        assert request.url.host == "openrouter.ai"
         assert request.headers["authorization"] == "Bearer synthetic-ai-runtime-not-a-key"
         assert len(requests) < len(plan), "No hidden model retry or replay is allowed."
         payload = json.loads(request.content)
         # This product never allows parallel tool calls and never lets the
         # provider keep the conversation: the durable record is this App's.
         assert payload["parallel_tool_calls"] is False
-        assert payload["store"] is False
-        assert {tool["name"] for tool in payload["tools"]} == expected_names
+        assert payload["provider"] == {"only": ["OpenAI"], "order": ["OpenAI"],
+            "allow_fallbacks": False, "require_parameters": True}
+        assert {tool["function"]["name"] for tool in payload["tools"]} == expected_names
         assert len(payload["tools"]) == len(expected_names)
-        assert all(tool["strict"] is True for tool in payload["tools"])
+        assert all(tool["function"]["strict"] is True for tool in payload["tools"])
         requests.append(payload)
         name, arguments = plan[len(requests) - 1](payload)
         if before_reply is not None:
@@ -72,10 +74,13 @@ def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None)
                               request=request)
 
     with httpx.Client(transport=httpx.MockTransport(receive), trust_env=False, timeout=5) as client:
-        model = create_consultant_model(model="gpt-5.6-luna",
-                                        api_key="synthetic-ai-runtime-not-a-key",
-                                        http_client=client)
-        yield model, requests
+        async_client = httpx.AsyncClient(transport=httpx.MockTransport(receive), trust_env=False, timeout=5)
+        try:
+            model = create_consultant_model(api_key="synthetic-ai-runtime-not-a-key",
+                                            http_client=client, async_http_client=async_client)
+            yield model, requests
+        finally:
+            asyncio.run(async_client.aclose())
 
 
 @contextmanager
@@ -110,9 +115,14 @@ def _final(_):
 
 
 def _last_page(payload):
-    results = [block for message in payload["messages"] for block in message["content"]
-        if isinstance(message["content"], list) and block["type"] == "tool_result"]
-    value = json.loads(results[-1]["content"])
+    results = []
+    for message in payload["messages"]:
+        if message.get("role") == "tool":
+            results.append(json.loads(message["content"]))
+        elif isinstance(message.get("content"), list):
+            results.extend(json.loads(block["content"]) for block in message["content"]
+                           if block.get("type") == "tool_result")
+    value = results[-1]
     assert value["view"] == "current" and value["access"] == "current" and not value["has_more"]
     return value
 

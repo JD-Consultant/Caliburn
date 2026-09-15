@@ -7,6 +7,8 @@ No provider, no connection.
 """
 
 from dataclasses import replace
+from types import SimpleNamespace
+from uuid import uuid4
 
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 import pytest
@@ -15,6 +17,10 @@ from jd_relational.background_admission import Admission
 from jd_relational.background_availability import (
     BLOCK, NOTICE, BackgroundAvailability, availability_notice,
 )
+from jd_relational.consultant_context import ConsultantContext, ConsultantContextError
+from jd_relational.memory_context import MemoryReadSession
+from jd_relational.notice_history import NoticeBoundary, NoticeMaterial
+from jd_relational.references import ReferenceCodec
 
 DOCUMENT = "0d6de1cd-52e0-4b2f-9a19-5f0e86a2ed6a"
 TARGET = "interview-window:target"
@@ -33,14 +39,6 @@ class Admissions:
 class Head:
     def __init__(self, processed_source):
         self.processed_source = processed_source
-
-
-class Publication:
-    def __init__(self, head=None):
-        self.head = head
-
-    def current(self):
-        return self.head
 
 
 class Windows:
@@ -64,24 +62,34 @@ def blocked(**changes):
                      error_code="source_unavailable", **changes)
 
 
+def _runtime(document=DOCUMENT, *, head=None):
+    dataset, run = str(uuid4()), str(uuid4())
+    boundary = NoticeBoundary(uuid4(), 1)
+    notice = NoticeMaterial(document, None, boundary, (), 0, 0, 0)
+    session = MemoryReadSession(dataset, document, run, object(), object(), head, "", object())
+    context = ConsultantContext(dataset, document, run, object(),
+        ReferenceCodec(b"x" * 32, dataset), notice, memory_session=session)
+    return SimpleNamespace(context=context)
+
+
 def test_nothing_is_said_when_background_work_is_not_blocked():
     for status in ("idle", "queued", "running"):
         admission = Admission(DOCUMENT, status=status, target_reference=TARGET)
         windows = Windows("interview-window:rest")
-        assert availability_notice(Admissions(admission), Publication(), windows, DOCUMENT) == ""
+        assert availability_notice(Admissions(admission), windows, DOCUMENT, None) == ""
         assert windows.seen == [], "a healthy row needs no coverage question"
 
 
 def test_nothing_is_said_when_the_blocked_target_turned_out_to_be_published():
     windows = Windows(None)
-    notice = availability_notice(Admissions(blocked()), Publication(Head("interview-window:after")),
-                                 windows, DOCUMENT)
+    notice = availability_notice(Admissions(blocked()), windows, DOCUMENT,
+                                 Head("interview-window:after"))
     assert notice == ""
     assert windows.seen == [(TARGET, DOCUMENT, "interview-window:after")]
 
 
 def test_a_blocked_and_uncovered_range_is_named():
-    notice = availability_notice(Admissions(blocked()), Publication(), Windows("rest"), DOCUMENT)
+    notice = availability_notice(Admissions(blocked()), Windows("rest"), DOCUMENT, None)
     assert notice.startswith(NOTICE)
     assert TARGET in notice
     assert "不要假定記憶已包含這段資料" in notice
@@ -90,41 +98,41 @@ def test_a_blocked_and_uncovered_range_is_named():
 def test_a_blocked_row_without_a_target_says_nothing():
     admission = replace(blocked(), target_reference=None)
     windows = Windows("rest")
-    assert availability_notice(Admissions(admission), Publication(), windows, DOCUMENT) == ""
+    assert availability_notice(Admissions(admission), windows, DOCUMENT, None) == ""
     assert windows.seen == []
 
 
-def _middleware(admission, windows=None, head=None):
-    return BackgroundAvailability(Admissions(admission), Publication(head),
-                                  windows or Windows("rest"), DOCUMENT)
+def _middleware(admission, windows=None):
+    return BackgroundAvailability(Admissions(admission), windows or Windows("rest"))
 
 
 def test_the_notice_is_read_once_per_employee_input():
     admissions = Admissions(blocked())
-    middleware = BackgroundAvailability(admissions, Publication(), Windows("rest"), DOCUMENT)
+    middleware = BackgroundAvailability(admissions, Windows("rest"))
     state = {"messages": [HumanMessage(id="m1", content="我每週巡檢設備")]}
-    first = middleware.before_agent(state, None)
+    runtime = _runtime()
+    first = middleware.before_agent(state, runtime)
     assert first["background_turn_id"] == "m1" and first["background_notice"]
     assert admissions.calls == 1
-    again = middleware.before_agent({**state, **first}, None)
+    again = middleware.before_agent({**state, **first}, runtime)
     assert again is None, "later model steps in the same turn reuse the one read"
     assert admissions.calls == 1
 
 
 def test_a_new_employee_input_is_read_again():
     admissions = Admissions(blocked())
-    middleware = BackgroundAvailability(admissions, Publication(), Windows("rest"), DOCUMENT)
+    middleware = BackgroundAvailability(admissions, Windows("rest"))
     state = {"messages": [HumanMessage(id="m1", content="第一段")],
              "background_turn_id": "m0", "background_notice": ""}
-    update = middleware.before_agent(state, None)
+    update = middleware.before_agent(state, _runtime())
     assert update["background_turn_id"] == "m1"
     assert admissions.calls == 1
 
 
 def test_a_turn_with_no_employee_input_reads_nothing():
     admissions = Admissions(blocked())
-    middleware = BackgroundAvailability(admissions, Publication(), Windows("rest"), DOCUMENT)
-    assert middleware.before_agent({"messages": [AIMessage(id="a1", content="hi")]}, None) is None
+    middleware = BackgroundAvailability(admissions, Windows("rest"))
+    assert middleware.before_agent({"messages": [AIMessage(id="a1", content="hi")]}, _runtime()) is None
     assert admissions.calls == 0
 
 
@@ -140,7 +148,7 @@ class Request:
 
 def test_the_notice_arrives_as_an_app_system_block_not_as_the_employee():
     middleware = _middleware(blocked())
-    notice = availability_notice(Admissions(blocked()), Publication(), Windows("rest"), DOCUMENT)
+    notice = availability_notice(Admissions(blocked()), Windows("rest"), DOCUMENT, None)
     request = Request({"background_notice": notice}, SystemMessage(content="顧問指引"))
     seen = {}
     middleware.wrap_model_call(request, lambda value: seen.setdefault("request", value))
@@ -160,7 +168,41 @@ def test_an_empty_notice_leaves_the_request_untouched():
 
 
 def test_availability_never_reaches_for_a_way_to_run_background_work():
-    notice = availability_notice(Admissions(blocked()), Publication(), Forbidden("rest"), DOCUMENT)
+    notice = availability_notice(Admissions(blocked()), Forbidden("rest"), DOCUMENT, None)
     assert notice.startswith(NOTICE)
     with pytest.raises(AssertionError):
         Forbidden("rest").start()
+
+
+def test_one_shared_middleware_reads_each_document_from_its_runtime_scope():
+    other = str(uuid4())
+
+    class ScopedAdmissions:
+        def __init__(self):
+            self.seen = []
+
+        def read(self, document_id):
+            self.seen.append(document_id)
+            return Admission(document_id, status="blocked",
+                             target_reference=f"target:{document_id}",
+                             error_code="source_unavailable")
+
+    admissions, windows = ScopedAdmissions(), Windows("rest")
+    middleware = BackgroundAvailability(admissions, windows)
+    first = middleware.before_agent(
+        {"messages": [HumanMessage(id="m1", content="第一份文件")]}, _runtime(DOCUMENT))
+    second = middleware.before_agent(
+        {"messages": [HumanMessage(id="m2", content="第二份文件")]}, _runtime(other))
+    assert admissions.seen == [DOCUMENT, other]
+    assert [item[1] for item in windows.seen] == [DOCUMENT, other]
+    assert f"target:{DOCUMENT}" in first["background_notice"]
+    assert f"target:{other}" in second["background_notice"]
+
+
+def test_missing_or_crossed_runtime_memory_scope_stops_before_any_read():
+    admissions = Admissions(blocked())
+    middleware = BackgroundAvailability(admissions, Windows("rest"))
+    with pytest.raises(ConsultantContextError, match="^invalid_background_scope$"):
+        middleware.before_agent(
+            {"messages": [HumanMessage(id="m1", content="內容")]}, SimpleNamespace(context=None))
+    assert admissions.calls == 0

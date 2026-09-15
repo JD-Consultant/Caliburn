@@ -28,7 +28,7 @@ class BackgroundContextState(AgentState):
     background_turn_id: str
 
 
-def availability_notice(admissions, publication, windows, document_id: str) -> str:
+def availability_notice(admissions, windows, document_id: str, published_head) -> str:
     """Empty unless this document's background work is really stuck and owed.
 
     A blocked row whose target the publication cursor already covers is not
@@ -38,10 +38,9 @@ def availability_notice(admissions, publication, windows, document_id: str) -> s
     admission = admissions.read(document_id)
     if admission.status != "blocked" or admission.target_reference is None:
         return ""
-    head = publication.current()
     covered = windows.plan_saved_batch(
         admission.target_reference, document_id,
-        after_reference=head.processed_source if head is not None else None)
+        after_reference=published_head.processed_source if published_head is not None else None)
     if covered["source_reference"] is None:
         return ""
     return NOTICE + RANGE_PREFIX + admission.target_reference
@@ -52,9 +51,24 @@ class BackgroundAvailability(AgentMiddleware):
 
     state_schema = BackgroundContextState
 
-    def __init__(self, admissions, publication, windows, document_id: str):
-        self._admissions, self._publication = admissions, publication
-        self._windows, self._document_id = windows, document_id
+    def __init__(self, admissions, windows):
+        self._admissions, self._windows = admissions, windows
+
+    @staticmethod
+    def _scope(runtime):
+        """Read the App-issued scope for this run, never model-visible input."""
+        from .consultant_context import ConsultantContext, ConsultantContextError
+        from .memory_context import MemoryReadSession
+
+        context = getattr(runtime, "context", None)
+        session = getattr(context, "memory_session", None)
+        if (not isinstance(context, ConsultantContext)
+                or not isinstance(session, MemoryReadSession)
+                or session.document_id != context.document_id
+                or session.dataset_id != context.dataset_id
+                or session.run_id != context.run_id):
+            raise ConsultantContextError("invalid_background_scope")
+        return context.document_id, session.head
 
     def before_agent(self, state, runtime):
         current = next((message.id for message in reversed(state["messages"])
@@ -62,9 +76,10 @@ class BackgroundAvailability(AgentMiddleware):
         if current is None or state.get("background_turn_id") == current:
             # Later model steps in the same turn reuse what was read once.
             return None
+        document_id, head = self._scope(runtime)
         return {"background_turn_id": current,
                 "background_notice": availability_notice(
-                    self._admissions, self._publication, self._windows, self._document_id)}
+                    self._admissions, self._windows, document_id, head)}
 
     def wrap_model_call(self, request, handler):
         notice = request.state.get("background_notice")

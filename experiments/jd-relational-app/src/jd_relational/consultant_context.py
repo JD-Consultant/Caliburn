@@ -210,11 +210,11 @@ def _project(request):
             raise ConsultantContextError("source_not_available") from None
         blocks.append({"type": "text", "text": source})
     if context.memory_session is not None:
-        from .memory_context import initial_memory_session
+        from .memory_context import memory_session
         # ModelRequest state is the native step state, not a model parameter.
         from types import SimpleNamespace
-        memory = initial_memory_session(SimpleNamespace(context=context, state=request.state,
-                                                        store=request.runtime.store))
+        memory = memory_session(SimpleNamespace(context=context, state=request.state,
+                                                store=request.runtime.store))
         blocks.append({"type": "text", "text": _json(memory.notice())})
     projected = request.override(system_message=SystemMessage(content=blocks),
         model_settings=settings)
@@ -286,7 +286,8 @@ def read_closed_model_view(graph, *, document_id, dataset_id, run_id):
     return view
 
 
-def build_consultant_node(model, *, tools, guidance: str, extra_middleware=()):
+def build_consultant_node(model, *, tools, guidance: str, extra_middleware=(),
+                          context_middleware=None):
     """Build the native child; the host injects owned tools/run context later.
 
     No checkpointer, provider configuration or document is created here. Scope
@@ -294,32 +295,39 @@ def build_consultant_node(model, *, tools, guidance: str, extra_middleware=()):
     """
     from langchain.agents import create_agent
     from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
-    from langchain_openai import ChatOpenAI
-    from .consultant_model import MAX_MODEL_STEPS, MAX_TOOL_CALLS
+    from .consultant_model import (
+        MAX_MODEL_STEPS, MAX_TOOL_CALLS, OPENROUTER_PROVIDER, ReceiptChatOpenRouter,
+    )
     from .inspection_model import InspectionOnly, InspectionGuard
     inspection = type(model) is InspectionOnly
     # One provider, checked by what the assembly actually configured. A model
     # that stores the conversation server-side, retries on its own or answers
     # with parallel tool calls is not this role's model.
-    provider_valid = (isinstance(model, ChatOpenAI) and model.use_responses_api
-        and model.output_version == "responses/v1" and model.store is False
-        and model.max_retries == 0
+    route = {"only": [OPENROUTER_PROVIDER], "order": [OPENROUTER_PROVIDER],
+             "allow_fallbacks": False, "require_parameters": True}
+    provider_valid = (isinstance(model, ReceiptChatOpenRouter)
+        and model.openrouter_provider == route and model.max_retries == 0
         and model.model_kwargs.get("parallel_tool_calls") is False
         and (model.reasoning or {}).get("effort") == "high")
     if ((not provider_valid and not inspection)
             or not isinstance(extra_middleware, (list, tuple))
             or any(not isinstance(value, AgentMiddleware) for value in extra_middleware)
+            or (context_middleware is not None
+                and not isinstance(context_middleware, AgentMiddleware))
             or not isinstance(guidance, str) or not guidance.strip()):
         raise ConsultantContextError("invalid_consultant_configuration")
     # This role's verified budgets, declared where the agent is assembled.
-    middleware = [JdNoticeMiddleware(), *extra_middleware,
+    middleware = [JdNoticeMiddleware(),
+                  *([context_middleware] if context_middleware is not None else []),
+                  *extra_middleware,
                   ModelCallLimitMiddleware(thread_limit=MAX_MODEL_STEPS, exit_behavior="end"),
                   ToolCallLimitMiddleware(thread_limit=MAX_TOOL_CALLS, exit_behavior="end")]
     if inspection:
         from .consultant_tools import AiToolMiddleware
         # Only this known layout has its non-wrap hook guarded. Unknown hooks
         # cannot be made inspection-only by wrapping model/tool execution.
-        if len(extra_middleware) != 1 or type(extra_middleware[0]) is not AiToolMiddleware:
+        if (context_middleware is not None or len(extra_middleware) != 1
+                or type(extra_middleware[0]) is not AiToolMiddleware):
             raise ConsultantContextError("invalid_consultant_configuration")
         middleware = [InspectionGuard(), JdNoticeMiddleware(), AiToolMiddleware(inspection_only=True)]
     return create_agent(model, tools=tools, system_prompt=guidance,

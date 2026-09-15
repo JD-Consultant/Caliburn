@@ -1,16 +1,16 @@
 # 關聯式 JD：隔離編輯核心
 
-**目前狀態（2026-09-14）：**C 的 App 接合／停止收尾／新程序查回已完成；source 與 B1 核心／OpenAI adapter 固定接合。[H4 runtime執行計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md) **R1 已完成**：source owner 發固定 target 並切有界批次（[結果](../../docs/specs/evidence/jd-b1-adoption/fixed-target-batch-results.md)），一批 B1 在真 PostgresSaver／PostgresStore 上保存、故障後關閉重建資源續作、重抽與查回（[結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。**R2 也已完成**：B2 已採用，B1→B2→publication 兩批有序交接、B2 pending 重建資源續作、發布回覆遺失查回與 C 較晚更正都在真 PG 上驗過（[結果](../../docs/specs/evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。**R3 進行中**（[結果](../../docs/specs/evidence/jd-b1-adoption/r3-notification-and-background-results.md)）：純通知工具已註冊並有自己的結果分類（不借用 JD operation）；「B2 未發布不得開始下一批」已由 `require_handed_over` 以 publication head 關閉；背景准入列 `jd_memory_admission` 已依 [ADR0076](../../docs/adr/0076-jd-background-admission-record.md) 建立並在真 PG 驗過保存、對帳、重複喚醒、受阻與封存。**宿主生命週期、有界背景 worker 與真新 Windows 程序恢復尚未做；顧問指引／Skills／BackgroundAvailability 與 JD 編輯器共用 writer 的接合也未做。**日常 AI 未啟用。既有非JD顧問有CT49／50限定真模型成果；新App日常AI未啟用，不等於顧問從未做好。下文早期切片保留當時結果，不能把當時「下一步」當目前待辦。
+**目前狀態（2026-09-15）：**人可編輯的 relational JD App、既有顧問 graph、JD／Memory 工具與分段背景成果都保留。正式組裝已完成兩個切片：`serve` 從 Windows 認證管理員讀單一 OpenRouter key，有 key 才以 LangChain／LangGraph 建立 OpenAI-only `openai/gpt-5.6-luna` 顧問、禁止 fallback 並啟用 chat；無 key 時人工 JD 照常且 AI 關閉。B1 strict structured extraction 也已改走共用 OpenRouter route，保留自己的 prompt／輸出／重試；背景提示的 `document_id` 與本回合目前 Memory 讀取基準由每次 App runtime 執行提供，不在共用 graph 建立時固定。C 準備修改時才確認最新版，保存沿既有 publication CAS；C 成功後同輪固定在其 applied head，後來 B2 發布不會偷偷推進本輪。既有 B2 stale→reload→recompute 流程保留。關閉時先排空 App，再關 model clients。這些改動沒有改顧問 prompt、Skills、Memory 判斷、通知語意、B2 graph 或 publication schema；完整離線回歸 2934 passed／315 skipped，Memory 套件 155 passed，精確真 PG 競爭案例 1 passed。A／B2 的 Responses inline compaction 是目前未閉合的共同 transport 門：離線考卷證明 `ChatOpenAI Responses`→OpenRouter 候選可完整承接 item，但真服務端 smoke 在 OpenAI route、23,725 input tokens、`compact_threshold=12000` 下仍回 0 個 compaction item；1 次外送花費 US$0.00556460 後依用量護欄停止，分類 `UNVERIFIED`，不是 production PASS 或全域不支援宣告。正式 A／B2 改線停在 Owner 的 transport／credential 裁決；正式 background dispatcher、真 PG／新程序完整 App 旅程與之後的完整自然 smoke也尚未完成，因此不能稱 H4 或整個 App 已接通。精確結果見 [OpenRouter live smoke](../../docs/specs/evidence/2026-09-15-openrouter-inline-compaction-live-smoke.md)，R1／R2／R3 分段成果與歷史狀態見 [H4 runtime 計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)及[接線對齊稿](../../docs/specs/evidence/2026-09-15-jd-integration-document-reconciliation.md)；下文較早「下一步」不能覆蓋本段。
 
 此目錄承接[新版施工計畫](../../docs/plans/2026-09-13-jd-relational-app-implementation.md)的 RS-1／2、RS-3 第一段及 RS-4 通知／模型保存接點。已驗證八個編輯操作、完整任務建立、相依內容更正、員工／模型共用規則及真實保存；框架選擇可替換，產品效果以既有六章 JD 研究為準。
 
-**最新：[同頁整輪改動](../../docs/specs/2026-09-13-jd-run-change-view-slice.md)承接聊天與原話保護。**整輪保存內容、完整前後對照、刪除原文與目前欄位提示沿同一歷史來源；只讀 GET 使用原生確認的固定範圍，Web 不計算業務差異。實測層级及獨審結果見結果稿；新畫面真瀏覽器互動未驗，先前 Fetch 原因仍 OPEN。未完成事項集中在[收尾清單](../../docs/specs/2026-09-13-jd-app-open-issues.md)；Memory／來源、還原撤回、日常 AI 與自然品質仍未完成，`enable_chat=False` 不因測試而改變。下文各切片較早「下一接 Web」為沿革。
+**[歷史切片] [同頁整輪改動](../../docs/specs/2026-09-13-jd-run-change-view-slice.md)承接聊天與原話保護。**整輪保存內容、完整前後對照、刪除原文與目前欄位提示沿同一歷史來源；只讀 GET 使用原生確認的固定範圍，Web 不計算業務差異。該切片當時尚未接 Memory／來源、還原撤回與日常 AI，`enable_chat=False` 是當時安全邊界；目前入口狀態以頁首 2026-09-15 段落為準。下文各切片較早「下一接 Web」為沿革。
 
-**已有可開啟的[六章手動管理畫面](web/README.md)，透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；[本次 UI 結果](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)包含自動保存、未完成表單重開及歷史。完整 AI 生命週期、来源回查、歷史還原與圖形啟動器尚未完成。此目錄不啟動模型、不接正式產品或舊實驗模組；原話保留以合成 native messages 驗證，沒有正式訪談／Memory 整合。
+**已有可開啟的[六章手動管理畫面](web/README.md)，透過共用 service／人工 HTTP 保存到獨立 PostgreSQL 的十三表。**已接讀取／差異查詢、人工 writer、原生 PG Saver、Windows 宿主互斥／跨重啟對帳，以及文件建立／列表／更名／封存恢復。`build_candidate` 仍只回保存前候選，`JdStorage` 在完整交易確認後才回已保存結果。[持久配置與一般開啟](../../docs/specs/2026-09-13-jd-managed-configuration-slice.md)已接同一服務；[該次 UI 結果](../../docs/specs/2026-09-13-jd-manual-ui-and-browser-drafts-slice.md)包含自動保存、未完成表單重開及歷史。該早期切片當時未啟動模型或接正式訪談／Memory；現在的前景組裝以頁首為準，圖形啟動器與完整背景仍未完成。
 
-**[RS-4 通知與模型保存](../../docs/specs/2026-09-13-jd-consultant-context-slice.md)已用真 SDK／原生 Agent／PG Saver 及固定離線串流接合。**人工改動投影不改原始對話；完整回覆與通知邊界成對保存，缺結束事件不前進，重開只讀不重播。74 項受影響測試通過（含 13 真 PG），獨立審查缺口已修。日常入口仍未啟用 AI；本輪前景回合與工具接合見下段。
+**[歷史切片] [RS-4 通知與模型保存](../../docs/specs/2026-09-13-jd-consultant-context-slice.md)已用真 SDK／原生 Agent／PG Saver 及固定離線串流接合。**人工改動投影不改原始對話；完整回覆與通知邊界成對保存，缺結束事件不前進，重開只讀不重播。74 項受影響測試通過（含 13 真 PG），獨立審查缺口已修。該切片當時未啟用日常 AI；目前入口狀態以頁首為準。
 
-**後續[本程序 AI 回合與工具](../../docs/specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)已接共同 owner／JdStorage。**原生 Agent 用 App 注入的身分及真 read 結果編輯；固定 SDK／真 PG 驗 AI→手改→AI、纯訪談不改及保存 ACK 遺失原結果恢復。同 owner 只允許一個 `AiRuntime`；`start` 同原請求回同 handle，App 自動收尾，`wait` 只觀察，`recover` 明示對帳且不重播模型或命令。最後253核心測試及14真PG通過，範圍重疊以結果稿為準。日常入口尚無聊天AI；新宿主AI恢復、Memory／source、選區、聊天HTTP／Web接合仍待完成。
+**[歷史切片] [本程序 AI 回合與工具](../../docs/specs/2026-09-13-jd-ai-runtime-and-tools-slice.md)已接共同 owner／JdStorage。**原生 Agent 用 App 注入的身分及真 read 結果編輯；固定 SDK／真 PG 驗 AI→手改→AI、純訪談不改及保存 ACK 遺失原結果恢復。同 owner 只允許一個 `AiRuntime`；`start` 同原請求回同 handle，App 自動收尾，`wait` 只觀察，`recover` 明示對帳且不重播模型或命令。最後253核心測試及14真PG通過，範圍重疊以結果稿為準。該切片當時尚無日常聊天入口；現在的前景組裝以頁首為準。
 
 **[新宿主 AI 恢復](../../docs/specs/2026-09-13-jd-ai-restart-recovery-slice.md)已完成。**一般 App 啟動先由同 owner 查原 AI／人工 pending；相同 Agent 結構的檢視模式不開 provider、不重播工具。真新程序／PG四組及既有PG八組通過，最後相關離線293項通過；獨審互斥pending缺口已修。上一段的新宿主待辦由此成果取代；聊天HTTP／Web、Memory／source等仍待完成。
 
@@ -24,7 +24,7 @@
 
 一般 host 現要求既有 `checkpoint_schema` 的八張表（四Saver＋兩Store＋兩publication）；public 是**十三張 JD 內容表＋一張 runtime 背景准入表（`jd_memory_admission`，[ADR0076](../../docs/adr/0076-jd-background-admission-record.md)）＋Alembic**，內容表本身未增減欄位。原ready實驗資料庫缺Memory時明示拒絕，不自動升級或清資料；新配置只明示初始化fresh DB。本機合成 fixture 的舊host區可由下方專用腳本補齊，不是產品更新流程。
 
-**最新[聊天HTTP與原修改結果](../../docs/specs/2026-09-13-jd-chat-http-slice.md)已接。**`ChatService` 共用 `AiRuntime`／人工write state，原話、實際執行與JD效果分開回報；`chat_history.py`固定原root/source分頁，只公開原話及AI正文。生成契約／TS、完整離線2211 PASS／209 SKIP、三個真PG HTTP情境與獨審通過。`open_managed_app`預設`enable_chat=False`，日常仍不開provider；新run回`ai_unavailable`，保存對話／原結果可查。下一接Web，不宣稱自然AI或完整App完成。
+**[歷史切片] [聊天HTTP與原修改結果](../../docs/specs/2026-09-13-jd-chat-http-slice.md)已接。**`ChatService` 共用 `AiRuntime`／人工 write state，原話、實際執行與 JD 效果分開回報；`chat_history.py` 固定原 root/source 分頁，只公開原話及 AI 正文。生成契約／TS、完整離線2211 PASS／209 SKIP、三個真PG HTTP情境與獨審通過。`open_managed_app` 的安全預設仍是 `enable_chat=False`；2026-09-15 正式 `serve` 只在有 OpenRouter key 時明確覆寫為 `True`。這仍不代表自然 AI 或完整 App 已驗收。
 
 - `contracts/jd-chat-http.schema.json`／`chat_service.py`／`chat_api.py`：原請求送出、原狀態、取消／恢復與已保存對話；原`BoundResult`及人工狀態直接external ref，不增加run／聊天表。所有同步查讀由同owner排空。
 - `chat_history.py`：同現有設定key/dataset、不同用途salt的固定native位置；初頁取最新公開文字、頁內正序，cursor 固定同 anchor 向前取較早頁，`anchor_run_id` 是該 snapshot 的 run。私有 token v2 明確拒絕舊 forward token；原生歷史不改寫。輸出頁有界，底層仍讀完整messages。不是另一份對話保存或LLM context壓縮。
@@ -50,8 +50,8 @@
 - `contracts/jd-catalog-http.schema.json`／`catalog_service.py`／`catalog_api.py`：在同一宿主新增文件建立／列表／查回／metadata；create 依原 key 與 dataset，metadata 以 ETag＋CAS 更新單一欄位。目錄更新不增加正文 revision，不新增目錄資料庫。
 - `local_configuration.py`／`config_file.py`：固定 Known Folder 的 DPAPI 設定；永久空 guard、防重複初始化、原設定 CAS。普通開啟不讀環境補值、不重配 key／UUID。
 - `configured_host.py`／`storage_setup.py`：明示初始化及原身分續作，普通開啟共用唯讀 schema 核對；`initialization_pending → initializing → ready`。固定 migration、Saver 原生 setup、不自動修復未知 schema。
-- `configured_api.py`／`managed_app.py`／`__main__.py`：真配置與 lifecycle 組合，unsafe HTTP 另需單一正確 `X-JD-Dataset`；先同 host startup 恢復才受理寫入。CLI 的 init／resume 與一般 serve 分開，無模型啟動。
-- `provider_keys.py`：provider 金鑰只存 Windows 認證管理員（`win32cred` generic credential，同一 Windows 使用者、同一電腦，跨重開保留），Anthropic 與 OpenAI 分開保存。金鑰不進設定檔、資料庫、prompt、對話、checkpoint、前端或日誌，也不在 App 資料備份內；換電腦或還原後重新設定。`jd-relational set-key --service anthropic|openai` 以不顯示的輸入設定或替換，`remove-key` 移除，`status` 只說已設定或未設定——**已設定不代表金鑰可用**，確認那件事要付費。缺金鑰時人工 JD 照常，對應 AI 功能顯示未啟用，不改用其他供應商，也不為了檢查而發出付費呼叫。
+- `configured_api.py`／`managed_app.py`／`__main__.py`：真配置與 lifecycle 組合，unsafe HTTP 另需單一正確 `X-JD-Dataset`；先同 host startup 恢復才受理寫入。CLI 的 init／resume 與一般 serve 分開；有 OpenRouter key 才建立顧問並啟用新 chat，無 key 則人工-only。
+- `provider_keys.py`：唯一 OpenRouter 金鑰只存 Windows 認證管理員（`win32cred` generic credential，同一 Windows 使用者、同一電腦，跨重開保留）。金鑰不進設定檔、資料庫、prompt、對話、checkpoint、前端或日誌，也不在 App 資料備份內；換電腦或還原後重新設定。`jd-relational set-key --service openrouter` 以不顯示的輸入設定或替換，`remove-key` 移除，`status` 只說已設定或未設定——**已設定不代表金鑰可用**，確認那件事要付費。缺金鑰時人工 JD 照常，AI 顯示未啟用，不 fallback，也不為了檢查而發出付費呼叫。
 - `src/jd_relational/generated`：標準工具生成 Python DTO／TS 型別，禁止手改。
 - `transport.py`：人工與模型轉入同一 command；兩家工具外殼不同。
 - `application.py`：同一準備入口，保留候選／原錯誤，發出固定安全診斷；沒有重試或保存。
@@ -62,7 +62,7 @@
 - `notice_history.py`：同版唯讀取得確切變更計數與有限事件；不新增歷史表或讀完整 snapshot。
 - `consultant_context.py`：原生 model middleware 投影通知、綁定完整回覆與通知邊界；固定 root checkpoint 查回。此觀察不授予 writer 資格。
 - `conversation_sources.py`：同一 Saver 的固定當輪原話／前 AI 上下文與來源驗證；同持久 key 的獨立來源用途。AI 真 request 仍含完整原話才供 metadata，原文不複製到 system；人工與 AI 共用 resolver，人工準備使用既有讀取排空。來源服務故障停止回合，操作查回不重建引用。這是[當輪來源接合](../../docs/specs/2026-09-13-jd-consultant-source-integration-slice.md)，較早 Memory 來源、專業指引及來源 UI 仍待接合。
-- `consultant_model.py`：固定相容的 Anthropic 原生 adapter；有限補 terminal 與 response 清理，private seams 升級須重驗，沒有自製 Agent loop／SSE parser。
+- `openrouter_model.py`／`consultant_model.py`／`consultant_runtime.py`：App 共用 OpenRouter transport／route／terminal evidence、既有顧問 profile 與 process-owned clients；A／B1 固定 OpenAI-only Luna、禁止 fallback，沒有自製 Agent loop／SSE parser。private adapter seam 升級須重驗；A／B2 Responses compaction 的客戶端候選雖通過離線考卷，真 OpenRouter smoke 未產生 item，故未正式改線並停在 Owner 的 transport／credential 裁決。
 - `manual_runtime.py`：每文件實際 writer／Future、保存與收尾確認；有 native lease 時先掃全 catalog 關閉原 pending 才開新修改。foreign pending 不把空本地 Future 當死亡證明。
 - `windows_host.py`／`host_runtime.py`：固定安裝 mutex、舊 Job 退出、新 Job membership 及程序終身 lease；成功後才開 DB／Saver，startup 完成才 ready。只供專用 App 程序，不在目前 Python shell／pytest 主程序直接 bootstrap。
 - `result_transport.py`／`http_results.py`：驗證觀察結果並投影；不執行寫入或自動重試，不把候選當保存完成。
@@ -151,7 +151,7 @@ uv run --offline --frozen python -m jd_relational serve
 
 目前／歷史 item、field、container、section 與觀察 refs 已發配／驗證，`command_context` 用同版讀取材料重核可寫用途、存在性與欄位摘要。來源查核仍是注入 callback，未接實際 source owner；讀取回 `readability=not_checked`。瀏覽器選區發配仍未完成，此接點明示拒絕 selection，不把 field ref 當選區。
 
-`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。固定設定與手動管理畫面已接，日常 configured API 包含無 refs recover 的資料集門閘。[備份與還原演練](../../docs/specs/2026-09-14-jd-backup-and-restore-slice.md)已完成：一份完整備份＝整個資料庫的 `pg_dump`（**不要用 `-n`**，`jd_runtime` 的對話與 Memory 在裡面）＋ `host.v1.dpapi`；還原後 JD 逐版 digest 與訪談 checkpoint 都相同，已發出的引用只有備份下來的簽章金鑰解得開，provider 金鑰不在備份內、還原後重新 `set-key`。世代輪替、異地保存與同名覆蓋還原尚未演練；人工通知及實際顧問回合尚待接線。
+`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。固定設定與手動管理畫面已接，日常 configured API 包含無 refs recover 的資料集門閘。[備份與還原演練](../../docs/specs/2026-09-14-jd-backup-and-restore-slice.md)已完成：一份完整備份＝整個資料庫的 `pg_dump`（**不要用 `-n`**，`jd_runtime` 的對話與 Memory 在裡面）＋ `host.v1.dpapi`；還原後 JD 逐版 digest 與訪談 checkpoint 都相同，已發出的引用只有備份下來的簽章金鑰解得開，provider 金鑰不在備份內、還原後重新 `set-key --service openrouter`。世代輪替、異地保存與同名覆蓋還原尚未演練；前景顧問與 B1 route 已正式組裝但仍待真 PG／新程序完整旅程，B2 convergence 與背景 dispatcher 尚待接線。
 
 文字自動保存、管理表單與原請求暫存已接，真瀏覽器重開可找回未完成內容；原生故障注入、實體 IME 及 AI 交接仍待驗。正文歷史還原／整輪撤回與維護尚未完成。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
 

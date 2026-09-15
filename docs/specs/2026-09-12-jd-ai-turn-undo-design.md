@@ -1,5 +1,7 @@
 # 撤回一輪 AI 的 JD 改動
 
+> **2026-09-15 範圍校正：本文的核心產品效果仍有效——一次撤回指定 LLM 回合對 current JD 的全部效果，且不撤回原始對話、來源、案例、Memory、工作理解、checkpoint 或原回合紀錄。本文早期把它建立在使用者可見完整 JD 歷史／任意整份還原上的部分已失效；實作應改以該 AI run 綁定的 operation receipts 與必要內部 before／after snapshot 計算，只在沒有較晚 JD 修改時經同一 JD domain service 形成安全補償寫入。最新範圍見 [產品核心目標](../product-notes.md) 與 [ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md)。**
+
 - 日期：2026-09-12；Topic：JD-R002；Owner 已選撤回單位，研究者依有界增量評估採 HR-02／G3 WORKING；本稿為 G4 設計，未實作。
 - 接續：[需求 §12](2026-09-12-jd-relational-editing-requirements.md#12-hr-02撤回這輪-ai-的-jd-改動2026-09-12)、[整份還原](2026-09-12-jd-history-and-recovery-design.md)、[共同保存契約](2026-09-12-jd-relational-schema-and-write-contract.md)。不重做 Memory 或通用 Undo 引擎。
 

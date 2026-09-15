@@ -1,9 +1,9 @@
-"""Terminal evidence for one OpenAI Responses reply, shared by every role.
+"""Common terminal evidence after each role's adapter normalization.
 
-The consultant, the extraction stage and the consolidation stage all talk to
-the same provider through the same adapter, so they judge a reply complete the
-same way, in one place. A second copy of this rule is how two roles start
-disagreeing about what "finished" means.
+The consultant and B1 OpenRouter adapters and the current B2 OpenAI Responses
+adapter use different wire formats, but all must project a completed status
+and preserve refusal evidence before this boundary. Keeping the final decision
+here prevents roles from disagreeing about what "finished" means.
 
 Checked 2026-09-14 against the official structured-output guidance: an
 application must see that the response reached `completed` and that no content

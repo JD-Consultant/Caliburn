@@ -1,6 +1,6 @@
 # 真瀏覽器聊天 helper
 
-日期：2026-09-13。本 helper 僅存在於 tests，沿現行 pinned Agent／Anthropic SDK 與既有固定 PG／DPAPI fixture；production 不 import。本輪不新增啟動框架、queue、重試或 HTTP 回覆閘門。
+日期：2026-09-13；2026-09-15 wire 更新。本 helper 僅存在於 tests，production 不 import。原文下方保存當時 Anthropic fixture 的歷史結果；目前 helper 已改用正式前景相同的 LangChain／LangGraph＋OpenRouter adapter、OpenAI-only Luna route 與 sync／async `httpx.MockTransport`，仍是四次固定合成回覆、0 provider。更新後相關模型／runtime／managed App／helper 38 passed，完整離線回歸 2930 passed／315 skipped；未重跑本頁舊的真瀏覽器 fixture，也未把歷史數字改寫成新結果。
 
 ## 已交付與證據界線
 

@@ -107,6 +107,7 @@ def cli(monkeypatch):
         events.append("file")
         return file
     monkeypatch.setattr(entry, "ConfigFile", make_file)
+    monkeypatch.setattr(entry, "read_key", lambda role: None)
     return events, file
 
 
@@ -141,8 +142,16 @@ def test_serve_is_single_loopback_process_and_drains(cli, monkeypatch):
     events, file = cli
     import uvicorn
     app = object()
+    inspection = object()
     fake = SimpleNamespace(app=app, port=8014, close=lambda: events.append("close") or True)
-    monkeypatch.setattr(entry, "open_managed_app", lambda f, **kwargs: fake)
+    monkeypatch.setattr(entry, "unavailable_consultant", lambda: inspection)
+    monkeypatch.setattr(entry, "open_consultant_runtime",
+        lambda **_: pytest.fail("No model runtime without a configured key."))
+    def open_app(passed_file, **kwargs):
+        assert passed_file is file
+        assert kwargs == {"consultant": inspection, "enable_chat": False}
+        return fake
+    monkeypatch.setattr(entry, "open_managed_app", open_app)
     def run(passed, **kwargs):
         assert passed is app and kwargs == dict(host="127.0.0.1", port=8014, workers=1,
             reload=False, access_log=False, proxy_headers=False, log_level="warning")
@@ -150,6 +159,51 @@ def test_serve_is_single_loopback_process_and_drains(cli, monkeypatch):
     monkeypatch.setattr(uvicorn, "run", run)
     assert entry.main(["serve"]) == 0
     assert events == ["file", "server", "close"]
+
+
+def test_serve_assembles_openrouter_consultant_and_enables_chat(cli, monkeypatch):
+    events, file = cli
+    import uvicorn
+    graph = object()
+    runtime = SimpleNamespace(graph=graph, close=lambda: events.append("consultant-close") or True)
+    monkeypatch.setattr(entry, "read_key", lambda role: (
+        events.append(("key", role)) or "synthetic-openrouter-not-a-key"))
+    monkeypatch.setattr(entry, "open_consultant_runtime", lambda **kwargs: (
+        events.append(("consultant", kwargs)) or runtime))
+    app = object()
+    managed_app = SimpleNamespace(app=app, port=8014,
+        close=lambda: events.append("app-close") or True)
+    def open_app(passed_file, **kwargs):
+        assert passed_file is file
+        assert kwargs == {"consultant": graph, "enable_chat": True}
+        events.append("app")
+        return managed_app
+    monkeypatch.setattr(entry, "open_managed_app", open_app)
+    monkeypatch.setattr(uvicorn, "run", lambda passed, **kwargs: events.append("server"))
+
+    assert entry.main(["serve"]) == 0
+    assert events == ["file", ("key", "openrouter"),
+        ("consultant", {"api_key": "synthetic-openrouter-not-a-key"}),
+        "app", "server", "app-close", "consultant-close"]
+
+
+def test_serve_still_closes_consultant_when_app_close_fails(cli, monkeypatch, capsys):
+    events, _ = cli
+    import uvicorn
+    runtime = SimpleNamespace(graph=object(),
+        close=lambda: events.append("consultant-close") or True)
+    monkeypatch.setattr(entry, "read_key", lambda _: "synthetic-openrouter-not-a-key")
+    monkeypatch.setattr(entry, "open_consultant_runtime", lambda **_: runtime)
+    def fail_close():
+        events.append("app-close-failed")
+        raise RuntimeError("private-close-cause")
+    monkeypatch.setattr(entry, "open_managed_app", lambda *_, **__: SimpleNamespace(
+        app=object(), port=8014, close=fail_close))
+    monkeypatch.setattr(uvicorn, "run", lambda *_, **__: events.append("server"))
+
+    assert entry.main(["serve"]) == 1
+    assert events == ["file", "server", "app-close-failed", "consultant-close"]
+    assert "未確認結束" in capsys.readouterr().err
 
 
 def test_init_refuses_noninteractive_secret_input(monkeypatch):

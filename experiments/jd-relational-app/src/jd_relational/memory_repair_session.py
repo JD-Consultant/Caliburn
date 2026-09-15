@@ -112,10 +112,18 @@ class MemoryRepairSession:
         outcome = self.progress(state).outcome
         if outcome is None:
             return self.initial
-        data = outcome["head"]
+        # A successful repair pins this turn to the version that repair
+        # actually produced. A later background publication remains current in
+        # the database, but is not an implicit refresh of this foreground turn.
+        # Accept older saved result envelopes whose observational `head` was
+        # later than `applied_head`, while projecting the corrected rule here.
+        data = (outcome["applied_head"]
+                if outcome["status"] == "applied" else outcome["head"])
         head = PublishedHead(data["revision"], MemoryVersion(**data["memory"]),
             data["processed_source"]) if data else None
-        return replace(self.initial, head=head, guide=outcome["guide"],
+        guide = (self.initial.artifacts.guide(head.memory)
+                 if outcome["status"] == "applied" and head else outcome["guide"])
+        return replace(self.initial, head=head, guide=guide,
             backend=self.initial.artifacts.reader(head.memory if head else None))
 
     def prepare(self, state, runtime):

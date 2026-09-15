@@ -1,7 +1,8 @@
 """Operator entry, using only the one OS-owned configuration location.
 
-No alternate config-path/DSN/identity switches. Init is explicit; serving never
-initializes or invokes a model. The employee UI and graphical launcher follow.
+No alternate config-path/DSN/identity switches. Init is explicit. Serving only
+enables the completed consultant when its OpenRouter credential exists; startup
+itself never sends a model request. The graphical launcher follows.
 """
 import argparse
 import getpass
@@ -9,9 +10,12 @@ import sys
 
 from .config_file import ConfigFile, default_config_path
 from .configured_host import initialize_configuration
+from .consultant_runtime import open_consultant_runtime
 from .local_configuration import parse_configuration
 from .managed_app import open_managed_app, unavailable_consultant
-from .provider_keys import ROLES, ProviderKeyError, configured_roles, remove_key, store_key
+from .provider_keys import (
+    ROLES, ProviderKeyError, configured_roles, read_key, remove_key, store_key,
+)
 
 
 _MESSAGES = {
@@ -29,7 +33,7 @@ _MESSAGES = {
     "host_already_running": "此 App 已在執行，請使用原視窗或先正常關閉。",
     "host_storage_unavailable": "目前無法開啟資料，請確認資料庫服務與已完成的初始化。",
     "storage_unavailable": "目前無法確認初始化結果，請保留原設定並稍後查看狀態。",
-    "unknown_provider_role": "沒有這個 AI 服務名稱。可設定的是 anthropic 或 openai。",
+    "unknown_provider_role": "沒有這個 AI 服務名稱。目前只使用 OpenRouter。",
     "invalid_provider_key": "金鑰內容不符合格式，未保存；原有設定沒有變動。",
     "credential_write_failed": "Windows 認證管理員未確認保存，請重新查看狀態後再設定一次。",
     "credential_delete_failed": "Windows 認證管理員未確認移除；金鑰可能仍在，請重新查看狀態後再移除一次。",
@@ -38,13 +42,22 @@ _MESSAGES = {
     "stored_key_unreadable": "已保存的金鑰無法讀取；請重新設定該項，人工 JD 不受影響。",
 }
 # Naming a capability, never a key: nothing here prints or logs a stored value.
-_ROLE_LABELS = {"anthropic": "訪談顧問（Anthropic）", "openai": "背景整理（OpenAI）"}
+_ROLE_LABELS = {"openrouter": "LLM 顧問（OpenRouter）"}
 _PHASES = {
     "initialization_pending": "尚待驗證空資料庫；可使用 resume-init 接續。",
     "initializing": "初始化未完成；可使用 resume-init 接續。",
     "ready": "設定已初始化。serve 仍會檢查資料库與恢復狀態。",
     "maintenance": "維護中；普通開啟已暫停。",
 }
+
+
+def _close(resource):
+    if resource is None:
+        return True
+    try:
+        return bool(resource.close())
+    except Exception:
+        return False
 
 
 def _connection_input():
@@ -68,7 +81,7 @@ def main(argv=None):
         file = ConfigFile(default_config_path())
         if args.action in {"set-key", "remove-key"}:
             if not args.service:
-                print("請以 --service 指定 anthropic 或 openai。", file=sys.stderr)
+                print("請以 --service 指定 openrouter。", file=sys.stderr)
                 return 2
             if args.action == "remove-key":
                 removed = remove_key(args.service)
@@ -95,12 +108,25 @@ def main(argv=None):
             print("本機設定及資料結構已初始化。可使用 serve 開啟服務。")
         else:
             import uvicorn
-            managed = open_managed_app(file, consultant=unavailable_consultant())
+            runtime = None
+            managed = None
             try:
+                key = read_key("openrouter")
+                if key is None:
+                    consultant = unavailable_consultant()
+                    enable_chat = False
+                else:
+                    runtime = open_consultant_runtime(api_key=key)
+                    del key
+                    consultant = runtime.graph
+                    enable_chat = True
+                managed = open_managed_app(file, consultant=consultant, enable_chat=enable_chat)
                 uvicorn.run(managed.app, host="127.0.0.1", port=managed.port, workers=1,
                     reload=False, access_log=False, proxy_headers=False, log_level="warning")
             finally:
-                if not managed.close():
+                app_closed = _close(managed)
+                consultant_closed = _close(runtime)
+                if not app_closed or not consultant_closed:
                     print("服務仍有工作未確認結束，請保留此程序的診斷現場。", file=sys.stderr)
                     return 1
         return 0

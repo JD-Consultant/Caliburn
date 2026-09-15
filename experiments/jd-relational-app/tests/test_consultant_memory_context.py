@@ -14,6 +14,7 @@ from sqlalchemy.pool import StaticPool
 
 from jd_relational.consultant_context import ConsultantContext, ConsultantState, JdNoticeMiddleware
 from jd_relational.memory_context import MemoryReadError, MemoryReadSession, build_memory_read_tools, checked_memory_view
+from jd_relational.memory_repair_session import MemoryRepairSession
 from jd_relational.memory_sources import MemorySourceReader
 from jd_relational.runtime_checkpoints import build_document_graph
 from test_chat_history import native
@@ -44,12 +45,13 @@ def memory(native):
     engine.dispose()
 
 
-def run_context(session, *, store=None, state=None, model=None):
+def run_context(session, *, store=None, state=None, model=None, repair=None):
     original, reply = setup()
     material = replace(original.turn_notice, document_id=session.document_id)
     context = replace(original, dataset_id=session.dataset_id, document_id=session.document_id,
         run_id=session.run_id, codec=type(original.codec)(b"s"*32, session.dataset_id),
-        history=MaterialReader(material), turn_notice=material, memory_session=session)
+        history=MaterialReader(material), turn_notice=material, memory_session=session,
+        memory_repair_session=repair)
     model = model or FixedModel(replies=[reply])
     child = create_agent(model, tools=build_memory_read_tools(session.backend), system_prompt="合成顧問",
         middleware=[JdNoticeMiddleware()], state_schema=ConsultantState, context_schema=ConsultantContext)
@@ -69,7 +71,8 @@ def test_head_is_pinned_across_real_model_and_native_file_tool_calls(memory):
             if not self.requests:
                 publish(1, "維修由外包負責。")
             return super()._generate(*args, **kwargs)
-    call = AIMessage(id="memory-read-call", content="", response_metadata={"stop_reason": "tool_use"},
+    call = AIMessage(id="memory-read-call", content="",
+        response_metadata={"status": "completed", "finish_reason": "tool_calls"},
         tool_calls=[{"name": "read_file", "id": "tool-memory-read", "args": {
             "file_path": "/memory/knowledge.md", "offset": 0, "limit": 100}}])
     _, final = setup()
@@ -95,6 +98,22 @@ def test_no_publication_is_explicit_empty_and_does_not_refresh_mid_turn(memory):
     assert notice["published"] is False and notice["guide"] == "" and notice["revision"] == 0
     assert result["messages"][0] == human
     assert empty.backend.read("/memory/knowledge.md").error
+
+
+def test_model_notice_uses_the_explicitly_refreshed_turn_baseline(memory, monkeypatch):
+    _, pub, publish, pin = memory
+    publish(0, "回合開始版本。")
+    initial = pin()
+    publish(1, "明確刷新後版本。")
+    refreshed = replace(pin(), run_id=initial.run_id)
+    repair = MemoryRepairSession(initial, pub)
+    monkeypatch.setattr(repair, "current_read", lambda state: refreshed)
+
+    _, requests, _ = run_context(initial, repair=repair)
+
+    notice = json.loads(requests[0][0].content[-1]["text"])
+    assert notice["revision"] == 2
+    assert notice["guide"] == "導覽：明確刷新後版本。"
 
 
 @pytest.mark.parametrize("mismatch", ["state", "store", "run", "document", "guide"])

@@ -1,5 +1,7 @@
 # JD 關聯式管理編輯器：整體可驗證設計
 
+> **2026-09-15 產品範圍校正：relational current JD、結構化編輯與人／LLM 共用業務邏輯仍是有效基線；本文中的完整 JD 歷史、任意 revision 比較及整份舊版還原不是目前第一版必要要求。已完成且穩定的能力可以保留，不必拆除，但不作接線前置或繼續擴張。首版只要求呈現當輪 LLM 的實際 JD 差異與安全整輪撤回；內部 snapshots 可保留作一致性與對帳。以 [產品核心目標](../product-notes.md) 與 [ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md) 為準。**
+
 - 日期：2026-09-12
 - Topic：JD-R002/C01、C03
 - 階段：G4 DRAFT；待 Owner／外部 reviewer 審查

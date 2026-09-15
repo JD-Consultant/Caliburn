@@ -1,9 +1,9 @@
 # 0075. 關聯式 JD authority 與結構化管理編輯器
 
-- **狀態**：Proposed／Needs revision；[原設計 findings](../specs/evidence/2026-09-12-jd-relational-editor-needs-and-design-review.md)已文件閉合，產品未決與整體驗證仍待完成，尚未改變 production authority
+- **狀態**：Proposed／Needs revision；2026-09-15 已依 Owner 最新產品範圍修正「歷史／撤回」與 App／LLM 關係，整體驗證與正式採用仍待完成，尚未改變 production authority
 - **日期**：2026-09-12
 - **Topic**：JD-R002/C01、C03
-- **Owner 方向**：要求關聯式資料庫、職責／任務／成果／要求／K/S 的獨立 CRUD 及任務跨職責移動；舊編輯器可作需求參考，不沿用其 authority
+- **Owner 方向**：一個供人與 LLM 共編 current JD 的 App；兩種入口共用 relational JD 業務邏輯。要求職責／任務／成果／要求／K/S 的獨立 CRUD 及任務跨職責移動；首版不把完整 JD 歷史或任意舊版還原列為必要，已完成能力可保留，必要產品效果是當輪 LLM 差異與安全整輪撤回。舊編輯器可作需求參考，不沿用其 authority
 - **設計**：[整體設計](../specs/2026-09-12-jd-relational-editor-design.md)、[資料庫契約](../specs/2026-09-12-jd-relational-schema-and-write-contract.md)、[AI／App 工具契約](../specs/2026-09-12-jd-relational-agent-tool-contract.md)
 
 ## Context
@@ -14,35 +14,37 @@ ADR 0073 提議以完整 Plate 文件樹、immutable JSONB revisions 與三個�
 
 PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與 row locks；OpenAI 與 Anthropic 的現行工具契約都把模型呼叫與 App 執行／結果回饋分開。這些可作機制基礎，但沒有供應商公開 Caliburn 應採的 JD SQL schema。[官方證據與邊界](../specs/evidence/2026-09-12-jd-relational-editor-evidence.md)
 
+2026-09-15 Owner 進一步確認：完整 JD 版本瀏覽、任意 revision diff 與整份舊版還原不是第一版必要需求。已完成且穩定的相關能力不用拆除；既有 revision／snapshot／operation 也可以保留作交易一致性、冪等、故障對帳、當輪差異與安全撤回的內部機制。這些能力不再是接線前置，也不據此擴張、重構或新建通用歷史／復原引擎。原始對話、來源、案例、Memory、工作理解、checkpoint 與 AI 回合紀錄不隨 JD 撤回而倒退。
+
 ## Decision
 
 1. **目前 JD 正文改以 relational rows 為唯一可寫 authority。**職責、任務、成果／要求、知識／技能、條件與關係都有 stable business identity；名稱、位置或 Plate path 不作身分。
 
-2. **使用 shared document catalog，加 12 張 JD 表。**完成態共 13 張 JD scope 表：正式 `jd_document` 共享 conversation／Memory／JD document identity；`jd_profile`、`jd_collaborator`、`jd_duty`、`jd_task`、`jd_task_detail`、`jd_capability`、`jd_task_capability`、`jd_condition`、`jd_source_link` 保存 current；`jd_head`、`jd_revision`、`jd_operation` 保存目前指標、歷史與回執。隔離 `q019_document` 只屬研究命名，fresh adoption 一次改用正式表名，不建立第二份 catalog。正式欄位及 FK 由 schema spec 負責，ADR 不另造第二份 DDL。
+2. **使用 shared document catalog，加 12 張 JD 表。**完成態共 13 張 JD scope 表：正式 `jd_document` 共享 conversation／Memory／JD document identity；`jd_profile`、`jd_collaborator`、`jd_duty`、`jd_task`、`jd_task_detail`、`jd_capability`、`jd_task_capability`、`jd_condition`、`jd_source_link` 保存 current；`jd_head`、`jd_revision`、`jd_operation` 保存目前指標、必要的內部 snapshot 與操作回執。這三表首先服務保存一致性、冪等、對帳、當輪差異與安全整輪撤回，不構成使用者可瀏覽的 JD 歷史承諾。隔離 `q019_document` 只屬研究命名，fresh adoption 一次改用正式表名，不建立第二份 catalog。正式欄位及 FK 由 schema spec 負責，ADR 不另造第二份 DDL。
 
 3. **Outcome／requirement 與 knowledge／skill 各按相同生命週期合表、用 kind 區分。**`jd_task_detail.kind` 固定 outcome／requirement；兩組平行、無一對一 pairing。`jd_capability.kind` 固定 knowledge／skill；任務與 capability 由 junction table 建 N:N，同一關係反向投影使用任務，不存第二份 incoming 清單。
 
-4. **目前內容 relational，歷史 snapshot 唯讀。**每次成功保存由 server 在同一 SQL transaction 從 current rows 產生 immutable canonical JSON snapshot；snapshot 不接受作 current write payload，不能被修改。current、revision、head 與成功 receipt 同交易全成或全敗；語意失敗先撤候選、另確認外層 failure receipt 提交。回覆不明保留原 operation，沿既有停止證明及 DB 邊界對帳，不重播。current 多表讀取、head 與 refs 使用同一短唯讀快照；外部原始問答來源查核分開標示。具體分支由資料庫契約 §6–9 負責。
+4. **目前內容 relational；snapshot 首先是內部技術材料。**每次成功保存可由 server 在同一 SQL transaction 從 current rows 產生 immutable canonical JSON snapshot；snapshot 不接受作 current write payload，不能被修改。current、revision、head 與成功 receipt 同交易全成或全敗；語意失敗先撤候選、另確認外層 failure receipt 提交。回覆不明保留原 operation，沿既有停止證明及 DB 邊界對帳，不重播。current 多表讀取、head 與 refs 使用同一短唯讀快照；外部原始問答來源查核分開標示。snapshot 可供內部恢復、當輪差異與撤回驗證；已完成的歷史／整份還原介面可保留，但首版不要求再擴張任意版本瀏覽、revision diff 或復原能力。具體分支由資料庫契約 §6–9 負責。
 
-5. **同一頁採結構化管理畫面。**聊天與唯一 JD 並存；右側以具名欄位、職責／任務卡片、成果／要求子清單、K/S relation selector、歷史／差異／來源抽屜呈現。未分組任務是合法資料。沒有「目前稿／更正稿」雙頁、pending 接受／拒絕或第二份可編正文。Owner 已選[CV-01](../specs/2026-09-12-jd-change-visibility-design.md)：AI 直接改稿，App 在目前稿標記並提供同頁按需差異；完整管理畫面與資料接線仍待驗證。
+5. **同一頁採結構化管理畫面。**聊天與唯一 JD 並存；右側以具名欄位、職責／任務卡片、成果／要求子清單、K/S relation selector，以及當輪 LLM 變更／來源檢視呈現。未分組任務是合法資料。沒有「目前稿／更正稿」雙頁、pending 接受／拒絕或第二份可編正文；歷史抽屜若已完成可保留，但不是首版接線必要。Owner 已選[CV-01](../specs/2026-09-12-jd-change-visibility-design.md)：AI 直接改稿，App 在目前稿標記並提供該輪實際差異；完整管理畫面與資料接線仍待驗證。
 
-6. **Plate 不再控制整份 JD。**結構、CRUD、relations、dirty buffer、保存與歷史由 App 負責。Owner 已選純文字與換行，並於 2026-09-13 明確撤除現有框架／原生元件優先與舊碼整合前提；依[選型前置](../specs/2026-09-13-jd-native-framework-and-integration-preflight.md)比較現行框架及成熟元件。具體框架尚未選定，真瀏覽器須驗 selection／IME／undo；不由元件選擇改變 relational authority，也不預先把 App 責任全部認定須自製。
+6. **Plate 不再控制整份 JD。**結構、CRUD、relations、dirty buffer、保存與當輪變更呈現由 App 負責。Owner 已選純文字與換行，並於 2026-09-13 明確撤除現有框架／原生元件優先與舊碼整合前提；依[選型前置](../specs/2026-09-13-jd-native-framework-and-integration-preflight.md)比較現行框架及成熟元件。具體框架尚未選定，真瀏覽器須驗 selection／IME／undo；不由元件選擇改變 relational authority，也不預先把 App 責任全部認定須自製。
 
 7. **模型使用具名且能完成完整工作的業務工具。**依工具責任稿提供讀取、完整新增任務、有界內容修訂、單欄／選區與結構操作；不凍結七工具或讓同項更正逐欄提交。strict schema 與 App-issued refs 協助定位；模型不填 document／operation IDs、SQL FK、position、revision 或 line number。人與模型共用 service／validator／transaction 並取得真實結果；具體 variants 與驗收見[完整業務設計](../specs/2026-09-12-jd-business-operations-and-scope-design.md)。
 
-8. **人工自動保存，已保存事件進下一輪模型 context。**Owner 已選一般文字短暫停頓後保存、結構操作完成後整組保存；保存中的後續輸入須保留。啟動 AI 前完成手改交接，App 以 response-backed model-view boundary 查後續 revisions，提供有界 manual event notice 與 change refs；不偽裝成員工原話、不改寫 Memory、不表示本輪必須再編輯 JD。細節及尚待驗證項目見[保存與交接設計](../specs/2026-09-12-jd-autosave-and-handoff-design.md)，不是新建另一份可寫正文。
+8. **人工自動保存，已保存事件進下一輪模型 context。**Owner 已選一般文字短暫停頓後保存、結構操作完成後整組保存；保存中的後續輸入須保留。啟動 AI 前完成手改交接，App 以 response-backed model-view boundary 查後續已保存 operations，提供有界 manual event notice 與 change refs；不偽裝成員工原話、不改寫 Memory、不表示本輪必須再編輯 JD。細節及尚待驗證項目見[保存與交接設計](../specs/2026-09-12-jd-autosave-and-handoff-design.md)，不是新建另一份可寫正文。
 
-   **HR-02 補充：**Owner 已選[撤回整輪 AI 的 JD 改動](../specs/2026-09-12-jd-ai-turn-undo-design.md)。只在安全閉合、完整連續範圍與沒有較晚 JD 修改時，人工 command 共用整份還原形成新修訂；JD operation 補既有 run 的可信歸屬，不新增 run authority 或 Undo stack。Memory、案例、原始對話及原操作結果保留。此為本 Proposed ADR 的設計增量，尚未實作或正式採用。
+   **HR-02 補充：**Owner 已選[撤回整輪 AI 的 JD 改動](../specs/2026-09-12-jd-ai-turn-undo-design.md)。App 依 AI run 綁定的 operation receipts 與必要的內部 before／after snapshot 計算整輪效果；只在範圍完整且沒有較晚 JD 修改時，人工 command 經同一 domain service 形成新的補償寫入。不得倒退 head、不得覆蓋較晚人工作業或其他 AI 回合，也不建立通用 Undo stack。Memory、案例、原始對話、來源、checkpoint 及原回合／操作結果保留；撤回事件可提供給下一輪模型，但不表示相關工作事實消失。這項首版產品效果不要求另外設計公開完整歷史；若已完成的整份還原能安全重用同一機制，可繼續保留。
 
 9. **來源保留引用，不複製原文。**`jd_source_link` 指向既有來源 owner；目標文字改變後以 basis digest 標成需重新核對，不能讓舊 source 無條件替新文字背書。K/S relation 本身可有來源 link。
 
 10. **刪除政策按 ownership 分開。**刪 task 的 owned details 與 task relations 可在明示 command 中一併移除，共享 capability 保留；仍被引用的 capability 採 RESTRICT。D01 已依 Owner 授權由研究者採[刪職責保留任務](../specs/2026-09-12-jd-relational-editing-requirements.md#8-d01刪除職責時保留任務2026-09-12)：App 同交易解除分組再刪 duty，DB 保留 RESTRICT 防止直接刪除。任務特有必要範圍隨任務卡、職責僅概括；必要內容調整及成果／要求新增與結構操作原子保存，自有來源分開處理、不自動轉掛。人與 AI 共用此業務效果，參照 [AWS 官方分層與生命週期依據](../specs/evidence/2026-09-12-jd-relational-editor-evidence.md#7-aws-業務邏輯與-d01-裁決依據2026-09-12)，不因此採用 AWS 服務。
 
-11. **同文件寫入依固定順序鎖 document／head rows，不用 service-global mutex。**archive／restore 走相同順序；不同 documents 可獨立操作。同文件 manual／AI foreground writer 必須協調進入與安全結束，不要求整合舊 admission 程式。模型與 transaction 外的候選計算不持有 SQL row locks；canonical snapshot 在短交易內由 current rows 產生。
+11. **同文件寫入依固定順序鎖 document／head rows，不用 service-global mutex。**archive／unarchive／當輪撤回走相同順序；不同 documents 可獨立操作。同文件 manual／AI foreground writer 必須協調進入與安全結束，不要求整合舊 admission 程式。模型與 transaction 外的候選計算不持有 SQL row locks；必要的 canonical snapshot 在短交易內由 current rows 產生。
 
 12. **fresh adoption，不搬舊資料、不雙寫。**新 schema 在專用新 DB 驗證；正式切換一次移除舊 JSONB current write、舊 approved/candidate writers 與 retired routes。conversation／Memory／source owner 仍依其 successor ADR 決定，不由本 ADR 重做。
 
-13. **Excel 延後。**2026-09-13 Owner 要求先完整App／業務／LLM接線及測試；本輪不以匯出為驗收門檻。之後恢復時仍由確切current或history版本衍生輸出，LLM不產Excel，不接回retired exporter；原話分開輸出的方向保留。
+13. **Excel 延後。**2026-09-13 Owner 要求先完整 App／業務／LLM 接線及測試；本輪不以匯出為驗收門檻。之後恢復時由確切 current JD 衍生輸出，LLM 不產 Excel，不接回 retired exporter；原話分開輸出的方向保留。首版不要求指定歷史版本匯出。
 
 ## Supersedes when Accepted
 
@@ -50,36 +52,36 @@ PostgreSQL 16 提供 PK/FK、junction tables、delete actions、transactions 與
 |---|---|---|
 | [0073](0073-plate-jd-app-working-document-and-revision-authority.md) | 完整 Plate JSONB 作 current authority、whole-document model edit 與 Plate whole-document UI | 同一工作稿、實際差異、operation receipt、同文件 writer、來源／Memory owner 邊界及既有故障證據 |
 | [0060](0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) JD authority 部分 | Saver／Store 中的 approved／candidate JD writers 與舊文件審核 publication | conversation／Memory 的能力及責任要求；新 runtime 依證據選定，正式採用由 0074 或 successor 完成。0060 在 successor 採用前仍為正式權威，不構成新碼沿用義務 |
-| [0066](0066-persistent-ai-jd-working-draft-and-semantic-review.md)、[0067](0067-deep-agents-store-backed-jd-working-draft.md)、[0069](0069-shared-current-jd-working-copy-and-semantic-approval.md) 的 JD 保存部分 | Store workspace、current↔approved 雙狀態、semantic accept/reject／rebase | 同文件延續、按需讀取、保存後可查差異等產品目的 |
+| [0066](0066-persistent-ai-jd-working-draft-and-semantic-review.md)、[0067](0067-deep-agents-store-backed-jd-working-draft.md)、[0069](0069-shared-current-jd-working-copy-and-semantic-approval.md) 的 JD 保存部分 | Store workspace、current↔approved 雙狀態、semantic accept/reject／rebase | 同文件延續、按需讀取、保存回執與當輪差異等產品目的 |
 | [0070](0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md) 的 JD 表單候選 | 舊 pending lifecycle、舊整份物件寫入與舊欄位形狀 | 舊畫面作 CRUD／relation 需求證據，不作 runtime import |
 
 Accepted 歷史 ADR 不改原文；只有本 ADR Accepted 且 production G6 完成後，上表才改變正式 authority。
 
 ## Consequences
 
-員工得到真正能管理 JD 項目與關係的畫面；任務移動、K/S 共享、刪除影響與 Excel 投影不再依文件排版猜測。AI 工具參數更少，也不需生成整份文件或維護 DB metadata。Stable IDs 與 immutable snapshots 讓歷史比較不靠模糊文字定位。
+員工得到真正能管理 JD 項目與關係的畫面；任務移動、K/S 共享、刪除影響與 Excel 投影不再依文件排版猜測。AI 工具參數更少，也不需生成整份文件或維護 DB metadata。Stable IDs、operation receipts 與必要的 immutable snapshots 讓當輪差異、故障對帳與安全撤回不靠模糊文字定位。
 
 代價是 current save 需同時維護 8 類正文／關係 rows、canonical snapshot 與 receipt；source link 的 typed targets、position normalization、current→snapshot round-trip 及 relation diff 都需專門測試。新管理畫面須驗實際輸入與保存，不能把既有 whole-document Plate 測試直接當成新畫面通過。
 
-13 張表不是產品品質指標，也不是宣稱 JSONB 不可表示關係；它是目前 CRUD、關係完整性與歷史需求下的可審映射。若未來證明每版 relational clone 更簡單可靠，可另以 successor 比較，不在第一版並建兩套。
+13 張表不是產品品質指標，也不是宣稱 JSONB 不可表示關係；它是目前 CRUD、關係完整性與內部保存需求下的可審映射。若未來需要完整版本歷史，再由 successor 比較保留策略與資料成本，不把既有技術 snapshot 自動升格成產品功能。
 
 ## Rejected alternatives
 
 - **保留整份 Plate JSONB，只在 UI 外觀加卡片：**仍沒有 relational current rows，移動／引用／刪除完整性只能由整份 validator 承擔，沒有解決 Owner 指出的資料與操作問題。
 - **把舊 ApprovedDocumentEditor 及 backend 接回來：**舊畫面可學，舊 authority／route／package 已退役且仍整份保存，會產生 compatibility path。
 - **每個 revision 複製所有 relational rows：**歷史純 relational，但每次小改都複製全部資料，第一版 schema、FK 與查詢顯著擴張；沒有目前需求需要支付此成本。
-- **event sourcing 只存 commands、靠 replay 重建 current：**對本機 JD 的 read、重開與匯出增加 replay／upcaster／snapshot 管理，現有需求可由 current rows＋derived history 完成。
+- **event sourcing 只存 commands、靠 replay 重建 current：**對本機 JD 的 read、重開與匯出增加 replay／upcaster／snapshot 管理；現有需求可由 current rows、operation receipts 與有界技術 snapshots 完成。
 - **讓 LLM 送 generic CRUD／SQL-like payload：**增加無關欄位、跨類型錯誤與資料庫責任外洩；不符合 strict、small named tool 的證據方向。
 - **不經比較便為每欄建立 Plate editor instance：**文字與換行需求不足以證明所有欄位都需富文字核心；應與其他成熟元件比較 focus／undo、效能及整合負擔，不預設採 Plate 或裸原生控制項。
 
 ## Open decision and acceptance gate
 
-**D01 任務保留政策已依 Owner 授權裁決；完整設計仍 Needs revision。**讀取與回執 JR-R02／03 通過[保存文件窄複核](../specs/evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 通過[完整操作文件複核](../specs/evidence/2026-09-12-jd-business-operations-review.md)；均未實測。Owner 後續已選不另設待整理區、歷史對照／局部更正／整份還原，研究者受權裁決先不设持久 AI 試稿區，見[需求 §10–11](../specs/2026-09-12-jd-relational-editing-requirements.md)。[歷史與恢復設計](../specs/2026-09-12-jd-history-and-recovery-design.md)將還原限定為人工端經同一 domain／交易產生新 JD 修訂；保留中間歷史，不倒退原始問答或 Memory。暫存格式／容量／資料集識別與完整 G4 尚待閉合，本 ADR 保持 Proposed。
+**D01 任務保留政策已依 Owner 授權裁決；完整設計仍 Needs revision。**讀取與回執 JR-R02／03 通過[保存文件窄複核](../specs/evidence/2026-09-12-jd-relational-save-contract-review.md)，JR-R01／04／05 通過[完整操作文件複核](../specs/evidence/2026-09-12-jd-business-operations-review.md)；均未實測。2026-09-15 Owner 已把完整 JD 歷史／任意整份還原從首版必要需求降為可保留的既有能力；[歷史與恢復設計](../specs/2026-09-12-jd-history-and-recovery-design.md)不再是接線前置，也不應繼續擴張。[HR-02](../specs/2026-09-12-jd-ai-turn-undo-design.md)則維持必要產品效果，但須依本 ADR 的 current-only 範圍閱讀：撤回整輪 LLM 的 JD 改動，不倒退原始問答或 Memory。其餘 App／LLM 接線、資料集識別與完整 G4 尚待閉合，本 ADR 保持 Proposed。
 
 進 G6／施工前還必須：
 
 1. D01 與必要範圍已回寫；閉合其餘產品未決並以固定案例驗刪除保留及仍有效條件；
-2. reviewer 可只依設計回答 current authority、表關係、工具責任、錯誤／恢復及歷史來源；
+2. reviewer 可只依設計回答 current authority、表關係、工具責任、錯誤／恢復、當輪差異／撤回，以及對話／Memory 不被撤回的邊界；
 3. 無影響實作的 schema／contract finding；
 4. 另產生實作計畫、generated contract、fresh migration 與可證偽測試；
 5. 不使用付費模型完成 core schema／CRUD／failure tests；自然模型另按核准預算驗收。

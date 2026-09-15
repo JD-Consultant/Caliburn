@@ -1,8 +1,8 @@
 """B1 -> B2 -> publication over real PostgreSQL, in order, with no provider.
 
 Real PostgresSaver for both stages' progress, real PostgresStore for detail and
-staged versions, real publication tables, and the real OpenAI SDK answered in
-process. What this file is for is the handover itself: that a batch reaches B2
+staged versions, real publication tables, and the real provider SDKs answered
+in process. What this file is for is the handover itself: that a batch reaches B2
 only after B1 finished it, that the published cursor is the only thing that
 moves the work forward, and that an interrupted handover resumes on rebuilt
 resources without consolidating or publishing twice.
@@ -10,6 +10,7 @@ resources without consolidating or publishing twice.
 Run `scripts/init_test_runtime.py` and `scripts/init_test_memory.py`
 explicitly first. These tests never setup, clear or drop anything.
 """
+import asyncio
 from contextlib import contextmanager
 import json
 import os
@@ -24,12 +25,13 @@ from langgraph.store.postgres import PostgresStore
 from caliburn_memory import PublicationStore
 from jd_relational.consolidation_app import build_consolidation_model, build_consolidation_workflow
 from jd_relational.extraction_app import build_extraction_model, build_extraction_workflow
+from jd_relational.openrouter_model import OPENROUTER_HEADERS
 
 from test_consolidation_app import staged
 from test_extraction_postgres import (
     FaultyStore, artifacts_for, interviewed, opened, published_rows, saved_rows,
 )
-from test_extraction_app import completed
+from test_extraction_app import completed, router_completed
 from test_memory_core_postgres import SCHEMA
 
 
@@ -61,6 +63,10 @@ def stages(windows, document, store, saver, publication):
 
     def respond(request):
         sent.append(json.loads(request.content))
+        if request.url.path.endswith("/chat/completions"):
+            answer = json.loads(json.dumps(router_completed()))
+            answer["id"] = f"chat_{len(sent)}"
+            return httpx.Response(200, json=answer)
         answer = queue.pop(0) if queue else completed()
         answer = json.loads(json.dumps(answer))
         answer["id"] = f"resp_{len(sent)}"
@@ -70,10 +76,12 @@ def stages(windows, document, store, saver, publication):
                 item["call_id"] = f"call_{len(sent)}_{index}"
         return httpx.Response(200, json=answer)
 
-    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+    transport = httpx.MockTransport(respond)
+    with httpx.Client(transport=transport, headers=OPENROUTER_HEADERS) as client:
+        async_client = httpx.AsyncClient(transport=transport, headers=OPENROUTER_HEADERS)
         b1 = build_extraction_workflow(service=windows, document_id=document, store=store,
-            model=build_extraction_model(model="gpt-5.6-luna", api_key="offline",
-                                         http_client=client).model_copy(update={"max_retries": 0}),
+            model=build_extraction_model(api_key="offline", http_client=client,
+                                         async_http_client=async_client, max_retries=0),
             checkpointer=saver)
         model = build_consolidation_model(model="gpt-5.6-luna", api_key="offline",
                                           http_client=client).model_copy(update={"max_retries": 0})
@@ -82,7 +90,10 @@ def stages(windows, document, store, saver, publication):
             return build_consolidation_workflow(extraction=b1, publication=publication,
                 model=model, checkpointer=saver, **options)
 
-        yield b1, b2, sent, queue
+        try:
+            yield b1, b2, sent, queue
+        finally:
+            asyncio.run(async_client.aclose())
 
 
 def test_two_batches_hand_over_in_order_and_only_publication_moves_the_work():
@@ -226,15 +237,15 @@ def test_a_repair_published_mid_job_makes_b2_reload_before_it_publishes(monkeypa
         with stages(windows, document, store, saver, publication) as (b1, b2, sent, queue):
             extracted = b1.start(batch)
             summary_path = extracted["files"][0]["summary_path"]
-            original, intervened = PublicationStore.publish, []
+            original, intervened, background_requests = PublicationStore.publish, [], []
 
             def repair_first(self, request):
+                background_requests.append(request)
                 if not intervened:
-                    intervened.append(True)
                     version = artifacts.save_memory(knowledge="更正：權限由客戶自行設定。",
                                                     guide="更正後導覽")
-                    original(self, self.prepare(version, expected_revision=0, kind="repair",
-                                                repair_sources=(corrected,)))
+                    intervened.append(original(self, self.prepare(version,
+                        expected_revision=0, kind="repair", repair_sources=(corrected,))))
                 return original(self, request)
 
             monkeypatch.setattr(PublicationStore, "publish", repair_first)
@@ -242,13 +253,19 @@ def test_a_repair_published_mid_job_makes_b2_reload_before_it_publishes(monkeypa
                           *staged(summary_path, body="更正後：權限由客戶自行設定。")])
             result = b2().start()
             # B1 and B2 share one transport here, so select B2's own payloads.
-            payloads = [payload for request in sent
+            payloads = [payload for request in sent if "input" in request
                         for payload in [json.loads(request["input"][1]["content"])]
                         if "RECENT_REPAIRS" in payload]
             assert payloads and not payloads[0]["RECENT_REPAIRS"]
             later = next(payload for payload in payloads if payload["RECENT_REPAIRS"])
             assert later["RECENT_REPAIRS"][0]["reference"] == corrected
             assert later["GUIDE"] == "更正後導覽", "the reload seeds from C's new head"
+            assert [request.expected_revision for request in background_requests] == [0, 1]
+            assert background_requests[0].memory != background_requests[1].memory
+            receipt = publication.receipt(background_requests[1].operation_id)
+            assert receipt.request_digest == background_requests[1].digest()
+            assert receipt.request_digest != background_requests[0].digest(), \
+                "B2 must recompute from the repaired head, not relabel its stale candidate"
             head = publication.current()
             assert head.revision == result["result"]["revision"] == 2
             assert head.processed_source == batch

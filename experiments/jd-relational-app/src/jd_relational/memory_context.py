@@ -1,8 +1,10 @@
-"""One published Memory view per foreground turn, using the owned native Store.
+"""One explicit Memory read baseline per foreground turn, using the native Store.
 
 This is a read session, not another publication owner or agent loop. Native
-input checkpoints hold the selected version; no background head refresh occurs
-between model/tool calls. A later turn selects the then-current publication.
+input checkpoints hold the turn-start version. Ordinary model/tool calls do not
+follow background publications; an explicit C stale result or applied repair
+may advance only this turn's effective baseline. A later turn selects the
+then-current publication.
 """
 from dataclasses import dataclass
 from hashlib import sha256
@@ -137,7 +139,7 @@ def initial_memory_session(runtime):
 
 
 def memory_session(runtime):
-    """Return this turn's fixed read view, including an applied C result."""
+    """Return this turn's current explicit baseline, including C refreshes."""
     initial = initial_memory_session(runtime)
     repair = getattr(runtime.context, "memory_repair_session", None)
     if repair is None:

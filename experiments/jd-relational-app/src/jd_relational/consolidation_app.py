@@ -6,21 +6,21 @@ files, stale->load and publication identity stay in
 `caliburn_memory.consolidation`; nothing here re-implements them, adds a
 scheduler, writes JD or exposes a user tool.
 
-Like B1, only this stage is bound to OpenAI. The conversation consultant
-keeps its pinned Anthropic runtime; there is no app-wide provider switch or
-fallback. B2 is a bounded tool-calling agent, so it carries the verified
-agent budgets, which are not B1's window budgets.
+Unlike B1, this older B2 adapter is still directly bound to OpenAI and is not yet
+part of the formal OpenRouter host composition. The conversation consultant
+now uses its pinned OpenRouter/OpenAI Luna route. B2 is a bounded tool-calling
+agent, so it carries the verified agent budgets, which are not B1's window
+budgets; its provider convergence belongs to the background slice.
 """
 
-from collections.abc import Callable
 import math
 
 from caliburn_memory import PublicationStore
 from caliburn_memory.consolidation import ConsolidationWorkflow
 from caliburn_memory.extraction import ExtractionWorkflow
-from langchain.agents.middleware import ModelRequest, ModelResponse, wrap_model_call
-from langchain_core.messages import AIMessage, BaseMessage
 from langchain_openai import ChatOpenAI
+
+from .response_context import native_context_view, server_compaction_view
 
 
 # This case's tested B2 profile, not a provider default: the agent budgets and
@@ -32,53 +32,6 @@ MAX_TOOL_CALLS = 15
 MAX_OUTPUT_TOKENS = 8192
 REASONING_EFFORT = "high"
 COMPACT_THRESHOLD = 12000
-
-
-def server_compaction_view(messages: list[BaseMessage]) -> list[BaseMessage]:
-    """Copy a conversation from its latest inline server compaction item.
-
-    Input is canonical conversation using ChatOpenAI ``responses/v1`` blocks.
-    System instructions/Memory guide must be supplied separately by the caller.
-    This is NOT for standalone ``/responses/compact`` output: that entire
-    returned window must be passed as-is. No database messages are modified.
-
-    https://developers.openai.com/api/docs/guides/compaction
-    """
-    for message_index in range(len(messages) - 1, -1, -1):
-        message = messages[message_index]
-        if not isinstance(message, AIMessage) or not isinstance(message.content, list):
-            continue
-        for block_index in range(len(message.content) - 1, -1, -1):
-            block = message.content[block_index]
-            if not isinstance(block, dict) or block.get("type") != "compaction":
-                continue
-            first = message.model_copy(deep=True)
-            first.content = first.content[block_index:]
-            remaining_call_ids = {
-                item["call_id"]
-                for item in first.content
-                if isinstance(item, dict)
-                and item.get("type") in ("function_call", "custom_tool_call")
-                and "call_id" in item
-            }
-            # The adapter also replays calls from these separate convenience
-            # fields. Leaving a pre-cut call here would reintroduce it on wire.
-            first.tool_calls = [call for call in first.tool_calls if call["id"] in remaining_call_ids]
-            first.invalid_tool_calls = [call for call in first.invalid_tool_calls if call["id"] in remaining_call_ids]
-            return [first, *(item.model_copy(deep=True) for item in messages[message_index + 1:])]
-    return [message.model_copy(deep=True) for message in messages]
-
-
-@wrap_model_call
-def native_context_view(request: ModelRequest,
-                        handler: Callable[[ModelRequest], ModelResponse]) -> ModelResponse:
-    """Override the model request, never return a messages update to graph state.
-
-    https://docs.langchain.com/oss/python/langchain/context-engineering
-    System instructions stay in request.system_message outside the conversation.
-    Only supports the responses/v1 inline-compaction contract of the builder below.
-    """
-    return handler(request.override(messages=server_compaction_view(request.messages)))
 
 
 def build_consolidation_model(*, model: str, api_key: str, http_client,
@@ -128,5 +81,3 @@ def build_consolidation_workflow(*, extraction: ExtractionWorkflow, publication:
                                  max_model_steps=options.pop("max_model_steps", MAX_MODEL_STEPS),
                                  max_tool_calls=options.pop("max_tool_calls", MAX_TOOL_CALLS),
                                  max_output_tokens=max_output_tokens, **options)
-
-

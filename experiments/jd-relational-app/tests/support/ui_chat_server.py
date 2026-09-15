@@ -1,12 +1,13 @@
 """Single synthetic browser journey, real managed host/SQL/Saver/Agent/SDK.
 
-Only Anthropic HTTP is replaced with httpx2.MockTransport. No real credential,
+Only OpenRouter HTTP is replaced with httpx.MockTransport. No real credential,
 provider network, runtime replacement, generic launcher, retry or response gate.
 Reuse the established fixed fixture's prepare/initialize/scope/DPAPI checks.
 The fresh jd-ui-gate-<hex> directory and database belong only to this journey.
 """
 
 import argparse
+import asyncio
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import json
@@ -49,7 +50,7 @@ class Evidence:
     def _snapshot(self):
         return {"format": 1, "model_request_count": len(self._requests),
             "model_requests": [dict(item) for item in self._requests],
-            "closed_model_bodies": sum(body.closed for body in self._bodies),
+            "closed_model_bodies": sum(body.is_closed for body in self._bodies),
             "writer_execute_count": len(self._writes), "writes": [dict(item) for item in self._writes],
             "http_counts": dict(self._routes), "http_observations": [dict(item) for item in self._http],
             "evidence_failed": self._failed,
@@ -78,7 +79,7 @@ class Evidence:
     def end_request(self, item, *, tool=None, failed=False):
         with self._lock:
             item["tool"] = tool
-            item["response"] = "fixture_rejected" if failed else "synthetic_complete_stream"
+            item["response"] = "fixture_rejected" if failed else "synthetic_complete_reply"
             self._save()
 
     def body(self, body):
@@ -163,11 +164,13 @@ def _cite(created, payload):
     there is no notice to quote. That path simply does not cite, and the
     journey checks for real source links afterwards rather than assuming.
     """
+    from support.openrouter_replies import system_blocks
     from test_conversation_sources_postgres import _source_notice
     name, arguments = created
-    if not isinstance(payload.get("system"), list):
+    blocks = system_blocks(payload)
+    if not blocks:
         return name, arguments
-    source_ref = _source_notice(payload)["source_ref"]
+    source_ref = _source_notice({"system": blocks})["source_ref"]
     arguments["basis_refs"] = [source_ref]
     for detail in [*arguments.get("outcomes", []), *arguments.get("requirements", [])]:
         detail["basis_refs"] = [source_ref]
@@ -178,15 +181,16 @@ def _cite(created, payload):
 def offline_model(evidence):
     """Pinned native SDK/adapter; exactly four synthetic model responses.
 
-    Reuse the proven fixture's read/create and complete SSE builders. The
+    Reuse the proven fixture's read/create replies. The
     dynamic container ref comes from the actual jd_read result, never a guess.
     The fixed script is test data, not an LLM quality or decision-making test.
     """
-    import httpx2
+    import httpx
     import pytest
     from langsmith import tracing_context
-    from jd_relational.consultant_model import create_consultant_model
-    from test_ai_runtime_postgres import _read, _create, _sse, SyncBody
+    from jd_relational.consultant_model import OPENROUTER_HEADERS, create_consultant_model
+    from support.openrouter_replies import reply
+    from test_ai_runtime_postgres import _read, _create
 
     bodies = []
     prefix = uuid4().hex
@@ -196,46 +200,48 @@ def offline_model(evidence):
         try:
             if position >= 4:
                 raise ValueError("synthetic_plan_exhausted")
-            if request.url.host != "api.anthropic.com" or request.headers.get("x-api-key") != KEY:
+            if request.url.host != "openrouter.ai" or request.headers.get("authorization") != f"Bearer {KEY}":
                 raise ValueError("synthetic_transport_scope_mismatch")
             payload = json.loads(request.content)
-            if (payload.get("stream") is not True or len(payload.get("tools", [])) != 10
-                    or not all(tool.get("strict") is True for tool in payload["tools"])
-                    or payload.get("tool_choice", {}).get("disable_parallel_tool_use") is not True):
+            if (len(payload.get("tools", [])) != 10
+                    or not all(tool.get("function", {}).get("strict") is True for tool in payload["tools"])
+                    or payload.get("parallel_tool_calls") is not False
+                    or payload.get("provider") != {"only": ["OpenAI"], "order": ["OpenAI"],
+                        "allow_fallbacks": False, "require_parameters": True}):
                 raise ValueError("synthetic_tool_contract_mismatch")
-            name, arguments = (_read(payload) if position == 0
-                               else _cite(_create(payload), payload)
-                               if position == 1 else (None, None))
-            chunks = _sse(f"ui_{prefix}_{position + 1}", name, arguments)
-            if name is None:
-                # Edit synthetic event fixture data only; native SDK owns parsing.
-                values = [json.loads(chunk.decode().split("data: ", 1)[1]) for chunk in chunks]
-                values[2]["delta"]["text"] = FIRST_REPLY if position == 2 else SECOND_REPLY
-                chunks = [f"event: {value['type']}\ndata: {json.dumps(value)}\n\n".encode() for value in values]
-            body = SyncBody(chunks)
-            bodies.append(body)
-            evidence.body(body)
+            try:
+                name, arguments = (_read(payload) if position == 0
+                                   else _cite(_create(payload), payload)
+                                   if position == 1 else (None, None))
+            except (AssertionError, IndexError, KeyError, TypeError, ValueError) as error:
+                raise ValueError("synthetic_plan_input_invalid") from error
+            body = reply(f"ui_{prefix}_{position + 1}", name, arguments,
+                         text=FIRST_REPLY if position == 2 else SECOND_REPLY)
+            response = httpx.Response(200, json=body, request=request)
+            bodies.append(response)
+            evidence.body(response)
             evidence.end_request(event, tool=name)
-            return httpx2.Response(200, headers={"content-type": "text/event-stream"}, stream=body, request=request)
+            return response
         except BaseException:
             evidence.end_request(event, failed=True)
             raise
 
-    def no_async(**kwargs):
-        raise ValueError("synthetic_async_transport_unavailable")
-
     with pytest.MonkeyPatch.context() as patch, tracing_context(enabled=False):
         patch.setenv("LANGSMITH_TRACING", "false")
         patch.setenv("LANGCHAIN_TRACING_V2", "false")
-        with httpx2.Client(transport=httpx2.MockTransport(receive), trust_env=False) as client:
-            patch.setattr("langchain_anthropic.chat_models._get_default_httpx_client", lambda **kwargs: client)
-            patch.setattr("langchain_anthropic.chat_models._get_default_async_httpx_client", no_async)
-            model = create_consultant_model(model_name="synthetic", api_key=KEY, timeout=5, max_tokens=2048)
+        with httpx.Client(transport=httpx.MockTransport(receive), trust_env=False,
+                          headers=OPENROUTER_HEADERS) as client:
+            async_client = httpx.AsyncClient(transport=httpx.MockTransport(receive),
+                                             trust_env=False, headers=OPENROUTER_HEADERS)
+            model = create_consultant_model(api_key=KEY, http_client=client,
+                                            async_http_client=async_client,
+                                            request_timeout=5, max_output_tokens=2048)
             try:
                 yield model
             finally:
+                asyncio.run(async_client.aclose())
                 evidence.flush()
-                if not all(body.closed for body in bodies):
+                if not all(body.is_closed for body in bodies):
                     raise ValueError("synthetic_model_body_unclosed")
 
 

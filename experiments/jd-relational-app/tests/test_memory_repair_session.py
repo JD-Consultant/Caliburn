@@ -101,14 +101,33 @@ def test_two_bad_calls_stop_repair_without_entering_core_or_sending_internal_ids
     assert pub.current().revision == 1
 
 
-def test_native_memory_read_uses_this_turns_applied_repair(memory):
+def test_native_memory_read_keeps_applied_repair_when_rebased_background_publishes_later(
+        memory, monkeypatch):
     root, model, initial, repair, pub, context, payload, config = setup_repair(memory,
         [call(1), read_call(1), AIMessage(content="已核對新版。")])
+    actual_publish = pub.publish
+    later = []
+
+    def publish_then_rebased_background(request):
+        applied = actual_publish(request)
+        if request.kind == "repair" and not later:
+            version = initial.artifacts.save_memory(
+                knowledge="維修由外包負責。背景重整後補充工作節奏。",
+                guide="背景重整後導覽")
+            later.append(actual_publish(pub.prepare(version,
+                expected_revision=applied.revision, kind="consolidation",
+                processed_source=applied.processed_source)))
+        return applied
+
+    monkeypatch.setattr(pub, "publish", publish_then_rebased_background)
     result = root.invoke(payload, config, context=context, durability="sync")
     feedback = [m for m in result["messages"] if isinstance(m, ToolMessage)]
     assert [m.name for m in feedback] == ["repair_memory", "read_file"]
     assert feedback[0].status == "success" and "維修由外包負責" in feedback[1].content
-    assert result["jd_memory_view"] == initial.view and pub.current().revision == 2
+    assert "背景重整後補充" not in feedback[1].content
+    assert result["jd_memory_view"] == initial.view
+    assert later and pub.current() == later[0] and pub.current().revision == 3
+    assert repair.current_read(result).head.revision == 2
 
 
 def test_wrong_scope_and_stop_are_checked_before_starting_c(memory):

@@ -6,7 +6,7 @@ import json
 from types import SimpleNamespace
 from uuid import uuid4
 
-import httpx2
+import httpx
 import pytest
 from langchain.agents import create_agent
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -66,7 +66,8 @@ def setup():
     reader = MaterialReader(material)
     context = ConsultantContext(dataset, document, run, reader, ReferenceCodec(b'x'*32, dataset), material)
     reply = AIMessage(id='fixed-reply-'+str(uuid4()), content='我會依目前已保存的工作內容繼續。',
-        response_metadata={'stop_reason':'end_turn', 'model_name':'synthetic'},
+        response_metadata={'stop_reason':'end_turn', 'status': 'completed',
+                           'model_name':'synthetic'},
         usage_metadata={'input_tokens':20,'output_tokens':10,'total_tokens':30})
     return context, reply
 
@@ -110,7 +111,8 @@ def test_actual_model_request_and_closed_root_preserve_original_conversation(asy
 
 @pytest.mark.parametrize('stop', ['max_tokens', 'pause_turn', None])
 def test_incomplete_reply_does_not_publish_notification_boundary(stop):
-    context, reply = setup(); reply.response_metadata['stop_reason'] = stop
+    context, reply = setup(); reply.response_metadata.update(
+        {'stop_reason': stop, 'status': 'incomplete'})
     model = FixedModel(replies=[reply]); root = graph(model, InMemorySaver())
     config = {'configurable':{'thread_id':context.document_id}}
     with pytest.raises(ConsultantContextError, match='incomplete_consultant_response'):
@@ -186,7 +188,7 @@ def test_tool_loop_keeps_initial_manual_notice_and_advances_response_boundary():
     initial = context.turn_notice
     first_reply = AIMessage(id='fixed-tool-reply', content='',
         tool_calls=[{'name': 'synthetic_change', 'args': {}, 'id': 'call-one', 'type': 'tool_call'}],
-        response_metadata={'stop_reason': 'tool_use'})
+        response_metadata={'stop_reason': 'tool_use', 'status': 'completed'})
 
     @tool
     def synthetic_change() -> str:
@@ -241,11 +243,11 @@ def test_closed_observer_rejects_mismatched_saved_evidence(corruption):
             dataset_id=context.dataset_id, run_id=context.run_id)
 
 
-def test_factory_sdk_tool_round_trip_keeps_native_blocks_and_real_result(monkeypatch):
-    from jd_relational.consultant_model import create_consultant_model
-    from test_consultant_model import SyncBody, events
+def test_factory_sdk_tool_round_trip_keeps_native_calls_and_real_result():
+    from jd_relational.consultant_model import OPENROUTER_HEADERS, create_consultant_model
+    from support.openrouter_replies import reply
 
-    context, _ = setup(); requests = []; bodies = []; executions = []
+    context, _ = setup(); requests = []; executions = []
 
     @tool
     def jd_read(target: str) -> str:
@@ -254,33 +256,97 @@ def test_factory_sdk_tool_round_trip_keeps_native_blocks_and_real_result(monkeyp
         return '{"synthetic_read_result":true}'
 
     def receive(request):
-        assert request.url.host == 'api.anthropic.com' and len(requests) < 2
+        assert request.url.host == 'openrouter.ai' and len(requests) < 2
         requests.append(json.loads(request.content))
-        chunks = events(kind='thinking_tool' if len(requests) == 1 else 'text')
-        # Distinct provider messages; actual native AIMessage IDs are not assumed.
-        chunks = [chunk.replace(b'msg_synthetic', f'msg_synthetic_{len(requests)}'.encode()) for chunk in chunks]
-        body = SyncBody(chunks); bodies.append(body)
-        return httpx2.Response(200, headers={'content-type': 'text/event-stream'}, stream=body)
+        body = (reply('first', 'jd_read', {'target': 'synthetic'}) if len(requests) == 1
+                else reply('second', text='完整合成回覆'))
+        return httpx.Response(200, json=body, request=request)
 
-    with httpx2.Client(transport=httpx2.MockTransport(receive), trust_env=False) as client:
-        monkeypatch.setattr('langchain_anthropic.chat_models._get_default_httpx_client', lambda **kwargs: client)
-        model = create_consultant_model(model_name='synthetic', api_key='synthetic-no-key', timeout=5, max_tokens=64)
+    client = httpx.Client(transport=httpx.MockTransport(receive), trust_env=False,
+                          headers=OPENROUTER_HEADERS)
+    async_client = httpx.AsyncClient(transport=httpx.MockTransport(receive), trust_env=False,
+                                     headers=OPENROUTER_HEADERS)
+    try:
+        model = create_consultant_model(api_key='synthetic-no-key', http_client=client,
+            async_http_client=async_client, request_timeout=5, max_output_tokens=64)
         root = build_document_graph(build_consultant_node(model, tools=[jd_read], guidance='synthetic'), InMemorySaver())
         result = root.invoke({'messages': [HumanMessage(content='合成原話')]},
             {'configurable': {'thread_id': context.document_id}}, context=context, durability='sync')
-    assert executions == ['synthetic'] and len(requests) == 2 and all(b.closed for b in bodies)
-    assert all(r['tool_choice']['disable_parallel_tool_use'] is True for r in requests)
+    finally:
+        client.close()
+        asyncio.run(async_client.aclose())
+    assert executions == ['synthetic'] and len(requests) == 2
+    assert all(r['parallel_tool_calls'] is False for r in requests)
     assert [m.type for m in result['messages']] == ['human', 'ai', 'tool', 'ai']
-    assert result['messages'][2].tool_call_id == 'toolu_synthetic'
-    assistant_wire = requests[1]['messages'][1]['content']
-    assert next(b for b in assistant_wire if b['type'] == 'thinking')['signature'] == 'synthetic-signature'
-    assert next(b for b in assistant_wire if b['type'] == 'tool_use')['id'] == 'toolu_synthetic'
-    tool_wire = requests[1]['messages'][2]['content'][0]
-    assert tool_wire['type'] == 'tool_result' and tool_wire['tool_use_id'] == 'toolu_synthetic'
+    assert result['messages'][2].tool_call_id == 'call_first'
+    assistant_wire = requests[1]['messages'][2]
+    assert assistant_wire['tool_calls'][0]['id'] == 'call_first'
+    tool_wire = requests[1]['messages'][3]
+    assert tool_wire['role'] == 'tool' and tool_wire['tool_call_id'] == 'call_first'
     assert tool_wire['content'] == '{"synthetic_read_result":true}'
     view = read_closed_model_view(root, document_id=context.document_id,
         dataset_id=context.dataset_id, run_id=context.run_id)
     assert view.response_message_id == result['messages'][-1].id
+
+
+def test_factory_context_seam_changes_only_the_model_request():
+    """A can accept a supported request view without trimming its Saver state.
+
+    This does not choose the unresolved production transport.  The synthetic
+    middleware stands in for whichever supported adapter the Owner later
+    selects and proves that the graph seam itself is request-only.
+    """
+    from langchain.agents.middleware import ModelRequest, ModelResponse, wrap_model_call
+    from jd_relational.consultant_model import OPENROUTER_HEADERS, create_consultant_model
+    from support.openrouter_replies import reply
+
+    context, _ = setup()
+    projected = []
+    requests = []
+
+    @wrap_model_call
+    def latest_message_only(request: ModelRequest, handler) -> ModelResponse:
+        projected.append([message.model_copy(deep=True) for message in request.messages])
+        return handler(request.override(messages=[request.messages[-1].model_copy(deep=True)]))
+
+    def receive(request):
+        requests.append(json.loads(request.content))
+        return httpx.Response(200, json=reply('context-seam', text='已收到最新訊息。'),
+                              request=request)
+
+    transport = httpx.MockTransport(receive)
+    client = httpx.Client(transport=transport, trust_env=False, headers=OPENROUTER_HEADERS)
+    async_client = httpx.AsyncClient(
+        transport=transport, trust_env=False, headers=OPENROUTER_HEADERS)
+    try:
+        model = create_consultant_model(
+            api_key='synthetic-no-key', http_client=client,
+            async_http_client=async_client, request_timeout=5, max_output_tokens=64)
+        child = build_consultant_node(
+            model, tools=[], guidance='synthetic', context_middleware=latest_message_only)
+        root = build_document_graph(child, InMemorySaver())
+        earlier = HumanMessage(id='earlier', content='較早但仍需完整保存的原話。')
+        earlier_reply = AIMessage(id='earlier-reply', content='較早回覆。')
+        current = HumanMessage(id='current', content='這次只送最新訊息。')
+        result = root.invoke(
+            {'messages': [earlier, earlier_reply, current]},
+            {'configurable': {'thread_id': context.document_id}},
+            context=context,
+            durability='sync',
+        )
+    finally:
+        client.close()
+        asyncio.run(async_client.aclose())
+
+    assert [[message.id for message in messages] for messages in projected] == [
+        ['earlier', 'earlier-reply', 'current']
+    ]
+    assert [message['role'] for message in requests[0]['messages']] == ['system', 'user']
+    assert requests[0]['messages'][-1]['content'] == '這次只送最新訊息。'
+    assert '較早但仍需完整保存的原話。' not in json.dumps(requests[0], ensure_ascii=False)
+    assert [message.id for message in result['messages'][:3]] == [
+        'earlier', 'earlier-reply', 'current'
+    ]
 
 
 def test_a_taken_back_turn_is_named_in_the_notice_and_nothing_else_is():

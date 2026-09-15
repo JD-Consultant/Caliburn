@@ -1,5 +1,7 @@
 # JD 歷史、整份還原與重開恢復
 
+> **2026-09-15 範圍校正：完整 JD 歷史、任意 revision 比較與整份舊版還原不屬目前第一版必要需求。已完成且穩定的能力可以保留，不必拆除；本文也可繼續說明其既有行為，但不再是接線或交付前置，不應再擴張成通用歷史／復原引擎。current JD 的 revision／snapshot／operation 可繼續供保存一致性、冪等、故障對帳、當輪 LLM 差異與安全整輪撤回使用。現行必要撤回只撤回指定 LLM 回合的 JD 效果；原始對話、來源、案例、Memory、工作理解、checkpoint 與原回合紀錄不撤回。最新範圍見 [產品核心目標](../product-notes.md) 與 [ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md)。**
+
 - 日期：2026-09-12；Topic：JD-R002；本輪 Owner 已選定操作效果，G3 WORKING；本稿為 G4 設計，尚未實作。
 - 需求：[需求 §11](2026-09-12-jd-relational-editing-requirements.md#11-本輪裁決草稿歷史與還原2026-09-12)。保存觸發與瀏覽器暫存沿[自動保存與交接](2026-09-12-jd-autosave-and-handoff-design.md)，SQL／唯一正文沿[資料庫契約](2026-09-12-jd-relational-schema-and-write-contract.md)。
 - 範圍：單人本機、唯一可編 JD；不改 Memory、原始訪談、正式權責或既有已驗的操作對帳機制。

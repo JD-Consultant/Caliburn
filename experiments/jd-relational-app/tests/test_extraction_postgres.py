@@ -1,7 +1,7 @@
 """B1 over real PostgreSQL: Saver progress and Store artifacts, no provider.
 
 The adopted extraction workflow runs on a real `PostgresSaver`, a real
-`PostgresStore` and the real OpenAI SDK, answered in process by
+`PostgresStore` and the real OpenRouter SDK, answered in process by
 `httpx.MockTransport`. Nothing here publishes, writes JD, adds a table or
 re-implements the workflow: this is the same B1 the offline tests cover, on
 durable resources that are then closed and rebuilt.
@@ -9,6 +9,7 @@ durable resources that are then closed and rebuilt.
 Run `scripts/init_test_runtime.py` and `scripts/init_test_memory.py`
 explicitly first. These tests never setup, clear or drop anything.
 """
+import asyncio
 from contextlib import contextmanager
 from copy import deepcopy
 import json
@@ -31,9 +32,10 @@ from jd_relational.ai_checkpoints import AiRunCheckpoints
 from jd_relational.conversation_sources import ConversationSourceCodec, ConversationSourceService
 from jd_relational.extraction_app import build_extraction_model, build_extraction_workflow
 from jd_relational.memory_sources import MemorySourceReader
+from jd_relational.openrouter_model import OPENROUTER_HEADERS
 from jd_relational.runtime_checkpoints import DocumentState, build_document_graph
 
-from test_extraction_app import completed
+from test_extraction_app import router_completed
 from test_interview_window_source import settled
 from test_manual_runtime_postgres import connect, NATIVE_TABLES, RUNTIME_SCHEMA
 from test_memory_core_postgres import SCHEMA, TABLES
@@ -100,14 +102,19 @@ def provider():
 
     def respond(request):
         sent.append(json.loads(request.content))
-        item = queue.pop(0) if queue else completed()
+        item = queue.pop(0) if queue else router_completed()
         if isinstance(item, int):
-            return httpx.Response(item, json={"error": {"message": "synthetic", "type": "server_error"}})
+            return httpx.Response(item, json={"error": {"code": item, "message": "synthetic"}})
         return httpx.Response(200, json=item)
 
-    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
-        yield build_extraction_model(model="gpt-5.6-luna", api_key="offline",
-                                     http_client=client).model_copy(update={"max_retries": 0}), sent, queue
+    transport = httpx.MockTransport(respond)
+    with httpx.Client(transport=transport, headers=OPENROUTER_HEADERS) as client:
+        async_client = httpx.AsyncClient(transport=transport, headers=OPENROUTER_HEADERS)
+        try:
+            yield build_extraction_model(api_key="offline", http_client=client,
+                async_http_client=async_client, max_retries=0), sent, queue
+        finally:
+            asyncio.run(async_client.aclose())
 
 
 def interviewed(native, count):

@@ -8,6 +8,7 @@ automatic graph replay occurs here. Opt in only to the existing test database.
 from contextlib import contextmanager
 from copy import deepcopy
 from hashlib import sha256
+import asyncio
 import json
 import os
 from uuid import uuid4
@@ -27,7 +28,7 @@ from jd_relational.notice_history import NoticeHistoryReader
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import build_document_graph
 from jd_relational.storage.service import JdStorage
-from support.openai_replies import reply as _reply, system_blocks, truncated as _truncated
+from support.openrouter_replies import reply as _reply, system_blocks, truncated as _truncated
 from test_manual_runtime_postgres import NATIVE_TABLES, RUNTIME_SCHEMA, connect
 from test_storage_postgres import engine
 from test_storage_service import FakeAuthority, change, intent_for
@@ -68,19 +69,25 @@ def _offline_model(monkeypatch, modes):
 
     def receive(request):
         # MockTransport receives the real SDK request; it never opens a socket.
-        assert request.url.host == "api.openai.com"
+        assert request.url.host == "openrouter.ai"
         assert request.headers["authorization"] == "Bearer synthetic-pg-not-a-key"
         assert len(requests) < len(modes), "No hidden model retry or replay is allowed."
         payload = json.loads(request.content)
-        assert payload["store"] is False and payload["parallel_tool_calls"] is False
+        assert payload["parallel_tool_calls"] is False
+        assert payload["provider"] == {"only": ["OpenAI"], "order": ["OpenAI"],
+            "allow_fallbacks": False, "require_parameters": True}
         requests.append(payload)
         return httpx.Response(200, json=_data(modes[len(requests) - 1], len(requests)),
                               request=request)
 
     with httpx.Client(transport=httpx.MockTransport(receive), trust_env=False, timeout=5) as client:
-        model = create_consultant_model(model="gpt-5.6-luna", api_key="synthetic-pg-not-a-key",
-                                        http_client=client)
-        yield model, requests, []
+        async_client = httpx.AsyncClient(transport=httpx.MockTransport(receive), trust_env=False, timeout=5)
+        try:
+            model = create_consultant_model(api_key="synthetic-pg-not-a-key",
+                                            http_client=client, async_http_client=async_client)
+            yield model, requests, []
+        finally:
+            asyncio.run(async_client.aclose())
 
 
 @contextmanager

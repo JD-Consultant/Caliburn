@@ -16,13 +16,15 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 
 `PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致；舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑保持相容。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
 
-### B1 案例 staged state／語意工具／固定來源 Agent graph
+### B1 案例 staged state／語意工具／固定 canonical batch Agent graph
 
 `caliburn_memory.case_maintenance` 已完成兩個零 provider 切片：`CaseMaintenanceStage` 保存固定 base、canonical source、本 attempt 已讀案例、目前 staged upserts／supersessions／guide 與 change set；`case_maintenance_tools()` 提供 `read/create/revise/split/merge/retire/set-route/finish` 八個窄工具。模型不填 document、來源、版本、路徑、digest 或新案例 ID。
 
 修訂、拆分、合併或淘汰已發布案例前必須先成功 `read_case`，該證據與 stage 一起由 LangGraph checkpoint 保存；同一模型步的多工具呼叫全部拒絕，避免平行 state update。局部修訂沿既有 V4A matcher，但只接收案例內容與 diff，不把儲存 path 暴露給模型。新案例與修訂案例的來源由 Runtime 自動綁定；guide link、穩定 UUID 與 supersession 同樣由 Runtime 產生。
 
-`CaseMaintenanceWorkflow` 已將 Runtime 固定的整批 canonical source 接到新 B1 Prompt 與上述工具。來源 owner 可在批內提供多個有界 `NEW_SOURCE`／`CONTEXT_ONLY` 窗口；它們共用一個 staged attempt，只有整批 source 成為案例證據。非最後窗口不能提前完成，最後窗口必須明確 `changed`／`no_op`；模型與工具額度、完成修正、incomplete／refusal 防護及工具後 transport failure 的原 checkpoint resume 都由 graph 保留。模型／工具上限是 App 必填組裝值：舊 B1 的 16 是窗口上限，不能誤當新 Agent 步數，也不自動借用 A／B2 的 16／15。
+`CaseMaintenanceWorkflow` 已將 Runtime 固定的整批 canonical source 接到新 B1 Prompt 與上述工具。這個 batch 是語意整理與來源單位；正式 App 能在實際 request 預算內完整提供時應使用單一來源窗口，只有來源或模型限制確實需要時，來源 owner 才在同一 batch 內提供多個有界 `NEW_SOURCE`／`CONTEXT_ONLY` 讀取窗口。所有窗口共用一個 staged attempt，只有整批 source 成為案例證據。若使用多窗口，非最後窗口不能提前完成，最後窗口必須明確 `changed`／`no_op`；模型與工具額度、完成修正、incomplete／refusal 防護及工具後 transport failure 的原 checkpoint resume 都由 graph 保留。窗口並非案例邊界或產品要求，package 的 `max_chars`／`max_windows` 也不是正式 App 的固定切割規則。
+
+B1 的 canonical 訪談 batch 是受保護來源：之後的 request-only compaction 不得摘要、截斷或替換它，也不能把 continuity summary 當作案例證據。compaction 只能處理 B1 自己已安全完成的舊模型／工具往返；原始訪談由來源 owner 持續完整保存。
 
 這仍只是 package 內的 B1 候選：沒有 B2、共同 publication、正式 App model factory、dispatcher、compaction、UI 或自然模型驗收。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
 
@@ -73,4 +75,4 @@ uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 
 Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，patch／保存核心不建立 provider；B1 執行由 App 注入的模型 runnable。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
 
-目前最新分層 bundle authority、B1 staged state／語意工具及固定來源 Agent graph 已完成；舊 publication CAS／receipt 與顧問方法資產保留作接續基礎。**B2 staged understanding、B1→B2 共同發布、C bundle repair、正式 App model factory／dispatcher、B1 compaction 與完整 App 旅程仍未完成**；不要把 package 測試、舊 B1／B2 真 PG 證據或固定組裝測試代稱新分層流程已可日常使用，也不能宣稱新流程自然品質已驗。
+目前最新分層 bundle authority、B1 staged state／語意工具及固定 canonical batch Agent graph 已完成；舊 publication CAS／receipt 與顧問方法資產保留作接續基礎。**B2 staged understanding、B1→B2 共同發布、C bundle repair、正式 App model factory／dispatcher、B1 compaction 與完整 App 旅程仍未完成**；不要把 package 測試、舊 B1／B2 真 PG 證據或固定組裝測試代稱新分層流程已可日常使用，也不能宣稱新流程自然品質已驗。

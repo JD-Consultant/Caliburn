@@ -75,7 +75,7 @@
 
 本切片只依[正式設計](../specs/2026-09-16-openrouter-continuation-compaction-design.md)施工，不再重開 transport 或 Memory 原理：
 
-**2026-09-16 分段進度：**第一小步只完成未接正式入口的 compaction 基礎元件與 12 項離線反例；canonical 不變、安全工具 wave、B2 固定任務、增量摘要、request-only view、Saver 跨 graph 恢復、取消、截斷及主模型失敗／截斷不發布均已固定。尚未把 middleware 注入 A，也未修改 B2 model boundary；下個小步從 A 的真實 `JdNoticeMiddleware` 組合與雙 Command 保存開始，不跳做 dispatcher、Memory 或付費 smoke。
+**2026-09-16 分段進度：**第一小步完成共用 compaction 基礎元件與 12 項離線反例；第二小步已正式注入 A。A 會先組好 JD／Memory、Skills、背景提示與工具資訊，再由 compaction 依真正 request view 判斷；摘要沿同一 OpenRouter／Luna route、沒有業務 tools，usage callback 可見，文件根 Checkpointer 同時保存 `jd_model_view` 與 `continuation_compaction`，canonical messages 不變。A／checkpoint／runtime／chat／背景提示相鄰離線回歸 134 項通過；未修改 `JdNoticeMiddleware`、Prompt、Memory、Working State 或 B1／B2，未讀 key、未呼叫 provider。下個小步是 B2 的 attempt-scoped OpenRouter 接線，不跳做 dispatcher 或付費 smoke。
 
 1. 以公開 LangChain／LangGraph middleware 接點新增 typed `continuation_compaction`，只保存 summary＋安全邊界＋canonical prefix digest；canonical `messages`、B1 source、Memory／JD authority 不變，不新增 table、migration、dependency 或歷史 UI。
 2. 沿既有 OpenRouter model factory 進行摘要，固定 OpenAI-only／no-fallback／hidden retry 0。起始 profile 為 16k trigger、至少 8 messages、2048 summary output；是否觸發要計算套用既有 summary 後真正送出的 view，包含 instructions、JD／Memory context、tools、B2 固定任務原文與輸出預留。摘要呼叫沿同輪 callback／停止訊號；摘要後若已取消，不得再送主模型。現碼沒有持久通用美元帳本，本切片不另建；route／usage 可觀察與付費 smoke 外送／費用上限仍須驗收。

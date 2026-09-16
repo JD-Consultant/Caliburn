@@ -9,6 +9,7 @@ from uuid import uuid4
 import httpx
 import pytest
 from langchain.agents import create_agent
+from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
@@ -347,6 +348,190 @@ def test_factory_context_seam_changes_only_the_model_request():
     assert [message.id for message in result['messages'][:3]] == [
         'earlier', 'earlier-reply', 'current'
     ]
+
+
+def test_context_compaction_counts_the_fully_projected_request():
+    from langchain.agents.middleware import AgentMiddleware
+    from jd_relational.consultant_model import OPENROUTER_HEADERS, create_consultant_model
+    from jd_relational.continuation_compaction import (
+        CompactionProfile,
+        ContinuationCompactionMiddleware,
+    )
+    from support.openrouter_replies import reply
+
+    context, _ = setup()
+    counted = []
+
+    class InnerContext(AgentMiddleware):
+        def wrap_model_call(self, request, handler):
+            content = request.system_message.content
+            blocks = ([{'type': 'text', 'text': content}]
+                      if isinstance(content, str) else list(content))
+            blocks.append({'type': 'text', 'text': 'inner-skills-and-background-context'})
+            return handler(request.override(system_message=SystemMessage(content=blocks)))
+
+    def count(request, view):
+        counted.append(deepcopy(request.system_message.content))
+        return 0
+
+    def receive(request):
+        return httpx.Response(200, json=reply('projected', text='完整合成回覆'),
+                              request=request)
+
+    transport = httpx.MockTransport(receive)
+    client = httpx.Client(transport=transport, trust_env=False, headers=OPENROUTER_HEADERS)
+    async_client = httpx.AsyncClient(
+        transport=transport, trust_env=False, headers=OPENROUTER_HEADERS)
+    try:
+        model = create_consultant_model(
+            api_key='synthetic-no-key', http_client=client,
+            async_http_client=async_client, request_timeout=5, max_output_tokens=64)
+        compaction = ContinuationCompactionMiddleware(
+            summary_model=model,
+            profile=CompactionProfile(trigger_input_tokens=100, keep_messages=1),
+            token_counter=count,
+        )
+        child = build_consultant_node(
+            model,
+            tools=[],
+            guidance='synthetic',
+            context_middleware=compaction,
+            extra_middleware=[InnerContext()],
+        )
+        root = build_document_graph(child, InMemorySaver())
+        root.invoke(
+            {'messages': [HumanMessage(id='current', content='目前問題。')]},
+            {'configurable': {'thread_id': context.document_id}},
+            context=context,
+            durability='sync',
+        )
+    finally:
+        client.close()
+        asyncio.run(async_client.aclose())
+
+    assert len(counted) == 1
+    rendered = json.dumps(counted[0], ensure_ascii=False)
+    assert 'jd_change_notice' in rendered
+    assert 'inner-skills-and-background-context' in rendered
+
+
+def test_a_compaction_and_jd_notice_commands_are_saved_together():
+    from jd_relational.consultant_model import (
+        CONSULTANT_MODEL,
+        OPENROUTER_HEADERS,
+        OPENROUTER_PROVIDER,
+        create_consultant_model,
+    )
+    from jd_relational.continuation_compaction import (
+        CompactionProfile,
+        ContinuationCompaction,
+        ContinuationCompactionMiddleware,
+    )
+    from support.openrouter_replies import reply
+
+    context, _ = setup()
+    payloads = []
+    observed_model_replies = []
+
+    class Capture(BaseCallbackHandler):
+        def on_llm_end(self, response, **kwargs):
+            observed_model_replies.append(response.generations[0][0].message)
+
+    @tool
+    def synthetic_jd_read(target: str) -> str:
+        """Expose one harmless business tool to the main request only."""
+        return target
+
+    def receive(request):
+        payloads.append(json.loads(request.content))
+        response = (reply('summary', text='舊訪談已確認案例 A；目前要處理最新更正。')
+                    if len(payloads) == 1
+                    else reply('main', text='我會先確認最新更正。'))
+        return httpx.Response(200, json=response, request=request)
+
+    transport = httpx.MockTransport(receive)
+    client = httpx.Client(transport=transport, trust_env=False, headers=OPENROUTER_HEADERS)
+    async_client = httpx.AsyncClient(
+        transport=transport, trust_env=False, headers=OPENROUTER_HEADERS)
+    try:
+        model = create_consultant_model(
+            api_key='synthetic-no-key', http_client=client,
+            async_http_client=async_client, request_timeout=5, max_output_tokens=64)
+        compaction = ContinuationCompactionMiddleware(
+            summary_model=model,
+            profile=CompactionProfile(trigger_input_tokens=1, keep_messages=1),
+            token_counter=lambda request, view: 100,
+        )
+        child = build_consultant_node(
+            model, tools=[synthetic_jd_read], guidance='synthetic',
+            context_middleware=compaction)
+        root = build_document_graph(child, InMemorySaver())
+        earlier = HumanMessage(id='earlier', content='案例 A 是每週巡檢。')
+        earlier_reply = AIMessage(id='earlier-reply', content='已記錄案例 A。')
+        current = HumanMessage(id='current', content='最新更正：其實是每月。')
+        originals = [deepcopy(message.model_dump())
+                     for message in (earlier, earlier_reply, current)]
+        result = root.invoke(
+            {'messages': [earlier, earlier_reply, current]},
+            {
+                'configurable': {'thread_id': context.document_id},
+                'callbacks': [Capture()],
+            },
+            context=context,
+            durability='sync',
+        )
+    finally:
+        client.close()
+        asyncio.run(async_client.aclose())
+
+    assert len(payloads) == 2
+    assert payloads[0]['max_tokens'] == 2048
+    assert [payload['model'] for payload in payloads] == [CONSULTANT_MODEL] * 2
+    assert [payload['provider'] for payload in payloads] == [
+        {
+            'only': [OPENROUTER_PROVIDER],
+            'order': [OPENROUTER_PROVIDER],
+            'allow_fallbacks': False,
+            'require_parameters': True,
+        }
+    ] * 2
+    assert 'tools' not in payloads[0]
+    assert payloads[1]['tools'][0]['function']['name'] == 'synthetic_jd_read'
+    # The nested summary call inherits the graph callback context, so the extra
+    # paid call cannot disappear from runtime usage instrumentation.
+    assert [message.text for message in observed_model_replies] == [
+        '舊訪談已確認案例 A；目前要處理最新更正。',
+        '我會先確認最新更正。',
+    ]
+    expected_usage = {
+        'input_tokens': 20,
+        'output_tokens': 10,
+        'total_tokens': 30,
+    }
+    assert all(message.usage_metadata == expected_usage
+               for message in observed_model_replies)
+    assert all(message.response_metadata['provider'] == 'OpenAI'
+               for message in observed_model_replies)
+    main_messages = payloads[1]['messages']
+    assert [message['role'] for message in main_messages] == ['system', 'assistant', 'user']
+    assert '對話延續摘要' in main_messages[1]['content']
+    assert main_messages[2]['content'] == '最新更正：其實是每月。'
+    assert [message.model_dump() for message in result['messages'][:3]] == originals
+    saved = ContinuationCompaction.model_validate(
+        result['continuation_compaction'], strict=True)
+    assert saved.covered_through_message_id == 'earlier-reply'
+    checkpoint = root.get_state(
+        {'configurable': {'thread_id': context.document_id}}, subgraphs=True)
+    checkpoint_saved = ContinuationCompaction.model_validate(
+        checkpoint.values['continuation_compaction'], strict=True)
+    assert checkpoint_saved == saved
+    view = read_closed_model_view(
+        root,
+        document_id=context.document_id,
+        dataset_id=context.dataset_id,
+        run_id=context.run_id,
+    )
+    assert view.response_message_id == result['messages'][-1].id
 
 
 def test_a_taken_back_turn_is_named_in_the_notice_and_nothing_else_is():

@@ -2,7 +2,7 @@
 
 - 日期：2026-09-16
 - Topic：`JD-R002／CTX-C001`
-- Stage：**G7 分段施工；基礎元件完成，正式 A／B2 接線未開始**
+- Stage：**G7 分段施工；基礎元件與正式 A 接線完成，B2 尚未開始**
 - 取代：2026-09-15「等待 OpenRouter、改 direct OpenAI、另選長上下文策略」三選一的未決狀態
 - 不取代：Q019 顧問 Prompt、Skills、JD relational writer、publication CAS、背景通知與准入規則；Memory 的最新 B1／B2／C 產品語意改由 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 持有
 
@@ -11,6 +11,8 @@
 > **2026-09-16 CTX-W001 邊界：**主顧問在尚無 Memory、尚未觸發 compaction 或一次無法問完時所需的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)另行承接。它與 continuity summary 都是非權威衍生狀態，但責任不同；summary 不可成為 Working State 的唯一 owner，Working State 也不取代長對話 compaction。
 
 > **2026-09-16 G7 第一小步結果：**已新增尚未接入正式 A／B2 的共用 typed state、role profile、安全工具 wave 切點、canonical prefix digest、增量 summary prompt、request-only view 與同步 middleware。鎖定 LangChain 的真實 `create_agent`／Saver 離線反例共 12 項通過，涵蓋 canonical 不變、B2 固定任務、跨 graph 重建恢復、依實際 view 判斷、主模型失敗或截斷不發布、取消與截斷摘要拒絕。這只是基礎接點，不代表 A 與 B2 已改線、OpenRouter 自然 smoke 通過或 H4 完成；下一步才是 A 的真實 middleware 組合與 Command 累積反例。
+
+> **2026-09-16 G7 第二小步結果：**正式 `build_consultant()` 現預設注入 A profile 的 compaction middleware，摘要沿同一個 OpenRouter／Luna model boundary，主回答預留沿顧問既有 8,192 tokens。A 的完整 JD／Memory、Skills、背景提示與工具投影先組裝，compaction 最後依真正 request view 計算；文件根 state 保留 `continuation_compaction`，不再於 child 返回 root 時遺失。真 `create_agent`＋真 OpenRouter client／合成 HTTP＋Saver 反例確認：摘要與主回答使用相同 OpenAI-only／no-fallback route、摘要 request 沒有業務 tools、兩次 usage callback 均可觀察、`jd_model_view` 與 `continuation_compaction` 同次保存且 canonical messages 未改。A／checkpoint／runtime／chat／背景提示相鄰離線回歸 134 項通過；唯一警告是測試環境無法寫 `.pytest_cache`。未修改 `JdNoticeMiddleware`、Prompt、Memory、Working State 或 B1／B2，未讀 key、未呼叫 provider。下一步才是 B2 attempt-scoped 接線。
 
 ## 1. 決定與產品效果
 
@@ -151,7 +153,7 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 
 ## 9. G7 最小施工與驗收
 
-施工只分成一個可審切片：
+施工分成可獨立複核的小步；目前 1–2 與 4 的 A 範圍已完成，3 尚未開始：
 
 1. 新增 typed compaction state、公開 middleware 與 profile 設定；不加 dependency／table／migration。
 2. 正式 A 注入新 middleware；以鎖定 LangChain 的真實組裝測試證明 `jd_model_view` 與 `continuation_compaction` 同時保存，不預設修改 `JdNoticeMiddleware`。

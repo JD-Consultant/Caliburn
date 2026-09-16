@@ -22,6 +22,7 @@ from langgraph.config import get_config
 from langgraph.types import Command
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
+from .continuation_compaction import ContinuationCompactionState
 from .notice_history import NoticeBoundary, NoticeHistoryReader, NoticeMaterial
 from .openai_responses import accepted
 from .references import ReferenceCodec, SignedReference
@@ -77,7 +78,7 @@ class ModelView(BaseModel):
         return NoticeBoundary(UUID(self.revision_id), self.revision_number)
 
 
-class ConsultantState(AgentState):
+class ConsultantState(ContinuationCompactionState):
     jd_memory_view: dict[str, Any] | None
     jd_model_view: dict[str, Any] | None
     jd_ai_run: dict[str, Any] | None
@@ -318,10 +319,13 @@ def build_consultant_node(model, *, tools, guidance: str, extra_middleware=(),
         raise ConsultantContextError("invalid_consultant_configuration")
     # This role's verified budgets, declared where the agent is assembled.
     middleware = [JdNoticeMiddleware(),
-                  *([context_middleware] if context_middleware is not None else []),
                   *extra_middleware,
                   ModelCallLimitMiddleware(thread_limit=MAX_MODEL_STEPS, exit_behavior="end"),
-                  ToolCallLimitMiddleware(thread_limit=MAX_TOOL_CALLS, exit_behavior="end")]
+                  ToolCallLimitMiddleware(thread_limit=MAX_TOOL_CALLS, exit_behavior="end"),
+                  # Request-only context projection must run after every
+                  # middleware that appends Skills or App notices, otherwise
+                  # its budget is not the request that reaches the model.
+                  *([context_middleware] if context_middleware is not None else [])]
     if inspection:
         from .consultant_tools import AiToolMiddleware
         # Only this known layout has its non-wrap hook guarded. Unknown hooks

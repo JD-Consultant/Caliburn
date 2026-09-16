@@ -13,7 +13,12 @@ work or grants writer authority.
 from .background_availability import BackgroundAvailability
 from .consultant_context import build_consultant_node
 from .consultant_guidance import build_consultant_guidance
+from .consultant_model import MAX_OUTPUT_TOKENS
 from .consultant_tools import AiToolMiddleware
+from .continuation_compaction import (
+    A_COMPACTION_PROFILE,
+    ContinuationCompactionMiddleware,
+)
 from .memory_context import build_consultant_tools
 
 
@@ -44,6 +49,14 @@ def build_consultant(model, *, admissions=None, windows=None, tools=None, guidan
     middleware = [AiToolMiddleware(), analysis_skills_middleware()]
     if all(value is not None for value in background):
         middleware.append(BackgroundAvailability(admissions, windows))
+    if context_middleware is None:
+        profile = A_COMPACTION_PROFILE.model_copy(update={
+            "main_output_reserve_tokens": MAX_OUTPUT_TOKENS,
+        })
+        context_middleware = ContinuationCompactionMiddleware(
+            summary_model=model,
+            profile=profile,
+        )
     return build_consultant_node(
         model,
         tools=build_consultant_tools() if tools is None else tools,

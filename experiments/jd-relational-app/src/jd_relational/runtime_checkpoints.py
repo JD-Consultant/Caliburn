@@ -32,6 +32,7 @@ class CheckpointError(ValueError):
 
 
 class DocumentState(MessagesState):
+    continuation_compaction: dict[str, Any] | None
     jd_memory_view: dict[str, Any] | None
     jd_manual_pending: dict[str, Any] | None
     jd_model_view: dict[str, Any] | None

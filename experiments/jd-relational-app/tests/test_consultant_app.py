@@ -12,6 +12,7 @@ from jd_relational.consultant_app import build_consultant
 from jd_relational.consultant_guidance import build_consultant_guidance
 from jd_relational.consultant_model import create_consultant_model
 from jd_relational.consultant_tools import AiToolMiddleware
+from jd_relational.continuation_compaction import ContinuationCompactionMiddleware
 from support.openrouter_replies import reply
 from test_consultant_model import answering
 
@@ -91,7 +92,12 @@ def test_the_app_installs_the_tool_middleware_and_the_skills_middleware(model, m
     module.build_consultant(model, admissions=Admissions(), windows=Windows())
     assert captured["middleware"] == [AiToolMiddleware.__name__, "SkillsMiddleware",
                                       BackgroundAvailability.__name__]
-    assert captured["context_middleware"] is None
+    assert isinstance(captured["context_middleware"], ContinuationCompactionMiddleware)
+    assert captured["context_middleware"].summary_model is model
+    profile = captured["context_middleware"].profile
+    assert (profile.trigger_input_tokens, profile.keep_messages,
+            profile.summary_max_output_tokens) == (16000, 8, 2048)
+    assert profile.main_output_reserve_tokens == 8192
     assert captured["guidance"] == build_consultant_guidance()
 
 

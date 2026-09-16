@@ -50,9 +50,11 @@ CASE_MAINTENANCE_INSTRUCTIONS = """你是背景工作案例整理者 B1，不是
 
 案例正文要保留會影響工作理解的完整實況：目的、本人實際行動、他人角色與責任、交接、觸發／頻率、條件、判斷依據、結果、例外、案例差異、更正、時間適用範圍及真正未確認事項。無關寒暄與重複措辭可省略；少見、一次性或過去工作仍可能重要，不能只因不常發生就刪除。不要把一個案例的工具、責任、頻率、條件或結果套到其他案例，也不要把顧問推測、continuity summary 或未被原話支持的內容寫成事實。
 
-同一真實案例的補充、更正或目前狀態變化保留既有 case_id，用 revise_case 做最小且完整的局部修改；未提及不等於撤銷。真正獨立的情境才 create_case。只有既有案例確實錯誤混合、重複或已證明不成立時才 split／merge／retire，並先讀所有受影響正文。guide 路由語意沒有改變時不必重寫；需要改時只提供 route_note，ID、來源、路徑與版本由 Runtime 管理。
+每個證據區塊都有本次 attempt 專用的 E1、E2 等 evidence_key；只選 Runtime 已展示的 key，不填 reference、offset 或順序。案例必須保留足以讓人只看引用也能理解案例的完整支持證據；同一證據可支持多個案例，一個案例也可選多個證據。create_case 要提交該新案例的完整 evidence_keys。revise_case 只用 add_evidence_keys／remove_evidence_keys 表達引用差異，未列出的既有引用保持不變；只修引用時 diff 可為 null。split_case 要為每個 replacement 提交完整 evidence_keys；舊引用若未分配給任何 replacement，必須在 discarded_evidence 說明原因。merge_cases 以被合併案例的引用聯集為起點，只提交 add／remove 差異。工具成功回傳的 key 順序是來源 owner 的正式順序。
 
-WINDOW.position／count 表示本批窗口進度。每個非最後窗口完成判斷後，以不呼叫工具的簡短回覆結束該窗口；不要提前 finish。最後窗口處理完所有必要操作後，必須呼叫 finish_case_maintenance(outcome)：有 staged 語意變更用 changed，整批沒有任何變更才用 no_op。工具錯誤是 Runtime 驗證回饋，不是員工原話；依錯誤修正，不能藉由清空案例、猜測來源或重填系統欄位繞過。
+同一真實案例的補充、更正或目前狀態變化保留既有 case_id，用 revise_case 做最小且完整的局部修改；未提及不等於撤銷。真正獨立的情境才 create_case。只有既有案例確實錯誤混合、重複或已證明不成立時才 split／merge／retire，並先讀所有受影響正文。guide 路由語意沒有改變時不必重寫；若只有 route 改變，用 set_case_route，不要把它包成案例 revise。需要更新 route 時只提供 route_note，ID、來源、路徑與版本由 Runtime 管理。
+
+WINDOW.position／count 表示本批窗口進度。每個非最後窗口完成判斷後，以不呼叫工具的簡短回覆結束該窗口；不要提前 finish。最後窗口處理完所有必要操作後，必須以零參數呼叫 finish_case_maintenance()；changed／no_op 由 Runtime 根據 staged 變更計算。工具錯誤是 Runtime 驗證回饋，不是員工原話；依錯誤修正，不能藉由清空案例、猜測來源或重填系統欄位繞過。
 
 不要輸出隱藏推理，不要填 document_id、source reference、版本、digest、路徑、時間、operation ID 或新 case_id。B1 結果只是 staged 候選，尚未發布，也不能宣稱 Memory 或 JD 已更新。"""
 
@@ -243,6 +245,78 @@ class ReplacementInput(BaseModel):
     model_config = ConfigDict(extra="forbid")
     content: str = Field(description="Complete case prose; preserve concrete actions, conditions and exceptions")
     route_note: str = Field(description="One-line guide wording; do not provide IDs, paths or source references")
+    evidence_keys: list[str] = Field(
+        min_length=1,
+        description="Complete supporting evidence keys for this replacement; copy only Runtime-provided keys",
+    )
+
+
+class EvidenceDiscardInput(BaseModel):
+    """An explicit semantic reason for not carrying one old citation into a split."""
+
+    model_config = ConfigDict(extra="forbid")
+    evidence_key: str
+    reason: str
+
+
+class _StrictToolInput(BaseModel):
+    """Runtime-validating base for model tool input; injected fields stay hidden."""
+
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    runtime: ToolRuntime
+
+
+class _ReadCaseInput(_StrictToolInput):
+    case_id: str
+
+
+class _BrowseInterviewHistoryInput(_StrictToolInput):
+    pass
+
+
+class _ReadMoreEvidenceInput(_StrictToolInput):
+    evidence_key: str
+
+
+class _CreateCaseInput(_StrictToolInput):
+    content: str
+    route_note: str
+    evidence_keys: list[str] = Field(min_length=1)
+
+
+class _ReviseCaseInput(_StrictToolInput):
+    case_id: str
+    diff: str | None
+    route_note: str | None
+    add_evidence_keys: list[str]
+    remove_evidence_keys: list[str]
+
+
+class _SplitCaseInput(_StrictToolInput):
+    case_id: str
+    replacements: list[ReplacementInput] = Field(min_length=2, max_length=MAX_REPLACEMENTS)
+    discarded_evidence: list[EvidenceDiscardInput]
+
+
+class _MergeCasesInput(_StrictToolInput):
+    case_ids: list[str] = Field(min_length=2, max_length=MAX_REPLACEMENTS)
+    content: str
+    route_note: str
+    add_evidence_keys: list[str]
+    remove_evidence_keys: list[str]
+
+
+class _RetireCaseInput(_StrictToolInput):
+    case_id: str
+
+
+class _SetCaseRouteInput(_StrictToolInput):
+    case_id: str
+    route_note: str
+
+
+class _FinishCaseMaintenanceInput(_StrictToolInput):
+    pass
 
 
 def _route_note(value: str) -> str:
@@ -309,6 +383,20 @@ def _normalized_case(content: str) -> str:
     if not content.strip():
         raise CaseMaintenanceError("invalid_case_content", "Case content cannot be empty")
     return content
+
+
+def _discard_reason(value: str) -> str:
+    if type(value) is not str:
+        raise CaseMaintenanceError("invalid_discard_reason", "Evidence discard reason must be text")
+    value = value.strip()
+    if (not value or len(value) > MAX_ROUTE_NOTE_CHARACTERS
+            or "\n" in value or "\r" in value or controlled_references(value)):
+        raise CaseMaintenanceError(
+            "invalid_discard_reason",
+            f"Evidence discard reason must be one plain line of at most "
+            f"{MAX_ROUTE_NOTE_CHARACTERS} characters",
+        )
+    return value
 
 
 class CaseMaintenanceSession:
@@ -403,16 +491,26 @@ class CaseMaintenanceSession:
         for case_id in stage.base_case_ids:
             _stable_id(case_id, field="case_id")
         upsert_ids: set[str] = set()
+        evidence_by_reference = {item.source_reference: item for item in stage.evidence}
         for item in stage.upserts:
             _stable_id(item.case_id, field="case_id")
             if item.case_id in upsert_ids:
                 raise CaseMaintenanceError("invalid_case_stage", "Duplicate staged case identity")
             upsert_ids.add(item.case_id)
             _normalized_case(item.content)
-            if stage.source_reference not in item.source_references:
-                raise CaseMaintenanceError("invalid_case_stage", "Changed case does not retain the current source")
-            for reference in item.source_references:
-                self.artifacts.validate_source(reference)
+            if not item.source_references or len(set(item.source_references)) != len(item.source_references):
+                raise CaseMaintenanceError(
+                    "invalid_case_stage", "Changed case evidence is empty or duplicated")
+            if any(reference not in evidence_by_reference for reference in item.source_references):
+                raise CaseMaintenanceError(
+                    "invalid_case_stage", "Changed case evidence was not supplied in this attempt")
+            ordered = tuple(entry.source_reference for entry in sorted(
+                (evidence_by_reference[reference] for reference in item.source_references),
+                key=lambda entry: entry.order_key,
+            ))
+            if item.source_references != ordered:
+                raise CaseMaintenanceError(
+                    "invalid_case_stage", "Changed case evidence is not in canonical order")
         retired: set[str] = set()
         for item in stage.supersessions:
             if item.kind != "case" or item.retired_id not in stage.base_case_ids or item.retired_id in retired:
@@ -461,6 +559,83 @@ class CaseMaintenanceSession:
             raise CaseMaintenanceError(
                 "unknown_evidence_key", "Use an evidence key already supplied by the Runtime")
         return item
+
+    def resolve_evidence_keys(
+        self,
+        stage: CaseMaintenanceStage,
+        evidence_keys: list[str],
+        *,
+        allow_empty: bool = False,
+    ) -> tuple[tuple[str, ...], tuple[str, ...]]:
+        """Resolve model keys to Runtime references and canonicalize owner order."""
+        self._validate(stage)
+        if (type(evidence_keys) is not list
+                or (not allow_empty and not evidence_keys)
+                or any(type(key) is not str for key in evidence_keys)):
+            raise CaseMaintenanceError(
+                "invalid_evidence_keys", "Select at least one Runtime-provided evidence key")
+        if len(set(evidence_keys)) != len(evidence_keys):
+            raise CaseMaintenanceError(
+                "duplicate_evidence_key", "Do not repeat an evidence key in one selection")
+        selected = [self.evidence(stage, key) for key in evidence_keys]
+        selected.sort(key=lambda item: item.order_key)
+        return (tuple(item.source_reference for item in selected),
+                tuple(item.evidence_key for item in selected))
+
+    def evidence_keys(
+        self, stage: CaseMaintenanceStage, references: tuple[str, ...],
+    ) -> tuple[str, ...]:
+        """Return canonical attempt keys for already validated formal references."""
+        self._validate(stage)
+        if not references or len(set(references)) != len(references):
+            raise CaseMaintenanceError(
+                "invalid_case_evidence", "Case evidence is empty or duplicated")
+        by_reference = {item.source_reference: item for item in stage.evidence}
+        if any(reference not in by_reference for reference in references):
+            raise CaseMaintenanceError(
+                "unknown_case_evidence", "Case evidence was not supplied in this attempt")
+        return tuple(item.evidence_key for item in sorted(
+            (by_reference[reference] for reference in references),
+            key=lambda item: item.order_key,
+        ))
+
+    def apply_evidence_delta(
+        self,
+        stage: CaseMaintenanceStage,
+        current_references: tuple[str, ...],
+        *,
+        add_evidence_keys: list[str],
+        remove_evidence_keys: list[str],
+    ) -> tuple[tuple[str, ...], tuple[str, ...]]:
+        """Apply a model-selected delta to a Runtime-known complete reference set."""
+        self.evidence_keys(stage, current_references)
+        add_references, _add_keys = self.resolve_evidence_keys(
+            stage, add_evidence_keys, allow_empty=True)
+        remove_references, _remove_keys = self.resolve_evidence_keys(
+            stage, remove_evidence_keys, allow_empty=True)
+        if set(add_evidence_keys) & set(remove_evidence_keys):
+            raise CaseMaintenanceError(
+                "conflicting_evidence_change", "The same evidence cannot be added and removed")
+        current = set(current_references)
+        if any(reference in current for reference in add_references):
+            raise CaseMaintenanceError(
+                "evidence_already_attached", "Added evidence is already attached")
+        if any(reference not in current for reference in remove_references):
+            raise CaseMaintenanceError(
+                "evidence_not_attached", "Removed evidence is not attached")
+        selected = (current | set(add_references)) - set(remove_references)
+        if not selected:
+            raise CaseMaintenanceError(
+                "empty_case_evidence", "A current case must retain at least one evidence source")
+        entries = sorted(
+            (item for item in stage.evidence if item.source_reference in selected),
+            key=lambda item: item.order_key,
+        )
+        references = tuple(item.source_reference for item in entries)
+        if len(references) != len(selected):
+            raise CaseMaintenanceError(
+                "unknown_case_evidence", "Case evidence was not supplied in this attempt")
+        return references, tuple(item.evidence_key for item in entries)
 
     def register_evidence(
         self,
@@ -615,35 +790,53 @@ class CaseMaintenanceSession:
                 current: tuple[str, ...], **updates: Any) -> CaseMaintenanceStage:
         return replace(stage, changes=(*stage.changes, CaseChange(kind, previous, current)), **updates)
 
-    def create_case(self, stage: CaseMaintenanceStage, *, content: str, route_note: str) -> CaseMaintenanceStage:
+    def create_case(self, stage: CaseMaintenanceStage, *, content: str, route_note: str,
+                    evidence_keys: list[str]) -> CaseMaintenanceStage:
         self._open_stage(stage)
+        content = _normalized_case(content)
+        references, _ordered_keys = self.resolve_evidence_keys(stage, evidence_keys)
+        route_note = _route_note(route_note)
         case_id = self._new_id(stage)
-        artifact = CaseArtifact(case_id, _normalized_case(content), (stage.source_reference,))
+        artifact = CaseArtifact(case_id, content, references)
         guide = _replace_route(stage.case_guide, case_id, route_note)
         return self._change(stage, "create", (), (case_id,),
                             upserts=self._with_upsert(stage, artifact), case_guide=guide)
 
-    def revise_case(self, stage: CaseMaintenanceStage, *, case_id: str, diff: str,
-                    route_note: str | None) -> CaseMaintenanceStage:
+    def revise_case(self, stage: CaseMaintenanceStage, *, case_id: str, diff: str | None,
+                    route_note: str | None, add_evidence_keys: list[str],
+                    remove_evidence_keys: list[str]) -> CaseMaintenanceStage:
         self._open_stage(stage)
         case_id = self._require_observed(stage, case_id)
         current = self.read_case(stage, case_id)
-        try:
-            content = apply_text_patch(current.content, diff, label=f"case {current.case_id}")
-        except MemoryPatchError as error:
-            raise CaseMaintenanceError("case_patch_failed", str(error)) from error
-        content = _normalized_case(content)
-        if content == current.content:
-            raise CaseMaintenanceError("case_unchanged", "Case patch made no change; use no-op when nothing else changed")
-        references = tuple(dict.fromkeys((*current.source_references, stage.source_reference)))
+        if diff is not None and type(diff) is not str:
+            raise CaseMaintenanceError("invalid_case_content", "Case diff must be text or null")
+        references, _ordered_keys = self.apply_evidence_delta(
+            stage, current.source_references,
+            add_evidence_keys=add_evidence_keys,
+            remove_evidence_keys=remove_evidence_keys,
+        )
+        content = current.content
+        if diff is not None:
+            try:
+                content = apply_text_patch(current.content, diff, label=f"case {current.case_id}")
+            except MemoryPatchError as error:
+                raise CaseMaintenanceError("case_patch_failed", str(error)) from error
+            content = _normalized_case(content)
         artifact = CaseArtifact(current.case_id, content, references)
         guide = (stage.case_guide if route_note is None
                  else _replace_route(stage.case_guide, current.case_id, route_note))
+        if content == current.content and references == current.source_references:
+            if guide != stage.case_guide:
+                raise CaseMaintenanceError(
+                    "route_only_revision", "Use set_case_route for a route-only change")
+            raise CaseMaintenanceError(
+                "case_unchanged", "Case revision made no change; use finish when nothing changed")
         return self._change(stage, "revise", (current.case_id,), (current.case_id,),
                             upserts=self._with_upsert(stage, artifact), case_guide=guide)
 
     def split_case(self, stage: CaseMaintenanceStage, *, case_id: str,
-                   replacements: list[ReplacementInput]) -> CaseMaintenanceStage:
+                   replacements: list[ReplacementInput],
+                   discarded_evidence: list[EvidenceDiscardInput]) -> CaseMaintenanceStage:
         self._open_stage(stage)
         case_id = self._require_observed(stage, case_id)
         current = self.read_case(stage, case_id)
@@ -651,17 +844,43 @@ class CaseMaintenanceSession:
             raise CaseMaintenanceError("unstable_case_identity", "Revise a case created in this attempt instead of superseding it")
         if not 2 <= len(replacements) <= MAX_REPLACEMENTS:
             raise CaseMaintenanceError("invalid_split", f"Split requires 2 to {MAX_REPLACEMENTS} replacement cases")
-        prepared = [(_normalized_case(item.content), _route_note(item.route_note)) for item in replacements]
+        if (type(discarded_evidence) is not list
+                or any(not isinstance(item, EvidenceDiscardInput) for item in discarded_evidence)):
+            raise CaseMaintenanceError(
+                "invalid_discarded_evidence", "Discarded evidence must include a key and reason")
+        current_keys = set(self.evidence_keys(stage, current.source_references))
+        prepared = []
+        used_old_keys: set[str] = set()
+        for item in replacements:
+            references, ordered_keys = self.resolve_evidence_keys(stage, item.evidence_keys)
+            used_old_keys.update(current_keys & set(ordered_keys))
+            prepared.append((
+                _normalized_case(item.content), _route_note(item.route_note), references,
+            ))
+        discard_keys = [item.evidence_key for item in discarded_evidence]
+        if len(set(discard_keys)) != len(discard_keys):
+            raise CaseMaintenanceError(
+                "duplicate_evidence_key", "Do not repeat discarded evidence keys")
+        for item in discarded_evidence:
+            if item.evidence_key not in current_keys:
+                raise CaseMaintenanceError(
+                    "invalid_discarded_evidence", "Only old case evidence may be discarded")
+            _discard_reason(item.reason)
+        expected_discards = current_keys - used_old_keys
+        if set(discard_keys) != expected_discards:
+            raise CaseMaintenanceError(
+                "unaccounted_split_evidence",
+                "Every old case evidence key must be assigned or explicitly accounted for with a reason",
+            )
         reserved: set[str] = set()
         new_ids: list[str] = []
         for _item in prepared:
             new_id = self._new_id(stage, reserved)
             reserved.add(new_id)
             new_ids.append(new_id)
-        references = tuple(dict.fromkeys((*current.source_references, stage.source_reference)))
         upserts = list(self._without_upserts(stage, {current.case_id}))
         guide = _remove_route(stage.case_guide, current.case_id)
-        for new_id, (content, note) in zip(new_ids, prepared, strict=True):
+        for new_id, (content, note, references) in zip(new_ids, prepared, strict=True):
             upserts.append(CaseArtifact(new_id, content, references))
             guide = _replace_route(guide, new_id, note)
         supersessions = (*stage.supersessions, Supersession("case", current.case_id, tuple(new_ids)))
@@ -670,7 +889,8 @@ class CaseMaintenanceSession:
                             supersessions=supersessions, case_guide=guide)
 
     def merge_cases(self, stage: CaseMaintenanceStage, *, case_ids: list[str], content: str,
-                    route_note: str) -> CaseMaintenanceStage:
+                    route_note: str, add_evidence_keys: list[str],
+                    remove_evidence_keys: list[str]) -> CaseMaintenanceStage:
         self._open_stage(stage)
         if not 2 <= len(case_ids) <= MAX_REPLACEMENTS or len(set(case_ids)) != len(case_ids):
             raise CaseMaintenanceError("invalid_merge", f"Merge requires 2 to {MAX_REPLACEMENTS} distinct cases")
@@ -678,10 +898,17 @@ class CaseMaintenanceSession:
         current = [self.read_case(stage, case_id) for case_id in case_ids]
         if any(item.case_id not in stage.base_case_ids for item in current):
             raise CaseMaintenanceError("unstable_case_identity", "Revise cases created in this attempt instead of superseding them")
+        union = tuple(dict.fromkeys(reference for item in current
+                                   for reference in item.source_references))
+        references, _ordered_keys = self.apply_evidence_delta(
+            stage, union,
+            add_evidence_keys=add_evidence_keys,
+            remove_evidence_keys=remove_evidence_keys,
+        )
+        content = _normalized_case(content)
+        route_note = _route_note(route_note)
         new_id = self._new_id(stage)
-        references = tuple(dict.fromkeys(reference for item in current
-                                         for reference in (*item.source_references, stage.source_reference)))
-        artifact = CaseArtifact(new_id, _normalized_case(content), references)
+        artifact = CaseArtifact(new_id, content, references)
         retired = {item.case_id for item in current}
         guide = stage.case_guide
         for case_id in sorted(retired):
@@ -716,12 +943,9 @@ class CaseMaintenanceSession:
             raise CaseMaintenanceError("route_unchanged", "Case route did not change")
         return self._change(stage, "route", (current.case_id,), (current.case_id,), case_guide=guide)
 
-    def finish(self, stage: CaseMaintenanceStage, *, outcome: Literal["changed", "no_op"]
-               ) -> CaseMaintenanceStage:
+    def finish(self, stage: CaseMaintenanceStage) -> CaseMaintenanceStage:
         self._open_stage(stage)
-        if (outcome == "changed") != stage.changed:
-            raise CaseMaintenanceError(
-                "incorrect_case_outcome", "Finish outcome must match whether this stage contains semantic changes")
+        outcome: Literal["changed", "no_op"] = "changed" if stage.changed else "no_op"
         guide = _prepare_text(stage.case_guide, guide=True)
         expected = {_case_path(case_id) for case_id in stage.current_case_ids}
         actual = controlled_references(guide)
@@ -891,7 +1115,7 @@ def case_maintenance_tools(reader: ExtractionSourceReader, session: CaseMaintena
         return _message(name, runtime, "error", effect="unchanged", error=error.code,
                         next_action=str(error))
 
-    @tool("read_case")
+    @tool("read_case", args_schema=_ReadCaseInput)
     def read_case(case_id: str, runtime: ToolRuntime) -> Command | ToolMessage:
         """Read one current case and its owner-ordered interview evidence; this has no semantic effect."""
         try:
@@ -905,7 +1129,7 @@ def case_maintenance_tools(reader: ExtractionSourceReader, session: CaseMaintena
         except CaseMaintenanceError as error:
             return failure("read_case", runtime, error)
 
-    @tool("browse_interview_history")
+    @tool("browse_interview_history", args_schema=_BrowseInterviewHistoryInput)
     def browse_interview_history(runtime: ToolRuntime) -> Command | ToolMessage:
         """Read the next bounded page of fixed interview exchanges; Runtime owns the cursor."""
         try:
@@ -945,7 +1169,7 @@ def case_maintenance_tools(reader: ExtractionSourceReader, session: CaseMaintena
         except CaseMaintenanceError as error:
             return failure("browse_interview_history", runtime, error)
 
-    @tool("read_more_evidence")
+    @tool("read_more_evidence", args_schema=_ReadMoreEvidenceInput)
     def read_more_evidence(evidence_key: str,
                            runtime: ToolRuntime) -> Command | ToolMessage:
         """Continue one already supplied evidence block; Runtime owns its exact-source cursor."""
@@ -966,52 +1190,86 @@ def case_maintenance_tools(reader: ExtractionSourceReader, session: CaseMaintena
         except CaseMaintenanceError as error:
             return failure("read_more_evidence", runtime, error)
 
-    @tool("create_case")
-    def create_case(content: str, route_note: str, runtime: ToolRuntime) -> Command | ToolMessage:
-        """Stage one genuinely new complete work case; Runtime assigns its ID and canonical source."""
+    @tool("create_case", args_schema=_CreateCaseInput)
+    def create_case(
+        content: str,
+        route_note: str,
+        evidence_keys: Annotated[list[str], Field(min_length=1)],
+        runtime: ToolRuntime,
+    ) -> Command | ToolMessage:
+        """Stage one new complete case using all supporting evidence keys already shown by Runtime."""
         try:
-            updated = session.create_case(staged(runtime), content=content, route_note=route_note)
+            updated = session.create_case(
+                staged(runtime), content=content, route_note=route_note,
+                evidence_keys=evidence_keys)
             case_id = updated.changes[-1].current_case_ids[0]
-            return _updated("create_case", runtime, updated, case_id=case_id)
+            item = session.read_case(updated, case_id)
+            return _updated(
+                "create_case", runtime, updated, case_id=case_id,
+                evidence_keys=list(session.evidence_keys(updated, item.source_references)))
         except CaseMaintenanceError as error:
             return failure("create_case", runtime, error)
 
-    @tool("revise_case")
-    def revise_case(case_id: str, diff: str, route_note: str | None,
+    @tool("revise_case", args_schema=_ReviseCaseInput)
+    def revise_case(case_id: str, diff: str | None, route_note: str | None,
+                    add_evidence_keys: list[str], remove_evidence_keys: list[str],
                     runtime: ToolRuntime) -> Command | ToolMessage:
-        """Patch one current case in place; send null route_note when its existing guide wording still applies."""
+        """Revise one read case; omitted evidence stays, and diff may be null for an evidence-only fix."""
         try:
             updated = session.revise_case(staged(runtime), case_id=case_id, diff=diff,
-                                          route_note=route_note)
-            return _updated("revise_case", runtime, updated, case_id=case_id)
+                                          route_note=route_note,
+                                          add_evidence_keys=add_evidence_keys,
+                                          remove_evidence_keys=remove_evidence_keys)
+            item = session.read_case(updated, case_id)
+            return _updated(
+                "revise_case", runtime, updated, case_id=case_id,
+                evidence_keys=list(session.evidence_keys(updated, item.source_references)))
         except CaseMaintenanceError as error:
             return failure("revise_case", runtime, error)
 
-    @tool("split_case")
+    @tool("split_case", args_schema=_SplitCaseInput)
     def split_case(case_id: str,
                    replacements: Annotated[list[ReplacementInput], Field(min_length=2, max_length=MAX_REPLACEMENTS)],
+                   discarded_evidence: list[EvidenceDiscardInput],
                    runtime: ToolRuntime) -> Command | ToolMessage:
-        """Supersede one published case with two or more complete cases; Runtime assigns all replacement IDs."""
+        """Split one read case; assign complete evidence per replacement and explain every old key not reused."""
         try:
-            updated = session.split_case(staged(runtime), case_id=case_id, replacements=replacements)
-            return _updated("split_case", runtime, updated,
-                            case_ids=list(updated.changes[-1].current_case_ids))
+            updated = session.split_case(
+                staged(runtime), case_id=case_id, replacements=replacements,
+                discarded_evidence=discarded_evidence)
+            result = []
+            for current_id in updated.changes[-1].current_case_ids:
+                item = session.read_case(updated, current_id)
+                result.append({
+                    "case_id": current_id,
+                    "evidence_keys": list(session.evidence_keys(updated, item.source_references)),
+                })
+            return _updated(
+                "split_case", runtime, updated, cases=result,
+                discarded_evidence_keys=[item.evidence_key for item in discarded_evidence])
         except CaseMaintenanceError as error:
             return failure("split_case", runtime, error)
 
-    @tool("merge_cases")
+    @tool("merge_cases", args_schema=_MergeCasesInput)
     def merge_cases(case_ids: Annotated[list[str], Field(min_length=2, max_length=MAX_REPLACEMENTS)],
-                    content: str, route_note: str, runtime: ToolRuntime) -> Command | ToolMessage:
-        """Supersede two or more published cases with one complete current case; Runtime assigns its ID."""
+                    content: str, route_note: str, add_evidence_keys: list[str],
+                    remove_evidence_keys: list[str],
+                    runtime: ToolRuntime) -> Command | ToolMessage:
+        """Merge read cases from their evidence union, applying only explicit add/remove key differences."""
         try:
             updated = session.merge_cases(staged(runtime), case_ids=case_ids, content=content,
-                                          route_note=route_note)
-            return _updated("merge_cases", runtime, updated,
-                            case_id=updated.changes[-1].current_case_ids[0])
+                                          route_note=route_note,
+                                          add_evidence_keys=add_evidence_keys,
+                                          remove_evidence_keys=remove_evidence_keys)
+            case_id = updated.changes[-1].current_case_ids[0]
+            item = session.read_case(updated, case_id)
+            return _updated(
+                "merge_cases", runtime, updated, case_id=case_id,
+                evidence_keys=list(session.evidence_keys(updated, item.source_references)))
         except CaseMaintenanceError as error:
             return failure("merge_cases", runtime, error)
 
-    @tool("retire_case")
+    @tool("retire_case", args_schema=_RetireCaseInput)
     def retire_case(case_id: str, runtime: ToolRuntime) -> Command | ToolMessage:
         """Remove one published case that current canonical evidence shows is invalid, duplicate or out of scope."""
         try:
@@ -1020,7 +1278,7 @@ def case_maintenance_tools(reader: ExtractionSourceReader, session: CaseMaintena
         except CaseMaintenanceError as error:
             return failure("retire_case", runtime, error)
 
-    @tool("set_case_route")
+    @tool("set_case_route", args_schema=_SetCaseRouteInput)
     def set_case_route(case_id: str, route_note: str,
                        runtime: ToolRuntime) -> Command | ToolMessage:
         """Update only one current case's guide wording; Runtime keeps the ID and link target."""
@@ -1030,10 +1288,9 @@ def case_maintenance_tools(reader: ExtractionSourceReader, session: CaseMaintena
         except CaseMaintenanceError as error:
             return failure("set_case_route", runtime, error)
 
-    @tool("finish_case_maintenance")
-    def finish_case_maintenance(outcome: Literal["changed", "no_op"],
-                                runtime: ToolRuntime) -> Command | ToolMessage:
-        """Finish B1 only after all case decisions and guide routes are complete; this does not publish Memory."""
+    @tool("finish_case_maintenance", args_schema=_FinishCaseMaintenanceInput)
+    def finish_case_maintenance(runtime: ToolRuntime) -> Command | ToolMessage:
+        """Finish B1 after all case decisions; Runtime computes changed or no_op and does not publish."""
         try:
             windows = runtime.state.get("source_windows")
             position = runtime.state.get("window_position")
@@ -1043,9 +1300,9 @@ def case_maintenance_tools(reader: ExtractionSourceReader, session: CaseMaintena
                     "source_windows_remaining",
                     "Do not finish B1 before Runtime supplies the final source window",
                 )
-            updated = session.finish(staged(runtime), outcome=outcome)
+            updated = session.finish(staged(runtime))
             return _updated("finish_case_maintenance", runtime, updated,
-                            effect="stage_complete", outcome=outcome,
+                            effect="stage_complete", outcome=updated.outcome,
                             current_case_ids=list(updated.current_case_ids))
         except CaseMaintenanceError as error:
             return failure("finish_case_maintenance", runtime, error)

@@ -24,7 +24,7 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 
 `CaseMaintenanceWorkflow` 已將 Runtime 固定的整批 canonical source 接到新 B1 Prompt 與上述工具。這個 batch 是語意整理與 `processed_source` 單位，不是案例引用；正式 App 能在實際 request 預算內完整提供時應使用單一來源窗口，只有來源或模型限制確實需要時，來源 owner 才在同一 batch 內提供多個有界 `NEW_SOURCE.window`／`CONTEXT_ONLY` 讀取窗口。每個 `NEW_SOURCE` 另帶 owner 排序的完整問答 evidence blocks，所有窗口共用同一 registry 與 staged attempt。若使用多窗口，非最後窗口不能提前完成，最後窗口必須明確 `changed`／`no_op`；模型與工具額度、完成修正、incomplete／refusal 防護及工具後 transport failure 的原 checkpoint resume 都由 graph 保留。窗口並非案例邊界或產品要求，package 的 `max_chars`／`max_windows` 也不是正式 App 的固定切割規則。
 
-create／revise／split／merge 目前仍保留舊的「自動附整批 window」暫時程式行為，尚未使用 registry 做精確 evidence 分配；這不是正式案例引用規則，也不能因此發布新 bundle。下一個引用切片會讓模型只選 Runtime 已展示的 keys，再由 Runtime 解析、驗證與 canonicalize 正式 references。guide link、穩定 UUID 與 supersession 仍由 Runtime 產生。
+create／revise／split／merge 已使用 attempt registry 做精確 evidence 分配：模型只選 Runtime 已展示的短 keys，Runtime 解析、驗證並依 source owner 順序 canonicalize 正式 signed references。create 提交完整引用集合；revise 只送 add/remove 差異且可做純引用修補；split 為每個 replacement 分配完整集合並明示未沿用舊證據的理由；merge 從既有聯集套用差異。`finish_case_maintenance()` 不收 outcome，由 Runtime 計算 `changed/no_op`。guide link、穩定 UUID 與 supersession 仍由 Runtime 產生；這些結果仍是 staged，尚未發布新 bundle。
 
 B1 的 canonical 訪談 batch 是受保護來源：之後的 request-only compaction 不得摘要、截斷或替換它，也不能把 continuity summary 當作案例證據。compaction 只能處理 B1 自己已安全完成的舊模型／工具往返；原始訪談由來源 owner 持續完整保存。
 
@@ -32,7 +32,7 @@ B1 的 canonical 訪談 batch 是受保護來源：之後的 request-only compac
 
 ### Ordered evidence source port（App 接點與 B1 stage 已接）
 
-`caliburn_memory.sources` 現提供 immutable typed evidence records：固定 window 內的逐輪 records、以同一 window 為上界的安全歷史分頁，以及 exact `source` 的有界文字頁。records 只含 signed reference 與 message ID／role；App source owner 才擁有 canonical order、lineage 與原文，adapter 不重排、不重簽、不建立第二份索引。B1 stage 已消費這些 port 並保存 key／order proof／cursor；offset 不是模型參數或持久 citation。B1 create／revise／split／merge 的精確引用分配及 B2 exact-source 工具仍依[引用施工計畫](../../docs/plans/2026-09-17-interview-evidence-citations.md)後續 task 接入。
+`caliburn_memory.sources` 現提供 immutable typed evidence records：固定 window 內的逐輪 records、以同一 window 為上界的安全歷史分頁，以及 exact `source` 的有界文字頁。records 只含 signed reference 與 message ID／role；App source owner 才擁有 canonical order、lineage 與原文，adapter 不重排、不重簽、不建立第二份索引。B1 stage 已消費這些 port 並保存 key／order proof／cursor；offset 不是模型參數或持久 citation。B1 create／revise／split／merge 的精確引用分配已完成；bundle 保存時的 owner-order 再驗證及 B2 exact-source key 工具仍依[引用施工計畫](../../docs/plans/2026-09-17-interview-evidence-citations.md) Task 5 接入。
 
 ### B2 工作理解 staged state／語意工具／durable Agent graph
 

@@ -16,13 +16,15 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 
 `PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致；舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑保持相容。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
 
-### B1 案例 staged state／語意工具
+### B1 案例 staged state／語意工具／固定來源 Agent graph
 
-`caliburn_memory.case_maintenance` 已完成第一個零 provider 切片：`CaseMaintenanceStage` 保存固定 base、canonical source、本 attempt 已讀案例、目前 staged upserts／supersessions／guide 與 change set；`case_maintenance_tools()` 提供 `read/create/revise/split/merge/retire/set-route/finish` 八個窄工具。模型不填 document、來源、版本、路徑、digest 或新案例 ID。
+`caliburn_memory.case_maintenance` 已完成兩個零 provider 切片：`CaseMaintenanceStage` 保存固定 base、canonical source、本 attempt 已讀案例、目前 staged upserts／supersessions／guide 與 change set；`case_maintenance_tools()` 提供 `read/create/revise/split/merge/retire/set-route/finish` 八個窄工具。模型不填 document、來源、版本、路徑、digest 或新案例 ID。
 
 修訂、拆分、合併或淘汰已發布案例前必須先成功 `read_case`，該證據與 stage 一起由 LangGraph checkpoint 保存；同一模型步的多工具呼叫全部拒絕，避免平行 state update。局部修訂沿既有 V4A matcher，但只接收案例內容與 diff，不把儲存 path 暴露給模型。新案例與修訂案例的來源由 Runtime 自動綁定；guide link、穩定 UUID 與 supersession 同樣由 Runtime 產生。
 
-這仍只是 B1 staging／工具契約：沒有 Agent Prompt、固定 source window graph、B2、publication、dispatcher、compaction 或 UI。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 第一施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
+`CaseMaintenanceWorkflow` 已將 Runtime 固定的整批 canonical source 接到新 B1 Prompt 與上述工具。來源 owner 可在批內提供多個有界 `NEW_SOURCE`／`CONTEXT_ONLY` 窗口；它們共用一個 staged attempt，只有整批 source 成為案例證據。非最後窗口不能提前完成，最後窗口必須明確 `changed`／`no_op`；模型與工具額度、完成修正、incomplete／refusal 防護及工具後 transport failure 的原 checkpoint resume 都由 graph 保留。模型／工具上限是 App 必填組裝值：舊 B1 的 16 是窗口上限，不能誤當新 Agent 步數，也不自動借用 A／B2 的 16／15。
+
+這仍只是 package 內的 B1 候選：沒有 B2、共同 publication、正式 App model factory、dispatcher、compaction、UI 或自然模型驗收。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
 
 ## 即時修補核心
 
@@ -36,7 +38,7 @@ App 配發 operation／base／source，模型只提供 path／diff；本核心�
 
 ## 舊 B1 訪談抽取核心（底層證據，產品語意已取代）
 
-`caliburn_memory.extraction.ExtractionWorkflow` 已自 `4f94fbfb` 採用。三文字欄位、prompt、窗口迴圈、格式更正額度、`start/resume/reextract` 保持已驗語意；`ExtractionSourceReader` 由 App 提供固定窗口與前置消歧，`accepted(raw)` 由 provider adapter 核拒絕／終局。這些來源固定、checkpoint、拒答／截斷與有限更正能力供新 B1 下一片沿用；三欄輸出與「保存詳記／候選即完成」已由 `MEM-L001` 取代，不能接成新案例層的正式完成條件。
+`caliburn_memory.extraction.ExtractionWorkflow` 已自 `4f94fbfb` 採用。三文字欄位、prompt、窗口迴圈、格式更正額度、`start/resume/reextract` 保持已驗語意；`ExtractionSourceReader` 由 App 提供固定窗口與前置消歧，`accepted(raw)` 由 provider adapter 核拒絕／終局。新 B1 已沿用其來源固定、窗口 pair、checkpoint、拒答／截斷與有限恢復原則；舊三欄輸出與「保存詳記／候選即完成」仍只作底層證據，不能接成新案例層的正式完成條件。
 
 歷史採用切片中，App `extraction_app.py` 的固定接合及真 `PostgresSaver`／`PostgresStore` 一批保存、資源重建後續作、重抽與相同 input 查回已驗（[R1 結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。這證明可沿用的底層能力，不代表新 B1 已接 App。
 
@@ -71,4 +73,4 @@ uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 
 Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，patch／保存核心不建立 provider；B1 執行由 App 注入的模型 runnable。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
 
-目前最新分層 bundle authority 與 B1 staged state／語意工具契約已完成；舊原話接點、checkpoint、publication CAS／receipt、有限錯誤恢復與顧問方法資產保留作接續基礎。**新 B1 Agent graph、B2 staged understanding、完整背景工作、C bundle repair、dispatcher 與完整 App 旅程仍未完成**；不要把 package 測試、舊 B1／B2 真 PG 證據或固定組裝測試代稱新分層流程已可日常使用，也不能宣稱新流程自然品質已驗。
+目前最新分層 bundle authority、B1 staged state／語意工具及固定來源 Agent graph 已完成；舊 publication CAS／receipt 與顧問方法資產保留作接續基礎。**B2 staged understanding、B1→B2 共同發布、C bundle repair、正式 App model factory／dispatcher、B1 compaction 與完整 App 旅程仍未完成**；不要把 package 測試、舊 B1／B2 真 PG 證據或固定組裝測試代稱新分層流程已可日常使用，也不能宣稱新流程自然品質已驗。

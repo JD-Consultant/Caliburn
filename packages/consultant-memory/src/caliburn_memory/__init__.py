@@ -19,10 +19,18 @@ from caliburn_memory.publication import (
 from caliburn_memory.skills import SkillAssets, analysis_files, analysis_skills
 from caliburn_memory.sources import ExtractionSourceReader, SourceReader
 from caliburn_memory.understanding_maintenance import (
+    CaseReworkIssue, CaseReworkIssueInput, CaseSourceRead,
     UnderstandingChange, UnderstandingMaintenanceAgentState,
     UnderstandingMaintenanceError, UnderstandingMaintenanceSession,
     UnderstandingMaintenanceStage, UnderstandingReplacementInput, UnderstandingSupportSelection,
     understanding_maintenance_tools,
+)
+from caliburn_memory.understanding_workflow import (
+    UNDERSTANDING_MAINTENANCE_INSTRUCTIONS,
+    UnderstandingMaintenanceResponseGuard,
+    UnderstandingMaintenanceWorkflow,
+    UnderstandingMaintenanceWorkflowState,
+    understanding_workflow_tools,
 )
 
 __all__ = [
@@ -38,8 +46,12 @@ __all__ = [
     "ConsolidationWorkflow", "MEMORY_ACTION_GUIDANCE",
     "SkillAssets", "analysis_files", "analysis_skills",
     "UnderstandingChange", "UnderstandingMaintenanceAgentState",
+    "CaseReworkIssue", "CaseReworkIssueInput", "CaseSourceRead",
     "UnderstandingMaintenanceError",
     "UnderstandingMaintenanceSession", "UnderstandingMaintenanceStage",
     "UnderstandingReplacementInput", "UnderstandingSupportSelection",
     "understanding_maintenance_tools",
+    "UNDERSTANDING_MAINTENANCE_INSTRUCTIONS",
+    "UnderstandingMaintenanceResponseGuard", "UnderstandingMaintenanceWorkflow",
+    "UnderstandingMaintenanceWorkflowState", "understanding_workflow_tools",
 ]

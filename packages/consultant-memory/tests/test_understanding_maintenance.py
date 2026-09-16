@@ -13,7 +13,8 @@ from langgraph.prebuilt import ToolNode
 from langgraph.store.memory import InMemoryStore
 
 from caliburn_memory import (
-    CaseArtifact, CaseMaintenanceSession, MemoryArtifacts,
+    CaseArtifact, CaseMaintenanceSession, CaseReworkIssueInput, CaseSourceRead,
+    MemoryArtifacts,
     ReplacementInput,
     UnderstandingMaintenanceError, UnderstandingMaintenanceSession,
     UnderstandingMaintenanceAgentState, UnderstandingReplacementInput,
@@ -140,6 +141,95 @@ def test_serialized_b2_stage_rejects_a_tampered_impact_set():
 
     with pytest.raises(UnderstandingMaintenanceError, match="impact|invalid"):
         session.load(tampered)
+
+
+def test_source_reference_requires_its_observed_case_and_is_durable_read_evidence():
+    source, artifacts, case_session, case_stage, ids = _fixture()
+    session = UnderstandingMaintenanceSession(artifacts, case_session)
+    stage = session.open(case_stage)
+
+    with pytest.raises(UnderstandingMaintenanceError, match="Read the case"):
+        session.observe_source_reference(
+            stage, case_id=ids["case_a"], source_reference=source.reference,
+        )
+
+    stage, _case = session.observe_case(stage, ids["case_a"])
+    with pytest.raises(UnderstandingMaintenanceError, match="does not belong"):
+        session.observe_source_reference(
+            stage, case_id=ids["case_a"], source_reference="conversation:document-a:missing",
+        )
+
+    observed = session.observe_source_reference(
+        stage, case_id=ids["case_a"], source_reference=source.reference,
+    )
+
+    assert observed.format_version == 2
+    assert observed.read_source_references == (
+        CaseSourceRead(ids["case_a"], source.reference),
+    )
+    assert session.load(observed.to_dict()) == observed
+    tampered = observed.to_dict()
+    tampered["read_source_references"] = [{
+        "case_id": ids["case_a"],
+        "source_reference": "conversation:document-a:missing",
+    }]
+    with pytest.raises(UnderstandingMaintenanceError, match="source read evidence"):
+        session.load(tampered)
+
+
+def test_case_rework_requires_read_source_and_never_becomes_publishable():
+    source, artifacts, case_session, case_stage, ids = _fixture()
+    session = UnderstandingMaintenanceSession(artifacts, case_session)
+    stage = session.open(case_stage)
+    stage, _case = session.observe_case(stage, ids["case_a"])
+    issue = CaseReworkIssueInput(
+        case_id=ids["case_a"],
+        source_reference=source.reference,
+        reason="原話顯示本人只做初判，案例卻把後續跨部門處理也列為本人責任。",
+    )
+
+    with pytest.raises(UnderstandingMaintenanceError, match="Read the cited canonical source"):
+        session.request_case_rework(stage, issues=[issue])
+
+    stage = session.observe_source_reference(
+        stage, case_id=ids["case_a"], source_reference=source.reference,
+    )
+    completed = session.request_case_rework(stage, issues=[issue])
+
+    assert completed.completed
+    assert completed.outcome == "case_rework_required"
+    assert completed.case_rework_issues[0].case_id == ids["case_a"]
+    assert completed.case_rework_issues[0].source_reference == source.reference
+    with pytest.raises(UnderstandingMaintenanceError, match="not publishable"):
+        session.current_understandings(completed)
+
+
+def test_case_rework_rejects_duplicate_or_mismatched_issue_evidence():
+    source, artifacts, case_session, case_stage, ids = _fixture()
+    session = UnderstandingMaintenanceSession(artifacts, case_session)
+    stage = session.open(case_stage)
+    stage, _case = session.observe_case(stage, ids["case_a"])
+    stage = session.observe_source_reference(
+        stage, case_id=ids["case_a"], source_reference=source.reference,
+    )
+    issue = CaseReworkIssueInput(
+        case_id=ids["case_a"], source_reference=source.reference,
+        reason="原話與案例責任範圍不一致。",
+    )
+
+    with pytest.raises(UnderstandingMaintenanceError, match="distinct"):
+        session.request_case_rework(stage, issues=[issue, issue])
+
+    wrong_case = CaseReworkIssueInput(
+        case_id=ids["case_b"], source_reference=source.reference,
+        reason="不得把 CASE-A 的來源冒充 CASE-B 已核對來源。",
+    )
+    with pytest.raises(UnderstandingMaintenanceError, match="Read the case"):
+        session.request_case_rework(stage, issues=[wrong_case])
+
+    stage, _case = session.observe_case(stage, ids["case_b"])
+    with pytest.raises(UnderstandingMaintenanceError, match="Read the cited canonical source"):
+        session.request_case_rework(stage, issues=[wrong_case])
 
 
 @pytest.mark.parametrize(

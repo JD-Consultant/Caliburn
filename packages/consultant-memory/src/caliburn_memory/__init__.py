@@ -6,7 +6,7 @@ from caliburn_memory.bundle import (
 )
 from caliburn_memory.case_maintenance import (
     CASE_MAINTENANCE_INSTRUCTIONS, CaseChange, CaseEvidence, CaseMaintenanceAgentState,
-    CaseMaintenanceError, CaseMaintenanceSession, CaseMaintenanceStage,
+    CaseMaintenanceError, CaseMaintenanceSession, CaseMaintenanceStage, CaseRuntimeReview,
     CaseMaintenanceWorkflow, EvidenceDiscardInput, ReplacementInput, case_maintenance_tools,
 )
 from caliburn_memory.consolidation import ConsolidationWorkflow
@@ -41,7 +41,7 @@ __all__ = [
     "CaseArtifact", "CaseRead", "MemoryBundleManifest", "Supersession",
     "UnderstandingCaseBinding", "WorkUnderstandingArtifact", "WorkUnderstandingRead",
     "CASE_MAINTENANCE_INSTRUCTIONS", "CaseChange", "CaseEvidence", "CaseMaintenanceAgentState",
-    "CaseMaintenanceError", "CaseMaintenanceSession", "CaseMaintenanceStage",
+    "CaseMaintenanceError", "CaseMaintenanceSession", "CaseMaintenanceStage", "CaseRuntimeReview",
     "CaseMaintenanceWorkflow", "EvidenceDiscardInput", "ReplacementInput",
     "case_maintenance_tools",
     "ExtractionFiles", "MemoryArtifacts", "MemoryVersion", "ReadOnlyFiles",

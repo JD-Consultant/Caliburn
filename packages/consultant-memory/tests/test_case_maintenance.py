@@ -240,9 +240,10 @@ def test_wrong_scope_source_is_rejected_before_any_stage_exists():
 
 def test_tool_schemas_hide_runtime_storage_and_require_nullable_route_choice():
     source, _artifacts, session = _session()
-    tools = case_maintenance_tools(session)
+    tools = case_maintenance_tools(source, session)
     assert [item.name for item in tools] == [
-        "read_case", "create_case", "revise_case", "split_case", "merge_cases",
+        "read_case", "browse_interview_history", "read_more_evidence",
+        "create_case", "revise_case", "split_case", "merge_cases",
         "retire_case", "set_case_route", "finish_case_maintenance",
     ]
     forbidden = {"runtime", "document_id", "source_reference", "base_revision", "version",
@@ -260,6 +261,10 @@ def test_tool_schemas_hide_runtime_storage_and_require_nullable_route_choice():
     definition = next(iter(split.tool_call_schema.model_json_schema()["$defs"].values()))
     assert definition["additionalProperties"] is False
     assert set(definition["required"]) == {"content", "route_note"}
+    browse = next(item for item in tools if item.name == "browse_interview_history")
+    assert browse.tool_call_schema.model_json_schema().get("properties", {}) == {}
+    more = next(item for item in tools if item.name == "read_more_evidence")
+    assert set(more.tool_call_schema.model_json_schema()["properties"]) == {"evidence_key"}
 
 
 def test_native_toolnode_checkpoints_created_case_then_finishes_same_stage():
@@ -268,7 +273,7 @@ def test_native_toolnode_checkpoints_created_case_then_finishes_same_stage():
     initial = session.open(base_publication_revision=0, base_version=None,
                            source_reference=source.reference)
     saver = InMemorySaver()
-    graph = _graph(case_maintenance_tools(session), saver=saver)
+    graph = _graph(case_maintenance_tools(source, session), saver=saver)
     config = {"configurable": {"thread_id": "b1-case-test"}}
 
     first = graph.invoke({
@@ -297,7 +302,7 @@ def test_native_toolnode_checkpoints_read_before_revising_published_case():
     version, (case_id,) = _base(artifacts, [("故障初判", "本人先做故障初判。")])
     initial = session.open(base_publication_revision=1, base_version=version,
                            source_reference=source.second_reference)
-    graph = _graph(case_maintenance_tools(session), saver=InMemorySaver())
+    graph = _graph(case_maintenance_tools(source, session), saver=InMemorySaver())
     config = {"configurable": {"thread_id": "b1-read-before-write"}}
 
     read = graph.invoke({
@@ -322,7 +327,7 @@ def test_tool_error_returns_unchanged_state_and_matching_error_result():
     source, _artifacts, session = _session()
     initial = session.open(base_publication_revision=0, base_version=None,
                            source_reference=source.reference)
-    graph = _graph(case_maintenance_tools(session))
+    graph = _graph(case_maintenance_tools(source, session))
     result = graph.invoke({
         "messages": [_call("revise_case", {
             "case_id": str(uuid4()), "diff": "@@\n-x\n+y", "route_note": None,
@@ -348,7 +353,7 @@ def test_parallel_case_mutations_are_rejected_without_a_state_race():
         {"name": "create_case", "args": {"content": "案例 B", "route_note": "案例 B"},
          "id": "create-b", "type": "tool_call"},
     ]
-    result = _graph(case_maintenance_tools(session)).invoke({
+    result = _graph(case_maintenance_tools(source, session)).invoke({
         "messages": [AIMessage("", id="parallel", tool_calls=calls)],
         "case_stage": initial.to_dict(),
     })

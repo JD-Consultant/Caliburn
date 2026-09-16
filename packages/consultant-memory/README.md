@@ -16,21 +16,23 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 
 `PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致；舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑保持相容。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
 
-### B1 案例 staged state／語意工具／固定 canonical batch Agent graph
+### B1 案例 staged state／證據 registry／固定 canonical batch Agent graph
 
-`caliburn_memory.case_maintenance` 已完成兩個零 provider 切片：`CaseMaintenanceStage` 保存固定 base、canonical source、本 attempt 已讀案例、目前 staged upserts／supersessions／guide 與 change set；`case_maintenance_tools()` 提供 `read/create/revise/split/merge/retire/set-route/finish` 八個窄工具。模型不填 document、來源、版本、路徑、digest 或新案例 ID。
+`caliburn_memory.case_maintenance` 已完成零 provider 的 B1 stage、Agent graph 與 evidence registry 切片：`CaseMaintenanceStage` 保存固定 base、canonical source、本 attempt 已讀案例、目前 staged upserts／supersessions／guide、change set，以及 attempt-scoped `evidence_key → signed source`、owner order proof 和 Runtime paging cursor。stage 只保存 reference 與 message ID／role，不複製訪談原話。模型不填 document、signed reference、offset、cursor、版本、路徑、digest 或新案例 ID。
 
-修訂、拆分、合併或淘汰已發布案例前必須先成功 `read_case`，該證據與 stage 一起由 LangGraph checkpoint 保存；同一模型步的多工具呼叫全部拒絕，避免平行 state update。局部修訂沿既有 V4A matcher，但只接收案例內容與 diff，不把儲存 path 暴露給模型。新案例與修訂案例的來源由 Runtime 自動綁定；guide link、穩定 UUID 與 supersession 同樣由 Runtime 產生。
+修訂、拆分、合併或淘汰已發布案例前必須先成功 `read_case`；它會從固定訪談歷史重新證明案例所有引用的 canonical 順序，再回傳 `oldest_to_newest` evidence blocks。證明不到任何一筆即拒絕，不能相信 artifact tuple 或 reference 字典序。模型可用無參數 `browse_interview_history` 取得下一批安全歷史，也可用 `read_more_evidence(evidence_key)` 續讀長來源；兩者的 offset 都由 checkpoint 管理。同一模型步的多工具呼叫仍全部拒絕，避免平行 state update。
 
-`CaseMaintenanceWorkflow` 已將 Runtime 固定的整批 canonical source 接到新 B1 Prompt 與上述工具。這個 batch 是語意整理與來源單位；正式 App 能在實際 request 預算內完整提供時應使用單一來源窗口，只有來源或模型限制確實需要時，來源 owner 才在同一 batch 內提供多個有界 `NEW_SOURCE`／`CONTEXT_ONLY` 讀取窗口。所有窗口共用一個 staged attempt，只有整批 source 成為案例證據。若使用多窗口，非最後窗口不能提前完成，最後窗口必須明確 `changed`／`no_op`；模型與工具額度、完成修正、incomplete／refusal 防護及工具後 transport failure 的原 checkpoint resume 都由 graph 保留。窗口並非案例邊界或產品要求，package 的 `max_chars`／`max_windows` 也不是正式 App 的固定切割規則。
+`CaseMaintenanceWorkflow` 已將 Runtime 固定的整批 canonical source 接到新 B1 Prompt 與上述工具。這個 batch 是語意整理與 `processed_source` 單位，不是案例引用；正式 App 能在實際 request 預算內完整提供時應使用單一來源窗口，只有來源或模型限制確實需要時，來源 owner 才在同一 batch 內提供多個有界 `NEW_SOURCE.window`／`CONTEXT_ONLY` 讀取窗口。每個 `NEW_SOURCE` 另帶 owner 排序的完整問答 evidence blocks，所有窗口共用同一 registry 與 staged attempt。若使用多窗口，非最後窗口不能提前完成，最後窗口必須明確 `changed`／`no_op`；模型與工具額度、完成修正、incomplete／refusal 防護及工具後 transport failure 的原 checkpoint resume 都由 graph 保留。窗口並非案例邊界或產品要求，package 的 `max_chars`／`max_windows` 也不是正式 App 的固定切割規則。
+
+create／revise／split／merge 目前仍保留舊的「自動附整批 window」暫時程式行為，尚未使用 registry 做精確 evidence 分配；這不是正式案例引用規則，也不能因此發布新 bundle。下一個引用切片會讓模型只選 Runtime 已展示的 keys，再由 Runtime 解析、驗證與 canonicalize 正式 references。guide link、穩定 UUID 與 supersession 仍由 Runtime 產生。
 
 B1 的 canonical 訪談 batch 是受保護來源：之後的 request-only compaction 不得摘要、截斷或替換它，也不能把 continuity summary 當作案例證據。compaction 只能處理 B1 自己已安全完成的舊模型／工具往返；原始訪談由來源 owner 持續完整保存。
 
 這仍只是 package 內的 B1 候選：沒有 B2、共同 publication、正式 App model factory、dispatcher、compaction、UI 或自然模型驗收。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
 
-### Ordered evidence source port（App 接點完成，B1 stage 尚未改線）
+### Ordered evidence source port（App 接點與 B1 stage 已接）
 
-`caliburn_memory.sources` 現提供 immutable typed evidence records：固定 window 內的逐輪 records、以同一 window 為上界的安全歷史分頁，以及 exact `source` 的有界文字頁。records 只含 signed reference 與 message ID／role；App source owner 才擁有 canonical order、lineage 與原文，adapter 不重排、不重簽、不建立第二份索引。offset 是之後由 Runtime checkpoint 管理的 paging state，不是模型參數或持久 citation。這一片只完成 port／adapter；`evidence_key`、已提供／已讀 registry、B1 create／revise／split／merge 的引用分配及 B2 exact-source 工具仍依[引用施工計畫](../../docs/plans/2026-09-17-interview-evidence-citations.md)後續 task 接入。
+`caliburn_memory.sources` 現提供 immutable typed evidence records：固定 window 內的逐輪 records、以同一 window 為上界的安全歷史分頁，以及 exact `source` 的有界文字頁。records 只含 signed reference 與 message ID／role；App source owner 才擁有 canonical order、lineage 與原文，adapter 不重排、不重簽、不建立第二份索引。B1 stage 已消費這些 port 並保存 key／order proof／cursor；offset 不是模型參數或持久 citation。B1 create／revise／split／merge 的精確引用分配及 B2 exact-source 工具仍依[引用施工計畫](../../docs/plans/2026-09-17-interview-evidence-citations.md)後續 task 接入。
 
 ### B2 工作理解 staged state／語意工具／durable Agent graph
 

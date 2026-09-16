@@ -8,7 +8,7 @@ selects a provider.
 from dataclasses import asdict
 import json
 from typing import Annotated, Any, Literal, NotRequired
-from uuid import NAMESPACE_URL, uuid5
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 from langchain.agents import create_agent
 from langchain.agents.middleware import (
@@ -53,6 +53,7 @@ UNDERSTANDING_MAINTENANCE_INSTRUCTIONS = """你是背景工作理解整理者 B2
 
 
 class UnderstandingMaintenanceWorkflowState(UnderstandingMaintenanceAgentState):
+    case_attempt_id: NotRequired[str | None]
     completion_corrections: NotRequired[int]
     completion_limit: NotRequired[int]
     thread_model_call_count: NotRequired[int]
@@ -274,13 +275,14 @@ class UnderstandingMaintenanceWorkflow:
         self.reader = reader
         self.session = session
         self.max_completion_corrections = max_completion_corrections
+        self.recursion_limit = max(100, max_model_steps * 3 + 6)
         route = str(uuid5(
             NAMESPACE_URL,
             "caliburn-b2-understanding-maintenance:" + reader.document_id,
         ))
         self.config = {
             "configurable": {"thread_id": route},
-            "recursion_limit": max(100, max_model_steps * 3 + 6),
+            "recursion_limit": self.recursion_limit,
         }
 
         configured_model = model.model_copy(update={"max_tokens": max_output_tokens})
@@ -316,6 +318,48 @@ class UnderstandingMaintenanceWorkflow:
         )
         self.graph = builder.compile(checkpointer=checkpointer)
 
+    def _attempt_config(self, case_attempt_id: str) -> dict[str, Any]:
+        try:
+            parsed = UUID(case_attempt_id)
+        except (ValueError, TypeError, AttributeError) as error:
+            raise ValueError("case_attempt_id must be a Runtime UUID") from error
+        if str(parsed) != case_attempt_id:
+            raise ValueError("case_attempt_id must use canonical UUID form")
+        route = str(uuid5(
+            NAMESPACE_URL,
+            f"caliburn-b2-understanding-maintenance:{self.reader.document_id}:"
+            f"case-attempt:{case_attempt_id}",
+        ))
+        return {"configurable": {"thread_id": route}, "recursion_limit": self.recursion_limit}
+
+    def run_attempt(
+        self, case_stage: CaseMaintenanceStage, *, case_attempt_id: str,
+    ) -> dict[str, Any]:
+        """Start, resume or look up B2 for one exact Runtime-owned B1 attempt."""
+        opened = self.session.open(case_stage)
+        config = self._attempt_config(case_attempt_id)
+        snapshot = self.graph.get_state(config)
+        if snapshot.values:
+            previous = self._validate_job(snapshot.values)
+            if (snapshot.values.get("case_attempt_id") != case_attempt_id
+                    or previous.case_stage != opened.case_stage):
+                raise ValueError("Understanding-maintenance attempt changed input")
+            if not snapshot.next:
+                return dict(snapshot.values)
+            return self.graph.invoke(None, config, durability="sync")
+        initial = {
+            "messages": [],
+            "understanding_stage": opened.to_dict(),
+            "case_attempt_id": case_attempt_id,
+            "completion_corrections": 0,
+            "completion_limit": self.max_completion_corrections,
+            "thread_model_call_count": 0,
+            "run_model_call_count": 0,
+            "thread_tool_call_count": {},
+            "run_tool_call_count": {},
+        }
+        return self.graph.invoke(initial, config, durability="sync")
+
     def start(self, case_stage: CaseMaintenanceStage) -> dict[str, Any]:
         """Start one B2 attempt, or return the same completed attempt."""
         opened = self.session.open(case_stage)
@@ -331,6 +375,7 @@ class UnderstandingMaintenanceWorkflow:
         initial = {
             "messages": messages,
             "understanding_stage": opened.to_dict(),
+            "case_attempt_id": None,
             "completion_corrections": 0,
             "completion_limit": self.max_completion_corrections,
             "thread_model_call_count": 0,
@@ -354,16 +399,26 @@ class UnderstandingMaintenanceWorkflow:
         try:
             corrections = state["completion_corrections"]
             limit = state["completion_limit"]
+            case_attempt_id = state["case_attempt_id"]
         except KeyError as error:
             raise ValueError(
                 "Pending understanding-maintenance checkpoint is incompatible",
             ) from error
         if (type(corrections) is not int or corrections < 0
                 or type(limit) is not int or limit < 0
-                or corrections > limit):
+                or corrections > limit
+                or (case_attempt_id is not None and type(case_attempt_id) is not str)):
             raise ValueError(
                 "Pending understanding-maintenance checkpoint is incompatible",
             )
+        if case_attempt_id is not None:
+            try:
+                if str(UUID(case_attempt_id)) != case_attempt_id:
+                    raise ValueError()
+            except (ValueError, TypeError, AttributeError) as error:
+                raise ValueError(
+                    "Pending understanding-maintenance checkpoint changed attempt identity",
+                ) from error
         return self.session.load(state.get("understanding_stage"))
 
     def _load_task(self, state: UnderstandingMaintenanceWorkflowState) -> dict[str, Any]:

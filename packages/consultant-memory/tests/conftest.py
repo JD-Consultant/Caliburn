@@ -36,6 +36,21 @@ class ExampleSource:
         self.validate_reference(source_reference)
         self.validate_reference(context_reference)
 
+    def source_progress(self, reference, previous):
+        self.validate_reference(reference)
+        self.validate_reference(previous)
+        order = list(self.material)
+        target, cursor = order.index(reference), order.index(previous)
+        if target <= cursor:
+            return "covered"
+        if target == cursor + 1:
+            return "next"
+        raise ValueError("invalid_source_progress")
+
+    def require_new_source_after(self, reference, previous):
+        if self.source_progress(reference, previous) != "next":
+            raise ValueError("source_is_not_next")
+
     def history_exchanges(self, through_reference, *, offset=0, limit=50):
         self.validate_reference(through_reference)
         references = list(self.material)

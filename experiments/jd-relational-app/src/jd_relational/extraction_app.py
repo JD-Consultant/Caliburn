@@ -12,6 +12,7 @@ prompt, output contract, window budget and retry profile remain its own.
 
 from contextlib import contextmanager
 from dataclasses import dataclass
+from typing import Literal
 from uuid import UUID
 
 from caliburn_memory import MemoryArtifacts
@@ -157,8 +158,12 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
                                                max_chars=max_chars, context_chars=context_chars)
 
     def require_new_source_after(self, reference: str, previous: str) -> None:
+        if self.source_progress(reference, previous) != "next":
+            raise InvalidSourceReference("invalid_source_reference")
+
+    def source_progress(self, reference: str, previous: str) -> Literal["covered", "next"]:
         with self._owner_errors():
-            self.service.follows(reference, previous, self.document_id)
+            return self.service.source_progress(reference, previous, self.document_id)
 
     @staticmethod
     def _exchange(excerpt) -> EvidenceExchange:

@@ -24,6 +24,7 @@ from jd_relational.conversation_sources import (
     ConversationSourceCodec, ConversationSourceError, WindowBudgetExceeded,
     _ContextPosition, _WindowPosition,
 )
+from jd_relational.extraction_app import ExtractionSourceAdapter
 
 from jd_relational.memory_sources import MemorySourceReader
 from langchain_core.messages import AIMessage, ToolMessage
@@ -558,6 +559,63 @@ def test_admission_refuses_an_earlier_or_skipping_range(interview, native):
         windows.follows(skipping, processed, document)
 
 
+def test_source_progress_distinguishes_covered_from_the_direct_next_range(interview, native):
+    """The owner compares whole settled-turn boundaries on one lineage.
+
+    A token being equal, newer or lexically ordered is not the proof.  The
+    publication cursor can cover the exact job or a job ending earlier; only a
+    range beginning at the first turn after that cursor is new work.
+    """
+    windows, document, first_run, second_run = interview
+    third = settled(native, [AIMessage(id="sp3", content="第三輪回覆")], text="第三輪原話")
+    job = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    later_head = windows.capture_window(
+        document, first_run_id=first_run, last_run_id=third.record.run_id)
+    direct_next = windows.capture_window(
+        document, first_run_id=third.record.run_id, last_run_id=third.record.run_id)
+
+    assert windows.source_progress(job, job, document) == "covered"
+    assert windows.source_progress(job, later_head, document) == "covered"
+    assert windows.source_progress(direct_next, job, document) == "next"
+
+
+def test_source_progress_refuses_partial_overlap_and_a_gap(interview, native):
+    windows, document, first_run, second_run = interview
+    third, fourth = plain(native, 2, start=30)
+    head = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    overlap = windows.capture_window(
+        document, first_run_id=second_run, last_run_id=third.record.run_id)
+    gap = windows.capture_window(
+        document, first_run_id=fourth.record.run_id, last_run_id=fourth.record.run_id)
+
+    for unsafe in (overlap, gap):
+        with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+            windows.source_progress(unsafe, head, document)
+
+
+def test_source_progress_refuses_cross_document_scope(interview):
+    windows, document, first_run, second_run = interview
+    job = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.source_progress(job, job, str(uuid4()))
+
+
+def test_extraction_adapter_exposes_the_owner_result_and_keeps_strict_admission(
+        interview, native):
+    windows, document, first_run, second_run = interview
+    third = settled(native, [AIMessage(id="spa3", content="第三輪回覆")], text="第三輪原話")
+    head = windows.capture_window(document, first_run_id=first_run, last_run_id=second_run)
+    direct_next = windows.capture_window(
+        document, first_run_id=third.record.run_id, last_run_id=third.record.run_id)
+    adapter = ExtractionSourceAdapter(windows, document)
+
+    assert adapter.source_progress(head, head) == "covered"
+    assert adapter.source_progress(direct_next, head) == "next"
+    adapter.require_new_source_after(direct_next, head)
+    with pytest.raises(InvalidSourceReference):
+        adapter.require_new_source_after(head, head)
+
+
 def test_the_memory_reader_grants_window_and_context_separately(issued, native):
     sources, document, _, source_ref, window = issued
     context = sources._codec._issue_context(_ContextPosition(format_version=2, purpose="context",
@@ -727,6 +785,8 @@ def test_a_candidate_window_on_a_sibling_branch_is_never_admitted(interview, nat
     windows.read_window(candidate, document)
     with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
         windows.follows(candidate, previous, document)
+    with pytest.raises(ConversationSourceError, match="^invalid_ref$"):
+        windows.source_progress(candidate, previous, document)
 
 
 def target_over(windows, document, first_run, last_run):

@@ -1043,6 +1043,33 @@ class ConversationSourceService:
         if not page["turns"]:
             raise ConversationSourceError("invalid_ref")
 
+    def source_progress(self, reference, previous, document_id) -> Literal["covered", "next"]:
+        """Classify one fixed range against the published cursor.
+
+        Both references are resolved at their own immutable positions and then
+        proven against one current canonical snapshot.  Reaching the target's
+        complete terminal means it is already covered; otherwise only the
+        first whole settled turn after the cursor may begin new work.  Partial
+        overlap, a gap, an abandoned branch or an unprovable position fails
+        closed instead of becoming an implicit retry.
+        """
+        current, messages, turns = self._settled(document_id)
+        if current is None:
+            raise ConversationSourceError("invalid_ref")
+        # Validate each issued range at its own fixed position before comparing
+        # their cumulative terminal boundaries on the canonical snapshot.
+        target, _, _, _ = self._pinned_range(reference, document_id)
+        self._pinned_range(previous, document_id)
+        target_boundary = self._cursor_boundary(document_id, reference, current, turns)
+        previous_boundary = self._cursor_boundary(document_id, previous, current, turns)
+        if previous_boundary >= target_boundary:
+            return "covered"
+        order = [message.id for message in messages]
+        following = [turn for turn in turns if order.index(turn["first"]) > previous_boundary]
+        if following and following[0]["first"] == target.first:
+            return "next"
+        raise ConversationSourceError("invalid_ref")
+
     def follows(self, reference, previous, document_id) -> None:
         """Admit a new range only directly after the published one.
 
@@ -1054,20 +1081,7 @@ class ConversationSourceService:
         or side-branch range is refused rather than treated as an implicit
         retry: history that still reads back is not an admissible new input.
         """
-        new = self._codec._resolve_window(reference, document_id)
-        current, _, _ = self._settled(document_id)
-        pinned = self._pinned(document_id, new.root_run_id, new.root_config())
-        if current is None or not self._on_lineage(document_id, new.root_checkpoint_id, current):
-            raise ConversationSourceError("invalid_ref")
-        turns = self._settled_turns(document_id, pinned.messages)
-        boundary = self._cursor_boundary(document_id, previous, pinned, turns)
-        order = [message.id for message in pinned.messages]
-        if new.first not in order or order.index(new.first) <= boundary:
-            raise ConversationSourceError("invalid_ref")
-        if new.last not in {turn["last"] for turn in turns}:
-            raise ConversationSourceError("invalid_ref")
-        following = [turn for turn in turns if order.index(turn["first"]) > boundary]
-        if not following or following[0]["first"] != new.first:
+        if self.source_progress(reference, previous, document_id) != "next":
             raise ConversationSourceError("invalid_ref")
 
     def read_context(self, context_ref, document_id) -> dict:

@@ -136,6 +136,16 @@ class ExtractionSourceReader(SourceReader, Protocol):
         """Admit a range only after the previous one, by saved conversation order."""
         ...
 
+    def source_progress(self, reference: str, previous: str) -> Literal["covered", "next"]:
+        """Classify a fixed range against the publication cursor.
+
+        ``covered`` means the cursor has already reached the range's complete
+        terminal on the same canonical lineage. ``next`` means the range starts
+        at the first safe turn after that cursor.  Every other relationship is
+        invalid rather than guessed by this package.
+        """
+        ...
+
     def window_exchanges(self, reference: str) -> EvidenceExchangePage:
         """All evidence exchanges inside one fixed window, in canonical order."""
         ...

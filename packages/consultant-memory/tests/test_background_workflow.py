@@ -22,6 +22,7 @@ from caliburn_memory import (
     CaseMaintenanceSession,
     CaseMaintenanceWorkflow,
     MemoryArtifacts,
+    PublicationUncertain,
     PublicationStore,
     UnderstandingMaintenanceSession,
     UnderstandingMaintenanceWorkflow,
@@ -61,7 +62,7 @@ def done(identity):
 
 def harness(*, changed: bool = True, b1_replies=None, b2_replies=None,
             case_ids=None, understanding_ids=None, evidence_text=None,
-            published_base: bool = False):
+            published_base: bool = False, max_stale_retries: int = 2):
     source = WindowSource()
     case_ids = list(case_ids or [str(uuid4())])
     understanding_ids = list(understanding_ids or [str(uuid4())])
@@ -78,6 +79,15 @@ def harness(*, changed: bool = True, b1_replies=None, b2_replies=None,
     source.set_window_evidence(window, evidence)
     source.set_history(*((base_evidence, evidence) if base_evidence else (evidence,)))
     source.plan(batch, [{"source_reference": window, "context_reference": None}])
+    if published_base:
+        inherited_progress = source.source_progress
+
+        def planned_progress(_self, reference, previous):
+            if (reference, previous) == (batch, base_batch):
+                return "next"
+            return inherited_progress(reference, previous)
+
+        source.source_progress = MethodType(planned_progress, source)
 
     artifacts = MemoryArtifacts(InMemoryStore(), source.document_id, source=source)
     base = None
@@ -158,7 +168,7 @@ def harness(*, changed: bool = True, b1_replies=None, b2_replies=None,
         ))
     workflow = BackgroundMemoryWorkflow(
         case_workflow, understanding_workflow, publication, InMemorySaver(),
-        max_stale_retries=2,
+        max_stale_retries=max_stale_retries,
     )
     return {
         "source": source,
@@ -423,5 +433,286 @@ def test_second_case_rework_is_bounded_and_never_publishes():
         assert built["publication"].current() is None
         assert built["case_model"].replies == []
         assert built["understanding_model"].replies == []
+    finally:
+        built["engine"].dispose()
+
+
+def create_case_replies(prefix, *, content="## 告警處理\n本人只確認告警。"):
+    return [
+        call("create_case", {
+            "content": content,
+            "route_note": "告警確認",
+            "evidence_keys": ["E1"],
+        }, f"{prefix}-create-case"),
+        call("finish_case_maintenance", {}, f"{prefix}-finish-case"),
+        done(f"{prefix}-case-done"),
+    ]
+
+
+def create_understanding_replies(case_id, understanding_label, prefix):
+    return [
+        call("read_case", {"case_id": case_id}, f"{prefix}-read-case"),
+        call("create_work_understanding", {
+            "content": understanding_label,
+            "supporting_case_ids": [case_id],
+            "route_note": "告警確認",
+        }, f"{prefix}-create-understanding"),
+        call("finish_understanding_maintenance", {}, f"{prefix}-finish-understanding"),
+        done(f"{prefix}-understanding-done"),
+    ]
+
+
+def publish_empty_repair(built, publish):
+    head = built["publication"].current()
+    revision = head.revision if head is not None else 0
+    candidate = built["artifacts"].save_bundle(
+        base_publication_revision=revision,
+        base_version=head.memory if head is not None else None,
+        evidence_through_reference=built["batch"],
+        case_guide="",
+        cases=(),
+        understanding_guide="",
+        understandings=(),
+    )
+    request = built["publication"].prepare(
+        candidate,
+        expected_revision=revision,
+        kind="repair",
+        repair_sources=(built["evidence"],),
+    )
+    return publish(request)
+
+
+def test_stale_after_case_rework_restarts_both_layers_from_the_new_head():
+    rejected_id, corrected_id, rebuilt_id = (str(uuid4()) for _ in range(3))
+    first_understanding, rebuilt_understanding = str(uuid4()), str(uuid4())
+    built = harness(
+        case_ids=[rejected_id, corrected_id, rebuilt_id],
+        understanding_ids=[first_understanding, rebuilt_understanding],
+        evidence_text="本人只確認告警。",
+        b1_replies=[
+            *create_case_replies(
+                "rejected",
+                content="## 告警處理\n本人確認告警並通知其他單位。",
+            ),
+            call("read_more_evidence", {"evidence_key": "E1"}, "review-source"),
+            *create_case_replies("corrected"),
+            *create_case_replies("rebuilt"),
+        ],
+        b2_replies=[
+            call("read_case", {"case_id": rejected_id}, "rejected-read-case"),
+            call("read_case_source", {"evidence_key": "E1"}, "rejected-read-source"),
+            call("request_case_rework", {"issues": [{
+                "evidence_key": "E1", "reason": "案例加入了原話沒有的通知責任。",
+            }]}, "request-rework"),
+            done("request-rework-done"),
+            *create_understanding_replies(
+                corrected_id, "本人穩定負責告警確認。", "corrected"),
+            *create_understanding_replies(
+                rebuilt_id, "本人穩定負責告警確認。", "rebuilt"),
+        ],
+    )
+    original_publish = built["publication"].publish
+    injected = False
+
+    def race_once(_self, request):
+        nonlocal injected
+        if not injected and request.kind == "consolidation":
+            injected = True
+            publish_empty_repair(built, original_publish)
+        return original_publish(request)
+
+    built["publication"].publish = MethodType(race_once, built["publication"])
+    try:
+        result = built["workflow"].start(built["batch"])
+        head = built["publication"].current()
+        manifest = built["artifacts"].bundle_manifest(head.memory)
+
+        assert result["status"] == "completed"
+        assert result["case_rework_count"] == 1
+        assert result["stale_retry_count"] == 1
+        assert head.revision == 2
+        assert manifest.base_publication_revision == 1
+        assert [item.case_id for item in manifest.cases] == [rebuilt_id]
+        assert corrected_id not in {item.case_id for item in manifest.cases}
+        assert built["case_model"].replies == []
+        assert built["understanding_model"].replies == []
+    finally:
+        built["engine"].dispose()
+
+
+def test_source_already_covered_returns_current_head_without_running_models():
+    built = harness()
+    candidate = built["artifacts"].save_bundle(
+        base_publication_revision=0,
+        evidence_through_reference=built["batch"],
+        case_guide="",
+        cases=(),
+        understanding_guide="",
+        understandings=(),
+    )
+    head = built["publication"].publish(built["publication"].prepare(
+        candidate,
+        expected_revision=0,
+        kind="consolidation",
+        processed_source=built["batch"],
+    ))
+    try:
+        result = built["workflow"].start(built["batch"])
+
+        assert result["status"] == "completed"
+        assert result["result"] == {
+            "revision": head.revision,
+            "memory_version_id": head.memory.version_id,
+            "processed_source": built["batch"],
+        }
+        assert built["publication"].current() == head
+        assert built["case_model"].requests == []
+        assert built["understanding_model"].requests == []
+    finally:
+        built["engine"].dispose()
+
+
+def test_stale_job_uses_a_competing_head_that_already_covers_its_source():
+    built = harness()
+    original_publish = built["publication"].publish
+    competing_head = None
+
+    def cover_before_old_publish(_self, request):
+        nonlocal competing_head
+        if competing_head is None:
+            candidate = built["artifacts"].save_bundle(
+                base_publication_revision=0,
+                evidence_through_reference=built["batch"],
+                case_guide="",
+                cases=(),
+                understanding_guide="",
+                understandings=(),
+            )
+            competing_head = original_publish(built["publication"].prepare(
+                candidate,
+                expected_revision=0,
+                kind="consolidation",
+                processed_source=built["batch"],
+            ))
+        return original_publish(request)
+
+    built["publication"].publish = MethodType(
+        cover_before_old_publish, built["publication"])
+    try:
+        result = built["workflow"].start(built["batch"])
+
+        assert result["status"] == "completed"
+        assert result["stale_retry_count"] == 1
+        assert result["result"] == {
+            "revision": competing_head.revision,
+            "memory_version_id": competing_head.memory.version_id,
+            "processed_source": built["batch"],
+        }
+        assert built["publication"].current() == competing_head
+        assert len(built["case_model"].requests) == 3
+        assert len(built["understanding_model"].requests) == 4
+    finally:
+        built["engine"].dispose()
+
+
+def test_invalid_source_progress_fails_before_models_or_publication():
+    built = harness()
+    candidate = built["artifacts"].save_bundle(
+        base_publication_revision=0,
+        evidence_through_reference=built["source"].reference,
+        case_guide="",
+        cases=(),
+        understanding_guide="",
+        understandings=(),
+    )
+    head = built["publication"].publish(built["publication"].prepare(
+        candidate,
+        expected_revision=0,
+        kind="consolidation",
+        processed_source=built["source"].reference,
+    ))
+    try:
+        with pytest.raises(ValueError, match="invalid_source_progress"):
+            built["workflow"].start(built["batch"])
+
+        assert built["publication"].current() == head
+        assert built["case_model"].requests == []
+        assert built["understanding_model"].requests == []
+    finally:
+        built["engine"].dispose()
+
+
+def test_stale_retry_limit_blocks_without_a_third_model_attempt():
+    case_ids = [str(uuid4()), str(uuid4())]
+    understanding_ids = [str(uuid4()), str(uuid4())]
+    built = harness(
+        case_ids=case_ids,
+        understanding_ids=understanding_ids,
+        evidence_text="本人只確認告警。",
+        max_stale_retries=1,
+        b1_replies=[
+            *create_case_replies("first"),
+            *create_case_replies("second"),
+        ],
+        b2_replies=[
+            *create_understanding_replies(
+                case_ids[0], "本人穩定負責告警確認。", "first"),
+            *create_understanding_replies(
+                case_ids[1], "本人穩定負責告警確認。", "second"),
+        ],
+    )
+    original_publish = built["publication"].publish
+
+    def always_race(_self, request):
+        publish_empty_repair(built, original_publish)
+        return original_publish(request)
+
+    built["publication"].publish = MethodType(always_race, built["publication"])
+    try:
+        result = built["workflow"].start(built["batch"])
+
+        assert result["status"] == "blocked"
+        assert result["error_code"] == "stale_retry_limit_reached"
+        assert result["stale_retry_count"] == 1
+        assert built["publication"].current().revision == 2
+        assert built["publication"].current().processed_source is None
+        assert built["case_model"].replies == []
+        assert built["understanding_model"].replies == []
+    finally:
+        built["engine"].dispose()
+
+
+def test_uncertain_publish_resumes_the_same_request_and_receipt():
+    built = harness()
+    original_publish = built["publication"].publish
+    lost_once = False
+
+    def lose_first_reply(_self, request):
+        nonlocal lost_once
+        result = original_publish(request)
+        if not lost_once:
+            lost_once = True
+            raise PublicationUncertain("synthetic committed response loss")
+        return result
+
+    built["publication"].publish = MethodType(lose_first_reply, built["publication"])
+    try:
+        with pytest.raises(PublicationUncertain, match="response loss"):
+            built["workflow"].start(built["batch"])
+        snapshot = built["workflow"].graph.get_state(built["workflow"].config)
+        request = dict(snapshot.values["publish_request"])
+        calls = (len(built["case_model"].requests),
+                 len(built["understanding_model"].requests))
+        assert built["publication"].current().revision == 1
+        assert built["publication"].receipt(request["operation_id"]) is not None
+
+        result = built["workflow"].resume()
+
+        assert result["status"] == "completed"
+        assert result["publish_request"] == request
+        assert built["publication"].current().revision == 1
+        assert calls == (len(built["case_model"].requests),
+                         len(built["understanding_model"].requests))
     finally:
         built["engine"].dispose()

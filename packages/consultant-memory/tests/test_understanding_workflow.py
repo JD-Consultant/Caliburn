@@ -347,6 +347,60 @@ def test_same_completed_b1_input_is_idempotent_but_changed_b1_starts_clean_attem
     assert second["thread_model_call_count"] == 6
 
 
+def test_b1_attempt_identity_prevents_reusing_an_older_b2_rework_result():
+    source, session, model, workflow, case_stage, ids = _harness([])
+    model.replies.extend([
+        _call("read_case", {"case_id": ids["case_a"]}, "a-read-case"),
+        _call("read_case_source", {"evidence_key": "E1"}, "a-read-source"),
+        _call("request_case_rework", {"issues": [{
+            "evidence_key": "E1",
+            "reason": "第一個 B1 attempt 的案例仍需重整。",
+        }]}, "a-rework"),
+        _done("a-done"),
+        *_no_op_replies(ids, "b"),
+    ])
+    first_attempt, second_attempt = str(uuid4()), str(uuid4())
+
+    first = workflow.run_attempt(case_stage, case_attempt_id=first_attempt)
+    first_stage = session.load(first["understanding_stage"])
+    calls_after_first = len(model.requests)
+    assert first_stage.outcome == "case_rework_required"
+    assert first["case_attempt_id"] == first_attempt
+    assert workflow.run_attempt(case_stage, case_attempt_id=first_attempt) == first
+    assert len(model.requests) == calls_after_first
+
+    second = workflow.run_attempt(case_stage, case_attempt_id=second_attempt)
+    second_stage = session.load(second["understanding_stage"])
+    assert second_stage.outcome == "no_op"
+    assert second["case_attempt_id"] == second_attempt
+    assert len(model.requests) == calls_after_first + 6
+
+
+def test_b2_runtime_attempt_resumes_the_same_checkpointed_tool_history():
+    _source, session, model, workflow, case_stage, ids = _harness([])
+    model.replies.extend([
+        _call("read_case", {"case_id": ids["case_a"]}, "attempt-read-case"),
+        RuntimeError("synthetic B2 attempt fault"),
+        _call("read_case_source", {"evidence_key": "E1"}, "attempt-read-source"),
+        _call("request_case_rework", {"issues": [{
+            "evidence_key": "E1",
+            "reason": "原話與案例責任邊界不一致。",
+        }]}, "attempt-rework"),
+        _done("attempt-done"),
+    ])
+    attempt_id = str(uuid4())
+
+    with pytest.raises(RuntimeError, match="synthetic B2 attempt fault"):
+        workflow.run_attempt(case_stage, case_attempt_id=attempt_id)
+    result = workflow.run_attempt(case_stage, case_attempt_id=attempt_id)
+
+    stage = session.load(result["understanding_stage"])
+    assert stage.outcome == "case_rework_required"
+    assert result["case_attempt_id"] == attempt_id
+    assert sum(isinstance(item, ToolMessage) and item.tool_call_id == "attempt-read-case"
+               for item in result["messages"]) == 1
+
+
 def test_transport_failure_resumes_same_attempt_without_replaying_checkpointed_read():
     source, session, model, workflow, case_stage, ids = _harness([])
     model.replies.extend([

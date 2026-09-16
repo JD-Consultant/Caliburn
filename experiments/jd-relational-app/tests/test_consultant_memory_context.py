@@ -3,7 +3,9 @@ from dataclasses import replace
 import json
 from uuid import uuid4
 
-from caliburn_memory import MemoryArtifacts, PublicationStore
+from caliburn_memory import (
+    CaseArtifact, MemoryArtifacts, PublicationStore, WorkUnderstandingArtifact,
+)
 from langchain.agents import create_agent
 from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
@@ -28,6 +30,10 @@ def memory(native):
     _, dataset, document, *_ = native
     sources = service(native)
     source_ref = sources.capture(document, observed.record.run_id).source_ref
+    safe_run_id = sources.safe_turns(document)[0]["input_id"]
+    bundle_source_ref = sources.capture(document, safe_run_id).source_ref
+    source_window = sources.capture_window(
+        document, first_run_id=safe_run_id, last_run_id=safe_run_id)
     store = InMemoryStore()
     engine = sa.create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
     artifacts = MemoryArtifacts(store, document, source=MemorySourceReader(sources, document))
@@ -38,9 +44,35 @@ def memory(native):
         request = publication.prepare(version, expected_revision=revision,
             kind="consolidation", processed_source=source_ref)
         return publication.publish(request)
+    def publish_bundle(revision, *, base_version=None, case_id=None, understanding_id=None,
+                       case_text="本人先做設備故障初判。"):
+        bundle_artifacts = MemoryArtifacts(store, document, source=MemorySourceReader(
+            sources, document, window_references=True))
+        bundle_publication = PublicationStore(engine, bundle_artifacts)
+        case_id = case_id or str(uuid4())
+        understanding_id = understanding_id or str(uuid4())
+        case_path = f"/memory/cases/items/{case_id}.md"
+        understanding_path = f"/memory/understanding/items/{understanding_id}.md"
+        version = bundle_artifacts.save_bundle(
+            base_publication_revision=revision,
+            base_version=base_version,
+            evidence_through_reference=source_window,
+            case_guide=f"故障處理案例：[{case_id}]({case_path})",
+            cases=(CaseArtifact(case_id, case_text, (bundle_source_ref,)),),
+            understanding_guide=f"穩定故障初判責任：[{understanding_id}]({understanding_path})",
+            understandings=(WorkUnderstandingArtifact(
+                understanding_id,
+                f"本人穩定負責初判；支持案例 [{case_id}]({case_path})。",
+                (case_id,),
+            ),),
+        )
+        request = bundle_publication.prepare(version, expected_revision=revision,
+            kind="consolidation", processed_source=source_window)
+        return bundle_publication.publish(request), case_path, understanding_path, bundle_source_ref
     def pin():
         return MemoryReadSession.open(store=store, engine=engine, sources=sources,
             dataset_id=dataset, document_id=document, run_id=str(uuid4()))
+    publish.bundle = publish_bundle
     yield store, publication, publish, pin
     engine.dispose()
 
@@ -157,3 +189,58 @@ def test_saved_memory_view_is_strict_and_bound_to_its_run(memory, changes):
     with pytest.raises(MemoryReadError, match="invalid_memory_view"):
         checked_memory_view(session.view | changes, dataset_id=session.dataset_id,
             document_id=session.document_id, run_id=session.run_id)
+
+
+def test_layered_bundle_starts_from_both_guides_and_reads_both_layers_on_the_pinned_version(memory):
+    _, publication, publish, pin = memory
+    head, case_path, understanding_path, source_ref = publish.bundle(0)
+    session = pin()
+    case_call = AIMessage(id="case-read-call", content="",
+        response_metadata={"status": "completed", "finish_reason": "tool_calls"},
+        tool_calls=[{"name": "read_case", "id": "tool-case-read", "args": {
+            "case_id": case_path.removeprefix("/memory/cases/items/").removesuffix(".md")}}])
+    understanding_call = AIMessage(id="understanding-read-call", content="",
+        response_metadata={"status": "completed", "finish_reason": "tool_calls"},
+        tool_calls=[{"name": "read_work_understanding", "id": "tool-understanding-read", "args": {
+            "understanding_id": understanding_path.removeprefix(
+                "/memory/understanding/items/").removesuffix(".md")}}])
+    source_call = AIMessage(id="source-read-call", content="",
+        response_metadata={"status": "completed", "finish_reason": "tool_calls"},
+        tool_calls=[{"name": "read_conversation", "id": "tool-source-read", "args": {
+            "reference": source_ref}}])
+    _, final = setup()
+
+    class UpdatingModel(FixedModel):
+        def _generate(self, *args, **kwargs):
+            if not self.requests:
+                publish.bundle(
+                    1, base_version=head.memory,
+                    case_id=case_path.removeprefix("/memory/cases/items/").removesuffix(".md"),
+                    understanding_id=understanding_path.removeprefix(
+                        "/memory/understanding/items/").removesuffix(".md"),
+                    case_text="新版改由外包處理。",
+                )
+            return super()._generate(*args, **kwargs)
+
+    result, requests, _ = run_context(
+        session, model=UpdatingModel(replies=[
+            case_call, understanding_call, source_call, final,
+        ]))
+
+    assert session.head == head and session.view["version_id"] == head.memory.version_id
+    notice = json.loads(requests[0][0].content[-1]["text"])
+    assert notice["type"] == "memory_guide" and notice["revision"] == 1
+    assert "案例導覽" in notice["guide"] and "/memory/cases/guide.md" in notice["guide"]
+    assert "工作理解導覽" in notice["guide"] and "/memory/understanding/guide.md" in notice["guide"]
+    assert case_path in notice["guide"] and understanding_path in notice["guide"]
+    assert "本人先做設備故障初判" not in notice["guide"]
+    assert "本人穩定負責初判" not in notice["guide"]
+    feedback = [message.content for message in result["messages"] if isinstance(message, ToolMessage)]
+    assert all("schema_version" not in content for content in feedback)
+    assert any("本人先做設備故障初判" in content for content in feedback)
+    assert any("source_references" in content and "conversation:" in content for content in feedback)
+    assert any("本人穩定負責初判" in content and "case_bindings" in content
+               and "case_digest" in content for content in feedback)
+    assert any("前一輪原話" in content for content in feedback)
+    assert all("新版改由外包處理" not in content for content in feedback)
+    assert publication.current().revision == 2 and publication.current() != head

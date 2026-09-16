@@ -40,7 +40,8 @@ class Windows:
 TOOLS = {"jd_read", "jd_change_read", "jd_create_task", "jd_revise_work", "jd_set_text",
          "jd_insert_item", "jd_delete_item", "jd_move_item", "jd_set_task_capability",
          "jd_replace_selection", "ls", "grep", "read_file", "read_conversation",
-         "repair_memory", "request_memory_consolidation"}
+         "read_case", "read_work_understanding", "repair_memory",
+         "request_memory_consolidation"}
 
 
 def _tools(agent):

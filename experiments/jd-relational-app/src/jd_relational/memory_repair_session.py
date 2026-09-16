@@ -137,11 +137,21 @@ class MemoryRepairSession:
         if len(progress.results) != len(progress.bindings):
             raise MemoryRepairError()
         notice = runtime.context.source_notice(state["messages"])
+        current = self.current_read(state)
         binding = make_repair_binding(message, **self.scope,
-            base=self.current_read(state).head, source_reference=notice["source_ref"])
+            base=current.head, source_reference=notice["source_ref"])
         self.initial.source.validate_reference(binding.source_reference)
         outcome, edits = None, None
-        if progress.failures >= 2:
+        try:
+            layered = (current.head is not None
+                       and current.artifacts.bundle_base(current.head.memory) is not None)
+        except Exception:
+            raise MemoryRepairError() from None
+        if layered:
+            outcome = {"status": "unsupported_memory_format",
+                "detail": "目前分層 Memory 尚未支援即時修補；本次沒有修改 Memory。",
+                "read_paths": []}
+        elif progress.failures >= 2:
             outcome = {"status": "repair_limit", "detail": "本輪 Memory 更正已兩次失敗；停止更正，先釐清工作內容。"}
         else:
             try:

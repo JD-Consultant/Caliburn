@@ -37,12 +37,15 @@ def read_call(number):
         "args": {"file_path": "/memory/knowledge.md", "offset": 0, "limit": 100}}])
 
 
-def setup_repair(memory, replies):
+def setup_repair(memory, replies, *, layered=False):
     store, pub, publish, pin = memory
-    publish(0, "只做初步確認。")
+    if layered:
+        _, _, _, source = publish.bundle(0)
+    else:
+        publish(0, "只做初步確認。")
+        source = pub.current().processed_source
     selected = pin()
     repair = MemoryRepairSession(selected, pub)
-    source = pub.current().processed_source
     stop = Event()
     permit = SimpleNamespace(identity=SimpleNamespace(document_id=selected.document_id,
         run_id=selected.run_id, request_digest="a" * 64), stop_event=stop)
@@ -67,6 +70,42 @@ def setup_repair(memory, replies):
         "jd_memory_repair_bindings": []}
     config = {"configurable": {"thread_id": selected.document_id}, "max_concurrency": 1}
     return root, model, selected, repair, pub, context, payload, config
+
+
+def test_layered_memory_repair_fails_closed_before_the_legacy_c_workflow(memory, monkeypatch):
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory, [call(1), AIMessage(content="先繼續訪談。")], layered=True)
+    monkeypatch.setattr(repair.workflow, "_seed", lambda state: pytest.fail("no legacy C for bundle"))
+
+    result = root.invoke(payload, config, context=context, durability="sync")
+
+    feedback = [json.loads(message.content) for message in result["messages"]
+                if isinstance(message, ToolMessage)]
+    assert feedback == [{
+        "detail": "目前分層 Memory 尚未支援即時修補；本次沒有修改 Memory。",
+        "read_paths": [],
+        "retryable": False,
+        "status": "unsupported_memory_format",
+    }]
+    assert pub.current() == initial.head and len(model.requests) == 2
+
+
+def test_layered_memory_generic_file_tools_cannot_bypass_typed_reads(memory):
+    manifest_call = AIMessage(id="manifest-read", content="", tool_calls=[{
+        "name": "read_file", "id": "manifest-read-call",
+        "args": {"file_path": "/memory/manifest.json", "offset": 0, "limit": 100},
+    }])
+    root, model, initial, _, pub, context, payload, config = setup_repair(
+        memory, [manifest_call, AIMessage(content="改用分層讀取工具。")], layered=True)
+
+    result = root.invoke(payload, config, context=context, durability="sync")
+
+    feedback = [message.content for message in result["messages"]
+                if isinstance(message, ToolMessage)]
+    assert len(feedback) == 1
+    assert "layered_memory_requires_typed_read" in feedback[0]
+    assert "schema_version" not in feedback[0]
+    assert pub.current() == initial.head and len(model.requests) == 2
 
 
 def test_two_native_repairs_refresh_only_this_turn_and_keep_staging_off_root(memory):

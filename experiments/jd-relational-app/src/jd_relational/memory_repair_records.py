@@ -20,7 +20,9 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 REPAIR_NAME = "repair_memory"
 _CORRECTABLE = frozenset({"invalid_edit", "stale", "no_memory"})
-_STATUSES = _CORRECTABLE | {"applied", "repair_limit", "not_executed", "not_published"}
+_STATUSES = _CORRECTABLE | {
+    "applied", "repair_limit", "not_executed", "not_published", "unsupported_memory_format",
+}
 _PATHS = tuple(PATHS.values())
 
 
@@ -217,8 +219,18 @@ def _request(value, binding):
         return None
     if type(value) is PublishRequest:
         value = json.loads(_json(asdict(value)))
-    _shape(value, ("operation_id", "memory", "expected_revision", "kind", "artifact_digest",
-                   "processed_source", "repair_sources"))
+    legacy_keys = {"operation_id", "memory", "expected_revision", "kind", "artifact_digest",
+                   "processed_source", "repair_sources"}
+    if type(value) is not dict or set(value) not in (
+            legacy_keys, legacy_keys | {"bundle_base_revision", "bundle_base_version_id"}):
+        raise ValueError()
+    # C still owns only the legacy two-file repair contract. The publication
+    # type gained additive bundle-base fields, but accepting non-empty values
+    # here would falsely claim that layered C is implemented.
+    if ("bundle_base_revision" in value
+            and (value["bundle_base_revision"] is not None
+                 or value["bundle_base_version_id"] is not None)):
+        raise ValueError()
     if (binding.base is None or value["operation_id"] != binding.operation_id
             or type(value["expected_revision"]) is not int
             or value["expected_revision"] != binding.base["revision"]

@@ -2,6 +2,8 @@
 
 日期：2026-09-13；JD-R002／OI-02 局部。基準 `81a1ca76`。沿[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)接已保存的工作理解；不新增產品功能或第二份 Memory。只顯示當輪 JD 改動，不增加舊對話選輪入口；Excel 延後，ADR0074／0075 Proposed、production ADR0060 不變。
 
+**2026-09-17 successor：**本切片的固定回合讀取語意已延伸到 [`MEM-L001` 分層 bundle](2026-09-16-layered-case-and-work-understanding-memory-alignment.md)：A 現在先取得案例與工作理解兩份 guide，再以 typed tools 按需讀取目前案例／理解及其已驗證來源／案例綁定；舊兩檔版本保持相容。這不代表 dispatcher、分層 C、B1 compaction 或完整 App 已完成。
+
 ## 效果與責任
 
 顧問每輪先取得已發布工作理解的簡短導覽，需要時使用原生 `ls`／`grep`／`read_file` 讀正文或詳記，再以 `read_conversation` 核對已取得詳記的原話。模型不填文件 ID、Memory 版本、執行身分或保存欄位。沒有發布過 Memory 是明確的空狀態；已發布版本讀不到，則停止本輪，不能假裝沒有工作理解。

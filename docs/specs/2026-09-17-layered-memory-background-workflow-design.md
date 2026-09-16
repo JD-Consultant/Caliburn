@@ -4,7 +4,7 @@
 
 **Stage：**G7 分段施工
 
-**Status：**package G7 切片已完成；App dispatcher／真 PG 新程序旅程待接
+**Status：**package G7 切片與後續 App A 分層讀取接點已完成；dispatcher／真 PG 新程序旅程待接
 **Date：**2026-09-17
 
 ## 1. 目標與既有決策
@@ -29,7 +29,7 @@ Runtime 組裝完整 candidate bundle
 
 **2026-09-17 實作結果：**`caliburn_memory.background_workflow.BackgroundMemoryWorkflow` 已在 package 內完成 deterministic `load base → B1 → B2 → complete bundle → prepare → publish` graph。它沿用兩個既有 Agent graph，不新增第三個模型；source relation、attempt／operation ID、review 轉換、版本與發布都由 Runtime 管理。離線固定模型加 real `MemoryArtifacts`／SQLite `PublicationStore` 已覆蓋 changed、no-op、父層 resume、有界 rework、stale 重做／涵蓋短路／上限、非法來源拒絕及同 request receipt 恢復。
 
-這個結果只完成 package workflow 與契約驗證。App 尚未組裝 dispatcher、正式 PostgresSaver／PostgresStore／publication 的新分層程序旅程，也未接 C bundle repair、B1 compaction、provider 或自然模型驗收；因此不能稱為 production dispatcher 或完整 App 已完成。
+這個 workflow 結果只完成 package workflow 與契約驗證。後續 App 切片已讓 A 在每回合固定一個 publication，從兩層 guide 起步並按需讀取案例、理解及其已驗證回查入口；它沒有改本 workflow 的排程或發布責任。App 仍未組裝 dispatcher、正式 PostgresSaver／PostgresStore／publication 的新分層程序旅程，也未接 C bundle repair、B1 compaction、provider 或自然模型驗收；因此不能稱為 production dispatcher 或完整 App 已完成。
 
 ## 2. 設計依據與本案映射
 
@@ -258,7 +258,7 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 - 不接 dispatcher、通知准入或自動尋找訪談範圍。
 - 不做 C bundle repair。
 - 不做 A／B1／B2 compaction 或 provider 切換。
-- 不修改主顧問 Prompt、Skills、JD writer、UI 或 production authority。
+- 本 workflow 切片不修改主顧問 Prompt、Skills、JD writer、UI 或 production authority；後續 A read 切片只改 Memory 導覽與按需讀取接點，仍未切 production authority。
 - 不做文件封存、Memory history UI、artifact GC、舊資料 migration 或第二套 relational Memory。
 
 ## 10. 來源
@@ -282,4 +282,4 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 - **Decision：**新增 deterministic `BackgroundMemoryWorkflow` 串接既有 B1、B2、bundle 與 publication；B2 review 只作 Runtime 診斷，新 B1 必須重讀原話；最多返工一次。
 - **Why：**避免 B1／B2 各自發布或 App 重做語意不變量，同時保留精確恢復、stale 重整與一次原子 publication。
 - **Implemented：**package 已完成 source progress 接點、B1／B2 durable attempt、B1 Runtime review、outer graph、完整 bundle 組裝、同步 request checkpoint、CAS／receipt、covered／stale／bounded retry 與 blocked 終局；未修改 provider、Prompt 方法、JD 或 production 入口。
-- **Next gate：**把既有 App source owner、Saver／Store、publication resource 與通知准入組裝到這個 workflow，完成真 PostgreSQL／新程序恢復旅程；其後才接 C bundle repair、B1 request-only compaction 與完整 App 驗收。
+- **Next gate：**把既有 App source owner、Saver／Store、publication resource 與通知准入組裝到這個 workflow，完成真 PostgreSQL／新程序恢復旅程；A 分層 read path 已完成，不在 dispatcher 施工中重做。其後才接 C bundle repair、B1 request-only compaction 與完整 App 驗收。

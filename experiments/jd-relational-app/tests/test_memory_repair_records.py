@@ -128,6 +128,26 @@ def test_applied_tool_artifact_keeps_original_request_and_later_b_separate():
     assert validate_repair_message(restored, bound) == (decoded, request)
 
 
+def test_legacy_repair_artifact_accepts_both_pre_bundle_and_additive_empty_request_shapes():
+    bound = binding()
+    outcome, request = applied(bound)
+    current = make_repair_message(bound, outcome, request)
+    assert current.artifact["request"]["bundle_base_revision"] is None
+    assert current.artifact["request"]["bundle_base_version_id"] is None
+    assert validate_repair_message(current, bound)[1] == request
+
+    historical = deepcopy(current)
+    historical.artifact["request"].pop("bundle_base_revision")
+    historical.artifact["request"].pop("bundle_base_version_id")
+    assert validate_repair_message(historical, bound)[1] == request
+
+    unsupported_layered = deepcopy(current)
+    unsupported_layered.artifact["request"]["bundle_base_revision"] = 1
+    unsupported_layered.artifact["request"]["bundle_base_version_id"] = VERSION
+    with pytest.raises(MemoryRepairError, match="^invalid_repair_message$"):
+        validate_repair_message(unsupported_layered, bound)
+
+
 def test_native_anthropic_projection_excludes_artifact_but_keeps_tool_identity():
     # Exact installed adapter's normal projection, without client/provider use.
     from langchain_anthropic.chat_models import _format_messages

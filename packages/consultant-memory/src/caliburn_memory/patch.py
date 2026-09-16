@@ -37,15 +37,15 @@ class MemoryPatchError(ValueError):
     """Model-correctable patch error, not a storage/infrastructure exception."""
 
 
-def apply_staged_patch(file_path: str, diff: str) -> bool:
-    """Return whether content changed; queue a write only after full SDK success.
+def apply_text_patch(original: str, diff: str, *, label: str = "Memory content") -> str:
+    """Apply one validated V4A diff body to caller-owned text.
 
-    The caller enforces its existing graph/document scope. This boundary accepts
-    only the SDK's single-file diff body: the SDK otherwise stops at operation
-    delimiters and could ignore trailing content while appearing successful.
+    Storage and scope remain caller responsibilities. Keeping the matcher here
+    lets the legacy two-file staging and layered case staging share the exact
+    SDK semantics without granting the model a filesystem path.
     """
-    if file_path not in PATHS.values():
-        raise MemoryPatchError("Patch denied: only the two existing /memory files are editable")
+    if not isinstance(original, str) or not isinstance(label, str) or not label:
+        raise TypeError("Expected text and a nonempty patch label")
     if not diff.strip() or len(diff) > MAX_PATCH_CHARACTERS:
         raise MemoryPatchError("Provide a nonempty diff, at most 12000 characters")
     lines = diff.rstrip('\r\n').splitlines()
@@ -56,6 +56,24 @@ def apply_staged_patch(file_path: str, diff: str) -> bool:
         raise MemoryPatchError("Provide only one file's diff body; omit patch/file operation headers")
     if not any(line.startswith(('+', '-')) for line in lines):
         raise MemoryPatchError("Diff must include added or removed source lines")
+    try:
+        return apply_diff(original, diff)
+    except ValueError as error:
+        raise MemoryPatchError(
+            f"{label}: {str(error)[:1000]}. Read the affected content and revise the diff; "
+            "nothing from this patch was written."
+        ) from error
+
+
+def apply_staged_patch(file_path: str, diff: str) -> bool:
+    """Return whether content changed; queue a write only after full SDK success.
+
+    The caller enforces its existing graph/document scope. This boundary accepts
+    only the SDK's single-file diff body: the SDK otherwise stops at operation
+    delimiters and could ignore trailing content while appearing successful.
+    """
+    if file_path not in PATHS.values():
+        raise MemoryPatchError("Patch denied: only the two existing /memory files are editable")
     backend = StateBackend()
     source = backend.download_files([file_path])[0]
     if source.error == 'file_not_found':
@@ -63,10 +81,7 @@ def apply_staged_patch(file_path: str, diff: str) -> bool:
     if source.error or source.content is None:
         raise RuntimeError(f"Unable to read staged Memory: {source.error}")
     original = source.content.decode('utf-8')
-    try:
-        revised = apply_diff(original, diff)
-    except ValueError as error:
-        raise MemoryPatchError(f"{file_path}: {str(error)[:1000]}. Read the affected range and revise the diff; nothing from this patch was written.") from error
+    revised = apply_text_patch(original, diff, label=file_path)
     if revised == original:
         return False
     result = backend.write(file_path, revised)

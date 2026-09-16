@@ -226,6 +226,118 @@ def test_transport_failure_after_a_tool_checkpoint_resumes_without_repeating_the
     assert len(model.requests) == 4
 
 
+def test_same_runtime_attempt_resumes_but_a_new_attempt_reprocesses_identical_input():
+    source, session, model, workflow = _workflow([
+        _call("finish_case_maintenance", {}, "finish-a"),
+        RuntimeError("synthetic attempt fault"),
+        _done("done-a"),
+        _call("finish_case_maintenance", {}, "finish-b"),
+        _done("done-b"),
+    ])
+    batch, _window, _context = _one_window(source)
+    first_attempt, second_attempt = str(uuid4()), str(uuid4())
+
+    with pytest.raises(RuntimeError, match="synthetic attempt fault"):
+        workflow.run_attempt(
+            batch, base_publication_revision=0, base_version=None,
+            case_attempt_id=first_attempt,
+        )
+    resumed = workflow.run_attempt(
+        batch, base_publication_revision=0, base_version=None,
+        case_attempt_id=first_attempt,
+    )
+    calls_after_resume = len(model.requests)
+    assert resumed["case_attempt_id"] == first_attempt
+    assert session.load(resumed["case_stage"]).completed
+
+    fresh = workflow.run_attempt(
+        batch, base_publication_revision=0, base_version=None,
+        case_attempt_id=second_attempt,
+    )
+    assert fresh["case_attempt_id"] == second_attempt
+    assert session.load(fresh["case_stage"]).completed
+    assert len(model.requests) == calls_after_resume + 2
+
+
+def test_runtime_review_requires_canonical_source_read_and_never_reuses_candidate_identity():
+    from caliburn_memory.case_maintenance import CaseRuntimeReview
+
+    rejected_id, created_id = str(uuid4()), str(uuid4())
+    source, session, model, workflow = _workflow([
+        _call("finish_case_maintenance", {}, "premature-finish"),
+        _call("read_more_evidence", {"evidence_key": "E1"}, "read-review"),
+        _call("create_case", {
+            "content": "## 故障處理\n本人先確認告警。",
+            "route_note": "故障處理、確認告警",
+            "evidence_keys": ["E1"],
+        }, "recreate"),
+        _call("finish_case_maintenance", {}, "finish"),
+        _done("done"),
+    ], generated=[created_id])
+    review_source = source.evidence("reviewsource", [("user", "本人確認告警")])
+    batch, window, _context = _one_window(source, text="本批沒有新增案例內容。")
+    source.set_history(review_source, window)
+    review = CaseRuntimeReview(
+        case_id=rejected_id,
+        source_reference=review_source,
+        reason="B2 發現草稿混入未被案例原話支持的責任。",
+        candidate_content="## 故障處理\n本人確認告警並通知其他單位。",
+        case_origin="candidate",
+    )
+
+    result = workflow.run_attempt(
+        batch, base_publication_revision=0, base_version=None,
+        case_attempt_id=str(uuid4()), runtime_review=(review,),
+    )
+
+    stage = session.load(result["case_stage"])
+    first_payload = json.loads(next(
+        message.content for message in model.requests[0] if isinstance(message, HumanMessage)
+    ))
+    assert first_payload["RUNTIME_REVIEW"] == [{
+        "case_locator": rejected_id,
+        "case_origin": "candidate",
+        "candidate_content": review.candidate_content,
+        "reason": review.reason,
+        "evidence_key": "E1",
+        "authority": "runtime_review_not_employee_evidence",
+    }]
+    assert "source_reference" not in first_payload["RUNTIME_REVIEW"][0]
+    assert review_source not in json.dumps(first_payload["RUNTIME_REVIEW"], ensure_ascii=False)
+    assert stage.completed and stage.current_case_ids == (created_id,)
+    assert rejected_id not in stage.base_case_ids and rejected_id not in stage.current_case_ids
+    assert stage.evidence[0].source_reference == review_source
+    assert stage.evidence[0].next_offset is None
+    premature = next(message for message in result["messages"]
+                     if isinstance(message, ToolMessage)
+                     and message.tool_call_id == "premature-finish")
+    assert json.loads(premature.content)["error"] == "runtime_review_evidence_unread"
+
+
+def test_runtime_attempt_rejects_changed_review_under_the_same_identity():
+    from caliburn_memory.case_maintenance import CaseRuntimeReview
+
+    source, _session, _model, workflow = _workflow([
+        _call("finish_case_maintenance", {}, "finish"),
+        _done("done"),
+    ])
+    batch, window, _context = _one_window(source, text="甲")
+    source.set_history(window)
+    attempt_id, case_id = str(uuid4()), str(uuid4())
+    original = CaseRuntimeReview(case_id, window, "原始原因", "## 草稿\n原始內容。", "candidate")
+    changed = CaseRuntimeReview(case_id, window, "改過原因", "## 草稿\n原始內容。", "candidate")
+
+    workflow.run_attempt(
+        batch, base_publication_revision=0, base_version=None,
+        case_attempt_id=attempt_id, runtime_review=(original,),
+    )
+    with pytest.raises(ValueError, match="changed input"):
+        workflow.run_attempt(
+            batch, base_publication_revision=0, base_version=None,
+            case_attempt_id=attempt_id, runtime_review=(changed,),
+        )
+
+
 def test_window_evidence_registry_is_checkpointed_without_copying_interview_text():
     source, session, model, workflow = _workflow([
         RuntimeError("synthetic transport fault"),

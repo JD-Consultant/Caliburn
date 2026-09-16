@@ -2,13 +2,15 @@
 
 - 日期：2026-09-16
 - Topic：`JD-R002／CTX-C001`
-- Stage：**G4 WORKING DESIGN；Owner 已裁決方向，可進 G7 小型施工**
+- Stage：**G7 分段施工；基礎元件完成，正式 A／B2 接線未開始**
 - 取代：2026-09-15「等待 OpenRouter、改 direct OpenAI、另選長上下文策略」三選一的未決狀態
 - 不取代：Q019 顧問 Prompt、Skills、JD relational writer、publication CAS、背景通知與准入規則；Memory 的最新 B1／B2／C 產品語意改由 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 持有
 
 > **2026-09-16 MEM-L001 影響：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 現已將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。B1 的具體 state／門檻與測試留給 MEM-L001 的 G4 設計補齊，不從本稿舊範圍推論已完成，也不因此重開 OpenRouter transport 選擇。
 
 > **2026-09-16 CTX-W001 邊界：**主顧問在尚無 Memory、尚未觸發 compaction 或一次無法問完時所需的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)另行承接。它與 continuity summary 都是非權威衍生狀態，但責任不同；summary 不可成為 Working State 的唯一 owner，Working State 也不取代長對話 compaction。
+
+> **2026-09-16 G7 第一小步結果：**已新增尚未接入正式 A／B2 的共用 typed state、role profile、安全工具 wave 切點、canonical prefix digest、增量 summary prompt、request-only view 與同步 middleware。鎖定 LangChain 的真實 `create_agent`／Saver 離線反例共 12 項通過，涵蓋 canonical 不變、B2 固定任務、跨 graph 重建恢復、依實際 view 判斷、主模型失敗或截斷不發布、取消與截斷摘要拒絕。這只是基礎接點，不代表 A 與 B2 已改線、OpenRouter 自然 smoke 通過或 H4 完成；下一步才是 A 的真實 middleware 組合與 Command 累積反例。
 
 ## 1. 決定與產品效果
 
@@ -173,7 +175,17 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 
 完成本切片只代表 A／B2 的 App-side compaction 接線與離線契約通過；不等於完整 App dispatcher、自然長訪談品質或 production authority 已驗收。
 
-## 10. Memory 分層參考的界線
+## 10. 官方交叉核對與本案選擇
+
+本稿在施工前重新核對 OpenAI、Anthropic 及鎖定框架文件／原始碼。可稱為跨來源共同原則的只有：長任務要主動管理 active context、摘要／compaction 應保留續作所需目標與未完事項、持久 Memory 與 context compaction 是不同責任，以及工具互動不可因裁切失去配對。各家沒有共同規定 Caliburn 必須採用同一個 summary schema、message boundary、digest 或 publication 方式；這些是本產品為了 canonical 原話、JD／Memory authority 與恢復需求所作的選擇。
+
+- OpenAI 的 [Compaction 指南](https://developers.openai.com/api/docs/guides/compaction)與 [長任務模型指引](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.5)支持在長任務中壓縮工作上下文，保留已完成動作、有效假設、識別資料、工具結果、未解阻塞與下一目標；原生 opaque item 是 Responses transport 能力，不等於本產品的工作理解 Memory。
+- Anthropic 的 [Compaction](https://platform.claude.com/docs/en/build-with-claude/compaction)、[Context windows](https://platform.claude.com/docs/en/build-with-claude/context-windows)與 [Memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)同樣把 active-context 縮減與可按需讀取的持久資料分開；這支持責任分離，不代表其 server-side summary 格式可直接當成本 App 契約。
+- LangChain 的 [Custom middleware](https://docs.langchain.com/oss/python/langchain/middleware/custom)、[Built-in middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)與 LangGraph [Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)提供 request override、state update、summary middleware 與 checkpoint primitive。鎖定的 LangChain 1.4.0 built-in summarizer 會用 summary＋tail 更新 `messages`，所以本案不用它覆寫 canonical conversation；同版 factory 原始碼則證明不同 middleware 的 `Command` 可累積，故不先修改 `JdNoticeMiddleware`。
+
+因此，官方資料支持本稿的責任切分與安全目標；「canonical messages 永久保留、衍生 summary 另存、B2 起始任務逐字保留、digest 驗證、摘要與主回答同 model step 發布」仍是 Caliburn 的產品／工程決策，不冒充大廠唯一共識。
+
+## 11. Memory 分層參考的界線
 
 OpenAI 官方目前只直接說明：Codex 會在背景從合格的既有聊天產生本機 memory files，跳過 active／short-lived sessions；生成資料包含 summaries、durable entries、recent inputs 與 supporting evidence，且 extraction／consolidation model 可分別設定。這支持「原始對話、抽取產物、整併結果與導覽用途分開」，但沒有規定 Caliburn 必須採相同 schema、同一版號或 publication CAS。[OpenAI Docs：Memories](https://learn.chatgpt.com/docs/customization/memories#how-local-codex-memories-work)
 

@@ -5,6 +5,8 @@
 狀態：B1 staged contract 與固定來源 Agent graph 兩片皆完成；尚未接 B2／背景發布／正式 App
 上位決策：[分層案例／工作理解 Memory 對齊](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)
 
+> **2026-09-17 接續修正：**本計畫記錄已完成切片及當時證據；其中「所有改動案例自動附整批 canonical source」只代表舊切片現況，已被 Owner 的完整訪談回合引用決策取代，不再指導下一步。下一片須讓 B1 從 Runtime 已提供／已讀的完整回合 references 選擇並在 revise／split／merge 時正確分配；本次待整理來源是 processed-source 邊界，不是 B1 訪談回查權限上限。見 [MEM-L001](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 與[完整背景 Workflow 設計](../specs/2026-09-17-layered-memory-background-workflow-design.md)。
+
 ## 1. 第一片要完成的效果
 
 本片只固定 B1 對案例層可做的語意操作與可 checkpoint 的 staged 狀態。B1 的輸出仍不是正式 Memory；必須等後續 B2 完成影響分析並由完整背景工作一次發布，A 才能看到。

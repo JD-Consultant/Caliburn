@@ -4,6 +4,8 @@
 
 **Goal:** 建立 B2 的 durable staged state、窄語意工具與多對多影響核對，讓完成的 B1 候選案例可被整理成可修訂的穩定工作理解候選，但本片不發布 Memory。
 
+> **2026-09-17 接續釐清：**本計畫的 required cases／directly affected understandings 是完成前必讀與影響驗收，不是 B2 的可讀案例 allowlist。B2 仍可從案例 guide 按需讀取 candidate 中任何目前案例，必要時沿案例保存的完整訪談回合 references 回查原話；後續施工不得把增量提示誤作資料權限限制。
+
 **Architecture:** `UnderstandingMaintenanceSession` 固定一份已完成的 `CaseMaintenanceStage` 與其精確 base bundle，Runtime 從 base manifest 推導受 B1 變更直接影響的既有理解，並擁有 ID、guide route、support bindings 與驗證。模型只能讀取 Runtime 提供的目前／被取代案例與目前理解，再提出 create／revise／revalidate／split／merge／retire／route／finish 等語意操作；所有結果只存在 checkpoint-safe B2 stage。
 
 **Tech Stack:** Python 3.12、LangChain 1.4.0 tools、LangGraph 1.2.11 state／ToolNode、既有 `MemoryArtifacts`／`CaseMaintenanceSession`／V4A text patch。

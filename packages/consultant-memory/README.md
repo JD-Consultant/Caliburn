@@ -10,6 +10,12 @@
 - `caliburn_memory.read_tools.readonly_file_tools(backend)` 提供原生 `ls`／`grep`／`read_file`，不掛檔案 middleware 的訊息 hooks。0.7 不支援 backend factory；App 用公開工具替換接點綁固定 reader，見[工具實證](read-tools-results.md)及[新 App 接合](../../docs/specs/2026-09-13-jd-memory-read-integration-slice.md)。
 - 沿用原 `q019-memory` namespace 及 `q019_document_memory_head`／`q019_memory_publication_receipt` 表，沒有另建平行權威。`setup()` 是明示初始化，禁止在一般開啟或每次回合呼叫。
 
+### 分層 Memory bundle 基礎
+
+**2026-09-16：**新增尚未切換 production 的 G4 foundation。`MemoryArtifacts.save_bundle()` 可在同一不可變 `MemoryVersion` 保存 Runtime-owned manifest、案例 guide、逐案例 Markdown、工作理解 guide 與逐理解 Markdown；`case_id`／`understanding_id` 使用 Runtime UUID，manifest 固定來源、內容 digest、多對多 `understanding → case` 精確 binding 及合併／拆分後的 supersession。`case()`／`understanding()` 按穩定 ID 讀回時同時回傳已驗證來源或案例 binding，不把 manifest 當第三層 Memory。
+
+`PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致；舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑保持相容。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
+
 ## 即時修補核心
 
 **2026-09-13：**新增公開 `build_repair_graph(resolve_workflow)`，供 App 固定 wrapper 在執行時取得同輪資源；`RepairWorkflow.graph` 共用同一六節點，未另寫引擎。建圖與檢視不執行 resolver、不開任何資源。`adoption.json` 已記此版實際 hash，wheel 在乾淨 venv 依 App lock 完成完整依賴安裝並通過隔離檢查，詳見[App 接合結果](../../docs/specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。

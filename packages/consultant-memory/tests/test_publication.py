@@ -1,7 +1,9 @@
 """Contract tests of the application publication seam, not model quality."""
 
-from dataclasses import replace
+from dataclasses import asdict, replace
+import hashlib
 import importlib.util
+import json
 from uuid import uuid4
 
 import pytest
@@ -29,6 +31,17 @@ def publications():
 def request(pub, artifacts, revision=0, text="案例A", **kwargs):
     version = artifacts.save_memory(knowledge=text, guide=text + "導覽")
     return pub.prepare(version, expected_revision=revision, kind="repair", **kwargs)
+
+
+def test_legacy_request_digest_omits_additive_bundle_lineage(publications):
+    pub, artifacts = publications
+    prepared = request(pub, artifacts)
+    data = asdict(prepared)
+    data.pop("bundle_base_revision")
+    data.pop("bundle_base_version_id")
+    expected = hashlib.sha256(json.dumps(
+        data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    assert prepared.digest() == expected
 
 
 def test_publish_and_replay_after_later_version_return_original_receipt(publications):

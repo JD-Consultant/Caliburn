@@ -4,6 +4,9 @@ from caliburn_memory.bundle import (
     CaseArtifact, CaseRead, MemoryBundleManifest, Supersession,
     UnderstandingCaseBinding, WorkUnderstandingArtifact, WorkUnderstandingRead,
 )
+from caliburn_memory.background_workflow import (
+    BackgroundMemoryWorkflow, BackgroundMemoryWorkflowState,
+)
 from caliburn_memory.case_maintenance import (
     CASE_MAINTENANCE_INSTRUCTIONS, CaseChange, CaseEvidence, CaseMaintenanceAgentState,
     CaseMaintenanceError, CaseMaintenanceSession, CaseMaintenanceStage, CaseRuntimeReview,
@@ -38,6 +41,7 @@ from caliburn_memory.understanding_workflow import (
 )
 
 __all__ = [
+    "BackgroundMemoryWorkflow", "BackgroundMemoryWorkflowState",
     "CaseArtifact", "CaseRead", "MemoryBundleManifest", "Supersession",
     "UnderstandingCaseBinding", "WorkUnderstandingArtifact", "WorkUnderstandingRead",
     "CASE_MAINTENANCE_INSTRUCTIONS", "CaseChange", "CaseEvidence", "CaseMaintenanceAgentState",

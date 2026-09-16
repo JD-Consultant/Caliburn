@@ -3,6 +3,7 @@
 - 日期：2026-09-17
 - Topic：`JD-R002 / MEM-L001`
 - Stage：G7 前置正確性切片
+- Status：Tasks 1–6 已完成；本檔保留施工步驟與證據，後續共同 publication 亦已由完整背景 workflow package 切片完成
 - 依據：[MEM-L001](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)、[背景 Workflow 設計](../specs/2026-09-17-layered-memory-background-workflow-design.md)、[模型／Runtime 參數權責審核](../specs/2026-09-17-model-runtime-parameter-ownership-review.md)
 
 ## 1. 目標

@@ -4,7 +4,7 @@
 
 **Stage：**G7 分段施工
 
-**Status：**Owner 已核准方向；施工前精確設計
+**Status：**package G7 切片已完成；App dispatcher／真 PG 新程序旅程待接
 **Date：**2026-09-17
 
 ## 1. 目標與既有決策
@@ -26,6 +26,10 @@ Runtime 組裝完整 candidate bundle
 ```
 
 有效產品語意仍以 [`MEM-L001`](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 為準：B1 維護完整、可持續修正的目前工作案例；B2 從目前案例維護穩定工作理解；兩層不是摘要關係，也不合併成同一 Agent。canonical 原始訪談、案例、工作理解與 JD 的權責不變。
+
+**2026-09-17 實作結果：**`caliburn_memory.background_workflow.BackgroundMemoryWorkflow` 已在 package 內完成 deterministic `load base → B1 → B2 → complete bundle → prepare → publish` graph。它沿用兩個既有 Agent graph，不新增第三個模型；source relation、attempt／operation ID、review 轉換、版本與發布都由 Runtime 管理。離線固定模型加 real `MemoryArtifacts`／SQLite `PublicationStore` 已覆蓋 changed、no-op、父層 resume、有界 rework、stale 重做／涵蓋短路／上限、非法來源拒絕及同 request receipt 恢復。
+
+這個結果只完成 package workflow 與契約驗證。App 尚未組裝 dispatcher、正式 PostgresSaver／PostgresStore／publication 的新分層程序旅程，也未接 C bundle repair、B1 compaction、provider 或自然模型驗收；因此不能稱為 production dispatcher 或完整 App 已完成。
 
 ## 2. 設計依據與本案映射
 
@@ -247,6 +251,8 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 
 離線測試以固定模型回應證明控制流與資料邊界；不以 mock 證明自然模型品質。真 PostgreSQL／新程序完整旅程留給 App 接線切片，但既有 publication 真 PG CAS／receipt 證據直接沿用，不重做無關考卷。
 
+**本次 G7 自審結論：**第 1～8、10、13～15 項的 package 控制流已有本 workflow 或相鄰 attempt／publication 測試；第 9 項沿用 bundle／publication 的失敗即零發布反例；第 11、12、16、17 項沿用同輪完成的 evidence registry、B1/B2 工具及 App source owner 測試。這些是離線契約證據，不包含自然模型品質。真 PostgreSQL、新程序資源重建與完整 App 旅程仍未執行，留在下一個 App 接線 gate，不標示通過。
+
 ## 9. 明確不做
 
 - 不接 dispatcher、通知准入或自動尋找訪談範圍。
@@ -275,4 +281,5 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 
 - **Decision：**新增 deterministic `BackgroundMemoryWorkflow` 串接既有 B1、B2、bundle 與 publication；B2 review 只作 Runtime 診斷，新 B1 必須重讀原話；最多返工一次。
 - **Why：**避免 B1／B2 各自發布或 App 重做語意不變量，同時保留精確恢復、stale 重整與一次原子 publication。
-- **Next gate：**依本設計寫施工計畫，以測試先行完成 package 切片；完成後才接 App dispatcher 與真 PG／新程序旅程。
+- **Implemented：**package 已完成 source progress 接點、B1／B2 durable attempt、B1 Runtime review、outer graph、完整 bundle 組裝、同步 request checkpoint、CAS／receipt、covered／stale／bounded retry 與 blocked 終局；未修改 provider、Prompt 方法、JD 或 production 入口。
+- **Next gate：**把既有 App source owner、Saver／Store、publication resource 與通知准入組裝到這個 workflow，完成真 PostgreSQL／新程序恢復旅程；其後才接 C bundle repair、B1 request-only compaction 與完整 App 驗收。

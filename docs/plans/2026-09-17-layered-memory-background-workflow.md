@@ -10,6 +10,8 @@
 
 **Spec:** `docs/specs/2026-09-17-layered-memory-background-workflow-design.md`
 
+**Execution status（2026-09-17）：**Tasks 1–7 已完成；package workflow 與離線回歸已閉合。本計畫保留逐步施工證據，下一 gate 是 App dispatcher／正式資源組裝與真 PostgreSQL／新程序旅程，不在本檔繼續擴張 C、compaction、provider 或完整 App。
+
 ## Global Constraints
 
 - 產品資料鏈固定為 `canonical 訪談 ↔ B1 完整案例 ↔ B2 穩定工作理解 → JD`；B1、B2 不合併成同一 Agent。
@@ -433,4 +435,3 @@ git tag mem-layered-background-workflow-v1-20260917
 ```
 
 不 push。提交作者必須仍為 `ArIs0x145 <aris0x145@gmail.com>`。
-

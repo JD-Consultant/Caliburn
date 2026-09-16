@@ -254,6 +254,31 @@ def test_pending_background_job_cannot_be_replaced_by_another_source():
         built["engine"].dispose()
 
 
+def test_outer_resume_does_not_repeat_completed_b1_after_b2_transport_failure():
+    case_id, understanding_id = str(uuid4()), str(uuid4())
+    built = harness(
+        case_ids=[case_id],
+        understanding_ids=[understanding_id],
+        b2_replies=[
+            RuntimeError("synthetic B2 transport fault"),
+            *create_understanding_replies(
+                case_id, "本人穩定負責告警確認與結果記錄。", "resumed"),
+        ],
+    )
+    try:
+        with pytest.raises(RuntimeError, match="synthetic B2 transport fault"):
+            built["workflow"].start(built["batch"])
+        b1_calls = len(built["case_model"].requests)
+
+        result = built["workflow"].resume()
+
+        assert result["status"] == "completed"
+        assert len(built["case_model"].requests) == b1_calls
+        assert built["publication"].current().revision == 1
+    finally:
+        built["engine"].dispose()
+
+
 def runtime_review_payloads(model):
     payloads = []
     for request in model.requests:

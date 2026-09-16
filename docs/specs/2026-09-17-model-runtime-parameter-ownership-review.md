@@ -5,6 +5,8 @@
 - Stage：G4 設計收斂／G7 前置審核
 - 範圍：B1／B2 訪談證據選擇、來源讀取與語意工具；不改 Memory 分層、publication、Prompt 分工或 provider
 
+**2026-09-17 施工狀態：**下列目標契約不變。引用施工 Tasks 1–4 已完成 source owner／port／adapter、B1 checkpoint registry 與 B1 evidence 分配；§3.2 中 B1 的第 1 項與 B1 finish 已修正。B2 exact-source keys、B2 rework／finish、bundle owner-order 再驗證及 provider request strict 證據仍待 Task 5／6。
+
 ## 1. 結論
 
 產品需要的是「引用按 canonical 訪談先後顯示，模型能選對完整問答，而且正式資料不會因模型抄錯地址、順序或分頁位置而損壞」。這個效果**不要求建立持久的全域 `turn_sequence` 欄位**。
@@ -50,14 +52,14 @@
 
 現有 B1／B2 已把以下資料留在 Runtime：`document_id`、base publication revision／Memory version、new case／understanding ID、路徑、digest、operation identity、checkpoint state、read-before-write、step limit、publication 與 CAS。`parallel_tool_calls=False` 也已在共用 OpenRouter model factory 設定。
 
-### 3.2 必須修正
+### 3.2 缺口與目前施工狀態
 
-1. B1 目前把固定 `window` 自動附到所有 create／revise／split／merge 案例，沒有讓模型分配真正支持各案例的 source exchanges。
-2. B2 `read_case_source(case_id, source_reference, offset)` 要模型重填 long signed reference 與數字 offset；這兩項 Runtime 已可從已讀 case 與 checkpoint 知道，不應交模型。
-3. B2 `request_case_rework` 再次要求 `case_id＋source_reference`，重複了已讀證據關係；應改用已綁定 case/source 的 `evidence_key`＋語意理由。
-4. B1／B2 的 finish tool 要模型填 `changed/no_op`，但 stage 已有 `changed` 可計算；應改成零參數完成動作，由 Runtime 決定 outcome。
+1. **B1 已完成：**固定 `window` 不再自動附到 create／revise／split／merge；模型分配真正支持各案例的 source exchanges，Runtime 解析及 canonicalize。
+2. **B2 待 Task 5：**`read_case_source(case_id, source_reference, offset)` 仍要模型重填 long signed reference 與數字 offset；這兩項 Runtime 已可從已讀 case 與 checkpoint 知道，不應交模型。
+3. **B2 待 Task 5：**`request_case_rework` 仍要求 `case_id＋source_reference`，重複了已讀證據關係；應改用已綁定 case/source 的 `evidence_key`＋語意理由。
+4. **B1 已完成、B2 待 Task 5：**B1 finish 已改為零參數並由 Runtime 計算 outcome；B2 仍須做相同責任收斂。
 5. 目前 B1／B2 `@tool` 未在這條組裝路徑明示 provider strict binding；Pydantic／Python 端驗證與 `extra="forbid"` 不等於 wire 上已證明 strict tool use。施工時須檢查實際 request；即使 provider strict 可用，也不能移除 Runtime 語意驗證。
-6. App 的 `ExtractionSourceAdapter.read()` 目前只讀 `window`／`context`，而 B2 需要 exact `purpose="source"` paging。不能只改模型 schema，必須補正確 source-owner adapter 接點。
+6. **port／adapter 已完成、B2 consumer 待 Task 5：**App adapter 已能提供 exact `purpose="source"` paging；B2 仍須改用這個接點，不能只改模型 schema。
 
 ## 4. 參數分配準則
 
@@ -122,4 +124,4 @@ split 不能使用 merge 的「聯集保留」捷徑，因為拆分時每筆來�
 
 ## 7. 下一步
 
-先按上述權責改寫[引用施工計畫](../plans/2026-09-17-interview-evidence-citations.md)並完成來源 owner／port／adapter 的紅燈測試；再修改 B1 工具與 B2 exact-source read。此切片仍不接 publication、dispatcher、C、compaction、JD writer、UI 或付費模型。
+來源 owner／port／adapter 與 B1 工具已完成。下一步直接依[引用施工計畫](../plans/2026-09-17-interview-evidence-citations.md) Task 5 修改 bundle 與 B2 exact-source read／rework／finish，再做 Task 6 收尾驗證；不重做 Tasks 1–4。此切片仍不接 publication、dispatcher、C、compaction、JD writer、UI 或付費模型。

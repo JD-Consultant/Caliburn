@@ -83,19 +83,21 @@ def _one_window(source, *, text="甲案原話：本人先做故障初判。", co
     return batch, window, context_reference
 
 
-def test_all_planned_windows_share_one_stage_and_only_outer_batch_becomes_evidence():
+def test_all_planned_windows_share_one_stage_and_each_case_selects_exact_window_evidence():
     first_id, second_id = str(uuid4()), str(uuid4())
     source, session, model, workflow = _workflow([
         _call("create_case", {
             "content": "## 甲案\n本人先做故障初判。",
             "route_note": "甲案、故障初判",
+            "evidence_keys": ["E1"],
         }, "create-first"),
         _done("first-window-done"),
         _call("create_case", {
             "content": "## 乙案\n本人核對付款條件。",
             "route_note": "乙案、付款條件",
+            "evidence_keys": ["E2"],
         }, "create-second"),
-        _call("finish_case_maintenance", {"outcome": "changed"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("all-done"),
     ], generated=[first_id, second_id])
     batch = source.window("batch", "甲案與乙案整批原話")
@@ -114,7 +116,10 @@ def test_all_planned_windows_share_one_stage_and_only_outer_batch_becomes_eviden
     stage = session.load(result["case_stage"])
     assert stage.completed and stage.outcome == "changed"
     assert stage.current_case_ids == tuple(sorted((first_id, second_id)))
-    assert all(item.source_references == (batch,) for item in session.current_cases(stage))
+    assert {item.case_id: item.source_references for item in session.current_cases(stage)} == {
+        first_id: (first,),
+        second_id: (second,),
+    }
     first_payload = json.loads(next(
         message.content for message in model.requests[0] if isinstance(message, HumanMessage)
     ))
@@ -131,9 +136,9 @@ def test_all_planned_windows_share_one_stage_and_only_outer_batch_becomes_eviden
 
 def test_finish_is_rejected_before_the_final_window_then_allowed_on_the_final_window():
     source, session, _model, workflow = _workflow([
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "too-early"),
+        _call("finish_case_maintenance", {}, "too-early"),
         _done("first-window-done"),
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("all-done"),
     ])
     batch = source.window("batch", "兩個沒有新工作資訊的回合")
@@ -166,7 +171,7 @@ def test_agent_reads_the_current_case_before_revising_and_keeps_both_sources():
         understanding_guide="",
         understandings=(),
     )
-    batch, _window, _context = _one_window(
+    batch, window, _context = _one_window(
         source, text="使用者補充：初判後也會留存紀錄。",
     )
     # Queue replies after the real base has been created so the workflow keeps
@@ -177,8 +182,10 @@ def test_agent_reads_the_current_case_before_revising_and_keeps_both_sources():
             "case_id": case_id,
             "diff": "@@\n-本人先做故障初判。\n+本人先做故障初判並留存紀錄。",
             "route_note": None,
+            "add_evidence_keys": ["E1"],
+            "remove_evidence_keys": [],
         }, "revise"),
-        _call("finish_case_maintenance", {"outcome": "changed"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("done"),
     ])
 
@@ -188,7 +195,7 @@ def test_agent_reads_the_current_case_before_revising_and_keeps_both_sources():
     revised = session.current_cases(stage)[0]
     assert revised.case_id == case_id
     assert "並留存紀錄" in revised.content
-    assert revised.source_references == (base_source, batch)
+    assert revised.source_references == (base_source, window)
     assert [change.kind for change in stage.changes] == ["revise"]
 
 
@@ -198,9 +205,10 @@ def test_transport_failure_after_a_tool_checkpoint_resumes_without_repeating_the
         _call("create_case", {
             "content": "## 故障處理\n本人先做故障初判。",
             "route_note": "故障處理、初判",
+            "evidence_keys": ["E1"],
         }, "create"),
         RuntimeError("synthetic transport fault"),
-        _call("finish_case_maintenance", {"outcome": "changed"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("done-after-resume"),
     ], generated=[case_id])
     batch, _window, _context = _one_window(source)
@@ -220,7 +228,7 @@ def test_transport_failure_after_a_tool_checkpoint_resumes_without_repeating_the
 def test_window_evidence_registry_is_checkpointed_without_copying_interview_text():
     source, session, model, workflow = _workflow([
         RuntimeError("synthetic transport fault"),
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("done-after-resume"),
     ])
     batch = source.window("batch", "固定批次")
@@ -279,7 +287,7 @@ def test_read_case_uses_owner_history_order_instead_of_artifact_tuple_order():
     source.set_history(older, newer)
     model.replies.extend([
         _call("read_case", {"case_id": case_id}, "read"),
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("done"),
     ])
 
@@ -308,7 +316,7 @@ def test_history_and_exact_evidence_paging_use_only_checkpointed_runtime_cursors
     model.replies.extend([
         _call("browse_interview_history", {}, "browse"),
         _call("read_more_evidence", {"evidence_key": "E2"}, "more"),
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("done"),
     ])
 
@@ -337,7 +345,7 @@ def test_history_cursor_and_evidence_keys_resume_at_the_next_owner_page():
         _call("browse_interview_history", {}, "browse-first"),
         RuntimeError("synthetic transport fault"),
         _call("browse_interview_history", {}, "browse-second"),
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("done"),
     ])
 
@@ -378,7 +386,7 @@ def test_read_case_fails_closed_when_owner_cannot_prove_every_citation_order():
     source.set_history(proven)
     model.replies.extend([
         _call("read_case", {"case_id": case_id}, "read"),
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _call("finish_case_maintenance", {}, "finish"),
         _done("done"),
     ])
 
@@ -447,7 +455,7 @@ def test_incomplete_or_refused_model_response_never_completes_the_stage(reply, r
 
 def test_incomplete_response_cannot_execute_its_proposed_case_tool():
     reply = _call("create_case", {
-        "content": "不完整輸出不得寫入。", "route_note": "不完整",
+        "content": "不完整輸出不得寫入。", "route_note": "不完整", "evidence_keys": ["E1"],
     }, "incomplete-tool")
     reply.response_metadata["status"] = "incomplete"
     source, session, _model, workflow = _workflow([reply], generated=[str(uuid4())])
@@ -463,9 +471,9 @@ def test_incomplete_response_cannot_execute_its_proposed_case_tool():
 
 def test_next_fixed_batch_clears_old_messages_and_gets_its_own_bounded_attempt():
     source, session, model, workflow = _workflow([
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish-first"),
+        _call("finish_case_maintenance", {}, "finish-first"),
         _done("done-first"),
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish-second"),
+        _call("finish_case_maintenance", {}, "finish-second"),
         _done("done-second"),
     ])
     first = source.window("firstbatch", "第一批專屬內容")
@@ -493,9 +501,9 @@ def test_next_fixed_batch_clears_old_messages_and_gets_its_own_bounded_attempt()
 
 def test_same_source_with_a_new_base_is_a_fresh_semantic_attempt_after_stale():
     source, session, model, workflow = _workflow([
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish-v0"),
+        _call("finish_case_maintenance", {}, "finish-v0"),
         _done("done-v0"),
-        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish-v1"),
+        _call("finish_case_maintenance", {}, "finish-v1"),
         _done("done-v1"),
     ])
     batch, _window, _context = _one_window(source)

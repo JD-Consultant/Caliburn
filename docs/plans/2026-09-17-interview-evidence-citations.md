@@ -74,9 +74,9 @@ App adapter 只轉譯 source owner 的既有錯誤與資料，不自行重排、
 4. `read_case` 回傳每筆既有 source 對應的 ordered evidence block；如果 owner 無法證明 canonical order，明示失敗，不照 tuple／字串原順序猜測。
 5. stage serialize／resume 後保留同一映射；同 attempt 不因 latest conversation 前進而偷偷改序或擴大已提供集合。
 
-實作結果：`CaseMaintenanceStage` 已升為 v2，在原 stage 內保存短 key、signed source、message ID／role、Runtime-private order proof、歷史下一頁與每筆 exact-source 下一頁；原話不進 stage。窗口載入同時登記 owner-ordered blocks；新增的 `browse_interview_history()` 沒有模型參數，`read_more_evidence(evidence_key)` 只收已展示 key。`read_case` 從 attempt 固定的 window 上界分頁掃描 owner metadata，全部引用都定位後才回正文與 ordered evidence；缺漏、重複、順序漂移或 paging 不前進皆拒絕，失敗不留下 read evidence。transport resume、反 artifact tuple 順序、Runtime-only cursor、無 raw-text checkpoint 及 fail-closed 反例已納入 package 回歸。Task 4 的案例引用選擇尚未提前施工。
+實作結果：`CaseMaintenanceStage` 已升為 v2，在原 stage 內保存短 key、signed source、message ID／role、Runtime-private order proof、歷史下一頁與每筆 exact-source 下一頁；原話不進 stage。窗口載入同時登記 owner-ordered blocks；新增的 `browse_interview_history()` 沒有模型參數，`read_more_evidence(evidence_key)` 只收已展示 key。`read_case` 從 attempt 固定的 window 上界分頁掃描 owner metadata，全部引用都定位後才回正文與 ordered evidence；缺漏、重複、順序漂移或 paging 不前進皆拒絕，失敗不留下 read evidence。transport resume、反 artifact tuple 順序、Runtime-only cursor、無 raw-text checkpoint 及 fail-closed 反例已納入 package 回歸。Task 4 已在下一節接續完成。
 
-### Task 4：B1 語意工具改為選擇證據
+### Task 4：B1 語意工具改為選擇證據（已完成）
 
 工具只接受 Runtime 已提供的 `evidence_key`，由 Runtime 解析成 references：
 
@@ -90,6 +90,8 @@ App adapter 只轉譯 source owner 的既有錯誤與資料，不自行重排、
 Runtime 拒絕未知／重複 key、同時新增及移除同一 key、空證據、跨文件、非 `source` purpose、模型直接提交 token，以及新增／移除後無法支持資料結構的請求。工具回應回傳實際接受的 ordered evidence keys，讓模型可修正錯誤；失敗不得部分修改 stage。
 
 Prompt 只補來源選擇與分配規則，不重寫案例分析方法、B1/B2 分層或主顧問 Prompt。
+
+實作結果：B1 create／revise／split／merge 現只接受 attempt 內已展示的 `evidence_key`，Runtime 解析正式 signed references、依 source owner 順序 canonicalize，並拒絕未知、重複、add/remove 衝突及空證據。revise 保留未提及引用，且允許 `diff=null` 完成純引用修補；split 對每個 replacement 要求完整 keys，未分配的舊引用須帶一行理由明示捨棄；merge 從已讀案例引用聯集套用 delta。工具成功結果回傳實際接受的 ordered keys，模型不能提交 reference、offset 或 outcome；`finish_case_maintenance()` 已為零參數並由 Runtime 計算 `changed/no_op`。所有輸入先驗證再配置新案例 ID，失敗不修改 stage 或消耗 identity。Prompt 只加入上述選擇規則；案例分析方法、B1／B2 邊界及主顧問 Prompt 未改。完整 package 回歸已涵蓋精確 window 引用、倒序輸入 canonicalize、引用-only revise、split 分配／捨棄、merge 聯集 delta、schema 隱藏及 transport resume。Task 5 的 bundle／B2 讀取仍未施工。
 
 ### Task 5：Memory bundle 與 B2 讀取保持相同順序
 

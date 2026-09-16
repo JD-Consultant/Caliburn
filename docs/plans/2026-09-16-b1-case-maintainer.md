@@ -6,6 +6,8 @@
 上位決策：[分層案例／工作理解 Memory 對齊](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)
 
 > **2026-09-17 接續修正：**本計畫記錄已完成切片及當時證據；其中「所有改動案例自動附整批 canonical source」只代表舊切片現況，已被 Owner 的完整訪談回合引用決策取代，不再指導下一步。下一片須讓 B1 從 Runtime 已提供／已讀的完整回合 references 選擇並在 revise／split／merge 時正確分配；本次待整理來源是 processed-source 邊界，不是 B1 訪談回查權限上限。見 [MEM-L001](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 與[完整背景 Workflow 設計](../specs/2026-09-17-layered-memory-background-workflow-design.md)。
+>
+> **2026-09-17 接續結果：**上述精確 evidence 分配已由[引用施工計畫](2026-09-17-interview-evidence-citations.md) Task 4 完成。本檔 §4、§5 與 §7 保留的是前兩片當時契約與證據，不再是目前工具介面；目前 create／revise／split／merge 只選 Runtime keys，finish 不收 outcome。後續以引用施工計畫 Task 5 為準，不把本檔舊介面接回。
 
 ## 1. 第一片要完成的效果
 

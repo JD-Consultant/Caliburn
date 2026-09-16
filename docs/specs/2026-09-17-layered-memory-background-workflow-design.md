@@ -76,7 +76,7 @@ Runtime 組裝完整 candidate bundle
 
 既有 `context_reference` 可幫助當次模型理解，但 context token 本身不冒充 evidence；若其中問答確實支持案例，來源 owner 要沿用既有 `source` 格式為對應的已安全完成使用者輪次提供可持久驗證的 references，B1 再選入案例證據集合。Runtime 可驗證完整交換、固定位置、文件範圍、已提供／已讀、去重與 canonical 排序；「是否足以獨立理解案例」是語意品質，交由 B1 規則、B2 沿引用反查及自然訪談驗收，不用關鍵詞或字數假裝純程式已證明。
 
-因此要先修正現有 B1「凡本次改動就自動附整批 `stage.source_reference`」的過粗行為：
+這項前置修正的完整責任如下；其中 source owner、B1 evidence registry 與 B1 語意工具分配已由引用施工 Tasks 1–4 完成，bundle／B2 同序讀取仍待 Task 5：
 
 - `processed_source`／job source range 繼續表示本次完整處理進度；
 - source owner 增加受控的歷史安全交換列舉／固定讀取能力，沿用現有 `AiRunHistory.find()`、固定 checkpoint 與 `source` 簽章，不另存第二份 conversation；

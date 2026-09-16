@@ -16,7 +16,7 @@ from langgraph.store.memory import InMemoryStore
 from pydantic import Field
 
 from caliburn_memory import (
-    CaseArtifact, CaseMaintenanceSession, MemoryArtifacts,
+    CaseArtifact, CaseMaintenanceSession, EvidenceExchange, EvidenceMessage, MemoryArtifacts,
     UNDERSTANDING_MAINTENANCE_INSTRUCTIONS,
     UnderstandingMaintenanceError,
     UnderstandingMaintenanceSession, UnderstandingMaintenanceWorkflow,
@@ -57,6 +57,18 @@ def _done(identity="done"):
     )
 
 
+def _register_case_evidence(session, stage, *references):
+    updated = stage
+    for index, reference in enumerate(references):
+        updated, _item = session.register_evidence(
+            updated,
+            EvidenceExchange(reference, (EvidenceMessage(reference, "user"),)),
+            order_key=(0, index, 0),
+            next_offset=None,
+        )
+    return updated
+
+
 def _harness(replies, **options):
     source = WindowSource()
     base_source = source.window(
@@ -92,6 +104,8 @@ def _harness(replies, **options):
         base_version=version,
         source_reference=batch_source,
     )
+    case_stage = _register_case_evidence(
+        case_session, case_stage, base_source, batch_source)
     case_stage, _case = case_session.observe_case(case_stage, case_a)
     case_stage = case_session.revise_case(
         case_stage,
@@ -99,8 +113,10 @@ def _harness(replies, **options):
         diff=("@@\n-本人先做故障初判並蒐集紀錄。\n"
               "+本人先做故障初判、蒐集紀錄；夜間先隔離設備後交給主管。"),
         route_note=None,
+        add_evidence_keys=["E2"],
+        remove_evidence_keys=[],
     )
-    case_stage = case_session.finish(case_stage, outcome="changed")
+    case_stage = case_session.finish(case_stage)
     session = UnderstandingMaintenanceSession(artifacts, case_session)
     model = FixedModel(replies=list(replies))
     options.setdefault("max_model_steps", 16)
@@ -243,6 +259,8 @@ def test_same_completed_b1_input_is_idempotent_but_changed_b1_starts_clean_attem
         base_version=ids["version"],
         source_reference=later_source,
     )
+    later_stage = _register_case_evidence(
+        session.case_session, later_stage, ids["base_source"], later_source)
     later_stage, _case = session.case_session.observe_case(later_stage, ids["case_a"])
     later_stage = session.case_session.revise_case(
         later_stage,
@@ -251,8 +269,10 @@ def test_same_completed_b1_input_is_idempotent_but_changed_b1_starts_clean_attem
               "+本人先做故障初判並蒐集紀錄；夜間只隔離設備，"
               "交接與跨部門協調仍由主管處理。"),
         route_note=None,
+        add_evidence_keys=["E2"],
+        remove_evidence_keys=[],
     )
-    later_stage = session.case_session.finish(later_stage, outcome="changed")
+    later_stage = session.case_session.finish(later_stage)
     model.replies.extend(_no_op_replies(ids, "second"))
 
     second = workflow.start(later_stage)

@@ -14,7 +14,7 @@ from langgraph.store.memory import InMemoryStore
 
 from caliburn_memory import (
     CaseArtifact, CaseMaintenanceSession, CaseReworkIssueInput, CaseSourceRead,
-    MemoryArtifacts,
+    EvidenceExchange, EvidenceMessage, MemoryArtifacts,
     ReplacementInput,
     UnderstandingMaintenanceError, UnderstandingMaintenanceSession,
     UnderstandingMaintenanceAgentState, UnderstandingReplacementInput,
@@ -39,6 +39,18 @@ def _call(name, arguments, call_id="understanding-call"):
     return AIMessage("", id=f"message-{call_id}", tool_calls=[{
         "name": name, "args": arguments, "id": call_id, "type": "tool_call",
     }])
+
+
+def _register_case_evidence(session, stage, *references):
+    updated = stage
+    for index, reference in enumerate(references):
+        updated, _item = session.register_evidence(
+            updated,
+            EvidenceExchange(reference, (EvidenceMessage(reference, "user"),)),
+            order_key=(0, index, 0),
+            next_offset=None,
+        )
+    return updated
 
 
 def _fixture():
@@ -74,19 +86,24 @@ def _fixture():
         base_version=version,
         source_reference=source.second_reference,
     )
+    case_stage = _register_case_evidence(
+        case_session, case_stage, source.reference, source.second_reference)
     case_stage, _case = case_session.observe_case(case_stage, case_a)
     case_stage = case_session.revise_case(
         case_stage,
         case_id=case_a,
         diff="@@\n-本人先做故障初判。\n+本人先做故障初判；夜間先隔離設備。",
         route_note=None,
+        add_evidence_keys=["E2"],
+        remove_evidence_keys=[],
     )
     case_stage = case_session.create_case(
         case_stage,
         content="本人核對付款條件與例外。",
         route_note="付款條件核對",
+        evidence_keys=["E2"],
     )
-    case_stage = case_session.finish(case_stage, outcome="changed")
+    case_stage = case_session.finish(case_stage)
     return source, artifacts, case_session, case_stage, {
         "case_a": case_a,
         "case_b": case_b,
@@ -269,6 +286,8 @@ def test_impact_covers_case_lifecycle_and_ignores_route_only_changes(
         base_version=version,
         source_reference=source.second_reference,
     )
+    case_stage = _register_case_evidence(
+        case_session, case_stage, source.reference, source.second_reference)
 
     if operation == "split":
         case_stage, _item = case_session.observe_case(case_stage, case_a)
@@ -276,9 +295,12 @@ def test_impact_covers_case_lifecycle_and_ignores_route_only_changes(
             case_stage,
             case_id=case_a,
             replacements=[
-                ReplacementInput(content="本人進行故障初判。", route_note="故障初判"),
-                ReplacementInput(content="本人隔離夜間設備。", route_note="夜間設備隔離"),
+                ReplacementInput(content="本人進行故障初判。", route_note="故障初判",
+                                 evidence_keys=["E1", "E2"]),
+                ReplacementInput(content="本人隔離夜間設備。", route_note="夜間設備隔離",
+                                 evidence_keys=["E1", "E2"]),
             ],
+            discarded_evidence=[],
         )
     elif operation == "merge":
         for case_id in (case_a, case_b):
@@ -288,6 +310,8 @@ def test_impact_covers_case_lifecycle_and_ignores_route_only_changes(
             case_ids=[case_a, case_b],
             content="本人完成事件初判與交付核對。",
             route_note="事件與交付處理",
+            add_evidence_keys=["E2"],
+            remove_evidence_keys=[],
         )
     elif operation == "retire":
         case_stage, _item = case_session.observe_case(case_stage, case_a)
@@ -296,7 +320,7 @@ def test_impact_covers_case_lifecycle_and_ignores_route_only_changes(
         case_stage = case_session.set_case_route(
             case_stage, case_id=case_a, route_note="故障事件初判",
         )
-    case_stage = case_session.finish(case_stage, outcome="changed")
+    case_stage = case_session.finish(case_stage)
 
     stage = UnderstandingMaintenanceSession(artifacts, case_session).open(case_stage)
 
@@ -438,14 +462,18 @@ def _two_understandings_fixture():
         base_version=version,
         source_reference=source.second_reference,
     )
+    case_stage = _register_case_evidence(
+        case_session, case_stage, source.reference, source.second_reference)
     case_stage, _case = case_session.observe_case(case_stage, case_a)
     case_stage = case_session.revise_case(
         case_stage,
         case_id=case_a,
         diff="@@\n-本人先做故障初判。\n+本人先做故障初判；夜間先隔離設備。",
         route_note=None,
+        add_evidence_keys=["E2"],
+        remove_evidence_keys=[],
     )
-    case_stage = case_session.finish(case_stage, outcome="changed")
+    case_stage = case_session.finish(case_stage)
     return artifacts, case_session, case_stage, {
         "case_a": case_a,
         "case_b": case_b,

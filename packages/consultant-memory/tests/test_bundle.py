@@ -31,6 +31,7 @@ def save_example(artifacts: MemoryArtifacts, *, base_revision: int = 0, base_ver
     understanding_path = f"/memory/understanding/items/{understanding_id}.md"
     return artifacts.save_bundle(
         base_publication_revision=base_revision,
+        evidence_through_reference=artifacts.source.reference,
         case_guide=f"故障處理：[{case_id}]({case_path})",
         cases=(CaseArtifact(case_id, case_text, (artifacts.source.reference,)),),
         understanding_guide=f"故障初判：[{understanding_id}]({understanding_path})",
@@ -71,6 +72,58 @@ def test_bundle_round_trip_keeps_sources_and_exact_case_bindings():
     assert source.reads == [source.reference]
 
 
+def test_bundle_uses_source_owner_order_instead_of_caller_reference_order():
+    source = ExampleSource()
+    older = "conversation:document-a:older"
+    newer = "conversation:document-a:newer"
+    source.material[older] = "較早的補充。"
+    source.material[newer] = "較晚的更正。"
+    artifacts = MemoryArtifacts(InMemoryStore(), source.document_id, source=source)
+    case_id, _understanding_id, _unused = ids()
+
+    version = artifacts.save_bundle(
+        base_publication_revision=0,
+        evidence_through_reference=source.reference,
+        case_guide=f"案例：[{case_id}](/memory/cases/items/{case_id}.md)",
+        cases=(CaseArtifact(case_id, "完整案例。", (newer, older)),),
+        understanding_guide="",
+        understandings=(),
+    )
+
+    assert artifacts.case(version, case_id).source_references == (older, newer)
+
+
+def test_bundle_rejects_evidence_not_proven_in_the_fixed_source_history():
+    source = ExampleSource()
+    missing = "conversation:document-a:missing"
+    source.material[missing] = "可讀，但不屬於這個固定 lineage。"
+    owner_history = source.history_exchanges
+
+    def bounded_history(through_reference, *, offset=0, limit=50):
+        page = owner_history(through_reference, offset=offset, limit=limit)
+        return type(page)(
+            page.order,
+            tuple(item for item in page.exchanges if item.source_reference != missing),
+            page.next_offset,
+        )
+
+    source.history_exchanges = bounded_history
+    artifacts = MemoryArtifacts(InMemoryStore(), source.document_id, source=source)
+    case_id, _understanding_id, _unused = ids()
+
+    with pytest.raises(ValueError, match="canonical|history|lineage"):
+        artifacts.save_bundle(
+            base_publication_revision=0,
+            evidence_through_reference=source.reference,
+            case_guide=f"案例：[{case_id}](/memory/cases/items/{case_id}.md)",
+            cases=(CaseArtifact(
+                case_id, "不可保存。", (missing,),
+            ),),
+            understanding_guide="",
+            understandings=(),
+        )
+
+
 def test_bundle_rejects_unknown_support_source_scope_and_model_chosen_identity():
     source = ExampleSource()
     artifacts = MemoryArtifacts(InMemoryStore(), source.document_id, source=source)
@@ -78,19 +131,24 @@ def test_bundle_rejects_unknown_support_source_scope_and_model_chosen_identity()
     case = CaseArtifact(case_id, "案例", (source.reference,))
 
     with pytest.raises(ValueError, match="Unknown supporting"):
-        artifacts.save_bundle(base_publication_revision=0, case_guide="案例", cases=(case,),
+        artifacts.save_bundle(base_publication_revision=0,
+            evidence_through_reference=source.reference, case_guide="案例", cases=(case,),
             understanding_guide="理解", understandings=(
                 WorkUnderstandingArtifact(understanding_id, "理解", (unknown_case_id,)),))
     with pytest.raises(ValueError, match="reference|document"):
-        artifacts.save_bundle(base_publication_revision=0, case_guide="案例", cases=(
+        artifacts.save_bundle(base_publication_revision=0,
+            evidence_through_reference=source.reference, case_guide="案例", cases=(
             replace(case, source_references=("conversation:document-b:original",)),),
             understanding_guide="理解", understandings=(
                 WorkUnderstandingArtifact(understanding_id, "理解", (case_id,)),))
     with pytest.raises(ValueError, match="runtime UUID"):
-        artifacts.save_bundle(base_publication_revision=0, case_guide="案例", cases=(
+        artifacts.save_bundle(base_publication_revision=0,
+            evidence_through_reference=source.reference, case_guide="案例", cases=(
             replace(case, case_id="CASE-A"),), understanding_guide="", understandings=())
     with pytest.raises(ValueError, match="guide does not route"):
-        artifacts.save_bundle(base_publication_revision=0, case_guide="沒有案例入口", cases=(case,),
+        artifacts.save_bundle(base_publication_revision=0,
+            evidence_through_reference=source.reference,
+            case_guide="沒有案例入口", cases=(case,),
             understanding_guide="", understandings=())
 
 
@@ -102,6 +160,7 @@ def test_bundle_supersession_only_targets_current_same_kind_identity():
     retired_understanding_path = f"/memory/understanding/items/{retired_understanding_id}.md"
     base = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=source.reference,
         case_guide=f"舊案例：[{retired_case_id}]({retired_case_path})",
         cases=(CaseArtifact(retired_case_id, "舊案例", (source.reference,)),),
         understanding_guide=f"舊理解：[{retired_understanding_id}]({retired_understanding_path})",
@@ -113,6 +172,7 @@ def test_bundle_supersession_only_targets_current_same_kind_identity():
     understanding_path = f"/memory/understanding/items/{understanding_id}.md"
     version = artifacts.save_bundle(
         base_publication_revision=1,
+        evidence_through_reference=source.reference,
         case_guide=f"目前案例：[{case_id}]({case_path})",
         cases=(CaseArtifact(case_id, "目前案例", (source.reference,)),),
         understanding_guide=f"目前理解：[{understanding_id}]({understanding_path})",
@@ -129,6 +189,7 @@ def test_bundle_supersession_only_targets_current_same_kind_identity():
     )
     retired_without_replacement = artifacts.save_bundle(
         base_publication_revision=1,
+        evidence_through_reference=source.reference,
         case_guide=f"舊案例：[{retired_case_id}]({retired_case_path})",
         cases=(CaseArtifact(retired_case_id, "舊案例", (source.reference,)),),
         understanding_guide="",
@@ -140,7 +201,8 @@ def test_bundle_supersession_only_targets_current_same_kind_identity():
         Supersession("understanding", retired_understanding_id, ()),)
     with pytest.raises(ValueError, match="unknown current"):
         artifacts.save_bundle(
-            base_publication_revision=1, case_guide=f"目前案例：[{case_id}]({case_path})",
+            base_publication_revision=1, evidence_through_reference=source.reference,
+            case_guide=f"目前案例：[{case_id}]({case_path})",
             cases=(CaseArtifact(case_id, "目前案例", (source.reference,)),),
             understanding_guide=f"目前理解：[{understanding_id}]({understanding_path})",
             understandings=(WorkUnderstandingArtifact(understanding_id, "目前理解", (case_id,)),),

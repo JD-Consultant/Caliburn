@@ -26,9 +26,13 @@ from .memory import (
 )
 from .patch import MemoryPatchError, apply_text_patch
 from .references import controlled_references
+from .sources import (
+    MAX_EVIDENCE_EXCHANGES, EvidenceExchange, EvidenceExchangePage, EvidenceMessage,
+    ExtractionSourceReader,
+)
 
 
-STAGE_FORMAT_VERSION = 2
+STAGE_FORMAT_VERSION = 3
 MAX_ROUTE_NOTE_CHARACTERS = 500
 MAX_REPLACEMENTS = 8
 MAX_REWORK_ISSUES = 8
@@ -73,13 +77,25 @@ class CaseSourceRead:
     source_reference: str
 
 
+@dataclass(frozen=True)
+class UnderstandingCaseEvidence:
+    """Attempt key bound to one case/source pair and a Runtime-owned cursor."""
+
+    evidence_key: str
+    case_id: str
+    source_reference: str
+    messages: tuple[EvidenceMessage, ...]
+    order_index: int
+    # Zero means the exact source has not been read. None means all text was read.
+    next_offset: int | None = 0
+
+
 class CaseReworkIssueInput(BaseModel):
-    """Model-visible B2 feedback; Runtime still validates case/source ownership."""
+    """Model-visible B2 feedback over one Runtime-bound evidence key."""
 
     model_config = ConfigDict(extra="forbid")
-    case_id: str = Field(description="Runtime-provided case ID whose current content is wrong")
-    source_reference: str = Field(
-        description="Exact canonical source reference returned by read_case and read_case_source",
+    evidence_key: str = Field(
+        description="Evidence key returned for the already-read case and exact source",
     )
     reason: str = Field(
         min_length=1, max_length=MAX_REWORK_REASON_CHARACTERS,
@@ -103,6 +119,66 @@ class UnderstandingReplacementInput(BaseModel):
     )
 
 
+class _StrictToolInput(BaseModel):
+    """Runtime validation for model input; injected state remains hidden."""
+
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    runtime: ToolRuntime
+
+
+class _ReadCaseInput(_StrictToolInput):
+    case_id: str
+
+
+class _ReadUnderstandingInput(_StrictToolInput):
+    understanding_id: str
+
+
+class _CreateUnderstandingInput(_StrictToolInput):
+    content: str
+    supporting_case_ids: list[str]
+    route_note: str
+
+
+class _ReviseUnderstandingInput(_StrictToolInput):
+    understanding_id: str
+    diff: str
+    supporting_case_ids: list[str]
+    route_note: str | None
+
+
+class _RevalidateUnderstandingInput(_StrictToolInput):
+    understanding_id: str
+    supporting_case_ids: list[str]
+
+
+class _SplitUnderstandingInput(_StrictToolInput):
+    understanding_id: str
+    replacements: list[UnderstandingReplacementInput] = Field(
+        min_length=2, max_length=MAX_REPLACEMENTS,
+    )
+
+
+class _MergeUnderstandingsInput(_StrictToolInput):
+    understanding_ids: list[str] = Field(min_length=2, max_length=MAX_REPLACEMENTS)
+    content: str
+    supporting_case_ids: list[str]
+    route_note: str
+
+
+class _RetireUnderstandingInput(_StrictToolInput):
+    understanding_id: str
+
+
+class _SetUnderstandingRouteInput(_StrictToolInput):
+    understanding_id: str
+    route_note: str
+
+
+class _FinishUnderstandingInput(_StrictToolInput):
+    pass
+
+
 @dataclass(frozen=True)
 class UnderstandingMaintenanceStage:
     """JSON-safe checkpoint state for one B2 attempt on one fixed B1 result."""
@@ -119,6 +195,7 @@ class UnderstandingMaintenanceStage:
     required_understanding_ids: tuple[str, ...]
     read_case_ids: tuple[str, ...] = ()
     read_understanding_ids: tuple[str, ...] = ()
+    evidence: tuple[UnderstandingCaseEvidence, ...] = ()
     read_source_references: tuple[CaseSourceRead, ...] = ()
     binding_updates: tuple[UnderstandingSupportSelection, ...] = ()
     upserts: tuple[WorkUnderstandingArtifact, ...] = ()
@@ -157,6 +234,14 @@ class UnderstandingMaintenanceStage:
             "required_understanding_ids": list(self.required_understanding_ids),
             "read_case_ids": list(self.read_case_ids),
             "read_understanding_ids": list(self.read_understanding_ids),
+            "evidence": [{
+                "evidence_key": item.evidence_key,
+                "case_id": item.case_id,
+                "source_reference": item.source_reference,
+                "messages": [asdict(message) for message in item.messages],
+                "order_index": item.order_index,
+                "next_offset": item.next_offset,
+            } for item in self.evidence],
             "read_source_references": [
                 asdict(item) for item in self.read_source_references
             ],
@@ -192,7 +277,7 @@ class UnderstandingMaintenanceStage:
             "base_memory_version_id", "case_stage", "base_understanding_ids",
             "base_understanding_guide_digest", "understanding_guide",
             "required_case_ids", "required_understanding_ids", "read_case_ids",
-            "read_understanding_ids", "read_source_references", "binding_updates",
+            "read_understanding_ids", "evidence", "read_source_references", "binding_updates",
             "upserts", "supersessions", "changes", "case_rework_issues",
             "completed", "outcome",
         }
@@ -212,6 +297,14 @@ class UnderstandingMaintenanceStage:
                 required_understanding_ids=tuple(value["required_understanding_ids"]),
                 read_case_ids=tuple(value["read_case_ids"]),
                 read_understanding_ids=tuple(value["read_understanding_ids"]),
+                evidence=tuple(UnderstandingCaseEvidence(
+                    evidence_key=item["evidence_key"],
+                    case_id=item["case_id"],
+                    source_reference=item["source_reference"],
+                    messages=tuple(EvidenceMessage(**message) for message in item["messages"]),
+                    order_index=item["order_index"],
+                    next_offset=item["next_offset"],
+                ) for item in value["evidence"]),
                 read_source_references=tuple(CaseSourceRead(
                     case_id=item["case_id"],
                     source_reference=item["source_reference"],
@@ -385,11 +478,41 @@ class UnderstandingMaintenanceSession:
             raise UnderstandingMaintenanceError(
                 "invalid_understanding_stage", "B2 case read evidence is invalid",
             )
+        evidence_keys: set[str] = set()
+        evidence_pairs: set[tuple[str, str]] = set()
+        evidence_orders: set[tuple[str, int]] = set()
+        for index, item in enumerate(stage.evidence, 1):
+            pair = (item.case_id, item.source_reference)
+            order = (item.case_id, item.order_index)
+            if (not isinstance(item, UnderstandingCaseEvidence)
+                    or item.evidence_key != f"E{index}"
+                    or item.evidence_key in evidence_keys
+                    or pair in evidence_pairs
+                    or order in evidence_orders
+                    or item.case_id not in stage.read_case_ids
+                    or type(item.messages) is not tuple or not item.messages
+                    or any(not isinstance(message, EvidenceMessage)
+                           for message in item.messages)
+                    or type(item.order_index) is not int or item.order_index < 0
+                    or (item.next_offset is not None
+                        and (type(item.next_offset) is not int
+                             or item.next_offset < 0))
+                    or item.source_reference not in self._read_case_from_fixed_stage(
+                        stage, item.case_id,
+                    ).source_references):
+                raise UnderstandingMaintenanceError(
+                    "invalid_understanding_stage", "B2 evidence registry is invalid",
+                )
+            self.artifacts.validate_source(item.source_reference)
+            evidence_keys.add(item.evidence_key)
+            evidence_pairs.add(pair)
+            evidence_orders.add(order)
         seen_source_reads: set[tuple[str, str]] = set()
         for source_read in stage.read_source_references:
             key = (source_read.case_id, source_read.source_reference)
             if (key in seen_source_reads
                     or source_read.case_id not in stage.read_case_ids
+                    or key not in evidence_pairs
                     or type(source_read.source_reference) is not str
                     or source_read.source_reference not in self._read_case_from_fixed_stage(
                         stage, source_read.case_id,
@@ -544,10 +667,15 @@ class UnderstandingMaintenanceSession:
         self._validate(observed)
         return observed, item
 
-    def observe_source_reference(self, stage: UnderstandingMaintenanceStage, *,
-                                 case_id: str, source_reference: str
-                                 ) -> UnderstandingMaintenanceStage:
-        """Checkpoint proof that B2 read one exact source exposed by an observed case."""
+    def register_case_evidence(
+        self,
+        stage: UnderstandingMaintenanceStage,
+        *,
+        case_id: str,
+        exchange: EvidenceExchange,
+        order_index: int,
+    ) -> tuple[UnderstandingMaintenanceStage, UnderstandingCaseEvidence]:
+        """Bind one owner-proven source to one observed case without reading its text."""
         self._open_stage(stage)
         try:
             case_id = _stable_id(case_id, field="case_id")
@@ -555,22 +683,81 @@ class UnderstandingMaintenanceSession:
             raise UnderstandingMaintenanceError("invalid_case_id", "Case ID is invalid") from error
         if case_id not in stage.read_case_ids:
             raise UnderstandingMaintenanceError(
-                "case_read_required", "Read the case before reading its canonical source",
+                "case_read_required", "Read the case before registering its evidence",
             )
-        item = self.read_case(stage, case_id)
-        if source_reference not in item.source_references:
+        if (not isinstance(exchange, EvidenceExchange)
+                or exchange.source_reference not in self.read_case(stage, case_id).source_references
+                or type(order_index) is not int or order_index < 0):
             raise UnderstandingMaintenanceError(
-                "source_not_owned_by_case",
-                "Canonical source reference does not belong to the observed case",
+                "invalid_case_evidence", "Case evidence is outside the owner-proven case scope",
             )
-        self.artifacts.validate_source(source_reference)
-        evidence = CaseSourceRead(case_id, source_reference)
-        observed = replace(stage, read_source_references=tuple(sorted(
-            {*stage.read_source_references, evidence},
-            key=lambda item: (item.case_id, item.source_reference),
-        )))
-        self._validate(observed)
-        return observed
+        existing = next((item for item in stage.evidence
+                         if item.case_id == case_id
+                         and item.source_reference == exchange.source_reference), None)
+        if existing is not None:
+            if existing.messages != exchange.messages or existing.order_index != order_index:
+                raise UnderstandingMaintenanceError(
+                    "case_evidence_order_changed",
+                    "Case evidence metadata changed after this attempt registered it",
+                )
+            return stage, existing
+        item = UnderstandingCaseEvidence(
+            evidence_key=f"E{len(stage.evidence) + 1}",
+            case_id=case_id,
+            source_reference=exchange.source_reference,
+            messages=exchange.messages,
+            order_index=order_index,
+        )
+        updated = replace(stage, evidence=(*stage.evidence, item))
+        self._validate(updated)
+        return updated, item
+
+    def evidence_for_key(
+        self, stage: UnderstandingMaintenanceStage, evidence_key: str,
+    ) -> UnderstandingCaseEvidence:
+        self._validate(stage)
+        if type(evidence_key) is not str:
+            raise UnderstandingMaintenanceError(
+                "unknown_evidence_key", "Evidence key is not available in this B2 attempt",
+            )
+        item = next((item for item in stage.evidence
+                     if item.evidence_key == evidence_key), None)
+        if item is None:
+            raise UnderstandingMaintenanceError(
+                "unknown_evidence_key", "Evidence key is not available in this B2 attempt",
+            )
+        return item
+
+    def advance_case_evidence(
+        self,
+        stage: UnderstandingMaintenanceStage,
+        *,
+        evidence_key: str,
+        next_offset: int | None,
+    ) -> tuple[UnderstandingMaintenanceStage, UnderstandingCaseEvidence]:
+        """Advance one exact-source cursor and record pair-scoped read authority."""
+        self._open_stage(stage)
+        item = self.evidence_for_key(stage, evidence_key)
+        if item.next_offset is None:
+            raise UnderstandingMaintenanceError(
+                "evidence_complete", "All text for this case evidence is already read",
+            )
+        if (next_offset is not None
+                and (type(next_offset) is not int or next_offset <= item.next_offset)):
+            raise UnderstandingMaintenanceError(
+                "invalid_evidence_page", "Case evidence paging did not advance",
+            )
+        advanced = replace(item, next_offset=next_offset)
+        evidence = tuple(advanced if current.evidence_key == evidence_key else current
+                         for current in stage.evidence)
+        source_read = CaseSourceRead(item.case_id, item.source_reference)
+        reads = tuple(sorted(
+            {*stage.read_source_references, source_read},
+            key=lambda value: (value.case_id, value.source_reference),
+        ))
+        updated = replace(stage, evidence=evidence, read_source_references=reads)
+        self._validate(updated)
+        return updated, advanced
 
     def read_understanding(self, stage: UnderstandingMaintenanceStage,
                            understanding_id: str) -> WorkUnderstandingArtifact:
@@ -922,9 +1109,7 @@ class UnderstandingMaintenanceSession:
         self._validate(changed)
         return changed
 
-    def finish(self, stage: UnderstandingMaintenanceStage, *,
-               outcome: Literal["changed", "no_op"]
-               ) -> UnderstandingMaintenanceStage:
+    def finish(self, stage: UnderstandingMaintenanceStage) -> UnderstandingMaintenanceStage:
         self._open_stage(stage)
         missing_cases = set(stage.required_case_ids) - set(stage.read_case_ids)
         if missing_cases:
@@ -942,11 +1127,7 @@ class UnderstandingMaintenanceSession:
                 "required_understandings_unhandled",
                 "Handle all directly affected work understandings before completing B2",
             )
-        if (outcome == "changed") != stage.changed:
-            raise UnderstandingMaintenanceError(
-                "incorrect_understanding_outcome",
-                "Finish outcome must match whether B2 contains semantic changes",
-            )
+        outcome: Literal["changed", "no_op"] = "changed" if stage.changed else "no_op"
         guide = _prepare_text(stage.understanding_guide, guide=True)
         expected = {
             _understanding_path(item) for item in stage.current_understanding_ids
@@ -972,37 +1153,29 @@ class UnderstandingMaintenanceSession:
         """End this B2 attempt without a publishable result; B1 owns the repair."""
         self._open_stage(stage)
         if (type(issues) is not list or not 1 <= len(issues) <= MAX_REWORK_ISSUES
-                or len({(item.case_id, item.source_reference) for item in issues})
-                != len(issues)):
+                or len({item.evidence_key for item in issues}) != len(issues)):
             raise UnderstandingMaintenanceError(
                 "invalid_case_rework",
-                f"Choose 1 to {MAX_REWORK_ISSUES} distinct case/source issues",
+                f"Choose 1 to {MAX_REWORK_ISSUES} distinct evidence issues",
             )
         prepared: list[CaseReworkIssue] = []
         for item in issues:
-            try:
-                case_id = _stable_id(item.case_id, field="case_id")
-            except ValueError as error:
-                raise UnderstandingMaintenanceError(
-                    "invalid_case_rework", "Case rework ID is invalid",
-                ) from error
-            if case_id not in stage.read_case_ids:
-                raise UnderstandingMaintenanceError(
-                    "case_read_required", "Read the case before requesting B1 rework",
-                )
-            if CaseSourceRead(case_id, item.source_reference) not in stage.read_source_references:
+            evidence = self.evidence_for_key(stage, item.evidence_key)
+            if CaseSourceRead(evidence.case_id, evidence.source_reference) \
+                    not in stage.read_source_references:
                 raise UnderstandingMaintenanceError(
                     "source_read_required",
                     "Read the cited canonical source before requesting B1 rework",
                 )
-            if item.source_reference not in self.read_case(stage, case_id).source_references:
+            if evidence.source_reference not in self.read_case(
+                    stage, evidence.case_id).source_references:
                 raise UnderstandingMaintenanceError(
                     "source_not_owned_by_case",
                     "Canonical source reference does not belong to the cited case",
                 )
             prepared.append(CaseReworkIssue(
-                case_id=case_id,
-                source_reference=item.source_reference,
+                case_id=evidence.case_id,
+                source_reference=evidence.source_reference,
                 reason=_rework_reason(item.reason),
             ))
         completed = replace(
@@ -1180,8 +1353,82 @@ def _updated(name: str, runtime: ToolRuntime, stage: UnderstandingMaintenanceSta
     })
 
 
-def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
+def _case_evidence_blocks(
+    reader: ExtractionSourceReader,
+    session: UnderstandingMaintenanceSession,
+    stage: UnderstandingMaintenanceStage,
+    case_id: str,
+    references: tuple[str, ...],
+) -> tuple[UnderstandingMaintenanceStage, list[dict[str, Any]]]:
+    """Register case-bound keys in owner order without preloading source text."""
+    targets = set(references)
+    if not targets or len(targets) != len(references):
+        raise UnderstandingMaintenanceError(
+            "invalid_case_evidence", "Current case evidence is empty or duplicated",
+        )
+    case_stage = session.case_session.load(stage.case_stage)
+    found: dict[str, tuple[int, EvidenceExchange]] = {}
+    offset = 0
+    ordinal = 0
+    while True:
+        try:
+            page = reader.history_exchanges(
+                case_stage.source_reference, offset=offset, limit=MAX_EVIDENCE_EXCHANGES,
+            )
+        except ValueError as error:
+            raise UnderstandingMaintenanceError(
+                "case_evidence_order_unavailable",
+                "Cannot prove this case's evidence order from the fixed interview history",
+            ) from error
+        if not isinstance(page, EvidenceExchangePage) or page.order != "oldest_to_newest":
+            raise UnderstandingMaintenanceError(
+                "case_evidence_order_unavailable",
+                "Source owner did not provide canonical evidence order",
+            )
+        for exchange in page.exchanges:
+            if exchange.source_reference in targets:
+                if exchange.source_reference in found:
+                    raise UnderstandingMaintenanceError(
+                        "case_evidence_order_unavailable",
+                        "Source owner returned duplicate canonical evidence",
+                    )
+                found[exchange.source_reference] = (ordinal, exchange)
+            ordinal += 1
+        if len(found) == len(targets):
+            break
+        if page.next_offset is None:
+            raise UnderstandingMaintenanceError(
+                "case_evidence_order_unavailable",
+                "Cannot prove canonical order for all case evidence references",
+            )
+        if page.next_offset <= offset:
+            raise UnderstandingMaintenanceError(
+                "case_evidence_order_unavailable", "Canonical history paging did not advance",
+            )
+        offset = page.next_offset
+
+    updated = stage
+    blocks: list[dict[str, Any]] = []
+    for order_index, exchange in sorted(found.values(), key=lambda value: value[0]):
+        updated, item = session.register_case_evidence(
+            updated, case_id=case_id, exchange=exchange, order_index=order_index,
+        )
+        blocks.append({
+            "evidence_key": item.evidence_key,
+            "messages": [{"role": message.role} for message in item.messages],
+            "has_unread_text": item.next_offset is not None,
+        })
+    return updated, blocks
+
+
+def understanding_maintenance_tools(
+    reader: ExtractionSourceReader,
+    session: UnderstandingMaintenanceSession,
+):
     """Build B2 tools whose model-visible schemas contain semantic inputs only."""
+
+    if reader.document_id != session.artifacts.document_id:
+        raise ValueError("Understanding-maintenance components belong to different documents")
 
     def staged(runtime: ToolRuntime) -> UnderstandingMaintenanceStage:
         messages = runtime.state.get("messages", ())
@@ -1202,26 +1449,29 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
             next_action=str(error),
         )
 
-    @tool("read_case")
+    @tool("read_case", args_schema=_ReadCaseInput)
     def read_case(case_id: str, runtime: ToolRuntime) -> Command | ToolMessage:
-        """Read one candidate or replaced base case by a Runtime-provided ID; this stages only read evidence."""
+        """Read one case plus owner-ordered evidence keys; source text remains on demand."""
         try:
             stage = staged(runtime)
             updated, item = session.observe_case(stage, case_id)
+            updated, blocks = _case_evidence_blocks(
+                reader, session, updated, item.case_id, item.source_references,
+            )
             current = case_id in session._case_stage(updated).current_case_ids
             return _updated(
                 "read_case", runtime, updated, effect="unchanged",
                 case={
                     "case_id": item.case_id,
                     "content": item.content,
-                    "source_references": list(item.source_references),
+                    "evidence": {"order": "oldest_to_newest", "blocks": blocks},
                     "current": current,
                 },
             )
         except UnderstandingMaintenanceError as error:
             return failure("read_case", runtime, error)
 
-    @tool("read_work_understanding")
+    @tool("read_work_understanding", args_schema=_ReadUnderstandingInput)
     def read_work_understanding(understanding_id: str,
                                 runtime: ToolRuntime) -> Command | ToolMessage:
         """Read one current work understanding and its exact supporting case IDs."""
@@ -1238,7 +1488,7 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
         except UnderstandingMaintenanceError as error:
             return failure("read_work_understanding", runtime, error)
 
-    @tool("create_work_understanding")
+    @tool("create_work_understanding", args_schema=_CreateUnderstandingInput)
     def create_work_understanding(content: str, supporting_case_ids: list[str],
                                   route_note: str,
                                   runtime: ToolRuntime) -> Command | ToolMessage:
@@ -1256,7 +1506,7 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
         except UnderstandingMaintenanceError as error:
             return failure("create_work_understanding", runtime, error)
 
-    @tool("revise_work_understanding")
+    @tool("revise_work_understanding", args_schema=_ReviseUnderstandingInput)
     def revise_work_understanding(understanding_id: str, diff: str,
                                   supporting_case_ids: list[str],
                                   route_note: str | None,
@@ -1274,7 +1524,7 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
         except UnderstandingMaintenanceError as error:
             return failure("revise_work_understanding", runtime, error)
 
-    @tool("revalidate_work_understanding")
+    @tool("revalidate_work_understanding", args_schema=_RevalidateUnderstandingInput)
     def revalidate_work_understanding(understanding_id: str,
                                       supporting_case_ids: list[str],
                                       runtime: ToolRuntime) -> Command | ToolMessage:
@@ -1291,7 +1541,7 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
         except UnderstandingMaintenanceError as error:
             return failure("revalidate_work_understanding", runtime, error)
 
-    @tool("split_work_understanding")
+    @tool("split_work_understanding", args_schema=_SplitUnderstandingInput)
     def split_work_understanding(
         understanding_id: str,
         replacements: Annotated[
@@ -1313,7 +1563,7 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
         except UnderstandingMaintenanceError as error:
             return failure("split_work_understanding", runtime, error)
 
-    @tool("merge_work_understandings")
+    @tool("merge_work_understandings", args_schema=_MergeUnderstandingsInput)
     def merge_work_understandings(
         understanding_ids: Annotated[
             list[str], Field(min_length=2, max_length=MAX_REPLACEMENTS),
@@ -1337,7 +1587,7 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
         except UnderstandingMaintenanceError as error:
             return failure("merge_work_understandings", runtime, error)
 
-    @tool("retire_work_understanding")
+    @tool("retire_work_understanding", args_schema=_RetireUnderstandingInput)
     def retire_work_understanding(understanding_id: str,
                                   runtime: ToolRuntime) -> Command | ToolMessage:
         """Retire one published understanding whose current case support no longer establishes it."""
@@ -1352,7 +1602,7 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
         except UnderstandingMaintenanceError as error:
             return failure("retire_work_understanding", runtime, error)
 
-    @tool("set_work_understanding_route")
+    @tool("set_work_understanding_route", args_schema=_SetUnderstandingRouteInput)
     def set_work_understanding_route(understanding_id: str, route_note: str,
                                      runtime: ToolRuntime) -> Command | ToolMessage:
         """Update only one current understanding's guide wording; Runtime keeps its ID and route target."""
@@ -1368,15 +1618,14 @@ def understanding_maintenance_tools(session: UnderstandingMaintenanceSession):
         except UnderstandingMaintenanceError as error:
             return failure("set_work_understanding_route", runtime, error)
 
-    @tool("finish_understanding_maintenance")
-    def finish_understanding_maintenance(outcome: Literal["changed", "no_op"],
-                                         runtime: ToolRuntime) -> Command | ToolMessage:
+    @tool("finish_understanding_maintenance", args_schema=_FinishUnderstandingInput)
+    def finish_understanding_maintenance(runtime: ToolRuntime) -> Command | ToolMessage:
         """Finish B2 after affected cases and understandings are handled; this does not publish Memory."""
         try:
-            updated = session.finish(staged(runtime), outcome=outcome)
+            updated = session.finish(staged(runtime))
             return _updated(
                 "finish_understanding_maintenance", runtime, updated,
-                effect="stage_complete", outcome=outcome,
+                effect="stage_complete", outcome=updated.outcome,
                 current_understanding_ids=list(updated.current_understanding_ids),
             )
         except UnderstandingMaintenanceError as error:

@@ -91,9 +91,9 @@ Runtime 拒絕未知／重複 key、同時新增及移除同一 key、空證據�
 
 Prompt 只補來源選擇與分配規則，不重寫案例分析方法、B1/B2 分層或主顧問 Prompt。
 
-實作結果：B1 create／revise／split／merge 現只接受 attempt 內已展示的 `evidence_key`，Runtime 解析正式 signed references、依 source owner 順序 canonicalize，並拒絕未知、重複、add/remove 衝突及空證據。revise 保留未提及引用，且允許 `diff=null` 完成純引用修補；split 對每個 replacement 要求完整 keys，未分配的舊引用須帶一行理由明示捨棄；merge 從已讀案例引用聯集套用 delta。工具成功結果回傳實際接受的 ordered keys，模型不能提交 reference、offset 或 outcome；`finish_case_maintenance()` 已為零參數並由 Runtime 計算 `changed/no_op`。所有輸入先驗證再配置新案例 ID，失敗不修改 stage 或消耗 identity。Prompt 只加入上述選擇規則；案例分析方法、B1／B2 邊界及主顧問 Prompt 未改。完整 package 回歸已涵蓋精確 window 引用、倒序輸入 canonicalize、引用-only revise、split 分配／捨棄、merge 聯集 delta、schema 隱藏及 transport resume。Task 5 的 bundle／B2 讀取仍未施工。
+實作結果：B1 create／revise／split／merge 現只接受 attempt 內已展示的 `evidence_key`，Runtime 解析正式 signed references、依 source owner 順序 canonicalize，並拒絕未知、重複、add/remove 衝突及空證據。revise 保留未提及引用，且允許 `diff=null` 完成純引用修補；split 對每個 replacement 要求完整 keys，未分配的舊引用須帶一行理由明示捨棄；merge 從已讀案例引用聯集套用 delta。工具成功結果回傳實際接受的 ordered keys，模型不能提交 reference、offset 或 outcome；`finish_case_maintenance()` 已為零參數並由 Runtime 計算 `changed/no_op`。所有輸入先驗證再配置新案例 ID，失敗不修改 stage 或消耗 identity。Prompt 只加入上述選擇規則；案例分析方法、B1／B2 邊界及主顧問 Prompt 未改。完整 package 回歸已涵蓋精確 window 引用、倒序輸入 canonicalize、引用-only revise、split 分配／捨棄、merge 聯集 delta、schema 隱藏及 transport resume；Task 5 已接續完成 bundle／B2 讀取。
 
-### Task 5：Memory bundle 與 B2 讀取保持相同順序
+### Task 5：Memory bundle 與 B2 讀取保持相同順序（已完成）
 
 修改：
 
@@ -108,7 +108,9 @@ Prompt 只補來源選擇與分配規則，不重寫案例分析方法、B1/B2 �
 4. 工作理解只引用案例身分／精確 case digest；不把 raw source references 複製成另一套 B2 citation authority。
 5. `request_case_rework` 的模型輸入只保留 `evidence_key＋reason`；Runtime 解析正式 case/source。B2 finish 同樣改為零參數並由 Runtime 計算 outcome。
 
-### Task 6：驗證與文件收尾
+實作結果：`save_bundle()` 現要求 Runtime 提供本次 B1 工作原有的固定歷史上界；它先驗證案例來源可讀，再從 source owner 的 `oldest_to_newest` 歷史一次證明同文件／同 lineage 及位置，最後依 owner order 寫入 manifest，不再相信 caller tuple、reference 或時間。這個上界只是 Runtime 驗證參數，不成為案例 evidence。B2 stage 已升為 v3；`read_case` 只回案例正文、按 owner 順序排列的案例專用 `evidence_key` 及 role metadata，不預載原話。`read_case_source(evidence_key)` 從同一 checkpoint 解析 case/source 與下一頁 cursor，回傳該頁 role／原文而不暴露 reference、message ID 或 offset；同一 source 支持兩案例時配置不同 keys，正式已讀證據仍以 `(case_id, source_reference)` 隔離。`request_case_rework` 只接受已讀 key＋reason，正式 issue 由 Runtime 解析；B2 finish 已為零參數。工作理解 artifact／binding 仍只保存 case ID＋精確 digest，沒有新增 raw-source citation authority。
+
+### Task 6：驗證與文件收尾（已完成）
 
 至少覆蓋：
 
@@ -124,6 +126,8 @@ Prompt 只補來源選擇與分配規則，不重寫案例分析方法、B1/B2 �
 10. 檢查 B1／B2 實際 provider request 是否真的啟用 strict schema；未證實不得只因 Pydantic schema 存在就標為 strict，Runtime 驗證在兩種情況都保留。
 
 執行受影響 package tests、conversation/source tests、B1/B2 App adapter tests、compileall 與 `git diff --check`。不呼叫 provider、不讀正式 key、不啟動 production、不做 push。
+
+實際結果：`consultant-memory` 全套 **247 passed**，App 的 `test_memory_sources.py`／`test_interview_window_source.py`／`test_extraction_app.py` **94 passed**；兩個範圍的 `compileall` 均通過。另以反例確認 B2 語意與 workflow 兩個工具工廠都在組裝時拒絕跨文件 source reader。鎖定版本的 provider wire tool definition 未啟用 `strict=true`，因此只記錄 Runtime Pydantic／ToolNode strict 驗證已通過，不把 schema 存在冒稱 provider strict。全程未呼叫 provider、未讀 key、未啟動 production、未 push。
 
 ## 4. 明確不做
 

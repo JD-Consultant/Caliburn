@@ -103,6 +103,11 @@ class SourceReader(Protocol):
         """
         raise InvalidSourceReference("invalid_source_reference")
 
+    def history_exchanges(self, through_reference: str, *, offset: int = 0,
+                          limit: int = MAX_EVIDENCE_EXCHANGES) -> EvidenceExchangePage:
+        """Owner-ordered safe source history bounded by a Runtime-fixed reference."""
+        ...
+
 
 class ExtractionSourceReader(SourceReader, Protocol):
     """What B1 needs from the source owner, and nothing more.

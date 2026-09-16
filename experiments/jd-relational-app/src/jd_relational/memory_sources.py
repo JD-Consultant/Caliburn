@@ -2,7 +2,10 @@
 from dataclasses import dataclass
 from uuid import UUID
 
-from caliburn_memory.sources import InvalidSourceReference, SourceReader
+from caliburn_memory.sources import (
+    MAX_EVIDENCE_EXCHANGES, EvidenceExchange, EvidenceExchangePage, EvidenceMessage,
+    InvalidSourceReference, SourceReader,
+)
 
 from .conversation_sources import ConversationSourceError, ConversationSourceService, SourceExcerpt
 
@@ -80,3 +83,27 @@ class MemorySourceReader(SourceReader):
             if error.code == "invalid_ref":
                 raise InvalidSourceReference("invalid_source_reference") from error
             raise
+
+    def history_exchanges(self, through_reference: str, *, offset: int = 0,
+                          limit: int = MAX_EVIDENCE_EXCHANGES) -> EvidenceExchangePage:
+        """Expose owner order only to a bundle Runtime granted fixed windows."""
+        if not self.window_references:
+            raise InvalidSourceReference("invalid_source_reference")
+        try:
+            page = self.service.history_exchanges(
+                through_reference, self.document_id, offset=offset, limit=limit,
+            )
+        except ConversationSourceError as error:
+            if error.code == "invalid_ref":
+                raise InvalidSourceReference("invalid_source_reference") from error
+            raise
+        return EvidenceExchangePage(
+            order=page["order"],
+            exchanges=tuple(EvidenceExchange(
+                source_reference=exchange.source_ref,
+                messages=tuple(EvidenceMessage(
+                    message_id=message.message_id, role=message.role,
+                ) for message in exchange.messages),
+            ) for exchange in page["exchanges"]),
+            next_offset=page["next_offset"],
+        )

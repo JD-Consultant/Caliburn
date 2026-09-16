@@ -5,7 +5,7 @@
 - Stage：G4 設計收斂／G7 前置審核
 - 範圍：B1／B2 訪談證據選擇、來源讀取與語意工具；不改 Memory 分層、publication、Prompt 分工或 provider
 
-**2026-09-17 施工狀態：**下列目標契約不變。引用施工 Tasks 1–4 已完成 source owner／port／adapter、B1 checkpoint registry 與 B1 evidence 分配；§3.2 中 B1 的第 1 項與 B1 finish 已修正。B2 exact-source keys、B2 rework／finish、bundle owner-order 再驗證及 provider request strict 證據仍待 Task 5／6。
+**2026-09-17 施工狀態：**下列目標契約不變。引用施工 Tasks 1–6 已完成 source owner／port／adapter、B1 checkpoint registry／evidence 分配、bundle owner-order 再驗證、B2 case-bound exact-source keys／rework／零參數 finish，以及文件與 fresh 回歸收尾。Runtime strict schema 與 ToolNode 拒絕反例已通過；鎖定的 LangChain 1.4.0 `create_agent` 在無 structured response format 的一般 tools 路徑沒有傳 `strict=True`，而 `langchain-openrouter` 0.2.7 的 `bind_tools(strict=None)` 不會把 strict 放進 wire tool definition，因此不得把本片標成 provider strict 已證明。這不削弱 Runtime fail-closed 驗證，也不授權改 provider。
 
 ## 1. 結論
 
@@ -55,11 +55,11 @@
 ### 3.2 缺口與目前施工狀態
 
 1. **B1 已完成：**固定 `window` 不再自動附到 create／revise／split／merge；模型分配真正支持各案例的 source exchanges，Runtime 解析及 canonicalize。
-2. **B2 待 Task 5：**`read_case_source(case_id, source_reference, offset)` 仍要模型重填 long signed reference 與數字 offset；這兩項 Runtime 已可從已讀 case 與 checkpoint 知道，不應交模型。
-3. **B2 待 Task 5：**`request_case_rework` 仍要求 `case_id＋source_reference`，重複了已讀證據關係；應改用已綁定 case/source 的 `evidence_key`＋語意理由。
-4. **B1 已完成、B2 待 Task 5：**B1 finish 已改為零參數並由 Runtime 計算 outcome；B2 仍須做相同責任收斂。
-5. 目前 B1／B2 `@tool` 未在這條組裝路徑明示 provider strict binding；Pydantic／Python 端驗證與 `extra="forbid"` 不等於 wire 上已證明 strict tool use。施工時須檢查實際 request；即使 provider strict 可用，也不能移除 Runtime 語意驗證。
-6. **port／adapter 已完成、B2 consumer 待 Task 5：**App adapter 已能提供 exact `purpose="source"` paging；B2 仍須改用這個接點，不能只改模型 schema。
+2. **B2 已完成：**`read_case` 登記 case-bound keys；`read_case_source(evidence_key)` 從 checkpoint 解析 signed reference 與 cursor，模型不再重填地址或 offset。
+3. **B2 已完成：**`request_case_rework` 只收已讀 `evidence_key＋reason`；Runtime 解析正式 case/source，且共享 source 在不同案例的 read authority 互不冒用。
+4. **B1／B2 已完成：**兩者 finish 都是零參數，`changed/no_op` 由 Runtime 計算。
+5. **provider strict 未啟用、Runtime strict 已驗：**目前一般 Agent tools 路徑未明示 wire `strict=true`；Pydantic `extra="forbid"` 與 ToolNode 仍拒絕模型多塞 Runtime 欄位。後續若 transport 切片要啟用 provider strict，必須按實際 OpenRouter／模型能力另驗，不能移除 Runtime 語意驗證。
+6. **port／adapter／B2 consumer 已完成：**B2 已使用 exact `purpose="source"` paging；App 的 bundle reader 只有在明示取得 window capability 時才可列 owner history。
 
 ## 4. 參數分配準則
 
@@ -124,4 +124,4 @@ split 不能使用 merge 的「聯集保留」捷徑，因為拆分時每筆來�
 
 ## 7. 下一步
 
-來源 owner／port／adapter 與 B1 工具已完成。下一步直接依[引用施工計畫](../plans/2026-09-17-interview-evidence-citations.md) Task 5 修改 bundle 與 B2 exact-source read／rework／finish，再做 Task 6 收尾驗證；不重做 Tasks 1–4。此切片仍不接 publication、dispatcher、C、compaction、JD writer、UI 或付費模型。
+來源 owner／port／adapter、B1 引用工具、bundle owner-order 與 B2 exact-source read／rework／finish 已完成。下一步回到[完整背景 Workflow 設計](2026-09-17-layered-memory-background-workflow-design.md)，串接 B1 staged → B2 staged → 最多一次 case rework → candidate bundle → 同一 CAS publication；不重做 Tasks 1–5，也不在同一單位接 dispatcher、C、compaction、JD writer、UI 或付費模型。

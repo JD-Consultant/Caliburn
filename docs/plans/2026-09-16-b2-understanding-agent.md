@@ -10,10 +10,12 @@
 
 **Spec:** `docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md`
 
+**2026-09-17 successor：**本計畫原先讓模型提交 `case_id／source_reference／offset` 的來源工具接口，已由[訪談證據引用與 Runtime 權責施工計畫](2026-09-17-interview-evidence-citations.md)取代。現行接口是 `read_case` 配發 case-bound、attempt-scoped `evidence_key`，`read_case_source(evidence_key)` 由 Runtime 從 checkpoint 解析正式 `(case_id, source_reference)` 與 paging cursor；`request_case_rework` 只收已讀 key＋reason。以下已完成步驟仍是 durable graph 的歷史施工證據，但舊參數形狀不是現行契約。
+
 ## Global Constraints
 
 - B2 管理工作理解，不直接建立、修訂、拆分、合併或淘汰 B1 案例。
-- B2 只能沿已成功 `read_case` 回傳的該案例 canonical source reference 讀原話；不能任意掃描對話、latest 或另一文件。
+- B2 只能沿已成功 `read_case` 回傳的該案例 canonical evidence key 讀原話；不能自行提交 reference／offset，也不能任意掃描對話、latest 或另一文件。
 - `case_rework_required` 是 attempt terminal control result，不是新 Memory、案例證據或 publication outcome；下一個 B1 必須重新讀 canonical source 並自行判斷。
 - 原話只由 source owner 讀取並完整保存；B2 request compaction 不得摘要、替換或冒充原話。
 - 同一 B2 attempt 固定 completed B1 stage 與 exact base；resume 不配置新模型／工具／修正額度。
@@ -30,7 +32,7 @@
 
 **Interfaces:**
 - Produces: `CaseReworkIssue`、`CaseReworkIssueInput`、`CaseSourceRead`、`UnderstandingMaintenanceStage.read_source_references`（case／source 配對證據）、`UnderstandingMaintenanceStage.case_rework_issues`。
-- Produces: `UnderstandingMaintenanceSession.observe_source_reference(stage, case_id, source_reference)`、`request_case_rework(stage, issues)`。
+- 最終接口：`register_case_evidence／advance_case_evidence` 由 Runtime 維護 case-bound key 與 cursor；`request_case_rework(stage, issues)` 的模型輸入只含已讀 key＋reason，正式 case／reference 由 Runtime 解析。
 - Changes: `UnderstandingMaintenanceStage.outcome` becomes `Literal["changed", "no_op", "case_rework_required"] | None`；`current_understandings()` only accepts publishable `changed`／`no_op` stages。
 
 - [x] **Step 1: Write failing stage tests**
@@ -46,7 +48,7 @@
 
 - [x] **Step 3: Implement minimal stage semantics**
 
-  `observe_source_reference()` validates stable `case_id`, requires that case in `read_case_ids`, loads the current/base case through the existing session, and accepts only a reference present in that case's `source_references`. `request_case_rework()` requires one to eight distinct, already-read `(case_id, source_reference)` issues with nonempty bounded reasons; it completes the attempt with `outcome="case_rework_required"` without changing B1 or claiming B2 completion suitable for publication.
+  最終 successor 實作由 `read_case` 登記 case-bound evidence keys，Runtime 以 `advance_case_evidence()` 推進 key 對應的 exact-source cursor；`request_case_rework()` 要求一至八筆已讀 `evidence_key＋reason`，再由 Runtime 解析成 distinct `(case_id, source_reference)` issues。它以 `outcome="case_rework_required"` 結束 attempt，不改 B1，也不宣稱 B2 已完成到可發布狀態。
 
 - [x] **Step 4: Run focused GREEN tests**
 
@@ -62,7 +64,7 @@
 **Interfaces:**
 - Consumes: `UnderstandingMaintenanceSession.open/load()`、`understanding_maintenance_tools()`、`ExtractionSourceReader.read(reference, offset)`。
 - Produces: `UNDERSTANDING_MAINTENANCE_INSTRUCTIONS`、`UnderstandingMaintenanceResponseGuard`、`UnderstandingMaintenanceWorkflow.start(case_stage)`／`resume()`。
-- Produces two workflow-only tools: `read_case_source(case_id, source_reference, offset)` and `request_case_rework(issues)`；they update the same `understanding_stage` through `Command`.
+- Produces two workflow-only tools: `read_case_source(evidence_key)` and `request_case_rework(issues=[{evidence_key, reason}])`；they update the same `understanding_stage` through `Command`，reference 與 cursor 不屬於模型參數。
 
 - [x] **Step 1: Write failing workflow tests**
 

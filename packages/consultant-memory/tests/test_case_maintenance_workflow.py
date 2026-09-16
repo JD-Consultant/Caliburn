@@ -166,6 +166,7 @@ def test_agent_reads_the_current_case_before_revising_and_keeps_both_sources():
     guide = f"- [故障處理](/memory/cases/items/{case_id}.md) — 故障初判"
     base = session.artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=base_source,
         case_guide=guide,
         cases=(CaseArtifact(case_id, "## 故障處理\n本人先做故障初判。", (base_source,)),),
         understanding_guide="",
@@ -277,6 +278,7 @@ def test_read_case_uses_owner_history_order_instead_of_artifact_tuple_order():
     guide = f"- [故障處理](/memory/cases/items/{case_id}.md) — 故障與夜間例外"
     base = session.artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=newer,
         case_guide=guide,
         cases=(CaseArtifact(case_id, "## 故障處理\n本人確認告警；夜間先隔離設備。",
                             (newer, older)),),
@@ -377,6 +379,7 @@ def test_read_case_fails_closed_when_owner_cannot_prove_every_citation_order():
     guide = f"- [故障處理](/memory/cases/items/{case_id}.md) — 故障處理"
     base = session.artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=missing,
         case_guide=guide,
         cases=(CaseArtifact(case_id, "## 故障處理\n本人確認告警。", (proven, missing)),),
         understanding_guide="",
@@ -511,6 +514,7 @@ def test_same_source_with_a_new_base_is_a_fresh_semantic_attempt_after_stale():
     calls_after_first = len(model.requests)
     base = session.artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=source.reference,
         case_guide="",
         cases=(),
         understanding_guide="",

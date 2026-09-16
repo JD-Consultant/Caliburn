@@ -81,6 +81,7 @@ def _harness(replies, **options):
     case_a, case_b, understanding_x = (str(uuid4()) for _ in range(3))
     version = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=batch_source,
         case_guide=(
             f"- [故障案例](/memory/cases/items/{case_a}.md) — 故障初判與交接\n"
             f"- [交付案例](/memory/cases/items/{case_b}.md) — 交付內容核對"
@@ -145,7 +146,7 @@ def _no_op_replies(ids, prefix):
             "understanding_id": ids["understanding_x"],
             "supporting_case_ids": [ids["case_a"], ids["case_b"]],
         }, f"{prefix}-revalidate"),
-        _call("finish_understanding_maintenance", {"outcome": "no_op"},
+        _call("finish_understanding_maintenance", {},
               f"{prefix}-finish"),
         _done(f"{prefix}-done"),
     ]
@@ -167,7 +168,7 @@ def test_agent_revises_stable_understanding_without_preloading_case_or_raw_text(
             "supporting_case_ids": [ids["case_a"], ids["case_b"]],
             "route_note": "事件初判、夜間隔離與交付核對；主管負責後續協調",
         }, "revise"),
-        _call("finish_understanding_maintenance", {"outcome": "changed"}, "finish"),
+        _call("finish_understanding_maintenance", {}, "finish"),
         _done(),
     ])
     source.reads.clear()
@@ -194,19 +195,14 @@ def test_agent_reads_only_case_owned_source_then_returns_nonpublishable_rework()
     source, session, model, workflow, case_stage, ids = _harness([])
     model.replies.extend([
         _call("read_case", {"case_id": ids["case_a"]}, "read-case"),
-        _call("read_case_source", {
-            "case_id": ids["case_a"],
-            "source_reference": ids["base_source"],
-            "offset": 0,
-        }, "read-source"),
+        _call("read_case_source", {"evidence_key": "E1"}, "read-source"),
         _call("request_case_rework", {"issues": [{
-            "case_id": ids["case_a"],
-            "source_reference": ids["base_source"],
+            "evidence_key": "E1",
             "reason": "原話明確說跨部門協調由主管負責，案例不可把它列為本人責任。",
         }]}, "rework"),
         _done("rework-done"),
     ])
-    source.reads.clear()
+    source.source_reads.clear()
 
     result = workflow.start(case_stage)
 
@@ -216,16 +212,79 @@ def test_agent_reads_only_case_owned_source_then_returns_nonpublishable_rework()
             for item in stage.read_source_references] == [
         (ids["case_a"], ids["base_source"]),
     ]
-    assert source.reads == [(ids["base_source"], 0)]
+    assert source.source_reads == [(ids["base_source"], 0)]
     source_result = next(
         item for item in result["messages"]
         if isinstance(item, ToolMessage) and item.tool_call_id == "read-source"
     )
     payload = json.loads(source_result.content)
-    assert payload["source"]["reference"] == ids["base_source"]
-    assert payload["source"]["next_offset"] is not None
+    assert payload["evidence"]["evidence_key"] == "E1"
+    assert payload["evidence"]["has_more"] is True
     with pytest.raises(UnderstandingMaintenanceError, match="not publishable"):
         session.current_understandings(stage)
+
+
+def test_b2_uses_case_bound_evidence_keys_and_runtime_owned_source_cursor():
+    source, session, model, workflow, case_stage, ids = _harness([])
+    model.replies.extend([
+        _call("read_case", {"case_id": ids["case_a"]}, "read-a"),
+        _call("read_case", {"case_id": ids["case_b"]}, "read-b"),
+        _call("read_case_source", {"evidence_key": "E1"}, "read-a-source-1"),
+        _call("read_case_source", {"evidence_key": "E1"}, "read-a-source-2"),
+        _call("read_case_source", {"evidence_key": "E3"}, "read-b-source"),
+        _call("request_case_rework", {"issues": [{
+            "evidence_key": "E3",
+            "reason": "這份原話對交付案例的支持不足，需要 B1 重新核對。",
+        }]}, "rework"),
+        _done("rework-done"),
+    ])
+
+    result = workflow.start(case_stage)
+
+    stage = session.load(result["understanding_stage"])
+    assert stage.completed and stage.outcome == "case_rework_required"
+    assert stage.case_rework_issues[0].case_id == ids["case_b"]
+    assert stage.case_rework_issues[0].source_reference == ids["base_source"]
+    assert [(item.evidence_key, item.case_id, item.source_reference)
+            for item in stage.evidence] == [
+        ("E1", ids["case_a"], ids["base_source"]),
+        ("E2", ids["case_a"], ids["batch_source"]),
+        ("E3", ids["case_b"], ids["base_source"]),
+    ]
+    assert source.source_reads[:3] == [
+        (ids["base_source"], 0),
+        (ids["base_source"], 12),
+        (ids["base_source"], 0),
+    ]
+    read_a = json.loads(next(
+        item.content for item in result["messages"]
+        if isinstance(item, ToolMessage) and item.tool_call_id == "read-a"
+    ))
+    read_b = json.loads(next(
+        item.content for item in result["messages"]
+        if isinstance(item, ToolMessage) and item.tool_call_id == "read-b"
+    ))
+    assert [item["evidence_key"] for item in read_a["case"]["evidence"]["blocks"]] == [
+        "E1", "E2",
+    ]
+    assert [item["evidence_key"] for item in read_b["case"]["evidence"]["blocks"]] == [
+        "E3",
+    ]
+    assert ids["base_source"] not in json.dumps(read_a, ensure_ascii=False)
+    source_page = json.loads(next(
+        item.content for item in result["messages"]
+        if isinstance(item, ToolMessage) and item.tool_call_id == "read-a-source-1"
+    ))
+    assert source_page["evidence"]["evidence_key"] == "E1"
+    assert "reference" not in source_page["evidence"]
+    rework_result = next(
+        item for item in result["messages"]
+        if isinstance(item, ToolMessage) and item.tool_call_id == "rework"
+    )
+    assert ids["base_source"] not in rework_result.content
+    checkpoint = json.dumps(stage.to_dict(), ensure_ascii=False)
+    assert "本人只負責故障初判" not in checkpoint
+    assert session.load(stage.to_dict()) == stage
 
 
 def test_semantic_no_op_revalidates_the_complete_support_set():
@@ -293,14 +352,9 @@ def test_transport_failure_resumes_same_attempt_without_replaying_checkpointed_r
     model.replies.extend([
         _call("read_case", {"case_id": ids["case_a"]}, "read-case"),
         RuntimeError("synthetic B2 transport fault"),
-        _call("read_case_source", {
-            "case_id": ids["case_a"],
-            "source_reference": ids["base_source"],
-            "offset": 0,
-        }, "read-source"),
+        _call("read_case_source", {"evidence_key": "E1"}, "read-source"),
         _call("request_case_rework", {"issues": [{
-            "case_id": ids["case_a"],
-            "source_reference": ids["base_source"],
+            "evidence_key": "E1",
             "reason": "原話與 B1 的責任邊界不一致。",
         }]}, "rework"),
         _done(),

@@ -6,13 +6,13 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 
 - `MemoryArtifacts` 使用 Deep Agents `StoreBackend`／`CompositeBackend` 保存不可變詳記與準備版本；`ReadOnlyFiles` 提供固定版本讀取。正式內容不寫到操作者的檔案系統。
 - `PublicationStore` 以 SQLAlchemy 的版本檢查，將目前版與操作回執寫入同一短交易；重取舊回執不倒退目前版。修補不推進背景整理游標。
-- App 提供 `SourceReader(document_id, validate_reference, read)`。`validate_reference` 只驗格式／簽章／文件範圍，不讀資料庫；`read` 必須讀原先固定的來源，不能換成最新內容。無效地址用 `caliburn_memory.sources.InvalidSourceReference`；來源服務／儲存故障不可轉成該型別。本套件不擁有原始對話。
+- App 提供 `SourceReader(document_id, validate_reference, read, history_exchanges)`。`validate_reference` 只驗格式／簽章／文件範圍，不讀資料庫；`read` 必須讀原先固定的來源，不能換成最新內容；`history_exchanges` 由來源 owner 依固定上界回傳 canonical `oldest_to_newest` 順序。無效地址用 `caliburn_memory.sources.InvalidSourceReference`；來源服務／儲存故障不可轉成該型別。本套件不擁有原始對話，也不另建來源順序索引。
 - `caliburn_memory.read_tools.readonly_file_tools(backend)` 提供原生 `ls`／`grep`／`read_file`，不掛檔案 middleware 的訊息 hooks。0.7 不支援 backend factory；App 用公開工具替換接點綁固定 reader，見[工具實證](read-tools-results.md)及[新 App 接合](../../docs/specs/2026-09-13-jd-memory-read-integration-slice.md)。
 - 沿用原 `q019-memory` namespace 及 `q019_document_memory_head`／`q019_memory_publication_receipt` 表，沒有另建平行權威。`setup()` 是明示初始化，禁止在一般開啟或每次回合呼叫。
 
 ### 分層 Memory bundle 基礎
 
-**2026-09-16：**新增尚未切換 production 的 G4 foundation。`MemoryArtifacts.save_bundle()` 可在同一不可變 `MemoryVersion` 保存 Runtime-owned manifest、案例 guide、逐案例 Markdown、工作理解 guide 與逐理解 Markdown；`case_id`／`understanding_id` 使用 Runtime UUID，manifest 固定來源、內容 digest、多對多 `understanding → case` 精確 binding 及合併／拆分後的 supersession。`case()`／`understanding()` 按穩定 ID 讀回時同時回傳已驗證來源或案例 binding，不把 manifest 當第三層 Memory。
+**2026-09-16：**新增尚未切換 production 的 G4 foundation。`MemoryArtifacts.save_bundle()` 可在同一不可變 `MemoryVersion` 保存 Runtime-owned manifest、案例 guide、逐案例 Markdown、工作理解 guide 與逐理解 Markdown；`case_id`／`understanding_id` 使用 Runtime UUID，manifest 固定來源、內容 digest、多對多 `understanding → case` 精確 binding 及合併／拆分後的 supersession。保存時由 Runtime 另給本次 B1 固定來源上界 `evidence_through_reference`，所有案例引用必須由 source owner 的固定歷史證明並按 owner 順序 canonicalize；不能只因 reference 可讀就納入。`case()`／`understanding()` 按穩定 ID 讀回時同時回傳已驗證來源或案例 binding，不把 manifest 當第三層 Memory。
 
 `PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致；舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑保持相容。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
 
@@ -28,21 +28,21 @@ create／revise／split／merge 已使用 attempt registry 做精確 evidence �
 
 B1 的 canonical 訪談 batch 是受保護來源：之後的 request-only compaction 不得摘要、截斷或替換它，也不能把 continuity summary 當作案例證據。compaction 只能處理 B1 自己已安全完成的舊模型／工具往返；原始訪談由來源 owner 持續完整保存。
 
-這仍只是 package 內的 B1 候選：沒有 B2、共同 publication、正式 App model factory、dispatcher、compaction、UI 或自然模型驗收。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
+這仍只是 package 內的 B1 候選：B2 staged maintainer 已另行完成，但共同 publication、正式 App model factory、dispatcher、compaction、UI 或自然模型驗收仍不存在。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
 
 ### Ordered evidence source port（App 接點與 B1 stage 已接）
 
-`caliburn_memory.sources` 現提供 immutable typed evidence records：固定 window 內的逐輪 records、以同一 window 為上界的安全歷史分頁，以及 exact `source` 的有界文字頁。records 只含 signed reference 與 message ID／role；App source owner 才擁有 canonical order、lineage 與原文，adapter 不重排、不重簽、不建立第二份索引。B1 stage 已消費這些 port 並保存 key／order proof／cursor；offset 不是模型參數或持久 citation。B1 create／revise／split／merge 的精確引用分配已完成；bundle 保存時的 owner-order 再驗證及 B2 exact-source key 工具仍依[引用施工計畫](../../docs/plans/2026-09-17-interview-evidence-citations.md) Task 5 接入。
+`caliburn_memory.sources` 現提供 immutable typed evidence records：固定 window 內的逐輪 records、以同一 window 為上界的安全歷史分頁，以及 exact `source` 的有界文字頁。records 只含 signed reference 與 message ID／role；App source owner 才擁有 canonical order、lineage 與原文，adapter 不重排、不重簽、不建立第二份索引。B1 與 B2 stage 已消費這些 port 並保存 attempt-scoped key／order proof／Runtime paging cursor；offset 不是模型參數或持久 citation。B1 create／revise／split／merge 的精確引用分配、bundle 保存時的 owner-order 再驗證，以及 B2 case-bound exact-source key 工具均已依[引用施工計畫](../../docs/plans/2026-09-17-interview-evidence-citations.md) Task 5 接入。
 
 ### B2 工作理解 staged state／語意工具／durable Agent graph
 
 `caliburn_memory.understanding_maintenance` 與 `understanding_workflow` 已完成兩個零 provider 切片。`UnderstandingMaintenanceSession` 固定一份 completed B1 stage 與 exact base bundle，從 B1 semantic case changes 及 base `understanding → case` bindings 自動推導必讀的 candidate cases 與直接受影響 understandings；模型不能提供或縮小 impact set。新案例即使沒有反向 binding 仍是必讀項目，讓 B2 判斷是否揭露新的穩定工作理解。
 
-十個窄工具提供 case／understanding 讀取，以及 create、revise、revalidate、split、merge、retire、route、finish。已發布理解採 read-before-write；所有 support case 必須屬於同一 B1 candidate 且已實際讀取。`revalidate_work_understanding` 讓正文語意不變時明確更新支持案例，binding-only refresh 不建立假正文修改；`finish(no_op)` 仍要求變更案例已讀、直接受影響理解已 revise／revalidate／supersede／retire，避免只換 digest 或漏掉新案例。Runtime 擁有 UUID、guide route、scope、base 與後續 digest。
+十個窄語意工具提供 case／understanding 讀取，以及 create、revise、revalidate、split、merge、retire、route、finish；另有兩個窄 workflow 工具處理 case-bound 原話分頁與要求 B1 rework。已發布理解採 read-before-write；所有 support case 必須屬於同一 B1 candidate 且已實際讀取。`revalidate_work_understanding` 讓正文語意不變時明確更新支持案例，binding-only refresh 不建立假正文修改；零參數 `finish_understanding_maintenance()` 仍要求變更案例已讀、直接受影響理解已 revise／revalidate／supersede／retire，`changed/no_op` 由 Runtime 從 staged 變更計算，避免只換 digest 或漏掉新案例。Runtime 擁有 UUID、guide route、scope、base 與後續 digest。
 
-`UnderstandingMaintenanceWorkflow` 以新 B2 Prompt 接上同一 stage／tools、response guard、thread-scoped 模型／工具額度與 durable checkpoint。初始 request 只帶 base revision、兩份 guide、B1 change set 及 Runtime 推導的必讀 ID，不預載案例正文、工作理解正文或原始訪談。模型按需讀取案例與理解；只有先讀案例後，才能沿該案例實際列出的 canonical reference 分頁核對原話。來源讀取證據以 `(case_id, source_reference)` 配對保存，不能把同一批來源在案例 A 的核對冒充案例 B 已核對。
+`UnderstandingMaintenanceWorkflow` 以新 B2 Prompt 接上同一 stage／tools、response guard、thread-scoped 模型／工具額度與 durable checkpoint。初始 request 只帶 base revision、兩份 guide、B1 change set 及 Runtime 推導的必讀 ID，不預載案例正文、工作理解正文或原始訪談。模型按需讀取案例與理解；`read_case` 只顯示該案例 owner-ordered、attempt-scoped 的 `evidence_key` 與角色形狀，不洩漏 signed reference 或原文。只有先讀案例後，模型才能選該案例的 key，由 Runtime 解析固定 reference 與 cursor 並有界讀取原話。來源讀取證據以 `(case_id, source_reference)` 配對保存，不能把同一來源在案例 A 的核對冒充案例 B 已核對；同一 signed reference 在不同案例會得到不同 key。
 
-若原話只補足細節，B2 繼續整理；若原話證明 B1 有會影響工作理解的實質錯誤或缺漏，`request_case_rework` 以結構化 `case_rework_required` 結束 attempt。該結果不能交給 `current_understandings()` 或 publication；B2 不改案例，也不自行重跑 B1。這一片已驗 changed、semantic no-op／完整 binding 重驗、按案例限制的來源讀取、rework terminal、同輸入冪等、新 B1 attempt 清除舊訊息、transport resume、完成修正及 incomplete／refusal／額度防護。
+若原話只補足細節，B2 繼續整理；若原話證明 B1 有會影響工作理解的實質錯誤或缺漏，`request_case_rework` 只收已讀 `evidence_key` 與理由，由 Runtime 寫入正式 case／reference 配對並以結構化 `case_rework_required` 結束 attempt。該結果不能交給 `current_understandings()` 或 publication；B2 不改案例，也不自行重跑 B1。所有 B2 工具 schema 都拒絕模型填入 document、signed reference、offset、版本與 outcome；目前已驗的是 Runtime／ToolNode 的 strict 拒絕，OpenRouter wire-level strict 尚未證明。這一片已驗 changed、semantic no-op／完整 binding 重驗、按案例限制的來源讀取、rework terminal、同輸入冪等、新 B1 attempt 清除舊訊息、transport resume、完成修正及 incomplete／refusal／額度防護。
 
 這仍沒有 B1→B2 自動重跑、共同 publication、stale 重整、dispatcher、compaction、App 組裝或自然模型驗收。完整契約與結果見 [B2 staged maintainer 計畫](../../docs/plans/2026-09-16-b2-understanding-maintainer.md)及[B2 Agent graph 計畫](../../docs/plans/2026-09-16-b2-understanding-agent.md)。
 

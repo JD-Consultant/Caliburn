@@ -19,6 +19,7 @@ from caliburn_memory import (
     UnderstandingMaintenanceError, UnderstandingMaintenanceSession,
     UnderstandingMaintenanceAgentState, UnderstandingReplacementInput,
     WorkUnderstandingArtifact, understanding_maintenance_tools,
+    understanding_workflow_tools,
 )
 from conftest import ExampleSource
 
@@ -63,6 +64,7 @@ def _fixture():
     case_a, case_b, understanding_x, new_case = _ids(4)
     version = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=source.second_reference,
         case_guide=(
             f"- [故障案例](/memory/cases/items/{case_a}.md)\n"
             f"- [交付案例](/memory/cases/items/{case_b}.md)"
@@ -165,22 +167,31 @@ def test_source_reference_requires_its_observed_case_and_is_durable_read_evidenc
     session = UnderstandingMaintenanceSession(artifacts, case_session)
     stage = session.open(case_stage)
 
+    exchange = EvidenceExchange(
+        source.reference, (EvidenceMessage(source.reference, "user"),),
+    )
     with pytest.raises(UnderstandingMaintenanceError, match="Read the case"):
-        session.observe_source_reference(
-            stage, case_id=ids["case_a"], source_reference=source.reference,
+        session.register_case_evidence(
+            stage, case_id=ids["case_a"], exchange=exchange, order_index=0,
         )
 
     stage, _case = session.observe_case(stage, ids["case_a"])
-    with pytest.raises(UnderstandingMaintenanceError, match="does not belong"):
-        session.observe_source_reference(
-            stage, case_id=ids["case_a"], source_reference="conversation:document-a:missing",
+    with pytest.raises(UnderstandingMaintenanceError, match="outside"):
+        session.register_case_evidence(
+            stage, case_id=ids["case_a"], exchange=EvidenceExchange(
+                "conversation:document-a:missing",
+                (EvidenceMessage("missing", "user"),),
+            ), order_index=1,
         )
 
-    observed = session.observe_source_reference(
-        stage, case_id=ids["case_a"], source_reference=source.reference,
+    staged, evidence = session.register_case_evidence(
+        stage, case_id=ids["case_a"], exchange=exchange, order_index=0,
+    )
+    observed, evidence = session.advance_case_evidence(
+        staged, evidence_key=evidence.evidence_key, next_offset=None,
     )
 
-    assert observed.format_version == 2
+    assert observed.format_version == 3
     assert observed.read_source_references == (
         CaseSourceRead(ids["case_a"], source.reference),
     )
@@ -199,17 +210,21 @@ def test_case_rework_requires_read_source_and_never_becomes_publishable():
     session = UnderstandingMaintenanceSession(artifacts, case_session)
     stage = session.open(case_stage)
     stage, _case = session.observe_case(stage, ids["case_a"])
+    stage, evidence = session.register_case_evidence(
+        stage, case_id=ids["case_a"], exchange=EvidenceExchange(
+            source.reference, (EvidenceMessage(source.reference, "user"),),
+        ), order_index=0,
+    )
     issue = CaseReworkIssueInput(
-        case_id=ids["case_a"],
-        source_reference=source.reference,
+        evidence_key=evidence.evidence_key,
         reason="原話顯示本人只做初判，案例卻把後續跨部門處理也列為本人責任。",
     )
 
     with pytest.raises(UnderstandingMaintenanceError, match="Read the cited canonical source"):
         session.request_case_rework(stage, issues=[issue])
 
-    stage = session.observe_source_reference(
-        stage, case_id=ids["case_a"], source_reference=source.reference,
+    stage, _evidence = session.advance_case_evidence(
+        stage, evidence_key=evidence.evidence_key, next_offset=None,
     )
     completed = session.request_case_rework(stage, issues=[issue])
 
@@ -226,25 +241,32 @@ def test_case_rework_rejects_duplicate_or_mismatched_issue_evidence():
     session = UnderstandingMaintenanceSession(artifacts, case_session)
     stage = session.open(case_stage)
     stage, _case = session.observe_case(stage, ids["case_a"])
-    stage = session.observe_source_reference(
-        stage, case_id=ids["case_a"], source_reference=source.reference,
+    stage, evidence_a = session.register_case_evidence(
+        stage, case_id=ids["case_a"], exchange=EvidenceExchange(
+            source.reference, (EvidenceMessage(source.reference, "user"),),
+        ), order_index=0,
+    )
+    stage, _evidence = session.advance_case_evidence(
+        stage, evidence_key=evidence_a.evidence_key, next_offset=None,
     )
     issue = CaseReworkIssueInput(
-        case_id=ids["case_a"], source_reference=source.reference,
+        evidence_key=evidence_a.evidence_key,
         reason="原話與案例責任範圍不一致。",
     )
 
     with pytest.raises(UnderstandingMaintenanceError, match="distinct"):
         session.request_case_rework(stage, issues=[issue, issue])
 
+    stage, _case = session.observe_case(stage, ids["case_b"])
+    stage, evidence_b = session.register_case_evidence(
+        stage, case_id=ids["case_b"], exchange=EvidenceExchange(
+            source.reference, (EvidenceMessage(source.reference, "user"),),
+        ), order_index=0,
+    )
     wrong_case = CaseReworkIssueInput(
-        case_id=ids["case_b"], source_reference=source.reference,
+        evidence_key=evidence_b.evidence_key,
         reason="不得把 CASE-A 的來源冒充 CASE-B 已核對來源。",
     )
-    with pytest.raises(UnderstandingMaintenanceError, match="Read the case"):
-        session.request_case_rework(stage, issues=[wrong_case])
-
-    stage, _case = session.observe_case(stage, ids["case_b"])
     with pytest.raises(UnderstandingMaintenanceError, match="Read the cited canonical source"):
         session.request_case_rework(stage, issues=[wrong_case])
 
@@ -262,6 +284,7 @@ def test_impact_covers_case_lifecycle_and_ignores_route_only_changes(
     case_a, case_b, understanding_x, understanding_y, replacement_a, replacement_b = _ids(6)
     version = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=source.second_reference,
         case_guide=(
             f"- [故障案例](/memory/cases/items/{case_a}.md)\n"
             f"- [交付案例](/memory/cases/items/{case_b}.md)"
@@ -439,6 +462,7 @@ def _two_understandings_fixture():
     case_a, case_b, understanding_x, understanding_y, merged_id = _ids(5)
     version = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=source.second_reference,
         case_guide=(
             f"- [故障案例](/memory/cases/items/{case_a}.md)\n"
             f"- [交付案例](/memory/cases/items/{case_b}.md)"
@@ -552,12 +576,12 @@ def test_finish_requires_changed_cases_and_direct_impacts_then_allows_semantic_n
     stage = session.open(case_stage)
 
     with pytest.raises(UnderstandingMaintenanceError, match="changed B1 cases"):
-        session.finish(stage, outcome="no_op")
+        session.finish(stage)
 
     for case_id in stage.required_case_ids:
         stage, _case = session.observe_case(stage, case_id)
     with pytest.raises(UnderstandingMaintenanceError, match="affected work understandings"):
-        session.finish(stage, outcome="no_op")
+        session.finish(stage)
 
     stage, _item = session.observe_understanding(stage, ids["understanding_x"])
     stage, _case = session.observe_case(stage, ids["case_b"])
@@ -566,7 +590,7 @@ def test_finish_requires_changed_cases_and_direct_impacts_then_allows_semantic_n
         understanding_id=ids["understanding_x"],
         supporting_case_ids=[ids["case_a"], ids["case_b"]],
     )
-    completed = session.finish(stage, outcome="no_op")
+    completed = session.finish(stage)
 
     assert completed.completed and completed.outcome == "no_op"
     assert session.current_understandings(completed) == (
@@ -592,7 +616,7 @@ def test_retire_and_route_are_controlled_and_outcome_must_match_semantic_change(
         route_note="事件初判、交付核對；夜間隔離待整合",
     )
     with pytest.raises(UnderstandingMaintenanceError, match="affected work understandings"):
-        session.finish(routed, outcome="no_op")
+        session.finish(routed)
 
     routed, _case = session.observe_case(routed, ids["case_b"])
     routed = session.revalidate_understanding(
@@ -600,13 +624,11 @@ def test_retire_and_route_are_controlled_and_outcome_must_match_semantic_change(
         understanding_id=ids["understanding_x"],
         supporting_case_ids=[ids["case_a"], ids["case_b"]],
     )
-    with pytest.raises(UnderstandingMaintenanceError, match="outcome must match"):
-        session.finish(routed, outcome="no_op")
+    completed_route = session.finish(routed)
+    assert completed_route.outcome == "changed"
 
     retired = session.retire_understanding(stage, understanding_id=ids["understanding_x"])
-    with pytest.raises(UnderstandingMaintenanceError, match="outcome must match"):
-        session.finish(retired, outcome="no_op")
-    completed = session.finish(retired, outcome="changed")
+    completed = session.finish(retired)
     assert completed.current_understanding_ids == ()
     assert completed.understanding_guide == ""
 
@@ -636,6 +658,7 @@ def test_route_update_requires_reading_the_published_understanding():
 def test_tool_schemas_hide_runtime_fields_and_expose_only_semantic_operations():
     _source, artifacts, case_session, _case_stage, _ids_value = _fixture()
     tools = understanding_maintenance_tools(
+        _source,
         UnderstandingMaintenanceSession(artifacts, case_session),
     )
 
@@ -648,7 +671,8 @@ def test_tool_schemas_hide_runtime_fields_and_expose_only_semantic_operations():
     ]
     forbidden = {
         "runtime", "document_id", "base_revision", "version", "path", "digest",
-        "operation_id", "understanding_stage", "case_stage",
+        "operation_id", "understanding_stage", "case_stage", "source_reference",
+        "offset", "outcome",
     }
     for item in tools:
         schema = item.tool_call_schema.model_json_schema()
@@ -656,6 +680,61 @@ def test_tool_schemas_hide_runtime_fields_and_expose_only_semantic_operations():
         strict = convert_to_openai_tool(item, strict=True)["function"]
         assert strict["strict"] is True
         assert strict["parameters"]["additionalProperties"] is False
+    assert tools[-1].tool_call_schema.model_json_schema().get("properties") == {}
+
+    source_tools = understanding_workflow_tools(
+        _source, UnderstandingMaintenanceSession(artifacts, case_session),
+    )
+    read_schema = source_tools[0].tool_call_schema.model_json_schema()
+    assert set(read_schema["properties"]) == {"evidence_key"}
+    rework_schema = json.dumps(
+        source_tools[1].tool_call_schema.model_json_schema(), ensure_ascii=False,
+    )
+    assert '"evidence_key"' in rework_schema and '"reason"' in rework_schema
+    assert '"source_reference"' not in rework_schema
+    assert '"case_id"' not in rework_schema
+    assert '"offset"' not in rework_schema
+
+
+@pytest.mark.parametrize("factory", [
+    understanding_maintenance_tools,
+    understanding_workflow_tools,
+])
+def test_understanding_tools_reject_a_source_reader_from_another_document(factory):
+    _source, artifacts, case_session, _case_stage, _ids_value = _fixture()
+
+    with pytest.raises(ValueError, match="different documents"):
+        factory(
+            ExampleSource("document-b"),
+            UnderstandingMaintenanceSession(artifacts, case_session),
+        )
+
+
+@pytest.mark.parametrize("name,args", [
+    ("finish_understanding_maintenance", {"outcome": "no_op"}),
+    ("read_case_source", {"evidence_key": "E1", "offset": 0}),
+    ("request_case_rework", {"issues": [{
+        "evidence_key": "E1", "source_reference": "conversation:document-a:original",
+        "reason": "不應接受 Runtime 欄位。",
+    }]}),
+])
+def test_b2_toolnode_rejects_model_supplied_runtime_fields(name, args):
+    source, artifacts, case_session, case_stage, _ids_value = _fixture()
+    session = UnderstandingMaintenanceSession(artifacts, case_session)
+    stage = session.open(case_stage)
+    tools = [
+        *understanding_maintenance_tools(source, session),
+        *understanding_workflow_tools(source, session),
+    ]
+
+    result = _graph(tools).invoke({
+        "messages": [_call(name, args, f"invalid-{name}")],
+        "understanding_stage": stage.to_dict(),
+    })
+
+    assert session.load(result["understanding_stage"]) == stage
+    message = result["messages"][-1]
+    assert isinstance(message, ToolMessage) and message.status == "error"
 
 
 def test_native_toolnode_checkpoints_reads_then_create_on_the_same_b2_stage():
@@ -665,7 +744,7 @@ def test_native_toolnode_checkpoints_reads_then_create_on_the_same_b2_stage():
         artifacts, case_session, id_factory=lambda: new_understanding,
     )
     saver = InMemorySaver()
-    graph = _graph(understanding_maintenance_tools(session), saver=saver)
+    graph = _graph(understanding_maintenance_tools(_source, session), saver=saver)
     config = {"configurable": {"thread_id": "b2-understanding-test"}}
     initial = session.open(case_stage)
 
@@ -696,7 +775,7 @@ def test_tool_error_and_parallel_calls_leave_the_b2_stage_unchanged():
     _source, artifacts, case_session, case_stage, ids = _fixture()
     session = UnderstandingMaintenanceSession(artifacts, case_session)
     initial = session.open(case_stage)
-    tools = understanding_maintenance_tools(session)
+    tools = understanding_maintenance_tools(_source, session)
 
     failed = _graph(tools).invoke({
         "messages": [_call("create_work_understanding", {

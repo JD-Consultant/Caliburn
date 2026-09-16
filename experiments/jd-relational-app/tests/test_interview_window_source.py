@@ -573,6 +573,29 @@ def test_the_memory_reader_grants_window_and_context_separately(issued, native):
     extraction.validate_reference(context)
 
 
+def test_bundle_history_order_requires_the_explicit_window_capability(interview, native):
+    sources, document, first_run, second_run = interview
+    window = sources.capture_window(
+        document, first_run_id=first_run, last_run_id=second_run,
+    )
+    expected = [
+        sources.capture(document, first_run).source_ref,
+        sources.capture(document, second_run).source_ref,
+    ]
+    with pytest.raises(InvalidSourceReference):
+        MemorySourceReader(sources, document).history_exchanges(window)
+
+    page = MemorySourceReader(
+        sources, document, window_references=True,
+    ).history_exchanges(window)
+
+    assert page.order == "oldest_to_newest"
+    assert [item.source_reference for item in page.exchanges] == expected
+    assert all([message.role for message in item.messages] in [
+        ["user"], ["assistant", "user"],
+    ] for item in page.exchanges)
+
+
 def test_a_broken_ancestor_chain_is_reported_not_read_as_no_earlier_turns(interview, native):
     graph, dataset, document, pending, _, _ = native
     windows, _, first_run, second_run = interview

@@ -6,6 +6,8 @@
 
 > **2026-09-17 接續釐清：**本計畫的 required cases／directly affected understandings 是完成前必讀與影響驗收，不是 B2 的可讀案例 allowlist。B2 仍可從案例 guide 按需讀取 candidate 中任何目前案例，必要時沿案例保存的完整訪談回合 references 回查原話；後續施工不得把增量提示誤作資料權限限制。
 
+> **2026-09-17 Runtime 權責更新：**完成工具現為零參數 `finish_understanding_maintenance()`，`changed/no_op` 由 Runtime 根據 staged semantic／binding changes 計算；模型不再提交 outcome。原話回查的模型接口亦已由 successor 引用計畫收斂成 case-bound `evidence_key`，不直接提交 reference 或 offset。
+
 **Architecture:** `UnderstandingMaintenanceSession` 固定一份已完成的 `CaseMaintenanceStage` 與其精確 base bundle，Runtime 從 base manifest 推導受 B1 變更直接影響的既有理解，並擁有 ID、guide route、support bindings 與驗證。模型只能讀取 Runtime 提供的目前／被取代案例與目前理解，再提出 create／revise／revalidate／split／merge／retire／route／finish 等語意操作；所有結果只存在 checkpoint-safe B2 stage。
 
 **Tech Stack:** Python 3.12、LangChain 1.4.0 tools、LangGraph 1.2.11 state／ToolNode、既有 `MemoryArtifacts`／`CaseMaintenanceSession`／V4A text patch。
@@ -66,7 +68,7 @@
 
 - [x] **Step 1: Write failing tests for read-before-write and binding revalidation**
 
-  覆蓋：新理解只能綁已讀 current cases；修訂既有理解前必須先讀；support case 未讀／已被取代時拒絕；B1 修訂 CASE-A 但理解正文不變時，`revalidate_understanding(X, [A, B])` 保存明確支持集合，`finish(no_op)` 成功，且沒有建立新 understanding prose artifact。
+  覆蓋：新理解只能綁已讀 current cases；修訂既有理解前必須先讀；support case 未讀／已被取代時拒絕；B1 修訂 CASE-A 但理解正文不變時，`revalidate_understanding(X, [A, B])` 保存明確支持集合，零參數 finish 由 Runtime 計算為 `no_op`，且沒有建立新 understanding prose artifact。
 
 - [x] **Step 2: Verify RED**
 

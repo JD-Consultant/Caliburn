@@ -18,6 +18,12 @@ from caliburn_memory.publication import (
 )
 from caliburn_memory.skills import SkillAssets, analysis_files, analysis_skills
 from caliburn_memory.sources import ExtractionSourceReader, SourceReader
+from caliburn_memory.understanding_maintenance import (
+    UnderstandingChange, UnderstandingMaintenanceAgentState,
+    UnderstandingMaintenanceError, UnderstandingMaintenanceSession,
+    UnderstandingMaintenanceStage, UnderstandingReplacementInput, UnderstandingSupportSelection,
+    understanding_maintenance_tools,
+)
 
 __all__ = [
     "CaseArtifact", "CaseRead", "MemoryBundleManifest", "Supersession",
@@ -31,4 +37,9 @@ __all__ = [
     "INSTRUCTIONS", "ExtractionOutput", "ExtractionSourceReader", "ExtractionWorkflow",
     "ConsolidationWorkflow", "MEMORY_ACTION_GUIDANCE",
     "SkillAssets", "analysis_files", "analysis_skills",
+    "UnderstandingChange", "UnderstandingMaintenanceAgentState",
+    "UnderstandingMaintenanceError",
+    "UnderstandingMaintenanceSession", "UnderstandingMaintenanceStage",
+    "UnderstandingReplacementInput", "UnderstandingSupportSelection",
+    "understanding_maintenance_tools",
 ]

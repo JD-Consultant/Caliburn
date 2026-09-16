@@ -196,6 +196,22 @@ def test_intervening_human_is_not_silently_swallowed_into_source(native):
     assert len(excerpt.messages) == 1 and excerpt.messages[0].message_id == observed.record.run_id
 
 
+def test_a_settled_historical_turn_can_be_issued_as_its_own_fixed_source(native):
+    """A later turn must not make an earlier canonical exchange unaddressable."""
+    first = append(native, [AIMessage(id="first-public-reply", content="第一輪回覆")],
+                   text="第一輪員工原話")
+    append(native, [AIMessage(id="second-public-reply", content="第二輪回覆")],
+           text="第二輪員工原話")
+    _, _, document, *_ = native
+
+    sources = service(native)
+    excerpt = sources.capture(document, first.record.run_id)
+
+    assert public(excerpt) == [
+        {"message_id": first.record.run_id, "role": "user", "text": "第一輪員工原話"}]
+    assert sources.read(excerpt.source_ref, document) == excerpt
+
+
 @pytest.mark.parametrize("fault", ["tamper", "document", "dataset", "key", "chat-anchor", "jd-ref", "old-conversation", "empty", "too-long"])
 def test_foreign_or_invalid_tokens_fail_before_native_source_read(native, monkeypatch, fault):
     observed, _ = seed(native)
@@ -263,6 +279,26 @@ def test_long_allowed_human_and_previous_ai_are_complete_without_pagination(nati
     excerpt = source.capture(document, observed.record.run_id)
     assert [len(row.text) for row in excerpt.messages] == [70000, 43000]
     assert source.read(excerpt.source_ref, document) == excerpt
+
+
+def test_one_exact_source_can_be_read_in_bounded_runtime_owned_pages(native):
+    append(native, [AIMessage(id="paged-question", content="問" * 3500)], text="previous")
+    observed = append(native, [], text="答" * 2500, pause=True)
+    _, _, document, *_ = native
+    source = service(native)
+    reference = source.capture(document, observed.record.run_id).source_ref
+
+    first = source.read_source_page(reference, document)
+    second = source.read_source_page(reference, document, offset=first["next_offset"])
+
+    assert first["reference"] == second["reference"] == reference
+    assert first["next_offset"] == 3000 and second["next_offset"] is None
+    assert [(row["role"], row["text_offset"]) for row in first["segments"]] == [
+        ("assistant", 0)]
+    assert [(row["role"], row["text_offset"]) for row in second["segments"]] == [
+        ("assistant", 3000), ("user", 0)]
+    assert "".join(row["text"] for row in (*first["segments"], *second["segments"])) == \
+        "問" * 3500 + "答" * 2500
 
 
 def test_capture_rejects_absent_or_wrong_current_run_and_invalid_scope(native):

@@ -16,7 +16,11 @@ from uuid import UUID
 
 from caliburn_memory import MemoryArtifacts
 from caliburn_memory.extraction import ExtractionOutput, ExtractionWorkflow
-from caliburn_memory.sources import ExtractionSourceReader, InvalidSourceReference
+from caliburn_memory.sources import (
+    MAX_EVIDENCE_EXCHANGES, EvidenceExchange, EvidenceExchangePage,
+    EvidenceMessage, EvidenceSegment, EvidenceTextPage,
+    ExtractionSourceReader, InvalidSourceReference,
+)
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
@@ -155,6 +159,43 @@ class ExtractionSourceAdapter(ExtractionSourceReader):
     def require_new_source_after(self, reference: str, previous: str) -> None:
         with self._owner_errors():
             self.service.follows(reference, previous, self.document_id)
+
+    @staticmethod
+    def _exchange(excerpt) -> EvidenceExchange:
+        return EvidenceExchange(
+            source_reference=excerpt.source_ref,
+            messages=tuple(EvidenceMessage(
+                message_id=message.message_id, role=message.role)
+                for message in excerpt.messages),
+        )
+
+    def window_exchanges(self, reference: str) -> EvidenceExchangePage:
+        with self._owner_errors():
+            exchanges = self.service.window_exchanges(reference, self.document_id)
+        return EvidenceExchangePage(
+            order="oldest_to_newest",
+            exchanges=tuple(self._exchange(exchange) for exchange in exchanges),
+        )
+
+    def history_exchanges(self, through_reference: str, *, offset: int = 0,
+                          limit: int = MAX_EVIDENCE_EXCHANGES) -> EvidenceExchangePage:
+        with self._owner_errors():
+            page = self.service.history_exchanges(
+                through_reference, self.document_id, offset=offset, limit=limit)
+        return EvidenceExchangePage(
+            order=page["order"],
+            exchanges=tuple(self._exchange(exchange) for exchange in page["exchanges"]),
+            next_offset=page["next_offset"],
+        )
+
+    def read_source_page(self, reference: str, offset: int = 0) -> EvidenceTextPage:
+        with self._owner_errors():
+            page = self.service.read_source_page(reference, self.document_id, offset)
+        return EvidenceTextPage(
+            reference=page["reference"],
+            segments=tuple(EvidenceSegment(**segment) for segment in page["segments"]),
+            next_offset=page["next_offset"],
+        )
 
 
 def build_extraction_workflow(*, service: ConversationSourceService, document_id: str, store,

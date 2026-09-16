@@ -11,7 +11,9 @@ import httpx
 import pytest
 from caliburn_memory import MemoryArtifacts
 from caliburn_memory.extraction import ExtractionOutput
-from caliburn_memory.sources import InvalidSourceReference
+from caliburn_memory.sources import (
+    EvidenceExchangePage, EvidenceTextPage, InvalidSourceReference,
+)
 from openrouter.errors import BadRequestResponseError
 from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
@@ -285,6 +287,30 @@ def test_the_adapter_reads_windows_and_context_but_refuses_a_turn_source(b1):
         adapter.read(turn_source)
     with pytest.raises(InvalidSourceReference):
         adapter.validate_reference(turn_source)
+
+
+def test_the_adapter_exposes_typed_ordered_evidence_without_reordering(interview):
+    windows, document, first_run, second_run = interview
+    whole = windows.capture_window(
+        document, first_run_id=first_run, last_run_id=second_run)
+    adapter = ExtractionSourceAdapter(windows, document)
+
+    fixed = adapter.window_exchanges(whole)
+    history = adapter.history_exchanges(whole, limit=1)
+    exact = adapter.read_source_page(fixed.exchanges[-1].source_reference)
+
+    assert isinstance(fixed, EvidenceExchangePage)
+    assert fixed.order == history.order == "oldest_to_newest"
+    assert [row.messages[-1].message_id for row in fixed.exchanges] == [
+        first_run, second_run]
+    assert all(not hasattr(message, "text") for row in fixed.exchanges
+               for message in row.messages)
+    assert [row.messages[-1].message_id for row in history.exchanges] == [first_run]
+    assert history.next_offset == 1
+    assert isinstance(exact, EvidenceTextPage)
+    assert exact.reference == fixed.exchanges[-1].source_reference
+    assert [(row.role, row.text) for row in exact.segments][-1] == (
+        "user", "第二輪原話😀")
 
 
 def test_a_saved_pair_is_revalidated_at_its_own_position(b1):

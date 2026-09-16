@@ -17,7 +17,10 @@ from caliburn_memory.publication import (
     PublicationStore, PublicationUncertain, PublishedHead, PublishRequest, Receipt, StalePublication,
 )
 from caliburn_memory.skills import SkillAssets, analysis_files, analysis_skills
-from caliburn_memory.sources import ExtractionSourceReader, SourceReader
+from caliburn_memory.sources import (
+    EvidenceExchange, EvidenceExchangePage, EvidenceMessage, EvidenceSegment,
+    EvidenceTextPage, ExtractionSourceReader, SourceReader,
+)
 from caliburn_memory.understanding_maintenance import (
     CaseReworkIssue, CaseReworkIssueInput, CaseSourceRead,
     UnderstandingChange, UnderstandingMaintenanceAgentState,
@@ -42,6 +45,8 @@ __all__ = [
     "ExtractionFiles", "MemoryArtifacts", "MemoryVersion", "ReadOnlyFiles",
     "PublicationStore", "PublicationUncertain", "PublishedHead", "PublishRequest",
     "Receipt", "StalePublication", "SourceReader",
+    "EvidenceExchange", "EvidenceExchangePage", "EvidenceMessage", "EvidenceSegment",
+    "EvidenceTextPage",
     "INSTRUCTIONS", "ExtractionOutput", "ExtractionSourceReader", "ExtractionWorkflow",
     "ConsolidationWorkflow", "MEMORY_ACTION_GUIDANCE",
     "SkillAssets", "analysis_files", "analysis_skills",

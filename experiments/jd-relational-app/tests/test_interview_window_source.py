@@ -21,7 +21,8 @@ from jd_relational.ai_checkpoints import AiCheckpointError, AiRunCheckpoints, ne
 from jd_relational.ai_history import MAX_PARENT_LOOKUPS, AiRunHistory
 from jd_relational.conversation_sources import (
     _CONTEXT_PREFIX,
-    ConversationSourceError, WindowBudgetExceeded, _ContextPosition, _WindowPosition,
+    ConversationSourceCodec, ConversationSourceError, WindowBudgetExceeded,
+    _ContextPosition, _WindowPosition,
 )
 
 from jd_relational.memory_sources import MemorySourceReader
@@ -161,6 +162,56 @@ def test_a_settled_cancelled_turn_keeps_its_speech_in_the_window(interview):
     assert [t["answer_succeeded"] for t in page["turns"]] == [True, False]
     assert page["omitted_content_types"] == ["thinking", "tool"]
     assert page["next_offset"] is None
+
+
+def test_window_exchanges_are_individually_signed_in_canonical_message_order(interview):
+    windows, document, first_run, second_run = interview
+    reference = windows.capture_window(
+        document, first_run_id=first_run, last_run_id=second_run)
+
+    exchanges = windows.window_exchanges(reference, document)
+
+    assert [exchange.messages[-1].message_id for exchange in exchanges] == [
+        first_run, second_run]
+    assert all(not hasattr(message, "text") for exchange in exchanges
+               for message in exchange.messages)
+    assert [[message.text for message in windows.read(exchange.source_ref, document).messages
+             if message.role == "user"] for exchange in exchanges] == [
+        ["第一輪原話"], ["第二輪原話😀"]]
+
+
+def test_source_token_lexical_order_never_reorders_canonical_exchanges(
+        interview, monkeypatch):
+    windows, document, first_run, second_run = interview
+    reference = windows.capture_window(
+        document, first_run_id=first_run, last_run_id=second_run)
+
+    def reverse_lexical_order(_codec, position):
+        return "conversation:z-first" if position.run_id == first_run else "conversation:a-second"
+
+    monkeypatch.setattr(ConversationSourceCodec, "_issue", reverse_lexical_order)
+    exchanges = windows.window_exchanges(reference, document)
+
+    assert [exchange.source_ref for exchange in exchanges] == [
+        "conversation:z-first", "conversation:a-second"]
+
+
+def test_history_exchange_pages_stay_pinned_to_the_requested_window(interview, native):
+    windows, document, first_run, second_run = interview
+    through = windows.capture_window(
+        document, first_run_id=first_run, last_run_id=second_run)
+
+    first_page = windows.history_exchanges(through, document, limit=1)
+    assert first_page["order"] == "oldest_to_newest"
+    assert [row.messages[-1].message_id for row in first_page["exchanges"]] == [first_run]
+    assert first_page["next_offset"] == 1
+
+    settled(native, [AIMessage(id="later-public-reply", content="稍後回覆")],
+            text="稍後才出現的原話")
+    second_page = windows.history_exchanges(
+        through, document, offset=first_page["next_offset"], limit=1)
+    assert [row.messages[-1].message_id for row in second_page["exchanges"]] == [second_run]
+    assert second_page["next_offset"] is None
 
 
 def test_a_window_pages_by_unicode_code_points_and_repeats_turns(interview, native):

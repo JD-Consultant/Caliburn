@@ -24,7 +24,7 @@
 
 ## 3. 範圍與步驟
 
-### Task 1：來源 owner 提供歷史安全交換與 canonical order proof
+### Task 1：來源 owner 提供歷史安全交換與 canonical order proof（已完成）
 
 修改：
 
@@ -42,7 +42,7 @@
 
 必要反例：反 UUID／反字典序仍按對話先後、同內容兄弟 lineage、較早歷史輪、failed／cancelled 但已安全保存的員工原話、unsettled gap、跨頁順序、單一 source 被兩個 consumer 重用。
 
-### Task 2：package source port 與 App adapter
+### Task 2：package source port 與 App adapter（已完成）
 
 修改：
 
@@ -57,6 +57,8 @@
 - exact `source` 的有界分頁讀取。
 
 App adapter 只轉譯 source owner 的既有錯誤與資料，不自行重排、重簽或保存另一份索引。現有 window／context pair 驗證與 admission cursor 不變。
+
+實作結果：既有 `source` 已可為安全歷史輪次重新簽發；固定 `window` 可列出 canonical 順序的逐輪 records，同一 `window` 也可作歷史分頁上界。清單只帶 signed reference 與 message ID／role，不攜帶全文、時間或 provider metadata；全文由 exact-source 3000 字元頁面讀取。package port 使用 immutable typed records，App adapter 只作資料與固定錯誤轉譯。後續 `evidence_key`、attempt cursor 與已讀集合仍屬 Task 3，沒有提前放進 source owner。
 
 ### Task 3：B1 stage 保存「已提供／已讀」證據 key，不保存原話副本
 

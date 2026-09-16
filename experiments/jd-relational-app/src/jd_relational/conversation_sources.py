@@ -43,6 +43,7 @@ MAX_CONTEXT_CHARACTERS = 1500
 MAX_PLANNED_WINDOWS = 16
 # Visible characters per window page, sized as the verified extraction reader.
 MAX_PAGE_CHARACTERS = 3000
+MAX_SOURCE_EXCHANGES = 50
 _TOKEN = re.compile(r"[A-Za-z0-9_.-]+\Z")
 _INSTRUCTION = (
     "此來源只涵蓋本輪已保存的員工原話及列明的前一則AI公開上下文。"
@@ -210,6 +211,18 @@ class SourceMessage:
 class SourceExcerpt:
     source_ref: str
     messages: tuple[SourceMessage, ...]
+
+
+@dataclass(frozen=True, slots=True, repr=False)
+class SourceMessageMetadata:
+    message_id: str
+    role: Literal["user", "assistant"]
+
+
+@dataclass(frozen=True, slots=True, repr=False)
+class SourceRecord:
+    source_ref: str
+    messages: tuple[SourceMessageMetadata, ...]
 
 
 class ConversationSourceCodec:
@@ -426,7 +439,11 @@ class ConversationSourceService:
             if observed is None:
                 raise ConversationSourceError("source_not_available")
             if observed.record.run_id != run_id:
-                raise ConversationSourceError("invalid_ref")
+                from .ai_history import AiRunHistory
+                observed = AiRunHistory(self._checkpoints).find(
+                    document_id, run_id, self.dataset_id)
+                if observed is None:
+                    raise ConversationSourceError("invalid_ref")
             messages = _selected(observed.messages, run_id)
             root, source = observed.root_config["configurable"], observed.source_config["configurable"]
             position = _SourcePosition(format_version=1, purpose="source", dataset_id=self.dataset_id,
@@ -438,6 +455,47 @@ class ConversationSourceService:
             raise
         except Exception:
             raise ConversationSourceError("source_not_available") from None
+
+    @staticmethod
+    def _record(excerpt: SourceExcerpt) -> SourceRecord:
+        return SourceRecord(
+            source_ref=excerpt.source_ref,
+            messages=tuple(SourceMessageMetadata(
+                message_id=message.message_id, role=message.role)
+                for message in excerpt.messages),
+        )
+
+    def window_exchanges(self, window_ref, document_id) -> tuple[SourceRecord, ...]:
+        """Issue one fixed turn source per settled turn in this saved window.
+
+        `_pinned_range` proves the window on the current canonical lineage and
+        returns its turns in native message order.  Source tokens remain
+        addresses only; their bytes are never used to sort the result.
+        """
+        _, _, turns, first = self._pinned_range(window_ref, document_id)
+        return tuple(self._record(self.capture(document_id, turn["input_id"]))
+                     for turn in turns[first:])
+
+    def history_exchanges(self, through_reference, document_id, *, offset: int = 0,
+                          limit: int = MAX_SOURCE_EXCHANGES) -> dict:
+        """Page safe historical exchanges at one already fixed window root.
+
+        The window is the upper bound, so conversation activity after it was
+        issued cannot enlarge a resumed page.  `offset` is an application
+        cursor over this owner-proven ordered list; it is never a model field
+        or a persistent citation.
+        """
+        if (type(offset) is not int or offset < 0 or type(limit) is not int
+                or not 1 <= limit <= MAX_SOURCE_EXCHANGES):
+            raise ConversationSourceError("invalid_ref")
+        _, _, turns, _ = self._pinned_range(through_reference, document_id)
+        if offset > len(turns):
+            raise ConversationSourceError("invalid_ref")
+        end = min(len(turns), offset + limit)
+        exchanges = tuple(self._record(self.capture(document_id, turn["input_id"]))
+                          for turn in turns[offset:end])
+        return {"order": "oldest_to_newest", "exchanges": exchanges,
+                "next_offset": end if end < len(turns) else None}
 
     def read(self, source_ref, document_id) -> SourceExcerpt:
         position = self._codec._resolve(source_ref, document_id)
@@ -457,6 +515,27 @@ class ConversationSourceService:
             raise ConversationSourceError(code) from None
         except Exception:
             raise ConversationSourceError("source_not_available") from None
+
+    def read_source_page(self, source_ref, document_id, offset: int = 0) -> dict:
+        """Read public text from one exact source using an application cursor."""
+        if type(offset) is not int or offset < 0:
+            raise ConversationSourceError("invalid_ref")
+        excerpt = self.read(source_ref, document_id)
+        total = sum(len(message.text) for message in excerpt.messages)
+        if offset > total:
+            raise ConversationSourceError("invalid_ref")
+        segments, seen, remaining = [], 0, MAX_PAGE_CHARACTERS
+        for message in excerpt.messages:
+            begin = max(0, offset - seen)
+            if begin < len(message.text) and remaining:
+                fragment = message.text[begin:begin + remaining]
+                segments.append({"message_id": message.message_id, "role": message.role,
+                                 "text": fragment, "text_offset": begin})
+                remaining -= len(fragment)
+            seen += len(message.text)
+        end_offset = offset + MAX_PAGE_CHARACTERS - remaining
+        return {"reference": source_ref, "segments": segments,
+                "next_offset": end_offset if end_offset < total else None}
 
     def validate_reference(self, source_ref, document_id) -> None:
         """Verify the original signed locator and scope without storage I/O.

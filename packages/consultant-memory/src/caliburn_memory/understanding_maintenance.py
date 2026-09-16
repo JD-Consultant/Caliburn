@@ -28,9 +28,11 @@ from .patch import MemoryPatchError, apply_text_patch
 from .references import controlled_references
 
 
-STAGE_FORMAT_VERSION = 1
+STAGE_FORMAT_VERSION = 2
 MAX_ROUTE_NOTE_CHARACTERS = 500
 MAX_REPLACEMENTS = 8
+MAX_REWORK_ISSUES = 8
+MAX_REWORK_REASON_CHARACTERS = 2000
 
 
 class UnderstandingMaintenanceError(ValueError):
@@ -52,6 +54,37 @@ class UnderstandingChange:
     kind: Literal["create", "revise", "revalidate", "split", "merge", "retire", "route"]
     previous_understanding_ids: tuple[str, ...]
     current_understanding_ids: tuple[str, ...]
+
+
+@dataclass(frozen=True)
+class CaseReworkIssue:
+    """One source-grounded reason the fixed B1 candidate cannot be trusted."""
+
+    case_id: str
+    source_reference: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class CaseSourceRead:
+    """Durable proof that B2 inspected one source through one observed case."""
+
+    case_id: str
+    source_reference: str
+
+
+class CaseReworkIssueInput(BaseModel):
+    """Model-visible B2 feedback; Runtime still validates case/source ownership."""
+
+    model_config = ConfigDict(extra="forbid")
+    case_id: str = Field(description="Runtime-provided case ID whose current content is wrong")
+    source_reference: str = Field(
+        description="Exact canonical source reference returned by read_case and read_case_source",
+    )
+    reason: str = Field(
+        min_length=1, max_length=MAX_REWORK_REASON_CHARACTERS,
+        description="Material discrepancy that B1 must reassess from canonical source",
+    )
 
 
 class UnderstandingReplacementInput(BaseModel):
@@ -86,12 +119,14 @@ class UnderstandingMaintenanceStage:
     required_understanding_ids: tuple[str, ...]
     read_case_ids: tuple[str, ...] = ()
     read_understanding_ids: tuple[str, ...] = ()
+    read_source_references: tuple[CaseSourceRead, ...] = ()
     binding_updates: tuple[UnderstandingSupportSelection, ...] = ()
     upserts: tuple[WorkUnderstandingArtifact, ...] = ()
     supersessions: tuple[Supersession, ...] = ()
     changes: tuple[UnderstandingChange, ...] = ()
+    case_rework_issues: tuple[CaseReworkIssue, ...] = ()
     completed: bool = False
-    outcome: Literal["changed", "no_op"] | None = None
+    outcome: Literal["changed", "no_op", "case_rework_required"] | None = None
 
     @property
     def current_understanding_ids(self) -> tuple[str, ...]:
@@ -122,6 +157,9 @@ class UnderstandingMaintenanceStage:
             "required_understanding_ids": list(self.required_understanding_ids),
             "read_case_ids": list(self.read_case_ids),
             "read_understanding_ids": list(self.read_understanding_ids),
+            "read_source_references": [
+                asdict(item) for item in self.read_source_references
+            ],
             "binding_updates": [
                 {**asdict(item), "supporting_case_ids": list(item.supporting_case_ids)}
                 for item in self.binding_updates
@@ -142,6 +180,7 @@ class UnderstandingMaintenanceStage:
                 }
                 for item in self.changes
             ],
+            "case_rework_issues": [asdict(item) for item in self.case_rework_issues],
             "completed": self.completed,
             "outcome": self.outcome,
         }
@@ -153,8 +192,9 @@ class UnderstandingMaintenanceStage:
             "base_memory_version_id", "case_stage", "base_understanding_ids",
             "base_understanding_guide_digest", "understanding_guide",
             "required_case_ids", "required_understanding_ids", "read_case_ids",
-            "read_understanding_ids", "binding_updates", "upserts", "supersessions",
-            "changes", "completed", "outcome",
+            "read_understanding_ids", "read_source_references", "binding_updates",
+            "upserts", "supersessions", "changes", "case_rework_issues",
+            "completed", "outcome",
         }
         try:
             if type(value) is not dict or set(value) != expected:
@@ -172,6 +212,10 @@ class UnderstandingMaintenanceStage:
                 required_understanding_ids=tuple(value["required_understanding_ids"]),
                 read_case_ids=tuple(value["read_case_ids"]),
                 read_understanding_ids=tuple(value["read_understanding_ids"]),
+                read_source_references=tuple(CaseSourceRead(
+                    case_id=item["case_id"],
+                    source_reference=item["source_reference"],
+                ) for item in value["read_source_references"]),
                 binding_updates=tuple(UnderstandingSupportSelection(
                     understanding_id=item["understanding_id"],
                     supporting_case_ids=tuple(item["supporting_case_ids"]),
@@ -190,6 +234,11 @@ class UnderstandingMaintenanceStage:
                     previous_understanding_ids=tuple(item["previous_understanding_ids"]),
                     current_understanding_ids=tuple(item["current_understanding_ids"]),
                 ) for item in value["changes"]),
+                case_rework_issues=tuple(CaseReworkIssue(
+                    case_id=item["case_id"],
+                    source_reference=item["source_reference"],
+                    reason=item["reason"],
+                ) for item in value["case_rework_issues"]),
                 completed=value["completed"],
                 outcome=value["outcome"],
             )
@@ -282,7 +331,9 @@ class UnderstandingMaintenanceSession:
                 or type(stage.base_publication_revision) is not int
                 or stage.base_publication_revision < 0
                 or type(stage.completed) is not bool
-                or stage.outcome not in {None, "changed", "no_op"}):
+                or stage.outcome not in {
+                    None, "changed", "no_op", "case_rework_required",
+                }):
             raise UnderstandingMaintenanceError(
                 "invalid_understanding_stage", "B2 staged state is invalid",
             )
@@ -334,6 +385,19 @@ class UnderstandingMaintenanceSession:
             raise UnderstandingMaintenanceError(
                 "invalid_understanding_stage", "B2 case read evidence is invalid",
             )
+        seen_source_reads: set[tuple[str, str]] = set()
+        for source_read in stage.read_source_references:
+            key = (source_read.case_id, source_read.source_reference)
+            if (key in seen_source_reads
+                    or source_read.case_id not in stage.read_case_ids
+                    or type(source_read.source_reference) is not str
+                    or source_read.source_reference not in self._read_case_from_fixed_stage(
+                        stage, source_read.case_id,
+                    ).source_references):
+                raise UnderstandingMaintenanceError(
+                    "invalid_understanding_stage", "B2 source read evidence is invalid",
+                )
+            seen_source_reads.add(key)
         known_understanding_ids = (
             set(stage.base_understanding_ids)
             | {item.understanding_id for item in stage.upserts}
@@ -410,12 +474,32 @@ class UnderstandingMaintenanceSession:
                 raise UnderstandingMaintenanceError(
                     "invalid_understanding_stage", "B2 change record is invalid",
                 )
+        seen_rework: set[tuple[str, str]] = set()
+        if len(stage.case_rework_issues) > MAX_REWORK_ISSUES:
+            raise UnderstandingMaintenanceError(
+                "invalid_understanding_stage", "B2 case rework issue set is invalid",
+            )
+        for issue in stage.case_rework_issues:
+            key = (issue.case_id, issue.source_reference)
+            if (key in seen_rework
+                    or issue.case_id not in stage.read_case_ids
+                    or CaseSourceRead(issue.case_id, issue.source_reference)
+                    not in stage.read_source_references
+                    or issue.source_reference
+                    not in self._read_case_from_fixed_stage(stage, issue.case_id).source_references
+                    or _rework_reason(issue.reason) != issue.reason):
+                raise UnderstandingMaintenanceError(
+                    "invalid_understanding_stage", "B2 case rework issue is invalid",
+                )
+            seen_rework.add(key)
         if stage.completed != (stage.outcome is not None):
             raise UnderstandingMaintenanceError(
                 "invalid_understanding_stage", "B2 completion state is inconsistent",
             )
         if (stage.outcome == "changed" and not stage.changed
-                or stage.outcome == "no_op" and stage.changed):
+                or stage.outcome == "no_op" and stage.changed
+                or (stage.outcome == "case_rework_required")
+                != bool(stage.case_rework_issues)):
             raise UnderstandingMaintenanceError(
                 "invalid_understanding_stage", "B2 outcome does not match staged changes",
             )
@@ -430,12 +514,8 @@ class UnderstandingMaintenanceSession:
                 "understanding_stage_completed", "B2 staging is already complete",
             )
 
-    def read_case(self, stage: UnderstandingMaintenanceStage, case_id: str) -> CaseArtifact:
-        self._validate(stage)
-        try:
-            case_id = _stable_id(case_id, field="case_id")
-        except ValueError as error:
-            raise UnderstandingMaintenanceError("invalid_case_id", "Case ID is invalid") from error
+    def _read_case_from_fixed_stage(self, stage: UnderstandingMaintenanceStage,
+                                    case_id: str) -> CaseArtifact:
         case_stage = self._case_stage(stage)
         if case_id in case_stage.current_case_ids:
             return self.case_session.read_case(case_stage, case_id)
@@ -448,6 +528,14 @@ class UnderstandingMaintenanceSession:
             "case_not_available", "Case is outside this B2 candidate and its exact base",
         )
 
+    def read_case(self, stage: UnderstandingMaintenanceStage, case_id: str) -> CaseArtifact:
+        self._validate(stage)
+        try:
+            case_id = _stable_id(case_id, field="case_id")
+        except ValueError as error:
+            raise UnderstandingMaintenanceError("invalid_case_id", "Case ID is invalid") from error
+        return self._read_case_from_fixed_stage(stage, case_id)
+
     def observe_case(self, stage: UnderstandingMaintenanceStage, case_id: str
                      ) -> tuple[UnderstandingMaintenanceStage, CaseArtifact]:
         self._open_stage(stage)
@@ -455,6 +543,34 @@ class UnderstandingMaintenanceSession:
         observed = replace(stage, read_case_ids=tuple(sorted({*stage.read_case_ids, item.case_id})))
         self._validate(observed)
         return observed, item
+
+    def observe_source_reference(self, stage: UnderstandingMaintenanceStage, *,
+                                 case_id: str, source_reference: str
+                                 ) -> UnderstandingMaintenanceStage:
+        """Checkpoint proof that B2 read one exact source exposed by an observed case."""
+        self._open_stage(stage)
+        try:
+            case_id = _stable_id(case_id, field="case_id")
+        except ValueError as error:
+            raise UnderstandingMaintenanceError("invalid_case_id", "Case ID is invalid") from error
+        if case_id not in stage.read_case_ids:
+            raise UnderstandingMaintenanceError(
+                "case_read_required", "Read the case before reading its canonical source",
+            )
+        item = self.read_case(stage, case_id)
+        if source_reference not in item.source_references:
+            raise UnderstandingMaintenanceError(
+                "source_not_owned_by_case",
+                "Canonical source reference does not belong to the observed case",
+            )
+        self.artifacts.validate_source(source_reference)
+        evidence = CaseSourceRead(case_id, source_reference)
+        observed = replace(stage, read_source_references=tuple(sorted(
+            {*stage.read_source_references, evidence},
+            key=lambda item: (item.case_id, item.source_reference),
+        )))
+        self._validate(observed)
+        return observed
 
     def read_understanding(self, stage: UnderstandingMaintenanceStage,
                            understanding_id: str) -> WorkUnderstandingArtifact:
@@ -850,12 +966,65 @@ class UnderstandingMaintenanceSession:
         self._validate(completed)
         return completed
 
+    def request_case_rework(self, stage: UnderstandingMaintenanceStage, *,
+                            issues: list[CaseReworkIssueInput]
+                            ) -> UnderstandingMaintenanceStage:
+        """End this B2 attempt without a publishable result; B1 owns the repair."""
+        self._open_stage(stage)
+        if (type(issues) is not list or not 1 <= len(issues) <= MAX_REWORK_ISSUES
+                or len({(item.case_id, item.source_reference) for item in issues})
+                != len(issues)):
+            raise UnderstandingMaintenanceError(
+                "invalid_case_rework",
+                f"Choose 1 to {MAX_REWORK_ISSUES} distinct case/source issues",
+            )
+        prepared: list[CaseReworkIssue] = []
+        for item in issues:
+            try:
+                case_id = _stable_id(item.case_id, field="case_id")
+            except ValueError as error:
+                raise UnderstandingMaintenanceError(
+                    "invalid_case_rework", "Case rework ID is invalid",
+                ) from error
+            if case_id not in stage.read_case_ids:
+                raise UnderstandingMaintenanceError(
+                    "case_read_required", "Read the case before requesting B1 rework",
+                )
+            if CaseSourceRead(case_id, item.source_reference) not in stage.read_source_references:
+                raise UnderstandingMaintenanceError(
+                    "source_read_required",
+                    "Read the cited canonical source before requesting B1 rework",
+                )
+            if item.source_reference not in self.read_case(stage, case_id).source_references:
+                raise UnderstandingMaintenanceError(
+                    "source_not_owned_by_case",
+                    "Canonical source reference does not belong to the cited case",
+                )
+            prepared.append(CaseReworkIssue(
+                case_id=case_id,
+                source_reference=item.source_reference,
+                reason=_rework_reason(item.reason),
+            ))
+        completed = replace(
+            stage,
+            case_rework_issues=tuple(prepared),
+            completed=True,
+            outcome="case_rework_required",
+        )
+        self._validate(completed)
+        return completed
+
     def current_understandings(self, stage: UnderstandingMaintenanceStage
                                ) -> tuple[WorkUnderstandingArtifact, ...]:
         self._validate(stage)
         if not stage.completed:
             raise UnderstandingMaintenanceError(
                 "understanding_stage_incomplete", "B2 stage is not complete",
+            )
+        if stage.outcome not in {"changed", "no_op"}:
+            raise UnderstandingMaintenanceError(
+                "understanding_stage_not_publishable",
+                "B2 stage is complete but not publishable",
             )
         return tuple(
             self.read_understanding(stage, understanding_id)
@@ -895,6 +1064,20 @@ def _normalized_understanding(content: str) -> str:
             "invalid_understanding_content", "Work-understanding content cannot be empty",
         )
     return content
+
+
+def _rework_reason(value: str) -> str:
+    if type(value) is not str:
+        raise UnderstandingMaintenanceError(
+            "invalid_case_rework", "Case rework reason must be text",
+        )
+    value = value.strip()
+    if not value or len(value) > MAX_REWORK_REASON_CHARACTERS:
+        raise UnderstandingMaintenanceError(
+            "invalid_case_rework",
+            f"Case rework reason must contain at most {MAX_REWORK_REASON_CHARACTERS} characters",
+        )
+    return value
 
 
 def _route_note(value: str) -> str:

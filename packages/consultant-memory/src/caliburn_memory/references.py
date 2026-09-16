@@ -9,9 +9,9 @@ from markdown_it import MarkdownIt
 from linkify_it import LinkifyIt
 
 
-PREFIXES = ('/interviews/', 'conversation:')
-_LITERAL = re.compile(r'''(?<![A-Za-z0-9_/:?=&%#@.+~-])(?:/interviews/|conversation:)[^\s<>()（）\[\]`"'，。；！？：、]*''')
-_CODE_LITERAL = re.compile(r'''(?<![A-Za-z0-9_/:?=&%#@.+~-])(?:/interviews/|conversation:)[^\s<>()\[\]`"']*''')
+PREFIXES = ('/interviews/', '/memory/', 'conversation:')
+_LITERAL = re.compile(r'''(?<![A-Za-z0-9_/:?=&%#@.+~-])(?:/interviews/|/memory/|conversation:)[^\s<>()（）\[\]`"'，。；！？：、]*''')
+_CODE_LITERAL = re.compile(r'''(?<![A-Za-z0-9_/:?=&%#@.+~-])(?:/interviews/|/memory/|conversation:)[^\s<>()\[\]`"']*''')
 
 
 def controlled_references(text: str) -> set[str]:

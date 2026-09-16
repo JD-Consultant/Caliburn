@@ -1,5 +1,9 @@
 """Memory artifacts and publication, independent of JD and model execution."""
 
+from caliburn_memory.bundle import (
+    CaseArtifact, CaseRead, MemoryBundleManifest, Supersession,
+    UnderstandingCaseBinding, WorkUnderstandingArtifact, WorkUnderstandingRead,
+)
 from caliburn_memory.consolidation import ConsolidationWorkflow
 from caliburn_memory.extraction import INSTRUCTIONS, ExtractionOutput, ExtractionWorkflow
 from caliburn_memory.guidance import MEMORY_ACTION_GUIDANCE
@@ -11,6 +15,8 @@ from caliburn_memory.skills import SkillAssets, analysis_files, analysis_skills
 from caliburn_memory.sources import ExtractionSourceReader, SourceReader
 
 __all__ = [
+    "CaseArtifact", "CaseRead", "MemoryBundleManifest", "Supersession",
+    "UnderstandingCaseBinding", "WorkUnderstandingArtifact", "WorkUnderstandingRead",
     "ExtractionFiles", "MemoryArtifacts", "MemoryVersion", "ReadOnlyFiles",
     "PublicationStore", "PublicationUncertain", "PublishedHead", "PublishRequest",
     "Receipt", "StalePublication", "SourceReader",

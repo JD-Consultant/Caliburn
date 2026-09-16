@@ -34,3 +34,8 @@ def test_code_literal_punctuation_is_not_repaired_into_another_address():
 def test_interview_paths_remain_controlled():
     target = "/interviews/00000000-0000-0000-0000-000000000001/summary.md"
     assert controlled_references(f"[案例]({target})") == {target}
+
+
+def test_layered_memory_paths_are_controlled():
+    target = "/memory/cases/items/00000000-0000-0000-0000-000000000001.md"
+    assert controlled_references(f"案例 `{target}`") == {target}

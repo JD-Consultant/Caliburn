@@ -1,7 +1,7 @@
 # JD-R002／MEM-L001：分層工作案例與工作理解 Memory 對齊
 
 - 日期：2026-09-16
-- Stage：**G4 WORKING；Owner 已確認產品語意與共同版本方向，本文件已補第一版可驗證設計，待窄切片實作驗證**
+- Stage：**G7 分段施工；Owner 已確認產品語意與共同版本方向，Bundle authority foundation 已完成離線驗證**
 - 取代：Q019 在 Caliburn 採用的「B1 固定訪談窗口詳記＋B2 只維護 knowledge／guide」產品映射
 - 不取代：canonical 原始訪談、已校準主顧問 Prompt／Skills、背景通知語意、JD relational writer、既有 Saver／Store／CAS／receipt 證據及 `CTX-C001` 的非破壞式 compaction 原則
 
@@ -9,10 +9,10 @@
 
 ```text
 Topic ID: JD-R002／MEM-L001
-Current stage: G4 WORKING
+Current stage: G7 segmented implementation
 Binding product goal: 完整理解個別工作案例／任務／事件，再歸納穩定共同工作，最後產生客製化 JD
 This turn's decision: B1、B2 的分層責任、各自 guide、共同 publication、C 即時更正語意，以及第一版 bundle／reference／tool authority 契約
-Still open after G4: 依本設計完成窄 G7 切片並以測試驗證；Prompt 文字只在對應 Agent 接線切片調整
+Still open after first G7 slice: B1、B2、C 與 dispatcher／A read path 依 §14 分段接線；Prompt 文字只在對應 Agent 切片調整
 Out of scope: 本輪不改 production authority、不呼叫模型、不修改正式資料、不做 provider／JD schema 選型
 ```
 
@@ -223,6 +223,7 @@ manifest 至少保存：
 schema_version
 document_id
 base_publication_revision
+base_memory_version_id
 case_guide: path + digest
 cases: case_id -> path + digest + canonical source references
 understanding_guide: path + digest
@@ -233,7 +234,9 @@ supersessions:
   retired stable ID -> [current stable IDs]
 ```
 
-`case_digest` 是候選 bundle 內實際選中的案例內容 digest。這使「UNDERSTANDING-X 引用 CASE-A」同時具有穩定身分與精確依據，不需要把 `CASE-A@r4` 字串複製進正文。head 的 publication revision 由 CAS 成功時配置；候選 manifest 只記自己依據的 `base_publication_revision`，不能預先猜下一版號。
+`case_digest` 是候選 bundle 內實際選中的案例內容 digest。這使「UNDERSTANDING-X 引用 CASE-A」同時具有穩定身分與精確依據，不需要把 `CASE-A@r4` 字串複製進正文。head 的 publication revision 由 CAS 成功時配置；候選 manifest 只記自己依據的 `base_publication_revision` 與精確 `base_memory_version_id`，不能預先猜下一版號。發布交易必須同時確認目前 head 的 revision 與 MemoryVersion 都是這個 base，避免拿同版號下另一個未發布／錯誤 bundle 作為語意依據。
+
+建立非首版候選時，Runtime 還必須持有該 base head 指定的精確 `MemoryVersion`，用它核對哪些穩定身分仍存在、哪些本批退出 current set；不能只拿一個版本數字從空白重建 bundle。每個退出 current set 的 ID 都要有 supersession／retirement 紀錄，且不能替仍屬 current 的 ID 偽造淘汰；若沒有後繼項目，replacement 清單可以為空。
 
 案例正文需要保存足以回查的來源語意；正式 canonical source reference 由工具參數交 Runtime 驗證後寫入 manifest。工作理解只能引用候選 bundle 中存在的 `case_id`，Runtime 將它解析並固定成該 bundle 的 `case_digest`。guide 可以顯示穩定 ID、名稱／別名、辨識詞、目前狀態與未確認事項作導覽，但 manifest 才是路徑、digest 與跨層關聯的結構 authority。模型按需讀取一筆案例或理解時，Runtime 的 read 結果須連同該筆已驗證的 source references／case bindings 回傳；不是把整份 manifest 塞進每次 context，也不能只回正文而藏掉回查入口。
 
@@ -314,7 +317,7 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 
 為避免又同時重做 Agent、Prompt、背景排程與 UI，施工拆成下列可獨立驗證的窄切片：
 
-1. **Bundle authority foundation（下一個切片）：**只擴充 Memory bundle／manifest 的資料型別、保存、讀取、驗證及 publication 測試；以 synthetic fixtures 驗證 stable IDs、digest、跨層 bindings、文件隔離、完整 CAS、receipt 與 stale。零模型、零 Prompt、零 dispatcher、零 UI。
+1. **Bundle authority foundation（已完成）：**已擴充 Memory bundle／manifest 的資料型別、保存、讀取、驗證及 publication；synthetic fixtures 已驗證 stable IDs、來源、digest、跨層 bindings、supersession、文件隔離、精確 bundle base、完整 CAS、receipt、tamper、stale 與舊 receipt digest 相容。舊兩檔 Memory 保持相容；零模型、零 Prompt、零 dispatcher、零 UI。`consultant-memory` 全套 162 項測試及 compileall 通過。
 2. **B1 case maintainer：**沿現有來源固定／checkpoint／錯誤處理，接上案例 guide、相關案例讀取與受控語意操作；先離線測新增、補充、更正、重複、拆分／合併候選與 no-op。
 3. **B2 understanding maintainer＋完整背景 job：**接 staged case change set、多對多影響查找、新理解發現與一次發布；驗證 B1 成功而 B2 失敗不外露、semantic no-op 與 stale 後 B1／B2 重整。
 4. **C repair：**把現有兩檔 patch 限制改成穩定目標 ID 的受控修訂，驗證同次案例／理解更正、來源、CAS、receipt 及本回合基準推進。
@@ -325,9 +328,9 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 ## 15. Closure
 
 - **Decision：**B1 成為目前案例／任務／事件層的整理 Agent 並擁有小型 guide；B2 以目前案例維護穩定工作理解及其 guide。兩者暫採同一文件級 Memory publication，B1 staged 後由 B2 完成或 no-op，再一次發布。C 可在明確更正時直接原子發布同一完整版本。
-- **Status：**G4 WORKING；產品語意與第一版可驗證設計已對齊，不是程式已完成或 production authority 已切換。
+- **Status：**G7 分段施工；第一個 bundle authority foundation 已完成，B1／B2／C 與正式接線尚未切換，不是完整產品已完成或 production authority 已切換。
 - **Why：**產品需要記住完整個別工作實況與可修訂的穩定共同理解，並透過分層引用產出貼合員工的 JD；歷史窗口詳記＋單一正文不能充分表達「目前完整案例」。
 - **Sources：**Owner 2026-09-16 對話裁決；[Codex Memories](https://learn.chatgpt.com/docs/customization/memories)、[Codex consolidation template](https://github.com/openai/codex/blob/main/codex-rs/memories/write/templates/memories/consolidation.md)與[Codex memories README](https://github.com/openai/codex/blob/main/codex-rs/memories/README.md)只支持分層、引用與引用感知整理的官方事實，不替本產品決定 publication schema；既有 Q019／重抽／publication／H4 實作證據只作可沿用工程基礎。
-- **Affected：**`current-decisions.md`、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫、`CTX-C001` 的 B1 適用範圍；程式尚未修改。
+- **Affected：**`current-decisions.md`、`packages/consultant-memory` 的 bundle／Memory／publication／reference 基礎、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫與 `CTX-C001` 的 B1 適用範圍；第一切片沒有改 Prompt、Agent graph、dispatcher、UI 或正式入口。
 - **Reopen：**Owner 改變案例完整度／更正效果；G4 發現共同 publication 無法在現有 Store／Saver 契約下可靠完成；或代表性測試證明兩層一致性／回查成本不能同時成立。
-- **Next gate：**依 §14 只開第一個 Bundle authority foundation 切片，先寫反例與資料契約測試，再改保存／讀取／publication。第一版沿用「舊 immutable artifact 暫留、不做 GC」，不把長期回收設計列為接線前置。若現有 Store 公開 API 無法可靠列舉／驗證動態 bundle，先回報具體限制，不自行改成第二套資料庫 authority。
+- **Next gate：**依 §14 只開 B1 case maintainer 切片：先固定 Agent 可用的語意操作與離線反例，再把既有 source window／checkpoint 接到案例 guide／目前案例 staging；不在同一切片接 B2、C、dispatcher 或 UI。第一版沿用「舊 immutable artifact 暫留、不做 GC」。

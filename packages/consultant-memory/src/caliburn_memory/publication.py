@@ -62,9 +62,17 @@ class PublishRequest:
     artifact_digest: str
     processed_source: str | None = None
     repair_sources: tuple[str, ...] = ()
+    bundle_base_revision: int | None = None
+    bundle_base_version_id: str | None = None
 
     def digest(self) -> str:
-        return hashlib.sha256(json.dumps(asdict(self), sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+        data = asdict(self)
+        # Preserve legacy two-file request digests/receipts across this additive
+        # bundle field. Layered bundles always carry an integer base revision.
+        if self.bundle_base_revision is None:
+            data.pop("bundle_base_revision")
+            data.pop("bundle_base_version_id")
+        return hashlib.sha256(json.dumps(data, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
 
 
 @dataclass(frozen=True)
@@ -120,6 +128,11 @@ class PublicationStore:
         UUID(request.operation_id)
         if type(request.expected_revision) is not int or request.expected_revision < 0:
             raise ValueError("Expected non-negative base revision")
+        if (request.bundle_base_revision is not None
+                and request.bundle_base_revision != request.expected_revision):
+            raise ValueError("Memory bundle was prepared from a different base revision")
+        if ((request.bundle_base_revision in (None, 0)) != (request.bundle_base_version_id is None)):
+            raise ValueError("Memory bundle base version does not match its base revision")
         if request.kind not in ("consolidation", "repair"):
             raise ValueError("Unknown publication kind")
         if request.kind == "consolidation" and not request.processed_source:
@@ -132,8 +145,12 @@ class PublicationStore:
 
     def prepare(self, memory: MemoryVersion, *, expected_revision: int, kind: str,
                 processed_source: str | None = None, repair_sources: tuple[str, ...] = ()) -> PublishRequest:
-        request = PublishRequest(str(uuid4()), memory, expected_revision, kind,
-                                 self.artifacts.verify_version(memory), processed_source, tuple(repair_sources))
+        bundle_base = self.artifacts.bundle_base(memory)
+        bundle_base_revision, bundle_base_version_id = bundle_base or (None, None)
+        request = PublishRequest(
+            str(uuid4()), memory, expected_revision, kind, self.artifacts.verify_version(memory),
+            processed_source, tuple(repair_sources), bundle_base_revision, bundle_base_version_id,
+        )
         self._validate(request)
         return request
 
@@ -161,6 +178,10 @@ class PublicationStore:
         # even after later heads; returning it does not reselect that old head.
         if result := self._match(self.receipt(request.operation_id), request):
             return result
+        if self.artifacts.bundle_base(request.memory) != (
+                None if request.bundle_base_revision is None else
+                (request.bundle_base_revision, request.bundle_base_version_id)):
+            raise ValueError("Memory bundle base revision changed or was not prepared")
         if self.artifacts.verify_version(request.memory) != request.artifact_digest:
             raise ValueError("Prepared Memory content changed; publication rejected")
         try:
@@ -169,7 +190,9 @@ class PublicationStore:
                 if prior is not None:
                     return self._match(self._receipt(prior), request)
                 row = session.get(HeadRow, self.document_id)
-                if (row.revision if row else 0) != request.expected_revision:
+                if ((row.revision if row else 0) != request.expected_revision
+                        or (request.bundle_base_version_id is not None
+                            and (row is None or row.memory_version != request.bundle_base_version_id))):
                     raise StalePublication(self._head(row) if row else None)
                 if row is None:
                     row = HeadRow(document_id=self.document_id, memory_version=request.memory.version_id,

@@ -28,6 +28,14 @@ B1 的 canonical 訪談 batch 是受保護來源：之後的 request-only compac
 
 這仍只是 package 內的 B1 候選：沒有 B2、共同 publication、正式 App model factory、dispatcher、compaction、UI 或自然模型驗收。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
 
+### B2 工作理解 staged state／語意工具
+
+`caliburn_memory.understanding_maintenance` 已完成零 provider 的第一片。`UnderstandingMaintenanceSession` 固定一份 completed B1 stage 與 exact base bundle，從 B1 semantic case changes 及 base `understanding → case` bindings 自動推導必讀的 candidate cases 與直接受影響 understandings；模型不能提供或縮小 impact set。新案例即使沒有反向 binding 仍是必讀項目，讓 B2 判斷是否揭露新的穩定工作理解。
+
+十個窄工具提供 case／understanding 讀取，以及 create、revise、revalidate、split、merge、retire、route、finish。已發布理解採 read-before-write；所有 support case 必須屬於同一 B1 candidate 且已實際讀取。`revalidate_work_understanding` 讓正文語意不變時明確更新支持案例，binding-only refresh 不建立假正文修改；`finish(no_op)` 仍要求變更案例已讀、直接受影響理解已 revise／revalidate／supersede／retire，避免只換 digest 或漏掉新案例。Runtime 擁有 UUID、guide route、scope、base 與後續 digest。
+
+本片只有 checkpoint-safe stage／tools／impact gate，沒有 B2 Prompt／Agent graph、publication、stale 重跑、dispatcher、compaction、App 組裝或自然模型驗收。完整契約與結果見 [B2 staged maintainer 計畫](../../docs/plans/2026-09-16-b2-understanding-maintainer.md)。
+
 ## 即時修補核心
 
 **2026-09-13：**新增公開 `build_repair_graph(resolve_workflow)`，供 App 固定 wrapper 在執行時取得同輪資源；`RepairWorkflow.graph` 共用同一六節點，未另寫引擎。建圖與檢視不執行 resolver、不開任何資源。`adoption.json` 已記此版實際 hash，wheel 在乾淨 venv 依 App lock 完成完整依賴安裝並通過隔離檢查，詳見[App 接合結果](../../docs/specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。
@@ -75,4 +83,4 @@ uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 
 Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，patch／保存核心不建立 provider；B1 執行由 App 注入的模型 runnable。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
 
-目前最新分層 bundle authority、B1 staged state／語意工具及固定 canonical batch Agent graph 已完成；舊 publication CAS／receipt 與顧問方法資產保留作接續基礎。**B2 staged understanding、B1→B2 共同發布、C bundle repair、正式 App model factory／dispatcher、B1 compaction 與完整 App 旅程仍未完成**；不要把 package 測試、舊 B1／B2 真 PG 證據或固定組裝測試代稱新分層流程已可日常使用，也不能宣稱新流程自然品質已驗。
+目前最新分層 bundle authority、B1 staged state／語意工具／固定 canonical batch Agent graph，以及 B2 staged state／語意工具／impact gate 已完成；舊 publication CAS／receipt 與顧問方法資產保留作接續基礎。**B2 Agent graph、B1→B2 共同發布、C bundle repair、正式 App model factory／dispatcher、B1 compaction 與完整 App 旅程仍未完成**；不要把 package 測試、舊 B1／B2 真 PG 證據或固定組裝測試代稱新分層流程已可日常使用，也不能宣稱新流程自然品質已驗。

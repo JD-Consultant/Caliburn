@@ -18,7 +18,7 @@ from caliburn_memory.bundle import (
     WorkUnderstandingArtifact, WorkUnderstandingRead,
 )
 from caliburn_memory.references import controlled_references
-from caliburn_memory.sources import SourceReader
+from caliburn_memory.sources import MAX_EVIDENCE_EXCHANGES, EvidenceExchangePage, SourceReader
 
 
 @dataclass(frozen=True)
@@ -208,7 +208,48 @@ class MemoryArtifacts:
         self._save(backend, "/memory/guide.md", guide)
         return version
 
-    def save_bundle(self, *, base_publication_revision: int, case_guide: str,
+    def _canonical_source_positions(
+        self, through_reference: str, references: set[str],
+    ) -> dict[str, int]:
+        """Prove one lineage and return source-owner order for every reference."""
+        if self.source is None:
+            raise ValueError("Canonical source reader is not configured")
+        if type(through_reference) is not str or not through_reference:
+            raise ValueError("Expected a Runtime-fixed evidence history reference")
+        positions: dict[str, int] = {}
+        offset = 0
+        ordinal = 0
+        while len(positions) < len(references):
+            try:
+                page = self.source.history_exchanges(
+                    through_reference, offset=offset, limit=MAX_EVIDENCE_EXCHANGES,
+                )
+            except (AttributeError, TypeError, ValueError) as error:
+                raise ValueError(
+                    "Canonical evidence history is unavailable for this lineage",
+                ) from error
+            if not isinstance(page, EvidenceExchangePage) or page.order != "oldest_to_newest":
+                raise ValueError("Canonical evidence history did not provide owner order")
+            for exchange in page.exchanges:
+                reference = exchange.source_reference
+                if reference in references:
+                    if reference in positions:
+                        raise ValueError("Canonical evidence history returned a duplicate source")
+                    positions[reference] = ordinal
+                ordinal += 1
+            if len(positions) == len(references):
+                break
+            if page.next_offset is None:
+                raise ValueError(
+                    "Canonical evidence history cannot prove the requested source lineage",
+                )
+            if page.next_offset <= offset:
+                raise ValueError("Canonical evidence history paging did not advance")
+            offset = page.next_offset
+        return positions
+
+    def save_bundle(self, *, base_publication_revision: int,
+                    evidence_through_reference: str, case_guide: str,
                     cases: tuple[CaseArtifact, ...], understanding_guide: str,
                     understandings: tuple[WorkUnderstandingArtifact, ...],
                     supersessions: tuple[Supersession, ...] = (),
@@ -227,6 +268,25 @@ class MemoryArtifacts:
         if understandings and not understanding_guide.strip():
             raise ValueError("Understanding guide is empty while current understandings exist")
 
+        source_sets: dict[str, tuple[str, ...]] = {}
+        all_sources: set[str] = set()
+        for item in cases:
+            case_id = _stable_id(item.case_id, field="case_id")
+            if case_id in source_sets:
+                raise ValueError(f"Duplicate case_id: {case_id}")
+            sources = tuple(item.source_references)
+            if not sources:
+                raise ValueError(f"Case requires at least one canonical source reference: {case_id}")
+            if len(set(sources)) != len(sources):
+                raise ValueError(f"Case contains duplicate source references: {case_id}")
+            for reference in sources:
+                self._validate_controlled_reference(reference)
+            source_sets[case_id] = sources
+            all_sources.update(sources)
+        source_positions = self._canonical_source_positions(
+            evidence_through_reference, all_sources,
+        ) if all_sources else {}
+
         case_texts: dict[str, str] = {}
         case_entries: list[CaseManifestEntry] = []
         case_digests: dict[str, str] = {}
@@ -237,11 +297,9 @@ class MemoryArtifacts:
             content = _prepare_text(item.content)
             if not content.strip():
                 raise ValueError(f"Case content is empty: {case_id}")
-            sources = tuple(dict.fromkeys(item.source_references))
-            if not sources:
-                raise ValueError(f"Case requires at least one canonical source reference: {case_id}")
-            for reference in sources:
-                self._validate_controlled_reference(reference)
+            sources = tuple(sorted(
+                source_sets[case_id], key=source_positions.__getitem__,
+            ))
             path, digest = _case_path(case_id), _digest(content)
             case_texts[case_id], case_digests[case_id] = content, digest
             case_entries.append(CaseManifestEntry(case_id, path, digest, sources))

@@ -24,6 +24,7 @@ from caliburn_memory.sources import (
 from caliburn_memory.understanding_maintenance import (
     CaseReworkIssue, CaseReworkIssueInput, CaseSourceRead,
     UnderstandingChange, UnderstandingMaintenanceAgentState,
+    UnderstandingCaseEvidence,
     UnderstandingMaintenanceError, UnderstandingMaintenanceSession,
     UnderstandingMaintenanceStage, UnderstandingReplacementInput, UnderstandingSupportSelection,
     understanding_maintenance_tools,
@@ -53,6 +54,7 @@ __all__ = [
     "SkillAssets", "analysis_files", "analysis_skills",
     "UnderstandingChange", "UnderstandingMaintenanceAgentState",
     "CaseReworkIssue", "CaseReworkIssueInput", "CaseSourceRead",
+    "UnderstandingCaseEvidence",
     "UnderstandingMaintenanceError",
     "UnderstandingMaintenanceSession", "UnderstandingMaintenanceStage",
     "UnderstandingReplacementInput", "UnderstandingSupportSelection",

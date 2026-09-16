@@ -21,10 +21,10 @@ from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.message import REMOVE_ALL_MESSAGES
 from langgraph.types import Command
-from pydantic import Field
+from pydantic import BaseModel, ConfigDict, Field
 
 from .case_maintenance import CaseMaintenanceStage
-from .sources import ExtractionSourceReader
+from .sources import EvidenceTextPage, ExtractionSourceReader
 from .understanding_maintenance import (
     MAX_REWORK_ISSUES,
     CaseReworkIssueInput,
@@ -43,11 +43,11 @@ UNDERSTANDING_MAINTENANCE_INSTRUCTIONS = """你是背景工作理解整理者 B2
 
 先讀完 REQUIRED_CASE_IDS 中的目前案例。DIRECTLY_AFFECTED_UNDERSTANDING_IDS 必須逐一讀取並以完整、目前有效的 supporting cases 處理；正文不改但支撐仍正確時使用 revalidate_work_understanding，不可因本批沒提到其他支撐案例就把它們漏掉。CASE_GUIDE 與 UNDERSTANDING_GUIDE 只是導覽 map；需要比較鄰近案例或理解時再按 ID 讀正文，不能只看 guide 覆寫未讀內容。
 
-一般情況以完整案例層作為 B2 證據。只有為了釐清已讀案例的歧義、衝突或可能錯漏時，才可從 read_case 回傳的 source_references 選擇精確 reference，使用 read_case_source 分頁按需核對原話；不能任意掃描原始訪談，也不能把 Runtime／工具錯誤當成員工原話。若原話只是補足分析細節，繼續完成 B2。若原話證明 B1 案例有會實質影響工作理解的錯誤、缺漏或責任歸屬問題，必須呼叫 request_case_rework，列出已讀案例、已讀來源與具體原因；不要修改案例，也不要在工作理解中繞過錯誤案例。這個結果不可發布，由上層 Runtime 之後決定是否重做 B1。
+一般情況以完整案例層作為 B2 證據。只有為了釐清已讀案例的歧義、衝突或可能錯漏時，才可從 read_case 回傳的 ordered evidence 選擇該案例專用的 evidence_key，使用 read_case_source 分頁按需核對原話；不要填 reference 或 offset，不能任意掃描原始訪談，也不能把 Runtime／工具錯誤當成員工原話。若原話只是補足分析細節，繼續完成 B2。若原話證明 B1 案例有會實質影響工作理解的錯誤、缺漏或責任歸屬問題，必須呼叫 request_case_rework，提交已讀 evidence_key 與具體原因；不要修改案例，也不要在工作理解中繞過錯誤案例。這個結果不可發布，由上層 Runtime 之後決定是否重做 B1。
 
 同一真實工作理解的修正保留既有 understanding_id 並使用最小完整 diff；真正分裂、合併或失效才 split／merge／retire。每次寫入或 revalidate 都要提供完整的目前 supporting_case_ids，而且先讀所有列入支撐的案例。guide 路由語意沒變不必重寫；需改時只提供 route_note。
 
-處理完所有必要案例與受影響理解後，必須呼叫 finish_understanding_maintenance：有工作理解正文、集合或 guide 的語意變更用 changed；沒有這些語意變更而只是確認既有完整支撐用 no_op。若已確認 B1 必須重做，改呼叫 request_case_rework，不再 finish。工具錯誤是 Runtime 驗證回饋，依錯誤修正，不能藉由猜 ID、來源或清空內容繞過。
+處理完所有必要案例與受影響理解後，必須以零參數呼叫 finish_understanding_maintenance()；changed／no_op 由 Runtime 根據 staged 變更計算。若已確認 B1 必須重做，改呼叫 request_case_rework，不再 finish。工具錯誤是 Runtime 驗證回饋，依錯誤修正，不能藉由猜 ID、來源或清空內容繞過。
 
 不要輸出隱藏推理，不要填 document_id、版本、digest、路徑、時間、operation ID 或新 understanding_id。B2 結果只是 staged 候選或 rework 控制結果，尚未發布，也不能宣稱 Memory 或 JD 已更新。"""
 
@@ -116,26 +116,41 @@ def _updated(name: str, runtime: ToolRuntime, stage: UnderstandingMaintenanceSta
     })
 
 
-def _source_page(value: object, reference: str) -> dict[str, Any]:
-    if type(value) is not dict:
-        raise ValueError("Source owner returned an invalid B2 source page")
-    required = {"segments", "turns", "omitted_content_types", "next_offset"}
-    if (not required.issubset(value)
-            or ("reference" in value and value["reference"] != reference)
-            or type(value["segments"]) is not list
-            or type(value["turns"]) is not list
-            or type(value["omitted_content_types"]) is not list
-            or (value["next_offset"] is not None
-                and (type(value["next_offset"]) is not int
-                     or value["next_offset"] < 0))):
-        raise ValueError("Source owner returned an invalid B2 source page")
-    return {
-        "reference": reference,
-        "segments": value["segments"],
-        "turns": value["turns"],
-        "omitted_content_types": value["omitted_content_types"],
-        "next_offset": value["next_offset"],
-    }
+class _StrictWorkflowToolInput(BaseModel):
+    model_config = ConfigDict(extra="forbid", arbitrary_types_allowed=True)
+    runtime: ToolRuntime
+
+
+class _ReadCaseSourceInput(_StrictWorkflowToolInput):
+    evidence_key: str
+
+
+class _RequestCaseReworkInput(_StrictWorkflowToolInput):
+    issues: list[CaseReworkIssueInput] = Field(
+        min_length=1, max_length=MAX_REWORK_ISSUES,
+    )
+
+
+def _validated_source_page(value: object, *, reference: str, offset: int,
+                           messages) -> EvidenceTextPage:
+    if (not isinstance(value, EvidenceTextPage)
+            or value.reference != reference or not value.segments
+            or (value.next_offset is not None and value.next_offset <= offset)):
+        raise UnderstandingMaintenanceError(
+            "invalid_evidence_page", "Source owner returned an invalid B2 evidence page",
+        )
+    positions = {message.message_id: (index, message.role)
+                 for index, message in enumerate(messages)}
+    previous = -1
+    for segment in value.segments:
+        metadata = positions.get(segment.message_id)
+        if metadata is None or metadata[1] != segment.role or metadata[0] < previous:
+            raise UnderstandingMaintenanceError(
+                "invalid_evidence_page",
+                "Evidence text no longer matches its fixed interview exchange",
+            )
+        previous = metadata[0]
+    return value
 
 
 def understanding_workflow_tools(
@@ -143,6 +158,9 @@ def understanding_workflow_tools(
     session: UnderstandingMaintenanceSession,
 ):
     """Add exact source inspection and terminal B1-rework feedback to B2."""
+
+    if reader.document_id != session.artifacts.document_id:
+        raise ValueError("Understanding-maintenance components belong to different documents")
 
     def staged(runtime: ToolRuntime) -> UnderstandingMaintenanceStage:
         messages = runtime.state.get("messages", ())
@@ -163,30 +181,45 @@ def understanding_workflow_tools(
             next_action=str(error),
         )
 
-    @tool("read_case_source")
-    def read_case_source(case_id: str, source_reference: str, offset: int,
+    @tool("read_case_source", args_schema=_ReadCaseSourceInput)
+    def read_case_source(evidence_key: str,
                          runtime: ToolRuntime) -> Command | ToolMessage:
-        """Read one page from an exact canonical reference returned by an already-read case."""
+        """Read the next page for one case-bound evidence key; Runtime owns source and cursor."""
         try:
             stage = staged(runtime)
-            authorized = session.observe_source_reference(
-                stage, case_id=case_id, source_reference=source_reference,
+            evidence = session.evidence_for_key(stage, evidence_key)
+            if evidence.next_offset is None:
+                raise UnderstandingMaintenanceError(
+                    "evidence_complete", "All text for this case evidence is already read",
+                )
+            try:
+                page = reader.read_source_page(
+                    evidence.source_reference, evidence.next_offset,
+                )
+            except ValueError as error:
+                raise UnderstandingMaintenanceError(
+                    "evidence_source_unavailable", "Case evidence source is unavailable",
+                ) from error
+            page = _validated_source_page(
+                page, reference=evidence.source_reference,
+                offset=evidence.next_offset, messages=evidence.messages,
+            )
+            updated, advanced = session.advance_case_evidence(
+                stage, evidence_key=evidence_key, next_offset=page.next_offset,
             )
         except UnderstandingMaintenanceError as error:
             return failure("read_case_source", runtime, error)
-        if type(offset) is not int or offset < 0:
-            return failure(
-                "read_case_source", runtime,
-                UnderstandingMaintenanceError(
-                    "invalid_source_offset", "Canonical source offset must be nonnegative",
-                ),
-            )
-        page = _source_page(reader.read(source_reference, offset), source_reference)
         return _updated(
-            "read_case_source", runtime, authorized, effect="unchanged", source=page,
+            "read_case_source", runtime, updated, effect="unchanged",
+            evidence={
+                "evidence_key": advanced.evidence_key,
+                "messages": [{"role": segment.role, "text": segment.text}
+                             for segment in page.segments],
+                "has_more": advanced.next_offset is not None,
+            },
         )
 
-    @tool("request_case_rework")
+    @tool("request_case_rework", args_schema=_RequestCaseReworkInput)
     def request_case_rework(
         issues: Annotated[
             list[CaseReworkIssueInput],
@@ -200,7 +233,10 @@ def understanding_workflow_tools(
             return _updated(
                 "request_case_rework", runtime, updated,
                 effect="case_rework_required",
-                issues=[asdict(item) for item in updated.case_rework_issues],
+                issues=[{
+                    "evidence_key": item.evidence_key,
+                    "reason": item.reason.strip(),
+                } for item in issues],
             )
         except UnderstandingMaintenanceError as error:
             return failure("request_case_rework", runtime, error)
@@ -249,7 +285,7 @@ class UnderstandingMaintenanceWorkflow:
 
         configured_model = model.model_copy(update={"max_tokens": max_output_tokens})
         tools = [
-            *understanding_maintenance_tools(session),
+            *understanding_maintenance_tools(reader, session),
             *understanding_workflow_tools(reader, session),
         ]
         agent = create_agent(
@@ -362,7 +398,7 @@ class UnderstandingMaintenanceWorkflow:
             "messages": [SystemMessage(
                 "Runtime validation feedback (not employee speech): B2 returned without "
                 "a terminal tool. Complete remaining work, then call "
-                "finish_understanding_maintenance(changed/no_op), or call "
+                "finish_understanding_maintenance(), or call "
                 "request_case_rework after source-grounded material B1 problems.",
             )],
         }

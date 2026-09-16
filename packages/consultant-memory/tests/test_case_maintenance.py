@@ -38,6 +38,7 @@ def _base(artifacts, contents):
     )
     version = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=artifacts.source.reference,
         case_guide=guide,
         cases=tuple(CaseArtifact(case_id, content, (artifacts.source.reference,))
                     for case_id, (_name, content) in zip(case_ids, contents, strict=True)),
@@ -319,6 +320,7 @@ def test_split_assigns_evidence_per_replacement_and_requires_explicit_old_discar
     guide = f"- [客服事件](/memory/cases/items/{old_id}.md) — 電話與現場事件"
     version = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=source.second_reference,
         case_guide=guide,
         cases=(CaseArtifact(old_id, "同一段混合了電話與現場處理。",
                             (source.reference, source.second_reference)),),
@@ -364,6 +366,7 @@ def test_split_accepts_a_reasoned_discard_without_copying_it_to_replacements():
     guide = f"- [混合案例](/memory/cases/items/{old_id}.md) — 待拆分"
     version = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=source.second_reference,
         case_guide=guide,
         cases=(CaseArtifact(old_id, "混合案例。", (source.reference, source.second_reference)),),
         understanding_guide="",
@@ -432,6 +435,7 @@ def test_merge_starts_from_read_case_evidence_union_then_applies_add_remove_delt
     ))
     version = artifacts.save_bundle(
         base_publication_revision=0,
+        evidence_through_reference=source.second_reference,
         case_guide=guide,
         cases=(
             CaseArtifact(first_id, "案例甲。", (source.reference,)),

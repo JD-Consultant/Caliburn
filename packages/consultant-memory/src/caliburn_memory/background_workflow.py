@@ -13,7 +13,7 @@ from langgraph.graph import END, START, StateGraph
 
 from .case_maintenance import CaseMaintenanceWorkflow, CaseRuntimeReview
 from .memory import MemoryVersion
-from .publication import PublishedHead, PublicationStore, PublishRequest
+from .publication import PublishedHead, PublicationStore, PublishRequest, StalePublication
 from .understanding_workflow import UnderstandingMaintenanceWorkflow
 
 
@@ -21,7 +21,7 @@ class BackgroundMemoryWorkflowState(TypedDict):
     source_reference: str
     base_publication_revision: int | None
     base_memory_version_id: str | None
-    case_attempt_id: str
+    case_attempt_id: str | None
     case_stage: dict[str, Any] | None
     understanding_stage: dict[str, Any] | None
     runtime_review: list[dict[str, str]]
@@ -77,7 +77,10 @@ class BackgroundMemoryWorkflow:
         builder.add_node("prepare_publication", self._prepare_publication)
         builder.add_node("publish", self._publish)
         builder.add_edge(START, "load_base")
-        builder.add_edge("load_base", "run_b1")
+        builder.add_conditional_edges(
+            "load_base", self._after_load,
+            {"process": "run_b1", "covered": END},
+        )
         builder.add_edge("run_b1", "run_b2")
         builder.add_edge("run_b2", "route_b2")
         builder.add_conditional_edges(
@@ -92,7 +95,10 @@ class BackgroundMemoryWorkflow:
         builder.add_edge("block_rework", END)
         builder.add_edge("assemble_bundle", "prepare_publication")
         builder.add_edge("prepare_publication", "publish")
-        builder.add_edge("publish", END)
+        builder.add_conditional_edges(
+            "publish", self._after_publish,
+            {"stale": "load_base", "done": END},
+        )
         self.graph = builder.compile(checkpointer=checkpointer)
 
     def start(self, source_reference: str) -> dict[str, Any]:
@@ -109,7 +115,7 @@ class BackgroundMemoryWorkflow:
             "source_reference": source_reference,
             "base_publication_revision": None,
             "base_memory_version_id": None,
-            "case_attempt_id": str(uuid4()),
+            "case_attempt_id": None,
             "case_stage": None,
             "understanding_stage": None,
             "runtime_review": [],
@@ -143,7 +149,8 @@ class BackgroundMemoryWorkflow:
             raise ValueError("Background Memory checkpoint is incompatible")
         state = value
         if (type(state["source_reference"]) is not str
-                or type(state["case_attempt_id"]) is not str
+                or (state["case_attempt_id"] is not None
+                    and type(state["case_attempt_id"]) is not str)
                 or type(state["case_rework_count"]) is not int
                 or state["case_rework_count"] < 0
                 or type(state["stale_retry_count"]) is not int
@@ -198,23 +205,53 @@ class BackgroundMemoryWorkflow:
         return MemoryVersion(self.document_id, identifier) if identifier is not None else None
 
     def _load_base(self, state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
-        self._validate_state(state)
+        state = self._validate_state(state)
         head = self.publication.current()
+        if head is not None and head.processed_source is not None:
+            progress = self.case_workflow.reader.source_progress(
+                state["source_reference"], head.processed_source)
+            if progress == "covered":
+                return {
+                    "base_publication_revision": head.revision,
+                    "base_memory_version_id": head.memory.version_id,
+                    "case_attempt_id": None,
+                    "case_stage": None,
+                    "understanding_stage": None,
+                    "runtime_review": [],
+                    "candidate_memory_version_id": None,
+                    "publish_request": None,
+                    "status": "completed",
+                    "error_code": None,
+                    "result": self._head_value(head),
+                }
+            if progress != "next":
+                raise ValueError("Source owner returned invalid publication progress")
         return {
             "base_publication_revision": head.revision if head is not None else 0,
             "base_memory_version_id": head.memory.version_id if head is not None else None,
+            "case_attempt_id": state["case_attempt_id"] or str(uuid4()),
+            "status": "pending",
+            "error_code": None,
+            "result": None,
         }
+
+    def _after_load(
+        self, state: BackgroundMemoryWorkflowState,
+    ) -> Literal["process", "covered"]:
+        state = self._validate_state(state)
+        return "covered" if state["status"] == "completed" else "process"
 
     def _run_b1(self, state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
         state = self._validate_state(state)
         revision = state["base_publication_revision"]
-        if revision is None:
+        attempt_id = state["case_attempt_id"]
+        if revision is None or attempt_id is None:
             raise ValueError("Background Memory base was not loaded")
         result = self.case_workflow.run_attempt(
             state["source_reference"],
             base_publication_revision=revision,
             base_version=self._base_version(state),
-            case_attempt_id=state["case_attempt_id"],
+            case_attempt_id=attempt_id,
             runtime_review=self._runtime_review(state["runtime_review"]),
         )
         stage = self.case_workflow.session.load(result.get("case_stage"))
@@ -224,9 +261,12 @@ class BackgroundMemoryWorkflow:
 
     def _run_b2(self, state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
         state = self._validate_state(state)
+        attempt_id = state["case_attempt_id"]
+        if attempt_id is None:
+            raise ValueError("Background Memory case attempt is unavailable")
         case_stage = self.case_workflow.session.load(state["case_stage"])
         result = self.understanding_workflow.run_attempt(
-            case_stage, case_attempt_id=state["case_attempt_id"],
+            case_stage, case_attempt_id=attempt_id,
         )
         stage = self.understanding_workflow.session.load(result.get("understanding_stage"))
         if not stage.completed:
@@ -361,5 +401,32 @@ class BackgroundMemoryWorkflow:
 
     def _publish(self, state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
         state = self._validate_state(state)
-        head = self.publication.publish(self._request(state["publish_request"]))
+        try:
+            head = self.publication.publish(self._request(state["publish_request"]))
+        except StalePublication:
+            if state["stale_retry_count"] >= self.max_stale_retries:
+                return {
+                    "status": "blocked",
+                    "error_code": "stale_retry_limit_reached",
+                }
+            return {
+                "base_publication_revision": None,
+                "base_memory_version_id": None,
+                "case_attempt_id": None,
+                "case_stage": None,
+                "understanding_stage": None,
+                "runtime_review": [],
+                "stale_retry_count": state["stale_retry_count"] + 1,
+                "candidate_memory_version_id": None,
+                "publish_request": None,
+                "status": "pending",
+                "error_code": None,
+                "result": None,
+            }
         return {"status": "completed", "error_code": None, "result": self._head_value(head)}
+
+    def _after_publish(
+        self, state: BackgroundMemoryWorkflowState,
+    ) -> Literal["stale", "done"]:
+        state = self._validate_state(state)
+        return "stale" if state["status"] == "pending" else "done"

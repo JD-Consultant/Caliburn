@@ -11,7 +11,7 @@ from uuid import NAMESPACE_URL, uuid4, uuid5
 from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 
-from .case_maintenance import CaseMaintenanceWorkflow
+from .case_maintenance import CaseMaintenanceWorkflow, CaseRuntimeReview
 from .memory import MemoryVersion
 from .publication import PublishedHead, PublicationStore, PublishRequest
 from .understanding_workflow import UnderstandingMaintenanceWorkflow
@@ -24,6 +24,7 @@ class BackgroundMemoryWorkflowState(TypedDict):
     case_attempt_id: str
     case_stage: dict[str, Any] | None
     understanding_stage: dict[str, Any] | None
+    runtime_review: list[dict[str, str]]
     case_rework_count: int
     stale_retry_count: int
     candidate_memory_version_id: str | None
@@ -70,6 +71,7 @@ class BackgroundMemoryWorkflow:
         builder.add_node("run_b1", self._run_b1)
         builder.add_node("run_b2", self._run_b2)
         builder.add_node("route_b2", lambda _state: {})
+        builder.add_node("prepare_case_rework", self._prepare_case_rework)
         builder.add_node("block_rework", self._block_rework)
         builder.add_node("assemble_bundle", self._assemble_bundle)
         builder.add_node("prepare_publication", self._prepare_publication)
@@ -80,8 +82,13 @@ class BackgroundMemoryWorkflow:
         builder.add_edge("run_b2", "route_b2")
         builder.add_conditional_edges(
             "route_b2", self._after_b2,
-            {"publishable": "assemble_bundle", "rework": "block_rework"},
+            {
+                "publishable": "assemble_bundle",
+                "rework": "prepare_case_rework",
+                "limit": "block_rework",
+            },
         )
+        builder.add_edge("prepare_case_rework", "run_b1")
         builder.add_edge("block_rework", END)
         builder.add_edge("assemble_bundle", "prepare_publication")
         builder.add_edge("prepare_publication", "publish")
@@ -105,6 +112,7 @@ class BackgroundMemoryWorkflow:
             "case_attempt_id": str(uuid4()),
             "case_stage": None,
             "understanding_stage": None,
+            "runtime_review": [],
             "case_rework_count": 0,
             "stale_retry_count": 0,
             "candidate_memory_version_id": None,
@@ -149,6 +157,7 @@ class BackgroundMemoryWorkflow:
                 or (state["case_stage"] is not None and type(state["case_stage"]) is not dict)
                 or (state["understanding_stage"] is not None
                     and type(state["understanding_stage"]) is not dict)
+                or type(state["runtime_review"]) is not list
                 or (state["candidate_memory_version_id"] is not None
                     and type(state["candidate_memory_version_id"]) is not str)
                 or (state["publish_request"] is not None
@@ -160,6 +169,29 @@ class BackgroundMemoryWorkflow:
                 != (state["base_memory_version_id"] is None)):
             raise ValueError("Background Memory base revision and version do not match")
         return state  # type: ignore[return-value]
+
+    @staticmethod
+    def _review_value(review: CaseRuntimeReview) -> dict[str, str]:
+        return {
+            "case_id": review.case_id,
+            "source_reference": review.source_reference,
+            "reason": review.reason,
+            "candidate_content": review.candidate_content,
+            "case_origin": review.case_origin,
+        }
+
+    @staticmethod
+    def _runtime_review(value: object) -> tuple[CaseRuntimeReview, ...]:
+        expected = {
+            "case_id", "source_reference", "reason", "candidate_content", "case_origin",
+        }
+        if (type(value) is not list
+                or any(type(item) is not dict or set(item) != expected for item in value)):
+            raise ValueError("Background Memory Runtime review is invalid")
+        try:
+            return tuple(CaseRuntimeReview(**item) for item in value)
+        except (TypeError, ValueError) as error:
+            raise ValueError("Background Memory Runtime review is invalid") from error
 
     def _base_version(self, state: BackgroundMemoryWorkflowState) -> MemoryVersion | None:
         identifier = state["base_memory_version_id"]
@@ -183,11 +215,12 @@ class BackgroundMemoryWorkflow:
             base_publication_revision=revision,
             base_version=self._base_version(state),
             case_attempt_id=state["case_attempt_id"],
+            runtime_review=self._runtime_review(state["runtime_review"]),
         )
         stage = self.case_workflow.session.load(result.get("case_stage"))
         if not stage.completed:
             raise ValueError("B1 attempt returned without a completed stage")
-        return {"case_stage": stage.to_dict()}
+        return {"case_stage": stage.to_dict(), "runtime_review": []}
 
     def _run_b2(self, state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
         state = self._validate_state(state)
@@ -200,15 +233,52 @@ class BackgroundMemoryWorkflow:
             raise ValueError("B2 attempt returned without a completed stage")
         return {"understanding_stage": stage.to_dict()}
 
-    def _after_b2(self, state: BackgroundMemoryWorkflowState) -> Literal["publishable", "rework"]:
+    def _after_b2(
+        self, state: BackgroundMemoryWorkflowState,
+    ) -> Literal["publishable", "rework", "limit"]:
         state = self._validate_state(state)
         stage = self.understanding_workflow.session.load(state["understanding_stage"])
-        return "publishable" if stage.outcome in {"changed", "no_op"} else "rework"
+        if stage.outcome in {"changed", "no_op"}:
+            return "publishable"
+        return "rework" if state["case_rework_count"] == 0 else "limit"
+
+    def _prepare_case_rework(self, state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
+        state = self._validate_state(state)
+        if state["case_rework_count"] != 0:
+            raise ValueError("Background Memory case rework limit was already used")
+        case_stage = self.case_workflow.session.load(state["case_stage"])
+        understanding_stage = self.understanding_workflow.session.load(
+            state["understanding_stage"])
+        if understanding_stage.outcome != "case_rework_required":
+            raise ValueError("Background Memory B2 did not request case rework")
+        reviews = []
+        for issue in understanding_stage.case_rework_issues:
+            candidate = self.case_workflow.session.read_case(case_stage, issue.case_id)
+            reviews.append(CaseRuntimeReview(
+                case_id=issue.case_id,
+                source_reference=issue.source_reference,
+                reason=issue.reason,
+                candidate_content=candidate.content,
+                case_origin="base" if issue.case_id in case_stage.base_case_ids else "candidate",
+            ))
+        if not reviews:
+            raise ValueError("Background Memory case rework has no source-grounded issue")
+        return {
+            "case_attempt_id": str(uuid4()),
+            "case_stage": None,
+            "understanding_stage": None,
+            "runtime_review": [self._review_value(item) for item in reviews],
+            "case_rework_count": 1,
+            "candidate_memory_version_id": None,
+            "publish_request": None,
+            "status": "pending",
+            "error_code": None,
+            "result": None,
+        }
 
     @staticmethod
     def _block_rework(_state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
-        # Task 5 replaces this temporary fail-closed stop with one bounded B1 rework.
-        return {"status": "blocked", "error_code": "case_rework_required"}
+        return {"status": "blocked", "error_code": "case_rework_limit_reached"}
 
     def _assemble_bundle(self, state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
         state = self._validate_state(state)

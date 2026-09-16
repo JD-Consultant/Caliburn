@@ -76,7 +76,7 @@ Runtime 組裝完整 candidate bundle
 
 既有 `context_reference` 可幫助當次模型理解，但 context token 本身不冒充 evidence；若其中問答確實支持案例，來源 owner 要沿用既有 `source` 格式為對應的已安全完成使用者輪次提供可持久驗證的 references，B1 再選入案例證據集合。Runtime 可驗證完整交換、固定位置、文件範圍、已提供／已讀、去重與 canonical 排序；「是否足以獨立理解案例」是語意品質，交由 B1 規則、B2 沿引用反查及自然訪談驗收，不用關鍵詞或字數假裝純程式已證明。
 
-這項前置修正的完整責任如下；其中 source owner、B1 evidence registry 與 B1 語意工具分配已由引用施工 Tasks 1–4 完成，bundle／B2 同序讀取仍待 Task 5：
+這項前置修正的完整責任如下；source owner、B1 evidence registry／語意工具分配、bundle owner-order 再驗證與 B2 case-bound exact-source 讀取已由引用施工 Tasks 1–6 完成：
 
 - `processed_source`／job source range 繼續表示本次完整處理進度；
 - source owner 增加受控的歷史安全交換列舉／固定讀取能力，沿用現有 `AiRunHistory.find()`、固定 checkpoint 與 `source` 簽章，不另存第二份 conversation；
@@ -150,15 +150,14 @@ publication 的 `kind` 仍為 `consolidation`，`processed_source=source_referen
 
 `case_rework_required` 是語意返工，不是失敗後重送同一次模型請求。新的 B1 必須是另一個 durable attempt；原 B1 對「同一 source＋同一 base」的冪等查回不能被誤用成返工。
 
-在 `CaseMaintenanceWorkflow` 增加明確的 rework 接點，命名採：
+在 `CaseMaintenanceWorkflow` 增加明確的 durable attempt 接點，命名採：
 
 ```python
-start_rework(source_reference, *, base_publication_revision, base_version,
-             review_issues)
-resume_rework(review_issues)
+run_attempt(source_reference, *, base_publication_revision, base_version,
+            case_attempt_id, runtime_review=())
 ```
 
-若實作後 `resume_rework()` 可從 checkpoint 安全驗證並恢復原 issues，則不重複要求 caller 傳入；精確簽章以最少可驗狀態為準。rework 使用獨立、可重建的 thread／attempt identity，不覆寫正常 B1 completed checkpoint。
+一般執行、B2 退回後的返工與 stale 後的重做共用同一套 B1 graph，不另外建立 rework graph；差異只在 Runtime 配發的新 `case_attempt_id` 與返工時存在的 `runtime_review`。同一 ID 表示 transport resume／完成結果查回，必須驗證固定 source、base 與 review digest；返工或 stale 一律使用新 ID，因此不會覆寫或錯誤查回先前 completed attempt。既有 `start()`／`resume()` 保持相容，供原 document-scoped default attempt 使用。
 
 ### 5.2 Runtime review 的證據邊界
 

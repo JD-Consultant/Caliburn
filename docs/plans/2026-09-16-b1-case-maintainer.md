@@ -103,19 +103,21 @@ Runtime 負責：
 
 第一片當時的實際驗證：`consultant-memory` **176 passed**；相鄰既有 B1 extraction／B2 consolidation App 固定接合 **33 passed**；0 provider、0 正式 publication、0 DB schema 變更。它指定的下一片是把既有固定 source window、Agent checkpoint／有限錯誤恢復接到這份 stage／tools 並補新 B1 Prompt；該片結果接續記於下節。
 
-## 8. 第二片：固定來源 Agent graph
+## 8. 第二片：固定 canonical batch Agent graph
 
 第二片只完成第一片已指定的下一接點：
 
 - `CaseMaintenanceWorkflow` 接受 Runtime 固定的整批 canonical source reference 與精確 base publication／Memory bundle。
-- 沿既有 `ExtractionSourceReader` 在該固定批次內規劃有界 `NEW_SOURCE`／`CONTEXT_ONLY` 窗口；多個模型窗口共用一個 B1 stage，正式案例來源只加入整批 canonical reference，context-only 不成為證據。
-- 每個窗口由同一個 LangChain Agent 依序處理；非最後窗口不能提前 `finish`，最後窗口必須明確以 `changed`／`no_op` 完成。
+- 沿既有 `ExtractionSourceReader` 交付 Runtime 固定的完整 canonical batch。能在實際 request 預算內完整提供時以單一窗口交付；只有來源或模型限制確實需要時，才在同一 batch 內規劃有界 `NEW_SOURCE`／`CONTEXT_ONLY` 分頁。是否分頁不是產品語意，也不由固定字數決定案例邊界。
+- 一個或多個來源窗口都由同一個 LangChain Agent 與同一 B1 stage 依序處理；若使用多個窗口，非最後窗口不能提前 `finish`，最後窗口必須明確以 `changed`／`no_op` 完成。正式案例來源只加入整批 canonical reference，context-only 不成為證據。
 - 新 B1 Prompt 只描述案例層責任、來源可信度、guide 導覽、read-before-write、案例身分生命週期與完成規則；不把 B2 穩定理解、JD 寫作或主顧問訪談責任混入。
 - Runtime 使用同一 durable graph checkpoint 保存成功工具效果。模型 transport 在工具後失敗時，`resume()` 從原 checkpoint 接續，不重做已成功的案例操作或重新配置 ID。
 - 模型／工具步數與最後完成修正都有同工作上限；重開／resume 不配置新額度。新 B1 的正式模型／工具上限不是舊 `max_windows=16`，也不直接借用 A／B2 的 16／15，因此 package 要求 App 組裝時明確提供；本片 16／15 只用於合成機制測試。provider 回報 incomplete、refusal 或 invalid tool call 時，在工具執行與完成前拒絕，stage 不發布。
 - 新工作可在前一個完成 attempt 後重用同一 document graph；同 source＋同 base 直接讀回原完成結果，真正 stale 的同 source＋新 base 才建立新語意 attempt。
 
-本片沒有把所有 planned windows 一次改成多份正式來源，也沒有另建 source cursor。dispatcher 仍負責提供固定 batch；來源 owner 仍負責窗口 pair、順序、分頁與 scope。這沿用既有「一個 B1 batch ref、批內可分模型窗口」契約。
+本片沒有把來源窗口改成多份正式來源，也沒有另建 source cursor。dispatcher 仍負責提供固定 batch；來源 owner 負責完整交付該 batch，只有必要時才決定窗口 pair、順序與分頁。這沿用「一個 B1 batch reference、一個語意 attempt；底層可用一個或多個讀取窗口」契約。package 的 `max_chars`／`max_windows` 是有界來源交付與合成測試機制，不是要求正式 App 固定切窗的產品規則。
+
+2026-09-16 Owner 再確認：訪談資訊可能跨很多回合散落，因此背景通知固定的完整 batch 才是 B1 分析單位；窗口只是可選工程方法。B1 compaction 不得摘要、截斷或替換該批 canonical 訪談，只能處理 Agent 自己已完成的舊模型／工具往返。此項校正不禁止必要分頁，也不改已驗證的同 stage、checkpoint 與來源引用行為。
 
 第二片新增 12 項零 provider graph 反例；連同第一片與既有套件測試，`consultant-memory` **188 passed**，相鄰舊 B1 extraction／B2 consolidation App **33 passed**。沒有 provider 呼叫、正式 publication、DB schema、dispatcher、compaction、UI 或 production authority 變更。
 

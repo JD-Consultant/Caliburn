@@ -59,7 +59,7 @@ B1 必須先讀案例小型 guide，辨認本批資料是在新增案例、補�
 
 案例 guide 是 map，不是案例全文或證據。至少要能用名稱／別名、辨識詞、目前狀態、未確認事項及穩定案例身分找到對應內容。案例文件是目前有效內容；同一案例的後續補充與更正更新該內容，而不是把每個訪談窗口都當成另一份「目前案例」。
 
-現有固定 source window、`NEW_SOURCE`／`CONTEXT_ONLY`、結構化抽取、checkpoint、拒答／截斷／格式處理與 runtime source reference 可以保留作 B1 的來源準備或候選步驟；普通 B1 的完成條件不再只是多存一對 `rollout_summary/raw_memory`，而是相關案例與案例 guide 已更新，或明確判定 no-op。
+主顧問通知背景整理後，Runtime 固定通知範圍內尚未處理的完整 canonical 訪談 batch；這個 batch 才是 B1 的語意整理與來源單位。實際組裝後能在 request 預算內完整提供時直接整批交付，不因固定字數主動切成多個產品單位。只有來源交付或模型限制確實需要時，來源 owner 才可將同一 batch 分頁成一個或多個 `NEW_SOURCE`／`CONTEXT_ONLY` 讀取窗口；所有窗口仍屬同一 Agent attempt 與同一 B1 stage，不各自產生案例、完成結果或 publication。既有 checkpoint、拒答／截斷／格式處理及 runtime source reference 可繼續作底層能力；普通 B1 的完成條件不再只是多存一對 `rollout_summary/raw_memory`，而是整批相關案例與案例 guide 已更新，或明確判定 no-op。
 
 ## 4. B2：由目前案例維護穩定工作理解
 
@@ -158,7 +158,7 @@ B2 再基於新的 B1 結果與 v13 理解重整
 
 ## 8. Compaction 邊界
 
-`CTX-C001` 的 runtime 判斷維持有效：是否 compaction 依套用既有摘要後、真正準備送出的完整 request 計算；只壓縮安全完成的舊訊息／工具 wave，保留當前輸入、未完成工具配對與固定任務原文。continuity summary 不是來源，不能寫入案例、理解或 JD basis。
+`CTX-C001` 的 runtime 判斷維持有效：是否 compaction 依套用既有摘要後、真正準備送出的完整 request 計算；只壓縮安全完成的舊模型訊息／工具 wave，保留當前輸入、未完成工具配對與固定任務原文。對 B1 而言，本次通知固定的 canonical 訪談 batch 是受保護來源，不得被 compaction 摘要、截斷、替換或當成可丟棄的舊訊息；極端超限時只能改用仍完整讀取原話的受控來源交付方式或較小的後續排程，不能用 continuity summary 冒充員工原話。continuity summary 不是來源，不能寫入案例、理解或 JD basis。
 
 原 `CTX-C001` 只需處理 A／B2，因當時 B1 是單次 structured extraction。B1 現改為可能多步讀寫的案例 Agent，G4 必須把 B1 納入相同非破壞式 context 原則；是否實際達門檻才執行，不因角色新增而每輪固定摘要。
 
@@ -168,7 +168,7 @@ B2 再基於新的 B1 結果與 v13 理解重整
 
 | 衝突 | 現況 | 後續要求 |
 |---|---|---|
-| B1 責任 | `extraction.py` 只讀固定窗口並保存詳記／候選 | 保留可用來源接縫，重新設計為能讀案例 guide／相關目前案例並 staged 更新的 B1 Agent |
+| B1 責任 | `extraction.py` 只讀固定窗口並保存詳記／候選 | 保留可用來源接縫；以通知固定的完整 batch 為語意單位，是否分頁只作必要的來源交付細節，B1 Agent 讀案例 guide／相關目前案例並 staged 更新 |
 | Memory bundle | `MemoryArtifacts.save_memory()` 只保存 `knowledge.md`／`guide.md` | G4 定義同一 version 如何選出案例 guide、案例、理解 guide、理解與 references；不先假定一定新增 relational Case table |
 | C 修改範圍 | `PATHS` 只允許兩個既有 Memory 檔 | 受控擴充到本次允許的案例與兩層 guide／理解；仍禁止任意路徑及跨文件修改 |
 | 背景發布 | H4 舊流程把 B1 artifact 交 B2，由 B2 發布兩檔 Memory | 改為一個 durable B job 內 B1 staged → B2 staged → 一次完整 publication；舊 R1／R2 結果只作底層證據 |
@@ -318,7 +318,7 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 為避免又同時重做 Agent、Prompt、背景排程與 UI，施工拆成下列可獨立驗證的窄切片：
 
 1. **Bundle authority foundation（已完成）：**已擴充 Memory bundle／manifest 的資料型別、保存、讀取、驗證及 publication；synthetic fixtures 已驗證 stable IDs、來源、digest、跨層 bindings、supersession、文件隔離、精確 bundle base、完整 CAS、receipt、tamper、stale 與舊 receipt digest 相容。舊兩檔 Memory 保持相容；零模型、零 Prompt、零 dispatcher、零 UI。`consultant-memory` 全套 162 項測試及 compileall 通過。
-2. **B1 case maintainer（前兩片已完成）：**沿現有來源固定／checkpoint／錯誤處理，接上案例 guide、相關案例讀取與受控語意操作；已離線測新增、補充、更正、重複、拆分／合併候選、no-op、多窗口、完成界線、transport resume、步數額度及 incomplete／refusal。
+2. **B1 case maintainer（前兩片已完成）：**沿現有來源固定／checkpoint／錯誤處理，接上案例 guide、相關案例讀取與受控語意操作；已離線測新增、補充、更正、重複、拆分／合併候選、no-op、單 batch 的一個或多個來源交付窗口、完成界線、transport resume、步數額度及 incomplete／refusal。多窗口是底層能力證據，不是正常產品流程的固定要求。
 3. **B2 understanding maintainer＋完整背景 job：**接 staged case change set、多對多影響查找、新理解發現與一次發布；驗證 B1 成功而 B2 失敗不外露、semantic no-op 與 stale 後 B1／B2 重整。
 4. **C repair：**把現有兩檔 patch 限制改成穩定目標 ID 的受控修訂，驗證同次案例／理解更正、來源、CAS、receipt 及本回合基準推進。
 5. **Dispatcher／A read path／compaction／App journey：**最後接回既有通知與背景恢復，讓 A 從兩層 guide 按需回查；補 B1 的 request-only compaction 與完整 App 驗收。未受影響的 H4／CTX-C001 證據直接沿用。
@@ -328,7 +328,7 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 ## 15. Closure
 
 - **Decision：**B1 成為目前案例／任務／事件層的整理 Agent 並擁有小型 guide；B2 以目前案例維護穩定工作理解及其 guide。兩者暫採同一文件級 Memory publication，B1 staged 後由 B2 完成或 no-op，再一次發布。C 可在明確更正時直接原子發布同一完整版本。
-- **Status：**G7 分段施工；bundle authority foundation、B1 staged state／語意工具及固定 source window Agent graph 已完成。B2／C、B1→B2 共同發布與正式 App 接線尚未切換，不是完整產品已完成或 production authority 已切換。
+- **Status：**G7 分段施工；bundle authority foundation、B1 staged state／語意工具及固定 canonical batch Agent graph 已完成；同一 batch 可由來源 owner 視必要性以一個或多個窗口交付，但產品不要求固定切窗。B2／C、B1→B2 共同發布與正式 App 接線尚未切換，不是完整產品已完成或 production authority 已切換。
 - **Why：**產品需要記住完整個別工作實況與可修訂的穩定共同理解，並透過分層引用產出貼合員工的 JD；歷史窗口詳記＋單一正文不能充分表達「目前完整案例」。
 - **Sources：**Owner 2026-09-16 對話裁決；[Codex Memories](https://learn.chatgpt.com/docs/customization/memories)、[Codex consolidation template](https://github.com/openai/codex/blob/main/codex-rs/memories/write/templates/memories/consolidation.md)與[Codex memories README](https://github.com/openai/codex/blob/main/codex-rs/memories/README.md)只支持分層、引用與引用感知整理的官方事實，不替本產品決定 publication schema；既有 Q019／重抽／publication／H4 實作證據只作可沿用工程基礎。
 - **Affected：**`current-decisions.md`、`packages/consultant-memory` 的 bundle／Memory／publication／reference 基礎、B1 Prompt／Agent graph、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫與 `CTX-C001` 的 B1 適用範圍；前兩片沒有改 dispatcher、B2／C、UI、provider credential 或正式入口。

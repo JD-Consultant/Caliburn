@@ -68,21 +68,23 @@ Runtime 組裝完整 candidate bundle
 
 順序是證據語意的一部分，不是 UI 裝飾：
 
-- source owner 對同一 canonical conversation 的安全完成使用者輪次提供一基準正整數 `turn_sequence`：第一輪為 1，之後按 conversation message order 遞增。settled failed／cancelled 回合的員工原話仍占序號；第一個 unsettled gap 後不列出。ID／reference 只負責身分與固定讀取，不能拿來排序。
-- `turn_sequence` 是 owner 推導的導覽／呈現資料，不取代已簽名 `source_reference`，也不由模型產生。Runtime 可讓模型在工具參數中**選擇已提供／已讀的序號**，再解析成真正 reference；模型不能填任意 reference 或創造序號。案例 artifact 仍保存 references，但 Runtime 必須依 owner 的 canonical sequence 驗證、去重並保存成先後順序。
-- B1／B2 展開來源時回傳 `turn_sequence`、role 與完整文字，並明示多筆引用的前後關係。若分頁，下一頁必須接續同一順序，不能在 page 內或 page 間重排。
+- source owner 對同一 canonical conversation 的安全完成使用者輪次提供 ordered source records，順序來自 conversation message order。settled failed／cancelled 回合的員工原話仍可列入；第一個 unsettled gap 後不列出。ID／reference 只負責身分與固定讀取，不能拿來排序。
+- Runtime 把本 attempt 已提供／已讀的 records 配置短 `evidence_key`，把 key→reference 對照及 owner order proof 保存進 checkpoint。模型只可選擇已展示的 key；key 不是全域輪次、時間或持久 citation，也不由模型創造。案例 artifact 仍保存 signed references，由 Runtime 依 owner order 驗證、去重並保存成先後順序。
+- B1／B2 展開來源時以明示 `oldest_to_newest` 的 ordered blocks 回傳 `evidence_key`、role 與完整文字。若分頁，cursor／offset 由 Runtime 保存，下一頁接續同一順序；模型不填 offset，page 內或 page 間都不能重排。
 - 第一版不把 wall-clock timestamp 送進模型，也不以時間戳判斷先後；如 UI 日後顯示時間，只是輔助資訊，不是 citation authority。
-- 不同文件、不能證明位於同一 canonical lineage、順序重複／倒置或模型自行製造的 reference 一律拒絕，不猜測修正。
+- 不同文件、不能證明位於同一 canonical lineage、未知／重複 key 或模型自行製造的 reference 一律拒絕，不猜測修正。
 
 既有 `context_reference` 可幫助當次模型理解，但 context token 本身不冒充 evidence；若其中問答確實支持案例，來源 owner 要沿用既有 `source` 格式為對應的已安全完成使用者輪次提供可持久驗證的 references，B1 再選入案例證據集合。Runtime 可驗證完整交換、固定位置、文件範圍、已提供／已讀、去重與 canonical 排序；「是否足以獨立理解案例」是語意品質，交由 B1 規則、B2 沿引用反查及自然訪談驗收，不用關鍵詞或字數假裝純程式已證明。
 
 因此要先修正現有 B1「凡本次改動就自動附整批 `stage.source_reference`」的過粗行為：
 
 - `processed_source`／job source range 繼續表示本次完整處理進度；
-- source owner 增加受控的歷史安全輪次列舉／固定讀取能力，沿用現有 `AiRunHistory.find()`、固定 checkpoint 與 `source` 簽章，不另存第二份 conversation；
-- `CaseArtifact.source_references` 改保存 B1 已實際看過、由 Runtime 提供並驗證的 `source` references，並依 canonical `turn_sequence` 排列；
-- 模型只可用 Runtime 顯示的 `turn_sequence` 選擇當次已提供／已讀的證據；Runtime 將序號解析成真正 reference，模型不可直接製造 reference 或序號；
+- source owner 增加受控的歷史安全交換列舉／固定讀取能力，沿用現有 `AiRunHistory.find()`、固定 checkpoint 與 `source` 簽章，不另存第二份 conversation；
+- `CaseArtifact.source_references` 改保存 B1 已實際看過、由 Runtime 提供並驗證的 `source` references，並依 owner 的 canonical order 排列；
+- 模型只可用 Runtime 顯示的 attempt-scoped `evidence_key` 選擇當次已提供／已讀證據；Runtime 將 key 解析成真正 reference，模型不可直接製造 reference、key 或序號；
 - create／revise／split／merge 必須表達本次正確的來源分配，Runtime 保留既有未變引用並驗證新增、移除與 replacement 的引用都可讀且屬同文件；不得為方便而把整批引用無差別複製到每個案例。
+
+工具參數依[模型／Runtime 參數權責審核](2026-09-17-model-runtime-parameter-ownership-review.md)收斂：B2 exact-source read 不再讓模型填 `source_reference＋offset`，rework 使用已綁 case/source 的 `evidence_key＋reason`，B1／B2 finish 不再讓模型重填可由 stage 算出的 `changed/no_op`。
 
 這是完整背景 workflow 的前置正確性修正，不新增第二個 conversation owner、文字區段 citation、RAG 或 citation Agent。
 
@@ -242,7 +244,7 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 14. stale 時相同／已涵蓋來源查回完成；較舊、重疊、跳號或不同 lineage 禁止發布，`processed_source` 不倒退。
 15. `PublishRequest` checkpoint 使用同步 durability；模擬 checkpoint／publish 邊界中斷時仍只產生一個 revision。
 16. 訪談使用代名詞、簡答或依賴前一個 AI 問題時，案例的回合證據集合包含足以理解主體與回答的相關完整回合；不保存文字 offset，也不把 context-only token 冒充 evidence。
-17. 多筆來源即使以反向工具參數順序、隨機 UUID 或字典序送入，Runtime 仍只接受並保存 source owner 證明的 canonical `turn_sequence`；B1／B2 分頁讀回後前後關係不變，模型 context 不含用來猜順序的時間戳。
+17. 多筆來源即使以反向 evidence key 順序送入，Runtime 仍依 source owner 證明的 canonical order 保存；checkpoint resume 後 key→reference 不漂移，B1／B2 分頁讀回後前後關係不變，模型不控制 offset，context 也不含用來猜順序的時間戳。
 
 離線測試以固定模型回應證明控制流與資料邊界；不以 mock 證明自然模型品質。真 PostgreSQL／新程序完整旅程留給 App 接線切片，但既有 publication 真 PG CAS／receipt 證據直接沿用，不重做無關考卷。
 

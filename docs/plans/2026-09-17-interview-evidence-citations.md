@@ -1,13 +1,13 @@
-# B1／B2 訪談證據引用與 canonical 順序施工計畫
+# B1／B2 訪談證據引用與 Runtime 權責施工計畫
 
 - 日期：2026-09-17
 - Topic：`JD-R002 / MEM-L001`
 - Stage：G7 前置正確性切片
-- 依據：[MEM-L001](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)、[背景 Workflow 設計](../specs/2026-09-17-layered-memory-background-workflow-design.md)
+- 依據：[MEM-L001](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)、[背景 Workflow 設計](../specs/2026-09-17-layered-memory-background-workflow-design.md)、[模型／Runtime 參數權責審核](../specs/2026-09-17-model-runtime-parameter-ownership-review.md)
 
 ## 1. 目標
 
-修正目前 B1 將整批 `window` 自動附到每個改動案例的過粗行為，讓 B1 能從已實際閱讀的完整訪談交換中選擇證據，並由 Runtime 保存為 canonical 順序的既有 `purpose="source"` references。B2 沿案例引用按需回查時，看到相同的正式輪次、前後關係、role 與原文。
+修正目前 B1 將整批 `window` 自動附到每個改動案例的過粗行為，讓 B1 能從已實際閱讀的完整訪談交換中選擇證據，並由 Runtime 保存為 canonical 順序的既有 `purpose="source"` references。B2 沿案例引用按需回查時，看到相同的前後關係、role 與原文。
 
 本片完成後只證明引用與讀取接點正確；B1／B2 結果仍是 staged，不接共同 publication、dispatcher、C、compaction、provider 或正式 App authority。
 
@@ -17,13 +17,14 @@
 - `source`：現有已簽名、固定 checkpoint 的完整訪談交換；包含該輪使用者回答與其前一則公開顧問問題／上下文。
 - `context`：window 閱讀時的暫時消歧資料，不是案例證據。
 - 同一 `source` 可支持多個案例；同一案例可保存多個 `source`。
-- 多筆來源必須按 source owner 的一基準正整數 `turn_sequence` 保存及展示：第一個安全完成使用者輪次為 1，settled failed／cancelled 仍占序號，第一個 unsettled gap 後不列出；不得依 reference、UUID、字典序或時間戳排序。
-- 模型不產生 reference、offset、sequence、document 或版本。Runtime 先提供可選的 `turn_sequence`；模型只選擇已提供／已讀序號，Runtime 解析及驗證真正 reference。
+- 多筆來源必須按 source owner 對 canonical conversation 證明的 message order 保存及展示；settled failed／cancelled 的員工原話仍可成為來源，第一個 unsettled gap 後不列出。不得依 reference、UUID、字典序或時間戳排序，也不把全域輪次欄位當成必要產品契約。
+- Runtime 將當次已提供／已讀來源放入明示 `oldest_to_newest` 的 ordered blocks，配置 checkpoint-stable、attempt-scoped `evidence_key`。模型只選既有 key；Runtime 解析、驗證並 canonicalize 真正 reference。key 不是輪次、時間或持久 citation。
+- 模型不產生 reference、offset、cursor、sequence、document、版本或完成 outcome；這些由 Runtime／source owner 決定。
 - 一筆交換不足以說明案例時，B1 選入較早的相關問答、補充及更正。效果要求是只看引用也能理解案例，不能只通過結構驗證就宣稱語意充分。
 
 ## 3. 範圍與步驟
 
-### Task 1：來源 owner 提供歷史安全交換與 canonical 順序
+### Task 1：來源 owner 提供歷史安全交換與 canonical order proof
 
 修改：
 
@@ -34,7 +35,7 @@
 先寫反例，再新增最小 owner API：
 
 1. 沿用 `AiRunHistory.find()` 與每輪自己的 terminal observation，為已安全完成的歷史使用者輪次簽發既有 `_SourcePosition`；不建立新 token purpose、第二份對話或文字 offset。
-2. 對同一 fixed／canonical lineage 回傳一基準遞增 `turn_sequence`、`source_reference` 及 source 中的 message metadata。
+2. 對同一 fixed／canonical lineage 回傳 ordered source records：`source_reference` 及 source 中的 message metadata；順序來自真正 conversation message order。可有 owner 私有 ordinal／比較資訊，但不成為模型欄位或持久 citation。
 3. 能列出某個已簽 `window` 內的 source exchanges，也能以有界分頁按需瀏覽同文件安全歷史；遇第一個 unsettled turn 停止，沿用現有 fail-closed 規則。
 4. 驗證外文件、兄弟 branch、缺 checkpoint、超過 ancestry bound、倒序與範圍外 reference 明示失敗，不 fallback latest。
 5. source 內容仍是「最近公開 AI 問題＋本輪 Human」，不把 tool／system／thinking／provider metadata 或時間戳投影給模型。
@@ -57,7 +58,7 @@
 
 App adapter 只轉譯 source owner 的既有錯誤與資料，不自行重排、重簽或保存另一份索引。現有 window／context pair 驗證與 admission cursor 不變。
 
-### Task 3：B1 stage 保存「已提供／已讀」證據，不保存原話副本
+### Task 3：B1 stage 保存「已提供／已讀」證據 key，不保存原話副本
 
 修改：
 
@@ -65,23 +66,24 @@ App adapter 只轉譯 source owner 的既有錯誤與資料，不自行重排、
 - `packages/consultant-memory/tests/test_case_maintenance.py`
 - `packages/consultant-memory/tests/test_case_maintenance_agent.py`
 
-1. 升級 B1 checkpoint stage 格式，保存 Runtime 已交付／已讀的 `(turn_sequence, source_reference)` 對照與必要 read evidence；不複製原始訪談文字。
-2. `_load_window` 在提供 `NEW_SOURCE` 時一併提供 owner 已驗證的 exchange sequence，並把它們登記為模型可選證據。
-3. 新增 B1 受控工具，讓模型按需讀既有案例引用及有界歷史交換；工具回傳 sequence、role、全文與分頁資訊，不能把 window／context 當 evidence。
-4. `read_case` 回傳每筆既有 source 對應的 canonical sequence；如果 owner 無法證明，明示失敗，不照 tuple／字串原順序猜測。
+1. 升級 B1 checkpoint stage 格式，保存 Runtime 已交付／已讀的 `evidence_key → source_reference` 對照、canonical order proof 與必要 read evidence；不複製原始訪談文字。
+2. `_load_window` 在提供 `NEW_SOURCE` 時一併提供 owner 已排序的 evidence blocks，並把 keys 登記為模型可選證據；容器明示 `order="oldest_to_newest"`。
+3. 新增 B1 受控讀取動作，讓模型按需讀既有案例引用及有界歷史交換；Runtime 保存 paging cursor，模型不填 offset。工具回傳 key、role、全文與是否尚有下一頁，不能把 window／context 當 evidence。
+4. `read_case` 回傳每筆既有 source 對應的 ordered evidence block；如果 owner 無法證明 canonical order，明示失敗，不照 tuple／字串原順序猜測。
 5. stage serialize／resume 後保留同一映射；同 attempt 不因 latest conversation 前進而偷偷改序或擴大已提供集合。
 
 ### Task 4：B1 語意工具改為選擇證據
 
-工具只接受已提供的 `turn_sequence`，由 Runtime 解析成 references：
+工具只接受 Runtime 已提供的 `evidence_key`，由 Runtime 解析成 references：
 
-- `create_case`：必填完整的 `source_turns`。
-- `revise_case`：使用 `add_source_turns`／`remove_source_turns` 做增量調整；未列出的既有證據保留，避免每次重填整組。
-- `split_case`：每個 replacement 各自提供完整 `source_turns`，不能把舊案例的全部來源複製給每個新案例。
-- `merge_cases`：提供合併後完整 `source_turns`；Runtime 可接受既有 cases 與本 attempt 已讀證據的聯集子集，但仍驗證至少一筆及 canonical order。
+- `create_case`：必填完整的 `evidence_keys`。
+- `revise_case`：使用 `add_evidence_keys`／`remove_evidence_keys` 做增量調整；未列出的既有證據保留，避免每次重填整組。
+- `split_case`：每個 replacement 各自提供完整 `evidence_keys`，不能把舊案例的全部來源複製給每個新案例。舊來源若不再支持任何 replacement，必須明示捨棄及原因，不能因漏填靜默遺失。
+- `merge_cases`：Runtime 先建立已讀 cases 的來源聯集；模型只提供 add/remove 語意差異，避免重抄整組時漏掉來源；套用後仍驗證至少一筆及 canonical order。
 - `retire_case`／`set_case_route`：不新增來源選擇。
+- `finish_case_maintenance`：改為零參數完成動作，`changed/no_op` 由 Runtime 依 stage 計算。
 
-Runtime 拒絕未提供序號、重複序號、空證據、跨文件、非 `source` purpose、模型直接提交 token，以及新增／移除後無法支持資料結構的請求。工具回應回傳實際保存的 ordered sequences，讓模型可修正錯誤。
+Runtime 拒絕未知／重複 key、同時新增及移除同一 key、空證據、跨文件、非 `source` purpose、模型直接提交 token，以及新增／移除後無法支持資料結構的請求。工具回應回傳實際接受的 ordered evidence keys，讓模型可修正錯誤；失敗不得部分修改 stage。
 
 Prompt 只補來源選擇與分配規則，不重寫案例分析方法、B1/B2 分層或主顧問 Prompt。
 
@@ -94,10 +96,11 @@ Prompt 只補來源選擇與分配規則，不重寫案例分析方法、B1/B2 �
 - `experiments/jd-relational-app/src/jd_relational/memory_sources.py` 或既有正確 adapter 接點
 - 對應 package／App tests
 
-1. `save_bundle()` 不再只相信 caller tuple 順序；經 source port 驗證 references 都屬同文件及 canonical sequence，再以該順序保存。
-2. B2 `read_case` 顯示 ordered source sequences；`read_case_source` 沿 exact reference 分頁後仍帶相同 `turn_sequence`。
+1. `save_bundle()` 不再只相信 caller tuple 順序；經 source port 驗證 references 都屬同文件及同一 canonical lineage，再按 owner order proof 保存。
+2. B2 `read_case` 顯示 ordered evidence blocks；exact source read 只收 `evidence_key`，key 已綁 case／reference，Runtime 從 checkpoint 取得 paging cursor，不讓模型填 `source_reference` 或 `offset`。
 3. B2 的 read evidence 仍以 `(case_id, source_reference)` 隔離；排序欄位不改變授權，不能把 case A 已讀冒充 case B 已讀。
 4. 工作理解只引用案例身分／精確 case digest；不把 raw source references 複製成另一套 B2 citation authority。
+5. `request_case_rework` 的模型輸入只保留 `evidence_key＋reason`；Runtime 解析正式 case/source。B2 finish 同樣改為零參數並由 Runtime 計算 outcome。
 
 ### Task 6：驗證與文件收尾
 
@@ -107,10 +110,12 @@ Prompt 只補來源選擇與分配規則，不重寫案例分析方法、B1/B2 �
 2. 同一 source 支持 A、B 兩案例；A／B 各自能按需回讀。
 3. revise 只增加或移除真正受影響來源；未提及來源保留。
 4. split 將來源分配到正確 replacement，不複製全部；merge 產生正確聯集子集。
-5. 工具以倒序 sequences 提交時，Runtime 保存 canonical 順序；未知／重複／跨文件／錯 purpose 拒絕。
-6. checkpoint resume、分頁與 B2 回查不改 sequence。
+5. 模型以倒序 keys 提交時，Runtime 仍保存 canonical 順序；未知／重複／跨文件／錯 purpose 拒絕。
+6. checkpoint resume 後 key→reference 不漂移；分頁與 B2 回查不改來源順序，模型無法控制 offset。
 7. 無 timestamp、offset、tool／system／thinking 進模型可見 evidence。
-8. 現有 window admission、context pair、lineage、B1/B2 step limits 與 bundle validation 回歸保持通過。
+8. finish 不再因模型填錯 `changed/no_op` 失敗；Runtime 仍攔截未完成必讀集合或不一致 stage。
+9. 現有 window admission、context pair、lineage、B1/B2 step limits 與 bundle validation 回歸保持通過。
+10. 檢查 B1／B2 實際 provider request 是否真的啟用 strict schema；未證實不得只因 Pydantic schema 存在就標為 strict，Runtime 驗證在兩種情況都保留。
 
 執行受影響 package tests、conversation/source tests、B1/B2 App adapter tests、compileall 與 `git diff --check`。不呼叫 provider、不讀正式 key、不啟動 production、不做 push。
 
@@ -124,4 +129,4 @@ Prompt 只補來源選擇與分配規則，不重寫案例分析方法、B1/B2 �
 
 ## 5. Gate
 
-本片通過後，才回到 `BackgroundMemoryWorkflow`，串接 B1 staged → B2 staged → 最多一次 case rework → bundle → CAS publication。若實作時發現現有 source owner 無法在不改 canonical conversation authority 的前提下證明歷史 source／sequence，停止並提出具體反例，不自行改成時間戳、文字 offset 或全歷史複製。
+本片通過後，才回到 `BackgroundMemoryWorkflow`，串接 B1 staged → B2 staged → 最多一次 case rework → bundle → CAS publication。若實作時發現現有 source owner 無法在不改 canonical conversation authority 的前提下證明歷史 source order，停止並提出具體反例，不自行改成時間戳、模型輪次、文字 offset 或全歷史複製。

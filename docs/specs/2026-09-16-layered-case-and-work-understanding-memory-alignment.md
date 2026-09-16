@@ -5,7 +5,7 @@
 - 取代：Q019 在 Caliburn 採用的「B1 固定訪談窗口詳記＋B2 只維護 knowledge／guide」產品映射
 - 不取代：canonical 原始訪談、已校準主顧問 Prompt／Skills、背景通知語意、JD relational writer、既有 Saver／Store／CAS／receipt 證據及 `CTX-C001` 的非破壞式 compaction 原則
 
-**2026-09-17 Owner 引用精確化：**B1 可按需查閱同文件已安全完成的 canonical 訪談，B2 可按需查閱 candidate 中所有目前案例；required／impact 集合只是最低驗收與優先提示，不是閱讀權限上限。案例來源沿用 source owner 在固定 checkpoint 簽發的 `purpose="source"` 完整訪談交換，不使用模型填寫的文字 offset；一筆 `source` 現已包含該輪使用者回答與最接近的前一則公開顧問問題。相同回合可支持多個案例，一個案例可引用多個回合；案例及工作理解 revise／split／merge／retire 時都必須重新分配仍真正支持目前內容的引用。多筆引用交給 LLM 或人閱讀時，必須由 source owner 提供 canonical `turn_sequence` 並按訪談先後排列，不能依 reference、UUID 或時間戳推測順序；時間戳第一版不進模型 context。現有「凡本次改動就自動附整批 `window` 來源」實作不足，須在共同 publication 前先修正；精確施工見[完整背景 Workflow 設計](2026-09-17-layered-memory-background-workflow-design.md)。
+**2026-09-17 Owner 引用精確化：**B1 可按需查閱同文件已安全完成的 canonical 訪談，B2 可按需查閱 candidate 中所有目前案例；required／impact 集合只是最低驗收與優先提示，不是閱讀權限上限。案例來源沿用 source owner 在固定 checkpoint 簽發的 `purpose="source"` 完整訪談交換，不使用模型填寫的文字 offset；一筆 `source` 現已包含該輪使用者回答與最接近的前一則公開顧問問題。相同回合可支持多個案例，一個案例可引用多個回合；案例及工作理解 revise／split／merge／retire 時都必須重新分配仍真正支持目前內容的引用。多筆引用交給 LLM 或人閱讀時，必須由 source owner 依 canonical message order 排列，不能依 reference、UUID 或時間戳推測順序；時間戳第一版不進模型 context。模型只選 Runtime 提供的 attempt-scoped `evidence_key`，不填 signed reference、全域輪次或 offset；正式 artifact 仍保存 signed references。現有「凡本次改動就自動附整批 `window` 來源」實作不足，須在共同 publication 前先修正；精確施工見[完整背景 Workflow 設計](2026-09-17-layered-memory-background-workflow-design.md)與[參數權責審核](2026-09-17-model-runtime-parameter-ownership-review.md)。
 
 ## 0. 本輪決策界線
 
@@ -254,7 +254,7 @@ supersessions:
 
 現有一筆 `source` 已處理常見的「顧問完整提問、員工簡答」，但一筆交換仍不一定足以讓人理解完整案例；主體、補充或更正可能散落在更早交換。因此一個案例的 `source_references` 是按 canonical 時序排列的**完整交換證據集合**：可以包含一個或多個 references；需要前題、代名詞指向、補充或更正才能理解時，B1 應把必要的相關交換一併引用。畫面展開引用時依序顯示 role 與全文，效果要求是不了解案例正文的人只看引用，也能理解案例的工作情境、細節與修正脈絡。
 
-source owner 為同一文件 canonical conversation 中安全完成的使用者輪次提供一基準正整數 `turn_sequence`：第一個安全完成的使用者輪次為 1，之後依 conversation message order 遞增。settled failed／cancelled 回合的員工原話仍占自己的序號；遇第一個 unsettled gap 即停止列舉，不能跳到後面。模型可選擇 Runtime 已提供／已讀的序號，不能自行產生；Runtime 解析成 reference、驗證 lineage 並按序保存。reference／UUID／時間戳都不能拿來推測順序，第一版不把時間戳送進模型 context。
+source owner 為同一文件 canonical conversation 中安全完成的使用者輪次提供 ordered source records，順序來自 conversation message order；settled failed／cancelled 回合的員工原話仍可列入，遇第一個 unsettled gap 即停止，不能跳到後面。Runtime 將本 attempt 已提供／已讀的 records 配置短 `evidence_key` 並把對照保存在 checkpoint；模型只能選既有 key，Runtime 解析成 reference、驗證 lineage 並按 owner order 保存。key 不代表輪次或時間，也不持久寫入案例；reference／UUID／時間戳都不能拿來推測順序，第一版不把時間戳送進模型 context。若底層使用 ordinal，它只是 owner 私有推導值，不是產品欄位。
 
 Runtime 可驗證 reference 由 owner 簽發、固定位置、同文件、完整回合、已提供／已讀、無重複且按 canonical 順序保存；它不能只靠關鍵詞或字數證明語意已完整。是否足以獨立理解由 B1 規則、B2 沿引用反查及包含省略主體／跨輪補充／後續更正的自然訪談驗收共同保護。
 
@@ -271,7 +271,7 @@ Runtime 可驗證 reference 由 owner 簽發、固定位置、同文件、完整
 
 ### 12.1 工具傳達語意操作，不讓模型管理儲存細節
 
-B1／B2 的模型輸入只包含 Runtime 已選定的 document scope、base revision、guide、相關內容及可用來源／案例 ID。模型可以提出下列效果，但不填 `document_id`、版本號、digest、實體路徑、時間戳或 operation ID：
+B1／B2 的模型輸入只包含 Runtime 已選定的 document scope、base revision、guide、相關內容及可用 evidence／案例 ID。模型可以提出下列效果，但不填 `document_id`、版本號、digest、實體路徑、時間戳、operation ID、signed source reference、offset／cursor 或可由 stage 計算的完成 outcome：
 
 | Agent | 允許的語意效果 | Runtime 責任 |
 |---|---|---|
@@ -279,7 +279,7 @@ B1／B2 的模型輸入只包含 Runtime 已選定的 document scope、base revi
 | B2 | create／revise／supersede 工作理解；選擇支持案例；必要時修訂理解 guide；語意 no-op；沿已讀案例引用核對原話後要求 B1 rework | 解析 case IDs 到候選 digests，限制 source read scope，建立多對多 bindings，驗證所有依賴與 guide 路由；rework 時終止本次可發布候選 |
 | C | 對最新 head 的既有目標做受控 revise；必要時同次修改案例與理解 | 套用 scope、最新版本檢查、來源驗證、完整 bundle 驗證、CAS 與 receipt |
 
-精確函式名稱可以在施工切片依現有框架公開 API 決定；上述輸入／輸出權責不可改。單純狀態變更不要求模型重填整份物件，未提及的既有項目保持不變；remove／supersede 也不能與 upsert 用互相矛盾的欄位同時表達。
+精確函式名稱可以在施工切片依現有框架公開 API 決定；上述輸入／輸出權責不可改。模型需要決定的是語意目標、正文／diff、route 文字及證據／支持關係；Runtime 提供 attempt-scoped keys，解析正式 ID/reference 並維護版本、排序、分頁與保存。單純狀態變更不要求模型重填整份物件，未提及的既有項目保持不變；remove／supersede 也不能與 upsert 用互相矛盾的欄位同時表達。完整參數矩陣見[模型／Runtime 參數權責審核](2026-09-17-model-runtime-parameter-ownership-review.md)。
 
 ### 12.2 一次背景工作的完整流程
 

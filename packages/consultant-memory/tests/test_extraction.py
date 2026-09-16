@@ -11,7 +11,10 @@ from langchain_core.messages import AIMessage
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
 
-from caliburn_memory import MemoryArtifacts
+from caliburn_memory import (
+    EvidenceExchange, EvidenceExchangePage, EvidenceMessage, EvidenceSegment,
+    EvidenceTextPage, MemoryArtifacts,
+)
 from caliburn_memory.extraction import INSTRUCTIONS, ExtractionOutput, ExtractionWorkflow
 
 from conftest import ExampleSource
@@ -28,6 +31,11 @@ class WindowSource(ExampleSource):
         self.saved_windows = []
         self.planned = []
         self.pairs = set()
+        self.window_evidence = {}
+        self.history = []
+        self.history_reads = []
+        self.source_reads = []
+        self.source_messages = {}
 
     def window(self, name, text, *, turns=None):
         reference = f"conversation:{self.document_id}:{name}"
@@ -81,6 +89,80 @@ class WindowSource(ExampleSource):
         self.validate_reference(previous)
         if self.order.index(reference) <= self.order.index(previous):
             raise ValueError("Source is not after the previously extracted range")
+
+    def evidence(self, name, messages):
+        """Add one exact interview exchange without inventing ordering metadata."""
+        reference = f"conversation:{self.document_id}:{name}"
+        normalized = tuple((role, text) for role, text in messages)
+        self.material[reference] = "".join(text for _role, text in normalized)
+        self.source_messages[reference] = normalized
+        self.pages[reference] = {
+            "text": self.material[reference],
+            "turns": [{"input_id": name, "status": "completed", "answer_succeeded": True}],
+        }
+        self.order.append(reference)
+        self.window_evidence.setdefault(reference, (reference,))
+        return reference
+
+    def set_window_evidence(self, window_reference, *source_references):
+        self.window_evidence[window_reference] = tuple(source_references)
+
+    def set_history(self, *source_references):
+        self.history = list(source_references)
+
+    def _exchange(self, reference):
+        if reference in self.source_messages:
+            messages = tuple(EvidenceMessage(f"{reference}:{index}", role)
+                             for index, (role, _text) in enumerate(self.source_messages[reference]))
+        else:
+            messages = (EvidenceMessage(reference, "user"),)
+        return EvidenceExchange(reference, messages)
+
+    def window_exchanges(self, reference):
+        references = self.window_evidence.get(reference, (reference,))
+        return EvidenceExchangePage(
+            order="oldest_to_newest",
+            exchanges=tuple(self._exchange(item) for item in references),
+        )
+
+    def history_exchanges(self, through_reference, *, offset=0, limit=50):
+        self.validate_reference(through_reference)
+        self.history_reads.append((through_reference, offset, limit))
+        references = self.history or self.order
+        end = min(len(references), offset + limit)
+        return EvidenceExchangePage(
+            order="oldest_to_newest",
+            exchanges=tuple(self._exchange(item) for item in references[offset:end]),
+            next_offset=end if end < len(references) else None,
+        )
+
+    def read_source_page(self, reference, offset=0):
+        self.validate_reference(reference)
+        self.source_reads.append((reference, offset))
+        text = self.material[reference]
+        if offset > len(text):
+            raise ValueError("Source offset is outside the fixed exchange")
+        remaining, seen = 12, 0
+        segments = []
+        messages = self.source_messages.get(reference, (("user", text),))
+        for index, (role, message_text) in enumerate(messages):
+            begin = max(0, offset - seen)
+            if begin < len(message_text) and remaining:
+                fragment = message_text[begin:begin + remaining]
+                segments.append(EvidenceSegment(
+                    message_id=f"{reference}:{index}" if reference in self.source_messages else reference,
+                    role=role,
+                    text=fragment,
+                    text_offset=begin,
+                ))
+                remaining -= len(fragment)
+            seen += len(message_text)
+        end = offset + 12 - remaining
+        return EvidenceTextPage(
+            reference=reference,
+            segments=tuple(segments),
+            next_offset=end if end < len(text) else None,
+        )
 
 
 def outcome(summary="甲案：單次付款。\n乙案：月租與權限分級。", candidates="兩案計費與權限條件不同。",

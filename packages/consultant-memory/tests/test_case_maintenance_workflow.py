@@ -217,6 +217,181 @@ def test_transport_failure_after_a_tool_checkpoint_resumes_without_repeating_the
     assert len(model.requests) == 4
 
 
+def test_window_evidence_registry_is_checkpointed_without_copying_interview_text():
+    source, session, model, workflow = _workflow([
+        RuntimeError("synthetic transport fault"),
+        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _done("done-after-resume"),
+    ])
+    batch = source.window("batch", "固定批次")
+    first = source.evidence("firstevidence", [
+        ("assistant", "請說明誰負責初判？"),
+        ("user", "我負責初判。"),
+    ])
+    second = source.evidence("secondevidence", [
+        ("assistant", "接著如何處理？"),
+        ("user", "我會留存紀錄。"),
+    ])
+    window = source.window("window", "我負責初判，接著留存紀錄。")
+    source.set_window_evidence(window, first, second)
+    source.plan(batch, [{"source_reference": window, "context_reference": None}])
+
+    with pytest.raises(RuntimeError, match="synthetic transport fault"):
+        workflow.start(batch, base_publication_revision=0, base_version=None)
+
+    saved = workflow.graph.get_state(workflow.config)
+    checkpointed = session.load(saved.values["case_stage"])
+    assert [(item.evidence_key, item.source_reference) for item in checkpointed.evidence] == [
+        ("E1", first), ("E2", second),
+    ]
+    serialized = json.dumps(checkpointed.to_dict(), ensure_ascii=False)
+    assert "我負責初判" not in serialized and "留存紀錄" not in serialized
+    payload = json.loads(next(
+        message.content for message in model.requests[0] if isinstance(message, HumanMessage)
+    ))
+    assert payload["NEW_SOURCE"]["evidence"]["order"] == "oldest_to_newest"
+    assert [item["evidence_key"] for item in payload["NEW_SOURCE"]["evidence"]["blocks"]] == [
+        "E1", "E2",
+    ]
+
+    result = workflow.resume()
+    resumed = session.load(result["case_stage"])
+    assert [(item.evidence_key, item.source_reference) for item in resumed.evidence] == [
+        ("E1", first), ("E2", second),
+    ]
+
+
+def test_read_case_uses_owner_history_order_instead_of_artifact_tuple_order():
+    source, session, model, workflow = _workflow([])
+    case_id = str(uuid4())
+    older = source.evidence("olderevidence", [("user", "較早：本人先確認告警。")])
+    newer = source.evidence("newerevidence", [("user", "較晚：補充夜間先隔離設備。")])
+    guide = f"- [故障處理](/memory/cases/items/{case_id}.md) — 故障與夜間例外"
+    base = session.artifacts.save_bundle(
+        base_publication_revision=0,
+        case_guide=guide,
+        cases=(CaseArtifact(case_id, "## 故障處理\n本人確認告警；夜間先隔離設備。",
+                            (newer, older)),),
+        understanding_guide="",
+        understandings=(),
+    )
+    batch, _window, _context = _one_window(source, text="沒有新的工作資訊。")
+    source.set_history(older, newer)
+    model.replies.extend([
+        _call("read_case", {"case_id": case_id}, "read"),
+        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _done("done"),
+    ])
+
+    result = workflow.start(batch, base_publication_revision=1, base_version=base)
+
+    stage = session.load(result["case_stage"])
+    assert [item.source_reference for item in sorted(stage.evidence, key=lambda item: item.order_key)] == [
+        older, newer, _window,
+    ]
+    read_result = next(message for message in result["messages"]
+                       if isinstance(message, ToolMessage) and message.tool_call_id == "read")
+    payload = json.loads(read_result.content)
+    blocks = payload["case"]["evidence"]["blocks"]
+    assert [block["evidence_key"] for block in blocks] == ["E2", "E3"]
+    assert "較早" in json.dumps(blocks[0], ensure_ascii=False)
+    assert "較晚" in json.dumps(blocks[1], ensure_ascii=False)
+
+
+def test_history_and_exact_evidence_paging_use_only_checkpointed_runtime_cursors():
+    source, session, model, workflow = _workflow([])
+    older = source.evidence("olderevidence", [(
+        "user", "這是一段超過單頁的較早訪談原話，必須由 Runtime 接續讀取。",
+    )])
+    batch, _window, _context = _one_window(source, text="本次沒有新增工作資訊。")
+    source.set_history(older)
+    model.replies.extend([
+        _call("browse_interview_history", {}, "browse"),
+        _call("read_more_evidence", {"evidence_key": "E2"}, "more"),
+        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _done("done"),
+    ])
+
+    result = workflow.start(batch, base_publication_revision=0, base_version=None)
+
+    stage = session.load(result["case_stage"])
+    assert stage.history_next_offset is None and stage.history_order_count == 1
+    older_entry = next(item for item in stage.evidence if item.source_reference == older)
+    assert older_entry.evidence_key == "E2" and older_entry.next_offset == 24
+    assert source.history_reads == [(batch, 0, 8)]
+    assert (older, 0) in source.source_reads and (older, 12) in source.source_reads
+    browse_result = next(message for message in result["messages"]
+                         if isinstance(message, ToolMessage) and message.tool_call_id == "browse")
+    browse_payload = json.loads(browse_result.content)
+    assert browse_payload["evidence"]["blocks"][0]["evidence_key"] == "E2"
+    assert "source_reference" not in browse_result.content and "offset" not in browse_result.content
+
+
+def test_history_cursor_and_evidence_keys_resume_at_the_next_owner_page():
+    source, session, model, workflow = _workflow([])
+    history = tuple(source.evidence(f"history{letter}", [("user", f"歷史訪談 {letter}")])
+                    for letter in "abcdefghi")
+    batch, current_window, _context = _one_window(source, text="本次沒有新增工作資訊。")
+    source.set_history(*history)
+    model.replies.extend([
+        _call("browse_interview_history", {}, "browse-first"),
+        RuntimeError("synthetic transport fault"),
+        _call("browse_interview_history", {}, "browse-second"),
+        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _done("done"),
+    ])
+
+    with pytest.raises(RuntimeError, match="synthetic transport fault"):
+        workflow.start(batch, base_publication_revision=0, base_version=None)
+
+    # The outer snapshot still shows the agent-node input while its pending
+    # writes are retained internally.  Actual resume behaviour is the proof:
+    # it must not ask the owner for offset 0 again.
+    assert source.history_reads == [(batch, 0, 8)]
+
+    result = workflow.resume()
+    resumed = session.load(result["case_stage"])
+    assert resumed.history_next_offset is None and resumed.history_order_count == 9
+    assert [(item.evidence_key, item.source_reference) for item in resumed.evidence] == [
+        ("E1", current_window),
+        *((f"E{index}", reference) for index, reference in enumerate(history, 2)),
+    ]
+    assert resumed.evidence[-1].evidence_key == "E10"
+    assert resumed.evidence[-1].source_reference == history[-1]
+    assert source.history_reads == [(batch, 0, 8), (batch, 8, 8)]
+
+
+def test_read_case_fails_closed_when_owner_cannot_prove_every_citation_order():
+    source, session, model, workflow = _workflow([])
+    case_id = str(uuid4())
+    proven = source.evidence("provenevidence", [("user", "可證明順序的原話。")])
+    missing = source.evidence("missingevidence", [("user", "未出現在固定歷史的原話。")])
+    guide = f"- [故障處理](/memory/cases/items/{case_id}.md) — 故障處理"
+    base = session.artifacts.save_bundle(
+        base_publication_revision=0,
+        case_guide=guide,
+        cases=(CaseArtifact(case_id, "## 故障處理\n本人確認告警。", (proven, missing)),),
+        understanding_guide="",
+        understandings=(),
+    )
+    batch, _window, _context = _one_window(source, text="沒有新的工作資訊。")
+    source.set_history(proven)
+    model.replies.extend([
+        _call("read_case", {"case_id": case_id}, "read"),
+        _call("finish_case_maintenance", {"outcome": "no_op"}, "finish"),
+        _done("done"),
+    ])
+
+    result = workflow.start(batch, base_publication_revision=1, base_version=base)
+
+    stage = session.load(result["case_stage"])
+    assert stage.read_case_ids == ()
+    read_result = next(message for message in result["messages"]
+                       if isinstance(message, ToolMessage) and message.tool_call_id == "read")
+    assert read_result.status == "error"
+    assert json.loads(read_result.content)["error"] == "case_evidence_order_unavailable"
+
+
 def test_final_window_gets_one_bounded_completion_correction_not_a_fresh_job():
     source, session, model, workflow = _workflow([
         _done("forgot-to-finish"),

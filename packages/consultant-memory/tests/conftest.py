@@ -1,6 +1,11 @@
 """Source port double only; artifacts use real InMemoryStore/StoreBackend."""
 import re
 
+from caliburn_memory import (
+    EvidenceExchange, EvidenceExchangePage, EvidenceMessage, EvidenceSegment,
+    EvidenceTextPage,
+)
+
 
 class ExampleSource:
     def __init__(self, document_id="document-a"):
@@ -30,3 +35,25 @@ class ExampleSource:
         """This double issues no planned pairs, so it only checks addresses."""
         self.validate_reference(source_reference)
         self.validate_reference(context_reference)
+
+    def history_exchanges(self, through_reference, *, offset=0, limit=50):
+        self.validate_reference(through_reference)
+        references = list(self.material)
+        end = min(len(references), offset + limit)
+        return EvidenceExchangePage(
+            "oldest_to_newest",
+            tuple(EvidenceExchange(reference, (EvidenceMessage(reference, "user"),))
+                  for reference in references[offset:end]),
+            end if end < len(references) else None,
+        )
+
+    def read_source_page(self, reference, offset=0):
+        self.validate_reference(reference)
+        text = self.material[reference]
+        fragment = text[offset:offset + 3000]
+        end = offset + len(fragment)
+        return EvidenceTextPage(
+            reference,
+            (EvidenceSegment(reference, "user", fragment, offset),) if fragment else (),
+            end if end < len(text) else None,
+        )

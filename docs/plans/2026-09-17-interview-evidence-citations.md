@@ -60,7 +60,7 @@ App adapter 只轉譯 source owner 的既有錯誤與資料，不自行重排、
 
 實作結果：既有 `source` 已可為安全歷史輪次重新簽發；固定 `window` 可列出 canonical 順序的逐輪 records，同一 `window` 也可作歷史分頁上界。清單只帶 signed reference 與 message ID／role，不攜帶全文、時間或 provider metadata；全文由 exact-source 3000 字元頁面讀取。package port 使用 immutable typed records，App adapter 只作資料與固定錯誤轉譯。後續 `evidence_key`、attempt cursor 與已讀集合仍屬 Task 3，沒有提前放進 source owner。
 
-### Task 3：B1 stage 保存「已提供／已讀」證據 key，不保存原話副本
+### Task 3：B1 stage 保存「已提供／已讀」證據 key，不保存原話副本（已完成）
 
 修改：
 
@@ -73,6 +73,8 @@ App adapter 只轉譯 source owner 的既有錯誤與資料，不自行重排、
 3. 新增 B1 受控讀取動作，讓模型按需讀既有案例引用及有界歷史交換；Runtime 保存 paging cursor，模型不填 offset。工具回傳 key、role、全文與是否尚有下一頁，不能把 window／context 當 evidence。
 4. `read_case` 回傳每筆既有 source 對應的 ordered evidence block；如果 owner 無法證明 canonical order，明示失敗，不照 tuple／字串原順序猜測。
 5. stage serialize／resume 後保留同一映射；同 attempt 不因 latest conversation 前進而偷偷改序或擴大已提供集合。
+
+實作結果：`CaseMaintenanceStage` 已升為 v2，在原 stage 內保存短 key、signed source、message ID／role、Runtime-private order proof、歷史下一頁與每筆 exact-source 下一頁；原話不進 stage。窗口載入同時登記 owner-ordered blocks；新增的 `browse_interview_history()` 沒有模型參數，`read_more_evidence(evidence_key)` 只收已展示 key。`read_case` 從 attempt 固定的 window 上界分頁掃描 owner metadata，全部引用都定位後才回正文與 ordered evidence；缺漏、重複、順序漂移或 paging 不前進皆拒絕，失敗不留下 read evidence。transport resume、反 artifact tuple 順序、Runtime-only cursor、無 raw-text checkpoint 及 fail-closed 反例已納入 package 回歸。Task 4 的案例引用選擇尚未提前施工。
 
 ### Task 4：B1 語意工具改為選擇證據
 

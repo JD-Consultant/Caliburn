@@ -12,7 +12,7 @@ Topic ID: JD-R002／MEM-L001
 Current stage: G7 segmented implementation
 Binding product goal: 完整理解個別工作案例／任務／事件，再歸納穩定共同工作，最後產生客製化 JD
 This turn's decision: B1、B2 的分層責任、各自 guide、共同 publication、C 即時更正語意，以及第一版 bundle／reference／tool authority 契約
-Still open after first G7 slice: B1、B2、C 與 dispatcher／A read path 依 §14 分段接線；Prompt 文字只在對應 Agent 切片調整
+Still open after second G7 slice: B2、C 與完整背景 job／dispatcher／A read path 依 §14 分段接線；B1 compaction 與正式 App 組裝仍待後續切片
 Out of scope: 本輪不改 production authority、不呼叫模型、不修改正式資料、不做 provider／JD schema 選型
 ```
 
@@ -318,7 +318,7 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 為避免又同時重做 Agent、Prompt、背景排程與 UI，施工拆成下列可獨立驗證的窄切片：
 
 1. **Bundle authority foundation（已完成）：**已擴充 Memory bundle／manifest 的資料型別、保存、讀取、驗證及 publication；synthetic fixtures 已驗證 stable IDs、來源、digest、跨層 bindings、supersession、文件隔離、精確 bundle base、完整 CAS、receipt、tamper、stale 與舊 receipt digest 相容。舊兩檔 Memory 保持相容；零模型、零 Prompt、零 dispatcher、零 UI。`consultant-memory` 全套 162 項測試及 compileall 通過。
-2. **B1 case maintainer：**沿現有來源固定／checkpoint／錯誤處理，接上案例 guide、相關案例讀取與受控語意操作；先離線測新增、補充、更正、重複、拆分／合併候選與 no-op。
+2. **B1 case maintainer（前兩片已完成）：**沿現有來源固定／checkpoint／錯誤處理，接上案例 guide、相關案例讀取與受控語意操作；已離線測新增、補充、更正、重複、拆分／合併候選、no-op、多窗口、完成界線、transport resume、步數額度及 incomplete／refusal。
 3. **B2 understanding maintainer＋完整背景 job：**接 staged case change set、多對多影響查找、新理解發現與一次發布；驗證 B1 成功而 B2 失敗不外露、semantic no-op 與 stale 後 B1／B2 重整。
 4. **C repair：**把現有兩檔 patch 限制改成穩定目標 ID 的受控修訂，驗證同次案例／理解更正、來源、CAS、receipt 及本回合基準推進。
 5. **Dispatcher／A read path／compaction／App journey：**最後接回既有通知與背景恢復，讓 A 從兩層 guide 按需回查；補 B1 的 request-only compaction 與完整 App 驗收。未受影響的 H4／CTX-C001 證據直接沿用。
@@ -328,9 +328,9 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 ## 15. Closure
 
 - **Decision：**B1 成為目前案例／任務／事件層的整理 Agent 並擁有小型 guide；B2 以目前案例維護穩定工作理解及其 guide。兩者暫採同一文件級 Memory publication，B1 staged 後由 B2 完成或 no-op，再一次發布。C 可在明確更正時直接原子發布同一完整版本。
-- **Status：**G7 分段施工；bundle authority foundation 與 B1 第一個 staged state／語意工具契約已完成。B1 尚未接固定 source window／Agent graph，B2／C 與正式接線也尚未切換，不是完整產品已完成或 production authority 已切換。
+- **Status：**G7 分段施工；bundle authority foundation、B1 staged state／語意工具及固定 source window Agent graph 已完成。B2／C、B1→B2 共同發布與正式 App 接線尚未切換，不是完整產品已完成或 production authority 已切換。
 - **Why：**產品需要記住完整個別工作實況與可修訂的穩定共同理解，並透過分層引用產出貼合員工的 JD；歷史窗口詳記＋單一正文不能充分表達「目前完整案例」。
 - **Sources：**Owner 2026-09-16 對話裁決；[Codex Memories](https://learn.chatgpt.com/docs/customization/memories)、[Codex consolidation template](https://github.com/openai/codex/blob/main/codex-rs/memories/write/templates/memories/consolidation.md)與[Codex memories README](https://github.com/openai/codex/blob/main/codex-rs/memories/README.md)只支持分層、引用與引用感知整理的官方事實，不替本產品決定 publication schema；既有 Q019／重抽／publication／H4 實作證據只作可沿用工程基礎。
-- **Affected：**`current-decisions.md`、`packages/consultant-memory` 的 bundle／Memory／publication／reference 基礎、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫與 `CTX-C001` 的 B1 適用範圍；第一切片沒有改 Prompt、Agent graph、dispatcher、UI 或正式入口。
+- **Affected：**`current-decisions.md`、`packages/consultant-memory` 的 bundle／Memory／publication／reference 基礎、B1 Prompt／Agent graph、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫與 `CTX-C001` 的 B1 適用範圍；前兩片沒有改 dispatcher、B2／C、UI、provider credential 或正式入口。
 - **Reopen：**Owner 改變案例完整度／更正效果；G4 發現共同 publication 無法在現有 Store／Saver 契約下可靠完成；或代表性測試證明兩層一致性／回查成本不能同時成立。
-- **Next gate：**B1 的語意操作、read-before-write、案例 guide／目前案例 staging 與離線反例已完成；下一片只把既有 source window／checkpoint／有限恢復接到這份 stage 與工具，並依本文件調整 B1 Prompt。不在同一片接 B2、C、dispatcher、compaction 或 UI。第一版沿用「舊 immutable artifact 暫留、不做 GC」。
+- **Next gate：**B1 前兩片已完成；下一個獨立工作單位先固定 B2 understanding maintainer 的 staged state／語意工具與多對多影響分析，再接 B1→B2→完整 bundle publication。不在同一單位接 dispatcher、C、compaction、UI 或真模型；第一版沿用「舊 immutable artifact 暫留、不做 GC」。

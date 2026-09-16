@@ -1,11 +1,11 @@
-# B1 案例維護者：第一施工切片
+# B1 案例維護者：前兩個施工切片
 
 日期：2026-09-16
 
-狀態：第一施工切片完成；B1 Agent graph／來源窗口接合待下一片
+狀態：B1 staged contract 與固定來源 Agent graph 兩片皆完成；尚未接 B2／背景發布／正式 App
 上位決策：[分層案例／工作理解 Memory 對齊](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)
 
-## 1. 本片要完成的效果
+## 1. 第一片要完成的效果
 
 本片只固定 B1 對案例層可做的語意操作與可 checkpoint 的 staged 狀態。B1 的輸出仍不是正式 Memory；必須等後續 B2 完成影響分析並由完整背景工作一次發布，A 才能看到。
 
@@ -26,7 +26,7 @@ Runtime 負責：
 - checkpoint 本 attempt 已成功讀取的案例；修訂、拆分、合併或淘汰前強制先讀目前正文，不能只看 guide 覆寫。
 - 驗證 no-op／changed 是否與實際 staged 變更一致，以及完成時每筆目前案例都有且只有可解析的導覽入口。
 
-## 2. 本片明確不做
+## 2. 第一片明確不做
 
 - 不改 B1 Prompt、Skills、模型、provider、credential 或費用設定。
 - 不把舊三欄 `rollout_summary/raw_memory/slug` 包裝成新案例層。
@@ -90,7 +90,7 @@ Runtime 負責：
 
 上述來源共同支持「窄工具、Runtime 注入已知狀態、驗證後再生效」；案例分層、共同 publication、supersession 與 B1/B2 權責仍是 Caliburn 已確認的產品設計，不冒稱廠商規定。
 
-## 7. 施工結果
+## 7. 第一片施工結果
 
 第一施工切片已完成：
 
@@ -101,4 +101,22 @@ Runtime 負責：
 - 同一模型步若送出多個 B1 工具會全部安全拒絕；不依賴 provider 永遠遵守 `parallel_tool_calls=false`。
 - 把既有 V4A matcher 抽成純文字 helper，舊兩檔 staging 繼續走同一 matcher，沒有改變其 path 白名單或寫入行為。
 
-實際驗證：`consultant-memory` **176 passed**；相鄰既有 B1 extraction／B2 consolidation App 固定接合 **33 passed**；0 provider、0 正式 publication、0 DB schema 變更。下一片只把既有固定 source window、Agent checkpoint／有限錯誤恢復接到這份 stage／tools，並補新 B1 Prompt；仍不接 B2、C、dispatcher、compaction 或 UI。
+第一片當時的實際驗證：`consultant-memory` **176 passed**；相鄰既有 B1 extraction／B2 consolidation App 固定接合 **33 passed**；0 provider、0 正式 publication、0 DB schema 變更。它指定的下一片是把既有固定 source window、Agent checkpoint／有限錯誤恢復接到這份 stage／tools 並補新 B1 Prompt；該片結果接續記於下節。
+
+## 8. 第二片：固定來源 Agent graph
+
+第二片只完成第一片已指定的下一接點：
+
+- `CaseMaintenanceWorkflow` 接受 Runtime 固定的整批 canonical source reference 與精確 base publication／Memory bundle。
+- 沿既有 `ExtractionSourceReader` 在該固定批次內規劃有界 `NEW_SOURCE`／`CONTEXT_ONLY` 窗口；多個模型窗口共用一個 B1 stage，正式案例來源只加入整批 canonical reference，context-only 不成為證據。
+- 每個窗口由同一個 LangChain Agent 依序處理；非最後窗口不能提前 `finish`，最後窗口必須明確以 `changed`／`no_op` 完成。
+- 新 B1 Prompt 只描述案例層責任、來源可信度、guide 導覽、read-before-write、案例身分生命週期與完成規則；不把 B2 穩定理解、JD 寫作或主顧問訪談責任混入。
+- Runtime 使用同一 durable graph checkpoint 保存成功工具效果。模型 transport 在工具後失敗時，`resume()` 從原 checkpoint 接續，不重做已成功的案例操作或重新配置 ID。
+- 模型／工具步數與最後完成修正都有同工作上限；重開／resume 不配置新額度。新 B1 的正式模型／工具上限不是舊 `max_windows=16`，也不直接借用 A／B2 的 16／15，因此 package 要求 App 組裝時明確提供；本片 16／15 只用於合成機制測試。provider 回報 incomplete、refusal 或 invalid tool call 時，在工具執行與完成前拒絕，stage 不發布。
+- 新工作可在前一個完成 attempt 後重用同一 document graph；同 source＋同 base 直接讀回原完成結果，真正 stale 的同 source＋新 base 才建立新語意 attempt。
+
+本片沒有把所有 planned windows 一次改成多份正式來源，也沒有另建 source cursor。dispatcher 仍負責提供固定 batch；來源 owner 仍負責窗口 pair、順序、分頁與 scope。這沿用既有「一個 B1 batch ref、批內可分模型窗口」契約。
+
+第二片新增 12 項零 provider graph 反例；連同第一片與既有套件測試，`consultant-memory` **188 passed**，相鄰舊 B1 extraction／B2 consolidation App **33 passed**。沒有 provider 呼叫、正式 publication、DB schema、dispatcher、compaction、UI 或 production authority 變更。
+
+下一個獨立工作單位先做 B2 understanding maintainer 的 staged state／語意工具與影響分析反例，再接 B1→B2→完整 bundle publication；不在 B1 片內偷接 dispatcher、C 或完整 App。

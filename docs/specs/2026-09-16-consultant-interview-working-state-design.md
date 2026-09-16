@@ -62,6 +62,8 @@ Working State 只保存足以讓顧問恢復分析的最小語意：
 | [Anthropic Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) | compaction、structured note-taking、JIT retrieval 與 multi-agent 是不同且可組合的技術；長任務 notes 可保留進度與依賴 | 支持 working notes 不應被 compaction 或長期 Memory 混為一物 |
 | [Anthropic Memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool) | 應用程式控制持久儲存，模型可寫入並按需讀取，不需把全部內容常駐 context | 支持 App 持有狀態及漸進回查；沒有規定 Caliburn 的待訪談事項欄位 |
 | [Anthropic Managed Agents](https://www.anthropic.com/engineering/managed-agents) | session 記錄與模型當下 context window 是兩件事；被壓縮移出 context 的訊息必須另有可恢復 owner | 支持 canonical 對話、working state 與 request projection 分權 |
+| [OpenAI Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs) | Structured Outputs 能限制輸出符合 schema，但官方明確提醒內容仍可能出錯 | schema 負責擋格式／enum 錯誤；「是否已回答、是否被 Memory 承接」仍須以產品不變量與情境測試驗證 |
+| [OpenAI Function calling](https://developers.openai.com/api/docs/guides/function-calling) | 工具應可預測、避免可形成矛盾的參數，且程式已知的值不應再要求模型填寫 | state 儲存欄位不等於每次 Tool 都要完整重送；ID、scope、version、時間、預設值與 transition 由 Runtime 處理 |
 
 跨來源可稱為共同原則的是：**可恢復的完整記錄、當前工作狀態／structured notes、compaction 與長期知識應分開管理，Context 再按需要組裝。**
 
@@ -108,7 +110,6 @@ Working State 只保存足以讓顧問恢復分析的最小語意：
 ```json
 {
   "item_id": "wi_...",
-  "kind": "case_detail",
   "subject": "重大故障初判與升級",
   "known_and_open": "已知本人先蒐集紀錄並做初判；尚不清楚哪些條件必須交主管，以及本人可否直接通知其他單位。",
   "why_it_matters": "會改變責任邊界、判斷權與有效完成要求。",
@@ -123,15 +124,16 @@ Working State 只保存足以讓顧問恢復分析的最小語意：
 | 欄位 | 用途與限制 |
 |---|---|
 | `item_id` | Runtime 產生的 thread-local stable ID；模型不可自行命名或跨文件引用 |
-| `kind` | `work_lead`、`case_detail`、`cross_case_comparison`、`conflict_or_correction`、`scope_coverage`；只協助導航，不決定分析結論 |
 | `subject` | 短而可辨識的工作主題，不是 JD 標題或穩定工作理解 |
 | `known_and_open` | 自足地寫出目前已知、未知或衝突；未知不得改寫成假設，已更正內容不得保留舊結論冒充現況 |
-| `why_it_matters` | 指出它可能改變的工作分析面向，例如本人責任、範圍、條件、產出、完成要求、知識或技能；不用逐欄填滿 |
+| `why_it_matters` | **可空。**只有影響不明顯、需說明為何值得保留，或選 `high_jd_impact` 時才優先填；不為了必填反覆寫「提升 JD 完整性」 |
 | `information_needed` | 下一步需要的資訊／比較，不保存固定問句；實際問題由顧問依當輪語境自然表達 |
 | `status` | `open`、`parked`、`captured_pending_memory`。目前焦點只由 root `focus_item_id` 表示，不再重複一個 `active` status |
-| `priority` | `employee_requested`、`correction_or_conflict`、`high_jd_impact`、`normal`；required clarification 仍由既有 blocking 機制處理，不塞進 priority |
-| `source_refs` | 只引用已存在的 canonical employee message／來源 handle；沒有來源的純未知可以為空，不能製造假引用 |
-| `related_refs` | 可選的現有案例、工作理解或 JD handle，協助按需回查；只接受 Runtime 已提供且 scope 正確的 handle |
+| `priority` | 單選的**目前主要排序原因**：`employee_requested` ＞ `correction_or_conflict` ＞ `high_jd_impact` ＞ `normal`；同時符合多項時取最前者，其他脈絡留在文字。Tool 未提供時由 Runtime 預設 `normal`。required clarification 仍由既有 blocking 機制處理，不塞進 priority |
+| `source_refs` | **選填。**只引用已存在的 canonical employee message／來源 handle；沒有來源的純未知可以為空，不能製造假引用 |
+| `related_refs` | **選填。**已有案例、工作理解或 JD handle 時才提供，協助按需回查；只接受 Runtime 已提供且 scope 正確的 handle |
+
+第一版不保存 `kind`。原先的 `work_lead`、`case_detail`、`cross_case_comparison`、`conflict_or_correction`、`scope_coverage` 會互相重疊，而且目前沒有必須依它執行的唯一行為：主題與追查內容由三個核心文字欄位表達；更正／衝突的載入優先度由 `priority` 承接；案例、理解與 JD 定位由 `related_refs` 承接。日後只有出現不能由這些資料完成的實際 routing 缺口，才用新證據重開分類，不先為了標籤要求模型判斷。
 
 刻意不加入：confidence score、完成百分比、固定 JD 欄位矩陣、Skill ID、模型推理稿、逐步計畫、依賴圖、deadline、另一份 Memory version、員工可編輯旗標，以及完整問句歷史。
 
@@ -142,6 +144,22 @@ Working State 只保存足以讓顧問恢復分析的最小語意：
 - `captured_pending_memory`：本輪已取得足以停止立即追問的原話／更正，等待 B1／B2 publication 或明確 no-op 後對帳；不能當作 Memory 已更新。
 
 當項目已被 Memory 正確承接、不再需要追問、已證實與工作無關，或被新版項目完整取代時，就從 current items 移除。其歷史仍可由 checkpoint／canonical conversation 查得，不在模型 context 中累積 `resolved` 墓碑。
+
+### 5.4 儲存物件不等於每次 Tool 輸入
+
+持久 state 可以有上述欄位，但模型建立新 item 時第一版只必填：
+
+```text
+subject
+known_and_open
+information_needed
+```
+
+`why_it_matters`、非 `normal` 的 `priority`、`source_refs` 與 `related_refs` 只在有實際內容時提供。`item_id`、初始 `status=open`、`priority=normal` 預設、文件 scope、Memory／checkpoint revision、時間與 receipt 全由 Runtime 產生或補入。
+
+這裡的「必填／選填」是產品語意，不預先假定某個 provider adapter 的 JSON Schema 表達。若正式 strict schema 要求所有 properties 出現，選填內容就以 `null`／空陣列等合法空值表達；不能為了滿足格式，要求模型捏造無意義文字。鎖定 SDK／adapter 的實際 schema 仍在 G7 以生成結果與契約測試固定。
+
+修改既有 item 時採 patch 語意：沒有出現在本次 patch 的欄位與沒有被點名的其他 items 全部保持不變，不能把「模型這次沒重送」解讀成清空或刪除。Stored state 仍使用完整 validated object；Tool input 則只表達本次改變。
 
 ## 6. 更新與恢復流程
 
@@ -154,7 +172,17 @@ A 取得一個小型、可選的批次工具，例如 `update_interview_working_
 - 員工回答「不知道」、暫時改題，或答案只解決部分問題；
 - 新 Memory publication 已承接、推翻或改變現有 item，需要更新或移除。
 
-工具一次可 create／revise／park／mark-captured／remove 多項並切換 Focus；App 驗證 item ID、scope、enum、引用與大小，再透過同一次 graph state update 保存。沒有變化就不呼叫，不為每回合固定增加模型 request，也不另開 planner node。
+工具一次可批次表達下列責任分離的 operation：
+
+- `create`：只提交新項目的核心文字與必要選填內容；Runtime 配發 ID、預設 open，並可在同一 operation 指定新項目成為 Focus；
+- `revise`：只提交 `item_id` 與真的有變化的內容 patch；不可同時自行改 `status`；
+- `park`／`reopen`／`mark_captured`：只提交 Runtime 已提供的 `item_id`，狀態由 operation 唯一決定，不另收一個可能衝突的 `status`；
+- `remove`：除 `item_id` 外，必須給單一理由 `memory_reconciled`、`no_longer_relevant` 或 `superseded`。`memory_reconciled` 必須引用本次 read session 實際讀過的同版 Memory handle；`no_longer_relevant` 必須引用主顧問採用的 canonical 員工回答；`superseded` 必須指向仍存在的 replacement item。Runtime 驗證 handle 已讀／存在、scope、版本及 replacement 等可判定前提，不能只因 publication 版本前進就接受移除；
+- `set_focus`：指向一個現有 open item 或清空 Focus；不改 item 內容與狀態。
+
+同一批次內，同一 item 最多一個 lifecycle operation；若同時需要補答案並轉成 `captured_pending_memory`，可以是一個 `revise` 加一個 `mark_captured`，兩者修改不同責任且原子套用。App 驗證 item ID、scope、enum、引用、transition 與大小，再透過同一次 graph state update 保存；非法組合整批不生效並回傳可修正錯誤。沒有變化就不呼叫，不為每回合固定增加模型 request，也不另開 planner node。
+
+上述 remove guard 只能攔截「沒讀就宣稱 Memory 已承接」「跨 scope reference」「替代項不存在」等可判定錯誤，不能由 schema 保證模型的語意判斷正確；部分回答、無關 publication 與錯誤對帳仍必須用代表性情境測試驗收。
 
 員工看得見的下一個問題照常留在 canonical conversation。Working item 保存的是「為何要問、需要取得什麼」，不是把上一輪句子複製成問題 queue。
 
@@ -202,7 +230,7 @@ A 每個 model step 的常駐 orientation 只包含：
 - current Memory／JD revision 等 Runtime metadata；
 - `focus_item_id`；
 - 所有 current items 的 `item_id`、`subject`、`status`、`priority` 小型目錄；
-- Focus、員工明確提及、correction／conflict 及本輪 deterministic refs 命中的完整 item。
+- Focus、員工明確提及、`priority=correction_or_conflict` 及本輪 deterministic refs 命中的完整 item。
 
 其他 item 細節沿既有唯讀 context／VFS 投影按 ID 讀取。若目錄超過本輪預算，必須保留總數、分組與可讀入口，不能靜默截斷後讓顧問誤以為沒有其他事項；第一版不因此導入 embedding／RAG 或另一個搜尋 Agent。
 
@@ -234,6 +262,7 @@ A 每個 model step 的常駐 orientation 只包含：
 - 不把 14 個工作分析面向各做成一筆固定待辦，或用數量／百分比宣稱完整。
 - 不保存 chain-of-thought、逐 token reasoning、模型內部信心或所有可能問題。
 - 不因 working state 存在而每輪強制更新 Memory、強制 compaction、強制背景通知或多一次模型呼叫。
+- 不把完整 stored item schema 原封不動當作每次 Tool 的必填輸入；不以漏傳欄位代表清空，也不讓 `park` 與另一個 `status` 同時表達同一 transition。
 - 不在文件間共用 item、Focus、source ref 或 checkpoint。
 - 不在未讀相關新版 Memory 時自動標示 item 已解決。
 
@@ -251,6 +280,8 @@ A 每個 model step 的常駐 orientation 只包含：
 10. **文件隔離：**兩份 JD 的 Focus／items／references 不互相污染。
 11. **零無謂呼叫：**普通回答若未改變工作狀態，不呼叫更新工具；第一版沒有固定 planner／summarizer step。
 12. **非權威：**Working item 的文字不能直接通過 B1／B2／JD source validation；只有其 canonical source reference 可被回查採用。
+13. **局部更新：**只 park 一項時不重送整筆內容；只 revise 一欄時其他欄位與其他 items 不變；`park＋status=open` 等矛盾輸入無法形成。
+14. **移除保護：**未讀相關新版 Memory 時，`memory_reconciled` remove 被拒絕；不相關 publication 不會清掉 item；superseded／不再相關也必須提供可解析的替代項或 canonical basis。
 
 ## 11. 下一步與 gate
 

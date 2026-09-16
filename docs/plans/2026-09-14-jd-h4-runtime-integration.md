@@ -2,6 +2,8 @@
 
 > **2026-09-16 MEM-L001 successor：**Owner 已將產品 Memory 修正為「B1 維護可持續修正的完整案例／任務／事件及案例 guide；B2 由目前案例維護穩定工作理解及理解 guide；兩層暫採一次共同 publication；C 可直接原子發布受影響兩層」。本計畫既有 R1／R2 完成證據仍可支持固定 source、checkpoint、Store／Saver、stale、CAS、receipt 與宿主恢復，但下方「B1 只產生詳記／候選再交 B2 發布兩檔 Memory」的產品流程已被 [MEM-L001](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 取代。不得依舊 R1／R2 步驟繼續改程式；先完成新的 G4 差距設計與施工重切片。R2C 對 A／B2 的 compaction 原則仍有效，新 B1 成為多步 Agent 後的相同接法須在新設計補齊。
 
+> **2026-09-16 文件封存範圍校正：**Owner 已取消首版的文件封存／恢復需求。下方 R3 原先要求的「封存停止新 B 批次、恢復後續作」不再施工或驗收；既有穩定能力可以保留，但不得因此新增 lifecycle、dispatcher 分支或 UI。這不表示刪除文件，也不影響一般程序重啟後恢復既有未完工作的可靠性要求。
+
 > 2026-09-16 閱讀校正：產品目標為 [一個由人與 LLM 共編 current JD 的 App](../product-notes.md)。下方 Anthropic、直連 OpenAI、模型未選與完整 JD 歷史／還原等敘述有施工時間差；目前模型路徑以 [目前決策](../current-decisions.md) 的 framework＋OpenRouter＋OpenAI Luna 為準。首版只需當輪 LLM 的 JD 差異與整輪撤回，原始對話／Memory 不撤回。R3 新程序結果見 [R3 證據](../specs/evidence/jd-b1-adoption/r3-notification-and-background-results.md)。正式組裝已把既有顧問 graph、單一 OpenRouter credential 與 `enable_chat=True` 接進日常 `serve`；B1 也已走同一 OpenRouter 邊界，背景提示的文件與本回合目前 Memory 讀取基準改由每次 runtime 執行提供。一般讀取不追逐背景最新 head；C 準備修改時才明確刷新，保存仍使用既有 CAS，成功後本回合固定在 C 實際產生的版本。B2 若依舊版完成候選，必須 stale→讀新版→重新整理，不能換版號重送；B2 後續發布也不自動推進前景本回合。缺 key 時仍只開人工 JD。2026-09-15 的 OpenRouter native compaction smoke 保留為 `SERVER-UNVERIFIED` 證據，但 Owner 已於 2026-09-16 結束 transport 三選一：A／B2 改採 [OpenRouter／Luna App-side continuity compaction](../specs/2026-09-16-openrouter-continuation-compaction-design.md)，不切 direct OpenAI、不等待原生 item、不改主顧問 Prompt 或 Memory 語意。背景 dispatcher、真 PG／新程序完整 App 旅程與之後的完整自然 smoke仍待後續。C 是前景即時 Memory 修補，B1/B2 是背景抽取／整併，不得把舊狀態當成新需求。
 
 2026-09-15 接縫進度：既有 Responses request-only view 已抽為 A／B2 可共用、未綁 provider 的 Responses middleware；B2 保持原組裝，A factory 已可注入，但正式 A runtime 刻意不注入任何未驗候選。這只先閉合 graph 接點，不是 transport 選擇、正式改線或長對話通過。同步邊界已沿實際呼叫鏈核對：A 的 admission 背景工作最終使用 `graph.invoke(..., durability="sync")`，B2 的 start／resume／attempt 也使用同步 `invoke()`；沒有真實 A／B2 async 模型入口，因此不加 `awrap_model_call`。B2 的 context 是單次有界整併嘗試，不是全員工訪談；Memory、B1、C 與原話範圍不變。本次沒有引入或核准全歷史替代方案；transport 未決只限此 context 切片，dispatcher 與完整 App 驗收仍按本計畫另行閉合。
@@ -88,7 +90,7 @@
 3. 同時採用 A 基本指引、`work-scope-interview`／`compare-work-patterns`／`outcomes-and-expertise`、SkillAssets 及按需載入、`MEMORY_ACTION_GUIDANCE`／`BackgroundAvailability`。只修原來「不製作 JD」的範圍限制，JD 撰寫規則映射六章研究；保存精確差異。把 `jd_read`／`jd_edit`／`jd_change_read` 接到同一個 JD domain writer：員工手改與 LLM 都走同一組欄位／關聯／版本／operation 規則，App 產生並驗證文件身分、版本、引用與保存結果，LLM 不直接填資料庫欄位或自行拼接定位 token。這是接合既有契約，不新增第二個 JD 寫入者或另一套審核引擎。
 4. 完成安全回合與啟動恢復時喚醒同一背景入口；喚醒可重複，持久准入／原工作決定能否執行。新批次必須有有效請求，字數後備預設不啟用；原來已准入的工作按原狀態續作。採既有宿主的有限 worker 接點，沒有則使用標準 executor 執行有界批次；不加入新長駐服務、分散式 queue 或無限 Future loop。
 5. 普通關閉：停止前景與背景新准入 → 等已登記的有限工作真的退出 → 關模型 client／Store／Saver／engine。不得持有全 App 鎖等 Future；未開始工作留持久狀態。重啟先沿既有 Windows 前宿主死亡證據取得宿主，找原 B job 續作；不把 `running` 當不存在，不把 timeout 當已停止。
-6. 接本機角色配置與狀態出口。缺 OpenRouter credential 時人工 JD 仍可用；未啟用模型不呼叫 provider，也不得 fallback 到 Anthropic 或其他 provider。整理受阻／未涵蓋通知交 App context，不要求員工判斷模型品質，也不把通知假寫成對話原話。封存停止新 B 批次，執行中批次可完成；原狀態保留，恢復文件後核原工作續作，按映射 §3.3 驗收。
+6. 接本機角色配置與狀態出口。缺 OpenRouter credential 時人工 JD 仍可用；未啟用模型不呼叫 provider，也不得 fallback 到 Anthropic 或其他 provider。整理受阻／未涵蓋通知交 App context，不要求員工判斷模型品質，也不把通知假寫成對話原話。文件封存／恢復已由 2026-09-16 Owner 裁決移出首版，不再新增或驗收其背景生命週期語意。
 7. 用真新 Windows 程序＋真 PG 驗以下原停點後續作：B1 模型已保存、B1完成/B2未開始、B2未發佈、B2已發佈僅回覆遺失。分别断言允许的 HTTP／寫入次數及原工作身份；由新程序取回，不沿用原 Python 物件。
 
 **H4 完成：**新 App 固定完整旅程能訪談、按需要整理、更正 Memory／JD、讀早期來源、續談與重開；當輪真實 JD 差異可查，取消／排空不謊報。固定／synthetic 驗收不呼叫 provider；正式接線後只補一條有界自然 smoke 核對 OpenRouter 真 route 與完整 App 結果，不重做已完成的顧問 prompt／品質研究。

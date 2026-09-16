@@ -12,7 +12,7 @@ Topic ID: JD-R002／MEM-L001
 Current stage: G3 WORKING
 Binding product goal: 完整理解個別工作案例／任務／事件，再歸納穩定共同工作，最後產生客製化 JD
 This turn's decision: B1、B2 的分層責任、各自 guide、共同 publication 與 C 即時更正語意
-Still open for G4: artifact/path/schema、工具契約、既有程式遷移切片、實體歷史產物保存上限
+Still open for G4: artifact/path/schema、工具契約、既有程式遷移切片；第一版保留舊 immutable artifacts、不做 GC，長期保存上限不是目前施工阻塞
 Out of scope: 本輪不改程式、不呼叫模型、不修改正式資料、不做 provider／Prompt／JD schema 選型
 ```
 
@@ -80,7 +80,11 @@ Memory publication vN
 └─ references／manifest
 ```
 
+這裡的 `manifest` 是**邏輯上的版本內容清單**：它記錄「vN 這一版實際選用了哪些案例、理解、guide 與引用 artifact」。它可以由現有 publication record／head 所保存的 artifact references 承擔，不表示第一版一定要另建一張名為 manifest 的資料表或一份新檔案。用途是避免案例已是 v13、工作理解卻仍混用 v12 之類的半套發布；一次 CAS 成功後，整組引用才一起成為新的正式版本。
+
 案例與理解具有跨版本不變的語意身分；每次內容保存產生不可變 artifact／digest。新版 publication 只替換有變動的 artifact，未變內容可以重用。現在查找可由穩定身分解析到該 publication 選定的內容；歷史重現則使用精確 artifact 身分與原始來源 reference。
+
+第一版不實作 GC（garbage collection）：新版不再引用的舊 immutable artifact 暫時留在 Store，不立即物理刪除。正常讀取只跟隨目前 publication head，因此舊 artifact 不會自動進入模型 context，也不是要新增使用者可見的 Memory／JD 歷史功能。日後只有出現可量測的儲存壓力，才另外設計「哪些未被任何有效 publication／引用使用的內部 artifact 可以安全回收」；canonical 原始訪談與仍被引用的證據不在可隨意清除的範圍。
 
 普通背景流程為：
 
@@ -150,7 +154,7 @@ B2 再基於新的 B1 結果與 v13 理解重整
 | 背景發布 | H4 舊流程把 B1 artifact 交 B2，由 B2 發布兩檔 Memory | 改為一個 durable B job 內 B1 staged → B2 staged → 一次完整 publication；舊 R1／R2 結果只作底層證據 |
 | stale 重整 | 舊 B1 不讀 Memory，C 插入後通常只需 B2 重整 | 新 B1 依賴目前案例；stale 後 B1、B2 都要基於新 head 重新評估 |
 | compaction | 現設計只有 A／B2 | 新 B1 多步 agent 納入同一 request-only 原則與受影響測試 |
-| 歷史 artifact 成長 | 現行 Store 無一般 GC | 目前先保證 current guide／案例不無腦累加且正常回查不掃歷史；實體舊 artifact 的封存／回收界線仍 OPEN，不得在未決前刪原始訪談或已引用證據 |
+| 歷史 artifact 成長 | 現行 Store 無一般 GC | 第一版保留不再由 current head 選用的舊 immutable artifact，不新增 GC，也不讓正常回查掃描它們；長期只有出現可量測儲存壓力才重開安全回收設計，canonical 原始訪談與仍被引用的證據不得隨意刪除 |
 
 上述衝突是已知設計／程式差距，不是授權實作者直接自行選 schema、改 Prompt 或宣稱舊測試已覆蓋。遇到會改產品效果、資料權責、引用可重現性或失敗語意的選擇，先提出具體衝突與最小方案。
 
@@ -173,4 +177,4 @@ B2 再基於新的 B1 結果與 v13 理解重整
 - **Sources：**Owner 2026-09-16 對話裁決；既有 Q019／重抽／publication／H4 實作證據只作可沿用工程基礎。
 - **Affected：**`current-decisions.md`、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫、`CTX-C001` 的 B1 適用範圍；程式尚未修改。
 - **Reopen：**Owner 改變案例完整度／更正效果；G4 發現共同 publication 無法在現有 Store／Saver 契約下可靠完成；或代表性測試證明兩層一致性／回查成本不能同時成立。
-- **Next gate：**先做現有 artifact／publication／C／dispatcher 的差距表與最小 G4 設計；裁決尚未回答的案例身分、時間變化表達及實體歷史保留，再另寫施工切片。遇到衝突先回報，不沿 H4 舊步驟直接開工。
+- **Next gate：**先做現有 artifact／publication／C／dispatcher 的差距表與最小 G4 設計；裁決尚未回答的案例身分與時間變化表達，再另寫施工切片。第一版沿用「舊 immutable artifact 暫留、不做 GC」，不把長期回收設計列為接線前置。遇到衝突先回報，不沿 H4 舊步驟直接開工。

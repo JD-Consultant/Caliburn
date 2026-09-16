@@ -1,6 +1,6 @@
 # Caliburn Consultant Memory
 
-工作詳記、目前工作理解／導覽、發布與已採用 Memory 工作流程的獨立 Python 套件。新 JD App 以一般套件依賴使用；不 import 舊 checkout，不含 JD 編輯、HTTP 入口或宿主排程。B1 會執行 App 注入的 structured runnable，B2 會執行 App 注入的 chat model 與 context 中介；provider client、金鑰、角色配置及資源生命週期由 App 組裝。
+Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新 JD App 以一般套件依賴使用；不 import 舊 checkout，不含 JD 編輯、HTTP 入口或宿主排程。最新產品語意依 `MEM-L001`：B1 維護完整案例層，B2 維護穩定工作理解層，兩者完成後才共同發布。舊三欄 extraction／兩檔 consolidation 仍保留已驗來源、checkpoint、錯誤與恢復證據，但不再代表新 B1／B2 的最終產物。provider client、金鑰、角色配置及資源生命週期由 App 組裝。
 
 ## 保存與來源
 
@@ -16,6 +16,14 @@
 
 `PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致；舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑保持相容。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
 
+### B1 案例 staged state／語意工具
+
+`caliburn_memory.case_maintenance` 已完成第一個零 provider 切片：`CaseMaintenanceStage` 保存固定 base、canonical source、本 attempt 已讀案例、目前 staged upserts／supersessions／guide 與 change set；`case_maintenance_tools()` 提供 `read/create/revise/split/merge/retire/set-route/finish` 八個窄工具。模型不填 document、來源、版本、路徑、digest 或新案例 ID。
+
+修訂、拆分、合併或淘汰已發布案例前必須先成功 `read_case`，該證據與 stage 一起由 LangGraph checkpoint 保存；同一模型步的多工具呼叫全部拒絕，避免平行 state update。局部修訂沿既有 V4A matcher，但只接收案例內容與 diff，不把儲存 path 暴露給模型。新案例與修訂案例的來源由 Runtime 自動綁定；guide link、穩定 UUID 與 supersession 同樣由 Runtime 產生。
+
+這仍只是 B1 staging／工具契約：沒有 Agent Prompt、固定 source window graph、B2、publication、dispatcher、compaction 或 UI。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 第一施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
+
 ## 即時修補核心
 
 **2026-09-13：**新增公開 `build_repair_graph(resolve_workflow)`，供 App 固定 wrapper 在執行時取得同輪資源；`RepairWorkflow.graph` 共用同一六節點，未另寫引擎。建圖與檢視不執行 resolver、不開任何資源。`adoption.json` 已記此版實際 hash，wheel 在乾淨 venv 依 App lock 完成完整依賴安裝並通過隔離檢查，詳見[App 接合結果](../../docs/specs/2026-09-13-jd-memory-repair-app-integration-slice.md)。
@@ -26,19 +34,19 @@ App 配發 operation／base／source，模型只提供 path／diff；本核心�
 
 程式採用來源、hash 與實際調整見 [adoption.json](adoption.json)；三核心僅分離來源依賴，沒有重寫 Memory 引擎。[完整接合設計與結果](../../docs/specs/2026-09-13-jd-memory-core-adoption-slice.md)保存官方依據、限制與驗證層級。
 
-## B1 訪談抽取核心
+## 舊 B1 訪談抽取核心（底層證據，產品語意已取代）
 
-`caliburn_memory.extraction.ExtractionWorkflow` 已自 `4f94fbfb` 採用。三文字欄位、prompt、窗口迴圈、格式更正額度、`start/resume/reextract` 保持已驗語意；`ExtractionSourceReader` 由 App 提供固定窗口與前置消歧，`accepted(raw)` 由 provider adapter 核拒絕／終局。B1 保存詳記／候選，不發布目前理解，也不前進 publication 游標。
+`caliburn_memory.extraction.ExtractionWorkflow` 已自 `4f94fbfb` 採用。三文字欄位、prompt、窗口迴圈、格式更正額度、`start/resume/reextract` 保持已驗語意；`ExtractionSourceReader` 由 App 提供固定窗口與前置消歧，`accepted(raw)` 由 provider adapter 核拒絕／終局。這些來源固定、checkpoint、拒答／截斷與有限更正能力供新 B1 下一片沿用；三欄輸出與「保存詳記／候選即完成」已由 `MEM-L001` 取代，不能接成新案例層的正式完成條件。
 
-新 App `extraction_app.py` 的 OpenAI 固定接合已完成；同文件工作須由 caller 串行，已完成 B1 的 `files` 交給 B2 後才可進下一批。B1 已在真 `PostgresSaver`／`PostgresStore` 上驗過一批的保存、資源重建後續作、重抽與相同 input 查回（[R1 結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)），套件程式未因此改動。
+歷史採用切片中，App `extraction_app.py` 的固定接合及真 `PostgresSaver`／`PostgresStore` 一批保存、資源重建後續作、重抽與相同 input 查回已驗（[R1 結果](../../docs/specs/evidence/jd-b1-adoption/r1-postgres-batch-results.md)）。這證明可沿用的底層能力，不代表新 B1 已接 App。
 
-## B2 整併核心
+## 舊 B2 兩檔整併核心（底層證據，產品語意已取代）
 
-`caliburn_memory.consolidation.ConsolidationWorkflow` 已自 `4f94fbfb` 採用。prompt 逐字相同（`instructions_sha256`）、`JobState`、`stale→load`、模型／工具／輸出／候選／修補五項預算、`_repair_input`、由產物推導的 `_operation_id` 與 publish／receipt 路徑都未改。暫存兩檔的編輯工具（`staging.consolidation_tools`）與最終回饋迴圈（`consolidation_feedback`）同批採用。
+`caliburn_memory.consolidation.ConsolidationWorkflow` 已自 `4f94fbfb` 採用。`JobState`、`stale→load`、模型／工具／輸出／候選／修補預算、`_repair_input`、由產物推導的 `_operation_id` 與 publish／receipt 路徑仍是可沿用工程證據。舊 Prompt、兩個固定檔案 staging 與「B1 artifact 直接交 B2 發布兩檔 Memory」已由 `MEM-L001` 取代；新 B2 必須消費 staged current cases、處理多對多影響並和 B1 一次發布，不能直接復用這個產品流程。
 
-**唯一接縫是本套件不綁 provider**：原本 import 的 `native_context_view` 改由 caller 以 `context_middleware=` 傳入，中介順序不變。B2 只從**已完成**的 B1 checkpoint 取 `files`；它推進 `processed_source`，C 的修補不推進背景游標。
+歷史流程唯一 provider 接縫是 `context_middleware=`；舊 B2 從已完成的舊 B1 checkpoint 取 `files`、推進 `processed_source`，而 C 不推進背景游標。這些 provider 分離、游標與恢復原則可沿用，`files`／兩檔 Memory 的產品形狀不可沿用。
 
-App adapter（`consolidation_app.py`）已接，並在真 `PostgresSaver`／`PostgresStore`／publication 上驗過兩批有序交接、pending 續作、發布回覆遺失查回與 C 較晚更正（[R2 結果](../../docs/specs/evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。**尚未接 runtime：**通知註冊、背景准入與宿主生命週期仍待施工；「B2 未發布不得開始下一批」目前由 caller 串行負責。[H4 執行計畫 R3](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)。
+歷史 App adapter 在真 `PostgresSaver`／`PostgresStore`／publication 上驗過兩批有序交接、pending 續作、發布回覆遺失查回與 C 較晚更正（[R2 結果](../../docs/specs/evidence/jd-b1-adoption/r2-consolidation-handover-results.md)）。新分層流程仍須在後續 B1／B2 完整背景工作重新接合；不得把這份舊 R2 證據冒稱新 bundle 已發布通過。
 
 ## 顧問方法資產
 
@@ -63,4 +71,4 @@ uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 
 Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，patch／保存核心不建立 provider；B1 執行由 App 注入的模型 runnable。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
 
-目前完成保存／發布、原話接點、固定只讀工具、C 修補核心及其 App 停止／恢復接合，B1／B2 兩個背景階段的採用與真 PG 交接，以及顧問方法資產（A 指引、三項分析 Skills、Memory 行動指引）的採用與 App 組裝。**新宿主程序恢復與完整旅程仍未完成**；不要把 package 測試或固定組裝測試代稱日常顧問可用，也不能宣稱自然訪談品質已驗。
+目前最新分層 bundle authority 與 B1 staged state／語意工具契約已完成；舊原話接點、checkpoint、publication CAS／receipt、有限錯誤恢復與顧問方法資產保留作接續基礎。**新 B1 Agent graph、B2 staged understanding、完整背景工作、C bundle repair、dispatcher 與完整 App 旅程仍未完成**；不要把 package 測試、舊 B1／B2 真 PG 證據或固定組裝測試代稱新分層流程已可日常使用，也不能宣稱新流程自然品質已驗。

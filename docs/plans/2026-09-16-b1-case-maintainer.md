@@ -1,0 +1,104 @@
+# B1 案例維護者：第一施工切片
+
+日期：2026-09-16
+
+狀態：第一施工切片完成；B1 Agent graph／來源窗口接合待下一片
+上位決策：[分層案例／工作理解 Memory 對齊](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)
+
+## 1. 本片要完成的效果
+
+本片只固定 B1 對案例層可做的語意操作與可 checkpoint 的 staged 狀態。B1 的輸出仍不是正式 Memory；必須等後續 B2 完成影響分析並由完整背景工作一次發布，A 才能看到。
+
+模型可做：
+
+- 依 Runtime 提供的穩定 `case_id` 按需讀取一筆目前案例。
+- 建立新案例。
+- 以局部 diff 修訂既有案例，未修改內容保持不變。
+- 將一筆既有案例拆成多筆、將多筆合成一筆，或淘汰不再成立／重複的案例。
+- 只更新指定案例的導覽文字；實體路徑及 Markdown link 由 Runtime 產生。
+- 明確以 `changed` 或 `no_op` 完成本次 B1 判斷。
+
+Runtime 負責：
+
+- 綁定 document、base publication revision、base Memory version 與本批 canonical source。
+- 產生新案例 ID，保存既有 ID，驗證來源及 scope。
+- 維持 staged current set、supersession、案例 guide 與 change set。
+- checkpoint 本 attempt 已成功讀取的案例；修訂、拆分、合併或淘汰前強制先讀目前正文，不能只看 guide 覆寫。
+- 驗證 no-op／changed 是否與實際 staged 變更一致，以及完成時每筆目前案例都有且只有可解析的導覽入口。
+
+## 2. 本片明確不做
+
+- 不改 B1 Prompt、Skills、模型、provider、credential 或費用設定。
+- 不把舊三欄 `rollout_summary/raw_memory/slug` 包裝成新案例層。
+- 不接固定 source window 的 Agent graph、checkpoint 恢復或 compaction；本片只提供它們之後使用的狀態／工具契約。
+- 不做 B2、C、dispatcher、正式 App 接線、UI 或 publication。
+- 不新增案例關聯式資料表、第二份 canonical 原話、RAG、文件封存、Memory GC 或舊資料猜測式 migration。
+
+## 3. 可沿用與不可沿用
+
+沿用既有：
+
+- `MemoryArtifacts` 的 document scope、canonical source 驗證、不可變 bundle 與穩定 UUID。
+- 既有 V4A `apply_diff` matcher；抽成純文字 helper 後供案例局部修訂共用，不改 matcher 語意。
+- LangChain 1.4.0／LangGraph 1.2.11 的 `ToolRuntime` 隱藏注入與 `Command(update=...)` checkpoint state 更新。
+- 正式模型組裝既有 `parallel_tool_calls=False`；同一 staged 狀態不接受平行競爭修改。
+
+不沿用：
+
+- 舊 B1 的固定三欄輸出與「每個窗口另存一份詳記／候選就是完成」語意。
+- 舊 B2 的兩個固定檔案 staging／patch path 白名單。
+- 讓模型填 document ID、來源引用、版本、路徑、digest、時間或 operation ID 的做法。
+
+## 4. 工具契約
+
+第一版固定八個窄工具：
+
+1. `read_case(case_id)`
+2. `create_case(content, route_note)`
+3. `revise_case(case_id, diff, route_note?)`
+4. `split_case(case_id, replacements[])`
+5. `merge_cases(case_ids[], content, route_note)`
+6. `retire_case(case_id)`
+7. `set_case_route(case_id, route_note)`
+8. `finish_case_maintenance(outcome)`
+
+`route_note` 是一行自由文字，只表達名稱／別名／辨識詞／狀態／未確認事項等導覽語意；模型不填路徑。新案例的來源固定加入本批 canonical source；修訂、拆分與合併保留既有來源並加入本批 source。`context-only`、Working State、compaction summary 或模型自己的 change note 都不能成為案例來源。
+
+拆分／合併只針對已發布的穩定案例 ID；同一 attempt 新建後發現內容要調整，使用 `revise_case`，避免產生從未發布過的虛假 supersession 歷史。
+
+## 5. 驗收
+
+本片全為零 provider 離線驗證：
+
+- 開啟空白及既有 bundle 時不深讀全部案例，只讀 manifest／小型 guide。
+- 新增、補充、更正保留穩定 ID、舊內容及舊來源，並加入本批來源。
+- 重複資訊可以明確 no-op，不新增案例。
+- 拆分、合併、淘汰的 current set、guide 與 supersession 一致。
+- 模型工具 schema 不暴露 document、版本、來源、路徑、digest 或 runtime。
+- 工具回傳的 `Command` 可經真 `ToolNode` 更新 checkpoint state，且保留完整 tool call/result 配對。
+- 不能以 no-op 結束已有變更，也不能以 changed 結束完全未變更的 staged 狀態。
+- 非法／不存在／已淘汰 ID、錯誤 diff、guide 漏 route、來源 scope 錯誤均安全失敗，沒有部分 state 變更。
+
+## 6. 官方／版本依據與本案取捨
+
+查閱 2026-09-16：
+
+- [OpenAI Function calling](https://developers.openai.com/api/docs/guides/function-calling)：工具應有清楚、不可互相矛盾的輸入，程式已知的參數由程式提供；本片據此把 scope、來源、ID 配置與儲存欄位留給 Runtime。
+- [OpenAI 模型／工具設計指引](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.5)：工具描述應說明用途、輸入、副作用及失敗／重試；本片用窄語意工具與明確 staged/no-op 回應，不把儲存細節交給模型。
+- [Anthropic tool use](https://platform.claude.com/docs/en/agents-and-tools/tool-use/how-tool-use-works)：工具是應用程式執行、模型選擇的 typed contract；錯誤可回給模型修正。本片不把工具呼叫本身當已發布效果。
+- [LangChain tools／runtime](https://docs.langchain.com/oss/python/langchain/tools)：`ToolRuntime` 可注入 state/context/store 且不出現在模型 schema；本片已再以鎖定的 LangChain 1.4.0／LangGraph 1.2.11 原碼與本地探針核對。
+
+上述來源共同支持「窄工具、Runtime 注入已知狀態、驗證後再生效」；案例分層、共同 publication、supersession 與 B1/B2 權責仍是 Caliburn 已確認的產品設計，不冒稱廠商規定。
+
+## 7. 施工結果
+
+第一施工切片已完成：
+
+- 新增可 JSON 往返、可由 LangGraph checkpoint 保存的 `CaseMaintenanceStage`。
+- 新增八個 B1 語意工具；模型 schema 不含 scope、來源、版本、路徑、digest 或 runtime，經鎖定版 LangChain 的 strict OpenAI tool conversion 後根物件與 split replacement 都拒絕額外欄位。
+- 新增 read-before-write 證據；修訂、拆分、合併或淘汰已發布案例前，必須先由同一 attempt 成功讀取正文。
+- 新 ID、canonical source 合併、案例路徑、guide link、supersession 與完成結果均由 Runtime 產生／驗證。
+- 同一模型步若送出多個 B1 工具會全部安全拒絕；不依賴 provider 永遠遵守 `parallel_tool_calls=false`。
+- 把既有 V4A matcher 抽成純文字 helper，舊兩檔 staging 繼續走同一 matcher，沒有改變其 path 白名單或寫入行為。
+
+實際驗證：`consultant-memory` **176 passed**；相鄰既有 B1 extraction／B2 consolidation App 固定接合 **33 passed**；0 provider、0 正式 publication、0 DB schema 變更。下一片只把既有固定 source window、Agent checkpoint／有限錯誤恢復接到這份 stage／tools，並補新 B1 Prompt；仍不接 B2、C、dispatcher、compaction 或 UI。

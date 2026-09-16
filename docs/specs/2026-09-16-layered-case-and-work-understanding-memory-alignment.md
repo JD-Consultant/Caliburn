@@ -328,9 +328,9 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 ## 15. Closure
 
 - **Decision：**B1 成為目前案例／任務／事件層的整理 Agent 並擁有小型 guide；B2 以目前案例維護穩定工作理解及其 guide。兩者暫採同一文件級 Memory publication，B1 staged 後由 B2 完成或 no-op，再一次發布。C 可在明確更正時直接原子發布同一完整版本。
-- **Status：**G7 分段施工；第一個 bundle authority foundation 已完成，B1／B2／C 與正式接線尚未切換，不是完整產品已完成或 production authority 已切換。
+- **Status：**G7 分段施工；bundle authority foundation 與 B1 第一個 staged state／語意工具契約已完成。B1 尚未接固定 source window／Agent graph，B2／C 與正式接線也尚未切換，不是完整產品已完成或 production authority 已切換。
 - **Why：**產品需要記住完整個別工作實況與可修訂的穩定共同理解，並透過分層引用產出貼合員工的 JD；歷史窗口詳記＋單一正文不能充分表達「目前完整案例」。
 - **Sources：**Owner 2026-09-16 對話裁決；[Codex Memories](https://learn.chatgpt.com/docs/customization/memories)、[Codex consolidation template](https://github.com/openai/codex/blob/main/codex-rs/memories/write/templates/memories/consolidation.md)與[Codex memories README](https://github.com/openai/codex/blob/main/codex-rs/memories/README.md)只支持分層、引用與引用感知整理的官方事實，不替本產品決定 publication schema；既有 Q019／重抽／publication／H4 實作證據只作可沿用工程基礎。
 - **Affected：**`current-decisions.md`、`packages/consultant-memory` 的 bundle／Memory／publication／reference 基礎、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫與 `CTX-C001` 的 B1 適用範圍；第一切片沒有改 Prompt、Agent graph、dispatcher、UI 或正式入口。
 - **Reopen：**Owner 改變案例完整度／更正效果；G4 發現共同 publication 無法在現有 Store／Saver 契約下可靠完成；或代表性測試證明兩層一致性／回查成本不能同時成立。
-- **Next gate：**依 §14 只開 B1 case maintainer 切片：先固定 Agent 可用的語意操作與離線反例，再把既有 source window／checkpoint 接到案例 guide／目前案例 staging；不在同一切片接 B2、C、dispatcher 或 UI。第一版沿用「舊 immutable artifact 暫留、不做 GC」。
+- **Next gate：**B1 的語意操作、read-before-write、案例 guide／目前案例 staging 與離線反例已完成；下一片只把既有 source window／checkpoint／有限恢復接到這份 stage 與工具，並依本文件調整 B1 Prompt。不在同一片接 B2、C、dispatcher、compaction 或 UI。第一版沿用「舊 immutable artifact 暫留、不做 GC」。

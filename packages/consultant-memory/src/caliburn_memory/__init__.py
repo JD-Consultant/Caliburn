@@ -4,6 +4,10 @@ from caliburn_memory.bundle import (
     CaseArtifact, CaseRead, MemoryBundleManifest, Supersession,
     UnderstandingCaseBinding, WorkUnderstandingArtifact, WorkUnderstandingRead,
 )
+from caliburn_memory.case_maintenance import (
+    CaseChange, CaseMaintenanceAgentState, CaseMaintenanceError, CaseMaintenanceSession,
+    CaseMaintenanceStage, ReplacementInput, case_maintenance_tools,
+)
 from caliburn_memory.consolidation import ConsolidationWorkflow
 from caliburn_memory.extraction import INSTRUCTIONS, ExtractionOutput, ExtractionWorkflow
 from caliburn_memory.guidance import MEMORY_ACTION_GUIDANCE
@@ -17,6 +21,9 @@ from caliburn_memory.sources import ExtractionSourceReader, SourceReader
 __all__ = [
     "CaseArtifact", "CaseRead", "MemoryBundleManifest", "Supersession",
     "UnderstandingCaseBinding", "WorkUnderstandingArtifact", "WorkUnderstandingRead",
+    "CaseChange", "CaseMaintenanceAgentState", "CaseMaintenanceError",
+    "CaseMaintenanceSession", "CaseMaintenanceStage", "ReplacementInput",
+    "case_maintenance_tools",
     "ExtractionFiles", "MemoryArtifacts", "MemoryVersion", "ReadOnlyFiles",
     "PublicationStore", "PublicationUncertain", "PublishedHead", "PublishRequest",
     "Receipt", "StalePublication", "SourceReader",

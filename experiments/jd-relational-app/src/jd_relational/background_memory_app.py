@@ -19,6 +19,11 @@ from caliburn_memory import (
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
 from .conversation_sources import ConversationSourceService
+from .continuation_compaction import (
+    B1_COMPACTION_PROFILE,
+    B2_COMPACTION_PROFILE,
+    ContinuationCompactionMiddleware,
+)
 from .extraction_app import ExtractionSourceAdapter
 from .memory_sources import MemorySourceReader
 
@@ -32,6 +37,8 @@ def build_background_memory_workflow(
     memory_engine,
     case_model: Any,
     understanding_model: Any,
+    case_max_output_tokens: int,
+    understanding_max_output_tokens: int,
     case_max_model_steps: int,
     case_max_tool_calls: int,
     case_max_chars: int,
@@ -58,6 +65,12 @@ def build_background_memory_workflow(
         ),
     )
     case_session = CaseMaintenanceSession(artifacts)
+    case_compaction = ContinuationCompactionMiddleware(
+        summary_model=case_model,
+        profile=B1_COMPACTION_PROFILE.model_copy(update={
+            "main_output_reserve_tokens": case_max_output_tokens,
+        }),
+    )
     case_workflow = CaseMaintenanceWorkflow(
         reader,
         case_session,
@@ -68,10 +81,18 @@ def build_background_memory_workflow(
         max_chars=case_max_chars,
         context_chars=case_context_chars,
         max_windows=case_max_windows,
+        max_output_tokens=case_max_output_tokens,
+        context_middleware=case_compaction,
     )
     understanding_session = UnderstandingMaintenanceSession(
         artifacts,
         case_session,
+    )
+    understanding_compaction = ContinuationCompactionMiddleware(
+        summary_model=understanding_model,
+        profile=B2_COMPACTION_PROFILE.model_copy(update={
+            "main_output_reserve_tokens": understanding_max_output_tokens,
+        }),
     )
     understanding_workflow = UnderstandingMaintenanceWorkflow(
         reader,
@@ -80,6 +101,8 @@ def build_background_memory_workflow(
         checkpointer,
         max_model_steps=understanding_max_model_steps,
         max_tool_calls=understanding_max_tool_calls,
+        max_output_tokens=understanding_max_output_tokens,
+        context_middleware=understanding_compaction,
     )
     publication = PublicationStore(memory_engine, artifacts)
     return BackgroundMemoryWorkflow(

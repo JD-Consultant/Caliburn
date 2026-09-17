@@ -13,6 +13,7 @@ from sqlalchemy import event
 from sqlalchemy.pool import StaticPool
 
 from jd_relational.background_memory_app import build_background_memory_workflow
+from jd_relational.continuation_compaction import ContinuationCompactionMiddleware
 
 from test_chat_history import native  # noqa: F401
 from test_conversation_sources import service
@@ -42,6 +43,8 @@ def build(sources, document_id, store, saver, engine, case_model, understanding_
         memory_engine=engine,
         case_model=case_model,
         understanding_model=understanding_model,
+        case_max_output_tokens=8192,
+        understanding_max_output_tokens=8192,
         case_max_model_steps=12,
         case_max_tool_calls=12,
         case_max_chars=24000,
@@ -88,6 +91,32 @@ def test_build_binds_one_authority_per_document_without_io_or_model_calls(native
             second.config["configurable"]["thread_id"]
         assert first.case_workflow.config["configurable"]["thread_id"] != \
             second.case_workflow.config["configurable"]["thread_id"]
+        assert isinstance(
+            first.case_workflow.context_middleware,
+            ContinuationCompactionMiddleware,
+        )
+        assert first.case_workflow.context_middleware.summary_model is case_model
+        assert first.case_workflow.context_middleware.profile.protect_latest_human_turn is True
+        assert first.case_workflow.context_middleware.profile.preserve_initial_messages == 0
+        assert first.case_workflow.context_middleware.profile.main_output_reserve_tokens == 8192
+
+        assert isinstance(
+            first.understanding_workflow.context_middleware,
+            ContinuationCompactionMiddleware,
+        )
+        assert first.understanding_workflow.context_middleware.summary_model is understanding_model
+        assert (
+            first.understanding_workflow.context_middleware.profile.preserve_initial_messages
+            == 1
+        )
+        assert (
+            first.understanding_workflow.context_middleware.profile.protect_latest_human_turn
+            is False
+        )
+        assert (
+            first.understanding_workflow.context_middleware.profile.main_output_reserve_tokens
+            == 8192
+        )
         assert statements == [], "building must not set up or query database tables"
         assert case_model.requests == [] and understanding_model.requests == []
     finally:

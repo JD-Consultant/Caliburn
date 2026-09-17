@@ -10,7 +10,7 @@
 
 **Spec:** `docs/specs/2026-09-16-openrouter-continuation-compaction-design.md`
 
-**Execution status (2026-09-17):** Tasks 1–4 are committed as `3017dccd`, `8a7fb965`, `5064d315`, `0d0829d6`, `5ae63c0e`, and review tightening `792f20d9`. Task 5 is documentation-only: it records fresh offline regression evidence and commits the seven owned documents. Independent review, broad whole-branch review, and the local tag are controller responsibilities after this task; this worker does not run or mark them complete.
+**Execution status (2026-09-17):** Tasks 1–4 are committed as `3017dccd`, `8a7fb965`, `5064d315`, `0d0829d6`, `5ae63c0e`, and review tightening `792f20d9`. Task 5 records fresh offline regression evidence and commits the seven owned documents. The final-review Minor findings are closed in the dedicated test/document polish commit. The local tag remains controller-pending and is intentionally not created, merged, or pushed by this work.
 
 ## Global Constraints
 
@@ -49,7 +49,7 @@
 - Consumes: existing `CompactionProfile`, `select_safe_boundary()`, `build_request_view()`, and `ContinuationCompactionMiddleware`.
 - Produces: `B1_COMPACTION_PROFILE: CompactionProfile` with `preserve_initial_messages=0` and `protect_latest_human_turn=True`.
 
-- [ ] **Step 1: Write failing B1 role tests**
+- [x] **Step 1: Write failing B1 role tests**
 
   Import `B1_COMPACTION_PROFILE` and add these exact behavioral tests:
 
@@ -91,7 +91,7 @@
       assert messages[0].id == "window-1" and messages[2].content.endswith("第二段訪談")
   ```
 
-- [ ] **Step 2: Run the focused tests and verify RED**
+- [x] **Step 2: Run the focused tests and verify RED**
 
   From `experiments/jd-relational-app`:
 
@@ -101,7 +101,7 @@
 
   Expected: collection fails because `B1_COMPACTION_PROFILE` does not exist.
 
-- [ ] **Step 3: Add only the explicit B1 profile**
+- [x] **Step 3: Add only the explicit B1 profile**
 
   Add beside the existing A/B2 profiles:
 
@@ -114,7 +114,7 @@
 
   Do not change `select_safe_boundary()`, digest semantics, summary prompt, or A/B2 profiles unless the new tests reproduce a concrete defect.
 
-- [ ] **Step 4: Run the focused tests and verify GREEN**
+- [x] **Step 4: Run the focused tests and verify GREEN**
 
   Use the Step 2 command. Expected: all continuation-compaction tests pass.
 
@@ -133,7 +133,7 @@
 - Produces: a keyword-only `context_middleware: AgentMiddleware | None = None` parameter on both `CaseMaintenanceWorkflow` and `UnderstandingMaintenanceWorkflow`.
 - Produces state key: `continuation_compaction: dict[str, Any] | None`, owned by the injected middleware but carried by the outer package graph and Saver.
 
-- [ ] **Step 1: Write failing middleware-placement tests**
+- [x] **Step 1: Write failing middleware-placement tests**
 
   Add this test helper in each workflow test module:
 
@@ -183,7 +183,7 @@
   assert result["continuation_compaction"] is None
   ```
 
-- [ ] **Step 2: Run package workflow tests and verify RED**
+- [x] **Step 2: Run package workflow tests and verify RED**
 
   From `packages/consultant-memory`:
 
@@ -193,7 +193,7 @@
 
   Expected: constructor failures because neither workflow accepts `context_middleware`, and results do not carry the compaction state field.
 
-- [ ] **Step 3: Implement the narrow package seam**
+- [x] **Step 3: Implement the narrow package seam**
 
   Add to both state schemas:
 
@@ -218,11 +218,11 @@
 
   B2 uses the same shape with `UnderstandingMaintenanceResponseGuard()`. Initialize `continuation_compaction` to `None` for a fresh `run_attempt()` and `start()`. When legacy `start()` replaces a previous completed job on the same thread, clear it together with `RemoveMessage(REMOVE_ALL_MESSAGES)`. Do not clear it on `resume()` or on lookup of the same attempt.
 
-- [ ] **Step 4: Run package workflow tests and verify GREEN**
+- [x] **Step 4: Run package workflow tests and verify GREEN**
 
   Use the Step 2 command. Expected: both workflow suites pass, with existing no-middleware behavior unchanged.
 
-- [ ] **Step 5: Commit the package seam**
+- [x] **Step 5: Commit the package seam**
 
   ```powershell
   git add packages/consultant-memory/src/caliburn_memory/case_maintenance.py packages/consultant-memory/src/caliburn_memory/understanding_workflow.py packages/consultant-memory/tests/test_case_maintenance_workflow.py packages/consultant-memory/tests/test_understanding_workflow.py
@@ -242,7 +242,7 @@
 - Consumes: injected `case_model`, injected `understanding_model`, explicit `case_max_output_tokens`, and explicit `understanding_max_output_tokens`.
 - Produces: one `ContinuationCompactionMiddleware` per role, using `B1_COMPACTION_PROFILE` or `B2_COMPACTION_PROFILE` with the matching main-output reserve.
 
-- [ ] **Step 1: Write failing composition assertions**
+- [x] **Step 1: Write failing composition assertions**
 
   Extend the existing `build()` helper and factory calls with:
 
@@ -272,7 +272,7 @@
 
   Keep the existing assertions that construction performs no SQL and no model call.
 
-- [ ] **Step 2: Run the composition test and verify RED**
+- [x] **Step 2: Run the composition test and verify RED**
 
   From `experiments/jd-relational-app`:
 
@@ -282,7 +282,7 @@
 
   Expected: factory-signature and `context_middleware` assertion failures because the App does not yet construct these middlewares.
 
-- [ ] **Step 3: Implement App-owned role assembly**
+- [x] **Step 3: Implement App-owned role assembly**
 
   Import the shared middleware and profiles, require the two output-token values, and construct:
 
@@ -303,7 +303,7 @@
 
   Pass each middleware and its matching `max_output_tokens` into the corresponding package workflow. Do not bind tools to the summary model, clone a provider client, inspect credentials, or add fallback. Update the two known test/support callers with explicit `8192` values.
 
-- [ ] **Step 4: Run composition and adjacent assembly tests and verify GREEN**
+- [x] **Step 4: Run composition and adjacent assembly tests and verify GREEN**
 
   ```powershell
   .\.venv\Scripts\python.exe -m pytest tests\test_background_memory_app.py tests\test_layered_background_dispatch.py tests\test_background_host.py -q -p no:cacheprovider
@@ -311,7 +311,7 @@
 
   Expected: all selected tests pass; construction still has zero SQL setup and zero model calls.
 
-- [ ] **Step 5: Commit App assembly**
+- [x] **Step 5: Commit App assembly**
 
   ```powershell
   git add experiments/jd-relational-app/src/jd_relational/background_memory_app.py experiments/jd-relational-app/tests/test_background_memory_app.py experiments/jd-relational-app/tests/support/layered_background_support.py experiments/jd-relational-app/src/jd_relational/continuation_compaction.py experiments/jd-relational-app/tests/test_continuation_compaction.py
@@ -329,7 +329,7 @@
 - Consumes: Tasks 1–3, actual `CaseMaintenanceWorkflow`/`UnderstandingMaintenanceWorkflow`, `InMemorySaver`, canonical source readers, and one role-aware synthetic chat model used for both summary and main calls.
 - Produces: end-to-end evidence for B1 processed-window eligibility, canonical preservation, same-attempt recovery, and stale/new-attempt isolation.
 
-- [ ] **Step 1: Add a role-aware synthetic model**
+- [x] **Step 1: Add a role-aware synthetic model**
 
   Implement one `BaseChatModel` whose `_generate()` identifies a summary call only from `SUMMARY_SYSTEM_PROMPT`, records separate `summary_requests` and `main_requests`, and returns queued completed `AIMessage` values. Use the same model object as both the workflow model and middleware `summary_model`; this proves boundary reuse without a provider call.
 
@@ -357,7 +357,7 @@
           return ChatResult(generations=[ChatGeneration(message=replies.pop(0))])
   ```
 
-- [ ] **Step 2: Write the B1 multi-window contract test**
+- [x] **Step 2: Write the B1 multi-window contract test**
 
   Use the existing native conversation-source fixtures to create at least two safe interview exchanges and force source delivery into two windows. Inject a B1 profile copied with `trigger_input_tokens=1`, `keep_messages=1`, and a deterministic test token counter returning `100`.
 
@@ -379,7 +379,7 @@
 
   Add a separate single-window test with the same low trigger and multiple tool calls; assert `summary_requests == []`. The latest source message protects the whole current-window interaction, so this is a behavior assertion, not a token-count assumption.
 
-- [ ] **Step 3: Write the B2 attempt-lifecycle contract test**
+- [x] **Step 3: Write the B2 attempt-lifecycle contract test**
 
   Build one completed B1 stage with an in-memory bundle, then run B2 with a low-trigger `B2_COMPACTION_PROFILE`. Force one successful read tool wave, one later synthetic transport failure, and resume the same attempt.
 
@@ -396,15 +396,15 @@
 
   Run the identical completed B1 stage under a different `case_attempt_id`. Assert its first main request contains the complete task `HumanMessage`, contains no `continuation-summary:` message, and does not contain the first attempt's summary text. Do not inspect private provider payloads.
 
-- [ ] **Step 4: Run the new integration tests and verify RED, then GREEN after Tasks 1–3**
+- [x] **Step 4: Run the new integration tests and verify the expected GREEN after Tasks 1–3**
 
   ```powershell
   .\.venv\Scripts\python.exe -m pytest tests\test_background_agent_compaction.py -q -p no:cacheprovider
   ```
 
-  Before Tasks 1–3: expected constructor/state/assembly failures. After Tasks 1–3: expected all tests pass with zero network calls.
+  Observed: Tasks 1–3 were already present when Task 4 started, so the first valid integration run was GREEN rather than a synthetic RED. All tests passed with zero network calls.
 
-- [ ] **Step 5: Commit lifecycle evidence**
+- [x] **Step 5: Commit lifecycle evidence**
 
   ```powershell
   git add experiments/jd-relational-app/tests/test_background_agent_compaction.py

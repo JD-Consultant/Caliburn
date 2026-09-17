@@ -21,6 +21,7 @@ from test_conversation_sources import service
 
 class NoCallModel(BaseChatModel):
     requests: list = Field(default_factory=list)
+    configured_max_tokens: list[int] = Field(default_factory=list)
 
     @property
     def _llm_type(self):
@@ -28,6 +29,11 @@ class NoCallModel(BaseChatModel):
 
     def bind_tools(self, tools, **kwargs):
         return self
+
+    def model_copy(self, *, update=None, deep=False):
+        if update and "max_tokens" in update:
+            self.configured_max_tokens.append(update["max_tokens"])
+        return super().model_copy(update=update, deep=deep)
 
     def _generate(self, messages, stop=None, run_manager=None, **kwargs):
         self.requests.append(deepcopy(messages))
@@ -43,8 +49,8 @@ def build(sources, document_id, store, saver, engine, case_model, understanding_
         memory_engine=engine,
         case_model=case_model,
         understanding_model=understanding_model,
-        case_max_output_tokens=8192,
-        understanding_max_output_tokens=8192,
+        case_max_output_tokens=4097,
+        understanding_max_output_tokens=8191,
         case_max_model_steps=12,
         case_max_tool_calls=12,
         case_max_chars=24000,
@@ -98,7 +104,8 @@ def test_build_binds_one_authority_per_document_without_io_or_model_calls(native
         assert first.case_workflow.context_middleware.summary_model is case_model
         assert first.case_workflow.context_middleware.profile.protect_latest_human_turn is True
         assert first.case_workflow.context_middleware.profile.preserve_initial_messages == 0
-        assert first.case_workflow.context_middleware.profile.main_output_reserve_tokens == 8192
+        assert first.case_workflow.context_middleware.profile.main_output_reserve_tokens == 4097
+        assert case_model.configured_max_tokens == [4097, 4097]
 
         assert isinstance(
             first.understanding_workflow.context_middleware,
@@ -115,8 +122,9 @@ def test_build_binds_one_authority_per_document_without_io_or_model_calls(native
         )
         assert (
             first.understanding_workflow.context_middleware.profile.main_output_reserve_tokens
-            == 8192
+            == 8191
         )
+        assert understanding_model.configured_max_tokens == [8191, 8191]
         assert statements == [], "building must not set up or query database tables"
         assert case_model.requests == [] and understanding_model.requests == []
     finally:

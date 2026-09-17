@@ -620,7 +620,11 @@ def test_b2_restores_same_attempt_compaction_and_new_attempt_starts_clean(native
     )
     first_fresh_summary_request = model.summary_requests[fresh_summary_index]
     assert first_summary not in first_fresh_summary_request[-1].content
-    assert '"existing_summary":null' in first_fresh_summary_request[-1].content
+    _prompt, fresh_summary_json = first_fresh_summary_request[-1].content.split(
+        "\n", maxsplit=1,
+    )
+    fresh_summary_payload = json.loads(fresh_summary_json)
+    assert fresh_summary_payload["existing_summary"] is None
 
     base_case = built["artifacts"].case(built["version"], case_id)
     base_understanding = built["artifacts"].understanding(

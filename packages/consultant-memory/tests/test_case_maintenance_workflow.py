@@ -111,6 +111,14 @@ def _one_window(source, *, text="甲案原話：本人先做故障初判。", co
     return batch, window, context_reference
 
 
+def test_context_middleware_must_be_an_agent_middleware():
+    with pytest.raises(
+        ValueError,
+        match="^context_middleware must be an AgentMiddleware$",
+    ):
+        _workflow([], context_middleware=object())
+
+
 def test_context_middleware_receives_the_assembled_b1_request_and_initial_state():
     probe = RequestProbe()
     source, _session, _model, workflow = _workflow(

@@ -13,6 +13,7 @@ from langgraph.checkpoint.memory import InMemorySaver
 
 from jd_relational.continuation_compaction import (
     A_COMPACTION_PROFILE,
+    B1_COMPACTION_PROFILE,
     B2_COMPACTION_PROFILE,
     CompactionProfile,
     ContinuationCompaction,
@@ -81,6 +82,43 @@ def test_safe_boundary_never_splits_parallel_tools_or_latest_employee_input():
         shortened,
         CompactionProfile(trigger_input_tokens=1, keep_messages=2),
     ) == 2
+
+
+def test_b1_single_current_window_is_never_a_compaction_boundary():
+    messages = [
+        HumanMessage(id="window-1", content="尚在處理的完整訪談窗口"),
+        AIMessage(
+            id="b1-call",
+            content="讀取案例",
+            tool_calls=[{"name": "read_case", "args": {"id": "A"}, "id": "call-a"}],
+        ),
+        ToolMessage(id="b1-tool", name="read_case", tool_call_id="call-a", content="A result"),
+        AIMessage(id="b1-done", content="完成目前工具 wave"),
+    ]
+    profile = B1_COMPACTION_PROFILE.model_copy(update={"keep_messages": 1})
+    assert select_safe_boundary(messages, profile) is None
+
+
+def test_b1_previous_processed_window_becomes_compactable_only_after_next_window_arrives():
+    messages = [
+        HumanMessage(id="window-1", content="已完整處理的第一段訪談"),
+        AIMessage(id="window-1-done", content="第一段處理完成"),
+        HumanMessage(id="window-2", content="目前尚未完整處理的第二段訪談"),
+        AIMessage(id="window-2-work", content="正在處理第二段"),
+    ]
+    profile = B1_COMPACTION_PROFILE.model_copy(update={"keep_messages": 1})
+    boundary = select_safe_boundary(messages, profile)
+    assert boundary == 2
+    state = ContinuationCompaction(
+        format_version=1,
+        summary_text="第一段訪談與處理進度的非權威延續摘要。",
+        covered_through_message_id="window-1-done",
+        covered_prefix_digest=canonical_prefix_digest(messages[:boundary]),
+    )
+    view = build_request_view(messages, state, profile)
+    assert view[0].id.startswith("continuation-summary:")
+    assert [message.id for message in view[1:]] == ["window-2", "window-2-work"]
+    assert messages[0].id == "window-1" and messages[2].content.endswith("第二段訪談")
 
 
 def test_b2_keeps_initial_task_exact_but_can_compact_completed_tool_waves():

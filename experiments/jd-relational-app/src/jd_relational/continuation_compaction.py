@@ -82,6 +82,10 @@ class CompactionProfile(BaseModel):
 
 
 A_COMPACTION_PROFILE = CompactionProfile()
+B1_COMPACTION_PROFILE = CompactionProfile(
+    preserve_initial_messages=0,
+    protect_latest_human_turn=True,
+)
 B2_COMPACTION_PROFILE = CompactionProfile(
     preserve_initial_messages=1,
     protect_latest_human_turn=False,

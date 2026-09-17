@@ -24,9 +24,7 @@ from dataclasses import dataclass, replace
 
 import sqlalchemy as sa
 
-from caliburn_memory import PublicationStore
-from caliburn_memory.consolidation import ConsolidationWorkflow
-from caliburn_memory.extraction import ExtractionWorkflow
+from caliburn_memory import BackgroundMemoryWorkflow, PublicationStore
 
 from .storage.schema import jd_memory_admission
 
@@ -34,8 +32,8 @@ from .storage.schema import jd_memory_admission
 STATUSES = ("idle", "queued", "running", "blocked")
 # Every step the reconciliation below may ask for. There is no other outcome:
 # an unrecognised durable combination is reported, never guessed at.
-STEPS = ("wait", "resume_extraction", "start_batch", "consolidate",
-         "resume_consolidation", "next_batch", "settle_idle", "blocked")
+STEPS = ("wait", "resume_workflow", "start_workflow", "next_batch",
+         "settle_idle", "record_blocked", "blocked")
 
 
 class BackgroundAdmissionError(ValueError):
@@ -63,24 +61,56 @@ class Admission:
             raise BackgroundAdmissionError("invalid_recovery_count")
 
 
-def require_handed_over(extraction: ExtractionWorkflow, publication: PublicationStore) -> None:
-    """Admit a new batch only when the last one reached the published cursor.
+def _observed_workflow(workflow: BackgroundMemoryWorkflow,
+                       publication: PublicationStore):
+    """Read only the outer checkpoint fields the App is allowed to reconcile."""
+    try:
+        if workflow.publication is not publication:
+            raise BackgroundAdmissionError("invalid_admission_input")
+        snapshot = workflow.graph.get_state(workflow.config)
+    except BackgroundAdmissionError:
+        raise
+    except (AttributeError, TypeError, ValueError) as error:
+        raise BackgroundAdmissionError("invalid_admission_input") from error
+    values = snapshot.values
+    if not values:
+        if snapshot.next:
+            raise BackgroundAdmissionError("workflow_checkpoint_incompatible")
+        return snapshot, None
+    if type(values) is not dict:
+        raise BackgroundAdmissionError("workflow_checkpoint_incompatible")
+    source = values.get("source_reference")
+    status = values.get("status")
+    error_code = values.get("error_code")
+    if (type(source) is not str or not source
+            or status not in {"pending", "completed", "blocked"}
+            or (error_code is not None and type(error_code) is not str)
+            or status == "blocked" and not error_code):
+        raise BackgroundAdmissionError("workflow_checkpoint_incompatible")
+    if (status == "pending") != bool(snapshot.next):
+        raise BackgroundAdmissionError("workflow_checkpoint_incompatible")
+    return snapshot, values
 
-    An unfinished B1 job is continued rather than replaced, so it blocks first
-    and on its own terms. Otherwise the last range B1 accepted must be exactly
-    what publication now names as processed: anything else means a batch is
-    still in flight between the two stages.
-    """
-    if not isinstance(extraction, ExtractionWorkflow) or not isinstance(publication, PublicationStore):
-        raise BackgroundAdmissionError("invalid_admission_input")
-    snapshot = extraction.graph.get_state(extraction.config)
-    if snapshot.next:
-        raise BackgroundAdmissionError("extraction_pending")
-    previous = snapshot.values.get("source_reference") if snapshot.values else None
-    if previous is None:
+
+def require_handed_over(workflow: BackgroundMemoryWorkflow,
+                        publication: PublicationStore) -> None:
+    """Admit only after the preceding outer job reached publication."""
+    snapshot, state = _observed_workflow(workflow, publication)
+    if state is None:
         return
+    if snapshot.next or state["status"] == "pending":
+        raise BackgroundAdmissionError("workflow_pending")
+    if state["status"] == "blocked":
+        raise BackgroundAdmissionError("workflow_blocked")
     head = publication.current()
-    if head is None or head.processed_source != previous:
+    if head is None or head.processed_source is None:
+        raise BackgroundAdmissionError("handover_incomplete")
+    try:
+        progress = workflow.case_workflow.reader.source_progress(
+            state["source_reference"], head.processed_source)
+    except (AttributeError, TypeError, ValueError) as error:
+        raise BackgroundAdmissionError("handover_incomplete") from error
+    if progress != "covered":
         raise BackgroundAdmissionError("handover_incomplete")
 
 
@@ -115,7 +145,7 @@ class BackgroundAdmissions:
                 index_elements=[jd_memory_admission.c.document_id], set_=values))
 
     def admit(self, document_id: str, *, target_reference: str,
-              extraction: ExtractionWorkflow, publication: PublicationStore) -> Admission:
+              workflow: BackgroundMemoryWorkflow, publication: PublicationStore) -> Admission:
         """Fix a target for work that is genuinely free to start.
 
         The recovery allowance resets here because this establishes new work,
@@ -129,7 +159,7 @@ class BackgroundAdmissions:
             # row and finishes; nothing here deletes state or resets an
             # allowance, so restoring the document resumes the same work.
             raise BackgroundAdmissionError("document_archived")
-        require_handed_over(extraction, publication)
+        require_handed_over(workflow, publication)
         admitted = replace(current, status="queued", target_reference=target_reference,
                            source_reference=None, error_code=None, recovery_count=0)
         self.save(admitted)
@@ -177,8 +207,8 @@ class BackgroundAdmissions:
         return counted
 
 
-def reconcile(admission: Admission, *, extraction: ExtractionWorkflow,
-              consolidation: ConsolidationWorkflow, publication: PublicationStore,
+def reconcile(admission: Admission, *, workflow: BackgroundMemoryWorkflow,
+              publication: PublicationStore,
               windows, document_id: str) -> str:
     """What this document owes now, read from every durable owner, in order.
 
@@ -190,23 +220,45 @@ def reconcile(admission: Admission, *, extraction: ExtractionWorkflow,
     """
     if admission.status == "blocked":
         return "blocked"
-    if extraction.graph.get_state(extraction.config).next:
-        return "resume_extraction"
-    if consolidation.graph.get_state(consolidation.config).next:
-        return "resume_consolidation"
+    snapshot, state = _observed_workflow(workflow, publication)
+    batch = admission.source_reference
+    if snapshot.next:
+        if (state is None or state["status"] != "pending"
+                or admission.status != "running"
+                or batch is None
+                or state["source_reference"] != batch):
+            raise BackgroundAdmissionError("workflow_source_mismatch")
+        return "resume_workflow"
     if admission.target_reference is None:
+        if state is not None and state["status"] == "pending":
+            raise BackgroundAdmissionError("workflow_checkpoint_incompatible")
         return "wait"
+    if batch is None:
+        return "next_batch"
+
     head = publication.current()
     published = head.processed_source if head is not None else None
-    batch = admission.source_reference
-    if batch is not None and published != batch:
-        extracted = extraction.graph.get_state(extraction.config).values
-        # B1 having finished this exact batch is what makes the handover owed;
-        # a recorded batch B1 never ran is simply still to be started.
-        return ("consolidate" if extracted and extracted.get("source_reference") == batch
-                else "start_batch")
-    # Everything dispatched so far is published, so the target's own remaining
-    # range decides. The source owner is the authority on coverage.
-    remaining = windows.plan_saved_batch(admission.target_reference, document_id,
-                                         after_reference=published)
-    return "next_batch" if remaining["source_reference"] is not None else "settle_idle"
+    if published is not None:
+        try:
+            progress = windows.source_progress(batch, published, document_id)
+        except (AttributeError, TypeError, ValueError) as error:
+            raise BackgroundAdmissionError("workflow_publication_mismatch") from error
+        if progress == "covered":
+            remaining = windows.plan_saved_batch(
+                admission.target_reference, document_id, after_reference=published)
+            return ("next_batch" if remaining["source_reference"] is not None
+                    else "settle_idle")
+        if progress != "next":
+            raise BackgroundAdmissionError("workflow_publication_mismatch")
+
+    if state is None:
+        return "start_workflow"
+    if state["source_reference"] == batch:
+        if state["status"] == "blocked":
+            return "record_blocked"
+        if state["status"] == "completed":
+            raise BackgroundAdmissionError("workflow_publication_missing")
+        raise BackgroundAdmissionError("workflow_checkpoint_incompatible")
+    if state["status"] == "completed" and published is not None:
+        return "start_workflow"
+    raise BackgroundAdmissionError("workflow_source_mismatch")

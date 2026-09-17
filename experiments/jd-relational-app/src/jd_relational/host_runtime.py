@@ -34,6 +34,7 @@ class ManualHost:
     lease: HostLease
     engine: sa.Engine
     saver_connection: Connection
+    saver: PostgresSaver
     graph: CompiledStateGraph
     checkpoints: DocumentCheckpoints
     runtime: ManualRuntime
@@ -102,7 +103,7 @@ def open_manual_host(instance_key: str, database_url: str, *, checkpoint_schema:
         graph = build_document_graph(consultant, saver, store=store)
         checkpoints = DocumentCheckpoints(graph)
         owner = ManualRuntime(checkpoints, lambda authority: JdStorage(engine, authority), previous_host=lease)
-        return ManualHost(lease, engine, connection, graph, checkpoints, owner,
+        return ManualHost(lease, engine, connection, saver, graph, checkpoints, owner,
                           store_connection, store, memory_engine)
     except Exception:
         for cleanup in (store_connection.close if store_connection is not None else None,

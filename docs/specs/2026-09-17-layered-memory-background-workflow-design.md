@@ -4,7 +4,7 @@
 
 **Stage：**G7 分段施工
 
-**Status：**package G7 切片與後續 App A 分層讀取接點已完成；dispatcher／真 PG 新程序旅程待接
+**Status：**package workflow、App A 分層讀取、App dispatcher／正式資源組裝與真 PG 新程序恢復均已完成窄切片；provider／compaction／C／完整 App 待接
 **Date：**2026-09-17
 
 ## 1. 目標與既有決策
@@ -29,7 +29,7 @@ Runtime 組裝完整 candidate bundle
 
 **2026-09-17 實作結果：**`caliburn_memory.background_workflow.BackgroundMemoryWorkflow` 已在 package 內完成 deterministic `load base → B1 → B2 → complete bundle → prepare → publish` graph。它沿用兩個既有 Agent graph，不新增第三個模型；source relation、attempt／operation ID、review 轉換、版本與發布都由 Runtime 管理。離線固定模型加 real `MemoryArtifacts`／SQLite `PublicationStore` 已覆蓋 changed、no-op、父層 resume、有界 rework、stale 重做／涵蓋短路／上限、非法來源拒絕及同 request receipt 恢復。
 
-這個 workflow 結果只完成 package workflow 與契約驗證。後續 App 切片已讓 A 在每回合固定一個 publication，從兩層 guide 起步並按需讀取案例、理解及其已驗證回查入口；它沒有改本 workflow 的排程或發布責任。App 仍未組裝 dispatcher、正式 PostgresSaver／PostgresStore／publication 的新分層程序旅程，也未接 C bundle repair、B1 compaction、provider 或自然模型驗收；因此不能稱為 production dispatcher 或完整 App 已完成。
+這個 workflow 的 package 結果已由後續 App 窄切片接到既有通知准入、process-owned PostgresSaver／PostgresStore／publication engine，並完成真 PostgreSQL 與全新 Windows process 的合成恢復旅程。A 另在每回合固定一個 publication，從兩層 guide 起步並按需讀取案例、理解及其已驗證回查入口；兩個 App 切片都沒有改本 workflow 的 B1／B2 語意與發布責任。正式 OpenRouter／Luna role model factory、B1／B2 request-only compaction、layered C bundle repair、managed App callback／document-scoped 組裝入口與自然模型／完整 App 驗收仍未接，因此不能稱 production authority 或完整 App 已完成，也不預設需要另一個 registry authority。
 
 ## 2. 設計依據與本案映射
 
@@ -249,11 +249,13 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 16. 訪談使用代名詞、簡答或依賴前一個 AI 問題時，案例的回合證據集合包含足以理解主體與回答的相關完整回合；不保存文字 offset，也不把 context-only token 冒充 evidence。
 17. 多筆來源即使以反向 evidence key 順序送入，Runtime 仍依 source owner 證明的 canonical order 保存；checkpoint resume 後 key→reference 不漂移，B1／B2 分頁讀回後前後關係不變，模型不控制 offset，context 也不含用來猜順序的時間戳。
 
-離線測試以固定模型回應證明控制流與資料邊界；不以 mock 證明自然模型品質。真 PostgreSQL／新程序完整旅程留給 App 接線切片，但既有 publication 真 PG CAS／receipt 證據直接沿用，不重做無關考卷。
+離線測試以固定模型回應證明控制流與資料邊界；不以 mock 證明自然模型品質。後續 App 接線切片已在隔離 PG18.6 上補驗同一 layered workflow 的 dispatcher、Saver／Store／publication／admission 與全新 Windows process 恢復；既有 publication CAS／receipt 證據沿用，未重做無關考卷。
 
-**本次 G7 自審結論：**第 1～8、10、13～15 項的 package 控制流已有本 workflow 或相鄰 attempt／publication 測試；第 9 項沿用 bundle／publication 的失敗即零發布反例；第 11、12、16、17 項沿用同輪完成的 evidence registry、B1/B2 工具及 App source owner 測試。這些是離線契約證據，不包含自然模型品質。真 PostgreSQL、新程序資源重建與完整 App 旅程仍未執行，留在下一個 App 接線 gate，不標示通過。
+**本次 G7 自審結論：**第 1～8、10、13～15 項的 package 控制流已有本 workflow 或相鄰 attempt／publication 測試；第 9 項沿用 bundle／publication 的失敗即零發布反例；第 11、12、16、17 項沿用同輪完成的 evidence registry、B1/B2 工具及 App source owner 測試。App successor 另以固定合成模型完成一通知→一 bundle publication、B1 完成／B2 transport failure、publication commit reply loss、admission 固定 target，以及兩種全新程序恢復。獨立審查後再補同 instance 並行 wake 單一提交、workflow status／pending node 一致性 fail-closed，以及新程序在 settle 前核對原 target；受影響離線與真 PG／新程序回歸均通過。這些仍是控制流與持久化證據，不包含自然模型品質、provider wire 或完整 App 使用旅程。
 
 ## 9. 明確不做
+
+以下是原 package workflow 切片的邊界；後續 App successor 已接 dispatcher 與通知准入，但沒有擴張其餘項目：
 
 - 不接 dispatcher、通知准入或自動尋找訪談範圍。
 - 不做 C bundle repair。
@@ -271,6 +273,8 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 - [Anthropic：Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)，查閱 2026-09-17
 - [LangGraph：Functional API / durable execution](https://docs.langchain.com/oss/python/langgraph/functional-api)，查閱 2026-09-17；本案固定 `langgraph==1.2.11`
 - [LangGraph：Fault tolerance](https://docs.langchain.com/oss/python/langgraph/fault-tolerance)，查閱 2026-09-17；只採本案固定版本實際存在的能力
+- [LangGraph：Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)，查閱 2026-09-17；checkpointer 保存 thread-scoped graph state，Store 保存跨 thread 資料，本案以實際鎖定版再驗
+- [Psycopg 3：Concurrent operations](https://www.psycopg.org/psycopg3/docs/advanced/async.html)，查閱 2026-09-17；同 connection 的 DB 操作會序列化，本切片沿既有單一 background worker 與分離 Saver／Store connections，不先增加 pool
 - [AWS：Optimistic locking with version number](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/BestPractices_OptimisticLocking.html)，查閱 2026-09-17
 - [OpenAI：Model guidance / agent orchestration](https://developers.openai.com/api/docs/guides/latest-model)，查閱 2026-09-17；只採工具／重試責任原則，不改目前 Luna provider 決策
 - [OpenAI Responses：List input items](https://developers.openai.com/api/reference/resources/responses/subresources/input_items/methods/list)，查閱 2026-09-17；items 的身分、游標與 asc／desc 順序分開，本案只採「順序由 owner 明示、不可由 ID 猜測」原則
@@ -281,5 +285,5 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 
 - **Decision：**新增 deterministic `BackgroundMemoryWorkflow` 串接既有 B1、B2、bundle 與 publication；B2 review 只作 Runtime 診斷，新 B1 必須重讀原話；最多返工一次。
 - **Why：**避免 B1／B2 各自發布或 App 重做語意不變量，同時保留精確恢復、stale 重整與一次原子 publication。
-- **Implemented：**package 已完成 source progress 接點、B1／B2 durable attempt、B1 Runtime review、outer graph、完整 bundle 組裝、同步 request checkpoint、CAS／receipt、covered／stale／bounded retry 與 blocked 終局；未修改 provider、Prompt 方法、JD 或 production 入口。
-- **Next gate：**把既有 App source owner、Saver／Store、publication resource 與通知准入組裝到這個 workflow，完成真 PostgreSQL／新程序恢復旅程；A 分層 read path 已完成，不在 dispatcher 施工中重做。其後才接 C bundle repair、B1 request-only compaction 與完整 App 驗收。
+- **Implemented：**package 已完成 source progress 接點、B1／B2 durable attempt、B1 Runtime review、outer graph、完整 bundle 組裝、同步 request checkpoint、CAS／receipt、covered／stale／bounded retry 與 blocked 終局；App successor 已把既有 source owner、admission、Saver／Store 與 publication 組裝到單一外層 workflow，並完成真 PostgreSQL／新程序恢復。未修改 provider、Prompt 方法、JD 或 production 入口。
+- **Next gate：**分開補 B1 與 B2 request-only compaction、正式 OpenRouter／Luna role model factory，再把 document-scoped dispatcher 接到 managed App callback；其後仍有 layered C bundle repair、自然模型與完整 App 驗收。A 分層 read path 已完成，不重做 Memory 分層、引用或 publication。

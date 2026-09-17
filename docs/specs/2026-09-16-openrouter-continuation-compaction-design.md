@@ -2,11 +2,11 @@
 
 - 日期：2026-09-16
 - Topic：`JD-R002／CTX-C001`
-- Stage：**G7 分段施工；基礎元件與正式 A 接線完成，B2 尚未開始**
+- Stage：**G7 分段施工；基礎元件與正式 A 接線完成，B1／B2 背景 Agent 接線均未開始**
 - 取代：2026-09-15「等待 OpenRouter、改 direct OpenAI、另選長上下文策略」三選一的未決狀態
 - 不取代：Q019 顧問 Prompt、Skills、JD relational writer、publication CAS、背景通知與准入規則；Memory 的最新 B1／B2／C 產品語意改由 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 持有
 
-> **2026-09-16 MEM-L001 影響：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 現已將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。B1 的具體 state／門檻與測試留給 MEM-L001 的 G4 設計補齊，不從本稿舊範圍推論已完成，也不因此重開 OpenRouter transport 選擇。
+> **2026-09-17 MEM-L001 影響：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 現已將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。layered dispatcher／真 PG 恢復已完成，但沒有替 B1 或 B2 注入 middleware；兩個背景 Agent 的具體 state、固定任務原文、門檻與 stale 新 attempt 測試都仍未完成，不從 dispatcher 通過推論 compaction 已完成，也不因此重開 OpenRouter transport 選擇。
 
 > **2026-09-16 CTX-W001 邊界：**主顧問在尚無 Memory、尚未觸發 compaction 或一次無法問完時所需的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)另行承接。它與 continuity summary 都是非權威衍生狀態，但責任不同；summary 不可成為 Working State 的唯一 owner，Working State 也不取代長對話 compaction。
 
@@ -153,11 +153,11 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 
 ## 9. G7 最小施工與驗收
 
-施工分成可獨立複核的小步；目前 1–2 與 4 的 A 範圍已完成，3 尚未開始：
+施工分成可獨立複核的小步；目前 1–2 與 4 的 A 範圍已完成，背景 Agent 接線尚未開始：
 
 1. 新增 typed compaction state、公開 middleware 與 profile 設定；不加 dependency／table／migration。
 2. 正式 A 注入新 middleware；以鎖定 LangChain 的真實組裝測試證明 `jd_model_view` 與 `continuation_compaction` 同時保存，不預設修改 `JdNoticeMiddleware`。
-3. B2 改用同一 OpenRouter model boundary＋attempt-scoped middleware，移除其 production direct Responses／native `context_management` 依賴；保留舊 adapter 契約測試作歷史證據。
+3. B1／B2 各自使用同一 OpenRouter model boundary 與 role-scoped／attempt-scoped middleware；B1 的固定 canonical batch 永不被 summary 取代，B2 的固定任務原文與 stale 新 attempt 邊界保持本稿規則。移除背景正式路徑對 direct Responses／native `context_management` 的依賴；保留舊 adapter 契約測試作歷史證據。
 4. 只跑受影響回歸；離線通過後再依既有費用授權規則提出一條有界自然 smoke，不在文件施工中讀 key 或呼叫 provider。
 
 最少固定反例：
@@ -175,7 +175,7 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 - summary 不是 source／Memory／JD basis，B1 固定窗口不受影響；
 - 完整 request 預算、輸出上限、OpenAI-only／no-fallback 與 usage receipt 均可觀察。
 
-完成本切片只代表 A／B2 的 App-side compaction 接線與離線契約通過；不等於完整 App dispatcher、自然長訪談品質或 production authority 已驗收。
+完成本切片只代表 A／B1／B2 的 App-side compaction 接線與離線契約通過；dispatcher 已由另一 successor 驗證，但仍不等於自然長訪談品質、managed App 完整旅程或 production authority 已驗收。
 
 ## 10. 官方交叉核對與本案選擇
 

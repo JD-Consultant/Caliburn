@@ -27,8 +27,11 @@ from test_manual_runtime import Checkpoints, Storage  # noqa: F401
 from test_storage_postgres import engine  # noqa: F401
 
 
-pytestmark = pytest.mark.skipif(os.environ.get("JD_RELATIONAL_TEST_DB") != "1",
-    reason="explicit isolated PostgreSQL test opt-in required")
+pytestmark = [
+    pytest.mark.skipif(os.environ.get("JD_RELATIONAL_TEST_DB") != "1",
+                       reason="explicit isolated PostgreSQL test opt-in required"),
+    pytest.mark.skip(reason="historical two-stage contract; superseded by layered background tests"),
+]
 
 
 def requested(native, index):

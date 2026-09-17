@@ -116,6 +116,7 @@ def test_native_bootstrap_precedes_resources_and_open_is_not_write_readiness(res
     events, _ = resources
     opened = host.open_manual_host(str(uuid4()), URL, checkpoint_schema="jd_runtime", consultant=child())
     assert opened.store_connection is not opened.saver_connection
+    assert opened.saver is opened.graph.checkpointer
     assert opened.graph.store is opened.store
     assert opened.memory_engine.pool is opened.engine.pool
     assert not opened.runtime.ready

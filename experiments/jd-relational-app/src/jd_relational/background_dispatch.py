@@ -11,6 +11,8 @@ fallback of the verified dispatcher is deliberately not enabled here: the
 employee's own notification is what decides when background work starts.
 """
 
+from threading import Lock
+
 from .background_admission import BackgroundAdmissionError, reconcile
 from .conversation_sources import (
     MAX_CONTEXT_CHARACTERS, MAX_PLANNED_WINDOWS, MAX_WINDOW_CHARACTERS,
@@ -20,17 +22,18 @@ from .conversation_sources import (
 class BackgroundDispatcher:
     """One document's background decisions, over resources the App assembled."""
 
-    def __init__(self, owner, admissions, windows, document_id, *, extraction, consolidation,
+    def __init__(self, owner, admissions, windows, document_id, *, workflow,
                  publication, max_windows: int = MAX_PLANNED_WINDOWS,
                  max_chars: int = MAX_WINDOW_CHARACTERS,
                  context_chars: int = MAX_CONTEXT_CHARACTERS):
         self._owner, self._admissions, self._windows = owner, admissions, windows
         self._document_id = document_id
-        self._extraction, self._consolidation = extraction, consolidation
+        self._workflow = workflow
         self._publication = publication
         self._max_windows, self._max_chars = max_windows, max_chars
         self._context_chars = context_chars
         self._running = None
+        self._wake_lock = Lock()
 
     def wake(self) -> str:
         """Decide, admit at most one bounded batch, and say what was decided.
@@ -39,19 +42,20 @@ class BackgroundDispatcher:
         that this document is busy. Waking on blocked work does not override
         the block, and waking with nothing asked for does not start anything.
         """
-        if self._running is not None and not self._running.done():
-            return "busy"
-        step = reconcile(self._admissions.read(self._document_id),
-                         extraction=self._extraction, consolidation=self._consolidation,
-                         publication=self._publication, windows=self._windows,
-                         document_id=self._document_id)
-        if step == "wait":
-            step = self._admit_new_target()
-        if step in {"wait", "blocked"}:
+        with self._wake_lock:
+            if self._running is not None and not self._running.done():
+                return "busy"
+            step = reconcile(self._admissions.read(self._document_id),
+                             workflow=self._workflow,
+                             publication=self._publication, windows=self._windows,
+                             document_id=self._document_id)
+            if step == "wait":
+                step = self._admit_new_target()
+            if step in {"wait", "blocked"}:
+                return step
+            self._running = self._owner.admit_background(
+                self._document_id, lambda: self._perform(step))
             return step
-        self._running = self._owner.admit_background(
-            self._document_id, lambda: self._perform(step))
-        return step
 
     def _cursor(self):
         head = self._publication.current()
@@ -67,7 +71,7 @@ class BackgroundDispatcher:
             return "wait"
         target = self._windows.capture_window(self._document_id, **bounds)
         self._admissions.admit(self._document_id, target_reference=target,
-                               extraction=self._extraction, publication=self._publication)
+                               workflow=self._workflow, publication=self._publication)
         return "next_batch"
 
     def _plan(self, target_reference):
@@ -77,20 +81,17 @@ class BackgroundDispatcher:
             max_windows=self._max_windows)
 
     def _perform(self, step):
-        if step == "resume_extraction":
-            return self._extraction.resume()
-        if step == "resume_consolidation":
-            return self._after_publication(self._consolidation.resume())
-        if step == "consolidate":
-            return self._after_publication(self._consolidation.start())
-        if step == "start_batch":
-            # The batch was committed before B1 was invoked and B1 never ran it.
-            return self._extraction.start(
-                self._admissions.read(self._document_id).source_reference)
+        if step == "resume_workflow":
+            return self._after_workflow(self._workflow.resume())
+        if step == "start_workflow":
+            source = self._admissions.read(self._document_id).source_reference
+            return self._after_workflow(self._workflow.start(source))
         if step == "next_batch":
             return self._next_batch()
         if step == "settle_idle":
             return self._admissions.settle(self._document_id)
+        if step == "record_blocked":
+            return self._record_blocked()
         raise BackgroundAdmissionError("unknown_background_step")
 
     def _next_batch(self):
@@ -100,19 +101,46 @@ class BackgroundDispatcher:
         if batch["source_reference"] is None:
             return self._admissions.settle(self._document_id)
         self._admissions.dispatch(self._document_id, source_reference=batch["source_reference"])
-        return self._extraction.start(batch["source_reference"])
+        return self._after_workflow(self._workflow.start(batch["source_reference"]))
 
-    def _after_publication(self, result):
+    def _record_blocked(self):
+        state = self._workflow.graph.get_state(self._workflow.config).values
+        admission = self._admissions.read(self._document_id)
+        if (not state or state.get("status") != "blocked"
+                or state.get("source_reference") != admission.source_reference
+                or not state.get("error_code")):
+            raise BackgroundAdmissionError("workflow_checkpoint_incompatible")
+        return self._admissions.block(
+            self._document_id, error_code=state["error_code"])
+
+    def _after_workflow(self, result):
         """Move admission on only from a publication that really happened.
 
-        A consolidation that did not reach the head leaves the row exactly
-        where it was, so the next wake sees the same work still owed rather
-        than a target that quietly advanced.
+        A pending or failed workflow leaves the row exactly where it was, so
+        the next wake resumes the same outer checkpoint. A bounded terminal
+        block is copied to admission only after the outer graph records it.
         """
+        if type(result) is not dict:
+            raise BackgroundAdmissionError("workflow_result_incompatible")
+        if result.get("status") == "blocked":
+            error_code = result.get("error_code")
+            if not error_code:
+                raise BackgroundAdmissionError("workflow_result_incompatible")
+            self._admissions.block(self._document_id, error_code=error_code)
+            return result
+        if result.get("status") != "completed":
+            return result
         admission = self._admissions.read(self._document_id)
         cursor = self._cursor()
-        if cursor is None or cursor != admission.source_reference:
-            return result
+        if cursor is None or admission.source_reference is None:
+            raise BackgroundAdmissionError("workflow_publication_missing")
+        try:
+            progress = self._windows.source_progress(
+                admission.source_reference, cursor, self._document_id)
+        except (AttributeError, TypeError, ValueError) as error:
+            raise BackgroundAdmissionError("workflow_publication_mismatch") from error
+        if progress != "covered":
+            raise BackgroundAdmissionError("workflow_publication_missing")
         if self._plan(admission.target_reference)["source_reference"] is None:
             self._admissions.settle(self._document_id)
         else:

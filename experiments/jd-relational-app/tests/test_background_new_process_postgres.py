@@ -30,6 +30,7 @@ pytestmark = [
     pytest.mark.skipif(os.environ.get("JD_RELATIONAL_TEST_DB") != "1",
                        reason="explicit isolated PostgreSQL test opt-in required"),
     pytest.mark.skipif(sys.platform != "win32", reason="new Windows process evidence"),
+    pytest.mark.skip(reason="historical two-stage contract; superseded by layered recovery tests"),
 ]
 
 

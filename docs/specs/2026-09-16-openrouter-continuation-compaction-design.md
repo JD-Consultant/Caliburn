@@ -8,6 +8,8 @@
 
 > **2026-09-17 MEM-L001 影響與 successor 結果：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 後續將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。App 現已把 B1／B2 各自的 middleware 從 exact injected role model 與明示 output reserve 組裝進 package workflow；B1 多窗口只壓縮已處理舊窗口，B2 固定任務、同 attempt resume 與新 attempt 清空均有離線 lifecycle 證據。後續[正式 OpenRouter／Luna 角色模型工廠](2026-09-17-openrouter-role-model-factory.md)也已離線完成；provider 自然模型、managed callback 與完整 App 仍未完成，且沒有重開 OpenRouter transport 選擇。
 
+> **2026-09-17 正式背景限制 successor：**A 維持既有 8,192 主輸出、2,048 summary、90 秒及原步數／工具限制。B1／B2 由 App 正式 profile 提高到 32,768 主輸出、8,192 summary、300 秒；trigger 仍為實際組裝 request view 的 16,000 input tokens，保留最近 8 個安全訊息／完整工具 wave。提高輸出預留只改背景角色可用容量，不讓 compaction 壓縮 runtime context、未處理訪談、canonical source、引用或 Memory；也沒有新增隱藏重送。精確值與理由由[角色模型工廠](2026-09-17-openrouter-role-model-factory.md)持有，本稿不再保存第二份設定權威。
+
 > **2026-09-16 CTX-W001 邊界：**主顧問在尚無 Memory、尚未觸發 compaction 或一次無法問完時所需的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)另行承接。它與 continuity summary 都是非權威衍生狀態，但責任不同；summary 不可成為 Working State 的唯一 owner，Working State 也不取代長對話 compaction。
 
 > **2026-09-16 G7 第一小步結果：**已新增尚未接入正式 A／B2 的共用 typed state、role profile、安全工具 wave 切點、canonical prefix digest、增量 summary prompt、request-only view 與同步 middleware。鎖定 LangChain 的真實 `create_agent`／Saver 離線反例共 12 項通過，涵蓋 canonical 不變、B2 固定任務、跨 graph 重建恢復、依實際 view 判斷、主模型失敗或截斷不發布、取消與截斷摘要拒絕。這只是基礎接點，不代表 A 與 B2 已改線、OpenRouter 自然 smoke 通過或 H4 完成；下一步才是 A 的真實 middleware 組合與 Command 累積反例。

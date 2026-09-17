@@ -65,7 +65,7 @@ def test_every_role_uses_the_verified_luna_route_without_fallback_or_hidden_retr
             model.invoke("合成輸入")
 
     assert len(requests) == 3
-    for request in requests:
+    for request, expected_max_tokens in zip(requests, (8192, 32768, 32768), strict=True):
         payload = json.loads(request.content)
         assert payload["model"] == "openai/gpt-5.6-luna"
         assert payload["provider"] == {
@@ -75,12 +75,15 @@ def test_every_role_uses_the_verified_luna_route_without_fallback_or_hidden_retr
             "require_parameters": True,
         }
         assert payload["reasoning"] == {"effort": "high"}
-        assert payload["max_tokens"] == 8192
+        assert payload["max_tokens"] == expected_max_tokens
         assert payload["parallel_tool_calls"] is False
 
     assert [model.max_retries for model in (
         roles.consultant, roles.case, roles.understanding,
     )] == [0, 0, 0]
+    assert [model.request_timeout for model in (
+        roles.consultant, roles.case, roles.understanding,
+    )] == [90_000, 300_000, 300_000]
 
 
 @pytest.mark.parametrize("api_key", ["", "   "])

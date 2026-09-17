@@ -112,6 +112,7 @@ class Windows:
     def __init__(self, batches=(), *, notified=False):
         self.batches = tuple(batches)
         self.notified = notified
+        self.plans = []
 
     def pending_windows(self, document_id, cursor):
         return self.notified and bool(self.batches)
@@ -131,7 +132,8 @@ class Windows:
         return "next"
 
     def plan_saved_batch(self, target_reference, document_id, *, after_reference=None,
-                         **_budgets):
+                         **budgets):
+        self.plans.append(budgets)
         if after_reference is None:
             index = 0
         else:
@@ -204,6 +206,23 @@ def dispatcher(*, batches=(), notified=False, workflow=None, worker=None,
         max_windows=2,
     )
     return built, worker, admissions, windows, workflow, publication
+
+
+def test_dispatcher_uses_the_reviewed_b1_source_budgets_by_default():
+    publication = Publication()
+    windows = Windows(("batch-1",), notified=True)
+    built = BackgroundDispatcher(
+        DirectWorker(), Admissions(), windows, "document",
+        workflow=Workflow(publication), publication=publication,
+    )
+
+    built._plan("target")
+
+    assert windows.plans == [{
+        "max_chars": 24000,
+        "context_chars": 6000,
+        "max_windows": 16,
+    }]
 
 
 def test_a_wake_without_a_saved_request_starts_nothing():

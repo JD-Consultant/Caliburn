@@ -14,18 +14,17 @@ employee's own notification is what decides when background work starts.
 from threading import Lock
 
 from .background_admission import BackgroundAdmissionError, reconcile
-from .conversation_sources import (
-    MAX_CONTEXT_CHARACTERS, MAX_PLANNED_WINDOWS, MAX_WINDOW_CHARACTERS,
-)
+from .background_memory_limits import FORMAL_BACKGROUND_MEMORY_LIMITS
 
 
 class BackgroundDispatcher:
     """One document's background decisions, over resources the App assembled."""
 
     def __init__(self, owner, admissions, windows, document_id, *, workflow,
-                 publication, max_windows: int = MAX_PLANNED_WINDOWS,
-                 max_chars: int = MAX_WINDOW_CHARACTERS,
-                 context_chars: int = MAX_CONTEXT_CHARACTERS):
+                 publication,
+                 max_windows: int = FORMAL_BACKGROUND_MEMORY_LIMITS.case_max_windows,
+                 max_chars: int = FORMAL_BACKGROUND_MEMORY_LIMITS.case_max_chars,
+                 context_chars: int = FORMAL_BACKGROUND_MEMORY_LIMITS.case_context_chars):
         self._owner, self._admissions, self._windows = owner, admissions, windows
         self._document_id = document_id
         self._workflow = workflow

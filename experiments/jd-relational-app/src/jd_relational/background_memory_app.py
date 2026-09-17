@@ -18,6 +18,10 @@ from caliburn_memory import (
 )
 from langgraph.checkpoint.base import BaseCheckpointSaver
 
+from .background_memory_limits import (
+    FORMAL_BACKGROUND_MEMORY_LIMITS,
+    BackgroundMemoryLimits,
+)
 from .conversation_sources import ConversationSourceService
 from .continuation_compaction import (
     B1_COMPACTION_PROFILE,
@@ -37,22 +41,13 @@ def build_background_memory_workflow(
     memory_engine,
     case_model: Any,
     understanding_model: Any,
-    case_max_output_tokens: int,
-    understanding_max_output_tokens: int,
-    case_max_model_steps: int,
-    case_max_tool_calls: int,
-    case_max_chars: int,
-    case_context_chars: int,
-    case_max_windows: int,
-    understanding_max_model_steps: int,
-    understanding_max_tool_calls: int,
-    max_stale_retries: int,
+    limits: BackgroundMemoryLimits = FORMAL_BACKGROUND_MEMORY_LIMITS,
 ) -> BackgroundMemoryWorkflow:
     """Bind one document without choosing a provider or opening resources.
 
-    The limits are deliberately explicit. Current decisions have not adopted
-    the old extraction role's numbers as the formal B1/B2 product profile, so
-    this boundary must not silently turn package test defaults into policy.
+    The App-owned profile is explicit at this boundary so package test defaults
+    cannot silently become product policy. Tests may inject a complete profile;
+    production callers use the reviewed formal profile.
     """
     reader = ExtractionSourceAdapter(service, document_id)
     artifacts = MemoryArtifacts(
@@ -68,7 +63,10 @@ def build_background_memory_workflow(
     case_compaction = ContinuationCompactionMiddleware(
         summary_model=case_model,
         profile=B1_COMPACTION_PROFILE.model_copy(update={
-            "main_output_reserve_tokens": case_max_output_tokens,
+            "trigger_input_tokens": limits.compaction_trigger_input_tokens,
+            "keep_messages": limits.compaction_keep_messages,
+            "main_output_reserve_tokens": limits.case_max_output_tokens,
+            "summary_max_output_tokens": limits.case_summary_max_output_tokens,
         }),
     )
     case_workflow = CaseMaintenanceWorkflow(
@@ -76,12 +74,13 @@ def build_background_memory_workflow(
         case_session,
         case_model,
         checkpointer,
-        max_model_steps=case_max_model_steps,
-        max_tool_calls=case_max_tool_calls,
-        max_chars=case_max_chars,
-        context_chars=case_context_chars,
-        max_windows=case_max_windows,
-        max_output_tokens=case_max_output_tokens,
+        max_model_steps=limits.case_max_model_steps,
+        max_tool_calls=limits.case_max_tool_calls,
+        max_chars=limits.case_max_chars,
+        context_chars=limits.case_context_chars,
+        max_windows=limits.case_max_windows,
+        max_completion_corrections=limits.case_max_completion_corrections,
+        max_output_tokens=limits.case_max_output_tokens,
         context_middleware=case_compaction,
     )
     understanding_session = UnderstandingMaintenanceSession(
@@ -91,7 +90,10 @@ def build_background_memory_workflow(
     understanding_compaction = ContinuationCompactionMiddleware(
         summary_model=understanding_model,
         profile=B2_COMPACTION_PROFILE.model_copy(update={
-            "main_output_reserve_tokens": understanding_max_output_tokens,
+            "trigger_input_tokens": limits.compaction_trigger_input_tokens,
+            "keep_messages": limits.compaction_keep_messages,
+            "main_output_reserve_tokens": limits.understanding_max_output_tokens,
+            "summary_max_output_tokens": limits.understanding_summary_max_output_tokens,
         }),
     )
     understanding_workflow = UnderstandingMaintenanceWorkflow(
@@ -99,9 +101,10 @@ def build_background_memory_workflow(
         understanding_session,
         understanding_model,
         checkpointer,
-        max_model_steps=understanding_max_model_steps,
-        max_tool_calls=understanding_max_tool_calls,
-        max_output_tokens=understanding_max_output_tokens,
+        max_model_steps=limits.understanding_max_model_steps,
+        max_tool_calls=limits.understanding_max_tool_calls,
+        max_completion_corrections=limits.understanding_max_completion_corrections,
+        max_output_tokens=limits.understanding_max_output_tokens,
         context_middleware=understanding_compaction,
     )
     publication = PublicationStore(memory_engine, artifacts)
@@ -110,5 +113,5 @@ def build_background_memory_workflow(
         understanding_workflow,
         publication,
         checkpointer,
-        max_stale_retries=max_stale_retries,
+        max_stale_retries=limits.max_stale_retries,
     )

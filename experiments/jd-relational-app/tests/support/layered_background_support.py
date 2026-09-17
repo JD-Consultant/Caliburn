@@ -123,16 +123,6 @@ def opened_layered(dataset, document, *, b2_fails_first=False):
             memory_engine=publication.engine,
             case_model=case_model,
             understanding_model=understanding_model,
-            case_max_output_tokens=8192,
-            understanding_max_output_tokens=8192,
-            case_max_model_steps=12,
-            case_max_tool_calls=12,
-            case_max_chars=24000,
-            case_context_chars=1500,
-            case_max_windows=16,
-            understanding_max_model_steps=12,
-            understanding_max_tool_calls=12,
-            max_stale_retries=2,
         )
         yield {
             "native": native,

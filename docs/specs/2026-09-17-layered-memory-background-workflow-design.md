@@ -200,7 +200,7 @@ B2 可能在相關既有案例中發現問題，該 `source_reference` 不保證
 | stale 次數耗盡 | `blocked / stale_retry_limit_reached`，保留正式 head |
 | source／artifact 不可讀 | 不轉成空白或 no-op；保留可恢復錯誤 |
 
-`max_stale_retries` 是 Runtime 必填的正整數組裝參數，第一版不在 package 偷選產品預設。它限制同一背景 job 因競爭重做的總次數；B1／B2 各自既有模型／工具上限仍限制單一 attempt。`case_rework` 次數不因 stale 而重設，避免同一 job 無界循環。
+`max_stale_retries` 是 Runtime 必填的正整數組裝參數，package 不偷選產品預設。App successor 已在正式背景 profile 採用 `5`，表示原始嘗試之外最多五次 stale 語意重做；它限制同一背景 job 因競爭重做的次數，B1／B2 各自的模型／工具上限仍限制單一 attempt。`case_rework` 次數不因 stale 而重設，且仍最多一次，避免同一 job 無界循環。
 
 初次載入與每次 stale reload 都必須由 source owner 驗證來源單調性：若 head 的 `processed_source` 已等於或涵蓋本 job，視為已由其他 writer 完成並查回正式結果；若不同，只有本 job 固定來源被證明緊接在目前 cursor 之後時才可繼續。較舊、重疊、跳過中間訪談或不同 lineage 的來源不得發布，以免 CAS 雖成功卻把 `processed_source` 倒退。dispatcher 仍負責排程／通知准入；這裡只保護 publication 正確性。
 

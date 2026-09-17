@@ -9,9 +9,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from .background_memory_limits import FORMAL_BACKGROUND_MEMORY_LIMITS
 from .consultant_model import (
     CONSULTANT_MODEL,
-    MAX_OUTPUT_TOKENS,
     REASONING_EFFORT,
     create_consultant_model,
 )
@@ -33,7 +33,6 @@ def create_role_models(*, api_key: str, http_client, async_http_client) -> RoleM
         "http_client": http_client,
         "async_http_client": async_http_client,
         "reasoning_effort": REASONING_EFFORT,
-        "max_output_tokens": MAX_OUTPUT_TOKENS,
         "max_retries": 0,
     }
     consultant = create_consultant_model(
@@ -41,9 +40,17 @@ def create_role_models(*, api_key: str, http_client, async_http_client) -> RoleM
         http_client=http_client,
         async_http_client=async_http_client,
     )
-    case = create_openrouter_model(component="background-case-maintainer", **shared)
+    limits = FORMAL_BACKGROUND_MEMORY_LIMITS
+    case = create_openrouter_model(
+        component="background-case-maintainer",
+        request_timeout=limits.request_timeout_seconds,
+        max_output_tokens=limits.case_max_output_tokens,
+        **shared,
+    )
     understanding = create_openrouter_model(
         component="background-understanding-maintainer",
+        request_timeout=limits.request_timeout_seconds,
+        max_output_tokens=limits.understanding_max_output_tokens,
         **shared,
     )
     return RoleModels(

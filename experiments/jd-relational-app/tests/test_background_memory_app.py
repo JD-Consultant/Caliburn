@@ -13,6 +13,7 @@ from sqlalchemy import event
 from sqlalchemy.pool import StaticPool
 
 from jd_relational.background_memory_app import build_background_memory_workflow
+from jd_relational.background_memory_limits import FORMAL_BACKGROUND_MEMORY_LIMITS
 from jd_relational.continuation_compaction import ContinuationCompactionMiddleware
 
 from test_chat_history import native  # noqa: F401
@@ -49,17 +50,35 @@ def build(sources, document_id, store, saver, engine, case_model, understanding_
         memory_engine=engine,
         case_model=case_model,
         understanding_model=understanding_model,
-        case_max_output_tokens=4097,
-        understanding_max_output_tokens=8191,
-        case_max_model_steps=12,
-        case_max_tool_calls=12,
-        case_max_chars=24000,
-        case_context_chars=1500,
-        case_max_windows=16,
-        understanding_max_model_steps=12,
-        understanding_max_tool_calls=12,
-        max_stale_retries=2,
     )
+
+
+def test_formal_background_limits_match_the_reviewed_product_profile():
+    limits = FORMAL_BACKGROUND_MEMORY_LIMITS
+
+    assert limits.request_timeout_seconds == 300.0
+    assert limits.compaction_trigger_input_tokens == 16000
+    assert limits.compaction_keep_messages == 8
+    assert (
+        limits.case_max_output_tokens,
+        limits.case_summary_max_output_tokens,
+        limits.case_max_model_steps,
+        limits.case_max_tool_calls,
+        limits.case_max_completion_corrections,
+    ) == (32768, 8192, 256, 240, 3)
+    assert (
+        limits.case_max_chars,
+        limits.case_context_chars,
+        limits.case_max_windows,
+    ) == (24000, 6000, 16)
+    assert (
+        limits.understanding_max_output_tokens,
+        limits.understanding_summary_max_output_tokens,
+        limits.understanding_max_model_steps,
+        limits.understanding_max_tool_calls,
+        limits.understanding_max_completion_corrections,
+    ) == (32768, 8192, 128, 120, 3)
+    assert limits.max_stale_retries == 5
 
 
 def test_build_binds_one_authority_per_document_without_io_or_model_calls(native):
@@ -104,8 +123,16 @@ def test_build_binds_one_authority_per_document_without_io_or_model_calls(native
         assert first.case_workflow.context_middleware.summary_model is case_model
         assert first.case_workflow.context_middleware.profile.protect_latest_human_turn is True
         assert first.case_workflow.context_middleware.profile.preserve_initial_messages == 0
-        assert first.case_workflow.context_middleware.profile.main_output_reserve_tokens == 4097
-        assert case_model.configured_max_tokens == [4097, 4097]
+        assert first.case_workflow.context_middleware.profile.trigger_input_tokens == 16000
+        assert first.case_workflow.context_middleware.profile.keep_messages == 8
+        assert first.case_workflow.context_middleware.profile.main_output_reserve_tokens == 32768
+        assert first.case_workflow.context_middleware.profile.summary_max_output_tokens == 8192
+        assert first.case_workflow.max_chars == 24000
+        assert first.case_workflow.context_chars == 6000
+        assert first.case_workflow.max_windows == 16
+        assert first.case_workflow.max_completion_corrections == 3
+        assert first.case_workflow.recursion_limit == (256 * 3 + 6) * 16
+        assert case_model.configured_max_tokens == [32768, 32768]
 
         assert isinstance(
             first.understanding_workflow.context_middleware,
@@ -121,10 +148,22 @@ def test_build_binds_one_authority_per_document_without_io_or_model_calls(native
             is False
         )
         assert (
-            first.understanding_workflow.context_middleware.profile.main_output_reserve_tokens
-            == 8191
+            first.understanding_workflow.context_middleware.profile.trigger_input_tokens
+            == 16000
         )
-        assert understanding_model.configured_max_tokens == [8191, 8191]
+        assert first.understanding_workflow.context_middleware.profile.keep_messages == 8
+        assert (
+            first.understanding_workflow.context_middleware.profile.main_output_reserve_tokens
+            == 32768
+        )
+        assert (
+            first.understanding_workflow.context_middleware.profile.summary_max_output_tokens
+            == 8192
+        )
+        assert first.understanding_workflow.max_completion_corrections == 3
+        assert first.understanding_workflow.recursion_limit == 128 * 3 + 6
+        assert first.max_stale_retries == 5
+        assert understanding_model.configured_max_tokens == [32768, 32768]
         assert statements == [], "building must not set up or query database tables"
         assert case_model.requests == [] and understanding_model.requests == []
     finally:

@@ -3,7 +3,7 @@
 - 日期：2026-09-17
 - Topic：`JD-R002`
 - Stage：**G7 離線窄切片完成**
-- 狀態：A／B1／B2 的正式角色模型由單一 App factory 建立；尚未接 managed background callback、layered C、付費自然模型或 production authority
+- 狀態：A／B1／B2 的正式角色模型由單一 App factory 建立，B1／B2 正式執行限制已由 App profile 統一；尚未接 managed background callback、layered C、付費自然模型或 production authority
 
 ## 1. 目的與既有決策
 
@@ -32,14 +32,32 @@ openai/gpt-5.6-luna
 ### Caliburn 取捨
 
 - 沿用既有共用 `openrouter_model.py`，不新增第二套 HTTP／SDK adapter。
-- 沿用已驗 Luna request profile：`openai/gpt-5.6-luna`、reasoning `high`、輸出上限 8,192、parallel tool calls 關閉。
+- 沿用已驗 Luna route：`openai/gpt-5.6-luna`、reasoning `high`、parallel tool calls 關閉。A 保留既有輸出上限 8,192 與 90 秒 timeout；背景 B1／B2 採下節正式 profile，不把 A 的數值誤當所有角色共同上限。
 - A／B1／B2 各有獨立 model object 與 tracing component，但共用 caller-owned sync／async HTTP clients、同一 credential、同一 provider restriction。
 - 三個角色的 SDK hidden retry 均為 0；語意返工、stale 重整與 durable resume 繼續由既有 Runtime／workflow 管理，不在 model factory 疊加重試。
 - B1／B2 主呼叫與 continuity compaction 仍由 `build_background_memory_workflow()` 使用同一個注入角色模型物件；factory 不另建 summary model。
 
-### 尚未由本切片決定
+### 正式背景執行 profile
 
-- 新 B1／B2 的正式 model-step、tool-call、來源窗口與 stale 上限仍由 managed callback 的組裝參數明示；不能把 package fixture 的 `12／12` 或舊 B2 的 `16／15` 偷升格為產品政策。
+`background_memory_limits.py` 是 App assembly 的單一設定來源；package defaults 仍只是通用／測試預設。正式值為：
+
+| 限制 | B1 案例維護 | B2 工作理解 |
+|---|---:|---:|
+| reasoning | high | high |
+| 主輸出上限 | 32,768 tokens | 32,768 tokens |
+| compaction summary 上限 | 8,192 tokens | 8,192 tokens |
+| request timeout | 300 秒 | 300 秒 |
+| model steps | 256 | 128 |
+| tool calls | 240 | 120 |
+| 完成修正 | 3 | 3 |
+| B1 來源窗口／消歧前文／最多窗口 | 24,000／6,000 chars／16 | 不適用 |
+
+共同 compaction trigger 保留 16,000 input tokens，保留最近 8 個安全訊息／完整工具 wave；同一背景 job 的 CAS stale 最多重做 5 次。B2 發現案例問題後退回 B1 的語意返工仍最多一次，與 stale 競爭重做不是同一額度。
+
+這些值是根據既有長訪談／背景實驗、工作複雜度與「優先產出可用結果」要求選定的 App guardrail，不是 OpenAI／OpenRouter 規定。32,768 是容量保險，不代表 8,192 已被自然模型實測證明必然截斷；暫不加入 32K→65K 自動重送，因目前框架計數與 checkpoint 邊界不能讓該重送保持明確可核算。若正式 route 日後出現可重現的 length truncation，再設計一個計入既有 durable counters 的恢復路徑。
+
+### 仍待真實驗證
+
 - 真 key 可用性、自然模型品質、費用與 provider 實際 route 尚未由本切片驗證。
 
 ## 3. 組裝與生命週期
@@ -62,13 +80,13 @@ RoleModels
 離線契約固定驗證：
 
 - 建立三個角色時沒有 HTTP request；
-- 三個 wire request 都是 Luna、OpenAI-only、`allow_fallbacks=false`、reasoning high、8,192 output、parallel tools 關閉；
+- 三個 wire request 都是 Luna、OpenAI-only、`allow_fallbacks=false`、reasoning high、parallel tools 關閉；A 實送 8,192／90 秒，B1／B2 實送 32,768／300 秒；
 - 三個角色的 hidden retry 都是 0；
 - 空白 key 在外送前拒絕；
 - process runtime 保留三個角色並仍用原 A graph／tools，shared clients 可確認關閉且 close 冪等；
-- 既有 B1／B2 assembly identity 測試繼續保證主呼叫與 compaction 使用同一注入角色模型。
+- B1／B2 assembly identity 測試繼續保證主呼叫與 compaction 使用同一注入角色模型，並固定兩個 summary 8,192、B1 24,000／6,000／16、步數／工具／完成修正與 stale 額度；dispatcher 的 source planning 使用相同 B1 設定。
 
-本切片指定相鄰離線回歸為 **63 passed／0 failed**；無 credential read、provider call、付費、DB、schema、migration、Prompt、Skills、Memory 或 JD 行為變更。
+原角色 factory 切片指定相鄰離線回歸為 **63 passed／0 failed**。正式背景 profile 接線後，fresh 完整 App 離線回歸為 **2,996 passed／320 environment-skipped／0 failed**，`src／tests` compileall 成功；無 credential read、provider call、付費、DB、schema、migration、Prompt、Skills、Memory 或 JD 行為變更。
 
 ## 5. 來源與下一 gate
 
@@ -79,4 +97,4 @@ RoleModels
 - [CTX-C001 compaction](2026-09-16-openrouter-continuation-compaction-design.md)；同角色 main／summary model boundary。
 - [MEM-L001 workflow](2026-09-17-layered-memory-background-workflow-design.md)；B1／B2 注入點、attempt 與 publication 權責。
 
-下一 gate 是把 process-owned `RoleModels.case／understanding` 經 document-scoped managed callback 注入既有 `BackgroundMemoryWorkflow`。該片只組裝已完成的 dispatcher 與 workflow；正式 B1／B2 執行上限若文件仍無有效決策，須先提出最小候選與影響，不得沿 fixture 猜值。
+下一 gate 是把 process-owned `RoleModels.case／understanding` 經 document-scoped managed callback 注入既有 `BackgroundMemoryWorkflow`。該片只組裝已完成的 dispatcher、workflow 與本稿正式 profile，不得再沿 fixture 猜值或重開 Memory／compaction 設計。

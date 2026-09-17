@@ -51,9 +51,6 @@ class BackgroundAvailability(AgentMiddleware):
 
     state_schema = BackgroundContextState
 
-    def __init__(self, admissions, windows):
-        self._admissions, self._windows = admissions, windows
-
     @staticmethod
     def _scope(runtime):
         """Read the App-issued scope for this run, never model-visible input."""
@@ -68,7 +65,7 @@ class BackgroundAvailability(AgentMiddleware):
                 or session.dataset_id != context.dataset_id
                 or session.run_id != context.run_id):
             raise ConsultantContextError("invalid_background_scope")
-        return context.document_id, session.head
+        return context.document_id, session.head, context.background_availability
 
     def before_agent(self, state, runtime):
         current = next((message.id for message in reversed(state["messages"])
@@ -76,10 +73,15 @@ class BackgroundAvailability(AgentMiddleware):
         if current is None or state.get("background_turn_id") == current:
             # Later model steps in the same turn reuse what was read once.
             return None
-        document_id, head = self._scope(runtime)
-        return {"background_turn_id": current,
-                "background_notice": availability_notice(
-                    self._admissions, self._windows, document_id, head)}
+        document_id, head, provider = self._scope(runtime)
+        try:
+            notice = provider(document_id, head) if provider is not None else ""
+        except Exception:
+            notice = ""
+        if type(notice) is not str:
+            from .consultant_context import ConsultantContextError
+            raise ConsultantContextError("background_notice_not_available")
+        return {"background_turn_id": current, "background_notice": notice}
 
     def wrap_model_call(self, request, handler):
         notice = request.state.get("background_notice")

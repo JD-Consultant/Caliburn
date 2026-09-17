@@ -33,22 +33,15 @@ def analysis_skills_middleware():
     return analysis_skills(SkillAssets())
 
 
-def build_consultant(model, *, admissions=None, windows=None, tools=None, guidance=None,
-                     context_middleware=None):
+def build_consultant(model, *, tools=None, guidance=None, context_middleware=None):
     """The shared consultant, with its method, Skills and run-scoped notices.
 
-    Background availability is included only when the callers that own those
-    App-wide readers supply them. The current document and turn-start Memory
-    baseline come from each invocation's trusted runtime context, never graph
-    assembly or model input. Explicit C refreshes stay run-scoped. A host without background wiring still gets a consultant that
-    can interview, read Memory and write JD.
+    Background availability is always present, but its App-owned provider and
+    the current document come from each invocation's trusted runtime context,
+    never graph assembly or model input. Explicit C refreshes stay run-scoped.
+    A host without background wiring gets an empty availability notice.
     """
-    background = (admissions, windows)
-    if any(value is None for value in background) and any(value is not None for value in background):
-        raise ValueError("incomplete_background_availability")
-    middleware = [AiToolMiddleware(), analysis_skills_middleware()]
-    if all(value is not None for value in background):
-        middleware.append(BackgroundAvailability(admissions, windows))
+    middleware = [AiToolMiddleware(), analysis_skills_middleware(), BackgroundAvailability()]
     if context_middleware is None:
         profile = A_COMPACTION_PROFILE.model_copy(update={
             "main_output_reserve_tokens": MAX_OUTPUT_TOKENS,

@@ -103,6 +103,7 @@ class ConsultantContext:
     source_notice: Callable | None = None
     memory_session: object | None = None
     memory_repair_session: object | None = None
+    background_availability: Callable[[str, object | None], str] | None = None
 
     def __post_init__(self):
         try:
@@ -115,6 +116,9 @@ class ConsultantContext:
             if self.stop_event is not None and not isinstance(self.stop_event, Event):
                 raise ValueError()
             if self.source_notice is not None and not callable(self.source_notice):
+                raise ValueError()
+            if self.background_availability is not None and not callable(
+                    self.background_availability):
                 raise ValueError()
         except (ValueError, TypeError, AttributeError):
             raise ConsultantContextError("invalid_consultant_context") from None

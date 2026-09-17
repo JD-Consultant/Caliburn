@@ -6,7 +6,6 @@ Nothing here opens a socket, a document or a connection, and no request is made.
 
 import pytest
 
-from jd_relational.background_admission import Admission
 from jd_relational.background_availability import BackgroundAvailability
 from jd_relational.consultant_app import build_consultant
 from jd_relational.consultant_guidance import build_consultant_guidance
@@ -25,16 +24,6 @@ def model():
     """The real assembly on a local transport; nothing here invokes it."""
     with answering(reply("assembly")) as (value, _):
         yield value
-
-
-class Admissions:
-    def read(self, document_id):
-        return Admission(document_id)
-
-
-class Windows:
-    def plan_saved_batch(self, target_reference, document_id, *, after_reference=None):
-        return {"source_reference": None, "covers_whole_range": True}
 
 
 TOOLS = {"jd_read", "jd_change_read", "jd_create_task", "jd_revise_work", "jd_set_text",
@@ -56,18 +45,10 @@ def test_the_consultant_carries_its_method_skills_and_tools(model):
     assert "SkillsMiddleware.before_agent" in agent.nodes
 
 
-def test_background_availability_is_included_only_with_its_owners(model):
-    without = build_consultant(model)
-    assert not any("BackgroundAvailability" in node for node in without.nodes)
-    with_background = build_consultant(model, admissions=Admissions(), windows=Windows())
-    assert any("BackgroundAvailability" in node for node in with_background.nodes)
-    assert _tools(with_background) == TOOLS
-
-
-def test_partial_background_wiring_is_refused(model):
-    with pytest.raises(ValueError) as error:
-        build_consultant(model, admissions=Admissions())
-    assert "incomplete_background_availability" in str(error.value)
+def test_shared_consultant_always_contains_stateless_background_availability(model):
+    agent = build_consultant(model)
+    assert any("BackgroundAvailability" in node for node in agent.nodes)
+    assert _tools(agent) == TOOLS
 
 
 def test_the_guidance_the_agent_gets_is_the_composed_one(model):
@@ -90,7 +71,7 @@ def test_the_app_installs_the_tool_middleware_and_the_skills_middleware(model, m
         return "agent"
 
     monkeypatch.setattr(module, "build_consultant_node", record)
-    module.build_consultant(model, admissions=Admissions(), windows=Windows())
+    module.build_consultant(model)
     assert captured["middleware"] == [AiToolMiddleware.__name__, "SkillsMiddleware",
                                       BackgroundAvailability.__name__]
     assert isinstance(captured["context_middleware"], ContinuationCompactionMiddleware)

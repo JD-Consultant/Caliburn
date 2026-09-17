@@ -62,13 +62,14 @@ def blocked(**changes):
                      error_code="source_unavailable", **changes)
 
 
-def _runtime(document=DOCUMENT, *, head=None):
+def _runtime(document=DOCUMENT, *, head=None, background_availability=None):
     dataset, run = str(uuid4()), str(uuid4())
     boundary = NoticeBoundary(uuid4(), 1)
     notice = NoticeMaterial(document, None, boundary, (), 0, 0, 0)
     session = MemoryReadSession(dataset, document, run, object(), object(), head, "", object())
     context = ConsultantContext(dataset, document, run, object(),
-        ReferenceCodec(b"x" * 32, dataset), notice, memory_session=session)
+        ReferenceCodec(b"x" * 32, dataset), notice, memory_session=session,
+        background_availability=background_availability)
     return SimpleNamespace(context=context)
 
 
@@ -102,15 +103,16 @@ def test_a_blocked_row_without_a_target_says_nothing():
     assert windows.seen == []
 
 
-def _middleware(admission, windows=None):
-    return BackgroundAvailability(Admissions(admission), windows or Windows("rest"))
+def _middleware():
+    return BackgroundAvailability()
 
 
 def test_the_notice_is_read_once_per_employee_input():
     admissions = Admissions(blocked())
-    middleware = BackgroundAvailability(admissions, Windows("rest"))
+    middleware = BackgroundAvailability()
     state = {"messages": [HumanMessage(id="m1", content="我每週巡檢設備")]}
-    runtime = _runtime()
+    runtime = _runtime(background_availability=lambda document_id, head: availability_notice(
+        admissions, Windows("rest"), document_id, head))
     first = middleware.before_agent(state, runtime)
     assert first["background_turn_id"] == "m1" and first["background_notice"]
     assert admissions.calls == 1
@@ -121,19 +123,24 @@ def test_the_notice_is_read_once_per_employee_input():
 
 def test_a_new_employee_input_is_read_again():
     admissions = Admissions(blocked())
-    middleware = BackgroundAvailability(admissions, Windows("rest"))
+    middleware = BackgroundAvailability()
     state = {"messages": [HumanMessage(id="m1", content="第一段")],
              "background_turn_id": "m0", "background_notice": ""}
-    update = middleware.before_agent(state, _runtime())
+    update = middleware.before_agent(state, _runtime(
+        background_availability=lambda document_id, head: availability_notice(
+            admissions, Windows("rest"), document_id, head)))
     assert update["background_turn_id"] == "m1"
     assert admissions.calls == 1
 
 
 def test_a_turn_with_no_employee_input_reads_nothing():
-    admissions = Admissions(blocked())
-    middleware = BackgroundAvailability(admissions, Windows("rest"))
-    assert middleware.before_agent({"messages": [AIMessage(id="a1", content="hi")]}, _runtime()) is None
-    assert admissions.calls == 0
+    calls = []
+    middleware = BackgroundAvailability()
+    assert middleware.before_agent(
+        {"messages": [AIMessage(id="a1", content="hi")]},
+        _runtime(background_availability=lambda *args: calls.append(args)),
+    ) is None
+    assert calls == []
 
 
 class Request:
@@ -147,7 +154,7 @@ class Request:
 
 
 def test_the_notice_arrives_as_an_app_system_block_not_as_the_employee():
-    middleware = _middleware(blocked())
+    middleware = _middleware()
     notice = availability_notice(Admissions(blocked()), Windows("rest"), DOCUMENT, None)
     request = Request({"background_notice": notice}, SystemMessage(content="顧問指引"))
     seen = {}
@@ -160,7 +167,7 @@ def test_the_notice_arrives_as_an_app_system_block_not_as_the_employee():
 
 
 def test_an_empty_notice_leaves_the_request_untouched():
-    middleware = _middleware(Admission(DOCUMENT))
+    middleware = _middleware()
     request = Request({"background_notice": ""}, SystemMessage(content="顧問指引"))
     seen = {}
     middleware.wrap_model_call(request, lambda value: seen.setdefault("request", value))
@@ -174,35 +181,67 @@ def test_availability_never_reaches_for_a_way_to_run_background_work():
         Forbidden("rest").start()
 
 
-def test_one_shared_middleware_reads_each_document_from_its_runtime_scope():
+def test_one_shared_middleware_uses_each_invocations_own_provider_once():
     other = str(uuid4())
+    calls = []
 
-    class ScopedAdmissions:
-        def __init__(self):
-            self.seen = []
+    def provider(document_id, head):
+        calls.append((document_id, head))
+        return f"notice:{document_id}"
 
-        def read(self, document_id):
-            self.seen.append(document_id)
-            return Admission(document_id, status="blocked",
-                             target_reference=f"target:{document_id}",
-                             error_code="source_unavailable")
-
-    admissions, windows = ScopedAdmissions(), Windows("rest")
-    middleware = BackgroundAvailability(admissions, windows)
+    middleware = BackgroundAvailability()
     first = middleware.before_agent(
-        {"messages": [HumanMessage(id="m1", content="第一份文件")]}, _runtime(DOCUMENT))
+        {"messages": [HumanMessage(id="turn-a", content="a")]},
+        _runtime(DOCUMENT, head="head-a", background_availability=provider),
+    )
     second = middleware.before_agent(
-        {"messages": [HumanMessage(id="m2", content="第二份文件")]}, _runtime(other))
-    assert admissions.seen == [DOCUMENT, other]
-    assert [item[1] for item in windows.seen] == [DOCUMENT, other]
-    assert f"target:{DOCUMENT}" in first["background_notice"]
-    assert f"target:{other}" in second["background_notice"]
+        {"messages": [HumanMessage(id="turn-b", content="b")]},
+        _runtime(other, head="head-b", background_availability=provider),
+    )
+
+    assert first == {"background_turn_id": "turn-a", "background_notice": f"notice:{DOCUMENT}"}
+    assert second == {"background_turn_id": "turn-b", "background_notice": f"notice:{other}"}
+    assert calls == [(DOCUMENT, "head-a"), (other, "head-b")]
+
+
+def test_missing_provider_records_an_empty_notice_without_reading_resources():
+    middleware = BackgroundAvailability()
+    assert middleware.before_agent(
+        {"messages": [HumanMessage(id="turn", content="a")]}, _runtime(),
+    ) == {"background_turn_id": "turn", "background_notice": ""}
+
+
+def test_provider_cannot_project_a_non_string_notice():
+    middleware = BackgroundAvailability()
+    with pytest.raises(ConsultantContextError, match="^background_notice_not_available$"):
+        middleware.before_agent(
+            {"messages": [HumanMessage(id="turn", content="a")]},
+            _runtime(background_availability=lambda *_: {"not": "text"}),
+        )
+
+
+def test_provider_read_failure_omits_only_the_optional_notice():
+    middleware = BackgroundAvailability()
+
+    def unavailable(*_):
+        raise OSError("synthetic background read failure")
+
+    assert middleware.before_agent(
+        {"messages": [HumanMessage(id="turn", content="a")]},
+        _runtime(background_availability=unavailable),
+    ) == {"background_turn_id": "turn", "background_notice": ""}
 
 
 def test_missing_or_crossed_runtime_memory_scope_stops_before_any_read():
-    admissions = Admissions(blocked())
-    middleware = BackgroundAvailability(admissions, Windows("rest"))
+    calls = []
+    middleware = BackgroundAvailability()
     with pytest.raises(ConsultantContextError, match="^invalid_background_scope$"):
         middleware.before_agent(
             {"messages": [HumanMessage(id="m1", content="內容")]}, SimpleNamespace(context=None))
-    assert admissions.calls == 0
+    runtime = _runtime(background_availability=lambda *args: calls.append(args))
+    runtime.context = replace(runtime.context, memory_session=replace(
+        runtime.context.memory_session, document_id=str(uuid4())))
+    with pytest.raises(ConsultantContextError, match="^invalid_background_scope$"):
+        middleware.before_agent(
+            {"messages": [HumanMessage(id="m1", content="內容")]}, runtime)
+    assert calls == []

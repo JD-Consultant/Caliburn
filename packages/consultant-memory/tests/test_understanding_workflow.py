@@ -163,6 +163,14 @@ def _harness(replies, **options):
     }
 
 
+def test_context_middleware_must_be_an_agent_middleware():
+    with pytest.raises(
+        ValueError,
+        match="^context_middleware must be an AgentMiddleware$",
+    ):
+        _harness([], context_middleware=object())
+
+
 def _no_op_replies(ids, prefix):
     return [
         _call("read_case", {"case_id": ids["case_a"]}, f"{prefix}-read-a"),

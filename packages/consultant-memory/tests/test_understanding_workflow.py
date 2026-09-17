@@ -6,7 +6,7 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from langchain.agents.middleware import AgentMiddleware
+from langchain.agents.middleware import AgentMiddleware, ExtendedModelResponse
 from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
 from langchain.agents.middleware.tool_call_limit import ToolCallLimitExceededError
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -14,6 +14,7 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, Tool
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
+from langgraph.types import Command
 from pydantic import Field
 
 from caliburn_memory import (
@@ -52,6 +53,23 @@ class RequestProbe(AgentMiddleware):
     def wrap_model_call(self, request, handler):
         self.requests.append(deepcopy(request.messages))
         return handler(request)
+
+
+class StateWritingProbe(AgentMiddleware):
+    marker = {"origin": "test-middleware"}
+
+    def __init__(self):
+        self.state_before_handler = []
+
+    def wrap_model_call(self, request, handler):
+        self.state_before_handler.append((
+            request.state["case_attempt_id"],
+            deepcopy(request.state.get("continuation_compaction")),
+        ))
+        return ExtendedModelResponse(
+            model_response=handler(request),
+            command=Command(update={"continuation_compaction": self.marker}),
+        )
 
 
 def _call(name, arguments, identity):
@@ -174,6 +192,40 @@ def test_context_middleware_receives_the_assembled_b2_request_and_initial_state(
     task = next(message for message in probe.requests[0] if isinstance(message, HumanMessage))
     assert "B1_CHANGES" in json.loads(task.content)
     assert result["continuation_compaction"] is None
+
+
+def test_context_middleware_command_state_survives_b2_resume_and_new_attempt_starts_empty():
+    probe = StateWritingProbe()
+    _source, _session, model, workflow, case_stage, ids = _harness(
+        [], context_middleware=probe,
+    )
+    attempt_id = str(uuid4())
+    model.replies.extend([
+        _call("read_case", {"case_id": ids["case_a"]}, "read-case"),
+        RuntimeError("synthetic B2 transport fault"),
+    ])
+
+    with pytest.raises(RuntimeError, match="synthetic B2 transport fault"):
+        workflow.run_attempt(case_stage, case_attempt_id=attempt_id)
+
+    assert [value for current, value in probe.state_before_handler
+            if current == attempt_id] == [None, probe.marker]
+    model.replies.extend(_no_op_replies(ids, "resume")[1:])
+
+    result = workflow.run_attempt(case_stage, case_attempt_id=attempt_id)
+    calls_after_resume = len(model.requests)
+
+    assert result["continuation_compaction"] == probe.marker
+    assert workflow.run_attempt(case_stage, case_attempt_id=attempt_id) == result
+    assert len(model.requests) == calls_after_resume
+
+    next_attempt_id = str(uuid4())
+    model.replies.extend(_no_op_replies(ids, "fresh"))
+    fresh = workflow.run_attempt(case_stage, case_attempt_id=next_attempt_id)
+
+    assert fresh["continuation_compaction"] == probe.marker
+    assert next(value for current, value in probe.state_before_handler
+                if current == next_attempt_id) is None
 
 
 def test_agent_revises_stable_understanding_without_preloading_case_or_raw_text():

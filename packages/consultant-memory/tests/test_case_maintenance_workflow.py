@@ -6,13 +6,14 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
-from langchain.agents.middleware import AgentMiddleware
+from langchain.agents.middleware import AgentMiddleware, ExtendedModelResponse
 from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.store.memory import InMemoryStore
+from langgraph.types import Command
 from pydantic import Field
 
 from caliburn_memory import (
@@ -53,6 +54,23 @@ class RequestProbe(AgentMiddleware):
     def wrap_model_call(self, request, handler):
         self.requests.append(deepcopy(request.messages))
         return handler(request)
+
+
+class StateWritingProbe(AgentMiddleware):
+    marker = {"origin": "test-middleware"}
+
+    def __init__(self):
+        self.state_before_handler = []
+
+    def wrap_model_call(self, request, handler):
+        self.state_before_handler.append((
+            request.state["source_reference"],
+            deepcopy(request.state.get("continuation_compaction")),
+        ))
+        return ExtendedModelResponse(
+            model_response=handler(request),
+            command=Command(update={"continuation_compaction": self.marker}),
+        )
 
 
 def _call(name, arguments, identity):
@@ -113,6 +131,36 @@ def test_context_middleware_receives_the_assembled_b1_request_and_initial_state(
     ))
     assert "NEW_SOURCE" in payload
     assert result["continuation_compaction"] is None
+
+
+def test_context_middleware_command_state_survives_lookup_and_legacy_replacement_resets():
+    probe = StateWritingProbe()
+    source, _session, model, workflow = _workflow([
+        _call("finish_case_maintenance", {}, "finish-first"),
+        _done("done-first"),
+        _call("finish_case_maintenance", {}, "finish-second"),
+        _done("done-second"),
+    ], context_middleware=probe)
+    first = source.window("firstbatch", "第一批專屬內容")
+    first_window = source.window("firstwindow", "第一批專屬內容")
+    source.plan(first, [{"source_reference": first_window, "context_reference": None}])
+    second = source.window("secondbatch", "第二批專屬內容")
+    second_window = source.window("secondwindow", "第二批專屬內容")
+    source.plan(second, [{"source_reference": second_window, "context_reference": None}])
+
+    original = workflow.start(first, base_publication_revision=0, base_version=None)
+    calls_after_first = len(model.requests)
+
+    assert original["continuation_compaction"] == probe.marker
+    assert workflow.start(first, base_publication_revision=0, base_version=None) == original
+    assert len(model.requests) == calls_after_first
+
+    replacement = workflow.start(second, base_publication_revision=0, base_version=None)
+
+    assert replacement["continuation_compaction"] == probe.marker
+    assert next(value for reference, value in probe.state_before_handler if reference == second) is None
+    assert all("第一批專屬內容" not in str(message.content)
+               for message in replacement["messages"])
 
 
 def test_all_planned_windows_share_one_stage_and_each_case_selects_exact_window_evidence():

@@ -112,7 +112,20 @@ def _two_exchange_source(native, *, first_text: str, second_text: str):
         first_run_id=first.record.run_id,
         last_run_id=second.record.run_id,
     )
-    return sources, ExtractionSourceAdapter(sources, document_id), batch
+    expected = {
+        "second_window_reference": sources.capture_window(
+            document_id,
+            first_run_id=second.record.run_id,
+            last_run_id=second.record.run_id,
+        ),
+        "source_references": (
+            sources.capture(document_id, first.record.run_id).source_ref,
+            sources.capture(document_id, second.record.run_id).source_ref,
+        ),
+        "second_run_id": second.record.run_id,
+        "second_last_message_id": second.messages[-1].id,
+    }
+    return sources, ExtractionSourceAdapter(sources, document_id), batch, expected
 
 
 def _one_exchange_source(native, *, text: str):
@@ -177,6 +190,12 @@ def _request_summary(request) -> AIMessage:
     return summaries[0]
 
 
+def _only_human(request) -> HumanMessage:
+    humans = [message for message in request if isinstance(message, HumanMessage)]
+    assert len(humans) == 1
+    return humans[0]
+
+
 def _user_text_from_window(reader, reference: str) -> str:
     offset = 0
     fragments: list[str] = []
@@ -207,7 +226,7 @@ def _user_text_from_source(reader, reference: str) -> str:
 def test_b1_compacts_only_the_processed_window_and_preserves_canonical_sources(native):
     first_text = "第一段：本人先完成設備異常初判。"
     second_text = "第二段：本人再把異常紀錄交給主管。"
-    _sources, reader, batch = _two_exchange_source(
+    _sources, reader, batch, expected = _two_exchange_source(
         native,
         first_text=first_text,
         second_text=second_text,
@@ -241,7 +260,37 @@ def test_b1_compacts_only_the_processed_window_and_preserves_canonical_sources(n
     second_request = model.main_requests[1]
     summary = _request_summary(second_request)
     assert "對話延續摘要" in summary.content
-    assert any("第二段" in str(message.content) for message in second_request)
+    second_payload_message = next(
+        message for message in second_request if isinstance(message, HumanMessage)
+    )
+    second_payload = json.loads(second_payload_message.content)
+    assert second_payload["WINDOW"] == {"position": 2, "count": 2, "final": True}
+    second_window = second_payload["NEW_SOURCE"]["window"]
+    assert second_window["turns"] == [{
+        "input_id": expected["second_run_id"],
+        "status": "completed",
+        "answer_succeeded": True,
+        "first": expected["second_run_id"],
+        "last": expected["second_last_message_id"],
+    }]
+    assert [
+        segment for segment in second_window["segments"]
+        if segment["role"] == "user"
+    ] == [{
+        "message_id": expected["second_run_id"],
+        "role": "user",
+        "text": second_text,
+        "text_offset": 0,
+    }]
+    second_evidence = second_payload["NEW_SOURCE"]["evidence"]
+    assert second_evidence["order"] == "oldest_to_newest"
+    assert [block["evidence_key"] for block in second_evidence["blocks"]] == ["E2"]
+    assert [
+        message
+        for block in second_evidence["blocks"]
+        for message in block["messages"]
+        if message["role"] == "user"
+    ] == [{"role": "user", "text": second_text}]
     summary_position = second_request.index(summary)
     assert summary_position == 1  # Static role instructions remain first.
     assert not any(
@@ -273,6 +322,7 @@ def test_b1_compacts_only_the_processed_window_and_preserves_canonical_sources(n
         item["source_reference"] for item in result["source_windows"]
     ]
     assert len(window_references) == 2
+    assert window_references[1] == expected["second_window_reference"]
     assert [
         _user_text_from_window(reader, reference)
         for reference in window_references
@@ -281,6 +331,9 @@ def test_b1_compacts_only_the_processed_window_and_preserves_canonical_sources(n
     stage = session.load(result["case_stage"])
     assert stage.completed and stage.outcome == "no_op"
     assert [item.evidence_key for item in stage.evidence] == ["E1", "E2"]
+    assert [
+        item.source_reference for item in stage.evidence
+    ] == list(expected["source_references"])
     assert [
         _user_text_from_source(reader, item.source_reference)
         for item in stage.evidence
@@ -332,7 +385,7 @@ def test_b1_single_window_never_compacts_even_across_multiple_tool_waves(native)
 def _completed_b1_stage(native):
     base_text = "基準原話：本人先完成設備異常初判。"
     batch_text = "本批補充：本人也把異常紀錄交給主管。"
-    sources, reader, through = _two_exchange_source(
+    sources, reader, through, _expected = _two_exchange_source(
         native,
         first_text=base_text,
         second_text=batch_text,
@@ -488,17 +541,21 @@ def test_b2_restores_same_attempt_compaction_and_new_attempt_starts_clean(native
             case_attempt_id=first_attempt,
         )
 
+    initial_task = deepcopy(_only_human(model.main_requests[0]))
+    for request in model.main_requests:
+        assert _only_human(request).model_dump() == initial_task.model_dump()
+
     saved = workflow.graph.get_state(workflow._attempt_config(first_attempt)).values
     assert saved["continuation_compaction"] is not None
     assert saved["continuation_compaction"]["summary_text"] == first_summary
     assert sum(isinstance(message, HumanMessage) for message in saved["messages"]) == 1
     assert isinstance(saved["messages"][0], HumanMessage)
+    assert saved["messages"][0].model_dump() == initial_task.model_dump()
     assert not any(
         isinstance(message.id, str)
         and message.id.startswith("continuation-summary:")
         for message in saved["messages"]
     )
-    saved_task = deepcopy(saved["messages"][0])
     resume_request_index = len(model.main_requests)
     assert first_summary in model.summary_requests[-1][-1].content
 
@@ -508,22 +565,32 @@ def test_b2_restores_same_attempt_compaction_and_new_attempt_starts_clean(native
     )
 
     assert resumed["case_attempt_id"] == first_attempt
-    assert resumed["messages"][0].model_dump() == saved_task.model_dump()
+    assert resumed["messages"][0].model_dump() == initial_task.model_dump()
     assert sum(isinstance(message, HumanMessage) for message in resumed["messages"]) == 1
+    for request in model.main_requests:
+        assert _only_human(request).model_dump() == initial_task.model_dump()
+    resumed_saved = workflow.graph.get_state(
+        workflow._attempt_config(first_attempt)
+    ).values
+    assert resumed_saved["messages"][0].model_dump() == initial_task.model_dump()
+    assert sum(
+        isinstance(message, HumanMessage)
+        for message in resumed_saved["messages"]
+    ) == 1
     first_resume_request = model.main_requests[resume_request_index]
     resume_task = next(
         message for message in first_resume_request if isinstance(message, HumanMessage)
     )
     assert isinstance(first_resume_request[0], SystemMessage)
-    assert first_resume_request[1].model_dump() == saved_task.model_dump()
-    assert resume_task.model_dump() == saved_task.model_dump()
+    assert first_resume_request[1].model_dump() == initial_task.model_dump()
+    assert resume_task.model_dump() == initial_task.model_dump()
     assert "same-boundary-summary-2" in _request_summary(first_resume_request).content
     final_resume_task = next(
         message for message in model.main_requests[-1]
         if isinstance(message, HumanMessage)
     )
-    assert model.main_requests[-1][1].model_dump() == saved_task.model_dump()
-    assert final_resume_task.model_dump() == saved_task.model_dump()
+    assert model.main_requests[-1][1].model_dump() == initial_task.model_dump()
+    assert final_resume_task.model_dump() == initial_task.model_dump()
 
     fresh_attempt = str(uuid4())
     fresh_main_index = len(model.main_requests)
@@ -538,7 +605,7 @@ def test_b2_restores_same_attempt_compaction_and_new_attempt_starts_clean(native
     fresh_task = next(
         message for message in first_fresh_request if isinstance(message, HumanMessage)
     )
-    assert json.loads(fresh_task.content) == json.loads(saved_task.content)
+    assert json.loads(fresh_task.content) == json.loads(initial_task.content)
     assert not any(
         isinstance(message.id, str)
         and message.id.startswith("continuation-summary:")

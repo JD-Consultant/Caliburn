@@ -16,17 +16,21 @@ def composed(monkeypatch):
     events = []
     def startup(**kwargs):
         events.append("startup")
+        opened.host.runtime.ready = True
     def close(**kwargs):
         events.append("close")
         return True
     value = settings("ready")
     opened = SimpleNamespace(settings=value, codec=object(), close=close,
-        host=SimpleNamespace(graph=object(), engine=object(), memory_engine=object(), runtime=SimpleNamespace(storage=object(), finish_startup=startup)))
+        host=SimpleNamespace(graph=object(), engine=object(), store=object(), saver=object(),
+            memory_engine=object(), runtime=SimpleNamespace(storage=object(), ready=False,
+                finish_startup=startup)), backgrounds=[])
     monkeypatch.setattr(managed, "open_configured_host", lambda *_, **__: opened)
     monkeypatch.setattr(managed, "HistoryReader", lambda _: object())
     monkeypatch.setattr(managed, "ReadService", lambda *args: object())
     monkeypatch.setattr(managed, "ChangeReadService", lambda *args: object())
     sources = SimpleNamespace(resolve=lambda *args: pytest.fail("Composition must not read sources."))
+    opened.sources = sources
     def source_owner(checkpoints, codec):
         assert checkpoints is opened.host.graph
         assert codec.dataset_id == value.dataset_id
@@ -39,11 +43,34 @@ def composed(monkeypatch):
     monkeypatch.setattr(managed, "ManualService", manual)
     monkeypatch.setattr(managed, "CatalogService", lambda *args: SimpleNamespace(list=lambda **_: {
         "dataset_id": value.dataset_id, "documents": [], "next_after": None}))
-    def ai(owner, codec, *, conversation_sources, memory_engine, execution_enabled):
+    class Coordinator:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+            opened.backgrounds.append(self)
+            events.append("background-owner")
+
+        def wake(self, document_id):
+            events.append(("wake", document_id))
+
+        def availability(self, document_id, head):
+            return ""
+
+        def resume_pending(self):
+            assert opened.host.runtime.ready
+            events.append("background-resume")
+            return 0
+
+    monkeypatch.setattr(managed, "BackgroundCoordinator", Coordinator, raising=False)
+    def ai(owner, codec, *, conversation_sources, memory_engine, background,
+           background_availability, execution_enabled):
         assert owner is opened.host.runtime and codec is opened.codec
         assert conversation_sources is sources
         assert memory_engine is opened.host.memory_engine
-        assert execution_enabled is False
+        opened.ai_arguments = {
+            "background": background,
+            "background_availability": background_availability,
+            "execution_enabled": execution_enabled,
+        }
         events.append("ai-owner")
         return SimpleNamespace(checkpoints=object())
     monkeypatch.setattr(managed, "AiRuntime", ai)
@@ -53,9 +80,15 @@ def composed(monkeypatch):
 
 
 def test_resources_recovered_before_first_request_and_drained_on_exit(composed):
-    events, _ = composed
+    events, opened = composed
     app = managed.open_managed_app(object(), consultant=object())
     assert events == ["ai-owner"]
+    assert opened.backgrounds == []
+    assert opened.ai_arguments == {
+        "background": None,
+        "background_availability": None,
+        "execution_enabled": False,
+    }
     assert app.ai_runtime is not None
     with TestClient(app.app, base_url="http://127.0.0.1") as client:
         assert events == ["ai-owner", "startup"]
@@ -64,6 +97,51 @@ def test_resources_recovered_before_first_request_and_drained_on_exit(composed):
             "Origin": "http://127.0.0.1:3002", "X-JD-Dataset": str(uuid4())})
         assert response.status_code == 409
     assert events == ["ai-owner", "startup", "close"]
+
+
+def test_ai_app_resumes_background_only_after_foreground_startup(composed):
+    events, opened = composed
+    app = managed.open_managed_app(
+        object(), consultant=object(), enable_chat=True,
+        case_model="case", understanding_model="understanding",
+    )
+    assert events == ["background-owner", "ai-owner"]
+    assert len(opened.backgrounds) == 1
+    background = opened.backgrounds[0]
+    assert background.kwargs == {
+        "owner": opened.host.runtime,
+        "engine": opened.host.engine,
+        "service": opened.sources,
+        "store": opened.host.store,
+        "checkpointer": opened.host.saver,
+        "memory_engine": opened.host.memory_engine,
+        "case_model": "case",
+        "understanding_model": "understanding",
+    }
+    assert opened.ai_arguments["execution_enabled"] is True
+    assert opened.ai_arguments["background"].__self__ is background
+    assert opened.ai_arguments["background_availability"].__self__ is background
+    with TestClient(app.app):
+        pass
+    assert events.index("startup") < events.index("background-resume") < events.index("close")
+
+
+@pytest.mark.parametrize("enable_chat,case_model,understanding_model", [
+    (True, None, "understanding"),
+    (True, "case", None),
+    (False, "case", None),
+    (False, None, "understanding"),
+])
+def test_incomplete_background_model_composition_is_sanitized_before_serving(
+        composed, enable_chat, case_model, understanding_model):
+    events, opened = composed
+    with pytest.raises(managed.ManagedAppError, match="^app_composition_failed$"):
+        managed.open_managed_app(
+            object(), consultant=object(), enable_chat=enable_chat,
+            case_model=case_model, understanding_model=understanding_model,
+        )
+    assert opened.backgrounds == []
+    assert events == ["close"]
 
 
 def test_startup_failure_is_sanitized_and_drain_still_occurs(composed):
@@ -149,7 +227,8 @@ def test_serve_is_single_loopback_process_and_drains(cli, monkeypatch):
         lambda **_: pytest.fail("No model runtime without a configured key."))
     def open_app(passed_file, **kwargs):
         assert passed_file is file
-        assert kwargs == {"consultant": inspection, "enable_chat": False}
+        assert kwargs == {"consultant": inspection, "enable_chat": False,
+                          "case_model": None, "understanding_model": None}
         return fake
     monkeypatch.setattr(entry, "open_managed_app", open_app)
     def run(passed, **kwargs):
@@ -165,7 +244,10 @@ def test_serve_assembles_openrouter_consultant_and_enables_chat(cli, monkeypatch
     events, file = cli
     import uvicorn
     graph = object()
-    runtime = SimpleNamespace(graph=graph, close=lambda: events.append("consultant-close") or True)
+    case_model, understanding_model = object(), object()
+    runtime = SimpleNamespace(graph=graph,
+        role_models=SimpleNamespace(case=case_model, understanding=understanding_model),
+        close=lambda: events.append("consultant-close") or True)
     monkeypatch.setattr(entry, "read_key", lambda role: (
         events.append(("key", role)) or "synthetic-openrouter-not-a-key"))
     monkeypatch.setattr(entry, "open_consultant_runtime", lambda **kwargs: (
@@ -175,7 +257,9 @@ def test_serve_assembles_openrouter_consultant_and_enables_chat(cli, monkeypatch
         close=lambda: events.append("app-close") or True)
     def open_app(passed_file, **kwargs):
         assert passed_file is file
-        assert kwargs == {"consultant": graph, "enable_chat": True}
+        assert kwargs == {"consultant": graph, "enable_chat": True,
+                          "case_model": case_model,
+                          "understanding_model": understanding_model}
         events.append("app")
         return managed_app
     monkeypatch.setattr(entry, "open_managed_app", open_app)
@@ -191,6 +275,7 @@ def test_serve_still_closes_consultant_when_app_close_fails(cli, monkeypatch, ca
     events, _ = cli
     import uvicorn
     runtime = SimpleNamespace(graph=object(),
+        role_models=SimpleNamespace(case=object(), understanding=object()),
         close=lambda: events.append("consultant-close") or True)
     monkeypatch.setattr(entry, "read_key", lambda _: "synthetic-openrouter-not-a-key")
     monkeypatch.setattr(entry, "open_consultant_runtime", lambda **_: runtime)

@@ -11,6 +11,7 @@ from starlette.concurrency import run_in_threadpool
 
 from .ai_runtime import AiRuntime
 from .ai_checkpoints import AiRunCheckpoints
+from .background_coordinator import BackgroundCoordinator
 from .chat_api import ChatServices
 from .chat_service import ChatService
 from .chat_history import ChatHistoryCodec, ChatHistoryService
@@ -50,7 +51,8 @@ class ManagedApp:
         return self.opened.close(timeout=10)
 
 
-def open_managed_app(file, *, consultant, enable_chat=False) -> ManagedApp:
+def open_managed_app(file, *, consultant, enable_chat=False,
+                     case_model=None, understanding_model=None) -> ManagedApp:
     """Dedicated process/main thread; trusted caller explicitly enables new turns.
 
     The ordinary inspection-only entry keeps enable_chat=False. Original-run
@@ -61,8 +63,28 @@ def open_managed_app(file, *, consultant, enable_chat=False) -> ManagedApp:
         host, codec = opened.host, opened.codec
         sources = ConversationSourceService(AiRunCheckpoints(host.graph), ConversationSourceCodec(
             opened.settings.signing_key_bytes(), opened.settings.dataset_id))
+        if enable_chat:
+            if case_model is None or understanding_model is None:
+                raise ManagedAppError("app_composition_failed")
+            background = BackgroundCoordinator(
+                owner=host.runtime,
+                engine=host.engine,
+                service=sources,
+                store=host.store,
+                checkpointer=host.saver,
+                memory_engine=host.memory_engine,
+                case_model=case_model,
+                understanding_model=understanding_model,
+            )
+        else:
+            if case_model is not None or understanding_model is not None:
+                raise ManagedAppError("app_composition_failed")
+            background = None
         ai_runtime = AiRuntime(host.runtime, codec, conversation_sources=sources,
-            memory_engine=host.memory_engine, execution_enabled=enable_chat)
+            memory_engine=host.memory_engine,
+            background=background.wake if background is not None else None,
+            background_availability=background.availability if background is not None else None,
+            execution_enabled=enable_chat)
         history = HistoryReader(host.engine)
         manual = ManualService(host.runtime, history, codec, source_resolver=sources.resolve)
         chat_history = ChatHistoryService(ai_runtime.checkpoints, ChatHistoryCodec(
@@ -77,6 +99,8 @@ def open_managed_app(file, *, consultant, enable_chat=False) -> ManagedApp:
             try:
                 try:
                     await run_in_threadpool(host.runtime.finish_startup, timeout=20)
+                    if background is not None:
+                        await run_in_threadpool(background.resume_pending)
                 except Exception:
                     raise ManagedAppError("startup_recovery_failed") from None
                 yield services

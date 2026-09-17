@@ -120,7 +120,15 @@ def main(argv=None):
                     del key
                     consultant = runtime.graph
                     enable_chat = True
-                managed = open_managed_app(file, consultant=consultant, enable_chat=enable_chat)
+                managed = open_managed_app(
+                    file,
+                    consultant=consultant,
+                    enable_chat=enable_chat,
+                    case_model=runtime.role_models.case if runtime is not None else None,
+                    understanding_model=(
+                        runtime.role_models.understanding if runtime is not None else None
+                    ),
+                )
                 uvicorn.run(managed.app, host="127.0.0.1", port=managed.port, workers=1,
                     reload=False, access_log=False, proxy_headers=False, log_level="warning")
             finally:

@@ -249,7 +249,7 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None,
 class AiRuntime:
     def __init__(self, owner: ManualRuntime, codec: ReferenceCodec, *, source_resolver=None,
                  conversation_sources: ConversationSourceService | None = None,
-                 memory_engine=None, background=None,
+                 memory_engine=None, background=None, background_availability=None,
                  execution_enabled: bool = True):
         if (not isinstance(owner, ManualRuntime) or not isinstance(owner.checkpoints, DocumentCheckpoints)
                 or not isinstance(codec, ReferenceCodec)
@@ -259,6 +259,7 @@ class AiRuntime:
                     or conversation_sources.dataset_id != codec.dataset_id
                     or source_resolver is not None)
                 or background is not None and not callable(background)
+                or background_availability is not None and not callable(background_availability)
                 or type(execution_enabled) is not bool):
             raise AiRuntimeError("invalid_ai_runtime")
         self.owner, self.codec = owner, codec
@@ -271,6 +272,7 @@ class AiRuntime:
         self.changes = ChangeReadService(self.history, codec)
         self.conversation_sources = conversation_sources
         self._background = background
+        self._background_availability = background_availability
         self.source_resolver = conversation_sources.resolve if conversation_sources is not None else source_resolver
         self.execution_enabled = execution_enabled
         if memory_engine is not None:
@@ -493,16 +495,8 @@ class AiRuntime:
             pass
 
     def _recover_previous(self, document_id: str, timeout: float) -> int:
-        """Inspect original state, then let the background look at it again.
-
-        The host is reopening, so work admitted before it stopped is
-        reconsidered from durable state rather than assumed finished or
-        abandoned. A recovery that raised wakes nothing: the document's own
-        ending is still unknown.
-        """
-        recovered = self._recover_previous_run(document_id, timeout)
-        self._wake_background(document_id)
-        return recovered
+        """Recover only foreground state while the host is still starting."""
+        return self._recover_previous_run(document_id, timeout)
 
     def _recover_previous_run(self, document_id: str, timeout: float) -> int:
         """Inspect original native state within the host's complete startup scan.
@@ -811,7 +805,8 @@ class AiRuntime:
             self.notices, self.codec, notice, tool_session=session, stop_event=permit.stop_event,
             source_notice=self.conversation_sources.for_turn(record.document_id, record.run_id)
                 if self.conversation_sources is not None else None, memory_session=memory,
-            memory_repair_session=memory_repair)
+            memory_repair_session=memory_repair,
+            background_availability=self._background_availability)
         # Disable remote traces even if the parent shell enabled them. Safe App
         # diagnostics and the native local Saver remain their separate owners.
         with tracing_context(enabled=False):
@@ -952,7 +947,8 @@ class AiRuntime:
                     raise AiRuntimeError("run_recovery_required")
             self.owner.finish_foreground(permit, confirm_closed)
             result = self._result(closed)
-            self._wake_background(record.document_id)
+            if not attempt.previous_host:
+                self._wake_background(record.document_id)
             return result
         except AiRuntimeError:
             raise

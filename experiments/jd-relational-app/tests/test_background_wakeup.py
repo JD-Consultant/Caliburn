@@ -1,10 +1,11 @@
-"""Where background work is woken: a settled turn, and startup recovery.
+"""Where ordinary turn completion wakes background work.
 
-Waking is all these two places do for the background; they never decide what
-runs. A turn that could not be closed wakes nothing, because the background
-must never be pointed at a turn whose own ending is still unknown. And a wake
-that fails is the background's own problem: it must not change what the
-employee's turn did, nor stop a host from starting.
+An ordinary turn wakes only after it settles. A turn that could not be closed
+wakes nothing, because the background must never be pointed at a turn whose
+own ending is still unknown. A wake that fails is the background's own problem:
+it must not change what the employee's turn did. Low-level startup recovery
+does not wake; after Runtime readiness, startup resume belongs to the managed
+App/coordinator.
 """
 from uuid import uuid4
 
@@ -75,22 +76,12 @@ def test_a_failing_wake_never_changes_what_the_turn_did(make_runtime):
     assert saved and runtime.lookup(document, run).wait() == result
 
 
-def test_startup_recovery_wakes_each_document_it_inspected():
-    """Reopening asks the background to look again, without deciding for it."""
+def test_low_level_startup_recovery_does_not_wake_before_runtime_is_ready():
     woken = Woken()
-    runtime, record, *_ = saved_turn(background=woken)
-    assert runtime.owner.finish_startup() == 1
-    # Waking is idempotent by design, so this pins which document, not a count.
-    assert woken.documents and set(woken.documents) == {record.document_id}
-
-
-def test_a_failing_wake_never_stops_a_host_from_starting():
-    """A host must open even when background work cannot be considered."""
-    woken = Woken(fail=True)
-    runtime, record, *_ = saved_turn(background=woken)
+    runtime, _, *_ = saved_turn(background=woken)
     assert runtime.owner.finish_startup() == 1
     assert runtime.owner.ready
-    assert woken.documents and set(woken.documents) == {record.document_id}
+    assert woken.documents == []
 
 
 def test_a_runtime_without_a_background_entry_still_settles(make_runtime):

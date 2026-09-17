@@ -178,8 +178,8 @@ def _cite(created, payload):
 
 
 @contextmanager
-def offline_model(evidence):
-    """Pinned native SDK/adapter; exactly four synthetic model responses.
+def offline_role_models(evidence):
+    """Pinned native SDK/adapter roles; exactly four synthetic A responses.
 
     Reuse the proven fixture's read/create replies. The
     dynamic container ref comes from the actual jd_read result, never a guess.
@@ -188,7 +188,8 @@ def offline_model(evidence):
     import httpx
     import pytest
     from langsmith import tracing_context
-    from jd_relational.consultant_model import OPENROUTER_HEADERS, create_consultant_model
+    from jd_relational.openrouter_model import OPENROUTER_HEADERS
+    from jd_relational.role_models import create_role_models
     from support.openrouter_replies import reply
     from test_ai_runtime_postgres import _read, _create
 
@@ -233,16 +234,22 @@ def offline_model(evidence):
                           headers=OPENROUTER_HEADERS) as client:
             async_client = httpx.AsyncClient(transport=httpx.MockTransport(receive),
                                              trust_env=False, headers=OPENROUTER_HEADERS)
-            model = create_consultant_model(api_key=KEY, http_client=client,
-                                            async_http_client=async_client,
-                                            request_timeout=5, max_output_tokens=2048)
+            models = create_role_models(api_key=KEY, http_client=client,
+                                        async_http_client=async_client)
             try:
-                yield model
+                yield models
             finally:
                 asyncio.run(async_client.aclose())
                 evidence.flush()
                 if not all(body.is_closed for body in bodies):
                     raise ValueError("synthetic_model_body_unclosed")
+
+
+@contextmanager
+def offline_model(evidence):
+    """Expose the consultant role for the focused SDK transport tests."""
+    with offline_role_models(evidence) as models:
+        yield models.consultant
 
 
 def serve(target):
@@ -259,10 +266,12 @@ def serve(target):
     file = fixture_file(target, value)
     file.read()  # Validate every real DPAPI read before any selected DB is opened.
     evidence = Evidence(target)
-    with offline_model(evidence) as model:
-        child = build_consultant_node(model, tools=build_jd_tools(),
+    with offline_role_models(evidence) as models:
+        child = build_consultant_node(models.consultant, tools=build_jd_tools(),
             guidance="只供合成 UI 驗收；忠實保存原話描述的工作。", extra_middleware=(AiToolMiddleware(),))
-        managed = open_managed_app(file, consultant=child, enable_chat=True)
+        managed = open_managed_app(file, consultant=child, enable_chat=True,
+                                   case_model=models.case,
+                                   understanding_model=models.understanding)
         done, control, started = Event(), {"reason": "server_exit"}, monotonic()
         server = None
         try:

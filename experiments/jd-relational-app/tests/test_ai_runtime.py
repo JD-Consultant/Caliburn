@@ -19,8 +19,10 @@ from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import START, END, StateGraph
 
 from jd_relational.ai_runtime import AiRuntime, AiRuntimeError, _pending_calls, _verify_saved_results
+from jd_relational.consultant_context import ConsultantContext
 from jd_relational.consultant_tools import decode_ai_binding
 from jd_relational.manual_runtime import ForegroundHandle, ManualRuntime, RuntimeFailure
+from jd_relational.notice_history import NoticeBoundary, NoticeMaterial
 from jd_relational.observation_projection import project_observation
 from jd_relational.reads import read_json
 from jd_relational.references import ReferenceCodec
@@ -58,7 +60,8 @@ class SyntheticRuntime(AiRuntime):
 def make_runtime():
     owners, releases, runtimes = [], [], []
 
-    def make(node=None, *, saver=None, background=None):
+    def make(node=None, *, saver=None, background=None, background_availability=None,
+             runtime_type=SyntheticRuntime):
         calls = []
         def work(state):
             calls.append(state["jd_ai_run"]["run_id"])
@@ -72,7 +75,8 @@ def make_runtime():
         graph = build_document_graph(child.compile(), saver or InMemorySaver())
         owner = ManualRuntime(DocumentCheckpoints(graph), SyntheticStorage, max_workers=2)
         codec = ReferenceCodec(b"synthetic-ai-runtime-test-key-32", str(uuid4()))
-        runtime = SyntheticRuntime(owner, codec, background=background)
+        runtime = runtime_type(owner, codec, background=background,
+            background_availability=background_availability)
         owners.append(owner); runtimes.append(runtime)
         return runtime, graph, calls
 
@@ -86,6 +90,44 @@ def make_runtime():
                 handle.wait(5)
     for owner in owners:
         assert owner.close(timeout=5)
+
+
+def test_real_run_injects_background_availability_into_its_consultant_context(make_runtime):
+    make, _ = make_runtime
+    calls = []
+
+    def availability(document_id, head):
+        calls.append((document_id, head))
+        return ""
+
+    runtime, graph, model_calls = make(
+        background_availability=availability, runtime_type=AiRuntime,
+    )
+    document, run = str(uuid4()), str(uuid4())
+    runtime.notices.read = lambda document_id, baseline=None: NoticeMaterial(
+        document_id, baseline, NoticeBoundary(HEAD, 1), (), 0, 0, 0,
+    )
+    contexts = []
+    invoke = graph.invoke
+
+    def capture(*args, **kwargs):
+        contexts.append(kwargs.get("context"))
+        return invoke(*args, **kwargs)
+
+    graph.invoke = capture
+    result = runtime.start(document, run, "原始問答", expected_revision_id=HEAD).wait(5)
+
+    assert result.status == "completed" and model_calls == [run]
+    assert len(contexts) == 1 and isinstance(contexts[0], ConsultantContext)
+    assert contexts[0].document_id == document and contexts[0].run_id == run
+    assert contexts[0].background_availability is availability
+    assert calls == [], "context injection itself must not read or wake the background"
+
+
+def test_uncallable_background_availability_is_refused_at_assembly(make_runtime):
+    make, _ = make_runtime
+    with pytest.raises(AiRuntimeError, match="^invalid_ai_runtime$"):
+        make(background_availability="not callable")
 
 
 def test_pure_interview_closes_native_root_and_original_request_never_replays(make_runtime):

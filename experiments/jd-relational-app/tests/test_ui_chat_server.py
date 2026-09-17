@@ -95,6 +95,39 @@ def test_existing_serve_marker_refuses_replaying_fixture_before_opening_host(tar
         helper.serve(target)
 
 
+def test_serve_passes_two_caller_owned_background_models_at_managed_app_seam(target, monkeypatch):
+    from jd_relational import managed_app as managed_app_module
+    from jd_relational.openrouter_model import ReceiptChatOpenRouter
+
+    class CompositionSeamReached(RuntimeError):
+        pass
+
+    selected_file = SimpleNamespace(read=lambda: None)
+    observed = {}
+
+    def capture_open(file, **kwargs):
+        observed["file"] = file
+        observed.update(kwargs)
+        raise CompositionSeamReached
+
+    monkeypatch.setattr(helper, "manifest", lambda _: {"fixture": "synthetic"})
+    monkeypatch.setattr(helper, "fixture_file", lambda *_: selected_file)
+    monkeypatch.setattr(managed_app_module, "open_managed_app", capture_open)
+
+    with pytest.raises(CompositionSeamReached):
+        helper.serve(target)
+
+    evidence = json.loads((target / "chat.observations.json").read_text(encoding="utf-8"))
+    assert evidence["model_request_count"] == 0
+    assert evidence["provider_network"] is False
+    assert observed["file"] is selected_file
+    assert observed["enable_chat"] is True
+    assert {"case_model", "understanding_model"} <= observed.keys()
+    assert isinstance(observed["case_model"], ReceiptChatOpenRouter)
+    assert isinstance(observed["understanding_model"], ReceiptChatOpenRouter)
+    assert observed["case_model"] is not observed["understanding_model"]
+
+
 def test_stop_requires_exact_ready_process_manifest_and_preserves_request(target, monkeypatch):
     monkeypatch.setattr(helper, "manifest", lambda _: {"fixture": "synthetic"})
     with pytest.raises(ValueError, match="probe_not_ready"):

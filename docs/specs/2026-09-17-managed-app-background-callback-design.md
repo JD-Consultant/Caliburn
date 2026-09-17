@@ -2,12 +2,12 @@
 
 - 日期：2026-09-17
 - Topic：`JD-R002／MEM-L001`
-- Stage：**G4 Owner 已確認；待 G7 施工**
-- 狀態：managed App 的生命週期、共享顧問 graph、文件範圍注入與背景恢復邊界已收斂；本稿不代表程式已接好、真模型已驗證或 production authority 已切換
+- Stage：**G7 離線窄切片完成**
+- 狀態：managed App 的生命週期、共享顧問 graph、文件範圍注入與背景恢復已完成離線接線與回歸；本稿不代表真模型／付費、完整瀏覽器 App 旅程、layered C、跨 process admission 或 production authority 已完成
 
 ## 1. 結果與範圍
 
-本切片只把已完成的 A 顧問、B1／B2 背景 Memory workflow、dispatcher、正式角色模型及 App 資源接成同一個可管理的本機服務：
+本切片已把既有 A 顧問、B1／B2 背景 Memory workflow、dispatcher、正式角色模型及 App 資源接成同一個可管理的本機服務：
 
 ```text
 一個 managed App process
@@ -39,11 +39,11 @@
 - `AiRuntime._settle()` 已有「前景安全結束後才喚醒背景」的 callback 位置。
 - `BackgroundAvailability` 已將背景狀態縮成一次最小系統提示；它只應通知 A，不應提交背景工作。
 
-### 2.2 必須修正的兩個接線缺口
+### 2.2 本切片已封閉的兩個接線缺口
 
-**缺口一：graph 建立早於 App 文件資源。**目前 availability middleware 要在 graph 建構時綁入 `BackgroundAdmissions／BackgroundWindows`，但這些 reader 只有 managed App 開啟 DB／host 後才存在。若因此為每份文件重建 A graph，或在共用 graph 保存「目前文件」，會製造多份 graph 或跨文件覆寫風險。
+**缺口一：graph 建立早於 App 文件資源。**施工前 availability middleware 要在 graph 建構時綁入 `BackgroundAdmissions／BackgroundWindows`，但這些 reader 只有 managed App 開啟 DB／host 後才存在。現已由每次 invocation 的 Runtime context 注入可信任 provider；共用 graph 不保存 reader、「目前文件」或 mutable proxy。
 
-**缺口二：重新啟動時背景 wake 發生得太早。**目前前景恢復 callback 會在 `ManualRuntime.finish_startup()` 尚未把 Runtime 標為 ready 時嘗試 wake；background admission 會以 `startup_pending` 拒絕，而上層又把錯誤隔離掉，因此可能留下「前景已恢復，但既有背景工作沒有再被喚醒」的狀態。
+**缺口二：重新啟動時背景 wake 發生得太早。**施工前前景恢復 callback 會在 `ManualRuntime.finish_startup()` 尚未把 Runtime 標為 ready 時嘗試 wake；background admission 會以 `startup_pending` 拒絕，而上層又把錯誤隔離掉。現已讓 low-level previous-host recovery 不 wake，待 `finish_startup()` 完成並標記 ready 後，才由 coordinator 掃 catalog、依 durable state 逐文件恢復。
 
 這兩個問題是 managed assembly／生命週期接線問題，不是 Memory、compaction 或 B1／B2 語意問題。
 
@@ -189,9 +189,9 @@ settle 確實關閉後，coordinator.wake(document_id)
 - shutdown 中拒絕新 background admission；已接受工作由既有 drain 規則收束。
 - no-key 模式不消費 pending 工作，也不清空它。
 
-## 7. G7 驗收
+## 7. G7 驗收與實際證據
 
-第一施工切片只需要固定以下效果：
+本 G7 切片已固定以下效果：
 
 1. A graph 只建立一次，且可在 App 文件 DB readers 尚未存在時建立；兩份文件交錯 invoke 不會混用 notice 或背景資源。
 2. availability provider 每個 employee input 最多讀一次，只產生 system notice，不 wake、不寫 DB、不送模型請求。
@@ -205,6 +205,17 @@ settle 確實關閉後，coordinator.wake(document_id)
 10. 既有 Memory bundle、引用、compaction、Prompt、JD 及 publication 規則不變。
 
 已通過且不受修改影響的 package、dispatcher、角色模型與 compaction 證據直接沿用；不重跑沒有依賴關係的完整研究或相同 provider smoke。
+
+2026-09-17 Task 4 使用 `--offline --frozen --no-sync`、workspace uv cache、停用 pytest cache 且未提供正式 credential，取得以下 fresh 證據：
+
+- Task 3 re-review 已關閉唯一曾阻擋 closure 的 T3-R1：synthetic `ui_chat_server.serve()` fresh-marker 路徑使用同組 caller-owned `MockTransport` sync／async clients 建立 A／B1／B2，並把互異的 `case／understanding` model objects 傳入 `open_managed_app()`；composition 前固定 `model_request_count == 0`、`provider_network is False`。
+- 上述 focused 測試刻意停在 `open_managed_app` composition seam，未啟動 DB、lifespan、listener 或瀏覽器；因此它只證明 UI helper 不再因漏傳 B1／B2 models 而固定組裝失敗，不代表真 PostgreSQL、provider、完整瀏覽器 App 旅程或 production authority 已通過。
+- 指定受影響集合：**125 passed／2 skipped／1 warning／0 failed**；兩個 skip 是需要明示隔離 PostgreSQL opt-in 的既有案例，未把它們寫成通過。唯一 warning 是既有 Starlette `anyio.abc.BlockingPortal` alias deprecation。
+- 第一次完整 App suite：**2,976 passed／320 skipped／5 warnings／37 setup errors**。首個 error 是 `test_missing_read_does_not_initialize` 在建立 `tmp_path` 前掃描既有 `C:\Users\chenb\AppData\Local\Temp\pytest-of-chenb` 時遇到 `WinError 5`；37 個 errors 都是同一 pytest 暫存 ACL，沒有進入產品測試本體。以同一首例在全新、可寫的隔離 basetemp 重跑為 **1 passed**，確認是環境條件而非本計畫回歸。
+- 使用另一個全新隔離 basetemp 完整重跑：**3,013 passed／320 skipped／5 warnings／0 failed**。五項 warnings 是一項上述 Starlette deprecation 與四項既有 Pydantic `ConsultantContext` serializer warnings；skipped 保持 skipped，不代稱真 PostgreSQL、provider 或瀏覽器情境已通過。
+- `python -m compileall -q src tests`：exit 0。三次驗證前後 `uv.lock` SHA-256 都是 `4D420BC0B9A39A9DB6D9A36B11BA6DF8CEC995D6B9B7EC902EA0E3DE9E24EDBB`，未修改 lock。
+
+以上固定：共用 graph 無建構期 reader 綁定；兩文件的 per-invocation provider 隔離且每個 employee input 只讀一次；coordinator map 僅是 process-local keyed single-flight、可由 catalog＋durable admission／checkpoint／publication 重建；startup ready 後才恢復；一般 turn settle 後 wake 與 shutdown drain 保留；manual／no-key 不建立 coordinator。整個切片為零 provider request、零正式 key read、零付費、零 schema／migration；沒有宣稱未執行的 PG、自然模型、完整瀏覽器或 production authority 通過。
 
 ## 8. 不採用方案
 
@@ -232,6 +243,8 @@ settle 確實關閉後，coordinator.wake(document_id)
 - [Anthropic：Managed agents](https://www.anthropic.com/engineering/managed-agents)，查閱 2026-09-17；外部 durable session、replaceable harness 與明示 wake／resume。
 - [AWS：Idempotency in durable executions](https://docs.aws.amazon.com/durable-execution/patterns/best-practices/idempotency/) 與 [DynamoDB conditional writes](https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/WorkingWithItems.html)，查閱 2026-09-17；重試 side effect 與條件寫入邊界。
 
-## 11. 下一步
+## 11. 下一 gate 與未完成邊界
 
-下一步依 [窄 G7 施工計畫](../superpowers/plans/2026-09-17-managed-app-background-callback.md)執行：先用反例固定「共享 graph 的每次執行注入」與「Runtime ready 後才恢復背景」，再做最小接線。此時不順手加入 C、UI、provider smoke、文件封存或完整 App 驗收。
+本 managed callback 的窄 G7 已完成。依既有 [MEM-L001 分層 Memory 路由](2026-09-16-layered-case-and-work-understanding-memory-alignment.md)，**唯一下一 gate 是獨立的 layered C bundle repair**；本切片不自動開始該工作。
+
+其後仍須分開完成自然模型／付費驗證、完整瀏覽器 App 旅程與 production authority 正式化。現行產品仍是單 process、host lease、單一背景 worker；若未來要改為多 App process／多 worker 共用同一 DB，必須在拓撲變更前新增並驗證 DB 原子 admission claim，不能以目前的 process-local coordinator map 冒充跨 process 保證。

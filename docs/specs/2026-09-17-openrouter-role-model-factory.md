@@ -3,7 +3,7 @@
 - 日期：2026-09-17
 - Topic：`JD-R002`
 - Stage：**G7 離線窄切片完成**
-- 狀態：A／B1／B2 的正式角色模型由單一 App factory 建立，B1／B2 正式執行限制已由 App profile 統一；尚未接 managed background callback、layered C、付費自然模型或 production authority
+- 狀態：A／B1／B2 的正式角色模型由單一 App factory 建立，B1／B2 正式執行限制已由 App profile 統一；successor 已完成 managed background callback 的離線窄接線，仍未完成 layered C、付費自然模型、完整瀏覽器 App 旅程或 production authority
 
 ## 1. 目的與既有決策
 
@@ -97,4 +97,6 @@ RoleModels
 - [CTX-C001 compaction](2026-09-16-openrouter-continuation-compaction-design.md)；同角色 main／summary model boundary。
 - [MEM-L001 workflow](2026-09-17-layered-memory-background-workflow-design.md)；B1／B2 注入點、attempt 與 publication 權責。
 
-managed callback 的 G4 已由 [managed App 背景 callback 設計](2026-09-17-managed-app-background-callback-design.md)收斂；下一 gate 是其窄 G7 施工：把 process-owned `RoleModels.case／understanding` 經 App-owned coordinator 注入既有 document-scoped `BackgroundMemoryWorkflow`，並以 per-invocation Runtime context 供共用 A graph 取得背景 availability。該片只組裝已完成的 dispatcher、workflow 與本稿正式 profile，不得再沿 fixture 猜值或重開 Memory／compaction 設計。
+[managed App 背景 callback](2026-09-17-managed-app-background-callback-design.md) successor 已完成窄 G7：process-owned `RoleModels.case／understanding` 已經 App-owned coordinator 注入既有 document-scoped `BackgroundMemoryWorkflow`，共用 A graph 也改由 per-invocation Runtime context 取得背景 availability；完整 App 離線回歸為 **3,013 passed／320 skipped／5 warnings／0 failed**。**唯一下一 gate 是獨立 layered C bundle repair**；其後的自然模型／付費、完整瀏覽器 App 旅程與 production authority 仍分開驗證，多 process 拓撲則必須先補 DB 原子 admission claim。本稿的模型 factory 契約與既有 Memory／compaction 邊界不因 successor 重開。
+
+Task 3 re-review 已關閉 synthetic `ui_chat_server` 漏傳 B1／B2 models 的 UI helper composition seam；該 focused 證據固定零 model request／零 provider network，但停在 `open_managed_app` 邊界，未啟動 DB、lifespan、listener 或瀏覽器，完整瀏覽器 App 旅程仍未驗。

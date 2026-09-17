@@ -26,9 +26,9 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 
 create／revise／split／merge 已使用 attempt registry 做精確 evidence 分配：模型只選 Runtime 已展示的短 keys，Runtime 解析、驗證並依 source owner 順序 canonicalize 正式 signed references。create 提交完整引用集合；revise 只送 add/remove 差異且可做純引用修補；split 為每個 replacement 分配完整集合並明示未沿用舊證據的理由；merge 從既有聯集套用差異。`finish_case_maintenance()` 不收 outcome，由 Runtime 計算 `changed/no_op`。guide link、穩定 UUID 與 supersession 仍由 Runtime 產生；這些結果仍是 staged，尚未發布新 bundle。
 
-B1 的 canonical 訪談 batch 是受保護來源：之後的 request-only compaction 不得摘要、截斷或替換它，也不能把 continuity summary 當作案例證據。compaction 只能處理 B1 自己已安全完成的舊模型／工具往返；原始訪談由來源 owner 持續完整保存。
+B1 正常以一個完整 canonical 訪談 batch 工作，不固定呼叫 compaction。若來源交付實際分成多個窗口，目前尚未完整處理的最新窗口必須逐字保留；已完整交付、其模型／工具 wave 安全完成且 Runtime checkpoint 已推進的舊窗口，才可在後續 request view 中像 A 的舊對話一樣被 continuity compaction。原始訪談、signed references 與 evidence registry 仍由來源 owner／checkpoint 完整保存並可按需回查；continuity summary 只作工作延續 Context，不能當案例證據、Memory 或 JD basis。
 
-這仍是 package 內的 B1 候選；目前已由 `BackgroundMemoryWorkflow` 與 B2 staged result 組成同一完整 bundle 後一次發布，但正式 App model factory／dispatcher、compaction、UI 或自然模型驗收仍未接。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
+這仍是 package 內的 B1 候選；目前已由 `BackgroundMemoryWorkflow` 與 B2 staged result 組成同一完整 bundle 後一次發布。後續 App 已從精確注入的 B1 role model 與明示 output reserve 建立 request-only compaction middleware；package 只接受 middleware 並攜帶 state，不選 provider。正式 OpenRouter／Luna role factory、managed callback、layered C、UI、provider／自然模型與完整 dispatcher／App journey 仍未完成。完整語意、驗收及下一接點見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)及[B1 前兩施工切片](../../docs/plans/2026-09-16-b1-case-maintainer.md)。
 
 ### Ordered evidence source port（App 接點與 B1 stage 已接）
 
@@ -44,7 +44,7 @@ B1 的 canonical 訪談 batch 是受保護來源：之後的 request-only compac
 
 若原話只補足細節，B2 繼續整理；若原話證明 B1 有會影響工作理解的實質錯誤或缺漏，`request_case_rework` 只收已讀 `evidence_key` 與理由，由 Runtime 寫入正式 case／reference 配對並以結構化 `case_rework_required` 結束 attempt。該結果不能交給 `current_understandings()` 或 publication；B2 不改案例，也不自行重跑 B1。所有 B2 工具 schema 都拒絕模型填入 document、signed reference、offset、版本與 outcome；目前已驗的是 Runtime／ToolNode 的 strict 拒絕，OpenRouter wire-level strict 尚未證明。這一片已驗 changed、semantic no-op／完整 binding 重驗、按案例限制的來源讀取、rework terminal、同輸入冪等、新 B1 attempt 清除舊訊息、transport resume、完成修正及 incomplete／refusal／額度防護。
 
-B2 本身仍不越權重跑 B1 或發布；package 外層 `BackgroundMemoryWorkflow` 現已消費這個 terminal，建立新 B1／B2 attempt，並在最多一次返工後發布或 blocked。dispatcher、compaction、App 組裝與自然模型驗收仍未完成。完整契約與結果見 [B2 staged maintainer 計畫](../../docs/plans/2026-09-16-b2-understanding-maintainer.md)、[B2 Agent graph 計畫](../../docs/plans/2026-09-16-b2-understanding-agent.md)及[完整背景 workflow 設計](../../docs/specs/2026-09-17-layered-memory-background-workflow-design.md)。
+B2 本身仍不越權重跑 B1 或發布；package 外層 `BackgroundMemoryWorkflow` 現已消費這個 terminal，建立新 B1／B2 attempt，並在最多一次返工後發布或 blocked。後續 App 已用精確注入的 B2 role model 組裝 request-only middleware：同一 attempt 固定第一個 task message 並恢復 `continuation_compaction`，新的 stale attempt 從空 state 開始。正式 role factory、managed callback、provider／自然模型與完整 dispatcher／App journey 仍未完成。完整契約與結果見 [B2 staged maintainer 計畫](../../docs/plans/2026-09-16-b2-understanding-maintainer.md)、[B2 Agent graph 計畫](../../docs/plans/2026-09-16-b2-understanding-agent.md)及[完整背景 workflow 設計](../../docs/specs/2026-09-17-layered-memory-background-workflow-design.md)。
 
 ### 分層完整背景 workflow（package 已完成）
 
@@ -54,7 +54,7 @@ B2 回報 `case_rework_required` 時，outer Runtime 從被拒 B1 stage 取得�
 
 CAS stale 時舊 stages、candidate 與 request 不會換版重送；Runtime 保留 source 與 rework 次數、增加有界 stale counter，重新取得 head。若新 cursor 已涵蓋來源，直接回正式 head；只有 source owner 證明為 `next` 才建立新的 B1／B2 semantic attempts。`PublicationUncertain` 不配置新 operation：outer checkpoint 保留原 `PublishRequest`，resume 以相同 operation／digest 由 receipt 查回。所有 outer `invoke` 使用同步 durability。
 
-目前證據是固定模型＋real package sessions／Store＋SQLite publication 的離線契約測試，以及相鄰 App source-owner 測試；不等於真 PostgreSQL／新程序資源恢復、dispatcher、C bundle repair、B1 compaction、provider wire 或自然模型品質已通過。
+本 workflow 自身的證據是固定模型＋real package sessions／Store＋SQLite publication 的離線契約測試，以及相鄰 App source-owner 測試；後續 App 窄切片另有 PostgreSQL／新程序資源恢復證據。2026-09-17 compaction 收尾的 fresh 指定回歸為 App **52 passed、0 skipped**、package **50 passed、0 skipped**，兩側 `compileall` 成功；它證明 B1／B2 App-side request-only wiring 與 attempt lifecycle，不等於 C bundle repair、正式 role factory、managed callback、provider wire、自然模型品質或完整 dispatcher／App journey 已通過，也未完整覆蓋 publication／JD byte-for-byte unchanged。
 
 ## 即時修補核心
 
@@ -103,4 +103,4 @@ uv build --out-dir ../../.research-tmp/jd-memory-core-dist
 
 Deep Agents 的標準 distribution 會連帶安裝 Anthropic／Google 等 provider 套件；OpenAI Agents SDK 0.22.0 提供公開純文字 patch 函式，patch／保存核心不建立 provider；B1 執行由 App 注入的模型 runnable。未為減少套件數自行複製框架 backend 或 matcher。此次新增 SDK 及其相依共八包，原 App 既有套件無升降；後續按具體相容性驗證，不追逐版本號。
 
-目前最新分層 bundle authority、完整回合引用、B1／B2 staged Agent graphs、durable attempts，以及外層 B1→B2 有界 rework／共同 publication／stale recovery 已在 package 完成；舊 publication CAS／receipt 與顧問方法資產保留作接續基礎。**C bundle repair、正式 App model factory／dispatcher、真 PG 新程序旅程、B1 compaction 與完整 App 驗收仍未完成**；不要把 package 測試、舊 B1／B2 真 PG 證據或固定組裝測試代稱新分層流程已可日常使用，也不能宣稱新流程自然品質已驗。
+目前最新分層 bundle authority、完整回合引用、B1／B2 staged Agent graphs、durable attempts，以及外層 B1→B2 有界 rework／共同 publication／stale recovery 已在 package 完成；App 已完成 B1／B2 request-only compaction 的離線注入與 lifecycle 驗證，summary 只是非權威 Context，canonical source、signed references 與 evidence registry 仍可查且具權威。**C bundle repair、正式 OpenRouter／Luna role factory、managed App callback、provider／自然模型、完整 dispatcher／App journey 與 production authority 仍未完成**；不要把 package／compaction 測試或既有窄接合證據代稱新分層流程已可日常使用，也不能宣稱 publication／JD byte-for-byte invariance 或自然模型品質已驗。

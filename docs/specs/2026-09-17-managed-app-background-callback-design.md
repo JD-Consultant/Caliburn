@@ -234,4 +234,4 @@ settle 確實關閉後，coordinator.wake(document_id)
 
 ## 11. 下一步
 
-下一步依本稿寫一份窄 G7 施工計畫，先用反例固定「共享 graph 的每次執行注入」與「Runtime ready 後才恢復背景」，再做最小接線。此時不順手加入 C、UI、provider smoke、文件封存或完整 App 驗收。
+下一步依 [窄 G7 施工計畫](../superpowers/plans/2026-09-17-managed-app-background-callback.md)執行：先用反例固定「共享 graph 的每次執行注入」與「Runtime ready 後才恢復背景」，再做最小接線。此時不順手加入 C、UI、provider smoke、文件封存或完整 App 驗收。

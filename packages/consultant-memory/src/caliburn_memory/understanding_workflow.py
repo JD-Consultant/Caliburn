@@ -53,6 +53,7 @@ UNDERSTANDING_MAINTENANCE_INSTRUCTIONS = """你是背景工作理解整理者 B2
 
 
 class UnderstandingMaintenanceWorkflowState(UnderstandingMaintenanceAgentState):
+    continuation_compaction: NotRequired[dict[str, Any] | None]
     case_attempt_id: NotRequired[str | None]
     completion_corrections: NotRequired[int]
     completion_limit: NotRequired[int]
@@ -259,6 +260,7 @@ class UnderstandingMaintenanceWorkflow:
         max_tool_calls: int,
         max_completion_corrections: int = 1,
         max_output_tokens: int = 8192,
+        context_middleware: AgentMiddleware | None = None,
     ):
         if reader.document_id != session.artifacts.document_id:
             raise ValueError("Understanding-maintenance components belong to different documents")
@@ -271,9 +273,12 @@ class UnderstandingMaintenanceWorkflow:
                 raise ValueError(f"{name} must be a positive integer")
         if type(max_completion_corrections) is not int or max_completion_corrections < 0:
             raise ValueError("max_completion_corrections must be a nonnegative integer")
+        if context_middleware is not None and not isinstance(context_middleware, AgentMiddleware):
+            raise ValueError("context_middleware must be an AgentMiddleware")
 
         self.reader = reader
         self.session = session
+        self.context_middleware = context_middleware
         self.max_completion_corrections = max_completion_corrections
         self.recursion_limit = max(100, max_model_steps * 3 + 6)
         route = str(uuid5(
@@ -290,20 +295,23 @@ class UnderstandingMaintenanceWorkflow:
             *understanding_maintenance_tools(reader, session),
             *understanding_workflow_tools(reader, session),
         ]
+        middleware = [
+            UnderstandingMaintenanceResponseGuard(),
+            ModelCallLimitMiddleware(
+                thread_limit=max_model_steps, exit_behavior="error",
+            ),
+            ToolCallLimitMiddleware(
+                thread_limit=max_tool_calls, exit_behavior="error",
+            ),
+        ]
+        if context_middleware is not None:
+            middleware.append(context_middleware)
         agent = create_agent(
             model=configured_model,
             tools=tools,
             system_prompt=UNDERSTANDING_MAINTENANCE_INSTRUCTIONS,
             state_schema=UnderstandingMaintenanceWorkflowState,
-            middleware=[
-                UnderstandingMaintenanceResponseGuard(),
-                ModelCallLimitMiddleware(
-                    thread_limit=max_model_steps, exit_behavior="error",
-                ),
-                ToolCallLimitMiddleware(
-                    thread_limit=max_tool_calls, exit_behavior="error",
-                ),
-            ],
+            middleware=middleware,
         )
         builder = StateGraph(UnderstandingMaintenanceWorkflowState)
         builder.add_node("load_task", self._load_task)
@@ -350,6 +358,7 @@ class UnderstandingMaintenanceWorkflow:
         initial = {
             "messages": [],
             "understanding_stage": opened.to_dict(),
+            "continuation_compaction": None,
             "case_attempt_id": case_attempt_id,
             "completion_corrections": 0,
             "completion_limit": self.max_completion_corrections,
@@ -375,6 +384,7 @@ class UnderstandingMaintenanceWorkflow:
         initial = {
             "messages": messages,
             "understanding_stage": opened.to_dict(),
+            "continuation_compaction": None,
             "case_attempt_id": None,
             "completion_corrections": 0,
             "completion_limit": self.max_completion_corrections,

@@ -97,4 +97,4 @@ RoleModels
 - [CTX-C001 compaction](2026-09-16-openrouter-continuation-compaction-design.md)；同角色 main／summary model boundary。
 - [MEM-L001 workflow](2026-09-17-layered-memory-background-workflow-design.md)；B1／B2 注入點、attempt 與 publication 權責。
 
-下一 gate 是把 process-owned `RoleModels.case／understanding` 經 document-scoped managed callback 注入既有 `BackgroundMemoryWorkflow`。該片只組裝已完成的 dispatcher、workflow 與本稿正式 profile，不得再沿 fixture 猜值或重開 Memory／compaction 設計。
+managed callback 的 G4 已由 [managed App 背景 callback 設計](2026-09-17-managed-app-background-callback-design.md)收斂；下一 gate 是其窄 G7 施工：把 process-owned `RoleModels.case／understanding` 經 App-owned coordinator 注入既有 document-scoped `BackgroundMemoryWorkflow`，並以 per-invocation Runtime context 供共用 A graph 取得背景 availability。該片只組裝已完成的 dispatcher、workflow 與本稿正式 profile，不得再沿 fixture 猜值或重開 Memory／compaction 設計。

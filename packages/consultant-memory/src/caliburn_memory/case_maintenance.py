@@ -234,6 +234,7 @@ class CaseMaintenanceStage:
 
 class CaseMaintenanceAgentState(AgentState):
     case_stage: dict[str, Any]
+    continuation_compaction: NotRequired[dict[str, Any] | None]
     source_reference: NotRequired[str]
     source_windows: NotRequired[list[dict[str, Any]]]
     case_attempt_id: NotRequired[str | None]
@@ -1388,8 +1389,9 @@ class CaseMaintenanceWorkflow:
     The source owner may split the batch into bounded model windows.  Those
     windows and their context-only prefixes shape requests; the outer batch is
     the sole canonical source attached to staged case changes.  This graph
-    never publishes Memory and deliberately has no B2, dispatcher or
-    compaction responsibility.
+    never publishes Memory and deliberately has no B2 or dispatcher
+    responsibility.  The App selects and implements any compaction policy;
+    this graph only carries an injected request-context middleware.
     """
 
     def __init__(
@@ -1406,6 +1408,7 @@ class CaseMaintenanceWorkflow:
         max_windows: int = 16,
         max_completion_corrections: int = 1,
         max_output_tokens: int = 8192,
+        context_middleware: AgentMiddleware | None = None,
     ):
         if reader.document_id != session.artifacts.document_id:
             raise ValueError("Case-maintenance components belong to different documents")
@@ -1420,9 +1423,12 @@ class CaseMaintenanceWorkflow:
                 raise ValueError(f"{name} must be a positive integer")
         if type(max_completion_corrections) is not int or max_completion_corrections < 0:
             raise ValueError("max_completion_corrections must be a nonnegative integer")
+        if context_middleware is not None and not isinstance(context_middleware, AgentMiddleware):
+            raise ValueError("context_middleware must be an AgentMiddleware")
 
         self.reader = reader
         self.session = session
+        self.context_middleware = context_middleware
         self.max_chars = max_chars
         self.context_chars = context_chars
         self.max_windows = max_windows
@@ -1435,20 +1441,23 @@ class CaseMaintenanceWorkflow:
         }
 
         configured_model = model.model_copy(update={"max_tokens": max_output_tokens})
+        middleware = [
+            CaseMaintenanceResponseGuard(),
+            ModelCallLimitMiddleware(
+                thread_limit=max_model_steps, exit_behavior="error",
+            ),
+            ToolCallLimitMiddleware(
+                thread_limit=max_tool_calls, exit_behavior="error",
+            ),
+        ]
+        if context_middleware is not None:
+            middleware.append(context_middleware)
         agent = create_agent(
             model=configured_model,
             tools=case_maintenance_tools(reader, session),
             system_prompt=CASE_MAINTENANCE_INSTRUCTIONS,
             state_schema=CaseMaintenanceAgentState,
-            middleware=[
-                CaseMaintenanceResponseGuard(),
-                ModelCallLimitMiddleware(
-                    thread_limit=max_model_steps, exit_behavior="error",
-                ),
-                ToolCallLimitMiddleware(
-                    thread_limit=max_tool_calls, exit_behavior="error",
-                ),
-            ],
+            middleware=middleware,
         )
         builder = StateGraph(CaseMaintenanceAgentState)
         builder.add_node("load_window", self._load_window)
@@ -1607,6 +1616,7 @@ class CaseMaintenanceWorkflow:
         initial = {
             "messages": [],
             "case_stage": stage.to_dict(),
+            "continuation_compaction": None,
             "source_reference": source_reference,
             "source_windows": windows,
             "case_attempt_id": case_attempt_id,
@@ -1656,6 +1666,7 @@ class CaseMaintenanceWorkflow:
         initial = {
             "messages": messages,
             "case_stage": stage.to_dict(),
+            "continuation_compaction": None,
             "source_reference": source_reference,
             "source_windows": windows,
             "case_attempt_id": None,

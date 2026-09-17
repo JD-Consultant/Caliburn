@@ -6,6 +6,7 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
+from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
 from langchain_core.language_models.chat_models import BaseChatModel
 from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
@@ -45,6 +46,15 @@ class FixedModel(BaseChatModel):
         return ChatResult(generations=[ChatGeneration(message=reply)])
 
 
+class RequestProbe(AgentMiddleware):
+    def __init__(self):
+        self.requests = []
+
+    def wrap_model_call(self, request, handler):
+        self.requests.append(deepcopy(request.messages))
+        return handler(request)
+
+
 def _call(name, arguments, identity):
     return AIMessage("", id=f"message-{identity}", tool_calls=[{
         "name": name, "args": arguments, "id": identity, "type": "tool_call",
@@ -81,6 +91,28 @@ def _one_window(source, *, text="甲案原話：本人先做故障初判。", co
         "context_reference": context_reference,
     }])
     return batch, window, context_reference
+
+
+def test_context_middleware_receives_the_assembled_b1_request_and_initial_state():
+    probe = RequestProbe()
+    source, _session, _model, workflow = _workflow(
+        [
+            _call("finish_case_maintenance", {}, "finish"),
+            _done("done"),
+        ],
+        context_middleware=probe,
+    )
+    batch, _window, _context = _one_window(source)
+
+    result = workflow.start(batch, base_publication_revision=0, base_version=None)
+
+    assert probe.requests
+    payload = json.loads(next(
+        message.content for message in probe.requests[0]
+        if isinstance(message, HumanMessage)
+    ))
+    assert "NEW_SOURCE" in payload
+    assert result["continuation_compaction"] is None
 
 
 def test_all_planned_windows_share_one_stage_and_each_case_selects_exact_window_evidence():

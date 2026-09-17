@@ -6,6 +6,7 @@ from typing import Any
 from uuid import uuid4
 
 import pytest
+from langchain.agents.middleware import AgentMiddleware
 from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
 from langchain.agents.middleware.tool_call_limit import ToolCallLimitExceededError
 from langchain_core.language_models.chat_models import BaseChatModel
@@ -42,6 +43,15 @@ class FixedModel(BaseChatModel):
         if isinstance(reply, Exception):
             raise reply
         return ChatResult(generations=[ChatGeneration(message=reply)])
+
+
+class RequestProbe(AgentMiddleware):
+    def __init__(self):
+        self.requests = []
+
+    def wrap_model_call(self, request, handler):
+        self.requests.append(deepcopy(request.messages))
+        return handler(request)
 
 
 def _call(name, arguments, identity):
@@ -150,6 +160,20 @@ def _no_op_replies(ids, prefix):
               f"{prefix}-finish"),
         _done(f"{prefix}-done"),
     ]
+
+
+def test_context_middleware_receives_the_assembled_b2_request_and_initial_state():
+    probe = RequestProbe()
+    _source, _session, model, workflow, case_stage, ids = _harness(
+        [], context_middleware=probe,
+    )
+    model.replies.extend(_no_op_replies(ids, "probe"))
+
+    result = workflow.run_attempt(case_stage, case_attempt_id=str(uuid4()))
+
+    task = next(message for message in probe.requests[0] if isinstance(message, HumanMessage))
+    assert "B1_CHANGES" in json.loads(task.content)
+    assert result["continuation_compaction"] is None
 
 
 def test_agent_revises_stable_understanding_without_preloading_case_or_raw_text():

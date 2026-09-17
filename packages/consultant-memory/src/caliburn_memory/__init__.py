@@ -15,6 +15,10 @@ from caliburn_memory.case_maintenance import (
 from caliburn_memory.consolidation import ConsolidationWorkflow
 from caliburn_memory.extraction import INSTRUCTIONS, ExtractionOutput, ExtractionWorkflow
 from caliburn_memory.guidance import MEMORY_ACTION_GUIDANCE
+from caliburn_memory.layered_repair import (
+    LayeredRepair, LayeredRepairWorkflow, LayeredUnderstandingRepair,
+    build_layered_repair_graph,
+)
 from caliburn_memory.memory import ExtractionFiles, MemoryArtifacts, MemoryVersion, ReadOnlyFiles
 from caliburn_memory.publication import (
     PublicationStore, PublicationUncertain, PublishedHead, PublishRequest, Receipt, StalePublication,
@@ -55,6 +59,8 @@ __all__ = [
     "EvidenceTextPage",
     "INSTRUCTIONS", "ExtractionOutput", "ExtractionSourceReader", "ExtractionWorkflow",
     "ConsolidationWorkflow", "MEMORY_ACTION_GUIDANCE",
+    "LayeredRepair", "LayeredRepairWorkflow", "LayeredUnderstandingRepair",
+    "build_layered_repair_graph",
     "SkillAssets", "analysis_files", "analysis_skills",
     "UnderstandingChange", "UnderstandingMaintenanceAgentState",
     "CaseReworkIssue", "CaseReworkIssueInput", "CaseSourceRead",

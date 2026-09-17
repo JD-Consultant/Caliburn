@@ -26,6 +26,7 @@ from caliburn_memory import (
     PublicationStore,
     UnderstandingMaintenanceSession,
     UnderstandingMaintenanceWorkflow,
+    WorkUnderstandingArtifact,
 )
 from test_extraction import WindowSource
 
@@ -506,6 +507,160 @@ def publish_empty_repair(built, publish):
         repair_sources=(built["evidence"],),
     )
     return publish(request)
+
+
+def test_repair_impact_reaches_b2_after_b1_no_op_even_when_binding_was_removed():
+    source = WindowSource()
+    base_evidence = source.evidence(
+        "baseevidence", [("user", "三個案例原本共同支持同一項穩定工作理解。")],
+    )
+    repair_evidence = source.evidence(
+        "repairevidence", [("user", "更正：案例 C 不屬於這項穩定工作理解。")],
+    )
+    incoming_evidence = source.evidence(
+        "incoming", [("user", "這批沒有再改變既有案例或工作理解。")],
+    )
+    base_batch = source.window("basebatch", "既有已整理訪談範圍")
+    batch = source.window("batch", "下一批待整理訪談範圍")
+    window = source.window("window", "這批沒有再改變既有案例或工作理解。")
+    source.set_window_evidence(window, incoming_evidence)
+    source.set_history(base_evidence, repair_evidence, incoming_evidence)
+    source.plan(batch, [{"source_reference": window, "context_reference": None}])
+    inherited_progress = source.source_progress
+
+    def planned_progress(_self, reference, previous):
+        if (reference, previous) == (batch, base_batch):
+            return "next"
+        return inherited_progress(reference, previous)
+
+    source.source_progress = MethodType(planned_progress, source)
+
+    artifacts = MemoryArtifacts(InMemoryStore(), source.document_id, source=source)
+    case_a, case_b, case_c, understanding_u = (str(uuid4()) for _ in range(4))
+    case_guide = (
+        f"- [案例 A](/memory/cases/items/{case_a}.md)\n"
+        f"- [案例 B](/memory/cases/items/{case_b}.md)\n"
+        f"- [案例 C](/memory/cases/items/{case_c}.md)"
+    )
+    understanding_guide = (
+        f"- [穩定任務 U](/memory/understanding/items/{understanding_u}.md)"
+    )
+    base = artifacts.save_bundle(
+        base_publication_revision=0,
+        evidence_through_reference=base_batch,
+        case_guide=case_guide,
+        cases=(
+            CaseArtifact(case_a, "## 案例 A\n本人執行共同任務的 A 情境。", (base_evidence,)),
+            CaseArtifact(case_b, "## 案例 B\n本人執行共同任務的 B 情境。", (base_evidence,)),
+            CaseArtifact(case_c, "## 案例 C\n本人執行共同任務的 C 情境。", (base_evidence,)),
+        ),
+        understanding_guide=understanding_guide,
+        understandings=(WorkUnderstandingArtifact(
+            understanding_u,
+            "本人穩定執行 A、B、C 共同呈現的工作任務。",
+            (case_a, case_b, case_c),
+        ),),
+    )
+    engine = create_engine(
+        "sqlite+pysqlite:///:memory:", connect_args={"check_same_thread": False},
+        poolclass=StaticPool,
+    )
+    publication = PublicationStore(engine, artifacts)
+    publication.setup()
+    base_head = publication.publish(publication.prepare(
+        base,
+        expected_revision=0,
+        kind="consolidation",
+        processed_source=base_batch,
+    ))
+    repaired = artifacts.save_bundle(
+        base_publication_revision=base_head.revision,
+        base_version=base_head.memory,
+        evidence_through_reference=repair_evidence,
+        case_guide=case_guide,
+        cases=(
+            CaseArtifact(case_a, "## 案例 A\n本人執行共同任務的 A 情境。", (base_evidence,)),
+            CaseArtifact(case_b, "## 案例 B\n本人執行共同任務的 B 情境。", (base_evidence,)),
+            CaseArtifact(
+                case_c,
+                "## 案例 C\n本人更正：此情境不屬於共同任務 U。",
+                (base_evidence, repair_evidence),
+            ),
+        ),
+        understanding_guide=understanding_guide,
+        understandings=(WorkUnderstandingArtifact(
+            understanding_u,
+            "本人穩定執行 A、B 共同呈現的工作任務。",
+            (case_a, case_b),
+        ),),
+    )
+    repair_head = publication.publish(publication.prepare(
+        repaired,
+        expected_revision=base_head.revision,
+        kind="repair",
+        repair_sources=(repair_evidence,),
+    ))
+
+    case_model = FixedModel(replies=[
+        call("finish_case_maintenance", {}, "finish-case"),
+        done("case-done"),
+    ])
+    case_session = CaseMaintenanceSession(artifacts)
+    case_workflow = CaseMaintenanceWorkflow(
+        source, case_session, case_model, InMemorySaver(),
+        max_model_steps=12, max_tool_calls=12,
+    )
+    understanding_model = FixedModel(replies=[
+        call("read_case", {"case_id": case_c}, "read-c"),
+        call("read_work_understanding", {
+            "understanding_id": understanding_u,
+        }, "read-u"),
+        call("read_case", {"case_id": case_a}, "read-a"),
+        call("read_case", {"case_id": case_b}, "read-b"),
+        call("revalidate_work_understanding", {
+            "understanding_id": understanding_u,
+            "supporting_case_ids": [case_a, case_b],
+        }, "revalidate-u"),
+        call("finish_understanding_maintenance", {}, "finish-understanding"),
+        done("understanding-done"),
+    ])
+    understanding_session = UnderstandingMaintenanceSession(artifacts, case_session)
+    understanding_workflow = UnderstandingMaintenanceWorkflow(
+        source, understanding_session, understanding_model, InMemorySaver(),
+        max_model_steps=12, max_tool_calls=12,
+    )
+    workflow = BackgroundMemoryWorkflow(
+        case_workflow, understanding_workflow, publication, InMemorySaver(),
+        max_stale_retries=2,
+    )
+
+    try:
+        result = workflow.start(batch)
+        task = json.loads(next(
+            item.content
+            for item in understanding_model.requests[0]
+            if isinstance(item, HumanMessage)
+        ))
+        head = publication.current()
+        manifest = artifacts.bundle_manifest(head.memory)
+
+        assert result["status"] == "completed"
+        assert task["B1_CHANGES"] == []
+        assert task["REQUIRED_CASE_IDS"] == [case_c]
+        assert task["DIRECTLY_AFFECTED_UNDERSTANDING_IDS"] == [understanding_u]
+        assert head.revision == repair_head.revision + 1
+        assert publication.latest_consolidation_revision(
+            through_revision=head.revision,
+        ) == head.revision
+        assert {item.case_id for item in manifest.cases} == {case_a, case_b, case_c}
+        assert {(item.understanding_id, item.case_id)
+                for item in manifest.understanding_case_bindings} == {
+            (understanding_u, case_a),
+            (understanding_u, case_b),
+        }
+        assert case_model.replies == [] and understanding_model.replies == []
+    finally:
+        engine.dispose()
 
 
 def test_stale_after_case_rework_restarts_both_layers_from_the_new_head():

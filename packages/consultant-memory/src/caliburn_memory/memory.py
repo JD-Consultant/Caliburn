@@ -168,14 +168,17 @@ class MemoryArtifacts:
         return {"knowledge": knowledge, "guide": guide}
 
     @staticmethod
-    def _save(backend: BackendProtocol, path: str, content: str):
-        content = _prepare_text(content)
+    def _write_exact(backend: BackendProtocol, path: str, content: str):
         result = backend.write(path, content)
         if result.error:
             raise RuntimeError(f"Artifact save failed: {result.error}")
         loaded = backend.download_files([path])[0]
         if loaded.error or loaded.content != content.encode("utf-8"):
             raise RuntimeError("Artifact save could not be verified; not ready for handoff")
+
+    @classmethod
+    def _save(cls, backend: BackendProtocol, path: str, content: str):
+        cls._write_exact(backend, path, _prepare_text(content))
 
     def save_extraction(self, *, summary: str, candidates: str, slug: str, source_reference: str, context_reference: str | None = None) -> ExtractionFiles:
         self.validate_source(source_reference)
@@ -386,7 +389,10 @@ class MemoryArtifacts:
         backend = self._backend("versions", version.version_id)
         for path in sorted(texts):
             self._save(backend, path, texts[path])
-        self._save(backend, MANIFEST_PATH, manifest.to_json())
+        # The manifest is Runtime-generated structured data, not model-authored
+        # prose. Its canonical JSON may exceed the prose-only per-line limit as
+        # the number of cases and bindings grows.
+        self._write_exact(backend, MANIFEST_PATH, manifest.to_json())
         self._verify_bundle(version)
         return version
 

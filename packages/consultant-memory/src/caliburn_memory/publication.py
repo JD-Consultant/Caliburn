@@ -10,7 +10,7 @@ import json
 from typing import Literal
 from uuid import UUID, uuid4
 
-from sqlalchemy import JSON, Integer, String, Text, select
+from sqlalchemy import JSON, Integer, String, Text, func, select
 from sqlalchemy.engine import Engine
 from sqlalchemy.exc import DBAPIError, IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, sessionmaker
@@ -228,3 +228,14 @@ class PublicationStore:
                 ReceiptRow.result_revision > after_revision, ReceiptRow.result_revision <= through_revision,
             ).order_by(ReceiptRow.result_revision).limit(limit))
             return [self._receipt(row) for row in rows]
+
+    def latest_consolidation_revision(self, *, through_revision: int) -> int:
+        if type(through_revision) is not int or through_revision < 0:
+            raise ValueError("Invalid consolidation receipt bound")
+        with self.sessions() as session:
+            revision = session.scalar(select(func.max(ReceiptRow.result_revision)).where(
+                ReceiptRow.document_id == self.document_id,
+                ReceiptRow.kind == "consolidation",
+                ReceiptRow.result_revision <= through_revision,
+            ))
+            return int(revision or 0)

@@ -140,6 +140,49 @@ def test_repair_receipts_can_be_read_in_bounded_revision_order(publications):
     assert pub.repair_receipts(after_revision=2, through_revision=2) == []
 
 
+def test_latest_consolidation_revision_is_the_implicit_repair_checkpoint(publications):
+    pub, artifacts = publications
+    source = artifacts.source.reference
+
+    assert pub.latest_consolidation_revision(through_revision=0) == 0
+
+    initial = request(pub, artifacts)
+    first = pub.publish(pub.prepare(
+        initial.memory,
+        expected_revision=0,
+        kind="consolidation",
+        processed_source=source,
+    ))
+    repair = pub.publish(request(
+        pub,
+        artifacts,
+        revision=first.revision,
+        text="更正",
+        repair_sources=(source,),
+    ))
+
+    assert pub.latest_consolidation_revision(
+        through_revision=repair.revision,
+    ) == first.revision
+
+    second = pub.publish(pub.prepare(
+        repair.memory,
+        expected_revision=repair.revision,
+        kind="consolidation",
+        processed_source=source,
+    ))
+    assert pub.latest_consolidation_revision(
+        through_revision=repair.revision,
+    ) == first.revision
+    assert pub.latest_consolidation_revision(
+        through_revision=second.revision,
+    ) == second.revision
+
+    for invalid in (-1, 1.5, True):
+        with pytest.raises(ValueError, match="bound"):
+            pub.latest_consolidation_revision(through_revision=invalid)
+
+
 def test_failure_before_commit_rolls_back_head_and_receipt(publications):
     from sqlalchemy import event
     pub, artifacts = publications

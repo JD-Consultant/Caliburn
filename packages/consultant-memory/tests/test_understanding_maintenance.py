@@ -131,6 +131,57 @@ def test_open_derives_changed_current_cases_and_directly_affected_understandings
     assert source.reads == []
 
 
+def test_open_unions_runtime_repair_impact_without_new_stage_fields():
+    source = ExampleSource()
+    artifacts = MemoryArtifacts(InMemoryStore(), source.document_id, source=source)
+    case_a, case_b, understanding_x, understanding_y = _ids(4)
+    version = artifacts.save_bundle(
+        base_publication_revision=0,
+        evidence_through_reference=source.reference,
+        case_guide=(
+            f"- [故障案例](/memory/cases/items/{case_a}.md)\n"
+            f"- [交付案例](/memory/cases/items/{case_b}.md)"
+        ),
+        cases=(
+            CaseArtifact(case_a, "本人先做故障初判。", (source.reference,)),
+            CaseArtifact(case_b, "本人核對交付內容。", (source.reference,)),
+        ),
+        understanding_guide=(
+            f"- [事件處理](/memory/understanding/items/{understanding_x}.md)\n"
+            f"- [交付核對](/memory/understanding/items/{understanding_y}.md)"
+        ),
+        understandings=(
+            WorkUnderstandingArtifact(understanding_x, "本人負責事件初判。", (case_a,)),
+            WorkUnderstandingArtifact(understanding_y, "本人負責交付核對。", (case_b,)),
+        ),
+    )
+    case_session = CaseMaintenanceSession(artifacts)
+    case_stage = case_session.finish(case_session.open(
+        base_publication_revision=1,
+        base_version=version,
+        source_reference=source.reference,
+    ))
+    session = UnderstandingMaintenanceSession(artifacts, case_session)
+
+    stage = session.open(
+        case_stage,
+        additional_required_case_ids=(case_b,),
+        additional_required_understanding_ids=(understanding_y,),
+    )
+
+    assert stage.required_case_ids == (case_b,)
+    assert stage.required_understanding_ids == (understanding_y,)
+
+    invalid_case, invalid_understanding = _ids(2)
+    with pytest.raises(UnderstandingMaintenanceError, match="required.*case|current case"):
+        session.open(case_stage, additional_required_case_ids=(invalid_case,))
+    with pytest.raises(UnderstandingMaintenanceError, match="required.*understanding|current understanding"):
+        session.open(
+            case_stage,
+            additional_required_understanding_ids=(invalid_understanding,),
+        )
+
+
 def test_open_rejects_incomplete_b1_stage_and_cross_document_components():
     _source, artifacts, case_session, completed, ids = _fixture()
     incomplete = case_session.open(

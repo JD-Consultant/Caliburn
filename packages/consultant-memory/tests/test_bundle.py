@@ -72,6 +72,35 @@ def test_bundle_round_trip_keeps_sources_and_exact_case_bindings():
     assert source.reads == [source.reference]
 
 
+def test_runtime_manifest_is_not_limited_by_model_prose_line_length():
+    source = ExampleSource()
+    artifacts = MemoryArtifacts(InMemoryStore(), source.document_id, source=source)
+    case_ids = tuple(str(uuid4()) for _ in range(3))
+    understanding_id = str(uuid4())
+
+    version = artifacts.save_bundle(
+        base_publication_revision=0,
+        evidence_through_reference=source.reference,
+        case_guide="\n".join(
+            f"- [案例](/memory/cases/items/{case_id}.md)" for case_id in case_ids
+        ),
+        cases=tuple(
+            CaseArtifact(case_id, f"案例 {index}", (source.reference,))
+            for index, case_id in enumerate(case_ids)
+        ),
+        understanding_guide=(
+            f"- [共同工作](/memory/understanding/items/{understanding_id}.md)"
+        ),
+        understandings=(WorkUnderstandingArtifact(
+            understanding_id, "共同工作理解", case_ids,
+        ),),
+    )
+
+    manifest = artifacts.bundle_manifest(version)
+    assert {item.case_id for item in manifest.cases} == set(case_ids)
+    assert artifacts.verify_version(version)
+
+
 def test_bundle_uses_source_owner_order_instead_of_caller_reference_order():
     source = ExampleSource()
     older = "conversation:document-a:older"

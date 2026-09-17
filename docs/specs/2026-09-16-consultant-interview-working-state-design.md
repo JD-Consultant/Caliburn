@@ -208,7 +208,7 @@ Checkpointer 恢復 Focus 與所有未完線索，不依賴 Memory 或 compactio
 - 部分回答：保留新已知與剩餘未知，可繼續作 Focus 或 park 後稍後回來。
 - 「不知道／無法確認」：這是有效回答，不可反覆逼問；記錄目前不可確認的狀態及其影響，依重要性 park、轉交背景整理或觸發既有 required clarification 規則。
 - 員工主動改題：員工要求優先，切換 Focus；舊項 park，不丟失。
-- 明確更正：優先更新或新增 `conflict_or_correction` 項，保留更正原話 reference；真正案例／工作理解更新仍走 C 或 B1／B2。
+- 明確更正：優先更新或新增對應 working item，將主要排序原因設為 `priority=correction_or_conflict`，保留更正原話 reference；只有已讀 latest 既有目標、使用者已在當輪或已核對的 canonical 原話中明確指出錯誤與正確範圍，且當輪需立即修正時才走 C。歷史原話互相矛盾但尚未裁決，或真正新案例／理解，仍由詢問及 B1／B2 承接。
 
 ### 6.4 與 B1／B2 Memory publication 對帳
 

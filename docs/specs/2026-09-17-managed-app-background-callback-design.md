@@ -160,7 +160,7 @@ settle 確實關閉後，coordinator.wake(document_id)
 
 ### 5.3 關閉
 
-關閉順序沿用既有 host owner：停止接受新工作，排空前景／人工／背景執行池，再關 Saver／Store／DB 與共用 model clients。Coordinator 不擁有 thread pool、network client 或 DB connection，因此不建立第二套 shutdown protocol。
+關閉順序沿用既有 host owner：停止接受新工作，以 `ManualRuntime.close()` 的 bounded drain 契約排空前景／人工／背景執行池，再關 Saver／Store／DB。`ConsultantRuntime` 的共用 model clients 是 caller-owned 資源，只有 managed App／host close 明確回覆成功後才可關閉；若 close 回覆未確認或拋錯，CLI 保留 clients、回既有非零結果與固定診斷，不 force close、不把未排空誤報為完成，也不加入重試 loop。Coordinator 不擁有 thread pool、network client 或 DB connection，因此不建立第二套 shutdown protocol。
 
 ## 6. 正確性、並行與失敗界線
 
@@ -185,7 +185,7 @@ settle 確實關閉後，coordinator.wake(document_id)
 
 - graph context 缺文件身分或 provider 回覆 scope 不一致：fail closed，不改用 global current document。
 - availability 讀取失敗：按既有 middleware 契約回最小不可用狀態或隔離該提示；不得因此啟動背景或捏造已完成。
-- wake／background job 失敗：保留 durable admission／checkpoint，前景結果不回滾。
+- wake／background job 失敗：保留 durable admission／checkpoint，前景結果不回滾。ordinary turn 的同步 wake 失敗與已提交 Future 的 terminal exception 各寫一筆 `caliburn.jd.background` 固定 event code，只帶必要 `document_id`，不帶 exception 文字、traceback、來源、prompt、員工內容、credential 或模型 payload；未啟動而取消的 Future 不算 workflow failure。
 - shutdown 中拒絕新 background admission；已接受工作由既有 drain 規則收束。
 - no-key 模式不消費 pending 工作，也不清空它。
 
@@ -196,11 +196,11 @@ settle 確實關閉後，coordinator.wake(document_id)
 1. A graph 只建立一次，且可在 App 文件 DB readers 尚未存在時建立；兩份文件交錯 invoke 不會混用 notice 或背景資源。
 2. availability provider 每個 employee input 最多讀一次，只產生 system notice，不 wake、不寫 DB、不送模型請求。
 3. 無 key／人工模式不建立 B1／B2 models、coordinator 或 provider，人工 JD 可正常使用。
-4. 前景 settle 後只 wake 正確 `document_id`；wake 失敗不改寫已完成的前景結果。
+4. 前景 settle 後只 wake 正確 `document_id`；wake 失敗不改寫已完成的前景結果，並留下 allowlisted operator event。
 5. 啟動恢復不會在 Runtime ready 前 wake；ready 後可從既有 catalog＋durable state 恢復 pending 文件。
 6. 新 process 不依賴舊 coordinator map；從 checkpoint／admission／publication 恢復時不重複發布或重做已成功語意工作。
 7. 同 process 同文件並行 wake 只提交一個 job；不同文件可被接受，但仍由既有單一背景 worker 依序執行。
-8. shutdown 先排空背景，再關 DB／Saver／Store／model clients。
+8. shutdown 先排空背景，再關 DB／Saver／Store；只有 App／host 確認 close 後才關 caller-owned model clients，未確認時保留 clients 與診斷現場。
 9. assembly 與離線回歸固定使用合成模型；不讀 key、不送 provider request、不付費。
 10. 既有 Memory bundle、引用、compaction、Prompt、JD 及 publication 規則不變。
 
@@ -216,6 +216,8 @@ settle 確實關閉後，coordinator.wake(document_id)
 - `python -m compileall -q src tests`：exit 0。三次驗證前後 `uv.lock` SHA-256 都是 `4D420BC0B9A39A9DB6D9A36B11BA6DF8CEC995D6B9B7EC902EA0E3DE9E24EDBB`，未修改 lock。
 
 以上固定：共用 graph 無建構期 reader 綁定；兩文件的 per-invocation provider 隔離且每個 employee input 只讀一次；coordinator map 僅是 process-local keyed single-flight、可由 catalog＋durable admission／checkpoint／publication 重建；startup ready 後才恢復；一般 turn settle 後 wake 與 shutdown drain 保留；manual／no-key 不建立 coordinator。整個切片為零 provider request、零正式 key read、零付費、零 schema／migration；沒有宣稱未執行的 PG、自然模型、完整瀏覽器或 production authority 通過。
+
+同日 Task 5 final lifecycle closure 先在原實作上取得 **4 failed／1 passed** 的精確 RED：兩種 App drain 未確認路徑都仍關閉 clients，ordinary wake 與 Future terminal exception 都缺 event，而 cancelled Future 保持不誤報。最小修正後，operator／managed shutdown、host bounded drain、wake、dispatcher、coordinator、AI restart 與相鄰 lifecycle focused set為 **105 passed／1 warning／0 failed**；Task 4 指定受影響集合為 **128 passed／2 skipped／1 warning／0 failed**；`python -m compileall -q src tests` exit 0。兩個 skip 與一個 Starlette deprecation 沿用原限制；全程 `--offline --frozen --no-sync`，未讀 key、未呼叫 provider、未新增 retry／polling／queue／authority，`uv.lock` 不變。
 
 ## 8. 不採用方案
 

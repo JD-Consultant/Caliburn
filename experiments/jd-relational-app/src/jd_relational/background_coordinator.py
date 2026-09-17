@@ -1,28 +1,17 @@
 """App-owned lifecycle seam for existing document-scoped background work."""
 
-import logging
 from threading import Lock
 
 from .background_admission import BackgroundAdmissions
 from .background_availability import availability_notice
+from .background_diagnostics import record_background_failure
 from .background_dispatch import BackgroundDispatcher
 from .background_memory_app import build_background_memory_workflow
 from .background_memory_limits import FORMAL_BACKGROUND_MEMORY_LIMITS
 
 
-LOG = logging.getLogger("caliburn.jd.background")
 _CATALOG_SCAN_FAILED = "background_catalog_scan_failed"
 _DOCUMENT_WAKE_FAILED = "background_document_wake_failed"
-
-
-def _record_failure(event_code: str, *, attempted: int, document_id: str | None = None):
-    metadata = {"event_code": event_code, "attempted": attempted}
-    if document_id is not None:
-        metadata["document_id"] = document_id
-    try:
-        LOG.warning(event_code, extra=metadata)
-    except Exception:
-        pass
 
 
 class BackgroundCoordinator:
@@ -99,14 +88,14 @@ class BackgroundCoordinator:
             try:
                 documents = self._owner.storage.document_ids(after=after, limit=100)
             except Exception:
-                _record_failure(_CATALOG_SCAN_FAILED, attempted=attempted)
+                record_background_failure(_CATALOG_SCAN_FAILED, attempted=attempted)
                 return attempted
             for document_id in documents:
                 attempted += 1
                 try:
                     self.wake(document_id)
                 except Exception:
-                    _record_failure(
+                    record_background_failure(
                         _DOCUMENT_WAKE_FAILED,
                         attempted=attempted,
                         document_id=document_id,

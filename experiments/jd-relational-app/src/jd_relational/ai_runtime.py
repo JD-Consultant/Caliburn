@@ -21,6 +21,7 @@ from langsmith import tracing_context
 
 from .ai_checkpoints import AiCheckpointError, AiRunCheckpoints, new_run_record
 from .ai_history import AiRunHistory
+from .background_diagnostics import record_background_failure
 from .change_reads import ChangeReadService
 from .consultant_context import ConsultantContext, checked_model_view
 from .consultant_tools import (
@@ -492,7 +493,10 @@ class AiRuntime:
         try:
             self._background(document_id)
         except Exception:
-            pass
+            record_background_failure(
+                "background_turn_wake_failed",
+                document_id=document_id,
+            )
 
     def _recover_previous(self, document_id: str, timeout: float) -> int:
         """Recover only foreground state while the host is still starting."""

@@ -133,7 +133,7 @@ def main(argv=None):
                     reload=False, access_log=False, proxy_headers=False, log_level="warning")
             finally:
                 app_closed = _close(managed)
-                consultant_closed = _close(runtime)
+                consultant_closed = _close(runtime) if app_closed else True
                 if not app_closed or not consultant_closed:
                     print("服務仍有工作未確認結束，請保留此程序的診斷現場。", file=sys.stderr)
                     return 1

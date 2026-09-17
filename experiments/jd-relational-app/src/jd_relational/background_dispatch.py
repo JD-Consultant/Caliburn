@@ -11,9 +11,11 @@ fallback of the verified dispatcher is deliberately not enabled here: the
 employee's own notification is what decides when background work starts.
 """
 
+from concurrent.futures import CancelledError
 from threading import Lock
 
 from .background_admission import BackgroundAdmissionError, reconcile
+from .background_diagnostics import record_background_failure
 from .background_memory_limits import FORMAL_BACKGROUND_MEMORY_LIMITS
 
 
@@ -54,7 +56,21 @@ class BackgroundDispatcher:
                 return step
             self._running = self._owner.admit_background(
                 self._document_id, lambda: self._perform(step))
+            self._running.add_done_callback(self._observe_terminal)
             return step
+
+    def _observe_terminal(self, future) -> None:
+        if future.cancelled():
+            return
+        try:
+            failure = future.exception()
+        except CancelledError:
+            return
+        if failure is not None:
+            record_background_failure(
+                "background_workflow_failed",
+                document_id=self._document_id,
+            )
 
     def _cursor(self):
         head = self._publication.current()

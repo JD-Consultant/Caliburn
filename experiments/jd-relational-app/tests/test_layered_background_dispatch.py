@@ -3,6 +3,7 @@
 from concurrent.futures import Future
 from concurrent.futures import ThreadPoolExecutor
 from dataclasses import replace
+import logging
 from threading import Event, Lock
 from types import SimpleNamespace
 
@@ -28,6 +29,14 @@ class PendingWorker(DirectWorker):
     def admit_background(self, document_id, work):
         self.jobs.append((document_id, work))
         return Future()
+
+
+class CancelledWorker(DirectWorker):
+    def admit_background(self, document_id, work):
+        self.jobs.append((document_id, work))
+        future = Future()
+        assert future.cancel()
+        return future
 
 
 class RacingWorker(PendingWorker):
@@ -339,3 +348,43 @@ def test_a_terminal_workflow_block_is_persisted_in_the_admission_row():
     assert row.status == "blocked"
     assert row.source_reference == "batch-1"
     assert row.error_code == "case_rework_limit_reached"
+
+
+def test_a_terminal_worker_exception_is_diagnosed_without_exposing_its_detail(caplog):
+    publication = Publication()
+    workflow = Workflow(publication, fail=RuntimeError("private employee content"))
+    built, worker, admissions, _, _, _ = dispatcher(
+        batches=("batch-1",),
+        notified=True,
+        workflow=workflow,
+        publication=publication,
+    )
+
+    with caplog.at_level(logging.WARNING, logger="caliburn.jd.background"):
+        assert built.wake() == "next_batch"
+
+    assert worker.jobs and admissions.read("document").status == "running"
+    records = [record for record in caplog.records
+               if record.name == "caliburn.jd.background"]
+    assert len(records) == 1
+    record = records[0]
+    assert record.getMessage() == "background_workflow_failed"
+    assert record.event_code == "background_workflow_failed"
+    assert record.document_id == "document"
+    assert record.exc_info is None
+    assert "private employee content" not in caplog.text
+
+
+def test_a_cancelled_worker_future_is_not_reported_as_a_workflow_failure(caplog):
+    built, worker, admissions, _, _, _ = dispatcher(
+        batches=("batch-1",),
+        notified=True,
+        worker=CancelledWorker(),
+    )
+
+    with caplog.at_level(logging.WARNING, logger="caliburn.jd.background"):
+        assert built.wake() == "next_batch"
+
+    assert worker.jobs and admissions.read("document").status == "queued"
+    assert [record for record in caplog.records
+            if record.name == "caliburn.jd.background"] == []

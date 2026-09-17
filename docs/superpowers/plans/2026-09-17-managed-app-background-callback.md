@@ -1,5 +1,7 @@
 # Managed App Background Callback Implementation Plan
 
+> **完成封存（2026-09-17）：**下列 Tasks 1–4 已由線性 commits `6e322fe5`、`f920f010`、`0c742248`、`a1157325` 完成；final lifecycle review 的 MABC-F1／F2／F3 亦已由 Task 5 follow-up 關閉。下方未勾選 checkbox 保留為當時的歷史施工稿與 RED／GREEN 指令，不代表待辦；最新效果、驗證與限制以同名 design、`docs/current-decisions.md` 及 Task 5 report 為準。
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** 將既有 A 顧問、B1／B2 背景 workflow、dispatcher 與 App 資源接成一個可恢復的本機 managed App，且共用 A graph 不綁死文件或 DB reader。

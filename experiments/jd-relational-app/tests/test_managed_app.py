@@ -271,7 +271,9 @@ def test_serve_assembles_openrouter_consultant_and_enables_chat(cli, monkeypatch
         "app", "server", "app-close", "consultant-close"]
 
 
-def test_serve_still_closes_consultant_when_app_close_fails(cli, monkeypatch, capsys):
+@pytest.mark.parametrize("close_mode", ["unconfirmed", "raises"])
+def test_serve_keeps_consultant_open_when_app_drain_is_unconfirmed(
+        cli, monkeypatch, capsys, close_mode):
     events, _ = cli
     import uvicorn
     runtime = SimpleNamespace(graph=object(),
@@ -281,14 +283,18 @@ def test_serve_still_closes_consultant_when_app_close_fails(cli, monkeypatch, ca
     monkeypatch.setattr(entry, "open_consultant_runtime", lambda **_: runtime)
     def fail_close():
         events.append("app-close-failed")
-        raise RuntimeError("private-close-cause")
+        if close_mode == "raises":
+            raise RuntimeError("private-close-cause")
+        return False
     monkeypatch.setattr(entry, "open_managed_app", lambda *_, **__: SimpleNamespace(
         app=object(), port=8014, close=fail_close))
     monkeypatch.setattr(uvicorn, "run", lambda *_, **__: events.append("server"))
 
     assert entry.main(["serve"]) == 1
-    assert events == ["file", "server", "app-close-failed", "consultant-close"]
-    assert "未確認結束" in capsys.readouterr().err
+    assert events == ["file", "server", "app-close-failed"]
+    error = capsys.readouterr().err
+    assert "未確認結束" in error
+    assert "private-close-cause" not in error
 
 
 def test_init_refuses_noninteractive_secret_input(monkeypatch):

@@ -7,6 +7,7 @@ it must not change what the employee's turn did. Low-level startup recovery
 does not wake; after Runtime readiness, startup resume belongs to the managed
 App/coordinator.
 """
+import logging
 from uuid import uuid4
 
 import pytest
@@ -63,17 +64,30 @@ def test_a_turn_that_could_not_be_closed_wakes_nothing(make_runtime, monkeypatch
     assert woken.documents, "the recovered ending is what the background gets"
 
 
-def test_a_failing_wake_never_changes_what_the_turn_did(make_runtime):
+def test_a_failing_wake_is_diagnosed_without_changing_what_the_turn_did(
+        make_runtime, caplog):
     """Background trouble is recorded by the background, not by the employee."""
     make, _ = make_runtime
     woken = Woken(fail=True)
     runtime, graph, _ = make(background=woken)
     document, run = str(uuid4()), str(uuid4())
-    result = runtime.start(document, run, "第一輪原話", expected_revision_id=HEAD).wait(5)
+    with caplog.at_level(logging.WARNING, logger="caliburn.jd.background"):
+        result = runtime.start(
+            document, run, "第一輪原話", expected_revision_id=HEAD,
+        ).wait(5)
     assert result.status == "completed" and result.input_saved
     assert woken.documents == [document]
     saved = graph.get_state({"configurable": {"thread_id": document}}).values["messages"]
     assert saved and runtime.lookup(document, run).wait() == result
+    records = [record for record in caplog.records
+               if record.name == "caliburn.jd.background"]
+    assert len(records) == 1
+    record = records[0]
+    assert record.getMessage() == "background_turn_wake_failed"
+    assert record.event_code == "background_turn_wake_failed"
+    assert record.document_id == document
+    assert record.exc_info is None
+    assert "synthetic background failure" not in caplog.text
 
 
 def test_low_level_startup_recovery_does_not_wake_before_runtime_is_ready():

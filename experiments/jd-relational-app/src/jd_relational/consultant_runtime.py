@@ -9,12 +9,14 @@ import httpx
 from langgraph.graph.state import CompiledStateGraph
 
 from .consultant_app import build_consultant
-from .consultant_model import OPENROUTER_HEADERS, create_consultant_model
+from .consultant_model import OPENROUTER_HEADERS
+from .role_models import RoleModels, create_role_models
 
 
 @dataclass(repr=False)
 class ConsultantRuntime:
     graph: CompiledStateGraph
+    role_models: RoleModels
     http_client: httpx.Client = field(repr=False)
     async_http_client: httpx.AsyncClient = field(repr=False)
     _closed: bool = field(default=False, init=False, repr=False)
@@ -43,12 +45,17 @@ def open_consultant_runtime(*, api_key: str) -> ConsultantRuntime:
     sync_client = httpx.Client(headers=OPENROUTER_HEADERS, follow_redirects=True)
     async_client = httpx.AsyncClient(headers=OPENROUTER_HEADERS, follow_redirects=True)
     try:
-        model = create_consultant_model(
+        role_models = create_role_models(
             api_key=api_key,
             http_client=sync_client,
             async_http_client=async_client,
         )
-        return ConsultantRuntime(build_consultant(model), sync_client, async_client)
+        return ConsultantRuntime(
+            build_consultant(role_models.consultant),
+            role_models,
+            sync_client,
+            async_client,
+        )
     except Exception:
         try:
             sync_client.close()

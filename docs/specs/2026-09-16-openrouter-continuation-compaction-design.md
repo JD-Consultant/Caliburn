@@ -6,7 +6,7 @@
 - 取代：2026-09-15「等待 OpenRouter、改 direct OpenAI、另選長上下文策略」三選一的未決狀態
 - 不取代：Q019 顧問 Prompt、Skills、JD relational writer、publication CAS、背景通知與准入規則；Memory 的最新 B1／B2／C 產品語意改由 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 持有
 
-> **2026-09-17 MEM-L001 影響與 successor 結果：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 後續將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。App 現已把 B1／B2 各自的 middleware 從 exact injected role model 與明示 output reserve 組裝進 package workflow；B1 多窗口只壓縮已處理舊窗口，B2 固定任務、同 attempt resume 與新 attempt 清空均有離線 lifecycle 證據。這不代表正式 OpenRouter／Luna role-model factory、provider wire、自然模型或完整 App 已完成，也不重開 OpenRouter transport 選擇。
+> **2026-09-17 MEM-L001 影響與 successor 結果：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 後續將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。App 現已把 B1／B2 各自的 middleware 從 exact injected role model 與明示 output reserve 組裝進 package workflow；B1 多窗口只壓縮已處理舊窗口，B2 固定任務、同 attempt resume 與新 attempt 清空均有離線 lifecycle 證據。後續[正式 OpenRouter／Luna 角色模型工廠](2026-09-17-openrouter-role-model-factory.md)也已離線完成；provider 自然模型、managed callback 與完整 App 仍未完成，且沒有重開 OpenRouter transport 選擇。
 
 > **2026-09-16 CTX-W001 邊界：**主顧問在尚無 Memory、尚未觸發 compaction 或一次無法問完時所需的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)另行承接。它與 continuity summary 都是非權威衍生狀態，但責任不同；summary 不可成為 Working State 的唯一 owner，Working State 也不取代長對話 compaction。
 
@@ -168,7 +168,7 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 
 1. 新增 typed compaction state、公開 middleware 與 profile 設定；不加 dependency／table／migration。
 2. 正式 A 注入新 middleware；以鎖定 LangChain 的真實組裝測試證明 `jd_model_view` 與 `continuation_compaction` 同時保存，不預設修改 `JdNoticeMiddleware`。
-3. B1／B2 各自使用 exact injected role model object 與 role-scoped／attempt-scoped middleware；B1 正常單一 batch 不固定摘要，多窗口時只允許已安全完成並 checkpoint 推進的舊窗口進入 request-only summary，當前未處理窗口逐字保留；B2 的固定任務原文與 stale 新 attempt 邊界保持本稿規則。正式 OpenRouter／Luna role-model factory、provider wire 與既有 direct Responses／native `context_management` 的 production 切換仍是後續工作；舊 adapter 契約測試保留作歷史證據。
+3. B1／B2 各自使用 exact injected role model object 與 role-scoped／attempt-scoped middleware；B1 正常單一 batch 不固定摘要，多窗口時只允許已安全完成並 checkpoint 推進的舊窗口進入 request-only summary，當前未處理窗口逐字保留；B2 的固定任務原文與 stale 新 attempt 邊界保持本稿規則。正式 OpenRouter／Luna role-model factory 已由 successor 離線完成，舊 direct Responses／native `context_management` 不接回正式路徑；舊 adapter 契約測試保留作歷史證據。
 4. 已跑受影響離線回歸與 compileall；付費／自然 smoke 仍須另依費用授權，不在本文件切片讀 key 或呼叫 provider。
 
 最少固定反例：
@@ -187,7 +187,7 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 - summary 不是 source／Memory／JD basis，不能取代 B1 canonical 訪談或引用；
 - 完整 request 預算、輸出上限、OpenAI-only／no-fallback 與 usage receipt 均可觀察。
 
-完成本切片只代表 A／B1／B2 的 App-side compaction 接線與離線契約通過；dispatcher 已由另一 successor 驗證。Task 4 直接證明的是 canonical graph messages／source readability、B1 window boundary 與 B2 attempt lifecycle，不是完整 publication／JD byte-for-byte unchanged-state。正式 OpenRouter／Luna role-model factory、layered C、managed App callback、付費／自然長訪談、完整 dispatcher／App 使用旅程與 production authority 仍未驗收。
+完成本切片只代表 A／B1／B2 的 App-side compaction 接線與離線契約通過；dispatcher 與正式 OpenRouter／Luna role-model factory 已由各自 successor 驗證。Task 4 直接證明的是 canonical graph messages／source readability、B1 window boundary 與 B2 attempt lifecycle，不是完整 publication／JD byte-for-byte unchanged-state。layered C、managed App callback、付費／自然長訪談、完整 dispatcher／App 使用旅程與 production authority 仍未驗收。
 
 ## 10. 官方交叉核對與本案選擇
 

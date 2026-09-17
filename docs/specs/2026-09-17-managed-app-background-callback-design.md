@@ -219,6 +219,8 @@ settle 確實關閉後，coordinator.wake(document_id)
 
 同日 Task 5 final lifecycle closure 先在原實作上取得 **4 failed／1 passed** 的精確 RED：兩種 App drain 未確認路徑都仍關閉 clients，ordinary wake 與 Future terminal exception 都缺 event，而 cancelled Future 保持不誤報。最小修正後，operator／managed shutdown、host bounded drain、wake、dispatcher、coordinator、AI restart 與相鄰 lifecycle focused set為 **105 passed／1 warning／0 failed**；Task 4 指定受影響集合為 **128 passed／2 skipped／1 warning／0 failed**；`python -m compileall -q src tests` exit 0。兩個 skip 與一個 Starlette deprecation 沿用原限制；全程 `--offline --frozen --no-sync`，未讀 key、未呼叫 provider、未新增 retry／polling／queue／authority，`uv.lock` 不變。
 
+Task 5 commit `9dbef03d` 與最終獨立複核完成後，於同一最終 HEAD 使用全新隔離 basetemp 再跑完整 App suite：**3,016 passed／320 skipped／5 warnings／0 failed**，`python -m compileall -q src tests` 再次 exit 0。320 個 opt-in／環境情境與五項既有 warnings 的限制不變；這次最終驗證仍為 offline／frozen／no-sync，沒有 credential 或 provider request，`uv.lock` 未變。
+
 ## 8. 不採用方案
 
 | 方案 | 不採用理由 |

@@ -97,6 +97,6 @@ RoleModels
 - [CTX-C001 compaction](2026-09-16-openrouter-continuation-compaction-design.md)；同角色 main／summary model boundary。
 - [MEM-L001 workflow](2026-09-17-layered-memory-background-workflow-design.md)；B1／B2 注入點、attempt 與 publication 權責。
 
-[managed App 背景 callback](2026-09-17-managed-app-background-callback-design.md) successor 已完成窄 G7：process-owned `RoleModels.case／understanding` 已經 App-owned coordinator 注入既有 document-scoped `BackgroundMemoryWorkflow`，共用 A graph 也改由 per-invocation Runtime context 取得背景 availability；完整 App 離線回歸為 **3,013 passed／320 skipped／5 warnings／0 failed**。**唯一下一 gate 是獨立 layered C bundle repair**；其後的自然模型／付費、完整瀏覽器 App 旅程與 production authority 仍分開驗證，多 process 拓撲則必須先補 DB 原子 admission claim。本稿的模型 factory 契約與既有 Memory／compaction 邊界不因 successor 重開。
+[managed App 背景 callback](2026-09-17-managed-app-background-callback-design.md) successor 已完成窄 G7：process-owned `RoleModels.case／understanding` 已經 App-owned coordinator 注入既有 document-scoped `BackgroundMemoryWorkflow`，共用 A graph 也改由 per-invocation Runtime context 取得背景 availability；Task 5 lifecycle closure 後的最終完整 App 離線回歸為 **3,016 passed／320 skipped／5 warnings／0 failed**。**唯一下一 gate 是獨立 layered C bundle repair**；其後的自然模型／付費、完整瀏覽器 App 旅程與 production authority 仍分開驗證，多 process 拓撲則必須先補 DB 原子 admission claim。本稿的模型 factory 契約與既有 Memory／compaction 邊界不因 successor 重開。
 
 Task 3 re-review 已關閉 synthetic `ui_chat_server` 漏傳 B1／B2 models 的 UI helper composition seam；該 focused 證據固定零 model request／零 provider network，但停在 `open_managed_app` 邊界，未啟動 DB、lifespan、listener 或瀏覽器，完整瀏覽器 App 旅程仍未驗。

@@ -4,7 +4,7 @@
 
 **Stage：**G7 分段施工
 
-**Status：**package workflow、App A 分層讀取、既有 App 背景資源窄接合、App B1／B2 request-only compaction 及正式 role factory 均已完成離線切片；managed callback、provider／自然模型、C 與完整 dispatcher／App journey 待接
+**Status：**package workflow、C repair→B2 impact 接力、App A 分層讀取、既有 App 背景資源窄接合、App B1／B2 request-only compaction、正式 role factory 及 managed callback 均已完成離線切片；provider／自然模型、layered C 工具與完整 App journey 待接
 **Date：**2026-09-17
 
 ## 1. 目標與既有決策
@@ -91,6 +91,20 @@ Runtime 組裝完整 candidate bundle
 工具參數依[模型／Runtime 參數權責審核](2026-09-17-model-runtime-parameter-ownership-review.md)收斂：B2 exact-source read 不再讓模型填 `source_reference＋offset`，rework 使用已綁 case/source 的 `evidence_key＋reason`，B1／B2 finish 不再讓模型重填可由 stage 算出的 `changed/no_op`。
 
 這是完整背景 workflow 的前置正確性修正，不新增第二個 conversation owner、文字區段 citation、RAG 或 citation Agent。
+
+### 2.4 C repair 影響接力（已施工）
+
+下一個 package 窄切片只補 C repair 與既有 B2 impact 的 Runtime 接點，不新增另一條背景流程：
+
+- `PublicationStore` 從現有 receipt 表查出固定 base revision 以前最近一次成功 consolidation result revision；之後的 repair receipts 就是尚未由一次完整 B1→B2 publication 消費的 durable delta。成功 consolidation 自然推進這個邊界，不另存 watermark。
+- `BackgroundMemoryWorkflow` 只在真正要處理新 source 的工作中讀取這批 receipts；重複／covered 通知仍直接查回目前 head，不因此喚醒模型。既有通知與 dispatcher 行為不改。
+- 每筆 repair 以 result manifest 的精確 base version 取得修補前 manifest，從前後案例 digest、理解 digest 與完整 bindings 推導 Runtime impact。舊／新 bindings 都要看；不依目前反向圖單邊查找。
+- B2 的現有 `required_case_ids／required_understanding_ids` 保留為唯一最低完成 gate，接受 Runtime 驗證後的 repair impact 與 B1 impact 聯集。stage schema 不增加模型可填欄位；required 集合仍不得小於 B1 自身推導結果，且所有額外 ID 必須是 fixed candidate／base 中目前有效的既有 ID。
+- 同一 B2 attempt 的 checkpoint resume 必須核對同一 repair impact；stale 後基於新 head 建立新的 B1／B2 attempt並重新推導，不能沿用舊集合。
+
+這個接點不實作 layered C 工具本身，也不改 C 准入。C 當下仍須發布完整一致 bundle；已知廣泛影響不得藉此延後。案例若經 B2 判斷暫不形成穩定理解，仍由既有 case guide 保持可發現，不新增 `held`／coverage manifest 或第二個 verifier。
+
+**2026-09-18 實作結果：**`PublicationStore.latest_consolidation_revision()` 沿既有 receipt 表提供隱含邊界；`BackgroundMemoryWorkflow` 以固定 base 分頁讀 repair receipts、驗證連續 lineage，從舊／新 manifests 的案例 digest、理解 digest 與完整 bindings 推導影響，再以 Runtime-only 參數與 B1 impact 聯集送入原 B2 gate。同一 B2 attempt 核對 required tuples；stale 仍由 outer workflow 清空舊 attempt、基於新 head 重算。A/B/C→U 的離線反例已證明 C 修訂 C 並解除 C→U 後，下一批 B1 `no_op` 仍要求 B2 讀 C、處理 U 並依 A/B revalidate；成功 consolidation 之後不再重播舊 impact。施工未新增 state schema、資料表、Agent、watermark、通知或模型欄位。package **276 passed**、相鄰 App 指定回歸 **15 passed**，兩側 compileall 成功。
 
 ## 3. 公開責任與命名
 
@@ -287,5 +301,5 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 
 - **Decision：**新增 deterministic `BackgroundMemoryWorkflow` 串接既有 B1、B2、bundle 與 publication；B2 review 只作 Runtime 診斷，新 B1 必須重讀原話；最多返工一次。
 - **Why：**避免 B1／B2 各自發布或 App 重做語意不變量，同時保留精確恢復、stale 重整與一次原子 publication。
-- **Implemented：**package 已完成 source progress 接點、B1／B2 durable attempt、B1 Runtime review、outer graph、完整 bundle 組裝、同步 request checkpoint、CAS／receipt、covered／stale／bounded retry 與 blocked 終局；App successor 已把既有 source owner、admission、Saver／Store 與 publication 組裝到單一外層 workflow，並完成真 PostgreSQL／新程序恢復。未修改 provider、Prompt 方法、JD 或 production 入口。
-- **Next gate：**正式 OpenRouter／Luna role model factory 已完成；下一片是 document-scoped managed App callback，layered C bundle repair 維持獨立；其後仍有 provider／自然模型與完整 dispatcher／App journey 驗收。B1／B2 request-only compaction 與 A 分層 read path 已完成離線切片，不重做 Memory 分層、引用或 publication。
+- **Implemented：**package 已完成 source progress 接點、B1／B2 durable attempt、B1 Runtime review、outer graph、完整 bundle 組裝、同步 request checkpoint、CAS／receipt、covered／stale／bounded retry、blocked 終局，以及 C repair receipt→B2 impact 接力；App successor 已把既有 source owner、admission、Saver／Store 與 publication 組裝到單一外層 workflow，完成真 PostgreSQL／新程序恢復及 managed callback。未修改 provider、Prompt 方法、JD 或 production 入口。
+- **Next gate：**正式 OpenRouter／Luna role model factory、managed App callback、B1／B2 request-only compaction 與 A 分層 read path 均已完成各自離線切片；下一片是 layered C bundle repair 本身，其後仍有 provider／自然模型與完整 App journey 驗收。不重做 Memory 分層、引用、impact 接力或 publication。

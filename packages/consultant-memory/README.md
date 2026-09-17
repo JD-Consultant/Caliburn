@@ -14,6 +14,8 @@ Memory artifact、來源、發布與 Agent staging 的獨立 Python 套件。新
 
 **2026-09-16：**新增尚未切換 production 的 G4 foundation。`MemoryArtifacts.save_bundle()` 可在同一不可變 `MemoryVersion` 保存 Runtime-owned manifest、案例 guide、逐案例 Markdown、工作理解 guide 與逐理解 Markdown；`case_id`／`understanding_id` 使用 Runtime UUID，manifest 固定來源、內容 digest、多對多 `understanding → case` 精確 binding 及合併／拆分後的 supersession。保存時由 Runtime 另給本次 B1 固定來源上界 `evidence_through_reference`，所有案例引用必須由 source owner 的固定歷史證明並按 owner 順序 canonicalize；不能只因 reference 可讀就納入。`case()`／`understanding()` 按穩定 ID 讀回時同時回傳已驗證來源或案例 binding，不把 manifest 當第三層 Memory。
 
+`manifest.json` 是 Runtime 自行產生與驗證的結構化 JSON，不套用模型 Markdown 正文的單行長度限制；案例／理解正文與 guide 仍沿原文字規則。這只解除結構資料隨案例與 binding 數量自然成長時的錯誤限制，不改 manifest schema、舊版本解析或 publication digest 的 canonical 計算。
+
 `PublicationStore` 沿用原 head／receipt／CAS，另拒絕候選 bundle 的 `base_publication_revision` 或精確 base `MemoryVersion` 與目前 head 不一致。foundation 當時仍讓舊兩檔 `knowledge.md`／`guide.md` request digest 與讀寫路徑通過歷史相容測試；依 2026-09-17 Owner 決定，這已不是正式新 App 的產品需求，後續 layered C 切片不得繼續暴露雙格式，legacy 程式與測試只作有界清理前的歷史證據。這一段只有資料 authority、保存與驗證，沒有改 B1／B2 Prompt、舊 staging／repair、dispatcher、UI 或 production authority。完整語意與後續切片見 [MEM-L001](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)。
 
 ### B1 案例 staged state／證據 registry／固定 canonical batch Agent graph
@@ -38,6 +40,8 @@ B1 正常以一個完整 canonical 訪談 batch 工作，不固定呼叫 compact
 
 `caliburn_memory.understanding_maintenance` 與 `understanding_workflow` 已完成兩個零 provider 切片。`UnderstandingMaintenanceSession` 固定一份 completed B1 stage 與 exact base bundle，從 B1 semantic case changes 及 base `understanding → case` bindings 自動推導必讀的 candidate cases 與直接受影響 understandings；模型不能提供或縮小 impact set。新案例即使沒有反向 binding 仍是必讀項目，讓 B2 判斷是否揭露新的穩定工作理解。
 
+Runtime 另可把 publication receipts 推導出的既有 C repair impact 加入同一 required-ID gate；它只能增加目前有效的案例／理解，不能移除 B1 自己推導的要求。同一 durable attempt 恢復時會核對最終 required tuples，避免用同一 attempt ID 偷換修補影響；stage schema 沒有新增模型可填的 repair 欄位。
+
 十個窄語意工具提供 case／understanding 讀取，以及 create、revise、revalidate、split、merge、retire、route、finish；另有兩個窄 workflow 工具處理 case-bound 原話分頁與要求 B1 rework。已發布理解採 read-before-write；所有 support case 必須屬於同一 B1 candidate 且已實際讀取。`revalidate_work_understanding` 讓正文語意不變時明確更新支持案例，binding-only refresh 不建立假正文修改；零參數 `finish_understanding_maintenance()` 仍要求變更案例已讀、直接受影響理解已 revise／revalidate／supersede／retire，`changed/no_op` 由 Runtime 從 staged 變更計算，避免只換 digest 或漏掉新案例。Runtime 擁有 UUID、guide route、scope、base 與後續 digest。
 
 `UnderstandingMaintenanceWorkflow` 以新 B2 Prompt 接上同一 stage／tools、response guard、thread-scoped 模型／工具額度與 durable checkpoint。初始 request 只帶 base revision、兩份 guide、B1 change set 及 Runtime 推導的必讀 ID，不預載案例正文、工作理解正文或原始訪談。模型按需讀取案例與理解；`read_case` 只顯示該案例 owner-ordered、attempt-scoped 的 `evidence_key` 與角色形狀，不洩漏 signed reference 或原文。只有先讀案例後，模型才能選該案例的 key，由 Runtime 解析固定 reference 與 cursor 並有界讀取原話。來源讀取證據以 `(case_id, source_reference)` 配對保存，不能把同一來源在案例 A 的核對冒充案例 B 已核對；同一 signed reference 在不同案例會得到不同 key。
@@ -54,7 +58,9 @@ B2 回報 `case_rework_required` 時，outer Runtime 從被拒 B1 stage 取得�
 
 CAS stale 時舊 stages、candidate 與 request 不會換版重送；Runtime 保留 source 與 rework 次數、增加有界 stale counter，重新取得 head。若新 cursor 已涵蓋來源，直接回正式 head；只有 source owner 證明為 `next` 才建立新的 B1／B2 semantic attempts。`PublicationUncertain` 不配置新 operation：outer checkpoint 保留原 `PublishRequest`，resume 以相同 operation／digest 由 receipt 查回。所有 outer `invoke` 使用同步 durability。
 
-本 workflow 自身的證據是固定模型＋real package sessions／Store＋SQLite publication 的離線契約測試，以及相鄰 App source-owner 測試；後續 App 窄切片另有 PostgreSQL／新程序資源恢復證據。2026-09-17 compaction 收尾的 fresh 指定回歸為 App **52 passed、0 skipped**、package **50 passed、0 skipped**，兩側 `compileall` 成功；它只證明當時 B1／B2 App-side request-only wiring 與 attempt lifecycle。正式 role factory 與 managed callback 的完成證據在各自 successor 文件；layered C、provider wire／自然模型品質及完整瀏覽器 App journey仍未通過，也未完整覆蓋 publication／JD byte-for-byte unchanged。
+背景工作固定 base 後，還會把最近一次成功 consolidation 之後、該 base 以前的 repair receipts 視為尚待背景重新分析的 durable delta。Runtime 沿每筆 result manifest 的精確 base version 比較修補前後案例 digest、理解 digest 與完整 bindings；舊／新 bindings 都參與，結果與本次 B1 impact 聯集後交給既有 B2 gate。B1 即使 `no_op` 也不會抹掉這份影響；成功 consolidation receipt 自然成為下一個邊界，不另建 watermark、queue、Agent 或資料表。這個接點不放寬 C 當次完整 publication，也不代表 layered C 工具本身已完成。
+
+本 workflow 自身的證據是固定模型＋real package sessions／Store＋SQLite publication 的離線契約測試，以及相鄰 App source-owner 測試；後續 App 窄切片另有 PostgreSQL／新程序資源恢復證據。2026-09-18 repair-impact 接力完成後，package 全套為 **276 passed**，相鄰 App 三個指定套件為 **15 passed**，兩側 `compileall` 成功；其中 A/B/C→U 反例證明 B1 `no_op` 時仍從舊／新 binding 把 C 與 U 送入 B2。這些仍是離線契約證據；layered C 工具、provider wire／自然模型品質及完整瀏覽器 App journey 尚未通過，也未完整覆蓋 publication／JD byte-for-byte unchanged。
 
 ## 分層 C 即時修補目標契約（設計已固定；尚未實作）
 

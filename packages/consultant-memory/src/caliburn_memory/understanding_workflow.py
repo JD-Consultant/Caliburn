@@ -341,16 +341,30 @@ class UnderstandingMaintenanceWorkflow:
         return {"configurable": {"thread_id": route}, "recursion_limit": self.recursion_limit}
 
     def run_attempt(
-        self, case_stage: CaseMaintenanceStage, *, case_attempt_id: str,
+        self,
+        case_stage: CaseMaintenanceStage,
+        *,
+        case_attempt_id: str,
+        additional_required_case_ids: tuple[str, ...] = (),
+        additional_required_understanding_ids: tuple[str, ...] = (),
     ) -> dict[str, Any]:
         """Start, resume or look up B2 for one exact Runtime-owned B1 attempt."""
-        opened = self.session.open(case_stage)
+        opened = self.session.open(
+            case_stage,
+            additional_required_case_ids=additional_required_case_ids,
+            additional_required_understanding_ids=(
+                additional_required_understanding_ids
+            ),
+        )
         config = self._attempt_config(case_attempt_id)
         snapshot = self.graph.get_state(config)
         if snapshot.values:
             previous = self._validate_job(snapshot.values)
             if (snapshot.values.get("case_attempt_id") != case_attempt_id
-                    or previous.case_stage != opened.case_stage):
+                    or previous.case_stage != opened.case_stage
+                    or previous.required_case_ids != opened.required_case_ids
+                    or previous.required_understanding_ids
+                    != opened.required_understanding_ids):
                 raise ValueError("Understanding-maintenance attempt changed input")
             if not snapshot.next:
                 return dict(snapshot.values)

@@ -356,7 +356,13 @@ class UnderstandingMaintenanceSession:
         self.case_session = case_session
         self._id_factory = id_factory or (lambda: str(uuid4()))
 
-    def open(self, case_stage: CaseMaintenanceStage) -> UnderstandingMaintenanceStage:
+    def open(
+        self,
+        case_stage: CaseMaintenanceStage,
+        *,
+        additional_required_case_ids: tuple[str, ...] = (),
+        additional_required_understanding_ids: tuple[str, ...] = (),
+    ) -> UnderstandingMaintenanceStage:
         case_stage = self.case_session.load(case_stage.to_dict())
         if not case_stage.completed:
             raise UnderstandingMaintenanceError(
@@ -372,6 +378,14 @@ class UnderstandingMaintenanceSession:
             ))
             guide = self.artifacts.understanding_guide(version)
         required_cases, required_understandings = self._impact(case_stage)
+        required_cases = tuple(sorted({
+            *required_cases,
+            *additional_required_case_ids,
+        }))
+        required_understandings = tuple(sorted({
+            *required_understandings,
+            *additional_required_understanding_ids,
+        }))
         stage = UnderstandingMaintenanceStage(
             format_version=STAGE_FORMAT_VERSION,
             document_id=self.artifacts.document_id,
@@ -458,9 +472,14 @@ class UnderstandingMaintenanceSession:
             raise UnderstandingMaintenanceError(
                 "invalid_understanding_stage", "B2 base understanding set or guide changed",
             )
-        required_cases, required_understandings = self._impact(case_stage)
-        if (stage.required_case_ids != required_cases
-                or stage.required_understanding_ids != required_understandings):
+        derived_cases, derived_understandings = self._impact(case_stage)
+        if (tuple(sorted(set(stage.required_case_ids))) != stage.required_case_ids
+                or tuple(sorted(set(stage.required_understanding_ids)))
+                != stage.required_understanding_ids
+                or not set(derived_cases).issubset(stage.required_case_ids)
+                or not set(derived_understandings).issubset(
+                    stage.required_understanding_ids,
+                )):
             raise UnderstandingMaintenanceError(
                 "invalid_understanding_impact", "B2 impact set changed after the attempt opened",
             )
@@ -472,6 +491,17 @@ class UnderstandingMaintenanceSession:
                 raise UnderstandingMaintenanceError(
                     "invalid_understanding_stage", "B2 staged identity is invalid",
                 ) from error
+        if any(case_id not in case_stage.current_case_ids
+               for case_id in stage.required_case_ids):
+            raise UnderstandingMaintenanceError(
+                "invalid_understanding_impact", "B2 required case is not a current case",
+            )
+        if any(understanding_id not in stage.base_understanding_ids
+               for understanding_id in stage.required_understanding_ids):
+            raise UnderstandingMaintenanceError(
+                "invalid_understanding_impact",
+                "B2 required understanding is not a current understanding",
+            )
         case_stage_ids = set(case_stage.base_case_ids) | set(case_stage.current_case_ids)
         if (len(set(stage.read_case_ids)) != len(stage.read_case_ids)
                 or any(case_id not in case_stage_ids for case_id in stage.read_case_ids)):

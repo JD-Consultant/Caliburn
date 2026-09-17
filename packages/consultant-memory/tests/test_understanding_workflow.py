@@ -460,6 +460,22 @@ def test_b1_attempt_identity_prevents_reusing_an_older_b2_rework_result():
     assert len(model.requests) == calls_after_first + 6
 
 
+def test_b2_attempt_identity_includes_runtime_supplied_repair_impact():
+    _source, _session, model, workflow, case_stage, ids = _harness([])
+    model.replies.extend(_no_op_replies(ids, "repair-impact"))
+    attempt_id = str(uuid4())
+
+    result = workflow.run_attempt(
+        case_stage,
+        case_attempt_id=attempt_id,
+        additional_required_case_ids=(ids["case_b"],),
+    )
+
+    assert result["case_attempt_id"] == attempt_id
+    with pytest.raises(ValueError, match="changed input"):
+        workflow.run_attempt(case_stage, case_attempt_id=attempt_id)
+
+
 def test_b2_runtime_attempt_resumes_the_same_checkpointed_tool_history():
     _source, session, model, workflow, case_stage, ids = _harness([])
     model.replies.extend([

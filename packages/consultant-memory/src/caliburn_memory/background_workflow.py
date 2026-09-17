@@ -204,6 +204,125 @@ class BackgroundMemoryWorkflow:
         identifier = state["base_memory_version_id"]
         return MemoryVersion(self.document_id, identifier) if identifier is not None else None
 
+    def _repair_impact(
+        self, state: BackgroundMemoryWorkflowState,
+    ) -> tuple[tuple[str, ...], tuple[str, ...]]:
+        """Derive unreconciled layered-repair impact at this job's fixed base."""
+        revision = state["base_publication_revision"]
+        version = self._base_version(state)
+        if revision is None:
+            raise ValueError("Background Memory base was not loaded")
+        if revision == 0:
+            return (), ()
+        if version is None:
+            raise ValueError("Background Memory base version is unavailable")
+
+        boundary = self.publication.latest_consolidation_revision(
+            through_revision=revision,
+        )
+        if boundary == revision:
+            return (), ()
+
+        changed_cases: set[str] = set()
+        affected_understandings: set[str] = set()
+        cursor = boundary
+        previous_result_version_id: str | None = None
+        while cursor < revision:
+            receipts = self.publication.repair_receipts(
+                after_revision=cursor,
+                through_revision=revision,
+                limit=100,
+            )
+            if not receipts:
+                raise ValueError("Unreconciled publication lineage is incomplete")
+            for receipt in receipts:
+                if receipt.base_revision != cursor:
+                    raise ValueError("Repair receipt lineage is not contiguous")
+                new_manifest = self.artifacts.bundle_manifest(receipt.result.memory)
+                if new_manifest.base_publication_revision != receipt.base_revision:
+                    raise ValueError("Repair bundle does not name its exact base revision")
+                old_version_id = new_manifest.base_memory_version_id
+                if receipt.base_revision == 0:
+                    if old_version_id is not None:
+                        raise ValueError("Initial repair bundle names an invalid base version")
+                    old_manifest = None
+                else:
+                    if old_version_id is None:
+                        raise ValueError("Repair bundle does not name its exact base version")
+                    if (previous_result_version_id is not None
+                            and old_version_id != previous_result_version_id):
+                        raise ValueError("Repair bundle base version breaks receipt lineage")
+                    old_manifest = self.artifacts.bundle_manifest(MemoryVersion(
+                        self.document_id, old_version_id,
+                    ))
+
+                old_cases = ({item.case_id: item.digest for item in old_manifest.cases}
+                             if old_manifest is not None else {})
+                new_cases = {item.case_id: item.digest for item in new_manifest.cases}
+                old_understandings = ({item.understanding_id: item.digest
+                                       for item in old_manifest.understandings}
+                                      if old_manifest is not None else {})
+                new_understandings = {
+                    item.understanding_id: item.digest
+                    for item in new_manifest.understandings
+                }
+                if (set(old_cases) != set(new_cases)
+                        or set(old_understandings) != set(new_understandings)):
+                    raise ValueError(
+                        "Layered repair impact contains unsupported identity changes",
+                    )
+
+                old_bindings: dict[str, tuple[tuple[str, str], ...]] = {}
+                new_bindings: dict[str, tuple[tuple[str, str], ...]] = {}
+                for target, manifest in (
+                    (old_bindings, old_manifest),
+                    (new_bindings, new_manifest),
+                ):
+                    if manifest is None:
+                        continue
+                    grouped: dict[str, list[tuple[str, str]]] = {}
+                    for binding in manifest.understanding_case_bindings:
+                        grouped.setdefault(binding.understanding_id, []).append((
+                            binding.case_id, binding.case_digest,
+                        ))
+                    target.update({
+                        understanding_id: tuple(sorted(bindings))
+                        for understanding_id, bindings in grouped.items()
+                    })
+
+                receipt_changed_cases = {
+                    case_id for case_id in set(old_cases) | set(new_cases)
+                    if old_cases.get(case_id) != new_cases.get(case_id)
+                }
+                changed_cases.update(receipt_changed_cases)
+                affected_understandings.update({
+                    binding.understanding_id
+                    for manifest in (old_manifest, new_manifest)
+                    if manifest is not None
+                    for binding in manifest.understanding_case_bindings
+                    if binding.case_id in receipt_changed_cases
+                })
+                affected_understandings.update({
+                    understanding_id
+                    for understanding_id in set(old_understandings) | set(new_understandings)
+                    if (old_understandings.get(understanding_id)
+                        != new_understandings.get(understanding_id)
+                        or old_bindings.get(understanding_id, ())
+                        != new_bindings.get(understanding_id, ()))
+                })
+                cursor = receipt.result.revision
+                previous_result_version_id = receipt.result.memory.version_id
+
+        if cursor != revision or previous_result_version_id != version.version_id:
+            raise ValueError("Repair receipt lineage does not reach the fixed background base")
+        current_manifest = self.artifacts.bundle_manifest(version)
+        if (not changed_cases <= {item.case_id for item in current_manifest.cases}
+                or not affected_understandings <= {
+                    item.understanding_id for item in current_manifest.understandings
+                }):
+            raise ValueError("Repair impact is not current in the fixed background base")
+        return tuple(sorted(changed_cases)), tuple(sorted(affected_understandings))
+
     def _load_base(self, state: BackgroundMemoryWorkflowState) -> dict[str, Any]:
         state = self._validate_state(state)
         head = self.publication.current()
@@ -265,8 +384,23 @@ class BackgroundMemoryWorkflow:
         if attempt_id is None:
             raise ValueError("Background Memory case attempt is unavailable")
         case_stage = self.case_workflow.session.load(state["case_stage"])
+        repair_cases, repair_understandings = self._repair_impact(state)
+        current_cases = set(case_stage.current_case_ids)
+        retired_by_b1 = {
+            case_id
+            for change in case_stage.changes if change.kind != "route"
+            for case_id in change.previous_case_ids
+        }
+        if any(case_id not in current_cases and case_id not in retired_by_b1
+               for case_id in repair_cases):
+            raise ValueError("B1 candidate did not preserve or handle repair impact")
         result = self.understanding_workflow.run_attempt(
-            case_stage, case_attempt_id=attempt_id,
+            case_stage,
+            case_attempt_id=attempt_id,
+            additional_required_case_ids=tuple(
+                case_id for case_id in repair_cases if case_id in current_cases
+            ),
+            additional_required_understanding_ids=repair_understandings,
         )
         stage = self.understanding_workflow.session.load(result.get("understanding_stage"))
         if not stage.completed:

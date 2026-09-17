@@ -5,6 +5,8 @@
 - Stage：**G7 離線窄切片完成**
 - 狀態：A／B1／B2 的正式角色模型由單一 App factory 建立，B1／B2 正式執行限制已由 App profile 統一；successor 已完成 managed background callback 的離線窄接線，仍未完成 layered C、付費自然模型、完整瀏覽器 App 旅程或 production authority
 
+> **2026-09-18 successor：**A 的 route、reasoning high、8,192 output、90 秒 timeout、禁止 fallback 與 hidden retry 0 均不變；只有本文件當時沿用的 16 model steps／15 tool calls，已由 [A 主顧問執行額度與安全收尾](2026-09-18-consultant-execution-budget-and-safe-finalization.md)取代為 64／63 並保留最後無工具回答。這是 G4 決策，尚未修改本文件記錄的既有 G7 證據。
+
 ## 1. 目的與既有決策
 
 Caliburn 只有一個 App 與一個 OpenRouter credential。正式模型路徑維持：
@@ -32,7 +34,7 @@ openai/gpt-5.6-luna
 ### Caliburn 取捨
 
 - 沿用既有共用 `openrouter_model.py`，不新增第二套 HTTP／SDK adapter。
-- 沿用已驗 Luna route：`openai/gpt-5.6-luna`、reasoning `high`、parallel tool calls 關閉。A 保留既有輸出上限 8,192 與 90 秒 timeout；背景 B1／B2 採下節正式 profile，不把 A 的數值誤當所有角色共同上限。
+- 沿用已驗 Luna route：`openai/gpt-5.6-luna`、reasoning `high`、parallel tool calls 關閉。A 保留既有輸出上限 8,192 與 90 秒 timeout；A 的 agent-loop 16／15 已由上方 successor 取代，背景 B1／B2 仍採下節正式 profile，不把任一角色數值誤當全部角色共同上限。
 - A／B1／B2 各有獨立 model object 與 tracing component，但共用 caller-owned sync／async HTTP clients、同一 credential、同一 provider restriction。
 - 三個角色的 SDK hidden retry 均為 0；語意返工、stale 重整與 durable resume 繼續由既有 Runtime／workflow 管理，不在 model factory 疊加重試。
 - B1／B2 主呼叫與 continuity compaction 仍由 `build_background_memory_workflow()` 使用同一個注入角色模型物件；factory 不另建 summary model。

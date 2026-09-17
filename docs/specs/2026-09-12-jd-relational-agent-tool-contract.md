@@ -292,7 +292,7 @@ Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案�
 
 | status | 誰處理 | 允許行為 | 禁止行為 |
 |---|---|---|---|
-| `invalid_input` | 模型／App | 依欄位說明修正一次；仍失敗停止 | 換 operation key 重送相同錯誤 payload |
+| `invalid_input` | 模型／App | 依欄位說明進入有界 correction episode；原始失敗後最多兩次替代提交，仍失敗或無進展就收尾 | 換 operation key 重送相同錯誤 payload |
 | `target_missing` | 模型 | `jd_read current`，確認新狀態後再決定 | 按名稱猜另一 target |
 | `stale_view` | 模型／Web | 重讀；人工保留 dirty buffer，重新比較 | App 偷換 latest token 自動覆蓋 |
 | `relationship_conflict` | 模型 | 讀相關 items，修正 relation | App 以同名或第一筆自動接線 |
@@ -302,7 +302,7 @@ Anthropic 官方建議 tool error 說明發生什麼及可採取動作；本案�
 | `operation_conflict` | App | 停止，保存原 receipt | 覆寫原 operation payload/result |
 | `busy`／`archived` | App／Web | 閱讀；閉合 writer 或恢復文件後再開始新意圖 | 只解除 UI disabled 後直接 POST |
 
-模型最多就同一語意錯誤做一次有根據的修正；額外工具與 token／時間／費用仍沿既有 run budget。這個次數是 Caliburn 的保守起始策略，不冒稱 OpenAI 或 Anthropic 規定。
+模型修正由 App 依可信 ToolMessage／`next_action` 管理，不要求 Runtime 猜「是不是同一語意」：第一個可修正錯誤後最多再提交兩次替代操作，必要 evidence read 不重置額度，成功／no-change 或本輪結束才關閉 correction episode；完全相同且無進展時提早停止。所有 read、修正與收尾仍共用 A 的 run budget。這是 Caliburn 的產品 guardrail，不冒稱 OpenAI 或 Anthropic 規定；精確分類、64／63 總額、最後無工具回答及不重播未知副作用見 [2026-09-18 successor](2026-09-18-consultant-execution-budget-and-safe-finalization.md)。
 
 ## 8. 人工修改如何進下一輪 context
 

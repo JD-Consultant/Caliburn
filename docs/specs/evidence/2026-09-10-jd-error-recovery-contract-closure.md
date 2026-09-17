@@ -2,6 +2,8 @@
 
 日期：2026-09-10。Topic：JD-R002/C03。效力：Owner 同意契約補正後的有限工程推薦，供主稿、共用 schema 與六切片計畫統一；不是 production 已接線或故障恢復已通過的證據。狀態以 [current register](../../current-decisions.md) 為準。本文只新增此附件，未修改 schema、程式、資料庫、Memory 或模型配置，未安裝或付費呼叫。
 
+> **2026-09-18 successor：**本文的 Node／SQL／receipt 每階段 1 attempt、0 automatic replay 及未知副作用先對帳規則完全保留。只有模型收到可修正工具結果後的 correction budget，改由 [A 主顧問執行額度與安全收尾](../2026-09-18-consultant-execution-budget-and-safe-finalization.md)明定為原始失敗後最多兩次替代提交；它不是 Node、SQL、transport 或整輪 Agent replay，也不改寫本文的歷史研究證據。
+
 閱讀基線：[責任稽核 §4](../2026-09-10-jd-responsibility-and-evidence-audit.md#4-錯誤重試與停止的責任)、[工具契約 §6–7](../2026-09-10-jd-app-tool-contract.md#6-結果與錯誤契約)、[正式契約 §4](../2026-09-10-jd-editor-contract-schema.md)、[主設計 §6–7](../2026-09-09-jd-editor-app-integration-design.md#6-成功失敗及回覆遺失)及[六切片計畫](../../plans/2026-09-10-jd-editor-core-implementation.md)。共用文件與 schema 由主工作單位修改；本文記錄選擇理由與驗收邊界，不成為第二份 schema owner。
 
 ## 1. 結論與官方證據的效力

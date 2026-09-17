@@ -93,9 +93,18 @@ def test_memory_actions_are_verbatim_and_only_mention_registered_tools():
         assert mentioned in registered
 
 
-def test_memory_action_guidance_matches_its_adoption_source():
-    assert MEMORY_ACTION_GUIDANCE == _adopted_constant(
+def test_only_live_repair_changed_and_background_wording_stays_adopted_verbatim():
+    adopted = _adopted_constant(
         "experiments/analysis-agent/src/analysis_agent/live_memory.py", "MEMORY_ACTION_GUIDANCE")
+    marker = "### Background consolidation\n"
+    assert MEMORY_ACTION_GUIDANCE.split(marker, 1)[1] == adopted.split(marker, 1)[1]
+    live = MEMORY_ACTION_GUIDANCE.split(marker, 1)[0]
+    for required in ("explicit correction", "current turn's Memory version",
+                     "every directly affected current work understanding",
+                     "revalidate", "Runtime owns", "Do not partially repair"):
+        assert required in live
+    for obsolete in ("Repair your own", "add a section", "two existing files"):
+        assert obsolete not in live
 
 
 def test_skill_bodies_are_not_pasted_into_the_prompt():

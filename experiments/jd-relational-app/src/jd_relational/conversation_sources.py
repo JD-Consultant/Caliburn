@@ -478,24 +478,67 @@ class ConversationSourceService:
 
     def history_exchanges(self, through_reference, document_id, *, offset: int = 0,
                           limit: int = MAX_SOURCE_EXCHANGES) -> dict:
-        """Page safe historical exchanges at one already fixed window root.
+        """Page safe historical exchanges at one already fixed upper bound.
 
-        The window is the upper bound, so conversation activity after it was
-        issued cannot enlarge a resumed page.  `offset` is an application
-        cursor over this owner-proven ordered list; it is never a model field
-        or a persistent citation.
+        A completed window is the normal B1/B2 upper bound.  Foreground C may
+        instead use the current turn's already issued immutable source: its
+        pinned checkpoint supplies the same fixed lineage while the turn is
+        not terminal yet.  `offset` is an application cursor over this
+        owner-proven ordered list; it is never a model field or a persistent
+        citation.
         """
-        if (type(offset) is not int or offset < 0 or type(limit) is not int
+        if (type(through_reference) is not str
+                or type(offset) is not int or offset < 0 or type(limit) is not int
                 or not 1 <= limit <= MAX_SOURCE_EXCHANGES):
             raise ConversationSourceError("invalid_ref")
-        _, _, turns, _ = self._pinned_range(through_reference, document_id)
-        if offset > len(turns):
+        if through_reference.startswith(_WINDOW_PREFIX):
+            _, _, turns, _ = self._pinned_range(through_reference, document_id)
+            exchanges = tuple(self._record(self.capture(document_id, turn["input_id"]))
+                              for turn in turns)
+        elif through_reference.startswith(_PREFIX):
+            position = self._codec._resolve(through_reference, document_id)
+            try:
+                observed = self._checkpoints.observe_at(
+                    document_id, position.run_id, self.dataset_id,
+                    position.root_config(), source_config=position.source_config(),
+                )
+                current = _selected(observed.messages, position.run_id)
+                if (current[0].message_id != position.first
+                        or current[-1].message_id != position.last):
+                    raise ValueError()
+                turns = self._settled_turns(document_id, observed.messages)
+                human_ids = tuple(message.id for message in observed.messages
+                                  if isinstance(message, HumanMessage))
+                settled_ids = tuple(turn["input_id"] for turn in turns)
+                if human_ids == settled_ids and settled_ids and settled_ids[-1] == position.run_id:
+                    # A previously settled canonical source can be the fixed
+                    # upper bound when C has re-read that exact correction.
+                    records = [self._record(self.capture(document_id, run_id))
+                               for run_id in settled_ids]
+                    records[-1] = self._record(SourceExcerpt(through_reference, current))
+                    exchanges = tuple(records)
+                elif human_ids == (*settled_ids, position.run_id):
+                    exchanges = (*(
+                        self._record(self.capture(document_id, turn["input_id"]))
+                        for turn in turns
+                    ), self._record(SourceExcerpt(through_reference, current)))
+                else:
+                    raise ValueError()
+            except ConversationSourceError:
+                raise
+            except AiCheckpointError as error:
+                raise ConversationSourceError(
+                    "invalid_ref" if error.code == "invalid_input" else "source_not_available",
+                ) from None
+            except Exception:
+                raise ConversationSourceError("invalid_ref") from None
+        else:
             raise ConversationSourceError("invalid_ref")
-        end = min(len(turns), offset + limit)
-        exchanges = tuple(self._record(self.capture(document_id, turn["input_id"]))
-                          for turn in turns[offset:end])
-        return {"order": "oldest_to_newest", "exchanges": exchanges,
-                "next_offset": end if end < len(turns) else None}
+        if offset > len(exchanges):
+            raise ConversationSourceError("invalid_ref")
+        end = min(len(exchanges), offset + limit)
+        return {"order": "oldest_to_newest", "exchanges": exchanges[offset:end],
+                "next_offset": end if end < len(exchanges) else None}
 
     def read(self, source_ref, document_id) -> SourceExcerpt:
         position = self._codec._resolve(source_ref, document_id)

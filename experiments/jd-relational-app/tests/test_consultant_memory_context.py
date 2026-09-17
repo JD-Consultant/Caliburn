@@ -15,7 +15,10 @@ import sqlalchemy as sa
 from sqlalchemy.pool import StaticPool
 
 from jd_relational.consultant_context import ConsultantContext, ConsultantState, JdNoticeMiddleware
-from jd_relational.memory_context import MemoryReadError, MemoryReadSession, build_memory_read_tools, checked_memory_view
+from jd_relational.memory_context import (
+    MemoryReadError, MemoryReadSession, build_memory_read_tools,
+    checked_memory_view, layered_read_proof,
+)
 from jd_relational.memory_repair_session import MemoryRepairSession
 from jd_relational.memory_sources import MemorySourceReader
 from jd_relational.runtime_checkpoints import build_document_graph
@@ -235,12 +238,37 @@ def test_layered_bundle_starts_from_both_guides_and_reads_both_layers_on_the_pin
     assert case_path in notice["guide"] and understanding_path in notice["guide"]
     assert "本人先做設備故障初判" not in notice["guide"]
     assert "本人穩定負責初判" not in notice["guide"]
-    feedback = [message.content for message in result["messages"] if isinstance(message, ToolMessage)]
-    assert all("schema_version" not in content for content in feedback)
-    assert any("本人先做設備故障初判" in content for content in feedback)
-    assert any("source_references" in content and "conversation:" in content for content in feedback)
+    feedback = [message for message in result["messages"] if isinstance(message, ToolMessage)]
+    contents = [message.content for message in feedback]
+    assert all("schema_version" not in content for content in contents)
+    assert any("本人先做設備故障初判" in content for content in contents)
+    assert any("source_references" in content and "conversation:" in content for content in contents)
     assert any("本人穩定負責初判" in content and "case_bindings" in content
-               and "case_digest" in content for content in feedback)
-    assert any("前一輪原話" in content for content in feedback)
-    assert all("新版改由外包處理" not in content for content in feedback)
+               and "case_digest" in content for content in contents)
+    assert any("前一輪原話" in content for content in contents)
+    assert all("新版改由外包處理" not in content for content in contents)
+    case_result = json.loads(next(message.content for message in feedback
+                                  if message.name == "read_case"))
+    understanding_result = json.loads(next(message.content for message in feedback
+                                           if message.name == "read_work_understanding"))
+    source_result = json.loads(next(message.content for message in feedback
+                                    if message.name == "read_conversation"))
+    assert case_result["memory_revision"] == understanding_result["memory_revision"] == 1
+    assert case_result["memory_version_id"] == understanding_result["memory_version_id"] \
+        == head.memory.version_id
+    assert case_result["evidence"] == [{
+        "evidence_key": "E1", "source_reference": source_ref,
+    }]
+    assert source_result["read_offset"] == 0 and source_result["next_offset"] is None
+    proof = layered_read_proof(
+        result["messages"], run_id=session.run_id,
+        revision=1, version_id=head.memory.version_id,
+    )
+    case_id = case_path.removeprefix("/memory/cases/items/").removesuffix(".md")
+    understanding_id = understanding_path.removeprefix(
+        "/memory/understanding/items/",
+    ).removesuffix(".md")
+    assert proof.case_evidence == {case_id: {"E1": source_ref}}
+    assert proof.understanding_ids == frozenset({understanding_id})
+    assert proof.complete_sources == frozenset({source_ref})
     assert publication.current().revision == 2 and publication.current() != head

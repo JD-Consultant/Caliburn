@@ -11,8 +11,10 @@ from caliburn_memory.memory import MemoryVersion
 from caliburn_memory.publication import PublishedHead, PublishRequest
 
 from jd_relational.memory_repair_records import (
-    REPAIR_NAME, MemoryRepairError, decode_repair_bindings, make_repair_binding,
-    make_repair_message, parse_repair_input, validate_repair_message,
+    REPAIR_NAME, LayeredRepairInput, MemoryRepairError, decode_repair_bindings,
+    make_repair_binding, make_repair_message, make_unbound_repair_message,
+    parse_layered_repair_input, parse_repair_input, validate_repair_message,
+    validate_unbound_repair_message,
     verify_repair_binding_message,
 )
 
@@ -26,12 +28,103 @@ SOURCE = "conversation:opaque-current-source"
 BASE = PublishedHead(1, MemoryVersion(DOCUMENT, VERSION), "conversation:background-source")
 SCOPE = dict(dataset_id=DATASET, document_id=DOCUMENT, run_id=RUN)
 EDIT = {"path": "/memory/knowledge.md", "diff": "@@\n-主管\n+處長"}
+CASE = "11111111-1111-4111-8111-111111111111"
+UNDERSTANDING = "22222222-2222-4222-8222-222222222222"
+LAYERED_ARGS = {
+    "case_id": CASE,
+    "case_diff": "@@\n-本人負責維修。\n+本人只負責通報；維修由外包負責。",
+    "case_route_note": None,
+    "remove_evidence_keys": ["E1"],
+    "understanding_updates": [{
+        "understanding_id": UNDERSTANDING,
+        "action": "revalidate",
+        "diff": None,
+        "supporting_case_ids": [CASE],
+        "route_note": None,
+    }],
+}
+LAYERED_REPAIR = {
+    "case_id": CASE,
+    "case_diff": LAYERED_ARGS["case_diff"],
+    "case_route_note": None,
+    "remove_source_references": ["conversation:old-source"],
+    "understanding_updates": LAYERED_ARGS["understanding_updates"],
+}
 
 
 def model_message(args=None):
     return AIMessage(id="msg-original", content=[], tool_calls=[{
         "name": REPAIR_NAME, "id": "call-original", "args": {"edits": [EDIT]} if args is None else args,
     }])
+
+
+def test_current_layered_input_exposes_only_model_owned_fields():
+    parsed = parse_layered_repair_input(LAYERED_ARGS)
+    assert parsed == LAYERED_ARGS
+    properties = LayeredRepairInput.model_json_schema(mode="validation")["properties"]
+    assert set(properties) == {
+        "case_id", "case_diff", "case_route_note", "remove_evidence_keys",
+        "understanding_updates",
+    }
+    encoded = json.dumps(properties, ensure_ascii=False)
+    for runtime_owned in ("source_reference", "revision", "version_id", "digest",
+                          "offset", "operation_id", "remove_source_references"):
+        assert runtime_owned not in encoded
+    with pytest.raises(MemoryRepairError, match="^invalid_repair_input$"):
+        parse_layered_repair_input({**LAYERED_ARGS, "revision": 1})
+
+
+def test_layered_binding_and_request_preserve_exact_runtime_resolved_repair():
+    message = model_message(LAYERED_ARGS)
+    bound = make_repair_binding(
+        message, **SCOPE, base=asdict(BASE), source_reference=SOURCE,
+        repair=LAYERED_REPAIR, layered=True,
+    )
+    assert bound.format_version == 2 and bound.repair == LAYERED_REPAIR
+    verify_repair_binding_message(bound, [message])
+    request = PublishRequest(
+        bound.operation_id, MemoryVersion(DOCUMENT, NEXT_VERSION), 1, "repair", "a" * 64,
+        repair_sources=(SOURCE,), bundle_base_revision=1,
+        bundle_base_version_id=VERSION,
+    )
+    saved = PublishedHead(2, request.memory, BASE.processed_source)
+    outcome = {"status": "applied", "detail": "已保存", "head": asdict(saved),
+        "guide": "分層導覽", "applied_head": asdict(saved),
+        "source_reference": SOURCE}
+    result = make_repair_message(bound, outcome, request)
+    assert result.artifact["format_version"] == 2
+    assert "read_paths" not in json.loads(result.content)
+    assert validate_repair_message(result, bound) == (outcome, request)
+
+
+def test_unbound_current_call_never_exposes_retired_two_file_read_paths():
+    original = model_message(LAYERED_ARGS)
+
+    result = make_unbound_repair_message(original)
+
+    assert result.artifact["format_version"] == 2
+    assert "read_paths" not in json.loads(result.content)
+    validate_unbound_repair_message(result, original)
+
+
+def test_unbound_current_legacy_shaped_call_is_closed_with_the_current_format():
+    original = model_message()
+
+    result = make_unbound_repair_message(original)
+
+    assert result.artifact["format_version"] == 2
+    assert "read_paths" not in json.loads(result.content)
+    validate_unbound_repair_message(result, original)
+
+
+def test_a_saved_legacy_unbound_result_remains_validatable_for_recovery():
+    original = model_message()
+
+    result = make_unbound_repair_message(original, format_version=1)
+
+    assert result.artifact["format_version"] == 1
+    assert "read_paths" in json.loads(result.content)
+    validate_unbound_repair_message(result, original)
 
 
 def binding(message=None, **kwargs):

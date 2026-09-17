@@ -292,7 +292,7 @@ class AiRuntime:
         """Reopen the immutable turn-start view and project saved C results."""
         from hashlib import sha256
         from caliburn_memory import MemoryArtifacts, MemoryVersion, PublishedHead, PublicationStore
-        from .memory_context import checked_memory_view
+        from .memory_context import memory_guide_projection, checked_memory_view
         from .memory_repair_records import decode_repair_bindings
         from .memory_sources import MemorySourceReader
 
@@ -308,7 +308,10 @@ class AiRuntime:
         first = bindings[0].base
         if view is None or (view["revision"] == 0) != (first is None):
             raise ValueError()
-        source = MemorySourceReader(self.conversation_sources, record.document_id)
+        source = MemorySourceReader(
+            self.conversation_sources, record.document_id,
+            window_references=bindings[0].format_version == 2,
+        )
         artifacts = MemoryArtifacts(self.graph.store, record.document_id, source=source)
         if first is None:
             head, guide = None, ""
@@ -317,7 +320,7 @@ class AiRuntime:
                 first["processed_source"])
             if (view["revision"] != head.revision or view["version_id"] != head.memory.version_id):
                 raise ValueError()
-            guide = artifacts.read_text("/memory/guide.md", head.memory)
+            guide = memory_guide_projection(artifacts, head.memory)
         if sha256(guide.encode("utf-8")).hexdigest() != view["guide_digest"]:
             raise ValueError()
         initial = MemoryReadSession(record.dataset_id, record.document_id, record.run_id,
@@ -347,9 +350,10 @@ class AiRuntime:
             if session is None:
                 return frozenset(verified)
             for binding, _, outcome, request in progress.results:
-                receipt = session.workflow.publication.receipt(binding.operation_id)
+                workflow = session.recovery_workflow(binding)
+                receipt = workflow.publication.receipt(binding.operation_id)
                 if outcome["status"] == "applied":
-                    confirmed = session.workflow.reconcile(request)
+                    confirmed = workflow.reconcile(request)
                     if (receipt is None or confirmed.get("applied_head") != outcome.get("applied_head")
                             or confirmed.get("source_reference") != binding.source_reference):
                         raise ValueError()
@@ -380,18 +384,26 @@ class AiRuntime:
         origins = [m for m in messages if isinstance(m, AIMessage) and m.id == key[0]]
         if len(origins) != 1 or call.get("id") != key[1]:
             raise ValueError()
-        return make_unbound_repair_message(origins[0], key[1]).model_copy(update={"id": str(uuid4())})
+        return make_unbound_repair_message(
+            origins[0], key[1], format_version=2,
+        ).model_copy(update={"id": str(uuid4())})
 
     def _verify_repair_start(self, checkpoint, binding, call):
         """Match the fixed child's own saved START input to this original call."""
-        from .memory_repair_records import parse_repair_input
         payload = checkpoint.get("input")
-        if (type(payload) is not dict
-                or set(payload) != {"operation_id", "base", "source_reference", "edits"}
-                or payload["operation_id"] != binding.operation_id
-                or payload["base"] != binding.base
-                or payload["source_reference"] != binding.source_reference
-                or payload["edits"] != parse_repair_input(call.get("args"))):
+        expected = ({"operation_id": binding.operation_id, "base": binding.base,
+                     "source_reference": binding.source_reference,
+                     "repair": binding.repair}
+                    if binding.format_version == 2 else None)
+        if binding.format_version == 1:
+            from .memory_repair_records import parse_repair_input
+            expected = {"operation_id": binding.operation_id, "base": binding.base,
+                        "source_reference": binding.source_reference,
+                        "edits": parse_repair_input(call.get("args"))}
+        if (type(payload) is not dict or any(payload.get(key) != value
+                for key, value in expected.items())
+                or any(key not in expected and value not in (None, {}, [], ())
+                       for key, value in payload.items())):
             raise AiRuntimeError("run_recovery_required")
 
     def _recover_pending_repair(self, observed, messages, pending):
@@ -429,11 +441,12 @@ class AiRuntime:
                     request = decode_repair_request(values["request"], binding)
                 if values.get("outcome") is not None:
                     outcome = values["outcome"]
-            receipt = session.workflow.publication.receipt(binding.operation_id)
+            workflow = session.recovery_workflow(binding)
+            receipt = workflow.publication.receipt(binding.operation_id)
             if receipt is not None:
                 if request is None:
                     raise ValueError()
-                outcome = session.workflow.reconcile(request)
+                outcome = workflow.reconcile(request)
             elif request is not None and outcome is None:
                 # The saved publish request may have reached COMMIT even when a
                 # current receipt read cannot prove it. Keep the foreground gate.

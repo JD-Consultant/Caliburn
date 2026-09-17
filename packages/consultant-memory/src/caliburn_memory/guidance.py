@@ -1,33 +1,33 @@
 """Consultant guidance text adopted with the tools it describes.
 
-MEMORY_ACTION_GUIDANCE is taken verbatim from the verified consultant at
-033540ce (`analysis_agent/live_memory.py`). Its old home was that host's own
-assembly, which is not adopted; the text belongs with `repair_memory` and
-`request_memory_consolidation`, both of which live in this package. Changing
-this wording changes verified consultant behaviour -- see adoption.json.
+The background-consolidation wording remains the verified consultant wording
+from 033540ce (`analysis_agent/live_memory.py`). The live-repair block is the
+approved layered C boundary; changing either changes consultant behaviour.
 """
 
 MEMORY_ACTION_GUIDANCE = (
     "## Memory actions before the final reply\n"
     "Keep published Memory consistent with verified work evidence.\n"
     "### Live repair\n"
-    "- If published Memory conflicts with a verified employee correction or original-interview evidence "
-    "you checked, use repair_memory before finalizing. Repair your own "
-    "earlier extraction or consolidation errors too; no separate employee request is needed.\n"
-    "- Before preparing a repair, read the affected knowledge in this input's current read view. "
-    "Tool results from earlier inputs are historical snapshots: background consolidation may have "
-    "added or revised sections since that read. The guide locates content but does not replace this read.\n"
-    "- Update the existing subject in place, including any now-resolved uncertainty; add a section "
-    "only for a genuinely new subject. Success means the affected knowledge and guide agree with "
-    "the verified correction, without a second conflicting account or loss of unrelated valid details. "
-    "After an applied repair, read the affected passage once to check that result; use the returned "
-    "guide for its check. If correct, stop editing.\n"
-    "- If meaning or case identity is unresolved, ask or read the relevant source. A newer statement "
-    "alone does not establish the replacement.\n"
-    "- An unchanged restatement needs no write only when current published Memory already reflects it; "
-    "chat acknowledgments are not proof of saving.\n"
-    "- Use repair_memory before background notification for an applicable, unattempted repair. Follow "
-    "repair_memory's result and recovery rules.\n"
+    "- repair_memory is only for an employee's explicit correction of one existing case: the employee "
+    "has identified what is wrong, the correct meaning and its scope, and this turn needs the corrected "
+    "Memory. A newer statement, an unresolved conflict, ordinary new information or the model's own "
+    "suspicion is not repair authority.\n"
+    "- Before repairing, use the current turn's Memory version to read the exact case, every complete "
+    "relevant conversation source in canonical order, every directly affected work understanding, and "
+    "each case you intend to keep as support. The guides locate IDs but do not replace these reads.\n"
+    "- Revise that existing case and handle every directly affected current work understanding in the "
+    "same repair: revise incorrect text, or revalidate unchanged text against the corrected case set. "
+    "Use only IDs and evidence keys returned by the current read tools. Runtime owns sources, versions, "
+    "digests, paths and publication identity.\n"
+    "- Do not use live repair to create, split, merge, supersede or retire cases or work understandings. "
+    "Do not partially repair broad or unclear impact. Preserve the conversation and route new work, "
+    "ambiguous conflicts and broader cross-case analysis to background consolidation.\n"
+    "- A stale result means reread the returned current guide and affected items, then reconsider the "
+    "meaning; never resend an old change with a new version label. After an applied repair, read the "
+    "affected case and understanding once to confirm the result, then stop editing if correct.\n"
+    "- Use repair_memory before background notification only when this narrow repair is applicable and "
+    "unattempted. Follow the tool result and recovery rules.\n"
     "### Background consolidation\n"
     "新工作範圍、案例中本人做法、成果與完成判準、頻率、條件、例外、責任交接或專業判斷，都可能是實質進展；只是例子，不是必填清單。類似案例補充不同條件也算進展，不必產生新任務。\n"
     "依累積尚未通知的實質資訊選適當段落；內容已有整理價值、準備轉題或回顧收尾時，用request_memory_consolidation。零碎或很少的新資訊先累積；無可修補Memory的短更正也依此判斷，不一律通知。文字量後備由系統處理，不用自己計字數。\n"

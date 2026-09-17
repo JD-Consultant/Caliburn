@@ -138,7 +138,7 @@ def build_conversation_read_tool() -> BaseTool:
             _source_error(error)
         except Exception:
             raise ConversationSourceError("source_not_available") from None
-        return {**source_page(excerpt, offset), **metadata}
+        return {**source_page(excerpt, offset), "read_offset": offset, **metadata}
 
     read_conversation.handle_tool_error = True
     read_conversation.handle_validation_error = _INPUT_ERROR

@@ -215,6 +215,40 @@ def test_history_exchange_pages_stay_pinned_to_the_requested_window(interview, n
     assert second_page["next_offset"] is None
 
 
+def test_current_turn_source_is_a_fixed_canonical_history_upper_bound(interview, native):
+    sources, document, first_run, second_run = interview
+    current = append(native, [], text="更正：本人只通報異常，不負責維修。", pause=True)
+    through = sources.capture(document, current.record.run_id).source_ref
+
+    first_page = sources.history_exchanges(through, document, limit=2)
+    assert first_page["order"] == "oldest_to_newest"
+    assert [row.messages[-1].message_id for row in first_page["exchanges"]] == [
+        first_run, second_run,
+    ]
+    assert first_page["next_offset"] == 2
+
+    final_page = sources.history_exchanges(
+        through, document, offset=first_page["next_offset"], limit=2,
+    )
+    assert [row.source_ref for row in final_page["exchanges"]] == [through]
+    assert [message.role for message in final_page["exchanges"][0].messages] == [
+        "assistant", "user",
+    ]
+    assert final_page["next_offset"] is None
+
+
+def test_a_verified_settled_source_is_a_fixed_canonical_history_upper_bound(interview):
+    sources, document, first_run, _ = interview
+    through = sources.capture(document, first_run).source_ref
+
+    page = sources.history_exchanges(through, document, limit=5)
+
+    assert page["order"] == "oldest_to_newest"
+    assert [row.source_ref for row in page["exchanges"]] == [through]
+    assert [row.messages[-1].message_id for row in page["exchanges"]] == [first_run]
+    assert page["next_offset"] is None
+
+
 def test_a_window_pages_by_unicode_code_points_and_repeats_turns(interview, native):
     windows, document, first_run, _ = interview
     # Each emoji is one code point but four UTF-8 bytes: a byte-based pager

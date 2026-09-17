@@ -10,7 +10,7 @@ from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 import pytest
 
-from caliburn_memory import PublicationStore
+from caliburn_memory import CaseArtifact, PublicationStore, WorkUnderstandingArtifact
 
 from jd_relational.ai_checkpoints import AiRunCheckpoints, new_run_record
 from jd_relational.ai_runtime import AiRuntime, AiRuntimeError, _pending_calls
@@ -29,12 +29,6 @@ def call(number, old="只做初步確認。", new="維修由外包負責。", *,
     return AIMessage(id=f"repair-{number}", content="", tool_calls=[{
         "name": "repair_memory", "id": f"repair-call-{number}", "args": args if args is not None else {
         "edits": [{"path": "/memory/knowledge.md", "diff": f"@@\n-{old}\n+{new}"}]}}])
-
-
-def read_call(number):
-    return AIMessage(id=f"read-{number}", content="", tool_calls=[{
-        "name": "read_file", "id": f"read-call-{number}",
-        "args": {"file_path": "/memory/knowledge.md", "offset": 0, "limit": 100}}])
 
 
 def setup_repair(memory, replies, *, layered=False):
@@ -61,7 +55,7 @@ def setup_repair(memory, replies, *, layered=False):
         run_id=selected.run_id, memory_session=selected, memory_repair_session=repair,
         tool_session=tool_session, stop_event=stop,
         source_notice=lambda messages: {"source_ref": source})
-    model = FixedModel(replies=replies)
+    model = FixedModel(replies=replies(selected, source) if callable(replies) else replies)
     child = create_agent(model, tools=build_consultant_tools(), middleware=[AiToolMiddleware()],
         state_schema=ConsultantState)
     root = build_document_graph(child, InMemorySaver(), store=store)
@@ -72,22 +66,209 @@ def setup_repair(memory, replies, *, layered=False):
     return root, model, selected, repair, pub, context, payload, config
 
 
-def test_layered_memory_repair_fails_closed_before_the_legacy_c_workflow(memory, monkeypatch):
+def layered_replies(initial, source_reference, *, updates=True, include_reads=True):
+    manifest = initial.artifacts.bundle_manifest(initial.head.memory)
+    case_id = manifest.cases[0].case_id
+    understanding_id = manifest.understandings[0].understanding_id
+    case = initial.artifacts.case(initial.head.memory, case_id)
+    understanding = initial.artifacts.understanding(initial.head.memory, understanding_id)
+    messages = []
+    if include_reads:
+        messages.extend([
+            AIMessage(id="layered-case-read", content="", tool_calls=[{
+                "name": "read_case", "id": "layered-case-read-call",
+                "args": {"case_id": case_id},
+            }]),
+            AIMessage(id="layered-source-read", content="", tool_calls=[{
+                "name": "read_conversation", "id": "layered-source-read-call",
+                "args": {"reference": case.source_references[0]},
+            }]),
+            AIMessage(id="layered-understanding-read", content="", tool_calls=[{
+                "name": "read_work_understanding", "id": "layered-understanding-read-call",
+                "args": {"understanding_id": understanding_id},
+            }]),
+        ])
+    messages.extend([
+        AIMessage(id="layered-repair", content="", tool_calls=[{
+            "name": "repair_memory", "id": "layered-repair-call", "args": {
+                "case_id": case_id,
+                "case_diff": ("@@\n-本人先做設備故障初判。\n"
+                              "+本人只通報設備故障，維修由外包負責。"),
+                "case_route_note": None,
+                "remove_evidence_keys": [],
+                "understanding_updates": ([{
+                    "understanding_id": understanding_id,
+                    "action": "revise",
+                    "diff": (f"@@\n-{understanding.content}\n"
+                             "+本人穩定負責設備故障通報；維修由外包負責。"),
+                    "supporting_case_ids": [case_id],
+                    "route_note": None,
+                }] if updates else []),
+            },
+        }]),
+        AIMessage(content="已完成明確更正。"),
+    ])
+    return messages
+
+
+def test_layered_memory_repair_reads_then_publishes_one_complete_bundle(memory, monkeypatch):
     root, model, initial, repair, pub, context, payload, config = setup_repair(
-        memory, [call(1), AIMessage(content="先繼續訪談。")], layered=True)
+        memory, layered_replies, layered=True)
     monkeypatch.setattr(repair.workflow, "_seed", lambda state: pytest.fail("no legacy C for bundle"))
+
+    result = root.invoke(payload, config, context=context, durability="sync")
+
+    tools = [message for message in result["messages"] if isinstance(message, ToolMessage)]
+    assert [message.name for message in tools] == [
+        "read_case", "read_conversation", "read_work_understanding", "repair_memory",
+    ]
+    assert json.loads(tools[-1].content)["status"] == "applied"
+    assert "read_paths" not in json.loads(tools[-1].content)
+    assert pub.current().revision == initial.head.revision + 1
+    current = repair.current_read(result)
+    assert current.head == pub.current()
+    manifest = current.artifacts.bundle_manifest(current.head.memory)
+    case = current.artifacts.case(current.head.memory, manifest.cases[0].case_id)
+    understanding = current.artifacts.understanding(
+        current.head.memory, manifest.understandings[0].understanding_id,
+    )
+    assert "維修由外包" in case.content and "維修由外包" in understanding.content
+    assert context.source_notice([])["source_ref"] in case.source_references
+    assert len(model.requests) == 5
+
+
+def test_a_new_legacy_two_file_call_cannot_bypass_the_layered_tool_schema(memory, monkeypatch):
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory, [call(1), AIMessage(content="改由分層工具處理。")],
+    )
+    monkeypatch.setattr(repair.workflow, "_seed",
+                        lambda state: pytest.fail("new calls cannot enter legacy C"))
+
+    result = root.invoke(payload, config, context=context, durability="sync")
+
+    feedback = [message for message in result["messages"]
+                if isinstance(message, ToolMessage)]
+    content = json.loads(feedback[0].content)
+    assert content["status"] == "invalid_edit"
+    assert "read_paths" not in content
+    assert feedback[0].artifact["format_version"] == 2
+    assert pub.current() == initial.head and len(model.requests) == 2
+
+
+def test_a_valid_layered_call_requires_a_layered_publication(memory, monkeypatch):
+    def replies(initial, _source):
+        args = {
+            "case_id": str(uuid4()),
+            "case_diff": "@@\n-舊案例\n+新案例",
+            "case_route_note": None,
+            "remove_evidence_keys": [],
+            "understanding_updates": [],
+        }
+        return [call(1, args=args), AIMessage(content="尚無可修補的分層 Memory。")]
+
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory, replies,
+    )
+    monkeypatch.setattr(repair.workflow, "_seed",
+                        lambda state: pytest.fail("new calls cannot enter legacy C"))
+
+    result = root.invoke(payload, config, context=context, durability="sync")
+
+    feedback = [message for message in result["messages"]
+                if isinstance(message, ToolMessage)]
+    content = json.loads(feedback[0].content)
+    assert content["status"] == "no_memory"
+    assert "read_paths" not in content
+    assert feedback[0].artifact["format_version"] == 2
+    assert pub.current() == initial.head and len(model.requests) == 2
+
+
+def test_layered_repair_without_saved_exact_reads_returns_read_required(memory, monkeypatch):
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory,
+        lambda selected, source: layered_replies(
+            selected, source, include_reads=False,
+        ),
+        layered=True,
+    )
+    monkeypatch.setattr(repair.layered_workflow, "_seed",
+                        lambda state: pytest.fail("admission must stop before child"))
 
     result = root.invoke(payload, config, context=context, durability="sync")
 
     feedback = [json.loads(message.content) for message in result["messages"]
                 if isinstance(message, ToolMessage)]
-    assert feedback == [{
-        "detail": "目前分層 Memory 尚未支援即時修補；本次沒有修改 Memory。",
-        "read_paths": [],
-        "retryable": False,
-        "status": "unsupported_memory_format",
-    }]
+    assert feedback[0]["status"] == "read_required" and feedback[0]["retryable"] is True
     assert pub.current() == initial.head and len(model.requests) == 2
+
+
+def test_layered_repair_requires_every_direct_understanding_action(memory, monkeypatch):
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory,
+        lambda selected, source: layered_replies(selected, source, updates=False),
+        layered=True,
+    )
+    monkeypatch.setattr(repair.layered_workflow, "_seed",
+                        lambda state: pytest.fail("scope admission must stop before child"))
+
+    result = root.invoke(payload, config, context=context, durability="sync")
+
+    feedback = [json.loads(message.content) for message in result["messages"]
+                if isinstance(message, ToolMessage)]
+    assert feedback[-1]["status"] == "scope_too_broad"
+    assert feedback[-1]["retryable"] is False
+    assert pub.current() == initial.head
+
+
+def advance_layered_head(repair, head, source_reference):
+    artifacts = repair.layered_workflow.artifacts
+    manifest = artifacts.bundle_manifest(head.memory)
+    version = artifacts.save_bundle(
+        base_publication_revision=head.revision,
+        base_version=head.memory,
+        evidence_through_reference=source_reference,
+        case_guide=artifacts.case_guide(head.memory),
+        cases=tuple(CaseArtifact(
+            item.case_id,
+            artifacts.case(head.memory, item.case_id).content,
+            artifacts.case(head.memory, item.case_id).source_references,
+        ) for item in manifest.cases),
+        understanding_guide=artifacts.understanding_guide(head.memory),
+        understandings=tuple(WorkUnderstandingArtifact(
+            item.understanding_id,
+            artifacts.understanding(head.memory, item.understanding_id).content,
+            tuple(binding.case_id for binding in artifacts.understanding(
+                head.memory, item.understanding_id).case_bindings),
+        ) for item in manifest.understandings),
+    )
+    publication = repair.layered_workflow.publication
+    return publication.publish(publication.prepare(
+        version, expected_revision=head.revision, kind="repair",
+        repair_sources=(source_reference,),
+    ))
+
+
+def test_layered_repair_refreshes_stale_head_before_resolving_old_edits(memory, monkeypatch):
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory,
+        lambda selected, source: layered_replies(
+            selected, source, include_reads=False,
+        ),
+        layered=True,
+    )
+    latest = advance_layered_head(
+        repair, initial.head, context.source_notice([])["source_ref"],
+    )
+    monkeypatch.setattr(repair.layered_workflow, "_seed",
+                        lambda state: pytest.fail("stale input must not enter child"))
+
+    result = root.invoke(payload, config, context=context, durability="sync")
+
+    feedback = [json.loads(message.content) for message in result["messages"]
+                if isinstance(message, ToolMessage)]
+    assert feedback[0]["status"] == "stale" and feedback[0]["retryable"] is True
+    assert repair.current_read(result).head == latest
+    assert pub.current() == latest and len(model.requests) == 2
 
 
 def test_layered_memory_generic_file_tools_cannot_bypass_typed_reads(memory):
@@ -108,23 +289,66 @@ def test_layered_memory_generic_file_tools_cannot_bypass_typed_reads(memory):
     assert pub.current() == initial.head and len(model.requests) == 2
 
 
+def two_layered_repairs(initial, source_reference):
+    first = layered_replies(initial, source_reference)[:-1]
+    manifest = initial.artifacts.bundle_manifest(initial.head.memory)
+    case_id = manifest.cases[0].case_id
+    understanding_id = manifest.understandings[0].understanding_id
+    return [*first,
+        AIMessage(id="layered-case-read-2", content="", tool_calls=[{
+            "name": "read_case", "id": "layered-case-read-call-2",
+            "args": {"case_id": case_id},
+        }]),
+        AIMessage(id="layered-source-read-2", content="", tool_calls=[{
+            "name": "read_conversation", "id": "layered-source-read-call-2",
+            "args": {"reference": source_reference},
+        }]),
+        AIMessage(id="layered-understanding-read-2", content="", tool_calls=[{
+            "name": "read_work_understanding", "id": "layered-understanding-read-call-2",
+            "args": {"understanding_id": understanding_id},
+        }]),
+        AIMessage(id="layered-repair-2", content="", tool_calls=[{
+            "name": "repair_memory", "id": "layered-repair-call-2", "args": {
+                "case_id": case_id,
+                "case_diff": ("@@\n-本人只通報設備故障，維修由外包負責。\n"
+                              "+本人只通報設備異常，維修由外包負責。"),
+                "case_route_note": None,
+                "remove_evidence_keys": [],
+                "understanding_updates": [{
+                    "understanding_id": understanding_id,
+                    "action": "revise",
+                    "diff": ("@@\n-本人穩定負責設備故障通報；維修由外包負責。\n"
+                             "+本人穩定負責設備異常通報；維修由外包負責。"),
+                    "supporting_case_ids": [case_id],
+                    "route_note": None,
+                }],
+            },
+        }]),
+        AIMessage(content="已完成兩次明確更正。"),
+    ]
+
+
 def test_two_native_repairs_refresh_only_this_turn_and_keep_staging_off_root(memory):
-    root, model, initial, repair, pub, context, payload, config = setup_repair(memory,
-        [call(1), call(2, "維修由外包負責。", "只通報異常，維修由外包負責。"), AIMessage(content="已更正。")])
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory, two_layered_repairs, layered=True,
+    )
     result = root.invoke(payload, config, context=context, durability="sync")
-    assert pub.current().revision == 3 and len(model.requests) == 3
+    assert pub.current().revision == 3 and len(model.requests) == 9
     assert result["jd_memory_view"] == initial.view
     assert not {"files", "request", "material", "version", "outcome"} & result.keys()
     progress = repair_progress(result, dataset_id=initial.dataset_id,
         document_id=initial.document_id, run_id=initial.run_id)
     assert progress.failures == 0 and progress.outcome["head"]["revision"] == 3
     results = [m for m in result["messages"] if isinstance(m, ToolMessage)]
-    assert len(results) == 2 and all(m.status == "success" for m in results)
-    assert results[0].artifact["request"]["expected_revision"] == 1
-    assert results[1].artifact["request"]["expected_revision"] == 2
-    assert "operation_id" not in json.loads(results[0].content)
-    loaded = repair.current_read(result).backend.read("/memory/knowledge.md")
-    assert not loaded.error and "只通報異常" in loaded.file_data["content"]
+    repair_results = [message for message in results if message.name == "repair_memory"]
+    assert len(repair_results) == 2 and all(m.status == "success" for m in repair_results)
+    assert repair_results[0].artifact["request"]["expected_revision"] == 1
+    assert repair_results[1].artifact["request"]["expected_revision"] == 2
+    assert "operation_id" not in json.loads(repair_results[0].content)
+    current = repair.current_read(result)
+    manifest = current.artifacts.bundle_manifest(current.head.memory)
+    loaded = current.artifacts.case(current.head.memory, manifest.cases[0].case_id)
+    assert "只通報設備異常" in loaded.content
     new_run = dict(payload, messages=result["messages"], jd_memory_repair_bindings=[])
     assert repair.current_read(new_run) is initial
 
@@ -142,35 +366,65 @@ def test_two_bad_calls_stop_repair_without_entering_core_or_sending_internal_ids
 
 def test_native_memory_read_keeps_applied_repair_when_rebased_background_publishes_later(
         memory, monkeypatch):
-    root, model, initial, repair, pub, context, payload, config = setup_repair(memory,
-        [call(1), read_call(1), AIMessage(content="已核對新版。")])
-    actual_publish = pub.publish
+    def replies(initial, source_reference):
+        values = layered_replies(initial, source_reference)[:-1]
+        case_id = initial.artifacts.bundle_manifest(initial.head.memory).cases[0].case_id
+        return [*values, AIMessage(id="post-repair-read", content="", tool_calls=[{
+            "name": "read_case", "id": "post-repair-read-call",
+            "args": {"case_id": case_id},
+        }]), AIMessage(content="已核對新版。")]
+
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory, replies, layered=True,
+    )
+    publication = repair.layered_workflow.publication
+    actual_publish = publication.publish
     later = []
 
     def publish_then_rebased_background(request):
         applied = actual_publish(request)
         if request.kind == "repair" and not later:
-            version = initial.artifacts.save_memory(
-                knowledge="維修由外包負責。背景重整後補充工作節奏。",
-                guide="背景重整後導覽")
-            later.append(actual_publish(pub.prepare(version,
-                expected_revision=applied.revision, kind="consolidation",
-                processed_source=applied.processed_source)))
+            artifacts = repair.layered_workflow.artifacts
+            manifest = artifacts.bundle_manifest(applied.memory)
+            version = artifacts.save_bundle(
+                base_publication_revision=applied.revision,
+                base_version=applied.memory,
+                evidence_through_reference=context.source_notice([])["source_ref"],
+                case_guide=artifacts.case_guide(applied.memory),
+                cases=tuple(CaseArtifact(
+                    item.case_id,
+                    artifacts.case(applied.memory, item.case_id).content + "背景補充。",
+                    artifacts.case(applied.memory, item.case_id).source_references,
+                ) for item in manifest.cases),
+                understanding_guide=artifacts.understanding_guide(applied.memory),
+                understandings=tuple(WorkUnderstandingArtifact(
+                    item.understanding_id,
+                    artifacts.understanding(applied.memory, item.understanding_id).content,
+                    tuple(binding.case_id for binding in artifacts.understanding(
+                        applied.memory, item.understanding_id).case_bindings),
+                ) for item in manifest.understandings),
+            )
+            later.append(actual_publish(publication.prepare(
+                version, expected_revision=applied.revision, kind="consolidation",
+                processed_source=applied.processed_source,
+            )))
         return applied
 
-    monkeypatch.setattr(pub, "publish", publish_then_rebased_background)
+    monkeypatch.setattr(publication, "publish", publish_then_rebased_background)
     result = root.invoke(payload, config, context=context, durability="sync")
     feedback = [m for m in result["messages"] if isinstance(m, ToolMessage)]
-    assert [m.name for m in feedback] == ["repair_memory", "read_file"]
-    assert feedback[0].status == "success" and "維修由外包負責" in feedback[1].content
-    assert "背景重整後補充" not in feedback[1].content
+    assert [m.name for m in feedback][-2:] == ["repair_memory", "read_case"]
+    assert feedback[-2].status == "success" and "維修由外包" in feedback[-1].content
+    assert "背景補充" not in feedback[-1].content
     assert result["jd_memory_view"] == initial.view
     assert later and pub.current() == later[0] and pub.current().revision == 3
     assert repair.current_read(result).head.revision == 2
 
 
 def test_wrong_scope_and_stop_are_checked_before_starting_c(memory):
-    root, model, initial, repair, pub, context, payload, config = setup_repair(memory, [call(1)])
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory, layered_replies, layered=True,
+    )
     context.stop_event.set()
     result = root.invoke(payload, config, context=context, durability="sync")
     assert pub.current().revision == 1 and len(model.requests) == 0
@@ -178,24 +432,26 @@ def test_wrong_scope_and_stop_are_checked_before_starting_c(memory):
 
 
 def test_cancel_during_c_drains_started_save_and_stops_next_model_work(memory, monkeypatch):
-    root, model, initial, repair, pub, context, payload, config = setup_repair(memory,
-        [call(1), AIMessage(content="result")])
-    original = repair.workflow._prepare
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory, layered_replies, layered=True,
+    )
+    original = repair.layered_workflow._prepare
     def prepare(state):
         context.stop_event.set()
         return original(state)
-    monkeypatch.setattr(repair.workflow, "_prepare", prepare)
+    monkeypatch.setattr(repair.layered_workflow, "_prepare", prepare)
     result = root.invoke(payload, config, context=context, durability="sync")
     assert pub.current().revision == 2
     assert next(m for m in result["messages"] if isinstance(m, ToolMessage)).status == "success"
-    assert len(model.requests) == 1, "A stop raised during C must block the next model request."
+    assert len(model.requests) == 4, "A stop raised during C must block the next model request."
 
 
-def parallel_calls(number=1):
+def parallel_calls(initial, source_reference):
     """One invalid response that puts a repair call beside another call."""
-    message = call(number)
-    message.tool_calls.append({"name": "read_file", "id": f"read-call-{number}",
-        "args": {"file_path": "/memory/knowledge.md", "offset": 0, "limit": 100},
+    message = layered_replies(initial, source_reference)[-2]
+    case_id = initial.artifacts.bundle_manifest(initial.head.memory).cases[0].case_id
+    message.tool_calls.append({"name": "read_case", "id": "parallel-read-call",
+        "args": {"case_id": case_id},
         "type": "tool_call"})
     return message
 
@@ -210,11 +466,12 @@ def stopped(memory, monkeypatch, fault, replies=None):
     saved. None of them may start the core.
     """
     root, model, initial, repair, pub, context, payload, config = setup_repair(
-        memory, replies if replies is not None else [call(1)])
+        memory, replies if replies is not None else layered_replies, layered=True,
+    )
     record, human = new_run_record(initial.dataset_id, initial.document_id, initial.run_id,
         "合成停止收尾", start_revision_id=str(uuid4()))
     payload.update(jd_ai_run=record.model_dump(mode="json"), messages=[human])
-    monkeypatch.setattr(repair.workflow, "_seed",
+    monkeypatch.setattr(repair.layered_workflow, "_seed",
         lambda state: pytest.fail("A stop proven before C must never start the core"))
     expected = OSError
     if fault == "parallel_calls":
@@ -226,8 +483,8 @@ def stopped(memory, monkeypatch, fault, replies=None):
             raise OSError("synthetic source notice failure")
         context.source_notice = unavailable
     elif fault == "tool_handoff":
-        # The native tool wrapper converts an unknown dependency failure into
-        # the App's fixed public code, so the stop lands on the tool node.
+        # The native tool wrapper converts the injected dependency failure to
+        # the App's fixed public error while preserving the tool-node stop.
         expected = AiToolError
         def refuse(self, runtime):
             raise OSError("synthetic tool handoff failure")
@@ -246,7 +503,8 @@ def stopped(memory, monkeypatch, fault, replies=None):
     runtime.graph, runtime.memory_engine = root, pub.engine
     runtime.conversation_sources = initial.source.service
     observed = AiRunCheckpoints(root).observe(initial.document_id, initial.run_id, initial.dataset_id)
-    assert len(model.requests) == 1 and pub.current().revision == 1
+    expected_requests = 1 if fault == "parallel_calls" else 4
+    assert len(model.requests) == expected_requests and pub.current().revision == 1
     return runtime, observed
 
 
@@ -255,12 +513,62 @@ def recovered(runtime, observed):
                                            _pending_calls(observed.messages))
 
 
+def stopped_layered_at_child_start(memory, monkeypatch):
+    root, model, initial, repair, pub, context, payload, config = setup_repair(
+        memory, layered_replies, layered=True,
+    )
+    record, human = new_run_record(initial.dataset_id, initial.document_id, initial.run_id,
+        "合成分層停止收尾", start_revision_id=str(uuid4()))
+    payload.update(jd_ai_run=record.model_dump(mode="json"), messages=[human])
+    original_put = root.checkpointer.put
+
+    def fail_first_child_loop(cfg, checkpoint, metadata, versions):
+        if (metadata["source"] == "loop"
+                and cfg["configurable"].get("checkpoint_ns", "").startswith("memory_repair:")):
+            raise OSError("synthetic layered first child loop save failure")
+        return original_put(cfg, checkpoint, metadata, versions)
+
+    monkeypatch.setattr(root.checkpointer, "put", fail_first_child_loop)
+    with pytest.raises(OSError):
+        root.invoke(payload, config, context=context, durability="sync")
+    runtime = AiRuntime.__new__(AiRuntime)
+    runtime.graph, runtime.memory_engine = root, pub.engine
+    runtime.conversation_sources = initial.source.service
+    observed = AiRunCheckpoints(root).observe(
+        initial.document_id, initial.run_id, initial.dataset_id,
+    )
+    assert len(model.requests) == 4 and pub.current() == initial.head
+    assert observed.repair_bindings[-1]["format_version"] == 2
+    assert observed.repair_checkpoint["next"] == ["__start__"]
+    return runtime, observed
+
+
+def test_layered_child_start_recovery_matches_the_runtime_resolved_repair(memory, monkeypatch):
+    runtime, observed = stopped_layered_at_child_start(memory, monkeypatch)
+
+    message = recovered(runtime, observed)
+
+    assert message.status == "error"
+    assert json.loads(message.content)["status"] == "not_executed"
+    assert message.artifact["format_version"] == 2
+
+
+def test_layered_child_start_recovery_rejects_a_changed_resolved_repair(memory, monkeypatch):
+    runtime, observed = stopped_layered_at_child_start(memory, monkeypatch)
+    checkpoint = observed.repair_checkpoint
+    checkpoint["input"]["repair"]["case_diff"] += "\n+偷換內容"
+    changed = replace(observed, _repair_checkpoint_json=json.dumps(checkpoint))
+
+    with pytest.raises(AiRuntimeError, match="^run_recovery_required$"):
+        recovered(runtime, changed)
+
+
 @pytest.mark.parametrize("fault", ["binding", "child_start"])
 def test_a_stop_proven_before_c_closes_the_same_original_call_as_not_executed(memory, monkeypatch, fault):
     runtime, observed = stopped(memory, monkeypatch, fault)
     message = recovered(runtime, observed)
     content = json.loads(message.content)
-    assert message.name == "repair_memory" and message.tool_call_id == "repair-call-1"
+    assert message.name == "repair_memory" and message.tool_call_id == "layered-repair-call"
     assert message.status == "error" and message.artifact["request"] is None
     assert content["status"] == "not_executed" and content["retryable"] is False
     if fault == "binding":
@@ -280,7 +588,7 @@ def test_an_unbound_call_stopped_outside_the_binding_node_keeps_the_gate(memory,
 
 
 @pytest.mark.parametrize("mutation",
-    ["operation_id", "base", "source_reference", "edits", "missing_key", "absent"])
+    ["operation_id", "base", "source_reference", "repair", "missing_key", "absent"])
 def test_a_child_start_input_that_disagrees_with_the_original_call_keeps_the_gate(
         memory, monkeypatch, mutation):
     runtime, observed = stopped(memory, monkeypatch, "child_start")
@@ -292,10 +600,10 @@ def test_a_child_start_input_that_disagrees_with_the_original_call_keeps_the_gat
         payload["base"] = dict(payload["base"], revision=payload["base"]["revision"] + 1)
     elif mutation == "source_reference":
         payload["source_reference"] = "conversation:synthetic-other-document"
-    elif mutation == "edits":
-        payload["edits"] = [{"path": "/memory/guide.md", "diff": "@@\n-其他\n+其他更正"}]
+    elif mutation == "repair":
+        payload["repair"]["case_diff"] += "\n+偷換內容"
     elif mutation == "missing_key":
-        payload.pop("edits")
+        payload.pop("repair")
     else:
         checkpoint["input"] = None
     changed = replace(observed, _repair_checkpoint_json=json.dumps(checkpoint))
@@ -345,11 +653,11 @@ def test_an_invalid_parallel_response_still_closes_its_repair_call(memory, monke
     never started; the original repair call still owes this turn a terminal.
     """
     runtime, observed = stopped(memory, monkeypatch, "parallel_calls",
-                                replies=[parallel_calls(1)])
+                                replies=lambda initial, source: [parallel_calls(initial, source)])
     pending = _pending_calls(observed.messages)
     assert len(pending) == 2 and observed.repair_bindings == []
     assert observed.consultant_next == [BINDING_NODE]
     message = recovered(runtime, observed)
-    assert message.tool_call_id == "repair-call-1"
+    assert message.tool_call_id == "layered-repair-call"
     assert json.loads(message.content)["status"] == "not_executed"
     assert message.artifact["operation_id"] is None

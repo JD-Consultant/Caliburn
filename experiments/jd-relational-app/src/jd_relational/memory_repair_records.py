@@ -11,6 +11,7 @@ import json
 from typing import Literal
 from uuid import UUID, uuid4
 
+from caliburn_memory import LayeredRepair
 from caliburn_memory.memory import MemoryVersion
 from caliburn_memory.patch import MAX_PATCH_CHARACTERS, PATHS
 from caliburn_memory.publication import PublishedHead, PublishRequest
@@ -19,9 +20,9 @@ from langchain_core.messages import AIMessage, ToolMessage
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 REPAIR_NAME = "repair_memory"
-_CORRECTABLE = frozenset({"invalid_edit", "stale", "no_memory"})
+_CORRECTABLE = frozenset({"invalid_edit", "stale", "no_memory", "read_required"})
 _STATUSES = _CORRECTABLE | {
-    "applied", "repair_limit", "not_executed", "not_published", "unsupported_memory_format",
+    "applied", "repair_limit", "not_executed", "not_published", "scope_too_broad",
 }
 _PATHS = tuple(PATHS.values())
 
@@ -81,7 +82,7 @@ def _head(value, document_id):
 
 class RepairBinding(BaseModel):
     model_config = ConfigDict(strict=True, extra="forbid", frozen=True)
-    format_version: Literal[1]
+    format_version: Literal[1, 2]
     dataset_id: str
     document_id: str
     run_id: str
@@ -91,6 +92,7 @@ class RepairBinding(BaseModel):
     input_digest: str = Field(pattern="^[0-9a-f]{64}$")
     base: dict | None
     source_reference: str
+    repair: dict | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -117,6 +119,70 @@ class RepairBinding(BaseModel):
     @model_validator(mode="after")
     def base_scope(self):
         _head(self.base, self.document_id)
+        if self.format_version == 1:
+            if self.repair is not None:
+                raise ValueError()
+        elif self.repair is not None:
+            repair = LayeredRepair.model_validate(self.repair)
+            if repair.model_dump(mode="json") != self.repair:
+                raise ValueError()
+        return self
+
+
+class LayeredUnderstandingRepairInput(BaseModel):
+    """Model-authored intent; Runtime owns all version and source identities."""
+
+    model_config = ConfigDict(strict=True, extra="forbid")
+    understanding_id: str
+    action: Literal["revise", "revalidate"]
+    diff: str | None = None
+    supporting_case_ids: list[str] = Field(min_length=1, max_length=96)
+    route_note: str | None = None
+
+    @model_validator(mode="after")
+    def validate_action(self):
+        _uuid(self.understanding_id)
+        if len(set(self.supporting_case_ids)) != len(self.supporting_case_ids):
+            raise ValueError()
+        for case_id in self.supporting_case_ids:
+            _uuid(case_id)
+        if self.action == "revise":
+            _text(self.diff, maximum=MAX_PATCH_CHARACTERS)
+            if self.route_note is not None:
+                _text(self.route_note, maximum=2000)
+        elif self.diff is not None or self.route_note is not None:
+            raise ValueError()
+        return self
+
+
+class LayeredRepairInput(BaseModel):
+    """The only repair shape exposed by the current App tool."""
+
+    model_config = ConfigDict(strict=True, extra="forbid")
+    case_id: str
+    case_diff: str
+    case_route_note: str | None = None
+    remove_evidence_keys: list[str] = Field(default_factory=list, max_length=96)
+    understanding_updates: list[LayeredUnderstandingRepairInput] = Field(
+        default_factory=list, max_length=96,
+    )
+
+    @model_validator(mode="after")
+    def validate_repair(self):
+        _uuid(self.case_id)
+        _text(self.case_diff, maximum=MAX_PATCH_CHARACTERS)
+        if self.case_route_note is not None:
+            _text(self.case_route_note, maximum=2000)
+        if (len(set(self.remove_evidence_keys)) != len(self.remove_evidence_keys)
+                or any(type(key) is not str or not key.startswith("E")
+                       or not key[1:].isdigit() or key[1] == "0"
+                       for key in self.remove_evidence_keys)
+                or len({item.understanding_id for item in self.understanding_updates})
+                   != len(self.understanding_updates)
+                or len(self.case_diff) + sum(len(item.diff or "")
+                                             for item in self.understanding_updates)
+                   > MAX_PATCH_CHARACTERS):
+            raise ValueError()
         return self
 
 
@@ -137,6 +203,16 @@ def parse_repair_input(args) -> list[dict]:
                 or any(edit.path not in _PATHS or not edit.diff.strip() for edit in edits)):
             raise ValueError()
         return [edit.model_dump(mode="json") for edit in edits]
+    except Exception:
+        raise MemoryRepairError("invalid_repair_input") from None
+
+
+def parse_layered_repair_input(args) -> dict:
+    """Strictly parse model intent without accepting Runtime-owned fields."""
+    try:
+        if type(args) is not dict:
+            raise ValueError()
+        return LayeredRepairInput.model_validate(args).model_dump(mode="json")
     except Exception:
         raise MemoryRepairError("invalid_repair_input") from None
 
@@ -166,13 +242,14 @@ def _original_call(message, call_id=None):
 
 
 def make_repair_binding(message, *, dataset_id, document_id, run_id, base,
-                        source_reference) -> RepairBinding:
+                        source_reference, repair=None, layered=False) -> RepairBinding:
     try:
         call, digest = _original_call(message)
-        return RepairBinding(format_version=1, dataset_id=dataset_id, document_id=document_id,
+        return RepairBinding(format_version=2 if layered else 1,
+            dataset_id=dataset_id, document_id=document_id,
             run_id=run_id, message_id=message.id, tool_call_id=call["id"],
             operation_id=str(uuid4()), input_digest=digest, base=_head(base, document_id),
-            source_reference=source_reference)
+            source_reference=source_reference, repair=repair)
     except Exception:
         raise MemoryRepairError() from None
 
@@ -224,12 +301,13 @@ def _request(value, binding):
     if type(value) is not dict or set(value) not in (
             legacy_keys, legacy_keys | {"bundle_base_revision", "bundle_base_version_id"}):
         raise ValueError()
-    # C still owns only the legacy two-file repair contract. The publication
-    # type gained additive bundle-base fields, but accepting non-empty values
-    # here would falsely claim that layered C is implemented.
-    if ("bundle_base_revision" in value
-            and (value["bundle_base_revision"] is not None
-                 or value["bundle_base_version_id"] is not None)):
+    bundle_revision = value.get("bundle_base_revision")
+    bundle_version = value.get("bundle_base_version_id")
+    if binding.format_version == 1:
+        if bundle_revision is not None or bundle_version is not None:
+            raise ValueError()
+    elif (binding.base is None or bundle_revision != binding.base["revision"]
+          or bundle_version != binding.base["memory"]["version_id"]):
         raise ValueError()
     if (binding.base is None or value["operation_id"] != binding.operation_id
             or type(value["expected_revision"]) is not int
@@ -242,7 +320,9 @@ def _request(value, binding):
         raise ValueError()
     memory = MemoryVersion(**_memory(value["memory"], binding.document_id))
     return PublishRequest(binding.operation_id, memory, value["expected_revision"], "repair",
-                          value["artifact_digest"], repair_sources=(binding.source_reference,))
+                          value["artifact_digest"], repair_sources=(binding.source_reference,),
+                          bundle_base_revision=bundle_revision,
+                          bundle_base_version_id=bundle_version)
 
 
 def decode_repair_request(value, binding) -> PublishRequest:
@@ -279,7 +359,9 @@ def _outcome(value, binding, request, *, strip_changes=False):
             raise ValueError()
         value["head"] = _head(value["head"], binding.document_id)
         guide = value["guide"]
-        if type(guide) is not str or len(guide) > 4000 or (value["head"] is None and guide != ""):
+        guide_limit = 9000 if binding.format_version == 2 else 4000
+        if (type(guide) is not str or len(guide) > guide_limit
+                or (value["head"] is None and guide != "")):
             raise ValueError()
         if binding.base and (value["head"] is None or value["head"]["revision"] < binding.base["revision"]):
             raise ValueError()
@@ -301,12 +383,13 @@ def _outcome(value, binding, request, *, strip_changes=False):
     return value
 
 
-def _content(outcome, failures_before):
+def _content(outcome, failures_before, *, layered=False):
     if type(failures_before) is not int or not 0 <= failures_before <= 2:
         raise ValueError()
     result = {"status": outcome["status"], "detail": outcome["detail"],
-              "read_paths": outcome.get("read_paths", list(_PATHS)),
               "retryable": outcome["status"] in _CORRECTABLE and failures_before < 1}
+    if not layered:
+        result["read_paths"] = outcome.get("read_paths", list(_PATHS))
     if "guide" in outcome:
         result["guide"] = outcome["guide"]
     return result
@@ -317,10 +400,12 @@ def make_repair_message(binding, outcome, request=None, *, failures_before=0) ->
         binding = _binding(binding)
         request = _request(request, binding)
         outcome = _outcome(outcome, binding, request, strip_changes=True)
-        artifact = {"format_version": 1, "operation_id": binding.operation_id,
+        artifact = {"format_version": binding.format_version,
+                    "operation_id": binding.operation_id,
                     "input_digest": binding.input_digest, "outcome": outcome,
                     "request": json.loads(_json(asdict(request))) if request else None}
-        return ToolMessage(content=_json(_content(outcome, failures_before)), name=REPAIR_NAME,
+        return ToolMessage(content=_json(_content(
+                outcome, failures_before, layered=binding.format_version == 2)), name=REPAIR_NAME,
             tool_call_id=binding.tool_call_id, status="success" if outcome["status"] == "applied" else "error",
             artifact=artifact)
     except Exception:
@@ -331,18 +416,27 @@ NOT_EXECUTED_DETAIL = "這次 Memory 更正尚未執行；回合已停止，Memo
 _UNBOUND_OUTCOME = {"status": "not_executed", "detail": NOT_EXECUTED_DETAIL}
 
 
-def make_unbound_repair_message(message, call_id=None) -> ToolMessage:
+def make_unbound_repair_message(message, call_id=None, *, format_version=2) -> ToolMessage:
     """Close one original call that stopped before any binding existed.
 
     No operation, base, source or request has been assigned yet, so none may be
     invented here. Only the original call and its own argument digest are kept,
     which keeps this result distinguishable from a bound correction result.
+
+    Current calls always use format 2, even when a rejected provider payload
+    still has the retired two-file shape. Format 1 is accepted only when an
+    already-saved legacy checkpoint is reconstructed explicitly.
     """
     try:
         call, digest = _original_call(message, call_id)
-        artifact = {"format_version": 1, "operation_id": None, "input_digest": digest,
+        if type(format_version) is not int or format_version not in {1, 2}:
+            raise ValueError()
+        layered = format_version == 2
+        artifact = {"format_version": format_version,
+                    "operation_id": None, "input_digest": digest,
                     "outcome": dict(_UNBOUND_OUTCOME), "request": None}
-        return ToolMessage(content=_json(_content(_UNBOUND_OUTCOME, 0)), name=REPAIR_NAME,
+        return ToolMessage(content=_json(_content(
+                _UNBOUND_OUTCOME, 0, layered=layered)), name=REPAIR_NAME,
             tool_call_id=call["id"], status="error", artifact=artifact)
     except Exception:
         raise MemoryRepairError("invalid_repair_message") from None
@@ -358,11 +452,13 @@ def validate_unbound_repair_message(result, message) -> None:
             raise ValueError()
         artifact = _shape(result.artifact, ("format_version", "operation_id", "input_digest",
                                             "outcome", "request"))
-        if (type(artifact["format_version"]) is not int or artifact["format_version"] != 1
+        format_version = artifact["format_version"]
+        if (type(format_version) is not int or format_version not in {1, 2}
                 or artifact["operation_id"] is not None or artifact["request"] is not None
                 or artifact["input_digest"] != digest or artifact["outcome"] != _UNBOUND_OUTCOME
                 or type(result.content) is not str
-                or result.content != _json(_content(_UNBOUND_OUTCOME, 0))):
+                or result.content != _json(_content(
+                    _UNBOUND_OUTCOME, 0, layered=format_version == 2))):
             raise ValueError()
     except Exception:
         raise MemoryRepairError("invalid_repair_message") from None
@@ -375,14 +471,17 @@ def validate_repair_message(message, binding, failures_before=0) -> tuple[dict, 
                 or message.tool_call_id != binding.tool_call_id):
             raise ValueError()
         artifact = _shape(message.artifact, ("format_version", "operation_id", "input_digest", "outcome", "request"))
-        if (type(artifact["format_version"]) is not int or artifact["format_version"] != 1
+        if (type(artifact["format_version"]) is not int
+                or artifact["format_version"] != binding.format_version
                 or artifact["operation_id"] != binding.operation_id
                 or artifact["input_digest"] != binding.input_digest):
             raise ValueError()
         request = _request(artifact["request"], binding)
         outcome = _outcome(artifact["outcome"], binding, request)
         if (message.status != ("success" if outcome["status"] == "applied" else "error")
-                or type(message.content) is not str or message.content != _json(_content(outcome, failures_before))):
+                or type(message.content) is not str
+                or message.content != _json(_content(
+                    outcome, failures_before, layered=binding.format_version == 2))):
             raise ValueError()
         return outcome, request
     except Exception:

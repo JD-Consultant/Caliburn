@@ -8,10 +8,12 @@ then-current publication.
 """
 from dataclasses import dataclass
 from hashlib import sha256
+import json
 from uuid import UUID
 
 from caliburn_memory import MemoryArtifacts, PublicationStore, PublishedHead
 from deepagents.backends.protocol import BackendProtocol, GrepResult, LsResult, ReadResult
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.config import get_config
 from langgraph.store.base import BaseStore
 from sqlalchemy.engine import Engine
@@ -29,7 +31,6 @@ MEMORY_READ_GUIDANCE = (
     "read_work_understanding或read_case，不要全量讀取。read_case會連同按原對話順序排列的來源回傳；"
     "需要確切問答時，把已取得的來源原樣交給read_conversation，不要猜測或改寫。"
     "分層版本不要用ls、grep或read_file繞過上述工具；manifest與Runtime欄位不是模型輸入。"
-    "舊兩檔版本需要核對時才讀/memory/knowledge.md。已知路徑直接read_file，只有尋找未知位置才ls。"
     "grep是字面搜尋；沒有命中不代表員工沒有這項工作。依回傳offset續讀，不必讀到檔尾。"
     "只有需要另存的前置脈絡才用part=context，也可讀App已提供的conversation來源。"
     "案例與工作理解是可修訂的目前理解，仍須核對來源與後續更正；AI轉述不等於員工確認。"
@@ -38,7 +39,117 @@ MEMORY_READ_GUIDANCE = (
 )
 
 
-def _read_guide_projection(artifacts, version):
+@dataclass(frozen=True, repr=False)
+class LayeredReadProof:
+    """Runtime-derived reads from this foreground run, never model claims."""
+
+    case_evidence: dict[str, dict[str, str]]
+    understanding_ids: frozenset[str]
+    complete_sources: frozenset[str]
+
+
+def layered_read_proof(messages, *, run_id: str, revision: int,
+                       version_id: str) -> LayeredReadProof:
+    """Project exact layered reads and complete source pages from saved tools."""
+    try:
+        if (type(messages) not in (list, tuple) or str(UUID(run_id)) != run_id
+                or type(revision) is not int or revision < 1
+                or str(UUID(version_id)) != version_id):
+            raise ValueError()
+        starts = [index for index, message in enumerate(messages)
+                  if isinstance(message, HumanMessage) and message.id == run_id]
+        if len(starts) != 1:
+            raise ValueError()
+        scoped = messages[starts[0]:]
+        calls = {}
+        for message in scoped:
+            if isinstance(message, AIMessage):
+                for call in message.tool_calls:
+                    call_id = call.get("id")
+                    if type(call_id) is not str or not call_id or call_id in calls:
+                        raise ValueError()
+                    calls[call_id] = call
+
+        cases: dict[str, dict[str, str]] = {}
+        understandings: set[str] = set()
+        source_offsets: dict[str, int | None] = {}
+        seen_results: set[str] = set()
+        for message in scoped:
+            if not isinstance(message, ToolMessage) or message.tool_call_id not in calls:
+                continue
+            call = calls[message.tool_call_id]
+            name = call.get("name")
+            if name not in {"read_case", "read_work_understanding", "read_conversation"}:
+                continue
+            if message.tool_call_id in seen_results:
+                raise ValueError()
+            seen_results.add(message.tool_call_id)
+            if message.status != "success" or type(message.content) is not str:
+                continue
+            payload = json.loads(message.content)
+            args = call.get("args")
+            if type(payload) is not dict or type(args) is not dict:
+                raise ValueError()
+            if name in {"read_case", "read_work_understanding"}:
+                if (payload.get("memory_revision") != revision
+                        or payload.get("memory_version_id") != version_id):
+                    continue
+            if name == "read_case":
+                case_id = args.get("case_id")
+                if payload.get("case_id") != case_id or str(UUID(case_id)) != case_id:
+                    raise ValueError()
+                references = payload.get("source_references")
+                evidence = payload.get("evidence")
+                if (type(references) is not list or type(evidence) is not list
+                        or len(references) != len(evidence) or not references
+                        or len(set(references)) != len(references)):
+                    raise ValueError()
+                mapping = {}
+                for index, (reference, item) in enumerate(zip(references, evidence, strict=True), 1):
+                    if (type(reference) is not str or type(item) is not dict
+                            or set(item) != {"evidence_key", "source_reference"}
+                            or item["evidence_key"] != f"E{index}"
+                            or item["source_reference"] != reference):
+                        raise ValueError()
+                    mapping[item["evidence_key"]] = reference
+                cases[case_id] = mapping
+            elif name == "read_work_understanding":
+                identity = args.get("understanding_id")
+                if payload.get("understanding_id") != identity or str(UUID(identity)) != identity:
+                    raise ValueError()
+                understandings.add(identity)
+            else:
+                reference = args.get("reference")
+                offset = args.get("offset", 0)
+                part = args.get("part", "source")
+                if (type(reference) is not str or reference.startswith("/interviews/")
+                        or part != "source" or type(offset) is not int or offset < 0
+                        or payload.get("reference") != reference
+                        or payload.get("read_offset") != offset):
+                    continue
+                expected = source_offsets.get(reference, 0)
+                if expected is None:
+                    continue
+                if offset != expected:
+                    raise ValueError()
+                following = payload.get("next_offset")
+                if following is not None and (type(following) is not int or following <= offset):
+                    raise ValueError()
+                source_offsets[reference] = following
+        return LayeredReadProof(
+            case_evidence=cases,
+            understanding_ids=frozenset(understandings),
+            complete_sources=frozenset(
+                reference for reference, offset in source_offsets.items() if offset is None
+            ),
+        )
+    except MemoryReadError:
+        raise
+    except Exception:
+        raise MemoryReadError("invalid_layered_read_proof") from None
+
+
+def memory_guide_projection(artifacts, version):
     """Load the selected version's navigation only, never its item bodies."""
     if artifacts.bundle_base(version) is None:
         guide = artifacts.read_text("/memory/guide.md", version)
@@ -127,7 +238,7 @@ class MemoryReadSession:
                     or str(UUID(head.memory.version_id)) != head.memory.version_id):
                 raise ValueError()
             version = head.memory if head else None
-            guide = _read_guide_projection(artifacts, version) if version else ""
+            guide = memory_guide_projection(artifacts, version) if version else ""
             return cls(dataset_id, document_id, run_id, artifacts, source, head,
                        guide, artifacts.reader(version))
         except Exception:
@@ -137,6 +248,22 @@ class MemoryReadSession:
         return {"type": "memory_guide", "instruction": MEMORY_READ_GUIDANCE,
                 "published": self.head is not None, "revision": self.view["revision"],
                 "guide": self.guide}
+
+    def at_head(self, head: PublishedHead | None) -> "MemoryReadSession":
+        """Select one explicit published head without consulting `latest` again."""
+        try:
+            if (head is not None and (not isinstance(head, PublishedHead)
+                    or head.memory.document_id != self.document_id
+                    or type(head.revision) is not int or head.revision < 1)):
+                raise ValueError()
+            version = head.memory if head else None
+            guide = memory_guide_projection(self.artifacts, version) if version else ""
+            return MemoryReadSession(
+                self.dataset_id, self.document_id, self.run_id, self.artifacts,
+                self.source, head, guide, self.artifacts.reader(version),
+            )
+        except Exception:
+            raise MemoryReadError() from None
 
 
 def initial_memory_session(runtime):
@@ -250,9 +377,15 @@ def _build_layered_memory_read_tools():
             raise MemoryReadError() from None
         except Exception:
             raise MemoryReadError() from None
-        return {"case_id": item.case_id, "content": item.content,
+        return {"memory_revision": session.head.revision,
+                "memory_version_id": session.head.memory.version_id,
+                "case_id": item.case_id, "content": item.content,
                 "source_order": "oldest_to_newest",
-                "source_references": list(item.source_references)}
+                "source_references": list(item.source_references),
+                "evidence": [
+                    {"evidence_key": f"E{index}", "source_reference": reference}
+                    for index, reference in enumerate(item.source_references, 1)
+                ]}
 
     @tool("read_work_understanding")
     def read_work_understanding(understanding_id: str, runtime: ToolRuntime) -> dict:
@@ -269,7 +402,9 @@ def _build_layered_memory_read_tools():
             raise MemoryReadError() from None
         except Exception:
             raise MemoryReadError() from None
-        return {"understanding_id": item.understanding_id, "content": item.content,
+        return {"memory_revision": session.head.revision,
+                "memory_version_id": session.head.memory.version_id,
+                "understanding_id": item.understanding_id, "content": item.content,
                 "case_bindings": [
                     {"case_id": binding.case_id, "case_digest": binding.case_digest}
                     for binding in item.case_bindings

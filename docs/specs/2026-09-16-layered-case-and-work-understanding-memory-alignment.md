@@ -1,7 +1,7 @@
 # JD-R002／MEM-L001：分層工作案例與工作理解 Memory 對齊
 
 - 日期：2026-09-16
-- Stage：**G7 分段施工；package 完整背景 workflow、App A 分層讀取、App B1／B2 request-only compaction、正式 role factory 及 managed callback 已完成離線驗證；下一 gate 為 layered C**
+- Stage：**G7 分段施工；package 完整背景 workflow、App A 分層讀取、App B1／B2 request-only compaction、正式 role factory、managed callback 及 layered C 已完成離線驗證**
 - 取代：Q019 在 Caliburn 採用的「B1 固定訪談窗口詳記＋B2 只維護 knowledge／guide」產品映射
 - 不取代：canonical 原始訪談、已校準主顧問 Prompt／Skills、背景通知語意、JD relational writer、既有 Saver／Store／CAS／receipt 證據及 `CTX-C001` 的非破壞式 compaction 原則
 
@@ -18,7 +18,7 @@ Topic ID: JD-R002／MEM-L001
 Current stage: G7 segmented implementation
 Binding product goal: 完整理解個別工作案例／任務／事件，再歸納穩定共同工作，最後產生客製化 JD
 This turn's decision: B1、B2 的分層責任、各自 guide、共同 publication、C 即時更正語意，以及第一版 bundle／reference／tool authority 契約
-Still open after current G7 slices: C bundle repair、provider／自然模型驗證、完整瀏覽器 App journey 與 production authority 切換
+Still open after current G7 slices: provider／自然模型驗證、完整瀏覽器 App journey 與 production authority 切換
 Out of scope: 本輪不改 production authority、不呼叫模型、不修改正式資料、不做 provider／JD schema 選型
 ```
 
@@ -174,7 +174,7 @@ C 當次 publication 必須已滿足 §6 的完整一致性；以下接力不能
 
 這個做法映射成熟系統的共同工程原則，但精確欄位仍是 Caliburn 既有契約：Google Bazel Skyframe 會從舊依賴圖失效 reverse dependencies，重算值不變時再 change-prune；Google Spanner change streams 將資料變更與 change record 原子保存並由 consumer checkpoint；OpenAI／Anthropic 則分開持久 Memory 與 active context，採 immutable version／條件更新及按需讀取。它們沒有公開本產品 B1／B2／C schema，因此不冒稱 repair impact ID 是廠商標準，也不採完整 Event Sourcing。[Bazel Skyframe](https://bazel.build/versions/8.5.0/reference/skyframe)、[Google Spanner change streams](https://docs.cloud.google.com/spanner/docs/change-streams)、[OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)、[Anthropic Managed Agent Memory](https://platform.claude.com/docs/en/managed-agents/memory)、[Microsoft Event Sourcing](https://learn.microsoft.com/en-us/azure/architecture/patterns/event-sourcing)
 
-**2026-09-18 實作結果：**上述接力已在 package 完成，不新增持久欄位或 Agent。Runtime 用既有 consolidation／repair receipts 與 immutable manifests 推導 impact，B2 stage 只沿用原 required-ID gate；同 attempt 不可換集合，stale 則由既有 outer workflow 以新 base 重算。A/B/C→U 反例已覆蓋「C 修訂 C、解除 C→U、下一批 B1 no-op、B2 仍讀 C 並處理 U」；package 全套 **276 passed**、相鄰 App 指定回歸 **15 passed**、兩側 compileall 成功。這只完成背景接力，§6 的 layered C 寫入工具仍是下一個獨立 gate。
+**2026-09-18 背景接力結果：**上述接力已在 package 完成，不新增持久欄位或 Agent。Runtime 用既有 consolidation／repair receipts 與 immutable manifests 推導 impact，B2 stage 只沿用原 required-ID gate；同 attempt 不可換集合，stale 則由既有 outer workflow 以新 base 重算。A/B/C→U 反例已覆蓋「C 修訂 C、解除 C→U、下一批 B1 no-op、B2 仍讀 C 並處理 U」；當時 package 全套 **276 passed**、相鄰 App 指定回歸 **15 passed**、兩側 compileall 成功。後續 §6 layered C 工具亦已依下方施工結果完成。
 
 ## 7. 並行與恢復
 
@@ -208,14 +208,14 @@ B2 再基於新的 B1 結果與 v13 理解重整
 |---|---|---|
 | B1 責任 | 舊 `extraction.py` 只讀固定窗口並保存詳記／候選 | 已保留可用來源接縫，並完成以通知固定的完整 batch 為語意單位、B1 讀案例 guide／相關目前案例後 staged 更新；是否分頁只作必要的來源交付細節 |
 | Memory bundle | 舊 `MemoryArtifacts.save_memory()` 只保存 `knowledge.md`／`guide.md` | 分層 bundle authority 已完成：同一 revision 選出案例 guide、案例、理解 guide、理解與 references；正式新 App 的舊兩檔格式已退役，不新增雙格式 adapter |
-| C 修改範圍 | legacy `PATHS` 只允許兩個既有 Memory 檔，舊 guidance 又允許為真正新主題增加 section | 產品語意已固定、程式尚待實作：layered C 只處理已讀且可唯一定位的 existing stable IDs；案例引用原話、理解引用案例 digest。新主題交 B1／B2，仍禁止任意路徑、跨文件修改及 routine hot-path 寫入 |
+| C 修改範圍 | legacy `PATHS` 只允許兩個既有 Memory 檔，舊 guidance 又允許為真正新主題增加 section | 已完成：正式工具只接受已讀 existing stable IDs 與 Runtime evidence keys；案例引用原話、理解引用案例 digest，並在完整 bundle 一次 CAS。新主題交 B1／B2，仍禁止任意路徑、跨文件修改及 routine hot-path 寫入 |
 | 背景發布 | H4 舊流程把 B1 artifact 交 B2，由 B2 發布兩檔 Memory | 已完成一個 durable B job 內 B1 staged → B2 staged → 一次完整 publication；舊 R1／R2 結果只作底層證據 |
 | stale 重整 | 舊 B1 不讀 Memory，C 插入後通常只需 B2 重整 | 已完成的新 B1 依賴目前案例；stale 後 B1、B2 都基於新 head 重新評估 |
 | compaction | 早期只有 request-only middleware，正式角色組裝與 App callback 尚未接上 | A／B1／B2 role factory 與 managed callback 均已完成離線切片；仍待 provider／自然模型與完整瀏覽器 App journey。summary 始終只是非權威 Context |
 | 跨層引用更新 | 舊 `knowledge.md`／`guide.md` 未表達多對多案例依賴、穩定身分與精確 artifact 的雙層引用 | reference contract、影響查找與 B2 更新已完成；案例改變後必須重新分析既有理解與可能的新理解，禁止只換 artifact ID |
 | 歷史 artifact 成長 | 現行 Store 無一般 GC | 第一版保留不再由 current head 選用的舊 immutable artifact，不新增自動 GC，也不讓正常回查掃描它們；長期只有出現可量測儲存壓力才重開 reference-aware 回收設計，canonical 原始訪談、有效 publication、仍被引用的證據與產品需保留的時間差異不得隨意刪除 |
 
-表中已完成項目保留為差距與處理結果的追溯，不代表需要重做。尚未完成的 C 也不是授權實作者直接自行選 schema、改 Prompt 或宣稱舊測試已覆蓋；遇到會改產品效果、資料權責、引用可重現性或失敗語意的選擇，先提出具體衝突與最小方案。
+表中已完成項目保留為差距與處理結果的追溯，不代表需要重做。C 的正式 schema、准入與恢復現由本文件及實作共同固定；後續若要改產品效果、資料權責、引用可重現性或失敗語意，仍須先提出具體衝突與最小方案。
 
 ## 10. G4 必須固定的代表性驗收
 
@@ -383,7 +383,7 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 3. **B2 understanding staged maintainer（第一片已完成）：**已固定 completed B1 candidate 與 exact base，從 case change set＋既有 bindings 推導必讀 cases／直接受影響 understandings；十個窄工具提供 read、create、revise、revalidate、split、merge、retire、route 及 finish。Runtime 驗證 read-before-write、目前 supports、穩定 ID、guide、supersession、semantic no-op 與 binding refresh；後續另加入 case-scoped source-read evidence 與不可發布 rework terminal。本片零模型、零 publication。
 4. **B2 Agent graph／Prompt／durable attempt（已完成）：**已用適用 B2 的工作分析方法與 attempt-scoped context，讓模型以 staged tools 完成新理解發現與多對多重整；初始 request 不預載案例、理解或原話正文。B2 沿已讀案例的 owner-ordered evidence keys 按需分頁核對原話，key 綁定 case/source，cursor 及正式 `(case_id, source_reference)` 已讀證據由 checkpoint 保存；發現實質 B1 問題時只提交 key＋理由，由 Runtime 產生不可發布的 `case_rework_required`。同一 completed B1 輸入冪等，新 B1 輸入清除舊訊息；transport resume、零參數完成、模型／工具上限及 incomplete／refusal 防護已離線驗證。本片不自動重跑 B1、不發布。
 5. **案例引用精確化＋完整背景 job／共同 publication（package 已完成）：**B1 已從「整批來源自動附到每個改動案例」改為 Runtime 驗證的完整回合引用選擇與 split／merge 分配；bundle 也會由固定歷史上界重新證明 lineage 與 owner order。`BackgroundMemoryWorkflow` 已串 B1 staged → B2 staged → candidate bundle → 一次 publication，消費 `case_rework_required` 並最多自動退回 B1 一次；已離線驗證 B1 成功而 B2 transport failure 的父層 resume、semantic no-op、正式／candidate-only case rework、stale 後 B1／B2 重做、來源已涵蓋短路、retry 上限與同 operation receipt。這仍是 package 切片，不是 dispatcher 或真 PG 新程序旅程。
-6. **C repair：**以 stable-ID 的分層受控處理取代正式 App 內舊兩檔 `path＋diff` 契約：案例 revise；直接依賴理解在正文錯誤時 revise、仍正確時 revalidate 並刷新 case digest。先固定並測試「已讀 latest 既有目標＋明確更正＋當輪依賴＋有界完整影響」准入；衝突未明、新主題、create／split／merge／supersede 與廣泛重整 fail closed。驗證案例 source、理解 case-digest binding、同次既有案例／理解處理、latest-head 刷新、完整 bundle CAS、receipt、本回合基準推進及成功後一次核讀。施工同時有界移除或隔離 App 的 legacy C 暴露面；不得新增雙格式 adapter。完成前，分層 head 呼叫舊 `repair_memory` 只回固定 unsupported 結果且不進 legacy workflow；這不算 layered C 已實作。
+6. **C repair（已完成離線切片）：**正式 `repair_memory` schema 已以 stable-ID 的分層受控處理取代舊兩檔 `path＋diff`：模型只提交案例／理解 ID、V4A 正文差異、revise／revalidate、支持案例 ID 與 Runtime evidence keys；Runtime 從本回合保存的 typed reads 解出來源、版本、digest、路徑、offset 與 operation ID。C 在執行前確認 latest，要求目前案例、其完整來源、所有直接依賴理解及保留支持案例均已讀；案例與全部直接理解經既有 B1／B2 maintenance invariants 組成完整 bundle，一次 CAS／receipt 發布。stale 不套用舊修改，成功只推進本回合到實際 applied head，後續背景不偷換基準；原 child START／request／receipt 可精確恢復。衝突未明、新主題、create／split／merge／supersede、retire 與廣泛重整仍 fail closed 並交 B1／B2。legacy 兩檔 workflow 只保留歷史 checkpoint／測試恢復，不在現行工具 schema、分層讀取提示或 model-facing result 暴露。
 7. **A 分層 read path（已完成）：**每個 A 回合固定當時的 publication head，只把案例 guide 與工作理解 guide 放進初始 Context；`read_case` 回目前案例與 owner-ordered canonical source references，`read_work_understanding` 回目前理解與精確 `case_id＋case_digest` bindings，需要原話再沿既有 `read_conversation` 回查。工具全程讀同一回合基準，背景後續發布不會偷偷換版；沒有預載完整案例、理解、manifest 或原始訪談。分層 head 的通用 `ls／grep／read_file` fail closed，不能繞過 typed read；正式新 App 不再提供舊兩檔讀取路徑。
 8. **Dispatcher／compaction／role factory／managed callback（離線接線已完成，完整 App 旅程未完成）：**App 已接回 dispatcher／背景恢復並組裝正式 Saver／Store／publication resource，也已用精確注入的 B1／B2 role model 與各自 output reserve 建立 request-only middleware；真 PostgreSQL 新程序接合與 B1／B2 attempt lifecycle 已有離線證據。正式 OpenRouter／Luna role factory 已用單一 credential／shared clients 建立 A／B1／B2，managed App callback 亦已組裝 document-scoped coordinator、前景 settle wake、startup recovery 及 bounded shutdown。provider／自然模型及完整瀏覽器 App journey 仍未完成，不得把局部接線稱為完整產品驗收。
 
@@ -392,9 +392,9 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 ## 15. Closure
 
 - **Decision：**B1 成為目前案例／任務／事件層的整理 Agent並擁有小型 guide；B2 以目前案例維護穩定工作理解及其 guide。兩者暫採同一文件級 Memory publication，B1 staged 後由 B2 完成或 no-op，再一次發布。B2 沿案例引用核對原話發現 B1 實質錯誤時只回報 `case_rework_required`，由 Runtime 有界重跑 B1→B2，不讓 B2 越權改案例。C 只在已讀 latest 既有目標、使用者明確更正、當輪需要且影響可完整判斷時，原子處理既有案例／理解：案例 revise；理解正文錯誤時 revise、仍正確時 revalidate。衝突未明或真正新內容交由詢問、Working State 與 B1／B2，不由 C 建立新項目。
-- **Status：**G7 package 分段施工已完成共同 publication 與 C repair→B2 impact 接力：bundle authority、完整回合 citation／owner order、B1／B2 staged state 與 durable attempts、B2→B1 一次有界 rework、完整 bundle、CAS／receipt、covered／stale recovery 均已有離線契約證據；來源 owner 可用一個或多個窗口交付同一範圍，但產品不要求固定切窗。App A 也已能從固定 publication 的兩層 guide 起步，按需讀案例／理解及其已驗證回查入口，同輪不追隨背景新 head。App dispatcher／真 PostgreSQL 新程序資源接合、B1／B2 request-only compaction 的注入與 attempt lifecycle、正式 OpenRouter／Luna role factory 及 managed App callback 已通過各自指定離線回歸；summary 仍只是非權威 Context，canonical source、signed references、Memory／JD／evidence 語意不變。Layered C bundle repair 工具本身、provider／自然模型、完整瀏覽器 App journey 與 production authority 切換仍未完成；目前證據也沒有完整覆蓋 publication／JD byte-for-byte unchanged。
+- **Status：**G7 package 分段施工已完成共同 publication、C repair→B2 impact 接力及 layered C bundle repair：bundle authority、完整回合 citation／owner order、B1／B2 staged state 與 durable attempts、B2→B1 一次有界 rework、完整 bundle、CAS／receipt、covered／stale recovery 均已有離線契約證據；來源 owner 可用一個或多個窗口交付同一範圍，但產品不要求固定切窗。App A 也已能從固定 publication 的兩層 guide 起步，按需讀案例／理解及其已驗證回查入口，同輪不追隨背景新 head。App dispatcher／真 PostgreSQL 新程序資源接合、B1／B2 request-only compaction 的注入與 attempt lifecycle、正式 OpenRouter／Luna role factory、managed App callback 及正式 layered C schema／admission／recovery 已通過各自指定離線回歸；summary 仍只是非權威 Context，canonical source、signed references、Memory／JD／evidence 語意不變。provider／自然模型、完整瀏覽器 App journey 與 production authority 切換仍未完成；目前證據也不等同完整瀏覽器下 publication／JD byte-for-byte 驗收。
 - **Why：**產品需要記住完整個別工作實況與可修訂的穩定共同理解，並透過分層引用產出貼合員工的 JD；歷史窗口詳記＋單一正文不能充分表達「目前完整案例」。
 - **Sources：**Owner 2026-09-16～17 對話裁決；[OpenAI Sandbox Agents](https://developers.openai.com/api/docs/guides/agents/sandboxes#persist-memory-across-runs)明示 live update 可修正 stale Memory／依使用者要求更新，run 結束後另做 extraction／consolidation；[Codex Memories](https://learn.chatgpt.com/docs/customization/memories)、[Codex consolidation template](https://github.com/openai/codex/blob/main/codex-rs/memories/write/templates/memories/consolidation.md)與[Codex memories README](https://github.com/openai/codex/blob/main/codex-rs/memories/README.md)只支持背景分層、引用與引用感知整理的官方事實，不替本產品決定 C 准入、publication schema 或兩層 citation；Anthropic prompt chaining／evaluator-optimizer、Microsoft AutoGen reflection、AWS dependency rerun 與 Google data lineage 共同支持「保留階段權責、結構化回饋、沿依賴回到真正出錯的上游並有界停止」方向，精確契約仍是 Caliburn 映射；既有 Q019／重抽／publication／H4 實作證據只作可沿用工程基礎。
-- **Affected：**`current-decisions.md`、本分層 Memory 規格、Working State 文字、`packages/consultant-memory` 責任 README，以及後續 layered C 工具／測試計畫；B1／B2 Prompt 與 Agent graph、App A typed reads、dispatcher／背景資源、compaction、role factory、managed callback、UI、provider credential owner、已校準 Prompt／Skills、JD 語意及 production authority 不因本次文件對齊改動。
+- **Affected：**`current-decisions.md`、本分層 Memory 規格、`packages/consultant-memory` 責任 README、App C 工具／typed read proof／恢復接點與 live-repair guidance；B1／B2 Prompt 與 Agent graph、dispatcher／背景資源、compaction、role factory、managed callback、UI、provider credential owner、背景通知文字、其餘已校準 Prompt／Skills、JD 語意及 production authority 均未改。
 - **Reopen：**Owner 改變案例完整度／更正效果；G4 發現共同 publication 無法在現有 Store／Saver 契約下可靠完成；或代表性測試證明兩層一致性／回查成本不能同時成立。
-- **Next gate：**managed App callback 已完成；下一片依本文件的窄准入與分層引用契約實作 layered C bundle repair，再做 provider／自然模型及完整瀏覽器 App journey 驗證；production authority 另循正式採用程序。第一版沿用「舊 immutable artifact 暫留、不做 GC」。
+- **Next gate：**layered C 已完成離線切片；下一步回到 provider／自然模型及完整瀏覽器 App journey 驗證，之後 production authority 另循正式採用程序。第一版沿用「舊 immutable artifact 暫留、不做 GC」。

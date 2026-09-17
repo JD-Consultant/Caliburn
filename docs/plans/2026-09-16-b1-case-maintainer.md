@@ -2,12 +2,12 @@
 
 日期：2026-09-16
 
-狀態：B1 staged contract 與固定來源 Agent graph 兩片皆完成；successor 已完成精確引用、B2 與 package 背景發布，正式 App dispatcher 仍未接
+狀態：B1 staged contract 與固定來源 Agent graph 兩片皆完成；successor 已完成精確引用、B2、package 背景發布及 App-side B1／B2 request-only compaction 離線接線；正式 role factory、managed callback、C、provider／自然模型與完整 dispatcher／App journey 仍未完成
 上位決策：[分層案例／工作理解 Memory 對齊](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)
 
 > **2026-09-17 接續修正：**本計畫記錄已完成切片及當時證據；其中「所有改動案例自動附整批 canonical source」只代表舊切片現況，已被 Owner 的完整訪談回合引用決策取代，不再指導下一步。下一片須讓 B1 從 Runtime 已提供／已讀的完整回合 references 選擇並在 revise／split／merge 時正確分配；本次待整理來源是 processed-source 邊界，不是 B1 訪談回查權限上限。見 [MEM-L001](../specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 與[完整背景 Workflow 設計](../specs/2026-09-17-layered-memory-background-workflow-design.md)。
 >
-> **2026-09-17 接續結果：**上述精確 evidence 分配已由[引用施工計畫](2026-09-17-interview-evidence-citations.md)完成。本檔 §4、§5 與 §7 保留的是前兩片當時契約與證據，不再是目前工具介面；目前 create／revise／split／merge 只選 Runtime keys，finish 不收 outcome。B2 與 package 背景 publication 也已由 successor 完成；下一步依[完整背景 Workflow 設計](../specs/2026-09-17-layered-memory-background-workflow-design.md)接 App dispatcher，不把本檔舊介面接回。
+> **2026-09-17 接續結果：**上述精確 evidence 分配已由[引用施工計畫](2026-09-17-interview-evidence-citations.md)完成。本檔 §4、§5 與 §7 保留的是前兩片當時契約與證據，不再是目前工具介面；目前 create／revise／split／merge 只選 Runtime keys，finish 不收 outcome。B2 與 package 背景 publication 也已由 successor 完成；後續 App-side compaction 切片只沿正式新介面注入 middleware，不把本檔舊介面接回。
 
 ## 1. 第一片要完成的效果
 
@@ -121,8 +121,10 @@ Runtime 負責：
 
 本片沒有把來源窗口改成多份正式來源，也沒有另建 source cursor。dispatcher 仍負責提供固定 batch；來源 owner 負責完整交付該 batch，只有必要時才決定窗口 pair、順序與分頁。這沿用「一個 B1 batch reference、一個語意 attempt；底層可用一個或多個讀取窗口」契約。package 的 `max_chars`／`max_windows` 是有界來源交付與合成測試機制，不是要求正式 App 固定切窗的產品規則。
 
-2026-09-16 Owner 再確認：訪談資訊可能跨很多回合散落，因此背景通知固定的完整 batch 才是 B1 分析單位；窗口只是可選工程方法。B1 compaction 不得摘要、截斷或替換該批 canonical 訪談，只能處理 Agent 自己已完成的舊模型／工具往返。此項校正不禁止必要分頁，也不改已驗證的同 stage、checkpoint 與來源引用行為。
+2026-09-17 Owner 精確化：訪談資訊可能跨很多回合散落，因此背景通知固定的完整 batch 仍是 B1 分析單位；窗口只是必要時的來源交付方法。正常單一窗口不固定執行 compaction。若實際分成多個窗口，尚未完整交給 B1 處理的最新窗口必須逐字保留；前一窗口只有在對應模型／工具 wave 安全完成、Runtime checkpoint 已推進後，才可像 A 的舊對話一樣進入 request-only continuity compaction。原始訪談與引用仍由 source owner／evidence registry 完整保存，summary 只能作後續 Context，不得成為案例證據。這取代本段較早「整批 canonical 訪談永遠不得摘要」的過度嚴格說法，不改同 batch、同 stage、checkpoint 與來源引用行為。
 
 第二片新增 12 項零 provider graph 反例；連同第一片與既有套件測試，`consultant-memory` **188 passed**，相鄰舊 B1 extraction／B2 consolidation App **33 passed**。沒有 provider 呼叫、正式 publication、DB schema、dispatcher、compaction、UI 或 production authority 變更。
 
 下一個獨立工作單位先做 B2 understanding maintainer 的 staged state／語意工具與影響分析反例，再接 B1→B2→完整 bundle publication；不在 B1 片內偷接 dispatcher、C 或完整 App。
+
+**2026-09-17 compaction 接續收尾：**App 已用精確注入的 B1 role model 與明示 output reserve 組裝 request-only middleware，package workflow 只攜帶 `continuation_compaction` state 與 attempt lifecycle。正常單一完整 batch 不壓縮；分窗時只有已處理、對應 wave 安全完成且 checkpoint 已推進的舊窗口可進 summary，最新未處理來源逐字保留。B2 同一 attempt 固定 task 並恢復 state，新的 stale attempt 從空 state 開始。fresh 指定回歸為 App **52 passed、0 skipped**、package **50 passed、0 skipped**，兩側 `compileall` 成功；本次 docs-only 收尾沒有 provider call、credential read、network、production code、dependency、DB/schema/migration、Prompt／Skills／Memory／C 改動。這些證據不涵蓋自然模型品質、正式 OpenRouter／Luna role factory、managed callback、layered C、完整 dispatcher／App journey、production authority，亦不證明 publication／JD byte-for-byte unchanged。

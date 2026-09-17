@@ -2,17 +2,19 @@
 
 - 日期：2026-09-16
 - Topic：`JD-R002／CTX-C001`
-- Stage：**G7 分段施工；基礎元件與正式 A 接線完成，B1／B2 背景 Agent 接線均未開始**
+- Stage：**G7 分段施工；基礎元件、正式 A 與 B1／B2 App-side request-only 接線均已完成離線驗證**
 - 取代：2026-09-15「等待 OpenRouter、改 direct OpenAI、另選長上下文策略」三選一的未決狀態
 - 不取代：Q019 顧問 Prompt、Skills、JD relational writer、publication CAS、背景通知與准入規則；Memory 的最新 B1／B2／C 產品語意改由 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 持有
 
-> **2026-09-17 MEM-L001 影響：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 現已將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。layered dispatcher／真 PG 恢復已完成，但沒有替 B1 或 B2 注入 middleware；兩個背景 Agent 的具體 state、固定任務原文、門檻與 stale 新 attempt 測試都仍未完成，不從 dispatcher 通過推論 compaction 已完成，也不因此重開 OpenRouter transport 選擇。
+> **2026-09-17 MEM-L001 影響與 successor 結果：**本稿原只處理 A／B2，因當時 B1 是單次 structured extraction。Owner 後續將 B1 定義為維護目前案例層與案例 guide 的多步 Agent；本稿的 canonical 不破壞、runtime 依實際 request 觸發、安全工具 wave、失敗不前移邊界及 summary 不作來源等原則維持不變。App 現已把 B1／B2 各自的 middleware 從 exact injected role model 與明示 output reserve 組裝進 package workflow；B1 多窗口只壓縮已處理舊窗口，B2 固定任務、同 attempt resume 與新 attempt 清空均有離線 lifecycle 證據。這不代表正式 OpenRouter／Luna role-model factory、provider wire、自然模型或完整 App 已完成，也不重開 OpenRouter transport 選擇。
 
 > **2026-09-16 CTX-W001 邊界：**主顧問在尚無 Memory、尚未觸發 compaction 或一次無法問完時所需的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)另行承接。它與 continuity summary 都是非權威衍生狀態，但責任不同；summary 不可成為 Working State 的唯一 owner，Working State 也不取代長對話 compaction。
 
 > **2026-09-16 G7 第一小步結果：**已新增尚未接入正式 A／B2 的共用 typed state、role profile、安全工具 wave 切點、canonical prefix digest、增量 summary prompt、request-only view 與同步 middleware。鎖定 LangChain 的真實 `create_agent`／Saver 離線反例共 12 項通過，涵蓋 canonical 不變、B2 固定任務、跨 graph 重建恢復、依實際 view 判斷、主模型失敗或截斷不發布、取消與截斷摘要拒絕。這只是基礎接點，不代表 A 與 B2 已改線、OpenRouter 自然 smoke 通過或 H4 完成；下一步才是 A 的真實 middleware 組合與 Command 累積反例。
 
 > **2026-09-16 G7 第二小步結果：**正式 `build_consultant()` 現預設注入 A profile 的 compaction middleware，摘要沿同一個 OpenRouter／Luna model boundary，主回答預留沿顧問既有 8,192 tokens。A 的完整 JD／Memory、Skills、背景提示與工具投影先組裝，compaction 最後依真正 request view 計算；文件根 state 保留 `continuation_compaction`，不再於 child 返回 root 時遺失。真 `create_agent`＋真 OpenRouter client／合成 HTTP＋Saver 反例確認：摘要與主回答使用相同 OpenAI-only／no-fallback route、摘要 request 沒有業務 tools、兩次 usage callback 均可觀察、`jd_model_view` 與 `continuation_compaction` 同次保存且 canonical messages 未改。A／checkpoint／runtime／chat／背景提示相鄰離線回歸 134 項通過；唯一警告是測試環境無法寫 `.pytest_cache`。未修改 `JdNoticeMiddleware`、Prompt、Memory、Working State 或 B1／B2，未讀 key、未呼叫 provider。下一步才是 B2 attempt-scoped 接線。
+
+> **2026-09-17 G7 背景 Agent 接線結果：**package 的 B1／B2 state 現承載可選 App-owned middleware；fresh start／new attempt 清空 `continuation_compaction`，same-attempt resume 與完成結果查回保留既有 state。`build_background_memory_workflow()` 以原 `case_model`／`understanding_model` 物件建立各角色 middleware，summary 直接呼叫該未綁業務 tools 的 injected model，主 Agent 才由框架綁工具；這是 App-side model-object identity 證據，不是正式 OpenRouter／Luna factory 或 provider wire 證據。固定合成模型＋真 Agent graph／Saver 測試另證明 B1 正常單一窗口即使多個工具 wave 也不摘要，多窗口只把第一個已完成窗口送 summary、第二個未處理窗口逐字保留，canonical graph messages 不混入 summary 且兩個 window／signed source 仍可讀回精確原文；B2 同 attempt transport failure 後恢復固定任務與 summary，新 attempt 首次 request 無舊 summary。fresh 精確受影響回歸為 App **52 passed／0 skipped**、package **50 passed／0 skipped**，兩邊 compileall 成功。這些測試沒有涵蓋完整 publication／JD byte-for-byte unchanged-state，也沒有 provider／credential／network、Prompt／Skills／Memory／C、DB／schema／migration／dependency 變更。
 
 ## 1. 決定與產品效果
 
@@ -76,6 +78,7 @@ continuation_compaction = 摘要文字＋涵蓋邊界＋來源指紋
 middleware 只摘要**已完成的舊互動 wave**。「完成」是指一組模型／工具往返已在 checkpoint 中完整配對，不是整個 A 回合或整個 B2 attempt 已經結束：
 
 - A 不納入本次尚未得到顧問最終回答的最新員工訊息；它與本回合後續尚未終結的工作保持在未壓縮尾段；
+- B1 正常以一個完整 canonical 訪談 batch 工作，不固定觸發摘要；若因來源交付或模型限制使用多個窗口，最新 `HumanMessage` 所帶的尚未完整處理窗口必須逐字留在尾段。前一窗口只有在其模型／工具 wave 安全完成、Runtime 已將 `window_position` 推進並保存 checkpoint 後，才可連同該舊 wave 納入後續 request-only compaction；不是只因訊息較舊就可壓縮；
 - B2 的第一則 `HumanMessage` 是本 attempt 的任務原文，整個 attempt 期間都逐字固定在 request 開頭。它不會因「任務尚未完成」而阻止後續已完成的舊工具 wave 被摘要；
 - 不切開 `AIMessage.tool_calls` 與所有對應 `ToolMessage`；
 - 不切開同一次模型回覆的平行工具結果；
@@ -109,7 +112,7 @@ middleware 只摘要**已完成的舊互動 wave**。「完成」是指一組模
 - 摘要前先檢查停止訊號；摘要請求沿用既有取消 callback；摘要回來後、主模型送出前再檢查一次。若此時已取消，不得再送主模型；已發生的摘要呼叫仍在實測 usage／外送次數中照實列出，但不保存新的 compaction state。
 - v1 不為摘要另加一個持久工作節點。摘要成功且主模型成功時，由同一 model step 的 `ExtendedModelResponse` 保存「模型結果＋summary／boundary」；主模型失敗時新摘要不推進，canonical 與上一個已保存摘要保持不變，恢復時只可在既有 model-step／recovery 次數界線內重算，不自動重試摘要。這是明示的有限重算，不宣稱 exactly-once。
 
-## 6. A 與 B2 的生命週期
+## 6. A、B1 與 B2 的生命週期
 
 ### A：文件唯一對話
 
@@ -119,13 +122,21 @@ middleware 只摘要**已完成的舊互動 wave**。「完成」是指一組模
 - summary 不進 `source_notice`、B1 source window、Memory reader 或 JD `basis_refs`。
 - 不同文件的 runtime context、thread、summary、boundary 與 digest 不得互用。
 
+### B1：一個固定 batch 的案例維護 attempt
+
+- 能在一次 request 內完整交付並完成的正常 batch 不需要固定摘要呼叫；只有套用既有 summary 後的真實後續 request 達門檻，才執行 compaction。
+- 若同一 batch 必須分成多個來源窗口，當前最新窗口與未完成工具配對保持逐字；上一窗口在安全完成並由 Runtime checkpoint 推進後，才成為可壓縮的舊 Context。這沿用現有 graph 的 `window_position`／完成邊界，不增加讓模型填寫的處理狀態。
+- 「已處理」不等於「一定已被案例引用」。重複、無關或經判斷不需修改案例的來源仍可能合法完成；反之，只有引用存在也不能取代安全完成與 checkpoint 邊界。
+- 被壓縮的是後續模型 request view，不是 canonical source。原始訪談、signed references、evidence registry 與 staged 案例仍完整保存；B1 對摘要有疑問時沿既有按需來源讀取回查原文，summary 不得作 evidence。
+- 新 stale attempt 從空的 `continuation_compaction` 開始；不得把舊 base 的工作摘要當成新版案例判斷。
+
 ### B2：單次有界整併 attempt
 
 - 使用相同 middleware 行為，但 state 只存在於該 B2 attempt 的 graph／checkpoint。
 - 每次 attempt 唯一的初始任務 `HumanMessage` 始終逐字放在 summary 前；summary 只涵蓋它之後已完整配對的舊模型／工具 wave，當前未完成 wave 保留在尾段。因此 B2 可在任務尚未結束時壓縮，不必等 publication 完成。
 - 同一 attempt 中斷後可沿原 state 恢復。
 - publication stale 後既有流程建立新版重整 attempt；新 attempt 從空的 `continuation_compaction` 開始，只讀新版 Memory 及 runtime 受控提供的更正來源。不得沿用舊 attempt 的 summary、opaque context 或工具尾段。
-- B1 依 `MEM-L001` 已升格為可多步讀寫的案例 Agent；它不使用 continuity summary 或 A 的 Working State 作來源，但若實際 request 達門檻，須沿本稿相同的 canonical 不破壞、安全工具 wave、失敗不前移邊界與 request-only 原則處理。B1 的固定任務／source、attempt scope、摘要保留比重與 stale 重整驗收由 `MEM-L001` 後續 G4 固定，不能從本稿舊 A／B2 範圍推定已完成。
+- B1 依 `MEM-L001` 已升格為可多步讀寫的案例 Agent；上節已固定其未處理來源保護、已處理舊窗口與 attempt scope。B1 不使用 continuity summary 或 A 的 Working State 作來源，summary 只協助續作。
 
 ## 7. Middleware Command 組合：由鎖定框架承接，先驗收而非先改碼
 
@@ -153,12 +164,12 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 
 ## 9. G7 最小施工與驗收
 
-施工分成可獨立複核的小步；目前 1–2 與 4 的 A 範圍已完成，背景 Agent 接線尚未開始：
+施工分成可獨立複核的小步；目前 1–3 的離線接線已完成，4 的自然 smoke 仍未授權：
 
 1. 新增 typed compaction state、公開 middleware 與 profile 設定；不加 dependency／table／migration。
 2. 正式 A 注入新 middleware；以鎖定 LangChain 的真實組裝測試證明 `jd_model_view` 與 `continuation_compaction` 同時保存，不預設修改 `JdNoticeMiddleware`。
-3. B1／B2 各自使用同一 OpenRouter model boundary 與 role-scoped／attempt-scoped middleware；B1 的固定 canonical batch 永不被 summary 取代，B2 的固定任務原文與 stale 新 attempt 邊界保持本稿規則。移除背景正式路徑對 direct Responses／native `context_management` 的依賴；保留舊 adapter 契約測試作歷史證據。
-4. 只跑受影響回歸；離線通過後再依既有費用授權規則提出一條有界自然 smoke，不在文件施工中讀 key 或呼叫 provider。
+3. B1／B2 各自使用 exact injected role model object 與 role-scoped／attempt-scoped middleware；B1 正常單一 batch 不固定摘要，多窗口時只允許已安全完成並 checkpoint 推進的舊窗口進入 request-only summary，當前未處理窗口逐字保留；B2 的固定任務原文與 stale 新 attempt 邊界保持本稿規則。正式 OpenRouter／Luna role-model factory、provider wire 與既有 direct Responses／native `context_management` 的 production 切換仍是後續工作；舊 adapter 契約測試保留作歷史證據。
+4. 已跑受影響離線回歸與 compileall；付費／自然 smoke 仍須另依費用授權，不在本文件切片讀 key 或呼叫 provider。
 
 最少固定反例：
 
@@ -171,11 +182,12 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 - 摘要前取消不呼叫 provider；摘要後取消不再送主模型，已發生摘要 usage 可觀察；
 - A 同時保存 `jd_model_view` 與 `continuation_compaction`；
 - A 跨回合恢復且兩文件隔離；
+- B1 單一正常 batch 不產生不必要的摘要呼叫；多窗口時，未處理的最新窗口逐字保留，只有 Runtime 已推進的舊窗口可壓縮，且壓縮後仍可沿正式引用讀回原話；
 - B2 同 attempt 恢復，stale 新 attempt 不帶舊 summary；
-- summary 不是 source／Memory／JD basis，B1 固定窗口不受影響；
+- summary 不是 source／Memory／JD basis，不能取代 B1 canonical 訪談或引用；
 - 完整 request 預算、輸出上限、OpenAI-only／no-fallback 與 usage receipt 均可觀察。
 
-完成本切片只代表 A／B1／B2 的 App-side compaction 接線與離線契約通過；dispatcher 已由另一 successor 驗證，但仍不等於自然長訪談品質、managed App 完整旅程或 production authority 已驗收。
+完成本切片只代表 A／B1／B2 的 App-side compaction 接線與離線契約通過；dispatcher 已由另一 successor 驗證。Task 4 直接證明的是 canonical graph messages／source readability、B1 window boundary 與 B2 attempt lifecycle，不是完整 publication／JD byte-for-byte unchanged-state。正式 OpenRouter／Luna role-model factory、layered C、managed App callback、付費／自然長訪談、完整 dispatcher／App 使用旅程與 production authority 仍未驗收。
 
 ## 10. 官方交叉核對與本案選擇
 

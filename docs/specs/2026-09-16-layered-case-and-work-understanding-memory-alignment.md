@@ -1,11 +1,11 @@
 # JD-R002／MEM-L001：分層工作案例與工作理解 Memory 對齊
 
 - 日期：2026-09-16
-- Stage：**G7 分段施工；package 完整背景 workflow 與 App A 分層讀取接點已完成離線驗證**
+- Stage：**G7 分段施工；package 完整背景 workflow、App A 分層讀取，以及 App B1／B2 request-only compaction 接線已完成離線驗證**
 - 取代：Q019 在 Caliburn 採用的「B1 固定訪談窗口詳記＋B2 只維護 knowledge／guide」產品映射
 - 不取代：canonical 原始訪談、已校準主顧問 Prompt／Skills、背景通知語意、JD relational writer、既有 Saver／Store／CAS／receipt 證據及 `CTX-C001` 的非破壞式 compaction 原則
 
-**2026-09-17 Owner 引用精確化：**B1 可按需查閱同文件已安全完成的 canonical 訪談，B2 可按需查閱 candidate 中所有目前案例；required／impact 集合只是最低驗收與優先提示，不是閱讀權限上限。案例來源沿用 source owner 在固定 checkpoint 簽發的 `purpose="source"` 完整訪談交換，不使用模型填寫的文字 offset；一筆 `source` 現已包含該輪使用者回答與最接近的前一則公開顧問問題。相同回合可支持多個案例，一個案例可引用多個回合；案例及工作理解 revise／split／merge／retire 時都必須重新分配仍真正支持目前內容的引用。多筆引用交給 LLM 或人閱讀時，必須由 source owner 依 canonical message order 排列，不能依 reference、UUID 或時間戳推測順序；時間戳第一版不進模型 context。模型只選 Runtime 提供的 attempt-scoped `evidence_key`，不填 signed reference、全域輪次或 offset；正式 artifact 仍保存 signed references。引用施工 Tasks 1–6 已淘汰「凡本次改動就自動附整批 `window`」、補上 bundle owner-order 再驗證、讓 B2 用 case-bound key 按需分頁核對原話，並完成文件與 fresh 回歸收尾；後續 package workflow 也已把 B1／B2 串成同一 publication，App dispatcher 尚未接。精確施工見[引用施工計畫](../plans/2026-09-17-interview-evidence-citations.md)、[完整背景 Workflow 設計](2026-09-17-layered-memory-background-workflow-design.md)與[參數權責審核](2026-09-17-model-runtime-parameter-ownership-review.md)。
+**2026-09-17 Owner 引用精確化：**B1 可按需查閱同文件已安全完成的 canonical 訪談，B2 可按需查閱 candidate 中所有目前案例；required／impact 集合只是最低驗收與優先提示，不是閱讀權限上限。案例來源沿用 source owner 在固定 checkpoint 簽發的 `purpose="source"` 完整訪談交換，不使用模型填寫的文字 offset；一筆 `source` 現已包含該輪使用者回答與最接近的前一則公開顧問問題。相同回合可支持多個案例，一個案例可引用多個回合；案例及工作理解 revise／split／merge／retire 時都必須重新分配仍真正支持目前內容的引用。多筆引用交給 LLM 或人閱讀時，必須由 source owner 依 canonical message order 排列，不能依 reference、UUID 或時間戳推測順序；時間戳第一版不進模型 context。模型只選 Runtime 提供的 attempt-scoped `evidence_key`，不填 signed reference、全域輪次或 offset；正式 artifact 仍保存 signed references。引用施工 Tasks 1–6 已淘汰「凡本次改動就自動附整批 `window`」、補上 bundle owner-order 再驗證、讓 B2 用 case-bound key 按需分頁核對原話，並完成文件與 fresh 回歸收尾；後續 package workflow 已把 B1／B2 串成同一 publication，App dispatcher、真 PostgreSQL 新程序資源組裝與離線接合亦已有證據。精確施工見[引用施工計畫](../plans/2026-09-17-interview-evidence-citations.md)、[完整背景 Workflow 設計](2026-09-17-layered-memory-background-workflow-design.md)與[參數權責審核](2026-09-17-model-runtime-parameter-ownership-review.md)。
 
 ## 0. 本輪決策界線
 
@@ -14,7 +14,7 @@ Topic ID: JD-R002／MEM-L001
 Current stage: G7 segmented implementation
 Binding product goal: 完整理解個別工作案例／任務／事件，再歸納穩定共同工作，最後產生客製化 JD
 This turn's decision: B1、B2 的分層責任、各自 guide、共同 publication、C 即時更正語意，以及第一版 bundle／reference／tool authority 契約
-Still open after current G7 slices: C bundle repair、dispatcher／正式資源組裝、B1 compaction、真 PG 新程序旅程與完整 App 驗收
+Still open after current G7 slices: C bundle repair、正式 OpenRouter／Luna role factory、managed App callback、provider／自然模型驗證、完整 dispatcher／App journey 與 production authority 切換
 Out of scope: 本輪不改 production authority、不呼叫模型、不修改正式資料、不做 provider／JD schema 選型
 ```
 
@@ -164,9 +164,9 @@ B2 再基於新的 B1 結果與 v13 理解重整
 
 ## 8. Compaction 邊界
 
-`CTX-C001` 的 runtime 判斷維持有效：是否 compaction 依套用既有摘要後、真正準備送出的完整 request 計算；只壓縮安全完成的舊模型訊息／工具 wave，保留當前輸入、未完成工具配對與固定任務原文。對 B1 而言，本次通知固定的 canonical 訪談 batch 是受保護來源，不得被 compaction 摘要、截斷、替換或當成可丟棄的舊訊息；極端超限時只能改用仍完整讀取原話的受控來源交付方式或較小的後續排程，不能用 continuity summary 冒充員工原話。continuity summary 不是來源，不能寫入案例、理解或 JD basis。
+`CTX-C001` 的 runtime 判斷維持有效：是否 compaction 依套用既有摘要後、真正準備送出的完整 request 計算；只壓縮安全完成的舊互動，保留當前輸入與未完成工具配對。對 B1 而言，正常的一個完整 canonical 訪談 batch 若可在一次 request 內交付並完成，就不固定執行 compaction。只有實際使用多個來源窗口且後續 request 達門檻時，Runtime 才可將已完整交給 B1、對應模型／工具 wave 已安全完成且 checkpoint 已推進的**舊窗口**納入 continuity compaction；尚未完整處理的最新窗口絕對不得摘要、截斷、替換或當成可丟棄訊息。這項資格沿既有 `window_position`／graph 完成邊界判定，不新增模型填寫的 `processed` 欄位，也不以「是否已被某案例引用」作唯一判準。canonical 訪談、signed references 與 evidence registry 始終完整保留；summary 只作後續工作 Context，不能冒充員工原話、寫入案例／理解／JD basis。B1 若需要精確細節，仍沿既有按需來源讀取回查原文。若目前未處理來源本身超限，只能改用仍完整交付原話的受控來源窗口或較小後續排程，不能先壓縮它來通過預算。
 
-原 `CTX-C001` 只需處理 A／B2，因當時 B1 是單次 structured extraction。B1 現改為可能多步讀寫的案例 Agent，G4 必須把 B1 納入相同非破壞式 context 原則；是否實際達門檻才執行，不因角色新增而每輪固定摘要。
+原 `CTX-C001` 只需處理 A／B2，因當時 B1 是單次 structured extraction。B1 現改為可能多步讀寫的案例 Agent；2026-09-17 的 App 接線已把 B1 納入相同非破壞式 request-only 原則。正常單一完整 batch 不壓縮；分窗時只有已處理舊窗口可能在門檻達成後壓縮，最新未處理來源保持逐字。B2 固定每個 attempt 的第一個 task message，同 attempt 恢復摘要狀態，新的 stale attempt 從空狀態開始。fresh 離線證據為 App 指定套件 **52 passed、0 skipped**、package 指定套件 **50 passed、0 skipped**，兩側 `compileall` 均成功；這些測試沒有完整覆蓋 publication／JD byte-for-byte unchanged，也不是 provider 或自然模型品質驗證。
 
 主顧問在第一輪尚無 publication、背景尚未整理或一次無法問完所有線索時的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)承接。它只是 A checkpoint 中的發布前工作面，不是第三層 Memory：B1／B2 不得把 item 文字當員工來源，仍從 canonical source 建立案例與理解；publication 完成後，A 必須按需讀相關新版再移除、保留或改寫 item，不能只因版本前進就自動宣告已解決。這補足「Memory 不會每回合更新」的恢復缺口，不改 B1／B2／C 的 authority 與單一 publication head。
 
@@ -179,7 +179,7 @@ B2 再基於新的 B1 結果與 v13 理解重整
 | C 修改範圍 | `PATHS` 只允許兩個既有 Memory 檔 | 受控擴充到本次允許的案例與兩層 guide／理解；仍禁止任意路徑及跨文件修改 |
 | 背景發布 | H4 舊流程把 B1 artifact 交 B2，由 B2 發布兩檔 Memory | 改為一個 durable B job 內 B1 staged → B2 staged → 一次完整 publication；舊 R1／R2 結果只作底層證據 |
 | stale 重整 | 舊 B1 不讀 Memory，C 插入後通常只需 B2 重整 | 新 B1 依賴目前案例；stale 後 B1、B2 都要基於新 head 重新評估 |
-| compaction | 現設計只有 A／B2 | 新 B1 多步 agent 納入同一 request-only 原則與受影響測試 |
+| compaction | A 與 App 注入的 B1／B2 已有 request-only middleware；package 只攜帶 state／lifecycle，不選 provider | 後續只補正式 role factory、provider／自然模型與完整 App journey；summary 始終只是非權威 Context |
 | 跨層引用更新 | 現行 `knowledge.md`／`guide.md` 未表達多對多案例依賴、穩定身分與精確 artifact 的雙層引用 | G4 固定 reference contract 與影響查找；案例改變後 B2 必須重新分析既有理解與可能的新理解，禁止只換 artifact ID |
 | 歷史 artifact 成長 | 現行 Store 無一般 GC | 第一版保留不再由 current head 選用的舊 immutable artifact，不新增自動 GC，也不讓正常回查掃描它們；長期只有出現可量測儲存壓力才重開 reference-aware 回收設計，canonical 原始訪談、有效 publication、仍被引用的證據與產品需保留的時間差異不得隨意刪除 |
 
@@ -345,16 +345,16 @@ Runtime 產生 understanding bindings 與完整 candidate manifest
 5. **案例引用精確化＋完整背景 job／共同 publication（package 已完成）：**B1 已從「整批來源自動附到每個改動案例」改為 Runtime 驗證的完整回合引用選擇與 split／merge 分配；bundle 也會由固定歷史上界重新證明 lineage 與 owner order。`BackgroundMemoryWorkflow` 已串 B1 staged → B2 staged → candidate bundle → 一次 publication，消費 `case_rework_required` 並最多自動退回 B1 一次；已離線驗證 B1 成功而 B2 transport failure 的父層 resume、semantic no-op、正式／candidate-only case rework、stale 後 B1／B2 重做、來源已涵蓋短路、retry 上限與同 operation receipt。這仍是 package 切片，不是 dispatcher 或真 PG 新程序旅程。
 6. **C repair：**把現有兩檔 patch 限制改成穩定目標 ID 的受控修訂，驗證同次案例／理解更正、來源、CAS、receipt 及本回合基準推進。完成前，分層 head 呼叫舊 `repair_memory` 只回固定 unsupported 結果且不進 legacy workflow；這不算 layered C 已實作。
 7. **A 分層 read path（已完成）：**每個 A 回合固定當時的 publication head，只把案例 guide 與工作理解 guide 放進初始 Context；`read_case` 回目前案例與 owner-ordered canonical source references，`read_work_understanding` 回目前理解與精確 `case_id＋case_digest` bindings，需要原話再沿既有 `read_conversation` 回查。工具全程讀同一回合基準，背景後續發布不會偷偷換版；沒有預載完整案例、理解、manifest 或原始訪談。分層 head 的通用 `ls／grep／read_file` fail closed，不能繞過 typed read；舊兩檔 Memory 仍保留原讀取行為。
-8. **Dispatcher／compaction／App journey：**接回既有通知與背景恢復，組裝正式 Saver／Store／publication resource，完成真 PG 新程序旅程；另補 B1 的 request-only compaction 與完整 App 驗收。未受影響的 H4／CTX-C001 證據直接沿用。
+8. **Dispatcher／compaction／App journey（離線接線已完成，完整旅程未完成）：**App 已接回 dispatcher／背景恢復並組裝正式 Saver／Store／publication resource，也已用精確注入的 B1／B2 role model 與各自 output reserve 建立 request-only middleware；真 PostgreSQL 新程序接合與 B1／B2 attempt lifecycle 已有離線證據。尚未完成正式 OpenRouter／Luna role factory、managed callback、provider／自然模型及完整 dispatcher／App journey，不得把局部接線稱為完整產品驗收。
 
 第一切片不得先改 B1／B2 Prompt 或正式 dispatcher，也不得把舊 `knowledge.md` 自動解讀成已符合新案例／理解 schema。專案目前沒有舊正式使用者資料搬移需求，因此只保留明確的不相容錯誤；不做猜測式 migration。
 
 ## 15. Closure
 
 - **Decision：**B1 成為目前案例／任務／事件層的整理 Agent並擁有小型 guide；B2 以目前案例維護穩定工作理解及其 guide。兩者暫採同一文件級 Memory publication，B1 staged 後由 B2 完成或 no-op，再一次發布。B2 沿案例引用核對原話發現 B1 實質錯誤時只回報 `case_rework_required`，由 Runtime 有界重跑 B1→B2，不讓 B2 越權改案例。C 可在明確更正時直接原子發布同一完整版本。
-- **Status：**G7 package 分段施工已完成至共同 publication：bundle authority、完整回合 citation／owner order、B1／B2 staged state 與 durable attempts、B2→B1 一次有界 rework、完整 bundle、CAS／receipt、covered／stale recovery 均已有離線契約證據；來源 owner 可用一個或多個窗口交付同一範圍，但產品不要求固定切窗。App A 也已能從固定 publication 的兩層 guide 起步，按需讀案例／理解及其已驗證回查入口，同輪不追隨背景新 head。C bundle repair、正式 App dispatcher／真 PG 新程序組裝、B1 compaction、provider／自然模型與完整 App 驗收仍未完成，不是完整產品已可用或 production authority 已切換。
+- **Status：**G7 package 分段施工已完成至共同 publication：bundle authority、完整回合 citation／owner order、B1／B2 staged state 與 durable attempts、B2→B1 一次有界 rework、完整 bundle、CAS／receipt、covered／stale recovery 均已有離線契約證據；來源 owner 可用一個或多個窗口交付同一範圍，但產品不要求固定切窗。App A 也已能從固定 publication 的兩層 guide 起步，按需讀案例／理解及其已驗證回查入口，同輪不追隨背景新 head。App dispatcher／真 PostgreSQL 新程序資源接合，以及 B1／B2 request-only compaction 的注入與 attempt lifecycle 已通過各自指定離線回歸；summary 仍只是非權威 Context，canonical source、signed references、Memory／JD／evidence 語意不變。C bundle repair、正式 OpenRouter／Luna role factory、managed App callback、provider／自然模型、完整 dispatcher／App journey 與 production authority 切換仍未完成；目前證據也沒有完整覆蓋 publication／JD byte-for-byte unchanged。
 - **Why：**產品需要記住完整個別工作實況與可修訂的穩定共同理解，並透過分層引用產出貼合員工的 JD；歷史窗口詳記＋單一正文不能充分表達「目前完整案例」。
 - **Sources：**Owner 2026-09-16 對話裁決；[Codex Memories](https://learn.chatgpt.com/docs/customization/memories)、[Codex consolidation template](https://github.com/openai/codex/blob/main/codex-rs/memories/write/templates/memories/consolidation.md)與[Codex memories README](https://github.com/openai/codex/blob/main/codex-rs/memories/README.md)只支持分層、引用與引用感知整理的官方事實，不替本產品決定 publication schema；Anthropic prompt chaining／evaluator-optimizer、Microsoft AutoGen reflection、AWS dependency rerun 與 Google data lineage 共同支持「保留階段權責、結構化回饋、沿依賴回到真正出錯的上游並有界停止」方向，`case_rework_required` 名稱與精確契約仍是 Caliburn 映射；既有 Q019／重抽／publication／H4 實作證據只作可沿用工程基礎。
-- **Affected：**`current-decisions.md`、`packages/consultant-memory` 的 bundle／Memory／publication／reference 基礎、B1／B2 Prompt 與 Agent graph、App A 的 Memory guide／typed read tools、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫與 `CTX-C001` 的 B1 適用範圍；已完成切片沒有改 dispatcher、分層 C、UI、provider credential 或正式入口。
+- **Affected：**`current-decisions.md`、`packages/consultant-memory` 的 bundle／Memory／publication／reference 基礎、B1／B2 Prompt 與 Agent graph、App A 的 Memory guide／typed read tools、App dispatcher／背景資源組裝與 B1／B2 request-only compaction 接線、產品核心目標、Q019 Memory、H4 舊 B1／B2 計畫與 `CTX-C001` 的 B1 適用範圍；已完成切片沒有改分層 C、UI、provider credential、Prompt／Skills／Memory／JD 語意或 production authority。
 - **Reopen：**Owner 改變案例完整度／更正效果；G4 發現共同 publication 無法在現有 Store／Saver 契約下可靠完成；或代表性測試證明兩層一致性／回查成本不能同時成立。
-- **Next gate：**接 App dispatcher 與新分層 workflow 的正式資源組裝，驗證真 PostgreSQL／新程序 resume、通知准入與完整 source 交接；再分開處理 C bundle repair、B1 request-only compaction、provider／自然模型及完整 App 旅程。第一版沿用「舊 immutable artifact 暫留、不做 GC」。
+- **Next gate：**分開完成正式 OpenRouter／Luna role factory、managed App callback 與 C bundle repair，再做 provider／自然模型及完整 dispatcher／App journey 驗證；production authority 另循正式採用程序。第一版沿用「舊 immutable artifact 暫留、不做 GC」。

@@ -4,7 +4,7 @@
 
 **Stage：**G7 分段施工
 
-**Status：**package workflow、App A 分層讀取、App dispatcher／正式資源組裝與真 PG 新程序恢復均已完成窄切片；provider／compaction／C／完整 App 待接
+**Status：**package workflow、App A 分層讀取、既有 App 背景資源窄接合，以及 App B1／B2 request-only compaction 接線均已完成離線切片；正式 role factory、managed callback、provider／自然模型、C 與完整 dispatcher／App journey 待接
 **Date：**2026-09-17
 
 ## 1. 目標與既有決策
@@ -29,7 +29,7 @@ Runtime 組裝完整 candidate bundle
 
 **2026-09-17 實作結果：**`caliburn_memory.background_workflow.BackgroundMemoryWorkflow` 已在 package 內完成 deterministic `load base → B1 → B2 → complete bundle → prepare → publish` graph。它沿用兩個既有 Agent graph，不新增第三個模型；source relation、attempt／operation ID、review 轉換、版本與發布都由 Runtime 管理。離線固定模型加 real `MemoryArtifacts`／SQLite `PublicationStore` 已覆蓋 changed、no-op、父層 resume、有界 rework、stale 重做／涵蓋短路／上限、非法來源拒絕及同 request receipt 恢復。
 
-這個 workflow 的 package 結果已由後續 App 窄切片接到既有通知准入、process-owned PostgresSaver／PostgresStore／publication engine，並完成真 PostgreSQL 與全新 Windows process 的合成恢復旅程。A 另在每回合固定一個 publication，從兩層 guide 起步並按需讀取案例、理解及其已驗證回查入口；兩個 App 切片都沒有改本 workflow 的 B1／B2 語意與發布責任。正式 OpenRouter／Luna role model factory、B1／B2 request-only compaction、layered C bundle repair、managed App callback／document-scoped 組裝入口與自然模型／完整 App 驗收仍未接，因此不能稱 production authority 或完整 App 已完成，也不預設需要另一個 registry authority。
+這個 workflow 的 package 結果已由後續 App 窄切片接到既有通知准入、process-owned PostgresSaver／PostgresStore／publication engine，並完成真 PostgreSQL 與全新 Windows process 的合成恢復旅程。A 另在每回合固定一個 publication，從兩層 guide 起步並按需讀取案例、理解及其已驗證回查入口；兩個 App 切片都沒有改本 workflow 的 B1／B2 語意與發布責任。2026-09-17 的後續 compaction 切片再由 App 以精確注入的 B1／B2 role model 與明示 output reserve 建立 request-only middleware，package workflow 只攜帶 state 與 attempt lifecycle，不選 provider。正式 OpenRouter／Luna role model factory、layered C bundle repair、managed App callback／document-scoped 組裝入口、provider／自然模型與完整 dispatcher／App 驗收仍未完成，因此不能稱 production authority 或完整 App 已完成，也不預設需要另一個 registry authority。
 
 ## 2. 設計依據與本案映射
 
@@ -177,7 +177,7 @@ B2 可能在相關既有案例中發現問題，該 `source_reference` 不保證
 
 若新 B1 認為 candidate-only 案例應保留，必須根據重讀的 canonical source 呼叫既有 `create_case`，由 Runtime 配發新的案例 ID；若不成立則不建立。未發布的舊 candidate ID 沒有跨 attempt 的正式身分，不建立 alias 或 supersession。正式 base 案例則沿既有 read-before-revise／split／merge／retire 規則處理。
 
-這個按需讀取避免把較早批次的整段原話預載進 request，也不把它冒充本次 `NEW_SOURCE`、不改 source cursor。只在 B1 Prompt／request payload 加必要邊界，不重寫案例分析方法或一般 attempt 行為；後續 compaction 也必須像保護 `NEW_SOURCE` 一樣保護這次真正載入的 canonical review source。
+這個按需讀取避免把較早批次的整段原話預載進 request，也不把它冒充本次 `NEW_SOURCE`、不改 source cursor。只在 B1 Prompt／request payload 加必要邊界，不重寫案例分析方法或一般 attempt 行為；後續 compaction 必須逐字保護本次尚未完整處理的 canonical review source。它在對應模型／工具 wave 安全完成並 checkpoint 後，才可像其他已處理舊來源一樣進入非權威 request-only summary；canonical 原文與引用始終保留且可按需回查。
 
 ### 5.3 有界停止
 
@@ -253,13 +253,15 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 
 **本次 G7 自審結論：**第 1～8、10、13～15 項的 package 控制流已有本 workflow 或相鄰 attempt／publication 測試；第 9 項沿用 bundle／publication 的失敗即零發布反例；第 11、12、16、17 項沿用同輪完成的 evidence registry、B1/B2 工具及 App source owner 測試。App successor 另以固定合成模型完成一通知→一 bundle publication、B1 完成／B2 transport failure、publication commit reply loss、admission 固定 target，以及兩種全新程序恢復。獨立審查後再補同 instance 並行 wake 單一提交、workflow status／pending node 一致性 fail-closed，以及新程序在 settle 前核對原 target；受影響離線與真 PG／新程序回歸均通過。這些仍是控制流與持久化證據，不包含自然模型品質、provider wire 或完整 App 使用旅程。
 
+**2026-09-17 compaction 收尾證據：**App 指定受影響套件 **52 passed、0 skipped**，package 指定套件 **50 passed、0 skipped**，兩側 `compileall` 均成功。B1 正常單一完整 batch 不壓縮；分窗時只有已處理且 checkpoint 已推進的舊窗口可進 summary，最新未處理來源逐字保留。B2 在單一 attempt 內固定 task 並恢復 state，新的 stale attempt 從空 state 開始。canonical source、signed references 與 evidence registry 仍是權威；summary 只是非權威 Context。這組測試沒有完整證明 publication／JD byte-for-byte unchanged，也沒有 provider、自然模型、managed callback 或完整 dispatcher／App journey 證據。
+
 ## 9. 明確不做
 
-以下是原 package workflow 切片的邊界；後續 App successor 已接 dispatcher 與通知准入，但沒有擴張其餘項目：
+以下是原 package workflow 切片的邊界；後續 App successor 已完成既有背景資源的窄接合，並另由 App 注入 B1／B2 request-only compaction，但沒有擴張其餘項目：
 
 - 不接 dispatcher、通知准入或自動尋找訪談範圍。
 - 不做 C bundle repair。
-- 不做 A／B1／B2 compaction 或 provider 切換。
+- 原 package workflow 本身不實作 A／B1／B2 compaction 或 provider 切換；後續 App 已注入 B1／B2 middleware，正式 role factory 與 provider 切換仍未做。
 - 本 workflow 切片不修改主顧問 Prompt、Skills、JD writer、UI 或 production authority；後續 A read 切片只改 Memory 導覽與按需讀取接點，仍未切 production authority。
 - 不做文件封存、Memory history UI、artifact GC、舊資料 migration 或第二套 relational Memory。
 
@@ -286,4 +288,4 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 - **Decision：**新增 deterministic `BackgroundMemoryWorkflow` 串接既有 B1、B2、bundle 與 publication；B2 review 只作 Runtime 診斷，新 B1 必須重讀原話；最多返工一次。
 - **Why：**避免 B1／B2 各自發布或 App 重做語意不變量，同時保留精確恢復、stale 重整與一次原子 publication。
 - **Implemented：**package 已完成 source progress 接點、B1／B2 durable attempt、B1 Runtime review、outer graph、完整 bundle 組裝、同步 request checkpoint、CAS／receipt、covered／stale／bounded retry 與 blocked 終局；App successor 已把既有 source owner、admission、Saver／Store 與 publication 組裝到單一外層 workflow，並完成真 PostgreSQL／新程序恢復。未修改 provider、Prompt 方法、JD 或 production 入口。
-- **Next gate：**分開補 B1 與 B2 request-only compaction、正式 OpenRouter／Luna role model factory，再把 document-scoped dispatcher 接到 managed App callback；其後仍有 layered C bundle repair、自然模型與完整 App 驗收。A 分層 read path 已完成，不重做 Memory 分層、引用或 publication。
+- **Next gate：**分開完成正式 OpenRouter／Luna role model factory、document-scoped managed App callback 與 layered C bundle repair；其後仍有 provider／自然模型與完整 dispatcher／App journey 驗收。B1／B2 request-only compaction 與 A 分層 read path 已完成離線切片，不重做 Memory 分層、引用或 publication。

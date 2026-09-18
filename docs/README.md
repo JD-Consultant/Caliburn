@@ -13,6 +13,7 @@
 - [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — 安裝、開發、測試與提交。
 - [`runbook.md`](runbook.md) — PostgreSQL、API、Web 起停與 fresh DB。
 - [`product-notes.md`](product-notes.md) — 產品範圍與 UX 優先級。
+- [`archive/worktree-history-index.md`](archive/worktree-history-index.md) — 舊 worktree 的研究、設計、實驗與結果封存索引；用於報告與演進追溯，不是現行施工 authority。
 
 > 下方是文檔目錄，不是施工授權清單。若標題中的 `latest`／`final`／`approved`、文件內狀態或聊天內容互相衝突，以 [`current-decisions.md`](current-decisions.md) 指定的 current authority 與 stage 為準；它本身也不能越過 Accepted ADR 或現行 code。
 

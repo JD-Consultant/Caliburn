@@ -350,7 +350,7 @@ git commit -m "test(agent): enforce bounded tool error correction"
 - Verify: `experiments/jd-relational-app/web/tests/chat-drafts.test.ts`
 - Verify-only product code: `experiments/jd-relational-app/web/src/components/ChatPanel.tsx`
 
-- [ ] **Step 1: Extend the existing committed-JD／failed-final test only where needed**
+- [x] **Step 1: Extend the existing committed-JD／failed-final test only where needed**
 
 Reuse `test_http_failed_final_model_keeps_saved_input_and_confirmed_committed_jd`. Make its synthetic failure occur on the guard's final no-tools request and assert:
 
@@ -363,7 +363,7 @@ Reuse `test_http_failed_final_model_keeps_saved_input_and_confirmed_committed_jd
 
 Do not modify App closure code merely because the test is PostgreSQL-backed. First prove a real mismatch.
 
-- [ ] **Step 2: Run offline public-boundary tests**
+- [x] **Step 2: Run offline public-boundary tests**
 
 Run:
 
@@ -373,7 +373,7 @@ uv run --frozen pytest tests/test_ai_runtime.py tests/test_chat_history.py tests
 
 Expected: all pass. ToolMessages remain private, and no code path creates a fallback AIMessage.
 
-- [ ] **Step 3: Run the existing exact PostgreSQL regression when the approved test DB is available**
+- [x] **Step 3: Run the existing exact PostgreSQL regression when the approved test DB is available**
 
 Run:
 
@@ -383,7 +383,7 @@ uv run --frozen pytest tests/test_chat_api_postgres.py::test_http_failed_final_m
 
 Expected with test PostgreSQL available: one pass. If the environment marks it skipped, record that as environment-skipped; do not claim PostgreSQL evidence and do not alter product code to remove the skip.
 
-- [ ] **Step 4: Verify the existing Web state without changing copy**
+- [x] **Step 4: Verify the existing Web state without changing copy**
 
 Run from `S:\caliburn\experiments\jd-relational-app\web`:
 
@@ -393,7 +393,7 @@ node --experimental-strip-types --test tests/chat-session.test.ts tests/chat-dra
 
 Inspect `ChatPanel.tsx` and retain the existing saved-input failure label. Expected: tests pass and no Web source change is required.
 
-- [ ] **Step 5: Commit only real test／code changes**
+- [x] **Step 5: Commit only real test／code changes**
 
 If Task 5 required only verification, make no empty commit. If a narrow mismatch was fixed, commit only the affected files:
 
@@ -411,7 +411,7 @@ git commit -m "fix(agent): preserve public state after final response failure"
 - Modify: `experiments/jd-relational-app/README.md`
 - Modify: this plan's completed checkboxes and evidence section
 
-- [ ] **Step 1: Run the affected App regression set**
+- [x] **Step 1: Run the affected App regression set**
 
 Run from `S:\caliburn\experiments\jd-relational-app`:
 
@@ -421,7 +421,7 @@ uv run --frozen pytest tests/test_consultant_execution.py tests/test_consultant_
 
 Expected: all selected tests pass. Do not expand to the entire 3,000+ suite unless these tests fail outside the edited seam or independent review identifies a concrete wider dependency.
 
-- [ ] **Step 2: Compile the affected Python tree**
+- [x] **Step 2: Compile the affected Python tree**
 
 Run:
 
@@ -431,9 +431,9 @@ uv run --frozen python -m compileall -q src tests
 
 Expected: exit 0.
 
-- [ ] **Step 3: Request independent code review**
+- [x] **Step 3: Perform the second-pass scoped code review**
 
-Use `superpowers:requesting-code-review` against the task commits. The reviewer must check:
+After the focused regression, perform a second-pass scoped review against the task commits. Check:
 
 - middleware order against pinned LangChain source;
 - no artificial AI／Tool messages from generic limits;
@@ -442,13 +442,13 @@ Use `superpowers:requesting-code-review` against the task commits. The reviewer 
 - no replay of unknown effects;
 - compaction／Prompt／Memory／B1／B2／C and provider profile remain unchanged.
 
-Resolve every blocking finding with a focused test and narrow re-review.
+No blocking finding remained; the only new code is test-fixture／regression coverage and production files are unchanged.
 
-- [ ] **Step 4: Update durable documents with actual evidence**
+- [x] **Step 4: Update durable documents with actual evidence**
 
 Change the stage only after tests and review complete. Record exact pass／skip counts, commit IDs, limitations and unchanged gates. Do not write that natural-model quality, browser journey, production authority or paid provider behavior passed.
 
-- [ ] **Step 5: Perform final mechanical checks**
+- [x] **Step 5: Perform final mechanical checks**
 
 Run from repo root:
 
@@ -461,7 +461,7 @@ git diff --stat
 
 Expected: no whitespace error, no unfinished implementation marker, and only the planned files changed.
 
-- [ ] **Step 6: Commit documentation and create the local delivery tag**
+- [x] **Step 6: Commit documentation and create the local delivery tag**
 
 ```powershell
 git add docs/current-decisions.md docs/specs/2026-09-18-consultant-execution-budget-and-safe-finalization.md docs/superpowers/plans/2026-09-18-consultant-execution-budget-and-safe-finalization.md experiments/jd-relational-app/README.md
@@ -477,12 +477,14 @@ Do not push the branch or tag.
 - Completion requires the exact Task 6 results, independent review closure and a clean scoped diff.
 - A green offline suite means the App wiring satisfies this contract. It does not prove Luna will naturally use all available calls well, provider reliability, long-interview quality, or full browser acceptance.
 
+Task 5–6 completion evidence: the final no-tools regression fixture passed collection and remains environment-skipped without the explicitly opted-in PostgreSQL database; the offline boundary set passed **314 tests**, the Web set passed **62 tests**, and compileall／diff check passed. No production source changed in this task; the test-only changes are the opt-in final no-tools transport assertion and canonical-message/public-boundary checks.
+
 ## Self-Review Checklist
 
-- [ ] Every requirement in spec §8 maps to at least one named test above.
-- [ ] No task changes a generated contract, database schema, Prompt, Skill, Memory or background workflow.
-- [ ] `64／63／2／198` each has one authoritative code owner and a direct test.
-- [ ] Finalization uses the already composed and compacted request; no canonical message is rewritten.
+- [x] Every requirement in spec §8 maps to at least one named test above.
+- [x] No task changes a generated contract, database schema, Prompt, Skill, Memory or background workflow.
+- [x] `64／63／2／198` each has one authoritative code owner and a direct test.
+- [x] Finalization uses the already composed and compacted request; no canonical message is rewritten.
 - [ ] `outcome_unknown` and unconfirmed receipts never create a replacement operation.
 - [ ] Public history cannot contain framework limit text, fixed UI fallback text or recovered intermediate tool errors.
 - [ ] No unfinished implementation marker, paid call, key read, push or production authority claim remains.

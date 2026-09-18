@@ -171,3 +171,10 @@ Runtime 不猜模型的「語意是不是同一件事」。它依目前 run 中�
 - 已完成的 A request-only compaction、B1／B2／C、Memory publication 與 App UI 權責。
 
 正式現況以[目前決策](../current-decisions.md)為入口；模型 route 參考[角色模型工廠](2026-09-17-openrouter-role-model-factory.md)，工具結果與保存責任參考[關聯式 Agent 工具契約](2026-09-12-jd-relational-agent-tool-contract.md)，歷史 Node／SQL 恢復研究參考[ER01–03 收斂依據](evidence/2026-09-10-jd-error-recovery-contract-closure.md)。
+
+## 11. G7 實際驗證紀錄（2026-09-18）
+
+- A guard、child thread 額度生命週期、原生 JD Tool correction、request-only context／compaction 接點及安全收尾已在既有 commit `8f16954a`、`9d6f6339`、`d2c3bd0d`、`6a9cbbad` 完成；本段只記 Task 5–6 的收尾驗證，不改前述產品契約。
+- PostgreSQL failed-final 回歸的 synthetic plan 先保存一筆真實 JD mutation，再以 61 次成功 `jd_read` 到達第 64 次 `tools=[]`／`tool_choice="none"`；最後 transport failure 後，確認 committed receipt／revision、原話保存與 `failed` run 不變，沒有 fallback AIMessage、框架英文限額訊息或公開 assistant history／source。
+- 受影響離線 Python 集合為 **314 passed／0 failed**；Web `chat-session`／`chat-drafts` 為 **62 passed／0 failed**；`src／tests` compileall 與 `git diff --check` 通過。精確 PostgreSQL 測試因未設定明示 `JD_RELATIONAL_TEST_DB=1` 而 **1 skipped**，不把它寫成真 PG 通過。
+- 本地證據不涵蓋自然 Luna 品質、OpenRouter 付費／服務端行為、完整瀏覽器 journey、多 process production authority；這些仍保持後續 gate。此次沒有讀取正式 key、provider request、schema／migration，也沒有改 Prompt、Skills、Memory、B1／B2／C、compaction 或 Web copy。

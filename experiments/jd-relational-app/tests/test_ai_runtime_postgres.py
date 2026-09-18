@@ -41,7 +41,8 @@ pytestmark = pytest.mark.skipif(os.environ.get("JD_RELATIONAL_TEST_DB") != "1",
 
 
 @contextmanager
-def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None):
+def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None,
+                   allow_final_no_tools=False):
     # Identity, not a count: the wire must carry exactly the tools this
     # consultant was given, so adding one is a deliberate, visible change.
     expected_names = {getattr(tool, "name", tool) for tool in
@@ -62,8 +63,12 @@ def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None)
         assert payload["parallel_tool_calls"] is False
         assert payload["provider"] == {"only": ["OpenAI"], "order": ["OpenAI"],
             "allow_fallbacks": False, "require_parameters": True}
-        assert {tool["function"]["name"] for tool in payload["tools"]} == expected_names
-        assert len(payload["tools"]) == len(expected_names)
+        final_no_tools = payload.get("tools") == [] and payload.get("tool_choice") == "none"
+        if final_no_tools:
+            assert allow_final_no_tools, "Unexpected final no-tools request in this fixture."
+        else:
+            assert {tool["function"]["name"] for tool in payload["tools"]} == expected_names
+            assert len(payload["tools"]) == len(expected_names)
         assert all(tool["function"]["strict"] is True for tool in payload["tools"])
         requests.append(payload)
         name, arguments = plan[len(requests) - 1](payload)

@@ -12,7 +12,7 @@ from uuid import UUID, uuid4
 
 from fastapi.testclient import TestClient
 import httpx2
-from langchain_core.messages import HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 import pytest
 
 from jd_relational.catalog_service import CatalogService
@@ -196,10 +196,16 @@ def test_http_ai_edit_results_match_original_receipt_change_and_history_after_ma
 def test_http_failed_final_model_keeps_saved_input_and_confirmed_committed_jd(monkeypatch, engine):
     marker = "SyntheticPrivateFinalModelFailure"
 
-    def failed_final(_):
+    def failed_final(payload):
+        assert payload["tools"] == [] and payload["tool_choice"] == "none"
         raise httpx2.ReadError(marker)
 
-    with _offline_model(monkeypatch, [_read, _create, failed_final]) as (model, requests):
+    # Preserve the real JD write first, then use successful read-only model
+    # turns to reach the reserved 64th request.  The final failure therefore
+    # exercises the Runtime no-tools finalization path, not an ordinary model
+    # request that happened to be the last fixture item.
+    plan = [_read, _create, *([_read] * 61), failed_final]
+    with _offline_model(monkeypatch, plan, allow_final_no_tools=True) as (model, requests):
         with _runtime(engine, model) as (runtime, owner, graph):
             document = owner.create_document(uuid4(), "合成 HTTP 已保存但最後回覆失敗")
             run, text = str(uuid4()), "建立約定設備檢查工作，先確認隔離並保留檢查及交接結果。"
@@ -223,11 +229,16 @@ def test_http_failed_final_model_keeps_saved_input_and_confirmed_committed_jd(mo
                 current = owner.storage.read_current(document)
                 assert current.revision_number == 2 and current.revision_id == saved.result_revision_id
                 assert len(current.domain["tasks"]) == 1 and len(current.domain["details"]) == 3
-                assert counts(engine, document) == (2, 1) and len(requests) == 3
+                assert counts(engine, document) == (2, 1) and len(requests) == 64
                 history = assert_result(client.get(f"/api/documents/{document}/chat/messages"), ChatHistoryPage)
                 assert history["messages"] == [{"message_id": run, "run_id": run, "role": "user", "text": text}]
                 native = graph.get_state({"configurable": {"thread_id": document}}, subgraphs=True)
                 assert not native.next and not native.tasks and native.values["jd_ai_run"]["status"] == "failed"
+                messages = native.values["messages"]
+                assert any(isinstance(message, AIMessage) and message.tool_calls for message in messages)
+                assert any(isinstance(message, ToolMessage) for message in messages)
+                assert not any(isinstance(message, AIMessage) and not message.tool_calls for message in messages)
+                assert all(marker not in str(message.content) for message in messages)
                 again = client.get(path + "/" + run)
                 assert assert_result(again, ChatRunState) == state and marker not in again.text
-                assert len(requests) == 3 and counts(engine, document) == (2, 1)
+                assert len(requests) == 64 and counts(engine, document) == (2, 1)

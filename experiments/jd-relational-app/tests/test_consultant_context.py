@@ -551,3 +551,127 @@ def test_a_taken_back_turn_is_named_in_the_notice_and_nothing_else_is():
     assert run not in json.dumps(notice, ensure_ascii=False)
     assert "took_back_an_ai_turn" in NOTICE_INSTRUCTION
     assert "訪談" in NOTICE_INSTRUCTION and "工作理解" in NOTICE_INSTRUCTION
+
+
+def test_per_employee_child_gets_fresh_budget_while_root_keeps_history():
+    from langchain.agents import create_agent
+    from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
+    from langchain_core.tools import tool
+    from jd_relational.consultant_execution import ConsultantExecutionMiddleware
+
+    first_run, second_run, document = (str(uuid4()) for _ in range(3))
+    executed = []
+
+    @tool
+    def synthetic_step(value: str) -> str:
+        """Execute one harmless synthetic step."""
+        executed.append(value)
+        return value
+
+    responses = [
+        AIMessage(
+            content="",
+            tool_calls=[{
+                "name": "synthetic_step",
+                "args": {"value": str(index)},
+                "id": f"call-{index}",
+                "type": "tool_call",
+            }],
+        )
+        for index in range(63)
+    ] + [AIMessage(content="第一輪完成"), AIMessage(content="第二輪完成")]
+    model = FixedModel(replies=responses)
+    child = create_agent(
+        model,
+        tools=[synthetic_step],
+        system_prompt="synthetic",
+        middleware=[
+            ModelCallLimitMiddleware(thread_limit=64, exit_behavior="error"),
+            ToolCallLimitMiddleware(thread_limit=63, exit_behavior="error"),
+            ConsultantExecutionMiddleware(),
+        ],
+    )
+    root = build_document_graph(child, InMemorySaver())
+    config = {"configurable": {"thread_id": document}}
+
+    first = root.invoke(
+        {"messages": [HumanMessage(id=first_run, content="第一輪")]},
+        config,
+        context=SimpleNamespace(run_id=first_run),
+        durability="sync",
+    )
+    second = root.invoke(
+        {"messages": [HumanMessage(id=second_run, content="第二輪")]},
+        config,
+        context=SimpleNamespace(run_id=second_run),
+        durability="sync",
+    )
+
+    assert len(model.requests) == 65
+    assert executed == [str(index) for index in range(63)]
+    assert first["messages"][-1].content == "第一輪完成"
+    assert second["messages"][-1].content == "第二輪完成"
+    assert [message.content for message in second["messages"] if isinstance(message, HumanMessage)] == [
+        "第一輪", "第二輪"
+    ]
+
+
+def test_consultant_recursion_headroom_is_derived_from_the_new_budget():
+    from jd_relational.consultant_model import CONSULTANT_RECURSION_LIMIT
+
+    assert CONSULTANT_RECURSION_LIMIT == 198
+
+
+def test_same_child_interrupt_resume_keeps_its_thread_model_count():
+    from langchain.agents import create_agent
+    from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
+    from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
+    from langchain_core.tools import tool
+    from langgraph.types import Command, interrupt
+    from jd_relational.consultant_execution import ConsultantExecutionMiddleware
+
+    run_id, document = str(uuid4()), str(uuid4())
+
+    @tool
+    def pause_for_review(value: str) -> str:
+        """Pause once for a synthetic review and then return the value."""
+        interrupt("synthetic review")
+        return value
+
+    model = FixedModel(replies=[
+        AIMessage(content="", tool_calls=[{
+            "name": "pause_for_review",
+            "args": {"value": "保留"},
+            "id": "pause-call",
+            "type": "tool_call",
+        }]),
+        AIMessage(content="完成"),
+    ])
+    child = create_agent(
+        model,
+        tools=[pause_for_review],
+        system_prompt="synthetic",
+        middleware=[
+            ModelCallLimitMiddleware(thread_limit=1, exit_behavior="error"),
+            ToolCallLimitMiddleware(thread_limit=1, exit_behavior="error"),
+            ConsultantExecutionMiddleware(),
+        ],
+    )
+    root = build_document_graph(child, InMemorySaver())
+    config = {"configurable": {"thread_id": document}}
+    first = root.invoke(
+        {"messages": [HumanMessage(id=run_id, content="請審核")]},
+        config,
+        context=SimpleNamespace(run_id=run_id),
+        durability="sync",
+    )
+    assert first.get("__interrupt__")
+
+    with pytest.raises(ModelCallLimitExceededError):
+        root.invoke(
+            Command(resume="approved"),
+            config,
+            context=SimpleNamespace(run_id=run_id),
+            durability="sync",
+        )
+    assert len(model.requests) == 1

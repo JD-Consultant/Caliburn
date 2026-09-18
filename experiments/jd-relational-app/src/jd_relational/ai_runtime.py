@@ -28,6 +28,7 @@ from .consultant_tools import (
     BINDING_NODE, AiToolSession, decode_ai_bindings, verify_binding_message,
 )
 from .conversation_sources import ConversationSourceService
+from .consultant_model import CONSULTANT_RECURSION_LIMIT
 from .memory_context import MEMORY_READ_NAMES, MemoryReadSession
 from .memory_repair_session import MemoryRepairSession
 from .manual_runtime import ForegroundIdentity, ManualRuntime, RuntimeFailure
@@ -799,7 +800,7 @@ class AiRuntime:
             raise AiRuntimeError("stale_view")
         config = {"configurable": {"thread_id": record.document_id},
             "callbacks": [_StopOnToken(permit.stop_event, attempt.tool_started)], "max_concurrency": 1,
-            "recursion_limit": 96}
+            "recursion_limit": CONSULTANT_RECURSION_LIMIT}
         before = self.graph.get_state({"configurable": {"thread_id": record.document_id}}, subgraphs=True)
         attempt.before_config = before.config
         attempt.before_state = deepcopy(before)

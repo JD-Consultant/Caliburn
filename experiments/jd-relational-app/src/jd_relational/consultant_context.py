@@ -23,6 +23,7 @@ from langgraph.types import Command
 from pydantic import BaseModel, ConfigDict, Field, ValidationError, field_validator
 
 from .continuation_compaction import ContinuationCompactionState
+from .consultant_execution import ConsultantExecutionMiddleware
 from .notice_history import NoticeBoundary, NoticeHistoryReader, NoticeMaterial
 from .openai_responses import accepted
 from .references import ReferenceCodec, SignedReference
@@ -324,12 +325,13 @@ def build_consultant_node(model, *, tools, guidance: str, extra_middleware=(),
     # This role's verified budgets, declared where the agent is assembled.
     middleware = [JdNoticeMiddleware(),
                   *extra_middleware,
-                  ModelCallLimitMiddleware(thread_limit=MAX_MODEL_STEPS, exit_behavior="end"),
-                  ToolCallLimitMiddleware(thread_limit=MAX_TOOL_CALLS, exit_behavior="end"),
+                  ModelCallLimitMiddleware(thread_limit=MAX_MODEL_STEPS, exit_behavior="error"),
+                  ToolCallLimitMiddleware(thread_limit=MAX_TOOL_CALLS, exit_behavior="error"),
                   # Request-only context projection must run after every
                   # middleware that appends Skills or App notices, otherwise
                   # its budget is not the request that reaches the model.
-                  *([context_middleware] if context_middleware is not None else [])]
+                  *([context_middleware] if context_middleware is not None else []),
+                  ConsultantExecutionMiddleware()]
     if inspection:
         from .consultant_tools import AiToolMiddleware
         # Only this known layout has its non-wrap hook guarded. Unknown hooks

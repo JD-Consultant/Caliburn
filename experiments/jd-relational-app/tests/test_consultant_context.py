@@ -251,7 +251,7 @@ def test_factory_sdk_tool_round_trip_keeps_native_calls_and_real_result():
     context, _ = setup(); requests = []; executions = []
 
     @tool
-    def jd_read(target: str) -> str:
+    def synthetic_read(target: str) -> str:
         """Return synthetic read material for adapter integration only."""
         executions.append(target)
         return '{"synthetic_read_result":true}'
@@ -259,7 +259,7 @@ def test_factory_sdk_tool_round_trip_keeps_native_calls_and_real_result():
     def receive(request):
         assert request.url.host == 'openrouter.ai' and len(requests) < 2
         requests.append(json.loads(request.content))
-        body = (reply('first', 'jd_read', {'target': 'synthetic'}) if len(requests) == 1
+        body = (reply('first', 'synthetic_read', {'target': 'synthetic'}) if len(requests) == 1
                 else reply('second', text='完整合成回覆'))
         return httpx.Response(200, json=body, request=request)
 
@@ -270,8 +270,8 @@ def test_factory_sdk_tool_round_trip_keeps_native_calls_and_real_result():
     try:
         model = create_consultant_model(api_key='synthetic-no-key', http_client=client,
             async_http_client=async_client, request_timeout=5, max_output_tokens=64)
-        root = build_document_graph(build_consultant_node(model, tools=[jd_read], guidance='synthetic'), InMemorySaver())
-        result = root.invoke({'messages': [HumanMessage(content='合成原話')]},
+        root = build_document_graph(build_consultant_node(model, tools=[synthetic_read], guidance='synthetic'), InMemorySaver())
+        result = root.invoke({'messages': [HumanMessage(id=context.run_id, content='合成原話')]},
             {'configurable': {'thread_id': context.document_id}}, context=context, durability='sync')
     finally:
         client.close()
@@ -328,7 +328,7 @@ def test_factory_context_seam_changes_only_the_model_request():
         root = build_document_graph(child, InMemorySaver())
         earlier = HumanMessage(id='earlier', content='較早但仍需完整保存的原話。')
         earlier_reply = AIMessage(id='earlier-reply', content='較早回覆。')
-        current = HumanMessage(id='current', content='這次只送最新訊息。')
+        current = HumanMessage(id=context.run_id, content='這次只送最新訊息。')
         result = root.invoke(
             {'messages': [earlier, earlier_reply, current]},
             {'configurable': {'thread_id': context.document_id}},
@@ -340,13 +340,13 @@ def test_factory_context_seam_changes_only_the_model_request():
         asyncio.run(async_client.aclose())
 
     assert [[message.id for message in messages] for messages in projected] == [
-        ['earlier', 'earlier-reply', 'current']
+        ['earlier', 'earlier-reply', context.run_id]
     ]
     assert [message['role'] for message in requests[0]['messages']] == ['system', 'user']
     assert requests[0]['messages'][-1]['content'] == '這次只送最新訊息。'
     assert '較早但仍需完整保存的原話。' not in json.dumps(requests[0], ensure_ascii=False)
     assert [message.id for message in result['messages'][:3]] == [
-        'earlier', 'earlier-reply', 'current'
+        'earlier', 'earlier-reply', context.run_id
     ]
 
 
@@ -400,7 +400,7 @@ def test_context_compaction_counts_the_fully_projected_request():
         )
         root = build_document_graph(child, InMemorySaver())
         root.invoke(
-            {'messages': [HumanMessage(id='current', content='目前問題。')]},
+            {'messages': [HumanMessage(id=context.run_id, content='目前問題。')]},
             {'configurable': {'thread_id': context.document_id}},
             context=context,
             durability='sync',
@@ -468,7 +468,7 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
         root = build_document_graph(child, InMemorySaver())
         earlier = HumanMessage(id='earlier', content='案例 A 是每週巡檢。')
         earlier_reply = AIMessage(id='earlier-reply', content='已記錄案例 A。')
-        current = HumanMessage(id='current', content='最新更正：其實是每月。')
+        current = HumanMessage(id=context.run_id, content='最新更正：其實是每月。')
         originals = [deepcopy(message.model_dump())
                      for message in (earlier, earlier_reply, current)]
         result = root.invoke(

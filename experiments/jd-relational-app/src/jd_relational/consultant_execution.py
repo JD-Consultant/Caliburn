@@ -12,7 +12,9 @@ import hashlib
 import json
 from typing import Literal, Sequence
 
-from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, ToolMessage
+from langchain.agents.middleware import AgentMiddleware
+from langchain.agents.middleware.types import ModelRequest, ModelResponse
+from langchain_core.messages import AIMessage, BaseMessage, HumanMessage, SystemMessage, ToolMessage
 
 from .change_transport import change_tool_output
 from .generated.reads import ReadFailure, ReadPage
@@ -241,3 +243,57 @@ def decide_consultant_execution(
     if model_requests_used >= max_model_requests - 1:
         return ExecutionDecision(True, "model_budget")
     return ExecutionDecision(False, None)
+
+
+FINALIZATION_INSTRUCTION = (
+    "這是 Runtime 的最後無工具收尾請求。只能回答使用者，整理已確認保存的成果，"
+    "並誠實說明尚未完成或下一輪需要處理的事項；不能再讀取、修改 JD、修補 Memory、"
+    "呼叫背景工作或呼叫任何工具，也不得把未確認結果說成已保存。不能再呼叫工具。"
+)
+
+
+def _append_finalization_instruction(system_message: SystemMessage | None) -> SystemMessage:
+    """Copy the assembled system blocks and append a request-only constraint."""
+    if system_message is None:
+        blocks = []
+    elif isinstance(system_message.content, str):
+        blocks = [{"type": "text", "text": system_message.content}]
+    elif isinstance(system_message.content, list):
+        blocks = list(system_message.content)
+    else:
+        raise ConsultantExecutionError("invalid_final_request")
+    blocks.append({"type": "text", "text": FINALIZATION_INSTRUCTION})
+    return SystemMessage(content=blocks)
+
+
+def _validate_final_response(response: ModelResponse) -> ModelResponse:
+    if not isinstance(response, ModelResponse) or len(response.result) != 1:
+        raise ConsultantExecutionError("invalid_final_response")
+    message = response.result[0]
+    if (not isinstance(message, AIMessage) or message.tool_calls
+            or message.invalid_tool_calls):
+        raise ConsultantExecutionError("invalid_final_response")
+    return response
+
+
+class ConsultantExecutionMiddleware(AgentMiddleware):
+    """Apply the App-owned correction and final no-tools policy synchronously."""
+
+    def wrap_model_call(self, request: ModelRequest, handler):
+        runtime = request.runtime
+        context = getattr(runtime, "context", None)
+        run_id = getattr(context, "run_id", None)
+        model_requests_used = request.state.get("thread_model_call_count", 0)
+        decision = decide_consultant_execution(
+            request.state.get("messages", request.messages),
+            run_id=run_id,
+            model_requests_used=model_requests_used,
+        )
+        if not decision.finalize:
+            return handler(request)
+        final_request = request.override(
+            system_message=_append_finalization_instruction(request.system_message),
+            tools=[],
+            tool_choice="none",
+        )
+        return _validate_final_response(handler(final_request))

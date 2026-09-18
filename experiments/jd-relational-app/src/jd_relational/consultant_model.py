@@ -19,8 +19,8 @@ CONSULTANT_MODEL = "openai/gpt-5.6-luna"
 # consultant graph is assembled; these values are model request parameters.
 REASONING_EFFORT = "high"
 MAX_OUTPUT_TOKENS = 8192
-MAX_MODEL_STEPS = 16
-MAX_TOOL_CALLS = 15
+MAX_MODEL_STEPS = 64
+MAX_TOOL_CALLS = 63
 
 
 ConsultantModelError = OpenRouterModelError

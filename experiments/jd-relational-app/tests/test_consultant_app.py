@@ -100,3 +100,37 @@ def test_the_optional_context_middleware_is_forwarded_as_a_separate_seam(
         model, context_middleware=native_context_view) == "agent"
     assert captured["context_middleware"] is native_context_view
     assert all(item is not native_context_view for item in captured["extra_middleware"])
+
+
+def test_execution_guard_is_last_after_context_and_framework_backstops(model, monkeypatch):
+    import langchain.agents as agents
+    from langchain.agents.middleware import AgentMiddleware, ModelCallLimitMiddleware, ToolCallLimitMiddleware
+    from jd_relational.consultant_context import build_consultant_node
+    from jd_relational.consultant_execution import ConsultantExecutionMiddleware
+
+    class Marker(AgentMiddleware):
+        pass
+
+    captured = {}
+
+    def record(model, *, tools, system_prompt, middleware, state_schema, context_schema):
+        captured["middleware"] = middleware
+        return "agent"
+
+    monkeypatch.setattr(agents, "create_agent", record)
+    marker = Marker()
+    assert build_consultant_node(
+        model,
+        tools=[],
+        guidance="synthetic",
+        extra_middleware=[marker],
+        context_middleware=marker,
+    ) == "agent"
+
+    middleware = captured["middleware"]
+    assert isinstance(middleware[-1], ConsultantExecutionMiddleware)
+    assert isinstance(middleware[-2], Marker)
+    limits = [item for item in middleware if isinstance(
+        item, (ModelCallLimitMiddleware, ToolCallLimitMiddleware))]
+    assert len(limits) == 2
+    assert all(item.exit_behavior == "error" for item in limits)

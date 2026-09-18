@@ -1,15 +1,22 @@
 """A consultant execution policy derived only from canonical saved messages."""
 
 import json
+from copy import deepcopy
+from types import SimpleNamespace
 from uuid import uuid4
 
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain.agents.middleware.types import ModelRequest, ModelResponse
+from langchain_core.language_models.fake_chat_models import FakeMessagesListChatModel
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
+from langgraph.runtime import Runtime
 import pytest
 
 from jd_relational.consultant_execution import (
     ConsultantExecutionError,
+    ConsultantExecutionMiddleware,
     decide_consultant_execution,
 )
+from jd_relational.consultant_model import MAX_MODEL_STEPS, MAX_TOOL_CALLS
 from jd_relational.generated.reads import ReadPage
 from jd_relational.result_transport import validate_result
 
@@ -184,3 +191,135 @@ def test_malformed_known_tool_result_fails_closed():
     )
     with pytest.raises(ConsultantExecutionError, match="^invalid_tool_result$"):
         _decision(messages, run_id)
+
+
+def _model_request(run_id, *, model_requests_used, messages=None, system_blocks=None):
+    messages = messages or [_human(run_id)]
+    system_blocks = system_blocks or [{"type": "text", "text": "assembled context"}]
+    return ModelRequest(
+        model=FakeMessagesListChatModel(responses=[AIMessage(content="synthetic answer")]),
+        messages=messages,
+        system_message=SystemMessage(content=system_blocks),
+        tools=[{"type": "function", "function": {"name": "jd_set_text"}}],
+        tool_choice="auto",
+        state={
+            "messages": messages,
+            "thread_model_call_count": model_requests_used,
+            "continuation_compaction": {"summary": "保留的上下文延續"},
+        },
+        runtime=Runtime(context=SimpleNamespace(run_id=run_id)),
+    )
+
+
+def test_request_64_has_no_tools_and_explicit_none_tool_choice():
+    run_id = str(uuid4())
+    request = _model_request(run_id, model_requests_used=63)
+    seen = []
+
+    def handler(projected):
+        seen.append(projected)
+        return ModelResponse(result=[AIMessage(content="只整理已確認結果")])
+
+    response = ConsultantExecutionMiddleware().wrap_model_call(request, handler)
+
+    assert isinstance(response, ModelResponse)
+    assert len(seen) == 1
+    assert seen[0].tools == []
+    assert seen[0].tool_choice == "none"
+    assert "不能再呼叫工具" in seen[0].system_message.content[-1]["text"]
+
+
+def test_finalization_rejects_a_provider_tool_call_without_synthetic_messages():
+    run_id = str(uuid4())
+    request = _model_request(run_id, model_requests_used=63)
+    called = []
+
+    def handler(projected):
+        called.append(projected)
+        return ModelResponse(result=[AIMessage(
+            content="不應再呼叫工具",
+            tool_calls=[{"name": "jd_read", "args": {}, "id": "unexpected", "type": "tool_call"}],
+        )])
+
+    with pytest.raises(ConsultantExecutionError, match="^invalid_final_response$"):
+        ConsultantExecutionMiddleware().wrap_model_call(request, handler)
+    assert len(called) == 1
+
+
+def test_early_public_answer_does_not_create_an_extra_request():
+    run_id = str(uuid4())
+    request = _model_request(run_id, model_requests_used=0)
+    seen = []
+
+    def handler(projected):
+        seen.append(projected)
+        return ModelResponse(result=[AIMessage(content="已完成回答")])
+
+    ConsultantExecutionMiddleware().wrap_model_call(request, handler)
+
+    assert len(seen) == 1
+    assert seen[0].tools == request.tools
+    assert seen[0].tool_choice == request.tool_choice
+    assert "不能再呼叫工具" not in seen[0].system_message.content[-1]["text"]
+
+
+def test_finalization_preserves_all_already_assembled_context_blocks():
+    run_id = str(uuid4())
+    blocks = [
+        {"type": "text", "text": "JD notice"},
+        {"type": "text", "text": "source notice"},
+        {"type": "text", "text": "Memory notice"},
+        {"type": "text", "text": "Skills and background"},
+        {"type": "text", "text": "compacted continuation"},
+    ]
+    request = _model_request(run_id, model_requests_used=63, system_blocks=blocks)
+    seen = []
+
+    def handler(projected):
+        seen.append(projected)
+        return ModelResponse(result=[AIMessage(content="整理目前成果與未完成事項")])
+
+    ConsultantExecutionMiddleware().wrap_model_call(request, handler)
+
+    final_text = "\n".join(block["text"] for block in seen[0].system_message.content)
+    for expected in ("JD notice", "source notice", "Memory notice", "Skills and background",
+                     "compacted continuation", "不能再呼叫工具"):
+        assert expected in final_text
+
+
+def test_finalization_does_not_mutate_canonical_messages_or_compaction_state():
+    run_id = str(uuid4())
+    request = _model_request(run_id, model_requests_used=63)
+    before_messages = deepcopy(request.messages)
+    before_state = deepcopy(request.state)
+    before_system = deepcopy(request.system_message.content)
+
+    ConsultantExecutionMiddleware().wrap_model_call(
+        request, lambda projected: ModelResponse(result=[AIMessage(content="完成")]))
+
+    assert request.messages == before_messages
+    assert request.state == before_state
+    assert request.system_message.content == before_system
+
+
+def test_framework_limit_backstops_raise_without_artificial_messages():
+    from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
+    from langchain.agents.middleware.model_call_limit import ModelCallLimitExceededError
+    from langchain.agents.middleware.tool_call_limit import ToolCallLimitExceededError
+
+    runtime = Runtime(context=None)
+    with pytest.raises(ModelCallLimitExceededError):
+        ModelCallLimitMiddleware(thread_limit=64, exit_behavior="error").before_model(
+            {"thread_model_call_count": 64}, runtime)
+
+    message = AIMessage(content="", tool_calls=[
+        {"name": "jd_set_text", "args": {}, "id": "blocked", "type": "tool_call"}
+    ])
+    with pytest.raises(ToolCallLimitExceededError):
+        ToolCallLimitMiddleware(thread_limit=63, exit_behavior="error").after_model(
+            {"messages": [message], "thread_tool_call_count": {"__all__": 63}}, runtime)
+
+
+def test_a_constants_are_64_and_63_without_changing_model_profile():
+    assert MAX_MODEL_STEPS == 64
+    assert MAX_TOOL_CALLS == 63

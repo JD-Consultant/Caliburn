@@ -8,8 +8,9 @@ from types import SimpleNamespace
 from uuid import UUID, uuid4
 
 from langchain.agents import create_agent
+from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
 from langchain_core.callbacks import BaseCallbackHandler
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 import pytest
 
@@ -17,6 +18,7 @@ from jd_relational.consultant_tools import (
     AiToolError, AiToolPending, AiToolMiddleware, AiToolSession,
     build_jd_tools, decode_ai_binding, decode_ai_bindings, verify_binding_message,
 )
+from jd_relational.consultant_execution import ConsultantExecutionMiddleware
 from jd_relational.generated.reads import ReadInput, ChangeReadInput
 from jd_relational.reads import ReadService
 from jd_relational.references import ReferenceCodec, SignedReference, field_value_digest
@@ -69,8 +71,8 @@ class Owner:
         else:
             receipt = SavedOperation(intent.document_id, intent.operation_id, intent.request_digest,
                 "ai", permit.identity.run_id, intent.base_revision_id,
-                uuid4() if self.status == "committed" else None, self.status,
-                body_for(intent.command["tool"], self.status), datetime.now(timezone.utc))
+                uuid4() if self.status == "committed" else intent.base_revision_id if self.status == "no_change" else None,
+                self.status, body_for(intent.command["tool"], self.status), datetime.now(timezone.utc))
             observed = WriteObservation(intent.document_id, intent.operation_id, receipt)
         return SimpleNamespace(wait=lambda timeout=None: SimpleNamespace(
             observation=observed, checkpoint_closed=False, error=self.error))
@@ -123,6 +125,28 @@ def run(context, replies, *, saver=None, initial=None, callbacks=()):
                          checkpointer=saver or InMemorySaver())
     config = {"configurable": {"thread_id": context.document_id}, "callbacks": list(callbacks)}
     result = graph.invoke(initial or {"messages": [HumanMessage(content="合成原話")],
+        "jd_ai_bindings": [], "jd_ai_read": None}, config, context=context, durability="sync")
+    return result, graph, model
+
+
+def run_with_execution(context, replies, *, saver=None, initial=None, callbacks=()):
+    """Run the native tools with the production A execution guard enabled."""
+    for reply in replies:
+        for request in reply.tool_calls:
+            if request["args"].get("container_ref") == "fixture-task-container":
+                request["args"]["container_ref"] = context.tool_session.codec.issue(SignedReference(
+                    document_id=context.document_id, revision_id=context.tool_session.history.value["revision"],
+                    purpose="current", role="container", kind="container", child_kind="task"))
+    model = FixedModel(replies=replies)
+    context.last_test_model = model
+    graph = create_agent(model, tools=build_jd_tools(), middleware=[
+        AiToolMiddleware(),
+        ModelCallLimitMiddleware(thread_limit=64, exit_behavior="error"),
+        ToolCallLimitMiddleware(thread_limit=63, exit_behavior="error"),
+        ConsultantExecutionMiddleware(),
+    ], checkpointer=saver or InMemorySaver())
+    config = {"configurable": {"thread_id": context.document_id}, "callbacks": list(callbacks)}
+    result = graph.invoke(initial or {"messages": [HumanMessage(id=context.run_id, content="合成原話")],
         "jd_ai_bindings": [], "jd_ai_read": None}, config, context=context, durability="sync")
     return result, graph, model
 
@@ -427,3 +451,166 @@ def test_successful_current_item_or_section_is_an_exact_run_read(view):
     assert json.loads(results(state)[0].content)["access"] == "current"
     assert owner.calls[0].base_revision_id == UUID(material.value["revision"])
     assert state["jd_ai_read"]["tool_message_id"] == results(state)[0].id
+
+
+def _named_task(name):
+    arguments = task_args()
+    arguments["name"] = name
+    return call("jd_create_task", arguments)
+
+
+def _mutation_results(state):
+    return [message for message in results(state) if message.name == "jd_create_task"]
+
+
+def _has_finalization_instruction(model):
+    return any(isinstance(message, SystemMessage) and "不能再呼叫工具" in str(message.content)
+               for request in model.requests for message in request)
+
+
+def test_invalid_input_can_be_corrected_twice_but_not_submitted_a_third_time():
+    _, context, owner, _, _ = setup()
+    state, _, model = run_with_execution(context, [
+        _named_task("任務甲"), _named_task("任務乙"), _named_task("任務丙"), done()])
+
+    mutations = _mutation_results(state)
+    assert len(model.requests) == 4
+    assert len(mutations) == 3
+    assert [message.status for message in mutations] == ["error"] * 3
+    assert all(json.loads(message.content)["status"] == "invalid_input" for message in mutations)
+    assert owner.calls == []
+    assert _has_finalization_instruction(model)
+
+
+def test_relationship_conflict_uses_reads_without_resetting_the_episode():
+    _, context, owner, _, _ = setup()
+    owner.status = "relationship_conflict"
+    state, _, model = run_with_execution(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("關係甲"),
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("關係乙"), _named_task("關係丙"), done()])
+
+    mutations = _mutation_results(state)
+    assert len(model.requests) == 6
+    assert len(owner.calls) == 3
+    assert len([message for message in results(state) if message.name == "jd_read"]) == 2
+    assert [json.loads(message.content)["status"] for message in mutations] == [
+        "relationship_conflict", "relationship_conflict", "relationship_conflict"]
+    assert _has_finalization_instruction(model)
+
+
+def test_stale_view_requires_current_read_before_replanned_submission():
+    _, context, owner, _, _ = setup()
+    owner.status = "stale_view"
+    state, _, model = run_with_execution(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("過期甲"), _named_task("沒有重讀"),
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("過期乙"), done()])
+
+    mutations = _mutation_results(state)
+    assert len(model.requests) == 6
+    assert len(owner.calls) == 2
+    assert [json.loads(message.content)["status"] for message in mutations] == [
+        "stale_view", "invalid_input", "stale_view"]
+    assert len([message for message in results(state) if message.name == "jd_read"]) == 2
+    assert state.get("jd_ai_read") is None
+    assert _has_finalization_instruction(model)
+
+
+@pytest.mark.parametrize("success_status", ["committed", "no_change"])
+def test_committed_or_no_change_closes_the_active_episode(success_status):
+    _, context, owner, _, _ = setup()
+    owner.status = "stale_view"
+
+    def switch_after_first_attempt(_):
+        if owner.calls:
+            owner.status = success_status
+
+    owner.on_execute = switch_after_first_attempt
+    state, _, model = run_with_execution(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("第一次過期"),
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("第二次成功"), done()])
+
+    mutations = _mutation_results(state)
+    assert len(model.requests) == 5
+    assert len(owner.calls) == 2
+    assert [json.loads(message.content)["status"] for message in mutations] == [
+        "stale_view", success_status]
+    assert not _has_finalization_instruction(model)
+
+
+def test_save_and_read_failures_finalize_without_replaying():
+    _, context, owner, _, _ = setup()
+    owner.status = "save_failed"
+    state, _, model = run_with_execution(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("不重送"), done()])
+    assert len(model.requests) == 3
+    assert len(owner.calls) == 1
+    assert json.loads(_mutation_results(state)[0].content)["status"] == "save_failed"
+    assert _has_finalization_instruction(model)
+
+    _, context, owner, material, _ = setup()
+    original_read = material.read_current
+
+    def failed_read(document):
+        raise HistoryError("read_failed")
+
+    material.read_current = failed_read
+    state, _, model = run_with_execution(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}), done()])
+    assert len(model.requests) == 2
+    assert owner.calls == []
+    assert json.loads(results(state)[0].content)["code"] == "read_failed"
+    assert _has_finalization_instruction(model)
+    material.read_current = original_read
+
+
+def test_unknown_outcome_stops_before_another_model_response_with_guard():
+    _, context, owner, _, _ = setup()
+    owner.status = "unknown"
+    with pytest.raises(AiToolPending, match="^ai_tool_pending"):
+        run_with_execution(context, [
+            call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+            _named_task("結果不明")])
+    assert len(context.last_test_model.requests) == 2
+    assert len(owner.calls) == 1
+
+
+def test_dependent_items_never_implies_cascade_or_set_null_command():
+    _, context, owner, _, _ = setup()
+    owner.status = "dependent_items"
+    state, _, model = run_with_execution(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("需要明確處理關係"), done()])
+
+    assert len(model.requests) == 3
+    assert len(owner.calls) == 1
+    assert [message.name for message in results(state)] == ["jd_read", "jd_create_task"]
+    assert json.loads(_mutation_results(state)[0].content)["next_action"] == "resolve_dependencies"
+
+
+def test_recovered_intermediate_tool_errors_remain_private_tool_messages():
+    _, context, owner, _, _ = setup()
+    owner.status = "stale_view"
+
+    def switch_after_first_attempt(_):
+        if owner.calls:
+            owner.status = "committed"
+
+    owner.on_execute = switch_after_first_attempt
+    state, _, _ = run_with_execution(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("先失敗"),
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        _named_task("後成功"), done()])
+
+    messages = results(state)
+    assert any(message.status == "error" for message in messages)
+    final = state["messages"][-1]
+    assert isinstance(final, AIMessage) and not final.tool_calls
+    assert "stale_view" not in final.content

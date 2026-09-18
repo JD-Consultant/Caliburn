@@ -285,12 +285,13 @@ git commit -m "test(agent): prove consultant budget and resume boundaries"
 ### Task 4: Exercise correction policy through the real tool middleware
 
 **Files:**
+- Modify: `experiments/jd-relational-app/src/jd_relational/consultant_tools.py`
 - Modify: `experiments/jd-relational-app/tests/test_consultant_tools.py`
-- Modify: `experiments/jd-relational-app/tests/test_consultant_execution.py`
+- Reuse: `experiments/jd-relational-app/src/jd_relational/consultant_execution.py` and its pure decision tests
 - Verify: `experiments/jd-relational-app/tests/test_memory_repair_session.py`
 - Verify: `experiments/jd-relational-app/tests/test_consultant_memory_context.py`
 
-- [ ] **Step 1: Add RED graph-level correction cases**
+- [x] **Step 1: Add RED graph-level correction cases**
 
 Use the existing `AiToolSession`, generated tool shapes, fixed owner and native ToolMessages. Do not construct a second fake result format.
 
@@ -305,7 +306,7 @@ Cover:
 
 Also prove `dependent_items` cannot cause an automatic cascade／set-null command: only an explicit model submission that already passes existing read／source／business validation may run.
 
-- [ ] **Step 2: Run the graph-level cases and record RED**
+- [x] **Step 2: Run the graph-level cases and record RED**
 
 Run:
 
@@ -315,11 +316,11 @@ uv run --frozen pytest tests/test_consultant_tools.py tests/test_consultant_exec
 
 Expected before integration: the third replacement and exact no-progress repeat are not yet stopped by a request guard.
 
-- [ ] **Step 3: Make only narrow integration corrections**
+- [x] **Step 3: Make only narrow integration corrections**
 
 If the pure decision cannot consume an actual result, adapt its decoder to the existing ToolMessage schema. Do not change `tool_output`, generated schemas, receipt identity, operation keys, writer behavior or Memory repair outcomes.
 
-- [ ] **Step 4: Run JD and Memory-adjacent regressions**
+- [x] **Step 4: Run JD and Memory-adjacent regressions**
 
 Run:
 
@@ -329,7 +330,7 @@ uv run --frozen pytest tests/test_consultant_tools.py tests/test_consultant_exec
 
 Expected: all selected tests pass; C's existing refresh／stale／publication behavior is byte-for-byte unaffected.
 
-- [ ] **Step 5: Commit the green unit**
+- [x] **Step 5: Commit the green unit**
 
 ```powershell
 git add experiments/jd-relational-app/src/jd_relational/consultant_execution.py experiments/jd-relational-app/tests/test_consultant_execution.py experiments/jd-relational-app/tests/test_consultant_tools.py

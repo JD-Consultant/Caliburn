@@ -358,7 +358,13 @@ class AiToolSession:
             raise AiToolPending()
         try:
             result = project_observation(observed, self.codec)
-            return _message(name, prepared.call_id, result)
+            message = _message(name, prepared.call_id, result)
+            # A stale or missing target invalidates the exact current-read
+            # base.  Force the next model submission through jd_read current;
+            # do not let an old binding be reused for another operation.
+            if result.get("status") in {"target_missing", "stale_view"}:
+                return Command(update={"messages": [message], "jd_ai_read": None})
+            return message
         except Exception:
             raise AiToolError("ai_tool_projection_failed") from None
 

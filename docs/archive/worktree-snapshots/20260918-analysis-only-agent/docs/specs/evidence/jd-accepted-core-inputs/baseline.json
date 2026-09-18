@@ -1,0 +1,1512 @@
+{
+  "status": "ACCEPTED SOURCE INPUT BASELINE ONLY; NOT COMPLETE A1 DEPENDENCY MERGE OR G6 AUTHORITY",
+  "observed_date": "2026-09-12",
+  "core_commit": "54cdfb3420d074d1f4566cb04f12d1fb9a868022",
+  "core_tag": "jd-editor-core-isolated-20260910",
+  "production_reference": "638ed877e85be3da4c5fd6d1f263b2efc204d1d8",
+  "files": [
+    {
+      "path": "experiments/analysis-agent/pyproject.toml",
+      "git_blob": "b4cf663892fb54f7c62eca870d0bda09fdfe70d3",
+      "sha256_git_bytes": "f65f1b8e1ce845e1587c506c2252e9f3f05fd3619d684cae46f6c2c02bc730ea",
+      "bytes": 997,
+      "responsibility": "Exact accepted dependency/license input; dependency merge and installability remain unproven"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/__init__.py",
+      "git_blob": "1b3ef0e5655177b12d36c0af0c17870385508e17",
+      "sha256_git_bytes": "eb0d84bcf786feed4e0652f5cbaea9d25fc9d3477ef08b39488bc86685931a70",
+      "bytes": 56,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/api.py",
+      "git_blob": "05a692b6534c6ba09918588f3dd9a1235c85c1e1",
+      "sha256_git_bytes": "605f1766a19b43219dd76a85f30c974cafb1de0c20d84749cdbb9a356c96d323",
+      "bytes": 17123,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/budget.py",
+      "git_blob": "692fb0d70a51084283cac59168863efeab1a6377",
+      "sha256_git_bytes": "c4c9c007220deff2b9d8a410820e123e79dc371cd6603361c87b99f9e497d5ef",
+      "bytes": 5822,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/catalog.py",
+      "git_blob": "2f876d6f439022b3c3dfb8bc8b977e3d50397dc2",
+      "sha256_git_bytes": "120c04a4b19c9775ab56f4377b1e13b506f6585e0a1fb1c86b6424f61587e5e2",
+      "bytes": 7164,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/consolidation.py",
+      "git_blob": "4e715b3eb4e11175ebb3ecbf4561af6fae927587",
+      "sha256_git_bytes": "1ec015eaaf5ea85f6b6d50901d5b002b6115b5aa9ad1dad15892c2c1bf7c8f4e",
+      "bytes": 19554,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/consolidation_feedback.py",
+      "git_blob": "1fa7ddc5166f8fc53b11ea028320a132d248fa3f",
+      "sha256_git_bytes": "60f573a67ffeab0aaf504ecef2465342a615d9d26a5d6f4df8217f85ea55600f",
+      "bytes": 2187,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/consolidation_request.py",
+      "git_blob": "925ca12b4173059308f334456fa210c7df2315cd",
+      "sha256_git_bytes": "6965d106a270209e61ef0982bf18be8096e4b72b234091d45c303ccd075414d2",
+      "bytes": 2354,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/consolidation_tools.py",
+      "git_blob": "d82b29f0ffd0fd2754087a87439055c6adadf31f",
+      "sha256_git_bytes": "d81efec80bc8e8b32b665f82d97bd0d632948e29daa56e2a38f5bc8b9d1ab6d0",
+      "bytes": 6497,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/context.py",
+      "git_blob": "6a1fffd394707e1c514e096c1a8eda49a4ddf6ef",
+      "sha256_git_bytes": "e2feaa7415171038ac442e4e94ee68f7b23ea354237762181b29ec20dfe7cfc5",
+      "bytes": 2030,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/conversation.py",
+      "git_blob": "98c291f3026cb9715cef2b0f3785a309a464d363",
+      "sha256_git_bytes": "725f772bd355650b154a590b4ad48f40692dbc4666db5545b12b65b0a6296d04",
+      "bytes": 18810,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/extraction.py",
+      "git_blob": "edbde312f73486de544a4393867a20ed3e15d8e3",
+      "sha256_git_bytes": "06dd3e8c4d9c76afb461d63ad02c4e733a8509416a98a55211e479b9359eb6ce",
+      "bytes": 17068,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_context.py",
+      "git_blob": "400aea7a02c415651b5fbeceb98135887ca20dc3",
+      "sha256_git_bytes": "5485f24c8e88e271369f6e4b9feeb29cc9a4515e7a2ddbff665199beef2b897b",
+      "bytes": 6648,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_contract.py",
+      "git_blob": "23a4287bd9c8bb505878628ba2df8f41533334a8",
+      "sha256_git_bytes": "e5a24154bdbaebec6a8488712eb849bb336f3caaf6b2672f81bcced6fc4e7c49",
+      "bytes": 7087,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_engine.py",
+      "git_blob": "76913438f3dbcbdcb333a6d1b25de3cac801b54a",
+      "sha256_git_bytes": "b22e38b13a450a40653a6108adfa4fdf98f6a3aa153ce500a06018b94308c6fa",
+      "bytes": 9650,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_reconcile.py",
+      "git_blob": "842c34b87eb1a1c08ce10a28434f5b82701d68d2",
+      "sha256_git_bytes": "f0474e9c4e08e35e37b93a5ed085ab250b709633e0d6a1c6bc743f49dd368e9e",
+      "bytes": 1800,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_references.py",
+      "git_blob": "dc821a0a8959fa7632ed76035c23acc84b38804b",
+      "sha256_git_bytes": "a96c4df811165656840bd09d3e55bec038c491e504b83eeebf1ad3e9fedd6108",
+      "bytes": 3352,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+      "git_blob": "a885c5e4cf37e331b0522ef748f0583b6d6923e3",
+      "sha256_git_bytes": "4ad2727cdf2e8de07445fb1d730181b73d697e574fb0d34818f38eee2ce57ea2",
+      "bytes": 13393,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_service.py",
+      "git_blob": "a1798b0af027f785d3b86f4c890f8b102087c6e3",
+      "sha256_git_bytes": "86087204832701cf6d1bd89897569ddd1362293497c51996e81c2b8095dbb974",
+      "bytes": 6936,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_store.py",
+      "git_blob": "697574fc405c51057e4677dcfd76581b395b9c7f",
+      "sha256_git_bytes": "113e1273a6d80917b904340144e5858ae7c3c4a12eb012f372beca9af6031768",
+      "bytes": 20574,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+      "git_blob": "71488ebf0e44a31b3d5a43ede644589d1871f9b9",
+      "sha256_git_bytes": "a6682daf5b8491fff5fd41919e3cdad426fa2282101f9a6e8c2766aff8f0b29e",
+      "bytes": 29848,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/jd_types.py",
+      "git_blob": "1cb2623d1939341340825795780c1a63762758a1",
+      "sha256_git_bytes": "a0a03b857f783902ed8008de37000fd34859f7473a7b14cb6ac345ebae543702",
+      "bytes": 2385,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/live_memory.py",
+      "git_blob": "5495801744154dcc02132971e0a749f3ab619bb6",
+      "sha256_git_bytes": "30c2901760d6d2e0a7173adc7368499d25b9679b9a17bf7344cb20b8e74ac5f2",
+      "bytes": 13433,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/memory.py",
+      "git_blob": "cb2d6889be20d28ff4958de07f5b472a4ffda3f1",
+      "sha256_git_bytes": "3f383a6ec433490edcef616ec138594d850de0c201c7c6da630253cca117a7d5",
+      "bytes": 12361,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/memory_patch.py",
+      "git_blob": "96ceeb8416262c09f3a4d9df9943d0e889384f56",
+      "sha256_git_bytes": "b26e5be41214c79664a42e1995bf670406b6c4c8e4af9feefa455be2b534b6fd",
+      "bytes": 3854,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/memory_tools.py",
+      "git_blob": "8bc9ef21cf8238f7a9d4bc7efd801ab408d1e194",
+      "sha256_git_bytes": "facdbfc5e3dc5035326e0af46be58479c720c54f0398ea6453312001dc429e11",
+      "bytes": 11521,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/provider.py",
+      "git_blob": "8719f9134ef2f2d8061f32383e247fd3e15424e6",
+      "sha256_git_bytes": "b65aebb3d2b696bd31f2b248e9a5a3cdadce99ec9c8a613bfa943e4956408a91",
+      "bytes": 2303,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/publication.py",
+      "git_blob": "8a165f4a6d7f9268e704ecfd576cfd34d9369b60",
+      "sha256_git_bytes": "3de2ef91c0ab865d9fed3241b94863db88f6dd516b809fa26c8edeebac6fcdf6",
+      "bytes": 10029,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/references.py",
+      "git_blob": "afd9a23dbc480b8eb6e6436f32282d1f02fe937d",
+      "sha256_git_bytes": "0ddaa542f92c8bf0eec5f301a1faba78c56a7a5a0727fc0371b45204e176ae9f",
+      "bytes": 2382,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/repair.py",
+      "git_blob": "48c8f395b7df116b05834971fa08766708cd8706",
+      "sha256_git_bytes": "8b4fa02e7ff70d6e868b7155e18b46fe6e1454fbfd505b9bfdaf7e625274742d",
+      "bytes": 7428,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/runtime.py",
+      "git_blob": "ed2b0e0a5dcf34e7c3a2baa4aba115a316b8631f",
+      "sha256_git_bytes": "cc868a54e00d7eac65989efe497cab495dc0f8df7c10953449719bfeda5fc71c",
+      "bytes": 2066,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/scheduling.py",
+      "git_blob": "d765f08d2eaa881f467b81953c570bacd15cd33d",
+      "sha256_git_bytes": "06959090f25e0ff50552d4cf8026ade58422d2292e4872c0c383a7c9676c568c",
+      "bytes": 12721,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/service.py",
+      "git_blob": "daffe89c2b0f731099c1fefe1d4cef092647cd25",
+      "sha256_git_bytes": "7b184f9de9c81344f833c621421eeff11b1007e89268c07b2add9c67c1585d95",
+      "bytes": 47358,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/skills.py",
+      "git_blob": "ccf1af330df6edf36ec96baf28cd19a7c0948b11",
+      "sha256_git_bytes": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce",
+      "bytes": 3887,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md",
+      "git_blob": "da2e0abe8172a0ea5ce37a741652bf2b4ae52f66",
+      "sha256_git_bytes": "d4e8abc339115f9ae4ad8c321e0696291c0dafa4c745b7606f648f5ad9f783aa",
+      "bytes": 1806,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md",
+      "git_blob": "6e61742e7dd450830da7636fdfa9b177a3c81619",
+      "sha256_git_bytes": "5856afcf8d7522257a656fb2b6162a3129a145fd91b54225636d72ccf94a6686",
+      "bytes": 1866,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md",
+      "git_blob": "3ff80e46088ddd88388cea76fa030285c0738a52",
+      "sha256_git_bytes": "dd3c90f7376cb99dce5da91c6aa3172af401ae891ac96213858303edbd260d30",
+      "bytes": 1726,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md",
+      "git_blob": "663c138773219a0b4edb7f2c4a3d2da2bab910d4",
+      "sha256_git_bytes": "be532fd22cf9ab5c68638510874537fdbe9c687c2d7157f00b119ea5713ef80b",
+      "bytes": 2576,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md",
+      "git_blob": "f096dfa962537fbfea761783cc29c4eed5923847",
+      "sha256_git_bytes": "e09ffbeaf0a5113f49eb97845c97ba3698525fffbbf149852a7fa3e6c4587fa2",
+      "bytes": 2956,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md",
+      "git_blob": "c6caba79b1ac6ecdb7b1b92a0646105f7b39cb93",
+      "sha256_git_bytes": "abe3ef41181b740c9906e06c44c0785eb297ccd3f7578f4359b937455737e643",
+      "bytes": 3628,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/sources.py",
+      "git_blob": "4096d03dc6386331777a3a6796ec48440195e433",
+      "sha256_git_bytes": "e46232b48ba8dad5ea418732d727ae600c772ce4a10ed53d2803458f28313d0e",
+      "bytes": 20876,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/src/analysis_agent/windows_lifecycle.py",
+      "git_blob": "709c2634c030a89dd5e33c55a921effda5021e74",
+      "sha256_git_bytes": "81484ec2f59a8bf7804e8910529bff6866fd820a0596c7b3eb5581f072f78d32",
+      "bytes": 5305,
+      "responsibility": "Tested advisor/Memory/JD runtime and methods; formal import, namespace and composition retargeting remains under A2/G6"
+    },
+    {
+      "path": "experiments/analysis-agent/uv.lock",
+      "git_blob": "37189db9558e920b73cd9c1465f1e6de0c427c76",
+      "sha256_git_bytes": "5fde00c7a94cedac91f47d5a1873f10fe0ebe718757782979c37a0b9cc1796cb",
+      "bytes": 162440,
+      "responsibility": "Exact accepted dependency/license input; dependency merge and installability remain unproven"
+    },
+    {
+      "path": "experiments/jd-editor/contract/generated/jd-editor-v2.schema.json",
+      "git_blob": "751ddeca7fc39e18e37a2d718a2127b799728422",
+      "sha256_git_bytes": "893fdb43fe2696846e74f15f2b5e12ed97a00f5ff1a5bc667c11ce734d7430fc",
+      "bytes": 121509,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/contract/package.json",
+      "git_blob": "c33517b1ff05e8c265e8bc8a92bb2a1e850cdbc3",
+      "sha256_git_bytes": "59cb6a822475fbb4df201d48d76a7514cdead7cd8b80bee8a8a666c1515c80fd",
+      "bytes": 427,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/contract/pyproject.toml",
+      "git_blob": "071a0efdb0295df89c0729f08d462ed44073cf2b",
+      "sha256_git_bytes": "b681f902d0e77ecac97a9680ad26a85fed47e21066c442cc9e93d3f69221714b",
+      "bytes": 436,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/contract/scripts/check-codegen.mjs",
+      "git_blob": "f8e01c955ad58bcc8340cd523c6464b739413e4a",
+      "sha256_git_bytes": "b2d9c9e58a2e779f33420b8e286c4685f988080169dca8a63bdfa3955452b60d",
+      "bytes": 636,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/contract/scripts/codegen.mjs",
+      "git_blob": "47a68716f608ed9fdc01f660ff8e16c7d2bc792d",
+      "sha256_git_bytes": "1d40e0324dadfa3174f3392ee684963860139f3c1111eb4d81b9e416e88f06d5",
+      "bytes": 3120,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/contract/src/jd_editor_contract/__init__.py",
+      "git_blob": "32d56e22d4a57b95f68485909a740dcdc4cfe6f1",
+      "sha256_git_bytes": "e8fa2912d352111149a6e2e988a532046b21f51b25e4b4d2acb3805a4d115a73",
+      "bytes": 69,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/contract/src/jd_editor_contract/models.py",
+      "git_blob": "41cd174c96f6028449b6309c937800079cdcb3e3",
+      "sha256_git_bytes": "57ba3234718ecd2df3a05b3a6ceea27ac5b0be9d7efc905043afe341b522822b",
+      "bytes": 44868,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/contract/types/jd-editor-v2.ts",
+      "git_blob": "de7cd944c2ce35597322b962924575b10d0c25c2",
+      "sha256_git_bytes": "6376d46cb72b80f4e5e277604269e1dd0153772565191a22f5bbf1033c9ad626",
+      "bytes": 42264,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/contract/uv.lock",
+      "git_blob": "bc9515ffece79b93c49db337a58c0d0f0a639f1e",
+      "sha256_git_bytes": "e3ce831c28fa9a20b3c4df14b7d2b4235368bc2839c303e6b10afda644aa28a2",
+      "bytes": 44518,
+      "responsibility": "SSOT/generation input; map into formal job-analysis contract under A2, never hand-edit generated output"
+    },
+    {
+      "path": "experiments/jd-editor/license-inventory.json",
+      "git_blob": "b719099096a0b773d24ef4dbd4e4a1eb05ce9dba",
+      "sha256_git_bytes": "62a76e1f327ccf88b35907823268ded6481b0760f6c6fcbdf740c3e8f097453e",
+      "bytes": 52468,
+      "responsibility": "Exact accepted dependency/license input; dependency merge and installability remain unproven"
+    },
+    {
+      "path": "experiments/jd-editor/native/package.json",
+      "git_blob": "69ff86a3f88aec08691f691c5d921aa2e72816f3",
+      "sha256_git_bytes": "0e709f6b0bf5be0194a925fe87e2546979d35136dfd1b0ac51388d4ad4cde99c",
+      "bytes": 1015,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/affected.ts",
+      "git_blob": "f45e32e5f930c6878516fac48dfe4eb248ea42f8",
+      "sha256_git_bytes": "86ab156a82297c492847d4320a2ca01d5024ff37db347a11cf4276e33c08cf14",
+      "bytes": 2657,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/bridge.ts",
+      "git_blob": "04716cf972c016787e8e49e69215fd95514bbe51",
+      "sha256_git_bytes": "448a67a20631e34da19960a9ad39c80e72941a9c68bd59886cb88eb3ab9896be",
+      "bytes": 1260,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/command-mapper.ts",
+      "git_blob": "583432deb34d6301bea1f9258bc40cd814366a58",
+      "sha256_git_bytes": "7527689a3972861fcad7d76f622c57fe96e1c7fa861676ef7b841d851074c56e",
+      "bytes": 622,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/copy.ts",
+      "git_blob": "822c0d1dc7d391387992c68621547bc69f2f6731",
+      "sha256_git_bytes": "414680239e35f02bc31d70dafd7d03acaa786ad7adb43e56f5d20c0029793fb6",
+      "bytes": 2249,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/profile.ts",
+      "git_blob": "372c7894a5cf1e79cf85af68144a313184bda5c4",
+      "sha256_git_bytes": "9049251f8affb767d86cc2f5340c7ae223dc2ca2feb44d0dddc144d0da1a00b1",
+      "bytes": 1988,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/react-profile.tsx",
+      "git_blob": "5fea2599d697841ed42d5a57a5ad1f5ad1ac4f18",
+      "sha256_git_bytes": "5acb3df1a1958fa52fe2e2b43bfc9ff64ac6e4f83f7d80cd4f7bee684552aa33",
+      "bytes": 1265,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/read-selection.ts",
+      "git_blob": "18d52174c5d7b8b24951740653a0803509e3bdf8",
+      "sha256_git_bytes": "98bca0b76d70e649d096c6f7094da50a57b466d9bae461ba0d3871d68e5203c8",
+      "bytes": 2862,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/schema.ts",
+      "git_blob": "ff01e13a4a623fdbd8359ea23922ae7de3bb7f6c",
+      "sha256_git_bytes": "e39e40eea632527248d9f4d5b3548ece60daef29d96350c7158ed6f03c545adf",
+      "bytes": 4105,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/transform.ts",
+      "git_blob": "4194ab8996f419e5167359d9f5bcbaa5ac1e4cd1",
+      "sha256_git_bytes": "c7e38dce848e6e187f50693d205aeb3c85b7f86dec3013a94681aaa9e83a83e1",
+      "bytes": 5239,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/native/src/validate.ts",
+      "git_blob": "5a0ea66811b26bd80aa7a5806bd05f2f8f225765",
+      "sha256_git_bytes": "fc88774dc45e208a5b11dd0468d2434bbcc6c9944f7e6c2493139ba78beaf3f7",
+      "bytes": 1431,
+      "responsibility": "Tested native editor adapter; candidate formal packages/jd-editor-native"
+    },
+    {
+      "path": "experiments/jd-editor/package-lock.json",
+      "git_blob": "b18d7c583bb59c0ec113e4c73180307d9e6c3444",
+      "sha256_git_bytes": "33aedab03c000daac196fba7c5ca58bc0d1cf819d8e75d0663c612a4cdb0e378",
+      "bytes": 304506,
+      "responsibility": "Exact accepted dependency/license input; dependency merge and installability remain unproven"
+    },
+    {
+      "path": "experiments/jd-editor/package.json",
+      "git_blob": "823f1664c0a967a6b39f6b666c1c51acb6b517dd",
+      "sha256_git_bytes": "9625507392a7b70f41c57cde16d46f1824b77d37cc1285ffd77a070158f5bdad",
+      "bytes": 316,
+      "responsibility": "Exact accepted dependency/license input; dependency merge and installability remain unproven"
+    },
+    {
+      "path": "experiments/jd-editor/web/package.json",
+      "git_blob": "024e35eb9022092f4231142e5a5e1d27948b929f",
+      "sha256_git_bytes": "e32f9e5f6f484bf7eb0f56b843e93e5ee1e5c27677c280b4070eaef8fadc12bf",
+      "bytes": 1281,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/app/globals.css",
+      "git_blob": "093fe5f89a84bd1a29957ec3afee1af2b0edb536",
+      "sha256_git_bytes": "fd15e2cd9dcfccedc51a3a141809352eb3956259e2e9ed222e38612ad2edb588",
+      "bytes": 6329,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/app/layout.tsx",
+      "git_blob": "729993bd5063df4673574697abc673f32c120f8b",
+      "sha256_git_bytes": "4c9013e42f12f0c39d8311ab66aa5000593ef6600d540158ed5265d9df8e6b3b",
+      "bytes": 332,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/app/page.tsx",
+      "git_blob": "00db83eab3774c08920869e0d89f339b0e162f91",
+      "sha256_git_bytes": "e0dc31818e81dadc5185323a16d9236aaaf03754000d131be3c2599a9073669d",
+      "bytes": 120,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/app/workspace/[document_id]/page.tsx",
+      "git_blob": "eb24ee9be40e9c9e26d48a1ae5a0b72b41d0a4af",
+      "sha256_git_bytes": "7bdd8d2136b7c7e2466f2e247df1083009851b3481751bac1eb89dd72a29841c",
+      "bytes": 265,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/documents/DocumentActions.tsx",
+      "git_blob": "c5bacd1224f18f3812458d47933fa26473976d66",
+      "sha256_git_bytes": "2eea494f167b4cd648a9e542085a567138baa3e80f67bf4660804a33d779e936",
+      "bytes": 771,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/documents/DocumentList.tsx",
+      "git_blob": "d2853f8b533599ae757e336726d6810c0d7fdf16",
+      "sha256_git_bytes": "da3a6fbc384c6bb008561a248e3f5311a6ba30e299dd5dfcdfe7dcce2e50a41f",
+      "bytes": 4394,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/generated/analysis-api.ts",
+      "git_blob": "c5b1fe2244c88bb8a4a27b0adff9e1e2623f8a84",
+      "sha256_git_bytes": "f2e89beb23ec63a4370631ffa99b2e3cc4c7a8292f38d68f237def941800ab3e",
+      "bytes": 6777,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/JdChanges.tsx",
+      "git_blob": "c125b7ee500103052f88466f6ff9808b6e3dd426",
+      "sha256_git_bytes": "a4336c73df9d9176edb0ec6e107b3b52482a2b4533298f25c83bf5d842b6d438",
+      "bytes": 2943,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/JdEditor.tsx",
+      "git_blob": "ff085c37a8e6b8271089f3ae9ead2044b862bc5a",
+      "sha256_git_bytes": "e25022fad010a1410cbb72376906ad4dcbef5f9e50d85dda86cf16a4af564ddf",
+      "bytes": 7407,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/JdLeaf.tsx",
+      "git_blob": "a40b56ff01cf89fdf8e79a315797f3e1eca20886",
+      "sha256_git_bytes": "b9f330d3772c59f37fba86f1d56caa4907babc286ebb45819aac0124ac22879d",
+      "bytes": 1043,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/JdNode.tsx",
+      "git_blob": "b18ff3d2267e6d22bbd95810b07ccd7d295a31e7",
+      "sha256_git_bytes": "192d69964983731ba753ecb09c49ac253516c892ffaa72afaded562a7f58aec3",
+      "bytes": 9668,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+      "git_blob": "9c7cb2d5ea289b8be139808576eccd02689d0a8b",
+      "sha256_git_bytes": "5993cc638f288c619cb8f48fa602d2bee577571de58054d6329676cd5af73ed3",
+      "bytes": 14448,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/api.ts",
+      "git_blob": "ef73b831fb17bcb15736eb97d0c13f2f07d52014",
+      "sha256_git_bytes": "4113aa6179952899fe0681c783bd2cbd587eaaec4fb5c18e3af97e06e9cd6e21",
+      "bytes": 5255,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/navigationGuard.ts",
+      "git_blob": "fc0ba3097f1bb052fc5827663df1e1311aaacd4a",
+      "sha256_git_bytes": "9373a29145537b549327a3c6ca9f3feed18339df40f8b9bdc432bbc213d17d2e",
+      "bytes": 417,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/requestRecoveryCache.ts",
+      "git_blob": "5f0c7c0be92f35c777db917876596efb481f66d5",
+      "sha256_git_bytes": "f61fde919e44331a89ed76e59e308128e328c0aca857f6e6e1b3c78bddd74726",
+      "bytes": 1940,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/submissionCache.ts",
+      "git_blob": "f4d3dd4934675cd1ac746b64a6f5cead76d54c31",
+      "sha256_git_bytes": "6d846f7ecf1d93b8c9febeb3fd6a67fca501b2dc0c838f8cca0cba4a8a96ca93",
+      "bytes": 1261,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    },
+    {
+      "path": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+      "git_blob": "b8c96450cc9c0961c6e7cb15f69718ffd1d0c86b",
+      "sha256_git_bytes": "fee5200dca1b6367d63e78eb4a863cb93261e28a030766c7dc369fc523a88e0f",
+      "bytes": 18076,
+      "responsibility": "Tested employee UI; integrate through the formal Web composition under G6, not copy isolated endpoints blindly"
+    }
+  ],
+  "python": {
+    "production": {
+      "requires_python": ">=3.13",
+      "declared": [
+        "fastapi==0.141.1",
+        "uvicorn[standard]==0.30.6",
+        "sqlalchemy[asyncio]==2.0.51",
+        "asyncpg==0.31.0",
+        "alembic==1.18.5",
+        "psycopg[binary]==3.3.4",
+        "openpyxl==3.1.5",
+        "pydantic==2.13.4",
+        "pydantic-settings==2.14.1",
+        "httpx==0.28.1",
+        "opentelemetry-sdk==1.42.1",
+        "opentelemetry-exporter-otlp-proto-http==1.42.1",
+        "langchain==1.3.15",
+        "langgraph==1.2.11",
+        "langgraph-checkpoint-postgres==3.1.2",
+        "langchain-openrouter==0.2.7",
+        "deepagents==0.7.5",
+        "job-analysis-contract"
+      ],
+      "groups": {
+        "dev": [
+          "pytest==8.3.3",
+          "pytest-asyncio==0.24.0",
+          "respx==0.21.1"
+        ]
+      },
+      "resolved": {
+        "alembic": "1.18.5",
+        "annotated-doc": "0.0.5",
+        "annotated-types": "0.7.0",
+        "anthropic": "0.122.0",
+        "anyio": "4.14.1",
+        "asyncpg": "0.31.0",
+        "bracex": "3.0.1",
+        "caliburn-api": "0.1.0",
+        "certifi": "2026.6.17",
+        "cffi": "2.1.1",
+        "charset-normalizer": "3.4.7",
+        "click": "8.4.2",
+        "colorama": "0.4.6",
+        "cryptography": "50.0.0",
+        "deepagents": "0.7.5",
+        "distro": "1.9.0",
+        "docstring-parser": "0.18.0",
+        "et-xmlfile": "2.0.0",
+        "fastapi": "0.141.1",
+        "filetype": "1.2.0",
+        "google-auth": "2.56.3",
+        "google-genai": "2.18.0",
+        "googleapis-common-protos": "1.75.0",
+        "greenlet": "3.5.3",
+        "h11": "0.16.0",
+        "httpcore": "1.0.9",
+        "httptools": "0.8.0",
+        "httpx": "0.28.1",
+        "idna": "3.18",
+        "iniconfig": "2.3.0",
+        "jiter": "0.15.0",
+        "job-analysis-contract": "0.1.0",
+        "jsonpatch": "1.33",
+        "jsonpath-python": "1.1.6",
+        "jsonpointer": "3.1.1",
+        "langchain": "1.3.15",
+        "langchain-anthropic": "1.5.6",
+        "langchain-core": "1.5.4",
+        "langchain-google-genai": "4.3.3",
+        "langchain-openrouter": "0.2.7",
+        "langchain-protocol": "0.0.18",
+        "langgraph": "1.2.11",
+        "langgraph-checkpoint": "4.1.1",
+        "langgraph-checkpoint-postgres": "3.1.2",
+        "langgraph-prebuilt": "1.1.0",
+        "langgraph-sdk": "0.4.2",
+        "langsmith": "0.10.18",
+        "mako": "1.3.12",
+        "markupsafe": "3.0.3",
+        "openpyxl": "3.1.5",
+        "openrouter": "0.10.8",
+        "opentelemetry-api": "1.42.1",
+        "opentelemetry-exporter-otlp-proto-common": "1.42.1",
+        "opentelemetry-exporter-otlp-proto-http": "1.42.1",
+        "opentelemetry-proto": "1.42.1",
+        "opentelemetry-sdk": "1.42.1",
+        "opentelemetry-semantic-conventions": "0.63b1",
+        "orjson": "3.11.9",
+        "ormsgpack": "1.12.2",
+        "packaging": "26.2",
+        "pluggy": "1.6.0",
+        "protobuf": "6.33.6",
+        "psycopg": "3.3.4",
+        "psycopg-binary": "3.3.4",
+        "psycopg-pool": "3.3.1",
+        "pyasn1": "0.6.4",
+        "pyasn1-modules": "0.4.2",
+        "pycparser": "3.0",
+        "pydantic": "2.13.4",
+        "pydantic-core": "2.46.4",
+        "pydantic-settings": "2.14.1",
+        "pytest": "8.3.3",
+        "pytest-asyncio": "0.24.0",
+        "python-dotenv": "1.2.2",
+        "pyyaml": "6.0.3",
+        "requests": "2.34.2",
+        "requests-toolbelt": "1.0.0",
+        "respx": "0.21.1",
+        "sniffio": "1.3.1",
+        "sqlalchemy": "2.0.51",
+        "starlette": "1.6.0",
+        "tenacity": "9.1.4",
+        "typing-extensions": "4.15.0",
+        "typing-inspection": "0.4.2",
+        "tzdata": "2026.2",
+        "urllib3": "2.7.0",
+        "uuid-utils": "0.16.2",
+        "uvicorn": "0.30.6",
+        "uvloop": "0.22.1",
+        "watchfiles": "1.2.0",
+        "wcmatch": "11.0",
+        "websockets": "15.0.1",
+        "xxhash": "3.8.0",
+        "zstandard": "0.25.0"
+      }
+    },
+    "accepted_core": {
+      "requires_python": ">=3.12,<3.13",
+      "declared": [
+        "caliburn-jd-editor-contract==0.0.1",
+        "jsonschema==4.26.0",
+        "langchain==1.4.0",
+        "langchain-openai==1.6.0",
+        "langgraph==1.2.11",
+        "langgraph-checkpoint==4.2.0",
+        "openai==3.8.0",
+        "openai-agents==0.22.0",
+        "httpx==0.28.1",
+        "langgraph-checkpoint-postgres==3.1.2",
+        "deepagents==0.7.13",
+        "sqlalchemy==2.0.52",
+        "psycopg[binary]>=3.2,<4",
+        "fastapi==0.141.1",
+        "uvicorn==0.52.4",
+        "apscheduler==3.11.3",
+        "markdown-it-py[linkify]==4.2.0",
+        "pywin32==312 ; sys_platform == 'win32'"
+      ],
+      "groups": {
+        "dev": [
+          "pytest==9.1.1"
+        ]
+      },
+      "resolved": {
+        "annotated-doc": "0.0.5",
+        "annotated-types": "0.8.0",
+        "anthropic": "1.4.0",
+        "anyio": "4.15.1",
+        "apscheduler": "3.11.3",
+        "attrs": "26.1.0",
+        "bracex": "3.0.1",
+        "caliburn-analysis-agent": "0.0.1",
+        "caliburn-jd-editor-contract": "0.0.1",
+        "certifi": "2026.7.22",
+        "cffi": "2.1.1",
+        "charset-normalizer": "3.5.1",
+        "click": "8.5.0",
+        "colorama": "0.4.6",
+        "cryptography": "50.0.1",
+        "deepagents": "0.7.13",
+        "distro": "1.9.0",
+        "docstring-parser": "0.18.0",
+        "fastapi": "0.141.1",
+        "filetype": "1.2.0",
+        "google-auth": "2.57.1",
+        "google-genai": "2.22.0",
+        "greenlet": "3.5.5",
+        "griffelib": "2.3.0",
+        "h11": "0.16.0",
+        "httpcore": "1.0.9",
+        "httpcore2": "2.12.0",
+        "httpx": "0.28.1",
+        "httpx2": "2.12.0",
+        "httpx2-jsfetch": "1.0",
+        "idna": "3.19",
+        "iniconfig": "2.3.0",
+        "jiter": "0.16.0",
+        "jsonpatch": "1.33",
+        "jsonpointer": "3.1.1",
+        "jsonschema": "4.26.0",
+        "jsonschema-specifications": "2025.9.1",
+        "langchain": "1.4.0",
+        "langchain-anthropic": "1.7.1",
+        "langchain-core": "1.6.2",
+        "langchain-google-genai": "4.4.0",
+        "langchain-openai": "1.6.0",
+        "langchain-protocol": "0.0.19",
+        "langgraph": "1.2.11",
+        "langgraph-checkpoint": "4.2.0",
+        "langgraph-checkpoint-postgres": "3.1.2",
+        "langgraph-prebuilt": "1.1.0",
+        "langgraph-sdk": "0.4.4",
+        "langsmith": "0.12.2",
+        "linkify-it-py": "2.2.0",
+        "markdown-it-py": "4.2.0",
+        "mcp": "2.1.1",
+        "mcp-types": "2.1.1",
+        "mdurl": "0.1.2",
+        "openai": "3.8.0",
+        "openai-agents": "0.22.0",
+        "opentelemetry-api": "1.44.0",
+        "orjson": "3.12.0",
+        "ormsgpack": "1.12.2",
+        "packaging": "26.3",
+        "pluggy": "1.6.0",
+        "psycopg": "3.3.5",
+        "psycopg-binary": "3.3.5",
+        "psycopg-pool": "3.3.1",
+        "pyasn1": "0.6.4",
+        "pyasn1-modules": "0.4.2",
+        "pycparser": "3.0",
+        "pydantic": "2.13.5",
+        "pydantic-core": "2.46.5",
+        "pygments": "2.21.0",
+        "pyjwt": "2.13.0",
+        "pytest": "9.1.1",
+        "python-multipart": "0.0.32",
+        "pywin32": "312",
+        "pyyaml": "6.0.3",
+        "referencing": "0.37.0",
+        "regex": "2026.9.3",
+        "requests": "2.34.2",
+        "requests-toolbelt": "1.0.0",
+        "rpds-py": "2026.6.3",
+        "sniffio": "1.3.1",
+        "sqlalchemy": "2.0.52",
+        "sse-starlette": "3.4.11",
+        "starlette": "1.6.0",
+        "tenacity": "9.1.4",
+        "tiktoken": "0.14.0",
+        "truststore": "0.10.4",
+        "typing-extensions": "4.16.0",
+        "typing-inspection": "0.4.4",
+        "tzdata": "2026.3",
+        "tzlocal": "5.4.4",
+        "urllib3": "2.7.0",
+        "uuid-utils": "0.17.0",
+        "uvicorn": "0.52.4",
+        "wcmatch": "11.0.1",
+        "websockets": "16.1.1",
+        "xxhash": "4.0.1",
+        "zstandard": "0.25.0"
+      }
+    },
+    "resolved_differences": [
+      {
+        "name": "alembic",
+        "production": "1.18.5",
+        "accepted_core": null
+      },
+      {
+        "name": "annotated-types",
+        "production": "0.7.0",
+        "accepted_core": "0.8.0"
+      },
+      {
+        "name": "anthropic",
+        "production": "0.122.0",
+        "accepted_core": "1.4.0"
+      },
+      {
+        "name": "anyio",
+        "production": "4.14.1",
+        "accepted_core": "4.15.1"
+      },
+      {
+        "name": "apscheduler",
+        "production": null,
+        "accepted_core": "3.11.3"
+      },
+      {
+        "name": "asyncpg",
+        "production": "0.31.0",
+        "accepted_core": null
+      },
+      {
+        "name": "attrs",
+        "production": null,
+        "accepted_core": "26.1.0"
+      },
+      {
+        "name": "caliburn-analysis-agent",
+        "production": null,
+        "accepted_core": "0.0.1"
+      },
+      {
+        "name": "caliburn-api",
+        "production": "0.1.0",
+        "accepted_core": null
+      },
+      {
+        "name": "caliburn-jd-editor-contract",
+        "production": null,
+        "accepted_core": "0.0.1"
+      },
+      {
+        "name": "certifi",
+        "production": "2026.6.17",
+        "accepted_core": "2026.7.22"
+      },
+      {
+        "name": "charset-normalizer",
+        "production": "3.4.7",
+        "accepted_core": "3.5.1"
+      },
+      {
+        "name": "click",
+        "production": "8.4.2",
+        "accepted_core": "8.5.0"
+      },
+      {
+        "name": "cryptography",
+        "production": "50.0.0",
+        "accepted_core": "50.0.1"
+      },
+      {
+        "name": "deepagents",
+        "production": "0.7.5",
+        "accepted_core": "0.7.13"
+      },
+      {
+        "name": "et-xmlfile",
+        "production": "2.0.0",
+        "accepted_core": null
+      },
+      {
+        "name": "google-auth",
+        "production": "2.56.3",
+        "accepted_core": "2.57.1"
+      },
+      {
+        "name": "google-genai",
+        "production": "2.18.0",
+        "accepted_core": "2.22.0"
+      },
+      {
+        "name": "googleapis-common-protos",
+        "production": "1.75.0",
+        "accepted_core": null
+      },
+      {
+        "name": "greenlet",
+        "production": "3.5.3",
+        "accepted_core": "3.5.5"
+      },
+      {
+        "name": "griffelib",
+        "production": null,
+        "accepted_core": "2.3.0"
+      },
+      {
+        "name": "httpcore2",
+        "production": null,
+        "accepted_core": "2.12.0"
+      },
+      {
+        "name": "httptools",
+        "production": "0.8.0",
+        "accepted_core": null
+      },
+      {
+        "name": "httpx2",
+        "production": null,
+        "accepted_core": "2.12.0"
+      },
+      {
+        "name": "httpx2-jsfetch",
+        "production": null,
+        "accepted_core": "1.0"
+      },
+      {
+        "name": "idna",
+        "production": "3.18",
+        "accepted_core": "3.19"
+      },
+      {
+        "name": "jiter",
+        "production": "0.15.0",
+        "accepted_core": "0.16.0"
+      },
+      {
+        "name": "job-analysis-contract",
+        "production": "0.1.0",
+        "accepted_core": null
+      },
+      {
+        "name": "jsonpath-python",
+        "production": "1.1.6",
+        "accepted_core": null
+      },
+      {
+        "name": "jsonschema",
+        "production": null,
+        "accepted_core": "4.26.0"
+      },
+      {
+        "name": "jsonschema-specifications",
+        "production": null,
+        "accepted_core": "2025.9.1"
+      },
+      {
+        "name": "langchain",
+        "production": "1.3.15",
+        "accepted_core": "1.4.0"
+      },
+      {
+        "name": "langchain-anthropic",
+        "production": "1.5.6",
+        "accepted_core": "1.7.1"
+      },
+      {
+        "name": "langchain-core",
+        "production": "1.5.4",
+        "accepted_core": "1.6.2"
+      },
+      {
+        "name": "langchain-google-genai",
+        "production": "4.3.3",
+        "accepted_core": "4.4.0"
+      },
+      {
+        "name": "langchain-openai",
+        "production": null,
+        "accepted_core": "1.6.0"
+      },
+      {
+        "name": "langchain-openrouter",
+        "production": "0.2.7",
+        "accepted_core": null
+      },
+      {
+        "name": "langchain-protocol",
+        "production": "0.0.18",
+        "accepted_core": "0.0.19"
+      },
+      {
+        "name": "langgraph-checkpoint",
+        "production": "4.1.1",
+        "accepted_core": "4.2.0"
+      },
+      {
+        "name": "langgraph-sdk",
+        "production": "0.4.2",
+        "accepted_core": "0.4.4"
+      },
+      {
+        "name": "langsmith",
+        "production": "0.10.18",
+        "accepted_core": "0.12.2"
+      },
+      {
+        "name": "linkify-it-py",
+        "production": null,
+        "accepted_core": "2.2.0"
+      },
+      {
+        "name": "mako",
+        "production": "1.3.12",
+        "accepted_core": null
+      },
+      {
+        "name": "markdown-it-py",
+        "production": null,
+        "accepted_core": "4.2.0"
+      },
+      {
+        "name": "markupsafe",
+        "production": "3.0.3",
+        "accepted_core": null
+      },
+      {
+        "name": "mcp",
+        "production": null,
+        "accepted_core": "2.1.1"
+      },
+      {
+        "name": "mcp-types",
+        "production": null,
+        "accepted_core": "2.1.1"
+      },
+      {
+        "name": "mdurl",
+        "production": null,
+        "accepted_core": "0.1.2"
+      },
+      {
+        "name": "openai",
+        "production": null,
+        "accepted_core": "3.8.0"
+      },
+      {
+        "name": "openai-agents",
+        "production": null,
+        "accepted_core": "0.22.0"
+      },
+      {
+        "name": "openpyxl",
+        "production": "3.1.5",
+        "accepted_core": null
+      },
+      {
+        "name": "openrouter",
+        "production": "0.10.8",
+        "accepted_core": null
+      },
+      {
+        "name": "opentelemetry-api",
+        "production": "1.42.1",
+        "accepted_core": "1.44.0"
+      },
+      {
+        "name": "opentelemetry-exporter-otlp-proto-common",
+        "production": "1.42.1",
+        "accepted_core": null
+      },
+      {
+        "name": "opentelemetry-exporter-otlp-proto-http",
+        "production": "1.42.1",
+        "accepted_core": null
+      },
+      {
+        "name": "opentelemetry-proto",
+        "production": "1.42.1",
+        "accepted_core": null
+      },
+      {
+        "name": "opentelemetry-sdk",
+        "production": "1.42.1",
+        "accepted_core": null
+      },
+      {
+        "name": "opentelemetry-semantic-conventions",
+        "production": "0.63b1",
+        "accepted_core": null
+      },
+      {
+        "name": "orjson",
+        "production": "3.11.9",
+        "accepted_core": "3.12.0"
+      },
+      {
+        "name": "packaging",
+        "production": "26.2",
+        "accepted_core": "26.3"
+      },
+      {
+        "name": "protobuf",
+        "production": "6.33.6",
+        "accepted_core": null
+      },
+      {
+        "name": "psycopg",
+        "production": "3.3.4",
+        "accepted_core": "3.3.5"
+      },
+      {
+        "name": "psycopg-binary",
+        "production": "3.3.4",
+        "accepted_core": "3.3.5"
+      },
+      {
+        "name": "pydantic",
+        "production": "2.13.4",
+        "accepted_core": "2.13.5"
+      },
+      {
+        "name": "pydantic-core",
+        "production": "2.46.4",
+        "accepted_core": "2.46.5"
+      },
+      {
+        "name": "pydantic-settings",
+        "production": "2.14.1",
+        "accepted_core": null
+      },
+      {
+        "name": "pygments",
+        "production": null,
+        "accepted_core": "2.21.0"
+      },
+      {
+        "name": "pyjwt",
+        "production": null,
+        "accepted_core": "2.13.0"
+      },
+      {
+        "name": "pytest",
+        "production": "8.3.3",
+        "accepted_core": "9.1.1"
+      },
+      {
+        "name": "pytest-asyncio",
+        "production": "0.24.0",
+        "accepted_core": null
+      },
+      {
+        "name": "python-dotenv",
+        "production": "1.2.2",
+        "accepted_core": null
+      },
+      {
+        "name": "python-multipart",
+        "production": null,
+        "accepted_core": "0.0.32"
+      },
+      {
+        "name": "pywin32",
+        "production": null,
+        "accepted_core": "312"
+      },
+      {
+        "name": "referencing",
+        "production": null,
+        "accepted_core": "0.37.0"
+      },
+      {
+        "name": "regex",
+        "production": null,
+        "accepted_core": "2026.9.3"
+      },
+      {
+        "name": "respx",
+        "production": "0.21.1",
+        "accepted_core": null
+      },
+      {
+        "name": "rpds-py",
+        "production": null,
+        "accepted_core": "2026.6.3"
+      },
+      {
+        "name": "sqlalchemy",
+        "production": "2.0.51",
+        "accepted_core": "2.0.52"
+      },
+      {
+        "name": "sse-starlette",
+        "production": null,
+        "accepted_core": "3.4.11"
+      },
+      {
+        "name": "tiktoken",
+        "production": null,
+        "accepted_core": "0.14.0"
+      },
+      {
+        "name": "truststore",
+        "production": null,
+        "accepted_core": "0.10.4"
+      },
+      {
+        "name": "typing-extensions",
+        "production": "4.15.0",
+        "accepted_core": "4.16.0"
+      },
+      {
+        "name": "typing-inspection",
+        "production": "0.4.2",
+        "accepted_core": "0.4.4"
+      },
+      {
+        "name": "tzdata",
+        "production": "2026.2",
+        "accepted_core": "2026.3"
+      },
+      {
+        "name": "tzlocal",
+        "production": null,
+        "accepted_core": "5.4.4"
+      },
+      {
+        "name": "uuid-utils",
+        "production": "0.16.2",
+        "accepted_core": "0.17.0"
+      },
+      {
+        "name": "uvicorn",
+        "production": "0.30.6",
+        "accepted_core": "0.52.4"
+      },
+      {
+        "name": "uvloop",
+        "production": "0.22.1",
+        "accepted_core": null
+      },
+      {
+        "name": "watchfiles",
+        "production": "1.2.0",
+        "accepted_core": null
+      },
+      {
+        "name": "wcmatch",
+        "production": "11.0",
+        "accepted_core": "11.0.1"
+      },
+      {
+        "name": "websockets",
+        "production": "15.0.1",
+        "accepted_core": "16.1.1"
+      },
+      {
+        "name": "xxhash",
+        "production": "3.8.0",
+        "accepted_core": "4.0.1"
+      }
+    ]
+  },
+  "web_declaration_differences": {
+    "dependencies": [
+      {
+        "name": "@base-ui/react",
+        "production": "^1.4.1",
+        "accepted_core": null
+      },
+      {
+        "name": "@caliburn/jd-editor-contract",
+        "production": null,
+        "accepted_core": "0.0.1"
+      },
+      {
+        "name": "@caliburn/jd-editor-native",
+        "production": null,
+        "accepted_core": "0.0.1"
+      },
+      {
+        "name": "@caliburn/job-analysis-contract",
+        "production": "*",
+        "accepted_core": null
+      },
+      {
+        "name": "@platejs/basic-nodes",
+        "production": null,
+        "accepted_core": "53.0.0"
+      },
+      {
+        "name": "@platejs/diff",
+        "production": null,
+        "accepted_core": "53.0.0"
+      },
+      {
+        "name": "@platejs/list-classic",
+        "production": null,
+        "accepted_core": "53.0.0"
+      },
+      {
+        "name": "@platejs/table",
+        "production": null,
+        "accepted_core": "53.0.9"
+      },
+      {
+        "name": "@radix-ui/react-checkbox",
+        "production": "^1.3.5",
+        "accepted_core": null
+      },
+      {
+        "name": "@radix-ui/react-popover",
+        "production": "^1.1.17",
+        "accepted_core": null
+      },
+      {
+        "name": "@tanstack/react-query",
+        "production": "^5.100.10",
+        "accepted_core": null
+      },
+      {
+        "name": "class-variance-authority",
+        "production": "^0.7.1",
+        "accepted_core": null
+      },
+      {
+        "name": "clsx",
+        "production": "^2.1.1",
+        "accepted_core": null
+      },
+      {
+        "name": "cmdk",
+        "production": "^1.1.1",
+        "accepted_core": null
+      },
+      {
+        "name": "fast-deep-equal",
+        "production": null,
+        "accepted_core": "3.1.3"
+      },
+      {
+        "name": "lucide-react",
+        "production": "^1.16.0",
+        "accepted_core": null
+      },
+      {
+        "name": "next",
+        "production": "16.2.6",
+        "accepted_core": "16.3.3"
+      },
+      {
+        "name": "platejs",
+        "production": null,
+        "accepted_core": "53.3.11"
+      },
+      {
+        "name": "shadcn",
+        "production": "^4.7.0",
+        "accepted_core": null
+      },
+      {
+        "name": "tailwind-merge",
+        "production": "^3.6.0",
+        "accepted_core": null
+      },
+      {
+        "name": "tw-animate-css",
+        "production": "^1.4.0",
+        "accepted_core": null
+      }
+    ],
+    "devDependencies": [
+      {
+        "name": "@playwright/test",
+        "production": null,
+        "accepted_core": "1.61.0"
+      },
+      {
+        "name": "@tailwindcss/postcss",
+        "production": "^4",
+        "accepted_core": null
+      },
+      {
+        "name": "@testing-library/react",
+        "production": "^16.3.2",
+        "accepted_core": "16.3.2"
+      },
+      {
+        "name": "@testing-library/user-event",
+        "production": "^14.6.4",
+        "accepted_core": "14.6.4"
+      },
+      {
+        "name": "@types/node",
+        "production": "^20",
+        "accepted_core": "20.19.43"
+      },
+      {
+        "name": "@types/react",
+        "production": "^19",
+        "accepted_core": "19.2.17"
+      },
+      {
+        "name": "@types/react-dom",
+        "production": "^19",
+        "accepted_core": "19.2.3"
+      },
+      {
+        "name": "@vitest/mocker",
+        "production": null,
+        "accepted_core": "4.1.11"
+      },
+      {
+        "name": "eslint",
+        "production": "^9",
+        "accepted_core": "9.39.4"
+      },
+      {
+        "name": "eslint-config-next",
+        "production": "16.2.6",
+        "accepted_core": "16.3.3"
+      },
+      {
+        "name": "jsdom",
+        "production": "^28.1.0",
+        "accepted_core": "28.1.0"
+      },
+      {
+        "name": "tailwindcss",
+        "production": "^4",
+        "accepted_core": null
+      },
+      {
+        "name": "typescript",
+        "production": "^5",
+        "accepted_core": "5.9.3"
+      },
+      {
+        "name": "vite",
+        "production": null,
+        "accepted_core": "8.1.3"
+      },
+      {
+        "name": "vitest",
+        "production": "^4.1.9",
+        "accepted_core": "4.1.11"
+      }
+    ],
+    "engines": []
+  },
+  "not_done": [
+    "merged dependency resolution/installability",
+    "final per-file formal HTTP/composition mapping",
+    "P3 actual trial endpoint/configuration and budget guard",
+    "P3 paid natural evaluation",
+    "successor ADR/G6 production adoption"
+  ],
+  "product_provider_calls": 0,
+  "code_copied_to_production": false,
+  "dependencies_installed": false
+}

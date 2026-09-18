@@ -1,0 +1,46 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('region', { name: '確切改動' }).getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。', { exact: true })
+Expected: visible
+Error: strict mode violation: getByRole('region', { name: '確切改動' }).getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。', { exact: true }) resolved to 2 elements:
+    1) <span>依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。</span> aka getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。').first()
+    2) <span>依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。</span> aka getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。').nth(1)
+
+Call log:
+  - Expect "to.be.visible" with timeout 5000ms
+  - waiting for getByRole('region', { name: '確切改動' }).getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。', { exact: true })
+
+    at captureRawStack (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright-core\lib\coreBundle.js:3172:17)
+    at callMatcherAsStep (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright\lib\matchers\expect.js:12875:57)
+    at Object.toBeVisible (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright\lib\matchers\expect.js:12865:23)
+    at S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web\browser\task6-journey.mjs:83:80 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('region', { name: '確切改動' }).getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。', { exact: true })\n" +
+      'Expected: visible\n' +
+      "Error: strict mode violation: getByRole('region', { name: '確切改動' }).getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。', { exact: true }) resolved to 2 elements:\n" +
+      "    1) <span>依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。</span> aka getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。').first()\n" +
+      "    2) <span>依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。</span> aka getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。').nth(1)\n" +
+      '\n' +
+      'Call log:\n' +
+      '  - Expect "to.be.visible" with timeout 5000ms\n' +
+      "  - waiting for getByRole('region', { name: '確切改動' }).getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。', { exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      '  - Expect "to.be.visible" with timeout 5000ms',
+      "  - waiting for getByRole('region', { name: '確切改動' }).getByText('依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。', { exact: true })"
+    ],
+    timeout: undefined,
+    ariaSnapshot: undefined
+  }
+}
+
+Node.js v22.23.2

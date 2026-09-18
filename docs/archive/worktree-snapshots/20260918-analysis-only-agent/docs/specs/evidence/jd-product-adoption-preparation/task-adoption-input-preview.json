@@ -1,0 +1,657 @@
+{
+  "status": "PREPARATION ONLY; NOT A1 FINAL MANIFEST OR ADOPTION AUTHORITY",
+  "source_baseline": "8eec072d51e97735b22c5f0df598b67101fe570b",
+  "production_reference": "8979494dfe73634708e35a6c4b369e6af0fd8719",
+  "paid_calls": 0,
+  "code_copied": false,
+  "dependency_resolution_performed": false,
+  "final_dependencies": [
+    "Task5 lifecycle and Windows dependency acceptance",
+    "Task6 Skill and fixed E2E acceptance",
+    "Whole-core review and authorized P3 evidence",
+    "A1 exact final hash manifest and A2/G6"
+  ],
+  "files": [
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/__init__.py",
+      "bytes": 56,
+      "sha256_git_bytes": "eb0d84bcf786feed4e0652f5cbaea9d25fc9d3477ef08b39488bc86685931a70",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/api.py",
+      "bytes": 16551,
+      "sha256_git_bytes": "a0b24df570f14a0c9f6f4130c942b5bb4875cc003a88348efedaea83b58453b6",
+      "responsibility": "API composition/HTTP adapter: integrate into the sole formal composition; not blind copy of isolated bootstrap"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/budget.py",
+      "bytes": 5822,
+      "sha256_git_bytes": "c4c9c007220deff2b9d8a410820e123e79dc371cd6603361c87b99f9e497d5ef",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/catalog.py",
+      "bytes": 7164,
+      "sha256_git_bytes": "120c04a4b19c9775ab56f4377b1e13b506f6585e0a1fb1c86b6424f61587e5e2",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/consolidation.py",
+      "bytes": 19554,
+      "sha256_git_bytes": "1ec015eaaf5ea85f6b6d50901d5b002b6115b5aa9ad1dad15892c2c1bf7c8f4e",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/consolidation_feedback.py",
+      "bytes": 2187,
+      "sha256_git_bytes": "60f573a67ffeab0aaf504ecef2465342a615d9d26a5d6f4df8217f85ea55600f",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/consolidation_request.py",
+      "bytes": 2354,
+      "sha256_git_bytes": "6965d106a270209e61ef0982bf18be8096e4b72b234091d45c303ccd075414d2",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/consolidation_tools.py",
+      "bytes": 6497,
+      "sha256_git_bytes": "d81efec80bc8e8b32b665f82d97bd0d632948e29daa56e2a38f5bc8b9d1ab6d0",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/context.py",
+      "bytes": 2030,
+      "sha256_git_bytes": "e2feaa7415171038ac442e4e94ee68f7b23ea354237762181b29ec20dfe7cfc5",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/conversation.py",
+      "bytes": 16196,
+      "sha256_git_bytes": "1e9448c49620392cc0024151189fd707170e51c61704eead5bd677bdd1578ad8",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/extraction.py",
+      "bytes": 17068,
+      "sha256_git_bytes": "06dd3e8c4d9c76afb461d63ad02c4e733a8509416a98a55211e479b9359eb6ce",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_context.py",
+      "bytes": 6648,
+      "sha256_git_bytes": "5485f24c8e88e271369f6e4b9feeb29cc9a4515e7a2ddbff665199beef2b897b",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_contract.py",
+      "bytes": 7087,
+      "sha256_git_bytes": "e5a24154bdbaebec6a8488712eb849bb336f3caaf6b2672f81bcced6fc4e7c49",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_engine.py",
+      "bytes": 6268,
+      "sha256_git_bytes": "8dd4e013247551ccef7ef6b848860572a086f9976368f816936d964f460926d5",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_references.py",
+      "bytes": 3352,
+      "sha256_git_bytes": "a96c4df811165656840bd09d3e55bec038c491e504b83eeebf1ad3e9fedd6108",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+      "bytes": 11537,
+      "sha256_git_bytes": "f686f7f25103725f6264738b94a181937c5af24071fd1e8cba14443954f58aaa",
+      "responsibility": "API composition/HTTP adapter: integrate into the sole formal composition; not blind copy of isolated bootstrap"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_service.py",
+      "bytes": 5844,
+      "sha256_git_bytes": "0c30ea26e7ca1926919e5c56b0e84e2d67057da4e628b4ca671c3c0d63c02586",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_store.py",
+      "bytes": 19393,
+      "sha256_git_bytes": "5f1641d51fccf5378100b7d1dd63be1ecbc5b44583fa0b35c7931393a65e3628",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+      "bytes": 25095,
+      "sha256_git_bytes": "d6de46ec066fb5abc01e1da26dc623aab0d6bcd5af1a0d8700e9e29ac9801f33",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/jd_types.py",
+      "bytes": 2385,
+      "sha256_git_bytes": "a0a03b857f783902ed8008de37000fd34859f7473a7b14cb6ac345ebae543702",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/live_memory.py",
+      "bytes": 13433,
+      "sha256_git_bytes": "30c2901760d6d2e0a7173adc7368499d25b9679b9a17bf7344cb20b8e74ac5f2",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/memory.py",
+      "bytes": 12361,
+      "sha256_git_bytes": "3f383a6ec433490edcef616ec138594d850de0c201c7c6da630253cca117a7d5",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/memory_patch.py",
+      "bytes": 3854,
+      "sha256_git_bytes": "b26e5be41214c79664a42e1995bf670406b6c4c8e4af9feefa455be2b534b6fd",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/memory_tools.py",
+      "bytes": 11521,
+      "sha256_git_bytes": "facdbfc5e3dc5035326e0af46be58479c720c54f0398ea6453312001dc429e11",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/provider.py",
+      "bytes": 2303,
+      "sha256_git_bytes": "b65aebb3d2b696bd31f2b248e9a5a3cdadce99ec9c8a613bfa943e4956408a91",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/publication.py",
+      "bytes": 10029,
+      "sha256_git_bytes": "3de2ef91c0ab865d9fed3241b94863db88f6dd516b809fa26c8edeebac6fcdf6",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/references.py",
+      "bytes": 2382,
+      "sha256_git_bytes": "0ddaa542f92c8bf0eec5f301a1faba78c56a7a5a0727fc0371b45204e176ae9f",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/repair.py",
+      "bytes": 7428,
+      "sha256_git_bytes": "8b4fa02e7ff70d6e868b7155e18b46fe6e1454fbfd505b9bfdaf7e625274742d",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/runtime.py",
+      "bytes": 2066,
+      "sha256_git_bytes": "cc868a54e00d7eac65989efe497cab495dc0f8df7c10953449719bfeda5fc71c",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/scheduling.py",
+      "bytes": 12721,
+      "sha256_git_bytes": "06959090f25e0ff50552d4cf8026ade58422d2292e4872c0c383a7c9676c568c",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/service.py",
+      "bytes": 26921,
+      "sha256_git_bytes": "54a9b7afac395da756496a8b659e7e182fb4c297f1c952755c5e73699a055d91",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/skills.py",
+      "bytes": 3883,
+      "sha256_git_bytes": "e5c7f750b8e48cc469c1aa57972baff9542e26c7efa4ba5e9b4db463708ccdea",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md",
+      "bytes": 1710,
+      "sha256_git_bytes": "412d4902af823eedb55c0b4d4f0a5ece156e343b2832f5f1cdc75c14538932db",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md",
+      "bytes": 1757,
+      "sha256_git_bytes": "7aa2b016dcde37dffadc78711a42a70c43239aff5ba76142fa90f793640985df",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md",
+      "bytes": 1626,
+      "sha256_git_bytes": "20e490d1b0d4b5a872f1c438c08a74b4d8da4eb12dd3b9b8df978f2a6edfd01b",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/analysis-agent/src/analysis_agent/sources.py",
+      "bytes": 20876,
+      "sha256_git_bytes": "e46232b48ba8dad5ea418732d727ae600c772ce4a10ed53d2803458f28313d0e",
+      "responsibility": "Tested runtime/Skill candidate; import/namespace retargeting later under G6"
+    },
+    {
+      "source": "experiments/jd-editor/contract/README.md",
+      "bytes": 359,
+      "sha256_git_bytes": "75bfb6e54d5da0f61b588fdcf98d8ebe8600b7c5c0d30030375b492ebbf7144d",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/generated/jd-editor-v2.schema.json",
+      "bytes": 121509,
+      "sha256_git_bytes": "893fdb43fe2696846e74f15f2b5e12ed97a00f5ff1a5bc667c11ce734d7430fc",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/package.json",
+      "bytes": 427,
+      "sha256_git_bytes": "59cb6a822475fbb4df201d48d76a7514cdead7cd8b80bee8a8a666c1515c80fd",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/pyproject.toml",
+      "bytes": 436,
+      "sha256_git_bytes": "b681f902d0e77ecac97a9680ad26a85fed47e21066c442cc9e93d3f69221714b",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/scripts/check-codegen.mjs",
+      "bytes": 636,
+      "sha256_git_bytes": "b2d9c9e58a2e779f33420b8e286c4685f988080169dca8a63bdfa3955452b60d",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/scripts/codegen.mjs",
+      "bytes": 3120,
+      "sha256_git_bytes": "1d40e0324dadfa3174f3392ee684963860139f3c1111eb4d81b9e416e88f06d5",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/src/jd_editor_contract/__init__.py",
+      "bytes": 69,
+      "sha256_git_bytes": "e8fa2912d352111149a6e2e988a532046b21f51b25e4b4d2acb3805a4d115a73",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/src/jd_editor_contract/models.py",
+      "bytes": 44868,
+      "sha256_git_bytes": "57ba3234718ecd2df3a05b3a6ceea27ac5b0be9d7efc905043afe341b522822b",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/tests/public-types.ts",
+      "bytes": 1130,
+      "sha256_git_bytes": "7d3f31690b8943cce1076b7d1ef1ebd74d2a7e9a3561f15034cfb10f2844a29d",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/tests/test_schema_contract.py",
+      "bytes": 3221,
+      "sha256_git_bytes": "fb340709078248060987e0c049b6f56d145b4ca34229ba0f14f84686d106c075",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/types/jd-editor-v2.ts",
+      "bytes": 42264,
+      "sha256_git_bytes": "6376d46cb72b80f4e5e277604269e1dd0153772565191a22f5bbf1033c9ad626",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/contract/uv.lock",
+      "bytes": 44518,
+      "sha256_git_bytes": "e3ce831c28fa9a20b3c4df14b7d2b4235368bc2839c303e6b10afda644aa28a2",
+      "responsibility": "Generated contract/toolchain input; merge reviewed defs into current SSOT, not a second authority"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/affected.ts",
+      "bytes": 2657,
+      "sha256_git_bytes": "86ab156a82297c492847d4320a2ca01d5024ff37db347a11cf4276e33c08cf14",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/bridge.ts",
+      "bytes": 1260,
+      "sha256_git_bytes": "448a67a20631e34da19960a9ad39c80e72941a9c68bd59886cb88eb3ab9896be",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/command-mapper.ts",
+      "bytes": 622,
+      "sha256_git_bytes": "7527689a3972861fcad7d76f622c57fe96e1c7fa861676ef7b841d851074c56e",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/copy.ts",
+      "bytes": 2249,
+      "sha256_git_bytes": "414680239e35f02bc31d70dafd7d03acaa786ad7adb43e56f5d20c0029793fb6",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/profile.ts",
+      "bytes": 1988,
+      "sha256_git_bytes": "9049251f8affb767d86cc2f5340c7ae223dc2ca2feb44d0dddc144d0da1a00b1",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/react-profile.tsx",
+      "bytes": 1265,
+      "sha256_git_bytes": "5acb3df1a1958fa52fe2e2b43bfc9ff64ac6e4f83f7d80cd4f7bee684552aa33",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/read-selection.ts",
+      "bytes": 2862,
+      "sha256_git_bytes": "98bca0b76d70e649d096c6f7094da50a57b466d9bae461ba0d3871d68e5203c8",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/schema.ts",
+      "bytes": 4105,
+      "sha256_git_bytes": "e39e40eea632527248d9f4d5b3548ece60daef29d96350c7158ed6f03c545adf",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/transform.ts",
+      "bytes": 5239,
+      "sha256_git_bytes": "c7e38dce848e6e187f50693d205aeb3c85b7f86dec3013a94681aaa9e83a83e1",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/native/src/validate.ts",
+      "bytes": 1431,
+      "sha256_git_bytes": "fc88774dc45e208a5b11dd0468d2434bbcc6c9944f7e6c2493139ba78beaf3f7",
+      "responsibility": "Candidate for packages/jd-editor-native; fixed entrypoint and OSS profile"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/app/globals.css",
+      "bytes": 6329,
+      "sha256_git_bytes": "fd15e2cd9dcfccedc51a3a141809352eb3956259e2e9ed222e38612ad2edb588",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/app/layout.tsx",
+      "bytes": 332,
+      "sha256_git_bytes": "4c9013e42f12f0c39d8311ab66aa5000593ef6600d540158ed5265d9df8e6b3b",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/app/page.tsx",
+      "bytes": 120,
+      "sha256_git_bytes": "e0dc31818e81dadc5185323a16d9236aaaf03754000d131be3c2599a9073669d",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/app/workspace/[document_id]/page.tsx",
+      "bytes": 265,
+      "sha256_git_bytes": "7bdd8d2136b7c7e2466f2e247df1083009851b3481751bac1eb89dd72a29841c",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/documents/DocumentActions.tsx",
+      "bytes": 771,
+      "sha256_git_bytes": "2eea494f167b4cd648a9e542085a567138baa3e80f67bf4660804a33d779e936",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/documents/DocumentList.test.tsx",
+      "bytes": 2237,
+      "sha256_git_bytes": "140a1cc5ffc063dd4539bdccdebd41ad5d6a27e2c7321110b8a4454c078c5c4a",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/documents/DocumentList.tsx",
+      "bytes": 4394,
+      "sha256_git_bytes": "da3a6fbc384c6bb008561a248e3f5311a6ba30e299dd5dfcdfe7dcce2e50a41f",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/generated/analysis-api.ts",
+      "bytes": 3604,
+      "sha256_git_bytes": "e77ecea6460b31d21838cb7209b7cc20fe9477072093512c79d3018b8c47e18a",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/JdChanges.test.tsx",
+      "bytes": 3112,
+      "sha256_git_bytes": "d158482f3da000fc484fdc87556ac164e840ec419b13a13add7e5f0a0bc01536",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/JdChanges.tsx",
+      "bytes": 2943,
+      "sha256_git_bytes": "a4336c73df9d9176edb0ec6e107b3b52482a2b4533298f25c83bf5d842b6d438",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/JdEditor.tsx",
+      "bytes": 7453,
+      "sha256_git_bytes": "81579cd97ec28bdf10c70a0e7774c8b76d3a617a5044e0c8e399ab5801f09f72",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/JdLeaf.tsx",
+      "bytes": 1043,
+      "sha256_git_bytes": "b9f330d3772c59f37fba86f1d56caa4907babc286ebb45819aac0124ac22879d",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/JdNode.test.tsx",
+      "bytes": 2390,
+      "sha256_git_bytes": "83c5ee519c6cfb9ec90aa82d79550ad1336b59409eb76d84e3d648659b57cbd1",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/JdNode.tsx",
+      "bytes": 9549,
+      "sha256_git_bytes": "6c21dc6958816d7485f44cd9448836fa36a6116cc9e38154fadc757cdb26dd5b",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/JdWorkspace.test.tsx",
+      "bytes": 1514,
+      "sha256_git_bytes": "387ee66e6ff254e3148e811370988e99a9dbb3c8b7b76ec489c5ad071a524616",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+      "bytes": 12013,
+      "sha256_git_bytes": "59d6a1a3191949e4fe51838ab7d4b4f91e439e4e5233cc654ea582a4a4b29856",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/api.ts",
+      "bytes": 4828,
+      "sha256_git_bytes": "22381a48529817807e93e43c669ec58b5cc5d1c72900627d952289a292561f72",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/navigationGuard.test.ts",
+      "bytes": 606,
+      "sha256_git_bytes": "8f7e97f3171509ee19055e33adff41fda7543feb4e88f87f66cdde75495e20f5",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/navigationGuard.ts",
+      "bytes": 417,
+      "sha256_git_bytes": "9373a29145537b549327a3c6ca9f3feed18339df40f8b9bdc432bbc213d17d2e",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/requestRecoveryCache.ts",
+      "bytes": 1940,
+      "sha256_git_bytes": "f61fde919e44331a89ed76e59e308128e328c0aca857f6e6e1b3c78bddd74726",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/submissionCache.test.ts",
+      "bytes": 1735,
+      "sha256_git_bytes": "52ce8011e06a8cc440d63f6c3a171c02c6264c094eea9f6f7fe46ee0b2958cd5",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/submissionCache.ts",
+      "bytes": 1261,
+      "sha256_git_bytes": "6d846f7ecf1d93b8c9febeb3fd6a67fca501b2dc0c838f8cca0cba4a8a96ca93",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/useJdSession.test.tsx",
+      "bytes": 8413,
+      "sha256_git_bytes": "605ae5422edad5d2ac93d05094a02bc0c25e7fd703104bb1141b0d8b228efa6e",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+      "bytes": 12181,
+      "sha256_git_bytes": "7fb4d715c8bf79bdacfbe652256282ca29c345c629fc4bc50f46e6a552638b4e",
+      "responsibility": "Same-page Web integration candidate; route/component mapping after final core baseline"
+    },
+    {
+      "source": "experiments/analysis-agent/pyproject.toml",
+      "bytes": 951,
+      "sha256_git_bytes": "fd509d731b490edcefcf888f5a427c8787936e57b8d0dfff373930627d35797d",
+      "responsibility": "Dependency/profile input; refresh at Task6 accepted freeze, preserve exact tested requirements"
+    },
+    {
+      "source": "experiments/analysis-agent/uv.lock",
+      "bytes": 162295,
+      "sha256_git_bytes": "38adde13767017319f52dd730ec60dad01595e5d3be8ff59466f891d248358ca",
+      "responsibility": "Dependency/profile input; refresh at Task6 accepted freeze, preserve exact tested requirements"
+    },
+    {
+      "source": "experiments/jd-editor/package.json",
+      "bytes": 316,
+      "sha256_git_bytes": "9625507392a7b70f41c57cde16d46f1824b77d37cc1285ffd77a070158f5bdad",
+      "responsibility": "Dependency/profile input; refresh at Task6 accepted freeze, preserve exact tested requirements"
+    },
+    {
+      "source": "experiments/jd-editor/package-lock.json",
+      "bytes": 304470,
+      "sha256_git_bytes": "67b22e91fed2deeeed6bbbf80990ef8ed06c61ad5558ca6f791e34955d920501",
+      "responsibility": "Dependency/profile input; refresh at Task6 accepted freeze, preserve exact tested requirements"
+    },
+    {
+      "source": "experiments/jd-editor/native/package.json",
+      "bytes": 1015,
+      "sha256_git_bytes": "0e709f6b0bf5be0194a925fe87e2546979d35136dfd1b0ac51388d4ad4cde99c",
+      "responsibility": "Dependency/profile input; refresh at Task6 accepted freeze, preserve exact tested requirements"
+    },
+    {
+      "source": "experiments/jd-editor/web/package.json",
+      "bytes": 1249,
+      "sha256_git_bytes": "4e601f1a797f7dce5f1442e49606ea2892e59bacd9bf8c6b6dab7c0aba08cd50",
+      "responsibility": "Dependency/profile input; refresh at Task6 accepted freeze, preserve exact tested requirements"
+    },
+    {
+      "source": "docs/specs/contracts/jd-editor-v2.schema.json",
+      "bytes": 121509,
+      "sha256_git_bytes": "893fdb43fe2696846e74f15f2b5e12ed97a00f5ff1a5bc667c11ce734d7430fc",
+      "responsibility": "Dependency/profile input; refresh at Task6 accepted freeze, preserve exact tested requirements"
+    }
+  ],
+  "dependency_inputs": {
+    "python_requires": {
+      "tested": ">=3.12,<3.13",
+      "production_reference": ">=3.13"
+    },
+    "tested_python": [
+      "caliburn-jd-editor-contract==0.0.1",
+      "jsonschema==4.26.0",
+      "langchain==1.4.0",
+      "langchain-openai==1.6.0",
+      "langgraph==1.2.11",
+      "langgraph-checkpoint==4.2.0",
+      "openai==3.8.0",
+      "openai-agents==0.22.0",
+      "httpx==0.28.1",
+      "langgraph-checkpoint-postgres==3.1.2",
+      "deepagents==0.7.13",
+      "sqlalchemy==2.0.52",
+      "psycopg[binary]>=3.2,<4",
+      "fastapi==0.141.1",
+      "uvicorn==0.52.4",
+      "apscheduler==3.11.3",
+      "markdown-it-py[linkify]==4.2.0"
+    ],
+    "production_python": [
+      "fastapi==0.141.1",
+      "uvicorn[standard]==0.30.6",
+      "sqlalchemy[asyncio]==2.0.51",
+      "asyncpg==0.31.0",
+      "alembic==1.18.5",
+      "psycopg[binary]==3.3.4",
+      "openpyxl==3.1.5",
+      "pydantic==2.13.4",
+      "pydantic-settings==2.14.1",
+      "httpx==0.28.1",
+      "opentelemetry-sdk==1.42.1",
+      "opentelemetry-exporter-otlp-proto-http==1.42.1",
+      "langchain==1.3.15",
+      "langgraph==1.2.11",
+      "langgraph-checkpoint-postgres==3.1.2",
+      "langchain-openrouter==0.2.7",
+      "deepagents==0.7.5",
+      "job-analysis-contract"
+    ],
+    "tested_web": {
+      "dependencies": {
+        "@caliburn/jd-editor-contract": "0.0.1",
+        "@caliburn/jd-editor-native": "0.0.1",
+        "next": "16.3.3",
+        "react": "19.2.4",
+        "react-dom": "19.2.4",
+        "platejs": "53.3.11",
+        "@platejs/basic-nodes": "53.0.0",
+        "@platejs/list-classic": "53.0.0",
+        "@platejs/table": "53.0.9",
+        "@platejs/diff": "53.0.0"
+      },
+      "devDependencies": {
+        "typescript": "5.9.3",
+        "vitest": "4.1.11",
+        "@vitest/mocker": "4.1.11",
+        "jsdom": "28.1.0",
+        "@testing-library/react": "16.3.2",
+        "@testing-library/user-event": "14.6.4",
+        "@types/node": "20.19.43",
+        "@types/react": "19.2.17",
+        "@types/react-dom": "19.2.3",
+        "eslint": "9.39.4",
+        "eslint-config-next": "16.3.3",
+        "@playwright/test": "1.61.0",
+        "vite": "8.1.3"
+      }
+    },
+    "production_web": {
+      "dependencies": {
+        "@base-ui/react": "^1.4.1",
+        "@caliburn/job-analysis-contract": "*",
+        "@radix-ui/react-checkbox": "^1.3.5",
+        "@radix-ui/react-popover": "^1.1.17",
+        "@tanstack/react-query": "^5.100.10",
+        "class-variance-authority": "^0.7.1",
+        "clsx": "^2.1.1",
+        "cmdk": "^1.1.1",
+        "lucide-react": "^1.16.0",
+        "next": "16.2.6",
+        "react": "19.2.4",
+        "react-dom": "19.2.4",
+        "shadcn": "^4.7.0",
+        "tailwind-merge": "^3.6.0",
+        "tw-animate-css": "^1.4.0"
+      },
+      "devDependencies": {
+        "@tailwindcss/postcss": "^4",
+        "@testing-library/react": "^16.3.2",
+        "@testing-library/user-event": "^14.6.4",
+        "@types/node": "^20",
+        "@types/react": "^19",
+        "@types/react-dom": "^19",
+        "eslint": "^9",
+        "eslint-config-next": "16.2.6",
+        "jsdom": "^28.1.0",
+        "tailwindcss": "^4",
+        "typescript": "^5",
+        "vitest": "^4.1.9"
+      }
+    }
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "schema_id": "professional-consultant-r1-case.v1",
+  "case_id": "TI-R1-03",
+  "case_revision": 1,
+  "source_type": "constructed_edge",
+  "case_family_id": "TI-R1-03",
+  "primary_risk": "一個故事包含多個工作，但見動詞就拆會產生大量假 Task",
+  "sources": [
+    {
+      "source_id": "turn-001",
+      "source_kind": "employee_turn",
+      "speaker": "employee",
+      "text": "系統故障時我會查 log、重現、修復和部署；事故後我還要獨立完成根因報告，主持每月改善追蹤。"
+    }
+  ],
+  "expected": {
+    "required_behaviors": [
+      "查 log、重現、修復、部署整併為同一個故障處理工作，不各自成為 Task",
+      "根因報告具備獨立產出與本人責任，可形成另一個工作單位",
+      "每月改善追蹤的責任邊界仍不明確時，以 clarify 追問而非直接建立 Task",
+      "Task 總數維持在合理範圍，不因動詞數量膨脹"
+    ],
+    "forbidden_behaviors": [
+      "把查 log、重現、修復、部署各自建立成 Task",
+      "產生六個以上的 Task",
+      "把根因報告與故障處理硬併成一個 Task 且不留下任何追問或不確定說明"
+    ],
+    "common_applicable_rubric_dimensions": [
+      "merge_split_boundary",
+      "meaningful_outcome",
+      "assignability_checkability",
+      "uncertainty_honesty",
+      "next_question_value"
+    ],
+    "full_harness_only_dimensions": []
+  }
+}

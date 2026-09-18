@@ -1,0 +1,125 @@
+{
+  "case_id": "CR-02-one-story-many-work",
+  "case_family_id": "CR-02",
+  "source_type": "constructed_edge",
+  "title": "一段故事包含兩項不同工作",
+  "primary_risk": "員工用同一天的故事描述新人到職準備與定期權限盤點，模型可能因敘事連續而錯誤合併成一個 Task",
+  "applicable_critical_checks": [
+    "C3_MERGE_SPLIT",
+    "C6_SOURCE_FIDELITY"
+  ],
+  "transcript": [
+    {
+      "source_id": "turn-001",
+      "role": "consultant",
+      "text": "請描述最近一個忙碌工作日，你實際完成了哪些事情，以及各自交付了什麼結果。"
+    },
+    {
+      "source_id": "turn-002",
+      "role": "employee",
+      "text": "上週新同事報到，我先建立系統帳號、準備電腦，並安排新人說明；同一天剛好月底，我另外核對所有在職人員的系統權限，把異常名單寄給資訊部。新人報到只在有人到職時做，權限盤點則是每月底固定做。"
+    }
+  ],
+  "claim_table": [
+    {
+      "claim_id": "claim-001",
+      "speaker": "employee",
+      "literal_text": "上週新同事報到",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 1
+    },
+    {
+      "claim_id": "claim-002",
+      "speaker": "employee",
+      "literal_text": "我先建立系統帳號",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 2
+    },
+    {
+      "claim_id": "claim-003",
+      "speaker": "employee",
+      "literal_text": "準備電腦",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 3
+    },
+    {
+      "claim_id": "claim-004",
+      "speaker": "employee",
+      "literal_text": "並安排新人說明",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 4
+    },
+    {
+      "claim_id": "claim-005",
+      "speaker": "employee",
+      "literal_text": "同一天剛好月底",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 5
+    },
+    {
+      "claim_id": "claim-006",
+      "speaker": "employee",
+      "literal_text": "我另外核對所有在職人員的系統權限",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 6
+    },
+    {
+      "claim_id": "claim-007",
+      "speaker": "employee",
+      "literal_text": "把異常名單寄給資訊部",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 7
+    },
+    {
+      "claim_id": "claim-008",
+      "speaker": "employee",
+      "literal_text": "新人報到只在有人到職時做",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 8
+    },
+    {
+      "claim_id": "claim-009",
+      "speaker": "employee",
+      "literal_text": "權限盤點則是每月底固定做",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 9
+    }
+  ],
+  "relevant_span_ids": [
+    "turn-002"
+  ],
+  "adjudication": {
+    "must_retain_tasks": [
+      "辦理新人到職所需的系統帳號、設備與使用說明準備",
+      "每月盤點在職人員系統權限並將異常名單交付資訊部"
+    ],
+    "must_not_create_tasks_from": [
+      "把同一天發生的兩項工作合併成單一模糊 Task",
+      "把建立帳號、準備電腦、安排說明各自拆成三個 Task"
+    ],
+    "allowed_task_variants": [
+      "完成新人資訊環境與操作說明的到職準備",
+      "定期核對人員權限並通報異常"
+    ],
+    "required_uncertainties": [],
+    "notes": "故事雖發生在同一天，卻有兩個不同觸發條件、對象與結果：到職事件產生可用的新人環境；月底週期產生權限異常名單。相關片段選 turn-002，因兩項工作及其週期都只在此回合出現。claim 切分保留「同一天剛好月底」「另外」「只在」「則是」等區分兩項工作的連接與頻率標記。"
+  }
+}

@@ -1,0 +1,30 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/JdStaleCandidate.test.tsx (2 tests | 1 failed) 10ms
+   × a confirmed stale submission can reach the current editable draft without losing its saved candidate or chat 8ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/JdStaleCandidate.test.tsx > a confirmed stale submission can reach the current editable draft without losing its saved candidate or chat
+AssertionError: expected 'r1' to be 'r2' // Object.is equality
+
+Expected: "r2"
+Received: "r1"
+
+ ❯ src/jd/JdStaleCandidate.test.tsx:45:38
+     43|   expect(candidate?.value).toEqual(value('尚未保存的員工更正'));
+     44|   await session.revalidate();
+     45|   expect(session.head?.revision_ref).toBe('r2');
+       |                                      ^
+     46|   expect(session.value).toEqual(value('已保存的新責任'));
+     47|   expect(session.dirty).toBe(false);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed (2)
+   Start at  12:25:27
+   Duration  14.63s (transform 114ms, setup 0ms, import 219ms, tests 10ms, environment 13.78s)
+

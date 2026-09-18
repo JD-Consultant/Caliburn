@@ -1,0 +1,44 @@
+{
+  "checked_chain": [
+    {
+      "ProcessId": 5248,
+      "ParentProcessId": 8284,
+      "CreationDate": "2026-09-10T11:58:41.917631+08:00",
+      "ExecutablePath": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+      "CommandLine": "\"S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe\" S:/caliburn/.worktrees/analysis-only-agent/.superpowers/sdd/2026-09-10-jd-editor-core-implementation/task4-run.py uv run python tests/jd_browser_server.py"
+    },
+    {
+      "ProcessId": 30616,
+      "ParentProcessId": 5248,
+      "CreationDate": "2026-09-10T11:58:41.96475+08:00",
+      "ExecutablePath": "C:\\Users\\chenb\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"C:\\Users\\chenb\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe\" S:/caliburn/.worktrees/analysis-only-agent/.superpowers/sdd/2026-09-10-jd-editor-core-implementation/task4-run.py uv run python tests/jd_browser_server.py"
+    },
+    {
+      "ProcessId": 20400,
+      "ParentProcessId": 30616,
+      "CreationDate": "2026-09-10T11:58:42.621371+08:00",
+      "ExecutablePath": "D:\\Python\\Python314\\Scripts\\uv.exe",
+      "CommandLine": "uv run python tests/jd_browser_server.py"
+    },
+    {
+      "ProcessId": 20652,
+      "ParentProcessId": 20400,
+      "CreationDate": "2026-09-10T11:58:42.658027+08:00",
+      "ExecutablePath": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+      "CommandLine": "\"S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe\" tests/jd_browser_server.py"
+    },
+    {
+      "ProcessId": 29272,
+      "ParentProcessId": 20652,
+      "CreationDate": "2026-09-10T11:58:42.672551+08:00",
+      "ExecutablePath": "C:\\Users\\chenb\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe",
+      "CommandLine": "\"C:\\Users\\chenb\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe\" tests/jd_browser_server.py"
+    }
+  ],
+  "untouched": "Next, production API, PostgreSQL and data",
+  "remaining_chain": [],
+  "scope": "Root-owned Task4 offline fixture; only worker29272 stopped",
+  "starttime_precision": "CIM microseconds vs Process handle 100ns; both exact values rechecked",
+  "worker_exited": true
+}

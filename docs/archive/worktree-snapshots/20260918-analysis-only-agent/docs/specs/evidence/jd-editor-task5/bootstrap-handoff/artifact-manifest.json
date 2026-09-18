@@ -1,0 +1,14 @@
+{
+  "artifacts": [
+    {
+      "path": "root-stop.json",
+      "sha256": "aabbb2c7906c32a3a1ac224ead71fc8b62710d50614ce519d26f4e72cbc2e47b",
+      "bytes": 2488
+    },
+    {
+      "path": "README.md",
+      "sha256": "a0208f0a21f403bd93df33e05987bdafff41fd33b8dcac41083628e191cf9cd9",
+      "bytes": 1684
+    }
+  ]
+}

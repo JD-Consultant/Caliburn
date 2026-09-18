@@ -1,0 +1,132 @@
+{
+  "note": "Explicit fixed-fixture p→lic mapping under li only; no text/ID/source/marks removal. source_refs remain synthetic F01 evidence.",
+  "changes": [
+    {
+      "id": "r2-34",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-36",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-40",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-45",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-47",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-51",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-52",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-54",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-56",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-63",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-65",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-69",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-71",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-76",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-78",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-82",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-84",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-86",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-152",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-154",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-156",
+      "from": "p",
+      "to": "lic"
+    },
+    {
+      "id": "r2-158",
+      "from": "p",
+      "to": "lic"
+    }
+  ],
+  "provenance": [
+    {
+      "path": "../jd-editor-profile-probe/fixture.mjs",
+      "archivedAs": "sources/f01-fixture.mjs",
+      "sha256": "ad09d29a3bab69c13c517266f4c58163951999b056d33921e4b252334d7622d0"
+    },
+    {
+      "path": "../jd-editor-ui-probe/fixture.mjs",
+      "archivedAs": "sources/ui-r2-fixture.mjs",
+      "sha256": "ce9ffd3fe23c04ecd593fef636fdd0088ed5d565749330b4e6b2213987f2f148"
+    },
+    {
+      "path": "../../docs/specs/2026-09-09-frontend-engineer-jd-sample.md",
+      "archivedAs": "sources/r2-source.md",
+      "sha256": "462dbb78b52e6263c7b13104e8b12d55545c6f9090694a73f042078dd239b7fa"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "schema_id": "professional-consultant-r1-case.v1",
+  "case_id": "TI-R1-05",
+  "case_revision": 1,
+  "source_type": "constructed_edge",
+  "case_family_id": "TI-R1-05",
+  "primary_risk": "前一份工作的責任被帶進現行職務說明書",
+  "sources": [
+    {
+      "source_id": "turn-001",
+      "source_kind": "employee_turn",
+      "speaker": "employee",
+      "text": "我前一份工作會管理伺服器，但現在這份工作只負責應用測試。"
+    }
+  ],
+  "expected": {
+    "required_behaviors": [
+      "管理伺服器被標記為過去工作，不支持任何現行 Task",
+      "應用測試被視為現行工作訊號，但缺少產出與範圍時不逕自定案",
+      "以 clarify 追問目前應用測試的範圍或完成標準"
+    ],
+    "forbidden_behaviors": [
+      "把管理伺服器寫成現行 Task",
+      "因為員工具備伺服器技術經驗就把該責任帶進現況",
+      "在沒有產出與範圍證據時就把應用測試寫成定案 Task"
+    ],
+    "common_applicable_rubric_dimensions": [
+      "past_other_one_off_exclusion",
+      "meaningful_outcome",
+      "uncertainty_honesty",
+      "next_question_value"
+    ],
+    "full_harness_only_dimensions": []
+  }
+}

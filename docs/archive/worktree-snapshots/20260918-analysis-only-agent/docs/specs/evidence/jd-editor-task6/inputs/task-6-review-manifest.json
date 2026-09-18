@@ -1,0 +1,226 @@
+[
+  {
+    "path": ".gitattributes",
+    "sha256": "30753c1f2eda2ea83cbe4f9ab4714ec01edf970370d82da44a39cb02b8761f5c",
+    "bytes": 1660,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "3c69e9d700a298417e94f6f14b73321933212592ea42a4e0dca73cddc076e798"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/api.py",
+    "sha256": "605f1766a19b43219dd76a85f30c974cafb1de0c20d84749cdbb9a356c96d323",
+    "bytes": 17123,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "0a09f79930711ef91ca790f2f804a12ce71b073290a4f969cb9227858f4b7620"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+    "sha256": "9e85aae99d9bd5a133a099bd6544f91eba7d963b0390cb0623705669ab83bff5",
+    "bytes": 30238,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "34426d29be0ebbadb68587fd22b85d02dd9969b5112015be953a39a543a97c00"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/skills.py",
+    "sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce",
+    "bytes": 3887,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "e5c7f750b8e48cc469c1aa57972baff9542e26c7efa4ba5e9b4db463708ccdea"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md",
+    "sha256": "d4e8abc339115f9ae4ad8c321e0696291c0dafa4c745b7606f648f5ad9f783aa",
+    "bytes": 1806,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "412d4902af823eedb55c0b4d4f0a5ece156e343b2832f5f1cdc75c14538932db"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md",
+    "sha256": "5856afcf8d7522257a656fb2b6162a3129a145fd91b54225636d72ccf94a6686",
+    "bytes": 1866,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "7aa2b016dcde37dffadc78711a42a70c43239aff5ba76142fa90f793640985df"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md",
+    "sha256": "dd3c90f7376cb99dce5da91c6aa3172af401ae891ac96213858303edbd260d30",
+    "bytes": 1726,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "20e490d1b0d4b5a872f1c438c08a74b4d8da4eb12dd3b9b8df978f2a6edfd01b"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md",
+    "sha256": "be532fd22cf9ab5c68638510874537fdbe9c687c2d7157f00b119ea5713ef80b",
+    "bytes": 2576,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md",
+    "sha256": "e09ffbeaf0a5113f49eb97845c97ba3698525fffbbf149852a7fa3e6c4587fa2",
+    "bytes": 2956,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md",
+    "sha256": "abe3ef41181b740c9906e06c44c0785eb297ccd3f7578f4359b937455737e643",
+    "bytes": 3628,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_context_budget.py",
+    "sha256": "995084be2976e77f38202c9e695aade98a8a60baa4adffaaa258950ba1c99540",
+    "bytes": 23539,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "72d5354cd7c659ac197b15bf66d619a5e3366cb85ae1c1de39042e6b604072b1"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_native_context_budget.py",
+    "sha256": "4d36a2b1e060f5ea5ef34fadd6ebf0c136fc3f7e76b87da8e2377b425e8a12ef",
+    "bytes": 7898,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "aa4cbd5bd70e64f996c48c3398ba62aba9e2dfbf181348d35bbc5b54e0699882"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_extraction_role.py",
+    "sha256": "ffc116b239b75fb295def6d34cf28cf9a52151ce535c637a2378303fed25b72f",
+    "bytes": 8512,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "3e09f16137f55f585bac5565c2da14935dd01ab542380d58137f9ed744f589cf"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_postgres_service.py",
+    "sha256": "28047e06be123e11a8fb4db8317dc3d9813e4c68f14c448e2be592180a239388",
+    "bytes": 14853,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "af7d070ed134218a890d69378f8927ff016c9f63996b294bf9676424cf5cd32b"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_memory_prompt_contract.py",
+    "sha256": "97152bd2b9f148424e77352a72ca0af24ce53850e5e2b623b205556f972bc5fa",
+    "bytes": 7879,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "a9b0838d74baa21fa2613feca527d6109b963222afe551be6098c1f0bac364e7"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_read_recovery.py",
+    "sha256": "65c4f0e93e04a4836edce8734aaabfd83387b48e88e2cb97ec0674090c1d07f6",
+    "bytes": 11727,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "9846eaeb03912fb7cd3ba6e9806b8a8fc04a1645364b1311a6a06ee4a2e4488f"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_skill_contract.py",
+    "sha256": "4f743bd1891579d88201536567e257590721f331a5552f6df9d0596d527e62bc",
+    "bytes": 3299,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_end_to_end.py",
+    "sha256": "36b1a30526944195af3c7941d24f3fbdd33edadcea3aa56308c76d77eab6004c",
+    "bytes": 10411,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_current_source_acquisition.py",
+    "sha256": "35f1b759d5d8844b23f618b8f9db8d12e8fe891072d6922a4e6a845379c622e0",
+    "bytes": 6483,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/jd_offline_service.py",
+    "sha256": "9f0ba4c252fdc3ec6b96d4133f4adb4ce136ddbe171edb9e836ec90d328fff89",
+    "bytes": 9748,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/fixtures/jd-task6-prompt-delta.json",
+    "sha256": "d585e4d12e571342b927b94f6d3836386cac1813c7a830231c8372c468339d3b",
+    "bytes": 1291,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/jd-editor/fixtures/core-scenario.json",
+    "sha256": "f3114b9479e62336172183af339ad557291e9fa90066c87fce4dbe0f631a3c51",
+    "bytes": 12106,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdEditor.tsx",
+    "sha256": "e25022fad010a1410cbb72376906ad4dcbef5f9e50d85dda86cf16a4af564ddf",
+    "bytes": 7407,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "81579cd97ec28bdf10c70a0e7774c8b76d3a617a5044e0c8e399ab5801f09f72"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "sha256": "ca5c602c372b51636596e9a58dd5186e016ca1eccf5914dc3b43f7e74da5aeb3",
+    "bytes": 16727,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "5c8a13bcfcac805ef8570179cb4a4c41cdc87a9a18ffb846302f64be30e7f0c2"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx",
+    "sha256": "3d8a0e9afd3344d34b0b63666ad1bdfea395fbcb01751350aa93656fdf483928",
+    "bytes": 7000,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/jd-editor/web/browser/task6-journey.mjs",
+    "sha256": "2d17844c67a2c76c7a7d35282ab8e1138bc62c0f63ced79d3bd47644db36c464",
+    "bytes": 8706,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/jd-editor/web/package.json",
+    "sha256": "e32f9e5f6f484bf7eb0f56b843e93e5ee1e5c27677c280b4070eaef8fadc12bf",
+    "bytes": 1281,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "4e601f1a797f7dce5f1442e49606ea2892e59bacd9bf8c6b6dab7c0aba08cd50"
+  },
+  {
+    "path": "experiments/jd-editor/package-lock.json",
+    "sha256": "874f1ffa61bb278aded419102494ecf2fc93c329a16405409d06f774580170c1",
+    "bytes": 313263,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "67b22e91fed2deeeed6bbbf80990ef8ed06c61ad5558ca6f791e34955d920501"
+  },
+  {
+    "path": "experiments/jd-editor/README.md",
+    "sha256": "05d15c3663c9e38437b1a3964072bcc73764fb635977b4b43195cad495a78d18",
+    "bytes": 6673,
+    "baseline": "git 444416722190fd48c14f4423d101f36b25831de1",
+    "review_before_sha256": "9972662069c37d2421b315cf10a842769f09245c473fc003f537451fe3885536"
+  },
+  {
+    "path": "experiments/jd-editor/ACCEPTANCE.md",
+    "sha256": "385c67d18c16f547fcc336386c7e03ea1de5588193b9efbed17da617a4721fef",
+    "bytes": 4127,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/README.md",
+    "sha256": "c212c4fb32ad7af12400e4c2f9ba10573f33ec64df9365e47bf256adc116fd23",
+    "bytes": 91344,
+    "baseline": "pre-existing snapshot task-6-readme-baseline.md",
+    "review_before_sha256": "eecb62e2eed02997490a3c975e9618e7226f3b58331a175f8ca41644f699f476"
+  },
+  {
+    "path": "docs/specs/evidence/2026-09-10-jd-editor-core-integration.md",
+    "sha256": "6037fcad590871a77a531b914522f325286a1c4592b96f94689ba4192cab37bb",
+    "bytes": 11288,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

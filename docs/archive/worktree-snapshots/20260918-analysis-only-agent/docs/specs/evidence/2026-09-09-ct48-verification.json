@@ -1,0 +1,19 @@
+{
+  "id": "CT48-verification",
+  "date": "2026-09-09",
+  "scope": "isolated analysis-agent; no production/JD",
+  "tdd_red": {"passed": 1, "failed": 2, "cause": "Original 12 model/tool ceiling"},
+  "focused_green": {"passed": 3},
+  "specific_tool_limit_green": {"passed": 1},
+  "initial_full_run": "Windows sandbox tmp_path PermissionError; not a product success. No deletion or permission changes.",
+  "next_full_run": {"passed": 558, "failed": 2, "skipped": 41, "cause": "Historical tool-description fixture did not yet include reviewed CT48 shared patch delta"},
+  "final_offline": {"passed": 560, "skipped": 41, "warnings": 1, "seconds": 50.20, "command": ".venv/Scripts/python.exe -m pytest -q --tb=short --basetemp=.test-tmp/pytest-ct48-final"},
+  "final_postgres": {"passed": 41, "warnings": 1, "seconds": 30.67, "database": "q019_agent_test", "host": "127.0.0.1:55433", "test_selection": "tests/test_postgres*.py", "basetemp": ".test-tmp/ct48-pg-final"},
+  "warning": "Existing Starlette/AnyIO BlockingPortal deprecation",
+  "limits": {"foreground_models": 12, "foreground_tools": 11, "background_models": 16, "background_tools": 15},
+  "quality": "G8 OPEN. Mock provider tests establish wiring/recovery, not natural model semantics.",
+  "paid_ledgers": {"CT45": "closed", "CT46": "closed", "CT47": "closed", "CT48": "closed"},
+  "paid_requests_total": 112,
+  "usage_estimated_usd_total": 0.17919779,
+  "original_ct45_database_unchanged_by_replays": true
+}

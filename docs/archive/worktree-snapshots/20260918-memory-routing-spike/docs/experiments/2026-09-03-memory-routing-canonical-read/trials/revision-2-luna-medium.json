@@ -1,0 +1,52 @@
+{
+  "schema_version": 1,
+  "record_type": "reconstructed_failed_attempt",
+  "revision": 2,
+  "status": "infrastructure_failed_before_model",
+  "requested_model": "openai/gpt-5.6-luna",
+  "resolved_model": null,
+  "requested_embedding_model": "openai/text-embedding-3-small",
+  "resolved_embedding_model": null,
+  "reasoning": "medium",
+  "frozen_hashes": {
+    "case_sha256": "a39f668dbcb23f4b7c8b8396cb8593f115dda8da41d092efb4b24be63bf9b835",
+    "rubric_sha256": "7555260a65dd5882be1ab680c6ac1ecf3ebb45fb385048f0515d5d72682a0158",
+    "prompt_sha256": "91558055927742669fe1be8df33100a63a216490d95c2dac44e24c808d62c701"
+  },
+  "process": {
+    "exit_code": 1,
+    "wall_time_ms": 2749,
+    "runner_receipt_written": false
+  },
+  "provider_activity": {
+    "metadata_preflight_completed": true,
+    "embedding_requests": 0,
+    "chat_model_requests": 0,
+    "model_semantic_output_observed": false,
+    "inference_cost_usd": "0"
+  },
+  "runtime_activity": {
+    "database_identity_read_completed": false,
+    "attempt_specific_database_writes": 0,
+    "tool_calls": 0
+  },
+  "error": {
+    "class": "psycopg.InterfaceError",
+    "code": "windows_proactor_event_loop_unsupported",
+    "location": "open_spike_runtime._read_current_database",
+    "message": "Psycopg cannot use the 'ProactorEventLoop' to run in async mode. Please use a compatible event loop, for instance by running 'asyncio.run(..., loop_factory=asyncio.SelectorEventLoop(selectors.SelectSelector()))'"
+  },
+  "grading": {
+    "a_detail": "not_evaluated",
+    "a_b_correction": "not_evaluated",
+    "unknown_admission": "not_evaluated",
+    "tool_routing": "not_evaluated",
+    "context_bounded": "not_evaluated",
+    "scope": "not_evaluated",
+    "overall": "fail_unproven"
+  },
+  "provenance": {
+    "note": "The process exited before live_smoke.py could create its normal LiveSmokeReceipt. This attempt record was reconstructed from the preserved Codex command execution result and verified control flow; it is not a provider response receipt.",
+    "selector_loop_diagnostic": "A separate DB-only diagnostic using asyncio.run(..., loop_factory=asyncio.SelectorEventLoop) returned caliburn_memory_routing_spike without making a provider request."
+  }
+}

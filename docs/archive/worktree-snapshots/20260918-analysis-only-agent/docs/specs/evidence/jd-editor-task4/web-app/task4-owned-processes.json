@@ -1,0 +1,56 @@
+[
+  {
+    "ProcessId": 24248,
+    "ParentProcessId": 12800,
+    "Name": "node.exe",
+    "CommandLine": "\"S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node.exe\" S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\node_modules\\next\\dist\\bin\\next dev --hostname 127.0.0.1 --port 3001"
+  },
+  {
+    "ProcessId": 12956,
+    "ParentProcessId": 24248,
+    "Name": "conhost.exe",
+    "CommandLine": "\\??\\C:\\WINDOWS\\system32\\conhost.exe 0x4"
+  },
+  {
+    "ProcessId": 25744,
+    "ParentProcessId": 24248,
+    "Name": "node.exe",
+    "CommandLine": "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node.exe S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\node_modules\\next\\dist\\server\\lib\\start-server.js"
+  },
+  {
+    "ProcessId": 2836,
+    "ParentProcessId": 7188,
+    "Name": "python.exe",
+    "CommandLine": "\"S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe\" S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-run.py uv run python tests/jd_browser_server.py"
+  },
+  {
+    "ProcessId": 28852,
+    "ParentProcessId": 2836,
+    "Name": "conhost.exe",
+    "CommandLine": "\\??\\C:\\WINDOWS\\system32\\conhost.exe 0x4"
+  },
+  {
+    "ProcessId": 26424,
+    "ParentProcessId": 2836,
+    "Name": "python.exe",
+    "CommandLine": "\"C:\\Users\\chenb\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe\" S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-run.py uv run python tests/jd_browser_server.py"
+  },
+  {
+    "ProcessId": 23424,
+    "ParentProcessId": 26424,
+    "Name": "uv.exe",
+    "CommandLine": "uv run python tests/jd_browser_server.py"
+  },
+  {
+    "ProcessId": 3736,
+    "ParentProcessId": 23424,
+    "Name": "python.exe",
+    "CommandLine": "\"S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe\" tests/jd_browser_server.py"
+  },
+  {
+    "ProcessId": 580,
+    "ParentProcessId": 3736,
+    "Name": "python.exe",
+    "CommandLine": "\"C:\\Users\\chenb\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe\" tests/jd_browser_server.py"
+  }
+]

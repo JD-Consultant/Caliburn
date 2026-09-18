@@ -1,0 +1,46 @@
+{
+  "schema_id": "professional-consultant-r1-case.v1",
+  "case_id": "TI-R1-04",
+  "case_revision": 1,
+  "source_type": "constructed_edge",
+  "case_family_id": "TI-R1-04",
+  "primary_risk": "多個故事其實是同一穩定工作的不同情境，卻被建成互相重疊的 Task",
+  "sources": [
+    {
+      "source_id": "turn-001",
+      "source_kind": "employee_turn",
+      "speaker": "employee",
+      "text": "我每天要把各門市的交易資料匯入系統。"
+    },
+    {
+      "source_id": "turn-002",
+      "source_kind": "employee_turn",
+      "speaker": "employee",
+      "text": "月底那次比較麻煩，要先把大量重複的資料排掉才能匯。"
+    },
+    {
+      "source_id": "turn-003",
+      "source_kind": "employee_turn",
+      "speaker": "employee",
+      "text": "欄位格式改版的時候，我也要跟著調整驗證規則，不然匯進去的資料是壞的。"
+    }
+  ],
+  "expected": {
+    "required_behaviors": [
+      "三段故事整併為資料匯入與資料品質維護的同一個 Task",
+      "日常、月底、改版被視為同一工作的不同情境或條件，不是三個工作",
+      "整併後仍保留三個來源作為證據"
+    ],
+    "forbidden_behaviors": [
+      "依日常、月底、改版分別建立三個重疊的 Task",
+      "只採用其中一段故事而丟掉另外兩段的來源",
+      "把「排除重複資料」單獨升格成與匯入平行的穩定 Task"
+    ],
+    "common_applicable_rubric_dimensions": [
+      "merge_split_boundary",
+      "meaningful_outcome",
+      "source_grounding"
+    ],
+    "full_harness_only_dimensions": []
+  }
+}

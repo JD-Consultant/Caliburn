@@ -1,0 +1,33 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/JdSavedProjection.test.tsx (2 tests | 1 failed) 146ms
+   × serialization key order alone does not become a manual save before the next interview 29ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/JdSavedProjection.test.tsx > serialization key order alone does not become a manual save before the next interview
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/jd/JdSavedProjection.test.tsx:30:42
+     28|   expect(session.dirty).toBe(false);
+     29|   session.setText('繼續訪談');
+     30|   expect(await session.send(() => null)).toBe(true);
+       |                                          ^
+     31|   expect(port.save).not.toHaveBeenCalled();
+     32|   expect(port.submit).toHaveBeenCalledOnce();
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed | 2 passed (3)
+      Tests  1 failed | 26 passed (27)
+   Start at  02:02:22
+   Duration  1.74s (transform 222ms, setup 0ms, import 1.32s, tests 482ms, environment 1.94s)
+

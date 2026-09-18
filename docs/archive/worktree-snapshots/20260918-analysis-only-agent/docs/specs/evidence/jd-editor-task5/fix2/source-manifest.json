@@ -1,0 +1,16 @@
+[
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/service.py",
+    "sha256": "422179128b9951466cd43f160bb64307daec374146c32f3a586ca3b98473d880",
+    "bytes": 47547,
+    "baseline": "pre-existing snapshot service.py",
+    "review_before_sha256": "549a17442c6e3661c32e5152e9876b1e60b43b634216c6f5a1ac079ce57459f4"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_stop_projection.py",
+    "sha256": "033aebc0a05ba90eaa2656f73cfa3b9e7917698f11b99b31a4dc2b97a35197f1",
+    "bytes": 2367,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

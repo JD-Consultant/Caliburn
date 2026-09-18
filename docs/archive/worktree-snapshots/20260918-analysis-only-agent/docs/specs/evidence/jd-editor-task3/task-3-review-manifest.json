@@ -1,0 +1,163 @@
+[
+  {
+    "path": "docs/specs/contracts/jd-editor-v2.schema.json",
+    "sha256": "c892f4ba00af594eab2eed5a5315c5f3ed4d506ae711844852d1c810587d6ea7",
+    "bytes": 120778,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "c6cc0f996b7a24b37cdf784a9d46e88cbb1d59f4d68d327e4167f3dfa40fb715"
+  },
+  {
+    "path": "docs/specs/2026-09-10-jd-app-tool-contract.md",
+    "sha256": "f00d2d6d7a888839367ce55ba28f15b08be3f0efe6eab098789346d7fb276a3f",
+    "bytes": 42105,
+    "baseline": "pre-existing root authority copy, not new Task3 file",
+    "review_before_sha256": "7ce44971fa656d4f2096bebe1837508fa85e4e27c9752a6347072722fa54a834"
+  },
+  {
+    "path": "experiments/analysis-agent/README.md",
+    "sha256": "461a5f1f5b28463d60e305d71de3c7308430c71135c3e308dcffd78bb1e9f160",
+    "bytes": 80648,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d; existing earlier11line dirty hunk intentionally excluded",
+    "review_before_sha256": "8c05fcd14325b86e9302793b10550787a8dfcee843fcee0a5d76bd5d2eaefb72"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/api.py",
+    "sha256": "3645b19beccfdf754722503667e1b2088fa9ca728c18e2f2cff3792a0c97052f",
+    "bytes": 14451,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "27e7560f80ee6c26ded93288b3f34014468f27e837a74276b9f2523205eb82df"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/conversation.py",
+    "sha256": "556ec0e967e94f43fb0f83ae9cf0e533d24225eba223727f6bf1d58aaf681ada",
+    "bytes": 16499,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "2e6697aef5ff453a7b61dba97214ff18addb88eadf03ec546407fe2518da42ce"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_contract.py",
+    "sha256": "a3f552995a30bebb0f0ea64ac968483ee9c9f741c3196acd81fa6e44903b79da",
+    "bytes": 7122,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "9a74e159d9b7501446b5806926149c6b7ed8ea7255c3a84fbe13552759148268"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_engine.py",
+    "sha256": "14058289677ac2e22184dc6b5d903e7d301ffb21c9284c4e42aaee967e6e3338",
+    "bytes": 6410,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "c4ff586a4ee2e75a141e229648474edcde56232beadfbc5e4bebb4941910a6cb"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_service.py",
+    "sha256": "6654c98cb0735af60f6158f42a0ae39a11d77e6d1c487efff224119280d4a06b",
+    "bytes": 5785,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "000ed160728f037227998d8418ada7a520f9de30161807b374ce71229b7a7039"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/service.py",
+    "sha256": "5af47e569767d5496f1fdd9ae72280061379aa2dea726dcc533752531138ee03",
+    "bytes": 26056,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "a7fd7c1f2ac7d40051fd8f584e147003fab3e4d601ab1a068b583d3cddad2725"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+    "sha256": "f3a492e95364ae9ac494526780c3f9f3e6ccb4d9a53c6ee21d8d4f7a6ffef26c",
+    "bytes": 22705,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_references.py",
+    "sha256": "e53c89adfda77a2bc811be32edf678e210d35cf984b5f4fcca3b2e6c0d2ef39f",
+    "bytes": 3425,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_context.py",
+    "sha256": "d15520b164be1b1a23a07766602ea9b241515070ca45ccc4eacf3ae324fb3906",
+    "bytes": 6497,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_tools.py",
+    "sha256": "52e8a09f3fe53ded60d10efc37dea38283c6c4d3e10318c587be6d9912240435",
+    "bytes": 13929,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_references.py",
+    "sha256": "0746c55a3727518a1b99e484c42b84711136fbe690f55b678cf6bed2a362150a",
+    "bytes": 319,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_sources.py",
+    "sha256": "b2f04816d654efd2650de9d9e8960ac8d1e70c9f48bb4366d0d1743174c2f7a1",
+    "bytes": 4982,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_provider_binding.py",
+    "sha256": "32461795bb0a20e990d5e27b95fb1efa7e8a75ff77d772d1a38ee138f6e16ca6",
+    "bytes": 4177,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_model_view.py",
+    "sha256": "7527a08c8027198a31253abf9af763f3f1183e12b47df8a6feef2f3349a1ba16",
+    "bytes": 14414,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_model_view_recovery.py",
+    "sha256": "a34f42e2a3c56b33a82c8ea2b2337dd04edf3c066f11837e97c77f32fd4d6a02",
+    "bytes": 5179,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/jd_model_view_worker.py",
+    "sha256": "573a5fc8b546455d6562753c06e44b13eccf8e2576a50f7e8752c5b610e478fa",
+    "bytes": 1444,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/jd-editor/fixtures/task3-selection.mjs",
+    "sha256": "1ae93e5fc7d99527d41d6aaf9317c23f4a76b78ca1de45b8e2d5b696e417af7f",
+    "bytes": 316,
+    "baseline": "new file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/jd-editor/contract/generated/jd-editor-v2.schema.json",
+    "sha256": "c892f4ba00af594eab2eed5a5315c5f3ed4d506ae711844852d1c810587d6ea7",
+    "bytes": 120778,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "c6cc0f996b7a24b37cdf784a9d46e88cbb1d59f4d68d327e4167f3dfa40fb715"
+  },
+  {
+    "path": "experiments/jd-editor/contract/src/jd_editor_contract/models.py",
+    "sha256": "628719cf5389b5f612bec1fffed11bcb1eb60c315f713eb2260965b556b3d2f2",
+    "bytes": 42864,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "4698fc6e108d098bc03e0881737a50b703579c2835e2580f56b6d21342713bb0"
+  },
+  {
+    "path": "experiments/jd-editor/contract/types/jd-editor-v2.ts",
+    "sha256": "f076eb15e61bab601166ea843d7c20a2bc54946ed76dcabfa3888016178e382a",
+    "bytes": 39815,
+    "baseline": "git 23bf0161d3d61dc8517ec1ecf4ee9ad5cb8e5a6d",
+    "review_before_sha256": "2e50235d6bfb656c158250b86bfaf10c07329a084c4caf085b5e05d2a952cecd"
+  }
+]

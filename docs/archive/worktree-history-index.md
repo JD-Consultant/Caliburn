@@ -2,6 +2,8 @@
 
 本頁是歷史研究、設計、實驗與階段性結果的尋找入口。它不改寫任何研究內容，也不取代 [`../current-decisions.md`](../current-decisions.md)；目前施工仍只依 current decisions、Accepted ADR 與現行 code。
 
+為了讓不使用 Git 指令、只透過 GitHub 網頁審查專案的人也能找到資料，5 個封存 tag 的已提交 `docs/` 已同步放在 [`worktree-snapshots/`](worktree-snapshots/)。tag 仍保留作為原始提交定位；snapshot 是可直接瀏覽的文件副本，不是新的決策來源。
+
 ## 保留原則
 
 - 已提交的研究文件、設計文件、實驗案例、模型輸入／輸出與結果都保留在 Git 歷史中。

@@ -1,0 +1,11 @@
+[GNUPG:] ERROR add_keyblock_resource 33587281
+gpgv: keyblock resource 'S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-node-preflight\\gpg-home/S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-node-preflight\\nodejs-release-keyring.kbx': No such file or directory
+[GNUPG:] PLAINTEXT 74 0 
+[GNUPG:] NEWSIG
+gpgv: Signature made Wed Jul 29 21:56:01 2026    
+[GNUPG:] ERROR keydb_search 33554445
+gpgv:                using RSA key CC68F5A3106FF448322E48ED27F5E38D5B0A215F
+[GNUPG:] ERROR keydb_search 33554445
+[GNUPG:] ERRSIG 27F5E38D5B0A215F 1 8 01 1785333361 9 CC68F5A3106FF448322E48ED27F5E38D5B0A215F
+[GNUPG:] NO_PUBKEY 27F5E38D5B0A215F
+gpgv: Can't check signature: No public key

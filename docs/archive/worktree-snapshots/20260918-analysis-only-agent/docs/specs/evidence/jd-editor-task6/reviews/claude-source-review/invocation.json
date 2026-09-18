@@ -1,0 +1,33 @@
+{
+  "argv": [
+    "C:\\Users\\chenb\\.local\\bin\\claude.exe",
+    "-p",
+    "--model",
+    "claude-opus-5",
+    "--effort",
+    "high",
+    "--output-format",
+    "stream-json",
+    "--verbose",
+    "--max-turns",
+    "12",
+    "--max-budget-usd",
+    "3",
+    "--restricted",
+    "--safe-mode",
+    "--tools",
+    "Read",
+    "--allowedTools",
+    "Read",
+    "--permission-mode",
+    "dontAsk",
+    "--permission-prompts",
+    "none",
+    "--strict-mcp-config",
+    "--no-session-persistence",
+    "--no-chrome",
+    "--disable-slash-commands"
+  ],
+  "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\claude-source-review",
+  "scope": "engineering review only"
+}

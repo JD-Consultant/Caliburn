@@ -1,0 +1,51 @@
+{
+  "snapshot": "P3 C-W v1 before operator adoption",
+  "created_at_utc": "2026-09-10T03:56:02.3528310Z",
+  "byte_exact": true,
+  "original_manifest_unchanged": true,
+  "files": [
+    {
+      "path": "employee-card.md",
+      "sha256": "231d8020e72a11b607f35be8a7daf8ac4ec38b1a8733b5fa516110c8a669262a",
+      "bytes": 3238,
+      "original_path": "docs/specs/evidence/jd-product-p3-calibration/employee-card.md"
+    },
+    {
+      "path": "release-protocol.md",
+      "sha256": "923686b5c4fe6d55186bdbdbefb5218646bbcf73fd2a1e609c9a32cdea9728dc",
+      "bytes": 4377,
+      "original_path": "docs/specs/evidence/jd-product-p3-calibration/release-protocol.md"
+    },
+    {
+      "path": "oracle.md",
+      "sha256": "8b157e14dc1097e1129098a26a42b23b279925352f8a2d2ea44c074e21edbf52",
+      "bytes": 7283,
+      "original_path": "docs/specs/evidence/jd-product-p3-calibration/oracle.md"
+    },
+    {
+      "path": "README.md",
+      "sha256": "910042a810869dd9e93864eaf8f4f45bc0d43a08ccbd29d6d3c776d60c9563cb",
+      "bytes": 3147,
+      "original_path": "docs/specs/evidence/jd-product-p3-calibration/README.md"
+    },
+    {
+      "path": "results-template.md",
+      "sha256": "cf3d1087c94e8de9fc0231cf6da66e0534db56c1dd78534d961f48e53b011f79",
+      "bytes": 3798,
+      "original_path": "docs/specs/evidence/jd-product-p3-calibration/results-template.md"
+    },
+    {
+      "path": "manifest.json",
+      "sha256": "5d4598ceca456f3451fd594c23687902b7596bf9154a204f0b24d43df5201eeb",
+      "bytes": 2654,
+      "original_path": "docs/specs/evidence/jd-product-p3-calibration/manifest.json"
+    },
+    {
+      "path": "2026-09-10-jd-product-quality-acceptance.md",
+      "sha256": "1407e42b0a3c0d87c73caff6d37c05faa74020973f8f3d6441594bbdc6bbd92c",
+      "bytes": 32986,
+      "original_path": "docs/specs/2026-09-10-jd-product-quality-acceptance.md"
+    }
+  ],
+  "hashes_itself": false
+}

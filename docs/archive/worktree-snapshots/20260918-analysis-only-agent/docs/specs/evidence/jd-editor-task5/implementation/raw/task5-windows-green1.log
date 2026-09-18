@@ -1,0 +1,21 @@
+F.                                                                       [100%]
+================================== FAILURES ===================================
+______ test_actual_bootstrap_mutex_competitor_cannot_terminate_live_api _______
+
+    def test_actual_bootstrap_mutex_competitor_cannot_terminate_live_api():
+        assert importlib.util.find_spec('analysis_agent.windows_lifecycle'), 'App bootstrap is absent'
+        key = 'test-' + uuid4().hex
+        first = launch(key)
+        try:
+            ready = json.loads(first.stdout.readline())
+            assert ready['ready'] and ready['member'] and not ready['handle_inheritable']
+            second = launch(key)
+            output, error = second.communicate(timeout=10)
+>           assert second.returncode != 0 and 'already_running' in error
+E           assert (1 != 0 and 'already_running' in 'Traceback (most recent call last):\n  File "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agen...      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\npywintypes.error: (5, \'CreateMutex\', \'存取被拒。\')\n')
+E            +  where 1 = <Popen: returncode: 1 args: ['S:\\caliburn\\.worktrees\\analysis-only-agent\...>.returncode
+
+tests\test_windows_lifecycle.py:32: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_windows_lifecycle.py::test_actual_bootstrap_mutex_competitor_cannot_terminate_live_api
+1 failed, 1 passed in 0.75s

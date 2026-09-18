@@ -1,0 +1,139 @@
+{
+  "case_id": "CR-04-responsibility-boundary",
+  "case_family_id": "CR-04",
+  "source_type": "constructed_edge",
+  "title": "本人穩定責任、他人權責與偶爾協助",
+  "primary_risk": "員工固定核對供應商發票，採購核准屬主管責任，且只偶爾轉交急件；模型可能把他人權責或低頻協助寫成本人 Task",
+  "applicable_critical_checks": [
+    "C2_RESPONSIBILITY_BOUNDARY",
+    "C4_CORRECTION_NEGATION",
+    "C6_SOURCE_FIDELITY"
+  ],
+  "transcript": [
+    {
+      "source_id": "turn-001",
+      "role": "consultant",
+      "text": "請說明供應商發票與採購單在你們部門怎麼處理，你固定負責哪一段。"
+    },
+    {
+      "source_id": "turn-002",
+      "role": "employee",
+      "text": "供應商發票都是我先核對金額、稅額和收貨資料，確認完整後交給會計入帳。"
+    },
+    {
+      "source_id": "turn-003",
+      "role": "consultant",
+      "text": "採購單的核准也是你負責嗎？"
+    },
+    {
+      "source_id": "turn-004",
+      "role": "employee",
+      "text": "不是，採購單由部門主管核准。我只在主管請假而且案件很急時，幫忙把資料轉給代理主管，一個月可能不到一次。"
+    },
+    {
+      "source_id": "turn-005",
+      "role": "consultant",
+      "text": "那日常來說，哪一項才是你固定負責的工作？"
+    },
+    {
+      "source_id": "turn-006",
+      "role": "employee",
+      "text": "固定的是核對供應商發票；我沒有採購核准權。"
+    }
+  ],
+  "claim_table": [
+    {
+      "claim_id": "claim-001",
+      "speaker": "employee",
+      "literal_text": "供應商發票都是我先核對金額、稅額和收貨資料",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 1
+    },
+    {
+      "claim_id": "claim-002",
+      "speaker": "employee",
+      "literal_text": "確認完整後交給會計入帳",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 2
+    },
+    {
+      "claim_id": "claim-003",
+      "speaker": "employee",
+      "literal_text": "不是",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 3
+    },
+    {
+      "claim_id": "claim-004",
+      "speaker": "employee",
+      "literal_text": "採購單由部門主管核准",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 4
+    },
+    {
+      "claim_id": "claim-005",
+      "speaker": "employee",
+      "literal_text": "我只在主管請假而且案件很急時，幫忙把資料轉給代理主管",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 5
+    },
+    {
+      "claim_id": "claim-006",
+      "speaker": "employee",
+      "literal_text": "一個月可能不到一次",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 6
+    },
+    {
+      "claim_id": "claim-007",
+      "speaker": "employee",
+      "literal_text": "固定的是核對供應商發票",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 7
+    },
+    {
+      "claim_id": "claim-008",
+      "speaker": "employee",
+      "literal_text": "我沒有採購核准權",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 8
+    }
+  ],
+  "relevant_span_ids": [
+    "turn-002",
+    "turn-004",
+    "turn-006"
+  ],
+  "adjudication": {
+    "must_retain_tasks": [
+      "核對供應商發票的金額、稅額與收貨資料，確認完整後交付會計入帳"
+    ],
+    "must_not_create_tasks_from": [
+      "核准採購單",
+      "把低頻急件轉交代理主管列為穩定 Task",
+      "把部門主管的核准責任歸給員工"
+    ],
+    "allowed_task_variants": [
+      "審核供應商發票資料完整性並送交會計入帳",
+      "核對供應商發票與收貨資料後交付入帳"
+    ],
+    "required_uncertainties": [],
+    "notes": "turn-002 與 turn-006 一致支持固定發票核對責任；turn-004 明確否定採購核准權，並以「只在主管請假而且案件很急時」及「一個月可能不到一次」限定偶爾協助。三個 employee turns 全部重貼，避免只挑正確責任而省略會誤導模型的他人權責與低頻協助。claim 切分保留完整條件、頻率與否定語句。"
+  }
+}

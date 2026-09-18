@@ -1,0 +1,1475 @@
+BASE 8eec072d51e97735b22c5f0df598b67101fe570b
+Explicit files: 10
+Working-tree snapshot; LF normalized for review only. Raw bytes and hashes retained.
+
+diff --git a/experiments/analysis-agent/README.md b/experiments/analysis-agent/README.md
+--- a/experiments/analysis-agent/README.md
++++ b/experiments/analysis-agent/README.md
+@@ -1223,25 +1223,29 @@
+ `jd_routes.py` 將 browser manual/read/change requests 映射至同一內部 ports，沒有 fabricated AI run 或 tool ID。immutable browser refs 核 route document；人工候選完整驗 profile／來源 owner，終局同鍵 receipt 在 busy／archive gate 前回傳。來源按原 ConversationReader 讀取，沒有平行來源儲存。來源引用保留不表示新手改內容已獲原文證實。
+ 
+ 兩個允許 origins 僅 `127.0.0.1:3001`／`localhost:3001`；GET／POST／PATCH、Content-Type、不帶 credentials，未知 origin 403，保留 TrustedHost。`scripts/export_web_contract.py` 只從實際 Pydantic models 生成 Web 型別，不啟動 open_service 或讀 key。
+ 
+ 既有隔離 DB 先明確執行 `scripts/setup_jd_web.py` 的 additive metadata setup，指定專用 `Q019_TEST_DATABASE_URL`（只准 local `q019_jd_app_20260910`）；不刪表或搬 production 資料，`create_all` 不代替升級。測試保持既有 Memory DB guard。Node 22.23.2 必須在建立 JdEngine 前以 scoped PATH 啟動，不能只在另一 terminal 換版本。
+ 
+ `tests/jd_browser_server.py` 是零付費 browser fixture：實際 AnalysisService／API／JD router、官方 PG Saver／Store、原三工具，僅 model transport 使用固定 MockTransport，沒有讀取真 key 或 live fallback。Task 4 瀏覽器證據分開記 headed Chrome、CDP composition 與 Windows 真人 IME；完整取消／native process owner 屬 Task 5，自然模型與 Skill/E2E 屬後續 gate。
+ 
+ Task4 review fix1：人工保存的明確未 admission 回覆使用實際 Pydantic `ManualSaveRejection`（生成至 Web），含原 request key；只有在同一 service lock 中確認該 identity 無 receipt 後才回覆。已有 receipt 的非法重放、receipt lookup unavailable 與一般 HTTP 409/422 不代表零寫入；原正常 receipt 優先規則保留。Pydantic body validation 失敗也走相同 receipt 查核，UUID 使用與有效 DTO 相同的 canonical identity。
+ 
+ ### Task 5 — 同文件 admission、原生程序生命週期與原身分恢復
+ 
+ Windows API 的主執行緒先執行 `windows_lifecycle.bootstrap()`，才建立 DB、model client 或 Node。啟動程序必須設定穩定的 `Q019_LIFECYCLE_INSTALLATION`（1–80 個英數字、底線或連字號），同一隔離安裝的重開沿用同值。私有 mutex 防止第二個 API 搶走正在工作的安裝；私有 Job 保留 kill-on-close 並禁止 handle 繼承，啟動核對 exact 舊 Job 停止後才加入新 Job。未知物件、指派失敗或舊物件仍存在都先拒絕工作。舊未受管服務切換必須先核實並受控停止；不能以換 key 或按 port 殺程序代替。
+ 
+ `tests/jd_browser_server.py` 也走真 bootstrap。既有離線啟動命令加上 process-scoped `Q019_LIFECYCLE_INSTALLATION=jd-editor-offline-20260910`；Node 使用 Task4 isolated 22.23.2，DB 仍是 `q019_jd_app_20260910`。可設 `Q019_TEST_EVIDENCE_PREFIX=task5` 或 `task6`，將離線 fixture 記錄分開，預設保留 task4 名稱。實際 API `create_app()` 在主執行緒 bootstrap；不可用尚未 bootstrap 的 `open_service()` 繞入 resources。
+ 
+ 人工儲存、AI、selection、HTTP selection read 及建立文件都由 App owner 保留 spawn／Popen／pipe／I/O 執行緒。原生回傳或 Future.done 不代表已清理；未清理時不發布候選、不新增同文件寫入。等待與有界 cleanup 不持全域 admission lock，另一文件可以繼續。關閉先停 admission、送出取消信號，再等原 Python entry 與 native owner 排空。AI stop 不停掉唯讀使用；唯讀入口只接 App shutdown 的獨立停止信號。
+ 
+ 人工 admission 在 Node 前以官方 root checkpoint 保存最多一筆 operation／base／digest／request_key／origin，沒有候選、假 HumanMessage 或 run。結果不明時保留原身分；停止已證後先取得 PG head row lock，下一 statement 查原 receipt，只有 known-none 才閉合原 failure。已提交結果永遠回原 receipt，取消不撤銷它。JD close 核對實際 factory session、原 message/call/input 與全部未閉合 bindings；只補缺失 ToolMessage，保留原訊息及已确认模型投影 manifest，未知不取得一般 resume 權。
+ 
+ App-only `GET /documents/{document}/jd/manual-recovery` 可不附 key 發現原待處理身分，或附原 `request_key` 唯讀查回結果。`POST` 同路徑只收原 UUID key，明示做一次有界恢復，不接收或重跑候選。每個 available／unknown／no_pending 都由同一 server admission 投影 `write_blocked`／`can_recover`；結果已讀但 descriptor 未清仍可明示清理，archive 不遮蔽原結果。GET 不停止程序、不更新 checkpoint、不寫 receipt。
+ 
+ 瀏覽器重開／pageshow 只讀查詢，不自動重送人工稿。沒有 cache 也保留原身分恢復入口；有 exact cache 且 no_pending 時，可另次明示完整原 key/base/value，可能是首次送達。查不到不代表零效果；終局失敗保留候選，新 dirty 不被晚到結果覆蓋。最新完整 server gate 讀取失敗仍維持鎖定。新 transport 型別由實際 Pydantic → export → generated Web，三個模型工具與 JD JSON Schema 不變。
+ 
+ Task5 測試與觀測限制列於 `scratch/task-5-report.md`；真 Windows kernel、真 PG/Saver 程序重開、App seam fixture 與 Web mocks 分別記錄，不將它們混成自然模型、真人 IME 或 Task6 成品通過。
++
++Task5 review fix1：輸入在最終 admission 再核封存與原 key；selection reservation 保留到同一鎖區內的最後檢查。manual recovery／stop／放棄中斷回合沿同文件 reservation，在全域鎖外等待 native／PG；shutdown 先禁止新操作，再等這些 entry 完整對帳及結果投影。全域 RLock 仍用於共用 owner 狀態與短 admission，不取代 PG row／advisory lock，也不宣稱效能倍數。
++
++原人工 full-save 先查原 key／digest 的 terminal receipt；descriptor 清理失敗或另有 active owner 仍回原結果並保留寫入 gate。cache 遺失時，明示恢復的原 key／結果在後續重讀仍可查看；無 key discovery 另決定目前 gate，不把已確認結果洗掉。App-only 恢復 DTO 新增 `restart_required`：無 run／manual descriptor 的 native read owner 未能停止時，畫面明示保留目前頁面及 dirty／問句、受控停止原服務、沿原 installation 設定重開後按「重新讀取狀態」。只重新整理網頁不會停止舊程序；本切片不新增一般 cancel route、假 run 或自動重播。正式日常啟停入口仍屬成品 P5。
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/jd_routes.py b/experiments/analysis-agent/src/analysis_agent/jd_routes.py
+--- a/experiments/analysis-agent/src/analysis_agent/jd_routes.py
++++ b/experiments/analysis-agent/src/analysis_agent/jd_routes.py
+@@ -12,50 +12,51 @@
+ from starlette.concurrency import run_in_threadpool
+ from jd_editor_contract import models
+ from jsonschema import ValidationError
+ from analysis_agent.jd_contract import (validate, revision_ref, parse_ref, outcome_to_wire,
+     manual_intent, manual_operation_id, read_failure_to_wire)
+ from analysis_agent.jd_references import elements, source_refs
+ from analysis_agent.jd_types import JdScope, JdReadQuery, JdChangeQuery, JdReadView
+ from analysis_agent.service import ServiceConflict
+ 
+ class ManualSaveRejection(BaseModel):
+     model_config = ConfigDict(extra='forbid')
+     admission: Literal['not_admitted'] = 'not_admitted'
+     request_key: str
+     message: str
+ 
+ 
+ class ManualRecoveryRequest(BaseModel):
+     model_config = ConfigDict(extra='forbid')
+     request_key: UUID
+ 
+ 
+ class ManualRecoveryGate(BaseModel):
+     model_config = ConfigDict(extra='forbid')
+     write_blocked: bool
+     can_recover: bool
++    restart_required: bool = False
+ 
+ 
+ class ManualRecoveryAvailable(ManualRecoveryGate):
+     status: Literal['available']
+     request_key: UUID
+     result: models.JdManualSaveResult
+ 
+ 
+ class ManualRecoveryUnknown(ManualRecoveryGate):
+     status: Literal['unknown']
+     request_key: UUID
+ 
+ 
+ class ManualRecoveryNoPending(ManualRecoveryGate):
+     status: Literal['no_pending']
+     request_key: UUID | None
+ 
+ 
+ ManualRecoveryResult = Annotated[ManualRecoveryAvailable | ManualRecoveryUnknown | ManualRecoveryNoPending,
+     Field(discriminator='status')]
+ 
+ 
+ def rejected_manual(request, document, key, message, status=422):
+     # Never infer zero-write from HTTP status or a failed receipt lookup.
+     service, scope = scoped(request, document)
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/service.py b/experiments/analysis-agent/src/analysis_agent/service.py
+--- a/experiments/analysis-agent/src/analysis_agent/service.py
++++ b/experiments/analysis-agent/src/analysis_agent/service.py
+@@ -54,50 +54,51 @@
+             raise StopRequested('Stopped at model entry')
+         return handler(request)
+ 
+     def wrap_tool_call(self, request, handler):
+         # Other hooks can run after after_model. Check again at the actual
+         # public tool entry; this result is certain because handler is NOT run.
+         if self.signal.is_set():
+             return ToolMessage('Tool not executed: stop was requested before tool entry.',
+                 name=request.tool_call['name'], tool_call_id=request.tool_call['id'], status='error')
+         return handler(request)
+ 
+ 
+ @dataclass
+ class DocumentRuntime:
+     graph: object
+     reader: ConversationReader
+     stop: Event
+     memory: MemorySession | None
+     jd_session: object | None = None
+     native_calls: object = field(default_factory=JdNativeCalls)
+     active_entries: int = 0
+     manual_active: bool = False
+     generation: int = 0
+     prior_execution: bool = False
+     closing: bool = False
++    close_entries: int = 0
+     read_stop: Event = field(default_factory=Event)
+ 
+     @property
+     def config(self):
+         return {'configurable': {'thread_id': self.reader.document_id}}
+ 
+ 
+ def current_values(snapshot):
+     for task in snapshot.tasks:
+         if (task.name == 'analysis' and hasattr(task.state, 'values')
+                 and task.state.values.get('messages')):
+             return task.state.values
+     return snapshot.values
+ 
+ 
+ def pending_input_id(snapshot):
+     return next((m.id for m in reversed(snapshot.values.get('messages', []))
+                  if isinstance(m, HumanMessage)), None)
+ 
+ 
+ def resumable_repair(state):
+     """Only the known C workflow can replay an uncertain publication safely.
+ 
+     Its checkpointed operation identity and existing CAS/receipt protocol own
+     idempotency. This is NOT permission to rerun arbitrary unknown tools.
+@@ -281,178 +282,207 @@
+         pending = context.graph.get_state(context.config).values.get('jd_manual_pending')
+         if pending is None:
+             return None
+         try:
+             valid = (set(pending)=={'operation','base','digest','request_key','origin'} and
+                 pending['origin']=='manual' and re.fullmatch('[0-9a-f]{64}',pending['digest']) and
+                 str(UUID(pending['request_key']))==pending['request_key'] and
+                 str(UUID(pending['base']))==pending['base'] and
+                 str(manual_operation_id(JdScope(context.reader.document_id),pending['request_key']))==pending['operation'])
+         except (TypeError,ValueError,KeyError):
+             valid = False
+         if not valid:
+             raise PublicationUncertain('Manual admission identity cannot be confirmed')
+         return pending
+ 
+     def manual_recovery(self, document, request_key=None):
+         """Pure projection of an original receipt and the same admission owner."""
+         from analysis_agent.jd_contract import manual_operation_id
+         from analysis_agent.jd_types import JdScope
+         with self.lock:
+             context = self._context(document)
+             pending = self._manual_pending(context)
+             key = request_key if request_key is not None else pending['request_key'] if pending else None
+             original = self.jd.store.receipt(JdScope(document),manual_operation_id(JdScope(document),key)) if key else None
+             matched = pending is not None and pending['request_key']==key
+-            can_recover = bool(matched and not context.manual_active and not context.closing and
++            can_recover = bool(self.accepting and matched and not context.manual_active and not context.closing and
+                 not context.active_entries and not self._running(document))
+             result = {'status':'available' if original else 'unknown' if matched else 'no_pending',
+-                'request_key':key,'write_blocked':self._write_blocked(context),'can_recover':can_recover}
++                'request_key':key,'write_blocked':self._write_blocked(context),'can_recover':can_recover,
++                'restart_required':bool(context.native_calls.blocked and not pending and
++                    not context.active_entries and not context.manual_active and not context.closing and
++                    not self._running(document) and not context.graph.get_state(context.config).next)}
+             if original:
+                 if original.durability!='confirmed' or original.status=='operation_conflict':
+                     raise PublicationUncertain('Original terminal receipt cannot be confirmed')
+                 result['result'] = original
+             return result
+ 
+     def recover_manual(self, document, request_key):
+         """One explicit attempt on the exact original identity; never replay."""
+         with self.lock:
++            if not self.accepting:
++                raise ServiceConflict('Service is stopping')
+             initial = self.manual_recovery(document,request_key)
+             context = self._context(document)
+             pending = self._manual_pending(context)
+             if not pending or pending['request_key']!=request_key:
+                 return initial
+-            if not initial['can_recover']:
++            if context.closing or context.manual_active or context.active_entries or self._running(document):
+                 if initial['status']=='available':
+                     return initial
+                 raise ServiceConflict('Original manual publisher or recovery is active')
+             context.closing = True
++            context.close_entries += 1
+             context.generation += 1
+             generation = context.generation
+         try:
+             # This owner retains the original handles. No global lock while waiting.
+             context.native_calls.cleanup()
+             with self.lock:
+                 if context.generation!=generation or self._manual_pending(context)!=pending:
+                     raise PublicationUncertain('Manual recovery admission changed')
++            try:
++                self._reconcile_manual(context)
++            except PublicationUncertain:
++                pass
++        finally:
++            with self.entries_changed:
++                context.closing = False
+                 try:
+-                    self._reconcile_manual(context)
+-                except PublicationUncertain:
+-                    pass
+-        finally:
+-            with self.lock:
+-                context.closing = False
+-        return self.manual_recovery(document,request_key)
++                    # Project the released gate before another admission or
++                    # shutdown can run; the drain count still owns this read.
++                    result = self.manual_recovery(document,request_key)
++                finally:
++                    context.close_entries -= 1
++                    self.entries_changed.notify_all()
++        return result
+ 
+     @contextmanager
+     def jd_read_entry(self, document):
+         with self.lock:
+             if not self.accepting:
+                 raise ServiceConflict('Service is stopping')
+             context = self._context(document)
++            if context.closing:
++                raise ServiceConflict('Document recovery is closing prior native work')
+             context.active_entries += 1
+         try:
+             yield context
+         finally:
+             with self.entries_changed:
+                 context.active_entries -= 1
+                 self.entries_changed.notify_all()
+ 
+     def save_manual(self, intent, request_key):
+         from analysis_agent.conversation import save_manual_pending
+         from analysis_agent.jd_contract import validate_intent_digest, manual_operation_id
+         from analysis_agent.jd_references import source_refs
+         validate_intent_digest(intent)
+         if manual_operation_id(intent.scope,request_key)!=intent.operation_id:
+             raise ValueError('Manual request identity differs')
+         document = intent.scope.document_id
+         with self.lock:
+             context = self._context(document)
+             pending = context.graph.get_state(context.config).values.get('jd_manual_pending')
+-            if pending and pending.get('request_key')==request_key and not context.manual_active:
+-                if pending.get('digest')!=intent.digest:
+-                    raise ServiceConflict('Original manual payload differs')
+-                return self._reconcile_manual(context)
+             original = self.jd.store.receipt(intent.scope,intent.operation_id,intent.digest)
+             if original:
+-                if pending and pending['operation']==str(intent.operation_id) and original.status!='operation_conflict':
+-                    save_manual_pending(context.graph,context.config,None)
++                if (pending and pending['operation']==str(intent.operation_id) and original.status!='operation_conflict'
++                        and not context.closing and not context.manual_active and not context.active_entries
++                        and context.native_calls.quiescent and not self._running(document)):
++                    try:
++                        save_manual_pending(context.graph,context.config,None)
++                    except Exception:
++                        pass  # A terminal receipt remains readable; the descriptor keeps its gate.
+                 return original
++            recover = pending and pending.get('request_key')==request_key
++            if recover and pending.get('digest')!=intent.digest:
++                raise ServiceConflict('Original manual payload differs')
++        if recover:
++            result = self.recover_manual(document,request_key)
++            if result['status']=='available':
++                return result['result']
++            raise PublicationUncertain('Original manual result is still unknown')
++        with self.lock:
++            # Another request can have admitted while the receipt was read.
+             if self._write_blocked(context):
+                 raise ServiceConflict('Close the admitted foreground/manual operation first')
+             for reference in source_refs(intent.value):
+                 context.reader.read(reference)
+             descriptor = {'operation':str(intent.operation_id),'base':str(intent.base_id),
+                 'digest':intent.digest,'request_key':request_key,'origin':'manual'}
+             # No candidate or synthetic input is written into this root channel.
+             save_manual_pending(context.graph,context.config,descriptor)
+             context.stop.clear()
+             context.manual_active = True
+             context.active_entries += 1
+             context.generation += 1
+         try:
+             result = self.jd.manual_save(intent,cancel=context.stop,native_calls=context.native_calls)
+             with self.lock:
+                 if result.durability=='confirmed' and result.status!='operation_conflict' and context.native_calls.quiescent:
+                     save_manual_pending(context.graph,context.config,None)
+             return result
+         finally:
+             with self.entries_changed:
+                 context.manual_active = False
+                 context.active_entries -= 1
+                 self.entries_changed.notify_all()
+ 
+     def _reconcile_manual(self, context):
+         """Only the root's admitted identity; no candidate reconstruction."""
+         from uuid import UUID
+         import re
+         from analysis_agent.conversation import save_manual_pending
+         from analysis_agent.jd_types import JdScope
+         from analysis_agent.jd_contract import manual_operation_id
+         from analysis_agent.jd_reconcile import JdWriterStopped,JdAdmittedIdentity,reconcile_identity
+-        snapshot = context.graph.get_state(context.config)
+-        pending = self._manual_pending(context)
++        with self.lock:
++            snapshot = context.graph.get_state(context.config)
++            pending = self._manual_pending(context)
++            generation = context.generation
+         if pending is None:
+             return None
+         scope = JdScope(context.reader.document_id)
+         if (snapshot.next or pending.get('origin')!='manual' or
+                 set(pending)!= {'operation','base','digest','request_key','origin'} or
+                 not re.fullmatch('[0-9a-f]{64}',pending.get('digest','')) or
+                 str(manual_operation_id(scope,pending['request_key']))!=pending['operation']):
+             raise PublicationUncertain('Manual admission identity cannot be confirmed')
+         proof = JdWriterStopped(scope,context.native_calls,
+             lambda: not context.active_entries and not self._running(scope.document_id),
+             self.lifecycle,context.prior_execution)
+         identity = JdAdmittedIdentity(scope,UUID(pending['operation']),UUID(pending['base']),pending['digest'],'manual')
+         result = reconcile_identity(self.jd.store,identity,proof)
+-        if context.graph.get_state(context.config).values.get('jd_manual_pending')!=pending:
+-            raise PublicationUncertain('Manual admission changed during reconciliation')
+-        try:
+-            save_manual_pending(context.graph,context.config,None)
+-        except Exception as exc:
+-            raise PublicationUncertain('Original result is terminal but admission cleanup is unconfirmed') from exc
+-        context.prior_execution = False
++        with self.lock:
++            if context.generation!=generation or context.graph.get_state(context.config).values.get('jd_manual_pending')!=pending:
++                raise PublicationUncertain('Manual admission changed during reconciliation')
++            try:
++                save_manual_pending(context.graph,context.config,None)
++            except Exception as exc:
++                raise PublicationUncertain('Original result is terminal but admission cleanup is unconfirmed') from exc
++            context.prior_execution = False
+         return result
+ 
+     def _close_turn(self, context, *, reason='cancelled', worker_unwound=False):
+         """Caller has reserved this document; no wait while holding admission."""
+         from analysis_agent.jd_reconcile import JdWriterStopped
+         document = context.reader.document_id
+         idle = lambda: (not context.active_entries and
+                         (worker_unwound or not self._running(document)))
+         proof = JdWriterStopped(context.jd_session.scope if context.jd_session else None,
+             context.native_calls,idle,self.lifecycle,context.prior_execution)
+         if context.jd_session:
+             proof.require(context.jd_session.scope)
+             context.jd_session.stopped_proof = proof
+         elif not idle():
+             raise PublicationUncertain('Foreground execution has not stopped')
+         try:
+             return close_turn(context.graph,context.config,reason=reason,quiescent=True,
+                 memory_session=context.memory,jd_session=context.jd_session)
+         finally:
+             if context.jd_session:
+                 context.jd_session.stopped_proof = None
+ 
+     def _reconcile(self, row, *, startup=False, observer=False):
+         context = self._context(row['document_id'])
+         snapshot = context.graph.get_state(context.config, subgraphs=True)
+@@ -475,108 +505,136 @@
+             outcome = snapshot.values.get('turn_outcome')
+             if not outcome or outcome['input_id'] != row['id']:
+                 outcome = row['outcome']
+             return self.catalog.update_run(row['id'], status=boundary['status'], outcome=outcome)
+         if startup:
+             if not observer and row['status'] == 'stopping' and pending_input_id(snapshot) == row['id']:
+                 try:
+                     self._close_turn(context)
+                 except PublicationUncertain:
+                     return self.catalog.update_run(row['id'], status='uncertain', error_code='publication_uncertain')
+                 return self._reconcile(row)
+             return self.catalog.update_run(row['id'], status=('uncertain' if row['error_code'] == 'publication_uncertain' else 'interrupted'),
+                 error_code=row['error_code'] or 'process_interrupted', usage_complete=False)
+         return row
+ 
+     def submit(self, document, request_key, text, *, abandon_pending=False, jd_selection=None):
+         if not text.strip() or not request_key or len(request_key) > 128:
+             raise ValueError('Non-empty text and a request key of at most 128 characters are required')
+         import json
+         from analysis_agent.jd_contract import validate, parse_ref
+         from analysis_agent.jd_types import JdScope
+         if jd_selection is not None:
+             jd_selection=validate('JdSelectionCaptureClientInput',jd_selection)
+         digest = hashlib.sha256(json.dumps({'text':text,'jd_selection':jd_selection,
+             'abandon_pending':abandon_pending},sort_keys=True,ensure_ascii=False,separators=(',', ':')).encode()).hexdigest()
++        closing_pending = False
+         with self.lock:
+             if not self.accepting:
+                 raise ServiceConflict('Service is stopping')
+             context = self._context(document)
+             existing = next((r for r in self.catalog.runs(document) if r['request_key'] == request_key), None)
+             if existing:
+                 if existing['input_digest'] != digest:
+                     raise ServiceConflict('Request key already belongs to different input')
+                 self.get_run(document, existing['id'])
+                 existing = self.catalog.run(document, existing['id'])
+                 saved = context.graph.get_state(context.config)
+                 if any(m.id == existing['id'] for m in saved.values.get('messages', [])):
+                     return self.get_run(document, existing['id'])
+                 self.catalog.update_run(existing['id'], status='not_received', error_code=None)
+             if self.catalog.document(document)['archived']:
+                 raise ServiceConflict('Document is archived')
+             if self._running(document):
+                 raise ServiceConflict('This document is still running')
+             if self._jd_busy(context):
+                 raise ServiceConflict('JD operation must be reconciled before new input')
+             snapshot = context.graph.get_state(context.config)
+             if snapshot.next:
+                 if not abandon_pending:
+                     raise ServiceConflict('Resume or explicitly close the interrupted run first')
+-                self._close_turn(context)
+-                for old in self.catalog.runs(document):
+-                    if old['status'] in {'running', 'interrupted', 'uncertain', 'stopping'}:
+-                        self._reconcile(old)
++                closing_pending = context.closing = True
++                context.close_entries += 1
+             context.stop.clear()
+             selection_context=None
+-            if jd_selection is not None:
++            if jd_selection is not None and not closing_pending:
+                 if self.jd is None: raise ServiceConflict('JD selection is unavailable')
+                 scope=JdScope(document)
+                 try:
+                     base,=parse_ref(jd_selection['base_revision_ref'],'revision',scope)
+                 except ValueError as exc:
+                     raise ServiceConflict('JD selection belongs to an invalid saved document reference') from exc
+                 current=self.jd.store.current(scope)
+                 if current.id!=base: raise ServiceConflict('JD selection base is stale; select saved current content again')
+                 context.active_entries += 1
+                 context.generation += 1
+                 selection_generation = context.generation
++        if closing_pending:
++            try:
++                self._close_turn(context)
++                if context.graph.get_state(context.config).next:
++                    raise PublicationUncertain('Interrupted input closure is unconfirmed')
++                for old in self.catalog.runs(document):
++                    if old['status'] in {'running','interrupted','uncertain','stopping'}:
++                        self._reconcile(old)
++            finally:
++                with self.entries_changed:
++                    context.closing = False
++                    context.close_entries -= 1
++                    self.entries_changed.notify_all()
++            # The old input is now closed. Recheck admission of this original
++            # request (including archive/stop), then prepare its selection.
++            return self.submit(document,request_key,text,abandon_pending=abandon_pending,jd_selection=jd_selection)
+         if jd_selection is not None:
+             try:
+                 from analysis_agent.jd_engine import JdEngineFailure
+                 try:
+                     native=self.jd.engine.selection(current.value,jd_selection['range'],cancel=context.stop,native_calls=context.native_calls)
+                 except JdEngineFailure as exc:
+                     if exc.code in {'invalid_input','invalid_selection','invalid_span','target_missing','unsupported_content'}:
+                         raise ServiceConflict('JD selection is unavailable; select supported saved content again') from exc
+                     raise
+                 selection_context={'document':document,'revision':str(base),'target':native['target_id'],
+                     'range':native['range'],'fragment':native['fragment']}
+-            finally:
++            except BaseException:
+                 with self.entries_changed:
+                     context.active_entries -= 1
+                     self.entries_changed.notify_all()
+-        with self.lock:
++                raise
++        with self.lock:
++            if jd_selection is not None:
++                context.active_entries -= 1
++                self.entries_changed.notify_all()
++            latest = next((r for r in self.catalog.runs(document) if r['request_key']==request_key),None)
++            if latest:
++                if latest['input_digest']!=digest:
++                    raise ServiceConflict('Request key already belongs to different input')
++                if any(m.id==latest['id'] for m in context.graph.get_state(context.config).values.get('messages',[])):
++                    return self.get_run(document,latest['id'])
++                existing = latest
++            if self.catalog.document(document)['archived'] or context.graph.get_state(context.config).next:
++                raise ServiceConflict('Document archive or pending input changed during admission')
+             if not self.accepting or self._running(document) or self._jd_busy(context):
+                 raise ServiceConflict('Document admission changed while preparing input')
+             if jd_selection is not None and (context.generation!=selection_generation or
+                     context.stop.is_set() or self.jd.store.current(scope).id!=base):
+                 raise ServiceConflict('JD selection base or owner changed during admission')
+             row = existing or self.catalog.create_run(document, request_key, digest)
+             context.generation += 1
+             if selection_context is not None: selection_context['input']=row['id']
+             # as_node START writes the real root input and schedules analysis,
+             # without running a model. It is a public update_state operation.
+             context.graph.update_state(context.config, {'messages': [HumanMessage(text, id=row['id'])],
+                                                         'turn_outcome': None, 'jd_selection': selection_context}, as_node=START)
+             saved = context.graph.get_state(context.config)
+             if not any(m.id == row['id'] for m in saved.values.get('messages', [])):
+                 raise RuntimeError('Input checkpoint was not confirmed')
+             self._launch(context, row)
+             return self.get_run(document, row['id'])
+ 
+     def _launch(self, context, row):
+         context.stop.clear()
+         self.catalog.update_run(row['id'], status='running', error_code=None)
+         self.futures[row['document_id']] = self.executor.submit(self._execute, context, row['id'])
+ 
+     def _execute(self, context, run_id):
+         try:
+@@ -593,54 +651,53 @@
+                 # the requested stop; do not offer an unwanted network resume.
+                 try:
+                     self._close_turn(context, worker_unwound=True)
+                 except PublicationUncertain:
+                     code, status = 'publication_uncertain', 'uncertain'
+                 else:
+                     code, status = None, 'cancelled'
+             elif isinstance(exc, PublicationUncertain):
+                 code, status = 'publication_uncertain', 'uncertain'
+             elif isinstance(exc, ModelError):
+                 billing = is_billing_error(exc)
+                 retryable = exc.is_retryable and not billing
+                 code = ('context_budget_exceeded' if isinstance(exc, RequestBudgetExceeded) else
+                         'billing_error' if billing else ('transport_error' if retryable else 'configuration_error'))
+                 status = 'interrupted'
+                 if not retryable:
+                     try:
+                         self._close_turn(context, reason='configuration_error', worker_unwound=True)
+                         status = 'configuration_error'
+                     except PublicationUncertain:
+                         code, status = 'publication_uncertain', 'uncertain'
+             else:
+                 code, status = 'runtime_error', 'interrupted'
+             with self.lock:
+                 row = self.catalog.update_run(run_id, status=status, error_code=code, usage_complete=False)
+-                self._reconcile(row)
++            self._reconcile(row)
+             return
+-        with self.lock:
+-            self._reconcile(self.catalog.run(context.reader.document_id, run_id))
++        self._reconcile(self.catalog.run(context.reader.document_id, run_id))
+ 
+     def get_run(self, document, run_id):
+         with self.lock:
+             row = self.catalog.run(document, run_id)
+             if not self._running(document) and row['status'] in {'receiving', 'running', 'stopping'}:
+                 row = self._reconcile(row, startup=True, observer=True)
+             context = self._context(document)
+             snapshot = context.graph.get_state(context.config, subgraphs=True)
+             state = current_values(snapshot)
+             if not any(m.id == run_id for m in snapshot.values.get('messages', [])):
+                 row = self.catalog.update_run(run_id, status='not_received', error_code=None)
+             repair_resume = row['error_code'] == 'publication_uncertain' and resumable_repair(state)
+             read_call = pending_memory_read(snapshot, context.memory)
+             read_resume = (row['error_code'] in {'runtime_error', 'process_interrupted'}
+                 and read_call is not None)
+             at_tools = any(t.name == 'analysis' and hasattr(t.state, 'next')
+                            and 'tools' in t.state.next for t in snapshot.tasks)
+             last = state.get('messages', [])[-1] if state.get('messages') else None
+             notification_pending = (isinstance(last, AIMessage) and not last.invalid_tool_calls
+                 and len(last.tool_calls) == 1 and last.tool_calls[0]['name'] == REQUEST_TOOL_NAME)
+             # A process/transport label cannot certify an unknown tool effect.
+             # Only bound reads, the reserved pure notification, and C's saved
+             # receipt identity may re-enter a pending ToolNode.
+             safe_tools = read_call is not None or notification_pending or resumable_repair(state)
+             can_resume = (not self._running(document) and row['status'] in {'interrupted', 'uncertain'}
+@@ -689,101 +746,107 @@
+             for message in state.get('messages', []):
+                 if not isinstance(message, (HumanMessage, AIMessage)):
+                     continue
+                 if message.additional_kwargs.get('analysis_agent_origin') == 'runtime_notice':
+                     continue
+                 if isinstance(message.content, str):
+                     text = message.content
+                 else:
+                     text = ''.join(b.get('text', '') for b in message.content
+                                    if isinstance(b, dict) and b.get('type') == 'text')
+                 if text:
+                     result.append({'id': message.id, 'role': 'user' if isinstance(message, HumanMessage) else 'assistant', 'text': text})
+             return result
+ 
+     def resume(self, document, run_id):
+         with self.lock:
+             if not self.accepting or not self.get_run(document, run_id)['can_resume']:
+                 raise ServiceConflict('Run is not safely resumable')
+             row = self.catalog.run(document, run_id)
+             row = self.catalog.update_run(run_id, resume_count=row['resume_count'] + 1)
+             self._launch(self._context(document), row)
+             return self.get_run(document, run_id)
+ 
+     def stop(self, document, run_id):
+         with self.lock:
++            if not self.accepting:
++                raise ServiceConflict('Service is stopping')
+             self.get_run(document, run_id)
+             row = self.catalog.run(document, run_id)
+             context = self._context(document)
+             snapshot = context.graph.get_state(context.config)
+             state = current_values(context.graph.get_state(context.config,subgraphs=True))
+             pending_jd = state.get('jd_pending_operation') or any(not b.get('closed') for b in state.get('jd_bindings',{}).values())
+             if (not snapshot.next and not pending_jd) or pending_input_id(snapshot) != run_id:
+                 return self.get_run(document, run_id)
+             if self._running(document):
+                 context.stop.set()
+                 self.catalog.update_run(run_id, status='stopping')
+                 return self.get_run(document,run_id)
+             if context.closing:
+                 return self.get_run(document,run_id)
+             context.stop.set()
+             context.closing = True
++            context.close_entries += 1
+             generation = context.generation
+             self.catalog.update_run(run_id,status='stopping')
+         # Same handles only, outside global admission. GET never reaches here.
+-        cleaned = context.native_calls.cleanup()
+-        with self.lock:
+-            try:
++        try:
++            cleaned = context.native_calls.cleanup()
++            with self.lock:
+                 if not cleaned or generation!=context.generation:
+                     raise PublicationUncertain('JD cleanup/generation is unconfirmed')
+-                self._close_turn(context)
+-                self._reconcile(row)
+-            except PublicationUncertain:
++            self._close_turn(context)
++            self._reconcile(row)
++        except PublicationUncertain:
++            with self.lock:
+                 self.catalog.update_run(run_id,status='uncertain',error_code='publication_uncertain')
+-            finally:
++        finally:
++            with self.entries_changed:
+                 context.closing = False
+-            return self.get_run(document,run_id)
++                context.close_entries -= 1
++                self.entries_changed.notify_all()
++        return self.get_run(document,run_id)
+ 
+     def join(self, document):
+         """Wait for quiescence without holding admission lock (also used at shutdown)."""
+         future = self.futures.get(document)
+         if future:
+             future.result()
+ 
+     def close(self):
+         with self.lock:
+             self.accepting = False
+             self.create_stop.set()
+             for context in self.contexts.values():
+                 context.stop.set()
+                 context.read_stop.set()
+         if self.scheduler is not None and self.scheduler.running:
+             self.scheduler.shutdown(wait=True)
+         if hasattr(self, 'background_lock'):
+             # Also join an admitted direct dispatcher call (maintenance/tests),
+             # not only work submitted by APScheduler. No lock held over A join.
+             with self.background_lock:
+                 pass
+         self.executor.shutdown(wait=True, cancel_futures=False)
+         with self.entries_changed:
+             drained = self.entries_changed.wait_for(lambda: not self.create_active and
+-                all(not context.active_entries for context in self.contexts.values()),timeout=10)
++                all(not context.active_entries and not context.close_entries for context in self.contexts.values()),timeout=10)
+         if not drained:
+             raise PublicationUncertain('App entry drain is not confirmed')
+         owners = [self.create_calls,*(c.native_calls for c in self.contexts.values())]
+         cleaned = [owner.cleanup() for owner in owners]
+         if not all(cleaned):
+             raise PublicationUncertain('Native cleanup is not confirmed')
+-        with self.lock:
+-            for context in self.contexts.values():
++        for context in list(self.contexts.values()):
+                 if self.jd is not None:
+                     self._reconcile_manual(context)
+                 snapshot = context.graph.get_state(context.config)
+                 if snapshot.next and context.jd_session is not None:
+                     try:
+                         self._close_turn(context)
+                     except PublicationUncertain:
+                         # Keep saved unknown work; do not fabricate a result.
+                         continue
+                     for row in self.catalog.runs(context.reader.document_id):
+                         if row['status'] in {'receiving','running','stopping','uncertain','interrupted'}:
+                             self._reconcile(row)
+
+diff --git a/experiments/analysis-agent/tests/test_jd_manual_recovery.py b/experiments/analysis-agent/tests/test_jd_manual_recovery.py
+--- a/experiments/analysis-agent/tests/test_jd_manual_recovery.py
++++ b/experiments/analysis-agent/tests/test_jd_manual_recovery.py
+@@ -20,71 +20,71 @@
+             yield service
+     with TestClient(create_app(resources),base_url='http://127.0.0.1:8091') as client:
+         yield client,client.app.state.service
+ 
+ 
+ def pending(jd,service):
+     intent=prepared(jd)
+     key=str(uuid4())
+     intent=manual_intent(intent.scope,{'request_key':key,'base_revision_ref':revision_ref(intent.scope,intent.base_id),'value':intent.value})
+     context=service._context(intent.scope.document_id)
+     descriptor={'operation':str(intent.operation_id),'base':str(intent.base_id),'digest':intent.digest,'request_key':key,'origin':'manual'}
+     save_manual_pending(context.graph,context.config,descriptor)
+     return intent,key,context,descriptor
+ 
+ 
+ def test_get_only_observes_and_explicit_original_key_closes_known_none(jd,tmp_path,monkeypatch):
+     with recovery_client(jd,tmp_path) as (client,service):
+         intent,key,context,descriptor=pending(jd,service)
+         path=f'/documents/{intent.scope.document_id}/jd/manual-recovery'
+         before=context.graph.get_state(context.config)
+         native=[]
+         monkeypatch.setattr(jd.engine,'validate_value',lambda *a,**kw:native.append(a))
+         found=client.get(path)
+         assert found.status_code==200,found.text
+         assert found.headers['cache-control']=='no-store'
+-        assert found.json()=={'status':'unknown','request_key':key,'write_blocked':True,'can_recover':True}
++        assert found.json()=={'status':'unknown','request_key':key,'write_blocked':True,'can_recover':True,'restart_required':False}
+         assert context.graph.get_state(context.config).config==before.config
+         assert jd.store.receipt(intent.scope,intent.operation_id) is None
+         recovered=client.post(path,json={'request_key':key})
+         assert recovered.status_code==200,recovered.text
+         result=recovered.json()
+         assert result['status']=='available' and result['result']['status']=='save_failed'
+         assert not result['write_blocked'] and not result['can_recover']
+         assert client.get(path,params={'request_key':key}).json()==result
+         assert context.graph.get_state(context.config).values['jd_manual_pending'] is None
+         assert not native and not service.test_sent
+ 
+ 
+ def test_old_key_never_clears_current_pending_and_active_post_does_not_take_over(jd,tmp_path):
+     with recovery_client(jd,tmp_path) as (client,service):
+         intent,key,context,descriptor=pending(jd,service)
+         path=f'/documents/{intent.scope.document_id}/jd/manual-recovery'
+         other=str(uuid4())
+         result=client.post(path,json={'request_key':other})
+         assert result.status_code==200,result.text
+-        assert result.json()=={'status':'no_pending','request_key':other,'write_blocked':True,'can_recover':False}
++        assert result.json()=={'status':'no_pending','request_key':other,'write_blocked':True,'can_recover':False,'restart_required':False}
+         assert context.graph.get_state(context.config).values['jd_manual_pending']==descriptor
+         context.manual_active=True; context.active_entries=1
+         try:
+             assert client.get(path).json()['can_recover'] is False
+             assert client.post(path,json={'request_key':key}).status_code==409
+         finally:
+             context.manual_active=False; context.active_entries=0
+ 
+ 
+ def test_terminal_clear_failure_preserves_result_and_matching_cleanup_exit(jd,tmp_path,monkeypatch):
+     with recovery_client(jd,tmp_path) as (client,service):
+         intent,key,context,descriptor=pending(jd,service)
+         terminal=jd.manual_save(intent)
+         assert terminal.status=='committed'
+         path=f'/documents/{intent.scope.document_id}/jd/manual-recovery'
+         original=context.graph.update_state
+         def cannot_clear(config,value,**kwargs):
+             if 'jd_manual_pending' in value and value['jd_manual_pending'] is None:
+                 raise RuntimeError('clear failed')
+             return original(config,value,**kwargs)
+         monkeypatch.setattr(context.graph,'update_state',cannot_clear)
+         observed=client.get(path)
+         assert observed.status_code==200,observed.text
+         context.manual_active=True
+         try:
+
+diff --git a/experiments/jd-editor/web/src/generated/analysis-api.ts b/experiments/jd-editor/web/src/generated/analysis-api.ts
+--- a/experiments/jd-editor/web/src/generated/analysis-api.ts
++++ b/experiments/jd-editor/web/src/generated/analysis-api.ts
+@@ -46,92 +46,95 @@
+   [k: string]: number;
+ } | null;
+ export type Outcome = {
+   [k: string]: unknown;
+ } | null;
+ export type CanResume = boolean;
+ export type Status1 = string;
+ export type ErrorCode1 = string | null;
+ export type RecoveryCount = number;
+ export type DocumentMetadataInput = JdDocumentRename | JdDocumentSetArchived;
+ export type Command = "rename";
+ export type Title2 = string;
+ export type ExpectedMetadataVersion = number;
+ export type Command1 = "set_archived";
+ export type Archived1 = boolean;
+ export type ExpectedMetadataVersion1 = number;
+ export type Found = false;
+ export type Found1 = true;
+ export type InputReceived = boolean;
+ export type Admission = "not_admitted";
+ export type RequestKey2 = string;
+ export type Message = string;
+ export type RequestKey3 = string;
+ export type WriteBlocked = boolean;
+ export type CanRecover = boolean;
++export type RestartRequired = boolean;
+ export type Status2 = "available";
+ export type RequestKey4 = string;
+ export type JdWriteStatus =
+   | "committed"
+   | "no_change"
+   | "invalid_input"
+   | "unsupported_content"
+   | "target_missing"
+   | "stale_base"
+   | "engine_failed"
+   | "save_failed"
+   | "outcome_unknown"
+   | "operation_conflict"
+   | "busy";
+ export type DocumentEffect = "unchanged" | "committed" | "unknown";
+ export type ReceiptDurability = "confirmed" | "unconfirmed";
+ export type Origin = "ai" | "manual" | "initial";
+ /**
+  * JSON-safe Plate operations when actually captured. Manual saves may use null; snapshots remain authoritative.
+  */
+ export type NativeOperations = JsonObject[] | null;
+ export type JsonValue =
+   | boolean
+   | number
+   | string
+   | (JsonValue | null)[]
+   | {
+       [k: string]: JsonValue | null;
+     }
+   | null;
+ export type AffectedElementId = string;
+ export type AffectedElementIds = AffectedElementId[];
+ export type Code = string;
+ export type Message1 = string;
+ export type CommandIndex = number | null;
+ export type NextAction1 = "continue" | "correct_arguments" | "reread_current" | "reconcile_operation" | "wait" | "stop";
+ export type WriteBlocked1 = boolean;
+ export type CanRecover1 = boolean;
++export type RestartRequired1 = boolean;
+ export type Status3 = "unknown";
+ export type RequestKey5 = string;
+ export type WriteBlocked2 = boolean;
+ export type CanRecover2 = boolean;
++export type RestartRequired2 = boolean;
+ export type Status4 = "no_pending";
+ export type RequestKey6 = string | null;
+ 
+ export interface DocumentInput {
+   title: Title;
+   request_key: RequestKey;
+ }
+ export interface DocumentOutput {
+   id: Id;
+   title: Title1;
+   created_at: CreatedAt;
+   archived: Archived;
+   metadata_version: MetadataVersion;
+ }
+ export interface MessageInput {
+   request_key: RequestKey1;
+   text: Text;
+   abandon_pending?: AbandonPending;
+   jd_selection?: JdSelectionCaptureClientInput | null;
+ }
+ export interface JdSelectionCaptureClientInput {
+   base_revision_ref: OpaqueRef;
+   range: SlateRange;
+ }
+ export interface SlateRange {
+@@ -173,68 +176,71 @@
+ }
+ export interface JdDocumentSetArchived {
+   command: Command1;
+   archived: Archived1;
+   expected_metadata_version: ExpectedMetadataVersion1;
+ }
+ export interface JdRunLookupMissing {
+   found: Found;
+ }
+ export interface RunLookupReceived {
+   found: Found1;
+   input_received: InputReceived;
+   run: RunOutput;
+ }
+ export interface ManualSaveRejection {
+   admission?: Admission;
+   request_key: RequestKey2;
+   message: Message;
+ }
+ export interface ManualRecoveryRequest {
+   request_key: RequestKey3;
+ }
+ export interface ManualRecoveryAvailable {
+   write_blocked: WriteBlocked;
+   can_recover: CanRecover;
++  restart_required?: RestartRequired;
+   status: Status2;
+   request_key: RequestKey4;
+   result: JdManualSaveResult;
+ }
+ export interface JdManualSaveResult {
+   status: JdWriteStatus;
+   operation_ref: OpaqueRef | null;
+   base_revision_ref: OpaqueRef | null;
+   result_revision_ref: OpaqueRef | null;
+   change_ref: OpaqueRef | null;
+   document_effect: DocumentEffect;
+   receipt_durability: ReceiptDurability;
+   actual_changes: JdActualChanges | null;
+   error: JdToolErrorDetail | null;
+   next_action: NextAction1;
+ }
+ export interface JdActualChanges {
+   origin: Origin;
+   before_revision_ref: OpaqueRef;
+   after_revision_ref: OpaqueRef;
+   native_operations: NativeOperations;
+   affected_element_ids: AffectedElementIds;
+ }
+ export interface JsonObject {
+   [k: string]: JsonValue | null;
+ }
+ export interface JdToolErrorDetail {
+   code: Code;
+   message: Message1;
+   command_index: CommandIndex;
+ }
+ export interface ManualRecoveryUnknown {
+   write_blocked: WriteBlocked1;
+   can_recover: CanRecover1;
++  restart_required?: RestartRequired1;
+   status: Status3;
+   request_key: RequestKey5;
+ }
+ export interface ManualRecoveryNoPending {
+   write_blocked: WriteBlocked2;
+   can_recover: CanRecover2;
++  restart_required?: RestartRequired2;
+   status: Status4;
+   request_key: RequestKey6;
+ }
+
+diff --git a/experiments/jd-editor/web/src/jd/useJdSession.ts b/experiments/jd-editor/web/src/jd/useJdSession.ts
+--- a/experiments/jd-editor/web/src/jd/useJdSession.ts
++++ b/experiments/jd-editor/web/src/jd/useJdSession.ts
+@@ -16,50 +16,51 @@
+ import { submissionCache, type Disk, type Submission } from "./submissionCache";
+ import { requestRecoveryCache } from "./requestRecoveryCache";
+ const same = (a: unknown, b: unknown) =>
+   JSON.stringify(a) === JSON.stringify(b);
+ const active = new Set([
+   "receiving",
+   "running",
+   "stopping",
+   "uncertain",
+   "interrupted",
+ ]);
+ export class JdSession {
+   head: JdReadSuccess | null = null;
+   value = [] as unknown as JdDocumentValue;
+   dirty = false;
+   text = "";
+   metadata: DocumentOutput | null = null;
+   messages: MessageOutput[] = [];
+   run: RunOutput | null = null;
+   busy = false;
+   saving = false;
+   loading = true;
+   readUnavailable = false;
+   manualUnknown = false;
+   serverWriteBlocked = true;
++  restartRequired = false;
+   recovery: Awaited<ReturnType<JdApi['readRecovery']>> | null = null;
+   candidateRecovery: Awaited<ReturnType<JdApi['readRecovery']>> | null = null;
+   recoverySequence = 0;
+   error = "";
+   notice = "";
+   candidate: Submission | null = null;
+   pendingRun: MessageInput | null = null;
+   change: JdChangeReadSuccess | null = null;
+   generation = 0;
+   disposed = false;
+   onChange = () => {};
+   /** The editor applies a confirmed batch only against its exact clean baseline. */
+   onHead:
+     ((head: JdReadSuccess, change: JdChangeReadSuccess | null) => void) | null =
+     null;
+   constructor(
+     public document: string,
+     public port: JdApi,
+     public disk: Disk,
+   ) {}
+   emit() {
+     if (!this.disposed) this.onChange();
+   }
+   setText(text: string) {
+     this.text = text;
+@@ -147,85 +148,89 @@
+       if (this.disposed || generation !== this.generation) return;
+       this.metadata = metadata;
+       this.messages = messages;
+       this.run = runs.at(-1) ?? null;
+       if (!this.dirty) {
+         let change: JdChangeReadSuccess | null = null;
+         if (
+           this.head &&
+           head.revision_ref !== this.head.revision_ref &&
+           head.change_refs[0]
+         )
+           change = await this.port.changes(this.document, {
+             change_ref: head.change_refs[0],
+           });
+         if (this.disposed || generation !== this.generation) return;
+         this.onHead?.(head, change);
+         this.head = head;
+         this.value = structuredClone(head.fragment) as JdDocumentValue;
+         if (change) this.change = change;
+       } else if (this.head?.revision_ref !== head.revision_ref)
+         this.notice = "已有新的保存內容；目前未保存修改仍留在畫面，請先處理。";
+       this.error = "";
+       this.readUnavailable = false;
+       await this.refreshRecovery(generation);
+     } catch (error) {
++      if (this.disposed || generation !== this.generation) return;
+       this.readUnavailable = true;
+       this.error = "暫時無法讀取，請重試。" + String(error);
++      // A failed native read must not hide the independent server owner gate.
++      try { await this.refreshRecovery(generation); } catch { /* keep the gate closed */ }
+       throw error;
+     } finally {
+       this.emit();
+     }
+   }
+   get canRetryCandidate() {
+     return !!this.candidate && !this.busy && !this.loading && !this.readUnavailable &&
+       !this.serverWriteBlocked && (this.candidateRecovery?.status === 'no_pending' || !this.manualUnknown);
+   }
+   applyRecovery(value: Awaited<ReturnType<JdApi['readRecovery']>>) {
+     if (value.request_key !== this.candidate?.request_key) return;
+     this.candidateRecovery = value;
+     if (value.status !== 'available') return;
+     this.manualUnknown = false;
+     if (['committed','no_change'].includes(value.result.status)) {
+       submissionCache(this.disk).confirm(this.document, value.result);
+       this.candidate = null;
+       this.notice = '已確認上次保存結果；目前工作稿仍保留。';
+     } else this.error = '這次修改尚未保存：' + value.result.status;
+   }
+   async refreshRecovery(generation = this.generation) {
+     const sequence = ++this.recoverySequence;
+-    const key = this.candidate?.request_key;
++    const key = this.candidate?.request_key ?? this.recovery?.request_key ?? undefined;
+     const current = () => !this.disposed && generation === this.generation && sequence === this.recoverySequence;
+     this.serverWriteBlocked = true;
+     try {
+       const exact = key ? await this.port.readRecovery(this.document,key) : null;
+       if (!current()) return;
+       const discovery = await this.port.readRecovery(this.document,undefined);
+       if (!current()) return;
+       if (exact && key === this.candidate?.request_key) this.applyRecovery(exact);
+       this.recovery = discovery.request_key ? discovery : exact ?? discovery;
+       this.serverWriteBlocked = discovery.write_blocked;
++      this.restartRequired = discovery.restart_required === true;
+     } catch (error) {
+       if (!current()) return;
+       this.serverWriteBlocked = true;
+       this.error = '無法確認保存狀態，請重新讀取：' + String(error);
+       throw error;
+     }
+   }
+   async recoverManual() {
+     const recovery = this.recovery;
+     if (this.busy || !recovery?.can_recover || !recovery.request_key) return;
+     const key = recovery.request_key;
+     const generation = ++this.generation;
+     ++this.recoverySequence;
+     this.serverWriteBlocked = true;
+     this.busy = true;
+     this.emit();
+     try {
+       const result = await this.port.recover(this.document,key);
+       if (this.disposed || generation !== this.generation || this.recovery?.request_key !== key) return;
+       this.applyRecovery(result);
+       this.recovery = result;
+       // A fresh complete snapshot is required even after a terminal result.
+       await this.refresh();
+     } catch (error) {
+       if (!this.disposed && generation === this.generation)
+
+diff --git a/experiments/jd-editor/web/src/jd/useJdSession.test.tsx b/experiments/jd-editor/web/src/jd/useJdSession.test.tsx
+--- a/experiments/jd-editor/web/src/jd/useJdSession.test.tsx
++++ b/experiments/jd-editor/web/src/jd/useJdSession.test.tsx
+@@ -221,50 +221,91 @@
+   session.unmount();
+   const newer:Submission={document_id:'A',request_key:'B-key',base_revision_ref:'r1',value};
+   session.candidate=newer;
+   session.edit([{...value[0],children:[{text:'new dirty'}]}]);
+   resolve({status:'available',request_key:'A-key',write_blocked:false,can_recover:false,result:{status:'committed',receipt_durability:'confirmed'}} as never);
+   await work;
+   expect(session.candidate).toEqual(newer);
+   expect(session.value[0].children).toEqual([{text:'new dirty'}]);
+   expect(session.serverWriteBlocked).toBe(true);
+ });
+ 
+ it('late GET and a failed fresh gate cannot unlock a newer recovery', async () => {
+   const {disk,port}=harness();
+   const session=new JdSession('A',port,disk);
+   await session.load();
+   let resolve!: (value:never)=>void;
+   vi.mocked(port.readRecovery).mockReturnValueOnce(new Promise(done=>{resolve=done;}));
+   const old=session.refreshRecovery();
+   ++session.generation;
+   vi.mocked(port.readRecovery).mockRejectedValueOnce(Error('new snapshot failed'));
+   await expect(session.refreshRecovery()).rejects.toThrow('new snapshot failed');
+   resolve({status:'no_pending',request_key:null,write_blocked:false,can_recover:false} as never);
+   await old;
+   expect(session.serverWriteBlocked).toBe(true);
+ });
++
++it.each(['committed','no_change','save_failed'])('R02 cachelost %s remains visible after fresh discovery and refresh', async (status) => {
++  const {disk,port}=harness();
++  let pending=true;
++  const terminal={status:'available',request_key:'original-A',write_blocked:false,can_recover:false,
++    result:{status,receipt_durability:'confirmed'}} as never;
++  vi.mocked(port.readRecovery).mockImplementation(async (_id,key)=> key ? terminal : pending ?
++    {status:'unknown',request_key:'original-A',write_blocked:true,can_recover:true} :
++    {status:'no_pending',request_key:null,write_blocked:false,can_recover:false});
++  vi.mocked(port.recover).mockImplementation(async ()=>{pending=false;return terminal;});
++  const session=new JdSession('A',port,disk);
++  await session.load();
++  await session.recoverManual();
++  await session.refresh();
++  expect(session.recovery).toEqual(terminal);
++  expect(session.serverWriteBlocked).toBe(false);
++  expect(session.candidate).toBeNull();
++  expect(port.save).not.toHaveBeenCalled();
++});
++it('R03 failed head reads still discover the retained owner and preserve dirty text', async () => {
++  const {disk,port}=harness();
++  const session=new JdSession('A',port,disk);
++  await session.load();
++  session.edit([{...value[0],children:[{text:'尚未保存'}]}]);
++  session.setText('尚未送出的補充');
++  vi.mocked(port.read).mockRejectedValue(Error('native cleanup unconfirmed'));
++  vi.mocked(port.readRecovery).mockResolvedValue({status:'no_pending',request_key:null,
++    write_blocked:true,can_recover:false,restart_required:true} as never);
++  await session.revalidate();
++  expect(session.restartRequired).toBe(true);
++  expect(session.locked).toBe(true);
++  expect(session.text).toBe('尚未送出的補充');
++  expect(session.value[0].children).toEqual([{text:'尚未保存'}]);
++  expect(port.recover).not.toHaveBeenCalled();
++  vi.mocked(port.read).mockResolvedValue(session.head!);
++  vi.mocked(port.readRecovery).mockResolvedValue({status:'no_pending',request_key:null,
++    write_blocked:false,can_recover:false,restart_required:false} as never);
++  await session.revalidate();
++  expect(session.restartRequired).toBe(false);
++  expect(session.dirty).toBe(true);
++});
+ it.each([409, 422])("only an identity-matched explicit rejection unlocks candidate handling (%s)", async (status) => {
+   const { disk, port } = harness();
+   vi.mocked(port.save).mockImplementation(async (_id, body) => {
+     throw Object.assign(new ApiError(status, "未送入保存"), {
+       manualRejection: { admission: "not_admitted", request_key: body.request_key, message: "未送入保存" },
+     });
+   });
+   const session = new JdSession("A", port, disk);
+   await session.load();
+   session.edit([{ ...value[0], children: [{ text: "拒絕候選" }] }]);
+   session.setText("原問句");
+   expect(await session.save()).toBe(false);
+   expect(session.manualUnknown).toBe(false);
+   expect(session.candidate?.value).toEqual(session.value);
+   expect(session.text).toBe("原問句");
+   session.discardCandidate();
+   expect(submissionCache(disk).read("A")).toBeNull();
+ });
+ it.each([409, 422, 503])("an unclassified error remains unknown (%s)", async (status) => {
+   const { disk, port } = harness();
+   vi.mocked(port.save).mockRejectedValue(new ApiError(status, "unknown"));
+   const session = new JdSession("A", port, disk);
+   await session.load();
+   session.edit([{ ...value[0], children: [{ text: "保留" }] }]);
+   await session.save();
+
+diff --git a/experiments/jd-editor/web/src/jd/JdWorkspace.tsx b/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
+--- a/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
++++ b/experiments/jd-editor/web/src/jd/JdWorkspace.tsx
+@@ -95,77 +95,87 @@
+       setHistory((items) => [...items, change]);
+     } catch (error) {
+       session.setError(String(error));
+     }
+   }
+   return (
+     <main className="workspace">
+       <header className="workspace-header">
+         <div>
+           <a
+             href="/"
+             onClick={(e) => {
+               if (session.dirty || session.text) {
+                 e.preventDefault();
+                 setLeaving(true);
+               }
+             }}
+           >
+             ← 我的職務說明書
+           </a>
+           <h1>{session.metadata?.title ?? "職務說明書"}</h1>
+         </div>
+         <span role="status" className="status">
+           {session.loading
+             ? "讀取中"
++            : session.restartRequired
++              ? "需要重新啟動，暫停編輯"
+             : session.busy
+               ? "正在處理"
+               : session.metadata?.archived
+                 ? "已封存，可查看"
+                 : session.run &&
+                     [
+                       "receiving",
+                       "running",
+                       "stopping",
+                       "uncertain",
+                       "interrupted",
+                     ].includes(session.run.status)
+                   ? "顧問處理中，暫停編輯"
+                   : session.dirty
+                     ? "未保存"
+                     : "已保存"}
+         </span>
+       </header>
+       {session.error && (
+         <div role="alert" className="alert">
+           {session.error}
+           <button onClick={() => void session.refresh().catch(() => {})}>
+             重新讀取
+           </button>
+         </div>
+       )}
+       {session.notice && <p className="notice">{session.notice}</p>}
++      {session.restartRequired && (
++        <aside role="alert" className="candidate">
++          <h3>上一個文件處理尚未停止</h3>
++          <p>先保留此頁；目前畫面中的未保存修改與問句仍在，請勿重新整理或關頁。</p>
++          <p>請在啟動此 App 的視窗停止服務，等待停止完成，再用原啟動入口重新啟動。之後按下方按鈕確認狀態；只重新整理網頁無法停止殘留的工作。</p>
++          <button disabled={session.busy} onClick={() => void session.revalidate()}>重新讀取狀態</button>
++        </aside>
++      )}
+       {sourceValue && (
+         <aside className="source-panel">
+           <h3>依據・已保存的原問答</h3>
+           {sourceValue.segments.map((segment, i) => (
+             <article key={i}>
+               <strong>
+                 {segment.role === "user" ? "員工原文" : "顧問原文"}
+               </strong>
+               <p>{segment.text}</p>
+             </article>
+           ))}
+           {sourceValue.omitted_content_types.length > 0 && (
+             <p>
+               未顯示的內容類型：{sourceValue.omitted_content_types.join("、")}
+             </p>
+           )}
+           {sourceValue.next_offset !== null && (
+             <button
+               onClick={() =>
+                 void source(sourceValue.reference, sourceValue.next_offset!)
+               }
+             >
+               讀取後續原文
+             </button>
+           )}
+
+diff --git a/experiments/analysis-agent/tests/test_jd_fix1_admission.py b/experiments/analysis-agent/tests/test_jd_fix1_admission.py
+--- a/experiments/analysis-agent/tests/test_jd_fix1_admission.py
++++ b/experiments/analysis-agent/tests/test_jd_fix1_admission.py
+@@ -0,0 +1,153 @@
++"""R01/R04–06 actual App seams, original review counterexamples as barriers."""
++from threading import Event,Thread
++from uuid import uuid4
++import pytest
++from test_service import service_harness
++from test_jd_postgres import jd,prepared
++from test_jd_manual_recovery import recovery_client,pending
++from analysis_agent.service import ServiceConflict
++from analysis_agent.jd_contract import outcome_to_wire
++
++
++def test_r01_archive_between_admission_sections_cannot_save_input(tmp_path):
++    with service_harness(tmp_path) as (service,sent,_):
++        document=service.create_document('archive race')['id']
++        original=service.lock
++        class Interleaving:
++            trigger=None
++            def __enter__(self): original.acquire();return self
++            def __exit__(self,*args):
++                original.release()
++                trigger,self.trigger=self.trigger,None
++                if trigger:trigger()
++        lock=Interleaving();service.lock=lock
++        lock.trigger=lambda:service.update_document(document,{'command':'set_archived','archived':True,'expected_metadata_version':1})
++        with pytest.raises(ServiceConflict):service.submit(document,'original','must not be admitted')
++        assert not service.catalog.runs(document) and not service.messages(document) and not sent
++
++
++@pytest.mark.parametrize('sibling',[False,True])
++def test_r05_full_original_post_preserves_terminal_if_cleanup_cannot_finish(jd,tmp_path,monkeypatch,sibling):
++    with recovery_client(jd,tmp_path) as (client,service):
++        intent,key,context,descriptor=pending(jd,service)
++        terminal=jd.manual_save(intent)
++        original=context.graph.update_state
++        def clear_fails(config,value,**kwargs):
++            if value.get('jd_manual_pending','missing') is None:raise RuntimeError('clear failed')
++            return original(config,value,**kwargs)
++        monkeypatch.setattr(context.graph,'update_state',clear_fails)
++        if sibling:context.active_entries+=1
++        try:
++            from analysis_agent.jd_contract import revision_ref
++            result=client.post(f'/documents/{intent.scope.document_id}/jd/manual-save',json={
++                'request_key':key,'base_revision_ref':revision_ref(intent.scope,intent.base_id),'value':intent.value})
++            assert result.status_code==200 and result.json()==outcome_to_wire(terminal)
++            assert context.graph.get_state(context.config).values['jd_manual_pending']==descriptor
++            assert service.manual_recovery(intent.scope.document_id,key)['write_blocked']
++        finally:
++            monkeypatch.setattr(context.graph,'update_state',original)
++            if sibling:context.active_entries-=1
++
++
++def test_r04_recovery_pg_wait_allows_other_document_admission(jd,tmp_path,monkeypatch):
++    from sqlalchemy import select
++    from analysis_agent.jd_store import head
++    with recovery_client(jd,tmp_path) as (client,service):
++        intent,key,context,_=pending(jd,service)
++        other=service.create_document('independent')['id']
++        connection=jd.store.engine.connect();transaction=connection.begin()
++        connection.execute(select(head).where(head.c.document_id==intent.scope.document_id).with_for_update())
++        entered,admitted=Event(),Event();errors=[]
++        original=jd.store._execute
++        def observed(connection,deadline,statement,params=None):
++            if getattr(statement,'_for_update_arg',None) is not None:entered.set()
++            return original(connection,deadline,statement,params)
++        monkeypatch.setattr(jd.store,'_execute',observed)
++        def recovery():
++            try:service.recover_manual(intent.scope.document_id,key)
++            except Exception as exc:errors.append(exc)
++        first=Thread(target=recovery);first.start()
++        second=Thread(target=lambda:(service.submit(other,'other','other doc'),admitted.set()))
++        try:
++            assert entered.wait(5)
++            second.start()
++            assert admitted.wait(2),'A head lock must not hold global admission'
++        finally:
++            transaction.rollback();connection.close();first.join(10);second.join(10)
++        assert not errors
++        service.join(other)
++
++
++def test_r06_close_waits_for_admitted_recovery_then_refuses_new_attempt(jd,tmp_path,monkeypatch):
++    with recovery_client(jd,tmp_path) as (client,service):
++        intent,key,context,_=pending(jd,service)
++        entered,release,closed=Event(),Event(),Event()
++        original=context.native_calls.cleanup
++        def wait_cleanup():
++            if not entered.is_set():
++                entered.set();assert release.wait(5)
++            return original()
++        monkeypatch.setattr(context.native_calls,'cleanup',wait_cleanup)
++        results=[];errors=[]
++        def recover():
++            try:results.append(service.recover_manual(intent.scope.document_id,key))
++            except Exception as exc:errors.append(exc)
++        worker=Thread(target=recover);worker.start()
++        assert entered.wait(5)
++        closer=Thread(target=lambda:(service.close(),closed.set()));closer.start()
++        try:
++            assert not closed.wait(.2)
++            with pytest.raises(ServiceConflict):service.recover_manual(intent.scope.document_id,key)
++        finally:
++            release.set();worker.join(10);closer.join(10)
++        assert closed.is_set() and not context.closing
++        assert not errors and len(results)==1 and not worker.is_alive() and not closer.is_alive()
++
++
++def test_r03_retained_read_reports_restart_without_fabricating_run(jd,tmp_path):
++    with recovery_client(jd,tmp_path) as (client,service):
++        document=service.create_document('retained read')['id']
++        context=service._context(document)
++        token,call=context.native_calls.register(lambda process:False,.01)
++        context.native_calls.finish(token)
++        try:
++            result=client.get(f'/documents/{document}/jd/manual-recovery').json()
++            assert result['restart_required'] is True
++            assert result['status']=='no_pending' and result['request_key'] is None
++            assert result['write_blocked'] and not result['can_recover']
++            assert service.catalog.runs(document)==[]
++            assert not context.graph.get_state(context.config).values.get('jd_manual_pending')
++        finally:
++            call.ready=True
++            context.native_calls.finish(token)
++
++
++@pytest.mark.parametrize('action',['stop','abandon'])
++def test_r04_foreground_closure_does_not_hold_other_document(action,tmp_path,monkeypatch):
++    import httpx
++    with service_harness(tmp_path) as (service,_,replies):
++        document=service.create_document('interrupted')['id']
++        other=service.create_document('independent')['id']
++        replies.extend(httpx.ReadTimeout('offline') for _ in range(3))
++        run=service.submit(document,'first','第一則');service.join(document)
++        entered,release,admitted=Event(),Event(),Event();errors=[]
++        original=service._close_turn
++        def hold(context,**kwargs):
++            if context.reader.document_id==document:
++                entered.set();assert release.wait(5)
++            return original(context,**kwargs)
++        monkeypatch.setattr(service,'_close_turn',hold)
++        def close():
++            try:
++                if action=='stop':service.stop(document,run['id'])
++                else:service.submit(document,'second','第二則',abandon_pending=True)
++            except Exception as exc:errors.append(exc)
++        first=Thread(target=close);first.start()
++        second=Thread(target=lambda:(service.submit(other,'independent','可繼續'),admitted.set()))
++        try:
++            assert entered.wait(5);second.start()
++            assert admitted.wait(2)
++        finally:
++            release.set();first.join(10);second.join(10)
++        assert not errors
++        service.join(document);service.join(other)
+
+diff --git a/experiments/jd-editor/web/src/jd/JdRecoveryWorkspace.test.tsx b/experiments/jd-editor/web/src/jd/JdRecoveryWorkspace.test.tsx
+--- a/experiments/jd-editor/web/src/jd/JdRecoveryWorkspace.test.tsx
++++ b/experiments/jd-editor/web/src/jd/JdRecoveryWorkspace.test.tsx
+@@ -0,0 +1,25 @@
++import React from 'react';
++import { afterEach, expect, it, vi } from 'vitest';
++import { cleanup, render, screen, fireEvent } from '@testing-library/react';
++const state=vi.hoisted(()=>({session:null as unknown}));
++vi.mock('./useJdSession',()=>({useJdSession:()=>state.session}));
++vi.mock('./JdEditor',()=>({JdEditor:()=> <div>保留的工作稿</div>,applySavedHead:vi.fn()}));
++vi.mock('./JdChanges',()=>({JdChanges:()=>null}));
++vi.mock('./JdNode',()=>({ReadOnlyValue:()=>null}));
++import { JdWorkspace } from './JdWorkspace';
++afterEach(cleanup);
++it('R03 no-run owner failure shows restart steps and keeps draft on state refresh',()=>{
++  const revalidate=vi.fn();
++  state.session={document:'A',head:{revision_ref:'r1'},value:[],metadata:{title:'我的工作'},
++    dirty:true,text:'還沒送出的補充',run:null,messages:[],candidate:null,
++    recovery:{status:'no_pending',request_key:null,write_blocked:true,can_recover:false,restart_required:true},
++    restartRequired:true,locked:true,bindHead:vi.fn(),revalidate};
++  render(<JdWorkspace document="A"/>);
++  expect(screen.getByRole('status').textContent).toContain('需要重新啟動');
++  expect(screen.getByText(/先保留此頁/)).toBeTruthy();
++  expect(screen.getByText(/停止.*重新啟動/)).toBeTruthy();
++  expect(screen.getByText('保留的工作稿')).toBeTruthy();
++  fireEvent.click(screen.getByRole('button',{name:'重新讀取狀態'}));
++  expect(revalidate).toHaveBeenCalledOnce();
++  expect(screen.queryByText('停止顧問')).toBeNull();
++});

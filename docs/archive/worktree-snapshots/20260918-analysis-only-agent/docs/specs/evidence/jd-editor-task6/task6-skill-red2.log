@@ -1,0 +1,104 @@
+FFFFFF                                                                   [100%]
+================================== FAILURES ===================================
+______ test_sdk_discovers_method_then_reads_only_requested_asset[False] _______
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-skill-red-pytest/test_sdk_discovers_method_then0')
+with_store = False
+
+    @pytest.mark.parametrize('with_store', [False, True])
+    def test_sdk_discovers_method_then_reads_only_requested_asset(tmp_path, with_store):
+        with service_harness(tmp_path, store=InMemoryStore() if with_store else None) as (service, sent, replies):
+            document = create_document(service)
+            replies.extend([*(call('read_file', file_path=PATH+path, limit=1000) for path in ASSETS), done()])
+            run = service.submit(document, 'skill', '請整理已說明的工作；不清楚的部分先保留。')
+            service.join(document)
+            first = payload(sent[0])
+>           assert PATH+'SKILL.md' in system_text(first), 'New JD method must be discoverable in the actual request'
+E           AssertionError: New JD method must be discoverable in the actual request
+E           assert ('/skills/write-customized-jd/' + 'SKILL.md') in '[{"content": [{"type": "input_text", "text": "訪談"}, {"type": "input_text", "text": "\\n\\n## 按需分析方法\\n**Analysis meth...檔、執行程式、網路或 JD 操作能力。\\n既有 Memory 讀取、引用回查與 repair 仍依各工具說明使用，不受 Skills 目錄限制。\\n"}], "role": "system", "type": "message"}]'
+E            +  where '[{"content": [{"type": "input_text", "text": "訪談"}, {"type": "input_text", "text": "\\n\\n## 按需分析方法\\n**Analysis meth...檔、執行程式、網路或 JD 操作能力。\\n既有 Memory 讀取、引用回查與 repair 仍依各工具說明使用，不受 Skills 目錄限制。\\n"}], "role": "system", "type": "message"}]' = system_text({'input': [{'content': [{'type': 'input_text', 'text': '訪談'}, {'type': 'input_text', 'text': '\n\n## 按需分析方法\n**Analysi... 'model': 'gpt-5.6-luna', 'parallel_tool_calls': False, 'reasoning': {'effort': 'medium', 'context': 'all_turns'}, ...})
+
+tests\test_jd_skill_contract.py:33: AssertionError
+_______ test_sdk_discovers_method_then_reads_only_requested_asset[True] _______
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task6-skill-red-pytest/test_sdk_discovers_method_then1')
+with_store = True
+
+    @pytest.mark.parametrize('with_store', [False, True])
+    def test_sdk_discovers_method_then_reads_only_requested_asset(tmp_path, with_store):
+        with service_harness(tmp_path, store=InMemoryStore() if with_store else None) as (service, sent, replies):
+            document = create_document(service)
+            replies.extend([*(call('read_file', file_path=PATH+path, limit=1000) for path in ASSETS), done()])
+            run = service.submit(document, 'skill', '請整理已說明的工作；不清楚的部分先保留。')
+            service.join(document)
+            first = payload(sent[0])
+>           assert PATH+'SKILL.md' in system_text(first), 'New JD method must be discoverable in the actual request'
+E           AssertionError: New JD method must be discoverable in the actual request
+E           assert ('/skills/write-customized-jd/' + 'SKILL.md') in '[{"content": [{"type": "input_text", "text": "訪談"}, {"type": "input_text", "text": "\\n\\n## 按需分析方法\\n**Analysis meth...OGQ1NmY4IiwgImxhc3QiOiAiZTI4MTEyYTgtNGQwMy00ZTE3LTkwZjMtM2U0MjEyOGQ1NmY4In0="}], "role": "system", "type": "message"}]'
+E            +  where '[{"content": [{"type": "input_text", "text": "訪談"}, {"type": "input_text", "text": "\\n\\n## 按需分析方法\\n**Analysis meth...OGQ1NmY4IiwgImxhc3QiOiAiZTI4MTEyYTgtNGQwMy00ZTE3LTkwZjMtM2U0MjEyOGQ1NmY4In0="}], "role": "system", "type": "message"}]' = system_text({'input': [{'content': [{'type': 'input_text', 'text': '訪談'}, {'type': 'input_text', 'text': '\n\n## 按需分析方法\n**Analysi... 'model': 'gpt-5.6-luna', 'parallel_tool_calls': False, 'reasoning': {'effort': 'medium', 'context': 'all_turns'}, ...})
+
+tests\test_jd_skill_contract.py:33: AssertionError
+_____________ test_new_method_assets_never_grant_mutation[write] ______________
+
+operation = 'write'
+
+    @pytest.mark.parametrize('operation', ['write', 'edit', 'delete', 'upload_files'])
+    def test_new_method_assets_never_grant_mutation(operation):
+        from analysis_agent.skills import SkillAssets, analysis_files
+        backend = analysis_files(SkillAssets())
+        path = PATH+'SKILL.md'
+        before = backend.download_files([path])[0].content
+>       assert before
+E       assert None
+
+tests\test_jd_skill_contract.py:56: AssertionError
+______________ test_new_method_assets_never_grant_mutation[edit] ______________
+
+operation = 'edit'
+
+    @pytest.mark.parametrize('operation', ['write', 'edit', 'delete', 'upload_files'])
+    def test_new_method_assets_never_grant_mutation(operation):
+        from analysis_agent.skills import SkillAssets, analysis_files
+        backend = analysis_files(SkillAssets())
+        path = PATH+'SKILL.md'
+        before = backend.download_files([path])[0].content
+>       assert before
+E       assert None
+
+tests\test_jd_skill_contract.py:56: AssertionError
+_____________ test_new_method_assets_never_grant_mutation[delete] _____________
+
+operation = 'delete'
+
+    @pytest.mark.parametrize('operation', ['write', 'edit', 'delete', 'upload_files'])
+    def test_new_method_assets_never_grant_mutation(operation):
+        from analysis_agent.skills import SkillAssets, analysis_files
+        backend = analysis_files(SkillAssets())
+        path = PATH+'SKILL.md'
+        before = backend.download_files([path])[0].content
+>       assert before
+E       assert None
+
+tests\test_jd_skill_contract.py:56: AssertionError
+__________ test_new_method_assets_never_grant_mutation[upload_files] __________
+
+operation = 'upload_files'
+
+    @pytest.mark.parametrize('operation', ['write', 'edit', 'delete', 'upload_files'])
+    def test_new_method_assets_never_grant_mutation(operation):
+        from analysis_agent.skills import SkillAssets, analysis_files
+        backend = analysis_files(SkillAssets())
+        path = PATH+'SKILL.md'
+        before = backend.download_files([path])[0].content
+>       assert before
+E       assert None
+
+tests\test_jd_skill_contract.py:56: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_jd_skill_contract.py::test_sdk_discovers_method_then_reads_only_requested_asset[False]
+FAILED tests/test_jd_skill_contract.py::test_sdk_discovers_method_then_reads_only_requested_asset[True]
+FAILED tests/test_jd_skill_contract.py::test_new_method_assets_never_grant_mutation[write]
+FAILED tests/test_jd_skill_contract.py::test_new_method_assets_never_grant_mutation[edit]
+FAILED tests/test_jd_skill_contract.py::test_new_method_assets_never_grant_mutation[delete]
+FAILED tests/test_jd_skill_contract.py::test_new_method_assets_never_grant_mutation[upload_files]
+6 failed in 6.13s

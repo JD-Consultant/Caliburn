@@ -1,0 +1,399 @@
+{
+  "browser": "153.0.8010.37",
+  "channel": "chrome",
+  "headed": true,
+  "OS_IME": "NOT RUN",
+  "network": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/workspace/28628dea-ea6b-4008-9276-0bcd7c1a2c73",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_src_app_globals_1jfs_-n.css",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_020za4m._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_next-devtools_index_0i-tx06.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_1r4gg59._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-server-dom-turbopack_1qs8bsa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_0eh-wsn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_client_1iy_1f_._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_07c1pr1._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40swc_helpers_cjs_01osh66._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_1anvha4._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/turbopack-experiments_jd-editor_web_10f7rtc._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_011_sho._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_1boebgf._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_server_browser_1dgj2n-.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_0ufbzhn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate_dist_index_es_04tuc_l.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_lodash_0nqrjx6._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_slate_dist_index_154h2_h.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_core_dist_0i5if2i._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate-react_dist_index_es_0fjcxe4.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_table_dist_0owi9th._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_list-classic_dist_0phwazw._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_ajv_dist_1wahgfa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_0ukaxp8._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/28628dea-ea6b-4008-9276-0bcd7c1a2c73/jd/manual-save",
+      "body": "{\"request_key\":\"a9cec373-ff71-4ebe-912e-c1c5d9331a02\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjI4NjI4ZGVhLWVhNmItNDAwOC05Mjc2LTBiY2Q3YzFhMmM3MyIsIjU0YWFhZTYxLTNmNDAtNDBmOC05ZmZiLWVkNTA0OTcyNzU2MyJd\",\"value\":[{\"type\":\"p\",\"id\":\"22651de8-5aec-492e-a82b-28e72a8daf51\",\"children\":[{\"text\":\"明確拒絕仍保留候選\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/workspace/355915fa-f063-4488-a7ed-31c59bb3ec3e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_src_app_globals_1jfs_-n.css",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_020za4m._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_next-devtools_index_0i-tx06.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_1r4gg59._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-server-dom-turbopack_1qs8bsa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_0eh-wsn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_client_1iy_1f_._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_07c1pr1._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40swc_helpers_cjs_01osh66._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_1anvha4._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/turbopack-experiments_jd-editor_web_10f7rtc._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_011_sho._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_1boebgf._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_server_browser_1dgj2n-.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_0ufbzhn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate_dist_index_es_04tuc_l.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_lodash_0nqrjx6._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_slate_dist_index_154h2_h.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_core_dist_0i5if2i._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate-react_dist_index_es_0fjcxe4.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_table_dist_0owi9th._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_list-classic_dist_0phwazw._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_ajv_dist_1wahgfa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_0ukaxp8._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/355915fa-f063-4488-a7ed-31c59bb3ec3e/jd/manual-save",
+      "body": "{\"request_key\":\"33110d5d-6d03-4539-a6d6-a73ce48b4ef1\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjM1NTkxNWZhLWYwNjMtNDQ4OC1hN2VkLTMxYzU5YmIzZWMzZSIsIjNmYzIwMDQ2LTdjMjYtNDUzMy1hNzBjLWYxOTliODU5MTFkZiJd\",\"value\":[{\"type\":\"p\",\"id\":\"4a6bca43-a317-4b42-b518-2be1be270d69\",\"children\":[{\"text\":\"網路未知必須保留\"}]}]}"
+    }
+  ],
+  "errors": [],
+  "rejection": {
+    "admission": "not_admitted",
+    "request_key": "a9cec373-ff71-4ebe-912e-c1c5d9331a02",
+    "message": "Document is archived"
+  },
+  "rejectedCandidate": {
+    "document_id": "28628dea-ea6b-4008-9276-0bcd7c1a2c73",
+    "request_key": "a9cec373-ff71-4ebe-912e-c1c5d9331a02",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjI4NjI4ZGVhLWVhNmItNDAwOC05Mjc2LTBiY2Q3YzFhMmM3MyIsIjU0YWFhZTYxLTNmNDAtNDBmOC05ZmZiLWVkNTA0OTcyNzU2MyJd",
+    "value": [
+      {
+        "type": "p",
+        "id": "22651de8-5aec-492e-a82b-28e72a8daf51",
+        "children": [
+          {
+            "text": "明確拒絕仍保留候選"
+          }
+        ]
+      }
+    ]
+  },
+  "rejectedDocument": "28628dea-ea6b-4008-9276-0bcd7c1a2c73",
+  "unknownCandidate": {
+    "document_id": "355915fa-f063-4488-a7ed-31c59bb3ec3e",
+    "request_key": "33110d5d-6d03-4539-a6d6-a73ce48b4ef1",
+    "base_revision_ref": "WyJyZXZpc2lvbiIsIjM1NTkxNWZhLWYwNjMtNDQ4OC1hN2VkLTMxYzU5YmIzZWMzZSIsIjNmYzIwMDQ2LTdjMjYtNDUzMy1hNzBjLWYxOTliODU5MTFkZiJd",
+    "value": [
+      {
+        "type": "p",
+        "id": "4a6bca43-a317-4b42-b518-2be1be270d69",
+        "children": [
+          {
+            "text": "網路未知必須保留"
+          }
+        ]
+      }
+    ]
+  },
+  "unknownDocument": "355915fa-f063-4488-a7ed-31c59bb3ec3e",
+  "ok": true
+}

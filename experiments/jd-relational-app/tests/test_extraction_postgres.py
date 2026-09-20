@@ -282,7 +282,7 @@ def test_re_extraction_reads_the_original_pair_and_leaves_the_normal_position():
                 store=store, model=model, checkpointer=saver)
             result = workflow.start(batch)
             summary_path = result["files"][0]["summary_path"]
-            queue.append(completed(summary="重抽後的詳記。", slug="重抽"))
+            queue.append(router_completed(summary="重抽後的詳記。", slug="重抽"))
             again = workflow.reextract(summary_path)
             assert again["replaces_summary"] == summary_path
             assert again["windows"] == [{

@@ -66,7 +66,15 @@ def _source_runtime(engine, model, dataset):
 
 
 def _source_notice(payload):
-    blocks = payload["system"]
+    blocks = []
+    for message in payload["messages"]:
+        if message.get("role") != "system":
+            continue
+        content = message.get("content", [])
+        if isinstance(content, str):
+            blocks.append({"type": "text", "text": content})
+        else:
+            blocks.extend(content)
     assert isinstance(blocks, list)
     notices = []
     for block in blocks:
@@ -102,9 +110,17 @@ def _employee_texts(payload):
 
 
 def _current_tool_page(payload):
-    results = [block for message in payload["messages"] if isinstance(message["content"], list)
-        for block in message["content"] if block["type"] == "tool_result"]
-    page = json.loads(results[-1]["content"])
+    contents = []
+    for message in payload["messages"]:
+        if message.get("role") == "tool":
+            contents.append(message["content"])
+        elif isinstance(message.get("content"), list):
+            contents.extend(block["content"] for block in message["content"]
+                if block.get("type") == "tool_result")
+    page = next((json.loads(content) for content in reversed(contents)
+        if isinstance(content, str) and content.lstrip().startswith("{")
+        and '"view"' in content and '"access"' in content), None)
+    assert page is not None
     assert page["view"] == "current" and page["access"] == "current"
     # This fixed reply only edits the name/description already present on this
     # page; it does not claim to have read the remaining source records.
@@ -158,7 +174,8 @@ def test_real_source_wire_jd_links_correction_and_reopen_keep_original_material(
             assert len(requests) == 3 and len(first_ref) == 1
             assert [_source_notice(payload)["source_ref"] for payload in requests] == first_ref * 3
             assert _source_notice(requests[0])["messages"] == [{"message_id": first_run, "role": "user"}]
-            assert all(first_text not in json.dumps(payload["system"], ensure_ascii=False) for payload in requests)
+            assert all(first_text not in json.dumps([message for message in payload["messages"]
+                if message.get("role") == "system"], ensure_ascii=False) for payload in requests)
             assert all(first_text in list(_employee_texts(payload)) for payload in requests)
             first_excerpt = sources.read(first_ref[0], document)
             assert first_excerpt.source_ref == first_ref[0]

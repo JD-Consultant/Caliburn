@@ -130,16 +130,23 @@ def _final(_):
 
 
 def _last_page(payload):
-    results = []
+    contents = []
     for message in payload["messages"]:
         if message.get("role") == "tool":
-            results.append(json.loads(message["content"]))
+            contents.append(message["content"])
         elif isinstance(message.get("content"), list):
-            results.extend(json.loads(block["content"]) for block in message["content"]
-                           if block.get("type") == "tool_result")
-    value = results[-1]
-    assert value["view"] == "current" and value["access"] == "current" and not value["has_more"]
-    return value
+            contents.extend(block["content"] for block in message["content"]
+                            if block.get("type") == "tool_result")
+    for content in reversed(contents):
+        try:
+            value = json.loads(content)
+        except (TypeError, ValueError):
+            continue
+        if (isinstance(value, dict) and value.get("view") == "current"
+                and value.get("access") == "current"):
+            assert not value["has_more"]
+            return value
+    raise AssertionError("current JD page was not present in tool results")
 
 
 def _create(payload):

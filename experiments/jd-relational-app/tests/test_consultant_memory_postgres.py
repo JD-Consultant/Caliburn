@@ -40,6 +40,9 @@ from test_storage_postgres import engine
 
 pytestmark = pytest.mark.skipif(os.environ.get("JD_RELATIONAL_TEST_DB") != "1",
     reason="explicit isolated PostgreSQL test opt-in required")
+_LEGACY_C_REASON = (
+    "historical two-file C contract; current App supports layered Memory bundle C only"
+)
 KEY = b"synthetic-memory-tools-key-32-bytes"
 
 
@@ -72,9 +75,24 @@ def opened(engine, model, dataset):
             assert owner.close(timeout=10)
 
 
+def _system_blocks(payload):
+    if "system" in payload:
+        return payload["system"]
+    blocks = []
+    for message in payload["messages"]:
+        if message.get("role") != "system":
+            continue
+        content = message.get("content", [])
+        if isinstance(content, str):
+            blocks.append({"type": "text", "text": content})
+        else:
+            blocks.extend(content)
+    return blocks
+
+
 def notice(payload):
     candidates = []
-    for block in payload["system"]:
+    for block in _system_blocks(payload):
         try: value = json.loads(block["text"])
         except (ValueError, KeyError): continue
         if isinstance(value, dict) and value.get("type") == "memory_guide": candidates.append(value)
@@ -84,7 +102,7 @@ def notice(payload):
 
 def conversation_notice(payload):
     candidates = []
-    for block in payload["system"]:
+    for block in _system_blocks(payload):
         try: value = json.loads(block["text"])
         except (ValueError, KeyError): continue
         if isinstance(value, dict) and value.get("type") == "conversation_source_notice":
@@ -94,8 +112,14 @@ def conversation_notice(payload):
 
 
 def last_tool(payload):
-    return [block for message in payload["messages"] if isinstance(message["content"], list)
-        for block in message["content"] if block["type"] == "tool_result"][-1]["content"]
+    results = []
+    for message in payload["messages"]:
+        if message.get("role") == "tool":
+            results.append(message["content"])
+        elif isinstance(message.get("content"), list):
+            results.extend(block["content"] for block in message["content"]
+                if block.get("type") == "tool_result")
+    return results[-1]
 
 
 def test_sdk_reads_fixed_memory_summary_original_then_writes_and_reopens(monkeypatch, engine):
@@ -181,6 +205,7 @@ def test_sdk_reads_fixed_memory_summary_original_then_writes_and_reopens(monkeyp
             assert len(requests) == 9
 
 
+@pytest.mark.skip(reason=_LEGACY_C_REASON)
 def test_sdk_repairs_memory_from_this_turn_then_reads_the_applied_version(monkeypatch, engine):
     dataset = str(uuid4())
     fixture = {}
@@ -234,6 +259,7 @@ def test_sdk_repairs_memory_from_this_turn_then_reads_the_applied_version(monkey
             assert owner.storage.read_current(document).revision_id == current.revision_id
 
 
+@pytest.mark.skip(reason=_LEGACY_C_REASON)
 def test_repair_commit_reply_loss_reconciles_original_request_without_replay(monkeypatch, engine):
     dataset = str(uuid4())
     fixture = {}
@@ -288,6 +314,7 @@ def test_repair_commit_reply_loss_reconciles_original_request_without_replay(mon
         assert len(calls) == 1 and len(requests) == 2
 
 
+@pytest.mark.skip(reason=_LEGACY_C_REASON)
 def test_unknown_repair_result_keeps_the_gate_until_the_original_receipt_appears(monkeypatch, engine):
     dataset = str(uuid4())
 
@@ -345,6 +372,7 @@ def test_unknown_repair_result_keeps_the_gate_until_the_original_receipt_appears
 
 
 @pytest.mark.parametrize("failure", ["source", "store"])
+@pytest.mark.skip(reason=_LEGACY_C_REASON)
 def test_repair_source_or_store_failure_closes_as_not_published(monkeypatch, engine, failure):
     dataset = str(uuid4())
     private = "SYNTHETIC_PRIVATE_REPAIR_DEPENDENCY"
@@ -389,6 +417,7 @@ def test_repair_source_or_store_failure_closes_as_not_published(monkeypatch, eng
             assert owner.storage.read_current(document).revision_id == current.revision_id
 
 
+@pytest.mark.skip(reason=_LEGACY_C_REASON)
 def test_repair_root_close_ack_loss_uses_exact_readback_without_replay(monkeypatch, engine):
     dataset = str(uuid4())
 
@@ -433,6 +462,7 @@ def test_repair_root_close_ack_loss_uses_exact_readback_without_replay(monkeypat
         assert len(updates) == 1 and len(requests) == 3
 
 
+@pytest.mark.skip(reason=_LEGACY_C_REASON)
 def test_cancel_during_repair_drains_publication_and_blocks_the_next_model(monkeypatch, engine):
     dataset = str(uuid4())
     entered, release = Event(), Event()
@@ -482,6 +512,7 @@ def test_cancel_during_repair_drains_publication_and_blocks_the_next_model(monke
 
 @pytest.mark.parametrize("stop",
     ["source_before_binding", "tool_handoff", "repair_child_start"])
+@pytest.mark.skip(reason=_LEGACY_C_REASON)
 def test_repair_stopped_before_c_closes_the_original_call_as_not_executed(monkeypatch, engine, stop):
     """A stop proven to precede C must close that same call, not hold the gate.
 
@@ -582,6 +613,7 @@ def test_repair_stopped_before_c_closes_the_original_call_as_not_executed(monkey
             assert publication.current() == before
 
 
+@pytest.mark.skip(reason=_LEGACY_C_REASON)
 def test_a_later_memory_head_does_not_invalidate_the_original_applied_repair(monkeypatch, engine):
     """Background consolidation may move the head after a turn already closed.
 

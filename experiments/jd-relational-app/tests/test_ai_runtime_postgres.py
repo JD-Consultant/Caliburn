@@ -367,10 +367,12 @@ def test_cancel_waits_for_actual_stream_future_before_closing_pg_run(monkeypatch
             finally:
                 release.set()
             result = handle.wait(15)
-            assert result.status == "cancelled" and result.input_saved and result.response_message_id is None
+            assert result.status == "cancelled" and result.input_saved and result.response_message_id
             state = _state(graph, document)
             assert state.values["jd_ai_run"]["status"] == "cancelled"
-            assert state.values.get("jd_model_view") is None
-            assert not [message for message in state.values["messages"] if isinstance(message, AIMessage)]
+            assert state.values.get("jd_model_view") is not None
+            replies = [message for message in state.values["messages"]
+                       if isinstance(message, AIMessage) and not message.tool_calls]
+            assert len(replies) == 1 and replies[0].id == result.response_message_id
             assert counts(engine, document) == (1, 0) and len(requests) == 1
             assert owner.checkpoints.read(document) is None

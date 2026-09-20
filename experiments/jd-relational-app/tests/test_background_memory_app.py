@@ -161,7 +161,7 @@ def test_build_binds_one_authority_per_document_without_io_or_model_calls(native
             == 8192
         )
         assert first.understanding_workflow.max_completion_corrections == 3
-        assert first.understanding_workflow.recursion_limit == 128 * 3 + 6
+        assert first.understanding_workflow.recursion_limit == max(100, 128 * 6 + 16)
         assert first.max_stale_retries == 5
         assert understanding_model.configured_max_tokens == [32768, 32768]
         assert statements == [], "building must not set up or query database tables"

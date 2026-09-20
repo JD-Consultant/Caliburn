@@ -1,5 +1,7 @@
 # Caliburn Current Decision Register
 
+**2026-09-20 新 App 全套離線複核：**修正一個過時的 B2 recursion-limit 測試斷言後，排除受本機暫存目錄 ACL 阻擋的 Credential Manager／設定檔測試檔，重新執行其餘新 JD App 套件為 **3,022 passed／320 skipped／0 product failure**；warnings 為既有 Pydantic／Starlette 警告。工作區維持乾淨，產品程式未改。被排除的 `test_config_file.py` 與 `test_operator_entry.py` 仍未取得本機 ACL 下的完整證據，不宣稱通過。此次仍未驗收自然 Luna／OpenRouter、完整瀏覽器旅程與 production authority。
+
 **2026-09-20 A／B2 步數補驗：**新 App 的框架步數估算已由反例修正，A 528、B2正式784，既定模型／工具額度與Memory架構不變。最後無工具收尾已清除工具專用 `strict`，明確送出 `tools=[]／tool_choice=none`；指定離線與隔離真PG／HTTP failed-final 回歸通過。自然模型、完整 App／瀏覽器旅程與 production authority 仍未完成。詳見[實測與結果](specs/evidence/2026-09-20-agent-recursion-headroom-review.md)。零provider／付費，未push。
 
 **2026-09-18 JD-R002／A-R001 Task 5–6 安全收尾驗證完成（Owner 已確認的 G7 窄切片）：**同一個 committed-JD／failed-final HTTP 回歸已改為先完成實際 JD 保存，再以 61 次成功只讀 `jd_read` 抵達第 64 次無工具收尾；synthetic final transport failure 確認不產生 assistant fallback，原生 checkpoint 只保留 Human／AI tool call／ToolMessage，公開 chat history 與來源沒有框架英文或固定 UI 訊息，查回同一 run 不重送模型／writer。受影響離線集合 **314 passed／0 failed**（既有 Pydantic serializer warnings），Web chat session／drafts **62 passed／0 failed**；精確 PostgreSQL 回歸在未設定 `JD_RELATIONAL_TEST_DB=1` 時 **1 skipped**，沒有宣稱真 PG 證據。`src／tests` compileall、diff check 與第二輪窄複核完成；本次只改 PostgreSQL 測試夾具／回歸，不改 production。自然模型、付費 provider、完整瀏覽器旅程與 production authority 仍未完成；A／Memory／B1／B2／C／compaction 設計與既有路由不變。交付 commit 與本地 tag 記於 A 執行額度規格及施工計畫。

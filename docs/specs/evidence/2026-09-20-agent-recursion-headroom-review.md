@@ -36,3 +36,7 @@
 最小修正：在最後一次 request 的公開 `model_settings` 移除只適用於工具的 `strict`，並明確傳遞 `tools=[]` 與 `tool_choice='none'`，保留其他設定；不 fork 框架、不放寬驗收、不更動收尾語意。修正後仍須驗真 adapter wire／PG 最後失敗和成功路徑。
 
 本輪零 provider、零正式 key、零付費、零 migration；隔離 PG 容器已停止，volume／合成證據保留。不表示完整 App、自然模型或瀏覽器旅程通過。
+
+## 2026-09-20 全套離線複核補記
+
+修正 `test_background_memory_app.py` 中仍引用舊 B2 recursion 公式的斷言後，單測通過；再以同一個 JD App `.venv` 執行完整套件，但因本機 ACL 無法讀取 pytest 系統暫存目錄，`test_config_file.py` 與 `test_operator_entry.py` 的 37 個 setup cases 無法取得測試環境，未將它們冒稱通過。排除這兩個受環境阻擋的測試檔並關閉 pytest cache 後，其餘新 App 套件為 **3,022 passed／320 skipped／95 warnings／0 product failure**。warnings 為既有 Pydantic／Starlette 警告；本次沒有 provider request、正式 key、資料庫 migration 或產品程式修改。

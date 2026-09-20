@@ -144,7 +144,7 @@ def test_responses_clients_round_trip_inline_compaction_and_tools(target):
                         "only": [OPENROUTER_PROVIDER],
                         "order": [OPENROUTER_PROVIDER],
                         "allow_fallbacks": False,
-                        "require_parameters": True,
+                        "require_parameters": False,
                     },
                 },
             )
@@ -193,7 +193,7 @@ def test_responses_clients_round_trip_inline_compaction_and_tools(target):
             "only": [OPENROUTER_PROVIDER],
             "order": [OPENROUTER_PROVIDER],
             "allow_fallbacks": False,
-            "require_parameters": True,
+            "require_parameters": False,
         } for payload in payloads)
     else:
         assert all("provider" not in payload for payload in payloads)

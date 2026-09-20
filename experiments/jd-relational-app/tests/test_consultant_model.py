@@ -51,7 +51,7 @@ def test_the_role_profile_and_route_are_the_verified_openrouter_binding():
         assert model.request_timeout == int(REQUEST_TIMEOUT_SECONDS * 1000)
         assert model.openrouter_provider == {
             "only": [OPENROUTER_PROVIDER], "order": [OPENROUTER_PROVIDER],
-            "allow_fallbacks": False, "require_parameters": True,
+            "allow_fallbacks": False, "require_parameters": False,
         }
         assert KEY not in repr(model.metadata)
 
@@ -81,8 +81,8 @@ def test_the_wire_carries_the_pinned_route_and_no_parallel_calls():
     payload = json.loads(requests[0].content)
     assert payload["model"] == CONSULTANT_MODEL
     assert payload["provider"] == {
-        "only": ["OpenAI"], "order": ["OpenAI"],
-        "allow_fallbacks": False, "require_parameters": True,
+        "only": ["openai"], "order": ["openai"],
+        "allow_fallbacks": False, "require_parameters": False,
     }
     assert payload["parallel_tool_calls"] is False
 

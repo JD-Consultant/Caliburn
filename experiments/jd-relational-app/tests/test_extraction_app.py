@@ -171,8 +171,8 @@ def test_the_request_carries_employee_speech_under_a_strict_schema_without_stora
     assert schema["strict"] is True
     assert sorted(schema["schema"]["properties"]) == sorted(ExtractionOutput.model_fields)
     assert request["max_tokens"] == 8192 and request["reasoning"] == {"effort": "high"}
-    assert request["provider"] == {"only": ["OpenAI"], "order": ["OpenAI"],
-        "allow_fallbacks": False, "require_parameters": True}
+    assert request["provider"] == {"only": ["openai"], "order": ["openai"],
+        "allow_fallbacks": False, "require_parameters": False}
     assert request["parallel_tool_calls"] is False
     assert request["model"] == "openai/gpt-5.6-luna"
 

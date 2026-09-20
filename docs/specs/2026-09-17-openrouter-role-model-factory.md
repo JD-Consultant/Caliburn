@@ -7,6 +7,8 @@
 
 > **2026-09-18 successor：**A 的 route、reasoning high、8,192 output、90 秒 timeout、禁止 fallback 與 hidden retry 0 均不變；只有本文件當時沿用的 16 model steps／15 tool calls，已由 [A 主顧問執行額度與安全收尾](2026-09-18-consultant-execution-budget-and-safe-finalization.md)取代為 64／63 並保留最後無工具回答。這是 G4 決策，尚未修改本文件記錄的既有 G7 證據。
 
+> **2026-09-20 routing successor：**OpenRouter provider routing 改用官方 slug `openai`（不是顯示名稱 `OpenAI`），`max_tokens`、reasoning high、`allow_fallbacks=false`、parallel tool calls 關閉與 hidden retry 0 保留。因 Luna endpoint metadata 未列 `parallel_tool_calls`，`require_parameters=true` 會使 OpenAI-only route 沒有可用 endpoint；現行正式 adapter 使用 `require_parameters=false`，並由 App 的單一工具呼叫 guard 保留安全邊界。離線受影響契約 83 passed／6 skipped；一次無工具合成真實 smoke 已確認 OpenAI provider、`openai/gpt-5.6-luna-20260709`、completed／stop。這是 transport 相容性修正，不代表工具迴圈、compaction、自然品質或完整 App 已驗收。
+
 ## 1. 目的與既有決策
 
 Caliburn 只有一個 App 與一個 OpenRouter credential。正式模型路徑維持：
@@ -17,7 +19,7 @@ LangChain／LangGraph
 ChatOpenRouter／OpenRouter SDK
     ↓ 單一 OpenRouter key
 OpenRouter
-    ↓ provider only = OpenAI、allow_fallbacks = false
+    ↓ provider only = openai、allow_fallbacks = false
 openai/gpt-5.6-luna
 ```
 
@@ -29,6 +31,7 @@ openai/gpt-5.6-luna
 
 - OpenRouter 提供單一 API key 與 OpenAI-compatible endpoint；client SDK 是薄的 API client，conversation loop、工具與應用狀態仍由 App／framework 管理。
 - OpenRouter provider routing 的 `only` 可限制 provider；`allow_fallbacks` 預設允許 fallback，因此本產品要禁止 fallback 必須明確送出 `false`。
+- OpenRouter provider routing 的 `require_parameters=true` 會排除不支援請求中所有參數的 endpoint；Luna metadata 沒有列出 `parallel_tool_calls`，因此本產品現行 route 使用 `false`，並保留 App 端單一工具呼叫 guard。
 - LangChain `ChatOpenRouter` 公開支援 `model`、`max_tokens`、`max_retries`、reasoning、tool calling、usage metadata 與 `openrouter_provider`。鎖定版 `langchain-openrouter==0.2.7` 仍以本 repo 的離線 wire tests 驗證實際序列化，不能把最新版文件直接外推成鎖定版已驗能力。
 
 ### Caliburn 取捨
@@ -60,7 +63,7 @@ openai/gpt-5.6-luna
 
 ### 仍待真實驗證
 
-- 真 key 可用性、自然模型品質、費用與 provider 實際 route 尚未由本切片驗證。
+- 真 key 與單次 OpenAI provider route 已由 2026-09-20 bounded smoke 驗證；自然模型品質、完整工具／Memory／JD 旅程、費用行為與瀏覽器 App 仍未由本切片完整驗證。
 
 ## 3. 組裝與生命週期
 
@@ -82,7 +85,7 @@ RoleModels
 離線契約固定驗證：
 
 - 建立三個角色時沒有 HTTP request；
-- 三個 wire request 都是 Luna、OpenAI-only、`allow_fallbacks=false`、reasoning high、parallel tools 關閉；A 實送 8,192／90 秒，B1／B2 實送 32,768／300 秒；
+- 三個 wire request 都是 Luna、`openai`-only、`allow_fallbacks=false`、`require_parameters=false`、reasoning high、parallel tools 關閉；A 實送 8,192／90 秒，B1／B2 實送 32,768／300 秒；
 - 三個角色的 hidden retry 都是 0；
 - 空白 key 在外送前拒絕；
 - process runtime 保留三個角色並仍用原 A graph／tools，shared clients 可確認關閉且 close 冪等；

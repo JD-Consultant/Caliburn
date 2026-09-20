@@ -310,7 +310,7 @@ def build_consultant_node(model, *, tools, guidance: str, extra_middleware=(),
     # that stores the conversation server-side, retries on its own or answers
     # with parallel tool calls is not this role's model.
     route = {"only": [OPENROUTER_PROVIDER], "order": [OPENROUTER_PROVIDER],
-             "allow_fallbacks": False, "require_parameters": True}
+             "allow_fallbacks": False, "require_parameters": False}
     provider_valid = (isinstance(model, ReceiptChatOpenRouter)
         and model.openrouter_provider == route and model.max_retries == 0
         and model.model_kwargs.get("parallel_tool_calls") is False

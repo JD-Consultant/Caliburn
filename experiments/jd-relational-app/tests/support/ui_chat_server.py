@@ -207,8 +207,8 @@ def offline_role_models(evidence):
             if (len(payload.get("tools", [])) != 10
                     or not all(tool.get("function", {}).get("strict") is True for tool in payload["tools"])
                     or payload.get("parallel_tool_calls") is not False
-                    or payload.get("provider") != {"only": ["OpenAI"], "order": ["OpenAI"],
-                        "allow_fallbacks": False, "require_parameters": True}):
+                    or payload.get("provider") != {"only": ["openai"], "order": ["openai"],
+                        "allow_fallbacks": False, "require_parameters": False}):
                 raise ValueError("synthetic_tool_contract_mismatch")
             try:
                 name, arguments = (_read(payload) if position == 0

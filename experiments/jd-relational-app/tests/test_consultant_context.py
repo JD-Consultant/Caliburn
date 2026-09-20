@@ -492,7 +492,7 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
             'only': [OPENROUTER_PROVIDER],
             'order': [OPENROUTER_PROVIDER],
             'allow_fallbacks': False,
-            'require_parameters': True,
+            'require_parameters': False,
         }
     ] * 2
     assert 'tools' not in payloads[0]

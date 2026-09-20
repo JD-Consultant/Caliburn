@@ -78,8 +78,8 @@ def _offline_model(monkeypatch, modes):
         assert len(requests) < len(modes), "No hidden model retry or replay is allowed."
         payload = json.loads(request.content)
         assert payload["parallel_tool_calls"] is False
-        assert payload["provider"] == {"only": ["OpenAI"], "order": ["OpenAI"],
-            "allow_fallbacks": False, "require_parameters": True}
+        assert payload["provider"] == {"only": ["openai"], "order": ["openai"],
+            "allow_fallbacks": False, "require_parameters": False}
         requests.append(payload)
         return httpx.Response(200, json=_data(modes[len(requests) - 1], len(requests)),
                               request=request)

@@ -16,7 +16,8 @@ from langchain_openrouter import ChatOpenRouter
 
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
-OPENROUTER_PROVIDER = "OpenAI"
+# OpenRouter routing fields use the provider slug, not the display name.
+OPENROUTER_PROVIDER = "openai"
 OPENROUTER_HEADERS = {"X-OpenRouter-Metadata": "enabled"}
 REQUEST_TIMEOUT_SECONDS = 90.0
 
@@ -137,7 +138,9 @@ def create_openrouter_model(
             "only": [OPENROUTER_PROVIDER],
             "order": [OPENROUTER_PROVIDER],
             "allow_fallbacks": False,
-            "require_parameters": True,
+            # Luna's endpoint metadata does not advertise parallel_tool_calls;
+            # strict parameter filtering would reject every OpenAI endpoint.
+            "require_parameters": False,
         },
         model_kwargs={"parallel_tool_calls": False},
         metadata={"caliburn_component": component, "requested_model": model},

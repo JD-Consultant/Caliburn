@@ -61,8 +61,8 @@ def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None,
         # This product never allows parallel tool calls and never lets the
         # provider keep the conversation: the durable record is this App's.
         assert payload["parallel_tool_calls"] is False
-        assert payload["provider"] == {"only": ["OpenAI"], "order": ["OpenAI"],
-            "allow_fallbacks": False, "require_parameters": True}
+        assert payload["provider"] == {"only": ["openai"], "order": ["openai"],
+            "allow_fallbacks": False, "require_parameters": False}
         final_no_tools = payload.get("tools") == [] and payload.get("tool_choice") == "none"
         if final_no_tools:
             assert allow_final_no_tools, "Unexpected final no-tools request in this fixture."

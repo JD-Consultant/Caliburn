@@ -69,10 +69,10 @@ def test_every_role_uses_the_verified_luna_route_without_fallback_or_hidden_retr
         payload = json.loads(request.content)
         assert payload["model"] == "openai/gpt-5.6-luna"
         assert payload["provider"] == {
-            "only": ["OpenAI"],
-            "order": ["OpenAI"],
+            "only": ["openai"],
+            "order": ["openai"],
             "allow_fallbacks": False,
-            "require_parameters": True,
+            "require_parameters": False,
         }
         assert payload["reasoning"] == {"effort": "high"}
         assert payload["max_tokens"] == expected_max_tokens

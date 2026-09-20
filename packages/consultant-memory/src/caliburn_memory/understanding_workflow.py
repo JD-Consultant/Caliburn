@@ -280,7 +280,10 @@ class UnderstandingMaintenanceWorkflow:
         self.session = session
         self.context_middleware = context_middleware
         self.max_completion_corrections = max_completion_corrections
-        self.recursion_limit = max(100, max_model_steps * 3 + 6)
+        # before-model limit, model, three after-model hooks, tools: six
+        # supersteps per tool wave, not three. Entry/completion get headroom;
+        # thread-persisted model/tool limits still enforce the attempt budget.
+        self.recursion_limit = max(100, max_model_steps * 6 + 16)
         route = str(uuid5(
             NAMESPACE_URL,
             "caliburn-b2-understanding-maintenance:" + reader.document_id,

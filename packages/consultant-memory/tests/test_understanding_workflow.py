@@ -188,6 +188,41 @@ def _no_op_replies(ids, prefix):
     ]
 
 
+def test_background_profile_can_finish_at_its_tool_budget():
+    """Real B2 graph must reach 120 tools, not its recursion backstop first."""
+    _, session, model, workflow, case_stage, ids = _harness(
+        [], max_model_steps=128, max_tool_calls=120,
+        max_completion_corrections=3, context_middleware=RequestProbe(),
+    )
+    model.replies.extend([
+        _call("read_case", {"case_id": ids["case_a"]}, f"budget-read-{index}")
+        for index in range(115)
+    ] + _no_op_replies(ids, "budget"))
+    result = workflow.start(case_stage)
+    assert len(model.requests) == 121
+    assert len([m for m in result["messages"] if isinstance(m, ToolMessage)]) == 120
+    assert all(m.status == "success" for m in result["messages"]
+               if isinstance(m, ToolMessage))
+    assert session.load(result["understanding_stage"]).outcome is not None
+
+
+def test_background_profile_still_rejects_tool_121():
+    _, _, model, workflow, case_stage, ids = _harness(
+        [], max_model_steps=128, max_tool_calls=120,
+        max_completion_corrections=3,
+    )
+    model.replies.extend([
+        _call("read_case", {"case_id": ids["case_a"]}, f"limit-read-{index}")
+        for index in range(121)
+    ])
+    with pytest.raises(ToolCallLimitExceededError):
+        workflow.start(case_stage)
+    assert len(model.requests) == 121
+    parent = workflow.graph.get_state(workflow.config, subgraphs=True)
+    saved = parent.tasks[0].state.values
+    assert len([m for m in saved["messages"] if isinstance(m, ToolMessage)]) == 120
+
+
 def test_context_middleware_receives_the_assembled_b2_request_and_initial_state():
     probe = RequestProbe()
     _source, _session, model, workflow, case_stage, ids = _harness(

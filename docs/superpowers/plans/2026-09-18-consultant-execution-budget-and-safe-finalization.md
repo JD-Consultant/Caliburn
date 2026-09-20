@@ -21,6 +21,8 @@
 
 ## Official Facts and Caliburn Mapping
 
+**2026-09-20 correction:** 下方原施工的 `3*steps+6／198` 是歷史估算，已被實測反例推翻，不可再按它施工。現行 A 為 `max(100, 8*64+16)=528`，模型／工具64／63不變；最終 no-tool wire 已補 request-only 傳遞，真 PG 回歸仍待確認。詳見[補驗與修正](../../specs/evidence/2026-09-20-agent-recursion-headroom-review.md)。其餘原施工步驟保留為迭代歷史。
+
 - OpenAI Responses accepts an empty tool surface and `tool_choice="none"`; `max_output_tokens` includes visible and reasoning output. This supports the final no-tools request but does not prescribe 64／63. [OpenAI Responses create](https://developers.openai.com/api/reference/cli/resources/responses/methods/create)
 - Anthropic recommends returning an instructive tool error tied to the original tool ID and reports that invalid or missing tool arguments are commonly corrected two or three times. This supports a bounded correction opportunity, not automatic replay of writes. [Anthropic Handle tool calls](https://platform.claude.com/docs/en/agents-and-tools/tool-use/handle-tool-calls)
 - AWS advises limiting retries at one understood layer and requiring idempotency before replaying mutations. This supports keeping model correction separate from provider, Node, SQL and receipt recovery. [AWS REL05-BP03](https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/rel_mitigate_interaction_failure_limit_retries.html)
@@ -218,7 +220,7 @@ Set:
 ```python
 MAX_MODEL_STEPS = 64
 MAX_TOOL_CALLS = 63
-CONSULTANT_RECURSION_LIMIT = max(100, MAX_MODEL_STEPS * 3 + 6)
+CONSULTANT_RECURSION_LIMIT = max(100, MAX_MODEL_STEPS * 8 + 16)
 ```
 
 Do not change `MAX_OUTPUT_TOKENS=8192`, reasoning, timeout, model ID, provider route, hidden retry, strict tools or parallel-tool setting. Do not add an async wrapper.
@@ -253,7 +255,7 @@ Required scenarios:
 3. A second employee input on the same document creates a new native child namespace and starts at zero counters.
 4. A model that answers on request 1 ends normally with one request and no artificial finalization call.
 5. A model that attempts a tool from the no-tools request fails closed without executing the tool or saving a fake ToolMessage.
-6. Runtime config supplies `CONSULTANT_RECURSION_LIMIT == 198`; the 63／64 fixture reaches the product guard rather than `GraphRecursionError`.
+6. Runtime config supplies `CONSULTANT_RECURSION_LIMIT == 528`; the 63／64 fixture reaches the product guard rather than `GraphRecursionError`.
 
 - [ ] **Step 2: Run lifecycle tests and preserve RED evidence**
 
@@ -483,7 +485,7 @@ Task 5–6 completion evidence: the final no-tools regression fixture passed col
 
 - [x] Every requirement in spec §8 maps to at least one named test above.
 - [x] No task changes a generated contract, database schema, Prompt, Skill, Memory or background workflow.
-- [x] `64／63／2／198` each has one authoritative code owner and a direct test.
+- [x] `64／63／2／528` each has one authoritative code owner and a direct test.
 - [x] Finalization uses the already composed and compacted request; no canonical message is rewritten.
 - [ ] `outcome_unknown` and unconfirmed receipts never create a replacement operation.
 - [ ] Public history cannot contain framework limit text, fixed UI fallback text or recovered intermediate tool errors.

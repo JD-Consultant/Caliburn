@@ -51,6 +51,20 @@ def test_shared_consultant_always_contains_stateless_background_availability(mod
     assert _tools(agent) == TOOLS
 
 
+def test_real_assembly_matches_the_recursion_headroom_assumption(model):
+    # Wrap hooks do not create graph nodes; before/after hooks do. A change
+    # here requires reviewing the full-budget tests, not increasing tool limits.
+    nodes = set(build_consultant(model).nodes)
+    assert {name for name in nodes if name.endswith(".before_model")} == {
+        "AiToolMiddleware.before_model", "ModelCallLimitMiddleware.before_model",
+    }
+    assert {name for name in nodes if name.endswith(".after_model")} == {
+        "AiToolMiddleware.after_model", "ModelCallLimitMiddleware.after_model",
+        "ToolCallLimitMiddleware.after_model",
+    }
+    assert {"model", "tools"} <= nodes
+
+
 def test_the_guidance_the_agent_gets_is_the_composed_one(model):
     guidance = build_consultant_guidance()
     assert "你是職務訪談顧問。" in guidance

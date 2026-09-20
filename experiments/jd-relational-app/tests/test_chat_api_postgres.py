@@ -61,8 +61,8 @@ def current_page(client, document, *, target=None):
     return page
 
 
-def wait_terminal(client, path):
-    deadline = monotonic() + 15
+def wait_terminal(client, path, *, timeout=15):
+    deadline = monotonic() + timeout
     while monotonic() < deadline:
         state = assert_result(client.get(path), ChatRunState)
         if state["run_status"] not in {"running", "closing"}:
@@ -215,7 +215,9 @@ def test_http_failed_final_model_keeps_saved_input_and_confirmed_committed_jd(mo
                 response = client.post(path, json={"run_id": run, "text": text,
                     "expected_jd_revision_ref": base["revision_ref"]})
                 assert response.status_code in {200, 202}, response.text
-                state = wait_terminal(client, path + "/" + run)
+                # 64 real SDK/Agent cycles checkpoint to PostgreSQL; this is
+                # test observation time, not a production request timeout.
+                state = wait_terminal(client, path + "/" + run, timeout=120)
                 assert state["run_status"] == "failed" and state["input_state"] == "saved"
                 assert state["response_message_id"] is None and not state["write_state"]["write_blocked"]
                 assert state["jd_effects"]["state"] == "settled" and len(state["jd_effects"]["results"]) == 1
@@ -229,11 +231,12 @@ def test_http_failed_final_model_keeps_saved_input_and_confirmed_committed_jd(mo
                 current = owner.storage.read_current(document)
                 assert current.revision_number == 2 and current.revision_id == saved.result_revision_id
                 assert len(current.domain["tasks"]) == 1 and len(current.domain["details"]) == 3
-                assert counts(engine, document) == (2, 1) and len(requests) == 64
+                assert counts(engine, document) == (2, 1)
                 history = assert_result(client.get(f"/api/documents/{document}/chat/messages"), ChatHistoryPage)
                 assert history["messages"] == [{"message_id": run, "run_id": run, "role": "user", "text": text}]
                 native = graph.get_state({"configurable": {"thread_id": document}}, subgraphs=True)
                 assert not native.next and not native.tasks and native.values["jd_ai_run"]["status"] == "failed"
+                assert len(requests) == 64
                 messages = native.values["messages"]
                 assert any(isinstance(message, AIMessage) and message.tool_calls for message in messages)
                 assert any(isinstance(message, ToolMessage) for message in messages)

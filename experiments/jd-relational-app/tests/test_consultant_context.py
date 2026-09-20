@@ -554,6 +554,7 @@ def test_a_taken_back_turn_is_named_in_the_notice_and_nothing_else_is():
 
 
 def test_per_employee_child_gets_fresh_budget_while_root_keeps_history():
+    from jd_relational.consultant_model import CONSULTANT_RECURSION_LIMIT
     from langchain.agents import create_agent
     from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
     from langchain_core.tools import tool
@@ -592,7 +593,8 @@ def test_per_employee_child_gets_fresh_budget_while_root_keeps_history():
         ],
     )
     root = build_document_graph(child, InMemorySaver())
-    config = {"configurable": {"thread_id": document}}
+    config = {"configurable": {"thread_id": document},
+              "recursion_limit": CONSULTANT_RECURSION_LIMIT}
 
     first = root.invoke(
         {"messages": [HumanMessage(id=first_run, content="第一輪")]},
@@ -619,7 +621,7 @@ def test_per_employee_child_gets_fresh_budget_while_root_keeps_history():
 def test_consultant_recursion_headroom_is_derived_from_the_new_budget():
     from jd_relational.consultant_model import CONSULTANT_RECURSION_LIMIT
 
-    assert CONSULTANT_RECURSION_LIMIT == 198
+    assert CONSULTANT_RECURSION_LIMIT == 64 * 8 + 16
 
 
 def test_same_child_interrupt_resume_keeps_its_thread_model_count():

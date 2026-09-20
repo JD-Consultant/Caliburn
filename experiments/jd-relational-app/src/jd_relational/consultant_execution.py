@@ -291,9 +291,20 @@ class ConsultantExecutionMiddleware(AgentMiddleware):
         )
         if not decision.finalize:
             return handler(request)
+        final_model_settings = {
+            key: value for key, value in request.model_settings.items()
+            if key != "strict"
+        }
+        final_model_settings["tools"] = []
+        final_model_settings["tool_choice"] = "none"
         final_request = request.override(
             system_message=_append_finalization_instruction(request.system_message),
             tools=[],
             tool_choice="none",
+            # LangChain 1.4.0's agent factory drops ModelRequest.tool_choice
+            # when the final tool surface is empty and calls model.bind() with
+            # only model_settings. Keep the same policy in the actual model
+            # binding so the provider wire also receives tool_choice=none.
+            model_settings=final_model_settings,
         )
         return _validate_final_response(handler(final_request))

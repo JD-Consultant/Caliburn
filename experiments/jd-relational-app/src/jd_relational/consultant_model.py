@@ -21,7 +21,11 @@ REASONING_EFFORT = "high"
 MAX_OUTPUT_TOKENS = 8192
 MAX_MODEL_STEPS = 64
 MAX_TOOL_CALLS = 63
-CONSULTANT_RECURSION_LIMIT = max(100, MAX_MODEL_STEPS * 3 + 6)
+# LangGraph counts supersteps, not model requests. The A child is mounted in
+# the document graph, so each complete model/tool wave includes the child
+# hooks plus its parent routing step (8 steps in the actual assembly). Leave
+# 16 steps for entry/exit; persisted model/tool counters remain authority.
+CONSULTANT_RECURSION_LIMIT = max(100, MAX_MODEL_STEPS * 8 + 16)
 
 
 ConsultantModelError = OpenRouterModelError

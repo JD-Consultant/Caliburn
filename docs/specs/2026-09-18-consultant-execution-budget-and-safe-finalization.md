@@ -2,7 +2,7 @@
 
 - 日期：2026-09-18
 - Topic：`JD-R002／A-R001`
-- Stage：**G4 Owner 已確認；文件對齊完成，G7 尚未開始**
+- Stage：**G7 既有離線切片完成；2026-09-20 步數修正已驗，最終無工具 wire／PG 驗收仍未通過**
 - 範圍：只調整 A 主顧問每次員工輸入的執行 guardrail。既有 OpenRouter／Luna、Prompt、Skills、JD／Memory 權責、B1／B2／C、compaction、保存與 UI 狀態契約均保留。
 
 ## 1. 決策結果
@@ -173,6 +173,8 @@ Runtime 不猜模型的「語意是不是同一件事」。它依目前 run 中�
 正式現況以[目前決策](../current-decisions.md)為入口；模型 route 參考[角色模型工廠](2026-09-17-openrouter-role-model-factory.md)，工具結果與保存責任參考[關聯式 Agent 工具契約](2026-09-12-jd-relational-agent-tool-contract.md)，歷史 Node／SQL 恢復研究參考[ER01–03 收斂依據](evidence/2026-09-10-jd-error-recovery-contract-closure.md)。
 
 ## 11. G7 實際驗證紀錄（2026-09-18）
+
+**2026-09-20 補驗（不改寫下方歷史）：**原 `198` 框架步數不足，依實際 child＋document graph topology 調為 `528`，64／63 模型工具額度不變。最後 request 的工具專用 `strict` 已清除，並明確以 request-only `model_settings` 傳遞 `tools=[]／tool_choice='none'`；隔離真 PG／HTTP failed-final 回歸 **1 passed／1 warning**。詳見[首敗、修正與回歸狀態](evidence/2026-09-20-agent-recursion-headroom-review.md)。
 
 - A guard、child thread 額度生命週期、原生 JD Tool correction、request-only context／compaction 接點及安全收尾已在既有 commit `8f16954a`、`9d6f6339`、`d2c3bd0d`、`6a9cbbad` 完成；本段只記 Task 5–6 的收尾驗證，不改前述產品契約。
 - PostgreSQL failed-final 回歸的 synthetic plan 先保存一筆真實 JD mutation，再以 61 次成功 `jd_read` 到達第 64 次 `tools=[]`／`tool_choice="none"`；最後 transport failure 後，確認 committed receipt／revision、原話保存與 `failed` run 不變，沒有 fallback AIMessage、框架英文限額訊息或公開 assistant history／source。

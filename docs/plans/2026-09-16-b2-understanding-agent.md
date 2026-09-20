@@ -14,6 +14,8 @@
 
 ## Global Constraints
 
+**2026-09-20 執行步數補驗：**既有每模型三步估算不足，B2 正式128／120配置在390步先中止；只將 framework headroom 改為每模型六步＋16入口／收尾保留（正式784），thread模型／工具額度、生命週期與產品語意不變。120工具可完成且第121工具仍拒絕，見[精確證據](../specs/evidence/2026-09-20-agent-recursion-headroom-review.md)。
+
 - B2 管理工作理解，不直接建立、修訂、拆分、合併或淘汰 B1 案例。
 - B2 只能沿已成功 `read_case` 回傳的該案例 canonical evidence key 讀原話；不能自行提交 reference／offset，也不能任意掃描對話、latest 或另一文件。
 - `case_rework_required` 是 attempt terminal control result，不是新 Memory、案例證據或 publication outcome；下一個 B1 必須重新讀 canonical source 並自行判斷。

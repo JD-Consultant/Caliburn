@@ -226,6 +226,8 @@ def test_request_64_has_no_tools_and_explicit_none_tool_choice():
     assert len(seen) == 1
     assert seen[0].tools == []
     assert seen[0].tool_choice == "none"
+    assert seen[0].model_settings["tool_choice"] == "none"
+    assert "strict" not in seen[0].model_settings
     assert "不能再呼叫工具" in seen[0].system_message.content[-1]["text"]
 
 

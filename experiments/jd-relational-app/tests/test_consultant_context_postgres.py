@@ -23,7 +23,11 @@ from jd_relational.consultant_context import (
     ConsultantContext, ConsultantContextError, build_consultant_node,
     checked_model_view, read_closed_model_view,
 )
-from jd_relational.consultant_model import ConsultantModelError, create_consultant_model
+from jd_relational.consultant_model import (
+    OPENROUTER_HEADERS,
+    ConsultantModelError,
+    create_consultant_model,
+)
 from jd_relational.notice_history import NoticeHistoryReader
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import build_document_graph
@@ -80,8 +84,18 @@ def _offline_model(monkeypatch, modes):
         return httpx.Response(200, json=_data(modes[len(requests) - 1], len(requests)),
                               request=request)
 
-    with httpx.Client(transport=httpx.MockTransport(receive), trust_env=False, timeout=5) as client:
-        async_client = httpx.AsyncClient(transport=httpx.MockTransport(receive), trust_env=False, timeout=5)
+    with httpx.Client(
+        transport=httpx.MockTransport(receive),
+        headers=OPENROUTER_HEADERS,
+        trust_env=False,
+        timeout=5,
+    ) as client:
+        async_client = httpx.AsyncClient(
+            transport=httpx.MockTransport(receive),
+            headers=OPENROUTER_HEADERS,
+            trust_env=False,
+            timeout=5,
+        )
         try:
             model = create_consultant_model(api_key="synthetic-pg-not-a-key",
                                             http_client=client, async_http_client=async_client)

@@ -22,7 +22,7 @@ import pytest
 
 from jd_relational.ai_runtime import AiRuntime
 from jd_relational.consultant_context import build_consultant_node, read_closed_model_view
-from jd_relational.consultant_model import create_consultant_model
+from jd_relational.consultant_model import OPENROUTER_HEADERS, create_consultant_model
 from jd_relational.consultant_tools import AiToolMiddleware, build_jd_tools, decode_ai_bindings
 from jd_relational.intents import bind_edit
 from jd_relational.manual_runtime import ManualRuntime, RuntimeFailure
@@ -78,8 +78,18 @@ def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None,
         return httpx.Response(200, json=_reply(f"{prefix}_{len(requests)}", name, arguments),
                               request=request)
 
-    with httpx.Client(transport=httpx.MockTransport(receive), trust_env=False, timeout=5) as client:
-        async_client = httpx.AsyncClient(transport=httpx.MockTransport(receive), trust_env=False, timeout=5)
+    with httpx.Client(
+        transport=httpx.MockTransport(receive),
+        headers=OPENROUTER_HEADERS,
+        trust_env=False,
+        timeout=5,
+    ) as client:
+        async_client = httpx.AsyncClient(
+            transport=httpx.MockTransport(receive),
+            headers=OPENROUTER_HEADERS,
+            trust_env=False,
+            timeout=5,
+        )
         try:
             model = create_consultant_model(api_key="synthetic-ai-runtime-not-a-key",
                                             http_client=client, async_http_client=async_client)

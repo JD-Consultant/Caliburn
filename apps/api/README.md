@@ -1,6 +1,8 @@
 # Caliburn API
 
-現行 API 是本機 AI 職務分析顧問。唯一 production prefix 是 `/api/v1/job-analysis/consultant-documents`，健康檢查是 `/healthz`。舊 interview、job-authoring 與 ADR 0058 writer routes 已移除。
+> **歷史文件（2026-09-22 退役）：**本目錄的可執行 API 已移除；以下內容只保留開發沿革與研究證據，不是目前啟動方式或正式權責。現行產品見 [`experiments/jd-relational-app`](../../experiments/jd-relational-app/README.md) 與 [ADR 0077](../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+
+以下記錄退役前的 API：當時唯一 production prefix 是 `/api/v1/job-analysis/consultant-documents`，健康檢查是 `/healthz`。舊 interview、job-authoring 與 ADR 0058 writer routes 已移除。
 
 ## 結構
 

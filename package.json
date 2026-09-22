@@ -1,27 +1,24 @@
 {
   "name": "caliburn",
   "private": true,
-  "packageManager": "npm@10.9.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "packageManager": "pnpm@12.5.1",
+  "engines": {
+    "node": ">=24.19.0 <25"
+  },
   "scripts": {
-    "up": "docker compose up -d db && turbo dev --filter=@caliburn/api --filter=@caliburn/web",
-    "down": "docker compose down && kill-port 3000 8001",
-    "infra": "docker compose up -d db",
-    "db:migrate": "npm run migrate -w @caliburn/api",
-    "consultant-storage:setup": "npm run consultant-storage:setup -w @caliburn/api",
-    "dev": "turbo dev --filter=@caliburn/api --filter=@caliburn/web",
-    "build": "turbo build",
-    "test": "turbo test",
-    "lint": "turbo lint",
+    "dev": "node scripts/run-jd-app.mjs dev",
+    "build": "pnpm --filter @caliburn/jd-relational-app run codegen:check && pnpm --filter @caliburn/jd-relational-web run build",
+    "start": "node scripts/run-jd-app.mjs start",
+    "test": "node --test scripts/run-jd-app.test.mjs && pnpm --filter @caliburn/jd-relational-app run test && pnpm --filter @caliburn/jd-relational-web run test",
+    "typecheck": "pnpm --filter @caliburn/jd-relational-web run typecheck",
+    "check": "pnpm run test && pnpm run typecheck && pnpm run build",
+    "app:status": "pnpm --filter @caliburn/jd-relational-app run status",
+    "app:init": "pnpm --filter @caliburn/jd-relational-app run init",
+    "app:resume-init": "pnpm --filter @caliburn/jd-relational-app run resume-init",
+    "app:set-key": "pnpm --filter @caliburn/jd-relational-app run set-key",
+    "app:remove-key": "pnpm --filter @caliburn/jd-relational-app run remove-key",
     "rag:up": "docker compose --profile rag up -d",
     "rag:down": "docker compose stop qdrant embedder",
-    "rag:dev": "turbo dev --filter=@caliburn/ocs-indexer"
-  },
-  "devDependencies": {
-    "kill-port": "^2.0.1",
-    "turbo": "^2.3.0"
+    "rag:dev": "pnpm --filter @caliburn/ocs-indexer run dev"
   }
 }

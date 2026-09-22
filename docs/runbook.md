@@ -1,73 +1,115 @@
-# Runbook — Caliburn 本機開發
+# Runbook — Caliburn JD App 本機操作
 
-Current 產品只有 PostgreSQL、FastAPI 與 Next.js；OpenRouter 是外部 LLM gateway。RAG 供應鏈保留但尚未接入 current 產品，必須明確 opt-in。
+正式 App 位於 [`experiments/jd-relational-app`](../experiments/jd-relational-app/README.md)，但日常操作統一從 repository 根目錄進入。舊 `apps/api`、`apps/web`、npm／Turbo 與 PostgreSQL 16 Compose 已退役；正式邊界見 [ADR 0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
 
-## 埠位
+## 服務與版本
 
-| 埠 | 服務 | 起法 |
-|---|---|---|
-| 5432 | PostgreSQL | `npm run infra` |
-| 8001 | API | `cd apps/api && uv run python run_live.py` 或 `npm run dev` |
-| 3000 | Web | `npm run dev` |
-| 6333／6334 | Qdrant（隔離 RAG） | `npm run rag:up` |
-| 8082 | embedder（隔離 RAG） | `npm run rag:up` |
-| 8000 | ocs-indexer（隔離 RAG） | `npm run rag:dev` |
+| 項目 | 正式要求 |
+|---|---|
+| Node.js | `>=24.19.0 <25` |
+| package manager | pnpm `12.5.1`，根目錄單一 lockfile |
+| Python | `>=3.12 <3.13`，由 uv 管理 |
+| PostgreSQL | 本機 **18.6**；由首次初始化記錄 host／port／database／user |
+| API | `127.0.0.1`；port 由首次初始化保存 |
+| Web | `http://127.0.0.1:3002/` |
+| OpenRouter | 外部 LLM gateway；key 只存 Windows 認證管理員 |
+| RAG | 隔離且非預設依賴 |
 
-## Fresh DB 與首次啟動
+API 固定單程序、loopback、無 reload、無 proxy headers。不要按端口終止身分不明的程序；程式變更後在原前景終端正常停止再重啟。
 
-```bash
-npm install
-npm run infra
-npm run db:migrate
-npm run consultant-storage:setup
-npm run dev
+## 安裝依賴
+
+在 repository 根目錄執行：
+
+```powershell
+pnpm install --frozen-lockfile
+uv sync --project experiments/jd-relational-app --frozen
 ```
 
-執行順序有意分開：Alembic root `0018_consultant_runtime_root` 先建立 `consultant_documents` catalog；接著 LangGraph 官方 `.setup()` 建立 Saver／Store tables；最後才啟動 API／Web。已初始化的日常環境可直接 `npm run up`。
+Node／TypeScript 只使用 `pnpm-lock.yaml`；Python 只使用 `experiments/jd-relational-app/uv.lock`。不要產生 npm lockfile，也不要用根目錄 Compose 建立 JD App 的資料庫。
 
-健康檢查：`http://127.0.0.1:8001/healthz`；工作台：`http://localhost:3000/workspace`。API reload 已關閉，改 Python 後要重啟。`npm run down` 會停止 compose 並清理 `3000`／`8001` 的孤兒程序。
+## 第一次初始化
 
-## 資料庫邊界
+先建立空的 PostgreSQL 18.6 資料庫，再執行：
 
-空 DB 完成 migration＋setup 後，public schema 應只有：
-
-- `alembic_version`、`consultant_documents`；
-- LangGraph 官方 `checkpoints`、`checkpoint_blobs`、`checkpoint_writes`、`checkpoint_migrations`、`store`、`store_migrations`。
-
-不得出現 `job_analysis_*` 舊表，也沒有資料搬移、雙寫或 compatibility converter。若本機 volume 仍是舊 schema，且確定資料可丟棄，重建：
-
-```bash
-docker compose down -v
-docker compose up -d db
-npm run db:migrate
-npm run consultant-storage:setup
+```powershell
+pnpm app:status
+pnpm app:init
+pnpm app:set-key
 ```
 
-## OpenRouter
+`app:init` 會互動詢問 PostgreSQL 連線、API port 及允許的 Web origin；管理畫面 origin 應為 `http://127.0.0.1:3002`。資料庫密碼不顯示，也不從命令參數或環境變數傳入。
 
-複製 `apps/api/.env.example` 為 `.env`，填入 `OPENROUTER_API_KEY`。`CONSULTANT_MODEL`／`CONSULTANT_PROVIDER` 指定一條 exact route，profile／policy revision 與參數會在每輪解析成 immutable execution snapshot；第一版禁止 silent fallback。沒有 key 時，catalog／snapshot 等不需模型的功能仍可使用，AI 回合回 typed unavailable response。
+初始化會執行固定 JD migration 與官方 LangGraph Saver／Store setup。普通啟動只核對既有結構，不自動 migration、清資料或重建 volume。初始化中斷時使用：
 
-Git worktree 不會自動帶入被 ignore 的 `apps/api/.env`。在隔離 worktree 做 live model smoke 時，應由啟動程序安全注入 key與明確的 `CONSULTANT_MODEL`／`CONSULTANT_PROVIDER` override；不要把 secret 複製、commit 或印到 log。判定實際路由時讀 durable attempt receipt 的 `actual_model`／`actual_provider`，不能只相信 shell 目標值；若 attempt receipt 為空，代表尚未呼叫 provider。
-
-## RAG（保留、隔離、非 current runtime）
-
-`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder`、`packages/ocs-contract` 與 `packages/indexer-contract` 不在 current API/Web dependency graph，也不由預設指令啟動：
-
-```bash
-npm run rag:up
-npm run rag:down
-npm run rag:dev
+```powershell
+pnpm app:resume-init
 ```
 
-目前產品沒有 Reference／RAG route、tool、contract 或 UI；不要把上述服務接進 current composition root。詳見 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
+不要對已有內容、未知物件或版本不符的資料庫再次執行 `app:init`。本版不搬移舊資料，也不讀取舊 schema。
 
-## 驗證與故障排除
+## AI credential
 
-```bash
-npx turbo test
-cd apps/api && uv run pytest -q
-cd apps/web && npm run test && npx tsc --noEmit && npm run lint
-npm run check-codegen -w @caliburn/job-analysis-contract
+```powershell
+pnpm app:set-key
+pnpm app:status
+pnpm app:remove-key
 ```
 
-`apps/api/tests/test_consultant_hard_cut.py` 會阻止舊 writer／route／migration／contract 復活；`test_consultant_foundation_boundaries.py` 會阻止 RAG 或 provider adapter 滲入核心顧問邏輯。若 import 行為與 code 不符，先確認 `pwd`、branch 與殘留 `__pycache__`，不要恢復已刪模組。
+OpenRouter key 只存同一 Windows 使用者的 Windows 認證管理員，不放 `.env`、DPAPI App 設定、資料庫、prompt、checkpoint、前端、log 或 Git。`app:status` 只證明 credential 已設定；確認有效性需要真 provider 請求。沒有 key 時人工 JD 仍可使用，AI 明示未啟用，且不會自動 fallback。
+
+## 日常啟動與停止
+
+先啟動已初始化的 PostgreSQL，再於 repository 根目錄執行：
+
+```powershell
+pnpm dev
+```
+
+正式 production build／serve：
+
+```powershell
+pnpm build
+pnpm start
+```
+
+開啟 <http://127.0.0.1:3002/>。根啟動器透過 App 的 `api-origin` 讀取已核准的 loopback API 位址；不讀出秘密、不猜 port，也不保存第二份設定。API 與 Web 共用前景程序群組；在原終端按 Ctrl+C 後，App 會先排空已登記工作再關閉資源。
+
+需要診斷時，才直接在 `experiments/jd-relational-app` 使用 `uv run --frozen python -m jd_relational ...`；這不是另一條日常產品入口。
+
+## 資料庫與備份
+
+`public` schema 保存關聯式 JD 與背景准入；`jd_runtime` 保存 LangGraph checkpoint／store／Memory publication。兩者屬同一 App、同一資料範圍，但責任分層。一份完整備份包含：
+
+1. 整個資料庫的 `pg_dump`，不要用 `-n` 只挑單一 schema；
+2. App 的 `host.v1.dpapi` 設定檔。
+
+OpenRouter key 不在備份內；換電腦或還原後須重新執行 `pnpm app:set-key`。瀏覽器 IndexedDB 不是正式資料庫備份。精確證據與限制見 [`specs/2026-09-14-jd-backup-and-restore-slice.md`](specs/2026-09-14-jd-backup-and-restore-slice.md)。
+
+## 驗證
+
+```powershell
+pnpm check
+```
+
+也可使用窄命令：
+
+```powershell
+pnpm test
+pnpm typecheck
+pnpm build
+```
+
+真 PostgreSQL、真瀏覽器與真模型結果分開記錄；離線測試不能代替 provider 或 UI 證據。Windows 受限 token 可能讓真 ACL 模組因暫存目錄權限出現 `WinError 5`，不得為測試變綠而放寬正式 App 的 ACL 或忽略錯誤。
+
+## RAG（隔離、非 JD App 依賴）
+
+`apps/pdf-to-json`、`apps/ocs-indexer`、`apps/embedder` 與 `packages/ocs-contract` 不在 JD App dependency graph。只有明確執行下列命令才啟動：
+
+```powershell
+pnpm rag:up
+pnpm rag:dev
+pnpm rag:down
+```
+
+不要把 RAG 接進 JD App composition root。詳見 [`design/rag-pipeline.md`](design/rag-pipeline.md)。

@@ -1,0 +1,113 @@
+# Architecture
+
+> 跨 app 鳥瞰，只寫現行產品邊界、真實 runtime 與已決定的 target。產品範圍見
+> [`docs/product-notes.md`](docs/product-notes.md)；顧問核心與切換決策見 ADR
+> [0040](docs/adr/0040-professional-consultant-engine-and-r1-validation-contract.md)／
+> [0054](docs/adr/0054-document-boundary-single-writer-cutover.md)／
+> [0055](docs/adr/0055-hybrid-job-discovery-and-ttop-formation.md)／
+> [0056](docs/adr/0056-real-employee-pilot-release-gate.md)／
+> [0057](docs/adr/0057-server-deployed-browser-product.md)。
+
+## 產品邊界
+
+Caliburn 是給員工使用的**伺服器部署、瀏覽器存取的 AI 職務分析與職務說明書 Web application**。Web、API、PostgreSQL、
+Qdrant、GPU embedder 與 server secrets 在 Caliburn deployment 執行；員工裝置只執行瀏覽器。deployment 可由企業在內網／
+私有環境自管，或由我們代管；開發者 `localhost` 不是產品交付邊界。
+
+第一個 production scope 是一個 deployment 服務一個企業。repo 留有早期 user/profile/tenant 欄位與程式，僅屬歷史／FK
+相容細節；ADR 0006 的共享 Pool + RLS SaaS 模型沒有復活。共享多租戶、organization/member、ACL、計費與 tenant admin
+不在現行 roadmap；多人或非受控網路 exposure 所需的 identity/access policy 必須在 R8 前另案決定。
+
+## 現行 runtime（ACTIVE／TRANSITIONAL development composition）
+
+```text
+PDF -> pdf-to-json -> OCS JSON -> ocs-indexer -> Qdrant
+                                      |
+                                      +-> embedder（BGE-M3 GPU）
+
+開發／過渡瀏覽器 -> Next.js Web -> FastAPI API -> PostgreSQL
+                                      |    |
+                                      |    +-> OpenRouter
+                                      +------> ocs-indexer HTTP
+```
+
+目前可執行組合仍是 development ports，不代表 production ingress 已完成。ADR 0057 的 R8 target 是：
+
+```text
+瀏覽器使用者 -> HTTPS ingress -> Next.js Web -> FastAPI API -> PostgreSQL
+                                                |    |
+                                                |    +-> OpenRouter
+                                                +------> ocs-indexer HTTP -> Qdrant / embedder
+```
+
+企業自管與我們代管共用這個 target shape；production Compose、TLS、secret、backup／restore 與 access policy 尚未實作。
+
+現行 Web/API 寫入仍是過渡路徑：
+
+```text
+/documents/[id]/interview
+  -> /api/v1/job-profiles/{profile_id}/interview:turn
+  -> app/interview v3
+  -> op -> verify -> DocumentVersion.content._pending
+  -> Web accept/reject
+  -> PATCH /api/v1/job-profiles/{profile_id}/document
+```
+
+這條舊路徑已進入 maintenance-only；不得再用它承接新顧問或 current-row Authoring 功能。
+現行 greenfield 路徑已接通並可實際使用：
+
+```text
+/workspace/[document_id]
+  -> /api/v1/job-analysis/*
+  -> app/job_analysis（packet -> 一次 HTTP -> verifier -> identity gate）
+  -> 候選／Proposal -> 員工 accept／edit-accept／reject
+  -> PostgreSQL Current State（Current JD + Current Work Model）-> reload
+```
+
+
+## 生命周期地圖
+
+| 區域 | 狀態 | 權威與限制 |
+|---|---|---|
+| `app/interview` + OCS editor | ACTIVE／TRANSITIONAL | 現行流量；只修阻斷、安全、資料損毀，不擴充 `_pending` |
+| `app/interview_vnext` | ISOLATED PROTOTYPE／DONOR | 有 durable persistence、provider/Capture 與舊 operation；production router 不 import；不得直接 promotion |
+| `app/job_authoring` v1 | ISOLATED PROTOTYPE | migration 0011 三表 revision core；不是 current-row v2 target，不得擴張 revision entities |
+| `app/job_analysis` | ACTIVE（現行工作面） | ADR 0040／0042；durable vertical、`/api/v1/job-analysis`、`/workspace` 已接通；Current JD／Current Work Model 是唯一真相，AI 只提 proposal |
+| `app/professional_consultant` + `evals/professional_consultant/r1` | ARCHIVED（離線分支資產） | 另一條離線分支在 ADR 0042 收束 R1 快篩前所建；無 route/DB/Web；合併進 main 不等於恢復快篩 |
+| `evals/professional_consultant_r1` | R1a 實證紀錄 | 已跑完 A1／A6／A2 共 24 observation；ADR 0042 已裁定停止續跑並以 A6 作第一版預設 |
+
+切換按整份 `document_id` 單寫者執行，不做同文件 dual-write。現行引擎端到端見
+[`docs/design/task-analysis-engine.md`](docs/design/task-analysis-engine.md)；離線 R1 資產與退役邊界見
+[`docs/design/professional-consultant-engine.md`](docs/design/professional-consultant-engine.md)（ARCHIVED）。
+完整 server-deployed Web 只形成 release candidate；通過 R9 真實在職員工端到端 pilot gate 後，才可稱為第一個員工可用成品。
+
+## Code map
+
+| 路徑 | 是什麼 | 內部風格 |
+|---|---|---|
+| [`apps/pdf-to-json/`](apps/pdf-to-json/README.md) | PDF→OCS JSON 離線 ETL | Pipes-and-Filters：parser→transformer→writer |
+| [`apps/ocs-indexer/`](apps/ocs-indexer/README.md) | Qdrant 知識／查詢服務（:8000） | ingest pipeline + 無狀態查詢 API；嵌入走 embedder |
+| [`apps/embedder/`](apps/embedder/README.md) | BGE-M3 GPU 嵌入容器（:8082） | FastAPI + FlagEmbedding；torch 只住容器 |
+| [`apps/api/`](apps/api/README.md) | FastAPI 著作後端（:8001） | Hexagonal：core/ports、adapters、services、API；PostgreSQL owner |
+| [`apps/web/`](apps/web/README.md) | Next.js 16 前端（:3000） | greenfield `/workspace` 已接通；舊 OCS 工作台暫留 |
+| `packages/` | 共用契約 | `ocs-contract`（JSON Schema→Pydantic/TS）、`indexer-contract`（共用 Pydantic）、`job-analysis-contract`（ADR 0045） |
+| [`docs/`](docs/README.md) | ADR、研究、plan、living design、runbook | 文檔分類與 living 規則見 `docs/README.md` |
+
+## 不常變的不變量
+
+- **Bounded contexts**：PDF 解析、OCS 知識檢索、JD 著作；deployment topology 不改變 context ownership，也不為未驗證規模拆微服務。
+- **依賴方向**：API 採 Hexagonal/Clean + DDD，domain 不 import FastAPI、ORM、provider SDK 或 Web DTO。
+- **資料主權**：PostgreSQL 屬 API；Qdrant 屬 indexer；跨 owner 只走 typed API，不直接讀對方 datastore。
+- **嵌入隔離**：BGE-M3 dense+sparse 只在 `apps/embedder` Linux GPU 容器；禁止把 torch 放回 indexer/API 進程。
+- **契約機制**：跨 Python/TypeScript 用 JSON Schema SSOT + codegen；全 Python 少量 consumer 用共用 typed package。
+- **文件權威**：新產品的 Current Work Model／Current JD 是唯一真相；OCS 是 ingest/export shape，不是 live workspace store。
+- **AI 權限**：LLM 只能提出有 support/Evidence 的 proposal；員工 accept/edit-accept 後 deterministic application code 才能更新 Current JD。
+- **職務發現**：以暫定框架＋開放敘事＋定向補漏形成 Task，再歸納 Duty 與 O/P/KSA；reference 是假說／候選，不是員工 Evidence。
+- **發布證據**：工程／模型 eval 是進入 pilot 的前置安全網，不能取代實際在職員工以本人工作完成端到端試用。
+- **狀態與歷史**：Current State 直接讀；Consultation Journal 與狀態同 transaction 追加，但不作 Event Sourcing replay。
+- **依賴降級**：critical dependency fail-fast；reference enrichment 可回部分結果 + `meta.partial`。見 [ADR 0018](docs/adr/0018-indexer-dependency-degradation-policy.md)。
+
+- **AI 工作面**：`apps/api/app/interview/` 是淘汰但暫留的舊訪談路徑；`apps/api/app/job_analysis/` 是 ADR 0040／0042 下的現行 greenfield Task Analysis 引擎，已接 PostgreSQL、`/api/v1/job-analysis` 與 `/workspace` Web。兩者不得互相 import、搬資料或雙寫；舊 LangGraph／CopilotKit 已退場勿救回。
+
+維運見 [`docs/runbook.md`](docs/runbook.md)，上手見 [`CONTRIBUTING.md`](CONTRIBUTING.md)，決策索引見
+[`docs/adr/README.md`](docs/adr/README.md)。

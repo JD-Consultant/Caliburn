@@ -1,0 +1,17 @@
+{
+  "schema_version": "r1_task_discovery_expectations.v1",
+  "case_id": "TI-R1-01-tools-not-task",
+  "minimum_task_candidates": 0,
+  "maximum_task_candidates": 0,
+  "permitted_decisions": ["no_op", "clarify"],
+  "expected_next_action": "deepen_story",
+  "forbidden_promotions": [
+    {"category": "tool", "statement": "使用 Java"},
+    {"category": "tool", "statement": "撰寫 HTML"},
+    {"category": "tool", "statement": "使用 Python"}
+  ],
+  "acceptable_task_examples": [],
+  "required_qualifier_notes": ["工具與方法訊號可保留，但目前缺少工作目的、對象與 outcome。"],
+  "question_intent": "請員工提供最近一次開發所服務的對象或完成結果。",
+  "critical_notes": ["Java、HTML、Python 任一被直接寫成 Task 即為 critical failure。"]
+}

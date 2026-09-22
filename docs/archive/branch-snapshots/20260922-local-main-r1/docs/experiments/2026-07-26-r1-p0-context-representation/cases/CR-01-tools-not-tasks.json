@@ -1,0 +1,91 @@
+{
+  "case_id": "CR-01-tools-not-tasks",
+  "case_family_id": "CR-01",
+  "source_type": "constructed_edge",
+  "title": "工具與步驟不得膨脹成多個工作",
+  "primary_risk": "員工在一項穩定資料處理工作中提到 Python、Excel、ERP 與多個步驟，模型可能把工具或步驟各自升格為 Task",
+  "applicable_critical_checks": [
+    "C1_TOOL_BOUNDARY",
+    "C3_MERGE_SPLIT",
+    "C6_SOURCE_FIDELITY"
+  ],
+  "transcript": [
+    {
+      "source_id": "turn-001",
+      "role": "consultant",
+      "text": "請用最近一次實際工作的例子，從收到資料到完成結果，照順序說明。"
+    },
+    {
+      "source_id": "turn-002",
+      "role": "employee",
+      "text": "我每天從各門市收到銷售檔，會用 Python 合併，再用 Excel 找重複資料，最後匯入 ERP，讓財務隔天可以對帳。"
+    }
+  ],
+  "claim_table": [
+    {
+      "claim_id": "claim-001",
+      "speaker": "employee",
+      "literal_text": "我每天從各門市收到銷售檔",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 1
+    },
+    {
+      "claim_id": "claim-002",
+      "speaker": "employee",
+      "literal_text": "會用 Python 合併",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 2
+    },
+    {
+      "claim_id": "claim-003",
+      "speaker": "employee",
+      "literal_text": "再用 Excel 找重複資料",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 3
+    },
+    {
+      "claim_id": "claim-004",
+      "speaker": "employee",
+      "literal_text": "最後匯入 ERP",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 4
+    },
+    {
+      "claim_id": "claim-005",
+      "speaker": "employee",
+      "literal_text": "讓財務隔天可以對帳",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 5
+    }
+  ],
+  "relevant_span_ids": [
+    "turn-002"
+  ],
+  "adjudication": {
+    "must_retain_tasks": [
+      "整理、檢核並匯入門市銷售資料，供財務對帳"
+    ],
+    "must_not_create_tasks_from": [
+      "使用 Python",
+      "使用 Excel",
+      "操作 ERP",
+      "把合併、找重複資料或匯入各自拆成獨立 Task"
+    ],
+    "allowed_task_variants": [
+      "處理門市銷售資料並匯入系統，以支援財務對帳",
+      "維護門市銷售資料的整併、品質檢核與匯入"
+    ],
+    "required_uncertainties": [],
+    "notes": "員工只描述一條每日穩定的資料處理責任鏈；Python、Excel 與 ERP 是 enabler，合併、檢核、匯入是同一結果鏈中的步驟。相關片段選 turn-002，因它同時包含正確 Task 的全部支持與容易造成工具／步驟膨脹的干擾。claim 切分保留「再」「最後」等順序標記，只省略標點連接。"
+  }
+}

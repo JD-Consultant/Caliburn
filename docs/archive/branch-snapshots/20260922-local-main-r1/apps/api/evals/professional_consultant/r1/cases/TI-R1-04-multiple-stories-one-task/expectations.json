@@ -1,0 +1,16 @@
+{
+  "schema_version": "r1_task_discovery_expectations.v1",
+  "case_id": "TI-R1-04-multiple-stories-one-task",
+  "minimum_task_candidates": 1,
+  "maximum_task_candidates": 1,
+  "permitted_decisions": ["add", "merge", "edit"],
+  "expected_next_action": "deepen_story",
+  "forbidden_promotions": [
+    {"category": "step", "statement": "排除重複資料"},
+    {"category": "step", "statement": "調整驗證規則"}
+  ],
+  "acceptable_task_examples": ["維護門市交易資料匯入與品質，以確保財務資料可正確使用。"],
+  "required_qualifier_notes": ["日常、月底與格式改版是同一責任的不同條件與情境。"],
+  "question_intent": "進一步取得使用者或完成標準，不重問三個已知情境。",
+  "critical_notes": ["不得因時間條件不同建立三個高度重疊 Task。"]
+}

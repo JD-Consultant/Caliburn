@@ -1,0 +1,15 @@
+{
+  "schema_version": "r1_task_discovery_expectations.v1",
+  "case_id": "TI-R1-08-correction",
+  "minimum_task_candidates": 0,
+  "maximum_task_candidates": 0,
+  "permitted_decisions": ["edit", "no_op", "clarify"],
+  "expected_next_action": "deepen_story",
+  "forbidden_promotions": [
+    {"category": "other_person", "statement": "部署正式版本"}
+  ],
+  "acceptable_task_examples": [],
+  "required_qualifier_notes": ["新 correction 必須 supersede claim-old-deploy；上線前測試仍缺 outcome。"],
+  "question_intent": "深挖上線前測試要確認的結果，不再假設本人部署。",
+  "critical_notes": ["舊本人部署責任繼續支持 Task 即為 correction resurrection。"]
+}

@@ -1,0 +1,4 @@
+{"turn_id":"turn-q1","role":"consultant","text":"版本上線時你負責什麼？"}
+{"turn_id":"turn-a1","role":"employee","text":"我負責把版本部署到正式環境。"}
+{"turn_id":"turn-q2","role":"consultant","text":"你說的部署是由你本人執行嗎？"}
+{"turn_id":"turn-a2","role":"employee","text":"剛才說錯，我只做上線前測試；正式部署是維運負責。"}

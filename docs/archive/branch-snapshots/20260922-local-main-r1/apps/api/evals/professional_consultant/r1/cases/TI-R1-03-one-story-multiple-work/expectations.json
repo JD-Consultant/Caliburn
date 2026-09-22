@@ -1,0 +1,21 @@
+{
+  "schema_version": "r1_task_discovery_expectations.v1",
+  "case_id": "TI-R1-03-one-story-multiple-work",
+  "minimum_task_candidates": 1,
+  "maximum_task_candidates": 2,
+  "permitted_decisions": ["add", "split", "clarify"],
+  "expected_next_action": "clarify_boundary",
+  "forbidden_promotions": [
+    {"category": "step", "statement": "查 log"},
+    {"category": "step", "statement": "重現問題"},
+    {"category": "step", "statement": "修復程式"},
+    {"category": "step", "statement": "部署修復"}
+  ],
+  "acceptable_task_examples": [
+    "處理應用系統故障並恢復服務。",
+    "完成事故根因分析並推動跨部門改善。"
+  ],
+  "required_qualifier_notes": ["故障處理步驟共享恢復服務 outcome；事故後治理可能有不同 outcome。"],
+  "question_intent": "確認每月改善追蹤是否為本人固定且可獨立檢核的責任。",
+  "critical_notes": ["不得因六個動詞建立六個 Task。"]
+}

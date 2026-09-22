@@ -2,7 +2,7 @@
 
 本頁是歷史研究、設計、實驗與階段性結果的尋找入口。它不改寫任何研究內容，也不取代 [`../current-decisions.md`](../current-decisions.md)；目前施工仍只依 current decisions、Accepted ADR 與現行 code。
 
-為了讓不使用 Git 指令、只透過 GitHub 網頁審查專案的人也能找到資料，5 個封存 tag 的已提交 `docs/` 已同步放在 [`worktree-snapshots/`](worktree-snapshots/)。tag 仍保留作為原始提交定位；snapshot 是可直接瀏覽的文件副本，不是新的決策來源。
+為了讓不使用 Git 指令、只透過 GitHub 網頁審查專案的人也能找到資料，5 個封存 tag 的已提交 `docs/` 已同步放在 [`worktree-snapshots/`](worktree-snapshots/)。另有只存在於舊本機分支的研究與實驗差異放在 [`branch-snapshots/`](branch-snapshots/)。snapshot 是可直接瀏覽的歷史副本，不是新的決策來源。
 
 ## 保留原則
 
@@ -21,6 +21,12 @@
 | `archive/worktree-consultant-workspace-ui-20260918` | 舊 consultant workspace UI | 舊 API／Web 工作區、JD 編輯與審查流程的迭代材料 | 舊架構保留作比較，不接回現行產品 |
 | `archive/worktree-shared-current-jd-20260918` | 舊 shared-current-JD implementation | 共同 JD 工作稿、人工／AI 編輯與 review 的演進材料 | 舊實作保留作歷史，不與目前 relational JD authority 混用 |
 
+## 本機分支 snapshot
+
+| Snapshot | 原分支／主題 | 報告用途 | 使用時注意 |
+|---|---|---|---|
+| [`20260922-local-main-r1`](branch-snapshots/20260922-local-main-r1/) | 舊本機 `main` 的 R0／R1 professional consultant 與 task-discovery 離線切片 | 研究、ADR、提示詞、合成案例、ablation、blind grader、rubric 與測試工具 | 只作歷史與實驗證據；其中 `apps/api` 副本不屬 production |
+
 ## 建議查找順序
 
 1. 先看 [`../current-decisions.md`](../current-decisions.md)，確認目前有效決策與文件入口。
@@ -30,4 +36,4 @@
 
 ## 目前分支與封存的界線
 
-目前產品工作區是 `tmp/save-all-20260914`。現行 `docs/` 已包含目前可直接查閱的 ADR、design、plans、specs 與 experiments；封存 tag 補足尚未整理進現行入口的歷史研究與實驗資產。未來整理報告時，應新增報告或索引連結，不要把互相衝突的歷史決策直接覆蓋或混回 current 文件。
+目前產品正式分支是 `main`。現行 `docs/` 已包含目前可直接查閱的 ADR、design、plans、specs 與 experiments；worktree tag 與 branch snapshot 補足尚未整理進現行入口的歷史研究與實驗資產。未來整理報告時，應新增報告或索引連結，不要把互相衝突的歷史決策直接覆蓋或混回 current 文件。

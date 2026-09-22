@@ -1,0 +1,2 @@
+{"turn_id":"turn-q1","role":"consultant","text":"請說一個你最近處理系統故障的例子。"}
+{"turn_id":"turn-a1","role":"employee","text":"系統故障時我會查 log、重現、修復和部署；事故後我還要獨立完成根因報告，主持每月改善追蹤。"}

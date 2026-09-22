@@ -1,0 +1,77 @@
+{
+  "schema_version": "job_analysis_quality_rubric.v1",
+  "task_definition": "Task 是角色目前承擔、具有明確工作結果、能作為責任被指派與檢核，並屬穩定例行或正式低頻責任的工作單位。",
+  "task_boundary_dimensions": [
+    {
+      "code": "meaningful_outcome",
+      "title": "有意義工作結果",
+      "description": "候選描述完成後造成的交付、服務、判斷或狀態改變，而不是工具、按鍵或單一步驟。",
+      "score_zero": "沒有可辨識結果，或把工具與步驟直接當結果。",
+      "score_one": "結果方向可推知但來源不足，必須澄清。",
+      "score_two": "結果由來源支持且足以區分工作責任。"
+    },
+    {
+      "code": "role_responsibility",
+      "title": "本人現行責任",
+      "description": "候選忠實保留本人、共同、支援、他人與更正後的 ownership，以及現行、過去與構想時間範圍。",
+      "score_zero": "誤收他人、過去、否定或已被更正的責任。",
+      "score_one": "責任或時間仍未知，候選只可保持暫定並追問。",
+      "score_two": "本人或共同承擔的現行責任有直接支持。"
+    },
+    {
+      "code": "assignability_checkability",
+      "title": "可指派與可檢核",
+      "description": "候選可合理作為一項責任交辦，且能判斷是否完成或達到目的。",
+      "score_zero": "只是知識、方法、能力、模糊活動或無完成意義的片段。",
+      "score_one": "可能可交辦但完成判準仍缺關鍵資訊。",
+      "score_two": "責任與完成意義清楚，可獨立討論與檢核。"
+    },
+    {
+      "code": "stability",
+      "title": "穩定或正式低頻",
+      "description": "候選是例行、週期或正式低頻責任；頻率不等於重要性，但一次性協助不能冒充穩定工作。",
+      "score_zero": "只由單次、臨時或非正式替代支援。",
+      "score_one": "是否為正式備援或可預期責任仍未知。",
+      "score_two": "例行、週期或正式低頻責任有來源支持。"
+    },
+    {
+      "code": "boundary_coherence",
+      "title": "邊界一致性",
+      "description": "共享主要 outcome 與責任的步驟不過拆，不同 outcome 或可分責工作不過度合併，多故事可支持同一 Task。",
+      "score_zero": "明顯 over-split、over-merge 或高度重複。",
+      "score_one": "邊界有合理假說但仍需一個高價值澄清。",
+      "score_two": "merge／split 邊界與來源故事一致。"
+    },
+    {
+      "code": "source_grounding",
+      "title": "來源與不確定性",
+      "description": "所有候選能回到合法 claim 與 source span；未知、反證、omission 與 correction 不被漂亮文案吃掉。",
+      "score_zero": "缺來源、引用錯誤、反證遺失或捏造未說內容。",
+      "score_one": "來源存在但關係或不確定性表達不完整。",
+      "score_two": "支持與限制可追溯，未知時誠實 no-op 或 clarify。"
+    }
+  ],
+  "critical_rules": [
+    {"code": "tool_as_task", "title": "工具升格", "description": "不得僅因工具、語言或系統名稱建立 Task。"},
+    {"code": "step_as_task", "title": "步驟升格", "description": "不得把共享同一 outcome 的操作步驟各自建立 Task。"},
+    {"code": "past_work_leakage", "title": "過去工作外洩", "description": "過去職務不得支持目前角色 Task。"},
+    {"code": "other_person_leakage", "title": "他人工作外洩", "description": "他人負責內容不得被記為本人 Task。"},
+    {"code": "one_off_leakage", "title": "一次性工作外洩", "description": "非正式一次性協助不得被寫成穩定責任。"},
+    {"code": "correction_resurrection", "title": "更正復活", "description": "被更正的舊主張不得繼續支持候選。"},
+    {"code": "unsupported_task", "title": "無支持 Task", "description": "Task 必須有合法且未被反證排除的來源支持。"},
+    {"code": "schema_forced_task", "title": "schema 強迫 Task", "description": "零 Task 是合法結果，schema 不得迫使模型填出候選。"}
+  ],
+  "question_rules": [
+    {"code": "single", "title": "單一問題", "description": "每輪只問一個主要問題，不列欄位清單。"},
+    {"code": "natural", "title": "自然承接", "description": "先承接員工原話，再用員工可理解的語言詢問。"},
+    {"code": "non_repeating", "title": "不重複", "description": "不得重問 transcript 已回答或最近已問的同一題。"},
+    {"code": "non_leading", "title": "不引導", "description": "不得用公版、職稱或內部 schema 暗示應有答案。"}
+  ],
+  "material_improvement": {
+    "fast_screen_case_count": 8,
+    "normalized_mean_delta": 0.1,
+    "family_net_win_rate": 0.2,
+    "critical_regressions_allowed": 0,
+    "critical_trial_count": 3
+  }
+}

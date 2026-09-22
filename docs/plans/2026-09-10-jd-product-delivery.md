@@ -4,6 +4,8 @@
 
 > **2026-09-23 優先序更新：**本計畫保留完整產品旅程、自然品質與真人試用 gate；下方 Plate／三工具／「Task 6 是唯一下一單位」是當時起點，已被 relational JD、分層 Memory、完整 App 驗收及 [ADR0077 正式權責切換](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)取代。Owner 現將備份／空庫還原移出首版核心驗收，只要求一般中斷後既有已保存資料與進度可查回。當前短路由以 [`current-decisions.md`](../current-decisions.md) 最上條為準；歷史階段與問題解決順序仍保留。
 
+> **2026-09-23 P3 最新入口：**GPT-6 Luna／OpenRouter Responses 隔離接線的首次有界真服務端 smoke 已送 1 筆模型請求，HTTP 200，但 test-only 支出閘門以 `provider_model_mismatch` 停止；後以公開模型 lookup 核對 alias／canonical 對應，並修正可重現的零付費閘門誤判。首次真回覆的原始 model 值未留存，不能宣稱當時唯一根因已證實。原帳本不續送，自然 C-W／Browser 仍未在新模型路徑驗收；下方 P3 表格的「0 外部 request／未付費授權」及「現行後續」保留其撰寫時狀態，最新證據、剩餘停止線與下一次付費授權界線見[GPT-6 接線證據](../specs/evidence/2026-09-23-gpt6-responses-offline.md#openrouter-別名核對與零付費閘門修正)。
+
 ## 1. 成品與範圍
 
 員工在目前這台電腦開啟 App，透過持續訪談建立忠實反映自己實際工作的客製化 JD，能看修改、更正、保存、日後續談。旅程：建立文件 → 訪談 → 理解 → 資料足夠才撰寫 → 查看／更正 → 全稿核對 → 保存／續談。

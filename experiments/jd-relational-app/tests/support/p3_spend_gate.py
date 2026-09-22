@@ -66,6 +66,10 @@ class LunaBudgetPolicy:
     """Pinned P3 wire contract and conservative per-request reservation."""
 
     MODEL = "openai/gpt-6-luna"
+    # OpenRouter's public model lookup resolves this request slug to the
+    # canonical snapshot below (checked 2026-09-23). Pin the accepted reply
+    # identity; a later alias change must stop this trial for re-verification.
+    RESPONSE_MODELS = (MODEL, "openai/gpt-6-luna-20260922")
     ENDPOINT = "https://openrouter.ai/api/v1/responses"
     PROVIDER = {
         "only": ["openai"],
@@ -164,7 +168,7 @@ class LunaBudgetPolicy:
         if value.get("status") != "completed" or value.get("error") is not None:
             raise BudgetGateError("provider_response_incomplete")
         model = value.get("model")
-        if model != self.MODEL:
+        if model not in self.RESPONSE_MODELS:
             raise BudgetGateError("provider_model_mismatch")
         provider = value.get("provider")
         routing = value.get("openrouter_metadata")
@@ -183,7 +187,7 @@ class LunaBudgetPolicy:
             raise BudgetGateError("provider_mismatch")
         if provider is None:
             provider = selected_provider
-        if selected and selected[0].get("model") not in (None, self.MODEL):
+        if selected and selected[0].get("model") not in (None, *self.RESPONSE_MODELS):
             raise BudgetGateError("provider_model_mismatch")
         if type(provider) is not str or provider.casefold() != "openai":
             raise BudgetGateError("provider_mismatch")

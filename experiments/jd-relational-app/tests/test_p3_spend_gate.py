@@ -231,6 +231,34 @@ def test_selected_router_provider_is_accepted_when_top_level_is_absent(tmp_path)
     assert spend.snapshot()["attempts"][0]["actual_provider"] == "OpenAI"
 
 
+@pytest.mark.parametrize(
+    "body_model, selected_model",
+    [
+        ("openai/gpt-6-luna-20260922", None),
+        ("openai/gpt-6-luna", "openai/gpt-6-luna-20260922"),
+    ],
+)
+def test_requested_luna_accepts_only_its_verified_canonical_snapshot(
+    tmp_path, body_model, selected_model,
+):
+    spend = gate(tmp_path)
+    sent = request()
+    wire = response(sent, model=body_model, cost="0.0021").json()
+    if selected_model is not None:
+        wire["openrouter_metadata"] = {"endpoints": {"available": [
+            {"selected": True, "provider": "OpenAI", "model": selected_model},
+        ]}}
+
+    spend.begin(sent)
+    spend.complete(httpx.Response(200, json=wire, request=sent))
+
+    state = spend.snapshot()
+    assert state["status"] == "active"
+    assert state["spent_usd"] == "0.0021"
+    assert state["attempts"][0]["actual_model"] == body_model
+    assert state["attempts"][0]["actual_provider"] == "OpenAI"
+
+
 @pytest.mark.parametrize("status,error", [
     ("incomplete", None), ("completed", {"code": "synthetic"}),
 ])

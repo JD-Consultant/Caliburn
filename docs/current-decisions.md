@@ -4,6 +4,8 @@
 
 **2026-09-23 GPT-6 Luna／Responses 遷移方向（Owner 最新裁決；尚未切換）：**Owner 選擇保留顧問的高推理與工具能力，以單一 OpenRouter credential 研究並遷移 A／B1／B2 至 GPT-6 Luna 的 Responses 路徑；不是只改模型名稱。現行正式 `openai/gpt-5.6-luna`／Chat Completions 接線及既有驗收證據在新路徑通過前維持原狀，Memory、Working State、JD、App-side compaction 及其權責不重新設計。Owner 曾核准單批自然試驗最多 12 次員工聊天 POST、180 次實際 provider request、US$1.00，但該 P3 支出閘門與執行包固定的是舊模型與舊 endpoint；新模型的 endpoint、reasoning＋tool wire、Saver 往返、路由／用量與保守費用上界必須先離線重新核對並凍結，不能直接用舊閘門外送。**目前沒有執行 GPT-6 或 P3 付費請求，也未授權自動 fallback／切正式路徑。**下方同日「未授權」文字保留其記錄當時的歷史狀態，不得誤讀為最新 Owner 未核准上限。
 
+施工前的有限範圍、既有接點及停止線見 [GPT-6 Luna／Responses 最小遷移設計](specs/2026-09-23-gpt6-luna-responses-migration.md)；該稿是設計，不是正式接線或服務端相容性 PASS。
+
 **2026-09-23 成品驗收優先序修正（Owner 最新裁決）：**目前目標是盡快確認正式新 JD App 的 **LLM 顧問自然訪談 → A／B1／B2、Working State／Memory／compaction → 專業 JD → 真 Browser 使用**。P5 不以備份、空庫還原、設定檔副本或跨電腦恢復作首版成品的前置 gate；下方同日 P5 備份範圍條目與 9/14 演練均保留作研究／未來可選維護工作，**不得據此要求再做備份施工或阻塞核心驗收**。本輪只核對一般中斷／重開後已確認保存的原話、JD 與工作進度能由既有 PostgreSQL／Saver／Store 查回，未知提交不重做副作用；未送出的輸入或未保存的草稿不承諾 crash recovery。沿現有 owner、測試與失敗提示，不加新備份系統、DB、queue、恢復框架或第二套狀態。P3 自然真模型仍須獨立費用授權，不能因優先序調整自行送付費請求。
 
 **2026-09-23 P5 備份還原範圍裁決與證據邊界：**Owner 明確選定這次只驗**目前這台電腦、同一 Windows 使用者**的恢復；跨電腦安裝／恢復維持 PARKED，不新增可攜金鑰、平行設定或新備份系統。9/14 新 JD App 的整庫 `pg_dump`→新空庫 `pg_restore` 演練已核對 JD 版本 digest、operation、`jd_runtime` checkpoint／pending writes／Store 列數，並以原設定檔驗證舊引用可解；不能重做或忽略，但**設定檔副本還原與還原庫實際續談均未驗**，只列為部分證據。當時「換一台機器拿得回來」是超出本輪範圍的歷史目標，已於[備份演練](specs/2026-09-14-jd-backup-and-restore-slice.md)加現行註記並於[runbook](runbook.md)明示限制。[P5 狀態](plans/2026-09-10-jd-product-delivery.md)由「未開始」修正為部分已施工／整體 OPEN。正式權責仍只屬 ADR0077 新 App；本裁決不觸及 P3 付費授權或 production code。

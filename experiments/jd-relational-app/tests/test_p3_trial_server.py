@@ -75,7 +75,9 @@ def test_formal_role_calls_record_exact_role_and_timing_without_private_content(
         wire["model"] = "openai/gpt-6-luna"
         wire["provider"] = "OpenAI"
         wire["usage"]["cost"] = "0.001"
-        return httpx.Response(200, json=wire, request=request)
+        return httpx.Response(200, json=wire,
+                              headers={"X-Generation-Id": f"gen-router-{len(sent)}"},
+                              request=request)
 
     with trial.open_trial_runtime(spend, "synthetic-not-a-secret",
                                   transport=httpx.MockTransport(receive)) as runtime:
@@ -90,8 +92,11 @@ def test_formal_role_calls_record_exact_role_and_timing_without_private_content(
         "consultant", "background-case-maintainer", "background-understanding-maintainer",
     ]
     assert [item["max_output_tokens"] for item in attempts] == [8192, 32768, 32768]
-    assert [item["generation_id"] for item in attempts] == [
+    assert [item["response_id"] for item in attempts] == [
         "resp_gen-synthetic-1", "resp_gen-synthetic-2", "resp_gen-synthetic-3",
+    ]
+    assert [item["router_generation_id"] for item in attempts] == [
+        "gen-router-1", "gen-router-2", "gen-router-3",
     ]
     assert all(item["http_status"] == 200 for item in attempts)
     for item in attempts:

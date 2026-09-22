@@ -206,9 +206,12 @@ class LunaBudgetPolicy:
             "actual_provider": provider,
             "actual_service_tier": value.get("service_tier"),
         }
-        generation_id = value.get("id")
-        if type(generation_id) is str and 0 < len(generation_id) <= 128:
-            metadata["generation_id"] = generation_id
+        response_id = value.get("id")
+        if type(response_id) is str and 0 < len(response_id) <= 128:
+            metadata["response_id"] = response_id
+        router_generation_id = response.headers.get("X-Generation-Id")
+        if router_generation_id and len(router_generation_id) <= 128:
+            metadata["router_generation_id"] = router_generation_id
         for field in ("input_tokens", "output_tokens", "total_tokens"):
             count = usage.get(field)
             if type(count) is int and count >= 0:
@@ -372,6 +375,7 @@ class P3SpendGate:
 
     def _stop_unknown(
         self, request: httpx.Request, reason: str, *, http_status: int | None = None,
+        router_generation_id: str | None = None,
     ) -> BudgetGateError | None:
         attempt = self._active_attempt(request)
         if attempt is None:
@@ -382,6 +386,8 @@ class P3SpendGate:
         facts: dict[str, Any] = {"reason": reason, "ended_at_utc": _utc_now()}
         if http_status is not None:
             facts["http_status"] = http_status
+        if router_generation_id and len(router_generation_id) <= 128:
+            facts["router_generation_id"] = router_generation_id
         self._settle_attempt(attempt["attempt_id"], "unknown", **facts)
         self._state["in_flight"] = []
         self._state["status"] = "stopped"
@@ -443,7 +449,10 @@ class P3SpendGate:
             try:
                 cost, metadata = self.policy.validate_response(response)
             except BudgetGateError as error:
-                stopped = self._stop_unknown(request, str(error), http_status=response.status_code)
+                stopped = self._stop_unknown(
+                    request, str(error), http_status=response.status_code,
+                    router_generation_id=response.headers.get("X-Generation-Id"),
+                )
                 raise stopped or error
 
             reserve = self._decimal(attempt["reserve_usd"])

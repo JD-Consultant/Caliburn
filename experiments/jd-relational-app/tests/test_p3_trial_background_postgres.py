@@ -52,7 +52,7 @@ def _payload(messages, field):
     raise AssertionError(f"formal {field} context was missing")
 
 
-def _saved_generations(workflow, config):
+def _saved_response_ids(workflow, config):
     snapshot = workflow.graph.get_state(config)
     assert not snapshot.next
     return [message.response_metadata["id"] for message in snapshot.values["messages"]
@@ -105,7 +105,9 @@ def test_formal_b1_b2_requests_match_durable_checkpoints_and_publication(engine,
         body["model"] = "openai/gpt-6-luna"
         body["provider"] = "OpenAI"
         body["usage"]["cost"] = "0.001"
-        return httpx.Response(200, json=body, request=request)
+        return httpx.Response(200, json=body,
+                              headers={"X-Generation-Id": f"gen-router-{len(sent)}"},
+                              request=request)
 
     with opened_b2(dataset, document) as (native, windows, store, saver, _, _, publication):
         interviewed(native, 1)
@@ -135,14 +137,17 @@ def test_formal_b1_b2_requests_match_durable_checkpoints_and_publication(engine,
             assert len(bundle.cases) == len(bundle.understandings) == 1
 
             attempt_id = outer.values["case_attempt_id"]
-            b1 = _saved_generations(workflow.case_workflow,
+            b1 = _saved_response_ids(workflow.case_workflow,
                                     workflow.case_workflow._attempt_config(attempt_id))
-            b2 = _saved_generations(workflow.understanding_workflow,
+            b2 = _saved_response_ids(workflow.understanding_workflow,
                                     workflow.understanding_workflow._attempt_config(attempt_id))
             ledger = spend.snapshot()
             rows = ledger["attempts"]
             assert len(rows) == len(sent) == len(b1) + len(b2)
-            assert [row["generation_id"] for row in rows if row["role"] == "background-case-maintainer"] == b1
-            assert [row["generation_id"] for row in rows if row["role"] == "background-understanding-maintainer"] == b2
+            assert [row["response_id"] for row in rows if row["role"] == "background-case-maintainer"] == b1
+            assert [row["response_id"] for row in rows if row["role"] == "background-understanding-maintainer"] == b2
+            assert [row["router_generation_id"] for row in rows] == [
+                f"gen-router-{number}" for number in range(1, len(rows) + 1)
+            ]
             assert b1 and b2 and all(row["outcome"] == "settled" for row in rows)
             assert "synthetic-not-a-secret" not in (tmp_path / "spend.json").read_text(encoding="utf-8")

@@ -164,13 +164,16 @@ def test_missing_cost_retains_full_reserve_and_stops(tmp_path):
     spend = gate(tmp_path)
     sent = request()
     spend.begin(sent)
+    missing_cost = response(sent, cost=None)
+    missing_cost.headers["X-Generation-Id"] = "gen-unknown-cost-123"
 
     with pytest.raises(BudgetGateError, match="usage_cost_missing"):
-        spend.complete(response(sent, cost=None))
+        spend.complete(missing_cost)
 
     state = spend.snapshot()
     assert state["status"] == "stopped"
     assert state["retained_unknown_usd"] == "0.268644"
+    assert state["attempts"][0]["router_generation_id"] == "gen-unknown-cost-123"
     with pytest.raises(BudgetGateError, match="usage_cost_missing"):
         spend.begin(request())
 
@@ -262,7 +265,7 @@ def test_settled_attempt_durably_records_only_actual_provider_usage_metadata(tmp
     spend = gate(tmp_path)
     sent = request()
     wire = response(sent, cost="0.0123").json()
-    wire["id"] = "gen-synthetic-123"
+    wire["id"] = "resp-synthetic-123"
     wire["usage"] = {
         "input_tokens": 100,
         "output_tokens": 20,
@@ -279,7 +282,7 @@ def test_settled_attempt_durably_records_only_actual_provider_usage_metadata(tmp
     assert attempt["actual_model"] == "openai/gpt-6-luna"
     assert attempt["actual_provider"] == "OpenAI"
     assert attempt["actual_service_tier"] == "default"
-    assert attempt["generation_id"] == "gen-synthetic-123"
+    assert attempt["response_id"] == "resp-synthetic-123"
     assert attempt["input_tokens"] == 100
     assert attempt["output_tokens"] == 20
     assert attempt["total_tokens"] == 120
@@ -289,6 +292,23 @@ def test_settled_attempt_durably_records_only_actual_provider_usage_metadata(tmp
     ledger_bytes = (tmp_path / "p3-spend-ledger.json").read_text(encoding="utf-8")
     assert "private-model-answer" not in ledger_bytes
     assert "合成測試" not in ledger_bytes
+
+
+def test_responses_id_and_router_generation_id_are_recorded_separately(tmp_path):
+    spend = gate(tmp_path)
+    sent = request()
+    wire = response(sent).json()
+    wire["id"] = "resp-synthetic-123"
+
+    spend.begin(sent)
+    spend.complete(httpx.Response(
+        200, json=wire, headers={"X-Generation-Id": "gen-synthetic-456"}, request=sent,
+    ))
+
+    attempt = spend.snapshot()["attempts"][0]
+    assert attempt["response_id"] == "resp-synthetic-123"
+    assert attempt["router_generation_id"] == "gen-synthetic-456"
+    assert "generation_id" not in attempt
 
 
 def test_ledger_write_failure_stops_the_live_gate(tmp_path, monkeypatch):

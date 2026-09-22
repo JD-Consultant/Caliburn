@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方保留「待驗／未驗」文字的是當時 gate 的歷史狀態，不得覆蓋上方較新的正式 16K 通過結論。
 
+**2026-09-23 真實模型驗收授權（Owner 最新裁決）：**Owner 明確核准為完成既定 Caliburn 新 JD App 驗收目標所需的後續真實模型請求，無須每一批再請示模型呼叫。這不是取消用量保護：每一批仍先固定目的、資料、實際外送數與費用上限，逐筆記帳；費用或路由不明、上限用盡、未授權 fallback／retry 或需要改產品／provider 權責時停止並討論。第一批自然 C-W 沿已提出的 **最多 12 次員工輸入、180 次實際 provider request、US$1.00** 執行；先前 2 筆 smoke 的額度與帳本不沿用。真實請求授權不等於自然品質、完整 Browser 或正式切換已驗收。
+
 **2026-09-23 GPT-6 Responses 第二次獨立真服務端 smoke（最新）：**Owner 另核准最多 2 筆模型 POST＋1 筆唯讀 metadata GET、US$0.54 保守上限；沿正式新 JD App A 模型工廠、既有 P3 test-only 支出閘門與本機合成 `read_case`，實際送出 **2 筆** `/api/v1/responses`，兩筆均 HTTP 200／`completed`，回覆提供 `openai/gpt-6-luna`、實際 provider `OpenAI`、tier `default`、`usage.cost`；工具呼叫與結果接續後產生非空 final。逐筆結算 US$0.0000253／US$0.0000305，總計 **US$0.0000558**、未知預留 0；metadata GET **0 筆**，無重試、fallback、正式資料或 production 修改。前次 stopped 帳本不回寫。**只關閉本次 Responses／high＋工具的有限服務端往返與結算 gate**；真實 encrypted reasoning 跨回合、B1／B2 真模型、自然 P3、16K 長上下文、同批真 Browser／JD 品質、正式切換與 main 合併仍 OPEN。詳見[第二次有界真實工具往返](specs/evidence/2026-09-23-gpt6-responses-offline.md#第二次獨立有界真實工具往返最新)。
 
 **2026-09-23 P3 真模型重測前的診斷閘門（最新）：**首次真回覆的 `model` 值未留存，是前次停止原因尚不能唯一判定的證據缺口。僅在 test-only 支出帳本補有界模型／選定端點／provider／tier 識別與 cost 欄位存在性，先以兩個真落盤的失敗反例紅綠驗證；受影響零付費 **57 passed／0 failed**，原帳本仍 stopped，本輪付費請求 **0**。不保存原始回覆與訪談文字，不改 production／停止和結算語意。**真實 GPT-6 工具往返、自然 P3、Browser 仍 OPEN；再次外送須另核准請求與費用上限。**詳見[下次 smoke 診斷準備](specs/evidence/2026-09-23-gpt6-responses-offline.md#下次有界-smoke-的失敗診斷準備)。

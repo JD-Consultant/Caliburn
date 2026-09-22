@@ -4,7 +4,7 @@
 
 > **2026-09-23 優先序更新：**本計畫保留完整產品旅程、自然品質與真人試用 gate；下方 Plate／三工具／「Task 6 是唯一下一單位」是當時起點，已被 relational JD、分層 Memory、完整 App 驗收及 [ADR0077 正式權責切換](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)取代。Owner 現將備份／空庫還原移出首版核心驗收，只要求一般中斷後既有已保存資料與進度可查回。當前短路由以 [`current-decisions.md`](../current-decisions.md) 最上條為準；歷史階段與問題解決順序仍保留。
 
-> **2026-09-23 P3 最新入口：**GPT-6 Luna／OpenRouter Responses 隔離接線的首次有界真服務端 smoke 已送 1 筆模型請求，HTTP 200，但 test-only 支出閘門以 `provider_model_mismatch` 停止；後以公開模型 lookup 核對 alias／canonical 對應，並修正可重現的零付費閘門誤判。首次真回覆的原始 model 值未留存，不能宣稱當時唯一根因已證實。原帳本不續送，自然 C-W／Browser 仍未在新模型路徑驗收；下方 P3 表格的「0 外部 request／未付費授權」及「現行後續」保留其撰寫時狀態，最新證據、剩餘停止線與下一次付費授權界線見[GPT-6 接線證據](../specs/evidence/2026-09-23-gpt6-responses-offline.md#openrouter-別名核對與零付費閘門修正)。
+> **2026-09-23 P3 最新入口：**GPT-6 Luna／OpenRouter Responses 的第二次獨立有界 smoke 已完成 2 筆真實模型請求、合成工具往返與非空 final；同筆回覆提供 OpenAI 路由及成本，逐筆結算。首次 smoke 曾因 test-only `provider_model_mismatch` 停止，舊帳本未重開；兩次結果與邊界皆保留於[GPT-6 接線證據](../specs/evidence/2026-09-23-gpt6-responses-offline.md#第二次獨立有界真實工具往返最新)。這只關閉有限服務端 gate，**自然 C-W／16K 長上下文／B1、B2 真模型／同批 Browser 仍未驗收**。下方 P3 表格的「0 外部 request／未付費授權」及「現行後續」是撰寫時歷史狀態，不可當成最新外送數或費用授權；下一批自然測試要另列實際請求與費用界線。
 
 ## 1. 成品與範圍
 

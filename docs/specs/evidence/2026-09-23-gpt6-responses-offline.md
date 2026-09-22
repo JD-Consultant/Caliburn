@@ -2,7 +2,7 @@
 
 - 日期：2026-09-23
 - 範圍：`codex/gpt6-luna-responses` 隔離分支；正式新 JD App `experiments/jd-relational-app`
-- 狀態：離線接線通過；首次服務端 smoke 因 `provider_model_mismatch` 停止；非工具往返或完整成品 PASS
+- 狀態：離線接線通過；首次服務端 smoke 曾因 `provider_model_mismatch` 停止；第二次獨立有界 smoke 已完成真實工具往返與 final。自然 P3／完整成品仍未驗收；以文末最新紀錄為準。
 - 下列離線階段外部 provider request：0；費用：US$0；首次付費 smoke 的數據另記於本文末段；未使用正式文件資料
 
 ## 已核對
@@ -53,3 +53,11 @@
 - 首次停止時只保留錯誤碼和 `X-Generation-Id`，未保留回覆正文中的模型識別，無法確認究竟是哪個 model 欄位觸發拒絕。這是 **test-only 帳本的證據缺口**，不改產品行為或前次結果。
 - 先以兩種拒絕案例確認測試紅燈：正文模型不符，以及 selected endpoint 模型不符。既有 `P3SpendGate` 現在只在驗證失敗時，持久保存有界的 `observed_model`／`observed_selected_model`、provider／tier 識別及 `observed_cost_present` 布林值；仍不保存完整 HTTP body、`output` 訪談文字、金鑰或費用數值。錯誤照舊停止、保留整筆預留額，不能憑診斷欄位解除停機。
 - 真正落盤的帳本測試與相鄰 P3／Responses 回歸 **57 passed／0 failed**，本輪新增外部模型請求 **0**。原 stopped ledger 不回寫、不重開；這只提高下一次已另行授權的 smoke 失敗時的可診斷性，**未驗證 GPT-6 真工具往返／final**。
+
+## 第二次獨立有界真實工具往返（最新）
+
+- 2026-09-23，Owner 核准最多 **2 筆模型 POST＋1 筆唯讀 generation metadata GET**、US$0.54 保守上限、純合成資料與本機無副作用 `read_case`；不重試、不 fallback、不切正式 App。前次停止的帳本保持原樣，另用 `.research-tmp/gpt6-live-smoke-20260923b/spend.json` 獨立記帳；測試腳本同目錄且受 Git ignore，不含金鑰、原始回覆或真實訪談。
+- 只沿正式新 App 的 `create_consultant_model` 與鎖定的 LangChain `create_agent`，在 HTTP 邊界接既有 `P3SpendGate`。送出前檢查 `/api/v1/responses`、`openai/gpt-6-luna`、OpenAI-only／no fallback、`reasoning.effort=high`、`store=false`、`include=[reasoning.encrypted_content]`、非串流、`max_output_tokens=8192`、工具 schema、每筆預留與累計上限；SDK 自動重試為 0。Credential Manager 金鑰只在程序內讀取，未輸出。
+- 實際送出 **2 筆**模型 POST，均 HTTP **200** 且 `status=completed`；同筆 Responses 正文提供模型 `openai/gpt-6-luna`、provider `OpenAI`、tier `default` 及 `usage.cost`，測試帳本逐筆結算。第 1 筆模型呼叫本機 `read_case(case-1)`；工具結果回模型後第 2 筆產生非空的最終回答。兩筆 `X-Generation-Id`／Response ID 均記於本地帳本，供查核；**未使用**另允許的 metadata GET，也沒有第 3 筆模型請求、重試或 fallback。
+- Provider 回報費用分別為 **US$0.0000253**、**US$0.0000305**，合計 **US$0.0000558**；未結不明預留為 0。帳本顯示 `attempt_count=2`、兩筆 `settled`、`stop_reason=null`。因 2 筆上限已用完，本輪不再外送。這是實際用量，不代表未來自然訪談的費用上界。
+- **本 gate PASS 的精確範圍：**這次模型／OpenRouter Responses／OpenAI 路由／high＋本機工具、兩段 tool-loop、最終回答、同筆成本與路由欄位。沒有單獨捕捉並驗證真實 encrypted reasoning item 的跨回合重播；其 Saver／下一請求形狀先前只由離線測試覆蓋。也未驗 B1／B2 真模型、完整 20-tool App 組裝、自然長訪談、16K 長上下文、真 PostgreSQL 與 Browser 的同批旅程、JD 品質或 main 切換。這次不修改 production、Domain、Prompt、Memory 或正式資料。

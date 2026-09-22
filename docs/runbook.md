@@ -79,12 +79,16 @@ pnpm start
 
 ## 資料庫與備份
 
+**首版成品驗收不以備份／空庫還原為前置。**目前優先驗證既有 PostgreSQL／Saver／Store 在一般中斷與重開後能查回已確認保存的訪談、JD 和進度；未送出的輸入或未保存草稿不保證意外關閉後找回。下列備份資訊保留供後續維護參考，不表示已完成完整還原端到端驗收。
+
 `public` schema 保存關聯式 JD 與背景准入；`jd_runtime` 保存 LangGraph checkpoint／store／Memory publication。兩者屬同一 App、同一資料範圍，但責任分層。一份完整備份包含：
 
 1. 整個資料庫的 `pg_dump`，不要用 `-n` 只挑單一 schema；
 2. App 的 `host.v1.dpapi` 設定檔。
 
-OpenRouter key 不在備份內；換電腦或還原後須重新執行 `pnpm app:set-key`。瀏覽器 IndexedDB 不是正式資料庫備份。精確證據與限制見 [`specs/2026-09-14-jd-backup-and-restore-slice.md`](specs/2026-09-14-jd-backup-and-restore-slice.md)。
+OpenRouter key 不在備份內；在目前電腦還原後若憑證不存在，須重新執行 `pnpm app:set-key`。瀏覽器 IndexedDB 不是正式資料庫備份。精確證據與限制見 [`specs/2026-09-14-jd-backup-and-restore-slice.md`](specs/2026-09-14-jd-backup-and-restore-slice.md)。
+
+目前的備份／還原驗收只涵蓋**同一台電腦、同一 Windows 使用者**。`host.v1.dpapi` 受 Windows 使用者 DPAPI 保護，不是可直接帶去另一台電腦解密的通用備份；跨電腦安裝／還原不在本版範圍。既有演練核對了整庫內容，並以原設定驗證舊引用；尚未驗證設定檔副本還原，也沒有在還原庫實際續談，因此不將完整還原標為已驗收。
 
 ## 驗證
 

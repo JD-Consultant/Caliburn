@@ -88,7 +88,7 @@
     }
   },
   "source_migrations_sha256": {
-    "0001_jd_relational_initial.py": "4abccba7242a383ef51fe4395eee4606c0e997e23ede9915d67e2238c6d4c2d0",
+    "0001_jd_relational_initial.py": "f12917204846f5a3e2949681b717961f8d486c7f7399152c56010c30d00001c3",
     "0002_jd_memory_admission.py": "b0c8e9f8c227f923e22d7e2a43667bb171c19efa260256e2af53e773d414cdad"
   }
 }

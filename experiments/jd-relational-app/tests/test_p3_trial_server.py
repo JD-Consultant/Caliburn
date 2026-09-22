@@ -12,9 +12,9 @@ import pytest
 from langsmith import tracing_context
 
 from jd_relational.openrouter_model import OPENROUTER_HEADERS
-from jd_relational.openrouter_model import ReceiptChatOpenRouter
+from langchain_openai import ChatOpenAI
 from support.p3_spend_gate import BudgetGateError, P3SpendGate
-from support.openrouter_replies import reply
+from support.openai_replies import reply
 from support import p3_trial_server as trial
 
 
@@ -54,8 +54,10 @@ def test_formal_a_b1_b2_share_denying_clients_without_provider_network(tmp_path)
         with tracing_context(enabled=False):
             for model in (runtime.role_models.consultant, runtime.role_models.case,
                           runtime.role_models.understanding):
-                with pytest.raises(BudgetGateError, match="not_authorized"):
+                with pytest.raises(Exception) as failure:
                     model.invoke("合成輸入")
+                assert isinstance(failure.value.__cause__.__cause__, BudgetGateError)
+                assert str(failure.value.__cause__.__cause__) == "not_authorized"
     assert observed == []
     assert spend.snapshot()["attempt_count"] == 0
 
@@ -70,6 +72,8 @@ def test_formal_role_calls_record_exact_role_and_timing_without_private_content(
     def receive(request):
         sent.append(request)
         wire = reply(f"gen-synthetic-{len(sent)}")
+        wire["model"] = "openai/gpt-6-luna"
+        wire["provider"] = "OpenAI"
         wire["usage"]["cost"] = "0.001"
         return httpx.Response(200, json=wire, request=request)
 
@@ -85,9 +89,9 @@ def test_formal_role_calls_record_exact_role_and_timing_without_private_content(
     assert [item["role"] for item in attempts] == [
         "consultant", "background-case-maintainer", "background-understanding-maintainer",
     ]
-    assert [item["max_tokens"] for item in attempts] == [8192, 32768, 32768]
+    assert [item["max_output_tokens"] for item in attempts] == [8192, 32768, 32768]
     assert [item["generation_id"] for item in attempts] == [
-        "gen-synthetic-1", "gen-synthetic-2", "gen-synthetic-3",
+        "resp_gen-synthetic-1", "resp_gen-synthetic-2", "resp_gen-synthetic-3",
     ]
     assert all(item["http_status"] == 200 for item in attempts)
     for item in attempts:
@@ -115,8 +119,10 @@ def test_trial_runtime_refuses_missing_model_role_before_provider_network(tmp_pa
                                   transport=httpx.MockTransport(receive)) as runtime:
         runtime.role_models.case.callbacks = []
         with tracing_context(enabled=False):
-            with pytest.raises(BudgetGateError, match="request_role_missing"):
+            with pytest.raises(Exception) as failure:
                 runtime.role_models.case.invoke("合成輸入")
+            assert isinstance(failure.value.__cause__.__cause__, BudgetGateError)
+            assert str(failure.value.__cause__.__cause__) == "request_role_missing"
     assert sent == []
     assert spend.snapshot()["attempt_count"] == 0
 
@@ -135,10 +141,12 @@ def test_trial_role_is_cleared_after_provider_error(tmp_path):
     with trial.open_trial_runtime(spend, "synthetic-not-a-secret",
                                   transport=httpx.MockTransport(receive)) as runtime:
         with tracing_context(enabled=False):
-            with pytest.raises(BudgetGateError, match="provider_http_500"):
+            with pytest.raises(Exception) as failure:
                 runtime.role_models.case.invoke("合成輸入")
+            assert isinstance(failure.value.__cause__.__cause__, BudgetGateError)
+            assert str(failure.value.__cause__.__cause__) == "provider_http_500"
             with pytest.raises(BudgetGateError, match="request_role_missing"):
-                runtime.http_client.send(httpx.Request("POST", "https://openrouter.ai/api/v1/chat/completions"))
+                runtime.http_client.send(httpx.Request("POST", "https://openrouter.ai/api/v1/responses"))
     assert len(sent) == 1
     assert spend.snapshot()["attempt_count"] == 1
 
@@ -158,9 +166,11 @@ def test_trial_client_does_not_follow_provider_redirect_outside_gate(tmp_path):
     with trial.open_trial_runtime(spend, "synthetic-not-a-secret",
                                   transport=httpx.MockTransport(redirected)) as runtime:
         with tracing_context(enabled=False):
-            with pytest.raises(BudgetGateError, match="provider_http_307"):
+            with pytest.raises(Exception) as failure:
                 runtime.role_models.consultant.invoke("合成輸入")
-    assert sent_to == ["https://openrouter.ai/api/v1/chat/completions"]
+            assert isinstance(failure.value.__cause__.__cause__, BudgetGateError)
+            assert str(failure.value.__cause__.__cause__) == "provider_http_307"
+    assert sent_to == ["https://openrouter.ai/api/v1/responses"]
     assert spend.snapshot()["status"] == "stopped"
 
 
@@ -277,15 +287,15 @@ def test_paid_entry_assembles_formal_graph_and_background_roles_before_host(tmp_
 
     assert seen["file"] is selected
     assert seen["enable_chat"] is True
-    assert isinstance(seen["case_model"], ReceiptChatOpenRouter)
-    assert isinstance(seen["understanding_model"], ReceiptChatOpenRouter)
+    assert isinstance(seen["case_model"], ChatOpenAI)
+    assert isinstance(seen["understanding_model"], ChatOpenAI)
     assert seen["consultant"] is not None
     assert json.loads((tmp_path / "spend.json").read_text(encoding="utf-8"))["attempt_count"] == 0
 
 
 def test_trial_evidence_uses_spend_attempts_and_keeps_request_content_out(tmp_path):
-    attempt = {"attempt_id": 1, "model": "openai/gpt-5.6-luna",
-               "max_tokens": 8192, "reserve_usd": "0.5397456",
+    attempt = {"attempt_id": 1, "model": "openai/gpt-6-luna",
+               "max_output_tokens": 8192, "reserve_usd": "0.268644",
                "actual_cost_usd": "0.001", "outcome": "settled"}
     spend = SimpleNamespace(snapshot=lambda: {"attempt_count": 1, "attempts": [attempt]})
     evidence = trial.TrialEvidence(tmp_path, spend)

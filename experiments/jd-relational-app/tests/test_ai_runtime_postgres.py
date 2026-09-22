@@ -30,7 +30,7 @@ from jd_relational.reads import command_context
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import DocumentCheckpoints, build_document_graph
 from jd_relational.storage.service import JdStorage
-from support.openrouter_replies import reply as _reply
+from support.openai_replies import reply as _reply
 from test_consultant_context_postgres import _notice
 from test_manual_runtime_postgres import NATIVE_TABLES, RUNTIME_SCHEMA, connect, counts
 from test_storage_postgres import engine
@@ -66,19 +66,20 @@ def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None,
         finalization = payload.get("tool_choice") == "none"
         if finalization:
             assert allow_finalization, "Unexpected finalization request in this fixture."
-        assert [tool["function"]["name"] for tool in payload["tools"]] == expected_names
+        assert [tool["name"] for tool in payload["tools"]] == expected_names
         assert len(payload["tools"]) == len(expected_names)
-        assert all(tool["function"]["strict"] is True for tool in payload["tools"])
-        system = next(message for message in payload["messages"]
+        assert all(tool["strict"] is True for tool in payload["tools"])
+        system = next(message for message in payload["input"]
                       if message.get("role") == "system")
-        assert system["content"][0]["cache_control"] == {"type": "ephemeral"}
+        assert system["content"], "The stable guidance remains in the request."
         requests.append(payload)
         name, arguments = plan[len(requests) - 1](payload)
         if before_reply is not None:
             # The test owns this pause; it holds the real in-flight call open.
             before_reply()
-        return httpx.Response(200, json=_reply(f"{prefix}_{len(requests)}", name, arguments),
-                              request=request)
+        answer = _reply(f"{prefix}_{len(requests)}", name, arguments)
+        answer["model"] = "openai/gpt-6-luna"
+        return httpx.Response(200, json=answer, request=request)
 
     with httpx.Client(
         transport=httpx.MockTransport(receive),
@@ -133,9 +134,11 @@ def _final(_):
 
 def _last_page(payload):
     contents = []
-    for message in payload["messages"]:
+    for message in payload.get("messages", payload.get("input", [])):
         if message.get("role") == "tool":
             contents.append(message["content"])
+        elif message.get("type") == "function_call_output":
+            contents.append(message["output"])
         elif isinstance(message.get("content"), list):
             contents.extend(block["content"] for block in message["content"]
                             if block.get("type") == "tool_result")

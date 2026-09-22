@@ -12,7 +12,7 @@ import pytest
 from jd_relational.openrouter_model import OPENROUTER_HEADERS
 from jd_relational.role_models import create_role_models
 import support.p3_spend_gate as p3_spend_gate
-from support.openrouter_replies import reply
+from support.openai_replies import reply
 from support.p3_spend_gate import (
     BudgetGateError,
     GuardedAsyncClient,
@@ -22,7 +22,7 @@ from support.p3_spend_gate import (
 )
 
 
-URL = "https://openrouter.ai/api/v1/chat/completions"
+URL = "https://openrouter.ai/api/v1/responses"
 PROVIDER = {
     "only": ["openai"],
     "order": ["openai"],
@@ -33,12 +33,14 @@ PROVIDER = {
 
 def payload(*, max_tokens: int = 8192) -> dict:
     return {
-        "model": "openai/gpt-5.6-luna",
-        "messages": [{"role": "user", "content": "合成測試"}],
-        "max_tokens": max_tokens,
+        "model": "openai/gpt-6-luna",
+        "input": [{"role": "user", "content": "合成測試"}],
+        "max_output_tokens": max_tokens,
         "parallel_tool_calls": False,
         "provider": PROVIDER,
         "reasoning": {"effort": "high"},
+        "store": False,
+        "include": ["reasoning.encrypted_content"],
     }
 
 
@@ -57,10 +59,10 @@ def response(
     cost: str | None = "0.01",
     status_code: int = 200,
     provider: str = "OpenAI",
-    model: str = "openai/gpt-5.6-luna-20260709",
+    model: str = "openai/gpt-6-luna",
     service_tier: str | None = "default",
 ) -> httpx.Response:
-    usage = {"prompt_tokens": 100, "completion_tokens": 20}
+    usage = {"input_tokens": 100, "output_tokens": 20}
     if cost is not None:
         usage["cost"] = cost
     return httpx.Response(
@@ -69,8 +71,11 @@ def response(
             "model": model,
             "provider": provider,
             "service_tier": service_tier,
+            "status": "completed",
+            "error": None,
             "usage": usage,
-            "choices": [{"message": {"role": "assistant", "content": "完成"}}],
+            "output": [{"type": "message", "role": "assistant", "content": [
+                {"type": "output_text", "text": "完成"}]}],
         },
         request=sent,
     )
@@ -90,15 +95,15 @@ def gate(tmp_path, *, cap="1.00", request_cap=180, wait_timeout=1.0):
 def test_policy_reserves_full_standard_long_context_and_role_output():
     policy = LunaBudgetPolicy()
 
-    assert policy.reserve_for(payload(max_tokens=8192)) == Decimal("0.5397456")
-    assert policy.reserve_for(payload(max_tokens=32768)) == Decimal("0.5839824")
+    assert policy.reserve_for(payload(max_tokens=8192)) == Decimal("0.268644")
+    assert policy.reserve_for(payload(max_tokens=32768)) == Decimal("0.287076")
 
 
 def test_role_cannot_disguise_a_different_output_limit(tmp_path):
     spend = gate(tmp_path)
 
     with pytest.raises(BudgetGateError, match="request_role_mismatch"):
-        spend.begin(request(max_tokens=8192), role="background-case-maintainer")
+        spend.begin(request(max_tokens=32768), role="consultant")
 
     assert spend.snapshot()["attempt_count"] == 0
 
@@ -106,11 +111,12 @@ def test_role_cannot_disguise_a_different_output_limit(tmp_path):
 @pytest.mark.parametrize(
     "change",
     [
-        lambda value: value.update(model="openai/gpt-5.6-terra"),
+        lambda value: value.update(model="openai/gpt-6-terra"),
         lambda value: value.update(service_tier="flex"),
         lambda value: value.update(parallel_tool_calls=True),
         lambda value: value.update(provider={**PROVIDER, "allow_fallbacks": True}),
-        lambda value: value.update(max_tokens=128000),
+        lambda value: value.update(max_output_tokens=128000),
+        lambda value: value.update(max_output_tokens=4096),
         lambda value: value.update(plugins=[{"id": "web"}]),
         lambda value: value.update(stream=True),
         lambda value: value.update(tools=[{"type": "web_search"}]),
@@ -164,7 +170,7 @@ def test_missing_cost_retains_full_reserve_and_stops(tmp_path):
 
     state = spend.snapshot()
     assert state["status"] == "stopped"
-    assert state["retained_unknown_usd"] == "0.5397456"
+    assert state["retained_unknown_usd"] == "0.268644"
     with pytest.raises(BudgetGateError, match="usage_cost_missing"):
         spend.begin(request())
 
@@ -178,6 +184,7 @@ def test_missing_cost_retains_full_reserve_and_stops(tmp_path):
         ({"provider": "Other"}, "provider_mismatch"),
         ({"model": "other/model"}, "provider_model_mismatch"),
         ({"service_tier": "flex"}, "provider_service_tier_mismatch"),
+        ({"model": "openai/gpt-6-luna-unapproved-snapshot"}, "provider_model_mismatch"),
     ],
 )
 def test_unaccountable_response_stops_with_full_reserve(
@@ -192,7 +199,50 @@ def test_unaccountable_response_stops_with_full_reserve(
 
     state = spend.snapshot()
     assert state["status"] == "stopped"
-    assert state["retained_unknown_usd"] == "0.5397456"
+    assert state["retained_unknown_usd"] == "0.268644"
+
+
+def test_conflicting_response_and_router_provider_evidence_stops(tmp_path):
+    spend = gate(tmp_path)
+    sent = request()
+    wire = response(sent).json()
+    wire["openrouter_metadata"] = {"endpoints": {"available": [
+        {"selected": True, "provider": "Azure"},
+    ]}}
+    spend.begin(sent)
+    with pytest.raises(BudgetGateError, match="provider_mismatch"):
+        spend.complete(httpx.Response(200, json=wire, request=sent))
+    assert spend.snapshot()["status"] == "stopped"
+
+
+def test_selected_router_provider_is_accepted_when_top_level_is_absent(tmp_path):
+    spend = gate(tmp_path)
+    sent = request()
+    wire = response(sent).json()
+    wire.pop("provider")
+    wire["openrouter_metadata"] = {"endpoints": {"available": [
+        {"selected": True, "provider": "OpenAI"},
+    ]}}
+    spend.begin(sent)
+    spend.complete(httpx.Response(200, json=wire, request=sent))
+    assert spend.snapshot()["attempts"][0]["actual_provider"] == "OpenAI"
+
+
+@pytest.mark.parametrize("status,error", [
+    ("incomplete", None), ("completed", {"code": "synthetic"}),
+])
+def test_unfinished_responses_reply_stops_trial_after_accounting_unknown(
+    tmp_path, status, error,
+):
+    spend = gate(tmp_path)
+    sent = request()
+    wire = response(sent).json()
+    wire["status"] = status
+    wire["error"] = error
+    spend.begin(sent)
+    with pytest.raises(BudgetGateError, match="provider_response_incomplete"):
+        spend.complete(httpx.Response(200, json=wire, request=sent))
+    assert spend.snapshot()["status"] == "stopped"
 
 
 def test_duplicate_response_cannot_charge_or_release_twice(tmp_path):
@@ -214,24 +264,24 @@ def test_settled_attempt_durably_records_only_actual_provider_usage_metadata(tmp
     wire = response(sent, cost="0.0123").json()
     wire["id"] = "gen-synthetic-123"
     wire["usage"] = {
-        "prompt_tokens": 100,
-        "completion_tokens": 20,
+        "input_tokens": 100,
+        "output_tokens": 20,
         "total_tokens": 120,
         "cost": "0.0123",
-        "prompt_tokens_details": {"cached_tokens": 30, "cache_write_tokens": 10},
+        "input_tokens_details": {"cached_tokens": 30, "cache_write_tokens": 10},
     }
-    wire["choices"][0]["message"]["content"] = "private-model-answer"
+    wire["output"][0]["content"][0]["text"] = "private-model-answer"
 
     spend.begin(sent)
     spend.complete(httpx.Response(200, json=wire, request=sent))
     attempt = gate(tmp_path).snapshot()["attempts"][0]
 
-    assert attempt["actual_model"] == "openai/gpt-5.6-luna-20260709"
+    assert attempt["actual_model"] == "openai/gpt-6-luna"
     assert attempt["actual_provider"] == "OpenAI"
     assert attempt["actual_service_tier"] == "default"
     assert attempt["generation_id"] == "gen-synthetic-123"
-    assert attempt["prompt_tokens"] == 100
-    assert attempt["completion_tokens"] == 20
+    assert attempt["input_tokens"] == 100
+    assert attempt["output_tokens"] == 20
     assert attempt["total_tokens"] == 120
     assert attempt["cached_tokens"] == 30
     assert attempt["cache_write_tokens"] == 10
@@ -278,7 +328,7 @@ def test_transport_failure_retains_reserve_and_restart_fails_closed(tmp_path):
     state = recovered.snapshot()
     assert state["status"] == "stopped"
     assert state["stop_reason"] == "transport_unknown"
-    assert state["retained_unknown_usd"] == "0.5839824"
+    assert state["retained_unknown_usd"] == "0.287076"
 
 
 def test_restart_turns_unsettled_request_into_unknown_and_stops(tmp_path):
@@ -290,7 +340,7 @@ def test_restart_turns_unsettled_request_into_unknown_and_stops(tmp_path):
 
     assert state["status"] == "stopped"
     assert state["stop_reason"] == "recovered_in_flight_unknown"
-    assert state["retained_unknown_usd"] == "0.5397456"
+    assert state["retained_unknown_usd"] == "0.268644"
     assert state["in_flight"] == []
 
 
@@ -302,7 +352,7 @@ def test_request_and_dollar_caps_block_before_send(tmp_path):
     with pytest.raises(BudgetGateError, match="request_cap"):
         count_gate.begin(request())
 
-    cost_gate = gate(tmp_path / "cost", cap="0.55")
+    cost_gate = gate(tmp_path / "cost", cap="0.28")
     first = request()
     cost_gate.begin(first)
     cost_gate.complete(response(first, cost="0.02"))
@@ -342,7 +392,7 @@ def test_guarded_sync_client_accounts_real_wire_and_exception(tmp_path):
     ) as client:
         with pytest.raises(httpx.ReadError):
             client.post(URL, json=payload())
-    assert failed.snapshot()["retained_unknown_usd"] == "0.5397456"
+    assert failed.snapshot()["retained_unknown_usd"] == "0.268644"
 
 
 def test_guarded_sync_client_rejects_per_send_redirect_override_before_network(tmp_path):
@@ -416,12 +466,14 @@ def test_authorization_is_required_even_for_a_valid_request(tmp_path):
 
 def test_formal_a_b1_b2_factory_uses_the_same_guarded_wire(tmp_path):
     spend = gate(tmp_path)
-    costs = iter(("0.001", "0.002", "0.003"))
+    costs = iter(("0.001", "0.002", "0.003", "0.004", "0.005"))
     observed_limits = []
 
     def handler(sent):
-        observed_limits.append(json.loads(sent.content)["max_tokens"])
+        observed_limits.append(json.loads(sent.content)["max_output_tokens"])
         body = reply(f"p3-{len(observed_limits)}")
+        body["model"] = "openai/gpt-6-luna"
+        body["provider"] = "OpenAI"
         body["service_tier"] = "default"
         body["usage"]["cost"] = next(costs)
         return httpx.Response(200, json=body, request=sent)
@@ -447,11 +499,13 @@ def test_formal_a_b1_b2_factory_uses_the_same_guarded_wire(tmp_path):
             )
             for model in (roles.consultant, roles.case, roles.understanding):
                 model.invoke("合成輸入")
+            roles.consultant.invoke("合成摘要", max_tokens=2048)
+            roles.case.invoke("合成背景摘要", max_tokens=8192)
         finally:
             asyncio.run(async_client.aclose())
 
-    assert observed_limits == [8192, 32768, 32768]
+    assert observed_limits == [8192, 32768, 32768, 2048, 8192]
     state = spend.snapshot()
-    assert state["attempt_count"] == 3
-    assert state["spent_usd"] == "0.006"
+    assert state["attempt_count"] == 5
+    assert state["spent_usd"] == "0.015"
     assert state["status"] == "active"

@@ -34,6 +34,11 @@ _ROLE_OUTPUT_LIMITS = {
     "background-case-maintainer": 32768,
     "background-understanding-maintainer": 32768,
 }
+_ROLE_SUMMARY_LIMITS = {
+    "consultant": 2048,
+    "background-case-maintainer": 8192,
+    "background-understanding-maintainer": 8192,
+}
 _active_model_role: ContextVar[str | None] = ContextVar("p3_model_role", default=None)
 
 
@@ -60,21 +65,21 @@ def _utc_now() -> str:
 class LunaBudgetPolicy:
     """Pinned P3 wire contract and conservative per-request reservation."""
 
-    MODEL = "openai/gpt-5.6-luna"
-    ENDPOINT = "https://openrouter.ai/api/v1/chat/completions"
+    MODEL = "openai/gpt-6-luna"
+    ENDPOINT = "https://openrouter.ai/api/v1/responses"
     PROVIDER = {
         "only": ["openai"],
         "order": ["openai"],
         "allow_fallbacks": False,
         "require_parameters": False,
     }
-    ROLE_OUTPUT_LIMITS = frozenset({8192, 32768})
+    ROLE_OUTPUT_LIMITS = frozenset({2048, 8192, 32768})
 
     # The full 1.05M context is reserved at the documented cache-write rate.
     # Output is reserved at the documented >272K long-context output rate.
     CONTEXT_TOKENS = Decimal("1050000")
-    CACHE_WRITE_USD_PER_MILLION = Decimal("0.50")
-    LONG_OUTPUT_USD_PER_MILLION = Decimal("1.80")
+    CACHE_WRITE_USD_PER_MILLION = Decimal("0.25")
+    LONG_OUTPUT_USD_PER_MILLION = Decimal("0.75")
     MILLION = Decimal("1000000")
 
     _DISALLOWED_KEYS = frozenset(
@@ -106,6 +111,12 @@ class LunaBudgetPolicy:
             raise BudgetGateError("request_contract_parallel_tools")
         if value.get("reasoning") != {"effort": "high"}:
             raise BudgetGateError("request_contract_reasoning")
+        if value.get("store") is not False:
+            raise BudgetGateError("request_contract_store")
+        if value.get("include") != ["reasoning.encrypted_content"]:
+            raise BudgetGateError("request_contract_reasoning_continuation")
+        if type(value.get("input")) is not list:
+            raise BudgetGateError("request_contract_input")
         if value.get("stream") is True:
             raise BudgetGateError("request_contract_streaming")
         tools = value.get("tools")
@@ -114,22 +125,23 @@ class LunaBudgetPolicy:
             or any(
                 type(tool) is not dict
                 or tool.get("type") != "function"
-                or type(tool.get("function")) is not dict
+                or type(tool.get("name")) is not str
+                or type(tool.get("parameters")) is not dict
                 for tool in tools
             )
         ):
             raise BudgetGateError("request_contract_server_tool")
-        max_tokens = value.get("max_tokens")
+        max_tokens = value.get("max_output_tokens")
         if type(max_tokens) is not int or max_tokens not in self.ROLE_OUTPUT_LIMITS:
-            raise BudgetGateError("request_contract_max_tokens")
+            raise BudgetGateError("request_contract_max_output_tokens")
         if self._DISALLOWED_KEYS.intersection(value):
             raise BudgetGateError("request_contract_disallowed_feature")
         return value
 
     def reserve_for(self, payload: dict[str, Any]) -> Decimal:
-        max_tokens = payload.get("max_tokens")
+        max_tokens = payload.get("max_output_tokens")
         if type(max_tokens) is not int or max_tokens not in self.ROLE_OUTPUT_LIMITS:
-            raise BudgetGateError("request_contract_max_tokens")
+            raise BudgetGateError("request_contract_max_output_tokens")
         input_reserve = (
             self.CONTEXT_TOKENS
             * self.CACHE_WRITE_USD_PER_MILLION
@@ -149,13 +161,30 @@ class LunaBudgetPolicy:
             raise BudgetGateError("provider_response_json") from None
         if type(value) is not dict:
             raise BudgetGateError("provider_response_body")
+        if value.get("status") != "completed" or value.get("error") is not None:
+            raise BudgetGateError("provider_response_incomplete")
         model = value.get("model")
-        if not (
-            type(model) is str
-            and (model == self.MODEL or model.startswith(self.MODEL + "-"))
-        ):
+        if model != self.MODEL:
             raise BudgetGateError("provider_model_mismatch")
         provider = value.get("provider")
+        routing = value.get("openrouter_metadata")
+        endpoints = routing.get("endpoints") if type(routing) is dict else None
+        available = endpoints.get("available") if type(endpoints) is dict else None
+        selected = ([item for item in available if type(item) is dict
+                     and item.get("selected") is True]
+                    if type(available) is list else [])
+        if len(selected) > 1:
+            raise BudgetGateError("provider_mismatch")
+        selected_provider = selected[0].get("provider") if selected else None
+        if provider is not None and selected_provider is not None and (
+            type(provider) is not str or type(selected_provider) is not str
+            or provider.casefold() != selected_provider.casefold()
+        ):
+            raise BudgetGateError("provider_mismatch")
+        if provider is None:
+            provider = selected_provider
+        if selected and selected[0].get("model") not in (None, self.MODEL):
+            raise BudgetGateError("provider_model_mismatch")
         if type(provider) is not str or provider.casefold() != "openai":
             raise BudgetGateError("provider_mismatch")
         if value.get("service_tier") not in (None, "default"):
@@ -180,11 +209,11 @@ class LunaBudgetPolicy:
         generation_id = value.get("id")
         if type(generation_id) is str and 0 < len(generation_id) <= 128:
             metadata["generation_id"] = generation_id
-        for field in ("prompt_tokens", "completion_tokens", "total_tokens"):
+        for field in ("input_tokens", "output_tokens", "total_tokens"):
             count = usage.get(field)
             if type(count) is int and count >= 0:
                 metadata[field] = count
-        details = usage.get("prompt_tokens_details")
+        details = usage.get("input_tokens_details")
         if type(details) is dict:
             for field in ("cached_tokens", "cache_write_tokens"):
                 count = details.get(field)
@@ -363,7 +392,9 @@ class P3SpendGate:
 
     def begin(self, request: httpx.Request, *, role: str | None = None) -> None:
         payload = self.policy.request_payload(request)
-        if role is not None and _ROLE_OUTPUT_LIMITS.get(role) != payload["max_tokens"]:
+        if role is not None and payload["max_output_tokens"] not in {
+            _ROLE_OUTPUT_LIMITS.get(role), _ROLE_SUMMARY_LIMITS.get(role),
+        }:
             raise BudgetGateError("request_role_mismatch")
         reserve = self.policy.reserve_for(payload)
         with self._condition:
@@ -390,7 +421,7 @@ class P3SpendGate:
             attempt = {
                 "attempt_id": attempt_id,
                 "model": payload["model"],
-                "max_tokens": payload["max_tokens"],
+                "max_output_tokens": payload["max_output_tokens"],
                 "reserve_usd": str(reserve),
                 "outcome": "in_flight",
                 "started_at_utc": _utc_now(),

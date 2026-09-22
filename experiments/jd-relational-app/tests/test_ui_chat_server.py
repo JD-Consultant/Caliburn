@@ -50,11 +50,11 @@ def test_real_sdk_fixed_plan_reads_live_ref_creates_complete_task_and_then_two_f
                                              tool_call_id=call["id"])])
         third = bound.invoke(messages)
         assert not third.tool_calls and helper.FIRST_REPLY in str(third.content)
-        assert third.response_metadata["finish_reason"] == "stop" and third.usage_metadata
+        assert third.response_metadata["status"] == "completed" and third.usage_metadata
         messages.extend([third, HumanMessage(content="synthetic-private-second-input")])
         fourth = bound.invoke(messages)
         assert not fourth.tool_calls and helper.SECOND_REPLY in str(fourth.content)
-        assert fourth.response_metadata["finish_reason"] == "stop"
+        assert fourth.response_metadata["status"] == "completed"
     result = evidence.snapshot()
     assert result["model_request_count"] == 4
     assert [item["tool"] for item in result["model_requests"]] == ["jd_read", "jd_create_task", None, None]
@@ -70,8 +70,10 @@ def test_extra_model_request_fails_without_new_network_or_hidden_retry(target):
         bound = model.bind_tools(build_jd_tools(), parallel_tool_calls=False, strict=True)
         # Exhausting the fixed plan is a failure, never another canned success.
         evidence._next_request = 4
-        with pytest.raises(ValueError, match="synthetic_plan_exhausted"):
+        with pytest.raises(Exception) as failure:
             bound.invoke([HumanMessage(content="private")])
+        assert isinstance(failure.value.__cause__.__cause__, ValueError)
+        assert str(failure.value.__cause__.__cause__) == "synthetic_plan_exhausted"
     assert evidence.snapshot()["model_request_count"] == 1
     assert evidence.snapshot()["model_requests"][0]["response"] == "fixture_rejected"
 
@@ -81,9 +83,11 @@ def test_wrong_second_step_read_page_stops_instead_of_inventing_location(target)
     with helper.offline_model(evidence) as model:
         bound = model.bind_tools(build_jd_tools(), parallel_tool_calls=False, strict=True)
         first = bound.invoke([HumanMessage(content="private")])
-        with pytest.raises(ValueError, match="synthetic_plan_input_invalid"):
+        with pytest.raises(Exception) as failure:
             bound.invoke([HumanMessage(content="private"), first,
                           ToolMessage(content='{"view":"wrong"}', tool_call_id=first.tool_calls[0]["id"])])
+        assert isinstance(failure.value.__cause__.__cause__, ValueError)
+        assert str(failure.value.__cause__.__cause__) == "synthetic_plan_input_invalid"
     assert evidence.snapshot()["model_request_count"] == 2
     assert evidence.snapshot()["model_requests"][1]["response"] == "fixture_rejected"
 
@@ -97,7 +101,7 @@ def test_existing_serve_marker_refuses_replaying_fixture_before_opening_host(tar
 
 def test_serve_passes_two_caller_owned_background_models_at_managed_app_seam(target, monkeypatch):
     from jd_relational import managed_app as managed_app_module
-    from jd_relational.openrouter_model import ReceiptChatOpenRouter
+    from langchain_openai import ChatOpenAI
 
     class CompositionSeamReached(RuntimeError):
         pass
@@ -123,8 +127,8 @@ def test_serve_passes_two_caller_owned_background_models_at_managed_app_seam(tar
     assert observed["file"] is selected_file
     assert observed["enable_chat"] is True
     assert {"case_model", "understanding_model"} <= observed.keys()
-    assert isinstance(observed["case_model"], ReceiptChatOpenRouter)
-    assert isinstance(observed["understanding_model"], ReceiptChatOpenRouter)
+    assert isinstance(observed["case_model"], ChatOpenAI)
+    assert isinstance(observed["understanding_model"], ChatOpenAI)
     assert observed["case_model"] is not observed["understanding_model"]
 
 

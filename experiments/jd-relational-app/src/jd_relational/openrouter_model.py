@@ -1,9 +1,8 @@
-"""Shared OpenRouter transport and response evidence for this App's LLM roles.
+"""Shared OpenRouter model factories for the App's LLM roles.
 
-Role prompts, graph budgets and business behaviour remain with each role.  This
-module owns only the common provider boundary: caller-owned clients, the stable
-prompt-cache boundary, the pinned OpenAI route, no provider fallback, and
-terminal/route evidence which the stock adapter currently drops.
+The formal GPT-6 route uses stateless Responses. The retained Chat factory
+preserves the historical GPT-5.6 transport evidence and cache boundary.
+Prompts, graph budgets, persistence and business behaviour stay elsewhere.
 """
 
 from __future__ import annotations
@@ -13,12 +12,14 @@ import math
 from typing import Any
 
 from langchain_core.messages import AIMessage, BaseMessage
+from langchain_openai import ChatOpenAI
 from langchain_openrouter import ChatOpenRouter
 
 
 OPENROUTER_BASE_URL = "https://openrouter.ai/api/v1"
 # OpenRouter routing fields use the provider slug, not the display name.
 OPENROUTER_PROVIDER = "openai"
+GPT6_LUNA_MODEL = "openai/gpt-6-luna"
 OPENROUTER_HEADERS = {"X-OpenRouter-Metadata": "enabled"}
 REQUEST_TIMEOUT_SECONDS = 90.0
 
@@ -184,6 +185,67 @@ def create_openrouter_model(
             "require_parameters": False,
         },
         model_kwargs={"parallel_tool_calls": False},
+        metadata={"caliburn_component": component, "requested_model": model},
+        tags=[f"caliburn-{component}"],
+        stream_usage=True,
+    )
+
+
+def create_responses_openrouter_model(
+    *,
+    component: str,
+    model: str,
+    api_key: str,
+    http_client,
+    async_http_client,
+    base_url: str = OPENROUTER_BASE_URL,
+    request_timeout: float = REQUEST_TIMEOUT_SECONDS,
+    reasoning_effort: str,
+    max_output_tokens: int,
+) -> ChatOpenAI:
+    """Bind the GPT-6 Luna role to stateless OpenRouter Responses.
+
+    The caller owns both HTTP clients. LangChain handles Responses items and
+    function-call conversion; the App still owns checkpoints and tool effects.
+    """
+    if (type(component) is not str or not component.strip() or "\0" in component
+            or model != GPT6_LUNA_MODEL
+            or type(api_key) is not str or not api_key.strip() or "\0" in api_key
+            or base_url != OPENROUTER_BASE_URL
+            or reasoning_effort != "high"
+            or type(max_output_tokens) is not int or max_output_tokens <= 0
+            or type(request_timeout) not in (int, float)
+            or not math.isfinite(request_timeout) or request_timeout <= 0
+            or not _metadata_enabled(http_client)
+            or not _metadata_enabled(async_http_client)):
+        raise OpenRouterModelError("invalid_model_configuration")
+
+    return ChatOpenAI(
+        model=model,
+        api_key=api_key,
+        base_url=base_url,
+        http_client=http_client,
+        http_async_client=async_http_client,
+        timeout=request_timeout,
+        max_retries=0,
+        use_responses_api=True,
+        output_version="responses/v1",
+        store=False,
+        reasoning={"effort": reasoning_effort},
+        include=["reasoning.encrypted_content"],
+        # ChatOpenAI 1.6.2 renames its max_tokens field to
+        # max_completion_tokens before Responses conversion. If the summary
+        # call overrides max_tokens, that default otherwise wins last and
+        # silently restores the main answer's ceiling. Keep the Responses
+        # native default here so per-call summary limits override correctly.
+        model_kwargs={"parallel_tool_calls": False,
+                      "max_output_tokens": max_output_tokens},
+        extra_body={"provider": {
+            "only": [OPENROUTER_PROVIDER],
+            "order": [OPENROUTER_PROVIDER],
+            "allow_fallbacks": False,
+            "require_parameters": False,
+        }},
         metadata={"caliburn_component": component, "requested_model": model},
         tags=[f"caliburn-{component}"],
         stream_usage=True,

@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方保留「待驗／未驗」文字的是當時 gate 的歷史狀態，不得覆蓋上方較新的正式 16K 通過結論。
 
+**2026-09-23 GPT-6 Luna／Responses 隔離接線進度（最新施工狀態）：**`codex/gpt6-luna-responses` 分支已把正式新 JD App 的 A／B1／B2 模型工廠與 A 組裝 guard 改為 Responses 候選；現有 Prompt、Skills、Memory、Working State、JD Domain、Saver／Store、App-side compaction 權責不變。新 P3 test-only 帳本及合成 Browser 夾具已改同一 wire；零付費客戶端與受影響離線測試通過。完整離線 App 套件在最後僅修改待跑的 PostgreSQL 夾具前為 **3158 passed／323 skipped／1 個原有資料庫 migration 雜湊不一致**；該檔未在本分支修改。GPT-6 的真 PostgreSQL、OpenRouter 服務端、實際價格／cost 欄位、真模型與 Browser 未驗，**main 未切換、不授權外送或 merge**。詳見[本輪離線證據](specs/evidence/2026-09-23-gpt6-responses-offline.md)。
+
 **2026-09-23 GPT-6 Luna／Responses 遷移方向（Owner 最新裁決；尚未切換）：**Owner 選擇保留顧問的高推理與工具能力，以單一 OpenRouter credential 研究並遷移 A／B1／B2 至 GPT-6 Luna 的 Responses 路徑；不是只改模型名稱。現行正式 `openai/gpt-5.6-luna`／Chat Completions 接線及既有驗收證據在新路徑通過前維持原狀，Memory、Working State、JD、App-side compaction 及其權責不重新設計。Owner 曾核准單批自然試驗最多 12 次員工聊天 POST、180 次實際 provider request、US$1.00，但該 P3 支出閘門與執行包固定的是舊模型與舊 endpoint；新模型的 endpoint、reasoning＋tool wire、Saver 往返、路由／用量與保守費用上界必須先離線重新核對並凍結，不能直接用舊閘門外送。**目前沒有執行 GPT-6 或 P3 付費請求，也未授權自動 fallback／切正式路徑。**下方同日「未授權」文字保留其記錄當時的歷史狀態，不得誤讀為最新 Owner 未核准上限。
 
 施工前的有限範圍、既有接點及停止線見 [GPT-6 Luna／Responses 最小遷移設計](specs/2026-09-23-gpt6-luna-responses-migration.md)；該稿是設計，不是正式接線或服務端相容性 PASS。

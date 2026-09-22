@@ -17,7 +17,7 @@ import pytest
 from jd_relational.background_admission import BackgroundAdmissions
 from jd_relational.background_dispatch import BackgroundDispatcher
 from jd_relational.background_memory_app import build_background_memory_workflow
-from support.openrouter_replies import reply
+from support.openai_replies import reply
 from support.p3_spend_gate import P3SpendGate
 from support.p3_trial_server import open_trial_runtime
 from test_background_admission_postgres import catalogued
@@ -38,6 +38,9 @@ def _payload(messages, field):
         if message.get("role") != "user":
             continue
         content = message.get("content")
+        if isinstance(content, list):
+            content = "".join(block.get("text", "") for block in content
+                              if isinstance(block, dict))
         if not isinstance(content, str):
             continue
         try:
@@ -68,12 +71,12 @@ def test_formal_b1_b2_requests_match_durable_checkpoints_and_publication(engine,
     def respond(request):
         payload = json.loads(request.content)
         sent.append(payload)
-        tools = {item["function"]["name"] for item in payload["tools"]}
-        called = [call["function"]["name"] for message in payload["messages"]
-                  for call in message.get("tool_calls", [])]
+        tools = {item["name"] for item in payload["tools"]}
+        called = [item["name"] for item in payload["input"]
+                  if item.get("type") == "function_call"]
         if "create_case" in tools:
             if "create_case" not in called:
-                evidence = _payload(payload["messages"], "NEW_SOURCE")["NEW_SOURCE"]["evidence"]["blocks"]
+                evidence = _payload(payload["input"], "NEW_SOURCE")["NEW_SOURCE"]["evidence"]["blocks"]
                 name, arguments = "create_case", {
                     "content": "## 告警處理\n本人先確認告警並記錄結果。",
                     "route_note": "告警確認與結果記錄",
@@ -85,7 +88,7 @@ def test_formal_b1_b2_requests_match_durable_checkpoints_and_publication(engine,
                 name, arguments = None, None
         else:
             assert "create_work_understanding" in tools
-            case_id = _payload(payload["messages"], "REQUIRED_CASE_IDS")["REQUIRED_CASE_IDS"][0]
+            case_id = _payload(payload["input"], "REQUIRED_CASE_IDS")["REQUIRED_CASE_IDS"][0]
             if "read_case" not in called:
                 name, arguments = "read_case", {"case_id": case_id}
             elif "create_work_understanding" not in called:
@@ -99,6 +102,8 @@ def test_formal_b1_b2_requests_match_durable_checkpoints_and_publication(engine,
             else:
                 name, arguments = None, None
         body = reply(f"gen-p3-background-{len(sent)}", name, arguments, text="完成。")
+        body["model"] = "openai/gpt-6-luna"
+        body["provider"] = "OpenAI"
         body["usage"]["cost"] = "0.001"
         return httpx.Response(200, json=body, request=request)
 

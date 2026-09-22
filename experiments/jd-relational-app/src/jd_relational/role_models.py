@@ -1,4 +1,4 @@
-"""Formal OpenRouter/Luna model assembly for the App's three LLM roles.
+"""Formal OpenRouter Responses model assembly for the App's three LLM roles.
 
 The caller owns the credential and HTTP clients.  This module only creates
 role-scoped model objects over the existing shared transport; it does not bind
@@ -8,6 +8,7 @@ prompts, tools, document scope, background scheduling, or provider fallback.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from langchain_openai import ChatOpenAI
 
 from .background_memory_limits import FORMAL_BACKGROUND_MEMORY_LIMITS
 from .consultant_model import (
@@ -15,14 +16,14 @@ from .consultant_model import (
     REASONING_EFFORT,
     create_consultant_model,
 )
-from .openrouter_model import ReceiptChatOpenRouter, create_openrouter_model
+from .openrouter_model import create_responses_openrouter_model
 
 
 @dataclass(frozen=True, repr=False)
 class RoleModels:
-    consultant: ReceiptChatOpenRouter
-    case: ReceiptChatOpenRouter
-    understanding: ReceiptChatOpenRouter
+    consultant: ChatOpenAI
+    case: ChatOpenAI
+    understanding: ChatOpenAI
 
 
 def create_role_models(*, api_key: str, http_client, async_http_client) -> RoleModels:
@@ -33,7 +34,6 @@ def create_role_models(*, api_key: str, http_client, async_http_client) -> RoleM
         "http_client": http_client,
         "async_http_client": async_http_client,
         "reasoning_effort": REASONING_EFFORT,
-        "max_retries": 0,
     }
     consultant = create_consultant_model(
         api_key=api_key,
@@ -41,13 +41,13 @@ def create_role_models(*, api_key: str, http_client, async_http_client) -> RoleM
         async_http_client=async_http_client,
     )
     limits = FORMAL_BACKGROUND_MEMORY_LIMITS
-    case = create_openrouter_model(
+    case = create_responses_openrouter_model(
         component="background-case-maintainer",
         request_timeout=limits.request_timeout_seconds,
         max_output_tokens=limits.case_max_output_tokens,
         **shared,
     )
-    understanding = create_openrouter_model(
+    understanding = create_responses_openrouter_model(
         component="background-understanding-maintainer",
         request_timeout=limits.request_timeout_seconds,
         max_output_tokens=limits.understanding_max_output_tokens,

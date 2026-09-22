@@ -1,20 +1,21 @@
-"""The completed consultant's model route through OpenRouter.
+"""The consultant's GPT-6 Luna Responses route through OpenRouter.
 
 The consultant stays a LangChain/LangGraph agent. This adapter only binds its
-verified Luna profile to OpenRouter, keeps the route on OpenAI with fallback
-disabled, and translates OpenRouter's terminal evidence into the App's existing
-``completed``/``incomplete`` boundary. It does not own prompts, tools, document
-scope, checkpoints, retries, or background work.
+Luna profile to OpenRouter, keeps the route on OpenAI with fallback disabled,
+and uses the installed Responses adapter for terminal and tool items. It does
+not own prompts, tools, document scope, checkpoints, or background work.
 """
 
+from langchain_openai import ChatOpenAI
+
 from .openrouter_model import (
-    OPENROUTER_BASE_URL, OPENROUTER_HEADERS, OPENROUTER_PROVIDER,
-    REQUEST_TIMEOUT_SECONDS, OpenRouterModelError, ReceiptChatOpenRouter,
-    create_openrouter_model,
+    GPT6_LUNA_MODEL, OPENROUTER_BASE_URL, OPENROUTER_HEADERS,
+    OPENROUTER_PROVIDER, REQUEST_TIMEOUT_SECONDS, OpenRouterModelError,
+    create_responses_openrouter_model,
 )
 
 
-CONSULTANT_MODEL = "openai/gpt-5.6-luna"
+CONSULTANT_MODEL = GPT6_LUNA_MODEL
 # The verified profile for this role. The agent loop budgets stay where the
 # consultant graph is assembled; these values are model request parameters.
 REASONING_EFFORT = "high"
@@ -41,9 +42,9 @@ def create_consultant_model(
     request_timeout: float = REQUEST_TIMEOUT_SECONDS,
     reasoning_effort: str = REASONING_EFFORT,
     max_output_tokens: int = MAX_OUTPUT_TOKENS,
-) -> ReceiptChatOpenRouter:
+) -> ChatOpenAI:
     """Bind the consultant profile to the App's common OpenRouter boundary."""
-    return create_openrouter_model(
+    return create_responses_openrouter_model(
         component="consultant",
         model=model,
         api_key=api_key,
@@ -53,5 +54,4 @@ def create_consultant_model(
         request_timeout=request_timeout,
         reasoning_effort=reasoning_effort,
         max_output_tokens=max_output_tokens,
-        max_retries=0,
     )

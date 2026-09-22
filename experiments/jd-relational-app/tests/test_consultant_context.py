@@ -15,6 +15,8 @@ from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import tool
 from langgraph.checkpoint.memory import InMemorySaver
+from openai.types.responses import Response
+from support.openai_replies import reply as responses_reply
 
 from jd_relational.consultant_context import (
     ConsultantContext, ConsultantContextError, ConsultantState, JdNoticeMiddleware,
@@ -23,6 +25,13 @@ from jd_relational.consultant_context import (
 from jd_relational.notice_history import NoticeBoundary, NoticeEvent, NoticeMaterial
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import build_document_graph
+
+
+def gpt6_reply(identity, name=None, arguments=None, *, text="合成回覆"):
+    payload = responses_reply(identity, name, arguments, text=text)
+    payload["model"] = "openai/gpt-6-luna"
+    payload["reasoning"] = {"effort": "high"}
+    return Response.model_validate(payload).model_dump(mode="json", exclude_none=True)
 
 
 @pytest.fixture(autouse=True)
@@ -251,7 +260,6 @@ def test_closed_observer_rejects_mismatched_saved_evidence(corruption):
 
 def test_factory_sdk_tool_round_trip_keeps_native_calls_and_real_result():
     from jd_relational.consultant_model import OPENROUTER_HEADERS, create_consultant_model
-    from support.openrouter_replies import reply
 
     context, _ = setup(); requests = []; executions = []
 
@@ -264,8 +272,8 @@ def test_factory_sdk_tool_round_trip_keeps_native_calls_and_real_result():
     def receive(request):
         assert request.url.host == 'openrouter.ai' and len(requests) < 2
         requests.append(json.loads(request.content))
-        body = (reply('first', 'synthetic_read', {'target': 'synthetic'}) if len(requests) == 1
-                else reply('second', text='完整合成回覆'))
+        body = (gpt6_reply('first', 'synthetic_read', {'target': 'synthetic'}) if len(requests) == 1
+                else gpt6_reply('second', text='完整合成回覆'))
         return httpx.Response(200, json=body, request=request)
 
     client = httpx.Client(transport=httpx.MockTransport(receive), trust_env=False,
@@ -285,11 +293,11 @@ def test_factory_sdk_tool_round_trip_keeps_native_calls_and_real_result():
     assert all(r['parallel_tool_calls'] is False for r in requests)
     assert [m.type for m in result['messages']] == ['human', 'ai', 'tool', 'ai']
     assert result['messages'][2].tool_call_id == 'call_first'
-    assistant_wire = requests[1]['messages'][2]
-    assert assistant_wire['tool_calls'][0]['id'] == 'call_first'
-    tool_wire = requests[1]['messages'][3]
-    assert tool_wire['role'] == 'tool' and tool_wire['tool_call_id'] == 'call_first'
-    assert tool_wire['content'] == '{"synthetic_read_result":true}'
+    tool_wire = requests[1]['input']
+    assert [(item['type'], item['call_id']) for item in tool_wire if 'call_id' in item] == [
+        ('function_call', 'call_first'), ('function_call_output', 'call_first')]
+    assert next(item for item in tool_wire if item.get('type') == 'function_call_output')[
+        'output'] == '{"synthetic_read_result":true}'
     view = read_closed_model_view(root, document_id=context.document_id,
         dataset_id=context.dataset_id, run_id=context.run_id)
     assert view.response_message_id == result['messages'][-1].id
@@ -304,7 +312,6 @@ def test_factory_context_seam_changes_only_the_model_request():
     """
     from langchain.agents.middleware import ModelRequest, ModelResponse, wrap_model_call
     from jd_relational.consultant_model import OPENROUTER_HEADERS, create_consultant_model
-    from support.openrouter_replies import reply
 
     context, _ = setup()
     projected = []
@@ -317,7 +324,7 @@ def test_factory_context_seam_changes_only_the_model_request():
 
     def receive(request):
         requests.append(json.loads(request.content))
-        return httpx.Response(200, json=reply('context-seam', text='已收到最新訊息。'),
+        return httpx.Response(200, json=gpt6_reply('context-seam', text='已收到最新訊息。'),
                               request=request)
 
     transport = httpx.MockTransport(receive)
@@ -347,8 +354,8 @@ def test_factory_context_seam_changes_only_the_model_request():
     assert [[message.id for message in messages] for messages in projected] == [
         ['earlier', 'earlier-reply', context.run_id]
     ]
-    assert [message['role'] for message in requests[0]['messages']] == ['system', 'user']
-    assert requests[0]['messages'][-1]['content'] == '這次只送最新訊息。'
+    assert [message['role'] for message in requests[0]['input']] == ['system', 'user']
+    assert requests[0]['input'][-1]['content'] == '這次只送最新訊息。'
     assert '較早但仍需完整保存的原話。' not in json.dumps(requests[0], ensure_ascii=False)
     assert [message.id for message in result['messages'][:3]] == [
         'earlier', 'earlier-reply', context.run_id
@@ -362,7 +369,6 @@ def test_context_compaction_counts_the_fully_projected_request():
         CompactionProfile,
         ContinuationCompactionMiddleware,
     )
-    from support.openrouter_replies import reply
 
     context, _ = setup()
     counted = []
@@ -380,7 +386,7 @@ def test_context_compaction_counts_the_fully_projected_request():
         return 0
 
     def receive(request):
-        return httpx.Response(200, json=reply('projected', text='完整合成回覆'),
+        return httpx.Response(200, json=gpt6_reply('projected', text='完整合成回覆'),
                               request=request)
 
     transport = httpx.MockTransport(receive)
@@ -432,7 +438,6 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
         ContinuationCompaction,
         ContinuationCompactionMiddleware,
     )
-    from support.openrouter_replies import reply
 
     context, _ = setup()
     payloads = []
@@ -449,9 +454,9 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
 
     def receive(request):
         payloads.append(json.loads(request.content))
-        response = (reply('summary', text='舊訪談已確認案例 A；目前要處理最新更正。')
+        response = (gpt6_reply('summary', text='舊訪談已確認案例 A；目前要處理最新更正。')
                     if len(payloads) == 1
-                    else reply('main', text='我會先確認最新更正。'))
+                    else gpt6_reply('main', text='我會先確認最新更正。'))
         return httpx.Response(200, json=response, request=request)
 
     transport = httpx.MockTransport(receive)
@@ -490,7 +495,7 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
         asyncio.run(async_client.aclose())
 
     assert len(payloads) == 2
-    assert payloads[0]['max_tokens'] == 2048
+    assert payloads[0]['max_output_tokens'] == 2048
     assert [payload['model'] for payload in payloads] == [CONSULTANT_MODEL] * 2
     assert [payload['provider'] for payload in payloads] == [
         {
@@ -501,7 +506,7 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
         }
     ] * 2
     assert 'tools' not in payloads[0]
-    assert payloads[1]['tools'][0]['function']['name'] == 'synthetic_jd_read'
+    assert payloads[1]['tools'][0]['name'] == 'synthetic_jd_read'
     # The nested summary call inherits the graph callback context, so the extra
     # paid call cannot disappear from runtime usage instrumentation.
     assert [message.text for message in observed_model_replies] == [
@@ -509,17 +514,18 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
         '我會先確認最新更正。',
     ]
     expected_usage = {
-        'input_tokens': 20,
-        'output_tokens': 10,
-        'total_tokens': 30,
+        'input_tokens': 100,
+        'output_tokens': 20,
+        'total_tokens': 120,
     }
-    assert all(message.usage_metadata == expected_usage
+    assert all(all(message.usage_metadata[key] == value
+                   for key, value in expected_usage.items())
                for message in observed_model_replies)
-    assert all(message.response_metadata['provider'] == 'OpenAI'
+    assert all(message.response_metadata['model_name'] == CONSULTANT_MODEL
                for message in observed_model_replies)
-    main_messages = payloads[1]['messages']
+    main_messages = payloads[1]['input']
     assert [message['role'] for message in main_messages] == ['system', 'assistant', 'user']
-    assert '對話延續摘要' in main_messages[1]['content']
+    assert '對話延續摘要' in json.dumps(main_messages[1]['content'], ensure_ascii=False)
     assert main_messages[2]['content'] == '最新更正：其實是每月。'
     assert [message.model_dump() for message in result['messages'][:3]] == originals
     saved = ContinuationCompaction.model_validate(

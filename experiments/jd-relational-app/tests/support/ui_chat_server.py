@@ -167,7 +167,7 @@ def _cite(created, payload):
     """
 
     def evidence_key(request):
-        for message in request["messages"]:
+        for message in request["input"]:
             if message.get("role") != "system":
                 continue
             content = message.get("content", [])
@@ -221,7 +221,7 @@ def offline_role_models(evidence):
     from langsmith import tracing_context
     from jd_relational.openrouter_model import OPENROUTER_HEADERS
     from jd_relational.role_models import create_role_models
-    from support.openrouter_replies import reply
+    from support.openai_replies import reply
     from test_ai_runtime_postgres import _read, _create
 
     bodies = []
@@ -232,32 +232,41 @@ def offline_role_models(evidence):
         try:
             if position >= 4:
                 raise ValueError("synthetic_plan_exhausted")
-            if request.url.host != "openrouter.ai" or request.headers.get("authorization") != f"Bearer {KEY}":
+            if (request.url.host != "openrouter.ai"
+                    or request.url.path != "/api/v1/responses"
+                    or request.headers.get("authorization") != f"Bearer {KEY}"):
                 raise ValueError("synthetic_transport_scope_mismatch")
             payload = json.loads(request.content)
             event["top_level_keys"] = sorted(payload)
-            if isinstance(payload.get("messages"), list):
-                event["message_count"] = len(payload["messages"])
-                event["message_roles"] = [item.get("role") for item in payload["messages"]
+            if isinstance(payload.get("input"), list):
+                event["message_count"] = len(payload["input"])
+                event["message_roles"] = [item.get("role") for item in payload["input"]
                     if isinstance(item, dict)]
-                system_messages = [item for item in payload["messages"]
+                system_messages = [item for item in payload["input"]
                     if isinstance(item, dict) and item.get("role") == "system"]
                 event["system_source_notice_present"] = "conversation_source_notice" in json.dumps(
                     system_messages, ensure_ascii=False)
             if (len(payload.get("tools", [])) != 10
-                    or not all(tool.get("function", {}).get("strict") is True for tool in payload["tools"])
+                    or not all(tool.get("strict") is True for tool in payload["tools"])
                     or payload.get("parallel_tool_calls") is not False
+                    or payload.get("store") is not False
+                    or payload.get("reasoning") != {"effort": "high"}
                     or payload.get("provider") != {"only": ["openai"], "order": ["openai"],
                         "allow_fallbacks": False, "require_parameters": False}):
                 raise ValueError("synthetic_tool_contract_mismatch")
             try:
+                prior_outputs = [dict(role="tool", content=item["output"])
+                    for item in payload.get("input", []) if isinstance(item, dict)
+                    and item.get("type") == "function_call_output"]
+                legacy_page_view = {"messages": prior_outputs}
                 name, arguments = (_read(payload) if position == 0
-                                   else _cite(_create(payload), payload)
+                                   else _cite(_create(legacy_page_view), payload)
                                    if position == 1 else (None, None))
             except (AssertionError, IndexError, KeyError, TypeError, ValueError) as error:
                 raise ValueError("synthetic_plan_input_invalid") from error
             body = reply(f"ui_{prefix}_{position + 1}", name, arguments,
                          text=FIRST_REPLY if position == 2 else SECOND_REPLY)
+            body["model"] = "openai/gpt-6-luna"
             response = httpx.Response(200, json=body, request=request)
             bodies.append(response)
             evidence.body(response)

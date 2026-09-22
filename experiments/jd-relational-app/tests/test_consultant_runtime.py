@@ -1,6 +1,6 @@
 """Formal process composition for the completed consultant; no model request."""
 
-from jd_relational.openrouter_model import ReceiptChatOpenRouter
+from langchain_openai import ChatOpenAI
 from jd_relational.consultant_runtime import open_consultant_runtime
 from jd_relational.memory_context import build_consultant_tools
 from langchain_core.utils.function_calling import convert_to_openai_tool
@@ -38,9 +38,9 @@ def _schema_issues(schema, path="root"):
 
 def test_runtime_assembles_existing_tools_once_and_closes_owned_clients():
     runtime = open_consultant_runtime(api_key="synthetic-runtime-not-a-key")
-    assert isinstance(runtime.role_models.consultant, ReceiptChatOpenRouter)
-    assert isinstance(runtime.role_models.case, ReceiptChatOpenRouter)
-    assert isinstance(runtime.role_models.understanding, ReceiptChatOpenRouter)
+    assert isinstance(runtime.role_models.consultant, ChatOpenAI)
+    assert isinstance(runtime.role_models.case, ChatOpenAI)
+    assert isinstance(runtime.role_models.understanding, ChatOpenAI)
     tools = set(runtime.graph.nodes["tools"].bound.tools_by_name)
     assert {"jd_read", "jd_set_text", "repair_memory",
             "request_memory_consolidation"}.issubset(tools)

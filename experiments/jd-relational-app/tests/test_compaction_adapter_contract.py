@@ -22,15 +22,17 @@ from pydantic import TypeAdapter, ValidationError
 
 from jd_relational.consolidation_app import build_consolidation_model
 from jd_relational.consultant_model import (
-    CONSULTANT_MODEL,
     OPENROUTER_BASE_URL,
     OPENROUTER_HEADERS,
     OPENROUTER_PROVIDER,
-    create_consultant_model,
 )
+from jd_relational.openrouter_model import create_openrouter_model
 from jd_relational.response_context import native_context_view
 from support.openai_replies import body
 from support.openrouter_replies import reply
+
+
+HISTORICAL_CHAT_MODEL = "openai/gpt-5.6-luna"
 
 
 def assistant_text(text: str, identity: str, phase: str = "final_answer") -> dict:
@@ -123,7 +125,7 @@ def test_responses_clients_round_trip_inline_compaction_and_tools(target):
     ) as client:
         if target == "openrouter-responses-candidate":
             model = ChatOpenAI(
-                model=CONSULTANT_MODEL,
+                model=HISTORICAL_CHAT_MODEL,
                 api_key="synthetic-not-a-key",
                 base_url=OPENROUTER_BASE_URL,
                 http_client=client,
@@ -188,7 +190,7 @@ def test_responses_clients_round_trip_inline_compaction_and_tools(target):
     ] for payload in payloads)
     assert all(payload["store"] is False for payload in payloads)
     if target == "openrouter-responses-candidate":
-        assert all(payload["model"] == CONSULTANT_MODEL for payload in payloads)
+        assert all(payload["model"] == HISTORICAL_CHAT_MODEL for payload in payloads)
         assert all(payload["provider"] == {
             "only": [OPENROUTER_PROVIDER],
             "order": [OPENROUTER_PROVIDER],
@@ -258,10 +260,12 @@ def test_current_chat_openrouter_drops_only_the_responses_compaction_block():
         headers=OPENROUTER_HEADERS,
     )
     try:
-        model = create_consultant_model(
+        model = create_openrouter_model(
+            component="historical-chat-contract", model=HISTORICAL_CHAT_MODEL,
             api_key="synthetic-not-a-key",
             http_client=sync_client,
             async_http_client=async_client,
+            reasoning_effort="high", max_output_tokens=8192,
         )
         assert model.streaming is False, "the formal A path is currently non-streaming"
         previous = AIMessage(
@@ -298,7 +302,7 @@ def test_current_chat_openrouter_drops_only_the_responses_compaction_block():
         asyncio.run(async_client.aclose())
 
     assert len(payloads) == 1
-    assert payloads[0]["model"] == CONSULTANT_MODEL
+    assert payloads[0]["model"] == HISTORICAL_CHAT_MODEL
     assistant = payloads[0]["messages"][1]
     assert assistant["content"] == [
         {"type": "text", "text": "可由 Chat Completions 表示的文字"}

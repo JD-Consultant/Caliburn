@@ -312,8 +312,10 @@ def build_consultant_node(model, *, tools, guidance: str, extra_middleware=(),
     from langchain.agents import create_agent
     from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
     from .consultant_model import (
-        MAX_MODEL_STEPS, MAX_TOOL_CALLS, OPENROUTER_PROVIDER, ReceiptChatOpenRouter,
+        MAX_MODEL_STEPS, MAX_TOOL_CALLS, OPENROUTER_BASE_URL,
+        OPENROUTER_PROVIDER, CONSULTANT_MODEL,
     )
+    from langchain_openai import ChatOpenAI
     from .inspection_model import InspectionOnly, InspectionGuard
     inspection = type(model) is InspectionOnly
     # One provider, checked by what the assembly actually configured. A model
@@ -321,8 +323,15 @@ def build_consultant_node(model, *, tools, guidance: str, extra_middleware=(),
     # with parallel tool calls is not this role's model.
     route = {"only": [OPENROUTER_PROVIDER], "order": [OPENROUTER_PROVIDER],
              "allow_fallbacks": False, "require_parameters": False}
-    provider_valid = (isinstance(model, ReceiptChatOpenRouter)
-        and model.openrouter_provider == route and model.max_retries == 0
+    provider_valid = (type(model) is ChatOpenAI
+        and model.model_name == CONSULTANT_MODEL
+        and str(model.openai_api_base).rstrip("/") == OPENROUTER_BASE_URL
+        and model.use_responses_api is True
+        and model.output_version == "responses/v1"
+        and model.store is False
+        and model.include == ["reasoning.encrypted_content"]
+        and (model.extra_body or {}).get("provider") == route
+        and model.max_retries == 0
         and model.model_kwargs.get("parallel_tool_calls") is False
         and (model.reasoning or {}).get("effort") == "high")
     if ((not provider_valid and not inspection)

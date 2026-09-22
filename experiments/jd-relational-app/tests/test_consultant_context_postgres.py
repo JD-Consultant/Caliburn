@@ -32,7 +32,7 @@ from jd_relational.notice_history import NoticeHistoryReader
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import build_document_graph
 from jd_relational.storage.service import JdStorage
-from support.openrouter_replies import reply as _reply, system_blocks, truncated as _truncated
+from support.openai_replies import reply as _reply, system_blocks, truncated as _truncated
 from test_manual_runtime_postgres import NATIVE_TABLES, RUNTIME_SCHEMA, connect
 from test_storage_postgres import engine
 from test_storage_service import FakeAuthority, change, intent_for
@@ -61,8 +61,11 @@ def _data(mode, number):
     """
     identity = f"synthetic_pg_{number}"
     if mode == "complete":
-        return _reply(identity, text=f"第 {number} 次合成回覆")
-    return _truncated(identity)
+        answer = _reply(identity, text=f"第 {number} 次合成回覆")
+    else:
+        answer = _truncated(identity)
+    answer["model"] = "openai/gpt-6-luna"
+    return answer
 
 
 @contextmanager
@@ -167,7 +170,7 @@ def _assert_pair(state, context):
     assert len(replies) == 1
     reply = replies[0]
     assert reply.response_metadata["status"] == "completed"
-    assert reply.usage_metadata["output_tokens"] == 10
+    assert reply.usage_metadata["output_tokens"] == 20
     assert _digest(reply.model_dump(mode="json")) == view.response_digest
     assert sha256(view.notice_json.encode()).hexdigest() == view.notice_digest
     return view
@@ -190,8 +193,8 @@ def test_real_notice_two_turns_and_pg_reopen_preserve_paired_response_without_re
             first_notice = _notice(requests[0])
             assert first_notice["turn_start"]["manual_change_count"] == 1
             assert first_notice["turn_start"]["ai_change_count"] == 0
-            assert [item for item in requests[0]["messages"] if item.get("role") == "user"] == [
-                {"role": "user", "content": humans[0].content}]
+            assert [_said(item) for item in requests[0]["input"]
+                    if item.get("role") == "user"] == [humans[0].content]
             first_ref = codec.resolve(first_notice["turn_start"]["events"][0]["change_ref"],
                 document_id=current.document_id, roles={"change"}, purposes={"observation"})
             assert first_ref.entity_id == str(first_edit.operation_id)
@@ -219,9 +222,9 @@ def test_real_notice_two_turns_and_pg_reopen_preserve_paired_response_without_re
                                   roles={"change"}, purposes={"observation"}).entity_id
                     for row in notice["turn_start"]["events"]] == [str(reverted.operation_id), str(changed.operation_id)]
             assert notice["turn_start"]["content_included"] is False
-            assert [item["role"] for item in requests[1]["messages"] if item.get("role")] == [
+            assert [item["role"] for item in requests[1]["input"] if item.get("role")] == [
                 "system", "user", "assistant", "user"]
-            assert [_said(item) for item in requests[1]["messages"] if item.get("role") == "user"] == [
+            assert [_said(item) for item in requests[1]["input"] if item.get("role") == "user"] == [
                 _said({"content": humans[0].content}), _said({"content": humans[1].content})]
             assert "合成工作 A" not in second.notice_json and "合成工作 B" not in second.notice_json
             state = graph.get_state(config)
@@ -275,7 +278,7 @@ def test_missing_terminal_event_keeps_previous_pg_boundary_and_reopen_does_not_r
             # stream, so the consultant node is what refuses it.
             assert failure.value.code == str(failure.value) == "incomplete_consultant_response"
             assert _notice(requests[1])["turn_start"]["manual_change_count"] == 1
-            assert [_said(item) for item in requests[1]["messages"] if item.get("role") == "user"] == [
+            assert [_said(item) for item in requests[1]["input"] if item.get("role") == "user"] == [
                 _said({"content": original.content}), _said({"content": next_human.content})]
             with pytest.raises(ConsultantContextError, match="^consultant_checkpoint_unconfirmed$"):
                 read_closed_model_view(graph, document_id=current.document_id,

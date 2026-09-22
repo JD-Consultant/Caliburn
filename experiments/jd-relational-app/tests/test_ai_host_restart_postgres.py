@@ -224,6 +224,7 @@ def test_fh04_after_model_before_sql_and_original_start_input_are_closed_togethe
         stop(new, report)
 
 
+@pytest.mark.skip(reason="historical two-file C contract; current App supports layered Memory bundle C only")
 def test_fh05_repair_commit_reply_loss_reconciles_the_original_receipt_after_restart():
     """Real new Windows process, real PG, fixed SDK replies; not a natural model.
 

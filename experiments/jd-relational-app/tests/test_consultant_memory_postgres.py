@@ -39,6 +39,7 @@ from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import DocumentCheckpoints, build_document_graph
 from jd_relational.storage.service import JdStorage
 from jd_relational.working_state import checked_working_state
+from support.openai_replies import system_blocks
 from test_ai_runtime_postgres import _create, _failure, _final, _offline_model, _read, _state
 from test_manual_runtime_postgres import connect
 from test_memory_core_postgres import SCHEMA, TABLES
@@ -81,24 +82,9 @@ def opened(engine, model, dataset):
             assert owner.close(timeout=10)
 
 
-def _system_blocks(payload):
-    if "system" in payload:
-        return payload["system"]
-    blocks = []
-    for message in payload["messages"]:
-        if message.get("role") != "system":
-            continue
-        content = message.get("content", [])
-        if isinstance(content, str):
-            blocks.append({"type": "text", "text": content})
-        else:
-            blocks.extend(content)
-    return blocks
-
-
 def notice(payload):
     candidates = []
-    for block in _system_blocks(payload):
+    for block in system_blocks(payload):
         try: value = json.loads(block["text"])
         except (ValueError, KeyError): continue
         if isinstance(value, dict) and value.get("type") == "memory_guide": candidates.append(value)
@@ -108,7 +94,7 @@ def notice(payload):
 
 def conversation_notice(payload):
     candidates = []
-    for block in _system_blocks(payload):
+    for block in system_blocks(payload):
         try: value = json.loads(block["text"])
         except (ValueError, KeyError): continue
         if isinstance(value, dict) and value.get("type") == "conversation_source_notice":
@@ -118,13 +104,8 @@ def conversation_notice(payload):
 
 
 def last_tool(payload):
-    results = []
-    for message in payload["messages"]:
-        if message.get("role") == "tool":
-            results.append(message["content"])
-        elif isinstance(message.get("content"), list):
-            results.extend(block["content"] for block in message["content"]
-                if block.get("type") == "tool_result")
+    results = [item["output"] for item in payload["input"]
+               if item.get("type") == "function_call_output"]
     return results[-1]
 
 

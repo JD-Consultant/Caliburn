@@ -175,7 +175,9 @@ def test_two_file_repair_saved_request_commit_ack_loss_and_new_connection_reconc
             stopped.setattr(source, "read", forbidden)
             recovered = RepairWorkflow(artifacts, pub, artifacts.source).reconcile(reopened_request)
         assert recovered["applied_head"] == asdict(applied)
-        assert recovered["head"] == asdict(later) and recovered["guide"] == "後續導覽：/memory/knowledge.md"
+        # Reconciliation confirms the exact C publication used by this turn;
+        # a later background head does not silently advance its read baseline.
+        assert recovered["head"] == asdict(applied) and recovered["guide"] == guide.replace("主管", "處長")
         assert recovered["source_reference"] == correction_ref and "changes" not in recovered
         assert pub.current() == later and pub.receipt(operation) == receipt
         assert source.read(first_ref, document).messages[-1].text == original

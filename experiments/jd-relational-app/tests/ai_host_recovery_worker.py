@@ -126,7 +126,7 @@ def _repair(_payload):
 
 def _second_write(payload):
     return "jd_set_text", {"target_field_ref": _task_field(_last_page(payload), "description")["field_ref"],
-        "text": "僅檢查約定設備；異常時交接，不維修外包設備。", "basis_refs": []}
+        "text": "僅檢查約定設備；異常時交接，不維修外包設備。", "basis_evidence_keys": []}
 
 
 def _guard_counters(monkeypatch, counts):

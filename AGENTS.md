@@ -40,10 +40,10 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 
 | 範圍 | 入口與界線 |
 |---|---|
-| 正式產品 | `apps/api`、`apps/web`、`packages/job-analysis-contract`；PostgreSQL 是唯一預設 Docker 基礎服務。 |
-| 現行正式顧問 | [ADR0060](docs/adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)／[runtime 設計](docs/design/consultant-runtime.md)。既有待審／核准稿及 Saver／Store 權責在 successor 採用前有效；這是正式切換界線，不是新 JD 必須沿用的體驗。 |
-| 新 JD／Memory | 從目前決策找到已批准的隔離 checkout、計畫及版本。不得混接正式入口，正式程式不得 import 研究／實驗目錄。 |
-| RAG | [ADR0057](docs/adr/0057-current-only-runtime-and-data-boundary.md)／[RAG 設計](docs/design/rag-pipeline.md)；保留的獨立範圍，非目前產品依賴，`rag:up` 明示啟用。 |
+| 正式產品 | [`experiments/jd-relational-app`](experiments/jd-relational-app/README.md)（含 `web`）與 `packages/consultant-memory`；[ADR0077](docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 是正式 authority。目錄名保留迭代沿革，不代表實驗功能。 |
+| 顧問／Memory | A／B1／B2／C、Saver／Store、Working State、來源、JD Tool 與 App-side compaction 均由上述 App 組裝；依目前決策與各責任設計維護，不建立平行 runtime。 |
+| 歷史舊架構 | `apps/api`、`apps/web`、`packages/job-analysis-contract` 只留歷史文件；可執行實作已退役，不可 wrapper、import 或接回 production。 |
+| RAG | [ADR0057](docs/adr/0057-current-only-runtime-and-data-boundary.md)／[RAG 設計](docs/design/rag-pipeline.md)；保留的獨立範圍，非目前產品依賴，`pnpm rag:up` 明示啟用。 |
 
 在各自適用範圍內，每類資料維持單一權威，不建立平行雙寫，也不讓 Web 重算 domain invariant。已退役的 `app.interview`、`app.interview_vnext`、`app.job_authoring`、`app.core`、`app.documents`、`app.task_analysis`、`app.opks`、`app.consultation` 及舊 `adapters.postgres` 不可 wrapper 或接回 production。
 
@@ -55,14 +55,14 @@ Caliburn 是本機 Web AI 職務分析與職務說明書（JD）應用程式。�
 - 後端 reload 關閉，改碼後重啟指定服務。只停止已確認身分的自有程序，不按端口任意 kill；背景啟動使用 Hidden。
 - 原 JD 核心切片零付費；真模型另按核准資料、呼叫數及費用執行。不輸出金鑰、不把秘密存入紀錄、不因測試啟動而誤連 provider。
 
-正式產品常用檢查如下；隔離 JD 依其計畫與專用測試 DB，不混用。
+正式產品常用檢查如下；真 PostgreSQL、瀏覽器與模型 gate 仍依相應計畫分開執行。
 
 | 改動 | 工作目錄與檢查 |
 |---|---|
-| API | `apps/api`：`uv run pytest -q`，可先指定受影響案例。 |
-| Web | `apps/web`：`npm run test`、`npx tsc --noEmit`、`npm run lint`。 |
-| 共用契約 | Repo 根：`npm run check-codegen -w @caliburn/job-analysis-contract`。 |
-| 整體接合 | 計畫要求時於 repo 根執行 `npx turbo test`。 |
+| API／Agent／Memory | `experiments/jd-relational-app`：`uv run --frozen pytest -q -p no:cacheprovider`，可先指定受影響案例。 |
+| Web | Repo 根：`pnpm --filter @caliburn/jd-relational-web test`、`typecheck`、`build`。 |
+| 生成契約 | Repo 根：`pnpm --filter @caliburn/jd-relational-app codegen:check`。 |
+| 整體接合 | Repo 根：`pnpm check`。 |
 
 必要檢查通過後，一個工作單位精確提交，收尾建立本地 tag；不混入無關變更。未經明確要求不 merge、push、發布或對外傳送。回報已完成效果、實際驗證、重要限制與未完工作，使用簡短白話及可點擊檔案連結；在重要進展或方向變化時更新，不逐工具解說。
 

@@ -1,5 +1,7 @@
 # AI 職務顧問 runtime 設計
 
+> **歷史設計（2026-09-22 successor）：**本文記錄已退役 `apps/api` 顧問 runtime 的設計與演進，不再描述正式產品。現行 authority、入口與責任路由以 [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)、[目前決策](../current-decisions.md)及正式 App 的 [`README`](../../experiments/jd-relational-app/README.md)為準；保留本文供研究與報告追溯，不可把下方路徑或命令接回 production。
+
 > **現況／目標邊界（2026-08-28）**：本文以下主體描述目前 production code，包含即將退役的 source correction、獨立 Gap／calibration、JD Evidence、`defer`／`edit-accept`、固定 structured root、model-authored occurrence／Skill 與舊充分性 shape。下一版目標以 [Proposed ADR 0071](../adr/0071-revisable-work-understanding-context-and-review-provenance.md)、[LLM 應填欄位與 Tool Contract 審查](../specs/2026-08-28-llm-authored-field-contract-audit.md)及 [Proposed ADR 0070](../adr/0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md) 為準；[2026-08-28 實作計畫](../superpowers/plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md) 仍含已撤回 snippets，尚不可執行。計畫尚未重寫／執行前，不把目標敘述冒充現況，也不得依本文舊欄位反推新需求。
 
 - Durable authority 決策：[ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md)

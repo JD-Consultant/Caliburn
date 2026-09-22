@@ -15,7 +15,7 @@ uv run datamodel-codegen \
 
 if ! git diff --quiet -- src/ocs_contract/models.py; then
   echo "ERROR: src/ocs_contract/models.py is out of sync with schema/ocs-document.schema.json."
-  echo "       Run 'npm run codegen' (in packages/ocs-contract) and commit the result."
+  echo "       Run 'pnpm run codegen' (in packages/ocs-contract) and commit the result."
   git --no-pager diff --stat -- src/ocs_contract/models.py
   git checkout -- src/ocs_contract/models.py   # restore — non-destructive check
   exit 1
@@ -23,11 +23,11 @@ fi
 echo "OK: generated models in sync with schema."
 
 # --- TypeScript (Contract #3): regen types/ocs-document.ts + diff ---
-npm run --silent codegen:ts
+pnpm run --silent codegen:ts
 
 if ! git diff --quiet -- types/ocs-document.ts; then
   echo "ERROR: types/ocs-document.ts is out of sync with schema/ocs-document.schema.json."
-  echo "       Run 'npm run codegen:ts' (in packages/ocs-contract) and commit the result."
+  echo "       Run 'pnpm run codegen:ts' (in packages/ocs-contract) and commit the result."
   git --no-pager diff --stat -- types/ocs-document.ts
   git checkout -- types/ocs-document.ts   # restore — non-destructive check
   exit 1

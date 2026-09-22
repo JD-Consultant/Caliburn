@@ -1,0 +1,52 @@
+{
+  "schema_version": "r1_task_discovery_case.v1",
+  "case_id": "TI-R1-08-correction",
+  "case_family_id": "family-correction",
+  "source_type": "constructed_edge",
+  "source_session_ref": null,
+  "title": "更正先前 ownership",
+  "capability": "新說法取代本人部署責任，舊主張不得再支持現行 Task",
+  "target_message_id": "turn-a2",
+  "question_context": {
+    "question_id": "turn-q2",
+    "question_text": "你說的部署是由你本人執行嗎？",
+    "target_claim_ids": ["claim-old-deploy"],
+    "target_candidate_ids": []
+  },
+  "prior_claims": [
+    {
+      "claim_id": "claim-old-deploy",
+      "kind": "work_activity",
+      "statement": "本人負責把版本部署到正式環境",
+      "ownership": "employee_responsible",
+      "time_scope": "current",
+      "typicality": "routine",
+      "polarity": "affirmed",
+      "certainty": "explicit",
+      "action": "部署",
+      "object": "版本",
+      "recipient": null,
+      "outcome": null,
+      "tool_or_method": null,
+      "condition": null,
+      "correction_target_claim_id": null,
+      "anchors": [
+        {
+          "message_id": "turn-a1",
+          "start": 0,
+          "end": 14,
+          "quote": "我負責把版本部署到正式環境。"
+        }
+      ]
+    }
+  ],
+  "prior_stories": [],
+  "prior_work_units": [],
+  "existing_task_candidates": [],
+  "omitted_relevant_context": false,
+  "files": {
+    "transcript": "transcript.jsonl",
+    "expectations": "expectations.json",
+    "adjudication": "adjudication.md"
+  }
+}

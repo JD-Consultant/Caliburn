@@ -1,0 +1,6 @@
+{"turn_id":"turn-q1","role":"consultant","text":"你日常怎麼處理門市交易資料？"}
+{"turn_id":"turn-a1","role":"employee","text":"我每天把門市交易資料匯入 ERP。"}
+{"turn_id":"turn-q2","role":"consultant","text":"月底資料量比較大時有什麼不同？"}
+{"turn_id":"turn-a2","role":"employee","text":"月底我會先排除大量重複資料，避免財務對帳出錯。"}
+{"turn_id":"turn-q3","role":"consultant","text":"如果欄位格式改版，你會怎麼處理？"}
+{"turn_id":"turn-a3","role":"employee","text":"我會調整驗證規則，再確認資料能正確匯入。"}

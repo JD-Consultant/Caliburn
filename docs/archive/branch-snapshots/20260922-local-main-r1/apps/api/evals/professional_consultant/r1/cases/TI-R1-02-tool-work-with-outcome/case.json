@@ -1,0 +1,26 @@
+{
+  "schema_version": "r1_task_discovery_case.v1",
+  "case_id": "TI-R1-02-tool-work-with-outcome",
+  "case_family_id": "family-tool-work-with-outcome",
+  "source_type": "constructed_edge",
+  "source_session_ref": null,
+  "title": "工具相關工作有獨立 outcome",
+  "capability": "辨識正式週期責任與獨立結果，不把同一 Task 的驗證、排程、恢復步驟過度拆分",
+  "target_message_id": "turn-a1",
+  "question_context": {
+    "question_id": "turn-q1",
+    "question_text": "你目前有哪些固定負責的技術維護工作？",
+    "target_claim_ids": [],
+    "target_candidate_ids": []
+  },
+  "prior_claims": [],
+  "prior_stories": [],
+  "prior_work_units": [],
+  "existing_task_candidates": [],
+  "omitted_relevant_context": false,
+  "files": {
+    "transcript": "transcript.jsonl",
+    "expectations": "expectations.json",
+    "adjudication": "adjudication.md"
+  }
+}

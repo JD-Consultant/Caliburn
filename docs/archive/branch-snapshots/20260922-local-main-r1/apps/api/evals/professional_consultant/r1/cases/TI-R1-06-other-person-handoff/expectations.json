@@ -1,0 +1,15 @@
+{
+  "schema_version": "r1_task_discovery_expectations.v1",
+  "case_id": "TI-R1-06-other-person-handoff",
+  "minimum_task_candidates": 1,
+  "maximum_task_candidates": 1,
+  "permitted_decisions": ["add", "clarify"],
+  "expected_next_action": "deepen_story",
+  "forbidden_promotions": [
+    {"category": "other_person", "statement": "正式部署版本"}
+  ],
+  "acceptable_task_examples": ["完成上線前後的應用測試與核心功能驗證。"],
+  "required_qualifier_notes": ["正式部署由維運負責；本人可能負責測試報告與部署後驗證。"],
+  "question_intent": "確認本人測試責任的完成標準，不追問維運部署細節。",
+  "critical_notes": ["把正式部署記為本人 Task 即為 critical failure。"]
+}

@@ -1,0 +1,2 @@
+{"turn_id":"turn-q1","role":"consultant","text":"測試完成到正式上線之間，你負責到哪裡？"}
+{"turn_id":"turn-a1","role":"employee","text":"我把測試報告交給維運，正式部署是他們做；我只在部署後確認核心功能。"}

@@ -1,0 +1,26 @@
+{
+  "schema_version": "r1_task_discovery_case.v1",
+  "case_id": "TI-R1-06-other-person-handoff",
+  "case_family_id": "family-other-person-handoff",
+  "source_type": "constructed_edge",
+  "source_session_ref": null,
+  "title": "他人工作與交接邊界",
+  "capability": "不把維運的正式部署誤收為本人 Task，保留測試報告與部署後驗證訊號",
+  "target_message_id": "turn-a1",
+  "question_context": {
+    "question_id": "turn-q1",
+    "question_text": "測試完成到正式上線之間，你負責到哪裡？",
+    "target_claim_ids": [],
+    "target_candidate_ids": []
+  },
+  "prior_claims": [],
+  "prior_stories": [],
+  "prior_work_units": [],
+  "existing_task_candidates": [],
+  "omitted_relevant_context": false,
+  "files": {
+    "transcript": "transcript.jsonl",
+    "expectations": "expectations.json",
+    "adjudication": "adjudication.md"
+  }
+}

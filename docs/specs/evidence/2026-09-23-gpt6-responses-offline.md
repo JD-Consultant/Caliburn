@@ -47,3 +47,9 @@
 - 責任點是 **P3 test-only** `LunaBudgetPolicy.validate_response` 將回覆 `model` 與送出 slug 做字串全等比較，並對 selected endpoint 重複同一限制。新增兩個獨立離線反例：正文回 canonical，以及正文仍為 alias 而 selected endpoint 回 canonical；修前均因 `provider_model_mismatch` 紅燈，修後均通過並完成成本記帳。只在回覆白名單固定接受該已驗 snapshot；request slug、未核准 snapshot 拒絕、provider／tier／cost、帳本 fail-closed 皆保留。
 - 零付費相鄰 `test_p3_spend_gate.py`、`test_p3_trial_server.py`、`test_gpt6_responses_transport.py` 共 **55 passed／0 failed**；首次一般 sandbox 的 pytest 暫存目錄遭 Windows ACL 拒絕，改於可存取環境以同一反例確認預期失敗及通過。隔離 PostgreSQL `127.0.0.1:55436` 目前不可連，未為 test-only 更動啟動或重建 DB；先前真 PG／Saver 證據不冒稱本次重跑。新增外部模型請求 **0**，原 stopped ledger 仍保留，不回寫 metadata 成本、不續送剩餘請求。
 - 此修正只清除一個**以公開 mapping 與離線反例證實可重現**的測試閘門誤判；首次真回覆的原始 `model` 值未保存，故不能斷言它就是當時唯一停止原因。服務端 Responses 正文的 route／tier／cost 完整形狀、SDK tool item、加密 reasoning 延續及 final 仍需另一次有界真模型請求才能驗；送出前再定實際外送與費用授權。自然 P3、完整 JD 品質、Browser 與 main 切換保持 OPEN。
+
+## 下次有界 smoke 的失敗診斷準備
+
+- 首次停止時只保留錯誤碼和 `X-Generation-Id`，未保留回覆正文中的模型識別，無法確認究竟是哪個 model 欄位觸發拒絕。這是 **test-only 帳本的證據缺口**，不改產品行為或前次結果。
+- 先以兩種拒絕案例確認測試紅燈：正文模型不符，以及 selected endpoint 模型不符。既有 `P3SpendGate` 現在只在驗證失敗時，持久保存有界的 `observed_model`／`observed_selected_model`、provider／tier 識別及 `observed_cost_present` 布林值；仍不保存完整 HTTP body、`output` 訪談文字、金鑰或費用數值。錯誤照舊停止、保留整筆預留額，不能憑診斷欄位解除停機。
+- 真正落盤的帳本測試與相鄰 P3／Responses 回歸 **57 passed／0 failed**，本輪新增外部模型請求 **0**。原 stopped ledger 不回寫、不重開；這只提高下一次已另行授權的 smoke 失敗時的可診斷性，**未驗證 GPT-6 真工具往返／final**。

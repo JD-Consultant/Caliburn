@@ -228,6 +228,39 @@ class LunaBudgetPolicy:
                     metadata[field] = count
         return cost, metadata
 
+    @staticmethod
+    def response_identity_facts(response: httpx.Response) -> dict[str, Any]:
+        """Keep bounded route identifiers on failure, never the response body."""
+        if response.status_code != 200:
+            return {}
+        try:
+            value = response.json()
+        except (json.JSONDecodeError, UnicodeDecodeError, ValueError):
+            return {}
+        if type(value) is not dict:
+            return {}
+        facts: dict[str, Any] = {}
+
+        def keep(source: dict[str, Any], field: str, name: str) -> None:
+            item = source.get(field)
+            if type(item) is str and 0 < len(item) <= 128:
+                facts[name] = item
+
+        for field in ("model", "provider", "service_tier"):
+            keep(value, field, f"observed_{field}")
+        usage = value.get("usage")
+        facts["observed_cost_present"] = type(usage) is dict and "cost" in usage
+        routing = value.get("openrouter_metadata")
+        endpoints = routing.get("endpoints") if type(routing) is dict else None
+        available = endpoints.get("available") if type(endpoints) is dict else None
+        selected = ([item for item in available if type(item) is dict
+                     and item.get("selected") is True]
+                    if type(available) is list else [])
+        if len(selected) == 1:
+            keep(selected[0], "model", "observed_selected_model")
+            keep(selected[0], "provider", "observed_selected_provider")
+        return facts
+
 
 class P3SpendGate:
     """Durable, serialized admission control for one bounded paid trial."""
@@ -380,6 +413,7 @@ class P3SpendGate:
     def _stop_unknown(
         self, request: httpx.Request, reason: str, *, http_status: int | None = None,
         router_generation_id: str | None = None,
+        observed: dict[str, Any] | None = None,
     ) -> BudgetGateError | None:
         attempt = self._active_attempt(request)
         if attempt is None:
@@ -392,6 +426,8 @@ class P3SpendGate:
             facts["http_status"] = http_status
         if router_generation_id and len(router_generation_id) <= 128:
             facts["router_generation_id"] = router_generation_id
+        if observed:
+            facts.update(observed)
         self._settle_attempt(attempt["attempt_id"], "unknown", **facts)
         self._state["in_flight"] = []
         self._state["status"] = "stopped"
@@ -456,6 +492,7 @@ class P3SpendGate:
                 stopped = self._stop_unknown(
                     request, str(error), http_status=response.status_code,
                     router_generation_id=response.headers.get("X-Generation-Id"),
+                    observed=self.policy.response_identity_facts(response),
                 )
                 raise stopped or error
 

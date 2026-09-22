@@ -205,6 +205,40 @@ def test_unaccountable_response_stops_with_full_reserve(
     assert state["retained_unknown_usd"] == "0.268644"
 
 
+@pytest.mark.parametrize(
+    "body_model, selected_model",
+    [
+        ("openai/gpt-6-luna-unapproved-snapshot", "openai/gpt-6-luna-20260922"),
+        ("openai/gpt-6-luna", "openai/gpt-6-luna-unapproved-snapshot"),
+    ],
+)
+def test_rejected_reply_keeps_only_bounded_route_identity_for_diagnosis(
+    tmp_path, body_model, selected_model,
+):
+    spend = gate(tmp_path)
+    sent = request()
+    wire = response(sent, model=body_model).json()
+    wire["output"][0]["content"][0]["text"] = "private synthetic interview text"
+    wire["openrouter_metadata"] = {"endpoints": {"available": [
+        {"selected": True, "provider": "OpenAI", "model": selected_model},
+    ]}}
+    spend.begin(sent)
+
+    with pytest.raises(BudgetGateError, match="provider_model_mismatch"):
+        spend.complete(httpx.Response(200, json=wire, request=sent))
+
+    state = json.loads((tmp_path / "p3-spend-ledger.json").read_text(encoding="utf-8"))
+    attempt = state["attempts"][0]
+    assert attempt["observed_model"] == body_model
+    assert attempt["observed_selected_model"] == selected_model
+    assert attempt["observed_provider"] == "OpenAI"
+    assert attempt["observed_selected_provider"] == "OpenAI"
+    assert attempt["observed_service_tier"] == "default"
+    assert attempt["observed_cost_present"] is True
+    assert state["retained_unknown_usd"] == "0.268644"
+    assert "private synthetic interview text" not in json.dumps(state)
+
+
 def test_conflicting_response_and_router_provider_evidence_stops(tmp_path):
     spend = gate(tmp_path)
     sent = request()

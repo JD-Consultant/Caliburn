@@ -14,7 +14,7 @@
 | 角色化 compaction 真 Luna 驗收 | 以現行唯一 `ContinuationCompactionMiddleware`、三角色 retention instructions 與合成資料各執行一次摘要＋續作，共 6 次外送，全部 HTTP 200；provider `OpenAI`、實際模型 `openai/gpt-5.6-luna-20260709`，usage 為 2,293 input／1,948 output tokens，OpenRouter 回報總 cost **US$0.0027962**。三者 canonical history 均未改，近期未處理輸入逐字保留；B2 固定任務也逐字留在 request view。 | A 的更正、通知 receipt／未完成 Memory 邊界及未解問題都保留；B1 只摘要已處理 CASE-ALPHA，未把尚未處理 CASE-BETA 放進摘要；B2 保留 CASE-A／B 支持與 CASE-C 反證／例外。**但本輪不是全綠：**B2 摘要仍改寫重述了已逐字保留的 fixed task，造成重複 context；A／B1 也出現從「沒有提供」延伸成「未完成／沒有待辦」的輕微負面推論。前者列為 prompt 品質問題，未先改 production。此低門檻 probe 不代表正式 16K 長上下文驗收。 |
 | B2 prompt 窄修與真 Luna 重測 | 根因是共用摘要指令要求保留「目前目標」，但後段又要求 B2 不重述 `protected_orientation`，形成互相拉扯；同時沒有明示「未提及不能推論成未完成／沒有待辦」。只收緊既有 system／B2 retention instructions，沒有新增 validator、後處理器、重試或狀態。相鄰離線回歸 **81 passed**；排除兩個既知 Windows ACL 模組後，新 JD App 全套 **3061 passed／322 skipped／0 failed**。 | 同一 B2 反例以真 Luna 重測 2 次外送，均 HTTP 200；846 input／393 output tokens，OpenRouter cost **US$0.0006408**。摘要只保留 CASE-A／B 支持、CASE-C 反證／例外與待解事項；未再重述 fixed task，也未新增「未提供／沒有待辦」等負面推論。固定任務、未處理尾段逐字保留，canonical history 不變。此結果關閉本次 B2 prompt 品質問題，但仍不是正式 16K 長上下文驗收。 |
 | JD 寫作 Skill／tool description 真 Luna 與 A 同回合 compaction 反例 | 一個全新隔離文件由真 Luna 自然讀取 JD 寫作 Skill、目前 JD、工作理解、案例與原話，完成 duty、task、O／P／K／S 及 task↔K／S 關係；六筆 JD receipt 均 confirmed／committed，final 為自然繁中且明列尚未知的班別與 KPI。25 次 provider response 全為 HTTP 200，實際 provider `OpenAI`、模型 `openai/gpt-5.6-luna-20260709`；首次錯誤 ref 經新 tool error 指引重讀後成功自修。 | JD 成文方法與 prompt gate **PASS**，但同一員工回合的 request 最後達 177,108 input tokens；25 次累計 2,085,926 input／9,874 output，cost **US$0.37018134**。durable history 下界約 78,816 tokens，`continuation_compaction=null`：現行 A boundary 把最新 Human 之後所有 completed waves 一併鎖住。TDD successor 只讓 Runtime 逐字保護最新 Human、摘要其後已完成舊 wave；舊 v1 state 可讀，v2 加 Runtime-owned `protected_message_id`。真實舊 checkpoint 的 safe boundary 從 `None` 變為 **41**；compaction／A／B1／B2／wire 相鄰離線 **201 passed**。這仍不是修後正式 16K 真模型 gate；在該 gate 前不再以 64 次上限代替 context／費用護欄。 |
-| A 正式 16K compaction／JD Prompt 真 Luna | 以 production A middleware／profile、正式 guidance 與 JD Skill 建立 17,467 approximate-token 脈絡；當輪員工原話在首則，後接八組可壓縮 completed waves，最近八則是 Skill、寫作參考、工作理解及目前 JD。正式 `medium／8192` 執行 summary＋main 各一次，均 HTTP 200；provider `OpenAI`、模型回傳 production 穩定別名 `openai/gpt-5.6-luna`。summary 12,255 input／1,543 output，main 4,867 input／1,960 output，cost **US$0.00811258**。 | **PASS。**v2 逐字保留最新 Human 且不把原話複製進摘要；summary 涵蓋至 `tool-8`，最近八則與 canonical history 不變。摘要保存共同工作、權責界線及未知事項，main 自然完成 O／P／K／S，無工具格式、虛構數字或越權責任。較早 test-only `2048` 輸出上限因 main 截斷而安全失敗，cost US$0.01924770；兩次 body preflight 均未送出。整個 gate paid cost **US$0.02736028**。原報表唯一 false 是 evaluator 硬寫日期 snapshot，離線改用 production route 精確比對後全綠，未重送模型。 |
+| A 正式 16K compaction／JD Prompt 真 Luna | 以 production A middleware／profile、正式 guidance 與 JD Skill 建立 17,467 approximate-token 脈絡；當輪員工原話在首則，後接八組可壓縮 completed waves，最近八則是 Skill、寫作參考、工作理解及目前 JD。正式 `high／8192` 執行 summary＋main 各一次，均 HTTP 200；provider `OpenAI`、模型回傳 production 穩定別名 `openai/gpt-5.6-luna`。summary 12,255 input／1,543 output，main 4,867 input／1,960 output，cost **US$0.00811258**。 | **PASS。**v2 逐字保留最新 Human 且不把原話複製進摘要；summary 涵蓋至 `tool-8`，最近八則與 canonical history 不變。摘要保存共同工作、權責界線及未知事項，main 自然完成 O／P／K／S，無工具格式、虛構數字或越權責任。較早 test-only `2048` 輸出上限因 main 截斷而安全失敗，cost US$0.01924770；兩次 body preflight 均未送出。整個 gate paid cost **US$0.02736028**。原報表唯一 false 是 evaluator 硬寫日期 snapshot，離線改用 production route 精確比對後全綠，未重送模型。 |
 
 ## 發現與窄修
 
@@ -47,3 +47,29 @@
 - durable-ref 修正後的離線證據：受影響集合 **147 passed／13 skipped**，codegen check 通過；加入上述對外表達護欄後，排除兩個既知 Windows ACL 模組的新 App 全套為 **3,075 passed／322 skipped／0 failed**。Web 為 **310 passed**、typecheck 通過；production build 在一般 sandbox 因 child process `EPERM` 中斷，於允許建立程序的相同 lock 環境重跑後通過。這些環境差異分開記錄，不把首次基礎設施限制寫成產品失敗。
 
 原始合成 probe 結果保存於本機 `.research-tmp/jd-ui-gate-20260922000000000000000000000002/component_*.json`、`role_compaction_live_probe.json` 與 `b2_compaction_live_recheck.json`，不含 credential；本檔保存可查的結論與限制。未 push。
+
+## 2026-09-23 Stable Chrome 正常與 failed-final 旅程
+
+本 successor 不重送既有真 Luna gate，也不改 A／B1／B2、Memory、Working State、compaction、JD Domain、receipt 或 recovery。它只補齊目前 production Web 的真瀏覽器使用者旅程：正式 build、API、PostgreSQL／Saver／Store、Agent graph 及 JD tools 全部沿用 production；唯一替換點是 OpenRouter HTTP 邊界的固定 `httpx.MockTransport`，因此 provider network 與 paid calls 都是 0。
+
+### 正常路徑
+
+- Stable Chrome 從畫面建立新文件並送出合成員工原話；正式 Agent 依序完成 `jd_read → jd_create_task → assistant final`，共 3 次模型邊界請求。
+- Browser 顯示員工原話、自然 final、1 次已保存 JD 修改與實際 JD。從「本輪 JD 改動」展開來源關係後，新增的「查看原話」沿既有 source owner 開啟 canonical source dialog；JD 內容既有「看第 1 段原話」入口也回到同一正確原話。兩個入口均顯示說話者及「JD 改動不會改變原始訪談」邊界。
+- 畫面執行「撤回這輪 JD 改動」後，JD 項目消失，但 assistant final、員工原話及本輪改動歷史仍在。fresh Chrome profile 重開並重新選取文件後，狀態一致且沒有新增模型請求。
+- 獨立 `REPEATABLE READ / READ ONLY` 查核顯示 revision 為 `initial → ai → manual`；兩筆 operation 分別為 `jd_create_task` 與 `undo_ai_turn`，均 committed。最終 revision 以新的 revision identity 重現本輪前 content digest，當前 task／duty／source link 為 0；checkpoint 與 writes 仍存在。
+
+### failed-final 路徑
+
+- 在另一份新文件中，固定模型邊界先回 `jd_read`、再回 `jd_create_task`，並只在第三次 assistant final request 注入 `httpx.ReadError`。兩個成功 response body 已關閉；第三次明確記為 fixture rejected，沒有 hidden retry、fallback 或 provider network。
+- 真 Browser 顯示「原話已保存，回覆未完成」、1 次已保存 JD 修改與實際 JD；canonical conversation 沒有 synthetic／fallback assistant message。即使 final 缺失，「本輪 JD 改動」仍可回到正確 canonical 原話，整輪 undo 仍可執行。
+- Undo 後 JD effect 消失，但員工原話、failed-final 狀態與本輪改動歷史保留。HTTP 查回為 `run_status=failed`、`input_state=saved`、`jd_effects.state=settled`、`response_message_id=null`，公開 history 只有該員工原話。
+- 唯讀 DB 查核同樣得到 `initial → ai → manual`；AI create 與 manual undo receipt 均 committed，最終內容回到本輪前，checkpoint／checkpoint writes 保留。這證明業務副作用與 assistant final 的生命週期分離，缺少 final 不會造成重送、回滾已確認 JD 或偽造對話。
+
+### 驗證與界線
+
+- 兩條 API fixture 都由控制檔正常排空；`managed.close()` 與 Saver connection close 均為 true。API、Web 與 Chrome 測試程序最後皆已確認沒有 listener。
+- Web 全套 **310 passed／0 failed**，`tsc --noEmit` 與 Next 16 production build 通過。一般 sandbox 首次執行 Node test runner／build worker 都在建立子程序時出現一致的 `spawn EPERM`；以完全相同 lock 與命令在允許建立程序的受控環境重跑後通過，沒有為此修改程式。
+- 本輪 production 差異只把既有 canonical-source owner 接到共享 `ChangeDetails`／`RunChangesPanel`，並停止把 source ref、digest、前後 ref 等 Runtime identity 顯示成使用者內容；沒有新增 source service、adapter、DB、validator 或另一套回查。
+- Stable Chrome 是產品瀏覽器 gate；Codex IAB 既知的 cross-origin POST response-read 問題仍列為 harness compatibility OPEN，不據此修改產品 HTTP／CORS／retry 語意。
+- 此固定模型旅程補齊 Browser、來源、undo、restart 及 failed-final UX，不取代既有真 Luna provider／自然工具／16K compaction 證據，也不宣稱長期實務訪談、P3／P6 未見職位或真人使用品質已完成。後者仍需另行付費與人員授權。

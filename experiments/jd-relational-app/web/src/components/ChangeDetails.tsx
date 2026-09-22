@@ -1,5 +1,5 @@
 'use client';
-import { Box, Divider, Paper, Typography } from '@mui/material';
+import { Box, Button, Divider, Paper, Typography } from '@mui/material';
 import type { ChangeReadRecord } from '../../../src/jd_relational/generated/jd-read';
 import type { JdView } from '../lib/view';
 import { fieldLabels, kindLabels } from '../lib/view';
@@ -15,10 +15,12 @@ function DeletedContent({ group, before }: { group: ChangeGroup; before: JdView 
         <Typography className="jd-text">{record.record.value ?? '（未填）'}</Typography></Box>;
       return null;
     })}
-    {group.header.entity_kind === 'source_link' && <Typography>這筆依據關係已移除；下方保留原目標與確切依據識別。原話回查尚未接合。</Typography>}
+    {group.header.entity_kind === 'source_link' && <Typography>這筆依據關係已移除；原始訪談仍保留。</Typography>}
   </Box>;
 }
-function Pair({ group, before, after }: { group: ChangeGroup; before: JdView; after: JdView }) {
+function Pair({ group, before, after, onOpenSource }: {
+  group: ChangeGroup; before: JdView; after: JdView; onOpenSource?: (sourceRef: string) => void;
+}) {
   return <>
     {group.records.map((record, index) => record.type === 'affected_task' && <Typography key={index} variant="body2" className="jd-text">
       影響任務：{referenceName(before, record.before_task_ref)} → {referenceName(after, record.after_task_ref)}</Typography>)}
@@ -36,14 +38,11 @@ function Pair({ group, before, after }: { group: ChangeGroup; before: JdView; af
           }
           if (record.type === 'item_placement') return <Typography key={index} className="jd-text">所屬：{referenceName(view, record.container_ref)}。前一項：{referenceName(view, record.previous_item_ref)}。後一項：{referenceName(view, record.next_item_ref)}。</Typography>;
           if (record.type === 'relation_placement') return <Typography key={index} className="jd-text">任務：{referenceName(view, record.task_ref)}；引用順序：{referenceName(view, record.previous_capability_ref)} → 本項 → {referenceName(view, record.next_capability_ref)}</Typography>;
-          if (record.type === 'source_value') return <Box key={index}><Typography>依據關係：{record.record.basis_status === 'current' ? '對照仍相符' : '內容變更，待重新核對'}（原話回查尚未接合）</Typography>
-            <details><summary>查看確切依據識別、順序與對照</summary><Box component="pre" sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{JSON.stringify({
-              source: record.record.source_ref, target: record.record.target_ref, relatedCapability: record.record.related_capability_ref,
-              order: record.position, basis: record.basis_digest, readability: record.record.readability }, null, 2)}</Box></details></Box>;
-          if (record.type === 'source_placement') return <Box key={index}><Typography>依據順序已記錄（原話回查尚未接合）。</Typography>
-            <details><summary>查看確切前後依據關係</summary><Box component="pre" sx={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere' }}>{JSON.stringify({
-              target: record.target_ref, relatedCapability: record.related_capability_ref,
-              previous: record.previous_source_ref, next: record.next_source_ref }, null, 2)}</Box></details></Box>;
+          if (record.type === 'source_value') return <Box key={index}>
+            <Typography>依據關係：{record.record.basis_status === 'current' ? '對照仍相符' : '內容變更，待重新核對'}</Typography>
+            {onOpenSource && <Button size="small" sx={{ mt: 0.5, px: 0.5 }} onClick={() => onOpenSource(record.record.source_ref)}>查看原話</Button>}
+          </Box>;
+          if (record.type === 'source_placement') return <Typography key={index}>依據順序已記錄。</Typography>;
           return null;
         })}
         {!(side === 'before' ? group.header.before_exists : group.header.after_exists) && <Typography>（此項不存在）</Typography>}
@@ -51,14 +50,15 @@ function Pair({ group, before, after }: { group: ChangeGroup; before: JdView; af
     })}</Box>
   </>;
 }
-export default function ChangeDetails({ records, before, after, compact = false, idPrefix = 'jd-history-change' }: {
+export default function ChangeDetails({ records, before, after, compact = false, idPrefix = 'jd-history-change', onOpenSource }: {
   records: ChangeReadRecord[]; before: JdView; after: JdView; compact?: boolean; idPrefix?: string;
+  onOpenSource?: (sourceRef: string) => void;
 }) {
   return <>{groupChanges(records).map(group => <Box key={group.header.change_index} id={`${idPrefix}-${group.header.change_index}`} sx={{ mt: 3, scrollMarginTop: 100 }}>
     <Typography sx={{ fontWeight: 700 }}>{changeKinds[group.header.kind]} · {changeName(group, before, after)}</Typography>
     <Typography variant="body2" color="text.secondary">{group.header.changed_fields.map(field => changeLabels[field] ?? field).join('、')}</Typography>
     {compact && group.header.kind === 'delete' && <DeletedContent group={group} before={before} />}
-    {compact ? <details id={`${idPrefix}-detail-${group.header.change_index}`}><summary>查看完整修改前後</summary><Pair group={group} before={before} after={after} /></details>
-      : <Pair group={group} before={before} after={after} />}
+    {compact ? <details id={`${idPrefix}-detail-${group.header.change_index}`}><summary>查看完整修改前後</summary><Pair group={group} before={before} after={after} onOpenSource={onOpenSource} /></details>
+      : <Pair group={group} before={before} after={after} onOpenSource={onOpenSource} />}
   </Box>)}</>;
 }

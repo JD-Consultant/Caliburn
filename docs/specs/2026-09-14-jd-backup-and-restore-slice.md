@@ -2,6 +2,8 @@
 
 日期：2026-09-14；Topic：JD-R002；[產品交付計畫](../plans/2026-09-10-jd-product-delivery.md) 第 6 項與 P5 的「全體資料備份及還原演練」。隔離 App，ADR0075 Proposed／production ADR0060 不變。零 provider。
 
+> **2026-09-23 現行範圍註記：**本文件以下保留 9/14 當時的目標、演練與限制，作為迭代紀錄；正式產品權責現依 [ADR0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。Owner 已將這次完整驗收的備份還原範圍限定為**目前這台電腦、同一 Windows 使用者**；以下「換一台機器」不是本次已支持或已驗收的效果。現行 `host.v1.dpapi` 使用 current-user DPAPI，[Microsoft 的 `CryptProtectData` 說明](https://learn.microsoft.com/en-us/windows/win32/api/dpapi/nf-dpapi-cryptprotectdata)指出解密通常須在同一台電腦，漫遊設定另有例外；它不是一般可攜備份格式。既有演練證明整庫還原後 JD 版本 digest、operation 與 Saver／Store 列數相同，並以**原本的**設定檔驗證舊引用可解；腳本未複製設定檔副本再還原，且**尚未在還原庫實際再送一輪訪談**。下表「設定檔應備份」是操作要求，不等於該步已驗；不能將資料列數相同寫成完整還原或續談端到端 PASS。跨電腦恢復維持 PARKED，不因此新增匯出金鑰或第二套設定機制。
+
 ## 1. 要完成的效果
 
 **員工的 JD 換一台機器、或資料損毀之後拿得回來，而且拿回來的是完整的——不只是 JD 正文，還有訪談、工作理解與能繼續談下去的位置。**同時說清楚哪些東西不在備份裡，還原之後必須重新設定。

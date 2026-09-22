@@ -73,10 +73,10 @@
 
 ## 8. 正式 16K 真 Luna 結果
 
-修後 gate 已以 production A middleware／profile、正式主顧問 guidance、`write-customized-jd` Skill 與 GPT-5.6 Luna `medium／8192` 執行。輸入約 17,467 approximate tokens；最新員工訊息位於同回合起點，後續含八組已完成案例回查，以及最近八則逐字保留的 Skill、寫作參考、工作理解與目前 JD。
+修後 gate 已以 production A middleware／profile、正式主顧問 guidance、`write-customized-jd` Skill 與 GPT-5.6 Luna `high／8192` 執行。輸入約 17,467 approximate tokens；最新員工訊息位於同回合起點，後續含八組已完成案例回查，以及最近八則逐字保留的 Skill、寫作參考、工作理解與目前 JD。
 
 結果為 **PASS**：第一個 summary request 使用 12,255 input／1,543 output tokens，第二個 compacted main request 降為 4,867 input／1,960 output tokens，兩次均由 OpenAI／`openai/gpt-5.6-luna` 回 HTTP 200，合計 cost **US$0.00811258**。state v2 逐字保留最新員工 HumanMessage，summary 只涵蓋已完成至 `tool-8` 的舊 wave；最近八則與 canonical 25 則訊息未改。摘要保留共同工作、權責界線及未知事項；主回答自然形成 O／P／K／S，沒有工具格式、虛構數字、KPI、班別或越權責任。
 
-原始 probe 曾因兩個測試自身問題報紅，均未改產品：兩次 body-size preflight 在 HTTP 送出前即停止，為 0 request／0 cost；一輪 test-only 誤把主輸出設為 2,048，summary 完成後 main 精確用滿上限，Runtime 正確以 `incomplete_compacted_model_response` fail closed，cost **US$0.01924770**。這與既有 Luna 研究的 `medium／8192` 互動基線一致，改回 production 值後即完成。正式結果最初另因 probe 硬寫帶日期 snapshot 而只剩模型名稱檢查 false；OpenRouter 實際回傳值正是 production 設定的穩定別名，provider 為 OpenAI，離線修正 evaluator 後所有檢查通過，沒有再送請求。
+原始 probe 曾因兩個測試自身問題報紅，均未改產品：兩次 body-size preflight 在 HTTP 送出前即停止，為 0 request／0 cost；一輪 test-only 誤把主輸出設為 2,048，summary 完成後 main 精確用滿上限，Runtime 正確以 `incomplete_compacted_model_response` fail closed，cost **US$0.01924770**。改回 production `high／8192` 後即完成。正式結果最初另因 probe 硬寫帶日期 snapshot 而只剩模型名稱檢查 false；OpenRouter 實際回傳值正是 production 設定的穩定別名，provider 為 OpenAI，離線修正 evaluator 後所有檢查通過，沒有再送請求。
 
 本 gate 實際 paid cost 共 **US$0.02736028**。它驗證 compaction 後的 A 續作與 JD 寫作契約，不替代完整 App 的保存、來源、撤回及背景 publication 旅程；後續不再為此重開 Prompt、Skill、Memory 或 compaction 架構。

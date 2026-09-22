@@ -23,6 +23,7 @@ function load(file: string): Record<string, unknown> {
   const native = createRequire(file), module = { exports: {} as Record<string, unknown> };
   modules.set(file, module);
   const output = babel.transformSync(readFileSync(file, 'utf8'), { filename: file, babelrc: false, configFile: false,
+    caller: { name: 'next-babel-turbo-loader' },
     presets: [[require('next/babel'), { 'preset-env': { modules: 'commonjs' }, 'preset-react': { runtime: 'automatic' } }]] }).code;
   const local = (name: string) => {
     if (name.startsWith('.')) {
@@ -112,7 +113,7 @@ test('actual editor labels are absent for late A, new B or unsaved manual candid
   assert.doesNotMatch(html({ ...scope, api: {} }), /本輪修改/);
   assert.doesNotMatch(html(scope, { ...current, dirty: true }), /本輪修改/);
 });
-test('shared renderer retains source identity/basis/order and affected tasks with placements', () => {
+test('shared renderer offers canonical source lookup without exposing runtime identities', () => {
   const { before, after } = fixture();
   const records: ChangeReadRecord[] = [
     { type: 'change', change_index: 0, kind: 'reorder', entity_kind: 'source_link', before_exists: true, after_exists: true, changed_fields: ['position', 'basis_digest'] },
@@ -121,9 +122,11 @@ test('shared renderer retains source identity/basis/order and affected tasks wit
     { type: 'source_placement', change_index: 0, side: 'after', target_ref: 'E-duty', related_capability_ref: null, previous_source_ref: 'exact-previous', next_source_ref: 'exact-next' },
     { type: 'affected_task', change_index: 0, before_task_ref: 'S-task', after_task_ref: null },
   ];
-  const html = renderToStaticMarkup(React.createElement(ChangeDetails, { records, before, after }));
-  for (const text of ['exact-source-identity', 'exact-basis', 'exact-previous', 'exact-next', '影響任務', '即將刪除的任務', '原話回查尚未接合']) assert.ok(html.includes(text), text);
-  assert.match(html, /order[^<]*3/);
+  const html = renderToStaticMarkup(React.createElement(ChangeDetails, { records, before, after, onOpenSource() {} }));
+  for (const text of ['影響任務', '即將刪除的任務', '查看原話', '依據順序已記錄']) assert.ok(html.includes(text), text);
+  for (const privateValue of ['exact-source-identity', 'exact-basis', 'exact-previous', 'exact-next', '原話回查尚未接合']) {
+    assert.ok(!html.includes(privateValue), privateValue);
+  }
 });
 test('deleted identical requirements under identical tasks remain distinguishable by their duty path', () => {
   function removedRequirement(which: 'a' | 'b') {

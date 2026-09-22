@@ -4,10 +4,11 @@ import { Alert, Box, Button, Paper, Stack, Typography } from '@mui/material';
 import { runChangeSummary, undoOffer, type LoadedRunChange } from '../lib/run-changes';
 import ChangeDetails from './ChangeDetails';
 
-export default function RunChangesPanel({ selection, loading, error, currentRevisionRef, onRetry, onUndo, undoing, onHold }: {
+export default function RunChangesPanel({ selection, loading, error, currentRevisionRef, onRetry, onUndo, undoing, onHold, onOpenSource }: {
   selection: LoadedRunChange | null; loading: boolean; error: string | null; currentRevisionRef: string | null; onRetry: () => void;
   onUndo?: (runId: string, expectedResultRef: string) => void; undoing?: boolean;
   onHold?: (holding: boolean) => void;
+  onOpenSource?: (sourceRef: string) => void;
 }) {
   const page = selection?.page;
   const [confirming, setConfirming] = useState(false);
@@ -25,7 +26,7 @@ export default function RunChangesPanel({ selection, loading, error, currentRevi
       {page.result_revision_ref && currentRevisionRef && page.result_revision_ref !== currentRevisionRef &&
         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>這輪當時的改動；目前稿版本不同，已停用目前欄位標記。歷史仍可查看。</Typography>}
       {page.continuity === 'discontinuous' && <Typography variant="body2" sx={{ mt: 1 }}>左側「查看第幾次實際改動」保留各次確切內容。</Typography>}
-      {selection.before && selection.after && <Box><ChangeDetails records={page.records} before={selection.before} after={selection.after} compact idPrefix="jd-run-change" /></Box>}
+      {selection.before && selection.after && <Box><ChangeDetails records={page.records} before={selection.before} after={selection.after} compact idPrefix="jd-run-change" onOpenSource={onOpenSource} /></Box>}
       {onUndo && offer && (offer.available
         ? <Stack sx={{ mt: 2, gap: 1 }}>
             {!confirming

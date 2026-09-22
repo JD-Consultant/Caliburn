@@ -175,6 +175,7 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     {changeKey && <RunChangesPanel selection={selectedRunChange} loading={!matchingLoad || !!runLoad?.loading}
       error={matchingLoad ? runLoad?.error ?? null : null} currentRevisionRef={snapshot.view?.revisionRef ?? null}
       onRetry={() => setRetryChanges(value => value + 1)} undoing={undoing} onHold={setUndoHold}
+      onOpenSource={ref => void openSource(ref)}
       onUndo={(runId, expectedResultRef) => void undoRun(runId, expectedResultRef)} />}
     {undoError && <Alert severity="warning" sx={{ mb: 3 }}>{undoError}</Alert>}
     {history && <HistoryPanel api={api} documentId={document.document_id} revisionRef={snapshot.view?.revisionRef ?? null} selectedChange={selectedChange}

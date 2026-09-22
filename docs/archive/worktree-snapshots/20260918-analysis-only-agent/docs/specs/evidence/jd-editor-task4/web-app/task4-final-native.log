@@ -1,0 +1,13 @@
+
+> @caliburn/jd-editor-native@0.0.1 test
+> vitest run
+
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/native
+
+
+ Test Files  9 passed (9)
+      Tests  68 passed (68)
+   Start at  11:24:50
+   Duration  2.21s (transform 527ms, setup 0ms, import 4.65s, tests 3.36s, environment 1ms)
+

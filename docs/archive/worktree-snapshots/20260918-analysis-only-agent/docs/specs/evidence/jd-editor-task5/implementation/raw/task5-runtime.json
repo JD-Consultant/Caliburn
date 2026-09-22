@@ -1,0 +1,12 @@
+{
+  "python": "3.12.13 (main, Mar  3 2026, 15:01:35) [MSC v.1944 64 bit (AMD64)]",
+  "executable": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent\\.venv\\Scripts\\python.exe",
+  "windows": [
+    10,
+    0,
+    26200,
+    2,
+    ""
+  ],
+  "pywin32": "312"
+}

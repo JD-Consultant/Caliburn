@@ -1,0 +1,131 @@
+FFFF.                                                                    [100%]
+================================== FAILURES ===================================
+________ test_r01_archive_between_admission_sections_cannot_save_input ________
+
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-fix1-pytest-08388f18-dd26-4811-9561-e0f3be1cc8a7/test_r01_archive_between_admis0')
+
+    def test_r01_archive_between_admission_sections_cannot_save_input(tmp_path):
+        with service_harness(tmp_path) as (service,sent,_):
+            document=service.create_document('archive race')['id']
+            original=service.lock
+            class Interleaving:
+                trigger=None
+                def __enter__(self): original.acquire();return self
+                def __exit__(self,*args):
+                    original.release()
+                    trigger,self.trigger=self.trigger,None
+                    if trigger:trigger()
+            lock=Interleaving();service.lock=lock
+            lock.trigger=lambda:service.update_document(document,{'command':'set_archived','archived':True,'expected_metadata_version':1})
+>           with pytest.raises(ServiceConflict):service.submit(document,'original','must not be admitted')
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           Failed: DID NOT RAISE ServiceConflict
+
+tests\test_jd_fix1_admission.py:25: Failed
+_ test_r05_full_original_post_preserves_terminal_if_cleanup_cannot_finish[False] _
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001D9C4803230>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-fix1-pytest-08388f18-dd26-4811-9561-e0f3be1cc8a7/test_r05_full_original_post_pr0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D9C44CDF10>
+sibling = False
+
+    @pytest.mark.parametrize('sibling',[False,True])
+    def test_r05_full_original_post_preserves_terminal_if_cleanup_cannot_finish(jd,tmp_path,monkeypatch,sibling):
+        with recovery_client(jd,tmp_path) as (client,service):
+            intent,key,context,descriptor=pending(jd,service)
+            terminal=jd.manual_save(intent)
+            original=context.graph.update_state
+            def clear_fails(config,value,**kwargs):
+                if value.get('jd_manual_pending','missing') is None:raise RuntimeError('clear failed')
+                return original(config,value,**kwargs)
+            monkeypatch.setattr(context.graph,'update_state',clear_fails)
+            if sibling:context.active_entries+=1
+            try:
+                from analysis_agent.jd_contract import revision_ref
+                result=client.post(f'/documents/{intent.scope.document_id}/jd/manual-save',json={
+                    'request_key':key,'base_revision_ref':revision_ref(intent.scope,intent.base_id),'value':intent.value})
+>               assert result.status_code==200 and result.json()==outcome_to_wire(terminal)
+E               assert (409 == 200)
+E                +  where 409 = <Response [409 Conflict]>.status_code
+
+tests\test_jd_fix1_admission.py:44: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-f24564d6-8758-4175-a7aa-d3c3467d6ae8.jsonl
+_ test_r05_full_original_post_preserves_terminal_if_cleanup_cannot_finish[True] _
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001D9C4BF2F90>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-fix1-pytest-08388f18-dd26-4811-9561-e0f3be1cc8a7/test_r05_full_original_post_pr1')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D9C44CDF40>
+sibling = True
+
+    @pytest.mark.parametrize('sibling',[False,True])
+    def test_r05_full_original_post_preserves_terminal_if_cleanup_cannot_finish(jd,tmp_path,monkeypatch,sibling):
+        with recovery_client(jd,tmp_path) as (client,service):
+            intent,key,context,descriptor=pending(jd,service)
+            terminal=jd.manual_save(intent)
+            original=context.graph.update_state
+            def clear_fails(config,value,**kwargs):
+                if value.get('jd_manual_pending','missing') is None:raise RuntimeError('clear failed')
+                return original(config,value,**kwargs)
+            monkeypatch.setattr(context.graph,'update_state',clear_fails)
+            if sibling:context.active_entries+=1
+            try:
+                from analysis_agent.jd_contract import revision_ref
+                result=client.post(f'/documents/{intent.scope.document_id}/jd/manual-save',json={
+                    'request_key':key,'base_revision_ref':revision_ref(intent.scope,intent.base_id),'value':intent.value})
+>               assert result.status_code==200 and result.json()==outcome_to_wire(terminal)
+E               assert (409 == 200)
+E                +  where 409 = <Response [409 Conflict]>.status_code
+
+tests\test_jd_fix1_admission.py:44: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-f24564d6-8758-4175-a7aa-d3c3467d6ae8.jsonl
+__________ test_r04_recovery_pg_wait_allows_other_document_admission __________
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001D9C4D9F8C0>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-fix1-pytest-08388f18-dd26-4811-9561-e0f3be1cc8a7/test_r04_recovery_pg_wait_allo0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001D9C4D9E9C0>
+
+    def test_r04_recovery_pg_wait_allows_other_document_admission(jd,tmp_path,monkeypatch):
+        from sqlalchemy import select
+        from analysis_agent.jd_store import head
+        with recovery_client(jd,tmp_path) as (client,service):
+            intent,key,context,_=pending(jd,service)
+            other=service.create_document('independent')['id']
+            connection=jd.store.engine.connect();transaction=connection.begin()
+            connection.execute(select(head).where(head.c.document_id==intent.scope.document_id).with_for_update())
+            entered,admitted=Event(),Event();errors=[]
+            original=jd.store._execute
+            def observed(connection,deadline,statement,params=None):
+                if getattr(statement,'_for_update_arg',None) is not None:entered.set()
+                return original(connection,deadline,statement,params)
+            monkeypatch.setattr(jd.store,'_execute',observed)
+            def recovery():
+                try:service.recover_manual(intent.scope.document_id,key)
+                except Exception as exc:errors.append(exc)
+            first=Thread(target=recovery);first.start()
+            second=Thread(target=lambda:(service.submit(other,'other','other doc'),admitted.set()))
+            try:
+                assert entered.wait(5)
+                second.start()
+>               assert admitted.wait(2),'A head lock must not hold global admission'
+E               AssertionError: A head lock must not hold global admission
+E               assert False
+E                +  where False = wait(2)
+E                +    where wait = <threading.Event at 0x1d9c4cc4da0: unset>.wait
+
+tests\test_jd_fix1_admission.py:74: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-f24564d6-8758-4175-a7aa-d3c3467d6ae8.jsonl
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_fix1_admission.py::test_r01_archive_between_admission_sections_cannot_save_input
+FAILED tests/test_jd_fix1_admission.py::test_r05_full_original_post_preserves_terminal_if_cleanup_cannot_finish[False]
+FAILED tests/test_jd_fix1_admission.py::test_r05_full_original_post_preserves_terminal_if_cleanup_cannot_finish[True]
+FAILED tests/test_jd_fix1_admission.py::test_r04_recovery_pg_wait_allows_other_document_admission
+4 failed, 1 passed, 1 warning in 10.81s

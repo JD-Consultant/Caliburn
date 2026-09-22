@@ -1,0 +1,28 @@
+{
+  "pid": 137512,
+  "closed": true,
+  "saver_connection_closed": true,
+  "reason": "requested",
+  "operations": [
+    "e3e3b383-5e3e-459c-9919-4e21eb4b4413",
+    "828751e1-e1c3-41c4-a481-0d146de9b826",
+    "7d594d61-b910-4f3a-bac4-a21b799824fa"
+  ],
+  "observations": [
+    {
+      "operation_id": "e3e3b383-5e3e-459c-9919-4e21eb4b4413",
+      "confirmed": true,
+      "result_revision_id": "9996f39d-60e0-4baf-adf8-c689a99786d6"
+    },
+    {
+      "operation_id": "828751e1-e1c3-41c4-a481-0d146de9b826",
+      "confirmed": true,
+      "result_revision_id": "d5f5ee6f-51dd-4fdd-b90d-5e154c737603"
+    },
+    {
+      "operation_id": "7d594d61-b910-4f3a-bac4-a21b799824fa",
+      "confirmed": true,
+      "result_revision_id": "69098797-ea14-4ba0-94e0-851ff6f81e8c"
+    }
+  ]
+}

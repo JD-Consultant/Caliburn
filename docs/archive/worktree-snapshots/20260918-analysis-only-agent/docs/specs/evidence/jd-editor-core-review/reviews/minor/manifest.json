@@ -1,0 +1,22 @@
+[
+  {
+    "path": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "file": "useJdSession.ts",
+    "sha256": "fee5200dca1b6367d63e78eb4a863cb93261e28a030766c7dc369fc523a88e0f"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+    "file": "JdWorkspace.tsx",
+    "sha256": "5993cc638f288c619cb8f48fa602d2bee577571de58054d6329676cd5af73ed3"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdStaleCandidate.test.tsx",
+    "file": "JdStaleCandidate.test.tsx",
+    "sha256": "585d2b1e9ac3e93dd727ce241da35f58c1dfb36f73d986491f64f42520ea8015"
+  },
+  {
+    "path": "experiments/jd-editor/web/browser/core-stale-recovery.mjs",
+    "file": "core-stale-recovery.mjs",
+    "sha256": "f2d74372b25ece7dcf3ce2e73d182f4f02ea92983bf8d6ae48b7657a820cdcd0"
+  }
+]

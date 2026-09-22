@@ -1,0 +1,23 @@
+{
+  "name": "caliburn-jd-editor-official-profile-probe",
+  "private": true,
+  "type": "module",
+  "scripts": { "probe": "node probe.mjs" },
+  "dependencies": {
+    "platejs": "53.3.11",
+    "@platejs/core": "53.3.11",
+    "@platejs/basic-nodes": "53.0.0",
+    "@platejs/list-classic": "53.0.0",
+    "@platejs/table": "53.0.9",
+    "@platejs/diff": "53.0.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "overrides": {
+    "@platejs/core": "53.3.11",
+    "@platejs/slate": "53.3.10",
+    "@platejs/utils": "53.3.11",
+    "@platejs/resizable": "53.0.0",
+    "slate": "0.126.2"
+  }
+}

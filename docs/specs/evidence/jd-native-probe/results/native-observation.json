@@ -1,0 +1,175 @@
+{
+  "note": "Native per-batch observation only. Original 13-case report and its two failures are unchanged.",
+  "total": 3,
+  "passed": 3,
+  "failed": 0,
+  "results": [
+    {
+      "name": "falsy leaf via native setNodes",
+      "passed": true
+    },
+    {
+      "name": "empty text formatting via native setNodes",
+      "passed": true
+    },
+    {
+      "name": "collapsed caret format is not yet document text mutation",
+      "passed": true
+    }
+  ],
+  "observed": {
+    "falsy leaf via native setNodes": {
+      "batches": [
+        {
+          "operations": [
+            {
+              "type": "set_node",
+              "path": [
+                0,
+                0
+              ],
+              "properties": {
+                "score": 1
+              },
+              "newProperties": {
+                "score": 0
+              }
+            }
+          ],
+          "value": [
+            {
+              "id": "a",
+              "type": "p",
+              "children": [
+                {
+                  "text": "工作",
+                  "score": 0
+                }
+              ]
+            }
+          ],
+          "marks": null
+        }
+      ],
+      "value": [
+        {
+          "id": "a",
+          "type": "p",
+          "children": [
+            {
+              "text": "工作",
+              "score": 0
+            }
+          ]
+        }
+      ],
+      "marks": null,
+      "remainingOperations": 0
+    },
+    "empty text formatting via native setNodes": {
+      "batches": [
+        {
+          "operations": [
+            {
+              "type": "set_node",
+              "path": [
+                0,
+                0
+              ],
+              "properties": {
+                "bold": true
+              },
+              "newProperties": {
+                "italic": true
+              }
+            }
+          ],
+          "value": [
+            {
+              "id": "a",
+              "type": "p",
+              "children": [
+                {
+                  "text": "",
+                  "italic": true
+                }
+              ]
+            }
+          ],
+          "marks": null
+        }
+      ],
+      "value": [
+        {
+          "id": "a",
+          "type": "p",
+          "children": [
+            {
+              "text": "",
+              "italic": true
+            }
+          ]
+        }
+      ],
+      "marks": null,
+      "remainingOperations": 0
+    },
+    "collapsed caret format is not yet document text mutation": {
+      "batches": [
+        {
+          "operations": [
+            {
+              "type": "set_selection",
+              "properties": null,
+              "newProperties": {
+                "anchor": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 0
+                },
+                "focus": {
+                  "path": [
+                    0,
+                    0
+                  ],
+                  "offset": 0
+                }
+              }
+            }
+          ],
+          "value": [
+            {
+              "id": "a",
+              "type": "p",
+              "children": [
+                {
+                  "text": ""
+                }
+              ]
+            }
+          ],
+          "marks": {
+            "italic": true
+          }
+        }
+      ],
+      "value": [
+        {
+          "id": "a",
+          "type": "p",
+          "children": [
+            {
+              "text": ""
+            }
+          ]
+        }
+      ],
+      "marks": {
+        "italic": true
+      },
+      "remainingOperations": 0
+    }
+  }
+}

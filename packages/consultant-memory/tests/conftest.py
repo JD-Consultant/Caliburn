@@ -1,0 +1,74 @@
+"""Source port double only; artifacts use real InMemoryStore/StoreBackend."""
+import re
+
+from caliburn_memory import (
+    EvidenceExchange, EvidenceExchangePage, EvidenceMessage, EvidenceSegment,
+    EvidenceTextPage,
+)
+
+
+class ExampleSource:
+    def __init__(self, document_id="document-a"):
+        self.document_id = document_id
+        self.reference = f"conversation:{document_id}:original"
+        self.context_reference = f"conversation:{document_id}:context"
+        self.material = {self.reference: "原話\r\n  例外由主管核准。",
+            self.context_reference: "誰負責核准？"}
+        self.validations = []
+        self.reads = []
+        self.unavailable = False
+
+    def validate_reference(self, reference):
+        self.validations.append(reference)
+        if not isinstance(reference, str) or re.fullmatch(
+                rf"conversation:{re.escape(self.document_id)}:[a-z]+", reference) is None:
+            raise ValueError("Invalid source reference or document")
+
+    def read(self, reference):
+        self.validate_reference(reference)
+        self.reads.append(reference)
+        if self.unavailable or reference not in self.material:
+            raise ValueError("Source unavailable")
+        return self.material[reference]
+
+    def validate_pair(self, source_reference, context_reference):
+        """This double issues no planned pairs, so it only checks addresses."""
+        self.validate_reference(source_reference)
+        self.validate_reference(context_reference)
+
+    def source_progress(self, reference, previous):
+        self.validate_reference(reference)
+        self.validate_reference(previous)
+        order = list(self.material)
+        target, cursor = order.index(reference), order.index(previous)
+        if target <= cursor:
+            return "covered"
+        if target == cursor + 1:
+            return "next"
+        raise ValueError("invalid_source_progress")
+
+    def require_new_source_after(self, reference, previous):
+        if self.source_progress(reference, previous) != "next":
+            raise ValueError("source_is_not_next")
+
+    def history_exchanges(self, through_reference, *, offset=0, limit=50):
+        self.validate_reference(through_reference)
+        references = list(self.material)
+        end = min(len(references), offset + limit)
+        return EvidenceExchangePage(
+            "oldest_to_newest",
+            tuple(EvidenceExchange(reference, (EvidenceMessage(reference, "user"),))
+                  for reference in references[offset:end]),
+            end if end < len(references) else None,
+        )
+
+    def read_source_page(self, reference, offset=0):
+        self.validate_reference(reference)
+        text = self.material[reference]
+        fragment = text[offset:offset + 3000]
+        end = offset + len(fragment)
+        return EvidenceTextPage(
+            reference,
+            (EvidenceSegment(reference, "user", fragment, offset),) if fragment else (),
+            end if end < len(text) else None,
+        )

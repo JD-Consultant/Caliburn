@@ -1,0 +1,132 @@
+{
+  "date": "2026-09-13",
+  "database": "caliburn_jd_relational_test",
+  "checkpoint_schema": "jd_ai_host_test",
+  "provider_requests": 0,
+  "test_sdk_requests": 12,
+  "cases": [
+    {
+      "case": "normal",
+      "raw_directory": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-908467e0dd004ad6b24a04dfacef0f00",
+      "original_pid": 56596,
+      "recovery_pid": 141744,
+      "original_mock_sdk_requests": 3,
+      "recovered_count": 0,
+      "recovery_counts": {
+        "model": 0,
+        "tools": 0,
+        "execute": 0,
+        "setup": 0
+      },
+      "original_sha256": "20fa6bcae314d389b0d07cba4bb62e05b89d1c6f9b798f526eb97e838ad93a92",
+      "recovery_sha256": "e7d210e73446c76d68e76277a95d81cc36baa15c5cd80218e39e573672d786eb",
+      "documents": [
+        {
+          "document_id": "eb581c84-a330-44f3-813a-19502605304a",
+          "revision_number": 2,
+          "revision_count": 2,
+          "receipt_statuses": [
+            "committed"
+          ],
+          "run_status": "completed"
+        },
+        {
+          "document_id": "a92bdbaa-2c5a-4485-9ffb-21789b49598d",
+          "revision_number": 1,
+          "revision_count": 1,
+          "receipt_statuses": [],
+          "run_status": null
+        }
+      ]
+    },
+    {
+      "case": "sql_pending",
+      "raw_directory": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-239ff29ea5674b43abaf3375572cc62c",
+      "original_pid": 32368,
+      "recovery_pid": 113396,
+      "original_mock_sdk_requests": 2,
+      "recovered_count": 1,
+      "recovery_counts": {
+        "model": 0,
+        "tools": 0,
+        "execute": 0,
+        "setup": 0
+      },
+      "original_sha256": "3cc38d60ac619e51bd6dbf36d5ee9eccf8daa7c53839a573f635fd8843f9569f",
+      "recovery_sha256": "7d78da6e1969a9db9885851228ac8e04af95fee638487a483ebfa9c84d21c44e",
+      "documents": [
+        {
+          "document_id": "27c10cca-3b93-41e4-a9b5-5f64ffc5d221",
+          "revision_number": 1,
+          "revision_count": 1,
+          "receipt_statuses": [
+            "save_failed"
+          ],
+          "run_status": "failed"
+        }
+      ]
+    },
+    {
+      "case": "commit_loss",
+      "raw_directory": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-f04f0641df34409a82b208f10d69f5a1",
+      "original_pid": 57136,
+      "recovery_pid": 78820,
+      "original_mock_sdk_requests": 4,
+      "recovered_count": 1,
+      "recovery_counts": {
+        "model": 0,
+        "tools": 0,
+        "execute": 0,
+        "setup": 0
+      },
+      "original_sha256": "af2bd88eac6b590c2f3bb7416e5b35244c8df77dc5e95cc5d9531a58b4f60596",
+      "recovery_sha256": "6a3c595f7d981fa8509090f5b69366a24f119a24d291c88b464fdf0431ef0465",
+      "documents": [
+        {
+          "document_id": "83cbe2c2-b7fc-431d-93db-f936624bddc2",
+          "revision_number": 3,
+          "revision_count": 3,
+          "receipt_statuses": [
+            "committed",
+            "committed"
+          ],
+          "run_status": "failed"
+        }
+      ]
+    },
+    {
+      "case": "two_boundaries",
+      "raw_directory": "S:\\caliburn\\.research-tmp\\jd-ai-host-recovery-9ce1d3c3850041b39f04d13edd396ed4",
+      "original_pid": 54516,
+      "recovery_pid": 58036,
+      "original_mock_sdk_requests": 3,
+      "recovered_count": 2,
+      "recovery_counts": {
+        "model": 0,
+        "tools": 0,
+        "execute": 0,
+        "setup": 0
+      },
+      "original_sha256": "05832d2e416c7fee976c1108b660e2c2765b98a0651f870b1fad5e0f4bf8444b",
+      "recovery_sha256": "8e25bb89a20bed0ea4111a8b0e1eb845e68533bb26c9e17f0494bc90ded94a31",
+      "documents": [
+        {
+          "document_id": "5e45c9c3-1092-47f2-a59c-13e4b057aca1",
+          "revision_number": 1,
+          "revision_count": 1,
+          "receipt_statuses": [
+            "save_failed"
+          ],
+          "run_status": "failed"
+        },
+        {
+          "document_id": "7671ee09-a68b-4f02-96f5-985d05e970e2",
+          "revision_number": 1,
+          "revision_count": 1,
+          "receipt_statuses": [],
+          "run_status": "failed"
+        }
+      ]
+    }
+  ]
+}

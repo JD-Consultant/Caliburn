@@ -10,9 +10,16 @@ uv.lock.bak
 
 # caches / generated output (api has no nested .gitignore — harden at root)
 .pytest_cache/
+.pytest-*/
+pytest-cache-files-*/
 .ruff_cache/
 .mypy_cache/
 .coverage
+.npm-cache/
+.pnpm-store/
+pnpm-debug.log*
+.research-tmp/
+tmp/
 output/
 !apps/api/app/consultant/skills/output/
 !apps/api/app/consultant/skills/output/SKILL.md

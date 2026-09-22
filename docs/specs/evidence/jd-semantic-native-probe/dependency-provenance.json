@@ -1,0 +1,754 @@
+{
+  "checkedOn": "2026-09-10",
+  "newInstall": false,
+  "versions": {
+    "platejs": {
+      "version": "53.3.11",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\platejs\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\platejs\\dist\\index.js"
+    },
+    "@platejs/core": {
+      "version": "53.3.11",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\core\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\core\\dist\\index.js"
+    },
+    "@platejs/slate": {
+      "version": "53.3.10",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\slate\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\slate\\dist\\index.js"
+    },
+    "slate": {
+      "version": "0.126.2",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\slate\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\slate\\dist\\index.js"
+    },
+    "@platejs/basic-nodes": {
+      "version": "53.0.0",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\basic-nodes\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\basic-nodes\\dist\\index.js"
+    },
+    "@platejs/list-classic": {
+      "version": "53.0.0",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\list-classic\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\list-classic\\dist\\index.js"
+    },
+    "@platejs/table": {
+      "version": "53.0.9",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\table\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\table\\dist\\index.js"
+    },
+    "@platejs/diff": {
+      "version": "53.0.0",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\diff\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\diff\\dist\\index.js"
+    },
+    "react": {
+      "version": "19.2.4",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react\\index.js"
+    },
+    "react-dom": {
+      "version": "19.2.4",
+      "packagePath": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react-dom\\package.json",
+      "resolved": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react-dom\\index.js"
+    }
+  },
+  "lock": {
+    "path": "../jd-official-profile-probe/package-lock.json",
+    "archivedSha256": "59f0bb0ea215c1eb85116a4c35d013e8e61c5226498d04ae65e55871cd78656f",
+    "installedSha256": "59f0bb0ea215c1eb85116a4c35d013e8e61c5226498d04ae65e55871cd78656f"
+  },
+  "licenses": [
+    {
+      "package": "@juggle/resize-observer",
+      "version": "3.4.0",
+      "declaredLicense": "Apache-2.0",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@juggle\\resize-observer\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "293c905e2ec4f6c30c4684592898fd24215ac735f0601b07b158d1588c8a5af7",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@juggle__resize-observer/LICENSE",
+      "archivedSha256": "293c905e2ec4f6c30c4684592898fd24215ac735f0601b07b158d1588c8a5af7",
+      "expectedSha256": "293c905e2ec4f6c30c4684592898fd24215ac735f0601b07b158d1588c8a5af7"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "version": "53.0.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\basic-nodes\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@platejs__basic-nodes/LICENSE",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "expectedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "package": "@platejs/core",
+      "version": "53.3.11",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\core\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "228ab3c2f96242633f2c3bdfb064e54728fd2e2eb6e54c3fd68034b0fa1cf40b",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@platejs__core/LICENSE",
+      "archivedSha256": "228ab3c2f96242633f2c3bdfb064e54728fd2e2eb6e54c3fd68034b0fa1cf40b",
+      "expectedSha256": "228ab3c2f96242633f2c3bdfb064e54728fd2e2eb6e54c3fd68034b0fa1cf40b"
+    },
+    {
+      "package": "@platejs/diff",
+      "version": "53.0.0",
+      "declaredLicense": null,
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\diff\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "61ad80d09a5fedf39e44c8779bd13714bbc0817ccafd05641610c7eb50e52e80",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@platejs__diff/LICENSE",
+      "archivedSha256": "61ad80d09a5fedf39e44c8779bd13714bbc0817ccafd05641610c7eb50e52e80",
+      "expectedSha256": "61ad80d09a5fedf39e44c8779bd13714bbc0817ccafd05641610c7eb50e52e80"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "version": "53.0.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\list-classic\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@platejs__list-classic/LICENSE",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "expectedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "package": "@platejs/resizable",
+      "version": "53.0.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\resizable\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@platejs__resizable/LICENSE",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "expectedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "package": "@platejs/slate",
+      "version": "53.3.10",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\slate\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "279cd6a0368f964603b228486f154e652bc3b7160864e3e4a1c3f26119abd62a",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@platejs__slate/LICENSE",
+      "archivedSha256": "279cd6a0368f964603b228486f154e652bc3b7160864e3e4a1c3f26119abd62a",
+      "expectedSha256": "279cd6a0368f964603b228486f154e652bc3b7160864e3e4a1c3f26119abd62a"
+    },
+    {
+      "package": "@platejs/table",
+      "version": "53.0.9",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\table\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@platejs__table/LICENSE",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "expectedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "package": "@platejs/utils",
+      "version": "53.3.11",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@platejs\\utils\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@platejs__utils/LICENSE",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "expectedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "package": "@radix-ui/react-compose-refs",
+      "version": "1.1.5",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@radix-ui\\react-compose-refs\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@radix-ui__react-compose-refs/LICENSE",
+      "archivedSha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "expectedSha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138"
+    },
+    {
+      "package": "@radix-ui/react-slot",
+      "version": "1.3.3",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@radix-ui\\react-slot\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@radix-ui__react-slot/LICENSE",
+      "archivedSha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138",
+      "expectedSha256": "0e80a2d229d2fd4fc7e8636142ec5d0ff0bc031f14c15b682e2ac01dfd5b5138"
+    },
+    {
+      "package": "@udecode/react-utils",
+      "version": "52.3.4",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@udecode\\react-utils\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@udecode__react-utils/LICENSE",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "expectedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "package": "@udecode/utils",
+      "version": "52.3.4",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\@udecode\\utils\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__@udecode__utils/LICENSE",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "expectedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "package": "clsx",
+      "version": "2.1.1",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\clsx\\license",
+      "installedExists": true,
+      "installedSha256": "9a9edad7baae52622bddf3c15b2ef8a33d2c89f2d25408ad13e8a7481c6b0c97",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__clsx/license",
+      "archivedSha256": "9a9edad7baae52622bddf3c15b2ef8a33d2c89f2d25408ad13e8a7481c6b0c97",
+      "expectedSha256": "9a9edad7baae52622bddf3c15b2ef8a33d2c89f2d25408ad13e8a7481c6b0c97"
+    },
+    {
+      "package": "compute-scroll-into-view",
+      "version": "3.1.1",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\compute-scroll-into-view\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "dfe2b2d612c7c1de1f32dcab5969bd68ecac0022a7582ca8cd4594729b9c8664",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__compute-scroll-into-view/LICENSE",
+      "archivedSha256": "dfe2b2d612c7c1de1f32dcab5969bd68ecac0022a7582ca8cd4594729b9c8664",
+      "expectedSha256": "dfe2b2d612c7c1de1f32dcab5969bd68ecac0022a7582ca8cd4594729b9c8664"
+    },
+    {
+      "package": "dequal",
+      "version": "2.0.3",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\dequal\\license",
+      "installedExists": true,
+      "installedSha256": "306fa513e39b23a6e8747520de761809d206b99800ef41907b530226574c59ae",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__dequal/license",
+      "archivedSha256": "306fa513e39b23a6e8747520de761809d206b99800ef41907b530226574c59ae",
+      "expectedSha256": "306fa513e39b23a6e8747520de761809d206b99800ef41907b530226574c59ae"
+    },
+    {
+      "package": "diff-match-patch-ts",
+      "version": "0.6.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\diff-match-patch-ts\\LICENSE.md",
+      "installedExists": true,
+      "installedSha256": "f7525c97f2e045d250676a7b087442dfb79c7889daa9f008a3cbf03f5362e6d2",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__diff-match-patch-ts/LICENSE.md",
+      "archivedSha256": "f7525c97f2e045d250676a7b087442dfb79c7889daa9f008a3cbf03f5362e6d2",
+      "expectedSha256": "f7525c97f2e045d250676a7b087442dfb79c7889daa9f008a3cbf03f5362e6d2"
+    },
+    {
+      "package": "direction",
+      "version": "1.0.4",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\direction\\license",
+      "installedExists": true,
+      "installedSha256": "9966260ba3ea9d6a5f839297dca80ddc99735a34b4ae82811cac7b956d2e3afd",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__direction/license",
+      "archivedSha256": "9966260ba3ea9d6a5f839297dca80ddc99735a34b4ae82811cac7b956d2e3afd",
+      "expectedSha256": "9966260ba3ea9d6a5f839297dca80ddc99735a34b4ae82811cac7b956d2e3afd"
+    },
+    {
+      "package": "immer",
+      "version": "10.2.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\immer\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "99cf22f6960a6fe228ec84ea9aefb0d75b27999ece83a3a9801e1c2081fa270b",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__immer/LICENSE",
+      "archivedSha256": "99cf22f6960a6fe228ec84ea9aefb0d75b27999ece83a3a9801e1c2081fa270b",
+      "expectedSha256": "99cf22f6960a6fe228ec84ea9aefb0d75b27999ece83a3a9801e1c2081fa270b"
+    },
+    {
+      "package": "is-hotkey",
+      "version": "0.2.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\is-hotkey\\License.md",
+      "installedExists": true,
+      "installedSha256": "0f644bc01d85e4b1958bdfe5a851704bd886404c78188d4d6fba43dc8293bc91",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__is-hotkey/License.md",
+      "archivedSha256": "0f644bc01d85e4b1958bdfe5a851704bd886404c78188d4d6fba43dc8293bc91",
+      "expectedSha256": "0f644bc01d85e4b1958bdfe5a851704bd886404c78188d4d6fba43dc8293bc91"
+    },
+    {
+      "package": "is-plain-object",
+      "version": "5.1.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\is-plain-object\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "4cd903859549d4b20b571041f96dfae1136ed079c476126268f9d7cc1b611150",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__is-plain-object/LICENSE",
+      "archivedSha256": "4cd903859549d4b20b571041f96dfae1136ed079c476126268f9d7cc1b611150",
+      "expectedSha256": "4cd903859549d4b20b571041f96dfae1136ed079c476126268f9d7cc1b611150"
+    },
+    {
+      "package": "jotai",
+      "version": "2.8.4",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\jotai\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "cea97f0609de01f9e17d7b6d5fb5716e7de6404662c56f8c286aef9c5b4ca09c",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__jotai/LICENSE",
+      "archivedSha256": "cea97f0609de01f9e17d7b6d5fb5716e7de6404662c56f8c286aef9c5b4ca09c",
+      "expectedSha256": "cea97f0609de01f9e17d7b6d5fb5716e7de6404662c56f8c286aef9c5b4ca09c"
+    },
+    {
+      "package": "jotai-optics",
+      "version": "0.4.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\jotai-optics\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "9f79f9d00a0994e7f67603c63dfe2d5cf4ecadeb141170b9b03501cc3657a0a5",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__jotai-optics/LICENSE",
+      "archivedSha256": "9f79f9d00a0994e7f67603c63dfe2d5cf4ecadeb141170b9b03501cc3657a0a5",
+      "expectedSha256": "9f79f9d00a0994e7f67603c63dfe2d5cf4ecadeb141170b9b03501cc3657a0a5"
+    },
+    {
+      "package": "lodash",
+      "version": "4.18.1",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\lodash\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__lodash/LICENSE",
+      "archivedSha256": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc",
+      "expectedSha256": "f71e8ed126b46346494aad5486874cd8f0aafe95092ed67d2e3cb6110f939abc"
+    },
+    {
+      "package": "lodash.mapvalues",
+      "version": "4.6.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\lodash.mapvalues\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "ffd8b33b354585f4ce119f19c53728281e48a97b074491eb6bf6d5c5ff305272",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__lodash.mapvalues/LICENSE",
+      "archivedSha256": "ffd8b33b354585f4ce119f19c53728281e48a97b074491eb6bf6d5c5ff305272",
+      "expectedSha256": "ffd8b33b354585f4ce119f19c53728281e48a97b074491eb6bf6d5c5ff305272"
+    },
+    {
+      "package": "mutative",
+      "version": "1.1.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\mutative\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8f0bab26b1edc2caedf89b889ef80305d660d876d240fba8ffb26b7acdfeab18",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__mutative/LICENSE",
+      "archivedSha256": "8f0bab26b1edc2caedf89b889ef80305d660d876d240fba8ffb26b7acdfeab18",
+      "expectedSha256": "8f0bab26b1edc2caedf89b889ef80305d660d876d240fba8ffb26b7acdfeab18"
+    },
+    {
+      "package": "nanoid",
+      "version": "5.1.16",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\nanoid\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "4383cb2c3608397ce7a4159502614ed66890f8999c2a9c056dd3b1024d6721f0",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__nanoid/LICENSE",
+      "archivedSha256": "4383cb2c3608397ce7a4159502614ed66890f8999c2a9c056dd3b1024d6721f0",
+      "expectedSha256": "4383cb2c3608397ce7a4159502614ed66890f8999c2a9c056dd3b1024d6721f0"
+    },
+    {
+      "package": "optics-ts",
+      "version": "2.4.1",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\optics-ts\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "031b4b7cdc2ce813c3aed3f113d24a6cc87d3eacd06c0b8b1c8205ec44c1a86c",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__optics-ts/LICENSE",
+      "archivedSha256": "031b4b7cdc2ce813c3aed3f113d24a6cc87d3eacd06c0b8b1c8205ec44c1a86c",
+      "expectedSha256": "031b4b7cdc2ce813c3aed3f113d24a6cc87d3eacd06c0b8b1c8205ec44c1a86c"
+    },
+    {
+      "package": "platejs",
+      "version": "53.3.11",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\platejs\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__platejs/LICENSE",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "expectedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "package": "proxy-compare",
+      "version": "2.6.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\proxy-compare\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "9dd70d748ceac21bcc34056812068bf8b577899647b7c60a6f9953ff153b3e55",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__proxy-compare/LICENSE",
+      "archivedSha256": "9dd70d748ceac21bcc34056812068bf8b577899647b7c60a6f9953ff153b3e55",
+      "expectedSha256": "9dd70d748ceac21bcc34056812068bf8b577899647b7c60a6f9953ff153b3e55"
+    },
+    {
+      "package": "react",
+      "version": "19.2.4",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__react/LICENSE",
+      "archivedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+      "expectedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "package": "react-dom",
+      "version": "19.2.4",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react-dom\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__react-dom/LICENSE",
+      "archivedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+      "expectedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "package": "react-tracked",
+      "version": "1.7.14",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\react-tracked\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "73ceddd047962ccad96a8d60f22e2032ca0db0610f46f225259bb624c674879c",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__react-tracked/LICENSE",
+      "archivedSha256": "73ceddd047962ccad96a8d60f22e2032ca0db0610f46f225259bb624c674879c",
+      "expectedSha256": "73ceddd047962ccad96a8d60f22e2032ca0db0610f46f225259bb624c674879c"
+    },
+    {
+      "package": "scheduler",
+      "version": "0.27.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\scheduler\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__scheduler/LICENSE",
+      "archivedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+      "expectedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "package": "scroll-into-view-if-needed",
+      "version": "3.1.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\scroll-into-view-if-needed\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "62b9f69bb4ccf131e7e4cc8ce6ec5b4acf3d9848f0ac73c3c2f285d716ff1b5c",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__scroll-into-view-if-needed/LICENSE",
+      "archivedSha256": "62b9f69bb4ccf131e7e4cc8ce6ec5b4acf3d9848f0ac73c3c2f285d716ff1b5c",
+      "expectedSha256": "62b9f69bb4ccf131e7e4cc8ce6ec5b4acf3d9848f0ac73c3c2f285d716ff1b5c"
+    },
+    {
+      "package": "tiny-invariant",
+      "version": "1.3.1",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\tiny-invariant\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "b1c501095de70182748cb8e8d97ac5577701a4ef3b755ba30d59fd87b24bdb0f",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__tiny-invariant/LICENSE",
+      "archivedSha256": "b1c501095de70182748cb8e8d97ac5577701a4ef3b755ba30d59fd87b24bdb0f",
+      "expectedSha256": "b1c501095de70182748cb8e8d97ac5577701a4ef3b755ba30d59fd87b24bdb0f"
+    },
+    {
+      "package": "use-context-selector",
+      "version": "1.4.4",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\use-context-selector\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "73ceddd047962ccad96a8d60f22e2032ca0db0610f46f225259bb624c674879c",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__use-context-selector/LICENSE",
+      "archivedSha256": "73ceddd047962ccad96a8d60f22e2032ca0db0610f46f225259bb624c674879c",
+      "expectedSha256": "73ceddd047962ccad96a8d60f22e2032ca0db0610f46f225259bb624c674879c"
+    },
+    {
+      "package": "use-deep-compare",
+      "version": "1.3.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\use-deep-compare\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "156701f3274f3e9b08833a9c48d294a534677d8ce491e4564312f254f84edb68",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__use-deep-compare/LICENSE",
+      "archivedSha256": "156701f3274f3e9b08833a9c48d294a534677d8ce491e4564312f254f84edb68",
+      "expectedSha256": "156701f3274f3e9b08833a9c48d294a534677d8ce491e4564312f254f84edb68"
+    },
+    {
+      "package": "use-sync-external-store",
+      "version": "1.4.0",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\use-sync-external-store\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__use-sync-external-store/LICENSE",
+      "archivedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93",
+      "expectedSha256": "da6d3703ed11cbe42bd212c725957c98da23cbff1998c05fa4b3d976d1a58e93"
+    },
+    {
+      "package": "zustand",
+      "version": "5.0.15",
+      "declaredLicense": "MIT",
+      "installed": "S:\\caliburn\\.research-tmp\\jd-editor-official-profile-probe\\node_modules\\zustand\\LICENSE",
+      "installedExists": true,
+      "installedSha256": "c1e6e266563517467b1bf874817d23e426f3149252bd7d42758cd697514b8417",
+      "archived": "../jd-official-profile-probe/licenses/node_modules__zustand/LICENSE",
+      "archivedSha256": "c1e6e266563517467b1bf874817d23e426f3149252bd7d42758cd697514b8417",
+      "expectedSha256": "c1e6e266563517467b1bf874817d23e426f3149252bd7d42758cd697514b8417"
+    }
+  ],
+  "sourceFiles": [
+    {
+      "package": "@platejs/core",
+      "source": "node_modules/@platejs/core/dist/index.d.ts",
+      "installedSha256": "52fe48f6d251a382ad97d0ff83aefbef239e019864335c37756115f4bb7cef4b",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__core/index.d.ts",
+      "archivedSha256": "52fe48f6d251a382ad97d0ff83aefbef239e019864335c37756115f4bb7cef4b",
+      "expectedSha256": "52fe48f6d251a382ad97d0ff83aefbef239e019864335c37756115f4bb7cef4b"
+    },
+    {
+      "package": "@platejs/core",
+      "source": "node_modules/@platejs/core/dist/react/index.d.ts",
+      "installedSha256": "ced95adce9425805de892f86a69ab89a194115bc3d5981d01611f803697d1851",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__core/react/index.d.ts",
+      "archivedSha256": "ced95adce9425805de892f86a69ab89a194115bc3d5981d01611f803697d1851",
+      "expectedSha256": "ced95adce9425805de892f86a69ab89a194115bc3d5981d01611f803697d1851"
+    },
+    {
+      "package": "@platejs/core",
+      "source": "node_modules/@platejs/core/dist/static/index.d.ts",
+      "installedSha256": "429293e83f82d735f7d3c9bfced243b104973c50bd633e0ab721e2b986145a63",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__core/static/index.d.ts",
+      "archivedSha256": "429293e83f82d735f7d3c9bfced243b104973c50bd633e0ab721e2b986145a63",
+      "expectedSha256": "429293e83f82d735f7d3c9bfced243b104973c50bd633e0ab721e2b986145a63"
+    },
+    {
+      "package": "@platejs/core",
+      "source": "node_modules/@platejs/core/dist/withSlate-CGuPv-qn.js",
+      "installedSha256": "8703e6a73fe92a0d0ee0a4744cfd1791c10a3a06270648b7e6890dff9555339d",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__core/withSlate-CGuPv-qn.js",
+      "archivedSha256": "8703e6a73fe92a0d0ee0a4744cfd1791c10a3a06270648b7e6890dff9555339d",
+      "expectedSha256": "8703e6a73fe92a0d0ee0a4744cfd1791c10a3a06270648b7e6890dff9555339d"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/BaseKbdPlugin-C5TGzG3P.js",
+      "installedSha256": "fba0a94e9116a696910f917770a8c337af16aeadf90003214752e5370453eba9",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__basic-nodes/BaseKbdPlugin-C5TGzG3P.js",
+      "archivedSha256": "fba0a94e9116a696910f917770a8c337af16aeadf90003214752e5370453eba9",
+      "expectedSha256": "fba0a94e9116a696910f917770a8c337af16aeadf90003214752e5370453eba9"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/index-B_h8MhaV.d.ts",
+      "installedSha256": "2ca0b836509c13bdc7c3384267342bc3b17dfcebe97c553ee845e067fe963947",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__basic-nodes/index-B_h8MhaV.d.ts",
+      "archivedSha256": "2ca0b836509c13bdc7c3384267342bc3b17dfcebe97c553ee845e067fe963947",
+      "expectedSha256": "2ca0b836509c13bdc7c3384267342bc3b17dfcebe97c553ee845e067fe963947"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/index.d.ts",
+      "installedSha256": "e8482aa36319c6ba2ae7c731ffe38e6531e2c25831d9618e8af1970b8bc24eb2",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__basic-nodes/index.d.ts",
+      "archivedSha256": "e8482aa36319c6ba2ae7c731ffe38e6531e2c25831d9618e8af1970b8bc24eb2",
+      "expectedSha256": "e8482aa36319c6ba2ae7c731ffe38e6531e2c25831d9618e8af1970b8bc24eb2"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/index.js",
+      "installedSha256": "a6f8946f22205ba946a42b8af27477f7ec289b61a80f8b4af5b88800e3e64cf8",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__basic-nodes/index.js",
+      "archivedSha256": "a6f8946f22205ba946a42b8af27477f7ec289b61a80f8b4af5b88800e3e64cf8",
+      "expectedSha256": "a6f8946f22205ba946a42b8af27477f7ec289b61a80f8b4af5b88800e3e64cf8"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/react/index.d.ts",
+      "installedSha256": "ee28e665163b98a19cff53498d0a5f1bdc410287c50a633479d288f6fdb92ff4",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__basic-nodes/react/index.d.ts",
+      "archivedSha256": "ee28e665163b98a19cff53498d0a5f1bdc410287c50a633479d288f6fdb92ff4",
+      "expectedSha256": "ee28e665163b98a19cff53498d0a5f1bdc410287c50a633479d288f6fdb92ff4"
+    },
+    {
+      "package": "@platejs/basic-nodes",
+      "source": "node_modules/@platejs/basic-nodes/dist/react/index.js",
+      "installedSha256": "5b5e882041ae6670720e5e5d934101afa7de4120b91a70d23336b9f35a061223",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__basic-nodes/react/index.js",
+      "archivedSha256": "5b5e882041ae6670720e5e5d934101afa7de4120b91a70d23336b9f35a061223",
+      "expectedSha256": "5b5e882041ae6670720e5e5d934101afa7de4120b91a70d23336b9f35a061223"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/BaseListPlugin-n9uuTtLe.js",
+      "installedSha256": "ea155ba43142d53b2e74f5624f0d1eff5635abe91b3ca2d2ed8bae082ca3b860",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__list-classic/BaseListPlugin-n9uuTtLe.js",
+      "archivedSha256": "ea155ba43142d53b2e74f5624f0d1eff5635abe91b3ca2d2ed8bae082ca3b860",
+      "expectedSha256": "ea155ba43142d53b2e74f5624f0d1eff5635abe91b3ca2d2ed8bae082ca3b860"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/BaseTodoListPlugin-C3ztdXje.d.ts",
+      "installedSha256": "9c448b1058ec60f4884c0cdf661ae2a6f122f4ed006e7b3c286e1676bdadacfa",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__list-classic/BaseTodoListPlugin-C3ztdXje.d.ts",
+      "archivedSha256": "9c448b1058ec60f4884c0cdf661ae2a6f122f4ed006e7b3c286e1676bdadacfa",
+      "expectedSha256": "9c448b1058ec60f4884c0cdf661ae2a6f122f4ed006e7b3c286e1676bdadacfa"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/index.d.ts",
+      "installedSha256": "29a59e029cb2bb05aa21bf96fb798250ab409f6f210ca22ea87a07fbb11a6e4f",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__list-classic/index.d.ts",
+      "archivedSha256": "29a59e029cb2bb05aa21bf96fb798250ab409f6f210ca22ea87a07fbb11a6e4f",
+      "expectedSha256": "29a59e029cb2bb05aa21bf96fb798250ab409f6f210ca22ea87a07fbb11a6e4f"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/index.js",
+      "installedSha256": "b67058f0f73d8f654684501cbab1f53366d7a2d6611155b975830fa5aa304507",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__list-classic/index.js",
+      "archivedSha256": "b67058f0f73d8f654684501cbab1f53366d7a2d6611155b975830fa5aa304507",
+      "expectedSha256": "b67058f0f73d8f654684501cbab1f53366d7a2d6611155b975830fa5aa304507"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/react/index.d.ts",
+      "installedSha256": "1ac56fcc4caecd8895e61f3a9df488f3ca6d4563dd245313046ad86b4af5d06c",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__list-classic/react/index.d.ts",
+      "archivedSha256": "1ac56fcc4caecd8895e61f3a9df488f3ca6d4563dd245313046ad86b4af5d06c",
+      "expectedSha256": "1ac56fcc4caecd8895e61f3a9df488f3ca6d4563dd245313046ad86b4af5d06c"
+    },
+    {
+      "package": "@platejs/list-classic",
+      "source": "node_modules/@platejs/list-classic/dist/react/index.js",
+      "installedSha256": "6b760de882ce9a5c50175e0cc12e0e3d2d01efa7b0c11771221eb13b556fa47f",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__list-classic/react/index.js",
+      "archivedSha256": "6b760de882ce9a5c50175e0cc12e0e3d2d01efa7b0c11771221eb13b556fa47f",
+      "expectedSha256": "6b760de882ce9a5c50175e0cc12e0e3d2d01efa7b0c11771221eb13b556fa47f"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/constants-6xljcM3U.js",
+      "installedSha256": "ace1a1a1a785fe2e4d3758c82e63991aee265d00688571bbb603b35a6d193abf",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__table/constants-6xljcM3U.js",
+      "archivedSha256": "ace1a1a1a785fe2e4d3758c82e63991aee265d00688571bbb603b35a6d193abf",
+      "expectedSha256": "ace1a1a1a785fe2e4d3758c82e63991aee265d00688571bbb603b35a6d193abf"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/index-BYg7T9gA.d.ts",
+      "installedSha256": "fab144ce46658ab9a340248246f0ea8e9b0c81dd598b37339ae539a960d6b362",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__table/index-BYg7T9gA.d.ts",
+      "archivedSha256": "fab144ce46658ab9a340248246f0ea8e9b0c81dd598b37339ae539a960d6b362",
+      "expectedSha256": "fab144ce46658ab9a340248246f0ea8e9b0c81dd598b37339ae539a960d6b362"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/index.d.ts",
+      "installedSha256": "8788533f12b948f67243f0292e3dd969b094d7cadeb0cbccad89563ee0bc205d",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__table/index.d.ts",
+      "archivedSha256": "8788533f12b948f67243f0292e3dd969b094d7cadeb0cbccad89563ee0bc205d",
+      "expectedSha256": "8788533f12b948f67243f0292e3dd969b094d7cadeb0cbccad89563ee0bc205d"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/index.js",
+      "installedSha256": "9975b4d6948ea4f881c9750facd57c5906699edeeac02e8eae108fa7463fbc06",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__table/index.js",
+      "archivedSha256": "9975b4d6948ea4f881c9750facd57c5906699edeeac02e8eae108fa7463fbc06",
+      "expectedSha256": "9975b4d6948ea4f881c9750facd57c5906699edeeac02e8eae108fa7463fbc06"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/react/index.d.ts",
+      "installedSha256": "2814dc2ab173c22c4b5cb141486d8a9651f61ee3fce39f86e34d00db94949fc5",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__table/react/index.d.ts",
+      "archivedSha256": "2814dc2ab173c22c4b5cb141486d8a9651f61ee3fce39f86e34d00db94949fc5",
+      "expectedSha256": "2814dc2ab173c22c4b5cb141486d8a9651f61ee3fce39f86e34d00db94949fc5"
+    },
+    {
+      "package": "@platejs/table",
+      "source": "node_modules/@platejs/table/dist/react/index.js",
+      "installedSha256": "c5a10a5c7610a750947d3c6389cf61602fa719b15ac3b754ff0db7eb1a004326",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__table/react/index.js",
+      "archivedSha256": "c5a10a5c7610a750947d3c6389cf61602fa719b15ac3b754ff0db7eb1a004326",
+      "expectedSha256": "c5a10a5c7610a750947d3c6389cf61602fa719b15ac3b754ff0db7eb1a004326"
+    },
+    {
+      "package": "@platejs/slate",
+      "source": "node_modules/@platejs/slate/dist/index.d.ts",
+      "installedSha256": "d798f575c676503badce42a12b4f197d5000e631af6e2b2308b05abecc72f7de",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__slate/index.d.ts",
+      "archivedSha256": "d798f575c676503badce42a12b4f197d5000e631af6e2b2308b05abecc72f7de",
+      "expectedSha256": "d798f575c676503badce42a12b4f197d5000e631af6e2b2308b05abecc72f7de"
+    },
+    {
+      "package": "@platejs/slate",
+      "source": "node_modules/@platejs/slate/dist/index.js",
+      "installedSha256": "84ec566e5689d7558200a65505a5610b773fc2252057b57063dd14c1cf7a6e8c",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__slate/index.js",
+      "archivedSha256": "84ec566e5689d7558200a65505a5610b773fc2252057b57063dd14c1cf7a6e8c",
+      "expectedSha256": "84ec566e5689d7558200a65505a5610b773fc2252057b57063dd14c1cf7a6e8c"
+    },
+    {
+      "package": "@platejs/utils",
+      "source": "node_modules/@platejs/utils/dist/index.d.ts",
+      "installedSha256": "5a86739820ee4ab94fe525ef5ec79348f9726f9cc87f57d1acddf882f18dc4ed",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__utils/index.d.ts",
+      "archivedSha256": "5a86739820ee4ab94fe525ef5ec79348f9726f9cc87f57d1acddf882f18dc4ed",
+      "expectedSha256": "5a86739820ee4ab94fe525ef5ec79348f9726f9cc87f57d1acddf882f18dc4ed"
+    },
+    {
+      "package": "@platejs/utils",
+      "source": "node_modules/@platejs/utils/dist/index.js",
+      "installedSha256": "5adb7649d69f5e6656ce6278946de9c94093b79b1d1dacf8e3ba5f3bf8708ab5",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__utils/index.js",
+      "archivedSha256": "5adb7649d69f5e6656ce6278946de9c94093b79b1d1dacf8e3ba5f3bf8708ab5",
+      "expectedSha256": "5adb7649d69f5e6656ce6278946de9c94093b79b1d1dacf8e3ba5f3bf8708ab5"
+    },
+    {
+      "package": "@platejs/utils",
+      "source": "node_modules/@platejs/utils/dist/react/index.d.ts",
+      "installedSha256": "a800896603075c5e96a172db5cfbe2678f18a9aefdd26a932b2542b0b821d21a",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__utils/react/index.d.ts",
+      "archivedSha256": "a800896603075c5e96a172db5cfbe2678f18a9aefdd26a932b2542b0b821d21a",
+      "expectedSha256": "a800896603075c5e96a172db5cfbe2678f18a9aefdd26a932b2542b0b821d21a"
+    },
+    {
+      "package": "@platejs/utils",
+      "source": "node_modules/@platejs/utils/dist/react/index.js",
+      "installedSha256": "d0f19129bb9ed91758e4990cbc64e2bf83d7464f48128beea880b35a7fd73ac2",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__utils/react/index.js",
+      "archivedSha256": "d0f19129bb9ed91758e4990cbc64e2bf83d7464f48128beea880b35a7fd73ac2",
+      "expectedSha256": "d0f19129bb9ed91758e4990cbc64e2bf83d7464f48128beea880b35a7fd73ac2"
+    },
+    {
+      "package": "@platejs/diff",
+      "source": "node_modules/@platejs/diff/dist/index.d.ts",
+      "installedSha256": "23bc4b399e97e5e2b0022b02806a2fee0b15d7968468e0b41583c74cd0732067",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__diff/index.d.ts",
+      "archivedSha256": "23bc4b399e97e5e2b0022b02806a2fee0b15d7968468e0b41583c74cd0732067",
+      "expectedSha256": "23bc4b399e97e5e2b0022b02806a2fee0b15d7968468e0b41583c74cd0732067"
+    },
+    {
+      "package": "@platejs/diff",
+      "source": "node_modules/@platejs/diff/dist/index.js",
+      "installedSha256": "bebb501cb9b1df2a36155dd08959e792c7c8de22aaaff6fcfa0a31fde7ac4d49",
+      "archived": "../jd-official-profile-probe/sources/installed/@platejs__diff/index.js",
+      "archivedSha256": "bebb501cb9b1df2a36155dd08959e792c7c8de22aaaff6fcfa0a31fde7ac4d49",
+      "expectedSha256": "bebb501cb9b1df2a36155dd08959e792c7c8de22aaaff6fcfa0a31fde7ac4d49"
+    },
+    {
+      "package": "slate",
+      "source": "node_modules/slate/dist/index.es.js",
+      "installedSha256": "eb85d66a23ffc1f72d8e5fe518fa3b6f6a9e40335ec29aa3fed42f4bf403f187",
+      "archived": "../jd-official-profile-probe/sources/installed/slate/index.es.js",
+      "archivedSha256": "eb85d66a23ffc1f72d8e5fe518fa3b6f6a9e40335ec29aa3fed42f4bf403f187",
+      "expectedSha256": "eb85d66a23ffc1f72d8e5fe518fa3b6f6a9e40335ec29aa3fed42f4bf403f187"
+    }
+  ],
+  "note": "F02 archival source/license files are reused by exact relative link; absent installed LICENSE entries retain F02 fixed release-source licenses. No copied node_modules or vendor changes."
+}

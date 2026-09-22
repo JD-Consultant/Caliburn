@@ -1,0 +1,11 @@
+{
+  "checked_at_utc": "2026-09-13T01:09:39.4002544Z",
+  "database_retained": true,
+  "owned_processes": [
+    89520,
+    135972,
+    122332,
+    142048
+  ],
+  "all_exited": true
+}

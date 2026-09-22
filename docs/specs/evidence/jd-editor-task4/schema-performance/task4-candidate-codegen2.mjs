@@ -1,0 +1,22 @@
+import {readFile,writeFile,mkdir} from 'node:fs/promises';
+import {resolve,dirname} from 'node:path';
+import {fileURLToPath} from 'node:url';
+import {createRequire} from 'node:module';
+import {spawnSync} from 'node:child_process';
+const here=dirname(fileURLToPath(import.meta.url)),root=resolve(here,'../../..');
+const contract=resolve(root,'experiments/jd-editor/contract'),out=resolve(here,'task4-schema-candidate2');
+const require=createRequire(resolve(contract,'package.json'));
+const {compile}=require('json-schema-to-typescript');
+const schema=JSON.parse(await readFile(resolve(out,'candidate.schema.json'),'utf8'));
+let ts=await compile(schema,schema.title,{unreachableDefinitions:true,bannerComment:'/* Generated from docs/specs/contracts/jd-editor-v2.schema.json. Do not edit. */'});
+for(const [name,definition] of Object.entries(schema.$defs))if(definition.$ref&&!new RegExp(`export (?:type|interface) ${name}\\b`).test(ts)){const target=definition.$ref.split('/').at(-1);ts+=`\nexport type ${name} = ${target};\n`;}
+await writeFile(resolve(out,'candidate.ts'),ts);
+const py=resolve(out,'src/jd_editor_contract/models.py');await mkdir(dirname(py),{recursive:true});await writeFile(resolve(out,'src/jd_editor_contract/__init__.py'),'');
+const args=['run','--project',contract,'datamodel-codegen','--input',resolve(out,'candidate.schema.json'),'--input-file-type','jsonschema','--output',py,'--output-model-type','pydantic_v2.BaseModel','--target-python-version','3.12','--strict-types','int','--disable-timestamp','--no-use-union-operator'];
+const dto=spawnSync('uv',args,{encoding:'utf8',env:{...process.env,PYTHONUTF8:'1'}});await writeFile(resolve(out,'codegen-invocation.json'),JSON.stringify({args,status:dto.status,stderr:dto.stderr},null,2));if(dto.status!==0)throw Error(dto.stderr||String(dto.error));
+await writeFile(py,(await readFile(py,'utf8')).replaceAll('\r\n','\n'));
+const apiRoot=resolve(root,'experiments/analysis-agent');const env={...process.env,PYTHONUTF8:'1',PYTHONPATH:[resolve(out,'src'),resolve(apiRoot,'src'),resolve(contract,'src')].join(';')};
+const actual=spawnSync('uv',['run','--project',apiRoot,'python','-c','import jd_editor_contract.models as m; print(m.__file__)'],{env,encoding:'utf8'});await writeFile(resolve(out,'actual-dto-import.txt'),actual.stdout+actual.stderr);if(actual.status!==0)throw Error(actual.stderr);
+const api=spawnSync('uv',['run','--project',apiRoot,'python',resolve(apiRoot,'scripts/export_web_contract.py')],{env,encoding:'utf8'});if(api.status!==0)throw Error(api.stderr||String(api.error));
+await writeFile(resolve(out,'analysis-api.ts'),await compile(JSON.parse(api.stdout),'AnalysisApi',{unreachableDefinitions:true,bannerComment:'/* Generated from actual analysis_agent.api Pydantic models. Do not edit. */'}));
+console.log('Candidate official generators and actual API export completed; active schema unchanged.');

@@ -1,0 +1,124 @@
+{
+  "checkedOn": "2026-09-10",
+  "packages": [
+    {
+      "name": "@platejs/basic-nodes",
+      "version": "53.0.0",
+      "license": "MIT",
+      "gitHead": "7b9b204e1e38a20b1f8bec5a900d67c64afbc525",
+      "url": "https://registry.npmjs.org/@platejs/basic-nodes/53.0.0"
+    },
+    {
+      "name": "@platejs/core",
+      "version": "53.3.11",
+      "license": "MIT",
+      "gitHead": "c6801761b10a81e54b8f2e91e5ecbd20414e2939",
+      "url": "https://registry.npmjs.org/@platejs/core/53.3.11"
+    },
+    {
+      "name": "@platejs/diff",
+      "version": "53.0.0",
+      "license": null,
+      "gitHead": "7b9b204e1e38a20b1f8bec5a900d67c64afbc525",
+      "url": "https://registry.npmjs.org/@platejs/diff/53.0.0"
+    },
+    {
+      "name": "@platejs/list-classic",
+      "version": "53.0.0",
+      "license": "MIT",
+      "gitHead": "7b9b204e1e38a20b1f8bec5a900d67c64afbc525",
+      "url": "https://registry.npmjs.org/@platejs/list-classic/53.0.0"
+    },
+    {
+      "name": "@platejs/resizable",
+      "version": "53.0.0",
+      "license": "MIT",
+      "gitHead": "7b9b204e1e38a20b1f8bec5a900d67c64afbc525",
+      "url": "https://registry.npmjs.org/@platejs/resizable/53.0.0"
+    },
+    {
+      "name": "@platejs/table",
+      "version": "53.0.9",
+      "license": "MIT",
+      "gitHead": "79578fd8ef53237edfc78389594df3ed5c722277",
+      "url": "https://registry.npmjs.org/@platejs/table/53.0.9"
+    },
+    {
+      "name": "@udecode/react-hotkeys",
+      "version": "52.0.11",
+      "license": "MIT",
+      "gitHead": "0a02e15d2f704bf60d28176b97c3761fe7aa4923",
+      "url": "https://registry.npmjs.org/@udecode/react-hotkeys/52.0.11"
+    },
+    {
+      "name": "jotai-x",
+      "version": "2.3.4",
+      "license": "MIT",
+      "gitHead": "11cf4bb2e565c7d1734537bea3bf947e474d9a59",
+      "url": "https://registry.npmjs.org/jotai-x/2.3.4"
+    },
+    {
+      "name": "platejs",
+      "version": "53.3.11",
+      "license": "MIT",
+      "gitHead": "c6801761b10a81e54b8f2e91e5ecbd20414e2939",
+      "url": "https://registry.npmjs.org/platejs/53.3.11"
+    },
+    {
+      "name": "react",
+      "version": "19.2.4",
+      "license": "MIT",
+      "gitHead": null,
+      "url": "https://registry.npmjs.org/react/19.2.4"
+    },
+    {
+      "name": "react-compiler-runtime",
+      "version": "1.0.0",
+      "license": "MIT",
+      "gitHead": "5c15c1cd3442f28044217703b5625f98c40042ee",
+      "url": "https://registry.npmjs.org/react-compiler-runtime/1.0.0"
+    },
+    {
+      "name": "react-dom",
+      "version": "19.2.4",
+      "license": "MIT",
+      "gitHead": null,
+      "url": "https://registry.npmjs.org/react-dom/19.2.4"
+    },
+    {
+      "name": "slate",
+      "version": "0.126.2",
+      "license": "MIT",
+      "gitHead": "ec793483ada7f7e21ebc82c2b3aa9ea674605ce3",
+      "url": "https://registry.npmjs.org/slate/0.126.2"
+    },
+    {
+      "name": "slate-dom",
+      "version": "0.126.0",
+      "license": "MIT",
+      "gitHead": "2b7d9b0bd0118e7ce9b9adeac748de8a3bbe390c",
+      "url": "https://registry.npmjs.org/slate-dom/0.126.0"
+    },
+    {
+      "name": "slate-hyperscript",
+      "version": "0.125.0",
+      "license": "MIT",
+      "gitHead": "19a7dff89a475403f64446b03fc118f2afd820f2",
+      "url": "https://registry.npmjs.org/slate-hyperscript/0.125.0"
+    },
+    {
+      "name": "slate-react",
+      "version": "0.126.4",
+      "license": "MIT",
+      "gitHead": "e06076c1935d4716f398d93aae266b9d30ae6048",
+      "url": "https://registry.npmjs.org/slate-react/0.126.4"
+    },
+    {
+      "name": "zustand-x",
+      "version": "6.2.1",
+      "license": "MIT",
+      "gitHead": "78abd51d8e3414ed3ae8c9b577ec273e91bdab4b",
+      "url": "https://registry.npmjs.org/zustand-x/6.2.1"
+    }
+  ]
+}

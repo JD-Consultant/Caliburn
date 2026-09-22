@@ -1,0 +1,138 @@
+{
+  "accessed": "2026-09-09",
+  "note": "Installed artifacts and borrowed fixed Plate material copied read-only. TypeScript source and compiled JS are not claimed byte-identical.",
+  "files": [
+    {
+      "original": "node_modules/superjson/package.json",
+      "copy": "source/installed-superjson/package.json",
+      "originalSha256": "d05ee30464bfd26bbdecdaa628b9937925f23c8d205d7db662c8b779c4ef6971",
+      "copySha256": "d05ee30464bfd26bbdecdaa628b9937925f23c8d205d7db662c8b779c4ef6971"
+    },
+    {
+      "original": "node_modules/superjson/LICENSE",
+      "copy": "source/installed-superjson/LICENSE",
+      "originalSha256": "d6b3a220bde9bf72fd0f9aecf71cd48c43ddc652abea727fc98a9b21a9534bb9",
+      "copySha256": "d6b3a220bde9bf72fd0f9aecf71cd48c43ddc652abea727fc98a9b21a9534bb9"
+    },
+    {
+      "original": "node_modules/superjson/README.md",
+      "copy": "source/installed-superjson/README.md",
+      "originalSha256": "25ac33efb2407ba318994c4cbc73d0558b5f6b01f2746164d63d81395cc851be",
+      "copySha256": "25ac33efb2407ba318994c4cbc73d0558b5f6b01f2746164d63d81395cc851be"
+    },
+    {
+      "original": "node_modules/superjson/dist/index.js",
+      "copy": "source/installed-superjson/dist/index.js",
+      "originalSha256": "232d0662f8ceafce122ccfcbe5ea6179c5acd898da2c4e6dd9f73e802da48392",
+      "copySha256": "232d0662f8ceafce122ccfcbe5ea6179c5acd898da2c4e6dd9f73e802da48392"
+    },
+    {
+      "original": "node_modules/superjson/dist/index.d.ts",
+      "copy": "source/installed-superjson/dist/index.d.ts",
+      "originalSha256": "7c11a1ba7e6c12ac8f50ba8c40b1126a154799343f135c221d0407a5f29ed6f9",
+      "copySha256": "7c11a1ba7e6c12ac8f50ba8c40b1126a154799343f135c221d0407a5f29ed6f9"
+    },
+    {
+      "original": "node_modules/superjson/dist/transformer.js",
+      "copy": "source/installed-superjson/dist/transformer.js",
+      "originalSha256": "6b5a821e2a572cdda9d2e2e00e7a6a01ea03758e20f3d42aae417f1ea1877260",
+      "copySha256": "6b5a821e2a572cdda9d2e2e00e7a6a01ea03758e20f3d42aae417f1ea1877260"
+    },
+    {
+      "original": "node_modules/superjson/dist/plainer.js",
+      "copy": "source/installed-superjson/dist/plainer.js",
+      "originalSha256": "b94448285ff7c47f47daa4137816b6ca16045c4217702825660598e14b8bb731",
+      "copySha256": "b94448285ff7c47f47daa4137816b6ca16045c4217702825660598e14b8bb731"
+    },
+    {
+      "original": "node_modules/superjson/dist/is.js",
+      "copy": "source/installed-superjson/dist/is.js",
+      "originalSha256": "cac1afcc1645724711c78eea1a8cc3137dbabdda7a035aa758fcb4a3c537ae2e",
+      "copySha256": "cac1afcc1645724711c78eea1a8cc3137dbabdda7a035aa758fcb4a3c537ae2e"
+    },
+    {
+      "original": "node_modules/superjson/dist/util.js",
+      "copy": "source/installed-superjson/dist/util.js",
+      "originalSha256": "0a44ab73cd32f5157038df95ff6ad0a8125d9fab06301c0ffc9b11ba549c6f70",
+      "copySha256": "0a44ab73cd32f5157038df95ff6ad0a8125d9fab06301c0ffc9b11ba549c6f70"
+    },
+    {
+      "original": "node_modules/copy-anything/package.json",
+      "copy": "source/installed-copy-anything/package.json",
+      "originalSha256": "7bbeb74a9f0ef8014a778412b53143d8fc2f5fd7bc55de5356c3ff53b1936af9",
+      "copySha256": "7bbeb74a9f0ef8014a778412b53143d8fc2f5fd7bc55de5356c3ff53b1936af9"
+    },
+    {
+      "original": "node_modules/copy-anything/LICENSE",
+      "copy": "source/installed-copy-anything/LICENSE",
+      "originalSha256": "91d090a8e06fd0f8b599f7bd5bc9e3d97896548037ef43ee1926c6109b7cd342",
+      "copySha256": "91d090a8e06fd0f8b599f7bd5bc9e3d97896548037ef43ee1926c6109b7cd342"
+    },
+    {
+      "original": "node_modules/copy-anything/README.md",
+      "copy": "source/installed-copy-anything/README.md",
+      "originalSha256": "01b88ae987959a379cf076f5e9ba99d6bc9b9b21bc31efcdb8f40404440a6348",
+      "copySha256": "01b88ae987959a379cf076f5e9ba99d6bc9b9b21bc31efcdb8f40404440a6348"
+    },
+    {
+      "original": "node_modules/copy-anything/dist/index.js",
+      "copy": "source/installed-copy-anything/dist/index.js",
+      "originalSha256": "4ffb0cbc0f6dd305332c43ac26f98b5bdc9dec600a74e13067f2a62ffc066431",
+      "copySha256": "4ffb0cbc0f6dd305332c43ac26f98b5bdc9dec600a74e13067f2a62ffc066431"
+    },
+    {
+      "original": "../jd-editor-review-probe/package.json",
+      "copy": "source/borrowed-review-probe/package.json",
+      "originalSha256": "f791443865af15ad0e42fc47d0159ccab7d072afd1694ac21e9e01c998aa1c7e",
+      "copySha256": "f791443865af15ad0e42fc47d0159ccab7d072afd1694ac21e9e01c998aa1c7e"
+    },
+    {
+      "original": "../jd-editor-review-probe/package-lock.json",
+      "copy": "source/borrowed-review-probe/package-lock.json",
+      "originalSha256": "dabb5e05ed949d538605f9464839dd88034da97a007214f0c81efedda7444eff",
+      "copySha256": "dabb5e05ed949d538605f9464839dd88034da97a007214f0c81efedda7444eff"
+    },
+    {
+      "original": "../jd-editor-review-probe/node_modules/@platejs/suggestion/package.json",
+      "copy": "source/borrowed-suggestion/package.json",
+      "originalSha256": "122ece31d11757b813d315acd37878576b95c10fa8014e096b734729cc2c7ae5",
+      "copySha256": "122ece31d11757b813d315acd37878576b95c10fa8014e096b734729cc2c7ae5"
+    },
+    {
+      "original": "../jd-editor-review-probe/node_modules/@platejs/suggestion/LICENSE",
+      "copy": "source/borrowed-suggestion/LICENSE",
+      "originalSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "copySha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    },
+    {
+      "original": "../jd-editor-review-probe/node_modules/@platejs/suggestion/dist/index.js",
+      "copy": "source/borrowed-suggestion/dist/index.js",
+      "originalSha256": "d5ee50eefcbbfac71bc0422f71138ba5c0e0fc3abb26fc9b6217efd6cb7a7335",
+      "copySha256": "d5ee50eefcbbfac71bc0422f71138ba5c0e0fc3abb26fc9b6217efd6cb7a7335"
+    },
+    {
+      "original": "../jd-editor-review-probe/node_modules/@platejs/suggestion/dist/index.d.ts",
+      "copy": "source/borrowed-suggestion/dist/index.d.ts",
+      "originalSha256": "568b028af5190f72f968f3cd7e940201c78b93ad63bd2e26534317fea40e452e",
+      "copySha256": "568b028af5190f72f968f3cd7e940201c78b93ad63bd2e26534317fea40e452e"
+    },
+    {
+      "original": "../jd-editor-review-probe/node_modules/@platejs/suggestion/dist/src-CMqLOrDd.js",
+      "copy": "source/borrowed-suggestion/dist/src-CMqLOrDd.js",
+      "originalSha256": "0188cba49494da891b18261cda039a56809324fd655f252d14d2a8c3e5cc1919",
+      "copySha256": "0188cba49494da891b18261cda039a56809324fd655f252d14d2a8c3e5cc1919"
+    },
+    {
+      "original": "../jd-editor-review-probe/node_modules/platejs/package.json",
+      "copy": "source/borrowed-platejs/package.json",
+      "originalSha256": "c6d4f25418a3b5e51e3f8d3a05f178d0e0273518b206cede0d713d7332f73480",
+      "copySha256": "c6d4f25418a3b5e51e3f8d3a05f178d0e0273518b206cede0d713d7332f73480"
+    },
+    {
+      "original": "../jd-editor-review-probe/node_modules/platejs/LICENSE",
+      "copy": "source/borrowed-platejs/LICENSE",
+      "originalSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "copySha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065"
+    }
+  ]
+}

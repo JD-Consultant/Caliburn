@@ -1,0 +1,107 @@
+{
+  "format": 1,
+  "journey": "undo_ai_turn",
+  "ran_at_utc": "2026-09-14T11:37:43.172486+00:00",
+  "ui_origin": "http://127.0.0.1:3002",
+  "provider_network": false,
+  "model_transport": "httpx2.MockTransport",
+  "paid_model_calls": 0,
+  "title": "整輪撤回驗收",
+  "steps": [
+    {
+      "step": 0,
+      "name": "opened",
+      "screenshot": "00-opened.png",
+      "status_chip": null
+    },
+    {
+      "step": 1,
+      "name": "created",
+      "screenshot": "01-created.png",
+      "status_chip": "讀取中",
+      "title": "整輪撤回驗收",
+      "duties_before": []
+    },
+    {
+      "step": 2,
+      "name": "ai-turn-done",
+      "screenshot": "02-ai-turn-done.png",
+      "status_chip": "已保存",
+      "duties_after": [],
+      "edit_calls": 0
+    },
+    {
+      "step": 3,
+      "name": "source-marker",
+      "screenshot": "03-source-marker.png",
+      "status_chip": "已保存",
+      "marker": "依據你說過的 1 段訪談。",
+      "open_buttons": 4
+    },
+    {
+      "step": 4,
+      "name": "source-opened",
+      "screenshot": "04-source-opened.png",
+      "status_chip": "已保存",
+      "own_words_shown": true,
+      "labels_who_said_it": true,
+      "says_the_interview_itself_does_not_change": true,
+      "no_consultant_line_claimed": true
+    },
+    {
+      "step": 5,
+      "name": "undo-offered",
+      "screenshot": "05-undo-offered.png",
+      "status_chip": "已保存",
+      "run_change_summary": "本輪 JD 改動\n\n以下是這輪已確認範圍的修改前後；查看不會更動 JD。\n\n這次比較涵蓋 1 次已保存修改。\n\n新增 · 任務：合成設備检查\n\n所屬分類、說明、名稱、順序\n\n查看完整修改前後\n\n新增 · 要求：先確認隔離再檢查\n\n所屬分類、類型、順序、內容\n\n查看完整修改前後\n\n新增 · 成果：異常交接\n\n所屬分類、類型、順序、內容\n\n查看完整修改前後\n\n新增 · 成果：檢查記錄\n\n所屬分類、類型、順序、內容\n\n查看完整修改前後\n\n加入引用 · 「先確認隔離再檢查」的依據\n\n依據對照、順序、依據、引用目標\n\n查看完整修改前後\n\n加入引用 · 「異常交接」的依據\n\n依據對照、順序、依據、引用目標\n\n查看完整修改前後\n\n加入引用 · 「檢查記錄」的依據\n\n依據對照、順序、依據、引用目標\n\n查看完整修改前後\n\n加入引用 · 「合成設備检查」的依據\n\n依據對照、順序、依據、引用目標\n\n查看完整修改"
+    },
+    {
+      "step": 6,
+      "name": "undo-explained",
+      "screenshot": "06-undo-explained.png",
+      "status_chip": "已保存",
+      "notice": "一次取回這輪對 JD 的全部改動，不是只取消最後一項。這只會改 JD：這輪的對話、工作理解與案例都會保留，歷史也保留這輪的紀錄。",
+      "duties_still_there": [
+        "合成設備检查",
+        "收到通知後檢查約定設備。",
+        "檢查記錄",
+        "異常交接",
+        "先確認隔離再檢查"
+      ]
+    },
+    {
+      "step": 7,
+      "name": "undone",
+      "screenshot": "07-undone.png",
+      "status_chip": "已保存",
+      "duties_after_undo": [],
+      "undo_call": [
+        {
+          "url": "http://127.0.0.1:8771/api/documents/228975c6-a55d-4dc3-b26e-93ad669f1dbe/jd/edits",
+          "method": "POST",
+          "body": null,
+          "status": 200,
+          "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj9FuhCAQRf9lnp1kQUTwZ8wA"
+        }
+      ]
+    },
+    {
+      "step": 8,
+      "name": "conversation-kept",
+      "screenshot": "08-conversation-kept.png",
+      "status_chip": "已保存",
+      "reply_still_shown": true,
+      "own_words_still_shown": true,
+      "turn_change_record_still_listed": true
+    }
+  ],
+  "edit_calls": [
+    {
+      "url": "http://127.0.0.1:8771/api/documents/228975c6-a55d-4dc3-b26e-93ad669f1dbe/jd/edits",
+      "method": "POST",
+      "body": null,
+      "status": 200,
+      "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj9FuhCAQRf9lnp1kQUTwZ8wAY0vKikE02Wz236t124e-3twz584TAlVauY4xwAAkWQl2PSqhW1RSBzQkCIVh73slpZ08NDDlcqc67lzWmGcYRAOFJy48e4bhCf4zpjB-xfm4OW8pNRCy3-48vzVSGtt3XiN1XUAVfItOakbbUtDaTiI4PjRHP9bHG7Fswo1u6HojUZEQaI8MjfLeKNdZ5cS5LHL6k14DIC9cqJ5DG1i2suSVz9StXPbfvPAez19-ZBddcuJ_9E5p4zHED17rVXu9vgHLVmbZ.FWJoniL8Tff2k2G"
+    }
+  ]
+}

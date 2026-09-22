@@ -1,0 +1,2268 @@
+{
+  "schema": "docs/specs/evidence/jd-contract-closure/schema-before.json",
+  "sha256": "6b42ba220c0102590dc651692be7497ae400bd713cb6f0d86fa1c5103f753f67",
+  "validator": "AJV 8.20.0",
+  "defs": 85,
+  "checks": [
+    {
+      "name": "TF01_model_overlap_source_refs",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_resolved_overlap_source_refs",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_model_overlap_colSizes",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_resolved_overlap_colSizes",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_model_overlap_marginLeft",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_resolved_overlap_marginLeft",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_model_overlap_size",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_resolved_overlap_size",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_model_overlap_colSpan",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_resolved_overlap_colSpan",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_model_overlap_rowSpan",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_resolved_overlap_rowSpan",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_model_overlap_background",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_resolved_overlap_background",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_model_overlap_borders",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_resolved_overlap_borders",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF01_disjoint_update",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF01_set_only",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF01_unset_only",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF01_empty_update_rejected",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF02_numeric_new_cell",
+      "definition": "JdNewElement",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF02_new_cell_attributes_rejected",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF02_set_attributes_rejected",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF02_unset_attributes_rejected",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF02_zero_span_rejected",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "TF02_saved_native_attributes_retained",
+      "definition": "JdSavedElement",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "TF03_move_without_repeated_sources",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": false
+    },
+    {
+      "name": "TF03_top_level_sources_rejected",
+      "definition": "JdEditModelInput",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "TF03_new_content_attached_sources",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": false
+    },
+    {
+      "name": "TF03_explicit_source_replacement",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": false
+    },
+    {
+      "name": "TF03_explicit_source_clear",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_continue",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_committed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_committed_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_continue",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_no_change_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_no_change_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_closed_invalid_input_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_invalid_input_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_invalid_input_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_invalid_input_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_invalid_input_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_invalid_input_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_unsupported_content_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_unsupported_content_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_unsupported_content_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_unsupported_content_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_unsupported_content_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_unsupported_content_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_target_missing_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_target_missing_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_target_missing_reread_current",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_target_missing_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_target_missing_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_target_missing_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_stale_base_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_stale_base_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_stale_base_reread_current",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_stale_base_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_stale_base_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_stale_base_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_engine_failed_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_engine_failed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_engine_failed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_engine_failed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_engine_failed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_engine_failed_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_save_failed_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_save_failed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_save_failed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_save_failed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_save_failed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_save_failed_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_operation_conflict_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_operation_conflict_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_operation_conflict_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_operation_conflict_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_operation_conflict_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_operation_conflict_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_busy_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_busy_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_busy_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_busy_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_busy_wait",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_closed_busy_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_unconfirmed_bound_outcome_unknown_stop",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER01_prebinding_invalid_continue",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_prebinding_invalid_correct_arguments",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_prebinding_invalid_reread_current",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_prebinding_invalid_reconcile_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_prebinding_invalid_wait",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_prebinding_invalid_stop",
+      "definition": "JdWriteResult",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER01_busy_must_not_bind_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_conflict_requires_original_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_confirmed_receipt_requires_operation",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_unknown_no_claimed_result",
+      "definition": "JdWriteResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER01_manual_uses_same_result_boundary",
+      "definition": "JdManualSaveResult",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_invalid_input_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_invalid_input_reread_current",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_invalid_input_wait",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_invalid_input_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_unsupported_content_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_unsupported_content_reread_current",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_unsupported_content_wait",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_unsupported_content_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_target_missing_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_target_missing_reread_current",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_target_missing_wait",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_target_missing_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_busy_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_busy_reread_current",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": true
+    },
+    {
+      "name": "ER02_busy_wait",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_busy_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "ER02_read_failed_correct_arguments",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_read_failed_reread_current",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_read_failed_wait",
+      "definition": "JdReadFailure",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "ER02_read_failed_stop",
+      "definition": "JdReadFailure",
+      "expected": true,
+      "actual": false
+    },
+    {
+      "name": "ER02_jd_read_infra_failure",
+      "definition": "JdReadResult",
+      "expected": true,
+      "actual": false
+    },
+    {
+      "name": "ER02_change_read_infra_failure",
+      "definition": "JdChangeReadResult",
+      "expected": true,
+      "actual": false
+    },
+    {
+      "name": "baseline_full_official_r2_still_valid",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "baseline_model_cannot_supply_id",
+      "definition": "JdEditModelInput",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "baseline_current_read_no_model_offsets",
+      "definition": "JdReadModelInput",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "baseline_read_modes_exclusive",
+      "definition": "JdReadModelInput",
+      "expected": false,
+      "actual": false
+    },
+    {
+      "name": "baseline_source_scope_is_not_a_schema_claim",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": false
+    }
+  ],
+  "errors": [
+    {
+      "name": "TF01_model_overlap_source_refs",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_resolved_overlap_source_refs",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_model_overlap_colSizes",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_resolved_overlap_colSizes",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_model_overlap_marginLeft",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_resolved_overlap_marginLeft",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_model_overlap_size",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_resolved_overlap_size",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_model_overlap_colSpan",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_resolved_overlap_colSpan",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_model_overlap_rowSpan",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_resolved_overlap_rowSpan",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_model_overlap_background",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_resolved_overlap_background",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_model_overlap_borders",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF01_resolved_overlap_borders",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF02_new_cell_attributes_rejected",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF02_set_attributes_rejected",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF02_unset_attributes_rejected",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF03_move_without_repeated_sources",
+      "expected": true,
+      "actual": false,
+      "mutated": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "source_refs"
+          },
+          "message": "must have required property 'source_refs'"
+        }
+      ]
+    },
+    {
+      "name": "TF03_top_level_sources_rejected",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "TF03_new_content_attached_sources",
+      "expected": true,
+      "actual": false,
+      "mutated": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "source_refs"
+          },
+          "message": "must have required property 'source_refs'"
+        }
+      ]
+    },
+    {
+      "name": "TF03_explicit_source_replacement",
+      "expected": true,
+      "actual": false,
+      "mutated": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "source_refs"
+          },
+          "message": "must have required property 'source_refs'"
+        }
+      ]
+    },
+    {
+      "name": "TF03_explicit_source_clear",
+      "expected": true,
+      "actual": false,
+      "mutated": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "source_refs"
+          },
+          "message": "must have required property 'source_refs'"
+        }
+      ]
+    },
+    {
+      "name": "ER01_closed_invalid_input_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_invalid_input_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_invalid_input_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_invalid_input_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_unsupported_content_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_unsupported_content_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_unsupported_content_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_unsupported_content_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_target_missing_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_target_missing_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_target_missing_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_target_missing_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_stale_base_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_stale_base_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_stale_base_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_stale_base_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_engine_failed_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_engine_failed_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_engine_failed_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_engine_failed_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_engine_failed_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_save_failed_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_save_failed_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_save_failed_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_save_failed_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_save_failed_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_operation_conflict_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_operation_conflict_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_operation_conflict_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_operation_conflict_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_operation_conflict_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_busy_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_busy_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_busy_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_closed_busy_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_invalid_input_stop",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_unsupported_content_stop",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_target_missing_stop",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_stale_base_stop",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_engine_failed_stop",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_save_failed_stop",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unconfirmed_bound_operation_conflict_stop",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_prebinding_invalid_continue",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_prebinding_invalid_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_prebinding_invalid_reconcile_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_prebinding_invalid_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_busy_must_not_bind_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_conflict_requires_original_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_confirmed_receipt_requires_operation",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_unknown_no_claimed_result",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER01_manual_uses_same_result_boundary",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_invalid_input_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_invalid_input_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_unsupported_content_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_unsupported_content_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_unsupported_content_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_target_missing_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_target_missing_wait",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_busy_correct_arguments",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_busy_reread_current",
+      "expected": false,
+      "actual": true,
+      "mutated": false,
+      "errors": null
+    },
+    {
+      "name": "ER02_read_failed_stop",
+      "expected": true,
+      "actual": false,
+      "mutated": false,
+      "errors": [
+        {
+          "instancePath": "/status",
+          "schemaPath": "#/properties/status/enum",
+          "keyword": "enum",
+          "params": {
+            "allowedValues": [
+              "invalid_input",
+              "unsupported_content",
+              "target_missing",
+              "busy"
+            ]
+          },
+          "message": "must be equal to one of the allowed values"
+        }
+      ]
+    },
+    {
+      "name": "ER02_jd_read_infra_failure",
+      "expected": true,
+      "actual": false,
+      "mutated": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "read_kind"
+          },
+          "message": "must have required property 'read_kind'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "revision_ref"
+          },
+          "message": "must have required property 'revision_ref'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "access"
+          },
+          "message": "must have required property 'access'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "fragment"
+          },
+          "message": "must have required property 'fragment'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "targets"
+          },
+          "message": "must have required property 'targets'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "selection"
+          },
+          "message": "must have required property 'selection'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "source_refs"
+          },
+          "message": "must have required property 'source_refs'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "change_refs"
+          },
+          "message": "must have required property 'change_refs'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "continuation_ref"
+          },
+          "message": "must have required property 'continuation_ref'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "document_effect"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "receipt_durability"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "error"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "next_action"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "/status",
+          "schemaPath": "#/properties/status/const",
+          "keyword": "const",
+          "params": {
+            "allowedValue": "ok"
+          },
+          "message": "must be equal to constant"
+        },
+        {
+          "instancePath": "/status",
+          "schemaPath": "#/properties/status/enum",
+          "keyword": "enum",
+          "params": {
+            "allowedValues": [
+              "invalid_input",
+              "unsupported_content",
+              "target_missing",
+              "busy"
+            ]
+          },
+          "message": "must be equal to one of the allowed values"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/oneOf",
+          "keyword": "oneOf",
+          "params": {
+            "passingSchemas": null
+          },
+          "message": "must match exactly one schema in oneOf"
+        }
+      ]
+    },
+    {
+      "name": "ER02_change_read_infra_failure",
+      "expected": true,
+      "actual": false,
+      "mutated": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "mode"
+          },
+          "message": "must have required property 'mode'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "change_ref"
+          },
+          "message": "must have required property 'change_ref'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "origin"
+          },
+          "message": "must have required property 'origin'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "before_revision_ref"
+          },
+          "message": "must have required property 'before_revision_ref'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "after_revision_ref"
+          },
+          "message": "must have required property 'after_revision_ref'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "before_fragment"
+          },
+          "message": "must have required property 'before_fragment'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "after_fragment"
+          },
+          "message": "must have required property 'after_fragment'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "native_operations"
+          },
+          "message": "must have required property 'native_operations'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "source_refs"
+          },
+          "message": "must have required property 'source_refs'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "presentation_limitations"
+          },
+          "message": "must have required property 'presentation_limitations'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "continuation_ref"
+          },
+          "message": "must have required property 'continuation_ref'"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "document_effect"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "receipt_durability"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "error"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/additionalProperties",
+          "keyword": "additionalProperties",
+          "params": {
+            "additionalProperty": "next_action"
+          },
+          "message": "must NOT have additional properties"
+        },
+        {
+          "instancePath": "/status",
+          "schemaPath": "#/properties/status/const",
+          "keyword": "const",
+          "params": {
+            "allowedValue": "ok"
+          },
+          "message": "must be equal to constant"
+        },
+        {
+          "instancePath": "/status",
+          "schemaPath": "#/properties/status/enum",
+          "keyword": "enum",
+          "params": {
+            "allowedValues": [
+              "invalid_input",
+              "unsupported_content",
+              "target_missing",
+              "busy"
+            ]
+          },
+          "message": "must be equal to one of the allowed values"
+        },
+        {
+          "instancePath": "",
+          "schemaPath": "#/oneOf",
+          "keyword": "oneOf",
+          "params": {
+            "passingSchemas": null
+          },
+          "message": "must match exactly one schema in oneOf"
+        }
+      ]
+    },
+    {
+      "name": "baseline_source_scope_is_not_a_schema_claim",
+      "expected": true,
+      "actual": false,
+      "mutated": false,
+      "errors": [
+        {
+          "instancePath": "",
+          "schemaPath": "#/required",
+          "keyword": "required",
+          "params": {
+            "missingProperty": "source_refs"
+          },
+          "message": "must have required property 'source_refs'"
+        }
+      ]
+    }
+  ],
+  "scope": "schema only; no editor, source validation, database, provider, DOM, or natural-model claim"
+}

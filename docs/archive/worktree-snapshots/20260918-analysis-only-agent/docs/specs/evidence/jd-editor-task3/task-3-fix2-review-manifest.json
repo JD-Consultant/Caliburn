@@ -1,0 +1,20 @@
+[
+  {
+    "path": "experiments/analysis-agent/README.md",
+    "sha256": "ac7cce901f96384a29b2bd1d5ca3fadcb0258ca740dc6ccfda00fc63b7f65cb5",
+    "bytes": 82601,
+    "before_sha256": "1ce975ab255d32702b8a65d4c51be277e13de8a8ca7604e002e3afaa1ade5736"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+    "sha256": "2692ad03eb861421fb3ebcdbb1176cac429b7f6c80468e41b8ced87e157e2743",
+    "bytes": 25495,
+    "before_sha256": "f8e2fbe534b4cc46c6f6bc9ab556fccea173b61393775a46661b8eabc849f255"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_fix2.py",
+    "sha256": "b38ca5b7a80339a68025bf1692aed1d9725c7a25a1c77ae3ef0e1b5a7f3ebd25",
+    "bytes": 2999,
+    "before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+]

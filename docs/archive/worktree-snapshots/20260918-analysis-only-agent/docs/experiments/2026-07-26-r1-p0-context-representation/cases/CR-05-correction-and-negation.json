@@ -1,0 +1,166 @@
+{
+  "case_id": "CR-05-correction-and-negation",
+  "case_family_id": "CR-05",
+  "source_type": "constructed_edge",
+  "title": "後續更正必須取代先前錯誤說法",
+  "primary_risk": "員工先把過去支援工作與主管核准權誤說成現行工作，後續才更正；模型可能復活舊說法或忽略否定",
+  "applicable_critical_checks": [
+    "C2_RESPONSIBILITY_BOUNDARY",
+    "C4_CORRECTION_NEGATION",
+    "C6_SOURCE_FIDELITY"
+  ],
+  "transcript": [
+    {
+      "source_id": "turn-001",
+      "role": "consultant",
+      "text": "你目前每週固定負責哪些工作？"
+    },
+    {
+      "source_id": "turn-002",
+      "role": "employee",
+      "text": "我現在每週整理庫存差異表，也會核准採購單。"
+    },
+    {
+      "source_id": "turn-003",
+      "role": "consultant",
+      "text": "請分別說明這兩項現在怎麼做，以及最後交給誰。"
+    },
+    {
+      "source_id": "turn-004",
+      "role": "employee",
+      "text": "等一下，我剛剛講錯了。庫存差異表是去年支援倉庫時做的，現在已經停掉了；採購單也不是我核准，我現在只是核對單據是否齊全，再送主管核准。"
+    },
+    {
+      "source_id": "turn-005",
+      "role": "consultant",
+      "text": "所以請你再確認一次，目前固定屬於你的責任是什麼？"
+    },
+    {
+      "source_id": "turn-006",
+      "role": "employee",
+      "text": "對，我目前固定做的是核對採購單據並送主管；庫存差異表和核准決定都不是我的現行工作。"
+    }
+  ],
+  "claim_table": [
+    {
+      "claim_id": "claim-001",
+      "speaker": "employee",
+      "literal_text": "我現在每週整理庫存差異表",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 1
+    },
+    {
+      "claim_id": "claim-002",
+      "speaker": "employee",
+      "literal_text": "也會核准採購單",
+      "source_turn_ids": [
+        "turn-002"
+      ],
+      "sequence_index": 2
+    },
+    {
+      "claim_id": "claim-003",
+      "speaker": "employee",
+      "literal_text": "等一下，我剛剛講錯了",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 3
+    },
+    {
+      "claim_id": "claim-004",
+      "speaker": "employee",
+      "literal_text": "庫存差異表是去年支援倉庫時做的",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 4
+    },
+    {
+      "claim_id": "claim-005",
+      "speaker": "employee",
+      "literal_text": "現在已經停掉了",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 5
+    },
+    {
+      "claim_id": "claim-006",
+      "speaker": "employee",
+      "literal_text": "採購單也不是我核准",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 6
+    },
+    {
+      "claim_id": "claim-007",
+      "speaker": "employee",
+      "literal_text": "我現在只是核對單據是否齊全",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 7
+    },
+    {
+      "claim_id": "claim-008",
+      "speaker": "employee",
+      "literal_text": "再送主管核准",
+      "source_turn_ids": [
+        "turn-004"
+      ],
+      "sequence_index": 8
+    },
+    {
+      "claim_id": "claim-009",
+      "speaker": "employee",
+      "literal_text": "對",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 9
+    },
+    {
+      "claim_id": "claim-010",
+      "speaker": "employee",
+      "literal_text": "我目前固定做的是核對採購單據並送主管",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 10
+    },
+    {
+      "claim_id": "claim-011",
+      "speaker": "employee",
+      "literal_text": "庫存差異表和核准決定都不是我的現行工作",
+      "source_turn_ids": [
+        "turn-006"
+      ],
+      "sequence_index": 11
+    }
+  ],
+  "relevant_span_ids": [
+    "turn-002",
+    "turn-004",
+    "turn-006"
+  ],
+  "adjudication": {
+    "must_retain_tasks": [
+      "核對採購單據是否齊全並送交主管核准"
+    ],
+    "must_not_create_tasks_from": [
+      "整理庫存差異表",
+      "核准採購單",
+      "把去年支援倉庫的工作當成現行 Task"
+    ],
+    "allowed_task_variants": [
+      "檢查採購單據完整性後送主管審批",
+      "核對採購文件並提交主管核准"
+    ],
+    "required_uncertainties": [],
+    "notes": "turn-002 是明確但已被撤回的舊說法，不能刪掉；turn-004 明示「講錯了」、過去時間、停用與責任否定；turn-006 再次確認唯一現行責任。三個 employee turns 全部列為相關片段，讓 salience arm 同時看到誤導內容與更正。claim 切分保留「現在已經停掉了」「也不是我核准」「都不是我的現行工作」等否定與時間標記；短答「對」依賴保留的顧問問句。"
+  }
+}

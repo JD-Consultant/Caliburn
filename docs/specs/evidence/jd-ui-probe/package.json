@@ -1,0 +1,18 @@
+{
+  "name": "caliburn-jd-editor-ui-probe",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "prepare-materials": "node prepare.mjs",
+    "verify": "node verify.mjs",
+    "build": "node build.mjs",
+    "serve": "node server.mjs"
+  },
+  "dependencies": {
+    "platejs": "53.3.11",
+    "@platejs/diff": "53.0.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": { "esbuild": "0.25.12" }
+}

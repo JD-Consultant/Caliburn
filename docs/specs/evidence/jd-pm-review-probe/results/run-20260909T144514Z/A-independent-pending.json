@@ -1,0 +1,2634 @@
+{
+  "id": "A-independent-pending",
+  "checks": [
+    {
+      "name": "both A and B contain pending deletion and insertion",
+      "passed": true,
+      "detail": [
+        {
+          "from": 1,
+          "to": 7,
+          "text": "每月檢查一次",
+          "mark": {
+            "type": "suggestion_delete",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "A",
+                "stage": "A:AI-initial"
+              }
+            }
+          },
+          "allMarks": [
+            {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "from": 7,
+          "to": 13,
+          "text": "每週檢查一次",
+          "mark": {
+            "type": "suggestion_insert",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "A",
+                "stage": "A:AI-initial"
+              }
+            }
+          },
+          "allMarks": [
+            {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "from": 24,
+          "to": 28,
+          "text": "通報主管",
+          "mark": {
+            "type": "suggestion_delete",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "B",
+                "stage": "B:AI-independent"
+              }
+            }
+          },
+          "allMarks": [
+            {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "from": 28,
+          "to": 38,
+          "text": "先隔離設備再通報主管",
+          "mark": {
+            "type": "suggestion_insert",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "B",
+                "stage": "B:AI-independent"
+              }
+            }
+          },
+          "allMarks": [
+            {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "doc and pending survive file JSON and new EditorState",
+      "passed": true
+    },
+    {
+      "name": "A exactly restored including attrs and sourceRefs",
+      "passed": true,
+      "detail": {
+        "type": "paragraph",
+        "attrs": {
+          "id": "task-A",
+          "scope": "例行設備檢查",
+          "sourceRefs": [
+            "utterance-1"
+          ]
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "每月檢查一次，記錄結果。"
+          }
+        ]
+      }
+    },
+    {
+      "name": "B text and pending marks exactly unchanged",
+      "passed": true,
+      "detail": {
+        "type": "paragraph",
+        "attrs": {
+          "id": "task-B",
+          "scope": "故障通報",
+          "sourceRefs": [
+            "utterance-2"
+          ]
+        },
+        "content": [
+          {
+            "type": "text",
+            "text": "故障時"
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ],
+            "text": "通報主管"
+          },
+          {
+            "type": "text",
+            "marks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ],
+            "text": "先隔離設備再通報主管"
+          },
+          {
+            "type": "text",
+            "text": "，記錄原因。"
+          }
+        ]
+      }
+    },
+    {
+      "name": "only B remains pending",
+      "passed": true,
+      "detail": [
+        {
+          "from": 18,
+          "to": 22,
+          "text": "通報主管",
+          "mark": {
+            "type": "suggestion_delete",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "B",
+                "stage": "B:AI-independent"
+              }
+            }
+          },
+          "allMarks": [
+            {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "from": 22,
+          "to": 32,
+          "text": "先隔離設備再通報主管",
+          "mark": {
+            "type": "suggestion_insert",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "B",
+                "stage": "B:AI-independent"
+              }
+            }
+          },
+          "allMarks": [
+            {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "traces": [
+    {
+      "label": "A:AI-initial",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": []
+      },
+      "requestedSteps": [
+        {
+          "stepType": "replace",
+          "from": 1,
+          "to": 7,
+          "slice": {
+            "content": [
+              {
+                "type": "text",
+                "text": "每週檢查一次"
+              }
+            ]
+          }
+        }
+      ],
+      "requestedStepClasses": [
+        "ReplaceStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每週檢查一次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 1,
+              "to": 7,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每週檢查一次"
+                  }
+                ]
+              }
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每週檢查一次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 1,
+              "to": 1,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每月檢查一次"
+                  }
+                ]
+              }
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              },
+              "from": 1,
+              "to": 7
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              },
+              "from": 7,
+              "to": 13
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep",
+            "AddMarkStep",
+            "AddMarkStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "A:AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每月檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "A:AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每週檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查一次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查一次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "B:AI-independent",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查一次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時通報主管，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查一次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requestedSteps": [
+        {
+          "stepType": "replace",
+          "from": 24,
+          "to": 28,
+          "slice": {
+            "content": [
+              {
+                "type": "text",
+                "text": "先隔離設備再通報主管"
+              }
+            ]
+          }
+        }
+      ],
+      "requestedStepClasses": [
+        "ReplaceStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_delete",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "A",
+                        "stage": "A:AI-initial"
+                      }
+                    }
+                  }
+                ],
+                "text": "每月檢查一次"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_insert",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "A",
+                        "stage": "A:AI-initial"
+                      }
+                    }
+                  }
+                ],
+                "text": "每週檢查一次"
+              },
+              {
+                "type": "text",
+                "text": "，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時先隔離設備再通報主管，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 24,
+              "to": 28,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "先隔離設備再通報主管"
+                  }
+                ]
+              }
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "A:AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每月檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "A:AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每週檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時先隔離設備再通報主管，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "steps": [
+            {
+              "stepType": "replace",
+              "from": 24,
+              "to": 24,
+              "slice": {
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "通報主管"
+                  }
+                ]
+              }
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              },
+              "from": 24,
+              "to": 28
+            },
+            {
+              "stepType": "addMark",
+              "mark": {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              },
+              "from": 28,
+              "to": 38
+            }
+          ],
+          "stepClasses": [
+            "ReplaceStep",
+            "AddMarkStep",
+            "AddMarkStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "A:AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每月檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "A",
+                            "stage": "A:AI-initial"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "每週檢查一次"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "B",
+                            "stage": "B:AI-independent"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "通報主管"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "B",
+                            "stage": "B:AI-independent"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "先隔離設備再通報主管"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查一次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "B",
+                          "stage": "B:AI-independent"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "通報主管"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "B",
+                          "stage": "B:AI-independent"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "先隔離設備再通報主管"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查一次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 24,
+            "to": 28,
+            "text": "通報主管",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 28,
+            "to": 38,
+            "text": "先隔離設備再通報主管",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "A-before-reject:new-EditorState-from-file",
+      "artifact": {
+        "file": "results/run-20260909T144514Z/A-before-reject.doc.json",
+        "sha256": "ae1379c9f35d1f2fca77bb1710dc3b42aef4b3c0baaa50e625caadb1fb3d00fd"
+      },
+      "documentEqual": true,
+      "pendingEqual": true,
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查一次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "B",
+                          "stage": "B:AI-independent"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "通報主管"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "B",
+                          "stage": "B:AI-independent"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "先隔離設備再通報主管"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查一次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 24,
+            "to": 28,
+            "text": "通報主管",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 28,
+            "to": 38,
+            "text": "先隔離設備再通報主管",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "reject:A",
+      "before": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每月檢查一次"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "A",
+                          "stage": "A:AI-initial"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "每週檢查一次"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "B",
+                          "stage": "B:AI-independent"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "通報主管"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "B",
+                          "stage": "B:AI-independent"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "先隔離設備再通報主管"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 1,
+            "to": 7,
+            "text": "每月檢查一次",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 7,
+            "to": 13,
+            "text": "每週檢查一次",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "A",
+                  "stage": "A:AI-initial"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 24,
+            "to": 28,
+            "text": "通報主管",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 28,
+            "to": 38,
+            "text": "先隔離設備再通報主管",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "requestedSteps": [
+        {
+          "stepType": "removeMark",
+          "mark": {
+            "type": "suggestion_delete",
+            "attrs": {
+              "username": "AI",
+              "data": {
+                "groupId": "A",
+                "stage": "A:AI-initial"
+              }
+            }
+          },
+          "from": 1,
+          "to": 7
+        },
+        {
+          "stepType": "replace",
+          "from": 7,
+          "to": 13
+        }
+      ],
+      "requestedStepClasses": [
+        "RemoveMarkStep",
+        "ReplaceStep"
+      ],
+      "requestedDoc": {
+        "type": "doc",
+        "content": [
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-A",
+              "scope": "例行設備檢查",
+              "sourceRefs": [
+                "utterance-1"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "每月檢查一次，記錄結果。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-B",
+              "scope": "故障通報",
+              "sourceRefs": [
+                "utterance-2"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "故障時"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_delete",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "B",
+                        "stage": "B:AI-independent"
+                      }
+                    }
+                  }
+                ],
+                "text": "通報主管"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "suggestion_insert",
+                    "attrs": {
+                      "username": "AI",
+                      "data": {
+                        "groupId": "B",
+                        "stage": "B:AI-independent"
+                      }
+                    }
+                  }
+                ],
+                "text": "先隔離設備再通報主管"
+              },
+              {
+                "type": "text",
+                "text": "，記錄原因。"
+              }
+            ]
+          },
+          {
+            "type": "paragraph",
+            "attrs": {
+              "id": "task-C",
+              "scope": "所有班別",
+              "sourceRefs": [
+                "utterance-3"
+              ]
+            },
+            "content": [
+              {
+                "type": "text",
+                "text": "參閱"
+              },
+              {
+                "type": "text",
+                "marks": [
+                  {
+                    "type": "link",
+                    "attrs": {
+                      "href": "https://example.invalid/manual-v1",
+                      "title": "原版手冊"
+                    }
+                  }
+                ],
+                "text": "設備手冊"
+              },
+              {
+                "type": "text",
+                "text": "。"
+              }
+            ]
+          }
+        ]
+      },
+      "transactions": [
+        {
+          "steps": [
+            {
+              "stepType": "removeMark",
+              "mark": {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "A",
+                    "stage": "A:AI-initial"
+                  }
+                }
+              },
+              "from": 1,
+              "to": 7
+            },
+            {
+              "stepType": "replace",
+              "from": 7,
+              "to": 13
+            }
+          ],
+          "stepClasses": [
+            "RemoveMarkStep",
+            "ReplaceStep"
+          ],
+          "doc": {
+            "type": "doc",
+            "content": [
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-A",
+                  "scope": "例行設備檢查",
+                  "sourceRefs": [
+                    "utterance-1"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "每月檢查一次，記錄結果。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-B",
+                  "scope": "故障通報",
+                  "sourceRefs": [
+                    "utterance-2"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "故障時"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_delete",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "B",
+                            "stage": "B:AI-independent"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "通報主管"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "suggestion_insert",
+                        "attrs": {
+                          "username": "AI",
+                          "data": {
+                            "groupId": "B",
+                            "stage": "B:AI-independent"
+                          }
+                        }
+                      }
+                    ],
+                    "text": "先隔離設備再通報主管"
+                  },
+                  {
+                    "type": "text",
+                    "text": "，記錄原因。"
+                  }
+                ]
+              },
+              {
+                "type": "paragraph",
+                "attrs": {
+                  "id": "task-C",
+                  "scope": "所有班別",
+                  "sourceRefs": [
+                    "utterance-3"
+                  ]
+                },
+                "content": [
+                  {
+                    "type": "text",
+                    "text": "參閱"
+                  },
+                  {
+                    "type": "text",
+                    "marks": [
+                      {
+                        "type": "link",
+                        "attrs": {
+                          "href": "https://example.invalid/manual-v1",
+                          "title": "原版手冊"
+                        }
+                      }
+                    ],
+                    "text": "設備手冊"
+                  },
+                  {
+                    "type": "text",
+                    "text": "。"
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ],
+      "after": {
+        "doc": {
+          "type": "doc",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-A",
+                "scope": "例行設備檢查",
+                "sourceRefs": [
+                  "utterance-1"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "每月檢查一次，記錄結果。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-B",
+                "scope": "故障通報",
+                "sourceRefs": [
+                  "utterance-2"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "故障時"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_delete",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "B",
+                          "stage": "B:AI-independent"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "通報主管"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "suggestion_insert",
+                      "attrs": {
+                        "username": "AI",
+                        "data": {
+                          "groupId": "B",
+                          "stage": "B:AI-independent"
+                        }
+                      }
+                    }
+                  ],
+                  "text": "先隔離設備再通報主管"
+                },
+                {
+                  "type": "text",
+                  "text": "，記錄原因。"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "attrs": {
+                "id": "task-C",
+                "scope": "所有班別",
+                "sourceRefs": [
+                  "utterance-3"
+                ]
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "參閱"
+                },
+                {
+                  "type": "text",
+                  "marks": [
+                    {
+                      "type": "link",
+                      "attrs": {
+                        "href": "https://example.invalid/manual-v1",
+                        "title": "原版手冊"
+                      }
+                    }
+                  ],
+                  "text": "設備手冊"
+                },
+                {
+                  "type": "text",
+                  "text": "。"
+                }
+              ]
+            }
+          ]
+        },
+        "pending": [
+          {
+            "from": 18,
+            "to": 22,
+            "text": "通報主管",
+            "mark": {
+              "type": "suggestion_delete",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_delete",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ]
+          },
+          {
+            "from": 22,
+            "to": 32,
+            "text": "先隔離設備再通報主管",
+            "mark": {
+              "type": "suggestion_insert",
+              "attrs": {
+                "username": "AI",
+                "data": {
+                  "groupId": "B",
+                  "stage": "B:AI-independent"
+                }
+              }
+            },
+            "allMarks": [
+              {
+                "type": "suggestion_insert",
+                "attrs": {
+                  "username": "AI",
+                  "data": {
+                    "groupId": "B",
+                    "stage": "B:AI-independent"
+                  }
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "label": "vendor-range-command-result",
+      "action": "reject",
+      "groupId": "A",
+      "range": {
+        "from": 1,
+        "to": 13
+      },
+      "returned": true,
+      "dispatchCount": 1
+    }
+  ],
+  "status": "PASS_FIXED_CASE"
+}

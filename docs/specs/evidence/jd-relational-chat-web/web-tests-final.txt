@@ -1,0 +1,12 @@
+Final complete Web test run, Node 24.19.0, no test isolation, 2026-09-13.
+Tool output was truncated; only the final counter section is retained here.
+The earlier 229-case full output is web-tests.txt.
+
+ℹ tests 233
+ℹ suites 0
+ℹ pass 233
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 558.2858

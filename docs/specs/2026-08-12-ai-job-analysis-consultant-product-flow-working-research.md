@@ -8,6 +8,8 @@
 - Framework 現況：§9.7–§9.12 已完成 persistence／runtime、Context／Skills／provider、frontend transport 與四個中立產品目的的 conformance，主方案收斂為 LangChain 1.x＋LangGraph 1.2.x；§9.19再把候選生命週期收斂為Deep Agents／LangGraph持久working draft＋application semantic review。§9.10 因重新沿用 Work Model／Focus／Progress／Proposal／Current JD 等舊概念切割 target state，已撤回並只保留為錯誤案例。施工必須以「可修訂理解、動態訪談重點、可信進度、待審文件變更、員工核准成品」等產品目的與framework primitive命名；選型先看效果、功能完整、可靠性與員工體驗，只有效果相當時才比較自寫量
 - 相關研究：[`階段式 AI 職務分析顧問 runtime/framework 研究`](2026-08-12-staged-ai-consultant-runtime-framework-research.md) 只能在本產品流程核准後評估，不得反向用框架能力定義顧問流程
 
+> **最新閱讀規則（2026-08-28）**：本文保存完整討論與翻案歷史；遇到 `Gap`、calibration、source correction、JD Evidence、`defer`、`edit-accept`、model-authored `skill_ids` 或把工作理解預先做成 JD 欄位圖等舊形狀時，不得直接施工。最新產品語意由 [Proposed ADR 0071](../adr/0071-revisable-work-understanding-context-and-review-provenance.md) 與 §9.20 之後的 owner 校正收斂，逐 task 作法見 [2026-08-28 實作計畫](../superpowers/plans/2026-08-28-consultant-work-understanding-and-workspace-implementation.md)。若歷史段落衝突，以較新的明示取代關係為準。
+
 ## 0. 這份工作稿怎麼使用
 
 這份文件用來避免長期討論遺失已確認的大方向。每次只把已對齊的內容寫成明確規則；尚未討論或仍可能翻案的內容列在「待討論」，不假裝已定案。
@@ -858,39 +860,40 @@ Skill 採 progressive disclosure：平時只保留短名稱與用途，當輪命
 
 ### 7.2 可修訂理解：AI 目前怎麼理解
 
-以 LangGraph durable state 保存 Story、Work Unit、Task／Duty hypothesis、O／P／K／S 候選、linkage、gap、矛盾、未映射線索與 retired candidate。它是可變動的分析內容，不是員工核准文件，也不建立名為 `WorkModel` 的新 domain 元件。
+以 LangGraph durable semantic state 保存 AI 對員工實際工作的**詳細目前理解**：目前成立、待釐清、矛盾、已修訂／被取代、已退休，以及確有員工來源但尚未定位的工作線索。它不是員工核准文件，不是一段濃縮聊天摘要，也不必長成 Task／Duty／O／P／K／S schema；Task、Duty 與 OPKS 是 Skills 依工作理解與專業方法形成的文件分析結果。
 
-- AI 可以依新證據新增、修正、合併、拆分、重新連結或淘汰假說；
-- 每項假說要保留穩定 identity、支持／反對證據、信心理由與生命週期狀態；
-- `employee_denied`、過去工作、他人工作、一次性支援等 retired reason 不應被一般檢索重新當成 active candidate；
-- 理解變化可以影響訪談重點與待審文件變更，但不得直接改變核准文件。
+- 已成立的工作事實只能依有效員工來源新增或修訂，並保留 stable identity、版本、來源與支持／反對／更正關係；資料缺口可形成待釐清，但不得偽造員工原話，也不為了湊 provenance 強制附 Skill 或 method／coverage 標籤；
+- 員工只能查看目前理解，不能直接編輯；發現錯誤時以普通聊天補充或更正，再由下一輪分析修訂；
+- 員工直接編輯 JD 不會同步偷改工作理解；若目前 JD 與理解不一致，顧問在下一輪比較後詢問、補充或修訂理解；
+- 單純「Task 缺 O／P／K／S」不是工作理解，只是 Skill／deterministic projection 的內部完整度訊號；
+- 理解變化可以影響 Focus、一般待釐清、必要澄清與目前 JD 的 AI 待審差異，但不得直接改變核准文件。
 
-#### 7.2.1 可演化工作假說的產品契約（2026-08-14 framework replacement 校正）
+#### 7.2.1 可演化工作理解的產品契約（2026-08-27 owner 校正）
 
-Owner 已確認採用「**typed、evidence-linked、可持續修訂的工作假說關係模型**」作為目標語意。它不是一份長得像 JD 的 AI 草稿，也不是把聊天紀錄壓成一段 memory summary；它保存的是 AI 對這位員工工作的**目前理解及其依據**。新證據可以改變任務邊界、Duty 分組、O／P／K／S linkage 與 gap，所以早期結構不能被誤當成永久分類。
+Owner 將先前「typed 工作假說關係模型」校正為「**source-linked、可持續修訂的詳細工作知識集合**」。工作理解要回答員工實際做什麼、何時／為何做、怎麼判斷、與誰協作、使用什麼、結果與例外是什麼；它可以比 JD 更詳細，但不預先把每則知識硬分類成 Task／Duty／OPKS。
 
-第一版先鎖定下列邏輯契約；LangGraph typed state／checkpoint 已由 §9.12 選為承接機制，但欄位名稱不沿用舊 Work Model schema：
+第一版邏輯契約如下；LangGraph typed state／checkpoint 承接通用 persistence，但不沿用舊 Work Model 名稱或 schema：
 
-1. **可不完整的 typed item**：Story、Work Unit、Task／Duty hypothesis、O／P／K／S 候選、gap、矛盾與未映射線索都可先存在；尚未判定為 Task／Duty／OPKS 的內容以「未映射線索」類型保留，尚未分組或尚未連到 Task 也不等於非法狀態。
-2. **穩定 identity 與修訂生命週期**：後續改名、補充、合併、拆分、重新分組或淘汰不能只靠文字相似度判斷同一性，也不能以覆寫抹除舊理解；至少要能分辨目前有效、被挑戰、被取代與有理由 retired 的版本。
-3. **一級 evidence linkage**：每項重要理解可連回一個或多個員工 source anchor，並區分支持、反對、更正或不確定；模型信心、embedding score 或任何檢索相似度不能取代來源關係。
-4. **typed domain relation**：能表達工作故事如何形成 Work Unit／Task、Task 如何暫時歸於 Duty、O／P 如何連到 Task、K／S 如何跨 Task 關聯，以及新證據如何造成 regroup、gap 或 contradiction。這些是關係語意的例子，不是先決定一套封閉 edge enum。
-5. **與文件 authority 分離**：一項理解可以比核准文件早出現、持續演化，也可以暫時與核准內容不同；只有待審 changeset 經員工 accept／edit-accept 後，framework authority transition 才能改變核准文件。員工修正 AI 理解不等於核准正式文件變更。
-6. **以 framework transition 更新、以 projection 使用**：主要顧問或按需 Skill 只能產生 typed change intent；deterministic node 驗證來源、document scope、revision／read-set 與 domain invariant 後才更新 durable state。側欄、進度、待處理集合與受限全域索引都由此投影；context-selection receipt 只記錄執行時實際選用內容，不另存一份競爭真相。
+1. **來源化的細粒度 knowledge items**：每項理解只表達一個可修訂主張或一個具體未解問題，避免一份巨大 profile 因局部更新而整份重寫。
+2. **穩定 identity 與修訂生命週期**：至少分辨目前成立、待釐清、矛盾、已被修訂／取代與有理由 retired；不能以覆寫抹除舊理解。
+3. **一級 source／provenance linkage**：目前成立的事實與來源型線索連回一個或多個員工 source／quote anchor，並區分支持、反對、更正或不確定；純資料缺口只需保存未知內容與必要的相關理解 reference，不強制附 Skill 或方法標籤。模型信心、embedding score 與檢索相似度不能取代來源，也不能把「尚未提供」偽裝成員工證詞。
+4. **JD-independent semantics**：理解保存工作本身，不以 Duty／Task／OPKS 欄位完整度定義；Skills 可從相同理解形成、拆分、重組或修訂 JD，並在資料不足時產生白話待釐清。
+5. **與文件 authority 分離**：理解可比核准文件早出現，也可暫時與目前 JD 不一致；只有員工接受 AI 差異或直接編輯，才能改變核准文件。
+6. **以 framework transition 更新、以 projection 使用**：主要顧問產生 typed understanding changes，deterministic node 驗來源、document scope 與 revision 後更新同一 semantic state；工作地圖、一般待釐清與 Context slice 都由此投影，不另建 Gap／PendingQuestion truth。
 
-「關係模型／graph」在這裡只描述**邏輯上可沿穩定 ID 與 typed relation 走訪**，不代表採用 graph database、GraphRAG、RDF ontology，亦不等於 LangGraph／其他框架的 execution graph。PostgreSQL 關聯模型、typed application model 或成熟框架的 store 都可能承接機制；是否採用要等 capability matrix 與 conformance spike，不能從 `graph` 一字反推技術選型。
+[LangGraph Memory](https://docs.langchain.com/oss/python/concepts/memory) 把 semantic memory 分成單一持續更新的 profile 與多筆窄範圍 collection，並提醒大型 profile 更新容易出錯。Caliburn 的工作理解會隨長訪談累積、局部修訂與保留衝突，因此採 collection-like typed items，而不是每輪讓模型重寫一大段「目前理解」。這是使用成熟 memory primitive 承接機制，不代表照抄通用 user-preference schema。
 
 研究佐證與可轉移限制如下：
 
 | 第一手來源 | 直接支持 | 不能據此宣稱 |
 | --- | --- | --- |
-| [U.S. OPM — Assessment and Selection](https://www.opm.gov/policy-data-oversight/assessment-and-selection/) | Job analysis 要辨識 Task、role／responsibility、competency、resources 與 context，向具直接且當前工作經驗的 SME 蒐集資料，並記錄 Task－competency linkage | OPM 沒有規定 LLM Work Model、graph schema、OPKS ontology 或資料庫技術 |
+| [U.S. OPM — Assessment and Selection](https://www.opm.gov/policy-data-oversight/assessment-and-selection/) | Job analysis 要辨識 Task、role／responsibility、competency、resources 與 context，向具直接且當前工作經驗的 SME 蒐集資料，並記錄 Task－competency linkage | OPM 沒有規定 LLM 工作理解 schema、OPKS ontology 或資料庫技術 |
 | [OpenAI Cookbook — Context Engineering for Personalization](https://developers.openai.com/cookbook/examples/agents_sdk/context_personalization/) | 以 local-first structured state 保存可修訂資訊、處理衝突與 precedence，推理時只注入相關 slice | 案例是個人化／旅遊助理，不直接證明其狀態欄位適合職務分析 |
 | [Google Cloud — Choose agentic AI architecture components](https://docs.cloud.google.com/architecture/choose-agentic-ai-architecture-components) 與 [Microsoft Agent Framework — Memory & Persistence](https://learn.microsoft.com/en-us/agent-framework/get-started/memory) | 區分 session／history、application state、long-term memory 與外部 persistence；context provider 可承接 application-specific memory | 這些是 runtime／deployment 指引，不知道 Task、Duty、OPKS、員工更正與 JD authority 的產品語意 |
-| [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents) 與 [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) | 長流程可把 structured notes／durable store 留在 context 外按需取用；LangGraph 明確區分 thread checkpoint 與 cross-thread Store | 被框架保存不會讓 structured note、Store 或 graph state 自動成為可信 evidence；State 通過 conformance 並直接成為唯一 document authority 時，可取代舊 Work Model／Current JD writer，可信性仍來自 source、schema、reducer 與 authority policy，不是儲存容器本身 |
+| [Anthropic — Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)、[LangGraph — Memory](https://docs.langchain.com/oss/python/concepts/memory) 與 [LangGraph — Persistence](https://docs.langchain.com/oss/python/langgraph/persistence) | 長流程可把 structured notes／semantic memory 留在 context 外按需取用；LangGraph 明確區分 thread checkpoint 與 Store | 被框架保存不會讓 memory／Store／graph state 自動成為可信 evidence；可信性仍來自 source、schema、reducer 與 authority policy |
 | [W3C PROV-O](https://www.w3.org/TR/prov-o/) 與 [W3C Web Annotation Data Model](https://www.w3.org/TR/annotation-model/) | 提供 derived-from、revision、quotation、primary source、invalidation，以及 quote／position selector 等可借鏡的來源與修訂語意 | W3C 不要求 Caliburn 採 RDF，也沒有定義職務分析的 domain model；position anchor 單獨使用對內容變更很脆弱 |
 
-因此，外部資料直接支持的是「**結構化狀態、可追溯來源、明確修訂、分離 runtime checkpoint、按需傳入 context**」；把它們組成上述可修訂理解，是 Caliburn 結合 OPM 職務分析原則、既有 Task／Duty／OPKS 研究與員工 authority 所作的產品推論。現階段尚無可信公開 benchmark 證明某個 memory／agent framework 能直接提升繁中職務訪談或 JD 品質，後續不得把框架功能表當成效果證據。
+因此，外部資料直接支持的是「**結構化 semantic memory、可追溯來源、明確修訂、分離 runtime checkpoint、按需傳入 Context**」；把它組成上述詳細工作理解，並由 Skills 衍生 Task／Duty／OPKS，是 Caliburn 結合 OPM、既有專業研究與員工 authority 所作的產品推論。現階段尚無可信公開 benchmark 證明某個 memory／agent framework 能直接提升繁中職務訪談或 JD 品質，後續不得把框架功能表當成效果證據。
 
 ### 7.3 核准職務文件：員工已授權的成品
 
@@ -903,12 +906,13 @@ Owner 已確認採用「**typed、evidence-linked、可持續修訂的工作假�
 
 ### 7.4 動態訪談工作：現在為何問、之後要處理什麼
 
-由 LangGraph routing／state 保存目前訪談重點、選擇原因、暫時收束條件、待處理問題、已停放線索、具體 gap、待審文件變更、進度投影與 blocked reason；不建立 `Focus`、`Progress` 或 `Agenda` 舊元件的新版複本。
+由 LangGraph routing／thread state 保存目前 Focus、選擇原因、暫時收束條件、待審文件影響與 blocked reason；具體未解語意仍是工作理解中的 unresolved／contradicted item，欄位完整度則由 Skills／deterministic projection 即時計算。不建立 `Focus`、`Progress`、`Agenda` 或獨立 Gap store 的新版複本。
 
 - 關頁、久後恢復或切換重點後能自然續談，不靠模型從聊天猜測上次談到哪裡，也不建立暫停狀態；
-- 待處理集合是 durable state 的可見工作投影，不成為第二份核准文件或第二份目前理解；
+- Focus 是可恢復、無 Evidence、不可由員工直接編輯的 attention bookmark，可指向工作理解、待釐清問題或訪談範圍，不必綁定 JD entity；
+- 待處理集合是工作理解、required clarification、pending review 與內部完整度訊號的 purpose-first projection，不成為第二份目前理解；
 - AI 預設選下一個最高價值訪談重點，員工可改道；
-- 已完成、已拒絕、已退休與 terminal unknown／not applicable 必須有理由，避免無限重問。
+- 已解決、已退休與 terminal unknown／not applicable 必須有理由，避免無限重問；員工沒有回答上一題時，原 unresolved 不自動消失。
 
 ### 7.5 Reference 是獨立知識來源，但本次升級暫不串接
 
@@ -1483,7 +1487,7 @@ Owner 已確認：**模型、provider 與底層參數由本機維護者透過版
 
 ## 9. 升級進度與下一步
 
-> **現況與閱讀順序（2026-08-22）**：產品大方向以 §1–§8 為準；框架選擇以 §9.12 為準；自然續談、舊名稱不得回流、第一版 LLM 範圍與「本次不做 RAG」以 §9.13 為準；schema／read Tool 修正見 §9.15–§9.16；VFS與Evidence機制見 §9.17–§9.18，最新候選生命週期以 §9.19 為準。§9.1.1–§9.11 是按時間保留的研究／反證歷程，其中 `Work Model`、`Focus`、`Progress`、`Proposal`、`Current JD` 等只描述被替換的舊機制，不得拿來切割target state。Accepted ADR 0060–0065保留決策歷史；run-scoped candidate、model-facing check／publication receipt與第二份pending lifecycle已由Accepted ADR 0066取代。
+> **現況與閱讀順序（2026-08-27）**：產品大方向以 §1–§8 為準；框架選擇以 §9.12 為準；自然續談、舊名稱不得回流、第一版 LLM 範圍與「本次不做 RAG」以 §9.13 為準；schema／read Tool 修正見 §9.15–§9.16；VFS／來源機制見 §9.17–§9.18；目前 JD／待審生命週期見 §9.19–§9.21；對話連續性、工作理解與未回答問題以最新 §9.22 為準。§9.1.1–§9.11 是按時間保留的研究／反證歷程，其中 `Work Model`、`Focus`、`Progress`、`Proposal`、`Current JD` 等只描述被替換的舊機制，不得拿來切割 target state。Accepted ADR 保存決策歷史；任何改變現行 authority／semantic-state 邊界的新版結論都必須由 successor ADR 明確取代，不可從歷史段落直接恢復舊機制。
 
 ### 9.1 討論與設計關卡（2026-08-14 現況）
 
@@ -2343,6 +2347,8 @@ AI 可在內部持續形成、修正或撤回暫時理解，不需要員工逐�
 
 #### 9.11.4 只新增的版本與能力差異
 
+> **2026-08-28 版本校正**：以下第 1 點是 0.13.0 的歷史實查，不再代表最新版功能。現行官方 Planning 已重新具備 stable ID、subtask／dependency、SQLite／Postgres／Redis store 與 events；最新版能力與產品適配已由[對話連續性研究 §15.19](2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md#1519-是否另建-model-owned-訪談-agenda目前基線可推翻)重查。Owner 仍決定第一版不採用，但理由已改為「與 Pattern／Unresolved／Focus／coverage 重複，沒有獨特產品責任」，不得再引用「框架沒有持久化／stable ID」作現行理由。
+
 1. **Pydantic Planning 的既有結論已被 0.13.0 推翻。** 本機以暫時環境實際安裝官方 0.13.0 後，公開模組只有 `Planning／PlanningToolset／PlanItem／TaskStatus`；`PlanItem` 只有 `content／status`，`Planning.for_run()` 每次建立隔離狀態，plan 只作 model-owned ephemeral reminder，不再提供先前研究到的 stable item ID、dependency／blocked、subtask 或 durable PlanStore。它仍可協助單一 run 的短期模型規劃，但不能直接承接跨回合訪談焦點、待處理 Gap、返回與可信進度，因此從這個目的的正式候選淘汰；不為保留舊結論而鎖舊版。[Pydantic AI Harness 0.13.0 release](https://github.com/pydantic/pydantic-ai-harness/releases/tag/v0.13.0)、[0.13.0 Planning source](https://github.com/pydantic/pydantic-ai-harness/blob/v0.13.0/pydantic_ai_harness/planning/_capability.py)
 2. **LangChain Todo 不能因同一家族就視為等價替代。** 目前 `Todo` 主要只有 `content` 與 `pending`／`in_progress`／`completed` status，`write_todos` 是整份 list replacement；它適合讓 agent 分解短期任務與顯示進度，但沒有 product-stable ID、dependency、blocked、cancelled、defer／return reason 或 correction-reopen 語意。若用 LangGraph-first，這些仍要在 typed state 中建模；若它不能忠實承接產品效果，就不能只因整合較方便或少寫程式而勝出。[LangChain Todo schema](https://reference.langchain.com/python/langchain/agents/middleware/todo/Todo)、[Todo middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)
 3. **一般 HITL 都偏向暫停目前 run，不能同時代表三種互動。** LangChain HITL、Pydantic deferred tools 與 Microsoft Workflow request／response 都能 durable 暫停、編輯或回應外部 request；Microsoft checkpoint 也會保存 pending requests。它們適合必要澄清或立即工具核准，卻不自動等於可延後、多筆並存的文件 patch review，也不等於待處理 Gap。產品應依目的選 primitive，不要求三者共享同一名稱或 storage shape。[LangChain HITL](https://docs.langchain.com/oss/python/langchain/human-in-the-loop)、[Pydantic deferred tools](https://pydantic.dev/docs/ai/tools-toolsets/deferred-tools/)、[Microsoft Agent Framework HITL](https://learn.microsoft.com/en-us/agent-framework/workflows/human-in-the-loop)
@@ -2379,10 +2385,10 @@ AI 可在內部持續形成、修正或撤回暫時理解，不需要員工逐�
 
 1. **主 runtime 收斂為 LangChain 1.x＋LangGraph 1.2.x family。** LangChain 承接 provider、tool loop、structured output、Skills／middleware 與最小 context 組裝；LangGraph 承接可恢復流程、動態訪談狀態、來源依賴、待審文件變更、必要澄清與核准 artifact 的單一 durable owner。正式版本在施工 ADR pin 到當時 stable patch。
 2. **不再為這四個目的加入 DBOS、Camunda、Microsoft Agent Framework 或另一套 memory／planning framework。** 四個效果皆通過，依 §9.11.5 stop rule，不以「可能功能更多」再堆第二個 workflow owner。若 production 才發現明確硬缺口，只針對該缺口重開候選，不翻掉已通過部分。
-3. **Pydantic AI Harness Planning 0.13.0 不進主路徑。** 它可作單次 run 的短期提醒，但實際 API 不具本產品跨回合訪談所需的 identity、dependency、blocked／defer／reopen 與 durable store。這是版本實查結果，不是偏好。
+3. **Pydantic AI Harness Planning 不進第一版主路徑。** 0.13.0 當時確實缺少 identity／dependency／durable store，但最新版已補回；現行不採用的理由不是功能不足，而是探索式訪談的 Pattern／Unresolved／Focus／coverage 已完整承接導航，另建 model-owned plan 會增加重複 writer、Tool 與 Context。最新版校正與 Owner 決定見[對話連續性研究 §15.19](2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md#1519-是否另建-model-owned-訪談-agenda目前基線可推翻)。
 4. **停止 spike，進入產品升級。** successor [ADR 0060](../adr/0060-langchain-langgraph-consultant-runtime-and-durable-authority.md) 與[受限 Big-bang implementation plan](../plans/2026-08-13-langgraph-consultant-runtime-big-bang-plan.md) 已依本文產品目的起草；owner 明確核准 ADR 後，在新 worktree 建第一條「員工回答 → 動態分析／按需 Skills → 可見焦點與 Gap → 文件 patch 審核／必要澄清 → 核准 artifact」production vertical slice。不移植 spike，也不加舊元件 compatibility layer。
 
-本節機制判斷依據為 LangGraph 官方的 [Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)、[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts) 與 [Durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)；版本淘汰依據仍是 [Pydantic AI Harness 0.13.0 release](https://github.com/pydantic/pydantic-ai-harness/releases/tag/v0.13.0) 與 [0.13.0 Planning source](https://github.com/pydantic/pydantic-ai-harness/blob/v0.13.0/pydantic_ai_harness/planning/_capability.py)。
+本節機制判斷依據為 LangGraph 官方的 [Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api)、[Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)、[Interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts) 與 [Durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)；[Pydantic AI Harness 0.13.0 release](https://github.com/pydantic/pydantic-ai-harness/releases/tag/v0.13.0) 與 [0.13.0 Planning source](https://github.com/pydantic/pydantic-ai-harness/blob/v0.13.0/pydantic_ai_harness/planning/_capability.py)只證明當時版本，最新版結論以[對話連續性研究 §15.19](2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md#1519-是否另建-model-owned-訪談-agenda目前基線可推翻)為準。
 
 ### 9.13 2026-08-14 owner 校正：自然續談、框架命名、LLM 範圍與 RAG
 
@@ -2630,6 +2636,66 @@ Owner進一步澄清：候選工作區不是單次run的暫存區，也不應等
 員工看到的是application由approved↔workspace產生的**semantic change set**，不是file diff或Tool JSON。互不相依項目可個別接受／修改後接受／拒絕／延後；Task拆分、Duty重組或跨Task／OPKS相依變更按atomic group整組決策。接受後approved與workspace重基線；拒絕項退出active draft但保留decision memory；延後項留在workspace。每個review group綁精確approved／workspace revision與digest，後續重疊改動使舊決策fail stale，避免把員工批准套到不同內容。
 
 持久workspace不等於每輪把完整JD塞進prompt；Skills、員工來源與workspace仍依目前訪談焦點按需讀取。第一版不做多workspace、版本歷史UI、auto-accept、RAG／Reference、能力級別／A、多Agent或正式eval平台。完整官方資料、方案比較、成本／checkpoint風險與施工gate見[`2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md`](2026-08-22-persistent-ai-jd-working-draft-and-semantic-review-research.md)；架構裁決見Accepted [ADR 0066](../adr/0066-persistent-ai-jd-working-draft-and-semantic-review.md)。
+
+### 9.20 共用「目前 JD」編輯面校正（2026-08-25，研究完成、待 owner 核准）
+
+後續 UI 討論釐清：VS Code 是「員工與 AI 對同一目前成果繼續編輯」的概念參考，不應被實作成兩個員工可感知的主要編輯面（正式 JD editor 與 AI working draft）再互相 rebase。建議改為一個員工可見、AI 與員工共同編輯的「目前 JD」工作副本；底層核准 baseline 保留為只讀比較與匯出 authority，待審內容由 baseline ↔ current working copy 即時計算 semantic diff，不另存第三份文件。
+
+本節是目前最新產品校正；若前面探索段落仍提到雙主要編輯面、`defer`，或由 pending review 鎖住聊天，均以本節為準。舊段落只保留為研究歷程，不得直接當成施工需求。
+
+員工直接修改時，其實際 touched semantic component 應同時成為目前值與核准值；若與 AI pending 重疊，員工 after-state 取代該範圍並解決差異，無關 pending 保留。未處理差異自然跨輪存在，不需要 `defer`；pending review 本身也不應鎖聊天，真正缺少只能由員工決定的事實或有重大衝突時，才由獨立 required clarification／LangGraph interrupt 處理。分析失敗後聊天也應保持可輸入，員工可直接用「我剛剛說錯了」等自然語句形成新來源與更正 lineage，不必在主要畫面尋找並操作舊原話。這維持「所有 LLM 文件內容須員工決定、員工直接編輯不審核自己、AI 可跨輪續編、匯出只含核准內容」的大方向。
+
+完整官方來源、方案比較、框架映射、重疊編輯語意與現行 code 差距見 [`2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md`](2026-08-25-shared-current-jd-working-copy-and-semantic-approval-research.md)。此節尚未取代 Accepted ADR 0066；owner 核准後需另開 successor ADR，不得事後改寫已接受決策。
+
+### 9.21 顧問工作區 UI、待審編輯與 OPKS 生命週期收斂（2026-08-27，白話方向已核准、書面待複核）
+
+Owner 以互動 HTML 模擬完成工作區排版、目前 JD、semantic diff、工作地圖、訪談、尚未歸屬與刪除語意的白話對齊；production 只採資訊層級與互動效果，不複製模擬碼。最新方向以 [`2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md`](2026-08-27-consultant-workspace-ui-and-pending-edit-semantics-design.md) 為完整規格，並由 Proposed [ADR 0070](../adr/0070-consultant-workspace-ui-and-explicit-pending-edit-approval.md) 等 owner 書面複核。若本節與 §9.20 的 edit-and-accept 描述衝突，以本節為目前建議；Accepted ADR 0069 在 0070 接受前仍是 production authority。
+
+收斂重點：
+
+1. 員工與 AI 仍共用一份 Store-backed「目前 JD」，approved baseline 只讀且為 export authority，review 是兩者的 derived semantic diff。
+2. 員工修改 AI 綠色 after-state 只更新 working copy，**不等於接受**；可修改同一 atomic group 多處後另按接受，才更新 approved。沒有 active AI diff 的普通員工 edit 則維持 direct authority。
+3. 寬螢幕採「訪談工作地圖｜目前 JD｜AI 顧問」三欄，左右可收合／調寬、三欄獨立滾動，composer 固定底部；中窄 Web 改單側 panel／drawer。中央只有一個主要 JD 編輯面，點 AI 差異才開就近審核控制。
+4. Duty→Task→「工作細節＋OPKS」是閱讀階層；O 是工作產出、P 是行為指標，K／S canonical item 可跨 Task 共用，A 與能力級別第一版仍不交給 AI。
+5. 分析順序不綁文件順序。O／P／K／S 可先成為有來源的待定位線索；進 JD 前才要求合法 linkage。未歸屬 Task 可帶完整 OPKS；O／P 不得脫離 Task；新的 AI K／S 至少連一個 Task 才形成待審變更，既有 K／S 因重組失去最後 link 才進「待重新連結 K／S」。
+6. Duty 是 Task 分組、Task 擁有工作細節與 O／P、K／S 是多對多 reference。解散 Duty 預設保留 Task；cascade delete 才刪 Task／O／P。刪 Task 只 unlink K／S；若要保留 O／P，就移動整個 Task 到未歸屬。
+7. Web framework 方案採現有 Next／React／Tailwind／shadcn／TanStack Query，加 Base UI 1.7.x、TanStack Form v1 與 react-resizable-panels v4；不加入 rich-text／IDE editor、XState、drag framework、第二套 agent frontend 或預先 virtualization。
+8. running 時同 document 暫停傳送；success、error 或 timeout 都解鎖。run failure 保留員工來源，可重試同一 input event或自然補充／更正；待審本身不鎖聊天。
+
+本校正不改 RAG 延後、approved-only export、單一主顧問、按需 Skills、一般待釐清／必要澄清分流、Evidence、deterministic verifier 或 framework-backed authority。現行 snapshot 尚缺 current working document projection，現行 edit-and-accept 亦不能表達「修改但仍待審」；施工前必須依 0070 新增 typed projection／command，而不是只換 CSS。
+
+### 9.22 對話連續性、未回答問題與工作理解邊界（2026-08-27，產品原則已確認）
+
+Owner 已確認兩項產品規則：第一，員工可見的「待釐清」只顯示具體、可回答且會影響工作理解或 JD 的問題；Task 單純缺 O／P／K／S 只作 Skill／deterministic projection 的內部訊號，除非它被轉成真正需要員工回答的白話問題。第二，Focus 不屬於工作理解本體，而是 LangGraph thread state 中可恢復、無 Evidence、不可由員工直接編輯的 runtime attention bookmark；它可指向工作理解、待釐清問題或訪談範圍，不必綁定 Task／Duty／OPKS。
+
+本輪官方資料與 code 稽核確認：模型不會天然記得上一輪 prompt。現行 bounded inner agent 每個 run 只以本輪員工訊息啟動，middleware 再從本地 checkpoint／Store 重建 Context；這避免把完整歷史、workspace 與 Diff 每輪重播，但若未回答問題只存在舊 consultant `next_question`，超出近期窗口後仍可能遺失。Owner 已確認：把「原顧問問句」保留在 conversation history，把「為何仍需回答」更新成工作理解中的 unresolved／contradicted item，再由工作理解投影出要問員工或要回答員工的問題。員工先回答別題時正常吸收新資料，原 unresolved 不自動 resolved，由 routing 決定何時回來；只有阻塞受影響分支且必須由員工裁決的重大歧義才提升為 required clarification。
+
+下一輪 Context 建議採「本輪完整原話＋最短近期員工／顧問雙向對話＋相關工作理解／unresolved＋Focus＋latest current-workspace orientation＋compact pending provenance＋按需來源／JD／review／Skill」，不保存或重播上一輪完整 prompt，也不另建 Gap／PendingQuestion authority。尚未處理但沒有變動的 AI after-state 已在 persistent workspace，不需以完整 Diff 重複送入；模型只需知道其 pending provenance，受新證據影響時再讀相關 `/review` details。
+
+第二輪紅隊複核發現，現行 `UnderstandingItem`、`GapItem` 與自由文字 `NextQuestion.answer_target` 仍是三套鬆散 shape；required clarification 回答後也必須明確回到一般分析以修訂工作理解。另須把 factual source／quote 與執行 tracing 分開：已成立工作事實必須有員工來源，但「資料尚未提供」不能靠捏造 quote 證明，也不強制附 Skill／method／coverage 標籤；實際載入過哪些 Skills 只屬 execution receipt。這些會改變 ADR 0060 的 semantic-state 邊界，應由 successor ADR 明確取代，不可在 implementation 中靜默改寫。完整 code audit、官方來源與最小 ADR 裁決集合見 [`2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md`](2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md) §11。
+
+Owner 進一步確認：blocking clarification 的產品名稱為「需要你的確認」，每一題必須引用 1～N 筆相關工作理解，不要求 Task、Duty、branch、quote 或 Skill ID。若衝突只在員工當前回合第一次出現，同一顧問結果先建立一筆 unresolved／contradicted 工作理解，再由確認題以 local handle 指向，application 在同一 transition 解析為 stable ID；因此不需要 0-reference 特例。純資料缺口的工作理解可以沒有員工來源，但確認題仍必須指向該理解。確認題本身的選項不是 Evidence，員工答案才是新的 source。
+
+時序建議採「本輪 safe-boundary pause」：模型先吸收所有可安全成立的理解與無關結果，停止依賴歧義的 JD 分析；deterministic transition 落盤並解析 reference 後，進入無前置 side effect 的 LangGraph wait node 顯示「需要你的確認」。員工回答後，`resume` 啟動新的正常顧問推理，先更新工作理解，再完成相依 JD 分析。這不是暫停同一段模型思考，也不是等整場訪談結束；員工可關頁後再回來回答。一般問題與 blocking 確認的分界、UI 形狀及 LangGraph／OpenAI／Claude 官方依據見同研究稿 §12。
+
+完整方案、現行 code 差距、官方來源、可轉移限制與驗收情境見 [`2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md`](2026-08-27-consultant-conversation-continuity-and-understanding-context-research.md)。此節尚未修改 Accepted ADR 或 production code；下一步應另開 successor ADR 取代 ADR 0060 中對理解／Gap／下一題的分離邊界，再更新施工計畫，不把這項語意變更混入 UI ADR 0070。
+
+### 9.23 核心 JD 欄位、彈性階層與 K／S 生命週期校正（2026-08-29，owner 已確認）
+
+本節是核心 JD schema 的最新產品基準，正式取代 §9.21 第 4～6 點中「工作細節拆欄、P 行為指標、A／能力級別保留、待重新連結 K／S」的舊候選。完整研究、跨職類壓力測試、官方來源與逐項裁決見 [`2026-08-28-llm-authored-field-contract-audit.md`](2026-08-28-llm-authored-field-contract-audit.md) §18；舊段落只保留為研究歷程，不得作 implementation authority。
+
+核心 JD 只保存員工需要閱讀、編輯、核准與匯出的穩定職務內容：
+
+1. 表頭必填職務名稱與職務目的；所屬單位／團隊、直接回報職位、管理責任及「工作關係與重要條件」只有在可靠且有資訊價值時才顯示；
+2. Duty 必填名稱／statement，可選目的或範圍說明，並可暫時有 0～N Tasks；
+3. Task 只有一段 canonical statement，可連 0～1 Duty。Action、Object、Purpose／Result、Context、frequency、responsibility role 與 enablers 留作 Work Understanding／Task Skill 分析資訊，不各自成為 JD 欄位；
+4. Task 下可有 0～N「關鍵產出」與 0～N「完成標準」，每一筆進核心 JD 時必須且只連一個 Task。成熟 Task 應能說明合理完成標準，但訪談中的 partial state 不因暫缺完成標準而被 schema 拒絕；
+5. Knowledge／Skill 在同一 JD 只保存一份 canonical item，與 Tasks 建立多對多關聯；進核心 JD 時必須連 1～N Tasks。Task 內與職務層總覽是同一資料的兩種 projection；第一版不建立跨文件 taxonomy、能力級別或 A；
+6. 訪談可以先發現 Duty、Task、成果、標準或 K／S 線索；未形成合法關聯者留在 Work Understanding／一般待釐清，不建立孤立關鍵產出、完成標準、K／S 或假的父項。只有 Task 可顯示在「尚未歸屬」；
+7. 已核准 K／S 失去最後 Task link 時，server 在同一 deterministic authority command 將它移出核心 JD，列入 dependency closure／blast radius 並提供適當 Undo／高影響確認；不建立「待重新連結 K／S」，也不以文件結構副作用自動改寫 Work Understanding；
+8. 匯出只讀 approved baseline，改用 Caliburn 自有核心 JD 格式；不保留 iCAP 公版、位置碼、A 或能力級別欄位。iCAP 只保留為研究來源之一。
+
+這項校正沒有改變上位資料流：員工訪談／歷史來源先形成可修訂且保留細節的 Work Understanding，AI 再從其萃取核心 JD；招募、KPI 與訓練是由核准 JD 派生的後續文件，不反向靜默改寫 JD。所有裁決仍依欄位稽核 §0 可由新證據提出翻案，但任何 agent／實作者不得未經 owner 討論核准自行改回舊 schema。
 
 ## 10. 本稿依據
 

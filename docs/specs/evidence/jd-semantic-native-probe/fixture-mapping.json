@@ -1,0 +1,343 @@
+{
+  "sourceFile": "file:///S:/caliburn/docs/specs/evidence/jd-official-profile-probe/results/2026-09-09T16-26-50-933Z/F02-A-canonical-input.json",
+  "sourceSha256": "1e6a468ff3d6c1d35aa56178f1b7ac236a2723d2f2f3e4a8a33b8018fa950db8",
+  "taskMapping": [
+    {
+      "task": "task-1",
+      "list": "r2-38",
+      "body": [],
+      "outcomes": [
+        "r2-35"
+      ],
+      "requirements": [
+        "r2-37"
+      ]
+    },
+    {
+      "task": "task-2",
+      "list": "r2-42",
+      "body": [],
+      "outcomes": [],
+      "requirements": [
+        "r2-41"
+      ]
+    },
+    {
+      "task": "task-3",
+      "list": "r2-49",
+      "body": [],
+      "outcomes": [
+        "r2-46"
+      ],
+      "requirements": [
+        "r2-48"
+      ]
+    },
+    {
+      "task": "task-4",
+      "list": "r2-60",
+      "body": [],
+      "outcomes": [],
+      "requirements": [
+        "r2-59"
+      ]
+    },
+    {
+      "task": "task-5",
+      "list": "r2-67",
+      "body": [],
+      "outcomes": [
+        "r2-64"
+      ],
+      "requirements": [
+        "r2-66"
+      ]
+    },
+    {
+      "task": "task-6",
+      "list": "r2-73",
+      "body": [],
+      "outcomes": [
+        "r2-70"
+      ],
+      "requirements": [
+        "r2-72"
+      ]
+    },
+    {
+      "task": "task-7",
+      "list": "r2-80",
+      "body": [
+        "r2-77"
+      ],
+      "outcomes": [],
+      "requirements": [
+        "r2-79"
+      ]
+    },
+    {
+      "task": "task-8",
+      "list": "r2-88",
+      "body": [
+        "r2-83"
+      ],
+      "outcomes": [
+        "r2-85"
+      ],
+      "requirements": [
+        "r2-87"
+      ]
+    }
+  ],
+  "itemMapping": [
+    {
+      "section": "section-knowledge",
+      "table": "knowledge-table",
+      "header": "r2-94",
+      "type": "jd_knowledge",
+      "rows": [
+        "r2-99",
+        "r2-104",
+        "r2-109",
+        "r2-114",
+        "r2-119"
+      ]
+    },
+    {
+      "section": "section-skills",
+      "table": "skills-table",
+      "header": "r2-125",
+      "type": "jd_skill",
+      "rows": [
+        "r2-130",
+        "r2-135",
+        "r2-140",
+        "r2-145",
+        "r2-150"
+      ]
+    }
+  ],
+  "syntheticLinks": {
+    "task-4": {
+      "knowledge_ids": [
+        "f03-jd_knowledge-2",
+        "f03-jd_knowledge-4"
+      ],
+      "skill_ids": [
+        "f03-jd_skill-3",
+        "f03-jd_skill-4"
+      ]
+    },
+    "task-7": {
+      "knowledge_ids": [
+        "f03-jd_knowledge-2"
+      ],
+      "skill_ids": [
+        "f03-jd_skill-3"
+      ]
+    },
+    "task-8": {
+      "knowledge_ids": [
+        "f03-jd_knowledge-5"
+      ],
+      "skill_ids": [
+        "f03-jd_skill-5"
+      ]
+    }
+  },
+  "syntheticLinksAreNotEmployeeFacts": true,
+  "retiredWrapperIds": [
+    {
+      "id": "knowledge-table",
+      "type": "table",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-94",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-91",
+      "type": "th",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-93",
+      "type": "th",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-99",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-96",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-98",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-104",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-101",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-103",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-109",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-106",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-108",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-114",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-111",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-113",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-119",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-116",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-118",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "skills-table",
+      "type": "table",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-125",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-122",
+      "type": "th",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-124",
+      "type": "th",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-130",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-127",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-129",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-135",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-132",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-134",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-140",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-137",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-139",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-145",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-142",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-144",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-150",
+      "type": "tr",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-147",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    },
+    {
+      "id": "r2-149",
+      "type": "td",
+      "reason": "fixed K/S table-to-complete-item fixture mapping; no content deleted"
+    }
+  ],
+  "preservedTextAndMarkedLeaves": true,
+  "sourceRefPolicy": "All prior source-bearing Element IDs and source_refs retained exactly; no new source facts"
+}

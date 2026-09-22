@@ -1,0 +1,128 @@
+{
+  "recorded_date": "2026-09-10",
+  "mode": "offline existing runtime; no rerun for archive",
+  "runtime_root": "S:/caliburn/.worktrees/analysis-only-agent/experiments/analysis-agent",
+  "versions": {
+    "langchain": "1.4.0",
+    "langchain_core": "1.6.2",
+    "langchain_openai": "1.6.0",
+    "openai": "3.8.0"
+  },
+  "files": [
+    {
+      "kind": "artifact",
+      "path": "docs/specs/evidence/jd-contract-schema/provider-wire-first-attempt.py",
+      "sha256": "a8477453fb4c4a296b2093e7c9444b66ac7a2030060b48d9e5166192d132a333",
+      "bytes": 3991
+    },
+    {
+      "kind": "artifact",
+      "path": "docs/specs/evidence/jd-contract-schema/provider-wire-first-output.txt",
+      "sha256": "a43c61d546844c84ae553d1f0d565c32a3433bd568a7992ec181ed179fdb7f23",
+      "bytes": 127
+    },
+    {
+      "kind": "artifact",
+      "path": "docs/specs/evidence/jd-contract-schema/provider-wire-output.txt",
+      "sha256": "9e3b766e0ecf92fd1565bb8df3c834a4d82c8f8d3986d05041056b102819e64c",
+      "bytes": 1460
+    },
+    {
+      "kind": "artifact",
+      "path": "docs/specs/evidence/jd-contract-schema/provider-wire-README.md",
+      "sha256": "7214be8542dd9243209324bff0ff9d9a151edb34e8168f899d8e5c6866374838",
+      "bytes": 4779
+    },
+    {
+      "kind": "artifact",
+      "path": "docs/specs/evidence/jd-contract-schema/provider-wire-serialize.py",
+      "sha256": "de303fdbeb7294ca6fcc6aee423234b0a1ff7682fe3e6166dda7fbc34893f4d9",
+      "bytes": 3909
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": "src/analysis_agent/provider.py",
+      "sha256": "b65aebb3d2b696bd31f2b248e9a5a3cdadce99ec9c8a613bfa943e4956408a91",
+      "bytes": 2303
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": "src/analysis_agent/runtime.py",
+      "sha256": "cc868a54e00d7eac65989efe497cab495dc0f8df7c10953449719bfeda5fc71c",
+      "bytes": 2066
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": "uv.lock",
+      "sha256": "d1804aa70a7c451fb7bc10fefd6bf9a6568fd8c88f6168cc169f90ade174c7ea",
+      "bytes": 161592
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/langchain_core/utils/function_calling.py",
+      "sha256": "5006fd0dcbb3bbe35bef7c21c87cddf4c3897520ba4bff9c60bbe29256c27838",
+      "bytes": 31880
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/langchain_core/utils/json_schema.py",
+      "sha256": "25a47b19b4514badc9c8dff24881de6f6934ed374bab6ae47ed7054acfe280e3",
+      "bytes": 9926
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/langchain_core/tools/base.py",
+      "sha256": "259da69b2ca5e171f4cc58acec2190352e7091f4d96a20158ce51feed4a78a02",
+      "bytes": 71629
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/langchain/agents/factory.py",
+      "sha256": "2e1855c669ed50df9795b1f73ca690d7664d0ef58a1c4080d0f6504076ebea97",
+      "bytes": 84827
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/langchain_openai/chat_models/base.py",
+      "sha256": "1be7c48ae74b2552001301ce471fae8e39b79d15e79d544d86cd613fd0a9d71d",
+      "bytes": 217331
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/openai/resources/responses/responses.py",
+      "sha256": "ec1c3ad5bfbda73cba3e8c731c7f4177958b35df0d2369618521420392d6bce8",
+      "bytes": 252700
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/langchain-1.4.0.dist-info/METADATA",
+      "sha256": "d8d9631bf52cba8f56b2ac636d9eb1c67a7ae3c2945dd35687579e4e92ae2247",
+      "bytes": 6191
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/langchain_core-1.6.2.dist-info/METADATA",
+      "sha256": "97c48aba419c9363fd39847fe9ed5615d9ec4262ce94cca840362a8a4f39d03d",
+      "bytes": 4787
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/langchain_openai-1.6.0.dist-info/METADATA",
+      "sha256": "9dae99b4e4c70ec86c8d8864c3e891994a65e97b08e22284fc030cacaf78d574",
+      "bytes": 3433
+    },
+    {
+      "kind": "installed-source-or-metadata",
+      "path": ".venv/Lib/site-packages/openai-3.8.0.dist-info/METADATA",
+      "sha256": "7353d467d498cd2299b3e1acab74019cabbd947ed4a8f62af54ddd0fc042a8a0",
+      "bytes": 41701
+    },
+    {
+      "kind": "schema",
+      "path": "docs/specs/contracts/jd-editor-v1.schema.json",
+      "sha256": "c1e6c8342a81050302ef2fcc182f2e422d03f6c031e337a27229970fb5ca9951",
+      "bytes": 45980,
+      "note": "Schema author confirmed no byte changes after successful serialization; referenced-def counts matched 4/61/4."
+    }
+  ]
+}

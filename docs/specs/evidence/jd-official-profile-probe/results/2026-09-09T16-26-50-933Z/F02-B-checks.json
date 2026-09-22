@@ -1,0 +1,23 @@
+{
+  "id": "F02-B",
+  "description": "修改段落與清單文字、官方表格插入及刪除一列",
+  "passed": true,
+  "checks": [
+    {
+      "name": "官方插入一列，原來各列精確保留",
+      "passed": true
+    },
+    {
+      "name": "原生刪新列後整張表的全文／格式／ID 精確回原表",
+      "passed": true
+    },
+    {
+      "name": "两處固定文字更新且其餘全稿精確保留",
+      "passed": true
+    },
+    {
+      "name": "確有原生 insert_node／remove_node，非整表替換",
+      "passed": true
+    }
+  ]
+}

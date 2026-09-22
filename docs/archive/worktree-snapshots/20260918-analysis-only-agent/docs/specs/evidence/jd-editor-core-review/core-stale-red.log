@@ -1,0 +1,32 @@
+failed to load config from S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web\vitest.config.ts
+
+⎯⎯⎯⎯⎯⎯⎯ Startup Error ⎯⎯⎯⎯⎯⎯⎯⎯
+Error: Build failed with 1 error:
+
+[plugin externalize-deps]
+Error: spawn EPERM
+    at ChildProcess.spawn (node:internal/child_process:420:11)
+    at spawn (node:child_process:787:9)
+    at Object.execFile (node:child_process:349:17)
+    at exec (node:child_process:236:25)
+    at optimizeSafeRealPathSync (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:2208:2)
+    at windowsSafeRealPathSync (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:2194:3)
+    at getRealPath (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:32048:36)
+    at tryResolveRealFileOrType (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:32042:9)
+    at tryCleanFsResolve (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:31791:21)
+    at tryFsResolve (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:31784:14)
+    at aggregateBindingErrorsIntoJsError (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:48:18)
+    at unwrapBindingResult (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/rolldown/dist/shared/error-BHRSI0R7.mjs:18:128)
+    at #build (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/rolldown/dist/shared/rolldown-build-CtPvmZgJ.mjs:3276:34)
+    at async bundleConfigFile (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:35685:17)
+    at async bundleAndLoadConfigFile (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:35593:18)
+    at async loadConfigFromFile (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:35554:42)
+    at async resolveConfig (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:35170:22)
+    at async _createServer (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vite/dist/node/chunks/node.js:25332:65)
+    at async createViteServer (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:8902:17)
+    at async createVitest (file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/node_modules/vitest/dist/chunks/cli-api.CnMVyzaz.js:14288:18) {
+  errors: [Getter/Setter]
+}
+
+
+

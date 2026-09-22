@@ -1,0 +1,105 @@
+{
+  "format": 1,
+  "checked_at_utc": "2026-09-13T00:25:45.083474+00:00",
+  "database": "caliburn_jd_setup_test_d5261157fbcc42897a9f26ef28dba317",
+  "port": 55436,
+  "mode": "REPEATABLE READ / READ ONLY",
+  "provider_calls": 0,
+  "database_writes": 0,
+  "documents": [
+    {
+      "document_id": "4c3939cb-333d-4c22-b039-7cafcc94b823",
+      "head_revision_id": "f2b16901-39eb-4541-8fa1-9e16e685aa60",
+      "head_revision_number": 7,
+      "revision_count": 7,
+      "operation_count": 6,
+      "operation_status_counts": {
+        "committed": 6
+      },
+      "content_digest": "f5907cd97fd94e1c4517c931fe65e8ce93ae3c7028469f64aa7deaeb982c3e17",
+      "counts": {
+        "duties": 1,
+        "tasks": 1,
+        "outcomes": 2,
+        "requirements": 1,
+        "knowledge": 1,
+        "skills": 0,
+        "task_capabilities": 1
+      },
+      "job_title_present": true,
+      "purpose_line_count": 2,
+      "expected_catalog_title": true,
+      "renamed_task_matches": 1,
+      "task_ids": [
+        "b3574799-1284-4fe6-be6b-3e1e4b123940"
+      ],
+      "checks": {
+        "current_equals_head_snapshot": true,
+        "history_digest_and_parent_chain": true,
+        "operations_match_exact_result_revisions": true,
+        "unique_operation_ids_and_relation_pairs": true,
+        "relations_resolve_within_document": true
+      },
+      "history_counts": [
+        {
+          "revision": 1,
+          "tasks": 0,
+          "details": 0,
+          "capabilities": 0
+        },
+        {
+          "revision": 2,
+          "tasks": 0,
+          "details": 0,
+          "capabilities": 0
+        },
+        {
+          "revision": 3,
+          "tasks": 0,
+          "details": 0,
+          "capabilities": 0
+        },
+        {
+          "revision": 4,
+          "tasks": 0,
+          "details": 0,
+          "capabilities": 0
+        },
+        {
+          "revision": 5,
+          "tasks": 0,
+          "details": 0,
+          "capabilities": 1
+        },
+        {
+          "revision": 6,
+          "tasks": 1,
+          "details": 3,
+          "capabilities": 1
+        },
+        {
+          "revision": 7,
+          "tasks": 1,
+          "details": 3,
+          "capabilities": 1
+        }
+      ],
+      "baseline_task": {
+        "id": "b3574799-1284-4fe6-be6b-3e1e4b123940",
+        "has_duty": true,
+        "outcomes": 2,
+        "requirements": 1,
+        "knowledge_links": 1,
+        "same_id_retained_across_rename": true
+      }
+    }
+  ],
+  "checks": {
+    "unique_creation_request_keys": true,
+    "baseline_document_present": true,
+    "all_document_consistency_checks": true
+  },
+  "snapshot_at_utc": "2026-09-13T00:25:45.106307+00:00",
+  "document_count": 1,
+  "passed": true
+}

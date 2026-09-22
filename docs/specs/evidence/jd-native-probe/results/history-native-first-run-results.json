@@ -1,0 +1,79 @@
+{
+  "topic": "JD-R002/C03",
+  "executedAt": "2026-09-09T13:40:20.651Z",
+  "node": "v22.12.0",
+  "versions": {
+    "platejs": "53.3.11",
+    "@platejs/core": "53.3.11",
+    "@platejs/slate": "53.3.10",
+    "slate": "0.126.2",
+    "react": "19.2.4"
+  },
+  "installedDependencies": false,
+  "passedAssertions": 7,
+  "failedAssertions": 1,
+  "countsAreCharacterizationNotUniversalCapability": true,
+  "results": [
+    {
+      "id": "H01",
+      "expectation": "同基底原生批次重播至第二個 React Plate editor，JSON／ID 與 undo／redo 往返一致",
+      "classification": "positive-with-fixed-baseline",
+      "assertionPassed": false,
+      "error": "AssertionError [ERR_ASSERTION]: Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  [\n    {\n      children: [\n        {\n          bold: true,\n...\n      ],\n+     id: 'history-new-2',\n-     id: 'history-new-1',\n      type: 'p'\n    }\n  ]\n\n    at file:///S:/caliburn/.research-tmp/jd-editor-native-probe/history-probe.mjs:65:10\n    at async record (file:///S:/caliburn/.research-tmp/jd-editor-native-probe/history-probe.mjs:31:9)\n    at async file:///S:/caliburn/.research-tmp/jd-editor-native-probe/history-probe.mjs:38:1"
+    },
+    {
+      "id": "H02",
+      "expectation": "withNewBatch 只隔開 AI 前方；相鄰人改仍與 AI 合併，第一次 undo 一起移除",
+      "classification": "confirmed-counterexample",
+      "assertionPassed": true
+    },
+    {
+      "id": "H03",
+      "expectation": "AI 後 setSplittingOnce(true) 使緊接人改獨立；原生 undo／redo 三批內容正確",
+      "classification": "positive-headless-only",
+      "assertionPassed": true
+    },
+    {
+      "id": "H04",
+      "expectation": "setValue 是可 undo 的根節點替換；保留舊 undo、清掉既有 redo",
+      "classification": "confirmed-setter-limitation",
+      "assertionPassed": true
+    },
+    {
+      "id": "H05",
+      "expectation": "reset 預設清內容與兩個 history stacks；undo／redo 都不還原先前文件",
+      "classification": "confirmed-reset-limitation",
+      "assertionPassed": true
+    },
+    {
+      "id": "H06",
+      "expectation": "withoutSaving(setValue) 不重算舊 undo；undo 在新文件錯位刪字，redo 也不復原外部稿",
+      "classification": "confirmed-counterexample",
+      "assertionPassed": true
+    },
+    {
+      "id": "H07",
+      "expectation": "原生 apply 中途無效 path 拋錯留下部分 AI 與無效 history，undo 再拋錯不能回復",
+      "classification": "confirmed-counterexample-disposable-editor",
+      "assertionPassed": true
+    },
+    {
+      "id": "H08",
+      "expectation": "withoutSaving callback 拋錯後續人改仍無 undo 紀錄；undo 只撤銷舊字",
+      "classification": "confirmed-counterexample-disposable-editor",
+      "assertionPassed": true
+    }
+  ],
+  "originalEvidenceHashesUnchanged": {
+    "probe.mjs": "ea175eba8b4f0df6d3379a769d93043cca0f5ca28c269413fe4ee13d33af2393",
+    "observe-native.mjs": "4474cb628352a34af33951820c836f6049d013812a29f2d396d582d77f8d8145",
+    "results/native-results.json": "0a69554b22ed13764e7d47093e2b91210a437bd9ae6f3b94622a91c57ea3c06f",
+    "results/native-observation.json": "c7dcbdaed191127cacdff4c5010698907b385aff31e0cc534a1f735ceac27675"
+  },
+  "limitations": [
+    "Same fixed baseline/schema only; no stale state, rebasing, transport retries, or database.",
+    "React Plate editor is instantiated headlessly; no DOM/selection/IME acceptance.",
+    "History is session-local; no history persistence claimed.",
+    "Confirmed counterexamples remain; no framework or history repair."
+  ]
+}

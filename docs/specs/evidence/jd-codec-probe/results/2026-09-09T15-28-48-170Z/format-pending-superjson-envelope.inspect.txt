@@ -1,0 +1,31 @@
+{
+  json: [
+    {
+      type: 'p',
+      id: 'format',
+      children: [
+        {
+          text: '保留必要的完成要求。',
+          suggestion_rm9Phr880yMQ8618GBc4W: {
+            id: 'rm9Phr880yMQ8618GBc4W',
+            createdAt: 1788967728210,
+            properties: {
+              bold: null
+            },
+            type: 'update',
+            userId: 'ai'
+          },
+          suggestion: true
+        }
+      ]
+    }
+  ],
+  meta: {
+    values: {
+      '0.children.0.suggestion_rm9Phr880yMQ8618GBc4W.properties.bold': [
+        'undefined'
+      ]
+    },
+    v: 1
+  }
+}

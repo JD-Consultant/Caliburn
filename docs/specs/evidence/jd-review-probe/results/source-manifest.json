@@ -1,0 +1,145 @@
+{
+  "accessed": "2026-09-09",
+  "sourceCommit": "cee7a4ec0328718d8cf147094466b597215f5406",
+  "note": "Selected official source/tests and installed dist copied read-only; package tag/current-source comparison was recorded by parent separately.",
+  "files": [
+    {
+      "file": "source\\official-fixed\\package.json",
+      "originalSha256": "546ede6936912047ba57a5335729a0e6abbbcf0c2df10a2b047b559ddb5ed621",
+      "archivedSha256": "546ede6936912047ba57a5335729a0e6abbbcf0c2df10a2b047b559ddb5ed621",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/package.json"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\BaseSuggestionPlugin.ts",
+      "originalSha256": "c1ccee31b1d4c90ddea81e5f720daa5ac9b8886be8855f890e22b311bb532138",
+      "archivedSha256": "c1ccee31b1d4c90ddea81e5f720daa5ac9b8886be8855f890e22b311bb532138",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/BaseSuggestionPlugin.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\withSuggestion.ts",
+      "originalSha256": "05165dfe693427c6abbae1c117809a33b3e640134ee803cfea8e0853b32bd23a",
+      "archivedSha256": "05165dfe693427c6abbae1c117809a33b3e640134ee803cfea8e0853b32bd23a",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/withSuggestion.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\queries\\findSuggestionProps.ts",
+      "originalSha256": "4c0762729478211b274817116d9a9f7e2dfbae2409a05f997559f2e10012a22c",
+      "archivedSha256": "4c0762729478211b274817116d9a9f7e2dfbae2409a05f997559f2e10012a22c",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/queries/findSuggestionProps.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\insertTextSuggestion.ts",
+      "originalSha256": "fee92f96066a743037d3153d27305b36839cd52372c7ad40f7ec01b164bc60ff",
+      "archivedSha256": "fee92f96066a743037d3153d27305b36839cd52372c7ad40f7ec01b164bc60ff",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/insertTextSuggestion.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\deleteFragmentSuggestion.ts",
+      "originalSha256": "6215d41c96c7e80fd72d27c8330a18aced8969199c0aad409596881fa47e7e73",
+      "archivedSha256": "6215d41c96c7e80fd72d27c8330a18aced8969199c0aad409596881fa47e7e73",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/deleteFragmentSuggestion.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\deleteSuggestion.ts",
+      "originalSha256": "074bd36a764405489bd8af658127a10c7fbfa6cbb73c5458107138ad633c278f",
+      "archivedSha256": "074bd36a764405489bd8af658127a10c7fbfa6cbb73c5458107138ad633c278f",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/deleteSuggestion.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\removeMarkSuggestion.ts",
+      "originalSha256": "9dca2a73eb7f2abc198cd849c2aab7e2a46e3a9f0d446629bf1c3715af3678a8",
+      "archivedSha256": "9dca2a73eb7f2abc198cd849c2aab7e2a46e3a9f0d446629bf1c3715af3678a8",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/removeMarkSuggestion.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\removeMarkSuggestion.spec.tsx",
+      "originalSha256": "5acf003d805040fd226f5a6afb68c6834c445a0b361bcbabcdad7db6021c8ee1",
+      "archivedSha256": "5acf003d805040fd226f5a6afb68c6834c445a0b361bcbabcdad7db6021c8ee1",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/removeMarkSuggestion.spec.tsx"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\acceptSuggestion.ts",
+      "originalSha256": "c3f06cb1dd97f793644367b9a9814ccb7c6165c654849e274b13fa680ac6915c",
+      "archivedSha256": "c3f06cb1dd97f793644367b9a9814ccb7c6165c654849e274b13fa680ac6915c",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/acceptSuggestion.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\rejectSuggestion.ts",
+      "originalSha256": "017a3571802e9e1d9f4e393cf67983bcd65529a8bb64feb14e05fca6b61b2c20",
+      "archivedSha256": "017a3571802e9e1d9f4e393cf67983bcd65529a8bb64feb14e05fca6b61b2c20",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/rejectSuggestion.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\utils\\getSuggestionKeys.ts",
+      "originalSha256": "56bc7eb1e2e0c7b8cb184b4f83cd9b6c86da4442d69e0a380578cc705b15848f",
+      "archivedSha256": "56bc7eb1e2e0c7b8cb184b4f83cd9b6c86da4442d69e0a380578cc705b15848f",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/utils/getSuggestionKeys.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\utils\\getSuggestionId.ts",
+      "originalSha256": "95b481d77ef4ebfe4356ffd4a29011655fedd7ef3a29b72ee7b350f4e510ed6d",
+      "archivedSha256": "95b481d77ef4ebfe4356ffd4a29011655fedd7ef3a29b72ee7b350f4e510ed6d",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/utils/getSuggestionId.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\setSuggestionNodes.ts",
+      "originalSha256": "611159bd7eec6cf5a733aa3109538cd88c120a3c258857d5840d655abe0478b7",
+      "archivedSha256": "611159bd7eec6cf5a733aa3109538cd88c120a3c258857d5840d655abe0478b7",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/setSuggestionNodes.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\getSuggestionProps.ts",
+      "originalSha256": "5489aca45dd476acdc3566462cefb562d01c3b77c1f7cbd7772049bfeb0b506f",
+      "archivedSha256": "5489aca45dd476acdc3566462cefb562d01c3b77c1f7cbd7772049bfeb0b506f",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/getSuggestionProps.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\transforms\\insertFragmentSuggestion.ts",
+      "originalSha256": "779fff3d821d0d11b727745c948c106f584d2f0bd591677cc29e550bf4582369",
+      "archivedSha256": "779fff3d821d0d11b727745c948c106f584d2f0bd591677cc29e550bf4582369",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/transforms/insertFragmentSuggestion.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\lib\\types.ts",
+      "originalSha256": "948c47401549e22ed873b55d9cfc50607bed548dc1457e4fe811ac2ef76050b2",
+      "archivedSha256": "948c47401549e22ed873b55d9cfc50607bed548dc1457e4fe811ac2ef76050b2",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/types.ts"
+    },
+    {
+      "file": "source\\official-fixed\\src\\react\\SuggestionPlugin.tsx",
+      "originalSha256": "57d48a313eaee2e98c534474ae17b82fbb39dacbf53f9bcf28dc23c022e88ea5",
+      "archivedSha256": "57d48a313eaee2e98c534474ae17b82fbb39dacbf53f9bcf28dc23c022e88ea5",
+      "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/react/SuggestionPlugin.tsx"
+    },
+    {
+      "file": "source\\installed-suggestion\\package.json",
+      "originalSha256": "122ece31d11757b813d315acd37878576b95c10fa8014e096b734729cc2c7ae5",
+      "archivedSha256": "122ece31d11757b813d315acd37878576b95c10fa8014e096b734729cc2c7ae5",
+      "package": "@platejs/suggestion@53.2.3"
+    },
+    {
+      "file": "source\\installed-suggestion\\LICENSE",
+      "originalSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "archivedSha256": "8b649e3569682298f50ed2048210e8f528034feb56f5d43a9977a7d60b0f7065",
+      "package": "@platejs/suggestion@53.2.3"
+    },
+    {
+      "file": "source\\installed-suggestion\\dist\\index.js",
+      "originalSha256": "d5ee50eefcbbfac71bc0422f71138ba5c0e0fc3abb26fc9b6217efd6cb7a7335",
+      "archivedSha256": "d5ee50eefcbbfac71bc0422f71138ba5c0e0fc3abb26fc9b6217efd6cb7a7335",
+      "package": "@platejs/suggestion@53.2.3"
+    },
+    {
+      "file": "source\\installed-suggestion\\dist\\index.d.ts",
+      "originalSha256": "568b028af5190f72f968f3cd7e940201c78b93ad63bd2e26534317fea40e452e",
+      "archivedSha256": "568b028af5190f72f968f3cd7e940201c78b93ad63bd2e26534317fea40e452e",
+      "package": "@platejs/suggestion@53.2.3"
+    },
+    {
+      "file": "source\\installed-suggestion\\dist\\src-CMqLOrDd.js",
+      "originalSha256": "0188cba49494da891b18261cda039a56809324fd655f252d14d2a8c3e5cc1919",
+      "archivedSha256": "0188cba49494da891b18261cda039a56809324fd655f252d14d2a8c3e5cc1919",
+      "package": "@platejs/suggestion@53.2.3"
+    }
+  ]
+}

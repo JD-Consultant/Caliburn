@@ -1,0 +1,9 @@
+{
+  "database": "jd_editor_probe_p01_20260909",
+  "host": "127.0.0.1",
+  "port": "55433",
+  "version": "PostgreSQL 16.14 (Debian 16.14-1.pgdg13+1) on x86_64-pc-linux-gnu, compiled by gcc (Debian 14.2.0-19) 14.2.0, 64-bit",
+  "initial_public_tables": [],
+  "created_by_this_probe": true,
+  "credential_source": "existing local configuration; not archived"
+}

@@ -1,0 +1,51 @@
+diff --git a/experiments/jd-editor/web/src/jd/useJdSession.ts b/experiments/jd-editor/web/src/jd/useJdSession.ts
+index 353583b3..d3dffd20 100644
+--- a/experiments/jd-editor/web/src/jd/useJdSession.ts
++++ b/experiments/jd-editor/web/src/jd/useJdSession.ts
+@@ -80,6 +80,35 @@ export class JdSession {
+     this.dirty = false;
+     this.text = "";
+   }
++  /** Explicitly discard only the visible buffer after the saved read succeeds. */
++  async loadSavedHead() {
++    if (this.locked) return false;
++    this.busy = true;
++    const generation = ++this.generation;
++    ++this.recoverySequence;
++    this.emit();
++    try {
++      const head = await this.port.read(this.document);
++      if (this.disposed || generation !== this.generation) return false;
++      this.onHead?.(head, null);
++      this.head = head;
++      this.value = structuredClone(head.fragment) as JdDocumentValue;
++      this.dirty = false;
++      this.change = null;
++      this.error = "";
++      this.notice = this.candidate
++        ? "已載入最新保存稿；先前送出的候選仍在下方，可複製需要的文字到目前稿。未送出聊天也已保留。"
++        : "已載入最新保存稿；未送出聊天已保留。";
++      return true;
++    } catch (error) {
++      if (!this.disposed && generation === this.generation)
++        this.error = "無法載入保存稿，畫面修改與聊天仍保留：" + String(error);
++      return false;
++    } finally {
++      this.busy = false;
++      this.emit();
++    }
++  }
+   mount(listener: () => void) {
+     this.disposed = false;
+     this.onChange = listener;
+@@ -303,7 +332,9 @@ export class JdSession {
+           this.change = await this.port.changes(this.document, {
+             change_ref: receipt.change_ref,
+           });
+-        this.notice = "已保存";
++        this.notice = this.dirty
++          ? "先前候選已保存；畫面上的修改尚未保存，仍以舊版為基準。請先處理，再載入最新保存稿。"
++          : "已保存";
+         return true;
+       }
+       this.error =

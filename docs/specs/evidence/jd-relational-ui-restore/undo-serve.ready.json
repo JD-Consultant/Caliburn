@@ -1,0 +1,14 @@
+{
+  "pid": 25636,
+  "parent_pid": 60820,
+  "status": "ready",
+  "api_origin": "http://127.0.0.1:8771",
+  "ui_origin": "http://127.0.0.1:3002",
+  "dataset_id": "a2e41eb7-4163-426d-8a1a-18ecc74229fc",
+  "installation_id": "57f50475-47d3-45f8-bb2b-592208ec759e",
+  "database": "caliburn_jd_setup_test_d5277a09222644918f94616342df0a29",
+  "chat_enabled": true,
+  "provider_network": false,
+  "model_transport": "httpx2.MockTransport",
+  "expected_model_requests": 4
+}

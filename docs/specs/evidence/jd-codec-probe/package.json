@@ -1,0 +1,7 @@
+{
+  "name": "caliburn-jd-editor-codec-probe",
+  "private": true,
+  "type": "module",
+  "scripts": { "probe": "node codec-probe.mjs" },
+  "dependencies": { "superjson": "2.2.6" }
+}

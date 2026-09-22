@@ -1,0 +1,2 @@
+{"sent_message_stop": false, "sdk_returned_snapshot": true, "stop_reason": "end_turn"}
+{"sent_message_stop": true, "sdk_returned_snapshot": true, "stop_reason": "end_turn"}

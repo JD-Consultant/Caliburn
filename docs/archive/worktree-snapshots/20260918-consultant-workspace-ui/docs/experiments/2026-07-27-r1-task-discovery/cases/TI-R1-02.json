@@ -1,0 +1,40 @@
+{
+  "schema_id": "professional-consultant-r1-case.v1",
+  "case_id": "TI-R1-02",
+  "case_revision": 1,
+  "source_type": "constructed_edge",
+  "case_family_id": "TI-R1-02",
+  "primary_risk": "唯一的正向案例：工具相關工作具備獨立 outcome 時應該成立 Task，卻因為過度擬合「看到工具就排除」而被漏掉",
+  "locked_regression_anchor": true,
+  "sources": [
+    {
+      "source_id": "turn-001",
+      "source_kind": "employee_turn",
+      "speaker": "employee",
+      "text": "我每季主責 Java 執行環境升級，要先做相容性驗證、排停機時間，最後確認服務都恢復。"
+    }
+  ],
+  "expected": {
+    "required_behaviors": [
+      "形成一個以升級結果為核心的 Task，例如規劃並執行執行環境升級以維持相容性與可用性",
+      "Java 被視為對象或技術條件，不是 Task 成立的理由",
+      "相容性驗證、排停機時間、確認服務恢復視為同一 Task 的步驟",
+      "下一問確認責任範圍或成功標準，不再重問已經講明的頻率"
+    ],
+    "forbidden_behaviors": [
+      "因為句中出現工具名稱就一律不建立 Task",
+      "把相容性驗證、排停機時間、確認服務恢復拆成三個獨立 Task",
+      "產生以「Java」為主體的 Task"
+    ],
+    "common_applicable_rubric_dimensions": [
+      "meaningful_outcome",
+      "employee_responsibility",
+      "assignability_checkability",
+      "stability_formal_low_frequency",
+      "merge_split_boundary",
+      "source_grounding",
+      "next_question_value"
+    ],
+    "full_harness_only_dimensions": []
+  }
+}

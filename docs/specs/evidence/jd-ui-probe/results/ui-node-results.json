@@ -1,0 +1,132 @@
+{
+  "executedAt": "2026-09-09T13:24:08.084Z",
+  "node": "v22.12.0",
+  "newProcessReadFromDisk": true,
+  "passed": 29,
+  "failed": 0,
+  "knownNativeDiffFailures": 2,
+  "checks": [
+    {
+      "name": "完整 r2 原文逐字保留（只移除原稿 Markdown 標記及空白）",
+      "pass": true
+    },
+    {
+      "name": "手寫 fixture 經原生初始化仍保持完整乾淨值",
+      "pass": true
+    },
+    {
+      "name": "包含 3 張真表格與至少一層 ul/li 子清單",
+      "pass": true
+    },
+    {
+      "name": "full-r2：保存後全新程序/editor 重開精確相等",
+      "pass": true
+    },
+    {
+      "name": "full-r2：原生 computeDiff 未改動乾淨快照",
+      "pass": true
+    },
+    {
+      "name": "full-r2：真實 operation 批次保存且回呼後清空",
+      "pass": true
+    },
+    {
+      "name": "full-r2/before：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "full-r2/after：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "full-r2/diff：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "leaf-score-zero：保存後全新程序/editor 重開精確相等",
+      "pass": true
+    },
+    {
+      "name": "leaf-score-zero：原生 computeDiff 未改動乾淨快照",
+      "pass": true
+    },
+    {
+      "name": "leaf-score-zero：真實 operation 批次保存且回呼後清空",
+      "pass": true
+    },
+    {
+      "name": "leaf-score-zero/before：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "leaf-score-zero/after：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "leaf-score-zero/diff：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "empty-mark：保存後全新程序/editor 重開精確相等",
+      "pass": true
+    },
+    {
+      "name": "empty-mark：原生 computeDiff 未改動乾淨快照",
+      "pass": true
+    },
+    {
+      "name": "empty-mark：真實 operation 批次保存且回呼後清空",
+      "pass": true
+    },
+    {
+      "name": "empty-mark/before：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "empty-mark/after：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "empty-mark/diff：真正 React Plate SSR 有 Slate readonly editor",
+      "pass": true
+    },
+    {
+      "name": "同 ID 屬性＋文字雙改：原生刪／增兩節點均保留",
+      "pass": true
+    },
+    {
+      "name": "SSR 同 ID：兩個 data-fixture-id 與新舊正文均輸出",
+      "pass": true
+    },
+    {
+      "name": "SSR before/after 全部文字節點均實際輸出，不只是資料留存",
+      "pass": true
+    },
+    {
+      "name": "SSR before/after/diff 全部有 3 張 table/tbody、tr/td 及真子清單",
+      "pass": true
+    },
+    {
+      "name": "原生 element 更新保留 0/false/object/移除；說明輸出不丟 undefined",
+      "pass": true
+    },
+    {
+      "name": "已知反例仍成立：leaf 0 在乾淨值與 set_node 都精確，diff 卻是 undefined",
+      "pass": true
+    },
+    {
+      "name": "已知反例仍成立：empty bold→italic 有保存的 set_node，diff 沒有 operation",
+      "pass": true
+    },
+    {
+      "name": "重算前後重新讀取的磁碟保存材料位元未變",
+      "pass": true
+    }
+  ],
+  "limitations": [
+    "SSR is not browser DOM/visual acceptance.",
+    "Two known native diff failures remain unrepaired.",
+    "Finite readonly renderer only; no general editor/schema/diff/rollback.",
+    "Saved files are research fixture materials, not production durable authority."
+  ]
+}

@@ -1,0 +1,109 @@
+{
+  "probe": "P01-fixed-python-node-postgresql",
+  "database": "jd_editor_probe_p01_20260909",
+  "engine_profile": "platejs@53.3.11/reuseId:true/initialValueIds:always",
+  "started_at": "2026-09-09T14:11:39.596989+00:00",
+  "fixture": {
+    "sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4",
+    "counts": {
+      "root_nodes": 43,
+      "elements": 174,
+      "text_leaves": 102,
+      "characters": 2133,
+      "ids": 174,
+      "unique_ids": 174
+    }
+  },
+  "scenarios": {
+    "fullr2_save_reopen_and_receipt": {
+      "document_id": "p01-fullr2-a85372dd-26f5-4e7d-8b76-6f1485744da3",
+      "operation_id": "p01-fullr2-ai-save",
+      "before_sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4",
+      "after_sha256": "ebe183e49a827ec8398d42c30c28184ca072ffbde712f68f7d2e57990570c7d3",
+      "before_counts": {
+        "root_nodes": 43,
+        "elements": 174,
+        "text_leaves": 102,
+        "characters": 2133,
+        "ids": 174,
+        "unique_ids": 174
+      },
+      "after_counts": {
+        "root_nodes": 43,
+        "elements": 174,
+        "text_leaves": 102,
+        "characters": 2144,
+        "ids": 174,
+        "unique_ids": 174
+      },
+      "table_counts": {
+        "heads": 1,
+        "revisions": 2,
+        "operations": 1
+      },
+      "same_operation": "same receipt; no new rows",
+      "same_id_different_payload": "rejected",
+      "saved_value_query": "SELECT value FROM jd_revision WHERE document_id = <document_id> AND revision = 2"
+    },
+    "partial_bridge_failure": {
+      "document_id": "p01-partial-f73d13bd-d8f1-4283-a9ba-47ba0a7b3f27",
+      "error": {
+        "code": "target_missing",
+        "command_index": 1
+      },
+      "before_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "after_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "durable_effect": "none"
+    },
+    "transaction_rollback": {
+      "document_id": "p01-rollback-129c97a1-791b-48dd-b082-08f723d71be5",
+      "fault_at": "after_head",
+      "before_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "after_counts": {
+        "heads": 1,
+        "revisions": 1,
+        "operations": 0
+      },
+      "head_sha256": "e5d0e9d758c3fc1aae1b8f63564e39755685617f6404e845ff30a8095f7f44c4"
+    },
+    "lost_reply_reconciliation": {
+      "document_id": "p01-lostreply-7d3603ba-0844-425e-8c9d-d320ee0b3ff2",
+      "operation_id": "p01-lost-reply",
+      "new_process_status": "committed",
+      "result_revision": 2,
+      "result_value_sha256": "71b6a34ad98df8a2f7feb8bfc78102c9545da23ffe87bf79fd1538e1e64b109b",
+      "table_counts": {
+        "heads": 1,
+        "revisions": 2,
+        "operations": 1
+      }
+    },
+    "post_compute_cas_human_and_no_change": {
+      "document_id": "p01-race-11b098a2-f159-4b53-b847-95900ba08757",
+      "human_operation": "committed",
+      "already_computed_ai_operation": "stale_base",
+      "no_change_operation": "no_change",
+      "final_revision": 2,
+      "table_counts": {
+        "heads": 1,
+        "revisions": 2,
+        "operations": 3
+      },
+      "final_sha256": "2e698b514b45ed626098ee84aa8a9217b999ca407c5c3ecf0243bbc087a2c8dc"
+    }
+  },
+  "finished_at": "2026-09-09T14:11:42.123757+00:00",
+  "status": "passed"
+}

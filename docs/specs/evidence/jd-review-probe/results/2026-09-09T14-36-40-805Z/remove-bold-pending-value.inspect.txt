@@ -1,0 +1,21 @@
+[
+  {
+    type: 'p',
+    id: 'format',
+    children: [
+      {
+        text: '保留必要的完成要求。',
+        suggestion_sCqfXN8T4UmSm5MUL9BvK: {
+          id: 'sCqfXN8T4UmSm5MUL9BvK',
+          createdAt: 1788964600917,
+          properties: {
+            bold: undefined
+          },
+          type: 'update',
+          userId: 'ai'
+        },
+        suggestion: true
+      }
+    ]
+  }
+]

@@ -1,0 +1,6 @@
+{
+  "ProcessId": 87500,
+  "ParentProcessId": 23964,
+  "CreationDate": "2026-09-11T19:36:59.203721+08:00",
+  "CommandLine": "\"C:\\Users\\chenb\\AppData\\Roaming\\uv\\python\\cpython-3.12-windows-x86_64-none\\python.exe\" -m uvicorn jd_offline_service:create_app --factory --app-dir tests --host 127.0.0.1 --port 8091 --workers 1 --no-proxy-headers"
+}

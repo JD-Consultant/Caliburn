@@ -1,0 +1,136 @@
+BASE 8eec072d51e97735b22c5f0df598b67101fe570b
+Explicit files: 2
+Working-tree snapshot; LF normalized for review only. Raw bytes and hashes retained.
+
+diff --git a/experiments/analysis-agent/src/analysis_agent/service.py b/experiments/analysis-agent/src/analysis_agent/service.py
+--- a/experiments/analysis-agent/src/analysis_agent/service.py
++++ b/experiments/analysis-agent/src/analysis_agent/service.py
+@@ -781,53 +781,56 @@
+             if self._running(document):
+                 context.stop.set()
+                 self.catalog.update_run(run_id, status='stopping')
+                 return self.get_run(document,run_id)
+             if context.closing:
+                 return self.get_run(document,run_id)
+             context.stop.set()
+             context.closing = True
+             context.close_entries += 1
+             generation = context.generation
+             self.catalog.update_run(run_id,status='stopping')
+         # Same handles only, outside global admission. GET never reaches here.
+         try:
+             cleaned = context.native_calls.cleanup()
+             with self.lock:
+                 if not cleaned or generation!=context.generation:
+                     raise PublicationUncertain('JD cleanup/generation is unconfirmed')
+             self._close_turn(context)
+             self._reconcile(row)
+         except PublicationUncertain:
+             with self.lock:
+                 self.catalog.update_run(run_id,status='uncertain',error_code='publication_uncertain')
+         finally:
+             with self.entries_changed:
+                 context.closing = False
+-                context.close_entries -= 1
+-                self.entries_changed.notify_all()
+-        return self.get_run(document,run_id)
++                try:
++                    result = self.get_run(document,run_id)
++                finally:
++                    context.close_entries -= 1
++                    self.entries_changed.notify_all()
++        return result
+ 
+     def join(self, document):
+         """Wait for quiescence without holding admission lock (also used at shutdown)."""
+         future = self.futures.get(document)
+         if future:
+             future.result()
+ 
+     def close(self):
+         with self.lock:
+             self.accepting = False
+             self.create_stop.set()
+             for context in self.contexts.values():
+                 context.stop.set()
+                 context.read_stop.set()
+         if self.scheduler is not None and self.scheduler.running:
+             self.scheduler.shutdown(wait=True)
+         if hasattr(self, 'background_lock'):
+             # Also join an admitted direct dispatcher call (maintenance/tests),
+             # not only work submitted by APScheduler. No lock held over A join.
+             with self.background_lock:
+                 pass
+         self.executor.shutdown(wait=True, cancel_futures=False)
+         with self.entries_changed:
+             drained = self.entries_changed.wait_for(lambda: not self.create_active and
+                 all(not context.active_entries and not context.close_entries for context in self.contexts.values()),timeout=10)
+
+diff --git a/experiments/analysis-agent/tests/test_jd_stop_projection.py b/experiments/analysis-agent/tests/test_jd_stop_projection.py
+--- a/experiments/analysis-agent/tests/test_jd_stop_projection.py
++++ b/experiments/analysis-agent/tests/test_jd_stop_projection.py
+@@ -0,0 +1,64 @@
++"""R06: an admitted stop owns its final projection until shutdown may drain."""
++from threading import Event, Thread
++import httpx
++import pytest
++from test_service import service_harness
++
++
++@pytest.mark.parametrize('projection_fails', [False, True])
++def test_close_waits_for_stop_final_projection(tmp_path, monkeypatch, projection_fails):
++    with service_harness(tmp_path) as (service, _, replies):
++        document = service.create_document('停止結果')['id']
++        replies.extend(httpx.ReadTimeout('offline') for _ in range(3))
++        run = service.submit(document, 'first', '保留原問句')
++        service.join(document)
++        context = service._context(document)
++        entered, release, closed = Event(), Event(), Event()
++        results, errors = [], []
++        original = service.get_run
++        calls = 0
++
++        def held_projection(*args):
++            nonlocal calls
++            calls += 1
++            if calls == 2:
++                entered.set()
++                assert release.wait(5)
++                if projection_fails:
++                    raise RuntimeError('final projection unavailable')
++            return original(*args)
++
++        monkeypatch.setattr(service, 'get_run', held_projection)
++
++        def stopping():
++            try:
++                results.append(service.stop(document, run['id']))
++            except Exception as exc:
++                errors.append(exc)
++
++        def closing():
++            try:
++                service.close()
++                closed.set()
++            except Exception as exc:
++                errors.append(exc)
++
++        worker = Thread(target=stopping)
++        closer = Thread(target=closing)
++        worker.start()
++        try:
++            assert entered.wait(5)
++            closer.start()
++            assert not closed.wait(.2), 'Shutdown returned before stop projection unwound'
++        finally:
++            release.set()
++            worker.join(10)
++            if closer.ident is not None:
++                closer.join(10)
++        assert closed.is_set() and not worker.is_alive() and not closer.is_alive()
++        assert context.close_entries == 0 and not context.closing
++        if projection_fails:
++            assert len(errors) == 1 and str(errors[0]) == 'final projection unavailable'
++            assert results == []
++        else:
++            assert not errors and results[0]['status'] == 'cancelled'

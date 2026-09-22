@@ -1,0 +1,22 @@
+name: caliburn-jd-relational-test
+
+# Synthetic-data verification only. This does not configure the product DB.
+services:
+  postgres:
+    image: postgres:18.6-bookworm@sha256:1c59e2c3c818eaa0f0628f695b36e7c9e362d6b219b36a54a32df645cbd7e1af
+    environment:
+      POSTGRES_USER: jd_test
+      POSTGRES_PASSWORD: jd-local-test-only
+      POSTGRES_DB: caliburn_jd_relational_test
+    ports:
+      - "127.0.0.1:55436:5432"
+    volumes:
+      - jd_test_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U jd_test -d caliburn_jd_relational_test"]
+      interval: 2s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  jd_test_data:

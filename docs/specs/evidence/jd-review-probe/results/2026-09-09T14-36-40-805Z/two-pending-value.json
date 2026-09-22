@@ -1,0 +1,52 @@
+[
+  {
+    "type": "p",
+    "id": "monthly",
+    "children": [
+      {
+        "text": "僅有月檢約定的專案按月檢查。",
+        "suggestion_ZGXJMoVuecTRW9aHmyE5d": {
+          "id": "ZGXJMoVuecTRW9aHmyE5d",
+          "createdAt": 1788964600822,
+          "type": "remove",
+          "userId": "ai"
+        },
+        "suggestion": true
+      },
+      {
+        "suggestion_ZGXJMoVuecTRW9aHmyE5d": {
+          "id": "ZGXJMoVuecTRW9aHmyE5d",
+          "createdAt": 1788964600818,
+          "type": "insert",
+          "userId": "ai"
+        },
+        "suggestion": true,
+        "text": "所有專案都按月檢查。"
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "id": "delivery",
+    "children": [
+      {
+        "text": "交付版本與檢查結果一致。"
+      }
+    ]
+  },
+  {
+    "type": "p",
+    "id": "fault",
+    "children": [
+      {
+        "text": "記錄故障處理結果與未解事項。"
+      }
+    ],
+    "suggestion": {
+      "id": "5XwiFDd56xGxBbJcx_TD2",
+      "createdAt": 1788964600846,
+      "type": "insert",
+      "userId": "ai"
+    }
+  }
+]

@@ -1,0 +1,667 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ManualHttpCatalog",
+  "description": "Generation catalog for the manual HTTP seam. Endpoints exchange only their named definitions; commands and write observations retain their own authoritative schemas.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ManualSaveInput": {
+      "$ref": "#/$defs/ManualSaveInput"
+    },
+    "ManualDocumentState": {
+      "$ref": "#/$defs/ManualDocumentState"
+    },
+    "ManualOperationState": {
+      "$ref": "#/$defs/ManualOperationState"
+    },
+    "ManualProblem": {
+      "$ref": "#/$defs/ManualProblem"
+    }
+  },
+  "required": [
+    "ManualSaveInput",
+    "ManualDocumentState",
+    "ManualOperationState",
+    "ManualProblem"
+  ],
+  "$defs": {
+    "ManualOperationId": {
+      "title": "ManualOperationId",
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "ManualCreateTaskCommand": {
+      "title": "ManualCreateTaskCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "jd_create_task"
+          ]
+        },
+        "arguments": {
+          "$ref": "jd-work.schema.json#/$defs/CreateTaskInput"
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualReviseWorkCommand": {
+      "title": "ManualReviseWorkCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "jd_revise_work"
+          ]
+        },
+        "arguments": {
+          "$ref": "jd-work.schema.json#/$defs/ReviseWorkInput"
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualSetTextCommand": {
+      "title": "ManualSetTextCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "jd_set_text"
+          ]
+        },
+        "arguments": {
+          "$ref": "jd-work.schema.json#/$defs/SetTextInput"
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualInsertItemCommand": {
+      "title": "ManualInsertItemCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "jd_insert_item"
+          ]
+        },
+        "arguments": {
+          "$ref": "jd-work.schema.json#/$defs/InsertItemInput"
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualDeleteItemCommand": {
+      "title": "ManualDeleteItemCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "jd_delete_item"
+          ]
+        },
+        "arguments": {
+          "$ref": "jd-work.schema.json#/$defs/DeleteItemInput"
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualMoveItemCommand": {
+      "title": "ManualMoveItemCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "jd_move_item"
+          ]
+        },
+        "arguments": {
+          "$ref": "jd-work.schema.json#/$defs/MoveItemInput"
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualSetTaskCapabilityCommand": {
+      "title": "ManualSetTaskCapabilityCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "jd_set_task_capability"
+          ]
+        },
+        "arguments": {
+          "$ref": "jd-work.schema.json#/$defs/SetTaskCapabilityInput"
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualReplaceSelectionCommand": {
+      "title": "ManualReplaceSelectionCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "jd_replace_selection"
+          ]
+        },
+        "arguments": {
+          "$ref": "jd-work.schema.json#/$defs/ReplaceSelectionInput"
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualCommand": {
+      "title": "ManualCommand",
+      "description": "Exactly one named business effect; no generic batch or arbitrary database operation is accepted. The last two are the employee's own entries and are never offered to the model.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ManualCreateTaskCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualReviseWorkCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualSetTextCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualInsertItemCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualDeleteItemCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualMoveItemCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualSetTaskCapabilityCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualReplaceSelectionCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualRestoreRevisionCommand"
+        },
+        {
+          "$ref": "#/$defs/ManualUndoAiTurnCommand"
+        }
+      ]
+    },
+    "ManualSaveInput": {
+      "title": "ManualSaveInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/ManualOperationId"
+        },
+        "base_revision_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "command": {
+          "$ref": "#/$defs/ManualCommand"
+        }
+      },
+      "required": [
+        "operation_id",
+        "base_revision_ref",
+        "command"
+      ]
+    },
+    "ManualWritableState": {
+      "title": "ManualWritableState",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "An unblocked document must be ready, active and idle with no pending operation or error.",
+      "properties": {
+        "ready": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "archived": {
+          "type": "boolean",
+          "enum": [
+            false
+          ]
+        },
+        "write_blocked": {
+          "type": "boolean",
+          "enum": [
+            false
+          ]
+        },
+        "running": {
+          "type": "boolean",
+          "enum": [
+            false
+          ]
+        },
+        "operation_id": {
+          "type": "null"
+        },
+        "error": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "ready",
+        "archived",
+        "write_blocked",
+        "running",
+        "operation_id",
+        "error"
+      ]
+    },
+    "ManualBlockedState": {
+      "title": "ManualBlockedState",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Conservatively blocked while archived, busy, unavailable or awaiting recovery; no implication of write success or rollback.",
+      "properties": {
+        "ready": {
+          "type": "boolean"
+        },
+        "archived": {
+          "type": "boolean"
+        },
+        "write_blocked": {
+          "type": "boolean",
+          "enum": [
+            true
+          ]
+        },
+        "running": {
+          "type": "boolean"
+        },
+        "operation_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ManualOperationId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "error": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "enum": [
+            "busy",
+            "recovery_required",
+            "service_unavailable",
+            null
+          ]
+        }
+      },
+      "required": [
+        "ready",
+        "archived",
+        "write_blocked",
+        "running",
+        "operation_id",
+        "error"
+      ]
+    },
+    "ManualDocumentState": {
+      "title": "ManualDocumentState",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ManualWritableState"
+        },
+        {
+          "$ref": "#/$defs/ManualBlockedState"
+        }
+      ]
+    },
+    "ManualPendingResult": {
+      "title": "ManualPendingResult",
+      "description": "Only an original bound operation whose durable receipt is still unconfirmed.",
+      "anyOf": [
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedInvalidInput"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedTargetMissing"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedStaleView"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedRelationshipConflict"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedDependentItems"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedSaveFailed"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnknownOutcomeResult"
+        }
+      ]
+    },
+    "ManualObservedResult": {
+      "title": "ManualObservedResult",
+      "description": "Only the original confirmed receipt; unbound request rejection is not a found operation.",
+      "anyOf": [
+        {
+          "$ref": "jd-result.schema.json#/$defs/CommittedResult"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/NoChangeResult"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedInvalidInput"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedTargetMissing"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedStaleView"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedRelationshipConflict"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedDependentItems"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedSaveFailed"
+        }
+      ]
+    },
+    "ManualOperationNotFound": {
+      "title": "ManualOperationNotFound",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/ManualOperationId"
+        },
+        "presence": {
+          "type": "string",
+          "enum": [
+            "not_found"
+          ]
+        },
+        "result": {
+          "type": "null"
+        },
+        "write_state": {
+          "$ref": "#/$defs/ManualDocumentState"
+        }
+      },
+      "required": [
+        "operation_id",
+        "presence",
+        "result",
+        "write_state"
+      ]
+    },
+    "ManualOperationPending": {
+      "title": "ManualOperationPending",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/ManualOperationId"
+        },
+        "presence": {
+          "type": "string",
+          "enum": [
+            "pending"
+          ]
+        },
+        "result": {
+          "$ref": "#/$defs/ManualPendingResult"
+        },
+        "write_state": {
+          "$ref": "#/$defs/ManualDocumentState"
+        }
+      },
+      "required": [
+        "operation_id",
+        "presence",
+        "result",
+        "write_state"
+      ]
+    },
+    "ManualOperationObserved": {
+      "title": "ManualOperationObserved",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "operation_id": {
+          "$ref": "#/$defs/ManualOperationId"
+        },
+        "presence": {
+          "type": "string",
+          "enum": [
+            "observed"
+          ]
+        },
+        "result": {
+          "$ref": "#/$defs/ManualObservedResult"
+        },
+        "write_state": {
+          "$ref": "#/$defs/ManualDocumentState"
+        }
+      },
+      "required": [
+        "operation_id",
+        "presence",
+        "result",
+        "write_state"
+      ]
+    },
+    "ManualOperationState": {
+      "title": "ManualOperationState",
+      "description": "Presence and original receipt evidence must agree; no receipt is invented by a successful HTTP lookup.",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ManualOperationNotFound"
+        },
+        {
+          "$ref": "#/$defs/ManualOperationPending"
+        },
+        {
+          "$ref": "#/$defs/ManualOperationObserved"
+        }
+      ]
+    },
+    "ManualProblem": {
+      "title": "ManualProblem",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "RFC 9457 request failure at the App layer. This problem does not establish the original mutation outcome, durability or rollback.",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "about:blank"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "status": {
+          "type": "integer",
+          "enum": [
+            403,
+            404,
+            409,
+            422,
+            500,
+            503
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "instance": {
+          "type": "string",
+          "minLength": 45,
+          "maxLength": 45,
+          "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "code": {
+          "type": "string",
+          "enum": [
+            "invalid_input",
+            "invalid_ref",
+            "target_missing",
+            "stale_view",
+            "operation_conflict",
+            "busy",
+            "service_unavailable",
+            "selection_not_available",
+            "origin_not_allowed"
+          ]
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "correct_input",
+            "reread",
+            "lookup_operation",
+            "wait",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "detail",
+        "instance",
+        "code",
+        "next_action"
+      ]
+    },
+    "ManualRestoreRevisionCommand": {
+      "title": "ManualRestoreRevisionCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "restore_revision"
+          ]
+        },
+        "arguments": {
+          "title": "ManualRestoreRevisionArguments",
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The employee names a saved revision by its issued reference; the App never handles raw identities.",
+          "properties": {
+            "target_revision_ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "required": [
+            "target_revision_ref"
+          ]
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    },
+    "ManualUndoAiTurnCommand": {
+      "title": "ManualUndoAiTurnCommand",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "tool": {
+          "type": "string",
+          "enum": [
+            "undo_ai_turn"
+          ]
+        },
+        "arguments": {
+          "title": "ManualUndoAiTurnArguments",
+          "type": "object",
+          "additionalProperties": false,
+          "description": "The turn to take back, and the revision the App showed as its end, by issued reference.",
+          "properties": {
+            "ai_run_id": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            "expected_result_ref": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            }
+          },
+          "required": [
+            "ai_run_id",
+            "expected_result_ref"
+          ]
+        }
+      },
+      "required": [
+        "tool",
+        "arguments"
+      ]
+    }
+  }
+}

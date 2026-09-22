@@ -1,0 +1,113 @@
+{
+  "package_id": "jd-product-p3-calibration-c-w",
+  "version": 2,
+  "created_at_utc": "2026-09-10T02:26:18.6212397Z",
+  "author": "Codex mechanical preparation from accepted C-W materials",
+  "case": "C-W",
+  "classification": "calibration",
+  "exposed": true,
+  "held_out": false,
+  "synthetic": true,
+  "exposure": [
+    "Original public quality-acceptance material exposed to research/implementation workflow",
+    "Codex preparation task and root review workflow",
+    "Version 2: existing task AI controller has seen oracle; not blind; same-controller interpretation is not independent human evaluation"
+  ],
+  "source": {
+    "path": "S:/caliburn/.worktrees/analysis-only-agent/docs/specs/2026-09-10-jd-product-quality-acceptance.md",
+    "sha256": "0a81e44018e55bdcf2d38780d229709750d7dfba932a0cd4c638a9533f47215e",
+    "sections": [
+      "4 Q01-Q15",
+      "5 C-W W01-W10 and M-W1",
+      "6 P3 zero-cost preparation items 2 and 4 and execution boundary"
+    ]
+  },
+  "official_context_only": [
+    "https://www.onetonline.org/link/summary/43-5071.00"
+  ],
+  "official_context_note": "Original material occupational plausibility only; no newly researched employer facts",
+  "execution": {
+    "status": "NOT RUN",
+    "authorization": "NOT AUTHORIZED",
+    "natural_trials": 0,
+    "model_requests": 0,
+    "proposed_employee_turn_cap": 12,
+    "proposed_provider_request_cap": 180,
+    "proposed_usd_cap": "1.00",
+    "includes_background_and_failures": true
+  },
+  "runtime": {
+    "status": "PENDING CORE TASKS 1-6 COMPLETION",
+    "commit": null,
+    "lock_hashes": null,
+    "prompt_hash": null,
+    "skill_hashes": null,
+    "schema_hash": null,
+    "model_id": null,
+    "effort": null,
+    "output_limit": null,
+    "budgets_and_compaction": null
+  },
+  "scope_excludes": [
+    "P6 held-out packages",
+    "Other calibration roles",
+    "Model execution",
+    "Product runtime or architecture changes (operator test method is revised in version 2)"
+  ],
+  "files": [
+    {
+      "path": "employee-card.md",
+      "sha256": "bd54e73337ffd0cbd41b8578f430d647ed433802bd9295fbf724f2ee04170281",
+      "bytes": 3314
+    },
+    {
+      "path": "release-protocol.md",
+      "sha256": "4db446fea06d51b8451bac58e7734aa1c9f7600c67231c4b9248180aeb57a46f",
+      "bytes": 4617
+    },
+    {
+      "path": "oracle.md",
+      "sha256": "61f08183f5a85ef7be29cdf9e984f440013fab61d206b48f7c023b7b95c33b60",
+      "bytes": 7407
+    },
+    {
+      "path": "README.md",
+      "sha256": "0c2d1275ce251e68ead12246a25cb67bb406cc49a54d2d58a91f1be58dbdfee8",
+      "bytes": 4153
+    },
+    {
+      "path": "results-template.md",
+      "sha256": "aef13928a9a28adaafbbd6543903bd4b003912e5c49ef7043cf3607e7c34752d",
+      "bytes": 4205
+    }
+  ],
+  "manifest_hashes_itself": false,
+  "revised_at_utc": "2026-09-10T03:58:24.563814Z",
+  "operator_method": {
+    "status": "ROOT ADOPTED METHOD; PAID EXECUTION NOT AUTHORIZED",
+    "operator": "Existing task AI controller simulating the synthetic employee from public C-W card",
+    "is_human": false,
+    "oracle_exposed": true,
+    "blind": false,
+    "independent_human_evaluation": false,
+    "additional_provider_employee_or_judge_models": false,
+    "scope": "Engineering vertical slice and preliminary semantic calibration only; P6 unseen cases and three real employees unchanged",
+    "cost_boundary": "Controller platform resources disclosed separately; not claimed free or covered by App foreground/background provider USD1 ledger",
+    "design": "../../2026-09-10-jd-natural-calibration-operator-design.md",
+    "reviewed_candidate_sha256": "3016d934f2ad174c83f7925b56e9abe16ec8261f7969b42b62eec2d2eb109d43"
+  },
+  "revision_history": [
+    {
+      "version": 1,
+      "archive": "archive/v1/snapshot-manifest.json",
+      "manifest_sha256": "5d4598ceca456f3451fd594c23687902b7596bf9154a204f0b24d43df5201eeb",
+      "source_sha256": "1407e42b0a3c0d87c73caff6d37c05faa74020973f8f3d6441594bbdc6bbd92c",
+      "note": "Original byte-exact public calibration package preserved; original human-operator proposal remains historical"
+    },
+    {
+      "version": 2,
+      "date": "2026-09-10",
+      "note": "Root adoption following finite spec/quality PASS; operator and evidence metadata only. W/M/Q and P6 thresholds unchanged; no execution authorization."
+    }
+  ]
+}

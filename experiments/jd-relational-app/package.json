@@ -1,0 +1,20 @@
+{
+  "name": "@caliburn/jd-relational-app",
+  "private": true,
+  "version": "0.1.0",
+  "engines": { "node": ">=24.19.0 <25" },
+  "scripts": {
+    "api-origin": "uv run --frozen --offline python -X utf8 -m jd_relational api-origin",
+    "codegen": "uv run --frozen python scripts/generate_contract.py",
+    "codegen:check": "uv run --frozen --offline python scripts/generate_contract.py --check",
+    "dev": "uv run --frozen --offline python -X utf8 -m jd_relational serve",
+    "init": "uv run --frozen python -X utf8 -m jd_relational init",
+    "remove-key": "uv run --frozen --offline python -X utf8 -m jd_relational remove-key --service openrouter",
+    "resume-init": "uv run --frozen python -X utf8 -m jd_relational resume-init",
+    "set-key": "uv run --frozen --offline python -X utf8 -m jd_relational set-key --service openrouter",
+    "start": "uv run --frozen --offline python -X utf8 -m jd_relational serve",
+    "status": "uv run --frozen --offline python -X utf8 -m jd_relational status",
+    "test": "uv run --frozen --offline pytest -q -p no:cacheprovider"
+  },
+  "devDependencies": { "json-schema-to-typescript": "16.0.0", "typescript": "7.0.2" }
+}

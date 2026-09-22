@@ -1,0 +1,80 @@
+{
+  "date": "2026-09-09",
+  "node": "v22.12.0",
+  "profile": "platejs53.3.11; ordinary elements; reuseId true; initialValueIds always",
+  "sourceSha256": {
+    "profile-probe.mjs": "178c9665917f00c15ac925c8319d9e87083d5d1aa241ce367d448ff7a4dbf477",
+    "fixture.mjs": "ad09d29a3bab69c13c517266f4c58163951999b056d33921e4b252334d7622d0",
+    "engine.mjs": "7e76a303de7a1d3953401ed5fdcbfb2928ce001e4c76ec498b7075e4aec3059e",
+    "README.md": "1b2f2b382358bc6910208a6a0188aae3c4c88c922fe92af06bf2b0746fd221eb"
+  },
+  "total": 6,
+  "passed": 5,
+  "failed": 1,
+  "results": [
+    {
+      "id": "F01-A",
+      "description": "完整 r2 容器 normalization、JSON 存檔及新 editor 重開",
+      "passed": false,
+      "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n... Skipped lines\n\n  [\n    {\n      children: [\n        {\n          text: '前端工程師職務說明書'\n...\n                            },\n-                           {\n-                             text: ''\n-                           }\n                          ],\n                          id: 'r2-51',\n                          type: 'p'\n                        },\n                        {\n"
+    },
+    {
+      "id": "F01-B",
+      "description": "Task8 原生移動保留完整適用條件與來源",
+      "passed": true,
+      "detail": {
+        "taskSubtreeExact": true,
+        "independentTaskExact": true
+      }
+    },
+    {
+      "id": "F01-C",
+      "description": "unwrap Duty 保留標題與其全部工作",
+      "passed": true,
+      "detail": {
+        "childSubtreesExact": true,
+        "taskCount": 8
+      }
+    },
+    {
+      "id": "F01-D",
+      "description": "未完整與未歸屬內容可保存；空容器另作觀測",
+      "passed": true,
+      "detail": {
+        "additionsPreserved": 3,
+        "emptyContainerIsProductValidated": false,
+        "emptyContainerNativeValue": [
+          {
+            "type": "jd_task",
+            "id": "empty-container",
+            "children": [
+              {
+                "text": ""
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "id": "F01-E",
+      "description": "正文 insertBreak 的實際範圍與 Task 身分",
+      "passed": true,
+      "detail": {
+        "taskCount": 8,
+        "sameTaskIdentity": true,
+        "notDomEnterOrIme": true
+      }
+    },
+    {
+      "id": "F01-F",
+      "description": "固定 Task fragment 插入的內容、層級及 ID",
+      "passed": true,
+      "detail": {
+        "fullCopies": 2,
+        "uniqueIds": true,
+        "clipboardOrCrossDocumentPolicyVerified": false
+      }
+    }
+  ]
+}

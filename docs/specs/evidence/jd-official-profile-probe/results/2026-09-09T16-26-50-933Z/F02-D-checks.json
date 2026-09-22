@@ -1,0 +1,19 @@
+{
+  "id": "F02-D",
+  "description": "原生格式 operations 的普通 JSON 保存與 fresh apply",
+  "passed": true,
+  "checks": [
+    {
+      "name": "原文不变；目的加底線、既有粗體 label 確實移除",
+      "passed": true
+    },
+    {
+      "name": "原生 operations 無 own undefined，普通 JSON 檔精確往返",
+      "passed": true
+    },
+    {
+      "name": "同基底全新 process 原生 apply 後完整 clean value 相等",
+      "passed": true
+    }
+  ]
+}

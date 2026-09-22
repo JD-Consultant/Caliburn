@@ -1,0 +1,144 @@
+{
+  "topic": "JD-R002/C03/R01",
+  "executedAt": "2026-09-09T14:36:40.941Z",
+  "node": "v22.12.0",
+  "versions": {
+    "platejs": "53.3.11",
+    "@platejs/core": "53.3.11",
+    "@platejs/slate": "53.3.10",
+    "@platejs/suggestion": "53.2.3",
+    "@platejs/diff": "53.0.0",
+    "slate": "0.126.2",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "profile": {
+    "currentUserIds": [
+      "ai",
+      "human"
+    ],
+    "isSuggesting": true,
+    "nodeId": {
+      "reuseId": true,
+      "initialValueIds": "always"
+    },
+    "normalization": "native defaults; suggestion wrappers normalize normally",
+    "customSuggestionMetadataWritten": false,
+    "aiHelpersUsed": false
+  },
+  "groups": [
+    {
+      "id": "R01-1",
+      "title": "兩組 pending 保存重開後取消月檢，保留故障 pending",
+      "checks": [
+        {
+          "name": "JSON→全新 editor 完整 pending value 相等",
+          "pass": true
+        },
+        {
+          "name": "月檢回到原始正文及乾淨節點",
+          "pass": true
+        },
+        {
+          "name": "故障正文及 pending metadata 完整保留",
+          "pass": true
+        },
+        {
+          "name": "別處交付內容不變",
+          "pass": true
+        },
+        {
+          "name": "只剩故障 ID 待審",
+          "pass": true
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "R01-2",
+      "title": "同一 pending fixture 重開後接受月檢，保留故障 pending",
+      "checks": [
+        {
+          "name": "接受當下月檢新文，不回到原文",
+          "pass": true
+        },
+        {
+          "name": "故障正文及 pending metadata 完整保留",
+          "pass": true
+        },
+        {
+          "name": "別處交付內容不變",
+          "pass": true
+        },
+        {
+          "name": "月檢已結算，只剩故障待審",
+          "pass": true
+        }
+      ],
+      "status": "PASS"
+    },
+    {
+      "id": "R01-3",
+      "title": "AI→人工→AI 後原始待審組 accept/reject 的實際範圍",
+      "checks": [
+        {
+          "name": "續編仍是原生同一月檢 ID（不造共組）",
+          "pass": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    'ZGXJMoVuecTRW9aHmyE5d',\n+   '5IE5qwahRmkLHapfW5AEX',\n+   'm3B3MrQpdikPTtR3cTYVP'\n  ]\n"
+        },
+        {
+          "name": "AI→人→AI JSON 重開不丟原生 metadata",
+          "pass": true
+        },
+        {
+          "name": "接受原始月檢組得到最新版完整正文且該組結清",
+          "pass": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    children: [\n      {\n+       suggestion: true,\n+       suggestion_5IE5qwahRmkLHapfW5AEX: {\n+         createdAt: 1788964600871,\n+         id: '5IE5qwahRmkLHapfW5AEX',\n+         type: 'remove',\n+         userId: 'human'\n+       },\n+       suggestion_ZGXJMoVuecTRW9aHmyE5d: {\n+         createdAt: 1788964600818,\n+         id: 'ZGXJMoVuecTRW9aHmyE5d',\n+         type: 'insert',\n+         userId: 'ai'\n+       },\n+       text: '所有專案都按月檢查。'\n+     },\n+     {\n+       suggestion: true,\n+       suggestion_5IE5qwahRmkLHapfW5AEX: {\n+         createdAt: 1788964600870,\n+         id: '5IE5qwahRmkLHapfW5AEX',\n+         type: 'insert',\n+         userId: 'human'\n+       },\n+       suggestion_m3B3MrQpdikPTtR3cTYVP: {\n+         createdAt: 1788964600879,\n+         id: 'm3B3MrQpdikPTtR3cTYVP',\n+         type: 'remove',\n+         userId: 'ai'\n+       },\n+       text: '僅有月檢約定的專案按月檢查，並記錄結果。'\n+     },\n+     {\n+       suggestion: true,\n+       suggestion_m3B3MrQpdikPTtR3cTYVP: {\n+         createdAt: 1788964600879,\n+         id: 'm3B3MrQpdikPTtR3cTYVP',\n+         type: 'insert',\n+         userId: 'ai'\n+       },\n        text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'\n      }\n    ],\n    id: 'monthly',\n    type: 'p'\n"
+        },
+        {
+          "name": "接受月檢不動故障 pending",
+          "pass": true
+        },
+        {
+          "name": "拒絕原始月檢組恢復組前完整內容",
+          "pass": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  {\n    children: [\n      {\n        text: '僅有月檢約定的專案按月檢查。'\n      },\n+     {\n+       suggestion: true,\n+       suggestion_5IE5qwahRmkLHapfW5AEX: {\n+         createdAt: 1788964600871,\n+         id: '5IE5qwahRmkLHapfW5AEX',\n+         type: 'remove',\n+         userId: 'human'\n+       },\n+       suggestion_ZGXJMoVuecTRW9aHmyE5d: {\n+         createdAt: 1788964600818,\n+         id: 'ZGXJMoVuecTRW9aHmyE5d',\n+         type: 'insert',\n+         userId: 'ai'\n+       },\n+       text: '所有專案都按月檢查。'\n+     },\n+     {\n+       suggestion: true,\n+       suggestion_5IE5qwahRmkLHapfW5AEX: {\n+         createdAt: 1788964600870,\n+         id: '5IE5qwahRmkLHapfW5AEX',\n+         type: 'insert',\n+         userId: 'human'\n+       },\n+       suggestion_m3B3MrQpdikPTtR3cTYVP: {\n+         createdAt: 1788964600879,\n+         id: 'm3B3MrQpdikPTtR3cTYVP',\n+         type: 'remove',\n+         userId: 'ai'\n+       },\n+       text: '僅有月檢約定的專案按月檢查，並記錄結果。'\n+     },\n+     {\n+       suggestion: true,\n+       suggestion_m3B3MrQpdikPTtR3cTYVP: {\n+         createdAt: 1788964600879,\n+         id: 'm3B3MrQpdikPTtR3cTYVP',\n+         type: 'insert',\n+         userId: 'ai'\n+       },\n+       text: '僅有月檢約定的專案按月檢查，記錄結果並追蹤未解事項。'\n+     }\n    ],\n    id: 'monthly',\n    type: 'p'\n  }\n"
+        },
+        {
+          "name": "拒絕月檢不動故障 pending",
+          "pass": true
+        }
+      ],
+      "status": "FAIL"
+    },
+    {
+      "id": "R01-4",
+      "title": "取消 bold 的待審變更 JSON 重開後拒絕",
+      "checks": [
+        {
+          "name": "保留 undefined 的記憶體控制組 reject 恢復粗體",
+          "pass": true
+        },
+        {
+          "name": "標準 JSON 重開後 reject 仍恢復原粗體",
+          "pass": false,
+          "error": "Expected values to be strictly deep-equal:\n+ actual - expected\n\n  [\n    {\n      children: [\n        {\n-         bold: true,\n          text: '保留必要的完成要求。'\n        }\n      ],\n      id: 'format',\n      type: 'p'\n"
+        },
+        {
+          "name": "格式正文不丟失",
+          "pass": true
+        }
+      ],
+      "status": "FAIL"
+    }
+  ],
+  "passGroups": 2,
+  "failGroups": 2,
+  "executionErrorGroups": 0,
+  "limitations": [
+    "No DOM/IME/UI/LLM/DB.",
+    "Only fixed unconfirmed suggestions; no accepted-history rollback.",
+    "No custom codec/grouping/review/rollback engine.",
+    "Different author profile is one tested policy, not an adopted product requirement."
+  ]
+}

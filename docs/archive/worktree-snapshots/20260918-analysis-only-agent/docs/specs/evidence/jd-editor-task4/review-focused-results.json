@@ -1,0 +1,46 @@
+{
+  "node": "v22.23.2",
+  "source": "frozen task-4-snapshot",
+  "cases": [
+    {
+      "case": "explicit rejection 409",
+      "locked": true,
+      "manualUnknown": true,
+      "candidateRetained": true,
+      "discardDidNotClear": true,
+      "retryCalls": 2,
+      "error": "保存尚未確認：Error: Document is archived"
+    },
+    {
+      "case": "explicit rejection 422",
+      "locked": true,
+      "manualUnknown": true,
+      "candidateRetained": true,
+      "discardDidNotClear": true,
+      "retryCalls": 2,
+      "error": "保存尚未確認：Error: Invalid scoped manual submission"
+    },
+    {
+      "case": "unrelated new save after recovered stale candidate",
+      "oldTextPresentInNewPayload": false,
+      "oldCandidateStillInCache": false,
+      "oldCandidateStillInSession": false,
+      "newPayload": {
+        "request_key": "fbb9b77e-2b30-47a5-95d5-6b82228b8d94",
+        "base_revision_ref": "r1",
+        "value": [
+          {
+            "type": "p",
+            "id": "p",
+            "children": [
+              {
+                "text": "unrelated edit to current"
+              }
+            ]
+          }
+        ]
+      },
+      "calls": 2
+    }
+  ]
+}

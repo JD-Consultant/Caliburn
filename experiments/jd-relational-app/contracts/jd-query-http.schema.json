@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "QueryProblem",
+  "description": "A failed JD query as RFC 9457. No write receipt or durability assertion is produced by a read failure.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "type": {"type": "string", "enum": ["about:blank"]},
+    "title": {"type": "string", "enum": ["Not Found", "Conflict", "Unprocessable Entity", "Internal Server Error"]},
+    "status": {"type": "integer", "enum": [404, 409, 422, 500]},
+    "detail": {"type": "string", "minLength": 1, "maxLength": 2048},
+    "instance": {"type": "string", "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"},
+    "jd_read_error": {"$ref": "jd-read.schema.json#/$defs/ReadFailure"}
+  },
+  "required": ["type", "title", "status", "detail", "instance", "jd_read_error"]
+}

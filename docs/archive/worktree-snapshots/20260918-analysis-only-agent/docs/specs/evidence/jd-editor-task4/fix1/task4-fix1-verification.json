@@ -1,0 +1,48 @@
+{
+  "node": "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node.EXE",
+  "PYTHONUTF8": "1",
+  "runs": [
+    {
+      "name": "types",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\web",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "typecheck"
+      ],
+      "exit_code": 0,
+      "seconds": 1.821435099991504
+    },
+    {
+      "name": "lint",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\web",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "lint"
+      ],
+      "exit_code": 0,
+      "seconds": 3.0558965999953216
+    },
+    {
+      "name": "build",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\web",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "build"
+      ],
+      "exit_code": 0,
+      "seconds": 7.211668000003556
+    }
+  ]
+}

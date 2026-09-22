@@ -1,0 +1,42 @@
+[
+  {
+    "stage": "jsonschema JdReadModelInput",
+    "seconds": 0.0002538000117056072
+  },
+  {
+    "stage": "pydantic JdReadModelInput",
+    "seconds": 1.6200006939470768e-05
+  },
+  {
+    "stage": "dump JdReadModelInput",
+    "seconds": 1.4200006262399256e-05
+  },
+  {
+    "stage": "DB current",
+    "seconds": 0.0331160999921849
+  },
+  {
+    "stage": "jsonschema JdReadSuccess",
+    "seconds": 38.842403500006185
+  },
+  {
+    "stage": "pydantic JdReadSuccess",
+    "seconds": 0.00661460000264924
+  },
+  {
+    "stage": "dump JdReadSuccess",
+    "seconds": 0.004744300007587299
+  },
+  {
+    "stage": "complete read mapper",
+    "seconds": 38.908840100004454
+  },
+  {
+    "stage": "FastAPI response Pydantic",
+    "seconds": 0.003604699988500215
+  },
+  {
+    "stage": "serialize JSON",
+    "seconds": 0.0007577999931527302
+  }
+]

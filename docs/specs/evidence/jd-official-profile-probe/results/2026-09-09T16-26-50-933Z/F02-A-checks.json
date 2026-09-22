@@ -1,0 +1,27 @@
+{
+  "id": "F02-A",
+  "description": "官方 canonical 全 r2 與新程序 JSON 重開",
+  "passed": true,
+  "checks": [
+    {
+      "name": "全部 r2 文字與非空 leaf 格式逐一保留",
+      "passed": true
+    },
+    {
+      "name": "所有輸入 Element ID 存在、唯一且來源未变",
+      "passed": true
+    },
+    {
+      "name": "原生官方 plugins 與形狀生效",
+      "passed": true
+    },
+    {
+      "name": "clean value 無 undefined 等 JSON 非值",
+      "passed": true
+    },
+    {
+      "name": "不同 Node PID／新 editor／normalization 後完整 JSON 相等",
+      "passed": true
+    }
+  ]
+}

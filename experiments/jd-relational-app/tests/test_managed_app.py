@@ -1,0 +1,303 @@
+"""Composition and lifecycle probes with synthetic resources, no real OS/DB."""
+from types import SimpleNamespace
+from uuid import uuid4
+
+from fastapi.testclient import TestClient
+import pytest
+
+import jd_relational.managed_app as managed
+import jd_relational.__main__ as entry
+from jd_relational.local_configuration import encode_configuration
+from test_configured_host import settings
+
+
+@pytest.fixture
+def composed(monkeypatch):
+    events = []
+    def startup(**kwargs):
+        events.append("startup")
+        opened.host.runtime.ready = True
+    def close(**kwargs):
+        events.append("close")
+        return True
+    value = settings("ready")
+    opened = SimpleNamespace(settings=value, codec=object(), close=close,
+        host=SimpleNamespace(graph=object(), engine=object(), store=object(), saver=object(),
+            memory_engine=object(), runtime=SimpleNamespace(storage=object(), ready=False,
+                finish_startup=startup)), backgrounds=[])
+    monkeypatch.setattr(managed, "open_configured_host", lambda *_, **__: opened)
+    monkeypatch.setattr(managed, "HistoryReader", lambda _: object())
+    monkeypatch.setattr(managed, "ReadService", lambda *args: object())
+    monkeypatch.setattr(managed, "ChangeReadService", lambda *args: object())
+    sources = SimpleNamespace(resolve=lambda *args: pytest.fail("Composition must not read sources."))
+    opened.sources = sources
+    def source_owner(checkpoints, codec):
+        assert checkpoints is opened.host.graph
+        assert codec.dataset_id == value.dataset_id
+        return sources
+    monkeypatch.setattr(managed, "AiRunCheckpoints", lambda graph: graph)
+    monkeypatch.setattr(managed, "ConversationSourceService", source_owner)
+    def manual(*args, source_resolver):
+        assert source_resolver is sources.resolve
+        return object()
+    monkeypatch.setattr(managed, "ManualService", manual)
+    monkeypatch.setattr(managed, "CatalogService", lambda *args: SimpleNamespace(list=lambda **_: {
+        "dataset_id": value.dataset_id, "documents": [], "next_after": None}))
+    class Coordinator:
+        def __init__(self, **kwargs):
+            self.kwargs = kwargs
+            opened.backgrounds.append(self)
+            events.append("background-owner")
+
+        def wake(self, document_id):
+            events.append(("wake", document_id))
+
+        def availability(self, document_id, head):
+            return ""
+
+        def resume_pending(self):
+            assert opened.host.runtime.ready
+            events.append("background-resume")
+            return 0
+
+    monkeypatch.setattr(managed, "BackgroundCoordinator", Coordinator, raising=False)
+    def ai(owner, codec, *, conversation_sources, memory_engine, background,
+           background_availability, execution_enabled):
+        assert owner is opened.host.runtime and codec is opened.codec
+        assert conversation_sources is sources
+        assert memory_engine is opened.host.memory_engine
+        opened.ai_arguments = {
+            "background": background,
+            "background_availability": background_availability,
+            "execution_enabled": execution_enabled,
+        }
+        events.append("ai-owner")
+        return SimpleNamespace(checkpoints=object())
+    monkeypatch.setattr(managed, "AiRuntime", ai)
+    monkeypatch.setattr(managed, "ChatHistoryService", lambda *args: object())
+    monkeypatch.setattr(managed, "ChatService", lambda *args: object())
+    return events, opened
+
+
+def test_resources_recovered_before_first_request_and_drained_on_exit(composed):
+    events, opened = composed
+    app = managed.open_managed_app(object(), consultant=object())
+    assert events == ["ai-owner"]
+    assert opened.backgrounds == []
+    assert opened.ai_arguments == {
+        "background": None,
+        "background_availability": None,
+        "execution_enabled": False,
+    }
+    assert app.ai_runtime is not None
+    with TestClient(app.app, base_url="http://127.0.0.1") as client:
+        assert events == ["ai-owner", "startup"]
+        # Invalid dataset is rejected without calling a fake writer.
+        response = client.post("/api/documents", content="bad-body", headers={
+            "Origin": "http://127.0.0.1:3002", "X-JD-Dataset": str(uuid4())})
+        assert response.status_code == 409
+    assert events == ["ai-owner", "startup", "close"]
+
+
+def test_ai_app_resumes_background_only_after_foreground_startup(composed):
+    events, opened = composed
+    app = managed.open_managed_app(
+        object(), consultant=object(), enable_chat=True,
+        case_model="case", understanding_model="understanding",
+    )
+    assert events == ["background-owner", "ai-owner"]
+    assert len(opened.backgrounds) == 1
+    background = opened.backgrounds[0]
+    assert background.kwargs == {
+        "owner": opened.host.runtime,
+        "engine": opened.host.engine,
+        "service": opened.sources,
+        "store": opened.host.store,
+        "checkpointer": opened.host.saver,
+        "memory_engine": opened.host.memory_engine,
+        "case_model": "case",
+        "understanding_model": "understanding",
+    }
+    assert opened.ai_arguments["execution_enabled"] is True
+    assert opened.ai_arguments["background"].__self__ is background
+    assert opened.ai_arguments["background_availability"].__self__ is background
+    with TestClient(app.app):
+        pass
+    assert events.index("startup") < events.index("background-resume") < events.index("close")
+
+
+@pytest.mark.parametrize("enable_chat,case_model,understanding_model", [
+    (True, None, "understanding"),
+    (True, "case", None),
+    (False, "case", None),
+    (False, None, "understanding"),
+])
+def test_incomplete_background_model_composition_is_sanitized_before_serving(
+        composed, enable_chat, case_model, understanding_model):
+    events, opened = composed
+    with pytest.raises(managed.ManagedAppError, match="^app_composition_failed$"):
+        managed.open_managed_app(
+            object(), consultant=object(), enable_chat=enable_chat,
+            case_model=case_model, understanding_model=understanding_model,
+        )
+    assert opened.backgrounds == []
+    assert events == ["close"]
+
+
+def test_startup_failure_is_sanitized_and_drain_still_occurs(composed):
+    events, opened = composed
+    def failure(**kwargs):
+        raise RuntimeError("private-connection-password")
+    opened.host.runtime.finish_startup = failure
+    app = managed.open_managed_app(object(), consultant=object())
+    with pytest.raises(RuntimeError, match="^jd_query_startup_failed$") as error:
+        with TestClient(app.app):
+            pytest.fail("No serving before recovery.")
+    assert error.value.__suppress_context__
+    assert events == ["ai-owner", "close"]
+
+
+def test_composition_failure_does_not_leak_open_host_or_raw_error(composed, monkeypatch):
+    events, _ = composed
+    def failure(*args, **kwargs):
+        raise RuntimeError("private-configuration")
+    monkeypatch.setattr(managed, "create_configured_api", failure)
+    with pytest.raises(managed.ManagedAppError, match="^app_composition_failed$"):
+        managed.open_managed_app(object(), consultant=object())
+    assert events == ["ai-owner", "close"]
+
+
+def test_manual_only_consultant_explicitly_refuses_interview_invocation():
+    from jd_relational.inspection_model import InspectionExecutionDisabled
+    with pytest.raises(InspectionExecutionDisabled) as error:
+        managed.unavailable_consultant().invoke({"messages": []})
+    assert str(error.value) == error.value.code == "execution_disabled"
+
+
+@pytest.fixture
+def cli(monkeypatch):
+    events = []
+    value = settings("ready")
+    file = SimpleNamespace(read=lambda: encode_configuration(value))
+    monkeypatch.setattr(entry, "default_config_path", lambda: "os-fixed-path")
+    def make_file(path):
+        assert path == "os-fixed-path"
+        events.append("file")
+        return file
+    monkeypatch.setattr(entry, "ConfigFile", make_file)
+    monkeypatch.setattr(entry, "read_key", lambda role: None)
+    return events, file
+
+
+def test_status_only_reads_configuration_and_does_not_claim_database_readiness(cli, monkeypatch, capsys):
+    events, _ = cli
+    monkeypatch.setattr(entry, "initialize_configuration", lambda *_, **__: pytest.fail("No init."))
+    monkeypatch.setattr(entry, "open_managed_app", lambda *_, **__: pytest.fail("No host."))
+    assert entry.main(["status"]) == 0
+    assert events == ["file"]
+    assert "serve 仍會檢查" in capsys.readouterr().out
+
+
+def test_cli_error_never_prints_private_exception(cli, capsys):
+    _, file = cli
+    def failure():
+        raise ValueError("private-password-and-file-name")
+    file.read = failure
+    assert entry.main(["status"]) == 1
+    assert "private-password" not in capsys.readouterr().err
+
+
+def test_resume_does_not_ask_for_new_connection_or_id(cli, monkeypatch):
+    _, file = cli
+    monkeypatch.setattr(entry, "_connection_input", lambda: pytest.fail("Keep original config."))
+    calls = []
+    monkeypatch.setattr(entry, "initialize_configuration", lambda f, **kwargs: calls.append((f, kwargs)))
+    assert entry.main(["resume-init"]) == 0
+    assert calls == [(file, {"connection": None, "resume": True})]
+
+
+def test_serve_is_single_loopback_process_and_drains(cli, monkeypatch):
+    events, file = cli
+    import uvicorn
+    app = object()
+    inspection = object()
+    fake = SimpleNamespace(app=app, port=8014, close=lambda: events.append("close") or True)
+    monkeypatch.setattr(entry, "unavailable_consultant", lambda: inspection)
+    monkeypatch.setattr(entry, "open_consultant_runtime",
+        lambda **_: pytest.fail("No model runtime without a configured key."))
+    def open_app(passed_file, **kwargs):
+        assert passed_file is file
+        assert kwargs == {"consultant": inspection, "enable_chat": False,
+                          "case_model": None, "understanding_model": None}
+        return fake
+    monkeypatch.setattr(entry, "open_managed_app", open_app)
+    def run(passed, **kwargs):
+        assert passed is app and kwargs == dict(host="127.0.0.1", port=8014, workers=1,
+            reload=False, access_log=False, proxy_headers=False, log_level="warning")
+        events.append("server")
+    monkeypatch.setattr(uvicorn, "run", run)
+    assert entry.main(["serve"]) == 0
+    assert events == ["file", "server", "close"]
+
+
+def test_serve_assembles_openrouter_consultant_and_enables_chat(cli, monkeypatch):
+    events, file = cli
+    import uvicorn
+    graph = object()
+    case_model, understanding_model = object(), object()
+    runtime = SimpleNamespace(graph=graph,
+        role_models=SimpleNamespace(case=case_model, understanding=understanding_model),
+        close=lambda: events.append("consultant-close") or True)
+    monkeypatch.setattr(entry, "read_key", lambda role: (
+        events.append(("key", role)) or "synthetic-openrouter-not-a-key"))
+    monkeypatch.setattr(entry, "open_consultant_runtime", lambda **kwargs: (
+        events.append(("consultant", kwargs)) or runtime))
+    app = object()
+    managed_app = SimpleNamespace(app=app, port=8014,
+        close=lambda: events.append("app-close") or True)
+    def open_app(passed_file, **kwargs):
+        assert passed_file is file
+        assert kwargs == {"consultant": graph, "enable_chat": True,
+                          "case_model": case_model,
+                          "understanding_model": understanding_model}
+        events.append("app")
+        return managed_app
+    monkeypatch.setattr(entry, "open_managed_app", open_app)
+    monkeypatch.setattr(uvicorn, "run", lambda passed, **kwargs: events.append("server"))
+
+    assert entry.main(["serve"]) == 0
+    assert events == ["file", ("key", "openrouter"),
+        ("consultant", {"api_key": "synthetic-openrouter-not-a-key"}),
+        "app", "server", "app-close", "consultant-close"]
+
+
+@pytest.mark.parametrize("close_mode", ["unconfirmed", "raises"])
+def test_serve_keeps_consultant_open_when_app_drain_is_unconfirmed(
+        cli, monkeypatch, capsys, close_mode):
+    events, _ = cli
+    import uvicorn
+    runtime = SimpleNamespace(graph=object(),
+        role_models=SimpleNamespace(case=object(), understanding=object()),
+        close=lambda: events.append("consultant-close") or True)
+    monkeypatch.setattr(entry, "read_key", lambda _: "synthetic-openrouter-not-a-key")
+    monkeypatch.setattr(entry, "open_consultant_runtime", lambda **_: runtime)
+    def fail_close():
+        events.append("app-close-failed")
+        if close_mode == "raises":
+            raise RuntimeError("private-close-cause")
+        return False
+    monkeypatch.setattr(entry, "open_managed_app", lambda *_, **__: SimpleNamespace(
+        app=object(), port=8014, close=fail_close))
+    monkeypatch.setattr(uvicorn, "run", lambda *_, **__: events.append("server"))
+
+    assert entry.main(["serve"]) == 1
+    assert events == ["file", "server", "app-close-failed"]
+    error = capsys.readouterr().err
+    assert "未確認結束" in error
+    assert "private-close-cause" not in error
+
+
+def test_init_refuses_noninteractive_secret_input(monkeypatch):
+    monkeypatch.setattr(entry.sys, "stdin", SimpleNamespace(isatty=lambda: False))
+    with pytest.raises(ValueError, match="interactive_initialization_required"):
+        entry._connection_input()

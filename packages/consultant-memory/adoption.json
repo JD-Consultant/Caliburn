@@ -1,0 +1,127 @@
+{
+  "format_version": 1,
+  "adopted_on": "2026-09-13",
+  "source_commit": "033540cef870d1f92baa5c69133a799231c46d48",
+  "files": [
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/memory.py",
+      "source_sha256": "3f383a6ec433490edcef616ec138594d850de0c201c7c6da630253cca117a7d5",
+      "adopted_path": "src/caliburn_memory/memory.py",
+      "adopted_sha256": "e6f748f2ad14bd446ae9ccb4eb866fcee6a346761293b3cbf2f5b0ec7aa2ced7",
+      "adaptation": "Package imports; SourceReader annotation; validate_source delegates source validation; replace legacy parser calls. Commit 3921a99d adds validate_pair delegation to the same source owner at extraction save and source-window readback when context is present; source-only readers retain their existing grant policy. 2026-09-16 MEM-L001 adds an additive layered bundle path: Runtime-owned manifest, guides, case/understanding artifacts, exact digests/bindings, source validation, exact-base identity lifecycle checks and typed on-demand readback. The adopted legacy two-file methods remain for compatibility and are not presented as the new B1/B2 product effect."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/publication.py",
+      "source_sha256": "3de2ef91c0ab865d9fed3241b94863db88f6dd516b809fa26c8edeebac6fcdf6",
+      "adopted_path": "src/caliburn_memory/publication.py",
+      "adopted_sha256": "00d2336213f9da2d4ae2fc4539ba53f4ea70d964f36ab7257440faa2c739b111",
+      "adaptation": "Package imports; source validation delegates MemoryArtifacts. Publication transactions, CAS and receipts remain unchanged. 2026-09-16 adds the prepared bundle base revision and exact base MemoryVersion to new request digests and rejects revision/version lineage mismatch; null legacy fields are omitted from hashing so existing two-file receipt digests remain compatible."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/references.py",
+      "source_sha256": "0ddaa542f92c8bf0eec5f301a1faba78c56a7a5a0727fc0371b45204e176ae9f",
+      "adopted_path": "src/caliburn_memory/references.py",
+      "adopted_sha256": "00ba2f65e9a3f649196ab212b3f5713f95f0deaf037f7a322d18dc37adf00b44",
+      "adaptation": "2026-09-16 extends the same CommonMark-aware controlled-reference parser to /memory/ paths so layered guide/item links are existence-checked against the candidate bundle; conversation and interview parsing semantics remain unchanged."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/memory_patch.py",
+      "source_sha256": "b26e5be41214c79664a42e1995bf670406b6c4c8e4af9feefa455be2b534b6fd",
+      "adopted_path": "src/caliburn_memory/patch.py",
+      "adopted_sha256": "7ec27fc2b206d1d8f298f0c2abead1082c9eb33757abfb0a7f00c1d606d57dd8",
+      "adaptation": "Package module name and provenance docstring only; original patch AST preserved."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation_tools.py",
+      "source_sha256": "d81efec80bc8e8b32b665f82d97bd0d632948e29daa56e2a38f5bc8b9d1ab6d0",
+      "adopted_path": "src/caliburn_memory/staging.py",
+      "adopted_sha256": "9afc5308bb31005df37c84610c8583d4577e26dc2eb667a33c845473c02f3e85",
+      "adaptation": "Extract only PATHS/staged_texts validation; share PATHS from patch; typed invalid-source port and fixed safe content errors; unknown I/O propagates. 2026-09-14 adopts the rest of this source file for B2: StagedFiles and consolidation_tools() are byte-identical apart from package imports, so the tool allowlist, the custom descriptions, the eviction limits, apply_memory_patch and validate_memory keep their verified behaviour. staged_texts keeps this package's earlier typed-error split, which makes a missing staged file correctable feedback rather than a hard failure."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/repair.py",
+      "source_sha256": "8b4fa02e7ff70d6e868b7155e18b46fe6e1454fbfd505b9bfdaf7e625274742d",
+      "adopted_path": "src/caliburn_memory/repair.py",
+      "adopted_sha256": "e41b12b9ff78d228615999a4ba9f064297a7f5b6656c050cc33331429f2d1e4b",
+      "adaptation": "Package imports; typed staged validation; original PublishRequest receipt reconciliation without caller edits; same-document non-regressing current-head guard. Six native graph nodes and publication owner retained. Adds build_repair_graph(resolve_workflow), which compiles those same six steps so a host can mount them as a static child; each node resolves its workflow from the native Runtime, so building or inspecting the graph opens no resource. 2026-09-15 Owner version-baseline correction: if the turn-start base is absent but a current publication now exists, repair returns stale so the model can read and reconsider from that explicit head; successful publish/reconciliation still verifies the non-regressing current head, but reports the exact applied head as this turn's read baseline. Prompt, graph nodes, patch validation, publication CAS and retry limits are unchanged."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation_request.py",
+      "source_sha256": "6965d106a270209e61ef0982bf18be8096e4b72b234091d45c303ccd075414d2",
+      "adopted_path": "src/caliburn_memory/requests.py",
+      "adopted_sha256": "6965d106a270209e61ef0982bf18be8096e4b72b234091d45c303ccd075414d2",
+      "adaptation": "Module renamed only; byte-identical. The tool takes no arguments, returns a durable receipt and never runs B1/B2 or writes Memory. Its description is verified model-facing text and was not reworded. Verified at 4f94fbfb (CT50 profile)."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/memory_tools.py",
+      "source_sha256": "facdbfc5e3dc5035326e0af46be58479c720c54f0398ea6453312001dc429e11",
+      "adopted_path": "src/caliburn_memory/read_tools.py",
+      "adopted_sha256": "2e0c0c15b515b71f72c8f308b598c57d14b689bac81a2c62344bbb885cd92bee",
+      "adaptation": "Extract only READONLY_TOOL_DESCRIPTIONS/readonly_file_tools; drop the Skill-file claim and make comments provider-neutral. No source store, SkillAssets, runner or write tool. See read-tools-results.md. 2026-09-14 also adopts MEMORY_EDIT_GUIDANCE verbatim from the same source file, with its comment references, because the B2 staged-file tool descriptions carry it."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/extraction.py",
+      "source_sha256": "06dd3e8c4d9c76afb461d63ad02c4e733a8509416a98a55211e479b9359eb6ce",
+      "adopted_path": "src/caliburn_memory/extraction.py",
+      "adopted_sha256": "af728c46261fd0efea32fb8109bbd12ea64906f1ffbd4d606ae5e497c76821f5",
+      "instructions_sha256": "83b1437619f6618fd776f3fec6fcf37397d1b5b476390b15f06016b55ec62398",
+      "adaptation": "B1 workflow adopted at 4f94fbfb (CT50 profile). INSTRUCTIONS is byte-identical (see instructions_sha256), as are ExtractionOutput's three fields and validators, the window loop, correction allowance, save, resume, reextract and reextraction_config. Two seams: package imports plus reader.validate_reference in place of the unsigned legacy parse_reference; and provider assembly moved to the caller, which supplies the already-configured structured runnable (built from ExtractionOutput.model_json_schema() with include_raw) and an accepted(raw) port carrying that provider's terminal/refusal evidence. The OpenAI-shaped refusal-block and response_metadata['status'] checks were the only provider-specific logic and now live behind that port; max_output_tokens moved with them. Not yet verified against a real provider on this stack."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation.py",
+      "source_sha256": "1ec015eaaf5ea85f6b6d50901d5b002b6115b5aa9ad1dad15892c2c1bf7c8f4e",
+      "adopted_path": "src/caliburn_memory/consolidation.py",
+      "adopted_sha256": "c64eb183bd14586445ac25b19bea73613309aa9c8fe9317afb677c9ca4a467a8",
+      "instructions_sha256": "d4061fc9ac3d5b51335af54dde9e9b7338b6050188ebca84875fbc6e56ea520c",
+      "adaptation": "B2 workflow adopted at 4f94fbfb (CT50 profile) on 2026-09-14. INSTRUCTIONS is byte-identical (see instructions_sha256). The graph, JobState, stale->load, budgets (16 model steps, 15 tool calls, 4096 output -- the class default, which the App overrides with the verified 8192 -- 24000 candidate chars, 12000 repair chars), the candidate/detail budget rule, _repair_input, the artifact-derived _operation_id and the publish/receipt path are unchanged. One seam: this package binds no provider, so runtime.native_context_view is no longer imported and the caller passes context_middleware instead; everything else in the middleware list keeps its order, including the after-hook ordering comment. Not yet verified against a real provider on this stack."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/consolidation_feedback.py",
+      "source_sha256": "60f573a67ffeab0aaf504ecef2465342a615d9d26a5d6f4df8217f85ea55600f",
+      "adopted_path": "src/caliburn_memory/consolidation_feedback.py",
+      "adopted_sha256": "9462dadba4de4fe2857dcac14724416d8dffd5d9365523e5f98922120c140fb6",
+      "adaptation": "Adopted 2026-09-14 with package imports only; completed_messages and the can_jump_to model feedback hook are otherwise byte-identical."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/skills.py",
+      "source_sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce",
+      "adopted_path": "src/caliburn_memory/skills.py",
+      "adopted_sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce",
+      "adaptation": "Adopted 2026-09-14 byte-identical. SkillAssets resolves its assets from Path(__file__).with_suffix(''), so the adopted skills/ directory sits beside this module exactly as it did at source. No host import existed to change."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md",
+      "source_sha256": "dd3c90f7376cb99dce5da91c6aa3172af401ae891ac96213858303edbd260d30",
+      "adopted_path": "src/caliburn_memory/skills/work-scope-interview/SKILL.md",
+      "adopted_sha256": "dd3c90f7376cb99dce5da91c6aa3172af401ae891ac96213858303edbd260d30",
+      "adaptation": "Adopted 2026-09-14 byte-identical."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md",
+      "source_sha256": "d4e8abc339115f9ae4ad8c321e0696291c0dafa4c745b7606f648f5ad9f783aa",
+      "adopted_path": "src/caliburn_memory/skills/compare-work-patterns/SKILL.md",
+      "adopted_sha256": "d4e8abc339115f9ae4ad8c321e0696291c0dafa4c745b7606f648f5ad9f783aa",
+      "adaptation": "Adopted 2026-09-14 byte-identical."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md",
+      "source_sha256": "5856afcf8d7522257a656fb2b6162a3129a145fd91b54225636d72ccf94a6686",
+      "adopted_path": "src/caliburn_memory/skills/outcomes-and-expertise/SKILL.md",
+      "adopted_sha256": "5856afcf8d7522257a656fb2b6162a3129a145fd91b54225636d72ccf94a6686",
+      "adaptation": "Adopted 2026-09-14 byte-identical."
+    },
+    {
+      "source_path": "experiments/analysis-agent/src/analysis_agent/live_memory.py",
+      "source_sha256": "30c2901760d6d2e0a7173adc7368499d25b9679b9a17bf7344cb20b8e74ac5f2",
+      "adopted_path": "src/caliburn_memory/guidance.py",
+      "adopted_sha256": "06cdbbe6eed56d7ce429e03697891ed6dd53a08bddc6239b7d8e1f59b74b1cb5",
+      "instructions_sha256": "680d4a61b42ac7c5260b0dc4c9f437563efe9b5f624acb45cb0e300bb988b3e5",
+      "adaptation": "Only MEMORY_ACTION_GUIDANCE is adopted, on 2026-09-14, and its text is byte-identical (instructions_sha256 is the sha256 of the constant's value; a test re-reads it from the source commit and compares). The rest of live_memory.py is that host's own C assembly and is NOT adopted -- this App has its own memory_context, repair session and notice path. The adopted file is therefore an extract with a new docstring, not a copy of the source file, which is why the file hashes differ. The guidance names repair_memory and request_memory_consolidation, both of which this package owns."
+    }
+  ],
+  "new_files": {
+    "src/caliburn_memory/bundle.py": "Runtime-owned MEM-L001 bundle dataclasses and canonical manifest serialization; no model, provider, publication or storage authority.",
+    "src/caliburn_memory/sources.py": "SourceReader port and InvalidSourceReference; no original conversation storage or old source implementation. ExtractionSourceReader adds the planning, paged read, saved-window and admission methods B1 needs from the source owner.",
+    "src/caliburn_memory/__init__.py": "Explicit public exports."
+  }
+}

@@ -1,0 +1,34 @@
+........F..................................                              [100%]
+================================== FAILURES ===================================
+____________ test_r02_legal_later_system_and_state_command_survive ____________
+
+jd = <analysis_agent.jd_service.JdService object at 0x000001BA19076CC0>
+
+    def test_r02_legal_later_system_and_state_command_survive(jd):
+        from langchain.agents.middleware.types import ExtendedModelResponse
+        from langchain_core.messages import SystemMessage
+        from langgraph.types import Command
+        class Legal(AgentMiddleware):
+            def wrap_model_call(self,request,handler):
+                blocks=list(request.system_message.content)
+                blocks.append({'type':'text','text':'legal additional system guidance'})
+                response=handler(request.override(system_message=SystemMessage(content=blocks)))
+                return ExtendedModelResponse(response,Command(update={'invalid_json_count':7}))
+        scope=seed(jd)
+        _,state,requests,_,_=run_calls(jd,scope,[],extra_middleware=[Legal()])
+>       assert state['invalid_json_count']==7
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'invalid_json_count'
+
+tests\test_jd_fix1.py:148: KeyError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-3b537648-64df-4bd3-b029-66a5aef2b3a1.jsonl
+============================== warnings summary ===============================
+tests/test_jd_model_view_recovery.py::test_real_api_native_selection_admission_and_exact_replacement
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_fix1.py::test_r02_legal_later_system_and_state_command_survive
+1 failed, 42 passed, 1 warning in 167.95s (0:02:47)

@@ -1,0 +1,143 @@
+{
+  "Filename": "pywin32-312-cp312-cp312-win_amd64.whl",
+  "Source": "https://files.pythonhosted.org/packages/03/d9/77040d3b43df3f3be32ea289433d660d2727f5ba327bc73be835127d9d60/pywin32-312-cp312-cp312-win_amd64.whl",
+  "ExpectedSHA256": "b457f6d628a47e8a7346ce22acb7e1a46a4a78b52e1d17e1af56871bd19a93bc",
+  "ActualSHA256": "b457f6d628a47e8a7346ce22acb7e1a46a4a78b52e1d17e1af56871bd19a93bc",
+  "Size": 6914841,
+  "MetadataSize": 6914841,
+  "SelectedRecordChecks": [
+    {
+      "Path": "adodbapi/license.txt",
+      "Bytes": 26925,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pythonwin/License.txt",
+      "Bytes": 1541,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pythonwin/Scintilla-License.txt",
+      "Bytes": 873,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pythonwin/pywin/idle/LICENSE.txt",
+      "Bytes": 12540,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/licenses/adodbapi/license.txt",
+      "Bytes": 26925,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/licenses/com/License.txt",
+      "Bytes": 1570,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/licenses/com/win32comext/mapi/src/MAPIStubLibrary/LICENSE",
+      "Bytes": 1087,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/licenses/isapi/README.txt",
+      "Bytes": 330,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/licenses/pythonwin/License.txt",
+      "Bytes": 1541,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/licenses/pythonwin/Scintilla/License.txt",
+      "Bytes": 873,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/licenses/pythonwin/pywin/idle/LICENSE.txt",
+      "Bytes": 12540,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/licenses/win32/License.txt",
+      "Bytes": 1541,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32_system32/pywintypes312.dll",
+      "Bytes": 136192,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "win32/License.txt",
+      "Bytes": 1541,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "win32/win32event.pyd",
+      "Bytes": 30208,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "win32/win32job.pyd",
+      "Bytes": 29696,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "win32com/License.txt",
+      "Bytes": 1570,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "win32comext/License.txt",
+      "Bytes": 1570,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "win32comext/mapi/MAPIStubLibrary-License.txt",
+      "Bytes": 1087,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "win32comext/mapi/NOTICE.md",
+      "Bytes": 476,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/METADATA",
+      "Bytes": 11168,
+      "HashMatch": true,
+      "SizeMatch": true
+    },
+    {
+      "Path": "pywin32-312.dist-info/WHEEL",
+      "Bytes": 101,
+      "HashMatch": true,
+      "SizeMatch": true
+    }
+  ],
+  "NotExecuted": true
+}

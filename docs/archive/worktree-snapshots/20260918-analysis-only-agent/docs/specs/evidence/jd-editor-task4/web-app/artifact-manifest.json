@@ -1,0 +1,191 @@
+{
+  "copied_raw_files": [
+    {
+      "file": "task4-browser-provider.jsonl",
+      "bytes": 650193,
+      "sha256": "5dbc7a5e6fabfb0e1d696283688a3087ec335fe5a9929069e07fdac5da78668f"
+    },
+    {
+      "file": "task4-browser-server.json",
+      "bytes": 1351,
+      "sha256": "434460ade023773873d89ea9109e9e8b2bb05b2619879b76b6e39b04c692ccfe"
+    },
+    {
+      "file": "task4-final-api-and-affected-owner-regression.log",
+      "bytes": 661,
+      "sha256": "c61b7a6e0a0ace6b50eff49f34c8e86c1d23125172d7aa42c7fda7c084e6e948"
+    },
+    {
+      "file": "task4-final-browser-script-lint.log",
+      "bytes": 86,
+      "sha256": "bfbca15c3670f732966c70f4e0ef309de10df90489e76e78a4bd001ad75b4829"
+    },
+    {
+      "file": "task4-final-codegen-check.log",
+      "bytes": 129,
+      "sha256": "3faa3aecd5a930f6a6ec7efb9d34f91449d2c833285b703bbf57bd8e3c979661"
+    },
+    {
+      "file": "task4-final-contract.log",
+      "bytes": 330,
+      "sha256": "a032e63e8991d20fb545fb2523da6e76838a63c3482fcb7a2bf532a168853322"
+    },
+    {
+      "file": "task4-final-native.log",
+      "bytes": 326,
+      "sha256": "8bfb8f553dbe5a8ca8651124de0874fb9d297555b42825686d16ec1390709746"
+    },
+    {
+      "file": "task4-final-verification.json",
+      "bytes": 4261,
+      "sha256": "e0fa043047198e883c3e4dea36026cfa11865fb67d95f63fe15529655bdfa1ec"
+    },
+    {
+      "file": "task4-final-verify.py",
+      "bytes": 2026,
+      "sha256": "d42316829a4fd26de333b60c279de1abdcb83938c146df15145d4d9c2352a986"
+    },
+    {
+      "file": "task4-final-web-build.log",
+      "bytes": 804,
+      "sha256": "df008ef2223da35edda0e6ac4c1974bdfcc1d9754c48bde8ac431c437de49956"
+    },
+    {
+      "file": "task4-final-web-lint.log",
+      "bytes": 52,
+      "sha256": "3bc43ebff97e4ac84e6eb7258eaa110c410116cb891846fafda0043214f68c79"
+    },
+    {
+      "file": "task4-final-web-tests.log",
+      "bytes": 484,
+      "sha256": "a5c3211fc077200ba5761e6aebcd7954d8cef4adc43f2d6f17df3911c77e3662"
+    },
+    {
+      "file": "task4-final-web-types.log",
+      "bytes": 63,
+      "sha256": "bc541812b7503c894f68bae865c488a102906951f560b3e2c25d854f3586671b"
+    },
+    {
+      "file": "task4-first-browser.json",
+      "bytes": 20990,
+      "sha256": "d604695eb916ade4888a3c02fb6f00ac02c77facb7a0b2ec78189003ca58ba7a"
+    },
+    {
+      "file": "task4-first-screen.png",
+      "bytes": 639554,
+      "sha256": "8d2d55a3e2e293b7d43dd7789daba5d862f815ac8e2b636d568bb57192dfd433"
+    },
+    {
+      "file": "task4-input-attempt1.json",
+      "bytes": 4819,
+      "sha256": "b60b57d2277e808bfa60b98654ee75557dffa5e708a1cd9036e39bcd2433a461"
+    },
+    {
+      "file": "task4-input-attempt1.png",
+      "bytes": 57452,
+      "sha256": "39e1b40424f836792d6f56d613660ac070f2306fde17f9c1651201f7cee680c5"
+    },
+    {
+      "file": "task4-input-attempt2.json",
+      "bytes": 4819,
+      "sha256": "71e78ce70254139874517da0bb18db451114840696a030c46f8c3b63fdf95946"
+    },
+    {
+      "file": "task4-input-attempt3.json",
+      "bytes": 5078,
+      "sha256": "c3cf09476b372bfe46ccd29222b8075c6fd6bab7fca8c13249d9f4e58ee9f691"
+    },
+    {
+      "file": "task4-input-attempt4.json",
+      "bytes": 5258,
+      "sha256": "f37b63ba1d7251634728e2cb9e9a76a44c07e1e5a60b2875d32441007e343cd1"
+    },
+    {
+      "file": "task4-input-browser.json",
+      "bytes": 17348,
+      "sha256": "1ed22efc86cb816f00c9dbc85d5affb17b80c3534297ad9ab6af99a63b151df9"
+    },
+    {
+      "file": "task4-input-screen.png",
+      "bytes": 76037,
+      "sha256": "439fd929288cd41c636ebc40bfea841232ca1b3b255faa7c9ba1ff2178450df7"
+    },
+    {
+      "file": "task4-navigation-browser.json",
+      "bytes": 8837,
+      "sha256": "9473b8f0cf3ef8c3ef0e79e2366957086ee93828326b507ea19ae4d6fbfe8c72"
+    },
+    {
+      "file": "task4-navigation-screen.png",
+      "bytes": 52056,
+      "sha256": "c3da08f5436cd4f53ec67c3cb87ac0173202638f42e55989f2560ec8086b3e87"
+    },
+    {
+      "file": "task4-owned-processes.json",
+      "bytes": 2536,
+      "sha256": "f727525ac77b8623fd43abd444785ef1bfdccfc571c706cfd46fceaadc350f24"
+    },
+    {
+      "file": "task4-recovery-attempt1.json",
+      "bytes": 1302,
+      "sha256": "11ee787c45d23cbec1ff9d3f6cf73160dbe854580cfca61f76805027287ec45b"
+    },
+    {
+      "file": "task4-recovery-browser.json",
+      "bytes": 18135,
+      "sha256": "e408a39b6e176e716f6ecc24201f34a971522852b8d0f117acf1c01df7ffd903"
+    },
+    {
+      "file": "task4-recovery-followup.json",
+      "bytes": 2397,
+      "sha256": "ac887e2e0317f0184ec7e231c3813cddc2e0cef5da2777267ce8306a49cbc094"
+    },
+    {
+      "file": "task4-recovery-screen.png",
+      "bytes": 63457,
+      "sha256": "0ce638e8e32f6bade8168340c8f2cff2fc8c3befaf79dc0ff04a9d6f43340fcb"
+    },
+    {
+      "file": "task4-run.py",
+      "bytes": 1011,
+      "sha256": "8219f0c03385a86728852a949ea17dd29ffbcec78af2bf0d7ae1b6375edb4277"
+    },
+    {
+      "file": "task4-structure-attempt1.json",
+      "bytes": 1626,
+      "sha256": "5fb19497e0f5e26d016dd8f5c36f61d8f11f50da2be7c7c58120ebed4e97d410"
+    },
+    {
+      "file": "task4-structure-attempt2.json",
+      "bytes": 24305,
+      "sha256": "6ab4c4b6b187b8693b7f125db255ea39af64c9a7612ac25d62c2797f6ac31706"
+    },
+    {
+      "file": "task4-structure-browser.json",
+      "bytes": 356480,
+      "sha256": "7c13ffb9daf92cbb577f2d51f7aac3cb4f0db61978d65121b5da1aa111293774"
+    },
+    {
+      "file": "task4-structure-final-browser.json",
+      "bytes": 348662,
+      "sha256": "923a95fd831c39132deb7991599fdb3887023373dcb0adde661c99aa623e5567"
+    },
+    {
+      "file": "task4-structure-final-screen.png",
+      "bytes": 655968,
+      "sha256": "29a277a8914cb5cbd2a6dd3c77c2b4cc92dff4cafaeb7956b956031ca2a14995"
+    },
+    {
+      "file": "task4-structure-screen.png",
+      "bytes": 657557,
+      "sha256": "de26c62e0ab028cc8caf241ae5a2e8a18b23418cec7f4d50ebcefc9dd644b50a"
+    }
+  ],
+  "copy_hash_mismatches": 0,
+  "report": "report.md",
+  "excluded": [
+    "root-owned Node evidence",
+    "root-owned schema-performance evidence",
+    "recovery-attempt2 stale duplicate"
+  ]
+}

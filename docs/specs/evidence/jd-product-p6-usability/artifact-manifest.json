@@ -1,0 +1,21 @@
+{
+  "files": [
+    {
+      "path": "protocol.md",
+      "sha256": "edff65e5c15dd954394073903014436d2b311cf1566d328bdd5ec2788a3830e7",
+      "bytes": 20145
+    },
+    {
+      "path": "review.md",
+      "sha256": "1fdbf7992a4835b0bbcd6a10442bdf28777d5cc4a876bb7cfedd1cb30e16a21c",
+      "bytes": 2981
+    },
+    {
+      "path": "README.md",
+      "sha256": "77905194a8342267ed0eb8d2a1707823187b4099bb2e30750e6bf5365ff90f0e",
+      "bytes": 672
+    }
+  ],
+  "real_employee_sessions": 0,
+  "product_provider_requests": 0
+}

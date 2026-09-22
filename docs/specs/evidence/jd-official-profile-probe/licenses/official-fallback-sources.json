@@ -1,0 +1,65 @@
+{
+  "checkedOn": "2026-09-10",
+  "sources": [
+    {
+      "name": "@udecode/react-hotkeys",
+      "version": "52.0.11",
+      "url": "https://raw.githubusercontent.com/udecode/plate/0a02e15d2f704bf60d28176b97c3761fe7aa4923/LICENSE",
+      "path": "licenses/official-fallback/@udecode__react-hotkeys-LICENSE",
+      "installedLicenseAbsent": true
+    },
+    {
+      "name": "jotai-x",
+      "version": "2.3.4",
+      "url": "https://raw.githubusercontent.com/udecode/jotai-x/11cf4bb2e565c7d1734537bea3bf947e474d9a59/LICENSE",
+      "path": "licenses/official-fallback/jotai-x-LICENSE",
+      "installedLicenseAbsent": true
+    },
+    {
+      "name": "react-compiler-runtime",
+      "version": "1.0.0",
+      "url": "https://raw.githubusercontent.com/facebook/react/5c15c1cd3442f28044217703b5625f98c40042ee/LICENSE",
+      "path": "licenses/official-fallback/react-compiler-runtime-LICENSE",
+      "installedLicenseAbsent": true
+    },
+    {
+      "name": "zustand-x",
+      "version": "6.2.1",
+      "url": "https://raw.githubusercontent.com/udecode/zustand-x/78abd51d8e3414ed3ae8c9b577ec273e91bdab4b/LICENSE",
+      "path": "licenses/official-fallback/zustand-x-LICENSE",
+      "installedLicenseAbsent": true
+    },
+    {
+      "name": "slate",
+      "version": "0.126.2",
+      "url": "https://raw.githubusercontent.com/ianstormtaylor/slate/ec793483ada7f7e21ebc82c2b3aa9ea674605ce3/License.md",
+      "path": "licenses/official-fallback/slate-License.md",
+      "installedLicenseAbsent": true,
+      "note": "Official root filename is case-sensitive License.md."
+    },
+    {
+      "name": "slate-dom",
+      "version": "0.126.0",
+      "url": "https://raw.githubusercontent.com/ianstormtaylor/slate/2b7d9b0bd0118e7ce9b9adeac748de8a3bbe390c/License.md",
+      "path": "licenses/official-fallback/slate-dom-License.md",
+      "installedLicenseAbsent": true,
+      "note": "Official root filename is case-sensitive License.md."
+    },
+    {
+      "name": "slate-hyperscript",
+      "version": "0.125.0",
+      "url": "https://raw.githubusercontent.com/ianstormtaylor/slate/19a7dff89a475403f64446b03fc118f2afd820f2/License.md",
+      "path": "licenses/official-fallback/slate-hyperscript-License.md",
+      "installedLicenseAbsent": true,
+      "note": "Official root filename is case-sensitive License.md."
+    },
+    {
+      "name": "slate-react",
+      "version": "0.126.4",
+      "url": "https://raw.githubusercontent.com/ianstormtaylor/slate/e06076c1935d4716f398d93aae266b9d30ae6048/License.md",
+      "path": "licenses/official-fallback/slate-react-License.md",
+      "installedLicenseAbsent": true,
+      "note": "Official root filename is case-sensitive License.md."
+    }
+  ]
+}

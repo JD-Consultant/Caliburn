@@ -1,0 +1,8 @@
+* { box-sizing: border-box; }
+body { margin: 0; }
+button, textarea, input { font: inherit; }
+.work-grid { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 24px; align-items: start; }
+.jd-text { white-space: pre-wrap; overflow-wrap: anywhere; }
+.jd-section { scroll-margin-top: 90px; }
+.jd-item { border-left: 3px solid #d8e5dd; padding-left: 16px; }
+@media (max-width: 850px) { .work-grid { grid-template-columns: 1fr; } }

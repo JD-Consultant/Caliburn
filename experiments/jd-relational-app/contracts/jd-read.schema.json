@@ -1,0 +1,1435 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://caliburn.local/contracts/jd-read-v2.schema.json",
+  "title": "ReadCatalog",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "read": {
+      "$ref": "#/$defs/ReadInput"
+    },
+    "page": {
+      "$ref": "#/$defs/ReadPage"
+    },
+    "failure": {
+      "$ref": "#/$defs/ReadFailure"
+    },
+    "change_read": {
+      "$ref": "#/$defs/ChangeReadInput"
+    },
+    "change_page": {
+      "$ref": "#/$defs/ChangeReadPage"
+    },
+    "restore_preview_read": {
+      "$ref": "#/$defs/RestorePreviewInput"
+    },
+    "restore_preview_page": {
+      "$ref": "#/$defs/RestorePreviewPage"
+    },
+    "source_read": {
+      "$ref": "#/$defs/SourceReadInput"
+    },
+    "source_read_page": {
+      "$ref": "#/$defs/SourceReadPage"
+    }
+  },
+  "required": [
+    "read",
+    "page",
+    "failure",
+    "change_read",
+    "change_page",
+    "restore_preview_read",
+    "restore_preview_page",
+    "source_read",
+    "source_read_page"
+  ],
+  "$defs": {
+    "ReadInput": {
+      "title": "ReadInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "view": {
+          "type": "string",
+          "enum": [
+            "current",
+            "item",
+            "section",
+            "history"
+          ]
+        },
+        "target_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "view",
+        "target_ref",
+        "cursor"
+      ],
+      "description": "Read a complete current JD, an issued item or section, or historical revisions. All arguments are required. Use null target for current or the history index; use a returned cursor to continue exactly the same view. History is read-only."
+    },
+    "SectionRecord": {
+      "title": "SectionRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "section"
+          ]
+        },
+        "section_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "section_key": {
+          "type": "string",
+          "enum": [
+            "profile",
+            "purpose",
+            "duties_tasks",
+            "knowledge",
+            "skills",
+            "conditions"
+          ],
+          "description": "Stable App-provided chapter identity for display. Not a writable locator."
+        },
+        "title": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "section_ref",
+        "section_key",
+        "title"
+      ]
+    },
+    "ContainerRecord": {
+      "title": "ContainerRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "container"
+          ]
+        },
+        "container_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "section_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "owner_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "child_kind": {
+          "type": "string",
+          "enum": [
+            "duty",
+            "task",
+            "outcome",
+            "requirement",
+            "knowledge",
+            "skill",
+            "collaborator",
+            "work_environment",
+            "schedule_travel",
+            "shared_authority",
+            "shared_collaboration",
+            "qualification"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "container_ref",
+        "section_ref",
+        "owner_ref",
+        "child_kind"
+      ]
+    },
+    "ItemRecord": {
+      "title": "ItemRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "item"
+          ]
+        },
+        "item_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "item_id": {
+          "type": "string",
+          "minLength": 36,
+          "maxLength": 36,
+          "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$",
+          "description": "Stable App-provided database item identity within this document and dataset, retained across edits and moves. Display only; commands must use current signed refs."
+        },
+        "section_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "container_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "duty",
+            "task",
+            "outcome",
+            "requirement",
+            "knowledge",
+            "skill",
+            "collaborator",
+            "work_environment",
+            "schedule_travel",
+            "shared_authority",
+            "shared_collaboration",
+            "qualification"
+          ]
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "type",
+        "item_ref",
+        "item_id",
+        "section_ref",
+        "container_ref",
+        "kind",
+        "position"
+      ]
+    },
+    "FieldRecord": {
+      "title": "FieldRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "field"
+          ]
+        },
+        "item_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "section_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "field_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "name": {
+          "type": "string",
+          "enum": [
+            "job_title",
+            "organization_unit",
+            "employee_name",
+            "reports_to",
+            "purpose",
+            "name",
+            "description",
+            "scope_text",
+            "text"
+          ]
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "item_ref",
+        "section_ref",
+        "field_ref",
+        "name",
+        "value"
+      ]
+    },
+    "RelationRecord": {
+      "title": "RelationRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "task_capability"
+          ]
+        },
+        "section_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "task_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "capability_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "capability_kind": {
+          "type": "string",
+          "enum": [
+            "knowledge",
+            "skill"
+          ]
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "type",
+        "section_ref",
+        "task_ref",
+        "capability_ref",
+        "capability_kind",
+        "position"
+      ]
+    },
+    "SourceRecord": {
+      "title": "SourceRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "source"
+          ]
+        },
+        "section_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "target_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "related_capability_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "source_ref": {
+          "type": "string"
+        },
+        "basis_status": {
+          "type": "string",
+          "enum": [
+            "current",
+            "needs_recheck"
+          ]
+        },
+        "readability": {
+          "type": "string",
+          "enum": [
+            "not_checked",
+            "available",
+            "unavailable"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "section_ref",
+        "target_ref",
+        "related_capability_ref",
+        "source_ref",
+        "basis_status",
+        "readability"
+      ]
+    },
+    "RevisionRecord": {
+      "title": "RevisionRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "revision"
+          ]
+        },
+        "revision_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "revision_number": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "initial",
+            "manual",
+            "ai"
+          ]
+        },
+        "created_at": {
+          "type": "string"
+        },
+        "change_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "operation_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "revision_ref",
+        "revision_number",
+        "origin",
+        "created_at",
+        "change_ref",
+        "operation_ref"
+      ]
+    },
+    "ReadRecord": {
+      "title": "ReadRecord",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/SectionRecord"
+        },
+        {
+          "$ref": "#/$defs/ContainerRecord"
+        },
+        {
+          "$ref": "#/$defs/ItemRecord"
+        },
+        {
+          "$ref": "#/$defs/FieldRecord"
+        },
+        {
+          "$ref": "#/$defs/RelationRecord"
+        },
+        {
+          "$ref": "#/$defs/SourceRecord"
+        },
+        {
+          "$ref": "#/$defs/RevisionRecord"
+        }
+      ]
+    },
+    "ReadPage": {
+      "title": "ReadPage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format_version": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 2
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "current",
+            "item",
+            "section",
+            "history"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "current",
+            "history"
+          ]
+        },
+        "revision_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ReadRecord"
+          }
+        },
+        "start_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_records": {
+          "anyOf": [
+            {
+              "type": "integer",
+              "minimum": 0
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "has_more": {
+          "type": "boolean"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "oversized_unit": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "format_version",
+        "view",
+        "access",
+        "revision_ref",
+        "records",
+        "start_index",
+        "total_records",
+        "has_more",
+        "next_cursor",
+        "oversized_unit"
+      ],
+      "description": "Application read projection. Fields are complete, not previews. has_more requires continuation; finishing this view does not mean the JD is professionally complete. Source readability is a separate observation from basis_status."
+    },
+    "ReadFailure": {
+      "title": "ReadFailure",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "read_error"
+          ]
+        },
+        "code": {
+          "type": "string",
+          "enum": [
+            "invalid_input",
+            "invalid_ref",
+            "stale_view",
+            "target_missing",
+            "read_failed"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "correct_arguments",
+            "reread_current",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "code",
+        "message",
+        "next_action"
+      ]
+    },
+    "ChangeReadInput": {
+      "title": "ChangeReadInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "change_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "change_ref",
+        "cursor"
+      ],
+      "description": "Read the immutable before/after change of an issued committed operation. Continue with the same change_ref and returned cursor until has_more is false. This read never provides writable references."
+    },
+    "ChangeHeaderRecord": {
+      "title": "ChangeHeaderRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "change"
+          ]
+        },
+        "change_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "create",
+            "update",
+            "delete",
+            "move",
+            "reorder",
+            "link",
+            "unlink"
+          ]
+        },
+        "entity_kind": {
+          "type": "string",
+          "enum": [
+            "profile",
+            "collaborator",
+            "duty",
+            "task",
+            "detail",
+            "capability",
+            "condition",
+            "task_capability",
+            "source_link"
+          ]
+        },
+        "before_exists": {
+          "type": "boolean"
+        },
+        "after_exists": {
+          "type": "boolean"
+        },
+        "changed_fields": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "job_title",
+              "organization_unit",
+              "employee_name",
+              "reports_to",
+              "purpose",
+              "name",
+              "description",
+              "scope_text",
+              "text",
+              "kind",
+              "container_ref",
+              "position",
+              "task_ref",
+              "capability_ref",
+              "target_ref",
+              "related_capability_ref",
+              "source_ref",
+              "basis_digest"
+            ]
+          }
+        }
+      },
+      "required": [
+        "type",
+        "change_index",
+        "kind",
+        "entity_kind",
+        "before_exists",
+        "after_exists",
+        "changed_fields"
+      ],
+      "description": "Header for one stable-identity net change. changed_fields uses public field names, not database identifiers. Reorder is a relative ordering observation, not the original drag action."
+    },
+    "ChangeValueRecord": {
+      "title": "ChangeValueRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "value"
+          ]
+        },
+        "change_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "record": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/SectionRecord"
+            },
+            {
+              "$ref": "#/$defs/ContainerRecord"
+            },
+            {
+              "$ref": "#/$defs/ItemRecord"
+            },
+            {
+              "$ref": "#/$defs/FieldRecord"
+            },
+            {
+              "$ref": "#/$defs/RelationRecord"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "change_index",
+        "side",
+        "record"
+      ],
+      "description": "A complete historical record using the same field projection as jd_read. A text field is never split or truncated."
+    },
+    "ChangeSourceValueRecord": {
+      "title": "ChangeSourceValueRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "source_value"
+          ]
+        },
+        "change_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "record": {
+          "$ref": "#/$defs/SourceRecord"
+        },
+        "basis_digest": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        },
+        "position": {
+          "type": "integer",
+          "minimum": 0
+        }
+      },
+      "required": [
+        "type",
+        "change_index",
+        "side",
+        "record",
+        "basis_digest",
+        "position"
+      ],
+      "description": "Exact stored source basis and order; basis_status is evaluated in this side snapshot, readability is not checked by this operation."
+    },
+    "ChangeItemPlacementRecord": {
+      "title": "ChangeItemPlacementRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "item_placement"
+          ]
+        },
+        "change_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "container_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "previous_item_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_item_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "change_index",
+        "side",
+        "container_ref",
+        "previous_item_ref",
+        "next_item_ref"
+      ],
+      "description": "Actual neighboring items in this historical side. It does not claim which item the operator dragged."
+    },
+    "ChangeRelationPlacementRecord": {
+      "title": "ChangeRelationPlacementRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "relation_placement"
+          ]
+        },
+        "change_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "task_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "previous_capability_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_capability_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "change_index",
+        "side",
+        "task_ref",
+        "previous_capability_ref",
+        "next_capability_ref"
+      ]
+    },
+    "ChangeSourcePlacementRecord": {
+      "title": "ChangeSourcePlacementRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "source_placement"
+          ]
+        },
+        "change_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "side": {
+          "type": "string",
+          "enum": [
+            "before",
+            "after"
+          ]
+        },
+        "target_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "related_capability_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "previous_source_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "next_source_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "change_index",
+        "side",
+        "target_ref",
+        "related_capability_ref",
+        "previous_source_ref",
+        "next_source_ref"
+      ]
+    },
+    "ChangeAffectedTaskRecord": {
+      "title": "ChangeAffectedTaskRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "affected_task"
+          ]
+        },
+        "change_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "before_task_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "after_task_ref": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "change_index",
+        "before_task_ref",
+        "after_task_ref"
+      ],
+      "description": "One affected task, paired across the two historical snapshots when it exists in both. Shared capabilities include the union of tasks from both sides."
+    },
+    "ChangeReadRecord": {
+      "title": "ChangeReadRecord",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ChangeHeaderRecord"
+        },
+        {
+          "$ref": "#/$defs/ChangeValueRecord"
+        },
+        {
+          "$ref": "#/$defs/ChangeSourceValueRecord"
+        },
+        {
+          "$ref": "#/$defs/ChangeItemPlacementRecord"
+        },
+        {
+          "$ref": "#/$defs/ChangeRelationPlacementRecord"
+        },
+        {
+          "$ref": "#/$defs/ChangeSourcePlacementRecord"
+        },
+        {
+          "$ref": "#/$defs/ChangeAffectedTaskRecord"
+        }
+      ]
+    },
+    "ChangeReadPage": {
+      "title": "ChangeReadPage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format_version": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 2
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "change"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "history"
+          ]
+        },
+        "change_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "operation_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "base_revision_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "result_revision_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "origin": {
+          "type": "string",
+          "enum": [
+            "manual",
+            "ai"
+          ]
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChangeReadRecord"
+          }
+        },
+        "start_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_changes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "has_more": {
+          "type": "boolean"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "oversized_unit": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "format_version",
+        "view",
+        "access",
+        "change_ref",
+        "operation_ref",
+        "base_revision_ref",
+        "result_revision_ref",
+        "origin",
+        "records",
+        "start_index",
+        "total_records",
+        "total_changes",
+        "has_more",
+        "next_cursor",
+        "oversized_unit"
+      ],
+      "description": "Flat original-operation records grouped by change_index. A page may continue within a change; every full field and each affected task is atomic. Follow next_cursor to completion. Page byte budget measures the exact UTF-8 inner tool result; an unavoidable oversized atomic record is emitted alone and flagged. All content references are history-only; this page is not a current document or a write permission."
+    },
+    "RestorePreviewPage": {
+      "title": "RestorePreviewPage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format_version": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 2
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "restore_preview"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "current"
+          ],
+          "description": "The comparison is against the current head, which may move before a restore is confirmed."
+        },
+        "base_revision_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "description": "The head this comparison was read at; confirming a restore sends it back, and a head that moved is refused."
+        },
+        "records": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChangeReadRecord"
+          }
+        },
+        "start_index": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_records": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_changes": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "has_more": {
+          "type": "boolean"
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 4096
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "oversized_unit": {
+          "type": "boolean"
+        },
+        "target_revision_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096,
+          "description": "The saved revision whose content would become current."
+        }
+      },
+      "required": [
+        "format_version",
+        "view",
+        "access",
+        "base_revision_ref",
+        "records",
+        "start_index",
+        "total_records",
+        "total_changes",
+        "has_more",
+        "next_cursor",
+        "oversized_unit",
+        "target_revision_ref"
+      ],
+      "description": "What restoring a chosen revision would change, compared against the head it was read at. There is no operation and no origin here: nothing has happened yet."
+    },
+    "RestorePreviewInput": {
+      "title": "RestorePreviewInput",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Ask what restoring one saved revision would change; reading never writes.",
+      "properties": {
+        "target_revision_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "cursor": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "target_revision_ref",
+        "cursor"
+      ]
+    },
+    "SourceReadInput": {
+      "title": "SourceReadInput",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Read back the saved interview behind one JD source marker; reading never writes.",
+      "properties": {
+        "source_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        }
+      },
+      "required": [
+        "source_ref"
+      ]
+    },
+    "SourceMessageRecord": {
+      "title": "SourceMessageRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "description": "One saved message exactly as it was stored. An assistant message is the consultant's own wording, never an employee fact.",
+      "properties": {
+        "message_id": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 512
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "user",
+            "assistant"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "maxLength": 200000
+        }
+      },
+      "required": [
+        "message_id",
+        "role",
+        "text"
+      ]
+    },
+    "SourceReadPage": {
+      "title": "SourceReadPage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format_version": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 2
+        },
+        "view": {
+          "type": "string",
+          "enum": [
+            "source_read"
+          ]
+        },
+        "access": {
+          "type": "string",
+          "enum": [
+            "history"
+          ]
+        },
+        "source_ref": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 4096
+        },
+        "messages": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 200,
+          "items": {
+            "$ref": "#/$defs/SourceMessageRecord"
+          }
+        }
+      },
+      "required": [
+        "format_version",
+        "view",
+        "access",
+        "source_ref",
+        "messages"
+      ]
+    }
+  }
+}

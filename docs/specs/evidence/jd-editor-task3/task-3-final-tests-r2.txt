@@ -1,0 +1,11 @@
+python -m pytest -q tests/test_jd_tools.py tests/test_jd_references.py tests/test_jd_sources.py tests/test_jd_provider_binding.py tests/test_jd_model_view.py tests/test_jd_model_view_recovery.py tests/test_jd_store.py tests/test_service.py tests/test_publication.py tests/test_conversation_lookup.py tests/test_conversation_lifecycle.py tests/test_api.py tests/test_live_memory.py tests/test_native_continuity.py --basetemp ..\..\.superpowers\sdd\2026-09-10-jd-editor-core-implementation\task3-pytest-fb84b97d-3389-4dd6-9b0d-c0feedc159ec --tb=short
+........................................................................ [ 40%]
+........................................................................ [ 81%]
+.................................                                        [100%]
+============================== warnings summary ===============================
+tests/test_jd_model_view_recovery.py::test_real_api_native_selection_admission_and_exact_replacement
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+177 passed, 1 warning in 169.04s (0:02:49)

@@ -1,0 +1,134 @@
+{
+  "browser": "153.0.8010.37",
+  "channel": "chrome",
+  "headed": true,
+  "OS_IME": "NOT RUN",
+  "cases": [],
+  "document": "685cd5e0-44eb-423c-8545-9a4ce43f5571",
+  "selectedText": "工作",
+  "ok": false,
+  "failure": "Error: expect(received).toContain(expected) // indexOf\n\nExpected substring: \"第二處修正\"\nReceived string:    \"[{\\\"type\\\":\\\"p\\\",\\\"id\\\":\\\"de6d04b9-9c19-4eed-b4fd-1a918a49e5b9\\\",\\\"children\\\":[{\\\"text\\\":\\\"工作工作\\\"}]}]\"\n\nCall Log:\n- Timeout 30000ms exceeded while waiting on the predicate",
+  "errors": [],
+  "network": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents?archived=false",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents",
+      "body": "{\"title\":\"真輸入驗收 1789007857310\",\"request_key\":\"2e1ff24e-777a-4922-95da-14e7db9faca8\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/jd/manual-save",
+      "body": "{\"request_key\":\"522fe91d-68fb-4707-b4f7-f72cc0eeb1b0\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjY4NWNkNWUwLTQ0ZWItNDIzYy04NTQ1LTlhNGNlNDNmNTU3MSIsIjA4ODJmNDZhLTM4YmEtNGU1Yy1iYzk1LWFiZjVhN2ZmZjYyYSJd\",\"value\":[{\"type\":\"p\",\"id\":\"de6d04b9-9c19-4eed-b4fd-1a918a49e5b9\",\"children\":[{\"text\":\"工作工作\"}]}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/jd/changes/read",
+      "body": "{\"change_ref\":\"WyJjaGFuZ2UiLCI2ODVjZDVlMC00NGViLTQyM2MtODU0NS05YTRjZTQzZjU1NzEiLCI3ZmZiMTk3NC04Y2FiLTU3ODUtOTIzOS1kOTBlMDRiNzc0ODYiLCIwODgyZjQ2YS0zOGJhLTRlNWMtYmM5NS1hYmY1YTdmZmY2MmEiLCJmMThmNGQ5ZC02ZGFlLTRlYzctOTFjNC1iNDEwZDE4N2I1M2UiXQ\"}"
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/runs",
+      "body": "{\"request_key\":\"cc0c3202-c9e0-4a74-9ce7-969428a228cb\",\"text\":\"請改選取\",\"abandon_pending\":false}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/runs/by-request?request_key=cc0c3202-c9e0-4a74-9ce7-969428a228cb",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/685cd5e0-44eb-423c-8545-9a4ce43f5571/jd",
+      "body": null
+    }
+  ]
+}

@@ -1,0 +1,72 @@
+[
+  {
+    "path": "experiments/analysis-agent/README.md",
+    "sha256": "d25a77199992eed39a19b9e0e21e555a05ad87a5540dd228f74e95597e4ab2eb",
+    "bytes": 89738,
+    "baseline": "pre-existing snapshot README.md",
+    "review_before_sha256": "c51d0f8e168e7b06636f56a1ed2bfd583aaab53c7761fd4b96a66d71f10b3a35"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/jd_routes.py",
+    "sha256": "b1b27debd195a285186673e7c9c4465a2222125b3f3bf3c8d9dc44da778d1dbd",
+    "bytes": 13538,
+    "baseline": "pre-existing snapshot jd_routes.py",
+    "review_before_sha256": "d5dc13690028a76ab02c2b66bc1c05de57f80407d4ca3d8006db3ab410dd5988"
+  },
+  {
+    "path": "experiments/analysis-agent/src/analysis_agent/service.py",
+    "sha256": "549a17442c6e3661c32e5152e9876b1e60b43b634216c6f5a1ac079ce57459f4",
+    "bytes": 47457,
+    "baseline": "pre-existing snapshot service.py",
+    "review_before_sha256": "f08d4e9b286799cff3d5063b241424456281d052ec737b77eccbb61c44732fdc"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_manual_recovery.py",
+    "sha256": "56fe7233cfabdb410247a93d77dea69c400e878801858328f5677a118e0b3f57",
+    "bytes": 7819,
+    "baseline": "pre-existing snapshot test_jd_manual_recovery.py",
+    "review_before_sha256": "0a05b96cff2af5dc45189799e19c22fa412ac2a3b29e48d123dc82cb337560a4"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/generated/analysis-api.ts",
+    "sha256": "f2e89beb23ec63a4370631ffa99b2e3cc4c7a8292f38d68f237def941800ab3e",
+    "bytes": 6777,
+    "baseline": "pre-existing snapshot analysis-api.ts",
+    "review_before_sha256": "0b24e5a58660050021aa0997ba18fa8a2adaafee1fcb1f7a4c0eecdabed88f36"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "sha256": "5c8a13bcfcac805ef8570179cb4a4c41cdc87a9a18ffb846302f64be30e7f0c2",
+    "bytes": 16333,
+    "baseline": "pre-existing snapshot useJdSession.ts",
+    "review_before_sha256": "aac27ccfdff4defcf6cc30d5111f1778b5d144a1bd86d88de3320ca84afb2a7f"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/useJdSession.test.tsx",
+    "sha256": "db7698a243426e8f92d2ee9ae6e78ce6beb101a1aafa3c9fe9add979dd412f28",
+    "bytes": 14316,
+    "baseline": "pre-existing snapshot useJdSession.test.tsx",
+    "review_before_sha256": "b04e827bffe5f52947a26048078e8aafc132ce2698839bc4cd6a1613961cdf02"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+    "sha256": "91be20d3194f4316cfa50cb896cd83b5dc84891ca793653f29dc9f30d0c76b7e",
+    "bytes": 13777,
+    "baseline": "pre-existing snapshot JdWorkspace.tsx",
+    "review_before_sha256": "9ca392fe0109944dc7951fec56a6394ba43a759920639798df6df07bf555a20f"
+  },
+  {
+    "path": "experiments/analysis-agent/tests/test_jd_fix1_admission.py",
+    "sha256": "f49fdc302dcfeb77ce346a04441c10310ad06527c32e2afd3180c3b51b076100",
+    "bytes": 7838,
+    "baseline": "new explicit task file",
+    "review_before_sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  {
+    "path": "experiments/jd-editor/web/src/jd/JdWorkspace.test.tsx",
+    "sha256": "ad1b6c904e40107fe78fe953a2c5b4cd2c01d0dc9323b3fc2d4c2700e53cee80",
+    "bytes": 1509,
+    "baseline": "git 8eec072d51e97735b22c5f0df598b67101fe570b",
+    "review_before_sha256": "387ee66e6ff254e3148e811370988e99a9dbb3c8b7b76ec489c5ad071a524616"
+  }
+]

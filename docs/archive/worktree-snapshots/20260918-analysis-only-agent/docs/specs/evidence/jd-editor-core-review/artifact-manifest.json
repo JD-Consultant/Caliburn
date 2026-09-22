@@ -1,0 +1,517 @@
+[
+  {
+    "path": "core-close-red.log",
+    "bytes": 285,
+    "sha256": "59f136d8407c18bc5bfceaf2961dc69bcf4518dfdba7ae4d22e350c2fa1f0407"
+  },
+  {
+    "path": "core-close-red2.log",
+    "bytes": 2478,
+    "sha256": "372c8ce3e7b8d8822d2a082dbff0f87efb9956abecf2cbf28f6810fcad8054aa"
+  },
+  {
+    "path": "core-final-web-server.json",
+    "bytes": 450,
+    "sha256": "6f3a3f4c92c27e475317c2d55a7b5893f8a684fe2409ef260f32c2efca05e14c"
+  },
+  {
+    "path": "core-fix-build.log",
+    "bytes": 770,
+    "sha256": "2aee07d91bc98d8477ffaf0a49d1bbfa8d229a6c23147635d4c8d57f5961db27"
+  },
+  {
+    "path": "core-fix-lint.log",
+    "bytes": 48,
+    "sha256": "75006a61a40e1794762a6d1cde43021aab8b5ead03243e90e5bb19aa56c7d688"
+  },
+  {
+    "path": "core-fix-pg.log",
+    "bytes": 102,
+    "sha256": "cc25af3b5adc6a3c770335b7f3b69efa9c26c8131cd87ae76abe83cfc7957fe4"
+  },
+  {
+    "path": "core-fix-python-results.json",
+    "bytes": 1357,
+    "sha256": "9d87bb8911478f7e9e683f4d2f70db26b5a9f6ba6a7ee3218513d92f577d5064"
+  },
+  {
+    "path": "core-fix-python.log",
+    "bytes": 183,
+    "sha256": "930428279e65df061f0aee9ff06926e860cf214f328ff8df5fcdd4edbfa41993"
+  },
+  {
+    "path": "core-fix-test.log",
+    "bytes": 466,
+    "sha256": "779e416fcb02eb18f11587d4bd087ca92f0e9d4f7380d1910ec480aae61448b5"
+  },
+  {
+    "path": "core-fix-typecheck.log",
+    "bytes": 59,
+    "sha256": "954fe8d817d624ba0d2f235f2d164ffa3bf32fcaf637b96987837816438e4494"
+  },
+  {
+    "path": "core-fix-web-results.json",
+    "bytes": 2474,
+    "sha256": "6cea783c6f62680739705caaa01b0bc4c8a1420b322b88ccef83146ab928427a"
+  },
+  {
+    "path": "core-minor-build.log",
+    "bytes": 773,
+    "sha256": "c2e2ac5043fc21e1315dbc002ab96ad557036ed73a1ca130045a6dbc2b8ea1ba"
+  },
+  {
+    "path": "core-minor-lint.log",
+    "bytes": 48,
+    "sha256": "75006a61a40e1794762a6d1cde43021aab8b5ead03243e90e5bb19aa56c7d688"
+  },
+  {
+    "path": "core-minor-test.log",
+    "bytes": 466,
+    "sha256": "7ca4dbc31b30085fb3d3ed7b2d1968685f83df08debd6ee2eae829161e55a27e"
+  },
+  {
+    "path": "core-minor-typecheck.log",
+    "bytes": 59,
+    "sha256": "954fe8d817d624ba0d2f235f2d164ffa3bf32fcaf637b96987837816438e4494"
+  },
+  {
+    "path": "core-minor-web-results.json",
+    "bytes": 2471,
+    "sha256": "d371551b1ed62368d55814180a54b3a413dab809b5dcee697b299478c240bb79"
+  },
+  {
+    "path": "core-servers.json",
+    "bytes": 1260,
+    "sha256": "85aebe9d9952909fcb70783731d256a753a88f05a524cd7253f89f45464da642"
+  },
+  {
+    "path": "core-stale-browser-before-minor.json",
+    "bytes": 13599,
+    "sha256": "3e9d9b4b8cda51e371ae10fc9ddc90c9a43741dbbf9f327f5f85a525a93d5029"
+  },
+  {
+    "path": "core-stale-browser-before-minor.log",
+    "bytes": 96,
+    "sha256": "8affbdbc210dbd62359a0da94180198f973185094c06b2172e5930aba75ce3a9"
+  },
+  {
+    "path": "core-stale-browser-before-minor.png",
+    "bytes": 80664,
+    "sha256": "7f11f68f3ac7cfe502ed0268f4229b7cbf974a10f5efc912d21ade5954c3df85"
+  },
+  {
+    "path": "core-stale-browser.json",
+    "bytes": 13667,
+    "sha256": "38ccd9b24c6b69f796c8abafee401bd76ce8e61695c6d5da73803a338e12e232"
+  },
+  {
+    "path": "core-stale-browser.log",
+    "bytes": 96,
+    "sha256": "2b85463696b78b897efe7a4e4a30802c08422171fd986883b9d1aa53aee778d5"
+  },
+  {
+    "path": "core-stale-browser.png",
+    "bytes": 83860,
+    "sha256": "3b67fa476fc429869a2e0c7a79b89dc8dea6a04d4a329489527f35cd84dd0c2a"
+  },
+  {
+    "path": "core-stale-red.log",
+    "bytes": 3041,
+    "sha256": "ad63244cecd41a866f170ad7176e6bf4be2f7ec212e3547c7248c1440e124581"
+  },
+  {
+    "path": "core-stale-red2.log",
+    "bytes": 1262,
+    "sha256": "c68f3074e80cef646ad67f55503e9cbb6765b70cb8850ab2fc0d61343c1be034"
+  },
+  {
+    "path": "core-web-green1.log",
+    "bytes": 271,
+    "sha256": "62ec193da00889d82e3390ede881cdc740aa6d2946d79676ff396136d63f8507"
+  },
+  {
+    "path": "inputs/completed-core-plan.md",
+    "bytes": 71291,
+    "sha256": "bf1437289267987876c953c681d2a56c71c1ef0ad82db1e8333e795af0ebea8d"
+  },
+  {
+    "path": "inputs/core-archive.py",
+    "bytes": 11414,
+    "sha256": "e8a3b65e8ab407d78361067ac9f90289a4e4dfae543c5c963e199692e837d62d"
+  },
+  {
+    "path": "inputs/core-final-web.py",
+    "bytes": 1360,
+    "sha256": "60b804012a55d83ef25c610a9e7cd63cec5027216cd7f42a3eb1bc0020055b95"
+  },
+  {
+    "path": "inputs/core-fix-checks.py",
+    "bytes": 2264,
+    "sha256": "626189371dc2d8f8cb61de6c69224a7810ad0974d5a1c96cb13f4e3ddc0ea379"
+  },
+  {
+    "path": "inputs/core-minor-checks.py",
+    "bytes": 2308,
+    "sha256": "fbf3bc8586ee02646c0a43587d4ae883d2df20ea058efdab4ffd4438b41e1c39"
+  },
+  {
+    "path": "inputs/core-start-servers.py",
+    "bytes": 2553,
+    "sha256": "2be3728b7fb91c4635247c227abdc1ba30a47a6e15874eb88e7627874693cf69"
+  },
+  {
+    "path": "inputs/run-claude-core-closure.py",
+    "bytes": 5703,
+    "sha256": "b540264ef800d11a0170d7a2297f8c9a34173432d89aff09b200b7c657cc4aba"
+  },
+  {
+    "path": "inputs/run-claude-core-minor.py",
+    "bytes": 3379,
+    "sha256": "0334bb75e1cc78734eb084bbabf38bf19e96d471bbbad60d81138dceee4d72d7"
+  },
+  {
+    "path": "inputs/run-claude-core-review.py",
+    "bytes": 7897,
+    "sha256": "c7eb5d6d71fcb974c1cd54f278e333b3457e8ad00411d84f67e9ce66a43689db"
+  },
+  {
+    "path": "README.md",
+    "bytes": 1071,
+    "sha256": "fee600cc27dcbbfa77b4c448ec509a62431c961db5cf99ad875c35cfa33de37a"
+  },
+  {
+    "path": "review.md",
+    "bytes": 6031,
+    "sha256": "f2c023ac7f62efb90579b84a9d048e065f1d7ae08aaffdb3e05c643db3380907"
+  },
+  {
+    "path": "reviews/closure/context/2026-09-10-jd-employee-journey-design.md",
+    "bytes": 32310,
+    "sha256": "a6e872132566f33bd7e7a13ad026d2a0e5f059df67e2fdc9edd41191b46c2352"
+  },
+  {
+    "path": "reviews/closure/context/2026-09-10-jd-manual-recovery-transport-design.md",
+    "bytes": 23150,
+    "sha256": "7a46f8f4564972eed3f8a2684204b211d04995e07759effef5c0cfa1d0edeae9"
+  },
+  {
+    "path": "reviews/closure/context/JdEditor.tsx",
+    "bytes": 7407,
+    "sha256": "e25022fad010a1410cbb72376906ad4dcbef5f9e50d85dda86cf16a4af564ddf"
+  },
+  {
+    "path": "reviews/closure/context/JdSavedProjection.test.tsx",
+    "bytes": 7000,
+    "sha256": "3d8a0e9afd3344d34b0b63666ad1bdfea395fbcb01751350aa93656fdf483928"
+  },
+  {
+    "path": "reviews/closure/context/submissionCache.ts",
+    "bytes": 1261,
+    "sha256": "6d846f7ecf1d93b8c9febeb3fd6a67fca501b2dc0c838f8cca0cba4a8a96ca93"
+  },
+  {
+    "path": "reviews/closure/diff/JdNode.tsx.diff",
+    "bytes": 798,
+    "sha256": "684078e875dc2d1e8cbf2c6f1b8062e1cf3c01cebf3e3985639a82ad5eb06341"
+  },
+  {
+    "path": "reviews/closure/diff/JdWorkspace.tsx.diff",
+    "bytes": 1423,
+    "sha256": "055c841ab19209b4b3b5b2c04154ae41e7ec9c98d664084279296e29a6a62c24"
+  },
+  {
+    "path": "reviews/closure/diff/service.py.diff",
+    "bytes": 972,
+    "sha256": "b880390822a63153fbedce75ceb485f9228f34a5dd157151fd2cd3fcb0b7414d"
+  },
+  {
+    "path": "reviews/closure/diff/useJdSession.ts.diff",
+    "bytes": 2060,
+    "sha256": "bf1e73fcfe1f79abd9cadafb0b94d8d459d32f9964a365f68fb50c6e8e97ad2c"
+  },
+  {
+    "path": "reviews/closure/evidence/core-close-red2.log",
+    "bytes": 2478,
+    "sha256": "372c8ce3e7b8d8822d2a082dbff0f87efb9956abecf2cbf28f6810fcad8054aa"
+  },
+  {
+    "path": "reviews/closure/evidence/core-fix-pg.log",
+    "bytes": 102,
+    "sha256": "cc25af3b5adc6a3c770335b7f3b69efa9c26c8131cd87ae76abe83cfc7957fe4"
+  },
+  {
+    "path": "reviews/closure/evidence/core-fix-python.log",
+    "bytes": 183,
+    "sha256": "930428279e65df061f0aee9ff06926e860cf214f328ff8df5fcdd4edbfa41993"
+  },
+  {
+    "path": "reviews/closure/evidence/core-fix-test.log",
+    "bytes": 466,
+    "sha256": "779e416fcb02eb18f11587d4bd087ca92f0e9d4f7380d1910ec480aae61448b5"
+  },
+  {
+    "path": "reviews/closure/evidence/core-fix-web-results.json",
+    "bytes": 2474,
+    "sha256": "6cea783c6f62680739705caaa01b0bc4c8a1420b322b88ccef83146ab928427a"
+  },
+  {
+    "path": "reviews/closure/evidence/core-stale-browser.json",
+    "bytes": 13599,
+    "sha256": "3e9d9b4b8cda51e371ae10fc9ddc90c9a43741dbbf9f327f5f85a525a93d5029"
+  },
+  {
+    "path": "reviews/closure/evidence/core-stale-browser.log",
+    "bytes": 96,
+    "sha256": "8affbdbc210dbd62359a0da94180198f973185094c06b2172e5930aba75ce3a9"
+  },
+  {
+    "path": "reviews/closure/evidence/core-stale-red2.log",
+    "bytes": 1262,
+    "sha256": "c68f3074e80cef646ad67f55503e9cbb6765b70cb8850ab2fc0d61343c1be034"
+  },
+  {
+    "path": "reviews/closure/invocation.json",
+    "bytes": 718,
+    "sha256": "72688a64fafd0adbe252bf5e38f473cee97d80e44a776b644a80a9299b8efc00"
+  },
+  {
+    "path": "reviews/closure/manifest.json",
+    "bytes": 4876,
+    "sha256": "998ccd8c140d6ff9156860b6d5d5d11bb965319481dfbea181b2690d18ea263e"
+  },
+  {
+    "path": "reviews/closure/original-review.md",
+    "bytes": 11277,
+    "sha256": "aa59991823f30045bfa3a8b8472bcfcf9a39adb9337b75d55941fbb831a3f6d7"
+  },
+  {
+    "path": "reviews/closure/original.md",
+    "bytes": 10491,
+    "sha256": "fd67452385f7b9100ce18c191de203c9195b0c4cb9d57bacb35ab7c4d50039ed"
+  },
+  {
+    "path": "reviews/closure/prompt.txt",
+    "bytes": 2376,
+    "sha256": "fc56d7698b8212eee42448d9cbfd810d95631c138f9900745257e8561cd3541c"
+  },
+  {
+    "path": "reviews/closure/report.md",
+    "bytes": 4353,
+    "sha256": "2b06d0d4d2574b91c95c7dd3b8ce6194ee7c45c929a950f84a089eddf01a95ee"
+  },
+  {
+    "path": "reviews/closure/result.json",
+    "bytes": 1067,
+    "sha256": "1125cfedf0d46caf21c1db8c185a5919ad994632332d09bc7f5ad37aaf912714"
+  },
+  {
+    "path": "reviews/closure/source/experiments/analysis-agent/src/analysis_agent/service.py",
+    "bytes": 47744,
+    "sha256": "5b42abb13a6e7d455fc8d7d6f05ad81a0c46ecc616aaaf352068d657c5d365dd"
+  },
+  {
+    "path": "reviews/closure/source/experiments/analysis-agent/tests/test_jd_shutdown_isolation.py",
+    "bytes": 1128,
+    "sha256": "669deafdabbd0a743cbc19b50d85bfa218a71af178c737aa5182ebd46980b195"
+  },
+  {
+    "path": "reviews/closure/source/experiments/jd-editor/web/browser/core-stale-recovery.mjs",
+    "bytes": 5951,
+    "sha256": "85bb1646a34a3d5f9d925af8a594794fa8ccffc2979db85d72ff4bcd4bb1a786"
+  },
+  {
+    "path": "reviews/closure/source/experiments/jd-editor/web/src/jd/JdNode.tsx",
+    "bytes": 9668,
+    "sha256": "192d69964983731ba753ecb09c49ac253516c892ffaa72afaded562a7f58aec3"
+  },
+  {
+    "path": "reviews/closure/source/experiments/jd-editor/web/src/jd/JdStaleCandidate.test.tsx",
+    "bytes": 6221,
+    "sha256": "deade290d98267c8b8cf928553b6f653254461e7ca90f5fcde832c828ab5de0a"
+  },
+  {
+    "path": "reviews/closure/source/experiments/jd-editor/web/src/jd/JdStaleWorkspace.test.tsx",
+    "bytes": 2652,
+    "sha256": "2c24d90c0c0cd3c4df273fd9142a3abdf01e8129b9e7fdf964a46a970376cca0"
+  },
+  {
+    "path": "reviews/closure/source/experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+    "bytes": 14220,
+    "sha256": "ef4dc66b5d015aaef045e6428ea4e3ed75c5d3d361767d14779e711b98d42d50"
+  },
+  {
+    "path": "reviews/closure/source/experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "bytes": 18020,
+    "sha256": "ae3271366c516b69af189a5aa02670d5e33a7827a4677ab096b65f3bf7ac1d58"
+  },
+  {
+    "path": "reviews/initial/invocation.json",
+    "bytes": 826,
+    "sha256": "68739bf8330ab238c5f5c69cdf244674be1086dbbcbb1c401202939b9546e5ea"
+  },
+  {
+    "path": "reviews/initial/manifest.json",
+    "bytes": 106512,
+    "sha256": "cc009030f4356be8c68fa53796987a8a54861ca0ea88919a09fec86051345388"
+  },
+  {
+    "path": "reviews/initial/original.md",
+    "bytes": 11372,
+    "sha256": "3ea7fb9db0365f4e43121ee3fa8681dc43e4b1dbc21ecdd53c58e8f6e054dece"
+  },
+  {
+    "path": "reviews/initial/prompt.txt",
+    "bytes": 3360,
+    "sha256": "9dc59ce25d7fcc3eac3b651e5f1137df89cae58ac27ba8ce64b7c0f7d1c534aa"
+  },
+  {
+    "path": "reviews/initial/requirements/2026-09-10-jd-app-tool-contract.md",
+    "bytes": 42105,
+    "sha256": "f00d2d6d7a888839367ce55ba28f15b08be3f0efe6eab098789346d7fb276a3f"
+  },
+  {
+    "path": "reviews/initial/requirements/2026-09-10-jd-editor-core-implementation.md",
+    "bytes": 71291,
+    "sha256": "784a4e9e5b70648a4434e02fe40f49ca02be3a4cafc039a3ba5de845ca6f6a3d"
+  },
+  {
+    "path": "reviews/initial/requirements/2026-09-10-jd-editor-core-integration.md",
+    "bytes": 11505,
+    "sha256": "5fbbe706a40a8d4668882cfd33d994aeb33fb55448b6000be4584056884ea542"
+  },
+  {
+    "path": "reviews/initial/requirements/2026-09-10-jd-employee-journey-design.md",
+    "bytes": 32310,
+    "sha256": "a6e872132566f33bd7e7a13ad026d2a0e5f059df67e2fdc9edd41191b46c2352"
+  },
+  {
+    "path": "reviews/initial/requirements/2026-09-10-jd-manual-recovery-transport-design.md",
+    "bytes": 23150,
+    "sha256": "7a46f8f4564972eed3f8a2684204b211d04995e07759effef5c0cfa1d0edeae9"
+  },
+  {
+    "path": "reviews/initial/requirements/2026-09-10-jd-model-view-change-notice-design.md",
+    "bytes": 29974,
+    "sha256": "aa2b17d226d08e0be28418f2ca6f2819115f88fa3674ebf13eb36dc5e11bb348"
+  },
+  {
+    "path": "reviews/initial/requirements/2026-09-10-jd-native-process-lifecycle-design.md",
+    "bytes": 39300,
+    "sha256": "39cf4710d55e5685c2903c28d5fe37a5f4d56e00bfe15213e43e0e71f02dde3d"
+  },
+  {
+    "path": "reviews/initial/requirements/2026-09-10-jd-plate-document-profile.md",
+    "bytes": 30114,
+    "sha256": "a14be53ae4a38a08d3629f07d5155b337aaab6b1da5f6d1fbc033986924dc462"
+  },
+  {
+    "path": "reviews/initial/requirements/core-review-brief.md",
+    "bytes": 4181,
+    "sha256": "23746466bafad2402448c5cd305c464fa649d0b10b80aa6cbbad4b60d57cd86b"
+  },
+  {
+    "path": "reviews/initial/requirements/review.md",
+    "bytes": 3363,
+    "sha256": "3f92ec88faab925ba13131de011569de981fbe66a0ed50a243ae20ab33c486cc"
+  },
+  {
+    "path": "reviews/initial/result.json",
+    "bytes": 1079,
+    "sha256": "f5a7c978279d5810f0a6f7d57433bbd5df983df0fdb06483cd651893be32a3c9"
+  },
+  {
+    "path": "reviews/minor/change.diff",
+    "bytes": 2850,
+    "sha256": "00a06a42acb5fe180fcf4c2610725eb1c5f39a60a0945cf947919bd51c173e2f"
+  },
+  {
+    "path": "reviews/minor/core-stale-recovery.mjs",
+    "bytes": 6148,
+    "sha256": "f2d74372b25ece7dcf3ce2e73d182f4f02ea92983bf8d6ae48b7657a820cdcd0"
+  },
+  {
+    "path": "reviews/minor/invocation.json",
+    "bytes": 718,
+    "sha256": "97104b6f555c014b4f4d9de8da46308ee8558cf490cd4b854d9a833e9e42322e"
+  },
+  {
+    "path": "reviews/minor/JdStaleCandidate.test.tsx",
+    "bytes": 6362,
+    "sha256": "585d2b1e9ac3e93dd727ce241da35f58c1dfb36f73d986491f64f42520ea8015"
+  },
+  {
+    "path": "reviews/minor/JdWorkspace.tsx",
+    "bytes": 14448,
+    "sha256": "5993cc638f288c619cb8f48fa602d2bee577571de58054d6329676cd5af73ed3"
+  },
+  {
+    "path": "reviews/minor/manifest.json",
+    "bytes": 800,
+    "sha256": "d5b64ddd49bf55e3e917c403b5278d9137a17a605b31b25594e3a1c7a6fa8cca"
+  },
+  {
+    "path": "reviews/minor/original.md",
+    "bytes": 2746,
+    "sha256": "1e938d3b2a82bf1d8e71acd091ebd8fe7faa817e903c0bd48dc20ca4353393c3"
+  },
+  {
+    "path": "reviews/minor/prompt.txt",
+    "bytes": 1246,
+    "sha256": "535139dac77288feea531c19422b1e9c611bbc1899c4560ca2ba14e9696ba3ca"
+  },
+  {
+    "path": "reviews/minor/result.json",
+    "bytes": 1070,
+    "sha256": "aa87fd36ba33656132442245ce487d668ee7314b6f313be409bb2b3f470a59c1"
+  },
+  {
+    "path": "reviews/minor/useJdSession.ts",
+    "bytes": 18076,
+    "sha256": "fee5200dca1b6367d63e78eb4a863cb93261e28a030766c7dc369fc523a88e0f"
+  },
+  {
+    "path": "reviews/minor/web.log",
+    "bytes": 466,
+    "sha256": "7ca4dbc31b30085fb3d3ed7b2d1968685f83df08debd6ee2eae829161e55a27e"
+  },
+  {
+    "path": "source/experiments/analysis-agent/src/analysis_agent/service.py",
+    "bytes": 47744,
+    "sha256": "5b42abb13a6e7d455fc8d7d6f05ad81a0c46ecc616aaaf352068d657c5d365dd"
+  },
+  {
+    "path": "source/experiments/analysis-agent/tests/test_jd_shutdown_isolation.py",
+    "bytes": 1128,
+    "sha256": "669deafdabbd0a743cbc19b50d85bfa218a71af178c737aa5182ebd46980b195"
+  },
+  {
+    "path": "source/experiments/jd-editor/web/browser/core-stale-recovery.mjs",
+    "bytes": 6148,
+    "sha256": "f2d74372b25ece7dcf3ce2e73d182f4f02ea92983bf8d6ae48b7657a820cdcd0"
+  },
+  {
+    "path": "source/experiments/jd-editor/web/src/jd/JdNode.tsx",
+    "bytes": 9668,
+    "sha256": "192d69964983731ba753ecb09c49ac253516c892ffaa72afaded562a7f58aec3"
+  },
+  {
+    "path": "source/experiments/jd-editor/web/src/jd/JdStaleCandidate.test.tsx",
+    "bytes": 6362,
+    "sha256": "585d2b1e9ac3e93dd727ce241da35f58c1dfb36f73d986491f64f42520ea8015"
+  },
+  {
+    "path": "source/experiments/jd-editor/web/src/jd/JdStaleWorkspace.test.tsx",
+    "bytes": 2652,
+    "sha256": "2c24d90c0c0cd3c4df273fd9142a3abdf01e8129b9e7fdf964a46a970376cca0"
+  },
+  {
+    "path": "source/experiments/jd-editor/web/src/jd/JdWorkspace.tsx",
+    "bytes": 14448,
+    "sha256": "5993cc638f288c619cb8f48fa602d2bee577571de58054d6329676cd5af73ed3"
+  },
+  {
+    "path": "source/experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "bytes": 18076,
+    "sha256": "fee5200dca1b6367d63e78eb4a863cb93261e28a030766c7dc369fc523a88e0f"
+  }
+]

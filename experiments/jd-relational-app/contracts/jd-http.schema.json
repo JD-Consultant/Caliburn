@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "HttpProblem",
+  "description": "A failed write projected as RFC 9457 about:blank. Success and unresolved bound observations use the separate JSON result response, not a Problem.",
+  "$defs": {
+    "NotFoundProblem": {
+      "title": "NotFoundProblem",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "about:blank"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "enum": [
+            "Not Found"
+          ]
+        },
+        "status": {
+          "type": "integer",
+          "enum": [
+            404
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "instance": {
+          "type": "string",
+          "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "jd_result": {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedTargetMissing"
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "detail",
+        "instance",
+        "jd_result"
+      ]
+    },
+    "ConflictProblem": {
+      "title": "ConflictProblem",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "about:blank"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "enum": [
+            "Conflict"
+          ]
+        },
+        "status": {
+          "type": "integer",
+          "enum": [
+            409
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "instance": {
+          "type": "string",
+          "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "jd_result": {
+          "anyOf": [
+            {
+              "$ref": "jd-result.schema.json#/$defs/ConfirmedStaleView"
+            },
+            {
+              "$ref": "jd-result.schema.json#/$defs/ConfirmedRelationshipConflict"
+            },
+            {
+              "$ref": "jd-result.schema.json#/$defs/ConfirmedDependentItems"
+            },
+            {
+              "$ref": "jd-result.schema.json#/$defs/UnboundOperationConflict"
+            },
+            {
+              "$ref": "jd-result.schema.json#/$defs/UnboundBusy"
+            },
+            {
+              "$ref": "jd-result.schema.json#/$defs/UnboundArchived"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "detail",
+        "instance",
+        "jd_result"
+      ]
+    },
+    "UnprocessableInputProblem": {
+      "title": "UnprocessableInputProblem",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "about:blank"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "enum": [
+            "Unprocessable Entity"
+          ]
+        },
+        "status": {
+          "type": "integer",
+          "enum": [
+            422
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "instance": {
+          "type": "string",
+          "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "jd_result": {
+          "anyOf": [
+            {
+              "$ref": "jd-result.schema.json#/$defs/ConfirmedInvalidInput"
+            },
+            {
+              "$ref": "jd-result.schema.json#/$defs/UnboundInvalidInput"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "detail",
+        "instance",
+        "jd_result"
+      ]
+    },
+    "SaveFailedProblem": {
+      "title": "SaveFailedProblem",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "about:blank"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "enum": [
+            "Internal Server Error"
+          ]
+        },
+        "status": {
+          "type": "integer",
+          "enum": [
+            500
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "instance": {
+          "type": "string",
+          "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "jd_result": {
+          "anyOf": [
+            {
+              "$ref": "jd-result.schema.json#/$defs/ConfirmedSaveFailed"
+            },
+            {
+              "$ref": "jd-result.schema.json#/$defs/UnboundSaveFailed"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "detail",
+        "instance",
+        "jd_result"
+      ]
+    }
+  },
+  "anyOf": [
+    {
+      "$ref": "#/$defs/NotFoundProblem"
+    },
+    {
+      "$ref": "#/$defs/ConflictProblem"
+    },
+    {
+      "$ref": "#/$defs/UnprocessableInputProblem"
+    },
+    {
+      "$ref": "#/$defs/SaveFailedProblem"
+    }
+  ]
+}

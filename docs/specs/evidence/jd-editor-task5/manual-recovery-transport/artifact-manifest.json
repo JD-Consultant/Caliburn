@@ -1,0 +1,26 @@
+{
+  "status": "FINITE DESIGN ADOPTED; IMPLEMENTATION NOT YET VERIFIED",
+  "files": [
+    {
+      "path": "reviewed-candidate.md",
+      "sha256": "34004e1e6eac29d6efca4ef5cbda165ad6fd8f44a4e543e3cc675ebd6fbcad6a",
+      "bytes": 23001
+    },
+    {
+      "path": "initial-candidate.md",
+      "sha256": "aa6456ab4d96e38bc510b44a061ba4bf0f7a552a5d0f7c201a3a8980a6fbf4f3",
+      "bytes": 18165
+    },
+    {
+      "path": "mrd-fix.diff",
+      "sha256": "f9124bb7887eda80f31dfb982c0319585e2699042839c8c3ac512f8381a1ff20",
+      "bytes": 21547
+    },
+    {
+      "path": "review.md",
+      "sha256": "b8869154668456652f025f013d426b9356c321cf1a89f3f7dd625f561e76dc10",
+      "bytes": 8772
+    }
+  ],
+  "hashes_itself": false
+}

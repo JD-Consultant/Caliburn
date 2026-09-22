@@ -1,0 +1,16 @@
+{
+  "id": "F03-B",
+  "description": "先建立無 links 內容，讀原生 ID 再設引用／續改",
+  "passed": false,
+  "checks": [
+    {
+      "name": "輸入無 IDs／links；原生建立完整未連線草稿",
+      "passed": true
+    },
+    {
+      "name": "execution",
+      "passed": false,
+      "message": "spawnSync D:\\nodejs\\node.exe EPERM"
+    }
+  ]
+}

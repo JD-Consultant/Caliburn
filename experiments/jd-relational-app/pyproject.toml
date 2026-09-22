@@ -1,0 +1,55 @@
+[project]
+name = "caliburn-jd-app"
+version = "0.1.0"
+description = "Caliburn local AI job-analysis and job-description application"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "alembic==1.20.0",
+    "caliburn-consultant-memory==0.1.0",
+    "fastapi==0.141.1",
+    "itsdangerous==2.2.0",
+    "jsonschema==4.26.0",
+    "langchain==1.4.0",
+    "langchain-anthropic==1.7.2",
+    "langchain-openai==1.6.2",
+    "langchain-openrouter==0.2.8",
+    "langgraph==1.2.11",
+    "langgraph-checkpoint-postgres==3.1.2",
+    "openrouter==0.10.8",
+    "psycopg[binary]==3.3.5",
+    "pydantic==2.13.5",
+    "pywin32==312 ; sys_platform == 'win32'",
+    "sqlalchemy==2.0.52",
+    "starlette==1.6.0",
+    "uvicorn==0.52.4",
+]
+
+[project.scripts]
+caliburn-jd = "jd_relational.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "jd_relational"
+
+[dependency-groups]
+dev = [
+    "anthropic==1.5.0",
+    "datamodel-code-generator==0.79.0",
+    "httpx2==2.12.0",
+    "openai==3.13.0",
+    "pytest==9.1.1",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.uv.sources]
+caliburn-consultant-memory = { path = "../../packages/consultant-memory", editable = true }
+
+[[tool.uv.index]]
+url = "https://pypi.org/simple"
+default = true

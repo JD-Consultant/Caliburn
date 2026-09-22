@@ -1,0 +1,21 @@
+{
+  json: {
+    unset: null,
+    nullable: null,
+    nested: {
+      unset: null,
+      nullable: null
+    }
+  },
+  meta: {
+    values: {
+      unset: [
+        'undefined'
+      ],
+      'nested.unset': [
+        'undefined'
+      ]
+    },
+    v: 1
+  }
+}

@@ -1,0 +1,82 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+ExpectError: expect(locator).toBeEditable() failed
+
+Locator: getByRole('textbox', { name: '職務說明書正文' })
+Expected: editable
+Timeout: 15000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "to.be.editable" with timeout 15000ms
+  - waiting for getByRole('textbox', { name: '職務說明書正文' })
+
+    at captureRawStack (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright-core\lib\coreBundle.js:3172:17)
+    at callMatcherAsStep (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright\lib\matchers\expect.js:12875:57)
+    at Object.toBeEditable (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright\lib\matchers\expect.js:12865:23)
+    at send (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web\browser\task6-journey.mjs:37:24)
+    at async file:///S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web/browser/task6-journey.mjs:72:22 {
+  matcherResult: {
+    message: 'expect(locator).toBeEditable() failed\n' +
+      '\n' +
+      "Locator: getByRole('textbox', { name: '職務說明書正文' })\n" +
+      'Expected: editable\n' +
+      'Timeout: 15000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      '  - Expect "to.be.editable" with timeout 15000ms\n' +
+      "  - waiting for getByRole('textbox', { name: '職務說明書正文' })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeEditable',
+    expected: 'editable',
+    log: [
+      '  - Expect "to.be.editable" with timeout 15000ms',
+      "  - waiting for getByRole('textbox', { name: '職務說明書正文' })"
+    ],
+    timeout: 15000,
+    ariaSnapshot: '- main:\n' +
+      '  - link "← 我的職務說明書":\n' +
+      '    - /url: /\n' +
+      '  - heading "Task6 完整旅程 1789150214747" [level=1]\n' +
+      '  - status: 已保存\n' +
+      '  - region "顧問訪談":\n' +
+      '    - heading "顧問訪談" [level=2]\n' +
+      '    - paragraph: 先談你的實際工作，資料足夠時顧問會開始整理。你可以隨時補充或更正。\n' +
+      '    - article:\n' +
+      '      - text: 你\n' +
+      '      - paragraph: 我是設備維護工程師，想整理自己的工作。\n' +
+      '    - article:\n' +
+      '      - text: 顧問\n' +
+      '      - paragraph: 你平常負責哪些設備工作？可以先說一件你親自處理的例子。\n' +
+      '    - article:\n' +
+      '      - text: 你\n' +
+      '      - paragraph: 我的工作是設備月檢與故障處理，維持服務範圍內設備可用。依服务安排每月檢查狀態，核對異常訊息，留下設備狀態紀錄與待處理清單，記設備與日期、觀察依據；超出授權交主管決定。故障時依操作員描述對照訊息與機械狀況，分辨磨耗與外物干涉，只做已授權機械調整，電控程式由另一職位處理。修後驗證，保留判斷依據與維修紀錄，未排除問題交接操作員。我需要懂訊息與機械狀態對應、授權交接界線，兩項工作都用交叉比對；故障另需調整後驗證與交接。其他資格還沒說明。請先整理這些工作。\n' +
+      '    - text: 補充或更正你的工作\n' +
+      '    - textbox "補充或更正你的工作":\n' +
+      '      - /placeholder: 例如：這項工作只在客戶提出需求時執行…\n' +
+      '    - paragraph: 選取正文後送出，可請顧問處理該段；未保存修改會先保存。\n' +
+      '    - button "送出" [disabled]\n' +
+      '  - region "目前職務說明書":\n' +
+      '    - heading "職務說明書" [level=2]\n' +
+      '    - button "保存" [disabled]\n' +
+      '    - button "這次改動"\n' +
+      '    - button "讀取上一筆歷史"\n' +
+      '    - button "粗體" [disabled]\n' +
+      '    - button "斜體" [disabled]\n' +
+      '    - button "底線" [disabled]\n' +
+      '    - button "刪除線" [disabled]\n' +
+      '    - button "復原" [disabled]\n' +
+      '    - button "重做" [disabled]\n' +
+      '    - button "表格增列" [disabled]\n' +
+      '    - button "表格刪列" [disabled]\n' +
+      '    - button "複製區塊" [disabled]\n' +
+      '    - paragraph\n' +
+      '- alert'
+  }
+}
+
+Node.js v22.23.2

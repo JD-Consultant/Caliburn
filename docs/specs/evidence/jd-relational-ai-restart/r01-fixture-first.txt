@@ -1,0 +1,17 @@
+F
+================================== FAILURES ===================================
+_ test_conflicting_saved_ai_and_manual_pending_is_rejected_before_any_recovery_write _
+
+    def test_conflicting_saved_ai_and_manual_pending_is_rejected_before_any_recovery_write():
+        runtime, record, _, graph, calls, _ = saved_turn()
+        manual = intent(record.document_id)
+        graph.update_state({"configurable": {"thread_id": record.document_id}},
+>                          {"jd_manual_pending": manual.identity.to_dict()}, as_node="consultant")
+                                                 ^^^^^^^^^^^^^^^^^^^^^^^
+E       AttributeError: 'AdmittedIdentity' object has no attribute 'to_dict'
+
+tests\test_ai_restart.py:138: AttributeError
+=========================== short test summary info ===========================
+FAILED tests/test_ai_restart.py::test_conflicting_saved_ai_and_manual_pending_is_rejected_before_any_recovery_write
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 9 deselected in 1.00s

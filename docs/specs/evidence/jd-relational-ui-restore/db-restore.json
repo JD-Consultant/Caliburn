@@ -1,0 +1,44 @@
+{
+  "stage": "restore",
+  "checked_at_utc": "2026-09-14T08:43:44.833879+00:00",
+  "database": "caliburn_jd_setup_test_23c344cbab3f4412943c90091cb7cb08",
+  "port": 55436,
+  "mode": "REPEATABLE READ / READ ONLY",
+  "provider_calls": 0,
+  "database_writes": 0,
+  "document_id": "c027a901-5eb9-4b51-85a6-5c07b7c0be36",
+  "title": "還原與撤回驗收",
+  "archived": false,
+  "head_revision_number": 4,
+  "revision_count": 4,
+  "operation_count": 3,
+  "revision_origins": [
+    "initial",
+    "manual",
+    "manual",
+    "manual"
+  ],
+  "operation_kinds": [
+    "jd_set_text",
+    "jd_set_text",
+    "restore_revision"
+  ],
+  "operation_statuses": [
+    "committed",
+    "committed",
+    "committed"
+  ],
+  "content_digest": "2e5afbc0791aa555669f7ebfd1dea667cac5e4f8610edfea049a4a3a420e0d21",
+  "current_equals_head_snapshot": true,
+  "job_title": "資深設備維運工程師",
+  "purpose": null,
+  "task_count": 0,
+  "duty_count": 0,
+  "restored_revision_reproduces_revision_2": true,
+  "restore_added_a_new_revision": true,
+  "replaced_revision_still_readable": true,
+  "later_content_removed_from_current": true,
+  "conversation_checkpoints": 6,
+  "conversation_writes": 5,
+  "memory_store_rows": 0
+}

@@ -1,0 +1,113 @@
+{
+  "schema_sha256": "c6cc0f996b7a24b37cdf784a9d46e88cbb1d59f4d68d327e4167f3dfa40fb715",
+  "frozen_v1_sha256": "ced26a3b625de891989a63d5f12e4ac884484083d7f677cf10ad8c54e318b973",
+  "native_run": "docs/specs/evidence/jd-semantic-native-probe/results/2026-09-09T22-38-20-172Z/",
+  "count": 16,
+  "failed": 0,
+  "checks": [
+    {
+      "name": "full_r2_v2_fixture",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "task8_only_expected_oracle",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_canonical",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_empty_task_groups",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_unlinked_creation",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_linked_and_renamed",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_fixed_copy_mapping_and_move",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_explicit_group_and_task_unwrap",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_clear_group_body",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_unlink_then_delete",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_single_task_unwrap_rejected",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "native_single_group_delete_rejected",
+      "expected": false,
+      "actual": false,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "orphan_is_shape_valid_not_relation_valid",
+      "expected": true,
+      "actual": true,
+      "passed": true,
+      "errors": []
+    },
+    {
+      "name": "recorded_wire_matches_active_jd_read",
+      "passed": true
+    },
+    {
+      "name": "recorded_wire_matches_active_jd_edit",
+      "passed": true
+    },
+    {
+      "name": "recorded_wire_matches_active_jd_change_read",
+      "passed": true
+    }
+  ],
+  "scope": "Read-only cross-check of recorded native values and captured SDK parameters. Orphan relation deliberately passes shape; App relation validation is separate. No new native process, database, provider or model execution; no UUID-format claim."
+}

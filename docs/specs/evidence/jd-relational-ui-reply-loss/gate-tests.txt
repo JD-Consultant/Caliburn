@@ -1,0 +1,8 @@
+.......................                                                  [100%]
+============================== warnings summary ===============================
+.venv\Lib\site-packages\_pytest\cacheprovider.py:469
+  S:\caliburn\experiments\jd-relational-app\.venv\Lib\site-packages\_pytest\cacheprovider.py:469: PytestCacheWarning: could not create cache path S:\caliburn\experiments\jd-relational-app\.pytest_cache\v\cache\nodeids: [WinError 5] 存取被拒。: 'S:\\caliburn\\experiments\\jd-relational-app\\pytest-cache-files-h5hv2qa4'
+    config.cache.set("cache/nodeids", sorted(self.cached_nodeids))
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+23 passed, 1 warning in 1.89s

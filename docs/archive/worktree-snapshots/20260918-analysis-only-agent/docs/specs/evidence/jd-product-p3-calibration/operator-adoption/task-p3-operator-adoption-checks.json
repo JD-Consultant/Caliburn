@@ -1,0 +1,55 @@
+[
+  {
+    "scope": "Quality sections 1-5",
+    "equal": true,
+    "sha256_utf8_text": "61f2b70cacf5b238e686064a4270ac0f2a93d7b4c67f349355ac2491b7b9453b"
+  },
+  {
+    "scope": "Quality sections 7-9",
+    "equal": true,
+    "sha256_utf8_text": "086ba1e265ffc216af2d2292c7a3276907d51fda7676f4784c4445dceef0b93f"
+  },
+  {
+    "scope": "employee-card.md all sections from first ##",
+    "equal": true,
+    "sha256_utf8_text": "d0ae576fa334c24a7f4540b6508b76e6c1a3ee9ebbe4c43152fd23a36b24da19"
+  },
+  {
+    "scope": "oracle.md all sections from first ##",
+    "equal": true,
+    "sha256_utf8_text": "e1623614a5217f7eddcb2791d8ca6a98ac0fe34a49ea5d2849225610edc750b5"
+  },
+  {
+    "scope": "Exact reverse diff docs/specs/2026-09-10-jd-product-quality-acceptance.md",
+    "equal": true
+  },
+  {
+    "scope": "Exact reverse diff docs/specs/evidence/jd-product-p3-calibration/employee-card.md",
+    "equal": true
+  },
+  {
+    "scope": "Exact reverse diff docs/specs/evidence/jd-product-p3-calibration/release-protocol.md",
+    "equal": true
+  },
+  {
+    "scope": "Exact reverse diff docs/specs/evidence/jd-product-p3-calibration/oracle.md",
+    "equal": true
+  },
+  {
+    "scope": "Exact reverse diff docs/specs/evidence/jd-product-p3-calibration/README.md",
+    "equal": true
+  },
+  {
+    "scope": "Exact reverse diff docs/specs/evidence/jd-product-p3-calibration/results-template.md",
+    "equal": true
+  },
+  {
+    "scope": "Exact reverse diff docs/specs/2026-09-10-jd-natural-calibration-operator-design.md",
+    "equal": true
+  },
+  {
+    "scope": "Final durable routes, budget append, scope metadata; archive hashes and execution/runtime objects unchanged",
+    "equal": true,
+    "reviewed_design_reverse_sha256": "3016d934f2ad174c83f7925b56e9abe16ec8261f7969b42b62eec2d2eb109d43"
+  }
+]

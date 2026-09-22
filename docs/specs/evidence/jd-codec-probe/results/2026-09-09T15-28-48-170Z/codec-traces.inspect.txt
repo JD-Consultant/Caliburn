@@ -1,0 +1,2546 @@
+{
+  C01: {
+    before: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              bold: true
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [],
+      rawSuggestionFields: [],
+      batches: []
+    },
+    nativePending: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              suggestion_rm9Phr880yMQ8618GBc4W: {
+                id: 'rm9Phr880yMQ8618GBc4W',
+                createdAt: 1788967728210,
+                properties: {
+                  bold: undefined
+                },
+                type: 'update',
+                userId: 'ai'
+              },
+              suggestion: true
+            }
+          ]
+        }
+      ],
+      selection: {
+        anchor: {
+          path: [
+            0,
+            0
+          ],
+          offset: 0
+        },
+        focus: {
+          path: [
+            0,
+            0
+          ],
+          offset: 10
+        }
+      },
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          data: {
+            id: 'rm9Phr880yMQ8618GBc4W',
+            createdAt: 1788967728210,
+            properties: {
+              bold: undefined
+            },
+            type: 'update',
+            userId: 'ai'
+          }
+        }
+      ],
+      rawSuggestionFields: [
+        {
+          path: [
+            0,
+            0
+          ],
+          fields: {
+            suggestion_rm9Phr880yMQ8618GBc4W: {
+              id: 'rm9Phr880yMQ8618GBc4W',
+              createdAt: 1788967728210,
+              properties: {
+                bold: undefined
+              },
+              type: 'update',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        }
+      ],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_selection',
+              properties: null,
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 10
+                }
+              }
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                bold: true
+              },
+              newProperties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_rm9Phr880yMQ8618GBc4W: {
+                  id: 'rm9Phr880yMQ8618GBc4W',
+                  createdAt: 1788967728210,
+                  properties: {
+                    bold: undefined
+                  },
+                  type: 'update',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'format',
+              children: [
+                {
+                  text: '保留必要的完成要求。',
+                  suggestion_rm9Phr880yMQ8618GBc4W: {
+                    id: 'rm9Phr880yMQ8618GBc4W',
+                    createdAt: 1788967728210,
+                    properties: {
+                      bold: undefined
+                    },
+                    type: 'update',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    originalPayload: {
+      hasBoldOwnKey: true,
+      boldIsUndefined: true,
+      keys: [
+        'bold'
+      ],
+      properties: {
+        bold: undefined
+      }
+    },
+    suggestionId: 'rm9Phr880yMQ8618GBc4W',
+    memoryReopened: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              suggestion_rm9Phr880yMQ8618GBc4W: {
+                id: 'rm9Phr880yMQ8618GBc4W',
+                createdAt: 1788967728210,
+                properties: {
+                  bold: undefined
+                },
+                type: 'update',
+                userId: 'ai'
+              },
+              suggestion: true
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          data: {
+            id: 'rm9Phr880yMQ8618GBc4W',
+            createdAt: 1788967728210,
+            properties: {
+              bold: undefined
+            },
+            type: 'update',
+            userId: 'ai'
+          }
+        }
+      ],
+      rawSuggestionFields: [
+        {
+          path: [
+            0,
+            0
+          ],
+          fields: {
+            suggestion_rm9Phr880yMQ8618GBc4W: {
+              id: 'rm9Phr880yMQ8618GBc4W',
+              createdAt: 1788967728210,
+              properties: {
+                bold: undefined
+              },
+              type: 'update',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        }
+      ],
+      batches: []
+    },
+    memoryAfterReject: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              bold: true
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [],
+      rawSuggestionFields: [],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {},
+              newProperties: {
+                bold: true
+              }
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion_rm9Phr880yMQ8618GBc4W: {
+                  id: 'rm9Phr880yMQ8618GBc4W',
+                  createdAt: 1788967728210,
+                  properties: {
+                    bold: undefined
+                  },
+                  type: 'update',
+                  userId: 'ai'
+                }
+              },
+              newProperties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion: true
+              },
+              newProperties: {}
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'format',
+              children: [
+                {
+                  text: '保留必要的完成要求。',
+                  bold: true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    rawJsonReopened: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              suggestion_rm9Phr880yMQ8618GBc4W: {
+                id: 'rm9Phr880yMQ8618GBc4W',
+                createdAt: 1788967728210,
+                properties: {},
+                type: 'update',
+                userId: 'ai'
+              },
+              suggestion: true
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          data: {
+            id: 'rm9Phr880yMQ8618GBc4W',
+            createdAt: 1788967728210,
+            properties: {},
+            type: 'update',
+            userId: 'ai'
+          }
+        }
+      ],
+      rawSuggestionFields: [
+        {
+          path: [
+            0,
+            0
+          ],
+          fields: {
+            suggestion_rm9Phr880yMQ8618GBc4W: {
+              id: 'rm9Phr880yMQ8618GBc4W',
+              createdAt: 1788967728210,
+              properties: {},
+              type: 'update',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        }
+      ],
+      batches: []
+    },
+    rawJsonPayload: {
+      hasBoldOwnKey: false,
+      boldIsUndefined: true,
+      keys: [],
+      properties: {}
+    },
+    rawJsonAfterReject: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。'
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [],
+      rawSuggestionFields: [],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion_rm9Phr880yMQ8618GBc4W: {
+                  id: 'rm9Phr880yMQ8618GBc4W',
+                  createdAt: 1788967728210,
+                  properties: {},
+                  type: 'update',
+                  userId: 'ai'
+                }
+              },
+              newProperties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion: true
+              },
+              newProperties: {}
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'format',
+              children: [
+                {
+                  text: '保留必要的完成要求。'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    rawJsonControl: {
+      restoredBold: false,
+      knownR4FailureReproduced: true,
+      assertionDiff: 'Expected values to be strictly deep-equal:\n' +
+        '+ actual - expected\n' +
+        '\n' +
+        '  [\n' +
+        '    {\n' +
+        '      children: [\n' +
+        '        {\n' +
+        '-         bold: true,\n' +
+        "          text: '保留必要的完成要求。'\n" +
+        '        }\n' +
+        '      ],\n' +
+        "      id: 'format',\n" +
+        "      type: 'p'\n"
+    },
+    persistedEnvelope: {
+      json: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              suggestion_rm9Phr880yMQ8618GBc4W: {
+                id: 'rm9Phr880yMQ8618GBc4W',
+                createdAt: 1788967728210,
+                properties: {
+                  bold: null
+                },
+                type: 'update',
+                userId: 'ai'
+              },
+              suggestion: true
+            }
+          ]
+        }
+      ],
+      meta: {
+        values: {
+          '0.children.0.suggestion_rm9Phr880yMQ8618GBc4W.properties.bold': [
+            'undefined'
+          ]
+        },
+        v: 1
+      }
+    },
+    codecReopened: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              suggestion_rm9Phr880yMQ8618GBc4W: {
+                id: 'rm9Phr880yMQ8618GBc4W',
+                createdAt: 1788967728210,
+                properties: {
+                  bold: undefined
+                },
+                type: 'update',
+                userId: 'ai'
+              },
+              suggestion: true
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          data: {
+            id: 'rm9Phr880yMQ8618GBc4W',
+            createdAt: 1788967728210,
+            properties: {
+              bold: undefined
+            },
+            type: 'update',
+            userId: 'ai'
+          }
+        }
+      ],
+      rawSuggestionFields: [
+        {
+          path: [
+            0,
+            0
+          ],
+          fields: {
+            suggestion_rm9Phr880yMQ8618GBc4W: {
+              id: 'rm9Phr880yMQ8618GBc4W',
+              createdAt: 1788967728210,
+              properties: {
+                bold: undefined
+              },
+              type: 'update',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        }
+      ],
+      batches: []
+    },
+    codecPayload: {
+      hasBoldOwnKey: true,
+      boldIsUndefined: true,
+      keys: [
+        'bold'
+      ],
+      properties: {
+        bold: undefined
+      }
+    },
+    codecAfterReject: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              bold: true
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [],
+      rawSuggestionFields: [],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {},
+              newProperties: {
+                bold: true
+              }
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion_rm9Phr880yMQ8618GBc4W: {
+                  id: 'rm9Phr880yMQ8618GBc4W',
+                  createdAt: 1788967728210,
+                  properties: {
+                    bold: undefined
+                  },
+                  type: 'update',
+                  userId: 'ai'
+                }
+              },
+              newProperties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion: true
+              },
+              newProperties: {}
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'format',
+              children: [
+                {
+                  text: '保留必要的完成要求。',
+                  bold: true
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  C02: {
+    reopened: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。',
+              suggestion_rm9Phr880yMQ8618GBc4W: {
+                id: 'rm9Phr880yMQ8618GBc4W',
+                createdAt: 1788967728210,
+                properties: {
+                  bold: undefined
+                },
+                type: 'update',
+                userId: 'ai'
+              },
+              suggestion: true
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          data: {
+            id: 'rm9Phr880yMQ8618GBc4W',
+            createdAt: 1788967728210,
+            properties: {
+              bold: undefined
+            },
+            type: 'update',
+            userId: 'ai'
+          }
+        }
+      ],
+      rawSuggestionFields: [
+        {
+          path: [
+            0,
+            0
+          ],
+          fields: {
+            suggestion_rm9Phr880yMQ8618GBc4W: {
+              id: 'rm9Phr880yMQ8618GBc4W',
+              createdAt: 1788967728210,
+              properties: {
+                bold: undefined
+              },
+              type: 'update',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        }
+      ],
+      batches: []
+    },
+    afterAccept: {
+      value: [
+        {
+          type: 'p',
+          id: 'format',
+          children: [
+            {
+              text: '保留必要的完成要求。'
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [],
+      rawSuggestionFields: [],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion_rm9Phr880yMQ8618GBc4W: {
+                  id: 'rm9Phr880yMQ8618GBc4W',
+                  createdAt: 1788967728210,
+                  properties: {
+                    bold: undefined
+                  },
+                  type: 'update',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'format',
+              children: [
+                {
+                  text: '保留必要的完成要求。'
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  },
+  C03: {
+    before: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        }
+      ],
+      selection: null,
+      suggestionEntries: [],
+      rawSuggestionFields: [],
+      batches: []
+    },
+    nativePending: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。',
+              suggestion_eaouITYCrPH97xOTwdY4R: {
+                id: 'eaouITYCrPH97xOTwdY4R',
+                createdAt: 1788967728268,
+                type: 'remove',
+                userId: 'ai'
+              },
+              suggestion: true
+            },
+            {
+              suggestion_eaouITYCrPH97xOTwdY4R: {
+                id: 'eaouITYCrPH97xOTwdY4R',
+                createdAt: 1788967728264,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '所有專案都按月檢查。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: 'S7b4icfOtsv_mvoGqORTE',
+            createdAt: 1788967728313,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: {
+        anchor: {
+          path: [
+            0,
+            1
+          ],
+          offset: 10
+        },
+        focus: {
+          path: [
+            0,
+            1
+          ],
+          offset: 10
+        }
+      },
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          data: {
+            id: 'eaouITYCrPH97xOTwdY4R',
+            createdAt: 1788967728268,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          data: {
+            id: 'eaouITYCrPH97xOTwdY4R',
+            createdAt: 1788967728264,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            2
+          ],
+          data: {
+            id: 'S7b4icfOtsv_mvoGqORTE',
+            createdAt: 1788967728313,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      rawSuggestionFields: [
+        {
+          path: [
+            0,
+            0
+          ],
+          fields: {
+            suggestion_eaouITYCrPH97xOTwdY4R: {
+              id: 'eaouITYCrPH97xOTwdY4R',
+              createdAt: 1788967728268,
+              type: 'remove',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          fields: {
+            suggestion_eaouITYCrPH97xOTwdY4R: {
+              id: 'eaouITYCrPH97xOTwdY4R',
+              createdAt: 1788967728264,
+              type: 'insert',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        },
+        {
+          path: [
+            2
+          ],
+          fields: {
+            suggestion: {
+              id: 'S7b4icfOtsv_mvoGqORTE',
+              createdAt: 1788967728313,
+              type: 'insert',
+              userId: 'ai'
+            }
+          }
+        }
+      ],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_selection',
+              properties: null,
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 14
+                }
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                focus: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 14
+                }
+              },
+              newProperties: {
+                focus: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 0
+                }
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    0
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                0
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    1
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    1
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    1
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    1
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                1
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                1
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    2
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    2
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    2
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    2
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                2
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                2
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    3
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    3
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    3
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    3
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                3
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                3
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    4
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    4
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    4
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    4
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                4
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                4
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    5
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    5
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    5
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    5
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                5
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                5
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    6
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    6
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    6
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    6
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                6
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                6
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    7
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    7
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    7
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    7
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                7
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                7
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    8
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    8
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    8
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    8
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                8
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                8
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    9
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    9
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    9
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    9
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                9
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                9
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    10
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    10
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    10
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    10
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                10
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                10
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    11
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    11
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    11
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    11
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                11
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                11
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    12
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    12
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    12
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    12
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'split_node',
+              path: [
+                0,
+                12
+              ],
+              position: 1,
+              properties: {}
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                12
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    13
+                  ],
+                  offset: 0
+                },
+                focus: {
+                  path: [
+                    0,
+                    13
+                  ],
+                  offset: 0
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    13
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    13
+                  ],
+                  offset: 1
+                }
+              }
+            },
+            {
+              type: 'set_node',
+              path: [
+                0,
+                13
+              ],
+              properties: {},
+              newProperties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              }
+            },
+            {
+              type: 'insert_node',
+              path: [
+                0,
+                14
+              ],
+              node: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728264,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                suggestion: true,
+                text: '所有專案都按月檢查。'
+              }
+            },
+            {
+              type: 'set_selection',
+              properties: {
+                anchor: {
+                  path: [
+                    0,
+                    13
+                  ],
+                  offset: 1
+                },
+                focus: {
+                  path: [
+                    0,
+                    13
+                  ],
+                  offset: 1
+                }
+              },
+              newProperties: {
+                anchor: {
+                  path: [
+                    0,
+                    14
+                  ],
+                  offset: 10
+                },
+                focus: {
+                  path: [
+                    0,
+                    14
+                  ],
+                  offset: 10
+                }
+              }
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 1,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 2,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 3,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 4,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 5,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 6,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 7,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 8,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 9,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 10,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 11,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 12,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            },
+            {
+              path: [
+                0,
+                1
+              ],
+              position: 13,
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              type: 'merge_node'
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_eaouITYCrPH97xOTwdY4R: {
+                    id: 'eaouITYCrPH97xOTwdY4R',
+                    createdAt: 1788967728268,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  suggestion_eaouITYCrPH97xOTwdY4R: {
+                    id: 'eaouITYCrPH97xOTwdY4R',
+                    createdAt: 1788967728264,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            }
+          ]
+        },
+        {
+          operations: [
+            {
+              type: 'insert_node',
+              path: [
+                2
+              ],
+              node: {
+                type: 'p',
+                id: 'fault',
+                children: [
+                  {
+                    text: '記錄故障處理結果與未解事項。'
+                  }
+                ],
+                suggestion: {
+                  id: 'S7b4icfOtsv_mvoGqORTE',
+                  createdAt: 1788967728313,
+                  type: 'insert',
+                  userId: 'ai'
+                }
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。',
+                  suggestion_eaouITYCrPH97xOTwdY4R: {
+                    id: 'eaouITYCrPH97xOTwdY4R',
+                    createdAt: 1788967728268,
+                    type: 'remove',
+                    userId: 'ai'
+                  },
+                  suggestion: true
+                },
+                {
+                  suggestion_eaouITYCrPH97xOTwdY4R: {
+                    id: 'eaouITYCrPH97xOTwdY4R',
+                    createdAt: 1788967728264,
+                    type: 'insert',
+                    userId: 'ai'
+                  },
+                  suggestion: true,
+                  text: '所有專案都按月檢查。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: 'S7b4icfOtsv_mvoGqORTE',
+                createdAt: 1788967728313,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        }
+      ]
+    },
+    monthlyId: 'eaouITYCrPH97xOTwdY4R',
+    faultId: 'S7b4icfOtsv_mvoGqORTE',
+    codecReopened: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。',
+              suggestion_eaouITYCrPH97xOTwdY4R: {
+                id: 'eaouITYCrPH97xOTwdY4R',
+                createdAt: 1788967728268,
+                type: 'remove',
+                userId: 'ai'
+              },
+              suggestion: true
+            },
+            {
+              suggestion_eaouITYCrPH97xOTwdY4R: {
+                id: 'eaouITYCrPH97xOTwdY4R',
+                createdAt: 1788967728264,
+                type: 'insert',
+                userId: 'ai'
+              },
+              suggestion: true,
+              text: '所有專案都按月檢查。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: 'S7b4icfOtsv_mvoGqORTE',
+            createdAt: 1788967728313,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      suggestionEntries: [
+        {
+          path: [
+            0,
+            0
+          ],
+          data: {
+            id: 'eaouITYCrPH97xOTwdY4R',
+            createdAt: 1788967728268,
+            type: 'remove',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          data: {
+            id: 'eaouITYCrPH97xOTwdY4R',
+            createdAt: 1788967728264,
+            type: 'insert',
+            userId: 'ai'
+          }
+        },
+        {
+          path: [
+            2
+          ],
+          data: {
+            id: 'S7b4icfOtsv_mvoGqORTE',
+            createdAt: 1788967728313,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      rawSuggestionFields: [
+        {
+          path: [
+            0,
+            0
+          ],
+          fields: {
+            suggestion_eaouITYCrPH97xOTwdY4R: {
+              id: 'eaouITYCrPH97xOTwdY4R',
+              createdAt: 1788967728268,
+              type: 'remove',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        },
+        {
+          path: [
+            0,
+            1
+          ],
+          fields: {
+            suggestion_eaouITYCrPH97xOTwdY4R: {
+              id: 'eaouITYCrPH97xOTwdY4R',
+              createdAt: 1788967728264,
+              type: 'insert',
+              userId: 'ai'
+            },
+            suggestion: true
+          }
+        },
+        {
+          path: [
+            2
+          ],
+          fields: {
+            suggestion: {
+              id: 'S7b4icfOtsv_mvoGqORTE',
+              createdAt: 1788967728313,
+              type: 'insert',
+              userId: 'ai'
+            }
+          }
+        }
+      ],
+      batches: []
+    },
+    afterRejectMonthly: {
+      value: [
+        {
+          type: 'p',
+          id: 'monthly',
+          children: [
+            {
+              text: '僅有月檢約定的專案按月檢查。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'delivery',
+          children: [
+            {
+              text: '交付版本與檢查結果一致。'
+            }
+          ]
+        },
+        {
+          type: 'p',
+          id: 'fault',
+          children: [
+            {
+              text: '記錄故障處理結果與未解事項。'
+            }
+          ],
+          suggestion: {
+            id: 'S7b4icfOtsv_mvoGqORTE',
+            createdAt: 1788967728313,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      selection: null,
+      suggestionEntries: [
+        {
+          path: [
+            2
+          ],
+          data: {
+            id: 'S7b4icfOtsv_mvoGqORTE',
+            createdAt: 1788967728313,
+            type: 'insert',
+            userId: 'ai'
+          }
+        }
+      ],
+      rawSuggestionFields: [
+        {
+          path: [
+            2
+          ],
+          fields: {
+            suggestion: {
+              id: 'S7b4icfOtsv_mvoGqORTE',
+              createdAt: 1788967728313,
+              type: 'insert',
+              userId: 'ai'
+            }
+          }
+        }
+      ],
+      batches: [
+        {
+          operations: [
+            {
+              type: 'set_node',
+              path: [
+                0,
+                0
+              ],
+              properties: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728268,
+                  type: 'remove',
+                  userId: 'ai'
+                },
+                suggestion: true
+              },
+              newProperties: {}
+            },
+            {
+              type: 'remove_node',
+              path: [
+                0,
+                1
+              ],
+              node: {
+                suggestion_eaouITYCrPH97xOTwdY4R: {
+                  id: 'eaouITYCrPH97xOTwdY4R',
+                  createdAt: 1788967728264,
+                  type: 'insert',
+                  userId: 'ai'
+                },
+                suggestion: true,
+                text: '所有專案都按月檢查。'
+              }
+            }
+          ],
+          value: [
+            {
+              type: 'p',
+              id: 'monthly',
+              children: [
+                {
+                  text: '僅有月檢約定的專案按月檢查。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'delivery',
+              children: [
+                {
+                  text: '交付版本與檢查結果一致。'
+                }
+              ]
+            },
+            {
+              type: 'p',
+              id: 'fault',
+              children: [
+                {
+                  text: '記錄故障處理結果與未解事項。'
+                }
+              ],
+              suggestion: {
+                id: 'S7b4icfOtsv_mvoGqORTE',
+                createdAt: 1788967728313,
+                type: 'insert',
+                userId: 'ai'
+              }
+            }
+          ]
+        }
+      ]
+    }
+  },
+  C04: {
+    before: {
+      unset: undefined,
+      nullable: null,
+      nested: {
+        unset: undefined,
+        nullable: null
+      }
+    },
+    envelope: {
+      json: {
+        unset: null,
+        nullable: null,
+        nested: {
+          unset: null,
+          nullable: null
+        }
+      },
+      meta: {
+        values: {
+          unset: [
+            'undefined'
+          ],
+          'nested.unset': [
+            'undefined'
+          ]
+        },
+        v: 1
+      }
+    },
+    restored: {
+      unset: undefined,
+      nullable: null,
+      nested: {
+        unset: undefined,
+        nullable: null
+      }
+    },
+    rawJsonControl: {
+      nullable: null,
+      nested: {
+        nullable: null
+      }
+    }
+  }
+}

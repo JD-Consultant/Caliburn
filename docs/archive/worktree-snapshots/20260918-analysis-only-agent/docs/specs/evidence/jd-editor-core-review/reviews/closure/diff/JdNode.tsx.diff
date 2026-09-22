@@ -1,0 +1,18 @@
+diff --git a/experiments/jd-editor/web/src/jd/JdNode.tsx b/experiments/jd-editor/web/src/jd/JdNode.tsx
+index 29f669b6..b18ff3d2 100644
+--- a/experiments/jd-editor/web/src/jd/JdNode.tsx
++++ b/experiments/jd-editor/web/src/jd/JdNode.tsx
+@@ -25,9 +25,11 @@ export function textOf(node: JdText | JdSavedElement): string {
+     : node.children.map(textOf).join("");
+ }
+ export function nameOf(node: JdSavedElement) {
++  const unnamed = node.type === "jd_knowledge" ? "未命名知識"
++    : node.type === "jd_skill" ? "未命名技能" : "未命名項目";
+   return node.children.length
+-    ? textOf(node.children[0]) || "未命名項目"
+-    : "未命名項目";
++    ? textOf(node.children[0]) || unnamed
++    : unnamed;
+ }
+ const sections: Record<string, string> = {
+   identity: "基本資料",

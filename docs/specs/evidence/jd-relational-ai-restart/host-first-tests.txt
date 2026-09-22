@@ -1,0 +1,26 @@
+...F
+================================== FAILURES ===================================
+_ test_fh04_after_model_before_sql_and_original_start_input_are_closed_together _
+
+    def test_fh04_after_model_before_sql_and_original_start_input_are_closed_together():
+        directory = evidence_directory()
+        manifest = directory / "original.json"
+        with worker("two_boundaries", directory, manifest) as (old, first, _):
+            assert first["event"] == "pending" and first["counts"] == {"model": 3, "tools": 1, "execute": 0, "setup": 0}
+            data = original(manifest)
+            before_a, before_b = data["documents"]
+            assert data["witness"]["after_model_binding_put_confirmed"]
+            assert len(before_a["ai"]["bindings"]) == 1 and before_a["receipts"] == []
+>           assert before_b["ai"]["bindings"] == [] and before_b["root_next"] == ["__start__"]
+E           AssertionError: assert ([] == []
+E
+E             Use -v to get more diff and [] == ['__start__']
+E
+E             Right contains one more item: '__start__'
+E             Use -v to get more diff)
+
+tests\test_ai_host_restart_postgres.py:206: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_ai_host_restart_postgres.py::test_fh04_after_model_before_sql_and_original_start_input_are_closed_together
+!!!!!!!!!!!!!!!!!!!!!!!!!! stopping after 1 failures !!!!!!!!!!!!!!!!!!!!!!!!!!
+1 failed, 3 passed in 48.23s

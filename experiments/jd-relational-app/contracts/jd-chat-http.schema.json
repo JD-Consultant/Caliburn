@@ -1,0 +1,1018 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ChatHttpCatalog",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "ChatStartInput": {
+      "$ref": "#/$defs/ChatStartInput"
+    },
+    "ChatRunState": {
+      "$ref": "#/$defs/ChatRunState"
+    },
+    "ChatHistoryPage": {
+      "$ref": "#/$defs/ChatHistoryPage"
+    },
+    "ChatMessage": {
+      "$ref": "#/$defs/ChatMessage"
+    },
+    "ChatProblem": {
+      "$ref": "#/$defs/ChatProblem"
+    },
+    "ChatRunChangePage": {
+      "$ref": "#/$defs/ChatRunChangePage"
+    }
+  },
+  "required": [
+    "ChatStartInput",
+    "ChatRunState",
+    "ChatHistoryPage",
+    "ChatMessage",
+    "ChatProblem",
+    "ChatRunChangePage"
+  ],
+  "description": "Generation catalog, not an endpoint body. App-only chat controls reuse manual write state and original mutation result contracts; no provider tool schema or persistence table is introduced.",
+  "$defs": {
+    "ChatRunChangePage": {
+      "title": "ChatRunChangePage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "format_version": {"type": "integer", "minimum": 1, "maximum": 1},
+        "view": {"type": "string", "enum": ["run_change"]},
+        "access": {"type": "string", "enum": ["history"]},
+        "dataset_id": {"$ref": "#/$defs/ChatUuid"},
+        "document_id": {"$ref": "#/$defs/ChatUuid"},
+        "run_id": {"$ref": "#/$defs/ChatUuid"},
+        "capture_ref": {"$ref": "#/$defs/ChatOpaqueRef"},
+        "effects_state": {"type": "string", "enum": ["settled", "unconfirmed"]},
+        "continuity": {"type": "string", "enum": ["none", "continuous", "discontinuous"]},
+        "captured_operation_count": {"type": "integer", "minimum": 0, "maximum": 96},
+        "base_revision_ref": {"anyOf": [{"$ref": "#/$defs/ChatOpaqueRef"}, {"type": "null"}]},
+        "result_revision_ref": {"anyOf": [{"$ref": "#/$defs/ChatOpaqueRef"}, {"type": "null"}]},
+        "records": {"type": "array", "items": {"$ref": "jd-read.schema.json#/$defs/ChangeReadRecord"}},
+        "start_index": {"type": "integer", "minimum": 0},
+        "total_records": {"type": "integer", "minimum": 0},
+        "total_changes": {"type": "integer", "minimum": 0},
+        "has_more": {"type": "boolean"},
+        "next_cursor": {"anyOf": [{"$ref": "#/$defs/ChatOpaqueRef"}, {"type": "null"}]},
+        "oversized_unit": {"type": "boolean"}
+      },
+      "required": ["format_version", "view", "access", "dataset_id", "document_id", "run_id",
+        "capture_ref", "effects_state", "continuity", "captured_operation_count", "base_revision_ref",
+        "result_revision_ref", "records", "start_index", "total_records", "total_changes", "has_more",
+        "next_cursor", "oversized_unit"],
+      "allOf": [
+        {
+          "if": {"properties": {"continuity": {"const": "continuous"}}},
+          "then": {"properties": {
+            "captured_operation_count": {"type": "integer", "minimum": 1},
+            "base_revision_ref": {"$ref": "#/$defs/ChatOpaqueRef"},
+            "result_revision_ref": {"$ref": "#/$defs/ChatOpaqueRef"}
+          }}
+        },
+        {
+          "if": {"properties": {"continuity": {"const": "none"}}},
+          "then": {"properties": {
+            "captured_operation_count": {"type": "integer", "maximum": 0},
+            "base_revision_ref": {"type": "null"}, "result_revision_ref": {"type": "null"},
+            "records": {"type": "array", "maxItems": 0}, "total_records": {"type": "integer", "maximum": 0}, "total_changes": {"type": "integer", "maximum": 0}
+          }}
+        },
+        {
+          "if": {"properties": {"continuity": {"const": "discontinuous"}}},
+          "then": {"properties": {
+            "captured_operation_count": {"type": "integer", "minimum": 1},
+            "base_revision_ref": {"type": "null"}, "result_revision_ref": {"type": "null"},
+            "records": {"type": "array", "maxItems": 0}, "total_records": {"type": "integer", "maximum": 0}, "total_changes": {"type": "integer", "maximum": 0}
+          }}
+        }
+      ],
+      "description": "One fixed captured run range, not a fabricated operation. capture_ref signs the exact committed IDs and captured settled state at offset zero; continuation preserves this range. Only continuous ranges have net comparison records and immutable S/E. Unconfirmed remains a partial run observation; zero net records with positive captured count preserves saved events. Historical fields are complete atomic records using the existing jd_read contract."
+    },
+    "ChatUuid": {
+      "title": "ChatUuid",
+      "type": "string",
+      "minLength": 36,
+      "maxLength": 36,
+      "pattern": "^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+    },
+    "ChatOpaqueRef": {
+      "title": "ChatOpaqueRef",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "ChatMessageId": {
+      "title": "ChatMessageId",
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096,
+      "description": "The original native message ID; it is not required to be a UUID."
+    },
+    "ChatOriginalText": {
+      "title": "ChatOriginalText",
+      "type": "string",
+      "minLength": 1,
+      "pattern": "^[^\u0000]*[^\\s\u0000\u001c-\u001f][^\u0000]*$",
+      "description": "Original Human text, not normalized or trimmed. The App checks the existing 128 KiB UTF-8 limit; maxLength is not a byte limit."
+    },
+    "ChatStartInput": {
+      "title": "ChatStartInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "text": {
+          "$ref": "#/$defs/ChatOriginalText"
+        },
+        "expected_jd_revision_ref": {
+          "$ref": "#/$defs/ChatOpaqueRef"
+        }
+      },
+      "required": [
+        "run_id",
+        "text",
+        "expected_jd_revision_ref"
+      ],
+      "description": "One original browser request. Route/document and dataset header are not duplicated in this body or passed to the model as tool arguments."
+    },
+    "ChatConfirmedResult": {
+      "title": "ChatConfirmedResult",
+      "anyOf": [
+        {
+          "$ref": "jd-result.schema.json#/$defs/CommittedResult"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/NoChangeResult"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedInvalidInput"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedTargetMissing"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedStaleView"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedRelationshipConflict"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedDependentItems"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedSaveFailed"
+        }
+      ],
+      "description": "Only original confirmed bound write receipts. No unbound request rejection or reconstructed outcome."
+    },
+    "ChatBoundResult": {
+      "title": "ChatBoundResult",
+      "anyOf": [
+        {
+          "$ref": "jd-result.schema.json#/$defs/CommittedResult"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/NoChangeResult"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedInvalidInput"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedTargetMissing"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedStaleView"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedRelationshipConflict"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedDependentItems"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/ConfirmedSaveFailed"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedInvalidInput"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedTargetMissing"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedStaleView"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedRelationshipConflict"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedDependentItems"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnconfirmedSaveFailed"
+        },
+        {
+          "$ref": "jd-result.schema.json#/$defs/UnknownOutcomeResult"
+        }
+      ],
+      "description": "Original bound write observations, including confirmed A and unknown B; excludes every Unbound result."
+    },
+    "ChatUnconfirmedEffects": {
+      "title": "ChatUnconfirmedEffects",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChatBoundResult"
+          },
+          "maxItems": 96
+        }
+      },
+      "required": [
+        "state",
+        "results"
+      ]
+    },
+    "ChatSettledEffects": {
+      "title": "ChatSettledEffects",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "settled"
+          ]
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChatConfirmedResult"
+          },
+          "maxItems": 96
+        }
+      },
+      "required": [
+        "state",
+        "results"
+      ]
+    },
+    "ChatEmptyUnconfirmedEffects": {
+      "title": "ChatEmptyUnconfirmedEffects",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChatBoundResult"
+          },
+          "maxItems": 0
+        }
+      },
+      "required": [
+        "state",
+        "results"
+      ]
+    },
+    "ChatEmptySettledEffects": {
+      "title": "ChatEmptySettledEffects",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "state": {
+          "type": "string",
+          "enum": [
+            "settled"
+          ]
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChatConfirmedResult"
+          },
+          "maxItems": 0
+        }
+      },
+      "required": [
+        "state",
+        "results"
+      ]
+    },
+    "ChatRunNotFound": {
+      "title": "ChatRunNotFound",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "write_state": {
+          "$ref": "jd-manual-http.schema.json#/$defs/ManualDocumentState"
+        },
+        "run_status": {
+          "type": "string",
+          "enum": [
+            "not_found"
+          ]
+        },
+        "input_state": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "response_message_id": {
+          "type": "null"
+        },
+        "stop_requested": {
+          "type": "null"
+        },
+        "jd_effects": {
+          "$ref": "#/$defs/ChatEmptyUnconfirmedEffects"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "run_id",
+        "write_state",
+        "run_status",
+        "input_state",
+        "response_message_id",
+        "stop_requested",
+        "jd_effects"
+      ]
+    },
+    "ChatRunRunning": {
+      "title": "ChatRunRunning",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "write_state": {
+          "$ref": "jd-manual-http.schema.json#/$defs/ManualBlockedState"
+        },
+        "run_status": {
+          "type": "string",
+          "enum": [
+            "running"
+          ]
+        },
+        "input_state": {
+          "type": "string",
+          "enum": [
+            "saved",
+            "unconfirmed"
+          ]
+        },
+        "response_message_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChatMessageId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stop_requested": {
+          "type": "boolean"
+        },
+        "jd_effects": {
+          "$ref": "#/$defs/ChatUnconfirmedEffects"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "run_id",
+        "write_state",
+        "run_status",
+        "input_state",
+        "response_message_id",
+        "stop_requested",
+        "jd_effects"
+      ]
+    },
+    "ChatRunClosing": {
+      "title": "ChatRunClosing",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "write_state": {
+          "$ref": "jd-manual-http.schema.json#/$defs/ManualBlockedState"
+        },
+        "run_status": {
+          "type": "string",
+          "enum": [
+            "closing"
+          ]
+        },
+        "input_state": {
+          "type": "string",
+          "enum": [
+            "saved",
+            "unconfirmed"
+          ]
+        },
+        "response_message_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChatMessageId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stop_requested": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jd_effects": {
+          "$ref": "#/$defs/ChatUnconfirmedEffects"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "run_id",
+        "write_state",
+        "run_status",
+        "input_state",
+        "response_message_id",
+        "stop_requested",
+        "jd_effects"
+      ]
+    },
+    "ChatRunRecoveryRequired": {
+      "title": "ChatRunRecoveryRequired",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "write_state": {
+          "$ref": "jd-manual-http.schema.json#/$defs/ManualBlockedState"
+        },
+        "run_status": {
+          "type": "string",
+          "enum": [
+            "recovery_required"
+          ]
+        },
+        "input_state": {
+          "type": "string",
+          "enum": [
+            "saved",
+            "unconfirmed"
+          ]
+        },
+        "response_message_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChatMessageId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stop_requested": {
+          "anyOf": [
+            {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "jd_effects": {
+          "$ref": "#/$defs/ChatUnconfirmedEffects"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "run_id",
+        "write_state",
+        "run_status",
+        "input_state",
+        "response_message_id",
+        "stop_requested",
+        "jd_effects"
+      ]
+    },
+    "ChatRunCompleted": {
+      "title": "ChatRunCompleted",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "write_state": {
+          "$ref": "jd-manual-http.schema.json#/$defs/ManualDocumentState"
+        },
+        "run_status": {
+          "type": "string",
+          "enum": [
+            "completed"
+          ]
+        },
+        "input_state": {
+          "type": "string",
+          "enum": [
+            "saved"
+          ]
+        },
+        "response_message_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChatMessageId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stop_requested": {
+          "type": "null"
+        },
+        "jd_effects": {
+          "$ref": "#/$defs/ChatSettledEffects"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "run_id",
+        "write_state",
+        "run_status",
+        "input_state",
+        "response_message_id",
+        "stop_requested",
+        "jd_effects"
+      ]
+    },
+    "ChatRunCancelled": {
+      "title": "ChatRunCancelled",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "write_state": {
+          "$ref": "jd-manual-http.schema.json#/$defs/ManualDocumentState"
+        },
+        "run_status": {
+          "type": "string",
+          "enum": [
+            "cancelled"
+          ]
+        },
+        "input_state": {
+          "type": "string",
+          "enum": [
+            "saved"
+          ]
+        },
+        "response_message_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChatMessageId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stop_requested": {
+          "type": "null"
+        },
+        "jd_effects": {
+          "$ref": "#/$defs/ChatSettledEffects"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "run_id",
+        "write_state",
+        "run_status",
+        "input_state",
+        "response_message_id",
+        "stop_requested",
+        "jd_effects"
+      ]
+    },
+    "ChatRunFailedSaved": {
+      "title": "ChatRunFailedSaved",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "write_state": {
+          "$ref": "jd-manual-http.schema.json#/$defs/ManualDocumentState"
+        },
+        "run_status": {
+          "type": "string",
+          "enum": [
+            "failed"
+          ]
+        },
+        "input_state": {
+          "type": "string",
+          "enum": [
+            "saved"
+          ]
+        },
+        "response_message_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChatMessageId"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "stop_requested": {
+          "type": "null"
+        },
+        "jd_effects": {
+          "$ref": "#/$defs/ChatSettledEffects"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "run_id",
+        "write_state",
+        "run_status",
+        "input_state",
+        "response_message_id",
+        "stop_requested",
+        "jd_effects"
+      ]
+    },
+    "ChatRunFailedNotSaved": {
+      "title": "ChatRunFailedNotSaved",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "write_state": {
+          "$ref": "jd-manual-http.schema.json#/$defs/ManualDocumentState"
+        },
+        "run_status": {
+          "type": "string",
+          "enum": [
+            "failed"
+          ]
+        },
+        "input_state": {
+          "type": "string",
+          "enum": [
+            "not_saved"
+          ]
+        },
+        "response_message_id": {
+          "type": "null"
+        },
+        "stop_requested": {
+          "type": "null"
+        },
+        "jd_effects": {
+          "$ref": "#/$defs/ChatEmptySettledEffects"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "run_id",
+        "write_state",
+        "run_status",
+        "input_state",
+        "response_message_id",
+        "stop_requested",
+        "jd_effects"
+      ]
+    },
+    "ChatRunState": {
+      "title": "ChatRunState",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ChatRunNotFound"
+        },
+        {
+          "$ref": "#/$defs/ChatRunRunning"
+        },
+        {
+          "$ref": "#/$defs/ChatRunClosing"
+        },
+        {
+          "$ref": "#/$defs/ChatRunRecoveryRequired"
+        },
+        {
+          "$ref": "#/$defs/ChatRunCompleted"
+        },
+        {
+          "$ref": "#/$defs/ChatRunCancelled"
+        },
+        {
+          "$ref": "#/$defs/ChatRunFailedSaved"
+        },
+        {
+          "$ref": "#/$defs/ChatRunFailedNotSaved"
+        }
+      ],
+      "description": "Independent facts about one run, its original Human input and JD effects. A saved terminal failed run may have committed JD. not_found never proves input not_saved. response_message_id identifies only a saved public-text response from this run, not tool-only or previous-run messages. These shape constraints do not substitute for scope, checkpoint, actual Future or receipt evidence checked by the App."
+    },
+    "ChatMessage": {
+      "title": "ChatMessage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "message_id": {
+          "$ref": "#/$defs/ChatMessageId"
+        },
+        "run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "user",
+            "assistant"
+          ]
+        },
+        "text": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "message_id",
+        "run_id",
+        "role",
+        "text"
+      ],
+      "description": "Saved public text only. Original native messages remain in Saver; no provider metadata, tool arguments, reasoning, timestamps or usage are invented or exposed here."
+    },
+    "ChatEmptyHistoryPage": {
+      "title": "ChatEmptyHistoryPage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "anchor": {
+          "type": "null"
+        },
+        "anchor_run_id": {
+          "type": "null"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChatMessage"
+          },
+          "maxItems": 0
+        },
+        "next_cursor": {
+          "type": "null"
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "anchor",
+        "anchor_run_id",
+        "messages",
+        "next_cursor"
+      ]
+    },
+    "ChatAnchoredHistoryPage": {
+      "title": "ChatAnchoredHistoryPage",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "dataset_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "document_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "anchor": {
+          "$ref": "#/$defs/ChatOpaqueRef"
+        },
+        "anchor_run_id": {
+          "$ref": "#/$defs/ChatUuid"
+        },
+        "messages": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChatMessage"
+          },
+          "maxItems": 50
+        },
+        "next_cursor": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ChatOpaqueRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "dataset_id",
+        "document_id",
+        "anchor",
+        "anchor_run_id",
+        "messages",
+        "next_cursor"
+      ]
+    },
+    "ChatHistoryPage": {
+      "title": "ChatHistoryPage",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ChatEmptyHistoryPage"
+        },
+        {
+          "$ref": "#/$defs/ChatAnchoredHistoryPage"
+        }
+      ],
+      "description": "The initial page contains the latest at most fifty public messages; next_cursor requests an older page at the same fixed root/child snapshot, and every page remains chronological. anchor_run_id is the run at that fixed anchor, not the first visible message or the latest run on later pages. No checkpoint means null anchor and anchor_run_id in the explicit empty branch, not guessed history or a new chat authority."
+    },
+    "ChatProblem": {
+      "title": "ChatProblem",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "about:blank"
+          ]
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 256
+        },
+        "status": {
+          "type": "integer",
+          "enum": [
+            403,
+            404,
+            409,
+            422,
+            500,
+            503
+          ]
+        },
+        "detail": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "instance": {
+          "type": "string",
+          "minLength": 45,
+          "maxLength": 45,
+          "pattern": "^urn:uuid:[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+        },
+        "code": {
+          "type": "string",
+          "enum": [
+            "invalid_input",
+            "invalid_ref",
+            "document_missing",
+            "dataset_changed",
+            "stale_view",
+            "run_conflict",
+            "busy",
+            "recovery_required",
+            "service_unavailable",
+            "ai_unavailable",
+            "origin_not_allowed"
+          ]
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "correct_input",
+            "reread",
+            "lookup_run",
+            "wait",
+            "recover",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "title",
+        "status",
+        "detail",
+        "instance",
+        "code",
+        "next_action"
+      ],
+      "description": "RFC 9457 App-layer request problem with fixed route/service mapping. This problem does not establish original Human/JD durability or rollback, nor reveal private exceptions."
+    }
+  }
+}

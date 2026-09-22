@@ -1,0 +1,135 @@
+{
+  "node": "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\node.EXE",
+  "node_version": "v22.23.2",
+  "PYTHONUTF8": "1",
+  "runs": [
+    {
+      "name": "codegen-check",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "check-codegen",
+        "-w",
+        "@caliburn/jd-editor-contract"
+      ],
+      "exit_code": 0,
+      "seconds": 6.745364899994456
+    },
+    {
+      "name": "contract",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor\\contract",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "-q",
+        "tests/test_schema_contract.py"
+      ],
+      "exit_code": 0,
+      "seconds": 5.294409299996914
+    },
+    {
+      "name": "native",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "test",
+        "-w",
+        "@caliburn/jd-editor-native"
+      ],
+      "exit_code": 0,
+      "seconds": 2.9031281000061426
+    },
+    {
+      "name": "web-tests",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "test",
+        "-w",
+        "@caliburn/jd-editor-web"
+      ],
+      "exit_code": 0,
+      "seconds": 4.140292799987947
+    },
+    {
+      "name": "web-types",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "typecheck",
+        "-w",
+        "@caliburn/jd-editor-web"
+      ],
+      "exit_code": 0,
+      "seconds": 2.071028299993486
+    },
+    {
+      "name": "web-lint",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "lint",
+        "-w",
+        "@caliburn/jd-editor-web"
+      ],
+      "exit_code": 0,
+      "seconds": 3.0324164000048768
+    },
+    {
+      "name": "web-build",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\jd-editor",
+      "command": [
+        "cmd.exe",
+        "/d",
+        "/c",
+        "S:\\caliburn\\.worktrees\\analysis-only-agent\\.superpowers\\sdd\\2026-09-10-jd-editor-core-implementation\\task4-runtime\\node-v22.23.2-win-x64\\npm.cmd",
+        "run",
+        "build",
+        "-w",
+        "@caliburn/jd-editor-web"
+      ],
+      "exit_code": 0,
+      "seconds": 7.387768900007359
+    },
+    {
+      "name": "api-and-affected-owner-regression",
+      "cwd": "S:\\caliburn\\.worktrees\\analysis-only-agent\\experiments\\analysis-agent",
+      "command": [
+        "uv",
+        "run",
+        "pytest",
+        "-q",
+        "tests/test_jd_api.py",
+        "tests/test_api.py",
+        "tests/test_jd_engine.py",
+        "tests/test_jd_tools.py",
+        "tests/test_jd_sources.py",
+        "tests/test_jd_fix1.py",
+        "tests/test_jd_fix2.py"
+      ],
+      "exit_code": 0,
+      "seconds": 62.13183990000107
+    }
+  ]
+}

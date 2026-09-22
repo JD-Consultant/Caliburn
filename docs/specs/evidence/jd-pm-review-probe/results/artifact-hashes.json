@@ -1,0 +1,344 @@
+[
+  {
+    "path": "README.md",
+    "source": ".research-tmp/jd-editor-pm-review-probe/README.md",
+    "sourceSha256": "0970FC0B855E0E08272207D92E65520A4868CDA3C93CB5D8D9C2BAECE126F266",
+    "archiveSha256": "0970FC0B855E0E08272207D92E65520A4868CDA3C93CB5D8D9C2BAECE126F266"
+  },
+  {
+    "path": "RESULTS.md",
+    "source": ".research-tmp/jd-editor-pm-review-probe/RESULTS.md",
+    "sourceSha256": "76D4AEE4DE169E8C7E835DF1E198DA7C0885583341A32BE349EC57883BA7BC97",
+    "archiveSha256": "76D4AEE4DE169E8C7E835DF1E198DA7C0885583341A32BE349EC57883BA7BC97"
+  },
+  {
+    "path": "package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/package.json",
+    "sourceSha256": "4D82C869D5AD55DF5CFE38DF97A9B31824B1D443CA018CCA570139EE05BBF10A",
+    "archiveSha256": "4D82C869D5AD55DF5CFE38DF97A9B31824B1D443CA018CCA570139EE05BBF10A"
+  },
+  {
+    "path": "package-lock.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/package-lock.json",
+    "sourceSha256": "517A3081143083F6465F049343B6FA487820EAC7CCADFCCE939BC96D557A610F",
+    "archiveSha256": "517A3081143083F6465F049343B6FA487820EAC7CCADFCCE939BC96D557A610F"
+  },
+  {
+    "path": "probe.mjs",
+    "source": ".research-tmp/jd-editor-pm-review-probe/probe.mjs",
+    "sourceSha256": "27651C6DFCB60EF00132BE8FA7260462427F2345685A514A1AAC6C26317B323F",
+    "archiveSha256": "27651C6DFCB60EF00132BE8FA7260462427F2345685A514A1AAC6C26317B323F"
+  },
+  {
+    "path": "results/dependency-tree-stderr.log",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/dependency-tree-stderr.log",
+    "sourceSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "archiveSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  },
+  {
+    "path": "results/dependency-tree.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/dependency-tree.json",
+    "sourceSha256": "24BA35DD30F7C8149D247AB06D40E0C191FC929C5A5EE2A790FFA45CFBFD38F2",
+    "archiveSha256": "24BA35DD30F7C8149D247AB06D40E0C191FC929C5A5EE2A790FFA45CFBFD38F2"
+  },
+  {
+    "path": "results/evidence-manifest.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/evidence-manifest.json",
+    "sourceSha256": "7110265DC7B4C7EE6DD3D190FECF77A7E8E7BD8F11FE3C7FF140FF0600879871",
+    "archiveSha256": "7110265DC7B4C7EE6DD3D190FECF77A7E8E7BD8F11FE3C7FF140FF0600879871"
+  },
+  {
+    "path": "results/first-run-schema-error-probe.mjs",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/first-run-schema-error-probe.mjs",
+    "sourceSha256": "64988E5CA5D20B7AAAA002C7C837CC1F45B611FDCDB283BC3572E025035C975A",
+    "archiveSha256": "64988E5CA5D20B7AAAA002C7C837CC1F45B611FDCDB283BC3572E025035C975A"
+  },
+  {
+    "path": "results/install.log",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/install.log",
+    "sourceSha256": "E6DCA6F646B576EE2C80D8ABC2F5C5ABB3A30F271A16418EBC72EB8E9B8E2233",
+    "archiveSha256": "E6DCA6F646B576EE2C80D8ABC2F5C5ABB3A30F271A16418EBC72EB8E9B8E2233"
+  },
+  {
+    "path": "results/probe-first-run-exit.txt",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/probe-first-run-exit.txt",
+    "sourceSha256": "6B86B273FF34FCE19D6B804EFF5A3F5747ADA4EAA22F1D49C01E52DDB7875B4B",
+    "archiveSha256": "6B86B273FF34FCE19D6B804EFF5A3F5747ADA4EAA22F1D49C01E52DDB7875B4B"
+  },
+  {
+    "path": "results/probe-first-run.log",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/probe-first-run.log",
+    "sourceSha256": "22DE69066CD4928A23890D0A4CDA22FA4D2805733972C1756BFCE1D54844E647",
+    "archiveSha256": "22DE69066CD4928A23890D0A4CDA22FA4D2805733972C1756BFCE1D54844E647"
+  },
+  {
+    "path": "results/probe-scope-run-exit.txt",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/probe-scope-run-exit.txt",
+    "sourceSha256": "D4735E3A265E16EEE03F59718B9B5D03019C07D8B6C51F90DA3A666EEC13AB35",
+    "archiveSha256": "D4735E3A265E16EEE03F59718B9B5D03019C07D8B6C51F90DA3A666EEC13AB35"
+  },
+  {
+    "path": "results/probe-scope-run.log",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/probe-scope-run.log",
+    "sourceSha256": "F17BBEE42C5146EBB7DC573E892636AA14BE63490A72D4235BD1EFDA0F0244B7",
+    "archiveSha256": "F17BBEE42C5146EBB7DC573E892636AA14BE63490A72D4235BD1EFDA0F0244B7"
+  },
+  {
+    "path": "results/registry-fetch-escalated-stderr.log",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/registry-fetch-escalated-stderr.log",
+    "sourceSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855",
+    "archiveSha256": "E3B0C44298FC1C149AFBF4C8996FB92427AE41E4649B934CA495991B7852B855"
+  },
+  {
+    "path": "results/registry-fetch-stderr.log",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/registry-fetch-stderr.log",
+    "sourceSha256": "F63A6EF759567D7C0F0145A6095DA2C2A25C45F697869C5659F7CD0011F0159A",
+    "archiveSha256": "F63A6EF759567D7C0F0145A6095DA2C2A25C45F697869C5659F7CD0011F0159A"
+  },
+  {
+    "path": "results/registry-package-1.0.79.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/registry-package-1.0.79.json",
+    "sourceSha256": "6C2E6EB021BD3D6288C6C2B66AA1997F5C571BACABC9127D69D4C55A05506D27",
+    "archiveSha256": "6C2E6EB021BD3D6288C6C2B66AA1997F5C571BACABC9127D69D4C55A05506D27"
+  },
+  {
+    "path": "results/run-20260909T144514Z/A-after-reject.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/A-after-reject.doc.json",
+    "sourceSha256": "E382E3663639111E5F9F75A9504FDFE786B49C23292BDB56FC89977B89956951",
+    "archiveSha256": "E382E3663639111E5F9F75A9504FDFE786B49C23292BDB56FC89977B89956951"
+  },
+  {
+    "path": "results/run-20260909T144514Z/A-before-reject.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/A-before-reject.doc.json",
+    "sourceSha256": "AE1379C9F35D1F2FCA77BB1710DC3B42AEF4B3C0BAAA50E625CAADB1FB3D00FD",
+    "archiveSha256": "AE1379C9F35D1F2FCA77BB1710DC3B42AEF4B3C0BAAA50E625CAADB1FB3D00FD"
+  },
+  {
+    "path": "results/run-20260909T144514Z/A-independent-pending.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/A-independent-pending.json",
+    "sourceSha256": "BD6FA55ABF0E37D9EF0EC9AA091E456BEEA3B2B9B686A9280ADA677F12605FF8",
+    "archiveSha256": "BD6FA55ABF0E37D9EF0EC9AA091E456BEEA3B2B9B686A9280ADA677F12605FF8"
+  },
+  {
+    "path": "results/run-20260909T144514Z/B-after-accept.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/B-after-accept.doc.json",
+    "sourceSha256": "6886F97EC4EB8A59B35460117F7708A13DB94A3747D32DB089EC4607D674A044",
+    "archiveSha256": "6886F97EC4EB8A59B35460117F7708A13DB94A3747D32DB089EC4607D674A044"
+  },
+  {
+    "path": "results/run-20260909T144514Z/B-after-reject.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/B-after-reject.doc.json",
+    "sourceSha256": "34B76B131AEAD8BEFF23479A659DD50785D532F85C197FDFA7350A9102BA489E",
+    "archiveSha256": "34B76B131AEAD8BEFF23479A659DD50785D532F85C197FDFA7350A9102BA489E"
+  },
+  {
+    "path": "results/run-20260909T144514Z/B-ai-human-ai.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/B-ai-human-ai.json",
+    "sourceSha256": "44D9AAC8EA51CE5E5993A64B1DAF276A588B7A6F0A307A8C5FA32148CDA7CF13",
+    "archiveSha256": "44D9AAC8EA51CE5E5993A64B1DAF276A588B7A6F0A307A8C5FA32148CDA7CF13"
+  },
+  {
+    "path": "results/run-20260909T144514Z/B-before-review.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/B-before-review.doc.json",
+    "sourceSha256": "DE9BE7AEBD1AD4A8CEF54A2746877F3E5C71DD07986A8D133B93CA62241F2693",
+    "archiveSha256": "DE9BE7AEBD1AD4A8CEF54A2746877F3E5C71DD07986A8D133B93CA62241F2693"
+  },
+  {
+    "path": "results/run-20260909T144514Z/C-link-and-node-attrs.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/C-link-and-node-attrs.json",
+    "sourceSha256": "02DFFB1EA1831BE3AB8F35D00BD6B65D185746DEBF13310E5FF854C6CD2EEC41",
+    "archiveSha256": "02DFFB1EA1831BE3AB8F35D00BD6B65D185746DEBF13310E5FF854C6CD2EEC41"
+  },
+  {
+    "path": "results/run-20260909T144514Z/C-link-href-title-after-accept.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/C-link-href-title-after-accept.doc.json",
+    "sourceSha256": "08ACE16699E1743F7BF71B1069FD83197CC2C04F0EBE02584A7406053CA9F4F6",
+    "archiveSha256": "08ACE16699E1743F7BF71B1069FD83197CC2C04F0EBE02584A7406053CA9F4F6"
+  },
+  {
+    "path": "results/run-20260909T144514Z/C-link-href-title-after-reject.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/C-link-href-title-after-reject.doc.json",
+    "sourceSha256": "0F7B7381559445F9BFB46245E6231031CFB53FBF6C921359EFB430205ACA5557",
+    "archiveSha256": "0F7B7381559445F9BFB46245E6231031CFB53FBF6C921359EFB430205ACA5557"
+  },
+  {
+    "path": "results/run-20260909T144514Z/C-link-href-title-before-review.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/C-link-href-title-before-review.doc.json",
+    "sourceSha256": "5C25969E17266C78FFC24EC145EE793F20993085683BC05A5F76452704DC11CB",
+    "archiveSha256": "5C25969E17266C78FFC24EC145EE793F20993085683BC05A5F76452704DC11CB"
+  },
+  {
+    "path": "results/run-20260909T144514Z/fixture.doc.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/fixture.doc.json",
+    "sourceSha256": "70A717DA1D7C78CA07BBA6C66B068D3292B0E6796A6AC8F7F529F9CD3AF80DB8",
+    "archiveSha256": "70A717DA1D7C78CA07BBA6C66B068D3292B0E6796A6AC8F7F529F9CD3AF80DB8"
+  },
+  {
+    "path": "results/run-20260909T144514Z/report.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/results/run-20260909T144514Z/report.json",
+    "sourceSha256": "CF52931703B94C36204F3B588ECBBB3D39A206F4DD416DF2FDA4B3D74BCB60E5",
+    "archiveSha256": "CF52931703B94C36204F3B588ECBBB3D39A206F4DD416DF2FDA4B3D74BCB60E5"
+  },
+  {
+    "path": "source/packages/crelt/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/crelt/package.json",
+    "sourceSha256": "9E85A4699C12AD932528BC2321986E8F991C1F9B074551A04E3814D72C1CC44A",
+    "archiveSha256": "9E85A4699C12AD932528BC2321986E8F991C1F9B074551A04E3814D72C1CC44A"
+  },
+  {
+    "path": "source/packages/crelt/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/crelt/LICENSE",
+    "sourceSha256": "23852EBF6AEF7FADFFC92514B3C5DF163A8651F2C3ED0DBB494CB49D93BD5DE5",
+    "archiveSha256": "23852EBF6AEF7FADFFC92514B3C5DF163A8651F2C3ED0DBB494CB49D93BD5DE5"
+  },
+  {
+    "path": "source/packages/orderedmap/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/orderedmap/package.json",
+    "sourceSha256": "282EA598284094608736ED5A75F4E0B48DA53B851B62BBA22362FEAC507D5C6C",
+    "archiveSha256": "282EA598284094608736ED5A75F4E0B48DA53B851B62BBA22362FEAC507D5C6C"
+  },
+  {
+    "path": "source/packages/orderedmap/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/orderedmap/LICENSE",
+    "sourceSha256": "869C30F368EB08735E779027B9F4BC9FEA2F39624351856AEBE42741F0BC0884",
+    "archiveSha256": "869C30F368EB08735E779027B9F4BC9FEA2F39624351856AEBE42741F0BC0884"
+  },
+  {
+    "path": "source/packages/prosemirror-commands/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-commands/package.json",
+    "sourceSha256": "4CEF535A05C932CE887CAA9FD6A6AF08C1B4EB0EC0B30F7F7D81CB7EF3D32E79",
+    "archiveSha256": "4CEF535A05C932CE887CAA9FD6A6AF08C1B4EB0EC0B30F7F7D81CB7EF3D32E79"
+  },
+  {
+    "path": "source/packages/prosemirror-commands/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-commands/LICENSE",
+    "sourceSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8",
+    "archiveSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8"
+  },
+  {
+    "path": "source/packages/prosemirror-history/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-history/package.json",
+    "sourceSha256": "934D5E211D998FCAAC4BE6789BFCB54DE2CAA9ADEF1C96C356E166A16815C105",
+    "archiveSha256": "934D5E211D998FCAAC4BE6789BFCB54DE2CAA9ADEF1C96C356E166A16815C105"
+  },
+  {
+    "path": "source/packages/prosemirror-history/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-history/LICENSE",
+    "sourceSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8",
+    "archiveSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8"
+  },
+  {
+    "path": "source/packages/prosemirror-keymap/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-keymap/package.json",
+    "sourceSha256": "4429EEC752CE8A67F357DD4EEC0381E4AFF1F8D83B583F7062D9360FBCC26E19",
+    "archiveSha256": "4429EEC752CE8A67F357DD4EEC0381E4AFF1F8D83B583F7062D9360FBCC26E19"
+  },
+  {
+    "path": "source/packages/prosemirror-keymap/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-keymap/LICENSE",
+    "sourceSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8",
+    "archiveSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8"
+  },
+  {
+    "path": "source/packages/prosemirror-menu/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-menu/package.json",
+    "sourceSha256": "C19BFEC384F7284D4C5E8263D72586D5ADEBAFDA06A1C3F2D9CCC787DD9BA1B1",
+    "archiveSha256": "C19BFEC384F7284D4C5E8263D72586D5ADEBAFDA06A1C3F2D9CCC787DD9BA1B1"
+  },
+  {
+    "path": "source/packages/prosemirror-menu/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-menu/LICENSE",
+    "sourceSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8",
+    "archiveSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8"
+  },
+  {
+    "path": "source/packages/prosemirror-model/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/package.json",
+    "sourceSha256": "4C86CAB7738B2A60CBB5C3AD514A8ECC7BA264C8CD8756EF530CBD9C408D175F",
+    "archiveSha256": "4C86CAB7738B2A60CBB5C3AD514A8ECC7BA264C8CD8756EF530CBD9C408D175F"
+  },
+  {
+    "path": "source/packages/prosemirror-model/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-model/LICENSE",
+    "sourceSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8",
+    "archiveSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8"
+  },
+  {
+    "path": "source/packages/prosemirror-state/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-state/package.json",
+    "sourceSha256": "B8EFD33E0995AD0FE1518A469DF823E748F1D2D262BE57D01E51EE5CB5AC10F7",
+    "archiveSha256": "B8EFD33E0995AD0FE1518A469DF823E748F1D2D262BE57D01E51EE5CB5AC10F7"
+  },
+  {
+    "path": "source/packages/prosemirror-state/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-state/LICENSE",
+    "sourceSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8",
+    "archiveSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8"
+  },
+  {
+    "path": "source/packages/prosemirror-suggestion-mode/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/package.json",
+    "sourceSha256": "4B31E0A11AA1724174F4334D5F86543CBD5D01A79056BE5EA450229557AC6345",
+    "archiveSha256": "4B31E0A11AA1724174F4334D5F86543CBD5D01A79056BE5EA450229557AC6345"
+  },
+  {
+    "path": "source/packages/prosemirror-transform/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-transform/package.json",
+    "sourceSha256": "77FCA8DCE0E81F43EA1DC2019C65A7C9E7AC935DDF43FB85EF42657846C0EB40",
+    "archiveSha256": "77FCA8DCE0E81F43EA1DC2019C65A7C9E7AC935DDF43FB85EF42657846C0EB40"
+  },
+  {
+    "path": "source/packages/prosemirror-transform/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-transform/LICENSE",
+    "sourceSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8",
+    "archiveSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8"
+  },
+  {
+    "path": "source/packages/prosemirror-view/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-view/package.json",
+    "sourceSha256": "074DF794A3480210F614BAF3D39F2D5B81C8A40E343824BE5A8C0B6555CE1FFE",
+    "archiveSha256": "074DF794A3480210F614BAF3D39F2D5B81C8A40E343824BE5A8C0B6555CE1FFE"
+  },
+  {
+    "path": "source/packages/prosemirror-view/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-view/LICENSE",
+    "sourceSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8",
+    "archiveSha256": "EF0B452CED6304DB2CE78CA66DE1FC7B97BAB05BC1750C95DF359ED3FE1D65C8"
+  },
+  {
+    "path": "source/packages/rope-sequence/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/rope-sequence/package.json",
+    "sourceSha256": "0E378A9DCC447C04E712238D60A1F2FFB878BFC161CBB95EF0A3C34D2A541548",
+    "archiveSha256": "0E378A9DCC447C04E712238D60A1F2FFB878BFC161CBB95EF0A3C34D2A541548"
+  },
+  {
+    "path": "source/packages/rope-sequence/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/rope-sequence/LICENSE",
+    "sourceSha256": "530424AEBDD0E73F53238D1F89DF250057BC8D8CE090CF5954197FADCE5BF226",
+    "archiveSha256": "530424AEBDD0E73F53238D1F89DF250057BC8D8CE090CF5954197FADCE5BF226"
+  },
+  {
+    "path": "source/packages/w3c-keyname/package.json",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/w3c-keyname/package.json",
+    "sourceSha256": "0396C646F74D52C1B0851074ECDB5CABF540AF595CEB5E5A5136DF2BF3C2F83B",
+    "archiveSha256": "0396C646F74D52C1B0851074ECDB5CABF540AF595CEB5E5A5136DF2BF3C2F83B"
+  },
+  {
+    "path": "source/packages/w3c-keyname/LICENSE",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/w3c-keyname/LICENSE",
+    "sourceSha256": "869C30F368EB08735E779027B9F4BC9FEA2F39624351856AEBE42741F0BC0884",
+    "archiveSha256": "869C30F368EB08735E779027B9F4BC9FEA2F39624351856AEBE42741F0BC0884"
+  },
+  {
+    "path": "source/packages/prosemirror-suggestion-mode/README.md",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/README.md",
+    "sourceSha256": "DD7618EAA3A74225411C0B0F84C794D2CA23AF07A2F5226B4ECCC08A82C6C8D1",
+    "archiveSha256": "DD7618EAA3A74225411C0B0F84C794D2CA23AF07A2F5226B4ECCC08A82C6C8D1"
+  },
+  {
+    "path": "source/packages/prosemirror-suggestion-mode/dist/index.js",
+    "source": ".research-tmp/jd-editor-pm-review-probe/node_modules/prosemirror-suggestion-mode/dist/index.js",
+    "sourceSha256": "CCAAAF5D181C1FBC7BFAB99F98218A2E9FEBDACD136F16A41C7EE864ADBF9A6F",
+    "archiveSha256": "CCAAAF5D181C1FBC7BFAB99F98218A2E9FEBDACD136F16A41C7EE864ADBF9A6F"
+  }
+]

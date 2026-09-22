@@ -1,0 +1,134 @@
+{
+  "format": 1,
+  "journey": "restore_revision",
+  "ran_at_utc": "2026-09-14T08:43:38.102058+00:00",
+  "ui_origin": "http://127.0.0.1:3002",
+  "provider_calls": 0,
+  "chat_enabled": false,
+  "title": "還原與撤回驗收",
+  "steps": [
+    {
+      "step": 0,
+      "name": "opened",
+      "screenshot": "00-opened.png",
+      "status_chip": null
+    },
+    {
+      "step": 1,
+      "name": "created",
+      "screenshot": "01-created.png",
+      "status_chip": "已保存",
+      "title": "還原與撤回驗收"
+    },
+    {
+      "step": 2,
+      "name": "saved-job-title",
+      "screenshot": "02-saved-job-title.png",
+      "status_chip": "已保存",
+      "job_title": "資深設備維運工程師"
+    },
+    {
+      "step": 3,
+      "name": "saved-purpose",
+      "screenshot": "03-saved-purpose.png",
+      "status_chip": "已保存",
+      "job_title": "資深設備維運工程師",
+      "purpose": "維持產線設備可用，讓生產排程不因設備停機而延誤。"
+    },
+    {
+      "step": 4,
+      "name": "history-open",
+      "screenshot": "04-history-open.png",
+      "status_chip": "已保存",
+      "restore_buttons": [
+        "還原到第 3 版",
+        "還原到第 2 版",
+        "還原到第 1 版"
+      ]
+    },
+    {
+      "step": 5,
+      "name": "restore-preview",
+      "screenshot": "05-restore-preview.png",
+      "status_chip": "已保存",
+      "preview_text": "會有 1 處變動；以下逐項列出將回復與移除的內容。",
+      "preview_shows_removed_purpose": true,
+      "jd_unchanged_by_preview": "維持產線設備可用，讓生產排程不因設備停機而延誤。",
+      "edit_calls_so_far": 2
+    },
+    {
+      "step": 6,
+      "name": "held-while-deciding",
+      "screenshot": "06-held-while-deciding.png",
+      "status_chip": "已保存",
+      "job_title_field_disabled": true,
+      "purpose_field_disabled": true,
+      "send_disabled": true,
+      "hold_explained": true
+    },
+    {
+      "step": 7,
+      "name": "released-on-cancel",
+      "screenshot": "07-released-on-cancel.png",
+      "status_chip": "已保存",
+      "job_title_field_disabled": false,
+      "still_holding": false,
+      "send_disabled_for_empty_input": true
+    },
+    {
+      "step": 8,
+      "name": "restored",
+      "screenshot": "08-restored.png",
+      "status_chip": "已保存",
+      "job_title": "資深設備維運工程師",
+      "purpose": "",
+      "restore_call": [
+        {
+          "url": "http://127.0.0.1:8771/api/documents/c027a901-5eb9-4b51-85a6-5c07b7c0be36/jd/edits",
+          "method": "POST",
+          "body": null,
+          "status": 200,
+          "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj8FuhSAQRf9l1pKAgoA_YwYY"
+        }
+      ]
+    },
+    {
+      "step": 9,
+      "name": "history-after-restore",
+      "screenshot": "09-history-after-restore.png",
+      "status_chip": "已保存",
+      "restore_buttons": [
+        "還原到第 4 版",
+        "還原到第 3 版",
+        "還原到第 2 版",
+        "還原到第 1 版"
+      ],
+      "conversation_panel_present": true
+    }
+  ],
+  "final_job_title": "資深設備維運工程師",
+  "final_purpose": "",
+  "edit_calls": [
+    {
+      "url": "http://127.0.0.1:8771/api/documents/c027a901-5eb9-4b51-85a6-5c07b7c0be36/jd/edits",
+      "method": "POST",
+      "body": null,
+      "status": 200,
+      "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj9FuhCAURP_lPksCCyj4MwZwtiVlxSCaNJv992Jt-9DXyZx75j5pdtVtqFOcaaRewWiuOHPBWqakMcxzGIZhEDy4AK8sdXTP5eHqdKBsMS80io4K7ihYAmh8UniPaZ4-4tJuLntKHc057A8sP5rAb4OzXDAN3zReC2a065kOfPBD4B6yb5rWj_XzQiAhvTSyIRJMaRuYtaLBuIm2yisl5LksIv1JrwGUVxRXz6EdrXtZ84Yz9RvK8ZsXHPH85Vt20SUn_KMPl3ZMc3zDVq_a6_UFWbdmRw.9RjVHl2k37tMxGoEU"
+    },
+    {
+      "url": "http://127.0.0.1:8771/api/documents/c027a901-5eb9-4b51-85a6-5c07b7c0be36/jd/edits",
+      "method": "POST",
+      "body": null,
+      "status": 200,
+      "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj9tuhSAURP9lP0sCCoL-jOEytqQcMYgmzcn592pt-9DXyay9Zj8p2Go31CkGGqmXMIpLzqwfBiY7Y5jjMAxaC-6th5MDNTTn8rB1OlC2mBcaRUMFMwoWDxqf5N9jCtNHXM6by55SQyH7_YHlR-N5q-3ABVNwp8YpwYyyPVOea6c9d-j6U3P2Y_28EdMarQQEg_Adk8JLZqURjAch-4DBmfZC5oj0J70HUF5RbL2GNrTuZc0brtRtKMdvXnDE65dv2U2XnPCPPmzaMYX4hq3etdfrCzOUZg0._2RaaJhUqryMRD2_"
+    },
+    {
+      "url": "http://127.0.0.1:8771/api/documents/c027a901-5eb9-4b51-85a6-5c07b7c0be36/jd/edits",
+      "method": "POST",
+      "body": null,
+      "status": 200,
+      "response": "{\"status\":\"committed\",\"effect\":\"changed\",\"receipt_durability\":\"confirmed\",\"operation_ref\":\".eJxdj8FuhSAQRf9l1pKAgoA_YwYYW1KeGECT5uX9e7W2XXR7c8-cO08I2LBSm2OACUZJRnHJGXprmRyMYY6TYaS14B49OWmhgyWXB7b5oFJjXmESHRRaqNDqCaYn-PeYwvwR1_PmuqfUQch-f9D6o_G812i5YIrcqXFKMKNwZMpz7bTnjobx1Jz92D5vRAdlZRgFc1ZwJpcBmUMvGfbCaWtNLxe8lkVKf9J7AOSNCrZraAfbXrZc6UpdpXL85oWOeP3yLbvpkhP9ow9MO80hvlFtd-31-gKBlWaf.L07xxgZ_Q_p7KnE"
+    }
+  ]
+}

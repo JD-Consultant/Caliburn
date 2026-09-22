@@ -1,0 +1,21 @@
+{
+  "id": "F03-D",
+  "description": "原生 unwrap／delete 與最終候選邊界",
+  "passed": false,
+  "checks": [
+    {
+      "name": "單 unwrap 原生執行但產生非法 group parent，不假稱原生拒絕",
+      "passed": true
+    },
+    {
+      "name": "明示同批先兩組後Task：全文／文字格式保留、最終有效",
+      "passed": false,
+      "message": "Failed to execute 'structuredClone': Options cannot be converted to a dictionary"
+    },
+    {
+      "name": "execution",
+      "passed": false,
+      "message": "spawnSync D:\\nodejs\\node.exe EPERM"
+    }
+  ]
+}

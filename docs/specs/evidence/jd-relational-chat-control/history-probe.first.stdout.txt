@@ -1,0 +1,7 @@
+{"database_calls":0,"lookup_resumes":0,"provider_calls":0,"versions":{"langchain-core":"1.6.3","langgraph":"1.2.11","langgraph-checkpoint":"4.2.0","langgraph-checkpoint-postgres":"3.1.2"}}
+{"A_terminal_material_preserved":true,"active_child_pinned":true,"case":"A_then_B_manual_then_active_C","lookup_node_calls":0,"manual_duplicate_terminal_snapshots":3}
+{"ancestor_A":"completed","case":"branch_prefix_is_not_original_result_proof","first_candidate_full_message_prefix_matches":true,"history_first_A":"failed","lookup_node_calls":0,"side_branch_rejected_by_parent_chain":true}
+{"case":"bounded_chain_and_fixed_conversation_page","chain_pages":12,"fixed_messages":40,"full_native_blocks_preserved":true,"later_run_excluded_from_continuation":true,"lookup_node_calls":0,"per_page_max":7,"unique_root_checkpoints":78}
+{"case":"START_and_native_missing_parent","variants":[{"chain_end":"gap","fault":"input_before","fixed_root_next":["consultant"],"lookup_node_calls":0,"original_human_preserved":true},{"chain_end":"end","fault":"loop_before","fixed_root_next":["__start__"],"lookup_node_calls":0,"original_human_preserved":true}]}
+{"case":"metadata_index_contract","explicit_close_ACK_loss_keeps_label":true,"invoke_root_and_child_labelled":true,"lookup_node_calls":0,"metadata_filter_still_contains_conflicting_side_branch":true,"next_input_metadata_B_contains_old_A_values":true,"ordinary_close_drops_label":true,"unknown_ID_absent_from_fixed_humans_and_index":true}
+PASS: 5 bounded native history groups; fixture setup only, no provider/DB/replay.

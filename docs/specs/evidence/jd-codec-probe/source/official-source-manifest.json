@@ -1,0 +1,37 @@
+{
+  "accessed": "2026-09-09",
+  "version": "2.2.6",
+  "gitHead": "931dccad2ccbb923d8cde95eed59ca41fbd860e1",
+  "files": [
+    {
+      "file": "source/official-superjson/package.json",
+      "url": "https://raw.githubusercontent.com/blitz-js/superjson/931dccad2ccbb923d8cde95eed59ca41fbd860e1/package.json",
+      "sha256": "d05ee30464bfd26bbdecdaa628b9937925f23c8d205d7db662c8b779c4ef6971"
+    },
+    {
+      "file": "source/official-superjson/LICENSE",
+      "url": "https://raw.githubusercontent.com/blitz-js/superjson/931dccad2ccbb923d8cde95eed59ca41fbd860e1/LICENSE",
+      "sha256": "d6b3a220bde9bf72fd0f9aecf71cd48c43ddc652abea727fc98a9b21a9534bb9"
+    },
+    {
+      "file": "source/official-superjson/README.md",
+      "url": "https://raw.githubusercontent.com/blitz-js/superjson/931dccad2ccbb923d8cde95eed59ca41fbd860e1/README.md",
+      "sha256": "25ac33efb2407ba318994c4cbc73d0558b5f6b01f2746164d63d81395cc851be"
+    },
+    {
+      "file": "source/official-superjson/src/index.ts",
+      "url": "https://raw.githubusercontent.com/blitz-js/superjson/931dccad2ccbb923d8cde95eed59ca41fbd860e1/src/index.ts",
+      "sha256": "570f0e01a9d0bc43b87165c42430422f46de26917aa2272e7751ee67a1f7fa66"
+    },
+    {
+      "file": "source/official-superjson/src/transformer.ts",
+      "url": "https://raw.githubusercontent.com/blitz-js/superjson/931dccad2ccbb923d8cde95eed59ca41fbd860e1/src/transformer.ts",
+      "sha256": "f2876d9d8db559b167637ffb633a6f006fe3c766356aa152964c0fa4f4144f19"
+    },
+    {
+      "file": "source/official-superjson/src/plainer.ts",
+      "url": "https://raw.githubusercontent.com/blitz-js/superjson/931dccad2ccbb923d8cde95eed59ca41fbd860e1/src/plainer.ts",
+      "sha256": "7b4619a8a8dd0c0eff2d035ae6f8e3e3fec3f5ff42c041e891a1cd21c527f344"
+    }
+  ]
+}

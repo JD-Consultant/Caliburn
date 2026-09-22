@@ -1,0 +1,1454 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ResultCatalog",
+  "description": "Observed result of one JD write intent. This schema validates combinations, not evidence of a database commit. Detailed changes are read through change_ref from immutable base/result revisions.",
+  "$defs": {
+    "OpaqueRef": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "InvalidInputError": {
+      "title": "InvalidInputError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "invalid_input"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "TargetMissingError": {
+      "title": "TargetMissingError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "target_missing"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "StaleViewError": {
+      "title": "StaleViewError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "stale_view"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "RelationshipConflictError": {
+      "title": "RelationshipConflictError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "relationship_conflict"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "DependentItemsError": {
+      "title": "DependentItemsError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "dependent_items"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "SaveFailedError": {
+      "title": "SaveFailedError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "save_failed"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "OutcomeUnknownError": {
+      "title": "OutcomeUnknownError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "outcome_unknown"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "OperationConflictError": {
+      "title": "OperationConflictError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "operation_conflict"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "BusyError": {
+      "title": "BusyError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "busy"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "ArchivedError": {
+      "title": "ArchivedError",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string",
+          "enum": [
+            "archived"
+          ]
+        },
+        "message": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 2048
+        },
+        "related_refs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/OpaqueRef"
+          },
+          "maxItems": 64
+        }
+      },
+      "required": [
+        "code",
+        "message",
+        "related_refs"
+      ]
+    },
+    "CommittedResult": {
+      "title": "CommittedResult",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "committed"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "changed"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "confirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "change_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "error": {
+          "type": "null"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "continue"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "NoChangeResult": {
+      "title": "NoChangeResult",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "no_change"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "confirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "type": "null"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "continue"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "ConfirmedInvalidInput": {
+      "title": "ConfirmedInvalidInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "invalid_input"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "confirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/InvalidInputError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "correct_arguments",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnconfirmedInvalidInput": {
+      "title": "UnconfirmedInvalidInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "invalid_input"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/InvalidInputError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reconcile_operation"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "ConfirmedTargetMissing": {
+      "title": "ConfirmedTargetMissing",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "target_missing"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "confirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/TargetMissingError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reread_current",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnconfirmedTargetMissing": {
+      "title": "UnconfirmedTargetMissing",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "target_missing"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/TargetMissingError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reconcile_operation"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "ConfirmedStaleView": {
+      "title": "ConfirmedStaleView",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "stale_view"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "confirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/StaleViewError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reread_current",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnconfirmedStaleView": {
+      "title": "UnconfirmedStaleView",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "stale_view"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/StaleViewError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reconcile_operation"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "ConfirmedRelationshipConflict": {
+      "title": "ConfirmedRelationshipConflict",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "relationship_conflict"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "confirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/RelationshipConflictError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "correct_arguments",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnconfirmedRelationshipConflict": {
+      "title": "UnconfirmedRelationshipConflict",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "relationship_conflict"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/RelationshipConflictError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reconcile_operation"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "ConfirmedDependentItems": {
+      "title": "ConfirmedDependentItems",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "dependent_items"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "confirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/DependentItemsError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "resolve_dependencies",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnconfirmedDependentItems": {
+      "title": "UnconfirmedDependentItems",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "dependent_items"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/DependentItemsError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reconcile_operation"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "ConfirmedSaveFailed": {
+      "title": "ConfirmedSaveFailed",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "save_failed"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "confirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/SaveFailedError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnconfirmedSaveFailed": {
+      "title": "UnconfirmedSaveFailed",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "save_failed"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/SaveFailedError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reconcile_operation"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnknownOutcomeResult": {
+      "title": "UnknownOutcomeResult",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "outcome_unknown"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unknown"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "$ref": "#/$defs/OpaqueRef"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/OutcomeUnknownError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "reconcile_operation"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnboundInvalidInput": {
+      "title": "UnboundInvalidInput",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "invalid_input"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "type": "null"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/InvalidInputError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "correct_arguments",
+            "reread_current",
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnboundOperationConflict": {
+      "title": "UnboundOperationConflict",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "operation_conflict"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "type": "null"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/OperationConflictError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnboundBusy": {
+      "title": "UnboundBusy",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "busy"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "type": "null"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/BusyError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnboundArchived": {
+      "title": "UnboundArchived",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "archived"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "type": "null"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/ArchivedError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "UnboundSaveFailed": {
+      "title": "UnboundSaveFailed",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "save_failed"
+          ]
+        },
+        "effect": {
+          "type": "string",
+          "enum": [
+            "unchanged"
+          ]
+        },
+        "receipt_durability": {
+          "type": "string",
+          "enum": [
+            "unconfirmed"
+          ]
+        },
+        "operation_ref": {
+          "type": "null"
+        },
+        "result_revision_ref": {
+          "type": "null"
+        },
+        "change_ref": {
+          "type": "null"
+        },
+        "error": {
+          "$ref": "#/$defs/SaveFailedError"
+        },
+        "next_action": {
+          "type": "string",
+          "enum": [
+            "stop"
+          ]
+        }
+      },
+      "required": [
+        "status",
+        "effect",
+        "receipt_durability",
+        "operation_ref",
+        "result_revision_ref",
+        "change_ref",
+        "error",
+        "next_action"
+      ]
+    },
+    "MutationResult": {
+      "title": "MutationResult",
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CommittedResult"
+        },
+        {
+          "$ref": "#/$defs/NoChangeResult"
+        },
+        {
+          "$ref": "#/$defs/ConfirmedInvalidInput"
+        },
+        {
+          "$ref": "#/$defs/UnconfirmedInvalidInput"
+        },
+        {
+          "$ref": "#/$defs/ConfirmedTargetMissing"
+        },
+        {
+          "$ref": "#/$defs/UnconfirmedTargetMissing"
+        },
+        {
+          "$ref": "#/$defs/ConfirmedStaleView"
+        },
+        {
+          "$ref": "#/$defs/UnconfirmedStaleView"
+        },
+        {
+          "$ref": "#/$defs/ConfirmedRelationshipConflict"
+        },
+        {
+          "$ref": "#/$defs/UnconfirmedRelationshipConflict"
+        },
+        {
+          "$ref": "#/$defs/ConfirmedDependentItems"
+        },
+        {
+          "$ref": "#/$defs/UnconfirmedDependentItems"
+        },
+        {
+          "$ref": "#/$defs/ConfirmedSaveFailed"
+        },
+        {
+          "$ref": "#/$defs/UnconfirmedSaveFailed"
+        },
+        {
+          "$ref": "#/$defs/UnknownOutcomeResult"
+        },
+        {
+          "$ref": "#/$defs/UnboundInvalidInput"
+        },
+        {
+          "$ref": "#/$defs/UnboundOperationConflict"
+        },
+        {
+          "$ref": "#/$defs/UnboundBusy"
+        },
+        {
+          "$ref": "#/$defs/UnboundArchived"
+        },
+        {
+          "$ref": "#/$defs/UnboundSaveFailed"
+        }
+      ]
+    }
+  },
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "mutation_result": {
+      "$ref": "#/$defs/MutationResult"
+    }
+  },
+  "required": [
+    "mutation_result"
+  ]
+}

@@ -1,0 +1,287 @@
+node:internal/modules/run_main:123
+    triggerUncaughtException(
+    ^
+
+ExpectError: expect(locator).toBeVisible() failed
+
+Locator: getByRole('region', { name: '確切改動' }).locator('details').nth(1).getByText('僅對已約定服務的設備每月檢查狀態，核對異常訊息並記錄需處理事項；未約定者不做固定月檢，超出本人授權的處置交主管決定。', { exact: true })
+Expected: visible
+Timeout: 5000ms
+Error: element(s) not found
+
+Call log:
+  - Expect "to.be.visible" with timeout 5000ms
+  - waiting for getByRole('region', { name: '確切改動' }).locator('details').nth(1).getByText('僅對已約定服務的設備每月檢查狀態，核對異常訊息並記錄需處理事項；未約定者不做固定月檢，超出本人授權的處置交主管決定。', { exact: true })
+
+    at captureRawStack (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright-core\lib\coreBundle.js:3172:17)
+    at callMatcherAsStep (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright\lib\matchers\expect.js:12875:57)
+    at Object.toBeVisible (S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\node_modules\playwright\lib\matchers\expect.js:12865:23)
+    at S:\caliburn\.worktrees\analysis-only-agent\experiments\jd-editor\web\browser\task6-journey.mjs:84:107 {
+  matcherResult: {
+    message: 'expect(locator).toBeVisible() failed\n' +
+      '\n' +
+      "Locator: getByRole('region', { name: '確切改動' }).locator('details').nth(1).getByText('僅對已約定服務的設備每月檢查狀態，核對異常訊息並記錄需處理事項；未約定者不做固定月檢，超出本人授權的處置交主管決定。', { exact: true })\n" +
+      'Expected: visible\n' +
+      'Timeout: 5000ms\n' +
+      'Error: element(s) not found\n' +
+      '\n' +
+      'Call log:\n' +
+      '  - Expect "to.be.visible" with timeout 5000ms\n' +
+      "  - waiting for getByRole('region', { name: '確切改動' }).locator('details').nth(1).getByText('僅對已約定服務的設備每月檢查狀態，核對異常訊息並記錄需處理事項；未約定者不做固定月檢，超出本人授權的處置交主管決定。', { exact: true })\n",
+    pass: false,
+    actual: undefined,
+    name: 'toBeVisible',
+    expected: 'visible',
+    log: [
+      '  - Expect "to.be.visible" with timeout 5000ms',
+      "  - waiting for getByRole('region', { name: '確切改動' }).locator('details').nth(1).getByText('僅對已約定服務的設備每月檢查狀態，核對異常訊息並記錄需處理事項；未約定者不做固定月檢，超出本人授權的處置交主管決定。', { exact: true })"
+    ],
+    timeout: 5000,
+    ariaSnapshot: '- main:\n' +
+      '  - link "← 我的職務說明書":\n' +
+      '    - /url: /\n' +
+      '  - heading "Task6 完整旅程 1789150016683" [level=1]\n' +
+      '  - status: 已保存\n' +
+      '  - region "顧問訪談":\n' +
+      '    - heading "顧問訪談" [level=2]\n' +
+      '    - paragraph: 先談你的實際工作，資料足夠時顧問會開始整理。你可以隨時補充或更正。\n' +
+      '    - article:\n' +
+      '      - text: 你\n' +
+      '      - paragraph: 我是設備維護工程師，想整理自己的工作。\n' +
+      '    - article:\n' +
+      '      - text: 顧問\n' +
+      '      - paragraph: 你平常負責哪些設備工作？可以先說一件你親自處理的例子。\n' +
+      '    - article:\n' +
+      '      - text: 你\n' +
+      '      - paragraph: 我的工作是設備月檢與故障處理，維持服務範圍內設備可用。依服务安排每月檢查狀態，核對異常訊息，留下設備狀態紀錄與待處理清單，記設備與日期、觀察依據；超出授權交主管決定。故障時依操作員描述對照訊息與機械狀況，分辨磨耗與外物干涉，只做已授權機械調整，電控程式由另一職位處理。修後驗證，保留判斷依據與維修紀錄，未排除問題交接操作員。我需要懂訊息與機械狀態對應、授權交接界線，兩項工作都用交叉比對；故障另需調整後驗證與交接。其他資格還沒說明。請先整理這些工作。\n' +
+      '    - article:\n' +
+      '      - text: 顧問\n' +
+      '      - paragraph: 已依實際工具結果保存本輪修改。\n' +
+      '    - article:\n' +
+      '      - text: 你\n' +
+      '      - paragraph: 更正月檢範圍：僅對已約定服務的設備每月檢查；未約定者不做固定月檢。其他故障處理都不變。\n' +
+      '    - article:\n' +
+      '      - text: 顧問\n' +
+      '      - paragraph: 已依實際工具結果保存本輪修改。\n' +
+      '    - text: 補充或更正你的工作\n' +
+      '    - textbox "補充或更正你的工作":\n' +
+      '      - /placeholder: 例如：這項工作只在客戶提出需求時執行…\n' +
+      '    - paragraph: 選取正文後送出，可請顧問處理該段；未保存修改會先保存。\n' +
+      '    - button "送出" [disabled]\n' +
+      '  - region "目前職務說明書":\n' +
+      '    - heading "職務說明書" [level=2]\n' +
+      '    - button "保存" [disabled]\n' +
+      '    - button "這次改動"\n' +
+      '    - button "讀取上一筆歷史"\n' +
+      '    - button "粗體"\n' +
+      '    - button "斜體"\n' +
+      '    - button "底線"\n' +
+      '    - button "刪除線"\n' +
+      '    - button "復原"\n' +
+      '    - button "重做"\n' +
+      '    - button "表格增列"\n' +
+      '    - button "表格刪列"\n' +
+      '    - button "複製區塊"\n' +
+      '    - textbox "職務說明書正文":\n' +
+      '      - button "依據 1"\n' +
+      '      - heading "職務基本資料" [level=2]\n' +
+      '      - paragraph: 設備維護工程師\n' +
+      '      - button "依據 1"\n' +
+      '      - heading "職務目的" [level=2]\n' +
+      '      - paragraph: 維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。\n' +
+      '      - button "依據 1"\n' +
+      '      - heading "主要職責與工作任務" [level=2]\n' +
+      '      - heading "設備維護與異常處理" [level=3]\n' +
+      '      - paragraph: 設備月檢\n' +
+      '      - paragraph:\n' +
+      '        - button "依據 1"\n' +
+      '        - text: 僅對已約定服務的設備每月檢查狀態，核對異常訊息並記錄需處理事項；未約定者不做固定月檢，超出本人授權的處置交主管決定。\n' +
+      '      - heading "工作成果／產出" [level=4]\n' +
+      '      - paragraph: 設備狀態紀錄\n' +
+      '      - paragraph: 待處理事項清單\n' +
+      '      - heading "工作執行要求" [level=4]\n' +
+      '      - paragraph: 記錄設備與檢查日期\n' +
+      '      - paragraph: 異常註明觀察依據\n' +
+      '      - paragraph: 超出授權範圍交主管決定\n' +
+      '      - strong: 相關知識\n' +
+      '      - group: 设备訊息與機械狀態的對應\n' +
+      '      - group: 機械處置的授權與交接界線\n' +
+      '      - group: 調整引用\n' +
+      '      - strong: 相關技能\n' +
+      '      - group: 交叉比對狀態與訊息\n' +
+      '      - group: 調整引用\n' +
+      '      - paragraph: 故障診斷與處理\n' +
+      '      - paragraph: 接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。\n' +
+      '      - heading "工作成果／產出" [level=4]\n' +
+      '      - paragraph: 完成驗證的處理結果\n' +
+      '      - paragraph: 可接續的維修紀錄\n' +
+      '      - heading "工作執行要求" [level=4]\n' +
+      '      - paragraph: 保留故障訊息與判斷依據\n' +
+      '      - paragraph: 未排除問題交接操作員\n' +
+      '      - paragraph: 不自行修改電控程式\n' +
+      '      - strong: 相關知識\n' +
+      '      - group: 设备訊息與機械狀態的對應\n' +
+      '      - group: 機械處置的授權與交接界線\n' +
+      '      - group: 調整引用\n' +
+      '      - strong: 相關技能\n' +
+      '      - group: 交叉比對狀態與訊息\n' +
+      '      - group: 機械調整後驗證與交接\n' +
+      '      - group: 調整引用\n' +
+      '      - button "依據 1"\n' +
+      '      - heading "所需知識" [level=2]\n' +
+      '      - paragraph: 设备訊息與機械狀態的對應\n' +
+      '      - paragraph: 用於月檢辨識異常與故障判斷。\n' +
+      '      - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '      - paragraph: 機械處置的授權與交接界線\n' +
+      '      - paragraph: 分辨本人處理、主管決定與電控職位責任。\n' +
+      '      - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '      - button "依據 1"\n' +
+      '      - heading "所需技能" [level=2]\n' +
+      '      - paragraph: 交叉比對狀態與訊息\n' +
+      '      - paragraph: 將觀察與故障訊息比對，區分需進一步處理的差異。\n' +
+      '      - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '      - paragraph: 機械調整後驗證與交接\n' +
+      '      - paragraph: 確認處理結果並說明尚未排除的問題。\n' +
+      '      - complementary: 共用於 1 項工作：故障診斷與處理\n' +
+      '      - button "依據 1"\n' +
+      '      - heading "工作條件與必要資格" [level=2]\n' +
+      '      - paragraph: 本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。\n' +
+      '    - region "確切改動":\n' +
+      '      - heading "這次改動" [level=3]\n' +
+      '      - paragraph: 顧問修改；已保存不代表工作事實已核准。\n' +
+      '      - group:\n' +
+      '        - text: 修改前・確切內容 章節用途：基本資料\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "職務基本資料" [level=2]\n' +
+      '        - paragraph: 設備維護工程師\n' +
+      '        - text: 章節用途：職務目的\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "職務目的" [level=2]\n' +
+      '        - paragraph: 維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。\n' +
+      '        - text: 章節用途：主要職責與工作任務\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "主要職責與工作任務" [level=2]\n' +
+      '        - heading "設備維護與異常處理" [level=3]\n' +
+      '        - paragraph: 設備月檢\n' +
+      '        - paragraph: 依服務安排每月檢查設備狀態，核對異常訊息並記錄需處理事項；超出本人授權的處置交主管決定。\n' +
+      '        - heading "工作成果／產出" [level=4]\n' +
+      '        - paragraph: 設備狀態紀錄\n' +
+      '        - paragraph: 待處理事項清單\n' +
+      '        - heading "工作執行要求" [level=4]\n' +
+      '        - paragraph: 記錄設備與檢查日期\n' +
+      '        - paragraph: 異常註明觀察依據\n' +
+      '        - paragraph: 超出授權範圍交主管決定\n' +
+      '        - strong: 相關知識\n' +
+      '        - group: 设备訊息與機械狀態的對應\n' +
+      '        - group: 機械處置的授權與交接界線\n' +
+      '        - strong: 相關技能\n' +
+      '        - group: 交叉比對狀態與訊息\n' +
+      '        - paragraph: 故障診斷與處理\n' +
+      '        - paragraph: 接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。\n' +
+      '        - heading "工作成果／產出" [level=4]\n' +
+      '        - paragraph: 完成驗證的處理結果\n' +
+      '        - paragraph: 可接續的維修紀錄\n' +
+      '        - heading "工作執行要求" [level=4]\n' +
+      '        - paragraph: 保留故障訊息與判斷依據\n' +
+      '        - paragraph: 未排除問題交接操作員\n' +
+      '        - paragraph: 不自行修改電控程式\n' +
+      '        - strong: 相關知識\n' +
+      '        - group: 设备訊息與機械狀態的對應\n' +
+      '        - group: 機械處置的授權與交接界線\n' +
+      '        - strong: 相關技能\n' +
+      '        - group: 交叉比對狀態與訊息\n' +
+      '        - group: 機械調整後驗證與交接\n' +
+      '        - text: 章節用途：相關知識\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "所需知識" [level=2]\n' +
+      '        - paragraph: 设备訊息與機械狀態的對應\n' +
+      '        - paragraph: 用於月檢辨識異常與故障判斷。\n' +
+      '        - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '        - paragraph: 機械處置的授權與交接界線\n' +
+      '        - paragraph: 分辨本人處理、主管決定與電控職位責任。\n' +
+      '        - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '        - text: 章節用途：相關技能\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "所需技能" [level=2]\n' +
+      '        - paragraph: 交叉比對狀態與訊息\n' +
+      '        - paragraph: 將觀察與故障訊息比對，區分需進一步處理的差異。\n' +
+      '        - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '        - paragraph: 機械調整後驗證與交接\n' +
+      '        - paragraph: 確認處理結果並說明尚未排除的問題。\n' +
+      '        - complementary: 共用於 1 項工作：故障診斷與處理\n' +
+      '        - text: 章節用途：工作條件與責任範圍\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "工作條件與必要資格" [level=2]\n' +
+      '        - paragraph: 本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。\n' +
+      '      - group:\n' +
+      '        - text: 修改後・確切內容 章節用途：基本資料\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "職務基本資料" [level=2]\n' +
+      '        - paragraph: 設備維護工程師\n' +
+      '        - text: 章節用途：職務目的\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "職務目的" [level=2]\n' +
+      '        - paragraph: 維持服務範圍內設備的可用狀態，將異常與未排除問題交接相關人員。\n' +
+      '        - text: 章節用途：主要職責與工作任務\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "主要職責與工作任務" [level=2]\n' +
+      '        - heading "設備維護與異常處理" [level=3]\n' +
+      '        - paragraph: 設備月檢\n' +
+      '        - paragraph:\n' +
+      '          - button "依據 1"\n' +
+      '          - text: 僅對已約定服務的設備每月檢查狀態，核對異常訊息並記錄需處理事項；未約定者不做固定月檢，超出本人授權的處置交主管決定。\n' +
+      '        - heading "工作成果／產出" [level=4]\n' +
+      '        - paragraph: 設備狀態紀錄\n' +
+      '        - paragraph: 待處理事項清單\n' +
+      '        - heading "工作執行要求" [level=4]\n' +
+      '        - paragraph: 記錄設備與檢查日期\n' +
+      '        - paragraph: 異常註明觀察依據\n' +
+      '        - paragraph: 超出授權範圍交主管決定\n' +
+      '        - strong: 相關知識\n' +
+      '        - group: 设备訊息與機械狀態的對應\n' +
+      '        - group: 機械處置的授權與交接界線\n' +
+      '        - strong: 相關技能\n' +
+      '        - group: 交叉比對狀態與訊息\n' +
+      '        - paragraph: 故障診斷與處理\n' +
+      '        - paragraph: 接到操作員異常描述後對照故障訊息與設備狀況，區分零件磨耗與外物干涉；處理已授權的機械調整，電控程式由另一職位處理，修後驗證並交接未排除問題。\n' +
+      '        - heading "工作成果／產出" [level=4]\n' +
+      '        - paragraph: 完成驗證的處理結果\n' +
+      '        - paragraph: 可接續的維修紀錄\n' +
+      '        - heading "工作執行要求" [level=4]\n' +
+      '        - paragraph: 保留故障訊息與判斷依據\n' +
+      '        - paragraph: 未排除問題交接操作員\n' +
+      '        - paragraph: 不自行修改電控程式\n' +
+      '        - strong: 相關知識\n' +
+      '        - group: 设备訊息與機械狀態的對應\n' +
+      '        - group: 機械處置的授權與交接界線\n' +
+      '        - strong: 相關技能\n' +
+      '        - group: 交叉比對狀態與訊息\n' +
+      '        - group: 機械調整後驗證與交接\n' +
+      '        - text: 章節用途：相關知識\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "所需知識" [level=2]\n' +
+      '        - paragraph: 设备訊息與機械狀態的對應\n' +
+      '        - paragraph: 用於月檢辨識異常與故障判斷。\n' +
+      '        - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '        - paragraph: 機械處置的授權與交接界線\n' +
+      '        - paragraph: 分辨本人處理、主管決定與電控職位責任。\n' +
+      '        - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '        - text: 章節用途：相關技能\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "所需技能" [level=2]\n' +
+      '        - paragraph: 交叉比對狀態與訊息\n' +
+      '        - paragraph: 將觀察與故障訊息比對，區分需進一步處理的差異。\n' +
+      '        - complementary: 共用於 2 項工作：設備月檢、故障診斷與處理\n' +
+      '        - paragraph: 機械調整後驗證與交接\n' +
+      '        - paragraph: 確認處理結果並說明尚未排除的問題。\n' +
+      '        - complementary: 共用於 1 項工作：故障診斷與處理\n' +
+      '        - text: 章節用途：工作條件與責任範圍\n' +
+      '        - button "依據 1"\n' +
+      '        - heading "工作條件與必要資格" [level=2]\n' +
+      '        - paragraph: 本人僅處理已授權機械工作，電控程式由另一職位處理；其他必要資格尚未說明。\n' +
+      '      - group: 文字與結構高亮\n' +
+      '- alert'
+  }
+}
+
+Node.js v22.23.2

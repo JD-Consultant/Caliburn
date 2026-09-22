@@ -1,10 +1,10 @@
 # indexer-contract
 
-Single source of truth for the **indexer query API** wire shapes — the HTTP seam between
-`apps/ocs-indexer` (producer) and `apps/api` (consumer). Both ends import these pydantic
-models (producer as FastAPI request/`response_model`; consumer as `KnowledgePort` return types +
-`HttpIndexerClient` parsing), so the request/response contract cannot drift.
+Single source of truth for the isolated **indexer query API** wire shapes. `apps/ocs-indexer`
+imports these pydantic models as FastAPI request/`response_model`; there is currently no formal
+JD App consumer. Historical consumer code and decisions remain in Git and the linked research.
 
-Pure pydantic, distributed as a per-app editable **path dependency** (like `ocs-contract`).
-This seam is Python↔Python with a single consumer, so no codegen / JSON-Schema is needed — see
-`docs/specs/2026-06-28-contract-2-indexer-query-api-research.md` and ADR 0010.
+Pure pydantic, distributed as an editable **path dependency** (like `ocs-contract`). The producer
+keeps a single typed contract, so no codegen / JSON-Schema is needed — see
+`docs/specs/2026-06-28-contract-2-indexer-query-api-research.md` and ADR 0010. Any future consumer
+must adopt this contract through a new approved integration rather than importing retired code.

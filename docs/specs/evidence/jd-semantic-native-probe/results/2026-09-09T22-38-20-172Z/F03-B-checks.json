@@ -1,0 +1,27 @@
+{
+  "id": "F03-B",
+  "description": "先建立無 links 內容，讀原生 ID 再設引用／續改",
+  "passed": true,
+  "checks": [
+    {
+      "name": "輸入無 IDs／links；原生建立完整未連線草稿",
+      "passed": true
+    },
+    {
+      "name": "未連線首建中間稿可 JSON 新程序重開",
+      "passed": true
+    },
+    {
+      "name": "setNodes 只建立指定 Task 兩組 links，共享 K 改名保留身分",
+      "passed": true
+    },
+    {
+      "name": "原生 set_node operations 真的包含兩组 ID 陣列且普通 JSON 保留",
+      "passed": true
+    },
+    {
+      "name": "連線與完整續編結果新程序重開全等",
+      "passed": true
+    }
+  ]
+}

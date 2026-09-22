@@ -1,0 +1,18 @@
+{
+  "accessed": "2026-09-09",
+  "source": "https://registry.npmjs.org/superjson",
+  "latest": "2.2.6",
+  "version": "2.2.6",
+  "published": "2025-11-27T13:27:45.738Z",
+  "modified": "2025-11-27T13:27:45.945Z",
+  "gitHead": "931dccad2ccbb923d8cde95eed59ca41fbd860e1",
+  "repository": "https://github.com/blitz-js/superjson",
+  "license": "MIT",
+  "engines": { "node": ">=16" },
+  "dependencies": { "copy-anything": "^4" },
+  "dist": {
+    "integrity": "sha512-H+ue8Zo4vJmV2nRjpx86P35lzwDT3nItnIsocgumgr0hHMQ+ZGq5vrERg9kJBo5AWGmxZDhzDo+WVIJqkB0cGA==",
+    "shasum": "a223a3a988172a5f9656e2063fe5f733af40d099",
+    "tarball": "https://registry.npmjs.org/superjson/-/superjson-2.2.6.tgz"
+  }
+}

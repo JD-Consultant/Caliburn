@@ -1,0 +1,25 @@
+{
+  "stage": "recovered",
+  "checked_at_utc": "2026-09-13T01:04:51.684363+00:00",
+  "database": "caliburn_jd_setup_test_5f6c67d9efb74d9db1482648845b4137",
+  "port": 55436,
+  "mode": "REPEATABLE READ / READ ONLY",
+  "provider_calls": 0,
+  "database_writes": 0,
+  "document_id": "1bcd7f2a-060f-454c-97bb-06b15c7c6dc4",
+  "head_revision_id": "149da711-4e72-497f-a87d-639ace08f59c",
+  "revision_number": 2,
+  "revision_count": 2,
+  "operation_count": 1,
+  "tasks": [
+    "62595750-c57b-4a7a-a465-aadea7c68e65"
+  ],
+  "task_count": 1,
+  "content_digest": "8eee48234e015a32be210df854f1016f256bcb732b36be3898b24ccf8340e9a7",
+  "operation_ids": [
+    "5e4efa34-d302-401c-ac88-b9124251224e"
+  ],
+  "current_equals_head_snapshot": true,
+  "original_operation_matches_committed_gate": true,
+  "unchanged_after_browser_recovery": true
+}

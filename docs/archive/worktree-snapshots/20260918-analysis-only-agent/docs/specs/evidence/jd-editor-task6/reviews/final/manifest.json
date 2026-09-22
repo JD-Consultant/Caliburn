@@ -1,0 +1,232 @@
+[
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/api.py",
+    "bytes": 17123,
+    "sha256": "605f1766a19b43219dd76a85f30c974cafb1de0c20d84749cdbb9a356c96d323"
+  },
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/jd_tools.py",
+    "bytes": 30238,
+    "sha256": "9e85aae99d9bd5a133a099bd6544f91eba7d963b0390cb0623705669ab83bff5"
+  },
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/skills.py",
+    "bytes": 3887,
+    "sha256": "dcbfae137229a29d7a8fa7fb490a5724e79fe0897a0c628af39496270fad1bce"
+  },
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/skills/compare-work-patterns/SKILL.md",
+    "bytes": 1806,
+    "sha256": "d4e8abc339115f9ae4ad8c321e0696291c0dafa4c745b7606f648f5ad9f783aa"
+  },
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/skills/outcomes-and-expertise/SKILL.md",
+    "bytes": 1866,
+    "sha256": "5856afcf8d7522257a656fb2b6162a3129a145fd91b54225636d72ccf94a6686"
+  },
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/skills/work-scope-interview/SKILL.md",
+    "bytes": 1726,
+    "sha256": "dd3c90f7376cb99dce5da91c6aa3172af401ae891ac96213858303edbd260d30"
+  },
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/SKILL.md",
+    "bytes": 2576,
+    "sha256": "be532fd22cf9ab5c68638510874537fdbe9c687c2d7157f00b119ea5713ef80b"
+  },
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/complete-work-guide.md",
+    "bytes": 2956,
+    "sha256": "e09ffbeaf0a5113f49eb97845c97ba3698525fffbbf149852a7fa3e6c4587fa2"
+  },
+  {
+    "file": "source/experiments/analysis-agent/src/analysis_agent/skills/write-customized-jd/references/writing-and-correction.md",
+    "bytes": 3628,
+    "sha256": "abe3ef41181b740c9906e06c44c0785eb297ccd3f7578f4359b937455737e643"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_context_budget.py",
+    "bytes": 23539,
+    "sha256": "995084be2976e77f38202c9e695aade98a8a60baa4adffaaa258950ba1c99540"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_native_context_budget.py",
+    "bytes": 7898,
+    "sha256": "4d36a2b1e060f5ea5ef34fadd6ebf0c136fc3f7e76b87da8e2377b425e8a12ef"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_extraction_role.py",
+    "bytes": 8512,
+    "sha256": "ffc116b239b75fb295def6d34cf28cf9a52151ce535c637a2378303fed25b72f"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_postgres_service.py",
+    "bytes": 14853,
+    "sha256": "28047e06be123e11a8fb4db8317dc3d9813e4c68f14c448e2be592180a239388"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_memory_prompt_contract.py",
+    "bytes": 7879,
+    "sha256": "97152bd2b9f148424e77352a72ca0af24ce53850e5e2b623b205556f972bc5fa"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_read_recovery.py",
+    "bytes": 11727,
+    "sha256": "65c4f0e93e04a4836edce8734aaabfd83387b48e88e2cb97ec0674090c1d07f6"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_jd_skill_contract.py",
+    "bytes": 3299,
+    "sha256": "4f743bd1891579d88201536567e257590721f331a5552f6df9d0596d527e62bc"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_jd_end_to_end.py",
+    "bytes": 10411,
+    "sha256": "36b1a30526944195af3c7941d24f3fbdd33edadcea3aa56308c76d77eab6004c"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/test_jd_current_source_acquisition.py",
+    "bytes": 6483,
+    "sha256": "35f1b759d5d8844b23f618b8f9db8d12e8fe891072d6922a4e6a845379c622e0"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/jd_offline_service.py",
+    "bytes": 9748,
+    "sha256": "9f0ba4c252fdc3ec6b96d4133f4adb4ce136ddbe171edb9e836ec90d328fff89"
+  },
+  {
+    "file": "source/experiments/analysis-agent/tests/fixtures/jd-task6-prompt-delta.json",
+    "bytes": 1291,
+    "sha256": "d585e4d12e571342b927b94f6d3836386cac1813c7a830231c8372c468339d3b"
+  },
+  {
+    "file": "source/experiments/jd-editor/fixtures/core-scenario.json",
+    "bytes": 12106,
+    "sha256": "f3114b9479e62336172183af339ad557291e9fa90066c87fce4dbe0f631a3c51"
+  },
+  {
+    "file": "source/experiments/jd-editor/web/src/jd/JdEditor.tsx",
+    "bytes": 7407,
+    "sha256": "e25022fad010a1410cbb72376906ad4dcbef5f9e50d85dda86cf16a4af564ddf"
+  },
+  {
+    "file": "source/experiments/jd-editor/web/src/jd/useJdSession.ts",
+    "bytes": 16727,
+    "sha256": "ca5c602c372b51636596e9a58dd5186e016ca1eccf5914dc3b43f7e74da5aeb3"
+  },
+  {
+    "file": "source/experiments/jd-editor/web/src/jd/JdSavedProjection.test.tsx",
+    "bytes": 7000,
+    "sha256": "3d8a0e9afd3344d34b0b63666ad1bdfea395fbcb01751350aa93656fdf483928"
+  },
+  {
+    "file": "source/experiments/jd-editor/web/browser/task6-journey.mjs",
+    "bytes": 8706,
+    "sha256": "2d17844c67a2c76c7a7d35282ab8e1138bc62c0f63ced79d3bd47644db36c464"
+  },
+  {
+    "file": "source/experiments/jd-editor/web/package.json",
+    "bytes": 1281,
+    "sha256": "e32f9e5f6f484bf7eb0f56b843e93e5ee1e5c27677c280b4070eaef8fadc12bf"
+  },
+  {
+    "file": "source/experiments/jd-editor/package-lock.json",
+    "bytes": 313263,
+    "sha256": "874f1ffa61bb278aded419102494ecf2fc93c329a16405409d06f774580170c1"
+  },
+  {
+    "file": "source/experiments/jd-editor/README.md",
+    "bytes": 6673,
+    "sha256": "05d15c3663c9e38437b1a3964072bcc73764fb635977b4b43195cad495a78d18"
+  },
+  {
+    "file": "source/experiments/jd-editor/ACCEPTANCE.md",
+    "bytes": 4127,
+    "sha256": "385c67d18c16f547fcc336386c7e03ea1de5588193b9efbed17da617a4721fef"
+  },
+  {
+    "file": "source/docs/specs/evidence/2026-09-10-jd-editor-core-integration.md",
+    "bytes": 11288,
+    "sha256": "6037fcad590871a77a531b914522f325286a1c4592b96f94689ba4192cab37bb"
+  },
+  {
+    "file": "evidence/task6-final-all.log",
+    "bytes": 12325,
+    "sha256": "5c2c42752949f714679626639b9f030a146d60dd269594d1afac58c9374c731a"
+  },
+  {
+    "file": "evidence/task6-final-jd.log",
+    "bytes": 825,
+    "sha256": "282c6cbf5dae947858b74bdd01a58da478565abbfbeaecb11f2d6d94166df417"
+  },
+  {
+    "file": "evidence/task6-final-memory.log",
+    "bytes": 709,
+    "sha256": "c84b39ee2d2273b1505c0f47210c09be0078e7a84025e38e2691c2ebc700af0b"
+  },
+  {
+    "file": "evidence/task6-web-tests.log",
+    "bytes": 777,
+    "sha256": "f16eabd2dad3ba0a50c1543b20cdaaecd8570d21a2afcf6514b7628fa6341241"
+  },
+  {
+    "file": "evidence/task6-review-dirty-red.log",
+    "bytes": 1449,
+    "sha256": "df05cdbc38070084d8ad42dad78a12f3ab08e6ce1b8721fe56d8f717ccb5c388"
+  },
+  {
+    "file": "evidence/task6-review-dirty-green.log",
+    "bytes": 266,
+    "sha256": "dbf0ddc3423bca4eb871f8864a73cc6ee9b57e27d8c849c96759b65dc7ece293"
+  },
+  {
+    "file": "evidence/task6-web-fix-checks.json",
+    "bytes": 1622,
+    "sha256": "bd8cd127abb50a6996935d15d5639593749945b40fbf5dca809a3f0933abe54e"
+  },
+  {
+    "file": "evidence/task6-browser-fixed5.log",
+    "bytes": 502,
+    "sha256": "de3a9e46ac86bd739d85d82d68f6bbab5632b8798df937613f7d964794ffe914"
+  },
+  {
+    "file": "evidence/task6-browser-reopened.log",
+    "bytes": 294,
+    "sha256": "7712d8b26b1d38b0e9fe67fdfaf63ee2d50f9f79ec714d1027c3782c60a84574"
+  },
+  {
+    "file": "evidence/task6-source-acquisition-regression-report.md",
+    "bytes": 4259,
+    "sha256": "d053bb39f4714a28ecf7c494786acf73ba37fe9be5ebe31e80fd6533e8b34e48"
+  },
+  {
+    "file": "requirements/official-skill-preflight.md",
+    "bytes": 6136,
+    "sha256": "b761b4fb91ed123c37a734ed816821c00218d1f9de239a36734153c60f824a23"
+  },
+  {
+    "file": "requirements/method-mapping.md",
+    "bytes": 13670,
+    "sha256": "482786d914e8218febe37f9227b35285aea4234c3b12dc28e1ecd3db05ef27b5"
+  },
+  {
+    "file": "requirements/review-brief.md",
+    "bytes": 3622,
+    "sha256": "be223700db527abdf3da210f0d1335c9912c7ff81af43b27208d821c3810089b"
+  },
+  {
+    "file": "context/jd_references.py",
+    "bytes": 3425,
+    "sha256": "e53c89adfda77a2bc811be32edf678e210d35cf984b5f4fcca3b2e6c0d2ef39f"
+  },
+  {
+    "file": "context/sources.py",
+    "bytes": 21255,
+    "sha256": "b42f8d98740d5d61295da00dfe8677b4d97758c5ae53339eae6f014e4bbbe2ac"
+  },
+  {
+    "file": "context/jd_types.py",
+    "bytes": 2385,
+    "sha256": "a0a03b857f783902ed8008de37000fd34859f7473a7b14cb6ac345ebae543702"
+  }
+]

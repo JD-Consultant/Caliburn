@@ -1,0 +1,16 @@
+{
+  "pid": 135972,
+  "closed": true,
+  "saver_connection_closed": true,
+  "reason": "requested",
+  "operations": [
+    "5e4efa34-d302-401c-ac88-b9124251224e"
+  ],
+  "observations": [
+    {
+      "operation_id": "5e4efa34-d302-401c-ac88-b9124251224e",
+      "confirmed": true,
+      "result_revision_id": "149da711-4e72-497f-a87d-639ace08f59c"
+    }
+  ]
+}

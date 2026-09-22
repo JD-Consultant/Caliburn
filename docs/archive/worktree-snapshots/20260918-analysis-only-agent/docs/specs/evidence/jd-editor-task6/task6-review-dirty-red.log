@@ -1,0 +1,43 @@
+
+ RUN  v4.1.11 S:/caliburn/.worktrees/analysis-only-agent/experiments/jd-editor/web
+
+ ❯ src/jd/JdSavedProjection.test.tsx (4 tests | 1 failed) 180ms
+   × typing while a changed-head diff is loading preserves the manual value and its saved baseline 64ms
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/jd/JdSavedProjection.test.tsx > typing while a changed-head diff is loading preserves the manual value and its saved baseline
+AssertionError: expected [ { type: 'p', id: 'empty', …(1) } ] to deeply equal [ { type: 'p', id: 'empty', …(1) } ]
+
+- Expected
++ Received
+
+@@ -1,10 +1,10 @@
+  [
+    {
+      "children": [
+        {
+-         "text": "員工尚未保存的更正",
++         "text": "AI 新稿",
+        },
+      ],
+      "id": "empty",
+      "type": "p",
+    },
+
+ ❯ src/jd/JdSavedProjection.test.tsx:106:25
+    104|   release({ status: 'ok', before_revision_ref: 'r0', after_revision_re…
+    105|   await refreshing;
+    106|   expect(session.value).toEqual(manual);
+       |                         ^
+    107|   expect(session.head).toEqual(baseline);
+    108|   expect(session.dirty).toBe(true);
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed (4)
+   Start at  02:42:51
+   Duration  1.57s (transform 112ms, setup 0ms, import 685ms, tests 180ms, environment 574ms)
+

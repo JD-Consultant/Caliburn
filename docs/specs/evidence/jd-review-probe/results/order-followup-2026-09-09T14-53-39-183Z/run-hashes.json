@@ -1,0 +1,25 @@
+{
+  "script": "825629f9a59afbafcc80b050abebd71d6ab6790a891970d872a6013b5e9ef971",
+  "packageLock": "dabb5e05ed949d538605f9464839dd88034da97a007214f0c81efedda7444eff",
+  "sourceInput": "b2c8ba40e2fdbff866a9cda147ac0edaed59ad7a7da9475b5035f70ca79b8266",
+  "results": "dace9652461d6916dc111ab6e1ed129e608d6d7aad901992c7e433d6873ce975",
+  "traces": "a5970bcef441a8b6fd80dd0463b9d8e08ff20ce58a8d9e9c3f0db135b134aa87",
+  "tracesInspect": "3a25b6d071cd89c2abed810de6965870dd11954ed0e8b4b806d97f53133fa3f9",
+  "installedImplementation": {
+    "file": "node_modules/@platejs/suggestion/dist/src-CMqLOrDd.js",
+    "sha256": "0188cba49494da891b18261cda039a56809324fd655f252d14d2a8c3e5cc1919"
+  },
+  "source": {
+    "url": "https://github.com/udecode/plate/blob/cee7a4ec0328718d8cf147094466b597215f5406/packages/suggestion/src/lib/utils/SkipSuggestionDeletes.ts",
+    "license": "MIT",
+    "accessed": "2026-09-09",
+    "originalSha256": "4fe19c7a37bc9d4a6562a6ec2a19cfde05c933439ab6c0844224a8f6a84f1e67",
+    "copySha256": "4fe19c7a37bc9d4a6562a6ec2a19cfde05c933439ab6c0844224a8f6a84f1e67"
+  },
+  "originalR01HashesStillMatch": {
+    "script": true,
+    "packageLock": true,
+    "results": true,
+    "traces": true
+  }
+}

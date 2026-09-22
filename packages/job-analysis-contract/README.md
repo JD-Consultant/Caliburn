@@ -1,6 +1,8 @@
 # job-analysis-contract
 
-現行 `/api/v1/job-analysis/consultant-documents` 與 `/workspace` 共用的 typed seam。`schema/job-analysis-workspace.schema.json`
+> **歷史文件（2026-09-22 退役）：**本套契約的 schema、生成器與生成碼已隨舊 API／Web 移除；本頁只保留契約演進記錄。現行新 App 契約由 [`experiments/jd-relational-app/contracts`](../../experiments/jd-relational-app/contracts) 產生並驗證，詳見 [ADR 0077](../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+
+以下描述退役前 `/api/v1/job-analysis/consultant-documents` 與 `/workspace` 共用的 typed seam。`schema/job-analysis-workspace.schema.json`
 是唯一 source of truth；`src/job_analysis_contract/models.py` 與 `types/job-analysis-workspace.ts`
 都是生成物，不可手改。
 

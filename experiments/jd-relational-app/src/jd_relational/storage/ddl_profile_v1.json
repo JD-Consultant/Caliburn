@@ -1,0 +1,94 @@
+{
+  "profile_version": 1,
+  "postgresql_server_version_num": 180006,
+  "alembic_revision": "20260914_0002",
+  "source_schema_sha256": "72cb4fc967df35d2ef92fead50b3b0d728500c9c919c237d5931e969d32aba25",
+  "captured_at": "2026-09-14T06:08:44Z",
+  "purpose": "Compatibility expectations captured from a fresh synthetic PostgreSQL database after the fixed migration; not document or migration authority.",
+  "checks": {
+    "jd_capability": {
+      "ck_jd_capability_content": "CHECK (((name IS NOT NULL) OR (description IS NOT NULL)))",
+      "ck_jd_capability_kind": "CHECK ((kind = ANY (ARRAY['knowledge'::text, 'skill'::text])))",
+      "ck_jd_capability_position": "CHECK ((\"position\" >= 0))"
+    },
+    "jd_collaborator": {
+      "ck_jd_collaborator_content": "CHECK (((name IS NOT NULL) OR (scope_text IS NOT NULL)))",
+      "ck_jd_collaborator_position": "CHECK ((\"position\" >= 0))"
+    },
+    "jd_condition": {
+      "ck_jd_condition_kind": "CHECK ((kind = ANY (ARRAY['work_environment'::text, 'schedule_travel'::text, 'shared_authority'::text, 'shared_collaboration'::text, 'qualification'::text])))",
+      "ck_jd_condition_position": "CHECK ((\"position\" >= 0))"
+    },
+    "jd_document": {
+      "ck_jd_document_metadata_version": "CHECK ((metadata_version >= 1))"
+    },
+    "jd_duty": {
+      "ck_jd_duty_content": "CHECK (((name IS NOT NULL) OR (scope_text IS NOT NULL)))",
+      "ck_jd_duty_position": "CHECK ((\"position\" >= 0))"
+    },
+    "jd_head": {
+      "ck_jd_head_revision_number": "CHECK ((revision_number >= 1))"
+    },
+    "jd_memory_admission": {
+      "ck_jd_memory_admission_recovery": "CHECK ((recovery_count >= 0))",
+      "ck_jd_memory_admission_state": "CHECK ((((status = 'idle'::text) AND (target_reference IS NULL) AND (source_reference IS NULL) AND (error_code IS NULL)) OR ((status = 'queued'::text) AND (target_reference IS NOT NULL) AND (error_code IS NULL)) OR ((status = 'running'::text) AND (target_reference IS NOT NULL) AND (source_reference IS NOT NULL) AND (error_code IS NULL)) OR ((status = 'blocked'::text) AND (error_code IS NOT NULL))))",
+      "ck_jd_memory_admission_status": "CHECK ((status = ANY (ARRAY['idle'::text, 'queued'::text, 'running'::text, 'blocked'::text])))"
+    },
+    "jd_operation": {
+      "ck_jd_operation_origin": "CHECK ((origin = ANY (ARRAY['manual'::text, 'ai'::text])))",
+      "ck_jd_operation_origin_run": "CHECK (((origin = 'ai'::text) = (ai_run_id IS NOT NULL)))",
+      "ck_jd_operation_result": "CHECK ((((status = 'committed'::text) AND (base_revision_id IS NOT NULL) AND (result_revision_id IS NOT NULL) AND (result_revision_id <> base_revision_id)) OR ((status = 'no_change'::text) AND (base_revision_id IS NOT NULL) AND (result_revision_id IS NOT NULL) AND (result_revision_id = base_revision_id)) OR ((status <> ALL (ARRAY['committed'::text, 'no_change'::text])) AND (result_revision_id IS NULL))))",
+      "ck_jd_operation_status": "CHECK ((status = ANY (ARRAY['committed'::text, 'no_change'::text, 'invalid_input'::text, 'target_missing'::text, 'stale_view'::text, 'relationship_conflict'::text, 'dependent_items'::text, 'save_failed'::text])))"
+    },
+    "jd_revision": {
+      "ck_jd_revision_engine_profile": "CHECK ((engine_profile = 'jd-relational-v1'::text))",
+      "ck_jd_revision_format_version": "CHECK ((format_version = 3))",
+      "ck_jd_revision_initial_parent": "CHECK (((origin = 'initial'::text) = (parent_revision_id IS NULL)))",
+      "ck_jd_revision_number": "CHECK ((revision_number >= 1))",
+      "ck_jd_revision_origin": "CHECK ((origin = ANY (ARRAY['initial'::text, 'manual'::text, 'ai'::text])))"
+    },
+    "jd_source_link": {
+      "ck_jd_source_link_one_target": "CHECK ((num_nonnulls(profile_field, collaborator_id, duty_id, task_id, detail_id, capability_id, condition_id, linked_task_id) = 1))",
+      "ck_jd_source_link_position": "CHECK ((\"position\" >= 0))",
+      "ck_jd_source_link_profile_field": "CHECK ((profile_field = ANY (ARRAY['job_title'::text, 'organization_unit'::text, 'employee_name'::text, 'reports_to'::text, 'purpose'::text])))",
+      "ck_jd_source_link_relation_pair": "CHECK (((linked_task_id IS NULL) = (linked_capability_id IS NULL)))"
+    },
+    "jd_task": {
+      "ck_jd_task_content": "CHECK (((name IS NOT NULL) OR (description IS NOT NULL)))",
+      "ck_jd_task_position": "CHECK ((\"position\" >= 0))"
+    },
+    "jd_task_capability": {
+      "ck_jd_task_capability_position": "CHECK ((\"position\" >= 0))"
+    },
+    "jd_task_detail": {
+      "ck_jd_task_detail_kind": "CHECK ((kind = ANY (ARRAY['outcome'::text, 'requirement'::text])))",
+      "ck_jd_task_detail_position": "CHECK ((\"position\" >= 0))"
+    }
+  },
+  "partial_indexes": {
+    "jd_operation": {
+      "ix_jd_operation_ai_run": "(ai_run_id IS NOT NULL)",
+      "uq_jd_operation_committed_result": "(status = 'committed'::text)"
+    },
+    "jd_revision": {
+      "uq_jd_revision_initial": "(origin = 'initial'::text)"
+    },
+    "jd_source_link": {
+      "ix_jd_source_link_capability_id": "(capability_id IS NOT NULL)",
+      "ix_jd_source_link_collaborator_id": "(collaborator_id IS NOT NULL)",
+      "ix_jd_source_link_condition_id": "(condition_id IS NOT NULL)",
+      "ix_jd_source_link_detail_id": "(detail_id IS NOT NULL)",
+      "ix_jd_source_link_duty_id": "(duty_id IS NOT NULL)",
+      "ix_jd_source_link_profile_field": "(profile_field IS NOT NULL)",
+      "ix_jd_source_link_relation": "(linked_task_id IS NOT NULL)",
+      "ix_jd_source_link_task_id": "(task_id IS NOT NULL)"
+    },
+    "jd_task": {
+      "ix_jd_task_unassigned": "(duty_id IS NULL)"
+    }
+  },
+  "source_migrations_sha256": {
+    "0001_jd_relational_initial.py": "4abccba7242a383ef51fe4395eee4606c0e997e23ede9915d67e2238c6d4c2d0",
+    "0002_jd_memory_admission.py": "b0c8e9f8c227f923e22d7e2a43667bb171c19efa260256e2af53e773d414cdad"
+  }
+}

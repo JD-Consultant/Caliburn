@@ -1,0 +1,110 @@
+# JD 歷史、整份還原與重開恢復
+
+> **2026-09-15 範圍校正：完整 JD 歷史、任意 revision 比較與整份舊版還原不屬目前第一版必要需求。已完成且穩定的能力可以保留，不必拆除；本文也可繼續說明其既有行為，但不再是接線或交付前置，不應再擴張成通用歷史／復原引擎。current JD 的 revision／snapshot／operation 可繼續供保存一致性、冪等、故障對帳、當輪 LLM 差異與安全整輪撤回使用。現行必要撤回只撤回指定 LLM 回合的 JD 效果；原始對話、來源、案例、Memory、工作理解、checkpoint 與原回合紀錄不撤回。最新範圍見 [產品核心目標](../product-notes.md) 與 [ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md)。**
+
+- 日期：2026-09-12；Topic：JD-R002；本輪 Owner 已選定操作效果，G3 WORKING；本稿為 G4 設計，尚未實作。
+- 需求：[需求 §11](2026-09-12-jd-relational-editing-requirements.md#11-本輪裁決草稿歷史與還原2026-09-12)。保存觸發與瀏覽器暫存沿[自動保存與交接](2026-09-12-jd-autosave-and-handoff-design.md)，SQL／唯一正文沿[資料庫契約](2026-09-12-jd-relational-schema-and-write-contract.md)。
+- 範圍：單人本機、唯一可編 JD；不改 Memory、原始訪談、正式權責或既有已驗的操作對帳機制。
+
+## 1. 已定效果與方案取捨
+
+Owner 原選查看修改前後、直接更正局部、明確確認後整份還原；後續重開快捷範圍，已選[HR-02：整輪 AI 的 JD 撤回](2026-09-12-jd-ai-turn-undo-design.md)。本稿保留共同歷史／整份還原／恢復責任，HR-02 沿此流程加有界入口，不取代它。未歸任務的零散資料用聊天或未完整任務承接，不加待整理區。
+
+| 方案 | 效果及本輪決定 |
+|---|---|
+| 歷史對照＋既有局部更正＋整份還原 | **Owner 已選**。少量錯誤在目前稿修正；要回到完整舊稿時，先看整份差異再還原 |
+| 再加最近一次已保存操作撤回 | 原先不提供，已由 HR-02 更新為整輪 AI 的 JD 撤回；不等同所有人工／AI 單次操作的通用 undo |
+| 任意早期操作或單項及相依資料一鍵撤回 | 相依修改不一定可分離；本案没有已確認用途，不建立通用逆運算或選擇性回退引擎 |
+
+文字框若提供原生 Ctrl+Z／redo，作用於仍有效的本地輸入歷程；自動保存過的值被改回時，走一次新的普通保存。不能說原資料庫提交沒發生，也不能保證跨重開仍有原生 undo stack。收到還原／AI 新版等外部值時，舊輸入歷程須失效或重新建立，避免按一次 Ctrl+Z 又自動存回舊畫面；實際 textarea 行為列瀏覽器驗收。
+
+## 2. 官方依據與適用限制
+
+以下於 **2026-09-12** 查閱正文；只參考公開能力，不採付費產品或推定其內部資料庫。產品頁未公布固定發行版本／預覽標籤者如實記錄，不稱版本化 API。
+
+| 來源 | 官方事實 | 本案映射與界線 |
+|---|---|---|
+| [Microsoft 365 版本歷史](https://support.microsoft.com/en-gb/office/collab-files/view-previous-versions-of-office-files)，現行產品文件；非 OSS 依賴 | 可開舊版、比較並選 Restore；此能力依 OneDrive／SharePoint 保存條件 | 學習先查看再還原；不照搬新視窗、帳號／權限或保留數量 |
+| [Google Docs 變更與版本](https://support.google.com/docs/answer/190843?hl=en-10)，現行產品文件；非 OSS 依賴 | 分開提供看舊版、還原、複製，分組可展開；版本可能合併，且某些格內歷史不含結構變更 | 本案所有已保存業務變動可查；不把文字 diff 當職責／任務／關係的完整證據，也不採其刪歷史或合併保存政策 |
+| [Claude Code checkpointing](https://code.claude.com/docs/en/checkpointing)，現行產品文件；非 OSS 依賴 | 可分別還原程式、對話或兩者；只涵蓋受追蹤編輯，shell／其他來源修改有邊界，不取代長期版本控制 | 本案須明定還原資料範圍；不能把檔案 rewind 直接用於 PostgreSQL、Memory 或原始問答 |
+| [Codex worktrees](https://learn.chatgpt.com/docs/environments/git-worktrees)，現行產品文件；非新增依賴 | 隔離 checkout 便於平行修改與驗證，再交接；需 Git，並有清理與生命週期 | 支持有用途時的隔離準備，不證明每個 JD 顧問都需要持久候選分支；本案評估見工作區研究 §7 |
+| [AWS Saga patterns](https://docs.aws.amazon.com/prescriptive-guidance/latest/cloud-design-patterns/saga-patterns.html)，現行方法文件；未採 AWS 服務 | 跨交易流程可用後續補償交易處理先前效果 | 只用以區別已提交後的修正與交易內 rollback；本案單 DB 整份還原不採 Saga、事件匯流排或通用補償引擎 |
+| [PostgreSQL 16 Transactions](https://www.postgresql.org/docs/16/tutorial-transactions.html)，指定且受支援穩定主版本；PostgreSQL License | 交易內中間更新不可見，rollback／savepoint 只作用於尚未提交的交易；COMMIT 確認後才是已保存 | 本案還原為新的條件式寫入，沿現有同交易 current／snapshot／receipt，不倒退 head 或刪掉後續歷史 |
+
+跨來源共同原則是分清目前狀態、可回看的舊狀態、明確恢復動作與涵蓋範圍。本案的線性新修訂、整份 JD 邊界及不做最近一步撤回，是需求與既有保存契約的映射，不宣稱大廠有一致的按鈕或表格。
+
+## 3. 同頁歷史與局部更正
+
+1. 唯一可編區維持目前 JD；同頁面板可展開某次保存的差異或完整舊版，清楚標示「歷史版本／唯讀」。返回目前稿不產生保存或回退。沒有第二份可編正文。
+2. 第一版按成功 revision 的真實順序列出時間、人工／AI、受影響項目及保存操作；一次完整業務操作可含多個欄位。只提供分頁與明示的比較範圍，先不按停頓時間合併多次保存成同一撤回單位。
+3. 差異從 base/result 的 stable IDs 與關係得到，完整覆蓋增刪、移動、排序、成果／要求、K/S 定義及引用、來源 link。共享定義改動要能查看受影響任務；不把移動表示成刪掉再新增，不靠 AI 摘要取代實際前後內容。
+4. 起終點淨差異與逐次事件分開。r4→r6 文字若相同，但 r5 曾改錯，仍能展開 r5／r6；失敗或 no_change 在操作狀態可查，不偽造內容版本。多工具 AI 回合各自的實際保存亦保留，不把整回合當一個可整批取消的交易。
+5. 想保留其他較新工作時，員工看舊文後在目前欄位更正、把任務移回，或透過聊天請 AI 修正。複製歷史文字到現有欄位走普通保存；重新新增項目由 App 發新身分，不自動帶回旧 parent、關係或來源。歷史 refs 不可當 current target refs 使用。
+
+## 4. 整份還原的使用流程
+
+**合成例子：**r5 有任務 A；r6 改 A；r7 新增任務 B。只想修 A 時在目前稿修正，保留 B。若明確選整份還原 r5，預覽必須列出 A 將回到舊內容、B 將從目前稿移除，並可展開全部前後內容；不能顯示成「只取消 r6」。
+
+1. 先沿自動保存交接處理未提交輸入與在途結果。存在無效候選時，先完成或明示捨棄；未知結果先對帳。還原不能繞過它們，也不能偷偷保存半個組合候選。
+2. App 取得確切目前版 H 與選定歷史 S，由同一 domain projection 產生整份 H→S 預覽；還原確認期間停手改與新 AI 回合。唯讀預覽不持有 SQL transaction 或 writer。
+3. 確認明說「以這份歷史內容取代目前 JD；之後的內容仍可在歷史找到」，呈現將移除／回復的項目及來源沿用提示。取消預覽只關閉預覽；不建立寫入。
+4. 使用者確認後由 App 配原 operation，提交 H 與 S 的受控 references；server 再驗 current 仍為 H、文件未封存、沒有其他 writer、目標屬同文件且格式相容。H 改變即停止並重新比較／確認，不把同意套到另一版。
+5. server 從自己的 immutable history 形成候選，經同一 domain rules 完整驗證、更新 relational rows、生成新 revision R（parent=H）、新 manual receipt 及 head，全部同交易確認。即使 S 是初版，也不改成新的 initial。
+6. H 與 S 的 canonical 內容相同時回 no_change，不另造修訂。已提交但回覆遺失則查原 operation，不再建立第二次還原；結果未確認前不恢復此文件寫入。
+
+還原範圍是 canonical JD 的六章資料、項目身分、順序、關係及原有來源引用。**不還原**文件列表名稱／封存狀態、原始訪談、Memory、聊天、操作歷史、AI 最後已讀基準或整個資料庫。操作名使用 `restore_revision`，與 catalog 的解除封存 `unarchive` 分清。
+
+## 5. 身分、來源與 AI 續談
+
+同文件歷史中的穩定項目 ID 在整份還原時代表同一歷史項目，可恢復其原身分；App 不用名稱猜配。參與恢復的 snapshot 必須具有效 format／profile／digest，且能通過現行同文件關係與文字規則；缺資料或不相容時停止，不部分復原、不清資料、不暗中遷移。
+
+來源採 **沿用歷史引用，並非重新核定**：
+
+- server 可從已驗證的內部歷史恢復原 `source_link_id`、target、`source_ref`、`basis_digest`，不接受 client 夾帶新 link 或任意 JSON。這是既有來源的有界恢復分支，不是省略新來源查核的通用入口。
+- 不因原話暫時不可讀就丟 link 或阻斷 JD 內容恢復；目前回查結果另標示可讀／不可用。若有已知 scope／格式不合法等完整性錯誤則整組拒絕。原 basis 不匹配仍顯示 needs_recheck，不能重算 basis 偽裝重新支持。
+- 還原預覽、結果及該歷史事件顯示「沿用舊版依據，未重新核對較新訪談」。這是整份操作的 provenance；由原 receipt 的還原目標取得，不新增可被手填的逐 link 專業核准欄位。一般來源界面仍明示可回讀不等於專業支持；較新更正可能推翻舊引用。
+- 新增或重新連結來源仍走既有可讀性／scope 查核；歷史恢復不能將裸 Memory 路徑變有效 source。
+
+新還原事件是 `origin=manual`，App 下一輪通知包括「整份還原」、base/result、被取用的歷史版本及實際變更入口，且說明只改 JD。通知基準不倒退；模型重讀 current，不沿歷史 target refs 續寫。Memory 保留較新理解；顧問比較實際更正與訪談後再判斷是否追問或修訂，不能把「使用者還原舊稿」解讀成「較新的事實全被否定」。這沿現有通知機制，不新增自動 Memory 雙寫或收尾攔截器。
+
+## 6. 關頁、切文件與重開的具體出口
+
+固定送出 A 與較晚未送出的輸入 B 沿既有單一 IndexedDB 記錄及串行更新規則；不能用本稿另建恢復正文。重開先核資料集／文件／格式身分，讀 server current 與原 operation：
+
+| 找回狀態 | 同頁呈現與下一步 |
+|---|---|
+| A 已 confirmed committed／no_change，沒有 B | 顯示目前 server 版本；清理匹配的 A 記錄。current 若已有後續修訂，不覆蓋回 A 的 result |
+| A 已 confirmed committed／no_change，有 B | 只清除 A 已涵蓋內容，顯示 B 與目前稿差別，讓員工選繼續或捨棄 B；不自動再送。即使 A 已成功仍不能稱 B 已保存 |
+| A 已 confirmed 語意失敗，有／無 B | 顯示實際原因，保留 A 中未保存內容及較晚輸入；修正形成新意圖。B 覆蓋同欄時以較晚輸入呈現，原 A request 仍可查 |
+| A 無 confirmed 結果 | 保留原 identity／payload，先查回或明示恢復原 operation。查無結果不表示未執行；沿 writer 停止及 DB 邊界對帳，不改 key 重做，不先送 B |
+| 只有 B，沒有送出記錄 | 明示找回未保存候選；比較後才選繼續／捨棄。base 過時不自動重設或按名稱配對 |
+| 暫存缺失、損壞、資料集或格式不合 | 保留可讀材料並说明可恢復範圍；只以 server 確認內容為已存，不從快取缺失推断舊操作沒發生 |
+
+員工捨棄 B 不得清除尚未閉合的 A。沿原恢復 transport 的 exact submission 入口重試時，承接的是原 relational commands，不是舊 Plate 完整 value。聊天尚未送出的文字不是 JD operation；本稿不增加跨重開自動送聊天。
+
+**切其他文件：**正常先完成保存交接。若原 A 結果持續未知，但原送出與所有待保留候選已確認寫入恢復記錄，可明示「保留待確認內容並切換」；原文件維持不可新寫入，回到它時先對帳。若持久暫存不成立，正常切換留在原頁、先處理或明示捨棄尚未送出候選，不假稱離開能找回；已送操作不能被捨棄。切頁不取消 server writer，也不讓舊頁回覆更新新文件。
+
+**取消 AI：**沿既有停止、pending operations 對帳及回合結束流程；已保存的 JD 修改保留並列實際結果。取消不是整份還原，也不撤回 Memory 已發布成果。確認 writer 結束後才可直接編輯或進整份還原；其他文件按各自狀態使用，不引入全域鎖。
+
+## 7. 驗收與剩餘工程前置
+
+以下皆為**待執行情境**，未以文件走查代稱實測：
+
+| ID | 反例與通過條件 |
+|---|---|
+| HR-01 | r5→r6 改 A→r7 增 B；局部更正 A 保留 B，整份還原 r5 明示移除 B並形成 r8，r6／r7仍可查 |
+| HR-02 | 預覽 r7→r5 後另一入口提交 r8；原確認拒絕過時，沒有部分還原；重新預覽才可新送 |
+| HR-03 | 還原第二張表注入錯誤／COMMIT 回覆遺失；前者全體不變，後者原 operation 對帳，無重複修訂 |
+| HR-04 | 復原 task／detail／共享 K/S links 與排序；同歷史 ID保留、跨文件 refs拒絕；不接受 browser snapshot payload |
+| HR-05 | 舊來源暫時不可讀、basis 不匹配、訪談已有較新更正；不丟引用、不假稱背書，下一輪看見還原事件，Memory／原話不倒退 |
+| HR-06 | 還原初版／與目前相同版；仍沿線性 parent=current，無改 initial；相同內容只有 no_change receipt |
+| HR-07 | 已存 A＋未存 B＋稍後 current C；重開顯示 C並保留 B供比較，不投影回 A、不自動 replay |
+| HR-08 | A 未知＋B 被捨棄／切其他文件；A identity保留，原文件 gate未解除，其他文件不被舊回覆污染 |
+| HR-09 | 文字改後又改回、移動／關係改變；逐次歷史完整可查，起終點淨差異不抹事件 |
+| HR-10 | 文字框 Ctrl+Z 遇已自動保存、AI 更新或整份還原；只處理有效輸入歷程，沒有舊值意外重存；中文組字不被破壞 |
+| HR-11 | AI 已保存第一項後取消第二項；畫面列真實完成／未知結果，取消不偽裝全部撤銷 |
+| HR-12 | snapshot不相容、暫存quota／資料集不同、恢復記錄缺失；停止不清空、不跨資料集寫入，無假保存成功 |
+
+本稿範圍已閉合；新增快捷依[HR-02](2026-09-12-jd-ai-turn-undo-design.md)，差異預設已選[CV-01 標記＋按需展開](2026-09-12-jd-change-visibility-design.md)，不據此稱整體 G4 通過。接續工程前置是 **瀏覽器恢復記錄的版本／容量、資料集識別的正式發配與備份還原關係，以及 successor DTO／原生瀏覽器有限驗證設計**。來源保持既有唯一權威，不能為填一個識別欄自行新增平行 catalog。完整管理画面／Excel 版型／原始訪談匯出及施工對齊依[剩餘工作盤點](2026-09-12-jd-design-readiness-audit.md)；完整 G4／ADR0075、施工與自然／真人驗收未完成。
+
+本輪只完成研究、需求裁決及責任接合；未建表、改 runtime、安裝套件、執行產品模型或建立 AI 試稿分支。獨立文件審查與首敗／複核結果見[本輪證據](evidence/2026-09-12-jd-history-and-recovery-review.md)。

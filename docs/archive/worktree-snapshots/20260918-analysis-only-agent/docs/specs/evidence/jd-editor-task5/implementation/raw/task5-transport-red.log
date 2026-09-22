@@ -1,0 +1,180 @@
+FFF                                                                      [100%]
+================================== FAILURES ===================================
+_____ test_get_only_observes_and_explicit_original_key_closes_known_none ______
+
+jd = <analysis_agent.jd_service.JdService object at 0x000002172E35CB90>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-58ba7923-205c-470a-ba35-f79b2a0d40ad/test_get_only_observes_and_exp0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000002172E189460>
+
+    def test_get_only_observes_and_explicit_original_key_closes_known_none(jd,tmp_path,monkeypatch):
+        with recovery_client(jd,tmp_path) as (client,service):
+            intent,key,context,descriptor=pending(jd,service)
+            path=f'/documents/{intent.scope.document_id}/jd/manual-recovery'
+            before=context.graph.get_state(context.config)
+            native=[]
+            monkeypatch.setattr(jd.engine,'validate_value',lambda *a,**kw:native.append(a))
+            found=client.get(path)
+>           assert found.status_code==200,found.text
+E           AssertionError: {"detail":"Not Found"}
+E           assert 404 == 200
+E            +  where 404 = <Response [404 Not Found]>.status_code
+
+tests\test_jd_manual_recovery.py:43: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-98698680-1efa-4ecf-b858-038f893444ab.jsonl
+_ test_old_key_never_clears_current_pending_and_active_post_does_not_take_over _
+
+jd = <analysis_agent.jd_service.JdService object at 0x0000021730CC41D0>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-58ba7923-205c-470a-ba35-f79b2a0d40ad/test_old_key_never_clears_curr0')
+
+    def test_old_key_never_clears_current_pending_and_active_post_does_not_take_over(jd,tmp_path):
+        with recovery_client(jd,tmp_path) as (client,service):
+            intent,key,context,descriptor=pending(jd,service)
+            path=f'/documents/{intent.scope.document_id}/jd/manual-recovery'
+            other=str(uuid4())
+            result=client.post(path,json={'request_key':other})
+>           assert result.status_code==200,result.text
+E           AssertionError: {"detail":"Not Found"}
+E           assert 404 == 200
+E            +  where 404 = <Response [404 Not Found]>.status_code
+
+tests\test_jd_manual_recovery.py:63: AssertionError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-98698680-1efa-4ecf-b858-038f893444ab.jsonl
+___ test_terminal_clear_failure_preserves_result_and_matching_cleanup_exit ____
+
+jd = <analysis_agent.jd_service.JdService object at 0x0000021731EE4FB0>
+tmp_path = WindowsPath('S:/caliburn/.worktrees/analysis-only-agent/scratch/task5-pytest-58ba7923-205c-470a-ba35-f79b2a0d40ad/test_terminal_clear_failure_pr0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x0000021731EE4E30>
+
+    def test_terminal_clear_failure_preserves_result_and_matching_cleanup_exit(jd,tmp_path,monkeypatch):
+>       with recovery_client(jd,tmp_path) as (client,service):
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_jd_manual_recovery.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:158: in __exit__
+    self.gen.throw(value)
+tests\test_jd_manual_recovery.py:21: in recovery_client
+    with TestClient(create_app(resources),base_url='http://127.0.0.1:8091') as client:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:709: in __exit__
+    self.exit_stack.close()
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:618: in close
+    self.__exit__(None, None, None)
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:610: in __exit__
+    raise exc_details[1]
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:595: in __exit__
+    if cb(*exc_details):
+       ^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:478: in _exit_wrapper
+    callback(*args, **kwds)
+.venv\Lib\site-packages\starlette\testclient.py:702: in wait_shutdown
+    portal.call(self.wait_shutdown)
+.venv\Lib\site-packages\anyio\from_thread.py:340: in call
+    return cast(T_Retval, self.start_task_soon(func, *args).result())
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py:456: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+.venv\Lib\site-packages\anyio\from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:749: in wait_shutdown
+    await receive()
+.venv\Lib\site-packages\starlette\testclient.py:739: in receive
+    self.task.result()
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\concurrent\futures\_base.py:401: in __get_result
+    raise self._exception
+.venv\Lib\site-packages\anyio\from_thread.py:265: in _call_func
+    retval = await retval_or_awaitable
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\starlette\testclient.py:714: in lifespan
+    await self.app(scope, self.stream_receive.receive, self.stream_send.send)
+.venv\Lib\site-packages\fastapi\applications.py:1163: in __call__
+    await super().__call__(scope, receive, send)
+.venv\Lib\site-packages\starlette\applications.py:96: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\errors.py:151: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\base.py:103: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\cors.py:80: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\trustedhost.py:36: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\middleware\exceptions.py:49: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\fastapi\middleware\asyncexitstack.py:18: in __call__
+    await self.app(scope, receive, send)
+.venv\Lib\site-packages\starlette\routing.py:670: in __call__
+    await self.middleware_stack(scope, receive, send)
+.venv\Lib\site-packages\fastapi\routing.py:2726: in app
+    await self.lifespan(scope, receive, send)
+.venv\Lib\site-packages\starlette\routing.py:648: in lifespan
+    async with self.lifespan_context(app) as maybe_state:
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+.venv\Lib\site-packages\fastapi\routing.py:240: in merged_lifespan
+    async with original_context(app) as maybe_original_state:
+               ^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:217: in __aexit__
+    await anext(self.gen)
+src\analysis_agent\api.py:230: in lifespan
+    await run_in_threadpool(manager.__exit__, None, None, None)
+.venv\Lib\site-packages\starlette\concurrency.py:34: in run_in_threadpool
+    return await anyio.to_thread.run_sync(func)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\to_thread.py:65: in run_sync
+    return await get_async_backend().run_sync_in_worker_thread(
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:2706: in run_sync_in_worker_thread
+    return await future
+           ^^^^^^^^^^^^
+.venv\Lib\site-packages\anyio\_backends\_asyncio.py:1100: in run
+    result = context.run(func, *args)
+             ^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:144: in __exit__
+    next(self.gen)
+tests\test_jd_manual_recovery.py:17: in resources
+    with service_harness(tmp_path,engine=jd.catalog.engine) as (service,sent,_):
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+C:\Users\chenb\AppData\Roaming\uv\python\cpython-3.12-windows-x86_64-none\Lib\contextlib.py:144: in __exit__
+    next(self.gen)
+tests\test_service.py:53: in service_harness
+    service.close()
+src\analysis_agent\service.py:684: in close
+    self._reconcile_manual(context)
+src\analysis_agent\service.py:352: in _reconcile_manual
+    save_manual_pending(context.graph,context.config,None)
+src\analysis_agent\conversation.py:195: in save_manual_pending
+    graph.update_state(config, {'jd_manual_pending': descriptor}, as_node='analysis')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+config = {'configurable': {'thread_id': 'a1a39adc-44b3-4861-9a31-08fc7bec96d1'}}
+value = {'jd_manual_pending': None}, kwargs = {'as_node': 'analysis'}
+
+    def cannot_clear(config,value,**kwargs):
+        if 'jd_manual_pending' in value and value['jd_manual_pending'] is None:
+>           raise RuntimeError('clear failed')
+E           RuntimeError: clear failed
+
+tests\test_jd_manual_recovery.py:83: RuntimeError
+-------------------------- Captured stdout teardown ---------------------------
+PG exact snapshot: task-2-pg-98698680-1efa-4ecf-b858-038f893444ab.jsonl
+============================== warnings summary ===============================
+.venv\Lib\site-packages\starlette\testclient.py:53
+  S:\caliburn\.worktrees\analysis-only-agent\experiments\analysis-agent\.venv\Lib\site-packages\starlette\testclient.py:53: DeprecationWarning: The anyio.abc.BlockingPortal alias is deprecated, use anyio.from_thread.BlockingPortal instead.
+    _PortalFactoryType = Callable[[], AbstractContextManager[anyio.abc.BlockingPortal]]
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ===========================
+FAILED tests/test_jd_manual_recovery.py::test_get_only_observes_and_explicit_original_key_closes_known_none
+FAILED tests/test_jd_manual_recovery.py::test_old_key_never_clears_current_pending_and_active_post_does_not_take_over
+FAILED tests/test_jd_manual_recovery.py::test_terminal_clear_failure_preserves_result_and_matching_cleanup_exit
+3 failed, 1 warning in 7.04s

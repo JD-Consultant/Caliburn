@@ -1,0 +1,2957 @@
+{
+  "schema": "docs/specs/contracts/jd-editor-v2.schema.json",
+  "schema_sha256": "c6cc0f996b7a24b37cdf784a9d46e88cbb1d59f4d68d327e4167f3dfa40fb715",
+  "fixture_sha256": "19fbf43d431e36fd799b8736a462e5f8d64eee4e6c6ddf708c06b0fef763114d",
+  "runner_sha256": "985bb5a126836c4676dff9a17ddda4604ac031c8f9d0e84df8d102667656aaef",
+  "node": "v22.12.0",
+  "validator": "AJV 8.20.0",
+  "definitions": 105,
+  "count": 259,
+  "layers": {
+    "schema-compilation": 105,
+    "schema": 114,
+    "finite-contract-model": 40
+  },
+  "checks": [
+    {
+      "name": "compile_OpaqueRef",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_Sha256",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdEngineProfile",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSourceRefs",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdText",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdEmptyText",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdBorder",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdBorders",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdCellAttributes",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSectionKind",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdElementType",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedElement",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewElement",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedElementOfBodyType",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedBodyElement",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedBlockquoteChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedList",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedListItem",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedListContent",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedTableRow",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedTableCell",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedCellChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedDutyChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedWorkSectionChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewBodyElement",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewBlockquoteChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewList",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewListItem",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewListContent",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewTableRow",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewTableCell",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewCellChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewDutyChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewWorkSectionChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdRootSavedElement",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdDocumentValue",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReadModelInput",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdInsertContentCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReplaceBlockContentCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReplaceSelectionCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdEditableProperties",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdUnsettableProperty",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSetPropertiesCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdMoveContentCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdUnwrapGroupCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdRemoveContentCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdEditCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdEditModelInput",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdChangeReadModelInput",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdToolRuntimeContext",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdEditRuntimeContext",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReadRuntimeRequest",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdEditRuntimeRequest",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdChangeReadRuntimeRequest",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_SlatePoint",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_SlateRange",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSelectionCaptureClientInput",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdResolvedEditCommand",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateTransformRequest",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JsonValue",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JsonObject",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdToolErrorDetail",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateTransformSuccess",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateTransformFailure",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateTransformResult",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateValidateValueRequest",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateValidateValueResult",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateReadSelectionRequest",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateReadSelectionSuccess",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPlateReadSelectionResult",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReadTarget",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReadSelection",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReadSuccess",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReadFailure",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdReadResult",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdActualChanges",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdWriteStatus",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdWriteResult",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdEditResult",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdManualSaveClientInput",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdManualSaveRequest",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdManualSaveResult",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdChangeReadSuccess",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdChangeReadFailure",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdChangeReadResult",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdPropertyUpdateConstraint",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdItemIds",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdItemRefs",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedOutcomes",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedRequirements",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedKnowledgeItem",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedSkillItem",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedTaskChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedKnowledgeSectionChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdSavedSkillsSectionChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewOutcomes",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewRequirements",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewKnowledgeItem",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewSkillItem",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewTaskChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewKnowledgeSectionChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdNewSkillsSectionChild",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdResolvedEditableProperties",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdResolvedUnsettableProperty",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "compile_JdResolvedPropertyUpdateConstraint",
+      "layer": "schema-compilation",
+      "expected": true,
+      "actual": true
+    },
+    {
+      "name": "profile_v2",
+      "layer": "schema",
+      "definition": "JdEngineProfile",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "profile_v1_is_not_v2",
+      "layer": "schema",
+      "definition": "JdEngineProfile",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "three_tasks_two_k_two_s_parallel_groups",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "empty_group_bodies_and_no_links_are_valid_draft",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "explicit_empty_saved_links",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "complete_empty_k_item_is_valid_draft",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "task_requires_outcomes",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "task_requires_requirements",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "task_requires_body_outside_groups",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "task_rejects_second_jd_outcomes",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "jd_outcomes_is_not_root",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "jd_outcomes_cannot_contain_k",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "jd_outcomes_cannot_have_empty_children",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "task_rejects_second_jd_requirements",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "jd_requirements_is_not_root",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "jd_requirements_cannot_contain_k",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "jd_requirements_cannot_have_empty_children",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "requirements_cannot_nest_under_outcomes",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "k_cannot_be_direct_task_child",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "k_not_allowed_in_skills_section",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "s_not_allowed_in_knowledge_section",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "k_not_allowed_in_work_section",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "k_cannot_contain_task",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "s_cannot_contain_k",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "k_not_root",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "saved_task_knowledge_ids_duplicates_rejected",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "saved_non_task_knowledge_ids_rejected",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "saved_empty_knowledge_ids_member_rejected",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "saved_task_skill_ids_duplicates_rejected",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "saved_non_task_skill_ids_rejected",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "saved_empty_skill_ids_member_rejected",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "saved_model_ref_property_rejected",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "saved_reverse_link_property_rejected",
+      "layer": "schema",
+      "definition": "JdSavedElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "new_task_groups_without_ids_or_links",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "new_complete_knowledge",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "new_complete_skill",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "new_task_no_knowledge_ids_even_empty",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "new_task_no_skill_ids_even_empty",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "new_task_no_knowledge_refs_even_empty",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "new_task_no_skill_refs_even_empty",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "new_top_level_id_rejected",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "new_nested_id_rejected",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "new_temporary_id_rejected",
+      "layer": "schema",
+      "definition": "JdNewElement",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "first_create_items_without_link_command",
+      "layer": "schema",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "model_set_knowledge_refs",
+      "layer": "schema",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "model_clear_knowledge_refs_empty",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "model_clear_knowledge_refs_unset",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "model_overlap_knowledge_refs",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "model_duplicate_knowledge_refs",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "model_cannot_set_knowledge_ids",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "model_cannot_unset_knowledge_ids",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "resolved_set_knowledge_ids",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "resolved_clear_knowledge_ids_unset",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "resolved_overlap_knowledge_ids",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "resolved_cannot_set_knowledge_refs",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "resolved_cannot_unset_knowledge_refs",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "model_set_skill_refs",
+      "layer": "schema",
+      "definition": "JdEditModelInput",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "model_clear_skill_refs_empty",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "model_clear_skill_refs_unset",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "model_overlap_skill_refs",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "model_duplicate_skill_refs",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "model_cannot_set_skill_ids",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "model_cannot_unset_skill_ids",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "resolved_set_skill_ids",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "resolved_clear_skill_ids_unset",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "resolved_overlap_skill_ids",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "resolved_cannot_set_skill_refs",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "resolved_cannot_unset_skill_refs",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "model_disjoint_relation_update",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "resolved_disjoint_relation_update",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "model_preserves_source_attachment_property",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "prior_model_overlap_source_refs_still_rejected",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_resolved_overlap_source_refs_still_rejected",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_model_overlap_colSizes_still_rejected",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_resolved_overlap_colSizes_still_rejected",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_model_overlap_marginLeft_still_rejected",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_resolved_overlap_marginLeft_still_rejected",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_model_overlap_size_still_rejected",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_resolved_overlap_size_still_rejected",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_model_overlap_colSpan_still_rejected",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_resolved_overlap_colSpan_still_rejected",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_model_overlap_rowSpan_still_rejected",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_resolved_overlap_rowSpan_still_rejected",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_model_overlap_background_still_rejected",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_resolved_overlap_background_still_rejected",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_model_overlap_borders_still_rejected",
+      "layer": "schema",
+      "definition": "JdSetPropertiesCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "prior_resolved_overlap_borders_still_rejected",
+      "layer": "schema",
+      "definition": "JdResolvedEditCommand",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_task_relation_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "read_knowledge_reverse_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "read_skill_reverse_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "read_unused_item_empty_reverse_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "read_history_task_still_has_relations",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "read_task_requires_knowledge_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_task_unique_knowledge_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_task_requires_skill_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_task_unique_skill_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_jd_knowledge_requires_reverse",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_jd_skill_requires_reverse",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_task_cannot_have_reverse_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_item_cannot_have_task_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "read_plain_body_cannot_have_relation_refs",
+      "layer": "schema",
+      "definition": "JdReadTarget",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "manual_complete_value_v2",
+      "layer": "schema",
+      "definition": "JdManualSaveClientInput",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "manual_uses_same_grammar",
+      "layer": "schema",
+      "definition": "JdManualSaveClientInput",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "node_complete_value_v2",
+      "layer": "schema",
+      "definition": "JdPlateValidateValueRequest",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "valid_many_to_many_and_zero_links",
+      "layer": "finite-contract-model",
+      "expected": [],
+      "actual": [],
+      "mutated": false
+    },
+    {
+      "name": "reverse_users_derived_in_task_order",
+      "layer": "finite-contract-model",
+      "expected": [
+        "task-1",
+        "task-2"
+      ],
+      "actual": [
+        "task-1",
+        "task-2"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "missing_endpoint_is_shape_valid_app_must_check",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "missing_endpoint_rejected",
+      "layer": "finite-contract-model",
+      "expected": [
+        "missing:task-1:knowledge_ids:missing-k"
+      ],
+      "actual": [
+        "missing:task-1:knowledge_ids:missing-k"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "wrong_kind_is_shape_valid_app_must_check",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "wrong_kind_endpoint_rejected",
+      "layer": "finite-contract-model",
+      "expected": [
+        "wrong-kind:task-1:knowledge_ids:s-1"
+      ],
+      "actual": [
+        "wrong-kind:task-1:knowledge_ids:s-1"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "plain_paragraph_is_not_skill_item",
+      "layer": "finite-contract-model",
+      "expected": [
+        "wrong-kind:task-1:skill_ids:task-1-body"
+      ],
+      "actual": [
+        "wrong-kind:task-1:skill_ids:task-1-body"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "duplicate_id_is_shape_valid_app_must_check",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "global_duplicate_element_ids_rejected",
+      "layer": "finite-contract-model",
+      "expected": [
+        "duplicate-id:k-1",
+        "duplicate-id:k-1-title",
+        "duplicate-id:k-1-body"
+      ],
+      "actual": [
+        "duplicate-id:k-1",
+        "duplicate-id:k-1-title",
+        "duplicate-id:k-1-body"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "full_value_boundary_rechecks_duplicates",
+      "layer": "finite-contract-model",
+      "expected": [
+        "duplicate-link:task-1:knowledge_ids:k-1"
+      ],
+      "actual": [
+        "duplicate-link:task-1:knowledge_ids:k-1"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "same_id_r1_resolves_r1_definition",
+      "layer": "finite-contract-model",
+      "expected": "發布程序",
+      "actual": "發布程序",
+      "mutated": false
+    },
+    {
+      "name": "same_id_r2_resolves_r2_definition",
+      "layer": "finite-contract-model",
+      "expected": "修訂後發布程序",
+      "actual": "修訂後發布程序",
+      "mutated": false
+    },
+    {
+      "name": "same_id_other_document_is_distinct",
+      "layer": "finite-contract-model",
+      "expected": "另一份文件同 ID 的不同項目",
+      "actual": "另一份文件同 ID 的不同項目",
+      "mutated": false
+    },
+    {
+      "name": "missing_revision_no_fallback_to_current",
+      "layer": "finite-contract-model",
+      "expected": null,
+      "actual": null,
+      "mutated": false
+    },
+    {
+      "name": "foreign_revision_no_cross_document_fallback",
+      "layer": "finite-contract-model",
+      "expected": null,
+      "actual": null,
+      "mutated": false
+    },
+    {
+      "name": "missing_in_this_revision_no_later_lookup",
+      "layer": "finite-contract-model",
+      "expected": null,
+      "actual": null,
+      "mutated": false
+    },
+    {
+      "name": "issued_refs_map_to_saved_ids_preserving_order",
+      "layer": "finite-contract-model",
+      "expected": {
+        "ids": [
+          "k-2",
+          "k-1"
+        ]
+      },
+      "actual": {
+        "ids": [
+          "k-2",
+          "k-1"
+        ]
+      },
+      "mutated": false
+    },
+    {
+      "name": "raw_saved_id_is_not_issued",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "unissued"
+      },
+      "actual": {
+        "error": "unissued"
+      },
+      "mutated": false
+    },
+    {
+      "name": "guessed_same_batch_id_is_not_issued",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "unissued"
+      },
+      "actual": {
+        "error": "unissued"
+      },
+      "mutated": false
+    },
+    {
+      "name": "source_ref_is_not_relation_ref",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "unissued"
+      },
+      "actual": {
+        "error": "unissued"
+      },
+      "mutated": false
+    },
+    {
+      "name": "foreign_document_ref_rejected",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "wrong-document"
+      },
+      "actual": {
+        "error": "wrong-document"
+      },
+      "mutated": false
+    },
+    {
+      "name": "old_base_ref_rejected_at_new_base",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "wrong-revision"
+      },
+      "actual": {
+        "error": "wrong-revision"
+      },
+      "mutated": false
+    },
+    {
+      "name": "history_ref_is_read_only",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "read-only"
+      },
+      "actual": {
+        "error": "read-only"
+      },
+      "mutated": false
+    },
+    {
+      "name": "history_read_of_head_still_read_only",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "read-only"
+      },
+      "actual": {
+        "error": "read-only"
+      },
+      "mutated": false
+    },
+    {
+      "name": "skill_handle_not_knowledge_handle",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "wrong-or-missing-kind"
+      },
+      "actual": {
+        "error": "wrong-or-missing-kind"
+      },
+      "mutated": false
+    },
+    {
+      "name": "issued_record_cannot_override_actual_kind",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "wrong-or-missing-kind"
+      },
+      "actual": {
+        "error": "wrong-or-missing-kind"
+      },
+      "mutated": false
+    },
+    {
+      "name": "issued_record_must_resolve_existing_item",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "wrong-or-missing-kind"
+      },
+      "actual": {
+        "error": "wrong-or-missing-kind"
+      },
+      "mutated": false
+    },
+    {
+      "name": "distinct_handle_aliases_cannot_duplicate_target",
+      "layer": "finite-contract-model",
+      "expected": {
+        "error": "duplicate-target"
+      },
+      "actual": {
+        "error": "duplicate-target"
+      },
+      "mutated": false
+    },
+    {
+      "name": "empty_link_update_is_valid",
+      "layer": "finite-contract-model",
+      "expected": {
+        "ids": []
+      },
+      "actual": {
+        "ids": []
+      },
+      "mutated": false
+    },
+    {
+      "name": "rename_exposes_all_affected_tasks",
+      "layer": "finite-contract-model",
+      "expected": [
+        "task-1",
+        "task-2"
+      ],
+      "actual": [
+        "task-1",
+        "task-2"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "rename_does_not_change_task_text_sources_or_links",
+      "layer": "finite-contract-model",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "json_round_trip_preserves_full_value_and_links",
+      "layer": "finite-contract-model",
+      "expected": {
+        "document_id": "document-a",
+        "revision_id": "a-r1",
+        "value": [
+          {
+            "type": "jd_section",
+            "id": "work-section",
+            "section_kind": "work",
+            "children": [
+              {
+                "type": "jd_task",
+                "id": "task-0",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "task-0-body",
+                    "children": [
+                      {
+                        "text": "尚未填入專業對應的有效草稿。"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "task-0-outcomes",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-0-outcomes-p1",
+                        "children": [
+                          {
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "task-0-requirements",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-0-requirements-p1",
+                        "children": [
+                          {
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "jd_task",
+                "id": "task-1",
+                "knowledge_ids": [
+                  "k-1",
+                  "k-2"
+                ],
+                "skill_ids": [
+                  "s-1"
+                ],
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "task-1-body",
+                    "children": [
+                      {
+                        "text": "僅在主管核准後發布；緊急案件的優先順序尚未確認。"
+                      }
+                    ],
+                    "source_refs": [
+                      "source:issued-01"
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "task-1-outcomes",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-1-outcomes-p1",
+                        "children": [
+                          {
+                            "text": "可回查的核對紀錄。"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "task-1-outcomes-p2",
+                        "children": [
+                          {
+                            "text": "完整的發布內容。"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "task-1-requirements",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-1-requirements-p1",
+                        "children": [
+                          {
+                            "text": "逐項核對版本。"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "task-1-requirements-p2",
+                        "children": [
+                          {
+                            "text": "取得主管核准。"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "task-1-requirements-p3",
+                        "children": [
+                          {
+                            "text": "保留異常與處理依據。"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "jd_task",
+                "id": "task-2",
+                "knowledge_ids": [
+                  "k-1"
+                ],
+                "skill_ids": [
+                  "s-1",
+                  "s-2"
+                ],
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "task-2-body",
+                    "children": [
+                      {
+                        "text": "整理核對結果；不代替主管核准。"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "task-2-outcomes",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-2-outcomes-p1",
+                        "children": [
+                          {
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "task-2-requirements",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-2-requirements-p1",
+                        "children": [
+                          {
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "jd_section",
+            "id": "knowledge-section",
+            "section_kind": "knowledge",
+            "children": [
+              {
+                "type": "jd_knowledge",
+                "id": "k-1",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "k-1-title",
+                    "children": [
+                      {
+                        "text": "發布程序"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "k-1-body",
+                    "children": [
+                      {
+                        "text": "包括核准節點、權責分工及異常回報原則。"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "jd_knowledge",
+                "id": "k-2",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "k-2-title",
+                    "children": [
+                      {
+                        "text": "版本管理概念"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "k-2-body",
+                    "children": [
+                      {
+                        "text": "辨識目前基底、保存結果與歷史內容。"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "jd_section",
+            "id": "skills-section",
+            "section_kind": "skills",
+            "children": [
+              {
+                "type": "jd_skill",
+                "id": "s-1",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "s-1-title",
+                    "children": [
+                      {
+                        "text": "逐項核對"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "s-1-body",
+                    "children": [
+                      {
+                        "text": "能比較兩份內容並保留可回查的差異。"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "jd_skill",
+                "id": "s-2",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "s-2-title",
+                    "children": [
+                      {
+                        "text": "整理說明"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "s-2-body",
+                    "children": [
+                      {
+                        "text": "能依讀者需要呈現內容與必要條件。"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "actual": {
+        "document_id": "document-a",
+        "revision_id": "a-r1",
+        "value": [
+          {
+            "type": "jd_section",
+            "id": "work-section",
+            "section_kind": "work",
+            "children": [
+              {
+                "type": "jd_task",
+                "id": "task-0",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "task-0-body",
+                    "children": [
+                      {
+                        "text": "尚未填入專業對應的有效草稿。"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "task-0-outcomes",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-0-outcomes-p1",
+                        "children": [
+                          {
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "task-0-requirements",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-0-requirements-p1",
+                        "children": [
+                          {
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "jd_task",
+                "id": "task-1",
+                "knowledge_ids": [
+                  "k-1",
+                  "k-2"
+                ],
+                "skill_ids": [
+                  "s-1"
+                ],
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "task-1-body",
+                    "children": [
+                      {
+                        "text": "僅在主管核准後發布；緊急案件的優先順序尚未確認。"
+                      }
+                    ],
+                    "source_refs": [
+                      "source:issued-01"
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "task-1-outcomes",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-1-outcomes-p1",
+                        "children": [
+                          {
+                            "text": "可回查的核對紀錄。"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "task-1-outcomes-p2",
+                        "children": [
+                          {
+                            "text": "完整的發布內容。"
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "task-1-requirements",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-1-requirements-p1",
+                        "children": [
+                          {
+                            "text": "逐項核對版本。"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "task-1-requirements-p2",
+                        "children": [
+                          {
+                            "text": "取得主管核准。"
+                          }
+                        ]
+                      },
+                      {
+                        "type": "p",
+                        "id": "task-1-requirements-p3",
+                        "children": [
+                          {
+                            "text": "保留異常與處理依據。"
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "jd_task",
+                "id": "task-2",
+                "knowledge_ids": [
+                  "k-1"
+                ],
+                "skill_ids": [
+                  "s-1",
+                  "s-2"
+                ],
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "task-2-body",
+                    "children": [
+                      {
+                        "text": "整理核對結果；不代替主管核准。"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_outcomes",
+                    "id": "task-2-outcomes",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-2-outcomes-p1",
+                        "children": [
+                          {
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  },
+                  {
+                    "type": "jd_requirements",
+                    "id": "task-2-requirements",
+                    "children": [
+                      {
+                        "type": "p",
+                        "id": "task-2-requirements-p1",
+                        "children": [
+                          {
+                            "text": ""
+                          }
+                        ]
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "jd_section",
+            "id": "knowledge-section",
+            "section_kind": "knowledge",
+            "children": [
+              {
+                "type": "jd_knowledge",
+                "id": "k-1",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "k-1-title",
+                    "children": [
+                      {
+                        "text": "發布程序"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "k-1-body",
+                    "children": [
+                      {
+                        "text": "包括核准節點、權責分工及異常回報原則。"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "jd_knowledge",
+                "id": "k-2",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "k-2-title",
+                    "children": [
+                      {
+                        "text": "版本管理概念"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "k-2-body",
+                    "children": [
+                      {
+                        "text": "辨識目前基底、保存結果與歷史內容。"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "type": "jd_section",
+            "id": "skills-section",
+            "section_kind": "skills",
+            "children": [
+              {
+                "type": "jd_skill",
+                "id": "s-1",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "s-1-title",
+                    "children": [
+                      {
+                        "text": "逐項核對"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "s-1-body",
+                    "children": [
+                      {
+                        "text": "能比較兩份內容並保留可回查的差異。"
+                      }
+                    ]
+                  }
+                ]
+              },
+              {
+                "type": "jd_skill",
+                "id": "s-2",
+                "children": [
+                  {
+                    "type": "p",
+                    "id": "s-2-title",
+                    "children": [
+                      {
+                        "text": "整理說明"
+                      }
+                    ]
+                  },
+                  {
+                    "type": "p",
+                    "id": "s-2-body",
+                    "children": [
+                      {
+                        "text": "能依讀者需要呈現內容與必要條件。"
+                      }
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      "mutated": false
+    },
+    {
+      "name": "delete_referenced_k_reports_all_remaining_users",
+      "layer": "finite-contract-model",
+      "expected": [
+        "missing:task-1:knowledge_ids:k-1",
+        "missing:task-2:knowledge_ids:k-1"
+      ],
+      "actual": [
+        "missing:task-1:knowledge_ids:k-1",
+        "missing:task-2:knowledge_ids:k-1"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "delete_ancestor_checks_descendant_endpoints",
+      "layer": "finite-contract-model",
+      "expected": [
+        "missing:task-1:knowledge_ids:k-1",
+        "missing:task-1:knowledge_ids:k-2",
+        "missing:task-2:knowledge_ids:k-1"
+      ],
+      "actual": [
+        "missing:task-1:knowledge_ids:k-1",
+        "missing:task-1:knowledge_ids:k-2",
+        "missing:task-2:knowledge_ids:k-1"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "explicit_unlink_delete_final_candidate_shape",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "explicit_unlink_delete_final_candidate_valid",
+      "layer": "finite-contract-model",
+      "expected": [],
+      "actual": [],
+      "mutated": false
+    },
+    {
+      "name": "explicit_unlink_delete_keeps_task_body_and_sources",
+      "layer": "finite-contract-model",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "delete_task_does_not_require_deleting_shared_items",
+      "layer": "finite-contract-model",
+      "expected": [
+        [],
+        [
+          "task-2"
+        ],
+        "發布程序"
+      ],
+      "actual": [
+        [],
+        [
+          "task-2"
+        ],
+        "發布程序"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "move_preserves_links_and_changes_derived_task_order",
+      "layer": "finite-contract-model",
+      "expected": [
+        [],
+        [
+          "task-2",
+          "task-1"
+        ]
+      ],
+      "actual": [
+        [],
+        [
+          "task-2",
+          "task-1"
+        ]
+      ],
+      "mutated": false
+    },
+    {
+      "name": "task_only_copy_candidate_shape",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "task_only_copy_uses_existing_shared_definitions",
+      "layer": "finite-contract-model",
+      "expected": [
+        [],
+        [
+          "task-1",
+          "task-2",
+          "copy-task"
+        ],
+        2
+      ],
+      "actual": [
+        [],
+        [
+          "task-1",
+          "task-2",
+          "copy-task"
+        ],
+        2
+      ],
+      "mutated": false
+    },
+    {
+      "name": "whole_group_copy_candidate_shape",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "group_copy_maps_internal_and_keeps_external_links",
+      "layer": "finite-contract-model",
+      "expected": [
+        [],
+        [
+          "copy-task"
+        ],
+        [
+          "task-1",
+          "task-2"
+        ],
+        [
+          "copy-k-1",
+          "k-2"
+        ]
+      ],
+      "actual": [
+        [],
+        [
+          "copy-task"
+        ],
+        [
+          "task-1",
+          "task-2"
+        ],
+        [
+          "copy-k-1",
+          "k-2"
+        ]
+      ],
+      "mutated": false
+    },
+    {
+      "name": "unmapped_cross_document_candidate_rejected",
+      "layer": "finite-contract-model",
+      "expected": [
+        "missing:task-1:knowledge_ids:foreign-only-k"
+      ],
+      "actual": [
+        "missing:task-1:knowledge_ids:foreign-only-k"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "manual_orphan_link_is_shape_valid_not_semantically_valid",
+      "layer": "schema",
+      "definition": "JdManualSaveClientInput",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "manual_full_value_uses_same_relation_boundary",
+      "layer": "finite-contract-model",
+      "expected": [
+        "missing:task-1:knowledge_ids:missing-k"
+      ],
+      "actual": [
+        "missing:task-1:knowledge_ids:missing-k"
+      ],
+      "mutated": false
+    },
+    {
+      "name": "unwrap_task_alone_leaves_illegal_groups",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "unwrap_one_group_alone_leaves_incomplete_task",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": false,
+      "actual": false,
+      "mutated": false
+    },
+    {
+      "name": "explicit_unwrap_candidate_body_remains_valid",
+      "layer": "schema",
+      "definition": "JdDocumentValue",
+      "expected": true,
+      "actual": true,
+      "mutated": false
+    },
+    {
+      "name": "unwrap_does_not_transfer_outgoing_links_to_body",
+      "layer": "finite-contract-model",
+      "expected": [
+        [],
+        [
+          "task-2"
+        ],
+        {
+          "type": "p",
+          "id": "task-1-body",
+          "children": [
+            {
+              "text": "僅在主管核准後發布；緊急案件的優先順序尚未確認。"
+            }
+          ],
+          "source_refs": [
+            "source:issued-01"
+          ]
+        }
+      ],
+      "actual": [
+        [],
+        [
+          "task-2"
+        ],
+        {
+          "type": "p",
+          "id": "task-1-body",
+          "children": [
+            {
+              "text": "僅在主管核准後發布；緊急案件的優先順序尚未確認。"
+            }
+          ],
+          "source_refs": [
+            "source:issued-01"
+          ]
+        }
+      ],
+      "mutated": false
+    }
+  ],
+  "errors": [],
+  "representative_fixture": [
+    {
+      "type": "jd_section",
+      "id": "work-section",
+      "section_kind": "work",
+      "children": [
+        {
+          "type": "jd_task",
+          "id": "task-0",
+          "children": [
+            {
+              "type": "p",
+              "id": "task-0-body",
+              "children": [
+                {
+                  "text": "尚未填入專業對應的有效草稿。"
+                }
+              ]
+            },
+            {
+              "type": "jd_outcomes",
+              "id": "task-0-outcomes",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "task-0-outcomes-p1",
+                  "children": [
+                    {
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_requirements",
+              "id": "task-0-requirements",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "task-0-requirements-p1",
+                  "children": [
+                    {
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "jd_task",
+          "id": "task-1",
+          "knowledge_ids": [
+            "k-1",
+            "k-2"
+          ],
+          "skill_ids": [
+            "s-1"
+          ],
+          "children": [
+            {
+              "type": "p",
+              "id": "task-1-body",
+              "children": [
+                {
+                  "text": "僅在主管核准後發布；緊急案件的優先順序尚未確認。"
+                }
+              ],
+              "source_refs": [
+                "source:issued-01"
+              ]
+            },
+            {
+              "type": "jd_outcomes",
+              "id": "task-1-outcomes",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "task-1-outcomes-p1",
+                  "children": [
+                    {
+                      "text": "可回查的核對紀錄。"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "task-1-outcomes-p2",
+                  "children": [
+                    {
+                      "text": "完整的發布內容。"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_requirements",
+              "id": "task-1-requirements",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "task-1-requirements-p1",
+                  "children": [
+                    {
+                      "text": "逐項核對版本。"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "task-1-requirements-p2",
+                  "children": [
+                    {
+                      "text": "取得主管核准。"
+                    }
+                  ]
+                },
+                {
+                  "type": "p",
+                  "id": "task-1-requirements-p3",
+                  "children": [
+                    {
+                      "text": "保留異常與處理依據。"
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "jd_task",
+          "id": "task-2",
+          "knowledge_ids": [
+            "k-1"
+          ],
+          "skill_ids": [
+            "s-1",
+            "s-2"
+          ],
+          "children": [
+            {
+              "type": "p",
+              "id": "task-2-body",
+              "children": [
+                {
+                  "text": "整理核對結果；不代替主管核准。"
+                }
+              ]
+            },
+            {
+              "type": "jd_outcomes",
+              "id": "task-2-outcomes",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "task-2-outcomes-p1",
+                  "children": [
+                    {
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "jd_requirements",
+              "id": "task-2-requirements",
+              "children": [
+                {
+                  "type": "p",
+                  "id": "task-2-requirements-p1",
+                  "children": [
+                    {
+                      "text": ""
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jd_section",
+      "id": "knowledge-section",
+      "section_kind": "knowledge",
+      "children": [
+        {
+          "type": "jd_knowledge",
+          "id": "k-1",
+          "children": [
+            {
+              "type": "p",
+              "id": "k-1-title",
+              "children": [
+                {
+                  "text": "發布程序"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "k-1-body",
+              "children": [
+                {
+                  "text": "包括核准節點、權責分工及異常回報原則。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "jd_knowledge",
+          "id": "k-2",
+          "children": [
+            {
+              "type": "p",
+              "id": "k-2-title",
+              "children": [
+                {
+                  "text": "版本管理概念"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "k-2-body",
+              "children": [
+                {
+                  "text": "辨識目前基底、保存結果與歷史內容。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "jd_section",
+      "id": "skills-section",
+      "section_kind": "skills",
+      "children": [
+        {
+          "type": "jd_skill",
+          "id": "s-1",
+          "children": [
+            {
+              "type": "p",
+              "id": "s-1-title",
+              "children": [
+                {
+                  "text": "逐項核對"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "s-1-body",
+              "children": [
+                {
+                  "text": "能比較兩份內容並保留可回查的差異。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "jd_skill",
+          "id": "s-2",
+          "children": [
+            {
+              "type": "p",
+              "id": "s-2-title",
+              "children": [
+                {
+                  "text": "整理說明"
+                }
+              ]
+            },
+            {
+              "type": "p",
+              "id": "s-2-body",
+              "children": [
+                {
+                  "text": "能依讀者需要呈現內容與必要條件。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "scope": "JSON Schema plus a finite read-only contract model and fixed before/after candidates. No editor transforms, ref issuer, native normalization, real source ownership, database, ToolNode, provider, DOM, or natural-model proof."
+}

@@ -1,0 +1,1 @@
+{"status":"PASS","document":"e6eea974-03a2-4524-82c6-e75b98e6bc43","cases":["new API process + fresh browser context recovered exact current, every history/source, messages and original run results","history and canonical source read in same page, no second editable document"],"headed":true}

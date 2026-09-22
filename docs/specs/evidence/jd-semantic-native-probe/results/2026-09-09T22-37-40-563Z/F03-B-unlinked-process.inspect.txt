@@ -1,0 +1,11 @@
+{
+  pid: 0,
+  status: null,
+  signal: null,
+  error: {
+    code: 'EPERM',
+    message: 'spawnSync D:\\nodejs\\node.exe EPERM'
+  },
+  stdout: undefined,
+  stderr: undefined
+}

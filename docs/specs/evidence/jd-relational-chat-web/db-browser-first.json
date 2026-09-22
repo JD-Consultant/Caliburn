@@ -1,0 +1,154 @@
+{
+  "format_version": 1,
+  "checked_at_utc": "2026-09-13T05:10:05.720583+00:00",
+  "reviewer": "jd_ref_signer_preflight",
+  "fixture": "jd-ui-gate-89efc61691f442b9bffd5e16ee6d57a9",
+  "document_id": "f3249666-14fa-4134-9d34-2ee2f763711e",
+  "dataset_id": "0d9beb32-cbc1-42b1-b557-76bb86eaa09e",
+  "checks": {
+    "fixed_fixture_database_user_version_and_readonly_scope": true,
+    "current_domain_invariants": true,
+    "expected_head3_revisions3_operations2": true,
+    "document_active": true,
+    "current_rows_equal_head_snapshot": true,
+    "all_revision_content_digests_valid": true,
+    "linear_revision_chain": true,
+    "revision_origins_initial_ai_manual": true,
+    "unique_operation_ids": true,
+    "expected_task_detail_counts": true,
+    "details_belong_to_original_task": true,
+    "task_unassigned": true,
+    "synthetic_task_and_details_exact": true,
+    "manual_job_title_exact": true,
+    "manual_changed_only_job_title": true,
+    "operation_receipts_match_revision_chain": true,
+    "two_original_humans_two_complete_public_ai_texts": true,
+    "no_third_human_backend": true,
+    "unique_native_message_ids": true,
+    "native_latest_closed_completed": true,
+    "native_first_closed_completed": true,
+    "original_humans_match_run_digests": true,
+    "first_binding_exact_original_sql_receipt": true,
+    "second_run_has_no_mutation_binding_or_operation": true,
+    "second_run_starts_after_manual_revision": true,
+    "native_model_views_canonical_pairing_validated": true,
+    "helper_execute_observations_match_original_sql": true,
+    "fixture_two_chat_posts_four_closed_synthetic_sdk_responses": true
+  },
+  "method": "One PostgreSQL READ ONLY REPEATABLE READ transaction for SQL and native Saver reads. No invoke/update_state/setup/DB writes/provider calls.",
+  "relational": {
+    "head_number": 3,
+    "head_revision_id": "4478ca19-d7bb-4c12-b1b0-19263f6d3bf7",
+    "metadata_version": 1,
+    "revision_count": 3,
+    "operation_count": 2,
+    "content_counts": {
+      "collaborators": 0,
+      "duties": 0,
+      "tasks": 1,
+      "details": 3,
+      "capabilities": 0,
+      "conditions": 0,
+      "task_capabilities": 0,
+      "source_links": 0
+    },
+    "details_by_kind": {
+      "requirement": 1,
+      "outcome": 2
+    },
+    "revisions": [
+      {
+        "number": 1,
+        "revision_id": "cb611637-4154-40ff-a495-f5ee522d3b13",
+        "parent_revision_id": null,
+        "origin": "initial",
+        "content_digest": "515cfd94863ba1150c4b617b06ac43076a9c54eba9a76cefb1067ce46ad9571d"
+      },
+      {
+        "number": 2,
+        "revision_id": "3b59a8c8-8777-45c2-8585-6799245bd397",
+        "parent_revision_id": "cb611637-4154-40ff-a495-f5ee522d3b13",
+        "origin": "ai",
+        "content_digest": "688abe2499a06ad278f4c0e3faf5b8ca4986071ccc93197ab2841dc998f3a4e0"
+      },
+      {
+        "number": 3,
+        "revision_id": "4478ca19-d7bb-4c12-b1b0-19263f6d3bf7",
+        "parent_revision_id": "3b59a8c8-8777-45c2-8585-6799245bd397",
+        "origin": "manual",
+        "content_digest": "4095af9e68daacdb6069b5b540c7825d2dce8587357995379eaa7e5897af2945"
+      }
+    ],
+    "operations": [
+      {
+        "operation_id": "24ffbade-d4a5-4feb-85b6-e9ef3b5d006e",
+        "origin": "ai",
+        "run_id": "f8fd4e7b-f41b-4cdb-9a9a-a4113a5e5f31",
+        "status": "committed",
+        "command_kind": "jd_create_task",
+        "base_revision_id": "cb611637-4154-40ff-a495-f5ee522d3b13",
+        "result_revision_id": "3b59a8c8-8777-45c2-8585-6799245bd397",
+        "request_digest": "d6fed81f3260468f93968407a8def8d02b0feb03d8ddf6f94bb498cbc04d7158"
+      },
+      {
+        "operation_id": "feafe1f9-3644-4074-b856-7cbb232c61ce",
+        "origin": "manual",
+        "run_id": null,
+        "status": "committed",
+        "command_kind": "jd_set_text",
+        "base_revision_id": "3b59a8c8-8777-45c2-8585-6799245bd397",
+        "result_revision_id": "4478ca19-d7bb-4c12-b1b0-19263f6d3bf7",
+        "request_digest": "53816f7258451e572d4a8efd761136a74247f4269ca9f426ab88ba2bd889670e"
+      }
+    ],
+    "task_ids": [
+      "4897fc90-aa55-40d6-a710-3e596d76e963"
+    ],
+    "detail_ids": [
+      "2a9f5ff2-b276-4d0d-9df8-9c3a6bf17265",
+      "a3c9b188-3e1f-4099-918e-df9d5b53911b",
+      "b703cf38-0f80-4159-86c9-758fd8d0edac"
+    ]
+  },
+  "native": {
+    "latest_run_id": "1a8793a3-1df7-4fc5-af77-dc77c4b4abed",
+    "first_run_id": "f8fd4e7b-f41b-4cdb-9a9a-a4113a5e5f31",
+    "latest_status": "completed",
+    "latest_closed": true,
+    "first_status": "completed",
+    "first_closed": true,
+    "human_message_ids": [
+      "f8fd4e7b-f41b-4cdb-9a9a-a4113a5e5f31",
+      "1a8793a3-1df7-4fc5-af77-dc77c4b4abed"
+    ],
+    "public_ai_message_ids": [
+      "lc_run--01a09920-864a-7352-8d0b-d67d61dea8b2",
+      "lc_run--01a09922-bd63-7642-a722-b7a8538470fd"
+    ],
+    "all_message_count": 8,
+    "human_count": 2,
+    "ai_message_count": 4,
+    "public_ai_count": 2,
+    "tool_message_count": 2,
+    "first_binding_count": 1,
+    "second_binding_count": 0,
+    "root_checkpoint_id": "1f1af2ff-08e2-6e0d-8008-cbf1017b0476"
+  },
+  "fixture_observations": {
+    "chat_post_count": 2,
+    "chat_get_count": 3,
+    "sdk_request_count": 4,
+    "sdk_closed_body_count": 4,
+    "writer_execute_count": 2,
+    "provider_network": false,
+    "evidence_failed": false
+  },
+  "result": "PASS",
+  "limitations": [
+    "Independent read-only database/native-checkpoint review of one synthetic browser fixture, not natural provider evaluation.",
+    "Root browser session had a fresh-read interruption, then explicit refresh recovery; this review does not claim the first attempt was fault-free.",
+    "Third unsent text persistence is browser/IndexedDB evidence owned by root; this database review establishes only no third Human input was saved.",
+    "HTTP chat POST/SDK counts are fixture instrumentation, not PostgreSQL facts; SQL receipts independently verify two committed business operations.",
+    "No DPAPI/config secrets or full interview/task text included. No DB mutation/setup, graph invoke/update, server start, or provider call."
+  ]
+}

@@ -1,0 +1,92 @@
+{
+  "bugs": {
+    "url": "https://github.com/udecode/zustand-x/issues"
+  },
+  "dist": {
+    "shasum": "c04299ad17ceec6dd832f7fdee6fd776911988f6",
+    "tarball": "https://registry.npmjs.org/zustand-x/-/zustand-x-6.2.1.tgz",
+    "fileCount": 18,
+    "integrity": "sha512-y3nQMQNx3BORY95vpuodJvh/8AqQu++S3q6mJYBSo1J0Q168Sy+FatqER658YESDqv2bwviXcIT3bgl/Ip6M5g==",
+    "signatures": [
+      {
+        "sig": "MEUCIQDFJXa6VC+iwMVrvJlRDkNeyoV9F2Qq2uuh1pdOd00baQIgauOtuTPAm7AJVeTPbCfiNOlbC8fnsGPYmeRPVv1iYBE=",
+        "keyid": "SHA256:DhQ8wR5APBvFHLF/+Tc+AYvPOdTpcIDqOhxsBHRwC7U"
+      }
+    ],
+    "unpackedSize": 194340
+  },
+  "main": "dist/index.js",
+  "name": "zustand-x",
+  "types": "dist/index.d.ts",
+  "module": "dist/index.mjs",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "module": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./vanilla": {
+      "types": "./dist/lib/index.d.ts",
+      "import": "./dist/lib/index.mjs",
+      "module": "./dist/lib/index.mjs",
+      "require": "./dist/lib/index.js"
+    }
+  },
+  "gitHead": "78abd51d8e3414ed3ae8c9b577ec273e91bdab4b",
+  "license": "MIT",
+  "scripts": {
+    "brl": "yarn p:brl",
+    "lint": "yarn p:lint",
+    "test": "yarn p:test",
+    "build": "yarn p:build",
+    "clean": "yarn p:clean",
+    "lint:fix": "yarn p:lint:fix",
+    "typecheck": "yarn p:typecheck",
+    "test:watch": "yarn p:test:watch",
+    "build:watch": "yarn p:build:watch"
+  },
+  "_npmUser": {
+    "name": "zbeyens",
+    "email": "zbeyens@udecode.dev"
+  },
+  "homepage": "https://zustand-x.udecode.dev",
+  "keywords": [
+    "zustand"
+  ],
+  "repository": {
+    "url": "git+https://github.com/udecode/zustand-x.git",
+    "type": "git"
+  },
+  "_npmVersion": "10.8.2",
+  "description": "Zustand store factory for a best-in-class developer experience.",
+  "directories": {},
+  "maintainers": [
+    {
+      "name": "zbeyens",
+      "email": "zbeyens@udecode.dev"
+    }
+  ],
+  "sideEffects": false,
+  "_nodeVersion": "20.19.5",
+  "dependencies": {
+    "immer": "^10.0.3",
+    "mutative": "1.1.0",
+    "react-tracked": "^1.7.11",
+    "lodash.mapvalues": "^4.6.0",
+    "use-sync-external-store": "1.4.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "_hasShrinkwrap": false,
+  "peerDependencies": {
+    "zustand": ">=5.0.2"
+  },
+  "_npmOperationalInternal": {
+    "tmp": "tmp/zustand-x_6.2.1_1760629094470_0.2179239277539471",
+    "host": "s3://npm-registry-packages-npm-production"
+  },
+  "_id": "zustand-x@6.2.1",
+  "version": "6.2.1"
+}

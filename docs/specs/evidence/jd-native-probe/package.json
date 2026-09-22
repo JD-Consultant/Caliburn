@@ -1,0 +1,12 @@
+{
+  "name": "caliburn-jd-editor-native-probe",
+  "private": true,
+  "type": "module",
+  "scripts": { "probe": "node probe.mjs" },
+  "dependencies": {
+    "platejs": "53.3.11",
+    "@platejs/diff": "53.0.0",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  }
+}

@@ -1,0 +1,494 @@
+{
+  "browser": "153.0.8010.37",
+  "channel": "chrome",
+  "headed": true,
+  "OS_IME": "NOT RUN",
+  "network": [
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/workspace/2a0631c4-099d-4d3b-b89d-b479cfa18c90",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_src_app_globals_1jfs_-n.css",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_020za4m._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_next-devtools_index_0i-tx06.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_1r4gg59._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-server-dom-turbopack_1qs8bsa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_0eh-wsn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_client_1iy_1f_._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_07c1pr1._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40swc_helpers_cjs_01osh66._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_1anvha4._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/turbopack-experiments_jd-editor_web_10f7rtc._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_011_sho._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_1boebgf._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_server_browser_1dgj2n-.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_0ufbzhn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate_dist_index_es_04tuc_l.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_lodash_0nqrjx6._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_slate_dist_index_154h2_h.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_core_dist_0i5if2i._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate-react_dist_index_es_0fjcxe4.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_table_dist_0owi9th._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_list-classic_dist_0phwazw._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_ajv_dist_1wahgfa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_0ukaxp8._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/jd/manual-save",
+      "body": "{\"request_key\":\"3065246f-3384-4118-b55f-96dd8f73a6da\",\"base_revision_ref\":\"WyJyZXZpc2lvbiIsIjJhMDYzMWM0LTA5OWQtNGQzYi1iODlkLWI0NzljZmExOGM5MCIsImVhOGMyNjAwLTFmNTctNGI3NC04NDBiLTM1NDJhYzk0NjIwYiJd\",\"value\":[{\"type\":\"p\",\"id\":\"375e177c-31b0-49ec-ab32-4192ae2d74e9\",\"children\":[{\"text\":\"複製\",\"bold\":true},{\"text\":\"保真內容\"}]},{\"type\":\"p\",\"children\":[{\"text\":\"複製\",\"bold\":true},{\"text\":\"保真內容\"}],\"id\":\"4SWKU1twwE\"}]}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/jd",
+      "body": null
+    },
+    {
+      "method": "POST",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/jd/changes/read",
+      "body": "{\"change_ref\":\"WyJjaGFuZ2UiLCIyYTA2MzFjNC0wOTlkLTRkM2ItYjg5ZC1iNDc5Y2ZhMThjOTAiLCIxOTNjYjc3MC1iNmU5LTUxYTMtODA0NC0xYTIzNTFkNTE3NTAiLCJlYThjMjYwMC0xZjU3LTRiNzQtODQwYi0zNTQyYWM5NDYyMGIiLCIxZWQwOWE2Ni0yYTkyLTRhNTctYjYzZi00NWQ0NGMxZDQ2NzQiXQ\"}"
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/workspace/2a0631c4-099d-4d3b-b89d-b479cfa18c90",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_src_app_globals_1jfs_-n.css",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_020za4m._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_next-devtools_index_0i-tx06.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_1r4gg59._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-server-dom-turbopack_1qs8bsa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_0eh-wsn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_client_1iy_1f_._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_07c1pr1._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40swc_helpers_cjs_01osh66._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_1anvha4._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/turbopack-experiments_jd-editor_web_10f7rtc._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_web_011_sho._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_1boebgf._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_next_dist_compiled_react-dom_server_browser_1dgj2n-.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/experiments_jd-editor_0ufbzhn._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate_dist_index_es_04tuc_l.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_lodash_0nqrjx6._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_slate_dist_index_154h2_h.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_core_dist_0i5if2i._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_slate-react_dist_index_es_0fjcxe4.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_table_dist_0owi9th._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_%40platejs_list-classic_dist_0phwazw._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_ajv_dist_1wahgfa._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/0r5h_0ukaxp8._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:3001/_next/static/chunks/%5Bturbopack%5D_browser_dev_hmr-client_hmr-client_ts_1mojsay._.js",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/jd",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/messages",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/runs",
+      "body": null
+    },
+    {
+      "method": "GET",
+      "url": "http://127.0.0.1:8091/documents/2a0631c4-099d-4d3b-b89d-b479cfa18c90/jd",
+      "body": null
+    }
+  ],
+  "errors": [],
+  "document": "2a0631c4-099d-4d3b-b89d-b479cfa18c90",
+  "original": [
+    {
+      "type": "p",
+      "id": "375e177c-31b0-49ec-ab32-4192ae2d74e9",
+      "children": [
+        {
+          "text": "複製",
+          "bold": true
+        },
+        {
+          "text": "保真內容"
+        }
+      ]
+    }
+  ],
+  "selection": {
+    "text": "複製保真內容",
+    "anchor": 0,
+    "focus": 4
+  },
+  "clipboard": [
+    {
+      "text/plain": "複製保真內容",
+      "text/html": "<span data-slate-node=\"text\"><span data-slate-leaf=\"true\"><strong><strong class=\"slate-bold\"><span data-slate-string=\"true\">複製</span></strong></strong></span></span><span data-slate-node=\"text\" data-slate-fragment=\"JTVCJTdCJTIydHlwZSUyMiUzQSUyMnAlMjIlMkMlMjJpZCUyMiUzQSUyMjM3NWUxNzdjLTMxYjAtNDllYy1hYjMyLTQxOTJhZTJkNzRlOSUyMiUyQyUyMmNoaWxkcmVuJTIyJTNBJTVCJTdCJTIydGV4dCUyMiUzQSUyMiVFOCVBNCU4NyVFOCVBMyVCRCUyMiUyQyUyMmJvbGQlMjIlM0F0cnVlJTdEJTJDJTdCJTIydGV4dCUyMiUzQSUyMiVFNCVCRiU5RCVFNyU5QyU5RiVFNSU4NSVBNyVFNSVBRSVCOSUyMiU3RCU1RCU3RCU1RA==\"><span data-slate-leaf=\"true\"><span data-slate-string=\"true\">保真內容</span></span></span>"
+    }
+  ],
+  "saved": {
+    "status": "ok",
+    "read_kind": "current",
+    "revision_ref": "WyJyZXZpc2lvbiIsIjJhMDYzMWM0LTA5OWQtNGQzYi1iODlkLWI0NzljZmExOGM5MCIsIjFlZDA5YTY2LTJhOTItNGE1Ny1iNjNmLTQ1ZDQ0YzFkNDY3NCJd",
+    "access": "read_only",
+    "fragment": [
+      {
+        "type": "p",
+        "id": "375e177c-31b0-49ec-ab32-4192ae2d74e9",
+        "children": [
+          {
+            "text": "複製",
+            "bold": true
+          },
+          {
+            "text": "保真內容"
+          }
+        ]
+      },
+      {
+        "type": "p",
+        "id": "4SWKU1twwE",
+        "children": [
+          {
+            "text": "複製",
+            "bold": true
+          },
+          {
+            "text": "保真內容"
+          }
+        ]
+      }
+    ],
+    "targets": [
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjJhMDYzMWM0LTA5OWQtNGQzYi1iODlkLWI0NzljZmExOGM5MCIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6IjFlZDA5YTY2LTJhOTItNGE1Ny1iNjNmLTQ1ZDQ0YzFkNDY3NCIsInRhcmdldCI6IjM3NWUxNzdjLTMxYjAtNDllYy1hYjMyLTQxOTJhZTJkNzRlOSJ9",
+        "element": {
+          "type": "p",
+          "id": "375e177c-31b0-49ec-ab32-4192ae2d74e9",
+          "children": [
+            {
+              "text": "複製",
+              "bold": true
+            },
+            {
+              "text": "保真內容"
+            }
+          ]
+        },
+        "access": "read_only"
+      },
+      {
+        "target_ref": "jd-browser:eyJkb2N1bWVudCI6IjJhMDYzMWM0LTA5OWQtNGQzYi1iODlkLWI0NzljZmExOGM5MCIsImtpbmQiOiJ0YXJnZXQiLCJyZXZpc2lvbiI6IjFlZDA5YTY2LTJhOTItNGE1Ny1iNjNmLTQ1ZDQ0YzFkNDY3NCIsInRhcmdldCI6IjRTV0tVMXR3d0UifQ==",
+        "element": {
+          "type": "p",
+          "id": "4SWKU1twwE",
+          "children": [
+            {
+              "text": "複製",
+              "bold": true
+            },
+            {
+              "text": "保真內容"
+            }
+          ]
+        },
+        "access": "read_only"
+      }
+    ],
+    "selection": null,
+    "source_refs": [],
+    "change_refs": [
+      "WyJjaGFuZ2UiLCIyYTA2MzFjNC0wOTlkLTRkM2ItYjg5ZC1iNDc5Y2ZhMThjOTAiLCIxOTNjYjc3MC1iNmU5LTUxYTMtODA0NC0xYTIzNTFkNTE3NTAiLCJlYThjMjYwMC0xZjU3LTRiNzQtODQwYi0zNTQyYWM5NDYyMGIiLCIxZWQwOWE2Ni0yYTkyLTRhNTctYjYzZi00NWQ0NGMxZDQ2NzQiXQ"
+    ],
+    "continuation_ref": null
+  },
+  "events": [
+    {
+      "type": "copy",
+      "selected": "複製保真內容",
+      "types": [
+        "application/x-slate-fragment",
+        "text/html",
+        "text/plain"
+      ],
+      "text": "複製保真內容",
+      "html": "<span data-slate-node=\"text\"><span data-slate-leaf=\"true\"><strong><strong class=\"slate-bold\"><span data-slate-string=\"true\">複製</span></strong></strong></span></span><span data-slate-node=\"text\" data-slate-fragment=\"JTVCJTdCJTIydHlwZSUyMiUzQSUyMnAlMjIlMkMlMjJpZCUyMiUzQSUyMjM3NWUxNzdjLTMxYjAtNDllYy1hYjMyLTQxOTJhZTJkNzRlOSUyMiUyQyUyMmNoaWxkcmVuJTIyJTNBJTVCJTdCJTIydGV4dCUyMiUzQSUyMiVFOCVBNCU4NyVFOCVBMyVCRCUyMiUyQyUyMmJvbGQlMjIlM0F0cnVlJTdEJTJDJTdCJTIydGV4dCUyMiUzQSUyMiVFNCVCRiU5RCVFNyU5QyU5RiVFNSU4NSVBNyVFNSVBRSVCOSUyMiU3RCU1RCU3RCU1RA==\"><span data-slate-leaf=\"true\"><span data-slate-string=\"true\">保真內容</span></span></span>",
+      "fragment": "JTVCJTdCJTIydHlwZSUyMiUzQSUyMnAlMjIlMkMlMjJpZCUyMiUzQSUyMjM3NWUxNzdjLTMxYjAtNDllYy1hYjMyLTQxOTJhZTJkNzRlOSUyMiUyQyUyMmNoaWxkcmVuJTIyJTNBJTVCJTdCJTIydGV4dCUyMiUzQSUyMiVFOCVBNCU4NyVFOCVBMyVCRCUyMiUyQyUyMmJvbGQlMjIlM0F0cnVlJTdEJTJDJTdCJTIydGV4dCUyMiUzQSUyMiVFNCVCRiU5RCVFNyU5QyU5RiVFNSU4NSVBNyVFNSVBRSVCOSUyMiU3RCU1RCU3RCU1RA=="
+    },
+    {
+      "type": "paste",
+      "selected": "",
+      "types": [
+        "text/plain",
+        "text/html",
+        "application/x-slate-fragment"
+      ],
+      "text": "複製保真內容",
+      "html": "<html>\r\n<body>\r\n<!--StartFragment--><span data-slate-node=\"text\"><span data-slate-leaf=\"true\"><strong><strong class=\"slate-bold\"><span data-slate-string=\"true\">複製</span></strong></strong></span></span><span data-slate-node=\"text\" data-slate-fragment=\"JTVCJTdCJTIydHlwZSUyMiUzQSUyMnAlMjIlMkMlMjJpZCUyMiUzQSUyMjM3NWUxNzdjLTMxYjAtNDllYy1hYjMyLTQxOTJhZTJkNzRlOSUyMiUyQyUyMmNoaWxkcmVuJTIyJTNBJTVCJTdCJTIydGV4dCUyMiUzQSUyMiVFOCVBNCU4NyVFOCVBMyVCRCUyMiUyQyUyMmJvbGQlMjIlM0F0cnVlJTdEJTJDJTdCJTIydGV4dCUyMiUzQSUyMiVFNCVCRiU5RCVFNyU5QyU5RiVFNSU4NSVBNyVFNSVBRSVCOSUyMiU3RCU1RCU3RCU1RA==\"><span data-slate-leaf=\"true\"><span data-slate-string=\"true\">保真內容</span></span></span><!--EndFragment-->\r\n</body>\r\n</html>",
+      "fragment": "JTVCJTdCJTIydHlwZSUyMiUzQSUyMnAlMjIlMkMlMjJpZCUyMiUzQSUyMjM3NWUxNzdjLTMxYjAtNDllYy1hYjMyLTQxOTJhZTJkNzRlOSUyMiUyQyUyMmNoaWxkcmVuJTIyJTNBJTVCJTdCJTIydGV4dCUyMiUzQSUyMiVFOCVBNCU4NyVFOCVBMyVCRCUyMiUyQyUyMmJvbGQlMjIlM0F0cnVlJTdEJTJDJTdCJTIydGV4dCUyMiUzQSUyMiVFNCVCRiU5RCVFNyU5QyU5RiVFNSU4NSVBNyVFNSVBRSVCOSUyMiU3RCU1RCU3RCU1RA=="
+    }
+  ],
+  "ok": true
+}

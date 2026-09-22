@@ -2,7 +2,7 @@
 
 - 日期：2026-09-23
 - Topic：正式新 JD App 的 A／B1／B2 模型傳輸
-- Stage：Owner 已選遷移方向；隔離分支已有離線接線候選，**main 尚未切換 production、尚未送付費請求**。結果見[零付費接線證據](evidence/2026-09-23-gpt6-responses-offline.md)。
+- Stage：Owner 已選遷移方向；隔離分支已有離線接線候選，首次有界真服務端 smoke 在 `provider_model_mismatch` 停止；**main 尚未切換 production，工具往返與完整 App 仍未驗**。結果見[接線與 smoke 證據](evidence/2026-09-23-gpt6-responses-offline.md)。
 - 現行狀態與後續結果以 [`current-decisions.md`](../current-decisions.md) 為準；既有 `docs/specs/2026-09-17-openrouter-role-model-factory.md` 與 `docs/specs/2026-09-16-openrouter-continuation-compaction-design.md` 保留當時設計及驗收歷史。
 
 ## 目的與不變量

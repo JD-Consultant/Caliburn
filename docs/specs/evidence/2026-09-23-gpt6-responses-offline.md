@@ -1,9 +1,9 @@
-# GPT-6 Luna／Responses 零付費接線證據
+# GPT-6 Luna／Responses 接線與首次服務端證據
 
 - 日期：2026-09-23
 - 範圍：`codex/gpt6-luna-responses` 隔離分支；正式新 JD App `experiments/jd-relational-app`
-- 狀態：**CLIENT／OFFLINE PARTIAL**；非 OpenRouter 服務端或完整成品 PASS
-- 本輪外部 provider request：0；費用：US$0；未使用正式文件資料
+- 狀態：離線接線通過；首次服務端 smoke 因 `provider_model_mismatch` 停止；非工具往返或完整成品 PASS
+- 下列離線階段外部 provider request：0；費用：US$0；首次付費 smoke 的數據另記於本文末段；未使用正式文件資料
 
 ## 已核對
 
@@ -28,4 +28,15 @@
 
 ## 下一個最小 gate
 
+> 以下保留離線階段寫下的下一關；其第一次執行與新的停止點見下節，不再把這段「未授權外送」當成最新狀態。
+
 受影響真 PostgreSQL 測試與合成回覆模型身分已核對；下一關是在既有 P3 帳本下提出**單一受控服務端 smoke**：只回答 GPT-6 Luna／Responses／high＋工具能否實際往返，以及同筆回覆的 route／tier／cost 是否足以結算。送出前另核明確實外送上限、保守預留與 Owner 費用授權；若要查 generation metadata，該唯讀外送也計入請求上限。本文件不授權外送。若缺欄則依現有 fail-closed 停止，先核實 `X-Generation-Id` 與官方 metadata 查詢是否可對應同筆，再決定是否需最窄帳本補線；不改 Domain、不估零、不自動進入自然 P3。
+
+## 首次有界真服務端 smoke
+
+- 日期：2026-09-23。Owner 在離線接線後核准此獨立小 gate：最多 2 筆 GPT-6 Luna 模型請求，另可 1 筆唯讀 generation metadata 查詢；保守預留上限 US$0.54；只用合成資料與本機無副作用 `read_case` 工具，不准自動重試、fallback 或切正式 App。這不是自然 P3 或 Browser 授權。
+- 前置：正式新 App 隔離分支 `9cf68db5`、乾淨工作樹；Credential Manager 有 OpenRouter key（未輸出）；2026-09-23 唯讀公開端點清單列出 OpenAI 標準 `openai/gpt-6-luna` 端點，1.05M context 及標準／長上下文費率。OpenRouter [Service Tiers](https://openrouter.ai/docs/guides/features/service-tiers) 說明未指定非預設 tier 的請求不進 flex／priority 端點。現行 test-only `LunaBudgetPolicy` 對 A 的每筆最壞預留為 US$0.268644，兩筆共 US$0.537288。
+- 實際外送：`P3SpendGate`／正式 A role model 只送 **1 筆** `/api/v1/responses` POST（合成工具要求，high、`store=false`、OpenAI-only、no fallback、`max_output_tokens=8192`、非串流；此 request contract 由帳本在外送前檢查），回 HTTP **200**。帳本在 `validate_response` 的 `provider_model_mismatch` 停止；SDK 未取得該回覆，也沒有送第 2 筆模型請求。因此不能宣稱工具呼叫、reasoning continuation、final 已通過；後續 provider／cost 欄位可能仍有獨立相容問題。
+- 使用該回覆標頭 `X-Generation-Id` 做核准的 **1 筆**唯讀 `GET /api/v1/generation?id=…`，HTTP 200，返回同筆 ID、`model=openai/gpt-6-luna-20260922`、`provider_name=OpenAI`、`service_tier=default`、`total_cost=US$0.0000269`、119 input／8 output tokens。這證明 OpenRouter 記錄的實際路由與費用；原始 Responses 正文的 `model` 值未被帳本保存，只能確定它不等於目前白名單的未帶日期 slug。metadata 的 `api_type=completions`、`streamed=true` 與客戶端已驗的 Responses POST／非串流 request 不同層，暫不猜其內部含義。
+- 帳本精確停在 `attempt_count=1`、`spent_usd=0`、`retained_unknown_usd=0.268644`、`stop_reason=provider_model_mismatch`；唯讀查詢取得的實際費用**沒有**回寫或解鎖帳本。沒有 production code 修改、正式資料寫入、第二次模型請求或額外 metadata 重試。
+- 下一個停止點：先確認 dated model ID 是否為本次 alias 的可接受正式版本，以及如何在 test-only gate 保留原始回覆 model／provider／tier／cost 存在性的安全診斷；不能單憑 GET 成功就放寬所有檢查或重送模型。若需另一筆付費驗證，另核準確費用與請求上限。完整自然 P3、B1／B2 真模型、Browser、JD 品質與 main 切換仍 OPEN。

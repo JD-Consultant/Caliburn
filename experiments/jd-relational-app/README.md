@@ -1,6 +1,6 @@
-# 關聯式 JD：隔離編輯核心
+# Caliburn 關聯式 JD App（正式產品）
 
-**目前狀態（2026-09-18）：**A／B1／B2 的正式角色模型由單一 App factory 透過同一 OpenRouter credential 與 process-owned shared clients 建立，固定 OpenAI-only `openai/gpt-5.6-luna`、禁止 fallback、零 hidden retry；建構不送出模型請求。A 沿既有顧問 graph，B1／B2 由 document-scoped managed callback 注入已完成的 `BackgroundMemoryWorkflow`。App-side continuity compaction、分層 Memory workflow、dispatcher／恢復、managed callback 及 layered C 的正式工具、准入、原子 publication 與恢復均已完成離線切片；仍未完成自然模型／付費驗證、完整 App journey 與 production authority。B1／B2 的正式執行 profile 已由 App 統一；A 的 64 model／63 tool、有限修正與無工具收尾已完成 G7 離線施工與回歸，且最終失敗時的已保存 JD／公開邊界已核對。精確邊界見[角色模型工廠](../../docs/specs/2026-09-17-openrouter-role-model-factory.md)、[A 執行額度與安全收尾](../../docs/specs/2026-09-18-consultant-execution-budget-and-safe-finalization.md)、[分層 Memory 契約](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)與[目前決策](../../docs/current-decisions.md)。
+**目前狀態（2026-09-22）：**本目錄與 `web/` 已由 [ADR0077](../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 採用為唯一正式 JD App；根目錄 `pnpm dev`／`pnpm start` 是日常入口。A／B1／B2 由單一 App factory 使用同一 Windows Credential Manager OpenRouter key 與 process-owned shared clients，固定 OpenAI-only Luna、禁止 fallback、零 hidden retry。人與 LLM 共用關聯式 JD 業務規則；A 的訪談、Working State、按需 Memory／來源回查、JD 工具、非等待式背景通知與自然 final，B1／B2 的分層整理／publication，App-side continuation compaction、layered C、dispatcher／恢復，以及 browser 的本輪改動、來源原話與只撤回本輪 JD 都已接線。真實 Luna 已通過 A／B1／B2 元件、正式 16K compaction、JD O／P／K／S 成文與完整 App 受控旅程；最新一次 browser run 也完成帶來源的 task＋2 outcomes＋2 requirements 與自然 final。排除兩個既知 Windows ACL 測試模組後，切換前新 App 全套為 **3,075 passed／322 skipped／0 failed**；Web 為 **310 passed**，typecheck／production build 通過。這些不代表所有長期訪談品質與恢復分支已驗畢；精確結果見[元件與完整 App 驗收](../../docs/specs/evidence/2026-09-22-jd-component-first-acceptance.md)、[角色模型工廠](../../docs/specs/2026-09-17-openrouter-role-model-factory.md)、[A 執行額度與安全收尾](../../docs/specs/2026-09-18-consultant-execution-budget-and-safe-finalization.md)、[分層 Memory 契約](../../docs/specs/2026-09-16-layered-case-and-work-understanding-memory-alignment.md)與[目前決策](../../docs/current-decisions.md)。
 
 **歷史狀態（2026-09-15；未決 transport 已由後續 App-side compaction 決策取代）：**人可編輯的 relational JD App、既有顧問 graph、JD／Memory 工具與分段背景成果都保留。正式組裝已完成兩個切片：`serve` 從 Windows 認證管理員讀單一 OpenRouter key，有 key 才以 LangChain／LangGraph 建立 OpenAI-only `openai/gpt-5.6-luna` 顧問、禁止 fallback 並啟用 chat；無 key 時人工 JD 照常且 AI 關閉。B1 strict structured extraction 也已改走共用 OpenRouter route，保留自己的 prompt／輸出／重試；背景提示的 `document_id` 與本回合目前 Memory 讀取基準由每次 App runtime 執行提供，不在共用 graph 建立時固定。C 準備修改時才確認最新版，保存沿既有 publication CAS；C 成功後同輪固定在其 applied head，後來 B2 發布不會偷偷推進本輪。既有 B2 stale→reload→recompute 流程保留。關閉時先排空 App，再關 model clients。這些改動沒有改顧問 prompt、Skills、Memory 判斷、通知語意、B2 graph 或 publication schema；完整離線回歸 2934 passed／315 skipped，Memory 套件 155 passed，精確真 PG 競爭案例 1 passed。A／B2 的 Responses inline compaction 是當時未閉合的共同 transport 門：離線考卷證明 `ChatOpenAI Responses`→OpenRouter 候選可完整承接 item，但真服務端 smoke 在 OpenAI route、23,725 input tokens、`compact_threshold=12000` 下仍回 0 個 compaction item；1 次外送花費 US$0.00556460 後依用量護欄停止，分類 `UNVERIFIED`，不是 production PASS 或全域不支援宣告。精確歷史結果見 [OpenRouter live smoke](../../docs/specs/evidence/2026-09-15-openrouter-inline-compaction-live-smoke.md)、[H4 runtime 計畫](../../docs/plans/2026-09-14-jd-h4-runtime-integration.md)及[接線對齊稿](../../docs/specs/evidence/2026-09-15-jd-integration-document-reconciliation.md)；這段的未決下一步不得覆蓋 9/17 現況。
 
@@ -18,7 +18,7 @@
 
 ## 結構
 
-**顧問 Memory 讀取與分層 C 已接：**[固定選版／導覽／原話工具](../../docs/specs/2026-09-13-jd-memory-read-integration-slice.md)後續已擴充為正式分層 typed reads。`open_managed_app` 注入同宿主 Memory engine／原生 Store，前景入圖前固定讀取版本；A 從兩份 guide 起步，按需讀案例、工作理解與完整原話。layered C 只從同一回合已保存的讀取結果推導准入與 evidence keys，latest 已變即拒絕舊修改，成功則以完整 bundle 一次 CAS 並推進本回合基準；中斷只核原 START／request／receipt，不重播模型。自然模型品質與完整 App journey 仍待驗，以下較早「模型工具未接」均為歷史狀態。
+**顧問 Memory 讀取與分層 C 已接：**[固定選版／導覽／原話工具](../../docs/specs/2026-09-13-jd-memory-read-integration-slice.md)後續已擴充為正式分層 typed reads。`open_managed_app` 注入同宿主 Memory engine／原生 Store，前景入圖前固定讀取版本；A 從兩份 guide 起步，按需讀案例、工作理解與完整原話。layered C 只從同一回合已保存的讀取結果推導准入與 evidence keys，latest 已變即拒絕舊修改，成功則以完整 bundle 一次 CAS 並推進本回合基準；中斷只核原 START／request／receipt，不重播模型。真實元件與完整 App 受控旅程已通過；以下較早「模型工具未接／自然模型待驗」均為歷史狀態，不可覆蓋本頁首現況。
 
 **Memory 更正核心已可採用：**[C 六節點與原結果查回](../../docs/specs/2026-09-13-jd-memory-repair-core-slice.md)位於正常 `caliburn_memory` 套件，使用官方 patch／原生 staging／既有 publication；App 的來源 adapter 同步區分可修地址錯誤與服務故障。核心真PG驗兩檔更正、回覆遺失與新連線查回，JD／原話保留。後續已新增`repair_memory`接線；十五工具的WIP與恢復缺口見頁首，不把核心完成等同App全部完成。
 
@@ -79,17 +79,17 @@
 
 ## 重現
 
-本單位驗證 Python 3.12.13、Node 24.19.0。使用此目錄的 lock；不修改正式 App 依賴。安裝公開套件後，測試可以全程離線且不需要模型金鑰：
+本單位驗證 Python 3.12.13、Node 24.19.0 與 pnpm 12.5.1。Node workspace 使用根目錄 lock，Python 使用本目錄 lock；安裝公開套件後，測試可以全程離線且不需要模型金鑰：
 
 ```powershell
 uv sync --frozen
-npm ci --ignore-scripts --no-audit --no-fund
+pnpm install --dir ../.. --frozen-lockfile
 uv run --frozen --offline python scripts/generate_contract.py --check
 uv run --frozen --offline pytest -q -p no:cacheprovider
-node node_modules/typescript/bin/tsc -p tsconfig.json
+pnpm --dir ../.. --filter @caliburn/jd-relational-web typecheck
 ```
 
-若工具預設暫存目錄不可寫，將 uv 的 `--cache-dir` 指到可寫位置。`NODE_BINARY` 可指到正確的 Node 執行檔；在本機不要依賴全機舊版 npm wrapper 選中的 Node。產生器只用標準 CLI stdout，`--check` 不寫生成物。
+若工具預設暫存目錄不可寫，將 uv 的 `--cache-dir` 指到可寫位置。使用根目錄 `packageManager` 與 `engines` 指定的 pnpm／Node，不依賴全機舊 wrapper。產生器只用標準 CLI stdout，`--check` 不寫生成物。
 
 SDK 測試使用 `httpx2.MockTransport`、固定假 key 與 `offline.invalid`，封鎖 sockets 及環境／本地帳號探索；16 個編輯 wire、4 個讀取 wire 與 4 個差異 wire 測試各兩次 POST 都在程序內攔截。這只證明 SDK 序列化，未證明 provider 接受或模型自然選用。
 
@@ -132,7 +132,7 @@ Windows-only `pywin32==312` 使用 creator token 的 default DACL、不繼承 ha
 
 ### 本機維運入口
 
-在此目錄、固定 lock 環境執行。這是目前人工 API 的維運入口；六章管理畫面已接，圖形啟停尚在施工：
+日常維運從 repository 根目錄執行 `pnpm app:status`／`pnpm app:init`／`pnpm dev`；以下底層命令只供診斷、恢復與窄測試：
 
 ```powershell
 $env:PYTHONUTF8='1'
@@ -149,13 +149,15 @@ uv run --offline --frozen python -m jd_relational serve
 
 測試只用 repo 下合成 DPAPI 路徑及55436新 `caliburn_jd_setup_test_<uuid>` 資料庫。`test_config_file.py` 是真 Windows；`test_storage_setup_postgres.py` 用真PG與明標lease分支；`test_configured_host_native.py` 用真 Win32／DPAPI／PG／HTTP 新程序。native ReplaceFileW 在受限 token 下可能因保留原 ACL 所需權限失敗；測試記錄這個執行邊界，不為通過而改 ACL 或忽略錯誤。不碰日常 Known Folder 或正式 DB，不自動刪測試資料。
 
-## 待接責任
+## 歷史待接與目前剩餘責任
 
-目前／歷史 item、field、container、section 與觀察 refs 已發配／驗證，`command_context` 用同版讀取材料重核可寫用途、存在性與欄位摘要。來源查核仍是注入 callback，未接實際 source owner；讀取回 `readability=not_checked`。瀏覽器選區發配仍未完成，此接點明示拒絕 selection，不把 field ref 當選區。
+下方保留早期切片的待接文字，供追查迭代順序；凡與頁首 2026-09-22 狀態衝突者均為歷史。production authority 與根目錄啟動器已由 ADR0077 切換；更廣的員工實務資料與恢復情境仍可持續驗收。B1／B2 dispatcher、Memory publication、來源查看與本輪 JD 撤回已完成，不得再依舊段落重做。
 
-`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。固定設定與手動管理畫面已接，日常 configured API 包含無 refs recover 的資料集門閘。[備份與還原演練](../../docs/specs/2026-09-14-jd-backup-and-restore-slice.md)已完成：一份完整備份＝整個資料庫的 `pg_dump`（**不要用 `-n`**，`jd_runtime` 的對話與 Memory 在裡面）＋ `host.v1.dpapi`；還原後 JD 逐版 digest 與訪談 checkpoint 都相同，已發出的引用只有備份下來的簽章金鑰解得開，provider 金鑰不在備份內、還原後重新 `set-key --service openrouter`。世代輪替、異地保存與同名覆蓋還原尚未演練；前景顧問與 B1 route 已正式組裝但仍待真 PG／新程序完整旅程，B2 convergence 與背景 dispatcher 尚待接線。
+[歷史] 目前／歷史 item、field、container、section 與觀察 refs 已發配／驗證，`command_context` 用同版讀取材料重核可寫用途、存在性與欄位摘要。當時來源查核仍是注入 callback，尚未接實際 source owner；後續已接 canonical 訪談原話來源。瀏覽器選區發配仍未完成，此接點明示拒絕 selection，不把 field ref 當選區。
 
-文字自動保存、管理表單與原請求暫存已接，真瀏覽器重開可找回未完成內容；原生故障注入、實體 IME 及 AI 交接仍待驗。正文歷史還原／整輪撤回與維護尚未完成。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
+`WriterAuthority` 已由實際 writer 提供；同安裝 Windows 程序互斥／退出證據、PG 屏障及全 catalog 人工 pending 恢復已驗。支持範圍是所有寫入入口共用固定安裝 key／同 session，不能覆蓋繞過宿主的程序。query／manual／catalog 組合由宿主注入同一 `ManualRuntime`。固定設定與手動管理畫面已接，日常 configured API 包含無 refs recover 的資料集門閘。[備份與還原演練](../../docs/specs/2026-09-14-jd-backup-and-restore-slice.md)已完成：一份完整備份＝整個資料庫的 `pg_dump`（**不要用 `-n`**，`jd_runtime` 的對話與 Memory 在裡面）＋ `host.v1.dpapi`；還原後 JD 逐版 digest 與訪談 checkpoint 都相同，已發出的引用只有備份下來的簽章金鑰解得開，provider 金鑰不在備份內、還原後重新 `set-key --service openrouter`。世代輪替、異地保存與同名覆蓋還原尚未演練；早期「B2 convergence／dispatcher 尚待接線」已由後續受控旅程取代。
+
+文字自動保存、管理表單與原請求暫存已接，真瀏覽器重開可找回未完成內容；原生故障注入、實體 IME 及更廣 AI 交接情境仍待驗。整輪 JD 撤回已完成；產品不提供整份 JD 歷史還原。保存 service 能提供真 DB 觀察；外部結果／HTTP mapper 必須由接線層以該觀察投影，不能自行宣稱 COMMIT。正式格式沿十三表、v3 snapshot 與永久回執，沒有另一份文件權威。
 
 原兩工具及來源 digest 見[首切片](../../docs/specs/2026-09-13-jd-relational-command-slice.md)；目前八工具、分層與錯誤／診斷、289 項結果及通過界線見[本次設計與結果](../../docs/specs/2026-09-13-jd-management-operations-slice.md)。
 

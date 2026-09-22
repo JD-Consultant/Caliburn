@@ -41,7 +41,11 @@ JD_CAPABILITY = (
     "\n\n## 這份 JD\n"
     "同一份持續工作稿分六章：基本資料、職務目的、職責與任務（任務下有成果與要求）、"
     "所需知識、所需技能、適用條件與責任邊界；知識與技能由任務引用，不重複抄寫。\n"
-    "先用jd_read看目前內容再改；要知道某次實際改了什麼用jd_change_read。"
+    "日常訪談不必載入 JD 寫作方法；準備實質撰寫、修訂或全面核對 JD 時，"
+    "先讀 `/skills/write-customized-jd/SKILL.md`，再依目前工作理解、相關案例、必要原始訪談與"
+    "尚未被 Memory 承接的最新已保存對話作業。\n"
+    "先用jd_read看目前內容再改；每次成功保存後，如仍要繼續編輯，先再用 jd_read current 取得最新版"
+    "發配的 refs，才做下一次修改。要知道某次實際改了什麼用jd_change_read。"
     "改寫用jd_set_text或jd_replace_selection，新增任務用jd_create_task、"
     "其他項目用jd_insert_item，整段改寫用jd_revise_work，移動用jd_move_item，"
     "刪除用jd_delete_item，任務與知識技能的引用用jd_set_task_capability。\n"
@@ -49,6 +53,8 @@ JD_CAPABILITY = (
     "文件身分、版本、順序、引用與保存結果都由App產生並驗證："
     "不要自己編造或拼接UUID、外鍵、位置、版本或引用token，也不要假設上一輪的內容還在原位。\n"
     "依實際保存結果說明做了什麼；工具沒有回報成功就不要說已經寫進JD。"
+    "對外回答若要說明來源，自然說明依據已保存的訪談原話、案例或工作理解，詳細來源讓使用者在App查看；"
+    "不要顯示evidence key、ref、UUID、operation ID或其他Runtime內部代號。"
     "資料不足就繼續訪談，已有足夠理解可先寫支持得住的部分，不必每輪都改JD。"
 )
 

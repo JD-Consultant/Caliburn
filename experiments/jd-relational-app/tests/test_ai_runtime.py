@@ -27,11 +27,26 @@ from jd_relational.observation_projection import project_observation
 from jd_relational.reads import read_json
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import DocumentCheckpoints, DocumentState, build_document_graph
+from jd_relational.working_state import (
+    WORKING_STATE_UPDATE_KIND, WorkingStateUpdateInput, working_state_digest,
+)
 from test_foreground_runtime import ForegroundStorage, ai_intent, run_identity
 from test_manual_runtime import observation
 
 
 HEAD = UUID("5d0edc37-c9d9-40c9-a4f1-70b79f5b1cd2")
+
+
+def _model_arguments(value):
+    """Build the model-facing view from a canonical test command."""
+    if isinstance(value, list):
+        return [_model_arguments(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    return {
+        ("basis_evidence_keys" if key == "basis_refs" else key): _model_arguments(item)
+        for key, item in value.items()
+    }
 
 
 class SyntheticStorage(ForegroundStorage):
@@ -261,7 +276,7 @@ def test_unanswered_read_is_closed_with_error_without_reinvoking_the_model(make_
     assert saved[-1].tool_call_id == "read-call" and saved[-1].name == "jd_read"
 
 
-@pytest.mark.parametrize("name", ["ls", "grep", "read_file", "read_conversation"])
+@pytest.mark.parametrize("name", ["ls", "grep", "read_file", "read_evidence"])
 @pytest.mark.parametrize("answered", [False, True])
 def test_memory_reads_close_without_write_receipts_or_replay(make_runtime, name, answered):
     make, _ = make_runtime
@@ -477,9 +492,10 @@ def _receipt_fixture():
     intent = ai_intent(identity)
     codec = ReferenceCodec(b"synthetic-ai-runtime-test-key-32", str(uuid4()))
     command = intent.command
+    model_value = _model_arguments(command["arguments"])
     call = AIMessage(id="bound-ai", content="", tool_calls=[{
-        "id": "bound-call", "name": command["tool"], "args": command["arguments"]}])
-    digest = sha256(json.dumps({"name": command["tool"], "args": command["arguments"]},
+        "id": "bound-call", "name": command["tool"], "args": model_value}])
+    digest = sha256(json.dumps({"name": command["tool"], "args": model_value},
         ensure_ascii=False, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     binding = decode_ai_binding({"format_version": 1, "dataset_id": codec.dataset_id,
         "document_id": identity.document_id, "run_id": identity.run_id,
@@ -510,6 +526,69 @@ def test_saved_success_must_match_the_original_receipt(fault):
     else:
         with pytest.raises(AiRuntimeError, match="^invalid_saved_tool_result$"):
             _verify_saved_results(messages, bindings, receipts, codec)
+
+
+def test_saved_working_state_success_must_match_original_call_and_final_checkpoint_state():
+    dataset, document, run = (str(uuid4()) for _ in range(3))
+    codec = ReferenceCodec(b"synthetic-ai-runtime-test-key-32", dataset)
+    arguments = {"operations": [{
+        "op": "create",
+        "subject": "故障升級",
+        "known_and_open": "升級條件仍待確認。",
+        "information_needed": "取得一次實際案例。",
+        "make_focus": True,
+    }]}
+    state = {
+        "format_version": 1,
+        "focus_item_id": "wi_" + "1" * 32,
+        "items": [{
+            "item_id": "wi_" + "1" * 32,
+            "subject": "故障升級",
+            "known_and_open": "升級條件仍待確認。",
+            "why_it_matters": None,
+            "information_needed": "取得一次實際案例。",
+            "status": "open",
+            "priority": "normal",
+            "source_refs": [],
+            "related_refs": [],
+        }],
+    }
+    call = AIMessage(id="working-ai", content="", tool_calls=[{
+        "id": "working-call", "name": "update_interview_working_state", "args": arguments,
+    }])
+    artifact = {
+        "format_version": 1,
+        "kind": WORKING_STATE_UPDATE_KIND,
+        "dataset_id": dataset,
+        "document_id": document,
+        "run_id": run,
+        "input_digest": working_state_digest(
+            WorkingStateUpdateInput.model_validate(arguments, strict=True).model_dump(mode="json"),
+        ),
+        "state_digest": working_state_digest(state),
+    }
+    result = ToolMessage(
+        id="working-result", tool_call_id="working-call",
+        name="update_interview_working_state", status="success", artifact=artifact,
+        content=read_json({
+            "status": "updated", "effect": "working_state_updated",
+            "created": [{"operation_index": 0, "item_id": "wi_" + "1" * 32}],
+            "focus_item_id": "wi_" + "1" * 32, "item_count": 1,
+        }),
+    )
+    messages = [HumanMessage(id=run, content="本輪"), call, result]
+    _verify_saved_results(
+        messages, (), {}, codec, run_id=run, dataset_id=dataset,
+        document_id=document, working_state=state,
+    )
+
+    tampered = deepcopy(state)
+    tampered["items"][0]["known_and_open"] = "被竄改"
+    with pytest.raises(AiRuntimeError, match="^invalid_saved_tool_result$"):
+        _verify_saved_results(
+            messages, (), {}, codec, run_id=run, dataset_id=dataset,
+            document_id=document, working_state=tampered,
+        )
 
 
 @pytest.mark.parametrize("following", [HumanMessage(content="next"), AIMessage(content="next"),

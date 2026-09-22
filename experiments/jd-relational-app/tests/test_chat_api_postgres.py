@@ -197,15 +197,15 @@ def test_http_failed_final_model_keeps_saved_input_and_confirmed_committed_jd(mo
     marker = "SyntheticPrivateFinalModelFailure"
 
     def failed_final(payload):
-        assert payload["tools"] == [] and payload["tool_choice"] == "none"
+        assert payload["tools"] and payload["tool_choice"] == "none"
         raise httpx2.ReadError(marker)
 
     # Preserve the real JD write first, then use successful read-only model
     # turns to reach the reserved 64th request.  The final failure therefore
-    # exercises the Runtime no-tools finalization path, not an ordinary model
+    # exercises the Runtime tool-disabled finalization path, not an ordinary model
     # request that happened to be the last fixture item.
     plan = [_read, _create, *([_read] * 61), failed_final]
-    with _offline_model(monkeypatch, plan, allow_final_no_tools=True) as (model, requests):
+    with _offline_model(monkeypatch, plan, allow_finalization=True) as (model, requests):
         with _runtime(engine, model) as (runtime, owner, graph):
             document = owner.create_document(uuid4(), "合成 HTTP 已保存但最後回覆失敗")
             run, text = str(uuid4()), "建立約定設備檢查工作，先確認隔離並保留檢查及交接結果。"

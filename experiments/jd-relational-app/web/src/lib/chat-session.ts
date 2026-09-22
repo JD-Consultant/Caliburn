@@ -42,6 +42,7 @@ export class ChatController {
   private messages: ChatMessage[] = [];
   private run: ChatRunState | null = null;
   private runId: string | null = null;
+  private statusReadFailures = 0;
 
   constructor(api: ChatApi, id: string, port: ChatPort, notify: (value: ChatSnapshot) => void) {
     this.api = api; this.id = id; this.port = port; this.notify = notify; this.dataset = api.datasetId;
@@ -60,7 +61,10 @@ export class ChatController {
   private stopTimer() { if (this.timer !== null) clearTimeout(this.timer); this.timer = null; }
   private schedule() {
     this.stopTimer();
-    if (this.disposed || this.busy || this.error || !active(this.run)) return;
+    if (this.disposed || this.busy || !active(this.run)) return;
+    // A transient read-only status failure may cross the server's closure
+    // boundary. Recheck that same run once; never replay its POST or tools.
+    if (this.error && !(this.error.code === 'service_unavailable' && this.statusReadFailures === 1)) return;
     // An explicit active response permits another observation, never a replay.
     this.timer = setTimeout(() => { this.timer = null; void this.poll(); }, 2000);
   }
@@ -95,7 +99,7 @@ export class ChatController {
     return this.port.chatOriginal()?.request.run_id ?? this.runId ?? this.page?.anchor_run_id ?? null;
   }
   private selectRun(runId: string | null) {
-    if (this.run?.run_id !== runId) this.run = null;
+    if (this.run?.run_id !== runId) { this.run = null; this.statusReadFailures = 0; }
     this.runId = runId; this.emit();
   }
   private async observe(value: ChatRunState, runId: string) {
@@ -114,7 +118,15 @@ export class ChatController {
   }
   private async status(runId: string) {
     this.selectRun(runId);
-    const state = await this.api.chatStatus(this.id, runId);
+    let state: ChatRunState;
+    try {
+      state = await this.api.chatStatus(this.id, runId);
+    } catch (error) {
+      if (active(this.run) && error instanceof ApiError && error.code === 'service_unavailable')
+        this.statusReadFailures++;
+      throw error;
+    }
+    this.statusReadFailures = 0;
     if (!this.disposed) await this.observe(state, runId);
     return state;
   }

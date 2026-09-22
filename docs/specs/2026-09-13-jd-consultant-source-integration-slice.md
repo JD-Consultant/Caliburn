@@ -2,6 +2,8 @@
 
 狀態：隔離接合已驗，JD-R002／OI-02 局部；2026-09-13。入口：[施工計畫](../plans/2026-09-13-jd-relational-app-implementation.md)、[未解事項](2026-09-13-jd-app-open-issues.md)。當輪改動畫面已收斂，不增舊對話選輪入口。
 
+> **2026-09-20 model-view successor：**本稿驗證的 source owner、signed locator、固定原話回查與 JD `jd_source_link` 保存仍有效；「把 `source_ref` 直接送給模型再由模型回填」則由[跨顧問、Memory 與 JD 的模型安全證據契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)取代。正式 ref 留在 Runtime／artifact／JD，A 只看並提交本 run 的 `evidence_key`。這是待施工的 adapter 對齊，不改本稿當時的實測事實。
+
 ## 效果與責任
 
 先接通「本輪已保存原話 → 顧問取得引用 → JD 共用保存驗證 → 固定原話回查」。原話繼續由同一 native Saver 保存；不新增原話表，不將 JD 當 Memory，不引用可反覆改寫的 Memory 路徑冒充永久原話。本切片不宣稱完整 Memory、背景整理、專業指引或自然訪談品質已完成。

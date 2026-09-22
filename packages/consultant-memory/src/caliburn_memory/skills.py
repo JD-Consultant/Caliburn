@@ -65,8 +65,8 @@ def analysis_files(assets: SkillAssets, memory: BackendProtocol | None = None):
 
 def analysis_skills(assets: SkillAssets):
     return SkillsMiddleware(
-        backend=analysis_files(assets), sources=[('/skills/', 'Analysis methods')],
-        system_prompt="""## 按需分析方法
+        backend=analysis_files(assets), sources=[('/skills/', 'Consultant methods')],
+        system_prompt="""## 按需工作方法
 {skills_locations}{skills_load_warnings}
 {skills_list}
 以上僅是方法名稱、用途及讀取路徑。需要該方法時，使用既有 read_file 讀取列出的

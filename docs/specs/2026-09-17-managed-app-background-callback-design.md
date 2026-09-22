@@ -249,6 +249,6 @@ Task 5 commit `9dbef03d` 與最終獨立複核完成後，於同一最終 HEAD �
 
 ## 11. 下一 gate 與未完成邊界
 
-本 managed callback 的窄 G7 已完成。依既有 [MEM-L001 分層 Memory 路由](2026-09-16-layered-case-and-work-understanding-memory-alignment.md)，**唯一下一 gate 是獨立的 layered C bundle repair**；本切片不自動開始該工作。
+本 managed callback 的窄 G7 已完成。這裡記錄的「下一 gate 是 layered C」是當時施工順序；layered C 已由後續切片完成。2026-09-20 之後的目前路由依 [`current-decisions.md`](../current-decisions.md) 與[跨顧問、Memory 與 JD 的模型安全證據契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)，不由本歷史切片另設競爭中的下一題。
 
 其後仍須分開完成自然模型／付費驗證、完整瀏覽器 App 旅程與 production authority 正式化。現行產品仍是單 process、host lease、單一背景 worker；若未來要改為多 App process／多 worker 共用同一 DB，必須在拓撲變更前新增並驗證 DB 原子 admission claim，不能以目前的 process-local coordinator map 冒充跨 process 保證。

@@ -8,12 +8,13 @@ memory. A missing cache never triggers source reads or command reconstruction.
 from dataclasses import dataclass, field
 from hashlib import sha256
 import json
+from types import SimpleNamespace
 from typing import Any
 from uuid import UUID, uuid4
 
 from langchain.agents.middleware import AgentMiddleware, AgentState, hook_config
 from langchain.tools import ToolRuntime
-from langchain_core.messages import AIMessage, ToolMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.tools import StructuredTool
 from langgraph.config import get_config
 from langgraph.errors import GraphBubbleUp
@@ -29,7 +30,9 @@ from .reads import ReadError, command_context
 from .references import ReferenceCodec
 from .storage.history import HistoryError
 from .storage.receipts import WriteObservation
-from .transport import DESCRIPTIONS, MODELS, TransportError, model_command, tool_output
+from .transport import DESCRIPTIONS, MODELS, TransportError, model_arguments, model_command, tool_output
+from .working_state import WORKING_STATE_TOOL_NAMES
+from caliburn_memory.requests import REQUEST_TOOL_NAME
 
 
 class AiToolError(ValueError):
@@ -54,6 +57,21 @@ _BINDING_KEYS = frozenset({"format_version", "dataset_id", "document_id", "run_i
     "tool_call_id", "input_digest", "operation_id", "base_revision_id", "origin", "request_digest", "command_kind"})
 _READ_KEYS = frozenset({"format_version", "dataset_id", "document_id", "run_id", "revision_id",
                       "tool_message_id", "tool_call_id", "content_digest"})
+_JD_READ_ARTIFACT_KEYS = frozenset({
+    "format_version", "kind", "dataset_id", "document_id", "run_id",
+    "tool_call_id", "content_digest", "canonical_result", "evidence",
+})
+
+
+@dataclass(frozen=True)
+class RuntimeEvidence:
+    """One Runtime-owned source handle available to the current A run."""
+    evidence_key: str
+    source_reference: str
+    scope_kind: str
+    scope_id: str
+    status: str
+    next_offset: int | None = 0
 
 
 def _json(value):
@@ -135,9 +153,10 @@ def verify_binding_message(binding: AiToolBinding, messages) -> None:
         if len(matching) != 1 or matching[0].invalid_tool_calls or len(matching[0].tool_calls) != 1:
             raise ValueError()
         call = matching[0].tool_calls[0]
+        model_value = model_arguments(call["name"], call["args"])
         command = model_command(call["name"], call["args"])
         if (call["id"] != binding.tool_call_id or command["tool"] != binding.command_kind
-                or _digest(_json({"name": command["tool"], "args": command["arguments"]})) != binding.input_digest):
+                or _digest(_json({"name": command["tool"], "args": model_value["arguments"]})) != binding.input_digest):
             raise ValueError()
     except Exception:
         raise AiToolError("invalid_ai_binding") from None
@@ -157,9 +176,180 @@ def _error_result(error):
     code = getattr(error, "code", None)
     if code == "selection_not_available":
         return _unbound("目前沒有可驗證的來源或選區接點；本次未進入保存。", "stop")
-    if code in {"invalid_ref", "stale_view", "target_missing", "revision_missing", "read_required"}:
+    if code == "invalid_ref":
+        return _unbound(
+            "提交的引用不是最新一次成功的 jd_read current 發配的相容可寫引用；"
+            "請重新讀取；新增子項時從 type=container 記錄依 child_kind／owner_ref 配對後"
+            "原樣複製 container_ref，不可使用 item_ref 或 type=item 記錄中的 container_ref，"
+            "不可推測、縮短或沿用舊引用；本次未進入保存。",
+            "reread_current",
+        )
+    if code in {"stale_view", "target_missing", "revision_missing", "read_required"}:
         return _unbound("請先用 jd_read current 取得本輪目前稿與可寫引用；本次未進入保存。", "reread_current")
+    if code == "invalid_jd_evidence":
+        return _unbound("目前的 JD 讀取接點已失效；請重新用 jd_read current 取得本輪內容。", "reread_current")
+    if code == "source_not_read":
+        return _unbound("請先用 read_evidence 完整讀取本輪已提供的證據；本次未進入保存。")
     return _unbound("本次工具參數不符；請依具名工具的欄位與限制修正。")
+
+
+def _jd_read_message(name: str, call_id: str, result: dict, *, dataset_id: str,
+                     document_id: str, run_id: str) -> ToolMessage:
+    try:
+        serialize = read_tool_output if name == "jd_read" else change_tool_output
+        envelope = serialize("anthropic", call_id, result)
+        canonical = json.loads(envelope["content"])
+        projected, evidence = _project_jd_read_result(
+            canonical, dataset_id=dataset_id, document_id=document_id, run_id=run_id,
+        )
+        content = _json(projected)
+        artifact = {
+            "format_version": 1, "kind": name, "dataset_id": dataset_id,
+            "document_id": document_id, "run_id": run_id,
+            "tool_call_id": call_id, "content_digest": _digest(content),
+            "canonical_result": canonical,
+            "evidence": [entry.__dict__ for entry in evidence],
+        }
+        return ToolMessage(id=str(uuid4()), name=name, tool_call_id=call_id,
+                           content=content, artifact=artifact,
+                           status="error" if envelope["is_error"] else "success")
+    except Exception:
+        raise AiToolError("invalid_tool_result") from None
+
+
+def _decode_jd_read_message(message: ToolMessage, *, name: str, call_id: str,
+                            dataset_id: str | None = None,
+                            document_id: str | None = None,
+                            run_id: str | None = None) -> tuple[dict, tuple[RuntimeEvidence, ...]]:
+    """Validate one model-safe JD read and recover its canonical private result."""
+    try:
+        artifact = message.artifact
+        if (type(message.name) is not str or message.name != name
+                or message.tool_call_id != call_id or type(message.content) is not str
+                or type(artifact) is not dict or set(artifact) != _JD_READ_ARTIFACT_KEYS
+                or artifact["format_version"] != 1 or artifact["kind"] != name
+                or artifact["tool_call_id"] != call_id
+                or artifact["content_digest"] != _digest(message.content)
+                or name not in {"jd_read", "jd_change_read"}):
+            raise ValueError("invalid_jd_read_artifact")
+        for expected, actual in (
+            (dataset_id, artifact["dataset_id"]),
+            (document_id, artifact["document_id"]),
+            (run_id, artifact["run_id"]),
+        ):
+            if expected is not None and actual != expected:
+                raise ValueError("invalid_jd_read_scope")
+        if not all(_identifier(artifact[key]) for key in ("dataset_id", "document_id", "run_id")):
+            raise ValueError("invalid_jd_read_scope")
+
+        canonical = artifact["canonical_result"]
+        serialize = read_tool_output if name == "jd_read" else change_tool_output
+        envelope = serialize("anthropic", call_id, canonical)
+        expected_status = "error" if envelope["is_error"] else "success"
+        if message.status != expected_status:
+            raise ValueError("invalid_jd_read_status")
+        canonical = json.loads(envelope["content"])
+        projected, evidence = _project_jd_read_result(
+            canonical,
+            dataset_id=artifact["dataset_id"],
+            document_id=artifact["document_id"],
+            run_id=artifact["run_id"],
+        )
+        if (_json(projected) != message.content
+                or [entry.__dict__ for entry in evidence] != artifact["evidence"]):
+            raise ValueError("invalid_jd_read_projection")
+        return canonical, evidence
+    except AiToolError:
+        raise
+    except Exception:
+        raise AiToolError("invalid_jd_evidence") from None
+
+
+def _merge_evidence(target: dict[str, RuntimeEvidence], entries) -> None:
+    for entry in entries:
+        if entry.evidence_key in target and target[entry.evidence_key] != entry:
+            raise AiToolError("invalid_jd_evidence")
+        target[entry.evidence_key] = entry
+
+
+def reproject_active_evidence_catalog(runtime, state=None) -> dict[str, RuntimeEvidence]:
+    """Rebuild A's active evidence view from canonical checkpoint owners.
+
+    This is deliberately a projection, not a cache or a new registry.  It is
+    called again after request-only compaction and after checkpoint restore so
+    the model-facing keys are always derived from the canonical messages,
+    private ToolMessage artifacts, Working State, and existing Memory proof.
+    A continuation summary is never an input to this projection and therefore
+    cannot create a key, read proof, or JD basis.
+    """
+    from .working_state import working_evidence_catalog
+    from .memory_context import layered_read_proof, memory_session
+
+    context = runtime.context
+    state = state if state is not None else getattr(runtime, "state", {})
+    messages = state.get("messages", ())
+    catalog = jd_evidence_catalog(runtime, state)
+    source_notice = getattr(context, "source_notice", None)
+    raw_source = source_notice(messages) if source_notice is not None else None
+    working_state = state.get("interview_working_state")
+    if working_state is not None or raw_source is not None:
+        working = working_evidence_catalog(
+            state=working_state, context=context,
+            messages=messages, raw_source_notice=raw_source,
+        )
+        _merge_evidence(catalog, (RuntimeEvidence(
+            value.evidence_key, value.source_reference, value.scope_kind, value.scope_id,
+            value.status, value.next_offset,
+        ) for value in working.values()))
+    # Node-style middleware receives the current state as the hook argument;
+    # LangChain's hook Runtime carries context/store but does not expose that
+    # state as ``runtime.state``.  Reuse the existing session validator with
+    # the same state explicitly, as the model middleware already does.
+    session = (memory_session(SimpleNamespace(context=context, state=state,
+                                               store=runtime.store))
+               if getattr(context, "memory_session", None) is not None else None)
+    if session is not None and session.head is not None:
+        try:
+            if session.artifacts.bundle_base(session.head.memory) is not None:
+                proof = layered_read_proof(
+                    messages, dataset_id=session.dataset_id, document_id=session.document_id,
+                    run_id=session.run_id, revision=session.head.revision,
+                    version_id=session.head.memory.version_id,
+                )
+                for case_id, mapping in proof.case_evidence.items():
+                    for key, reference in mapping.items():
+                        _merge_evidence(catalog, [RuntimeEvidence(
+                            key, reference, "case", case_id,
+                            "read_complete" if (case_id, key) in proof.complete_case_evidence else "available",
+                            proof.evidence_next_offsets.get(key, 0),
+                        )])
+        except Exception as error:
+            if isinstance(error, AiToolError):
+                raise
+            raise AiToolError("invalid_jd_evidence") from None
+    return catalog
+
+
+def _resolve_model_evidence(value: object, catalog: dict[str, RuntimeEvidence]) -> object:
+    if isinstance(value, list):
+        return [_resolve_model_evidence(item, catalog) for item in value]
+    if not isinstance(value, dict):
+        return value
+    result = {}
+    for key, item in value.items():
+        if key == "basis_refs":
+            if not isinstance(item, list) or len(set(item)) != len(item):
+                raise AiToolError("invalid_jd_evidence")
+            resolved = []
+            for evidence_key in item:
+                entry = catalog.get(evidence_key)
+                if entry is None or entry.status not in {"visible", "read_complete"}:
+                    raise AiToolError("source_not_read")
+                resolved.append(entry.source_reference)
+            result[key] = resolved
+        else:
+            result[key] = _resolve_model_evidence(item, catalog)
+    return result
 
 
 @dataclass(frozen=True)
@@ -171,6 +361,194 @@ class _Prepared:
     error: dict | None = field(default=None, repr=False)
     intent: BoundEdit | None = field(default=None, repr=False)
     binding: dict | None = field(default=None, repr=False)
+
+
+def _jd_evidence_key(*, dataset_id: str, document_id: str, run_id: str,
+                     target_ref: str, related_capability_ref: str | None,
+                     source_reference: str) -> str:
+    from .memory_context import issue_scoped_evidence_key
+    scope_id = f"{target_ref}|{related_capability_ref or ''}"
+    return issue_scoped_evidence_key(
+        dataset_id=dataset_id, document_id=document_id, run_id=run_id,
+        scope_kind="jd_source", scope_id=scope_id,
+        source_reference=source_reference,
+    )
+
+
+def _project_jd_read_result(value: dict, *, dataset_id: str, document_id: str,
+                            run_id: str) -> tuple[dict, tuple[RuntimeEvidence, ...]]:
+    """Hide signed source locators while retaining source order and read state."""
+    entries: dict[str, RuntimeEvidence] = {}
+
+    def source_key(item: dict, source_reference: str) -> str:
+        target_ref = item.get("target_ref")
+        related_capability_ref = item.get("related_capability_ref")
+        if (not _identifier(target_ref, 4096)
+                or related_capability_ref is not None and not _identifier(related_capability_ref, 4096)
+                or not _identifier(source_reference, 4096)):
+            raise AiToolError("invalid_jd_evidence")
+        key = _jd_evidence_key(
+            dataset_id=dataset_id, document_id=document_id, run_id=run_id,
+            target_ref=target_ref,
+            related_capability_ref=related_capability_ref,
+            source_reference=source_reference,
+        )
+        entry = RuntimeEvidence(key, source_reference, "jd_source",
+                                f"{target_ref}|{related_capability_ref or ''}",
+                                "available", 0)
+        previous = entries.get(key)
+        if previous is not None and previous != entry:
+            raise AiToolError("invalid_jd_evidence")
+        entries[key] = entry
+        return key
+
+    def visit(item):
+        if isinstance(item, list):
+            return [visit(value) for value in item]
+        if not isinstance(item, dict):
+            return item
+        result = {key: visit(value) for key, value in item.items()}
+        if item.get("type") == "source" and isinstance(item.get("source_ref"), str):
+            source_reference = item["source_ref"]
+            result.pop("source_ref", None)
+            result["evidence_key"] = source_key(item, source_reference)
+            result["read_status"] = "available"
+        elif item.get("type") == "source_placement":
+            target_ref = item.get("target_ref")
+            related_capability_ref = item.get("related_capability_ref")
+            if (not _identifier(target_ref, 4096)
+                    or related_capability_ref is not None
+                    and not _identifier(related_capability_ref, 4096)):
+                raise AiToolError("invalid_jd_evidence")
+            for old, new in (("previous_source_ref", "previous_evidence_key"),
+                             ("next_source_ref", "next_evidence_key")):
+                source_reference = item.get(old)
+                if source_reference is not None:
+                    result.pop(old, None)
+                    result[new] = source_key(item, source_reference)
+        return result
+
+    return visit(value), tuple(entries.values())
+
+
+def jd_evidence_catalog(runtime, state=None) -> dict[str, RuntimeEvidence]:
+    """Rebuild JD source handles from trusted private read artifacts."""
+    try:
+        state = state if state is not None else getattr(runtime, "state", {})
+        scope = runtime.context
+        dataset_id, document_id, run_id = scope.dataset_id, scope.document_id, scope.run_id
+        messages = state.get("messages", ())
+        starts = [index for index, message in enumerate(messages)
+                  if isinstance(message, HumanMessage) and message.id == run_id]
+        # Production A runs mark their first HumanMessage with run_id. Keep a
+        # narrow compatibility fallback for isolated unit fixtures that do not
+        # carry that marker; they have no prior-turn evidence to trust.
+        scoped = messages[starts[0]:] if len(starts) == 1 else messages
+        catalog: dict[str, RuntimeEvidence] = {}
+        calls = {}
+        evidence_calls = {}
+        for message in scoped:
+            if isinstance(message, AIMessage):
+                for call in message.tool_calls:
+                    if call.get("name") in {"jd_read", "jd_change_read"}:
+                        calls[call.get("id")] = call
+                    elif call.get("name") == "read_evidence":
+                        evidence_calls[call.get("id")] = call
+        for message in scoped:
+            if (not isinstance(message, ToolMessage) or message.tool_call_id not in calls
+                    or message.status != "success"):
+                continue
+            call = calls[message.tool_call_id]
+            _, projected_entries = _decode_jd_read_message(
+                message,
+                name=call.get("name"),
+                call_id=message.tool_call_id,
+                dataset_id=dataset_id,
+                document_id=document_id,
+                run_id=run_id,
+            )
+            for entry in projected_entries:
+                if (not _identifier(entry.evidence_key, 64)
+                        or not _identifier(entry.source_reference, 4096)
+                        or not _identifier(entry.scope_id, 4096)
+                        or entry.scope_kind != "jd_source"
+                        or entry.status not in {"available", "read_complete"}
+                        or (entry.next_offset is not None
+                            and (type(entry.next_offset) is not int or entry.next_offset < 0))):
+                    raise AiToolError("invalid_jd_evidence")
+                previous = catalog.get(entry.evidence_key)
+                if previous is not None:
+                    if (previous.source_reference, previous.scope_kind, previous.scope_id) != (
+                            entry.source_reference, entry.scope_kind, entry.scope_id):
+                        raise AiToolError("invalid_jd_evidence")
+                    # Re-reading a JD page must not erase an already completed
+                    # evidence read.  JD projections begin at offset zero;
+                    # foreground read progress is applied below.
+                    if previous.next_offset is None or entry.next_offset is None:
+                        entry = RuntimeEvidence(
+                            entry.evidence_key, entry.source_reference, entry.scope_kind,
+                            entry.scope_id, "read_complete", None,
+                        )
+                    elif previous.next_offset != 0:
+                        entry = previous
+                catalog[entry.evidence_key] = entry
+        for message in scoped:
+            if (not isinstance(message, ToolMessage)
+                    or message.tool_call_id not in evidence_calls
+                    or message.status != "success"):
+                continue
+            artifact = message.artifact
+            call = evidence_calls[message.tool_call_id]
+            # read_evidence is shared by JD, layered Memory and Working State.
+            # Their own validators own these known foreign artifacts; an
+            # unknown kind still fails closed below.
+            if type(artifact) is dict and artifact.get("kind") in {
+                    "evidence", "working_evidence"}:
+                continue
+            if (type(artifact) is not dict or set(artifact) != {
+                    "format_version", "kind", "dataset_id", "document_id", "run_id",
+                    "scope_kind", "scope_id", "evidence_key", "source_reference",
+                    "read_offset", "next_offset", "content_digest"
+                } or artifact.get("format_version") != 1
+                    or artifact.get("kind") != "jd_evidence"
+                    or (artifact.get("dataset_id"), artifact.get("document_id"), artifact.get("run_id"))
+                    != (dataset_id, document_id, run_id)
+                    or artifact.get("content_digest") != _digest(message.content)):
+                raise AiToolError("invalid_jd_evidence")
+            key = call.get("args", {}).get("evidence_key")
+            entry = catalog.get(key)
+            if (entry is None or entry.scope_kind != "jd_source"
+                    or artifact.get("scope_kind") != entry.scope_kind
+                    or artifact.get("scope_id") != entry.scope_id
+                    or artifact.get("evidence_key") != key
+                    or artifact.get("source_reference") != entry.source_reference):
+                raise AiToolError("invalid_jd_evidence")
+            expected_offset = entry.next_offset
+            if expected_offset is None:
+                expected_offset = 0
+            offset = artifact.get("read_offset")
+            following = artifact.get("next_offset")
+            if (type(offset) is not int or offset != expected_offset
+                    or (following is not None
+                        and (type(following) is not int or following <= offset))):
+                raise AiToolError("invalid_jd_evidence")
+            try:
+                payload = json.loads(message.content)
+            except Exception:
+                raise AiToolError("invalid_jd_evidence") from None
+            if (type(payload) is not dict or payload.get("evidence_key") != key
+                    or payload.get("has_more") is not (following is not None)):
+                raise AiToolError("invalid_jd_evidence")
+            catalog[key] = RuntimeEvidence(
+                entry.evidence_key, entry.source_reference, entry.scope_kind,
+                entry.scope_id, "read_complete" if following is None else "available",
+                following,
+            )
+        return catalog
+    except AiToolError:
+        raise
+    except Exception:
+        raise AiToolError("invalid_jd_evidence") from None
 
 
 class AiToolSession:
@@ -216,7 +594,16 @@ class AiToolSession:
             if (message.name != "jd_read" or message.status != "success" or message.tool_call_id != value["tool_call_id"]
                     or type(message.content) is not str or _digest(message.content) != value["content_digest"]):
                 raise ValueError()
-            page = ReadPage.model_validate(json.loads(message.content), strict=True)
+            artifact = message.artifact
+            if (type(artifact) is not dict or artifact.get("format_version") != 1
+                    or artifact.get("kind") != "jd_read"
+                    or artifact.get("tool_call_id") != value["tool_call_id"]
+                    or artifact.get("content_digest") != value["content_digest"]
+                    or type(artifact.get("canonical_result")) is not dict):
+                raise ValueError()
+            # The model sees the evidence-key projection. The writer still
+            # validates the private canonical JD read produced by the App.
+            page = ReadPage.model_validate(artifact["canonical_result"], strict=True)
             if page.access != "current" or page.view not in {"current", "item", "section"}:
                 raise ValueError()
             reference = self.codec.resolve(page.revision_ref, document_id=self.document_id,
@@ -227,7 +614,7 @@ class AiToolSession:
         except Exception:
             raise ReadError("read_required") from None
 
-    def prepare(self, state):
+    def prepare(self, state, runtime=None):
         message = state["messages"][-1]
         if not isinstance(message, AIMessage) or message.invalid_tool_calls:
             raise AiToolError("invalid_tool_call")
@@ -262,15 +649,22 @@ class AiToolSession:
             if name == "jd_read":
                 parse_read_arguments(call["args"])
                 prepared = _Prepared(name, message.id, call_id, digest)
-            elif name in MEMORY_READ_NAMES:
+            elif (name in MEMORY_READ_NAMES or name in WORKING_STATE_TOOL_NAMES
+                  or name == REQUEST_TOOL_NAME):
                 # Native ToolNode owns these tools' argument validation. They
-                # cannot create a JD write binding or operation receipt.
+                # cannot create a JD write binding or operation receipt. The
+                # consolidation notification has its own receipt artifact,
+                # but no JD operation binding.
                 prepared = _Prepared(name, message.id, call_id, digest)
             elif name == "jd_change_read":
                 parse_change_arguments(call["args"])
                 prepared = _Prepared(name, message.id, call_id, digest)
             else:
                 command = model_command(name, call["args"])
+                if runtime is not None:
+                    command = _resolve_model_evidence(
+                        command, reproject_active_evidence_catalog(runtime, state)
+                    )
                 base = self._read_base(state)
                 original = self.history.read_revision(self.document_id, base)
                 context = command_context(original.domain, command, self.codec, self.source_resolver, lambda: str(uuid4()))
@@ -291,6 +685,10 @@ class AiToolSession:
             if error.code not in {"document_missing", "revision_missing"}:
                 raise AiToolError("ai_tool_unavailable") from None
             prepared = _Prepared(name, message.id, call_id, digest, error=_error_result(ReadError("target_missing")))
+        except AiToolError as error:
+            if error.code not in {"source_not_read", "invalid_jd_evidence"}:
+                raise
+            prepared = _Prepared(name, message.id, call_id, digest, error=_error_result(error))
         except GraphBubbleUp:
             raise
         except Exception:
@@ -324,7 +722,10 @@ class AiToolSession:
                 raise
             except Exception:
                 raise AiToolError("ai_tool_unavailable") from None
-            message = _message(name, prepared.call_id, result)
+            message = _jd_read_message(
+                name, prepared.call_id, result, dataset_id=self.dataset_id,
+                document_id=self.document_id, run_id=self.run_id,
+            )
             if name == "jd_read" and result.get("access") == "current" and result.get("view") in {"current", "item", "section"}:
                 ref = self.codec.resolve(result["revision_ref"], document_id=self.document_id,
                                          roles={"revision"}, purposes={"history"})
@@ -372,7 +773,9 @@ class AiToolSession:
 def _call_identity(call):
     try:
         name, call_id, args = call["name"], call["id"], call["args"]
-        if name not in {*MODELS, "jd_read", "jd_change_read", *MEMORY_READ_NAMES}:
+        if name not in {
+                *MODELS, "jd_read", "jd_change_read", *MEMORY_READ_NAMES,
+                *WORKING_STATE_TOOL_NAMES, REQUEST_TOOL_NAME}:
             raise AiToolError("unknown_tool")
         if not _identifier(call_id) or type(args) is not dict:
             raise ValueError()
@@ -443,7 +846,7 @@ class AiToolMiddleware(AgentMiddleware):
             _session(runtime)
             from .memory_repair_session import repair_session
             return repair_session(runtime).prepare(state, runtime)
-        return _session(runtime).prepare(state)
+        return _session(runtime).prepare(state, runtime)
 
     async def aafter_model(self, state, runtime):
         import asyncio

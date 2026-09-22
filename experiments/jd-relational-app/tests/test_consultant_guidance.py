@@ -58,10 +58,12 @@ def test_every_verified_interview_sentence_survives_verbatim(verified):
         position = found
 
 
-def test_the_unadopted_jd_tail_is_gone_but_its_general_rule_is_kept(verified):
+def test_the_old_jd_tail_is_not_copied_but_the_current_on_demand_route_is_explicit(verified):
     guidance = build_consultant_guidance()
-    assert "write-customized-jd" not in guidance
-    assert "按需讀write-customized-jd方法與目前稿" not in guidance
+    assert UNADOPTED_TAIL[0] not in guidance
+    assert "/skills/write-customized-jd/SKILL.md" in JD_CAPABILITY
+    assert "實質撰寫" in JD_CAPABILITY and "全面核對" in JD_CAPABILITY
+    assert "日常訪談" in JD_CAPABILITY and "不必載入" in JD_CAPABILITY
     assert "不製作" not in guidance and "不編輯JD" not in guidance
     assert GENERAL_CONDUCT == "不顯示隱藏推理。"
     assert GENERAL_CONDUCT in verified and GENERAL_CONDUCT in guidance
@@ -81,6 +83,20 @@ def test_jd_capability_covers_the_six_chapters_and_refuses_model_authored_identi
     assert "成果" in JD_CAPABILITY and "要求" in JD_CAPABILITY
     for owned in ("UUID", "外鍵", "位置", "版本", "引用token"):
         assert owned in JD_CAPABILITY, owned
+
+
+def test_jd_capability_requires_a_fresh_current_read_after_each_saved_change():
+    assert "每次成功保存後" in JD_CAPABILITY
+    assert "再用 jd_read current 取得最新版" in JD_CAPABILITY
+    assert "才做下一次修改" in JD_CAPABILITY
+
+
+def test_final_explains_sources_without_exposing_runtime_handles():
+    assert "對外回答" in JD_CAPABILITY
+    assert "已保存的訪談原話" in JD_CAPABILITY
+    for runtime_handle in ("evidence key", "ref", "UUID", "operation ID"):
+        assert runtime_handle in JD_CAPABILITY, runtime_handle
+    assert "不要顯示" in JD_CAPABILITY
 
 
 def test_memory_actions_are_verbatim_and_only_mention_registered_tools():

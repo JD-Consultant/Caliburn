@@ -55,7 +55,7 @@ class RoleAwareModel(BaseChatModel):
         is_summary = bool(
             messages
             and isinstance(messages[0], SystemMessage)
-            and messages[0].content == SUMMARY_SYSTEM_PROMPT
+            and messages[0].content.startswith(SUMMARY_SYSTEM_PROMPT)
         )
         target = self.summary_requests if is_summary else self.main_requests
         replies = self.summary_replies if is_summary else self.main_replies

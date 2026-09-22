@@ -16,6 +16,7 @@ from jd_relational.consultant_execution import (
     ConsultantExecutionMiddleware,
     decide_consultant_execution,
 )
+from jd_relational.consultant_tools import _jd_read_message
 from jd_relational.consultant_model import MAX_MODEL_STEPS, MAX_TOOL_CALLS
 from jd_relational.generated.reads import ReadPage
 from jd_relational.result_transport import validate_result
@@ -181,6 +182,46 @@ def test_previous_employee_runs_do_not_consume_the_new_child_budget():
     assert decision.reason is None
 
 
+def test_projected_jd_source_read_is_valid_execution_input():
+    """A model-safe evidence key must not make App execution reject its own read."""
+    run_id = str(uuid4())
+    call_id = f"call-{uuid4()}"
+    request = AIMessage(
+        id=f"message-{uuid4()}",
+        content="",
+        tool_calls=[{
+            "name": "jd_read",
+            "args": {"view": "current", "target_ref": None, "cursor": None},
+            "id": call_id,
+            "type": "tool_call",
+        }],
+    )
+    canonical = _read_page()
+    canonical["records"] = [{
+        "type": "source",
+        "section_ref": "section-ref",
+        "target_ref": "target-ref",
+        "related_capability_ref": None,
+        "source_ref": "private-source-reference",
+        "basis_status": "current",
+        "readability": "not_checked",
+    }]
+    canonical["total_records"] = 1
+    reply = _jd_read_message(
+        "jd_read",
+        call_id,
+        canonical,
+        dataset_id="dataset-id",
+        document_id="document-id",
+        run_id=run_id,
+    )
+
+    decision = _decision([_human(run_id), request, reply], run_id)
+
+    assert decision.finalize is False
+    assert decision.reason is None
+
+
 def test_malformed_known_tool_result_fails_closed():
     run_id = str(uuid4())
     messages = [_human(run_id)]
@@ -211,7 +252,7 @@ def _model_request(run_id, *, model_requests_used, messages=None, system_blocks=
     )
 
 
-def test_request_64_has_no_tools_and_explicit_none_tool_choice():
+def test_request_64_keeps_the_same_tools_but_explicitly_disables_tool_choice():
     run_id = str(uuid4())
     request = _model_request(run_id, model_requests_used=63)
     seen = []
@@ -224,11 +265,30 @@ def test_request_64_has_no_tools_and_explicit_none_tool_choice():
 
     assert isinstance(response, ModelResponse)
     assert len(seen) == 1
-    assert seen[0].tools == []
+    assert seen[0].tools == request.tools
     assert seen[0].tool_choice == "none"
-    assert seen[0].model_settings["tool_choice"] == "none"
-    assert "strict" not in seen[0].model_settings
+    assert "tools" not in seen[0].model_settings
+    assert "tool_choice" not in seen[0].model_settings
     assert "不能再呼叫工具" in seen[0].system_message.content[-1]["text"]
+
+
+def test_finalization_contract_forbids_textual_tool_simulation_and_internal_refs():
+    run_id = str(uuid4())
+    request = _model_request(run_id, model_requests_used=63)
+    seen = []
+
+    def handler(projected):
+        seen.append(projected)
+        return ModelResponse(result=[AIMessage(content="只回覆使用者可閱讀的結果")])
+
+    ConsultantExecutionMiddleware().wrap_model_call(request, handler)
+
+    instruction = seen[0].system_message.content[-1]["text"]
+    assert "繁體中文" in instruction
+    assert "不得模擬工具呼叫" in instruction
+    assert "不得輸出 JSON" in instruction
+    assert "工具名稱" in instruction
+    assert "內部引用" in instruction
 
 
 def test_finalization_rejects_a_provider_tool_call_without_synthetic_messages():

@@ -154,26 +154,57 @@ class Evidence:
 
 
 def _cite(created, payload):
-    """Quote this turn's own saved interview as the basis, as a consultant should.
+    """Use the Runtime-issued model evidence key as this turn's basis.
 
-    The reference is the one the App issued for this turn; nothing here invents
-    or edits a token. Without it the JD carries no source links at all and the
-    page's "where did this come from" markers never appear.
+    The model sees a short key, not the signed source reference. The real App
+    adapter resolves this key back to the canonical source before domain write;
+    the fixture must exercise that current contract rather than the old raw-ref
+    input shape.
 
     Driving the model directly, without the App's consultant context, means
     there is no notice to quote. That path simply does not cite, and the
     journey checks for real source links afterwards rather than assuming.
     """
-    from support.openrouter_replies import system_blocks
-    from test_conversation_sources_postgres import _source_notice
+
+    def evidence_key(request):
+        for message in request["messages"]:
+            if message.get("role") != "system":
+                continue
+            content = message.get("content", [])
+            blocks = ([{"type": "text", "text": content}]
+                if isinstance(content, str) else content)
+            for block in blocks:
+                if not isinstance(block, dict) or block.get("type") != "text":
+                    continue
+                try:
+                    value = json.loads(block.get("text", ""))
+                except (TypeError, ValueError):
+                    continue
+                if (isinstance(value, dict)
+                        and value.get("type") == "conversation_source_notice"):
+                    key = value.get("evidence_key")
+                    if isinstance(key, str) and key:
+                        return key
+        raise ValueError("synthetic_source_key_missing")
+
     name, arguments = created
-    blocks = system_blocks(payload)
-    if not blocks:
+    try:
+        key = evidence_key(payload)
+    except ValueError:
+        # Focused helper tests call the synthetic model without the full
+        # consultant context.  Preserve that explicit no-citation case while
+        # still exercising the current model-facing contract.
+        arguments.pop("basis_refs", None)
+        arguments["basis_evidence_keys"] = []
+        for detail in [*arguments.get("outcomes", []), *arguments.get("requirements", [])]:
+            detail.pop("basis_refs", None)
+            detail["basis_evidence_keys"] = []
         return name, arguments
-    source_ref = _source_notice({"system": blocks})["source_ref"]
-    arguments["basis_refs"] = [source_ref]
+    arguments.pop("basis_refs", None)
+    arguments["basis_evidence_keys"] = [key]
     for detail in [*arguments.get("outcomes", []), *arguments.get("requirements", [])]:
-        detail["basis_refs"] = [source_ref]
+        detail.pop("basis_refs", None)
+        detail["basis_evidence_keys"] = [key]
     return name, arguments
 
 
@@ -204,6 +235,15 @@ def offline_role_models(evidence):
             if request.url.host != "openrouter.ai" or request.headers.get("authorization") != f"Bearer {KEY}":
                 raise ValueError("synthetic_transport_scope_mismatch")
             payload = json.loads(request.content)
+            event["top_level_keys"] = sorted(payload)
+            if isinstance(payload.get("messages"), list):
+                event["message_count"] = len(payload["messages"])
+                event["message_roles"] = [item.get("role") for item in payload["messages"]
+                    if isinstance(item, dict)]
+                system_messages = [item for item in payload["messages"]
+                    if isinstance(item, dict) and item.get("role") == "system"]
+                event["system_source_notice_present"] = "conversation_source_notice" in json.dumps(
+                    system_messages, ensure_ascii=False)
             if (len(payload.get("tools", [])) != 10
                     or not all(tool.get("function", {}).get("strict") is True for tool in payload["tools"])
                     or payload.get("parallel_tool_calls") is not False

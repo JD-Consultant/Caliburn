@@ -16,6 +16,8 @@ pytest-cache-files-*/
 .mypy_cache/
 .coverage
 .npm-cache/
+.pnpm-store/
+pnpm-debug.log*
 .research-tmp/
 tmp/
 output/

@@ -98,11 +98,11 @@ OpenAI 公開 Sandbox Memory 將 live update 描述為修正 stale Memory 或依
 
 ## 顧問方法資產
 
-`caliburn_memory.skills` 與三項分析 Skills（`work-scope-interview`／`compare-work-patterns`／`outcomes-and-expertise`）已自 `033540ce` **位元組相同**採用；`SkillAssets` 只讀，沒有 write／edit／delete／execute，`upload_files` 不實作。`analysis_skills(SkillAssets())` 以官方 Skills middleware 把方法**名稱、用途與讀取路徑**放進 system prompt，SKILL.md 內文由模型按需以既有 `read_file` 讀取，不每輪全載。後加的 `write-customized-jd` **不採用**。
+`caliburn_memory.skills` 提供四項按需方法：自 `033540ce` **位元組相同**採用的三項分析 Skills（`work-scope-interview`／`compare-work-patterns`／`outcomes-and-expertise`），以及依 2026-09-22 successor 決策採用的 `write-customized-jd`。後者只有在 A 實質撰寫、修訂或全面核對 JD 時才讀，詳細成文與完整性規則再按需讀兩份 references；日常訪談與 B1／B2 不載入。`SkillAssets` 只讀，沒有 write／edit／delete／execute，`upload_files` 不實作。`analysis_skills(SkillAssets())` 雖保留既有函式名稱以避免無益改名，現在會以官方 Skills middleware 把所有顧問方法的**名稱、用途與讀取路徑**放進 system prompt；SKILL.md 及 references 由模型按需以既有 `read_file` 讀取，不每輪全載。這些資產不新增 Agent、DB、Domain 或寫入權限。
 
 `caliburn_memory.guidance.MEMORY_ACTION_GUIDANCE` 的背景通知段逐字保留已驗內容，live-repair 段則已替換為上方分層 C 契約；測試會逐字比對背景段，避免接線時改壞既有通知判斷。`repair_memory` 與 `request_memory_consolidation` 都由本套件提供；新內容仍交 B1／B2。舊 `live_memory.py` 的其餘部分是舊 host 組裝，不採用。
 
-wheel 已含這些 `.md` 資產（`uv build` 後於 `caliburn_memory/skills/*/SKILL.md` 可見）。
+2026-09-22 已以 `uv build --offline` 確認 wheel 包含這些 `.md` 資產，包括 `write-customized-jd/references/*.md`。
 
 ## 安裝與驗證
 

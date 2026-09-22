@@ -10,13 +10,24 @@ from uuid import UUID, uuid4
 from langchain.agents import create_agent
 from langchain.agents.middleware import ModelCallLimitMiddleware, ToolCallLimitMiddleware
 from langchain_core.callbacks import BaseCallbackHandler
-from langchain_core.messages import AIMessage, HumanMessage, SystemMessage, ToolMessage
+from langchain_core.messages import (
+    AIMessage, HumanMessage, SystemMessage, ToolMessage, message_to_dict,
+    messages_from_dict,
+)
 from langgraph.checkpoint.memory import InMemorySaver
 import pytest
+from caliburn_memory.requests import REQUEST_KIND, REQUEST_TOOL_NAME, request_memory_consolidation
 
 from jd_relational.consultant_tools import (
-    AiToolError, AiToolPending, AiToolMiddleware, AiToolSession,
+    AiToolError, AiToolPending, AiToolMiddleware, AiToolSession, RuntimeEvidence,
+    _error_result, _jd_read_message, _project_jd_read_result, _resolve_model_evidence,
+    jd_evidence_catalog, reproject_active_evidence_catalog,
     build_jd_tools, decode_ai_binding, decode_ai_bindings, verify_binding_message,
+)
+from jd_relational.memory_context import evidence_read_projection
+from jd_relational.continuation_compaction import (
+    A_COMPACTION_PROFILE, ContinuationCompaction, build_request_view,
+    canonical_prefix_digest,
 )
 from jd_relational.consultant_execution import ConsultantExecutionMiddleware
 from jd_relational.generated.reads import ReadInput, ChangeReadInput
@@ -105,9 +116,9 @@ def done():
 
 def task_args():
     return {"container_ref": "fixture-task-container", "after_ref": None, "name": "合成完整任務", "description": None,
-            "outcomes": [{"text": "成果甲", "basis_refs": []}, {"text": "成果乙", "basis_refs": []}],
-            "requirements": [{"text": "保留重要要求", "basis_refs": []}],
-            "capabilities": [], "basis_refs": []}
+            "outcomes": [{"text": "成果甲", "basis_evidence_keys": []}, {"text": "成果乙", "basis_evidence_keys": []}],
+            "requirements": [{"text": "保留重要要求", "basis_evidence_keys": []}],
+            "capabilities": [], "basis_evidence_keys": []}
 
 
 def run(context, replies, *, saver=None, initial=None, callbacks=()):
@@ -151,8 +162,44 @@ def run_with_execution(context, replies, *, saver=None, initial=None, callbacks=
     return result, graph, model
 
 
+def test_consolidation_notification_executes_and_returns_to_the_model():
+    """The pure background notice must not terminate the consultant loop."""
+    session, context, _, _, _ = setup()
+    notice = AIMessage(id="notice-message", content="", tool_calls=[{
+        "name": REQUEST_TOOL_NAME, "args": {}, "id": "notice-call", "type": "tool_call",
+    }], response_metadata={"stop_reason": "tool_use"})
+    model = FixedModel(replies=[notice, done()])
+    graph = create_agent(model, tools=[request_memory_consolidation], middleware=[AiToolMiddleware()],
+                         checkpointer=InMemorySaver())
+    result = graph.invoke({"messages": [HumanMessage(id=context.run_id, content="合成原話")],
+        "jd_ai_bindings": [], "jd_ai_read": None},
+        {"configurable": {"thread_id": context.document_id}}, context=context, durability="sync")
+
+    messages = result["messages"]
+    assert [message.type for message in messages] == ["human", "ai", "tool", "ai"]
+    tool = messages[2]
+    assert isinstance(tool, ToolMessage) and tool.name == REQUEST_TOOL_NAME
+    assert tool.status == "success" and tool.artifact == {"kind": REQUEST_KIND}
+    assert messages[3].content == "synthetic final"
+    assert len(model.requests) == 2
+
+
 def results(state):
     return [message for message in state["messages"] if isinstance(message, ToolMessage)]
+
+
+def test_invalid_ref_error_teaches_exact_safe_recovery_without_echoing_input():
+    result = _error_result(SimpleNamespace(
+        code="invalid_ref",
+        message="model supplied PRIVATE_BAD_REFERENCE",
+    ))
+
+    message = result["error"]["message"]
+    assert result["next_action"] == "reread_current"
+    assert "最新一次成功的 jd_read current" in message
+    assert "原樣複製" in message
+    assert "不可推測" in message
+    assert "PRIVATE_BAD_REFERENCE" not in message
 
 
 def test_factory_uses_only_generated_shapes_and_no_runtime_fields():
@@ -164,6 +211,209 @@ def test_factory_uses_only_generated_shapes_and_no_runtime_fields():
         assert tool.args_schema["type"] == "object" and tool.args_schema["additionalProperties"] is False
         assert set(tool.args_schema["required"]) == set(tool.args_schema["properties"])
         assert set(tool.args_schema["properties"]).isdisjoint({"runtime", "config", "document_id", "run_id", "operation_id"})
+
+
+def test_jd_source_projection_is_private_until_the_source_is_read():
+    projected, evidence = _project_jd_read_result({
+        "access": "current",
+        "view": "current",
+        "records": [{
+            "type": "source",
+            "section_ref": "section-1",
+            "target_ref": "task-1",
+            "related_capability_ref": None,
+            "source_ref": "private-source-reference",
+            "basis_status": "current",
+            "readability": "not_checked",
+        }],
+    }, dataset_id="dataset-1", document_id="document-1", run_id="run-1")
+
+    projected_json = json.dumps(projected, ensure_ascii=False)
+    assert "private-source-reference" not in projected_json
+    assert projected["records"][0]["read_status"] == "available"
+    assert projected["records"][0]["basis_status"] == "current"
+    assert len(evidence) == 1
+
+    key = evidence[0].evidence_key
+    catalog = {key: evidence[0]}
+    with pytest.raises(AiToolError, match="source_not_read"):
+        _resolve_model_evidence({"basis_refs": [key]}, catalog)
+
+    catalog[key] = RuntimeEvidence(
+        key, evidence[0].source_reference, evidence[0].scope_kind,
+        evidence[0].scope_id, "read_complete", None,
+    )
+    assert _resolve_model_evidence({"basis_refs": [key]}, catalog) == {
+        "basis_refs": ["private-source-reference"]
+    }
+
+
+def test_jd_model_projection_keeps_durable_item_shape_unchanged():
+    projected, evidence = _project_jd_read_result({
+        "access": "current",
+        "view": "current",
+        "records": [
+            {
+                "type": "container",
+                "container_ref": "issued-task-container",
+                "section_ref": "section-1",
+                "owner_ref": "issued-duty-item",
+                "child_kind": "task",
+            },
+            {
+                "type": "item",
+                "item_ref": "issued-duty-item",
+                "item_id": "00000000-0000-0000-0000-000000000001",
+                "section_ref": "section-1",
+                "kind": "duty",
+                "container_ref": "issued-duty-list-container",
+                "position": "a0",
+            },
+        ],
+    }, dataset_id="dataset-1", document_id="document-1", run_id="run-1")
+
+    duty = projected["records"][1]
+    assert duty["container_ref"] == "issued-duty-list-container"
+    assert "parent_container_ref" not in duty
+    assert "child_container_refs" not in duty
+    assert projected["records"][0]["container_ref"] == "issued-task-container"
+    assert evidence == ()
+
+
+def test_active_evidence_catalog_reprojects_after_compaction_and_checkpoint_restore():
+    """Compaction may change the request view, never the source-key authority."""
+    dataset_id, document_id, run_id = "dataset-1", "document-1", "run-1"
+    runtime = SimpleNamespace(context=SimpleNamespace(
+        dataset_id=dataset_id, document_id=document_id, run_id=run_id,
+    ))
+    read_call = AIMessage(
+        id="read-ai",
+        content="",
+        tool_calls=[{
+            "name": "jd_read", "args": {}, "id": "read-call", "type": "tool_call",
+        }],
+    )
+    read_result = _jd_read_message(
+        "jd_read", "read-call", {
+            "format_version": 2,
+            "view": "current",
+            "access": "current",
+            "revision_ref": "revision-ref",
+            "records": [{
+                "type": "source",
+                "section_ref": "section-ref",
+                "target_ref": "task-ref",
+                "related_capability_ref": None,
+                "source_ref": "private-source-reference",
+                "basis_status": "current",
+                "readability": "available",
+            }],
+            "start_index": 0,
+            "total_records": 1,
+            "has_more": False,
+            "next_cursor": None,
+            "oversized_unit": False,
+        },
+        dataset_id=dataset_id, document_id=document_id, run_id=run_id,
+    )
+    canonical = {
+        "messages": [HumanMessage(id=run_id, content="目前 JD 要保留這項工作。"),
+                     read_call, read_result],
+    }
+    before = reproject_active_evidence_catalog(runtime, canonical)
+    assert len(before) == 1
+    key = next(iter(before))
+
+    compaction = ContinuationCompaction(
+        format_version=1,
+        summary_text=f"已讀取 JD 來源；不可把 {key} 當成新來源。",
+        covered_through_message_id=read_result.id,
+        covered_prefix_digest=canonical_prefix_digest(canonical["messages"]),
+    )
+    request_view = build_request_view(
+        canonical["messages"], compaction, A_COMPACTION_PROFILE,
+    )
+    assert any(compaction.summary_text in str(message.content) for message in request_view)
+
+    restored_messages = messages_from_dict([
+        message_to_dict(message) for message in canonical["messages"]
+    ])
+    restored = {
+        "messages": restored_messages,
+        "continuation_compaction": compaction.model_dump(mode="json"),
+    }
+    after = reproject_active_evidence_catalog(runtime, restored)
+    assert after == before
+    assert jd_evidence_catalog(runtime, restored) == {
+        key: before[key],
+    }
+
+    # A summary mentioning a key is still not an authority source.  It is only
+    # present in the detached request view, never in the canonical projection.
+    summary_only = {
+        "messages": [
+            HumanMessage(id=run_id, content="目前 JD 要保留這項工作。"),
+            AIMessage(id="summary-only", content=f"摘要提到 {key}。"),
+        ],
+        "continuation_compaction": compaction.model_dump(mode="json"),
+    }
+    assert reproject_active_evidence_catalog(runtime, summary_only) == {}
+
+    tampered = deepcopy(restored_messages)
+    tampered[-1].artifact["canonical_result"]["records"][0]["source_ref"] = "tampered"
+    with pytest.raises(AiToolError, match="invalid_jd_evidence"):
+        reproject_active_evidence_catalog(runtime, {"messages": tampered})
+
+
+def test_jd_catalog_does_not_claim_another_owner_s_successful_evidence_read():
+    """The shared read_evidence tool can serve a case before its next call."""
+    dataset_id, document_id, run_id = str(uuid4()), str(uuid4()), str(uuid4())
+    context = SimpleNamespace(dataset_id=dataset_id, document_id=document_id, run_id=run_id)
+    session = SimpleNamespace(**context.__dict__, head=SimpleNamespace(
+        revision=1, memory=SimpleNamespace(version_id=str(uuid4()))))
+    content, artifact = evidence_read_projection(
+        session, case_id=str(uuid4()), evidence_key="E-case-source",
+        source_reference="synthetic-case-source",
+        page={"segments": [{"role": "user", "text": "合成原話", "text_offset": 0}],
+              "read_offset": 0, "next_offset": None},
+    )
+    call = AIMessage(id="case-evidence-call", content="", tool_calls=[{
+        "name": "read_evidence", "args": {"evidence_key": "E-case-source"},
+        "id": "case-evidence-1", "type": "tool_call",
+    }])
+    result = ToolMessage(id="case-evidence-result", name="read_evidence",
+                         tool_call_id="case-evidence-1", status="success",
+                         content=content, artifact=artifact)
+    runtime = SimpleNamespace(context=context, state={"messages": [
+        HumanMessage(id=run_id, content="核對兩筆案例原話"), call, result,
+    ]})
+    assert jd_evidence_catalog(runtime) == {}
+    result.artifact = {**artifact, "kind": "unknown_evidence_kind"}
+    with pytest.raises(AiToolError, match="invalid_jd_evidence"):
+        jd_evidence_catalog(runtime)
+
+
+def test_active_evidence_projection_uses_hook_state_for_memory_validation(monkeypatch):
+    """Node hooks receive state separately; projection must not read runtime.state."""
+    captured = []
+
+    def memory_reader(runtime):
+        captured.append(runtime)
+        assert isinstance(runtime.state, dict)
+        return None
+
+    monkeypatch.setattr("jd_relational.memory_context.memory_session", memory_reader)
+    runtime = SimpleNamespace(
+        context=SimpleNamespace(
+            dataset_id="dataset-1", document_id="document-1", run_id="run-1",
+            memory_session=object(), source_notice=None,
+        ),
+        store=object(),
+    )
+    state = {"messages": []}
+
+    assert reproject_active_evidence_catalog(runtime, state) == {}
+    assert len(captured) == 1 and captured[0].state is state
 
 
 def test_native_after_model_checkpoint_precedes_writer_and_exact_read_is_bound():
@@ -199,7 +449,7 @@ def test_native_after_model_checkpoint_precedes_writer_and_exact_read_is_bound()
 @pytest.mark.parametrize("name,args", [
     ("jd_read", {"view": "current", "target_ref": None, "cursor": {"private": "SYNTHETIC_PRIVATE_MARKER"}}),
     ("jd_create_task", {**task_args(), "runtime": "SYNTHETIC_PRIVATE_MARKER"}),
-    ("jd_set_text", {"target_field_ref": "SYNTHETIC_PRIVATE_MARKER", "text": 7, "basis_refs": []}),
+    ("jd_set_text", {"target_field_ref": "SYNTHETIC_PRIVATE_MARKER", "text": 7, "basis_evidence_keys": []}),
 ])
 def test_invalid_arguments_have_fixed_error_and_no_writer_or_history_io(name, args, caplog):
     class Capture(BaseCallbackHandler):
@@ -248,7 +498,7 @@ def test_valid_current_read_does_not_authorize_historical_target_ref():
         revision_id=material.value["revision"], purpose="history", role="field", kind="profile", field="purpose",
         value_digest=field_value_digest(None)))
     state, _, _ = run(context, [call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
-        call("jd_set_text", {"target_field_ref": old_ref, "text": "不能套用", "basis_refs": []}), done()])
+        call("jd_set_text", {"target_field_ref": old_ref, "text": "不能套用", "basis_evidence_keys": []}), done()])
     assert results(state)[-1].status == "error" and owner.calls == []
     assert not state.get("jd_ai_bindings")
 
@@ -256,12 +506,13 @@ def test_valid_current_read_does_not_authorize_historical_target_ref():
 @pytest.mark.parametrize("case", ["source", "selection"])
 def test_unavailable_source_and_selection_do_not_fabricate_authority(case):
     _, context, owner, material, codec = setup()
-    mutation = call("jd_create_task", {**task_args(), "basis_refs": ["synthetic-not-issued-source"]}) if case == "source" else call(
-        "jd_replace_selection", {"selection_ref": "synthetic-not-issued-selection", "replacement_text": "替換", "basis_refs": []})
+    mutation = call("jd_create_task", {**task_args(), "basis_evidence_keys": ["synthetic-not-issued-source"]}) if case == "source" else call(
+        "jd_replace_selection", {"selection_ref": "synthetic-not-issued-selection", "replacement_text": "替換", "basis_evidence_keys": []})
     if case == "source":
-        with pytest.raises(AiToolError, match="^ai_tool_unavailable"):
-            run(context, [call("jd_read", {"view": "current", "target_ref": None, "cursor": None}), mutation, done()])
-        assert owner.calls == [] and len(context.last_test_model.requests) == 2
+        state, _, _ = run(context, [call("jd_read", {"view": "current", "target_ref": None, "cursor": None}), mutation, done()])
+        reply = results(state)[-1]
+        assert reply.status == "error" and json.loads(reply.content)["next_action"] == "correct_arguments"
+        assert owner.calls == [] and len(context.last_test_model.requests) == 3
         return
     state, _, _ = run(context, [call("jd_read", {"view": "current", "target_ref": None, "cursor": None}), mutation, done()])
     assert results(state)[-1].status == "error" and owner.calls == [] and not state.get("jd_ai_bindings")

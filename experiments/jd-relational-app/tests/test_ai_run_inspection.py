@@ -9,7 +9,7 @@ import pytest
 from langchain_core.messages import AIMessage, ToolMessage
 
 from jd_relational.ai_runtime import AiRunSnapshot, AiRuntimeError
-from test_ai_runtime import HEAD, make_runtime
+from test_ai_runtime import HEAD, _model_arguments, make_runtime
 from test_foreground_runtime import ai_intent, run_identity
 from test_manual_runtime import observation
 from jd_relational.consultant_tools import decode_ai_binding
@@ -108,9 +108,10 @@ def written_run(make_runtime):
         identity = run_identity(record['document_id'],run=record['run_id'])
         intent = ai_intent(identity)
         command = intent.command
+        model_value = _model_arguments(command["arguments"])
         call = AIMessage(id='original-call-message',content='',tool_calls=[{
-            'id':'original-call','name':command['tool'],'args':command['arguments']}])
-        digest = sha256(json.dumps({'name':command['tool'],'args':command['arguments']},
+            'id':'original-call','name':command['tool'],'args':model_value}])
+        digest = sha256(json.dumps({'name':command['tool'],'args':model_value},
             ensure_ascii=False,sort_keys=True,separators=(',',':')).encode()).hexdigest()
         binding = decode_ai_binding({'format_version':1,'dataset_id':runtime.codec.dataset_id,
             'document_id':identity.document_id,'run_id':identity.run_id,

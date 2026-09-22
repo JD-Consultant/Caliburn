@@ -16,8 +16,10 @@ from jd_relational.ai_checkpoints import AiRunCheckpoints, new_run_record
 from jd_relational.ai_runtime import AiRuntime, AiRuntimeError, _pending_calls
 from jd_relational.consultant_context import ConsultantState
 from jd_relational.consultant_tools import BINDING_NODE, AiToolError, AiToolMiddleware, AiToolSession
-from jd_relational.memory_context import build_consultant_tools
-from jd_relational.memory_repair_session import MemoryRepairSession, repair_progress
+from jd_relational.memory_context import build_consultant_tools, issue_evidence_key
+from jd_relational.memory_repair_session import (
+    MemoryRepairSession, build_repair_tool, model_layered_repair_schema, repair_progress,
+)
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import build_document_graph
 from test_chat_history import native
@@ -72,6 +74,13 @@ def layered_replies(initial, source_reference, *, updates=True, include_reads=Tr
     understanding_id = manifest.understandings[0].understanding_id
     case = initial.artifacts.case(initial.head.memory, case_id)
     understanding = initial.artifacts.understanding(initial.head.memory, understanding_id)
+    evidence_key = issue_evidence_key(
+        dataset_id=initial.dataset_id,
+        document_id=initial.document_id,
+        run_id=initial.run_id,
+        case_id=case_id,
+        source_reference=case.source_references[0],
+    )
     messages = []
     if include_reads:
         messages.extend([
@@ -80,8 +89,8 @@ def layered_replies(initial, source_reference, *, updates=True, include_reads=Tr
                 "args": {"case_id": case_id},
             }]),
             AIMessage(id="layered-source-read", content="", tool_calls=[{
-                "name": "read_conversation", "id": "layered-source-read-call",
-                "args": {"reference": case.source_references[0]},
+                "name": "read_evidence", "id": "layered-source-read-call",
+                "args": {"evidence_key": evidence_key},
             }]),
             AIMessage(id="layered-understanding-read", content="", tool_calls=[{
                 "name": "read_work_understanding", "id": "layered-understanding-read-call",
@@ -111,6 +120,19 @@ def layered_replies(initial, source_reference, *, updates=True, include_reads=Tr
     return messages
 
 
+def test_repair_tool_exposes_strict_wire_but_keeps_existing_domain_shape():
+    tool = build_repair_tool()
+    schema = tool.args_schema
+    assert schema == model_layered_repair_schema()
+    assert set(schema["required"]) == set(schema["properties"])
+    nested = schema["properties"]["understanding_updates"]["items"]
+    assert set(nested["required"]) == set(nested["properties"])
+    for field in ("action", "diff", "supporting_case_ids", "route_note"):
+        assert nested["properties"][field].get("description")
+    for runtime_owned in ("revision", "version_id", "digest", "offset", "operation_id"):
+        assert runtime_owned not in json.dumps(schema, ensure_ascii=False)
+
+
 def test_layered_memory_repair_reads_then_publishes_one_complete_bundle(memory, monkeypatch):
     root, model, initial, repair, pub, context, payload, config = setup_repair(
         memory, layered_replies, layered=True)
@@ -120,7 +142,7 @@ def test_layered_memory_repair_reads_then_publishes_one_complete_bundle(memory, 
 
     tools = [message for message in result["messages"] if isinstance(message, ToolMessage)]
     assert [message.name for message in tools] == [
-        "read_case", "read_conversation", "read_work_understanding", "repair_memory",
+        "read_case", "read_evidence", "read_work_understanding", "repair_memory",
     ]
     assert json.loads(tools[-1].content)["status"] == "applied"
     assert "read_paths" not in json.loads(tools[-1].content)
@@ -294,14 +316,21 @@ def two_layered_repairs(initial, source_reference):
     manifest = initial.artifacts.bundle_manifest(initial.head.memory)
     case_id = manifest.cases[0].case_id
     understanding_id = manifest.understandings[0].understanding_id
+    evidence_key = issue_evidence_key(
+        dataset_id=initial.dataset_id,
+        document_id=initial.document_id,
+        run_id=initial.run_id,
+        case_id=case_id,
+        source_reference=source_reference,
+    )
     return [*first,
         AIMessage(id="layered-case-read-2", content="", tool_calls=[{
             "name": "read_case", "id": "layered-case-read-call-2",
             "args": {"case_id": case_id},
         }]),
         AIMessage(id="layered-source-read-2", content="", tool_calls=[{
-            "name": "read_conversation", "id": "layered-source-read-call-2",
-            "args": {"reference": source_reference},
+            "name": "read_evidence", "id": "layered-source-read-call-2",
+            "args": {"evidence_key": evidence_key},
         }]),
         AIMessage(id="layered-understanding-read-2", content="", tool_calls=[{
             "name": "read_work_understanding", "id": "layered-understanding-read-call-2",
@@ -479,8 +508,15 @@ def stopped(memory, monkeypatch, fault, replies=None):
         # it before any C material exists, and never reaches the repair session.
         expected = AiToolError
     elif fault == "binding":
-        def unavailable(_messages):
-            raise OSError("synthetic source notice failure")
+        original_source_notice = context.source_notice
+
+        def unavailable(messages):
+            latest = messages[-1] if messages else None
+            if (isinstance(latest, AIMessage)
+                    and len(latest.tool_calls) == 1
+                    and latest.tool_calls[0].get("name") == "repair_memory"):
+                raise OSError("synthetic source notice failure")
+            return original_source_notice(messages)
         context.source_notice = unavailable
     elif fault == "tool_handoff":
         # The native tool wrapper converts the injected dependency failure to

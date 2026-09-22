@@ -3,12 +3,12 @@
 OCS 文件 seam 的 typed contract。`schema/ocs-document.schema.json` 是唯一 source of truth；
 `src/ocs_contract/models.py` 與 `types/ocs-document.ts` 都是生成物，不可手改。
 
-主要消費者：`apps/pdf-to-json` 的輸出驗證、`apps/ocs-indexer` 的 ingestion，以及仍可執行的
-legacy OCS Web（`apps/web` 的 legacy editor）。它不屬於 current `job_analysis` Current JD contract。
+目前消費者是 `apps/pdf-to-json` 的輸出驗證與 `apps/ocs-indexer` 的 ingestion。
+它屬於隔離 RAG bounded context，不是正式 JD App contract，也沒有 legacy Web consumer。
 
 ```bash
-npm run codegen -w @caliburn/ocs-contract
-npm run check-codegen -w @caliburn/ocs-contract
+pnpm --filter @caliburn/ocs-contract run codegen
+pnpm --filter @caliburn/ocs-contract run check-codegen
 ```
 
 `check-codegen` 會呼叫 `bash scripts/check-codegen.sh`。Windows PowerShell 環境須可使用 Git Bash／

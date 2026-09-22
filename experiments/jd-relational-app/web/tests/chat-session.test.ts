@@ -93,6 +93,38 @@ test('explicit refresh recovers an initial history failure with no local pending
   assert.equal(f.controller.snapshot().error, null);
 });
 
+test('one transient active-run status 503 is re-read without replaying the run', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const f = fixture(); t.after(() => f.controller.dispose());
+  await f.controller.send();
+  let reads = 0;
+  f.answers.status = async () => {
+    if (++reads === 1) throw new ApiError('service_unavailable');
+    return state('completed');
+  };
+  t.mock.timers.tick(2000); await microtasks();
+  assert.equal(reads, 1);
+  assert.equal(f.controller.snapshot().error?.code, 'service_unavailable');
+  t.mock.timers.tick(2000); await microtasks();
+  assert.equal(reads, 2);
+  assert.equal(f.controller.snapshot().run?.run_status, 'completed');
+  assert.equal(f.controller.snapshot().error, null);
+  assert.equal(f.calls.filter(call => call.method === 'post').length, 1);
+});
+
+test('repeated active-run status 503 stops after one extra read', async t => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const f = fixture(); t.after(() => f.controller.dispose());
+  await f.controller.send();
+  f.answers.status = async () => { throw new ApiError('service_unavailable'); };
+  t.mock.timers.tick(2000); await microtasks();
+  t.mock.timers.tick(2000); await microtasks();
+  t.mock.timers.tick(4000); await microtasks();
+  assert.equal(f.calls.filter(call => call.method === 'status').length, 2);
+  assert.equal(f.controller.snapshot().error?.code, 'service_unavailable');
+  assert.equal(f.calls.filter(call => call.method === 'post').length, 1);
+});
+
 test('explicit refresh discovers a later run and replaces the old terminal window', async t => {
   const f = fixture(); t.after(() => f.controller.dispose());
   f.setPage(page([user(OLD), reply(OLD)], 'old-anchor', OLD));

@@ -9,7 +9,12 @@ import os
 from threading import Event
 from uuid import uuid4
 
-from caliburn_memory import MemoryArtifacts, PublicationStore
+from caliburn_memory import (
+    CaseArtifact,
+    MemoryArtifacts,
+    PublicationStore,
+    WorkUnderstandingArtifact,
+)
 from caliburn_memory.publication import PublicationUncertain
 from caliburn_memory.repair import RepairWorkflow
 from langchain_core.messages import ToolMessage
@@ -27,12 +32,13 @@ from jd_relational.consultant_tools import AiToolMiddleware
 from jd_relational.conversation_sources import ConversationSourceCodec, ConversationSourceService
 from jd_relational.inspection_model import build_inspection_consultant_node
 from jd_relational.manual_runtime import ManualRuntime
-from jd_relational.memory_context import build_consultant_tools
+from jd_relational.memory_context import build_consultant_tools, issue_evidence_key
 from jd_relational.memory_repair_session import MemoryRepairSession
 from jd_relational.memory_sources import MemorySourceReader
 from jd_relational.references import ReferenceCodec
 from jd_relational.runtime_checkpoints import DocumentCheckpoints, build_document_graph
 from jd_relational.storage.service import JdStorage
+from jd_relational.working_state import checked_working_state
 from test_ai_runtime_postgres import _create, _failure, _final, _offline_model, _read, _state
 from test_manual_runtime_postgres import connect
 from test_memory_core_postgres import SCHEMA, TABLES
@@ -122,6 +128,7 @@ def last_tool(payload):
     return results[-1]
 
 
+@pytest.mark.skip(reason="historical two-file A read contract; layered evidence test supersedes it")
 def test_sdk_reads_fixed_memory_summary_original_then_writes_and_reopens(monkeypatch, engine):
     dataset = str(uuid4())
     fixture = {}
@@ -203,6 +210,162 @@ def test_sdk_reads_fixed_memory_summary_original_then_writes_and_reopens(monkeyp
             assert runtime.lookup(document, third_run).wait().status == "completed"
             assert sources.read(fixture["source"], document).messages[0].text == fixture["original"]
             assert len(requests) == 9
+
+
+def test_layered_evidence_artifact_stays_private_and_survives_postgres_reopen(
+        monkeypatch, engine):
+    dataset = str(uuid4())
+    fixture = {}
+
+    def read_case(payload):
+        assert notice(payload)["revision"] == 1
+        assert fixture["source"] not in json.dumps(payload, ensure_ascii=False)
+        return "read_case", {"case_id": fixture["case_id"]}
+
+    def read_evidence(payload):
+        case = json.loads(last_tool(payload))
+        assert case["evidence"] == [{"evidence_key": fixture["evidence_key"]}]
+        assert fixture["source"] not in json.dumps(payload, ensure_ascii=False)
+        return "read_evidence", {"evidence_key": fixture["evidence_key"]}
+
+    def finish(payload):
+        page = json.loads(last_tool(payload))
+        assert page["evidence_key"] == fixture["evidence_key"]
+        assert page["has_more"] is False
+        assert "收到通知後檢查設備" in page["segments"][0]["text"]
+        assert fixture["source"] not in json.dumps(payload, ensure_ascii=False)
+        return _final(payload)
+
+    plan = [_final, read_case, read_evidence, finish]
+    with _offline_model(monkeypatch, plan, expected_tools=build_consultant_tools()) as (model, requests):
+        with opened(engine, model, dataset) as (runtime, owner, graph, store, memory_engine, sources):
+            document = owner.create_document(uuid4(), "合成分層證據保存驗收")
+            current = owner.storage.read_current(document)
+            first_run = str(uuid4())
+            first = runtime.start(
+                document,
+                first_run,
+                "收到通知後檢查設備，先確認隔離並留下記錄。",
+                expected_revision_id=current.revision_id,
+            )
+            assert first.wait(20).status == "completed", _failure(first)
+            fixture["source"] = sources.capture(document, first_run).source_ref
+            window = sources.capture_window(
+                document, first_run_id=first_run, last_run_id=first_run,
+            )
+            artifacts = MemoryArtifacts(
+                store,
+                document,
+                source=MemorySourceReader(sources, document, window_references=True),
+            )
+            publication = PublicationStore(memory_engine, artifacts)
+            fixture["case_id"] = str(uuid4())
+            understanding_id = str(uuid4())
+            case_path = f"/memory/cases/items/{fixture['case_id']}.md"
+            understanding_path = f"/memory/understanding/items/{understanding_id}.md"
+            version = artifacts.save_bundle(
+                base_publication_revision=0,
+                base_version=None,
+                evidence_through_reference=window,
+                case_guide=f"設備檢查：[{fixture['case_id']}]({case_path})",
+                cases=(CaseArtifact(
+                    fixture["case_id"],
+                    "本人收到通知後檢查設備、確認隔離並留下記錄。",
+                    (fixture["source"],),
+                ),),
+                understanding_guide=f"設備初判：[{understanding_id}]({understanding_path})",
+                understandings=(WorkUnderstandingArtifact(
+                    understanding_id,
+                    "本人穩定負責設備初步檢查與記錄。",
+                    (fixture["case_id"],),
+                ),),
+            )
+            publication.publish(publication.prepare(
+                version,
+                expected_revision=0,
+                kind="consolidation",
+                processed_source=window,
+            ))
+            second_run = str(uuid4())
+            fixture["evidence_key"] = issue_evidence_key(
+                dataset_id=dataset,
+                document_id=document,
+                run_id=second_run,
+                case_id=fixture["case_id"],
+                source_reference=fixture["source"],
+            )
+            second = runtime.start(
+                document,
+                second_run,
+                "請核對這個案例的原話。",
+                expected_revision_id=current.revision_id,
+            )
+            assert second.wait(30).status == "completed", _failure(second)
+            observed = runtime.checkpoints.observe(document, second_run, dataset)
+            saved = [message for message in observed.messages
+                     if isinstance(message, ToolMessage)
+                     and message.name in {"read_case", "read_evidence"}]
+            assert [message.name for message in saved] == ["read_case", "read_evidence"]
+            assert saved[0].artifact["evidence"][0]["source_reference"] == fixture["source"]
+            assert saved[1].artifact["source_reference"] == fixture["source"]
+            fixture["artifacts"] = [message.artifact for message in saved]
+            assert len(requests) == 4
+
+        with opened(engine, None, dataset) as (runtime, owner, _graph, _store, _, _sources):
+            reopened = runtime.checkpoints.observe(document, second_run, dataset)
+            saved = [message for message in reopened.messages
+                     if isinstance(message, ToolMessage)
+                     and message.name in {"read_case", "read_evidence"}]
+            assert [message.artifact for message in saved] == fixture["artifacts"]
+            assert runtime.lookup(document, second_run).wait().status == "completed"
+
+
+def test_interview_working_state_survives_real_postgres_saver_reopen(monkeypatch, engine):
+    dataset = str(uuid4())
+
+    def create_working_state(payload):
+        assert "source_ref" not in json.dumps(payload, ensure_ascii=False)
+        return "update_interview_working_state", {"operations": [{
+            "op": "create",
+            "subject": "故障升級",
+            "known_and_open": "已知本人先做初判；升級條件仍待確認。",
+            "information_needed": "取得一次實際升級案例與決定者。",
+            "priority": "high_jd_impact",
+            "make_focus": True,
+        }]}
+
+    plan = [create_working_state, _final]
+    with _offline_model(
+        monkeypatch, plan, expected_tools=build_consultant_tools(),
+    ) as (model, requests):
+        with opened(engine, model, dataset) as (runtime, owner, graph, *_):
+            document = owner.create_document(uuid4(), "合成訪談工作狀態恢復驗收")
+            current = owner.storage.read_current(document)
+            run_id = str(uuid4())
+            run = runtime.start(
+                document,
+                run_id,
+                "我會先判斷故障，但還沒有說清楚升級條件。",
+                expected_revision_id=current.revision_id,
+            )
+            try:
+                result = run.wait(20)
+            except Exception:
+                pytest.fail(str(_failure(run)))
+            assert result.status == "completed", _failure(run)
+            before = checked_working_state(
+                _state(graph, document).values["interview_working_state"],
+            )
+            assert before is not None and len(before.items) == 1
+            assert before.focus_item_id == before.items[0].item_id
+            assert len(requests) == 2
+
+        with opened(engine, None, dataset) as (runtime, owner, graph, *_):
+            after = checked_working_state(
+                _state(graph, document).values["interview_working_state"],
+            )
+            assert after == before
+            assert runtime.lookup(document, run_id).wait().status == "completed"
 
 
 @pytest.mark.skip(reason=_LEGACY_C_REASON)

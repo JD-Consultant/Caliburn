@@ -42,11 +42,11 @@ pytestmark = pytest.mark.skipif(os.environ.get("JD_RELATIONAL_TEST_DB") != "1",
 
 @contextmanager
 def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None,
-                   allow_final_no_tools=False):
+                   allow_finalization=False):
     # Identity, not a count: the wire must carry exactly the tools this
     # consultant was given, so adding one is a deliberate, visible change.
-    expected_names = {getattr(tool, "name", tool) for tool in
-                      (build_jd_tools() if expected_tools is None else expected_tools)}
+    expected_names = [getattr(tool, "name", tool) for tool in
+                      (build_jd_tools() if expected_tools is None else expected_tools)]
     monkeypatch.setenv("LANGSMITH_TRACING", "false")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "false")
     requests = []
@@ -63,13 +63,15 @@ def _offline_model(monkeypatch, plan, *, before_reply=None, expected_tools=None,
         assert payload["parallel_tool_calls"] is False
         assert payload["provider"] == {"only": ["openai"], "order": ["openai"],
             "allow_fallbacks": False, "require_parameters": False}
-        final_no_tools = payload.get("tools") == [] and payload.get("tool_choice") == "none"
-        if final_no_tools:
-            assert allow_final_no_tools, "Unexpected final no-tools request in this fixture."
-        else:
-            assert {tool["function"]["name"] for tool in payload["tools"]} == expected_names
-            assert len(payload["tools"]) == len(expected_names)
+        finalization = payload.get("tool_choice") == "none"
+        if finalization:
+            assert allow_finalization, "Unexpected finalization request in this fixture."
+        assert [tool["function"]["name"] for tool in payload["tools"]] == expected_names
+        assert len(payload["tools"]) == len(expected_names)
         assert all(tool["function"]["strict"] is True for tool in payload["tools"])
+        system = next(message for message in payload["messages"]
+                      if message.get("role") == "system")
+        assert system["content"][0]["cache_control"] == {"type": "ephemeral"}
         requests.append(payload)
         name, arguments = plan[len(requests) - 1](payload)
         if before_reply is not None:
@@ -154,9 +156,12 @@ def _create(payload):
     container = next(row for row in page["records"] if row["type"] == "container"
                      and row["child_kind"] == "task" and row["owner_ref"] is None)
     return "jd_create_task", {"container_ref": container["container_ref"], "after_ref": None,
-        "name": "合成設備检查", "description": "收到通知後檢查約定設備。", "basis_refs": [],
-        "outcomes": [{"text": "檢查記錄", "basis_refs": []}, {"text": "異常交接", "basis_refs": []}],
-        "requirements": [{"text": "先確認隔離再檢查", "basis_refs": []}], "capabilities": []}
+        "name": "合成設備检查", "description": "收到通知後檢查約定設備。",
+        "basis_evidence_keys": [],
+        "outcomes": [{"text": "檢查記錄", "basis_evidence_keys": []},
+                     {"text": "異常交接", "basis_evidence_keys": []}],
+        "requirements": [{"text": "先確認隔離再檢查", "basis_evidence_keys": []}],
+        "capabilities": []}
 
 
 def _task_field(page, name):
@@ -169,7 +174,7 @@ def _revise(payload):
     page = _last_page(payload)
     assert _task_field(page, "description")["value"] == "人工更正：只檢查約定設備，不修理外包設備。"
     return "jd_set_text", {"target_field_ref": _task_field(page, "name")["field_ref"],
-                           "text": "約定設備檢查與交接", "basis_refs": []}
+                           "text": "約定設備檢查與交接", "basis_evidence_keys": []}
 
 
 def _manual_description(runtime, document):

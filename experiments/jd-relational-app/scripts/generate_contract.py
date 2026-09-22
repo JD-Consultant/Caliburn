@@ -10,7 +10,8 @@ import sys
 
 
 ROOT = Path(__file__).resolve().parents[1]
-SCHEMAS = [("jd-work", "models.py"), ("jd-result", "results.py"), ("jd-http", "http_results.py"),
+SCHEMAS = [("jd-work", "models.py"), ("jd-model-work", "model_inputs.py"),
+           ("jd-result", "results.py"), ("jd-http", "http_results.py"),
            ("jd-snapshot", "snapshots.py"), ("jd-read", "reads.py"),
            ("jd-query-http", "query_http.py"), ("jd-manual-http", "manual_http.py"),
            ("jd-catalog-http", "catalog_http.py"), ("jd-chat-http", "chat_http.py")]

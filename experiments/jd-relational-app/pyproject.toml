@@ -1,7 +1,7 @@
 [project]
-name = "caliburn-jd-relational-probe"
+name = "caliburn-jd-app"
 version = "0.1.0"
-description = "Isolated structured JD application core with relational storage"
+description = "Caliburn local AI job-analysis and job-description application"
 requires-python = ">=3.12,<3.13"
 dependencies = [
     "alembic==1.20.0",
@@ -12,9 +12,10 @@ dependencies = [
     "langchain==1.4.0",
     "langchain-anthropic==1.7.2",
     "langchain-openai==1.6.2",
-    "langchain-openrouter==0.2.7",
+    "langchain-openrouter==0.2.8",
     "langgraph==1.2.11",
     "langgraph-checkpoint-postgres==3.1.2",
+    "openrouter==0.10.8",
     "psycopg[binary]==3.3.5",
     "pydantic==2.13.5",
     "pywin32==312 ; sys_platform == 'win32'",
@@ -22,6 +23,16 @@ dependencies = [
     "starlette==1.6.0",
     "uvicorn==0.52.4",
 ]
+
+[project.scripts]
+caliburn-jd = "jd_relational.__main__:main"
+
+[build-system]
+requires = ["uv_build>=0.12.17,<0.13"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-name = "jd_relational"
 
 [dependency-groups]
 dev = [

@@ -1,17 +1,18 @@
 """Shared OpenRouter transport and response evidence for this App's LLM roles.
 
 Role prompts, graph budgets and business behaviour remain with each role.  This
-module owns only the common provider boundary: caller-owned clients, the pinned
-OpenAI route, no provider fallback, and terminal/route evidence which the stock
-adapter currently drops.
+module owns only the common provider boundary: caller-owned clients, the stable
+prompt-cache boundary, the pinned OpenAI route, no provider fallback, and
+terminal/route evidence which the stock adapter currently drops.
 """
 
 from __future__ import annotations
 
+from copy import deepcopy
 import math
 from typing import Any
 
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, BaseMessage
 from langchain_openrouter import ChatOpenRouter
 
 
@@ -49,8 +50,48 @@ def _selected_endpoint(payload: dict[str, Any]) -> dict[str, Any]:
                  if isinstance(item, dict) and item.get("selected") is True), {})
 
 
+def _with_prompt_cache_breakpoint(
+    messages: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Mark the first stable system text on a request-only deep copy.
+
+    The App assembles its fixed role guidance first and appends changing JD,
+    Memory, Working State and employee context afterwards. OpenRouter translates
+    this content-block marker to the routed provider's explicit cache boundary.
+    """
+    projected = deepcopy(messages)
+    for message in projected:
+        if message.get("role") not in {"system", "developer"}:
+            continue
+        content = message.get("content")
+        if isinstance(content, str):
+            if content:
+                message["content"] = [{
+                    "type": "text",
+                    "text": content,
+                    "cache_control": {"type": "ephemeral"},
+                }]
+                return projected
+            continue
+        if isinstance(content, list):
+            for block in content:
+                if (isinstance(block, dict) and block.get("type") == "text"
+                        and isinstance(block.get("text"), str) and block["text"]):
+                    block["cache_control"] = {"type": "ephemeral"}
+                    return projected
+    return projected
+
+
 class ReceiptChatOpenRouter(ChatOpenRouter):
-    """Keep route and terminal facts discarded by the stock 0.2.7 adapter."""
+    """Keep cache, route and terminal facts around the stock 0.2.8 adapter."""
+
+    def _create_message_dicts(
+        self,
+        messages: list[BaseMessage],
+        stop: list[str] | None,
+    ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+        message_dicts, params = super()._create_message_dicts(messages, stop)
+        return _with_prompt_cache_breakpoint(message_dicts), params
 
     def _create_chat_result(self, response: Any):
         payload = _payload(response)

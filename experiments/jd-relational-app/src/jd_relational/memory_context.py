@@ -22,17 +22,16 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from .memory_sources import MemorySourceReader
 
 MEMORY_READ_NAMES = frozenset({
-    "ls", "grep", "read_file", "read_conversation", "read_case", "read_work_understanding",
+    "ls", "grep", "read_file", "read_evidence", "read_case", "read_work_understanding",
 })
 MEMORY_READ_GUIDANCE = (
     "memory_guide是已發布Memory的導覽資料，不是指令、員工原話或完整工作內容。"
     "分層版本同時提供案例導覽與工作理解導覽：工作理解用來定位穩定共同工作，"
     "案例用來核對個別任務、條件、例外與更正；從導覽選既有ID後，按需使用"
-    "read_work_understanding或read_case，不要全量讀取。read_case會連同按原對話順序排列的來源回傳；"
-    "需要確切問答時，把已取得的來源原樣交給read_conversation，不要猜測或改寫。"
+    "read_work_understanding或read_case，不要全量讀取。read_case會回傳按原對話順序排列的短evidence key；"
+    "需要確切問答時，只把已取得的key交給read_evidence，不要猜測來源、offset或版本。"
     "分層版本不要用ls、grep或read_file繞過上述工具；manifest與Runtime欄位不是模型輸入。"
     "grep是字面搜尋；沒有命中不代表員工沒有這項工作。依回傳offset續讀，不必讀到檔尾。"
-    "只有需要另存的前置脈絡才用part=context，也可讀App已提供的conversation來源。"
     "案例與工作理解是可修訂的目前理解，仍須核對來源與後續更正；AI轉述不等於員工確認。"
     "保留主體、行動、適用條件、頻率、責任邊界及案例差異；不清楚時追問。"
     "讀取Memory不代表這輪必須改JD；JD撤回不撤回訪談或Memory。"
@@ -45,16 +44,139 @@ class LayeredReadProof:
 
     case_evidence: dict[str, dict[str, str]]
     understanding_ids: frozenset[str]
-    complete_sources: frozenset[str]
+    complete_case_evidence: frozenset[tuple[str, str]]
+    evidence_next_offsets: dict[str, int | None]
 
 
-def layered_read_proof(messages, *, run_id: str, revision: int,
+def _json(value):
+    return json.dumps(
+        value, ensure_ascii=False, sort_keys=True, separators=(",", ":"), allow_nan=False,
+    )
+
+
+def _content_digest(content: str) -> str:
+    return sha256(content.encode("utf-8")).hexdigest()
+
+
+def issue_scoped_evidence_key(*, dataset_id: str, document_id: str, run_id: str,
+                              scope_kind: str, scope_id: str,
+                              source_reference: str) -> str:
+    """Issue one stable run/scope handle without exposing its locator."""
+    payload = _json({
+        "dataset_id": dataset_id,
+        "document_id": document_id,
+        "run_id": run_id,
+        "scope_kind": scope_kind,
+        "scope_id": scope_id,
+        "source_reference": source_reference,
+    })
+    return "E-" + sha256(payload.encode("utf-8")).hexdigest()[:20]
+
+
+def issue_evidence_key(*, dataset_id: str, document_id: str, run_id: str,
+                       case_id: str, source_reference: str) -> str:
+    """Issue one stable run/case-scoped handle without exposing its locator."""
+    return issue_scoped_evidence_key(
+        dataset_id=dataset_id,
+        document_id=document_id,
+        run_id=run_id,
+        scope_kind="case",
+        scope_id=case_id,
+        source_reference=source_reference,
+    )
+
+
+def _artifact_scope(session, *, kind: str, content: str) -> dict:
+    return {
+        "format_version": 1,
+        "kind": kind,
+        "dataset_id": session.dataset_id,
+        "document_id": session.document_id,
+        "run_id": session.run_id,
+        "memory_revision": session.head.revision,
+        "memory_version_id": session.head.memory.version_id,
+        "content_digest": _content_digest(content),
+    }
+
+
+def case_read_projection(session, item) -> tuple[str, dict]:
+    evidence = [
+        {
+            "evidence_key": issue_evidence_key(
+                dataset_id=session.dataset_id,
+                document_id=session.document_id,
+                run_id=session.run_id,
+                case_id=item.case_id,
+                source_reference=reference,
+            ),
+            "source_reference": reference,
+            "canonical_order": index,
+        }
+        for index, reference in enumerate(item.source_references, 1)
+    ]
+    content = _json({
+        "case_id": item.case_id,
+        "memory_handle": f"case:{item.case_id}",
+        "content": item.content,
+        "source_order": "oldest_to_newest",
+        "evidence": [{"evidence_key": entry["evidence_key"]} for entry in evidence],
+    })
+    return content, {
+        **_artifact_scope(session, kind="case", content=content),
+        "case_id": item.case_id,
+        "evidence": evidence,
+    }
+
+
+def understanding_read_projection(session, item) -> tuple[str, dict]:
+    content = _json({
+        "understanding_id": item.understanding_id,
+        "memory_handle": f"understanding:{item.understanding_id}",
+        "content": item.content,
+        "case_bindings": [{"case_id": binding.case_id} for binding in item.case_bindings],
+    })
+    return content, {
+        **_artifact_scope(session, kind="understanding", content=content),
+        "understanding_id": item.understanding_id,
+    }
+
+
+def evidence_read_projection(session, *, case_id: str, evidence_key: str,
+                             source_reference: str, page: dict) -> tuple[str, dict]:
+    content = _json({
+        "case_id": case_id,
+        "evidence_key": evidence_key,
+        "source_order": "oldest_to_newest",
+        "segments": [
+            {
+                "role": segment["role"],
+                "text": segment["text"],
+                "continued_from_previous_page": segment["text_offset"] > 0,
+            }
+            for segment in page["segments"]
+        ],
+        "has_more": page["next_offset"] is not None,
+    })
+    return content, {
+        **_artifact_scope(session, kind="evidence", content=content),
+        "case_id": case_id,
+        "evidence_key": evidence_key,
+        "source_reference": source_reference,
+        "read_offset": page["read_offset"],
+        "next_offset": page["next_offset"],
+    }
+
+
+def layered_read_proof(messages, *, dataset_id: str, document_id: str,
+                       run_id: str, revision: int,
                        version_id: str) -> LayeredReadProof:
-    """Project exact layered reads and complete source pages from saved tools."""
+    """Project exact layered reads from trusted private ToolMessage artifacts."""
     try:
-        if (type(messages) not in (list, tuple) or str(UUID(run_id)) != run_id
+        if (type(messages) not in (list, tuple)
+                or any(str(UUID(value)) != value
+                       for value in (dataset_id, document_id, run_id, version_id))
                 or type(revision) is not int or revision < 1
-                or str(UUID(version_id)) != version_id):
+                ):
             raise ValueError()
         starts = [index for index, message in enumerate(messages)
                   if isinstance(message, HumanMessage) and message.id == run_id]
@@ -72,76 +194,129 @@ def layered_read_proof(messages, *, run_id: str, revision: int,
 
         cases: dict[str, dict[str, str]] = {}
         understandings: set[str] = set()
-        source_offsets: dict[str, int | None] = {}
+        evidence_offsets: dict[str, int | None] = {}
+        evidence_scope: dict[str, tuple[str, str]] = {}
+        complete: set[tuple[str, str]] = set()
         seen_results: set[str] = set()
         for message in scoped:
             if not isinstance(message, ToolMessage) or message.tool_call_id not in calls:
                 continue
             call = calls[message.tool_call_id]
             name = call.get("name")
-            if name not in {"read_case", "read_work_understanding", "read_conversation"}:
+            if name not in {"read_case", "read_work_understanding", "read_evidence"}:
                 continue
             if message.tool_call_id in seen_results:
                 raise ValueError()
             seen_results.add(message.tool_call_id)
-            if message.status != "success" or type(message.content) is not str:
+            if message.status != "success":
                 continue
+            if type(message.content) is not str or type(message.artifact) is not dict:
+                raise ValueError()
             payload = json.loads(message.content)
+            artifact = message.artifact
             args = call.get("args")
             if type(payload) is not dict or type(args) is not dict:
                 raise ValueError()
-            if name in {"read_case", "read_work_understanding"}:
-                if (payload.get("memory_revision") != revision
-                        or payload.get("memory_version_id") != version_id):
-                    continue
+            # The shared model-facing read_evidence tool also serves Working
+            # State and JD keys. Their own validators own those artifacts;
+            # neither can satisfy a case-scoped layered Memory read.
+            if name == "read_evidence" and artifact.get("kind") in {
+                    "working_evidence", "jd_evidence"}:
+                continue
+            expected_keys = {
+                "format_version", "kind", "dataset_id", "document_id", "run_id",
+                "memory_revision", "memory_version_id", "content_digest",
+            }
+            expected_kind = {
+                "read_case": "case",
+                "read_work_understanding": "understanding",
+                "read_evidence": "evidence",
+            }[name]
+            if (artifact.get("format_version") != 1
+                    or artifact.get("kind") != expected_kind
+                    or (artifact.get("dataset_id"), artifact.get("document_id"), artifact.get("run_id"))
+                    != (dataset_id, document_id, run_id)
+                    or artifact.get("content_digest") != _content_digest(message.content)
+                    or any(str(UUID(artifact.get(key))) != artifact.get(key)
+                           for key in ("dataset_id", "document_id", "run_id", "memory_version_id"))):
+                raise ValueError()
+            # A successful C repair may advance this foreground run to a new
+            # explicit basis. Earlier valid reads remain canonical history but
+            # cannot prove reads against the refreshed publication.
+            if (artifact.get("memory_revision") != revision
+                    or artifact.get("memory_version_id") != version_id):
+                continue
             if name == "read_case":
                 case_id = args.get("case_id")
-                if payload.get("case_id") != case_id or str(UUID(case_id)) != case_id:
+                if (set(artifact) != expected_keys | {"case_id", "evidence"}
+                        or payload.get("case_id") != case_id
+                        or artifact.get("case_id") != case_id or str(UUID(case_id)) != case_id):
                     raise ValueError()
-                references = payload.get("source_references")
-                evidence = payload.get("evidence")
-                if (type(references) is not list or type(evidence) is not list
-                        or len(references) != len(evidence) or not references
-                        or len(set(references)) != len(references)):
+                evidence = artifact.get("evidence")
+                visible = payload.get("evidence")
+                if (type(evidence) is not list or type(visible) is not list or not evidence
+                        or len(evidence) != len(visible)):
                     raise ValueError()
                 mapping = {}
-                for index, (reference, item) in enumerate(zip(references, evidence, strict=True), 1):
-                    if (type(reference) is not str or type(item) is not dict
-                            or set(item) != {"evidence_key", "source_reference"}
-                            or item["evidence_key"] != f"E{index}"
-                            or item["source_reference"] != reference):
+                for index, (item, shown) in enumerate(zip(evidence, visible, strict=True), 1):
+                    if (type(item) is not dict
+                            or set(item) != {"evidence_key", "source_reference", "canonical_order"}
+                            or type(item["source_reference"]) is not str
+                            or item["canonical_order"] != index
+                            or shown != {"evidence_key": item["evidence_key"]}
+                            or item["evidence_key"] != issue_evidence_key(
+                                dataset_id=dataset_id, document_id=document_id,
+                                run_id=run_id, case_id=case_id,
+                                source_reference=item["source_reference"],
+                            )):
                         raise ValueError()
-                    mapping[item["evidence_key"]] = reference
+                    key = item["evidence_key"]
+                    if key in evidence_scope and evidence_scope[key] != (case_id, item["source_reference"]):
+                        raise ValueError()
+                    mapping[key] = item["source_reference"]
+                    evidence_scope[key] = (case_id, item["source_reference"])
+                if case_id in cases and cases[case_id] != mapping:
+                    raise ValueError()
                 cases[case_id] = mapping
             elif name == "read_work_understanding":
                 identity = args.get("understanding_id")
-                if payload.get("understanding_id") != identity or str(UUID(identity)) != identity:
+                if (set(artifact) != expected_keys | {"understanding_id"}
+                        or payload.get("understanding_id") != identity
+                        or artifact.get("understanding_id") != identity
+                        or str(UUID(identity)) != identity):
                     raise ValueError()
                 understandings.add(identity)
             else:
-                reference = args.get("reference")
-                offset = args.get("offset", 0)
-                part = args.get("part", "source")
-                if (type(reference) is not str or reference.startswith("/interviews/")
-                        or part != "source" or type(offset) is not int or offset < 0
-                        or payload.get("reference") != reference
-                        or payload.get("read_offset") != offset):
-                    continue
-                expected = source_offsets.get(reference, 0)
+                if set(artifact) != expected_keys | {
+                    "case_id", "evidence_key", "source_reference", "read_offset", "next_offset",
+                }:
+                    raise ValueError()
+                key = args.get("evidence_key")
+                scope = evidence_scope.get(key)
+                if (type(key) is not str or scope is None
+                        or artifact.get("evidence_key") != key
+                        or (artifact.get("case_id"), artifact.get("source_reference")) != scope
+                        or payload.get("evidence_key") != key or payload.get("case_id") != scope[0]):
+                    raise ValueError()
+                offset = artifact.get("read_offset")
+                expected = evidence_offsets.get(key, 0)
                 if expected is None:
-                    continue
+                    expected = 0
                 if offset != expected:
                     raise ValueError()
-                following = payload.get("next_offset")
+                following = artifact.get("next_offset")
                 if following is not None and (type(following) is not int or following <= offset):
                     raise ValueError()
-                source_offsets[reference] = following
+                if payload.get("has_more") is not (following is not None):
+                    raise ValueError()
+                evidence_offsets[key] = following
+                if following is None:
+                    complete.add((scope[0], key))
         return LayeredReadProof(
             case_evidence=cases,
             understanding_ids=frozenset(understandings),
-            complete_sources=frozenset(
-                reference for reference, offset in source_offsets.items() if offset is None
-            ),
+            complete_case_evidence=frozenset(complete),
+            evidence_next_offsets=evidence_offsets,
         )
     except MemoryReadError:
         raise
@@ -340,9 +515,9 @@ def _is_layered(session):
 def build_memory_read_tools(backend=None):
     """Native tool instances; 0.7 removed backend factories, so use override."""
     from caliburn_memory.read_tools import readonly_file_tools
-    from .memory_read_tools import build_conversation_read_tool
+    from .memory_read_tools import build_evidence_read_tool
     return [*readonly_file_tools(backend if backend is not None else _UnboundMemoryFiles()),
-            build_conversation_read_tool(), *_build_layered_memory_read_tools()]
+            build_evidence_read_tool(), *_build_layered_memory_read_tools()]
 
 
 def _build_layered_memory_read_tools():
@@ -364,9 +539,9 @@ def _build_layered_memory_read_tools():
             raise ToolException("layered_memory_unavailable: 目前版本沒有分層案例與工作理解。")
         return session
 
-    @tool("read_case")
-    def read_case(case_id: str, runtime: ToolRuntime) -> dict:
-        """讀取案例導覽中的一筆目前案例，並取得按原對話順序排列的來源；不要自行產生ID。"""
+    @tool("read_case", response_format="content_and_artifact")
+    def read_case(case_id: str, runtime: ToolRuntime):
+        """讀取一筆目前案例與按原對話順序排列的evidence keys；不要自行產生ID。"""
         session = current(runtime)
         case_id = identifier(case_id, kind="case")
         try:
@@ -377,18 +552,10 @@ def _build_layered_memory_read_tools():
             raise MemoryReadError() from None
         except Exception:
             raise MemoryReadError() from None
-        return {"memory_revision": session.head.revision,
-                "memory_version_id": session.head.memory.version_id,
-                "case_id": item.case_id, "content": item.content,
-                "source_order": "oldest_to_newest",
-                "source_references": list(item.source_references),
-                "evidence": [
-                    {"evidence_key": f"E{index}", "source_reference": reference}
-                    for index, reference in enumerate(item.source_references, 1)
-                ]}
+        return case_read_projection(session, item)
 
-    @tool("read_work_understanding")
-    def read_work_understanding(understanding_id: str, runtime: ToolRuntime) -> dict:
+    @tool("read_work_understanding", response_format="content_and_artifact")
+    def read_work_understanding(understanding_id: str, runtime: ToolRuntime):
         """讀取理解導覽中的一筆目前工作理解與其支持案例ID；不要自行產生ID。"""
         session = current(runtime)
         understanding_id = identifier(understanding_id, kind="understanding")
@@ -402,13 +569,7 @@ def _build_layered_memory_read_tools():
             raise MemoryReadError() from None
         except Exception:
             raise MemoryReadError() from None
-        return {"memory_revision": session.head.revision,
-                "memory_version_id": session.head.memory.version_id,
-                "understanding_id": item.understanding_id, "content": item.content,
-                "case_bindings": [
-                    {"case_id": binding.case_id, "case_digest": binding.case_digest}
-                    for binding in item.case_bindings
-                ]}
+        return understanding_read_projection(session, item)
 
     for item in (read_case, read_work_understanding):
         item.handle_tool_error = True
@@ -423,11 +584,15 @@ def bind_memory_read_request(request):
         return request
     session = memory_session(request.runtime)
     if request.tool_call["name"] in {
-            "read_conversation", "read_case", "read_work_understanding"}:
+            "read_evidence", "read_case", "read_work_understanding"}:
         return request
     from caliburn_memory.read_tools import readonly_file_tools
+    from caliburn_memory.skills import SkillAssets, analysis_files
     backend = _LayeredMemoryFiles() if _is_layered(session) else session.backend
-    replacement = next(t for t in readonly_file_tools(backend)
+    # SkillsMiddleware advertises /skills/ paths, while these are the actual
+    # model-facing file tools. Route both through its existing read-only mount.
+    files = analysis_files(SkillAssets(), memory=backend)
+    replacement = next(t for t in readonly_file_tools(files)
                        if t.name == request.tool_call["name"])
     return request.override(tool=replacement)
 
@@ -435,6 +600,16 @@ def bind_memory_read_request(request):
 def build_consultant_tools():
     from .consultant_tools import build_jd_tools
     from .memory_repair_session import build_repair_tool
+    from .working_state import build_working_state_tools
     from caliburn_memory.requests import request_memory_consolidation
-    return [*build_jd_tools(), *build_memory_read_tools(), build_repair_tool(),
-            request_memory_consolidation]
+    consolidation_tool = request_memory_consolidation.model_copy(update={
+        "args_schema": {
+            "type": "object",
+            "properties": {},
+            "required": [],
+            "additionalProperties": False,
+        },
+    })
+    return [*build_jd_tools(), *build_memory_read_tools(), *build_working_state_tools(),
+            build_repair_tool(),
+            consolidation_tool]

@@ -31,8 +31,9 @@ from .memory_repair_records import (
 from .memory_sources import MemorySourceReader
 
 _CORRECTABLE = frozenset({"invalid_edit", "stale", "no_memory", "read_required"})
-_HANDOFF_FIELDS = ("messages", "jd_ai_run", "jd_ai_bindings", "jd_ai_read",
-    "jd_memory_view", "jd_model_view", "jd_memory_repair_bindings")
+_HANDOFF_FIELDS = ("messages", "interview_working_state", "jd_ai_run", "jd_ai_bindings",
+                   "jd_ai_read", "jd_memory_view", "jd_model_view",
+                   "jd_memory_repair_bindings")
 
 
 class _RepairNodeState(FilesystemState):
@@ -207,7 +208,8 @@ class MemoryRepairSession:
         """Resolve model evidence keys against exact saved current-version reads."""
         value = parse_layered_repair_input(args)
         proof = layered_read_proof(
-            state.get("messages", []), run_id=self.initial.run_id,
+            state.get("messages", []), dataset_id=self.initial.dataset_id,
+            document_id=self.initial.document_id, run_id=self.initial.run_id,
             revision=current.head.revision,
             version_id=current.head.memory.version_id,
         )
@@ -215,7 +217,7 @@ class MemoryRepairSession:
         evidence = proof.case_evidence.get(case_id)
         if evidence is None:
             raise MemoryReadError("case_read_required")
-        if set(evidence.values()) - proof.complete_sources:
+        if ({(case_id, key) for key in evidence} - proof.complete_case_evidence):
             raise MemoryReadError("case_sources_read_required")
         try:
             manifest = current.artifacts.bundle_manifest(current.head.memory)
@@ -400,6 +402,63 @@ def build_repair_node():
     return execute
 
 
+def _strict_object(properties: dict) -> dict:
+    return {
+        "type": "object",
+        "additionalProperties": False,
+        "properties": properties,
+        "required": list(properties),
+    }
+
+
+def model_layered_repair_schema() -> dict:
+    """Return the strict model view without replacing the repair Domain input."""
+    understanding_update = _strict_object({
+        "understanding_id": {
+            "type": "string",
+            "description": "目前 manifest 中直接受本次案例影響的既有工作理解 ID。",
+        },
+        "action": {
+            "type": "string", "enum": ["revise", "revalidate"],
+            "description": "revise 修改工作理解正文；revalidate 表示正文仍正確，只重新確認引用關係。",
+        },
+        "diff": {
+            "type": ["string", "null"],
+            "description": "action=revise 時填既有正文的 V4A diff；action=revalidate 時填 null。",
+        },
+        "supporting_case_ids": {
+            "type": "array", "items": {"type": "string"},
+            "description": "本次工作理解實際依據的、已讀取且應保留的案例 ID 集合。",
+        },
+        "route_note": {
+            "type": ["string", "null"],
+            "description": "只有既有 repair 規則需要路由說明時填寫；沒有就填 null。",
+        },
+    })
+    return _strict_object({
+        "case_id": {
+            "type": "string",
+            "description": "要立即修補的既有案例 ID；只能選已讀取且由 Runtime 提供的案例。",
+        },
+        "case_diff": {
+            "type": "string",
+            "description": "既有案例正文的 V4A diff，不是完整案例正文。",
+        },
+        "case_route_note": {
+            "type": ["string", "null"],
+            "description": "案例修補需要保留的路由說明；沒有就填 null。",
+        },
+        "remove_evidence_keys": {
+            "type": "array", "items": {"type": "string"},
+            "description": "本次案例修補明確移除的、已讀取的 Runtime-issued evidence key；沒有就填空陣列。",
+        },
+        "understanding_updates": {
+            "type": "array", "items": understanding_update,
+            "description": "本案例直接依賴的每個工作理解都必須列出 revise 或 revalidate；不能只更新部分直接依賴。",
+        },
+    })
+
+
 def build_repair_tool():
     def execute(runtime: ToolRuntime, **arguments):
         return repair_session(runtime).handoff(runtime)
@@ -412,5 +471,5 @@ def build_repair_tool():
             "case_diff與understanding_updates中的diff只填既有正文的V4A差異內容：以@@開始區段，"
             "未變行前加一個空格、刪除行前加-、新增行前加+，並帶足以唯一定位的真實上下文。"
             "不要填完整正文、數字行號、Markdown圍欄、檔案路徑或patch檔頭；不匹配時先重讀再修正。"),
-        args_schema=LayeredRepairInput.model_json_schema(mode="validation"), func=execute,
+        args_schema=model_layered_repair_schema(), func=execute,
         handle_validation_error="工具參數不符；本次未進入修補。")

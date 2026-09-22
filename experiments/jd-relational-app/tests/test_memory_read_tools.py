@@ -4,7 +4,7 @@ from types import SimpleNamespace
 from uuid import uuid4
 
 from caliburn_memory.memory import MemoryArtifacts
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langchain_core.tools import ToolException
 from langgraph.graph import END, START, MessagesState, StateGraph
 from langgraph.prebuilt import ToolNode
@@ -13,8 +13,13 @@ import pytest
 
 from jd_relational.conversation_sources import ConversationSourceError, SourceExcerpt, SourceMessage
 from jd_relational.memory_context import MemoryReadError, MemoryReadSession
-from jd_relational.memory_read_tools import build_conversation_read_tool, source_page
+from jd_relational.memory_read_tools import (
+    build_conversation_read_tool,
+    build_evidence_read_tool,
+    source_page,
+)
 from jd_relational.memory_sources import MemorySourceReader
+from jd_relational.working_state import sanitized_source_notice
 from test_chat_history import native
 from test_conversation_sources import seed, service
 
@@ -42,6 +47,68 @@ def test_page_preserves_exact_unicode_and_original_message_positions():
     assert recovered == {"question": first, "human": second}
     assert len(pages[0]["segments"]) == 2
     assert source_page(excerpt, len(first) + len(second))["segments"] == []
+
+
+def test_a_evidence_tool_exposes_only_the_runtime_issued_key():
+    schema = build_evidence_read_tool().tool_call_schema
+    schema = schema if isinstance(schema, dict) else schema.model_json_schema()
+    assert set(schema["properties"]) == {"evidence_key"}
+    assert schema["additionalProperties"] is False
+
+
+def test_openrouter_wire_excludes_private_evidence_artifact():
+    from langchain_openrouter.chat_models import _convert_message_to_dict
+
+    private = "conversation:PRIVATE_SIGNED_REFERENCE"
+    message = ToolMessage(
+        content='{"evidence_key":"E-safe"}',
+        artifact={"source_reference": private},
+        tool_call_id="call-1",
+        name="read_evidence",
+    )
+    wire = _convert_message_to_dict(message)
+
+    assert wire == {
+        "role": "tool",
+        "content": message.content,
+        "tool_call_id": "call-1",
+    }
+    assert private not in json.dumps(wire)
+
+
+def test_first_interview_can_read_current_turn_evidence_without_working_state(bound):
+    session, owner, ref, _, context = bound
+    context.source_notice = owner.for_turn(session.document_id, session.run_id)
+    original = owner.read(ref, session.document_id).messages
+    conversation = [
+        (HumanMessage if part.role == "user" else AIMessage)(
+            id=part.message_id, content=part.text,
+        ) for part in original
+    ]
+    notice = context.source_notice(conversation)
+    key = sanitized_source_notice(notice, context)["evidence_key"]
+
+    graph = StateGraph(ReadState)
+    graph.add_node("tools", ToolNode([build_evidence_read_tool()]))
+    graph.add_edge(START, "tools")
+    graph.add_edge("tools", END)
+    result = graph.compile(store=session.artifacts.store).invoke({
+        "jd_memory_view": session.view,
+        "messages": [*conversation, AIMessage(content="", tool_calls=[{
+            "id": "read-current-turn", "name": "read_evidence",
+            "args": {"evidence_key": key},
+        }])],
+    }, {"configurable": {"thread_id": session.document_id}}, context=context)
+
+    message = result["messages"][-1]
+    assert message.status == "success", message.content
+    page = json.loads(message.content)
+    assert page["evidence_key"] == key
+    assert [(part["role"], part["text"]) for part in page["segments"]] == [
+        (part.role, part.text) for part in original
+    ]
+    assert ref not in message.content
+    assert message.artifact["source_reference"] == ref
 
 
 @pytest.mark.parametrize("offset", [-1, True, 1.5, "0", 2**63, 4])

@@ -124,6 +124,7 @@ dependencies = [
     { name = "langgraph" },
     { name = "markdown-it-py", extra = ["linkify"] },
     { name = "openai-agents" },
+    { name = "pydantic" },
     { name = "sqlalchemy" },
 ]
 
@@ -134,13 +135,14 @@ requires-dist = [
     { name = "langgraph", specifier = "==1.2.11" },
     { name = "markdown-it-py", extras = ["linkify"], specifier = "==4.2.0" },
     { name = "openai-agents", specifier = "==0.22.0" },
+    { name = "pydantic", specifier = "==2.13.5" },
     { name = "sqlalchemy", specifier = "==2.0.52" },
 ]
 
 [[package]]
-name = "caliburn-jd-relational-probe"
+name = "caliburn-jd-app"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "alembic" },
     { name = "caliburn-consultant-memory" },
@@ -153,6 +155,7 @@ dependencies = [
     { name = "langchain-openrouter" },
     { name = "langgraph" },
     { name = "langgraph-checkpoint-postgres" },
+    { name = "openrouter" },
     { name = "psycopg", extra = ["binary"] },
     { name = "pydantic" },
     { name = "pywin32", marker = "sys_platform == 'win32'" },
@@ -180,9 +183,10 @@ requires-dist = [
     { name = "langchain", specifier = "==1.4.0" },
     { name = "langchain-anthropic", specifier = "==1.7.2" },
     { name = "langchain-openai", specifier = "==1.6.2" },
-    { name = "langchain-openrouter", specifier = "==0.2.7" },
+    { name = "langchain-openrouter", specifier = "==0.2.8" },
     { name = "langgraph", specifier = "==1.2.11" },
     { name = "langgraph-checkpoint-postgres", specifier = "==3.1.2" },
+    { name = "openrouter", specifier = "==0.10.8" },
     { name = "psycopg", extras = ["binary"], specifier = "==3.3.5" },
     { name = "pydantic", specifier = "==2.13.5" },
     { name = "pywin32", marker = "sys_platform == 'win32'", specifier = "==312" },
@@ -782,15 +786,15 @@ wheels = [
 
 [[package]]
 name = "langchain-openrouter"
-version = "0.2.7"
+version = "0.2.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "langchain-core" },
     { name = "openrouter" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/48/89/cf39b374bdf0172af99cbd85807feaa07bc7b1f5d05dd6524436222ebff7/langchain_openrouter-0.2.7.tar.gz", hash = "sha256:07f6fc26db08b97eb60bab330d45af7668777f596d48b5ce5098b21e063e964b", size = 182317, upload-time = "2026-07-22T20:16:18.85Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/b0/ee/23384b92b918fa17e724267146fd0365e39644164d318a29d1c3ebd77ef4/langchain_openrouter-0.2.8.tar.gz", hash = "sha256:97c044fdd71dbba01d8f9418e37a11ae4c17b3d6c34b48e2b272c9d5f2b8f065", size = 183170, upload-time = "2026-08-14T19:03:32.634Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/65/70/6c003f4d250feecd57bd102fd36eb199ab2e9ccc7dc70f3d5f3e10e15000/langchain_openrouter-0.2.7-py3-none-any.whl", hash = "sha256:d4a06f93fd9ffdd2d8840013e1c70ae071aef0faf8b9b30f2c6642ece2828d8a", size = 29214, upload-time = "2026-07-22T20:16:17.739Z" },
+    { url = "https://files.pythonhosted.org/packages/56/9d/f8c8ac721dff192a4378b645c6000a9eda828e0af0f91922b1c024bbe927/langchain_openrouter-0.2.8-py3-none-any.whl", hash = "sha256:c2c8d719a3ee6406a69f818b1c8cd0db3313a33d9c3b27dea0a44ba751ba97d0", size = 29586, upload-time = "2026-08-14T19:03:31.54Z" },
 ]
 
 [[package]]

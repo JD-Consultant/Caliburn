@@ -114,6 +114,7 @@ def _material(snapshot, document_id, run_id, dataset_id):
     # The source owner also depends on this checkpoint adapter. Load only the
     # shared pure binding validator here, without opening Memory resources.
     from .memory_context import checked_memory_view
+    from .working_state import checked_working_state
     if type(snapshot.values) is not dict:
         raise ValueError()
     values = snapshot.values
@@ -142,7 +143,9 @@ def _material(snapshot, document_id, run_id, dataset_id):
     if type(repairs) is not list:
         raise ValueError()
     _canonical(repairs)  # The App owns binding/request identity and result checks.
-    return record, messages, deepcopy(bindings), view, deepcopy(read), memory, deepcopy(repairs)
+    working = checked_working_state(values.get("interview_working_state"))
+    return (record, messages, deepcopy(bindings), view, deepcopy(read), memory,
+            deepcopy(repairs), None if working is None else working.model_dump(mode="json"))
 
 
 @dataclass(frozen=True, slots=True)
@@ -160,6 +163,7 @@ class AiRunObservation:
     _repair_bindings_json: str = field(default="[]", repr=False)
     _repair_checkpoint_json: str = field(default="null", repr=False)
     _consultant_next_json: str = field(default="null", repr=False)
+    _working_state_json: str = field(default="null", repr=False)
 
     @property
     def record(self): return parse_run_record_json(self._record_json)
@@ -175,6 +179,8 @@ class AiRunObservation:
     def memory_view(self): return json.loads(self._memory_json)
     @property
     def repair_bindings(self): return json.loads(self._repair_bindings_json)
+    @property
+    def working_state(self): return json.loads(self._working_state_json)
     @property
     def repair_checkpoint(self): return json.loads(self._repair_checkpoint_json)
     @property
@@ -394,12 +400,13 @@ class AiRunCheckpoints:
             if root.next == (START,):
                 if requested_source is not None and requested_source != root_config:
                     raise ValueError()
-                record, messages, bindings, view, read, memory, repairs = self._initial_material(
+                record, messages, bindings, view, read, memory, repairs, working = self._initial_material(
                     root, root_config, document_id, run_id, dataset_id)
                 return AiRunObservation(_canonical(record.model_dump(mode="json")), _messages_json(messages),
                     _canonical(bindings), _canonical(view), _canonical(read), _canonical(root_config),
                     _canonical(root_config), False, _memory_json=_canonical(memory),
-                    _repair_bindings_json=_canonical(repairs))
+                    _repair_bindings_json=_canonical(repairs),
+                    _working_state_json=_canonical(working))
             if root.next not in ((), ("consultant",), ("memory_repair",)):
                 raise ValueError()
             raw_record = root.values.get("jd_ai_run")
@@ -483,13 +490,14 @@ class AiRunCheckpoints:
                 raise ValueError()
             elif requested_source is not None and requested_source != root_config:
                 raise ValueError()
-            record, messages, bindings, view, read, memory, repairs = material
+            record, messages, bindings, view, read, memory, repairs, working = material
             return AiRunObservation(_canonical(record.model_dump(mode="json")), _messages_json(messages),
                 _canonical(bindings), _canonical(view), _canonical(read), _canonical(root_config),
                 _canonical(source_config), not (root.next or root.tasks or root.interrupts),
                 _memory_json=_canonical(memory), _repair_bindings_json=_canonical(repairs),
                 _repair_checkpoint_json=_canonical(repair_checkpoint),
-                _consultant_next_json=_canonical(consultant_next))
+                _consultant_next_json=_canonical(consultant_next),
+                _working_state_json=_canonical(working))
         except AiCheckpointError:
             raise
         except Exception:
@@ -540,11 +548,15 @@ class AiRunCheckpoints:
             if type(repairs) is not list:
                 raise ValueError()
             _canonical(repairs)
+            from .working_state import checked_working_state
+            working = checked_working_state(observed.working_state)
+            working = None if working is None else working.model_dump(mode="json")
             target_record = record.model_copy(update={"status": status})
             desired = {"jd_ai_run": target_record.model_dump(mode="json"), "messages": proposed,
                 "jd_ai_bindings": deepcopy(bindings), "jd_model_view": deepcopy(model_view),
                 "jd_ai_read": deepcopy(read_binding), "jd_memory_view": deepcopy(memory),
-                "jd_memory_repair_bindings": deepcopy(repairs)}
+                "jd_memory_repair_bindings": deepcopy(repairs),
+                "interview_working_state": deepcopy(working)}
         except Exception:
             raise AiCheckpointError("invalid_closure") from None
         current = self.observe(record.document_id, record.run_id, record.dataset_id)
@@ -554,7 +566,7 @@ class AiRunCheckpoints:
                 and _messages_json(result.messages) == _messages_json(proposed)
                 and result.bindings == bindings and result.model_view == model_view
                 and result.read_binding == read_binding and result.memory_view == memory
-                and result.repair_bindings == repairs)
+                and result.repair_bindings == repairs and result.working_state == working)
 
         if exact(current):
             return current

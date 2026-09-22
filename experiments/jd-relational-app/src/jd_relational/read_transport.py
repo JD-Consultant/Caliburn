@@ -13,6 +13,8 @@ DESCRIPTION = (
     "has_more 為 true 必須沿原 view／target_ref 與 next_cursor 續讀；不可將缺頁當完整工作。"
     "開始撰寫、收到人工更改通知或定位過時時先讀 current；歷史 refs 不可寫入。"
     "欄位全文、任務成果要求與 K/S 關係可查；source readability 與 basis_status 是不同事實。"
+    "type=item 記錄中的 container_ref 只表示目前父清單，不是新增子項的目標；"
+    "新增子項應從 type=container 記錄依 child_kind／owner_ref 配對後取 container_ref。"
 )
 ERRORS = {
     "invalid_input": (

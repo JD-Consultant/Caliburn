@@ -7,6 +7,8 @@
 
 **2026-09-17 施工狀態：**下列目標契約不變。引用施工 Tasks 1–6 已完成 source owner／port／adapter、B1 checkpoint registry／evidence 分配、bundle owner-order 再驗證、B2 case-bound exact-source keys／rework／零參數 finish，以及文件與 fresh 回歸收尾。Runtime strict schema 與 ToolNode 拒絕反例已通過；鎖定的 LangChain 1.4.0 `create_agent` 在無 structured response format 的一般 tools 路徑沒有傳 `strict=True`，而 `langchain-openrouter` 0.2.7 的 `bind_tools(strict=None)` 不會把 strict 放進 wire tool definition，因此不得把本片標成 provider strict 已證明。這不削弱 Runtime fail-closed 驗證，也不授權改 provider。
 
+**2026-09-20 cross-role successor：**本稿已完成的 B1／B2 stage、keys、cursor、formal refs 與 publication 不改寫；[跨顧問、Memory 與 JD 的模型安全證據契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)將同一參數責任延伸到 A、Working State、C read proof 與 JD model adapter。A 的 key 為 run-scoped，B1／B2 仍為 attempt-scoped；這是共同語意，不要求改成同一內部 state 類別。
+
 ## 1. 結論
 
 產品需要的是「引用按 canonical 訪談先後顯示，模型能選對完整問答，而且正式資料不會因模型抄錯地址、順序或分頁位置而損壞」。這個效果**不要求建立持久的全域 `turn_sequence` 欄位**。

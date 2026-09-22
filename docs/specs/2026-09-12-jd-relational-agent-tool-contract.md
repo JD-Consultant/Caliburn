@@ -6,6 +6,8 @@
 - 上層設計：[整體設計](2026-09-12-jd-relational-editor-design.md)
 - 保存契約：[資料庫與保存](2026-09-12-jd-relational-schema-and-write-contract.md)
 
+> **2026-09-20 model-view successor：**本稿的 relational JD 業務操作、App-issued JD target refs、domain／transaction／receipt 與 `jd_source_link` 均保持。模型 mutation 直接回填 signed `basis_refs` 的接口，改由[跨顧問、Memory 與 JD 的模型安全證據契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)收斂為 `basis_evidence_keys`；Runtime 解析後仍把同一 canonical refs 交既有 domain。下文 `basis_refs` 是目前已實作契約的歷史形狀，待窄切片更新 generated model contract，不得先手改生成檔或 DB schema。
+
 ## 1. 契約目的
 
 模型應專注於理解工作及撰寫內容；App 應承擔身分、定位、關係、版本、排序、交易與真實結果。模型不需要填一整份 JD JSON，也不需要算行號、DB UUID、外鍵、position、revision 或 operation key。

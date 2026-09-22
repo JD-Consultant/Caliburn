@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 const config = {
   reactStrictMode: true,
   poweredByHeader: false,
-  turbopack: { root: fileURLToPath(new URL('..', import.meta.url)) },
+  // pnpm hoists the shared dependency graph to the repository workspace root.
+  turbopack: { root: fileURLToPath(new URL('../../..', import.meta.url)) },
 };
 export default config;

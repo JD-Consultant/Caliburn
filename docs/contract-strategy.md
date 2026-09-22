@@ -2,9 +2,9 @@
 
 ## 現行規則
 
-Current 產品（`apps/api`／`apps/web`）目前只有一個跨語言 contract：`packages/job-analysis-contract`。其 JSON Schema 是 SSOT，生成 Python／TypeScript DTO，消費者是 `apps/api` 與 `apps/web`。改 schema 必須先研究、更新 ADR／plan，再執行 codegen、schema diff 與兩端測試。
+Current 產品（`experiments/jd-relational-app` 及其 `web`）的跨語言 contract 位於 App 自己的 `contracts/`。JSON Schema 是 SSOT，`scripts/generate_contract.py` 以鎖定的標準生成器產生 `src/jd_relational/generated` 下的 Python DTO 與 TypeScript 型別；API 與 Web 共用這批生成物。改 schema 必須先研究、更新 ADR／plan，再執行 codegen、schema diff 與兩端測試。舊 `packages/job-analysis-contract` 已退役，只留歷史 README，不得再作正式依賴。
 
-保留、隔離的 RAG bounded context 另有自己的跨語言 contract `packages/ocs-contract`（同一種 JSON Schema SSOT 機制，生成 Pydantic model 與 TypeScript type，`npm run check-codegen -w @caliburn/ocs-contract` 驗證無 diff），但不屬於 current 產品的 contract surface：`apps/api`／`apps/web` 不 import、不消費它。
+保留、隔離的 RAG bounded context 另有自己的跨語言 contract `packages/ocs-contract`（同一種 JSON Schema SSOT 機制，生成 Pydantic model 與 TypeScript type，`pnpm --filter @caliburn/ocs-contract run check-codegen` 驗證無 diff），但不屬於 current JD 產品的 contract surface：正式 App／Web 不 import、不消費它。
 
 API 內部的 domain／application model 不直接 import transport contract；mapper 是 HTTP DTO 與 domain 之間唯一的轉換邊界。Web 不手寫重複的 Current State、Evidence、Proposal 或 readiness shape。
 
@@ -24,4 +24,4 @@ API 內部的 domain／application model 不直接 import transport contract；m
 2. 在 `docs/adr/` 記錄選擇、拒絕選項與升級條件，並更新索引。
 3. 在 `docs/plans/` 拆出可驗證切片。
 4. 先跑現有測試，再改 codegen／consumer；一個 task 一個 commit。
-5. 跑 `npm run check-codegen -w @caliburn/job-analysis-contract`、API／Web 測試與 `git diff --check`。
+5. 跑根目錄 `pnpm build`（包含正式 App `codegen:check`）、API／Web 測試與 `git diff --check`；RAG contract 改動另跑其 filter 命令。

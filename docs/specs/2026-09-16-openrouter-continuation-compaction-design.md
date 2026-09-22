@@ -2,7 +2,7 @@
 
 - 日期：2026-09-16
 - Topic：`JD-R002／CTX-C001`
-- Stage：**G7 分段施工；基礎元件、正式 A 與 B1／B2 App-side request-only 接線均已完成離線驗證**
+- Stage：**G7 分段施工完成；基礎元件、正式 A 與 B1／B2 App-side request-only 接線及 2026-09-22 角色化摘要／reasoning client 契約均已完成離線驗證**
 - 取代：2026-09-15「等待 OpenRouter、改 direct OpenAI、另選長上下文策略」三選一的未決狀態
 - 不取代：Q019 顧問 Prompt、Skills、JD relational writer、publication CAS、背景通知與准入規則；Memory 的最新 B1／B2／C 產品語意改由 [MEM-L001](2026-09-16-layered-case-and-work-understanding-memory-alignment.md) 持有
 
@@ -17,6 +17,12 @@
 > **2026-09-16 G7 第二小步結果：**正式 `build_consultant()` 現預設注入 A profile 的 compaction middleware，摘要沿同一個 OpenRouter／Luna model boundary，主回答預留沿顧問既有 8,192 tokens。A 的完整 JD／Memory、Skills、背景提示與工具投影先組裝，compaction 最後依真正 request view 計算；文件根 state 保留 `continuation_compaction`，不再於 child 返回 root 時遺失。真 `create_agent`＋真 OpenRouter client／合成 HTTP＋Saver 反例確認：摘要與主回答使用相同 OpenAI-only／no-fallback route、摘要 request 沒有業務 tools、兩次 usage callback 均可觀察、`jd_model_view` 與 `continuation_compaction` 同次保存且 canonical messages 未改。A／checkpoint／runtime／chat／背景提示相鄰離線回歸 134 項通過；唯一警告是測試環境無法寫 `.pytest_cache`。未修改 `JdNoticeMiddleware`、Prompt、Memory、Working State 或 B1／B2，未讀 key、未呼叫 provider。下一步才是 B2 attempt-scoped 接線。
 
 > **2026-09-17 G7 背景 Agent 接線結果：**package 的 B1／B2 state 現承載可選 App-owned middleware；fresh start／new attempt 清空 `continuation_compaction`，same-attempt resume 與完成結果查回保留既有 state。`build_background_memory_workflow()` 以原 `case_model`／`understanding_model` 物件建立各角色 middleware，summary 直接呼叫該未綁業務 tools 的 injected model，主 Agent 才由框架綁工具；這是 App-side model-object identity 證據，不是正式 OpenRouter／Luna factory 或 provider wire 證據。固定合成模型＋真 Agent graph／Saver 測試另證明 B1 正常單一窗口即使多個工具 wave 也不摘要，多窗口只把第一個已完成窗口送 summary、第二個未處理窗口逐字保留，canonical graph messages 不混入 summary 且兩個 window／signed source 仍可讀回精確原文；B2 同 attempt transport failure 後恢復固定任務與 summary，新 attempt 首次 request 無舊 summary。fresh 精確受影響回歸為 App **52 passed／0 skipped**、package **50 passed／0 skipped**，兩邊 compileall 成功。這些測試沒有涵蓋完整 publication／JD byte-for-byte unchanged-state，也沒有 provider／credential／network、Prompt／Skills／Memory／C、DB／schema／migration／dependency 變更。
+
+> **2026-09-22 角色化摘要與 reasoning successor 結果：**回看 A 訪談 Working State、完整工作分析／JD 寫作、B1 案例維護、B2 工作理解及跨 Agent 證據契約後，確認共用 compaction 元件與 authority 邊界不變，但三個角色不能只共用一段沒有角色目的的通用摘要指令。既有 `CompactionProfile` 現已加入角色專用 retention instructions；B2 摘要模型另把逐字保留的固定任務當作唯讀 orientation。沒有新增 Agent、Memory、資料表、schema compiler、第二套摘要狀態或新的 boundary policy。Opaque `reasoning_details` 不送入 Caliburn semantic summary、也不升格為 Memory／evidence／JD basis；未被 boundary 覆蓋的近期 canonical tail 維持完整 `AIMessage`。零付費 checkpoint／request-view characterization 已證明該 metadata 原樣保留，沒有出現需要「額外保留最近 completed wave」的反例，因此維持既有安全工具 wave 與最近八則訊息規則。
+>
+> **2026-09-22 真 Luna prompt 品質 successor：**首輪角色化實測確認 B2 仍會把 `protected_orientation` 改寫成摘要目標，原因是共用「保留目前目標」與 B2「不重述 orientation」互相拉扯。現行規則已收斂為：所有角色只記錄受控輸入明確支持的狀態，未提及不能推論為未完成／沒有發生／沒有待辦／已確認；B2 summary 只保存相對於 fixed task 的新進度、差異及未解事項，不能另列目標、限制或下一步來重抄、改寫或概括 orientation。這只調整既有 summary instructions，不新增後處理器或 rejection／retry loop。真 Luna 兩請求重測已證 fixed task 不再重複、支持／反證／例外仍保留；精確證據見[元件優先驗收](evidence/2026-09-22-jd-component-first-acceptance.md)。
+
+> **2026-09-22 A 同回合工具迴圈 successor：**真 Luna JD 成文驗收在同一則員工輸入後自然執行 24 次工具判斷與 1 次 final；durable canonical messages 的離線輸入下界約 78,816 tokens，卻因 `protect_latest_human_turn` 把最新 `HumanMessage` 之後整段都排除而沒有 safe boundary。這與本稿「完成 wave 可壓縮、最新員工原話逐字保留」的效果要求不符。現行最小 successor 沿用同一 middleware、summary、digest、checkpoint 與 16K 門檻：A 將最新員工訊息作 Runtime 推導的逐字 `protected_orientation`，其後已完成 wave 可進累積摘要；B1 仍保護整個未處理窗口，B2 仍保護固定任務。state format v2 只新增 Runtime-owned `protected_message_id`，不由模型填寫，也不新增 Agent、資料表或第二種 compaction。原失敗 run 的同一 canonical history 現可選出第 41 則安全邊界；精確證據見[元件優先驗收](evidence/2026-09-22-jd-component-first-acceptance.md)。
 
 ## 1. 決定與產品效果
 
@@ -59,7 +65,8 @@ continuation_compaction = 摘要文字＋涵蓋邊界＋來源指紋
     "format_version": 1,
     "summary_text": "...",
     "covered_through_message_id": "...",
-    "covered_prefix_digest": "sha256:..."
+    "covered_prefix_digest": "sha256:...",
+    "protected_message_id": null
   }
 }
 ```
@@ -67,6 +74,7 @@ continuation_compaction = 摘要文字＋涵蓋邊界＋來源指紋
 - `summary_text` 與涵蓋邊界必須作為同一個 state value 更新，不能只前移位置或只保存文字。
 - `covered_through_message_id` 指向 canonical conversation 中實際存在的安全終點。
 - `covered_prefix_digest` 由該次已涵蓋 canonical prefix 的穩定序列化產生，用來攔截邊界指錯、內容暗變或跨文件重用；模型不填這兩個欄位。
+- format v1 維持原連續 prefix 語意，`protected_message_id=null`；A 的 format v2 由 Runtime 填入 covered prefix 中唯一且最新的員工 `HumanMessage.id`。摘要不包含該訊息，request view 則把原訊息逐字放在 summary 前。ID 不存在、重複、不是 `HumanMessage` 或不是該 prefix 最新 HumanMessage 時 fail closed。
 - B2 的初始任務訊息由固定 role profile 從 canonical attempt messages 推導並逐字保留，不複製進此 state，也不增加一個可由模型填寫的 identity 欄位；digest 仍涵蓋它所在的 canonical prefix。
 - 不建立新的 SQL table、原文副本、詳記副本或第二個 publication head。此 state 由既有 Checkpointer 按原 thread／attempt 保存。
 - request view 是臨時值，不另存完整副本。只保存能重建它的 summary 與邊界。
@@ -79,7 +87,7 @@ continuation_compaction = 摘要文字＋涵蓋邊界＋來源指紋
 
 middleware 只摘要**已完成的舊互動 wave**。「完成」是指一組模型／工具往返已在 checkpoint 中完整配對，不是整個 A 回合或整個 B2 attempt 已經結束：
 
-- A 不納入本次尚未得到顧問最終回答的最新員工訊息；它與本回合後續尚未終結的工作保持在未壓縮尾段；
+- A 的最新員工訊息在該回合始終逐字保留；它本身不進摘要，但它之後已完整配對並離開近期尾段的舊模型／工具 wave 可以進摘要。當前尚未完整配對的 wave 與最近八則仍逐字留在尾段；不能因整個 A 回合尚未 final 就阻止前段已完成工作被壓縮；
 - B1 正常以一個完整 canonical 訪談 batch 工作，不固定觸發摘要；若因來源交付或模型限制使用多個窗口，最新 `HumanMessage` 所帶的尚未完整處理窗口必須逐字留在尾段。前一窗口只有在其模型／工具 wave 安全完成、Runtime 已將 `window_position` 推進並保存 checkpoint 後，才可連同該舊 wave 納入後續 request-only compaction；不是只因訊息較舊就可壓縮；
 - B2 的第一則 `HumanMessage` 是本 attempt 的任務原文，整個 attempt 期間都逐字固定在 request 開頭。它不會因「任務尚未完成」而阻止後續已完成的舊工具 wave 被摘要；
 - 不切開 `AIMessage.tool_calls` 與所有對應 `ToolMessage`；
@@ -103,6 +111,47 @@ middleware 只摘要**已完成的舊互動 wave**。「完成」是指一組模
 
 摘要模型不取得 JD 編輯、Memory 修改、背景通知或其他業務 Tool。它只收到上一份 summary 與選定的 canonical prefix。
 
+### 4.3 共用不變量與三種角色保留規則
+
+本產品只保留一個 `ContinuationCompactionMiddleware`、一個 `continuation_compaction` state shape 及一套 safe-boundary／digest／發布流程。角色差異只放在既有 `CompactionProfile` 的 summary instructions，不建立三個 compactor、三套 prompt engine 或新的角色狀態。
+
+共同摘要必須保留可觀察且續作需要的：目前目標、已確認更正、已完成工具效果、未解問題、衝突／失敗、承諾及下一步；不得保存隱藏推理、補造事實、把 tool request 當成功，或複製會由 Runtime 重新注入的完整 JD／Memory／Working State。再按角色補下列重點：
+
+| 角色 | 角色專用 retention instructions | 明確不做 |
+|---|---|---|
+| A 主顧問 | 目前訪談焦點與完整工作覆蓋缺口；員工已確認事實、更正、未知／衝突與尚缺資訊；最近問答進度；已完成 JD／Working State／來源讀取的真實結果；背景整理只能記「已通知／receipt」，不能記成已完成；下一個適合詢問或處理的步驟 | 不複製完整 Working State、JD 或 Memory；不把每個分析面向變成固定問卷；不把摘要當員工原話 |
+| B1 案例維護 | 本次來源／窗口的處理位置；案例身分與差異；觸發、輸入、本人行動、判斷、成果、分工、條件、例外、更正、時間範圍與未知；已讀 evidence keys；staged create／revise／split／merge／retire／route、驗證結果與下一步 | 不把案例直接抽象成穩定工作理解；不摘要尚未完整處理的最新訪談來源；不以 summary 取代 canonical 引用 |
+| B2 工作理解 | 固定任務與 base orientation；B1 change set；已讀案例／理解及其支持、反證與差異；共同穩定任務、責任、條件、例外及未知；staged create／revise／revalidate／split／merge／retire／route、case rework、衝突與下一步 | 不修改案例；不把單一案例條件誤寫成共同模式；不因某一案例改變就假定其他案例也改變；不以 summary 取代案例／原話回查 |
+
+這些 retention instructions 是 continuation 的選材規則，不是 A／B1／B2 主 Prompt 的副本。摘要只記「繼續工作不可缺少的狀態」，完整工作與 JD 品質仍由主 Prompt、Skills、Working State、案例／理解 artifacts、guides 及按需讀取共同完成。
+
+### 4.4 B2 固定任務與 A 最新員工輸入只作唯讀 orientation
+
+B2 的首個固定 `HumanMessage` 仍由 `preserve_initial_messages=1` 逐字放在每次主 request 的 summary 前，且不被 summary 覆蓋。摘要 request 另把同一則**既有 model-visible 原文**放入 `protected_orientation`，讓摘要模型知道此次 attempt 的固定目標、base 與 B1 change set，據此判斷哪些舊工具結果及未完事項值得保留。
+
+- `protected_orientation` 不計入新 summary 的 covered incremental messages；
+- 不建立縮短版 task、第二份 task state 或新的持久欄位；
+- summary 不必重抄整份固定任務，且不得改寫其內容；
+- B1 的 `preserve_initial_messages=0`，且未處理窗口仍由 latest-turn boundary 保護；A 不固定保留第一則訊息，而是由 Runtime 從當前 canonical messages 推導最新員工 `HumanMessage`。只有 safe boundary 已越過該訊息時，A 才把它作動態 `protected_orientation` 並發布 format v2；模型不選 ID；
+- 任務內若含 Runtime-issued handles，它們仍只在原 attempt／scope 有效，summary 文字不能延長其權限。
+
+採逐字既有 model-view，而不是另做「精簡 B2 任務投影」，是為避免新增一份可能遺漏或漂移的語意轉換。若日後實測證明固定任務本身造成不可接受的預算壓力，再以具體 token／品質證據重開；第一版不先猜測並新增抽取器。
+
+A 的動態 orientation 同樣逐字取自 canonical message，不建縮短版。當下一則員工訊息進入且新 safe boundary 前移時，前一則受保護訊息會作為受控增量併回累積摘要，新訊息接替成為唯一逐字保護項；因此不會永久累積每一輪原話，也不會在換輪時靜默遺失前一輪員工要求。
+
+### 4.5 Reasoning continuation 與 semantic summary 的界線
+
+Reasoning 是 provider／模型延續用的 Context，不是產品權威資料。Caliburn 採以下單一政策：
+
+1. canonical message／checkpoint 沿框架既有 serializer 保存已收到的 `AIMessage.additional_kwargs`；不因 compaction 物理刪除 provider metadata；
+2. 尚未被 boundary 覆蓋的近期 tail 以 deep copy 原樣進主 request view，鎖定 `langchain-openrouter==0.2.7` 負責把 `reasoning_content`／`reasoning_details` 序列化回 OpenRouter；
+3. safe boundary 不切進未完成的 tool call／result wave；A 逐字保護最新員工 HumanMessage 但允許其後完成 wave 壓縮，B1 則保護最新未處理 Human turn／來源窗口；
+4. boundary 以前的 completed old reasoning 不送入 Caliburn summary model，也不轉寫成可見的「推理摘要」；續作所需結論必須已出現在可觀察對話、ToolMessage、Working State、Memory、JD receipt 或 continuation summary；
+5. summary 只能承接可觀察的 task state、工具結果、未解事項及下一步，不建立 Reasoning Memory、Reasoning DB 或 reasoning evidence；
+6. 未來若 provider route 真正提供且驗證 native reasoning-aware compaction，可作 transport optimization，但仍不得改變 canonical／Memory／JD authority。
+
+正式零付費測試已固定這條 client contract：鎖定 adapter 收到 `reasoning_details` 後放入 `AIMessage.additional_kwargs`，`message_to_dict／messages_from_dict` 與未被覆蓋的 request tail 都保留它；`_summary_input()` 則刻意排除 opaque 值。這只證明客戶端 checkpoint／request-view 路徑，不冒稱每次真 Luna 都一定回傳 reasoning metadata，也不把 source inspection 冒稱新的 provider smoke。測試沒有顯示 `keep_messages=8` 會切掉當前未完成工具 wave，因此沒有增加另一個 token／wave retention policy。
+
 ## 5. 預算、呼叫與保存時點
 
 - 第一版沿既有 OpenRouter 顧問政策，以完整 request 約 **16,000 input tokens** 作摘要觸發起點，保留至少八則近期訊息；這兩項放入 role profile，不散落硬編碼。
@@ -120,6 +169,7 @@ middleware 只摘要**已完成的舊互動 wave**。「完成」是指一組模
 
 - `continuation_compaction` 位於 `ConsultantState`，跟隨該文件既有 `thread_id=document_id` checkpoint 跨回合恢復。
 - A 的正式 `graph.invoke(..., durability="sync")` 每輪只提交新 `HumanMessage`，同一 `thread_id` 由 Checkpointer 恢復前輪 state；跨回合與關閉重開後取回 compaction 是既有呼叫鏈上的驗收，不是另一套保存設計。
+- A 的最新員工 `HumanMessage` 是逐字 orientation，不是 summary source。若 16K 門檻在同一回合工具迴圈內觸發，Runtime 可摘要該訊息之後已完成的舊 wave；下一輪新的員工訊息進入後，舊 protected message 才併入累積摘要並由新訊息接替。
 - 每個 model step 先由既有 `JdNoticeMiddleware` 組入當次 JD／source／Memory context，再由 compaction middleware 以完整 projected request 判斷預算；它只替換送模型的 `messages` view。
 - summary 不進 `source_notice`、B1 source window、Memory reader 或 JD `basis_refs`。
 - 不同文件的 runtime context、thread、summary、boundary 與 digest 不得互用。
@@ -166,12 +216,14 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 
 ## 9. G7 最小施工與驗收
 
-施工分成可獨立複核的小步；目前 1–3 的離線接線已完成，4 的自然 smoke 仍未授權：
+原施工 1–4 與 2026-09-22 successor 的第 5–6 小步均已完成離線驗證；沒有重做舊切片，也沒有以此自動執行新的付費 smoke：
 
 1. 新增 typed compaction state、公開 middleware 與 profile 設定；不加 dependency／table／migration。
 2. 正式 A 注入新 middleware；以鎖定 LangChain 的真實組裝測試證明 `jd_model_view` 與 `continuation_compaction` 同時保存，不預設修改 `JdNoticeMiddleware`。
 3. B1／B2 各自使用 exact injected role model object 與 role-scoped／attempt-scoped middleware；B1 正常單一 batch 不固定摘要，多窗口時只允許已安全完成並 checkpoint 推進的舊窗口進入 request-only summary，當前未處理窗口逐字保留；B2 的固定任務原文與 stale 新 attempt 邊界保持本稿規則。正式 OpenRouter／Luna role-model factory 已由 successor 離線完成，舊 direct Responses／native `context_management` 不接回正式路徑；舊 adapter 契約測試保留作歷史證據。
 4. 已跑受影響離線回歸與 compileall；付費／自然 smoke 仍須另依費用授權，不在本文件切片讀 key 或呼叫 provider。
+5. reasoning-continuity characterization 已固定：checkpoint round-trip 與 request-only tail 保留近期 `reasoning_details`，summary projection 不包含它；既有行為成立，因此未修改 serializer／adapter／boundary。
+6. 既有 profile／prompt seam 已補 A／B1／B2 retention instructions 與 B2 `protected_orientation`；只修改共用 compaction 模組及受影響測試，沒有修改主 Prompt、Memory／JD、Agent graph 或 provider factory。
 
 最少固定反例：
 
@@ -188,15 +240,21 @@ B2 沒有 A 的 JD notice，但仍用相同 compaction state 與 request-only �
 - B2 同 attempt 恢復，stale 新 attempt 不帶舊 summary；
 - summary 不是 source／Memory／JD basis，不能取代 B1 canonical 訪談或引用；
 - 完整 request 預算、輸出上限、OpenAI-only／no-fallback 與 usage receipt 均可觀察。
+- A／B1／B2 的 summary request 分別取得正確 retention instructions；通用規則與角色規則不互相覆蓋；
+- B2 摘要可看到逐字固定任務作 `protected_orientation`，但該任務仍逐字留在主 request、沒有被 summary boundary 吞掉或複製成第二份持久 task；
+- recent tail 的 `reasoning_details` 經 checkpoint／request view／OpenRouter serializer 原樣保留，covered old reasoning 不進 semantic summary，也不形成 evidence／Memory／JD basis；
+- 角色摘要對完整工作與 JD 品質只保留續作線索：A 保留待訪談缺口，B1 保留案例差異／更正，B2 保留跨案例支持／反證；不把十四分析面向、完整 artifacts 或 guides 全量複製進 summary。
 
-完成本切片只代表 A／B1／B2 的 App-side compaction 接線與離線契約通過；dispatcher 與正式 OpenRouter／Luna role-model factory 已由各自 successor 驗證。Task 4 直接證明的是 canonical graph messages／source readability、B1 window boundary 與 B2 attempt lifecycle，不是完整 publication／JD byte-for-byte unchanged-state。layered C、managed App callback、付費／自然長訪談、完整 dispatcher／App 使用旅程與 production authority 仍未驗收。
+本切片的直接證據為：compaction／adapter／背景 Agent **29 passed**，A／App 組裝與相鄰 context **55 passed**；排除本機 ACL 會阻擋的 Credential Manager／operator 兩個測試模組後，新 JD App 其餘完整離線套件為 **3061 passed／322 skipped／0 failed**。另有一項既有 Memory repair 測試只縮窄故障注入時點，使其仍在 `repair_memory` 綁定而非較早的合法 evidence projection 觸發；產品程式未因該測試修改。這些結果代表 A／B1／B2 的 App-side compaction 接線、角色摘要及 client-side reasoning continuity 契約通過；不代表正式 16K 自然長訪談、每次真 Luna 都返回 reasoning metadata、provider-native compaction 或付費摘要品質已由本切片驗證。其他 dispatcher、完整 App 與真模型旅程狀態以 `docs/current-decisions.md` 較新的驗收條目為準，本稿不保存第二份總狀態。
 
 ## 10. 官方交叉核對與本案選擇
 
 本稿在施工前重新核對 OpenAI、Anthropic 及鎖定框架文件／原始碼。可稱為跨來源共同原則的只有：長任務要主動管理 active context、摘要／compaction 應保留續作所需目標與未完事項、持久 Memory 與 context compaction 是不同責任，以及工具互動不可因裁切失去配對。各家沒有共同規定 Caliburn 必須採用同一個 summary schema、message boundary、digest 或 publication 方式；這些是本產品為了 canonical 原話、JD／Memory authority 與恢復需求所作的選擇。
 
 - OpenAI 的 [Compaction 指南](https://developers.openai.com/api/docs/guides/compaction)與 [長任務模型指引](https://developers.openai.com/api/docs/guides/latest-model?model=gpt-5.5)支持在長任務中壓縮工作上下文，保留已完成動作、有效假設、識別資料、工具結果、未解阻塞與下一目標；原生 opaque item 是 Responses transport 能力，不等於本產品的工作理解 Memory。
-- Anthropic 的 [Compaction](https://platform.claude.com/docs/en/build-with-claude/compaction)、[Context windows](https://platform.claude.com/docs/en/build-with-claude/context-windows)與 [Memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)同樣把 active-context 縮減與可按需讀取的持久資料分開；這支持責任分離，不代表其 server-side summary 格式可直接當成本 App 契約。
+- OpenAI Agents SDK 的 [`OpenAIResponsesCompactionSession`](https://openai.github.io/openai-agents-python/ref/memory/openai_responses_compaction_session/)明確把 user messages 排除在 compaction candidates 外；這支持「員工輸入保留、其餘已完成工作可壓縮」，不代表 Caliburn 必須採其 Responses transport 或改寫 canonical history。
+- OpenAI 的 [Reasoning 指南](https://developers.openai.com/api/docs/guides/reasoning#keeping-reasoning-items-in-context)建議函式呼叫期間保留最近使用者訊息以後的 reasoning／function call／output items；原生 Responses 能自行判斷可用 reasoning，不代表 App 應將 opaque metadata 轉寫成產品摘要。
+- Anthropic 的 [Compaction on demand](https://platform.claude.com/docs/en/build-with-claude/compaction-on-demand)、[Context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing)、[Context windows](https://platform.claude.com/docs/en/build-with-claude/context-windows)與 [Memory tool](https://platform.claude.com/docs/en/agents-and-tools/tool-use/memory-tool)同樣把 active-context 縮減與可按需讀取的持久資料分開，並允許保留近期 thinking／工具配對、清除較舊 completed tool results；這支持 hybrid retention 與責任分離，不代表其 server-side summary 格式或固定保留數量可直接當成本 App 契約。
 - LangChain 的 [Custom middleware](https://docs.langchain.com/oss/python/langchain/middleware/custom)、[Built-in middleware](https://docs.langchain.com/oss/python/langchain/middleware/built-in)與 LangGraph [Persistence](https://docs.langchain.com/oss/python/langgraph/persistence)提供 request override、state update、summary middleware 與 checkpoint primitive。鎖定的 LangChain 1.4.0 built-in summarizer 會用 summary＋tail 更新 `messages`，所以本案不用它覆寫 canonical conversation；同版 factory 原始碼則證明不同 middleware 的 `Command` 可累積，故不先修改 `JdNoticeMiddleware`。
 
 因此，官方資料支持本稿的責任切分與安全目標；「canonical messages 永久保留、衍生 summary 另存、B2 起始任務逐字保留、digest 驗證、摘要與主回答同 model step 發布」仍是 Caliburn 的產品／工程決策，不冒充大廠唯一共識。

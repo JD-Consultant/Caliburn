@@ -99,7 +99,9 @@ def test_actual_model_request_and_closed_root_preserve_original_conversation(asy
     assert result['messages'][1].usage_metadata == reply.usage_metadata
     assert len(model.requests) == 1
     assert isinstance(model.requests[0][0], SystemMessage)
-    notice = json.loads(model.requests[0][0].content[-1]['text'])
+    notice = next(json.loads(block['text']) for block in model.requests[0][0].content
+                  if block['text'].startswith('{')
+                  and json.loads(block['text']).get('type') == 'jd_change_notice')
     assert notice['turn_start']['manual_change_count'] == 2
     assert notice['turn_start']['content_included'] is False
     assert human.content not in view.notice_json
@@ -207,7 +209,10 @@ def test_tool_loop_keeps_initial_manual_notice_and_advances_response_boundary():
     root = build_document_graph(child, InMemorySaver())
     result = root.invoke({'messages': [HumanMessage(content='請繼續')]},
         {'configurable': {'thread_id': context.document_id}}, context=context, durability='sync')
-    notices = [json.loads(messages[0].content[-1]['text']) for messages in model.requests]
+    notices = [next(json.loads(block['text']) for block in messages[0].content
+                    if block['text'].startswith('{')
+                    and json.loads(block['text']).get('type') == 'jd_change_notice')
+               for messages in model.requests]
     assert len(notices) == 2
     assert notices[0]['turn_start'] == notices[1]['turn_start']
     assert notices[1]['turn_start']['manual_change_count'] == 2

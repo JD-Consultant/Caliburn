@@ -26,7 +26,15 @@ def test_source_metadata_reaches_request_without_copying_original_into_system():
                          context=context, durability="sync")
     assert captured == [[original.model_dump()]]
     blocks = model.requests[0][0].content
-    assert json.loads(blocks[-1]["text"]) == metadata
+    projected = [json.loads(block["text"]) for block in blocks
+                 if block["text"].startswith("{")]
+    source = next(item for item in projected if item.get("type") == "conversation_source_notice")
+    working = next(item for item in projected if item.get("type") == "interview_working_state")
+    assert set(source) == {"type", "evidence_key", "messages", "instruction"}
+    assert source["messages"] == metadata["messages"]
+    assert source["evidence_key"].startswith("E-")
+    assert working["item_count"] == 0 and working["directory"] == []
+    assert metadata["source_ref"] not in json.dumps(blocks, ensure_ascii=False)
     assert original.content not in json.dumps(blocks, ensure_ascii=False)
     assert model.requests[0][1].model_dump() == original.model_dump()
     assert [m.type for m in result["messages"]] == ["human", "ai"]

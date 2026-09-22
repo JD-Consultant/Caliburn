@@ -7,11 +7,17 @@ server, opens a provider or writes to the real installation path.
 
 import os
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 import jd_relational.__main__ as entry
 from jd_relational.__main__ import main
+from jd_relational.local_configuration import (
+    configuration_phase,
+    encode_configuration,
+    new_configuration,
+)
 
 SECRETS = ("jd-local-test-only", "password", "postgresql://", "sk-", "127.0.0.1:55436")
 
@@ -91,3 +97,45 @@ def test_serving_is_separate_from_initialising(nowhere, capsys, monkeypatch):
     assert main(["serve"]) == 1
     assert called == [], "serve initialised something"
     assert "尚未找到本機設定" in capsys.readouterr().err
+
+
+def configured(phase="ready"):
+    value = new_configuration(
+        host="127.0.0.1",
+        port=55436,
+        database="synthetic",
+        username="synthetic",
+        password="private-fixture-password",
+        checkpoint_schema="jd_runtime",
+        api_port=8014,
+        allowed_origins=("http://127.0.0.1:3002",),
+    )
+    if phase == "ready":
+        value = configuration_phase(value, "initializing")
+        value = configuration_phase(value, "ready")
+    return value
+
+
+def test_api_origin_projects_only_the_ready_loopback_endpoint(capsys, monkeypatch):
+    """A launcher gets the configured API endpoint without reading secrets itself."""
+    raw = encode_configuration(configured())
+    monkeypatch.setattr(entry, "ConfigFile", lambda _path: SimpleNamespace(read=lambda: raw))
+
+    assert main(["api-origin"]) == 0
+
+    printed = capsys.readouterr()
+    assert printed.out == "http://127.0.0.1:8014\n"
+    assert printed.err == ""
+    for secret in SECRETS:
+        assert secret not in printed.out and secret not in printed.err
+
+
+def test_api_origin_refuses_an_installation_that_is_not_ready(capsys, monkeypatch):
+    raw = encode_configuration(configured("initialization_pending"))
+    monkeypatch.setattr(entry, "ConfigFile", lambda _path: SimpleNamespace(read=lambda: raw))
+
+    assert main(["api-origin"]) == 1
+
+    printed = capsys.readouterr()
+    assert printed.out == ""
+    assert "初始化尚未完成" in printed.err

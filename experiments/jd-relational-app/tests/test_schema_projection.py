@@ -38,7 +38,7 @@ def test_each_published_tool_is_closed_and_contains_only_reachable_definitions(n
 def test_single_field_tool_does_not_include_other_command_shapes():
     schema = tool_definition("openai", "jd_set_text")["parameters"]
     assert "$defs" not in schema
-    assert set(schema["properties"]) == {"target_field_ref", "text", "basis_refs"}
+    assert set(schema["properties"]) == {"target_field_ref", "text", "basis_evidence_keys"}
 
 
 def test_advertisement_does_not_repeat_the_whole_catalog_per_tool():

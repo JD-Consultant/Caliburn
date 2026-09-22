@@ -57,6 +57,54 @@ test('fetch is called without binding the JdApi instance as its receiver', async
   assert.deepEqual(calls, [{ url: 'http://127.0.0.1:9000/api/documents?archived=false', method: 'GET' }]);
 });
 
+test('request uses the standard AbortSignal.timeout deadline', async t => {
+  const nativeTimeout = AbortSignal.timeout;
+  let timeoutMs: number | undefined;
+  Object.defineProperty(AbortSignal, 'timeout', { configurable: true, value: (milliseconds: number) => {
+    timeoutMs = milliseconds;
+    return nativeTimeout(milliseconds);
+  }});
+  t.after(() => Object.defineProperty(AbortSignal, 'timeout', { configurable: true, value: nativeTimeout }));
+  let signal!: AbortSignal;
+  const fetcher: typeof fetch = async (_input, init) => {
+    signal = init?.signal as AbortSignal;
+    return json({ dataset_id: DATASET, documents: [], next_after: null });
+  };
+  const api = new JdApi('http://127.0.0.1:9000', fetcher);
+  assert.deepEqual(await api.list(), { dataset_id: DATASET, documents: [], next_after: null });
+  assert.equal(signal.aborted, false);
+  assert.equal(timeoutMs, 15_000);
+});
+
+test('response body interruption is response_unknown rather than invalid_response', async () => {
+  let signal!: AbortSignal;
+  let streamController!: ReadableStreamDefaultController<Uint8Array>;
+  const fetcher: typeof fetch = async (_input, init) => {
+    signal = init?.signal as AbortSignal;
+    const body = new ReadableStream<Uint8Array>({ start(controller) {
+      streamController = controller;
+      const abort = () => controller.error(new DOMException('aborted', 'AbortError'));
+      if (signal.aborted) abort();
+      else signal.addEventListener('abort', abort, { once: true });
+    } });
+    return new Response(body, { headers: { 'Content-Type': 'application/json' } });
+  };
+  const api = new JdApi('http://127.0.0.1:9000', fetcher);
+  const pending = api.list();
+  await Promise.resolve();
+  streamController.error(new DOMException('aborted', 'AbortError'));
+  await assert.rejects(pending, (error: unknown) => error instanceof ApiError && error.code === 'response_unknown');
+  assert.equal(signal.aborted, false);
+});
+
+test('a complete malformed JSON body remains invalid_response', async () => {
+  const fetcher: typeof fetch = async () => new Response('{"broken":', {
+    headers: { 'Content-Type': 'application/json' },
+  });
+  const api = new JdApi('http://127.0.0.1:9000', fetcher);
+  await assert.rejects(api.list(), invalid);
+});
+
 test('AJV validates authoritative command schema without coercion or injected identities', () => {
   validateManualRequest(request);
   assert.throws(() => validateManualRequest({ ...request, operation_id: 3 }), invalid);

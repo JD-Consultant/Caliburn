@@ -1,10 +1,12 @@
 # 分層 Memory 完整背景 Workflow 設計
 
+> **2026-09-20 successor 路由：**本稿的 B1→B2 workflow、attempt、rework、CAS／receipt 與後續 App 接線都保留；文中「layered C／managed callback 尚未完成」是當時狀態，兩者現已由後續切片完成。目前待施工的是[A／Working State／JD 的短-key證據對齊](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)，不是重做本 workflow。
+
 **Topic：**`JD-R002 / MEM-L001`
 
 **Stage：**G7 分段施工
 
-**Status：**package workflow、C repair→B2 impact 接力、App A 分層讀取、既有 App 背景資源窄接合、App B1／B2 request-only compaction、正式 role factory 及 managed callback 均已完成離線切片；provider／自然模型、layered C 工具與完整 App journey 待接
+**Status：**package workflow、C repair→B2 impact 接力、App A 分層讀取、既有 App 背景資源窄接合、App B1／B2 request-only compaction、正式 role factory、managed callback 及 layered C 均已完成離線切片；A／JD 證據 model-view 對齊、provider／自然模型與完整 App journey 待接
 **Date：**2026-09-17
 
 ## 1. 目標與既有決策
@@ -302,4 +304,4 @@ B1／B2 仍使用自己的 durable graphs。外層節點若在子 workflow 完�
 - **Decision：**新增 deterministic `BackgroundMemoryWorkflow` 串接既有 B1、B2、bundle 與 publication；B2 review 只作 Runtime 診斷，新 B1 必須重讀原話；最多返工一次。
 - **Why：**避免 B1／B2 各自發布或 App 重做語意不變量，同時保留精確恢復、stale 重整與一次原子 publication。
 - **Implemented：**package 已完成 source progress 接點、B1／B2 durable attempt、B1 Runtime review、outer graph、完整 bundle 組裝、同步 request checkpoint、CAS／receipt、covered／stale／bounded retry、blocked 終局，以及 C repair receipt→B2 impact 接力；App successor 已把既有 source owner、admission、Saver／Store 與 publication 組裝到單一外層 workflow，完成真 PostgreSQL／新程序恢復及 managed callback。未修改 provider、Prompt 方法、JD 或 production 入口。
-- **Next gate：**正式 OpenRouter／Luna role model factory、managed App callback、B1／B2 request-only compaction 與 A 分層 read path 均已完成各自離線切片；下一片是 layered C bundle repair 本身，其後仍有 provider／自然模型與完整 App journey 驗收。不重做 Memory 分層、引用、impact 接力或 publication。
+- **Next gate：**layered C 已由後續切片完成；目前先依[跨顧問、Memory 與 JD 的模型安全證據契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)把 A／Working State／JD 的來源 model-view 收斂為短 key，再分開驗 provider／自然模型與完整 App journey。不重做 Memory 分層、B1／B2 引用、impact 接力或 publication。

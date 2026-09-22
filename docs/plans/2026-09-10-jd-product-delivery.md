@@ -2,6 +2,8 @@
 
 2026-09-10；Topic JD-R002／JD-R001-C06。Owner 已明確要求實作本總計畫。狀態：開始執行，尚未交付成品。
 
+> **2026-09-22 路由更新：**本計畫保留完整產品旅程、自然品質與真人試用 gate；下方 Plate／三工具／「Task 6 是唯一下一單位」是當時起點，已被 relational JD、分層 Memory、完整 App 驗收及 [ADR0077 正式權責切換](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)取代，不再作目前施工指令。當前短路由以 [`current-decisions.md`](../current-decisions.md) 最上條為準；歷史階段與問題解決順序仍保留。
+
 ## 1. 成品與範圍
 
 員工在目前這台電腦開啟 App，透過持續訪談建立忠實反映自己實際工作的客製化 JD，能看修改、更正、保存、日後續談。旅程：建立文件 → 訪談 → 理解 → 資料足夠才撰寫 → 查看／更正 → 全稿核對 → 保存／續談。
@@ -13,7 +15,7 @@
 - Plate 免費開源能力，沿六章、Task 平行成果／要求組、同份 JD 共享 K／S 引用及語意 v2。暫用「工作執行要求」，名稱微調不阻塞施工。
 - 其他電腦安裝、下載／匯出、真人顧問交付／問答包、永久刪除、登入／ACL／多人／雲端／RAG／舊資料搬移 PARKED。
 
-本總計畫不取代細部契約，不使 Proposed ADR 自動 Accepted。沿 [register](../current-decisions.md)、[process](../decision-process.md)、[六切片](2026-09-10-jd-editor-core-implementation.md)執行。隔離接線可開始；production 改 authority 前完成 G6。已驗 Memory／顧問做採用及接點回歸，不重新選架構或模型。
+本總計畫不取代細部契約，不使 Proposed ADR 自動 Accepted。沿 [register](../current-decisions.md)、[process](../decision-process.md)、[六切片](2026-09-10-jd-editor-core-implementation.md)執行。production authority 已由 Owner 接受的 ADR0077 完成硬切換；已驗 Memory／顧問／JD 直接採用，不重新選架構或模型。
 
 ## 2. 階段、依賴與完成證據
 
@@ -23,10 +25,10 @@
 | P1 核心 | 原 Task 1–3：schema 生成、原生 profile／adapter／validator、PG 保存、三工具、手改通知 | 固定操作保存／重開／定位／恢復，錯誤不重複套用或部分發布 | Task 1–3完成；原生／保存／三工具固定工程驗收通過，完整lifecycle仍留P2 |
 | P2 畫面 | 原 Task 4–6：聊天＋JD、手改／真選取、差異／歷史／來源、取消／恢復、單一 JD Skill；入口防重複及未保存保護 | 真瀏覽器完整固定旅程；API／DB／模型所見一致 | Task4–5已接受；接Task6完整固定旅程，OS真人IME未驗 |
 | P3 自然縱切 | 既有真顧問自行訪談→初稿→K／S首建及引用→更正→全稿核對→重開 | 1個不指定 tool calls 的完整案例；結果、來源、失敗、延遲、用量可查 | [C-W v2校準包](../specs/evidence/jd-product-p3-calibration/README.md)及AI操作者測法接合review通過；非真人／非盲，0次／未付費授權，預算guard仍須補驗 |
-| P4 正式整合 | 採用已驗 Memory／來源 runtime、獨立 successor ADR；0073 review／G6；統一依賴／composition／契約 | 正式 API/Web 唯一 JD owner；舊 pending／approved writers、UI 與下載入口退出；無 research/worktree runtime imports | 研究可並行；切換未開始 |
+| P4 正式整合 | 採用已驗 Memory／來源 runtime、獨立 successor ADR；統一依賴／composition／契約 | 正式 API/Web 唯一 JD owner；舊 pending／approved writers、UI 與下載入口退出；無 research/worktree runtime imports | **完成**；ADR0077 Accepted，舊可執行 authority 已移除，正式根入口通過 |
 | P5 日常使用 | 更名、封存／恢復、首次引導、啟停／設定檢查、離線／服務錯誤、備份還原／更新 | 重開續談、封存恢复及完整資料還原演練成立 | [操作前置核對](../specs/2026-09-10-jd-operations-preflight.md)已備，技術接合問題留在受影響施工前閉合；施工未開始 |
 | P6 品質試用 | 3異質未見職位各2自然流程、長訪談／compaction／晚期更正／手改／重開、3名目標員工操作 | 重大忠實度／資料／旅程問題處理完；固定回歸及失敗保留 | [真人操作空表](../specs/evidence/jd-product-p6-usability/README.md)已備且有限review通過；自然及真人驗收未開始 |
-| P7 交付 | 固定版本／依賴、使用及維護說明、獨立審查、驗收與後續清單 | 日常入口可用，不需研究者代操作；code/design/ADR/register 一致 | 未開始 |
+| P7 交付 | 固定版本／依賴、使用及維護說明、獨立審查、驗收與後續清單 | 日常入口可用，不需研究者代操作；code/design/ADR/register 一致 | 技術交付 gate 完成；PR／merge 進行中，P6 真人品質試用仍獨立未完成 |
 
 主依賴 P0→P1→P2→P3→P4→P5→P6→P7。P4採用研究、P5旅程設計、P6評量材料與P1/P2並行，在受影響施工前閉合。P3隔離驗證不代稱正式驗收；P4不跨過核心及authority gates。
 
@@ -53,7 +55,7 @@
 - PG與顧問保存機制：各自唯一保存責任資料、維持文件隔離；Web不重算invariant。
 - 員工：提供真實工作、指出誤解、補充或手改；專業寫作及完整性核對由顧問承擔。
 
-三工具`jd_read/jd_edit/jd_change_read`及Web／Node／Python介面沿active v2 schema。Web型別機械生成，正式採用納回`job-analysis-contract`單一生成路線。補文件更名／封存／恢復及create response-loss防重複。人工通知是App context，不偽裝HumanMessage、不自動改Memory。金鑰、診斷及模型資料流納入正式接合。
+歷史三工具與 `job-analysis-contract` 路線已由 relational JD 的正式 generated contract、細粒度 JD tools 與同一 Domain／Runtime 取代；Web 型別仍由正式 schema 機械生成，不手改生成檔。人工通知是 App context，不偽裝 HumanMessage、不自動改 Memory。金鑰、診斷及模型資料流已納入正式接合。
 
 ## 5. 驗收與執行邊界
 
@@ -67,8 +69,8 @@
 
 原六切片0付費模型請求。P3/P6先備妥資料、案例、呼叫數及美元上限，Owner確認後逐批執行；CT49–51舊授權不延用。首例交付實測及下一批建議；品質／等待界線在P6前固定。缺人員／預算仍推進無依賴工程，不冒稱自然／真人驗收完成。
 
-2026-09-10查阅：[OpenAI評估方法](https://developers.openai.com/api/docs/guides/evaluation-best-practices)、[Anthropic agent evals](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)支持情境評估、實際outcome及人工校準；只採方法及本地帳本，不引入已公告棄用的OpenAI Evals平台/API，效力核對見R6材料。[GOV.UK](https://www.gov.uk/service-manual/user-research/using-moderated-usability-testing)支持觀察目標使用者完成任務。案例數為本案映射。備份依[PostgreSQL 16](https://www.postgresql.org/docs/16/backup-dump.html)，不能只備份JD JSON。
+2026-09-10查閱：[OpenAI評估方法](https://developers.openai.com/api/docs/guides/evaluation-best-practices)、[Anthropic agent evals](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents)支持情境評估、實際 outcome 及人工校準；只採方法及本地帳本，不引入已公告棄用的 OpenAI Evals 平台／API，效力核對見 R6 材料。[GOV.UK](https://www.gov.uk/service-manual/user-research/using-moderated-usability-testing)支持觀察目標使用者完成任務。案例數為本案映射。現行備份依 [PostgreSQL 18](https://www.postgresql.org/docs/18/backup-dump.html)，不能只備份 JD JSON。
 
-## 本輪唯一下一施工單位
+## 現行後續
 
-既有隔離checkout之核心Task6：一份專業方法、固定端到端與核心交接。P0及Task1–5已完成；Task5獨立review六項重要缺口均閉合，保存點後立即接Task6。依序完成其餘切片；production尚依ADR0060，ADR0073／0074仍Proposed。
+正式程式、依賴、根入口與操作文件已由 ADR0077 完成技術交付；本輪只剩提交、PR、checks 與 merge。產品品質後續仍依 P6 做異質職位與真人試用，不把這次工程 gate 冒稱真人成效已完成。

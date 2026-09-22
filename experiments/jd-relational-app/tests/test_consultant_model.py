@@ -6,6 +6,7 @@ import json
 
 import httpx
 import pytest
+from langchain_core.messages import HumanMessage, SystemMessage
 
 from jd_relational.consultant_model import (
     CONSULTANT_MODEL, MAX_OUTPUT_TOKENS, OPENROUTER_HEADERS, OPENROUTER_PROVIDER,
@@ -85,6 +86,28 @@ def test_the_wire_carries_the_pinned_route_and_no_parallel_calls():
         "allow_fallbacks": False, "require_parameters": False,
     }
     assert payload["parallel_tool_calls"] is False
+
+
+def test_the_wire_marks_only_the_stable_system_prefix_without_mutating_messages():
+    system = SystemMessage(content=[
+        {"type": "text", "text": "固定的顧問方法與行為規則"},
+        {"type": "text", "text": "每次請求會改變的 App context"},
+    ])
+    original = system.model_copy(deep=True)
+
+    with answering(reply("cache-prefix")) as (model, requests):
+        model.invoke([system, HumanMessage(content="本輪員工原話")])
+
+    payload = json.loads(requests[0].content)
+    blocks = payload["messages"][0]["content"]
+    assert blocks[0] == {
+        "type": "text",
+        "text": "固定的顧問方法與行為規則",
+        "cache_control": {"type": "ephemeral"},
+    }
+    assert blocks[1] == {"type": "text", "text": "每次請求會改變的 App context"}
+    assert payload["messages"][1] == {"role": "user", "content": "本輪員工原話"}
+    assert system == original
 
 
 @pytest.mark.parametrize("body", [truncated("a4"), refused("a5")])

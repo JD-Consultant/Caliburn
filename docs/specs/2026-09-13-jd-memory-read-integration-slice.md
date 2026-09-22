@@ -4,6 +4,8 @@
 
 **2026-09-17 successor：**本切片的固定回合讀取語意已延伸到 [`MEM-L001` 分層 bundle](2026-09-16-layered-case-and-work-understanding-memory-alignment.md)：A 現在先取得案例與工作理解兩份 guide，再以 typed tools 按需讀取目前案例／理解及其已驗證來源／案例綁定；舊兩檔版本保持相容。這不代表 dispatcher、分層 C、B1 compaction 或完整 App 已完成。
 
+**2026-09-20 model-view successor：**固定本回合 Memory 基準、guide→正文→原話的逐層回查與原 source owner 都保留；A 的 model-facing `read_conversation(reference, offset, part)` 及 `read_case` 暴露 signed refs 的部分，改由[整體證據契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)收斂為 Runtime-issued `evidence_key` 與 private read proof。下文舊參數只記錄當時已驗切片，不再是下一施工接口。
+
 ## 效果與責任
 
 顧問每輪先取得已發布工作理解的簡短導覽，需要時使用原生 `ls`／`grep`／`read_file` 讀正文或詳記，再以 `read_conversation` 核對已取得詳記的原話。模型不填文件 ID、Memory 版本、執行身分或保存欄位。沒有發布過 Memory 是明確的空狀態；已發布版本讀不到，則停止本輪，不能假裝沒有工作理解。

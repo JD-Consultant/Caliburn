@@ -1,5 +1,7 @@
 # JD-R002／CTX-W001：主顧問訪談 Working State 設計
 
+> **2026-09-21 施工狀態：**下文 Working State 的產品語意、欄位與生命週期保持；typed checkpoint state、model projection、批次更新與按 ID 讀取工具已接入。持久 item 保存 Runtime-private canonical `source_refs`；模型可見 projection 與更新工具不收／回 signed refs，只使用本 run 的 `evidence_key`／`source_evidence_keys`，由 Runtime 解析後保存。精確共同契約見[跨顧問、Memory 與 JD 的模型安全證據契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)。Owner 經官方資料與既有研究複核後確認：Working State 不另設全表 Memory 對帳模式，也不保存全域 `memory_basis_revision`；A 的固定 Memory 讀取基準繼續由既有 Runtime session 擁有。只有個別 item 以 `memory_reconciled` 移除時，才要求相關最新版 Memory 的實際讀取證明。
+
 - 日期：2026-09-16
 - Topic：`JD-R002／CTX-W001`
 - Stage：**G4 WORKING DESIGN；Owner 已確認需要與設計依據，精確欄位待本輪複核**
@@ -89,7 +91,6 @@ Working State 只保存足以讓顧問恢復分析的最小語意：
 {
   "interview_working_state": {
     "format_version": 1,
-    "memory_basis_revision": 12,
     "focus_item_id": "wi_...",
     "items": []
   }
@@ -99,11 +100,10 @@ Working State 只保存足以讓顧問恢復分析的最小語意：
 | 欄位 | Owner 與語意 |
 |---|---|
 | `format_version` | Runtime 填寫；只用於狀態格式遷移 |
-| `memory_basis_revision` | Runtime 填入「主顧問產生這份 current Working State 時，實際可用來判斷的 Memory publication revision」；不是模型猜測的 latest，也不代表所有 item 已被 Memory 吸收或解決 |
 | `focus_item_id` | 目前優先深入的一項；Runtime 驗證 ID 與 scope，主顧問可建議切換；可為空 |
 | `items` | 尚需在訪談工作面保留的項目；只保存 current view，不累積已關閉項目的第二份歷史 |
 
-`document_id`／thread 身分、checkpoint revision、建立時間、更新時間與 operation receipt 由 App／Checkpointer 擁有，不讓模型重複填進 payload。
+`document_id`／thread 身分、checkpoint revision、Memory 讀取基準、建立時間、更新時間與 operation receipt 由 App／Checkpointer 擁有，不讓模型重複填進 payload。Working State 沒有單一 Memory 版本欄位：不同 item 可能在不同時間形成，根層版本容易被誤讀成全部 item 已被同一 publication 全面核對。
 
 ### 5.2 Working item
 
@@ -157,7 +157,7 @@ information_needed
 
 `why_it_matters`、非 `normal` 的 `priority`、`source_refs` 與 `related_refs` 只在有實際內容時提供。`item_id`、初始 `status=open`、`priority=normal` 預設、文件 scope、Memory／checkpoint revision、時間與 receipt 全由 Runtime 產生或補入。
 
-這裡的「必填／選填」是產品語意，不預先假定某個 provider adapter 的 JSON Schema 表達。若正式 strict schema 要求所有 properties 出現，選填內容就以 `null`／空陣列等合法空值表達；不能為了滿足格式，要求模型捏造無意義文字。鎖定 SDK／adapter 的實際 schema 仍在 G7 以生成結果與契約測試固定。
+這裡的「必填／選填」是產品語意，不預先假定某個 provider adapter 的 JSON Schema 表達。若 OpenAI-compatible strict wire 要求所有 declared properties 出現，adapter 必須選擇能保留既有 `preserve／set／clear` mutation semantics 的 model-facing 表達；不能把 nullable value 偷換成 partial-update 的通用「不修改」sentinel，也不能為了滿足格式要求模型捏造無意義文字。`null` 只有在該欄位本身允許空值或明確清除語意時才可使用；未提交、不修改與清除必須可區分。鎖定 SDK／adapter 的實際 schema 由 G7 的 test-only strict wire 候選與 round-trip 契約固定，Domain parser／validator 仍是業務語意 authority。
 
 修改既有 item 時採 patch 語意：沒有出現在本次 patch 的欄位與沒有被點名的其他 items 全部保持不變，不能把「模型這次沒重送」解讀成清空或刪除。Stored state 仍使用完整 validated object；Tool input 則只表達本次改變。
 
@@ -210,18 +210,15 @@ Checkpointer 恢復 Focus 與所有未完線索，不依賴 Memory 或 compactio
 - 員工主動改題：員工要求優先，切換 Focus；舊項 park，不丟失。
 - 明確更正：優先更新或新增對應 working item，將主要排序原因設為 `priority=correction_or_conflict`，保留更正原話 reference；只有已讀 latest 既有目標、使用者已在當輪或已核對的 canonical 原話中明確指出錯誤與正確範圍，且當輪需立即修正時才走 C。歷史原話互相矛盾但尚未裁決，或真正新案例／理解，仍由詢問及 B1／B2 承接。
 
-### 6.4 與 B1／B2 Memory publication 對帳
+### 6.4 與 B1／B2 Memory publication 配合
 
 Working State 不能成為 B1／B2 的事實輸入，B1／B2 仍只依 canonical source、現行案例／工作理解與其引用工作。它也不與 Memory 雙寫。
 
-當 Runtime 發現目前正式 Memory head 已高於 `memory_basis_revision`：
+OpenAI、Anthropic 與 LangGraph 的共同原則，是把可恢復的 thread／工作狀態、長期 Memory 與 compaction 分責；並沒有規定所有產品都必須使用相同的待辦欄位或對帳名稱。`captured_pending_memory` 與 `memory_reconciled` 是 Caliburn 對**個別 working item** 的生命週期與安全條件：前者表示答案已取得但尚未確認被正式 Memory 正確保存，後者只表示 A 已實際讀取相關正式 Memory、判斷這一項已完整承接，因此可以移除暫時提醒。它們不是框架內建狀態，也不建立全域 Memory 同步流程。
 
-1. Runtime 提供明確新 revision 與既有 Memory guide／按需讀取入口；
-2. A 依相關 item 按需讀新案例或工作理解，不要求重讀全部 Memory；
-3. A 判斷哪些 item 已被承接、仍未解、被推翻或需重開，再以同一小型工具更新；
-4. A 以新版 guide 與按需讀到的相關內容重新考慮整份 current item map；Runtime 只在這次 Working State 更新成功時，把 `memory_basis_revision` 填成實際採用的版本。仍未解的 item 可以原樣保留，不等於已被 Memory 吸收。
+每個 A 回合仍由既有 Runtime session 固定一個 Memory publication，提供 guide 與按需讀取入口；這是 Memory reader 的責任，不是 Working State 欄位。背景發布新版不會改寫已送出的 request，也不強制 A 全量掃描、逐項重存或另進「對帳模式」。下一回合取得的新 guide 若與目前訪談相關，A 才按需讀案例或工作理解，並只在 Focus、已知／未知、所需資訊、狀態或引用真的改變時更新相應 item。
 
-只更新 revision 變數、未讓模型看到相關新版內容，不算對帳。反過來，背景 publication 的一般成功也不需要插入一段自然語言「背景結果」干擾當輪；只有版本／可讀入口、錯誤或需恢復的明確狀態由 Runtime 提供。
+Working State 未變就不為了 publication 版本前進而寫一次空更新；仍未解的 item 可以原樣保留。若 A 要以「已被長期 Memory 正確承接」為由移除個別 item，仍須先讀該回合固定版本中的相關內容，並以 `memory_reconciled` 的既有 read-proof guard 驗證。背景 publication 的一般成功也不插入自然語言「背景結果」干擾當輪。
 
 ## 7. Context 與 compaction 如何配合
 
@@ -251,7 +248,7 @@ A 每個 model step 的常駐 orientation 只包含：
 | required clarification | 只有不取得員工明確決定就不能安全前進時使用；可引用一個 working item，但仍是獨立 interrupt／blocking authority |
 | qualitative coverage／sufficiency | 從案例、工作理解、未知與 JD 反推的可推翻判斷；不是 writable working item，也不產生百分比 |
 | B1／B2 notification | 主顧問依既有校準規則通知背景整理；不因 items 存在就由 Runtime 自動製造通知 |
-| C immediate correction | 真正發布案例／工作理解修補；working item 只保留更正待處理／對帳狀態，不取代 C |
+| C immediate correction | 真正發布案例／工作理解修補；working item 只保留這一項更正的待處理／承接狀態，不取代 C |
 | JD pending／AI run | 顯示與撤回當輪 JD 效果；不承接訪談未知或 Memory 工作 |
 
 ## 9. 第一版禁止事項

@@ -95,7 +95,7 @@ def _json_content(message: ToolMessage) -> dict:
     return value
 
 
-def _decode_result(name: str, call_id: str, message: ToolMessage) -> dict:
+def _decode_result(name: str, call_id: str, message: ToolMessage, *, run_id: str) -> dict:
     if type(message.name) is not str or message.name != name or message.tool_call_id != call_id:
         raise ConsultantExecutionError("invalid_tool_result")
     value = _json_content(message)
@@ -103,6 +103,18 @@ def _decode_result(name: str, call_id: str, message: ToolMessage) -> dict:
         if name in _JD_MUTATIONS:
             result = validate_result(value)
             expected_status = "error" if result["error"] is not None else "success"
+        elif name in _JD_READS and message.artifact is not None:
+            # consultant_tools reaches consultant_context, which owns this
+            # middleware. Import only while decoding a saved tool result so
+            # the modules keep their existing composition boundary.
+            from .consultant_tools import AiToolError, _decode_jd_read_message
+            try:
+                result, _ = _decode_jd_read_message(
+                    message, name=name, call_id=call_id, run_id=run_id,
+                )
+            except AiToolError:
+                raise ConsultantExecutionError("invalid_tool_result") from None
+            expected_status = "error" if result.get("type") == "read_error" else "success"
         elif name == "jd_read":
             read_tool_output("openai", call_id, value)
             result = ReadFailure.model_validate(value, strict=True).model_dump(mode="json") \
@@ -110,9 +122,8 @@ def _decode_result(name: str, call_id: str, message: ToolMessage) -> dict:
             expected_status = "error" if value.get("type") == "read_error" else "success"
         elif name == "jd_change_read":
             change_tool_output("openai", call_id, value)
-            # The change adapter uses the same read error shape.  A successful
-            # page is kept as a generic dict because the correction policy only
-            # needs to know that the read succeeded.
+            # Compatibility for canonical test fixtures and pre-projection
+            # checkpoints. Production model-safe reads carry a private artifact.
             result = value
             expected_status = "error" if value.get("type") == "read_error" else "success"
         else:
@@ -126,7 +137,7 @@ def _decode_result(name: str, call_id: str, message: ToolMessage) -> dict:
     return result
 
 
-def _events(messages: Sequence[BaseMessage]) -> list[_ToolEvent]:
+def _events(messages: Sequence[BaseMessage], *, run_id: str) -> list[_ToolEvent]:
     calls: dict[str, tuple[str, dict]] = {}
     results: dict[str, ToolMessage] = {}
     call_order: list[str] = []
@@ -155,7 +166,7 @@ def _events(messages: Sequence[BaseMessage]) -> list[_ToolEvent]:
     result = []
     for call_id in call_order:
         name, arguments = calls[call_id]
-        decoded = _decode_result(name, call_id, results[call_id])
+        decoded = _decode_result(name, call_id, results[call_id], run_id=run_id)
         result.append(_ToolEvent(call_id, name, arguments, decoded,
                                  _digest({"name": name, "args": arguments, "result": decoded})))
     return result
@@ -201,7 +212,7 @@ def decide_consultant_execution(
         raise ConsultantExecutionError("invalid_execution_policy")
 
     current = _run_messages(messages, run_id)
-    events = _events(current)
+    events = _events(current, run_id=run_id)
     correction: _Correction | None = None
 
     for event in events:
@@ -246,9 +257,11 @@ def decide_consultant_execution(
 
 
 FINALIZATION_INSTRUCTION = (
-    "這是 Runtime 的最後無工具收尾請求。只能回答使用者，整理已確認保存的成果，"
-    "並誠實說明尚未完成或下一輪需要處理的事項；不能再讀取、修改 JD、修補 Memory、"
-    "呼叫背景工作或呼叫任何工具，也不得把未確認結果說成已保存。不能再呼叫工具。"
+    "這是 Runtime 的最後無工具收尾請求。只輸出簡潔、自然的繁體中文使用者回覆，"
+    "整理已確認保存的成果，並誠實說明尚未完成或下一輪需要處理的事項。"
+    "不得模擬工具呼叫，不得輸出 JSON、程式碼區塊、工具名稱、參數、內部引用、"
+    "識別碼或 Runtime／除錯細節。不能再讀取、修改 JD、修補 Memory、呼叫背景工作"
+    "或呼叫任何工具，也不得把未確認結果說成已保存。不能再呼叫工具。"
 )
 
 
@@ -291,20 +304,13 @@ class ConsultantExecutionMiddleware(AgentMiddleware):
         )
         if not decision.finalize:
             return handler(request)
-        final_model_settings = {
-            key: value for key, value in request.model_settings.items()
-            if key != "strict"
-        }
-        final_model_settings["tools"] = []
-        final_model_settings["tool_choice"] = "none"
         final_request = request.override(
             system_message=_append_finalization_instruction(request.system_message),
-            tools=[],
+            # Keep the identical tool schema prefix for provider caching. The
+            # provider-level prohibition is tool_choice=none; response
+            # validation remains the final fail-closed boundary.
+            tools=request.tools,
             tool_choice="none",
-            # LangChain 1.4.0's agent factory drops ModelRequest.tool_choice
-            # when the final tool surface is empty and calls model.bind() with
-            # only model_settings. Keep the same policy in the actual model
-            # binding so the provider wire also receives tool_choice=none.
-            model_settings=final_model_settings,
+            model_settings=request.model_settings,
         )
         return _validate_final_response(handler(final_request))

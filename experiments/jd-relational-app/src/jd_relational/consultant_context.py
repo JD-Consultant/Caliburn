@@ -80,6 +80,7 @@ class ModelView(BaseModel):
 
 
 class ConsultantState(ContinuationCompactionState):
+    interview_working_state: dict[str, Any] | None
     jd_memory_view: dict[str, Any] | None
     jd_model_view: dict[str, Any] | None
     jd_ai_run: dict[str, Any] | None
@@ -207,14 +208,18 @@ def _project(request):
         settings["parallel_tool_calls"] = False
         settings["strict"] = True
     blocks.append({"type": "text", "text": text})
+    raw_source = None
     if context.source_notice is not None:
         try:
-            source = _json(context.source_notice(request.messages))
+            raw_source = context.source_notice(request.messages)
+            from .working_state import sanitized_source_notice
+            source = _json(sanitized_source_notice(raw_source, context))
             if len(source.encode("utf-8")) > MAX_NOTICE_BYTES:
                 raise ValueError()
         except Exception:
             raise ConsultantContextError("source_not_available") from None
         blocks.append({"type": "text", "text": source})
+    memory = None
     if context.memory_session is not None:
         from .memory_context import memory_session
         # ModelRequest state is the native step state, not a model parameter.
@@ -222,6 +227,11 @@ def _project(request):
         memory = memory_session(SimpleNamespace(context=context, state=request.state,
                                                 store=request.runtime.store))
         blocks.append({"type": "text", "text": _json(memory.notice())})
+    from .working_state import working_state_notice
+    working = working_state_notice(
+        request.state.get("interview_working_state"), context,
+    )
+    blocks.append({"type": "text", "text": _json(working)})
     projected = request.override(system_message=SystemMessage(content=blocks),
         model_settings=settings)
     return projected, context, current.head, text

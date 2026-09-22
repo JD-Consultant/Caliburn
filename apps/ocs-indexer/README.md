@@ -1,14 +1,14 @@
 # ocs-indexer — OCS 知識索引與查詢服務
 
 「檢索」bounded context。把 [`apps/pdf-to-json`](../pdf-to-json/) 產出的 OCS(職能基準)JSON
-轉成 **兩種 Qdrant 向量點(profile + task)**,並提供**無狀態查詢 HTTP API**(:8000)給
-[`apps/api`](../api/)(Caliburn 著作後端)。本 app 只負責「結構化 + 可語意搜尋的候選池」;
-對話 / LLM / 使用者狀態都在 `apps/api`。
+轉成 **兩種 Qdrant 向量點(profile + task)**,並提供**無狀態查詢 HTTP API**(:8000)。
+本 app 只負責「結構化 + 可語意搜尋的候選池」；不保存對話、LLM 或使用者狀態。
+它目前是隔離、明示啟動的 RAG bounded context，沒有正式 JD App consumer。
 
 ```text
 OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HTTP→apps/embedder GPU) ─► Qdrant(ocs_v4)
                                                                                             │
-                                                    apps/api ◄── 無狀態查詢 API(:8000) ◄──┘
+                                                查詢 client ◄── 無狀態 API(:8000) ◄──┘
 ```
 
 - **嵌入不在本進程**:BGE-M3(dense 1024d + sparse)由 [`apps/embedder`](../embedder/)
@@ -22,7 +22,7 @@ OCS JSON ─► normalize ─► build(profile + 每任務 task) ─► embed(HT
 uv sync --all-extras                       # api extra = fastapi + uvicorn
 docker compose up -d qdrant embedder       # 從 monorepo 根(:6333 + :8082 GPU)
 uv run jd-ocs-indexer index ./data/jd-json # 建索引(空 Qdrant 首次必跑;不需本機 torch)
-uv run jd-ocs-indexer serve --port 8000    # 查詢 API(或根目錄 npx turbo dev)
+uv run jd-ocs-indexer serve --port 8000    # 查詢 API（或根目錄 pnpm rag:dev）
 uv run --all-extras pytest -q
 ```
 
@@ -111,7 +111,7 @@ embed 字串只放 ChunkRecord.text) → HTTP embed(batch) → QdrantWriter.upse
 | GET | `/occupations/{ocs_code}/competencies` | K/S/O/P/A 能力池(多來源 CitableItem) |
 | GET | `/healthz`、`/stats` | 就緒(含 `index_model`)、點數統計 |
 
-消費端視角(哪個端點餵哪個池、critical/enrichment 分級)見 [`apps/api/README.md`](../api/README.md)。
+歷史消費端設計保留在 Git 與研究文件；未來若要接入正式 JD App，須另經現行決策流程，不能直接復活舊 `apps/api` 接點。
 
 ## Codemap
 

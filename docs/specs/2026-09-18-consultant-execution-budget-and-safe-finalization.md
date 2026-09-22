@@ -5,6 +5,8 @@
 - Stage：**G7 既有離線切片完成；2026-09-20 步數修正已驗，最終無工具 wire／PG 驗收仍未通過**
 - 範圍：只調整 A 主顧問每次員工輸入的執行 guardrail。既有 OpenRouter／Luna、Prompt、Skills、JD／Memory 權責、B1／B2／C、compaction、保存與 UI 狀態契約均保留。
 
+> **2026-09-22 cache-coherent wire successor：**「無工具收尾」仍表示模型不得選擇或執行工具，但 wire 不再移除工具 definitions。第 64 次 request 保留與前 63 次相同的工具 schema、順序與 strict 設定，明確送 `tool_choice="none"`；Provider 若仍回 tool call，既有 final-response validator 照常拒絕。這只取代下文歷史紀錄中的 `tools=[]`／清除 strict 細節，不改 64／63 額度、已保存副作用、失敗 UI、canonical history 或其他產品語意。原因是 OpenAI prompt caching 要求固定前綴（包含工具 definitions）保持一致；移除整組 tools 會讓最後一次高輸入收尾失去可重用前綴。[OpenAI Prompt Caching](https://developers.openai.com/api/docs/guides/prompt-caching)，查閱 2026-09-22。
+
 ## 1. 決策結果
 
 每次員工輸入對應的一個 A child run，最多使用：

@@ -11,7 +11,7 @@ import sys
 from .config_file import ConfigFile, default_config_path
 from .configured_host import initialize_configuration
 from .consultant_runtime import open_consultant_runtime
-from .local_configuration import parse_configuration
+from .local_configuration import ConfigurationError, parse_configuration
 from .managed_app import open_managed_app, unavailable_consultant
 from .provider_keys import (
     ROLES, ProviderKeyError, configured_roles, read_key, remove_key, store_key,
@@ -71,9 +71,10 @@ def _connection_input():
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Caliburn 關聯式 JD 本機服務；管理畫面與 AI 接合仍在施工。")
+    parser = argparse.ArgumentParser(description="Caliburn 關聯式 JD 本機服務。")
     parser.add_argument("action",
-                        choices=("status", "init", "resume-init", "serve", "set-key", "remove-key"))
+                        choices=("status", "api-origin", "init", "resume-init", "serve",
+                                 "set-key", "remove-key"))
     parser.add_argument("--service", choices=ROLES,
                         help="set-key／remove-key 指定哪一項 AI 服務。")
     args = parser.parse_args(argv)
@@ -102,6 +103,13 @@ def main(argv=None):
             for role, ready in configured_roles().items():
                 # Configured is not proof the key works; finding that out costs money.
                 print(f"{_ROLE_LABELS[role]}：{'已設定金鑰' if ready else '尚未設定，功能未啟用'}")
+        elif args.action == "api-origin":
+            settings = parse_configuration(file.read())
+            if settings.phase != "ready":
+                code = ("configuration_maintenance" if settings.phase == "maintenance"
+                        else "configuration_initialization_required")
+                raise ConfigurationError(code)
+            print(f"http://127.0.0.1:{settings.api_port}")
         elif args.action in {"init", "resume-init"}:
             initialize_configuration(file, connection=_connection_input() if args.action == "init" else None,
                 resume=args.action == "resume-init")

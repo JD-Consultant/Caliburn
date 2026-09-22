@@ -37,6 +37,8 @@ for (const [name, schema] of Object.entries({ work: workSchema, read: readSchema
   ajv.addSchema(schema, `jd-${name}.schema.json`);
 }
 const checks = new Map<string, ReturnType<typeof ajv.compile>>();
+const REQUEST_TIMEOUT_MS = 15_000;
+
 export function decode<T>(file: string, name: string, value: unknown): T {
   // These two authoritative contracts define their response at the root.
   const root = file === 'http' && name === 'HttpProblem' || file === 'query-http' && name === 'QueryProblem';
@@ -88,7 +90,7 @@ export class JdApi {
     try {
       const send = this.fetcher; // Browser fetch must not receive JdApi as its receiver.
       response = await send(this.origin + path, { method, cache: 'no-store', credentials: 'omit', redirect: 'error',
-        signal: AbortSignal.timeout(15_000), headers: {
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS), headers: {
           ...(body === undefined ? {} : { 'Content-Type': method === 'PATCH' ? 'application/merge-patch+json' : 'application/json' }),
           ...(this.datasetId ? { 'X-JD-Dataset': this.datasetId } : {}),
           ...(options.etag ? { 'If-Match': options.etag } : {}),
@@ -99,7 +101,13 @@ export class JdApi {
     const media = response.headers.get('Content-Type')?.split(';')[0].trim().toLowerCase();
     if (media !== (response.ok ? 'application/json' : 'application/problem+json')) invalid();
     let value: unknown;
-    try { value = await response.json(); } catch { throw new ApiError('invalid_response'); }
+    try { value = await response.json(); }
+    catch (error) {
+      if (error instanceof SyntaxError) throw new ApiError('invalid_response');
+      throw new ApiError('response_unknown', options.chat
+        ? '連線中斷或服務未回應；請保留原輸入，並用原回合查看狀態。'
+        : '連線中斷或服務未回應；保存結果須用原操作查回。');
+    }
     if (!response.ok) {
       // Preserve the same domain result; a transport Problem is not a new result.
       if (value && typeof value === 'object' && 'jd_result' in value) {

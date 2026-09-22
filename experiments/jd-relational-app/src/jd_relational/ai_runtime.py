@@ -8,6 +8,7 @@ a terminal root. Only actual durable tool receipts become recovered results.
 
 from dataclasses import dataclass, field
 from copy import deepcopy
+from hashlib import sha256
 import json
 from threading import Event, Lock
 from uuid import UUID, uuid4
@@ -41,6 +42,11 @@ from .result_transport import validate_result
 from .runtime_checkpoints import DocumentCheckpoints
 from .storage.history import HistoryReader, HistoryError
 from .storage.receipts import WriteObservation
+from .working_state import (
+    WORKING_STATE_READ_NAME, WORKING_STATE_TOOL_NAMES,
+    WORKING_STATE_UPDATE_KIND, WORKING_STATE_UPDATE_NAME,
+    WorkingStateUpdateInput, checked_working_state, working_state_digest,
+)
 
 
 class AiRuntimeError(ValueError):
@@ -180,6 +186,10 @@ def _not_executed():
         "next_action": "stop"})
 
 
+def _working_not_executed():
+    return {"status": "not_executed", "effect": "unchanged", "next_action": "stop"}
+
+
 def _run_messages(messages, run_id):
     """Slice exactly this run's own saved turn out of the shared conversation."""
     positions = [i for i, m in enumerate(messages) if isinstance(m, HumanMessage) and m.id == run_id]
@@ -189,21 +199,25 @@ def _run_messages(messages, run_id):
 
 
 def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None,
+                          dataset_id=None, document_id=None, working_state=None,
                           verified_repair_calls=frozenset()):
     """A stored tool success is evidence only when its original SQL receipt agrees."""
     if run_id is not None:
         messages = _run_messages(messages, run_id)
     by_call = {(b.message_id, b.tool_call_id): b for b in bindings}
     active = {}
+    last_working_state_digest = None
     for message in messages:
         if isinstance(message, AIMessage):
-            active = {call["id"]: (call["name"], by_call.get((message.id, call["id"])), message.id)
+            active = {call["id"]: (
+                call["name"], call["args"], by_call.get((message.id, call["id"])), message.id,
+            )
                       for call in message.tool_calls}
         elif isinstance(message, ToolMessage):
             call = active.get(message.tool_call_id)
             if call is None:
                 raise AiRuntimeError("invalid_saved_tool_result")
-            name, binding, message_id = call
+            name, arguments, binding, message_id = call
             if binding is None:
                 if name == "repair_memory":
                     if (message_id, message.tool_call_id) not in verified_repair_calls:
@@ -226,6 +240,74 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None,
                     if not stopped:
                         raise AiRuntimeError("invalid_saved_tool_result")
                     continue
+                if name in WORKING_STATE_TOOL_NAMES:
+                    if (message.name != name or message.status not in {"success", "error"}
+                            or type(message.content) is not str):
+                        raise AiRuntimeError("invalid_saved_tool_result")
+                    if message.status == "error":
+                        if message.artifact is not None:
+                            raise AiRuntimeError("invalid_saved_tool_result")
+                        try:
+                            stopped = json.loads(message.content) == _working_not_executed()
+                        except Exception:
+                            stopped = False
+                        if not stopped and not message.content.strip():
+                            raise AiRuntimeError("invalid_saved_tool_result")
+                        continue
+                    artifact = message.artifact
+                    if name == WORKING_STATE_READ_NAME:
+                        try:
+                            expected_keys = {
+                                "format_version", "kind", "dataset_id", "document_id",
+                                "run_id", "item_id", "content_digest", "source_refs",
+                            }
+                            if (type(artifact) is not dict or set(artifact) != expected_keys
+                                    or artifact["format_version"] != 1
+                                    or artifact["kind"] != "working_item"
+                                    or artifact["dataset_id"] != dataset_id
+                                    or artifact["document_id"] != document_id
+                                    or artifact["run_id"] != run_id
+                                    or artifact["item_id"] != arguments["item_id"]
+                                    or artifact["content_digest"]
+                                    != sha256(message.content.encode("utf-8")).hexdigest()
+                                    or type(artifact["source_refs"]) is not list):
+                                raise ValueError()
+                        except Exception:
+                            raise AiRuntimeError("invalid_saved_tool_result") from None
+                        continue
+                    try:
+                        parsed = WorkingStateUpdateInput.model_validate(
+                            arguments, strict=True,
+                        )
+                        expected_keys = {
+                            "format_version", "kind", "dataset_id", "document_id",
+                            "run_id", "input_digest", "state_digest",
+                        }
+                        payload = json.loads(message.content)
+                        if (name != WORKING_STATE_UPDATE_NAME
+                                or type(artifact) is not dict or set(artifact) != expected_keys
+                                or artifact["format_version"] != 1
+                                or artifact["kind"] != WORKING_STATE_UPDATE_KIND
+                                or artifact["dataset_id"] != dataset_id
+                                or artifact["document_id"] != document_id
+                                or artifact["run_id"] != run_id
+                                or artifact["input_digest"] != working_state_digest(
+                                    parsed.model_dump(mode="json"))
+                                or type(artifact["state_digest"]) is not str
+                                or len(artifact["state_digest"]) != 64
+                                or any(character not in "0123456789abcdef"
+                                       for character in artifact["state_digest"])
+                                or type(payload) is not dict
+                                or set(payload) != {
+                                    "status", "effect", "created", "focus_item_id", "item_count",
+                                }
+                                or payload["status"] != "updated"
+                                or payload["effect"] != "working_state_updated"):
+                            raise ValueError()
+                    except Exception:
+                        raise AiRuntimeError("invalid_saved_tool_result") from None
+                    last_working_state_digest = artifact["state_digest"]
+                    continue
                 # Read tools never bind writes. An unbound mutation is legal
                 # only as a validated pre-execution error, never a saved write.
                 if name not in {"jd_read", "jd_change_read", *MEMORY_READ_NAMES}:
@@ -246,6 +328,11 @@ def _verify_saved_results(messages, bindings, receipts, codec, *, run_id=None,
                     raise ValueError()
             except Exception:
                 raise AiRuntimeError("invalid_saved_tool_result") from None
+    if last_working_state_digest is not None:
+        current = checked_working_state(working_state)
+        if (current is None or working_state_digest(current.model_dump(mode="json"))
+                != last_working_state_digest):
+            raise AiRuntimeError("invalid_saved_tool_result")
 
 
 class AiRuntime:
@@ -548,7 +635,9 @@ class AiRuntime:
                     raise AiRuntimeError("run_recovery_required")
                 repairs = self._repair_evidence(observed)
                 _verify_saved_results(observed.messages, bindings, receipts, self.codec,
-                    run_id=record.run_id, verified_repair_calls=repairs)
+                    run_id=record.run_id, dataset_id=record.dataset_id,
+                    document_id=record.document_id, working_state=observed.working_state,
+                    verified_repair_calls=repairs)
                 return 0
             else:
                 identity = ForegroundIdentity(document_id, record.run_id, record.request_digest)
@@ -658,7 +747,9 @@ class AiRuntime:
             raise AiRuntimeError("run_recovery_required")
         repairs = self._repair_evidence(original)
         _verify_saved_results(original.messages, bindings, receipts, self.codec,
-            run_id=run_id, verified_repair_calls=repairs)
+            run_id=run_id, dataset_id=original.record.dataset_id,
+            document_id=original.record.document_id, working_state=original.working_state,
+            verified_repair_calls=repairs)
         human = next(m for m in original.messages if isinstance(m, HumanMessage) and m.id == run_id)
         return AiRunHandle(self, _Attempt(original.record, human, result=self._result(original)))
 
@@ -749,7 +840,9 @@ class AiRuntime:
                 raise AiRuntimeError("run_recovery_required")
             repairs = self._repair_evidence(observed)
             _verify_saved_results(observed.messages, bindings, receipts, self.codec,
-                run_id=run_id, verified_repair_calls=repairs)
+                run_id=run_id, dataset_id=observed.record.dataset_id,
+                document_id=observed.record.document_id, working_state=observed.working_state,
+                verified_repair_calls=repairs)
         response = self._public_response(observed)
         if terminal and (attempt is None or local_result is not None):
             if local_result is not None and (not local_result.input_saved or local_result.status != observed.record.status):
@@ -940,6 +1033,8 @@ class AiRuntime:
                 else:
                     value = ({"error": "memory_read_not_completed", "next_action": "stop"}
                         if call["name"] in MEMORY_READ_NAMES
+                        else _working_not_executed()
+                        if call["name"] in WORKING_STATE_TOOL_NAMES
                         else _request_not_executed() if call["name"] == REQUEST_TOOL_NAME
                         else read_failure("read_failed")
                         if call["name"] in {"jd_read", "jd_change_read"} else _not_executed())
@@ -950,6 +1045,8 @@ class AiRuntime:
                 raise AiRuntimeError("invalid_saved_conversation")
             repairs = self._repair_evidence(observed, messages=messages)
             _verify_saved_results(messages, bindings, receipts, self.codec, run_id=record.run_id,
+                dataset_id=record.dataset_id, document_id=record.document_id,
+                working_state=observed.working_state,
                 verified_repair_calls=repairs)
             if observed.record.status != "running":
                 status = observed.record.status

@@ -43,6 +43,17 @@ def create_arguments():
             "capabilities": [{"capability_ref": "picked-skill", "basis_refs": []}]}
 
 
+def model_arguments(value):
+    if isinstance(value, list):
+        return [model_arguments(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    result = {}
+    for key, item in value.items():
+        result["basis_evidence_keys" if key == "basis_refs" else key] = model_arguments(item)
+    return result
+
+
 def test_manual_and_model_create_full_task_then_correct_without_losing_children():
     outputs = []
     for mode in ("manual", "openai-json", "anthropic-object"):
@@ -54,7 +65,8 @@ def test_manual_and_model_create_full_task_then_correct_without_losing_children(
                 return manual_command({"tool": tool, "arguments": payload})
             return model_command(tool, json.dumps(payload) if mode == "openai-json" else payload)
 
-        candidate = build_candidate(snapshot, adapt("jd_create_task", create_arguments()), context)
+        payload = create_arguments() if mode == "manual" else model_arguments(create_arguments())
+        candidate = build_candidate(snapshot, adapt("jd_create_task", payload), context)
         assert snapshot == original
         assert candidate["capabilities"] == snapshot["capabilities"]
         task_id, = candidate["tasks"]
@@ -68,7 +80,8 @@ def test_manual_and_model_create_full_task_then_correct_without_losing_children(
             "description-now": Ref("scope-a", "base-2", "task", task_id, field="description")})
         correction = {"changes": [{"kind": "set_field", "target_field_ref": "description-now",
                                   "text": "只有 B 系統有月檢；A 系統僅提供交付後缺陷修正。", "basis_refs": []}]}
-        revised = build_candidate(next_base, adapt("jd_revise_work", correction), next_context)
+        correction_payload = correction if mode == "manual" else model_arguments(correction)
+        revised = build_candidate(next_base, adapt("jd_revise_work", correction_payload), next_context)
         assert revised["details"] == next_base["details"]
         assert revised["task_capabilities"] == next_base["task_capabilities"]
         assert revised["source_links"] == next_base["source_links"]  # Old basis retained, not silently refreshed.
@@ -79,7 +92,7 @@ def test_manual_and_model_create_full_task_then_correct_without_losing_children(
 @pytest.mark.parametrize("mode", ["manual", "model"])
 def test_valid_first_change_and_stale_second_reference_return_no_candidate(mode):
     snapshot, context = baseline()
-    candidate = build_candidate(snapshot, model_command("jd_create_task", create_arguments()), context)
+    candidate = build_candidate(snapshot, model_command("jd_create_task", model_arguments(create_arguments())), context)
     task_id, = candidate["tasks"]
     context = replace(context, refs={
         "current": Ref("scope-a", "base-1", "task", task_id, field="name"),
@@ -90,7 +103,7 @@ def test_valid_first_change_and_stale_second_reference_return_no_candidate(mode)
         {"kind": "set_field", "target_field_ref": "stale", "text": "不得套用", "basis_refs": []},
     ]}
     command = (manual_command({"tool": "jd_revise_work", "arguments": payload}) if mode == "manual"
-               else model_command("jd_revise_work", json.dumps(payload)))
+               else model_command("jd_revise_work", json.dumps(model_arguments(payload))))
     before = deepcopy(candidate)
     with pytest.raises(DomainError) as error:
         build_candidate(candidate, command, context)
@@ -115,10 +128,10 @@ def test_monthly_check_correction_preserves_other_valid_and_low_frequency_work()
     expected = deepcopy(snapshot)
     expected["tasks"]["monthly"]["description"] = "只有 B 系統有月檢"
     expected["details"]["monthly-requirement"]["text"] = "依 B 系統服務約定檢查"
-    command = model_command("jd_revise_work", {"changes": [
+    command = model_command("jd_revise_work", model_arguments({"changes": [
         {"kind": "set_field", "target_field_ref": "monthly-description", "text": "只有 B 系統有月檢", "basis_refs": []},
         {"kind": "set_field", "target_field_ref": "monthly-requirement-text", "text": "依 B 系統服務約定檢查", "basis_refs": []},
-    ]})
+    ]}))
     assert build_candidate(snapshot, command, context) == expected
 
 
@@ -135,8 +148,9 @@ def test_all_eight_operations_share_manual_and_both_model_paths():
         def apply(tool, payload):
             nonlocal snapshot
             before = deepcopy(snapshot)
+            model_payload = payload if mode == "manual" else model_arguments(payload)
             command = (manual_command({"tool": tool, "arguments": payload}) if mode == "manual"
-                       else model_command(tool, json.dumps(payload) if mode == "openai-json" else payload))
+                       else model_command(tool, json.dumps(model_payload) if mode == "openai-json" else model_payload))
             candidate = build_candidate(snapshot, command, context)
             assert snapshot == before
             assert candidate["revision"] == "base-1"  # Preparation only, no simulated commit.

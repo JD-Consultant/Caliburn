@@ -22,6 +22,7 @@ TEXT = "原話\r\n  每月處理異常。"
 
 
 class State(MessagesState):
+    interview_working_state: dict | None
     jd_ai_run: dict | None
     jd_ai_bindings: list
     jd_ai_read: dict | None
@@ -41,7 +42,8 @@ def legacy_run(dataset, document, run, text):
     return parse_run_record(value), HumanMessage(id=run, content=text)
 
 
-def native(*, paused=False, malformed_view=False, saver=None, root_failure=None, record_format=2):
+def native(*, paused=False, malformed_view=False, saver=None, root_failure=None, record_format=2,
+           working_state=None):
     calls = []
 
     def model(state):
@@ -56,9 +58,12 @@ def native(*, paused=False, malformed_view=False, saver=None, root_failure=None,
             "response_message_id": reply.id,
             "response_digest": "0" * 64 if malformed_view else sha256(canonical.encode()).hexdigest(),
             "notice_json": notice, "notice_digest": sha256(notice.encode()).hexdigest()}
-        return {"messages": [reply], "jd_model_view": view,
+        result = {"messages": [reply], "jd_model_view": view,
                 "jd_ai_bindings": [{"original": "opaque-test-binding"}],
                 "jd_ai_read": {"original": "opaque-test-read"}}
+        if working_state is not None:
+            result["interview_working_state"] = deepcopy(working_state)
+        return result
 
     def ending(state):
         if paused:
@@ -199,6 +204,32 @@ def test_stopped_child_can_explicitly_close_root_with_verified_tool_message(mode
     assert result.messages[0].content == TEXT and result.messages[-1].id
     assert result.model_view == before.model_view and result.bindings == before.bindings
     assert calls == ["model"] and len(wrapped.updates) == 1
+
+
+def test_stopped_child_closure_copies_its_verified_working_state_to_the_root():
+    working = {
+        "format_version": 1,
+        "focus_item_id": "wi_" + "1" * 32,
+        "items": [{
+            "item_id": "wi_" + "1" * 32,
+            "subject": "故障升級",
+            "known_and_open": "升級條件仍待確認。",
+            "why_it_matters": None,
+            "information_needed": "取得一次實際案例。",
+            "status": "open",
+            "priority": "normal",
+            "source_refs": [],
+            "related_refs": [],
+        }],
+    }
+    graph, _ = native(paused=True, working_state=working)
+    adapter = AiRunCheckpoints(graph)
+    before = observe(adapter)
+    assert before.working_state == working and before.source_config != before.root_config
+    extra = ToolMessage(content="synthetic confirmed original result", tool_call_id="synthetic-call")
+    result = close(adapter, before, status="cancelled", messages=[*before.messages, extra])
+    assert result.closed and result.working_state == working
+    assert graph.get_state(config()).values["interview_working_state"] == working
 
 
 def test_failed_update_does_not_retry_or_claim_closed():

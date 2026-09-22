@@ -1,0 +1,6 @@
+packages:
+  - "experiments/jd-relational-app"
+  - "experiments/jd-relational-app/web"
+  - "packages/ocs-contract"
+  - "apps/ocs-indexer"
+  - "apps/pdf-to-json"

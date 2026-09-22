@@ -57,7 +57,7 @@ def offline_environment(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(socket.socket, "connect_ex", forbid_network)
 
 
-def arguments_for(tool: str) -> dict[str, Any]:
+def _canonical_arguments_for(tool: str) -> dict[str, Any]:
     if tool == "jd_create_task":
         return {
             "container_ref": "issued-unassigned-tasks",
@@ -134,6 +134,22 @@ def arguments_for(tool: str) -> dict[str, Any]:
             {"kind": "remove_condition", "condition_ref": "issued-wrong-authority"},
         ]
     }
+
+
+def _model_arguments(value: Any) -> Any:
+    if isinstance(value, list):
+        return [_model_arguments(item) for item in value]
+    if not isinstance(value, dict):
+        return value
+    return {
+        ("basis_evidence_keys" if key == "basis_refs" else key): _model_arguments(item)
+        for key, item in value.items()
+    }
+
+
+def arguments_for(tool: str) -> dict[str, Any]:
+    """Provider fixtures use the model-facing key; domain fixtures stay canonical."""
+    return _model_arguments(_canonical_arguments_for(tool))
 
 
 def schema_nodes(value: Any):
@@ -220,7 +236,7 @@ def assert_wire_schema(definition: dict[str, Any], provider: str, tool: str) -> 
         assert args["text"] is None
         assert not validator.is_valid({key: value for key, value in args.items() if key != "text"})
     elif tool == "jd_replace_selection":
-        assert set(schema["properties"]) == {"selection_ref", "replacement_text", "basis_refs"}
+        assert set(schema["properties"]) == {"selection_ref", "replacement_text", "basis_evidence_keys"}
         assert not validator.is_valid({**args, "start": 0})
         assert not validator.is_valid({**args, "replacement_text": None})
 
@@ -282,7 +298,7 @@ def test_openai_responses_wire_round_trip(tool: str) -> None:
             call = response.output[0]
             assert call.type == "function_call"
             assert call.id == "fc_offline_item" and call.call_id == "call_offline_result"
-            assert model_command(call.name, call.arguments) == {"tool": tool, "arguments": args}
+            assert model_command(call.name, call.arguments) == model_command(tool, args)
             result_block = tool_output("openai", call.call_id, deepcopy(RESULT))
             client.responses.create(
                 model=MODEL, store=False, tools=[definition],
@@ -322,7 +338,7 @@ def test_anthropic_messages_wire_round_trip(tool: str) -> None:
             )
             call = response.content[0]
             assert call.type == "tool_use" and call.id == "toolu_offline_result"
-            assert model_command(call.name, call.input) == {"tool": tool, "arguments": args}
+            assert model_command(call.name, call.input) == model_command(tool, args)
             result_block = tool_output("anthropic", call.id, deepcopy(RESULT))
             client.messages.create(
                 model=MODEL, max_tokens=1024, tools=[definition],

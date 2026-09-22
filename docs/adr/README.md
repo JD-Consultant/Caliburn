@@ -85,6 +85,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0074](0074-tested-consultant-runtime-source-and-memory-adoption.md) | 採用已驗顧問／Memory runtime；Saver原始訪談與Store Memory、正式composition／契約、fresh setup及本機恢復；2026-09-16 長對話改採單一 OpenRouter／Luna 的 App-side 非破壞式 continuity compaction | **Proposed**（2026-09-10；2026-09-16 依 Owner `CTX-C001` 修訂；成品P4/R5候選，待G6；不重做Memory，不憑總計畫跳過core驗收） |
 | [0075](0075-relational-jd-authority-and-structured-editor.md) | 關聯式current JD、結構化管理畫面、derived immutable history／receipt及小型業務工具；若Accepted取代0073的完整Plate JSONB authority | **Proposed**（2026-09-12；Owner要求後的G4 draft；D01 duty刪除效果與外部review未閉合，未建表／改production） |
 | [0076](0076-jd-background-admission-record.md) | 隔離JD App的runtime背景准入列：一文件一列六欄，保存已准入target／本批／受阻碼／恢復次數 | **Proposed**（2026-09-14；缺口已在真PG逐欄實測，十三張JD內容表不變但App總表數增為十四；不改production authority） |
+| [0077](0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) | 採用已驗關聯式 JD App 為唯一 production authority；舊 API／Web／契約硬退役、fresh PostgreSQL 18.6、Node 24＋pnpm 12 單一根入口，完整保留研究與實驗文件 | **Accepted**（2026-09-22；Owner 核准不保留舊程式或舊資料相容性；取代 0060／0066／0067／0069 的舊 production authority，並採用 0074–0076 已驗實作） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、契約 #1–#4 登記）。

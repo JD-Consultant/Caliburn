@@ -2,15 +2,23 @@
 
 from copy import deepcopy
 from dataclasses import dataclass
+import json
 from threading import Event
 
 import pytest
 from langchain.agents import create_agent
 from langchain_core.language_models.chat_models import BaseChatModel
-from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
+from langchain_core.messages import (
+    AIMessage,
+    HumanMessage,
+    ToolMessage,
+    message_to_dict,
+    messages_from_dict,
+)
 from langchain_core.outputs import ChatGeneration, ChatResult
 from langgraph.checkpoint.memory import InMemorySaver
 
+from jd_relational.consultant_context import ConsultantState
 from jd_relational.continuation_compaction import (
     A_COMPACTION_PROFILE,
     B1_COMPACTION_PROFILE,
@@ -20,10 +28,12 @@ from jd_relational.continuation_compaction import (
     ContinuationCompactionError,
     ContinuationCompactionMiddleware,
     ContinuationCompactionState,
+    _summary_prompt,
     build_request_view,
     canonical_prefix_digest,
     select_safe_boundary,
 )
+from jd_relational.working_state import InterviewWorkingState, WorkingItem
 
 
 class FixedModel(BaseChatModel):
@@ -82,6 +92,210 @@ def test_safe_boundary_never_splits_parallel_tools_or_latest_employee_input():
         shortened,
         CompactionProfile(trigger_input_tokens=1, keep_messages=2),
     ) == 2
+
+
+def test_request_only_compaction_does_not_delete_private_tool_artifacts():
+    private = {"source_reference": "conversation:PRIVATE", "next_offset": None}
+    messages = [
+        HumanMessage(id="h1", content="請核對案例原話。"),
+        AIMessage(
+            id="a1",
+            content="",
+            tool_calls=[{
+                "name": "read_evidence",
+                "args": {"evidence_key": "E-safe"},
+                "id": "call-evidence",
+            }],
+        ),
+        ToolMessage(
+            id="t1",
+            name="read_evidence",
+            tool_call_id="call-evidence",
+            content='{"evidence_key":"E-safe","has_more":false}',
+            artifact=private,
+        ),
+        AIMessage(id="a2", content="已完成原話核對。"),
+        HumanMessage(id="h2", content="請繼續。"),
+    ]
+    profile = A_COMPACTION_PROFILE.model_copy(update={"keep_messages": 1})
+    boundary = select_safe_boundary(messages, profile)
+    assert boundary == 4
+    state = ContinuationCompaction(
+        format_version=1,
+        summary_text="先前案例原話已核對。",
+        covered_through_message_id="a2",
+        covered_prefix_digest=canonical_prefix_digest(messages[:boundary]),
+    )
+
+    view = build_request_view(messages, state, profile)
+
+    assert [message.id for message in view] == [view[0].id, "h2"]
+    assert view[0].id.startswith("continuation-summary:")
+    assert messages[2].artifact == private
+    assert messages[2].content == '{"evidence_key":"E-safe","has_more":false}'
+
+
+def test_summary_prompt_keeps_visible_tool_wave_and_excludes_private_metadata():
+    messages = [
+        HumanMessage(id="h1", content="請核對案例原話。"),
+        AIMessage(
+            id="a1",
+            content="我會查證。",
+            tool_calls=[{
+                "name": "read_evidence",
+                "args": {"evidence_key": "E-safe"},
+                "id": "call-evidence",
+            }],
+            additional_kwargs={
+                "reasoning_details": [{"data": "PRIVATE-OPAQUE-REASONING"}],
+            },
+            response_metadata={"private_provider_marker": "PRIVATE-RESPONSE"},
+        ),
+        ToolMessage(
+            id="t1",
+            name="read_evidence",
+            tool_call_id="call-evidence",
+            content='{"evidence_key":"E-safe","has_more":false}',
+            artifact={"source_reference": "PRIVATE-SIGNED-REFERENCE"},
+            status="success",
+        ),
+    ]
+
+    prompt = _summary_prompt(None, messages)
+    payload = json.loads(prompt.split("\n", 1)[1])
+
+    assert payload == {
+        "protected_orientation": [],
+        "existing_summary": None,
+        "new_completed_messages": [
+            {"role": "user", "content": "請核對案例原話。"},
+            {
+                "role": "assistant",
+                "content": "我會查證。",
+                "tool_calls": [{
+                    "name": "read_evidence",
+                    "args": {"evidence_key": "E-safe"},
+                    "id": "call-evidence",
+                }],
+            },
+            {
+                "role": "tool",
+                "content": '{"evidence_key":"E-safe","has_more":false}',
+                "name": "read_evidence",
+                "tool_call_id": "call-evidence",
+                "status": "success",
+            },
+        ],
+    }
+    assert "PRIVATE-OPAQUE-REASONING" not in prompt
+    assert "PRIVATE-RESPONSE" not in prompt
+    assert "PRIVATE-SIGNED-REFERENCE" not in prompt
+
+
+def test_uncovered_reasoning_details_survive_checkpoint_and_request_view():
+    reasoning_details = [{
+        "type": "reasoning.encrypted",
+        "data": "opaque-recent-reasoning",
+    }]
+    messages = [
+        HumanMessage(id="h-old", content="舊工作"),
+        AIMessage(id="a-old", content="舊工作已完成"),
+        HumanMessage(id="h-current", content="請繼續目前工作"),
+        AIMessage(
+            id="a-current",
+            content="",
+            tool_calls=[{
+                "name": "jd_read",
+                "args": {"view": "current"},
+                "id": "call-current",
+            }],
+            additional_kwargs={"reasoning_details": reasoning_details},
+        ),
+        ToolMessage(
+            id="t-current",
+            tool_call_id="call-current",
+            content="目前 JD 已讀取",
+        ),
+    ]
+    restored = messages_from_dict([message_to_dict(message) for message in messages])
+    state = ContinuationCompaction(
+        format_version=1,
+        summary_text="舊工作摘要",
+        covered_through_message_id="a-old",
+        covered_prefix_digest=canonical_prefix_digest(messages[:2]),
+    )
+
+    view = build_request_view(restored, state, A_COMPACTION_PROFILE)
+    recent = next(message for message in view if message.id == "a-current")
+    prompt = _summary_prompt(None, restored[2:])
+
+    assert recent.additional_kwargs["reasoning_details"] == reasoning_details
+    assert "opaque-recent-reasoning" not in prompt
+
+
+@pytest.mark.parametrize(("profile", "marker"), [
+    (A_COMPACTION_PROFILE, "訪談焦點"),
+    (B1_COMPACTION_PROFILE, "案例身分與差異"),
+    (B2_COMPACTION_PROFILE, "跨案例"),
+])
+def test_summary_request_uses_role_specific_retention_instructions(profile, marker):
+    summary = FixedModel(replies=[completed("summary", "角色摘要")])
+    main = FixedModel(replies=[completed("answer", "繼續")])
+    agent = create_agent(
+        main,
+        tools=[],
+        middleware=[ContinuationCompactionMiddleware(
+            summary_model=summary,
+            profile=profile.model_copy(update={
+                "trigger_input_tokens": 1,
+                "keep_messages": 1,
+            }),
+            token_counter=lambda request, view: 100,
+        )],
+        state_schema=ContinuationCompactionState,
+    )
+
+    agent.invoke({"messages": conversation()})
+
+    assert marker in summary.requests[0][0].text
+
+
+def test_b2_summary_reads_fixed_task_as_orientation_without_covering_it():
+    summary = FixedModel(replies=[completed("summary", "B2 摘要")])
+    main = FixedModel(replies=[completed("answer", "繼續 B2")])
+    messages = [
+        HumanMessage(id="task", content="固定 B2 任務原文"),
+        AIMessage(id="a1", content="開始讀案例"),
+        HumanMessage(id="h1", content="繼續"),
+        AIMessage(id="a2", content="已完成一段比較"),
+        HumanMessage(id="h2", content="目前尾段"),
+    ]
+    agent = create_agent(
+        main,
+        tools=[],
+        middleware=[ContinuationCompactionMiddleware(
+            summary_model=summary,
+            profile=B2_COMPACTION_PROFILE.model_copy(update={
+                "trigger_input_tokens": 1,
+                "keep_messages": 1,
+            }),
+            token_counter=lambda request, view: 100,
+        )],
+        state_schema=ContinuationCompactionState,
+    )
+
+    agent.invoke({"messages": messages})
+
+    payload = json.loads(summary.requests[0][1].text.split("\n", 1)[1])
+    assert payload["protected_orientation"] == [
+        {"role": "user", "content": "固定 B2 任務原文"}
+    ]
+    assert payload["new_completed_messages"][0] == {
+        "role": "assistant",
+        "content": "開始讀案例",
+    }
+    assert main.requests[0][0].content == "固定 B2 任務原文"
+    assert main.requests[0][1].id.startswith("continuation-summary:")
 
 
 def test_b1_single_current_window_is_never_a_compaction_boundary():
@@ -155,6 +369,192 @@ def test_b2_keeps_initial_task_exact_but_can_compact_completed_tool_waves():
     assert all(message.id != "b2-a1" for message in view)
 
 
+def test_a_keeps_current_employee_input_exact_while_compacting_completed_tool_waves():
+    messages = [
+        HumanMessage(id="employee-current", content="請依目前資料完成這份 JD。"),
+        AIMessage(
+            id="a-read-1",
+            content="先讀目前 JD。",
+            tool_calls=[{"name": "jd_read", "args": {"view": "current"}, "id": "call-read-1"}],
+        ),
+        ToolMessage(id="t-read-1", name="jd_read", tool_call_id="call-read-1", content="JD page 1"),
+        AIMessage(
+            id="a-read-2",
+            content="再讀工作理解。",
+            tool_calls=[{"name": "read_work_understanding", "args": {}, "id": "call-read-2"}],
+        ),
+        ToolMessage(
+            id="t-read-2",
+            name="read_work_understanding",
+            tool_call_id="call-read-2",
+            content="工作理解結果",
+        ),
+        AIMessage(
+            id="a-recent",
+            content="保留近期寫入。",
+            tool_calls=[{"name": "jd_insert_item", "args": {}, "id": "call-recent"}],
+        ),
+        ToolMessage(
+            id="t-recent",
+            name="jd_insert_item",
+            tool_call_id="call-recent",
+            content="最近寫入結果",
+        ),
+    ]
+    summary = FixedModel(replies=[completed("summary", "已讀目前 JD 與工作理解。")])
+    main = FixedModel(replies=[completed("answer", "繼續完成 JD。")])
+    profile = A_COMPACTION_PROFILE.model_copy(update={
+        "trigger_input_tokens": 1,
+        "keep_messages": 2,
+    })
+    agent = create_agent(
+        main,
+        tools=[],
+        middleware=[ContinuationCompactionMiddleware(
+            summary_model=summary,
+            profile=profile,
+            token_counter=lambda request, view: 100,
+        )],
+        state_schema=ContinuationCompactionState,
+    )
+
+    result = agent.invoke({"messages": messages})
+
+    payload = json.loads(summary.requests[0][1].text.split("\n", 1)[1])
+    assert payload["protected_orientation"] == [{
+        "role": "user",
+        "content": "請依目前資料完成這份 JD。",
+    }]
+    assert all(
+        item != {"role": "user", "content": "請依目前資料完成這份 JD。"}
+        for item in payload["new_completed_messages"]
+    )
+    assert [message.id for message in main.requests[0]] == [
+        "employee-current",
+        main.requests[0][1].id,
+        "a-recent",
+        "t-recent",
+    ]
+    saved = ContinuationCompaction.model_validate(
+        result["continuation_compaction"], strict=True,
+    )
+    assert saved.format_version == 2
+    assert saved.protected_message_id == "employee-current"
+    assert [message.id for message in result["messages"][:-1]] == [
+        message.id for message in messages
+    ]
+
+
+def test_a_releases_previous_protected_input_when_the_next_employee_turn_is_compacted():
+    messages = [
+        HumanMessage(id="employee-1", content="第一輪員工原話。"),
+        AIMessage(
+            id="a1",
+            content="讀取第一輪資料。",
+            tool_calls=[{"name": "jd_read", "args": {}, "id": "call-1"}],
+        ),
+        ToolMessage(id="t1", name="jd_read", tool_call_id="call-1", content="第一輪結果"),
+        AIMessage(id="answer-1", content="第一輪回答。"),
+        HumanMessage(id="employee-2", content="第二輪需要逐字保留的新原話。"),
+        AIMessage(
+            id="a2",
+            content="讀取第二輪資料。",
+            tool_calls=[{"name": "jd_read", "args": {}, "id": "call-2"}],
+        ),
+        ToolMessage(id="t2", name="jd_read", tool_call_id="call-2", content="第二輪結果 A"),
+        AIMessage(
+            id="a3",
+            content="繼續讀取。",
+            tool_calls=[{"name": "read_case", "args": {}, "id": "call-3"}],
+        ),
+        ToolMessage(id="t3", name="read_case", tool_call_id="call-3", content="第二輪結果 B"),
+        AIMessage(
+            id="a-recent",
+            content="近期工具呼叫。",
+            tool_calls=[{"name": "jd_insert_item", "args": {}, "id": "call-recent"}],
+        ),
+        ToolMessage(
+            id="t-recent",
+            name="jd_insert_item",
+            tool_call_id="call-recent",
+            content="近期結果",
+        ),
+    ]
+    previous_boundary = 3
+    previous = ContinuationCompaction(
+        format_version=2,
+        summary_text="第一輪已讀取資料。",
+        covered_through_message_id="t1",
+        covered_prefix_digest=canonical_prefix_digest(messages[:previous_boundary]),
+        protected_message_id="employee-1",
+    )
+    summary = FixedModel(replies=[completed("summary", "兩輪進度已整合。")])
+    main = FixedModel(replies=[completed("answer", "繼續第二輪。")])
+    agent = create_agent(
+        main,
+        tools=[],
+        middleware=[ContinuationCompactionMiddleware(
+            summary_model=summary,
+            profile=A_COMPACTION_PROFILE.model_copy(update={
+                "trigger_input_tokens": 1,
+                "keep_messages": 2,
+            }),
+            token_counter=lambda request, view: 100,
+        )],
+        state_schema=ContinuationCompactionState,
+    )
+
+    result = agent.invoke({
+        "messages": messages,
+        "continuation_compaction": previous.model_dump(mode="json"),
+    })
+
+    payload = json.loads(summary.requests[0][1].text.split("\n", 1)[1])
+    assert payload["existing_summary"] == "第一輪已讀取資料。"
+    assert payload["protected_orientation"] == [{
+        "role": "user",
+        "content": "第二輪需要逐字保留的新原話。",
+    }]
+    assert {"role": "user", "content": "第一輪員工原話。"} in payload[
+        "new_completed_messages"
+    ]
+    assert {"role": "user", "content": "第二輪需要逐字保留的新原話。"} not in payload[
+        "new_completed_messages"
+    ]
+    assert [message.id for message in main.requests[0]] == [
+        "employee-2",
+        main.requests[0][1].id,
+        "a-recent",
+        "t-recent",
+    ]
+    saved = ContinuationCompaction.model_validate(
+        result["continuation_compaction"], strict=True,
+    )
+    assert saved.protected_message_id == "employee-2"
+
+
+def test_a_dynamic_protection_fails_closed_when_it_does_not_name_latest_human_in_prefix():
+    messages = [
+        HumanMessage(id="employee-1", content="第一輪原話。"),
+        AIMessage(id="answer-1", content="第一輪回答。"),
+        HumanMessage(id="employee-2", content="第二輪原話。"),
+        AIMessage(id="answer-2", content="第二輪回答。"),
+    ]
+    state = {
+        "format_version": 2,
+        "summary_text": "無效的保護邊界。",
+        "covered_through_message_id": "answer-2",
+        "covered_prefix_digest": canonical_prefix_digest(messages),
+        "protected_message_id": "employee-1",
+    }
+
+    with pytest.raises(
+        ContinuationCompactionError,
+        match="invalid_compaction_boundary",
+    ):
+        build_request_view(messages, state, A_COMPACTION_PROFILE)
+
+
 def test_saved_summary_is_validated_against_immutable_canonical_prefix():
     messages = conversation()
     boundary = 2
@@ -209,14 +609,53 @@ def test_middleware_summarizes_incrementally_and_publishes_with_main_response():
     assert len(summary.requests) == 1
     prompt = summary.requests[0][-1].content
     assert previous.summary_text in prompt
-    assert "h2" in prompt and "a3" in prompt
-    assert "h1" not in prompt and "a1" not in prompt
+    assert "請讀取相關案例。" in prompt and "兩份都已讀完。" in prompt
+    assert "案例 A：每週巡檢。" not in prompt and "A 已記錄。" not in prompt
     assert len(main.requests) == 1
     assert isinstance(main.requests[0][0], AIMessage)
     assert "新摘要" in main.requests[0][0].content
     saved = ContinuationCompaction.model_validate(result["continuation_compaction"], strict=True)
     assert saved.covered_through_message_id == "a3"
     assert [message.id for message in result["messages"][:-1]] == [message.id for message in messages]
+
+
+def test_compaction_updates_only_its_own_checkpoint_field_and_preserves_working_state():
+    working = InterviewWorkingState(
+        focus_item_id="wi_" + "1" * 32,
+        items=[WorkingItem(
+            item_id="wi_" + "1" * 32,
+            subject="故障升級",
+            known_and_open="已知本人先初判；升級條件仍待確認。",
+            information_needed="取得一次實際升級案例。",
+            status="open",
+            priority="high_jd_impact",
+        )],
+    )
+    summary = FixedModel(replies=[completed("summary", "舊互動已整理；最新更正仍待確認。")])
+    main = FixedModel(replies=[completed("answer", "請問正確的升級條件是什麼？")])
+    saver = InMemorySaver()
+    config = {"configurable": {"thread_id": "working-state-compaction"}}
+    agent = create_agent(
+        main,
+        tools=[],
+        middleware=[ContinuationCompactionMiddleware(
+            summary_model=summary,
+            profile=CompactionProfile(trigger_input_tokens=1, keep_messages=1),
+            token_counter=lambda request, view: 100,
+        )],
+        state_schema=ConsultantState,
+        checkpointer=saver,
+    )
+    result = agent.invoke({
+        "messages": conversation(),
+        "interview_working_state": working.model_dump(mode="json"),
+    }, config, durability="sync")
+
+    assert result["interview_working_state"] == working.model_dump(mode="json")
+    assert agent.get_state(config).values["interview_working_state"] == working.model_dump(mode="json")
+    assert ContinuationCompaction.model_validate(
+        result["continuation_compaction"], strict=True,
+    ).summary_text == "舊互動已整理；最新更正仍待確認。"
 
 
 def test_effective_request_size_prevents_recompacting_a_small_saved_view():

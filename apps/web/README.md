@@ -1,6 +1,8 @@
 # Caliburn Web
 
-Next.js 本機員工顧問工作區。`/` 導向 `/workspace`；文件庫與單一文件頁分別是 `/workspace` 與 `/workspace/[document_id]`。
+> **歷史文件（2026-09-22 退役）：**本目錄的可執行 Web 已移除；以下內容只保留舊 UI 的設計沿革，不是目前啟動方式。現行 Web 位於 [`experiments/jd-relational-app/web`](../../experiments/jd-relational-app/web/README.md)，正式入口見 [ADR 0077](../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+
+以下記錄退役前的 Next.js 本機員工顧問工作區。`/` 導向 `/workspace`；文件庫與單一文件頁分別是 `/workspace` 與 `/workspace/[document_id]`。
 
 ## 結構
 

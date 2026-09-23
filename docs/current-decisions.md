@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方的 16K／待驗文字是當時 gate 的歷史狀態，不得覆蓋上方較新的正式設定與驗收邊界。
 
+**2026-09-23 C-W JD 首敗定位與來源錯引的分層核對（最新；唯讀）：**已停止合成 trial 的 root Saver 顯示，第一次出貨 Duty 寫入的 `container_ref` 是最新 `jd_read current` 發出的正確 duty 容器；無效的是 100 字元 `after_ref`，它不等於、也不是此前已發出 refs 的前綴，因此 `invalid_input` 未保存。模型重讀後使用完整且有效的排序 item_ref，卻把一個正確出貨 evidence key 換成無關的當輪庫存 key；第二次 committed，造成 Q11 假背書。**定位首敗與來源語意錯引分開處理**；單一觀測不足以推定長 ref 是唯一根因，也不授權正式改短 handle、JD authority 或加第二套 validator。若比較短 target handle，只做現有 JD owner 的零付費 model-view round-trip、scope／revision／kind 反例，再討論正式契約；自然來源品質仍 FAIL。[逐層證據](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#同一批試跑的-jd-來源語意唯讀核對一筆錯誤背書)。
+
 **2026-09-23 P3 背景首敗診斷補線（最新；零付費）：**只在既有 test-only P3 閘門記錄第一筆**外送前拒絕**的固定白名單錯誤碼、allowlisted 角色、已准入筆數與時間，不記模型內容／金鑰，不把拒絕算成付費 request。同步 B1 串行等待、非同步缺角色及未知錯誤文字不可落盤反例先紅後綠；受影響 **60 passed／0 failed**。這能讓下批試跑區分本機 admission 拒絕與已外送的 provider／transport 失敗，**不能倒推已停止批次的 B1 根因**；沒有改正式 App、背景、Memory、重試、模型路由或額度。[證據與界線](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#b1-失敗再定位第-141-筆後缺內層拒絕碼)。
 
 **2026-09-23 C-W B1 背景中斷的次級唯讀定位（最新）：**已停止試跑的 B1 第 132／136／141 筆真模型請求均結算；下一次 B1 呼叫沒有新增已准入 attempt。第 141 筆時累計 US$0.45005514，加一筆 B1 保守預留 US$0.287076 仍低於 US$1，名額亦僅 141／180，因此不是當時總量上限已滿。鎖定 test-only P3 閘門可在外送前拒絕；OpenAI SDK 會把其一般例外包成 `APIConnectionError`，但 Saver 未留內層 cause。**本機 pre-admission 拒絕是候選，不是已證根因；OpenRouter 傳輸、角色／wire 或 30 秒串行等待亦不能憑目前時間戳各自確證。**下一 gate 只在既有 test-only 邊界取得安全的內層錯誤碼；不因此改正式背景設計或重送舊試跑。[分層定位](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#b1-失敗再定位第-141-筆後缺內層拒絕碼)。

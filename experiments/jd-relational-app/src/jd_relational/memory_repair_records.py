@@ -354,7 +354,12 @@ def _outcome(value, binding, request, *, strip_changes=False):
                 or len(set(paths)) != len(paths)):
             raise ValueError()
     status = value["status"]
-    if status in {"applied", "stale", "no_memory"}:
+    layered_failure_feedback = (
+        binding.format_version == 2
+        and status in {"invalid_edit", "scope_too_broad"}
+        and ("head" in value or "guide" in value)
+    )
+    if status in {"applied", "stale", "no_memory"} or layered_failure_feedback:
         if "head" not in value or "guide" not in value:
             raise ValueError()
         value["head"] = _head(value["head"], binding.document_id)

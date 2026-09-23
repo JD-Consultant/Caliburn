@@ -159,6 +159,37 @@ def test_layered_memory_repair_reads_then_publishes_one_complete_bundle(memory, 
     assert len(model.requests) == 5
 
 
+def test_layered_diff_mismatch_returns_feedback_and_keeps_publication(memory):
+    def replies(initial, source_reference):
+        messages = layered_replies(initial, source_reference)
+        messages[-2].tool_calls[0]["args"]["case_diff"] = (
+            "@@\n-不存在的案例原文\n+本人只通報設備故障。"
+        )
+        messages[-1] = AIMessage(content="這次差異未套用，需先核對目前案例。")
+        return messages
+
+    root, model, initial, _, pub, context, payload, config = setup_repair(
+        memory, replies, layered=True,
+    )
+
+    result = root.invoke(payload, config, context=context, durability="sync")
+
+    feedback = [message for message in result["messages"]
+                if isinstance(message, ToolMessage) and message.name == "repair_memory"]
+    assert len(feedback) == 1
+    assert feedback[0].status == "error"
+    assert json.loads(feedback[0].content)["status"] == "invalid_edit"
+    assert "guide" in json.loads(feedback[0].content)
+    assert feedback[0].artifact["request"] is None
+    assert pub.current() == initial.head
+    assert result["messages"][-1].content == "這次差異未套用，需先核對目前案例。"
+    assert len(model.requests) == 5
+    assert any(isinstance(message, ToolMessage)
+               and message.name == "repair_memory"
+               and json.loads(message.content)["status"] == "invalid_edit"
+               for message in model.requests[-1])
+
+
 def test_a_new_legacy_two_file_call_cannot_bypass_the_layered_tool_schema(memory, monkeypatch):
     root, model, initial, repair, pub, context, payload, config = setup_repair(
         memory, [call(1), AIMessage(content="改由分層工具處理。")],

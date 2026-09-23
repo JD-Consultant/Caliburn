@@ -97,6 +97,24 @@ def test_layered_binding_and_request_preserve_exact_runtime_resolved_repair():
     assert validate_repair_message(result, bound) == (outcome, request)
 
 
+@pytest.mark.parametrize("status", ["invalid_edit", "scope_too_broad"])
+def test_layered_failed_repair_preserves_current_head_and_guide(status):
+    bound = make_repair_binding(
+        model_message(LAYERED_ARGS), **SCOPE, base=asdict(BASE),
+        source_reference=SOURCE, repair=LAYERED_REPAIR, layered=True,
+    )
+    outcome = {"status": status, "detail": "案例 patch 無法套用，尚未寫入。",
+               "head": asdict(BASE), "guide": "目前案例與理解導覽"}
+
+    result = make_repair_message(bound, outcome)
+
+    assert result.status == "error"
+    assert json.loads(result.content)["guide"] == "目前案例與理解導覽"
+    assert validate_repair_message(result, bound) == (outcome, None)
+    restored = JsonPlusSerializer().loads_typed(JsonPlusSerializer().dumps_typed(result))
+    assert validate_repair_message(restored, bound) == (outcome, None)
+
+
 def test_unbound_current_call_never_exposes_retired_two_file_read_paths():
     original = model_message(LAYERED_ARGS)
 

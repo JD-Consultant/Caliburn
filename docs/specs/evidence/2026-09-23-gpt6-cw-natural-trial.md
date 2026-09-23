@@ -170,3 +170,17 @@ Owner 決定先不接 tool search、不用 Browser，優先以正式新 App API 
 本批帳本 **104 筆實際模型請求均 settled、US$0.194038960、在途 0、員工輸入 11 次**。依安全停止入口停止試驗程序；`serve.finished.json` 記錄 `app_closed=false`、`saver_connection_closed=false`，故只稱程序已退出、隔離資料保留，**不冒稱 App／Saver 優雅關閉**。舊第 11 輪不重新 POST、不自行清理已保存的 C pending 狀態；下次正式自然驗收用新凍結版本與新隔離目標，不繞過 P3 preflight。
 
 依[分層 C 設計](../2026-09-16-layered-case-and-work-understanding-memory-alignment.md#6-c-即時修補工具)與核心 `_feedback` 原碼，只在現有 App outcome decoder 允許 format v2 的上述兩種未套用狀態攜帶**成對、受既有 scope／revision／長度驗證**的 head／guide；未改 C 核心、模型 Prompt、重試上限、publication、JD、背景 B1／B2 或 provider。測試先見兩個狀態的失敗反例，修後 ToolMessage／Saver 序列化往返均通過；另以真 Agent graph、錯誤案例 diff 驗證回饋正常進模型、最終回答可生成，publication 原版不變。相鄰 C 測試 **154 passed**；完整新 App 離線測試在可用 Windows 暫存環境為 **3,180 passed／323 skipped／0 failed**。受限執行環境先出現 93 個 pytest 暫存目錄 `WinError 5` setup errors；同一個控制測試在可存取環境通過，故不歸因於產品修改。**修後真模型、原 pending run 的精確恢復、完整 JD 品質與 Browser 仍未由這些離線測試驗證。**
+
+### 修後新隔離試跑：C 回饋可達模型，但第 11 輪未完成
+
+2026-09-23 以修後 commit `2e50223f35505fdfc5eef2ab04a332f9654b9f7d`、新隔離目標 `jd-ui-gate-562d202db2ff49bfa996e0a0c521f55d`、dataset `d2be2c19-ce1f-420a-bd88-16025c309910`、文件 `a8076092-0e5a-48a7-a460-9b85e15d32a9`，重跑同一已曝光 C-W 員工卡。使用正式新 App API、GPT-6 Luna Responses、A 64K／B1/B2 128K、既有 App-side compaction 與 20 個 A tools；沒有啟用 Browser 或尚未驗成的 tool search。前 10 次自然員工輸入均 `completed`，模型在資料漸足時自行寫入 JD；本批觀察到 9 筆 writer 執行／保存，並非每輪強迫使用 JD 工具。第 11 次明確更正 W05，員工原話有保存，並另說 W09 A/B 結果仍未知。
+
+本批第 11 輪的真 Saver 記錄顯示：A 已讀目前案例、直接相關工作理解與來源，兩次呼叫 `repair_memory` 的 V4A `case_diff` 都把案例正文中**同一段落內的兩句**當成分開兩行，其中一行被錯放為獨立 unchanged context。實際 `read_case` 回傳的是單一完整段落；C 的 SDK patch 因 `Invalid Context 0` 正確回 `invalid_edit`，未部分寫入。第一次 ToolMessage 明示要重讀並修正，模型雖重讀目前內容，第二次仍提交相同錯位 diff。App 這次已把兩次 `invalid_edit` 正常交回模型，**沒有再發生先前的 `invalid_repair_message`**。既有兩次失敗上限之後，第三、四次修補請求都收到 `repair_limit`；其中第三次改成整段替換，但上限已生效，不能聲稱該候選可成功。這是 model-facing V4A 精確行匹配與模型使用上的實測缺口，不是已證 Memory 版本競爭、來源資料遺失或 C 核心錯誤。
+
+模型在 `repair_limit` 後仍繼續多次讀 JD／案例／工作理解／原話及寫作 Skill，沒有本輪 JD mutation 或 final。該輪 Saver 自最後一則 HumanMessage 起有 4 次 `repair_memory`、13 次 `jd_read`、11 次 `read_evidence`、7 次 `read_file`、4 次 `read_case`、4 次 `read_work_understanding`、1 次背景通知。正式 `q019_document_memory_head` 停在 revision **2**，兩筆成功 publication receipt 均為先前 `consolidation`，沒有本輪 C repair publication。第 11 輪終態 `run_status=failed`、`input_state=saved`、`jd_effects.state=settled` 且本輪 effects 0、無 assistant final；**不得標為 C 更正或完整 JD 通過**。第 12 次員工輸入未外送。
+
+P3 每批既定上限 **180 筆實際模型外送／US$1.00**：本批 180 筆均結算，共 **US$0.575568895**、未知保留 0、在途 0；第 181 筆未外送。關停時 `serve.finished.json` 記 `reason=requested`、`app_closed=true`、`saver_connection_closed=true`。關閉輸出另有 `background_workflow_failed`，目前僅能確認新背景 publication 未出現，不能從單一 log 推定具體根因。隔離資料與完整帳本保留，不重送失敗回合、不為這次結果擅自擴大額度。
+
+關停後用**鎖定的 OpenAI Agents SDK `apply_diff`**、本批 Saver 已讀正文及四次原始 `repair_memory` 參數作零付費純記憶體比對：前兩次案例與理解 diff 均不匹配；第三、四次整段 diff 對各自原文都能套用、替換舊頻率且不留「每月全盤」。這只證明 V4A text patch 部分可用，不會越過正式 `repair_limit`，也沒有模擬整個 C 的來源／引用／CAS 驗證；不得倒推那兩次完整 publication 必然成功。[OpenAI 官方 Apply Patch 指南](https://developers.openai.com/api/docs/guides/tools-apply-patch)（查閱 2026-09-23）建議在 patch conflict 時回報可理解錯誤、讓模型重新讀取並調整 diff；本案已採相同錯誤回饋原則，但真 Luna 第二次仍重送相同錯位 diff。這是公開方法與本案實測的區分，不把 OpenAI 原生 `apply_patch` tool 誤稱為本 App 正式工具。
+
+下一個低成本 gate 是沿既有 C／Tool owner，在零付費真形狀測試重現「正文單段、模型產生分行 context」與第一次 `invalid_edit` 後重送相同 diff 的情境；先核對現有工具描述、SDK `apply_diff`、錯誤回饋與 retry guard，再提出最小 model-facing 修正及其受影響測試。不得先加重試次數、替模型自動改寫 diff、新建 patch engine 或重開 Memory 架構。即使 C 候選修正，還需另驗 A 在更正失敗後能誠實收尾、完成 JD 及最終品質；Browser 仍依 Owner 決定暫後。

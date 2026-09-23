@@ -494,3 +494,64 @@ def test_continuation_stop_only_writes_separate_control_file(tmp_path, monkeypat
     trial.stop_continuation(tmp_path)
     assert (tmp_path / "continuation" / "stop.request").is_file()
     assert (tmp_path / "stop.request").is_file() is False
+
+
+def test_continuation_verifies_prior_document_and_all_native_runs_before_listening(
+    tmp_path, monkeypatch,
+):
+    document_id, _approval = _continuation_records(tmp_path, monkeypatch)
+    dataset_id = str(uuid4())
+    (tmp_path / "initialize.finished.json").write_text(
+        json.dumps({"dataset_id": dataset_id}), encoding="utf-8",
+    )
+    run_ids = [str(uuid4()) for _ in range(12)]
+    rows = [row for run_id in run_ids for row in (
+        {"role": "user", "run_id": run_id, "message_id": run_id, "text": "合成原話"},
+        {"role": "assistant", "run_id": run_id, "message_id": "answer-" + run_id, "text": "合成回覆"},
+    )]
+    settings = SimpleNamespace(dataset_id=dataset_id,
+                               signing_key_bytes=lambda: b"synthetic-32-byte-local-signing-key")
+    runtime = SimpleNamespace(
+        checkpoints=object(),
+        run_history=SimpleNamespace(find=lambda _doc, run_id, _dataset: SimpleNamespace(
+            record=SimpleNamespace(run_id=run_id, document_id=document_id,
+                                   dataset_id=dataset_id, status="completed"),
+            closed=True,
+        )),
+    )
+    managed = SimpleNamespace(
+        opened=SimpleNamespace(settings=settings, host=SimpleNamespace(runtime=object())),
+        ai_runtime=runtime,
+    )
+    catalog = {"dataset_id": dataset_id, "documents": [{"document_id": document_id}],
+               "next_after": None}
+    history = {"dataset_id": dataset_id, "document_id": document_id,
+               "messages": rows, "next_cursor": None}
+    monkeypatch.setattr(trial, "CatalogService", lambda *_args: SimpleNamespace(list=lambda **_kw: catalog))
+    monkeypatch.setattr(trial, "ChatHistoryCodec", lambda *_args: object())
+    monkeypatch.setattr(trial, "ChatHistoryService", lambda *_args: SimpleNamespace(
+        read=lambda *_a, **_kw: history))
+
+    trial.verify_prior_conversation(managed, document_id, tmp_path)
+
+    catalog["documents"] = [{"document_id": str(uuid4())}]
+    with pytest.raises(trial.TrialPreflightError, match="continuation_document_mismatch"):
+        trial.verify_prior_conversation(managed, document_id, tmp_path)
+    catalog["documents"] = [{"document_id": document_id}]
+
+    runtime.run_history = SimpleNamespace(find=lambda _doc, run_id, _dataset: SimpleNamespace(
+        record=SimpleNamespace(run_id=run_id, document_id=document_id,
+                               dataset_id=dataset_id, status="failed"),
+        closed=True,
+    ))
+    with pytest.raises(trial.TrialPreflightError, match="continuation_prior_run_incomplete"):
+        trial.verify_prior_conversation(managed, document_id, tmp_path)
+
+    runtime.run_history = SimpleNamespace(find=lambda _doc, run_id, _dataset: SimpleNamespace(
+        record=SimpleNamespace(run_id=run_id, document_id=document_id,
+                               dataset_id=dataset_id, status="completed"),
+        closed=True,
+    ))
+    history["messages"] = rows[:-1]
+    with pytest.raises(trial.TrialPreflightError, match="continuation_prior_run_incomplete"):
+        trial.verify_prior_conversation(managed, document_id, tmp_path)

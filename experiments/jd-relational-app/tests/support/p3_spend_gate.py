@@ -483,6 +483,7 @@ class P3SpendGate:
                 "attempt_id": attempt_id,
                 "model": payload["model"],
                 "max_output_tokens": payload["max_output_tokens"],
+                "declared_tool_count": len(payload.get("tools") or []),
                 "reserve_usd": str(reserve),
                 "outcome": "in_flight",
                 "started_at_utc": _utc_now(),

@@ -60,3 +60,9 @@ Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；
 同一 Saver 工具序列顯示第七輪 `read_file` 6、`jd_read` 3、`read_work_understanding` 6、`read_case` 4、`read_evidence` 5，**24 筆 ToolMessage 均為 success**；現有 execution guard 的「修正同一失敗」規則因此沒有觸發，不能把這些讀取稱作工具錯誤重試。摘要曾把較早 `jd_read` 的完整結果移出 request tail，模型後來重讀是可觀察事實；但最末 `build_request_view` 仍逐字包含當輪員工「先寫暫定 JD、未知留待確認」的輸入，並包含最近一次 `jd_read` 結果與兩筆工作理解結果。故**沒有證據說當輪要求或所有 JD refs 已被壓縮掉**；摘要頻繁和未使用 writer 有關聯，不足以證明單一根因。
 
 [OpenAI Compaction](https://developers.openai.com/api/docs/guides/compaction)、[Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching)與 [Anthropic keep-recent-turns](https://platform.claude.com/docs/en/build-with-claude/compaction-keep-recent-turns)（查閱 2026-09-23）支持按實際 context 管理長任務、保留必要近期工具往返；**沒有一家規定本產品必須用 16K 或改用其原生 compaction**。本案仍沿既有 App-side compaction／canonical 保存權責；下個診斷 gate 應先辨明新 P3 `incomplete_details.reason`，再用同一正式 request 的摘要頻率、近期 tool-result 保留及 writer 選擇作窄比較。不以本次觀察直接提高 trigger、改 Prompt／Skill、加入成功讀取防迴圈或重跑已停止的第七輪。
+
+### 第 110 筆請求定位與下批帳本欄位
+
+沿同一隔離庫的唯讀 Saver／P3 response ID 對帳：第 109 筆已結算 A 請求對上 canonical AIMessage 的 `read_work_understanding` 呼叫，後接成功 ToolMessage；第 108 筆已結算 A 請求沒有對上 canonical AIMessage，且使用 1,831 input／2,275 output tokens，符合摘要呼叫特徵。第 110 筆在該工具結果之後失敗。按當時摘要安全邊界及 request 門檻推論，它**很可能**是下一次摘要請求，但原帳本未保存請求工具數量或明確種類，也未保存 `incomplete_details.reason`；故仍不能確認第 110 筆種類與失敗原因，更不能由此直接改 16K／8,192 設定。
+
+為讓未來批次不再靠 Saver 間接猜測，僅在 **test-only P3 spend ledger** 的每筆准入紀錄加入 `declared_tool_count`：經既有 wire 檢查後，無 `tools` 記 0，有工具只記數量；不保存名稱、定義、參數、對話或新狀態，也不更動費用保留、拒絕、重試或 production request。先用 0／1 工具且服務端 `incomplete` 的持久化反例取得紅燈，再以一行紀錄修正取得該測試檔 **45 passed／0 failed**，沒有外送模型請求。此欄位僅輔助區分未來的摘要與工具主請求，**不是精確 request-kind 權威**；第三批舊帳本無法回填，仍維持 stopped／未知預留。下一個產品決策仍應依新的具體請求／回覆證據，而非把重讀、摘要頻率或未使用 writer 單獨當成根因。

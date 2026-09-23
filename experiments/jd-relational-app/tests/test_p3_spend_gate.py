@@ -333,6 +333,36 @@ def test_incomplete_reply_records_bounded_reason_and_observed_cost_without_settl
     assert "private synthetic interview text" not in json.dumps(state)
 
 
+@pytest.mark.parametrize("tool_count", [0, 1])
+def test_admitted_request_records_only_declared_tool_count_on_incomplete_reply(
+    tmp_path, tool_count,
+):
+    spend = gate(tmp_path)
+    body = payload()
+    body["input"][0]["content"] = "private synthetic interview"
+    if tool_count:
+        body["tools"] = [{
+            "type": "function",
+            "name": "synthetic_read",
+            "description": "private synthetic tool description",
+            "parameters": {"type": "object", "properties": {}},
+        }]
+    sent = request(body=body)
+    wire = response(sent).json()
+    wire["status"] = "incomplete"
+    wire["incomplete_details"] = {"reason": "max_output_tokens"}
+
+    spend.begin(sent, role="consultant")
+    with pytest.raises(BudgetGateError, match="provider_response_incomplete"):
+        spend.complete(httpx.Response(200, json=wire, request=sent))
+
+    ledger = (tmp_path / "p3-spend-ledger.json").read_text(encoding="utf-8")
+    attempt = json.loads(ledger)["attempts"][0]
+    assert attempt["declared_tool_count"] == tool_count
+    assert "private synthetic interview" not in ledger
+    assert "private synthetic tool description" not in ledger
+
+
 def test_duplicate_response_cannot_charge_or_release_twice(tmp_path):
     spend = gate(tmp_path)
     sent = request()

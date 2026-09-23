@@ -44,6 +44,8 @@ else:
 
 from jd_relational.consultant_runtime import ConsultantRuntime
 from jd_relational.consultant_app import build_consultant
+from jd_relational.catalog_service import CatalogService
+from jd_relational.chat_history import ChatHistoryCodec, ChatHistoryService
 from jd_relational.openrouter_model import OPENROUTER_HEADERS
 from jd_relational.provider_keys import read_key
 from jd_relational.role_models import create_role_models
@@ -290,6 +292,52 @@ class TrialEvidence(Evidence):
         return value
 
 
+def verify_prior_conversation(managed, document_id: str, target: Path) -> None:
+    """Read the existing App authority before admitting any continuation HTTP."""
+    settings = managed.opened.settings
+    try:
+        initialized = json.loads((target / "initialize.finished.json").read_text(encoding="utf-8"))
+        if (type(initialized) is not dict
+                or initialized.get("dataset_id") != settings.dataset_id):
+            raise ValueError()
+        catalog = CatalogService(managed.opened.host.runtime, settings.dataset_id).list(archived=None)
+        if (catalog.get("dataset_id") != settings.dataset_id
+                or catalog.get("next_after") is not None
+                or len(catalog.get("documents", [])) != 1
+                or catalog["documents"][0]["document_id"] != document_id):
+            raise TrialPreflightError("continuation_document_mismatch")
+        history = ChatHistoryService(managed.ai_runtime.checkpoints, ChatHistoryCodec(
+            settings.signing_key_bytes(), settings.dataset_id)).read(document_id, limit=50)
+        messages = history.get("messages")
+        if (history.get("dataset_id") != settings.dataset_id
+                or history.get("document_id") != document_id
+                or history.get("next_cursor") is not None
+                or type(messages) is not list or len(messages) != 2 * TURN_CAP):
+            raise TrialPreflightError("continuation_prior_run_incomplete")
+        seen = set()
+        for index in range(0, len(messages), 2):
+            employee, assistant = messages[index:index + 2]
+            run_id = employee.get("run_id")
+            if (employee.get("role") != "user" or employee.get("message_id") != run_id
+                    or run_id in seen or assistant.get("role") != "assistant"
+                    or assistant.get("run_id") != run_id
+                    or not assistant.get("message_id")):
+                raise TrialPreflightError("continuation_prior_run_incomplete")
+            seen.add(run_id)
+            observed = managed.ai_runtime.run_history.find(document_id, run_id,
+                                                            settings.dataset_id)
+            if (observed is None or not observed.closed
+                    or observed.record.run_id != run_id
+                    or observed.record.document_id != document_id
+                    or observed.record.dataset_id != settings.dataset_id
+                    or observed.record.status != "completed"):
+                raise TrialPreflightError("continuation_prior_run_incomplete")
+    except TrialPreflightError:
+        raise
+    except Exception:
+        raise TrialPreflightError("continuation_prior_run_incomplete") from None
+
+
 @contextmanager
 def open_trial_runtime(spend: P3SpendGate, api_key: str, *, transport=None):
     """Formal A/B1/B2 graph with one guarded sync/async provider boundary."""
@@ -356,6 +404,8 @@ def serve(target: Path, *, continuation: bool = False):
         started = monotonic()
         try:
             check_settings(managed.opened.settings, value)
+            if continuation:
+                verify_prior_conversation(managed, approval["document_id"], target)
             original_execute = managed.opened.host.runtime.storage.execute
 
             def observe_write(intent):

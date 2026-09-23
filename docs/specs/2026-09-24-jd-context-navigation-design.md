@@ -55,3 +55,11 @@
 - **停止線**：候選查找／短目錄漏掉重要工作、無法確保模型看過目標全文、locator 會越過現有寫入檢查、或更省 bytes 但多步成本／品質更差；先保留現有 production 路徑，帶 trace 與最小候選回 Owner 討論。不得因大 repo 類比自動加向量庫／RAG／新 Agent／新 DB、切 OpenAI tool search、換 provider、強制每輪讀全稿或把摘要當來源。
 
 本稿要先審 **資料流與權責**；實作細節只在本地固定合約、分頁與可信 ToolMessage 反例通過後定版。這些 gate 前不改正式行為、不送付費模型。
+
+## 6. 首輪離線核對結果（2026-09-24；不改正式接線）
+
+沿已停止的 C-W checkpoint 與 §5 同一口徑複核：第四次同版全稿讀取前，A 的 request-only 視圖沒有 11 個 JD item ref 中任何一個，六章 ref 只剩 `conditions`。在這個**實際可見狀態**，現有 `item/section` 不能直接替代 `current`；不能只用舊 checkpoint 中存在 refs 推論模型當下能指定它們。現有六章逐章讀取對此稿是 8 步／88,650 bytes，較全稿 3 步／85,893 bytes 更大；單一 Task item 是 1 步／25,281 bytes，但前提是已取得當前同版 ref，且這個目標足以回答本次修改問題。這些都是工具回覆 bytes／步數，**不是真模型總 token、延遲或 JD 品質收益**；數據與限制沿用[原始對照](evidence/2026-09-23-gpt6-cw-natural-trial.md#同一已保存-checkpoint-的-jd-request-view聚焦讀取對照零付費)，不複製其整份 trace。
+
+鎖定 App 的現有測試在不使用共用 uv 快取時通過：`test_reads.py` **10 passed**；`task_item_view_includes_parent_details_shared_definitions_and_sources` 與 `successful_current_item_or_section_is_an_exact_run_read` **3 passed**。它們證明既有 item 投影包含部分關聯、current cursor 會拒絕跨版，以及同版 item／section 的可信讀取能進原 JD writer；**沒有證明自然模型能自行取得已不在 request 視圖的 ref，亦沒有證明局部結果涵蓋一項寫入所需的所有頁面／相鄰任務**。首次測試未執行是 Windows 共用 uv cache `WinError 5`，換 `uv --no-cache` 後同一聚焦測試通過，不列為產品失敗。
+
+程式與正式工具說明仍有待對齊的責任邊界：`consultant_guidance`／`read_transport` 引導開始編輯及成功保存後讀 `current`；`AiToolSession._read_base` 則接受 `current/item/section`，但只核同版可信讀取，不核目標範圍與 `has_more` 全頁完成。這是**源碼審核發現的驗收缺口**，不是已證可越過 Domain／CAS 的資料損壞。下一個有界 gate 先沿同一 JD owner 比較「當前同版短定位入口 → 既有局部正文／關聯讀取」與全稿；若新增只讀 locator，必須證明它不會變成寫入授權，且沒有降低來源與全稿核對品質。這輪不選定新 view／schema，不改 Prompt、Memory、compaction、Domain、writer 或資料庫；G4 仍為 **Proposed**。

@@ -1,6 +1,6 @@
 # JD 按需導覽與正文讀取：設計審查稿
 
-- 日期／階段：2026-09-24；G4 **Proposed**。Owner 已同意「導覽定位、讀正文後修改、必要時讀全稿」的效果，並於 2026-09-24 同意以「按任務定位、按需讀正文、追查關聯、修改後驗證」作為設計首選。依 Codex／Claude Code 大型 repo 導覽方式複核後，原「固定六章入口＋outline」改列**待比較候選**，不再當作已決實作。現有工具能否充分定位、是否需要新唯讀入口、wire／引用實現仍待離線 gate 審查；這項方向同意**不授權 production 施工**。
+- 日期／階段：2026-09-24；G4 設計完成、G5 離線反例與同稿比較完成；G6／G7 見 [ADR 0078](../adr/0078-current-jd-read-only-locator.md) 與 [施工計畫](../plans/2026-09-24-jd-context-navigation-slice.md)。Owner 後續明確要求完成、驗證此方向並允許必要架構改動，因此本稿早期「不授權 production 施工」只保留為當時 gate 紀錄，不再是目前限制。正式產品效果仍是「按任務定位、按需讀正文、追查關聯、修改後驗證」，不是強制每輪 JD 讀取。
 - 範圍：正式新 App 的 A 主顧問讀取 **current JD**。不改 B1／B2／C、Memory、來源 authority、JD Domain、保存／撤回、Prompt／Skills 或模型路由。
 - 既有權責：[跨顧問來源與 JD 契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)、[完整工作分析](2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[品質驗收](2026-09-10-jd-product-quality-acceptance.md)、[ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md)及[ADR 0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)不由本稿取代。
 
@@ -63,3 +63,18 @@
 鎖定 App 的現有測試在不使用共用 uv 快取時通過：`test_reads.py` **10 passed**；`task_item_view_includes_parent_details_shared_definitions_and_sources` 與 `successful_current_item_or_section_is_an_exact_run_read` **3 passed**。它們證明既有 item 投影包含部分關聯、current cursor 會拒絕跨版，以及同版 item／section 的可信讀取能進原 JD writer；**沒有證明自然模型能自行取得已不在 request 視圖的 ref，亦沒有證明局部結果涵蓋一項寫入所需的所有頁面／相鄰任務**。首次測試未執行是 Windows 共用 uv cache `WinError 5`，換 `uv --no-cache` 後同一聚焦測試通過，不列為產品失敗。
 
 程式與正式工具說明仍有待對齊的責任邊界：`consultant_guidance`／`read_transport` 引導開始編輯及成功保存後讀 `current`；`AiToolSession._read_base` 則接受 `current/item/section`，但只核同版可信讀取，不核目標範圍與 `has_more` 全頁完成。這是**源碼審核發現的驗收缺口**，不是已證可越過 Domain／CAS 的資料損壞。下一個有界 gate 先沿同一 JD owner 比較「當前同版短定位入口 → 既有局部正文／關聯讀取」與全稿；若新增只讀 locator，必須證明它不會變成寫入授權，且沒有降低來源與全稿核對品質。這輪不選定新 view／schema，不改 Prompt、Memory、compaction、Domain、writer 或資料庫；G4 仍為 **Proposed**。
+
+## 7. 反例後的最小選擇與界線（2026-09-24）
+
+§6 的同版 checkpoint 已證明：模型需要局部讀取時，當前 request 內可能沒有任何 item ref；只保留六章也未降低此稿總回傳量。這是新增**唯讀定位入口**的具體理由，不是因為 Codex／Claude Code 公開了同一種資料結構。[Codex 公開預設指引](https://github.com/openai/codex/blob/main/codex-rs/protocol/src/prompts/base_instructions/default.md)偏好 `rg`／檔名搜尋；[Claude Code 工具說明](https://code.claude.com/docs/en/tools-reference)公開 Windows 預設 Glob／Grep 的檔名／內容篩選、分頁、Read 的 offset／limit，以及有插件時可用的 LSP 定義／引用導覽；macOS／Linux／WSL 預設改走 shell 內的 `find`／`grep`，不能泛稱永遠使用 ripgrep。[Anthropic context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)建議即時混合檢索、輕量 locator、按需讀來源。它們支持「先定位、讀原文、再修改」的共同原則，**不保證 JD 模型選對候選**。Claude Code 目前甚至對新模型放寬了編輯前必讀的硬規則，改以目前文字的精確／唯一匹配防錯；本案要求完整正文與同版引用，是 Caliburn 的可追溯業務取捨，不能冒稱所有 coding agent 的統一強制規範。[Agent Retrieval Bench](https://arxiv.org/abs/2607.24882) 也未找到 universally 最優檢索器，不能推論向量檢索是本案必要條件。
+
+| 選項 | 此稿量測與決定 |
+|---|---|
+| 每次全讀 `current` | 仍保留作小稿、定位不確定、跨工作對照及最後全稿核對；此稿 3 頁、模型可見投影 85,893 bytes。 |
+| 逐章讀 | 此稿 8 步、88,650 bytes，不能當預設節省方案。 |
+| **同一 current snapshot 的短 locator，再讀 item／section** | 選為可逆的窄接點：11 項及六章在 1 頁、11,497 bytes；選一項任務再讀正文 1 頁、25,281 bytes，合計約 36,778 bytes。這只是回傳量／步數，非實際 provider token、總成本或正確候選命中率。 |
+| 文字搜尋、向量索引、另建 JD map | 目前 11 項可由既有 snapshot 的短 locator 涵蓋；沒有證據值得新增另一套索引／權威。若真模型仍找不對，先以 trace 分析詞彙與範圍，再比較受控查找，不以「零命中」推論工作不存在。 |
+
+定位項由 App 從已保存的同版 JD 產生短名稱／文字線索與上層標籤；它只是候選入口，不是摘要、原話、來源或寫入憑證。模型不填 document、item ID、revision 或 cursor；現有 `ReferenceCodec` 發讀取專用的簽署 ref。`jd_read(item/section)` 以此 ref 回到同版完整正文與關聯，再發原有可寫 current refs。`command_context` 不接受導覽 ref；原 `AiToolSession` 只把同版、模型仍可見且分頁讀完的正文結果作為寫入目標來源，不把 locator 或被 compaction 移出 request 的舊工具結果算進去。跨文件、跨版與 cursor 仍按既有驗證拒絕。未新增 Agent、DB、queue、registry、writer、Memory 變體或第二套 validator。
+
+離線結果：`test_reads.py` 的每項涵蓋、無名稱低頻工作線索、同名不同範圍線索、局部正文／來源讀回、導覽 ref 不可寫、跨文件／跨版／分頁拒絕；`test_consultant_tools.py` 的 locator-only 不綁定、缺頁與讀甲改乙拒絕、完整多頁與定位後讀正文仍可寫、compaction 後舊正文不計入、舊無效讀取不妨礙後來有效讀取、摘要失效與正式模型的完整視圖回退一致。正式 App Python 離線套件 3,207 passed／323 skipped；Web 310 passed、TypeScript typecheck 與 production build 通過；codegen check 一致。[獨立驗收紀錄](evidence/2026-09-24-jd-locator-acceptance.md)另有三筆有界真 GPT-6 Luna 元件檢查：全合成同名職責選擇、帶 10 個 JD 工具的同題選擇，以及在使用者明確准許後，保存 C-W 稿的 11 項中選對相關 Task 並本機讀回正文。完整 App 的自發工具選擇、更多題型命中率、總體費用、跨 K／S／手改及最終專業 JD 品質仍須各自驗證，不能因單題成功或 bytes 減少標 PASS。若模型選錯或局部讀漏影響資料，停止擴大接線、回到 full current 與本稿的停止線。

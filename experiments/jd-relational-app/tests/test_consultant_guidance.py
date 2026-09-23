@@ -85,9 +85,10 @@ def test_jd_capability_covers_the_six_chapters_and_refuses_model_authored_identi
         assert owned in JD_CAPABILITY, owned
 
 
-def test_jd_capability_requires_a_fresh_current_read_after_each_saved_change():
+def test_jd_capability_requires_fresh_body_refs_after_each_saved_change():
     assert "每次成功保存後" in JD_CAPABILITY
-    assert "再用 jd_read current 取得最新版" in JD_CAPABILITY
+    assert "先再讀最新版相關正文取得可用 refs" in JD_CAPABILITY
+    assert "不能只憑定位清單修改" in JD_CAPABILITY
     assert "才做下一次修改" in JD_CAPABILITY
 
 

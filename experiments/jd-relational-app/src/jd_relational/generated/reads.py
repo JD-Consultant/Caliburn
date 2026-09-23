@@ -21,7 +21,7 @@ class ReadInput(BaseModel):
     model_config = ConfigDict(
         extra='forbid',
     )
-    view: Literal['current', 'item', 'section', 'history']
+    view: Literal['current', 'locator', 'item', 'section', 'history']
     target_ref: constr(min_length=1, max_length=4096, strict=True) | None
     cursor: constr(min_length=1, max_length=4096, strict=True) | None
 
@@ -39,6 +39,27 @@ class SectionRecord(BaseModel):
         )
     )
     title: StrictStr
+
+
+class LocatorRecord(BaseModel):
+    model_config = ConfigDict(
+        extra='forbid',
+    )
+    type: Literal['locator']
+    read_ref: constr(min_length=1, max_length=4096, strict=True) = Field(
+        ...,
+        description='App-issued read-only current-revision locator. Use with item view to read the body; not a writer target.',
+    )
+    section_key: Literal['profile', 'purpose', 'duties_tasks', 'knowledge', 'skills', 'conditions']
+    kind: Literal['duty', 'task', 'outcome', 'requirement', 'knowledge', 'skill', 'collaborator', 'work_environment', 'schedule_travel', 'shared_authority', 'shared_collaboration', 'qualification']
+    label: StrictStr = Field(
+        ...,
+        description='Short location cue from the saved JD, not complete body or evidence.',
+    )
+    parent_label: StrictStr | None = Field(
+        ...,
+        description='Saved parent duty/task cue, when one exists; not an authority to edit.',
+    )
 
 
 class ContainerRecord(BaseModel):
@@ -122,7 +143,8 @@ class RevisionRecord(BaseModel):
 
 class ReadRecord(
     RootModel[
-        SectionRecord
+        LocatorRecord
+        | SectionRecord
         | ContainerRecord
         | ItemRecord
         | FieldRecord
@@ -132,7 +154,8 @@ class ReadRecord(
     ]
 ):
     root: (
-        SectionRecord
+        LocatorRecord
+        | SectionRecord
         | ContainerRecord
         | ItemRecord
         | FieldRecord
@@ -147,7 +170,7 @@ class ReadPage(BaseModel):
         extra='forbid',
     )
     format_version: conint(ge=2, le=2, strict=True)
-    view: Literal['current', 'item', 'section', 'history']
+    view: Literal['current', 'locator', 'item', 'section', 'history']
     access: Literal['current', 'history']
     revision_ref: constr(min_length=1, max_length=4096, strict=True)
     records: list[ReadRecord]

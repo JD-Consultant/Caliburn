@@ -86,6 +86,7 @@ ADR 是「為什麼」層;搭配 `../specs/`(細節設計)與 `../runbook.md`(�
 | [0075](0075-relational-jd-authority-and-structured-editor.md) | 關聯式current JD、結構化管理畫面、derived immutable history／receipt及小型業務工具；若Accepted取代0073的完整Plate JSONB authority | **Proposed**（2026-09-12；Owner要求後的G4 draft；D01 duty刪除效果與外部review未閉合，未建表／改production） |
 | [0076](0076-jd-background-admission-record.md) | 隔離JD App的runtime背景准入列：一文件一列六欄，保存已准入target／本批／受阻碼／恢復次數 | **Proposed**（2026-09-14；缺口已在真PG逐欄實測，十三張JD內容表不變但App總表數增為十四；不改production authority） |
 | [0077](0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) | 採用已驗關聯式 JD App 為唯一 production authority；舊 API／Web／契約硬退役、fresh PostgreSQL 18.6、Node 24＋pnpm 12 單一根入口，完整保留研究與實驗文件 | **Accepted**（2026-09-22；Owner 核准不保留舊程式或舊資料相容性；取代 0060／0066／0067／0069 的舊 production authority，並採用 0074–0076 已驗實作） |
+| [0078](0078-current-jd-read-only-locator.md) | 正式 A 顧問在同一 current JD 上唯讀定位、按需讀正文與關聯，完整讀取後才寫；全稿讀取仍可回退 | **Proposed**（2026-09-24；分支內施工、離線與窄真模型定位通過，完整旅程／品質仍待驗收） |
 
 完整脈絡見 [`../specs/2026-06-27-system-architecture-design.md`](../specs/2026-06-27-system-architecture-design.md)。
 契約怎麼選/怎麼交付的規範見 [`../contract-strategy.md`](../contract-strategy.md)（ADR 0004/0010 的一般化、契約 #1–#4 登記）。

@@ -26,7 +26,8 @@ from jd_relational.consultant_tools import (
 )
 from jd_relational.memory_context import evidence_read_projection
 from jd_relational.continuation_compaction import (
-    A_COMPACTION_PROFILE, ContinuationCompaction, build_request_view,
+    A_COMPACTION_PROFILE, ContinuationCompaction, ContinuationCompactionMiddleware,
+    build_request_view,
     canonical_prefix_digest,
 )
 from jd_relational.consultant_execution import ConsultantExecutionMiddleware
@@ -702,6 +703,166 @@ def test_successful_current_item_or_section_is_an_exact_run_read(view):
     assert json.loads(results(state)[0].content)["access"] == "current"
     assert owner.calls[0].base_revision_id == UUID(material.value["revision"])
     assert state["jd_ai_read"]["tool_message_id"] == results(state)[0].id
+
+
+def test_locator_only_does_not_bind_a_jd_writer():
+    _, context, owner, _, _ = setup()
+    state, _, _ = run(context, [
+        call("jd_read", {"view": "locator", "target_ref": None, "cursor": None}),
+        call("jd_create_task", task_args()), done(),
+    ])
+    assert json.loads(results(state)[0].content)["view"] == "locator"
+    assert state.get("jd_ai_read") is None
+    assert owner.calls == []
+    assert json.loads(results(state)[-1].content)["next_action"] == "reread_current"
+
+
+def test_incomplete_current_page_does_not_bind_a_jd_writer():
+    session, context, owner, _, _ = setup()
+    session.reads.page_bytes = 4096
+    state, _, _ = run(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        call("jd_create_task", task_args()), done(),
+    ])
+    assert json.loads(results(state)[0].content)["has_more"] is True
+    assert owner.calls == []
+    assert json.loads(results(state)[-1].content)["next_action"] == "reread_current"
+
+
+def test_item_a_read_does_not_authorize_editing_unread_item_b():
+    _, context, owner, material, codec = setup()
+    first, second = str(uuid4()), str(uuid4())
+    for identity, name, position in ((first, "甲職責", 0), (second, "乙職責", 1)):
+        material.value["duties"][identity] = {
+            "duty_id": identity, "name": name, "scope_text": None, "position": position,
+        }
+    material.versions[material.value["revision"]] = deepcopy(material.value)
+    read_first = codec.issue(SignedReference(
+        document_id=context.document_id, revision_id=material.value["revision"],
+        purpose="navigation", role="item", kind="duty", entity_id=first,
+    ))
+    edit_second = codec.issue(SignedReference(
+        document_id=context.document_id, revision_id=material.value["revision"],
+        purpose="current", role="field", kind="duty", entity_id=second,
+        field="name", value_digest=field_value_digest("乙職責"),
+    ))
+    state, _, _ = run(context, [
+        call("jd_read", {"view": "item", "target_ref": read_first, "cursor": None}),
+        call("jd_set_text", {"target_field_ref": edit_second, "text": "乙職責更新", "basis_evidence_keys": []}),
+        done(),
+    ])
+    assert owner.calls == []
+    assert json.loads(results(state)[-1].content)["next_action"] == "reread_current"
+
+
+def test_complete_multipage_current_still_authorizes_a_jd_writer():
+    session, context, owner, _, _ = setup()
+    session.reads.page_bytes = 4096
+    replies, cursor = [], None
+    while True:
+        arguments = {"view": "current", "target_ref": None, "cursor": cursor}
+        page = session.reads.read(context.document_id, arguments)
+        replies.append(call("jd_read", arguments))
+        cursor = page["next_cursor"]
+        if cursor is None:
+            break
+    assert len(replies) > 1
+    state, _, _ = run(context, [*replies, call("jd_create_task", task_args()), done()])
+    assert len(owner.calls) == 1
+    assert json.loads(results(state)[-1].content)["status"] == "committed"
+
+
+def test_invalid_read_then_valid_complete_read_can_authorize_writer():
+    _, context, owner, _, _ = setup()
+    state, _, _ = run(context, [
+        call("jd_read", {"view": "not-a-view", "target_ref": None, "cursor": None}),
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        call("jd_create_task", task_args()), done(),
+    ])
+    assert results(state)[0].status == "error"
+    assert json.loads(results(state)[1].content)["view"] == "current"
+    assert len(owner.calls) == 1
+
+
+def test_invalid_compaction_fallback_uses_the_same_full_view_for_read_and_write():
+    session, context, owner, _, codec = setup()
+    replies = [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}),
+        call("jd_create_task", task_args()), done(),
+    ]
+    replies[1].tool_calls[0]["args"]["container_ref"] = codec.issue(SignedReference(
+        document_id=context.document_id, revision_id=session.history.value["revision"],
+        purpose="current", role="container", kind="container", child_kind="task",
+    ))
+    main = FixedModel(replies=replies)
+    graph = create_agent(main, tools=build_jd_tools(), middleware=[
+        AiToolMiddleware(),
+        ContinuationCompactionMiddleware(
+            summary_model=FixedModel(replies=[]),
+            profile=A_COMPACTION_PROFILE,
+            token_counter=lambda request, view: len(view),
+        ),
+    ], checkpointer=InMemorySaver())
+    bad = {"format_version": 1, "summary_text": "損壞摘要",
+           "covered_through_message_id": "missing",
+           "covered_prefix_digest": "sha256:" + "0" * 64}
+    state = graph.invoke({
+        "messages": [HumanMessage(id=context.run_id, content="合成原話")],
+        "jd_ai_bindings": [], "jd_ai_read": None, "continuation_compaction": bad,
+    }, {"configurable": {"thread_id": context.document_id}},
+        context=context, durability="sync")
+    assert len(main.requests) == 3
+    assert any(isinstance(message, ToolMessage) and message.name == "jd_read"
+               for message in main.requests[1])
+    assert json.loads(results(state)[0].content)["view"] == "current"
+    assert len(owner.calls) == 1
+
+
+def test_locator_then_complete_item_read_authorizes_its_own_container():
+    session, context, owner, material, codec = setup()
+    duty = str(uuid4())
+    material.value["duties"][duty] = {
+        "duty_id": duty, "name": "合成職責", "scope_text": None, "position": 0,
+    }
+    material.versions[material.value["revision"]] = deepcopy(material.value)
+    locator = session.reads.read(context.document_id, {
+        "view": "locator", "target_ref": None, "cursor": None,
+    })
+    nav = next(row["read_ref"] for row in locator["records"] if row["type"] == "locator")
+    body = session.reads.read(context.document_id, {
+        "view": "item", "target_ref": nav, "cursor": None,
+    })
+    container = next(row["container_ref"] for row in body["records"]
+                     if row["type"] == "container" and row["child_kind"] == "task"
+                     and row["owner_ref"] is not None)
+    arguments = task_args()
+    arguments["container_ref"] = container
+    state, _, _ = run(context, [
+        call("jd_read", {"view": "locator", "target_ref": None, "cursor": None}),
+        call("jd_read", {"view": "item", "target_ref": nav, "cursor": None}),
+        call("jd_create_task", arguments), done(),
+    ])
+    assert len(owner.calls) == 1
+    assert json.loads(results(state)[-1].content)["status"] == "committed"
+
+
+def test_compacted_old_jd_read_is_not_current_writing_evidence():
+    session, context, _, _, _ = setup()
+    state, _, _ = run(context, [
+        call("jd_read", {"view": "current", "target_ref": None, "cursor": None}), done(),
+    ])
+    read_message = results(state)[0]
+    boundary = next(index + 1 for index, message in enumerate(state["messages"])
+                    if message.id == read_message.id)
+    state["continuation_compaction"] = {
+        "format_version": 2,
+        "summary_text": "已讀過 JD；必要時重新取回正文。",
+        "covered_through_message_id": read_message.id,
+        "covered_prefix_digest": canonical_prefix_digest(state["messages"][:boundary]),
+        "protected_message_id": state["messages"][0].id,
+    }
+    assert session._read_base(state) == UUID(session.history.value["revision"])
+    assert session._completed_read_refs(state, session.history.value["revision"]) == set()
 
 
 def _named_task(name):

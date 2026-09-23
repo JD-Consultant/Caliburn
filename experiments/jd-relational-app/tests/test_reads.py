@@ -196,6 +196,64 @@ def test_task_item_view_includes_parent_details_shared_definitions_and_sources(c
     assert kinds.count("knowledge") == 1 and kinds.count("skill") == 1
 
 
+def test_locator_view_finds_every_item_then_requires_body_read_for_writable_refs(codec):
+    value = complete_domain()
+    service, _ = reader(value, codec)
+    records, pages = all_pages(service, "document-a", "locator")
+    sections = [row for row in records if row["type"] == "section"]
+    locators = [row for row in records if row["type"] == "locator"]
+    assert len(sections) == 6
+    assert len(locators) == sum(len(value[name]) for name in (
+        "duties", "tasks", "details", "capabilities", "conditions", "collaborators"))
+    assert all(row["access"] == "current" for row in pages)
+    assert all(row["type"] not in {"field", "source"} for row in records)
+    task = next(row for row in locators if row["label"].startswith("功能檢查"))
+    assert task["parent_label"].startswith("設備維護")
+    assert task["section_key"] == "duties_tasks"
+    assert any("低頻但重要" in row["label"] for row in locators)
+    body, _ = all_pages(service, "document-a", "item", task["read_ref"])
+    assert any(row["type"] == "field" and row["name"] == "description" for row in body)
+    assert any(row["type"] == "source" for row in body)
+    with pytest.raises(ReadError, match="invalid_ref"):
+        command_context(value, {"tool": "jd_move_item", "arguments": {
+            "target_ref": task["read_ref"],
+            "destination_container_ref": next(row for row in body
+                if row["type"] == "container" and row["child_kind"] == "task")["container_ref"],
+            "after_ref": None, "content_changes": [],
+        }}, codec, lambda *_: None, lambda: str(uuid4()))
+
+
+def test_locator_read_ref_and_cursor_reject_other_document_and_new_revision(codec):
+    service, current = reader(complete_domain(), codec, 4096)
+    first = service.read("document-a", {"view": "locator", "target_ref": None, "cursor": None})
+    assert first["has_more"] is True
+    with pytest.raises(ReadError, match="invalid_ref"):
+        service.read("document-b", {"view": "locator", "target_ref": None,
+            "cursor": first["next_cursor"]})
+    reference = next(row["read_ref"] for row in first["records"] if row["type"] == "locator")
+    current.value = deepcopy(current.value)
+    current.value["revision"] = uid(999)
+    with pytest.raises(ReadError, match="stale_view"):
+        service.read("document-a", {"view": "locator", "target_ref": None,
+            "cursor": first["next_cursor"]})
+    with pytest.raises(ReadError, match="stale_view"):
+        service.read("document-a", {"view": "item", "target_ref": reference, "cursor": None})
+
+
+def test_locator_distinguishes_same_named_duties_by_saved_scope(codec):
+    value = complete_domain()
+    value["duties"][uid(123)] = {
+        "duty_id": uid(123), "name": "設備維護", "scope_text": "只限夜班設備", "position": 1,
+    }
+    service, _ = reader(value, codec)
+    rows, _ = all_pages(service, "document-a", "locator")
+    duties = [row for row in rows if row["type"] == "locator" and row["kind"] == "duty"]
+    assert len(duties) == 2
+    assert {row["label"] for row in duties} == {
+        "設備維護 — 僅限約定設備", "設備維護 — 只限夜班設備",
+    }
+
+
 def test_issued_manual_and_ai_contexts_reach_same_domain_without_exposing_context_input(codec):
     value = complete_domain()
     service, _ = reader(value, codec)

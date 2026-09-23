@@ -93,7 +93,7 @@ def test_the_app_installs_the_tool_middleware_and_the_skills_middleware(model, m
     assert captured["context_middleware"].summary_model is model
     profile = captured["context_middleware"].profile
     assert (profile.trigger_input_tokens, profile.keep_messages,
-            profile.summary_max_output_tokens) == (16000, 8, 8192)
+            profile.summary_max_output_tokens) == (64000, 8, 8192)
     assert profile.main_output_reserve_tokens == 8192
     assert captured["guidance"] == build_consultant_guidance()
 

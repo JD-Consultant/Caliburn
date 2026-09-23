@@ -15,6 +15,8 @@
 
 > **2026-09-23 C-W A 摘要 successor：**第二批真實試跑已越過前次 90 秒處，但在 A 的 2,048-token continuation summary 請求取得服務端 `max_output_tokens` 截斷。只提高 A 摘要上限至 **8,192**，不提高 A 主回答的 8,192 或 B1／B2 現有的 8,192 摘要／32,768 主回答；零隱藏重試、同一模型與費用保護不變。這是實測驅動的 Caliburn guardrail，非供應商規定或品質通過證據。詳見[compaction successor](2026-09-16-openrouter-continuation-compaction-design.md)及[試跑記錄](evidence/2026-09-23-gpt6-cw-natural-trial.md)。
 
+> **2026-09-23 compaction 觸發值 successor：**Owner 後續選定 A 64K、B1／B2 128K input-token 試驗觸發值；下方表格旁的共同 16K 是本稿當時的歷史設定。正式 App profile 與最新驗收邊界見[compaction successor](2026-09-16-openrouter-continuation-compaction-design.md)及[目前決策](../current-decisions.md)。
+
 ## 1. 目的與既有決策
 
 Caliburn 只有一個 App 與一個 OpenRouter credential。正式模型路徑維持：

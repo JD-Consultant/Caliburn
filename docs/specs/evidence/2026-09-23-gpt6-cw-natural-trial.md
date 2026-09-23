@@ -96,3 +96,67 @@ Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；
 **需先對齊的正式規則：**[既有 compaction 設計](../2026-09-16-openrouter-continuation-compaction-design.md) §8／§9 要求至少保留最近 8 則原樣；不能只為減少 17 次摘要便擅自降成 2／4。最小候選先限既有 A middleware／JD read 契約：比較在保持員工當輪原話、最新未完成工具 wave、正確 JD ref 與來源回查的前提下，是否可讓「已完成且已失效的舊 JD 讀取結果」更早離開 model request；若需改動 8 則硬規則，先請 Owner 裁決。另一候選是維持 8 則、改觸發／節流策略，但須以相同保存與實際 provider usage 證明不會只把大 request 與成本推高。此處只記診斷及候選；**沒有 production diff、沒有額外付費請求，也沒有重跑已停止的 C-W trial**。
 
 再用末次 checkpoint、相同 20 個正式工具與靜態顧問 guidance，對既有安全切點作**零付費估算**：保留 8／6／4／2 則時，`count_tokens_approximately` 分別約 **31.7k／30.7k／22.3k／21.2k**。這些值未加當次 App notices／Skills 注入，也非供應商精確計數；但連 2 則候選都高於 16k trigger，足以否定「只把 8 改小就能使本回合摘要後低於觸發值」這個簡單修法。正式 8 則規則維持不變。下一個可證偽重點是：既有 middleware 能否在保存安全邊界下避免**無法把有效 request 壓到門檻以下時，每完成一個工具 wave 就再花一次摘要呼叫**；同時不得以跳過摘要讓真 provider request／費用無界增長。可調節的 trigger、最小收益判斷或縮小 JD read payload 均僅為候選，先離線比較再定方案。
+
+### 首批 C-W 的 Memory→JD 基礎唯讀核對（不改產品）
+
+同日另以 inspection-only 正式新 App 開啟**首批已停止**的隔離文件；先核對原 `serve.finished.json` 已記 App／Saver 關閉且支出帳本 stopped，再讀 PostgreSQL publication、Store 與 Saver，未啟用聊天／背景、未恢復第七輪、未送模型或改 JD。停機後目前 head 為 revision 3：三份案例、三份工作理解、各三條案例→原話與工作理解→案例關聯；兩份 guide 可導覽這三項工作。
+
+將目前 Memory 正文與已保存的前六次員工原話逐項比較：收貨包含到貨單／品號／數量／外箱與條件式批號核對、短少標記及交採購、入庫與追溯要求；出貨包含核准揀貨單、包裝／交運、缺件回報與不自行換料號；庫存查核包含實物／記錄比對、複點、查出入庫及交主管決定調帳。盤點頻率仍寫作「印象中、未查證」，差異後續責任與試算表用途維持未知。這是**局部內容對照**，支持三個主題已有可供暫定 JD 使用的材料；沒有檢驗每條來源引用的完整語意支持，也不宣稱六章 JD 或全工作範圍已完整。
+
+第七次員工原話明確要求「先把目前已說清楚的工作整理成一版職務說明書，不確定的先標明」，並新增 A／B 兩案差異。從該輪最新 consultant 子 checkpoint 可獨立確認 `jd_read`、`read_work_understanding`、`read_case` 已呼叫；其中成功的工作理解正文讀取為**收貨**一項。其餘兩項已在停機後 Memory head 中，但此 checkpoint **不能證明**顧問在該輪逐項讀完。兩案差異是第七輪才說出的原話，不要求已在此前發布的 B1／B2 中。結合既有帳本的第七輪 timeout／0 writer，結論限於：**Memory 並非完全空白；至少收貨主題已有局部可寫依據且顧問確實讀到，惟第七輪在寫入前停止。**不能由此推定顧問「拒絕寫」、三項都已完整讀取，或唯一根因是 Memory／compaction／Prompt。自然 Memory→JD、完整暫定稿與最後回答仍 OPEN；不引入每輪必寫 JD 的規則。
+
+### JD 撰寫回合的 context 膨脹與反覆摘要：分項唯讀診斷
+
+2026-09-23 仍用已停止的 `jd-ui-gate-64548b4215564bec809f29809260301a` 子 graph checkpoint，僅離線重建 request-only view 與計數；不改 canonical、資料庫、工具契約或產品碼，也不送模型。所有 token 數是鎖定 LangChain `count_tokens_approximately` 的**估算**，包含 20 個正式工具與靜態顧問 guidance，但未重現每次動態 JD／Memory／Working State notices，也不是 OpenRouter 供應商精確分項計費。既有帳本顯示末段真 provider 主請求約 53k input tokens，與估算口徑不可相減作精確歸因。
+
+| 已發布摘要次序 | 摘要前估算 | 摘要後估算 | 本次少送的估算 | 摘要後是否仍達 16k trigger |
+|---|---:|---:|---:|---|
+| 1 | 24,183 | 23,347 | 836 | 是 |
+| 9 | 26,970 | 25,776 | 1,194 | 是 |
+| 17 | 43,211 | 40,837 | 2,374 | 是 |
+
+全部 **17／17** 次發布後的估算 request 仍高於 16k，單次節省範圍約 **440–8,475**、中位約 **1,293 tokens**。現碼只檢查「本次 view 達 16k、且有向前的安全切點」便再呼叫摘要模型；沒有摘要後低於 trigger 或最小淨收益條件。故在已保存的逐 wave 進展中，每次新 wave 都可能再花一次摘要呼叫。A profile 的 `hard_input_tokens` 目前也是 `None`；**不能**只加「少摘要」而沒有經驗證的安全容量／失敗路徑，否則只是把成本問題移成過長 request。這足以解釋**為何反覆觸發**，不單獨證明顧問未收尾的語意根因。
+
+| 摘要後 view 組成（估算） | 第 1 次 | 第 9 次 | 第 17 次 |
+|---|---:|---:|---:|
+| 完整 request（不含動態 notices） | 23,347 | 25,776 | 40,837 |
+| 20 個工具 schema | 11,541 | 11,541 | 11,541 |
+| 靜態 guidance | 935 | 935 | 935 |
+| `jd_read` ToolMessage | 7,799 | 9,129 | 23,555 |
+| 延續摘要文字連同訊息開銷 | 47 | 223 | 308 |
+
+分項為逐訊息粗估，非完整計數的嚴格可加拆帳。末段的主要來源是**近期 JD 讀取結果和固定工具定義，不是摘要本身或本輪員工原話**。最大工具 schema 粗估依序含 `jd_insert_item` 約 2,163、`jd_revise_work` 約 1,227、`update_interview_working_state` 約 1,220；這是現有 20 工具的描述／輸入合計，不等於可安全刪除其中任一工具。
+
+對第 10 次 `jd_read` 的第一頁（31,329 字元、34 筆 records）只按 JSON 欄名統計字串長度，不輸出值：`section_ref` 約 11,588、`container_ref` 約 5,957、`field_ref` 約 4,556、`item_ref` 約 3,306、`owner_ref` 約 1,469 字元；上述五種重複發配的定位引用合計約 **26.9k 字元／86%**。文字 `value` 合計僅 320 字元。第一頁含 6 個 section、14 個 container、11 個 field、3 個 item。單是 `section_ref` 在 34 筆 records 中出現 34 次，實際僅 **6 個不同值**；相同值的重複字元約 9.6k。`item_ref` 也在 9 次出現中僅有 3 個不同值。這證實此筆 payload 主要是**安全定位用 signed refs 的重複投影**，不是 JD 正文太長；但只去除完全重複的字串仍不能消除每個不同 field／container 都要可寫定位的成本。縮頁或少讀正文不能直接當作同等修法。`jd_read` current／續頁、成功保存後取新版 ref 與 Runtime 驗證仍是既有業務契約，不能無證據刪除。
+
+2026-09-23 官方交叉核對：[OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting)將工具 schema 計入 context；[OpenAI compaction](https://developers.openai.com/api/docs/guides/compaction)按實際 request token 觸發但不給本產品 16k 規定；[Anthropic context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)區分保留高訊號工作狀態與清理舊工具結果；[Anthropic keep-recent-turns](https://platform.claude.com/docs/en/build-with-claude/compaction-keep-recent-turns)明示保留近期越多，可壓縮空間越少且工具配對不可切開；[Anthropic context editing](https://platform.claude.com/docs/en/build-with-claude/context-editing)的 `clear_at_least` 是清理舊工具結果時避免低收益／cache 失效的產品化例子；[LangChain short-term memory](https://docs.langchain.com/oss/python/langchain/short-term-memory)提供摘要／裁剪的不同接點。各家**沒有**共同要求固定 16k、8 則、每有安全 wave 必重摘要，亦未證明 OpenRouter 目前支援 OpenAI／Claude 的原生 compaction 或 tool-search。[OpenRouter GPT-6 Luna 型錄](https://openrouter.ai/openai/gpt-6-luna/)標稱 1,050,000-token context；本次約 53k 的已觀察主請求遠低於型錄上限，**尚無服務端 context overflow 證據**。這是「超過本產品過早的 16k 摘要起點」，不是「已超過模型硬窗口」；也不代表 53k 的品質、延遲及成本已可接受。OpenAI [prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching)與 Anthropic context editing 均提醒改寫上下文可能使快取前綴失配；本產品 OpenRouter 實際 cache 收益仍需獨立量測。
+
+**後續最小候選／停止線：**先在同一現有 `jd_read` owner 做 test-only 模型可見投影，評估對**重複 signed refs** 的減量，同時證明最新版、跨文件／歷史拒絕、item／container 類型、來源回查、cursor 與 writer round-trip 都不變。若要改為短代號，Runtime 必須保持唯一解析及 scope／revision 檢查，模型不能自行生成授權引用；不先立新資料表或通用 registry。另於既有 compaction middleware 做零付費 pre／post 收益與安全餘額對照，評估「低收益時不再付費重摘要、但硬安全上限仍有受控出口」是否可行。**至少保留最近八則**是目前正式設計，任何清理近期工具結果、調高 16k trigger 或改可用工具集合都先提出此處的量測、失去的 context／cache／費用影響及產品取捨，不以本次研究直接施工。不得把原始員工輸入、未完成工具 wave、Memory／JD authority 或來源證據當可任意刪的資料；不因官方有原生 API 就切換 provider。
+
+### 重複 JD 引用的零付費候選對照（非正式工具格式）
+
+同一批 17 個已發布摘要的 request-only view，沿相同工具、靜態 guidance、既有近八則與員工原話，僅在離線複本中把 `jd_read` records 的 `section_ref`／`container_ref`／`field_ref`／`item_ref`／`owner_ref` 字串改成**每頁整數索引＋完整原值表**。每頁都做逆轉換並斷言可還原原 JSON；沒有更動 Saver、App、ToolMessage artifact 或任何正式 tool schema。這只測**一種無損資料表示候選的減量**，不是所有編碼方式的最小 token 下界；也未證明模型能正確查表、原有 `jd_read` 私有 artifact／digest 校驗可接受新格式，或 writer 在實際回合能安全使用索引。後兩點若要正式採用，仍需在現有 JD owner 做窄接線與真實回歸，不能把索引冒充已發配的可寫 ref。
+
+| 摘要次序 | 現有估算 | 無損表格投影估算 | 節省估算 | 全部 `jd_read` 內容設成空字串的純數學下界 |
+|---|---:|---:|---:|---:|
+| 1 | 23,347 | 20,750 | 2,597 | 15,574 |
+| 9 | 25,776 | 21,979 | 3,797 | 16,673 |
+| 17 | 40,837 | 30,204 | 10,633 | 17,321 |
+
+**17／17** 個摘要後 request 在無損表格投影下仍高於 16K；節省範圍約 2.6K–10.6K。末次三筆近期 `jd_read current` 都是各約 7.8K token 的第一頁、各 34 records，且分別屬於**三個不同 JD revision**：前兩頁對最新可寫 ref 已過期，但不能只看版號便斷言其歷程資訊全部無用。末欄把所有 `jd_read` 回覆內容直接清空僅是**不合法、不可採用**的下界測量；末次仍約 17.3K，尚未包含動態 notices。由此可證：**只去重 JD ref，或只把 JD read 變短，並不足以保證壓縮後低於現行 16K trigger**；同時也不表示應刪原始工具結果、縮短近八則或把 trigger 直接提高到某個未驗值。
+
+現在的可審問題應收斂為同一件事：在保留 canonical、未處理員工原話、工具配對、最新可寫 ref 與按需回查的前提下，現行 A middleware 的 **16K 觸發點、可壓縮部分的實際收益、以及過長 request 的安全上限**如何共同設定，使它不對不可再縮的固定／近期部分每 wave 付費重摘要，也不讓 provider request 無界增長。先用離線 trace 驗證候選，再用單一有界真模型／JD writer gate 驗證效果與費用；OpenAI 原生 compaction／tool-search 與 Anthropic 原生 tool-result clearing 均不是目前 OpenRouter 路徑已證可直接切換的產品能力。
+
+再以同一 17 個真 Saver 摘要發布點測一個**只用於證偽的理想下界**：保持原安全切點、當輪員工原話、近期尾段、正式 20 工具及靜態 guidance，唯獨把每次摘要正文暫時換成一個字元；以既有 `build_request_view` 重建並計數。這不是可用的摘要內容，也不修改 checkpoint。結果 **17／17 仍高於 16K**，理想下界約 **23.3K–40.5K**；第 1／9／17 次分別約 23,314／25,567／40,543。當時實際摘要的離線節省 17 筆中 **10 筆不足 2K、13 筆不足 4K**。因此不能以「加強摘要 prompt，讓 summary 再短一點」作為這個逐 wave 觸發問題的主要修法；理想化零資訊摘要都跨不過 trigger。這只證明目前**A 的此一長 JD 寫作 trace**，不是 B1／B2 的容量結論，也不等於正式品質、費用或 provider hard limit 已驗收。
+
+### 工具定義按需載入之相容性核對（非正式接線）
+
+2026-09-23 核對鎖定的 LangChain 1.4.0／`langchain-openai` 1.6.2 原碼、正式 A／B1／B2 組裝及 [LangChain Provider Tool Search](https://docs.langchain.com/oss/python/langchain/middleware/built-in)、[OpenAI Tool Search](https://developers.openai.com/api/docs/guides/tools-tool-search)、[OpenRouter Tool Search](https://openrouter.ai/docs/guides/features/server-tools/tool-search) 官方說明。LangChain 有現成 `ProviderToolSearchMiddleware`，可對指定工具標 `defer_loading` 並加 `tool_search`；OpenRouter Responses 官方也接受該 alias，標示 beta。這是工具**參數 schema 延後進模型 context**，不是不用在每次 HTTP request 向服務端宣告工具；OpenAI 逐一 deferred function 仍先露出名稱／描述。OpenRouter 自己建議 3–5 個常用工具先 eager、適合約 >10K schema tokens／>10 tools，且說小型工具集可能因搜尋往返更貴。
+
+沿現行 `count_tokens_approximately([], tools=...)` 離線估算：A 20 個工具約 **11,541**；B1 10 個約 **1,263**；B2 12 個約 **1,484**。因此 A 有可衡量的延遲載入動機，但 B1／B2 目前 schema 很小，不能因共用 compaction 就自動全 defer。三角色的摘要模型請求本來不帶業務工具，不能再靠 tool search 降那部分。正式 compaction counter 目前估算全套 BaseTool schema，尚未有 deferred 的實際 provider 用量對照，不能先在計數中扣掉工具或宣稱 64K／128K 已反映新機制。
+
+服務端合成 probe 使用單一 OpenRouter key、GPT-6 Luna Responses、OpenAI-only／無 fallback／`store=false`／高推理、無副作用函式與一個 deferred tool；沒有正式文件、JD 或 Memory。第一個沙盒嘗試為 `transport_unknown`，帳本保守保留 US$0.268644，沒有重送；兩個獨立的可連線嘗試各只送一筆 POST，均 HTTP 200、路由 metadata 顯示 OpenAI／`openai/gpt-6-luna-20260922`，觀察費用各 **US$0.0000866**、**US$0.0000859**。第二筆的安全輸出類型記錄為 `openrouter:tool_search`、`function_call`，證明此路徑在這次設定下實際搜尋並產生函式呼叫。既有 P3 test-only 閘門只允許 `service_tier=default`／空，而合成 probe 的回覆為 `auto`，因此兩筆帳本均依既有規則停於 `provider_service_tier_mismatch` 並各保留 US$0.268644 未知額度；**不能稱帳本結算通過，也不能把觀察費用當成承諾上界**。三個獨立帳本不覆寫、不重送；總保守保留 US$0.805932，另見兩筆 HTTP 回覆觀察費用合計 US$0.0001725。
+
+目前不能把 LangChain middleware 直接插入正式 A／B1／B2：`langchain-openai` 的 Responses 回應轉換及下次輸入重播只列 `tool_search_call`／`tool_search_output`，不明列 OpenRouter 這次實測的 `openrouter:tool_search`。零付費 MockTransport 以**已實測的 item type、合成內容**送入現行 ChatOpenAI：SDK 仍能解析伴隨的 `function_call`，但 `AIMessage` 僅留下 `function_call`；真 `create_agent`／InMemorySaver 工具往返的下一次 outbound input 類型只有 `message`、`function_call`、`function_call_output`，沒有 `openrouter:tool_search`。這證明目前 client **沒有忠實保留該類 item**；合成 payload 不能進一步證明 OpenRouter 在缺少它時一定拒絕下一請求或工具搜尋完全失效。OpenRouter 官方也明示 deferred search 與 `tool_choice=none` 衝突；A 既有第 64 次無工具收尾會設 `none`，須維持該安全語意並先做相容性反例。沒有因此修改 LangChain、A 收尾或正式工具集，也不因 server 單次 200 就聲稱完整 App PASS。下一個最小 gate 是只在隔離 fixture 驗真回覆形狀下的 SDK／Saver 重播、A no-tool 收尾、B1／B2 terminal，以及有／無 deferral 的實際 request token／延遲比較；若薄接線無法保持正確語意，才拿具體失敗與 direct OpenAI Responses 的 credential／路由取捨給 Owner 裁決，不新建一套工具 registry／搜索 Agent。
+
+後續零付費 production-model-factory／真 `create_agent`／MockTransport 契約補測：鎖定的 LangChain middleware 辨識現行 GPT-6 Responses 模型為 `openai`，正式 factory 所組出的實際 outbound request 帶 `tool_search` 與所選函式的 `defer_loading=true`，仍保留 OpenAI-only route；定向測試通過。這只證明**請求側可以組裝**，沒有把前述回應 item 遺失或 A 無工具收尾衝突改判通過；也不代表 B1／B2 的小工具集有延遲載入收益。

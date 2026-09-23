@@ -33,7 +33,7 @@ class BackgroundMemoryLimits:
 
 FORMAL_BACKGROUND_MEMORY_LIMITS = BackgroundMemoryLimits(
     request_timeout_seconds=300.0,
-    compaction_trigger_input_tokens=16000,
+    compaction_trigger_input_tokens=128000,
     compaction_keep_messages=8,
     case_max_output_tokens=32768,
     case_summary_max_output_tokens=8192,

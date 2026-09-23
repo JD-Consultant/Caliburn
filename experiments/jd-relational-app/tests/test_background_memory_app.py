@@ -57,7 +57,7 @@ def test_formal_background_limits_match_the_reviewed_product_profile():
     limits = FORMAL_BACKGROUND_MEMORY_LIMITS
 
     assert limits.request_timeout_seconds == 300.0
-    assert limits.compaction_trigger_input_tokens == 16000
+    assert limits.compaction_trigger_input_tokens == 128000
     assert limits.compaction_keep_messages == 8
     assert (
         limits.case_max_output_tokens,
@@ -123,7 +123,7 @@ def test_build_binds_one_authority_per_document_without_io_or_model_calls(native
         assert first.case_workflow.context_middleware.summary_model is case_model
         assert first.case_workflow.context_middleware.profile.protect_latest_human_turn is True
         assert first.case_workflow.context_middleware.profile.preserve_initial_messages == 0
-        assert first.case_workflow.context_middleware.profile.trigger_input_tokens == 16000
+        assert first.case_workflow.context_middleware.profile.trigger_input_tokens == 128000
         assert first.case_workflow.context_middleware.profile.keep_messages == 8
         assert first.case_workflow.context_middleware.profile.main_output_reserve_tokens == 32768
         assert first.case_workflow.context_middleware.profile.summary_max_output_tokens == 8192
@@ -149,7 +149,7 @@ def test_build_binds_one_authority_per_document_without_io_or_model_calls(native
         )
         assert (
             first.understanding_workflow.context_middleware.profile.trigger_input_tokens
-            == 16000
+            == 128000
         )
         assert first.understanding_workflow.context_middleware.profile.keep_messages == 8
         assert (

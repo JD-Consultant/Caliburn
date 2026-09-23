@@ -5,6 +5,7 @@ import json
 import httpx
 import pytest
 from langchain.agents import create_agent
+from langchain.agents.middleware import ProviderToolSearchMiddleware
 from langchain_core.messages import HumanMessage
 from langchain_core.tools import tool
 from langchain_openai import ChatOpenAI
@@ -13,8 +14,9 @@ from openai.types.responses import Response
 
 from jd_relational.openrouter_model import (
     OPENROUTER_BASE_URL, OPENROUTER_HEADERS, OpenRouterModelError,
+    create_responses_openrouter_model,
 )
-from support.openai_replies import body, refused, truncated
+from support.openai_replies import body, refused, reply, truncated
 
 
 def _reply(output, identity):
@@ -102,6 +104,51 @@ def test_locked_client_can_send_and_resume_gpt6_reasoning_tool_loop():
     assert any(getattr(message, "response_metadata", {}).get("id") == "resp_first"
                for message in canonical)
     assert result["messages"][-1].text == "已讀取案例。"
+
+
+def test_locked_provider_search_defers_a_function_on_actual_responses_wire():
+    """Candidate-only boundary: no App switch and no provider-support claim."""
+    requests = []
+
+    @tool
+    def read_case(case_id: str) -> str:
+        """Read a synthetic case by its identifier."""
+        return "合成案例內容"
+
+    def receive(request):
+        requests.append(json.loads(request.content))
+        return httpx.Response(200, json=reply("deferred-probe"), request=request)
+
+    with httpx.Client(
+        transport=httpx.MockTransport(receive), trust_env=False,
+        headers=OPENROUTER_HEADERS,
+    ) as client:
+        async_client = httpx.AsyncClient(
+            transport=httpx.MockTransport(receive), trust_env=False,
+            headers=OPENROUTER_HEADERS,
+        )
+        try:
+            model = create_responses_openrouter_model(
+                component="consultant", model="openai/gpt-6-luna",
+                api_key="synthetic-not-a-key", http_client=client,
+                async_http_client=async_client, reasoning_effort="high",
+                max_output_tokens=8192,
+            )
+            agent = create_agent(
+                model=model, tools=[read_case],
+                middleware=[ProviderToolSearchMiddleware(searchable_tools=["read_case"])],
+            )
+            agent.invoke({"messages": [HumanMessage("合成輸入")]})
+        finally:
+            import asyncio
+            asyncio.run(async_client.aclose())
+
+    assert len(requests) == 1
+    tools = requests[0]["tools"]
+    assert any(item["type"] == "tool_search" for item in tools)
+    deferred = next(item for item in tools if item.get("name") == "read_case")
+    assert deferred["defer_loading"] is True
+    assert requests[0]["provider"]["only"] == ["openai"]
 
 
 def test_role_factory_binds_the_verified_responses_profile_without_network():

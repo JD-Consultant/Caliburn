@@ -230,3 +230,13 @@ Saver 工具序列與 JD revision 對照可定位接合點：模型首次提出�
 零付費分層定位：第二次 Working State patch 本身以目前 checkpoint state 經正式 parser／`_apply_update` 可成功；但 `working_evidence_catalog` 以已保存同輪 ToolMessage 重算時，可重現 `invalid_working_state`。原 `_read_item_ids` 拿**讀取當時**的完整 item ToolMessage，和**第一次修訂後**的 current item 正文逐字比較；正常文字變更被當作假 read proof。這是 Working State 自身驗證時點錯置，不是 OpenRouter 400、Memory 發布、JD Domain 或新增 Agent 的需求。窄修正仍在同一 owner：驗證當時 ToolMessage 的 scope、call identity、private artifact、digest 與投影一致性；只有來源集合仍與 current item 相同時，舊 read 才可展開目前來源；來源已變則舊 read 不授權新來源，也不因正常修訂卡死整輪。不改 canonical conversation、Memory、JD、工具 schema、Prompt、費用上限或重試。
 
 同檔 regression 先以「同輪讀取後只修文字」得到預期紅燈，再以「來源變更後舊 read 不授權新來源」得到第二個紅燈；修後受影響 Working State **15 passed**，並直接用本批 Saver 最後 checkpoint 做唯讀重算，不再出現該 `invalid_working_state`。完整新 App 離線 suite 在可存取 Windows 暫存環境 **3,185 passed／323 skipped／0 failed**；受限沙盒第一次使用 pytest 暫存資料夾有 `WinError 5` setup errors，不能當產品回歸。這些只驗證 deterministic 讀取證明與相鄰契約；**真模型第 8 輪不會重送，修後自然訪談、C 更正、完整 JD／Q11 來源語意、Browser 仍 OPEN**。下一次須再用新凍結 commit／新隔離目標延續有界自然驗收，不沿用本批帳本或把離線結果冒稱完整產品通過。
+
+### Working State 修後的獨立 C-W 長訪談：12 輪上限結果
+
+固定 commit `c1678359889b4faf39e2ed287d910acd03690ece`、新隔離目標 `jd-ui-gate-af5e1d33c3a5446797a366aea6835f5f`、dataset `9c595693-e365-4f8b-9a55-b08bb7b86e23`、文件 `4466b141-1c8e-493a-82fb-15faf15de7b2`。沿同一已核准 P3 C-W 卡、正式新 App、GPT-6 Luna Responses/OpenAI-only，員工回答不提供 oracle、工具名或寫 JD 指令；每輪只按自然提問揭露。程式整理後重新驗證 Working State 指定測試 **15 passed**、完整新 App **3,185 passed／323 skipped**，無新產品差異。
+
+12／12 次員工 POST 的原話已保存、各 run `completed` 且有自然 assistant final；第 8 輪含到貨短少與重複入帳兩案，這次正常回覆並保持處理結論分開，惟未單憑 final 證明模型重現前批完全相同的兩次 Working State 工具序列。顧問多次保留員工明言「不清楚」的放行、調帳、試算表與重量資訊；對「印象中每月全盤」沒有提前升格為確定事實。第 12 輪員工明確查證更正為「每週只循環盤 A 類料，每季才全庫盤點」，final 自然回覆正確轉述，沒有說每月全盤。這是**對話層更正 PASS**，不是 Memory 或 JD 寫入 PASS。第 4 輪查詢 run 狀態曾短暫收到 503，但同一 run 隨後查回 `completed` 與 final；沒有重送員工 POST。
+
+正式 PostgreSQL 唯讀核對：背景 B1／B2 有四筆 `consolidation` publication，最新 Memory head revision 4，admission 回到 `idle`；無 `repair` receipt。revision 4 的盤點案例及理解仍寫「頻率尚未查證」，其 artifact 約在 **11:46:43 UTC** 形成，早於第 12 輪更正。因此目前只能說**更正尚未在已發布 Memory 中出現**，不能用舊版內容直接判定 C 或 B 已錯誤處理，也不能把口頭更正冒充已發布。JD head 仍 revision 1、`jd_operation` 0、12 輪 `jd_effects.results` 全空；沒有 AI 工作稿可做來源、改動查看、手改或撤回驗收。這批未證明「資訊必然不足」或「JD writer 必然有程式故障」，但 P3 所要求的完整 JD 旅程**未達成**；已揭露 W01／W03／W04／W07 等可支持的局部內容，需在下一個有界續談中確認顧問是否能適時開始撰稿。
+
+支出閘門紀錄：**12 員工回合／61 實際 provider requests（A 19、B1 18、B2 24）／US$0.037472660**，全部 settled、在途與未知保留皆 0，無 fallback。達原 [P3 首批停止線](../2026-09-10-jd-product-quality-acceptance.md#6-p3-首個自然縱切有界尚未執行)後未增加 cap、未再送員工訊息。正常 stop 後 `app_closed=true`、`saver_connection_closed=true`；隔離 PostgreSQL、Saver、Store 與原話保留，不刪資料。下一步先就**同一文件續談所需的新一批回合／請求／費用上限及測試入口**取得具體裁決，不能用重啟繞過這批 12 輪閘門；再驗更正是否進正式 Memory、JD 首建／局部足夠時機、來源語意與後續 Browser 旅程。不為了這批未完成直接改 Prompt、Memory 架構或新增 Agent。

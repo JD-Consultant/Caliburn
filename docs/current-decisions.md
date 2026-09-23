@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方保留「待驗／未驗」文字的是當時 gate 的歷史狀態，不得覆蓋上方較新的正式 16K 通過結論。
 
+**2026-09-23 C-W 首批自然真模型驗收（最新狀態）：**正式新 JD App 隔離環境經 API 建立文件並自然訪談 7 輪；前 6 輪原話與顧問回答保存，A 自主觸發 B1／B2，Memory head 到 revision 3，已保存 3 個案例與 3 項工作理解。第 7 輪先讀 JD／案例／理解後，一筆 GPT-6 Luna Responses 請求在現行 A 90 秒期限處未取得可結算回覆；P3 帳本以 `transport_unknown` 停止，58 筆已結算 US$0.031256040，末筆保守保留 US$0.268644，不重送或清零。該輪員工原話已保存、JD writer 0 次，無最終顧問訊息；關閉並以 inspection-only 新 App 重開後仍可查回相同狀態。確切傳輸例外與服務端是否完成未證，不能僅憑 90 秒斷言 provider 根因。Codex IAB 建立前 lookup response-body 失敗，Chrome 自動控制受工具限制；Owner 同意本輪先略過 Browser，完整 Browser／JD 成品品質仍 OPEN。後續只評估既有 A request timeout profile 與有界重測，不重開 Memory／JD 架構。詳見[首批自然試跑與首敗](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md)。
+
 **2026-09-23 真實模型驗收授權（Owner 最新裁決）：**Owner 明確核准為完成既定 Caliburn 新 JD App 驗收目標所需的後續真實模型請求，無須每一批再請示模型呼叫。這不是取消用量保護：每一批仍先固定目的、資料、實際外送數與費用上限，逐筆記帳；費用或路由不明、上限用盡、未授權 fallback／retry 或需要改產品／provider 權責時停止並討論。第一批自然 C-W 沿已提出的 **最多 12 次員工輸入、180 次實際 provider request、US$1.00** 執行；先前 2 筆 smoke 的額度與帳本不沿用。真實請求授權不等於自然品質、完整 Browser 或正式切換已驗收。
 
 **2026-09-23 GPT-6 Responses 第二次獨立真服務端 smoke（最新）：**Owner 另核准最多 2 筆模型 POST＋1 筆唯讀 metadata GET、US$0.54 保守上限；沿正式新 JD App A 模型工廠、既有 P3 test-only 支出閘門與本機合成 `read_case`，實際送出 **2 筆** `/api/v1/responses`，兩筆均 HTTP 200／`completed`，回覆提供 `openai/gpt-6-luna`、實際 provider `OpenAI`、tier `default`、`usage.cost`；工具呼叫與結果接續後產生非空 final。逐筆結算 US$0.0000253／US$0.0000305，總計 **US$0.0000558**、未知預留 0；metadata GET **0 筆**，無重試、fallback、正式資料或 production 修改。前次 stopped 帳本不回寫。**只關閉本次 Responses／high＋工具的有限服務端往返與結算 gate**；真實 encrypted reasoning 跨回合、B1／B2 真模型、自然 P3、16K 長上下文、同批真 Browser／JD 品質、正式切換與 main 合併仍 OPEN。詳見[第二次有界真實工具往返](specs/evidence/2026-09-23-gpt6-responses-offline.md#第二次獨立有界真實工具往返最新)。

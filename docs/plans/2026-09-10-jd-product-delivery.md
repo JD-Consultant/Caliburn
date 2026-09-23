@@ -4,6 +4,8 @@
 
 > **2026-09-23 優先序更新：**本計畫保留完整產品旅程、自然品質與真人試用 gate；下方 Plate／三工具／「Task 6 是唯一下一單位」是當時起點，已被 relational JD、分層 Memory、完整 App 驗收及 [ADR0077 正式權責切換](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)取代。Owner 現將備份／空庫還原移出首版核心驗收，只要求一般中斷後既有已保存資料與進度可查回。當前短路由以 [`current-decisions.md`](../current-decisions.md) 最上條為準；歷史階段與問題解決順序仍保留。
 
+> **2026-09-23 自然試跑首敗 successor：**[首批 C-W 自然真模型驗收](../specs/evidence/2026-09-23-gpt6-cw-natural-trial.md)已進行 7 次員工輸入；A／B1／B2 真請求與局部 Memory 發布有證據，但第 7 輪 JD 初稿前遇 A 單筆 90 秒結果未知，帳本停止，沒有 JD writer 效果或完整 Browser 證據。前批試跑不能算 P3 通過，也不覆寫下方歷史欄位；先處理可重現的期限／診斷邊界，再於新有界批次驗自然完整旅程。
+
 > **2026-09-23 P3 最新入口：**GPT-6 Luna／OpenRouter Responses 的第二次獨立有界 smoke 已完成 2 筆真實模型請求、合成工具往返與非空 final；同筆回覆提供 OpenAI 路由及成本，逐筆結算。首次 smoke 曾因 test-only `provider_model_mismatch` 停止，舊帳本未重開；兩次結果與邊界皆保留於[GPT-6 接線證據](../specs/evidence/2026-09-23-gpt6-responses-offline.md#第二次獨立有界真實工具往返最新)。這只關閉有限服務端 gate，**自然 C-W／16K 長上下文／B1、B2 真模型／同批 Browser 仍未驗收**。Owner 隨後核准完成本計畫所需的真實模型請求，首批自然 C-W 仍限 **12 次員工輸入、180 次實際外送、US$1.00**；下方 P3 表格的「0 外部 request／未付費授權」及「現行後續」是撰寫時歷史狀態，不可當成最新狀態。
 
 ## 1. 成品與範圍

@@ -10,7 +10,7 @@ from langchain_openai import ChatOpenAI
 
 from .openrouter_model import (
     GPT6_LUNA_MODEL, OPENROUTER_BASE_URL, OPENROUTER_HEADERS,
-    OPENROUTER_PROVIDER, REQUEST_TIMEOUT_SECONDS, OpenRouterModelError,
+    OPENROUTER_PROVIDER, OpenRouterModelError,
     create_responses_openrouter_model,
 )
 
@@ -20,6 +20,7 @@ CONSULTANT_MODEL = GPT6_LUNA_MODEL
 # consultant graph is assembled; these values are model request parameters.
 REASONING_EFFORT = "high"
 MAX_OUTPUT_TOKENS = 8192
+CONSULTANT_REQUEST_TIMEOUT_SECONDS = 300.0
 MAX_MODEL_STEPS = 64
 MAX_TOOL_CALLS = 63
 # LangGraph counts supersteps, not model requests. The A child is mounted in
@@ -39,7 +40,7 @@ def create_consultant_model(
     async_http_client,
     model: str = CONSULTANT_MODEL,
     base_url: str = OPENROUTER_BASE_URL,
-    request_timeout: float = REQUEST_TIMEOUT_SECONDS,
+    request_timeout: float = CONSULTANT_REQUEST_TIMEOUT_SECONDS,
     reasoning_effort: str = REASONING_EFFORT,
     max_output_tokens: int = MAX_OUTPUT_TOKENS,
 ) -> ChatOpenAI:

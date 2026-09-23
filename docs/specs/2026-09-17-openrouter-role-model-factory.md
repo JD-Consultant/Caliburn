@@ -11,6 +11,8 @@
 
 > **2026-09-22 prompt-cache／SDK successor：**共用 `ReceiptChatOpenRouter` 在 SDK 已序列化的 request-only message 副本上，只為第一個固定 system／developer 文字區塊加上 `cache_control: {type: ephemeral}`。A／B1／B2 與各角色 compaction summary 因共用同一工廠而沿用；後續 JD、來源、Memory、Working State、背景提示、員工原話及工具結果都不標為固定內容，canonical messages 也不修改。OpenRouter 的 OpenAI 路由會把 content-block marker 轉成 provider 的 prompt-cache breakpoint；既有 implicit caching 保留，未新增 `prompt_cache_key`、session ID、cache service、資料表或第二套 middleware。安全收尾保留同一組工具定義與順序，只用 `tool_choice="none"` 停用工具，避免最後 request 因工具 schema 消失而破壞已重用的前綴；行為仍由既有 response validator fail closed。依賴升到 `langchain-openrouter==0.2.8`，程式直接 import 的 `openrouter==0.10.8` 改列一級依賴；這是現有 `pydantic==2.13.5` 下 resolver 能選出的最新相容 SDK。`openrouter 0.11.46` 要求 `pydantic<2.13`，`langchain-openrouter 0.2.8` 又仍限制 `openrouter<1.0.0`，因此不為追版降級全域 Pydantic，也不強裝 1.x。隔離候選與正式鎖定組合皆通過 model-boundary 測試；本決策只改善傳輸成本／前綴穩定性，不改 Prompt、A／B1／B2、Memory、compaction 或 JD 語意。官方依據：[OpenRouter Prompt Caching](https://openrouter.ai/docs/guides/best-practices/prompt-caching)、[OpenAI Prompt Caching](https://developers.openai.com/api/docs/guides/prompt-caching)、[langchain-openrouter 0.2.8 metadata](https://pypi.org/project/langchain-openrouter/0.2.8/)、[openrouter 0.11.46 metadata](https://pypi.org/project/openrouter/0.11.46/)，查閱 2026-09-22。
 
+> **2026-09-23 GPT-6 Responses／C-W timeout successor：**本稿的 GPT-5.6 Chat route／A 90 秒是當時 profile；[GPT-6 Responses 遷移](2026-09-23-gpt6-luna-responses-migration.md)已取代正式模型傳輸。在首批自然 C-W 試跑的單筆 A 90 秒結果未知後，只將 GPT-6 A 模型工廠的預設單請求等待上限改為 300 秒，B1／B2 原有 300 秒及 hidden retry 0 不變。這是由實測失敗與現行角色預算作出的 Caliburn guardrail 調整，不是供應商規定，也不是前次根因已證；零付費邊界回歸完成，真實自然複驗仍待進行。詳見[試跑記錄](evidence/2026-09-23-gpt6-cw-natural-trial.md)。
+
 ## 1. 目的與既有決策
 
 Caliburn 只有一個 App 與一個 OpenRouter credential。正式模型路徑維持：

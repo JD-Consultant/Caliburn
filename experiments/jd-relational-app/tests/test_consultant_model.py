@@ -12,7 +12,7 @@ from openai.types.responses import Response
 
 from jd_relational.consultant_model import (
     CONSULTANT_MODEL, MAX_OUTPUT_TOKENS, OPENROUTER_HEADERS,
-    OPENROUTER_PROVIDER, REQUEST_TIMEOUT_SECONDS,
+    OPENROUTER_PROVIDER,
     ConsultantModelError, create_consultant_model,
 )
 from jd_relational.openai_responses import accepted
@@ -57,7 +57,7 @@ def test_the_role_profile_and_route_are_the_verified_responses_binding():
         assert model.reasoning == {"effort": "high"}
         assert model.model_kwargs["parallel_tool_calls"] is False
         assert model.max_retries == 0
-        assert model.request_timeout == REQUEST_TIMEOUT_SECONDS
+        assert model.request_timeout == 300.0
         assert model.store is False
         assert model.include == ["reasoning.encrypted_content"]
         assert model.extra_body["provider"] == {

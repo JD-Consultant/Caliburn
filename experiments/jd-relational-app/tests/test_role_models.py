@@ -119,7 +119,7 @@ def test_every_role_uses_the_verified_luna_route_without_fallback_or_hidden_retr
     )] == [0, 0, 0]
     assert [model.request_timeout for model in (
         roles.consultant, roles.case, roles.understanding,
-    )] == [90, 300, 300]
+    )] == [300, 300, 300]
 
 
 @pytest.mark.parametrize("api_key", ["", "   "])

@@ -26,3 +26,9 @@
 目前不重開 Memory、Working State、JD Domain、Prompt 或 provider；不為一筆 timeout 加自動重試，也不把 tool 成功誤稱 JD 已寫入。先核對 A 的 90 秒期限與 GPT-6 high 推理真實延遲、鎖定 SDK 的 timeout 行為；若調整，只改既有 model profile、保留 0 retry／同一費用及保存權責，再做受影響回歸與新一批有界自然驗收。原帳本維持 stopped，不清除未知預留。
 
 Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；人工 JD 完稿品質、晚期更正、手改願望與來源區分、16K 長上下文及完整 B1／B2 語意也仍 **OPEN**。本記錄不覆蓋先前有限 provider smoke 或固定合成 Browser 證據。
+
+## 後續：A 單請求期限的離線窄修正
+
+2026-09-23 只改正式新 App 的 A 模型工廠預設 `request_timeout` 由 90 秒為 300 秒；B1／B2、同一模型／Responses endpoint、零隱藏重試、支出帳本與 JD／Memory 權責不變。測試先證明舊工廠回傳 A=90／B1=B2=300 的紅燈，再驗證 A=B1=B2=300 的綠燈；受影響集合 **44 passed／4 skipped**，完整新 App 離線 **3,172 passed／323 skipped／0 failed**。首次完整執行受 Windows 沙盒 pytest 暫存 ACL 阻擋；可存取環境重跑後沒有該錯誤，既有 warnings 為 95。
+
+這只驗證新 client 設定已送到既有模型工廠，不把「延長等待」推論為前次根因或品質修復。前一批 `transport_unknown` 原帳本繼續停止，未知費用預留不清零；下一批必須使用新的隔離目標／帳本與明確上限。Browser 因 Codex 自動控制受限暫緩，仍獨立 OPEN，不以 API 旅程代稱通過。

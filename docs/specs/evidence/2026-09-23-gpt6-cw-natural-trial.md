@@ -74,3 +74,13 @@ Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；
 [Anthropic tool design](https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools)建議工具回覆只帶下一步判斷所需的高訊號資訊；[OpenAI deployment checklist](https://developers.openai.com/api/docs/guides/deployment-checklist)建議用代表性任務比較品質、延遲與每次成功成本，不能只看請求 200 或單次 token。這提供診斷順序，**不證明**本案的工具回覆過大、Prompt 不佳或模型選錯。OpenRouter 的[message-transforms 插件](https://openrouter.ai/docs/guides/features/message-transforms)會從 prompt 中間移除／截短訊息，與本案不可丟未處理訪談及引用的規則不同，不作直接替代；OpenAI 原生 compaction 在目前 OpenRouter 目標路徑仍未驗證，不因 OpenAI 官方支援而宣稱已可切換。
 
 下個最低成本、高區辨力的驗收問題是：**在上下文尚短、已有足夠已知工作且使用者明確要求先寫暫定 JD 時，同一 GPT-6／正式工具接線是否會選 JD writer？**正式組裝的兩個零付費定向測試已確認 `jd_create_task`／`jd_insert_item` 等工具在 A graph 中、A 的 compaction middleware 仍用原 profile（**2 passed**），但只證明可用，不證明模型自然選用。若短上下文仍不寫，先查 model-facing 工具／Skill／指令和實際 tool result；若可寫，才用長上下文的 request view、摘要頻率及 reader 結果比較。任何調門檻、改 Prompt 或加防重讀規則都須有該對照證據，不能由本批 20 次摘要與 0 writer 直接推定。
+
+### 新文件、單回合 GPT-6 寫入診斷（非 C-W 自然 trial）
+
+另以全新隔離目標 `jd-ui-gate-64548b4215564bec809f29809260301a`、正式新 App／PostgreSQL／Saver／Store、同一 OpenRouter GPT-6 Luna Responses／OpenAI-only 接線執行一次合成倉庫收發工作輸入。員工在該回合描述收貨、短少處理、出貨與責任邊界，明確要求先寫有根據的暫定 JD，並保留盤點頻率與 KPI 未知。這不是 C-W 的自然扮演，也**沒有預先發布 B1/B2 工作理解**；只回答「資料足夠且明確要求寫時，正式 A 是否真的能選寫入工具」。依現行[JD 品質規則](../2026-09-10-jd-product-quality-acceptance.md#3-單一顧問的寫作修訂與收尾規則)，不要求每輪寫 JD，背景 Memory 尚未發布也不是對已知部分一律禁止寫稿的硬門檻。Memory→JD 的完整按需回查／品質另驗，不能由本次替代。
+
+測試重用既有 P3 test-only 逐筆支出閘門，獨立 ledger 限 **40 筆實際 provider 外送／US$0.75**、零 hidden retry／fallback；沒有修改 production 或使用正式員工資料。Windows 配置首次初始化在 `initialization_pending` 留下 candidate，經唯讀確認 phase 後以既有 `resume=True` 在隔離目標完成初始化；沒有刪除舊資料或重建已存在的測試庫。模型 40 筆均完成並結算，合計 **US$0.107812515**、未知保留 0；其中 22 筆帶正式 20 個工具，18 筆沒有宣告工具。後者可協助辨識摘要／收尾路徑，**不能單靠工具數將每筆精確定性**。最後幾筆帶工具的請求顯示約 53k 實際 input tokens，已高於 profile 的 16k *approximate* trigger；這是計數與 wire 的觀察差異，不足以斷言唯一根因。
+
+隔離資料庫唯讀查回 **5 筆 JD 修改均 committed**，目前 JD revision 6：已寫收貨核對、短少／破損隔離與採購通知的 1 項 task、1 項 outcome、1 項 requirement；索賠權責沒有錯放給員工。Saver 工具序列含 `jd_set_text`／`jd_create_task`／`jd_insert_item`，證明「GPT-6 完全不會使用 JD writer」不成立。出貨部分尚未寫入；40 筆額度用盡時本輪 `run_status=failed`、`input_state=saved`、5 筆 effects 已提交、無 final assistant。第 41 筆未外送；公開 run state 未提供精確內部 exception，故只將**外送上限耗盡與未能收尾**列為直接觀察，不把它寫成模型或 compaction 的唯一故障。App／Saver 已正常關閉，沒有自動重送或補造回答。
+
+這次暴露的真正下一個診斷是：單回合 JD 撰寫為何消耗 22 筆帶工具請求與 18 筆無工具請求、實際 request 如何從約 9k 增至約 53k input tokens，以及哪些讀取是成功保存後取得新 ref 所必需。先核對既有 compaction counter、正式 request view 與實際 usage，再決定是否需要最小設定／接線修正；不能因這次 40 筆上限過低就盲目加 cap，也不能把尚未實測的 Memory→JD、完整 JD、自然 C-W 或 Browser 宣告通過。

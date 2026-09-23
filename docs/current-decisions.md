@@ -2,6 +2,10 @@
 
 > 同日條目依上到下為 successor 順序；較下方的 16K／待驗文字是當時 gate 的歷史狀態，不得覆蓋上方較新的正式設定與驗收邊界。
 
+**2026-09-23 P3 背景首敗診斷補線（最新；零付費）：**只在既有 test-only P3 閘門記錄第一筆**外送前拒絕**的固定白名單錯誤碼、allowlisted 角色、已准入筆數與時間，不記模型內容／金鑰，不把拒絕算成付費 request。同步 B1 串行等待、非同步缺角色及未知錯誤文字不可落盤反例先紅後綠；受影響 **60 passed／0 failed**。這能讓下批試跑區分本機 admission 拒絕與已外送的 provider／transport 失敗，**不能倒推已停止批次的 B1 根因**；沒有改正式 App、背景、Memory、重試、模型路由或額度。[證據與界線](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#b1-失敗再定位第-141-筆後缺內層拒絕碼)。
+
+**2026-09-23 C-W B1 背景中斷的次級唯讀定位（最新）：**已停止試跑的 B1 第 132／136／141 筆真模型請求均結算；下一次 B1 呼叫沒有新增已准入 attempt。第 141 筆時累計 US$0.45005514，加一筆 B1 保守預留 US$0.287076 仍低於 US$1，名額亦僅 141／180，因此不是當時總量上限已滿。鎖定 test-only P3 閘門可在外送前拒絕；OpenAI SDK 會把其一般例外包成 `APIConnectionError`，但 Saver 未留內層 cause。**本機 pre-admission 拒絕是候選，不是已證根因；OpenRouter 傳輸、角色／wire 或 30 秒串行等待亦不能憑目前時間戳各自確證。**下一 gate 只在既有 test-only 邊界取得安全的內層錯誤碼；不因此改正式背景設計或重送舊試跑。[分層定位](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#b1-失敗再定位第-141-筆後缺內層拒絕碼)。
+
 **2026-09-23 修後 C-W 的 JD 來源語意核對（最新；唯讀）：**隔離文件 revision 10 的 18 筆來源連結／5 個 distinct signed conversation sources，均可在正確文件 scope 指向 pinned Saver 原話；這只關閉結構可讀 gate。逐筆對照 JD 目標與五段問答後，revision 4 的「出貨核對、包裝與交運」Duty 除正確出貨原話外，還連到只談庫存差異／試算表的當輪原話，構成 [JD 品質 Q11](specs/2026-09-10-jd-product-quality-acceptance.md#4-可執行驗收-rubric正例與反例)「來源假背書」的實際 **FAIL**。Saver trace 顯示模型首次寫入被拒後，重試自行把第二個 evidence key 換成該無關的 current-turn key；App 依既有契約只驗定位、scope 與可讀性，沒有自動加入該 key 的證據。另有一筆收貨 Duty 連至以顧問重述收貨、員工回答出貨為主的回合，屬來源支持範圍待判讀，不把它混同確定錯引或宣告其餘連結全部 PASS。Browser 來源導覽尚未測；不猜測式改 Prompt／Skill、加平行 validator 或重做來源架構。先沿既有 owner 討論可證偽的最小改善。詳見[唯讀來源稽核](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#同一批試跑的-jd-來源語意唯讀核對一筆錯誤背書)。
 
 **2026-09-23 修後 C-W 試跑關停後唯讀核對（最新；未改產品）：**B1 背景檢查點留下 `OpenAIConnectionError`，但 SDK 會包裹不同底層例外；本批缺內層錯誤碼，**不能定性為 OpenRouter 斷線或 Memory 發布錯誤**。背景 admission 仍 `running`、沒有新 publication。該隔離文件 JD current revision 10 為部分工作稿：4 個 Duty／3 個 Task／無 K-S；出貨 Duty 尚無 Task，年度封存 Task 與 Duty 分組不一致；第 11 輪 W05 更正未套用。18 筆來源連結已落庫但未做語意或 Browser 導覽驗證。C、更正後全稿、背景完成、來源導覽、完整 JD／Browser 仍 OPEN；先沿既有 owner 取可重現證據，再考慮最小修正，不重做架構。[唯讀盤點](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#同一批試跑的關停後唯讀盤點背景中斷與-jd-半成品)。

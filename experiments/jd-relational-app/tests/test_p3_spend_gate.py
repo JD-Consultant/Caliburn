@@ -547,6 +547,65 @@ def test_guarded_sync_client_rejects_per_send_redirect_override_before_network(t
     assert spend.snapshot()["attempt_count"] == 0
 
 
+def test_sync_pre_admission_wait_rejection_keeps_first_safe_reason(tmp_path):
+    spend = gate(tmp_path, wait_timeout=0.01)
+    spend.begin(request())
+
+    def unexpected_network(_sent):
+        raise AssertionError("pre-admission rejection must not send")
+
+    token = p3_spend_gate._active_model_role.set("background-case-maintainer")
+    try:
+        with GuardedClient(spend, require_role=True,
+                           transport=httpx.MockTransport(unexpected_network),
+                           headers={"X-OpenRouter-Metadata": "enabled"}) as client:
+            with pytest.raises(BudgetGateError, match="in_flight_wait_timeout"):
+                client.post(URL, json=payload(max_tokens=32768))
+    finally:
+        p3_spend_gate._active_model_role.reset(token)
+
+    state = spend.snapshot()
+    assert state["first_pre_admission_rejection"]["code"] == "in_flight_wait_timeout"
+    assert state["first_pre_admission_rejection"]["role"] == "background-case-maintainer"
+    assert state["first_pre_admission_rejection"]["attempt_count"] == 1
+    assert state["attempt_count"] == 1
+    assert state["retained_unknown_usd"] == "0"
+    assert state["status"] == "active"
+
+
+def test_async_pre_admission_missing_role_is_recorded_without_sending(tmp_path):
+    spend = gate(tmp_path)
+
+    async def unexpected_network(_sent):
+        raise AssertionError("missing role must not send")
+
+    async def run():
+        async with GuardedAsyncClient(spend, require_role=True,
+                                      transport=httpx.MockTransport(unexpected_network),
+                                      headers={"X-OpenRouter-Metadata": "enabled"}) as client:
+            with pytest.raises(BudgetGateError, match="request_role_missing"):
+                await client.post(URL, json=payload(max_tokens=32768))
+
+    asyncio.run(run())
+    state = spend.snapshot()
+    assert state["first_pre_admission_rejection"]["code"] == "request_role_missing"
+    assert state["first_pre_admission_rejection"]["role"] == "unknown"
+    assert state["first_pre_admission_rejection"]["attempt_count"] == 0
+    assert state["attempt_count"] == 0
+    assert state["status"] == "active"
+    assert gate(tmp_path).snapshot()["first_pre_admission_rejection"] == state["first_pre_admission_rejection"]
+
+
+def test_pre_admission_diagnostic_never_persists_unrecognized_error_text(tmp_path):
+    spend = gate(tmp_path)
+    spend.record_pre_admission_rejection("secretvalue", role="untrusted-role")
+
+    state = spend.snapshot()
+    assert state["first_pre_admission_rejection"]["code"] == "pre_admission_unknown"
+    assert state["first_pre_admission_rejection"]["role"] == "unknown"
+    assert "secretvalue" not in spend.path.read_text(encoding="utf-8")
+
+
 def test_guarded_async_client_rejects_per_send_redirect_override_before_network(tmp_path):
     spend = gate(tmp_path)
     sent_urls = []

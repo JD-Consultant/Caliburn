@@ -40,6 +40,16 @@ _ROLE_SUMMARY_LIMITS = {
     "background-case-maintainer": 8192,
     "background-understanding-maintainer": 8192,
 }
+_PRE_ADMISSION_CODES = frozenset({
+    "request_contract_endpoint", "request_contract_metadata", "request_contract_json",
+    "request_contract_body", "request_contract_model", "request_contract_provider",
+    "request_contract_parallel_tools", "request_contract_reasoning", "request_contract_store",
+    "request_contract_reasoning_continuation", "request_contract_input",
+    "request_contract_streaming", "request_contract_server_tool",
+    "request_contract_max_output_tokens", "request_contract_disallowed_feature",
+    "request_contract_redirect_override", "request_role_missing", "request_role_mismatch",
+    "not_authorized", "in_flight_wait_timeout", "request_cap", "usd_cap",
+})
 _active_model_role: ContextVar[str | None] = ContextVar("p3_model_role", default=None)
 
 
@@ -357,6 +367,7 @@ class P3SpendGate:
             "retained_unknown_usd": "0",
             "in_flight": [],
             "attempts": [],
+            "first_pre_admission_rejection": None,
         }
 
     def _load_or_create(self) -> dict[str, Any]:
@@ -541,6 +552,21 @@ class P3SpendGate:
         with self._condition:
             return deepcopy(self._state)
 
+    def record_pre_admission_rejection(self, code: str, *, role: str | None) -> None:
+        """Keep the first safe local rejection without counting a network attempt."""
+        safe_code = code if code in _PRE_ADMISSION_CODES else "pre_admission_unknown"
+        safe_role = role if role in _ROLE_OUTPUT_LIMITS else "unknown"
+        with self._condition:
+            if self._state.get("first_pre_admission_rejection") is not None:
+                return
+            self._state["first_pre_admission_rejection"] = {
+                "code": safe_code,
+                "role": safe_role,
+                "attempt_count": self._state["attempt_count"],
+                "at_utc": _utc_now(),
+            }
+            self._persist()
+
 
 class GuardedClient(httpx.Client):
     """httpx client whose every send is admitted and settled by one gate."""
@@ -552,6 +578,7 @@ class GuardedClient(httpx.Client):
 
     def send(self, request: httpx.Request, **kwargs: Any) -> httpx.Response:
         admitted = False
+        role = None
         try:
             if kwargs.get("follow_redirects") is True:
                 raise BudgetGateError("request_contract_redirect_override")
@@ -565,9 +592,14 @@ class GuardedClient(httpx.Client):
             response.read()
             self._spend_gate.complete(response)
             return response
-        except Exception:
+        except Exception as error:
             if admitted:
                 self._spend_gate.fail(request, "transport_unknown")
+            elif isinstance(error, BudgetGateError) and str(error) != "ledger_persist_failed":
+                try:
+                    self._spend_gate.record_pre_admission_rejection(str(error), role=role)
+                except BudgetGateError:
+                    pass  # The gate itself has already failed closed.
             raise
 
 
@@ -581,6 +613,7 @@ class GuardedAsyncClient(httpx.AsyncClient):
 
     async def send(self, request: httpx.Request, **kwargs: Any) -> httpx.Response:
         admitted = False
+        role = None
         try:
             if kwargs.get("follow_redirects") is True:
                 raise BudgetGateError("request_contract_redirect_override")
@@ -594,9 +627,17 @@ class GuardedAsyncClient(httpx.AsyncClient):
             await response.aread()
             await asyncio.to_thread(self._spend_gate.complete, response)
             return response
-        except Exception:
+        except Exception as error:
             if admitted:
                 await asyncio.to_thread(
                     self._spend_gate.fail, request, "transport_unknown"
                 )
+            elif isinstance(error, BudgetGateError) and str(error) != "ledger_persist_failed":
+                try:
+                    await asyncio.to_thread(
+                        self._spend_gate.record_pre_admission_rejection,
+                        str(error), role=role,
+                    )
+                except BudgetGateError:
+                    pass  # The gate itself has already failed closed.
             raise

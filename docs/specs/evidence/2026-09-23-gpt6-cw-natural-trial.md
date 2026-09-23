@@ -191,6 +191,14 @@ P3 每批既定上限 **180 筆實際模型外送／US$1.00**：本批 180 筆�
 
 同一文件目前 `jd_head.revision_number=10`，9 筆 JD operation 已保存。唯讀 current 表顯示：有職務名稱、目的、4 個 Duty、3 個 Task、6 個成果／要求 detail、1 個工作條件；K／S 與 task-capability link 均為 0。18 個 JD source link 均為 conversation 類型；**僅確認 link 已保存，尚未驗證每筆語意是否支持文字或 Browser 導覽是否正確**。內容已有收貨核對、到貨差異／重複入帳的區分及年度封存責任，但出貨 Duty 尚無 Task；「年度封存批次清單整理」Task 掛在「庫存查核與差異說明」Duty 下，而另有「封存批次清單整理與追溯」Duty 沒有 Task，構成目前分組的具體待核差異。第 11 輪 W05 更正未成功發布／寫入 JD，因此現稿的盤點頻率仍標待確認；不能把當輪已保存原話誤當現稿已反映。依[工作分析指南](../2026-09-09-complete-work-analysis-guide.md)、[JD 欄位／寫作指南](../2026-09-09-jd-field-and-writing-guide.md)及[品質 Q01–Q15](../2026-09-10-jd-product-quality-acceptance.md)，這是可回查的**部分工作稿**，不是完整 JD 品質 PASS；缺少 K／S、出貨 Task、正確分組、更正後全稿核對與瀏覽器來源／撤回驗證仍是後續 gate。這些觀察尚不足以歸因 Prompt、Memory 或 JD Domain，故本次不做猜測式產品修改。
 
+#### B1 失敗再定位：第 141 筆後缺內層拒絕碼
+
+續以相同**已停止**隔離帳本及鎖定程式唯讀核對，沒有恢復工作或外送請求。B1 最後三筆模型請求為第 132、136、141 筆，皆已結算；第 141 筆完成後至下一筆已准入的第 142 筆 A 請求，中間**沒有 B1 新 attempt**、未知費用預留或 provider HTTP 回應。第 141 筆以前全部已結算費用合計 **US$0.45005514**；加上現行 B1 一筆保守預留 **US$0.287076** 為 **US$0.73713114**，且當時只用到 141／180 個實際外送名額。故「當時已碰 US$1 或 180 次總上限」不是這次 B1 失敗的解釋。
+
+鎖定的 test-only `P3SpendGate.begin()` 在真正外送前驗角色、request 契約、串行等待、次數與費用；若在 admission 前拒絕，`attempt_count` 不增加。鎖定 OpenAI Python SDK 的同步／非同步 `_base_client` 送出邊界均會將非 `OpenAIError` 的一般例外（包括此處可能的 `BudgetGateError`）包成 `APIConnectionError`，並只把原例外留在 `__cause__`；目前 B1 Saver `__error__` 只保留外層 `OpenAIConnectionError`。**這使本機 pre-admission 拒絕成為具體候選，而非已證根因**；也不能從沒有 attempt 單獨證明必定是角色、wire、串行等待或其他哪一個檢查。帳本顯示第 142 筆 A 請求稍後外送並耗時約 46 秒，但沒有 B1 下一次呼叫的精確時點，故不能排除或坐實 30 秒串行等待逾時。下一次驗證應在既有 P3 test-only client 邊界保留**有限、安全的 pre-admission 錯誤碼與角色**，或等價取得例外 cause；不保存原話／金鑰、不修改正式 dispatcher、Memory、publication 或放寬支出上限。取得具體碼前，本次 B1 仍 `OPEN`。
+
+依此缺口，僅在既有 **P3 test-only** 帳本增加 `first_pre_admission_rejection`：首次拒絕的 allowlisted role、固定代碼白名單、當時已准入筆數及時間；不保存 request／response、原話、credential、exception stack，不把拒絕計成外送，也不增加新紀錄服務。同步的「另一請求占用閘門、B1 等待逾時」與非同步的「缺角色」兩個零網路反例先因沒有該欄位而失敗，補接後均通過；後者亦驗證重新建立帳本物件仍能讀回同一筆紀錄，**沒有做跨程序測試**。另以未知但符合一般字串格式的錯誤文字作反例，先確認原接法會原樣落盤，再改為 `pre_admission_unknown`；避免未來意外保存敏感字串。受影響的 P3 閘門及試跑入口測試 **60 passed／0 failed**，沒有修改正式 App／SDK、背景排程、Memory 或產品費用規則。這是**下次試跑的診斷能力**，無法回填本次第 141 筆之後已遺失的內層原因；本次 B1 根因與自然背景完成仍 `OPEN`。
+
 ### 同一批試跑的 JD 來源語意唯讀核對：一筆錯誤背書
 
 2026-09-23 繼續沿用上述**已停止**的隔離目標，僅以唯讀 PostgreSQL 與 Saver 檢查 JD revision 10 的來源，沒有重啟試跑、恢復背景、送模型或修改產品。18 筆 `jd_source_link` 對應 5 個不同的 signed conversation source；五個簽章均可在本文件 scope 解析，所指 pinned Saver checkpoint 存在，且選出的 canonical assistant／employee 訊息範圍與 locator 相符。這只證明結構及可回查性，不證明來源對每個 JD 句子的語意支持，也**沒有執行 Browser 來源導覽**。

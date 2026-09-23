@@ -52,3 +52,11 @@ Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；
 第 **110** 筆實際 provider 請求（A、8,192 上限）HTTP 200 但回覆未完成，P3 閘門以 `provider_response_incomplete` 停止，109 筆已結算 **US$0.075124560**、最後一筆保留 **US$0.268644** 未知額度。第七輪 `failed`、員工輸入 `saved`、JD effects `settled` 但結果空、無 final；JD writer 仍 0。依既有停止入口確認 App／Saver 關閉，原帳本不重送、不清零。對最後一筆 generation ID 的唯讀 metadata GET 回 **404**，相鄰成功第 109 筆同端點／同 credential 回 **200**，所以不能由此次 404 推定錯誤 key 或憑空推算末筆費用，也不能把這次 8,192 未完成再歸因於 `max_output_tokens`；服務端具體 `incomplete_details.reason` 尚缺。
 
 官方 [OpenAI Reasoning 指南](https://developers.openai.com/api/docs/guides/reasoning)與 [OpenRouter Responses 契約](https://openrouter.ai/docs/api/api-reference/responses/create-responses)（查閱 2026-09-23）都描述 `incomplete_details.reason`；本次 test-only P3 閘門原先只保存概括的 incomplete 狀態，未保存該安全枚舉。離線反例先紅後綠後，僅補記受限的 `observed_status`、`observed_incomplete_reason` 和已回覆的 `observed_cost_usd`，**不保存回應內容、不把 observed cost 當成 settled、不解除未知預留或增加重試**。本批原帳本無法回填缺失原因；後續先從此證據缺口和重讀路徑作定向診斷，再決定是否需要產品變更。Browser、JD 初稿與最終成品質量仍 OPEN。
+
+### 第三批 Saver 的唯讀續查：摘要頻率與工具可見性
+
+在同一隔離庫以 `unavailable_consultant()` 開 inspection-only App，唯讀回查第七輪 child checkpoint 歷史，未恢復執行、未送模型或寫 JD。該輪共觀察到 **20 次**已保存的 A continuation summary 更新；後段每完成一組工具呼叫／結果便推進一次安全摘要邊界。現行 A profile 的觸發點是**完整 request 約 16,000 input tokens**、保留最近 8 則 canonical 訊息，不是 GPT-6 Luna 服務端 context 已滿的證據。對應 P3 帳本的 A 主請求有約 20k–23k input tokens，A 摘要請求另行結算；這是可量測的額外模型往返與成本，不表示摘要內容必然不正確。
+
+同一 Saver 工具序列顯示第七輪 `read_file` 6、`jd_read` 3、`read_work_understanding` 6、`read_case` 4、`read_evidence` 5，**24 筆 ToolMessage 均為 success**；現有 execution guard 的「修正同一失敗」規則因此沒有觸發，不能把這些讀取稱作工具錯誤重試。摘要曾把較早 `jd_read` 的完整結果移出 request tail，模型後來重讀是可觀察事實；但最末 `build_request_view` 仍逐字包含當輪員工「先寫暫定 JD、未知留待確認」的輸入，並包含最近一次 `jd_read` 結果與兩筆工作理解結果。故**沒有證據說當輪要求或所有 JD refs 已被壓縮掉**；摘要頻繁和未使用 writer 有關聯，不足以證明單一根因。
+
+[OpenAI Compaction](https://developers.openai.com/api/docs/guides/compaction)、[Prompt caching](https://developers.openai.com/api/docs/guides/prompt-caching)與 [Anthropic keep-recent-turns](https://platform.claude.com/docs/en/build-with-claude/compaction-keep-recent-turns)（查閱 2026-09-23）支持按實際 context 管理長任務、保留必要近期工具往返；**沒有一家規定本產品必須用 16K 或改用其原生 compaction**。本案仍沿既有 App-side compaction／canonical 保存權責；下個診斷 gate 應先辨明新 P3 `incomplete_details.reason`，再用同一正式 request 的摘要頻率、近期 tool-result 保留及 writer 選擇作窄比較。不以本次觀察直接提高 trigger、改 Prompt／Skill、加入成功讀取防迴圈或重跑已停止的第七輪。

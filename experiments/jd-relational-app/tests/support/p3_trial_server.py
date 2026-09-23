@@ -20,6 +20,7 @@ import subprocess
 import sys
 from threading import Event, Lock, Thread
 from time import monotonic
+from uuid import UUID
 
 APP = Path(__file__).resolve().parents[2]
 ROOT = APP.parents[1]
@@ -54,6 +55,10 @@ TRIAL_ID = "p3-c-w"
 TURN_CAP = 12
 REQUEST_CAP = 180
 USD_CAP = Decimal("1.00")
+CONTINUATION_ID = "p3-c-w-continuation-1"
+CONTINUATION_TURN_CAP = 6
+CONTINUATION_REQUEST_CAP = 90
+CONTINUATION_USD_CAP = Decimal("0.50")
 
 
 class TrialPreflightError(RuntimeError):
@@ -130,11 +135,81 @@ def preflight(target: Path) -> dict:
     return value
 
 
+def preflight_continuation(target: Path) -> dict:
+    """Unlock only a closed, settled first batch and one frozen existing document."""
+    approval_path = target / "continuation" / "paid-authorization.json"
+    if not approval_path.is_file():
+        raise TrialPreflightError("continuation_not_authorized")
+    try:
+        approval = json.loads(approval_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        raise TrialPreflightError("continuation_authorization_invalid") from None
+    required = {
+        "format", "trial_id", "authorized", "document_id", "git_commit",
+        "employee_turn_cap", "provider_request_cap", "usd_cap",
+        "prior_turns_sha256", "prior_spend_sha256", "prior_finish_sha256",
+        "owner_approval_reference",
+    }
+    if (type(approval) is not dict or set(approval) != required
+            or type(approval["format"]) is not int or approval["format"] != 1
+            or approval["trial_id"] != CONTINUATION_ID or approval["authorized"] is not True
+            or approval["employee_turn_cap"] != CONTINUATION_TURN_CAP
+            or approval["provider_request_cap"] != CONTINUATION_REQUEST_CAP
+            or approval["usd_cap"] != str(CONTINUATION_USD_CAP)
+            or type(approval["git_commit"]) is not str
+            or type(approval["owner_approval_reference"]) is not str
+            or not approval["owner_approval_reference"].strip()):
+        raise TrialPreflightError("continuation_authorization_invalid")
+    try:
+        if (type(approval["document_id"]) is not str
+                or str(UUID(approval["document_id"])) != approval["document_id"]):
+            raise ValueError()
+    except (ValueError, TypeError, AttributeError):
+        raise TrialPreflightError("continuation_authorization_invalid") from None
+    if (approval["git_commit"] != _git("rev-parse", "HEAD")
+            or _git("status", "--porcelain", "--untracked-files=all")):
+        raise TrialPreflightError("continuation_revision_changed")
+
+    prior_paths = {"turns": target / "turns.json", "spend": target / "spend.json",
+                   "finish": target / "serve.finished.json"}
+    try:
+        if any(_hash(path) != approval[f"prior_{name}_sha256"]
+               for name, path in prior_paths.items()):
+            raise TrialPreflightError("continuation_prior_changed")
+        prior = {name: json.loads(path.read_text(encoding="utf-8"))
+                 for name, path in prior_paths.items()}
+    except (OSError, json.JSONDecodeError):
+        raise TrialPreflightError("continuation_prior_changed") from None
+    turns, spend, finish = prior["turns"], prior["spend"], prior["finish"]
+    if (type(turns) is not dict or turns.get("trial_id") != TRIAL_ID
+            or type(turns.get("turn_attempts")) is not int
+            or turns["turn_attempts"] != TURN_CAP
+            or type(spend) is not dict or spend.get("trial_id") != TRIAL_ID
+            or spend.get("status") != "active" or spend.get("in_flight") != []
+            or spend.get("retained_unknown_usd") != "0"
+            or type(spend.get("attempt_count")) is not int
+            or type(spend.get("attempts")) is not list
+            or len(spend["attempts"]) != spend["attempt_count"]
+            or not all(type(attempt) is dict and attempt.get("outcome") == "settled"
+                       for attempt in spend["attempts"])
+            or type(finish) is not dict or finish.get("app_closed") is not True
+            or finish.get("saver_connection_closed") is not True
+            or finish.get("reason") != "requested"
+            or finish.get("spend") != spend
+            or type(finish.get("evidence")) is not dict
+            or finish["evidence"].get("model_request_count") != spend["attempt_count"]
+            or finish["evidence"].get("http_counts", {}).get("POST chat_runs") != TURN_CAP):
+        raise TrialPreflightError("continuation_prior_unsettled")
+    return approval
+
+
 class P3TurnGate:
     """Conservatively count chat POST attempts before reaching the App."""
 
-    def __init__(self, app, path: Path, *, cap: int = TURN_CAP):
+    def __init__(self, app, path: Path, *, cap: int = TURN_CAP,
+                 trial_id: str = TRIAL_ID, document_id: str | None = None):
         self.app, self.path, self.cap = app, Path(path), cap
+        self.trial_id, self.document_id = trial_id, document_id
         self._lock = Lock()
         self._stopped = False
         if self.path.exists():
@@ -143,13 +218,13 @@ class P3TurnGate:
             except (OSError, json.JSONDecodeError):
                 raise TrialPreflightError("trial_turn_state_invalid") from None
             if (type(state) is not dict or set(state) != {"format", "trial_id", "turn_attempts"}
-                    or state["format"] != 1 or state["trial_id"] != TRIAL_ID
+                    or state["format"] != 1 or state["trial_id"] != trial_id
                     or type(state["turn_attempts"]) is not int
                     or not 0 <= state["turn_attempts"] <= cap):
                 raise TrialPreflightError("trial_turn_state_invalid")
             self._state = state
         else:
-            self._state = {"format": 1, "trial_id": TRIAL_ID, "turn_attempts": 0}
+            self._state = {"format": 1, "trial_id": trial_id, "turn_attempts": 0}
             self._persist()
 
     def _persist(self):
@@ -166,6 +241,17 @@ class P3TurnGate:
             raise TrialPreflightError("trial_turn_state_unwritable") from None
 
     async def __call__(self, scope, receive, send):
+        if (self.document_id is not None and scope["type"] == "http"
+                and scope.get("method") in {"POST", "PUT", "PATCH", "DELETE"}):
+            path = scope.get("path", "")
+            match = re.fullmatch(r"/api/documents(?:/([^/]+)(?:/.*)?)?/?", path)
+            if match and match.group(1) != self.document_id:
+                body = b'{"code":"trial_document_scope"}'
+                await send({"type": "http.response.start", "status": 403,
+                    "headers": [(b"content-type", b"application/json"),
+                                (b"content-length", str(len(body)).encode())]})
+                await send({"type": "http.response.body", "body": body})
+                return
         if (scope["type"] == "http" and scope.get("method") == "POST"
                 and re.fullmatch(r"/api/documents/[^/]+/chat/runs/?", scope.get("path", ""))):
             with self._lock:
@@ -237,7 +323,7 @@ def open_trial_runtime(spend: P3SpendGate, api_key: str, *, transport=None):
         raise
 
 
-def serve(target: Path):
+def serve(target: Path, *, continuation: bool = False):
     """Explicit later paid run. No service starts without the unlock preflight."""
     import uvicorn
     from jd_relational.managed_app import open_managed_app
@@ -245,17 +331,22 @@ def serve(target: Path):
     if sys.platform != "win32" or os.environ.get("JD_RELATIONAL_TEST_DB") != "1":
         raise TrialPreflightError("explicit_test_scope_required")
     value = manifest(target)
-    approval = preflight(target)
-    if any((target / name).exists() for name in ("serve.ready.json", "serve.finished.json", "stop.request")):
+    approval = preflight_continuation(target) if continuation else preflight(target)
+    artifacts = target / "continuation" if continuation else target
+    trial_id = CONTINUATION_ID if continuation else TRIAL_ID
+    turn_cap = CONTINUATION_TURN_CAP if continuation else TURN_CAP
+    request_cap = CONTINUATION_REQUEST_CAP if continuation else REQUEST_CAP
+    usd_cap = CONTINUATION_USD_CAP if continuation else USD_CAP
+    if any((artifacts / name).exists() for name in ("serve.ready.json", "serve.finished.json", "stop.request")):
         raise TrialPreflightError("trial_already_served")
     file = fixture_file(target, value)
     file.read()
     key = read_key("openrouter")
     if not key:
         raise TrialPreflightError("trial_credential_missing")
-    spend = P3SpendGate(target / "spend.json", trial_id=TRIAL_ID, authorized=True,
-                        usd_cap=USD_CAP, request_cap=REQUEST_CAP, wait_timeout_seconds=30)
-    evidence = TrialEvidence(target, spend)
+    spend = P3SpendGate(artifacts / "spend.json", trial_id=trial_id, authorized=True,
+                        usd_cap=usd_cap, request_cap=request_cap, wait_timeout_seconds=30)
+    evidence = TrialEvidence(artifacts, spend)
     with open_trial_runtime(spend, key) as runtime:
         del key
         managed = open_managed_app(file, consultant=runtime.graph, enable_chat=True,
@@ -273,7 +364,9 @@ def serve(target: Path):
                 return result
 
             managed.opened.host.runtime.storage.execute = observe_write
-            turns = P3TurnGate(managed.app, target / "turns.json")
+            turns = P3TurnGate(managed.app, artifacts / "turns.json", cap=turn_cap,
+                               trial_id=trial_id,
+                               document_id=approval["document_id"] if continuation else None)
 
             async def app(scope, receive, send):
                 await evidence.routes(turns, scope, receive, send)
@@ -295,21 +388,25 @@ def serve(target: Path):
                                 control["reason"] = "startup_timeout"
                                 server.should_exit = True
                                 return
-                        write_report(target / "serve.ready.json", {
+                        ready = {
                             "pid": os.getpid(), "status": "ready",
                             "api_origin": f"http://127.0.0.1:{managed.port}",
                             "ui_origin": ORIGIN, "database": value["database"],
-                            "trial_id": TRIAL_ID,
+                            "trial_id": trial_id,
                             "git_commit": approval["git_commit"],
-                            "package_manifest_sha256": approval["package_manifest_sha256"],
-                            "results_template_sha256": approval["results_template_sha256"],
-                            "employee_turn_cap": TURN_CAP,
-                            "provider_request_cap": REQUEST_CAP,
-                            "usd_cap": str(USD_CAP),
-                        })
+                            "employee_turn_cap": turn_cap,
+                            "provider_request_cap": request_cap,
+                            "usd_cap": str(usd_cap),
+                        }
+                        if continuation:
+                            ready["document_id"] = approval["document_id"]
+                        else:
+                            ready["package_manifest_sha256"] = approval["package_manifest_sha256"]
+                            ready["results_template_sha256"] = approval["results_template_sha256"]
+                        write_report(artifacts / "serve.ready.json", ready)
                         while not done.wait(0.1):
-                            if (target / "stop.request").exists() or monotonic() - started >= 3600:
-                                control["reason"] = "requested" if (target / "stop.request").exists() else "trial_deadline"
+                            if (artifacts / "stop.request").exists() or monotonic() - started >= 3600:
+                                control["reason"] = "requested" if (artifacts / "stop.request").exists() else "trial_deadline"
                                 server.should_exit = True
                                 return
                     except Exception:
@@ -326,7 +423,7 @@ def serve(target: Path):
         finally:
             done.set()
             closed = managed.close()
-            write_report(target / "serve.finished.json", {
+            write_report(artifacts / "serve.finished.json", {
                 "pid": os.getpid(), "app_closed": closed,
                 "saver_connection_closed": managed.opened.host.saver_connection.closed,
                 "reason": control["reason"], "spend": spend.snapshot(),
@@ -336,9 +433,24 @@ def serve(target: Path):
             raise TrialPreflightError("trial_shutdown_unconfirmed")
 
 
+def stop_continuation(target: Path):
+    manifest(target)
+    artifacts = target / "continuation"
+    try:
+        ready = json.loads((artifacts / "serve.ready.json").read_text(encoding="utf-8"))
+        if (type(ready.get("pid")) is not int or ready["pid"] <= 0
+                or ready.get("status") != "ready" or ready.get("trial_id") != CONTINUATION_ID):
+            raise ValueError()
+    except (OSError, ValueError, TypeError, AttributeError):
+        raise TrialPreflightError("continuation_not_ready") from None
+    with (artifacts / "stop.request").open("x", encoding="utf-8"):
+        pass
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("mode", choices=("prepare", "initialize", "serve", "stop"))
+    parser.add_argument("mode", choices=("prepare", "initialize", "serve", "stop",
+                                         "continue", "stop-continuation"))
     parser.add_argument("directory", type=directory)
     parser.add_argument("--api-port", type=int, default=8769)
     args = parser.parse_args()
@@ -350,8 +462,10 @@ def main():
         initialize(args.directory)
     elif args.mode == "stop":
         stop(args.directory)
+    elif args.mode == "stop-continuation":
+        stop_continuation(args.directory)
     else:
-        serve(args.directory)
+        serve(args.directory, continuation=args.mode == "continue")
 
 
 if __name__ == "__main__":

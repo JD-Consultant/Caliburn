@@ -555,3 +555,162 @@ def test_continuation_verifies_prior_document_and_all_native_runs_before_listeni
     history["messages"] = rows[:-1]
     with pytest.raises(trial.TrialPreflightError, match="continuation_prior_run_incomplete"):
         trial.verify_prior_conversation(managed, document_id, tmp_path)
+
+
+def _second_continuation_records(tmp_path, monkeypatch):
+    document_id, _first_approval = _continuation_records(tmp_path, monkeypatch)
+    first = tmp_path / "continuation"
+    spend = {
+        "format": 1, "trial_id": "p3-c-w-continuation-1", "status": "active",
+        "attempt_count": 1, "spent_usd": "0.001", "retained_unknown_usd": "0",
+        "in_flight": [], "attempts": [{"outcome": "settled"}],
+    }
+    records = {
+        "turns.json": {"format": 1, "trial_id": "p3-c-w-continuation-1", "turn_attempts": 1},
+        "spend.json": spend,
+        "serve.finished.json": {
+            "reason": "requested", "app_closed": True, "saver_connection_closed": True,
+            "spend": spend, "evidence": {"model_request_count": 1,
+                                           "http_counts": {"POST chat_runs": 1}},
+        },
+    }
+    for name, record in records.items():
+        (first / name).write_text(json.dumps(record), encoding="utf-8")
+    second = tmp_path / "continuation-2"
+    second.mkdir()
+    approval = {
+        "format": 1, "trial_id": "p3-c-w-continuation-2", "authorized": True,
+        "document_id": document_id, "git_commit": "frozen",
+        "employee_turn_cap": 1, "provider_request_cap": 120, "usd_cap": "0.50",
+        "prior_turns_sha256": trial._hash(first / "turns.json"),
+        "prior_spend_sha256": trial._hash(first / "spend.json"),
+        "prior_finish_sha256": trial._hash(first / "serve.finished.json"),
+        "prior_approval_sha256": trial._hash(first / "paid-authorization.json"),
+        "owner_approval_reference": "owner-approved-one-turn-120-requests",
+    }
+    (second / "paid-authorization.json").write_text(json.dumps(approval), encoding="utf-8")
+    return document_id, approval
+
+
+def test_second_continuation_requires_separate_approval_and_preserves_both_prior_batches(
+    tmp_path, monkeypatch,
+):
+    document_id, approval = _second_continuation_records(tmp_path, monkeypatch)
+    assert trial.preflight_continuation(tmp_path, second=True)["document_id"] == document_id
+    (tmp_path / "continuation" / "spend.json").write_text("{}", encoding="utf-8")
+    with pytest.raises(trial.TrialPreflightError, match="continuation_prior_changed"):
+        trial.preflight_continuation(tmp_path, second=True)
+    approval["prior_spend_sha256"] = trial._hash(tmp_path / "continuation" / "spend.json")
+    (tmp_path / "continuation-2" / "paid-authorization.json").write_text(
+        json.dumps(approval), encoding="utf-8",
+    )
+    with pytest.raises(trial.TrialPreflightError, match="continuation_prior_unsettled"):
+        trial.preflight_continuation(tmp_path, second=True)
+
+
+def test_second_continuation_stops_before_credential_when_prior_authority_changes(
+    tmp_path, monkeypatch,
+):
+    _second_continuation_records(tmp_path, monkeypatch)
+    (tmp_path / "turns.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("JD_RELATIONAL_TEST_DB", "1")
+    monkeypatch.setattr(trial, "manifest", lambda *_args: {"fixture": "offline"})
+    monkeypatch.setattr(trial, "read_key", lambda *_args: (_ for _ in ()).throw(
+        AssertionError("credential_accessed")))
+    with pytest.raises(trial.TrialPreflightError, match="continuation_prior_changed"):
+        trial.serve(tmp_path, second_continuation=True)
+
+
+def test_second_continuation_new_ledger_and_one_turn_scope(tmp_path, monkeypatch):
+    from jd_relational import managed_app as managed_app_module
+
+    class CompositionReached(RuntimeError):
+        pass
+
+    document_id, _approval = _second_continuation_records(tmp_path, monkeypatch)
+    selected = SimpleNamespace(read=lambda: None)
+    observed = {}
+
+    def capture(file, **kwargs):
+        observed.update(file=file, **kwargs)
+        raise CompositionReached
+
+    monkeypatch.setenv("JD_RELATIONAL_TEST_DB", "1")
+    monkeypatch.setattr(trial, "manifest", lambda *_args: {"fixture": "offline"})
+    monkeypatch.setattr(trial, "fixture_file", lambda *_args: selected)
+    monkeypatch.setattr(trial, "read_key", lambda *_args: "synthetic-not-a-secret")
+    monkeypatch.setattr(managed_app_module, "open_managed_app", capture)
+    original = (tmp_path / "spend.json").read_bytes()
+    prior = (tmp_path / "continuation" / "spend.json").read_bytes()
+    with pytest.raises(CompositionReached):
+        trial.serve(tmp_path, second_continuation=True)
+    assert observed["file"] is selected
+    assert observed["enable_chat"] is True
+    assert (tmp_path / "spend.json").read_bytes() == original
+    assert (tmp_path / "continuation" / "spend.json").read_bytes() == prior
+    fresh = json.loads((tmp_path / "continuation-2" / "spend.json").read_text())
+    assert (fresh["trial_id"], fresh["request_cap"], fresh["usd_cap"], fresh["attempt_count"]) == (
+        "p3-c-w-continuation-2", 120, "0.50", 0,
+    )
+    called = []
+
+    async def app(scope, receive, send):
+        called.append(scope["path"])
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        await send({"type": "http.response.body", "body": b"{}"})
+
+    async def request(gate, path):
+        responses = []
+        async def send(message):
+            responses.append(message)
+        await gate({"type": "http", "method": "POST", "path": path}, lambda: None,
+                   send)
+        return responses[0]["status"]
+
+    gate = trial.P3TurnGate(app, tmp_path / "continuation-2" / "turns.json", cap=1,
+                            trial_id="p3-c-w-continuation-2", document_id=document_id)
+    path = f"/api/documents/{document_id}/chat/runs"
+    assert asyncio.run(request(gate, f"/api/documents/{uuid4()}/chat/runs")) == 403
+    assert asyncio.run(request(gate, path)) == 200
+    restarted = trial.P3TurnGate(app, tmp_path / "continuation-2" / "turns.json", cap=1,
+                                 trial_id="p3-c-w-continuation-2", document_id=document_id)
+    assert asyncio.run(request(restarted, path)) == 429
+    assert called == [path]
+
+
+def test_second_continuation_requires_thirteen_completed_runs(tmp_path, monkeypatch):
+    document_id, _approval = _second_continuation_records(tmp_path, monkeypatch)
+    dataset_id = str(uuid4())
+    (tmp_path / "initialize.finished.json").write_text(
+        json.dumps({"dataset_id": dataset_id}), encoding="utf-8",
+    )
+    run_ids = [str(uuid4()) for _ in range(13)]
+    rows = [message for run_id in run_ids for message in (
+        {"role": "user", "run_id": run_id, "message_id": run_id},
+        {"role": "assistant", "run_id": run_id, "message_id": "answer-" + run_id},
+    )]
+    settings = SimpleNamespace(dataset_id=dataset_id,
+                               signing_key_bytes=lambda: b"synthetic-32-byte-local-signing-key")
+    runtime = SimpleNamespace(
+        checkpoints=object(),
+        run_history=SimpleNamespace(find=lambda _doc, run_id, _dataset: SimpleNamespace(
+            record=SimpleNamespace(run_id=run_id, document_id=document_id,
+                                   dataset_id=dataset_id, status="completed"), closed=True,
+        )),
+    )
+    managed = SimpleNamespace(
+        opened=SimpleNamespace(settings=settings, host=SimpleNamespace(runtime=object())),
+        ai_runtime=runtime,
+    )
+    history = {"dataset_id": dataset_id, "document_id": document_id,
+               "messages": rows, "next_cursor": None}
+    monkeypatch.setattr(trial, "CatalogService", lambda *_args: SimpleNamespace(list=lambda **_kw: {
+        "dataset_id": dataset_id, "documents": [{"document_id": document_id}], "next_after": None,
+    }))
+    monkeypatch.setattr(trial, "ChatHistoryCodec", lambda *_args: object())
+    monkeypatch.setattr(trial, "ChatHistoryService", lambda *_args: SimpleNamespace(
+        read=lambda *_a, **_kw: history))
+    trial.verify_prior_conversation(managed, document_id, tmp_path, expected_turns=13)
+    history["messages"] = rows[:-2]
+    with pytest.raises(trial.TrialPreflightError, match="continuation_prior_run_incomplete"):
+        trial.verify_prior_conversation(managed, document_id, tmp_path, expected_turns=13)

@@ -61,6 +61,10 @@ CONTINUATION_ID = "p3-c-w-continuation-1"
 CONTINUATION_TURN_CAP = 6
 CONTINUATION_REQUEST_CAP = 90
 CONTINUATION_USD_CAP = Decimal("0.50")
+SECOND_CONTINUATION_ID = "p3-c-w-continuation-2"
+SECOND_CONTINUATION_TURN_CAP = 1
+SECOND_CONTINUATION_REQUEST_CAP = 120
+SECOND_CONTINUATION_USD_CAP = Decimal("0.50")
 
 
 class TrialPreflightError(RuntimeError):
@@ -137,9 +141,16 @@ def preflight(target: Path) -> dict:
     return value
 
 
-def preflight_continuation(target: Path) -> dict:
-    """Unlock only a closed, settled first batch and one frozen existing document."""
-    approval_path = target / "continuation" / "paid-authorization.json"
+def preflight_continuation(target: Path, *, second: bool = False) -> dict:
+    """Unlock only closed, settled earlier batches on one frozen document."""
+    trial_id = SECOND_CONTINUATION_ID if second else CONTINUATION_ID
+    turn_cap = SECOND_CONTINUATION_TURN_CAP if second else CONTINUATION_TURN_CAP
+    request_cap = SECOND_CONTINUATION_REQUEST_CAP if second else CONTINUATION_REQUEST_CAP
+    usd_cap = SECOND_CONTINUATION_USD_CAP if second else CONTINUATION_USD_CAP
+    prior_dir = target / "continuation" if second else target
+    prior_id = CONTINUATION_ID if second else TRIAL_ID
+    prior_turn_count = 1 if second else TURN_CAP
+    approval_path = target / ("continuation-2" if second else "continuation") / "paid-authorization.json"
     if not approval_path.is_file():
         raise TrialPreflightError("continuation_not_authorized")
     try:
@@ -152,12 +163,14 @@ def preflight_continuation(target: Path) -> dict:
         "prior_turns_sha256", "prior_spend_sha256", "prior_finish_sha256",
         "owner_approval_reference",
     }
+    if second:
+        required.add("prior_approval_sha256")
     if (type(approval) is not dict or set(approval) != required
             or type(approval["format"]) is not int or approval["format"] != 1
-            or approval["trial_id"] != CONTINUATION_ID or approval["authorized"] is not True
-            or approval["employee_turn_cap"] != CONTINUATION_TURN_CAP
-            or approval["provider_request_cap"] != CONTINUATION_REQUEST_CAP
-            or approval["usd_cap"] != str(CONTINUATION_USD_CAP)
+            or approval["trial_id"] != trial_id or approval["authorized"] is not True
+            or approval["employee_turn_cap"] != turn_cap
+            or approval["provider_request_cap"] != request_cap
+            or approval["usd_cap"] != str(usd_cap)
             or type(approval["git_commit"]) is not str
             or type(approval["owner_approval_reference"]) is not str
             or not approval["owner_approval_reference"].strip()):
@@ -172,8 +185,21 @@ def preflight_continuation(target: Path) -> dict:
             or _git("status", "--porcelain", "--untracked-files=all")):
         raise TrialPreflightError("continuation_revision_changed")
 
-    prior_paths = {"turns": target / "turns.json", "spend": target / "spend.json",
-                   "finish": target / "serve.finished.json"}
+    if second:
+        first_approval_path = prior_dir / "paid-authorization.json"
+        try:
+            if _hash(first_approval_path) != approval["prior_approval_sha256"]:
+                raise TrialPreflightError("continuation_prior_changed")
+            first_approval = json.loads(first_approval_path.read_text(encoding="utf-8"))
+            if (first_approval.get("document_id") != approval["document_id"]
+                    or any(_hash(target / f"{name}.json") != first_approval[f"prior_{label}_sha256"]
+                           for label, name in (("turns", "turns"), ("spend", "spend"),
+                                               ("finish", "serve.finished")))):
+                raise TrialPreflightError("continuation_prior_changed")
+        except (OSError, KeyError, AttributeError, TypeError, json.JSONDecodeError):
+            raise TrialPreflightError("continuation_prior_changed") from None
+    prior_paths = {"turns": prior_dir / "turns.json", "spend": prior_dir / "spend.json",
+                   "finish": prior_dir / "serve.finished.json"}
     try:
         if any(_hash(path) != approval[f"prior_{name}_sha256"]
                for name, path in prior_paths.items()):
@@ -183,10 +209,10 @@ def preflight_continuation(target: Path) -> dict:
     except (OSError, json.JSONDecodeError):
         raise TrialPreflightError("continuation_prior_changed") from None
     turns, spend, finish = prior["turns"], prior["spend"], prior["finish"]
-    if (type(turns) is not dict or turns.get("trial_id") != TRIAL_ID
+    if (type(turns) is not dict or turns.get("trial_id") != prior_id
             or type(turns.get("turn_attempts")) is not int
-            or turns["turn_attempts"] != TURN_CAP
-            or type(spend) is not dict or spend.get("trial_id") != TRIAL_ID
+            or turns["turn_attempts"] != prior_turn_count
+            or type(spend) is not dict or spend.get("trial_id") != prior_id
             or spend.get("status") != "active" or spend.get("in_flight") != []
             or spend.get("retained_unknown_usd") != "0"
             or type(spend.get("attempt_count")) is not int
@@ -200,7 +226,7 @@ def preflight_continuation(target: Path) -> dict:
             or finish.get("spend") != spend
             or type(finish.get("evidence")) is not dict
             or finish["evidence"].get("model_request_count") != spend["attempt_count"]
-            or finish["evidence"].get("http_counts", {}).get("POST chat_runs") != TURN_CAP):
+            or finish["evidence"].get("http_counts", {}).get("POST chat_runs") != prior_turn_count):
         raise TrialPreflightError("continuation_prior_unsettled")
     return approval
 
@@ -292,7 +318,8 @@ class TrialEvidence(Evidence):
         return value
 
 
-def verify_prior_conversation(managed, document_id: str, target: Path) -> None:
+def verify_prior_conversation(managed, document_id: str, target: Path,
+                              *, expected_turns: int = TURN_CAP) -> None:
     """Read the existing App authority before admitting any continuation HTTP."""
     settings = managed.opened.settings
     try:
@@ -312,7 +339,7 @@ def verify_prior_conversation(managed, document_id: str, target: Path) -> None:
         if (history.get("dataset_id") != settings.dataset_id
                 or history.get("document_id") != document_id
                 or history.get("next_cursor") is not None
-                or type(messages) is not list or len(messages) != 2 * TURN_CAP):
+                or type(messages) is not list or len(messages) != 2 * expected_turns):
             raise TrialPreflightError("continuation_prior_run_incomplete")
         seen = set()
         for index in range(0, len(messages), 2):
@@ -371,7 +398,8 @@ def open_trial_runtime(spend: P3SpendGate, api_key: str, *, transport=None):
         raise
 
 
-def serve(target: Path, *, continuation: bool = False):
+def serve(target: Path, *, continuation: bool = False,
+          second_continuation: bool = False):
     """Explicit later paid run. No service starts without the unlock preflight."""
     import uvicorn
     from jd_relational.managed_app import open_managed_app
@@ -379,12 +407,15 @@ def serve(target: Path, *, continuation: bool = False):
     if sys.platform != "win32" or os.environ.get("JD_RELATIONAL_TEST_DB") != "1":
         raise TrialPreflightError("explicit_test_scope_required")
     value = manifest(target)
-    approval = preflight_continuation(target) if continuation else preflight(target)
-    artifacts = target / "continuation" if continuation else target
-    trial_id = CONTINUATION_ID if continuation else TRIAL_ID
-    turn_cap = CONTINUATION_TURN_CAP if continuation else TURN_CAP
-    request_cap = CONTINUATION_REQUEST_CAP if continuation else REQUEST_CAP
-    usd_cap = CONTINUATION_USD_CAP if continuation else USD_CAP
+    if continuation and second_continuation:
+        raise TrialPreflightError("trial_mode_invalid")
+    is_continuation = continuation or second_continuation
+    approval = preflight_continuation(target, second=second_continuation) if is_continuation else preflight(target)
+    artifacts = target / ("continuation-2" if second_continuation else "continuation") if is_continuation else target
+    trial_id = SECOND_CONTINUATION_ID if second_continuation else CONTINUATION_ID if continuation else TRIAL_ID
+    turn_cap = SECOND_CONTINUATION_TURN_CAP if second_continuation else CONTINUATION_TURN_CAP if continuation else TURN_CAP
+    request_cap = SECOND_CONTINUATION_REQUEST_CAP if second_continuation else CONTINUATION_REQUEST_CAP if continuation else REQUEST_CAP
+    usd_cap = SECOND_CONTINUATION_USD_CAP if second_continuation else CONTINUATION_USD_CAP if continuation else USD_CAP
     if any((artifacts / name).exists() for name in ("serve.ready.json", "serve.finished.json", "stop.request")):
         raise TrialPreflightError("trial_already_served")
     file = fixture_file(target, value)
@@ -404,8 +435,9 @@ def serve(target: Path, *, continuation: bool = False):
         started = monotonic()
         try:
             check_settings(managed.opened.settings, value)
-            if continuation:
-                verify_prior_conversation(managed, approval["document_id"], target)
+            if is_continuation:
+                verify_prior_conversation(managed, approval["document_id"], target,
+                                          expected_turns=TURN_CAP + (1 if second_continuation else 0))
             original_execute = managed.opened.host.runtime.storage.execute
 
             def observe_write(intent):
@@ -416,7 +448,7 @@ def serve(target: Path, *, continuation: bool = False):
             managed.opened.host.runtime.storage.execute = observe_write
             turns = P3TurnGate(managed.app, artifacts / "turns.json", cap=turn_cap,
                                trial_id=trial_id,
-                               document_id=approval["document_id"] if continuation else None)
+                               document_id=approval["document_id"] if is_continuation else None)
 
             async def app(scope, receive, send):
                 await evidence.routes(turns, scope, receive, send)
@@ -448,7 +480,7 @@ def serve(target: Path, *, continuation: bool = False):
                             "provider_request_cap": request_cap,
                             "usd_cap": str(usd_cap),
                         }
-                        if continuation:
+                        if is_continuation:
                             ready["document_id"] = approval["document_id"]
                         else:
                             ready["package_manifest_sha256"] = approval["package_manifest_sha256"]
@@ -483,13 +515,14 @@ def serve(target: Path, *, continuation: bool = False):
             raise TrialPreflightError("trial_shutdown_unconfirmed")
 
 
-def stop_continuation(target: Path):
+def stop_continuation(target: Path, *, second: bool = False):
     manifest(target)
-    artifacts = target / "continuation"
+    artifacts = target / ("continuation-2" if second else "continuation")
+    trial_id = SECOND_CONTINUATION_ID if second else CONTINUATION_ID
     try:
         ready = json.loads((artifacts / "serve.ready.json").read_text(encoding="utf-8"))
         if (type(ready.get("pid")) is not int or ready["pid"] <= 0
-                or ready.get("status") != "ready" or ready.get("trial_id") != CONTINUATION_ID):
+                or ready.get("status") != "ready" or ready.get("trial_id") != trial_id):
             raise ValueError()
     except (OSError, ValueError, TypeError, AttributeError):
         raise TrialPreflightError("continuation_not_ready") from None
@@ -500,7 +533,8 @@ def stop_continuation(target: Path):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("mode", choices=("prepare", "initialize", "serve", "stop",
-                                         "continue", "stop-continuation"))
+                                         "continue", "stop-continuation",
+                                         "continue-2", "stop-continuation-2"))
     parser.add_argument("directory", type=directory)
     parser.add_argument("--api-port", type=int, default=8769)
     args = parser.parse_args()
@@ -514,8 +548,11 @@ def main():
         stop(args.directory)
     elif args.mode == "stop-continuation":
         stop_continuation(args.directory)
+    elif args.mode == "stop-continuation-2":
+        stop_continuation(args.directory, second=True)
     else:
-        serve(args.directory, continuation=args.mode == "continue")
+        serve(args.directory, continuation=args.mode == "continue",
+              second_continuation=args.mode == "continue-2")
 
 
 if __name__ == "__main__":

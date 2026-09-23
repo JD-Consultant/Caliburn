@@ -320,3 +320,177 @@ def test_invalid_turn_state_fails_closed_before_app(tmp_path):
 
     with pytest.raises(trial.TrialPreflightError, match="trial_turn_state_invalid"):
         trial.P3TurnGate(app, saved)
+
+
+def _continuation_records(tmp_path, monkeypatch):
+    document_id = str(uuid4())
+    prior_turns = {"format": 1, "trial_id": trial.TRIAL_ID, "turn_attempts": 12}
+    prior_spend = {
+        "format": 1, "trial_id": trial.TRIAL_ID, "status": "active",
+        "attempt_count": 1, "spent_usd": "0.001", "retained_unknown_usd": "0",
+        "in_flight": [], "attempts": [{"outcome": "settled"}],
+    }
+    prior_finish = {
+        "reason": "requested", "app_closed": True, "saver_connection_closed": True,
+        "spend": prior_spend, "evidence": {"model_request_count": 1,
+                                              "http_counts": {"POST chat_runs": 12}},
+    }
+    for name, data in (("turns.json", prior_turns), ("spend.json", prior_spend),
+                       ("serve.finished.json", prior_finish)):
+        (tmp_path / name).write_text(json.dumps(data), encoding="utf-8")
+    continuation = tmp_path / "continuation"
+    continuation.mkdir()
+    approval = {
+        "format": 1, "trial_id": trial.CONTINUATION_ID, "authorized": True,
+        "document_id": document_id, "git_commit": "frozen",
+        "employee_turn_cap": 6, "provider_request_cap": 90, "usd_cap": "0.50",
+        "prior_turns_sha256": trial._hash(tmp_path / "turns.json"),
+        "prior_spend_sha256": trial._hash(tmp_path / "spend.json"),
+        "prior_finish_sha256": trial._hash(tmp_path / "serve.finished.json"),
+        "owner_approval_reference": "owner-approved-separate-batch",
+    }
+    (continuation / "paid-authorization.json").write_text(
+        json.dumps(approval), encoding="utf-8",
+    )
+    monkeypatch.setattr(trial, "_git", lambda *args: "frozen" if args[0] == "rev-parse" else "")
+    return document_id, approval
+
+
+def test_continuation_requires_separate_approval_before_credential_or_host(tmp_path, monkeypatch):
+    (tmp_path / "continuation").mkdir()
+    monkeypatch.setenv("JD_RELATIONAL_TEST_DB", "1")
+    monkeypatch.setattr(trial, "manifest", lambda *_args: {"fixture": "offline"})
+    monkeypatch.setattr(trial, "read_key", lambda *_args: (_ for _ in ()).throw(
+        AssertionError("credential_accessed")))
+    monkeypatch.setattr(trial, "fixture_file", lambda *_args: (_ for _ in ()).throw(
+        AssertionError("host_accessed")))
+
+    with pytest.raises(trial.TrialPreflightError, match="continuation_not_authorized"):
+        trial.serve(tmp_path, continuation=True)
+
+
+def test_continuation_requires_closed_settled_prior_batch_and_frozen_records(tmp_path, monkeypatch):
+    document_id, approval = _continuation_records(tmp_path, monkeypatch)
+    assert trial.preflight_continuation(tmp_path)["document_id"] == document_id
+
+    spend_path = tmp_path / "spend.json"
+    spend = json.loads(spend_path.read_text(encoding="utf-8"))
+    spend["in_flight"] = [{"attempt_id": 2}]
+    spend_path.write_text(json.dumps(spend), encoding="utf-8")
+    with pytest.raises(trial.TrialPreflightError, match="continuation_prior_changed"):
+        trial.preflight_continuation(tmp_path)
+
+    approval["prior_spend_sha256"] = trial._hash(spend_path)
+    (tmp_path / "continuation" / "paid-authorization.json").write_text(
+        json.dumps(approval), encoding="utf-8",
+    )
+    with pytest.raises(trial.TrialPreflightError, match="continuation_prior_unsettled"):
+        trial.preflight_continuation(tmp_path)
+
+    spend["in_flight"] = []
+    spend_path.write_text(json.dumps(spend), encoding="utf-8")
+    approval["prior_spend_sha256"] = trial._hash(spend_path)
+    approval["document_id"] = str(uuid4()) + "wrong"
+    (tmp_path / "continuation" / "paid-authorization.json").write_text(
+        json.dumps(approval), encoding="utf-8",
+    )
+    with pytest.raises(trial.TrialPreflightError, match="continuation_authorization_invalid"):
+        trial.preflight_continuation(tmp_path)
+
+
+def test_continuation_turn_gate_only_allows_existing_document_and_six_new_turns(tmp_path):
+    document_id, other_id = str(uuid4()), str(uuid4())
+    called = []
+    (tmp_path / "continuation").mkdir()
+
+    async def app(scope, receive, send):
+        called.append(scope["path"])
+        await send({"type": "http.response.start", "status": 200, "headers": []})
+        await send({"type": "http.response.body", "body": b"{}"})
+
+    async def request(gate, method, path):
+        messages = []
+        async def send(message):
+            messages.append(message)
+        await gate({"type": "http", "method": method, "path": path},
+                   lambda: None, send)
+        return messages[0]["status"]
+
+    path = f"/api/documents/{document_id}/chat/runs"
+    gate = trial.P3TurnGate(app, tmp_path / "continuation" / "turns.json", cap=6,
+                            trial_id=trial.CONTINUATION_ID, document_id=document_id)
+    assert asyncio.run(request(gate, "POST", "/api/documents")) == 403
+    assert asyncio.run(request(gate, "POST", f"/api/documents/{other_id}/chat/runs")) == 403
+    for _ in range(3):
+        assert asyncio.run(request(gate, "POST", path)) == 200
+    gate = trial.P3TurnGate(app, tmp_path / "continuation" / "turns.json", cap=6,
+                            trial_id=trial.CONTINUATION_ID, document_id=document_id)
+    for _ in range(3):
+        assert asyncio.run(request(gate, "POST", path)) == 200
+    assert asyncio.run(request(gate, "POST", path)) == 429
+    assert called == [path] * 6
+    assert json.loads((tmp_path / "continuation" / "turns.json").read_text())["turn_attempts"] == 6
+
+
+def test_continuation_formal_app_reuses_original_fixture_with_new_ledger(tmp_path, monkeypatch):
+    from jd_relational import managed_app as managed_app_module
+
+    class CompositionReached(RuntimeError):
+        pass
+
+    document_id, _approval = _continuation_records(tmp_path, monkeypatch)
+    selected = SimpleNamespace(read=lambda: None)
+    seen = {}
+
+    def capture(file, **kwargs):
+        seen["file"] = file
+        seen.update(kwargs)
+        raise CompositionReached
+
+    monkeypatch.setenv("JD_RELATIONAL_TEST_DB", "1")
+    monkeypatch.setattr(trial, "manifest", lambda *_args: {"fixture": "offline"})
+    monkeypatch.setattr(trial, "fixture_file", lambda *_args: selected)
+    monkeypatch.setattr(trial, "read_key", lambda *_args: "synthetic-not-a-secret")
+    monkeypatch.setattr(managed_app_module, "open_managed_app", capture)
+    prior_spend = (tmp_path / "spend.json").read_bytes()
+
+    with pytest.raises(CompositionReached):
+        trial.serve(tmp_path, continuation=True)
+
+    assert seen["file"] is selected
+    assert seen["enable_chat"] is True
+    assert (tmp_path / "spend.json").read_bytes() == prior_spend
+    fresh = json.loads((tmp_path / "continuation" / "spend.json").read_text())
+    assert fresh["trial_id"] == trial.CONTINUATION_ID
+    assert fresh["request_cap"] == 90
+    assert fresh["usd_cap"] == "0.50"
+    assert fresh["attempt_count"] == 0
+    assert document_id == _approval["document_id"]
+
+
+def test_continuation_does_not_restart_an_already_opened_batch(tmp_path, monkeypatch):
+    _continuation_records(tmp_path, monkeypatch)
+    (tmp_path / "continuation" / "serve.ready.json").write_text("{}", encoding="utf-8")
+    monkeypatch.setenv("JD_RELATIONAL_TEST_DB", "1")
+    monkeypatch.setattr(trial, "manifest", lambda *_args: {"fixture": "offline"})
+    monkeypatch.setattr(trial, "fixture_file", lambda *_args: (_ for _ in ()).throw(
+        AssertionError("host_accessed")))
+    monkeypatch.setattr(trial, "read_key", lambda *_args: (_ for _ in ()).throw(
+        AssertionError("credential_accessed")))
+
+    with pytest.raises(trial.TrialPreflightError, match="trial_already_served"):
+        trial.serve(tmp_path, continuation=True)
+
+
+def test_continuation_stop_only_writes_separate_control_file(tmp_path, monkeypatch):
+    _continuation_records(tmp_path, monkeypatch)
+    monkeypatch.setattr(trial, "manifest", lambda *_args: {"fixture": "offline"})
+    with pytest.raises(trial.TrialPreflightError, match="continuation_not_ready"):
+        trial.stop_continuation(tmp_path)
+
+    (tmp_path / "continuation" / "serve.ready.json").write_text(json.dumps({
+        "pid": 123, "status": "ready", "trial_id": trial.CONTINUATION_ID,
+    }), encoding="utf-8")
+    trial.stop_continuation(tmp_path)
+    assert (tmp_path / "continuation" / "stop.request").is_file()
+    assert (tmp_path / "stop.request").is_file() is False

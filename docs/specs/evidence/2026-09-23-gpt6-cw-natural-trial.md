@@ -66,3 +66,11 @@ Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；
 沿同一隔離庫的唯讀 Saver／P3 response ID 對帳：第 109 筆已結算 A 請求對上 canonical AIMessage 的 `read_work_understanding` 呼叫，後接成功 ToolMessage；第 108 筆已結算 A 請求沒有對上 canonical AIMessage，且使用 1,831 input／2,275 output tokens，符合摘要呼叫特徵。第 110 筆在該工具結果之後失敗。按當時摘要安全邊界及 request 門檻推論，它**很可能**是下一次摘要請求，但原帳本未保存請求工具數量或明確種類，也未保存 `incomplete_details.reason`；故仍不能確認第 110 筆種類與失敗原因，更不能由此直接改 16K／8,192 設定。
 
 為讓未來批次不再靠 Saver 間接猜測，僅在 **test-only P3 spend ledger** 的每筆准入紀錄加入 `declared_tool_count`：經既有 wire 檢查後，無 `tools` 記 0，有工具只記數量；不保存名稱、定義、參數、對話或新狀態，也不更動費用保留、拒絕、重試或 production request。先用 0／1 工具且服務端 `incomplete` 的持久化反例取得紅燈，再以一行紀錄修正取得該測試檔 **45 passed／0 failed**，沒有外送模型請求。此欄位僅輔助區分未來的摘要與工具主請求，**不是精確 request-kind 權威**；第三批舊帳本無法回填，仍維持 stopped／未知預留。下一個產品決策仍應依新的具體請求／回覆證據，而非把重讀、摘要頻率或未使用 writer 單獨當成根因。
+
+### 針對長工具迴圈的官方做法複核（不改設定）
+
+查閱 2026-09-23：[OpenAI Compaction](https://developers.openai.com/api/docs/guides/compaction)以實際渲染的 request tokens 觸發，並將延續狀態帶到後續請求；[Anthropic keep-recent-turns](https://platform.claude.com/docs/en/build-with-claude/compaction-keep-recent-turns)明示最近訊息逐字保留，切點不能拆開工具呼叫及結果；[Anthropic threshold compaction](https://platform.claude.com/docs/en/build-with-claude/compaction-threshold)明示壓縮本身有額外推理／計費，門檻由工作負載配置。這些是不同服務的公開做法，**共同原則**是依有效上下文量測、保留近期工作及完整工具配對、把額外壓縮成本算入驗收；它們沒有共同指定 Caliburn 應用 16K、32K 或改用某個服務端 API。
+
+[Anthropic tool design](https://platform.claude.com/docs/en/agents-and-tools/tool-use/define-tools)建議工具回覆只帶下一步判斷所需的高訊號資訊；[OpenAI deployment checklist](https://developers.openai.com/api/docs/guides/deployment-checklist)建議用代表性任務比較品質、延遲與每次成功成本，不能只看請求 200 或單次 token。這提供診斷順序，**不證明**本案的工具回覆過大、Prompt 不佳或模型選錯。OpenRouter 的[message-transforms 插件](https://openrouter.ai/docs/guides/features/message-transforms)會從 prompt 中間移除／截短訊息，與本案不可丟未處理訪談及引用的規則不同，不作直接替代；OpenAI 原生 compaction 在目前 OpenRouter 目標路徑仍未驗證，不因 OpenAI 官方支援而宣稱已可切換。
+
+下個最低成本、高區辨力的驗收問題是：**在上下文尚短、已有足夠已知工作且使用者明確要求先寫暫定 JD 時，同一 GPT-6／正式工具接線是否會選 JD writer？**正式組裝的兩個零付費定向測試已確認 `jd_create_task`／`jd_insert_item` 等工具在 A graph 中、A 的 compaction middleware 仍用原 profile（**2 passed**），但只證明可用，不證明模型自然選用。若短上下文仍不寫，先查 model-facing 工具／Skill／指令和實際 tool result；若可寫，才用長上下文的 request view、摘要頻率及 reader 結果比較。任何調門檻、改 Prompt 或加防重讀規則都須有該對照證據，不能由本批 20 次摘要與 0 writer 直接推定。

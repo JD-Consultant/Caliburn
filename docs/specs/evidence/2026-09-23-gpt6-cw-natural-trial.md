@@ -84,3 +84,13 @@ Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；
 隔離資料庫唯讀查回 **5 筆 JD 修改均 committed**，目前 JD revision 6：已寫收貨核對、短少／破損隔離與採購通知的 1 項 task、1 項 outcome、1 項 requirement；索賠權責沒有錯放給員工。Saver 工具序列含 `jd_set_text`／`jd_create_task`／`jd_insert_item`，證明「GPT-6 完全不會使用 JD writer」不成立。出貨部分尚未寫入；40 筆額度用盡時本輪 `run_status=failed`、`input_state=saved`、5 筆 effects 已提交、無 final assistant。第 41 筆未外送；公開 run state 未提供精確內部 exception，故只將**外送上限耗盡與未能收尾**列為直接觀察，不把它寫成模型或 compaction 的唯一故障。App／Saver 已正常關閉，沒有自動重送或補造回答。
 
 這次暴露的真正下一個診斷是：單回合 JD 撰寫為何消耗 22 筆帶工具請求與 18 筆無工具請求、實際 request 如何從約 9k 增至約 53k input tokens，以及哪些讀取是成功保存後取得新 ref 所必需。先核對既有 compaction counter、正式 request view 與實際 usage，再決定是否需要最小設定／接線修正；不能因這次 40 筆上限過低就盲目加 cap，也不能把尚未實測的 Memory→JD、完整 JD、自然 C-W 或 Browser 宣告通過。
+
+### 同一隔離回合的零付費 checkpoint 診斷（不改產品）
+
+唯讀檢查該文件的子 graph Saver：45 則 canonical messages、17 個不同的已發布 A `continuation_compaction` v2；發布後的 request-only view 各為 12 則，內容字元數由約 43k 漲到約 113k。末次 view 仍留有三筆約 31k 字元的 `jd_read` 結果；現行 `keep_messages=8` 的安全切點，在末次狀態留下 8 則、其中工具內容約 75k 字元。只作離線比較時，保留 4 則的安全切點約 38k 字元、保留 2 則約 33k 字元；**這不是批准修改正式 8 則規則**，也沒有證明 2／4 則已足以維持來源／JD ref／reasoning 延續品質。原始員工 HumanMessage 仍由 v2 獨立逐字保護，canonical 對話與資料庫沒有被此檢查改寫。
+
+10 次 `jd_read current` 中，前三次隨成功保存的 revision 前進；任務建立後，39 筆記錄的 current 投影依既有 `page_bytes=32768` 分成第一頁約 31k 字元及第二頁約 5k 字元，模型正確沿 cursor 續頁。成功保存後若繼續編輯，現行主顧問明文要求再讀最新版 refs，這些重讀不能直接標成多餘。後段在同一 revision 上有再次全讀、重讀 Skill／evidence 的實際序列，需與 compaction 對照，不以模型動機猜根因。6 筆 JD writer call 中 5 筆 `committed`、1 筆 `invalid_input`；`jd_create_task` 已在同一呼叫帶入一筆 outcome 與一筆 requirement，不能誤稱模型完全沒用既有複合能力。
+
+鎖定 middleware 用 LangChain `count_tokens_approximately`，其 [官方參考](https://reference.langchain.com/python/langchain-core/messages/utils/count_tokens_approximately)明說預設 4 字元／token、只是估算，並計入宣告的工具 schema；[OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting)則說工具與訊息結構都佔 context，精確計數需對實際 OpenAI request。後者是 OpenAI API 能力，**未證明**可直接套目前 OpenRouter credential／route。[Anthropic keep-recent compaction](https://platform.claude.com/docs/en/build-with-claude/compaction-keep-recent-turns)指出逐字保留近期越多，可釋放的空間越少，且切點不可拆工具呼叫／結果；它沒有指定本產品應保留幾則。這些公開原則加上本地 trace 支持「近期大型 JD tool results 造成反覆摘要」的局部診斷；仍不把模型未收尾的所有原因歸給單一 token counter。
+
+**需先對齊的正式規則：**[既有 compaction 設計](../2026-09-16-openrouter-continuation-compaction-design.md) §8／§9 要求至少保留最近 8 則原樣；不能只為減少 17 次摘要便擅自降成 2／4。最小候選先限既有 A middleware／JD read 契約：比較在保持員工當輪原話、最新未完成工具 wave、正確 JD ref 與來源回查的前提下，是否可讓「已完成且已失效的舊 JD 讀取結果」更早離開 model request；若需改動 8 則硬規則，先請 Owner 裁決。另一候選是維持 8 則、改觸發／節流策略，但須以相同保存與實際 provider usage 證明不會只把大 request 與成本推高。此處只記診斷及候選；**沒有 production diff、沒有額外付費請求，也沒有重跑已停止的 C-W trial**。

@@ -1,23 +1,26 @@
 """Working State is one checkpoint field, not a second Memory or source owner."""
 
 from dataclasses import replace
+from hashlib import sha256
 from types import SimpleNamespace
 from uuid import uuid4
 import json
 
 import pytest
 from langchain.agents import create_agent
-from langchain_core.messages import AIMessage, HumanMessage
+from langchain_core.messages import AIMessage, HumanMessage, ToolMessage
 from langgraph.checkpoint.memory import InMemorySaver
 
 from jd_relational.consultant_context import ConsultantContext, ConsultantState, JdNoticeMiddleware
 from jd_relational.runtime_checkpoints import build_document_graph
 from jd_relational.working_state import (
-    InterviewWorkingState, WorkingEvidence, WorkingStateError,
+    InterviewWorkingState, WorkingEvidence, WorkingItem, WorkingStateError,
     WorkingStateUpdateInput, _apply_update, _model_working_state_to_domain,
     build_working_state_tools, model_working_state_schema,
-    checked_working_state, sanitized_source_notice, working_state_notice,
+    checked_working_state, sanitized_source_notice, working_evidence_catalog,
+    working_state_notice,
 )
+from jd_relational.memory_context import issue_scoped_evidence_key
 from test_consultant_context import FixedModel, setup
 
 
@@ -139,6 +142,54 @@ def test_prior_available_source_must_be_read_before_reuse_elsewhere():
         apply(InterviewWorkingState(),
               [create_operation(source_evidence_keys=[key])],
               context=context, runtime=runtime, catalog=catalog)
+
+
+@pytest.mark.parametrize("sources_changed", [False, True])
+def test_read_working_item_proof_survives_text_revision_without_authorizing_new_sources(sources_changed):
+    """A read keeps its old source scope even when the item is revised."""
+    context, _ = scope()
+    identity = "wi_" + "1" * 32
+    reference = "conversation:prior"
+    key = issue_scoped_evidence_key(
+        dataset_id=context.dataset_id, document_id=context.document_id,
+        run_id=context.run_id, scope_kind="working_item", scope_id=identity,
+        source_reference=reference,
+    )
+    original = WorkingItem(item_id=identity, subject="盤點差異",
+        known_and_open="盤點差異待查。", information_needed="確認原因。",
+        status="open", priority="normal", source_refs=[reference])
+    body = json.dumps({"item_id": identity, "subject": original.subject,
+        "known_and_open": original.known_and_open,
+        "why_it_matters": None, "information_needed": original.information_needed,
+        "status": "open", "priority": "normal", "evidence_keys": [key],
+        "related_handles": []}, ensure_ascii=False, sort_keys=True, separators=(",", ":"))
+    call_id = "read-working-item"
+    messages = [HumanMessage(id=context.run_id, content="盤點差異"),
+        AIMessage(id="read-call", content="", tool_calls=[{
+            "name": "read_interview_working_item", "args": {"item_id": identity},
+            "id": call_id, "type": "tool_call",
+        }]),
+        ToolMessage(id="read-result", name="read_interview_working_item",
+            tool_call_id=call_id, content=body, status="success", artifact={
+                "format_version": 1, "kind": "working_item",
+                "dataset_id": context.dataset_id, "document_id": context.document_id,
+                "run_id": context.run_id, "item_id": identity,
+                "content_digest": sha256(body.encode("utf-8")).hexdigest(),
+                "source_refs": [reference],
+            })]
+    revised = original.model_copy(update={
+        "known_and_open": "已查到重複入帳；仍須主管決定調帳。",
+        "source_refs": ["conversation:new"] if sources_changed else [reference],
+    })
+
+    catalog = working_evidence_catalog(
+        state=InterviewWorkingState(items=[revised]).model_dump(mode="json"),
+        context=context, messages=messages, raw_source_notice=None,
+    )
+    if sources_changed:
+        assert catalog == {}
+    else:
+        assert catalog[key].status == "available"
 
 
 def test_model_schema_cannot_supply_runtime_owned_fields():

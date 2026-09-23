@@ -607,19 +607,41 @@ def _read_item_ids(messages: object, state: InterviewWorkingState, context: obje
         artifact = message.artifact
         try:
             item_id = call["args"]["item_id"]
-            item = known[item_id]
-            content = _json(_project_item(item, context))
-            if (type(artifact) is not dict or artifact != {
+            # A later update can change the item's text in this same run.
+            # Verify what the trusted read returned at the time. Its source
+            # set is compared with the current item only after that proof is
+            # valid; an old read cannot authorize newly attached sources.
+            if type(artifact) is not dict:
+                raise ValueError()
+            projected = json.loads(message.content)
+            if type(projected) is not dict or set(projected) != {
+                    "item_id", "subject", "known_and_open", "why_it_matters",
+                    "information_needed", "status", "priority", "evidence_keys",
+                    "related_handles"}:
+                raise ValueError()
+            snapshot = WorkingItem.model_validate({
+                "item_id": item_id, "subject": projected["subject"],
+                "known_and_open": projected["known_and_open"],
+                "why_it_matters": projected["why_it_matters"],
+                "information_needed": projected["information_needed"],
+                "status": projected["status"], "priority": projected["priority"],
+                "source_refs": artifact["source_refs"],
+                "related_refs": projected["related_handles"],
+            }, strict=True)
+            content = _json(_project_item(snapshot, context))
+            if (artifact != {
                     "format_version": 1, "kind": "working_item",
                     "dataset_id": dataset_id, "document_id": document_id,
                     "run_id": run_id, "item_id": item_id,
                     "content_digest": _digest(content),
-                    "source_refs": item.source_refs,
+                    "source_refs": snapshot.source_refs,
                     } or message.content != content):
                 raise ValueError()
         except Exception:
             raise WorkingStateError() from None
-        result.add(item_id)
+        current = known.get(item_id)
+        if current is not None and current.source_refs == snapshot.source_refs:
+            result.add(item_id)
     return result
 
 

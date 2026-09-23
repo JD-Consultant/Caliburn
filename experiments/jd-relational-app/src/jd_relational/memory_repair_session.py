@@ -424,7 +424,7 @@ def model_layered_repair_schema() -> dict:
         },
         "diff": {
             "type": ["string", "null"],
-            "description": "action=revise 時填既有正文的 V4A diff；action=revalidate 時填 null。",
+            "description": "action=revise 時填既有正文的 V4A diff，未變及刪除行須逐字使用 read_work_understanding 回傳的完整原文行，不可拆分段內句子；action=revalidate 時填 null。",
         },
         "supporting_case_ids": {
             "type": "array", "items": {"type": "string"},
@@ -442,7 +442,7 @@ def model_layered_repair_schema() -> dict:
         },
         "case_diff": {
             "type": "string",
-            "description": "既有案例正文的 V4A diff，不是完整案例正文。",
+            "description": "既有案例正文的 V4A diff，不是完整案例正文；未變及刪除行須逐字使用 read_case 回傳的完整原文行，不可把段內句子拆成不存在的獨立行。",
         },
         "case_route_note": {
             "type": ["string", "null"],

@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方的 16K／待驗文字是當時 gate 的歷史狀態，不得覆蓋上方較新的正式設定與驗收邊界。
 
+**2026-09-23 C 工具 V4A 完整行提示補齊（最新；真模型待驗）：**已停止 C-W 試跑的 Saver 再核對：兩次 `repair_memory` 前的 `read_case` 都回傳單一段落，模型卻把段內句子拆成不存在的 V4A 獨立行；此核對與既有首敗紀錄一致，尚不能單憑 Saver 證明每次 provider request view 的完整內容。現有 SDK patch 指引要求完整原文行，正式 `repair_memory` 的模型可見 `case_diff`／理解 `diff` 說明原先沒有說透，現僅補「未變及刪除行須逐字使用對應 typed read 的完整原文行，不拆段內句子」。工具名稱、strict schema shape、C Domain／patch engine、錯誤回饋、重試上限、Memory 發布及模型路由均不改；離線 strict tool wire 核對包含新說明，相關測試 **40 passed**，新 App 全套在可存取暫存環境 **3,183 passed／323 skipped**。第一次受限環境全套的 96 個 setup errors 來自 pytest 暫存目錄 `WinError 5`，不計為產品失敗。**C 自然更正、背景完成、JD Q11 與完整長訪談仍 OPEN**；下一批必須另以有界真模型驗證，不把說明修正當成成效已證。[原始試跑與本次界線](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#c-v4a-完整行說明的窄修正與離線驗證)。
+
 **2026-09-23 C-W JD 首敗定位與來源錯引的分層核對（最新；唯讀）：**已停止合成 trial 的 root Saver 顯示，第一次出貨 Duty 寫入的 `container_ref` 是最新 `jd_read current` 發出的正確 duty 容器；無效的是 100 字元 `after_ref`，它不等於、也不是此前已發出 refs 的前綴，因此 `invalid_input` 未保存。模型重讀後使用完整且有效的排序 item_ref，卻把一個正確出貨 evidence key 換成無關的當輪庫存 key；第二次 committed，造成 Q11 假背書。**定位首敗與來源語意錯引分開處理**；單一觀測不足以推定長 ref 是唯一根因，也不授權正式改短 handle、JD authority 或加第二套 validator。若比較短 target handle，只做現有 JD owner 的零付費 model-view round-trip、scope／revision／kind 反例，再討論正式契約；自然來源品質仍 FAIL。[逐層證據](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#同一批試跑的-jd-來源語意唯讀核對一筆錯誤背書)。
 
 **2026-09-23 P3 背景首敗診斷補線（最新；零付費）：**只在既有 test-only P3 閘門記錄第一筆**外送前拒絕**的固定白名單錯誤碼、allowlisted 角色、已准入筆數與時間，不記模型內容／金鑰，不把拒絕算成付費 request。同步 B1 串行等待、非同步缺角色及未知錯誤文字不可落盤反例先紅後綠；受影響 **60 passed／0 failed**。這能讓下批試跑區分本機 admission 拒絕與已外送的 provider／transport 失敗，**不能倒推已停止批次的 B1 根因**；沒有改正式 App、背景、Memory、重試、模型路由或額度。[證據與界線](specs/evidence/2026-09-23-gpt6-cw-natural-trial.md#b1-失敗再定位第-141-筆後缺內層拒絕碼)。

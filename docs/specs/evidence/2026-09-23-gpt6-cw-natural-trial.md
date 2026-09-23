@@ -185,6 +185,12 @@ P3 每批既定上限 **180 筆實際模型外送／US$1.00**：本批 180 筆�
 
 下一個低成本 gate 是沿既有 C／Tool owner，在零付費真形狀測試重現「正文單段、模型產生分行 context」與第一次 `invalid_edit` 後重送相同 diff 的情境；先核對現有工具描述、SDK `apply_diff`、錯誤回饋與 retry guard，再提出最小 model-facing 修正及其受影響測試。不得先加重試次數、替模型自動改寫 diff、新建 patch engine 或重開 Memory 架構。即使 C 候選修正，還需另驗 A 在更正失敗後能誠實收尾、完成 JD 及最終品質；Browser 仍依 Owner 決定暫後。
 
+### C V4A 完整行說明的窄修正與離線驗證
+
+2026-09-23 再以停止的合成 trial Saver 唯讀核對：第一次 `repair_memory` 前 `read_case` ToolMessage 的 `content` 為單一 137 字元段落、無換行；第二次修補前重讀同一段落。前兩次候選 diff 各為四行，卻把段內句子當成獨立的未變／刪除行。這與上面的原始試跑結論相同，**不是新證據證明 compaction 丟失該段或 provider 未收到工具結果**。鎖定的 `caliburn_memory.patch.PATCH_GUIDANCE` 明文要求完整原文行，但正式 `repair_memory` 的模型可見參數說明原先只稱「V4A diff」；故只補 `case_diff` 與理解 `diff` 的完整原文行、不得拆分段內句子要求。這是本產品 SDK matcher 的契約提示，不宣稱 OpenAI／Anthropic 有本 App 的特定 schema；[OpenAI Apply Patch 公開指南](https://developers.openai.com/api/docs/guides/tools-apply-patch)（查閱 2026-09-23）只支持 V4A diff、失敗回報及由模型調整候選的一般做法。
+
+零付費檢查確認 `build_repair_tool()` 經鎖定 LangChain strict tool serializer 後仍為 `repair_memory`、root `required` 5／5，兩處新說明均實際出現在參數 schema；工具名稱、參數結構、C 保存規則、錯誤回饋與兩次失敗上限不變。相鄰離線測試 **40 passed**；新 App 全套第一次在受限 Windows 暫存目錄出現 96 個 `WinError 5` setup errors（3,087 passed／323 skipped），改在可存取的隔離暫存環境執行相同全套後為 **3,183 passed／323 skipped／0 failed**。本次沒有付費請求、沒有恢復或改寫舊 trial，也沒有驗證 Luna 會因描述而產生正確 diff；自然 C、更正後 A 收尾、B1、JD Q11 及完整品質驗收依然 OPEN。
+
 ### 同一批試跑的關停後唯讀盤點：背景中斷與 JD 半成品
 
 2026-09-23 使用同一隔離 PostgreSQL 的唯讀連線核對 Saver、背景 admission、JD current 與 P3 帳本；沒有恢復背景工作、重送失敗回合、送模型或修改產品。背景 dispatcher 的 `background_workflow_failed` 只表示 Future 以例外結束，log 本身未保存內層原因。Saver 的 B1 agent、B1 root 與外層 workflow `__error__` 均為 `OpenAIConnectionError('Connection error.')`；B1 agent 在三次已結算的 `background-case-maintainer` 請求及三次成功 `read_case` 後，下一個 model 節點沒有產生已結算的 B1 請求。外層 checkpoint 仍待 `run_b1`，admission 為 `running`／無 error code，沒有新 publication。鎖定 OpenAI SDK 會把底層一般例外（包括測試支出閘門可能拋出的拒絕）包成 `APIConnectionError`；Saver 只留下外層類別，**無法從此紀錄判定是 OpenRouter 連線、本機傳輸或 P3 閘門的哪一種內層原因**。事故時帳本尚未達 180 筆總上限，最終帳本為 active／180 已結算／無未知保留；不能因最後達上限，就反推較早的 B1 錯誤是該上限造成。背景失敗是本次自然 trial 的 OPEN，不是已證的 Memory 邏輯或發布錯誤。若要再定位，先沿既有 test-only 閘門與背景記錄邊界取得不含原話／密鑰的內層錯誤碼；不以猜測修改正式 dispatcher／Memory。

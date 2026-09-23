@@ -345,6 +345,38 @@ class _Projection:
             )
         return result
 
+    def locator_records(self):
+        """Short, read-only cues from this same saved revision; never writing refs."""
+        value, token = self.value, self.token
+        result = [
+            dict(type="section", section_ref=token("section", "section", name),
+                 section_key=name, title=title)
+            for name, title in SECTIONS.items()
+        ]
+
+        def cue(row, kind):
+            primary = row.get("name") or row.get("text") or row.get("description") or row.get("scope_text")
+            detail = (row.get("description") or row.get("scope_text")) if row.get("name") else None
+            if detail and detail != primary:
+                return f"{primary[:80]} — {detail[:80]}"
+            return (primary or f"未命名 {kind}")[:160]
+
+        for kind, collection in COLLECTIONS.items():
+            for identity, row in value[collection].items():
+                parent = (value["duties"].get(row["duty_id"])
+                          if kind == "task" and row["duty_id"] else
+                          value["tasks"].get(row["task_id"])
+                          if kind == "detail" else None)
+                result.append(dict(
+                    type="locator",
+                    read_ref=token("item", kind, identity),
+                    section_key=_section(kind, row),
+                    kind=row["kind"] if kind in {"detail", "capability", "condition"} else kind,
+                    label=cue(row, kind),
+                    parent_label=cue(parent, "parent")[:80] if parent else None,
+                ))
+        return result
+
 
 def content_projection(value, codec, purpose):
     """Share the fixed JD record/field projection with original change reads."""
@@ -493,7 +525,7 @@ class ReadService:
                     request.target_ref,
                     document_id=document_id,
                     roles=roles,
-                    purposes={"current", "history", "observation"},
+                    purposes={"current", "history", "observation", "navigation"},
                 )
             elif view in {"item", "section"}:
                 raise ReadError("invalid_input")
@@ -536,8 +568,12 @@ class ReadService:
             value = domain_from_snapshot(material.snapshot, revision)
             if value["document_id"] != document_id:
                 raise ReadError("read_failed")
-            records = _Projection(value, self.codec, access).records(
-                target if view in {"item", "section"} else None
+            records = (
+                _Projection(value, self.codec, "navigation").locator_records()
+                if view == "locator"
+                else _Projection(value, self.codec, access).records(
+                    target if view in {"item", "section"} else None
+                )
             )
             start = cursor.offset if cursor else 0
             if start > len(records) or cursor and start == len(records):

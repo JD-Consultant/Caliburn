@@ -54,6 +54,7 @@
           "type": "string",
           "enum": [
             "current",
+            "locator",
             "item",
             "section",
             "history"
@@ -89,7 +90,7 @@
         "target_ref",
         "cursor"
       ],
-      "description": "Read a complete current JD, an issued item or section, or historical revisions. All arguments are required. Use null target for current or the history index; use a returned cursor to continue exactly the same view. History is read-only."
+      "description": "Read a complete current JD, a short current-JD locator, an issued item or section, or historical revisions. All arguments are required. Use null target for current, locator or the history index; use a returned cursor to continue exactly the same view. Locator and history are read-only."
     },
     "SectionRecord": {
       "title": "SectionRecord",
@@ -129,6 +130,22 @@
         "section_key",
         "title"
       ]
+    },
+    "LocatorRecord": {
+      "title": "LocatorRecord",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "type": {"type": "string", "enum": ["locator"]},
+        "read_ref": {"type": "string", "minLength": 1, "maxLength": 4096,
+          "description": "App-issued read-only current-revision locator. Use with item view to read the body; not a writer target."},
+        "section_key": {"type": "string", "enum": ["profile", "purpose", "duties_tasks", "knowledge", "skills", "conditions"]},
+        "kind": {"type": "string", "enum": ["duty", "task", "outcome", "requirement", "knowledge", "skill", "collaborator", "work_environment", "schedule_travel", "shared_authority", "shared_collaboration", "qualification"]},
+        "label": {"type": "string", "description": "Short location cue from the saved JD, not complete body or evidence."},
+        "parent_label": {"anyOf": [{"type": "string"}, {"type": "null"}],
+          "description": "Saved parent duty/task cue, when one exists; not an authority to edit."}
+      },
+      "required": ["type", "read_ref", "section_key", "kind", "label", "parent_label"]
     },
     "ContainerRecord": {
       "title": "ContainerRecord",
@@ -500,6 +517,9 @@
       "title": "ReadRecord",
       "anyOf": [
         {
+          "$ref": "#/$defs/LocatorRecord"
+        },
+        {
           "$ref": "#/$defs/SectionRecord"
         },
         {
@@ -536,6 +556,7 @@
           "type": "string",
           "enum": [
             "current",
+            "locator",
             "item",
             "section",
             "history"

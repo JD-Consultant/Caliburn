@@ -27,11 +27,11 @@ from .domain import COLLECTIONS, CONDITION_KINDS, FIELDS
 MAX_TOKEN_BYTES = 4096
 MAX_SCOPE_BYTES = 256
 SECTION_IDS = frozenset({"profile", "purpose", "duties_tasks", "knowledge", "skills", "conditions"})
-Purpose = Literal["current", "history", "observation"]
+Purpose = Literal["current", "history", "observation", "navigation"]
 Role = Literal["item", "field", "container", "section", "revision", "operation", "change"]
 # `restore_preview` pages a comparison that has not been written; the cursor is
 # still an opaque signed token, like every other view's.
-View = Literal["current", "item", "section", "history", "change", "restore_preview"]
+View = Literal["current", "locator", "item", "section", "history", "change", "restore_preview"]
 _REF_SALT = "caliburn.jd.reference.v1"
 _CURSOR_SALT = "caliburn.jd.cursor.v1"
 _RUN_CURSOR_SALT = "caliburn.jd.run-change-cursor.v1"
@@ -97,7 +97,8 @@ class SignedReference(_Strict):
             _require(self.purpose in {"history", "observation"} and self.kind == "revision"
                      and _uuid(self.revision_id) and self.entity_id is None)
         else:
-            _require(self.purpose in {"current", "history"} and _uuid(self.revision_id))
+            _require(self.purpose in {"current", "history", "navigation"} and _uuid(self.revision_id))
+            _require(self.purpose != "navigation" or self.role in {"item", "section"})
             if self.role == "item":
                 _require(self.kind in COLLECTIONS and _uuid(self.entity_id))
             elif self.role == "field":
@@ -141,7 +142,7 @@ class ReadCursor(_Strict):
             _require(self.target is None and _uuid(self.operation_id))
         else:
             _require(self.operation_id is None)
-            if self.view == "current":
+            if self.view in {"current", "locator"}:
                 _require(self.target is None)
             elif self.view in {"item", "section"}:
                 _require(self.target is not None and self.target.role == self.view)

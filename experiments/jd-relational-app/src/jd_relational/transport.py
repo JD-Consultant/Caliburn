@@ -43,7 +43,7 @@ MODEL_MODELS = {"jd_create_task": ModelCreateTaskInput, "jd_revise_work": ModelR
 MODELS = MODEL_MODELS
 DESCRIPTIONS = {
     "jd_set_text": "單独修改一個既有欄位的完整文字。多欄相依更正用 jd_revise_work；選區修改用 jd_replace_selection。保留未知，不用清空模擬刪除項目。",
-    "jd_insert_item": "新增職責、協作對象、知識、技能、成果、要求或全職位條件。container_ref 必須從最新一次成功的 jd_read current 中，按 type=container 的 child_kind／owner_ref 選擇相符種類並原樣複製；不可使用 item_ref 或 type=item 記錄中的 container_ref，不可推算、縮短或沿用舊值。未知內容可空，任務改用 jd_create_task 一次建立。",
+    "jd_insert_item": "新增職責、協作對象、知識、技能、成果、要求或全職位條件。container_ref 必須從已完整讀取的同版 jd_read current／item／section 正文中，按 type=container 的 child_kind／owner_ref 選擇相符種類並原樣複製；locator 清單不是正文或寫入依據。不可使用 item_ref 或 type=item 記錄中的 container_ref，不可推算、縮短或沿用舊值。未知內容可空，任務改用 jd_create_task 一次建立。",
     "jd_delete_item": "依明確意圖刪除項目。刪职責保留其任務及子項並解除分組；仍被任務引用的知識技能不能直接刪。刪職責可同次補齊存活任務的必要範圍，其他刪除不帶內容更正。",
     "jd_move_item": "將任務移至另一職責或未分組，或在同一清單重排項目；保留身分、子項及引用。任務換組可一併修正相關範圍；不要刪除後重建，也不要改不相關工作。",
     "jd_set_task_capability": "新增或解除任務對既有知識或技能的引用；使用已發配refs，不用名稱猜測。解除引用不刪共用定義、不影響其他任務；unlink時basis_evidence_keys為空。",

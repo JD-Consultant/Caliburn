@@ -8,10 +8,12 @@ from .reads import ReadError, read_json
 from .transport import TransportError
 
 DESCRIPTION = (
-    "讀取目前完整 JD、指定項目／章節或唯讀歷史。current 的 target_ref 為 null；"
-    "item／section 使用先前讀取的同類 ref；history 的 null target 列歷史，revision ref 讀舊稿。"
+    "讀取目前完整 JD、當前版本的短定位清單、指定項目／章節或唯讀歷史。"
+    "current／locator 的 target_ref 為 null；locator 只列章節、項目與簡短位置線索，不能當正文或修改依據。"
+    "item／section 使用先前讀取的同類 ref，先讀完整相關正文與關聯再修改；history 的 null target 列歷史，revision ref 讀舊稿。"
     "has_more 為 true 必須沿原 view／target_ref 與 next_cursor 續讀；不可將缺頁當完整工作。"
-    "開始撰寫、收到人工更改通知或定位過時時先讀 current；歷史 refs 不可寫入。"
+    "開始撰寫、收到人工更改通知或定位過時時先讀最新 locator 或 current；不確定候選範圍時擴讀章節或完整 current。"
+    "locator 和歷史 refs 不可直接寫入；正文讀取才發出可用的當前 refs。"
     "欄位全文、任務成果要求與 K/S 關係可查；source readability 與 basis_status 是不同事實。"
     "type=item 記錄中的 container_ref 只表示目前父清單，不是新增子項的目標；"
     "新增子項應從 type=container 記錄依 child_kind／owner_ref 配對後取 container_ref。"

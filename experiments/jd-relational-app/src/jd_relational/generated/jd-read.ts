@@ -10,7 +10,14 @@
  * via the `definition` "ReadRecord".
  */
 export type ReadRecord =
-  SectionRecord | ContainerRecord | ItemRecord | FieldRecord | RelationRecord | SourceRecord | RevisionRecord;
+  | LocatorRecord
+  | SectionRecord
+  | ContainerRecord
+  | ItemRecord
+  | FieldRecord
+  | RelationRecord
+  | SourceRecord
+  | RevisionRecord;
 /**
  * This interface was referenced by `ReadCatalog`'s JSON-Schema
  * via the `definition` "ChangeReadRecord".
@@ -36,13 +43,13 @@ export interface ReadCatalog {
   source_read_page: SourceReadPage;
 }
 /**
- * Read a complete current JD, an issued item or section, or historical revisions. All arguments are required. Use null target for current or the history index; use a returned cursor to continue exactly the same view. History is read-only.
+ * Read a complete current JD, a short current-JD locator, an issued item or section, or historical revisions. All arguments are required. Use null target for current, locator or the history index; use a returned cursor to continue exactly the same view. Locator and history are read-only.
  *
  * This interface was referenced by `ReadCatalog`'s JSON-Schema
  * via the `definition` "ReadInput".
  */
 export interface ReadInput {
-  view: "current" | "item" | "section" | "history";
+  view: "current" | "locator" | "item" | "section" | "history";
   target_ref: string | null;
   cursor: string | null;
 }
@@ -54,7 +61,7 @@ export interface ReadInput {
  */
 export interface ReadPage {
   format_version: number;
-  view: "current" | "item" | "section" | "history";
+  view: "current" | "locator" | "item" | "section" | "history";
   access: "current" | "history";
   revision_ref: string;
   records: ReadRecord[];
@@ -63,6 +70,39 @@ export interface ReadPage {
   has_more: boolean;
   next_cursor: string | null;
   oversized_unit: boolean;
+}
+/**
+ * This interface was referenced by `ReadCatalog`'s JSON-Schema
+ * via the `definition` "LocatorRecord".
+ */
+export interface LocatorRecord {
+  type: "locator";
+  /**
+   * App-issued read-only current-revision locator. Use with item view to read the body; not a writer target.
+   */
+  read_ref: string;
+  section_key: "profile" | "purpose" | "duties_tasks" | "knowledge" | "skills" | "conditions";
+  kind:
+    | "duty"
+    | "task"
+    | "outcome"
+    | "requirement"
+    | "knowledge"
+    | "skill"
+    | "collaborator"
+    | "work_environment"
+    | "schedule_travel"
+    | "shared_authority"
+    | "shared_collaboration"
+    | "qualification";
+  /**
+   * Short location cue from the saved JD, not complete body or evidence.
+   */
+  label: string;
+  /**
+   * Saved parent duty/task cue, when one exists; not an authority to edit.
+   */
+  parent_label: string | null;
 }
 /**
  * This interface was referenced by `ReadCatalog`'s JSON-Schema

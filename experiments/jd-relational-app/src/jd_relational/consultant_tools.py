@@ -19,8 +19,12 @@ from langchain_core.tools import StructuredTool
 from langgraph.config import get_config
 from langgraph.errors import GraphBubbleUp
 from langgraph.types import Command
+from pydantic import ValidationError
 
 from .change_transport import DESCRIPTION as CHANGE_DESCRIPTION, change_tool_output, parse_change_arguments
+from .continuation_compaction import (
+    A_COMPACTION_PROFILE, ContinuationCompactionError, build_request_view,
+)
 from .generated.reads import ChangeReadInput, ReadInput, ReadPage
 from .intents import AdmittedIdentity, BoundEdit, IntentValidationError, bind_edit
 from .memory_context import MEMORY_READ_NAMES, bind_memory_read_request
@@ -614,6 +618,89 @@ class AiToolSession:
         except Exception:
             raise ReadError("read_required") from None
 
+    def _completed_read_refs(self, state, revision_id):
+        """Only complete, model-visible current reads can support a JD command."""
+        try:
+            canonical = list(state.get("messages", ()))
+            try:
+                visible = build_request_view(
+                    canonical, state.get("continuation_compaction"), A_COMPACTION_PROFILE,
+                )
+            except ContinuationCompactionError:
+                # The existing model middleware uses the canonical request view
+                # when a damaged summary is below its hard input limit.
+                visible = canonical
+            requests, active, completed = {}, {}, set()
+            for message in visible:
+                if isinstance(message, AIMessage):
+                    for call in message.tool_calls:
+                        if call.get("name") == "jd_read":
+                            call_id = call.get("id")
+                            if call_id in requests:
+                                raise ValueError()
+                            try:
+                                requests[call_id] = parse_read_arguments(call.get("args"))
+                            except (ReadError, TransportError):
+                                # An earlier bad call must not poison a later,
+                                # valid and complete read in the same request view.
+                                continue
+                if not isinstance(message, ToolMessage) or message.name != "jd_read":
+                    continue
+                request = requests.pop(message.tool_call_id, None)
+                if request is None or message.status != "success":
+                    continue
+                try:
+                    canonical_result, _ = _decode_jd_read_message(
+                        message, name="jd_read", call_id=message.tool_call_id,
+                        **self.scope,
+                    )
+                    page = ReadPage.model_validate(canonical_result, strict=True)
+                except (AiToolError, ReadError, TransportError, ValidationError):
+                    continue
+                if page.access != "current" or page.view not in {"current", "item", "section"}:
+                    continue
+                ref = self.codec.resolve(
+                    page.revision_ref, document_id=self.document_id,
+                    roles={"revision"}, purposes={"history"},
+                )
+                if ref.revision_id != revision_id:
+                    continue
+                key = (page.view, request["target_ref"])
+                sequence = (None if request["cursor"] is None else active.get(key))
+                if sequence is None:
+                    if request["cursor"] is not None or page.start_index != 0:
+                        active.pop(key, None)
+                        continue
+                    sequence = {"cursor": None, "offset": 0, "total": page.total_records, "refs": set()}
+                if (request["cursor"] != sequence["cursor"]
+                        or page.start_index != sequence["offset"]
+                        or page.total_records != sequence["total"]):
+                    active.pop(key, None)
+                    continue
+                for record in page.records:
+                    for field, token in record.model_dump(mode="json").items():
+                        if not field.endswith("_ref") or not isinstance(token, str):
+                            continue
+                        try:
+                            self.codec.resolve(
+                                token, document_id=self.document_id,
+                                roles={"item", "field", "container"}, purposes={"current"},
+                                revision_id=revision_id,
+                            )
+                        except Exception:
+                            continue
+                        sequence["refs"].add(token)
+                sequence["offset"] += len(page.records)
+                sequence["cursor"] = page.next_cursor
+                if page.has_more:
+                    active[key] = sequence
+                elif sequence["offset"] == sequence["total"]:
+                    completed.update(sequence["refs"])
+                    active.pop(key, None)
+            return completed
+        except Exception:
+            raise ReadError("read_required") from None
+
     def prepare(self, state, runtime=None):
         message = state["messages"][-1]
         if not isinstance(message, AIMessage) or message.invalid_tool_calls:
@@ -668,6 +755,8 @@ class AiToolSession:
                 base = self._read_base(state)
                 original = self.history.read_revision(self.document_id, base)
                 context = command_context(original.domain, command, self.codec, self.source_resolver, lambda: str(uuid4()))
+                if not context.refs or not set(context.refs).issubset(self._completed_read_refs(state, str(base))):
+                    raise ReadError("read_required")
                 intent = bind_edit(uuid4(), "ai", self.run_id, command, context)
                 binding = {"format_version": 1, **self.scope, "message_id": message.id, "tool_call_id": call_id,
                     "input_digest": digest, "operation_id": str(intent.operation_id), "base_revision_id": str(base),

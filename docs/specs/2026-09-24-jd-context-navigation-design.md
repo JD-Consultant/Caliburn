@@ -1,6 +1,6 @@
 # JD 按需導覽與正文讀取：設計審查稿
 
-- 日期／階段：2026-09-24；G4 **Proposed**。Owner 已同意「導覽定位、讀正文後修改、必要時讀全稿」的效果；2026-09-24 依 Codex／Claude Code 大型 repo 導覽方式複核後，原「固定六章入口＋outline」改列**待比較候選**，不再當作已決實作。wire／引用實現仍待審查，**不授權 production 施工**。
+- 日期／階段：2026-09-24；G4 **Proposed**。Owner 已同意「導覽定位、讀正文後修改、必要時讀全稿」的效果，並於 2026-09-24 同意以「按任務定位、按需讀正文、追查關聯、修改後驗證」作為設計首選。依 Codex／Claude Code 大型 repo 導覽方式複核後，原「固定六章入口＋outline」改列**待比較候選**，不再當作已決實作。現有工具能否充分定位、是否需要新唯讀入口、wire／引用實現仍待離線 gate 審查；這項方向同意**不授權 production 施工**。
 - 範圍：正式新 App 的 A 主顧問讀取 **current JD**。不改 B1／B2／C、Memory、來源 authority、JD Domain、保存／撤回、Prompt／Skills 或模型路由。
 - 既有權責：[跨顧問來源與 JD 契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)、[完整工作分析](2026-09-09-complete-work-analysis-guide.md)、[JD 寫作指南](2026-09-09-jd-field-and-writing-guide.md)、[品質驗收](2026-09-10-jd-product-quality-acceptance.md)、[ADR 0075](../adr/0075-relational-jd-authority-and-structured-editor.md)及[ADR 0077](../adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)不由本稿取代。
 

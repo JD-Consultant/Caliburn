@@ -42,3 +42,13 @@ Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；
 只針對該筆 OpenRouter generation ID `gen-1790128923-QJZK4Si2WZ9VwME2iJ8Q` 做一次唯讀 metadata 查詢，回報實際模型 `openai/gpt-6-luna-20260922`、provider `OpenAI`、tier `default`、`finish_reason=length`、`native_finish_reason=max_output_tokens`、completion 上限 2,048，其中 reasoning 1,611、可見輸出 458 tokens，`total_cost=US$0.0013058`、未取消。這是獨立的服務端費用與截斷證據，**沒有回寫或結清原 P3 帳本**。與首批 90 秒 `transport_unknown` 不同，本批失敗是已證的摘要輸出額度不足，不能把兩次都歸因於 timeout，也不能宣稱 JD／Browser 通過。
 
 官方 [OpenAI Reasoning 指南](https://developers.openai.com/api/docs/guides/reasoning)（查閱 2026-09-23）說明 `max_output_tokens` 同時涵蓋 reasoning 與可見輸出，耗盡時可能回 `status=incomplete`／`incomplete_details.reason=max_output_tokens`。本案沒有因此新建摘要引擎或降低 A 推理等級；只把正式 A summary 的有界上限從 2,048 提高到 B1／B2 已使用的 **8,192**，通用 profile default 仍 2,048。與前批相同，必須在另一個新隔離目標以現行費用閘門再次自然驗證；原失敗回合不重送。
+
+## 第三批獨立試跑：8,192 摘要越過首敗，但 JD 仍未產生
+
+隔離目標 `jd-ui-gate-679488ebeae946ae904bfb60102b74fe`、dataset `ad97e073-6599-4c36-85d6-714a5b04c893`、文件 `6fbd6142-73ff-4286-8285-73e7257a1170`，凍結程式 `ae9cc2eb7f40753660aedbd7cad135bfaa523f6e`。同一 C-W 扮演卡、正式新 App API、12 輪／180 模型請求／US$1.00 獨立閘門；開場照卡片，後續只按實際追問回答。前六輪 `completed` 且原話與回覆保存，A／B1／B2 均有真模型請求；第七輪請求先就已確定工作形成暫定 JD，未查證盤點頻率維持未知。
+
+第七輪多筆 A `max_output_tokens=8192` 請求已正常結算，確實越過第二批原本的 2,048 摘要截斷點。然而顧問在同一輪的 Saver 中呼叫 `read_file` **6** 次、`jd_read` **3** 次、`read_work_understanding` **6** 次、`read_case` **4** 次及 `read_evidence` **5** 次，JD writer 工具 **0** 次。inspection-only 查得最新已保存摘要有工作事實、未知、JD／Memory 讀取及引用線索；同樣資料反覆讀取是真實觀察，但**不能據此斷言唯一原因是 compaction、Prompt 或模型品質**。JD 編輯 Skill 明文允許已足夠理解的部分先寫、未知留空，因此這是待定位的「使用者要求暫定 JD，卻未進 writer」語意／進度缺口，不以修改 Skill 或新增 Agent 猜測修復。
+
+第 **110** 筆實際 provider 請求（A、8,192 上限）HTTP 200 但回覆未完成，P3 閘門以 `provider_response_incomplete` 停止，109 筆已結算 **US$0.075124560**、最後一筆保留 **US$0.268644** 未知額度。第七輪 `failed`、員工輸入 `saved`、JD effects `settled` 但結果空、無 final；JD writer 仍 0。依既有停止入口確認 App／Saver 關閉，原帳本不重送、不清零。對最後一筆 generation ID 的唯讀 metadata GET 回 **404**，相鄰成功第 109 筆同端點／同 credential 回 **200**，所以不能由此次 404 推定錯誤 key 或憑空推算末筆費用，也不能把這次 8,192 未完成再歸因於 `max_output_tokens`；服務端具體 `incomplete_details.reason` 尚缺。
+
+官方 [OpenAI Reasoning 指南](https://developers.openai.com/api/docs/guides/reasoning)與 [OpenRouter Responses 契約](https://openrouter.ai/docs/api/api-reference/responses/create-responses)（查閱 2026-09-23）都描述 `incomplete_details.reason`；本次 test-only P3 閘門原先只保存概括的 incomplete 狀態，未保存該安全枚舉。離線反例先紅後綠後，僅補記受限的 `observed_status`、`observed_incomplete_reason` 和已回覆的 `observed_cost_usd`，**不保存回應內容、不把 observed cost 當成 settled、不解除未知預留或增加重試**。本批原帳本無法回填缺失原因；後續先從此證據缺口和重讀路徑作定向診斷，再決定是否需要產品變更。Browser、JD 初稿與最終成品質量仍 OPEN。

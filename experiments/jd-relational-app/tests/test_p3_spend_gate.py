@@ -311,6 +311,28 @@ def test_unfinished_responses_reply_stops_trial_after_accounting_unknown(
     assert spend.snapshot()["status"] == "stopped"
 
 
+def test_incomplete_reply_records_bounded_reason_and_observed_cost_without_settling(tmp_path):
+    spend = gate(tmp_path)
+    sent = request()
+    wire = response(sent, cost="0.0013058").json()
+    wire["status"] = "incomplete"
+    wire["incomplete_details"] = {"reason": "max_output_tokens"}
+    wire["output"][0]["content"][0]["text"] = "private synthetic interview text"
+    spend.begin(sent)
+
+    with pytest.raises(BudgetGateError, match="provider_response_incomplete"):
+        spend.complete(httpx.Response(200, json=wire, request=sent))
+
+    state = json.loads((tmp_path / "p3-spend-ledger.json").read_text(encoding="utf-8"))
+    attempt = state["attempts"][0]
+    assert attempt["observed_status"] == "incomplete"
+    assert attempt["observed_incomplete_reason"] == "max_output_tokens"
+    assert attempt["observed_cost_usd"] == "0.0013058"
+    assert state["spent_usd"] == "0"
+    assert state["retained_unknown_usd"] == "0.268644"
+    assert "private synthetic interview text" not in json.dumps(state)
+
+
 def test_duplicate_response_cannot_charge_or_release_twice(tmp_path):
     spend = gate(tmp_path)
     sent = request()

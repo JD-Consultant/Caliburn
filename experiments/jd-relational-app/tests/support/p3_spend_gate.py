@@ -17,6 +17,7 @@ import json
 import math
 import os
 from pathlib import Path
+import re
 from threading import Condition, RLock
 from time import monotonic
 from typing import Any
@@ -248,8 +249,22 @@ class LunaBudgetPolicy:
 
         for field in ("model", "provider", "service_tier"):
             keep(value, field, f"observed_{field}")
+        if value.get("status") == "incomplete":
+            facts["observed_status"] = "incomplete"
+            details = value.get("incomplete_details")
+            if type(details) is dict:
+                reason = details.get("reason")
+                if type(reason) is str and re.fullmatch(r"[a-z_]{1,48}", reason):
+                    facts["observed_incomplete_reason"] = reason
         usage = value.get("usage")
         facts["observed_cost_present"] = type(usage) is dict and "cost" in usage
+        if type(usage) is dict and type(usage.get("cost")) in (str, int, float):
+            try:
+                observed_cost = Decimal(str(usage["cost"]))
+                if observed_cost.is_finite() and observed_cost >= 0:
+                    facts["observed_cost_usd"] = str(observed_cost)
+            except InvalidOperation:
+                pass
         routing = value.get("openrouter_metadata")
         endpoints = routing.get("endpoints") if type(routing) is dict else None
         available = endpoints.get("available") if type(endpoints) is dict else None

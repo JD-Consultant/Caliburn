@@ -35,7 +35,7 @@ _ROLE_OUTPUT_LIMITS = {
     "background-understanding-maintainer": 32768,
 }
 _ROLE_SUMMARY_LIMITS = {
-    "consultant": 2048,
+    "consultant": 8192,
     "background-case-maintainer": 8192,
     "background-understanding-maintainer": 8192,
 }

@@ -32,3 +32,13 @@ Browser 的建立／自然訪談／改動查看／來源／撤回仍 **OPEN**；
 2026-09-23 只改正式新 App 的 A 模型工廠預設 `request_timeout` 由 90 秒為 300 秒；B1／B2、同一模型／Responses endpoint、零隱藏重試、支出帳本與 JD／Memory 權責不變。測試先證明舊工廠回傳 A=90／B1=B2=300 的紅燈，再驗證 A=B1=B2=300 的綠燈；受影響集合 **44 passed／4 skipped**，完整新 App 離線 **3,172 passed／323 skipped／0 failed**。首次完整執行受 Windows 沙盒 pytest 暫存 ACL 阻擋；可存取環境重跑後沒有該錯誤，既有 warnings 為 95。
 
 這只驗證新 client 設定已送到既有模型工廠，不把「延長等待」推論為前次根因或品質修復。前一批 `transport_unknown` 原帳本繼續停止，未知費用預留不清零；下一批必須使用新的隔離目標／帳本與明確上限。Browser 因 Codex 自動控制受限暫緩，仍獨立 OPEN，不以 API 旅程代稱通過。
+
+## 第二批獨立 C-W 自然試跑：A 摘要輸出截斷
+
+第二批使用另一隔離目標 `jd-ui-gate-c13dd32e24bc475183473cca696db82c`、dataset `3ffc3327-9a8c-4835-860d-6f2df35d86d7`、文件 `7ad1cc29-9f1d-492c-bd9b-ea3143560eae`，凍結程式 `ae93fd3c9bdc01af4f19a4ae8ef3a0c2044f30b8`。仍限最多 12 次員工輸入／180 次實際 provider request／US$1.00，GPT-6 Luna Responses、OpenAI-only、`store=false`、零 hidden retry；沒有使用前批未知請求或重送前批第 7 輪。正式新 App API 建立文件；初次請求漏帶正式 dataset header 得到 `409 dataset_changed`，依既有契約補上後才進入自然訪談，未改產品。前 6 輪均有 final，A 自主通知背景 B1／B2；第 7 輪要求依已確認事實形成暫定 JD，未確認的盤點頻率維持待查。
+
+第 7 輪正式 JD writer execute 為 **0**，`run_status=failed`、員工原話 `saved`、JD effects `settled` 但結果空、無 final。第 49 筆實際模型請求是 A 的 continuation summary，wire 的 `max_output_tokens=2048`；服務端 HTTP 200 卻回未完成。P3 test-only 帳本按既有 fail-closed 規則停在 `provider_response_incomplete`，48 筆已結算 **US$0.027235260**，末筆保留 **US$0.264036** 的保守未知額度，不當成零費用或逕自解除停止；App 與 Saver 依既有 stop 流程確認關閉。
+
+只針對該筆 OpenRouter generation ID `gen-1790128923-QJZK4Si2WZ9VwME2iJ8Q` 做一次唯讀 metadata 查詢，回報實際模型 `openai/gpt-6-luna-20260922`、provider `OpenAI`、tier `default`、`finish_reason=length`、`native_finish_reason=max_output_tokens`、completion 上限 2,048，其中 reasoning 1,611、可見輸出 458 tokens，`total_cost=US$0.0013058`、未取消。這是獨立的服務端費用與截斷證據，**沒有回寫或結清原 P3 帳本**。與首批 90 秒 `transport_unknown` 不同，本批失敗是已證的摘要輸出額度不足，不能把兩次都歸因於 timeout，也不能宣稱 JD／Browser 通過。
+
+官方 [OpenAI Reasoning 指南](https://developers.openai.com/api/docs/guides/reasoning)（查閱 2026-09-23）說明 `max_output_tokens` 同時涵蓋 reasoning 與可見輸出，耗盡時可能回 `status=incomplete`／`incomplete_details.reason=max_output_tokens`。本案沒有因此新建摘要引擎或降低 A 推理等級；只把正式 A summary 的有界上限從 2,048 提高到 B1／B2 已使用的 **8,192**，通用 profile default 仍 2,048。與前批相同，必須在另一個新隔離目標以現行費用閘門再次自然驗證；原失敗回合不重送。

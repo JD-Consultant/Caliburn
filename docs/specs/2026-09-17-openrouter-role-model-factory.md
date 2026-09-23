@@ -13,6 +13,8 @@
 
 > **2026-09-23 GPT-6 Responses／C-W timeout successor：**本稿的 GPT-5.6 Chat route／A 90 秒是當時 profile；[GPT-6 Responses 遷移](2026-09-23-gpt6-luna-responses-migration.md)已取代正式模型傳輸。在首批自然 C-W 試跑的單筆 A 90 秒結果未知後，只將 GPT-6 A 模型工廠的預設單請求等待上限改為 300 秒，B1／B2 原有 300 秒及 hidden retry 0 不變。這是由實測失敗與現行角色預算作出的 Caliburn guardrail 調整，不是供應商規定，也不是前次根因已證；零付費邊界回歸完成，真實自然複驗仍待進行。詳見[試跑記錄](evidence/2026-09-23-gpt6-cw-natural-trial.md)。
 
+> **2026-09-23 C-W A 摘要 successor：**第二批真實試跑已越過前次 90 秒處，但在 A 的 2,048-token continuation summary 請求取得服務端 `max_output_tokens` 截斷。只提高 A 摘要上限至 **8,192**，不提高 A 主回答的 8,192 或 B1／B2 現有的 8,192 摘要／32,768 主回答；零隱藏重試、同一模型與費用保護不變。這是實測驅動的 Caliburn guardrail，非供應商規定或品質通過證據。詳見[compaction successor](2026-09-16-openrouter-continuation-compaction-design.md)及[試跑記錄](evidence/2026-09-23-gpt6-cw-natural-trial.md)。
+
 ## 1. 目的與既有決策
 
 Caliburn 只有一個 App 與一個 OpenRouter credential。正式模型路徑維持：

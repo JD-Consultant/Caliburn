@@ -126,6 +126,7 @@ class CompactionProfile(BaseModel):
 
 A_COMPACTION_PROFILE = CompactionProfile(
     summary_instructions=A_SUMMARY_INSTRUCTIONS,
+    summary_max_output_tokens=8192,
     protect_latest_human_turn=False,
     preserve_latest_human_message=True,
 )

@@ -10,6 +10,8 @@
 
 > **2026-09-17 正式背景限制 successor：**A 維持既有 8,192 主輸出、2,048 summary、90 秒及原步數／工具限制。B1／B2 由 App 正式 profile 提高到 32,768 主輸出、8,192 summary、300 秒；trigger 仍為實際組裝 request view 的 16,000 input tokens，保留最近 8 個安全訊息／完整工具 wave。提高輸出預留只改背景角色可用容量，不讓 compaction 壓縮 runtime context、未處理訪談、canonical source、引用或 Memory；也沒有新增隱藏重送。精確值與理由由[角色模型工廠](2026-09-17-openrouter-role-model-factory.md)持有，本稿不再保存第二份設定權威。
 
+> **2026-09-23 A 摘要容量 successor：**GPT-6 Luna Responses 第二批自然 C-W 訪談的第 7 輪，A 的 continuation summary 請求達 2,048 `max_output_tokens` 而被服務端標成 `incomplete`；同筆唯讀 generation metadata 回報 `finish_reason=length`、`native_finish_reason=max_output_tokens`、1,611 reasoning tokens。這證明原 2,048 上限對這次 high-reasoning 摘要不足，並非本次 300 秒等待不足。只在正式 A profile 把 summary 上限提高到 **8,192**，與現行 B1／B2 相同；通用 profile default、選材、boundary、canonical Saver、Memory、JD、同一步只摘要一次與失敗時不發布的規則不變。8,192 是根據本案實測及現有角色上限的有界產品設定，不是供應商保證足夠；新自然試跑仍須驗證。原 2,048 為本稿第一版歷史值，不再是正式 A 值。詳見[自然試跑證據](evidence/2026-09-23-gpt6-cw-natural-trial.md)及 [OpenAI Reasoning 指南](https://developers.openai.com/api/docs/guides/reasoning)（查閱 2026-09-23；輸出額度包含推理與可見輸出、超額可回 `incomplete`）。
+
 > **2026-09-16 CTX-W001 邊界：**主顧問在尚無 Memory、尚未觸發 compaction 或一次無法問完時所需的 Focus／待追查事項，由 [CTX-W001 訪談 Working State](2026-09-16-consultant-interview-working-state-design.md)另行承接。它與 continuity summary 都是非權威衍生狀態，但責任不同；summary 不可成為 Working State 的唯一 owner，Working State 也不取代長對話 compaction。
 
 > **2026-09-16 G7 第一小步結果：**已新增尚未接入正式 A／B2 的共用 typed state、role profile、安全工具 wave 切點、canonical prefix digest、增量 summary prompt、request-only view 與同步 middleware。鎖定 LangChain 的真實 `create_agent`／Saver 離線反例共 12 項通過，涵蓋 canonical 不變、B2 固定任務、跨 graph 重建恢復、依實際 view 判斷、主模型失敗或截斷不發布、取消與截斷摘要拒絕。這只是基礎接點，不代表 A 與 B2 已改線、OpenRouter 自然 smoke 通過或 H4 完成；下一步才是 A 的真實 middleware 組合與 Command 累積反例。

@@ -99,11 +99,12 @@ def test_policy_reserves_full_standard_long_context_and_role_output():
     assert policy.reserve_for(payload(max_tokens=32768)) == Decimal("0.287076")
 
 
-def test_role_cannot_disguise_a_different_output_limit(tmp_path):
+@pytest.mark.parametrize("limit", [2048, 32768])
+def test_role_cannot_disguise_a_different_output_limit(tmp_path, limit):
     spend = gate(tmp_path)
 
     with pytest.raises(BudgetGateError, match="request_role_mismatch"):
-        spend.begin(request(max_tokens=32768), role="consultant")
+        spend.begin(request(max_tokens=limit), role="consultant")
 
     assert spend.snapshot()["attempt_count"] == 0
 
@@ -581,12 +582,12 @@ def test_formal_a_b1_b2_factory_uses_the_same_guarded_wire(tmp_path):
             )
             for model in (roles.consultant, roles.case, roles.understanding):
                 model.invoke("合成輸入")
-            roles.consultant.invoke("合成摘要", max_tokens=2048)
+            roles.consultant.invoke("合成摘要", max_tokens=8192)
             roles.case.invoke("合成背景摘要", max_tokens=8192)
         finally:
             asyncio.run(async_client.aclose())
 
-    assert observed_limits == [8192, 32768, 32768, 2048, 8192]
+    assert observed_limits == [8192, 32768, 32768, 8192, 8192]
     state = spend.snapshot()
     assert state["attempt_count"] == 5
     assert state["spent_usd"] == "0.015"

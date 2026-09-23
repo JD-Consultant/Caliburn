@@ -434,7 +434,7 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
         create_consultant_model,
     )
     from jd_relational.continuation_compaction import (
-        CompactionProfile,
+        A_COMPACTION_PROFILE,
         ContinuationCompaction,
         ContinuationCompactionMiddleware,
     )
@@ -469,7 +469,10 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
             async_http_client=async_client, request_timeout=5, max_output_tokens=64)
         compaction = ContinuationCompactionMiddleware(
             summary_model=model,
-            profile=CompactionProfile(trigger_input_tokens=1, keep_messages=1),
+            profile=A_COMPACTION_PROFILE.model_copy(update={
+                'trigger_input_tokens': 1,
+                'keep_messages': 1,
+            }),
             token_counter=lambda request, view: 100,
         )
         child = build_consultant_node(
@@ -495,7 +498,7 @@ def test_a_compaction_and_jd_notice_commands_are_saved_together():
         asyncio.run(async_client.aclose())
 
     assert len(payloads) == 2
-    assert payloads[0]['max_output_tokens'] == 2048
+    assert payloads[0]['max_output_tokens'] == 8192
     assert [payload['model'] for payload in payloads] == [CONSULTANT_MODEL] * 2
     assert [payload['provider'] for payload in payloads] == [
         {

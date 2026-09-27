@@ -26,12 +26,12 @@ export default function ChatPanel({ snapshot, chat, controller, archived, holdin
     && (!original || original.request.run_id === chat.runId) ? chat.run : null;
   const committed = run?.jd_effects.results.filter(result => result.status === 'committed') ?? [];
   const pendingNotInHistory = original && !chat.messages.some(message => message.role === 'user' && message.run_id === original.request.run_id);
-  return <Paper component="section" aria-label="工作訪談" sx={{ p: 2.5, alignSelf: 'start', minWidth: 0 }}>
+  return <Paper component="section" aria-label="工作訪談" variant="outlined" sx={{ p: 2.5, alignSelf: 'start', minWidth: 0 }}>
     <Chip label="你的工作顧問" size="small" variant="outlined" />
     <Typography variant="h6" sx={{ mt: 2 }}>從實際工作，逐步整理。</Typography>
     <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>說說你負責的工作、實際例子與需要更正的地方。資料足夠時，AI 會整理到右側 JD。</Typography>
     <Divider sx={{ my: 2 }} />
-    <Box sx={{ maxHeight: '55vh', overflowY: 'auto', overflowWrap: 'anywhere' }}>
+    <Box sx={{ maxHeight: '72vh', overflowY: 'auto', overflowWrap: 'anywhere' }}>
       {chat.page?.next_cursor && <Button disabled={chat.busy} onClick={() => void controller?.more()}>載入較早對話</Button>}
       {chat.loading && <Typography role="status">讀取已保存的對話…</Typography>}
       {!chat.loading && !chat.messages.length && <Typography color="text.secondary" sx={{ mb: 2 }}>可以先從「我平常負責……」開始。不用一次說完。</Typography>}

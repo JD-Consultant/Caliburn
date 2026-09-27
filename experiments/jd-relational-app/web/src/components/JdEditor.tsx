@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Alert, Box, Button, Divider, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, Chip, Divider, Paper, Stack, TextField, Typography } from '@mui/material';
 import type { ContainerRecord } from '../../../src/jd_relational/generated/jd-read.ts';
 import type { ManualCommand } from '../../../src/jd_relational/generated/jd-manual-http.ts';
 import { containerKey, fieldLabels, kindLabels, sourceSummary, sourcesFor, type FieldView, type ItemView, type JdView } from '../lib/view';
@@ -82,10 +82,12 @@ export default function JdEditor({ view, disabled, commandsDisabled = false, val
     const childContainers = view.containers.filter(row => row.owner_ref === item.item_ref);
     const linked = view.relations.filter(relation => relation.task_ref === item.item_ref);
     const uses = view.relations.filter(relation => relation.capability_ref === item.item_ref);
-    return <Box key={item.item_id} id={`jd-item-${item.item_id}`} className="jd-item" sx={{ scrollMarginTop: 100, py: 1 }}>
+    return <Box key={item.item_id} id={`jd-item-${item.item_id}`}
+      sx={{ scrollMarginTop: 100, py: 1, pl: 2, borderLeft: '3px solid', borderColor: 'divider' }}>
       <Stack direction="row" spacing={1} sx={{ alignItems: 'center', flexWrap: 'wrap', mb: 1.5 }}>
-        <Stack sx={{ flex: 1 }}>
-          <Typography variant="subtitle2">{kindLabels[item.kind]} {index + 1}</Typography>
+        <Stack sx={{ flex: 1 }} spacing={0.5}>
+          <Chip label={`${kindLabels[item.kind]} ${index + 1}`} size="small" variant="outlined"
+            sx={{ alignSelf: 'flex-start', fontFamily: 'monospace', fontWeight: 700, letterSpacing: 0.3 }} />
           {sourceNote(item.item_ref)}
         </Stack>
         {markerLinks(markers?.items[item.item_id])}
@@ -146,7 +148,13 @@ export default function JdEditor({ view, disabled, commandsDisabled = false, val
     {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
     <Stack spacing={3}>{view.sections.map((section, index) => <Paper key={section.section_key} component="section"
       id={`jd-section-${section.section_key}`} className="jd-section" variant="outlined" sx={{ p: { xs: 2, md: 3 } }}>
-      <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>{index + 1}　{section.title}</Typography>
+      <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center', mb: 2 }}>
+        <Box aria-hidden sx={{ width: 28, height: 28, borderRadius: 1, bgcolor: 'primary.main', color: 'primary.contrastText',
+          display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 700, fontFamily: 'monospace', flexShrink: 0 }}>
+          {index + 1}
+        </Box>
+        <Typography variant="h5">{section.title}</Typography>
+      </Stack>
       {section.section_key === 'conditions' && <Typography color="text.secondary" sx={{ mb: 2 }}>在這裡記錄全職位共通的條件與邊界。只適用某項任務的範圍與條件，依內容寫在該任務的敘述或要求中。</Typography>}
       <Stack spacing={2}>{view.fields.filter(field => field.section_ref === section.section_ref && field.item_ref === null).map(fieldEditor)}</Stack>
       {view.containers.filter(container => container.section_ref === section.section_ref && container.owner_ref === null).map((container, index) =>

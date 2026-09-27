@@ -163,7 +163,7 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     {snapshot.needsReview && !snapshot.row?.submission && <Paper variant="outlined" sx={{ p: 3, mb: 3, borderColor: 'warning.main' }}>
       <Typography variant="h6">找回尚未完成的內容</Typography>
       <Typography color="text.secondary" sx={{ my: 1 }}>下方顯示資料庫目前內容。請先比較找回的文字，再決定是否繼續編輯。</Typography>
-      {Object.entries(snapshot.recoveryFields).map(([key, candidate]) => <Box key={key} sx={{ py: 2, borderTop: '1px solid #eee' }}>
+      {Object.entries(snapshot.recoveryFields).map(([key, candidate]) => <Box key={key} sx={{ py: 2, borderTop: '1px solid', borderColor: 'divider' }}>
         <Typography sx={{ fontWeight: 700 }}>{fieldLabels[candidate.fieldName as keyof typeof fieldLabels] ?? candidate.fieldName}</Typography>
         <Typography variant="caption">目前已保存</Typography><Typography className="jd-text">{snapshot.view?.fields.find(item => item.key === key)?.value ?? '（尚無內容或項目已移除）'}</Typography>
         <Typography variant="caption">找回的文字</Typography><Typography className="jd-text">{candidate.text ?? '（清空）'}</Typography>
@@ -192,7 +192,7 @@ export default function DocumentWorkspace({ api, document, onSafeToLeave }: {
     <DialogContent>
       {source?.error && <Alert severity="warning">{source.error}</Alert>}
       {source && !source.page && !source.error && <Typography role="status">讀取這段訪談…</Typography>}
-      {source?.page?.messages.map(item => <Box key={item.message_id} sx={{ py: 1.5, borderTop: '1px solid #eee' }}>
+      {source?.page?.messages.map(item => <Box key={item.message_id} sx={{ py: 1.5, borderTop: '1px solid', borderColor: 'divider' }}>
         <Typography variant="caption" color="text.secondary">{item.role === 'user' ? '你說的' : '顧問當時的回覆'}</Typography>
         <Typography className="jd-text">{item.text}</Typography>
       </Box>)}

@@ -1,17 +1,19 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { Alert, AppBar, Box, Button, Chip, CircularProgress, Container, Dialog, DialogActions,
-  DialogContent, DialogTitle, Divider, MenuItem, Paper, Stack, TextField, Toolbar, Typography } from '@mui/material';
+  DialogContent, DialogTitle, Divider, FormControlLabel, MenuItem, Paper, Stack, Switch, TextField, Toolbar, Typography } from '@mui/material';
 import { ApiError, JdApi } from '../lib/api';
 import { openDraftStore, readCreation, storeCreation, clearCreation } from '../lib/drafts';
 import type { CatalogCreateInput, CatalogDocument } from '../../../src/jd_relational/generated/jd-catalog-http';
 import DocumentWorkspace from './DocumentWorkspace';
+import { useColorMode } from '../app/color-mode';
 
 export function message(error: unknown): string {
   return error instanceof ApiError ? error.message : '目前無法完成操作，已保留內容。請重新查看狀態。';
 }
 
 export default function Workspace({ apiOrigin }: { apiOrigin: string | null }) {
+  const { mode, toggle } = useColorMode();
   const api = useMemo(() => { try { return apiOrigin ? new JdApi(apiOrigin) : null; } catch { return null; } }, [apiOrigin]);
   const [documents, setDocuments] = useState<CatalogDocument[]>([]);
   const [selected, setSelected] = useState<string>('');
@@ -87,9 +89,13 @@ export default function Workspace({ apiOrigin }: { apiOrigin: string | null }) {
     <Typography sx={{ mt: 2 }}>請從已完成設定的 App 入口開啟。文件保存在本機資料庫，設定完成後即可建立與管理。</Typography>
   </Paper></Container>;
 
-  return <><AppBar position="sticky" color="inherit" elevation={0} sx={{ borderBottom: '1px solid #dce2df' }}><Toolbar sx={{ gap: 2, flexWrap: 'wrap', py: 1 }}>
+  return <><AppBar position="sticky" color="inherit" elevation={0}
+    sx={{ borderBottom: '1px solid', borderColor: 'divider', bgcolor: 'background.paper' }}>
+    <Toolbar sx={{ gap: 2, flexWrap: 'wrap', py: 1 }}>
     <Typography variant="h6" sx={{ fontWeight: 800 }}>Caliburn</Typography>
     <Typography color="text.secondary">我的職務說明書</Typography><Box sx={{ flex: 1 }} />
+    <FormControlLabel sx={{ mr: 0 }} label={mode === 'dark' ? '深色' : '淺色'}
+      control={<Switch size="small" checked={mode === 'dark'} onChange={toggle} aria-label="切換深色模式" />} />
     <Button onClick={() => { setError(''); setTitle(''); setDialog('create'); }} disabled={busy || !safeToLeave || !!creation}>建立文件</Button>
   </Toolbar></AppBar>
   <Container maxWidth="xl" sx={{ py: 3 }}>

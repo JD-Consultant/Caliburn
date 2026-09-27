@@ -29,6 +29,18 @@ function buildTheme(mode: ColorMode) {
       MuiButton: { defaultProps: { disableElevation: true } },
       MuiAppBar: { styleOverrides: { root: { backgroundImage: 'none' } } },
       MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
+      // A stronger left accent bar keeps error/warning/info/success visually
+      // unmistakable at a glance, on top of MUI's existing tint + icon —
+      // the frontend must never blur the backend's error-severity taxonomy.
+      MuiAlert: {
+        styleOverrides: {
+          root: { alignItems: 'flex-start' },
+          colorError: ({ theme }) => ({ borderLeft: `4px solid ${theme.palette.error.main}` }),
+          colorWarning: ({ theme }) => ({ borderLeft: `4px solid ${theme.palette.warning.main}` }),
+          colorInfo: ({ theme }) => ({ borderLeft: `4px solid ${theme.palette.info.main}` }),
+          colorSuccess: ({ theme }) => ({ borderLeft: `4px solid ${theme.palette.success.main}` }),
+        },
+      },
       MuiCssBaseline: {
         styleOverrides: {
           html: { colorScheme: mode },

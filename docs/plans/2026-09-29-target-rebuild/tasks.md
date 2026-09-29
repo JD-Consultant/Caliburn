@@ -1,13 +1,13 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01 進行中，其餘未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01 已完成，其餘未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
 ## T01 工具鏈、契約生成與可測邊界
 
-- [ ] T01；依賴：無。
-- **進度（2026-09-29）：**分支 `target-rebuild`；隔離工具鏈、最小 health 契約／生成及前後端骨架已建立。最近後端測試 15 通過、1 失敗（schema 仍接受額外欄位）；前端相依衝突與真 PG／saver 等尚待驗證。T01 未完成；接續依[實測與下一步](evidence/t01-foundation.md)，不重置已有工作。
+- [x] T01；依賴：無。
+- **證據（2026-09-29）：**health schema 原失敗已修；乾淨 uv／pnpm 安裝、20 項後端測試（含真 PG 跨程序 saver）、1 項前端測試、lint／型別／格式／生成／建置及實際啟停通過。精確命令、版本、授權、限制及後續接縫見[實測紀錄](evidence/t01-foundation.md#3-修正後實測2026-09-29)。基礎程式與此證據共同提交；根正式入口不變，尚未做產品／真模型驗收。
 - **契約：**[程式組織](../../implementation/code-organization.md)、[選型](../../implementation/technology-decisions.md)、[契約策略](../../contract-strategy.md)。
 - **程式／交付：**新 API package、Web build、fresh PG 測試配置、lint／typecheck、契約生成與 import 邊界測試；新路徑 README 說清目標狀態。先只做 health／最小 schema round trip，不生全部空模組。
 - **先驗：**記實際穩定版本、license、Windows 支援及 lock；fake transport 能構造原生 SDK 回應，PG saver 可初始化。設定／生成任務不假稱 TDD；schema 非法 payload 與越界 import 應有失敗測例。

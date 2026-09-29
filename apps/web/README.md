@@ -1,28 +1,31 @@
-# Caliburn Web
+# Caliburn frontend（新目標施工中）
 
-> **歷史文件（2026-09-22 退役）：**本目錄的可執行 Web 已移除；以下內容只保留舊 UI 的設計沿革，不是目前啟動方式。現行 Web 位於 [`experiments/jd-relational-app/web`](../../experiments/jd-relational-app/web/README.md)，正式入口見 [ADR 0077](../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+React／TypeScript／Vite 的新前端，目前只顯示施工狀態，不是訪談或 JD 編輯產品已完成。現行根 `dev/start/build` 仍指向舊正式產品；後續依[任務計畫](../../docs/plans/2026-09-29-target-rebuild/tasks.md)逐步接線，最後才正式切換。
 
-以下記錄退役前的 Next.js 本機員工顧問工作區。`/` 導向 `/workspace`；文件庫與單一文件頁分別是 `/workspace` 與 `/workspace/[document_id]`。
+## 開發與檢查
 
-## 結構
+從 repo root 使用 Node 24 及根 `packageManager` 指定的 pnpm：
 
-- `src/features/consultant/`：文件庫、訪談對話、AI 目前理解／焦點／Gap／語意進度、必要澄清、待審文件變更與核准文件 editor。
-- `src/shared/api/jobAnalysisApi.ts`：唯一 consultant API client。
-- `src/shared/query/jobAnalysisQueries.ts`：TanStack Query keys、revision-monotonic cache 與 invalidation。
-- `src/shared/ui/`：通用 UI；不放 domain policy。
-- `src/app/workspace/`：App Router composition；只從 feature barrel 掛載。
-- `src/architecture.test.ts`：feature-first import boundary。
-
-Web 只讀 purpose-first durable snapshot，不解析 LangGraph checkpoint／interrupt／receipt，也不重算 authority、evidence、readiness 或完成度。正式文件草稿只存在 document-scoped localStorage，不能成為第二份 server document store。所有 AI 文件內容都先讓員工 accept／edit-accept／reject／defer；員工直接編輯另走 authority command。
-
-目前沒有 RAG／Reference UI、consumer 或 contract。能力級別與 A 只有員工可直接編輯，LLM 不產生。
-
-## 驗證
-
-```bash
-npm run test
-npx tsc --noEmit
-npm run lint
+```powershell
+pnpm install --filter @caliburn/frontend --frozen-lockfile --strict-peer-dependencies
+pnpm --filter @caliburn/frontend dev
 ```
 
-跨 app 真相見 [`docs/design/consultant-runtime.md`](../../docs/design/consultant-runtime.md)。
+開發站固定 `127.0.0.1:5173`；`/api` 代理到 `127.0.0.1:8100`。後端啟動依[backend README](../api/README.md)。Ctrl+C 停止前景程序；不載入舊 Next.js 或 `.next` 生成物。
+
+```powershell
+pnpm --filter @caliburn/frontend test
+pnpm --filter @caliburn/frontend typecheck
+pnpm --filter @caliburn/frontend lint
+pnpm --filter @caliburn/frontend format:check
+pnpm --filter @caliburn/frontend build
+```
+
+生成契約還需要 uv 及隔離的 Python 環境：
+
+```powershell
+$env:UV_PROJECT_ENVIRONMENT = Join-Path $PWD 'apps/api/.venv-target'
+pnpm --filter @caliburn/frontend codegen:check
+```
+
+`src/shared/api/generated` 只由後端 schema 生成。不要為 TypeScript 另外手寫相同 wire 型別。此時尚無產品 E2E；不能把單元測試／build 通過稱為 UI 旅程完成。

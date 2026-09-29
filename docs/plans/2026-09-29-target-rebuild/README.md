@@ -1,6 +1,6 @@
 # Caliburn 新目標重建：SDD／TDD 實作計畫
 
-- 日期：2026-09-29；狀態：**Owner 已以 Goal 授權 T01–T18 施工與驗收；T01 進行中，其餘依任務表**。
+- 日期：2026-09-29；狀態：**Owner 已以 Goal 授權 T01–T18 施工與驗收；實際進度依任務表**。
 - 沿革：前次交付僅研究、規劃與文件審查；本次 Goal 另授權新架構實作、必要有界 OpenAI 直連測試、本地提交，以及通過 T18 gate 後的正式入口切換／精確舊碼退役。沒有授權任意刪除 DB、volume、秘密或無關資料，也不 push／merge／對外部署。
 - 產品權威：[目標架構](../../target-architecture-map.md)；工程入口：[實作文件](../../implementation/README.md)；工作方法：[開發規範](../../implementation/development-standard.md)。
 

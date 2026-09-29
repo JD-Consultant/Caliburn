@@ -27,7 +27,13 @@ def violations(module: str, code: str) -> list[str]:
             dependency = target.split(".")
             forbidden = dependency[0] in {"jd_relational", "consultant_memory"}
             is_feature = source[:2] == ["caliburn", "features"] and len(source) > 3
-            if is_feature and source[3] == "models":
+            pure_values = source[3] == "models" if is_feature else False
+            pure_values |= module in {
+                "caliburn.features.job_description.areas",
+                "caliburn.features.job_description.tasks",
+                "caliburn.features.job_description.task_changes",
+            }
+            if pure_values:
                 forbidden |= dependency[0] in {"fastapi", "sqlalchemy", "langgraph", "openai"}
                 forbidden |= target.startswith("caliburn.contracts.generated.")
             if source[:2] == ["caliburn", "agent_execution"]:
@@ -51,6 +57,8 @@ def violations(module: str, code: str) -> list[str]:
     ("module", "code"),
     [
         ("caliburn.features.work_memory.models", "from sqlalchemy import Column"),
+        ("caliburn.features.job_description.tasks", "import fastapi"),
+        ("caliburn.features.job_description.task_changes", "import sqlalchemy"),
         (
             "caliburn.features.work_memory.models",
             "from caliburn.contracts.generated import health_status",

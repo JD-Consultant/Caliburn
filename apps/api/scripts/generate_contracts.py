@@ -13,11 +13,17 @@ WEB_ROOT = API_ROOT.parent / "web"
 
 def generate(check: bool) -> bool:
     matches = True
-    schemas = sorted((API_ROOT / "contracts/http").glob("*.schema.json"))
+    schemas = [
+        schema
+        for family in ("http", "tools")
+        for schema in sorted((API_ROOT / "contracts" / family).glob("*.schema.json"))
+    ]
     with TemporaryDirectory(prefix="caliburn-codegen-") as directory:
         for schema in schemas:
             stem = schema.name.removesuffix(".schema.json")
-            python_output = Path(directory) / f"{stem.replace('-', '_')}.py"
+            output_directory = Path("tools") if schema.parent.name == "tools" else Path()
+            python_output = Path(directory) / output_directory / f"{stem.replace('-', '_')}.py"
+            python_output.parent.mkdir(parents=True, exist_ok=True)
             subprocess.run(
                 [
                     sys.executable,
@@ -61,12 +67,23 @@ def generate(check: bool) -> bool:
             outputs = {
                 API_ROOT
                 / "src/caliburn/contracts/generated"
+                / output_directory
                 / python_output.name: python_output.read_text(encoding="utf-8"),
-                WEB_ROOT / "src/shared/api/generated" / f"{stem}.ts": typescript,
+                WEB_ROOT / "src/shared/api/generated" / output_directory / f"{stem}.ts": typescript,
             }
+            if schema.parent.name == "tools":
+                outputs[API_ROOT / "src/caliburn/contracts/generated/tools" / schema.name] = (
+                    schema.read_text(encoding="utf-8", newline="")
+                )
             for target, content in outputs.items():
                 if check:
-                    existing = target.read_text(encoding="utf-8") if target.exists() else ""
+                    # Packaged schemas retain the authored wire, including its line endings.
+                    newline = "" if target.suffix == ".json" else None
+                    existing = (
+                        target.read_text(encoding="utf-8", newline=newline)
+                        if target.exists()
+                        else ""
+                    )
                     if existing != content:
                         matches = False
                         print(

@@ -10,7 +10,10 @@ from caliburn.features.interviews.models import (
     InterviewMessage,
     InterviewReadError,
     InterviewReadScope,
+    InterviewScopeError,
+    InterviewSourceNotAvailableError,
     InterviewSpeaker,
+    InvalidInterviewSelectionError,
     RecentInterviews,
     StoredInterviewInput,
 )
@@ -40,15 +43,17 @@ async def read_history_frontier(session: AsyncSession, job_file_id: UUID) -> int
 
 
 def _check_sequence(scope: InterviewReadScope, sequence: int) -> None:
-    if type(sequence) is not int or sequence < 1 or sequence > scope.through_sequence:
-        raise InterviewReadError("Select positive formal sequences within the fixed read boundary")
+    if type(sequence) is not int or sequence < 1:
+        raise InvalidInterviewSelectionError("Select positive integer formal interview sequences")
+    if sequence > scope.through_sequence:
+        raise InterviewScopeError("The selection exceeds the fixed interview read boundary")
 
 
 async def read_interview_messages(
     session: AsyncSession, scope: InterviewReadScope, *, sequences: tuple[int, ...]
 ) -> list[InterviewMessage]:
     if not sequences:
-        raise InterviewReadError("Select at least one formal interview sequence")
+        raise InvalidInterviewSelectionError("Select at least one formal interview sequence")
     for sequence in sequences:
         _check_sequence(scope, sequence)
     selected = tuple(sorted(set(sequences)))
@@ -56,7 +61,9 @@ async def read_interview_messages(
         session, scope.job_file_id, sequences=selected
     )
     if len(messages) != len(selected):
-        raise InterviewReadError("The entire selection must exist as formal interview sources")
+        raise InterviewSourceNotAvailableError(
+            "The entire selection must exist as formal interview sources"
+        )
     return messages
 
 
@@ -65,13 +72,13 @@ async def read_interview_sources(
 ) -> list[InterviewMessage]:
     """Resolve an entire source selection within the fixed formal boundary, regardless of role."""
     if not source_ids:
-        raise InterviewReadError("Select at least one formal interview source")
+        raise InvalidInterviewSelectionError("Select at least one formal interview source")
     selected = tuple(dict.fromkeys(source_ids))
     messages = await persistence.list_formal_interviews(
         session, scope.job_file_id, source_ids=selected, end_sequence=scope.through_sequence
     )
     if len(messages) != len(selected):
-        raise InterviewReadError(
+        raise InterviewSourceNotAvailableError(
             "The entire selection must exist as formal interview sources within the fixed boundary"
         )
     return messages
@@ -84,13 +91,15 @@ async def read_interview_range(
     _check_sequence(scope, start_sequence)
     _check_sequence(scope, end_sequence)
     if start_sequence > end_sequence:
-        raise InterviewReadError("The start sequence must not follow the end sequence")
+        raise InvalidInterviewSelectionError("The start sequence must not follow the end sequence")
     messages = await persistence.list_formal_interviews(
         session, scope.job_file_id, start_sequence=start_sequence, end_sequence=end_sequence
     )
     # Count without allocating range(start, end): even a bad huge boundary stays bounded by rows.
     if len(messages) != end_sequence - start_sequence + 1:
-        raise InterviewReadError("The entire range must exist as formal interview sources")
+        raise InterviewSourceNotAvailableError(
+            "The entire range must exist as formal interview sources"
+        )
     return messages
 
 

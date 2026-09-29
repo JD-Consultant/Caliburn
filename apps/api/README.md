@@ -2,6 +2,8 @@
 
 本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。目前提供 health、職務檔案建立／清單／改名／回讀、App 開場正式訪談、JD profile／職責／任務／共用知識／技能及任務關係、協作對象／共通條件的人工讀寫與生成契約；候選／正式隔離、回退與交易內採用底層亦已實作。Memory 候選、固定修訂、快照讀取及原子發布保存已通過真 PG；模型工具／diff、AI 訪談、背景 Agent、JD 來源與候選預覽 UI 尚未交付。底層採用不是獨立的 Turn 完成端點。現行正式產品入口不變，進度見[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)。目前僅供隔離開發／合成測試，完整瀏覽器入口安全與正式交付 gate 尚未完成，不對外開放。
 
+T05 續進度：Memory 模型讀取工具已在內部接線，固定基準／權限／來源導航通過真 PG；工具定義可從安裝 wheel 取得，離線 SDK payload 已驗。這不是已接通模型 runner；寫入工具、背景執行與真模型效果仍未交付，見 [Memory 工具接線](../../docs/implementation/memory-tools.md)。
+
 ## 安裝與執行
 
 從 repo root 執行。使用 Python 3.14、uv 0.12.20；先安裝根 `package.json` 指定的 Node 24／pnpm，前端生成器也需要該環境。精確依賴由 `uv.lock` 保存。
@@ -59,7 +61,7 @@ uv run --project apps/api --locked mypy --config-file apps/api/pyproject.toml ap
 uv run --project apps/api --locked python apps/api/scripts/generate_contracts.py --check
 ```
 
-修改 `contracts/http/*.schema.json` 後，執行相同生成命令但不帶 `--check`。標準生成器產 Python／TS，禁止手改 `generated/`。Python enum 成員使用大寫以避免與 `str.title` 等內建方法撞名；wire 值不改。App schema 與模型原生輸出是不同邊界：前者拒絕額外欄位，後者保留 SDK 原生項目及未知 metadata。
+修改 `contracts/http/*.schema.json` 或 `contracts/tools/*.schema.json` 後，執行相同生成命令但不帶 `--check`。標準生成器產 Python／TS；tools 另生成包內原 schema 資源，供工具 definitions 讀取。禁止手改 `generated/` 的型別或 JSON。Python enum 成員使用大寫以避免與 `str.title` 等內建方法撞名；wire 值不改。App schema 與模型原生輸出是不同邊界：前者拒絕額外欄位，後者保留 SDK 原生項目及未知 metadata。
 
 真 PostgreSQL 測試只接受**明確指定、loopback、名稱以 `_test` 結尾的隔離資料庫**；缺環境變數會 skip，不代表通過。測試建立隨機 schema，完成後只清理自己新建的 schema，不刪 DB。
 

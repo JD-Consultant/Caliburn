@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T04 已完成；T05–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T04 已完成；T05 施工中；T06–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -56,6 +56,7 @@
 ## T05 Memory 讀寫工具與唯一 V4A
 
 - [ ] T05；依賴：T04。
+- **進度（2026-09-30）：**先交付受限 V4A 純編輯器：官方語法抽取、全體合格位置唯一、原文保留與全 hunk 拒絕；模型 schema／角色 handlers／候選交易與實際效果回傳尚待接線。[切片證據與下一步](evidence/t05-memory-tools.md)，不先勾 T05／V19 整體完成。
 - **契約：**[共同工具規範](../../specs/2026-09-27-agent-tool-contract-design-research.md)、[讀取](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[更新](../../specs/2026-09-27-memory-object-update-tool-contract.md)；修改語意時須完整讀相應章節。
 - **程式／交付：**schema、角色可用 handlers、Memory 投影與受限 V4A adapter；沿既有研究定位 parser／helper，鎖來源及 license。
 - **Red：**零／多處精確或近似匹配、兩個相似段落、multi-hunk 後段失敗、正文外 path 操作、跨層越權、title 改名重用後原 operation 重入。

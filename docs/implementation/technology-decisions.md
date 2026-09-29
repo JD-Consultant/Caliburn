@@ -37,6 +37,8 @@ T02 保存切片已核對並採用 SQLAlchemy 2.1.1＋Alembic 1.20.0（Python 3.
 
 V4A 的載體仍是既定 Memory 業務工具，不引入 filesystem tool 或全 repo patch 權限。官方 apply_patch 說明執行方處理 diff，沒有替本案保證唯一匹配。[OpenAI](https://developers.openai.com/api/docs/guides/tools-apply-patch)。優先重用語法解析；新增的有限安全政策必須有測例，不能自製通用模糊編輯框架。
 
+T05 已選官方 MIT section parser 的受限抽取＋RapidFuzz 3.14.6（MIT）作文字相似度；不安裝 Agents SDK runner。所有合格位置共同計數、完整解析及原文保留由有限 adapter 負責。來源鎖定、政策／容量、替代取捨與未接通範圍見[正文編輯接線](memory-body-editing.md)，不是原 helper 自帶的保證。
+
 ## 3. 運作參數不是無限值，也不是已核准費用
 
 已確認 A 輪前 128,000、A／B1／B2 中途 272,000；時間點及回退依[執行契約 §6.3](../specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與-272k-中途保險目標已確認未實作)。以下只作 **T16 校準起始設定**，不升格 Owner 決策，不直接用於無授權外送：

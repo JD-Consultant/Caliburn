@@ -18,7 +18,7 @@
 | 業務、SQL、來源、快照及生成契約如何接 | [業務與資料接線](data-and-contracts.md) |
 | 已實作的職務檔案／正式訪談如何保存 | [訪談保存接線](interview-storage.md)；區分已驗切片與尚未完成的正式化／准入 |
 | 已實作的 JD 修訂、原結果與人工編輯如何保存 | [JD 保存接線](jd-storage.md)；全部人工集合、候選／正式隔離、位置回退及交易內採用；完整 Agent／來源／候選 UI 另依 T07–T09 |
-| Memory 候選與固定快照如何接入保存 | [Memory 保存接線](memory-storage.md)；T04 施工中，固定物件修訂已落地，候選／發布快照待接 |
+| Memory 候選與固定快照如何接入保存 | [Memory 保存接線](memory-storage.md)；T04 候選／固定修訂、回復與原子發布已驗；模型工具／diff／背景 Agent 依 T05／T10／T11 |
 | Graph、原生 Responses、恢復與取消如何接 | [Agent 執行接線](agent-execution.md) |
 | UI、串流、PDF、啟停及安全如何交付 | [介面與交付](interface-and-delivery.md) |
 | 哪個需求由哪個任務與測試證明 | [驗證對照](verification-plan.md) |

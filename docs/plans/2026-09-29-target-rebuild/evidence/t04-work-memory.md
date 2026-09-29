@@ -1,6 +1,6 @@
 # T04：受訪者工作記憶保存證據
 
-- 日期：2026-09-29；更新：2026-09-30；狀態：**施工中，未完成 T04**。接續 T03 `4e673cf8`，唯一進度入口為[任務表](../tasks.md#t04-memory-可變候選不可變修訂與快照)。
+- 日期：2026-09-29；更新：2026-09-30；狀態：**T04 保存與業務切片完成**，最新驗證見 §4；前面各片保留當時狀態，不能當作目前未交付清單。接續 T03 `4e673cf8`，唯一進度入口為[任務表](../tasks.md#t04-memory-可變候選不可變修訂與快照)。
 - 責任：[Memory 保存接線](../../../implementation/memory-storage.md)、[資料保存](../../../architecture/persistence.md)。本頁記實測，不另定模型工具、角色或發布語意。
 
 ## 1. 第一切片：內容、引用集合與標題純規則
@@ -108,3 +108,54 @@ Ruff 通過、132 檔格式通過，mypy **97 source files** 通過。子代理�
 固定修訂 service 不持有 current pointer、角色、候選位置、執行分支或原操作回執；這些是下一片的必要接線，不可直接拿本函式暴露成 B1／B2 工具。尚無候選 CRUD／位置回退、固定快照 map/read、整版發布與發布原結果。尚未證明完整 A／B1／B2 或模型語意品質。未呼叫模型、未讀密鑰、費用 US$0。
 
 本片已提交 `28397311`。另一位只讀子代理按有效責任文件審查下一片的表示與既有准入接線，主代理核原碼及 PostgreSQL／SQLAlchemy 官方契約後，將有限施工方向寫入 [Memory 保存接線 §5](../../../implementation/memory-storage.md#5-後續接線與驗收歸屬)。該審查沒有執行候選／發布測試，不能當實作或驗收證據。
+
+## 4. 第四切片：候選、交接位置與原子發布
+
+接續施工方向 `566a3529`，新增真 PG candidate workflow、migration `0012` 與兩組整合測例。結構、各檔案 owner 及讀取差異只在 [保存接線 §2.2](../../../implementation/memory-storage.md#22-候選位置批次與正式快照) 維護。
+
+主代理處理領域／workflow／行為測試；子代理僅可寫兩個 persistence、0012、env 註冊及 storage 測試共五檔。委派明列 Goal／責任文件、caller transaction、來源／角色邊界、禁止額外保存正文或使用模型、禁止 commit。主代理完整讀回 migration／adapter，另外委派只讀 reviewer 審跨層恢復，不讓同一寫入集合互相覆寫。
+
+### 4.1 已驗的產品保存效果
+
+- B1 情境修改後，B2 candidate read 沿目前位置解析最新情境；理解內容不用因 B1 每次改字而重建。發布時來源換版產生新的固定理解修訂、正文重用；原 snapshot 沿原修訂保持完全相同。
+- 刪除多個理解共同引用的情境，候選所有入邊同交易解除；理解保留、其他來源保留、已發布 snapshot 不受影響。空來源合法。
+- B1↔B2 回交保留雙方已成立工作；B1 不可讀寫理解、B2 不可修改情境。新階段使舊階段不能完成發布；回復換 generation，遲到寫入被拒。
+- ①起始位置、②B1 完成後位置可恢復；不能偽造 role／stage、跨批次或回到已放棄的子分支。這是候選保存能力，尚非實際 checkpointer／程序重啟驗收。
+- 同命令並行重入只產生一個效果，競爭同一 expected position 只有一筆成功；writer 被接管後，舊 writer 被拒，新 writer 可接同候選。
+- 原操作回傳保留原物件身分與位置：改名後另一物件重用舊 title，不會使原操作重入指向新物件。同 ID 不同意圖拒絕。
+- 發布、head、原結果及 execution completed 在同一 caller transaction。注入 COMMIT 前例外時整體撤回且候選仍可用；已完成再呼叫原發布回同一 snapshot，不新增版本。
+- 新一批沒有內容／來源變更時重用原固定位置與物件，只發布新的涵蓋邊界。跨檔案 snapshot read 拒絕；本批來源 F 不因後續正式訪談或 start 重入擴大。
+
+### 4.2 Red／Green、失敗與修正
+
+主代理先建六個核心測例及明確 stub，取得 **6 failed**；完成接線後測到發布 pointer 提早 UPDATE 觸發 FK：修成先插入完整位置，再前移 pointer，沒有把 FK 改成寬鬆或關掉。整合時 helper 參數曾不一致，統一為六個座標的 `dict[str, str]`；此為接線修正，不冒稱行為 Red。
+
+擴充反例實際找出「execution 已 failed，但沒有原 discard，workflow 仍能新建 discard」：先得 **DID NOT RAISE**，改成只查原結果，無原結果則拒絕。第一輪主流程 **16 passed**。子代理的 snapshot 結構 guard 先有 **4 failed**，補上同選用固定 pair、正式來源序號及上界後，storage **26 passed**；與既有固定修訂合跑 **38 passed**。
+
+```powershell
+$env:PYTHONUTF8='1'
+$env:CALIBURN_TEST_DATABASE_URL='postgresql://caliburn_test@127.0.0.1:55439/caliburn_t01_test'
+.venv-target/Scripts/python.exe -B -m pytest tests/integration/test_memory_candidates.py -q -p no:cacheprovider --tb=short
+.venv-target/Scripts/python.exe -B -m ruff check --no-cache src tests migrations
+.venv-target/Scripts/python.exe -B -m ruff format --check --no-cache src tests migrations
+.venv-target/Scripts/python.exe -B -m mypy --cache-dir ../../.research-tmp/mypy-t04 src
+.venv-target/Scripts/python.exe -B -m pytest tests -q -p no:cacheprovider --tb=short
+```
+
+cwd `S:/caliburn/apps/api`。主代理全後端結果 **545 passed，0 skipped，162.94 秒**；Ruff 全通過、143 檔格式通過，mypy **105 source files** 通過。測試只建立及清除既有 loopback test DB 中各自隨機 namespace。沒有 mock 代替 PG、沒有讀秘密或呼叫模型，模型費用 US$0。
+
+獨立 reviewer 確認主代理另發現的 P2：F 已涵蓋時 workflow 回 None 並完成 execution，沒有原結果，重入卻被 active-writer check 拒絕。這是 T04 已提交效果的恢復責任，不能推給尚未實作的 T11。新增行為反例先 **1 failed**；依 AWS 安全重試原則，用既有 operations 保存綁定原來源的 no-work 結果並同交易完成，不造空候選／快照或第二套結果表。operation FK 改連 execution，來源跨檔案保護不變。補測提交前失敗一起撤回、確認遺失回原 None、同 execution 換來源拒絕。其餘指定跨層範圍未發現可確立缺陷；reviewer 僅靜態審查，不代替主代理測試。
+
+三張 Memory Mermaid 圖實際渲染；新增 candidate／snapshot schema 圖已目視檢查，文字與關係可讀、沒有截斷。審查後的精確重測結果記於下方。
+
+no-work 修正後，主代理重跑 `test_memory_candidates.py`＋`test_memory_position_storage.py`：**43 passed，25.58 秒**（17 個流程＋26 個儲存），包含 migration 重跑／metadata 對齊。mypy 105 source files 再通過。此修正只改尚未交付的 Memory operations FK 與 start 恢復，不再重跑未受影響的全部 JD／訪談測例；上面的 **545** 是修正前完整回歸，不把新測例加到該次實跑總數。
+
+T04 對 V12／V13 已證明候選跟隨、固定鏈路、歷史不變及修訂重用；對 V27 只證明 Memory ①／②及原結果的保存與回復，未聲稱完成該驗收列在其他任務的 checkpoint 清理／程序重啟部分。
+
+### 4.3 驗證邊界
+
+本片是保存／恢復座標／同交易結果，不是完整 Agent。尚未交付 T05 的模型 schema、V4A、diff 投影，T06 的 native items／checkpointer 或 T10／T11 的真 B1／B2 分析與有界重試。`publish` 的受信任呼叫方必須只在當前 B2 階段真正完成後呼叫；stage gate／SQL guard 不代替語意判斷。
+
+沒有正文去重平台、每物件一個 service、額外 broker、B2 逐引用確認或新 Memory UI。原操作只保存必要摘要與定位，完整 native 請求由執行層持久化；不能靠 hash 重建遺失工具參數。所有歷史與候選目前不自動清理，並非宣稱無限保存無成本。
+
+下一項具備前置條件的是 **T05：模型可見 Memory 讀寫工具、唯一 V4A 編輯與差異投影**。沿既有 read/update/diff 契約及工具規範施工；不可把本片內部 UUID、stage／position 或全正文更新參數直接當成模型 schema。後續 T10／T11 再接分析角色、原生接續及真完成條件。

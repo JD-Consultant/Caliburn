@@ -16,7 +16,6 @@ from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agent_execution.tool_steps import (
     ReceivedModelResponse,
-    ResponseStepRuntime,
     _build_response_step,
 )
 from caliburn.features.executions import service as executions
@@ -38,6 +37,7 @@ from caliburn.transport.model_tools.memory_writes import MemoryWriteTools, Prepa
 from caliburn.workflows.memory_candidates import MemoryCandidateWorkflow
 from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkflow
 from caliburn.workflows.memory_writes import MemoryWritePreparation
+from tests.fixtures.response_capacity import synthetic_capacity_limits, synthetic_response_runtime
 
 pytestmark = pytest.mark.postgres
 
@@ -164,7 +164,7 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
                 async with database.sessions.begin() as session:
                     await executions.lock_active_writer(session, writer)
 
-            runtime = ResponseStepRuntime(
+            runtime = synthetic_response_runtime(
                 request_model=request,
                 prepare_tool=prepare,
                 execute_tool=execute,
@@ -188,6 +188,7 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
                             "request_snapshot": model_request.create_payload(),
                             "model_step_limit": None,
                             "tool_call_limit": 16,
+                            "capacity_limits": synthetic_capacity_limits(),
                             "request_id": uuid4(),
                         },
                         config,

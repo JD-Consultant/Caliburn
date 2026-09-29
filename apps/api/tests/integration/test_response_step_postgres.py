@@ -15,12 +15,12 @@ from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import NativeItems
 from caliburn.agent_execution.tool_steps import (
     ReceivedModelResponse,
-    ResponseStepRuntime,
     ResponseStepSaveError,
     _build_response_step,
     run_response_step,
 )
 from caliburn.settings import DatabaseSettings
+from tests.fixtures.response_capacity import synthetic_capacity_limits, synthetic_response_runtime
 
 pytestmark = pytest.mark.postgres
 
@@ -95,7 +95,7 @@ def test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_o
             events.append("execute")
             return "original observation"
 
-        runtime = ResponseStepRuntime(
+        runtime = synthetic_response_runtime(
             request_model=request,
             prepare_tool=prepare,
             execute_tool=execute,
@@ -170,7 +170,7 @@ def test_saved_step_reopens_without_repeating_window_items(
 
         dsn = make_conninfo(settings.url, options=f"-c search_path={settings.schema}")
         config = {"configurable": {"thread_id": "completed-step"}}
-        runtime = ResponseStepRuntime(
+        runtime = synthetic_response_runtime(
             request_model=request,
             prepare_tool=prepare,
             execute_tool=execute,
@@ -188,6 +188,7 @@ def test_saved_step_reopens_without_repeating_window_items(
                     "request_id": uuid4(),
                     "model_step_limit": None,
                     "tool_call_limit": 16,
+                    "capacity_limits": synthetic_capacity_limits(),
                 },
                 config,
                 context=runtime,
@@ -235,7 +236,7 @@ def test_public_step_recovery_saves_held_model_result_after_both_writes_fail(
 
         dsn = make_conninfo(settings.url, options=f"-c search_path={settings.schema}")
         config = {"configurable": {"thread_id": "no-durable-response"}}
-        runtime = ResponseStepRuntime(
+        runtime = synthetic_response_runtime(
             request_model=request,
             prepare_tool=prepare,
             execute_tool=execute,

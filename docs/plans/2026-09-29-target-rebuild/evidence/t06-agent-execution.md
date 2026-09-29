@@ -191,8 +191,23 @@ $env:PYTHONUTF8='1'
 
 本次無 provider 呼叫、未讀 `.env` 或外送私人資料。仍缺 §6 的直連 provider 證據；沒有把假 provider＋真 PG 當模型品質、產品 UI 或整個 T06 完成。
 
-## 9. 下一個可執行切片
+## 9. 第九切片：固定計數與容量准入
 
-接容量計數／真實費率配置與單一有界 retry supervisor，再接 compact／角色控制。共同 loop 已固定完整 request、sync／局部步數、原 R 恢復、首次外送准入及保存後結算。已有 attempt 必須先核對，不因本切片的明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
+承接 `62e463fe`。主代理讀 OpenAI 最新 token-counting／per-run spending controller 原文，核對本機 SDK。選現有 Graph 保存計數、現有 executions 管所有外送預留；不新增 cache、owner 或通用 quota 引擎。正式接法見[工程 §5.2](../../../implementation/agent-execution.md#52-已落地的固定請求計數與容量准入t06-第九切片)。本輪使用計畫執行、TDD、OpenAI 文件及獨立審查技能；既有施工授權不重開。
+
+- 首批行為 Red **5 failed**：容量超限仍生成、沒有計數、下一請求未停在 272K。接線後 **5 passed**；另補已知模型／輸出設定不合法時應零 count 的 **2 個行為 Red**，前移無需遠端資訊的檢查後通過。測例編輯時曾誤放三行斷言導致 NameError，修回原案例，不計作產品 Red。
+- 固定完整 payload／capacity policy；已存 count 於模型節點失敗後原樣恢復，容量不合仍不重計，不能恢復時放寬 policy。不合法 count 不當零；count 失敗無估算 fallback。首請求高於272K但符合模型限制不誤觸中途保險；第二請求達門檻保存原歷史、停止於未接線的 compact 需求，不冒稱已壓縮。
+- `test_request_capacity_postgres.py` 真 PG＋SDK MockTransport：HTTP 時另一連線可取 execution 鎖並看見 count 預留；count 算外送但不算模型 Step。重開 saver 後沿用 count；488＋512＝1000 可發生成、489＋512 超限零生成。未知 count 成本保留合成預留，不記免費。
+- `test_model_request_accounting.py` 原 model 准入確認遺失／timeout 測例延伸到 count：前者 HTTP 0、後者 1，恢復均先核對原 attempt 不再發送。原 R 記帳／取消／工具恢復測例仍保留。與容量 PG、新程序測例初次整合 **10 passed**，加入 count 故障後 accounting **8 passed**。
+
+完整 backend 測試命令（`pytest -q -p no:cacheprovider --tb=short`，使用既有 loopback 測試 PG）**908 passed in 210.31s**。其啟動後另補 271,999 可接續、final 不再多計數的邊界測例，容量檔單獨重跑 **13 passed**；不把後加案例冒充已在該次 908 全集合中。Ruff check／format **196 files**、mypy **147 source files**通過。
+
+獨立唯讀 reviewer 未發現阻擋提交的問題；其另跑四個受影響 unit 檔 **36 passed**，並以記憶體故障注入核 count 保存確認遺失、272K 重入、count 途中取消。這是 reviewer 回報的額外證據，主代理的全套／PG 結果如上，兩者不混算。真 provider 校準、動態費率、compact 接線、原 count 完全未保存時的恢复及單一 retry supervisor 均明確留在後續切片；未把缺口移出 T06。
+
+文件 **20 份／328 links** 零錯、diff check 通過。三張工程 Mermaid 圖實際渲染，主代理檢視更新的 loop 圖，計數保存、容量 gate、停止與返回路徑可读；sandbox 的 `spawn EPERM` 後使用獲准的既有無頭瀏覽器渲染，未以首次失敗當通過。Reviewer 已結束。未讀 `.env`、無真 provider 呼叫；所有 model／capacity／費率數值均為合成測試配置。T06 維持施工中，未把此 gate 當產品旅程完成。
+
+## 10. 下一個可執行切片
+
+接真實費率配置與單一有界 retry supervisor、compact／角色控制。共同 loop 已固定完整 request、sync／局部步數、原 R 恢復、首次外送准入、保存後結算及固定計數。容量 gate 目前只停在 `CompactionRequiredError`，仍需接合法 compact、完整 C 安全採用／再計數、不重加 maps／输入及控制先行。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復；count 雙保存失敗的原件可取回性也須在後續恢復切片明確承接。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

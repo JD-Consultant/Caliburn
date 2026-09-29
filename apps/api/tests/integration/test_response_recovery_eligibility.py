@@ -16,7 +16,6 @@ from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.agent_execution.tool_steps import (
     ReceivedModelResponse,
-    ResponseStepRuntime,
     ResponseStepSaveError,
     _build_response_step,
     run_response_step,
@@ -29,6 +28,7 @@ from caliburn.features.executions.models import (
     ExecutionStatus,
 )
 from caliburn.settings import DatabaseSettings
+from tests.fixtures.response_capacity import synthetic_response_runtime
 
 pytestmark = pytest.mark.postgres
 
@@ -102,7 +102,7 @@ def test_late_or_held_response_requires_current_writer_before_tools(
             async def execute(prepared):
                 pytest.fail("Read-only fixture")
 
-            runtime = ResponseStepRuntime(
+            runtime = synthetic_response_runtime(
                 request_model=request,
                 prepare_tool=prepare,
                 execute_tool=execute,

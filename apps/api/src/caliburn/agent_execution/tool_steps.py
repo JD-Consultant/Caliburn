@@ -24,6 +24,13 @@ from caliburn.adapters.response_serialization import (
     restore_response,
     snapshot_response,
 )
+from caliburn.agent_execution.request_capacity import (
+    ModelCapacityLimits,
+    ReceivedInputCount,
+    require_request_capacity,
+    require_request_limits,
+    validate_capacity_limits,
+)
 from caliburn.agent_execution.response_steps import ResponseAction, inspect_response_step
 
 
@@ -40,6 +47,9 @@ class ResponseStepState(TypedDict, total=False):
     completed_steps: int
     model_step_limit: int | None
     tool_call_limit: int
+    capacity_limits: ModelCapacityLimits
+    input_count: ReceivedInputCount | None
+    counted_request_id: UUID | None
 
 
 @dataclass(frozen=True, slots=True)
@@ -59,6 +69,8 @@ class ResponseStepRuntime:
     execute_tool: Callable[[object], Awaitable[str]]
     ensure_active: Callable[[], Awaitable[None]]
     account_response: Callable[[ReceivedModelResponse], Awaitable[None]]
+    count_input: Callable[[ResponseRequest, UUID], Awaitable[ReceivedInputCount]]
+    capacity_limits: ModelCapacityLimits
 
 
 @dataclass(frozen=True, slots=True)
@@ -154,6 +166,7 @@ async def _run_response_flow(
 ) -> ResponseStepState:
     if not thread_id:
         raise ValueError("A durable Step requires a nonempty thread identity")
+    validate_capacity_limits(runtime.capacity_limits)
     if recovery is not None and (recovery.thread_id != thread_id or request is not None):
         raise ValueError("A held response can only resume its original Step with None")
     # The small holder belongs to this invocation, not to the role or the saver.
@@ -197,6 +210,8 @@ async def _run_response_flow(
     # those original limits before any outbound request.
     if saved.created_at is not None and not (not saved.values and saved.next == ("__start__",)):
         _require_execution_limits(saved.values, max_tool_calls, max_model_steps)
+        if saved.values.get("capacity_limits") != runtime.capacity_limits:
+            raise ValueError("Resume with the original capacity limits")
     if recovery is not None:
         if (
             saved.values.get("request_id") != recovery.request_id
@@ -255,6 +270,7 @@ async def _run_response_flow(
             "completed_steps": 0,
             "model_step_limit": max_model_steps,
             "tool_call_limit": max_tool_calls,
+            "capacity_limits": deepcopy(runtime.capacity_limits),
         }
     try:
         result = await graph.ainvoke(
@@ -286,11 +302,38 @@ def _build_response_step(
     if type(max_tool_calls) is not int or max_tool_calls < 1:
         raise ValueError("Configure a positive per-response tool bound")
 
+    async def count_input(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
+        _require_execution_limits(state, max_tool_calls, max_model_steps)
+        if state["capacity_limits"] != runtime.context.capacity_limits:
+            raise ValueError("Resume with the original capacity limits")
+        validate_capacity_limits(state["capacity_limits"])
+        await runtime.context.ensure_active()
+        require_request_limits(
+            ResponseRequest.from_snapshot(state["request_snapshot"]), state["capacity_limits"]
+        )
+        count = await runtime.context.count_input(
+            ResponseRequest.from_snapshot(state["request_snapshot"]),
+            uuid5(state["request_id"], "input_tokens"),
+        )
+        # Save before interpretation/admission. A failed count never becomes a guessed zero.
+        return {"input_count": count, "counted_request_id": state["request_id"]}
+
     async def request_model(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
         _require_execution_limits(state, max_tool_calls, max_model_steps)
         await runtime.context.ensure_active()
+        count = state.get("input_count")
+        if count is None or state.get("counted_request_id") != state["request_id"]:
+            raise ValueError("The exact request needs a saved input count before generation")
+        require_request_capacity(
+            ResponseRequest.from_snapshot(state["request_snapshot"]),
+            count,
+            state["capacity_limits"],
+            completed_steps=state.get("completed_steps", 0),
+        )
         received = await runtime.context.request_model(
             ResponseRequest.from_snapshot(state["request_snapshot"]), state["request_id"]
         )
@@ -408,18 +451,22 @@ def _build_response_step(
             "prepared_tool": None,
             "tool_results": [],
             "next_action": None,
+            "input_count": None,
+            "counted_request_id": None,
         }
 
     def route_finished(state: ResponseStepState) -> Literal["prepare_next_request", "__end__"]:
         return "__end__" if state["next_action"] == "deliver_answer" else "prepare_next_request"
 
     graph = StateGraph(ResponseStepState, context_schema=ResponseStepRuntime)
+    graph.add_node("count_input", count_input)
     graph.add_node("request_model", request_model)
     graph.add_node("account_response", account_response)
     graph.add_node("prepare_tool", prepare_tool)
     graph.add_node("execute_tool", execute_tool)
     graph.add_node("finish_step", finish_step)
-    graph.add_edge(START, "request_model")
+    graph.add_edge(START, "count_input")
+    graph.add_edge("count_input", "request_model")
     graph.add_edge("request_model", "account_response")
     graph.add_edge("account_response", "prepare_tool")
     graph.add_conditional_edges("prepare_tool", route_prepared)
@@ -429,7 +476,7 @@ def _build_response_step(
     else:
         graph.add_node("prepare_next_request", prepare_next_request)
         graph.add_conditional_edges("finish_step", route_finished)
-        graph.add_edge("prepare_next_request", "request_model")
+        graph.add_edge("prepare_next_request", "count_input")
     return graph.compile(checkpointer=checkpointer)
 
 

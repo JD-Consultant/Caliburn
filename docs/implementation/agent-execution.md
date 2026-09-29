@@ -50,6 +50,45 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 此接法須過 E02／E08–E11；若框架私有子圖方式能更簡單滿足同等反例，可在該任務調整 thread 組織並更新本頁，不增加第二套恢復引擎。
 
+### 3.1 跨工作的合法歷史選用（T06 第十五切片）
+
+`features/executions/history.py` 管理**是否可採用**；`workflows/context_history.py` 的 `RoleContextHistory` 將資格接到既有準備／模型 Graph；完整原生窗口仍只由官方 saver 保存。每份職務檔案、每個角色各有一個已採用位置，每次 execution 綁定一次原基底，不能因重開而改選目前最新 checkpoint。
+
+| 保存責任 | 實際資料 | 不負責 |
+|---|---|---|
+| `context_history_heads` | 職務檔案＋角色目前可採用的 thread／checkpoint／窗口種類 | 原生正文、模型回應、Graph 路由 |
+| `context_history_bindings` | execution＋角色的原基底、已準備位置及正式完成位置 | 第二套回執、候選正文、進度日誌 |
+| 官方 checkpointer | 上述固定位置的完整窗口及原 Graph State | 判定 JD／Memory 是否正式完成 |
+
+兩個 reference-only 關係由 migration `0016_context_histories` 與既有 executions owner 維護。所有採用均在短交易中核原 writer、scope／角色與已採用位置；saver／模型 I/O 不放進該交易。未找到明確 checkpoint 時失敗，不回退到任意最新值。
+
+```mermaid
+flowchart TD
+    H[角色已採用的歷史位置] --> B[新工作只綁定一次原基底]
+    B --> P{已是準備好的基底？}
+    P -->|是：前次取消未延伸它| R[讀回同一完整窗口]
+    P -->|否| C[既有門檻準備 Graph 保存原 W 或完整 C]
+    C --> R
+    R --> A[短交易核資格並採用準備位置]
+    A -.-> I[角色固定新資料並追加本次輸入]
+    I -.-> G[既有模型與工具 Graph]
+    G -->|取消／失去資格| K[不採用輪中內容；保留準備基底]
+    K --> H
+    G -.-> F[正式產品完成交易]
+    F -.-> D[共同提交業務效果與角色完成位置]
+    D --> H
+```
+
+實線為本切片可測的歷史接縫；虛線的角色資料組裝及完整產品完成交易仍由 T08／T10／T11 接線，不以 Graph 返回 final 取代它們。
+
+- `prepare_history` 只接收不含新輸入／maps 的 request template，歷史從綁定位置回讀；A 使用已確認的 128K 門檻。準備 Graph 保存成功、但採用交易尚未成立時，重入同一準備 thread 承接原结果。若已採用準備基底後取消，後續新工作直接重用同一基底，即使 C 仍很大也不因此重壓一次。
+- `read_prepared_history` 只讀已採用的**輪前準備**結果，不把輪中 compact 當取消後基底。`read_completed_response_history` 核保存的 final 路由及官方 StateSnapshot 沒有待執行 node／task；暫停中的 final、只有 R 或 pending writes，都不能直接成為完成歷史。完整 reasoning、message、工具往返保留原順序，回傳獨立複本。
+- 讀取固定 checkpoint 是純查詢，不是 `invoke` 歷史位置做 replay。同工作續作仍走原 Graph 的最新可靠執行位置；取消後的新工作則只取領域已採用的位置，兩者不能混淆。
+- `complete_context_histories` 由產品協調方在**同一正式完成交易**中呼叫：A 採用一個角色；Memory 同時採用 B1／B2，不容許只完成一邊。它核各自的原準備基底並沿既有 owner 完成 execution；JD、正式訪談及 Memory 發布不在此重寫。產品協調方仍須先驗真實 Graph 完成及相應業務資格。
+- COMMIT 確認遺失時重交原完成位置，只核對原結果，不倒轉後來已前進的歷史。取消、暫停要求及被替換 writer 不得採用晚到內容；取消不刪 saver 原件，但那些原件不再具備跨工作採用資格。
+
+依據：[LangGraph 官方 checkpoint／歷史查詢](https://docs.langchain.com/oss/python/langgraph/checkpointers)區分完整 checkpoint 與 pending writes；[PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)提供短交易序列化。跨工作採用、角色隔離及取消保留準備基底是 Caliburn 的產品取捨，不是框架自動保證。證據與未驗範圍見 [T06 §15](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#15-第十五切片跨工作合法歷史與取消後基底)。
+
 ## 4. Requests 與工具
 
 `openai_responses.py` 明確設 `store=False`、`reasoning.context="all_turns"`，不帶 response chaining／server-side compact／silent truncation。instructions 與 tools 在 request 層明確提供，並保留原生 items；SDK 的默認 retry 關閉，由 Runtime 在有界預算內分類處理。
@@ -353,7 +392,7 @@ flowchart TD
 - `PreparationCountSaveError.recovery` 只保留程序內仍完整的原 count。核對 thread／原 request 後，優先承接原 checkpoint 或 pending writes；未保存才補存，不能倒退後面的 C／採用結果。完整 C 的保存故障沿原 `CompactionSaveError`，沒有第二份恢復協定。真正遺失的結果仍需上位核對／重試政策。
 - 返回的是原歷史或**全部** `compacted.output` 的複本；呼叫方追加新輸入不改掉保存的輪前基底。不在這一步重加 maps、改 opaque items 或將準備完成當作整個 Turn 完成。
 
-**尚未接完的產品邊界：**此元件不自行決定哪個歷史 checkpoint 可跨取消採用，不擁有已完成 Turn 的有效基底指標，也不提供取消後繞過舊 writer guard 的入口。§3／T08／T10 必須把「輪前已採用準備位置」「本工作追加資料」「輪中 C」分開綁定與選用，才能證明取消不丟輪前 C、不帶入被取消輸入。同批只準備一次、消耗 Agent 要求及新工作資料只追加一次，亦須角色接線驗證；不能由本元件測試宣稱 E09／E10 全完成。
+**產品接線邊界：**本元件仍不自行決定哪個歷史 checkpoint 可跨取消採用；第十五切片的 §3.1 已由 executions owner 管理合法基底並驗取消後重用。它不提供取消後繞過舊 writer guard 的入口。角色固定 maps／來源、本工作資料只追加一次，以及 B 整批安全點與各角色私有歷史共同回退仍由 T08／T10／T11 完成；不能由本元件測試宣稱 E09／E10 全完成。
 
 依據：重新核 [OpenAI standalone compaction 的完整窗口接續](https://developers.openai.com/api/docs/guides/compaction#user-journey-for-standalone-compaction)及 [LangGraph checkpoint／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)。框架負責保存執行結果，128K／角色準備時點與取消效果是 Caliburn 已確認政策，不稱為供應商共同規定。驗證層級及限制見 [T06 §14](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#14-第十四切片輪前歷史的門檻判斷與可恢復準備)。
 

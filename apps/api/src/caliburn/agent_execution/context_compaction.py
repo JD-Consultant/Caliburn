@@ -23,12 +23,34 @@ from caliburn.adapters.response_serialization import (
     compaction_input_items,
     snapshot_compaction,
 )
+from caliburn.agent_execution.context_windows import SavedContextWindow, read_context_checkpoint
 from caliburn.agent_execution.request_capacity import (
     ModelCapacityLimits,
     ReceivedInputCount,
     require_request_capacity,
     require_request_limits,
 )
+
+
+async def read_prepared_history(
+    checkpointer: BaseCheckpointSaver[str], *, thread_id: str, checkpoint_id: str | None = None
+) -> SavedContextWindow:
+    """Select a fully saved pre-work window, never a pending C or in-work compaction.
+
+    This does not adopt it for a role; that decision belongs to execution eligibility.
+    The raw checkpoint intentionally excludes pending writes, which are not this boundary.
+    """
+    saved = await read_context_checkpoint(
+        checkpointer, thread_id=thread_id, checkpoint_id=checkpoint_id
+    )
+    values = saved.checkpoint["channel_values"]
+    if values.get("adopted") is not True or values.get("preparation_policy") is None:
+        raise ValueError("The history boundary has not been prepared")
+    if values.get("compaction_snapshot") is not None:
+        items = compaction_input_items(values["compaction_snapshot"])
+    else:
+        items = ResponseRequest.from_snapshot(values["request_snapshot"]).create_payload()["input"]
+    return SavedContextWindow(saved.checkpoint["id"], deepcopy(items))
 
 
 @dataclass(frozen=True, slots=True)

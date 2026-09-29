@@ -298,8 +298,26 @@ Ruff check／format **214 files**、mypy **150 source files** 通過；文件 **
 
 本切片不讀 `.env`、不外送真模型，不增加套件或 migration。原完整接續資料仍由官方 saver 保存；已採用位置跨工作選用、角色 maps／原話固定及自動恢復 supervisor 尚未完成，T06 維持施工中。
 
-## 15. 下一個可執行切片
+## 15. 第十五切片：跨工作合法歷史與取消後基底
 
-接準備結果的合法基底選用與角色控制、真實費率配置及未明 attempt 的恢復調度。共同 loop 已有完整 request、sync／局部步數、原 R／C／count 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用、完整 Step pause 與已確認 provider 故障的有界重試；未配置 compact 接縫仍明確停止。第十四切片已有輪前門檻／Agent 意圖的共用可恢復準備；A 新 Turn／B 新批只準備一次、準備後固定並追加資料、取消相容基底，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度仍須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
+承接 `62d547f9`。重讀當前 LangGraph checkpoint／StateSnapshot 與 PostgreSQL 行鎖契約：框架保存完整窗口，執行領域只保存「哪個既有位置可採用」的參照。機制、交易、圖及未完成角色交界只維護於[工程 §3.1](../../../implementation/agent-execution.md#31-跨工作的合法歷史選用t06-第十五切片)，不另造全文庫、通用恢復引擎或第二份 Graph 路由。
+
+主代理負責原生窗口讀取、`RoleContextHistory` 及真 saver 整合；子代理限定 executions 的 reference-only 模型／保存／migration／測試。共同保留既有 writer fencing、短交易與 caller transaction；B 的兩角色位置必須共同採用，Graph final 不能自行當產品正式完成。
+
+- 原生窗口讀取骨架先得到行為 Red **2 failed／2 passed**：完整已保存窗口尚不能取回；實作後加入控制交界，**5 passed**。保存的完整 reasoning／工具配對按原順序回讀；呼叫方改返回值不改原件；未採用 C、暫停 final 均拒絕。明確 checkpoint 缺失不改讀最新位置。
+- Workflow 真 PG 反例先 **1 failed**：準備返回空列表但沒有固定採用基底。補接既有 saver 準備與 executions 採用；施工期間尚缺子代理完成函式的 AttributeError 不算有效 Red。
+- `test_role_context_history.py` 驗正常與採用交易回滾兩條路徑：完整 C 已保存、採用尚未提交可重入；A 取消後重連 saver，新工作 b 使用同一完整 C＋新 App 資料＋b，不帶入已取消的 a、不重計或重壓；較舊完成結果重入不倒轉目前位置。兩案與原生單元合計 **7 passed in 2.52s**。
+
+上述模型為合成 runtime probe，PostgreSQL 與 AsyncPostgresSaver 為實際元件；不是 SDK 遠端接受、程序 kill 或完整 A 產品取消驗收。未讀 `.env`、未呼叫真模型。本切片尚未交付 maps／訪談固定組裝、正式 JD＋訪談共同完成、背景安全點調度及自動恢復 supervisor，T06 不勾完成。整合回歸、圖稿與獨立審查結果接續補記。
+
+子代理回報 executions 保存專項 **40 passed**，包含 caller transaction 回滾、取消／完成雙連線競爭、兩角色共同採用、舊完成重送、讀取不寫表及 DB 約束。主代理讀取整合變更後，重跑 unit／contracts、上述 domain／workflow、Graph PG、輪前準備、compact／model accounting、execution control 與 migration，**676 passed in 69.42s**。這是明列範圍回歸，不冒称全後端或產品 E01–E15 全完成。
+
+Ruff check／format **223 files**、mypy **154 source files** 通過。文件 **20 份／345 links** 零錯，diff check 通過；六張工程 Mermaid 已渲染，主代理檢視新增歷史選用圖，固定基底、取消保留與正式完成採用方向可讀。首次 sandbox 拒絕 headless Chromium 後經准許完成渲染。未部署 production migration、未新增依賴或對外傳送專案資料。
+
+獨立 reviewer 接受本切片，未發現可重現的阻擋缺陷；其窄複核真 PG **4 passed**，另以 **6 個 probe** 檢查 pending Step／control、輪中 C、未提交準備位置、缺失位置及返回複本。這是 reviewer 的分層複核，不與主代理 676 項加總。角色固定輸入、正式業務完成及 B 候選共同回退仍按上述後續任務交付；兩位子代理均已結束。
+
+## 16. 下一個可執行切片
+
+接角色控制、真實費率配置及未明 attempt 的恢復調度。共同 loop 已有完整 request、sync／局部步數、原 R／C／count 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用、完整 Step pause 與已確認 provider 故障的有界重試；未配置 compact 接縫仍明確停止。第十四、十五切片已有輪前可恢復準備與合法跨工作基底；準備後固定並追加角色資料、B 兩角色與候選安全點共同回退，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度仍須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

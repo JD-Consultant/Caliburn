@@ -25,6 +25,7 @@ from caliburn.adapters.response_serialization import (
     restore_response,
     snapshot_response,
 )
+from caliburn.agent_execution.context_windows import SavedContextWindow, read_context_checkpoint
 from caliburn.agent_execution.request_capacity import (
     CompactionRequiredError,
     ModelCapacityLimits,
@@ -35,6 +36,45 @@ from caliburn.agent_execution.request_capacity import (
     validate_capacity_limits,
 )
 from caliburn.agent_execution.response_steps import ResponseAction, inspect_response_step
+
+
+async def read_completed_response_history(
+    checkpointer: BaseCheckpointSaver[str], *, thread_id: str, checkpoint_id: str | None = None
+) -> SavedContextWindow:
+    """Read an exact complete Graph result, without invoking or replaying any node.
+
+    A final R is insufficient: its tools, Step save and control boundary must be done.
+    This is not product completion; only the owning transaction may adopt this position.
+    """
+    saved = await read_context_checkpoint(
+        checkpointer, thread_id=thread_id, checkpoint_id=checkpoint_id
+    )
+    values = saved.checkpoint["channel_values"]
+    if values.get("next_action") != "deliver_answer":
+        raise ValueError("The response history has not completed")
+
+    async def read_only_pause() -> bool:
+        raise RuntimeError("A history reader must never execute Graph controls")
+
+    async def read_only_acknowledge() -> None:
+        raise RuntimeError("A history reader must never execute Graph controls")
+
+    controls = (
+        ResponseLoopControls(read_only_pause, read_only_acknowledge)
+        if values["pause_enabled"]
+        else None
+    )
+    graph = _build_response_step(
+        checkpointer,
+        max_tool_calls=values["tool_call_limit"],
+        max_model_steps=values["model_step_limit"],
+        controls=controls,
+    )
+    # A checkpoint ID makes this a historical read, NOT ainvoke(checkpoint_id).
+    snapshot = await graph.aget_state(saved.config)
+    if snapshot.next or snapshot.tasks:
+        raise ValueError("The response history has not completed its control boundary")
+    return SavedContextWindow(saved.checkpoint["id"], deepcopy(values["input_items"]))
 
 
 class ResponseStepState(TypedDict, total=False):

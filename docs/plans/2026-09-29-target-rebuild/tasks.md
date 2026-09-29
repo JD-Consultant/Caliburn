@@ -80,6 +80,7 @@
 - **第十二切片（2026-09-30）：**承接 `0641beff`，沿原 saver／recovery 補回仍在程序內的完整 count，不另計數、不回退後續結果，取消仍拒絕採用。真 PG 重開與原預算接線見[證據與限制](evidence/t06-agent-execution.md#12-第十二切片原計數結果補存)。不是遠端結果備份／完整重試 supervisor，T06 仍施工中。
 - **第十三切片（2026-09-30）：**承接 `9d38e038`，create／count／compact 共用持久 failure、Retry-After 與原工作預算；只有已核明故障可新准入，保存／結果不明不盲送。獨立審查的安全錯誤出口、例外鏈及耗盡前停止等待均補反例修正。[研究、回歸與未完邊界](evidence/t06-agent-execution.md#13-第十三切片共同外送的持久有界重試)。輪前準備、未明 attempt 調度、角色整合與真 provider 尚未完成，T06 不勾選。
 - **第十四切片（2026-09-30）：**承接 `bbe55f59`，輪前歷史計數／門檻／Agent 意圖共用原 C 保存流程；未壓縮決定亦可恢復，原 count／C 不因保存故障重送。[證據與限制](evidence/t06-agent-execution.md#14-第十四切片輪前歷史的門檻判斷與可恢復準備)。合法基底跨工作選用、角色資料綁定與取消回退尚未接完，不宣稱 T06 或產品安全點完成。
+- **第十五切片（2026-09-30）：**承接 `62d547f9`，沿 executions 管理 reference-only 歷史資格，原生完整窗口仍由官方 saver 保存；取消後新工作重用輪前基底、不帶被取消輸入、不重壓。[證據與限制](evidence/t06-agent-execution.md#15-第十五切片跨工作合法歷史與取消後基底)。角色固定資料、正式業務完成及背景回退調度仍待接線，T06 施工中。
 - **契約：**[共用執行](../../specs/2026-09-27-shared-agent-execution-and-state-design.md)、[Agent 接線](../../implementation/agent-execution.md)。
 - **程式／交付：**`agent_execution`、Responses／saver adapter、typed State／serializer、窄工具 handler 介面、單一 retry／計量責任；先使用測試工具與 fake Responses，不依賴產品工具完成。
 - **Red：**R 已保存卻重呼模型、只存 output_text、兩工具平行／配錯 call、公開文字誤判 final、serializer 丟 opaque／phase、role namespace 污染、SDK 隱含 retry。

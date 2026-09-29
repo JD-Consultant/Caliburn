@@ -13,6 +13,7 @@
 |---|---|---|
 | `prepare_context` | 核新工作綁定、已採用基底；追加一次 App 資料及必要輸入；保存原位置 | 同工作恢復刷新 maps、重複員工原話 |
 | `request_model` | 容量／外送資格通過後呼叫 SDK；保存完整 R、原 calls 與 App 操作身分 | 同一未持久 node 內直接做寫入工具 |
+| `account_response` | R 已保存後，以原 attempt 冪等結算；失敗恢復不重呼模型 | 把記帳失敗變成原 R 遺失、把取消當未付費 |
 | `prepare_tool` | 有業務效果的 call 先解析目前目標，形成固定命令與有界回傳，可靠保存後才執行；純讀取可直接走讀取路徑 | 工具重入重新解析舊 title、把預期成功文字當已提交 |
 | `execute_tool` | 每次處理一個已存 call；原業務核對／執行，保存配對結果；按原 output 次序前進 | 多個相依寫入平行；用最新資料冒充舊讀取結果 |
 | `finish_step` | 確認所有 calls 有確定結果；保存可用 Step 位置 | unresolved call 當完成、將此點當正式提交 |
@@ -77,13 +78,13 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 ### 4.2 已落地的單一模型／工具 Step（T06 第二切片）
 
-`agent_execution/tool_steps.py` 的 StateGraph 路徑是 `request_model → prepare_tool → execute_tool → prepare_tool → finish_step`；純讀／已知拒絕由 prepare 保存觀察，不進 execute。所有 call 處理完才形成新完整視窗並返回下一步建議；不是每次工具返回都重新呼叫模型。它是將納入共同 loop 的一個可組合 Step，不是 A／B1／B2 各自的 runner。
+`agent_execution/tool_steps.py` 的 StateGraph 路徑原為 `request_model → prepare_tool → execute_tool → prepare_tool → finish_step`；第七切片在 R 保存後、prepare 前加入 §4.5 的 `account_response`。純讀／已知拒絕由 prepare 保存觀察，不進 execute。所有 call 處理完才形成新完整視窗並返回下一步建議；不是每次工具返回都重新呼叫模型。它是將納入共同 loop 的一個可組合 Step，不是 A／B1／B2 各自的 runner。
 
 - 正常入口 `run_response_step` 統一指定 `durability="sync"`，依本次允許 call 數設定有界 graph recursion limit；超過 call 上限在派送前拒絕。框架 super-step 數與模型 Step 數不是同一上限。只在隔離故障測例使用私有 builder，不讓角色自行選保存模式。
 - 此元件每個邏輯 Step 使用獨立 thread；新輸入不得覆蓋已有 thread，只有 `None` 能恢復它，沒有保存位置也不能假裝恢復。外層角色 loop 接走完成窗口再建立下一 Step，並非重新定義產品 Turn。入口讀取檢查不是競爭鎖，單 writer／工作資格仍由執行 owner 保證。使用官方 `GraphOutput.value` typed 返回，不自造圖結果格式。
 - 原回應先保存，下一節點才檢查協定／工具。未知 phase 等被拒絕時，R 仍可回讀；不是先丟掉 R 再宣稱可恢復。操作 seed 和 R 同存，每個 call 從 seed＋原 call_id 得到穩定 App 操作身分，不由模型指定業務 ID。
 - 寫入 prepare 的命令先保存，execute 才交回原業務 owner。工具結果僅按原 calls 的有序前綴增加，下一筆 prepare 能看見上一筆已成立的候選；不平行派送。恢復不重新解析已保存命令的標題／正文，也不重算成功回傳。
-- `ResponseStepRuntime` 僅注入模型與工具 I/O，不持久化 SDK client／DB session。共用 State 不理解 Memory 命令內容；工具接線必須核對還原型別及原工作資格，業務效果仍由原 owner 的交易／冪等處理。
+- `ResponseStepRuntime` 注入模型、結算、工具與資格 I/O，不持久化 SDK client／DB session。共用 State 不理解 Memory 命令內容；工具接線必須核對還原型別及原工作資格，業務效果仍由原 owner 的交易／冪等處理。
 - `adapters/graph_checkpointer.py` 只配置官方 `JsonPlusSerializer`：關閉 pickle 與 legacy JSON 自訂 constructor；自訂 msgpack 型別由實際 caller 明確 allowlist，不建立 domain registry。Memory prepared create／revise／delete 的巢狀 dataclass、Enum、UUID、frozenset 已驗。框架 4.2.0 對未允許型別會降為 dict／原始值，且 tuple 會變 list，不能拿值相等當型別正確；本 Step 原生集合用 list，Memory prepared 無 tuple 欄位。不補第二套 codec。
 
 已驗：完整 R 保存後跨程序零重呼；兩工具有序；第一筆候選已提交但確認遺失，重入得到原效果後才進第二筆；model checkpoint 寫入前／寫入後拋錯均不先派工具，若 pending writes 已保存則由原框架承接；完成 Step 再 resume 不重加 items。以假 provider＋真 PG 驗證，無真實模型品質宣稱。
@@ -105,9 +106,9 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 ### 4.4 已落地的原回應補存與資格接線（T06 第五切片）
 
-`run_response_step` 在模型 node 返回前保留完整原 R、原 input 及同一 operation seed；僅在尚未進入下游節點的保存失敗時，以 `ResponseStepSaveError.recovery` 交還程序內的 `HeldModelResponse`。一般工具／協定／資格錯誤仍保持原分類，不一律轉為可重試保存錯誤。這不是另一份持久 ResponseStore，不寫入業務表、模型 context 或一般 log。
+`run_response_step` 在模型 node 返回前保留完整原 R、固定原 request 及同一 operation seed；僅在尚未進入下游節點的保存失敗時，以 `ResponseStepSaveError.recovery` 交還程序內的 `HeldModelResponse`。一般結算／工具／協定／資格錯誤仍保持原分類，不一律轉為可重試保存錯誤。這不是另一份持久 ResponseStore，不寫入業務表、模型 context 或一般 log。
 
-- 仍握有 recovery 時，以同一 thread、`input_items=None`、`recovery=...` 回到公開入口。入口先核有效工作資格，再查官方 saver；不呼叫模型、不由呼叫方自行改 Graph State。
+- 仍握有 recovery 時，以同一 thread、`request=None`、`recovery=...` 回到公開入口（第七切片將輸入改為完整固定 request）。先查官方 saver／原 request 身分；任何採用與執行仍須通過工作資格；不呼叫模型、不由呼叫方自行改 Graph State。無採用資格的晚到 R 只允許原計量，詳 §4.5。
 - 原 R／seed 已在 checkpoint 或 pending writes 時核對相符，沿目前位置恢復，**不覆寫之後的 prepared command、工具結果或完成視窗**。此時立即釋放該次呼叫的暫存保存責任，避免直接恢復 execute node 的工具／資格錯誤被誤分類。
 - 原 R 尚未保存時，必須仍在原 `request_model` 邊界、原 input 相同且無後續效果資料；再查資格，以官方 `aupdate_state(as_node="request_model")` 補存原 update，然後正常 `None` 接續。不同 thread、不同 input、不同已存 R／seed 或不相容位置拒絕，不猜測、不回退。
 - 查詢／補存再次失敗，仍交還同一原件；沒有自行循環、重新推論或增加付費請求。是否與何時重試由工作 supervisor 的單一有界政策承接；程序整個消失且兩種保存皆失敗時，不保證記憶體原件可恢復。`store=false` 不能靠 response ID 補取遺失內容。
@@ -115,6 +116,33 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 - Guard 與 saver／provider 不共用原子交易：取消後晚到 R 仍可能物理保存，但不能派送工具或交付有效結果。業務工具還須在自己的提交交易內核資格；T08／T11 才決定有效 Turn／批次基底，不能把任意 latest checkpoint 當成可採用歷史。
 
 已驗公開恢復入口、重複 handoff、原 R 確認遺失、雙保存失敗、後續工具錯誤不誤分類；真 PG 取消／writer 替換拒絕舊 worker，新有效 writer 可承接同一原 R。完整模型外送准入／費用結算、自動恢復調度、產品暫停／取消及 compaction 仍未因此完成。機制依 [LangGraph 狀態更新與接續](https://docs.langchain.com/oss/python/langgraph/use-time-travel)；本案只在核對原位置後補存既有 R，不以舊 checkpoint replay 重算外部工作。
+
+### 4.5 已落地的固定請求、一次外送與保存後結算（T06 第七切片）
+
+此切片把已有 executions 額度與 Step 接成**首次生成的受控路徑**。`workflows/model_requests.py` 協調公開業務服務、短交易與 SDK；共用 Graph 仍不 import features，不增加 ResponseStore、重試平台或第二套回執。完整容量檢查／多次 attempt 政策、compact／loop 尚待接線，這個元件不能單獨充作正式產品 runner。
+
+```mermaid
+flowchart TD
+  P["保存固定 request 與 logical request ID"] --> A["短交易：有效 writer、額度、首次 attempt"]
+  A -->|"提交已確認；釋放交易"| H["SDK 外送一次；隱含重試關閉"]
+  H --> R["保存完整 R、attempt ID、operation seed"]
+  R --> C["原 attempt 冪等結算"]
+  C --> G{"仍有工作資格？"}
+  G -->|是| T["依序 prepare／execute tools"]
+  G -->|否| X["不採用、不派工具；保留費用事實"]
+  A -->|"確認不明"| U["核對既有 attempt；不直接重送"]
+  H -->|"結果不明"| U
+  C -->|"結算失敗"| W["保留原 R，交回呼叫者"]
+  W -.->|"再次恢復只重入結算；不是自動無限重試"| C
+```
+
+- 每個新 Step 的初始 checkpoint 固定 App 產生的 `request_id` 與 **實際 create payload**，包括 model、instructions、tools、input、reasoning、輸出上限與 `stream=false`。沒有另存初始 input 副本；`input_items` 僅在完成 Step 時形成後續窗口。`ResponseRequest.from_snapshot` 還原同一請求，拒絕不符固定直連政策的快照，不能用目前角色設定代替當時設定。這是恢復資料，不宣告永久保存所有請求。
+- `ModelRequestExecutor.request_model` 在既有 execution 鎖內查原 request 的 attempts，核固定費用依據並預留；交易確認完成後才發一次 HTTP。同一 request 已有 attempt，即使其結果未知，也明確停止讓外層核對，不換 UUID 假裝首次呼叫；已保存 R 由 Graph 直接接續，不再進此入口。完整 payload 以 canonical JSON 的 SHA-256 綁定，不拿 payload hash 當 logical request 身分。
+- SDK 返回後，立即交出 `ReceivedModelResponse(response, attempt_id)`；其間沒有可能失敗的記費 SQL 或費用推算。Graph 保存原 R／attempt 後，才進 `account_response`。結算解析或提交失敗時，原 R 已在既有 saver，下一次只重入同一結算，不重呼模型。這借鑑官方耐久節點交界，不將整輪鎖成一個 DB transaction。
+- `ModelRequestAccounting` 必須明確提供與原 budget 相同的 `cost_basis`、預留及觀察成本計算；目前測例是合成數值，**尚未提供正式模型費率／容量配置**。沒有 usage／可靠成本時保留預留並停止，不能記零。費率與算式的正式接線需官方研究、容量及 provider gate，不能把此依賴注入當已完成帳單驗證。
+- 結算與採用分開：一般晚到 R、已保存 R 的取消後重入，以及已驗證 Held 補存期間取消，都可核對原 attempt 記費；仍不能派工具、採用新 context 或交付正式結果。Held 在進結算節點時釋放「尚未保存」責任，不把結算故障誤報為模型保存故障。取消恰好發生在 `aupdate_state` 補存期間時，使用剛補存的原件結算，不看過時的補存前查詢值。
+
+已驗同一 request 原子准入、准入確認遺失／HTTP timeout 不盲送、R 保存後結算前／後故障、取消後原成本核對、HTTP 期間另一連線可取得執行鎖，以及原恢復／工具效果回歸。具體命令與限制在 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#7-第七切片固定請求與保存後計量)。官方依據：[LangGraph sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)、[OpenAI 原件接續](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)；安全交界為本案工程取捨，不宣稱 provider 和 PostgreSQL 可共同原子提交。
 
 ## 5. 容量、重試與恢復不是同一政策
 

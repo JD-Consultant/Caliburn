@@ -3,16 +3,18 @@
 import json
 from copy import deepcopy
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from openai.types.responses import Response, ResponseFunctionToolCall
 
-from caliburn.adapters.response_serialization import snapshot_response
+from caliburn.adapters.openai_responses import ResponseRequest
+from caliburn.adapters.response_serialization import NativeItems, snapshot_response
 from caliburn.agent_execution.response_steps import UnsupportedModelResponseError
 from caliburn.agent_execution.tool_steps import (
+    ReceivedModelResponse,
     ResponseStepRuntime,
     _build_response_step,
     run_response_step,
@@ -21,6 +23,21 @@ from caliburn.agent_execution.tool_steps import (
 
 async def ensure_active() -> None:
     """This isolated graph fixture has no product execution owner."""
+
+
+async def account_response(received: ReceivedModelResponse) -> None:
+    """This isolated graph fixture does not persist execution costs."""
+
+
+def make_request(input_items: NativeItems) -> ResponseRequest:
+    return ResponseRequest(
+        model="gpt-6-luna",
+        instructions="synthetic",
+        input_items=input_items,
+        tools=[],
+        reasoning_effort="low",
+        max_output_tokens=512,
+    )
 
 
 def model_response() -> Response:
@@ -44,10 +61,10 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
     config = {"configurable": {"thread_id": "ordered-step"}}
     input_items = [{"role": "user", "content": "synthetic"}]
 
-    async def request(items: list) -> Response:
-        assert items == input_items
+    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+        assert model_request.count_payload()["input"] == input_items
         events.append("model")
-        return response
+        return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
         saved = await graph.aget_state(config)
@@ -64,9 +81,15 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
         return "result:" + prepared["call_id"]
 
     result = await graph.ainvoke(
-        {"input_items": input_items},
+        {"request_snapshot": make_request(input_items).create_payload(), "request_id": uuid4()},
         config,
-        context=ResponseStepRuntime(request, prepare, execute, ensure_active),
+        context=ResponseStepRuntime(
+            request_model=request,
+            prepare_tool=prepare,
+            execute_tool=execute,
+            ensure_active=ensure_active,
+            account_response=account_response,
+        ),
         durability="sync",
     )
     assert events == [
@@ -95,9 +118,9 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
     graph = _build_response_step(saver, max_tool_calls=16)
     config = {"configurable": {"thread_id": "recover-second"}}
 
-    async def request(items: list) -> Response:
+    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
         events.append("model")
-        return response
+        return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
         events.append("prepare:" + call.call_id)
@@ -115,9 +138,20 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
             assert prepared == prepared_second
         return "original result:" + prepared["call_id"]
 
-    runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
+    runtime = ResponseStepRuntime(
+        request_model=request,
+        prepare_tool=prepare,
+        execute_tool=execute,
+        ensure_active=ensure_active,
+        account_response=account_response,
+    )
     with pytest.raises(ConnectionError):
-        await graph.ainvoke({"input_items": []}, config, context=runtime, durability="sync")
+        await graph.ainvoke(
+            {"request_snapshot": make_request([]).create_payload(), "request_id": uuid4()},
+            config,
+            context=runtime,
+            durability="sync",
+        )
     assert (await graph.aget_state(config)).next == ("execute_tool",)
     result = await graph.ainvoke(None, config, context=runtime, durability="sync")
     assert events == [
@@ -137,8 +171,8 @@ async def test_read_or_rejection_is_saved_as_result_without_executing() -> None:
     saver = InMemorySaver()
     graph = _build_response_step(saver, max_tool_calls=16)
 
-    async def request(items: list) -> Response:
-        return response
+    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+        return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
         return "read or known rejection:" + call.call_id
@@ -147,9 +181,15 @@ async def test_read_or_rejection_is_saved_as_result_without_executing() -> None:
         pytest.fail("A read or known rejection must not dispatch a write")
 
     result = await graph.ainvoke(
-        {"input_items": []},
+        {"request_snapshot": make_request([]).create_payload(), "request_id": uuid4()},
         {"configurable": {"thread_id": "read-only"}},
-        context=ResponseStepRuntime(request, prepare, execute, ensure_active),
+        context=ResponseStepRuntime(
+            request_model=request,
+            prepare_tool=prepare,
+            execute_tool=execute,
+            ensure_active=ensure_active,
+            account_response=account_response,
+        ),
         durability="sync",
     )
     assert len(result["tool_results"]) == 2
@@ -164,8 +204,8 @@ async def test_unsupported_response_is_preserved_before_routing_rejects_it() -> 
     graph = _build_response_step(saver, max_tool_calls=16)
     config = {"configurable": {"thread_id": "unsupported-phase"}}
 
-    async def request(items: list) -> Response:
-        return response
+    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+        return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
         pytest.fail("Unsupported protocol cannot reach tools")
@@ -175,9 +215,15 @@ async def test_unsupported_response_is_preserved_before_routing_rejects_it() -> 
 
     with pytest.raises(UnsupportedModelResponseError):
         await graph.ainvoke(
-            {"input_items": []},
+            {"request_snapshot": make_request([]).create_payload(), "request_id": uuid4()},
             config,
-            context=ResponseStepRuntime(request, prepare, execute, ensure_active),
+            context=ResponseStepRuntime(
+                request_model=request,
+                prepare_tool=prepare,
+                execute_tool=execute,
+                ensure_active=ensure_active,
+                account_response=account_response,
+            ),
             durability="sync",
         )
     saved = await graph.aget_state(config)
@@ -193,10 +239,10 @@ async def test_public_entry_rejects_restarted_input_and_resumes_same_operation()
     operations = []
     saver = InMemorySaver()
 
-    async def request(items: list) -> Response:
+    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
         nonlocal requests
         requests += 1
-        return response
+        return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
         return {"call_id": call.call_id, "operation_id": operation_id}
@@ -211,15 +257,21 @@ async def test_public_entry_rejects_restarted_input_and_resumes_same_operation()
         operations.append(prepared["operation_id"])
         return "done"
 
-    runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
+    runtime = ResponseStepRuntime(
+        request_model=request,
+        prepare_tool=prepare,
+        execute_tool=execute,
+        ensure_active=ensure_active,
+        account_response=account_response,
+    )
     options = {"thread_id": "protected-entry", "runtime": runtime, "max_tool_calls": 16}
     with pytest.raises(ValueError, match="no saved Step"):
-        await run_response_step(saver, input_items=None, **options)
+        await run_response_step(saver, request=None, **options)
     with pytest.raises(ConnectionError):
-        await run_response_step(saver, input_items=[], **options)
+        await run_response_step(saver, request=make_request([]), **options)
     with pytest.raises(ValueError, match="already exists"):
-        await run_response_step(saver, input_items=[], **options)
-    result = await run_response_step(saver, input_items=None, **options)
+        await run_response_step(saver, request=make_request([]), **options)
+    result = await run_response_step(saver, request=None, **options)
     assert requests == 1
     assert len(set(operations)) == len(operations) == 2
     assert result["next_action"] == "continue"
@@ -227,8 +279,8 @@ async def test_public_entry_rejects_restarted_input_and_resumes_same_operation()
 
 @pytest.mark.asyncio
 async def test_configured_tool_bound_rejects_before_any_effect() -> None:
-    async def request(items: list) -> Response:
-        return model_response()
+    async def request(model_request: ResponseRequest, request_id: UUID) -> ReceivedModelResponse:
+        return ReceivedModelResponse(response=model_response(), attempt_id=uuid4())
 
     async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
         pytest.fail("Over-limit response cannot dispatch any tool")
@@ -240,7 +292,13 @@ async def test_configured_tool_bound_rejects_before_any_effect() -> None:
         await run_response_step(
             InMemorySaver(),
             thread_id="limited-step",
-            input_items=[],
-            runtime=ResponseStepRuntime(request, prepare, execute, ensure_active),
+            request=make_request([]),
+            runtime=ResponseStepRuntime(
+                request_model=request,
+                prepare_tool=prepare,
+                execute_tool=execute,
+                ensure_active=ensure_active,
+                account_response=account_response,
+            ),
             max_tool_calls=1,
         )

@@ -14,6 +14,7 @@ from langgraph.runtime import Runtime
 from openai.types.responses import Response, ResponseFunctionToolCall
 from openai.types.responses.response_input_item_param import FunctionCallOutput
 
+from caliburn.adapters.openai_responses import ResponseRequest
 from caliburn.adapters.response_serialization import (
     NativeItems,
     NativeSnapshot,
@@ -27,7 +28,10 @@ from caliburn.agent_execution.response_steps import ResponseAction, inspect_resp
 
 
 class ResponseStepState(TypedDict, total=False):
+    request_id: UUID
+    request_snapshot: NativeSnapshot
     input_items: NativeItems
+    response_attempt_id: UUID
     response_snapshot: NativeSnapshot
     operation_seed: UUID
     prepared_tool: object | None
@@ -36,13 +40,22 @@ class ResponseStepState(TypedDict, total=False):
 
 
 @dataclass(frozen=True, slots=True)
+class ReceivedModelResponse:
+    """The original SDK result paired with the already-admitted outbound attempt."""
+
+    response: Response = field(repr=False)
+    attempt_id: UUID
+
+
+@dataclass(frozen=True, slots=True)
 class ResponseStepRuntime:
     """Injected I/O, not persisted State. The tool owner validates its prepared command type."""
 
-    request_model: Callable[[NativeItems], Awaitable[Response]]
+    request_model: Callable[[ResponseRequest, UUID], Awaitable[ReceivedModelResponse]]
     prepare_tool: Callable[[ResponseFunctionToolCall, UUID], Awaitable[object]]
     execute_tool: Callable[[object], Awaitable[str]]
     ensure_active: Callable[[], Awaitable[None]]
+    account_response: Callable[[ReceivedModelResponse], Awaitable[None]]
 
 
 @dataclass(frozen=True, slots=True)
@@ -54,7 +67,8 @@ class HeldModelResponse:
     """
 
     thread_id: str
-    input_items: NativeItems = field(repr=False)
+    request_id: UUID
+    request_snapshot: NativeSnapshot = field(repr=False)
     update: ResponseStepState = field(repr=False)
 
 
@@ -72,7 +86,7 @@ async def run_response_step(
     checkpointer: BaseCheckpointSaver[str],
     *,
     thread_id: str,
-    input_items: NativeItems | None,
+    request: ResponseRequest | None,
     runtime: ResponseStepRuntime,
     max_tool_calls: int,
     recovery: HeldModelResponse | None = None,
@@ -84,16 +98,18 @@ async def run_response_step(
     """
     if not thread_id:
         raise ValueError("A durable Step requires a nonempty thread identity")
-    if recovery is not None and (recovery.thread_id != thread_id or input_items is not None):
+    if recovery is not None and (recovery.thread_id != thread_id or request is not None):
         raise ValueError("A held response can only resume its original Step with None")
     # The small holder belongs to this invocation, not to the role or the saver.
-    # Clearing it on entry to prepare means later tool/protocol errors cannot
+    # Clearing it on entry to accounting means later accounting/tool errors cannot
     # accidentally be classified as model persistence errors.
     held = recovery
 
-    def retain(input_items: NativeItems, update: ResponseStepState) -> None:
+    def retain(state: ResponseStepState, update: ResponseStepState) -> None:
         nonlocal held
-        held = HeldModelResponse(thread_id, deepcopy(input_items), deepcopy(update))
+        held = HeldModelResponse(
+            thread_id, state["request_id"], deepcopy(state["request_snapshot"]), deepcopy(update)
+        )
 
     def release() -> None:
         nonlocal held
@@ -109,22 +125,26 @@ async def run_response_step(
         "configurable": {"thread_id": thread_id},
         "recursion_limit": 2 * max_tool_calls + 8,
     }
-    await runtime.ensure_active()
     try:
         saved = await graph.aget_state(config)
     except Exception as error:
         if held is not None:
             raise ResponseStepSaveError(held) from error
         raise
-    if input_items is not None and saved.created_at is not None:
+    if request is not None and saved.created_at is not None:
         raise ValueError("This Step already exists; resume with None instead of new input")
-    if input_items is None and saved.created_at is None:
+    if request is None and saved.created_at is None:
         raise ValueError("There is no saved Step to resume")
     if recovery is not None:
+        if (
+            saved.values.get("request_id") != recovery.request_id
+            or saved.values.get("request_snapshot") != recovery.request_snapshot
+        ):
+            raise ValueError("The held response does not match the saved request boundary")
         if "response_snapshot" in saved.values:
             if any(
                 saved.values.get(key) != recovery.update[key]
-                for key in ("response_snapshot", "operation_seed")
+                for key in ("response_snapshot", "response_attempt_id", "operation_seed")
             ):
                 raise ValueError("The saved Step contains a different model result")
             # A confirmed R (including native pending writes) wins. In particular,
@@ -133,22 +153,41 @@ async def run_response_step(
         else:
             if (
                 saved.next != ("request_model",)
-                or saved.values.get("input_items") != recovery.input_items
                 or saved.values.get("tool_results")
                 or saved.values.get("prepared_tool") is not None
                 or saved.values.get("next_action") is not None
             ):
                 raise ValueError("The held response does not match the saved request boundary")
-            await runtime.ensure_active()
+            try:
+                await runtime.ensure_active()
+            except Exception:
+                # Late billing is still real, but an inactive worker cannot adopt the R.
+                await runtime.account_response(_received_response(recovery.update))
+                raise
             try:
                 await graph.aupdate_state(
                     config, deepcopy(recovery.update), as_node="request_model"
                 )
             except Exception as error:
                 raise ResponseStepSaveError(recovery) from error
-    initial_state: ResponseStepState | None = (
-        {"input_items": input_items} if input_items is not None else None
-    )
+    try:
+        await runtime.ensure_active()
+    except Exception:
+        if "response_snapshot" in saved.values:
+            await runtime.account_response(
+                ReceivedModelResponse(
+                    restore_response(saved.values["response_snapshot"]),
+                    saved.values["response_attempt_id"],
+                )
+            )
+        elif recovery is not None:
+            # The validated handoff may just have been adopted by aupdate_state;
+            # `saved` still describes the earlier boundary, not that successful write.
+            await runtime.account_response(_received_response(recovery.update))
+        raise
+    initial_state: ResponseStepState | None = None
+    if request is not None:
+        initial_state = {"request_id": uuid4(), "request_snapshot": request.create_payload()}
     try:
         result = await graph.ainvoke(
             initial_state,
@@ -169,7 +208,7 @@ def _build_response_step(
     checkpointer: BaseCheckpointSaver[str],
     *,
     max_tool_calls: int,
-    retain_response: Callable[[NativeItems, ResponseStepState], None] | None = None,
+    retain_response: Callable[[ResponseStepState, ResponseStepState], None] | None = None,
     release_response: Callable[[], None] | None = None,
 ) -> CompiledStateGraph[
     ResponseStepState, ResponseStepRuntime, ResponseStepState, ResponseStepState
@@ -182,23 +221,34 @@ def _build_response_step(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
         await runtime.context.ensure_active()
-        response = await runtime.context.request_model(deepcopy(state["input_items"]))
+        received = await runtime.context.request_model(
+            ResponseRequest.from_snapshot(state["request_snapshot"]), state["request_id"]
+        )
         update: ResponseStepState = {
-            "response_snapshot": snapshot_response(response),
+            "response_snapshot": snapshot_response(received.response),
+            "response_attempt_id": received.attempt_id,
             "operation_seed": uuid4(),
             "prepared_tool": None,
             "tool_results": [],
             "next_action": None,
         }
         if retain_response is not None:
-            retain_response(state["input_items"], update)
+            retain_response(state, update)
         return update
 
-    async def prepare_tool(
+    async def account_response(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
         if release_response is not None:
             release_response()
+        # R is durable before usage parsing / SQL. Accounting is idempotent and must
+        # remain possible after cancellation; only subsequent adoption needs a guard.
+        await runtime.context.account_response(_received_response(state))
+        return {}
+
+    async def prepare_tool(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
         await runtime.context.ensure_active()
         # Inspection is after R's node boundary so unsupported output is still recoverable.
         calls = inspect_response_step(restore_response(state["response_snapshot"])).calls
@@ -256,7 +306,7 @@ def _build_response_step(
             raise ValueError("A complete Step cannot have unresolved tool results")
         return {
             "input_items": [
-                *state["input_items"],
+                *state["request_snapshot"]["input"],
                 *response_input_items(response),
                 *(dict(item) for item in state["tool_results"]),
             ],
@@ -267,12 +317,20 @@ def _build_response_step(
 
     graph = StateGraph(ResponseStepState, context_schema=ResponseStepRuntime)
     graph.add_node("request_model", request_model)
+    graph.add_node("account_response", account_response)
     graph.add_node("prepare_tool", prepare_tool)
     graph.add_node("execute_tool", execute_tool)
     graph.add_node("finish_step", finish_step)
     graph.add_edge(START, "request_model")
-    graph.add_edge("request_model", "prepare_tool")
+    graph.add_edge("request_model", "account_response")
+    graph.add_edge("account_response", "prepare_tool")
     graph.add_conditional_edges("prepare_tool", route_prepared)
     graph.add_edge("execute_tool", "prepare_tool")
     graph.add_edge("finish_step", END)
     return graph.compile(checkpointer=checkpointer)
+
+
+def _received_response(state: ResponseStepState) -> ReceivedModelResponse:
+    return ReceivedModelResponse(
+        restore_response(state["response_snapshot"]), state["response_attempt_id"]
+    )

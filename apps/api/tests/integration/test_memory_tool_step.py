@@ -13,7 +13,12 @@ from psycopg.conninfo import make_conninfo
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
-from caliburn.agent_execution.tool_steps import ResponseStepRuntime, _build_response_step
+from caliburn.adapters.openai_responses import ResponseRequest
+from caliburn.agent_execution.tool_steps import (
+    ReceivedModelResponse,
+    ResponseStepRuntime,
+    _build_response_step,
+)
 from caliburn.features.executions import service as executions
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
 from caliburn.features.work_memory.candidates import (
@@ -35,6 +40,10 @@ from caliburn.workflows.memory_reads import CandidateMemoryRead, MemoryReadWorkf
 from caliburn.workflows.memory_writes import MemoryWritePreparation
 
 pytestmark = pytest.mark.postgres
+
+
+async def account_response(received: ReceivedModelResponse) -> None:
+    """Memory effect fixture, without execution cost persistence."""
 
 
 def test_committed_first_write_recovers_original_before_dependent_second_write(
@@ -109,9 +118,11 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
             calls = []
             committed = None
 
-            async def request(items: list) -> Response:
+            async def request(
+                model_request: ResponseRequest, request_id: UUID
+            ) -> ReceivedModelResponse:
                 calls.append("model")
-                return response
+                return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
             async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
                 calls.append("prepare:" + call.call_id)
@@ -153,13 +164,33 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
                 async with database.sessions.begin() as session:
                     await executions.lock_active_writer(session, writer)
 
-            runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
+            runtime = ResponseStepRuntime(
+                request_model=request,
+                prepare_tool=prepare,
+                execute_tool=execute,
+                ensure_active=ensure_active,
+                account_response=account_response,
+            )
+            model_request = ResponseRequest(
+                model="gpt-6-luna",
+                instructions="synthetic",
+                input_items=[],
+                tools=[],
+                reasoning_effort="low",
+                max_output_tokens=512,
+            )
             async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
                 await saver.setup()
                 graph = _build_response_step(saver, max_tool_calls=16)
                 with pytest.raises(ConnectionError, match="after business commit"):
                     await graph.ainvoke(
-                        {"input_items": []}, config, context=runtime, durability="sync"
+                        {
+                            "request_snapshot": model_request.create_payload(),
+                            "request_id": uuid4(),
+                        },
+                        config,
+                        context=runtime,
+                        durability="sync",
                     )
                 assert (await graph.aget_state(config)).next == ("execute_tool",)
                 assert len(await candidates.read_map(scope, stage=stage, layer=stage.phase)) == 1

@@ -1,17 +1,20 @@
 # 職務檔案與訪談保存接線
 
-- 狀態：**T02 局部已實作／真 PostgreSQL 已驗**，2026-09-29。完成範圍以[任務及證據](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md)為準；尚無 A 完成、取消／准入或列表 UI。
+- 狀態：**T02 局部已實作／真 PostgreSQL 已驗**，2026-09-29。已有檔案／開場、輸入接受及持久執行准入；尚無 A 完成、Graph 控制／恢復或列表 UI。範圍與實測見[任務及證據](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md)。
 - 語意仍由[資料保存](../architecture/persistence.md)及[正式來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
 - 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/migrations/versions/0001_job_files_and_interviews.py)。
 
-## 1. 三類記錄，不複製原話
+## 1. 原文、正式資格與執行身分分開，不複製原話
 
-圖只含目前已建立的業務表，不含尚未實作的執行資格、JD、Memory。
+圖只含目前已建立的五張業務表，不含尚未實作的 JD、Memory 或 Graph checkpoint。
 
 ```mermaid
 erDiagram
   job_files ||--o{ interview_texts : owns
+  job_files ||--o{ executions : admits
   interview_texts ||--o| formal_interviews : qualifies
+  interview_texts ||--o| interview_inputs : submitted_as
+  executions ||--o| interview_inputs : accepts
   job_files {
     uuid job_file_id PK
     uuid creation_command_id UK
@@ -31,6 +34,20 @@ erDiagram
     int interview_sequence PK
     uuid source_id FK,UK
   }
+  executions {
+    uuid execution_id PK
+    uuid job_file_id FK
+    text kind
+    text status
+    uuid writer_id
+    timestamptz created_at
+  }
+  interview_inputs {
+    uuid job_file_id PK,FK
+    uuid command_id PK
+    uuid source_id FK,UK
+    uuid execution_id FK,UK
+  }
 ```
 
 | 儲存 | 擁有的內容與身分 | 關係／約束 |
@@ -38,10 +55,12 @@ erDiagram
 | `job_files` | UUID 職務檔案、目前顯示名稱、受訪者及建立命令的原始結果資料 | 同名可存在；建立命令唯一。名稱不是隔離鍵 |
 | `interview_texts` | 不可變來源、所屬檔案、真實發話者、完整訪談原文 | 沒有正式序號；UPDATE／DELETE 拒絕 |
 | `formal_interviews` | 檔案內的正式順序及指向原文的來源身分 | 同檔案複合外鍵；來源最多取得一次正式資格；正整數、不可改寫 |
+| `interview_inputs` | 原提交命令、原文來源與 A 執行的固定關係 | 同檔案複合 FK；命令限檔案內唯一；不可改寫。只有員工提交有此關係，App 開場沒有 |
+| `executions` | 工作種類、持久准入狀態與可被取代的 writer 身分 | 同檔案各一個活躍／暫停 A、各一個活躍 Memory；不保存模型窗口、圖節點或候選正文 |
 
 一份檔案可有多筆原文；原文可以尚無正式資格。正式歷史從 `formal_interviews` JOIN `interview_texts` 投影，不直接掃全部原文。複合 FK `(job_file_id, source_id)` 防止把甲檔案的原文編入乙檔案；`source_id` 與正式序號是不同身分。這是既定「原文保存不等於正式可用」的儲存分離，**不是新增一份可自行編輯的對話副本**。
 
-目前只有 App 開場會在建立時取得序號 1。原文表能承接後續待處理輸入，但接受員工輸入、成功完成時分配正式序號、執行失效與候選引用接線仍由 T02 後續／T08 完成；沒有對外開任意新增正式訊息的 API。
+目前只有 App 開場會在建立時取得序號 1。已接受員工輸入會進原文與提交關係，但不進正式資格。成功時受控分配序號仍由 T02 後續／T08 完成；沒有對外開任意新增正式訊息的 API。停止執行資格不能自行完成整個 Turn 的候選／context 回退。
 
 ## 2. 建立與重送
 
@@ -61,11 +80,13 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 |---|---|
 | `features/*/models.py` | 純值型別、輸入不變量及領域錯誤；不依賴 ORM／HTTP |
 | `job_files/service.py` | 建立與原命令輸入一致性；不 commit |
-| `interviews/service.py` | 建立 App 開場用例；不 commit |
+| `interviews/service.py` | 保存 App 開場、接受員工原文及核對原提交；不 commit，不因接受輸入授予正式資格 |
 | 各 feature `persistence.py` | 自己的表及參數化 SQL；不讀另一 feature 的私有 persistence |
 | 各 feature `queries.py` | 對外 typed 查詢投影；無寫入副作用 |
 | `workflows/job_files.py` | 跨領域短交易及每次獨立 session |
-| `transport/http/job_files.py` | 生成 DTO、HTTP 狀態及結果投影；不寫 SQL |
+| `workflows/interview_inputs.py` | 同次保存原輸入、原接受結果及 A 准入；不直接啟動模型 |
+| `features/executions/service.py` | 同範圍准入、writer CAS／fencing、暫停與終態資格；不是 Graph 游標或程序存活偵測 |
+| `transport/http/job_files.py`、`interview_inputs.py` | 生成 DTO、HTTP 狀態及結果投影；不寫 SQL |
 | `bootstrap.py`／`adapters/database.py` | lifespan 組裝／關閉 engine、啟動檢查 migration head；不保存業務內容 |
 
 沒有 BaseRepository、通用 UnitOfWork 註冊器或每層一個抽象 interface。Service 以少量 module 函式實現；共用 session factory 的 workflow 才用小型實例。這是[程式撰寫規範](coding-standard.md)的實際應用，不以「每層一個 class」表示解耦。
@@ -86,3 +107,31 @@ Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／Type
 - PostgreSQL [ON CONFLICT](https://www.postgresql.org/docs/current/sql-insert.html#SQL-ON-CONFLICT)提供原子衝突處理；原始 payload／結果如何保存仍是本案用例責任，不由框架猜。
 - Alembic [命名慣例](https://alembic.sqlalchemy.org/en/latest/naming.html)中的 `op.f()` 表示已完成命名，避免 CHECK 名稱被再次加前綴；[cookbook](https://alembic.sqlalchemy.org/en/latest/cookbook.html)承接顯式 connection。
 - 不可變原文與資格分表、建立原結果保存在原 owner，是依本產品保證的選擇，不聲稱是所有大型專案唯一標準。
+
+## 6. 輸入接受、重送與新提交
+
+[InterviewInputWorkflow](../../apps/api/src/caliburn/workflows/interview_inputs.py)以一個短交易依序：鎖定職務檔案列 → 查原命令 → 若尚未成立則取得 A 准入 → 保存原文及提交關係 → COMMIT。命令身分由 HTTP client 提供；execution／source UUID 由 App 配置，不讓模型填寫。
+
+- 原命令已存在：核對完整原文字串，返回相同 source／execution。即使原 Turn 已取消，這仍是「當時曾接受」的原結果，不表示再次執行；UI 之後查當前執行狀態，不能由 200 推論 A 活躍。
+- 使用者決定重新提交相同文字：使用**新命令**，得到新執行／來源；舊輸入不進正式歷史。與瀏覽器斷線重送原命令不同。
+- 同命令不同文字回 409；同檔案另一個活躍／暫停 A 回 409，未接受內容不承諾已保存。輸入驗證不做 trim 或補標籤，完整保留實際文字；空白／NUL 拒絕。
+- 原文寫入後交易失敗：原文、提交關係與准入一起回滾。不能只留下活躍 A 卻沒有其輸入，也不能留下可被背景取用的半套來源。
+- 正式訪談 API 始終只讀正式資格 JOIN 原文。可保存、可供原工作接續、可給其他 Agent 引用，是三種不同能力。
+
+目前 HTTP 202 **只證明輸入與准入已保存**；本切片尚無 Graph 啟動，不能當成 AI 訪談已可用。正常調度、控制與完成交易由 T08／T09 接上，不增加假完成端點來繞過前置條件。
+
+## 7. 准入與 writer fencing 的實際界線
+
+[Execution service](../../apps/api/src/caliburn/features/executions/service.py)使用 PostgreSQL partial unique index 限制 `(job_file_id, kind)` 中 status 為 active／paused 的列。A 與 Memory 的種類不同，可以同檔並行；不同檔案互不鎖整個 App。額外以 CHECK 拒絕 Memory 的 paused／cancelled，使用者不管理 Memory。
+
+執行准入與 writer 領取分開：輸入可先可靠保存，尚無 writer。Runner 提供 App 產生且可重用的 `writer_id`，以列鎖核對原 writer 身分後領取；相同領取可重入，競爭者不能覆蓋已成立身分。受控恢復可明確比較並取代舊 writer，之後遲到的舊 writer 不得寫入。這是資料庫檢查用的 **fencing**，不是授權憑證、租約、自動逾時或已確認程序停止的證據。
+
+需具副作用的 workflow 必須在**同一交易**內 `lock_active_writer` 後才改候選／完成；不能檢查後先 COMMIT，再以記憶體裡的結果寫入。取消／完成也鎖同一執行列，因此終態只能有一個勝者。terminal 結果不可反向改為 active；原結果查回不授予新的寫入資格。這僅保證資格裁決，不等於完整 JD、正式訪談與背景意圖已共同提交。
+
+固定短鎖順序為 **職務檔案 → 執行 → 相關領域記錄**。A 接受與未來人工 JD 修改共享職務檔案列的短鎖；人工 workflow 鎖檔案後呼叫 `require_manual_edit_allowed`。單純候選工具／控制只需執行列時不得反向再取檔案鎖。檔案鎖／交易不跨模型呼叫、等待使用者或 backoff。
+
+`pause_execution` 表示 runner 已到安全點，不表示已實作 UI「要求暫停」；`finish_execution` 只改准入資格，必須由 T08／T11 的原子協調與所需業務效果一起提交。被取消／失敗來源的原文仍保留，序號與模型可見歷史不因此成立。
+
+**仍待 T06／T08／T11／T12：**控制意圖、證明舊 runner 不再使用資格的 supervisor 接線、重啟領取政策、Graph 接續、候選回退、費用累計與真程序故障。不得只憑「有 writer_id」就宣稱故障恢復已完成；不能因請求超時便自行取代仍在執行的 writer。
+
+官方依據：[PostgreSQL 列鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)與[部分唯一索引](https://www.postgresql.org/docs/current/indexes-partial.html)提供短交易競爭與限定集合的唯一性；狀態、作用域及恢復授權是本案契約，並非 PostgreSQL 替 App 判斷。未新增 scheduler、broker、lease 平台或第二份 Graph State。

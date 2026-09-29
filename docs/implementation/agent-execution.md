@@ -92,6 +92,17 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 尚未完成：上述雙保存失敗的正式接線、執行／預算准入、取消與暫停、角色 thread／候選安全點整合、compact 安全採用及官方 API。不能因上述 Step 可恢復就宣告 T06 或產品生命週期已完成。依據：[官方 durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)、[saver／sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)，及鎖定框架原碼與本切片反例。
 
+### 4.3 已落地的直連請求與失敗分類（T06 第三切片）
+
+`adapters/openai_responses.py` 只承接官方 SDK，不負責預算、保存、採用或重試。`ResponseRequest` 擁有組裝完成資料的獨立複本；計數與 create 從同一 context 產生 payload，外部後續改 maps／items 不會改掉已計數的請求。它不是持久 request store。工具允許一次返回多 calls，App 仍按 §4.2 順序執行。
+
+- Client factory 固定官方 base URL、有限 timeout、`max_retries=0`；不採環境中的 proxy base。SDK 預設 HTTP client 會跟隨 redirect，本案明確關閉，注入的 client 若開啟跟隨則拒絕；避免官方起始網址的 307／308 把原文轉送別處。
+- Create 明確使用 `store=False`、`all_turns`、`truncation="disabled"`、輸出上限及同步非 background 回應；不帶 `previous_response_id`／server-side compaction。保留 `include=["reasoning.encrypted_content"]` 作明確相容設定；當前官方說明 `store=false` 已預設附帶，不把它說成唯一取得方法。
+- Count 和 compact 也只外送一次，不降級成猜測計數／本地摘要；compact 返回完整 SDK C，沒有在 adapter 自行採用。鎖定 SDK 的 standalone compact **沒有 `max_output_tokens`**，不能用 create 的輸出上限當其費用上界。
+- `adapters/openai_failures.py` 區分遠端結果不明、暫時服務問題、權限／額度阻塞、容量、請求與回應協定問題；不複製可能含原話／秘密的 error body 到 State 或 UI。分類不等於已准許重試，更不代表該次免費。
+
+此切片目前是**非串流傳輸接線**；公開中間訊息／UI 串流、Retry-After 排程、持久額度與原結果採用仍待後續。離線官方 SDK MockTransport 已驗一次外送、同 payload 及 redirect 拒絕；不是遠端接受或產品恢復驗收。依據：[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[錯誤分類](https://developers.openai.com/api/docs/guides/error-codes)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)，並核鎖定 SDK 3.20.0 的 client／retry／compact 原碼。
+
 ## 5. 容量、重試與恢復不是同一政策
 
 每次推論外送前核實際完整 request，含 instructions、tools、原生 items、App 資料及輸出／推理預留。首選 direct SDK 的 `responses.input_tokens.count`：用同一份組裝 payload 中計數 API 接受的欄位計數，核對所選模型、reasoning／compaction items 的實際接受性。這是遠端計數，不是本機 tokenizer；仍受資料外送授權、timeout 與重試規則約束，不假設免費或永遠可用。[OpenAI token counting](https://developers.openai.com/api/docs/guides/token-counting)

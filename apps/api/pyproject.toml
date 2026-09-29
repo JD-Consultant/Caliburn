@@ -13,6 +13,7 @@ dependencies = [
     "langgraph==1.2.12",
     "langgraph-checkpoint-postgres==3.1.2",
     "openai==3.20.0",
+    "httpx2==2.13.1",
     "rapidfuzz==3.14.6",
 ]
 
@@ -20,7 +21,6 @@ dependencies = [
 dev = [
     "datamodel-code-generator==0.83.0",
     "httpx==0.28.1",
-    "httpx2==2.13.1",
     "jsonschema==4.26.0",
     "mypy==2.3.1",
     "pytest==9.1.1",

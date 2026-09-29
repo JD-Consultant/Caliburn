@@ -70,7 +70,28 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/ca
 
 上述追加後同集合 **452 passed in 9.40s**。Ruff check／format **162 files**、mypy **139 source files** 通過，文件 20 份／312 links 零錯、diff check 通過。獨立代理複核兩個 P2 已修，指定 4 tests 與 9 組有界離線 probe 通過（含 call 數恰達上限、完成後公開入口恢復），無新增重大發現。真正 DB 僅使用測例建立的隨機 schema，測後移除該 schema；共享 55439 server／database 留存。無付費、無 `.env`、無真員工外送。本段不是完整 E01–E04 或 T06 完成。
 
-## 3. 下一個可執行切片
+## 3. 第三切片：直連請求與安全失敗分類
+
+第二切片已提交 `a52d76d9`。本切片重新搜尋並取得官方 reasoning、error codes、token counting、standalone compaction 原文，再核 SDK 3.20.0 的 retry、HTTP defaults 與方法簽名。沿 [工程接線 §4.3](../../../implementation/agent-execution.md#43-已落地的直連請求與失敗分類t06-第三切片) 記能力與限制，不自建 Provider／Responses store。
+
+### 反例與驗證
+
+- 初始未關 SDK retry 的 503 測例得到 **1 failed**：實際外送 3 次，不是上層看見的 1 次。明確 `max_retries=0` 後，create／count／compact 與 timeout 都只做原次請求；後續重試必須回執行責任。
+- `ResponseRequest` 先複製 context；測例修改原輸入／tools 及曾取得的 payload，不影響 count／create 的一致性。SDK 原返回保留 opaque、phase 及 metadata；compact 保留完整 C，不修改原 W。這是 HTTP MockTransport 證據，不代表遠端已接受。
+- 獨立唯讀審查指出 SDK 會跟隨 redirect，把正文轉往其他 host；新增注入不安全 client 反例先得 **1 failed**。改用官方 `DefaultAsyncHttpxClient(follow_redirects=False)`，並拒絕不安全注入；307／308 各覆蓋 create／count／compact，只收到官方 host 的一次請求。子代理重新跑 12 項契約測試通過，原 P2 關閉。
+- 安全錯誤分類以已知 quota／permission／capacity／transient 狀態處理；不把 API exception 的原文帶入摘要，不把未知結果當未收費。分類器無自動重試或無限回圈。
+
+受影響 adapter／分類測例 **23 passed in 0.67s**；全 unit／contract **469 passed in 7.86s**。Ruff check／format **166 files**、mypy **141 source files** 通過。命令沿 §1，這次沒有修改 DB／Graph 保存，故不為薄 adapter 重跑全部 PG／UI；既有 PG 證據仍為 §2，不把本次离線測試標成新增持久 gate。
+
+`httpx2==2.13.1` 因直接 runtime import 由 dev 移到 runtime dependency；uv lock 僅變更依賴分組，沒有升版。預設 cache 權限／本機 offline metadata 不足時改用 repo cache，經授權網路取得公開套件 metadata；不把環境錯誤算產品 Red。本批沒有付費模型、`.env`、真員工或 repo 資料外送。
+
+### 持久額度的下一切片方向（尚未實作）
+
+研究子代理唯讀比較 Azure Retry、官方 SDK 與既有 executions owner；主代理採「原工作共用預算、每次外送先持久准入、查回原結果優先」作下一切片方向，不另建通用 scheduler 或 R／C 正文庫。外送許可與結果採用分開：晚到結果仍須計量，失效 writer 不得採用；重啟／B 回交不重置額度。未知費用保留估計占用，不能按零處理。
+
+待驗反例：兩連線競爭最後一次額度；准入後中斷不能拿舊許可再外送；原 R／C 已保存只補結果不重呼；取消後舊結果可記帳但不可進下一步。Standalone compact 沒有 create 的輸出限制、計數 API 也不可假設免費，須在費用規則與預檢 manifest 說清楚。這是工程研究方向，不是上述能力已交付。
+
+## 4. 下一個可執行切片
 
 繼續外層共用 loop 與單一有界計量／外送資格，將「checkpoint＋pending writes 都失敗，但原 R 還在」的能力證據接入有資格檢查的正式恢復路徑，再接 compact／角色控制。正常 Step 入口已固定 sync／recursion／新輸入與恢復界線。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執。工具接線需核對還原巢狀型別；目前只有 Memory 的 prepared 路徑證據，未驗 JD／角色完整整合。
 

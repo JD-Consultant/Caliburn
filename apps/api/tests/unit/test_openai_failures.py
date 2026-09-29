@@ -1,0 +1,51 @@
+"""Transient classification never overrides a known billing/capacity block."""
+
+import httpx2
+import pytest
+from openai import APIConnectionError, APIResponseValidationError, APIStatusError, APITimeoutError
+
+from caliburn.adapters.openai_failures import ResponseFailureKind, classify_response_failure
+
+
+@pytest.mark.parametrize(
+    ("status", "code", "error_type", "retry_header", "expected"),
+    [
+        (429, "credit_balance_exhausted", None, "true", ResponseFailureKind.ACCESS_BLOCKED),
+        (429, "project_spend_limit_exceeded", None, None, ResponseFailureKind.ACCESS_BLOCKED),
+        (429, "new_quota_code", "insufficient_quota", None, ResponseFailureKind.ACCESS_BLOCKED),
+        (401, None, None, "true", ResponseFailureKind.ACCESS_BLOCKED),
+        (403, None, None, None, ResponseFailureKind.ACCESS_BLOCKED),
+        (400, "context_length_exceeded", None, "true", ResponseFailureKind.CAPACITY_EXCEEDED),
+        (429, "slow_down", "rate_limit_error", None, ResponseFailureKind.TRANSIENT_SERVICE),
+        (503, "server_is_overloaded", None, None, ResponseFailureKind.TRANSIENT_SERVICE),
+        (503, None, None, "false", ResponseFailureKind.REQUEST_REJECTED),
+        (400, None, None, "true", ResponseFailureKind.REQUEST_REJECTED),
+    ],
+)
+def test_known_block_wins_over_generic_retry_signal(
+    status, code, error_type, retry_header, expected
+) -> None:
+    response = httpx2.Response(
+        status,
+        headers={"x-should-retry": retry_header} if retry_header is not None else {},
+        request=httpx2.Request("POST", "https://api.openai.com/v1/responses"),
+    )
+    error = APIStatusError(
+        "SENSITIVE MUST NOT BE PROJECTED",
+        response=response,
+        body={"code": code, "type": error_type, "message": "SENSITIVE MUST NOT BE PROJECTED"},
+    )
+    failure = classify_response_failure(error)
+    assert failure.kind == expected
+    assert failure.status_code == status
+    assert "SENSITIVE" not in repr(failure)
+
+
+def test_lost_transport_is_unknown_not_a_known_unexecuted_or_free_request() -> None:
+    request = httpx2.Request("POST", "https://api.openai.com/v1/responses")
+    for error in (APIConnectionError(request=request), APITimeoutError(request=request)):
+        failure = classify_response_failure(error)
+        assert failure.kind == ResponseFailureKind.REMOTE_RESULT_UNKNOWN
+        assert failure.status_code is None
+    invalid = APIResponseValidationError(httpx2.Response(200, request=request), {"raw": "private"})
+    assert classify_response_failure(invalid).kind == ResponseFailureKind.RESPONSE_PROTOCOL

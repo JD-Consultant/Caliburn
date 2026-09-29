@@ -7,6 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 from caliburn.features.interviews import queries as interview_queries
 from caliburn.features.interviews import service as interview_service
 from caliburn.features.interviews.models import InterviewMessage
+from caliburn.features.job_description import service as jd_service
 from caliburn.features.job_files import queries as job_file_queries
 from caliburn.features.job_files import service as job_file_service
 from caliburn.features.job_files.models import (
@@ -26,6 +27,7 @@ class JobFileWorkflow:
             result = await job_file_service.create_job_file(session, command)
             if result.is_new:
                 await interview_service.create_opening(session, result.job_file.job_file_id)
+                await jd_service.create_empty_jd(session, result.job_file.job_file_id)
         return result
 
     async def list_files(self) -> list[JobFile]:

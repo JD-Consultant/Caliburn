@@ -91,7 +91,27 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/ca
 
 待驗反例：兩連線競爭最後一次額度；准入後中斷不能拿舊許可再外送；原 R／C 已保存只補結果不重呼；取消後舊結果可記帳但不可進下一步。Standalone compact 沒有 create 的輸出限制、計數 API 也不可假設免費，須在費用規則與預檢 manifest 說清楚。這是工程研究方向，不是上述能力已交付。
 
-## 4. 下一個可執行切片
+## 4. 第四切片：不可重置的工作額度與外送預留
+
+直連切片已提交 `a48b39a1`。讀共用執行 §6–7、既有 executions owner、SQL 交易／程式規範後，核 PostgreSQL 行鎖與 Azure Retry 的當前官方契約：短交易裁決准入，網路在提交確認後；分類及原結果核對由單一工作流程處理，不讓 SDK／Graph 疊加。沒有新增框架或費率猜測。
+
+在既有 executions 內新增固定 policy 與 outbound attempts；原生內容仍由 checkpointer 保存。確切表、程式責任、計量單位及未接線處集中 [工程 §5.1](../../../implementation/agent-execution.md#51-已落地的工作額度保存t06-第四切片)。操作不重置原 policy；logical request／每次 attempt 分開，重用原 attempt 只回紀錄，不能重送。未知成本保留預留；取消後已知成本仍可記入，不授權採用結果。
+
+### Red／Green 與恢復證據
+
+- 初次 migration 的前版識別字少寫尾碼，造成 setup error；修正後才取得真正行為 Red：兩連線爭同一最後額度都成功，**1 failed（2 != 1）**。這不是用 migration typo 當 TDD。
+- 在原 execution 行鎖下核額度及新增預留後，兩連線只有一個准入成功。原 reservation／query／state 以獨立 session 讀回，未用 Python mutex 代替 DB。
+- 新 attempt 確認遺失後再入返回 `created=False`，額度未加第二次；想再送的新 attempt 被已耗盡成本拒絕。相同 request 改 fingerprint／kind 拒絕；傳輸 attempt 可增加但模型 Step 只算一次。
+- 已取消不能新准入；原 attempt 成本可重入記帳，不能改寫既有值。writer 替換後仍用同 policy／成本；新程序讀回原限制並拒絕超額准入。這不是程序中斷後原 provider response 的恢復測試。
+- SQL 禁止刪除或改寫預算／原 attempt；全新 namespace migration、重複 upgrade、Alembic metadata／CHECK 比對通過。只清理由 fixture 新建的隨機 schema，保留共享 DB／server。
+
+受影響集合：unit／contracts，加 execution budget／admission、migration，以及原有 Graph／Memory Step PG 回歸，**503 passed in 30.47s**。Ruff check／format（含 migrations，**185 files**）、mypy **144 source files**通過。新增測例皆用合成金額／範圍，不呼叫 provider，也不讀憑證。
+
+獨立唯讀審查未發現阻擋缺陷；除上述 11 項 budget PG 測例外，另做 8 組不落檔探針，含相同 attempt 競爭、鎖等待跨期限、Session 舊資料刷新、取消／stale writer 與暫停續作。這些是代理補充觀察，不另充作完整產品 gate。文件 20 份／316 links 零錯；新增 ERD 用既有 Mermaid 11.17.2／Chromium 渲染並實際檢視，欄位與關係可讀。首次 sandbox 禁止啟動 browser，經准許的 headless 執行完成；不是略過圖稿驗證。
+
+這仍是 T06 計量元件；沒有宣稱已將所有模型請求接入准入，沒有真實費用上限驗收。下一步需以有界 supervisor 綁定完整 payload、原 attempt、R／C 保存及費用採用，檢查 HTTP 等待不持有業務鎖；然後接共同 loop／compact。
+
+## 5. 下一個可執行切片
 
 繼續外層共用 loop 與單一有界計量／外送資格，將「checkpoint＋pending writes 都失敗，但原 R 還在」的能力證據接入有資格檢查的正式恢復路徑，再接 compact／角色控制。正常 Step 入口已固定 sync／recursion／新輸入與恢復界線。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執。工具接線需核對還原巢狀型別；目前只有 Memory 的 prepared 路徑證據，未驗 JD／角色完整整合。
 

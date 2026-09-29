@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01 已完成，其餘未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01 已完成；T02 施工中，其餘未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -18,6 +18,7 @@
 ## T02 職務檔案、正式訪談與執行准入
 
 - [ ] T02；依賴：T01。
+- **局部證據（2026-09-29）：**檔案建立／回讀、App 開場正式序號 1、原文與正式資格分離、重送原結果及 migration 已通過真 PG；本輪整體 60 測試通過。原輸入接受／執行准入／受控正式化與列表 UI 尚未完成，**不勾選 T02**。詳見[切片證據與下一步](evidence/t02-job-files-and-interviews.md)。
 - **契約：**[產品概念](../../product-concept.md)、[來源範圍](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[資料交易](../../architecture/persistence.md)。
 - **程式／交付：**`features/job_files`、`interviews`、`executions`；建立檔案 API／列表 UI；開場正式序號 1，原輸入保存及受控正式化介面；schema migrations。完整 A final 在 T08 接，不新增假正式對話入口給 UI。
 - **Red：**重送同一命令兩次、跨檔案讀取、取消輸入占正式序號、兩個 runner 同檔案准入、另一檔案無法前進。

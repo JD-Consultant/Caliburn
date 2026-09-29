@@ -1,6 +1,6 @@
 # Caliburn backend（新目標施工中）
 
-本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。目前提供最小 health、生成契約及離線／真 PG 基礎測試；訪談、JD 和 Memory 產品功能尚未交付。現行正式產品入口不變，進度見[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)。
+本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。目前提供 health、職務檔案建立／清單／回讀、App 開場正式訪談及生成契約；AI 訪談、JD 和 Memory 產品功能尚未交付。現行正式產品入口不變，進度見[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)。目前僅供隔離開發／合成測試，完整瀏覽器入口安全與正式交付 gate 尚未完成，不對外開放。
 
 ## 安裝與執行
 
@@ -18,6 +18,27 @@ uv run --project apps/api --locked uvicorn caliburn.bootstrap:create_app --facto
 Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。這尚不代表 PDF 的 Windows 子程序接線已驗證；後續 T13 必須處理其不同 loop 需求，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)。
 
 ## 驗證
+
+### 目標資料庫初始化
+
+先建立**專用的新空白 PostgreSQL database**，不填舊產品連線。以下從 repo root 執行；密碼由本機秘密管理注入，勿提交。僅使用新的配置名稱，不自動載入 `.env`。
+
+```powershell
+$env:CALIBURN_DATABASE_URL = 'postgresql://帳號:密碼@127.0.0.1:5432/caliburn_target'
+$env:CALIBURN_DATABASE_SCHEMA = 'caliburn'
+uv run --project apps/api --locked alembic -c apps/api/alembic.ini upgrade head
+uv run --project apps/api --locked alembic -c apps/api/alembic.ini check
+```
+
+migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade head` 不重建原資料。應用啟動只檢查 migration head，不默默升級。未配置新 DB 時 health 仍可用、檔案 API 回 503；已配置但結構未初始化／不相符則啟動失敗。初始 schema 包含不可變原文，不提供破壞性 downgrade；需要資料處置應另行核對精確範圍。
+
+目前資料入口（具體 DTO 由 `/openapi.json` 與 `contracts/http/` 生成）：
+
+- `POST /api/job-files`：`command_id`、`display_name`、`employee_name`；新建立回 201，同一命令重送回原結果／200，不同輸入重用命令回 409。
+- `GET /api/job-files`、`GET /api/job-files/{job_file_id}`：清單／目前檔案 metadata。
+- `GET /api/job-files/{job_file_id}/interviews`：只有已正式化的訪談；目前建立後只有來源為 App 的開場第 1 則。未完成原文不在這裡出現。
+
+### 測試與檢查
 
 保持前述 `UV_PROJECT_ENVIRONMENT`；不要意外使用舊 `apps/api/.venv`。
 

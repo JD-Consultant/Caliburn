@@ -13,8 +13,9 @@ WEB_ROOT = API_ROOT.parent / "web"
 
 def generate(check: bool) -> bool:
     matches = True
+    schemas = sorted((API_ROOT / "contracts/http").glob("*.schema.json"))
     with TemporaryDirectory(prefix="caliburn-codegen-") as directory:
-        for schema in sorted((API_ROOT / "contracts/http").glob("*.schema.json")):
+        for schema in schemas:
             stem = schema.name.removesuffix(".schema.json")
             python_output = Path(directory) / f"{stem.replace('-', '_')}.py"
             subprocess.run(
@@ -26,6 +27,8 @@ def generate(check: bool) -> bool:
                     str(schema),
                     "--input-file-type",
                     "jsonschema",
+                    "--no-allow-remote-refs",
+                    "--strict-refs",
                     "--output",
                     str(python_output),
                     "--output-model-type",

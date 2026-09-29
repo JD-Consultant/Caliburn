@@ -6,6 +6,10 @@ from sqlalchemy.schema import CreateSchema
 
 from caliburn.adapters.database import Base
 from caliburn.features.executions.budget_persistence import ExecutionBudgetRecord
+from caliburn.features.executions.history_persistence import (
+    ContextHistoryBindingRecord,
+    ContextHistoryHeadRecord,
+)
 from caliburn.features.executions.persistence import ExecutionRecord
 from caliburn.features.interviews.persistence import (
     FormalInterviewRecord,
@@ -31,6 +35,8 @@ assert InterviewInputRecord.__table__.metadata is target_metadata
 assert InterviewReplyRecord.__table__.metadata is target_metadata
 assert ExecutionRecord.__table__.metadata is target_metadata
 assert ExecutionBudgetRecord.__table__.metadata is target_metadata
+assert ContextHistoryHeadRecord.__table__.metadata is target_metadata
+assert ContextHistoryBindingRecord.__table__.metadata is target_metadata
 assert JdRevisionRecord.__table__.metadata is target_metadata
 assert JdCandidateRecord.__table__.metadata is target_metadata
 assert MemoryObjectRevisionRecord.__table__ is target_metadata.tables["memory_object_revisions"]

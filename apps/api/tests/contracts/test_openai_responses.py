@@ -29,6 +29,24 @@ def request_fixture() -> ResponseRequest:
     )
 
 
+def test_saved_request_restores_exact_settings_without_sharing_mutable_context() -> None:
+    original = request_fixture()
+    saved = json.loads(json.dumps(original.create_payload()))
+    restored = ResponseRequest.from_snapshot(saved)
+    saved["input"].clear()
+    saved["instructions"] = "later role instruction"
+    assert restored.create_payload() == original.create_payload()
+    assert restored.count_payload() == original.count_payload()
+
+
+@pytest.mark.parametrize("field, value", [("stream", True), ("store", True)])
+def test_saved_request_cannot_silently_change_the_direct_contract(field, value) -> None:
+    saved = request_fixture().create_payload()
+    saved[field] = value
+    with pytest.raises(ValueError, match="direct SDK contract"):
+        ResponseRequest.from_snapshot(saved)
+
+
 @pytest.mark.asyncio
 async def test_transient_failure_is_one_outbound_attempt_not_sdk_retries() -> None:
     attempts = 0

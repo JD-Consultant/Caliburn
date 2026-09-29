@@ -4,7 +4,8 @@ from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import persistence
+from caliburn.features.job_description import persistence, revision_editing
+from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.models import (
     JdCommandConflictError,
     JdProfile,
@@ -31,10 +32,16 @@ async def create_empty_jd(session: AsyncSession, job_file_id: UUID) -> None:
 
 
 async def recover_profile_result(
-    session: AsyncSession, job_file_id: UUID, command: ReviseJdProfile
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: ReviseJdProfile,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdProfileRevision | None:
     """Return the original result only; a replay does not require fresh write admission."""
-    operation = await persistence.read_operation(session, job_file_id, command.command_id)
+    operation = await revision_editing.read_edit_operation(
+        session, job_file_id, command.command_id, candidate
+    )
     if operation is None:
         return None
     if (
@@ -47,17 +54,21 @@ async def recover_profile_result(
 
 
 async def revise_profile(
-    session: AsyncSession, job_file_id: UUID, command: ReviseJdProfile
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: ReviseJdProfile,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdProfileRevision:
     """Apply a new command after replay lookup, file lock and admission in this transaction.
 
     The workflow must call recover_profile_result first under the same lock. This function
     participates without committing; all specified fields and the result succeed together.
     """
-    document = await persistence.read_document(session, job_file_id)
-    if document.current_revision_id != command.expected_revision_id:
+    revision_id = await revision_editing.read_edit_revision(session, job_file_id, candidate)
+    if revision_id != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")
-    current = await persistence.read_revision(session, job_file_id, document.current_revision_id)
+    current = await persistence.read_revision(session, job_file_id, revision_id)
     profile = apply_profile_changes(current.profile, command.changes)
     result = current
     if profile != current.profile:
@@ -65,16 +76,14 @@ async def revise_profile(
         await persistence.insert_revision(
             session, job_file_id, result, parent_revision_id=current.revision_id
         )
-        document.current_revision_id = result.revision_id
-    session.add(
-        persistence.JdOperationRecord(
-            job_file_id=job_file_id,
-            command_id=command.command_id,
-            kind="revise_profile",
-            expected_revision_id=command.expected_revision_id,
-            result_revision_id=result.revision_id,
-            request_payload=profile_change_payload(command.changes),
-        )
+    await revision_editing.record_edit(
+        session,
+        job_file_id,
+        command_id=command.command_id,
+        kind="revise_profile",
+        expected_revision_id=command.expected_revision_id,
+        result_revision_id=result.revision_id,
+        request_payload=profile_change_payload(command.changes),
+        candidate=candidate,
     )
-    await session.flush()
     return result

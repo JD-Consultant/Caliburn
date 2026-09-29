@@ -46,7 +46,7 @@ API 接受的 client command ID 用於辨認瀏覽器重送同一命令；模型
 
 JD 業務沿既定 profile／職責／任務／成果／要求／知識／技能／關係建立型別模型；schema 不從 Memory Markdown 或 UI widget 反推。欄位意義依[JD 指南](../specs/2026-09-09-jd-field-and-writing-guide.md)。舊 SQL／測例只供參考，沒有相容表名義務。
 
-T03 已實作的 profile、職責／任務、共用知識／技能及任務關係、協作對象／共通條件人工端點與 UI、固定修訂、原結果及交易見 [JD 保存接線](jd-storage.md)；候選及本節其餘未交付項目仍依任務施工，不能將人工正式 API 當作 A 候選寫入。
+T03 已實作上述集合的人工端點／UI、固定修訂、原結果及候選底層；候選位置、分支回退、放棄與交易內採用見 [JD 保存接線 §3.1](jd-storage.md#31-本輪候選與可恢復位置)。來源、Agent 共同完成與候選 UI 仍依 T07–T09 施工，不能將人工正式 API 當作 A 候選寫入，也不因底層可組合而宣稱整輪恢復已驗收。
 
 JD `read_ref` 解到本輪 JD identity／型別與合法內容基準；Memory `target_title` 解到本輪固定 snapshot 內 identity。existing `citation_ref` 解到 JD 自己保存的特定來源，不用同名猜舊來源。直接來源可選正式訪談、情境、理解或 current_input；pending current_input 僅在 A 完成交易取得正式來源資格。
 

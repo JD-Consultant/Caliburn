@@ -87,7 +87,12 @@ async def run(mode: str, thread_id: str) -> None:
             assert not before.values
             request_id = uuid4()
             await graph.ainvoke(
-                {"request_snapshot": model_request.create_payload(), "request_id": request_id},
+                {
+                    "request_snapshot": model_request.create_payload(),
+                    "request_id": request_id,
+                    "model_step_limit": None,
+                    "tool_call_limit": 16,
+                },
                 config,
                 context=runtime,
                 durability="sync",

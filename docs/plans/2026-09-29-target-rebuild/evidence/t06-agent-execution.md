@@ -175,8 +175,24 @@ $env:PYTHONUTF8='1'
 
 這些是 fake provider＋真 PostgreSQL 的控制／恢復證據，不是遠端接受或正式費率驗收。暫時只接**首次生成**；已有 attempt 先明確交回核對，尚未選擇自動重試／Retry-After／jitter 接線。容量／token count、compact、完整 loop／角色控制繼續施工，T06 不勾完成。
 
-## 8. 下一個可執行切片
+## 8. 第八切片：有界多 Step 接續
 
-繼續共用 loop、容量計數／真實費率配置與單一有界 retry supervisor，再接 compact／角色控制。正常 Step 已固定完整 request、sync／recursion、原 R 恢復、首次外送准入及保存後結算。已有 attempt 必須先核對，不因本切片的明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
+承接 `082d4d5f`。重新取得 OpenAI function-calling 與 LangGraph Graph API 官方文件，核 conditional edges、State／super-step 與 recursion limit；比較在現有 Graph 接邊和再加 parent／child thread。選前者延續已有保存責任，不增第二份 cursor／窗口庫。機制、界線及圖集中 [工程 §4.6](../../../implementation/agent-execution.md#46-已落地的有界多-step-接續t06-第八切片)。本輪使用計畫執行／TDD／OpenAI 文件技能；依使用者既有授權接續，不重開產品審批或新規格副本。
+
+- 真正行為 Red：三個模型 Step（多 calls／commentary／final）只呼叫一次模型，`1 != 3`，**1 failed**。加入共用 Graph 的有界循環後，原生 reasoning／message／calls／各結果順序完整，固定設定不刷新；工具與 final 同時存在不誤停。
+- 完成步數與限制隨原 checkpoint 恢復；已耗盡再 resume 仍停止，調高限制、改成單步入口或重新提交初始 input 均拒絕。最後一步 final 可返回，不強迫多呼叫一次。無新增額度表，工作總額度仍是原 executions owner。
+- 第二步兩工具中最後一筆失敗，只重入原固定命令，已完成工具不重跑；第二個 R 的 checkpoint／pending writes 皆失敗時由原 Held 補存，不能混成第一個 R。下一 request 保存前／提交確認後拋錯都不提前 HTTP，恢復同一 request ID，不重加 items。取消出現在完成 Step 後時不再呼叫模型。
+- 獨立唯讀 reviewer 發現 P2：初始 input checkpoint 保存、但 `__start__` 展開尚未保存時，`values` 空導致新限額檢查誤拒恢復。主代理新增反例取得 **1 failed**；改為原生恢復後、外送前再次驗固定限額，原測例通過，另驗此邊界不能提高限制偷送。沒有解析 checkpointer 私有表或自行重建 input。
+- 新 `response_loop_worker.py` 用真 PG、兩個獨立 Python 程序：write 程序模型 2／工具觀察 1，第二個 R 保存後注入中斷；resume 程序模型 0／工具觀察 0，完整原視窗接到 final，重複 resume 不變。沿既有 fixture 僅清理自己的隨機 schema，不停止共享 PG。
+
+受影響回歸沿 §7 全集合（unit／contracts＋budgets、migration、admission、Graph／Step／Memory tool、eligibility、model accounting），**534 passed in 32.00s**。Ruff check／format **192 files**、mypy **146 source files**通過。新增測例的中途斷言曾誤貼到取消案例，按失敗行號修回原案例；不把測試編輯錯誤當產品 Red。原內部 builder 測例補齊初始固定限額，未刪除原故障斷言。
+
+文件 20 份／325 links 零錯，diff check 通過。三張工程 Mermaid 圖用既有 headless Chromium／Mermaid 渲染成功，主代理實際檢視新增循環圖，條件、保存、停止與非產品提交界線可讀；首次 sandbox `spawn EPERM` 後經准許渲染，不以失敗當通過。Reviewer 已結束，P2 的關閉依主代理新增 Red／Green 及完整回歸，沒有冒稱第二次獨立複核。
+
+本次無 provider 呼叫、未讀 `.env` 或外送私人資料。仍缺 §6 的直連 provider 證據；沒有把假 provider＋真 PG 當模型品質、產品 UI 或整個 T06 完成。
+
+## 9. 下一個可執行切片
+
+接容量計數／真實費率配置與單一有界 retry supervisor，再接 compact／角色控制。共同 loop 已固定完整 request、sync／局部步數、原 R 恢復、首次外送准入及保存後結算。已有 attempt 必須先核對，不因本切片的明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

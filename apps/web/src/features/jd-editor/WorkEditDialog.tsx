@@ -1,14 +1,26 @@
 import { useRef, useState } from 'react';
 import { Alert, Button, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
-import type { Area, JdWorkView, WorkTask } from '../../shared/api/generated/jd-work-view';
+import type {
+  Area,
+  Capability,
+  JdWorkView,
+  WorkTask,
+} from '../../shared/api/generated/jd-work-view';
 import type { WorkCommand } from './jd-work-api';
 import { AreaFields } from './AreaFields';
 import { TaskFields } from './TaskFields';
+import { CapabilityFields } from './CapabilityFields';
 import { focusDialogInput } from './dialog-focus';
 
 export type WorkEditing =
   | { kind: 'area'; baseline: JdWorkView; area?: Area }
   | { kind: 'task'; baseline: JdWorkView; task?: WorkTask; areaId: string | null }
+  | {
+      kind: 'capability';
+      baseline: JdWorkView;
+      capabilityKind: Capability['kind'];
+      capability?: Capability;
+    }
   | { kind: 'confirm'; title: string; description: string; command: WorkCommand };
 
 interface Props {
@@ -26,7 +38,25 @@ interface Props {
 function dialogTitle(editing: WorkEditing): string {
   if (editing.kind === 'area') return editing.area ? '編輯職責' : '新增職責';
   if (editing.kind === 'task') return editing.task ? '編輯任務' : '新增任務';
+  if (editing.kind === 'capability')
+    return `${editing.capability ? '編輯' : '新增'}${editing.capabilityKind === 'knowledge' ? '知識' : '技能'}`;
   return editing.title;
+}
+
+function formAction(editing: WorkEditing): { id: string; label: string } | null {
+  switch (editing.kind) {
+    case 'area':
+      return { id: 'jd-area-form', label: '儲存職責' };
+    case 'task':
+      return { id: 'jd-task-form', label: '儲存任務' };
+    case 'capability':
+      return {
+        id: 'jd-capability-form',
+        label: editing.capabilityKind === 'knowledge' ? '儲存知識' : '儲存技能',
+      };
+    case 'confirm':
+      return null;
+  }
 }
 
 export function WorkEditDialog({
@@ -43,6 +73,7 @@ export function WorkEditDialog({
   const [localError, setLocalError] = useState<string | null>(null);
   const titleInput = useRef<HTMLInputElement>(null);
   const title = dialogTitle(editing);
+  const action = formAction(editing);
   return (
     <Dialog
       open
@@ -90,19 +121,25 @@ export function WorkEditDialog({
             </Button>
           </>
         )}
+        {editing.kind === 'capability' && (
+          <CapabilityFields
+            titleInput={titleInput}
+            revisionId={editing.baseline.revision_id}
+            kind={editing.capabilityKind}
+            capability={editing.capability}
+            disabled={locked}
+            onSubmit={onSubmit}
+            onError={setLocalError}
+          />
+        )}
       </DialogContent>
       <DialogActions sx={{ flexWrap: 'wrap', px: 3, pb: 2 }}>
         <Button disabled={isSending} onClick={onClose}>
           返回 JD
         </Button>
-        {editing.kind !== 'confirm' && !pending && (
-          <Button
-            type="submit"
-            form={editing.kind === 'area' ? 'jd-area-form' : 'jd-task-form'}
-            variant="contained"
-            disabled={locked}
-          >
-            {editing.kind === 'area' ? '儲存職責' : '儲存任務'}
+        {action && !pending && (
+          <Button type="submit" form={action.id} variant="contained" disabled={locked}>
+            {action.label}
           </Button>
         )}
         {pending && (

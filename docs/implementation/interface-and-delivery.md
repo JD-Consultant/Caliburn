@@ -1,6 +1,6 @@
 # 介面、公開訊息與本機交付
 
-- 狀態：**工程設計；T02 檔案 UI、T03 JD 基本資料及職責／任務人工編輯已實作，其餘依任務 gate**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
+- 狀態：**工程設計；T02 檔案 UI、T03 JD 基本資料、職責／任務及共用知識／技能關係人工編輯已實作，其餘依任務 gate**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
 
 ## 1. API 與 UI 的責任
 
@@ -59,7 +59,7 @@ sequenceDiagram
 - 明確拒絕不自動改基底重送；保留畫面草稿供辨認，要求讀目前 JD 再決定。原命令成功確認後關表單，invalidate 並 GET 目前正式稿；舊操作回傳不直接寫入最新 cache。
 - 讀取失敗不當空白 JD；取消未送出表單只是放棄局部草稿，關閉結果未確認表單也不是撤銷後端效果。未知欄位顯示「尚未提供」，不表示已確認沒有。人工寫入本身不等於員工事實或依據核對完成。
 
-採用 [React 的 state／key 生命週期](https://react.dev/learn/preserving-and-resetting-state)及 [TanStack Query 的 mutation invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)。以上原命令／基底保護是本案契約，不是 React／cache 自動提供交易原子性。沿用既有 Dialog／HTTP 驗證，不新增全域表單 store、通用命令引擎或雙寫保存服務。實測見 [T03 evidence §4](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#4-第二切片基本資料人工編輯-ui2026-09-29)；職責／任務 UI 接 §1.3，其餘 K／S 等集合、候選及來源 UI 仍待後續切片。
+採用 [React 的 state／key 生命週期](https://react.dev/learn/preserving-and-resetting-state)及 [TanStack Query 的 mutation invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)。以上原命令／基底保護是本案契約，不是 React／cache 自動提供交易原子性。沿用既有 Dialog／HTTP 驗證，不新增全域表單 store、通用命令引擎或雙寫保存服務。實測見 [T03 evidence §4](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#4-第二切片基本資料人工編輯-ui2026-09-29)；職責／任務 UI 接 §1.3，知識／技能接 §1.4，其餘集合、候選及來源 UI 仍待後續切片。
 
 ### 1.3 T03 職責與任務的人工編輯
 
@@ -73,6 +73,18 @@ sequenceDiagram
 - 儲存按鈕放 Dialog 固定底部，長表單內容可捲動。轉場完成才設定初始焦點；若使用者已在表單欄位／按鈕操作，不搶焦點。此窄 helper 同時用於 profile，不取消框架的 focus trap。
 
 沿用 §1.2 的 React／TanStack 官方契約及 MUI 原生表單與 [Dialog](https://mui.com/material-ui/react-dialog/)；保存、新鮮度與原結果辨識由既有業務責任實現，非 UI cache 的保證。相應實測與限制見 [T03 §7](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#7-第五切片職責任務人工-ui-與同版讀取2026-09-29)。
+
+### 1.4 T03 共用知識／技能及任務關係的人工編輯
+
+[CapabilitiesSection](../../apps/web/src/features/jd-editor/CapabilitiesSection.tsx)呈現兩類共用定義、概覽排序及反向用途；[CapabilityFields](../../apps/web/src/features/jd-editor/CapabilityFields.tsx)只管理開啟時的局部草稿；[TaskCapabilities](../../apps/web/src/features/jd-editor/TaskCapabilities.tsx)在每項任務管理連結、解除及關係排序。沿同一 `JdWorkEditor`、`WorkEditDialog` 及 `useWorkCommand`，不增加第二套命令暫存、對照表或保存服務。
+
+- 所有定義與關係來自同版 `/jd/work`。畫面可在任務顯示共用說明並連回定義；反向用途連回所屬任務。這是呈現，不把正文或反向列表另存一份。
+- 新增／編輯定義只填名稱、說明；至少一者有意義。只改變動欄位；空字串轉明確 null，沒改不送。知識／技能類別在建立時確定，不提供會改變所有用途含意的跨類切換。
+- 任務選單顯示名稱及說明以辨識範圍，使用 stable ID 操作而非標題；同名項仍是獨立物件。清楚標示「選取後即保存關聯」，不冒充尚未提交的表單草稿。解除只移除該任務關係；概覽與每任務的各類排序分開。
+- 使用中的共用定義顯示相關任務及刪除限制；先解除所有用途才能刪定義，後端仍為最終約束。刪任務保留共用定義，刪職責不丟失任務關係。
+- 定義與關係命令共用 §1.3 的原基底、待確認／重開及 cache 失效邊界；原命令結果再度取得也不覆寫目前新稿。profile／集合互相刷新，沒有獨立 `/capabilities` latest 拼接或樂觀宣告保存。
+
+研究核對 [MUI Select](https://mui.com/material-ui/react-select/) 的標籤／受控選取及 §1.2 的 React／Query 契約；目前用既有元件即可，不為局部選取新增搜尋或表單框架。MUI 不是資料准入、原子性或重送的 owner。桌面／390px、共享修改及實際丟失回應的證據見 [T03 §9](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#9-第七切片共用知識技能與任務關係人工-ui2026-09-29)。
 
 ## 2. 串流不是保存權威
 

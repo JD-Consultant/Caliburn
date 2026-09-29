@@ -229,3 +229,45 @@ JD 保存文件的 4 張 Mermaid 圖（職責、任務明細、同版讀取時�
 沿 §2 的獨立 PG18.6 測試環境，每測例用自身隨機 schema 並由 fixture 清理，不改原產品 DB；未讀秘密、未呼叫模型，費用 0。沒有新增依賴，沒有啟動新的 App／UI 服務。
 
 **下一步：**知識／技能與關係人工 UI，須使用同版組合查詢，不能拼接 `/work` 與 `/capabilities` 的獨立 latest；再補協作／共通條件及候選。來源／工具跨項目原子能力仍在 T07，Turn 共同正式化在 T08，T03／Goal 均未完成。
+
+## 9. 第七切片：共用知識／技能與任務關係人工 UI（2026-09-29）
+
+### 9.1 範圍與方法
+
+接續 `536ea774`，重用 §8 後端及 §7 UI 的單一命令／固定基底／重讀機制。先核 JD 指南、工具覆蓋的共享 K／S 規則，再核 MUI Select、React／Query 與 Pydantic 官方契約；研究及取捨分別維護在[介面 §1.4](../../../implementation/interface-and-delivery.md#14-t03-共用知識技能及任務關係的人工編輯)及[保存 §5](../../../implementation/jd-storage.md#5-研究依據與本案取捨)。未新增依賴、表、保存 owner、表單框架或搜尋平台。
+
+交付共用定義的增修刪、概覽排序、反向用途；任務的選用／解除及各類關係排序。改共用定義不改關係；刪任務不刪定義；使用中須先解除才能刪定義。改動仍是人工正式編輯，不是 Agent 候選工具。
+
+同版 `/jd/work` 擴充既有 definition／link schema，先固定一次 head，再讀所有相關集合；不由 UI 拼接多個 latest。各元件只處理自身表單或呈現，命令提交及恢復沿同一 hook，沒有為 K／S 另建一份 pending owner。
+
+### 9.2 Red、問題與修正
+
+- 先加同版集合測例，原 `/work` 缺 `capabilities`，**1 failed／1 passed**；前三項 UI 測例因新增／關係控制尚未存在而失敗。補機制後再驗非空集合、並行更新及真畫面，不把空集合轉綠當成功。
+- 非空資料實測發現 Python 生成契約的 Enum class 不同，預設 `model_dump()` 跨契約重組會被 Pydantic 拒絕；完整後端當時 **311 passed／1 failed**，兩個瀏覽器旅程也因 GET 500 失敗。核對官方序列化後，在 transport 使用 `mode="json"` 交接 wire 值；沒有改生成檔、放寬型別或略過驗證。
+- 修正後瀏覽器的業務步驟成功，但 console gate 發現缺少 `/favicon.ico`。trace 確認不是 API 失敗；補明確的本機 SVG icon，保留原錯誤斷言、不忽略所有 404。完整瀏覽器再驗轉綠。
+- 審查移除測例中缺元素時退回整個 document 的容錯；同名物件按穩定 ID 明確驗證，不用「第一個碰巧匹配」當 identity。
+
+### 9.3 已執行驗證
+
+| 層級 | 結果與範圍 |
+|---|---|
+| 後端全套 | **312 passed**，78.32 秒、無 skip／警告；213 項真 PG、99 項單元／契約。原同版測例擴充為另一請求刪職責、改共用名稱、解除關係後，本 GET 仍保留全部原修訂，下次 GET 才讀新稿 |
+| 前端 | **44 passed**，7 個檔；新增 7 項涵蓋描述單獨建立、名稱更新、用途／刪除保護、連結解除、兩類原命令 remount、同名身分、兩種排序與空白／no-op 拒絕 |
+| 真 PG 瀏覽器 | **14 passed**，29.3 秒；12 個既有旅程及 2 個新共享編輯旅程，未開自動 retry |
+| 靜態／生成／建置 | Ruff lint／格式（99 檔）、mypy（72 source files）、完整生成比對；前端 TypeScript、ESLint、Prettier 及正式 build 通過 |
+
+新瀏覽器旅程透過真 HTTP／PG 驗證：兩任務共用知識、任務另用技能、定義改名反映各用途、概覽排序不改任務關係排序、reload 不丟資料、解除後才可刪、刪任務保留剩餘定義。另一旅程在真提交後丟 HTTP 回應，其他命令先改名；reload 用相同原命令確認，畫面及 DB 仍保留後來新名稱，沒有第二份定義或舊結果覆蓋。
+
+桌面共享定義與 390px 編輯 Dialog 截圖實際檢視，焦點、固定底部儲存入口及文字可讀，沒有水平溢出；正常旅程無 pageerror／console error。保存頁五張 Mermaid 圖以既有 Mermaid 11.17.2／Chromium 流程全部渲染，更新的同版讀取時序圖已視覺檢查，集合／關係及固定修訂方向清楚。
+
+命令沿 App README：後端 `pytest -q -p no:cacheprovider`、Ruff、mypy、`scripts/generate_contracts.py --check`；前端 `test`、`typecheck`、`lint`、`format:check`、`build`、`test:e2e`。新瀏覽器可單跑 `jd-capabilities.spec.ts`，不是以 mock／200 替代效果。
+
+### 9.4 邊界與接續
+
+沿 §2 的 Python／Node／PG 工具鏈；真瀏覽器用獨立合成 namespace `t03_capability_ui_20260929_2210`、loopback API／Vite，未讀秘密、未呼叫模型，費用 0，舊 DB 與入口不動。測試資料保留供診斷，不刪 schema。
+
+前端正式 bundle 742.04 kB（gzip 223.25 kB），仍有既有 >500 kB 提示；不調高閥值掩蓋，整體效能／CSP 與 Ajv 評估依 T15。此為功能切片，不宣稱完整產品安全、長訪談或模型品質通過。
+
+八份入口／責任／證據文件的 165 個本機連結及錨點、fences、行尾與 Git diff 檢查通過。
+
+**下一步：**沿 T03 補協作者／共通條件，再補候選；來源／模型工具在 T07、Turn 共同完成在 T08、程序強殺與提交確認遺失全鏈在 T12。T03 及 Goal 仍未完成，不切換 production。

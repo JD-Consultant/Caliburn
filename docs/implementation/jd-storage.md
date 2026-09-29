@@ -1,11 +1,11 @@
 # JD 保存接線
 
-- 狀態：**T03 profile、職責／任務、共用知識／技能與任務關係後端及人工 UI 已實作；驗證依 T03 證據，整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
+- 狀態：**T03 profile、職責／任務、共用知識／技能與任務關係後端及人工 UI 已實作；協作對象／共通條件後端已實作、UI 待接；驗證依 T03 證據，整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
 - 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
 
-目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求、共用知識／技能與任務使用關係的人工讀寫與排序。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[基本資料](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)、[職責／任務](interface-and-delivery.md#13-t03-職責與任務的人工編輯)及[知識／技能](interface-and-delivery.md#14-t03-共用知識技能及任務關係的人工編輯)。協作者／共通條件、Agent 候選、依據與核對尚未交付；不能把這些人工正式端點當作 A 寫入捷徑。
+目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求、共用知識／技能與任務使用關係、協作對象／共通條件的人工讀寫與排序。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[基本資料](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)、[職責／任務](interface-and-delivery.md#13-t03-職責與任務的人工編輯)及[知識／技能](interface-and-delivery.md#14-t03-共用知識技能及任務關係的人工編輯)。協作對象／共通條件 UI、Agent 候選、依據與核對尚未交付；不能把這些人工正式端點當作 A 寫入捷徑。
 
 | 責任 | 已實作位置 |
 |---|---|
@@ -22,6 +22,8 @@
 | 任務用例、保存與 HTTP | [task_service.py](../../apps/api/src/caliburn/features/job_description/task_service.py)、[task_persistence.py](../../apps/api/src/caliburn/features/job_description/task_persistence.py)、[jd_tasks.py](../../apps/api/src/caliburn/transport/http/jd_tasks.py)；沿同一 JD workflow、head 與 operation，不另造服務／交易平台 |
 | 共用知識／技能的值與變更 | [capabilities.py](../../apps/api/src/caliburn/features/job_description/capabilities.py)、[capability_changes.py](../../apps/api/src/caliburn/features/job_description/capability_changes.py)；名稱中的 capability 僅統稱這兩種 JD 能力定義，不代表 Agent 工具能力 |
 | 共用定義／任務關係的用例、SQL、HTTP | [capability_service.py](../../apps/api/src/caliburn/features/job_description/capability_service.py)、[capability_persistence.py](../../apps/api/src/caliburn/features/job_description/capability_persistence.py)、[jd_capabilities.py](../../apps/api/src/caliburn/transport/http/jd_capabilities.py)；沿同一 JD 固定修訂及原操作，反向用途由同一關係投影 |
+| 協作對象值、用例與 SQL | [collaborators.py](../../apps/api/src/caliburn/features/job_description/collaborators.py)、[collaborator_service.py](../../apps/api/src/caliburn/features/job_description/collaborator_service.py)、[collaborator_persistence.py](../../apps/api/src/caliburn/features/job_description/collaborator_persistence.py)；獨立文字與選用，不混成 task 關係 |
+| 共通條件值、變更、用例與 SQL | [conditions.py](../../apps/api/src/caliburn/features/job_description/conditions.py)、[condition_changes.py](../../apps/api/src/caliburn/features/job_description/condition_changes.py)、[condition_service.py](../../apps/api/src/caliburn/features/job_description/condition_service.py)、[condition_persistence.py](../../apps/api/src/caliburn/features/job_description/condition_persistence.py)；分類不表示自動繼承 |
 | 新建檔案連同空 JD／開場保存 | [job_files.py](../../apps/api/src/caliburn/workflows/job_files.py)；重送建立不重設 JD |
 
 ## 2. 固定修訂與目前正式頭
@@ -216,6 +218,32 @@ erDiagram
 
 完整 DDL 見 [0008](../../apps/api/migrations/versions/0008_jd_capability_relations.py)，資料形狀見 [edit request](../../apps/api/contracts/http/edit-jd-capabilities-request.schema.json)與 [view](../../apps/api/contracts/http/jd-capabilities-view.schema.json)。每次命令處理一筆定義或一條任務關係及其排序，沿原 workflow 的准入、鎖、原結果及 CAS；HTTP UUID 不是模型的 `read_ref`／`title_target`。
 
+### 2.5 協作對象與全職務共通條件
+
+這兩個集合仍在同一 JD feature、同一正式修訂、原操作及 workflow 內。沒有另建 CRUD service／泛型 repository、進度表或全文 JSON 副本。新 target migration [0009](../../apps/api/migrations/versions/0009_jd_collaborators_conditions.py) 加入內容及選用；原新 target 資料自然為空集合，不搬舊產品資料。
+
+```mermaid
+flowchart LR
+  R[固定 JD 修訂 R] --> CS[協作對象選用與順序]
+  R --> JS[共通條件選用與順序]
+  CS --> C[協作對象固定內容修訂]
+  JS --> J[條件固定內容修訂]
+  N[下一個 JD 修訂 R2] --> CS2[新的協作選用]
+  N --> JS2[新的條件選用]
+  CS2 -->|未改內容重用| C
+  JS2 -->|未改內容重用| J
+```
+
+- 協作對象有穩定 `collaborator_id`；`name`／`scope_text` 至少一欄有意義，未知可 null。允許只記已知合作範圍，未填欄位不猜人名。修訂欄位未指定保留、明確 null 清空但不能清成無內容；順序屬選用，不是正文。
+- 共通條件有穩定 `condition_id`，以既定五種 `kind` 與非空 `text` 表達，沒有虛構 title。只涵蓋整個職務，不自動產生任務、成果或要求，也不把資格條件當成技能。
+- 條件顯示／排序在各 kind 內。保存採一份有序選用，按 kind 篩選得到各組順序，與 K／S 已採模式相同。`before_condition_id` 只接受同組目前項目；null 放該組最後，不改其他組相對順序。
+- `revise_condition` 可改 `text` 或明確更正 `kind`；更正分類保留身分、產生固定內容新修訂、追加到目的分類末尾。原分類、內容與位置仍由舊 JD 修訂重建。更正分類不是透過跨類 reorder 偷做，也不用刪除重建；指定相同分類／文字不產生新修訂。
+- 刪除只讓新 JD 不再選用該項，歷史保留；同名重建是新身分。各集合可空，不強制為了欄位完整而補造資料。正文不變的排序不新增正文，改回舊文字仍建立新修訂。
+- `insert_revision` 為**所有**既有人工修改路徑保留兩個集合的小型選用鍵；兩個新路徑同樣保留 profile、職責、任務／明細、共用 K／S 及關係。內容／選用複合 FK 都限制同職務檔案；同 JD 修訂同物件只選一版。
+- 所有內容／選用禁止 UPDATE／DELETE，已採用 JD 修訂禁止事後追加選用；沿既有 DB 防護與交易，不另造發布檢查引擎。新內容、選用、head、原操作同次提交，任一步失敗都不留下半稿。
+
+人工 transport：`GET/POST /jd/collaborators` 與 `/jd/conditions`；完整 shape 由 [collaborator request](../../apps/api/contracts/http/edit-jd-collaborators-request.schema.json)、[condition request](../../apps/api/contracts/http/edit-jd-conditions-request.schema.json)及其 view schema 生成。讀取各自固定一次 head；獨立 HTTP 請求不承諾彼此同版。**UI 尚未接入**，後續須擴充 §2.3 同版組合讀取，而非把多次 latest 拼成一個畫面。這些 ID／命令／基底是人工傳輸協定，不是新模型工具參數。
+
 ## 3. 人工編輯與原結果接續
 
 HTTP shape 的唯一來源為 [request schema](../../apps/api/contracts/http/revise-jd-profile-request.schema.json)與 [view schema](../../apps/api/contracts/http/jd-profile-view.schema.json)，生成 Python／TypeScript；使用路徑見 [backend README](../../apps/api/README.md)。不是本輪新增的模型工具 schema。
@@ -261,6 +289,7 @@ sequenceDiagram
 2026-09-29 核對官方文件：
 
 - [PostgreSQL constraints](https://www.postgresql.org/docs/current/ddl-constraints.html)：複合主鍵／FK 可維護資料關係；本案用它限制同檔案修訂，不以 Python「先查存在」代替約束。
+- 協作／條件沿相同機制：固定 kind 值域與單列正文條件用具名 CHECK，跨列身分／修訂用 FK／UNIQUE；未引入需要獨立生命週期的 PostgreSQL enum type 或 schema 動態引擎。核對 [SQLAlchemy constraints](https://docs.sqlalchemy.org/en/21/core/constraints.html)後採與既有 capability 相同的 text＋明確約束。條件換分類的排序與身分是本案領域選擇，不是 PostgreSQL 代替顧問判斷。
 - 同頁的 `NULLS NOT DISTINCT` 用於任務未歸屬排序，避免一般 UNIQUE 把 null 視為可重複而留下衝突位置；跨列／表限制用 FK／UNIQUE，不塞入跨表 CHECK。SQLAlchemy 2.1.1 已安裝 dialect 原碼的 UniqueConstraint `nulls_not_distinct` 支援、實際 migration／metadata 比對及真 PG 反例共同驗證，沒有為此加自訂排序引擎。
 - [PostgreSQL row locking](https://www.postgresql.org/docs/current/explicit-locking.html)：列鎖在交易結束釋放；本案延用已建立的檔案列鎖，把准入與正式修改放同一短提交，不持鎖等待模型或人。
 - [SQLAlchemy version counter](https://docs.sqlalchemy.org/en/21/orm/versioning.html)：ORM counter 的 flush 衝突檢查不是自動保留完整歷史。因此採 JD 自己的固定修訂／head／原結果，不增加通用版本平台。

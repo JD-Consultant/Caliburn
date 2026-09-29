@@ -271,3 +271,42 @@ JD 保存文件的 4 張 Mermaid 圖（職責、任務明細、同版讀取時�
 八份入口／責任／證據文件的 165 個本機連結及錨點、fences、行尾與 Git diff 檢查通過。
 
 **下一步：**沿 T03 補協作者／共通條件，再補候選；來源／模型工具在 T07、Turn 共同完成在 T08、程序強殺與提交確認遺失全鏈在 T12。T03 及 Goal 仍未完成，不切換 production。
+
+## 10. 第八切片：協作對象與共通條件後端（2026-09-29）
+
+### 10.1 範圍與研究
+
+接續 `2bf929e6`，完成兩個集合的正式人工讀寫、排序、固定修訂／歷史與原操作恢復；**未接這兩個集合的 UI、模型工具、候選或來源**。沿 JD 指南與工具能力覆蓋的既定欄位／分類，重用同一檔案鎖、准入、短交易、head、operation 及不可變選用，不建立另一套 CRUD 平台。
+
+先查 PostgreSQL 當前 constraints 與 SQLAlchemy 2.1 constraints 官方契約，採既有 text＋具名 CHECK、複合 FK／UNIQUE，沒有為五種類別另增 enum type 管理或框架。責任、研究及增量圖維護在 [JD 保存 §2.5](../../../implementation/jd-storage.md#25-協作對象與全職務共通條件)及該頁 §5，不以單一廠商文件宣稱整份 schema 是業界共識。
+
+協作對象允許只知道合作範圍、不猜名稱；共通條件不新增 title，不自動套用成任務要求。明確更正條件分類保留身分、固定正文新修訂並移到目的分類最後；分類內排序不影響另一分類。這是有界欄位編輯及身分保留，不增加通用動態分類產品。
+
+### 10.2 Red、修正與審查
+
+- 最初兩項真 PG 反例均因端點不存在回 404 失敗；新增 schema、domain、保存／workflow、transport 與 0009 migration 後，兩項與五項 migration 測例全通過。
+- 擴充歷史測例時，一處改寫舊測例誤把 profile 的 `job_title` 寫成 `job_name`，**34 passed／1 failed**。核對唯一 schema，修測例回真正 profile 欄位；沒有放寬 API、忽略 422 或移除歷史斷言。
+- 完整靜態審查處理格式與長字串，保留 strict 型別及明確錯誤；生成 Python／TS 只從 schema 生成。未修改既有模型工具形狀，未引入額外依賴。
+- 新集合接入共用 `insert_revision`，測試改 profile／職責／任務／能力後兩集合仍在，反向修改兩集合也保留其他內容；未改正文只重用固定內容鍵，不完整重存 JD。
+
+### 10.3 已執行驗證
+
+| 層級 | 實測結果 |
+|---|---|
+| 後端全套 | **381 passed**，103.86 秒，無 skip／警告；258 項真 PG、123 項單元／契約 |
+| 新增 PostgreSQL | **45 項**：CRUD、兩類排序、分類更正、同身分改回舊文字、no-op、歷史讀回、空白／錯值全拒、跨檔案、活躍／暫停 A、並行重送／競爭與提交前例外全退 |
+| 新增單元／契約 | **24 項**：domain 不靠 HTTP 才拒絕空白、分類 no-op／修訂、重複 change 拒絕、JSON Schema／Pydantic round trip、未知欄位拒絕、內部內容修訂不外露 |
+| 既有前端回歸 | **44 passed**，7 檔；本切片未改畫面，沒有冒稱新 UI 已驗收 |
+| 靜態／生成 | Ruff lint／format（115 檔）、mypy（85 source files）、全契約生成比對；前端 TypeScript、ESLint、Prettier 通過 |
+
+DB 測例直接驗證：固定正文／選用不能 UPDATE／DELETE；目前、初始及過去已採用修訂不能再追加選用；不同檔案正文／修訂不能接在一起，同版同身分及位置不能重複。回應遺失以原命令回原固定結果，不用最新內容冒充；同時重送只產生一次新增效果。這些不取代 T12 的程序強殺／COMMIT 確認遺失全鏈 gate。
+
+命令沿 backend README：`pytest -q -p no:cacheprovider`、Ruff、mypy、`scripts/generate_contracts.py --check`；前端 `test`、`typecheck`、`lint`、`format:check`。單跑新範圍用 `test_jd_collaborators_conditions.py`、兩個 storage tests、兩個 contracts tests 與 `test_jd_collaborator_condition_values.py`。完整 migration 同樣驗 fresh schema、upgrade 重跑、metadata 與具名約束對照。
+
+保存頁六張 Mermaid 圖均用既有 Mermaid 11.17.2／Chromium 流程渲染；新增固定正文重用圖實際檢視，關係清楚、無文字裁切。八份相關文件的 177 個本機連結／錨點、fences 與 Git diff 檢查通過。
+
+### 10.4 環境、限制與下一步
+
+沿 §2 PG18.6／Python 工具鏈，每測例只建立並清理其自有隨機 schema；沒有讀取／遷移原產品資料、載入秘密或呼叫模型，provider 費用 0。沒有啟動新 API／Vite 服務；本輪未重跑瀏覽器旅程或 provider gate，之前的瀏覽器證據仍屬 §9。
+
+`/jd/work` 尚只含既有集合，下一切片須把協作／條件一併放在同版組合查詢，再接人工 UI 與相應真 PG 瀏覽器。之後續做候選，T07 接來源／模型工具，T08 接共同正式完成；**T03 和 Goal 仍未完成，正式入口不切換**。

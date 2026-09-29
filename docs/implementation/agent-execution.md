@@ -294,7 +294,7 @@ erDiagram
 
 外送沿 `ModelRequestExecutor` 與原 executions 預算：`COMPACTION` 預留短交易確認後才 HTTP，完整 C 先交 Graph，再結算。`compaction_payload()` 是指紋與 wire 的共用組裝來源，明確使用 `service_tier="default"`；SDK 預設 auto 可能跟隨遠端 Project 設定。compact 需顯式行政預留與成本計算器；沒有 usage／計算結果時保留未知預留，不歸零。無新增資料表，實際費率、遠端硬費用上限及真 provider 相容仍未驗。
 
-**目前限制：**只對已計數且仍符合完整 create 容量的 W 作保守 compact 准入，不宣稱能搶救任意超長輸入；壓後重新核完整 create。A128K／Agent 意圖及 B 輪前準備、完整 pause 調度、取消／回退挑選合法基底、未明結果的恢復調度與角色整合仍待後續切片。完整 Step pause 見 §4.7，count 原件補存見 §5.2，provider 失敗重試見 §5.4；不因此視為角色／產品整合完成。
+**目前限制：**只對已計數且仍符合完整 create 容量的 W 作保守 compact 准入，不宣稱能搶救任意超長輸入；壓後重新核完整 create。輪前門檻／Agent 意圖的共用準備見 §5.5；完整 pause 調度、取消／回退挑選合法基底、未明結果的恢復調度與角色整合仍待後續切片。完整 Step pause 見 §4.7，count 原件補存見 §5.2，provider 失敗重試見 §5.4；不因此視為角色／產品整合完成。
 
 依據：2026-09-30 重讀 [OpenAI standalone compact](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)、核本機 OpenAI 3.20.0 compact 參數及 SDK construct 實作；借鑑 [LangGraph 私有 State 的明確輸入輸出轉換](https://docs.langchain.com/oss/python/langgraph/use-subgraphs)及[持久執行](https://docs.langchain.com/oss/python/langgraph/persistence)。子圖以明確 thread 固定一次壓縮身分，是本案機制取捨；不是新增一份產品歷史。實測範圍見 [T06 §10](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#10-第十切片完整-c-安全採用與中途接續)。
 
@@ -329,6 +329,33 @@ flowchart TD
 依據：2026-09-30 查[OpenAI 錯誤與 Retry-After 指引](https://developers.openai.com/api/docs/guides/error-codes#python-library-error-types)、核本機 SDK 3.20.0 header／jitter 原碼；借鑑 [Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)的單一責任、分類及整體交易考量。未直接啟用 SDK／LangGraph／通用 decorator，是因它們的隱含 attempts 不承接本案持久費用准入；純等待計算不需要新依賴。這是本案接線，不聲稱業界共同採同一資料表。
 
 **未完成邊界：**沒有失敗紀錄、但原程序確已遺失的 attempt，仍需角色 supervisor 核原 Graph／在途資格後決定是否准許新 attempt；DB 原件補存的有界調度、完整角色恢復／UI 通知、真費率及 provider gate 亦未完成。不得將本節當作 T06／T08／T11 完整驗收。實测與反例見 [T06 §13](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#13-第十三切片共同外送的持久有界重試)。
+
+### 5.5 輪前歷史準備元件（T06 第十四切片）
+
+`prepare_context_history()` 與 §5.3 共用 `context_compaction.py` 的原 C 保存／結算／採用流程。它只接受**已選定的合法歷史**，不讀最新 Memory、不追加本輪 App 資料或員工输入、不產生模型答覆。A 的組裝方須提供已定 128,000 門檻；B 的門檻仍須由有效執行配置明定，本元件不將候選 512K 寫成產品預設。
+
+```mermaid
+flowchart TD
+  W["固定合法歷史 W、準備身分與策略"] --> E{"有歷史？"}
+  E -->|否| K["保存沿用 W 的準備結果"]
+  E -->|是| N["計數原請求；可靠保存原 count"]
+  N --> G["核容量；判斷門檻或已固定 Agent 要求"]
+  G -->|未達且無要求| K
+  G -->|需要壓縮| C["原共用流程：完整 C 保存、結算、採用"]
+  K --> R["返回可重用歷史；同準備重入不重送"]
+  C --> R
+  R -.-> P["角色接線：固定新工作資料，追加一次，再計數完整請求"]
+```
+
+- 準備的歷史 request、門檻、Agent 要求及容量限制先保存；恢復必須使用同一身分及原參數，不能藉回交改門檻、換歷史或再次壓縮。連「未達門檻，沿用 W」也有持久結果。A 的新 Turn／B 的新批首次準備與同批回交如何選身分，仍由上位角色負責，不能每次呼叫便產生新 thread。
+- 首次無歷史不呼叫 count／compact，即使有壓縮要求亦不壓空窗口。有歷史時，計數含該角色固定 instructions／tools 及歷史 items；壓縮只送原歷史 items。這是保守的輪前計量接法，不以字元數或上一 response usage 代替；加入新資料後，仍須由共用 loop 計數完整實際請求。
+- `count_history → assess_history` 使用原 saver 的 sync 交界；先保存原 count，再判門檻／容量。計數與 compact 使用不同且穩定的 logical request 身分，共用原工作預算。計數失败不當零；超模型容量不盲目嘗試壓縮。不新增永久 count cache、資料表或另一份候選／模型全文。
+- `PreparationCountSaveError.recovery` 只保留程序內仍完整的原 count。核對 thread／原 request 後，優先承接原 checkpoint 或 pending writes；未保存才補存，不能倒退後面的 C／採用結果。完整 C 的保存故障沿原 `CompactionSaveError`，沒有第二份恢復協定。真正遺失的結果仍需上位核對／重試政策。
+- 返回的是原歷史或**全部** `compacted.output` 的複本；呼叫方追加新輸入不改掉保存的輪前基底。不在這一步重加 maps、改 opaque items 或將準備完成當作整個 Turn 完成。
+
+**尚未接完的產品邊界：**此元件不自行決定哪個歷史 checkpoint 可跨取消採用，不擁有已完成 Turn 的有效基底指標，也不提供取消後繞過舊 writer guard 的入口。§3／T08／T10 必須把「輪前已採用準備位置」「本工作追加資料」「輪中 C」分開綁定與選用，才能證明取消不丟輪前 C、不帶入被取消輸入。同批只準備一次、消耗 Agent 要求及新工作資料只追加一次，亦須角色接線驗證；不能由本元件測試宣稱 E09／E10 全完成。
+
+依據：重新核 [OpenAI standalone compaction 的完整窗口接續](https://developers.openai.com/api/docs/guides/compaction#user-journey-for-standalone-compaction)及 [LangGraph checkpoint／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)。框架負責保存執行結果，128K／角色準備時點與取消效果是 Caliburn 已確認政策，不稱為供應商共同規定。驗證層級及限制見 [T06 §14](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#14-第十四切片輪前歷史的門檻判斷與可恢復準備)。
 
 ## 6. Memory 背景工作
 

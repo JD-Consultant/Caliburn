@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ReviseJdProfileArguments",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "changes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"anyOf": [
+        {"$ref": "#/$defs/SetProfileText"},
+        {"$ref": "#/$defs/ClearProfileText"},
+        {"$ref": "#/$defs/AddProfileSource"},
+        {"$ref": "#/$defs/RemoveProfileSource"},
+        {"$ref": "#/$defs/AlignProfileSource"}
+      ]}
+    }
+  },
+  "required": ["changes"],
+  "$defs": {
+    "ProfileField": {"type": "string", "enum": ["job_title", "organization_unit", "reports_to", "purpose"]},
+    "SetProfileText": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "set_field", "type": "string"},
+        "field": {"$ref": "#/$defs/ProfileField"},
+        "value": {"type": "string", "minLength": 1}
+      }, "required": ["action", "field", "value"]
+    },
+    "ClearProfileText": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "clear_field", "type": "string"},
+        "field": {"$ref": "#/$defs/ProfileField"}
+      }, "required": ["action", "field"]
+    },
+    "AddProfileSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "add_source", "type": "string"},
+        "field": {"$ref": "#/$defs/ProfileField"},
+        "source": {"anyOf": [
+          {"$ref": "#/$defs/CurrentInputSource"},
+          {"$ref": "#/$defs/InterviewSource"},
+          {"$ref": "#/$defs/MemorySource"}
+        ]}
+      }, "required": ["action", "field", "source"]
+    },
+    "RemoveProfileSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "remove_source", "type": "string"},
+        "field": {"$ref": "#/$defs/ProfileField"},
+        "citation_ref": {"type": "string", "minLength": 1}
+      }, "required": ["action", "field", "citation_ref"]
+    },
+    "AlignProfileSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "action": {"const": "confirm_reference_alignment", "type": "string"},
+        "field": {"$ref": "#/$defs/ProfileField"},
+        "citation_ref": {"type": "string", "minLength": 1}
+      }, "required": ["action", "field", "citation_ref"]
+    },
+    "CurrentInputSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {"kind": {"const": "current_input", "type": "string"}},
+      "required": ["kind"]
+    },
+    "InterviewSource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"const": "interview", "type": "string"},
+        "interview_sequence": {"type": "integer", "minimum": 1}
+      }, "required": ["kind", "interview_sequence"]
+    },
+    "MemorySource": {
+      "type": "object", "additionalProperties": false,
+      "properties": {
+        "kind": {"type": "string", "enum": ["work_situation", "work_understanding"]},
+        "target_title": {"type": "string", "minLength": 1}
+      }, "required": ["kind", "target_title"]
+    }
+  }
+}

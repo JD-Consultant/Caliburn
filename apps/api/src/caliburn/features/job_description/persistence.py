@@ -92,7 +92,7 @@ class JdOperationRecord(Base):
         CheckConstraint(
             "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
             "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
-            "'discard_candidate', 'adopt_candidate')",
+            "'discard_candidate', 'adopt_candidate', 'edit_sources')",
             name="kind",
         ),
         ForeignKeyConstraint(

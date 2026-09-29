@@ -8,9 +8,11 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import candidate_persistence, persistence
+from caliburn.features.job_description import candidate_persistence, persistence, source_persistence
 from caliburn.features.job_description.candidates import CandidateStateError, JdCandidateScope
 from caliburn.features.job_description.models import JdCommandConflictError, StaleJdRevisionError
+from caliburn.features.job_description.source_inheritance import inherited_source_references
+from caliburn.features.job_description.sources import JdSourceReference
 
 
 async def require_open_candidate(
@@ -59,7 +61,17 @@ async def record_edit(
     result_revision_id: UUID,
     request_payload: object,
     candidate: JdCandidateScope | None,
+    source_references: tuple[JdSourceReference, ...] | None = None,
 ) -> None:
+    if result_revision_id != expected_revision_id:
+        references = source_references
+        if references is None:
+            references = await inherited_source_references(
+                session, job_file_id, expected_revision_id, result_revision_id
+            )
+        await source_persistence.insert_source_references(
+            session, job_file_id, result_revision_id, references
+        )
     if candidate is None:
         document = await persistence.read_document(session, job_file_id)
         document.current_revision_id = result_revision_id

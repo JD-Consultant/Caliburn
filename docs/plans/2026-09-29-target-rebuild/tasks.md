@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01、T02 已完成；T03–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01、T02 已完成；T03 施工中；T04–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -28,6 +28,7 @@
 ## T03 關聯式 JD 與人工編輯垂直切片
 
 - [ ] T03；依賴：T02。
+- **進度（2026-09-29）：**第一切片完成 profile 正式保存／人工 API、固定修訂及原結果；196 項後端測試（144 項真 PG）、靜態與生成比對通過。UI、集合與候選仍未完成，詳見[施工證據](evidence/t03-relational-jd.md)；不先勾選 T03。
 - **契約：**[JD 欄位指南](../../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具能力覆蓋 §2.1](../../specs/2026-09-29-jd-model-tool-contract-review.md#21-欄位與操作覆蓋)、[資料接線](../../implementation/data-and-contracts.md)。
 - **程式／交付：**`features/job_description`、HTTP DTO／mapper、`jd-editor`；profile、職責／未歸屬任務、成果／要求、共用 K／S 與關係、協作／共通條件；候選及固定正式修訂機制。
 - **Red：**刪職責誤刪任務、成果與要求錯配、已用 K／S 被刪、跨任務明細操作、後段 change 失敗留下前半修改、活躍 A 時人工寫入。

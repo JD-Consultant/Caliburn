@@ -65,10 +65,44 @@ cwd `apps/api`；結果 **122 passed**（48 真 PG，22 為本片新增，0 skip
 
 關鍵反例：正式員工 F=5、其後答覆=6；即使再有員工=7、答覆=8，延後 bind 同一原來源仍是 F=5。K=2 時新資料為 3–5，引用仍可指 1–2；已涵蓋至 5／7 則不重造同一批。非員工 K/F、非法數值、缺失或不可用來源均拒絕。測例刻意不用員工必為偶數的假設。
 
-子代理對主代理的 Memory 範圍接線另做只讀審核，未發現阻擋缺陷；它沒有代跑主代理測試。pending／cancelled／跨檔案／不存在的細節在正式来源 owner 測例驗證，Memory bind 未重複每一組相同參數。10 份相關文件 207 個本地連結／anchor 與差異空白通過；本片未改圖形，沿用第一切片的實際渲染。
+子代理對主代理的 Memory 範圍接線另做只讀審核，未發現阻擋缺陷；它沒有代跑主代理測試。pending／cancelled／跨檔案／不存在的細節在正式來源 owner 測例驗證，Memory bind 未重複每一組相同參數。10 份相關文件 207 個本地連結／anchor 與差異空白通過；本片未改圖形，沿用第一切片的實際渲染。
 
 ### 2.2 限制與後續
 
 本片驗證的是**正式來源解析與固定讀取**。尚無 Memory 批次保存、恢復 writer／generation、候選修訂、固定選用、發布及原操作結果；也未證明模型不會誤解訪談。新批次呼叫方必須從正式 intent 及同一已發布基底給來源身分／K；同批恢復沿持久 window，不重新 bind。這些接線仍由後續 T04／T08／T11 完成與驗證。
 
 下一切片沿 §1.2 做候選 → 快照真 PG 保存，重用本片來源查詢；不再從頭設計來源身分或另存原話。T04 仍未勾選。
+
+## 3. 第三切片：固定物件修訂與正文重用
+
+2026-09-30 接續 `acc5e85e`。先完成候選／發布所需的固定修訂保存，不假裝已接成候選或正式快照入口。schema 與生命週期只在 [Memory 保存接線 §2.1](../../../implementation/memory-storage.md#21-已落地固定物件修訂) 維護。
+
+主代理負責領域 service 與真 PG 反例；子代理的唯一寫入範圍為 revision persistence、migration `0011` 及 `env.py` 註冊。主代理整合審閱 migration 的延後封存、引用鎖定、同檔案／層別 FK 與實際測試，不將子代理完成當 T04 完成。
+
+### 3.1 Red／Green 與驗證
+
+主代理先建 7 項保存測例及明確 stub，**7 failed**（未實作，不是環境錯誤）；完成後加歷史竄改、半套提交與非法來源反例，共 **12 項真 PG passed**，4.93 秒。
+
+```powershell
+$env:CALIBURN_TEST_DATABASE_URL='postgresql://caliburn_test@127.0.0.1:55439/caliburn_t01_test'
+.venv-target/Scripts/python.exe -B -m pytest tests/integration/test_memory_revisions.py -q -p no:cacheprovider
+.venv-target/Scripts/python.exe -B -m pytest tests -q -p no:cacheprovider
+.venv-target/Scripts/python.exe -B -m ruff check --no-cache src tests migrations
+.venv-target/Scripts/python.exe -B -m ruff format --check --no-cache src tests migrations
+.venv-target/Scripts/python.exe -B -m mypy --cache-dir ../../.research-tmp/mypy-t04 src
+```
+
+cwd `apps/api`。新增全庫 migration，故整合驗證升至全後端而非只測 12 項：首次 **501 passed／1 failed**，172.73 秒。唯一失敗是舊 JD migration 測試升至 `head` 卻硬斷言仍為 `0010`；改為明確升至該測例真正負責的 `0010_jd_candidates`，仍保留升級／重跑、原結果不變及拒絕破壞歷史的全部斷言。其所在 `test_jd_candidate_storage.py` **13 passed**，4.63 秒。沒有因純測試目標修正再重跑未受影響的全套，也沒有把首次全套說成零失敗。
+
+Ruff 通過、132 檔格式通過，mypy **97 source files** 通過。子代理另外在獨立真 PG schema 驗升級／重跑升級、Alembic metadata 對齊及 deferred trigger 設定，均通過，未改既有 schema。10 份相關文件的 209 個本地連結／anchor、code fence 與差異空白通過；Memory 兩張 Mermaid 圖實際渲染，新增 schema 圖已目視檢查，文字／箭頭無截斷。
+
+關鍵反例：
+
+- 只改 title／引用重用正文；同內容與來源無效果；修改正文後再改回仍新修訂，不回到舊身分。
+- 情境換版後，理解新固定修訂指新版、舊修訂仍指舊版；理解正文未改可重用。
+- 11 種歷史 UPDATE／DELETE 及兩種封存後引用 INSERT 被 DB 拒絕；未封存標頭到 COMMIT 仍被拒絕，沒有留下半套修訂。
+- 未正式來源、錯層、跨檔案、同物件混用兩個來源修訂被拒絕；外層 transaction 失敗撤回所有本次資料。
+
+### 3.2 未驗邊界
+
+固定修訂 service 不持有 current pointer、角色、候選位置、執行分支或原操作回執；這些是下一片的必要接線，不可直接拿本函式暴露成 B1／B2 工具。尚無候選 CRUD／位置回退、固定快照 map/read、整版發布與發布原結果。尚未證明完整 A／B1／B2 或模型語意品質。未呼叫模型、未讀密鑰、費用 US$0。

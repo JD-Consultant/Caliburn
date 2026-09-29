@@ -9,6 +9,7 @@ from caliburn.adapters.database import Database
 from caliburn.settings import Settings
 from caliburn.transport.http.health import router as health_router
 from caliburn.transport.http.interview_inputs import router as interview_input_router
+from caliburn.transport.http.jd_areas import router as jd_areas_router
 from caliburn.transport.http.jd_profile import router as jd_profile_router
 from caliburn.transport.http.job_files import router as job_file_router
 from caliburn.workflows.interview_inputs import InterviewInputWorkflow
@@ -42,4 +43,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(job_file_router)
     app.include_router(interview_input_router)
     app.include_router(jd_profile_router)
+    app.include_router(jd_areas_router)
     return app

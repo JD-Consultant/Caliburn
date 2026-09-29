@@ -8,9 +8,9 @@ from pydantic import BaseModel, ConfigDict, Field, StrictInt, StrictStr
 
 
 class Speaker(StrEnum):
-    app = "app"
-    employee = "employee"
-    consultant = "consultant"
+    APP = "app"
+    EMPLOYEE = "employee"
+    CONSULTANT = "consultant"
 
 
 class InterviewMessage(BaseModel):

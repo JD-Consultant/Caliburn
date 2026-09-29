@@ -9,6 +9,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
+from caliburn.features.job_description import area_persistence
+from caliburn.features.job_description.areas import ResponsibilityArea
 from caliburn.features.job_description.models import JdProfile, JdProfileRevision
 
 
@@ -69,7 +71,7 @@ class JdOperationRecord(Base):
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_operations_result_revision",
         ),
-        CheckConstraint("kind IN ('revise_profile')", name="kind"),
+        CheckConstraint("kind IN ('revise_profile', 'edit_areas')", name="kind"),
     )
 
     job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
@@ -77,7 +79,8 @@ class JdOperationRecord(Base):
     kind: Mapped[str] = mapped_column(Text)
     expected_revision_id: Mapped[UUID]
     result_revision_id: Mapped[UUID]
-    request_payload: Mapped[list[dict[str, str]]] = mapped_column(JSONB)
+    # Loaded JSON is untrusted until compared with the typed original command.
+    request_payload: Mapped[object] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
@@ -117,6 +120,7 @@ async def insert_revision(
     revision: JdProfileRevision,
     *,
     parent_revision_id: UUID | None,
+    areas: tuple[ResponsibilityArea, ...] | None = None,
 ) -> None:
     session.add(
         JdRevisionRecord(
@@ -130,3 +134,9 @@ async def insert_revision(
         )
     )
     await session.flush()
+    if areas is not None:
+        await area_persistence.select_areas(session, job_file_id, revision.revision_id, areas)
+    elif parent_revision_id is not None:
+        await area_persistence.copy_area_selection(
+            session, job_file_id, parent_revision_id, revision.revision_id
+        )

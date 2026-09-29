@@ -5,7 +5,12 @@ from sqlalchemy import Connection, create_engine, pool, text
 from sqlalchemy.schema import CreateSchema
 
 from caliburn.adapters.database import Base
-from caliburn.features.interviews.persistence import FormalInterviewRecord, InterviewTextRecord
+from caliburn.features.executions.persistence import ExecutionRecord
+from caliburn.features.interviews.persistence import (
+    FormalInterviewRecord,
+    InterviewInputRecord,
+    InterviewTextRecord,
+)
 from caliburn.features.job_files.persistence import JobFileRecord
 from caliburn.settings import Settings
 
@@ -15,6 +20,8 @@ target_metadata = Base.metadata
 assert JobFileRecord.__table__.metadata is target_metadata
 assert InterviewTextRecord.__table__.metadata is target_metadata
 assert FormalInterviewRecord.__table__.metadata is target_metadata
+assert InterviewInputRecord.__table__.metadata is target_metadata
+assert ExecutionRecord.__table__.metadata is target_metadata
 
 
 def migrate(connection: Connection, schema: str) -> None:

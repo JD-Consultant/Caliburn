@@ -17,3 +17,32 @@ class InterviewMessage:
     interview_sequence: int
     speaker: InterviewSpeaker
     interview_text: str
+
+
+class InputCommandConflictError(RuntimeError):
+    """The same submission command cannot be reused for different original text."""
+
+
+@dataclass(frozen=True, slots=True)
+class SubmitInterviewInput:
+    job_file_id: UUID
+    command_id: UUID
+    text: str
+
+    def __post_init__(self) -> None:
+        if not self.text.strip() or "\x00" in self.text:
+            raise ValueError("Input must contain non-whitespace text without NUL")
+
+
+@dataclass(frozen=True, slots=True)
+class AcceptedInterviewInput:
+    job_file_id: UUID
+    command_id: UUID
+    source_id: UUID
+    execution_id: UUID
+
+
+@dataclass(frozen=True, slots=True)
+class InputAcceptance:
+    accepted: AcceptedInterviewInput
+    is_new: bool

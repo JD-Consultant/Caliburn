@@ -12,6 +12,7 @@ from caliburn.transport.http.interview_inputs import router as interview_input_r
 from caliburn.transport.http.jd_areas import router as jd_areas_router
 from caliburn.transport.http.jd_profile import router as jd_profile_router
 from caliburn.transport.http.jd_tasks import router as jd_tasks_router
+from caliburn.transport.http.jd_work import router as jd_work_router
 from caliburn.transport.http.job_files import router as job_file_router
 from caliburn.workflows.interview_inputs import InterviewInputWorkflow
 from caliburn.workflows.jd_editing import JdEditingWorkflow
@@ -46,4 +47,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(jd_profile_router)
     app.include_router(jd_areas_router)
     app.include_router(jd_tasks_router)
+    app.include_router(jd_work_router)
     return app

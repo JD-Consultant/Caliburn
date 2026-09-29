@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { InterviewHistory } from '../features/interview/InterviewHistory';
 import { JdProfileEditor } from '../features/jd-editor/JdProfileEditor';
+import { JdWorkEditor } from '../features/jd-editor/JdWorkEditor';
 import { jobFileQuery } from '../features/job-files/job-file-api';
 import { describeReadError } from '../shared/api/http';
 
@@ -48,10 +49,12 @@ function JobFileContent({ jobFileId }: { jobFileId: string }) {
             <p>受訪員工：{file.data.employee_name}</p>
           </header>
           <Alert severity="info">
-            已可編輯 JD 基本資料與回看開場。其他 JD 欄位及 AI 訪談仍在開發，這裡不會送出模型請求。
+            已可編輯 JD 基本資料、職責與任務，並回看開場。知識／技能等其餘欄位及 AI
+            訪談仍在開發，這裡不會送出模型請求。
           </Alert>
           <InterviewHistory jobFileId={jobFileId} />
-          <JdProfileEditor key={jobFileId} jobFileId={jobFileId} />
+          <JdProfileEditor jobFileId={jobFileId} />
+          <JdWorkEditor jobFileId={jobFileId} />
         </>
       )}
     </Stack>

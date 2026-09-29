@@ -1,6 +1,6 @@
 # T04：受訪者工作記憶保存證據
 
-- 日期：2026-09-29；狀態：**施工中，未完成 T04**。接續 T03 `4e673cf8`，唯一進度入口為[任務表](../tasks.md#t04-memory-可變候選不可變修訂與快照)。
+- 日期：2026-09-29；更新：2026-09-30；狀態：**施工中，未完成 T04**。接續 T03 `4e673cf8`，唯一進度入口為[任務表](../tasks.md#t04-memory-可變候選不可變修訂與快照)。
 - 責任：[Memory 保存接線](../../../implementation/memory-storage.md)、[資料保存](../../../architecture/persistence.md)。本頁記實測，不另定模型工具、角色或發布語意。
 
 ## 1. 第一切片：內容、引用集合與標題純規則
@@ -40,3 +40,35 @@
 純函式中的 `allowed` 和單層 map 由呼叫者提供；不證明來源已正式化、在 F 以內、同檔案或角色有權。**目前沒有 Memory PostgreSQL 候選／發布服務**，不把值測試當成真正版本、交易、恢復或可用 Agent。
 
 下一片建立最小真 PG 路徑：有效訪談來源 → 情境候選 → 理解候選 → 固定發布快照讀回；再覆蓋修改／刪除／回退、原結果及未變重用。V4A 與模型 schema 留在 T05，Agent 與完成資格接線留在 T10／T11。T04 保持未勾選。
+
+## 2. 第二切片：正式來源身分與 Memory 固定範圍
+
+2026-09-30 接續 `5c5b09b8`，先交付上一節垂直路徑中的有效來源邊界；無新 migration、原文副本或模型 API：
+
+- 訪談 owner 增加 `read_interview_sources`，用內部 ID 選取已正式化來源；SQL 保持同檔案與指定上界。整筆資格檢查、去重排序及原文保留不另造第二個來源服務。
+- `work_memory/sources.py` 根據原要求的正式員工來源身分解出 F，不拿目前最後答覆／最大序號或奇偶規則代替。`MemorySourceWindow` 保留固定 `(K,F]`；已涵蓋的合法要求不產生空批。
+- 必處理區間沿原文讀取，引用可查更早 `≤F` 的合法來源；取消／未完成、跨檔案、不存在、越 F 任何一筆均不允許混入。Memory 空引用合法，因此空集合不被來源查詢的「空選取錯誤」誤傷。
+
+### 2.1 實測與審查
+
+主代理先建批次範圍測例和明確 stub，真 PG **13 failed**（`NotImplementedError`，非環境失敗）；補實作後通過。子代理限於訪談 owner 查詢及其測試，**9 failed → 9 passed**；其與既有訪談讀取合跑 **35 passed**。主代理審核後完整跑受影響集合：
+
+```powershell
+$env:CALIBURN_TEST_DATABASE_URL='postgresql://caliburn_test@127.0.0.1:55439/caliburn_t01_test'
+.venv-target/Scripts/python.exe -B -m pytest tests/integration/test_memory_source_windows.py tests/integration/test_interview_source_queries.py tests/integration/test_interview_reads.py tests/unit/test_work_memory_values.py tests/unit/test_import_boundaries.py -q -p no:cacheprovider
+.venv-target/Scripts/python.exe -B -m ruff check --no-cache src tests
+.venv-target/Scripts/python.exe -B -m ruff format --check --no-cache src tests
+.venv-target/Scripts/python.exe -B -m mypy --cache-dir ../../.research-tmp/mypy-t04 src
+```
+
+cwd `apps/api`；結果 **122 passed**（48 真 PG，22 為本片新增，0 skip），16.52 秒；Ruff 全部通過、116 檔格式通過；mypy **94 source files** 通過。每項 PG 使用既有 fixture 的獨立隨機 schema，僅回收自己的測試 namespace。沒有執行模型、沒有憑證存取、模型費用 US$0。
+
+關鍵反例：正式員工 F=5、其後答覆=6；即使再有員工=7、答覆=8，延後 bind 同一原來源仍是 F=5。K=2 時新資料為 3–5，引用仍可指 1–2；已涵蓋至 5／7 則不重造同一批。非員工 K/F、非法數值、缺失或不可用來源均拒絕。測例刻意不用員工必為偶數的假設。
+
+子代理對主代理的 Memory 範圍接線另做只讀審核，未發現阻擋缺陷；它沒有代跑主代理測試。pending／cancelled／跨檔案／不存在的細節在正式来源 owner 測例驗證，Memory bind 未重複每一組相同參數。10 份相關文件 207 個本地連結／anchor 與差異空白通過；本片未改圖形，沿用第一切片的實際渲染。
+
+### 2.2 限制與後續
+
+本片驗證的是**正式來源解析與固定讀取**。尚無 Memory 批次保存、恢復 writer／generation、候選修訂、固定選用、發布及原操作結果；也未證明模型不會誤解訪談。新批次呼叫方必須從正式 intent 及同一已發布基底給來源身分／K；同批恢復沿持久 window，不重新 bind。這些接線仍由後續 T04／T08／T11 完成與驗證。
+
+下一切片沿 §1.2 做候選 → 快照真 PG 保存，重用本片來源查詢；不再從頭設計來源身分或另存原話。T04 仍未勾選。

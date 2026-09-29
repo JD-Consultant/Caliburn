@@ -1,6 +1,6 @@
 # Memory 保存接線
 
-- 日期：2026-09-29；狀態：**T04 施工中；純值規則先行，PostgreSQL 候選／快照尚未交付**。精確證據與下一切片見 [T04 紀錄](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)。本頁維護實作映射，不另定產品規則或模型工具。
+- 日期：2026-09-30；狀態：**T04 施工中；純規則與正式來源範圍已驗，PostgreSQL 候選／快照尚未交付**。精確證據與下一切片見 [T04 紀錄](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)。本頁維護實作映射，不另定產品規則或模型工具。
 - 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[內容與引用修改](../specs/2026-09-27-memory-object-update-tool-contract.md)、[title 解析](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#4-未決接縫與停止線)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 
 ## 1. 實作責任與第一切片
@@ -14,6 +14,17 @@
 - 標題在 App 的單層 map 內精確映射為 ID，CRUD 與引用進入資料介面後用 ID；歷史與已綁定原操作不重新解析 title。純規則只檢查傳入 map，不自行查其他層。
 
 純值／變更放 `models.py`／`changes.py`，不依賴 ORM、HTTP、LLM 或生成 DTO。這些函式**不證明**來源已正式成立、在本批 F 以內或角色有權；後續 service 必須由正式來源 owner 和批次綁定取得合法集合。
+
+### 1.1 正式來源範圍接線
+
+第二切片 `work_memory/sources.py` 透過 `interviews/queries.py`，重用現有正式訊息保存，不直接讀別的領域表，也不複製原話：
+
+- `bind_memory_source_window` 只供新批次準備：接收原整理要求的員工來源身分，精確解出正式序號 F；K 由呼叫方選定的已發布快照提供。F 與非零 K 均須為同檔案的有效員工發話；首次 K=0。查詢最大序號只用於驗證來源資格，**不是拿最大序號當 F**。有效要求 F≤K 返回「已涵蓋」，不另造空批。
+- `MemorySourceWindow` 明列固定檔案、來源身分及 `(K,F]`；不是模型可填欄位，也不是新的保存 owner。批次保存／恢復後續必須沿原值，不在每次讀取、回交或恢復重呼 bind 取得新範圍。
+- `read_required_interviews` 共用既有近期歷史組裝，保留完整 `(K,F]`、真實角色及前置語境規則；不含 F 之後即使已正式保存的答覆。`read_reference_sources` 可回讀 `≤F` 的更早有效來源，空引用合法，不把必處理新區間當成唯一可引用範圍。
+- 訪談 owner 的 `read_interview_sources` 在 SQL 同時限定檔案、來源 ID 與上界；有一個來源不存在、未正式化、跨檔案或超界就整組拒絕，不返回部分結果。這是新增的內部 ID 查詢，**不是新增模型工具**。
+
+真 PG 已驗來源資格、延後啟動不擴張 F、K/F 角色、不以奇偶判定、空區間與早期來源回查；仍未實作背景要求保存、批次持久綁定、Memory 候選 CRUD 或發布。不能因這些查詢通過，就稱取消／恢復整體已完成。
 
 ## 2. 保存表示：固定修訂，而非資料庫舊列
 

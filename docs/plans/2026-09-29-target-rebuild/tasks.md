@@ -44,6 +44,7 @@
 
 - [ ] T04；依賴：T02。
 - **進度：**接續 T03 `4e673cf8`，先完成內容、精確標題與引用集合純規則；[保存接線](../../implementation/memory-storage.md)記錄官方機制比較及下一個 PG 垂直切片。[實際證據／未驗邊界](evidence/t04-work-memory.md)。候選／快照 SQL、發布、角色／來源資格與恢復尚未完成，不把純值測試當 Memory 產品可用。
+- **第二切片（2026-09-30）：**第一切片 `5c5b09b8`；接著完成本批固定員工來源 F、正式來源身分查詢與必處理區間的真 PG 驗證。[來源邊界證據](evidence/t04-work-memory.md#2-第二切片正式來源身分與-memory-固定範圍)。這不是批次持久化／候選／發布完成，T04 仍未勾選。
 - **契約：**[資料保存 §2–4](../../architecture/persistence.md)、[B1／B2 生命週期](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[凍結接線](../../implementation/data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 - **程式／交付：**`features/work_memory` 的候選 CRUD、位置／階段快照、發布及固定 map／read；原操作結果與同 transaction 修改；schema 圖及 migrations。
 - **Red：**相同物件不同引用路徑得到不同修訂、修改歷史、只改下層引用卻沿用上層舊修訂、回改舊文字冒充原修訂、刪情境破壞歷史。

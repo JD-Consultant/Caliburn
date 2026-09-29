@@ -186,6 +186,8 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
                     await graph.ainvoke(
                         {
                             "request_snapshot": model_request.create_payload(),
+                            "model_step_limit": None,
+                            "tool_call_limit": 16,
                             "request_id": uuid4(),
                         },
                         config,

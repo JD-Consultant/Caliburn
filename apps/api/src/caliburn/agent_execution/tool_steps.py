@@ -1,6 +1,6 @@
-"""One durable native model/tool Step; product completion and control remain outside it."""
+"""Durable native model/tool Steps; product completion and control remain outside them."""
 
-from collections.abc import Awaitable, Callable
+from collections.abc import Awaitable, Callable, Mapping
 from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import Literal, TypedDict
@@ -31,12 +31,15 @@ class ResponseStepState(TypedDict, total=False):
     request_id: UUID
     request_snapshot: NativeSnapshot
     input_items: NativeItems
-    response_attempt_id: UUID
+    response_attempt_id: UUID | None
     response_snapshot: NativeSnapshot
-    operation_seed: UUID
+    operation_seed: UUID | None
     prepared_tool: object | None
     tool_results: list[FunctionCallOutput]
     next_action: Literal["continue", "deliver_answer"] | None
+    completed_steps: int
+    model_step_limit: int | None
+    tool_call_limit: int
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,6 +85,38 @@ class ResponseStepSaveError(RuntimeError):
         self.recovery = recovery
 
 
+class ModelStepLimitError(RuntimeError):
+    """The last Step is saved, but this invocation may not request another response."""
+
+
+async def run_response_loop(
+    checkpointer: BaseCheckpointSaver[str],
+    *,
+    thread_id: str,
+    request: ResponseRequest | None,
+    runtime: ResponseStepRuntime,
+    max_tool_calls: int,
+    max_model_steps: int,
+    recovery: HeldModelResponse | None = None,
+) -> ResponseStepState:
+    """Continue complete native Steps to a final answer within a fixed saved limit.
+
+    This does not commit the product Turn, retry failed I/O, or refresh context.
+    Resume the same loop with None and the original limits.
+    """
+    if type(max_model_steps) is not int or max_model_steps < 1:
+        raise ValueError("Configure a positive model Step bound")
+    return await _run_response_flow(
+        checkpointer,
+        thread_id=thread_id,
+        request=request,
+        runtime=runtime,
+        max_tool_calls=max_tool_calls,
+        max_model_steps=max_model_steps,
+        recovery=recovery,
+    )
+
+
 async def run_response_step(
     checkpointer: BaseCheckpointSaver[str],
     *,
@@ -94,8 +129,29 @@ async def run_response_step(
     """Start a fresh Step or resume it with None; callers still own single-writer eligibility.
 
     A Step uses one dedicated thread identity. A completed Step may be read/resumed but
-    not restarted with new input. A role's outer loop carries its resulting window forward.
+    not restarted with new input. Use run_response_loop for multi-Step execution.
     """
+    return await _run_response_flow(
+        checkpointer,
+        thread_id=thread_id,
+        request=request,
+        runtime=runtime,
+        max_tool_calls=max_tool_calls,
+        max_model_steps=None,
+        recovery=recovery,
+    )
+
+
+async def _run_response_flow(
+    checkpointer: BaseCheckpointSaver[str],
+    *,
+    thread_id: str,
+    request: ResponseRequest | None,
+    runtime: ResponseStepRuntime,
+    max_tool_calls: int,
+    max_model_steps: int | None,
+    recovery: HeldModelResponse | None,
+) -> ResponseStepState:
     if not thread_id:
         raise ValueError("A durable Step requires a nonempty thread identity")
     if recovery is not None and (recovery.thread_id != thread_id or request is not None):
@@ -118,12 +174,13 @@ async def run_response_step(
     graph = _build_response_step(
         checkpointer,
         max_tool_calls=max_tool_calls,
+        max_model_steps=max_model_steps,
         retain_response=retain,
         release_response=release,
     )
     config: RunnableConfig = {
         "configurable": {"thread_id": thread_id},
-        "recursion_limit": 2 * max_tool_calls + 8,
+        "recursion_limit": (2 * max_tool_calls + 8) * (max_model_steps or 1),
     }
     try:
         saved = await graph.aget_state(config)
@@ -135,13 +192,18 @@ async def run_response_step(
         raise ValueError("This Step already exists; resume with None instead of new input")
     if request is None and saved.created_at is None:
         raise ValueError("There is no saved Step to resume")
+    # The first durable checkpoint can still hold input in __start__, with no
+    # expanded values. Let the native graph restore it; request_model validates
+    # those original limits before any outbound request.
+    if saved.created_at is not None and not (not saved.values and saved.next == ("__start__",)):
+        _require_execution_limits(saved.values, max_tool_calls, max_model_steps)
     if recovery is not None:
         if (
             saved.values.get("request_id") != recovery.request_id
             or saved.values.get("request_snapshot") != recovery.request_snapshot
         ):
             raise ValueError("The held response does not match the saved request boundary")
-        if "response_snapshot" in saved.values:
+        if saved.values.get("response_snapshot"):
             if any(
                 saved.values.get(key) != recovery.update[key]
                 for key in ("response_snapshot", "response_attempt_id", "operation_seed")
@@ -173,7 +235,7 @@ async def run_response_step(
     try:
         await runtime.ensure_active()
     except Exception:
-        if "response_snapshot" in saved.values:
+        if saved.values.get("response_snapshot"):
             await runtime.account_response(
                 ReceivedModelResponse(
                     restore_response(saved.values["response_snapshot"]),
@@ -187,7 +249,13 @@ async def run_response_step(
         raise
     initial_state: ResponseStepState | None = None
     if request is not None:
-        initial_state = {"request_id": uuid4(), "request_snapshot": request.create_payload()}
+        initial_state = {
+            "request_id": uuid4(),
+            "request_snapshot": request.create_payload(),
+            "completed_steps": 0,
+            "model_step_limit": max_model_steps,
+            "tool_call_limit": max_tool_calls,
+        }
     try:
         result = await graph.ainvoke(
             initial_state,
@@ -208,18 +276,20 @@ def _build_response_step(
     checkpointer: BaseCheckpointSaver[str],
     *,
     max_tool_calls: int,
+    max_model_steps: int | None = None,
     retain_response: Callable[[ResponseStepState, ResponseStepState], None] | None = None,
     release_response: Callable[[], None] | None = None,
 ) -> CompiledStateGraph[
     ResponseStepState, ResponseStepRuntime, ResponseStepState, ResponseStepState
 ]:
-    """Internal graph; production callers use run_response_step for enforced invocation rules."""
+    """Shared graph; public entry points enforce thread identity and saved limits."""
     if type(max_tool_calls) is not int or max_tool_calls < 1:
         raise ValueError("Configure a positive per-response tool bound")
 
     async def request_model(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
+        _require_execution_limits(state, max_tool_calls, max_model_steps)
         await runtime.context.ensure_active()
         received = await runtime.context.request_model(
             ResponseRequest.from_snapshot(state["request_snapshot"]), state["request_id"]
@@ -258,7 +328,10 @@ def _build_response_step(
         if len(state["tool_results"]) == len(calls):
             return {"prepared_tool": None}
         call = calls[len(state["tool_results"])]
-        operation_id = uuid5(state["operation_seed"], call.call_id)
+        operation_seed = state["operation_seed"]
+        if operation_seed is None:
+            raise ValueError("The model response has no saved operation identity")
+        operation_id = uuid5(operation_seed, call.call_id)
         prepared = await runtime.context.prepare_tool(call, operation_id)
         if isinstance(prepared, str):
             return {
@@ -305,6 +378,7 @@ def _build_response_step(
         if len(state["tool_results"]) != len(step.calls) or state["prepared_tool"] is not None:
             raise ValueError("A complete Step cannot have unresolved tool results")
         return {
+            "completed_steps": state.get("completed_steps", 0) + 1,
             "input_items": [
                 *state["request_snapshot"]["input"],
                 *response_input_items(response),
@@ -314,6 +388,30 @@ def _build_response_step(
             if step.action == ResponseAction.DELIVER_ANSWER
             else "continue",
         }
+
+    async def prepare_next_request(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
+        await runtime.context.ensure_active()
+        limit = state["model_step_limit"]
+        if limit is None or state["completed_steps"] >= limit:
+            raise ModelStepLimitError("The saved model Step limit has been reached")
+        # Change only input. Instructions, tools, model, reasoning and the existing
+        # maps remain those of the original execution, not today's configuration.
+        next_request = {**deepcopy(state["request_snapshot"]), "input": state["input_items"]}
+        return {
+            "request_id": uuid4(),
+            "request_snapshot": next_request,
+            "response_snapshot": {},
+            "response_attempt_id": None,
+            "operation_seed": None,
+            "prepared_tool": None,
+            "tool_results": [],
+            "next_action": None,
+        }
+
+    def route_finished(state: ResponseStepState) -> Literal["prepare_next_request", "__end__"]:
+        return "__end__" if state["next_action"] == "deliver_answer" else "prepare_next_request"
 
     graph = StateGraph(ResponseStepState, context_schema=ResponseStepRuntime)
     graph.add_node("request_model", request_model)
@@ -326,11 +424,29 @@ def _build_response_step(
     graph.add_edge("account_response", "prepare_tool")
     graph.add_conditional_edges("prepare_tool", route_prepared)
     graph.add_edge("execute_tool", "prepare_tool")
-    graph.add_edge("finish_step", END)
+    if max_model_steps is None:
+        graph.add_edge("finish_step", END)
+    else:
+        graph.add_node("prepare_next_request", prepare_next_request)
+        graph.add_conditional_edges("finish_step", route_finished)
+        graph.add_edge("prepare_next_request", "request_model")
     return graph.compile(checkpointer=checkpointer)
 
 
 def _received_response(state: ResponseStepState) -> ReceivedModelResponse:
-    return ReceivedModelResponse(
-        restore_response(state["response_snapshot"]), state["response_attempt_id"]
-    )
+    attempt_id = state["response_attempt_id"]
+    if attempt_id is None:
+        raise ValueError("There is no model response to account for")
+    return ReceivedModelResponse(restore_response(state["response_snapshot"]), attempt_id)
+
+
+def _require_execution_limits(
+    state: Mapping[str, object],
+    max_tool_calls: int,
+    max_model_steps: int | None,
+) -> None:
+    if (
+        state.get("model_step_limit") != max_model_steps
+        or state.get("tool_call_limit") != max_tool_calls
+    ):
+        raise ValueError("Resume with the original execution mode and limits")

@@ -8,6 +8,8 @@ dependencies = [
     "pydantic==2.13.5",
     "uvicorn==0.54.0",
     "psycopg[binary,pool]==3.3.6",
+    "sqlalchemy[asyncio]==2.1.1",
+    "alembic==1.20.0",
     "langgraph==1.2.12",
     "langgraph-checkpoint-postgres==3.1.2",
     "openai==3.20.0",
@@ -48,6 +50,9 @@ extend-exclude = ["src/caliburn/contracts/generated"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B", "ASYNC", "N", "A", "RUF006", "RUF100"]
+
+[tool.ruff.lint.isort]
+known-third-party = ["alembic"]
 
 [tool.mypy]
 python_version = "3.14"

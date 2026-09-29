@@ -25,6 +25,8 @@ T01 已發現 TS 7 超出 [typescript-eslint 支援範圍](https://typescript-es
 
 ## 2. 有具體風險的機制，先驗再擴大
 
+T02 保存切片已核對並採用 SQLAlchemy 2.1.1＋Alembic 1.20.0（Python 3.14／Windows），不是沿用 2.0 legacy 作新安裝。當前官方 [2.1 transaction](https://docs.sqlalchemy.org/en/21/orm/session_transaction.html)、[Alembic 命名](https://alembic.sqlalchemy.org/en/latest/naming.html)與實際接線見[訪談保存](interview-storage.md)；真 PostgreSQL 證據及已發現接縫在 [T02 evidence](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md)。不因此推導 Memory／JD 整體交易已驗收。
+
 | Spike／承接任務 | 檢查與產物 | 不通過時 |
 |---|---|---|
 | T01 相容組合 | SDK 的 typed reasoning／compact／stream；LangGraph saver serializer；生成器支援 schemas；Windows＋Node／Python＋PG 啟動。留下實際版本及可重現命令 | 在同一已選框架內選受支援相容版；涉及撤換產品選型才提出問題 |

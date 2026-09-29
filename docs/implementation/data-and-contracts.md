@@ -1,6 +1,6 @@
 # 業務、資料及契約接線
 
-- 狀態：**工程設計／未實作、未驗收**。不在此預先列所有資料表；表名、索引與 DDL 由任務依測例實現並留下 schema 圖。
+- 狀態：**工程設計／分切片施工中**。T02 的檔案與開場保存見[實際接線](interview-storage.md)；其餘依任務表，不因此宣稱 JD／Memory／執行均已實作。不在此預先列所有資料表；表名、索引與 DDL 由任務依測例實現並留下 schema 圖。
 - 語意權威：[資料保存與交易](../architecture/persistence.md)、[Memory 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[JD 工具](../specs/2026-09-29-jd-model-tool-contract-review.md)。本頁只說接線方式。
 
 ## 1. 一個 service、一個正式結果，兩種入口

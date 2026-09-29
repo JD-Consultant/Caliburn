@@ -8,6 +8,7 @@
 
 - [x] T01；依賴：無。
 - **證據（2026-09-29）：**health schema 原失敗已修；乾淨 uv／pnpm 安裝、20 項後端測試（含真 PG 跨程序 saver）、1 項前端測試、lint／型別／格式／生成／建置及實際啟停通過。精確命令、版本、授權、限制及後續接縫見[實測紀錄](evidence/t01-foundation.md#3-修正後實測2026-09-29)。基礎程式與此證據共同提交；根正式入口不變，尚未做產品／真模型驗收。
+- **同日補強：**Owner 補充的 code 寫法規範已連入施工流程；命名／非同步／typed lint 的反例與回歸見 [evidence §5](evidence/t01-foundation.md#5-程式撰寫規範與自動檢查補強2026-09-29)，不重新勾選或重做全部 T01。
 - **契約：**[程式組織](../../implementation/code-organization.md)、[選型](../../implementation/technology-decisions.md)、[契約策略](../../contract-strategy.md)。
 - **程式／交付：**新 API package、Web build、fresh PG 測試配置、lint／typecheck、契約生成與 import 邊界測試；新路徑 README 說清目標狀態。先只做 health／最小 schema round trip，不生全部空模組。
 - **先驗：**記實際穩定版本、license、Windows 支援及 lock；fake transport 能構造原生 SDK 回應，PG saver 可初始化。設定／生成任務不假稱 TDD；schema 非法 payload 與越界 import 應有失敗測例。

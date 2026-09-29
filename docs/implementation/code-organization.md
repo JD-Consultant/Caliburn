@@ -2,6 +2,7 @@
 
 - 狀態：**目標程式設計／施工中**；2026-09-29。T01 已建立最小組裝根、health 與測試；樹中其餘路徑仍是施工位置，不代表全部存在，進度依[任務表](../plans/2026-09-29-target-rebuild/tasks.md)。
 - 依據：[系統責任](../architecture/system-boundaries.md)、[工程取捨](../architecture/design-decisions.md)、[開發規範](development-standard.md)。採模組化單體，不將每個業務模組拆成部署或套件。
+- 配套：[程式撰寫規範](coding-standard.md)定義函式／實例／Service、型別、錯誤、非同步與測試寫法；本頁保留目錄、依賴及共用命名責任。
 
 ## 1. 目錄依業務責任組織，機制集中在少數邊界
 

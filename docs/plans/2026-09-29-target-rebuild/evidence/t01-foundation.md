@@ -100,3 +100,24 @@ T01 gate 的基礎機制已成立；其覆蓋不升格為 V／E／JDT 全產品�
 已有相容組合與離線測例可直接重用；不因 Goal 縮短重新下載、廣搜或開付費測試。T01 沒有需 Owner 重新裁決的產品語意阻塞。
 
 提交前文件檢查：15 份相關文件、129 個本機連結、25 個錨點、fences／行尾空白通過；新 lock 的既有 workspace importers 與 HEAD 完全相同。`git diff --check` 通過，沒有更改 Mermaid 圖形或重做渲染。
+
+## 5. 程式撰寫規範與自動檢查補強（2026-09-29）
+
+Owner 指出架構／目錄規範以外也需要 code 寫法。已有命名表及依賴限制，但函式、實例、Service、錯誤／資源管理與 React 具體寫法缺少可遵循範例；新增[程式撰寫規範](../../../implementation/coding-standard.md)，上位入口／AGENTS／Refactor 規則與計畫完成條件指回它，不手抄第二套風格指南。
+
+本次查閱 Google Python／TS／code review、PEP 8、Microsoft DI、FastAPI、Python Protocol／asyncio、SQLAlchemy、React 及檢查器官方文件；來源與本案取捨直接放在該規範。保留原工具鏈，不因「最新」另加框架、抽象基底或 DI container。文件中的區間型別／表單狀態是寫法例子，Service 片段明示非完整產品實作。
+
+實際配置：Python 在既有 Ruff 規則上增加 N（命名）、A（遮蔽 builtins）、RUF006（無持有者的 async task）、RUF100（失效 noqa）。Web 的 `src` 改用 recommended type-checked＋projectService，增加 type-only import、switch union 完整性及禁用非空斷言；腳本不強塞 TS project。生成物沿既有排除，不手改生成程式；TS 外部 wire keys 不因命名風格重寫。
+
+| 本次執行 | 實際結果／限制 |
+|---|---|
+| Ruff／format／mypy | PASS，15 Python files 格式一致、8 source files 型別通過 |
+| backend unit＋contracts | 19 passed；首次有既有 `.pytest_cache` ACL warning，與測試結果無關；加 `-p no:cacheprovider` 重跑 19 passed 無警告，未更動測試斷言。未因此重跑 DB 或模型 |
+| Web lint／typecheck／format | PASS，typed project 接線可用 |
+| Web test／build | 1 test passed，Vite build PASS；首次 sandbox `spawn EPERM`，以工具核准的相同本地命令重跑成立，沒有修改產品繞過錯誤 |
+| Python stdin 反例 | `badName(list)`、裸 `create_task`、無效 noqa 同時觸發 N802／A002／RUF006／RUF100；返回 1 且驗實際 diagnostic，不將檢查器安裝成功當規則生效 |
+| ESLint `lintText` 反例 | `any`、未處理 Promise、非空斷言與漏 union case 分別觸發相應 4 條規則；使用記憶體片段，沒有加入故意錯誤的產品檔案 |
+| 文件範例 | Python 區間型別的有效／反向／非正數例通過；TS 表單示例經實際 strict typecheck，三個分支的文字結果通過。Service 片段僅接線形狀，不宣稱可獨立執行 |
+| 文件一致性 | 9 份相關文件、117 本機連結、19 錨點、fences／行尾空白通過；大型決策檔只檢查本次入口。`git diff --check` 通過，Git 提示既有 LF／CRLF 轉換 |
+
+這是 lint／文件與基礎回歸，不是新的產品／資料交易／恢復驗收。沒有改 Mermaid 圖、依賴版本或 lock，沒有讀憑證、送付費請求、啟 DB、修改既有產品或刪資料。T02 尚未施工；接下來沿其原契約與新撰寫規範推進，不再廣搜同一份風格議題。

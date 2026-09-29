@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "AcceptedInterviewInput",
+  "description": "The original acceptance result, not current progress or formal interview eligibility.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["job_file_id", "command_id", "source_id", "execution_id"],
+  "properties": {
+    "job_file_id": {"type": "string", "format": "uuid"},
+    "command_id": {"type": "string", "format": "uuid"},
+    "source_id": {"type": "string", "format": "uuid"},
+    "execution_id": {"type": "string", "format": "uuid"}
+  }
+}

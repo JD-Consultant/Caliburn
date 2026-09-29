@@ -1,5 +1,7 @@
 """Create a file once; replay the original creation result, not today's renamed label."""
 
+from uuid import UUID
+
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from caliburn.features.job_files import persistence
@@ -8,6 +10,7 @@ from caliburn.features.job_files.models import (
     CreationCommandConflictError,
     JobFile,
     JobFileCreation,
+    JobFileNotFoundError,
 )
 
 
@@ -30,3 +33,9 @@ async def create_job_file(session: AsyncSession, command: CreateJobFile) -> JobF
         ),
         is_new=is_new,
     )
+
+
+async def lock_job_file(session: AsyncSession, job_file_id: UUID) -> None:
+    """Serialize short admission/manual-edit/sequence decisions for this file only."""
+    if await persistence.lock_job_file(session, job_file_id) is None:
+        raise JobFileNotFoundError("Job file not found")

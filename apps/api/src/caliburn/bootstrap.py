@@ -8,7 +8,9 @@ from fastapi import FastAPI
 from caliburn.adapters.database import Database
 from caliburn.settings import Settings
 from caliburn.transport.http.health import router as health_router
+from caliburn.transport.http.interview_inputs import router as interview_input_router
 from caliburn.transport.http.job_files import router as job_file_router
+from caliburn.workflows.interview_inputs import InterviewInputWorkflow
 from caliburn.workflows.job_files import JobFileWorkflow
 
 
@@ -21,6 +23,9 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         database = Database(configured.database) if configured.database else None
         app.state.database = database
         app.state.job_file_workflow = JobFileWorkflow(database.sessions) if database else None
+        app.state.interview_input_workflow = (
+            InterviewInputWorkflow(database.sessions) if database else None
+        )
         try:
             if database is not None:
                 await database.verify_schema()
@@ -32,4 +37,5 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app = FastAPI(title="Caliburn", version="0.1.0", lifespan=lifespan)
     app.include_router(health_router)
     app.include_router(job_file_router)
+    app.include_router(interview_input_router)
     return app

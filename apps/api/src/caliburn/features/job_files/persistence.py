@@ -61,6 +61,17 @@ async def read_job_file(session: AsyncSession, job_file_id: UUID) -> JobFileReco
     return await session.get(JobFileRecord, job_file_id)
 
 
+async def lock_job_file(session: AsyncSession, job_file_id: UUID) -> JobFileRecord | None:
+    return (
+        await session.scalars(
+            select(JobFileRecord)
+            .where(JobFileRecord.job_file_id == job_file_id)
+            .with_for_update()
+            .execution_options(populate_existing=True)
+        )
+    ).one_or_none()
+
+
 async def list_job_files(session: AsyncSession) -> list[JobFileRecord]:
     return list(
         await session.scalars(

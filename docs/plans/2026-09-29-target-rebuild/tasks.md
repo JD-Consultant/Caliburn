@@ -18,7 +18,7 @@
 ## T02 職務檔案、正式訪談與執行准入
 
 - [ ] T02；依賴：T01。
-- **局部證據（2026-09-29）：**檔案建立／回讀、App 開場正式序號 1、原文與正式資格分離、重送原結果及 migration 已通過真 PG；本輪整體 60 測試通過。原輸入接受／執行准入／受控正式化與列表 UI 尚未完成，**不勾選 T02**。詳見[切片證據與下一步](evidence/t02-job-files-and-interviews.md)。
+- **局部證據（2026-09-29）：**檔案／開場保存已提交 `e3889e28`；續增原輸入接受、重送核對、同檔 A／Memory 分別准入、writer fencing 與終態競爭，整體 **94 測試通過**（54 項真 PG）。受控正式化、來源區間底層及列表 UI 尚未完成，**不勾選 T02**；Graph 控制／回退仍待 T08，不以資格測試冒充。詳見[切片證據與下一步](evidence/t02-job-files-and-interviews.md)。
 - **契約：**[產品概念](../../product-concept.md)、[來源範圍](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[資料交易](../../architecture/persistence.md)。
 - **程式／交付：**`features/job_files`、`interviews`、`executions`；建立檔案 API／列表 UI；開場正式序號 1，原輸入保存及受控正式化介面；schema migrations。完整 A final 在 T08 接，不新增假正式對話入口給 UI。
 - **Red：**重送同一命令兩次、跨檔案讀取、取消輸入占正式序號、兩個 runner 同檔案准入、另一檔案無法前進。

@@ -69,6 +69,7 @@
 - **第一切片（2026-09-30）：**接續 T05 寫入提交 `d87b3c86`，實作原生回應原件／重送投影、phase／多 call 路由及對應配對。獨立審查後補空白 final／compact 保留 user 反例；Unit／contracts＋真 saver 新程序 **413 passed**。目前只是元件與正常保存往返，沒有宣稱 E01–E04 整體、完整 Graph、費用／取消或 provider 已驗收。[研究、反例及下一步](evidence/t06-agent-execution.md)。
 - **第二切片（2026-09-30）：**承接 `5cfbb1da`，單一原生模型／有序工具 Step、官方 serializer 明確 allowlist，接上實際 Memory 候選寫入與跨程序 saver。公開入口統一 sync／有界呼叫／恢復准入；模型保存故障／確認遺失、部分工具恢復與元件集合 **452 passed**。雙保存失敗的官方補存已有能力反例；正式 supervisor、完整 loop、預算／compact 與 provider 仍未完成。
 - **第三切片（2026-09-30）：**承接 `a52d76d9`，官方直連 SDK 關閉隱含 retry／redirect，count／create 共用固定 payload；新增不洩漏原文的錯誤分類。Unit／contract **469 passed**，獨立複核 redirect P2 已修；[第三切片證據](evidence/t06-agent-execution.md#3-第三切片直連請求與安全失敗分類)。持久額度、完整 loop、串流與 provider 仍待交付，T06 不勾選。
+- **第四切片（2026-09-30）：**承接 `a48b39a1`，executions owner 固定 policy／每次外送預留，原 attempt 重入不給重送許可，未知成本不歸零，取消後可記帳但不授權採用。Unit／contracts＋相關真 PG／新程序 **503 passed**；[額度證據及未接線邊界](evidence/t06-agent-execution.md#4-第四切片不可重置的工作額度與外送預留)。尚未將元件接成完整 HTTP／Graph supervisor，T06 維持施工中。
 - **契約：**[共用執行](../../specs/2026-09-27-shared-agent-execution-and-state-design.md)、[Agent 接線](../../implementation/agent-execution.md)。
 - **程式／交付：**`agent_execution`、Responses／saver adapter、typed State／serializer、窄工具 handler 介面、單一 retry／計量責任；先使用測試工具與 fake Responses，不依賴產品工具完成。
 - **Red：**R 已保存卻重呼模型、只存 output_text、兩工具平行／配錯 call、公開文字誤判 final、serializer 丟 opaque／phase、role namespace 污染、SDK 隱含 retry。

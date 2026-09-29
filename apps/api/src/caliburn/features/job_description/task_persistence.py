@@ -106,6 +106,19 @@ class TaskSelectionRecord(Base):
     position: Mapped[int] = mapped_column(Integer)
 
 
+async def read_task_ids(
+    session: AsyncSession, job_file_id: UUID, revision_id: UUID
+) -> tuple[UUID, ...]:
+    """Membership checks do not need task prose or outcome/requirement bodies."""
+    rows = await session.scalars(
+        select(TaskSelectionRecord.task_id).where(
+            TaskSelectionRecord.job_file_id == job_file_id,
+            TaskSelectionRecord.revision_id == revision_id,
+        )
+    )
+    return tuple(rows)
+
+
 async def read_tasks(
     session: AsyncSession, job_file_id: UUID, revision_id: UUID
 ) -> tuple[WorkTask, ...]:

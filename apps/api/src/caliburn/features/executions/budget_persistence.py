@@ -59,6 +59,17 @@ class OutboundAttemptRecord(Base):
             "(reported_cost_usd >= 0 AND reported_cost_usd < 1000000000)",
             name="reported_cost",
         ),
+        CheckConstraint(
+            "failure_code IS NULL OR failure_code IN ('remote_result_unknown', "
+            "'transient_service', 'access_blocked', 'capacity_exceeded', "
+            "'request_rejected', 'response_protocol')",
+            name="failure_code",
+        ),
+        CheckConstraint(
+            "retry_not_before IS NULL OR (failure_code IS NOT NULL AND "
+            "failure_code IN ('remote_result_unknown', 'transient_service'))",
+            name="failure_retry",
+        ),
         Index("ix_execution_outbound_attempts_request", "execution_id", "request_id"),
     )
 
@@ -72,6 +83,8 @@ class OutboundAttemptRecord(Base):
     writer_id: Mapped[UUID] = mapped_column()
     reserved_cost_usd: Mapped[Decimal] = mapped_column(Numeric(18, 9))
     reported_cost_usd: Mapped[Decimal | None] = mapped_column(Numeric(18, 9))
+    failure_code: Mapped[str | None] = mapped_column(Text)
+    retry_not_before: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     admitted_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.clock_timestamp()
     )

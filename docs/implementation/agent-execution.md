@@ -103,7 +103,7 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 - Count 和 compact 也只外送一次，不降級成猜測計數／本地摘要；compact 返回完整 SDK C，沒有在 adapter 自行採用。鎖定 SDK 的 standalone compact **沒有 `max_output_tokens`**，不能用 create 的輸出上限當其費用上界。
 - `adapters/openai_failures.py` 區分遠端結果不明、暫時服務問題、權限／額度阻塞、容量、請求與回應協定問題；不複製可能含原話／秘密的 error body 到 State 或 UI。分類不等於已准許重試，更不代表該次免費。
 
-此切片目前是**非串流傳輸接線**；公開中間訊息／UI 串流、Retry-After 排程、持久額度與原結果採用仍待後續。離線官方 SDK MockTransport 已驗一次外送、同 payload 及 redirect 拒絕；不是遠端接受或產品恢復驗收。依據：[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[錯誤分類](https://developers.openai.com/api/docs/guides/error-codes)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)，並核鎖定 SDK 3.20.0 的 client／retry／compact 原碼。
+此切片是**非串流傳輸接線**；公開中間訊息／UI 串流仍待後續。持久額度／原結果採用見後續章節，Retry-After 接線見 §5.4。離線官方 SDK MockTransport 已驗 adapter 每次只外送一次、同 payload 及 redirect 拒絕；不是遠端接受或產品恢復驗收。依據：[stateless reasoning](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[錯誤分類](https://developers.openai.com/api/docs/guides/error-codes)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)，並核鎖定 SDK 3.20.0 的 client／retry／compact 原碼。
 
 ### 4.4 已落地的原回應補存與資格接線（T06 第五切片）
 
@@ -120,7 +120,7 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 ### 4.5 已落地的固定請求、一次外送與保存後結算（T06 第七切片）
 
-此切片把已有 executions 額度與 Step 接成**首次生成的受控路徑**。`workflows/model_requests.py` 協調公開業務服務、短交易與 SDK；共用 Graph 仍不 import features，不增加 ResponseStore、重試平台或第二套回執。第八切片已加 §4.6 的有界 loop，第九切片在生成前加入 §5.2 的計數／容量准入；多次 attempt 政策與 compact 尚待接線，這個元件不能單獨充作正式產品 runner。下圖聚焦生成階段，不表示可略過計數。
+此切片把已有 executions 額度與 Step 接成**首次生成的受控路徑**。`workflows/model_requests.py` 協調公開業務服務、短交易與 SDK；共用 Graph 仍不 import features，不增加 ResponseStore、重試平台或第二套回執。第八切片已加 §4.6 的有界 loop，第九切片在生成前加入 §5.2 的計數／容量准入；compact 見 §5.3，已確認 provider 故障的多次 attempt 見 §5.4。這個元件不能單獨充作正式產品 runner。下圖聚焦生成成功路徑，不表示可略過計數或故障分類。
 
 ```mermaid
 flowchart TD
@@ -138,7 +138,7 @@ flowchart TD
 ```
 
 - 每個新 Step 的初始 checkpoint 固定 App 產生的 `request_id` 與 **實際 create payload**，包括 model、instructions、tools、input、reasoning、輸出上限與 `stream=false`。沒有另存初始 input 副本；`input_items` 僅在完成 Step 時形成後續窗口。`ResponseRequest.from_snapshot` 還原同一請求，拒絕不符固定直連政策的快照，不能用目前角色設定代替當時設定。這是恢復資料，不宣告永久保存所有請求。
-- `ModelRequestExecutor.request_model` 在既有 execution 鎖內查原 request 的 attempts，核固定費用依據並預留；交易確認完成後才發一次 HTTP。同一 request 已有 attempt，即使其結果未知，也明確停止讓外層核對，不換 UUID 假裝首次呼叫；已保存 R 由 Graph 直接接續，不再進此入口。完整 payload 以 canonical JSON 的 SHA-256 綁定，不拿 payload hash 當 logical request 身分。
+- `ModelRequestExecutor.request_model` 在既有 execution 鎖內查原 request 的 attempts，核固定費用依據並預留；交易確認完成後才發一次 HTTP。同一 request 有尚未核明的 attempt 時停止讓外層核對，不換 UUID 假裝首次呼叫；只有 §5.4 已確認的可重試故障才可新准入。已保存 R 由 Graph 直接接續，不再進此入口。完整 payload 以 canonical JSON 的 SHA-256 綁定，不拿 payload hash 當 logical request 身分。
 - SDK 返回後，立即交出 `ReceivedModelResponse(response, attempt_id)`；其間沒有可能失敗的記費 SQL 或費用推算。Graph 保存原 R／attempt 後，才進 `account_response`。結算解析或提交失敗時，原 R 已在既有 saver，下一次只重入同一結算，不重呼模型。這借鑑官方耐久節點交界，不將整輪鎖成一個 DB transaction。
 - `ModelRequestAccounting` 必須明確提供與原 budget 相同的 `cost_basis`、預留及觀察成本計算；目前測例是合成數值，**尚未提供正式模型費率／容量配置**。沒有 usage／可靠成本時保留預留並停止，不能記零。費率與算式的正式接線需官方研究、容量及 provider gate，不能把此依賴注入當已完成帳單驗證。
 - 結算與採用分開：一般晚到 R、已保存 R 的取消後重入，以及已驗證 Held 補存期間取消，都可核對原 attempt 記費；仍不能派工具、採用新 context 或交付正式結果。Held 在進結算節點時釋放「尚未保存」責任，不把結算故障誤報為模型保存故障。取消恰好發生在 `aupdate_state` 補存期間時，使用剛補存的原件結算，不看過時的補存前查詢值。
@@ -264,7 +264,7 @@ erDiagram
 - 取消／writer 更換只停止新的准入與採用，不刪已發生的記帳。晚到結果仍可結算原 attempt，但記帳函式不恢復執行、不採用 R／C、不准派工具。沒有新外送時，讀原结果不受已耗盡額度阻擋。
 - SQL 禁止改寫／刪除固定 budget，禁止清除／改寫 attempt 身分與已知成本；不存另一份可失同步的計數器。FK 及 scope 查詢維持檔案隔離，成本採固定精度 Decimal，不用 float。
 
-已驗兩連線競爭最後額度、未知預留、每 request 重試上限、count／compact 分計、取消後記帳、writer 更換及新程序不歸零、DDL／ORM 一致。完整 HTTP 准入→原結果保存→結算／採用、Retry-After、compact 真實費用預留尚待後續；不能把此元件通過當 E15 全通過。設計借鑑 [PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)及 [Azure 單一重試責任](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)，兩張表及原結果不等於重送許可是本案取捨。
+已驗兩連線競爭最後額度、未知預留、每 request 重試上限、count／compact 分計、取消後記帳、writer 更換及新程序不歸零、DDL／ORM 一致。HTTP／原結果採用見 §4.5、§5.2–5.3，Retry-After 見 §5.4；compact 真實費用預留仍待 provider 驗證，不能把此元件通過當 E15 全通過。設計借鑑 [PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)及 [Azure 單一重試責任](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)，兩張表及原結果不等於重送許可是本案取捨。
 
 ### 5.2 已落地的固定請求計數與容量准入（T06 第九切片）
 
@@ -294,9 +294,41 @@ erDiagram
 
 外送沿 `ModelRequestExecutor` 與原 executions 預算：`COMPACTION` 預留短交易確認後才 HTTP，完整 C 先交 Graph，再結算。`compaction_payload()` 是指紋與 wire 的共用組裝來源，明確使用 `service_tier="default"`；SDK 預設 auto 可能跟隨遠端 Project 設定。compact 需顯式行政預留與成本計算器；沒有 usage／計算結果時保留未知預留，不歸零。無新增資料表，實際費率、遠端硬費用上限及真 provider 相容仍未驗。
 
-**目前限制：**只對已計數且仍符合完整 create 容量的 W 作保守 compact 准入，不宣稱能搶救任意超長輸入；壓後重新核完整 create。A128K／Agent 意圖及 B 輪前準備、完整 pause 調度、取消／回退挑選合法基底、單一 retry supervisor 與角色整合仍待後續切片。完整 Step pause 見 §4.7，count 原件補存見 §5.2；不因此視為角色／產品整合完成。
+**目前限制：**只對已計數且仍符合完整 create 容量的 W 作保守 compact 准入，不宣稱能搶救任意超長輸入；壓後重新核完整 create。A128K／Agent 意圖及 B 輪前準備、完整 pause 調度、取消／回退挑選合法基底、未明結果的恢復調度與角色整合仍待後續切片。完整 Step pause 見 §4.7，count 原件補存見 §5.2，provider 失敗重試見 §5.4；不因此視為角色／產品整合完成。
 
 依據：2026-09-30 重讀 [OpenAI standalone compact](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)、核本機 OpenAI 3.20.0 compact 參數及 SDK construct 實作；借鑑 [LangGraph 私有 State 的明確輸入輸出轉換](https://docs.langchain.com/oss/python/langgraph/use-subgraphs)及[持久執行](https://docs.langchain.com/oss/python/langgraph/persistence)。子圖以明確 thread 固定一次壓縮身分，是本案機制取捨；不是新增一份產品歷史。實測範圍見 [T06 §10](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#10-第十切片完整-c-安全採用與中途接續)。
+
+### 5.4 已落地的單一外送重試責任（T06 第十三切片）
+
+`ModelRequestExecutor` 統一承接 create／count／compact 的 provider 失敗。SDK 仍 `max_retries=0`，Graph 不另掛無差別 retry。`agent_execution/response_retries.py` 只計算分類後的退避，executions 保存原 attempt 的失敗事實，workflow 協調短交易與外送；不新增排程平台、ResponseStore 或工具副作用重送迴圈。
+
+```mermaid
+flowchart TD
+  Q["讀固定 request、原 attempts 與工作資格"] --> U{"原 attempt 可判定？"}
+  U -->|"仍在途／無失敗紀錄／結果可能已保存"| X["交回核對；不盲送"]
+  U -->|"首次或全部已記可重試故障"| D{"已到最早重試時間且仍有額度？"}
+  D -->|"尚未到；預算仍允許"| W["交易外等待；重新核資格"]
+  W --> Q
+  D -->|"耗盡／永久阻塞"| S["停止；保留原結果與未知費用"]
+  D -->|是| A["短交易預留新的 attempt；確認提交"]
+  A --> H["SDK 外送一次"]
+  H -->|"完整 R／C／count"| R["立即交原 Graph 保存；之後才結算／採用"]
+  H -->|"已返回 API 錯誤"| F["保存安全失敗分類及最早重試時間"]
+  F -->|"可重試且保存可核對"| Q
+  F -->|"阻塞／保存不明"| S
+```
+
+- **原結果優先不變：**Graph 已保存的 R／C／count 直接接續；仍握有原件則走既有補存。此迴圈只 catch SDK 外送的 `APIError`，不包整個 Graph、不把保存／結算／工具錯誤當成 provider retry。成功收到完整結果後、交給 Graph 之前仍沒有 DB 操作。
+- **允許重試的證據：**原本地 HTTP 呼叫已返回錯誤，分類為短暫服務或遠端结果未知，且安全故障記錄已提交。逾時仍可能已收費、曾遠端生成，但本機沒有完整 R；新推論是新 attempt，不冒充原結果。程序崩潰、准入 COMMIT 確認不明，或原失敗尚未可靠保存時仍維持 `Prior*AttemptError`，不靠不存在的遠端備份／時間到自動放行。
+- migration `0015_outbound_failures` 只在既有 attempt 增加 `failure_code`、`retry_not_before`。不保存 error body、prompt、token、模型輸出或另造 Graph cursor。故障原件不可覆寫／清除，重入相同結果冪等；晚到故障可記錄，但不恢復被取消的工作。報告成本仍獨立，不因失败釋放未知預留。
+- **錯誤出口也須安全：**停止重試時拋 `ModelRequestFailedError`，只攜帶既有安全分類，不把 SDK 原始 error 傳給 Graph 持久保存。保存失敗／取消仍保留本地錯誤型別、停止外送，抑制供應商例外鏈進入標準 traceback；取消不能被吞掉或當成 provider retry。這不宣稱任意第三方 tracing 的 frame locals 安全；不得啟用未經遮罩的原文／憑證紀錄。
+- **尊重服務端等待：**支援 `retry-after-ms`、秒數及 HTTP-date；不把有效長等待截短到本機 backoff 上限。無有效 header 才作 capped exponential backoff＋jitter。工程初值為 1 秒起、30 秒封頂、0–25% jitter；不是新增每工作「五次」產品決策，所有實際次數仍由原 budget 決定。不可表示的超大等待明確停止，不退回短等待。
+- 最早重試時間用 DB clock 計算並保存；重開不重新抽 jitter／縮短舊等待。等待在交易外，每至多一秒重核 writer、取消與 deadline。等待前沿 executions 原准入規則核成本與總次數，已耗盡就立即停止；共用 `check_outbound_capacity()` 只檢查、不產生外送許可，等待結束仍須新 attempt 確認提交。Retry-After 已超過工作期限直接停止，額度不足不擴費。同 request 指紋不可換；新 attempt 不增加模型邏輯 Step／compact 次數，但外送次數及成本逐次計。
+- 行鎖下確認**所有** prior attempts 都已有可重試故障，再准入新 attempt。任一先前結果尚未核明就停止，因此兩個 retry runner 不能因同一故障各發一次。新 attempt 的提交確認遺失不授權再次傳送；失敗紀錄的提交確認遺失則重讀原紀錄後判斷。
+
+依據：2026-09-30 查[OpenAI 錯誤與 Retry-After 指引](https://developers.openai.com/api/docs/guides/error-codes#python-library-error-types)、核本機 SDK 3.20.0 header／jitter 原碼；借鑑 [Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)的單一責任、分類及整體交易考量。未直接啟用 SDK／LangGraph／通用 decorator，是因它們的隱含 attempts 不承接本案持久費用准入；純等待計算不需要新依賴。這是本案接線，不聲稱業界共同採同一資料表。
+
+**未完成邊界：**沒有失敗紀錄、但原程序確已遺失的 attempt，仍需角色 supervisor 核原 Graph／在途資格後決定是否准許新 attempt；DB 原件補存的有界調度、完整角色恢復／UI 通知、真費率及 provider gate 亦未完成。不得將本節當作 T06／T08／T11 完整驗收。實测與反例見 [T06 §13](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#13-第十三切片共同外送的持久有界重試)。
 
 ## 6. Memory 背景工作
 

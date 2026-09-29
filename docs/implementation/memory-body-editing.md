@@ -45,9 +45,9 @@ App 已綁定的一份候選正文 + body diff
 
 ## 4. 尚未完成的接縫
 
-- 工具 schema／generated DTO、B1／B2/A 的角色 handlers、map／read 投影。
-- title → ID、原操作綁定、正文與 metadata／來源同次採用，及已提交後工具回傳恢復。
+- 讀取 schema／generated DTO、B1／B2/A 的讀取 handlers、map／read 與 title → ID 已交付，見 [工具接線](memory-tools.md)；尚未接模型執行。
+- 寫入工具的原操作綁定、正文與 metadata／來源同次採用，及已提交後工具回傳恢復。
 - Update 回傳真實前後差異與實際定位，不能只 echo 輸入 patch；這不是只返回編輯器的新正文就已完成。
-- 真 PostgreSQL 工具接線、provider strict 接受與模型修正效果。純字串測例不證明上述能力。
+- 寫入工具的真 PostgreSQL 接線、provider strict 接受與模型修正效果。純字串或讀取測例不證明上述能力。
 
 既有規格的欄位與例子維持單一權威；本頁不另複製所有工具 JSON。

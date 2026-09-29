@@ -1,15 +1,15 @@
-"""SQL for job-file metadata and its immutable original creation identity."""
+"""SQL for current job-file metadata and immutable creation/rename results."""
 
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import CheckConstraint, DateTime, Text, func, select
+from sqlalchemy import BigInteger, CheckConstraint, DateTime, ForeignKey, Text, func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
-from caliburn.features.job_files.models import CreateJobFile
+from caliburn.features.job_files.models import CreateJobFile, RenameJobFile
 
 
 class JobFileRecord(Base):
@@ -23,14 +23,69 @@ class JobFileRecord(Base):
             "length(btrim(employee_name)) > 0 AND length(employee_name) <= 200",
             name="employee_name_length",
         ),
+        CheckConstraint("name_revision BETWEEN 1 AND 9007199254740991", name="name_revision_range"),
     )
 
     job_file_id: Mapped[UUID] = mapped_column(primary_key=True)
     creation_command_id: Mapped[UUID] = mapped_column(unique=True)
     initial_display_name: Mapped[str] = mapped_column(Text)
     display_name: Mapped[str] = mapped_column(Text)
+    name_revision: Mapped[int] = mapped_column(BigInteger, server_default="1")
     employee_name: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class JobFileRenameRecord(Base):
+    """Minimal immutable original command/result; current metadata remains in job_files."""
+
+    __tablename__ = "job_file_renames"
+    __table_args__ = (
+        CheckConstraint(
+            "length(btrim(display_name)) > 0 AND length(display_name) <= 200",
+            name="display_name_length",
+        ),
+        CheckConstraint(
+            "expected_name_revision BETWEEN 1 AND 9007199254740991 "
+            "AND name_revision BETWEEN expected_name_revision AND expected_name_revision + 1",
+            name="name_revision_range",
+        ),
+    )
+
+    job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
+    command_id: Mapped[UUID] = mapped_column(primary_key=True)
+    display_name: Mapped[str] = mapped_column(Text)
+    expected_name_revision: Mapped[int] = mapped_column(BigInteger)
+    name_revision: Mapped[int] = mapped_column(BigInteger)
+
+
+async def read_rename(
+    session: AsyncSession, job_file_id: UUID, command_id: UUID
+) -> JobFileRenameRecord | None:
+    return await session.get(JobFileRenameRecord, (job_file_id, command_id))
+
+
+async def apply_rename(
+    session: AsyncSession, job_file_id: UUID, command: RenameJobFile
+) -> JobFileRenameRecord:
+    # The caller holds the file row lock. The DB maintains the name counter on label changes.
+    name_revision = (
+        await session.scalars(
+            update(JobFileRecord)
+            .where(JobFileRecord.job_file_id == job_file_id)
+            .values(display_name=command.display_name)
+            .returning(JobFileRecord.name_revision)
+        )
+    ).one()
+    result = JobFileRenameRecord(
+        job_file_id=job_file_id,
+        command_id=command.command_id,
+        display_name=command.display_name,
+        expected_name_revision=command.expected_name_revision,
+        name_revision=name_revision,
+    )
+    session.add(result)
+    await session.flush()
+    return result
 
 
 async def insert_job_file(session: AsyncSession, command: CreateJobFile) -> JobFileRecord | None:

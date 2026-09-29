@@ -3,7 +3,7 @@
 
 from uuid import UUID
 
-from pydantic import AwareDatetime, BaseModel, ConfigDict, StrictStr
+from pydantic import AwareDatetime, BaseModel, ConfigDict, Field, StrictInt, StrictStr
 
 
 class JobFile(BaseModel):
@@ -12,6 +12,12 @@ class JobFile(BaseModel):
     )
     job_file_id: UUID
     display_name: StrictStr
+    name_revision: StrictInt = Field(
+        ...,
+        description="Opaque freshness counter for the display label, not a JD or Memory revision.",
+        ge=1,
+        le=9007199254740991,
+    )
     employee_name: StrictStr
     created_at: AwareDatetime
 

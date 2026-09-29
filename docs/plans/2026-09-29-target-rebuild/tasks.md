@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01 已完成；T02 施工中，其餘未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01、T02 已完成；T03–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -17,10 +17,10 @@
 
 ## T02 職務檔案、正式訪談與執行准入
 
-- [ ] T02；依賴：T01。
-- **局部證據（2026-09-29）：**檔案／開場保存 `e3889e28`、輸入／准入 `a630f957`、正式化／原話查詢 `f51d6ccf`；後端 **134 測試通過**（94 項真 PG）。第四切片新增建立／列表／選取／開場 UI，12 項前端測試與真 PG 瀏覽器 3 項旅程通過，包含提交後回應遺失重送。**T02 尚缺產品已定的列表改名，不勾選**；完整 A 完成、Graph 控制／回退仍待 T08。詳見[切片證據與下一步](evidence/t02-job-files-and-interviews.md)。
+- [x] T02；依賴：T01。
+- **證據（2026-09-29）：**檔案／開場保存 `e3889e28`、輸入／准入 `a630f957`、正式化／原話查詢 `f51d6ccf`、建立／隔離 UI `598daff2`；第五切片補列表改名及其重送／競爭，後端 **158 測試通過**（117 項真 PG）、前端 **15 項**、真 PG 瀏覽器 **5 項旅程**。T02 底層與檔案 UI 範圍完成；完整 A 完成、Graph 控制／回退仍待 T08，不能視為 AI 已可用。詳見[切片證據與下一步](evidence/t02-job-files-and-interviews.md#9-第五切片列表改名與-t02-完成2026-09-29)。
 - **契約：**[產品概念](../../product-concept.md)、[來源範圍](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[資料交易](../../architecture/persistence.md)。
-- **程式／交付：**`features/job_files`、`interviews`、`executions`；建立檔案 API／列表 UI；開場正式序號 1，原輸入保存及受控正式化介面；schema migrations。完整 A final 在 T08 接，不新增假正式對話入口給 UI。
+- **程式／交付：**`features/job_files`、`interviews`、`executions`；建立／改名 API、列表／選取 UI；開場正式序號 1，原輸入保存及受控正式化介面；schema migrations。完整 A final 在 T08 接，不新增假正式對話入口給 UI。
 - **Red：**重送同一命令兩次、跨檔案讀取、取消輸入占正式序號、兩個 runner 同檔案准入、另一檔案無法前進。
 - **完成：**V01／V02／V28 對應底層部分真 PG 通過；原話不可改寫；接受輸入不等於正式資格；同檔案唯一 A、獨立 Memory 資格。
 - **不做：**使用者帳號平台、全局單檔鎖、A 控制 UI、背景工作佇列框架。

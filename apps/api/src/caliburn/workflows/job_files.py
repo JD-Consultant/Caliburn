@@ -9,7 +9,12 @@ from caliburn.features.interviews import service as interview_service
 from caliburn.features.interviews.models import InterviewMessage
 from caliburn.features.job_files import queries as job_file_queries
 from caliburn.features.job_files import service as job_file_service
-from caliburn.features.job_files.models import CreateJobFile, JobFile, JobFileCreation
+from caliburn.features.job_files.models import (
+    CreateJobFile,
+    JobFile,
+    JobFileCreation,
+    RenameJobFile,
+)
 
 
 class JobFileWorkflow:
@@ -26,6 +31,10 @@ class JobFileWorkflow:
     async def list_files(self) -> list[JobFile]:
         async with self.sessions() as session:
             return await job_file_queries.list_job_files(session)
+
+    async def rename(self, job_file_id: UUID, command: RenameJobFile) -> JobFile:
+        async with self.sessions.begin() as session:
+            return await job_file_service.rename_job_file(session, job_file_id, command)
 
     async def read_file(self, job_file_id: UUID) -> JobFile:
         async with self.sessions() as session:

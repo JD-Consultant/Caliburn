@@ -1,7 +1,12 @@
 import { expect, test } from '@playwright/test';
 import type { Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { isCreateJobFileRequest, isJobFileList } from '../../src/shared/api/validation';
+import {
+  isCreateJobFileRequest,
+  isJobFile,
+  isJobFileList,
+  isRenameJobFileRequest,
+} from '../../src/shared/api/validation';
 
 async function createFile(page: Page, displayName: string, employeeName: string): Promise<string> {
   await page.getByRole('button', { name: '建立職務檔案' }).click();
@@ -101,4 +106,81 @@ test('服務離線有明確重讀入口，不偽裝成空清單', async ({ page 
   await page.unroute('**/api/job-files');
   await page.getByRole('button', { name: '重新讀取' }).click();
   await expect(page.getByRole('link', { name: new RegExp(`開啟 ${displayName}`) })).toBeVisible();
+});
+
+test('列表改名保留訪談與受訪者，同名仍隔離，窄螢幕可操作', async ({ page }, testInfo) => {
+  const originalName = `合成改名 ${randomUUID()}`;
+  await page.goto('/');
+  const fileUrl = await createFile(page, originalName, '合成改名員工');
+  const opening = await page.locator('.interview-text').textContent();
+  await page.getByRole('link', { name: /職務檔案清單/ }).click();
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: new RegExp(`重新命名 ${originalName}`) }).click();
+  const field = page.getByRole('textbox', { name: '職務檔案名稱' });
+  await expect(field).toBeFocused();
+  await field.fill('合成同名標籤');
+  await page.screenshot({ path: testInfo.outputPath('rename-mobile.png'), fullPage: true });
+  await page.getByRole('button', { name: '儲存名稱' }).click();
+  const link = page
+    .getByRole('link', { name: /開啟 合成同名標籤.*合成改名員工/ })
+    .and(page.locator(`a[href="${new URL(fileUrl).pathname}"]`));
+  await expect(link).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+    true,
+  );
+  await page.screenshot({ path: testInfo.outputPath('renamed-list-mobile.png'), fullPage: true });
+  await link.click();
+  expect(page.url()).toBe(fileUrl);
+  await expect(page.getByText('受訪員工：合成改名員工')).toBeVisible();
+  await expect(page.locator('.interview-text')).toHaveText(opening ?? '');
+  await page.reload();
+  await expect(page.getByRole('heading', { name: '合成同名標籤' })).toBeVisible();
+});
+
+test('改名已提交但回應遺失，reload 重送不覆蓋之後的名稱', async ({ page }) => {
+  const created = await page.request.post('/api/job-files', {
+    data: {
+      command_id: randomUUID(),
+      display_name: `合成改名重送 ${randomUUID()}`,
+      employee_name: '合成重送員工',
+    },
+  });
+  const original: unknown = await created.json();
+  if (!isJobFile(original)) throw new Error('Invalid created file');
+  const endpoint = `/api/job-files/${original.job_file_id}/rename`;
+  const commands: string[] = [];
+  await page.route(`**${endpoint}`, async (route) => {
+    const command: unknown = route.request().postDataJSON();
+    if (!isRenameJobFileRequest(command)) throw new Error('Invalid rename');
+    commands.push(command.command_id);
+    const response = await route.fetch();
+    expect(response.status()).toBe(200);
+    if (commands.length === 1) await route.abort('failed');
+    else await route.fulfill({ response });
+  });
+  await page.goto('/');
+  await page.getByRole('button', { name: new RegExp(`重新命名 ${original.display_name}`) }).click();
+  await page.getByRole('textbox', { name: '職務檔案名稱' }).fill('第一個改名');
+  await page.getByRole('button', { name: '儲存名稱' }).click();
+  await expect(page.getByRole('alert')).toContainText('改名結果尚未確認');
+  // Another acknowledged command is allowed to move the name forward before recovery.
+  const nextName = `之後的名稱 ${randomUUID()}`;
+  const second = await page.request.post(endpoint, {
+    data: { command_id: randomUUID(), expected_name_revision: 2, display_name: nextName },
+  });
+  expect(second.status()).toBe(200);
+  await page.reload();
+  await page.getByRole('button', { name: new RegExp(`重新命名 ${nextName}`) }).click();
+  await expect(page.getByRole('textbox', { name: '職務檔案名稱' })).toHaveValue('第一個改名');
+  await page.getByRole('button', { name: '重新確認改名結果' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByRole('link', { name: new RegExp(`開啟 ${nextName}`) })).toBeVisible();
+  expect(commands).toHaveLength(2);
+  expect(commands[1]).toBe(commands[0]);
+  const current: unknown = await (
+    await page.request.get(`/api/job-files/${original.job_file_id}`)
+  ).json();
+  if (!isJobFile(current)) throw new Error('Invalid current file');
+  expect(current.name_revision).toBe(3);
+  expect(current.display_name).toBe(nextName);
 });

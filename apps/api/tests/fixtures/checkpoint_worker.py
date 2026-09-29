@@ -46,7 +46,10 @@ async def run(mode: str, thread_id: str) -> None:
     async def execute_tool(prepared: object) -> str:
         raise AssertionError("The synthetic read does not have a write phase")
 
-    runtime = ResponseStepRuntime(request_model, prepare_tool, execute_tool)
+    async def ensure_active() -> None:
+        """Isolated saver probe; no product scope in this fixture."""
+
+    runtime = ResponseStepRuntime(request_model, prepare_tool, execute_tool, ensure_active)
 
     async with AsyncPostgresSaver.from_conn_string(
         os.environ["CALIBURN_TEST_DATABASE_URL"],

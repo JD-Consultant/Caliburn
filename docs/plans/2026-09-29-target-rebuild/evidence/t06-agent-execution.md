@@ -111,8 +111,24 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/ca
 
 這仍是 T06 計量元件；沒有宣稱已將所有模型請求接入准入，沒有真實費用上限驗收。下一步需以有界 supervisor 綁定完整 payload、原 attempt、R／C 保存及費用採用，檢查 HTTP 等待不持有業務鎖；然後接共同 loop／compact。
 
-## 5. 下一個可執行切片
+## 5. 第五切片：原 R 保存失敗的公開恢復與工作資格
 
-繼續外層共用 loop 與單一有界計量／外送資格，將「checkpoint＋pending writes 都失敗，但原 R 還在」的能力證據接入有資格檢查的正式恢復路徑，再接 compact／角色控制。正常 Step 入口已固定 sync／recursion／新輸入與恢復界線。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執。工具接線需核對還原巢狀型別；目前只有 Memory 的 prepared 路徑證據，未驗 JD／角色完整整合。
+第四切片已提交 `6b0eb918`。主代理重讀本題契約／工程規範，OpenAI Docs search→fetch 核 stateless 完整 output；LangGraph 官方持久化／狀態更新與鎖定原碼支持既有 saver 補存。沿原 `tool_steps.py` 接線，不增加原生內容 DB、自製 serializer 或多層 retry。詳細介面／限制只放 [工程 §4.4](../../../implementation/agent-execution.md#44-已落地的原回應補存與資格接線t06-第五切片)。
+
+- 行為 Red：checkpoint 與 pending writes 都失敗後，公開入口只拋保存錯誤，完整原 R 無法交回恢復呼叫者；新增反例 **1 failed**。保存原 update 並經明確 recovery handoff 回到原 thread 後通過；不靠 stream update 或重新請求模型。
+- 原件已保存時核對後續位置；未保存時核原 input／node，再由公開入口使用官方 `aupdate_state`。原 operation seed 保持一致；重複 handoff 不清除已存工具結果、不重複 append。第二次保存故障仍交同一原件。
+- 真 PG 的舊人工補存測例改走公開入口，不再由測例直接建 update；寫前失敗、確認遺失、雙保存失敗均保持模型呼叫 1。既有新程序恢復、Memory 原工具效果測例同步注入資格檢查並回歸。
+- 新增真 PG 資格反例：模型等待時另一交易可取消；晚到 R 可保存但不派工具。雙保存失敗後取消／更換 writer，舊 writer 不能補存；新有效 writer 可承接原件而不重呼模型。這不是整體取消／安全基底採用已完成。
+- 主代理及獨立子代理都找到重用 recovery 的同一 P2：若直接續跑 execute node，已保存 R 的暫存責任未清，會把後續工具／資格錯誤誤分類成模型保存失敗。追加反例 **1 failed**，改為確認原 R／seed 已保存後即釋放本次暫存責任；工具及 guard 兩分支通過。
+
+完整受影響回歸：沿 §4 的 unit／contracts、budget／admission／migration、Graph／Memory Step，另加 `tests/integration/test_response_recovery_eligibility.py`。初次集合 **513 passed in 25.80s**；新增 P2 兩項測例後 **515 passed in 26.83s**。Ruff check／format **187 files**、mypy **144 source files** 通過；文件 **20 份／318 links** 零錯、diff check 通過。獨立子代理短複核修正並跑相關 unit **40 passed**，原 P2 關閉，無新增重大發現。不改產品 wire／DB schema／UI／圖稿，因此不新增無關瀏覽器或圖稿渲染驗證。無付費、未讀 `.env`，僅合成資料與隨機 test schema。
+
+### 後續費用預檢研究（尚未執行）
+
+另一唯讀子代理依規範查 [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna)、[pricing](https://developers.openai.com/api/docs/pricing)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)、[compact](https://developers.openai.com/api/docs/guides/compaction) 與 [Fast mode](https://developers.openai.com/api/docs/guides/fast-mode)。回報 create 可依明確輸出上限預留，但計數 API 未查到明確免費／費率承諾；standalone compact 沒有 create 的輸出限制，未查到足以保證單次帳單硬上限的官方條款。不能以未知按零或把 create 容量當 compact 計費保證。這是後續 manifest／計量需明示的限制，未啟用任何付費預檢，也未更改模型。compact 的明確 service tier 及有界單次風險仍需在對應接線處處理。
+
+## 6. 下一個可執行切片
+
+繼續外層共用 loop 與單一有界計量／外送資格，將已落地的原 R recovery handoff 接入 supervisor，再接 compact／角色控制。正常 Step 入口已固定 sync／recursion／新輸入與恢復界線。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執。工具接線需核對還原巢狀型別；目前只有 Memory 的 prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢仍需另備全合成 request／費用 manifest，目前無付費、無金鑰讀取、無真人資料外送。

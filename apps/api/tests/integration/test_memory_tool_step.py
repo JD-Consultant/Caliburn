@@ -148,7 +148,12 @@ def test_committed_first_write_recovers_original_before_dependent_second_write(
                 database_settings.url, options=f"-c search_path={database_settings.schema}"
             )
             config = {"configurable": {"thread_id": str(scope.execution_id)}}
-            runtime = ResponseStepRuntime(request, prepare, execute)
+
+            async def ensure_active() -> None:
+                async with database.sessions.begin() as session:
+                    await executions.lock_active_writer(session, writer)
+
+            runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
             async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
                 await saver.setup()
                 graph = _build_response_step(saver, max_tool_calls=16)

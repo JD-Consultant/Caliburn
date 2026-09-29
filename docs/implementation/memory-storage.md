@@ -1,6 +1,6 @@
 # Memory 保存接線
 
-- 日期：2026-09-30；狀態：**T04 施工中；純規則與正式來源範圍已驗，PostgreSQL 候選／快照尚未交付**。精確證據與下一切片見 [T04 紀錄](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)。本頁維護實作映射，不另定產品規則或模型工具。
+- 日期：2026-09-30；狀態：**T04 施工中；純規則、正式來源範圍及固定物件修訂已落地，候選／發布快照尚未交付**。精確證據與下一切片見 [T04 紀錄](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)。本頁維護實作映射，不另定產品規則或模型工具。
 - 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[內容與引用修改](../specs/2026-09-27-memory-object-update-tool-contract.md)、[title 解析](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#4-未決接縫與停止線)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 
 ## 1. 實作責任與第一切片
@@ -28,7 +28,7 @@
 
 ## 2. 保存表示：固定修訂，而非資料庫舊列
 
-採既定 PostgreSQL＋SQLAlchemy／Alembic，以明確新增不可變修訂、保存選用來表達歷史。**不以 MVCC 舊列、ORM 版本計數器或每次完整正文複製充當 Memory 發布快照。**下圖是 T04 的施工設計，不是已建立資料表；具體 DDL 隨真 PG 切片補入本頁。
+採既定 PostgreSQL＋SQLAlchemy／Alembic，以明確新增不可變修訂、保存選用來表達歷史。**不以 MVCC 舊列、ORM 版本計數器或每次完整正文複製充當 Memory 發布快照。**下圖是 T04 整體施工設計；已落地的固定修訂 schema 見 §2.1，不將其餘接線當成已完成。
 
 ```mermaid
 flowchart TD
@@ -56,6 +56,27 @@ flowchart TD
 
 候選關係維持 stable object identity；B1 改情境不要求 B2 remove/add 相同關係。發布固定化時才把保留關係解析為本版選用的情境修訂；若其變了，即使理解正文未變，也不能沿用指向舊情境的固定理解修訂。B2 對當前交接完成分析是發布資格，App 不以零文字 diff 代替它。
 
+### 2.1 已落地：固定物件修訂
+
+Migration `0011_memory_object_revisions` 與 `revision_persistence.py` 維護下列關係；所有身分／FK 均包含職務檔案範圍。這些是**固定儲存表示，不是 B1／B2 操作中的候選關係表**。
+
+```mermaid
+flowchart LR
+  O[memory_objects<br/>固定物件身分與層別] --> B[memory_bodies<br/>同物件可重用正文]
+  O --> R[memory_object_revisions<br/>title、description、body_id]
+  R --> B
+  R --> I[memory_interview_references<br/>情境 → 正式來源身分]
+  I --> F[interviews owner<br/>正式序號與不可改原文]
+  R --> S[memory_situation_references<br/>理解 → 情境固定修訂]
+  S -->|同檔案、同物件的精確修訂| R
+```
+
+- `revisions.py` 定義不依賴 ORM 的固定修訂值；`revision_service.py` 接收完整內部編輯結果及明確的原修訂，不是新增整文覆寫 tool。工具／候選服務仍須先綁定當前位置、目標 ID、角色與原操作。
+- 同正文的標題、描述或引用調整重用 `body_id`；內容與固定來源完全未變則沿用原修訂。正文改動後又改回，仍是新的修訂與正文列，不以相同文字冒充舊版本。未做跨歷史或跨物件內容去重。
+- 情境只能引用正式訪談；理解只能引用同檔案情境的固定修訂。同一理解修訂對同一情境身分至多一個來源修訂；零來源合法。Service 沿固定來源驗 `≤F`，SQL 以 FK／層別限制拒絕未正式化、跨檔案、錯層或不存在的來源。
+- 保存於呼叫方的同一短交易：建立修訂標頭 → 寫齊來源 → 封存 `is_sealed=true`。DB 在交易完成時確認新修訂已封存；封存後正文、欄位、引用均不可改寫，也不能追加來源。讀取只返回完整封存修訂。**封存只是固定儲存完整性，不是 Memory 發布、B2 分析完成或候選可見性。**
+- 不增加自己的 commit、候選 head 或原操作回執。外層失敗時新增物件／正文／修訂／來源一起撤回；這個 primitive 不能單獨承諾工具重入冪等。A／JD 的正式快照入口與 B1／B2 權限仍由後續 service 接入，不直接暴露此歷史讀取函式給模型。
+
 ## 3. 交易與讀取的施工邊界
 
 沿現有檔案隔離、Memory execution 資格、短鎖與呼叫方 transaction，不建第二套跨 Agent 鎖／UnitOfWork。候選操作原意圖、採用位置及原結果共同提交；模型、patch 大額純計算或重試等待不持有 SQL transaction。讀固定位置後計算、提交前再核位置／資格，不能把最新稿偷偷代入原命令。
@@ -69,7 +90,7 @@ flowchart TD
 5. ①／②恢復沿可定位候選；新 writer／回退分支使遲到修改失效。同批 B1↔B2 依序接手，B2 已成立的理解候選不能因回交遺失。
 6. ③在同一短提交中保存固定選用／關係、涵蓋與原結果；正式 head 最後採用。已成立結果重入回原快照，不重新發一版；未知提交不當未執行。
 
-以上是測試落點，不另加發布前語意 reviewer、格式修補 loop 或最少引用數。權限與結構在每次操作維持；發布只做正式資格與一致提交。具體 schema、原操作 shape 與恢復位置在下一 PG 切片決定並驗證，不能把本頁當成已實作。
+以上是整體測試落點；固定修訂中的正式來源 FK、不可變引用及外層交易已驗，不代表候選／發布流程已驗。不另加發布前語意 reviewer、格式修補 loop 或最少引用數。權限與結構在每次操作維持；發布只做正式資格與一致提交。候選 schema、原操作 shape 與恢復位置由後續 PG 切片接入。
 
 ## 4. 官方機制、比較與取捨
 
@@ -80,6 +101,8 @@ flowchart TD
 - [PostgreSQL constraints](https://www.postgresql.org/docs/18/ddl-constraints.html)提供 FK／UNIQUE／CHECK；跨列存在性使用 FK／UNIQUE，不寫查其他表的 CHECK。名稱比較須核[collation 的 deterministic 與 non-deterministic 區別](https://www.postgresql.org/docs/18/collation.html#COLLATION-NONDETERMINISTIC)，下一 PG 切片驗精確 Unicode／空白與唯一限制。
 
 這些是成熟公開機制及本案取捨，不宣稱單一廠商範例就是全業界唯一共識。T04 暫無具體需求支持另加 graph DB、版本套件、通用 event sourcing 或永久 diff 資料庫；既有 PostgreSQL 足以承接已定資料形狀，仍須用真 PG 反例證明實作正確。
+
+2026-09-30 固定修訂切片補查：[PostgreSQL deferred constraints](https://www.postgresql.org/docs/18/sql-set-constraints.html)允許 constraint trigger 延至提交檢查；普通 CHECK 不提供跨列集合完成保證。[行鎖](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-ROWS)在交易結束釋放。因此以短交易內的來源組裝＋封存防止「歷史修訂事後新增來源」與「只有半套標頭即提交」，不把模型分析期間包進 transaction。這是針對不可變多列 aggregate 的本案實現，不是要求所有產品資料都增加封存欄位。
 
 ## 5. 後續接線與驗收歸屬
 

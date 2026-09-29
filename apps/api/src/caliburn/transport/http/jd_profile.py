@@ -1,10 +1,9 @@
 """Profile HTTP input/output; shared JD rules and transaction live below transport."""
 
 from dataclasses import asdict
-from typing import Annotated
 from uuid import UUID
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException
 
 from caliburn.contracts.generated.jd_profile_view import JdProfileView
 from caliburn.contracts.generated.revise_jd_profile_request import ReviseJdProfileRequest, SetField
@@ -19,19 +18,9 @@ from caliburn.features.job_description.models import (
     StaleJdRevisionError,
 )
 from caliburn.features.job_files.models import JobFileNotFoundError
-from caliburn.workflows.jd_editing import JdEditingWorkflow
+from caliburn.transport.http.jd_dependencies import JdEditing
 
 router = APIRouter(prefix="/api/job-files/{job_file_id}/jd", tags=["job-description"])
-
-
-def get_jd_workflow(request: Request) -> JdEditingWorkflow:
-    workflow = request.app.state.jd_editing_workflow
-    if not isinstance(workflow, JdEditingWorkflow):
-        raise HTTPException(status_code=503, detail={"code": "database_not_configured"})
-    return workflow
-
-
-JdEditing = Annotated[JdEditingWorkflow, Depends(get_jd_workflow)]
 
 
 @router.get("/profile", response_model=JdProfileView)

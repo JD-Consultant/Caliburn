@@ -1,6 +1,6 @@
 # Caliburn backend（新目標施工中）
 
-本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。目前提供 health、職務檔案建立／清單／改名／回讀、App 開場正式訪談、JD profile 人工讀寫及生成契約；完整 JD 編輯器、AI 訪談和 Memory 產品功能尚未交付。現行正式產品入口不變，進度見[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)。目前僅供隔離開發／合成測試，完整瀏覽器入口安全與正式交付 gate 尚未完成，不對外開放。
+本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。目前提供 health、職務檔案建立／清單／改名／回讀、App 開場正式訪談、JD profile／職責集合人工讀寫及生成契約；完整 JD 編輯器、AI 訪談和 Memory 產品功能尚未交付。現行正式產品入口不變，進度見[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)。目前僅供隔離開發／合成測試，完整瀏覽器入口安全與正式交付 gate 尚未完成，不對外開放。
 
 ## 安裝與執行
 
@@ -40,6 +40,7 @@ migration 會在已存在的目標 DB 建立指定 namespace；重跑 `upgrade h
 - `GET /api/job-files/{job_file_id}/interviews`：只有已正式化的訪談；目前建立後只有來源為 App 的開場第 1 則。未完成原文不在這裡出現。
 - `GET /api/job-files/{job_file_id}/jd/profile`：目前正式修訂與四欄基本資料；新檔案為 null，代表尚未提供。
 - `POST /api/job-files/{job_file_id}/jd/profile`：`command_id`、`expected_revision_id`、`changes`；明確 set／clear 指定欄位，未指定保留。成功／原命令重送回 200；舊基底、重用命令改 payload、活躍／暫停 A 的新人工修改回 409；非法欄位或重複 change 回 422。重送可返回舊操作當時的固定修訂，需最新內容另 GET；背景 Memory 不阻止人工編輯。保存／恢復界線見 [JD 保存接線](../../docs/implementation/jd-storage.md)。已接人工基本資料 UI，**不是 A 候選寫入入口**。
+- `GET /api/job-files/{job_file_id}/jd/areas`：目前正式修訂與依序排列的職責集合，無資料時 `areas: []`。`POST` 同路徑：同一命令／基底規則下，以 `change.action` 建立、修訂、刪除或排序一項職責；完整輸入以 schema 為準。職責修改不抹除 profile，反之亦然。仍是人工後端，尚未接職責 UI／任務；不是模型直接修改正式 JD 的路徑。
 - `POST /api/job-files/{job_file_id}/inputs`：`command_id`、`text`；原文與 A 准入同次保存回 202，重送原命令回原接受結果／200，改內容重用命令或已有其他 A 回 409。重新提交已取消原文須用新命令，不是重送舊命令。**目前只做持久接受，尚無模型 runner／控制 UI，不會生成答覆**；不提供任意正式化 API。接線及未完邊界見[訪談保存](../../docs/implementation/interview-storage.md#6-輸入接受重送與新提交)。
 
 ### 測試與檢查
@@ -54,7 +55,7 @@ uv run --project apps/api --locked mypy --config-file apps/api/pyproject.toml ap
 uv run --project apps/api --locked python apps/api/scripts/generate_contracts.py --check
 ```
 
-修改 `contracts/http/*.schema.json` 後，執行相同生成命令但不帶 `--check`。標準生成器產 Python／TS，禁止手改 `generated/`。App schema 與模型原生輸出是不同邊界：前者拒絕額外欄位，後者保留 SDK 原生項目及未知 metadata。
+修改 `contracts/http/*.schema.json` 後，執行相同生成命令但不帶 `--check`。標準生成器產 Python／TS，禁止手改 `generated/`。Python enum 成員使用大寫以避免與 `str.title` 等內建方法撞名；wire 值不改。App schema 與模型原生輸出是不同邊界：前者拒絕額外欄位，後者保留 SDK 原生項目及未知 metadata。
 
 真 PostgreSQL 測試只接受**明確指定、loopback、名稱以 `_test` 結尾的隔離資料庫**；缺環境變數會 skip，不代表通過。測試建立隨機 schema，完成後只清理自己新建的 schema，不刪 DB。
 

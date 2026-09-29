@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Ordered collaborators in one fixed formal JD revision; tasks are not expanded here.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "revision_id",
+    "collaborators"
+  ],
+  "properties": {
+    "revision_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "collaborators": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/Collaborator"
+      }
+    }
+  },
+  "$defs": {
+    "Collaborator": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "collaborator_id",
+        "name",
+        "scope_text"
+      ],
+      "properties": {
+        "collaborator_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "name": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "scope_text": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    }
+  },
+  "title": "JdCollaboratorsView"
+}

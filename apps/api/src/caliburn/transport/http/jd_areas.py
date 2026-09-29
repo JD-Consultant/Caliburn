@@ -40,7 +40,7 @@ def _change_from_wire(
             return areas.ReorderArea(change.area_id, change.before_area_id)
 
 
-def _view(result: areas.JdAreasRevision) -> JdAreasView:
+def areas_view(result: areas.JdAreasRevision) -> JdAreasView:
     return JdAreasView(
         revision_id=result.revision_id,
         areas=[
@@ -53,7 +53,7 @@ def _view(result: areas.JdAreasRevision) -> JdAreasView:
 @router.get("/areas", response_model=JdAreasView)
 async def read_areas(job_file_id: UUID, workflow: JdEditing) -> JdAreasView:
     try:
-        return _view(await workflow.read_areas(job_file_id))
+        return areas_view(await workflow.read_areas(job_file_id))
     except JobFileNotFoundError as error:
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
 
@@ -66,7 +66,7 @@ async def edit_areas(
         command = areas.EditJdAreas(
             body.command_id, body.expected_revision_id, _change_from_wire(body.change)
         )
-        return _view(await workflow.edit_areas(job_file_id, command))
+        return areas_view(await workflow.edit_areas(job_file_id, command))
     except JobFileNotFoundError as error:
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
     except areas.AreaNotFoundError as error:

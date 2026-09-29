@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "JdWorkView",
+  "description": "Responsibility areas and tasks from one fixed formal JD revision, for the manual grouped editor.",
+  "type": "object", "additionalProperties": false,
+  "required": ["revision_id", "areas", "tasks"],
+  "properties": {
+    "revision_id": {"type": "string", "format": "uuid"},
+    "areas": {"type": "array", "items": {"$ref": "jd-areas-view.schema.json#/$defs/Area"}},
+    "tasks": {"type": "array", "items": {"$ref": "jd-tasks-view.schema.json#/$defs/WorkTask"}}
+  }
+}

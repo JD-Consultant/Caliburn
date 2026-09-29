@@ -9,6 +9,7 @@ from caliburn.features.job_description import area_service, queries, service, ta
 from caliburn.features.job_description.areas import EditJdAreas, JdAreasRevision
 from caliburn.features.job_description.models import JdProfileRevision, ReviseJdProfile
 from caliburn.features.job_description.tasks import EditJdTasks, JdTasksRevision
+from caliburn.features.job_description.work_queries import JdWorkRevision, read_work
 from caliburn.features.job_files import queries as file_queries
 from caliburn.features.job_files import service as file_service
 
@@ -51,6 +52,11 @@ class JdEditingWorkflow:
         async with self.sessions() as session:
             await file_queries.read_job_file(session, job_file_id)
             return await task_service.read_tasks(session, job_file_id)
+
+    async def read_work(self, job_file_id: UUID) -> JdWorkRevision:
+        async with self.sessions() as session:
+            await file_queries.read_job_file(session, job_file_id)
+            return await read_work(session, job_file_id)
 
     async def edit_tasks(self, job_file_id: UUID, command: EditJdTasks) -> JdTasksRevision:
         async with self.sessions.begin() as session:

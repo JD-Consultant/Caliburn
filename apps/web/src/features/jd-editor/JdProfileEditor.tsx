@@ -6,6 +6,7 @@ import type { JdProfileView } from '../../shared/api/generated/jd-profile-view';
 import { describeReadError } from '../../shared/api/http';
 import { EditJdProfileDialog } from './EditJdProfileDialog';
 import { jdProfileQuery } from './jd-profile-api';
+import { jdWorkQuery } from './jd-work-api';
 import { profileFields, profileLabels } from './profile-command';
 
 export function JdProfileEditor({ jobFileId }: { jobFileId: string }) {
@@ -15,6 +16,7 @@ export function JdProfileEditor({ jobFileId }: { jobFileId: string }) {
   function refresh(): void {
     setEditing(null);
     void queryClient.invalidateQueries({ queryKey: jdProfileQuery(jobFileId).queryKey });
+    void queryClient.invalidateQueries({ queryKey: jdWorkQuery(jobFileId).queryKey });
   }
   return (
     <section aria-labelledby="jd-profile-heading">
@@ -68,6 +70,7 @@ export function JdProfileEditor({ jobFileId }: { jobFileId: string }) {
             <div>
               <Button
                 variant="outlined"
+                disabled={profile.isFetching}
                 onClick={() => {
                   if (profile.data) setEditing(profile.data);
                 }}

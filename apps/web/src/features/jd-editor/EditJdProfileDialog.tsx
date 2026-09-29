@@ -17,6 +17,7 @@ import type { ReviseJdProfileRequest } from '../../shared/api/generated/revise-j
 import { ApiError } from '../../shared/api/http';
 import { isReviseJdProfileRequest } from '../../shared/api/validation';
 import { reviseJdProfile } from './jd-profile-api';
+import { focusDialogInput } from './dialog-focus';
 import {
   clearPendingProfile,
   makeProfileDraft,
@@ -127,7 +128,7 @@ export function EditJdProfileDialog({ jobFileId, baseline, onClose, onRefresh }:
       maxWidth="sm"
       aria-labelledby="edit-jd-profile-title"
       onClose={mutation.isPending ? undefined : onClose}
-      slotProps={{ transition: { onEntered: () => titleInput.current?.focus() } }}
+      slotProps={{ transition: { onEntered: () => focusDialogInput(titleInput.current) } }}
     >
       <form
         onSubmit={(event) => {

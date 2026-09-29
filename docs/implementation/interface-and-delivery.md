@@ -1,6 +1,6 @@
 # 介面、公開訊息與本機交付
 
-- 狀態：**工程設計；T02 檔案 UI、T03 JD 基本資料人工編輯已實作，其餘依任務 gate**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
+- 狀態：**工程設計；T02 檔案 UI、T03 JD 基本資料及職責／任務人工編輯已實作，其餘依任務 gate**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
 
 ## 1. API 與 UI 的責任
 
@@ -59,7 +59,20 @@ sequenceDiagram
 - 明確拒絕不自動改基底重送；保留畫面草稿供辨認，要求讀目前 JD 再決定。原命令成功確認後關表單，invalidate 並 GET 目前正式稿；舊操作回傳不直接寫入最新 cache。
 - 讀取失敗不當空白 JD；取消未送出表單只是放棄局部草稿，關閉結果未確認表單也不是撤銷後端效果。未知欄位顯示「尚未提供」，不表示已確認沒有。人工寫入本身不等於員工事實或依據核對完成。
 
-採用 [React 的 state／key 生命週期](https://react.dev/learn/preserving-and-resetting-state)及 [TanStack Query 的 mutation invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)。以上原命令／基底保護是本案契約，不是 React／cache 自動提供交易原子性。沿用既有 Dialog／HTTP 驗證，不新增全域表單 store、通用命令引擎或雙寫保存服務。實測見 [T03 evidence §4](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#4-第二切片基本資料人工編輯-ui2026-09-29)；其餘 JD 集合、候選及來源 UI 仍待後續切片。
+採用 [React 的 state／key 生命週期](https://react.dev/learn/preserving-and-resetting-state)及 [TanStack Query 的 mutation invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)。以上原命令／基底保護是本案契約，不是 React／cache 自動提供交易原子性。沿用既有 Dialog／HTTP 驗證，不新增全域表單 store、通用命令引擎或雙寫保存服務。實測見 [T03 evidence §4](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#4-第二切片基本資料人工編輯-ui2026-09-29)；職責／任務 UI 接 §1.3，其餘 K／S 等集合、候選及來源 UI 仍待後續切片。
+
+### 1.3 T03 職責與任務的人工編輯
+
+[JdWorkEditor](../../apps/web/src/features/jd-editor/JdWorkEditor.tsx)組裝職責、任務及未歸屬區；表單分為 [AreaFields](../../apps/web/src/features/jd-editor/AreaFields.tsx)及 [TaskFields](../../apps/web/src/features/jd-editor/TaskFields.tsx)，[useWorkCommand](../../apps/web/src/features/jd-editor/useWorkCommand.ts)只管理本檔案、本分頁的一筆待確認集合命令。使用既有 MUI、Query、HTTP guard，不新增 form store、拖曳框架或通用命令引擎。
+
+- 畫面使用[同版組合讀取](jd-storage.md#23-組合畫面使用同一修訂)，開表單固定當時內容／基底。profile 與集合修改後互相 invalidate，因為兩者共用 JD 修訂；正在重讀時不讓新表單取已失效 cache。已開啟草稿仍不被背景更新覆蓋。
+- 職責／任務名稱和內容可局部清空，但至少保留一項有意義內容。成果／要求是獨立可增刪的明細；未改明細不重送，改字保留身分。移至另一職責可同次附帶必要文字調整；未歸屬明確顯示，不用空白選項冒充。
+- 排序採明確上移／下移；任務及兩組明細各自排序。刪職責先說明任務會保留並轉未歸屬，刪任務另外確認，不把兩種刪除混成同一結果。
+- 所有集合命令先保留原意，再 POST；未知結果不能換命令。待確認入口獨立於原目標是否仍出現在新稿，因此原任務後來已刪除也可取回原結果。成功只觸發 GET 目前稿，不把舊結果塞回 cache。
+- 收到合法成功結果但本分頁清理失敗，明說「修改已保存、暫存未清除」，保留原命令供後續確認，不誤報後端保存未知。清除分頁資料的限制仍沿 §1.2。
+- 儲存按鈕放 Dialog 固定底部，長表單內容可捲動。轉場完成才設定初始焦點；若使用者已在表單欄位／按鈕操作，不搶焦點。此窄 helper 同時用於 profile，不取消框架的 focus trap。
+
+沿用 §1.2 的 React／TanStack 官方契約及 MUI 原生表單與 [Dialog](https://mui.com/material-ui/react-dialog/)；保存、新鮮度與原結果辨識由既有業務責任實現，非 UI cache 的保證。相應實測與限制見 [T03 §7](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#7-第五切片職責任務人工-ui-與同版讀取2026-09-29)。
 
 ## 2. 串流不是保存權威
 

@@ -1,5 +1,7 @@
 # JD-R002／CTX-W001：主顧問訪談 Working State 設計
 
+> **2026-09-24 後續裁決（WORKING，未施工）：**目標架構退役 C；本稿 C 相關分支只保留歷史脈絡。明確更正由原話與 A 的 Working State 暫時承接，直到後續正式 Memory 實際讀取、核對，最新邊界見[分層架構導覽](2026-09-24-caliburn-layered-architecture-map.md)。
+
 > **2026-09-21 施工狀態：**下文 Working State 的產品語意、欄位與生命週期保持；typed checkpoint state、model projection、批次更新與按 ID 讀取工具已接入。持久 item 保存 Runtime-private canonical `source_refs`；模型可見 projection 與更新工具不收／回 signed refs，只使用本 run 的 `evidence_key`／`source_evidence_keys`，由 Runtime 解析後保存。精確共同契約見[跨顧問、Memory 與 JD 的模型安全證據契約](2026-09-20-cross-agent-evidence-and-jd-context-contract.md)。Owner 經官方資料與既有研究複核後確認：Working State 不另設全表 Memory 對帳模式，也不保存全域 `memory_basis_revision`；A 的固定 Memory 讀取基準繼續由既有 Runtime session 擁有。只有個別 item 以 `memory_reconciled` 移除時，才要求相關最新版 Memory 的實際讀取證明。
 
 - 日期：2026-09-16

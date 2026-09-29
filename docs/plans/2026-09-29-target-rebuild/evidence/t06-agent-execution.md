@@ -248,8 +248,21 @@ Reviewer 另用真 PG 領域＋記憶體 saver 模擬「領域 resume 已提交�
 
 本次未讀 `.env`、無真 provider 呼叫；沿用已有直連預檢前置缺口，不用第三方 key 替代。T06 仍在施工，pause 元件不等於完整 UI／supervisor、Turn 取消回退或背景角色控制已交付。
 
-## 12. 下一個可執行切片
+## 12. 第十二切片：原計數結果補存
 
-接輪前準備與角色控制、真實費率配置及單一有界 retry supervisor。共同 loop 已有完整 request、sync／局部步數、原 R／C 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用及完整 Step pause；未配置 compact 接縫仍明確停止。輪前128K／Agent意圖、B起始準備、取消相容基底，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復；count 雙保存失敗的原件可取回性亦須承接。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
+承接暫停切片 `0641beff`，補第九切片已記錄的 count 原件保存缺口。重讀[官方計數契約](https://developers.openai.com/api/docs/guides/token-counting)、本機 OpenAI 3.20.0 `InputTokenCountResponse` 及既有原 R／C 補存路徑：遠端 count 是固定 payload 的觀察，不是 provider 保存的 Response，也沒有成本 usage；沿原 saver 與 attempt 補存即可，不增加 cache／資料表／另一套結算。
+
+- 先以保存前／保存後確認遺失反例得到 **2 failed**：原程式只丟 `ConnectionError`，仍完整的 count 未交給恢復方。新增受限 `HeldInputCount`／`InputCountSaveError`，沿原 `recovery` 入口核 thread、request 及固定 payload，保存或承接既有结果後再檢查容量；原 R 恢復語意不變。
+- 第一輪相關 **45 passed in 1.63s**。再加 pending writes 優先、補存重複失敗仍保留原件、跨 request 拒絕、取消不可採用、超容量仍停止等代表性反例。測例編輯誤置舊 assertion 的 `NameError` 已修回原測例，不記為產品 Red；沒有放寬斷言。
+- `test_request_capacity_postgres.py` 擴充原有真 PG saver／execution 預算／SDK MockTransport 接線，計數保存前／後故障，關閉再開 saver 後補存或承接既有結果。HTTP 計數只一次；原 count 已超容量則零生成，否則只新增一次生成；未知計數費用預留仍保留。專項 **13 passed in 4.57s**，不把合成 HTTP 當真 provider。
+- 首輪主代理受影響回歸：unit／contracts、計數／R 保存／資格／pause、模型與 compact 記帳、Graph PG，**579 passed in 36.81s**。Ruff check／format **207 files**、mypy **149 source files** 通過；文件 **20 份／336 links** 零錯、diff check 通過。這是明列範圍回歸，不冒稱全後端或真 provider 已驗收。
+- 獨立 reviewer 發現 P2：原 count 已補存且 Step 已完成後，重帶同一 handoff 會因 `recovery != None` 跳過新 pause。新增 final／非 final 反例先 **2 failed**；共用控制判斷改為「是否仍有待補存原件」，而非呼叫是否帶 handoff。保留前切片的 pending Step 防覆寫條件；相關 **52 passed in 1.76s**。修的是跨 count／原 R 與控制的共同邊界，不另造暫停特例或改既定產品語意。
+- 修正後相同受影響集合 **581 passed in 35.84s**，Ruff／mypy 與文件檢查再通過。PG 測例最後只把巢狀條件表達式展開以提升可讀性，專項再驗 **6 passed in 3.61s**。Reviewer 窄複核 **9 passed**，另 4 組原 R handoff 探針保持第 1 Step 暫停、原 R／operation seed／窗口及外送次數不變，確認 P2 關閉；該複核為記憶體 saver，不混同 PG／provider。
+
+本切片不改 Graph 節點／流程圖、不改業務儲存或計量契約；未讀 `.env`、無付費外送。process-local 原件不是跨程序備份；此處的真 PG 測試是重新連線，不冒稱 kill 後能取回尚未保存的 count。重試 supervisor／輪前準備及角色整合仍未完成。
+
+## 13. 下一個可執行切片
+
+接輪前準備與角色控制、真實費率配置及單一有界 retry supervisor。共同 loop 已有完整 request、sync／局部步數、原 R／C／count 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用及完整 Step pause；未配置 compact 接縫仍明確停止。輪前128K／Agent意圖、B起始準備、取消相容基底，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

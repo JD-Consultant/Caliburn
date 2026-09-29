@@ -1,8 +1,10 @@
 # Caliburn Contract Strategy
 
-## 新目標的實作路由（2026-09-29；未實作）
+## 新目標的實作路由（2026-09-29；施工中）
 
 新 `apps/api`／`apps/web` 依[實作規劃](implementation/data-and-contracts.md#5-唯一契約來源及生成)使用 App 自有 `apps/api/contracts/` 作為 JSON Schema SSOT，產 Python／TypeScript；不接回退役 contract package，不手寫生成檔。模型 tools 與 HTTP 各有必要投影，不強制同 envelope。下方「現行」描述既有 production，不是新目標路徑限制；正式切換與 successor ADR 在計畫 T18 驗收時處理。新切片採測試先行、再生驗證與小型可審查交付，一項 task 可有多個完整小提交，不機械限制一 task 一 commit。
+
+T01 已驗最小 health schema 的雙端生成與非法 payload；這不是 JD／Memory 工具契約已落地。實際命令見 [backend README](../apps/api/README.md)，後續切片沿相同唯一來源擴充。
 
 ## 現行規則
 

@@ -82,13 +82,13 @@ T08／T12 的 `test_cancelled_turn_cannot_publish_late_tool_result`：
 
 ## 5. 命令與證據
 
-T01 必須落地以下**目標命令介面**，本文件不聲稱目前已存在：
+T01 落地基礎命令；產品旅程及 provider 命令隨相應任務加入，不建立假可用入口。已可執行的精確命令見 [backend README](../../apps/api/README.md)及 [frontend README](../../apps/web/README.md)：
 
 | 使用方 | 待建立並實測的命令 |
 |---|---|
 | API | `uv run --project apps/api pytest …`；unit／contracts／integration／journeys 分 marker，預設不外送 |
 | Python 品質 | `uv run --project apps/api ruff check apps/api`、`ruff format --check`；mypy 只選新 package |
-| Web | 新 workspace `@caliburn/frontend` 的 `test`、`typecheck`、`lint`、`build`、`test:e2e`；實際可用命令依任務證據，未建立的不可冒稱已執行 |
+| Web | 新 workspace `@caliburn/frontend` 的 `test`、`typecheck`、`lint`、`build`；`test:e2e` 在 T09 UI 旅程加入，不能把 T01 元件測試當 E2E |
 | 契約 | 新 API package／script 的 `codegen`、`codegen:check`；再生無 diff |
 | 文檔 | links／anchors、JSON fences、Mermaid render、task DAG／gate coverage、`git diff --check` |
 

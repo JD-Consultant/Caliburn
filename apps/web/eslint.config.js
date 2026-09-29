@@ -11,8 +11,20 @@ export default defineConfig(
   tseslint.configs.recommended,
   {
     files: ['src/**/*.{ts,tsx}'],
-    extends: [hooks.configs.flat.recommended, refresh.configs.vite],
-    languageOptions: { globals: globals.browser },
+    extends: [
+      tseslint.configs.recommendedTypeChecked,
+      hooks.configs.flat.recommended,
+      refresh.configs.vite,
+    ],
+    languageOptions: {
+      globals: globals.browser,
+      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+    },
+    rules: {
+      '@typescript-eslint/consistent-type-imports': 'error',
+      '@typescript-eslint/switch-exhaustiveness-check': 'error',
+      '@typescript-eslint/no-non-null-assertion': 'error',
+    },
   },
   {
     files: ['scripts/**/*.mjs', '*.js'],

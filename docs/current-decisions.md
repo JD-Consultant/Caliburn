@@ -2,6 +2,8 @@
 
 > 同日條目依上到下為 successor 順序；較下方的 16K／待驗文字是當時 gate 的歷史狀態，不得覆蓋上方較新的正式設定與驗收邊界。
 
+**2026-09-29 程式撰寫規範補充（工程規則／不變更產品契約）：**依 Owner 要求補齊架構分層以外的 code 寫法。新增[程式撰寫規範](implementation/coding-standard.md)，研究並區分語言／框架建議與本案取捨，涵蓋命名、函式／實例、Service／依賴注入、錯誤、非同步、React 及反過度抽象；沿既有工程入口與 Refactor／Review 路由。Ruff／typed ESLint 的有界增補與驗證記入 [T01 evidence](plans/2026-09-29-target-rebuild/evidence/t01-foundation.md#5-程式撰寫規範與自動檢查補強2026-09-29)。不重置 Goal、不改產品狀態機、不把風格檢查當產品驗收。
+
 **2026-09-29 Goal 分層整理（範圍不縮減／不重置施工）：**依 Owner 要求，把長 Goal 的成果、有效授權與完整退出條件集中於[既有計畫入口](plans/2026-09-29-target-rebuild/README.md)；工程接續方法在[開發規範 §10](implementation/development-standard.md#10-長任務goal-與工作上下文)，進度及實測仍由任務表／evidence 管理。原要求覆蓋見[審查紀錄](plans/2026-09-29-target-rebuild/review.md#4-goal-分層整理與覆蓋審查)。本次只整理文件與短 prompt，不替換或重建執行中的 Goal，不把 T01 局部測試當成產品通過，也不新增施工或外送範圍。
 
 **2026-09-29 新目標 Goal 施工授權（T01 開始／產品未驗收）：**Owner 已明確授權完成既有 T01–T18、同步維護文件、必要有界 OpenAI 直連合成測試及本地 Commit；正式入口／舊碼切換仍須最後 gate。新分支不加 `codex/`，不自動 push／merge／對外部署、不任意刪除舊 DB／volume／秘密。安全使用 `apps/api/.env` 中所需 API 憑證是本次明示例外，不套用舊產品其他配置。分析方法、Prompt／Tool／Context 共同驗收、問題解法紀錄與 Git 規則集中於[開發規範](implementation/development-standard.md)，授權及進度見[計畫](plans/2026-09-29-target-rebuild/README.md)。下方「僅文件／未授權」保留為當時狀態，不覆蓋本次授權。

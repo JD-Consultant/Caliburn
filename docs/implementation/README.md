@@ -14,6 +14,7 @@
 | 長 Goal 如何持續接手、不漏要求 | [Goal 持久入口](../plans/2026-09-29-target-rebuild/README.md)與[長任務工作規則](development-standard.md#10-長任務goal-與工作上下文)；當前實測及下一步從任務 evidence 深入 |
 | 選哪些框架、為何、不選什麼 | [技術選型與機制驗證](technology-decisions.md) |
 | 程式如何分模組、命名、限制依賴 | [程式組織與命名](code-organization.md) |
+| 函式／類別／Service 怎麼寫、錯誤與非同步如何處理 | [程式撰寫規範與實例](coding-standard.md)；與模組架構分責，不另造產品契約 |
 | 業務、SQL、來源、快照及生成契約如何接 | [業務與資料接線](data-and-contracts.md) |
 | Graph、原生 Responses、恢復與取消如何接 | [Agent 執行接線](agent-execution.md) |
 | UI、串流、PDF、啟停及安全如何交付 | [介面與交付](interface-and-delivery.md) |

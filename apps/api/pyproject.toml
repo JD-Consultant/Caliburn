@@ -47,7 +47,7 @@ line-length = 100
 extend-exclude = ["src/caliburn/contracts/generated"]
 
 [tool.ruff.lint]
-select = ["E", "F", "I", "UP", "B", "ASYNC"]
+select = ["E", "F", "I", "UP", "B", "ASYNC", "N", "A", "RUF006", "RUF100"]
 
 [tool.mypy]
 python_version = "3.14"

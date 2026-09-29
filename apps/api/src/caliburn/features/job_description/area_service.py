@@ -5,7 +5,7 @@ from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import area_persistence, persistence
+from caliburn.features.job_description import area_persistence, persistence, task_persistence
 from caliburn.features.job_description.areas import (
     AreaChange,
     AreaField,
@@ -24,6 +24,7 @@ from caliburn.features.job_description.models import (
     JdProfileRevision,
     StaleJdRevisionError,
 )
+from caliburn.features.job_description.task_changes import detach_area_tasks
 
 
 async def read_areas(session: AsyncSession, job_file_id: UUID) -> JdAreasRevision:
@@ -103,12 +104,19 @@ async def edit_areas(
             await area_persistence.insert_area_content(session, job_file_id, new_content)
         profile = await persistence.read_revision(session, job_file_id, current.revision_id)
         result = JdAreasRevision(uuid4(), areas)
+        tasks = None
+        if isinstance(command.change, DeleteArea):
+            tasks = detach_area_tasks(
+                await task_persistence.read_tasks(session, job_file_id, current.revision_id),
+                command.change.area_id,
+            )
         await persistence.insert_revision(
             session,
             job_file_id,
             JdProfileRevision(result.revision_id, profile.profile),
             parent_revision_id=current.revision_id,
             areas=areas,
+            tasks=tasks,
         )
         document = await persistence.read_document(session, job_file_id)
         document.current_revision_id = result.revision_id

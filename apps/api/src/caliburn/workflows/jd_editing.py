@@ -5,9 +5,10 @@ from uuid import UUID
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
 from caliburn.features.executions import service as execution_service
-from caliburn.features.job_description import area_service, queries, service
+from caliburn.features.job_description import area_service, queries, service, task_service
 from caliburn.features.job_description.areas import EditJdAreas, JdAreasRevision
 from caliburn.features.job_description.models import JdProfileRevision, ReviseJdProfile
+from caliburn.features.job_description.tasks import EditJdTasks, JdTasksRevision
 from caliburn.features.job_files import queries as file_queries
 from caliburn.features.job_files import service as file_service
 
@@ -45,3 +46,17 @@ class JdEditingWorkflow:
                 return original
             await execution_service.require_manual_edit_allowed(session, job_file_id)
             return await area_service.edit_areas(session, job_file_id, command)
+
+    async def read_tasks(self, job_file_id: UUID) -> JdTasksRevision:
+        async with self.sessions() as session:
+            await file_queries.read_job_file(session, job_file_id)
+            return await task_service.read_tasks(session, job_file_id)
+
+    async def edit_tasks(self, job_file_id: UUID, command: EditJdTasks) -> JdTasksRevision:
+        async with self.sessions.begin() as session:
+            await file_service.lock_job_file(session, job_file_id)
+            original = await task_service.recover_task_result(session, job_file_id, command)
+            if original is not None:
+                return original
+            await execution_service.require_manual_edit_allowed(session, job_file_id)
+            return await task_service.edit_tasks(session, job_file_id, command)

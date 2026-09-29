@@ -3,6 +3,7 @@ import { Link as RouterLink, useParams } from 'react-router';
 import { useQuery } from '@tanstack/react-query';
 import { Alert, Button, Stack, Typography } from '@mui/material';
 import { InterviewHistory } from '../features/interview/InterviewHistory';
+import { JdProfileEditor } from '../features/jd-editor/JdProfileEditor';
 import { jobFileQuery } from '../features/job-files/job-file-api';
 import { describeReadError } from '../shared/api/http';
 
@@ -47,9 +48,10 @@ function JobFileContent({ jobFileId }: { jobFileId: string }) {
             <p>受訪員工：{file.data.employee_name}</p>
           </header>
           <Alert severity="info">
-            已可管理檔案與回看開場。AI 訪談與 JD 編輯尚未開放，這裡不會送出模型請求。
+            已可編輯 JD 基本資料與回看開場。其他 JD 欄位及 AI 訪談仍在開發，這裡不會送出模型請求。
           </Alert>
           <InterviewHistory jobFileId={jobFileId} />
+          <JdProfileEditor key={jobFileId} jobFileId={jobFileId} />
         </>
       )}
     </Stack>

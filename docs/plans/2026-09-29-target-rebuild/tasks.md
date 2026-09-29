@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T03 已完成；T04 施工中；T05–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T04 已完成；T05–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -42,10 +42,11 @@
 
 ## T04 Memory 可變候選、不可變修訂與快照
 
-- [ ] T04；依賴：T02。
-- **進度：**接續 T03 `4e673cf8`，先完成內容、精確標題與引用集合純規則；[保存接線](../../implementation/memory-storage.md)記錄官方機制比較及下一個 PG 垂直切片。[實際證據／未驗邊界](evidence/t04-work-memory.md)。候選／快照 SQL、發布、角色／來源資格與恢復尚未完成，不把純值測試當 Memory 產品可用。
+- [x] T04；依賴：T02。
+- **完成（2026-09-30）：**固定來源、候選 CRUD、分層權限、回交／回復位置、原結果、固定 map/read 與原子發布已驗。全後端 545 passed；審查補上 no-work 重入後，受影響 43 passed。接線及 schema 見[保存接線](../../implementation/memory-storage.md)，精確層級見[實際證據／未驗邊界](evidence/t04-work-memory.md#4-第四切片候選交接位置與原子發布)。未交付模型工具／diff／B1／B2 真執行；這些是 T05／T10／T11，不把本項完成當完整 Memory 產品可用。
 - **第二切片（2026-09-30）：**第一切片 `5c5b09b8`；接著完成本批固定員工來源 F、正式來源身分查詢與必處理區間的真 PG 驗證。[來源邊界證據](evidence/t04-work-memory.md#2-第二切片正式來源身分與-memory-固定範圍)。這不是批次持久化／候選／發布完成，T04 仍未勾選。
 - **第三切片（2026-09-30）：**第二切片 `acc5e85e`；新增固定物件修訂、正文重用與不可變來源關係，SQL 拒絕歷史改寫、封存後追加及半套提交。[固定修訂證據](evidence/t04-work-memory.md#3-第三切片固定物件修訂與正文重用)。尚未交付候選 CRUD／位置、角色資格及整版原子發布，不把 storage 當作可用 Memory Agent。
+- **第四切片（2026-09-30）：**接續 `28397311`／`566a3529`，完成前述待接保存路徑；前兩行「尚未」是該切片當時狀態。獨立審查發現已涵蓋要求的完成結果無法重入，補反例並修復，沒有新建空批次／快照或第二套收據。
 - **契約：**[資料保存 §2–4](../../architecture/persistence.md)、[B1／B2 生命週期](../../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[凍結接線](../../implementation/data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 - **程式／交付：**`features/work_memory` 的候選 CRUD、位置／階段快照、發布及固定 map／read；原操作結果與同 transaction 修改；schema 圖及 migrations。
 - **Red：**相同物件不同引用路徑得到不同修訂、修改歷史、只改下層引用卻沿用上層舊修訂、回改舊文字冒充原修訂、刪情境破壞歷史。

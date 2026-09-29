@@ -1,6 +1,6 @@
 # Memory 保存接線
 
-- 日期：2026-09-30；狀態：**T04 施工中；純規則、正式來源範圍及固定物件修訂已落地，候選／發布快照尚未交付**。精確證據與下一切片見 [T04 紀錄](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)。本頁維護實作映射，不另定產品規則或模型工具。
+- 日期：2026-09-30；狀態：**T04 保存切片已完成；候選編輯／恢復位置與固定快照已通過真 PostgreSQL 驗證，尚未接模型工具或背景 Agent**。精確證據與下一切片見 [T04 紀錄](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)。本頁維護實作映射，不另定產品規則或模型工具。
 - 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[內容與引用修改](../specs/2026-09-27-memory-object-update-tool-contract.md)、[title 解析](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#4-未決接縫與停止線)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
 
 ## 1. 實作責任與第一切片
@@ -24,11 +24,11 @@
 - `read_required_interviews` 共用既有近期歷史組裝，保留完整 `(K,F]`、真實角色及前置語境規則；不含 F 之後即使已正式保存的答覆。`read_reference_sources` 可回讀 `≤F` 的更早有效來源，空引用合法，不把必處理新區間當成唯一可引用範圍。
 - 訪談 owner 的 `read_interview_sources` 在 SQL 同時限定檔案、來源 ID 與上界；有一個來源不存在、未正式化、跨檔案或超界就整組拒絕，不返回部分結果。這是新增的內部 ID 查詢，**不是新增模型工具**。
 
-真 PG 已驗來源資格、延後啟動不擴張 F、K/F 角色、不以奇偶判定、空區間與早期來源回查；仍未實作背景要求保存、批次持久綁定、Memory 候選 CRUD 或發布。不能因這些查詢通過，就稱取消／恢復整體已完成。
+第二切片真 PG 已驗來源資格、延後啟動不擴張 F、K/F 角色、不以奇偶判定、空區間與早期來源回查；該片尚無批次持久綁定／候選／發布，後續接線見 §2.2、§5。背景要求與 Graph 恢復仍由 T08／T11 負責，不能因來源查詢通過就稱整體完成。
 
 ## 2. 保存表示：固定修訂，而非資料庫舊列
 
-採既定 PostgreSQL＋SQLAlchemy／Alembic，以明確新增不可變修訂、保存選用來表達歷史。**不以 MVCC 舊列、ORM 版本計數器或每次完整正文複製充當 Memory 發布快照。**下圖是 T04 整體施工設計；已落地的固定修訂 schema 見 §2.1，不將其餘接線當成已完成。
+採既定 PostgreSQL＋SQLAlchemy／Alembic，以明確新增不可變修訂、保存選用來表達歷史。**不以 MVCC 舊列、ORM 版本計數器或每次完整正文複製充當 Memory 發布快照。**下圖為整體目標；T04 已實現中間的保存與發布路徑，A／JD 模型工具與 B1／B2 執行接線仍屬後續任務。schema 見 §2.1–2.2。
 
 ```mermaid
 flowchart TD
@@ -75,22 +75,57 @@ flowchart LR
 - 同正文的標題、描述或引用調整重用 `body_id`；內容與固定來源完全未變則沿用原修訂。正文改動後又改回，仍是新的修訂與正文列，不以相同文字冒充舊版本。未做跨歷史或跨物件內容去重。
 - 情境只能引用正式訪談；理解只能引用同檔案情境的固定修訂。同一理解修訂對同一情境身分至多一個來源修訂；零來源合法。Service 沿固定來源驗 `≤F`，SQL 以 FK／層別限制拒絕未正式化、跨檔案、錯層或不存在的來源。
 - 保存於呼叫方的同一短交易：建立修訂標頭 → 寫齊來源 → 封存 `is_sealed=true`。DB 在交易完成時確認新修訂已封存；封存後正文、欄位、引用均不可改寫，也不能追加來源。讀取只返回完整封存修訂。**封存只是固定儲存完整性，不是 Memory 發布、B2 分析完成或候選可見性。**
-- 不增加自己的 commit、候選 head 或原操作回執。外層失敗時新增物件／正文／修訂／來源一起撤回；這個 primitive 不能單獨承諾工具重入冪等。A／JD 的正式快照入口與 B1／B2 權限仍由後續 service 接入，不直接暴露此歷史讀取函式給模型。
+- 不增加自己的 commit、候選 head 或原操作回執。外層失敗時新增物件／正文／修訂／來源一起撤回；這個 primitive 不能單獨承諾工具重入冪等。A／JD 的正式快照入口與 B1／B2 權限由 §2.2 的 service 接入，不直接暴露此歷史讀取函式給模型。
+
+### 2.2 候選位置、批次與正式快照
+
+Migration `0012_memory_candidates_snapshots` 重用 §2.1 的正文／固定修訂；沒有第二份可寫正文，也不將 title 當 SQL 修改目標。
+
+```mermaid
+flowchart TD
+  E[executions<br/>Memory 執行資格與 writer] --> B[memory_batches<br/>固定 K/F、發布基底<br/>目前階段、分支與位置]
+  B --> P[memory_positions<br/>固定位置與 parent]
+  P --> PM[memory_position_members<br/>每物件選一個修訂]
+  PM --> R[memory_object_revisions<br/>重用正文與來源]
+  E --> O[memory_operations<br/>原意圖摘要值、結果定位]
+  B --> S[memory_snapshots<br/>完成發布的固定位置與 F]
+  S --> P
+  H[memory_heads<br/>檔案目前發布版本] --> S
+```
+
+| 責任 | 實作位置 | 保證／界線 |
+|---|---|---|
+| 內部型別與分層權限 | `candidates.py` | App 綁定檔案、execution、generation、stage、position；不是模型參數。B1 只讀寫情境；B2 讀情境、讀寫理解。 |
+| 工作稿及原操作 | `candidate_service.py`、`candidate_operations.py` | create／revise／delete 全成全拒；有效位置前移及原結果同交易。原意圖用穩定序列化的 SHA-256 判相等，結果保存必要身分／位置，不重複存長篇 Markdown。 |
+| 交接、回復與發布 | `candidate_lifecycle.py` | 回交保留兩層已成立工作稿；恢復只採本批可證明的原位置，換 generation／stage 阻擋遲到寫入。發布固定化理解來源並保存完整快照。 |
+| 可見資料投影 | `candidate_queries.py` | 候選捕捉當前位置後解析身分綁定；正式入口要求 snapshot，沿其固定修訂。map 不讀正文。 |
+| SQL 與保存約束 | `position_persistence.py`、`batch_persistence.py` | 同檔案 FK、每身分一修訂、位置封存、同層精確 title 唯一及引用來源存在。快照要求精確來源 pair 與訪談上界；固定位置、快照與操作結果不可改寫。 |
+| 跨領域短交易 | `workflows/memory_candidates.py` | 鎖檔案、驗既有 writer、呼叫領域操作；發布與 execution 完成共同提交。adapter／領域不自行 commit。 |
+
+每次內容修改只新增必要修訂與輕量選用列。位置沿 parent 保存可恢復路徑；回復必須在本批 base 到目前位置的路徑內，且六個階段座標曾由真實原結果提供，不能只拿一個存在的 position ID 偽造 B2 資格。候選讀取使用目前 stage，會看到該 stage 內後續成功操作；新修改則須符合精確目前位置。這兩種檢查不同，不把模型歷史文字改成 latest。
+
+`memory_positions.is_sealed` 只表示選用集合完成、不可再加列；不表示已分析或已發布。候選理解可以保存舊固定來源 pair，但**目前讀取依 source object ID 解析該位置選用**。正式快照不能如此模糊解析：發布先建立需要的新理解修訂，然後存下所有路徑一致的精確 pair。這使動態候選綁定與歷史固定引用各有明確責任。
+
+此片不保存原生模型 request，也不提供全歷史模型入口。原操作摘要只能核對同一意圖，不能重建遺失的工具參數；完整 native request 的可靠保存、工具配對及 Graph 接續由 T06／T08／T11 承接。
 
 ## 3. 交易與讀取的施工邊界
 
 沿現有檔案隔離、Memory execution 資格、短鎖與呼叫方 transaction，不建第二套跨 Agent 鎖／UnitOfWork。候選操作原意圖、採用位置及原結果共同提交；模型、patch 大額純計算或重試等待不持有 SQL transaction。讀固定位置後計算、提交前再核位置／資格，不能把最新稿偷偷代入原命令。
 
-後續 SQL 切片需直接證明：
+真 PG 驗證涵蓋下列保存條件；具體測例與層級見 T04 evidence，不能上推為模型語意品質已驗：
 
 1. 本批有效來源邊界來自正式訪談 owner；pending／取消來源、另一檔案或超出 F 皆不能建立引用。快照的訪談層指向既有不可改原文，不複製正文；F 指最後有效員工訊息，不以最大序號猜。
-2. 同層目前 title 唯一；App 精確解析及 DB 唯一約束採相同相等語意。考慮非預設／不區分大小寫的 DB collation，不能讓部署環境改變已定字串比較；SQL 層仍以 ID 定位，不用 title 作 UPDATE／DELETE 目標。
+2. 同層目前 title 唯一；App 精確解析及 DB 封存約束採相同相等語意。使用明確 `COLLATE "C"`，不因部署環境而改變字串比較；SQL 層仍以 ID 定位，不用 title 作 UPDATE／DELETE 目標。
 3. 情境刪除與候選入邊解除同交易，理解本身保留；B1 結果不外露理解資料。歷史快照不改寫，不用歷史 FK cascade 清除正式來源。
 4. 候選修改後 current read 取得最新已成立狀態；單次物件／map 投影捕捉同一位置。A 只能沿已發布的固定 snapshot 查詢，不能混入候選。
 5. ①／②恢復沿可定位候選；新 writer／回退分支使遲到修改失效。同批 B1↔B2 依序接手，B2 已成立的理解候選不能因回交遺失。
 6. ③在同一短提交中保存固定選用／關係、涵蓋與原結果；正式 head 最後採用。已成立結果重入回原快照，不重新發一版；未知提交不當未執行。
 
-以上是整體測試落點；固定修訂中的正式來源 FK、不可變引用及外層交易已驗，不代表候選／發布流程已驗。不另加發布前語意 reviewer、格式修補 loop 或最少引用數。權限與結構在每次操作維持；發布只做正式資格與一致提交。候選 schema、原操作 shape 與恢復位置由後續 PG 切片接入。
+不另加發布前語意 reviewer、格式修補 loop 或最少引用數。權限與結構在每次操作維持；DB 快照結構 gate 只防止不一致資料落地，不推斷 B2 是否真正理解。T04 的發布入口只接受目前 B2 階段，T10／T11 必須在真正完成該階段後才呼叫，不能將 read 次數、零 diff 或正常返回一個工具當作完成。
+
+系統 discard 與 execution failed 同交易；失敗後若原操作已提交，只回原結果，不能再開始另一筆放棄。Memory 沒有使用者取消／暫停端點。發布確認遺失時查原 snapshot；COMMIT 前失敗則整筆撤回，原候選仍可恢復。此片驗的是 transaction 與可辨識位置，不承諾未保存的串流／推理可回復。
+
+新要求的 F 已被正式 Memory 涵蓋時，`start_memory_candidate` 不建立空候選或快照，但會在既有 `memory_operations` 留下綁定原來源的「已涵蓋」結果，與 execution completed 同交易。重入先回原結果再判定是否需新工作；同 execution 換來源拒絕。操作表因此直接 FK 到 execution，而非要求每筆結果必先有 batch。T11 調度可先篩掉已涵蓋要求，仍不能取代此入口的提交恢復保證。
 
 ## 4. 官方機制、比較與取捨
 
@@ -104,16 +139,18 @@ flowchart LR
 
 2026-09-30 固定修訂切片補查：[PostgreSQL deferred constraints](https://www.postgresql.org/docs/18/sql-set-constraints.html)允許 constraint trigger 延至提交檢查；普通 CHECK 不提供跨列集合完成保證。[行鎖](https://www.postgresql.org/docs/18/explicit-locking.html#LOCKING-ROWS)在交易結束釋放。因此以短交易內的來源組裝＋封存防止「歷史修訂事後新增來源」與「只有半套標頭即提交」，不把模型分析期間包進 transaction。這是針對不可變多列 aggregate 的本案實現，不是要求所有產品資料都增加封存欄位。
 
+候選／發布重入另核 [AWS Builders' Library：安全重試](https://aws.amazon.com/builders-library/making-retries-safe-with-idempotent-APIs/)：使用 caller 提供的原操作身分、同次保存效果與去重結果，且重入應回語意等價結果；只保證不重寫、卻回「已存在／已結束」會讓呼叫方仍無法確認。Caliburn 因此也保存「來源已涵蓋、無新批次」的原結果；摘要 hash 僅核對相同操作的 payload，不拿內容相同推定兩個新命令是同一意圖。不擴張成通用重試平台。
+
 ## 5. 後續接線與驗收歸屬
 
-下一個可執行切片是候選／固定選用的最小真 PG 垂直路徑：有效來源 → B1 建立情境 → B2 建立理解 → 固定快照讀回；再擴增修改／刪除／回退／原結果與重用反例。不先生成全部 Agent／HTTP／UI。2026-09-30 主代理與只讀子代理審查後，採以下**待實作驗證的接線方向**，沿用 §2.1，不另建第二份正文體系：
+2026-09-30 第四切片已接成：有效來源 → B1 候選情境 → B2 候選理解 → 固定快照讀回，並驗修改／刪除／回退／原結果與重用。採以下接線，沿用 §2.1，不另建第二份正文體系；不因此生成未完成的 Agent／HTTP／UI：
 
 - 候選位置只保存各身分的修訂選用。理解候選的來源集合可從所選理解修訂取得情境 ID，再沿**同一候選位置**解析目前情境；不直接把儲存的舊來源修訂當成目前候選來源。固定歷史 read 則完整沿原 `(object_id, revision_id)`，兩條讀取路徑命名／型別須區分。
 - B1 修改情境只前移其選用，保留理解的身分綁定；刪除情境時，同次為受影響理解產生解除該綁定的新修訂、重用正文，再一起前移位置。原固定列不改。B1 的投影不包含理解資訊，App 的確定性解除不代表 B1 已分析理解。
 - 發布使用確定的候選位置，將理解保留的情境身分解析成該版情境修訂；關係換版時新建理解修訂。先前歷史及未變正文重用，不能把不一致的候選選用直接當正式快照。
-- 准入／writer fencing 重用 `executions`；候選回退用 generation 使被放棄分支失效。Memory 自己保存原命令及結果，參考既有 JD 用例的恢復模式，不借用 JD 的操作表、不造通用收據框架。完成交接、發布與終局狀態由 workflow 在同一短交易協調。
+- 准入／writer fencing 重用 `executions`；候選回退用 generation 使被放棄分支失效。Memory 自己保存原意圖摘要值及結果，參考既有 JD 用例的恢復模式，不借用 JD 的操作表、不造通用收據框架。完成交接、發布與終局狀態由 workflow 在同一短交易協調。
 - 必測「候選看新／歷史看舊／發布成同一鏈」、刪除多個理解共用情境的全成全拒，以及改回舊字串、舊 writer／回退分支、發布確認遺失。B2 完成須綁定當時情境階段；不能由固定修訂封存、read 次數或零 diff 推定語意完成。
 
-採此表示的原因是重用既有固定內容與身分，同時滿足候選動態綁定及歷史固定引用，沒有引入第二套可寫正文。一次 read 先捕捉位置再沿固定選用投影，避免 [Read Committed](https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED) 下多次 latest 查詢看到不同提交；並行工作使用[各自的 AsyncSession](https://docs.sqlalchemy.org/en/21/orm/extensions/asyncio.html#using-asyncsession-with-concurrent-tasks)。官方機制支持此接法，具體位置 schema 與效果仍須下一片驗證，並非業界規定的唯一模型。
+採此表示的原因是重用既有固定內容與身分，同時滿足候選動態綁定及歷史固定引用，沒有引入第二套可寫正文。一次 read 先捕捉位置再沿固定選用投影，避免 [Read Committed](https://www.postgresql.org/docs/18/transaction-iso.html#XACT-READ-COMMITTED) 下多次 latest 查詢看到不同提交；並行工作使用[各自的 AsyncSession](https://docs.sqlalchemy.org/en/21/orm/extensions/asyncio.html#using-asyncsession-with-concurrent-tasks)。官方機制支持此接法，具體 schema 是本案取捨，不是業界規定的唯一模型。
 
 T04 負責保存及業務不變量；T05 負責精簡模型工具、V4A 唯一定位與 diff 投影；T10／T11 才把真實 B1／B2 接續與交接完成資格接入。所有發布快照及可達依據不自動清理；候選／checkpoint 的保留沿上位規範，不在本頁新增一個全產品過期時間。

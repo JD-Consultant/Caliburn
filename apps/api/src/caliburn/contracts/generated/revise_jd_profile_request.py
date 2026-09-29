@@ -9,10 +9,10 @@ from pydantic import BaseModel, ConfigDict, Field, StrictStr
 
 
 class ProfileField(StrEnum):
-    job_title = "job_title"
-    organization_unit = "organization_unit"
-    reports_to = "reports_to"
-    purpose = "purpose"
+    JOB_TITLE = "job_title"
+    ORGANIZATION_UNIT = "organization_unit"
+    REPORTS_TO = "reports_to"
+    PURPOSE = "purpose"
 
 
 class SetField(BaseModel):

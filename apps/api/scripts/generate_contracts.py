@@ -38,6 +38,7 @@ def generate(check: bool) -> bool:
                     "--disable-timestamp",
                     "--use-standard-collections",
                     "--use-union-operator",
+                    "--capitalize-enum-members",
                     "--field-constraints",
                     "--formatters",
                     "ruff-check",

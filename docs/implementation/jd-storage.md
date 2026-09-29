@@ -1,11 +1,11 @@
 # JD 保存接線
 
-- 狀態：**T03 profile 後端及人工 UI 已實作／已驗；T03 整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
+- 狀態：**T03 profile 後端及人工 UI、職責集合後端已實作；驗證依 T03 證據，整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
 - 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
 
-目前只有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[介面 §1.2](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)。尚未提供職責／任務／K／S 等關聯式集合、Agent 候選、依據與核對；不能把本切片端點直接當作 A 的正式寫入捷徑。
+目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責集合的人工讀寫／排序後端。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 profile UI 接線見[介面 §1.2](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)。職責 UI、任務／K／S、Agent 候選、依據與核對尚未交付；不能把這些人工正式端點當作 A 寫入捷徑。
 
 | 責任 | 已實作位置 |
 |---|---|
@@ -15,11 +15,13 @@
 | 固定正式內容查詢 | [queries.py](../../apps/api/src/caliburn/features/job_description/queries.py)；GET 不偷偷建立資料 |
 | 檔案隔離、人工准入及一次提交 | [jd_editing.py](../../apps/api/src/caliburn/workflows/jd_editing.py)；沿既有檔案鎖與 executions，不重建鎖定系統 |
 | HTTP 驗證／錯誤投影 | [jd_profile.py](../../apps/api/src/caliburn/transport/http/jd_profile.py)；無業務 SQL |
+| 職責值、用例、固定內容／排序 | [areas.py](../../apps/api/src/caliburn/features/job_description/areas.py)、[area_service.py](../../apps/api/src/caliburn/features/job_description/area_service.py)、[area_persistence.py](../../apps/api/src/caliburn/features/job_description/area_persistence.py)；仍屬同一 JD feature，非另套保存服務 |
+| 職責 HTTP 與共用 workflow 注入 | [jd_areas.py](../../apps/api/src/caliburn/transport/http/jd_areas.py)、[jd_dependencies.py](../../apps/api/src/caliburn/transport/http/jd_dependencies.py)；與 profile 共用准入／交易責任 |
 | 新建檔案連同空 JD／開場保存 | [job_files.py](../../apps/api/src/caliburn/workflows/job_files.py)；重送建立不重設 JD |
 
 ## 2. 固定修訂與目前正式頭
 
-以下為**已實作資料關係**，非完整未來 schema。`job_files` 是既有 owner；圖的複合識別均含 `job_file_id`。簡化屬性只列識別／關係與 profile，完整 DDL 以 [0005 migration](../../apps/api/migrations/versions/0005_jd_profile_revisions.py)為準。
+以下為**已實作資料關係**，非完整未來 schema。`job_files` 是既有 owner；圖的複合識別均含 `job_file_id`。簡化屬性只列識別／關係及已實作欄位，完整 DDL 以 [0005](../../apps/api/migrations/versions/0005_jd_profile_revisions.py)及 [0006 migration](../../apps/api/migrations/versions/0006_jd_area_selections.py)為準。
 
 ```mermaid
 erDiagram
@@ -27,6 +29,8 @@ erDiagram
   job_files ||--|| job_descriptions : owns
   job_descriptions }o--|| jd_revisions : selects_initial_and_current
   jd_revisions ||--o{ jd_operations : expected_and_result
+  jd_revisions ||--o{ jd_area_selections : selects_ordered_areas
+  jd_area_revisions ||--o{ jd_area_selections : reuses_fixed_content
   job_files {
     uuid job_file_id PK
   }
@@ -51,21 +55,51 @@ erDiagram
     uuid result_revision_id FK
     jsonb request_payload
   }
+  jd_area_revisions {
+    uuid job_file_id PK,FK
+    uuid area_id PK
+    uuid content_revision_id PK
+    text title
+    text scope_text
+  }
+  jd_area_selections {
+    uuid job_file_id PK,FK
+    uuid revision_id PK,FK
+    uuid area_id PK,FK
+    uuid content_revision_id FK
+    int position
+  }
 ```
 
 - `job_descriptions` 選初始與目前正式修訂；初始身分不改。固定修訂的父修訂、head、操作結果均以**同檔案的複合 FK**約束，不能指到另一檔案。
 - `jd_revisions` 保存四個獨立文字欄位，不把整份 JD 存 JSON／Markdown。修訂與原操作不允許 UPDATE／DELETE；空 JD 的四欄為 null，表示尚未提供，不是已確認沒有。
 - 有內容改變才建立新修訂並移動 head。改回相同舊文字仍建立新的修訂身分；只設為目前相同值則沿用修訂，但原命令仍有可重送結果。
 - `jd_operations` 保存原命令的預期基底、型別化修改與結果修訂。JSONB 是原操作意圖，不是第二份可編輯 JD；結果透過固定修訂取回，不複製一份完整結果正文。
-- 每次改動目前只複製四個小欄位，不引入內容定址、delta 或事件重播。後續大集合應以固定選用／關聯式項目接入，不可讓舊修訂沿用可變最新子項、也不可把本切片做法擴成每次無條件複製全份 JD。具體方案由後續切片測例決定。
+- 每次改動只複製四個小欄位及職責選用鍵／排序；職責正文未變就重用固定內容修訂，不引入內容定址、delta 或事件重播。後續其他集合沿此不變量接入，不可讓舊修訂讀可變最新子項，也不可無條件複製整份 JD。
 
 UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。這不是把 ORM 的版本計數器當作永久歷史，亦不是要求 LLM 填修訂號。
+
+### 2.1 職責集合：身分、固定正文與排序分開
+
+`area_id` 是職責身分，`content_revision_id` 是一次固定標題／範圍正文；每份 JD 修訂以 `jd_area_selections` 選定這些內容及順序。每個 JD 修訂對同一職責只能選一個內容修訂，同一位置只准一項，複合 FK 限同檔案。沒有將 JD 標題當身分，也不沿用 Memory 的同層 title 唯一規則。
+
+- 新建在末尾，`title`／`scope_text` 至少一個非空；未知欄位可 null，不硬造職責內容。這是沿既有 JD 草稿的合法內容界線，不要求兩欄必填。
+- 改內容保持 `area_id`、新增固定內容修訂；未指定欄位保留，指定 null 明確清空，但不能清成無內容。改回先前文字仍有新修訂。
+- 排序只改選用順序、不複製正文；放到已在的位置不新增 JD 修訂。HTTP 以 `before_area_id` 選相鄰目標，null 放末尾；不能指定別份 JD 的物件或任意 position。
+- 刪除只移除新 JD 的選用；先前正式修訂、原操作結果及正文仍可回查。同名重建是新 `area_id`，不偷接舊身分。
+- profile 修改必須複製原職責選用；職責修改必須保留 profile。讀取先固定一次 JD head，再依固定選用讀內容，不以多次 latest 查詢拼出混版。
+
+固定內容／選用禁止 UPDATE／DELETE。正式初始／目前 head 及已保存操作結果對應的修訂也禁止事後追加選用；新選用必須在同一短交易、採用 head／保存原結果**之前**完成。這是目前人工修改路徑的歷史保護，不代表 DB 管理員任意 SQL 都被業務授權；T08 接 A 正式採用時須延伸相同保障，不能漏掉新的採用途徑。
+
+**任務尚未接入。**後續刪職責仍須同次保留任務、轉未歸屬並保留原順序；不能因這個切片目前只有空群組，就將任務設成 cascade delete。此效果依工具覆蓋及 T03 原反例，不在本頁新增業務規則。
 
 ## 3. 人工編輯與原結果接續
 
 HTTP shape 的唯一來源為 [request schema](../../apps/api/contracts/http/revise-jd-profile-request.schema.json)與 [view schema](../../apps/api/contracts/http/jd-profile-view.schema.json)，生成 Python／TypeScript；使用路徑見 [backend README](../../apps/api/README.md)。不是本輪新增的模型工具 schema。
 
 HTTP 的 `expected_revision_id` 是使用者畫面讀到的正式基底，`command_id` 辨認同次送出。新的修改不得默默換成最新基底重試；保存確認不明時，保留原命令及原內容重送。`set_field` 只提供指定欄位的完整新值；清空用 `clear_field`。未指定欄位保留；同命令重複指定同一欄位拒絕，不猜先後覆蓋。blank／NUL／錯欄位在修改前拒絕。
+
+職責 HTTP 的唯一 shape 見 [edit request](../../apps/api/contracts/http/edit-jd-areas-request.schema.json)及 [collection view](../../apps/api/contracts/http/jd-areas-view.schema.json)。每命令有界修改一個職責，可同時修改其標題／範圍；整批全成或全拒。回原結果的集合投影不暴露內部內容修訂，也不是要模型傳 command／revision。與 profile 共用 `jd_operations` 命令空間，不能用同 ID 換成另一類 JD 動作。
 
 ```mermaid
 sequenceDiagram
@@ -104,5 +138,7 @@ sequenceDiagram
 - [PostgreSQL constraints](https://www.postgresql.org/docs/current/ddl-constraints.html)：複合主鍵／FK 可維護資料關係；本案用它限制同檔案修訂，不以 Python「先查存在」代替約束。
 - [PostgreSQL row locking](https://www.postgresql.org/docs/current/explicit-locking.html)：列鎖在交易結束釋放；本案延用已建立的檔案列鎖，把准入與正式修改放同一短提交，不持鎖等待模型或人。
 - [SQLAlchemy version counter](https://docs.sqlalchemy.org/en/21/orm/versioning.html)：ORM counter 的 flush 衝突檢查不是自動保留完整歷史。因此採 JD 自己的固定修訂／head／原結果，不增加通用版本平台。
+- [SQLAlchemy INSERT FROM SELECT](https://docs.sqlalchemy.org/en/21/tutorial/data_insert.html#insert-from-select)：profile 改動由既有固定選用複製小型關係鍵，不先把全部正文讀回再寫一份。職責新增／修訂才寫新正文，其餘選用重用固定修訂。
+- [datamodel-code-generator enum 命名](https://datamodel-code-generator.koxudaxi.dev/cli-reference/field-customization/#capitalize-enum-members)：生成 Python enum 成員用大寫常數，避免 `title` 與 `str.title` 方法衝突；JSON 的 `title` 等 wire 值不變。修生成器而非手改 DTO，原 schema／DTO round trip 及生成比對一起回歸。
 
-上述是官方機制；**三表切法、四欄局部修訂與重送順序是 Caliburn 的有界實現選擇**，不是聲稱所有大廠都用此 schema。沒有新增套件或框架，真 PG 證據見任務紀錄。
+上述是官方機制；**固定修訂、職責內容／選用分離與重送順序是 Caliburn 的有界實現選擇**，不是聲稱所有大廠都用此 schema。沒有新增套件或框架，真 PG 證據見任務紀錄。

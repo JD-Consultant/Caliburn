@@ -36,6 +36,7 @@ from caliburn.agent_execution.request_capacity import (
     validate_capacity_limits,
 )
 from caliburn.agent_execution.response_steps import ResponseAction, inspect_response_step
+from caliburn.agent_execution.result_save_retries import ResultSaveRetryPolicy, retry_result_save
 
 
 async def read_completed_response_history(
@@ -199,10 +200,12 @@ async def run_response_loop(
     recovery: HeldModelResponse | HeldInputCount | None = None,
     controls: ResponseLoopControls | None = None,
     resume_interrupt_id: str | None = None,
+    save_retry_policy: ResultSaveRetryPolicy | None = None,
 ) -> ResponseStepState | PausedResponseLoop:
     """Continue complete native Steps to a final answer within a fixed saved limit.
 
-    This does not commit the product Turn, retry failed I/O, or refresh context.
+    This does not commit the product Turn or refresh context. Only intact result
+    save failures receive bounded local recovery, not arbitrary failed I/O.
     Recover with None and the original limits/bindings. A native pause is a typed
     result, not failure; release it only with the current interrupt ID after the
     product owner authorizes resume. Ordinary recovery cannot grant that authority.
@@ -219,6 +222,7 @@ async def run_response_loop(
         recovery=recovery,
         controls=controls,
         resume_interrupt_id=resume_interrupt_id,
+        save_retry_policy=save_retry_policy or ResultSaveRetryPolicy(),
     )
 
 
@@ -230,6 +234,7 @@ async def run_response_step(
     runtime: ResponseStepRuntime,
     max_tool_calls: int,
     recovery: HeldModelResponse | HeldInputCount | None = None,
+    save_retry_policy: ResultSaveRetryPolicy | None = None,
 ) -> ResponseStepState:
     """Start a fresh Step or resume it with None; callers still own single-writer eligibility.
 
@@ -244,6 +249,7 @@ async def run_response_step(
         max_tool_calls=max_tool_calls,
         max_model_steps=None,
         recovery=recovery,
+        save_retry_policy=save_retry_policy or ResultSaveRetryPolicy(),
     )
     if isinstance(result, PausedResponseLoop):
         raise ValueError("Single-Step execution cannot own a pause interrupt")
@@ -251,6 +257,48 @@ async def run_response_step(
 
 
 async def _run_response_flow(
+    checkpointer: BaseCheckpointSaver[str],
+    *,
+    thread_id: str,
+    request: ResponseRequest | None,
+    runtime: ResponseStepRuntime,
+    max_tool_calls: int,
+    max_model_steps: int | None,
+    recovery: HeldModelResponse | HeldInputCount | None,
+    controls: ResponseLoopControls | None = None,
+    resume_interrupt_id: str | None = None,
+    save_retry_policy: ResultSaveRetryPolicy,
+) -> ResponseStepState | PausedResponseLoop:
+    async def run_or_reconcile() -> ResponseStepState | PausedResponseLoop:
+        nonlocal request, recovery, resume_interrupt_id
+        try:
+            return await _run_response_flow_once(
+                checkpointer,
+                thread_id=thread_id,
+                request=request,
+                runtime=runtime,
+                max_tool_calls=max_tool_calls,
+                max_model_steps=max_model_steps,
+                recovery=recovery,
+                controls=controls,
+                resume_interrupt_id=resume_interrupt_id,
+            )
+        except (ResponseStepSaveError, InputCountSaveError) as error:
+            # The request and any prior interrupt have already been consumed.
+            # Preserve exact native output/operation identities, never submit input again.
+            request = None
+            resume_interrupt_id = None
+            recovery = error.recovery
+            raise
+
+    return await retry_result_save(
+        run_or_reconcile,
+        errors=(ResponseStepSaveError, InputCountSaveError),
+        policy=save_retry_policy,
+    )
+
+
+async def _run_response_flow_once(
     checkpointer: BaseCheckpointSaver[str],
     *,
     thread_id: str,

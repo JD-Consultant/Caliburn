@@ -316,8 +316,32 @@ Ruff check／format **223 files**、mypy **154 source files** 通過。文件 **
 
 獨立 reviewer 接受本切片，未發現可重現的阻擋缺陷；其窄複核真 PG **4 passed**，另以 **6 個 probe** 檢查 pending Step／control、輪中 C、未提交準備位置、缺失位置及返回複本。這是 reviewer 的分層複核，不與主代理 676 項加總。角色固定輸入、正式業務完成及 B 候選共同回退仍按上述後續任務交付；兩位子代理均已結束。
 
-## 16. 下一個可執行切片
+## 16. 第十六切片：原件補存的有限自動恢復
+
+承接 `cc564072`。依當前 LangGraph 節點重試、Azure Retry pattern、Tenacity 異步重試及 Psycopg／PostgreSQL SQLSTATE 契約，選擇原件 handoff 層的有限調度，不對模型 node 加無差別 retry。機制、圖及精確限制只維護於[工程 §5.6](../../../implementation/agent-execution.md#56-原件補存的有限自動恢復t06-第十六切片)。Tenacity 9.1.4 原已在 lock，現在列直接依賴；無新增套件版本、資料表或第二套保存。
+
+主代理接四個既有入口、原請求／interrupt 續作及跨 saver 整合；子代理限定 driver 錯誤分類與單元測試。按 TDD／驗證 skill 保留反例、再獨立審查，不把工程細節再交 Owner 審批。
+
+- 新測試最初缺少 module 的收集失敗不算行為 Red。子代理分類骨架的行為 Red 為 **17 failed／54 passed**；主線接上分類骨架時原件不會重試，**11 failed／9 passed**。分類實作後主線 **20 passed**，追加既有 pause 恢復與下游工具錯誤界線後 **22 passed**。
+- 自動接回同一完整 R／C／count、確認遺失先讀原保存、永久錯誤不自動嘗試、用盡保留原 handoff、程序取消直接傳遞、已取消 writer 不派工具；恢復已消耗 interrupt 後若保存失敗，不重送 resume。工具已進入而失敗不被保存 retry 接管。
+- 真 PG＋官方 AsyncPostgresSaver 六案：R／C／count 各在保存前／實際提交後失去確認，程序仍持有原結果時自動核對；關閉並重開 saver 後相同結果、原外送／記帳不重複。主代理新專項（22 項追加前）**97 passed in 4.42s**，含 71 分類、20 流程、6 PG。這是合成 SDK MockTransport、實際 saver 提交與重新連線，不是外部 provider 或整程序 kill 後找回未存原件。
+
+無 SQLSTATE 的 Psycopg `OperationalError` 可能亦是認證設定問題，只能有限嘗試；不解析錯誤文字猜測。永久錯誤／語意衝突不改成成功，未知外送仍停在原 attempt。未讀 `.env`、未外送真模型、無 production schema 操作。本切片不等於 T06／完整產品恢復驗收；整合回歸與獨立審查結果接續補記。
+
+獨立 reviewer 找到 P2：task 在 Tenacity backoff 被取消時，原完整結果仍在程序裡，但 plain `CancelledError` 沒有 handoff，呼叫方無法承接。主代理以真正的 task cancellation 重現 R／C／模型計數／準備計數 **4 failed**（皆缺原 handoff）；核 Python 取消與 Tenacity sleep hook 後，在共用等待層交回仍屬取消的型別及原保存錯誤。四案接續原結果而不重呼，連既有測例 **26 passed**；再驗補存完成後於工具期間取消，不附上舊 handoff，整檔 **27 passed**。没有新增原件 DB 或各角色的取消處理副本。
+
+後段取消測例最初直接在 node 拋 `CancelledError`，LangGraph 將其轉為 `NodeCancelledError`；受影響回歸因此 **1 failed／742 passed**。這不是外層 task 被取消的等價情境，已改成 Event 確認抵達工具後對實際 task 取消，沒有放寬產品斷言或改框架行為。最終回歸與 reviewer 複核於下方記錄；上一次取消補正前 **738 passed** 不當作最終版本證據。
+
+獨立窄複核 **98 passed**（27 流程＋71 分類）及另 5 個探針：原 R／request／attempt／operation seed 未換、等待取消仍為 cancelled、後段真 task 取消沒有 stale handoff；另核巢狀 compact、timeout 與標準 traceback。Reviewer 已關閉原 P2，未發現本次增量需要修正的缺陷；這次複核沒有重跑 PG／全套，不能與主代理回歸加總或當成完整角色恢復。兩位子代理均已結束。
+
+最終主代理完整後端 `pytest -q -p no:cacheprovider --tb=short`，使用明確 loopback 測試 PostgreSQL：**1229 passed in 269.71s**。這次包含取消補正與真 PG 整合，不使用前次未修測例的回歸數字。Ruff check／format **228 files**、mypy **156 source files** 通過；文件 **20 份／349 links** 零錯、diff check 通過。七張工程 Mermaid 圖已渲染並檢視新增補存圖；首次 sandbox headless 啟動受限後沿獲准 renderer 完成。之後只補取消交接文字，未再改圖。
+
+`uv sync --locked --offline` 通過（86 個既有相依，重建本地 target package）；僅將已鎖定 Tenacity 列為直接依賴。全部測試仍為離線模型／SDK 合成資料與真測試 DB，不是 OpenAI 遠端／訪談品質驗收。T06 與整個 Goal 均未完成；原件可恢復不等於完整角色 supervisor 已接好。
+
+## 17. 下一個可執行切片
 
 接角色控制、真實費率配置及未明 attempt 的恢復調度。共同 loop 已有完整 request、sync／局部步數、原 R／C／count 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用、完整 Step pause 與已確認 provider 故障的有界重試；未配置 compact 接縫仍明確停止。第十四、十五切片已有輪前可恢復準備與合法跨工作基底；準備後固定並追加角色資料、B 兩角色與候選安全點共同回退，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度仍須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
-一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。
+一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。第十六切片已為仍完整的原 R／C／count 接上有限補存，不重呼原付費請求；不能據此跳過未知 attempt 或角色恢復責任。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。
+
+下一切片費率的查證入口（2026-09-30，僅研究、未實作）：[官方 pricing](https://developers.openai.com/api/docs/pricing)明確區分 Standard／其他 tier、短／長 context、cache read／write；[prompt caching 的成本範例](https://developers.openai.com/api/docs/guides/prompt-caching#monitor-cache-performance)將普通輸入視為 input 減去 cached 與 cache-write tokens。已核本機 SDK 3.20.0 `ResponseUsage` 也有兩欄；不得只用 input／output 兩個數字算費用或把 cache writes 當免費。`CompactedResponse.usage` 亦為 `ResponseUsage`，但壓縮的實際適用費率、token-count 計費、模型／tier 綁定與行政預留仍須再核官方契約；不能由型別一樣推定帳單相同。沿既有 `ModelRequestAccounting` 接線，不另建費用服務，不據本研究自動改模型選擇。

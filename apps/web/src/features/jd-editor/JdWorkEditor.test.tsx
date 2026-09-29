@@ -31,7 +31,15 @@ afterEach(() => {
 });
 
 test('建立職責只送表單內容與捕捉基底，成功後讀取同版職責任務', async () => {
-  const current = { revision_id: revision, areas: [], tasks: [], capabilities: [], task_links: [] };
+  const current = {
+    revision_id: revision,
+    areas: [],
+    tasks: [],
+    capabilities: [],
+    task_links: [],
+    collaborators: [],
+    conditions: [],
+  };
   const updated = {
     ...current,
     areas: [{ area_id: areaId, title: '網站交付', scope_text: '約定前端範圍' }],
@@ -63,6 +71,8 @@ test('建立職責只送表單內容與捕捉基底，成功後讀取同版職�
 });
 
 const original: JdWorkView = {
+  collaborators: [],
+  conditions: [],
   revision_id: revision,
   capabilities: [],
   task_links: [],
@@ -127,6 +137,8 @@ test('原目標後來已刪除仍能 remount 重新確認同命令，不復活�
         tasks: [],
         capabilities: [],
         task_links: [],
+        collaborators: [],
+        conditions: [],
       };
       return attempt === 1
         ? Promise.reject(new TypeError('lost response'))

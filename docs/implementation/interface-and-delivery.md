@@ -1,6 +1,6 @@
 # 介面、公開訊息與本機交付
 
-- 狀態：**工程設計；T02 檔案 UI、T03 JD 基本資料、職責／任務及共用知識／技能關係人工編輯已實作，其餘依任務 gate**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
+- 狀態：**工程設計；T02 檔案 UI、T03 JD 基本資料與全部集合人工編輯已實作，候選及其餘依任務 gate**。上位：[運作與交付](../architecture/delivery-and-operations.md)、[核心閉環](../specs/2026-09-29-core-value-loop-lifecycle.md)。不增加雲端登入、多人權限或 Memory 操作台。
 
 ## 1. API 與 UI 的責任
 
@@ -85,6 +85,17 @@ sequenceDiagram
 - 定義與關係命令共用 §1.3 的原基底、待確認／重開及 cache 失效邊界；原命令結果再度取得也不覆寫目前新稿。profile／集合互相刷新，沒有獨立 `/capabilities` latest 拼接或樂觀宣告保存。
 
 研究核對 [MUI Select](https://mui.com/material-ui/react-select/) 的標籤／受控選取及 §1.2 的 React／Query 契約；目前用既有元件即可，不為局部選取新增搜尋或表單框架。MUI 不是資料准入、原子性或重送的 owner。桌面／390px、共享修改及實際丟失回應的證據見 [T03 §9](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#9-第七切片共用知識技能與任務關係人工-ui2026-09-29)。
+
+### 1.5 T03 協作對象與共通條件的人工編輯
+
+[CollaboratorsSection](../../apps/web/src/features/jd-editor/CollaboratorsSection.tsx)及[ConditionsSection](../../apps/web/src/features/jd-editor/ConditionsSection.tsx)是同一編輯器的集合呈現；各自的 Fields 元件管理固定開啟基底的局部草稿。仍沿 §1.3 的單一待確認命令、Dialog、schema guards 及重讀，不新增保存機制或另一套操作引擎。
+
+- 協作對象填已知名稱與合作範圍，至少一項有內容；未知名稱可空，不因合作推定主管。只改有變動欄位；清空已知名稱但保留範圍是明確 null，不是刪除物件。
+- 共通條件以五種既定分類及正文呈現，新增時須明確選分類，不代猜預設。分類內上移／下移；更正分類保留原身分、追加於新類末尾。共通條件不自動變成任務要求，未知不等於沒有或不需要。
+- 刪除需確認，只移除目前選用，歷史仍保留。新集合從同版 `/jd/work` 取得；未知結果重開後沿原請求確認，確認成功再 GET 目前稿，不將舊結果寫回 cache。
+- 回傳 schema 及 TypeScript 由同一份來源生成；顯示分組／文案是 UI 投影，不另存第二份 server state。既有草稿不因背景查詢改基底。
+
+2026-09-29 再核 [React state 原則](https://react.dev/learn/choosing-the-state-structure)、[TanStack invalidation](https://tanstack.com/query/latest/docs/framework/react/guides/invalidations-from-mutations)、[MUI Select](https://mui.com/material-ui/react-select/)；目前元件足以承接，無需新表單／分類框架。這些來源支持 state／呈現機制，交易、固定歷史與原命令保證仍由 Caliburn owner 承接。驗證與限制見 [T03 第九切片](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md#11-第九切片協作與條件人工-ui2026-09-29)。
 
 ## 2. 串流不是保存權威
 

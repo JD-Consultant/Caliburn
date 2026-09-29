@@ -14,6 +14,10 @@ import editJdAreasSchema from '../../../../api/contracts/http/edit-jd-areas-requ
 import editJdTasksSchema from '../../../../api/contracts/http/edit-jd-tasks-request.schema.json' with { type: 'json' };
 import jdCapabilitiesSchema from '../../../../api/contracts/http/jd-capabilities-view.schema.json' with { type: 'json' };
 import editJdCapabilitiesSchema from '../../../../api/contracts/http/edit-jd-capabilities-request.schema.json' with { type: 'json' };
+import jdCollaboratorsSchema from '../../../../api/contracts/http/jd-collaborators-view.schema.json' with { type: 'json' };
+import jdConditionsSchema from '../../../../api/contracts/http/jd-conditions-view.schema.json' with { type: 'json' };
+import editJdCollaboratorsSchema from '../../../../api/contracts/http/edit-jd-collaborators-request.schema.json' with { type: 'json' };
+import editJdConditionsSchema from '../../../../api/contracts/http/edit-jd-conditions-request.schema.json' with { type: 'json' };
 import type { CreateJobFileRequest } from './generated/create-job-file-request';
 import type { InterviewHistory } from './generated/interview-history';
 import type { JobFile, JobFileList } from './generated/job-file-list';
@@ -27,12 +31,18 @@ import type { EditJdAreasRequest } from './generated/edit-jd-areas-request';
 import type { EditJdTasksRequest } from './generated/edit-jd-tasks-request';
 import type { JdCapabilitiesView } from './generated/jd-capabilities-view';
 import type { EditJdCapabilitiesRequest } from './generated/edit-jd-capabilities-request';
+import type { EditJdCollaboratorsRequest } from './generated/edit-jd-collaborators-request';
+import type { EditJdConditionsRequest } from './generated/edit-jd-conditions-request';
+import type { JdCollaboratorsView } from './generated/jd-collaborators-view';
+import type { JdConditionsView } from './generated/jd-conditions-view';
 
 const validator = new Ajv2020();
 addFormats(validator);
 validator.addSchema(jdAreasSchema, 'jd-areas-view.schema.json');
 validator.addSchema(jdTasksSchema, 'jd-tasks-view.schema.json');
 validator.addSchema(jdCapabilitiesSchema, 'jd-capabilities-view.schema.json');
+validator.addSchema(jdCollaboratorsSchema, 'jd-collaborators-view.schema.json');
+validator.addSchema(jdConditionsSchema, 'jd-conditions-view.schema.json');
 
 export const isJobFileList = validator.compile<JobFileList>(jobFileListSchema);
 export const isJobFile = validator.compile<JobFile>({
@@ -53,3 +63,9 @@ export const isEditJdTasksRequest = validator.compile<EditJdTasksRequest>(editJd
 export const isJdCapabilitiesView = validator.compile<JdCapabilitiesView>(jdCapabilitiesSchema);
 export const isEditJdCapabilitiesRequest =
   validator.compile<EditJdCapabilitiesRequest>(editJdCapabilitiesSchema);
+export const isJdCollaboratorsView = validator.compile<JdCollaboratorsView>(jdCollaboratorsSchema);
+export const isJdConditionsView = validator.compile<JdConditionsView>(jdConditionsSchema);
+export const isEditJdCollaboratorsRequest =
+  validator.compile<EditJdCollaboratorsRequest>(editJdCollaboratorsSchema);
+export const isEditJdConditionsRequest =
+  validator.compile<EditJdConditionsRequest>(editJdConditionsSchema);

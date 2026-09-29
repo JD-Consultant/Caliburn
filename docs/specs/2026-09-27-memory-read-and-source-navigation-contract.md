@@ -1,7 +1,7 @@
 # Memory 導覽、正文讀取與來源回查契約
 
-- 日期：2026-09-27；最後核對：2026-09-29。
-- 狀態：**PROD-G2-010 已確認的目標讀取效果／WORKING；工程契約於 2026-09-29 收斂，未實作、未驗收。**下文選定模型分支、起始範圍及錯誤語意；生成 schema、來源定位與保存接線仍須實作驗證，不把設計收斂稱為 wire 通過。
+- 日期：2026-09-27；最後核對：2026-09-30。
+- 狀態：**PROD-G2-010 已確認的目標讀取效果／WORKING；T05 讀取切片已實作及局部驗證，完整 Agent／provider 尚未驗收。**生成 schema、三角色讀取與來源定位已通過契約及真 PG；範圍見 [工具接線](../implementation/memory-tools.md)。下文較早的「未實作／待驗」保留討論時序，不代表已通過全產品 gate。
 - 決策者：Product Owner；研究與維護：工程協作者。
 - 唯一責任：Memory map、情境／理解讀取回傳，以及從回傳來源繼續回查的介面效果。從[全產品導覽](../target-architecture-map.md)或[記憶子圖](2026-09-24-caliburn-layered-architecture-map.md)進入本頁。
 - 上位規則：[內容欄位與來源分離](../product-concept.md#工作情境與工作理解的三個內容欄位目標未實作)、[固定版本鏈](2026-09-24-caliburn-layered-architecture-map.md#來源與版本)、[B1／B2 權限](2026-09-25-b1-b2-information-gap-lifecycle.md#讀寫權限與交接資料007目標已確認)。本頁不重定分析方法、版本或發布責任。

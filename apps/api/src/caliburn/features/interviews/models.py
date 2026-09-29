@@ -60,6 +60,18 @@ class InterviewReadError(ValueError):
     """The entire selection is invalid, unavailable or outside the App-bound scope."""
 
 
+class InvalidInterviewSelectionError(InterviewReadError):
+    """Correct the selection shape or ordering, without changing its App scope."""
+
+
+class InterviewScopeError(InterviewReadError):
+    """A requested sequence exceeds the caller's fixed read boundary."""
+
+
+class InterviewSourceNotAvailableError(InterviewReadError):
+    """At least one selected source lacks formal membership within the scope."""
+
+
 @dataclass(frozen=True, slots=True)
 class StoredInterviewInput:
     source_id: UUID

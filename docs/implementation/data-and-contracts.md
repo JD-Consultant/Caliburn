@@ -68,6 +68,8 @@ JD `read_ref` 解到本輪 JD identity／型別與合法內容基準；Memory `t
 
 模型 schema 與 HTTP 不強求相同：HTTP 需要保存／預覽狀態，tool 只回推理下一步所需資訊。模型 strict wire 是薄編譯邊界：有限 variants、required／additionalProperties 按 provider 子集，語意上未列 change 仍是保留，不把 null 當清空。生成後以真 SDK payload 驗，而非只測 Python class 建得出來。
 
+T05 的生成器亦將 tools 原 schema 複製為安裝包內唯讀資源，`--check` 驗 byte 一致；provider definitions 使用這份生成副本，不從 DTO 再生另一個 shape。離線 SDK payload 不等於遠端 strict 接受；實測範圍依 [Memory 工具接線](memory-tools.md)。
+
 原始 Responses items 不塞進自製 message schema；按官方 SDK output→input 轉換後保留必要 metadata、opaque bytes 與順序，兩種方向各有 round-trip 測例。生成檔不手改；CI 再生成比 diff。新 schema 尚未產生前，本文不宣稱任何 wire 已完成。
 
 ## 6. 資料演進與恢復

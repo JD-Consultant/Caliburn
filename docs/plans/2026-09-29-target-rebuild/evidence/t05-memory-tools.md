@@ -40,8 +40,24 @@ $env:PYTHONUTF8 = '1'
 
 本切片未碰 DB schema／交易，故依風險執行純運算、unit／contract 及靜態驗證，沒有重跑 PostgreSQL 整合；多欄原子採用仍是下一切片的真 DB gate。
 
-## 3. 下一個可執行切片
+## 3. 第二切片：按需讀取與來源導航（2026-09-30）
 
-保持 T05 未完成。承接 T04 候選／快照公開介面，建立唯一 schema、角色工具與按需投影；先用原操作重入／title 重用、跨層拒絕及多欄後段 hunk 失敗作真 PG 反例。薄工具不複製資料 owner、版本或原操作結果。工具成功必須返回真實採用位置與差異，不能把請求 echo 成效果。
+主代理接線與文件；子代理在明確限定的 schema／生成器／contract tests 範圍施工，完整讀相應規範後完成，再做一輪唯讀權限／來源／基準審查。沒有各造一套保存；接線唯一說明見 [Memory 模型工具](../../../implementation/memory-tools.md)。
+
+- 研究：主代理使用 OpenAI Docs 技能讀官方 [strict mode](https://developers.openai.com/api/docs/guides/function-calling#strict-mode)，明確 `strict: true`、closed objects／required、巢狀分支；未將 SDK 能序列化當成遠端接受。schema 本身是唯一 shape，生成原樣 package resource，避免 Python DTO 再生不同 wire。
+- 行為 Red：`MemoryReadWorkflow.read_map` 先返回空集合；真 PG 候選新增後要求 `盤點` 的測例 **1 failed**。不是 missing import 當行為 Red。補上既有候選 map owner 接線後通過。
+- 真 PG 新增 7 項場景：候選 map 更新；改名／標題重用仍沿原物件引用；A 固定舊快照與原本空基準；B1 越層／舊 stage／取消拒絕；批次訪談上界；工具完整精簡回传／合法空來源／不合法選取；容量整筆拒絕。另於同一 read 的 map／正文之間注入真 DB 刪除與同名建立，證明本次 view 不混版，下次才看到新位置。
+- 7 份讀取 schema 加共同 rejection schema，生成 Python／TS 與 8 份包內 JSON；參數禁止模型填 execution／snapshot／scope。63 個生成／契約案例與 5 個工具／離線 SDK 案例通過；schema 缺少時的生成失敗只算施工檢查，不冒充產品行為 Red。
+- `pytest tests/unit tests/contracts` 加全部 `test_memory*`／`test_interview*` PostgreSQL 整合檔：**444 passed in 81.92s**。使用既有 55439 隔離 test DB、每測試新 schema；未停止共享 DB、未讀舊資料。
+- Ruff check／format 通過（143 files）；mypy 通過（122 source files）；生成器 `--check`、前端 TypeScript 檢查通過。工具 output DTO 失效不被當成模型參數錯誤；基礎設施 timeout 交 Runtime 的控制測試通過。
+- uv 建 wheel 成功，檢查 **8** 個 tools schema；直接由 wheel 的 Python resources 讀取訪談 schema，bytes 與正式來源相同。未發布或替换 production 環境。
+- 獨立快審沒有確認的新 finding；它未重跑 DB／wheel，這兩項由主代理實測。沒有聲稱審查能證明絕無缺陷。
+- 文件檢查 16 檔、267 連結、0 errors；初次將既有 HTML anchor 誤報缺失，已修檢查器辨認顯式 anchor，未任意改責任連結。主代理生成檢查曾受 Windows 沙盒子程序暫存 ACL 阻擋，改以授權本地命令重驗，不改產品機制繞過。
+
+上述沒有付費 API、外送員工資料或讀取金鑰。Native tool-call 保存／配對、模型接續、真 provider strict 與模型導航品質尚未驗證；單次讀取的字元上限不是 T06 token 預算。
+
+## 4. 下一個可執行切片
+
+保持 T05 未完成。讀取已接；下一步承接 T04 候選公開介面，建立 create/update/delete 模型契約及薄寫入工具。用原操作重入／title 重用、跨層拒絕及多欄後段 hunk 失敗作真 PG 反例。薄工具不複製資料 owner、版本或原操作結果。Update 成功必須返回真實採用位置與差異，不能把請求 echo 成效果。
 
 本輪不呼叫付費模型、不讀密鑰／原始員工資料；無 provider strict／真模型品質證據。後續接線須依 T06／T16 有界 preflight 與 T17 品質 gate，不能用離線通過替代。

@@ -56,7 +56,7 @@
 ## T05 Memory 讀寫工具與唯一 V4A
 
 - [ ] T05；依賴：T04。
-- **進度（2026-09-30）：**先交付受限 V4A 純編輯器：官方語法抽取、全體合格位置唯一、原文保留與全 hunk 拒絕；模型 schema／角色 handlers／候選交易與實際效果回傳尚待接線。[切片證據與下一步](evidence/t05-memory-tools.md)，不先勾 T05／V19 整體完成。
+- **進度（2026-09-30）：**受限 V4A 純編輯器已提交 `3dc82ff7`。續完成 read schema／生成資源、三角色讀取 handlers、固定快照／候選最新位置及來源導航；受影響 unit／contract／真 PG 共 444 passed。寫入工具／候選多欄交易接線與實際效果回傳仍待完成。[切片證據與下一步](evidence/t05-memory-tools.md)，不先勾 T05／V19 或 provider 整體通過。
 - **契約：**[共同工具規範](../../specs/2026-09-27-agent-tool-contract-design-research.md)、[讀取](../../specs/2026-09-27-memory-read-and-source-navigation-contract.md)、[更新](../../specs/2026-09-27-memory-object-update-tool-contract.md)；修改語意時須完整讀相應章節。
 - **程式／交付：**schema、角色可用 handlers、Memory 投影與受限 V4A adapter；沿既有研究定位 parser／helper，鎖來源及 license。
 - **Red：**零／多處精確或近似匹配、兩個相似段落、multi-hunk 後段失敗、正文外 path 操作、跨層越權、title 改名重用後原 operation 重入。

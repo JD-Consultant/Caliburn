@@ -1,0 +1,63 @@
+{
+  "scope": "DISPOSABLE CONTEXTUAL-HUNK PROBE; NO PARSER OR PRODUCT ACCEPTANCE",
+  "rapidfuzz": "3.14.6",
+  "checks": 7,
+  "rows": [
+    {
+      "name": "context_selects_second_function",
+      "status": "applied",
+      "method": "exact",
+      "matches": 1,
+      "characters": 179,
+      "elapsed_ms": 0.016
+    },
+    {
+      "name": "context_survives_prefix_shift",
+      "status": "applied",
+      "method": "exact",
+      "matches": 1,
+      "characters": 218,
+      "elapsed_ms": 0.012
+    },
+    {
+      "name": "fuzzy_context_is_not_rewritten",
+      "status": "applied",
+      "method": "fuzzy_lines",
+      "matches": 1,
+      "characters": 162,
+      "elapsed_ms": 0.098
+    },
+    {
+      "name": "duplicate_complete_hunk_rejected",
+      "status": "ambiguous",
+      "method": "exact",
+      "matches": 2,
+      "characters": 162,
+      "elapsed_ms": 0.004
+    },
+    {
+      "name": "two_near_complete_hunks_rejected",
+      "status": "ambiguous",
+      "method": "fuzzy_lines",
+      "matches": 3,
+      "characters": 163,
+      "elapsed_ms": 0.018
+    },
+    {
+      "name": "wrong_context_not_ignored",
+      "status": "no_match",
+      "method": "fuzzy_lines",
+      "matches": 0,
+      "characters": 80,
+      "elapsed_ms": 0.005
+    },
+    {
+      "name": "long_chinese_hunk_preserves_actual_context",
+      "status": "applied",
+      "method": "fuzzy_lines",
+      "matches": 1,
+      "characters": 117145,
+      "elapsed_ms": 5.258
+    }
+  ]
+}

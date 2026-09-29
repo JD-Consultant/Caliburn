@@ -258,3 +258,66 @@ Saver 工具序列與 JD revision 對照可定位接合點：模型首次提出�
 本批在只完成 1 個新回合後主動停止，因剩餘 23 筆請求不足以安全承諾下一個同等長度回合；`serve.finished.json` 顯示 `reason=requested`、App／Saver 關閉成功、無 in-flight／unknown。這 23 筆是**未使用的舊批餘額，不是可重啟帳本或自動增加的新授權**。下一步先在此停止資料上完成唯讀 JD／來源品質審核與長回合成本診斷；若需要正式行為改動，必須先給具體反例、讀其設計／測試，再提出最小 owner 修正。新的付費續談需另立可核對的批次與停止線；完整專業 JD、來源語意逐項驗收及 Browser journey 仍 OPEN。
 
 **停止後的 JD 定位與來源窄核：**第 47 次 `jd_revise_work` 首次把職務目的正文送入 `reports_to`（直屬主管）的 App-issued field ref；後續模型自行將該欄清空，並把相同正文寫入 `purpose`。正式 revision 5 的 `reports_to=null`、`purpose` 為已揭露收貨／出貨／盤點／年度封存範圍的概述。依既有 Domain 的來源保留規則，錯置文字附帶的六筆舊來源仍在空的 `reports_to` 上，但六筆的 basis digest **全部是 `needs_recheck`**；`purpose` 六筆及其他目前有內容的十二筆來源為 `current`。以正式 `ConversationSourceService` 唯讀查回七個不同原始訪談窗口，逐項對照目前收貨 Duty／Task／五個細節、職稱與目的，**未在這 18 筆 current link 中發現像前一隔離批次出貨 Duty 掛純庫存原話的確定反例**；六筆 stale 連結不應被 UI 或驗收者當成目前 `reports_to` 有證據。這是有限人工語意窄核，不替代全稿 Q11 或 Browser 來源導覽。第 63 次 `jd_read` 的 296 字元 cursor 不等於先前成功 read 發出的任一 `next_cursor`（僅第 54、62 次有發出）；最相近的新游標雖有 158 字元相同前綴，仍不完全一致，故 `invalid_ref` 有具體無效輸入證據，尚不能斷言是模型手改、截斷或 adapter 轉換的哪一種生成原因。沒有因此修改 JD ref、source retention、分頁或 Runtime validator。
+
+### 同文件第二次續談：長工具迴圈的唯讀瓶頸診斷
+
+2026-09-23 沿上述隔離文件與既有 P3 `continuation-2` 帳本，只讀已停止 run 的正式 PostgreSQL／Saver 與 test-only usage；沒有恢復執行、外送模型、改正式程式或清除資料。第二次續談只有一個新增員工回合，59 筆已結算 GPT-6 Luna 請求（56 筆帶 20 個 A 業務工具、3 筆無業務工具的摘要），合計 4,126,730 input tokens（其中 3,374,088 cached）、28,532 output tokens、US$0.142080905；provider 請求耗時合計約 433 秒。**Cached 不等於模型沒有接收這些 context。**同輪 55 個工具呼叫及結果配對完整：`read_file` 6、`jd_read` 15、`read_work_understanding` 5、`read_case` 8、`read_evidence` 19、JD writer 2。兩筆 writer `jd_insert_item`／`jd_create_task` 的正式工具結果均為 `committed`，因此不可把本輪歸類為「JD 完全沒有寫入」；完整 JD 品質仍未驗成。
+
+最有區辨力的重複模式是 `jd_read view=current` 的四次三頁完整掃描。第一次在 writer 前讀 revision R1；第二次在首次保存後讀 R2；第三次在第二次保存後讀 R3，這些跨版讀取不能當成無效重複。第四次工具序號 52–54 仍讀 **同一 R3**，三頁的 `revision_ref` 與回覆 bytes 分別逐頁完全等於第三次工具序號 27–29，大小約 31.7／30.6／23.6 KB，合計 **85,893 bytes**；中間沒有 JD writer。這額外消耗三個序列化模型／工具步驟，卻未引入新的 JD 內容。`jd_read` 全部結果約 342 KB；`read_evidence` 19 次僅 9 組不同參數、10 次精確重讀。這些原話回查可能有可見上下文及來源核對用途，不能因參數相同就阻斷；完整 `jd_read` 的最後同版重讀則是優先檢驗的低資訊增量候選。三次摘要發生在這個長回合中，最後一次後出現同版全稿重讀；**時序相關不等於已證明摘要造成重讀**。
+
+這應改寫成「長 JD 撰寫的逐次模型決策＋大頁回覆如何降低資訊效率，同時維持正確來源與保存真相」，而非單純「20 個工具太多」或「把 64 次上限加高」。A 的 schema 先前估算約 11.5K tokens，是真實固定開銷；但本輪平均每筆約 69.9K input tokens，主要瓶頸不能僅憑 schema 大小推定。既有 OpenRouter tool search 的回應 item 經鎖定 SDK／Saver 重播會遺失，尚不可切正式。官方 [OpenAI latency optimization](https://developers.openai.com/api/docs/guides/latency-optimization)與 [Anthropic effective tools](https://www.anthropic.com/engineering/writing-tools-for-agents)支持先減少不必要的模型往返、讓讀取結果只帶判斷所需內容；[OpenAI tool search](https://developers.openai.com/api/docs/guides/tools-tool-search)與 [Anthropic advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use)分別處理工具定義膨脹與大量中間結果，並非目前 OpenRouter／SDK 路徑的即插即用修法。[Microsoft Research 的 meta-tools 論文](https://www.microsoft.com/en-us/research/publication/optimizing-agentic-workflows-using-meta-tools/)亦是重複確定性子流程可合併的研究依據，**不是本案已授權新增 composite tool**；訪談與來源判讀仍需模型語意決策。[Lost in the Middle](https://arxiv.org/abs/2307.03172)只支持「更長 context 不自動保證資訊使用品質」，其實驗不直接證明本次 JD 錯漏根因。
+
+下一個零付費比較應在既有 JD read/model-view owner 內，對同一已保存 checkpoint 分別測目前完整頁、無損較小投影與聚焦的 `section`／`item` 讀取：記頁數、工具／模型步驟、request bytes、正確 current-revision target refs、所需正文／來源是否都可回查；不得截斷未處理員工原話或讓摘要冒充原始證據。只有這個對照仍不足時才討論**僅獨立 read-only** 呼叫是否能安全同批執行；既有 A 單工具 guard、B1／B2 staged state 與寫入序列不因效率研究直接放寬。若要變更正式工具呈現或 prompt，先給 Owner 看上述對照及品質反例，不造新 agent／DB／registry。**另有獨立的 Q12 保存真相反例：**本輪最後 assistant text 自稱「本輪我沒有完成新的保存」，但同輪 `jd_insert_item`／`jd_create_task` 的可信工具結果均為 `committed`。這不是費用／工具步數的推論，須按現有 receipt 與 final 呈現 owner 另行定位；效率優化不能把這項品質錯誤一起掩蓋。
+
+### 長工具迴圈的跨廠與論文複核：先量資訊增量，不改產品
+
+2026-09-23 以本節已停止的真實 trace 與正式 `jd_read` 契約為基準，核對 OpenAI／Anthropic 公開指南及三篇原始研究。這是**研究與候選排序**，不是認定某項正式工具已設計錯誤或授權切換。優化目標應是「維持 JD 正確性、來源涵蓋、保存與收尾真相時，每個模型步驟帶來多少必要資訊／有效修改」，不能只最小化呼叫數；同版回覆逐 byte 相同只證明資料庫沒有新增 JD 內容，**模型當時可見的資訊增量須另查 request view**（見下節），十次相同參數的原話重讀亦須看當時可見 context、引用需求與後續動作，不能自動禁止。
+
+| 公開方法與證據強度 | 原方法解決什麼 | 對本案的適用界線 |
+|---|---|---|
+| [OpenAI latency optimization](https://developers.openai.com/api/docs/guides/latency-optimization)、[agent evals](https://developers.openai.com/api/docs/guides/agent-evals)（官方指南） | 減少不必要的模型往返；用完整 trace 檢查工具選擇、結果及最終成敗；可由傳統程式確定的步驟不必交模型反覆推斷。 | 先逐次標示「JD 版本變了／取得新段落或證據／同版同內容／修正失敗」；不能因為 request 很多就取消必要的來源判讀。 |
+| [Anthropic effective tools](https://www.anthropic.com/engineering/writing-tools-for-agents)、[context engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)（官方工程文章） | 根據代表性軌跡觀察冗餘呼叫及無效參數；提供能支持下一步判斷的高訊號回覆，必要時使用範圍、過濾與精簡／詳細兩種讀取；逐層按需取資料。 | `jd_read` 已有 `current`／`section`／`item`，先比較現成聚焦讀取；「多分頁」本身也可能增加模型步驟，不能把縮小單頁 bytes 當成成功。原話與 issued target refs 不得被有損摘要冒充。 |
+| [OpenAI Programmatic Tool Calling](https://developers.openai.com/api/docs/guides/tools-programmatic-tool-calling)、[Anthropic advanced tool use](https://www.anthropic.com/engineering/advanced-tool-use)（不同服務的官方能力）及 [Microsoft Research AWO](https://arxiv.org/html/2601.22037)（論文） | 對可預測的多步讀取／過濾，讓程式處理中間結果、只把必要結果交模型；AWO 在兩個 benchmark 中用合併固定工具序列減少模型呼叫，但並非所有模型／任務都改善。 | 只是後順位研究方向：Caliburn 目前的 OpenRouter／SDK、單工具 guard、來源回查與 JD 寫入／receipt，沒有被這些文章證明可直接改成 hosted program 或 composite tool。每次結果需新語意判斷、或有副作用的寫入繼續由模型與既有 Runtime 明確交接。 |
+| [OpenAI tool search](https://developers.openai.com/api/docs/guides/tools-tool-search)（官方 API） | 按需載入工具**定義**，省固定 schema context；它不會自行減少 `jd_read` 或原話重讀。 | 現有 OpenRouter 搜尋 item 在鎖定 client／Saver 往返會遺失；此功能仍未驗成，不能拿其預期節省計入本輪方案。 |
+| [RedundancyBench](https://arxiv.org/html/2605.29893)、[Lost in the Middle](https://arxiv.org/abs/2307.03172)（研究論文） | 前者顯示判斷一步是否多餘要看完整軌跡及依賴，不宜只看相同參數；後者顯示長 context 的資訊使用可能受位置影響。 | 支持「保留必要核證、避免全量堆疊」的測法；它們**不能**證明本案十次同參數 `read_evidence` 均多餘，也不能推定三次摘要就是同版重讀的根因。 |
+
+**最低成本的下一個可證偽比較：**沿現有 JD read/model-view owner、同一已保存 checkpoint，先做不改正式契約的離線對照：原完整 `current`、現成 `section`／`item` 聚焦讀取、以及先前無損投影候選。記錄每條路徑取得完整所需 JD 正文／來源／App-issued target refs 的讀取次數下界、頁數與工具回覆大小；**離線投影不能宣稱真模型會少走幾步**，模型步數與品質之後才用另行有界的真模型測試核對。同版多次讀取是否真的因缺少可見內容或定位資訊而必要，須看當次 request view，不能只看 canonical Saver。若較短路徑失去正確引用、目標定位或 JD 品質，即使省 token 也不通過；若能保留，才討論是否調整 model-facing read 指引或呈現。當前不變更 Prompt、工具數、單工具 guard、compaction、Memory、Domain、provider，不新增 meta-tool／Agent／快取 authority。另將 Q12「已 committed 卻聲稱未保存」維持獨立 correctness gate，不能以步數改善代替。
+
+### 同一已保存 checkpoint 的 JD request-view／聚焦讀取對照（零付費）
+
+2026-09-23 只讀正式新 App 的 PostgreSQL／LangGraph Saver 與已停止的 `continuation-2` run，不啟動顧問、不外送模型、不修改產品資料。沿真正的 A `build_request_view` 重建**第 12 次 `jd_read`（第四次同版全稿掃描）決策前**的 child checkpoint：20 則 request-view 訊息中只看得到第 11 次 `conditions` 章節讀取；第 7–9 次的 R3 全稿三頁均已越過 v2 compaction 邊界，不在送模型的近期訊息。該次 1,093 字元摘要有 JD 工作進度，但沒有 R3 的精確 revision／定位引用。以先前三頁發出的同版目標 refs 逐一比對整個 request view：六章中僅 `conditions` 的 section ref 可見，11 個 item ref **0 個可見**。當時模型因此不能憑空合法指定其他章節／項目 ref；這是「canonical 相同內容」與「模型目前可見內容」的實際差別。它支持重新查回精確 JD 有用途，**不證明模型必須重讀全部三頁**，也不證明摘要直接造成該模型決策。
+
+以現有 `ReadService`／`ReadInput`、同一正式 R3、同一 run 的模型安全來源投影做離線對照；重新計算的 `current` 三頁與 Saver 第 12–14 次模型可見結果逐頁完全一致。下表的 bytes 是**JD 工具回覆本身**，不是 provider 完整 request 或 tokens；聚焦讀取均以 App 已發出的同版 ref 為輸入，不要求模型生成 ID。表中「步數」是讀完該範圍所需的序列化工具讀取次數，不等於已證真模型會採用。
+
+| 現有讀取路徑 | 頁／讀取步數 | 模型可見工具回覆 bytes | 正文／來源涵蓋與前提 |
+|---|---:|---:|---|
+| 完整 `current` | 3 | 85,893 | 84 records、31 個 source records；首頁 31,168 bytes 有六章 ref、三個 item，但沒有 source records，不能把缺頁當完整稿。 |
+| 六章 `section` 逐章讀全 | 8 | 88,650 | 同樣 84 records，正規化後與全稿 record 集合完全相同；需要先持有六個同版 section refs，本次決策前不具備。 |
+| 僅 `duties_tasks` 章節 | 3 | 60,994 | 53 records、18 個 sources；不含其他章節，且當時缺該章節 ref。 |
+| 僅 `purpose` 章節 | 1 | 7,570 | 8 records、6 個 sources；只適合確實僅需職務目的且已有同版 ref。 |
+| 單一 Task `item` 範例 | 1 | 25,281 | 23 records、7 個 sources，含關聯項目；當時缺該 item ref，也不代表全部 JD。 |
+| 單一 Duty `item` 範例 | 2 | 53,259 | 47 records、16 個 sources；當時缺該 item ref，也不代表全部 JD。 |
+
+現行 tool description 要求開始撰寫／定位過時先讀 `current`，`has_more=true` 要循 issued cursor 讀完，JD 寫入仍以最近成功讀取所發的同版 ref 進既有 binding。`section`／`item` 的聚焦能力**存在**，但不能在沒有 App-issued 目標、或仍缺必要頁／來源時直接替代全稿。本次 `consultant_context._project` 的動態 JD notice 只有 revision／事件／history anchor，`content_included=false`，不供應六章／項目的 current target ref；較早的跨 Agent context 規格 §5.1 寫「輕量導覽與 App-issued targets」。這是需由 JD context owner 核對的**文件效果與目前組裝差距**，不是本次已授權新增另一套 map 或更改 authority 的結論。若要讓摘要後仍可直接聚焦讀，先釐清該規格的現行效力、ref 發配與同版／跨版安全，再給最小方案。
+
+先前「每頁整數索引＋完整原值表」的無損表格候選在**本次 R3 三頁**重算為 51,916 bytes，比現行 85,893 少 33,977（39.6%），逐頁逆轉換可還原原 JSON；仍是 test-only 的另一種資料表示，沒有驗 provider schema、ToolMessage private artifact／digest、模型查表或 writer round-trip，也不減三次讀取步數。不能把這個數字算成已上線的 context／費用節省，更不能把整頁的 issued targets 或來源文字直接刪掉。
+
+**本次裁定：**第四次同版掃描在資料庫層沒有新 JD revision，但先前三頁已不可見於模型 request；原文「低資訊增量」只能指 canonical 內容，不應當成死循環或可直接禁止重讀的證據。現成全章節拆讀對這份稿反而增加步數及 bytes；聚焦單章／單項只有在目標 ref 已可見、任務範圍夠窄時才可能有益。零付費比較到此停止，正式程式／Prompt／compaction／工具契約不變；Q12 的 committed-versus-final 錯報仍另列 correctness OPEN，不被效率數字沖掉。
+
+### Q12 本輪保存真相：最後 request-view 的唯讀對照（2026-09-24）
+
+沿已停止的同文件 `continuation-2`，只讀原隔離 PostgreSQL 的 `jd_operation` 及 `jd_runtime` Saver；沒有恢復試跑、外送模型或修改產品資料。文件 `4466b141-1c8e-493a-82fb-15faf15de7b2` 的最後一輪 `3a199206-3965-46f5-b092-49442c9d25d5` 有 **2 筆正式 `committed` JD operation**、目前 JD revision 7、run `completed`；已保存的最後模型文字卻說「本輪我沒有完成新的保存」。這確認 Q12 是同一輪保存事實與回答不一致，不是 failed-final 或只存在草稿的情境。
+
+以正式 `build_request_view` 和 A 的現行 compaction profile，從關閉 root 的最後一則 AI 回覆之前重建 request-only 訊息：canonical 共 278 則，最後 request view 為 28 則。兩筆本輪 writer 的工具結果位於 canonical index 210／218；最新摘要切點在 index 250，**最後 request view 的可信 writer ToolMessage 數為 0**。摘要有 JD 主題文字，但沒有直接表達「保存／已寫」；最後一次 JD notice 的 `turn_start` 基準為 revision 5、`since_previous_response` 已到 revision 7，該增量的事件數為 0。另一方面，切點後仍有 `jd_read current` 三頁及 `jd_read item`，不能說模型完全沒看到新版 JD；它能看到目前內容，卻沒有直接看到本輪兩筆保存回執。
+
+作對照，同文件較早一輪 `473b1499-c07f-43b7-beb8-847ce65d4bf7` 有 4 筆 `committed`，最後回答如實區分已保存與尚未保存內容；其最後 request view 仍有 **1 筆** writer 工具結果，摘要也提及保存。兩輪任務與 context 不同，這個對照**不證明 compaction 單獨造成錯報**，但把可重現缺口定位在「本輪保存事實是否持續呈現於最後模型 request」，而不是 JD 寫入、DB receipt 或 locator 的保存失敗。
+
+**狀態：Q12 FAIL／原因待驗。**下一個低成本診斷應沿既有 JD notice、run receipt 與 compaction owner，核對最後模型輸入中何處可取得可信的本輪保存結果，再以固定合成回覆建立缺失／存在的對照；若仍需產品改動，先討論最小接點，不新增第二套 receipt、資料表、Agent 或以摘要文字作保存 authority。此處沒有改 Prompt、JD Domain、Memory、provider 或正式行為。
+
+### Q12 JD 通知生命週期反例與現有 owner 接點（2026-09-24；零付費）
+
+沿上一節的同一真實 run 證據，另以正式 `JdNoticeMiddleware`＋真 `create_agent`／LangGraph graph、固定合成模型與可控通知 reader 執行三次模型請求：第一次選合成寫入，第二次選不修改 JD 的讀取，第三次自然收尾。這只隔離**通知投影語意**，沒有真 SQL receipt、真 compaction 或 provider；不能把合成寫入測試冒充產品寫入。中間一次模型請求的 `since_previous_response.ai_change_count=1`；最後一次已到 revision 4，但固定 `turn_start.ai_change_count=0`，新的 `since_previous_response.ai_change_count=0`。由原起點到 revision 4 的事件仍可由 reader 回查，卻沒有累計出現在最後 JD notice。此反例 **1 passed**；正式相鄰顧問 context／compaction 離線測試 **49 passed**。另跑通知歷史測試 **14 passed、12 skipped**，skip 是未啟用隔離 PostgreSQL fixture，並非 PG 通過。首次 `uv` 因全機 cache ACL 報 `WinError 5`，改用本 App 已鎖定 `.venv` 的 Python 跑同一離線測試；沒有更換依賴、修改產品或送模型請求。
+
+程式對照顯示：`consultant_context._project` 的 `turn_start` 固定於本輪進入時；`since_previous_response` 只從最近一個成功模型回應的 JD boundary 讀取。它滿足「跨輪人工改動不因一次回覆消失」與「本次新增事件」兩項既定用途，但**沒有提供本輪累計已確認 AI 保存效果的獨立保證**。`NoticeHistoryReader` 只列 committed revision 事件；`no_change`、拒絕或 outcome unknown 不應以「沒有新 revision」混同。本案真實 Q12 的最後視圖又已越過兩筆 writer ToolMessage，故缺少本輪保存事實的直接模型可見依據；仍不能由此單獨證明模型錯報的全部因果。
+
+最小接點候選只在**現有 JD 通知／run receipt 邊界**討論：由 App 已有的 `jd_operation` 與 run 綁定推導一份有界、request-only 的「本輪已確認效果」，每次模型請求重新投影；不把摘要、Working State、B1／B2 Memory 或模型自述當保存 authority，也不建立第二套 receipt／表／Agent。`HistoryReader.read_run_operations(document_id, run_id)` 已能讀本輪 SQL receipt，但其契約明示：空結果不證明 run 沒有操作，UUID 排序也不是執行順序。正式接線前必須核對當下 `jd_ai_bindings`、真正工具結果與保存列，將 `committed`／`no_change`／確定失敗／未明分開；不能在模型節點內直接假定 closed-run `inspect_run()` 可安全重入。若查證或投影失敗，不得靜默顯示「本輪沒有保存」。下一 gate 是以既有隔離 PG／Saver 做這個對帳的紅燈反例與重開測試，再提出精確最小產品差異供 Owner 審核；**本次沒有施工正式接線，也未宣告 Q12 修好**。

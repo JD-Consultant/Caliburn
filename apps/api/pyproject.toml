@@ -13,6 +13,7 @@ dependencies = [
     "langgraph==1.2.12",
     "langgraph-checkpoint-postgres==3.1.2",
     "openai==3.20.0",
+    "rapidfuzz==3.14.6",
 ]
 
 [dependency-groups]

@@ -1,7 +1,8 @@
 """One durable native model/tool Step; product completion and control remain outside it."""
 
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass
+from copy import deepcopy
+from dataclasses import dataclass, field
 from typing import Literal, TypedDict
 from uuid import UUID, uuid4, uuid5
 
@@ -41,6 +42,30 @@ class ResponseStepRuntime:
     request_model: Callable[[NativeItems], Awaitable[Response]]
     prepare_tool: Callable[[ResponseFunctionToolCall, UUID], Awaitable[object]]
     execute_tool: Callable[[object], Awaitable[str]]
+    ensure_active: Callable[[], Awaitable[None]]
+
+
+@dataclass(frozen=True, slots=True)
+class HeldModelResponse:
+    """Process-local recovery handoff, never a replacement for a durable checkpoint.
+
+    Only pass this object back to the same Step. Do not serialize it into logs or
+    product history. Its operation seed is retained along with the exact native R.
+    """
+
+    thread_id: str
+    input_items: NativeItems = field(repr=False)
+    update: ResponseStepState = field(repr=False)
+
+
+class ResponseStepSaveError(RuntimeError):
+    """No tools started from this R; the caller can retry saving the held original."""
+
+    def __init__(self, recovery: HeldModelResponse) -> None:
+        super().__init__(
+            "The original model result is held; reconcile its checkpoint before retrying"
+        )
+        self.recovery = recovery
 
 
 async def run_response_step(
@@ -50,6 +75,7 @@ async def run_response_step(
     input_items: NativeItems | None,
     runtime: ResponseStepRuntime,
     max_tool_calls: int,
+    recovery: HeldModelResponse | None = None,
 ) -> ResponseStepState:
     """Start a fresh Step or resume it with None; callers still own single-writer eligibility.
 
@@ -58,26 +84,84 @@ async def run_response_step(
     """
     if not thread_id:
         raise ValueError("A durable Step requires a nonempty thread identity")
-    graph = _build_response_step(checkpointer, max_tool_calls=max_tool_calls)
+    if recovery is not None and (recovery.thread_id != thread_id or input_items is not None):
+        raise ValueError("A held response can only resume its original Step with None")
+    # The small holder belongs to this invocation, not to the role or the saver.
+    # Clearing it on entry to prepare means later tool/protocol errors cannot
+    # accidentally be classified as model persistence errors.
+    held = recovery
+
+    def retain(input_items: NativeItems, update: ResponseStepState) -> None:
+        nonlocal held
+        held = HeldModelResponse(thread_id, deepcopy(input_items), deepcopy(update))
+
+    def release() -> None:
+        nonlocal held
+        held = None
+
+    graph = _build_response_step(
+        checkpointer,
+        max_tool_calls=max_tool_calls,
+        retain_response=retain,
+        release_response=release,
+    )
     config: RunnableConfig = {
         "configurable": {"thread_id": thread_id},
         "recursion_limit": 2 * max_tool_calls + 8,
     }
-    saved = await graph.aget_state(config)
+    await runtime.ensure_active()
+    try:
+        saved = await graph.aget_state(config)
+    except Exception as error:
+        if held is not None:
+            raise ResponseStepSaveError(held) from error
+        raise
     if input_items is not None and saved.created_at is not None:
         raise ValueError("This Step already exists; resume with None instead of new input")
     if input_items is None and saved.created_at is None:
         raise ValueError("There is no saved Step to resume")
+    if recovery is not None:
+        if "response_snapshot" in saved.values:
+            if any(
+                saved.values.get(key) != recovery.update[key]
+                for key in ("response_snapshot", "operation_seed")
+            ):
+                raise ValueError("The saved Step contains a different model result")
+            # A confirmed R (including native pending writes) wins. In particular,
+            # never overwrite later prepared commands, observations or completed items.
+            held = None
+        else:
+            if (
+                saved.next != ("request_model",)
+                or saved.values.get("input_items") != recovery.input_items
+                or saved.values.get("tool_results")
+                or saved.values.get("prepared_tool") is not None
+                or saved.values.get("next_action") is not None
+            ):
+                raise ValueError("The held response does not match the saved request boundary")
+            await runtime.ensure_active()
+            try:
+                await graph.aupdate_state(
+                    config, deepcopy(recovery.update), as_node="request_model"
+                )
+            except Exception as error:
+                raise ResponseStepSaveError(recovery) from error
     initial_state: ResponseStepState | None = (
         {"input_items": input_items} if input_items is not None else None
     )
-    result = await graph.ainvoke(
-        initial_state,
-        config,
-        context=runtime,
-        durability="sync",
-        version="v2",
-    )
+    try:
+        result = await graph.ainvoke(
+            initial_state,
+            config,
+            context=runtime,
+            durability="sync",
+            version="v2",
+        )
+    except Exception as error:
+        if held is not None:
+            raise ResponseStepSaveError(held) from error
+        raise
+    await runtime.ensure_active()
     return result.value
 
 
@@ -85,6 +169,8 @@ def _build_response_step(
     checkpointer: BaseCheckpointSaver[str],
     *,
     max_tool_calls: int,
+    retain_response: Callable[[NativeItems, ResponseStepState], None] | None = None,
+    release_response: Callable[[], None] | None = None,
 ) -> CompiledStateGraph[
     ResponseStepState, ResponseStepRuntime, ResponseStepState, ResponseStepState
 ]:
@@ -95,18 +181,25 @@ def _build_response_step(
     async def request_model(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
-        response = await runtime.context.request_model(state["input_items"])
-        return {
+        await runtime.context.ensure_active()
+        response = await runtime.context.request_model(deepcopy(state["input_items"]))
+        update: ResponseStepState = {
             "response_snapshot": snapshot_response(response),
             "operation_seed": uuid4(),
             "prepared_tool": None,
             "tool_results": [],
             "next_action": None,
         }
+        if retain_response is not None:
+            retain_response(state["input_items"], update)
+        return update
 
     async def prepare_tool(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
+        if release_response is not None:
+            release_response()
+        await runtime.context.ensure_active()
         # Inspection is after R's node boundary so unsupported output is still recoverable.
         calls = inspect_response_step(restore_response(state["response_snapshot"])).calls
         if len(calls) > max_tool_calls:
@@ -129,6 +222,7 @@ def _build_response_step(
     async def execute_tool(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
+        await runtime.context.ensure_active()
         calls = inspect_response_step(restore_response(state["response_snapshot"])).calls
         require_result_order(calls, state["tool_results"])
         prepared = state["prepared_tool"]
@@ -151,7 +245,10 @@ def _build_response_step(
         calls = inspect_response_step(restore_response(state["response_snapshot"])).calls
         return "prepare_tool" if len(state["tool_results"]) < len(calls) else "finish_step"
 
-    def finish_step(state: ResponseStepState) -> ResponseStepState:
+    async def finish_step(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
+        await runtime.context.ensure_active()
         response = restore_response(state["response_snapshot"])
         step = inspect_response_step(response)
         require_result_order(step.calls, state["tool_results"])

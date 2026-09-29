@@ -3,7 +3,7 @@
 import asyncio
 import json
 from pathlib import Path
-from uuid import UUID, uuid4
+from uuid import UUID
 
 import pytest
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
@@ -11,15 +11,19 @@ from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from openai.types.responses import Response, ResponseFunctionToolCall
 from psycopg.conninfo import make_conninfo
 
-from caliburn.adapters.response_serialization import snapshot_response
 from caliburn.agent_execution.tool_steps import (
     ResponseStepRuntime,
+    ResponseStepSaveError,
     _build_response_step,
     run_response_step,
 )
 from caliburn.settings import DatabaseSettings
 
 pytestmark = pytest.mark.postgres
+
+
+async def ensure_active() -> None:
+    """Storage-only cases; product fencing is exercised by the execution tests."""
 
 
 class ModelCheckpointFault(AsyncPostgresSaver):
@@ -71,11 +75,11 @@ def test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_o
             events.append("execute")
             return "original observation"
 
-        runtime = ResponseStepRuntime(request, prepare, execute)
+        runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
         async with ModelCheckpointFault.from_conn_string(dsn, serde=serde) as saver:
             await saver.setup()
             saver.fail_after_commit = fail_after_commit
-            with pytest.raises(ConnectionError, match="checkpoint confirmation"):
+            with pytest.raises(ResponseStepSaveError) as failure:
                 await run_response_step(
                     saver,
                     input_items=[],
@@ -83,6 +87,7 @@ def test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_o
                     runtime=runtime,
                     max_tool_calls=16,
                 )
+            assert isinstance(failure.value.__cause__, ConnectionError)
             assert events == ["model"]
 
         # New connection/runner; no checkpoint_id, which would explicitly replay work.
@@ -90,6 +95,7 @@ def test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_o
             result = await run_response_step(
                 saver,
                 input_items=None,
+                recovery=failure.value.recovery,
                 thread_id=config["configurable"]["thread_id"],
                 runtime=runtime,
                 max_tool_calls=16,
@@ -136,7 +142,7 @@ def test_saved_step_reopens_without_repeating_window_items(
 
         dsn = make_conninfo(settings.url, options=f"-c search_path={settings.schema}")
         config = {"configurable": {"thread_id": "completed-step"}}
-        runtime = ResponseStepRuntime(request, prepare, execute)
+        runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
         serde = JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
         async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
             await saver.setup()
@@ -159,10 +165,10 @@ def test_saved_step_reopens_without_repeating_window_items(
         runner.run(scenario())
 
 
-def test_held_model_update_can_be_saved_with_native_update_state_after_both_writes_fail(
+def test_public_step_recovery_saves_held_model_result_after_both_writes_fail(
     empty_database_settings: DatabaseSettings,
 ) -> None:
-    """Capability proof only: the supervisor must verify eligibility before adopting this update."""
+    """The caller retains the public recovery handoff; no hand-written graph state repair."""
     settings = empty_database_settings
 
     async def scenario() -> None:
@@ -172,12 +178,9 @@ def test_held_model_update_can_be_saved_with_native_update_state_after_both_writ
             )
         )
         calls = []
-        retained_response = None
 
         async def request(items: list) -> Response:
-            nonlocal retained_response
             calls.append("model")
-            retained_response = snapshot_response(response)
             return response
 
         async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
@@ -189,43 +192,34 @@ def test_held_model_update_can_be_saved_with_native_update_state_after_both_writ
 
         dsn = make_conninfo(settings.url, options=f"-c search_path={settings.schema}")
         config = {"configurable": {"thread_id": "no-durable-response"}}
-        runtime = ResponseStepRuntime(request, prepare, execute)
+        runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
         serde = JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
-        streamed_update = None
         async with EntireModelSaveFault.from_conn_string(dsn, serde=serde) as saver:
             await saver.setup()
-            graph = _build_response_step(saver, max_tool_calls=16)
-            with pytest.raises(ConnectionError):
-                async for update in graph.astream(
-                    {"input_items": []},
-                    config,
-                    context=runtime,
-                    durability="sync",
-                    stream_mode="updates",
-                ):
-                    if "request_model" in update:
-                        streamed_update = update["request_model"]
-            # Graph updates are not guaranteed to reach the caller if persistence fails.
-            assert streamed_update is None
-            assert retained_response is not None
+            with pytest.raises(ResponseStepSaveError) as failure:
+                await run_response_step(
+                    saver,
+                    thread_id=config["configurable"]["thread_id"],
+                    input_items=[],
+                    runtime=runtime,
+                    max_tool_calls=16,
+                )
             assert calls == ["model"]
 
         async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
             graph = _build_response_step(saver, max_tool_calls=16)
             saved = await graph.aget_state(config)
             assert "response_snapshot" not in saved.values
-            # Known isolated work, no later effect, original update still held in this process.
-            retained_update = {
-                "response_snapshot": retained_response,
-                "operation_seed": uuid4(),
-                "prepared_tool": None,
-                "tool_results": [],
-                "next_action": None,
-            }
-            await graph.aupdate_state(config, retained_update, as_node="request_model")
-            result = await graph.ainvoke(None, config, context=runtime, durability="sync")
-            assert result["response_snapshot"] == retained_update["response_snapshot"]
-            assert result["operation_seed"] == retained_update["operation_seed"]
+            result = await run_response_step(
+                saver,
+                thread_id=config["configurable"]["thread_id"],
+                input_items=None,
+                recovery=failure.value.recovery,
+                runtime=runtime,
+                max_tool_calls=16,
+            )
+            assert result["response_snapshot"] == failure.value.recovery.update["response_snapshot"]
+            assert result["operation_seed"] == failure.value.recovery.update["operation_seed"]
             assert calls == ["model", "read"]
 
     with asyncio.Runner(loop_factory=asyncio.SelectorEventLoop) as runner:

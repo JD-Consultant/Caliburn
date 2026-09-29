@@ -30,6 +30,7 @@ from caliburn.agent_execution.request_capacity import (
     require_request_capacity,
     require_request_limits,
 )
+from caliburn.agent_execution.result_save_retries import ResultSaveRetryPolicy, retry_result_save
 
 
 async def read_prepared_history(
@@ -126,6 +127,7 @@ async def prepare_context_history(
     count_input: Callable[[ResponseRequest, UUID], Awaitable[ReceivedInputCount]],
     runtime: CompactionRuntime,
     recovery: HeldCompaction | HeldPreparationCount | None = None,
+    save_retry_policy: ResultSaveRetryPolicy | None = None,
 ) -> NativeItems:
     """Prepare valid history once, before adding new-work maps or employee input.
 
@@ -150,6 +152,7 @@ async def prepare_context_history(
         },
         count_input=count_input,
         recovery=recovery,
+        save_retry_policy=save_retry_policy or ResultSaveRetryPolicy(),
     )
 
 
@@ -161,6 +164,7 @@ async def run_context_compaction(
     input_count: ReceivedInputCount,
     runtime: CompactionRuntime,
     recovery: HeldCompaction | None = None,
+    save_retry_policy: ResultSaveRetryPolicy | None = None,
 ) -> NativeItems:
     """Compact once at a caller-selected boundary; repeat the same arguments to resume.
 
@@ -176,10 +180,47 @@ async def run_context_compaction(
         preparation_policy=None,
         count_input=None,
         recovery=recovery,
+        save_retry_policy=save_retry_policy or ResultSaveRetryPolicy(),
     )
 
 
 async def _run_context_boundary(
+    checkpointer: BaseCheckpointSaver[str],
+    *,
+    thread_id: str,
+    request: ResponseRequest,
+    input_count: ReceivedInputCount | None,
+    runtime: CompactionRuntime,
+    preparation_policy: HistoryPreparationPolicy | None,
+    count_input: Callable[[ResponseRequest, UUID], Awaitable[ReceivedInputCount]] | None,
+    recovery: HeldCompaction | HeldPreparationCount | None,
+    save_retry_policy: ResultSaveRetryPolicy,
+) -> NativeItems:
+    async def run_or_reconcile() -> NativeItems:
+        nonlocal recovery
+        try:
+            return await _run_context_boundary_once(
+                checkpointer,
+                thread_id=thread_id,
+                request=request,
+                input_count=input_count,
+                runtime=runtime,
+                preparation_policy=preparation_policy,
+                count_input=count_input,
+                recovery=recovery,
+            )
+        except (CompactionSaveError, PreparationCountSaveError) as error:
+            recovery = error.recovery
+            raise
+
+    return await retry_result_save(
+        run_or_reconcile,
+        errors=(CompactionSaveError, PreparationCountSaveError),
+        policy=save_retry_policy,
+    )
+
+
+async def _run_context_boundary_once(
     checkpointer: BaseCheckpointSaver[str],
     *,
     thread_id: str,

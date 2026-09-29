@@ -9,10 +9,14 @@ from fastapi import APIRouter, Depends, HTTPException, Request, Response
 from caliburn.contracts.generated.create_job_file_request import CreateJobFileRequest
 from caliburn.contracts.generated.interview_history import InterviewHistory, InterviewMessage
 from caliburn.contracts.generated.job_file_list import JobFile, JobFileList
+from caliburn.contracts.generated.rename_job_file_request import RenameJobFileRequest
 from caliburn.features.job_files.models import (
     CreateJobFile,
     CreationCommandConflictError,
     JobFileNotFoundError,
+    RenameCommandConflictError,
+    RenameJobFile,
+    StaleJobFileNameError,
 )
 from caliburn.workflows.job_files import JobFileWorkflow
 
@@ -74,3 +78,25 @@ async def read_interview_history(job_file_id: UUID, workflow: JobFiles) -> Inter
     return InterviewHistory(
         messages=[InterviewMessage.model_validate(asdict(message)) for message in messages]
     )
+
+
+@router.post("/{job_file_id}/rename", response_model=JobFile)
+async def rename_job_file(
+    job_file_id: UUID, body: RenameJobFileRequest, workflow: JobFiles
+) -> JobFile:
+    try:
+        result = await workflow.rename(
+            job_file_id,
+            RenameJobFile(
+                command_id=body.command_id,
+                display_name=body.display_name,
+                expected_name_revision=body.expected_name_revision,
+            ),
+        )
+    except JobFileNotFoundError as error:
+        raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
+    except RenameCommandConflictError as error:
+        raise HTTPException(status_code=409, detail={"code": "rename_command_conflict"}) from error
+    except StaleJobFileNameError as error:
+        raise HTTPException(status_code=409, detail={"code": "stale_job_file_name"}) from error
+    return JobFile.model_validate(asdict(result))

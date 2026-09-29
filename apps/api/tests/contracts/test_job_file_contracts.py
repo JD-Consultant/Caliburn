@@ -12,6 +12,7 @@ from caliburn.contracts.generated.accepted_interview_input import AcceptedInterv
 from caliburn.contracts.generated.create_job_file_request import CreateJobFileRequest
 from caliburn.contracts.generated.interview_history import InterviewHistory
 from caliburn.contracts.generated.job_file_list import JobFileList
+from caliburn.contracts.generated.rename_job_file_request import RenameJobFileRequest
 from caliburn.contracts.generated.submit_interview_input import SubmitInterviewInput
 
 SCHEMAS = Path(__file__).parents[2] / "contracts/http"
@@ -39,6 +40,11 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
             {"command_id": str(uuid4()), "display_name": "工作檔案", "employee_name": "員工"},
         ),
         (
+            "rename-job-file-request",
+            RenameJobFileRequest,
+            {"command_id": str(uuid4()), "display_name": "新名稱", "expected_name_revision": 1},
+        ),
+        (
             "job-file-list",
             JobFileList,
             {
@@ -46,6 +52,7 @@ SCHEMAS = Path(__file__).parents[2] / "contracts/http"
                     {
                         "job_file_id": str(uuid4()),
                         "display_name": "工作檔案",
+                        "name_revision": 1,
                         "employee_name": "員工",
                         "created_at": "2026-09-29T00:00:00Z",
                     }

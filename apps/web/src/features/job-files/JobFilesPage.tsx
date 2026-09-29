@@ -16,20 +16,35 @@ import {
   Typography,
 } from '@mui/material';
 import { describeReadError } from '../../shared/api/http';
+import type { JobFile } from '../../shared/api/generated/job-file-list';
 import { CreateJobFileDialog } from './CreateJobFileDialog';
-import { jobFilesQuery } from './job-file-api';
+import { RenameJobFileDialog } from './RenameJobFileDialog';
+import { jobFileQuery, jobFilesQuery } from './job-file-api';
 
 export function JobFilesPage() {
   const files = useQuery(jobFilesQuery);
   const cache = useQueryClient();
   const navigate = useNavigate();
   const [isCreating, setIsCreating] = useState(false);
+  const [renaming, setRenaming] = useState<JobFile | null>(null);
 
   function created(jobFileId: string): void {
     setIsCreating(false);
     // Do not cache creation-time metadata as the latest metadata on a replay.
     void cache.invalidateQueries({ queryKey: jobFilesQuery.queryKey });
     void navigate(`/job-files/${jobFileId}`);
+  }
+
+  function refreshRenamedFile(): void {
+    if (renaming) {
+      void cache.invalidateQueries({
+        queryKey: jobFileQuery(renaming.job_file_id).queryKey,
+        exact: true,
+      });
+    }
+    setRenaming(null);
+    // Replayed results describe the original command, not necessarily today's name.
+    void cache.invalidateQueries({ queryKey: jobFilesQuery.queryKey });
   }
 
   return (
@@ -74,12 +89,15 @@ export function JobFilesPage() {
           </Paper>
         ) : (
           <TableContainer component={Paper} variant="outlined">
-            <Table aria-label="職務檔案清單">
+            <Table
+              aria-label="職務檔案清單"
+              sx={{ '& .MuiTableCell-root': { px: { xs: 1, sm: 2 } } }}
+            >
               <TableHead>
                 <TableRow>
                   <TableCell>職務檔案</TableCell>
-                  <TableCell>受訪員工</TableCell>
-                  <TableCell>建立時間</TableCell>
+                  <TableCell sx={{ whiteSpace: 'nowrap' }}>受訪員工</TableCell>
+                  <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>建立時間</TableCell>
                   <TableCell align="right">操作</TableCell>
                 </TableRow>
               </TableHead>
@@ -92,20 +110,33 @@ export function JobFilesPage() {
                         識別 {file.job_file_id.slice(0, 8)}
                       </small>
                     </TableCell>
-                    <TableCell>{file.employee_name}</TableCell>
-                    <TableCell>
+                    <TableCell sx={{ minWidth: { xs: '4em', sm: 'auto' } }}>
+                      {file.employee_name}
+                    </TableCell>
+                    <TableCell sx={{ display: { xs: 'none', sm: 'table-cell' } }}>
                       <time dateTime={file.created_at}>
                         {new Date(file.created_at).toLocaleString('zh-TW')}
                       </time>
                     </TableCell>
-                    <TableCell align="right">
-                      <Button
-                        component={RouterLink}
-                        to={`/job-files/${file.job_file_id}`}
-                        aria-label={`開啟 ${file.display_name}（${file.employee_name}，${file.job_file_id.slice(0, 8)}）`}
+                    <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                      <Stack
+                        direction={{ xs: 'column', sm: 'row' }}
+                        sx={{ alignItems: 'flex-end', justifyContent: 'flex-end' }}
                       >
-                        開啟
-                      </Button>
+                        <Button
+                          component={RouterLink}
+                          to={`/job-files/${file.job_file_id}`}
+                          aria-label={`開啟 ${file.display_name}（${file.employee_name}，${file.job_file_id.slice(0, 8)}）`}
+                        >
+                          開啟
+                        </Button>
+                        <Button
+                          onClick={() => setRenaming(file)}
+                          aria-label={`重新命名 ${file.display_name}（${file.employee_name}，${file.job_file_id.slice(0, 8)}）`}
+                        >
+                          重新命名
+                        </Button>
+                      </Stack>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -115,6 +146,14 @@ export function JobFilesPage() {
         ))}
       {isCreating && (
         <CreateJobFileDialog onClose={() => setIsCreating(false)} onCreated={created} />
+      )}
+      {renaming && (
+        <RenameJobFileDialog
+          key={renaming.job_file_id}
+          file={renaming}
+          onClose={() => setRenaming(null)}
+          onRefresh={refreshRenamedFile}
+        />
       )}
     </Stack>
   );

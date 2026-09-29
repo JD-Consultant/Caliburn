@@ -1,6 +1,6 @@
 # Caliburn frontend（新目標施工中）
 
-React／TypeScript／Vite 的新前端，目前可建立、列出與選取隔離職務檔案，回看 App 正式開場。尚無 AI 傳送、JD 編輯或檔案改名，不是完整產品已完成。現行根 `dev/start/build` 仍指向舊正式產品；後續依[任務計畫](../../docs/plans/2026-09-29-target-rebuild/tasks.md)逐步接線，最後才正式切換。
+React／TypeScript／Vite 的新前端，目前可建立、列出、改名與選取隔離職務檔案，回看 App 正式開場。尚無 AI 傳送或 JD 編輯，不是完整產品已完成。現行根 `dev/start/build` 仍指向舊正式產品；後續依[任務計畫](../../docs/plans/2026-09-29-target-rebuild/tasks.md)逐步接線，最後才正式切換。
 
 ## 開發與檢查
 
@@ -42,4 +42,4 @@ pnpm --filter @caliburn/frontend test:e2e
 
 Playwright 依 lock 的 Chromium 版本執行，另開隔離 context、不使用個人瀏覽器 profile。若安裝器受環境限制，`CALIBURN_E2E_CHROMIUM_PATH` 可明確提供已核對該 release 版本的 binary；未驗的跨版本不能視為等價證據。`test-results` 的故障 trace／截圖不入版控，僅供合成測試，避免對真實員工資料留無限紀錄。
 
-目前 `tests/e2e` 驗建立／同名選取／reload／鍵盤／窄螢幕、POST 真提交後故意丟回應再確認、列表連線失敗。後端是真 PostgreSQL；fault injection 用 Playwright network routing，不以 mock 成功回應代替 DB 提交。此 gate 不驗模型、A Turn／Memory 恢復、完整安全、PDF 或品質。
+目前 `tests/e2e` 驗建立／同名選取／reload／鍵盤／窄螢幕、列表改名不改訪談／姓名、POST 真提交後故意丟回應再確認、舊改名重送不覆蓋較新名稱、列表連線失敗。後端是真 PostgreSQL；fault injection 用 Playwright network routing，不以 mock 成功回應代替 DB 提交。此 gate 不驗模型、A Turn／Memory 恢復、完整安全、PDF 或品質。

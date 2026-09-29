@@ -4,6 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter } from 'react-router';
 import { afterEach, beforeEach, expect, test, vi } from 'vitest';
 import type { JobFile } from '../shared/api/generated/job-file-list';
+import { isRenameJobFileRequest } from '../shared/api/validation';
 import { App } from './App';
 
 const firstFile: JobFile = {
@@ -11,6 +12,7 @@ const firstFile: JobFile = {
   display_name: '前端職務',
   employee_name: '合成員工甲',
   created_at: '2026-09-29T10:00:00Z',
+  name_revision: 1,
 };
 const secondFile: JobFile = {
   ...firstFile,
@@ -163,4 +165,95 @@ test('歷史訪談以原文字串顯示，不解析成 HTML', async () => {
   const paragraph = await screen.findByText(/<img src=x/);
   expect(paragraph.textContent).toBe(original);
   expect(paragraph.querySelector('img')).toBeNull();
+});
+
+test('列表改名只送標籤與讀取基準，保存後重讀清單', async () => {
+  const user = userEvent.setup();
+  let current = firstFile;
+  const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
+  fetch.mockImplementation((path) => {
+    if (path.endsWith('/rename')) {
+      current = { ...firstFile, display_name: '目前工作紀錄', name_revision: 2 };
+      return Promise.resolve(Response.json(current));
+    }
+    return Promise.resolve(Response.json({ job_files: [current, secondFile] }));
+  });
+  vi.stubGlobal('fetch', fetch);
+  renderApp();
+  await user.click(await screen.findByRole('button', { name: /重新命名.*合成員工甲/ }));
+  const field = screen.getByRole('textbox', { name: '職務檔案名稱' });
+  await user.clear(field);
+  await user.type(field, '目前工作紀錄');
+  await user.click(screen.getByRole('button', { name: '儲存名稱' }));
+  expect(await screen.findByRole('link', { name: /開啟 目前工作紀錄.*合成員工甲/ })).toBeVisible();
+  expect(screen.getByRole('link', { name: /開啟 前端職務.*合成員工乙/ })).toBeVisible();
+  const sent = fetch.mock.calls.find(([path]) => path.endsWith('/rename'));
+  const body = sent?.[1]?.body;
+  if (typeof body !== 'string') throw new Error('Expected JSON command');
+  const command: unknown = JSON.parse(body);
+  if (!isRenameJobFileRequest(command)) throw new Error('Invalid rename command');
+  expect(command.display_name).toBe('目前工作紀錄');
+  expect(command.expected_name_revision).toBe(1);
+  expect(Object.keys(command).sort()).toEqual([
+    'command_id',
+    'display_name',
+    'expected_name_revision',
+  ]);
+});
+
+test('改名結果不明，關閉重開仍送原命令而不採用新基準', async () => {
+  const user = userEvent.setup();
+  let current = firstFile;
+  let attempt = 0;
+  const fetch = vi.fn<(path: string, options?: RequestInit) => Promise<Response>>();
+  fetch.mockImplementation((path) => {
+    if (path.endsWith('/rename')) {
+      attempt += 1;
+      current = { ...firstFile, display_name: '已改名', name_revision: 2 };
+      return attempt === 1
+        ? Promise.reject(new TypeError('lost response'))
+        : Promise.resolve(Response.json(current));
+    }
+    return Promise.resolve(Response.json({ job_files: [current] }));
+  });
+  vi.stubGlobal('fetch', fetch);
+  const view = renderApp();
+  await user.click(await screen.findByRole('button', { name: /重新命名/ }));
+  const field = screen.getByRole('textbox', { name: '職務檔案名稱' });
+  await user.clear(field);
+  await user.type(field, '已改名');
+  await user.click(screen.getByRole('button', { name: '儲存名稱' }));
+  expect(await screen.findByRole('alert')).toHaveTextContent('改名結果尚未確認');
+  view.unmount();
+  renderApp();
+  await user.click(await screen.findByRole('button', { name: /重新命名/ }));
+  expect(screen.getByRole('textbox', { name: '職務檔案名稱' })).toBeDisabled();
+  await user.click(screen.getByRole('button', { name: '重新確認改名結果' }));
+  expect(await screen.findByRole('link', { name: /開啟 已改名/ })).toBeVisible();
+  const writes = fetch.mock.calls.filter(([path]) => path.endsWith('/rename'));
+  expect(writes).toHaveLength(2);
+  expect(writes[1]?.[1]?.body).toBe(writes[0]?.[1]?.body);
+});
+
+test('過期改名不可自行換基準重送，先要求重讀', async () => {
+  const user = userEvent.setup();
+  let current = firstFile;
+  const fetch = vi.fn<(path: string) => Promise<Response>>();
+  fetch.mockImplementation((path) => {
+    if (path.endsWith('/rename')) {
+      current = { ...firstFile, display_name: '其他分頁改名', name_revision: 2 };
+      return Promise.resolve(
+        Response.json({ detail: { code: 'stale_job_file_name' } }, { status: 409 }),
+      );
+    }
+    return Promise.resolve(Response.json({ job_files: [current] }));
+  });
+  vi.stubGlobal('fetch', fetch);
+  renderApp();
+  await user.click(await screen.findByRole('button', { name: /重新命名/ }));
+  await user.click(screen.getByRole('button', { name: '儲存名稱' }));
+  expect(await screen.findByRole('alert')).toHaveTextContent('改名未被接受');
+  expect(fetch.mock.calls.filter(([path]) => path.endsWith('/rename'))).toHaveLength(1);
+  await user.click(screen.getByRole('button', { name: '讀取目前名稱' }));
+  expect(await screen.findByRole('link', { name: /開啟 其他分頁改名/ })).toBeVisible();
 });

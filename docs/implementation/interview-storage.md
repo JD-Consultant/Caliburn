@@ -1,21 +1,21 @@
 # 職務檔案與訪談保存接線
 
-- 狀態：**T02 局部已實作／真 PostgreSQL 已驗**，2026-09-29。已有檔案／開場、輸入接受、持久執行准入、正式化交易參與介面及有界原話查詢；尚無完整 A 完成、Graph 控制／恢復或列表 UI。範圍與實測見[任務及證據](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md)。
+- 狀態：**T02 已實作／真 PostgreSQL 與檔案 UI 已驗**，2026-09-29。已有檔案建立／列表／改名／開場、輸入接受、持久執行准入、正式化交易參與介面及有界原話查詢；尚無完整 A 完成、Graph 控制／恢復。範圍與實測見[任務及證據](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md)。
 - 語意仍由[資料保存](../architecture/persistence.md)及[正式來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
 - 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/migrations/versions/0001_job_files_and_interviews.py)。
 
 ## 1. 原文、正式資格與執行身分分開，不複製原話
 
-圖只含目前已建立的六張業務表，不含尚未實作的 JD、Memory 或 Graph checkpoint。
+以下兩個視圖涵蓋目前七張業務表，不含尚未實作的 JD、Memory 或 Graph checkpoint。同名表是同一份資料，不是副本；拆圖避免多條跨層線遮住節點。
+
+**原文與正式資格：**
 
 ```mermaid
 erDiagram
-  direction LR
+  direction TB
   job_files ||--o{ interview_texts : owns
-  job_files ||--o{ executions : admits
   interview_texts ||--o| formal_interviews : qualifies
   interview_texts ||--o| interview_inputs : submitted_as
-  executions ||--o| interview_inputs : accepts
   interview_inputs ||--o| interview_replies : receives
   interview_texts ||--o| interview_replies : records_reply
   job_files {
@@ -23,6 +23,7 @@ erDiagram
     uuid creation_command_id UK
     text initial_display_name
     text display_name
+    bigint name_revision
     text employee_name
     timestamptz created_at
   }
@@ -36,6 +37,32 @@ erDiagram
     uuid job_file_id PK,FK
     int interview_sequence PK
     uuid source_id FK,UK
+  }
+  interview_inputs {
+    uuid job_file_id PK,FK
+    uuid command_id PK
+    uuid source_id FK,UK
+    uuid execution_id FK,UK
+  }
+  interview_replies {
+    uuid job_file_id PK,FK
+    uuid execution_id PK,FK
+    uuid source_id FK,UK
+  }
+```
+
+**檔案准入與改名結果：**下圖補前圖 `interview_inputs.execution_id` 的同檔案複合外鍵；完整原文關係見前圖。
+
+```mermaid
+erDiagram
+  direction LR
+  job_files ||--o{ executions : admits
+  executions ||--o| interview_inputs : accepts
+  job_files ||--o{ job_file_renames : records_rename
+  job_files {
+    uuid job_file_id PK
+    text display_name
+    bigint name_revision
   }
   executions {
     uuid execution_id PK
@@ -51,16 +78,19 @@ erDiagram
     uuid source_id FK,UK
     uuid execution_id FK,UK
   }
-  interview_replies {
+  job_file_renames {
     uuid job_file_id PK,FK
-    uuid execution_id PK,FK
-    uuid source_id FK,UK
+    uuid command_id PK
+    text display_name
+    bigint expected_name_revision
+    bigint name_revision
   }
 ```
 
 | 儲存 | 擁有的內容與身分 | 關係／約束 |
 |---|---|---|
 | `job_files` | UUID 職務檔案、目前顯示名稱、受訪者及建立命令的原始結果資料 | 同名可存在；建立命令唯一。名稱不是隔離鍵 |
+| `job_file_renames` | 原改名命令的期望名稱修訂、新名稱與結果修訂 | 檔案＋命令複合主鍵、FK、結果不可變；不複製員工姓名／訪談／JD |
 | `interview_texts` | 不可變來源、所屬檔案、真實發話者、完整訪談原文 | 沒有正式序號；UPDATE／DELETE 拒絕 |
 | `formal_interviews` | 檔案內的正式順序及指向原文的來源身分 | 同檔案複合外鍵；來源最多取得一次正式資格；正整數、不可改寫 |
 | `interview_inputs` | 原提交命令、原文來源與 A 執行的固定關係 | 同檔案複合 FK；命令限檔案內唯一；不可改寫。只有員工提交有此關係，App 開場沒有 |
@@ -88,7 +118,7 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 | 位置 | 責任 |
 |---|---|
 | `features/*/models.py` | 純值型別、輸入不變量及領域錯誤；不依賴 ORM／HTTP |
-| `job_files/service.py` | 建立與原命令輸入一致性；不 commit |
+| `job_files/service.py` | 建立／改名、原命令輸入一致性與名稱新鮮度；不 commit |
 | `interviews/service.py` | 保存 App 開場、接受員工原文及核對原提交；完成時保存完整答覆／正式序號。全部不 commit，不因接受輸入授予正式資格 |
 | 各 feature `persistence.py` | 自己的表及參數化 SQL；不讀另一 feature 的私有 persistence |
 | 各 feature `queries.py` | 對外 typed 查詢投影；無寫入副作用 |
@@ -176,3 +206,16 @@ Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／Type
 所有回傳保留固定 source ID、訪談序號、真實 speaker 及完整原文。`InterviewReadScope` 由 App 綁定，內含職務檔案與固定上界；這是值物件，不是權限憑證或新的保存 owner。即使後面又有正式訪談，原 scope 不會擴張。直接指定訊息／範圍不補前問；近期投影才按來源契約補一則，沒有歷史時不捏造。查詢不按字數截斷或把 role 轉成新發話。
 
 **仍待接線：**A／B 從固定 Memory 取得 K、持久綁定 H／F 與同輪恢復、模型可見 JSON／user 資料訊息、工具 schema／錯誤投影及容量策略，分屬 T07／T08／T10／T11／T16。這裡只完成它們共用的正式來源底層，不能以測試 scope 代替正式基準注入或 provider 驗收。
+
+## 10. 列表改名：名稱新鮮度與原操作結果
+
+改名只改職務檔案的顯示標籤，同名仍可存在；stable ID、員工姓名、訪談與 JD 不受影響。HTTP 用 `POST /api/job-files/{job_file_id}/rename`，參數由[唯一 schema](../../apps/api/contracts/http/rename-job-file-request.schema.json)定義；這不是 Memory 的 title 解析，也不把 UI 修訂參數搬進模型工具。
+
+`JobFileWorkflow.rename` 開短交易 → 取得檔案列鎖 → 先查原命令 → 有結果則校驗 payload 並回原結果 → 新命令才核 `expected_name_revision` → 修改 label、保存原結果 → 同次提交。列鎖釋放後才返回 HTTP；不持鎖等待人或模型，不改 A／Memory 執行資格。
+
+- `name_revision` 只代表此 label 的新鮮度，從 1 開始。DB trigger 在 label 真正改變時加一；改回同字仍前進，不讓舊分頁繞過檢查。同值命令可確認，但不增加修訂。
+- 過期基準回 409，不默默覆蓋；同命令不同 payload 亦拒絕。原命令先查，所以即使後來已有新名稱，重送仍回原結果而**不再次改名**。UI 成功後須 GET 最新 metadata，不把舊結果寫成目前名稱。
+- 建立重送仍用不可變 `initial_display_name`、初始修訂 1 及原建立資料，不受 rename 結果影響。新欄位由 [0004 migration](../../apps/api/migrations/versions/0004_job_file_renames.py)加入，不重寫舊 migration。
+- 只存最小的原命令及結果欄位；現行表頭無法證明某個舊命令是否已提交，因此此資料不能只放 UI。這是原 job-files owner 的結果，不是新通用收據服務、Graph checkpoint 或全文版本平台。首版不清除可重送命令結果。
+
+研究借鑑 [Google AIP-154](https://google.aip.dev/154)的資源新鮮度檢查與 [PostgreSQL row lock](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)；本案採明確 label counter 而非完整資源 ETag，原操作重送保證沿本案既有交易契約。測例涵蓋舊命令重送、同基準競爭、同名隔離、改回同字、原結果不可改、後段失敗一起回滾；不由此宣稱全產品程序故障或交付安全已完成。

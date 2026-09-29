@@ -12,6 +12,7 @@ def to_job_file(record: persistence.JobFileRecord) -> JobFile:
     return JobFile(
         job_file_id=record.job_file_id,
         display_name=record.display_name,
+        name_revision=record.name_revision,
         employee_name=record.employee_name,
         created_at=record.created_at,
     )

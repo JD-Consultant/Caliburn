@@ -1,35 +1,42 @@
-# Caliburn API
+# Caliburn backend（新目標施工中）
 
-> **歷史文件（2026-09-22 退役）：**本目錄的可執行 API 已移除；以下內容只保留開發沿革與研究證據，不是目前啟動方式或正式權責。現行產品見 [`experiments/jd-relational-app`](../../experiments/jd-relational-app/README.md) 與 [ADR 0077](../../docs/adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md)。
+本目錄是新架構，不沿用同路徑的舊 venv、DB 或配置。目前提供最小 health、生成契約及離線／真 PG 基礎測試；訪談、JD 和 Memory 產品功能尚未交付。現行正式產品入口不變，進度見[任務表](../../docs/plans/2026-09-29-target-rebuild/tasks.md)。
 
-以下記錄退役前的 API：當時唯一 production prefix 是 `/api/v1/job-analysis/consultant-documents`，健康檢查是 `/healthz`。舊 interview、job-authoring 與 ADR 0058 writer routes 已移除。
+## 安裝與執行
 
-## 結構
+從 repo root 執行。使用 Python 3.14、uv 0.12.20；先安裝根 `package.json` 指定的 Node 24／pnpm，前端生成器也需要該環境。精確依賴由 `uv.lock` 保存。
 
-```text
-app/
-  consultant/            LangGraph state／commands、顧問 Skills、context、verifier、review、authority
-  export/                核准文件 → deterministic export model
-  adapters/
-    langgraph/           PostgreSQL Saver／Store 與最小 catalog
-    openrouter/          LangChain OpenRouter binding
-    xlsx/                OpenPyXL renderer
-  api/                   consultant route、mapper、problem response、composition
-  database.py            lifespan／health connection
-  observability.py       payload-free OpenTelemetry
+```powershell
+$env:UV_PROJECT_ENVIRONMENT = Join-Path $PWD 'apps/api/.venv-target'
+uv sync --project apps/api --locked
+pnpm install --filter @caliburn/frontend --frozen-lockfile --strict-peer-dependencies
+uv run --project apps/api --locked uvicorn caliburn.bootstrap:create_app --factory --host 127.0.0.1 --port 8100 --loop asyncio:SelectorEventLoop
 ```
 
-`app.consultant` 不依賴 FastAPI、OpenRouter adapter、XLSX 或 RAG。LangGraph checkpoint／Store 是唯一 durable semantic state／員工來源 owner；LLM 只能提出待審 changeset，員工 command 才能寫核准文件。邊界由 `tests/test_consultant_foundation_boundaries.py` 與 `tests/test_consultant_hard_cut.py` 強制。
+`GET /api/health` 回傳 `{"status":"ok"}`，只表示程序存活，不表示 DB／模型可用。Ctrl+C 停止前景開發程序。新應用不在 import 時讀取 `.env`，這組命令不需模型金鑰，也不使用現行產品資料。
 
-## 資料庫與啟動
+Windows 的 psycopg async 不支援預設 Proactor loop，因此明確使用 Python／Uvicorn 支援的 Selector factory，而非已棄用的全域 event-loop policy。這尚不代表 PDF 的 Windows 子程序接線已驗證；後續 T13 必須處理其不同 loop 需求，見[介面交付](../../docs/implementation/interface-and-delivery.md#4-pdf-與程序)。
 
-Fresh root migration `0018_consultant_runtime_root` 只建立最小 catalog；LangGraph 官方 tables 由 setup script 初始化。舊資料不搬移、不雙寫。
+## 驗證
 
-```bash
-npm run infra
-npm run db:migrate
-npm run consultant-storage:setup
-cd apps/api && uv run python run_live.py
+保持前述 `UV_PROJECT_ENVIRONMENT`；不要意外使用舊 `apps/api/.venv`。
+
+```powershell
+uv run --project apps/api --locked pytest apps/api/tests/unit apps/api/tests/contracts -q
+uv run --project apps/api --locked ruff check apps/api
+uv run --project apps/api --locked ruff format --check apps/api
+uv run --project apps/api --locked mypy --config-file apps/api/pyproject.toml apps/api/src/caliburn
+uv run --project apps/api --locked python apps/api/scripts/generate_contracts.py --check
 ```
 
-LLM route 由 `.env` 的 `CONSULTANT_*` 與 `OPENROUTER_*` 設定版本化 profile／policy。跨 app 真相見 [`docs/design/consultant-runtime.md`](../../docs/design/consultant-runtime.md)。RAG bounded context 仍保留，但本 app 不得 import 或呼叫；目前沒有 Reference／RAG consumer。
+修改 `contracts/http/*.schema.json` 後，執行相同生成命令但不帶 `--check`。標準生成器產 Python／TS，禁止手改 `generated/`。App schema 與模型原生輸出是不同邊界：前者拒絕額外欄位，後者保留 SDK 原生項目及未知 metadata。
+
+真 PostgreSQL 測試只接受**明確指定、loopback、名稱以 `_test` 結尾的隔離資料庫**；缺環境變數會 skip，不代表通過。測試建立隨機 schema，完成後只清理自己新建的 schema，不刪 DB。
+
+```powershell
+# 使用自行建立的空白測試 DB，不填既有產品 DB 或真實員工資料。
+$env:CALIBURN_TEST_DATABASE_URL = 'postgresql://測試帳號:測試密碼@127.0.0.1:5432/caliburn_test'
+uv run --project apps/api --locked pytest apps/api/tests/integration -m postgres -q
+```
+
+SDK 測試以 `MockTransport` 攔截所有請求，不連 OpenAI；跨程序 PG probe 只驗框架原生字典及既存 node 接續，不能替代 T06／T12 的業務副作用、取消與故障驗收。真 API 測試必須另外依[有界授權](../../docs/plans/2026-09-29-target-rebuild/README.md#3-狀態與施工順序)執行。

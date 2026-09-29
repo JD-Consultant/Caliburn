@@ -1,0 +1,34 @@
+import js from '@eslint/js';
+import { defineConfig, globalIgnores } from 'eslint/config';
+import tseslint from 'typescript-eslint';
+import hooks from 'eslint-plugin-react-hooks';
+import refresh from 'eslint-plugin-react-refresh';
+import globals from 'globals';
+
+export default defineConfig(
+  globalIgnores(['dist', '.next', 'src/shared/api/generated']),
+  js.configs.recommended,
+  tseslint.configs.recommended,
+  {
+    files: ['src/**/*.{ts,tsx}'],
+    extends: [hooks.configs.flat.recommended, refresh.configs.vite],
+    languageOptions: { globals: globals.browser },
+  },
+  {
+    files: ['scripts/**/*.mjs', '*.js'],
+    languageOptions: { globals: globals.node },
+  },
+  {
+    files: ['src/shared/**/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            { group: ['**/features/**', '**/app/**'], message: 'shared 不依賴業務或頁面組裝。' },
+          ],
+        },
+      ],
+    },
+  },
+);

@@ -11,6 +11,9 @@ from openai.types.responses import Response, ResponseFunctionToolCall
 from openai.types.responses.compacted_response import CompactedResponse
 from openai.types.responses.response_input_item_param import FunctionCallOutput
 
+type NativeSnapshot = dict[str, Any]
+type NativeItems = list[dict[str, Any]]
+
 
 def snapshot_response(response: Response) -> dict[str, Any]:
     """Capture every received field, preserving aliases and unknown provider metadata."""

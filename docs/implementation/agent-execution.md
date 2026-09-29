@@ -1,11 +1,11 @@
 # Agent 原生接續與可恢復接線
 
-- 狀態：**T06 施工中；原生回應保存／投影及完整回應路由已有元件證據，完整 Runtime 仍未交付**。實測與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
+- 狀態：**T06 施工中；原生回應與逐筆工具 Step 已有恢復元件證據，完整 Runtime 仍未交付**。實測與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
 - T06–T12 先以假 provider＋真 saver／PG 驗證；T06 可依[本 Goal 授權及分批上限](../plans/2026-09-29-target-rebuild/README.md#3-狀態與施工順序)提前做少量協定預檢，T16 才做完整有界模型驗收。LLM 推理內容不可解讀作驗收。
 
 ## 1. 執行圖與業務資格分開
 
-目標由 `agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；目前僅有下述原生回應路由元件，不能把本節節點表當已接好的 runner。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯；不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。
+目標由 `agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；目前已有下述單一模型／工具 Step，不能把本節完整節點表當已接好的 runner。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯；不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。
 
 建議節點切法如下，節點名稱是工程名稱，不是對模型公開的新工具：
 
@@ -73,7 +73,24 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 依據：2026-09-30 重新讀取 [stateless 接續](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[部署範例](https://developers.openai.com/api/docs/guides/deployment-checklist#use-reasoningencrypted_content)、[phase](https://developers.openai.com/api/docs/guides/deployment-checklist#set-up-the-assistant-phase-parameter)、[多工具配對](https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls)，以及鎖定 OpenAI 3.20.0 的 input/output 型別；不靠舊專案的 3.13.0 宣稱本次相容。
 
-已用官方 saver／真 PG 新程序驗原件往返、正常 `ainvoke(None)` 接續且模型不重跑。測試明確關閉 pickle 及自訂 msgpack 型別還原；沒有自製 serializer。Prepared command 的遞迴型別 allowlist、保存失敗／確認遺失、多工具副作用、執行資格與預算仍待後續切片。`sync` 不代表框架與業務共用一次交易，也不能保證尚未保存的回應永遠可取回。
+已用官方 saver／真 PG 新程序驗原件往返、正常 `ainvoke(None)` 接續且模型不重跑。純原生 items 的測試關閉 pickle 及自訂 msgpack 型別還原；prepared command 接法及部分故障證據見下一節。`sync` 不代表框架與業務共用一次交易，也不能保證尚未保存的回應永遠可取回。
+
+### 4.2 已落地的單一模型／工具 Step（T06 第二切片）
+
+`agent_execution/tool_steps.py` 的 StateGraph 路徑是 `request_model → prepare_tool → execute_tool → prepare_tool → finish_step`；純讀／已知拒絕由 prepare 保存觀察，不進 execute。所有 call 處理完才形成新完整視窗並返回下一步建議；不是每次工具返回都重新呼叫模型。它是將納入共同 loop 的一個可組合 Step，不是 A／B1／B2 各自的 runner。
+
+- 正常入口 `run_response_step` 統一指定 `durability="sync"`，依本次允許 call 數設定有界 graph recursion limit；超過 call 上限在派送前拒絕。框架 super-step 數與模型 Step 數不是同一上限。只在隔離故障測例使用私有 builder，不讓角色自行選保存模式。
+- 此元件每個邏輯 Step 使用獨立 thread；新輸入不得覆蓋已有 thread，只有 `None` 能恢復它，沒有保存位置也不能假裝恢復。外層角色 loop 接走完成窗口再建立下一 Step，並非重新定義產品 Turn。入口讀取檢查不是競爭鎖，單 writer／工作資格仍由執行 owner 保證。使用官方 `GraphOutput.value` typed 返回，不自造圖結果格式。
+- 原回應先保存，下一節點才檢查協定／工具。未知 phase 等被拒絕時，R 仍可回讀；不是先丟掉 R 再宣稱可恢復。操作 seed 和 R 同存，每個 call 從 seed＋原 call_id 得到穩定 App 操作身分，不由模型指定業務 ID。
+- 寫入 prepare 的命令先保存，execute 才交回原業務 owner。工具結果僅按原 calls 的有序前綴增加，下一筆 prepare 能看見上一筆已成立的候選；不平行派送。恢復不重新解析已保存命令的標題／正文，也不重算成功回傳。
+- `ResponseStepRuntime` 僅注入模型與工具 I/O，不持久化 SDK client／DB session。共用 State 不理解 Memory 命令內容；工具接線必須核對還原型別及原工作資格，業務效果仍由原 owner 的交易／冪等處理。
+- `adapters/graph_checkpointer.py` 只配置官方 `JsonPlusSerializer`：關閉 pickle 與 legacy JSON 自訂 constructor；自訂 msgpack 型別由實際 caller 明確 allowlist，不建立 domain registry。Memory prepared create／revise／delete 的巢狀 dataclass、Enum、UUID、frozenset 已驗。框架 4.2.0 對未允許型別會降為 dict／原始值，且 tuple 會變 list，不能拿值相等當型別正確；本 Step 原生集合用 list，Memory prepared 無 tuple 欄位。不補第二套 codec。
+
+已驗：完整 R 保存後跨程序零重呼；兩工具有序；第一筆候選已提交但確認遺失，重入得到原效果後才進第二筆；model checkpoint 寫入前／寫入後拋錯均不先派工具，若 pending writes 已保存則由原框架承接；完成 Step 再 resume 不重加 items。以假 provider＋真 PG 驗證，無真實模型品質宣稱。
+
+另以真 PG 注入 checkpoint 與 pending writes 同時失敗：`astream` 不保證還來得及交出 node update，不能依賴它保住原回應。測例在 provider callback 保留已取得原 R，重開 saver 核無原結果後，使用官方 `aupdate_state(..., as_node="request_model")` 補存，再以 `None` 接續，模型總呼叫 1。這只證明官方機制可承接原 R，**正式 supervisor 的保留／資格核對與採用尚未接線**；不能把測例中的人工補存當完整恢復產品。
+
+尚未完成：上述雙保存失敗的正式接線、執行／預算准入、取消與暫停、角色 thread／候選安全點整合、compact 安全採用及官方 API。不能因上述 Step 可恢復就宣告 T06 或產品生命週期已完成。依據：[官方 durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)、[saver／sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)，及鎖定框架原碼與本切片反例。
 
 ## 5. 容量、重試與恢復不是同一政策
 

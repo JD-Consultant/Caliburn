@@ -1,11 +1,11 @@
 # JD 保存接線
 
-- 狀態：**T03 profile、職責／任務後端及人工 UI 已實作；驗證依 T03 證據，整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
+- 狀態：**T03 profile、職責／任務後端及人工 UI、共用知識／技能與任務關係後端已實作；驗證依 T03 證據，整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
 - 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
 
-目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求的人工讀寫與排序。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[基本資料](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)及[職責／任務](interface-and-delivery.md#13-t03-職責與任務的人工編輯)。K／S、Agent 候選、依據與核對尚未交付；不能把這些人工正式端點當作 A 寫入捷徑。
+目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求、共用知識／技能與任務使用關係的人工讀寫與排序。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[基本資料](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)及[職責／任務](interface-and-delivery.md#13-t03-職責與任務的人工編輯)。知識／技能 UI、其他集合、Agent 候選、依據與核對尚未交付；不能把這些人工正式端點當作 A 寫入捷徑。
 
 | 責任 | 已實作位置 |
 |---|---|
@@ -20,6 +20,8 @@
 | 職責 HTTP 與共用 workflow 注入 | [jd_areas.py](../../apps/api/src/caliburn/transport/http/jd_areas.py)、[jd_dependencies.py](../../apps/api/src/caliburn/transport/http/jd_dependencies.py)；與 profile 共用准入／交易責任 |
 | 任務與獨立明細的值、變更計算 | [tasks.py](../../apps/api/src/caliburn/features/job_description/tasks.py)、[task_changes.py](../../apps/api/src/caliburn/features/job_description/task_changes.py)；先計算完整合法結果，無 DB／HTTP 相依 |
 | 任務用例、保存與 HTTP | [task_service.py](../../apps/api/src/caliburn/features/job_description/task_service.py)、[task_persistence.py](../../apps/api/src/caliburn/features/job_description/task_persistence.py)、[jd_tasks.py](../../apps/api/src/caliburn/transport/http/jd_tasks.py)；沿同一 JD workflow、head 與 operation，不另造服務／交易平台 |
+| 共用知識／技能的值與變更 | [capabilities.py](../../apps/api/src/caliburn/features/job_description/capabilities.py)、[capability_changes.py](../../apps/api/src/caliburn/features/job_description/capability_changes.py)；名稱中的 capability 僅統稱這兩種 JD 能力定義，不代表 Agent 工具能力 |
+| 共用定義／任務關係的用例、SQL、HTTP | [capability_service.py](../../apps/api/src/caliburn/features/job_description/capability_service.py)、[capability_persistence.py](../../apps/api/src/caliburn/features/job_description/capability_persistence.py)、[jd_capabilities.py](../../apps/api/src/caliburn/transport/http/jd_capabilities.py)；沿同一 JD 固定修訂及原操作，反向用途由同一關係投影 |
 | 新建檔案連同空 JD／開場保存 | [job_files.py](../../apps/api/src/caliburn/workflows/job_files.py)；重送建立不重設 JD |
 
 ## 2. 固定修訂與目前正式頭
@@ -78,7 +80,7 @@ erDiagram
 - `jd_revisions` 保存四個獨立文字欄位，不把整份 JD 存 JSON／Markdown。修訂與原操作不允許 UPDATE／DELETE；空 JD 的四欄為 null，表示尚未提供，不是已確認沒有。
 - 有內容改變才建立新修訂並移動 head。改回相同舊文字仍建立新的修訂身分；只設為目前相同值則沿用修訂，但原命令仍有可重送結果。
 - `jd_operations` 保存原命令的預期基底、型別化修改與結果修訂。JSONB 是原操作意圖，不是第二份可編輯 JD；結果透過固定修訂取回，不複製一份完整結果正文。
-- 每次改動只複製四個小欄位及職責／任務選用鍵、歸屬與排序；職責、任務內容未變就重用固定內容修訂，不引入內容定址、delta 或事件重播。任務內容修訂包含自身成果／要求，詳見 §2.2。後續其他集合沿此不變量接入，不可讓舊修訂讀可變最新子項，也不可無條件複製整份 JD。
+- 每次改動只複製四個小欄位及職責／任務／能力選用鍵、關係與排序；內容未變就重用固定內容修訂，不引入內容定址、delta 或事件重播。任務內容修訂包含自身成果／要求，詳見 §2.2；共用知識／技能見 §2.4。後續其他集合沿此不變量接入，不可讓舊修訂讀可變最新子項，也不可無條件複製整份 JD。
 
 UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。這不是把 ORM 的版本計數器當作永久歷史，亦不是要求 LLM 填修訂號。
 
@@ -138,7 +140,7 @@ erDiagram
 - 任務歸屬與排序在 `jd_task_selections`，不是正文的一部分。只移動任務不新增內容修訂；其明細與未來來源／能力關係不得因此換身分。移動可帶同一任務所需的文字／明細調整，一次全成或全拒；不是任意跨項目 batch。
 - `area_id = null` 表未歸屬。FK 要求非空群組存在於**同檔案、同 JD 修訂**，不僅存在於歷史正文。`UNIQUE NULLS NOT DISTINCT` 同時保障未歸屬與各職責組內的位置唯一。人工讀取依未歸屬、職責順序、組內順序投影；每組位置獨立。
 - 固定任務內容、明細與選用禁止 UPDATE／DELETE。已被選用的任務內容禁止事後追加明細；已採用的 JD 版本禁止追加選用。建立順序為新內容 → 明細 → JD／職責選用 → 任務選用 → head／原結果，同一交易提交。
-- profile／職責改動都保留任務選用；任務改動保留 profile／職責。刪任務只從新稿移除選用，歷史內容與明細仍可重建；同名重建是新身分。現在尚未實作 K／S 與來源，不能宣稱相關連結效果已通過。
+- profile／職責改動都保留任務選用；任務改動保留 profile／職責。刪任務只從新稿移除選用，歷史內容與明細仍可重建；同名重建是新身分。K／S 關係已接 §2.4；來源在 T07 接，不能推定其連結效果已通過。
 
 任務讀取先取得一個固定正式修訂，再讀該修訂的任務／明細；兩次 SQL 查詢不分別讀 latest，不會拼接新舊稿。新修改受相同檔案列鎖與基底檢查保護。
 
@@ -163,6 +165,54 @@ sequenceDiagram
 ```
 
 HTTP Schema 透過 [JSON Schema `$ref`](https://json-schema.org/understanding-json-schema/structuring)重用既有 Area／WorkTask 定義；官方 Python／TS 生成器及 Ajv 實測跨檔引用，不手抄第二份欄位規格。此為人工 transport，並非模型的完整 JD／map 工具。
+
+### 2.4 共用知識／技能與任務使用關係
+
+`capability_id` 是某筆知識或技能的穩定身分；`kind` 分 `knowledge`／`skill`，同一身分不提供跨類轉換。`name`／`description` 至少一個有內容，不用假標題填補未知，也不把正文塞到每個任務。內容修訂固定這三欄，任務與能力的連結另由同版關係保存。
+
+以下為 **0008 已實作**的增量關係；複合 FK 均包含檔案及正式 JD 修訂，不是只驗 ID 存在。
+
+```mermaid
+erDiagram
+  direction LR
+  jd_revisions ||--o{ jd_capability_selections : selects
+  jd_capability_revisions ||--o{ jd_capability_selections : fixed_content
+  jd_capability_selections ||--o{ jd_task_capabilities : used_by
+  jd_task_selections ||--o{ jd_task_capabilities : uses
+  jd_capability_revisions {
+    uuid job_file_id PK,FK
+    uuid capability_id PK
+    uuid content_revision_id PK
+    text kind
+    text name
+    text description
+  }
+  jd_capability_selections {
+    uuid job_file_id PK,FK
+    uuid revision_id PK,FK
+    uuid capability_id PK,FK
+    uuid content_revision_id FK
+    int position
+  }
+  jd_task_capabilities {
+    uuid job_file_id PK,FK
+    uuid revision_id PK,FK
+    uuid task_id PK,FK
+    uuid capability_id PK,FK
+    int position
+  }
+```
+
+- 一筆定義可由多任務使用，也可暫無用途；`task_links` 是同一組關係的投影，可得任務使用的能力及能力的反向用途，不新增反向保存表。重複連結不增加第二條邊；解除不存在的連結為無效果命令，仍保存原操作結果。
+- 知識與技能各自呈現概覽順序；任務的知識與技能亦各自排序，**不是沿用概覽順序**。目前儲存一個概覽 position 及每任務的關係 position，按 kind 篩選後得到各組順序；排序只重排同 kind 的位置，不改另一組相對順序。`before_capability_id` 必須在同組；null 表該組末尾。
+- 修正文保留能力身分及所有使用關係；只改排序／關係不產生新正文。改回舊文字仍新增內容修訂；設為目前相同值不增修訂。未改的正文重用，沒有完整 JD 正文複製或內容去重平台。
+- **仍被任務使用的能力禁止直接刪除**；須先解除關係。刪任務則只移除新稿中的任務選用及其使用關係，保留共用定義；刪職責讓任務未歸屬，關係不受影響。歷史 JD 的能力與關係完全不變。
+- `insert_revision` 統一保留未受改動的集合及關係；複製 task links 時只選新修訂仍存在的任務。人工 profile／職責／任務改動不會意外清空能力；能力操作也不覆蓋其餘內容。
+- 定義、選用與關係列一旦成立均不可 UPDATE／DELETE；已採用的 JD 修訂不可事後追加選用或關係。新內容、關係、head 及原操作同次提交，失敗全退；DB FK 保證連結兩端在同檔案同修訂。
+
+`GET /jd/capabilities` 只讀一次 head，再讀該固定修訂的定義與連結，故兩次 SQL 間有其他提交也不混版。它和 `/jd/work` **不同 HTTP 請求不承諾同版**；後續整合 UI 須擴充同版組合讀取，不以多個 latest 拼接畫面。這次沒有新增使用者畫面或模型入口。
+
+完整 DDL 見 [0008](../../apps/api/migrations/versions/0008_jd_capability_relations.py)，資料形狀見 [edit request](../../apps/api/contracts/http/edit-jd-capabilities-request.schema.json)與 [view](../../apps/api/contracts/http/jd-capabilities-view.schema.json)。每次命令處理一筆定義或一條任務關係及其排序，沿原 workflow 的准入、鎖、原結果及 CAS；HTTP UUID 不是模型的 `read_ref`／`title_target`。
 
 ## 3. 人工編輯與原結果接續
 
@@ -213,6 +263,7 @@ sequenceDiagram
 - [PostgreSQL row locking](https://www.postgresql.org/docs/current/explicit-locking.html)：列鎖在交易結束釋放；本案延用已建立的檔案列鎖，把准入與正式修改放同一短提交，不持鎖等待模型或人。
 - [SQLAlchemy version counter](https://docs.sqlalchemy.org/en/21/orm/versioning.html)：ORM counter 的 flush 衝突檢查不是自動保留完整歷史。因此採 JD 自己的固定修訂／head／原結果，不增加通用版本平台。
 - [SQLAlchemy INSERT FROM SELECT](https://docs.sqlalchemy.org/en/21/tutorial/data_insert.html#insert-from-select)：profile 改動由既有固定選用複製小型關係鍵，不先把全部正文讀回再寫一份。職責新增／修訂才寫新正文，其餘選用重用固定修訂。
+- [SQLAlchemy association object](https://docs.sqlalchemy.org/en/21/orm/basic_relationships.html#association-object)：關係有自身屬性時用明確關聯表示。本案任務與能力的關係帶排序、固定 JD 修訂，因此保留具名關係列；使用既有顯式 SQL，不另外混用可寫 secondary 關係或 ORM cascade 去管理同一組邊。知識／技能正文與反向用途不重複保存。
 - [datamodel-code-generator enum 命名](https://datamodel-code-generator.koxudaxi.dev/cli-reference/field-customization/#capitalize-enum-members)：生成 Python enum 成員用大寫常數，避免 `title` 與 `str.title` 方法衝突；JSON 的 `title` 等 wire 值不變。修生成器而非手改 DTO，原 schema／DTO round trip 及生成比對一起回歸。
 
 上述是官方機制；**固定修訂、職責內容／選用分離與重送順序是 Caliburn 的有界實現選擇**，不是聲稱所有大廠都用此 schema。沒有新增套件或框架，真 PG 證據見任務紀錄。

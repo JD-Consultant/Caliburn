@@ -10,6 +10,7 @@ from caliburn.settings import Settings
 from caliburn.transport.http.health import router as health_router
 from caliburn.transport.http.interview_inputs import router as interview_input_router
 from caliburn.transport.http.jd_areas import router as jd_areas_router
+from caliburn.transport.http.jd_capabilities import router as jd_capabilities_router
 from caliburn.transport.http.jd_profile import router as jd_profile_router
 from caliburn.transport.http.jd_tasks import router as jd_tasks_router
 from caliburn.transport.http.jd_work import router as jd_work_router
@@ -46,6 +47,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     app.include_router(interview_input_router)
     app.include_router(jd_profile_router)
     app.include_router(jd_areas_router)
+    app.include_router(jd_capabilities_router)
     app.include_router(jd_tasks_router)
     app.include_router(jd_work_router)
     return app

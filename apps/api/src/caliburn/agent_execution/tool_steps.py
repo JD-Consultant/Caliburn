@@ -102,6 +102,22 @@ class HeldModelResponse:
     update: ResponseStepState = field(repr=False)
 
 
+@dataclass(frozen=True, slots=True)
+class HeldInputCount:
+    """Intact process-local count bound to the exact original request, not a cache."""
+
+    thread_id: str
+    request_id: UUID
+    request_snapshot: NativeSnapshot = field(repr=False)
+    update: ResponseStepState = field(repr=False)
+
+
+class InputCountSaveError(RuntimeError):
+    def __init__(self, recovery: HeldInputCount) -> None:
+        super().__init__("The original input count is held; reconcile before counting again")
+        self.recovery = recovery
+
+
 class ResponseStepSaveError(RuntimeError):
     """No tools started from this R; the caller can retry saving the held original."""
 
@@ -140,7 +156,7 @@ async def run_response_loop(
     runtime: ResponseStepRuntime,
     max_tool_calls: int,
     max_model_steps: int,
-    recovery: HeldModelResponse | None = None,
+    recovery: HeldModelResponse | HeldInputCount | None = None,
     controls: ResponseLoopControls | None = None,
     resume_interrupt_id: str | None = None,
 ) -> ResponseStepState | PausedResponseLoop:
@@ -173,7 +189,7 @@ async def run_response_step(
     request: ResponseRequest | None,
     runtime: ResponseStepRuntime,
     max_tool_calls: int,
-    recovery: HeldModelResponse | None = None,
+    recovery: HeldModelResponse | HeldInputCount | None = None,
 ) -> ResponseStepState:
     """Start a fresh Step or resume it with None; callers still own single-writer eligibility.
 
@@ -202,7 +218,7 @@ async def _run_response_flow(
     runtime: ResponseStepRuntime,
     max_tool_calls: int,
     max_model_steps: int | None,
-    recovery: HeldModelResponse | None,
+    recovery: HeldModelResponse | HeldInputCount | None,
     controls: ResponseLoopControls | None = None,
     resume_interrupt_id: str | None = None,
 ) -> ResponseStepState | PausedResponseLoop:
@@ -216,13 +232,19 @@ async def _run_response_flow(
     if recovery is not None and (recovery.thread_id != thread_id or request is not None):
         raise ValueError("A held response can only resume its original Step with None")
     # The small holder belongs to this invocation, not to the role or the saver.
-    # Clearing it on entry to accounting means later accounting/tool errors cannot
-    # accidentally be classified as model persistence errors.
+    # Release only after the next node confirms the preceding sync save, so later
+    # capacity/accounting/tool failures are not mistaken for result-save failures.
     held = recovery
 
     def retain(state: ResponseStepState, update: ResponseStepState) -> None:
         nonlocal held
         held = HeldModelResponse(
+            thread_id, state["request_id"], deepcopy(state["request_snapshot"]), deepcopy(update)
+        )
+
+    def retain_count(state: ResponseStepState, update: ResponseStepState) -> None:
+        nonlocal held
+        held = HeldInputCount(
             thread_id, state["request_id"], deepcopy(state["request_snapshot"]), deepcopy(update)
         )
 
@@ -236,6 +258,8 @@ async def _run_response_flow(
         max_model_steps=max_model_steps,
         retain_response=retain,
         release_response=release,
+        retain_count=retain_count,
+        release_count=release,
         controls=controls,
     )
     config: RunnableConfig = {
@@ -246,7 +270,7 @@ async def _run_response_flow(
         saved = await graph.aget_state(config)
     except Exception as error:
         if held is not None:
-            raise ResponseStepSaveError(held) from error
+            raise _result_save_error(held) from error
         raise
     if request is not None and saved.created_at is not None:
         raise ValueError("This Step already exists; resume with None instead of new input")
@@ -280,7 +304,26 @@ async def _run_response_flow(
             or saved.values.get("request_snapshot") != recovery.request_snapshot
         ):
             raise ValueError("The held response does not match the saved request boundary")
-        if saved.values.get("response_snapshot"):
+        if isinstance(recovery, HeldInputCount):
+            if saved.values.get("input_count") is not None:
+                if (
+                    saved.values.get("input_count") != recovery.update.get("input_count")
+                    or saved.values.get("counted_request_id") != recovery.request_id
+                ):
+                    raise ValueError("The saved request contains a different input count")
+                # Native saved/pending results win; do not rewind later work.
+                held = None
+            else:
+                if saved.next != ("count_input",):
+                    raise ValueError("The held count does not match the saved request boundary")
+                await runtime.ensure_active()
+                try:
+                    await graph.aupdate_state(
+                        config, deepcopy(recovery.update), as_node="count_input"
+                    )
+                except Exception as error:
+                    raise InputCountSaveError(recovery) from error
+        elif saved.values.get("response_snapshot"):
             if any(
                 saved.values.get(key) != recovery.update[key]
                 for key in ("response_snapshot", "response_attempt_id", "operation_seed")
@@ -331,7 +374,7 @@ async def _run_response_flow(
                     saved.values["response_attempt_id"],
                 )
             )
-        elif recovery is not None:
+        elif isinstance(recovery, HeldModelResponse):
             # The validated handoff may just have been adopted by aupdate_state;
             # `saved` still describes the earlier boundary, not that successful write.
             await runtime.account_response(_received_response(recovery.update))
@@ -339,7 +382,7 @@ async def _run_response_flow(
     if (
         controls is not None
         and request is None
-        and recovery is None
+        and held is None
         and resume_interrupt_id is None
         and saved.values.get("completed_steps", 0) > 0
         and saved.values.get("next_action") in ("continue", "deliver_answer")
@@ -347,6 +390,7 @@ async def _run_response_flow(
         and not any(task.name == "finish_step" for task in saved.tasks)
     ):
         # A saved continue decision is not authority across a recovery boundary.
+        # An already-confirmed result handoff does not suppress this control check.
         # Re-enter only its pure control successor at the current checkpoint; no
         # historical checkpoint, Step replay, input rewrite or model/tool effects.
         # get_state can project pending finish_step writes over an older checkpoint;
@@ -375,7 +419,7 @@ async def _run_response_flow(
         )
     except Exception as error:
         if held is not None:
-            raise ResponseStepSaveError(held) from error
+            raise _result_save_error(held) from error
         raise
     if result.interrupts:
         if controls is None:
@@ -396,6 +440,8 @@ def _build_response_step(
     max_model_steps: int | None = None,
     retain_response: Callable[[ResponseStepState, ResponseStepState], None] | None = None,
     release_response: Callable[[], None] | None = None,
+    retain_count: Callable[[ResponseStepState, ResponseStepState], None] | None = None,
+    release_count: Callable[[], None] | None = None,
     controls: ResponseLoopControls | None = None,
 ) -> CompiledStateGraph[
     ResponseStepState, ResponseStepRuntime, ResponseStepState, ResponseStepState
@@ -421,7 +467,13 @@ def _build_response_step(
             uuid5(state["request_id"], "input_tokens"),
         )
         # Save before interpretation/admission. A failed count never becomes a guessed zero.
-        return {"input_count": count, "counted_request_id": state["request_id"]}
+        update: ResponseStepState = {
+            "input_count": count,
+            "counted_request_id": state["request_id"],
+        }
+        if retain_count is not None:
+            retain_count(state, update)
+        return update
 
     async def request_model(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
@@ -455,6 +507,8 @@ def _build_response_step(
     async def check_capacity(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
+        if release_count is not None:
+            release_count()
         await runtime.context.ensure_active()
         count = state.get("input_count")
         if count is None or state.get("counted_request_id") != state["request_id"]:
@@ -682,6 +736,16 @@ def _received_response(state: ResponseStepState) -> ReceivedModelResponse:
     if attempt_id is None:
         raise ValueError("There is no model response to account for")
     return ReceivedModelResponse(restore_response(state["response_snapshot"]), attempt_id)
+
+
+def _result_save_error(
+    held: HeldModelResponse | HeldInputCount,
+) -> ResponseStepSaveError | InputCountSaveError:
+    return (
+        InputCountSaveError(held)
+        if isinstance(held, HeldInputCount)
+        else ResponseStepSaveError(held)
+    )
 
 
 def _require_execution_limits(

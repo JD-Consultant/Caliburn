@@ -17,7 +17,11 @@ from psycopg.conninfo import make_conninfo
 from caliburn.adapters.database import Database
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest, create_responses_client
-from caliburn.agent_execution.tool_steps import ResponseStepRuntime, run_response_step
+from caliburn.agent_execution.tool_steps import (
+    InputCountSaveError,
+    ResponseStepRuntime,
+    run_response_step,
+)
 from caliburn.features.executions import budgets, service
 from caliburn.features.executions.budget_models import ExecutionBudget
 from caliburn.features.executions.models import ExecutionKind, ExecutionScope
@@ -27,9 +31,26 @@ from tests.fixtures.response_capacity import synthetic_capacity_limits
 pytestmark = pytest.mark.postgres
 
 
+class InputCountSaveFault(AsyncPostgresSaver):
+    fail_after_commit = False
+
+    async def aput(self, config, checkpoint, metadata, new_versions):
+        if checkpoint["channel_values"].get("input_count"):
+            if self.fail_after_commit:
+                await super().aput(config, checkpoint, metadata, new_versions)
+            raise ConnectionError("synthetic count checkpoint unavailable")
+        return await super().aput(config, checkpoint, metadata, new_versions)
+
+    async def aput_writes(self, config, writes, task_id, task_path=""):
+        if any(name == "input_count" for name, _ in writes):
+            raise ConnectionError("synthetic count pending writes unavailable")
+        await super().aput_writes(config, writes, task_id, task_path)
+
+
 @pytest.mark.parametrize("input_tokens", [488, 489])
+@pytest.mark.parametrize("save_fault", [None, "before_save", "after_save"])
 def test_saved_count_reconnects_without_recount_and_reserves_its_actual_outbound(
-    database_settings, database_connection: psycopg.Connection, input_tokens: int
+    database_settings, database_connection: psycopg.Connection, input_tokens: int, save_fault
 ):
     file_id = uuid4()
     database_connection.execute(
@@ -125,13 +146,24 @@ def test_saved_count_reconnects_without_recount_and_reserves_its_actual_outbound
                     database_settings.url, options=f"-c search_path={database_settings.schema}"
                 )
                 options = dict(thread_id=str(uuid4()), max_tool_calls=2)
-                error = ConnectionError if input_tokens == 488 else ValueError
-                async with AsyncPostgresSaver.from_conn_string(
+                if save_fault:
+                    error = InputCountSaveError
+                elif input_tokens == 488:
+                    error = ConnectionError
+                else:
+                    error = ValueError
+                saver_type = InputCountSaveFault if save_fault else AsyncPostgresSaver
+                recovery = None
+                async with saver_type.from_conn_string(
                     dsn, serde=create_graph_serializer()
                 ) as saver:
                     await saver.setup()
-                    with pytest.raises(error):
+                    if save_fault:
+                        saver.fail_after_commit = save_fault == "after_save"
+                    with pytest.raises(error) as failure:
                         await run_response_step(saver, request=request, runtime=runtime, **options)
+                    if save_fault:
+                        recovery = failure.value.recovery
                 # Reopen the actual saver; original count is independent of this client instance.
                 async with AsyncPostgresSaver.from_conn_string(
                     dsn, serde=create_graph_serializer()
@@ -139,12 +171,14 @@ def test_saved_count_reconnects_without_recount_and_reserves_its_actual_outbound
                     resumed = replace(runtime, request_model=executor.request_model)
                     if input_tokens == 488:
                         result = await run_response_step(
-                            saver, request=None, runtime=resumed, **options
+                            saver, request=None, runtime=resumed, recovery=recovery, **options
                         )
                         assert result["next_action"] == "deliver_answer"
                     else:
                         with pytest.raises(ValueError, match="capacity"):
-                            await run_response_step(saver, request=None, runtime=resumed, **options)
+                            await run_response_step(
+                                saver, request=None, runtime=resumed, recovery=recovery, **options
+                            )
                 assert paths == (
                     ["/v1/responses/input_tokens", "/v1/responses"]
                     if input_tokens == 488

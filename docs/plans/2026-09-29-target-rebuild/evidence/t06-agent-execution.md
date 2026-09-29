@@ -127,8 +127,40 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/ca
 
 另一唯讀子代理依規範查 [GPT-6 Luna](https://developers.openai.com/api/docs/models/gpt-6-luna)、[pricing](https://developers.openai.com/api/docs/pricing)、[token counting](https://developers.openai.com/api/docs/guides/token-counting)、[compact](https://developers.openai.com/api/docs/guides/compaction) 與 [Fast mode](https://developers.openai.com/api/docs/guides/fast-mode)。回報 create 可依明確輸出上限預留，但計數 API 未查到明確免費／費率承諾；standalone compact 沒有 create 的輸出限制，未查到足以保證單次帳單硬上限的官方條款。不能以未知按零或把 create 容量當 compact 計費保證。這是後續 manifest／計量需明示的限制，未啟用任何付費預檢，也未更改模型。compact 的明確 service tier 及有界單次風險仍需在對應接線處處理。
 
-## 6. 下一個可執行切片
+## 6. 第六切片：有界直連協定預檢
+
+### 批次 manifest（2026-09-30；執行前設定）
+
+目的只驗遠端接受 `store=false`／`all_turns`、strict function、原生 R 序列化／重送及原 call 配對，不驗職務分析品質、完整恢復或 compact。沿計畫既有真模型授權；腳本為 `apps/api/scripts/probe_responses_protocol.py`，直接呼叫已測的 adapter／serializer，不建立第二套產品 runner。
+
+| 項目 | 本批界線 |
+|---|---|
+| 模型／資料 | `gpt-6-luna`、`low`、`service_tier=default`；只有腳本內合成協定文字及一個無參數虛擬唯讀工具；不送 repo／員工／JD 內容 |
+| 請求 | `(input_tokens.count → responses.create) × 2`，最多 4 次 HTTP、2 次生成；SDK／腳本重試皆 0、並行 1；任何未預期結果立即停止 |
+| 容量／時間 | 每次 count ≤ 4,096 才 create，`max_output_tokens=512`；每次 30 秒、整批 120 秒 |
+| 金額 | 管理預算 US$1，不是 provider 硬帳單保證；生成以最保守全 input 按 cache-write US$0.125/M、output US$0.50/M 估兩次上界約 US$0.001536；計數 API 未查到明確免費／費率承諾，未知不記成零 |
+| 停止／重跑 | timeout、quota／model 不可用、協定錯誤、超量即停；不換模型、不全批自動重跑。追加批次须先診斷、另記理由與上限 |
+| 憑證／紀錄 | 僅取 `apps/api/.env` 的 `OPENAI_API_KEY`，不套舊配置；結果檔 exclusive-create，只記次數、型別、phase、usage、安全錯誤碼，不記 key／opaque／原始 error body |
+
+主代理已取得上述官方 model／pricing／token-counting 原文（來源同 §5），生成估計含所有輸入按較高 cache-write 費率及隱藏 reasoning 的輸出上限。尚無足夠證據為 compact 設同樣硬成本上限，故本批不送 compact；也不拿逾時當未付費。
+
+此腳本是有限相容性 probe，不是產品新行為，故不製造假 TDD Red；實際 SDK 序列化、工具配對及路由已有單元／契約證據，本批驗其遠端接縫。
+
+### 實際結果：憑證前置條件未滿足，零外送
+
+2026-09-30 03:59 台北時間執行第一批，安全結果留於忽略區 `.research-tmp/t06-protocol-preflight-01.jsonl`：`started` 後在載入必要金鑰時停止，**HTTP 0／生成 0／模型費用 0**。只檢查變數名稱確認授權檔案有 `OPENROUTER_API_KEY`，沒有 `OPENAI_API_KEY`；沒有讀取或套用其值、沒有用第三方 key 直連試錯，也沒有切換 provider。已請 Owner 在本機加入直連 key，等待時繼續不依賴 provider 的 T06 工作；這不是整個 Goal blocked。
+
+腳本 Ruff 通過；mypy 連同 src **145 source files** 通過；`--help` 可執行。先單獨跑腳本 mypy 時，editable package 被當成無 py.typed 的外部依賴，改為與 src 一起檢查，不新增 ignore 或改變型別規範。無 DB／Graph／產品 wire 修改，不重跑無關整合測試。**原生接續／strict／計數遠端接受性仍未驗證**，上述離線檢查不能替代。
+
+待憑證就緒，以相同限制、另一次性結果檔執行；上一批零外送不代表可無界反覆跑。命令：
+
+```powershell
+$env:PYTHONUTF8='1'
+./.venv-target/Scripts/python.exe -B scripts/probe_responses_protocol.py --key-file S:/caliburn/apps/api/.env --output S:/caliburn/.research-tmp/t06-protocol-preflight-02.jsonl
+```
+
+## 7. 下一個可執行切片
 
 繼續外層共用 loop 與單一有界計量／外送資格，將已落地的原 R recovery handoff 接入 supervisor，再接 compact／角色控制。正常 Step 入口已固定 sync／recursion／新輸入與恢復界線。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執。工具接線需核對還原巢狀型別；目前只有 Memory 的 prepared 路徑證據，未驗 JD／角色完整整合。
 
-一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢仍需另備全合成 request／費用 manifest，目前無付費、無金鑰讀取、無真人資料外送。
+一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

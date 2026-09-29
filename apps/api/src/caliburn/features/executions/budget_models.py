@@ -29,7 +29,7 @@ class BudgetExceededError(RuntimeError):
 
 
 class BudgetConflictError(RuntimeError):
-    """A saved policy, request binding or cost cannot be replaced by different values."""
+    """A saved policy, request binding, cost or failure cannot be replaced."""
 
 
 def validate_cost(cost_usd: Decimal, *, positive: bool = False) -> None:
@@ -81,12 +81,35 @@ class OutboundRequest:
 
 
 @dataclass(frozen=True, slots=True)
+class OutboundFailure:
+    failure_code: str
+    retry_not_before: datetime | None
+
+    def __post_init__(self) -> None:
+        if self.failure_code not in (
+            "remote_result_unknown",
+            "transient_service",
+            "access_blocked",
+            "capacity_exceeded",
+            "request_rejected",
+            "response_protocol",
+        ):
+            raise ValueError("Use a recognized outbound failure code without provider payloads")
+        if self.retry_not_before is not None:
+            if self.failure_code not in ("remote_result_unknown", "transient_service"):
+                raise ValueError("Only retryable outbound failures can carry a retry deadline")
+            if self.retry_not_before.utcoffset() is None:
+                raise ValueError("An outbound retry deadline must be timezone-aware")
+
+
+@dataclass(frozen=True, slots=True)
 class OutboundAttempt:
     attempt_id: UUID
     request: OutboundRequest
     writer_id: UUID
     reserved_cost_usd: Decimal
     reported_cost_usd: Decimal | None
+    failure: OutboundFailure | None = None
 
 
 @dataclass(frozen=True, slots=True)

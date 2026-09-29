@@ -261,8 +261,29 @@ Reviewer 另用真 PG 領域＋記憶體 saver 模擬「領域 resume 已提交�
 
 本切片不改 Graph 節點／流程圖、不改業務儲存或計量契約；未讀 `.env`、無付費外送。process-local 原件不是跨程序備份；此處的真 PG 測試是重新連線，不冒稱 kill 後能取回尚未保存的 count。重試 supervisor／輪前準備及角色整合仍未完成。
 
-## 13. 下一個可執行切片
+## 13. 第十三切片：共同外送的持久有界重試
 
-接輪前準備與角色控制、真實費率配置及單一有界 retry supervisor。共同 loop 已有完整 request、sync／局部步數、原 R／C／count 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用及完整 Step pause；未配置 compact 接縫仍明確停止。輪前128K／Agent意圖、B起始準備、取消相容基底，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
+承接 `9d38e038`。重讀當前 [OpenAI 錯誤／Retry-After 指引](https://developers.openai.com/api/docs/guides/error-codes#python-library-error-types)、本機 SDK 3.20.0 的 header 與 jitter 處理，以及 [Azure Retry pattern](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)。借鑑單一重試責任、故障分類、服務端等待及整體交易語意；沒有把多廠商名字當共識證據，也沒有啟用不承接本案持久預算的 SDK／Graph 隱含重試。責任、機制及圖只維護於[工程 §5.4](../../../implementation/agent-execution.md#54-已落地的單一外送重試責任t06-第十三切片)。
+
+主代理使用計畫執行、TDD、OpenAI 文件與獨立審查流程；子代理只負責既有 executions 的安全故障保存、migration 與專項測試，主代理接共同 workflow、錯誤／等待策略及跨層測試。並行修改範圍分開，最後由主代理整合；沒有第二套 validator／receipt／queue／全文庫。
+
+- 初始真正行為 Red：429 已確認失敗後未取得第二次受預算限制的外送，**1 failed**。同 request／同完整 payload、新 attempt 准入後通過；create、count、compact 共用同一路徑，HTTP 期間另一連線可取 execution 鎖並讀已提交預留。
+- 保存安全 failure 與最早 retry 時間；重開沿用原時間，不重新抽 jitter。failure 保存前失敗不重送；COMMIT 確認遺失先查原紀錄。准入確認不明仍拒絕重送，兩個 runner 不能沿同一失敗各送一次。重試保留原次數／成本／期限；未知成本不按零，取消／writer 更替不恢復資格。
+- 初次整合 **3 failed／49 passed** 是既有 timeout 測例仍要求首次直接拋 SDK error；已依本切片新政策改驗「確認的 timeout 受原三次上限限制、再入不加次數」，沒有放寬准入確認遺失時零外送的保證。更新後同集合 **52 passed**。Retry-After unit 包括毫秒、秒、HTTP-date、無效／超大值及 jitter，**16 passed**。
+- 獨立審查與主代理找到三项 P2。其一為成本／總次數已耗盡卻仍等非零 Retry-After；主代理 **2 failed** 後將原准入檢查抽為同 owner 共用方法，等待前拒絕，不新增假 admission。其二、三為永久 API error 進 Graph ERROR，以及 failure 保存出錯時原 SDK body 經例外鏈進 traceback；真 PG Graph／標準 traceback 的合成敏感標記 **5 failed**，安全型別與抑制 chaining 後通過。超大 Retry-After 停止也覆蓋安全出口。
+- 上述修正後，retry／failure／execution-budget 真 PG 專項 **60 passed in 25.12s**；Ruff check／format **212 files**、mypy **150 source files** 通過。修正前完整後端曾 **1051 passed in 261.59s**；不把該次數字當修正後全套證據，最終回歸與 reviewer 結論另於下方補記。
+- 窄複核找到取消例外鏈殘餘：`CancelledError` 不屬於 `Exception`。主代理先測 COMMIT 前取消通過，沒有冒充 Red；再加入連線取得前取消，得到 **1 failed／1 passed**，確認真正失敗交界。明確保留取消型別並抑制 SDK chain，兩分支與整個 retry 檔 **21 passed in 10.88s**；不吞取消、不新增外送，保存未確認再入仍停在原 attempt。
+
+四張工程 Mermaid 圖已用既有 Mermaid／headless Chromium 實際渲染，主代理檢視新增 retry 圖；交易、等待、原件優先與不明結果停止路徑可讀。首次 sandbox `spawn EPERM` 後經准許啟用 renderer，不略過圖稿驗證。沒有修改模型 wire／prompt、讀取 `.env` 或呼叫真 provider；HTTP 為合成 SDK MockTransport，PG 為既有 loopback 測試庫內 fixture 自建 schema。
+
+最終整合：取消例外鏈小修前啟動的完整後端 **1055 passed in 245.33s**；小修後依風險重跑 unit／contracts **552 passed in 7.64s**，以及 outbound retry／failure、execution budget、model／compact accounting、migration、Graph PG **96 passed in 54.38s**。不把前次全套當作最後兩項取消測例也已包含。最終 Ruff check／format **212 files**、mypy **150 source files** 通過。文件 **20 份／339 links** 零錯，diff check 通過。
+
+独立 reviewer 首次修正複核 **13 passed**，其指出的取消殘餘再以兩項實跑 **2 passed** 確認關閉，沒有本次增量新增的重大發現；任意 tracing locals、角色 supervisor 與真 provider／費率未在本次審查承諾中。子代理均已結束。這些數字是各次明列集合，不加總宣稱為互不重複的產品案例。
+
+**仍未交付：**原程序確已遺失、沒有可核對 failure 的 attempt，不由此切片自動放行；角色 supervisor、輪前準備、原件保存的有界調度、真費率／provider 與 UI 都有後續任務。這不是 E15／T06 整體完成，更不是產品訪談品質已驗收。
+
+## 14. 下一個可執行切片
+
+接輪前準備與角色控制、真實費率配置及未明 attempt 的恢復調度。共同 loop 已有完整 request、sync／局部步數、原 R／C／count 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用、完整 Step pause 與已確認 provider 故障的有界重試；未配置 compact 接縫仍明確停止。輪前128K／Agent意圖、B起始準備、取消相容基底，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

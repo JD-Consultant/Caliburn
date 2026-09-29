@@ -13,13 +13,13 @@ from uuid import UUID, uuid4
 import httpx2
 import psycopg
 import pytest
-from openai import APITimeoutError
 from openai.types.responses.compacted_response import CompactedResponse
 
 from caliburn.adapters.database import Database
 from caliburn.adapters.openai_responses import ResponseRequest, create_responses_client
 from caliburn.adapters.response_serialization import snapshot_compaction
 from caliburn.agent_execution.context_compaction import ReceivedCompaction
+from caliburn.agent_execution.response_retries import ResponseRetryPolicy
 from caliburn.features.executions import budgets, service
 from caliburn.features.executions.budget_models import (
     BudgetConflictError,
@@ -153,7 +153,13 @@ async def admitted_executor(
             timeout_seconds=5,
             http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond)),
         ) as client:
-            yield ModelRequestExecutor(database.sessions, writer, client, accounting)
+            yield ModelRequestExecutor(
+                database.sessions,
+                writer,
+                client,
+                accounting,
+                retry_policy=ResponseRetryPolicy(0.001, 0.001),
+            )
     finally:
         await database.close()
 
@@ -302,7 +308,7 @@ def test_unavailable_compaction_cost_keeps_original_and_reservation(
 
 
 @pytest.mark.parametrize("failure_boundary", ["admission_ack", "http_timeout"])
-def test_lost_admission_ack_or_http_timeout_never_blindly_resends(
+def test_unknown_admission_stops_and_confirmed_timeouts_exhaust_original_budget(
     database_settings: DatabaseSettings,
     file_id: UUID,
     runner: asyncio.Runner,
@@ -332,23 +338,32 @@ def test_lost_admission_ack_or_http_timeout_never_blindly_resends(
                 if failure_boundary == "admission_ack"
                 else executor
             )
-            expected = ConnectionError if failure_boundary == "admission_ack" else APITimeoutError
+            expected = (
+                ConnectionError if failure_boundary == "admission_ack" else BudgetExceededError
+            )
             with pytest.raises(expected):
                 await initial.request_compaction(request_fixture(), request_id)
             # Reconstruct the executor; no process-local attempt identity authorizes a resend.
             recovered = replace(executor)
-            with pytest.raises(PriorCompactionAttemptError):
+            resume_error = (
+                PriorCompactionAttemptError
+                if failure_boundary == "admission_ack"
+                else BudgetExceededError
+            )
+            with pytest.raises(resume_error):
                 await recovered.request_compaction(request_fixture(), request_id)
-            assert len(http_requests) == (0 if failure_boundary == "admission_ack" else 1)
+            expected_attempts = 1 if failure_boundary == "admission_ack" else 3
+            assert len(http_requests) == (0 if failure_boundary == "admission_ack" else 3)
             async with executor.sessions.begin() as session:
                 attempts = await budgets.read_request_attempts(
                     session, executor.writer.scope, request_id
                 )
                 usage = await budgets.read_budget_usage(session, executor.writer.scope)
-            assert len(attempts) == usage.outbound_attempts == usage.compactions == 1
+            assert len(attempts) == usage.outbound_attempts == expected_attempts
+            assert usage.compactions == 1
             assert usage.model_steps == 0
-            assert attempts[0].reported_cost_usd is None
-            assert usage.accounted_cost_usd == Decimal("0.2")
+            assert all(attempt.reported_cost_usd is None for attempt in attempts)
+            assert usage.accounted_cost_usd == Decimal("0.2") * expected_attempts
 
     runner.run(scenario())
 

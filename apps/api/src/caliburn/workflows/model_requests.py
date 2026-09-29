@@ -1,17 +1,21 @@
 """Coordinate existing execution budgets with direct model I/O; no response storage here."""
 
 import json
-from collections.abc import Callable
+from asyncio import CancelledError, sleep
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass
+from datetime import timedelta
 from decimal import Decimal
 from hashlib import sha256
+from random import random
 from uuid import UUID, uuid4
 
-from openai import AsyncOpenAI
+from openai import APIError, AsyncOpenAI
 from openai.types.responses import Response
 from openai.types.responses.compacted_response import CompactedResponse
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
+from caliburn.adapters.openai_failures import ResponseFailure, classify_response_failure
 from caliburn.adapters.openai_responses import (
     ResponseRequest,
     compact_context,
@@ -21,10 +25,15 @@ from caliburn.adapters.openai_responses import (
 )
 from caliburn.agent_execution.context_compaction import ReceivedCompaction
 from caliburn.agent_execution.request_capacity import ReceivedInputCount
+from caliburn.agent_execution.response_retries import ResponseRetryPolicy
 from caliburn.agent_execution.tool_steps import ReceivedModelResponse
 from caliburn.features.executions import budgets, service
 from caliburn.features.executions.budget_models import (
     BudgetConflictError,
+    BudgetExceededError,
+    BudgetLimit,
+    ExecutionBudget,
+    OutboundFailure,
     OutboundKind,
     OutboundRequest,
     validate_cost,
@@ -61,6 +70,14 @@ class ModelUsageUnavailableError(RuntimeError):
     """Keep the original reservation when no reliable observed cost can be calculated."""
 
 
+class ModelRequestFailedError(RuntimeError):
+    """Safe Graph/log boundary; never retain provider bodies or the SDK exception as data."""
+
+    def __init__(self, failure: ResponseFailure) -> None:
+        self.failure = failure
+        super().__init__(f"Outbound model request stopped: {failure.kind.value}")
+
+
 class PriorInputCountAttemptError(RuntimeError):
     """Reconcile the original counting attempt; do not blindly repeat a remote count."""
 
@@ -69,23 +86,30 @@ class PriorCompactionAttemptError(RuntimeError):
     """Reconcile the original compaction attempt; an admission never permits a resend."""
 
 
+class _RetryNotReadyError(Exception):
+    def __init__(self, seconds: float) -> None:
+        self.seconds = seconds
+        super().__init__("The saved server/backoff delay has not elapsed")
+
+
 @dataclass(frozen=True, slots=True)
 class ModelRequestExecutor:
     sessions: async_sessionmaker[AsyncSession]
     writer: ExecutionWriter
     client: AsyncOpenAI
     accounting: ModelRequestAccounting
+    retry_policy: ResponseRetryPolicy = ResponseRetryPolicy()
 
     async def request_model(
         self, request: ResponseRequest, request_id: UUID
     ) -> ReceivedModelResponse:
-        attempt_id = await self._reserve_request(
+        response, attempt_id = await self._send(
             request_id,
             OutboundKind.MODEL,
             request.create_payload(),
             self.accounting.reserved_cost_usd,
+            lambda: create_response(self.client, request),
         )
-        response = await create_response(self.client, request)
         # No DB or cost calculation after the HTTP await: hand intact R to Graph first.
         return ReceivedModelResponse(response, attempt_id)
 
@@ -93,10 +117,13 @@ class ModelRequestExecutor:
         reservation = self.accounting.token_count_reservation_usd
         if reservation is None:
             raise ValueError("Configure a positive reservation before remote token counting")
-        attempt_id = await self._reserve_request(
-            request_id, OutboundKind.TOKEN_COUNT, request.count_payload(), reservation
+        response, attempt_id = await self._send(
+            request_id,
+            OutboundKind.TOKEN_COUNT,
+            request.count_payload(),
+            reservation,
+            lambda: count_response_input(self.client, request),
         )
-        response = await count_response_input(self.client, request)
         # Counting provides no billing usage. Keep the administrative reservation unknown,
         # and persist the returned count before capacity interpretation or another HTTP call.
         return {"input_tokens": response.input_tokens, "attempt_id": attempt_id}
@@ -109,17 +136,79 @@ class ModelRequestExecutor:
             raise ValueError("Configure an explicit compaction reservation and cost calculator")
         context = request.count_payload()
         payload = compaction_payload(model=context["model"], input_items=context["input"])
-        attempt_id = await self._reserve_request(
+        response, attempt_id = await self._send(
             request_id,
             OutboundKind.COMPACTION,
             payload,
             reservation,
-        )
-        response = await compact_context(
-            self.client, model=payload["model"], input_items=payload["input"]
+            lambda: compact_context(
+                self.client, model=payload["model"], input_items=payload["input"]
+            ),
         )
         # Hand intact C to Graph before any DB work or fallible cost calculation.
         return ReceivedCompaction(response, attempt_id)
+
+    async def _send[T](
+        self,
+        request_id: UUID,
+        kind: OutboundKind,
+        payload: dict[str, object],
+        reservation: Decimal,
+        send: Callable[[], Awaitable[T]],
+    ) -> tuple[T, UUID]:
+        """One retry owner for local-function Responses/count/compact, never for tool effects.
+
+        Only a caught provider failure can authorize the next attempt. A crash or lost
+        admission acknowledgement leaves an unresolved record and stops on re-entry.
+        """
+        while True:
+            try:
+                attempt_id = await self._reserve_request(request_id, kind, payload, reservation)
+            except _RetryNotReadyError as delay:
+                # No DB transaction across waiting. Recheck cancellation/writer/deadline;
+                # the persisted timestamp, not this process's timer, authorizes sending.
+                await sleep(min(delay.seconds, 1.0))
+                continue
+            try:
+                response = await send()
+            except APIError as error:
+                try:
+                    retryable = await self._record_failure(attempt_id, error)
+                except (Exception, CancelledError) as save_error:
+                    # Keep the local failure's type and stop. Its default traceback must
+                    # not chain the provider body that happened to precede the DB error.
+                    # Cancellation still propagates, including while awaiting a connection.
+                    raise save_error from None
+                if not retryable:
+                    raise ModelRequestFailedError(classify_response_failure(error)) from None
+                continue
+            return response, attempt_id
+
+    async def _record_failure(self, attempt_id: UUID, error: APIError) -> bool:
+        async with self.sessions.begin() as session:
+            now = await budgets.read_execution_time(session, self.writer.scope)
+            attempt = await budgets.read_outbound_attempt(session, self.writer.scope, attempt_id)
+            if attempt is None:
+                raise BudgetConflictError("Cannot record an unadmitted provider failure")
+            prior = await budgets.read_request_attempts(
+                session, self.writer.scope, attempt.request.request_id
+            )
+            delay = self.retry_policy.delay_seconds(
+                error, attempt_number=len(prior), now=now, random_fraction=random()
+            )
+            retry_at = None
+            if delay is not None:
+                try:
+                    retry_at = now + timedelta(seconds=delay)
+                except OverflowError:
+                    pass  # Too large to represent means stop, never retry sooner.
+            await budgets.record_attempt_failure(
+                session,
+                self.writer.scope,
+                attempt_id,
+                failure=OutboundFailure(classify_response_failure(error).kind.value, retry_at),
+            )
+        return retry_at is not None
 
     async def _reserve_request(
         self,
@@ -145,12 +234,27 @@ class ModelRequestExecutor:
         async with self.sessions.begin() as session:
             # Same-request competitors serialize here. No Python lock or HTTP transaction.
             await service.lock_active_writer(session, self.writer)
-            await self._require_cost_basis(session)
+            policy = await self._require_cost_basis(session)
             prior = await budgets.read_request_attempts(session, self.writer.scope, request_id)
             if any(attempt.request != outbound for attempt in prior):
                 raise BudgetConflictError("An outbound request cannot change its saved payload")
             if prior:
-                raise prior_error("Reconcile the original outbound attempt before retrying")
+                retry_times = []
+                for attempt in prior:
+                    if attempt.failure is None or attempt.failure.retry_not_before is None:
+                        raise prior_error("Reconcile the original outbound attempt before retrying")
+                    retry_times.append(attempt.failure.retry_not_before)
+                now = await budgets.read_execution_time(session, self.writer.scope)
+                retry_at = max(retry_times)
+                if now >= policy.deadline_at or retry_at >= policy.deadline_at:
+                    raise BudgetExceededError(BudgetLimit.DEADLINE)
+                if retry_at > now:
+                    # Reuse admission's budget rules; don't spend a server delay waiting
+                    # when cost or attempt limits already preclude another request.
+                    await budgets.check_outbound_capacity(
+                        session, self.writer, request=outbound, reserved_cost_usd=reservation
+                    )
+                    raise _RetryNotReadyError((retry_at - now).total_seconds())
             admission = await budgets.reserve_outbound_attempt(
                 session,
                 self.writer,
@@ -203,7 +307,8 @@ class ModelRequestExecutor:
                 session, self.writer.scope, received.attempt_id, cost_usd=cost
             )
 
-    async def _require_cost_basis(self, session: AsyncSession) -> None:
+    async def _require_cost_basis(self, session: AsyncSession) -> ExecutionBudget:
         policy = await budgets.read_execution_budget(session, self.writer.scope)
         if policy is None or policy.cost_basis != self.accounting.cost_basis:
             raise BudgetConflictError("The accounting policy does not match this execution")
+        return policy

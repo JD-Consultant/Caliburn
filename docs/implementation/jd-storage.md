@@ -1,11 +1,11 @@
 # JD 保存接線
 
-- 狀態：**T03 profile、職責／任務、共用知識／技能與任務關係、協作對象／共通條件後端及人工 UI 已實作；候選仍待接，驗證依 T03 證據，整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
+- 狀態：**T03 人工編輯與候選／固定正式修訂底層已實作並驗證；來源、Agent Turn 共同完成與候選 UI 仍待後續任務**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
 - 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
 
-目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求、共用知識／技能與任務使用關係、協作對象／共通條件的人工讀寫與排序。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[基本資料](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)、[職責／任務](interface-and-delivery.md#13-t03-職責與任務的人工編輯)、[知識／技能](interface-and-delivery.md#14-t03-共用知識技能及任務關係的人工編輯)及[協作／條件](interface-and-delivery.md#15-t03-協作對象與共通條件的人工編輯)。Agent 候選、依據與核對尚未交付；不能把這些人工正式端點當作 A 寫入捷徑。
+目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求、共用知識／技能與任務使用關係、協作對象／共通條件的人工讀寫與排序。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[基本資料](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)、[職責／任務](interface-and-delivery.md#13-t03-職責與任務的人工編輯)、[知識／技能](interface-and-delivery.md#14-t03-共用知識技能及任務關係的人工編輯)及[協作／條件](interface-and-delivery.md#15-t03-協作對象與共通條件的人工編輯)。候選底層見 §3.1；依據／核對、Agent 接線與候選 UI 尚未交付，不能把人工正式端點當作 A 寫入捷徑。
 
 | 責任 | 已實作位置 |
 |---|---|
@@ -25,6 +25,9 @@
 | 協作對象值、用例與 SQL | [collaborators.py](../../apps/api/src/caliburn/features/job_description/collaborators.py)、[collaborator_service.py](../../apps/api/src/caliburn/features/job_description/collaborator_service.py)、[collaborator_persistence.py](../../apps/api/src/caliburn/features/job_description/collaborator_persistence.py)；獨立文字與選用，不混成 task 關係 |
 | 共通條件值、變更、用例與 SQL | [conditions.py](../../apps/api/src/caliburn/features/job_description/conditions.py)、[condition_changes.py](../../apps/api/src/caliburn/features/job_description/condition_changes.py)、[condition_service.py](../../apps/api/src/caliburn/features/job_description/condition_service.py)、[condition_persistence.py](../../apps/api/src/caliburn/features/job_description/condition_persistence.py)；分類不表示自動繼承 |
 | 新建檔案連同空 JD／開場保存 | [job_files.py](../../apps/api/src/caliburn/workflows/job_files.py)；重送建立不重設 JD |
+| 共用修改範圍與原結果 | [revision_editing.py](../../apps/api/src/caliburn/features/job_description/revision_editing.py)；六種編輯共用欄位規則與固定修訂，只選擇正式或候選指標 |
+| 候選位置、回退及採用參與者 | [candidates.py](../../apps/api/src/caliburn/features/job_description/candidates.py)、[candidate_service.py](../../apps/api/src/caliburn/features/job_description/candidate_service.py)、[candidate_persistence.py](../../apps/api/src/caliburn/features/job_description/candidate_persistence.py)；服務不自行 commit |
+| A 候選准入／短交易 | [jd_candidates.py](../../apps/api/src/caliburn/workflows/jd_candidates.py)；沿既有 execution writer 與檔案鎖，不提供獨立正式完成 HTTP |
 
 ## 2. 固定修訂與目前正式頭
 
@@ -96,7 +99,7 @@ UUID 是身分，不表示時間大小；先後由父修訂與原操作表達。
 - 刪除只移除新 JD 的選用；先前正式修訂、原操作結果及正文仍可回查。同名重建是新 `area_id`，不偷接舊身分。
 - profile 修改必須複製原職責選用；職責修改必須保留 profile。讀取先固定一次 JD head，再依固定選用讀內容，不以多次 latest 查詢拼出混版。
 
-固定內容／選用禁止 UPDATE／DELETE。正式初始／目前 head 及已保存操作結果對應的修訂也禁止事後追加選用；新選用必須在同一短交易、採用 head／保存原結果**之前**完成。這是目前人工修改路徑的歷史保護，不代表 DB 管理員任意 SQL 都被業務授權；T08 接 A 正式採用時須延伸相同保障，不能漏掉新的採用途徑。
+固定內容／選用禁止 UPDATE／DELETE。正式初始／目前 head 及已保存操作結果對應的修訂也禁止事後追加選用；新選用必須在同一短交易、採用 head／保存原結果**之前**完成。人工與候選修改共用這個保護；候選修訂即使從未成為正式 head，也由其原操作結果封存選用。不代表 DB 管理員任意 SQL 都被業務授權；T08 共同完成須沿相同保證接入。
 
 刪職責已在同一短交易將存活任務轉為未歸屬，保留內容與明細身分；追加於既有未歸屬任務之後，維持原組內相對順序，不作 cascade delete。舊操作回讀仍得到當時的職責歸屬。結構操作伴隨跨項目必要內容修訂的完整模型契約仍由 T07 接；不能把目前單純人工刪組端點宣稱為完整模型工具。
 
@@ -278,13 +281,41 @@ sequenceDiagram
 
 所有變更、新修訂、head 與原操作同次提交；中途例外全退。例：命令 P 產生 R2，後來另一命令產生 R3，重送 P 仍回 R2，GET 則回 R3。沒有在此新增未知 COMMIT 的自動 retry loop，也不能用 GET 的 R3 冒充 P 的結果。程序故障／COMMIT 確認遺失的完整跨層驗收仍屬 T12；目前真 PG 回歸包含提交前例外及提交後原命令重送。
 
+### 3.1 本輪候選與可恢復位置
+
+**本節為已實作的 JD 底層，不表示完整 A Turn 已可用。** [0010 migration](../../apps/api/migrations/versions/0010_jd_candidates.py) 為每個 A execution 增加一個候選指標；不複製整份正文，不建立第二份收據或長時間 SQL transaction。
+
+候選保存 `base_revision_id`、`current_revision_id`、`generation_id` 及 `open/adopted/discarded` 狀態。base 為開始時正式修訂；current 選用同一套不可變 JD 修訂。建立候選只讓兩指標指向正式基底，重入取得目前候選，不重設工作。execution／修訂 FK 限同檔案，已關閉候選不能以同 execution 重開。
+
+```mermaid
+flowchart TD
+  F[正式 head：R0] --> S[開始候選：base R0、current R0]
+  S --> E[短交易修改：current R1 → R2]
+  E --> P[預覽固定 current 一次<br/>profile 與全部集合沿同一修訂讀取]
+  E --> R[恢復到本候選祖先 R1<br/>更換 generation，拒絕舊分支遲到寫入]
+  R --> E
+  E --> D[放棄：標記 discarded<br/>正式 head 仍 R0]
+  E --> A[採用參與者：current 成為正式 head<br/>與訪談及 Turn 完成共用呼叫方交易]
+  P -. 不移動正式 head .-> F
+```
+
+- **修改**：檔案列鎖 → 活躍 execution writer → open／generation／正式基底檢查 → 查原操作 → 同一套欄位修改 → 候選 current 與原操作一起提交。每次只持有短交易，不跨模型請求或暫停持鎖。人工正式修改沿既有准入；活躍／暫停 A 仍阻止人工寫入。
+- **讀取**：正式查詢只沿正式 head。候選預覽只接受 active／paused 的 A execution，捕捉一次 current，再讀該固定修訂的 profile 及全部集合；不以多次 latest 拼接。候選 UI／HTTP 與串流更新留 T09，不因已有查詢函式就宣稱 UI 可預覽。
+- **原結果**：沿既有 `jd_operations` 增加 candidate execution／generation scope，人工兩欄皆空；同命令不能改 payload、kind 或跨正式／候選範圍。候選繼續改到 R3 後，重送原先產生 R1 的命令仍回 R1，不把預覽的 R3 冒充原結果。舊分支已失效時，不重新執行其編輯。
+- **回退**：只接受目前候選分支、且不早於 base 的祖先修訂。回退建立新的 generation；它和 execution writer 不同，前者隔離已放棄的工作分支，後者隔離被接管的程序。原回退命令重送回原結果，不再次移動 current、也不復活先前分支。所有這些定位由 App 管理，不讓 LLM 填版本／generation。
+- **安全點不是每個修訂**：工具可能在同一 Step 中產生多個修訂；哪個位置已形成完整可恢復 Step，由共用執行／T08 的已保存進度決定。本服務僅保障可定位與合法回退，不自行猜 Step、清 context 或處理 compaction。T08 必須把 JD 位置與對應 context 一起接回，不能只回退 JD。
+- **放棄**：關閉本候選，保留固定修訂與原結果；不是倒轉正式修改。暫停可讀不可編輯，仍可取消；T08 須以同一短交易把放棄與 execution 終態一起提交。目前工作流的單項 discard 僅內部底層能力，不提供假 Turn 取消端點。
+- **採用**：`adopt_candidate_jd` 是不 commit 的參與者，要求原 writer 與候選位置仍有效，再讓正式 head 選 current、關閉候選並保存原結果。已提交採用可取回原結果，不重新取得寫入資格；不能把 cancelled／failed 當成功。T08 才會把 JD、正式輸入／完整答覆、current_input 依據、背景意圖與 execution 完成全部接入同一交易。
+
+**已驗證的組合界線**：真 PG 測試把採用、正式訪談保存及 execution 完成放在同一交易；提交前故障全退，成功後重送取回原結果。沒有用這個底層測例代替 T08 真 Agent、T09 預覽畫面或 T12 強殺／未知 COMMIT 驗收。候選歷史目前不自動清理，亦不宣稱永久保留策略已完成。
+
 ## 4. 初始化、演進與保證界線
 
 新建職務檔案、開場與空 JD 同一短交易；任一失敗不留下半套檔案。0005 為已存在的**新目標 0004** 檔案補一份空 JD，重跑 upgrade 不重建；沒有讀舊 production／搬舊資料。已知檔案卻缺少 JD head 是保存不一致，不在 GET 偷修成空白；缺 schema 的啟動仍 fail fast。
 
 資料庫保障複合 FK、唯一命令、固定修訂不可改與交易原子性；領域／工作流負責允許欄位、人工准入與新基底檢查。這不宣稱 DB 管理員任意 SQL 都符合業務，也不以檢查通過表示文字是員工事實。人工編輯造成的核對狀態與來源固定鏈路在 T07 接入，不在此自動確認。
 
-後續 A 必須寫候選而非本 HTTP 的正式 head；A 完成時再與正式訪談、答覆及背景意圖同次發布（T08）。已建立的純欄位規則可共用，但人工准入和候選資格不可被一個忽略差異的 `save` 合併。當集合、候選與來源落地，更新本頁及相應圖，不另建第二份 JD 儲存權威。
+後續 A 使用 §3.1 候選而非本 HTTP 的正式 head；A 完成時再與正式訪談、答覆及背景意圖同次發布（T08）。六類編輯已共用純欄位規則，但人工准入和候選資格仍明確分開。來源落地時更新本頁及相應圖，不另建第二份 JD 儲存權威。
 
 ## 5. 研究依據與本案取捨
 
@@ -294,6 +325,8 @@ sequenceDiagram
 - 協作／條件沿相同機制：固定 kind 值域與單列正文條件用具名 CHECK，跨列身分／修訂用 FK／UNIQUE；未引入需要獨立生命週期的 PostgreSQL enum type 或 schema 動態引擎。核對 [SQLAlchemy constraints](https://docs.sqlalchemy.org/en/21/core/constraints.html)後採與既有 capability 相同的 text＋明確約束。條件換分類的排序與身分是本案領域選擇，不是 PostgreSQL 代替顧問判斷。
 - 同頁的 `NULLS NOT DISTINCT` 用於任務未歸屬排序，避免一般 UNIQUE 把 null 視為可重複而留下衝突位置；跨列／表限制用 FK／UNIQUE，不塞入跨表 CHECK。SQLAlchemy 2.1.1 已安裝 dialect 原碼的 UniqueConstraint `nulls_not_distinct` 支援、實際 migration／metadata 比對及真 PG 反例共同驗證，沒有為此加自訂排序引擎。
 - [PostgreSQL row locking](https://www.postgresql.org/docs/current/explicit-locking.html)：列鎖在交易結束釋放；本案延用已建立的檔案列鎖，把准入與正式修改放同一短提交，不持鎖等待模型或人。
+- [PostgreSQL SAVEPOINT](https://www.postgresql.org/docs/18/sql-savepoint.html)屬目前交易內的回退位置，不是跨程序、跨多次提交的 Step 安全點。本案沿固定修訂保存候選位置，回退只變更候選指標與 generation，不讓 DB 交易跨越 LLM 執行；這是依既定產品恢復要求做的選擇，不是把 SAVEPOINT 當持久 checkpoint。
+- [SQLAlchemy transaction context](https://docs.sqlalchemy.org/en/21/orm/session_transaction.html)由外層 `session.begin()` 界定提交／回退；JD 採用只參與交易。真 PG 驗證它能和既有正式訪談／execution 完成一起全成或全退，沒有另引交易框架。
 - [SQLAlchemy version counter](https://docs.sqlalchemy.org/en/21/orm/versioning.html)：ORM counter 的 flush 衝突檢查不是自動保留完整歷史。因此採 JD 自己的固定修訂／head／原結果，不增加通用版本平台。
 - [SQLAlchemy INSERT FROM SELECT](https://docs.sqlalchemy.org/en/21/tutorial/data_insert.html#insert-from-select)：profile 改動由既有固定選用複製小型關係鍵，不先把全部正文讀回再寫一份。職責新增／修訂才寫新正文，其餘選用重用固定修訂。
 - [SQLAlchemy association object](https://docs.sqlalchemy.org/en/21/orm/basic_relationships.html#association-object)：關係有自身屬性時用明確關聯表示。本案任務與能力的關係帶排序、固定 JD 修訂，因此保留具名關係列；使用既有顯式 SQL，不另外混用可寫 secondary 關係或 ORM cascade 去管理同一組邊。知識／技能正文與反向用途不重複保存。

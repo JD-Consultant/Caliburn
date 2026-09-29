@@ -3,7 +3,15 @@
 from datetime import datetime
 from uuid import UUID
 
-from sqlalchemy import CheckConstraint, DateTime, ForeignKey, ForeignKeyConstraint, Text, func
+from sqlalchemy import (
+    CheckConstraint,
+    DateTime,
+    ForeignKey,
+    ForeignKeyConstraint,
+    Text,
+    func,
+    select,
+)
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
@@ -83,8 +91,18 @@ class JdOperationRecord(Base):
         ),
         CheckConstraint(
             "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities', "
-            "'edit_collaborators', 'edit_conditions')",
+            "'edit_collaborators', 'edit_conditions', 'restore_candidate', "
+            "'discard_candidate', 'adopt_candidate')",
             name="kind",
+        ),
+        ForeignKeyConstraint(
+            ["job_file_id", "candidate_execution_id"],
+            ["jd_candidates.job_file_id", "jd_candidates.execution_id"],
+            name="fk_jd_operations_candidate",
+        ),
+        CheckConstraint(
+            "(candidate_execution_id IS NULL) = (candidate_generation_id IS NULL)",
+            name="candidate_scope",
         ),
     )
 
@@ -93,6 +111,8 @@ class JdOperationRecord(Base):
     kind: Mapped[str] = mapped_column(Text)
     expected_revision_id: Mapped[UUID]
     result_revision_id: Mapped[UUID]
+    candidate_execution_id: Mapped[UUID | None]
+    candidate_generation_id: Mapped[UUID | None]
     # Loaded JSON is untrusted until compared with the typed original command.
     request_payload: Mapped[object] = mapped_column(JSONB)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
@@ -126,6 +146,29 @@ async def read_operation(
     session: AsyncSession, job_file_id: UUID, command_id: UUID
 ) -> JdOperationRecord | None:
     return await session.get(JdOperationRecord, (job_file_id, command_id))
+
+
+async def is_revision_ancestor(
+    session: AsyncSession, job_file_id: UUID, *, ancestor: UUID, descendant: UUID, boundary: UUID
+) -> bool:
+    """Follow fixed parents only as far as this candidate's initial formal base."""
+    chain = (
+        select(JdRevisionRecord.revision_id, JdRevisionRecord.parent_revision_id)
+        .where(
+            JdRevisionRecord.job_file_id == job_file_id, JdRevisionRecord.revision_id == descendant
+        )
+        .cte("candidate_ancestry", recursive=True)
+    )
+    chain = chain.union_all(
+        select(JdRevisionRecord.revision_id, JdRevisionRecord.parent_revision_id)
+        .join(chain, JdRevisionRecord.revision_id == chain.c.parent_revision_id)
+        .where(JdRevisionRecord.job_file_id == job_file_id, chain.c.revision_id != boundary)
+    )
+    return (
+        await session.scalar(
+            select(chain.c.revision_id).where(chain.c.revision_id == ancestor).limit(1)
+        )
+    ) is not None
 
 
 async def insert_revision(

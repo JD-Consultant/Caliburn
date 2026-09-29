@@ -1,11 +1,16 @@
-"""Area commands reuse the JD formal head, original results and caller-owned transaction."""
+"""Area commands share fixed JD revisions and a caller-selected editing scope."""
 
 from dataclasses import replace
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import area_persistence, persistence, task_persistence
+from caliburn.features.job_description import (
+    area_persistence,
+    persistence,
+    revision_editing,
+    task_persistence,
+)
 from caliburn.features.job_description.areas import (
     AreaChange,
     AreaField,
@@ -19,6 +24,7 @@ from caliburn.features.job_description.areas import (
     ReviseArea,
     area_change_payload,
 )
+from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.models import (
     JdCommandConflictError,
     JdProfileRevision,
@@ -36,9 +42,15 @@ async def read_areas(session: AsyncSession, job_file_id: UUID) -> JdAreasRevisio
 
 
 async def recover_area_result(
-    session: AsyncSession, job_file_id: UUID, command: EditJdAreas
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: EditJdAreas,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdAreasRevision | None:
-    operation = await persistence.read_operation(session, job_file_id, command.command_id)
+    operation = await revision_editing.read_edit_operation(
+        session, job_file_id, command.command_id, candidate
+    )
     if operation is None:
         return None
     if (
@@ -91,10 +103,17 @@ def _apply_change(
 
 
 async def edit_areas(
-    session: AsyncSession, job_file_id: UUID, command: EditJdAreas
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: EditJdAreas,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdAreasRevision:
-    """Call only after original-result lookup, file lock and manual admission; do not commit."""
-    current = await read_areas(session, job_file_id)
+    """Call after original-result lookup, file lock and scope admission; do not commit."""
+    revision_id = await revision_editing.read_edit_revision(session, job_file_id, candidate)
+    current = JdAreasRevision(
+        revision_id, await area_persistence.read_areas(session, job_file_id, revision_id)
+    )
     if current.revision_id != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")
     areas, new_content = _apply_change(current.areas, command.change)
@@ -118,17 +137,14 @@ async def edit_areas(
             areas=areas,
             tasks=tasks,
         )
-        document = await persistence.read_document(session, job_file_id)
-        document.current_revision_id = result.revision_id
-    session.add(
-        persistence.JdOperationRecord(
-            job_file_id=job_file_id,
-            command_id=command.command_id,
-            kind="edit_areas",
-            expected_revision_id=command.expected_revision_id,
-            result_revision_id=result.revision_id,
-            request_payload=area_change_payload(command.change),
-        )
+    await revision_editing.record_edit(
+        session,
+        job_file_id,
+        command_id=command.command_id,
+        kind="edit_areas",
+        expected_revision_id=command.expected_revision_id,
+        result_revision_id=result.revision_id,
+        request_payload=area_change_payload(command.change),
+        candidate=candidate,
     )
-    await session.flush()
     return result

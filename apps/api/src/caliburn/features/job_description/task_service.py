@@ -1,10 +1,16 @@
-"""Task commands share the formal JD head and caller-owned transaction."""
+"""Task commands share fixed JD revisions and a caller-selected editing scope."""
 
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import area_persistence, persistence, task_persistence
+from caliburn.features.job_description import (
+    area_persistence,
+    persistence,
+    revision_editing,
+    task_persistence,
+)
+from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.models import (
     JdCommandConflictError,
     JdProfileRevision,
@@ -26,8 +32,12 @@ async def recover_task_result(
     session: AsyncSession,
     job_file_id: UUID,
     command: EditJdTasks,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdTasksRevision | None:
-    operation = await persistence.read_operation(session, job_file_id, command.command_id)
+    operation = await revision_editing.read_edit_operation(
+        session, job_file_id, command.command_id, candidate
+    )
     if operation is None:
         return None
     if (
@@ -46,9 +56,14 @@ async def edit_tasks(
     session: AsyncSession,
     job_file_id: UUID,
     command: EditJdTasks,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdTasksRevision:
-    """Call after file lock, original-result lookup and manual admission; do not commit."""
-    current = await read_tasks(session, job_file_id)
+    """Call after file lock, original-result lookup and scope admission; do not commit."""
+    revision_id = await revision_editing.read_edit_revision(session, job_file_id, candidate)
+    current = JdTasksRevision(
+        revision_id, await task_persistence.read_tasks(session, job_file_id, revision_id)
+    )
     if current.revision_id != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")
     areas = await area_persistence.read_areas(session, job_file_id, current.revision_id)
@@ -68,17 +83,14 @@ async def edit_tasks(
             parent_revision_id=current.revision_id,
             tasks=tasks,
         )
-        document = await persistence.read_document(session, job_file_id)
-        document.current_revision_id = result.revision_id
-    session.add(
-        persistence.JdOperationRecord(
-            job_file_id=job_file_id,
-            command_id=command.command_id,
-            kind="edit_tasks",
-            expected_revision_id=command.expected_revision_id,
-            result_revision_id=result.revision_id,
-            request_payload=task_edit_payload(command.change),
-        )
+    await revision_editing.record_edit(
+        session,
+        job_file_id,
+        command_id=command.command_id,
+        kind="edit_tasks",
+        expected_revision_id=command.expected_revision_id,
+        result_revision_id=result.revision_id,
+        request_payload=task_edit_payload(command.change),
+        candidate=candidate,
     )
-    await session.flush()
     return result

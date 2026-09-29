@@ -1,10 +1,11 @@
-"""Condition commands reuse the JD formal head, original results and caller-owned transaction."""
+"""Condition commands share fixed JD revisions and a caller-selected editing scope."""
 
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import condition_persistence, persistence
+from caliburn.features.job_description import condition_persistence, persistence, revision_editing
+from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.condition_changes import apply_condition_change
 from caliburn.features.job_description.conditions import (
     EditJdConditions,
@@ -27,9 +28,15 @@ async def read_conditions(session: AsyncSession, job_file_id: UUID) -> JdConditi
 
 
 async def recover_condition_result(
-    session: AsyncSession, job_file_id: UUID, command: EditJdConditions
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: EditJdConditions,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdConditionsRevision | None:
-    operation = await persistence.read_operation(session, job_file_id, command.command_id)
+    operation = await revision_editing.read_edit_operation(
+        session, job_file_id, command.command_id, candidate
+    )
     if operation is None:
         return None
     if (
@@ -47,10 +54,17 @@ async def recover_condition_result(
 
 
 async def edit_conditions(
-    session: AsyncSession, job_file_id: UUID, command: EditJdConditions
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: EditJdConditions,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdConditionsRevision:
-    """Call only after original-result lookup, file lock and manual admission; do not commit."""
-    current = await read_conditions(session, job_file_id)
+    """Call after original-result lookup, file lock and scope admission; do not commit."""
+    revision_id = await revision_editing.read_edit_revision(session, job_file_id, candidate)
+    current = JdConditionsRevision(
+        revision_id, await condition_persistence.read_conditions(session, job_file_id, revision_id)
+    )
     if current.revision_id != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")
     conditions, new_content = apply_condition_change(current.conditions, command.change)
@@ -67,17 +81,14 @@ async def edit_conditions(
             parent_revision_id=current.revision_id,
             conditions=conditions,
         )
-        document = await persistence.read_document(session, job_file_id)
-        document.current_revision_id = result.revision_id
-    session.add(
-        persistence.JdOperationRecord(
-            job_file_id=job_file_id,
-            command_id=command.command_id,
-            kind="edit_conditions",
-            expected_revision_id=command.expected_revision_id,
-            result_revision_id=result.revision_id,
-            request_payload=condition_change_payload(command.change),
-        )
+    await revision_editing.record_edit(
+        session,
+        job_file_id,
+        command_id=command.command_id,
+        kind="edit_conditions",
+        expected_revision_id=command.expected_revision_id,
+        result_revision_id=result.revision_id,
+        request_payload=condition_change_payload(command.change),
+        candidate=candidate,
     )
-    await session.flush()
     return result

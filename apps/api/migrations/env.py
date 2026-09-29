@@ -9,6 +9,7 @@ from caliburn.features.executions.persistence import ExecutionRecord
 from caliburn.features.interviews.persistence import (
     FormalInterviewRecord,
     InterviewInputRecord,
+    InterviewReplyRecord,
     InterviewTextRecord,
 )
 from caliburn.features.job_files.persistence import JobFileRecord
@@ -21,6 +22,7 @@ assert JobFileRecord.__table__.metadata is target_metadata
 assert InterviewTextRecord.__table__.metadata is target_metadata
 assert FormalInterviewRecord.__table__.metadata is target_metadata
 assert InterviewInputRecord.__table__.metadata is target_metadata
+assert InterviewReplyRecord.__table__.metadata is target_metadata
 assert ExecutionRecord.__table__.metadata is target_metadata
 
 

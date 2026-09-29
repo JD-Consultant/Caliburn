@@ -1,4 +1,4 @@
-"""A fresh-process LangGraph/PG capability probe; intentionally has no product side effects."""
+"""Fresh-process PG probe using native response helpers, not the full product runner."""
 
 import asyncio
 import json
@@ -8,11 +8,21 @@ from pathlib import Path
 from typing import Any, TypedDict
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
+from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from langgraph.graph import END, START, StateGraph
 from openai.types.responses import Response
 
+from caliburn.adapters.response_serialization import (
+    function_result_item,
+    response_input_items,
+    restore_response,
+    snapshot_response,
+)
+from caliburn.agent_execution.response_steps import ResponseAction, inspect_response_step
+
 
 class ProbeState(TypedDict):
+    response_snapshot: dict[str, Any]
     native_items: list[dict[str, Any]]
 
 
@@ -20,7 +30,8 @@ async def run(mode: str, thread_id: str) -> None:
     response = Response.model_validate_json(
         Path(__file__).with_name("native-response.json").read_text(encoding="utf-8")
     )
-    original_items = [item.model_dump(mode="json") for item in response.output]
+    original_snapshot = snapshot_response(response)
+    original_items = response_input_items(response)
     model_calls = 0
     observation_calls = 0
     observation = {
@@ -32,16 +43,25 @@ async def run(mode: str, thread_id: str) -> None:
     def model_step(state: ProbeState) -> ProbeState:
         nonlocal model_calls
         model_calls += 1
-        return {"native_items": original_items}
+        return {"response_snapshot": original_snapshot, "native_items": []}
 
     def observe(state: ProbeState) -> ProbeState:
         nonlocal observation_calls
         observation_calls += 1
-        assert state["native_items"] == original_items
-        return {"native_items": [*state["native_items"], observation]}
+        restored = restore_response(state["response_snapshot"])
+        step = inspect_response_step(restored)
+        assert step.action == ResponseAction.EXECUTE_TOOLS
+        assert len(step.calls) == 1
+        result = function_result_item(step.calls[0], "synthetic result")
+        assert result == observation
+        return {
+            "response_snapshot": state["response_snapshot"],
+            "native_items": [*response_input_items(restored), result],
+        }
 
     async with AsyncPostgresSaver.from_conn_string(
-        os.environ["CALIBURN_TEST_DATABASE_URL"]
+        os.environ["CALIBURN_TEST_DATABASE_URL"],
+        serde=JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None),
     ) as saver:
         await saver.setup()
         builder = StateGraph(ProbeState)
@@ -55,14 +75,17 @@ async def run(mode: str, thread_id: str) -> None:
         before = await graph.aget_state(config)
         if mode == "write":
             assert not before.values
-            await graph.ainvoke({"native_items": []}, config, durability="sync")
+            await graph.ainvoke(
+                {"response_snapshot": {}, "native_items": []}, config, durability="sync"
+            )
             saved = await graph.aget_state(config)
             assert saved.next == ("observe",)
-            assert saved.values["native_items"] == original_items
+            assert saved.values["response_snapshot"] == original_snapshot
+            assert saved.values["native_items"] == []
             assert model_calls == 1 and observation_calls == 0
         elif mode == "resume":
             assert before.next == ("observe",)
-            assert before.values["native_items"] == original_items
+            assert before.values["response_snapshot"] == original_snapshot
             await graph.ainvoke(None, config, durability="sync")
             saved = await graph.aget_state(config)
             assert not saved.next

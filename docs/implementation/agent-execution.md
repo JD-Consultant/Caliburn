@@ -1,11 +1,11 @@
 # Agent 原生接續與可恢復接線
 
-- 狀態：**供實作的工程接線／未驗證**。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
+- 狀態：**T06 施工中；原生回應保存／投影及完整回應路由已有元件證據，完整 Runtime 仍未交付**。實測與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
 - T06–T12 先以假 provider＋真 saver／PG 驗證；T06 可依[本 Goal 授權及分批上限](../plans/2026-09-29-target-rebuild/README.md#3-狀態與施工順序)提前做少量協定預檢，T16 才做完整有界模型驗收。LLM 推理內容不可解讀作驗收。
 
 ## 1. 執行圖與業務資格分開
 
-`agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯；不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。
+目標由 `agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；目前僅有下述原生回應路由元件，不能把本節節點表當已接好的 runner。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯；不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。
 
 建議節點切法如下，節點名稱是工程名稱，不是對模型公開的新工具：
 
@@ -57,6 +57,23 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 一次 response 可能零／一／多 calls，也可能有公開中間文字。以原生項目與尚未完成的 calls 路由，不能憑 `output_text` 非空或 response.completed 當 Turn 結束。每一 call 都保留 call_id 與結果，已拒絕可回確定錯誤，未知效果先對帳。[OpenAI function calling](https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls)
 
 模型不填 version／job_file_id／budget／operation；工具 handler 收 Runtime binding，轉譯成領域命令。傳給模型的 schema 只包含被授權角色的動作；不新增 generic execute、SQL 或任意文件操作。
+
+### 4.1 已落地的原生回應邊界（T06 第一切片）
+
+`adapters/response_serialization.py` 承接 SDK `Response`／`CompactedResponse`，不自製 provider 格式：
+
+- 保存原件使用 `model_dump(mode="json", by_alias=True, exclude_unset=True)`；保留全部已收到欄位、usage、opaque content、原 status 與額外 provider metadata。`by_alias` 保持原 `async`，不把 Python 的 `async_` 寫成 wire 欄位。恢復以同一 SDK schema 驗原件，不能只存 `output_text`。
+- 一般模型 output 的出站投影保留完整項目，只依官方部署範例排除各項頂層 `status`，不修改原件；`phase`、call metadata、內容順序及未知附加欄位不裁掉。Reasoning 頁的 Python 範例未排除此欄，故本案選部署範例作最小投影並保留 provider gate；離線 SDK 會發送不等於遠端已接受。
+- Standalone compact 保存整份返回，採用時取其**全部 output**，含保留項目，不只選摘要、不再添加舊輸入。SDK 3.20.0 的 output union 過窄，不能拿它重驗可能保留的 user/input_text；保存使用 SDK `to_dict(mode="json", warnings=False)` 保留實際欄位，避免已知型別警告印出原話，採用時僅核 output 容器並複製完整窗口。不自訂替代 provider schema。已用 SDK MockTransport 比對原 JSON，但安全採用與遠端相容仍須後續 gate。[官方完整 window 契約](https://developers.openai.com/api/docs/guides/compaction#standalone-compact-endpoint)
+- 工具結果用原 call_id，保留 direct caller；已保存結果序列只能是原 calls 的有序前綴，不能跳過、重複或交換配對。原操作冪等與 Graph 保存仍是另外兩個責任。
+
+`agent_execution/response_steps.py` 只從完整原件推導路由，**不執行工具或宣告正式完成**。完整 response 內有 calls 時先走工具，即使同時有 final 文字也不結束；只有 commentary／reasoning 或空白 final 時繼續；無 calls 且有非空白 final 文字／拒絕時才交給產品完成責任。公開文字只取 assistant message，reasoning 不進公開訊息列表。
+
+未完成 response／item、error、不一致的 incomplete details 不准派送工具。重複或空 call 身分、未配置的 builtin、program／async／namespace 協定或沒有可辨認 phase，明確停下，不默默忽略或猜 final。這是本產品**目前只支援 direct local functions 與明確 phase**的防護，不是 API 本身禁止那些能力；真模型預檢若顯示合約差距，要查證調整而非無限重試。原回應須先保留，之後才做此檢查。
+
+依據：2026-09-30 重新讀取 [stateless 接續](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)、[部署範例](https://developers.openai.com/api/docs/guides/deployment-checklist#use-reasoningencrypted_content)、[phase](https://developers.openai.com/api/docs/guides/deployment-checklist#set-up-the-assistant-phase-parameter)、[多工具配對](https://developers.openai.com/api/docs/guides/function-calling#handling-function-calls)，以及鎖定 OpenAI 3.20.0 的 input/output 型別；不靠舊專案的 3.13.0 宣稱本次相容。
+
+已用官方 saver／真 PG 新程序驗原件往返、正常 `ainvoke(None)` 接續且模型不重跑。測試明確關閉 pickle 及自訂 msgpack 型別還原；沒有自製 serializer。Prepared command 的遞迴型別 allowlist、保存失敗／確認遺失、多工具副作用、執行資格與預算仍待後續切片。`sync` 不代表框架與業務共用一次交易，也不能保證尚未保存的回應永遠可取回。
 
 ## 5. 容量、重試與恢復不是同一政策
 

@@ -9,8 +9,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from caliburn.adapters.database import Base
-from caliburn.features.job_description import area_persistence, task_persistence
+from caliburn.features.job_description import (
+    area_persistence,
+    capability_persistence,
+    task_persistence,
+)
 from caliburn.features.job_description.areas import ResponsibilityArea
+from caliburn.features.job_description.capabilities import Capability, TaskCapabilityLink
 from caliburn.features.job_description.models import JdProfile, JdProfileRevision
 from caliburn.features.job_description.tasks import WorkTask
 
@@ -72,7 +77,10 @@ class JdOperationRecord(Base):
             ["jd_revisions.job_file_id", "jd_revisions.revision_id"],
             name="fk_jd_operations_result_revision",
         ),
-        CheckConstraint("kind IN ('revise_profile', 'edit_areas', 'edit_tasks')", name="kind"),
+        CheckConstraint(
+            "kind IN ('revise_profile', 'edit_areas', 'edit_tasks', 'edit_capabilities')",
+            name="kind",
+        ),
     )
 
     job_file_id: Mapped[UUID] = mapped_column(ForeignKey("job_files.job_file_id"), primary_key=True)
@@ -123,6 +131,8 @@ async def insert_revision(
     parent_revision_id: UUID | None,
     areas: tuple[ResponsibilityArea, ...] | None = None,
     tasks: tuple[WorkTask, ...] | None = None,
+    capabilities: tuple[Capability, ...] | None = None,
+    task_links: tuple[TaskCapabilityLink, ...] | None = None,
 ) -> None:
     session.add(
         JdRevisionRecord(
@@ -146,5 +156,21 @@ async def insert_revision(
         await task_persistence.select_tasks(session, job_file_id, revision.revision_id, tasks)
     elif parent_revision_id is not None:
         await task_persistence.copy_task_selection(
+            session, job_file_id, parent_revision_id, revision.revision_id
+        )
+    if capabilities is not None:
+        await capability_persistence.select_capabilities(
+            session, job_file_id, revision.revision_id, capabilities
+        )
+    elif parent_revision_id is not None:
+        await capability_persistence.copy_capability_selection(
+            session, job_file_id, parent_revision_id, revision.revision_id
+        )
+    if task_links is not None:
+        await capability_persistence.select_task_links(
+            session, job_file_id, revision.revision_id, task_links
+        )
+    elif parent_revision_id is not None:
+        await capability_persistence.copy_task_links(
             session, job_file_id, parent_revision_id, revision.revision_id
         )

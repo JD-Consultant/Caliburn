@@ -1,0 +1,109 @@
+# 程式組織、依賴方向與命名
+
+- 狀態：**目標程式設計／未建立**；2026-09-29。樹中的路徑是施工位置，不代表檔案已存在。
+- 依據：[系統責任](../architecture/system-boundaries.md)、[工程取捨](../architecture/design-decisions.md)、[開發規範](development-standard.md)。採模組化單體，不將每個業務模組拆成部署或套件。
+
+## 1. 目錄依業務責任組織，機制集中在少數邊界
+
+```text
+apps/
+  api/
+    pyproject.toml / uv.lock
+    contracts/                  # JSON Schema 唯一來源，依 http、tools 分用途
+    migrations/                 # Alembic；業務 schema，不手改框架 checkpoint 表
+    src/caliburn/
+      bootstrap.py              # 唯一組裝根：settings、DB、clients、services、graphs
+      settings.py               # 啟動配置驗證；不在 import 時讀密鑰或啟動程序
+      features/
+        job_files/              # 檔案名稱、受訪者、隔離與建立
+        interviews/             # 原輸入、正式序號、原文範圍與來源資格
+        job_description/        # JD、候選、來源、差異、正式稿與撤回
+        work_memory/            # 候選三層、關係、交接差異、不可變發布快照
+        executions/             # 持久執行資格、取消／完成勝負與費用限制
+      workflows/
+        consultant_turn.py      # 跨模組 A 接受、完成、取消的協調
+        memory_batch.py         # 背景領取、階段交接、發布協調
+      agents/
+        job_consultant/         # A：prompt、允許工具與起始投影
+        work_situation_analyst/ # B1：只處理情境
+        work_understanding_analyst/ # B2：理解與按需情境回交
+      agent_execution/          # 共用 node loop、原生 context、Step／恢復／compact
+      adapters/
+        database.py             # engine／session／短交易機制
+        openai_responses.py     # direct SDK；不另造 provider interface family
+        graph_checkpointer.py  # 官方 saver 初始化、序列化與身分綁定
+        pdf_renderer.py         # 正式 JD 的受控列印
+      transport/http/           # routers、DTO mapping、公開串流；無業務 SQL
+      contracts/generated/     # 生成 Python DTO，只有邊界可用
+    tests/
+      unit/ contracts/ integration/ journeys/ fixtures/
+  web/
+    package.json
+    src/
+      app/                      # 路由、啟動、providers、頁面組裝
+      features/
+        job-files/ interview/ jd-editor/ source-viewer/
+      shared/api/               # generated 型別、HTTP／串流 transport
+      shared/ui/                # 確有多處使用的元件，非業務元件大倉庫
+    tests/e2e/
+```
+
+不先建立所有空資料夾／檔案。每個 feature 先以 `models.py`（純型別與不變量）、`service.py`（用例）、`persistence.py`（該領域 SQL）、`queries.py`（讀取投影）按實際需要建立；大了再依業務責任拆，例如 `citations.py`、`snapshots.py`。不是每功能必須四個檔案，也不為一個函式包 class。測試依受測責任命名，不做一份幾千行全產品測試。
+
+業務表的 SQL 留在各 feature 的 persistence，不塞進全域 database.py；交易與連線機制才共用。`executions` 只擁有正式准入／控制資格與預算，不能再存一份 Graph node 游標、候選全文或模型對話。
+
+## 2. 依賴方向與可檢查限制
+
+圖為**目標 Python 靜態依賴**；箭頭表示 import／呼叫方向，不是執行時序。組裝根可注入所有具體實作。
+
+```mermaid
+flowchart TD
+  bootstrap[bootstrap 組裝根] --> http[HTTP 邊界]
+  bootstrap --> roles[角色組裝與工具]
+  http --> workflows[跨領域 workflows]
+  roles --> workflows
+  roles --> services[各 feature service／queries]
+  roles --> execution[共用 agent_execution]
+  workflows --> services
+  services --> models[純 models／領域規則]
+  services --> storage[各 feature persistence]
+  storage --> database[共用 DB session／transaction]
+  execution --> provider[Responses／checkpointer adapter]
+```
+
+1. `models.py` 不 import FastAPI、SQLAlchemy、LangGraph、OpenAI、生成 transport DTO 或別的 feature persistence。
+2. Router／模型工具是薄入口，轉型後呼叫同一業務 service；人工與 AI 不各寫一套 JD validator。UI 不自行裁決權限、正式成功、來源版本或 Memory 發布。
+3. `agent_execution` 不 import A／B1／B2 角色、JD 或 Memory ORM；由角色提供具名工具 handler 與起始資料。角色可依賴它，不能互相 import 私有 prompt／state。
+4. 跨 feature 協調放 workflows；讀別的領域走具體公開查詢／typed result，不直查別人的表。共享交易由 workflow 開啟，把同一 session 交給指定 service；內層不私自 commit。不是微服務，也不需要把同庫內呼叫變 HTTP。
+5. 需要替換外部 I/O 做測試時用窄 `Protocol`／callable；純 Python 少數消費者直接使用明確型別。不建每類一套抽象 factory、BaseRepository 或萬用 UnitOfWork 註冊表。
+6. 前端 `shared` 不 import feature；feature 不 import 別的 feature 私有元件。頁面跨 feature 協作由 app 組裝，server state 用同一 query cache，局部輸入草稿留局部元件。
+
+T01 用 lint import 限制與小型 AST／import 測試鎖住上述幾條高價值規則；不自行開發架構分析平台。需要例外先說出實際循環／成本，不能用 `TYPE_CHECKING` 或動態 import 掩蓋不當依賴。
+
+本案借鑑 [AWS ports／adapters](https://docs.aws.amazon.com/prescriptive-guidance/latest/hexagonal-architectures/overview.html)的業務與 I/O 分離；不聲稱上述目錄是 AWS 標準模板，也不照搬每層必須 interface 的儀式。
+
+## 3. 名稱要能表達身分、時間與效果
+
+| 類型 | 本案規則／例子 |
+|---|---|
+| Python module／函式／變數 | `snake_case`；`publish_memory_snapshot`、`complete_consultant_turn`、`list_work_situations`，不用 `process_data`／`handle_thing` |
+| Python class／型別 | `PascalCase`；`MemorySnapshot`、`ConsultantTurnBinding`、`CandidatePosition`；不把所有服務叫 Manager／Engine |
+| TypeScript | 型別／React 元件 `PascalCase`，函式／變數 `camelCase`，hook `use…`；元件檔 `JdEditor.tsx`、一般檔 `jd-api.ts`，資料夾 kebab-case |
+| wire／schema／模型工具 | 沿契約的 snake_case，不為 JS 美觀換一套欄名；工具動賓短語。native provider keys 不重命名 |
+| 身分與位置 | `job_file_id`、`memory_snapshot_id`、`object_id`、`revision_id`、`interview_sequence`；不能全叫 `version`／`id` |
+| 時間／容量 | `timeout_seconds`、`input_tokens`、`cost_usd`；布林 `is_…`／`has_…`，不讓數字單位靠記憶 |
+| 角色與資料 | 程式用完整角色名；A／B1／B2 僅作文件別名。內部 `work_situation`／`work_understanding`，不沿用含義模糊的 case／memory_data |
+| 命令與查詢 | 查詢 `read/get/list/compare` 無業務寫入副作用；命令 `create/revise/delete/publish/confirm` 描述效果。`complete` 只能表示已成立的相應完成邊界 |
+| 測試 | `test_cancelled_turn_cannot_publish_late_tool_result`；清楚行為與條件，不以 `test_01` 或實作函式名取代意圖 |
+
+`target_title` 是 Memory 模型選擇；`read_ref` 是 JD 模型定位；`citation_ref` 是既存 JD 依據定位；三者不互換。`turn` 是執行工作，`step` 是一次模型回應及工具結果，`interview_sequence` 是正式訪談順序。不能把圖的 super-step 當產品 Step。
+
+命名原則參考 [Google Python](https://google.github.io/styleguide/pyguide.html#316-naming)、[Google TypeScript](https://google.github.io/styleguide/tsguide.html#identifiers)。本案選擇 TS 檔名與格式化器，不表示原樣採用 Google 全部內部規約。
+
+## 4. 讓修改容易理解
+
+- 每個 module 一段短 docstring 說 owner／邊界；不逐行翻譯程式。解釋「為何不能這樣做」及恢復不變量，比重複型別更重要。
+- 公開介面／持久資料使用明確型別；`Any` 只容於隔離且驗證過的 provider／serializer 邊界。不要把 dict 層層傳進業務。
+- 業務結果使用有限型別分支；錯誤不得全部吞成空清單或 success。log 用 stable IDs、階段、錯誤類別，不直接 log 原話、prompt、opaque payload 或工具正文。
+- 模組超大先找職責混合，不用固定行數硬拆。通用 helper 只有真正相同語意與多個使用者才提取；相似形狀不代表相同業務。
+- 程式規則由 Ruff／mypy／TS／ESLint 驗；業務規則由測試驗。每次變更一起維護 owner 文件，不把所有說明塞進 AGENTS.md。

@@ -2,6 +2,12 @@
 
 > 同日條目依上到下為 successor 順序；較下方的 16K／待驗文字是當時 gate 的歷史狀態，不得覆蓋上方較新的正式設定與驗收邊界。
 
+**2026-09-29 Goal 分層整理（範圍不縮減／不重置施工）：**依 Owner 要求，把長 Goal 的成果、有效授權與完整退出條件集中於[既有計畫入口](plans/2026-09-29-target-rebuild/README.md)；工程接續方法在[開發規範 §10](implementation/development-standard.md#10-長任務goal-與工作上下文)，進度及實測仍由任務表／evidence 管理。原要求覆蓋見[審查紀錄](plans/2026-09-29-target-rebuild/review.md#4-goal-分層整理與覆蓋審查)。本次只整理文件與短 prompt，不替換或重建執行中的 Goal，不把 T01 局部測試當成產品通過，也不新增施工或外送範圍。
+
+**2026-09-29 新目標 Goal 施工授權（T01 開始／產品未驗收）：**Owner 已明確授權完成既有 T01–T18、同步維護文件、必要有界 OpenAI 直連合成測試及本地 Commit；正式入口／舊碼切換仍須最後 gate。新分支不加 `codex/`，不自動 push／merge／對外部署、不任意刪除舊 DB／volume／秘密。安全使用 `apps/api/.env` 中所需 API 憑證是本次明示例外，不套用舊產品其他配置。分析方法、Prompt／Tool／Context 共同驗收、問題解法紀錄與 Git 規則集中於[開發規範](implementation/development-standard.md)，授權及進度見[計畫](plans/2026-09-29-target-rebuild/README.md)。下方「僅文件／未授權」保留為當時狀態，不覆蓋本次授權。
+
+**2026-09-29 SDD／TDD 實作規劃與程式設計（文件階段／未施工）：**依 Owner 要求研究業界實作方法，採用[開發規範](implementation/development-standard.md)，建立[新目標實作計畫與 18 項任務](plans/2026-09-29-target-rebuild/README.md)，以及[模組、命名、資料／契約、Agent 接線、介面與驗證文件](implementation/README.md)。Owner 允許新目標使用 `apps/api`／`apps/web`，不整合舊架構及資料；這不復活舊接線、不授權本輪刪除資料或切換 production。現行 ADR0077 保持有效。工程選型與相容性待驗分開，V／E／JDT 逐項映射；實際文件檢查與風險見[計畫審查](plans/2026-09-29-target-rebuild/review.md)。本輪未修改產品程式、依賴或 schema，未送付費模型。
+
 **2026-09-29 目標架構補完與圖面續審（文件完成基線／未實作、未產品驗收）：**依 Owner 授權補齊而非只列缺口，建立[產品專題介紹](product-introduction.md)及[全產品閱讀地圖](target-architecture-map.md)，完成責任、跨層介面、來源區間、工具、候選／交易、恢復與保留的設計接縫，並實際渲染架構圖。工程接法與 Owner 已定效果分開，歷史「待定」不覆蓋最新責任文件；本次沒有改動產品規則、生成實作計畫、施工、遷移舊資料或提交。補完範圍、文件檢查、反例與尚待實測的參數見[續審紀錄](architecture/verification.md#6-架構文件補完與圖面審查2026-09-29-續審)，不以文件完成冒充原生接續／資料庫／產品驗收。
 
 **2026-09-29 A 輪前 128K 門檻補正（Owner 已確認目標／未實作、未驗收）：**每個新 Turn 開始前檢查 128K，達門檻才由容量條件觸發 compact；未達且沒有既有 Agent 主動要求則完整沿用歷史，不是每輪必壓縮。取代下方把 A 128K 列為候選的狀態；三者中途 272K、輪前／輪中接續與回退規則不變，B1／B2 輪前數值及呼叫／重試次數不一併核准。唯一詳細規則及邊界反例見[共用執行 §6.3](specs/2026-09-27-shared-agent-execution-and-state-design.md#63-輪前主動壓縮與-272k-中途保險目標已確認未實作)。本輪只校正文件，不改程式。

@@ -4,18 +4,23 @@
 
 ## 先讀
 
-- [產品核心目標](product-notes.md) — 一個 JD App；人與 LLM 共用 relational JD 業務邏輯，framework 經 OpenRouter 使用 Luna。第一版只要求看／撤回當輪 LLM 的 JD 變更；既有完整歷史可保留但不再擴張，對話或 Memory 不隨 JD 撤回。
+- **先理解產品價值：**[Caliburn 產品專題介紹](product-introduction.md)——面向讀者與報告聽眾，說明痛點、旅程、解法與驗證方向；不是另一份架構權威或現行功能完成清單。
+- **設計新架構先看 [目標導覽](target-architecture-map.md)**：由產品概念 → 系統責任 → 跨層生命週期 → Agent／Memory／JD 契約 → 資料交易／運作／驗收逐層深入。新目標採 LangGraph＋OpenAI direct Responses；未實作，不要求整合舊架構與舊資料。
+- [現行產品筆記](product-notes.md) — 保留現行範圍與演進記錄；其中 OpenRouter／舊接線不是新目標選型。人與 LLM 共用 JD 業務、撤回 JD 不撤回訪談／Memory 的產品原則沿最新決策讀取。
 
 - [`../AGENTS.md`](../AGENTS.md) — agent 工作紀律與 current-only 邊界。
 - [`current-decisions.md`](current-decisions.md) — **目前有效／未決／暫停事項的唯一閱讀入口**；先看這裡，再決定需不需要打開長研究稿。
 - [`decision-process.md`](decision-process.md) — 從產品目的、研究、Owner 決策、design／spike、ADR、施工到驗收的 gate、停止與翻案規則。
+- [`architecture-discussion-standard.md`](architecture-discussion-standard.md) — **新目標架構的討論與文件方法（工作版）**：先從全產品旅程與可逐層深入的導覽建立閱讀路徑，再逐題維護責任、資料、正常／異常生命週期與驗收；不是宣稱目標架構已實作。
+- [`target-architecture-map.md`](target-architecture-map.md) — **全產品目標閱讀地圖**：唯一目標責任集合、文件分層與變更路由；不與現行程式鳥瞰混用。`architecture/` 放系統責任、資料交易、交付運作、工程選擇及驗收；`specs/` 中被入口選用的文件持續維護元件／介面，不每輪新增另一個 final。
+- [`specs/2026-09-27-shared-agent-execution-and-state-design.md`](specs/2026-09-27-shared-agent-execution-and-state-design.md) — **共用執行機制設計**：已確認產品恢復要求、框架能力與工程建議分列；A／B1／B2 的工具接續、候選／正式提交接縫，未實作、未驗收。角色權限與 context 仍連回其唯一責任文件。
 - [`../ARCHITECTURE.md`](../ARCHITECTURE.md) — 現行 monorepo 與 API／Web 邊界。
 - [`../CONTRIBUTING.md`](../CONTRIBUTING.md) — 安裝、開發、測試與提交。
 - [`runbook.md`](runbook.md) — PostgreSQL、API、Web 起停與 fresh DB。
 - [`product-notes.md`](product-notes.md) — 產品範圍與 UX 優先級。
 - [`archive/worktree-history-index.md`](archive/worktree-history-index.md) — 舊 worktree 與本機分支的研究、設計、實驗及結果封存索引；用於報告與演進追溯，不是現行施工 authority。
 
-> 下方是文檔目錄，不是施工授權清單。若標題中的 `latest`／`final`／`approved`、文件內狀態或聊天內容互相衝突，以 [`current-decisions.md`](current-decisions.md) 指定的 current authority 與 stage 為準；它本身也不能越過 Accepted ADR 或現行 code。
+> 下方包含現行與歷史研究，不是新目標必讀清單或施工授權。新設計依目標導覽及最新已確認產品規則；現行正式權責依 Accepted ADR／現碼／實測。`current-decisions.md` 路由兩者，不能用現碼覆蓋未實作新目標，也不能用新目標冒充現況。
 
 ## JD 核心知識與成品研究
 

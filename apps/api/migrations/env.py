@@ -12,6 +12,7 @@ from caliburn.features.interviews.persistence import (
     InterviewReplyRecord,
     InterviewTextRecord,
 )
+from caliburn.features.job_description.persistence import JdRevisionRecord
 from caliburn.features.job_files.persistence import JobFileRecord
 from caliburn.settings import Settings
 
@@ -24,6 +25,7 @@ assert FormalInterviewRecord.__table__.metadata is target_metadata
 assert InterviewInputRecord.__table__.metadata is target_metadata
 assert InterviewReplyRecord.__table__.metadata is target_metadata
 assert ExecutionRecord.__table__.metadata is target_metadata
+assert JdRevisionRecord.__table__.metadata is target_metadata
 
 
 def migrate(connection: Connection, schema: str) -> None:

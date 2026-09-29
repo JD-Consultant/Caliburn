@@ -77,6 +77,7 @@
 - **第九切片（2026-09-30）：**承接 `62e463fe`，count 接既有外送額度、原 request 與 checkpoint；同次恢復不重計、容量超限不生成、完整 Step 間達272K明確交回 compact 需求。[證據與限制](evidence/t06-agent-execution.md#9-第九切片固定計數與容量准入)。compact 執行／控制、重試及真 provider 仍未完成，不勾 T06。
 - **第十切片（2026-09-30）：**承接 `00c3449b`，完整 C 先保存再結算／採用，中途接續不重貼輸入、重新計數、不反覆壓同一視窗；compact 共用外送額度與 canonical payload。真 PG 新程序驗 C→父圖交接中斷不重壓，審查取消補帳 P2 已修並複核。[證據與未完範圍](evidence/t06-agent-execution.md#10-第十切片完整-c-安全採用與中途接續)。輪前準備／角色控制、retry與provider仍待交付，T06不勾完成。
 - **第十一切片（2026-09-30）：**承接 `4266ee0d`，沿既有 execution owner 保存暫停要求，完整 Step 後原生 interrupt 停妥，明確原 interrupt 續作；真 PG／新程序驗普通重開不發模型，取消及舊 writer 不得復活。[證據與未接線交界](evidence/t06-agent-execution.md#11-第十一切片完整-step-暫停與原生續作)。尚非完整 UI／控制調度，T06 不勾完成。
+- **第十二切片（2026-09-30）：**承接 `0641beff`，沿原 saver／recovery 補回仍在程序內的完整 count，不另計數、不回退後續結果，取消仍拒絕採用。真 PG 重開與原預算接線見[證據與限制](evidence/t06-agent-execution.md#12-第十二切片原計數結果補存)。不是遠端結果備份／完整重試 supervisor，T06 仍施工中。
 - **契約：**[共用執行](../../specs/2026-09-27-shared-agent-execution-and-state-design.md)、[Agent 接線](../../implementation/agent-execution.md)。
 - **程式／交付：**`agent_execution`、Responses／saver adapter、typed State／serializer、窄工具 handler 介面、單一 retry／計量責任；先使用測試工具與 fake Responses，不依賴產品工具完成。
 - **Red：**R 已保存卻重呼模型、只存 output_text、兩工具平行／配錯 call、公開文字誤判 final、serializer 丟 opaque／phase、role namespace 污染、SDK 隱含 retry。

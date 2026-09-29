@@ -32,6 +32,7 @@ def violations(module: str, code: str) -> list[str]:
                 "caliburn.features.job_description.areas",
                 "caliburn.features.job_description.tasks",
                 "caliburn.features.job_description.task_changes",
+                "caliburn.features.work_memory.changes",
             }
             if pure_values:
                 forbidden |= dependency[0] in {"fastapi", "sqlalchemy", "langgraph", "openai"}
@@ -59,6 +60,7 @@ def violations(module: str, code: str) -> list[str]:
         ("caliburn.features.work_memory.models", "from sqlalchemy import Column"),
         ("caliburn.features.job_description.tasks", "import fastapi"),
         ("caliburn.features.job_description.task_changes", "import sqlalchemy"),
+        ("caliburn.features.work_memory.changes", "import sqlalchemy"),
         (
             "caliburn.features.work_memory.models",
             "from caliburn.contracts.generated import health_status",

@@ -1,0 +1,77 @@
+# Memory 保存接線
+
+- 日期：2026-09-29；狀態：**T04 施工中；純值規則先行，PostgreSQL 候選／快照尚未交付**。精確證據與下一切片見 [T04 紀錄](../plans/2026-09-29-target-rebuild/evidence/t04-work-memory.md)。本頁維護實作映射，不另定產品規則或模型工具。
+- 上位責任：[資料保存 §2–4](../architecture/persistence.md#2-不可變修訂與發布快照)、[B1／B2 生命週期](../specs/2026-09-25-b1-b2-information-gap-lifecycle.md)、[內容與引用修改](../specs/2026-09-27-memory-object-update-tool-contract.md)、[title 解析](../specs/2026-09-27-memory-read-and-source-navigation-contract.md#4-未決接縫與停止線)。接線總則見 [data-and-contracts §3](data-and-contracts.md#3-memory可變工作稿與固定快照不是兩個相反模型)。
+
+## 1. 實作責任與第一切片
+
+`features/work_memory` 是候選、物件修訂、固定快照及原操作的唯一業務 owner。Agent 工具只翻譯模型意圖、投影結果；背景 workflow 管交接與執行資格，不另存可寫 Memory；checkpointer 留位置與接續，不持有第二份可修改正文。
+
+第一切片只落地下列純規則，不建立假 Memory API、發布端點或未完成的 schema：
+
+- 三個內容欄位均為必要且非空白的字串；保留原文，不 trim、大小寫折疊或 Unicode 正規化。Markdown `body` 的編輯 adapter 在 T05 接；領域只接收已計算、仍須合法的結果，不提供模型整文覆寫捷徑。
+- 引用按穩定內部身分作集合增刪；保留未指定成員。重複新增已有關係是無效果；移除不存在的關係、同次又加又移除或新增不允許來源均拒絕。移除最後一筆合法，與無效來源不同。
+- 標題在 App 的單層 map 內精確映射為 ID，CRUD 與引用進入資料介面後用 ID；歷史與已綁定原操作不重新解析 title。純規則只檢查傳入 map，不自行查其他層。
+
+純值／變更放 `models.py`／`changes.py`，不依賴 ORM、HTTP、LLM 或生成 DTO。這些函式**不證明**來源已正式成立、在本批 F 以內或角色有權；後續 service 必須由正式來源 owner 和批次綁定取得合法集合。
+
+## 2. 保存表示：固定修訂，而非資料庫舊列
+
+採既定 PostgreSQL＋SQLAlchemy／Alembic，以明確新增不可變修訂、保存選用來表達歷史。**不以 MVCC 舊列、ORM 版本計數器或每次完整正文複製充當 Memory 發布快照。**下圖是 T04 的施工設計，不是已建立資料表；具體 DDL 隨真 PG 切片補入本頁。
+
+```mermaid
+flowchart TD
+  I[訪談 owner：有效原文與正式序號] --> W[同批 Memory 候選<br/>來源上界 F 固定]
+  W --> S[情境：內容與訪談身分引用]
+  W --> U[理解：內容與情境身分綁定]
+  U -->|讀目前候選| S
+  W --> P[可靠候選位置／交接狀態<br/>用於恢復與 diff，不是正式發布]
+  P --> F[完成資格成立後<br/>固定物件修訂及引用]
+  F --> M[已發布快照 M<br/>每身分選一個固定修訂]
+  M --> A[A 固定此快照讀 map／正文]
+  M --> J[JD 保存當時固定依據]
+  M --> N[後續批次沿未變物件重用修訂]
+```
+
+保存拆清楚三種必要含意，不要求一種含意一張表或一個服務：
+
+| 含意 | 必須保存／辨認的資訊 | 不能偷換成 |
+|---|---|---|
+| 候選目前位置 | 本批目前成員、內容修訂、身分綁定與有效執行分支；先前位置可依恢復／diff 需求取回 | 最新正式 Memory；或每次由 LLM 重建全文 |
+| 物件固定修訂 | 當時內容與固定下層來源；未變可重用，變更再改回仍有新修訂身分 | 只存內容 hash、只存標題，或以相同字串合併修訂歷史 |
+| 發布快照 | 選定各層固定修訂、正式訪談範圍與完整引用關係，並保留原發布結果 | DB transaction snapshot、checkpointer 顯示 END 或某一層完成 |
+
+正文和小型引用／選用分開保存：只有正文實際修改時新增所需內容；引用換版但正文未變時重用正文，仍產生能表達新固定關係的物件修訂。不引入跨物件內容定址或 Git delta；相同正文的跨歷史去重不是本片必需。**身分／修訂與正文儲存共用是兩件事。**
+
+候選關係維持 stable object identity；B1 改情境不要求 B2 remove/add 相同關係。發布固定化時才把保留關係解析為本版選用的情境修訂；若其變了，即使理解正文未變，也不能沿用指向舊情境的固定理解修訂。B2 對當前交接完成分析是發布資格，App 不以零文字 diff 代替它。
+
+## 3. 交易與讀取的施工邊界
+
+沿現有檔案隔離、Memory execution 資格、短鎖與呼叫方 transaction，不建第二套跨 Agent 鎖／UnitOfWork。候選操作原意圖、採用位置及原結果共同提交；模型、patch 大額純計算或重試等待不持有 SQL transaction。讀固定位置後計算、提交前再核位置／資格，不能把最新稿偷偷代入原命令。
+
+後續 SQL 切片需直接證明：
+
+1. 本批有效來源邊界來自正式訪談 owner；pending／取消來源、另一檔案或超出 F 皆不能建立引用。快照的訪談層指向既有不可改原文，不複製正文；F 指最後有效員工訊息，不以最大序號猜。
+2. 同層目前 title 唯一；App 精確解析及 DB 唯一約束採相同相等語意。考慮非預設／不區分大小寫的 DB collation，不能讓部署環境改變已定字串比較；SQL 層仍以 ID 定位，不用 title 作 UPDATE／DELETE 目標。
+3. 情境刪除與候選入邊解除同交易，理解本身保留；B1 結果不外露理解資料。歷史快照不改寫，不用歷史 FK cascade 清除正式來源。
+4. 候選修改後 current read 取得最新已成立狀態；單次物件／map 投影捕捉同一位置。A 只能沿已發布的固定 snapshot 查詢，不能混入候選。
+5. ①／②恢復沿可定位候選；新 writer／回退分支使遲到修改失效。同批 B1↔B2 依序接手，B2 已成立的理解候選不能因回交遺失。
+6. ③在同一短提交中保存固定選用／關係、涵蓋與原結果；正式 head 最後採用。已成立結果重入回原快照，不重新發一版；未知提交不當未執行。
+
+以上是測試落點，不另加發布前語意 reviewer、格式修補 loop 或最少引用數。權限與結構在每次操作維持；發布只做正式資格與一致提交。具體 schema、原操作 shape 與恢復位置在下一 PG 切片決定並驗證，不能把本頁當成已實作。
+
+## 4. 官方機制、比較與取捨
+
+2026-09-29 研究：
+
+- [PostgreSQL MVCC](https://www.postgresql.org/docs/18/mvcc-intro.html)保障交易讀取可見性；[VACUUM](https://www.postgresql.org/docs/18/routine-vacuuming.html#VACUUM-FOR-SPACE-RECOVERY)會回收不再需要的舊列。**推論：**不能把它當已發布 Memory／JD 依據的永久歷史服務。保留那些修訂必須是應用資料契約。
+- [SQLAlchemy version counter](https://docs.sqlalchemy.org/en/21/orm/versioning.html)主要在 flush 核對並行修訂，不自動保存本案完整來源圖；其[官方 temporal row 範例](https://docs.sqlalchemy.org/en/21/orm/examples.html#versioning-using-temporal-rows)示範以 INSERT 新列保留原版本。借鑑不可變修訂原則，但不直接引入攔截全 ORM 修改的通用 event hook：本案兩層發布、來源上界與原操作要由明確用例控制。
+- [PostgreSQL constraints](https://www.postgresql.org/docs/18/ddl-constraints.html)提供 FK／UNIQUE／CHECK；跨列存在性使用 FK／UNIQUE，不寫查其他表的 CHECK。名稱比較須核[collation 的 deterministic 與 non-deterministic 區別](https://www.postgresql.org/docs/18/collation.html#COLLATION-NONDETERMINISTIC)，下一 PG 切片驗精確 Unicode／空白與唯一限制。
+
+這些是成熟公開機制及本案取捨，不宣稱單一廠商範例就是全業界唯一共識。T04 暫無具體需求支持另加 graph DB、版本套件、通用 event sourcing 或永久 diff 資料庫；既有 PostgreSQL 足以承接已定資料形狀，仍須用真 PG 反例證明實作正確。
+
+## 5. 後續接線與驗收歸屬
+
+下一個可執行切片是候選／固定選用的最小真 PG 垂直路徑：有效來源 → B1 建立情境 → B2 建立理解 → 固定快照讀回；再擴增修改／刪除／回退／原結果與重用反例。不先生成全部 Agent／HTTP／UI。
+
+T04 負責保存及業務不變量；T05 負責精簡模型工具、V4A 唯一定位與 diff 投影；T10／T11 才把真實 B1／B2 接續與交接完成資格接入。所有發布快照及可達依據不自動清理；候選／checkpoint 的保留沿上位規範，不在本頁新增一個全產品過期時間。

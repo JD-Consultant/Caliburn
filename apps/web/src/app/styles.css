@@ -1,26 +1,52 @@
-:root {
-  font-family: system-ui, sans-serif;
-  color: #253342;
-  background: #f5f7f9;
+.app-header {
+  padding: 1.2rem 0;
+  background: white;
+  border-bottom: 1px solid #dfe7e3;
 }
-body {
+.app-header .brand {
+  font-size: 1.4rem;
+  font-weight: 750;
+}
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+}
+.page-heading p {
+  color: #53655d;
+  line-height: 1.7;
+}
+.empty-state {
+  padding: 4rem 2rem;
+  text-align: center;
+}
+.file-identity {
+  display: block;
+  color: #607068;
+  margin-top: 0.25rem;
+}
+.interview-history {
+  list-style: none;
+  padding: 0;
   margin: 0;
 }
-main {
-  max-width: 48rem;
-  margin: 12vh auto;
-  padding: 2rem;
+.interview-message {
+  padding: 1.5rem;
 }
-h1 {
-  font-size: 3rem;
-  margin: 0 0 1rem;
+.interview-text {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  line-height: 1.9;
+  margin-bottom: 0;
 }
-h2 {
-  font-size: 1.25rem;
-}
-p {
-  line-height: 1.6;
-}
-.eyebrow {
-  color: #4b647b;
+@media (max-width: 640px) {
+  .page-heading {
+    align-items: stretch;
+    flex-direction: column;
+  }
+  .app-header .MuiStack-root {
+    flex-wrap: wrap;
+    row-gap: 0.5rem;
+  }
 }

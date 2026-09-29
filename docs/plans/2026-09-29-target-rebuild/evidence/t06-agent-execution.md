@@ -206,8 +206,26 @@ $env:PYTHONUTF8='1'
 
 文件 **20 份／328 links** 零錯、diff check 通過。三張工程 Mermaid 圖實際渲染，主代理檢視更新的 loop 圖，計數保存、容量 gate、停止與返回路徑可读；sandbox 的 `spawn EPERM` 後使用獲准的既有無頭瀏覽器渲染，未以首次失敗當通過。Reviewer 已結束。未讀 `.env`、無真 provider 呼叫；所有 model／capacity／費率數值均為合成測試配置。T06 維持施工中，未把此 gate 當產品旅程完成。
 
-## 10. 下一個可執行切片
+## 10. 第十切片：完整 C 安全採用與中途接續
 
-接真實費率配置與單一有界 retry supervisor、compact／角色控制。共同 loop 已固定完整 request、sync／局部步數、原 R 恢復、首次外送准入、保存後結算及固定計數。容量 gate 目前只停在 `CompactionRequiredError`，仍需接合法 compact、完整 C 安全採用／再計數、不重加 maps／输入及控制先行。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復；count 雙保存失敗的原件可取回性也須在後續恢復切片明確承接。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
+承接 `00c3449b`。主代理重新讀 OpenAI standalone compaction、SDK 3.20.0 compact／construct 原碼，以及 LangGraph 私有子圖與持久執行文件。採用既有 saver 保存完整 C、原 executions 計量，不增加儲存系統；一次 compact 的小型私有 Graph 可由輪前準備及中途交界共用。正式接法及限制見[工程 §5.3](../../../implementation/agent-execution.md#53-已落地的完整-c-保存採用與中途接續t06-第十切片)。本輪使用計畫執行、TDD、OpenAI 文件、平行分工、診斷及獨立審查技能，未重開已授權產品決策。
+
+- 初始測例先因缺少新模組／接縫失敗，這只記為 API 施工起點，**不當業務 Red**。行為反例包括：空 C 原先可覆蓋非空歷史；compact wire 未指定 default；父圖取消後漏掉子圖既存 C 的補帳。各自取得失敗後修正、保留原斷言。
+- Graph 整合時發現條件路由拋容量拒絕可能在重入時不重跑，原容量恢復測例及壓後超門檻測例出現 **3 failed**；把判斷放到正式 `check_capacity` node 後通過，不削弱限制。框架 Runtime 注入曾因參數名稱不符失敗，核本機 `_runnable.py` 後更正為框架契約名稱，非產品設計變更。
+- 完整 C／pending writes 雙失敗及保存確認遺失均保留原件，恢復不再 compact；記帳失敗承接已保存 C。取消仍可結算但不得採用；舊 W 在安全採用前可取回。完整 output（含保留 user message）送入下一請求，沒有重貼原輸入／maps。採用後重新計數；仍達272K保留位置並拒絕重壓，真正新增完整 Step 後可再次壓縮。
+- `compaction_worker.py` 使用真 PG 與兩個 Python 程序。第一程序完成模型／工具 Step，C 已採用但父圖未接上時中斷；第二程序原 C 接續，compact **0**、新 count **1**、新模型 **1**，原工具觀察不重讀。新增 worker 的專項實跑 **1 passed**。採用既有隨機 schema fixture，沒有停止共用 PG 或刪除既有資料。
+- 子代理完成 compact 外送計量：沿既有 `COMPACTION` 預留，獨立 DB 連線在 HTTP 時能看見已提交額度且無長交易鎖；原 C 先交回 Graph、後結算。未配置／未知費率不當免費；原 attempt 重入不取得第二次 HTTP 許可。主代理核 SDK service_tier 預設 auto 的差距，建立唯一 `compaction_payload()`；子代理據實際 wire／已提交指紋不一致的 Red 同步使用該 helper，不留兩份 payload。
+- 獨立 reviewer 發現 P2：子圖 C 已保存、結算失敗後取消，父入口只認父 R，漏掉 C 補帳。主代理重現 **1 failed（settled 0，應為1）**，讓原 compact 邊界在取消恢復時重入受 guard 保護的子圖對帳，仍禁止採用。reviewer 再驗「子圖尚未開始」「已保存 C」「Held C」，確認零新增 compact、既存 attempt 結算及未採用；P2 關閉。reviewer 的五個 unit／contract 檔 **53 passed** 為獨立補充證據，不冒充 PG 或真 provider。
+- 收尾反例：模型回傳空 output、窗口未增加資料，僅換 request ID 不應再次壓縮同一份 C。先取得 **1 failed**（第二次 compact 被觸發）；改為只有實際增加 items 才清除已壓縮判定，空 output 仍跨 request 保留，原斷言通過。
+
+完整後端回歸 **938 passed in 206.04s**；上述最後小修後，依風險重跑 unit／contracts、Graph PG、compact／model 計量及容量 PG，**545 passed in 28.24s**。不將前一次全套宣稱為小修後的新全套結果。最終 Ruff check／format **200 files**、mypy **148 source files** 通過。三張工程 Mermaid 圖已實際渲染，主代理檢視更新的 loop 圖；圖稿清楚區分計數、准入、完整 C 採用及重新計數。首次 sandbox 的 `spawn EPERM` 由獲准的既有 headless renderer 解決，沒有跳過圖稿驗證。
+
+最後窄範圍 reviewer 複核 **4 passed**，另查連續空回應／多次恢復仍只 compact 一次，以及空回應後確有新增 items 可以再次 compact；無阻擋發現。文件 **20 份／331 links** 零錯、diff check 通過，子代理均已結束。
+
+本輪未讀 `.env`、未呼叫真 provider，沒有外送私人訪談。compact 輸出品質／真實價格、輪前128K／B起始準備、完整 pause／取消回退及 retry supervisor 尚未驗收；不能以此切片宣告 T06 或產品完成。
+
+## 11. 下一個可執行切片
+
+接輪前準備與角色控制、真實費率配置及單一有界 retry supervisor。共同 loop 已有完整 request、sync／局部步數、原 R／C 保存恢復、外送准入、保存後結算、計數與中途完整 C 採用；未配置 compact 接縫仍明確停止。輪前128K／Agent意圖、B起始準備、pause優先及取消相容基底須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復；count 雙保存失敗的原件可取回性亦須承接。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

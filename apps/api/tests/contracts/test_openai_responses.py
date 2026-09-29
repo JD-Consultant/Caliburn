@@ -152,6 +152,7 @@ async def test_compact_sends_complete_window_and_returns_original_without_adopti
 
     def respond(request: httpx2.Request) -> httpx2.Response:
         assert request.url.path == "/v1/responses/compact"
+        assert json.loads(request.content)["service_tier"] == "default"
         captured.append(json.loads(request.content))
         return httpx2.Response(200, json=raw)
 
@@ -161,7 +162,7 @@ async def test_compact_sends_complete_window_and_returns_original_without_adopti
         http_client=httpx2.AsyncClient(transport=httpx2.MockTransport(respond)),
     ) as client:
         result = await compact_context(client, model="gpt-6-luna", input_items=window)
-    assert captured == [{"model": "gpt-6-luna", "input": window}]
+    assert captured == [{"model": "gpt-6-luna", "input": window, "service_tier": "default"}]
     assert snapshot_compaction(result) == raw
     assert window == [{"role": "user", "content": "synthetic previous history"}]
 

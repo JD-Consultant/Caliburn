@@ -16,6 +16,32 @@ class MemoryMapInconsistencyError(RuntimeError):
     """The supplied layer map contains multiple entries for the selected title."""
 
 
+class MemorySourceWindowError(ValueError):
+    """A batch's required source window has invalid bounds or a non-employee endpoint."""
+
+
+@dataclass(frozen=True, slots=True)
+class MemorySourceWindow:
+    """App-bound required interval (coverage, through], never a model parameter.
+
+    Creation must resolve the triggering formal employee source. Restored values
+    come from the original batch, not the latest history frontier.
+    """
+
+    job_file_id: UUID
+    through_source_id: UUID
+    covered_through_sequence: int
+    through_sequence: int
+
+    def __post_init__(self) -> None:
+        if (
+            type(self.covered_through_sequence) is not int
+            or type(self.through_sequence) is not int
+            or not 0 <= self.covered_through_sequence < self.through_sequence
+        ):
+            raise MemorySourceWindowError("A batch requires a nonempty, nonnegative source window")
+
+
 def validate_memory_text(text: str) -> None:
     """Reject blank or unstorable content without changing the supplied string."""
     if not text.strip() or "\x00" in text:

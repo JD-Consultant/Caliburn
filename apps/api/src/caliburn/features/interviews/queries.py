@@ -60,6 +60,23 @@ async def read_interview_messages(
     return messages
 
 
+async def read_interview_sources(
+    session: AsyncSession, scope: InterviewReadScope, *, source_ids: tuple[UUID, ...]
+) -> list[InterviewMessage]:
+    """Resolve an entire source selection within the fixed formal boundary, regardless of role."""
+    if not source_ids:
+        raise InterviewReadError("Select at least one formal interview source")
+    selected = tuple(dict.fromkeys(source_ids))
+    messages = await persistence.list_formal_interviews(
+        session, scope.job_file_id, source_ids=selected, end_sequence=scope.through_sequence
+    )
+    if len(messages) != len(selected):
+        raise InterviewReadError(
+            "The entire selection must exist as formal interview sources within the fixed boundary"
+        )
+    return messages
+
+
 async def read_interview_range(
     session: AsyncSession, scope: InterviewReadScope, *, start_sequence: int, end_sequence: int
 ) -> list[InterviewMessage]:

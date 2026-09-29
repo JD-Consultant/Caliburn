@@ -1,12 +1,35 @@
 """Application composition root; dependency creation is explicit at startup."""
 
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
+from caliburn.adapters.database import Database
+from caliburn.settings import Settings
 from caliburn.transport.http.health import router as health_router
+from caliburn.transport.http.job_files import router as job_file_router
+from caliburn.workflows.job_files import JobFileWorkflow
 
 
-def create_app() -> FastAPI:
+def create_app(settings: Settings | None = None) -> FastAPI:
     """Create the app without reading legacy configuration or requiring model credentials."""
-    app = FastAPI(title="Caliburn", version="0.1.0")
+    configured = settings if settings is not None else Settings.from_environment()
+
+    @asynccontextmanager
+    async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+        database = Database(configured.database) if configured.database else None
+        app.state.database = database
+        app.state.job_file_workflow = JobFileWorkflow(database.sessions) if database else None
+        try:
+            if database is not None:
+                await database.verify_schema()
+            yield
+        finally:
+            if database is not None:
+                await database.close()
+
+    app = FastAPI(title="Caliburn", version="0.1.0", lifespan=lifespan)
     app.include_router(health_router)
+    app.include_router(job_file_router)
     return app

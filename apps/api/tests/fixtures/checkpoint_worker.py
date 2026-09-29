@@ -5,25 +5,17 @@ import json
 import os
 import sys
 from pathlib import Path
-from typing import Any, TypedDict
+from uuid import UUID
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
-from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
-from langgraph.graph import END, START, StateGraph
-from openai.types.responses import Response
+from openai.types.responses import Response, ResponseFunctionToolCall
 
+from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.response_serialization import (
-    function_result_item,
     response_input_items,
-    restore_response,
     snapshot_response,
 )
-from caliburn.agent_execution.response_steps import ResponseAction, inspect_response_step
-
-
-class ProbeState(TypedDict):
-    response_snapshot: dict[str, Any]
-    native_items: list[dict[str, Any]]
+from caliburn.agent_execution.tool_steps import ResponseStepRuntime, _build_response_step
 
 
 async def run(mode: str, thread_id: str) -> None:
@@ -40,56 +32,51 @@ async def run(mode: str, thread_id: str) -> None:
         "output": "synthetic result",
     }
 
-    def model_step(state: ProbeState) -> ProbeState:
+    async def request_model(items: list) -> Response:
         nonlocal model_calls
         model_calls += 1
-        return {"response_snapshot": original_snapshot, "native_items": []}
+        return response
 
-    def observe(state: ProbeState) -> ProbeState:
+    async def prepare_tool(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
         nonlocal observation_calls
         observation_calls += 1
-        restored = restore_response(state["response_snapshot"])
-        step = inspect_response_step(restored)
-        assert step.action == ResponseAction.EXECUTE_TOOLS
-        assert len(step.calls) == 1
-        result = function_result_item(step.calls[0], "synthetic result")
-        assert result == observation
-        return {
-            "response_snapshot": state["response_snapshot"],
-            "native_items": [*response_input_items(restored), result],
-        }
+        assert call.call_id == "call_synthetic"
+        return "synthetic result"
+
+    async def execute_tool(prepared: object) -> str:
+        raise AssertionError("The synthetic read does not have a write phase")
+
+    runtime = ResponseStepRuntime(request_model, prepare_tool, execute_tool)
 
     async with AsyncPostgresSaver.from_conn_string(
         os.environ["CALIBURN_TEST_DATABASE_URL"],
-        serde=JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None),
+        serde=create_graph_serializer(),
     ) as saver:
         await saver.setup()
-        builder = StateGraph(ProbeState)
-        builder.add_node("model_step", model_step)
-        builder.add_node("observe", observe)
-        builder.add_edge(START, "model_step")
-        builder.add_edge("model_step", "observe")
-        builder.add_edge("observe", END)
-        graph = builder.compile(checkpointer=saver, interrupt_before=["observe"])
+        graph = _build_response_step(saver, max_tool_calls=16)
         config = {"configurable": {"thread_id": thread_id}}
         before = await graph.aget_state(config)
         if mode == "write":
             assert not before.values
             await graph.ainvoke(
-                {"response_snapshot": {}, "native_items": []}, config, durability="sync"
+                {"input_items": []},
+                config,
+                context=runtime,
+                durability="sync",
+                interrupt_before=["prepare_tool"],
             )
             saved = await graph.aget_state(config)
-            assert saved.next == ("observe",)
+            assert saved.next == ("prepare_tool",)
             assert saved.values["response_snapshot"] == original_snapshot
-            assert saved.values["native_items"] == []
+            assert saved.values["input_items"] == []
             assert model_calls == 1 and observation_calls == 0
         elif mode == "resume":
-            assert before.next == ("observe",)
+            assert before.next == ("prepare_tool",)
             assert before.values["response_snapshot"] == original_snapshot
-            await graph.ainvoke(None, config, durability="sync")
+            await graph.ainvoke(None, config, context=runtime, durability="sync")
             saved = await graph.aget_state(config)
             assert not saved.next
-            assert saved.values["native_items"] == [*original_items, observation]
+            assert saved.values["input_items"] == [*original_items, observation]
             assert model_calls == 0 and observation_calls == 1
         else:
             raise ValueError("Unknown probe mode")

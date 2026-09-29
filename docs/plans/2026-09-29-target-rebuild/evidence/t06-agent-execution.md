@@ -148,7 +148,7 @@ $env:CALIBURN_TEST_DATABASE_URL = 'postgresql://caliburn_test@127.0.0.1:55439/ca
 
 ### 實際結果：憑證前置條件未滿足，零外送
 
-2026-09-30 03:59 台北時間執行第一批，安全結果留於忽略區 `.research-tmp/t06-protocol-preflight-01.jsonl`：`started` 後在載入必要金鑰時停止，**HTTP 0／生成 0／模型費用 0**。只檢查變數名稱確認授權檔案有 `OPENROUTER_API_KEY`，沒有 `OPENAI_API_KEY`；沒有讀取或套用其值、沒有用第三方 key 直連試錯，也沒有切換 provider。已請 Owner 在本機加入直連 key，等待時繼續不依賴 provider 的 T06 工作；這不是整個 Goal blocked。
+2026-09-30 03:59 台北時間執行第一批，安全結果留於忽略區 `.research-tmp/t06-protocol-preflight-01.jsonl`：`started` 後在載入必要金鑰時停止，**HTTP 0／生成 0／模型費用 0**。只輸出變數名稱確認授權檔案有 `OPENROUTER_API_KEY`，沒有 `OPENAI_API_KEY`；未使用或輸出任何金鑰、沒有用第三方 key 直連試錯，也沒有切換 provider。已請 Owner 在本機加入直連 key，等待時繼續不依賴 provider 的 T06 工作；這不是整個 Goal blocked。
 
 腳本 Ruff 通過；mypy 連同 src **145 source files** 通過；`--help` 可執行。先單獨跑腳本 mypy 時，editable package 被當成無 py.typed 的外部依賴，改為與 src 一起檢查，不新增 ignore 或改變型別規範。無 DB／Graph／產品 wire 修改，不重跑無關整合測試。**原生接續／strict／計數遠端接受性仍未驗證**，上述離線檢查不能替代。
 
@@ -159,8 +159,24 @@ $env:PYTHONUTF8='1'
 ./.venv-target/Scripts/python.exe -B scripts/probe_responses_protocol.py --key-file S:/caliburn/apps/api/.env --output S:/caliburn/.research-tmp/t06-protocol-preflight-02.jsonl
 ```
 
-## 7. 下一個可執行切片
+## 7. 第七切片：固定請求與保存後計量
 
-繼續外層共用 loop 與單一有界計量／外送資格，將已落地的原 R recovery handoff 接入 supervisor，再接 compact／角色控制。正常 Step 入口已固定 sync／recursion／新輸入與恢復界線。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執。工具接線需核對還原巢狀型別；目前只有 Memory 的 prepared 路徑證據，未驗 JD／角色完整整合。
+預檢脚本／限制已提交 `946c663f`，仍缺直連 key、零外送。同步推進本切片：主代理先沿既有 executions／saver／SDK，唯讀子代理比較官方耐久 node、同 node Held 與原生 task 三種方式。選 **R 先保存，再獨立結算 node**，因為既有 StateGraph 已有合適交界，無須重作 serializer／ResponseStore。子代理記憶體 probe 證明若把記費放在 request callback 返回前，記費拋錯會使 R 無法交給 Held，續跑重呼模型；這是錯誤組合方式的反例，不是已接 production 的故障宣稱。
+
+實際接法集中 [工程 §4.5](../../../implementation/agent-execution.md#45-已落地的固定請求一次外送與保存後結算t06-第七切片)：初始 checkpoint 固定完整 request／logical ID，輸出保存原 attempt；workflow 只協調既有 budget 與 direct SDK。六個既有 fixture／測試由具明確寫入範圍的子代理更新必填介面，主代理審查並整合，保留原故障斷言與 native fixture。未新增業務表／依賴。
+
+### Red／Green 與整合
+
+- 准入接線前，真 PG＋SDK MockTransport 的行為 Red 為 HTTP 時看不到已提交 allowance（`0 != 1`，**1 failed**）。此前測例用錯本地 settings／close 名稱只是 fixture error，不計 Red。接線後一次外送前可由另一連線取得 execution 鎖並看到 allowance。
+- `tests/integration/test_model_request_accounting.py` **6 passed**：結算前失敗／已提交但確認遺失 × 隨後正常恢復／取消；R 不重呼、原成本一致、取消零工具。准入 COMMIT 確認遺失時 HTTP 0；HTTP timeout 時 1；兩者新 saver／executor 恢復均找到原 request、保留未知預留、不拿舊 allowance 再發送。
+- 獨立唯讀審查找到補存 R 期間取消的 P2：第二次 guard 拒絕，但 saved 仍是補存前狀態而漏記費。主代理追加單元反例先得 **1 failed**，改為承接已驗證且剛補存的 recovery 原件後通過，模型仍 1／結算 1／工具 0。不是重新查最新版資料或重做生成。
+- 初次整合 unit／contracts／Graph／Memory Step／新 PG 集合 **489 passed in 12.31s**；後續加入 request snapshot／P2 回歸並納入 budgets、admission、migration 的完整受影響集合 **525 passed in 28.70s**。Ruff check／format **190 files**、mypy **146 source files** 通過；文件 **20 份／322 links** 零錯、diff check 通過。流程圖與既有 ERD 以既有 Mermaid／headless Chromium 實際渲染，主代理檢視新增流程圖，交易／保存／結算及失敗路徑可讀。
+- 獨立代理短複核 P2 可關閉，新增測例 **1 passed**；無新增重大發現。子代理均已結束；無付費或新私人資料外送，僅合成 SDK transport 與 fixture 自建的隨機測試 schema，共享 PostgreSQL server／database 留存。
+
+這些是 fake provider＋真 PostgreSQL 的控制／恢復證據，不是遠端接受或正式費率驗收。暫時只接**首次生成**；已有 attempt 先明確交回核對，尚未選擇自動重試／Retry-After／jitter 接線。容量／token count、compact、完整 loop／角色控制繼續施工，T06 不勾完成。
+
+## 8. 下一個可執行切片
+
+繼續共用 loop、容量計數／真實費率配置與單一有界 retry supervisor，再接 compact／角色控制。正常 Step 已固定完整 request、sync／recursion、原 R 恢復、首次外送准入及保存後結算。已有 attempt 必須先核對，不因本切片的明確停止省略產品要求的有界恢復。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

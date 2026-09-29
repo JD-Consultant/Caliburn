@@ -3,7 +3,7 @@
 import asyncio
 import json
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
@@ -11,7 +11,10 @@ from langgraph.checkpoint.serde.jsonplus import JsonPlusSerializer
 from openai.types.responses import Response, ResponseFunctionToolCall
 from psycopg.conninfo import make_conninfo
 
+from caliburn.adapters.openai_responses import ResponseRequest
+from caliburn.adapters.response_serialization import NativeItems
 from caliburn.agent_execution.tool_steps import (
+    ReceivedModelResponse,
     ResponseStepRuntime,
     ResponseStepSaveError,
     _build_response_step,
@@ -24,6 +27,21 @@ pytestmark = pytest.mark.postgres
 
 async def ensure_active() -> None:
     """Storage-only cases; product fencing is exercised by the execution tests."""
+
+
+async def account_response(received: ReceivedModelResponse) -> None:
+    """Storage-only cases, without execution cost persistence."""
+
+
+def make_request(input_items: NativeItems) -> ResponseRequest:
+    return ResponseRequest(
+        model="gpt-6-luna",
+        instructions="synthetic",
+        input_items=input_items,
+        tools=[],
+        reasoning_effort="low",
+        max_output_tokens=512,
+    )
 
 
 class ModelCheckpointFault(AsyncPostgresSaver):
@@ -63,9 +81,11 @@ def test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_o
         dsn = make_conninfo(settings.url, options=f"-c search_path={settings.schema}")
         serde = JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
 
-        async def request(items: list) -> Response:
+        async def request(
+            model_request: ResponseRequest, request_id: UUID
+        ) -> ReceivedModelResponse:
             events.append("model")
-            return response
+            return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
         async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
             events.append("prepare")
@@ -75,14 +95,20 @@ def test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_o
             events.append("execute")
             return "original observation"
 
-        runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
+        runtime = ResponseStepRuntime(
+            request_model=request,
+            prepare_tool=prepare,
+            execute_tool=execute,
+            ensure_active=ensure_active,
+            account_response=account_response,
+        )
         async with ModelCheckpointFault.from_conn_string(dsn, serde=serde) as saver:
             await saver.setup()
             saver.fail_after_commit = fail_after_commit
             with pytest.raises(ResponseStepSaveError) as failure:
                 await run_response_step(
                     saver,
-                    input_items=[],
+                    request=make_request([]),
                     thread_id=config["configurable"]["thread_id"],
                     runtime=runtime,
                     max_tool_calls=16,
@@ -94,7 +120,7 @@ def test_model_checkpoint_failure_does_not_dispatch_and_pending_writes_recover_o
         async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
             result = await run_response_step(
                 saver,
-                input_items=None,
+                request=None,
                 recovery=failure.value.recovery,
                 thread_id=config["configurable"]["thread_id"],
                 runtime=runtime,
@@ -129,10 +155,12 @@ def test_saved_step_reopens_without_repeating_window_items(
         response = Response.model_validate(payload)
         requests = 0
 
-        async def request(items: list) -> Response:
+        async def request(
+            model_request: ResponseRequest, request_id: UUID
+        ) -> ReceivedModelResponse:
             nonlocal requests
             requests += 1
-            return response
+            return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
         async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
             pytest.fail("No tools in final response")
@@ -142,12 +170,23 @@ def test_saved_step_reopens_without_repeating_window_items(
 
         dsn = make_conninfo(settings.url, options=f"-c search_path={settings.schema}")
         config = {"configurable": {"thread_id": "completed-step"}}
-        runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
+        runtime = ResponseStepRuntime(
+            request_model=request,
+            prepare_tool=prepare,
+            execute_tool=execute,
+            ensure_active=ensure_active,
+            account_response=account_response,
+        )
         serde = JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
         async with AsyncPostgresSaver.from_conn_string(dsn, serde=serde) as saver:
             await saver.setup()
             result = await _build_response_step(saver, max_tool_calls=16).ainvoke(
-                {"input_items": [{"role": "user", "content": "synthetic"}]},
+                {
+                    "request_snapshot": make_request(
+                        [{"role": "user", "content": "synthetic"}]
+                    ).create_payload(),
+                    "request_id": uuid4(),
+                },
                 config,
                 context=runtime,
                 durability="sync",
@@ -179,9 +218,11 @@ def test_public_step_recovery_saves_held_model_result_after_both_writes_fail(
         )
         calls = []
 
-        async def request(items: list) -> Response:
+        async def request(
+            model_request: ResponseRequest, request_id: UUID
+        ) -> ReceivedModelResponse:
             calls.append("model")
-            return response
+            return ReceivedModelResponse(response=response, attempt_id=uuid4())
 
         async def prepare(call: ResponseFunctionToolCall, operation_id: UUID) -> object:
             calls.append("read")
@@ -192,7 +233,13 @@ def test_public_step_recovery_saves_held_model_result_after_both_writes_fail(
 
         dsn = make_conninfo(settings.url, options=f"-c search_path={settings.schema}")
         config = {"configurable": {"thread_id": "no-durable-response"}}
-        runtime = ResponseStepRuntime(request, prepare, execute, ensure_active)
+        runtime = ResponseStepRuntime(
+            request_model=request,
+            prepare_tool=prepare,
+            execute_tool=execute,
+            ensure_active=ensure_active,
+            account_response=account_response,
+        )
         serde = JsonPlusSerializer(pickle_fallback=False, allowed_msgpack_modules=None)
         async with EntireModelSaveFault.from_conn_string(dsn, serde=serde) as saver:
             await saver.setup()
@@ -200,7 +247,7 @@ def test_public_step_recovery_saves_held_model_result_after_both_writes_fail(
                 await run_response_step(
                     saver,
                     thread_id=config["configurable"]["thread_id"],
-                    input_items=[],
+                    request=make_request([]),
                     runtime=runtime,
                     max_tool_calls=16,
                 )
@@ -213,7 +260,7 @@ def test_public_step_recovery_saves_held_model_result_after_both_writes_fail(
             result = await run_response_step(
                 saver,
                 thread_id=config["configurable"]["thread_id"],
-                input_items=None,
+                request=None,
                 recovery=failure.value.recovery,
                 runtime=runtime,
                 max_tool_calls=16,

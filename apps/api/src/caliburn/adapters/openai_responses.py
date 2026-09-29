@@ -51,12 +51,31 @@ class ResponseRequest:
     def create_payload(self) -> dict[str, Any]:
         return {
             **self.count_payload(),
+            "stream": False,
             "max_output_tokens": self._max_output_tokens,
             "store": False,
             "background": False,
             "service_tier": "default",
             "include": ["reasoning.encrypted_content"],
         }
+
+    @classmethod
+    def from_snapshot(cls, snapshot: dict[str, Any]) -> ResponseRequest:
+        """Restore this adapter's exact request, not today's role settings or live maps."""
+        try:
+            request = cls(
+                model=snapshot["model"],
+                instructions=snapshot["instructions"],
+                input_items=snapshot["input"],
+                tools=snapshot["tools"],
+                reasoning_effort=snapshot["reasoning"]["effort"],
+                max_output_tokens=snapshot["max_output_tokens"],
+            )
+        except (KeyError, TypeError, AttributeError) as error:
+            raise ValueError("The saved model request is incomplete") from error
+        if request.create_payload() != snapshot:
+            raise ValueError("The saved model request does not match the direct SDK contract")
+        return request
 
 
 def create_responses_client(
@@ -79,7 +98,7 @@ def create_responses_client(
 async def create_response(client: AsyncOpenAI, request: ResponseRequest) -> Response:
     """Return the original SDK response; no routing, model fallback or business completion."""
     _require_direct_client(client)
-    response = await client.responses.create(stream=False, **request.create_payload())
+    response = await client.responses.create(**request.create_payload())
     if not isinstance(response, Response):
         raise TypeError("The non-streaming SDK call did not return a Response")
     return response

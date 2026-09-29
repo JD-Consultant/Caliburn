@@ -133,6 +133,15 @@ async def read_outbound_attempt(
     return _attempt(record) if record is not None else None
 
 
+async def read_request_attempts(
+    session: AsyncSession, scope: ExecutionScope, request_id: UUID
+) -> tuple[OutboundAttempt, ...]:
+    """Reconcile existing sends without granting a new outbound allowance."""
+    await service.read_execution(session, scope)
+    records = await storage.read_request_attempts(session, scope.execution_id, request_id)
+    return tuple(_attempt(record) for record in records)
+
+
 async def record_attempt_cost(
     session: AsyncSession, scope: ExecutionScope, attempt_id: UUID, *, cost_usd: Decimal
 ) -> OutboundAttempt:

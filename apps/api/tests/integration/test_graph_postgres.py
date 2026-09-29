@@ -14,7 +14,17 @@ from psycopg.conninfo import conninfo_to_dict, make_conninfo
 
 
 @pytest.mark.postgres
-def test_native_items_survive_process_restart_without_reexecuting_saved_node() -> None:
+@pytest.mark.parametrize(
+    "worker_name,expected_counts",
+    [
+        ("checkpoint_worker.py", [(1, 0), (0, 1)]),
+        ("response_loop_worker.py", [(2, 1), (0, 0)]),
+    ],
+)
+def test_native_items_survive_process_restart_without_reexecuting_saved_node(
+    worker_name: str,
+    expected_counts: list[tuple[int, int]],
+) -> None:
     dsn = os.environ.get("CALIBURN_TEST_DATABASE_URL")
     if not dsn:
         pytest.skip("Set CALIBURN_TEST_DATABASE_URL to an isolated local database ending in _test")
@@ -24,7 +34,7 @@ def test_native_items_survive_process_restart_without_reexecuting_saved_node() -
     ).endswith("_test"):
         pytest.fail("The persistence probe requires an explicit loopback test database")
     schema = "t01_" + uuid4().hex
-    worker = Path(__file__).parents[1] / "fixtures/checkpoint_worker.py"
+    worker = Path(__file__).parents[1] / "fixtures" / worker_name
     with psycopg.connect(dsn, autocommit=True) as conn:
         conn.execute(sql.SQL("CREATE SCHEMA {}").format(sql.Identifier(schema)))
         try:
@@ -46,8 +56,10 @@ def test_native_items_survive_process_restart_without_reexecuting_saved_node() -
                 assert process.returncode == 0, process.stderr
                 summaries.append(json.loads(process.stdout))
             assert summaries == [
-                {"mode": "write", "model_calls": 1, "observation_calls": 0},
-                {"mode": "resume", "model_calls": 0, "observation_calls": 1},
+                {"mode": mode, "model_calls": models, "observation_calls": observations}
+                for mode, (models, observations) in zip(
+                    ("write", "resume"), expected_counts, strict=True
+                )
             ]
         finally:
             # Only this test's freshly created schema; never drop a database or pre-existing schema.

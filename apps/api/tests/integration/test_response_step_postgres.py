@@ -186,6 +186,8 @@ def test_saved_step_reopens_without_repeating_window_items(
                         [{"role": "user", "content": "synthetic"}]
                     ).create_payload(),
                     "request_id": uuid4(),
+                    "model_step_limit": None,
+                    "tool_call_limit": 16,
                 },
                 config,
                 context=runtime,

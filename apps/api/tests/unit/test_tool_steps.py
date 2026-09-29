@@ -81,7 +81,12 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
         return "result:" + prepared["call_id"]
 
     result = await graph.ainvoke(
-        {"request_snapshot": make_request(input_items).create_payload(), "request_id": uuid4()},
+        {
+            "request_snapshot": make_request(input_items).create_payload(),
+            "request_id": uuid4(),
+            "model_step_limit": None,
+            "tool_call_limit": 16,
+        },
         config,
         context=ResponseStepRuntime(
             request_model=request,
@@ -147,7 +152,12 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
     )
     with pytest.raises(ConnectionError):
         await graph.ainvoke(
-            {"request_snapshot": make_request([]).create_payload(), "request_id": uuid4()},
+            {
+                "request_snapshot": make_request([]).create_payload(),
+                "request_id": uuid4(),
+                "model_step_limit": None,
+                "tool_call_limit": 16,
+            },
             config,
             context=runtime,
             durability="sync",
@@ -181,7 +191,12 @@ async def test_read_or_rejection_is_saved_as_result_without_executing() -> None:
         pytest.fail("A read or known rejection must not dispatch a write")
 
     result = await graph.ainvoke(
-        {"request_snapshot": make_request([]).create_payload(), "request_id": uuid4()},
+        {
+            "request_snapshot": make_request([]).create_payload(),
+            "request_id": uuid4(),
+            "model_step_limit": None,
+            "tool_call_limit": 16,
+        },
         {"configurable": {"thread_id": "read-only"}},
         context=ResponseStepRuntime(
             request_model=request,
@@ -215,7 +230,12 @@ async def test_unsupported_response_is_preserved_before_routing_rejects_it() -> 
 
     with pytest.raises(UnsupportedModelResponseError):
         await graph.ainvoke(
-            {"request_snapshot": make_request([]).create_payload(), "request_id": uuid4()},
+            {
+                "request_snapshot": make_request([]).create_payload(),
+                "request_id": uuid4(),
+                "model_step_limit": None,
+                "tool_call_limit": 16,
+            },
             config,
             context=ResponseStepRuntime(
                 request_model=request,

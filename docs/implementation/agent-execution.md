@@ -1,11 +1,11 @@
 # Agent 原生接續與可恢復接線
 
-- 狀態：**T06 施工中；原生回應與逐筆工具 Step 已有恢復元件證據，完整 Runtime 仍未交付**。實測與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
+- 狀態：**T06 施工中；原生回應、有序工具及有界多 Step 接續已有恢復元件證據，完整 Runtime 仍未交付**。實測與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
 - T06–T12 先以假 provider＋真 saver／PG 驗證；T06 可依[本 Goal 授權及分批上限](../plans/2026-09-29-target-rebuild/README.md#3-狀態與施工順序)提前做少量協定預檢，T16 才做完整有界模型驗收。LLM 推理內容不可解讀作驗收。
 
 ## 1. 執行圖與業務資格分開
 
-目標由 `agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；目前已有下述單一模型／工具 Step，不能把本節完整節點表當已接好的 runner。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯；不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。
+目標由 `agent_execution` 提供 A／B1／B2 共用的 StateGraph node 組合；目前已有單一模型／工具 Step 與 §4.6 的有界接續，不能把本節完整節點表當已接好的 runner。角色只提供 instructions、允許工具、起始資料 projector 及結束結果轉譯；不各寫 loop。Memory Parent 編排 B1、B2 與領域交接服務，不寫第二套 validator。
 
 建議節點切法如下，節點名稱是工程名稱，不是對模型公開的新工具：
 
@@ -78,10 +78,10 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 ### 4.2 已落地的單一模型／工具 Step（T06 第二切片）
 
-`agent_execution/tool_steps.py` 的 StateGraph 路徑原為 `request_model → prepare_tool → execute_tool → prepare_tool → finish_step`；第七切片在 R 保存後、prepare 前加入 §4.5 的 `account_response`。純讀／已知拒絕由 prepare 保存觀察，不進 execute。所有 call 處理完才形成新完整視窗並返回下一步建議；不是每次工具返回都重新呼叫模型。它是將納入共同 loop 的一個可組合 Step，不是 A／B1／B2 各自的 runner。
+`agent_execution/tool_steps.py` 的 StateGraph 路徑原為 `request_model → prepare_tool → execute_tool → prepare_tool → finish_step`；第七切片在 R 保存後、prepare 前加入 §4.5 的 `account_response`。純讀／已知拒絕由 prepare 保存觀察，不進 execute。所有 call 處理完才形成新完整視窗並返回下一步建議；不是每次工具返回都重新呼叫模型。第八切片以同一組 nodes 接上 §4.6 的共同 loop，不是 A／B1／B2 各自的 runner。
 
 - 正常入口 `run_response_step` 統一指定 `durability="sync"`，依本次允許 call 數設定有界 graph recursion limit；超過 call 上限在派送前拒絕。框架 super-step 數與模型 Step 數不是同一上限。只在隔離故障測例使用私有 builder，不讓角色自行選保存模式。
-- 此元件每個邏輯 Step 使用獨立 thread；新輸入不得覆蓋已有 thread，只有 `None` 能恢復它，沒有保存位置也不能假裝恢復。外層角色 loop 接走完成窗口再建立下一 Step，並非重新定義產品 Turn。入口讀取檢查不是競爭鎖，單 writer／工作資格仍由執行 owner 保證。使用官方 `GraphOutput.value` typed 返回，不自造圖結果格式。
+- 單 Step 入口使用獨立 thread；第八切片的多 Step 入口則讓**整次 loop 共用同一 thread**，不要求每次迭代新建 thread。新輸入不得覆蓋已有 thread，只有 `None` 能恢復它，沒有保存位置也不能假裝恢復。入口讀取檢查不是競爭鎖，單 writer／工作資格仍由執行 owner 保證。使用官方 `GraphOutput.value` typed 返回，不自造圖結果格式。
 - 原回應先保存，下一節點才檢查協定／工具。未知 phase 等被拒絕時，R 仍可回讀；不是先丟掉 R 再宣稱可恢復。操作 seed 和 R 同存，每個 call 從 seed＋原 call_id 得到穩定 App 操作身分，不由模型指定業務 ID。
 - 寫入 prepare 的命令先保存，execute 才交回原業務 owner。工具結果僅按原 calls 的有序前綴增加，下一筆 prepare 能看見上一筆已成立的候選；不平行派送。恢復不重新解析已保存命令的標題／正文，也不重算成功回傳。
 - `ResponseStepRuntime` 注入模型、結算、工具與資格 I/O，不持久化 SDK client／DB session。共用 State 不理解 Memory 命令內容；工具接線必須核對還原型別及原工作資格，業務效果仍由原 owner 的交易／冪等處理。
@@ -119,7 +119,7 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 ### 4.5 已落地的固定請求、一次外送與保存後結算（T06 第七切片）
 
-此切片把已有 executions 額度與 Step 接成**首次生成的受控路徑**。`workflows/model_requests.py` 協調公開業務服務、短交易與 SDK；共用 Graph 仍不 import features，不增加 ResponseStore、重試平台或第二套回執。完整容量檢查／多次 attempt 政策、compact／loop 尚待接線，這個元件不能單獨充作正式產品 runner。
+此切片把已有 executions 額度與 Step 接成**首次生成的受控路徑**。`workflows/model_requests.py` 協調公開業務服務、短交易與 SDK；共用 Graph 仍不 import features，不增加 ResponseStore、重試平台或第二套回執。第八切片已加 §4.6 的有界 loop；完整容量檢查／多次 attempt 政策與 compact 尚待接線，這個元件不能單獨充作正式產品 runner。
 
 ```mermaid
 flowchart TD
@@ -143,6 +143,32 @@ flowchart TD
 - 結算與採用分開：一般晚到 R、已保存 R 的取消後重入，以及已驗證 Held 補存期間取消，都可核對原 attempt 記費；仍不能派工具、採用新 context 或交付正式結果。Held 在進結算節點時釋放「尚未保存」責任，不把結算故障誤報為模型保存故障。取消恰好發生在 `aupdate_state` 補存期間時，使用剛補存的原件結算，不看過時的補存前查詢值。
 
 已驗同一 request 原子准入、准入確認遺失／HTTP timeout 不盲送、R 保存後結算前／後故障、取消後原成本核對、HTTP 期間另一連線可取得執行鎖，以及原恢復／工具效果回歸。具體命令與限制在 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#7-第七切片固定請求與保存後計量)。官方依據：[LangGraph sync／pending writes](https://docs.langchain.com/oss/python/langgraph/checkpointers)、[OpenAI 原件接續](https://developers.openai.com/api/docs/guides/reasoning#preserve-reasoning-without-stored-responses)；安全交界為本案工程取捨，不宣稱 provider 和 PostgreSQL 可共同原子提交。
+
+### 4.6 已落地的有界多 Step 接續（T06 第八切片）
+
+`run_response_loop` 與單步入口共用原 StateGraph、原生 State 及恢復接線，只增加完成 Step 後的條件路由與 `prepare_next_request`。不是在外層手動另存 cursor，也不為每次模型迭代建 child graph／thread。官方支援 conditional edges 與持久迴圈；採這個較小組合是本案取捨，**不宣稱所有大廠用同一個 loop**。[LangGraph Graph API](https://docs.langchain.com/oss/python/langgraph/graph-api#conditional-edges)、[OpenAI 工具接續](https://developers.openai.com/api/docs/guides/function-calling)
+
+```mermaid
+flowchart TD
+  I["保存初始 request、身分與本次限制"] --> R["模型回應 → 保存 R → 結算"]
+  R --> T["依原順序保存各工具結果"]
+  T --> S["finish_step：完整窗口＋完成步數"]
+  S --> F{"無待處理 call 且有正式答覆？"}
+  F -->|是| D["交回結果；不是產品提交"]
+  F -->|否| N{"資格仍有效且未達模型步數上限？"}
+  N -->|否| E["保留可靠位置；停止並交回原因"]
+  N -->|是| P["保存下一 request；只追加原生 items"]
+  P --> R
+```
+
+- 每次模型 Step 可有多工具，全部依序完成後才接下一請求；工具旁有 final 文字仍先處理 calls，只有 commentary 的完整回應則繼續。下一請求只替換 input 為已完成窗口，不重新取 maps／指令／模型設定，不改歷史、不重加起始輸入。
+- 同一 loop 的模型步數上限、每回應工具上限在初始 checkpoint 固定。`completed_steps` 由完成 Step 前進，恢復不歸零；不能用較大上限或單步入口繞過原 loop 限制。最後准許的一步若有合法 final，仍可交回；需要再呼叫才觸發 `ModelStepLimitError`，保留最後完整窗口，不偽造收尾答覆。
+- 這是**單次角色 loop 的局部上限**；整個工作／Memory batch 的費用、時限、跨 B 回交與重試共用額度仍由 §5.1 的 executions owner 負責。LangGraph `recursion_limit` 只是本次 graph invoke 的 super-step 防護，依有限工具／模型步數配置，不代替產品計量。
+- 下一 request 的新 logical ID／完整 payload 先經 sync 保存，才可外送；只有完成前一 Step 才產生新 request。清除當前 response 欄位，避免把前一步 R 認成下一步的 R。第二步以後同樣可承接 Held 原件；後來步驟不能拿舊 handoff 倒轉目前位置。
+- 初始 input checkpoint 可能尚未展開成 State（`values` 空、`next=__start__`）；由原生 Graph 恢復原輸入，於 request node 外送前核對原限制。不因尚未展開便拒絕正常恢復，也不讓恢復參數改寫初始限制。
+- 已完成 loop 再 resume 不新增模型／工具／items。恢復不指定舊 checkpoint ID；工具失敗只承接當前 prepared command。全部共用單步原 R 保存、結算與業務冪等責任，沒有新增保存系統。
+
+真 PG 兩程序已驗：第一程序完成一個工具 Step、保存第二個 R 後中斷，第二程序從結算接到 final，模型與先前工具均不重跑。原生歷史、固定 request 及恢復故障的具體證據見 [T06 §8](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#8-第八切片有界多-step-接續)。目前仍是非串流的共用 loop 元件；容量／compact、使用者 pause、角色／正式提交及自動重試 supervisor 未整合，不能拿圖中結果返回當成完整 A Turn／Memory batch 完成。
 
 ## 5. 容量、重試與恢復不是同一政策
 

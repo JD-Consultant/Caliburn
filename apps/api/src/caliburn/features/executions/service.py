@@ -68,6 +68,13 @@ async def lock_active_writer(session: AsyncSession, writer: ExecutionWriter) -> 
         raise ExecutionStateError("The execution is no longer active")
 
 
+async def lock_unfinished_writer(session: AsyncSession, writer: ExecutionWriter) -> None:
+    """Control operations may discard a paused Turn; ordinary effects require active."""
+    record = await _lock_writer(session, writer)
+    if record.status not in (ExecutionStatus.ACTIVE, ExecutionStatus.PAUSED):
+        raise ExecutionStateError("The execution has already finished")
+
+
 async def pause_execution(session: AsyncSession, writer: ExecutionWriter) -> None:
     """Called after reaching a safe boundary, not on receipt of a UI pause request."""
     record = await _lock_writer(session, writer)

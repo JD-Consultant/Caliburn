@@ -1,11 +1,16 @@
-"""Collaborator commands reuse the JD formal head, original results and caller-owned transaction."""
+"""Collaborator commands share fixed JD revisions and a caller-selected editing scope."""
 
 from dataclasses import replace
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import collaborator_persistence, persistence
+from caliburn.features.job_description import (
+    collaborator_persistence,
+    persistence,
+    revision_editing,
+)
+from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.collaborators import (
     Collaborator,
     CollaboratorChange,
@@ -37,9 +42,15 @@ async def read_collaborators(session: AsyncSession, job_file_id: UUID) -> JdColl
 
 
 async def recover_collaborator_result(
-    session: AsyncSession, job_file_id: UUID, command: EditJdCollaborators
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: EditJdCollaborators,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdCollaboratorsRevision | None:
-    operation = await persistence.read_operation(session, job_file_id, command.command_id)
+    operation = await revision_editing.read_edit_operation(
+        session, job_file_id, command.command_id, candidate
+    )
     if operation is None:
         return None
     if (
@@ -108,10 +119,18 @@ def _apply_change(
 
 
 async def edit_collaborators(
-    session: AsyncSession, job_file_id: UUID, command: EditJdCollaborators
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: EditJdCollaborators,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdCollaboratorsRevision:
-    """Call only after original-result lookup, file lock and manual admission; do not commit."""
-    current = await read_collaborators(session, job_file_id)
+    """Call after original-result lookup, file lock and scope admission; do not commit."""
+    revision_id = await revision_editing.read_edit_revision(session, job_file_id, candidate)
+    current = JdCollaboratorsRevision(
+        revision_id,
+        await collaborator_persistence.read_collaborators(session, job_file_id, revision_id),
+    )
     if current.revision_id != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")
     collaborators, new_content = _apply_change(current.collaborators, command.change)
@@ -130,17 +149,14 @@ async def edit_collaborators(
             parent_revision_id=current.revision_id,
             collaborators=collaborators,
         )
-        document = await persistence.read_document(session, job_file_id)
-        document.current_revision_id = result.revision_id
-    session.add(
-        persistence.JdOperationRecord(
-            job_file_id=job_file_id,
-            command_id=command.command_id,
-            kind="edit_collaborators",
-            expected_revision_id=command.expected_revision_id,
-            result_revision_id=result.revision_id,
-            request_payload=collaborator_change_payload(command.change),
-        )
+    await revision_editing.record_edit(
+        session,
+        job_file_id,
+        command_id=command.command_id,
+        kind="edit_collaborators",
+        expected_revision_id=command.expected_revision_id,
+        result_revision_id=result.revision_id,
+        request_payload=collaborator_change_payload(command.change),
+        candidate=candidate,
     )
-    await session.flush()
     return result

@@ -33,7 +33,13 @@ class JdWorkRevision:
 
 async def read_work(session: AsyncSession, job_file_id: UUID) -> JdWorkRevision:
     document = await persistence.read_document(session, job_file_id)
-    revision_id = document.current_revision_id
+    return await read_work_at(session, job_file_id, document.current_revision_id)
+
+
+async def read_work_at(
+    session: AsyncSession, job_file_id: UUID, revision_id: UUID
+) -> JdWorkRevision:
+    """The caller selects a trusted formal or candidate revision; never a model version input."""
     return JdWorkRevision(
         revision_id,
         await area_persistence.read_areas(session, job_file_id, revision_id),

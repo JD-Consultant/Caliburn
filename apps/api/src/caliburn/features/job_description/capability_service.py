@@ -1,10 +1,16 @@
-"""Knowledge/skill edits participate in the existing formal JD transaction."""
+"""Knowledge/skill edits share fixed JD revisions and a caller-selected editing scope."""
 
 from uuid import UUID, uuid4
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from caliburn.features.job_description import capability_persistence, persistence, task_persistence
+from caliburn.features.job_description import (
+    capability_persistence,
+    persistence,
+    revision_editing,
+    task_persistence,
+)
+from caliburn.features.job_description.candidates import JdCandidateScope
 from caliburn.features.job_description.capabilities import (
     EditJdCapabilities,
     JdCapabilitiesRevision,
@@ -36,9 +42,15 @@ async def read_capabilities(session: AsyncSession, job_file_id: UUID) -> JdCapab
 
 
 async def recover_capability_result(
-    session: AsyncSession, job_file_id: UUID, command: EditJdCapabilities
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: EditJdCapabilities,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdCapabilitiesRevision | None:
-    operation = await persistence.read_operation(session, job_file_id, command.command_id)
+    operation = await revision_editing.read_edit_operation(
+        session, job_file_id, command.command_id, candidate
+    )
     if operation is None:
         return None
     if (
@@ -51,10 +63,15 @@ async def recover_capability_result(
 
 
 async def edit_capabilities(
-    session: AsyncSession, job_file_id: UUID, command: EditJdCapabilities
+    session: AsyncSession,
+    job_file_id: UUID,
+    command: EditJdCapabilities,
+    *,
+    candidate: JdCandidateScope | None = None,
 ) -> JdCapabilitiesRevision:
-    """Call after file lock, original-result lookup and manual admission; do not commit."""
-    current = await read_capabilities(session, job_file_id)
+    """Call after file lock, original-result lookup and scope admission; do not commit."""
+    revision_id = await revision_editing.read_edit_revision(session, job_file_id, candidate)
+    current = await read_capabilities_at(session, job_file_id, revision_id)
     if current.revision_id != command.expected_revision_id:
         raise StaleJdRevisionError("Read the current JD before submitting a new edit")
     task_ids = await task_persistence.read_task_ids(session, job_file_id, current.revision_id)
@@ -80,17 +97,14 @@ async def edit_capabilities(
             capabilities=capabilities,
             task_links=links,
         )
-        document = await persistence.read_document(session, job_file_id)
-        document.current_revision_id = result.revision_id
-    session.add(
-        persistence.JdOperationRecord(
-            job_file_id=job_file_id,
-            command_id=command.command_id,
-            kind="edit_capabilities",
-            expected_revision_id=command.expected_revision_id,
-            result_revision_id=result.revision_id,
-            request_payload=capability_change_payload(command.change),
-        )
+    await revision_editing.record_edit(
+        session,
+        job_file_id,
+        command_id=command.command_id,
+        kind="edit_capabilities",
+        expected_revision_id=command.expected_revision_id,
+        result_revision_id=result.revision_id,
+        request_payload=capability_change_payload(command.change),
+        candidate=candidate,
     )
-    await session.flush()
     return result

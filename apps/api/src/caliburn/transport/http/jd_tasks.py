@@ -58,7 +58,7 @@ def _edit_from_wire(
             return tasks.DeleteTask(edit.task_id)
 
 
-def _view(result: tasks.JdTasksRevision) -> view.JdTasksView:
+def tasks_view(result: tasks.JdTasksRevision) -> view.JdTasksView:
     return view.JdTasksView(
         revision_id=result.revision_id,
         tasks=[
@@ -86,7 +86,7 @@ def _view(result: tasks.JdTasksRevision) -> view.JdTasksView:
 @router.get("/tasks", response_model=view.JdTasksView)
 async def read_tasks(job_file_id: UUID, workflow: JdEditing) -> view.JdTasksView:
     try:
-        return _view(await workflow.read_tasks(job_file_id))
+        return tasks_view(await workflow.read_tasks(job_file_id))
     except JobFileNotFoundError as error:
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
 
@@ -101,7 +101,7 @@ async def edit_tasks(
         command = tasks.EditJdTasks(
             body.command_id, body.expected_revision_id, _edit_from_wire(body.change)
         )
-        return _view(await workflow.edit_tasks(job_file_id, command))
+        return tasks_view(await workflow.edit_tasks(job_file_id, command))
     except JobFileNotFoundError as error:
         raise HTTPException(status_code=404, detail={"code": "job_file_not_found"}) from error
     except tasks.TaskTargetNotFoundError as error:

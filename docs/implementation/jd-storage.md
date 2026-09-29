@@ -1,11 +1,11 @@
 # JD 保存接線
 
-- 狀態：**T03 profile 後端及人工 UI、職責／任務集合後端已實作；驗證依 T03 證據，整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
+- 狀態：**T03 profile、職責／任務後端及人工 UI 已實作；驗證依 T03 證據，整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
 - 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
 
-目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求的人工讀寫與排序後端。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 profile UI 接線見[介面 §1.2](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)。職責／任務 UI、K／S、Agent 候選、依據與核對尚未交付；不能把這些人工正式端點當作 A 寫入捷徑。
+目前有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`，以及職責／任務集合、獨立成果／要求的人工讀寫與排序。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[基本資料](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)及[職責／任務](interface-and-delivery.md#13-t03-職責與任務的人工編輯)。K／S、Agent 候選、依據與核對尚未交付；不能把這些人工正式端點當作 A 寫入捷徑。
 
 | 責任 | 已實作位置 |
 |---|---|
@@ -13,6 +13,7 @@
 | 原結果核對、修訂與欄位用例 | [service.py](../../apps/api/src/caliburn/features/job_description/service.py)；參與呼叫方交易，不 commit |
 | 正式頭、固定修訂、原操作 SQL | [persistence.py](../../apps/api/src/caliburn/features/job_description/persistence.py) |
 | 固定正式內容查詢 | [queries.py](../../apps/api/src/caliburn/features/job_description/queries.py)；GET 不偷偷建立資料 |
+| 同版職責／任務組合讀取 | [work_queries.py](../../apps/api/src/caliburn/features/job_description/work_queries.py)、[jd_work.py](../../apps/api/src/caliburn/transport/http/jd_work.py)；先固定 head 一次，再沿既有查詢投影，無新儲存 owner |
 | 檔案隔離、人工准入及一次提交 | [jd_editing.py](../../apps/api/src/caliburn/workflows/jd_editing.py)；沿既有檔案鎖與 executions，不重建鎖定系統 |
 | HTTP 驗證／錯誤投影 | [jd_profile.py](../../apps/api/src/caliburn/transport/http/jd_profile.py)；無業務 SQL |
 | 職責值、用例、固定內容／排序 | [areas.py](../../apps/api/src/caliburn/features/job_description/areas.py)、[area_service.py](../../apps/api/src/caliburn/features/job_description/area_service.py)、[area_persistence.py](../../apps/api/src/caliburn/features/job_description/area_persistence.py)；仍屬同一 JD feature，非另套保存服務 |
@@ -140,6 +141,28 @@ erDiagram
 - profile／職責改動都保留任務選用；任務改動保留 profile／職責。刪任務只從新稿移除選用，歷史內容與明細仍可重建；同名重建是新身分。現在尚未實作 K／S 與來源，不能宣稱相關連結效果已通過。
 
 任務讀取先取得一個固定正式修訂，再讀該修訂的任務／明細；兩次 SQL 查詢不分別讀 latest，不會拼接新舊稿。新修改受相同檔案列鎖與基底檢查保護。
+
+### 2.3 組合畫面使用同一修訂
+
+`GET /jd/work` 給人工編輯畫面一組固定 `revision_id`、`areas`、`tasks`。不能由前端分別讀取 `/areas`、`/tasks` 的 latest 再拼接，否則另一請求可能在兩次讀取之間改歸屬或刪職責。組合讀取只捕捉 head 一次，之後都讀不可變修訂；不需要為此另存投影表、鎖住人工編輯或提高整個 App 的 isolation level。
+
+```mermaid
+sequenceDiagram
+  participant UI as 人工編輯畫面
+  participant API as JD 查詢
+  participant DB as 既有 JD 保存
+  UI->>API: GET 職責與任務
+  API->>DB: 讀一次目前 head
+  DB-->>API: 固定修訂 R
+  API->>DB: 讀 R 的職責
+  DB-->>API: 職責集合
+  Note over DB: 即使另一請求此時發布 R2<br/>R 的選用與內容不變
+  API->>DB: 讀 R 的任務及明細
+  DB-->>API: 任務集合
+  API-->>UI: R + 職責 + 任務
+```
+
+HTTP Schema 透過 [JSON Schema `$ref`](https://json-schema.org/understanding-json-schema/structuring)重用既有 Area／WorkTask 定義；官方 Python／TS 生成器及 Ajv 實測跨檔引用，不手抄第二份欄位規格。此為人工 transport，並非模型的完整 JD／map 工具。
 
 ## 3. 人工編輯與原結果接續
 

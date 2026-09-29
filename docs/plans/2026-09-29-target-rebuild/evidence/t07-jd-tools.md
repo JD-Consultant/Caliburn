@@ -30,7 +30,27 @@
 
 依 Owner 的先跑通優先序，沿既有 owner 接上 JD 精確／區域／全稿讀取、來源與編輯 handler，再接 A 的完整保存閉環；不先做額外觀測平台或完整效能調校。不得用假的空來源陣列把未完成來源能力包裝為正式工具。
 
-- T07 仍欠來源保存與核對、current_input 接線、兩類 diff、完整 read 與八工具 handler 的組合及相應必要反例。
+- 本節原待辦已由 §3 完成來源保存／核對、current_input、完整 read 及兩個寫入 handler；仍欠兩類 diff 與其餘 handler，不將增量當全部 T07 完成。
 - T06 尚欠已保存但結果未明的原 attempt 核對後受控恢復，範圍見[原任務 §18](t06-agent-execution.md#18-下一個可執行切片)。不是用導航切片掩蓋恢復缺口。
 - T08／T09 才提供 A 正式 Turn、控制及候選預覽；T12／T15 的廣故障矩陣／效能、T16／T17 的真 provider／長訪談留各 gate。不為本次純 mapper 重跑整套 UI 或付費品質評測。
 - `read_ref` 不是寫入許可或讀過全文的憑證；map 正文預覽也不等於已閱讀完整修改目標。後續 handler 使用原契約與既有候選資格，不自行推導授權。
+
+## 3. 第二切片：來源、按需讀取與有據候選寫入（2026-09-30）
+
+承接 `d002095f`。依五小時 Demo 優先序，交付 `read_jd`、`revise_jd_profile`、`create_jd_task` 及來源 owner；其餘入口仍未假註冊。實際接線唯一說明見 [JD 保存 §3.3](../../../implementation/jd-storage.md#33-直接來源按需讀取與候選模型寫入t07-增量)。
+
+### 原因、反例與改進
+
+- 只回空來源會讓模型把未接線誤認為沒有依據；因此先保存真正直接引用，再開讀取與寫入。current_input 同身分在 Turn 完成時正式化，不用模型填來源 UUID／scope／版本。
+- `store=false` 下只保存 output_text 無法接續工具；A 沿既有原生 items／checkpoint。工具 prepared command 的 nested tuple 在官方 serializer 恢復後可能成 list；因此用現有 Pydantic JSON 嚴格還原，不加入自訂 serializer／pickle 或另一份業務資料庫。
+- 獨立審核發現空白 Memory title 的 `InvalidMemoryChangeError` 沒有映射，會使可修正參數錯誤中止 Turn。先加入真正失敗反例，再回標準 `invalid_arguments`；不吞基礎設施錯誤。
+- 真 PG 故障注入在已写來源後拋錯，確認內容、來源與候選位置全部回退；同 prepared operation 可再進入並承接原結果，未重複業務效果。
+
+### 驗證層級
+
+- 全 unit＋contracts：**763 passed in 8.70s**。命令：`pytest tests/unit tests/contracts -q --tb=short -p no:cacheprovider`。
+- A 組裝／原子完成＋工具組合：**30 passed in 7.47s**；`test_consultant_runner.py`／`test_consultant_completion.py`／`test_consultant_tools.py`。Runner 用 OpenAI SDK 的合成 HTTP transport，DB 和官方 checkpointer 使用真 PostgreSQL；不是已通真模型。
+- 個別增量：來源／profile／task 核心此前 **26 passed**；新增故障與 JSON 接續 **5 passed**；read 投影 **15 passed（含 2 PG）**；工具組合 **17 passed**。這些與上列有重疊，不相加稱總數。
+- Runner＋settings mypy 通過；生成器已生成 schema／Python／TS（Windows 暫存 ACL 以已批准的相同命令處理）。各分工的 Ruff／型別通過，最終合併檢查另記。
+
+未付費外送。官方 OpenAI key 尚未提供至授權位置，真模型 preflight／品質保持未驗。Demo 與整個 Goal 未完成；此證據不表示八入口、UI、來源 diff 或 T08 全部控制／恢復已完成。

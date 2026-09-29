@@ -1,6 +1,6 @@
 # JD 保存接線
 
-- 狀態：**T03 人工編輯與候選／固定正式修訂底層已實作並驗證；來源、Agent Turn 共同完成與候選 UI 仍待後續任務**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
+- 狀態：**T03 已驗；T07 已接來源保存、完整按需讀取與 profile／建立任務的候選工具，尚非全部八入口。T08 共同完成已有真 PG＋合成模型接線，候選 UI／真模型品質仍待驗**。2026-09-30。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。歷次切片中的「尚未」是當時狀態，最新增量見 §3.3。
 - 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
@@ -318,6 +318,31 @@ flowchart TD
 `read_ref` 是 App 將既有物件類型與 UUID 組成的一個定位字串；不建立第二套短 ID、registry 或名稱映射。精確下鑽的 [resolver](../../apps/api/src/caliburn/features/job_description/navigation.py) 只在 App 已限定的可見修訂中解析，不解碼後跨檔案找資料，也不以標題回退查詢。同身分改名仍定位同物件；刪除後同名新建，不承接舊物件的定位。它不是版本參數、讀過全文的證明或寫入授權，後續 handler 仍須遵守原工具與候選資格契約。
 
 這裡共用既有資料與固定修訂讀取，不新增 map 保存、索引資料庫或消息投影流程。導覽／完整正文／來源按需下鑽的正式入口、來源保存及核對仍由 T07 接續交付；map 不預載到每輪 context。本切片的真 PG 反例包含候選可見而正式稿未變、刪職責保留未歸屬任務、跨檔案定位拒絕及終態 execution 不再取得候選導覽基底。
+
+### 3.3 直接來源、按需讀取與候選模型寫入（T07 增量）
+
+來源由同一 JD feature 的 [sources](../../apps/api/src/caliburn/features/job_description/sources.py)、[source service](../../apps/api/src/caliburn/features/job_description/source_service.py)及 [source persistence](../../apps/api/src/caliburn/features/job_description/source_persistence.py)負責。沒有新建 receipt／引用平台。`0017` 讓每份固定 JD 修訂保存其直接引用及已核對內容基底，與既有 revision／operation 一起提交；禁止封存後改写或追加。來源內容仍留在原 owner。
+
+- 直接目標為 profile 欄、項目、任務明細或任務－能力關係；不繼承父項來源。每筆引用保留 `citation_id`、固定來源和當時核對的 JD 內容；人工／AI 改文繼承這個基底，不能自動宣稱已核對。只有明確確認才對齊目前內容與 A 固定 Memory 中的同身分新修訂。
+- 原始訪談用不可變 `source_id`；Memory 用已發布快照與確切物件修訂，不以標題存引用。模型只選正式序號、`current_input` 或 `target_title`，由 [source resolver](../../apps/api/src/caliburn/workflows/jd_sources.py)在 A 固定範圍內解析。當次輸入暫無正式序號，仍可作本輪候選依據；成功時原身分取得正式資格，取消不留下正式 JD 引用。
+- 新 JD 修訂沿 [source inheritance](../../apps/api/src/caliburn/features/job_description/source_inheritance.py)保留仍存在目標的原引用；刪目標只從新修訂移除其引用，歷史不變。排序／移動不等於文字改寫。共用能力正文變化會使其任務使用關係的內容基底不再相符。
+- [read_jd](../../apps/api/src/caliburn/transport/model_tools/jd_reads.py)沿固定候選位置完成十一種 view：map 精簡 JSON、full 成品 Markdown、局部／區域完整 JSON。正式／候選不混版，來源改名列歷史名稱，移除不改指同名新物件；只在必要時回 `needs_recheck`。大結果明確拒絕，不偷偷截斷。
+- [profile write](../../apps/api/src/caliburn/workflows/jd_profile_writes.py)與 [task write](../../apps/api/src/caliburn/workflows/jd_task_writes.py)先解析固定意圖，再在一個短交易內共同修改候選內容與各直接來源。子操作沿既有 JD operation 的穩定衍生身分重入；後段失敗全退，不另建整包回執。`created`／`updated` 只是候選效果。
+- Graph 保存 prepared command 使用 [JSON checkpoint adapter](../../apps/api/src/caliburn/transport/model_tools/jd_write_checkpoint.py)：Pydantic TypeAdapter 序列化／嚴格還原具型別意圖，官方 saver 只保存 JSON 值，不靠允許任意 Python constructor／pickle 恢復工具命令。完整 tool request 與配對仍由共用執行機制管理。
+
+來源與修訂的最小關係如下；完整欄位仍以 migration 為準，不手抄第二份 schema：
+
+```mermaid
+flowchart LR
+  JD[固定 JD 修訂] --> Ref[直接引用與已核對內容基底]
+  Ref --> Interview[不可變訪談來源]
+  Ref --> Memory[固定 Memory 快照與物件修訂]
+  Candidate[A 本輪候選] --> JD
+  Complete[完整答覆與正式訪談共同提交] --> Official[正式 JD 頭]
+  Candidate --> Complete
+```
+
+**尚未因此完成：**其餘模型寫入入口、兩類 diff、候選預覽 UI、provider strict／自然內容品質及完整故障矩陣。A 共同完成由 [consultant completion](../../apps/api/src/caliburn/workflows/consultant_completion.py)協調，不讓工具提交整輪；背景意圖未接入前不註冊通知工具。測試與審核見 [T07 證據 §3](../plans/2026-09-29-target-rebuild/evidence/t07-jd-tools.md#3-第二切片來源按需讀取與有據候選寫入2026-09-30)。
 
 ## 4. 初始化、演進與保證界線
 

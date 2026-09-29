@@ -21,6 +21,7 @@ from caliburn.features.job_description import (
     condition_service,
     revision_editing,
     service,
+    source_service,
     task_service,
 )
 from caliburn.features.job_description.areas import EditJdAreas
@@ -34,6 +35,7 @@ from caliburn.features.job_description.capabilities import EditJdCapabilities
 from caliburn.features.job_description.collaborators import EditJdCollaborators
 from caliburn.features.job_description.conditions import EditJdConditions
 from caliburn.features.job_description.models import ReviseJdProfile
+from caliburn.features.job_description.sources import ReviseJdSources
 from caliburn.features.job_description.tasks import EditJdTasks
 from caliburn.features.job_files import service as job_files
 
@@ -44,6 +46,7 @@ type JdCandidateEdit = (
     | EditJdCapabilities
     | EditJdCollaborators
     | EditJdConditions
+    | ReviseJdSources
 )
 
 
@@ -87,7 +90,7 @@ class JdCandidateWorkflow:
             await revision_editing.require_open_candidate(
                 session, writer.scope.job_file_id, candidate
             )
-            result_revision = await _apply_edit(
+            result_revision = await apply_candidate_edit(
                 session, writer.scope.job_file_id, candidate, command
             )
             position = await candidate_service.read_position(
@@ -130,10 +133,19 @@ def _require_position_owner(writer: ExecutionWriter, position: JdCandidatePositi
         raise CandidateStateError("Candidate belongs to a different Turn")
 
 
-async def _apply_edit(
+async def apply_candidate_edit(
     session: AsyncSession, job_file_id: UUID, candidate: JdCandidateScope, command: JdCandidateEdit
 ) -> UUID:
-    """Reuse typed field rules and the same original-operation owner, not a second editor."""
+    """Reuse typed field rules after caller acquires the file/writer/candidate guards."""
+    if isinstance(command, ReviseJdSources):
+        original = await source_service.recover_source_result(
+            session, job_file_id, command, candidate=candidate
+        )
+        if original is not None:
+            return original
+        return await source_service.revise_sources(
+            session, job_file_id, command, candidate=candidate
+        )
     if isinstance(command, ReviseJdProfile):
         profile = await service.recover_profile_result(
             session, job_file_id, command, candidate=candidate

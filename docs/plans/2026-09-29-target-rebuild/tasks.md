@@ -28,7 +28,7 @@
 ## T03 關聯式 JD 與人工編輯垂直切片
 
 - [ ] T03；依賴：T02。
-- **進度（2026-09-29）：**第一切片完成 profile 正式保存／人工 API、固定修訂及原結果；196 項後端測試（144 項真 PG）、靜態與生成比對通過。UI、集合與候選仍未完成，詳見[施工證據](evidence/t03-relational-jd.md)；不先勾選 T03。
+- **進度（2026-09-29）：**profile 正式保存／人工 API、固定修訂及原結果 `52b55951`；第二切片接上基本資料人工 UI。196 項後端測試（144 項真 PG）、24 項前端、8 項真 PG 瀏覽器旅程通過；集合、候選及其 UI 仍未完成，詳見[施工證據](evidence/t03-relational-jd.md)；不先勾選 T03。
 - **契約：**[JD 欄位指南](../../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具能力覆蓋 §2.1](../../specs/2026-09-29-jd-model-tool-contract-review.md#21-欄位與操作覆蓋)、[資料接線](../../implementation/data-and-contracts.md)。
 - **程式／交付：**`features/job_description`、HTTP DTO／mapper、`jd-editor`；profile、職責／未歸屬任務、成果／要求、共用 K／S 與關係、協作／共通條件；候選及固定正式修訂機制。
 - **Red：**刪職責誤刪任務、成果與要求錯配、已用 K／S 被刪、跨任務明細操作、後段 change 失敗留下前半修改、活躍 A 時人工寫入。

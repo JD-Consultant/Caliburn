@@ -224,8 +224,32 @@ $env:PYTHONUTF8='1'
 
 本輪未讀 `.env`、未呼叫真 provider，沒有外送私人訪談。compact 輸出品質／真實價格、輪前128K／B起始準備、完整 pause／取消回退及 retry supervisor 尚未驗收；不能以此切片宣告 T06 或產品完成。
 
-## 11. 下一個可執行切片
+## 11. 第十一切片：完整 Step 暫停與原生續作
 
-接輪前準備與角色控制、真實費率配置及單一有界 retry supervisor。共同 loop 已有完整 request、sync／局部步數、原 R／C 保存恢復、外送准入、保存後結算、計數與中途完整 C 採用；未配置 compact 接縫仍明確停止。輪前128K／Agent意圖、B起始準備、pause優先及取消相容基底須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復；count 雙保存失敗的原件可取回性亦須承接。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
+承接 `4266ee0d`。主代理重讀本題產品控制契約、程式分層／撰寫規範與 LangGraph 原生 interrupt 文件，沿現有 StateGraph 接控制節點，不新增另一套停止／恢復引擎。子代理只修改既有 executions owner、單一 migration 與專項 PG 測試；主代理負責共用 Graph、薄 workflow 接線、程序恢復及文件。具體機制、尚未接上的競爭交界集中 [工程 §4.7](../../../implementation/agent-execution.md#47-已落地的完整-step-暫停與原生續作t06-第十一切片)，不是第二份產品狀態機。
+
+- 原生 pause API 起初因新符號不存在而 collection error，只是施工起點；補齊介面但未接行為時，取得 **4 個行為 Red**：final／非 final 越過暫停、錯誤續作身分未拒絕、停妥確認故障未傳回。接線後保留原斷言通過。
+- 完整 Step 才停；兩個工具中第二個結果未明時仍未停妥，恢復沿原 command 完成後才 interrupt，第一工具／模型均不重跑。interrupt 自身保存失敗不能確認暫停；停妥 callback 確認遺失可重入，不重做模型。這些是原生 saver 的故障測試，不是 mock success。
+- `test_response_loop_controls.py` 用真 PG saver 與 execution owner：模型在途另一短交易受理要求，status 仍 ACTIVE；完整 Step 後才 PAUSED。重新建立 saver 普通重開零生成；明確原 interrupt 續作保留歷史／限制。取消或更換 writer 後，舊 runner 不得重開或回報有效 PAUSED。Graph 完成仍為 ACTIVE，未冒稱產品已提交。
+- 新 `response_pause_worker.py` 用真 PG 與兩個獨立 Python 程序：write 生成 1 次後停在完整 final；resume 程序普通重開仍 paused，明確續作才返回原 final，count／模型／工具均 0。fixture 只清理自己的隨機 schema，保留共享資料庫。
+- 工作模型、工具與暫停聯合專項 **21 passed in 15.66s**。薄 binding 新模組首次 import 缺失記為 API 施工起點，不冒充行為 Red；真 PG 接線後 **3 passed in 2.59s**。測例編輯過程誤置原 assertion 時先修回原案例，沒有更動預期。Ruff check／format **206 files**、mypy **149 source files** 通過；全後端回歸與獨立審查另於下方記錄。
+
+子代理回報 execution 專項 **22 passed**，並以原 SQL 越過 PAUSED 完成及 8 個 pending／清旗標反例作 Red；主代理檢視變更並重新跑完整後端：`pytest -q -p no:cacheprovider --tb=short`，明確 loopback test DB，**971 passed in 238.04s**。此為主線自身的整合證據，不混用子代理較早的全套數字。包含 in-flight JD 候選可以繼續、但 pending pause 使正式採用與完成同交易回滾，以及暫停／完成兩連線競爭只有一個勝出。
+
+獨立唯讀 reviewer 初次檢查與相關 **101 項**測試／靜態檢查通過，另實跑出控制交界反例。主代理判斷其中「已保存 continue，故障後新受理 pause 卻跳過重核」應在本切片補強，沒有僅因 T08 未開始就略過。新測例先 **2 failed**：非 final 多執行一個 Step，final 原樣返回未停妥；核官方 node successor 更新契約後，於當前完整 Step 的恢復入口重新安排純控制節點，**16 passed**（pause＋loop）。不回放舊 checkpoint、不重做模型或工具、不增加另一份游標。上面的 971 是此修正前全套，不冒充修正後新全套。
+
+Reviewer 另用真 PG 領域＋記憶體 saver 模擬「領域 resume 已提交、尚未送 Command」後普通重開，觀察 PAUSED／已清意圖；這是兩段呼叫間的模擬，**不是 kill 程序測試**。仍由 T08 supervisor 的持久控制接線處理，與外送准入／正式提交競爭一併明列工程 §4.7；不能讓後續實作者誤認普通 None 已具備完整 resume 調度。
+
+首次控制重核修正後，同一受影響集合 **576 passed in 39.74s**。後續 reviewer 找到 P1：`finish_step` 完整 checkpoint 寫入前失敗、但 pending writes 已存時，`get_state` 已顯示完成結果；此時用控制更新覆蓋，會遺失 Step 完成步數與部分接續內容。主代理加入 final／非 final 反例先 **2 failed**，沿公開 `StateSnapshot.tasks` 排除尚待保存的 `finish_step`，交由框架原生恢復。另將控制 checkpoint 故障擴為保存前／後兩種，保留原重核要求；pause＋loop **20 passed in 1.31s**。
+
+最終依風險重跑 unit／contracts、Graph PG、execution 控制／准入、pause 薄接線、原 Step／資格及 migration，**580 passed in 39.65s**；Ruff check／format **206 files**、mypy **149 source files** 通過。獨立 reviewer 另重跑上述 **6 案，6 passed in 0.84s**，確認 P1 關閉、未重做模型／計數。這 6 案是記憶體 saver 故障測試，不冒稱真 PG kill；跨程序 PG 證據仍以前述專項為準。沒有因修正只重跑新增測例，也沒有把早期 971 全套數字當成最終修正版全套。
+
+三張工程 Mermaid 圖已用既有 renderer 渲染，主代理實際檢視更新的 Step loop 圖；先處理 pause、再 final／下一請求的方向與中途 compact 路徑可讀。首次 sandbox `spawn EPERM` 後使用獲准 headless renderer，不把失敗當通過。文件 **20 份／334 links** 零錯、diff check 通過。流程圖表示已接好的元件流程，不代表完整 UI／調度已驗收。
+
+本次未讀 `.env`、無真 provider 呼叫；沿用已有直連預檢前置缺口，不用第三方 key 替代。T06 仍在施工，pause 元件不等於完整 UI／supervisor、Turn 取消回退或背景角色控制已交付。
+
+## 12. 下一個可執行切片
+
+接輪前準備與角色控制、真實費率配置及單一有界 retry supervisor。共同 loop 已有完整 request、sync／局部步數、原 R／C 保存恢復、外送准入、保存後結算、計數、中途完整 C 採用及完整 Step pause；未配置 compact 接縫仍明確停止。輪前128K／Agent意圖、B起始準備、取消相容基底，以及 §11／工程 §4.7 的控制要求競爭與持久續作調度須在同一上位契約內接好。已有 attempt 必須先核對，不因明確停止省略產品要求的有界恢復；count 雙保存失敗的原件可取回性亦須承接。沿既有 execution／候選 owner，不增加模型全文 DB 或第二套業務回執；目前只有 Memory prepared 路徑證據，未驗 JD／角色完整整合。
 
 一般恢復不用歷史 checkpoint_id；明確 replay 與 App 回退另走既定資格。SDK／Graph 不自行套多層 retry。完整原 R 還在時須保存／承接原結果，不能只靠重新 invoke 重呼付費模型。T06 預檢已有 §6 manifest／腳本，因欠直連 key 尚未外送，不假稱 provider 通過。

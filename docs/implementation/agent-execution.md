@@ -1,6 +1,6 @@
 # Agent 原生接續與可恢復接線
 
-- 狀態：**T06 施工中；原生回應、有序工具及有界多 Step 接續已有恢復元件證據，完整 Runtime 仍未交付**。實測與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
+- 狀態：**T06 施工中；原生回應、有序工具、有界多 Step、完整 C 及 Step 暫停已有恢復元件證據，完整 Runtime 仍未交付**。實測與限制見 [T06 evidence](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md)。產品生命週期以[共用執行設計](../specs/2026-09-27-shared-agent-execution-and-state-design.md)為準，這裡不另造安全點。
 - T06–T12 先以假 provider＋真 saver／PG 驗證；T06 可依[本 Goal 授權及分批上限](../plans/2026-09-29-target-rebuild/README.md#3-狀態與施工順序)提前做少量協定預檢，T16 才做完整有界模型驗收。LLM 推理內容不可解讀作驗收。
 
 ## 1. 執行圖與業務資格分開
@@ -161,7 +161,10 @@ flowchart TD
   G -->|超容量或同一 C 仍超門檻| E["保留可靠位置；停止並交回原因"]
   R --> T["依原順序保存各工具結果"]
   T --> S["finish_step：完整窗口＋完成步數"]
-  S --> F{"無待處理 call 且有正式答覆？"}
+  S --> CT{"有控制綁定且已受理暫停？"}
+  CT -->|是| PA["純控制節點 interrupt → 保存停妥 → 回報暫停"]
+  PA -->|明確續作原 interrupt| CT
+  CT -->|否| F{"無待處理 call 且有正式答覆？"}
   F -->|是| D["交回結果；不是產品提交"]
   F -->|否| N{"資格仍有效且未達模型步數上限？"}
   N -->|否| E
@@ -176,7 +179,31 @@ flowchart TD
 - 初始 input checkpoint 可能尚未展開成 State（`values` 空、`next=__start__`）；由原生 Graph 恢復原輸入，於 request node 外送前核對原限制。不因尚未展開便拒絕正常恢復，也不讓恢復參數改寫初始限制。
 - 已完成 loop 再 resume 不新增模型／工具／items。恢復不指定舊 checkpoint ID；工具失敗只承接當前 prepared command。全部共用單步原 R 保存、結算與業務冪等責任，沒有新增保存系統。
 
-真 PG 兩程序已驗：第一程序完成一個工具 Step、保存第二個 R 後中斷，第二程序從結算接到 final，模型與先前工具均不重跑。原生歷史、固定 request 及恢復故障的具體證據見 [T06 §8](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#8-第八切片有界多-step-接續)。圖已補第十切片的顯式 compact；仍是非串流共用元件，使用者 pause、輪前準備、角色／正式提交及自動重試 supervisor 未整合，不能拿圖中返回當成完整 A Turn／Memory batch 完成。
+真 PG 兩程序已驗：第一程序完成一個工具 Step、保存第二個 R 後中斷，第二程序從結算接到 final，模型與先前工具均不重跑。原生歷史、固定 request 及恢復故障的具體證據見 [T06 §8](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#8-第八切片有界多-step-接續)。圖含第十切片顯式 compact 及 §4.7 暫停；仍是非串流共用元件，輪前準備、UI 控制／角色正式提交及自動重試 supervisor 未整合，不能拿圖中返回當成完整 A Turn／Memory batch 完成。
+
+### 4.7 已落地的完整 Step 暫停與原生續作（T06 第十一切片）
+
+**分開控制意圖與已停妥的證據。**既有 `executions` owner 增加 `pause_requested`，不是新控制表或第二套 Graph 進度。`request_pause` 用職務檔案／execution／kind 範圍受理，不要求 UI 持有 worker 身分；受理後仍為 ACTIVE，當前模型與有序工具可以完成。只有原生 interrupt 已可靠保存，Graph 才經 `ConsultantExecutionControls.mark_paused()` 呼叫領域 `pause_execution` 記 PAUSED。Graph 不直接寫 SQL，領域也不解析 checkpoint。
+
+| 責任 | 已接線 | 不代表 |
+|---|---|---|
+| executions | 短交易受理暫停、writer fencing、停妥／續作、正式完成互斥 | UI 一按就已停止、可以用 checkpoint 猜正式效果 |
+| 共用 Response loop | 完整 Step 後 `check_control`，純 `pause_at_boundary` 原生 interrupt | 在工具結果不明時偽造 Step、在 interrupt 前重做模型／工具 |
+| workflow 薄接線 | 注入讀要求、有效 writer 檢查、停妥確認 | 新控制儲存、UI／完整 supervisor 已完成 |
+
+- `run_response_loop` 可注入 `ResponseLoopControls`；A 使用，B 不配置。設定是否存在隨初始 State 固定，恢復不能卸除控制來越過原暫停。`ConsultantExecutionControls` 拒絕 Memory kind；Memory 沒有使用者 pause／resume。
+- `check_control` 在 `finish_step` 之後且在 final 返回、下一次 count／compact／model 之前；控制讀取失敗保留節點供重入，不當成「沒有要求」。本輪多 call 全部配對後才可停，已保存 final 同樣先停在待交付位置，不另發模型。
+- `pause_at_boundary` 不執行业務副作用，重入必達同一個 `interrupt`；不能在恢復時根據最新要求跳過它。LangGraph 恢復會重跑節點開頭，故資格檢查可重入，但模型／工具不放在這裡。
+- 正常暫停回傳內部型別 `PausedResponseLoop`，含當前 `interrupt_id` 及原 State；不是執行失敗或給模型的新工具結果。UI 不直接取得整份 State／reasoning；未接 UI 投影。
+- 普通 `request=None` 重開已暫停圖，只核原停妥並回傳原暫停；不發 count／compact／model、不自動 final。明確續作需原 `interrupt_id`，轉為 `Command(resume={interrupt_id: True})`；不帶新 input／Held R、不換 maps／Memory 基準，錯誤或過時 ID 拒絕。產品 owner 須先按原資格核准續作；Graph 不自行清除領域意圖。
+- 普通恢復若仍在完整 Step 後、尚未建立下一 request（`prepare_next_request` 或待交付 final 的 END），不能把先前已保存的 `continue` 當成現在仍有執行許可。使用當前 checkpoint 的 `aupdate_state(..., as_node="finish_step")` 僅重新安排 `check_control`，不重跑 `finish_step`、不改原生 items／完成步數、不讀歷史 checkpoint。新受理暫停能停在原完整 Step；無暫停才沿原路繼續。這不代表下一 request 已進入計數／外送後也可任意退回此點。
+- 上述更新不能覆蓋尚待整合的 Step 結果：`get_state()` 可把 pending writes 投影成完成值，不等於整個 Step checkpoint 已寫成。若公開 `StateSnapshot.tasks` 仍含 `finish_step`，直接走原生 `None` 恢復，由框架保存該結果並接續 `check_control`，不先呼叫 `aupdate_state`。如此保留已成立的完成步數／原生 items；不讀 saver 私有表，也不另存 Step 副本。
+- interrupt 保存失敗不確認 PAUSED；保存成功但領域確認遺失，重開可重入確認同一 interrupt。取消／替換 writer 後，舊 callback 不得把 execution 改回 PAUSED 或採用既存 final。
+- 受理暫停與正式完成在同一 execution 行鎖競爭，只有一個勝出。service 拒絕 pending pause 的完成；migration `0014` 同時補 DB CHECK 與終局 trigger，不能在同一 UPDATE 清除意圖並偷提交。取消／最終失敗仍可終止並清除意圖；人工編輯仍受 ACTIVE／PAUSED 封鎖。這些都在原 owner，不增加全域 validator。
+
+**仍待完整控制調度接線：**這是 T06 可恢復節點與領域接縫，不是 T08/UI 已完成。已離開完整 Step 控制點、準備／計數或外送期間又收到要求，領域續作已提交但 `Command` 尚未完成，以及 final 已交出後與正式提交競爭，必須由 T08 原工作 supervisor 依持久意圖與原 interrupt／完成結果收斂。上述完整 Step 的普通恢復重核不能取代這些接線。不能把普通重開當新的續作授權，也不能把 pending pause 的正式提交拒絕當 Turn 最終失敗；外送／提交交界需驗明確先後，不能以兩次分離的 bool 查詢宣稱沒有競爭窗口。現有 `resume_execution` 是內部受控操作，不直接暴露成缺少原控制身分的 UI handler。該限制保留在原任務，不另造通用控制命令平台。
+
+依據：2026-09-30 查 [LangGraph interrupts](https://docs.langchain.com/oss/python/langgraph/interrupts) 的 durable pause、原 thread／interrupt ID 與節點重跑契約，以及[狀態更新的 node successor 語意](https://docs.langchain.com/oss/python/langgraph/use-time-travel#from-a-specific-node)；沿既有 PostgreSQL 行鎖／原子提交。框架提供機制，產品的完整 Step 與 final 優先順序是本案已確認語意。實測及未驗邊界見 [T06 §11](../plans/2026-09-29-target-rebuild/evidence/t06-agent-execution.md#11-第十一切片完整-step-暫停與原生續作)。
 
 ## 5. 容量、重試與恢復不是同一政策
 

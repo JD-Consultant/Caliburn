@@ -4,6 +4,7 @@ from datetime import datetime
 from uuid import UUID
 
 from sqlalchemy import (
+    Boolean,
     CheckConstraint,
     DateTime,
     ForeignKey,
@@ -34,6 +35,10 @@ class ExecutionRecord(Base):
             "kind = 'consultant_turn' OR status NOT IN ('paused', 'cancelled')",
             name="memory_control",
         ),
+        CheckConstraint(
+            "NOT pause_requested OR (kind = 'consultant_turn' AND status IN ('active', 'paused'))",
+            name="pause_request_control",
+        ),
         Index(
             "uq_executions_active_kind",
             "job_file_id",
@@ -48,6 +53,7 @@ class ExecutionRecord(Base):
     kind: Mapped[str] = mapped_column(Text)
     status: Mapped[str] = mapped_column(Text)
     writer_id: Mapped[UUID | None] = mapped_column()
+    pause_requested: Mapped[bool] = mapped_column(Boolean, server_default=text("false"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 

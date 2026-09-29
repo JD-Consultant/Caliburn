@@ -3,7 +3,7 @@
 from collections.abc import Awaitable, Callable, Mapping
 from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Literal, TypedDict
+from typing import Literal, TypedDict, cast
 from uuid import UUID, uuid4, uuid5
 
 from langchain_core.runnables import RunnableConfig
@@ -11,6 +11,7 @@ from langgraph.checkpoint.base import BaseCheckpointSaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.graph.state import CompiledStateGraph
 from langgraph.runtime import Runtime
+from langgraph.types import Command, Interrupt, interrupt
 from openai.types.responses import Response, ResponseFunctionToolCall
 from openai.types.responses.response_input_item_param import FunctionCallOutput
 
@@ -54,6 +55,8 @@ class ResponseStepState(TypedDict, total=False):
     counted_request_id: UUID | None
     compacted_request_id: UUID | None
     request_admission: Literal["request_model", "compact_window"]
+    pause_enabled: bool
+    control_action: Literal["pause", "continue"]
 
 
 @dataclass(frozen=True, slots=True)
@@ -113,6 +116,22 @@ class ModelStepLimitError(RuntimeError):
     """The last Step is saved, but this invocation may not request another response."""
 
 
+@dataclass(frozen=True, slots=True)
+class ResponseLoopControls:
+    """Product-owned pause request and acknowledgement; no model-visible controls."""
+
+    read_pause_requested: Callable[[], Awaitable[bool]]
+    mark_paused: Callable[[], Awaitable[None]]
+
+
+@dataclass(frozen=True, slots=True)
+class PausedResponseLoop:
+    """A durable native interrupt, not a final answer or a failed execution."""
+
+    interrupt_id: str
+    state: ResponseStepState = field(repr=False)
+
+
 async def run_response_loop(
     checkpointer: BaseCheckpointSaver[str],
     *,
@@ -122,11 +141,15 @@ async def run_response_loop(
     max_tool_calls: int,
     max_model_steps: int,
     recovery: HeldModelResponse | None = None,
-) -> ResponseStepState:
+    controls: ResponseLoopControls | None = None,
+    resume_interrupt_id: str | None = None,
+) -> ResponseStepState | PausedResponseLoop:
     """Continue complete native Steps to a final answer within a fixed saved limit.
 
     This does not commit the product Turn, retry failed I/O, or refresh context.
-    Resume the same loop with None and the original limits.
+    Recover with None and the original limits/bindings. A native pause is a typed
+    result, not failure; release it only with the current interrupt ID after the
+    product owner authorizes resume. Ordinary recovery cannot grant that authority.
     """
     if type(max_model_steps) is not int or max_model_steps < 1:
         raise ValueError("Configure a positive model Step bound")
@@ -138,6 +161,8 @@ async def run_response_loop(
         max_tool_calls=max_tool_calls,
         max_model_steps=max_model_steps,
         recovery=recovery,
+        controls=controls,
+        resume_interrupt_id=resume_interrupt_id,
     )
 
 
@@ -155,7 +180,7 @@ async def run_response_step(
     A Step uses one dedicated thread identity. A completed Step may be read/resumed but
     not restarted with new input. Use run_response_loop for multi-Step execution.
     """
-    return await _run_response_flow(
+    result = await _run_response_flow(
         checkpointer,
         thread_id=thread_id,
         request=request,
@@ -164,6 +189,9 @@ async def run_response_step(
         max_model_steps=None,
         recovery=recovery,
     )
+    if isinstance(result, PausedResponseLoop):
+        raise ValueError("Single-Step execution cannot own a pause interrupt")
+    return result
 
 
 async def _run_response_flow(
@@ -175,10 +203,16 @@ async def _run_response_flow(
     max_tool_calls: int,
     max_model_steps: int | None,
     recovery: HeldModelResponse | None,
-) -> ResponseStepState:
+    controls: ResponseLoopControls | None = None,
+    resume_interrupt_id: str | None = None,
+) -> ResponseStepState | PausedResponseLoop:
     if not thread_id:
         raise ValueError("A durable Step requires a nonempty thread identity")
     validate_capacity_limits(runtime.capacity_limits)
+    if resume_interrupt_id is not None and (
+        not resume_interrupt_id or request is not None or recovery is not None or controls is None
+    ):
+        raise ValueError("Explicit resume requires the original paused loop with no new input")
     if recovery is not None and (recovery.thread_id != thread_id or request is not None):
         raise ValueError("A held response can only resume its original Step with None")
     # The small holder belongs to this invocation, not to the role or the saver.
@@ -202,10 +236,11 @@ async def _run_response_flow(
         max_model_steps=max_model_steps,
         retain_response=retain,
         release_response=release,
+        controls=controls,
     )
     config: RunnableConfig = {
         "configurable": {"thread_id": thread_id},
-        "recursion_limit": (2 * max_tool_calls + 11) * (max_model_steps or 1),
+        "recursion_limit": (2 * max_tool_calls + 14) * (max_model_steps or 1),
     }
     try:
         saved = await graph.aget_state(config)
@@ -224,6 +259,21 @@ async def _run_response_flow(
         _require_execution_limits(saved.values, max_tool_calls, max_model_steps)
         if saved.values.get("capacity_limits") != runtime.capacity_limits:
             raise ValueError("Resume with the original capacity limits")
+        _require_control_configuration(saved.values, controls)
+    if saved.interrupts:
+        if controls is None or recovery is not None:
+            raise ValueError("A paused loop requires its original control binding")
+        # StateSnapshot erases the compiled graph's TypedDict in its public type.
+        paused = _paused_result(cast(ResponseStepState, saved.values), saved.interrupts)
+        if resume_interrupt_id is None:
+            # An ordinary reopen only reconciles the already durable pause. The
+            # product owner checks unfinished writer eligibility in mark_paused.
+            await controls.mark_paused()
+            return paused
+        if resume_interrupt_id != paused.interrupt_id:
+            raise ValueError("The resume identity does not match the current interrupt")
+    elif resume_interrupt_id is not None:
+        raise ValueError("There is no current pause interrupt to resume")
     if recovery is not None:
         if (
             saved.values.get("request_id") != recovery.request_id
@@ -286,7 +336,23 @@ async def _run_response_flow(
             # `saved` still describes the earlier boundary, not that successful write.
             await runtime.account_response(_received_response(recovery.update))
         raise
-    initial_state: ResponseStepState | None = None
+    if (
+        controls is not None
+        and request is None
+        and recovery is None
+        and resume_interrupt_id is None
+        and saved.values.get("completed_steps", 0) > 0
+        and saved.values.get("next_action") in ("continue", "deliver_answer")
+        and saved.next in (("prepare_next_request",), ())
+        and not any(task.name == "finish_step" for task in saved.tasks)
+    ):
+        # A saved continue decision is not authority across a recovery boundary.
+        # Re-enter only its pure control successor at the current checkpoint; no
+        # historical checkpoint, Step replay, input rewrite or model/tool effects.
+        # get_state can project pending finish_step writes over an older checkpoint;
+        # let native recovery consolidate those first, rather than overwriting them.
+        await graph.aupdate_state(config, {"control_action": "continue"}, as_node="finish_step")
+    initial_state: ResponseStepState | Command[str] | None = None
     if request is not None:
         initial_state = {
             "request_id": uuid4(),
@@ -295,7 +361,10 @@ async def _run_response_flow(
             "model_step_limit": max_model_steps,
             "tool_call_limit": max_tool_calls,
             "capacity_limits": deepcopy(runtime.capacity_limits),
+            "pause_enabled": controls is not None,
         }
+    elif resume_interrupt_id is not None:
+        initial_state = Command(resume={resume_interrupt_id: True})
     try:
         result = await graph.ainvoke(
             initial_state,
@@ -308,6 +377,14 @@ async def _run_response_flow(
         if held is not None:
             raise ResponseStepSaveError(held) from error
         raise
+    if result.interrupts:
+        if controls is None:
+            raise ValueError("Unexpected pause in an execution without controls")
+        paused = _paused_result(result.value, result.interrupts)
+        # Only acknowledge the product pause after the saver confirms the native
+        # interrupt. A lost acknowledgement is reconciled by the entry path above.
+        await controls.mark_paused()
+        return paused
     await runtime.ensure_active()
     return result.value
 
@@ -319,6 +396,7 @@ def _build_response_step(
     max_model_steps: int | None = None,
     retain_response: Callable[[ResponseStepState, ResponseStepState], None] | None = None,
     release_response: Callable[[], None] | None = None,
+    controls: ResponseLoopControls | None = None,
 ) -> CompiledStateGraph[
     ResponseStepState, ResponseStepRuntime, ResponseStepState, ResponseStepState
 ]:
@@ -330,6 +408,7 @@ def _build_response_step(
         state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
     ) -> ResponseStepState:
         _require_execution_limits(state, max_tool_calls, max_model_steps)
+        _require_control_configuration(state, controls)
         if state["capacity_limits"] != runtime.context.capacity_limits:
             raise ValueError("Resume with the original capacity limits")
         validate_capacity_limits(state["capacity_limits"])
@@ -537,6 +616,34 @@ def _build_response_step(
     def route_finished(state: ResponseStepState) -> Literal["prepare_next_request", "__end__"]:
         return "__end__" if state["next_action"] == "deliver_answer" else "prepare_next_request"
 
+    async def check_control(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
+        await runtime.context.ensure_active()
+        if controls is None:
+            raise ValueError("Control handling requires the original product binding")
+        requested = await controls.read_pause_requested()
+        if type(requested) is not bool:
+            raise ValueError("The product pause request must have a definite boolean value")
+        return {"control_action": "pause" if requested else "continue"}
+
+    def route_control(
+        state: ResponseStepState,
+    ) -> Literal["pause_at_boundary", "prepare_next_request", "__end__"]:
+        return "pause_at_boundary" if state["control_action"] == "pause" else route_finished(state)
+
+    async def pause_at_boundary(
+        state: ResponseStepState, runtime: Runtime[ResponseStepRuntime]
+    ) -> ResponseStepState:
+        await runtime.context.ensure_active()
+        # Always reach this same interrupt on re-entry. No model/tool effects in
+        # this node: native resume restarts the node, not its Python instruction.
+        resumed = interrupt({"kind": "step_pause", "completed_steps": state["completed_steps"]})
+        if resumed is not True:
+            raise ValueError("Only an explicit original-loop resume may release this pause")
+        await runtime.context.ensure_active()
+        return {}
+
     graph = StateGraph(ResponseStepState, context_schema=ResponseStepRuntime)
     graph.add_node("count_input", count_input)
     graph.add_node("check_capacity", check_capacity)
@@ -558,7 +665,14 @@ def _build_response_step(
         graph.add_edge("finish_step", END)
     else:
         graph.add_node("prepare_next_request", prepare_next_request)
-        graph.add_conditional_edges("finish_step", route_finished)
+        if controls is None:
+            graph.add_conditional_edges("finish_step", route_finished)
+        else:
+            graph.add_node("check_control", check_control)
+            graph.add_node("pause_at_boundary", pause_at_boundary)
+            graph.add_edge("finish_step", "check_control")
+            graph.add_conditional_edges("check_control", route_control)
+            graph.add_edge("pause_at_boundary", "check_control")
         graph.add_edge("prepare_next_request", "count_input")
     return graph.compile(checkpointer=checkpointer)
 
@@ -580,3 +694,24 @@ def _require_execution_limits(
         or state.get("tool_call_limit") != max_tool_calls
     ):
         raise ValueError("Resume with the original execution mode and limits")
+
+
+def _require_control_configuration(
+    state: Mapping[str, object], controls: ResponseLoopControls | None
+) -> None:
+    if state.get("pause_enabled", False) != (controls is not None):
+        raise ValueError("Resume with the original pause-control configuration")
+
+
+def _paused_result(
+    state: ResponseStepState, interrupts: tuple[Interrupt, ...]
+) -> PausedResponseLoop:
+    if (
+        len(interrupts) != 1
+        or not isinstance(interrupts[0].value, dict)
+        or interrupts[0].value.get("kind") != "step_pause"
+        or state.get("control_action") != "pause"
+        or state.get("completed_steps", 0) < 1
+    ):
+        raise ValueError("The saved interrupt is not a complete Step pause")
+    return PausedResponseLoop(interrupts[0].id, deepcopy(state))

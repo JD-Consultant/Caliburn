@@ -1,5 +1,9 @@
 # Caliburn Contract Strategy
 
+## 新目標的實作路由（2026-09-29；未實作）
+
+新 `apps/api`／`apps/web` 依[實作規劃](implementation/data-and-contracts.md#5-唯一契約來源及生成)使用 App 自有 `apps/api/contracts/` 作為 JSON Schema SSOT，產 Python／TypeScript；不接回退役 contract package，不手寫生成檔。模型 tools 與 HTTP 各有必要投影，不強制同 envelope。下方「現行」描述既有 production，不是新目標路徑限制；正式切換與 successor ADR 在計畫 T18 驗收時處理。新切片採測試先行、再生驗證與小型可審查交付，一項 task 可有多個完整小提交，不機械限制一 task 一 commit。
+
 ## 現行規則
 
 Current 產品（`experiments/jd-relational-app` 及其 `web`）的跨語言 contract 位於 App 自己的 `contracts/`。JSON Schema 是 SSOT，`scripts/generate_contract.py` 以鎖定的標準生成器產生 `src/jd_relational/generated` 下的 Python DTO 與 TypeScript 型別；API 與 Web 共用這批生成物。改 schema 必須先研究、更新 ADR／plan，再執行 codegen、schema diff 與兩端測試。舊 `packages/job-analysis-contract` 已退役，只留歷史 README，不得再作正式依賴。

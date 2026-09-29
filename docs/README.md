@@ -1,11 +1,12 @@
 # Caliburn 文檔索引
 
-本目錄是 repo 的文檔權威。現行產品是 [`experiments/jd-relational-app`](../experiments/jd-relational-app/README.md) 的本機 Web AI Job Analysis／JD App；[ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 已將它與 `web`、`packages/consultant-memory` 採用為唯一 production authority。舊 `apps/api`、`apps/web`、`packages/job-analysis-contract` 只留歷史文件，不再有 runtime 或 schema。repo 另保留與正式 App 完全隔離的 RAG bounded context（`pdf-to-json`／`ocs-indexer`／`embedder`／`ocs-contract`／`indexer-contract`），設計見 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
+本目錄是 repo 的文檔權威。現行產品是 [`experiments/jd-relational-app`](../experiments/jd-relational-app/README.md) 的本機 Web AI Job Analysis／JD App；[ADR0077](adr/0077-relational-jd-app-production-authority-and-pnpm-entrypoint.md) 已將它與 `web`、`packages/consultant-memory` 採用為唯一 production authority。原 `apps/api`、`apps/web`、`packages/job-analysis-contract` 的舊接線已退役；`apps/api`／`apps/web` 現供新目標重建，不代表正式入口已切換。repo 另保留與正式 App 完全隔離的 RAG bounded context（`pdf-to-json`／`ocs-indexer`／`embedder`／`ocs-contract`／`indexer-contract`），設計見 [`design/rag-pipeline.md`](design/rag-pipeline.md)。
 
 ## 先讀
 
+- **新目標 Goal／施工：**[成果、授權及完成條件](plans/2026-09-29-target-rebuild/README.md) → [SDD／TDD 與程式設計入口](implementation/README.md) → [18 項可驗證任務](plans/2026-09-29-target-rebuild/tasks.md)。已授權施工，實際進度依任務表；目標路徑不復活舊接線，現行入口不變。
 - **先理解產品價值：**[Caliburn 產品專題介紹](product-introduction.md)——面向讀者與報告聽眾，說明痛點、旅程、解法與驗證方向；不是另一份架構權威或現行功能完成清單。
-- **設計新架構先看 [目標導覽](target-architecture-map.md)**：由產品概念 → 系統責任 → 跨層生命週期 → Agent／Memory／JD 契約 → 資料交易／運作／驗收逐層深入。新目標採 LangGraph＋OpenAI direct Responses；未實作，不要求整合舊架構與舊資料。
+- **設計新架構先看 [目標導覽](target-architecture-map.md)**：由產品概念 → 系統責任 → 跨層生命週期 → Agent／Memory／JD 契約 → 資料交易／運作／驗收逐層深入。新目標採 LangGraph＋OpenAI direct Responses；施工中、尚未完成整體驗收，不要求整合舊架構與舊資料。
 - [現行產品筆記](product-notes.md) — 保留現行範圍與演進記錄；其中 OpenRouter／舊接線不是新目標選型。人與 LLM 共用 JD 業務、撤回 JD 不撤回訪談／Memory 的產品原則沿最新決策讀取。
 
 - [`../AGENTS.md`](../AGENTS.md) — agent 工作紀律與 current-only 邊界。

@@ -208,3 +208,7 @@ Owner 已裁決／仍屬候選／明確 OPEN：
 - [Google Software Engineering：Documentation](https://abseil.io/resources/swe-book/html/ch10.html) 與 [Diátaxis](https://diataxis.fr/)：文件要有受眾、維護責任與用途，不把解釋、參考、操作與證據混成一份。
 
 上述來源支持**分視角、用代表性情境揭露風險、記錄決策與取捨、維護可找得到的文件**。本文件的討論順序與分類欄位，是針對本產品討論需求作的明示取捨，不冒稱外部標準的逐字要求。
+
+## 10. 從架構交到實作（2026-09-29）
+
+已建立[SDD／TDD 開發規範](implementation/development-standard.md)與[實作文件入口](implementation/README.md)。架構仍擁有產品效果、權責與不變量；實作文件維護機制／程式邊界，任務只維護依賴／驗收／狀態。新增規則先找原 owner，不把相同工具 schema、資料欄位或生命週期抄成三份。完成文件審查後才進有授權的施工，並以原反例驗證，而非依計畫摘要自行猜需求。

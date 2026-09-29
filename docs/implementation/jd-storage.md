@@ -309,6 +309,16 @@ flowchart TD
 
 **已驗證的組合界線**：真 PG 測試把採用、正式訪談保存及 execution 完成放在同一交易；提交前故障全退，成功後重送取回原結果。沒有用這個底層測例代替 T08 真 Agent、T09 預覽畫面或 T12 強殺／未知 COMMIT 驗收。候選歷史目前不自動清理，亦不宣稱永久保留策略已完成。
 
+### 3.2 模型導覽與既有物件定位
+
+**T07 第一切片已實作 map 投影與局部讀取的定位基礎，尚未接成完整 `read_jd` 工具。**模型導覽的欄位仍依 [A context §3.2](../specs/2026-09-26-consultant-context-and-state-design.md#32-jd-導覽的按需定位目標已確認未實作)，wire 格式只在 [JD map schema](../../apps/api/contracts/tools/jd-map.schema.json)維護；Python／TypeScript DTO 由既有生成器產生，不另手寫一份。
+
+讀取沿 §3.1 已捕捉的候選位置，將同一修訂的 profile／work 交給 [map projector](../../apps/api/src/caliburn/transport/model_tools/jd_navigation.py)。它無 IO、不改資料、不讓 LLM 另寫摘要；保留全部項目、順序、職責內任務與未歸屬任務，以及成果／要求數量。只有契約明定的 preview 欄位取既有正文前綴，截短加省略號；目前初值為 120 個 Unicode code point，可由呼叫方配置，是工程初值而非已通過模型品質的最佳長度。K／S／協作不多附描述。尚未填妥的名稱保留 `null`，不造名稱、不隱藏合法但未完成的 JD 項目。
+
+`read_ref` 是 App 將既有物件類型與 UUID 組成的一個定位字串；不建立第二套短 ID、registry 或名稱映射。精確下鑽的 [resolver](../../apps/api/src/caliburn/features/job_description/navigation.py) 只在 App 已限定的可見修訂中解析，不解碼後跨檔案找資料，也不以標題回退查詢。同身分改名仍定位同物件；刪除後同名新建，不承接舊物件的定位。它不是版本參數、讀過全文的證明或寫入授權，後續 handler 仍須遵守原工具與候選資格契約。
+
+這裡共用既有資料與固定修訂讀取，不新增 map 保存、索引資料庫或消息投影流程。導覽／完整正文／來源按需下鑽的正式入口、來源保存及核對仍由 T07 接續交付；map 不預載到每輪 context。本切片的真 PG 反例包含候選可見而正式稿未變、刪職責保留未歸屬任務、跨檔案定位拒絕及終態 execution 不再取得候選導覽基底。
+
 ## 4. 初始化、演進與保證界線
 
 新建職務檔案、開場與空 JD 同一短交易；任一失敗不留下半套檔案。0005 為已存在的**新目標 0004** 檔案補一份空 JD，重跑 upgrade 不重建；沒有讀舊 production／搬舊資料。已知檔案卻缺少 JD head 是保存不一致，不在 GET 偷修成空白；缺 schema 的啟動仍 fail fast。
@@ -332,5 +342,6 @@ flowchart TD
 - [SQLAlchemy association object](https://docs.sqlalchemy.org/en/21/orm/basic_relationships.html#association-object)：關係有自身屬性時用明確關聯表示。本案任務與能力的關係帶排序、固定 JD 修訂，因此保留具名關係列；使用既有顯式 SQL，不另外混用可寫 secondary 關係或 ORM cascade 去管理同一組邊。知識／技能正文與反向用途不重複保存。
 - [datamodel-code-generator enum 命名](https://datamodel-code-generator.koxudaxi.dev/cli-reference/field-customization/#capitalize-enum-members)：生成 Python enum 成員用大寫常數，避免 `title` 與 `str.title` 方法衝突；JSON 的 `title` 等 wire 值不變。修生成器而非手改 DTO，原 schema／DTO round trip 及生成比對一起回歸。
 - [Pydantic serialization](https://docs.pydantic.dev/latest/concepts/serialization/)：預設 Python dump 可保留 Python 型別，`mode="json"` 轉為 JSON 相容值。跨生成契約組合時使用後者，避免相同 wire enum 值卻不同 Python class 的驗證失敗；不關閉 validator 或改生成檔。
+- 2026-09-30 核 [Azure CQRS](https://learn.microsoft.com/en-us/azure/architecture/patterns/cqrs)：查詢可返回 DTO／投影，基本形式可以共用同一資料庫，並不要求另一套儲存或 event sourcing。本案只借讀取投影與修改分責，JD map 直接用既有固定修訂；不是引入獨立 CQRS 平台，也不是主張所有查詢均需此模式。
 
 上述是官方機制；**固定修訂、職責內容／選用分離與重送順序是 Caliburn 的有界實現選擇**，不是聲稱所有大廠都用此 schema。沒有新增套件或框架，真 PG 證據見任務紀錄。

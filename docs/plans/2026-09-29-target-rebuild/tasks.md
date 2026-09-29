@@ -1,6 +1,6 @@
 # 可驗證任務與交付責任
 
-- 狀態：**T01–T05 已完成；T06 施工中；T07–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
+- 狀態：**T01–T05 已完成；T06–T07 施工中；T08–T18 未開始**。每項遵守[SDD／TDD](../../implementation/development-standard.md)。以下交付須依實際證據判定，不由規劃名稱推導已存在。
 - 勾選表示相應層級實際驗證通過，不是「寫了文件」。每項完成後補實際命令、結果、證據連結及有授權的 commit。
 - 每項「Red」為先寫的代表反例，非唯一測試；完整覆蓋見[驗證對照](../../implementation/verification-plan.md)。同一任務可拆多個小提交，但不脫離依賴與非目標。
 
@@ -93,6 +93,7 @@
 ## T07 A 的 JD／來源／差異按需工具
 
 - [ ] T07；依賴：T03、T04、T05。
+- **第一切片（2026-09-30）：**承接 `79b773ee`，接既有候選／固定修訂的精簡 JD map 與同範圍物件定位；不新增 map 儲存、名稱 ID 或 LLM 摘要。專項 **14 passed**，unit／contracts 與受影響候選真 PG **731 passed**；[證據與未完範圍](evidence/t07-jd-tools.md)。完整 read／編輯／來源及兩類 diff 尚未接好，不勾 T07、不當作 A 已可用。
 - **契約：**[JD 八入口與分支](../../specs/2026-09-29-jd-model-tool-contract-review.md)、[A 的 read／map](../../specs/2026-09-26-consultant-context-and-state-design.md)、共同工具規範。
 - **程式／交付：**`agents/job_consultant` 工具 schema／handler；JD service 的 source links、兩類 diff、精確來源確認；全稿 Markdown、map 精簡 JSON、局部讀取定位與下鑽。
 - **Red：**同名新建被當舊來源、人工改待核對 JD 後丟舊基準、只讀 diff 解除待核對、確認後再改文字仍視為已核對、current_input 取消仍被引用、全稿重貼全部關係鏈。

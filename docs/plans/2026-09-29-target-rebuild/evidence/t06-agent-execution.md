@@ -362,3 +362,7 @@ Ruff check／format **223 files**、mypy **154 source files** 通過。文件 **
 第十七切片已接公開費率估算與模型綁定，實際帳戶／invoice 尚未驗。後續依原 capacity 和 fee manifest 組裝行政預留，不把 create 輸出上限搬給 compact、不因 SDK usage 型別相同推定帳單已核實；T16 必須辨明這些界線。
 
 先按任務表的 T06 完成契約收斂剩餘缺口：共用機制在 T06，正式 A 控制／提交屬 T08，B 角色／批次屬 T10／T11，不能把所有角色交付無限併入本任務。T07 的 T03／T04／T05 前置條件已滿足，可繼續 JD／來源工具垂直切片；未驗 provider gate 必須保留，不阻止不依賴它的工作。
+
+2026-09-30 獨立只讀範圍審查進一步定位：`workflows/model_requests.py` 的 `_reserve_request` 對已存在但没有 failure 記錄的原 attempt 會明確停止；目前 reopen 整合測例只驗停止，未驗核對後的受控再准入。**最小共用缺口是區分原結果可承接、仍在途／不明、已確認本機原件不可恢復，並僅在最後一類及工作／額度仍有效時准許新 attempt。**不能直接刪舊 reservation、重置預算或將查不到視為未送出。觸發／接管／角色通知仍屬 T08／T11，不另建 retry framework；T12 驗 kill／競爭，T16 驗 provider。
+
+審查者另跑 13 個相關離線單元／契約檔 **210 passed in 2.81s**；沒有新 PG、provider 或程式修改，不與前述主代理數量相加。本輪轉進 T07 導覽以推進 M2，沒有把此缺口視為已修復或將 T06 勾選完成。

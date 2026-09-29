@@ -1,20 +1,23 @@
 # 職務檔案與訪談保存接線
 
-- 狀態：**T02 局部已實作／真 PostgreSQL 已驗**，2026-09-29。已有檔案／開場、輸入接受及持久執行准入；尚無 A 完成、Graph 控制／恢復或列表 UI。範圍與實測見[任務及證據](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md)。
+- 狀態：**T02 局部已實作／真 PostgreSQL 已驗**，2026-09-29。已有檔案／開場、輸入接受、持久執行准入、正式化交易參與介面及有界原話查詢；尚無完整 A 完成、Graph 控制／恢復或列表 UI。範圍與實測見[任務及證據](../plans/2026-09-29-target-rebuild/evidence/t02-job-files-and-interviews.md)。
 - 語意仍由[資料保存](../architecture/persistence.md)及[正式來源契約](../specs/2026-09-27-memory-read-and-source-navigation-contract.md)維護。本頁說明實際 schema／交易如何承接，不另定訪談資格。
 - 實作入口：[JobFileWorkflow](../../apps/api/src/caliburn/workflows/job_files.py)、[migration](../../apps/api/migrations/versions/0001_job_files_and_interviews.py)。
 
 ## 1. 原文、正式資格與執行身分分開，不複製原話
 
-圖只含目前已建立的五張業務表，不含尚未實作的 JD、Memory 或 Graph checkpoint。
+圖只含目前已建立的六張業務表，不含尚未實作的 JD、Memory 或 Graph checkpoint。
 
 ```mermaid
 erDiagram
+  direction LR
   job_files ||--o{ interview_texts : owns
   job_files ||--o{ executions : admits
   interview_texts ||--o| formal_interviews : qualifies
   interview_texts ||--o| interview_inputs : submitted_as
   executions ||--o| interview_inputs : accepts
+  interview_inputs ||--o| interview_replies : receives
+  interview_texts ||--o| interview_replies : records_reply
   job_files {
     uuid job_file_id PK
     uuid creation_command_id UK
@@ -48,6 +51,11 @@ erDiagram
     uuid source_id FK,UK
     uuid execution_id FK,UK
   }
+  interview_replies {
+    uuid job_file_id PK,FK
+    uuid execution_id PK,FK
+    uuid source_id FK,UK
+  }
 ```
 
 | 儲存 | 擁有的內容與身分 | 關係／約束 |
@@ -56,11 +64,12 @@ erDiagram
 | `interview_texts` | 不可變來源、所屬檔案、真實發話者、完整訪談原文 | 沒有正式序號；UPDATE／DELETE 拒絕 |
 | `formal_interviews` | 檔案內的正式順序及指向原文的來源身分 | 同檔案複合外鍵；來源最多取得一次正式資格；正整數、不可改寫 |
 | `interview_inputs` | 原提交命令、原文來源與 A 執行的固定關係 | 同檔案複合 FK；命令限檔案內唯一；不可改寫。只有員工提交有此關係，App 開場沒有 |
+| `interview_replies` | 已正式採用的完整答覆來源與原提交的固定關係 | 每次提交最多一份；同檔案複合 FK、不可改寫；原文仍只在 `interview_texts` 保存 |
 | `executions` | 工作種類、持久准入狀態與可被取代的 writer 身分 | 同檔案各一個活躍／暫停 A、各一個活躍 Memory；不保存模型窗口、圖節點或候選正文 |
 
 一份檔案可有多筆原文；原文可以尚無正式資格。正式歷史從 `formal_interviews` JOIN `interview_texts` 投影，不直接掃全部原文。複合 FK `(job_file_id, source_id)` 防止把甲檔案的原文編入乙檔案；`source_id` 與正式序號是不同身分。這是既定「原文保存不等於正式可用」的儲存分離，**不是新增一份可自行編輯的對話副本**。
 
-目前只有 App 開場會在建立時取得序號 1。已接受員工輸入會進原文與提交關係，但不進正式資格。成功時受控分配序號仍由 T02 後續／T08 完成；沒有對外開任意新增正式訊息的 API。停止執行資格不能自行完成整個 Turn 的候選／context 回退。
+App 開場會在建立時取得序號 1。已接受員工輸入會進原文與提交關係，但不進正式資格。§8 已有成功提交的序號分配介面，供 T08 完整 A 完成交易參與使用；目前無模型 runner 呼叫它，也沒有對外開任意新增正式訊息的 API。停止執行資格不能自行完成整個 Turn 的候選／context 回退。
 
 ## 2. 建立與重送
 
@@ -80,11 +89,12 @@ HTTP 驗證生成 DTO → `JobFileWorkflow.create` 開短交易 → `job_files.s
 |---|---|
 | `features/*/models.py` | 純值型別、輸入不變量及領域錯誤；不依賴 ORM／HTTP |
 | `job_files/service.py` | 建立與原命令輸入一致性；不 commit |
-| `interviews/service.py` | 保存 App 開場、接受員工原文及核對原提交；不 commit，不因接受輸入授予正式資格 |
+| `interviews/service.py` | 保存 App 開場、接受員工原文及核對原提交；完成時保存完整答覆／正式序號。全部不 commit，不因接受輸入授予正式資格 |
 | 各 feature `persistence.py` | 自己的表及參數化 SQL；不讀另一 feature 的私有 persistence |
 | 各 feature `queries.py` | 對外 typed 查詢投影；無寫入副作用 |
 | `workflows/job_files.py` | 跨領域短交易及每次獨立 session |
 | `workflows/interview_inputs.py` | 同次保存原輸入、原接受結果及 A 准入；不直接啟動模型 |
+| `workflows/interview_completion.py` | 核對 A／writer、鎖定檔案後參與正式化；由未來 T08 完成協調開交易並一併採用 JD／背景意圖，不自行完成整輪 |
 | `features/executions/service.py` | 同範圍准入、writer CAS／fencing、暫停與終態資格；不是 Graph 游標或程序存活偵測 |
 | `transport/http/job_files.py`、`interview_inputs.py` | 生成 DTO、HTTP 狀態及結果投影；不寫 SQL |
 | `bootstrap.py`／`adapters/database.py` | lifespan 組裝／關閉 engine、啟動檢查 migration head；不保存業務內容 |
@@ -135,3 +145,34 @@ Schema SSOT 在 [HTTP contracts](../../apps/api/contracts/http/)；Python／Type
 **仍待 T06／T08／T11／T12：**控制意圖、證明舊 runner 不再使用資格的 supervisor 接線、重啟領取政策、Graph 接續、候選回退、費用累計與真程序故障。不得只憑「有 writer_id」就宣稱故障恢復已完成；不能因請求超時便自行取代仍在執行的 writer。
 
 官方依據：[PostgreSQL 列鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)與[部分唯一索引](https://www.postgresql.org/docs/current/indexes-partial.html)提供短交易競爭與限定集合的唯一性；狀態、作用域及恢復授權是本案契約，並非 PostgreSQL 替 App 判斷。未新增 scheduler、broker、lease 平台或第二份 Graph State。
+
+## 8. 正式答覆與序號：參與完成交易，不自成完成 API
+
+`record_formal_interview(session, writer, reply_text=...)` 是 [A 完成交易的訪談參與介面](../../apps/api/src/caliburn/workflows/interview_completion.py)，不擁有 session／COMMIT，不呼叫模型，也不自行把 execution 標成 completed。調用者必須已辨認完整正式答覆，不把進度文字、工具請求或串流片段交入；T08 還必須在同一交易採用 JD、來源及背景要求，再裁決完成，不能把本介面另包成獨立正式化 endpoint。
+
+1. 核種類為 A，鎖職務檔案，查這次 execution 原已成立的正式交流。已完成重送承接原 pair；相同 execution 配不同答覆拒絕，不讀目前最後兩則冒充。
+2. 未完成原結果則鎖當前 writer，確認仍 active；paused、cancelled、failed、過期 writer、錯誤檔案及 Memory 不可授予正式訪談資格。
+3. 由提交關係取得原員工來源，完整文字不再複製。以該檔案現有正式最大序號加一，分配員工及完整答覆兩個序號；分配受同一檔案列鎖保護，不使用 `nextval` 或奇偶推斷說話者。
+4. 同交易保存答覆原文、兩則正式資格與答覆—原提交關係；後續任何完成效果失敗，這些寫入一起回滾。下一次合法提交不消耗被回滾的序號。
+
+新增的關係只保存來源 ID，不另存答覆正文或建立通用 receipt。原交流返回員工／顧問的固定來源與序號；背景 F 由其中 `employee_input.interview_sequence` 取得，**不是**顧問答覆或當下全檔最大序號。
+
+依據：[PostgreSQL sequence](https://www.postgresql.org/docs/current/functions-sequence.html)明示 `nextval` 不隨交易 abort 回收，不能提供無跳號序列；本案利用已需的檔案列鎖與短交易分配。這是正式序號的產品要求，不推廣成所有內部 ID 都要連號。
+
+**驗證範圍：**合成完成 harness 在同交易呼叫正式化及終態資格，已驗併發重送、取消競爭、後段失敗回滾與原結果回讀；尚未接 JD／背景發布意圖，不能稱完整 A final 原子提交已通過。
+
+## 9. 有界來源查詢與近期歷史投影
+
+[訪談 queries](../../apps/api/src/caliburn/features/interviews/queries.py)提供內部 typed 介面；不把 scope 放進模型可填參數，也不新增搜尋／第二套原話儲存：
+
+| 介面 | 已實作效果 |
+|---|---|
+| `read_execution_input` | App 私有地依檔案及 execution 讀原提交；不授正式資格，不註冊成 Agent 共用歷史工具 |
+| `read_history_frontier` | 取得有效正式歷史上界；A 的起點由上層固定，不能每個 Step 重取當作新範圍；B 的 F 不由此推算 |
+| `read_interview_messages` | 非空正整數集合；去重、正式序號升序，只回選中訊息，不補未選內容 |
+| `read_interview_range` | 閉區間內全部正式原文；任一缺失、非法或超出 App 固定上界就整筆拒絕，無部分成功 |
+| `read_recent_interviews` | `(K,H/F]` 完整原文，必要時補最近合法前問；`context_sequences` 明示只為語境補入的序號，不改涵蓋 |
+
+所有回傳保留固定 source ID、訪談序號、真實 speaker 及完整原文。`InterviewReadScope` 由 App 綁定，內含職務檔案與固定上界；這是值物件，不是權限憑證或新的保存 owner。即使後面又有正式訪談，原 scope 不會擴張。直接指定訊息／範圍不補前問；近期投影才按來源契約補一則，沒有歷史時不捏造。查詢不按字數截斷或把 role 轉成新發話。
+
+**仍待接線：**A／B 從固定 Memory 取得 K、持久綁定 H／F 與同輪恢復、模型可見 JSON／user 資料訊息、工具 schema／錯誤投影及容量策略，分屬 T07／T08／T10／T11／T16。這裡只完成它們共用的正式來源底層，不能以測試 scope 代替正式基準注入或 provider 驗收。

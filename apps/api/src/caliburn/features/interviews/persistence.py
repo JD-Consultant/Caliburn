@@ -8,6 +8,7 @@ from sqlalchemy import (
     ForeignKeyConstraint,
     Text,
     UniqueConstraint,
+    func,
     select,
 )
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -60,12 +61,109 @@ class InterviewInputRecord(Base):
         ),
         UniqueConstraint("source_id"),
         UniqueConstraint("execution_id"),
+        UniqueConstraint(
+            "job_file_id", "execution_id", name="uq_interview_inputs_job_file_id_execution_id"
+        ),
     )
 
     job_file_id: Mapped[UUID] = mapped_column(primary_key=True)
     command_id: Mapped[UUID] = mapped_column(primary_key=True)
     source_id: Mapped[UUID] = mapped_column()
     execution_id: Mapped[UUID] = mapped_column()
+
+
+class InterviewReplyRecord(Base):
+    __tablename__ = "interview_replies"
+    __table_args__ = (
+        ForeignKeyConstraint(
+            ["job_file_id", "execution_id"],
+            ["interview_inputs.job_file_id", "interview_inputs.execution_id"],
+        ),
+        ForeignKeyConstraint(
+            ["job_file_id", "source_id"],
+            ["interview_texts.job_file_id", "interview_texts.source_id"],
+        ),
+        UniqueConstraint("source_id"),
+    )
+
+    job_file_id: Mapped[UUID] = mapped_column(primary_key=True)
+    execution_id: Mapped[UUID] = mapped_column(primary_key=True)
+    source_id: Mapped[UUID] = mapped_column()
+
+
+async def read_execution_input(
+    session: AsyncSession, *, job_file_id: UUID, execution_id: UUID
+) -> InterviewTextRecord | None:
+    return (
+        await session.scalars(
+            select(InterviewTextRecord)
+            .join(InterviewInputRecord)
+            .where(
+                InterviewInputRecord.job_file_id == job_file_id,
+                InterviewInputRecord.execution_id == execution_id,
+            )
+        )
+    ).one_or_none()
+
+
+async def read_reply_source_id(
+    session: AsyncSession, *, job_file_id: UUID, execution_id: UUID
+) -> UUID | None:
+    return await session.scalar(
+        select(InterviewReplyRecord.source_id).where(
+            InterviewReplyRecord.job_file_id == job_file_id,
+            InterviewReplyRecord.execution_id == execution_id,
+        )
+    )
+
+
+async def read_formal_frontier(session: AsyncSession, job_file_id: UUID) -> int:
+    return (
+        await session.scalar(
+            select(func.max(FormalInterviewRecord.interview_sequence)).where(
+                FormalInterviewRecord.job_file_id == job_file_id
+            )
+        )
+    ) or 0
+
+
+async def insert_formal_exchange(
+    session: AsyncSession,
+    *,
+    job_file_id: UUID,
+    execution_id: UUID,
+    input_source_id: UUID,
+    reply_source_id: UUID,
+    reply_text: str,
+    input_sequence: int,
+) -> None:
+    session.add(
+        InterviewTextRecord(
+            source_id=reply_source_id,
+            job_file_id=job_file_id,
+            speaker=InterviewSpeaker.CONSULTANT.value,
+            interview_text=reply_text,
+        )
+    )
+    await session.flush()
+    session.add_all(
+        [
+            FormalInterviewRecord(
+                job_file_id=job_file_id,
+                interview_sequence=input_sequence,
+                source_id=input_source_id,
+            ),
+            FormalInterviewRecord(
+                job_file_id=job_file_id,
+                interview_sequence=input_sequence + 1,
+                source_id=reply_source_id,
+            ),
+            InterviewReplyRecord(
+                job_file_id=job_file_id, execution_id=execution_id, source_id=reply_source_id
+            ),
+        ]
+    )
+    await session.flush()
 
 
 async def read_input_submission(
@@ -134,14 +232,29 @@ async def insert_opening(
 
 
 async def list_formal_interviews(
-    session: AsyncSession, job_file_id: UUID
+    session: AsyncSession,
+    job_file_id: UUID,
+    *,
+    sequences: tuple[int, ...] | None = None,
+    start_sequence: int | None = None,
+    end_sequence: int | None = None,
+    source_ids: tuple[UUID, ...] | None = None,
 ) -> list[InterviewMessage]:
-    rows = await session.execute(
+    statement = (
         select(FormalInterviewRecord, InterviewTextRecord)
         .join(InterviewTextRecord)
         .where(FormalInterviewRecord.job_file_id == job_file_id)
         .order_by(FormalInterviewRecord.interview_sequence)
     )
+    if sequences is not None:
+        statement = statement.where(FormalInterviewRecord.interview_sequence.in_(sequences))
+    if start_sequence is not None:
+        statement = statement.where(FormalInterviewRecord.interview_sequence >= start_sequence)
+    if end_sequence is not None:
+        statement = statement.where(FormalInterviewRecord.interview_sequence <= end_sequence)
+    if source_ids is not None:
+        statement = statement.where(FormalInterviewRecord.source_id.in_(source_ids))
+    rows = await session.execute(statement)
     return [
         InterviewMessage(
             source_id=original.source_id,
@@ -151,3 +264,19 @@ async def list_formal_interviews(
         )
         for formal, original in rows
     ]
+
+
+async def read_preceding_guidance_sequence(
+    session: AsyncSession, *, job_file_id: UUID, before_sequence: int
+) -> int | None:
+    return await session.scalar(
+        select(FormalInterviewRecord.interview_sequence)
+        .join(InterviewTextRecord)
+        .where(
+            FormalInterviewRecord.job_file_id == job_file_id,
+            FormalInterviewRecord.interview_sequence < before_sequence,
+            InterviewTextRecord.speaker.in_((InterviewSpeaker.APP, InterviewSpeaker.CONSULTANT)),
+        )
+        .order_by(FormalInterviewRecord.interview_sequence.desc())
+        .limit(1)
+    )

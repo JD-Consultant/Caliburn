@@ -115,6 +115,54 @@ B1／B2 的本批私有歷史必須在按需回交時接續。T06 採用有明�
 
 完整 R 已存則恢復零額外模型呼叫。候選工具提交、checkpoint 尚缺結果則查回原操作；多次進入程式可接受，業務效果只一次。費用資格、次數與原工作相連，重啟／B 回交不歸零。
 
+### 5.1 已落地的工作額度保存（T06 第四切片）
+
+`features/executions/budgets.py` 沿既有 execution 身分與 writer fencing 維護額度，migration `0013_execution_budgets` 建立下圖兩表。**這是可組合的准入／記帳元件，尚未接成所有 HTTP 呼叫的共同 runner。**不含 R／C、prompt、Graph cursor、候選正文或秘密；沒有第二套 ResponseStore。
+
+```mermaid
+erDiagram
+    executions ||--o| execution_budgets : "固定工作限制"
+    execution_budgets ||--o{ execution_outbound_attempts : "每次外送先預留"
+    executions {
+        uuid execution_id PK
+        uuid job_file_id FK
+        string status
+        uuid writer_id
+    }
+    execution_budgets {
+        uuid execution_id PK,FK
+        int max_model_steps
+        int max_compactions
+        int max_outbound_attempts
+        int max_attempts_per_request
+        datetime deadline_at
+        decimal max_cost_usd
+        string cost_basis
+    }
+    execution_outbound_attempts {
+        uuid execution_id PK,FK
+        uuid attempt_id PK
+        uuid request_id
+        string kind
+        string fingerprint
+        uuid writer_id
+        decimal reserved_cost_usd
+        decimal reported_cost_usd "未知時 NULL"
+        datetime admitted_at
+    }
+```
+
+執行配置啟動時固定，由公開查詢恢復，不以啟動當下的新 deadline 覆蓋。`cost_basis` 是本工作經研究的計價依據定位，不允許未配置；目前測試使用合成數值，真實模型價格／預留計算仍須預檢。B1／B2 應使用同一 Memory batch scope，不各領一份可重置的預算。
+
+- 新模型 Step、compact、count 使用 App 產生的 logical request 身分與 exact payload SHA-256；傳輸重試保留同 request、另給 attempt。新模型修參數則是新 request。模型步數與壓縮數按不同 request 計，所有實際准入 attempt 均計入總次數與成本。
+- 新 attempt 在既有 execution 短行鎖下重查有效 writer、固定 deadline、各次數與成本，再預留；deadline 用取得鎖後的 DB 時間，不能用等待鎖前的時間判斷。交易內沒有網路等待。
+- **只有新准入且提交確認後才可外送一次。**同 attempt 重入回原紀錄、`created=False`，不是可重送的票。COMMIT 確認不明先查回，不能因看到原紀錄便再發送；確需重新推論時要新 attempt，仍占同一工作限額。HTTP 監督流程尚須接上此判斷。
+- 聚合 `reported_cost_usd ?? reserved_cost_usd` 作准入占用；timeout、崩潰或沒有 usage 均保留原預留，不歸零。已知 usage 依固定計價規則得出成本後只記一次；相同重入可承接、不同值拒絕。已知成本高於預留也如實記入，使後續准入受限，不以拒絕記帳隱藏超支。它不是 provider 帳單保證。
+- 取消／writer 更換只停止新的准入與採用，不刪已發生的記帳。晚到結果仍可結算原 attempt，但記帳函式不恢復執行、不採用 R／C、不准派工具。沒有新外送時，讀原结果不受已耗盡額度阻擋。
+- SQL 禁止改寫／刪除固定 budget，禁止清除／改寫 attempt 身分與已知成本；不存另一份可失同步的計數器。FK 及 scope 查詢維持檔案隔離，成本採固定精度 Decimal，不用 float。
+
+已驗兩連線競爭最後額度、未知預留、每 request 重試上限、count／compact 分計、取消後記帳、writer 更換及新程序不歸零、DDL／ORM 一致。完整 HTTP 准入→原結果保存→結算／採用、Retry-After、compact 真實費用預留尚待後續；不能把此元件通過當 E15 全通過。設計借鑑 [PostgreSQL 行鎖](https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-ROWS)及 [Azure 單一重試責任](https://learn.microsoft.com/en-us/azure/architecture/patterns/retry)，兩張表及原結果不等於重送許可是本案取捨。
+
 ## 6. Memory 背景工作
 
 A 完成交易持久化要求的 F（通知該 Turn 最後員工輸入的正式序號），調度器由待處理事實領取；同檔案只一批，後來要求合併待處理上界但不擴大在途 F。沒有 broker、沒有只存記憶體通知。

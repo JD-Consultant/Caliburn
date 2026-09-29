@@ -1,11 +1,11 @@
 # JD 保存接線
 
-- 狀態：**T03 第一切片已實作／後端已驗；T03 整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
+- 狀態：**T03 profile 後端及人工 UI 已實作／已驗；T03 整體未完成**。2026-09-29。本文只維護 JD 的實際保存、交易與讀寫接線，不重訂欄位語意或模型工具。
 - 上位契約：[JD 欄位指南](../specs/2026-09-09-jd-field-and-writing-guide.md)、[JD 工具覆蓋](../specs/2026-09-29-jd-model-tool-contract-review.md)、[資料接線 §4](data-and-contracts.md#4-jd關聯式候選來源與正式完成)。實測及下一步見 [T03 證據](../plans/2026-09-29-target-rebuild/evidence/t03-relational-jd.md)。
 
 ## 1. 本切片範圍與程式責任
 
-目前只有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。尚未提供 profile UI、職責／任務／K／S 等關聯式集合、Agent 候選、依據與核對；不能把本切片端點直接當作 A 的正式寫入捷徑。
+目前只有 profile 四個欄位的正式保存：`job_title`、`organization_unit`、`reports_to`、`purpose`。欄位意義沿指南；檔案名稱／員工姓名留在職務檔案，不複製進 JD。人工 UI 接線見[介面 §1.2](interface-and-delivery.md#12-t03-基本資料編輯的讀取基底與恢復)。尚未提供職責／任務／K／S 等關聯式集合、Agent 候選、依據與核對；不能把本切片端點直接當作 A 的正式寫入捷徑。
 
 | 責任 | 已實作位置 |
 |---|---|

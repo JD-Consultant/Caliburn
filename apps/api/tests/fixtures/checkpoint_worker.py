@@ -9,6 +9,7 @@ from uuid import UUID, uuid4
 
 from langgraph.checkpoint.postgres.aio import AsyncPostgresSaver
 from openai.types.responses import Response, ResponseFunctionToolCall
+from response_capacity import synthetic_capacity_limits, synthetic_response_runtime
 
 from caliburn.adapters.graph_checkpointer import create_graph_serializer
 from caliburn.adapters.openai_responses import ResponseRequest
@@ -18,7 +19,6 @@ from caliburn.adapters.response_serialization import (
 )
 from caliburn.agent_execution.tool_steps import (
     ReceivedModelResponse,
-    ResponseStepRuntime,
     _build_response_step,
 )
 
@@ -67,7 +67,7 @@ async def run(mode: str, thread_id: str) -> None:
     async def ensure_active() -> None:
         """Isolated saver probe; no product scope in this fixture."""
 
-    runtime = ResponseStepRuntime(
+    runtime = synthetic_response_runtime(
         request_model=request_model,
         prepare_tool=prepare_tool,
         execute_tool=execute_tool,
@@ -92,6 +92,7 @@ async def run(mode: str, thread_id: str) -> None:
                     "request_id": request_id,
                     "model_step_limit": None,
                     "tool_call_limit": 16,
+                    "capacity_limits": synthetic_capacity_limits(),
                 },
                 config,
                 context=runtime,

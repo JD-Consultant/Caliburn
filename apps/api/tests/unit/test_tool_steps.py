@@ -15,10 +15,10 @@ from caliburn.adapters.response_serialization import NativeItems, snapshot_respo
 from caliburn.agent_execution.response_steps import UnsupportedModelResponseError
 from caliburn.agent_execution.tool_steps import (
     ReceivedModelResponse,
-    ResponseStepRuntime,
     _build_response_step,
     run_response_step,
 )
+from tests.fixtures.response_capacity import synthetic_capacity_limits, synthetic_response_runtime
 
 
 async def ensure_active() -> None:
@@ -86,9 +86,10 @@ async def test_model_and_each_prepared_operation_are_saved_before_effects() -> N
             "request_id": uuid4(),
             "model_step_limit": None,
             "tool_call_limit": 16,
+            "capacity_limits": synthetic_capacity_limits(),
         },
         config,
-        context=ResponseStepRuntime(
+        context=synthetic_response_runtime(
             request_model=request,
             prepare_tool=prepare,
             execute_tool=execute,
@@ -143,7 +144,7 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
             assert prepared == prepared_second
         return "original result:" + prepared["call_id"]
 
-    runtime = ResponseStepRuntime(
+    runtime = synthetic_response_runtime(
         request_model=request,
         prepare_tool=prepare,
         execute_tool=execute,
@@ -157,6 +158,7 @@ async def test_saved_first_result_and_pending_second_do_not_recall_or_reprepare(
                 "request_id": uuid4(),
                 "model_step_limit": None,
                 "tool_call_limit": 16,
+                "capacity_limits": synthetic_capacity_limits(),
             },
             config,
             context=runtime,
@@ -196,9 +198,10 @@ async def test_read_or_rejection_is_saved_as_result_without_executing() -> None:
             "request_id": uuid4(),
             "model_step_limit": None,
             "tool_call_limit": 16,
+            "capacity_limits": synthetic_capacity_limits(),
         },
         {"configurable": {"thread_id": "read-only"}},
-        context=ResponseStepRuntime(
+        context=synthetic_response_runtime(
             request_model=request,
             prepare_tool=prepare,
             execute_tool=execute,
@@ -235,9 +238,10 @@ async def test_unsupported_response_is_preserved_before_routing_rejects_it() -> 
                 "request_id": uuid4(),
                 "model_step_limit": None,
                 "tool_call_limit": 16,
+                "capacity_limits": synthetic_capacity_limits(),
             },
             config,
-            context=ResponseStepRuntime(
+            context=synthetic_response_runtime(
                 request_model=request,
                 prepare_tool=prepare,
                 execute_tool=execute,
@@ -277,7 +281,7 @@ async def test_public_entry_rejects_restarted_input_and_resumes_same_operation()
         operations.append(prepared["operation_id"])
         return "done"
 
-    runtime = ResponseStepRuntime(
+    runtime = synthetic_response_runtime(
         request_model=request,
         prepare_tool=prepare,
         execute_tool=execute,
@@ -313,7 +317,7 @@ async def test_configured_tool_bound_rejects_before_any_effect() -> None:
             InMemorySaver(),
             thread_id="limited-step",
             request=make_request([]),
-            runtime=ResponseStepRuntime(
+            runtime=synthetic_response_runtime(
                 request_model=request,
                 prepare_tool=prepare,
                 execute_tool=execute,
